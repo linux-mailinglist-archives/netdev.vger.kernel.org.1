@@ -1,278 +1,236 @@
-Return-Path: <netdev+bounces-147630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A9DD9DAD5C
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 19:50:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F1649DAD60
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 19:51:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AFCC2818E0
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 18:50:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC95CB21809
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 18:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B378B14430E;
-	Wed, 27 Nov 2024 18:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853FD201113;
+	Wed, 27 Nov 2024 18:51:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="02qH0lI8"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="bxQdiNYV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-42ac.mail.infomaniak.ch (smtp-42ac.mail.infomaniak.ch [84.16.66.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C8D20309
-	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 18:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3022010F9
+	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 18:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732733421; cv=none; b=KM4xTz/Zs1Q2KkBLshdbMxOAhs1FLQdpV9ybbfnLxMTKHe6pd0Gf+eNTkXjQuXgy456/Hemkhjb4LxCwYFnuAfzNFl7VKLhF/CxlYLSMRbgM+kJKiZqXhNjuyk/GVSpxvujlSkSqC/H84kBYj7cV4Y4QoSjwoPI3uUU4Op8+QvM=
+	t=1732733483; cv=none; b=CCPq4MqG52nAT4gmtBFm0lqPDkihdodqIO5rJF0Dh/wBvM0RKO9xypu9b6HpDxcUfaYLcZHd67HCmXa5qcP117n71F6iyZXPYmkyrBscBlFeb3FIk3g/Wg6h1msQoIoNFr6YjB9ZVwYXWlI2hQ3MlVffGq0Zg97zXZwC8FvJKIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732733421; c=relaxed/simple;
-	bh=f29BfYHJPRGYxBtCZcsqHNouOxPw/Q6TEnGFYvrwoBA=;
+	s=arc-20240116; t=1732733483; c=relaxed/simple;
+	bh=fPfgZwnSLS2kQoF5+M1p4U2PsLLTNWNdyf0KSRk/2Xg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LrnW+PXYIVAk6UTR5bHrCKxv+JgPQf0y3/bWBXA6CEtPkEtqHUFqyniIlr8Ah7Q6MKUTsUN7qluWRHGOFJZOYeqTwsHpiE+VKLxwKP3GyeTBFPiIYUWxDQm9wvl7Dnthw+5Pn7OzpyK2SSZzVWcoVduk1RVSEGxiluSjTnbZgtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=02qH0lI8; arc=none smtp.client-ip=84.16.66.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Xz7d66fDdzR3L;
-	Wed, 27 Nov 2024 19:43:54 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1732733034;
-	bh=cIakuwuB5TwB5ymwL7HjeKJ6VkD/58mW709ZRR8/txo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=02qH0lI8zHRJy9L0fy6W6EAMWN/dNy/4RF9OSzJ9YAg1kSS8E5mzBXnEz6G8rEZKx
-	 MRRXzhimGVhrFeQERDivP98FSvoLPy5ezSmiXyJl29olEJgk8EOWc/W1+lce+lNAHU
-	 GTyawd5tE/GpyDtMhuyVreLEhrgm5XTKXWXpHqkc=
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4Xz7d62ftXzxmg;
-	Wed, 27 Nov 2024 19:43:54 +0100 (CET)
-Date: Wed, 27 Nov 2024 19:43:53 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, linux-security-module@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Subject: Re: [RFC PATCH v3 01/19] landlock: Support socket access-control
-Message-ID: <20241127.oophah4Ueboo@digikod.net>
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
- <20240904104824.1844082-2-ivanov.mikhail1@huawei-partners.com>
- <ea026af8-bc29-709c-7e04-e145d01fd825@huawei-partners.com>
- <Z0DDQKACIRRDRZRE@google.com>
- <36ac2fde-1344-9055-42e2-db849abf02e0@huawei-partners.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ksa8xVKzfduPGTwC792mZ0YzBonO89ktJezxEi9bwWzzqPw4/PRO4BSIbZff8LU894ZYlA0If5gy4uACb94YXtaZrDb/+5kM0bcJmej2YO7F0/dfC28qHjt9jO5KUv+jwiVgVJ7mzZLCk8oS5Voyifdp4qx1YPzTRyuBXiVI/1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=bxQdiNYV; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2142214abd2so238725ad.0
+        for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 10:51:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1732733480; x=1733338280; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VsL5lh4/mMVU/3l2rG4YRwXPxx1DY2vb0Xku31fNN8c=;
+        b=bxQdiNYVOCoV86TNypKTMtHh5xZE7IcTPty5DaA0c1XveT92yI3GTHGH0uhmQXaFaF
+         V12FF1UtlJIipXL0UOnxy7F4YlybM2J8itU8o7m0papgTBdjhXX0rkkbpl9tSDmfjUuK
+         YUhBGyEMfA0Jf/ge4NrQFR9xK+Ry31untqYKM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732733480; x=1733338280;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VsL5lh4/mMVU/3l2rG4YRwXPxx1DY2vb0Xku31fNN8c=;
+        b=cQ2YKZzlSlnLmzJzbTLyGhiCvKePT0Lwo/q3qIditTB8UDyN8fRqNaDjdVIs+pd5z0
+         yiMiVgchN/vEvqDg5V9ULjLkQApf4zkg7kKem7eTCJgQolqR46V630d00tNFN83Fcze3
+         4J6X761NZf2Ot4jD3aJ4SZXth8oz+KAgUSFZ+H5EXcwswE3Qr4fVNIGSM2e+RPTWyeTB
+         cSZuTyaYEKqvrhNgF7gCUYQjVTVX3J7211ovViePadJ5+IQywac1WpnWaDsUrzeVvb0n
+         /+AlGl/0YFSwSSHzAL/4h3x/MlUe+QG1bLiAo10Lr1MzuOqnN6BzZfeGxhEMo0vmrc5I
+         xiVQ==
+X-Gm-Message-State: AOJu0YxcuGhjwkuOC3eIkbyRkIQCC+QvyIA/w/xgRXsUf9fiH+oOM3Xl
+	15uZ4KgB8cvYxSeXoKuVr5oiMXhdwRVkVnzQqaVtz3SC0+beWnIwIg8THeUcwvs=
+X-Gm-Gg: ASbGncuSspa4GrNrScnSrafkVsw168Oh3557NzXYEeaHSLtAGyzGC5n1DnZKyvpgCca
+	+PFu6Ix+Qwa62fP6oxJSDXLVSneeweQdfTs6V4QTC5nIZciS/Fs+mR6GhzyC6cltICbq8jZfgl7
+	qryRXpfVAxm4iCWrE6ynCft+Q8Rlm4ooutobOEHp74EbNJTM4rsUjwlKSuAebl6PxaL3VO0rxEx
+	ByJUPD6H1vists7iSEulsezFOwRo90zf6TA4PNAmtSRZTZfBXu4i7Qo/qvLngv0ZjACbhA+g1tR
+	owVc49bKofSYJOJ8
+X-Google-Smtp-Source: AGHT+IFkJr9GlfDzMfKesKE8ace4E8O09xxP/zgehp8g1sOlhe/RbcBXYI45O4OUnl3dYJmueQxa4g==
+X-Received: by 2002:a17:902:d48c:b0:20c:5404:ed69 with SMTP id d9443c01a7336-21501a43fc5mr51658525ad.31.1732733479954;
+        Wed, 27 Nov 2024 10:51:19 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2150b4d9abasm15364505ad.35.2024.11.27.10.51.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Nov 2024 10:51:19 -0800 (PST)
+Date: Wed, 27 Nov 2024 10:51:16 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com,
+	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
+	edumazet@google.com, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Johannes Berg <johannes.berg@intel.com>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>, pcnet32@frontier.com
+Subject: Re: [net-next v6 5/9] net: napi: Add napi_config
+Message-ID: <Z0dqJNnlcIrvLuV6@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Guenter Roeck <linux@roeck-us.net>, netdev@vger.kernel.org,
+	mkarsten@uwaterloo.ca, skhawaja@google.com, sdf@fomichev.me,
+	bjorn@rivosinc.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
+	edumazet@google.com, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Johannes Berg <johannes.berg@intel.com>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>, pcnet32@frontier.com
+References: <20241011184527.16393-1-jdamato@fastly.com>
+ <20241011184527.16393-6-jdamato@fastly.com>
+ <85dd4590-ea6b-427d-876a-1d8559c7ad82@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <36ac2fde-1344-9055-42e2-db849abf02e0@huawei-partners.com>
-X-Infomaniak-Routing: alpha
+In-Reply-To: <85dd4590-ea6b-427d-876a-1d8559c7ad82@roeck-us.net>
 
-On Mon, Nov 25, 2024 at 02:04:09PM +0300, Mikhail Ivanov wrote:
-> On 11/22/2024 8:45 PM, Günther Noack wrote:
-> > Hello Mikhail,
-> > 
-> > sorry for the delayed response;
-> > I am very happy to see activity on this patch set! :)
+On Wed, Nov 27, 2024 at 09:43:54AM -0800, Guenter Roeck wrote:
+> Hi,
 > 
-> Hello Günther,
-> No problem, thanks a lot for your feedback!
+> On Fri, Oct 11, 2024 at 06:45:00PM +0000, Joe Damato wrote:
+> > Add a persistent NAPI config area for NAPI configuration to the core.
+> > Drivers opt-in to setting the persistent config for a NAPI by passing an
+> > index when calling netif_napi_add_config.
+> > 
+> > napi_config is allocated in alloc_netdev_mqs, freed in free_netdev
+> > (after the NAPIs are deleted).
+> > 
+> > Drivers which call netif_napi_add_config will have persistent per-NAPI
+> > settings: NAPI IDs, gro_flush_timeout, and defer_hard_irq settings.
+> > 
+> > Per-NAPI settings are saved in napi_disable and restored in napi_enable.
+> > 
+> > Co-developed-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> > Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 > 
-> > 
-> > On Mon, Nov 11, 2024 at 07:29:49PM +0300, Mikhail Ivanov wrote:
-> > > On 9/4/2024 1:48 PM, Mikhail Ivanov wrote:
-> > > > Landlock implements the `LANDLOCK_RULE_NET_PORT` rule type, which provides
-> > > > fine-grained control of actions for a specific protocol. Any action or
-> > > > protocol that is not supported by this rule can not be controlled. As a
-> > > > result, protocols for which fine-grained control is not supported can be
-> > > > used in a sandboxed system and lead to vulnerabilities or unexpected
-> > > > behavior.
-> > > > 
-> > > > Controlling the protocols used will allow to use only those that are
-> > > > necessary for the system and/or which have fine-grained Landlock control
-> > > > through others types of rules (e.g. TCP bind/connect control with
-> > > > `LANDLOCK_RULE_NET_PORT`, UNIX bind control with
-> > > > `LANDLOCK_RULE_PATH_BENEATH`). Consider following examples:
-> > > > 
-> > > > * Server may want to use only TCP sockets for which there is fine-grained
-> > > >     control of bind(2) and connect(2) actions [1].
-> > > > * System that does not need a network or that may want to disable network
-> > > >     for security reasons (e.g. [2]) can achieve this by restricting the use
-> > > >     of all possible protocols.
-> > > > 
-> > > > This patch implements such control by restricting socket creation in a
-> > > > sandboxed process.
-> > > > 
-> > > > Add `LANDLOCK_RULE_SOCKET` rule type that restricts actions on sockets.
-> > > > This rule uses values of address family and socket type (Cf. socket(2))
-> > > > to determine sockets that should be restricted. This is represented in a
-> > > > landlock_socket_attr struct:
-> > > > 
-> > > >     struct landlock_socket_attr {
-> > > >       __u64 allowed_access;
-> > > >       int family; /* same as domain in socket(2) */
-> > > >       int type; /* see socket(2) */
-> > > >     };
-> > > 
-> > > Hello! I'd like to consider another approach to define this structure
-> > > before sending the next version of this patchset.
-> > > 
-> > > Currently, it has following possible issues:
-> > > 
-> > > First of all, there is a lack of protocol granularity. It's impossible
-> > > to (for example) deny creation of ICMP and SCTP sockets and allow TCP
-> > > and UDP. Since the values of address family and socket type do not
-> > > completely define the protocol for the restriction, we may gain
-> > > incomplete control of the network actions. AFAICS, this is limited to
-> > > only a couple of IP protocol cases (e.g. it's impossible to deny SCTP
-> > > and SMC sockets to only allow TCP, deny ICMP and allow UDP).
-> > > 
-> > > But one of the main advantages of socket access rights is the ability to
-> > > allow only those protocols for which there is a fine-grained control
-> > > over their actions (TCP bind/connect). It can be inconvenient
-> > > (and unsafe) for SCTP to be unrestricted, while sandboxed process only
-> > > needs TCP sockets.
-> > 
-> > That is a good observation which I had missed.
-> > 
-> > I agree with your analysis, I also see the main use case of socket()
-> > restrictions in:
-> > 
-> >   (a) restricting socket creating altogether
-> >   (b) only permitting socket types for which there is fine grained control
-> > 
-> > and I also agree that it would be very surprising when the same socket types
-> > that provide fine grained control would also open the door for unrestricted
-> > access to SMC, SCTP or other protocols.  We should instead strive for a
-> > socket() access control with which these additional protocols weren't
-> > accessible.
-> > 
-> > 
-> > > Adding protocol (Cf. socket(2)) field was considered a bit during the
-> > > initial discussion:
-> > > https://lore.kernel.org/all/CABi2SkVWU=Wxb2y3fP702twyHBD3kVoySPGSz2X22VckvcHeXw@mail.gmail.com/
-> > 
-> > So adding "protocol" to the rule attributes would suffice to restrict the use of
-> > SMC and SCTP then?  (Sorry, I lost context on these protocols a bit in the
-> > meantime, I was so far under the impression that these were using different
-> > values for family and type than TCP and UDP do.)
-> 
-> Yeap. Following rule will be enough to allow TCP sockets only:
-> 
-> const struct landlock_socket_attr create_socket_attr = {
-> 	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
-> 	.family = AF_INET{,6},
-> 	.type = SOCK_STREAM,
-> 	.protocol = 0
-> };
+> This patch triggers a lock inversion message on pcnet Ethernet adapters.
 
-We should indeed include the protocol type in the rule definition.
+Thanks for the report. I am not familiar with the pcnet driver, but
+took some time now to read the report below and the driver code.
 
-> 
-> Btw, creation of SMC sockets via IP stack was added quite recently.
-> So far, creation has been possible only with AF_SMC family.
-> 
-> https://lore.kernel.org/all/1718301630-63692-1-git-send-email-alibuda@linux.alibaba.com/
-> 
-> > 
-> > 
-> > > Secondly, I'm not really sure if socket type granularity is required
-> > > for most of the protocols. It may be more convenient for the end user
-> > > to be able to completely restrict the address family without specifying
-> > > whether restriction is dedicated to stream or dgram sockets (e.g. for
-> > > BLUETOOTH, VSOCK sockets). However, this is not a big issue for the
-> > > current design, since address family can be restricted by specifying
-> > > type = SOCK_TYPE_MASK.
+I could definitely be reading the output incorrectly (if so please
+let me know), but it seems like the issue can be triggered in this
+case:
 
-It looks like SOCK_TYPE_MASK is not part of UAPI, which means it could
-change with kernel versions (even while being in UAPI in fact).  This
-new socket creation control should allow to deny any socket creation
-known or unknow at the time of the user space program build, and
-whatever the available C headers.
-
-This also means that Landlock should accept any domain, type, and
-protocols defined in rules.  Indeed, we don't want to reject rules for
-which some protocols are not allowed.
-
-What about using bitmasks for the domain and type fields (renamed to
-"domains" and "types")?  The last protocol is currently 45/MCTP so a
-64-bit field is enough, and 10/SOCK_PACKET also fits for the last socket
-type.
-
-We cannot do the same with the protocol because the higher one is
-262/MPTCP though.  But it looks like a value of 0 (default protocol)
-should be enough for most use cases, and users could specify a protocol
-(but this time as a number, not a bitmask).
-
-To sum up, we could have something like this:
-
-  const struct landlock_socket_attr create_socket_attr = {
-  	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
-  	.families = 1 << AF_INET | 1 << AF_INET6,
-  	.types = 1 << SOCK_STREAM,
-  	.protocol = IPPROTO_SCTP
-  };
+CPU 0:
+pcnet32_open
+   lock(lp->lock)
+     napi_enable
+       napi_hash_add
+         lock(napi_hash_lock)
+         unlock(napi_hash_lock)
+   unlock(lp->lock)
 
 
-> > 
-> > Whether the user is adding one rule to permit AF_INET+*, or whether the user is
-> > adding two rules to permit (1) AF_INET+SOCK_STREAM and (2) AF_INET+SOCK_DGRAM,
-> > that does not seem like a big deal to me as long as the list of such
-> > combinations is so low?
-> 
-> Agreed
+Meanwhile on CPU 1:
+  pcnet32_close
+    napi_disable
+      napi_hash_del
+        lock(napi_hash_lock)
+        unlock(napi_hash_lock)
+    lock(lp->lock)
+    [... other code ...]
+    unlock(lp->lock)
+    [... other code ...]
+    lock(lp->lock)
+    [... other code ...]
+    unlock(lp->lock)
 
-I also agree, but this might change if users have to set a combination
-of families, types, and protocols.  This should be OK with the bitmask
-approach though.
+In other words: while the close path is holding napi_hash_lock (and
+before it acquires lp->lock), the enable path takes lp->lock and
+then napi_hash_lock.
 
-> 
-> > 
-> > 
-> > > I suggest implementing something close to selinux socket classes for the
-> > > struct landlock_socket_attr (Cf. socket_type_to_security_class()). This
-> > > will provide protocol granularity and may be simpler and more convenient
-> > > in the terms of determining access rights. WDYT?
-> > 
-> > I see that this is a longer switch statement that maps to this enum, it would be
-> > an additional data table that would have to be documented separately for users.
-> 
-> This table is the general drawback, since it makes API a bit more
-> complex.
-> 
-> > 
-> > Do you have an example for how such a "security class enum" would map to the
-> > combinations of family, type and socket for the protocols discussed above?
-> 
-> I think the socket_type_to_security_class() has a pretty good mapping
-> for UNIX and IP families.
+It seems this was triggered because before the identified commit,
+napi_enable did not call napi_hash_add (and thus did not take the
+napi_hash_lock).
 
-The mapping looks good indeed, and it has been tested for a long time
-with many applications.  However, this would make the kernel
-implementation more complex, and I think this mapping could easily be
-implemented in user space libraries with the bitmask approach, if really
-needed, which I'm not sure.
+So, I agree there is an inversion; I can't say for sure if this
+would cause a deadlock in certain situations. It seems like
+napi_hash_del in the close path will return, so the inversion
+doesn't seem like it'd lead to a deadlock, but I am not an expert in
+this and could certainly be wrong.
 
-> 
-> > 
-> > If this is just a matter of actually mapping (family, type, protocol)
-> > combinations in a more flexible way, could we get away by allowing a special
-> > "wildcard" value for the "protocol" field, when it is used within a ruleset?
-> > Then the LSM would have to look up whether there is a rule for (family, type,
-> > protocol) and the only change would be that it now needs to also check whether
-> > there is a rule for (family, type, *)?
-> 
-> Something like this?
-> 
-> const struct landlock_socket_attr create_socket_attr = {
-> 	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
-> 	.family = AF_INET6,
-> 	.type = SOCK_DGRAM,
-> 	.protocol = LANDLOCK_SOCKET_PROTO_ALL
-> };
-> 
-> > 
-> > —Günther
-> 
+I wonder if a potential fix for this would be in the driver's close
+function? 
+
+In pcnet32_open the order is:
+  lock(lp->lock)
+    napi_enable
+    netif_start_queue
+    mod_timer(watchdog)
+  unlock(lp->lock)
+
+Perhaps pcnet32_close should be the same?
+
+I've included an example patch below for pcnet32_close and I've CC'd
+the maintainer of pcnet32 that is not currently CC'd.
+
+Guenter: Is there any change you might be able to test the proposed
+patch below?
+
+Don: Would you mind taking a look to see if this change is sensible?
+
+Netdev maintainers: at a higher level, I'm not sure how many other
+drivers might have locking patterns like this that commit
+86e25f40aa1e ("net: napi: Add napi_config") will break in a similar
+manner. 
+
+Do I:
+  - comb through drivers trying to identify these, and/or
+  - do we find a way to implement the identified commit with the
+    original lock ordering to avoid breaking any other driver?
+
+I'd appreciate guidance/insight from the maintainers on how to best
+proceed.
+
+diff --git a/drivers/net/ethernet/amd/pcnet32.c b/drivers/net/ethernet/amd/pcnet32.c
+index 72db9f9e7bee..ff56a308fec9 100644
+--- a/drivers/net/ethernet/amd/pcnet32.c
++++ b/drivers/net/ethernet/amd/pcnet32.c
+@@ -2623,13 +2623,13 @@ static int pcnet32_close(struct net_device *dev)
+        struct pcnet32_private *lp = netdev_priv(dev);
+        unsigned long flags;
+
++       spin_lock_irqsave(&lp->lock, flags);
++
+        del_timer_sync(&lp->watchdog_timer);
+
+        netif_stop_queue(dev);
+        napi_disable(&lp->napi);
+
+-       spin_lock_irqsave(&lp->lock, flags);
+-
+        dev->stats.rx_missed_errors = lp->a->read_csr(ioaddr, 112);
+
+        netif_printk(lp, ifdown, KERN_DEBUG, dev,
 
