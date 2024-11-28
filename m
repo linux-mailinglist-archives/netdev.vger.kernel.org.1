@@ -1,123 +1,191 @@
-Return-Path: <netdev+bounces-147751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B2A59DB7F0
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 13:52:24 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 714079DB913
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 14:53:09 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E57EF163D19
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 12:52:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30DA6281C01
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 13:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08EEA19CC02;
-	Thu, 28 Nov 2024 12:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378321A9B58;
+	Thu, 28 Nov 2024 13:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XOH6DmSI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nXru4PHy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913BF13D8B4;
-	Thu, 28 Nov 2024 12:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D3A158527;
+	Thu, 28 Nov 2024 13:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732798339; cv=none; b=pKCaV70NK5op2rHP+P/2i5wLhdEBv81b0bw9OJQI4jGuUyhwHf013fIJHgxfoBaaqk7Q8TftuGCsZ70fqq1zBb2PYuI4gxpiOuRfOnCw115L3pef10Ext1mbJRR+U1oGHoHyTIPJSKxG3XhnUI6KSCq2pe+FHLiOmFrYsG+bCGU=
+	t=1732801985; cv=none; b=em7Wh98ZWb+K/tTVlOYePU/rhi5DnR0GNZFsDPboHQQ+HR0DonMu2QLMlDWydwUBMbpa9KS9Am9IaNwIC3vvjR8LXDEfF+9iYfmQRmbYFJIhG0YSlEBbEfdKKmWl/H15OdaKU41uSlz40qdnNEt13aSB7KoGxiOMAi3HeXkbxGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732798339; c=relaxed/simple;
-	bh=c0I1ebBoE0U20YC9Avj0dh3hMwsDJv34edqCQOxBSg8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TypnIBLgI4znCiIeOM3qEazGlsPiQeHwoMcjWovumQnr5vWizw2RVmRJBrt9aT+lbooKUiTf7La3kTjie1U+3Oilu8Y6b0qaXiMlnk4sZ9ZraBsJIiX6D/stqTl7LYq6luHMKHsCq4ZFYxIljB0VFW+tMv1QvmQWRgJGoX8lpJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XOH6DmSI; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-7fb9b79ec6aso58618a12.3;
-        Thu, 28 Nov 2024 04:52:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732798338; x=1733403138; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qiFR6Ea/6okMG4DqQkGwh+G4hHAubOlQ92CrJDjCFBo=;
-        b=XOH6DmSIDJWsxahOg9LP+PLTh7LZ36PvLYyMXJZ3JQGg9SMf+cJfSOax/6/UjqeGs8
-         mxmQirDQscDI3K9aSAFE6nLcvk1kiLxjOaDO4GGYQ5w5+XBDBzjr//umAoQgW+7TwxEj
-         1nWCYr5gS4NWLMLRH6ZFJhINWcGcVBNAWCEj9aFUwTRcDQV7FziCT1xpkMuaLBiTD5Ih
-         tfOGH+jnNEf9tfP5W54y+k1w3x9AAbuWnA8Lh3JZfwXY5NJxu886GWIgEO+ss98zV9h4
-         tgPcBzxdLBegrfCIzLATiEHluF0zTYo8H5okq3ScZIod4r2UneAh9ffyRNj/NQZcgLJX
-         vLog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732798338; x=1733403138;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qiFR6Ea/6okMG4DqQkGwh+G4hHAubOlQ92CrJDjCFBo=;
-        b=DN7nscOIflzDThlZ/7Dri5uz4LFenVgM+SHDzOH9JBJowPw3EOEZJ3cDV1HH94eK0S
-         dZuvjwIUvqUEGdjE7/gw6BmN9X6OWS4FE2ir//Z7HMWZlK39G27w1SSFMVSN+JiH33k9
-         E9vOURlmFy8EYR373xULQmipYy4VimAFY+fvvhU+fGaTJ+Z0N8c5VRfhvsDqGxH07clQ
-         qAYyp3SN2AWNF0sRQNi8wVIKWIVs1UjyPcMIxmtmdoaHuQ86HpyDzd5fpr0Lo1HiNjIY
-         fXkHG6uAsvlnjYMQmLO8pT+1DJPUAUGgwF/puOE1qmOz1bRJXazD4v4bvBgNkZeKYKuK
-         YlYg==
-X-Forwarded-Encrypted: i=1; AJvYcCUt2tRSAzMzso0uDwb124TP9YaWO+m+ZMKLpE6I+voEixFraqdAA5s/fwiSYc215jNVFTvfuHYAWVzU9u4U4qAb@vger.kernel.org, AJvYcCVEVKRivWCjPtaIJ8rKxgtqLf57iFBztXrjbERmdPQZsW3OpIXLF8XeTNj1blH670ah1RRFcXarmzI5RGc=@vger.kernel.org, AJvYcCX6//InpzCYS81jFivkbcI7Xqivu4G1Zf78o9nzomVO5KI4HDNc7n/hHhx6YM/mlRScLijLwYAZ@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrVhvzhOJheosuFDQCJmNsorEjVlPlXHpdWupw3og+l8V8Gazs
-	Cnep69/nVF0n9kp7IXrChOgw3BijeqUH2iLSiKcvYz6xzFNwp6af
-X-Gm-Gg: ASbGncvLl+QKMmeF+872ZeEgGPze45ZN5rQUT2f7m0Ur6nZHcGytvy8uaXUCOm9T4qr
-	mnSRH536DCtjXWeTapUk2AYbmUvLu4w4anar0Mk3tvAv65z8W7rPuTQFyiexU3emcwcr9+b/sM6
-	0MSNyW7qqj/1vWkwRxt82PCeIAXGFloNVOS+IXLywYTdNtxveatk/+dfI1BWqjTYR5N3+howFnQ
-	lPU47kajeTzzj0ES4OoEhB2kmQ07ivOTXdfWiDDU5+97ghxp8fk9Ihw/9c211cuP6Nz9Kgc
-X-Google-Smtp-Source: AGHT+IED2AaMgfEZlqIfP/s69awQSqsvaDuPzDwYjk0OI8Nkd9zv7CnIn9fcoZ9J++uE5eVxfP4qCw==
-X-Received: by 2002:a05:6a20:3947:b0:1dc:77fc:1cd1 with SMTP id adf61e73a8af0-1e0e0ab441emr4995192637.3.1732798337804;
-        Thu, 28 Nov 2024 04:52:17 -0800 (PST)
-Received: from cavivies-mini.dev.lan ([103.127.243.132])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fc9c39f4b6sm1242793a12.70.2024.11.28.04.52.14
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 28 Nov 2024 04:52:17 -0800 (PST)
-From: "caivive (Weibiao Tu)" <cavivie@gmail.com>
-To: pablo@netfilter.org
-Cc: kadlec@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"caivive (Weibiao Tu)" <cavivie@gmail.com>
-Subject: [PATCH] NETFILTER: Fix typo in nf_conntrack_l4proto.h comment
-Date: Thu, 28 Nov 2024 20:52:04 +0800
-Message-Id: <20241128125204.73121-1-cavivie@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1732801985; c=relaxed/simple;
+	bh=UG+77VmKk7jPmYy+z4+sWVfveyZZmvMyCQvvHM+X7Gs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QPoeYoiONjHBeFNc94K42vYIJ9DiH0Jtdx/ZXapmMweZIGLeTf51abUDYIuSKfcutf0JXlwR5UruIzb3C/6aITbF9XD/qFp4WfB6iFfwomFKaUY1SPHL2hWu+QvaAkJZuCccd3m7kUJZ0Im6omlI/AZP3xlCmEUTmAf1M3w2bE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nXru4PHy; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732801983; x=1764337983;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UG+77VmKk7jPmYy+z4+sWVfveyZZmvMyCQvvHM+X7Gs=;
+  b=nXru4PHy8tKuVyt638fxhfaX7gC8I2gzvHVqZqEfHl0yxOIVrosxMVn1
+   MqvMNGjHa/DBleZuSV1j7mHuY+qAmh3mJaJ5Fsyi05sCoM7tLf9FHLLKw
+   +koHjdmUbSJzlxM4zNGWDADLHOxVXzLjhTWGelSC+rRP+z1Fg3EgS9L7i
+   RpWAdH6Om8BWFtHKwwbbbWPuxd3pczmSPkr0EP9PfgICjiWwSlnRBE6uF
+   A+s3LH1MHDgeA2fLjhQXUuoVRyydWzAZwIeQAzC0O+yy1PgyBJIDzN2R2
+   CoSJXM2boHcizQL6cYV7pO7bcKfUEQVcGHgel/GPZ+1PYbCyYXltKgh7F
+   A==;
+X-CSE-ConnectionGUID: KkCtx6B3QSCMoShgVjEZxw==
+X-CSE-MsgGUID: tgfDycWOT76zvNcVaDMwdA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11270"; a="33279016"
+X-IronPort-AV: E=Sophos;i="6.12,192,1728975600"; 
+   d="scan'208";a="33279016"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2024 05:53:02 -0800
+X-CSE-ConnectionGUID: bTMg1z2ETMCuv7KPMMZ99A==
+X-CSE-MsgGUID: ucUiTrj/RAaNx28VzoteOg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,192,1728975600"; 
+   d="scan'208";a="97203444"
+Received: from lkp-server01.sh.intel.com (HELO 8122d2fc1967) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 28 Nov 2024 05:52:58 -0800
+Received: from kbuild by 8122d2fc1967 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tGewx-0009dT-1q;
+	Thu, 28 Nov 2024 13:52:55 +0000
+Date: Thu, 28 Nov 2024 21:52:13 +0800
+From: kernel test robot <lkp@intel.com>
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, wenjia@linux.ibm.com,
+	jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: Re: [PATCH net-next 2/2] net/smc: support ipv4 mapped ipv6 addr
+ client for smc-r v2
+Message-ID: <202411282154.DjX7ilwF-lkp@intel.com>
+References: <20241127094533.18459-3-guangguan.wang@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241127094533.18459-3-guangguan.wang@linux.alibaba.com>
 
-In the comment for nf_conntrack_l4proto.h, the word "nfnetink" was
-incorrectly spelled. It has been corrected to "nfnetlink".
+Hi Guangguan,
 
-Fixes a typo to enhance readability and ensure consistency.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: caivive (Weibiao Tu) <cavivie@gmail.com>
----
- include/net/netfilter/nf_conntrack_l4proto.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+[auto build test ERROR on net-next/main]
 
-diff --git a/include/net/netfilter/nf_conntrack_l4proto.h b/include/net/netfilter/nf_conntrack_l4proto.h
-index 1f47bef51..c49e02377 100644
---- a/include/net/netfilter/nf_conntrack_l4proto.h
-+++ b/include/net/netfilter/nf_conntrack_l4proto.h
-@@ -30,7 +30,7 @@ struct nf_conntrack_l4proto {
- 	/* called by gc worker if table is full */
- 	bool (*can_early_drop)(const struct nf_conn *ct);
- 
--	/* convert protoinfo to nfnetink attributes */
-+	/* convert protoinfo to nfnetlink attributes */
- 	int (*to_nlattr)(struct sk_buff *skb, struct nlattr *nla,
- 			 struct nf_conn *ct, bool destroy);
- 
+url:    https://github.com/intel-lab-lkp/linux/commits/Guangguan-Wang/net-smc-support-SMC-R-V2-for-rdma-devices-with-max_recv_sge-equals-to-1/20241128-111259
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241127094533.18459-3-guangguan.wang%40linux.alibaba.com
+patch subject: [PATCH net-next 2/2] net/smc: support ipv4 mapped ipv6 addr client for smc-r v2
+config: arm-randconfig-001-20241128 (https://download.01.org/0day-ci/archive/20241128/202411282154.DjX7ilwF-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 592c0fe55f6d9a811028b5f3507be91458ab2713)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241128/202411282154.DjX7ilwF-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411282154.DjX7ilwF-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from net/smc/af_smc.c:27:
+   In file included from include/linux/if_vlan.h:10:
+   In file included from include/linux/netdevice.h:38:
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:8:
+   In file included from include/linux/cacheflush.h:5:
+   In file included from arch/arm/include/asm/cacheflush.h:10:
+   In file included from include/linux/mm.h:2225:
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+>> net/smc/af_smc.c:1120:46: error: no member named 'skc_v6_rcv_saddr' in 'struct sock_common'; did you mean 'skc_rcv_saddr'?
+    1120 |              !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||
+         |                                                     ^
+   include/net/sock.h:376:37: note: expanded from macro 'sk_v6_rcv_saddr'
+     376 | #define sk_v6_rcv_saddr __sk_common.skc_v6_rcv_saddr
+         |                                     ^
+   include/net/sock.h:155:11: note: 'skc_rcv_saddr' declared here
+     155 |                         __be32  skc_rcv_saddr;
+         |                                 ^
+   1 warning and 1 error generated.
+
+
+vim +1120 net/smc/af_smc.c
+
+  1087	
+  1088	static int smc_find_proposal_devices(struct smc_sock *smc,
+  1089					     struct smc_init_info *ini)
+  1090	{
+  1091		int rc = 0;
+  1092	
+  1093		/* check if there is an ism device available */
+  1094		if (!(ini->smcd_version & SMC_V1) ||
+  1095		    smc_find_ism_device(smc, ini) ||
+  1096		    smc_connect_ism_vlan_setup(smc, ini))
+  1097			ini->smcd_version &= ~SMC_V1;
+  1098		/* else ISM V1 is supported for this connection */
+  1099	
+  1100		/* check if there is an rdma device available */
+  1101		if (!(ini->smcr_version & SMC_V1) ||
+  1102		    smc_find_rdma_device(smc, ini))
+  1103			ini->smcr_version &= ~SMC_V1;
+  1104		/* else RDMA is supported for this connection */
+  1105	
+  1106		ini->smc_type_v1 = smc_indicated_type(ini->smcd_version & SMC_V1,
+  1107						      ini->smcr_version & SMC_V1);
+  1108	
+  1109		/* check if there is an ism v2 device available */
+  1110		if (!(ini->smcd_version & SMC_V2) ||
+  1111		    !smc_ism_is_v2_capable() ||
+  1112		    smc_find_ism_v2_device_clnt(smc, ini))
+  1113			ini->smcd_version &= ~SMC_V2;
+  1114	
+  1115		/* check if there is an rdma v2 device available */
+  1116		ini->check_smcrv2 = true;
+  1117		ini->smcrv2.saddr = smc->clcsock->sk->sk_rcv_saddr;
+  1118		if (!(ini->smcr_version & SMC_V2) ||
+  1119		    (smc->clcsock->sk->sk_family != AF_INET &&
+> 1120		     !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||
+  1121		    !smc_clc_ueid_count() ||
+  1122		    smc_find_rdma_device(smc, ini))
+  1123			ini->smcr_version &= ~SMC_V2;
+  1124		ini->check_smcrv2 = false;
+  1125	
+  1126		ini->smc_type_v2 = smc_indicated_type(ini->smcd_version & SMC_V2,
+  1127						      ini->smcr_version & SMC_V2);
+  1128	
+  1129		/* if neither ISM nor RDMA are supported, fallback */
+  1130		if (ini->smc_type_v1 == SMC_TYPE_N && ini->smc_type_v2 == SMC_TYPE_N)
+  1131			rc = SMC_CLC_DECL_NOSMCDEV;
+  1132	
+  1133		return rc;
+  1134	}
+  1135	
+
 -- 
-2.39.5 (Apple Git-154)
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
