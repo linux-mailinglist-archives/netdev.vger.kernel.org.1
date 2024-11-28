@@ -1,126 +1,167 @@
-Return-Path: <netdev+bounces-147724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FE109DB71F
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 13:08:26 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25C5C163A08
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 12:08:23 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68AE019004B;
-	Thu, 28 Nov 2024 12:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CYjIVQpK"
-X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43E369DB73F
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 13:12:51 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC0C2CCC0
-	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 12:08:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4334B21735
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 12:12:48 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F7719ADBF;
+	Thu, 28 Nov 2024 12:12:47 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DF519924E;
+	Thu, 28 Nov 2024 12:12:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732795703; cv=none; b=mATsJ1gsfZe9d5PvCUrYzpyeUuplx7FNNKidKY8O0KdjJSizHPIkMktBfiz+Nb5+bHj1IlpBNvjHjPPuMHgsyatzM9diXfWAclWvrrABbR3XnlL/ATMeQXHsIFBUV86yb09Z1k8qwLElIOxe9bLBA5UKxMdmZTCi5KBm6Nc5vj4=
+	t=1732795967; cv=none; b=ZEZ8kRu2GnkMihHMfx8e00AhMlaFdPrLWVD5xgMNjYyyHH7V8KPsqd8rce2JaysDiSQg2y+t2nQedK1fUOJnsv8ImJwhoI2DOzjyTnGNfK10TKX4I9gupSX1QKpaeMyC1qSZEaYsqj80GWWCFf95nHNpSfeFam6A99h1TbLcIrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732795703; c=relaxed/simple;
-	bh=8LGQyM5AqDmOL8NpYqNyjsRpxEfRvMUZce2z+surDkE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N4GlVXqjCGP9i0tlFeXIY7Yjj0MujM2jqR29FakPmRk+rx9USudGceDb5F9OeOjak7udK/7orx79MXQ2msUDGDCkOET6QdLML83wFHKXhDN077TO0+slNxp9aW2jwpTXmFNRTWdH2f8Pp3xtO7+v5KnqNqtU9PgTuCV9sSR6lY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CYjIVQpK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732795700;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+A2A4Rt5ieD9ZkqE0p7CEIEyAzE272HyF0E/VCkylME=;
-	b=CYjIVQpKoEEEEmyZ3Z6z31fb2NsKrfAtXDa+BoXUKi27S6p8olbvHRFTQZogqSzmIoVS4z
-	2Tgh4h+PURaP7r36b6C/5PnleJqjZNiN3UytNH2rL1FjDIe8f73k6qv+yEtUVmmBM+2hGp
-	gPit+DYFO9yQ/g0z2lyxm4IqToqbQn8=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-205-gtwfSDcQNs2hIIpnE5E9hg-1; Thu, 28 Nov 2024 07:08:19 -0500
-X-MC-Unique: gtwfSDcQNs2hIIpnE5E9hg-1
-X-Mimecast-MFC-AGG-ID: gtwfSDcQNs2hIIpnE5E9hg
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-6eec33c5c50so14092987b3.1
-        for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 04:08:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732795699; x=1733400499;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+A2A4Rt5ieD9ZkqE0p7CEIEyAzE272HyF0E/VCkylME=;
-        b=sIeyDLbWHPSpnbXI4fcFnMPG/tOXUO293ls4AFPyi4MwVrTkPK1XfnrirtDmtjkXNw
-         FYbZSBF1EIYzx6jAxVpaHQPkD4KXT+vIodJZZGI/a0JCs1gm3mJ6l2tdiwijpmqqdpqJ
-         0KmNbQy3gwDPlBVRBteyeK6c0HKEdQDLehZ8MhwYsgw1+xo0aTi6pgTohGr24Fm0KP7w
-         6FEq9SCOWxFXM2lhj+ygXg9E+qeF0AemTivF+RR7tH/P5QuZBMB0506JY1W8PWVsRItO
-         MLDW/fyTfbYY0YFfE8dzSVA80+GFUe+/5yiTATxDmJLpDirMGi1PK0orVOk0QgDqZZT+
-         uXvw==
-X-Forwarded-Encrypted: i=1; AJvYcCXuVmeOc2E7BOay2uYr6K6wTSEMKFnyhTkR/m1sUHG9WTDcjyanUfrG5j7ziVNLLtxwDttQYh0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzstdoN7rG9kDzfRk9PHoEyuzwKfo2gVWxmG0MX4yDfWG6dYFNI
-	1Rgd/cxTvPMtdRpXdy+N7H7oEir1YTFrLhhCsnvboTtd4L95fKNRF28IO2ogBDhwLmI5taWBl8C
-	HeQpxOkNR+jD36/DU7OLOkutJY5MGe6/HaQcUTMZWVBUqCwwIVphfQg==
-X-Gm-Gg: ASbGnctE6X/qOgV6Ie7fSlllyZX2QeMDFUlj7taEqs8nmAiLn3Zz2S4Fm/MbIa+OFLd
-	/M3ws48avJFMnbKLh7tg6LALbz6pV1J/WaeLgckkbYp++bGu1WfvhcED5zSPC1X/9eO9cvneDDG
-	e0dCEYUio75Iq1csHaWHCO2+8bLV3nMC/5OJ1XLJ9oiu8QsnZDyoI04wAWm59V1mAWb+FoEG/sA
-	elBBZAfuOj9vijl4vs/3vMR7WlvBFfNSqIi3/pHZIbKRq7BOSDviCFrKGCGEiA5X5/6qfK5O5Wz
-X-Received: by 2002:a05:690c:d1f:b0:6e5:9d3c:f9d3 with SMTP id 00721157ae682-6ef3729e910mr79179867b3.41.1732795698968;
-        Thu, 28 Nov 2024 04:08:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHDc6KdA0WeHu/hlqzrCjnK78CxQVqVleXDlG3kGktlOf55x5mTsk0qD/f9tuIVI9vz2i/0kQ==
-X-Received: by 2002:a05:690c:d1f:b0:6e5:9d3c:f9d3 with SMTP id 00721157ae682-6ef3729e910mr79179607b3.41.1732795698681;
-        Thu, 28 Nov 2024 04:08:18 -0800 (PST)
-Received: from [192.168.88.24] (146-241-38-31.dyn.eolo.it. [146.241.38.31])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d875163a01sm5882586d6.23.2024.11.28.04.08.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Nov 2024 04:08:18 -0800 (PST)
-Message-ID: <b7bbca8a-23af-4f1d-8112-8ad94d3fa870@redhat.com>
-Date: Thu, 28 Nov 2024 13:08:14 +0100
+	s=arc-20240116; t=1732795967; c=relaxed/simple;
+	bh=TuOb665RSI48F19c1IWSP3kx/J14aZG+T0RK8WWALls=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XxNXCduRXJDTidOlW7FKu33j78If6WXBBWpGK4krDTdvMQjxOW2bCeoP0vrATmda8Bd1iOH85TgSaLpN5elIGMJ10GooTfhuavPqXbjTxd03pfBjxUttm/IdEOaKVaDAJ3xuyG4gOqLoSIUvzoqQltPOiTr06bZ6cCG+UE+KYK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.39.247] (port=48626 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1tGdNl-00FndA-5W; Thu, 28 Nov 2024 13:12:31 +0100
+Date: Thu, 28 Nov 2024 13:12:28 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Julian Anastasov <ja@ssi.bg>
+Cc: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@verge.net.au>,
+	netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	"David S. Miller" <davem@davemloft.net>,
+	kernel test robot <lkp@intel.com>, Ruowen Qin <ruqin@redhat.com>,
+	Jinghao Jia <jinghao7@illinois.edu>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Kees Cook <kees@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Subject: Re: [PATCH v3 net] ipvs: fix UB due to uninitialized stack access in
+ ip_vs_protocol_init()
+Message-ID: <Z0heLGWuOEkC2n35@calendula>
+References: <20241123094256.28887-1-jinghao7@illinois.edu>
+ <70cd1035-07d8-4356-a53e-020d93c2515e@redhat.com>
+ <87fca918-403d-2fd5-576a-dfa730483fc2@ssi.bg>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] net: phy: fix phy_ethtool_set_eee() incorrectly
- enabling LPI
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Florian Fainelli <florian.fainelli@broadcom.com>, netdev@vger.kernel.org
-References: <E1tErSe-005RhB-2R@rmk-PC.armlinux.org.uk>
- <bedf2521-dcbf-4b5b-8482-9436a54a614f@redhat.com>
- <Z0hQQONGxPM04EVl@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <Z0hQQONGxPM04EVl@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87fca918-403d-2fd5-576a-dfa730483fc2@ssi.bg>
+X-Spam-Score: -1.7 (-)
 
-On 11/28/24 12:13, Russell King (Oracle) wrote:
-> On Thu, Nov 28, 2024 at 09:44:37AM +0100, Paolo Abeni wrote:
->> AFAICS this patch has no kconfig implication, so my local build should
->> be a safe-enough test, but please wait for the pre-reqs being merged for
->> future submissions.
+On Thu, Nov 28, 2024 at 01:18:39PM +0200, Julian Anastasov wrote:
 > 
-> I guess there's no way to tell the CI tests that another patch is
-> required? It would be useful if something like a message-id could
-> indicate to the CI tests that the patch in that message-id is
-> required.
+> 	Hello,
+> 
+> On Thu, 28 Nov 2024, Paolo Abeni wrote:
+> 
+> > On 11/23/24 10:42, Jinghao Jia wrote:
+> > > Under certain kernel configurations when building with Clang/LLVM, the
+> > > compiler does not generate a return or jump as the terminator
+> > > instruction for ip_vs_protocol_init(), triggering the following objtool
+> > > warning during build time:
+> > > 
+> > >   vmlinux.o: warning: objtool: ip_vs_protocol_init() falls through to next function __initstub__kmod_ip_vs_rr__935_123_ip_vs_rr_init6()
+> > > 
+> > > At runtime, this either causes an oops when trying to load the ipvs
+> > > module or a boot-time panic if ipvs is built-in. This same issue has
+> > > been reported by the Intel kernel test robot previously.
+> > > 
+> > > Digging deeper into both LLVM and the kernel code reveals this to be a
+> > > undefined behavior problem. ip_vs_protocol_init() uses a on-stack buffer
+> > > of 64 chars to store the registered protocol names and leaves it
+> > > uninitialized after definition. The function calls strnlen() when
+> > > concatenating protocol names into the buffer. With CONFIG_FORTIFY_SOURCE
+> > > strnlen() performs an extra step to check whether the last byte of the
+> > > input char buffer is a null character (commit 3009f891bb9f ("fortify:
+> > > Allow strlen() and strnlen() to pass compile-time known lengths")).
+> > > This, together with possibly other configurations, cause the following
+> > > IR to be generated:
+> > > 
+> > >   define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #5 section ".init.text" align 16 !kcfi_type !29 {
+> > >     %1 = alloca [64 x i8], align 16
+> > >     ...
+> > > 
+> > >   14:                                               ; preds = %11
+> > >     %15 = getelementptr inbounds i8, ptr %1, i64 63
+> > >     %16 = load i8, ptr %15, align 1
+> > >     %17 = tail call i1 @llvm.is.constant.i8(i8 %16)
+> > >     %18 = icmp eq i8 %16, 0
+> > >     %19 = select i1 %17, i1 %18, i1 false
+> > >     br i1 %19, label %20, label %23
+> > > 
+> > >   20:                                               ; preds = %14
+> > >     %21 = call i64 @strlen(ptr noundef nonnull dereferenceable(1) %1) #23
+> > >     ...
+> > > 
+> > >   23:                                               ; preds = %14, %11, %20
+> > >     %24 = call i64 @strnlen(ptr noundef nonnull dereferenceable(1) %1, i64 noundef 64) #24
+> > >     ...
+> > >   }
+> > > 
+> > > The above code calculates the address of the last char in the buffer
+> > > (value %15) and then loads from it (value %16). Because the buffer is
+> > > never initialized, the LLVM GVN pass marks value %16 as undefined:
+> > > 
+> > >   %13 = getelementptr inbounds i8, ptr %1, i64 63
+> > >   br i1 undef, label %14, label %17
+> > > 
+> > > This gives later passes (SCCP, in particular) more DCE opportunities by
+> > > propagating the undef value further, and eventually removes everything
+> > > after the load on the uninitialized stack location:
+> > > 
+> > >   define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #0 section ".init.text" align 16 !kcfi_type !11 {
+> > >     %1 = alloca [64 x i8], align 16
+> > >     ...
+> > > 
+> > >   12:                                               ; preds = %11
+> > >     %13 = getelementptr inbounds i8, ptr %1, i64 63
+> > >     unreachable
+> > >   }
+> > > 
+> > > In this way, the generated native code will just fall through to the
+> > > next function, as LLVM does not generate any code for the unreachable IR
+> > > instruction and leaves the function without a terminator.
+> > > 
+> > > Zero the on-stack buffer to avoid this possible UB.
+> > > 
+> > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > > Reported-by: kernel test robot <lkp@intel.com>
+> > > Closes: https://lore.kernel.org/oe-kbuild-all/202402100205.PWXIz1ZK-lkp@intel.com/
+> > > Co-developed-by: Ruowen Qin <ruqin@redhat.com>
+> > > Signed-off-by: Ruowen Qin <ruqin@redhat.com>
+> > > Signed-off-by: Jinghao Jia <jinghao7@illinois.edu>
+> > 
+> > @Pablo, @Simon, @Julian: recent ipvs patches landed either on the
+> > net(-next) trees or the netfiler trees according to a random (?) pattern.
+> > 
+> > What is your preference here? Should such patches go via netfilter or
+> > net? Or something else. FTR, I *think* netfilter should be the
+> > preferable target, but I'm open to other options.
+> 
+> 	IPVS patches should go always via Netfilter trees.
+> It is my fault to tell people to use the 'net' tag, I'll
+> recommend the proper nf tree the next time. Sorry for the
+> confusion.
 
-Not yet. I guess the main road-blocker is the limited time avail for
-such developments (mostly Jakub's spare time). Feel free to contribute
-to such feature to the CI infra (https://github.com/linux-netdev/nipa),
-if time and will allow.
-
-Thanks,
-
-Paolo
-
+No issue, I have applied this to nf.git, thanks for the clarification.
 
