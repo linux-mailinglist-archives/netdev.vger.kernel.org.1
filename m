@@ -1,111 +1,151 @@
-Return-Path: <netdev+bounces-147696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3887C9DB3F1
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 09:41:14 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73BDD9DB3FB
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 09:44:48 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD38DB21BD9
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 08:41:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 287CC1646C7
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 08:44:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54DA914F9D6;
-	Thu, 28 Nov 2024 08:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7785414C5BF;
+	Thu, 28 Nov 2024 08:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fkB9MwKy"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB8414D456
-	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 08:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C15114C59B
+	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 08:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732783267; cv=none; b=qVHivxZj8UGJSLDdJA/KehstetQMkpOK9xQst/P+cxGEpDDlkkuWIJmH0MHNLdbp1pN7v4IFzYAhokw7ug22Mzp5EiFvupBU5ojnaaqWvmk2bdbliVeF6gCvOxjq8W83Mali0pRv/1cKq2dNdwW2UxsHytWz3Jn/lAr0dwT+Nzc=
+	t=1732783485; cv=none; b=qIsXNCxTvbv/xZDODAV5j3rZ1+fkZXtmEg5BDd1xfSsLZMmTSSvBmEi33sc877oTwNLTJ8FQzQn93B+k8XSJBU+4m5b/5BA0oy8Frn9CQxHA0eXmGeTzGqhXvIHmX2UFG3wXpflXeGo4Fta6RUsoqsPlvEJ+F0CZDfbDgNXUkNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732783267; c=relaxed/simple;
-	bh=CkhsE/rZw9spgAt5s0YzkZZkXLkpvQ1u/gVwpQ+wcBg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fXzacL+yBvC4N5Sm7XsBQ6iu9owO8fkVYskXGcJtpQbQMo/8n+2CynswGstFaY8muXvTonuYXQCLvbtqHHcqbHdRPE7IuDVBz3ArK+3kSTMo3kEeVP8Mk9pRQ2Qt3cZEBN0Kgjb11i35QjZpeU+JwQm0EGlID4blTrSQXyUaWOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tGa57-0002Md-Qn; Thu, 28 Nov 2024 09:41:01 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tGa56-000a9p-2T;
-	Thu, 28 Nov 2024 09:41:01 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tGa57-002puy-1S;
-	Thu, 28 Nov 2024 09:41:01 +0100
-Date: Thu, 28 Nov 2024 09:41:01 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: kernel@pengutronix.de, netdev@vger.kernel.org
-Subject: Re: [PATCH ethtool-next v1 1/1] ethtool: add support for
- ETHTOOL_A_CABLE_FAULT_LENGTH_SRC and ETHTOOL_A_CABLE_RESULT_SRC
-Message-ID: <Z0gsnc_t_G2YN_Gy@pengutronix.de>
-References: <20241119131054.3317432-1-o.rempel@pengutronix.de>
- <dkfesntoylodx2xm65frikdhm6gslddp6xj2mcidxwbpjtklsv@cwfxiuywrysg>
+	s=arc-20240116; t=1732783485; c=relaxed/simple;
+	bh=z6dSAxTCoGwpeLaeKD6UwZtBvUZguLwF0psS9dF6NDo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GsIclRvyt8qXAdCSWFYIUpKce3ELd7KV3+AJsqj2OGjusW/jLq2yG9kn8KYj/VNM8ij9PYHv2wGKXhFw6w1rRrj/yiNjR0taEzyasSWHGwDZszzyDjb+8vZ90CEFUfE8PiUmaffgOfUGx3F51w01dZHXq/UbHTei1qHi8Huz69o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fkB9MwKy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732783482;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3xYQmL/kJPyGibrWvcAhkVuAXbD7+oBx5V8aAxel9Dc=;
+	b=fkB9MwKyhW72/O9Gnln7L6Ek+69bLM0zymuoGMXnAZ/871VMi4LXGxlUTpzRH+raYZAo2Q
+	VPkwq0JGaArgnHj/E/oYDf53Ki5Om7NjvIPRd+ILgHlvoTcIk6AeB7UjpfmeUmlTYTdPJ4
+	7vW8CCHsX72X7ab+4mTE1veAYmmvLzc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-593-88EHCDGsNfiO-_eWxyemWw-1; Thu, 28 Nov 2024 03:44:40 -0500
+X-MC-Unique: 88EHCDGsNfiO-_eWxyemWw-1
+X-Mimecast-MFC-AGG-ID: 88EHCDGsNfiO-_eWxyemWw
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-38245ddf59fso521240f8f.0
+        for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 00:44:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732783479; x=1733388279;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3xYQmL/kJPyGibrWvcAhkVuAXbD7+oBx5V8aAxel9Dc=;
+        b=nSdhnI/slpc58F3KSK9Fmr5/kJSWapd0JDEgqPxHcURvMKnS4lK0McAl2ryPMxp5P6
+         XGDP/hKBDmG6qWdoRAZj85+IqHcsFKTcsNPVlK81BuNVrUsi3jAdxcYJBDnNsWfxbogT
+         xsHh2sUHL7jK4HHfkJnAypElZxcltCWgb+D/GaTEMDIU8oMvZDLdrBafvLPu6nMToOau
+         zX/8icp6xx+4ArsTvb8XSALrLg5//NZBnCQgZFD/hDKKhYI5jV0GF0M6yXHSb6lrBXCs
+         PaUaR3gUaBgC0CAwA8PQMxuXCmQ+79tyKiZKwPBhp4ITqhSNWG9tcAInAsnEZBZkpbYh
+         aK2A==
+X-Forwarded-Encrypted: i=1; AJvYcCUEprxGKzcpY7hpIbRmO8aq+3NeAyrnaN0mi+rKmpz1xh2BseIpbHBr0AkaT+IffIX3431QDX4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywqh+zH4cxCOx7CgndPfEn5x8irYIyAQRGw12MBoRiicIZsk4by
+	qrSwLDdCuGk1cjyM1kySHqD0MMLSh4tqHYNzz+h+B2nw00/SIriDuJ78I4KzTv/EzwfwakHsbXu
+	3MWK4TJdtSdoLE3lG+/Nq81XTvROUVXd+m/eYGW4nQFJBCk/ZZMCrMA==
+X-Gm-Gg: ASbGncurWb2t62hlz/R66YXYVMgbXr9Fsz1z3RvpzuRc9Ky1sUMeXS48iNcg8MUZEbA
+	BI3pI55qEoimx873tArnEbYFIL26gecX1Sib18ayjjN7mZJpO2l/eHShk/RzCHil2+t+F8v7VSW
+	51AOEER4/6jfTxFvZwmWo6HZ1OmC+YCoi+jjEyJn4PvagVSO3R8eVb+PrCengs1LHy+zeE1YVda
+	8MCTpsy68CGHYA5gnO9zKZ/dso0OGCBP/RLJYgF3ZL9nJeSiuHuOaH8FzU65iY1c5TPUFoQr2cC
+X-Received: by 2002:a5d:6d0b:0:b0:382:1cff:2e6f with SMTP id ffacd0b85a97d-385c6edd784mr4533906f8f.37.1732783479623;
+        Thu, 28 Nov 2024 00:44:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH5rFebua0JRlNymqOZ+vBJY95XKmZ/vKiRD15ohZpVhecgbEJxDERPXuJeZuRQvlDUh/tp2A==
+X-Received: by 2002:a5d:6d0b:0:b0:382:1cff:2e6f with SMTP id ffacd0b85a97d-385c6edd784mr4533890f8f.37.1732783479296;
+        Thu, 28 Nov 2024 00:44:39 -0800 (PST)
+Received: from [192.168.88.24] (146-241-60-32.dyn.eolo.it. [146.241.60.32])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385ccd7feccsm1024472f8f.95.2024.11.28.00.44.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Nov 2024 00:44:38 -0800 (PST)
+Message-ID: <bedf2521-dcbf-4b5b-8482-9436a54a614f@redhat.com>
+Date: Thu, 28 Nov 2024 09:44:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <dkfesntoylodx2xm65frikdhm6gslddp6xj2mcidxwbpjtklsv@cwfxiuywrysg>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: phy: fix phy_ethtool_set_eee() incorrectly
+ enabling LPI
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, netdev@vger.kernel.org
+References: <E1tErSe-005RhB-2R@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <E1tErSe-005RhB-2R@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 25, 2024 at 08:29:30PM +0100, Michal Kubecek wrote:
-> On Tue, Nov 19, 2024 at 02:10:54PM +0100, Oleksij Rempel wrote:
-> > diff --git a/netlink/desc-ethtool.c b/netlink/desc-ethtool.c
-> > index 5c0e1c6f433d..97a994961c8e 100644
-> > --- a/netlink/desc-ethtool.c
-> > +++ b/netlink/desc-ethtool.c
-> > @@ -252,12 +252,14 @@ static const struct pretty_nla_desc __cable_test_result_desc[] = {
-> >  	NLATTR_DESC_INVALID(ETHTOOL_A_CABLE_RESULT_UNSPEC),
-> >  	NLATTR_DESC_U8(ETHTOOL_A_CABLE_RESULT_PAIR),
-> >  	NLATTR_DESC_U8(ETHTOOL_A_CABLE_RESULT_CODE),
-> > +	NLATTR_DESC_U8(ETHTOOL_A_CABLE_RESULT_SRC),
-> >  };
-> >  
-> >  static const struct pretty_nla_desc __cable_test_flength_desc[] = {
-> >  	NLATTR_DESC_INVALID(ETHTOOL_A_CABLE_FAULT_LENGTH_UNSPEC),
-> >  	NLATTR_DESC_U8(ETHTOOL_A_CABLE_FAULT_LENGTH_PAIR),
-> >  	NLATTR_DESC_U32(ETHTOOL_A_CABLE_FAULT_LENGTH_CM),
-> > +	NLATTR_DESC_U8(ETHTOOL_A_CABLE_FAULT_LENGTH_SRC),
-> >  };
-> >  
-> >  static const struct pretty_nla_desc __cable_nest_desc[] = {
+Hi,
+
+On 11/23/24 15:50, Russell King (Oracle) wrote:
+> When phy_ethtool_set_eee_noneg() detects a change in the LPI
+> parameters, it attempts to update phylib state and trigger the link
+> to cycle so the MAC sees the updated parameters.
 > 
-> AFAICS both new attributes are U32 so that NLATTR_DESC_U32() should be
-> used here. Looks good to me otherwise.
+> However, in doing so, it sets phydev->enable_tx_lpi depending on
+> whether the EEE configuration allows the MAC to generate LPI without
+> taking into account the result of negotiation.
 > 
-> One question: the kernel counterpart seems to be present in 6.12 final,
-> is there something that would prevent including this in ethtool 6.12
-> (planned to be wrapped up at the end of this week)?
+> This can be demonstrated with a 1000base-T FD interface by:
+> 
+>  # ethtool --set-eee eno0 advertise 8   # cause EEE to be not negotiated
+>  # ethtool --set-eee eno0 tx-lpi off
+>  # ethtool --set-eee eno0 tx-lpi on
+> 
+> This results in being true, despite EEE not having been negotiated and:
+>  # ethtool --show-eee eno0
+> 	EEE status: enabled - inactive
+> 	Tx LPI: 250 (us)
+> 	Supported EEE link modes:  100baseT/Full
+> 	                           1000baseT/Full
+> 	Advertised EEE link modes:  100baseT/Full
+> 	                                         1000baseT/Full
+> 
+> Fix this by keeping track of whether EEE was negotiated via a new
+> eee_active member in struct phy_device, and include this state in
+> the decision whether phydev->enable_tx_lpi should be set.
+> 
+> Fixes: 3e43b903da04 ("net: phy: Immediately call adjust_link if only tx_lpi_enabled changes")
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Ah, sorry. I overseen this mail. I do not see anything against it. I'll
-resend new version today. 
+This patch did not apply net cleanly to net tree when it was submitted,
+due to its dependency. As a result it did not went through the CI tests.
+Currently there is little material there phy specific - mostly builds
+with different Kconfigs - but with time we hope to increase H/W coverage.
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+AFAICS this patch has no kconfig implication, so my local build should
+be a safe-enough test, but please wait for the pre-reqs being merged for
+future submissions.
+
+Thanks,
+
+Paolo
+
 
