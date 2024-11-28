@@ -1,303 +1,203 @@
-Return-Path: <netdev+bounces-147776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E4779DBBC6
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 18:28:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEE5A9DBBCF
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 18:36:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56610281748
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 17:28:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69005281A35
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 17:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F151C07E6;
-	Thu, 28 Nov 2024 17:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC02A1C07EE;
+	Thu, 28 Nov 2024 17:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dOmBcczi"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="14ndno9S";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="PCF8oIJw";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="14ndno9S";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="PCF8oIJw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7462837A
-	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 17:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4EF3537F8
+	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 17:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732814917; cv=none; b=ozqAvwFLQOIMyHMszinKIoF1cATs2Z2tzJjAGFriJDNkbWywH3Ag/jE8XfuR3QX0HEdXQcCUGN6V0hKLRD833Ju8BeVUqGPKxuiWUEQGcs/FWRcnFyJ/TG14v6PrJn8cSps+tadaE2CSa/y9CTdqammvTboPfW2PCEQDeEChJ/k=
+	t=1732815391; cv=none; b=s3oU7ivsEWLBuzgAVgxcvWAcpAf+dWnjFBBn+KAN+f+RhLlSIdPwI0lmiDy/vII4zoJPvS034USF0dVDYS3fz7xD9ivgdl+Mygvu66TYlcfNx4NCtr9yk0W072zIblGh3IJzSj1skRlop6XyX/3G+0P8VXD8lOy6HMQi7WCQCzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732814917; c=relaxed/simple;
-	bh=BCbHyeaO0765R3qDqVK1XDIC33Vs0NNYZjT85sebh04=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=c16vcP6Z81VgmmFXVCCuE5sWw8wuMvjSxX1aAt/HYETXAKoNI9RcAWsZh0vuSHbULdyzA4OB2imoe6kFv42lA9pGx6IxnpRHVyIbjJnZOl7UwVFMgojEaXEzcV/UPNcSrnHnZrQP4S0CEcP+N7KprGgxg0oqMNBKHBNf+1P4Epw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dOmBcczi; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732814914;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Frq/Lp6j9bjnJcld5HTLQjovzJZhq3sAq4+f4l9rVjc=;
-	b=dOmBcczifWKOzZNzV1lVaUzN2OiHxxNc8zVKZYk/qJzpKdxfAETkbQgY/Xj4LJ1KlvdQIS
-	c7tVyOv1hzDpSLKgWB84u8PYm8L1s1C0+/cXuzpHHI8IAuXMOjNWc14MQJ40Odv0ySdIMw
-	cFOlesPZ0Dqov0rZB0JVbwi56eQnOjk=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-187-X34v0KWoOiS3mfleTUBndw-1; Thu,
- 28 Nov 2024 12:28:32 -0500
-X-MC-Unique: X34v0KWoOiS3mfleTUBndw-1
-X-Mimecast-MFC-AGG-ID: X34v0KWoOiS3mfleTUBndw
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	s=arc-20240116; t=1732815391; c=relaxed/simple;
+	bh=F7jd7nDH3zTMt1/v9gqD7XlB/0DzGEd2q0jhMaDZRsc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tJw1WhnklVbzyBNZkkP9X+3wCFL7eRJeGkyqqX8/x6umKpLHWfHdgu+bpx1QwSK/AhrY2EHGwQaskS4QadSBT17f6F4uv3ZXriLw0oUf9mGdfO+KFmoHwvqeqbB9SS8IbXpJB+ipVEhY3eA6YMakwiydZHhoLNXTwwcr5jpv+wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=14ndno9S; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=PCF8oIJw; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=14ndno9S; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=PCF8oIJw; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.100.225.114])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9CB70195419B;
-	Thu, 28 Nov 2024 17:28:31 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.39.193.69])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 46F33300019E;
-	Thu, 28 Nov 2024 17:28:28 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	sashal@kernel.org
-Subject: [GIT PULL] Networking for v6.13-rc1 - attempt II
-Date: Thu, 28 Nov 2024 18:28:01 +0100
-Message-ID: <20241128172801.157135-1-pabeni@redhat.com>
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B711C21190;
+	Thu, 28 Nov 2024 17:36:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1732815387; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MV+Blc1npQEDRV5S/DXP5Mldnkh1LoSBUVDyLOfybWc=;
+	b=14ndno9SL9CD8H6M/27qupOAKHpa3YEGGVFMgWAw9endcC2DOzaw5qG91rW9HZEWxFd4Ko
+	mDwiqB7JI/EXGAm4/recT/Ztt6YRSC3uNuKo4dKPYsyTPcUwjhNYZ0K+AmK9ezHscYW9Lq
+	6w1TgX4+hjazPqgtRfeDs0ImTcdA2oc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1732815387;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MV+Blc1npQEDRV5S/DXP5Mldnkh1LoSBUVDyLOfybWc=;
+	b=PCF8oIJwsj90JdHAXkF9kCldkLB79fLVeNmffmI6Gis1HvD0jBz+0j7Wlo7rK4GxZHR8at
+	8n8ugFXJJbyUCCBg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1732815387; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MV+Blc1npQEDRV5S/DXP5Mldnkh1LoSBUVDyLOfybWc=;
+	b=14ndno9SL9CD8H6M/27qupOAKHpa3YEGGVFMgWAw9endcC2DOzaw5qG91rW9HZEWxFd4Ko
+	mDwiqB7JI/EXGAm4/recT/Ztt6YRSC3uNuKo4dKPYsyTPcUwjhNYZ0K+AmK9ezHscYW9Lq
+	6w1TgX4+hjazPqgtRfeDs0ImTcdA2oc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1732815387;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MV+Blc1npQEDRV5S/DXP5Mldnkh1LoSBUVDyLOfybWc=;
+	b=PCF8oIJwsj90JdHAXkF9kCldkLB79fLVeNmffmI6Gis1HvD0jBz+0j7Wlo7rK4GxZHR8at
+	8n8ugFXJJbyUCCBg==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id 8600F2012C; Thu, 28 Nov 2024 18:36:27 +0100 (CET)
+Date: Thu, 28 Nov 2024 18:36:27 +0100
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2] ethtool: add support for
+ ETHTOOL_A_CABLE_FAULT_LENGTH_SRC and ETHTOOL_A_CABLE_RESULT_SRC
+Message-ID: <eajj4mhvqkwrl7lmsrmjy32sncanymqefhxkv4cpnjvxnf2v7o@o6vtfpu7pyym>
+References: <20241128090111.1974482-1-o.rempel@pengutronix.de>
+ <919a9842-f719-41ac-96fb-ae24d2f0798f@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="prhtkawvkibaprk2"
+Content-Disposition: inline
+In-Reply-To: <919a9842-f719-41ac-96fb-ae24d2f0798f@lunn.ch>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-5.90 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SIGNED_PGP(-2.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	NEURAL_HAM_SHORT(-0.20)[-0.994];
+	RCVD_COUNT_ONE(0.00)[1];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ARC_NA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lion.mk-sys.cz:helo]
+X-Spam-Score: -5.90
+X-Spam-Flag: NO
 
-Hi Linus!
 
-The only difference WRT the first attempt is the fixup for the build
-issue reported by Sasha. I'm very sorry for the additional noise.
+--prhtkawvkibaprk2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The following changes since commit fcc79e1714e8c2b8e216dc3149812edd37884eef:
+On Thu, Nov 28, 2024 at 05:58:09PM +0100, Andrew Lunn wrote:
+> On Thu, Nov 28, 2024 at 10:01:11AM +0100, Oleksij Rempel wrote:
+> > Extend cable test output to include source information, supporting
+> > diagnostic technologies like TDR (Time Domain Reflectometry) and ALCD
+> > (Active Link Cable Diagnostic). The source is displayed optionally at
+> > the end of each result or fault length line.
+> >=20
+> > TDR requires interrupting the active link to measure parameters like
+> > fault location, while ALCD can operate on an active link to provide
+> > details like cable length without disruption.
+> >=20
+> > Example output:
+> > Pair B code Open Circuit, source: TDR
+> > Pair B, fault length: 8.00m, source: TDR
+> >=20
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > ---
+> > changes v2:
+> > - s/NLATTR_DESC_U8/NLATTR_DESC_U32
+> > ---
+> >  netlink/cable_test.c   | 39 +++++++++++++++++++++++++++++++++------
+> >  netlink/desc-ethtool.c |  2 ++
+> >  2 files changed, 35 insertions(+), 6 deletions(-)
+> >=20
+> > diff --git a/netlink/cable_test.c b/netlink/cable_test.c
+> > index ba21c6cd31e4..0a1c42010114 100644
+> > --- a/netlink/cable_test.c
+> > +++ b/netlink/cable_test.c
+> > @@ -18,7 +18,7 @@ struct cable_test_context {
+> >  };
+> > =20
+> >  static int nl_get_cable_test_result(const struct nlattr *nest, uint8_t=
+ *pair,
+> > -				    uint16_t *code)
+> > +				    uint16_t *code, uint32_t *src)
+> >  {
+> >  	const struct nlattr *tb[ETHTOOL_A_CABLE_RESULT_MAX+1] =3D {};
+> >  	DECLARE_ATTR_TB_INFO(tb);
+> > @@ -32,12 +32,15 @@ static int nl_get_cable_test_result(const struct nl=
+attr *nest, uint8_t *pair,
+> > =20
+> >  	*pair =3D mnl_attr_get_u8(tb[ETHTOOL_A_CABLE_RESULT_PAIR]);
+> >  	*code =3D mnl_attr_get_u8(tb[ETHTOOL_A_CABLE_RESULT_CODE]);
+> > +	if (tb[ETHTOOL_A_CABLE_RESULT_CODE])
+> > +		*src =3D mnl_attr_get_u32(tb[ETHTOOL_A_CABLE_RESULT_SRC]);
+>=20
+> ETHTOOL_A_CABLE_RESULT_SRC is a new property, so only newer kernels
+> will report it. I think you need an
+> if (tb[ETHTOOL_A_CABLE_RESULT_SRC]) here, and anywhere else you look for
+> this property?
 
-  Merge tag 'net-next-6.13' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2024-11-21 08:28:08 -0800)
+Looks like a forgotten edit of copy&pasted text as the
+!tb[ETHTOOL_A_CABLE_RESULT_CODE] case is already handled by a bail out
+few lines before. (And the same for ETHTOOL_A_CABLE_FAULT_LENGTH_CM in
+nl_get_cable_test_fault_length().)
 
-are available in the Git repository at:
+Michal
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.13-rc1
+--prhtkawvkibaprk2
+Content-Type: application/pgp-signature; name="signature.asc"
 
-for you to fetch changes up to f6d7695b5ae22092fa2cc42529bb7462f7e0c4ad:
+-----BEGIN PGP SIGNATURE-----
 
-  ipmr: fix build with clang and DEBUG_NET disabled. (2024-11-28 17:40:54 +0100)
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmdIqhUACgkQ538sG/LR
+dpWWSggAkUwEuOl+ImSQRxmMLLvTMGC+y8LllqNDEGK6qCvebNrBRfT9+BlQ0n/1
+beNEPb3sCt4HsJhSpLD0hI/LMqOnmB+8R2/GKOFeornW7SSUwC98mFhRXMC81gai
+Ed5Zxwps6+6fZulbcj2cHVOg+IC93iBvqeleR8GtCngqHSDbSqY7IX8ZRRL5BcGu
+pT+58KYpXeuYE9gKiSXS1q8HDfYBdjlcUo3udqiUE5n69ufxywRjxO95cJ5JRInU
+KLlUiQADsD8bp8Q7G8OGviIrK9U3awXuXv8Q7OaH9ghMlbU4GAX0vXPQpwkw7/r/
+vwoW7pLGXWeqwG/rDdk+8Ki01V+rPg==
+=rOtl
+-----END PGP SIGNATURE-----
 
-----------------------------------------------------------------
-Including fixes from bluetooth.
-
-Current release - regressions:
-
-  - rtnetlink: fix rtnl_dump_ifinfo() error path
-
-  - bluetooth: remove the redundant sco_conn_put
-
-Previous releases - regressions:
-
-  - netlink: fix false positive warning in extack during dumps
-
-  - sched: sch_fq: don't follow the fast path if Tx is behind now
-
-  - ipv6: delete temporary address if mngtmpaddr is removed or unmanaged
-
-  - tcp: fix use-after-free of nreq in reqsk_timer_handler().
-
-  - bluetooth: fix slab-use-after-free Read in set_powered_sync
-
-  - l2tp: fix warning in l2tp_exit_net found
-
-  - eth: bnxt_en: fix receive ring space parameters when XDP is active
-
-  - eth: lan78xx: fix double free issue with interrupt buffer allocation
-
-  - eth: tg3: set coherent DMA mask bits to 31 for BCM57766 chipsets
-
-Previous releases - always broken:
-
-  - ipmr: fix tables suspicious RCU usage
-
-  - iucv: MSG_PEEK causes memory leak in iucv_sock_destruct()
-
-  - eth: octeontx2-af: fix low network performance
-
-  - eth: stmmac: dwmac-socfpga: set RX watchdog interrupt as broken
-
-  - eth: rtase: correct the speed for RTL907XD-V1
-
-Misc:
-
-  - some documentation fixup
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Choong Yong Liang (1):
-      net: stmmac: set initial EEE policy configuration
-
-David Wei (1):
-      selftests: fix nested double quotes in f-string
-
-Edward Adam Davis (1):
-      Bluetooth: SCO: remove the redundant sco_conn_put
-
-Eric Dumazet (2):
-      rtnetlink: fix rtnl_dump_ifinfo() error path
-      net: hsr: fix hsr_init_sk() vs network/transport headers.
-
-Guenter Roeck (1):
-      net: microchip: vcap: Add typegroup table terminators in kunit tests
-
-Hangbin Liu (3):
-      net/ipv6: delete temporary address if mngtmpaddr is removed or unmanaged
-      selftests/rtnetlink.sh: add mngtempaddr test
-      selftests: rds: move test.py to TEST_FILES
-
-Hariprasad Kelam (5):
-      octeontx2-af: RPM: Fix mismatch in lmac type
-      octeontx2-af: RPM: Fix low network performance
-      octeontx2-af: RPM: fix stale RSFEC counters
-      octeontx2-af: RPM: fix stale FCFEC counters
-      octeontx2-af: Quiesce traffic before NIX block reset
-
-Heiner Kallweit (1):
-      net: phy: ensure that genphy_c45_an_config_eee_aneg() sees new value of phydev->eee_cfg.eee_enabled
-
-Jakub Kicinski (3):
-      netlink: fix false positive warning in extack during dumps
-      selftests: net: test extacks in netlink dumps
-      net_sched: sch_fq: don't follow the fast path if Tx is behind now
-
-James Chapman (1):
-      net/l2tp: fix warning in l2tp_exit_net found by syzbot
-
-Justin Lai (3):
-      rtase: Refactor the rtase_check_mac_version_valid() function
-      rtase: Correct the speed for RTL907XD-V1
-      rtase: Corrects error handling of the rtase_check_mac_version_valid()
-
-Kuniyuki Iwashima (1):
-      tcp: Fix use-after-free of nreq in reqsk_timer_handler().
-
-Leo Stone (1):
-      Documentation: tls_offload: fix typos and grammar
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: MGMT: Fix slab-use-after-free Read in set_powered_sync
-      Bluetooth: MGMT: Fix possible deadlocks
-
-Maxime Chevallier (1):
-      net: stmmac: dwmac-socfpga: Set RX watchdog interrupt as broken
-
-Michael Chan (2):
-      bnxt_en: Refactor bnxt_ptp_init()
-      bnxt_en: Unregister PTP during PCI shutdown and suspend
-
-Michal Luczaj (3):
-      llc: Improve setsockopt() handling of malformed user input
-      rxrpc: Improve setsockopt() handling of malformed user input
-      net: Comment copy_from_sockptr() explaining its behaviour
-
-Oleksij Rempel (3):
-      net: usb: lan78xx: Fix double free issue with interrupt buffer allocation
-      net: usb: lan78xx: Fix memory leak on device unplug by freeing PHY device
-      net: usb: lan78xx: Fix refcounting and autosuspend on invalid WoL configuration
-
-Paolo Abeni (11):
-      Merge branch 'correcting-switch-hardware-versions-and-reported-speeds'
-      Merge branch 'ipv6-fix-temporary-address-not-removed-correctly'
-      Merge branch 'octeontx2-af-misc-rpm-fixes'
-      Merge branch 'bnxt_en-bug-fixes'
-      Merge branch 'net-fix-some-callers-of-copy_from_sockptr'
-      Merge tag 'for-net-2024-11-26' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
-      ipmr: add debug check for mr table cleanup
-      ip6mr: fix tables suspicious RCU usage
-      ipmr: fix tables suspicious RCU usage
-      Merge branch 'net-fix-mcast-rcu-splats'
-      ipmr: fix build with clang and DEBUG_NET disabled.
-
-Pavan Chebbi (1):
-      tg3: Set coherent DMA mask bits to 31 for BCM57766 chipsets
-
-Rosen Penev (1):
-      net: mdio-ipq4019: add missing error check
-
-Russell King (Oracle) (1):
-      net: phy: fix phy_ethtool_set_eee() incorrectly enabling LPI
-
-Saravanan Vajravel (1):
-      bnxt_en: Reserve rings after PCIe AER recovery if NIC interface is down
-
-Shravya KN (2):
-      bnxt_en: Set backplane link modes correctly for ethtool
-      bnxt_en: Fix receive ring space parameters when XDP is active
-
-Sidraya Jayagond (1):
-      s390/iucv: MSG_PEEK causes memory leak in iucv_sock_destruct()
-
-Somnath Kotur (1):
-      bnxt_en: Fix queue start to update vnic RSS table
-
-Vitalii Mordan (1):
-      marvell: pxa168_eth: fix call balance of pep->clk handling routines
-
-Vyshnav Ajith (1):
-      Fix spelling mistake
-
- Documentation/networking/cdc_mbim.rst              |   2 +-
- Documentation/networking/tls-offload.rst           |  29 ++---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c          |  37 +++++-
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c  |   9 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c      |   4 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h      |   3 +-
- drivers/net/ethernet/broadcom/tg3.c                |   3 +
- drivers/net/ethernet/marvell/octeontx2/af/cgx.c    |  70 ++++++++++-
- drivers/net/ethernet/marvell/octeontx2/af/cgx.h    |   5 +
- .../ethernet/marvell/octeontx2/af/lmac_common.h    |   7 +-
- drivers/net/ethernet/marvell/octeontx2/af/rpm.c    |  87 ++++++++++----
- drivers/net/ethernet/marvell/octeontx2/af/rpm.h    |  18 ++-
- drivers/net/ethernet/marvell/octeontx2/af/rvu.c    |   1 +
- drivers/net/ethernet/marvell/octeontx2/af/rvu.h    |   1 +
- .../net/ethernet/marvell/octeontx2/af/rvu_cgx.c    |  45 +++++--
- drivers/net/ethernet/marvell/pxa168_eth.c          |  14 +--
- .../net/ethernet/microchip/vcap/vcap_api_kunit.c   |  17 +--
- drivers/net/ethernet/realtek/rtase/rtase.h         |   7 +-
- drivers/net/ethernet/realtek/rtase/rtase_main.c    |  43 ++++---
- .../net/ethernet/stmicro/stmmac/dwmac-socfpga.c    |   2 +
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |   3 +
- drivers/net/mdio/mdio-ipq4019.c                    |   5 +-
- drivers/net/phy/phy-c45.c                          |   2 +-
- drivers/net/phy/phy.c                              |  52 +++++----
- drivers/net/usb/lan78xx.c                          |  40 ++++---
- include/linux/phy.h                                |   2 +
- include/linux/sockptr.h                            |   2 +
- net/bluetooth/mgmt.c                               |  38 ++++--
- net/bluetooth/sco.c                                |   2 +-
- net/core/rtnetlink.c                               |  14 ++-
- net/hsr/hsr_device.c                               |   4 +-
- net/ipv4/inet_connection_sock.c                    |   2 +-
- net/ipv4/ipmr.c                                    |  56 ++++++---
- net/ipv6/addrconf.c                                |  41 +++++--
- net/ipv6/ip6mr.c                                   |  52 +++++++--
- net/iucv/af_iucv.c                                 |  26 +++--
- net/l2tp/l2tp_core.c                               |  22 +++-
- net/llc/af_llc.c                                   |   2 +-
- net/netlink/af_netlink.c                           |  21 ++--
- net/rxrpc/af_rxrpc.c                               |   7 +-
- net/sched/sch_fq.c                                 |   6 +
- .../selftests/drivers/net/hw/lib/py/linkconfig.py  |   2 +-
- tools/testing/selftests/net/Makefile               |   3 +-
- tools/testing/selftests/net/netlink-dumps.c        | 129 +++++++++++++++++++++
- tools/testing/selftests/net/rds/Makefile           |   5 +-
- tools/testing/selftests/net/rtnetlink.sh           |  95 +++++++++++++++
- 46 files changed, 811 insertions(+), 226 deletions(-)
-
+--prhtkawvkibaprk2--
 
