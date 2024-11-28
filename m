@@ -1,118 +1,119 @@
-Return-Path: <netdev+bounces-147787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45B0B9DBCAE
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 20:43:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DF9A9DBCB7
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 20:59:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F22781624F2
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 19:43:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAC7C16467C
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 19:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FBC61C302E;
-	Thu, 28 Nov 2024 19:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C16D1487C1;
+	Thu, 28 Nov 2024 19:59:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FYqTaA7l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e2kRFp9l"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2DF1C231D
-	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 19:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1FD7A13A
+	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 19:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732822996; cv=none; b=n2PjqEmOn8Q9UQKC8GomGmLWa10Uilqx8XP2G7mx6uuHxNpk/qVS9ryF5yMqPVBDmUieAZLZRV8ciUkNhjm/yL7lLN7R3OTHwSDZyeBUHSS8VhiQeIesdAKIJpsIqq8oFkYnWeQ374Es38oxvQnKkP2gIvzf2jLwIDQtD4odENQ=
+	t=1732823952; cv=none; b=Jxl4x/Yia0iA8bIV8HpHNvE+PD9npDNdu2jz5Qj9gn1syz1iz3drCecyEUjg8CDOhFGChqbH12D59j/gV1vWKqFQOsUZyoGd+gFgy9/x3P1y210TK41i1d8EWAPYEt3rqhQ7eEEEm4PsXC6EP2YaPTM/lxt+D4J7LEu324l4ivI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732822996; c=relaxed/simple;
-	bh=VaTHl5CWYXaEUg5GJy076IuF06Ppro6TIwGO5pxBuO0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WTCwQnvzJ5Q+uEwPIZpyWTT/4Y8v3PjkEmVRzwqp+b6hjGixxvkahNMQFX/B4i1GujGcAAnorzWoWtJRye0iCkW7aq9zGmMZ6S0ZTie5Gc0D+5WIp4FYDLiaywSa5PSLZQxdARp/+AfeYN4/KFIHrfghoxzSPrBvG+cZdHFRZ3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FYqTaA7l; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732822993;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PGHdr5xe6OO2VfVdzoKzmBYzOtEMeKKpC50tlN0vOu0=;
-	b=FYqTaA7ltxX7VfLkNB+1VOmt36SgJsBUkgDpNjV7+HxiqYWB3BxoEfkl/LYvBj2l9c1uFS
-	HcuTxN3aFs+Z99yxWEbGmdDXUY2hnMyxheGGTpDB/IsXZwoPnWjj5I7jnytPTzCRlJwHCi
-	hYi0QzxgXaTWhonp7T1P94znBo2cPfQ=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-312-pQL-K4C2OSu2dQbquJMVrw-1; Thu,
- 28 Nov 2024 14:43:10 -0500
-X-MC-Unique: pQL-K4C2OSu2dQbquJMVrw-1
-X-Mimecast-MFC-AGG-ID: pQL-K4C2OSu2dQbquJMVrw
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DF1651954197;
-	Thu, 28 Nov 2024 19:43:04 +0000 (UTC)
-Received: from starship.lan (unknown [10.22.88.88])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7ECDB195605A;
-	Thu, 28 Nov 2024 19:43:01 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: kvm@vger.kernel.org
-Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Eric Dumazet <edumazet@google.com>,
-	linux-hyperv@vger.kernel.org,
-	Long Li <longli@microsoft.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Leon Romanovsky <leon@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Dexuan Cui <decui@microsoft.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: mana: Fix memory leak in mana_gd_setup_irqs
-Date: Thu, 28 Nov 2024 14:43:00 -0500
-Message-Id: <20241128194300.87605-1-mlevitsk@redhat.com>
+	s=arc-20240116; t=1732823952; c=relaxed/simple;
+	bh=WojhLmvNYdvGz1lXH4yB9jUW012CA0hTwl5wJZAods8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=feSr+K0MYmsW19LfMJ0FcIVWbyIehNl3SLXiXQGo4Z+ffOFo2HQo3fGIaUdigPN0tQhB6OZiOE8sLZTMVAgTEMO4kX4myKeQeUeH9B3LAyDWR9dApNUyFkK/ZWOXI0HwE8G5z4Lmf9knNKjlO3/DmoLBPp7X5NYz8vDuLBcWYgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e2kRFp9l; arc=none smtp.client-ip=209.85.161.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5f1e573f365so479036eaf.1
+        for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 11:59:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732823950; x=1733428750; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RQoJvwwRV2WuKH22MOuMgnTVVA7Jtg/d2Ctxd5KIy5A=;
+        b=e2kRFp9l8XyY125I2ozMcLXI+JK5ycWWeJZyes0BsginN7ziXDRFYnFtlvm6DgH2Ca
+         Kc9zm79RhrRf+EJPUlfOONz9vQ+rEjvNmPLVBDlTru9nkDUfG8BlPv6VdzPrS0GW9jo3
+         cXdf1gi6yZvulpXx1zdfXj0xBXeL0QoNq+dkmB8eLM/zpF2yn2ZEbDnTp3Bs1woYNkAK
+         CRqyZ69hxCQWbB1xwL23MI+Ma+vNJKNUkt6f1EnGMQPQ3oyVSb/XEYDvN1YSjtWtomad
+         BVnxra5vhohC1NJar88UyaHyE+6et0sGDVMEJx/SBYVPGQjAmOH5QQG16mv6Yut8s1b2
+         zKuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732823950; x=1733428750;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RQoJvwwRV2WuKH22MOuMgnTVVA7Jtg/d2Ctxd5KIy5A=;
+        b=gs/NgUyK4uqx17zJPS86VfSDiv/Mpu3k9zJ0irMF761eLV4mbqnRMi+ZVfVNhh4ZXz
+         UGxIR+TtZJpaYaTmxpL/E2IuXq+3M5ccnIQvEw/OC9jzZSXD0axVmdPx5qPs5OrGuBtO
+         GsJMEj6flOb9NYBdM4YZtnwJEWFht63r7huEblqFtIZLGK3GumlPXLgoEUTu6aPv8K88
+         D9WN8SWQ/8MSo9xiXcjMp0SeWWoXMFdkCXIQ2B0WBVbdeglgU1cnN8Og6/LpK1Yujzy/
+         Ja3BrOZ4RwLNt9KUPWZhbu1qr/DJWDUnW6CyOCm0ta4x01pS1Nvo2mSDZyaN9v4qn9lM
+         DG0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXIccR/Z6fbBAS+46qu4P52RaO6gl1hFKctKuAlDpnzewoGeTIXOcCC/+H9kv8Iio9SQ7KGVjo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8R92xU09t6Y7pR6Vh+R86f4kt4XChl6RaVwyl4cJK3AmJe2/g
+	vrnKS4c31yARyAJRvRtCn3ksYzgy7s5hhtBM/qB4phSDVy964nBf
+X-Gm-Gg: ASbGnctNYmO38cQeA7z3Ff6bHzqE8agPgIqs4MriZdLjKcQSdQ6K+DDLCfk90+H9Rjj
+	p7VKgbEuGCU3VPh2VxAIw2elvQKmuU7EnPF6URDhdL9qp8V6ZGBzQWIO/ZrL7H2JijOfeUBNgHF
+	EESAlxsY/QVQbcBAwOhr8r4F5qkyMVHIokA8yzahleGMS+hHb6F+bipwpPtKdrFg8L5jrZude/M
+	BCtbbHZPAWQ6GwB4awnfHWvDABwqu2dTiIeks1DhcuzEXKgkkSVtpgUk3QtVKbSgph6nQ==
+X-Google-Smtp-Source: AGHT+IHFkbPlipMnHbPl0yjwyi6QLmWlxz6kS5RUQqGeJVF42MyMeYrGcOOJbrV3b4mnMkEG8c5EtA==
+X-Received: by 2002:a05:6820:1620:b0:5f1:e8fd:5da2 with SMTP id 006d021491bc7-5f20a1e71a6mr6974410eaf.7.1732823949941;
+        Thu, 28 Nov 2024 11:59:09 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5f21a4cc99dsm451475eaf.33.2024.11.28.11.59.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Nov 2024 11:59:09 -0800 (PST)
+Date: Thu, 28 Nov 2024 11:59:06 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"Korba, Przemyslaw" <przemyslaw.korba@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Olech, Milena" <milena.olech@intel.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Subject: Re: [PATCH iwl-net] ice: fix incorrect PHY settings for 100 GB/s
+Message-ID: <Z0jLiisnLOTSvbaW@hoboy.vegasvil.org>
+References: <20241126102311.344972-1-przemyslaw.korba@intel.com>
+ <946b6621-fd35-46b9-84ee-37de14195610@lunn.ch>
+ <PH0PR11MB4904824FA658713F78CA404D94282@PH0PR11MB4904.namprd11.prod.outlook.com>
+ <6cca6089-ed72-407a-8f23-70bb67b42e63@intel.com>
+ <1c95b010-cb57-4864-aa0b-82b7093f44d1@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1c95b010-cb57-4864-aa0b-82b7093f44d1@lunn.ch>
 
-Commit 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
-added memory allocation in mana_gd_setup_irqs of 'irqs' but the code
-doesn't free this temporary array in the success path.
+On Thu, Nov 28, 2024 at 05:20:44PM +0100, Andrew Lunn wrote:
 
-This was caught by kmemleak.
+> "only Intel's driver" is a bit of a worry. Part of being a Maintainer
+> is to ensure that all drivers behave the same. There should not be any
+> difference between an Intel PTP device, a Marvell PTP devices, a
+> Microchip PTP device etc. They should all implement the API in a
+> uniform way.
 
-Fixes: 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- drivers/net/ethernet/microsoft/mana/gdma_main.c | 1 +
- 1 file changed, 1 insertion(+)
+Yes, and I appreciate it being on CC even for driver changes.
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index e97af7ac2bb2..aba188f9f10f 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -1375,6 +1375,7 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
- 	gc->max_num_msix = nvec;
- 	gc->num_msix_usable = nvec;
- 	cpus_read_unlock();
-+	kfree(irqs);
- 	return 0;
- 
- free_irq:
--- 
-2.26.3
+> What i have also seen is that if one driver gets something wrong,
+> other drivers might as well.
 
+Yeah, unfortunately there are many device drivers (not just
+PTP/network drivers) that get things wrong.  These are then copied by
+the authors of new drivers, and so on.
+
+Thanks,
+Richard
 
