@@ -1,186 +1,116 @@
-Return-Path: <netdev+bounces-147741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EBE39DB79D
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 13:29:37 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C7699DB7A7
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 13:30:28 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3575AB23DFA
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 12:29:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA32D1635C3
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 12:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F94419D092;
-	Thu, 28 Nov 2024 12:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC56C19D09C;
+	Thu, 28 Nov 2024 12:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NF86R7YP"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="RoNn7aZw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5872519CC02
-	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 12:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07FB19C54C;
+	Thu, 28 Nov 2024 12:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732796957; cv=none; b=lZ4D2mGKRiYrKKJL/DKdoSh5UA3ZT2hqA0clty4srTFdipK944d+hwY7mrHMW4OP+RZdMIZ4DioKw9ODv0dBQPTKvqXcahRLXimnFF5YsHZCFVpKMd0EPxYozXnhbdQRPf6A16GmsCS8sBW1qlRsGL5Jud8ryOp51y9IwXYgkvI=
+	t=1732797014; cv=none; b=kQZLCtVHxjgoL70p+x5bHXoU5mvD0qhJXChq7sUqhdUrdolxAHeB6/ZzfPD7RR2068eaiUUQdwe5SkbTsn6U/ChaTe7xFudO+Dtwz5uifUkb/l5DzxLZLeoj6t03DHNjwqTzCNIXZXNzM2wqFse4l39s/NX+rg4FvfhhDq9XUjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732796957; c=relaxed/simple;
-	bh=JpPbSJkGmB+FiXHSVu+2bxdWkGhcoXfBF30rmHgjyGg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bQXyNQViHw40lBZYcK34FqyiBYROqiZ/tdvVje2EKDZoBDhMTVm+CKIvfj/hZctGiN7vSOEhjKduGeAB9Kpome07RvHFOKlfn4CvkbGdmSwEPRhwc5OFycmnROK8xCAEzLPMZnSq32YmgbGDH0+mAJaHnjrmbznhOJNP4aC2Hhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NF86R7YP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732796954;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0Nxf6CkGK3NslY+JLgqPcTLt32q1OCumzkrHYUKQkbE=;
-	b=NF86R7YPaO4OmYapdN/YmkctK36hyatOwgFnMmypDgOYs+5hDSzw9VI6kPrX1Sfwh9Y/oh
-	pkRUEbh4+BmMaTxCAagWRlwi7lwQxDFd7HAWNdry//JprUXWVkYB37Tpxs4gq9uxDC5E3q
-	Hb7mXLh0aj/aMRbdo2tBNwPWG0P55Bs=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-178-dEgXcKHLNFWss4JZ_YQO0g-1; Thu, 28 Nov 2024 07:29:13 -0500
-X-MC-Unique: dEgXcKHLNFWss4JZ_YQO0g-1
-X-Mimecast-MFC-AGG-ID: dEgXcKHLNFWss4JZ_YQO0g
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5cfb912729dso487202a12.3
-        for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 04:29:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732796952; x=1733401752;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0Nxf6CkGK3NslY+JLgqPcTLt32q1OCumzkrHYUKQkbE=;
-        b=RRRoSdiCs+PbqlxmM9utdNA040caTXE2Ne6KAXokCY4KEmI8iqOcDsChWo878kPb8R
-         NhLAf/B3HxI7UhfKNWT33d9T273Dxmn0O+zfXB5bd/3ZMepDv3h1NW8Q5ZPwmqY3wZ/k
-         Hy/N5m0yr/uCThaUOB5qhzL7scAW4qJtzbiwXWeKpPgIp05IXobGkdBjnorEcDHjwb4/
-         T4zgPGxTooDFmK6CylKMPTnJySXvmGvjQV3VN4L/77InNIzKPnj+mpwCr9E2hwSLJ+7J
-         rpjEeuupHc5RaBroUtcpfte32MAkCeRXzLlQ3cOcFuML/D4Ul7T4rnooOgaAn1CU+5Ea
-         5AAA==
-X-Forwarded-Encrypted: i=1; AJvYcCWCSPSXlZRoLr76YDQ2Xt4xmQRolHLkIqSxAIeW/eM0YxQe29id0gpDdpRq9jIWDbZsMlDGxvE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3Hmj0PnXHkQhFucoNM7u5chjBxmNODUQvx8J1BpTxcxWXTFE4
-	i0IzvPpWHMZnYKGJdsT/XCQtZeQm2ePwQ/aLLHYeiNM46bNkYev3B4B2+C8aqV72ZqxnLYhtwsX
-	ifkzS237UXae5oOhxOIWI+XYg8f/nUN3DqslsEhBNDN1qkFFcIamPK4k+pXKQiDxWgwXKTExS3J
-	q2o+PtW0QqJQgSb61H7ksriRW66ZGe
-X-Gm-Gg: ASbGnctxNC2rt+RODgJTvZDK9kdHlyY1VhLpRjguhLilgh0tA9S1w24w46wu9C4wRQ4
-	gkGUO9joAb+X04eYOmyZutFqZXVM1XM0=
-X-Received: by 2002:a05:6402:5243:b0:5cf:e26b:9797 with SMTP id 4fb4d7f45d1cf-5d080c604fcmr5605112a12.29.1732796951936;
-        Thu, 28 Nov 2024 04:29:11 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGuE0zkJ6zJza+fGet7qX+06h7Jmet7/bu0xRwgqC9A06SMAgod8PaoQJd1k5pY7KRDfw0cJAGqmNIglvOyUZo=
-X-Received: by 2002:a05:6402:5243:b0:5cf:e26b:9797 with SMTP id
- 4fb4d7f45d1cf-5d080c604fcmr5605060a12.29.1732796951475; Thu, 28 Nov 2024
- 04:29:11 -0800 (PST)
+	s=arc-20240116; t=1732797014; c=relaxed/simple;
+	bh=HyeQglZOudROU9yJJbfOQSXVMLAgWs9JGAnbZ3wh/jg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pABU+joqLwxKXO1jmCTVPdflQ1uxljzuQ2489zhm4fSWJzNNcj9pMuIcCcYlRlVs4rnZJTOYGXbBCj3K+d59jLvqEfIGk6hrZDDKcr63H9oQNWuGZC0edyiYq0dNu8RYVY1+I28qoZCGjMhUt0adpGoyrgJFqzaiVOPmkRoLnjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=RoNn7aZw; arc=none smtp.client-ip=198.47.19.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 4ASCTh2Y1097675
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 28 Nov 2024 06:29:43 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1732796983;
+	bh=noavx6PZ/oVwRRxrHaJIk2XW7aikczxx+lo0NYI5Ov4=;
+	h=From:To:CC:Subject:Date;
+	b=RoNn7aZw5ab9cUJTmftgh0FvcVUTVfghtjty+pInJMH28Kf7r0kOXvfUXEhmQmHXz
+	 CQp6HLQItthpc7NHrBeLCIQrjnN7jVab1A+KZ6HOr1MmtNFaflH0ey8+PfKNrMjAC+
+	 rkmIZClLkAo9RGyvMQ0jIn4I3+NNa4/f5UrdrX2o=
+Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4ASCThHi107006;
+	Thu, 28 Nov 2024 06:29:43 -0600
+Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 28
+ Nov 2024 06:29:42 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 28 Nov 2024 06:29:42 -0600
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4ASCTgVM042252;
+	Thu, 28 Nov 2024 06:29:42 -0600
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 4ASCTfA3028118;
+	Thu, 28 Nov 2024 06:29:42 -0600
+From: Meghana Malladi <m-malladi@ti.com>
+To: <lokeshvutla@ti.com>, <vigneshr@ti.com>, <m-malladi@ti.com>,
+        <javier.carrasco.cruz@gmail.com>, <diogo.ivo@siemens.com>,
+        <jacob.e.keller@intel.com>, <horms@kernel.org>, <pabeni@redhat.com>,
+        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
+        <andrew+netdev@lunn.ch>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net v2 0/2] IEP clock module bug fixes
+Date: Thu, 28 Nov 2024 17:59:29 +0530
+Message-ID: <20241128122931.2494446-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com>
- <20241115-converge-secs-to-jiffies-v1-18-19aadc34941b@linux.microsoft.com>
-In-Reply-To: <20241115-converge-secs-to-jiffies-v1-18-19aadc34941b@linux.microsoft.com>
-From: Alex Markuze <amarkuze@redhat.com>
-Date: Thu, 28 Nov 2024 14:29:00 +0200
-Message-ID: <CAO8a2SjKS2nWWVkAcqXkZhR+Q1TocULkwRk09ABf8XQjjzwJPQ@mail.gmail.com>
-Subject: Re: [PATCH 18/22] ceph: Convert timeouts to secs_to_jiffies()
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Julia Lawall <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, 
-	Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, 
-	Robert Jarzmik <robert.jarzmik@free.fr>, Russell King <linux@armlinux.org.uk>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>, 
-	Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi <lucas.demarchi@intel.com>, 
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
-	Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	James Smart <james.smart@broadcom.com>, Dick Kennedy <dick.kennedy@broadcom.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>, 
-	Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui <rjui@broadcom.com>, 
-	Scott Branden <sbranden@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>, 
-	Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
-	Miroslav Benes <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, 
-	Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Lucas Stach <l.stach@pengutronix.de>, Russell King <linux+etnaviv@armlinux.org.uk>, 
-	Christian Gmeiner <christian.gmeiner@gmail.com>, Louis Peens <louis.peens@corigine.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	cocci@inria.fr, linux-arm-kernel@lists.infradead.org, 
-	linux-s390@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	intel-xe@lists.freedesktop.org, linux-scsi@vger.kernel.org, 
-	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org, 
-	linux-mm@kvack.org, linux-bluetooth@vger.kernel.org, 
-	linux-staging@lists.linux.dev, linux-rpi-kernel@lists.infradead.org, 
-	ceph-devel@vger.kernel.org, live-patching@vger.kernel.org, 
-	linux-sound@vger.kernel.org, etnaviv@lists.freedesktop.org, 
-	oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org, 
-	Anna-Maria Behnsen <anna-maria@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-looks good
+Hi All,
+This series has some bug fixes for IEP module needed by PPS and
+timesync operations.
 
-On Fri, Nov 15, 2024 at 11:35=E2=80=AFPM Easwar Hariharan
-<eahariha@linux.microsoft.com> wrote:
->
-> Changes made with the following Coccinelle rules:
->
-> @@ constant C; @@
->
-> - msecs_to_jiffies(C * 1000)
-> + secs_to_jiffies(C)
->
-> @@ constant C; @@
->
-> - msecs_to_jiffies(C * MSEC_PER_SEC)
-> + secs_to_jiffies(C)
->
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-> ---
->  fs/ceph/quota.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/ceph/quota.c b/fs/ceph/quota.c
-> index 06ee397e0c3a6172592e62dba95cd267cfff0db1..d90eda19bcc4618f98bfed833=
-c10a6071cf2e2ac 100644
-> --- a/fs/ceph/quota.c
-> +++ b/fs/ceph/quota.c
-> @@ -166,7 +166,7 @@ static struct inode *lookup_quotarealm_inode(struct c=
-eph_mds_client *mdsc,
->         if (IS_ERR(in)) {
->                 doutc(cl, "Can't lookup inode %llx (err: %ld)\n", realm->=
-ino,
->                       PTR_ERR(in));
-> -               qri->timeout =3D jiffies + msecs_to_jiffies(60 * 1000); /=
-* XXX */
-> +               qri->timeout =3D jiffies + secs_to_jiffies(60); /* XXX */
->         } else {
->                 qri->timeout =3D 0;
->                 qri->inode =3D in;
->
-> --
-> 2.34.1
->
->
+Patch 1/2 fixes firmware load sequence to run all the firmwares
+when either of the ethernet interfaces is up. Move all the code
+common for firmware bringup under common functions.
+
+Patch 2/2 fixes distorted PPS signal when the ethernet interfaces
+are brough down and up. This patch also fixes enabling PPS signal
+after bringing the interface up, without disabling PPS.
+
+MD Danish Anwar (1):
+  net: ti: icssg-prueth: Fix firmware load sequence.
+
+Meghana Malladi (1):
+  net: ti: icssg-prueth: Fix clearing of IEP_CMP_CFG registers during
+    iep_init
+
+ drivers/net/ethernet/ti/icssg/icss_iep.c     |   9 ++
+ drivers/net/ethernet/ti/icssg/icssg_config.c |  45 ++++--
+ drivers/net/ethernet/ti/icssg/icssg_config.h |   1 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 150 ++++++++++++-------
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h |   3 +
+ 5 files changed, 142 insertions(+), 66 deletions(-)
+
+
+base-commit: dfc14664794a4706e0c2186a0c082386e6b14c4d
+-- 
+2.25.1
 
 
