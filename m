@@ -1,101 +1,128 @@
-Return-Path: <netdev+bounces-147781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6A8E9DBC30
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 19:35:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A94269DBC36
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 19:38:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22973281F34
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 18:35:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 330E3B20B92
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 18:38:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058971C1F31;
-	Thu, 28 Nov 2024 18:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD841C1ACB;
+	Thu, 28 Nov 2024 18:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sd1ohPme"
 X-Original-To: netdev@vger.kernel.org
-Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5D41C1AD1;
-	Thu, 28 Nov 2024 18:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B0D19EED3;
+	Thu, 28 Nov 2024 18:38:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732818932; cv=none; b=Pw3nVIRdDZU0E44DAykzuJGqsad4KRiRwO9CUCKSzqvWieDBSUtxiJdbhBr0019Soxi2Kmbvftqhyi78q3uCAhlbnzL2dH3JDCjoikhNMChwgWhhK+zEu0/1kJYXwRyo14GTu9k/E+YXR0IzcKPhn1OekYCnYI5GWiPCD/xmyd4=
+	t=1732819086; cv=none; b=pbClY0ga1erx2WH/6eLpOoe9UeGFIaCWLCFj0tzBgKH8Kaki4yyUecvhkB/0Z91SChMBIIS2JBEjF6M+WlPYIKEk3O3Z2ur8kKT0cJ6SCEqh1VsQCwBKKUTMXeaOuNuDB5RazhoUZBGAXJdaG4pFmn5kbsGFNIoBSPJm1v6128o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732818932; c=relaxed/simple;
-	bh=iK5M1/Niyt4Poh1Y/a5sp7IifwhDqAK7SOasFu30Oio=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=thexddXWDoT0vhk1avwSb/o1ay0QtSWSItuf1vmdAB6usCJIDxURdn8teUVsWPS12/29OiN6wWYhVPUB/G4KWCs+3bGt3Ja+nw+0JXzD+t5z7aLANniTlUuo3nOJNm3RgNdPhpiPcqouOB6HpqZGfeLhx97yK45SWNYd0TeqcUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
-Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
- (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Thu, 28 Nov
- 2024 21:35:26 +0300
-Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Thu, 28 Nov
- 2024 21:35:26 +0300
-From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Sasha Levin
-	<sashal@kernel.org>, <stable@vger.kernel.org>
-CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Boris Pismenny
-	<borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>, "Daniel
- Borkmann" <daniel@iogearbox.net>, Jakub Kicinski <kuba@kernel.org>, "David
- S. Miller" <davem@davemloft.net>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: [PATCH 5.4/5.10/5.15 1/1] net/tls: tls_is_tx_ready() checked list_entry
-Date: Thu, 28 Nov 2024 10:35:09 -0800
-Message-ID: <20241128183509.23236-2-n.zhandarovich@fintech.ru>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241128183509.23236-1-n.zhandarovich@fintech.ru>
-References: <20241128183509.23236-1-n.zhandarovich@fintech.ru>
+	s=arc-20240116; t=1732819086; c=relaxed/simple;
+	bh=5kHFSIgUt75t6zTwBLU8YLk/bo3MvEHaMsy1SVdn1xA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jlmrzPZSaQuDKExaSN4rCm4xJz+LK5pr8bJB+/43Nh++6Mbk7vlUEJO2OulBo3+KmAAvIkUK8pw5ABbEWvo13LKYTc0m+P4lAb9E/u5xqUOyhQOKttg/0ZuGW6tHH/xB1+hZmxX1EcnJ/QUGBskZFz3RtYT5nVB5JUnVFFDTuvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sd1ohPme; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7ee51d9ae30so699539a12.1;
+        Thu, 28 Nov 2024 10:38:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732819085; x=1733423885; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o+tE7Xp6FcgLMBVi5JpUkzbSQKbNu8pSIDauMkrQaJw=;
+        b=Sd1ohPme+zP0ABo8c3I53CT/jjKR6xv+Zwaev35pDdwZBTN91mQ/Xl8hhTldcWAPBi
+         vrmtvyoGfGfEX9oFXoCCAbu95fws8aQGk/n9wW79Sf4U5/6N4WGqCf9TBZvOBjwG4YVr
+         mU64FBUW+z+TyWEGHWsw4nsY6vBQMMXEjwxKeBEe9tE4R0m9YAcl9OjQmjfPVsCR2VJn
+         sffXCZmynX7QUrUUirFh360MeIy/vy6X0eZvYR5PBtUW8zTb1ZYOBmRJY4CXIeP9xXUQ
+         Of+A+B60rSKg931vKI7dABhOPK1OyRkTF/Nsw8BtEtN20mASF1OrLBjR398IhMC+fA9A
+         NEyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732819085; x=1733423885;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o+tE7Xp6FcgLMBVi5JpUkzbSQKbNu8pSIDauMkrQaJw=;
+        b=DU16x27zmydehRBwHeGrnLHM/XMARvgwOQdA5BPvcjJM/bVogEHELwpOgxOeeOzieI
+         BlEVdt6HSISIBZPaRJLJgScoou5R3E3keQ/Yap0IjPtTYVE32DDoHmRDnX/QvUTwW8Ja
+         W4JcaVdd1OmU+krEPlniILW3NWfTWSXhJY4xV6o/XafbqhP6Wft3W+SM6GRoA/Vc7Arr
+         UzViAMPnqvLwYKZ7ynmbv3jS8e3ZBTyJ5hrM5qPCJA1cUMO5IgHxW4ND/OYPorI4xige
+         v2TCCWPJ9iNR7Fn7kshSgIdaDMd8L5mUYIEHTb9ngSIY1iX+v+AoRHM1KHpMFomaL4/P
+         k4tw==
+X-Forwarded-Encrypted: i=1; AJvYcCUqcyh2/htv1BwyxEJylrkDGlnV5tK/HpBlBqkclOzt707zGQlkrp0cOcz2Uu1WW6wZgo4=@vger.kernel.org, AJvYcCXlBWH6c4xmeDid6bCl1QFoozR0IQqHmeY4zA89X41NCO1iUbzr04OLEU3YvSDr8d0y6Ev6sYVC@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwPo/7zebPFLw8XId1JGSpSD2HSdC4ggIc4Urd7YrS8fniSbh9
+	I5yuOUMJoEjqh7PpnPvf45hSuA9TENMYnQlEfqos8RFSEyHjn4WtlMI2CQ==
+X-Gm-Gg: ASbGncuGnB2FGODo3U6IlL/K3/eUKHZvJb+aUy/2sXN2FG3ZuFMCdqXk+IUSpBrTD5S
+	zzFDOEpzLaMpm2IiqmfSa6ZIAJMdITyJZ1LB56j9yMMLVQ08XaEr6dhu3fVctlJWjBUCxTUY56I
+	SkgXH0n0w4GFGlTGhMxqBvxozDSmp//aqoX6IeR9sVZwOogO1h+Ye6mZ/SmCN/9A52C92Hs49Zw
+	K5EBUikT4C7VCs0FXRTGdNoKHLSQWcMOz/LyO1WlKv9RBqPyYlMXvnd
+X-Google-Smtp-Source: AGHT+IHxAgsakWZpaMi/QTj+rwkOiNDU/j/x4CnaTAbnzdeHmOYAfVvEkWxmeXse+hh3jr4pfVnqxw==
+X-Received: by 2002:a17:90b:4a4e:b0:2ea:752c:3c2 with SMTP id 98e67ed59e1d1-2ee08eb2f0fmr9640255a91.13.1732819084630;
+        Thu, 28 Nov 2024 10:38:04 -0800 (PST)
+Received: from localhost ([2601:647:6881:9060:c1c1:c76b:dac2:9d68])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ee2aff1f28sm1803743a91.7.2024.11.28.10.38.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Nov 2024 10:38:04 -0800 (PST)
+Date: Thu, 28 Nov 2024 10:38:03 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: Zijian Zhang <zijianzhang@bytedance.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
+	Daniel Borkmann <daniel@iogearbox.net>
+Subject: Re: [External] [Patch bpf 2/2] selftests/bpf: Add a BPF selftest for
+ bpf_skb_change_tail()
+Message-ID: <Z0i4i0Db8EnRjzZJ@pop-os.localdomain>
+References: <20241107034141.250815-1-xiyou.wangcong@gmail.com>
+ <20241107034141.250815-2-xiyou.wangcong@gmail.com>
+ <67a0fb14-f791-4499-8751-01bbbd1cafcb@bytedance.com>
+ <6746cb81870d7_f422208e@john.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
- (10.0.10.18)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6746cb81870d7_f422208e@john.notmuch>
 
-From: Pietro Borrello <borrello@diag.uniroma1.it>
+On Tue, Nov 26, 2024 at 11:34:25PM -0800, John Fastabend wrote:
+> Zijian Zhang wrote:
+> > 
+> > LGTM!
+> > 
+> > I think it will be better if the test could also cover the case you
+> > indicated in the first patch, where skb_transport_offset is a negative
+> > value.
+> > 
+> > Thanks,
+> > Zijian
+> > 
+> 
+> Hi Cong,
+> 
+> I agree it would be great to see the skb_transport_offset is
+> negative pattern. Could we add it?
 
-[ Upstream commit ffe2a22562444720b05bdfeb999c03e810d84cbb ]
+Hmm? It is already negative for sockmap, as I already mentioned in patch
+1/1:
 
-tls_is_tx_ready() checks that list_first_entry() does not return NULL.
-This condition can never happen. For empty lists, list_first_entry()
-returns the list_entry() of the head, which is a type confusion.
-Use list_first_entry_or_null() which returns NULL in case of empty
-lists.
+"skb_transport_offset() and skb_transport_offset() can be negative when
+they are called after we pull the transport header, for example, when
+we use eBPF sockmap (aka at the point of ->sk_data_ready())."
 
-Fixes: a42055e ("net/tls: Add support for async encryption of records for performance")
-Signed-off-by: Pietro Borrello <borrello@diag.uniroma1.it>
-Link: https://lore.kernel.org/r/20230128-list-entry-null-check-tls-v1-1-525bbfe6f0d0@diag.uniroma1.it
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[Nikita: since tls_is_tx_ready() exists only as is_tx_ready() in
-include/net/tls.h, fix the issue there instead.]
-Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
----
- include/net/tls.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+My test case uses skb verdict, which is one of the sockmap hooks.
 
-diff --git a/include/net/tls.h b/include/net/tls.h
-index 7f220e03ebb2..e6836a5dfb6e 100644
---- a/include/net/tls.h
-+++ b/include/net/tls.h
-@@ -427,7 +427,7 @@ static inline bool is_tx_ready(struct tls_sw_context_tx *ctx)
- {
- 	struct tls_rec *rec;
- 
--	rec = list_first_entry(&ctx->tx_list, struct tls_rec, list);
-+	rec = list_first_entry_or_null(&ctx->tx_list, struct tls_rec, list);
- 	if (!rec)
- 		return false;
- 
--- 
-2.25.1
+Or I guess you mean positive? In that case, we would need hook different
+locations, like TC. I can certainly add it, but once again, it would
+make backporting this patchset even harder.
 
+Thanks!
 
