@@ -1,93 +1,115 @@
-Return-Path: <netdev+bounces-147706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B4149DB4B0
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 10:20:23 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 311189DB4BA
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 10:25:40 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F6A8B218F4
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 09:20:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA083164733
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 09:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE54154BEC;
-	Thu, 28 Nov 2024 09:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326A915574E;
+	Thu, 28 Nov 2024 09:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sgbSfD9T"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="wr9TLDYX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA96E145A11;
-	Thu, 28 Nov 2024 09:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC27E17BA5;
+	Thu, 28 Nov 2024 09:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732785617; cv=none; b=tRh6cm0B+2E1/3RYQEi92byKUBkr6hY5wa7RXloqfnFrJKwD4gfb1upPn8aJ15rCuFgSrpgHu34utZfTNpWqRtE5uq/JoS83EpdDajvTFQqG2rXsybV0yPrFJpgmVB7SXHTYaogxrgDopXIIRJs7XcMNPTVkjnB1TmcfSVzxL0A=
+	t=1732785936; cv=none; b=dMpnzbqL+ls00vO0lnVk91aylYj7d/BT4ujJSEIBHQv+njpmoFMaEkN7MfyUF5M8CNHW2XUmYlFoj84Lggl71R6JwkALOueLm3BKSsu20ln2l1OizI06ApEO0RJmH56ICMT6zuMqxV+tLZppC0jVw+F9nNwPAKX/Yr70JAtDRMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732785617; c=relaxed/simple;
-	bh=GDuSm73QraAtt0oqnAK19yP+OXaRigKSiICRLGas0Dw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QSnqTiK6uuwhd/89dmW8N8I0JfkjMRZ2KudKK+3dKqn8o1VyGpMWiptjsVB9DrgGnzgWcO5GmPqCwpWhAfdtyLMJvXMYXSqPN4eAOnZD2TOKvkoMZQphVFbS0ZpboG2H0U6H1uVXdKs47HDw9coepnRPO+65mo2gvhdsD4ggTTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sgbSfD9T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47813C4CECE;
-	Thu, 28 Nov 2024 09:20:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732785617;
-	bh=GDuSm73QraAtt0oqnAK19yP+OXaRigKSiICRLGas0Dw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sgbSfD9T3ZO+dlsiWGuaKltfUvkvzSXlFbC2LFZLOceofrWwMNc5IZFAiA4eu3X2m
-	 RoObNhczJnROLtXPUYgEyHPztKw0AzZWkPyhZ368jzEU9o1dbrFIm9kjQxCbAzZZ3v
-	 LyOOWa0kNQatT1dOM9PUuKiiLo23m6XIxMU9OjmBOfkbpO1lflED4MFtfgGIMICUbM
-	 Wj4E5tXj8KG1FOaZ8C9mO93onzaotHG3D75DEkaaVbzcJRNNnEHEhbuQ+PKEp2v0CW
-	 L1IH3md6eH3nsBQMiIdXs+1BxvVOYGF1odcCcdHsxlVzuyh1sOsx7KhUJQu0vNJF/K
-	 +lkRpMkeCBqoQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD12380A944;
-	Thu, 28 Nov 2024 09:20:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1732785936; c=relaxed/simple;
+	bh=xDZbs25Ro1Le6d5NO3nl0DYrtlOsay0BdyZ4UZbXCPE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ghzqw6c6YKBi0+Fctz51Zvz2TDbOD7qlPRgdEONRKYt9FLveAMmnTD/Lc26pqu5wgOAuX/D9URqg2WOojG7/5343KZ175njitEUPSzo/NEfMndJzB1S2L6Nsw5h/vktBg1flzE8sCcxFZ1Jkn3tib/v7K2K6kupZR1ube8enlo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=wr9TLDYX; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id B9F872088A;
+	Thu, 28 Nov 2024 10:25:24 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id Dllkb9X-ccYE; Thu, 28 Nov 2024 10:25:24 +0100 (CET)
+Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 2C0932085A;
+	Thu, 28 Nov 2024 10:25:24 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 2C0932085A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1732785924;
+	bh=t/7n88zTDlq2bmfBwLns/chDoKA+TtamzqKlnGAD0gI=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=wr9TLDYXU7kciVYcG7oyHnTRU+dqKUnApyv3puKjRvmi1+8FTfYBN/znrYQTiBaGY
+	 o1BCc0o+/xrod24w5pQQJvpZDtE5ejuJUCipnXQiDBvcwJoip1NCbzB77AzBxjshIx
+	 QdfADBrOa06rplJ/943xddlJCDa4GAD7C7R0kNTuOOfv4j8WMfHk3JQg5/wj0LfKoK
+	 YDiO40+TjTL1+7oDALE3IEIFp/qEbmulTWC71RcOp25U7P1rwom+fsrFpY4bqjJ8FA
+	 YI4GC4s6lsMqjIeUfu79xOi0hdcAiNNNAc72jb9gKmALbecRcR9RwxM88ygymhVO41
+	 xW22YUUuH+PIQ==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 28 Nov 2024 10:25:23 +0100
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 28 Nov
+ 2024 10:25:23 +0100
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 9038B3181FC0; Thu, 28 Nov 2024 10:25:23 +0100 (CET)
+Date: Thu, 28 Nov 2024 10:25:23 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Leon Romanovsky <leon@kernel.org>
+CC: Ilia Lin <ilia.lin@kernel.org>, <herbert@gondor.apana.org.au>, "David
+ Miller" <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] xfrm: Add pre-encap fragmentation for packet offload
+Message-ID: <Z0g3A87ArEdrOCgj@gauss3.secunet.de>
+References: <20241124093531.3783434-1-ilia.lin@kernel.org>
+ <20241124120424.GE160612@unreal>
+ <CA+5LGR2n-jCyGbLy9X5wQoUT5OXPkAc3nOr9bURO6=9ObEZVnA@mail.gmail.com>
+ <20241125194340.GI160612@unreal>
+ <CA+5LGR0e677wm5zEx9yYZDtsCUL6etMoRB2yF9o5msqdVOWU8w@mail.gmail.com>
+ <20241126083513.GL160612@unreal>
+ <Z0XGMxSou3AZrB2f@gauss3.secunet.de>
+ <20241126132145.GA1245331@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net_sched: sch_fq: don't follow the fast path if Tx is
- behind now
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173278563051.1673806.10013100672638771740.git-patchwork-notify@kernel.org>
-Date: Thu, 28 Nov 2024 09:20:30 +0000
-References: <20241124022148.3126719-1-kuba@kernel.org>
-In-Reply-To: <20241124022148.3126719-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: edumazet@google.com, netdev@vger.kernel.org, davem@davemloft.net,
- pabeni@redhat.com, stable@vger.kernel.org, jhs@mojatatu.com,
- xiyou.wangcong@gmail.com, jiri@resnulli.us
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241126132145.GA1245331@unreal>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sat, 23 Nov 2024 18:21:48 -0800 you wrote:
-> Recent kernels cause a lot of TCP retransmissions
+On Tue, Nov 26, 2024 at 03:21:45PM +0200, Leon Romanovsky wrote:
+> On Tue, Nov 26, 2024 at 01:59:31PM +0100, Steffen Klassert wrote:
+> > On Tue, Nov 26, 2024 at 10:35:13AM +0200, Leon Romanovsky wrote:
+> > > 
+> > > Steffen, do we need special case for packet offload here? My preference is
+> > > to make sure that we will have as less possible special cases for packet
+> > > offload.
+> > 
+> > Looks like the problem on packet offload is that packets
+> > bigger than MTU size are dropped before the PMTU signaling
+> > is handled.
 > 
-> [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-> [  5]   0.00-1.00   sec  2.24 GBytes  19.2 Gbits/sec  2767    442 KBytes
-> [  5]   1.00-2.00   sec  2.23 GBytes  19.1 Gbits/sec  2312    350 KBytes
->                                                       ^^^^
-> 
-> [...]
+> But PMTU should be less or equal to MTU, even before first packet was
+> sent. Otherwise already first packet will be fragmented.
 
-Here is the summary with links:
-  - [net,v2] net_sched: sch_fq: don't follow the fast path if Tx is behind now
-    https://git.kernel.org/netdev/net/c/122aba8c8061
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Atually I ment PMTU. On packet offload, we just drop packets bigger
+than PMTU. We need to make sure that xfrm{4,6}_tunnel_check_size
+is called. This will either fragment or do PMTU signaling.
 
