@@ -1,133 +1,180 @@
-Return-Path: <netdev+bounces-147718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B50DB9DB653
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 12:13:30 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B03D29DB662
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 12:19:16 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B02E28110F
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 11:13:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 655B5165283
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 11:19:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A0415E5CA;
-	Thu, 28 Nov 2024 11:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43015195980;
+	Thu, 28 Nov 2024 11:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NaQ2XkF5"
+	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="gSatPmu+"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E4B158531
-	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 11:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4649284E1C;
+	Thu, 28 Nov 2024 11:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732792407; cv=none; b=arB0wsNk55Muq2TKydAS3ZSsB/LncJ47cZZ5vk8mVwe9weZ94QkgqU5t0om0ZPy5AJxETprhu/HKcSQLV/OCcL1qzqf13ObPWCkH5q6Miuz+EQfvRglzQoBP4EWhlCdE3PX3Q4vopui0CFhYKupx8Jhe1LLjlrT+ESl7oLRVWxg=
+	t=1732792752; cv=none; b=X/MR4R458++ZpSs48efFYzpW3dOMaLz/WWjqUcgBxWU4gubuYL0WsTz/leez02XwTMnEHNO1QJTjubO2Is4Z+Jow0QDAHYWtz7qCiCOS+mGudmGQ6R2Zd7CVSNMwQMgnaR/gWcD9+RFmhMJd35YwdKNdpRfiWX4Ruf4EE6YeNEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732792407; c=relaxed/simple;
-	bh=EfDxn3wa4oPc2n3ROsh0C1qP0wN//eIh6SGuU1yaNgg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n2ibiZe8PJeVGEP3XmyeP92nDBiqArWtHv5jolzMz7NZERilFRxgTesBE01TEvY38fUaWHAm5Vo3+HCPhyKOiFnf7dbKXQWqhUJzJOhJENKU5T3FHk8IXFDIlgVKHaehmiy15UgwUY6zx9b0MuwezAAW2iH4ZboLUSFB4PSBu84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=NaQ2XkF5; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=YZzYJHFWOCvB53qVL1CMWFHtvZovTy2goym6l1eIshw=; b=NaQ2XkF5nVKsgG0VD2caLr7SVD
-	tAUrefe9IHfRydu0hnMIV/Em66IFlQfN74QBRW2EWYrtawFDfdSf+4ZKwBde/LimObaWnuWK5/eFm
-	U8Zn/lPLvheaEWvUtKvNv0BgaPJu3OINNSpkFTqiXtIWRMn95qHgdIbOLseS3H6YhkEE5MNFdrbCs
-	J/RxJzur9MUGKRqKwIbVNjRPtjpnHuR//APtfy/BGunazpHt+vXff7n6UM5+rDs9QorskLrI9ndJF
-	O4gZyeoNlhX0qEeh1NJJJXDK+LA3WwaTA6G4/BUrt+ztTQ8gmMrhGxUneGI7iwOyjHhebGyggPpg2
-	jZxo9HPQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33808)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tGcSJ-00025c-2F;
-	Thu, 28 Nov 2024 11:13:08 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tGcSG-00086T-0r;
-	Thu, 28 Nov 2024 11:13:04 +0000
-Date: Thu, 28 Nov 2024 11:13:04 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+	s=arc-20240116; t=1732792752; c=relaxed/simple;
+	bh=UeZaCJrPRNOMMCTBxSYlt5tB19qDO3+mBAS1XVsGV0A=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=mexfi/zlez6bCxOhhsyNPTsRRHg3JPLbwR3AG8Ht4qLzoBJr+7ECCllaikw76BJpAKcjL8W+526W8EX9aMteaYuavBNi4X9CRl7q/HT2EMEJOSChJ81YV6mJPi+RRfKbjLYkBY1CFVHER0MA1i8d1/0bt/7UOiAvrQTYFfirIl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=gSatPmu+; arc=none smtp.client-ip=193.238.174.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mg.ssi.bg (localhost [127.0.0.1])
+	by mg.ssi.bg (Proxmox) with ESMTP id 1CA7481300;
+	Thu, 28 Nov 2024 13:19:02 +0200 (EET)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.ssi.bg (Proxmox) with ESMTPS;
+	Thu, 28 Nov 2024 13:19:00 +0200 (EET)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id DF85A302E72;
+	Thu, 28 Nov 2024 13:18:49 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1732792731; bh=UeZaCJrPRNOMMCTBxSYlt5tB19qDO3+mBAS1XVsGV0A=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=gSatPmu+YkuDPMzVzD08d01eTowkOx6BFD8bNfsIC9QiGnfTQeawdi4B87JHBAzs3
+	 gIUbq85ZKcI0aJbVdQlEBaCNR/gkcDYK9Bru178+Nafv7zVYm+wnVcyY7SSiNWq9QC
+	 ylYe0bSzxW9reJ7b67ZyY3wVGRk28GgZ24gcNItg=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 4ASBIdhE024472;
+	Thu, 28 Nov 2024 13:18:39 +0200
+Date: Thu, 28 Nov 2024 13:18:39 +0200 (EET)
+From: Julian Anastasov <ja@ssi.bg>
 To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net v3] net: phy: fix phy_ethtool_set_eee() incorrectly
- enabling LPI
-Message-ID: <Z0hQQONGxPM04EVl@shell.armlinux.org.uk>
-References: <E1tErSe-005RhB-2R@rmk-PC.armlinux.org.uk>
- <bedf2521-dcbf-4b5b-8482-9436a54a614f@redhat.com>
+cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
+        netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+        "David S. Miller" <davem@davemloft.net>,
+        kernel test robot <lkp@intel.com>, Ruowen Qin <ruqin@redhat.com>,
+        Jinghao Jia <jinghao7@illinois.edu>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Kees Cook <kees@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Bill Wendling <morbo@google.com>,
+        Justin Stitt <justinstitt@google.com>
+Subject: Re: [PATCH v3 net] ipvs: fix UB due to uninitialized stack access
+ in ip_vs_protocol_init()
+In-Reply-To: <70cd1035-07d8-4356-a53e-020d93c2515e@redhat.com>
+Message-ID: <87fca918-403d-2fd5-576a-dfa730483fc2@ssi.bg>
+References: <20241123094256.28887-1-jinghao7@illinois.edu> <70cd1035-07d8-4356-a53e-020d93c2515e@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bedf2521-dcbf-4b5b-8482-9436a54a614f@redhat.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
 
-On Thu, Nov 28, 2024 at 09:44:37AM +0100, Paolo Abeni wrote:
-> Hi,
-> 
-> On 11/23/24 15:50, Russell King (Oracle) wrote:
-> > When phy_ethtool_set_eee_noneg() detects a change in the LPI
-> > parameters, it attempts to update phylib state and trigger the link
-> > to cycle so the MAC sees the updated parameters.
-> > 
-> > However, in doing so, it sets phydev->enable_tx_lpi depending on
-> > whether the EEE configuration allows the MAC to generate LPI without
-> > taking into account the result of negotiation.
-> > 
-> > This can be demonstrated with a 1000base-T FD interface by:
-> > 
-> >  # ethtool --set-eee eno0 advertise 8   # cause EEE to be not negotiated
-> >  # ethtool --set-eee eno0 tx-lpi off
-> >  # ethtool --set-eee eno0 tx-lpi on
-> > 
-> > This results in being true, despite EEE not having been negotiated and:
-> >  # ethtool --show-eee eno0
-> > 	EEE status: enabled - inactive
-> > 	Tx LPI: 250 (us)
-> > 	Supported EEE link modes:  100baseT/Full
-> > 	                           1000baseT/Full
-> > 	Advertised EEE link modes:  100baseT/Full
-> > 	                                         1000baseT/Full
-> > 
-> > Fix this by keeping track of whether EEE was negotiated via a new
-> > eee_active member in struct phy_device, and include this state in
-> > the decision whether phydev->enable_tx_lpi should be set.
-> > 
-> > Fixes: 3e43b903da04 ("net: phy: Immediately call adjust_link if only tx_lpi_enabled changes")
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> This patch did not apply net cleanly to net tree when it was submitted,
-> due to its dependency. As a result it did not went through the CI tests.
-> Currently there is little material there phy specific - mostly builds
-> with different Kconfigs - but with time we hope to increase H/W coverage.
-> 
-> AFAICS this patch has no kconfig implication, so my local build should
-> be a safe-enough test, but please wait for the pre-reqs being merged for
-> future submissions.
 
-I guess there's no way to tell the CI tests that another patch is
-required? It would be useful if something like a message-id could
-indicate to the CI tests that the patch in that message-id is
-required.
+	Hello,
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+On Thu, 28 Nov 2024, Paolo Abeni wrote:
+
+> On 11/23/24 10:42, Jinghao Jia wrote:
+> > Under certain kernel configurations when building with Clang/LLVM, the
+> > compiler does not generate a return or jump as the terminator
+> > instruction for ip_vs_protocol_init(), triggering the following objtool
+> > warning during build time:
+> > 
+> >   vmlinux.o: warning: objtool: ip_vs_protocol_init() falls through to next function __initstub__kmod_ip_vs_rr__935_123_ip_vs_rr_init6()
+> > 
+> > At runtime, this either causes an oops when trying to load the ipvs
+> > module or a boot-time panic if ipvs is built-in. This same issue has
+> > been reported by the Intel kernel test robot previously.
+> > 
+> > Digging deeper into both LLVM and the kernel code reveals this to be a
+> > undefined behavior problem. ip_vs_protocol_init() uses a on-stack buffer
+> > of 64 chars to store the registered protocol names and leaves it
+> > uninitialized after definition. The function calls strnlen() when
+> > concatenating protocol names into the buffer. With CONFIG_FORTIFY_SOURCE
+> > strnlen() performs an extra step to check whether the last byte of the
+> > input char buffer is a null character (commit 3009f891bb9f ("fortify:
+> > Allow strlen() and strnlen() to pass compile-time known lengths")).
+> > This, together with possibly other configurations, cause the following
+> > IR to be generated:
+> > 
+> >   define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #5 section ".init.text" align 16 !kcfi_type !29 {
+> >     %1 = alloca [64 x i8], align 16
+> >     ...
+> > 
+> >   14:                                               ; preds = %11
+> >     %15 = getelementptr inbounds i8, ptr %1, i64 63
+> >     %16 = load i8, ptr %15, align 1
+> >     %17 = tail call i1 @llvm.is.constant.i8(i8 %16)
+> >     %18 = icmp eq i8 %16, 0
+> >     %19 = select i1 %17, i1 %18, i1 false
+> >     br i1 %19, label %20, label %23
+> > 
+> >   20:                                               ; preds = %14
+> >     %21 = call i64 @strlen(ptr noundef nonnull dereferenceable(1) %1) #23
+> >     ...
+> > 
+> >   23:                                               ; preds = %14, %11, %20
+> >     %24 = call i64 @strnlen(ptr noundef nonnull dereferenceable(1) %1, i64 noundef 64) #24
+> >     ...
+> >   }
+> > 
+> > The above code calculates the address of the last char in the buffer
+> > (value %15) and then loads from it (value %16). Because the buffer is
+> > never initialized, the LLVM GVN pass marks value %16 as undefined:
+> > 
+> >   %13 = getelementptr inbounds i8, ptr %1, i64 63
+> >   br i1 undef, label %14, label %17
+> > 
+> > This gives later passes (SCCP, in particular) more DCE opportunities by
+> > propagating the undef value further, and eventually removes everything
+> > after the load on the uninitialized stack location:
+> > 
+> >   define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #0 section ".init.text" align 16 !kcfi_type !11 {
+> >     %1 = alloca [64 x i8], align 16
+> >     ...
+> > 
+> >   12:                                               ; preds = %11
+> >     %13 = getelementptr inbounds i8, ptr %1, i64 63
+> >     unreachable
+> >   }
+> > 
+> > In this way, the generated native code will just fall through to the
+> > next function, as LLVM does not generate any code for the unreachable IR
+> > instruction and leaves the function without a terminator.
+> > 
+> > Zero the on-stack buffer to avoid this possible UB.
+> > 
+> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Closes: https://lore.kernel.org/oe-kbuild-all/202402100205.PWXIz1ZK-lkp@intel.com/
+> > Co-developed-by: Ruowen Qin <ruqin@redhat.com>
+> > Signed-off-by: Ruowen Qin <ruqin@redhat.com>
+> > Signed-off-by: Jinghao Jia <jinghao7@illinois.edu>
+> 
+> @Pablo, @Simon, @Julian: recent ipvs patches landed either on the
+> net(-next) trees or the netfiler trees according to a random (?) pattern.
+> 
+> What is your preference here? Should such patches go via netfilter or
+> net? Or something else. FTR, I *think* netfilter should be the
+> preferable target, but I'm open to other options.
+
+	IPVS patches should go always via Netfilter trees.
+It is my fault to tell people to use the 'net' tag, I'll
+recommend the proper nf tree the next time. Sorry for the
+confusion.
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
