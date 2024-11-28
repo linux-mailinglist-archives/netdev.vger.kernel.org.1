@@ -1,122 +1,96 @@
-Return-Path: <netdev+bounces-147711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6CE29DB4DE
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 10:40:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 749869DB565
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 11:10:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 710DA282D35
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 09:40:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39E3828373D
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 10:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC847188CDC;
-	Thu, 28 Nov 2024 09:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q1wEIyvt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 648E518A950;
+	Thu, 28 Nov 2024 10:09:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9F4172767;
-	Thu, 28 Nov 2024 09:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD0014D70F
+	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 10:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732786792; cv=none; b=F7bl4caOsO/fpC88liYn6fM14GB8Jgbk3CjAkkik0F1W0Fh11aPjmlDEXfrYKKWzcqvGJwFXTqhhWCs1ZPwVxnc327BC+xFundsV7s5bgGm3jE3lm66vc5p7k0Y5Xqkr3PNEDo8QaURyEeOHCmbaj6bhQAdkNl+86QBLIs6N7fM=
+	t=1732788584; cv=none; b=bK0nCsYo1qvr3qGftt5d3ZHhq8Da9oXu1wBC2Pk7WR3x2FkttEeJWrFBBRvEFkjrAxKGE0G0lTZkKqeKYLn/IqALriK9soe3jBDALaBLY08JdEVMka3MoE4tF0mdgP71W0bF2V/NlBBdqe+nOtTCm0TASFMZPBl9dRpAhxeqVt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732786792; c=relaxed/simple;
-	bh=gpZawZf4vvEGxMBlzOfTYu8D4Aw3jJQi/uScP72UgNw=;
+	s=arc-20240116; t=1732788584; c=relaxed/simple;
+	bh=t4pt1e7Pm7Bw+XbC5tkYEIN3LyopXTuatJ5g8DJ3iEo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lQ1cD+Obj7ju3r9obSjL2o8uvoyUrMCp07YzBuwB3HR3jpsXHRQX8R99O7lv7In9Jp9r11/noW7ULxYuBwjWmYG9ymWFzUvnx1ndkclZ8giJYhLMHWGiAeheBkhcsmygo4T4TQXnHXt7b7mWprIGh7ETF/vPneqckjlq4M80mdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q1wEIyvt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A836C4CECE;
-	Thu, 28 Nov 2024 09:39:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732786792;
-	bh=gpZawZf4vvEGxMBlzOfTYu8D4Aw3jJQi/uScP72UgNw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q1wEIyvt1ljagrlcifMtQvqkJGXCQx9je6FED0s+wIkv5SEOnlVfClAEC/qPvI3yE
-	 NAH9oIxX5E/didBbNGcxOhKLmyqI4e5w4OnfP25B4jYSRNMym4OTlZYAdLq/oyebk/
-	 Yb3AK+EngnuCjRDn8efpvEoG92Dr+Zcsvhxk6k2zrBWq6OWZTYoTvFwkkqOW6VV/8r
-	 qWybU9YocAYz1xF4jOpC6f+ap3yAexTorSOkOG4MFoKI7jfhnBrQWWlBaFn/BpsLE8
-	 pXir1jfGks3qIF3+Y//CYAjA+BlqpUZoIfMUmgskdRpZS1QZGnuLnd4TathvJxMN9v
-	 /CYh21X+ijmzA==
-Date: Thu, 28 Nov 2024 11:39:47 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Long Li <longli@microsoft.com>
-Cc: Parav Pandit <parav@nvidia.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Konstantin Taranov <kotaranov@linux.microsoft.com>,
-	Wei Hu <weh@microsoft.com>,
-	"sharmaajay@microsoft.com" <sharmaajay@microsoft.com>,
-	"jgg@ziepe.ca" <jgg@ziepe.ca>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	linux-netdev <netdev@vger.kernel.org>,
-	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH rdma-next 1/1] RDMA/mana_ib: Set correct
- device into ib
-Message-ID: <20241128093947.GG1245331@unreal>
-References: <1719311307-7920-1-git-send-email-kotaranov@linux.microsoft.com>
- <20240626054748.GN29266@unreal>
- <PAXPR83MB0559F4678E73B0091A8ADFBBB4D62@PAXPR83MB0559.EURPRD83.prod.outlook.com>
- <20240626121118.GP29266@unreal>
- <CH3PR21MB43989630F6CA822AF3DFB32CCE222@CH3PR21MB4398.namprd21.prod.outlook.com>
- <CY8PR12MB719506ED60DBD124D3784CB6DC2E2@CY8PR12MB7195.namprd12.prod.outlook.com>
- <20241125201036.GK160612@unreal>
- <CH3PR21MB4398E0C57E7B6BC73B1A8F04CE282@CH3PR21MB4398.namprd21.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=a9Yr5pg3+D/kyq95q8ILwS2hl9YatoU/Jdwza1XXCIAwA89pXx1XitU8vAorOVS9RMeT0hEYC3/JElrYJgtAwwB8BiaYr4vrcGjTbV3u6MB0FI96ExdyKWmNzn4Ra1ApsmKzH4dIjmQHeYcbKH+mEr9yBvBJ+LEc9tSmWoS4SbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tGbSs-0005pb-BJ; Thu, 28 Nov 2024 11:09:38 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tGbSr-000b0E-16;
+	Thu, 28 Nov 2024 11:09:38 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tGbSs-002rwx-03;
+	Thu, 28 Nov 2024 11:09:38 +0100
+Date: Thu, 28 Nov 2024 11:09:37 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: kernel@pengutronix.de, netdev@vger.kernel.org
+Subject: Re: [PATCH ethtool v2] ethtool: add support for
+ ETHTOOL_A_CABLE_FAULT_LENGTH_SRC and ETHTOOL_A_CABLE_RESULT_SRC
+Message-ID: <Z0hBYTCNeZTIU52A@pengutronix.de>
+References: <20241128090111.1974482-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CH3PR21MB4398E0C57E7B6BC73B1A8F04CE282@CH3PR21MB4398.namprd21.prod.outlook.com>
+In-Reply-To: <20241128090111.1974482-1-o.rempel@pengutronix.de>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Nov 27, 2024 at 07:46:39PM +0000, Long Li wrote:
-> 
-> > > > I think Konstantin's suggestion makes sense, how about we do this
-> > > > (don't need to define netdev_is_slave(dev)):
-> > > >
-> > > > --- a/drivers/infiniband/core/roce_gid_mgmt.c
-> > > > +++ b/drivers/infiniband/core/roce_gid_mgmt.c
-> > > > @@ -161,7 +161,7 @@ is_eth_port_of_netdev_filter(struct ib_device
-> > > > *ib_dev, u32 port,
-> > > >         res = ((rdma_is_upper_dev_rcu(rdma_ndev, cookie) &&
-> > > >                (is_eth_active_slave_of_bonding_rcu(rdma_ndev, real_dev) &
-> > > >                 REQUIRED_BOND_STATES)) ||
-> > > > -              real_dev == rdma_ndev);
-> > > > +              (real_dev == rdma_ndev &&
-> > > > + !netif_is_bond_slave(rdma_ndev)));
-> > > >
-> > > >         rcu_read_unlock();
-> > > >         return res;
-> > > >
-> > > >
-> > > > is_eth_port_of_netdev_filter() should not return true if this netdev
-> > > > is a bonded slave. In this case, only use the address of its bonded master.
-> > > >
-> > > Right. This change makes sense to me.
-> > > I don't have a setup presently to verify it to ensure I didn't miss a corner case.
-> > > Leon,
-> > > Can you or others please test the regression once with the formal patch?
-> > 
-> > Sure, once Long will send the patch, I'll make sure that it is tested.
-> > 
-> > Thanks
-> > 
-> 
-> I posted patches for discussion.
-> https://lore.kernel.org/linux-rdma/1732736619-19941-1-git-send-email-longli@linuxonhyperv.com/T/#t
+Sorry, I forgot to add ethtool notation to the subject.
 
-Please resend these patches as series with cover letter and don't embed
-extra patch (the one which is not numbered) into the series.
-
-Thanks
-
+On Thu, Nov 28, 2024 at 10:01:11AM +0100, Oleksij Rempel wrote:
+> Extend cable test output to include source information, supporting
+> diagnostic technologies like TDR (Time Domain Reflectometry) and ALCD
+> (Active Link Cable Diagnostic). The source is displayed optionally at
+> the end of each result or fault length line.
 > 
-> Thank you,
-> Long
+> TDR requires interrupting the active link to measure parameters like
+> fault location, while ALCD can operate on an active link to provide
+> details like cable length without disruption.
 > 
+> Example output:
+> Pair B code Open Circuit, source: TDR
+> Pair B, fault length: 8.00m, source: TDR
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
