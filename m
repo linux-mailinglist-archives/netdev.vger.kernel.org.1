@@ -1,339 +1,300 @@
-Return-Path: <netdev+bounces-147760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BD679DB9B0
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 15:33:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 857479DB996
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 15:28:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C563281D9E
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 14:33:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFDC4B20E3E
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 14:28:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D4C1AA7AF;
-	Thu, 28 Nov 2024 14:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E511ADFF9;
+	Thu, 28 Nov 2024 14:28:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TIoBbDGl"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68E95D8F0
-	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 14:33:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE40192D77
+	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 14:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732804407; cv=none; b=PXmONuQS/EUCzvRfrtouITvOxADni2KjSP4gQENlJ0Rvp5Lo2GKH6BEYfGifW/7qAHa+L/nEjm0VdaeDqrwgPtizMnmwbsRLkjgdzzqR+8Zzsb5rVNzAIG6z4V4WZvXVj4VHjGV+cvRDEgShf2OQcrsFfOZdcV36CQN+AdLdOvw=
+	t=1732804102; cv=none; b=buzMLUSkALUT6mPrdSMW36U6kQ7x/XqvwYsY+pbBFSX04nj8NfA45zairzaPtsThE0MWL5JMmYPZm4KElfpQfC/rN21h8WGtjBTv4oRQXj+gVtJf8KTteUIs90xHPjq6miTOwXCP1WL3J9wSq/nJXhtwhmrYiB5E5KAUaEG/Nb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732804407; c=relaxed/simple;
-	bh=VW9V4RqoNEhWev8GKkjKjfnHFnB8wjaN+lvNKphW+lQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fASj5lQTToVZYBj5lFJUFtmz/C8N+8foB30sA8qOurKJASODITtPQqN6KI1nQm1Lgk9KOecqMwi9b6kvNiLKJul+zCqokiQVm1NWIbBW2zguWzGRQ/hFZSewq2q+Cvd4T4sE6dDIym+OOFkNCfdHrCUBfgio3xfZoOdHAZpkakU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1tGfZy-00006N-MV; Thu, 28 Nov 2024 15:33:14 +0100
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	dvyukov@google.com,
-	Florian Westphal <fw@strlen.de>,
-	syzbot+5f9f31cb7d985f584d8e@syzkaller.appspotmail.com
-Subject: [PATCH ipsec] xfrm: state: fix out-of-bounds read during lookup
-Date: Thu, 28 Nov 2024 15:26:25 +0100
-Message-ID: <20241128142640.26848-1-fw@strlen.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <6745e035.050a0220.1286eb.001b.GAE@google.com>
-References: <6745e035.050a0220.1286eb.001b.GAE@google.com>
+	s=arc-20240116; t=1732804102; c=relaxed/simple;
+	bh=R8TjSpi/afDr6JkuNWcxq4jz+9ahghAamlgXiBn1OOs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XnAphNkC+MrD0lper7pcd4yhjt+BlRxBjq2IuF7xOSxhGFgrCntQWPiP/vaSxvphCps9npRUsxI5QR9GUEpOM9/2yDCHcVYQIUvMyb4qd64mydNMidAksmguzve5WyzGtEDVRknB2vc/ZSNOsVI0JagSSlKcQFsl7FGxCweGwdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TIoBbDGl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732804100;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=C8y9rNhtPEDKFIvEh+1mbCwk+d6L94p51TvKBj3PoGY=;
+	b=TIoBbDGlozagyYn2aGaO0UQ58Kzfxo83wglNKRX+MwEhLpjivQJoyLdWYeCO03tit1UvTc
+	S3HddJocIn+nJmV5o5U1HwBtwXmlBRX+LPxLwxYpKaSGKBjERNAK76/nAmNzQgUSUBKaLP
+	sgrCeOxkDPHcWuarSzbA0kYeU5wTy7I=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-649-xoquMNu1P6COeVfIifcM-w-1; Thu,
+ 28 Nov 2024 09:28:16 -0500
+X-MC-Unique: xoquMNu1P6COeVfIifcM-w-1
+X-Mimecast-MFC-AGG-ID: xoquMNu1P6COeVfIifcM-w
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7D23A1955F68;
+	Thu, 28 Nov 2024 14:28:15 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.39.193.69])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8282A300018D;
+	Thu, 28 Nov 2024 14:28:13 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.13-rc1
+Date: Thu, 28 Nov 2024 15:27:38 +0100
+Message-ID: <20241128142738.132961-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-lookup and resize can run in parallel.
+Hi Linus!
 
-The xfrm_state_hash_generation seqlock ensures a retry, but the hash
-functions can observe a hmask value that is too large for the new hlist
-array.
+Very calm week, thanks to US holidays.
 
-rehash does:
-  rcu_assign_pointer(net->xfrm.state_bydst, ndst) [..]
-  net->xfrm.state_hmask = nhashmask;
+The following changes since commit fcc79e1714e8c2b8e216dc3149812edd37884eef:
 
-While state lookup does:
-  h = xfrm_dst_hash(net, daddr, saddr, tmpl->reqid, encap_family);
-  hlist_for_each_entry_rcu(x, net->xfrm.state_bydst + h, bydst) {
+  Merge tag 'net-next-6.13' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2024-11-21 08:28:08 -0800)
 
-This is only safe in case the update to state_bydst is larger than
-net->xfrm.xfrm_state_hmask (or if the lookup function gets
-serialized via state spinlock again).
+are available in the Git repository at:
 
-Fix this by prefetching state_hmask and the associated pointers.
-The xfrm_state_hash_generation seqlock retry will ensure that the pointer
-and the hmask will be consistent.
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.13-rc1
 
-The existing helpers, like xfrm_dst_hash(), are now unsafe for RCU side,
-add lockdep assertions to document that they are only safe for insert
-side.
+for you to fetch changes up to 04f5cb48995d51deed0af71aaba1b8699511313f:
 
-xfrm_state_lookup_byaddr() uses the spinlock rather than RCU.
-AFAICS this is an oversight from back when state lookup was converted to
-RCU, this lock should be replaced with RCU in a future patch.
+  Documentation: tls_offload: fix typos and grammar (2024-11-28 12:09:06 +0100)
 
-Reported-by: syzbot+5f9f31cb7d985f584d8e@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/CACT4Y+azwfrE3uz6A5ZErov5YN2LYBN5KrsymBerT36VU8qzBA@mail.gmail.com/
-Diagnosed-by: Dmitry Vyukov <dvyukov@google.com>
-Fixes: c2f672fc9464 ("xfrm: state lookup can be lockless")
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/xfrm/xfrm_state.c | 89 ++++++++++++++++++++++++++++++++++---------
- 1 file changed, 70 insertions(+), 19 deletions(-)
+----------------------------------------------------------------
+Including fixes from bluetooth.
 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 67ca7ac955a3..1781728ca428 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -34,6 +34,8 @@
- 
- #define xfrm_state_deref_prot(table, net) \
- 	rcu_dereference_protected((table), lockdep_is_held(&(net)->xfrm.xfrm_state_lock))
-+#define xfrm_state_deref_check(table, net) \
-+	rcu_dereference_check((table), lockdep_is_held(&(net)->xfrm.xfrm_state_lock))
- 
- static void xfrm_state_gc_task(struct work_struct *work);
- 
-@@ -62,6 +64,8 @@ static inline unsigned int xfrm_dst_hash(struct net *net,
- 					 u32 reqid,
- 					 unsigned short family)
- {
-+	lockdep_assert_held(&net->xfrm.xfrm_state_lock);
-+
- 	return __xfrm_dst_hash(daddr, saddr, reqid, family, net->xfrm.state_hmask);
- }
- 
-@@ -70,6 +74,8 @@ static inline unsigned int xfrm_src_hash(struct net *net,
- 					 const xfrm_address_t *saddr,
- 					 unsigned short family)
- {
-+	lockdep_assert_held(&net->xfrm.xfrm_state_lock);
-+
- 	return __xfrm_src_hash(daddr, saddr, family, net->xfrm.state_hmask);
- }
- 
-@@ -77,11 +83,15 @@ static inline unsigned int
- xfrm_spi_hash(struct net *net, const xfrm_address_t *daddr,
- 	      __be32 spi, u8 proto, unsigned short family)
- {
-+	lockdep_assert_held(&net->xfrm.xfrm_state_lock);
-+
- 	return __xfrm_spi_hash(daddr, spi, proto, family, net->xfrm.state_hmask);
- }
- 
- static unsigned int xfrm_seq_hash(struct net *net, u32 seq)
- {
-+	lockdep_assert_held(&net->xfrm.xfrm_state_lock);
-+
- 	return __xfrm_seq_hash(seq, net->xfrm.state_hmask);
- }
- 
-@@ -1041,16 +1051,38 @@ xfrm_init_tempstate(struct xfrm_state *x, const struct flowi *fl,
- 	x->props.family = tmpl->encap_family;
- }
- 
--static struct xfrm_state *__xfrm_state_lookup_all(struct net *net, u32 mark,
-+struct xfrm_hash_state_ptrs {
-+	const struct hlist_head *bydst;
-+	const struct hlist_head *bysrc;
-+	const struct hlist_head *byspi;
-+	unsigned int hmask;
-+};
-+
-+static void xfrm_hash_ptrs_get(const struct net *net, struct xfrm_hash_state_ptrs *ptrs)
-+{
-+	unsigned int sequence;
-+
-+	do {
-+		sequence = read_seqcount_begin(&net->xfrm.xfrm_state_hash_generation);
-+
-+		ptrs->bydst = xfrm_state_deref_check(net->xfrm.state_bydst, net);
-+		ptrs->bysrc = xfrm_state_deref_check(net->xfrm.state_bysrc, net);
-+		ptrs->byspi = xfrm_state_deref_check(net->xfrm.state_byspi, net);
-+		ptrs->hmask = net->xfrm.state_hmask;
-+	} while (read_seqcount_retry(&net->xfrm.xfrm_state_hash_generation, sequence));
-+}
-+
-+static struct xfrm_state *__xfrm_state_lookup_all(const struct xfrm_hash_state_ptrs *state_ptrs,
-+						  u32 mark,
- 						  const xfrm_address_t *daddr,
- 						  __be32 spi, u8 proto,
- 						  unsigned short family,
- 						  struct xfrm_dev_offload *xdo)
- {
--	unsigned int h = xfrm_spi_hash(net, daddr, spi, proto, family);
-+	unsigned int h = __xfrm_spi_hash(daddr, spi, proto, family, state_ptrs->hmask);
- 	struct xfrm_state *x;
- 
--	hlist_for_each_entry_rcu(x, net->xfrm.state_byspi + h, byspi) {
-+	hlist_for_each_entry_rcu(x, state_ptrs->byspi + h, byspi) {
- #ifdef CONFIG_XFRM_OFFLOAD
- 		if (xdo->type == XFRM_DEV_OFFLOAD_PACKET) {
- 			if (x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
-@@ -1084,15 +1116,16 @@ static struct xfrm_state *__xfrm_state_lookup_all(struct net *net, u32 mark,
- 	return NULL;
- }
- 
--static struct xfrm_state *__xfrm_state_lookup(struct net *net, u32 mark,
-+static struct xfrm_state *__xfrm_state_lookup(const struct xfrm_hash_state_ptrs *state_ptrs,
-+					      u32 mark,
- 					      const xfrm_address_t *daddr,
- 					      __be32 spi, u8 proto,
- 					      unsigned short family)
- {
--	unsigned int h = xfrm_spi_hash(net, daddr, spi, proto, family);
-+	unsigned int h = __xfrm_spi_hash(daddr, spi, proto, family, state_ptrs->hmask);
- 	struct xfrm_state *x;
- 
--	hlist_for_each_entry_rcu(x, net->xfrm.state_byspi + h, byspi) {
-+	hlist_for_each_entry_rcu(x, state_ptrs->byspi + h, byspi) {
- 		if (x->props.family != family ||
- 		    x->id.spi       != spi ||
- 		    x->id.proto     != proto ||
-@@ -1114,6 +1147,7 @@ struct xfrm_state *xfrm_input_state_lookup(struct net *net, u32 mark,
- 					   __be32 spi, u8 proto,
- 					   unsigned short family)
- {
-+	struct xfrm_hash_state_ptrs state_ptrs;
- 	struct hlist_head *state_cache_input;
- 	struct xfrm_state *x = NULL;
- 	int cpu = get_cpu();
-@@ -1135,7 +1169,9 @@ struct xfrm_state *xfrm_input_state_lookup(struct net *net, u32 mark,
- 		goto out;
- 	}
- 
--	x = __xfrm_state_lookup(net, mark, daddr, spi, proto, family);
-+	xfrm_hash_ptrs_get(net, &state_ptrs);
-+
-+	x = __xfrm_state_lookup(&state_ptrs, mark, daddr, spi, proto, family);
- 
- 	if (x && x->km.state == XFRM_STATE_VALID) {
- 		spin_lock_bh(&net->xfrm.xfrm_state_lock);
-@@ -1155,15 +1191,16 @@ struct xfrm_state *xfrm_input_state_lookup(struct net *net, u32 mark,
- }
- EXPORT_SYMBOL(xfrm_input_state_lookup);
- 
--static struct xfrm_state *__xfrm_state_lookup_byaddr(struct net *net, u32 mark,
-+static struct xfrm_state *__xfrm_state_lookup_byaddr(const struct xfrm_hash_state_ptrs *state_ptrs,
-+						     u32 mark,
- 						     const xfrm_address_t *daddr,
- 						     const xfrm_address_t *saddr,
- 						     u8 proto, unsigned short family)
- {
--	unsigned int h = xfrm_src_hash(net, daddr, saddr, family);
-+	unsigned int h = __xfrm_src_hash(daddr, saddr, family, state_ptrs->hmask);
- 	struct xfrm_state *x;
- 
--	hlist_for_each_entry_rcu(x, net->xfrm.state_bysrc + h, bysrc) {
-+	hlist_for_each_entry_rcu(x, state_ptrs->bysrc + h, bysrc) {
- 		if (x->props.family != family ||
- 		    x->id.proto     != proto ||
- 		    !xfrm_addr_equal(&x->id.daddr, daddr, family) ||
-@@ -1183,14 +1220,17 @@ static struct xfrm_state *__xfrm_state_lookup_byaddr(struct net *net, u32 mark,
- static inline struct xfrm_state *
- __xfrm_state_locate(struct xfrm_state *x, int use_spi, int family)
- {
-+	struct xfrm_hash_state_ptrs state_ptrs;
- 	struct net *net = xs_net(x);
- 	u32 mark = x->mark.v & x->mark.m;
- 
-+	xfrm_hash_ptrs_get(net, &state_ptrs);
-+
- 	if (use_spi)
--		return __xfrm_state_lookup(net, mark, &x->id.daddr,
-+		return __xfrm_state_lookup(&state_ptrs, mark, &x->id.daddr,
- 					   x->id.spi, x->id.proto, family);
- 	else
--		return __xfrm_state_lookup_byaddr(net, mark,
-+		return __xfrm_state_lookup_byaddr(&state_ptrs, mark,
- 						  &x->id.daddr,
- 						  &x->props.saddr,
- 						  x->id.proto, family);
-@@ -1264,6 +1304,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 		unsigned short family, u32 if_id)
- {
- 	static xfrm_address_t saddr_wildcard = { };
-+	struct xfrm_hash_state_ptrs state_ptrs;
- 	struct net *net = xp_net(pol);
- 	unsigned int h, h_wildcard;
- 	struct xfrm_state *x, *x0, *to_put;
-@@ -1328,8 +1369,10 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 	else if (acquire_in_progress) /* XXX: acquire_in_progress should not happen */
- 		WARN_ON(1);
- 
--	h = xfrm_dst_hash(net, daddr, saddr, tmpl->reqid, encap_family);
--	hlist_for_each_entry_rcu(x, net->xfrm.state_bydst + h, bydst) {
-+	xfrm_hash_ptrs_get(net, &state_ptrs);
-+
-+	h = __xfrm_dst_hash(daddr, saddr, tmpl->reqid, encap_family, state_ptrs.hmask);
-+	hlist_for_each_entry_rcu(x, state_ptrs.bydst + h, bydst) {
- #ifdef CONFIG_XFRM_OFFLOAD
- 		if (pol->xdo.type == XFRM_DEV_OFFLOAD_PACKET) {
- 			if (x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
-@@ -1362,8 +1405,9 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 	if (best || acquire_in_progress)
- 		goto found;
- 
--	h_wildcard = xfrm_dst_hash(net, daddr, &saddr_wildcard, tmpl->reqid, encap_family);
--	hlist_for_each_entry_rcu(x, net->xfrm.state_bydst + h_wildcard, bydst) {
-+	h_wildcard = __xfrm_dst_hash(daddr, &saddr_wildcard, tmpl->reqid,
-+				     encap_family, state_ptrs.hmask);
-+	hlist_for_each_entry_rcu(x, state_ptrs.bydst + h_wildcard, bydst) {
- #ifdef CONFIG_XFRM_OFFLOAD
- 		if (pol->xdo.type == XFRM_DEV_OFFLOAD_PACKET) {
- 			if (x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
-@@ -1401,7 +1445,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 
- 	if (!x && !error && !acquire_in_progress) {
- 		if (tmpl->id.spi &&
--		    (x0 = __xfrm_state_lookup_all(net, mark, daddr,
-+		    (x0 = __xfrm_state_lookup_all(&state_ptrs, mark, daddr,
- 						  tmpl->id.spi, tmpl->id.proto,
- 						  encap_family,
- 						  &pol->xdo)) != NULL) {
-@@ -2180,10 +2224,13 @@ struct xfrm_state *
- xfrm_state_lookup(struct net *net, u32 mark, const xfrm_address_t *daddr, __be32 spi,
- 		  u8 proto, unsigned short family)
- {
-+	struct xfrm_hash_state_ptrs state_ptrs;
- 	struct xfrm_state *x;
- 
- 	rcu_read_lock();
--	x = __xfrm_state_lookup(net, mark, daddr, spi, proto, family);
-+	xfrm_hash_ptrs_get(net, &state_ptrs);
-+
-+	x = __xfrm_state_lookup(&state_ptrs, mark, daddr, spi, proto, family);
- 	rcu_read_unlock();
- 	return x;
- }
-@@ -2194,10 +2241,14 @@ xfrm_state_lookup_byaddr(struct net *net, u32 mark,
- 			 const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 			 u8 proto, unsigned short family)
- {
-+	struct xfrm_hash_state_ptrs state_ptrs;
- 	struct xfrm_state *x;
- 
- 	spin_lock_bh(&net->xfrm.xfrm_state_lock);
--	x = __xfrm_state_lookup_byaddr(net, mark, daddr, saddr, proto, family);
-+
-+	xfrm_hash_ptrs_get(net, &state_ptrs);
-+
-+	x = __xfrm_state_lookup_byaddr(&state_ptrs, mark, daddr, saddr, proto, family);
- 	spin_unlock_bh(&net->xfrm.xfrm_state_lock);
- 	return x;
- }
--- 
-2.45.2
+Current release - regressions:
+
+  - rtnetlink: fix rtnl_dump_ifinfo() error path
+
+  - bluetooth: remove the redundant sco_conn_put
+
+Previous releases - regressions:
+
+  - netlink: fix false positive warning in extack during dumps
+
+  - sched: sch_fq: don't follow the fast path if Tx is behind now
+
+  - ipv6: delete temporary address if mngtmpaddr is removed or unmanaged
+
+  - tcp: fix use-after-free of nreq in reqsk_timer_handler().
+
+  - bluetooth: fix slab-use-after-free Read in set_powered_sync
+
+  - l2tp: fix warning in l2tp_exit_net found
+
+  - eth: bnxt_en: fix receive ring space parameters when XDP is active
+
+  - eth: lan78xx: fix double free issue with interrupt buffer allocation
+
+  - eth: tg3: set coherent DMA mask bits to 31 for BCM57766 chipsets
+
+Previous releases - always broken:
+
+  - ipmr: fix tables suspicious RCU usage
+
+  - iucv: MSG_PEEK causes memory leak in iucv_sock_destruct()
+
+  - eth: octeontx2-af: fix low network performance
+
+  - eth: stmmac: dwmac-socfpga: set RX watchdog interrupt as broken
+
+  - eth: rtase: correct the speed for RTL907XD-V1
+
+Misc:
+
+  - some documentation fixup
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Choong Yong Liang (1):
+      net: stmmac: set initial EEE policy configuration
+
+David Wei (1):
+      selftests: fix nested double quotes in f-string
+
+Edward Adam Davis (1):
+      Bluetooth: SCO: remove the redundant sco_conn_put
+
+Eric Dumazet (2):
+      rtnetlink: fix rtnl_dump_ifinfo() error path
+      net: hsr: fix hsr_init_sk() vs network/transport headers.
+
+Guenter Roeck (1):
+      net: microchip: vcap: Add typegroup table terminators in kunit tests
+
+Hangbin Liu (3):
+      net/ipv6: delete temporary address if mngtmpaddr is removed or unmanaged
+      selftests/rtnetlink.sh: add mngtempaddr test
+      selftests: rds: move test.py to TEST_FILES
+
+Hariprasad Kelam (5):
+      octeontx2-af: RPM: Fix mismatch in lmac type
+      octeontx2-af: RPM: Fix low network performance
+      octeontx2-af: RPM: fix stale RSFEC counters
+      octeontx2-af: RPM: fix stale FCFEC counters
+      octeontx2-af: Quiesce traffic before NIX block reset
+
+Heiner Kallweit (1):
+      net: phy: ensure that genphy_c45_an_config_eee_aneg() sees new value of phydev->eee_cfg.eee_enabled
+
+Jakub Kicinski (3):
+      netlink: fix false positive warning in extack during dumps
+      selftests: net: test extacks in netlink dumps
+      net_sched: sch_fq: don't follow the fast path if Tx is behind now
+
+James Chapman (1):
+      net/l2tp: fix warning in l2tp_exit_net found by syzbot
+
+Justin Lai (3):
+      rtase: Refactor the rtase_check_mac_version_valid() function
+      rtase: Correct the speed for RTL907XD-V1
+      rtase: Corrects error handling of the rtase_check_mac_version_valid()
+
+Kuniyuki Iwashima (1):
+      tcp: Fix use-after-free of nreq in reqsk_timer_handler().
+
+Leo Stone (1):
+      Documentation: tls_offload: fix typos and grammar
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: MGMT: Fix slab-use-after-free Read in set_powered_sync
+      Bluetooth: MGMT: Fix possible deadlocks
+
+Maxime Chevallier (1):
+      net: stmmac: dwmac-socfpga: Set RX watchdog interrupt as broken
+
+Michael Chan (2):
+      bnxt_en: Refactor bnxt_ptp_init()
+      bnxt_en: Unregister PTP during PCI shutdown and suspend
+
+Michal Luczaj (3):
+      llc: Improve setsockopt() handling of malformed user input
+      rxrpc: Improve setsockopt() handling of malformed user input
+      net: Comment copy_from_sockptr() explaining its behaviour
+
+Oleksij Rempel (3):
+      net: usb: lan78xx: Fix double free issue with interrupt buffer allocation
+      net: usb: lan78xx: Fix memory leak on device unplug by freeing PHY device
+      net: usb: lan78xx: Fix refcounting and autosuspend on invalid WoL configuration
+
+Paolo Abeni (10):
+      Merge branch 'correcting-switch-hardware-versions-and-reported-speeds'
+      Merge branch 'ipv6-fix-temporary-address-not-removed-correctly'
+      Merge branch 'octeontx2-af-misc-rpm-fixes'
+      Merge branch 'bnxt_en-bug-fixes'
+      Merge branch 'net-fix-some-callers-of-copy_from_sockptr'
+      Merge tag 'for-net-2024-11-26' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
+      ipmr: add debug check for mr table cleanup
+      ip6mr: fix tables suspicious RCU usage
+      ipmr: fix tables suspicious RCU usage
+      Merge branch 'net-fix-mcast-rcu-splats'
+
+Pavan Chebbi (1):
+      tg3: Set coherent DMA mask bits to 31 for BCM57766 chipsets
+
+Rosen Penev (1):
+      net: mdio-ipq4019: add missing error check
+
+Russell King (Oracle) (1):
+      net: phy: fix phy_ethtool_set_eee() incorrectly enabling LPI
+
+Saravanan Vajravel (1):
+      bnxt_en: Reserve rings after PCIe AER recovery if NIC interface is down
+
+Shravya KN (2):
+      bnxt_en: Set backplane link modes correctly for ethtool
+      bnxt_en: Fix receive ring space parameters when XDP is active
+
+Sidraya Jayagond (1):
+      s390/iucv: MSG_PEEK causes memory leak in iucv_sock_destruct()
+
+Somnath Kotur (1):
+      bnxt_en: Fix queue start to update vnic RSS table
+
+Vitalii Mordan (1):
+      marvell: pxa168_eth: fix call balance of pep->clk handling routines
+
+Vyshnav Ajith (1):
+      Fix spelling mistake
+
+ Documentation/networking/cdc_mbim.rst              |   2 +-
+ Documentation/networking/tls-offload.rst           |  29 ++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          |  37 +++++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c  |   9 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c      |   4 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h      |   3 +-
+ drivers/net/ethernet/broadcom/tg3.c                |   3 +
+ drivers/net/ethernet/marvell/octeontx2/af/cgx.c    |  70 ++++++++++-
+ drivers/net/ethernet/marvell/octeontx2/af/cgx.h    |   5 +
+ .../ethernet/marvell/octeontx2/af/lmac_common.h    |   7 +-
+ drivers/net/ethernet/marvell/octeontx2/af/rpm.c    |  87 ++++++++++----
+ drivers/net/ethernet/marvell/octeontx2/af/rpm.h    |  18 ++-
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c    |   1 +
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h    |   1 +
+ .../net/ethernet/marvell/octeontx2/af/rvu_cgx.c    |  45 +++++--
+ drivers/net/ethernet/marvell/pxa168_eth.c          |  14 +--
+ .../net/ethernet/microchip/vcap/vcap_api_kunit.c   |  17 +--
+ drivers/net/ethernet/realtek/rtase/rtase.h         |   7 +-
+ drivers/net/ethernet/realtek/rtase/rtase_main.c    |  43 ++++---
+ .../net/ethernet/stmicro/stmmac/dwmac-socfpga.c    |   2 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |   3 +
+ drivers/net/mdio/mdio-ipq4019.c                    |   5 +-
+ drivers/net/phy/phy-c45.c                          |   2 +-
+ drivers/net/phy/phy.c                              |  52 +++++----
+ drivers/net/usb/lan78xx.c                          |  40 ++++---
+ include/linux/phy.h                                |   2 +
+ include/linux/sockptr.h                            |   2 +
+ net/bluetooth/mgmt.c                               |  38 ++++--
+ net/bluetooth/sco.c                                |   2 +-
+ net/core/rtnetlink.c                               |  14 ++-
+ net/hsr/hsr_device.c                               |   4 +-
+ net/ipv4/inet_connection_sock.c                    |   2 +-
+ net/ipv4/ipmr.c                                    |  56 ++++++---
+ net/ipv6/addrconf.c                                |  41 +++++--
+ net/ipv6/ip6mr.c                                   |  52 +++++++--
+ net/iucv/af_iucv.c                                 |  26 +++--
+ net/l2tp/l2tp_core.c                               |  22 +++-
+ net/llc/af_llc.c                                   |   2 +-
+ net/netlink/af_netlink.c                           |  21 ++--
+ net/rxrpc/af_rxrpc.c                               |   7 +-
+ net/sched/sch_fq.c                                 |   6 +
+ .../selftests/drivers/net/hw/lib/py/linkconfig.py  |   2 +-
+ tools/testing/selftests/net/Makefile               |   3 +-
+ tools/testing/selftests/net/netlink-dumps.c        | 129 +++++++++++++++++++++
+ tools/testing/selftests/net/rds/Makefile           |   5 +-
+ tools/testing/selftests/net/rtnetlink.sh           |  95 +++++++++++++++
+ 46 files changed, 811 insertions(+), 226 deletions(-)
 
 
