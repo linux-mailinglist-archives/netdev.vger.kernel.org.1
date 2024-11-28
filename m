@@ -1,215 +1,138 @@
-Return-Path: <netdev+bounces-147672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEC5A9DB13E
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 02:51:08 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85EA816539E
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 01:51:05 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9323253E23;
-	Thu, 28 Nov 2024 01:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="g1VN7bb+"
-X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2059.outbound.protection.outlook.com [40.107.243.59])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 358B49DB18C
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 03:43:52 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA76126C08
-	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 01:48:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732758509; cv=fail; b=GdsyZeHxJ6E/FIlXGJwETvMA8rEylpxYX7pPUxGaGexXlk0vvd3AV2o4kRQqUAxxdFadcWb4sFSkwN/odagt1yN7QmJGXmhu85ucR0mH26/UYKgykpLC/ntGtJSjL2h7AECutwtGbyT8ZWsrG9JvlYrnP0qOQ0xti3vaBN4yb/M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732758509; c=relaxed/simple;
-	bh=/RHEY0hyvfHT/ah9NRiHYsXrxuB8oaYWr1HwECs66vc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=VDvsFgEouCC0WRyVkPsfelna3Unpm6UeHc7W+on50ssIcJ7lJOO7i1r7BSNBfmUB7ZoSCHLCyLaL2kukgQQXTJeUaRZnSNVrxWEB7DdVwmKL9xknEts0EaAfS0Khb3+521z2rcOBDXLms7J8CA8mVdnzWGBOMUGBIOps0peUcEA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=g1VN7bb+; arc=fail smtp.client-ip=40.107.243.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rq2fI9CieChxgHJQsLvxMUKf1qARkEYYwUsooyOPIbqwRYz/HK2Yth64x2oPYfvV9+WqVHDCyD+R25QvRqdLh47Ds2Ish2M6UuaPliCtq6L0dp1HDu0sgdH3rHU0uyJhTmoh261aLOaPma7ULZLbKi42Bh2Qp5ikE4+OtE6n66T4oNP0hxLH4FicwlxpJBSQhzUvkO07h6A4EW3uJ8ef4HRQCzZVYthfY0suWRNJqyjox9bZ+UFpdrbztCA+zNZKO4ycxEhlK9W0nxqcvuT4RUhc3Wie+2NXLo2HN5i90nxVboH0EvKB0HFVtH/xvfv6zJ96vycyxQcmZFmJ+TzOyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=78AYU0yvEBsKDWNMsxkBNLwTPUJtIXE6TcMcjGbwGEg=;
- b=vzNqym/WPHPyreYXhui3wFFBaXFNgWrfz9KgzVkATFVHQ/jPCu9WbaqbpG5/QemoFHqbu09VealH5gO7ml7NlxCE8PrEIy5xvB92tJ/5tS0RHpZs+ug3RWkgMhUmwcizuW2qpuK+dSc3dAMK4kWHGNHt+8Dafoz87mSUXgL6tyjTl1SzC4WUNRGaXpV5eKqmDUrpgc9lYz48NTKppNW6eEH6oR4ZdG019N0YUOC9RqsieR6XZIDAHakpSw4u+xS5rvQ2Yuun+4MLWYaVaeBuQ+xkzzPXnJSylEEwvdYlS856zr4RMyoKMCHvUVF/x4OaP9XQtltYzpN4YCHCk9ZetA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=78AYU0yvEBsKDWNMsxkBNLwTPUJtIXE6TcMcjGbwGEg=;
- b=g1VN7bb+OT/JVB2drkQyTKWwdfXU2Bb+DdbVAJZy4UErpVwfR5vamWv3JMUVjoueXtMfq7fdV45Kctkt9ss6iuSvkAhk8lzNFg3LUa1/cw8vNfPYi6BrkFEFkci8t+IgkQmAo+DDEEsp/3HXqM8GwZgA2fOunGYglgacrlTzUFIPYeSiq4P8uDlcMIS9JylFTOiB4Br/yKCIraBP+TOoO9ZuF67WPYa++Da7BCP+H2m7O2t7Iu/yBWLk3tWyejDI57xBR+SJ1pxxkn8Mjl6OUzvzmvLXxuXbGAyzxyERRfDb1jDqlmNni0ogWhRmflyrJc/8XnGcE8ddpBvZ+UXbNQ==
-Received: from SN4PR0501CA0071.namprd05.prod.outlook.com
- (2603:10b6:803:41::48) by DM4PR12MB8451.namprd12.prod.outlook.com
- (2603:10b6:8:182::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.21; Thu, 28 Nov
- 2024 01:48:23 +0000
-Received: from SN1PEPF00036F3D.namprd05.prod.outlook.com
- (2603:10b6:803:41:cafe::b3) by SN4PR0501CA0071.outlook.office365.com
- (2603:10b6:803:41::48) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8207.13 via Frontend Transport; Thu,
- 28 Nov 2024 01:48:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF00036F3D.mail.protection.outlook.com (10.167.248.21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8207.12 via Frontend Transport; Thu, 28 Nov 2024 01:48:23 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 27 Nov
- 2024 17:48:12 -0800
-Received: from [10.19.167.61] (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 27 Nov
- 2024 17:48:10 -0800
-Message-ID: <c9b051af-b4c7-49cb-aab5-74450bca7288@nvidia.com>
-Date: Thu, 28 Nov 2024 09:48:10 +0800
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72899B21587
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 02:43:49 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA465D8F0;
+	Thu, 28 Nov 2024 02:43:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BhlVeTAr"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB51433B1;
+	Thu, 28 Nov 2024 02:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732761825; cv=none; b=fjP2FdgwdfFtBn32pNy77S7ctP2xHXnBjUf2VIMzErJHYanPIH14NbIQ9XPL6v67OtV3hFcyV9l6MP8zzjBeXCT0H+GwPBp4QZllYCfqcRPnek9c9jZCQ9gxZkSZMgxiqtVKr4f4guHCfiG/nCq0jUNobYDF1tTjdfTcSMN6k2I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732761825; c=relaxed/simple;
+	bh=B2VUcb3Tmrx1La4HxceUCEyC1e9wB4j5rPnZnNSD+Iw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a3OrvNry0QRrwYTAb1J1GPeavWbI74SuoX4F/Hn210o18uIWe6hGFvYz4PhciQo+16GoxludU1X2ijoDdVObUdDm9VH5uwh+yfn7sk6+xU4JWD9NGqeI/ANws3xwFRDvV2n37xEPhNKJMICoJwA5G2xbrc9i+ofrVUzoEF47xRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BhlVeTAr; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-434a099ba95so2885855e9.0;
+        Wed, 27 Nov 2024 18:43:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732761821; x=1733366621; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Owa14ZCDoNgQ06uVhcHXrxie/5XbfMeHw34tNIT+blY=;
+        b=BhlVeTArOV4zXFRy+9hRR75YR5vNXRZosRRaHnPXFQJO0z1rvIY28lHzOydHT5HMYq
+         gfqXQxTf+HbyRtZV/+n7dc0iPKYUC5kUdjMjY4gx/N01SctDCrQ9rlW3JaZazT2H+jfc
+         Rd4EPK3mMzOFXKddpW+yngobn/Ld8s4PYvLiM+tzcg7ObHKRt+hGgW4OzLO5O4Xl2K6w
+         xbyx6zEyBO1AVB3kfw2OWhR5GK9EHfX2QawoayrkoBG22TU/uHoEh+T/AyrBxmLBbiCW
+         LW9IfTFWeHwTdPR9dGwHONRYGxFmDZV1efieyY4bIdFgq//8Mg46aYhecNwl1izCji0R
+         o4Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732761821; x=1733366621;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Owa14ZCDoNgQ06uVhcHXrxie/5XbfMeHw34tNIT+blY=;
+        b=F9ArfOkYigotVYXxdVm9BY1S77Cha0ysaldfGSamTpDYivorJs+0fJOqB4e3ZcZIxv
+         Tmitq9oUVscP/8DTHhCUdjnYRY33NQxg+SM+MCGMVkgvZEuzU/108av66NEoYuJXV8A3
+         WYWijpPaa7qPUzDqrGB2JUowOxocX47JZZd66gTugsorlroTR67lVu6Ok1BuUCnjNvPE
+         9PtZCj/9GYoHdTUiS1tfOAh8pVtDtPzfoDRc1bWxLEHCW9GGGm4lOFEoNfPxRxFMv7eD
+         8Fb1D9r/jTlaJyqhc5en/oIauLiGWwt5/B/oKuDpLb6k8gejoqPZU4tzhRkpt8RqxzRO
+         w7UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUU58KKYeLmODeNP9+wKujJFXef0UewaZ/x9p9oej8Bfg2MueuDuIdgBcHDy1h3O+BCEIZq18LuxJan+gM4@vger.kernel.org, AJvYcCUcqTvkqRwB07SMSdm6NxYhPi+8m+2HzxR17rJ7DuWUDKbo21phGExHH4GpiOqEMKi3H/mCSyth@vger.kernel.org, AJvYcCUoWBKPP7Op5ragXOGhIrhiWBeRH0SAoqM/Jzm42ueRXMP1fC1kRAFQ8U021Owh86l8o8Y=@vger.kernel.org, AJvYcCVxj0Y7CTBhLLC/KHkECfBgR5cdm/z2uX9wzMiEJz+F8qMFex8EFAUbS+Afq2+vfQbAGCYW2VIVsQ/H6aw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXNLyYoLrCi5VvJprvSL1SWhN0iNfrXAToaa194oxpM8W+V0LP
+	BGuSr2aZDpPWFW8iiq1K3RWKJLStGBE3JQanzJAfEagn4vPMtP9lNWe01OGi5fyIcdGCzhI4/kg
+	RmQPJqEzhVz03MLemNGrmmqVa03Y=
+X-Gm-Gg: ASbGncuo5dzrTxi5cjclOUFNwp0GEVcMkzsWsem/QSRZfX4kiF3AUp5EXRYay+4HQXs
+	95WkdIPJftmq28wtuc2iNsPge7MSUhw==
+X-Google-Smtp-Source: AGHT+IGL7KlI85w+FpUF5vt3IezZ2f7SZDQWHC1gXz+5gsMJi6fPNdnBTHJG5WwEXnUVsABNq6hffhwecd6FoqZ0SRc=
+X-Received: by 2002:a05:6000:1ac9:b0:382:3527:a147 with SMTP id
+ ffacd0b85a97d-385c6eb6625mr4763206f8f.1.1732761820964; Wed, 27 Nov 2024
+ 18:43:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH ipsec-rc] xfrm: replay: Fix the update of
- replay_esn->oseq_hi for GSO
-To: Leon Romanovsky <leon@kernel.org>, Steffen Klassert
-	<steffen.klassert@secunet.com>
-CC: Christian Langrock <christian.langrock@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>, Patrisious Haddad
-	<phaddad@nvidia.com>
-References: <d364e4f9c5f04ed83b777b96e6e1b48f11cb34cf.1731413249.git.leon@kernel.org>
-Content-Language: en-US
-From: Jianbo Liu <jianbol@nvidia.com>
-In-Reply-To: <d364e4f9c5f04ed83b777b96e6e1b48f11cb34cf.1731413249.git.leon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00036F3D:EE_|DM4PR12MB8451:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8a1fecb3-e010-4fe5-5100-08dd0f4ebe60
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ak9VM0lFUURDYUdPWWpNbWFlSHdUQnJ3T1cwdzhtM1A1b3FVZmIwRHg1dUl0?=
- =?utf-8?B?bXdwQVBMYmM4bXhMaktPa2dEOGVMZjJaY0dGanBaVTZXUXgrQk1BMzM0MndZ?=
- =?utf-8?B?WFhOejVKSm1uRldLSmcvaDNuOUMxZlhSVFN4djBHTjM1eXNXdisrTWV2TjJF?=
- =?utf-8?B?RHBHck5LdFdLeHlaWUdTVUVCaERwUVNtU2wvQXhPbVdVV2tXMGpTdVIyL1J1?=
- =?utf-8?B?TWtJL0I0QlptMEo3VEtnZFdMdEw3dnZoa01UNlRhUjk4WGNKd0lyZGpZUCsv?=
- =?utf-8?B?dFlrTGNYenM5NG45MytET1RhOFBpbmhyMEtjTHQwN0ZmOHN5SlY5K0ZsNUw2?=
- =?utf-8?B?YXJxcm1TM21vcUtMbHpIbUxZQ3RlVGtsU3F1bmNNK1V6QUkrRndyRGxNWCtl?=
- =?utf-8?B?Ynlua2dTOEdITEhLempQcVk3MmdzMlpzcUF1cmRBREd5S2lLWkFFWitjRm1R?=
- =?utf-8?B?cDhaT2hCK2ZEVTF5eTMxRkxjWTVCTjBTZ2M5bEM0RFRwWFl2MTB6bVRBQzBT?=
- =?utf-8?B?VUoyK0tpUTQ2aXIwSTUxNjAxcjRhcWVYK09OVVVrNjZZNDdHZkJFYk13WkZ3?=
- =?utf-8?B?Nm90ZndBTjBHN296YkRvUTM4OWpYRytNYzN6c0IvMG96NC92bzVpNHBYTm0x?=
- =?utf-8?B?QmJnWmtFdEpvRGFyYm1ZNjBqY0FqTWlEZWR2NXpWMjlxU2VYdVhCR245NjF1?=
- =?utf-8?B?RVVWZ0Y5T25wcnNiZzlwcGxXRkgwSTZIOFdkbjd1SzV2QVM1SnFweW84djgy?=
- =?utf-8?B?a056R1JSV2xlcGNicTZ4YVc1bnRSczh6OGMyWDJHNHJ0bVBBZEYrSnYranQv?=
- =?utf-8?B?WmJRMXhORE85UzVVb3QxdUZCZnVPa3FwNVZZdGJOa1R1eU9EK2hBMXNxY1Rv?=
- =?utf-8?B?eEQwbEttWG9qVTRubU5td3M4ZmF4TGo5d0RCL1JBNUMvcDVnOFBSaDVSakxs?=
- =?utf-8?B?Y3gxbE9XRm5odTU0emtlNTVXVEUzTnlzU1VIT2VCU3RtbnRHTllWUHBYNUh5?=
- =?utf-8?B?T1FTMTVFYWNRN0lvWndPNldKcGJ5LzZKSHgxV0RFa1o2UEpFSUFmMUI2cnZM?=
- =?utf-8?B?cUtXc1M5blpDQXgxUjB1ZHBrSmUyTU4vdmVaWVZMc1hoazFIVGRlWHdCZ0FW?=
- =?utf-8?B?ejNNV0hhUHRNamYxb042Qk1uUDZ4c3VibFloeTh0dEVTTDFDT1g4WjI5VCtT?=
- =?utf-8?B?aUZmcDJ3aXZjSXJ0WnJXNHZDU0pqYXErZ0FjaW9GZG5ZTHVZV0c3L3pJTzgw?=
- =?utf-8?B?RzlUS3JJck5jMU82cTV3ckxhaXpIaDhQc0RhRk1UdnhRMDhHR3JQblRNbFpY?=
- =?utf-8?B?TlJreC9ZcW94WHVESC9hcS9nOVYxZkR6dXUzSjF1VTdyQmVTQnIrWjRJN0Nr?=
- =?utf-8?B?bFVZR3U2RWJZTFV3SzBFQmFUY082Rk00YXROWFhVQVZzQzFyK2t0TEFqMVli?=
- =?utf-8?B?YWdLVWFnN3pvTWNCcVRYVU9XdnQvZURHUDZaUlM1Q1p2YndLRkphbld3amhJ?=
- =?utf-8?B?aTVhT3FiTFNZYWI5YU5OZnJaODFFcnc4SVBJTXl3MG54Z2prWlpDTllGcDB3?=
- =?utf-8?B?YjJrbGRRWjlsVWxZdTRDSlJlS0IxM3lpOXF4b1NsYU55bFBvd3o1SHp6U0Fi?=
- =?utf-8?B?T3ppald2SXFaKzN6WDRRU0NFbEFrYUFra1luSnNHZnB5UTZlb2NiSjNtOXBv?=
- =?utf-8?B?elh3WDB5Zzh3YlJJN3BuaFErRHVlcWlidkl6UGlpeGNKRkhVcElCbHRtVW95?=
- =?utf-8?B?R0FQUmVmQ3JNbGRSL01ib1FocXVBVlU5RkoyK1hQRzZCM0RCUHNlNkNYTE9Y?=
- =?utf-8?B?c2FBSmtCZnZhK3RnUjJZM1NBUDdmdDNia1dpMnRpVTJIR0hvMGNqelpRSmhU?=
- =?utf-8?B?UU4xbjVCTFgvZ0pKelh0NnpBcS9ibzVSS05DcDl2eEd6WDA2UzY1SnUzODlv?=
- =?utf-8?Q?YBquFsmKJGS0ANe0W4jj0kQoiqw6CG7Z?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2024 01:48:23.1233
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a1fecb3-e010-4fe5-5100-08dd0f4ebe60
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00036F3D.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8451
+References: <20241127-bpf-const-ops-v1-0-a698b8d58680@weissschuh.net> <20241127-bpf-const-ops-v1-2-a698b8d58680@weissschuh.net>
+In-Reply-To: <20241127-bpf-const-ops-v1-2-a698b8d58680@weissschuh.net>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 27 Nov 2024 18:43:30 -0800
+Message-ID: <CAADnVQ+yTZkfC=6Vw3+P9OA2iqzB02OhYTwWWCBGKLy_EfvQKA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 2/9] bpf: Move func_models from bpf_struct_ops to bpf_struct_ops_desc
+To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>, 
+	Kui-Feng Lee <thinker.li@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Tejun Heo <tj@kernel.org>, 
+	David Vernet <void@manifault.com>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
+	Valentin Schneider <vschneid@redhat.com>, Network Development <netdev@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:HID CORE LAYER" <linux-input@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Nov 27, 2024 at 11:20=E2=80=AFAM Thomas Wei=C3=9Fschuh <linux@weiss=
+schuh.net> wrote:
+>
+> --- a/net/bpf/bpf_dummy_struct_ops.c
+> +++ b/net/bpf/bpf_dummy_struct_ops.c
+> @@ -129,7 +129,7 @@ extern const struct bpf_link_ops bpf_struct_ops_link_=
+lops;
+>  int bpf_struct_ops_test_run(struct bpf_prog *prog, const union bpf_attr =
+*kattr,
+>                             union bpf_attr __user *uattr)
+>  {
+> -       const struct bpf_struct_ops *st_ops =3D &bpf_bpf_dummy_ops;
+> +       static typeof_member(struct bpf_struct_ops_desc, func_models) fun=
+c_models;
+>         const struct btf_type *func_proto;
+>         struct bpf_dummy_ops_test_args *args;
+>         struct bpf_tramp_links *tlinks =3D NULL;
+> @@ -175,7 +175,7 @@ int bpf_struct_ops_test_run(struct bpf_prog *prog, co=
+nst union bpf_attr *kattr,
+>
+>         op_idx =3D prog->expected_attach_type;
+>         err =3D bpf_struct_ops_prepare_trampoline(tlinks, link,
+> -                                               &st_ops->func_models[op_i=
+dx],
+> +                                               &func_models[op_idx],
 
+This is sad. You didn't bother running the tests.
+Above is producing garbage.
+That's why so many BPF CI tests are failing.
 
-On 11/12/2024 8:10 PM, Leon Romanovsky wrote:
-> From: Jianbo Liu <jianbol@nvidia.com>
-> 
-> When skb needs GSO and wrap around happens, if xo->seq.low (seqno of
-> the first skb segment) is before the last seq number but oseq (seqno
-> of the last segment) is after it, xo->seq.low is still bigger than
-> replay_esn->oseq while oseq is smaller than it, so the update of
-> replay_esn->oseq_hi is missed for this case wrap around because of
-> the change in the cited commit.
-> 
-> For example, if sending a packet with gso_segs=3 while old
-> replay_esn->oseq=0xfffffffe, we calculate:
->      xo->seq.low = 0xfffffffe + 1 = 0x0xffffffff
->      oseq = 0xfffffffe + 3 = 0x1
-> (oseq < replay_esn->oseq) is true, but (xo->seq.low <
-> replay_esn->oseq) is false, so replay_esn->oseq_hi is not incremented.
-> 
-> To fix this issue, change the outer checking back for the update of
-> replay_esn->oseq_hi. And add new checking inside for the update of
-> packet's oseq_hi.
-> 
-> Fixes: 4b549ccce941 ("xfrm: replay: Fix ESN wrap around for GSO")
-> Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-> Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->   net/xfrm/xfrm_replay.c | 10 ++++++----
->   1 file changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/xfrm/xfrm_replay.c b/net/xfrm/xfrm_replay.c
-> index bc56c6305725..235bbefc2aba 100644
-> --- a/net/xfrm/xfrm_replay.c
-> +++ b/net/xfrm/xfrm_replay.c
-> @@ -714,10 +714,12 @@ static int xfrm_replay_overflow_offload_esn(struct xfrm_state *x, struct sk_buff
->   			oseq += skb_shinfo(skb)->gso_segs;
->   		}
->   
-> -		if (unlikely(xo->seq.low < replay_esn->oseq)) {
-> -			XFRM_SKB_CB(skb)->seq.output.hi = ++oseq_hi;
-> -			xo->seq.hi = oseq_hi;
-> -			replay_esn->oseq_hi = oseq_hi;
-> +		if (unlikely(oseq < replay_esn->oseq)) {
-> +			replay_esn->oseq_hi = ++oseq_hi;
-> +			if (xo->seq.low < replay_esn->oseq) {
-> +				XFRM_SKB_CB(skb)->seq.output.hi = oseq_hi;
-> +				xo->seq.hi = oseq_hi;
-> +			}
->   			if (replay_esn->oseq_hi == 0) {
->   				replay_esn->oseq--;
->   				replay_esn->oseq_hi--;
+Overall I think it's a minimal positive value to constify struct_ops.
+Unless other bpf developers see a huge value
+I'd prefer to keep the code as-is.
 
-Gentle ping ...
-
-Thanks！
-Jianbo
+pw-bot: cr
 
