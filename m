@@ -1,112 +1,136 @@
-Return-Path: <netdev+bounces-147759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6AC59DB99D
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 15:29:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C9B39DB9B2
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 15:34:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85FB1281DE0
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 14:29:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11A432819FE
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 14:34:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024861AF0A0;
-	Thu, 28 Nov 2024 14:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37EFD1AF0A0;
+	Thu, 28 Nov 2024 14:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fJySpkI3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MPQUjaMe"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D281B21A8;
-	Thu, 28 Nov 2024 14:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BBC192D77
+	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 14:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732804171; cv=none; b=b11vzASf/FyhaZldVHhIpeBYip8l+S0UQkipqXMlj4g2ATBLOGlIbHwWiwG25245UPVjmvlmfZw9IceMQlG8DXTbnkvTgmWpgiEn8642Moxd8Nt+jrc9FoTk23XFv/+UPsSWmzUiQa7CQF+UOSeXxaktyZ5A8sOxN9UqaQup/cI=
+	t=1732804447; cv=none; b=hg4n1PpJwNFSq+NbICTNex1rumGEulrSTcgOGUAzjvTmhi3oOOLJgiyor9Boa5ODMy4rvPeFbNYZMhkAejTxXoXify15feVzEt6cEUJ4uXK+Was+EJCIUZqG0wMGO7aJRH++PqOGN4lpVkYdS2pLqKaZoETSQ4sGmOewUmlclOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732804171; c=relaxed/simple;
-	bh=ZMvMg8+Oa0TyJtTQnHUSVZzinBVvJE2xUaPMaeF+6c0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jgbRGWJnOvxms5rk3R+iuy0Z8Fg7oZfB+XnrSMV2wccsseY5kjMdsPZx3FfO2pDybOOJYe9ie9vxyMv2wi3PbhjKMqnXPOobLCaI7HZWnKvJum/LbH1XOnjdN8NczbbslbU1FB7bg9LAttgt7i6/wQDXiB7oV+vaLmwnMKPnRqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fJySpkI3; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Q4Mp5RBOVSRX1FefyVEktnbia0u/FdO2PSScCAZRv9k=; b=fJySpkI3EGU7DeYIAn6vdllo6/
-	QBBwtoSs8fgdWb97RQYwTuJazBl51jrLSUqqJlm6K5VIMQsVXd5jUEGIKusXzAWGFzZgtWk6SI2a1
-	GwvgpTSsAz4Ie97jqknWxAWeSU5Ts8SP4NJOjBh9MT4O5TwQ3G9b2a3/fJ1cPcrKdtnU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tGfWC-00EiHp-UJ; Thu, 28 Nov 2024 15:29:20 +0100
-Date: Thu, 28 Nov 2024 15:29:20 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [RFC net-next v1 2/2] net. phy: dp83tg720: Add randomized
- polling intervals for unstable link detection
-Message-ID: <1f2c1169-076d-460f-9635-d6ca6c4d310d@lunn.ch>
-References: <20241127131011.92800-1-o.rempel@pengutronix.de>
- <20241127131011.92800-2-o.rempel@pengutronix.de>
- <43cceaf2-6540-4a45-95fa-4382ab2953ef@lunn.ch>
- <Z0gksn9nEKJOY5Ul@pengutronix.de>
+	s=arc-20240116; t=1732804447; c=relaxed/simple;
+	bh=gdLUI1umdb/rW5MV+Vie2SqmLyB0r5FRY7XWGNb7lEI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WD0C1YLd/9XH31DbbWZjifSCS3ZQVP1J8GGZsnR3SJ4IvbJQXauKxeW8c6iV76hCNd17cfDlznWw9siLL32U2Dm0MRPY8fEOTUs3g/4wGiBUx9UwIMw5HGjSmzmuD6ft4/vkcEc8RUASThGjhvwPNJUVVFzmZNxnE6/uCp7r3fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MPQUjaMe; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732804444;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xa1GFFWBjwObkzYkodtut89seCqzVlMLu2RNr+6Yzzo=;
+	b=MPQUjaMeN/eotmGTo+WkhbAVxiAX4AVnUwEDTETaGUuI0kklhpRkQYzAwVkQF0qeTmgiJb
+	pLWpf6vSZ55Dc31EDITv2hLJPmdT9tMPnlaOllOUJZxSmaVuSkLvp9TLR9KahMmOzyBuQw
+	pydSk7VdIgDEniUdKdf84iK9l1g3rlE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-593-e6ccXJIAM-KpMXBYR4ziDg-1; Thu, 28 Nov 2024 09:34:03 -0500
+X-MC-Unique: e6ccXJIAM-KpMXBYR4ziDg-1
+X-Mimecast-MFC-AGG-ID: e6ccXJIAM-KpMXBYR4ziDg
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4349d895ef8so8362555e9.0
+        for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 06:34:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732804442; x=1733409242;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xa1GFFWBjwObkzYkodtut89seCqzVlMLu2RNr+6Yzzo=;
+        b=vz2t0TSs6g/XTDXWkkQbjv+EukXPgDNGrzsY9YY14OpttVs4O4aW1rbLA1Av1PEo30
+         jDGzO45j2S0JmPvlD3dOd6xotD7hCljyv9HVGJj9O1mYUCFjWAwWIkjYz1wXGqeGl+RU
+         PaYmuc8PDoPHd273F4SK7iXmCZlG90AhupeuzXzy3NHmtkt2wz538d89W9dUFrxUMlZK
+         rFwrnFElIRD2ht4ComDDNJ1FEG0z61BhT1PNGp6hxJjVnjYYsCCBv4SoBDVObiachjuq
+         bnkPmyF69Q1HA50e06RjgIfSbjGA0qSpPQ/epnapYckr6clRk8cOlXXOG1pHR6B8yADn
+         Wp9g==
+X-Forwarded-Encrypted: i=1; AJvYcCVjX0hYPCzrw63V9Vafx5PavIEhQ/nQXgsve7qriPoj+Cqevv+QRu67gO9Aakggo5eL7iieyj4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHnlRflSr74jSQNJVtd23IMIL0EIm+EW5Ln0dEcXZMWmtfmmbM
+	vf4WTfNtnVJSGYWx7BNggNToJPDeiGDevJqhBc4SO7FZTp2/jEwtY2KA6hsE5jNmNSFRCn3AWaM
+	l/VgHt1baIEuEqYFX32ZLdzA25Hiq1qI9WQKUCR+vb+CQHrRqiD28gQ==
+X-Gm-Gg: ASbGncu65+eT8bRD0xRj5fM/hJEnP2WZKaaesiVIYrX1/D0dGa+6aJXK4CPEdGVfa8t
+	XIdYHx2ZzKdtHNaKITQNrv+WDSzQJ+8h22zgxQiK1Wini65fqo8Y8VkBGu1Yg6nDiN9r/X8pv2z
+	XWyiB825Xnx2OkDyVo3duqBJy/Lzu9aJH+/h0CHDbrziPIofCzg+lEZ9cUcAq3+Yb7nuKRNyjQm
+	pDTO+QycXZFIxoPl5hLmmd0YDDcRzV/hKq+zEKYrp98B4XNwQY+x6kaemockuQCcOP4k3yvOO82
+X-Received: by 2002:a05:600c:458b:b0:42f:8229:a09e with SMTP id 5b1f17b1804b1-434a9df7b85mr69158555e9.29.1732804442043;
+        Thu, 28 Nov 2024 06:34:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEGSJwAZufVlwux6fyvnWoUoLuDNYE+JXwRvg7ZKjaI2N2OLZle9IsMIsJNi3GMwOw5YRJ3UQ==
+X-Received: by 2002:a05:600c:458b:b0:42f:8229:a09e with SMTP id 5b1f17b1804b1-434a9df7b85mr69158355e9.29.1732804441715;
+        Thu, 28 Nov 2024 06:34:01 -0800 (PST)
+Received: from [192.168.88.24] (146-241-38-31.dyn.eolo.it. [146.241.38.31])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434b0f70cbfsm24154265e9.36.2024.11.28.06.34.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Nov 2024 06:34:00 -0800 (PST)
+Message-ID: <d74075e2-8e82-4c7d-b876-398f4880d097@redhat.com>
+Date: Thu, 28 Nov 2024 15:33:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z0gksn9nEKJOY5Ul@pengutronix.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net,v2 0/4] Netfilter fixes for net
+To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
+ edumazet@google.com, fw@strlen.de
+References: <20241128123840.49034-1-pablo@netfilter.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241128123840.49034-1-pablo@netfilter.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 28, 2024 at 09:07:14AM +0100, Oleksij Rempel wrote:
-> Hi Andrew,
+On 11/28/24 13:38, Pablo Neira Ayuso wrote:
+> v2: Amended missing Fixes: tag in patch #4.
 > 
-> On Wed, Nov 27, 2024 at 04:37:49PM +0100, Andrew Lunn wrote:
-> > On Wed, Nov 27, 2024 at 02:10:11PM +0100, Oleksij Rempel wrote:
-> > > Address the limitations of the DP83TG720 PHY, which cannot reliably detect or
-> > > report a stable link state. To handle this, the PHY must be periodically reset
-> > > when the link is down. However, synchronized reset intervals between the PHY
-> > > and its link partner can result in a deadlock, preventing the link from
-> > > re-establishing.
-> > > 
-> > > This change introduces a randomized polling interval when the link is down to
-> > > desynchronize resets between link partners.
-> > 
-> > Hi Oleksij
-> > 
-> > What other solutions did you try? I'm wondering if this is more
-> > complex than it needs to be. Could you add a random delay in
-> > dp83tg720_read_status() when it decides to do a reset?
+> -o-
 > 
-> Yes, this would be possible, but there are multiple reasons I decided to
-> go this way:
-> - in link down case, it is better to increase polling frequency, it
->   allows to reduce link up time.
-> - there are PHYs, for example an integrated to LAN9372 which supports
->   only link down interrupt. As long as link is down, it should be
->   polled.
-> - i'm working on generic PHY stats support and PHYs need to be polled,
->   even with IRQ support, just less frequently.
+> Hi,
 > 
-> I can add it to the commit message.
+> The following patchset contains Netfilter fixes for net:
+> 
+> 1) Fix esoteric UB due to uninitialized stack access in ip_vs_protocol_init(),
+>    from Jinghao Jia.
+> 
+> 2) Fix iptables xt_LED slab-out-of-bounds, reported by syzbot,
+>    patch from Dmitry Antipov.
+> 
+> 3) Remove WARN_ON_ONCE reachable from userspace to cap maximum cgroup
+>    levels to 255, reported by syzbot.
+> 
+> 4) Fix nft_inner incorrect use of percpu area to store tunnel parser
+>    context with softirqs, reported by syzbot.
+> 
+> Please, pull these changes from:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-11-28
+> 
+> Thanks.
 
-Yes, more justification would be good.
+Oops... I completed the net PR a little earlier than this message, I was
+testing it up 2 now, and I just sent it to Linus. Is there anything
+above that can't wait until next week?
 
-In general, we try to hide workarounds for broken devices in the
-driver, not expose it to all drivers. Variable rate polling, and
-polling even when interrupt are enabled does however sound
-useful. Cable testing might also be able to use it.
+Thanks,
 
-	Andrew
+Paolo
+
 
