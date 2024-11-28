@@ -1,119 +1,121 @@
-Return-Path: <netdev+bounces-147788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DF9A9DBCB7
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 20:59:16 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E30359DBCE0
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 21:28:05 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAC7C16467C
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 19:59:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1355BB2192D
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 20:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C16D1487C1;
-	Thu, 28 Nov 2024 19:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4894A1C302B;
+	Thu, 28 Nov 2024 20:27:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e2kRFp9l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kKvLsRpz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1FD7A13A
-	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 19:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5761B3933
+	for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 20:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732823952; cv=none; b=Jxl4x/Yia0iA8bIV8HpHNvE+PD9npDNdu2jz5Qj9gn1syz1iz3drCecyEUjg8CDOhFGChqbH12D59j/gV1vWKqFQOsUZyoGd+gFgy9/x3P1y210TK41i1d8EWAPYEt3rqhQ7eEEEm4PsXC6EP2YaPTM/lxt+D4J7LEu324l4ivI=
+	t=1732825677; cv=none; b=lIWCh5WLOKUxXoFlxjdnQ+FdsVlHNF88FO1d8FQr7v0laS87TfiiaeIrkaywhPNPoqXSW6j8GXmbS0D/E3+ZYWw0Cl2S3UmA/+fVXNEDBN6xndV+WgVQ4IZtLl76nAQX7XOAohw0C8v7WpBVVLI0dezfgv2UTPSVKNE3CHfISNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732823952; c=relaxed/simple;
-	bh=WojhLmvNYdvGz1lXH4yB9jUW012CA0hTwl5wJZAods8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=feSr+K0MYmsW19LfMJ0FcIVWbyIehNl3SLXiXQGo4Z+ffOFo2HQo3fGIaUdigPN0tQhB6OZiOE8sLZTMVAgTEMO4kX4myKeQeUeH9B3LAyDWR9dApNUyFkK/ZWOXI0HwE8G5z4Lmf9knNKjlO3/DmoLBPp7X5NYz8vDuLBcWYgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e2kRFp9l; arc=none smtp.client-ip=209.85.161.41
+	s=arc-20240116; t=1732825677; c=relaxed/simple;
+	bh=anpGhFH1NdArbWrj7Yvc9daLlhDSfr3Wj9ecMSsmPwg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PS2sSkrM8NjjZVyUxLTCui+I7qeiBgiHbwgwd/iZi1/8RS3ZkqOVsgiHAOXofXpvCh93rG0Okk2mQDB0/06gW9K/SAEowzqq1jxbM17qQQlQcMH4jENZTQys9Ni0PL8jeNs+u/aL7+XXfy6DjJOda8NNFQZG3qfbYOdcrGEtM74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kKvLsRpz; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5f1e573f365so479036eaf.1
-        for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 11:59:10 -0800 (PST)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-434a1fe2b43so10662975e9.2
+        for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 12:27:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732823950; x=1733428750; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RQoJvwwRV2WuKH22MOuMgnTVVA7Jtg/d2Ctxd5KIy5A=;
-        b=e2kRFp9l8XyY125I2ozMcLXI+JK5ycWWeJZyes0BsginN7ziXDRFYnFtlvm6DgH2Ca
-         Kc9zm79RhrRf+EJPUlfOONz9vQ+rEjvNmPLVBDlTru9nkDUfG8BlPv6VdzPrS0GW9jo3
-         cXdf1gi6yZvulpXx1zdfXj0xBXeL0QoNq+dkmB8eLM/zpF2yn2ZEbDnTp3Bs1woYNkAK
-         CRqyZ69hxCQWbB1xwL23MI+Ma+vNJKNUkt6f1EnGMQPQ3oyVSb/XEYDvN1YSjtWtomad
-         BVnxra5vhohC1NJar88UyaHyE+6et0sGDVMEJx/SBYVPGQjAmOH5QQG16mv6Yut8s1b2
-         zKuQ==
+        d=gmail.com; s=20230601; t=1732825672; x=1733430472; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VyGJcOUL4RWiU3AIrG5CvRh+phEgBhZ3OEB8JPUvRck=;
+        b=kKvLsRpzx4lF8LL/FmXADnFJmlENTz4TCH1OVYUbKrkw/pwB4b7KxwamP2oayp0ZXk
+         l17YN0Tc+R+0hQiwHANLDbAEjcXktHab0XG9Fp+qOIpVuWQS8+s8szbroGTEFUCkZ1Lh
+         ao9nXf41k0bQ/p2H7cBXTzd9olUAg1jbN4RQxLtBd5z4ZmRT6Xvkk9bJEX6J/1mfOaKQ
+         NPm5YIN6oos4cJKMYgVixBynSCuh03548Q0hktIyYDSJlCUeq9RIUc6XtzKNmcVdu/hi
+         MvixGDdszJYLtb4NnZqsU7s3HqRawOq7euadqHn2zdjZrYvMiGGm7Vps0L6JjcwgSL38
+         Qqww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732823950; x=1733428750;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RQoJvwwRV2WuKH22MOuMgnTVVA7Jtg/d2Ctxd5KIy5A=;
-        b=gs/NgUyK4uqx17zJPS86VfSDiv/Mpu3k9zJ0irMF761eLV4mbqnRMi+ZVfVNhh4ZXz
-         UGxIR+TtZJpaYaTmxpL/E2IuXq+3M5ccnIQvEw/OC9jzZSXD0axVmdPx5qPs5OrGuBtO
-         GsJMEj6flOb9NYBdM4YZtnwJEWFht63r7huEblqFtIZLGK3GumlPXLgoEUTu6aPv8K88
-         D9WN8SWQ/8MSo9xiXcjMp0SeWWoXMFdkCXIQ2B0WBVbdeglgU1cnN8Og6/LpK1Yujzy/
-         Ja3BrOZ4RwLNt9KUPWZhbu1qr/DJWDUnW6CyOCm0ta4x01pS1Nvo2mSDZyaN9v4qn9lM
-         DG0A==
-X-Forwarded-Encrypted: i=1; AJvYcCXIccR/Z6fbBAS+46qu4P52RaO6gl1hFKctKuAlDpnzewoGeTIXOcCC/+H9kv8Iio9SQ7KGVjo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8R92xU09t6Y7pR6Vh+R86f4kt4XChl6RaVwyl4cJK3AmJe2/g
-	vrnKS4c31yARyAJRvRtCn3ksYzgy7s5hhtBM/qB4phSDVy964nBf
-X-Gm-Gg: ASbGnctNYmO38cQeA7z3Ff6bHzqE8agPgIqs4MriZdLjKcQSdQ6K+DDLCfk90+H9Rjj
-	p7VKgbEuGCU3VPh2VxAIw2elvQKmuU7EnPF6URDhdL9qp8V6ZGBzQWIO/ZrL7H2JijOfeUBNgHF
-	EESAlxsY/QVQbcBAwOhr8r4F5qkyMVHIokA8yzahleGMS+hHb6F+bipwpPtKdrFg8L5jrZude/M
-	BCtbbHZPAWQ6GwB4awnfHWvDABwqu2dTiIeks1DhcuzEXKgkkSVtpgUk3QtVKbSgph6nQ==
-X-Google-Smtp-Source: AGHT+IHFkbPlipMnHbPl0yjwyi6QLmWlxz6kS5RUQqGeJVF42MyMeYrGcOOJbrV3b4mnMkEG8c5EtA==
-X-Received: by 2002:a05:6820:1620:b0:5f1:e8fd:5da2 with SMTP id 006d021491bc7-5f20a1e71a6mr6974410eaf.7.1732823949941;
-        Thu, 28 Nov 2024 11:59:09 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5f21a4cc99dsm451475eaf.33.2024.11.28.11.59.08
+        d=1e100.net; s=20230601; t=1732825672; x=1733430472;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VyGJcOUL4RWiU3AIrG5CvRh+phEgBhZ3OEB8JPUvRck=;
+        b=eyeOGTGSez/NOg+MiG0W0wDKB8TnpiNrvrS7XEogAGaPMtSqqSiwRwaciahV5iz2TP
+         a+TD+PslE2hFB9riUu3mL2bDU/1Zi98P1gfCmrQ8K586FQ41NlAYnFD4sO3f0aO3UmpT
+         wpkqhpVowEZ3MhAPqJR7FSLOiLtqheELaqaV4pJY7CIqVZdg2FybB7QbQNKBR2t2xZGk
+         ynxJ9ABzXuvgeeRh3/vVIxTRoGFrilqrp/O7qsLhUEDv2QJswB2KOiGSJFqa8hsI6M3U
+         D4SY6ZgjmCLxk9JxJsEHp7RSLQDb3YLGMeCETVlvjx48pdY86IaxRW5+h0eCqV/2xIrS
+         iVfg==
+X-Gm-Message-State: AOJu0YzaEy2vnXYI5Zgy9ov+VdtLx6L7vje37wmoxt/BDx1PiWTBPLjC
+	JaUdrb+h0MsQrd8iS4nRG3Vc/bWmcc51JSQtQ2ERt7xB8+RmGPvKtB3ZJtPz
+X-Gm-Gg: ASbGncsBfK0txhP8LaMTXd/q0QeC/4t/NyLg049BfmPnjH6ZBCFKNLOuzk9YxUaI+38
+	u4GJ6IaICTiJydgRFzaP4th4dFrRNYSGfjNikoDaBbHDmTSZ2E54Sz19E78pEHdisddXPrn3Cjl
+	Hqe85wsHg7SapCZspeq8TX3IYuUe1Q1sNH784VVEmRGyQvLf/6ZfSscl7poFMTpFuQZQmUO6T+U
+	ab0gzsCEdTGqnnSNe7gO2C/VKKHYbddshdbAGUgwjzByXJ1tjnEfi2e8qSkvW2lZnwGLf/TUaRI
+	giPpoI6+6dsKY5t3+D2NCsOcz5OV3l+sQ3JLKPUEpVRyLQ==
+X-Google-Smtp-Source: AGHT+IExTfQ0fAmjLbWDpLM+u1VPi1IqAtPAcPtZrpCSM+Y6laoCBODRSFkuTLvf/2rFeZkyV1NN1A==
+X-Received: by 2002:a05:600c:510c:b0:434:a902:97d0 with SMTP id 5b1f17b1804b1-434a9df21f4mr73908205e9.29.1732825671760;
+        Thu, 28 Nov 2024 12:27:51 -0800 (PST)
+Received: from KJKCLT3928.esterline.net (192.234-180-91.adsl-dyn.isp.belgacom.be. [91.180.234.192])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385ccd801e9sm2457560f8f.103.2024.11.28.12.27.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Nov 2024 11:59:09 -0800 (PST)
-Date: Thu, 28 Nov 2024 11:59:06 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	"Korba, Przemyslaw" <przemyslaw.korba@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"Olech, Milena" <milena.olech@intel.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: Re: [PATCH iwl-net] ice: fix incorrect PHY settings for 100 GB/s
-Message-ID: <Z0jLiisnLOTSvbaW@hoboy.vegasvil.org>
-References: <20241126102311.344972-1-przemyslaw.korba@intel.com>
- <946b6621-fd35-46b9-84ee-37de14195610@lunn.ch>
- <PH0PR11MB4904824FA658713F78CA404D94282@PH0PR11MB4904.namprd11.prod.outlook.com>
- <6cca6089-ed72-407a-8f23-70bb67b42e63@intel.com>
- <1c95b010-cb57-4864-aa0b-82b7093f44d1@lunn.ch>
+        Thu, 28 Nov 2024 12:27:51 -0800 (PST)
+From: Jesse Van Gavere <jesseevg@gmail.com>
+X-Google-Original-From: Jesse Van Gavere <jesse.vangavere@scioteq.com>
+To: netdev@vger.kernel.org,
+	woojung.huh@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	andrew@lunn.ch,
+	olteanv@gmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Jesse Van Gavere <jesse.vangavere@scioteq.com>
+Subject: [PATCH net] net: dsa: microchip: Make MDIO bus name unique
+Date: Thu, 28 Nov 2024 21:27:43 +0100
+Message-Id: <20241128202743.15248-1-jesse.vangavere@scioteq.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1c95b010-cb57-4864-aa0b-82b7093f44d1@lunn.ch>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 28, 2024 at 05:20:44PM +0100, Andrew Lunn wrote:
+In configurations with 2 or more DSA clusters it will fail to allocate
+unique MDIO bus names as only the switch ID is used, fix this by using
+a combination of the tree ID and switch ID
 
-> "only Intel's driver" is a bit of a worry. Part of being a Maintainer
-> is to ensure that all drivers behave the same. There should not be any
-> difference between an Intel PTP device, a Marvell PTP devices, a
-> Microchip PTP device etc. They should all implement the API in a
-> uniform way.
+Signed-off-by: Jesse Van Gavere <jesse.vangavere@scioteq.com>
+---
+ drivers/net/dsa/microchip/ksz_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yes, and I appreciate it being on CC even for driver changes.
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 920443ee8ffd..0d5dbbdd41f8 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2550,7 +2550,7 @@ static int ksz_mdio_register(struct ksz_device *dev)
+ 		bus->read = ksz_sw_mdio_read;
+ 		bus->write = ksz_sw_mdio_write;
+ 		bus->name = "ksz user smi";
+-		snprintf(bus->id, MII_BUS_ID_SIZE, "SMI-%d", ds->index);
++		snprintf(bus->id, MII_BUS_ID_SIZE, "SMI-%d-%d", ds->dst->index, ds->index);
+ 	}
+ 
+ 	ret = ksz_parse_dt_phy_config(dev, bus, mdio_np);
+-- 
+2.34.1
 
-> What i have also seen is that if one driver gets something wrong,
-> other drivers might as well.
-
-Yeah, unfortunately there are many device drivers (not just
-PTP/network drivers) that get things wrong.  These are then copied by
-the authors of new drivers, and so on.
-
-Thanks,
-Richard
 
