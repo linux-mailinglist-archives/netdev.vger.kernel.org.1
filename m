@@ -1,128 +1,79 @@
-Return-Path: <netdev+bounces-147782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A94269DBC36
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 19:38:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 276649DBC72
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 20:20:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 330E3B20B92
-	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 18:38:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68DC9B21AA1
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 19:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD841C1ACB;
-	Thu, 28 Nov 2024 18:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED83E1C3041;
+	Thu, 28 Nov 2024 19:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sd1ohPme"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cfurvpTq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B0D19EED3;
-	Thu, 28 Nov 2024 18:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37B41C1F23;
+	Thu, 28 Nov 2024 19:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732819086; cv=none; b=pbClY0ga1erx2WH/6eLpOoe9UeGFIaCWLCFj0tzBgKH8Kaki4yyUecvhkB/0Z91SChMBIIS2JBEjF6M+WlPYIKEk3O3Z2ur8kKT0cJ6SCEqh1VsQCwBKKUTMXeaOuNuDB5RazhoUZBGAXJdaG4pFmn5kbsGFNIoBSPJm1v6128o=
+	t=1732821585; cv=none; b=P9WcnoS5/99a+uw3NpFqV9OVMEUahPFnq/cd8dWRNiutkaPTXTFH/NaA5o5nEUYnGat0hTWRtq9Cp4fNa2Zc6eBBocqGlQ5R7JDIqw8kNB0PhpPUG1nw7w3WE9RlxCbFE4G3W6iGJeGGvkAFgLM8yzYx8MtpzIznJe0LkMf2K3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732819086; c=relaxed/simple;
-	bh=5kHFSIgUt75t6zTwBLU8YLk/bo3MvEHaMsy1SVdn1xA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jlmrzPZSaQuDKExaSN4rCm4xJz+LK5pr8bJB+/43Nh++6Mbk7vlUEJO2OulBo3+KmAAvIkUK8pw5ABbEWvo13LKYTc0m+P4lAb9E/u5xqUOyhQOKttg/0ZuGW6tHH/xB1+hZmxX1EcnJ/QUGBskZFz3RtYT5nVB5JUnVFFDTuvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sd1ohPme; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7ee51d9ae30so699539a12.1;
-        Thu, 28 Nov 2024 10:38:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732819085; x=1733423885; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o+tE7Xp6FcgLMBVi5JpUkzbSQKbNu8pSIDauMkrQaJw=;
-        b=Sd1ohPme+zP0ABo8c3I53CT/jjKR6xv+Zwaev35pDdwZBTN91mQ/Xl8hhTldcWAPBi
-         vrmtvyoGfGfEX9oFXoCCAbu95fws8aQGk/n9wW79Sf4U5/6N4WGqCf9TBZvOBjwG4YVr
-         mU64FBUW+z+TyWEGHWsw4nsY6vBQMMXEjwxKeBEe9tE4R0m9YAcl9OjQmjfPVsCR2VJn
-         sffXCZmynX7QUrUUirFh360MeIy/vy6X0eZvYR5PBtUW8zTb1ZYOBmRJY4CXIeP9xXUQ
-         Of+A+B60rSKg931vKI7dABhOPK1OyRkTF/Nsw8BtEtN20mASF1OrLBjR398IhMC+fA9A
-         NEyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732819085; x=1733423885;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o+tE7Xp6FcgLMBVi5JpUkzbSQKbNu8pSIDauMkrQaJw=;
-        b=DU16x27zmydehRBwHeGrnLHM/XMARvgwOQdA5BPvcjJM/bVogEHELwpOgxOeeOzieI
-         BlEVdt6HSISIBZPaRJLJgScoou5R3E3keQ/Yap0IjPtTYVE32DDoHmRDnX/QvUTwW8Ja
-         W4JcaVdd1OmU+krEPlniILW3NWfTWSXhJY4xV6o/XafbqhP6Wft3W+SM6GRoA/Vc7Arr
-         UzViAMPnqvLwYKZ7ynmbv3jS8e3ZBTyJ5hrM5qPCJA1cUMO5IgHxW4ND/OYPorI4xige
-         v2TCCWPJ9iNR7Fn7kshSgIdaDMd8L5mUYIEHTb9ngSIY1iX+v+AoRHM1KHpMFomaL4/P
-         k4tw==
-X-Forwarded-Encrypted: i=1; AJvYcCUqcyh2/htv1BwyxEJylrkDGlnV5tK/HpBlBqkclOzt707zGQlkrp0cOcz2Uu1WW6wZgo4=@vger.kernel.org, AJvYcCXlBWH6c4xmeDid6bCl1QFoozR0IQqHmeY4zA89X41NCO1iUbzr04OLEU3YvSDr8d0y6Ev6sYVC@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwPo/7zebPFLw8XId1JGSpSD2HSdC4ggIc4Urd7YrS8fniSbh9
-	I5yuOUMJoEjqh7PpnPvf45hSuA9TENMYnQlEfqos8RFSEyHjn4WtlMI2CQ==
-X-Gm-Gg: ASbGncuGnB2FGODo3U6IlL/K3/eUKHZvJb+aUy/2sXN2FG3ZuFMCdqXk+IUSpBrTD5S
-	zzFDOEpzLaMpm2IiqmfSa6ZIAJMdITyJZ1LB56j9yMMLVQ08XaEr6dhu3fVctlJWjBUCxTUY56I
-	SkgXH0n0w4GFGlTGhMxqBvxozDSmp//aqoX6IeR9sVZwOogO1h+Ye6mZ/SmCN/9A52C92Hs49Zw
-	K5EBUikT4C7VCs0FXRTGdNoKHLSQWcMOz/LyO1WlKv9RBqPyYlMXvnd
-X-Google-Smtp-Source: AGHT+IHxAgsakWZpaMi/QTj+rwkOiNDU/j/x4CnaTAbnzdeHmOYAfVvEkWxmeXse+hh3jr4pfVnqxw==
-X-Received: by 2002:a17:90b:4a4e:b0:2ea:752c:3c2 with SMTP id 98e67ed59e1d1-2ee08eb2f0fmr9640255a91.13.1732819084630;
-        Thu, 28 Nov 2024 10:38:04 -0800 (PST)
-Received: from localhost ([2601:647:6881:9060:c1c1:c76b:dac2:9d68])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ee2aff1f28sm1803743a91.7.2024.11.28.10.38.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Nov 2024 10:38:04 -0800 (PST)
-Date: Thu, 28 Nov 2024 10:38:03 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: Zijian Zhang <zijianzhang@bytedance.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: Re: [External] [Patch bpf 2/2] selftests/bpf: Add a BPF selftest for
- bpf_skb_change_tail()
-Message-ID: <Z0i4i0Db8EnRjzZJ@pop-os.localdomain>
-References: <20241107034141.250815-1-xiyou.wangcong@gmail.com>
- <20241107034141.250815-2-xiyou.wangcong@gmail.com>
- <67a0fb14-f791-4499-8751-01bbbd1cafcb@bytedance.com>
- <6746cb81870d7_f422208e@john.notmuch>
+	s=arc-20240116; t=1732821585; c=relaxed/simple;
+	bh=bGzu/UYt3Xj9yEDb+GnTV1ppMbvTCTfIHASuj0sUzpE=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=OgkZmuYoZCMviBmqCxMCIyihm7GnH+AQp1/K7xa8s0Ji2dLmLfuS2LKzMc8X5SqZS3nowq/pFXL8Ls+g8mNphZ7BibHMZCTceoxl6md/Aby8d3HPgWcYF83TC6KjFs9rUB2tnQ8soXsrXquXML0TDoMPm5p+NoAY0BW7o/efx2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cfurvpTq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A73E4C4CED4;
+	Thu, 28 Nov 2024 19:19:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732821585;
+	bh=bGzu/UYt3Xj9yEDb+GnTV1ppMbvTCTfIHASuj0sUzpE=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=cfurvpTqgIjS4fzCaJOCHN7C4UzJj3sDtlHgZi1iUazEoMeBRcH5bJ5vL/BjmyhzC
+	 gAaVmdcy72tbhnGIbgv1KQkgQZZSYbj7uOWw82nCNL1r20Tf0UNC3FOl0CGFJ05jiD
+	 Lum7fy+eIwCPuzNPF9wXOZLCzpm3r9z1zP6DU5zAYzXaubtdrKiue/8UoDEOFFcS4G
+	 fkrsetsQcEcMUxE1t1FHoLk7EcOBgaU1mkdxQ/gJIU9z9VT63o+T1P56RuhMICcIgu
+	 Vk0Tt2V5zahl6PGtase4xjEQwFcAhBxC1ExODr4AlE6fO0/TlGrXM0aWu+k7TK+m7f
+	 xNPXb2AIyfMxA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F84380A944;
+	Thu, 28 Nov 2024 19:20:00 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.13-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20241128142738.132961-1-pabeni@redhat.com>
+References: <20241128142738.132961-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20241128142738.132961-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.13-rc1
+X-PR-Tracked-Commit-Id: 04f5cb48995d51deed0af71aaba1b8699511313f
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: f6d7695b5ae22092fa2cc42529bb7462f7e0c4ad
+Message-Id: <173282159884.1826869.13998358571660244760.pr-tracker-bot@kernel.org>
+Date: Thu, 28 Nov 2024 19:19:58 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6746cb81870d7_f422208e@john.notmuch>
 
-On Tue, Nov 26, 2024 at 11:34:25PM -0800, John Fastabend wrote:
-> Zijian Zhang wrote:
-> > 
-> > LGTM!
-> > 
-> > I think it will be better if the test could also cover the case you
-> > indicated in the first patch, where skb_transport_offset is a negative
-> > value.
-> > 
-> > Thanks,
-> > Zijian
-> > 
-> 
-> Hi Cong,
-> 
-> I agree it would be great to see the skb_transport_offset is
-> negative pattern. Could we add it?
+The pull request you sent on Thu, 28 Nov 2024 15:27:38 +0100:
 
-Hmm? It is already negative for sockmap, as I already mentioned in patch
-1/1:
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.13-rc1
 
-"skb_transport_offset() and skb_transport_offset() can be negative when
-they are called after we pull the transport header, for example, when
-we use eBPF sockmap (aka at the point of ->sk_data_ready())."
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/f6d7695b5ae22092fa2cc42529bb7462f7e0c4ad
 
-My test case uses skb verdict, which is one of the sockmap hooks.
+Thank you!
 
-Or I guess you mean positive? In that case, we would need hook different
-locations, like TC. I can certainly add it, but once again, it would
-make backporting this patchset even harder.
-
-Thanks!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
