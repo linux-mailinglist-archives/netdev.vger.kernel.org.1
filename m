@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-147841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F24DB9DE66B
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 13:28:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A54FE9DE674
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 13:28:33 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0F8F28298A
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 12:28:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DD40165135
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 12:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8414319D064;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78EA519F12D;
 	Fri, 29 Nov 2024 12:27:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F4319DF60
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079E019DF5F
 	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 12:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732883260; cv=none; b=P8zGh3kZTNyQLUwi9YRWaId54BhC4KYH8MWeSFa4/94o1EHv8Cv7pIA4BdlXHPxVGJRDlAWVPGPCQfCHGiyWQCyvVD1s8pbu9ZxSOjGgEmC8zIyjnOROLI0biCWLMpnC1Y0Iexw1FKGT7hQprg8HDk+2hUNsD2zujgBmQINh64Q=
+	t=1732883260; cv=none; b=B59iAWdf9ClSElHtKO3fDXmZTYxe9guSFV7WA86YpCkxA6qqyCbO86Q7VMaI2L4FxPgWVK5y75x5jTH91CxGlaZrOk46/eLcPSG9YhULXupoMvLtf6DEIs+kol9mTtfati4+xvLkfTs6obAoVbeHUwcYPjfpjiNfyN7Ao4N+UxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1732883260; c=relaxed/simple;
-	bh=o4pNKqEkR1LvILS6q0K4cBcYkyg0qyQFpd4dDrAZfCc=;
+	bh=vCaRM3dJJWxIrxCNSOy28UpqmLqEZk+IENGtsIy6qDE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cmpt9aH7sHUy1oXhbOpCvdLLtvaEYBYgSoptm4gHx9JvJE2a1EKN64rCmQpodsiMG1wJ/U/Ir2YF4hjaSGAjJK/Cbc8//bnhZSPGN5bkAB8o8xTLL6/QrdzOjW+iT09mzCLvAy19XX4S1pZNf/1NGSqjTfk6BygsyeDlHjsvNE4=
+	 MIME-Version; b=LYLkV2UVkqBGLiWfWQQ4g/NK/PN1wZLU40Vo9t3YpI93bBmsk3eqnfo1itkgEPIMuKsLPIUhKN9lc3xZo+3dc36La9+MpMMhRtD2z3ZtD/LF2gF6KFjsuu2gw6BnQ8zXo3R6o6eTISENlxO9sDT1kyELZWeuLBwXicoZE7dCk/I=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,26 +33,26 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1tH05w-0007rv-75
+	id 1tH05w-0007ry-6g
 	for netdev@vger.kernel.org; Fri, 29 Nov 2024 13:27:36 +0100
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1tH05t-000mkZ-1E
+	id 1tH05t-000mka-1G
 	for netdev@vger.kernel.org;
 	Fri, 29 Nov 2024 13:27:34 +0100
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id D2040381172
+	by bjornoya.blackshift.org (Postfix) with SMTP id D61BB381173
 	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 12:27:33 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id C9686381116;
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id E13B3381118;
 	Fri, 29 Nov 2024 12:27:30 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 6e8ca2ea;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 06be26fa;
 	Fri, 29 Nov 2024 12:27:29 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -62,9 +62,9 @@ Cc: davem@davemloft.net,
 	kernel@pengutronix.de,
 	Dario Binacchi <dario.binacchi@amarulasolutions.com>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net 10/14] can: sja1000: sja1000_err(): fix {rx,tx}_errors statistics
-Date: Fri, 29 Nov 2024 13:16:57 +0100
-Message-ID: <20241129122722.1046050-11-mkl@pengutronix.de>
+Subject: [PATCH net 11/14] can: sun4i_can: sun4i_can_err(): fix {rx,tx}_errors statistics
+Date: Fri, 29 Nov 2024 13:16:58 +0100
+Message-ID: <20241129122722.1046050-12-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20241129122722.1046050-1-mkl@pengutronix.de>
 References: <20241129122722.1046050-1-mkl@pengutronix.de>
@@ -82,139 +82,56 @@ X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 From: Dario Binacchi <dario.binacchi@amarulasolutions.com>
 
-The sja1000_err() function only incremented the receive error counter
-and never the transmit error counter, even if the ECC_DIR flag reported
-that an error had occurred during transmission.
+The sun4i_can_err() function only incremented the receive error counter
+and never the transmit error counter, even if the STA_ERR_DIR flag
+reported that an error had occurred during transmission.
 
 Increment the receive/transmit error counter based on the value of the
-ECC_DIR flag.
+STA_ERR_DIR flag.
 
-Fixes: 429da1cc841b ("can: Driver for the SJA1000 CAN controller")
+Fixes: 0738eff14d81 ("can: Allwinner A10/A20 CAN Controller support - Kernel module")
 Signed-off-by: Dario Binacchi <dario.binacchi@amarulasolutions.com>
-Link: https://patch.msgid.link/20241122221650.633981-10-dario.binacchi@amarulasolutions.com
+Link: https://patch.msgid.link/20241122221650.633981-11-dario.binacchi@amarulasolutions.com
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/sja1000/sja1000.c | 65 ++++++++++++++++++-------------
- 1 file changed, 38 insertions(+), 27 deletions(-)
+ drivers/net/can/sun4i_can.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/can/sja1000/sja1000.c b/drivers/net/can/sja1000/sja1000.c
-index ddb3247948ad..4d245857ef1c 100644
---- a/drivers/net/can/sja1000/sja1000.c
-+++ b/drivers/net/can/sja1000/sja1000.c
-@@ -416,8 +416,6 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
- 	int ret = 0;
- 
- 	skb = alloc_can_err_skb(dev, &cf);
--	if (skb == NULL)
--		return -ENOMEM;
- 
- 	txerr = priv->read_reg(priv, SJA1000_TXERR);
- 	rxerr = priv->read_reg(priv, SJA1000_RXERR);
-@@ -425,8 +423,11 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
- 	if (isrc & IRQ_DOI) {
- 		/* data overrun interrupt */
- 		netdev_dbg(dev, "data overrun interrupt\n");
--		cf->can_id |= CAN_ERR_CRTL;
--		cf->data[1] = CAN_ERR_CRTL_RX_OVERFLOW;
-+		if (skb) {
-+			cf->can_id |= CAN_ERR_CRTL;
-+			cf->data[1] = CAN_ERR_CRTL_RX_OVERFLOW;
-+		}
-+
- 		stats->rx_over_errors++;
- 		stats->rx_errors++;
- 		sja1000_write_cmdreg(priv, CMD_CDO);	/* clear bit */
-@@ -452,7 +453,7 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
- 		else
- 			state = CAN_STATE_ERROR_ACTIVE;
- 	}
--	if (state != CAN_STATE_BUS_OFF) {
-+	if (state != CAN_STATE_BUS_OFF && skb) {
- 		cf->can_id |= CAN_ERR_CNT;
- 		cf->data[6] = txerr;
- 		cf->data[7] = rxerr;
-@@ -460,33 +461,38 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
- 	if (isrc & IRQ_BEI) {
+diff --git a/drivers/net/can/sun4i_can.c b/drivers/net/can/sun4i_can.c
+index 17f94cca93fb..4311c1f0eafd 100644
+--- a/drivers/net/can/sun4i_can.c
++++ b/drivers/net/can/sun4i_can.c
+@@ -579,11 +579,9 @@ static int sun4i_can_err(struct net_device *dev, u8 isrc, u8 status)
  		/* bus error interrupt */
+ 		netdev_dbg(dev, "bus error interrupt\n");
  		priv->can.can_stats.bus_error++;
 -		stats->rx_errors++;
++		ecc = readl(priv->base + SUN4I_REG_STA_ADDR);
  
- 		ecc = priv->read_reg(priv, SJA1000_ECC);
-+		if (skb) {
-+			cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR;
- 
--		cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR;
-+			/* set error type */
-+			switch (ecc & ECC_MASK) {
-+			case ECC_BIT:
-+				cf->data[2] |= CAN_ERR_PROT_BIT;
-+				break;
-+			case ECC_FORM:
-+				cf->data[2] |= CAN_ERR_PROT_FORM;
-+				break;
-+			case ECC_STUFF:
-+				cf->data[2] |= CAN_ERR_PROT_STUFF;
-+				break;
-+			default:
-+				break;
-+			}
- 
--		/* set error type */
--		switch (ecc & ECC_MASK) {
--		case ECC_BIT:
--			cf->data[2] |= CAN_ERR_PROT_BIT;
--			break;
--		case ECC_FORM:
--			cf->data[2] |= CAN_ERR_PROT_FORM;
--			break;
--		case ECC_STUFF:
--			cf->data[2] |= CAN_ERR_PROT_STUFF;
--			break;
--		default:
--			break;
-+			/* set error location */
-+			cf->data[3] = ecc & ECC_SEG;
- 		}
- 
--		/* set error location */
--		cf->data[3] = ecc & ECC_SEG;
+ 		if (likely(skb)) {
+-			ecc = readl(priv->base + SUN4I_REG_STA_ADDR);
 -
- 		/* Error occurred during transmission? */
--		if ((ecc & ECC_DIR) == 0)
--			cf->data[2] |= CAN_ERR_PROT_TX;
-+		if ((ecc & ECC_DIR) == 0) {
+ 			cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR;
+ 
+ 			switch (ecc & SUN4I_STA_MASK_ERR) {
+@@ -601,9 +599,15 @@ static int sun4i_can_err(struct net_device *dev, u8 isrc, u8 status)
+ 					       >> 16;
+ 				break;
+ 			}
+-			/* error occurred during transmission? */
+-			if ((ecc & SUN4I_STA_ERR_DIR) == 0)
++		}
++
++		/* error occurred during transmission? */
++		if ((ecc & SUN4I_STA_ERR_DIR) == 0) {
++			if (likely(skb))
+ 				cf->data[2] |= CAN_ERR_PROT_TX;
 +			stats->tx_errors++;
-+			if (skb)
-+				cf->data[2] |= CAN_ERR_PROT_TX;
 +		} else {
 +			stats->rx_errors++;
-+		}
+ 		}
  	}
- 	if (isrc & IRQ_EPI) {
- 		/* error passive interrupt */
-@@ -502,8 +508,10 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
- 		netdev_dbg(dev, "arbitration lost interrupt\n");
- 		alc = priv->read_reg(priv, SJA1000_ALC);
- 		priv->can.can_stats.arbitration_lost++;
--		cf->can_id |= CAN_ERR_LOSTARB;
--		cf->data[0] = alc & 0x1f;
-+		if (skb) {
-+			cf->can_id |= CAN_ERR_LOSTARB;
-+			cf->data[0] = alc & 0x1f;
-+		}
- 	}
- 
- 	if (state != priv->can.state) {
-@@ -516,6 +524,9 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
- 			can_bus_off(dev);
- 	}
- 
-+	if (!skb)
-+		return -ENOMEM;
-+
- 	netif_rx(skb);
- 
- 	return ret;
+ 	if (isrc & SUN4I_INT_ERR_PASSIVE) {
 -- 
 2.45.2
 
