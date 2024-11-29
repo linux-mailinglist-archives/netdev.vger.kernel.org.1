@@ -1,92 +1,94 @@
-Return-Path: <netdev+bounces-147805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB3B39DBF33
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 06:38:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EF199DBF36
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 06:48:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EC32B20CF8
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 05:38:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFF2FB21325
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 05:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2083214F117;
-	Fri, 29 Nov 2024 05:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25ABB14D6F6;
+	Fri, 29 Nov 2024 05:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6mQI4nz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="RabZ1T+8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53E233C5;
-	Fri, 29 Nov 2024 05:38:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5F72B2DA;
+	Fri, 29 Nov 2024 05:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732858724; cv=none; b=BkQJP3WJUIPezoJ3uQ9aJQ6NHaIKfmaLhVgQGgD3IVhUuSLdcJL+Bms2QceL4b3xNzZ9Z/86iOrg7Qv3pY0r5T7qhco0ZqbxNf8gb/ZkdlXi1YQ6knPAlveFR4xQ803Rpth0ZsjCmWO8i8w97iYaAzKTAoq1xBa7kp31TVXGZQY=
+	t=1732859289; cv=none; b=PWeVVoZ9Ahac03VF6qY2jXjC16Sx52uNl4kJCQMBhajaDgK6moh838uOVOrVo5pi/lFDeTlVpri93T0F17GwLDfK9pNTxZ6AtH3Ns+Q2lYu1n5psqjvgIWXvL+d7101yCYuthJBG7I5lByQDl2XblN6qGEJ/f6nchYkgwc4dGxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732858724; c=relaxed/simple;
-	bh=4uLJ93C/b7Z9jyF9WuaQVk/7LPHrqxw8oKsSkbIYFUY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NNo3Xdpcat8G6qy8q8lWICv/zKvu+T6XIDq1IvhV8EPJOS5TMcFJ32nF/CNxK9bBMHKUGnZ1fp18X/WOqfrPOIV57XiBF700rAewcB+LD4Qms03eItyXGsLPQv/DKzaIDr4Aq6JT92naPvCba0/yZL155M0aIX3CQh02fG743WE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6mQI4nz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D8ECC4CECF;
-	Fri, 29 Nov 2024 05:38:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732858723;
-	bh=4uLJ93C/b7Z9jyF9WuaQVk/7LPHrqxw8oKsSkbIYFUY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=T6mQI4nzSKvAvYZIoimrUho2uuiDON6HO+j9SYrSXPBwEORh20+H05BuGyP/BPiTe
-	 yTE9TYK9Hcxky7RcLQbn3C7NBGo6GCJyT//Qjlu+aKlLZ/C154N9sIC74WYUuuXrir
-	 V1pIdm8iyHYBMfk3sBvi3Qcjk27KnNImzZh+EclSDZcuW61PsJSQ9gBvded5odaeK9
-	 K4kvMLzMDMjbZFbiKJyQctyHnaqBK8w0dKMhc74dkBNeVNpP+fJPPdCdXZr6/XUT0E
-	 W8ferWp55HjQfFfOys+PEn20R6X5obKJRPWd+URrkCoqbZuM/2hXs9DyDsPjYza85a
-	 89JTGMdJ0sibQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE52380A944;
-	Fri, 29 Nov 2024 05:38:57 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1732859289; c=relaxed/simple;
+	bh=cmRn9M1qxrd4AfZ03Cxm6WUQlFfSFrrYHmEjmYoK9YI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jn8jsAeQZ8XIB7IAdFHTTUVYLxbhkO2/n3gWCDsF+JvcjUUuNhyzKvWF2tALm2HYY3xZpo/dyTusihYaiooE/glqX2QTjGndRY5jcTJG/i1Ol60j6vfi+afin1/3IBEaMWafFcGAf1rf9WjnVvodffNOB7612X6B0Fxcc3YD+7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=RabZ1T+8; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=0WFqm03LASHMTyNt5a67Mk7JKchTI8bd3NQnsi8VLts=; b=RabZ1T+8UjCRgLHHXqz2Ng12E2
+	UpQ8whlQdklzQS4BQmJ2r5AjliQUUjj5A+knrd6aK42mKJyLvK0lqxPM92ycXRRgRaofO3w/5sg5K
+	vuJoQzaA6Wbive6Ht5fdxSrDBpd5tLN8vQ2T4nnf9jwdFJMstI22bT666xny88ee5mzcM1liXDnVh
+	SfAn5aM/wzelfmGm6cYEVZHMkLASxjuEXSL4mncM0k8TL02yOlt1yuPyHDrkcZzpOHZ+/SIXI+kpm
+	iD4nPYQrN9ESYzvzBA2Zprz6hfmWiRAc5NsRUvXFiO0dto35FDyjz2yDywFBYVvpUesihCwbp5vdg
+	q2u0u6Mw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tGtqw-002KZu-0i;
+	Fri, 29 Nov 2024 13:47:43 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 Nov 2024 13:47:42 +0800
+Date: Fri, 29 Nov 2024 13:47:42 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
+	Tejun Heo <tj@kernel.org>, Hao Luo <haoluo@google.com>,
+	Josh Don <joshdon@google.com>, Barret Rhoden <brho@google.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] rhashtable: Fix potential deadlock by moving
+ schedule_work outside lock
+Message-ID: <Z0lVftsFRSSkPkld@gondor.apana.org.au>
+References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] Networking for v6.13-rc1
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173285873675.1939307.8972452324762545532.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Nov 2024 05:38:56 +0000
-References: <20241128142738.132961-1-pabeni@redhat.com>
-In-Reply-To: <20241128142738.132961-1-pabeni@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
 
-Hello:
-
-This pull request was applied to netdev/net.git (main)
-by Linus Torvalds <torvalds@linux-foundation.org>:
-
-On Thu, 28 Nov 2024 15:27:38 +0100 you wrote:
-> Hi Linus!
+On Thu, Nov 28, 2024 at 04:16:25AM -0800, Breno Leitao wrote:
+> Move the hash table growth check and work scheduling outside the
+> rht lock to prevent a possible circular locking dependency.
 > 
-> Very calm week, thanks to US holidays.
+> The original implementation could trigger a lockdep warning due to
+> a potential deadlock scenario involving nested locks between
+> rhashtable bucket, rq lock, and dsq lock. By relocating the
+> growth check and work scheduling after releasing the rth lock, we break
+> this potential deadlock chain.
 > 
-> The following changes since commit fcc79e1714e8c2b8e216dc3149812edd37884eef:
-> 
->   Merge tag 'net-next-6.13' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2024-11-21 08:28:08 -0800)
-> 
-> [...]
+> This change expands the flexibility of rhashtable by removing
+> restrictive locking that previously limited its use in scheduler
+> and workqueue contexts.
 
-Here is the summary with links:
-  - [GIT,PULL] Networking for v6.13-rc1
-    https://git.kernel.org/netdev/net/c/65ae975e97d5
+Could you please explain the deadlock? Is the workqueue system actually
+using rhashtable?
 
-You are awesome, thank you!
+Thanks,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
