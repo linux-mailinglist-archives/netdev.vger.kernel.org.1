@@ -1,549 +1,316 @@
-Return-Path: <netdev+bounces-147850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E96C9DE6BA
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 13:56:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 015719DE6C0
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 13:58:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D97B282198
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 12:56:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7017282188
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 12:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FAEC19D898;
-	Fri, 29 Nov 2024 12:56:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88FE19DFAB;
+	Fri, 29 Nov 2024 12:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jGhDdhOB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G07qwqKt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7F719D07B;
-	Fri, 29 Nov 2024 12:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732885006; cv=none; b=aj6JMe7KTHGxoNhby7LiDhEHUzKLCxmm/flmBa0W7pCaKDwgI67cXG1m9K+Ue9EqT77PddkkU8F0J8Xk3fBb6UxuayYtFFuEFP/glGF7T+ZjKiR8BhPVyWJ5cmr4RT1CT3fpZJc8gFa6RkRvD5FceIbLZkul6Ufd68Oi/i/OADw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732885006; c=relaxed/simple;
-	bh=sb645liDOsPFve3SGjSrOk2gr9iXBXwbXk/8ieeKKCM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=knFb3zjaXaOZVgKkv4WmaMqhLKbrmdmH/jopT2IYr+qznVZ97JqRnkVq+qZJzjaxfUOoSuTMg981LgZqVCh86971+8J/mPWlJ8k/1c6v+uG7ypdqkrKdoqK95ovss6YxBZRGSSMTR8Q3jK3cjAphB9o1xcwXL7lmYRE0LfiMKVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jGhDdhOB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5453C4CECF;
-	Fri, 29 Nov 2024 12:56:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732885005;
-	bh=sb645liDOsPFve3SGjSrOk2gr9iXBXwbXk/8ieeKKCM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=jGhDdhOBpE0i8hkdCUm5+mItkO5NzH7RV4jEHqaLj3RxlVo2obRL+1ynT/pCPUuaY
-	 RJ6V1uxsroAEUe0e4QbxQDwHSsMcC529rg5NkuAdQq3VyBzykxXpVa7ABaPk8wcLuG
-	 FvQpHPMGivIL9dfu26oqTZDQjt+RiFsOYQtfBzLipfOR12NDu3sCB94QRLfI5BKwyC
-	 pqUCtpvKKozC/riMV/CmcT5pmEp6qarUgOzIYKnHvY72TzMvyzk5z4oAyBy2Memenh
-	 MDvkMsG685MQmAbnljYYw4zFS8Et+Oxt+iwZ+dLoO6x2IgNHQYey340+t3xMM8TYHC
-	 Rsv+1zIeV1hmw==
-Message-ID: <a4071a1c-8c27-4464-9054-df9b3e317eab@kernel.org>
-Date: Fri, 29 Nov 2024 14:56:39 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96E319D098;
+	Fri, 29 Nov 2024 12:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732885087; cv=fail; b=AfOzo4PP23HfKcugbqRpjB5x0Cm1Jogx/kF1AOmE+jvbeOo+d+rtpLPGCUGQZmHGLeGoNhIMn4LzhuFGleZ9+hhTygkbUanzU9Kp5p1WcXvemImPyMW4dljbLc+bg/yvy+FUAIRNOVPnXT5yefsjmM3rfgsiApl0q2+nEq9KuUc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732885087; c=relaxed/simple;
+	bh=weL3piMTjoNujiNid4RDogwwA/DCEKj+1u5pMzDG49k=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=b3FAs7E6TnurYONqc4J6le3CwCcvu/Bz7XZj/7H3kJBB0LNGWOLKXN3bHTvsMwJ53to3P7YNZU4NEwneQtGBZ0LlRdtNlDBqEReWOHlF4X2P/pJ5MV4/NcCdv84dVW7OK+XoAhUYbsPbH8d2/pgGcdiOqPrSka5EWLDDtuD6SSo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G07qwqKt; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732885086; x=1764421086;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=weL3piMTjoNujiNid4RDogwwA/DCEKj+1u5pMzDG49k=;
+  b=G07qwqKtG+z5vgkkyA8yT6aMH8uoMXGhr4X9pnSjBLzHGdVZFE6noSKa
+   u86u8WjhB0tjMK4dsimpW9JfiGAWNwHdkAG56q4AohAQ/vl8T4bkJ8BcC
+   N+FceARtUQGQZl9BO0DgSPSLF9E05V61nMewzmxmF+R0MNEyDW91GmMti
+   HAc7rPzoKbVNnVrfqR9GnGxArciYLzvpBJIVNgu3bzU+ax0UaVLpUeukm
+   oeBzh1KRmRVF8wxF5tC4mtSxVzMluI6DSps4Kro+bBDUf3cGTBiT91CKc
+   wRoCSZ/doNlj3YQlCGSAlVQqP2yV8o4Hja7uEKbc4XVa4QfijBVWyGuh/
+   Q==;
+X-CSE-ConnectionGUID: slLDaV0mRO2caP4Z9mURKQ==
+X-CSE-MsgGUID: ewuHcardRi2bH6XSJdeK6w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11271"; a="33054650"
+X-IronPort-AV: E=Sophos;i="6.12,195,1728975600"; 
+   d="scan'208";a="33054650"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2024 04:58:04 -0800
+X-CSE-ConnectionGUID: HAvQQNW/RNWOl4aOfrc//Q==
+X-CSE-MsgGUID: QKzxRDpsRp2+YRSgSDDPkg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,195,1728975600"; 
+   d="scan'208";a="92593314"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Nov 2024 04:58:04 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 29 Nov 2024 04:58:03 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 29 Nov 2024 04:58:03 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.176)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 29 Nov 2024 04:58:02 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=quCbtJ24tWPmPATmSXI/wOXpATuCaCo0hIr9k7ZcwEZewHb/EuBWyTInctB5QwhSROxmEXN3PiwxGX687e7QwCYxAlBFD70gzdNI5a8r7uNBpjJWZqy9uxCqXKbkTFYWqlm7HzQFc2+yE9/f2BbXDBXPre1STezTtXrVQpV2vaJOZ/1nNyvtn+PSE/1JAAqbG/bkxJG+ApYSq82+VTLWjkX1PcITcSpGlfM0J8Rl0y6X35x1eEQM7RI77zmYQHh5gixrXJqrvrpBxim9bIJUMU28zFs1eWDnsxbKwG0fhFcgSoOfMvE+Ro/5A5OsQ5rKCZr4/tJg2yF1pLgVvvEmcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SV+OufASk8xBhFc+yWg6QA9nU9jS1Mod881QXXOOPQA=;
+ b=lJRjYzW7QtP0TJ254CvUOkjztPHqGJmr37Wdd1gmdGN7C2dILYcW7EJsd+41ncfJ1q1qHgmJaGY941JBQJOQiPEGlP9tIexdimvDINiV0Wrm9lg+1ZXYDtdx3QnJPejJ6MA6mxT5sbz+WQthSO56tiBrHYLkVhwJtZCB1Go351VQJcKLR/tCNEfmn1rGlmykc/coPhXRCHztsFeZMPpe4kLsXEYN1OWauVRPxDYj+UxE45GOZm1+E7DFSGg2TStYKLnOVDNTSSgr9W/BUx+7vo9kkTrBXxAW5PDSt5fcnRAJo/tfwcjW+AUjbhXBZ/MC4Yhl76E8g8JFTWGgqYCT+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by SA2PR11MB5147.namprd11.prod.outlook.com (2603:10b6:806:118::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.15; Fri, 29 Nov
+ 2024 12:58:00 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%4]) with mapi id 15.20.8207.010; Fri, 29 Nov 2024
+ 12:58:00 +0000
+Message-ID: <b9fcb12a-b7a4-4c33-836e-67109ce07deb@intel.com>
+Date: Fri, 29 Nov 2024 13:57:52 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
+To: Easwar Hariharan <eahariha@linux.microsoft.com>
+CC: <netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <cocci@inria.fr>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-s390@vger.kernel.org>,
+	<dri-devel@lists.freedesktop.org>, <intel-xe@lists.freedesktop.org>,
+	<linux-scsi@vger.kernel.org>, <xen-devel@lists.xenproject.org>,
+	<linux-block@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<ath11k@lists.infradead.org>, <linux-mm@kvack.org>,
+	<linux-bluetooth@vger.kernel.org>, <linux-staging@lists.linux.dev>,
+	<linux-rpi-kernel@lists.infradead.org>, <ceph-devel@vger.kernel.org>,
+	<live-patching@vger.kernel.org>, <linux-sound@vger.kernel.org>,
+	<etnaviv@lists.freedesktop.org>, <oss-drivers@corigine.com>,
+	<linuxppc-dev@lists.ozlabs.org>, Anna-Maria Behnsen
+	<anna-maria@linutronix.de>
+References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA2P291CA0045.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1f::19) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/2] net: ti: icssg-prueth: Fix firmware load
- sequence.
-To: Meghana Malladi <m-malladi@ti.com>, lokeshvutla@ti.com, vigneshr@ti.com,
- javier.carrasco.cruz@gmail.com, diogo.ivo@siemens.com,
- jacob.e.keller@intel.com, horms@kernel.org, pabeni@redhat.com,
- kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- andrew+netdev@lunn.ch
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com, danishanwar@ti.com
-References: <20241128122931.2494446-1-m-malladi@ti.com>
- <20241128122931.2494446-2-m-malladi@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20241128122931.2494446-2-m-malladi@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SA2PR11MB5147:EE_
+X-MS-Office365-Filtering-Correlation-Id: 67d5165e-3df9-44c0-490c-08dd10757449
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?dkxVcnZ6ZG1sM1ZPYjdBekZPRHhJMzJOVDlWdVc4Lzg3T254OEFXSFVEbEV1?=
+ =?utf-8?B?bitJLy9YVHdIeHB5Q1o4QjZVSzJZcDFHem5rTXcyMnF1VTFvU3RiQ3BUNVhy?=
+ =?utf-8?B?TlZhckMvZm1GSXNaVm1ra2JjWklJM3MwWUQ2eEhSbENQa1ZSa3VXMUN2QUhl?=
+ =?utf-8?B?aXIxZWdpejRINDMvb1dwM0Z1UllBQUNad3lzMEliTGRva2lOUFV3WjZrNjN2?=
+ =?utf-8?B?Y1V2dmtWVmV0ejBzazAxcnFBcHpCSXpzcE9Vam1UUkEyQTRRM1pVeGYrbDJS?=
+ =?utf-8?B?RkpOSEgrMEhLNklaMXJJazdSbUVFWEVoSWdsaHluQkNRWVd0Um81ODB3WS9O?=
+ =?utf-8?B?N3c1a1FEejgyWkVyemxrU1VXMkdWMmF2RGtFTFpoNjNObFpMdVAzaytNU1RL?=
+ =?utf-8?B?OUZwd3ZBVTk5RG1BdHNKOUFEV2JPSXVuVGdMOVY3Q0NJQmZPTTNGdUpzRkZV?=
+ =?utf-8?B?NFpCTnJndkNSRkdNNzc1NzhkVzN2Z1poaGtBcmVkdElHOGpSVHA5UFlCKzlG?=
+ =?utf-8?B?M3pjMUovRkxnZ2wySlFteHRqTWRhRFBHUzBiazJCcnJZZ0xSQmNPdDlQcWlz?=
+ =?utf-8?B?ZWFMb0tkYU9lcFRQTjVJN2ZuZmIwb3R6K2sxTW5HeEg5RGFMUzFraXhKZVJP?=
+ =?utf-8?B?bFl6WkkyU0NOL1g2OFBTVUUrNEhJc2d4YTZnRHl2em9kVHZNZkRFQnVQSFRX?=
+ =?utf-8?B?bDNjM2NndjB3WkhITmtMb2w4U3NNSjZRdE1XRUNMQjNVejEyQkdhaUtnUWRk?=
+ =?utf-8?B?Vndia0hpeFFUaERTWUtjYWdZK0c5d0NHelZPNFRpVWNmd0ZpVmVUNk5wSUx0?=
+ =?utf-8?B?QW5DN2xLREVFaXRlZWJ1Tnp1RDMwYS8yN0ZZempwbXhudzNJUE5vczhuZ2N4?=
+ =?utf-8?B?UTJya0tlYWcrM1ZNdWI3UFo5WHo5QTE2bUhvVi9ITXpSOHdlczREY1FodStv?=
+ =?utf-8?B?QXR6RDdheE9NSmNHTVhJV1RMNk10djE4anhhL0I2dnhveFZLNkhuZWw0ZndJ?=
+ =?utf-8?B?OEhNK3Z4SGtDVHZHeCt2NU9SRjdIMEl2MWRBVGFpV2NpWlpIMmY5ZktTdlY5?=
+ =?utf-8?B?L0RHL0tTdkNGRUl2alA5VW1ROUlLWnRUSTdNMXB2YkVVa3NIUDZKckNaWG1I?=
+ =?utf-8?B?cmdvaEJYVWYvdWFIYVYyMCtKeGY4RGpVb3hjbDVqblVHTU1mQVd2djNCaGFV?=
+ =?utf-8?B?QnZTaDlSWGtyVjJTL0pvQVRjc282VFpMdG0xVVUzb05PUit3VG1SVWN3T0tP?=
+ =?utf-8?B?VldMMG4zdk1BZGhUVjZNZ3YvVVZaNFRIZkx4MHk4YXF2QTg4U2pUWlRXdS94?=
+ =?utf-8?B?VHp1VFFXNEU1elUzQVJZbWNTcS9YOWlLcUwySzhZWDd6aWRRcUMvTVpzL1Bq?=
+ =?utf-8?B?ZEN2anZzNEJVMmQ5Q0xpbW15cFdLa2NiM2RGYnZvZU4zSmQyaTNkS1VxMENx?=
+ =?utf-8?B?WWprTEpoVkg1WEJrQ3Z2SlpEOVA5dXdkY3p4NnBWNmhBYlpnZXFWS3V4dmVy?=
+ =?utf-8?B?RDlyQ2ZrZ3B5VlR2TkFOUWVqb0NJT05UazByRlRoUnJIbmNYNi8xTk1WM0Zt?=
+ =?utf-8?B?cExlWS85VWJiU0MwaDNPQnBXMTc1ZStybFY5SkNWSitvUXh0cUFObE04R2pa?=
+ =?utf-8?B?NlZMalFXWURBaDgvdFpISm9yVHFGaStaUHlHckJWNmpxVUhObVMrcnV1NTU1?=
+ =?utf-8?B?anloQTgzZllIUFVLYmZnYjJYV3kvMUJqSlJ1M3BtQ2orbnlsRzFIK2hMN0or?=
+ =?utf-8?Q?kqlUCgrkXGW14PGqqE=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TzBicjlHQkRsSklUZGpsMVBLRW9WOUVoUUxVMTZLREpncm9KZGhPN2hKa0cx?=
+ =?utf-8?B?S1NHZHNaKzJjM1ZleElOVjVPSkh0eklmRFY1enpxWk9TUFlnbkoxeGdzMXNn?=
+ =?utf-8?B?NFVjTks5ZjZCRndhR05rTzBQQmdaM2FBaWNGK29wOTZmc2gyS1JWdlczQzZo?=
+ =?utf-8?B?OFlSd0FUQVBtaGNzak1nbHQ4cFZVRDNvbDB2Qm54RURlOEZEL01xN1JTMFRk?=
+ =?utf-8?B?U1NOSDE5UTdiUWl0TjlKSG96eUtPQ1lPL2Z0Q2dUSFRBQUNTeWdkSHY5YTBh?=
+ =?utf-8?B?cVNRZys3RXVTbmJkdm01VExFV0tKaW1NbUdDUDhUZzk1VWVWTkZEcWo1aU1o?=
+ =?utf-8?B?cGVJY1VuMmdZbmtxaHQ2UC94OFBhVzRBOGJCbzk0b0FCcDd6UlliQnFBaXB4?=
+ =?utf-8?B?ZUhRb21KZ2VlNG9FTjIvUGxxb3BvUnM0Tk00NUlsQzN1NVFIcHFZaUxHVGtG?=
+ =?utf-8?B?ZitGeGtHR05mMzd0M1Y5QlpPLzlqTlFMR2xrbjhjTW5OdndkL3lGM0lQNkhP?=
+ =?utf-8?B?MEdwZ2FPTnc5Sm85Vm5pOFRmTTl0akdlRFhIR2h2bktZTFBFeHdsQ0dNUlI4?=
+ =?utf-8?B?S3dDUWJUM0xoRVZ5R21TaUMwelozRGdkVzVzemhTTFBTOWxnNTUwSjdVcUtj?=
+ =?utf-8?B?Q2VQOVZEWXYzQWJpd0ViQnpwR3I2MWVkVkMweWc1Nm4vWkhBVzhxQmFzczA1?=
+ =?utf-8?B?VTJ6NVdoeGVuZ2dOQzlWQzFYQ1c5UStNWHVhRmlzbGlGS0lERVFaSFFxUUpI?=
+ =?utf-8?B?cURYMEs3RStNbCtMZmlJNDhzVjlhTjFwRHdzZjlrYlR1S0I5RkVYUDhKbXk5?=
+ =?utf-8?B?Tm41ZUhiMnlQZnhER0w0NU1GM01FWGxJSHFUeURaUis2Tng1T1Z5a04wdUJM?=
+ =?utf-8?B?MWxVbCszdk42UUpZM1pVMWVZQTFzc3pySUlzOG5WN2tXZm11cHZmUG9Ddkx1?=
+ =?utf-8?B?SmdmbFVJMnljR1RQam1xR3BSd29oYmJjcGZNVU5qL3hzYUtMWTN2UHBrMlJ4?=
+ =?utf-8?B?d1ZoSmFrVU5GQXc0N1J5Rm1HeVRwSXVHUGhXOHhIWW1lMkYwNTFudFlwMUlz?=
+ =?utf-8?B?bzlzcENOblQ4U2k1NTRLeGoySW9pdmJZZjIyL3dwQTdvaGk1cnUzUE5yeUdr?=
+ =?utf-8?B?OVRSWDNIZUgwMkd0UmZ4TFZnNzhpSitJSm8xRjB4TUcxbVl3cmxscDhZNzRI?=
+ =?utf-8?B?cEtYLytwY0h4RGJOY1d6U01PYVI0cUh3Vm0zOEhsV2paN2U3VTZ5TTNwS2F0?=
+ =?utf-8?B?Q1I4OFlpMnY3UjV0NXVVSmJiYzF3bklpVlJOMW1Wc21NZVc3ZXdTbzBBUHp1?=
+ =?utf-8?B?KzluVlN4UnFPem9PZEZhODI0L05BNWVZRnBkbVZCU1Bkb2JYQWZVRTZObGcx?=
+ =?utf-8?B?ZFpTNzVZZXdBVEtSc2o4YzdXdXRnY2p0b0tLTzFVR296cEg3ZkFlYVAwMXc0?=
+ =?utf-8?B?Z1lka1lNQjNHZDdISXNCQTFXRkRiWkNFWk9SbmhvRkJSSlRLWWRGaWFtTllq?=
+ =?utf-8?B?c3plVkVtRTB6ZGYrSG9KbjkwOXB4a3h6cnNVc0FZWDhNVUV3ZDVGcVRsRW40?=
+ =?utf-8?B?YjhQeThqMkYwQzE5dHpWUDg5cmVObE1DRGlGL0IyMWZCR1ZrYU1SYmY2eUUy?=
+ =?utf-8?B?VVZNTmpRUzRnc2FnSEVIbEJidmFGdEVEblExcVJIV1RnR3VEOFpxTEJoZmlk?=
+ =?utf-8?B?NnJXTmZOWXFVV244ZzFhSHhQUGtKaHUvcUptdzJ1ZXRTRlM2djdxaHFwZndM?=
+ =?utf-8?B?VUlMTjJBUS90ME9EQUhVU2tHcVdrTFYrWjVWNkZsWGNyRjAyc2JSUUYxY0tj?=
+ =?utf-8?B?c3RKZ1pFenJ3RjZwWUJtbXpKQmhxWXBpUlRIR3ZXUnVqWDVVVlplbmtUZTN3?=
+ =?utf-8?B?WHZld1VzY2pQWnNyeldBV3FHM2xobmpiTC9rM29IS29yaVJYYWJScnQwdHNY?=
+ =?utf-8?B?SVFXa1czanVTdlg3Ny9leFlURnRqUGVDZHg5U0Vrb1c3TUdwVGlWdFlYS1Z2?=
+ =?utf-8?B?RFVSZzlOMk91N0ZrU2F6RGQ0ZkRvdjJzRmdIRVZMeUd4ZUQxRHp2NXl4d1pU?=
+ =?utf-8?B?YXdBaXFGUGUvR3BNOUF4c0pGOE1FQ005eWd1Q2ZaR1FxYkFLc1krYWFtTjk5?=
+ =?utf-8?B?anFqOG5TNWNyRlZJR3N5UGY4bmtsVHRNRjA2S1pvbzRtNVhqYmNvNUVRNkhn?=
+ =?utf-8?B?T0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 67d5165e-3df9-44c0-490c-08dd10757449
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2024 12:58:00.6662
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7oJDD6qW2ylePjbQiFLukqf725XNvKEjJdGC96Qc7GsdtHc8H4mr0M/UZyhXA11t6B6X2TWAYoqh/Ueo1h3WJ/GmLtyX9JwWT9WrZpqkg70=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5147
+X-OriginatorOrg: intel.com
 
-Hi,
 
-On 28/11/2024 14:29, Meghana Malladi wrote:
-> From: MD Danish Anwar <danishanwar@ti.com>
+[removed most non-list recipients, it's just too much]
+
+On 11/15/24 10:26 PM, Easwar Hariharan wrote:
+> This is a series that follows up on my previous series to introduce
+> secs_to_jiffies() and convert a few initial users.[1] In the review for
+> that series, Anna-Maria requested converting other users with
+> Coccinelle. This is part 1 that converts users of msecs_to_jiffies()
+> that use the multiply pattern of either of:
+> - msecs_to_jiffies(N*1000), or
+> - msecs_to_jiffies(N*MSEC_PER_SEC)
 > 
-> Timesync related operations are ran in PRU0 cores for both ICSSG SLICE0
-> and SLICE1. Currently whenever any ICSSG interface comes up we load the
-> respective firmwares to PRU cores and whenever interface goes down, we
-> stop the resective cores. Due to this, when SLICE0 goes down while
-> SLICE1 is still active, PRU0 firmwares are unloaded and PRU0 core is
-> stopped. This results in clock jump for SLICE1 interface as the timesync
-> related operations are no longer running.
+> The entire conversion is made with Coccinelle in the script added in
+> patch 2. Some changes suggested by Coccinelle have been deferred to
+> later parts that will address other possible variant patterns.
 > 
-> As there are interdependencies between SLICE0 and SLICE1 firmwares,
-> fix this by running both PRU0 and PRU1 firmwares as long as at least 1
-> ICSSG interface is up.
+> CC: Anna-Maria Behnsen <anna-maria@linutronix.de>
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 > 
-> Use emacs_initialized as reference count to load the firmwares for the
-> first and last interface up/down. Moving init_emac_mode and fw_offload_mode
-> API outside of icssg_config to icssg_common_start API as they need
-> to be called only once per firmware boot.
+> [1] https://lore.kernel.org/all/20241030-open-coded-timeouts-v3-0-9ba123facf88@linux.microsoft.com/
+> [2] https://lore.kernel.org/all/8734kngfni.fsf@somnus/
 > 
-> Fixes: c1e0230eeaab ("net: ti: icss-iep: Add IEP driver")
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
 > ---
+> Changes in v2:
+> - EDITME: describe what is new in this series revision.
+> - EDITME: use bulletpoints and terse descriptions.
+> - Link to v1: https://lore.kernel.org/r/20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com
+
+that is not a proper changelog, you were supposed to edit those
+placeholder entries; please look around for examples
+
+There is also just too much recipients. Please split up your patches
+into smaller pieces. You will also learn the process on a smaller
+sample.
+
+And definitively please wait for 48h before reposting such big series.
+
+Regarding code - you could also convert msecs_to_jiffies(const * HZ),
+there are 10 that are greppable.
+
 > 
-> Hi all,
+> ---
+> Easwar Hariharan (21):
+>        netfilter: conntrack: Cleanup timeout definitions
+>        coccinelle: misc: Add secs_to_jiffies script
+>        arm: pxa: Convert timeouts to use secs_to_jiffies()
+>        s390: kernel: Convert timeouts to use secs_to_jiffies()
+>        powerpc/papr_scm: Convert timeouts to secs_to_jiffies()
+>        mm: kmemleak: Convert timeouts to secs_to_jiffies()
+>        accel/habanalabs: Convert timeouts to secs_to_jiffies()
+>        drm/xe: Convert timeout to secs_to_jiffies()
+>        drm/etnaviv: Convert timeouts to secs_to_jiffies()
+>        scsi: lpfc: Convert timeouts to secs_to_jiffies()
+>        scsi: arcmsr: Convert timeouts to secs_to_jiffies()
+>        scsi: pm8001: Convert timeouts to secs_to_jiffies()
+>        xen/blkback: Convert timeouts to secs_to_jiffies()
+>        gve: Convert timeouts to secs_to_jiffies()
+>        wifi: ath11k: Convert timeouts to secs_to_jiffies()
+>        Bluetooth: MGMT: Convert timeouts to secs_to_jiffies()
+>        staging: vc04_services: Convert timeouts to secs_to_jiffies()
+>        ceph: Convert timeouts to secs_to_jiffies()
+>        livepatch: Convert timeouts to secs_to_jiffies()
+>        ALSA: line6: Convert timeouts to secs_to_jiffies()
+>        nfp: Convert timeouts to secs_to_jiffies()
 > 
-> This patch is based on net-next tagged next-2024110.
-> v1:https://lore.kernel.org/all/20241106074040.3361730-2-m-malladi@ti.com
+>   arch/arm/mach-pxa/sharpsl_pm.c                      |  6 +++---
+>   arch/powerpc/platforms/pseries/papr_scm.c           |  2 +-
+>   arch/s390/kernel/lgr.c                              |  3 ++-
+>   arch/s390/kernel/time.c                             |  4 ++--
+>   arch/s390/kernel/topology.c                         |  2 +-
+>   drivers/accel/habanalabs/common/device.c            |  2 +-
+>   drivers/accel/habanalabs/common/habanalabs_drv.c    |  3 +--
+>   drivers/block/xen-blkback/blkback.c                 |  2 +-
+>   drivers/gpu/drm/etnaviv/etnaviv_cmdbuf.c            |  2 +-
+>   drivers/gpu/drm/xe/xe_device.c                      |  2 +-
+>   drivers/net/ethernet/google/gve/gve_tx_dqo.c        |  6 ++----
+>   drivers/net/ethernet/netronome/nfp/nfp_net_common.c |  2 +-
+>   drivers/net/wireless/ath/ath11k/debugfs.c           |  2 +-
+>   drivers/scsi/arcmsr/arcmsr_hba.c                    |  2 +-
+>   drivers/scsi/lpfc/lpfc_init.c                       | 18 +++++++++---------
+>   drivers/scsi/lpfc/lpfc_nportdisc.c                  |  8 ++++----
+>   drivers/scsi/lpfc/lpfc_nvme.c                       |  2 +-
+>   drivers/scsi/lpfc/lpfc_sli.c                        |  4 ++--
+>   drivers/scsi/lpfc/lpfc_vmid.c                       |  2 +-
+>   drivers/scsi/pm8001/pm8001_init.c                   |  2 +-
+>   .../vc04_services/bcm2835-audio/bcm2835-vchiq.c     |  2 +-
+>   fs/ceph/quota.c                                     |  2 +-
+>   mm/kmemleak.c                                       |  4 ++--
+>   net/bluetooth/mgmt.c                                |  2 +-
+>   net/netfilter/nf_conntrack_proto_sctp.c             | 21 ++++++++-------------
+>   samples/livepatch/livepatch-callbacks-busymod.c     |  2 +-
+>   samples/livepatch/livepatch-shadow-fix1.c           |  2 +-
+>   samples/livepatch/livepatch-shadow-mod.c            | 10 +++++-----
+>   scripts/coccinelle/misc/secs_to_jiffies.cocci       | 21 +++++++++++++++++++++
+>   sound/usb/line6/toneport.c                          |  2 +-
+>   30 files changed, 79 insertions(+), 65 deletions(-)
+> ---
+> base-commit: 2d5404caa8c7bb5c4e0435f94b28834ae5456623
+> change-id: 20241112-converge-secs-to-jiffies-d99d1016bd11
 > 
-> Changes since v1 (v2-v1):
-> - Moving the NULL check inside the function as suggested by
-> Simon Horman <horms@kernel.org>
-> - Introduce prueth_emac_common_start() and prueth_emac_common_stop()
-> and move common code there as suggested by Roger Quadros <rogerq@kernel.org>
-> - Moving init_emac_mode and fw_offload_mode API outside of icssg_config
-> to icssg_common_start API as they need to be called only once per
-> firmware boot
-> 
->  drivers/net/ethernet/ti/icssg/icssg_config.c |  45 ++++--
->  drivers/net/ethernet/ti/icssg/icssg_config.h |   1 +
->  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 150 ++++++++++++-------
->  drivers/net/ethernet/ti/icssg/icssg_prueth.h |   3 +
->  4 files changed, 133 insertions(+), 66 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-> index 5d2491c2943a..342150756cf7 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-> @@ -397,7 +397,7 @@ static int prueth_emac_buffer_setup(struct prueth_emac *emac)
->  	return 0;
->  }
->  
-> -static void icssg_init_emac_mode(struct prueth *prueth)
-> +void icssg_init_emac_mode(struct prueth *prueth)
->  {
->  	/* When the device is configured as a bridge and it is being brought
->  	 * back to the emac mode, the host mac address has to be set as 0.
-> @@ -406,9 +406,6 @@ static void icssg_init_emac_mode(struct prueth *prueth)
->  	int i;
->  	u8 mac[ETH_ALEN] = { 0 };
->  
-> -	if (prueth->emacs_initialized)
-> -		return;
-> -
->  	/* Set VLAN TABLE address base */
->  	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, SMEM_VLAN_OFFSET_MASK,
->  			   addr <<  SMEM_VLAN_OFFSET);
-> @@ -423,15 +420,13 @@ static void icssg_init_emac_mode(struct prueth *prueth)
->  	/* Clear host MAC address */
->  	icssg_class_set_host_mac_addr(prueth->miig_rt, mac);
->  }
-> +EXPORT_SYMBOL_GPL(icssg_init_emac_mode);
->  
-> -static void icssg_init_fw_offload_mode(struct prueth *prueth)
-> +void icssg_init_fw_offload_mode(struct prueth *prueth)
->  {
->  	u32 addr = prueth->shram.pa + EMAC_ICSSG_SWITCH_DEFAULT_VLAN_TABLE_OFFSET;
->  	int i;
->  
-> -	if (prueth->emacs_initialized)
-> -		return;
-> -
->  	/* Set VLAN TABLE address base */
->  	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, SMEM_VLAN_OFFSET_MASK,
->  			   addr <<  SMEM_VLAN_OFFSET);
-> @@ -448,6 +443,7 @@ static void icssg_init_fw_offload_mode(struct prueth *prueth)
->  		icssg_class_set_host_mac_addr(prueth->miig_rt, prueth->hw_bridge_dev->dev_addr);
->  	icssg_set_pvid(prueth, prueth->default_vlan, PRUETH_PORT_HOST);
->  }
-> +EXPORT_SYMBOL_GPL(icssg_init_fw_offload_mode);
->  
->  int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
->  {
-> @@ -455,11 +451,6 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
->  	struct icssg_flow_cfg __iomem *flow_cfg;
->  	int ret;
->  
-> -	if (prueth->is_switch_mode || prueth->is_hsr_offload_mode)
-> -		icssg_init_fw_offload_mode(prueth);
-> -	else
-> -		icssg_init_emac_mode(prueth);
-> -
->  	memset_io(config, 0, TAS_GATE_MASK_LIST0);
->  	icssg_miig_queues_init(prueth, slice);
->  
-> @@ -786,3 +777,31 @@ void icssg_set_pvid(struct prueth *prueth, u8 vid, u8 port)
->  		writel(pvid, prueth->shram.va + EMAC_ICSSG_SWITCH_PORT0_DEFAULT_VLAN_OFFSET);
->  }
->  EXPORT_SYMBOL_GPL(icssg_set_pvid);
-> +
-> +int emac_fdb_flow_id_updated(struct prueth_emac *emac)
-> +{
-> +	struct mgmt_cmd_rsp fdb_cmd_rsp = { 0 };
-> +	int slice = prueth_emac_slice(emac);
-> +	struct mgmt_cmd fdb_cmd = { 0 };
-> +	int ret = 0;
-> +
-> +	fdb_cmd.header = ICSSG_FW_MGMT_CMD_HEADER;
-> +	fdb_cmd.type   = ICSSG_FW_MGMT_FDB_CMD_TYPE_RX_FLOW;
-> +	fdb_cmd.seqnum = ++(emac->prueth->icssg_hwcmdseq);
-> +	fdb_cmd.param  = 0;
-> +
-> +	fdb_cmd.param |= (slice << 4);
-> +	fdb_cmd.cmd_args[0] = 0;
-> +
-> +	ret = icssg_send_fdb_msg(emac, &fdb_cmd, &fdb_cmd_rsp);
-> +
-> +	if (ret)
-> +		return ret;
-> +
-> +	WARN_ON(fdb_cmd.seqnum != fdb_cmd_rsp.seqnum);
-> +	if (fdb_cmd_rsp.status == 1)
-> +		return 0;
-> +
-> +	return -EINVAL;
-> +}
-> +EXPORT_SYMBOL_GPL(emac_fdb_flow_id_updated);
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
-> index 92c2deaa3068..c884e9fa099e 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_config.h
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
-> @@ -55,6 +55,7 @@ struct icssg_rxq_ctx {
->  #define ICSSG_FW_MGMT_FDB_CMD_TYPE	0x03
->  #define ICSSG_FW_MGMT_CMD_TYPE		0x04
->  #define ICSSG_FW_MGMT_PKT		0x80000000
-> +#define ICSSG_FW_MGMT_FDB_CMD_TYPE_RX_FLOW	0x05
->  
->  struct icssg_r30_cmd {
->  	u32 cmd[4];
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> index c568c84a032b..3a495b5d010c 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> @@ -164,11 +164,11 @@ static struct icssg_firmwares icssg_emac_firmwares[] = {
->  	}
->  };
->  
-> -static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
-> +static int prueth_emac_start(struct prueth *prueth, int slice)
->  {
->  	struct icssg_firmwares *firmwares;
->  	struct device *dev = prueth->dev;
-> -	int slice, ret;
-> +	int ret;
->  
->  	if (prueth->is_switch_mode)
->  		firmwares = icssg_switch_firmwares;
-> @@ -177,16 +177,6 @@ static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
->  	else
->  		firmwares = icssg_emac_firmwares;
->  
-> -	slice = prueth_emac_slice(emac);
-> -	if (slice < 0) {
-> -		netdev_err(emac->ndev, "invalid port\n");
-> -		return -EINVAL;
-> -	}
-> -
-> -	ret = icssg_config(prueth, emac, slice);
-> -	if (ret)
-> -		return ret;
-> -
->  	ret = rproc_set_firmware(prueth->pru[slice], firmwares[slice].pru);
->  	ret = rproc_boot(prueth->pru[slice]);
->  	if (ret) {
-> @@ -208,7 +198,6 @@ static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
->  		goto halt_rtu;
->  	}
->  
-> -	emac->fw_running = 1;
->  	return 0;
->  
->  halt_rtu:
-> @@ -220,6 +209,77 @@ static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
->  	return ret;
->  }
->  
-> +static int prueth_emac_common_start(struct prueth *prueth)
-> +{
-> +	struct prueth_emac *emac;
-> +	int slice, ret;
-> +
-> +	if (!prueth->emac[ICSS_SLICE0] && !prueth->emac[ICSS_SLICE1])
-> +		return -EINVAL;
-> +
-> +	/* clear SMEM and MSMC settings for all slices */
-> +	memset_io(prueth->msmcram.va, 0, prueth->msmcram.size);
-> +	memset_io(prueth->shram.va, 0, ICSSG_CONFIG_OFFSET_SLICE1 * PRUETH_NUM_MACS);
-> +
-> +	icssg_class_default(prueth->miig_rt, ICSS_SLICE0, 0, false);
-> +	icssg_class_default(prueth->miig_rt, ICSS_SLICE1, 0, false);
-> +
-> +	if (prueth->is_switch_mode || prueth->is_hsr_offload_mode)
-> +		icssg_init_fw_offload_mode(prueth);
-> +	else
-> +		icssg_init_emac_mode(prueth);
-> +
-> +	for (slice = 0; slice < PRUETH_NUM_MACS; slice++) {
-> +		emac = prueth->emac[slice];
-> +		if (emac) {
-> +			ret = icssg_config(prueth, emac, slice);
-> +			if (ret)
-> +				return ret;
-> +		}
-> +		ret = prueth_emac_start(prueth, slice);
-
-if (ret)
-	return ret;
-
-> +		if (!ret && emac)
-
-Then no need to check for !ret
-
-> +			emac->fw_running = 1;
-> +	}
-> +
-> +	emac = prueth->emac[ICSS_SLICE0] ? prueth->emac[ICSS_SLICE0] :
-> +	       prueth->emac[ICSS_SLICE1];
-> +	ret = icss_iep_init(emac->iep, &prueth_iep_clockops,
-> +			    emac, IEP_DEFAULT_CYCLE_TIME_NS);
-> +	if (ret) {
-> +		dev_err(prueth->dev, "Failed to initialize IEP module\n");
-> +		return ret;
-> +	}
-
-If we return error anywhere in this function will the caller take
-care of cleaning up?
-i.e. icssg_class_disable(), stopping any started cores, icss_iep_exit?
-
-You can't rely on prueth_emac_common_stop() as all cores might not
-have started and iep_init may not have been called.
-But you can if you check and call only if required.
-e.g. fw_running flag can be used to track if cores were started.
-
-> +
-
-Shouldn't we be setting emacs->initialized here and get rid of doing that
-in emac_ndo_open()?
-
-then you can track it to call icss_iep_exit().
-
-> +	return 0;
-> +}
-> +
-> +static int prueth_emac_common_stop(struct prueth *prueth)
-> +{
-> +	struct prueth_emac *emac;
-> +	int slice;
-> +
-> +	if (!prueth->emac[ICSS_SLICE0] && !prueth->emac[ICSS_SLICE1])
-> +		return -EINVAL;
-> +
-> +	icssg_class_disable(prueth->miig_rt, ICSS_SLICE0);
-> +	icssg_class_disable(prueth->miig_rt, ICSS_SLICE1);
-> +
-> +	for (slice = 0; slice < PRUETH_NUM_MACS; slice++) {
-> +		emac = prueth->emac[slice];
-> +		rproc_shutdown(prueth->txpru[slice]);
-> +		rproc_shutdown(prueth->rtu[slice]);
-> +		rproc_shutdown(prueth->pru[slice]);
-> +		if (emac)
-> +			emac->fw_running = 0;
-> +	}
-> +
-> +	emac = prueth->emac[ICSS_SLICE0] ? prueth->emac[ICSS_SLICE0] :
-> +	       prueth->emac[ICSS_SLICE1];
-> +	icss_iep_exit(emac->iep);
-> +
-
-emacs->initialized = 0;
-
-> +	return 0;
-> +}
-> +
->  /* called back by PHY layer if there is change in link state of hw port*/
->  static void emac_adjust_link(struct net_device *ndev)
->  {
-> @@ -543,23 +603,17 @@ static int emac_ndo_open(struct net_device *ndev)
->  {
->  	struct prueth_emac *emac = netdev_priv(ndev);
->  	int ret, i, num_data_chn = emac->tx_ch_num;
-> +	struct icssg_flow_cfg __iomem *flow_cfg;
->  	struct prueth *prueth = emac->prueth;
->  	int slice = prueth_emac_slice(emac);
->  	struct device *dev = prueth->dev;
->  	int max_rx_flows;
->  	int rx_flow;
->  
-> -	/* clear SMEM and MSMC settings for all slices */
-> -	if (!prueth->emacs_initialized) {
-> -		memset_io(prueth->msmcram.va, 0, prueth->msmcram.size);
-> -		memset_io(prueth->shram.va, 0, ICSSG_CONFIG_OFFSET_SLICE1 * PRUETH_NUM_MACS);
-> -	}
-> -
->  	/* set h/w MAC as user might have re-configured */
->  	ether_addr_copy(emac->mac_addr, ndev->dev_addr);
->  
->  	icssg_class_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
-> -	icssg_class_default(prueth->miig_rt, slice, 0, false);
-
-This is changing existing behaviour.
-If network device is stopped and started we expect all classifiers to be set to defaults?
-
->  	icssg_ft1_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
->  
->  	/* Notify the stack of the actual queue counts. */
-> @@ -597,18 +651,23 @@ static int emac_ndo_open(struct net_device *ndev)
->  		goto cleanup_napi;
->  	}
->  
-> -	/* reset and start PRU firmware */
-> -	ret = prueth_emac_start(prueth, emac);
-> -	if (ret)
-> -		goto free_rx_irq;
-> +	if (!prueth->emacs_initialized) {
-> +		ret = prueth_emac_common_start(prueth);
-> +		if (ret)
-> +			goto free_rx_irq;
-
-goto stop;
-
-so you can use pruet_emac_common_stop() to do the necessary cleanup.
-
-> +	}
->  
-> -	icssg_mii_update_mtu(prueth->mii_rt, slice, ndev->max_mtu);
-> +	flow_cfg = emac->dram.va + ICSSG_CONFIG_OFFSET + PSI_L_REGULAR_FLOW_ID_BASE_OFFSET;
-> +	writew(emac->rx_flow_id_base, &flow_cfg->rx_base_flow);
-> +	ret = emac_fdb_flow_id_updated(emac);
->  
-> -	if (!prueth->emacs_initialized) {
-> -		ret = icss_iep_init(emac->iep, &prueth_iep_clockops,
-> -				    emac, IEP_DEFAULT_CYCLE_TIME_NS);
-> +	if (ret) {
-> +		netdev_err(ndev, "Failed to update Rx Flow ID %d", ret);
-> +		goto stop;
->  	}
->  
-> +	icssg_mii_update_mtu(prueth->mii_rt, slice, ndev->max_mtu);
-> +
->  	ret = request_threaded_irq(emac->tx_ts_irq, NULL, prueth_tx_ts_irq,
->  				   IRQF_ONESHOT, dev_name(dev), emac);
->  	if (ret)
-> @@ -653,7 +712,7 @@ static int emac_ndo_open(struct net_device *ndev)
->  free_tx_ts_irq:
->  	free_irq(emac->tx_ts_irq, emac);
->  stop:
-> -	prueth_emac_stop(emac);
-> +	prueth_emac_common_stop(prueth);
->  free_rx_irq:
->  	free_irq(emac->rx_chns.irq[rx_flow], emac);
->  cleanup_napi:
-> @@ -689,8 +748,6 @@ static int emac_ndo_stop(struct net_device *ndev)
->  	if (ndev->phydev)
->  		phy_stop(ndev->phydev);
->  
-> -	icssg_class_disable(prueth->miig_rt, prueth_emac_slice(emac));
-> -
->  	if (emac->prueth->is_hsr_offload_mode)
->  		__dev_mc_unsync(ndev, icssg_prueth_hsr_del_mcast);
->  	else
-> @@ -729,10 +786,8 @@ static int emac_ndo_stop(struct net_device *ndev)
->  	cancel_delayed_work_sync(&emac->stats_work);
->  
->  	if (prueth->emacs_initialized == 1)
-> -		icss_iep_exit(emac->iep);
-> -
-> -	/* stop PRUs */
-> -	prueth_emac_stop(emac);
-> +		/* stop PRUs */
-> +		prueth_emac_common_stop(prueth);
-
-You don't need this anymore as we will rely on stop: label to call
-prueth_emac_common_stop();
-
->  
->  	free_irq(emac->tx_ts_irq, emac);
->  
-> @@ -1069,16 +1124,10 @@ static void prueth_emac_restart(struct prueth *prueth)
->  	icssg_set_port_state(emac1, ICSSG_EMAC_PORT_DISABLE);
->  
->  	/* Stop both pru cores for both PRUeth ports*/
-> -	prueth_emac_stop(emac0);
-> -	prueth->emacs_initialized--;
-> -	prueth_emac_stop(emac1);
-> -	prueth->emacs_initialized--;
-> +	prueth_emac_common_stop(prueth);
->  
->  	/* Start both pru cores for both PRUeth ports */
-> -	prueth_emac_start(prueth, emac0);
-> -	prueth->emacs_initialized++;
-> -	prueth_emac_start(prueth, emac1);
-> -	prueth->emacs_initialized++;
-> +	prueth_emac_common_start(prueth);
->  
->  	/* Enable forwarding for both PRUeth ports */
->  	icssg_set_port_state(emac0, ICSSG_EMAC_PORT_FORWARD);
-> @@ -1413,13 +1462,10 @@ static int prueth_probe(struct platform_device *pdev)
->  		prueth->pa_stats = NULL;
->  	}
->  
-> -	if (eth0_node) {
-> +	if (eth0_node || eth1_node) {
->  		ret = prueth_get_cores(prueth, ICSS_SLICE0, false);
->  		if (ret)
->  			goto put_cores;
-> -	}
-> -
-> -	if (eth1_node) {
->  		ret = prueth_get_cores(prueth, ICSS_SLICE1, false);
->  		if (ret)
->  			goto put_cores;
-> @@ -1618,14 +1664,12 @@ static int prueth_probe(struct platform_device *pdev)
->  	pruss_put(prueth->pruss);
->  
->  put_cores:
-> -	if (eth1_node) {
-> -		prueth_put_cores(prueth, ICSS_SLICE1);
-> -		of_node_put(eth1_node);
-> -	}
-> -
-> -	if (eth0_node) {
-> +	if (eth0_node || eth1_node) {
->  		prueth_put_cores(prueth, ICSS_SLICE0);
->  		of_node_put(eth0_node);
-> +
-> +		prueth_put_cores(prueth, ICSS_SLICE1);
-> +		of_node_put(eth1_node);
->  	}
->  
->  	return ret;
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> index f5c1d473e9f9..9fc72614d990 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> @@ -361,6 +361,8 @@ int icssg_set_port_state(struct prueth_emac *emac,
->  			 enum icssg_port_state_cmd state);
->  void icssg_config_set_speed(struct prueth_emac *emac);
->  void icssg_config_half_duplex(struct prueth_emac *emac);
-> +void icssg_init_emac_mode(struct prueth *prueth);
-> +void icssg_init_fw_offload_mode(struct prueth *prueth);
->  
->  /* Buffer queue helpers */
->  int icssg_queue_pop(struct prueth *prueth, u8 queue);
-> @@ -377,6 +379,7 @@ void icssg_vtbl_modify(struct prueth_emac *emac, u8 vid, u8 port_mask,
->  		       u8 untag_mask, bool add);
->  u16 icssg_get_pvid(struct prueth_emac *emac);
->  void icssg_set_pvid(struct prueth *prueth, u8 vid, u8 port);
-> +int emac_fdb_flow_id_updated(struct prueth_emac *emac);
->  #define prueth_napi_to_tx_chn(pnapi) \
->  	container_of(pnapi, struct prueth_tx_chn, napi_tx)
->  
-
--- 
-cheers,
--roger
+> Best regards,
 
 
