@@ -1,91 +1,128 @@
-Return-Path: <netdev+bounces-147852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CBA09DE6C9
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 13:59:03 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 384D916508A
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 12:58:50 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC1D19D8AC;
-	Fri, 29 Nov 2024 12:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q7kF5xOB"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC1179DE6D5
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 14:00:16 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63DF719D8A4;
-	Fri, 29 Nov 2024 12:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF168282623
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 13:00:15 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4E3219E830;
+	Fri, 29 Nov 2024 12:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MXbyhe5A"
+X-Original-To: netdev@vger.kernel.org
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07EAD19E826;
+	Fri, 29 Nov 2024 12:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732885104; cv=none; b=W5W5r2Mh99uCmCOYNb3LWfWvwXbhPyr/9d+pcy5cauwbNqt6z7G+RwihwqdoJDQdd4w6Cw0rXiIM4FLkl4cwayPiCeoUQ13m5KSGRjZ3rFyuZY/Q5sglY0mkL8LODuXF8WWFZEtCjwbXqh+Qe6m4nVrVdfq6XeRPiJg4/nVUD5s=
+	t=1732885166; cv=none; b=QzHmCkpo1dLpZHu0ZJPtMK+IIBB+CymzDkrDV8mrlo//4yaaI/co2BlUrc91g5k/QVnyPlm+Z1Vmv0Y53FP5cK0hciEw+fmqWx7O964y1VhuGZWPnx1fanIb9hslcTJhv6uCuOkZVRTB7kTIMeSTgRD4WetlTwyilj0sDGg/K7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732885104; c=relaxed/simple;
-	bh=sq/YLAb/fB+2vkIJfrLd/Ha67t4otVRZ7+d52cxNFXI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HyyUf5ODjesyvRVRa3SOGKlaVNInI/c9gPc3XMXXqOi6tY6CAnnTUbYKHFMs++EVUg62ScuXmaW++WK4ZpsSBoa8k1CO//XC+F+NEuDbjTzb3gKc+vV4wZ6pzJq3meaRCdgCk1ZzGeynFhHXQQybYPc4zGEKdUslTySjcooiwNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q7kF5xOB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F656C4CECF;
-	Fri, 29 Nov 2024 12:58:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732885103;
-	bh=sq/YLAb/fB+2vkIJfrLd/Ha67t4otVRZ7+d52cxNFXI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Q7kF5xOB27aQnYfMlebD1tv+LucTFpSonUqh4/C42D2KymsHuuuYHJfajqQ2GiK1n
-	 HYKcPvcK5X+a/go5MSnR17aKSyiocpm7v74tmP/1DAyX7V5UTiqFxOrXtaoMrHb6Nd
-	 epuar4o9D8HJHP8E8N73bMSwpBUwAoljsbuva5MUKbsuHJ8Bsahl5atHbawjX4PbvC
-	 kHoMKvDUAb/e/1JvtDMdC3o5e/QJ73hIRYwpxTtoteEowCZZFOq1CT8gCqWfl4BM4E
-	 AUdY/pOBO0IX6XJc7oqsuaOm2rrTBMBdPzLDaBjPVGJnWuvnA0GqozwSDmK0ZIHjcJ
-	 tq7y5/qjbHmJA==
-Message-ID: <5b6cf8f9-fdaf-4719-b1b2-f4745c671263@kernel.org>
-Date: Fri, 29 Nov 2024 14:58:17 +0200
+	s=arc-20240116; t=1732885166; c=relaxed/simple;
+	bh=S8gYZA1lf0QfDrBwvaQjuVwwNCyxR9f+zhHMjMaL+KQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YMBeEqOWLPyduB+EsS+xfe16PpboPPPk+ZpVuQWwglNBdY+506ETc3p8LbA3Am7b9xl6rrA3kCmHwK+cAhm0tcC8McZwhklK0nbRYWhNRCEf28C9iTmD4Pg9f9lol3UVhQ3wAQxPYwKhiQ98jndIzQ0SaQ/9VXI9j6GC7dnh8ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MXbyhe5A; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CD261240008;
+	Fri, 29 Nov 2024 12:59:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1732885161;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B6/gF1M4D5vI9QsQxw31ksKS61JRuGAPL5A9hcfPi0E=;
+	b=MXbyhe5AePWsOTmc5MMa1I89c1AYBxclenJekWOkeahAg88uSpkU3kWaFkbEZsaten0dzD
+	t6XPa2WWS5l6QtKA6ntIhGVFQGlQNuGTXG6EDJzEhFOFJUebVIqCDdVMJg9RnmB/r/NPxD
+	lVJtkLMFK0J4upS/TH9kouky0TcmssP6mKYmFjauDh9fn8cgtQLY+gP0NCbng30k4Ei0WJ
+	L5+fKyvfdv/lp0aG/pjEEM0Xcq4GoEc2II370J1CTfzJl6Bfm4+sXTJpHF5LJuWVgXyWzN
+	f/hv1bjQrhem+97QSQMfS6ff3S16xTFjGeCz03TN+w/yJbroOFFUBl2fV8ZegQ==
+Date: Fri, 29 Nov 2024 13:59:19 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: <Tristram.Ha@microchip.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>,
+ "Krzysztof Kozlowski" <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Marek Vasut <marex@denx.de>,
+ <UNGLinuxDriver@microchip.com>, <devicetree@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: Add SGMII port
+ support to KSZ9477 switch
+Message-ID: <20241129135919.57d59c90@fedora.home>
+In-Reply-To: <20241109015633.82638-3-Tristram.Ha@microchip.com>
+References: <20241109015633.82638-1-Tristram.Ha@microchip.com>
+	<20241109015633.82638-3-Tristram.Ha@microchip.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] net: ti: icssg-prueth: Fix clearing of
- IEP_CMP_CFG registers during iep_init
-To: Meghana Malladi <m-malladi@ti.com>, lokeshvutla@ti.com, vigneshr@ti.com,
- javier.carrasco.cruz@gmail.com, diogo.ivo@siemens.com,
- jacob.e.keller@intel.com, horms@kernel.org, pabeni@redhat.com,
- kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- andrew+netdev@lunn.ch
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com, danishanwar@ti.com
-References: <20241128122931.2494446-1-m-malladi@ti.com>
- <20241128122931.2494446-3-m-malladi@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20241128122931.2494446-3-m-malladi@ti.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
+Hello Tristram,
 
+On Fri, 8 Nov 2024 17:56:33 -0800
+<Tristram.Ha@microchip.com> wrote:
 
-On 28/11/2024 14:29, Meghana Malladi wrote:
-> When ICSSG interfaces are brought down and brought up again, the
-> pru cores are shut down and booted again, flushing out all the memories
-> and start again in a clean state. Hence it is expected that the
-> IEP_CMP_CFG register needs to be flushed during iep_init() to ensure
-> that the existing residual configuration doesn't cause any unusual
-> behavior. If the register is not cleared, existing IEP_CMP_CFG set for
-> CMP1 will result in SYNC0_OUT signal based on the SYNC_OUT register values.
+> From: Tristram Ha <tristram.ha@microchip.com>
 > 
-> After bringing the interface up, calling PPS enable doesn't work as
-> the driver believes PPS is already enabled, (iep->pps_enabled is not
-> cleared during interface bring down) and driver will just return true
-> even though there is no signal. Fix this by disabling pps and perout.
+> The SGMII module of KSZ9477 switch can be setup in 3 ways: 0 for direct
+> connect, 1 for 1000BaseT/1000BaseX SFP, and 2 for 10/100/1000BaseT SFP.
 > 
-> Fixes: c1e0230eeaab ("net: ti: icss-iep: Add IEP driver")
-> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+> SFP is typically used so the default is 1.  The driver can detect
+> 10/100/1000BaseT SFP and change the mode to 2.  For direct connect the
+> device tree can use fixed-link for the SGMII port as this link will
+> never be disconnected.
+> 
+> The SGMII module can only support basic link status of the SFP, so the
+> port can be simulated as having a regular internal PHY when SFP cage
+> logic is not used.
+> 
+> One issue for the 1000BaseX SFP is there is no link down interrupt, so
+> the driver has to use polling to detect link off when the link is up.
+> 
+> Note the SGMII interrupt cannot be masked in hardware.  Also the module
+> is not reset when the switch is reset.  It is important to reset the
+> module properly to make sure interrupt is not triggered prematurely.
+> 
+> A PCS driver for the SGMII port is added to accommodate the SFP cage
+> logic used in the phylink code.  It is used to confirm the link is up
+> and process the SGMII interrupt.
 
-Reviewed-by: Roger Quadros <rogerq@kernel.org>
+I'm currently working on a product on which I need the SGMII/1000BaseX
+port to work on KSZ9477, so I gave that series a try.
 
+I seems that this PCS is actually a Designware XPCS, reading the
+registers 0x2/3 returns 0x7996ced0, which is the PHY id for the
+Designware XPCS. Looking at the register definitions, they are
+indeed very very similar. Andrew already pointed out that the SGMII
+acccessors in the series (port_sgmii_r/w) look like C45 MDIO accessors.
+
+So, you could move forward by implementing an mdio bus for the PCS with
+the C45 accessors mentionned above, and then plumb that to the XPCS
+driver with the xpcs_create_mdiodev(). I'm still figuring out if the
+KSZ9477 needs some extra bits of configuration to get that port fully
+operationnal though.
+
+I'm currently integrating such a solution on a 6.6 kernel, I would be
+very happy to test any further version of this patchset.
+
+Thanks,
+
+Maxime
 
