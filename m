@@ -1,135 +1,126 @@
-Return-Path: <netdev+bounces-147814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 504B79DBFC8
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 08:36:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBC109DC03D
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 09:10:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1D2516299F
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 07:36:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A88D5162AD7
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 08:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1761537DA;
-	Fri, 29 Nov 2024 07:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC88A158538;
+	Fri, 29 Nov 2024 08:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="TV2HOj4N"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Vl3fTfXg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871F3184F
-	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 07:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7340745C14;
+	Fri, 29 Nov 2024 08:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732865780; cv=none; b=Xw61HHONvepvl4Nf5tl5E1n/iliOIKvUdoONEk+oUHqF/xKPFJFAntYXbK1P4SgY5AVb/cWX6JNOIi/dcYmDVkCFOv+0jxL9ozL92FiJYEYD3yBhdAt28wcrkNQu05w18Qkac9OmlLemj6yPlFRvZ6IqbhOyaSl8Li/87PPc94A=
+	t=1732867832; cv=none; b=DdV+TGXNFL9tcBEC+kxMSyGqOhZ/GmeZkY9h6fIhpxJLBdv3gXb345qaRG8HI9wDhhq/qrxCQbclzq3UDoWlO9nBX90ldotcIE/TRSJIeAF7kecQeZabPLgzeTR3jzcAc+wUjsmVn1De35CzlIk3YN8a3k/iiw0JWRMjqEVvHuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732865780; c=relaxed/simple;
-	bh=C++RCFCnEmKpxpAcZXP95owrmD3LxrsxtPhDm6kuk44=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U96iopIc1bKicolf+Nbj/Mv6MV1UxZ4OnRNVvqcgvOifaa51aSfk1SB0+EAFPxcbe9hJKkmuI+FmAoA9L1kbyPnbogN40QOMlM4WE2O5cdw48ASEt5aQtH7dT57jCThGeDpokVlJ/jyh0CO1c6uGSDkIH6AVouJWVMyPg5mRt/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=TV2HOj4N; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1732865778; x=1764401778;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=suiVFLSlVMWuuw5sPLr3XRGL9BvfwNQ36MD1q3sDEWQ=;
-  b=TV2HOj4N360jr9uZgnk4KdGauTta6lxdxgPFTNAXrzpDo0+q+P/EiEg+
-   szukVbZLKJgroKtW+es9Wu8F/GRxSmxcXgNlqOMT9IvdwN+fk7y62GyP9
-   XPL3x5cYD9pNn+unDuvuJoE/9Kl8+NioSleDhe2yK0piYEKPt2daV7Dr3
-   E=;
-X-IronPort-AV: E=Sophos;i="6.12,194,1728950400"; 
-   d="scan'208";a="148886304"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2024 07:36:15 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:40197]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.190:2525] with esmtp (Farcaster)
- id 99c059aa-9f43-4482-9a77-a74ae7f21ee7; Fri, 29 Nov 2024 07:36:15 +0000 (UTC)
-X-Farcaster-Flow-ID: 99c059aa-9f43-4482-9a77-a74ae7f21ee7
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 29 Nov 2024 07:36:15 +0000
-Received: from 6c7e67c6786f.amazon.com (10.37.244.8) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 29 Nov 2024 07:36:12 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <xiyou.wangcong@gmail.com>
-CC: <cong.wang@bytedance.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<syzbot+21ba4d5adff0b6a7cfc6@syzkaller.appspotmail.com>
-Subject: Re: [Patch net] rtnetlink: catch error pointer for rtnl_link_get_net()
-Date: Fri, 29 Nov 2024 16:36:09 +0900
-Message-ID: <20241129073609.30713-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241129063112.763095-1-xiyou.wangcong@gmail.com>
-References: <20241129063112.763095-1-xiyou.wangcong@gmail.com>
+	s=arc-20240116; t=1732867832; c=relaxed/simple;
+	bh=AYPeFCSY+ZM8FxtiRhfjwjKx4LWm2P0yK9KPPipft6U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EExgx+2P45AF1NzBsVzCtrHdIpOtYJjXdXbeS4I5Mqq1xfmVucnBGa2UbhbIbYxDe4o4IqzedSZ95YTpDqRnSU41rX4Th/L55rkiqIKOZ765N7YIaci+dHUIaNU/O6NUCRQig9JzWBAgSzoOWdZWdIu9FZY1lAXCPNzkVRTv8u8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Vl3fTfXg; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id ADF4240003;
+	Fri, 29 Nov 2024 08:10:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1732867819;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xI6ZyEQYlO67EDyhVXwWpx45NB2tNXa1Y4U0cY6j/nk=;
+	b=Vl3fTfXgOUqb4XayzRUopNxuNO2a0PA88El3Vu57k1X2uvPqC3YDMFL4SXXvcnqdEv2qcC
+	p7VAOtljAwIHPBmNSp/2/uIvdwozWyEuG9XBsypuWuD9uKEPEgHC0fLTumczbcD3dofyC9
+	qwO/5TjFzq8qFITgBpYSGKkjQ8BvHIjfMvKXBRMcXgC/2yjhWejvojKqQRsryivCiD1JCy
+	dx5myJsMw0QS86yN7CcSdrwNtG5t2wrN0bmKXVAjU9S2vPTG9ALfB6xSEIHzaGIeJBjGxS
+	iM8o8ZeVZ4ex/HxBnuVh1FCfjxnQ9p06O9oGcM/2Z2YNI4a1b9mEiZwCTOlX7A==
+Date: Fri, 29 Nov 2024 09:10:13 +0100
+From: Herve Codina <herve.codina@bootlin.com>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Andy Shevchenko
+ <andy.shevchenko@gmail.com>, Simon Horman <horms@kernel.org>, Lee Jones
+ <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Derek Kiernan
+ <derek.kiernan@amd.com>, Dragan Cvetic <dragan.cvetic@amd.com>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Bjorn Helgaas
+ <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, Lars Povlsen
+ <lars.povlsen@microchip.com>, Steen Hegelund
+ <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Saravana Kannan <saravanak@google.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Allan Nielsen
+ <allan.nielsen@microchip.com>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v9 1/6] misc: Add support for LAN966x PCI device
+Message-ID: <20241129091013.029fced3@bootlin.com>
+In-Reply-To: <dywwnh7ns47ffndsttstpcsw44avxjvzcddmceha7xavqjdi77@cqdgmpdtywol>
+References: <20241010063611.788527-1-herve.codina@bootlin.com>
+	<20241010063611.788527-2-herve.codina@bootlin.com>
+	<dywwnh7ns47ffndsttstpcsw44avxjvzcddmceha7xavqjdi77@cqdgmpdtywol>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-GND-Sasl: herve.codina@bootlin.com
 
-From: Cong Wang <xiyou.wangcong@gmail.com>
-Date: Thu, 28 Nov 2024 22:31:12 -0800
-> From: Cong Wang <cong.wang@bytedance.com>
+Hi Michal,
+
+On Thu, 28 Nov 2024 20:42:53 +0100
+Michal Kubecek <mkubecek@suse.cz> wrote:
+
+...
+> > --- a/drivers/misc/Kconfig
+> > +++ b/drivers/misc/Kconfig
+> > @@ -610,6 +610,30 @@ config MARVELL_CN10K_DPI
+> >  	  To compile this driver as a module, choose M here: the module
+> >  	  will be called mrvl_cn10k_dpi.
+> >  
+> > +config MCHP_LAN966X_PCI
+> > +	tristate "Microchip LAN966x PCIe Support"
+> > +	depends on PCI
+> > +	select OF
+> > +	select OF_OVERLAY  
 > 
-> Currently all callers of rtnl_link_get_net() assume that it always
-> returns a valid netns pointer,
-
-because I assume it's always tested in rtnl_add_peer_net()...
-
-
-> when rtnl_link_get_net_ifla() fails,
-> it uses 'src_net' as a fallback.
+> Are these "select" statements what we want? When configuring current
+> mainline snapshot, I accidentally enabled this driver and ended up
+> flooded with an enormous amount of new config options, most of which
+> didn't make much sense on x86_64. It took quite long to investigate why.
 > 
-> This is not true,
-
-because rtnl_link_get_net_ifla() isn't called if (!data ||
-!data[ops->peer_type]),
-
-so the correct fix is:
-
----8<---
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index dd142f444659..c1f4aaa40823 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3815,6 +3815,10 @@ static int rtnl_add_peer_net(struct rtnl_nets *rtnl_nets,
- 	struct net *net;
- 	int err;
- 
-+	net = rtnl_link_get_net_ifla(tb);
-+	if (IS_ERR(net))
-+		return PTR_ERR(net);
-+
- 	if (!data || !data[ops->peer_type])
- 		return 0;
- 
-@@ -3828,9 +3832,6 @@ static int rtnl_add_peer_net(struct rtnl_nets *rtnl_nets,
- 			return err;
- 	}
- 
--	net = rtnl_link_get_net_ifla(tb);
--	if (IS_ERR(net))
--		return PTR_ERR(net);
- 	if (net)
- 		rtnl_nets_add(rtnl_nets, net);
- 
----8<---
-
-
-> because rtnl_link_get_net_ifla() can return an
-> error pointer too, we need to handle this error case and propagate
-> the error code to its callers.
+> Couldn't we rather use
 > 
-> Add a comment to better document its return value.
+> 	depends on PCI && OF && OF_OVERLAY
+> 
+> like other drivers?
+> 
+
+I don't have a strong opinion on this 'select' vs 'depends on' for those
+symbols.
+
+I used select because the dependency is not obvious for a user that just
+want the driver for the LAN966x PCI device.
+
+Best regards,
+Hervé
 
