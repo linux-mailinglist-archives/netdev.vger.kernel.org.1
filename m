@@ -1,153 +1,238 @@
-Return-Path: <netdev+bounces-147831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 064359DC33B
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 13:10:10 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09DE716435C
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 12:10:04 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8A619D07B;
-	Fri, 29 Nov 2024 12:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LIC54FVV"
-X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E9FB9DE64B
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 13:23:37 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D8F19CD0B;
-	Fri, 29 Nov 2024 12:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A627A282734
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 12:23:35 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB2E19CC3E;
+	Fri, 29 Nov 2024 12:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9M4YI3a"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5379A19A298;
+	Fri, 29 Nov 2024 12:23:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732882196; cv=none; b=kAwG+rqz7p1d5XWvJV4+aykLFDyC3+scy6KQfK2Dr0cAi1KlIo02KFwVky+eKOFIsUjqPPtBLXg087Cfkg8OvQW9vRnpJ6E5bSfRAxMJTG2DY3JlQ8R/Kq/8d4z7xkl1331++x1DDwCgdndpu2tRD/1UKV9oXV407Mnw4bdqPQI=
+	t=1732883013; cv=none; b=nh+sM8+mCT6VPNbfF+LSvp5SAjrbcmhie335RdkCzgKNLltBnL2YmWNS9OUGi5UtXzelUWxU8DT0OqtlkhOhP4XwBftAgiJ3sbhys9vS8bPrs+n9070A6PYhuLPxxBK+gs3/BFMnYH/3O3km/GUQY65oupyGN9uLC9vWdLriGRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732882196; c=relaxed/simple;
-	bh=jAJdSp15+3ttSJ3dw0H0gS0lYJCcfjp4txGBVJvg2VE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JEm7619t9u4mvs9uQewQDP+lmpTghNUJeW/NfyhoOj1se+UNo8lLZxO68GGIu7yABdbCidkQxfH5wYD8whFkEOoqOqkyGedFP1mHeKuLsCViUFlSfU4ZY4K6gHrcwTcCSNaSHpS3y+ZMowMuCs4emai7l3AVMw7cppdWixnBkZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LIC54FVV; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=bcF2+uKv+THIH1HdaMT8XOaR+gAw7l3df+j7RVgj46g=; b=LIC54FVVsAQLuUlBTptoz80eFn
-	MSRfSt+dFjzI6lE0IxP4+eO3AfNIPWaPx+KRxNT8QxQRrAANmNBj2pxnj3lVxl+Hg8Dr3tFldMqx2
-	9j8BZBF5GI6L+9YcDR3YSJxRbPfyTzaIksLpIJ3b7TykGXFGuwaT6Cyo+8lMBhezwpj0E5htokGpA
-	QtrEVISprtDXxdtjyG+h4BIoYdQv5mbPn0RqVVm1NdVIfOhJH+Nt9uL6McT3OIXeRjrkjndUappFX
-	4NAC7yxUvnKePBDWqfOX/o6IAy+0So6n+Us+PCVkbbYU1hAvuhQ9jxZVXRHX5WsOZtNkLrg99Bypj
-	RXXlSLPA==;
-Received: from 77-249-17-89.cable.dynamic.v4.ziggo.nl ([77.249.17.89] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tGzoa-00000001je5-2qlb;
-	Fri, 29 Nov 2024 12:09:41 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id DBAC830026A; Fri, 29 Nov 2024 13:09:39 +0100 (CET)
-Date: Fri, 29 Nov 2024 13:09:39 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Masami Hiramatsu <mhiramat@kernel.org>
-Cc: Ruan Bonan <bonan.ruan@u.nus.edu>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"longman@redhat.com" <longman@redhat.com>,
-	"boqun.feng@gmail.com" <boqun.feng@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kpsingh@kernel.org" <kpsingh@kernel.org>,
-	"mattbobrowski@google.com" <mattbobrowski@google.com>,
-	"ast@kernel.org" <ast@kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"andrii@kernel.org" <andrii@kernel.org>,
-	"martin.lau@linux.dev" <martin.lau@linux.dev>,
-	"eddyz87@gmail.com" <eddyz87@gmail.com>,
-	"song@kernel.org" <song@kernel.org>,
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	"sdf@fomichev.me" <sdf@fomichev.me>,
-	"haoluo@google.com" <haoluo@google.com>,
-	"jolsa@kernel.org" <jolsa@kernel.org>,
-	"rostedt@goodmis.org" <rostedt@goodmis.org>,
-	"mathieu.desnoyers@efficios.com" <mathieu.desnoyers@efficios.com>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Fu Yeqi <e1374359@u.nus.edu>, akinobu.mita@gmail.com, tytso@mit.edu,
-	Jason@zx2c4.com
-Subject: Re: [BUG] possible deadlock in __schedule (with reproducer available)
-Message-ID: <20241129120939.GG35539@noisy.programming.kicks-ass.net>
-References: <24481522-69BF-4CE7-A05D-1E7398400D80@u.nus.edu>
- <20241129173554.11e3b2b2f5126c2b72c6a78e@kernel.org>
+	s=arc-20240116; t=1732883013; c=relaxed/simple;
+	bh=x6ds4depXJ3x1wS0EfDmuF9bTtZmMDhaiDzLRWiI5UU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=HxmmdwIWW/Rg5ctd4HFQXNexNygojaPbyy/oKmHIqGJrTaZjB8Sfp+scIQ/YTEZaUToQiJA6TW1hv2TAV9xEcJM1GPjWMKAinTFEvmMq3J1n81YbCt6eHRHsYMu7Qs2o6oy2y4/h4r9M2vxJjUVBy2oJ+JJxJoESqkWSB1zMq/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9M4YI3a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2030C4CED2;
+	Fri, 29 Nov 2024 12:23:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732883012;
+	bh=x6ds4depXJ3x1wS0EfDmuF9bTtZmMDhaiDzLRWiI5UU=;
+	h=Date:From:To:Cc:Subject:From;
+	b=k9M4YI3aucPoCkXM3faDD/1h6Me2Tuz+kcoKunXgdZaFa8Rnfy4ayYdY2QVxy3OTr
+	 k7NymP0TsqeViokqae97qf5KP9THD8rUEnRZua+Vik0qaRefIrLQz8qp4QMGwg9RW6
+	 BZUPURAbaHHbpUUirB/VieokL6pcQjZyEHJqhMrZ9pG7cbPpl4eOeEfGYQzPL/8hKk
+	 C93S8jxkUV1FJRehOpO31oIbbbWSWaJ7f8KA3u6ghEoFrSsKXBKZ28/ibbnW47rg/5
+	 F4LIGgzO44dDxmQ1a6L4dOBwHbLR1AtSHefcYiq5VnbeXgRlZ7nOnmnbxDHYB3MTeN
+	 RLPkqhaMqI2pg==
+Date: Fri, 29 Nov 2024 12:23:28 +0000
+From: Conor Dooley <conor@kernel.org>
+To: netdev@vger.kernel.org
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, conor@kernel.org
+Subject: deadlock in macb_start_xmit() with PREEMPT_RT enabled
+Message-ID: <20241129-glimpse-wilt-8a9ba002d7bf@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="vVya7FBFnkVqn3JA"
+Content-Disposition: inline
+
+
+--vVya7FBFnkVqn3JA
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241129173554.11e3b2b2f5126c2b72c6a78e@kernel.org>
 
-On Fri, Nov 29, 2024 at 05:35:54PM +0900, Masami Hiramatsu wrote:
-> On Sat, 23 Nov 2024 03:39:45 +0000
-> Ruan Bonan <bonan.ruan@u.nus.edu> wrote:
-> 
-> > 
-> >        vprintk_emit+0x414/0xb90 kernel/printk/printk.c:2406
-> >        _printk+0x7a/0xa0 kernel/printk/printk.c:2432
-> >        fail_dump lib/fault-inject.c:46 [inline]
-> >        should_fail_ex+0x3be/0x570 lib/fault-inject.c:154
-> >        strncpy_from_user+0x36/0x230 lib/strncpy_from_user.c:118
-> >        strncpy_from_user_nofault+0x71/0x140 mm/maccess.c:186
-> >        bpf_probe_read_user_str_common kernel/trace/bpf_trace.c:215 [inline]
-> >        ____bpf_probe_read_user_str kernel/trace/bpf_trace.c:224 [inline]
-> 
-> Hmm, this is a combination issue of BPF and fault injection.
-> 
-> static void fail_dump(struct fault_attr *attr)
-> {
->         if (attr->verbose > 0 && __ratelimit(&attr->ratelimit_state)) {
->                 printk(KERN_NOTICE "FAULT_INJECTION: forcing a failure.\n"
->                        "name %pd, interval %lu, probability %lu, "
->                        "space %d, times %d\n", attr->dname,
->                        attr->interval, attr->probability,
->                        atomic_read(&attr->space),
->                        atomic_read(&attr->times));
-> 
-> This printk() acquires console lock under rq->lock has been acquired.
-> 
-> This can happen if we use fault injection and trace event too because
-> the fault injection caused printk warning.
+Yo,
 
-Ah indeed. Same difference though, if you don't know the context, most
-things are unsafe to do.
+Just reporting a deadlock that I've been seeing since PREEMPT_RT was
+merged in the cadence macb driver. I meant to report this weeks ago
+after mentioning it to Nicolas but it slipped my mind. With PREEMPT_RT
+disabled, the deadlock does not get reported.
 
-> I think this should be a bug of the fault injection, not tracing/BPF.
-> And to solve this issue, we may be able to check the context and if
-> it is tracing/NMI etc, fault injection should NOT make it failure.
+Cheers,
+Conor.
 
-Well, it should be okay to cause the failure, but it must be very
-careful how it goes about doing that. Tripping printk() definitely is
-out.
+======================================================
+WARNING: possible circular locking dependency detected
+6.12.0-10553-gb86545e02e8c-dirty #1 Not tainted
+------------------------------------------------------
+kworker/0:1/9 is trying to acquire lock:
+ffffffe5c0abb460 (&bp->lock){+.+.}-{3:3}, at: macb_start_xmit+0x836/0xa3e
 
-But there's a much bigger problem there, get_random*() is not wait-free,
-in fact it takes a spinlock_t which makes that it is unusable from most
-context, and it's definitely out for tracing.
+but task is already holding lock:
+ffffffe5c0ab9270 (&queue->tx_ptr_lock){+...}-{3:3}, at: macb_start_xmit+0x300/0xa3e
 
-Notably, this spinlock_t makes that it is unsafe to use from anything
-that holds a raw_spinlock_t or is from hardirq context, or has
-preempt_disable() -- which is a TON of code.
+which lock already depends on the new lock.
 
-On this alone I would currently label the whole of fault-injection
-broken. The should_fail() call itself is unsafe where many of its
-callsites are otherwise perfectly fine -- eg. usercopy per the above.
 
-Perhaps it should use a simple PRNG, a simple LFSR should be plenty good
-enough to provide failure conditions.
+the existing dependency chain (in reverse order) is:
 
-And yeah, I would just completely rip out the printk. Trying to figure
-out where and when it's safe to call printk() is non-trivial and just
-not worth the effort imo.
+-> #3 (&queue->tx_ptr_lock){+...}-{3:3}:
+       __lock_acquire+0xadc/0xda6
+       lock_acquire+0x124/0x2d0
+       rt_spin_lock+0x3a/0x142
+       macb_start_xmit+0x300/0xa3e
+       dev_hard_start_xmit+0xf4/0x28c
+       sch_direct_xmit+0xbc/0x324
+       __dev_queue_xmit+0x5f6/0xb5e
+       neigh_resolve_output+0x122/0x15a
+       ip6_finish_output2+0x624/0xa06
+       ip6_output+0x182/0x35a
+       mld_sendpack+0x274/0x47e
+       mld_ifc_work+0x254/0x400
+       process_one_work+0x224/0x55a
+       worker_thread+0x236/0x360
+       kthread+0xf2/0x10c
+       ret_from_fork+0xe/0x18
+
+-> #2 (_xmit_ETHER#2){+...}-{3:3}:
+       __lock_acquire+0xadc/0xda6
+       lock_acquire+0x124/0x2d0
+       rt_spin_lock+0x3a/0x142
+       sch_direct_xmit+0x80/0x324
+       __dev_queue_xmit+0x5f6/0xb5e
+       neigh_resolve_output+0x122/0x15a
+       ip6_finish_output2+0x624/0xa06
+       ip6_output+0x182/0x35a
+       mld_sendpack+0x274/0x47e
+       mld_ifc_work+0x254/0x400
+       process_one_work+0x224/0x55a
+       worker_thread+0x236/0x360
+       kthread+0xf2/0x10c
+       ret_from_fork+0xe/0x18
+
+-> #1 ((softirq_ctrl.lock)){+.+.}-{3:3}:
+       __lock_acquire+0xadc/0xda6
+       lock_acquire+0x124/0x2d0
+       rt_spin_lock+0x3a/0x142
+       __local_bh_disable_ip+0x10c/0x1ec
+       local_bh_disable+0x1c/0x24
+       __netdev_alloc_skb+0x12e/0x232
+       gem_rx_refill+0xf6/0x1ae
+       gem_init_rings+0x56/0x110
+       macb_mac_link_up+0xc0/0x2d6
+       phylink_resolve+0x5f2/0x72e
+       process_one_work+0x224/0x55a
+       worker_thread+0x236/0x360
+       kthread+0xf2/0x10c
+       ret_from_fork+0xe/0x18
+
+-> #0 (&bp->lock){+.+.}-{3:3}:
+       check_noncircular+0x146/0x15c
+       validate_chain+0xb86/0x2806
+       __lock_acquire+0xadc/0xda6
+       lock_acquire+0x124/0x2d0
+       rt_spin_lock+0x3a/0x142
+       macb_start_xmit+0x836/0xa3e
+       dev_hard_start_xmit+0xf4/0x28c
+       sch_direct_xmit+0xbc/0x324
+       __dev_queue_xmit+0x5f6/0xb5e
+       neigh_resolve_output+0x122/0x15a
+       ip6_finish_output2+0x624/0xa06
+       ip6_output+0x182/0x35a
+       mld_sendpack+0x274/0x47e
+       mld_ifc_work+0x254/0x400
+       process_one_work+0x224/0x55a
+       worker_thread+0x236/0x360
+       kthread+0xf2/0x10c
+       ret_from_fork+0xe/0x18
+
+other info that might help us debug this:
+
+Chain exists of:
+  &bp->lock --> _xmit_ETHER#2 --> &queue->tx_ptr_lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&queue->tx_ptr_lock);
+                               lock(_xmit_ETHER#2);
+                               lock(&queue->tx_ptr_lock);
+  lock(&bp->lock);
+
+ *** DEADLOCK ***
+
+15 locks held by kworker/0:1/9:
+ #0: ffffffe5c084f538 ((wq_completion)mld){+.+.}-{0:0}, at: process_one_work+0x194/0x55a
+ #1: ffffffc600063d88 ((work_completion)(&(&idev->mc_ifc_work)->work)){+.+.}-{0:0}, at: process_one_work+0x1b2/0x55a
+ #2: ffffffe5c5228620 (&idev->mc_lock){+.+.}-{4:4}, at: mld_ifc_work+0x2e/0x400
+ #3: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x32
+ #4: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x32
+ #5: ffffffe5fef5c210 ((softirq_ctrl.lock)){+.+.}-{3:3}, at: __local_bh_disable_ip+0x10c/0x1ec
+ #6: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x34
+ #7: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x2e
+ #8: ffffffff81ca92c8 (rcu_read_lock_bh){....}-{1:3}, at: rcu_lock_acquire+0x0/0x2a
+ #9: ffffffe5c4ce7398 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock){+...}-{3:3}, at: __dev_queue_xmit+0x458/0xb5e
+ #10: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x34
+ #11: ffffffe5c5721318 (_xmit_ETHER#2){+...}-{3:3}, at: sch_direct_xmit+0x80/0x324
+ #12: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x34
+ #13: ffffffe5c0ab9270 (&queue->tx_ptr_lock){+...}-{3:3}, at: macb_start_xmit+0x300/0xa3e
+ #14: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x34
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 9 Comm: kworker/0:1 Not tainted 6.12.0-10553-gb86545e02e8c-dirty #1
+Hardware name: Microchip PolarFire-SoC Icicle Kit (DT)
+Workqueue: mld mld_ifc_work
+Call Trace:
+[<ffffffff80007870>] show_stack+0x2c/0x3c
+[<ffffffff80c205dc>] dump_stack_lvl+0x32/0x9a
+[<ffffffff80c20658>] dump_stack+0x14/0x1c
+[<ffffffff8009a950>] print_circular_bug+0x320/0x326
+[<ffffffff8009a3f0>] check_noncircular+0x146/0x15c
+[<ffffffff80097eb2>] validate_chain+0xb86/0x2806
+[<ffffffff80092c0e>] __lock_acquire+0xadc/0xda6
+[<ffffffff80091eb2>] lock_acquire+0x124/0x2d0
+[<ffffffff80c2bee2>] rt_spin_lock+0x3a/0x142
+[<ffffffff80870788>] macb_start_xmit+0x836/0xa3e
+[<ffffffff80a0a410>] dev_hard_start_xmit+0xf4/0x28c
+[<ffffffff80a6ed88>] sch_direct_xmit+0xbc/0x324
+[<ffffffff80a0b57c>] __dev_queue_xmit+0x5f6/0xb5e
+[<ffffffff80a1feec>] neigh_resolve_output+0x122/0x15a
+[<ffffffff80b2fcc0>] ip6_finish_output2+0x624/0xa06
+[<ffffffff80b2ac3a>] ip6_output+0x182/0x35a
+[<ffffffff80b67128>] mld_sendpack+0x274/0x47e
+[<ffffffff80b642dc>] mld_ifc_work+0x254/0x400
+[<ffffffff800451e6>] process_one_work+0x224/0x55a
+[<ffffffff8004754e>] worker_thread+0x236/0x360
+[<ffffffff8004e076>] kthread+0xf2/0x10c
+[<ffffffff80c324e2>] ret_from_fork+0xe/0x18
+
+--vVya7FBFnkVqn3JA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZ0myQAAKCRB4tDGHoIJi
+0lSzAP4/Mb0RONUDlGP+GtmT1lyoj6E760RDZFCMuYODbqiOCgD+MFQrrP0HpWjS
+t5pMcPKpm0FThkEso63mDLgTwV3qrgE=
+=/2XV
+-----END PGP SIGNATURE-----
+
+--vVya7FBFnkVqn3JA--
 
