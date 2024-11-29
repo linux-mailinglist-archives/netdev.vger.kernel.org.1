@@ -1,238 +1,150 @@
-Return-Path: <netdev+bounces-147832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E9FB9DE64B
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 13:23:37 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2898D9DE65D
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 13:27:41 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A627A282734
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 12:23:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB038164369
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 12:27:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB2E19CC3E;
-	Fri, 29 Nov 2024 12:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9M4YI3a"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DDD119D081;
+	Fri, 29 Nov 2024 12:27:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5379A19A298;
-	Fri, 29 Nov 2024 12:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0639919A298
+	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 12:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732883013; cv=none; b=nh+sM8+mCT6VPNbfF+LSvp5SAjrbcmhie335RdkCzgKNLltBnL2YmWNS9OUGi5UtXzelUWxU8DT0OqtlkhOhP4XwBftAgiJ3sbhys9vS8bPrs+n9070A6PYhuLPxxBK+gs3/BFMnYH/3O3km/GUQY65oupyGN9uLC9vWdLriGRo=
+	t=1732883257; cv=none; b=oVvTJ44cyqV5pvkryPNXBQEmbHFatinNoDDzVTS3WkV+q3lmB4a3R2VHP+npsZX7n+GA6Timu7xi63tyFXffxeKq/QMfJ6V9wIs/UdAU1hDcxGHYjPzM2fK7EaB1X6PjOjFM6bzNMTeidJ8dCTlhyI9hEKrgc/n4LbrmdDqv/nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732883013; c=relaxed/simple;
-	bh=x6ds4depXJ3x1wS0EfDmuF9bTtZmMDhaiDzLRWiI5UU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=HxmmdwIWW/Rg5ctd4HFQXNexNygojaPbyy/oKmHIqGJrTaZjB8Sfp+scIQ/YTEZaUToQiJA6TW1hv2TAV9xEcJM1GPjWMKAinTFEvmMq3J1n81YbCt6eHRHsYMu7Qs2o6oy2y4/h4r9M2vxJjUVBy2oJ+JJxJoESqkWSB1zMq/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9M4YI3a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2030C4CED2;
-	Fri, 29 Nov 2024 12:23:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732883012;
-	bh=x6ds4depXJ3x1wS0EfDmuF9bTtZmMDhaiDzLRWiI5UU=;
-	h=Date:From:To:Cc:Subject:From;
-	b=k9M4YI3aucPoCkXM3faDD/1h6Me2Tuz+kcoKunXgdZaFa8Rnfy4ayYdY2QVxy3OTr
-	 k7NymP0TsqeViokqae97qf5KP9THD8rUEnRZua+Vik0qaRefIrLQz8qp4QMGwg9RW6
-	 BZUPURAbaHHbpUUirB/VieokL6pcQjZyEHJqhMrZ9pG7cbPpl4eOeEfGYQzPL/8hKk
-	 C93S8jxkUV1FJRehOpO31oIbbbWSWaJ7f8KA3u6ghEoFrSsKXBKZ28/ibbnW47rg/5
-	 F4LIGgzO44dDxmQ1a6L4dOBwHbLR1AtSHefcYiq5VnbeXgRlZ7nOnmnbxDHYB3MTeN
-	 RLPkqhaMqI2pg==
-Date: Fri, 29 Nov 2024 12:23:28 +0000
-From: Conor Dooley <conor@kernel.org>
+	s=arc-20240116; t=1732883257; c=relaxed/simple;
+	bh=BX6dNmRyBmtmvDOVfMug6Id+L2DaIwPG0ClQbElpQKE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=R2nEF7zw84ilGWYTWbNxa0kpj/pakRVvCwnIHzMZs1JU+BaSztawex4rFpkwZsRcIZ6v5Y1wtiYcUZ+N3bx6eVKpXbvxtOOc37wHAK5MgXp79yVzrzUj5MvsEMFGZcvkQ4rmbmf3HfzOMqE2eiCOQKIxmLqE2VdaNqvD+A9L7vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tH05r-0007jR-Pa
+	for netdev@vger.kernel.org; Fri, 29 Nov 2024 13:27:31 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tH05q-000mg8-2R
+	for netdev@vger.kernel.org;
+	Fri, 29 Nov 2024 13:27:31 +0100
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 3C9FB381123
+	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 12:27:31 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id DA8C6381101;
+	Fri, 29 Nov 2024 12:27:29 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 489071bb;
+	Fri, 29 Nov 2024 12:27:29 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, conor@kernel.org
-Subject: deadlock in macb_start_xmit() with PREEMPT_RT enabled
-Message-ID: <20241129-glimpse-wilt-8a9ba002d7bf@spud>
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/14] pull-request: can 2024-11-29
+Date: Fri, 29 Nov 2024 13:16:47 +0100
+Message-ID: <20241129122722.1046050-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="vVya7FBFnkVqn3JA"
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+Hello netdev-team,
 
---vVya7FBFnkVqn3JA
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+this is a pull request of 14 patches for net/master.
 
-Yo,
+The first patch is by me and allows the use of sleeping GPIOs to set
+termination GPIOs.
 
-Just reporting a deadlock that I've been seeing since PREEMPT_RT was
-merged in the cadence macb driver. I meant to report this weeks ago
-after mentioning it to Nicolas but it slipped my mind. With PREEMPT_RT
-disabled, the deadlock does not get reported.
+Alexander Kozhinov fixes the gs_usb driver to use the endpoints
+provided by the usb endpoint descriptions instead of hard coded ones.
 
-Cheers,
-Conor.
+Dario Binacchi contributes 11 statistics related patches for various
+CAN driver. A potential use after free in the hi311x is fixed. The
+statistics for the c_can, sun4i_can, hi311x, m_can, ifi_canfd,
+sja1000, sun4i_can, ems_usb, f81604 are fixed: update statistics even
+if the allocation of the error skb fails and fix the incrementing of
+the rx,tx error counters.
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.12.0-10553-gb86545e02e8c-dirty #1 Not tainted
-------------------------------------------------------
-kworker/0:1/9 is trying to acquire lock:
-ffffffe5c0abb460 (&bp->lock){+.+.}-{3:3}, at: macb_start_xmit+0x836/0xa3e
+The last patch is by me, targets the mcp251xfd driver and fixes the
+workaround for erratum DS80000789E 6.
 
-but task is already holding lock:
-ffffffe5c0ab9270 (&queue->tx_ptr_lock){+...}-{3:3}, at: macb_start_xmit+0x300/0xa3e
+regards,
+Marc
 
-which lock already depends on the new lock.
+---
 
+The following changes since commit 5ccdcdf186aec6b9111845fd37e1757e9b413e2f:
 
-the existing dependency chain (in reverse order) is:
+  net: xilinx: axienet: Enqueue Tx packets in dql before dmaengine starts (2024-11-03 14:35:11 -0800)
 
--> #3 (&queue->tx_ptr_lock){+...}-{3:3}:
-       __lock_acquire+0xadc/0xda6
-       lock_acquire+0x124/0x2d0
-       rt_spin_lock+0x3a/0x142
-       macb_start_xmit+0x300/0xa3e
-       dev_hard_start_xmit+0xf4/0x28c
-       sch_direct_xmit+0xbc/0x324
-       __dev_queue_xmit+0x5f6/0xb5e
-       neigh_resolve_output+0x122/0x15a
-       ip6_finish_output2+0x624/0xa06
-       ip6_output+0x182/0x35a
-       mld_sendpack+0x274/0x47e
-       mld_ifc_work+0x254/0x400
-       process_one_work+0x224/0x55a
-       worker_thread+0x236/0x360
-       kthread+0xf2/0x10c
-       ret_from_fork+0xe/0x18
+are available in the Git repository at:
 
--> #2 (_xmit_ETHER#2){+...}-{3:3}:
-       __lock_acquire+0xadc/0xda6
-       lock_acquire+0x124/0x2d0
-       rt_spin_lock+0x3a/0x142
-       sch_direct_xmit+0x80/0x324
-       __dev_queue_xmit+0x5f6/0xb5e
-       neigh_resolve_output+0x122/0x15a
-       ip6_finish_output2+0x624/0xa06
-       ip6_output+0x182/0x35a
-       mld_sendpack+0x274/0x47e
-       mld_ifc_work+0x254/0x400
-       process_one_work+0x224/0x55a
-       worker_thread+0x236/0x360
-       kthread+0xf2/0x10c
-       ret_from_fork+0xe/0x18
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.12-20241104
 
--> #1 ((softirq_ctrl.lock)){+.+.}-{3:3}:
-       __lock_acquire+0xadc/0xda6
-       lock_acquire+0x124/0x2d0
-       rt_spin_lock+0x3a/0x142
-       __local_bh_disable_ip+0x10c/0x1ec
-       local_bh_disable+0x1c/0x24
-       __netdev_alloc_skb+0x12e/0x232
-       gem_rx_refill+0xf6/0x1ae
-       gem_init_rings+0x56/0x110
-       macb_mac_link_up+0xc0/0x2d6
-       phylink_resolve+0x5f2/0x72e
-       process_one_work+0x224/0x55a
-       worker_thread+0x236/0x360
-       kthread+0xf2/0x10c
-       ret_from_fork+0xe/0x18
+for you to fetch changes up to 3c1c18551e6ac1b988d0a05c5650e3f6c95a1b8a:
 
--> #0 (&bp->lock){+.+.}-{3:3}:
-       check_noncircular+0x146/0x15c
-       validate_chain+0xb86/0x2806
-       __lock_acquire+0xadc/0xda6
-       lock_acquire+0x124/0x2d0
-       rt_spin_lock+0x3a/0x142
-       macb_start_xmit+0x836/0xa3e
-       dev_hard_start_xmit+0xf4/0x28c
-       sch_direct_xmit+0xbc/0x324
-       __dev_queue_xmit+0x5f6/0xb5e
-       neigh_resolve_output+0x122/0x15a
-       ip6_finish_output2+0x624/0xa06
-       ip6_output+0x182/0x35a
-       mld_sendpack+0x274/0x47e
-       mld_ifc_work+0x254/0x400
-       process_one_work+0x224/0x55a
-       worker_thread+0x236/0x360
-       kthread+0xf2/0x10c
-       ret_from_fork+0xe/0x18
+  can: mcp251xfd: mcp251xfd_get_tef_len(): fix length calculation (2024-11-04 18:01:07 +0100)
 
-other info that might help us debug this:
+----------------------------------------------------------------
+linux-can-fixes-for-6.12-20241104
 
-Chain exists of:
-  &bp->lock --> _xmit_ETHER#2 --> &queue->tx_ptr_lock
+----------------------------------------------------------------
+Alexander Hölzl (1):
+      can: j1939: fix error in J1939 documentation.
 
- Possible unsafe locking scenario:
+Dario Binacchi (1):
+      can: c_can: fix {rx,tx}_errors statistics
 
-       CPU0                    CPU1
-       ----                    ----
-  lock(&queue->tx_ptr_lock);
-                               lock(_xmit_ETHER#2);
-                               lock(&queue->tx_ptr_lock);
-  lock(&bp->lock);
+Geert Uytterhoeven (1):
+      can: rockchip_canfd: CAN_ROCKCHIP_CANFD should depend on ARCH_ROCKCHIP
 
- *** DEADLOCK ***
+Jean Delvare (1):
+      can: rockchip_canfd: Drop obsolete dependency on COMPILE_TEST
 
-15 locks held by kworker/0:1/9:
- #0: ffffffe5c084f538 ((wq_completion)mld){+.+.}-{0:0}, at: process_one_work+0x194/0x55a
- #1: ffffffc600063d88 ((work_completion)(&(&idev->mc_ifc_work)->work)){+.+.}-{0:0}, at: process_one_work+0x1b2/0x55a
- #2: ffffffe5c5228620 (&idev->mc_lock){+.+.}-{4:4}, at: mld_ifc_work+0x2e/0x400
- #3: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x32
- #4: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x32
- #5: ffffffe5fef5c210 ((softirq_ctrl.lock)){+.+.}-{3:3}, at: __local_bh_disable_ip+0x10c/0x1ec
- #6: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x34
- #7: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x2e
- #8: ffffffff81ca92c8 (rcu_read_lock_bh){....}-{1:3}, at: rcu_lock_acquire+0x0/0x2a
- #9: ffffffe5c4ce7398 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock){+...}-{3:3}, at: __dev_queue_xmit+0x458/0xb5e
- #10: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x34
- #11: ffffffe5c5721318 (_xmit_ETHER#2){+...}-{3:3}, at: sch_direct_xmit+0x80/0x324
- #12: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x34
- #13: ffffffe5c0ab9270 (&queue->tx_ptr_lock){+...}-{3:3}, at: macb_start_xmit+0x300/0xa3e
- #14: ffffffff81ca92a0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x0/0x34
+Marc Kleine-Budde (3):
+      can: m_can: m_can_close(): don't call free_irq() for IRQ-less devices
+      can: mcp251xfd: mcp251xfd_ring_alloc(): fix coalescing configuration when switching CAN modes
+      can: mcp251xfd: mcp251xfd_get_tef_len(): fix length calculation
 
-stack backtrace:
-CPU: 0 UID: 0 PID: 9 Comm: kworker/0:1 Not tainted 6.12.0-10553-gb86545e02e8c-dirty #1
-Hardware name: Microchip PolarFire-SoC Icicle Kit (DT)
-Workqueue: mld mld_ifc_work
-Call Trace:
-[<ffffffff80007870>] show_stack+0x2c/0x3c
-[<ffffffff80c205dc>] dump_stack_lvl+0x32/0x9a
-[<ffffffff80c20658>] dump_stack+0x14/0x1c
-[<ffffffff8009a950>] print_circular_bug+0x320/0x326
-[<ffffffff8009a3f0>] check_noncircular+0x146/0x15c
-[<ffffffff80097eb2>] validate_chain+0xb86/0x2806
-[<ffffffff80092c0e>] __lock_acquire+0xadc/0xda6
-[<ffffffff80091eb2>] lock_acquire+0x124/0x2d0
-[<ffffffff80c2bee2>] rt_spin_lock+0x3a/0x142
-[<ffffffff80870788>] macb_start_xmit+0x836/0xa3e
-[<ffffffff80a0a410>] dev_hard_start_xmit+0xf4/0x28c
-[<ffffffff80a6ed88>] sch_direct_xmit+0xbc/0x324
-[<ffffffff80a0b57c>] __dev_queue_xmit+0x5f6/0xb5e
-[<ffffffff80a1feec>] neigh_resolve_output+0x122/0x15a
-[<ffffffff80b2fcc0>] ip6_finish_output2+0x624/0xa06
-[<ffffffff80b2ac3a>] ip6_output+0x182/0x35a
-[<ffffffff80b67128>] mld_sendpack+0x274/0x47e
-[<ffffffff80b642dc>] mld_ifc_work+0x254/0x400
-[<ffffffff800451e6>] process_one_work+0x224/0x55a
-[<ffffffff8004754e>] worker_thread+0x236/0x360
-[<ffffffff8004e076>] kthread+0xf2/0x10c
-[<ffffffff80c324e2>] ret_from_fork+0xe/0x18
+Thomas Mühlbacher (1):
+      can: {cc770,sja1000}_isa: allow building on x86_64
 
---vVya7FBFnkVqn3JA
-Content-Type: application/pgp-signature; name="signature.asc"
+ Documentation/networking/j1939.rst             |  2 +-
+ drivers/net/can/c_can/c_can_main.c             |  7 ++++++-
+ drivers/net/can/cc770/Kconfig                  |  2 +-
+ drivers/net/can/m_can/m_can.c                  |  3 ++-
+ drivers/net/can/rockchip/Kconfig               |  3 ++-
+ drivers/net/can/sja1000/Kconfig                |  2 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-ring.c |  8 +++++---
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c  | 10 +++++++---
+ 8 files changed, 25 insertions(+), 12 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZ0myQAAKCRB4tDGHoIJi
-0lSzAP4/Mb0RONUDlGP+GtmT1lyoj6E760RDZFCMuYODbqiOCgD+MFQrrP0HpWjS
-t5pMcPKpm0FThkEso63mDLgTwV3qrgE=
-=/2XV
------END PGP SIGNATURE-----
-
---vVya7FBFnkVqn3JA--
 
