@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-147867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 696039DE929
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 16:15:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B04B29DE95C
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 16:29:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3DB0B22969
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 15:15:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7608A28239A
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 15:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B1B13BC39;
-	Fri, 29 Nov 2024 15:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC0D1422C7;
+	Fri, 29 Nov 2024 15:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IhQoyofM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BrGnU19w"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59DC208D7;
-	Fri, 29 Nov 2024 15:15:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7C8208CA;
+	Fri, 29 Nov 2024 15:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732893344; cv=none; b=BqUtxykCcFKrqod/EZACYcoz2z63xvd+vW6t6ayzLIs+3JR+iU6m532qj4RZUw49GrMEPPwEI3Z2Je03Q5mH89ikJaYIslq+7cqfWh5zvHS1t6AKdtmYazlfJBA95Z6acbAB9JsQhY6FZJFQB8C7AkrcQlrju/yj2N8mxpbisXE=
+	t=1732894151; cv=none; b=eJleWiXb4FLSgh41Ba+4XoRSVzlCMIjyktmHoHl4YzrwsLqZ6ieyxDb7JN4pfwIHwLjthWOYY8uwnirjp8BUD4eUYvwWYVxXlqXvhQr3RSKz97PB02yuYHdO0VZJdHd7HUmnMFLjUBhOvbS3jBUXRGpbroq72DrwMDqNuZGPy48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732893344; c=relaxed/simple;
-	bh=rUZ5NIdEIYlCn8HyzSe6zl5HHKhzIBZ4/pYs2KTpGfU=;
+	s=arc-20240116; t=1732894151; c=relaxed/simple;
+	bh=lfmDZAdOZcwsj0j9s3hNP6RbUmz5QvoDJrRmMvPJITI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LWhBnZbM91t20WPiTmjaj75PgKCBemHzVP1BXdO7Jmyqq+sbaiYE3zYA+Hsr81rMFbZ7E/O6+RNexKmhi4fNZiqr2TaYs/RfAPJkaPH7Wbipym5qS9honJWZAS4zqYBX+iUbuHedHfK3qWMjEY2TwdBA+HrN+NU+x6gW551IwS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IhQoyofM; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=I7jj2eQHpTTuf3IsdU7f4MzFOq8Ukwi5r839vMfDorvtuEzhwFdY7k6Qd8/lLU34Vml+XOKsbcui1HjBSqE4NBqii77uELz/vBrzJjyT9zFQAg5bVLIfGbe/AzD5ZjzJR6bGFllqlmmjVcROX5ZtM6sQbA6cuT/xk8ufJKf+dEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BrGnU19w; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0NBukuuVJgfoFTSUK27Phbsx0LrIXsMWovFBCA0Cxj4=; b=IhQoyofMOjBrm7kgThO9Ko8q2w
-	wvHLp4TacAhK4nI7DHjDhadds602NfZDUog1x0bR/pFqj4iNaEA7UcWIou4uFi/XdpmpDob74cWWL
-	KMSm4lmWHiXH1fHjxZEXBswh1khB3znp/ccOCKERKOLLIMuEHDiP8ZR7G8QtB713DmhY=;
+	bh=MKLFyWXQI6exBSS0mW7Tm+wDxmLwRTvmq+HQx8mM2v4=; b=BrGnU19wKVt8sK1IDm0aNQuqcQ
+	ND3qjMakLiuVMAZUMNZl3bxzIbpQ+Jjx7F7EiIox+jWQ+V+M50ddJa9etJZM6ZxdY4DIoRwm1vuWj
+	hH8TS3C7yAm7/HWkFj/Af2bvDXO+QpiUwN057gzjqpFc5PQETwGPINpI9UMSdDO7quK0=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tH2iW-00EmLR-JA; Fri, 29 Nov 2024 16:15:36 +0100
-Date: Fri, 29 Nov 2024 16:15:36 +0100
+	id 1tH2vX-00EmO0-Fm; Fri, 29 Nov 2024 16:29:03 +0100
+Date: Fri, 29 Nov 2024 16:29:03 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Yijie Yang <quic_yijiyang@quicinc.com>
 Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
@@ -56,7 +56,7 @@ Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
 	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: qcs615-ride: Enable ethernet
  node
-Message-ID: <e1c192ff-4fe9-4473-92ba-4c3a40ab99da@lunn.ch>
+Message-ID: <4a6a6697-a476-40f4-b700-09ef18e4ba22@lunn.ch>
 References: <20241118-dts_qcs615-v2-0-e62b924a3cbd@quicinc.com>
  <20241118-dts_qcs615-v2-2-e62b924a3cbd@quicinc.com>
  <ececbbe1-07b3-4050-b3a4-3de9451ac7d7@lunn.ch>
@@ -64,6 +64,7 @@ References: <20241118-dts_qcs615-v2-0-e62b924a3cbd@quicinc.com>
  <c2800557-225d-4fbd-83ee-d4b72eb587ce@oss.qualcomm.com>
  <3c69423e-ba80-487f-b585-1e4ffb4137b6@lunn.ch>
  <2556b02c-f884-40c2-a0d4-0c87da6e5332@quicinc.com>
+ <75fb42cc-1cc5-4dd3-924c-e6fda4061f03@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,41 +73,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2556b02c-f884-40c2-a0d4-0c87da6e5332@quicinc.com>
+In-Reply-To: <75fb42cc-1cc5-4dd3-924c-e6fda4061f03@quicinc.com>
 
-> > The usual setting here is 'rgmmii-id', which means something needs to
-> > insert a 2ns delay on the clock lines. This is not always true, a very
-> > small number of boards use extra long clock likes on the PCB to add
-> > the needed 2ns delay.
-> > 
-> > Now, if 'rgmii' does work, it means something else is broken
-> > somewhere. I will let you find out what.
-> 
-> The 'rgmii' does function correctly, but it does not necessarily mean that a
-> time delay is required at the board level. The EPHY can also compensate for
-> the time skew.
+> I was mistaken earlier; it is actually the EMAC that will introduce a time
+> skew by shifting the phase of the clock in 'rgmii' mode.
 
-Basic definitions for phy-mode:
+This is fine, but not the normal way we do this. The Linux preference
+is that the PHY adds the delays. There are a few exceptions, boards
+which have PHYs which cannot add delays. In that case the MAC adds the
+delays. But this is pretty unusual.
 
-rgmii: Indicates the board provides the delays, normally via extra
-long clock lines.
-
-rgmii-id: The board does not provide the delay, the software need to
-arrange that either the MAC or the PHY adds the delays.
-
-We then have the values passed between the MAC and the PHY driver:
-PHY_INTERFACE_MODE_RGMII: The PHY should not add delays
-PHY_INTERFACE_MODE_RGMII_ID: The PHY should add delays.
-
-A typical MAC/PHY combination, phy-mode is passed to the PHY, and the
-PHY adds the delays, if needed.
-
-This is why i said there are probably two bugs:
-
-1) phy-mode rgmii should probably be rgmii-id
-
-2) The PHY is adding delays when it should not be, because it is being
-   passed PHY_INTERFACE_MODE_RGMII not PHY_INTERFACE_MODE_RGMII_ID.
+If you decided you want to be unusual and have the MAC add the delays,
+it should not be hard coded. You need to look at phy-mode. Only add
+delays for rgmii-id. And you then need to mask the value passed to the
+PHY, pass PHY_INTERFACE_MODE_RGMII, not PHY_INTERFACE_MODE_RGMII_ID,
+so the PHY does not add delays as well.
 
 	Andrew
 
