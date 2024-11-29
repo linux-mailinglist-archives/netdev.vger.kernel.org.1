@@ -1,86 +1,100 @@
-Return-Path: <netdev+bounces-147800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABBA59DBE80
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 02:59:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C94789DBE8F
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 03:13:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A4AAB20CE9
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 01:59:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E87D2824E2
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 02:13:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 109EC13B7A3;
-	Fri, 29 Nov 2024 01:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7684F14B08E;
+	Fri, 29 Nov 2024 02:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HXEmgGFN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PgvBI4xJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886FD1386DA
-	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 01:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F043922EE4;
+	Fri, 29 Nov 2024 02:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732845557; cv=none; b=qZumpcbY4Tht44x2QX7JwbdiU4b4X3dm6i5NtVSiahNAZT0jVP743MabBfEdsFf6J6EFEskAFl2y2n5Hpc+ulYAfee6Dl0vNmE9gfV6vvTo3WtufrbYdwS77owJOyQqa/TemGt7ConcLJyM/Mi8XesbnkD95JTpjd7DHS8/qKHE=
+	t=1732846410; cv=none; b=s4igcodpUerfko0sJut1YCOmxZaIy3r3PagHiV9T57dXgMDUXBYpw396p/xmgZDG7FZo/3M62p0ZgsY7g259FUe36W1jn7P0GDil7XlnQ2tiVnDr1WmdiUvUglxYTTpgZ4McP+3OU/usL1yElH/egY9UtjpdGBMOJYl46uUvvI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732845557; c=relaxed/simple;
-	bh=lyDDqU5fPmxLyGjsg7dIl4Yau70OmpuEXhcGX7d0GPk=;
+	s=arc-20240116; t=1732846410; c=relaxed/simple;
+	bh=tlX6/XQDENq68SPtN7Fe1eSVuzsBAK7YJwk0y5vXzRw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oE6gTc9e3ErsgIPzZmPEo17McVvD/JUUy2qq5CFEUh/6/PmxdhBIsH9Wh5kCV+BGZxPTw/3rReamsMgQsj9zgp7X7BfGj6pYiYWiNYFWkDX79Tq+62FzbvYGtLdfKRqYwDe6cX7Q3VHiZV+sIUIaVQJa2aylj5I54+NvRSp1gW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HXEmgGFN; arc=none smtp.client-ip=209.85.214.182
+	 Content-Type:Content-Disposition:In-Reply-To; b=SG2uIST8v8tQWZ+a5iKu7fiY9Yo8ruNRvLUGZSVznTPpk65GOJ5mIetcj/QdfU+E2N1mftFzWBGnAhqAWlyP50TOxYkw+sYV5eX9TKoesK8jfOrBYQv9PAudSdJQM9N+FQduegOB0+HDFgcTOwHyfI5z30JbW+NedmXult2CBho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PgvBI4xJ; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2124a86f4cbso10116195ad.3
-        for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 17:59:15 -0800 (PST)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-720c286bcd6so1177757b3a.3;
+        Thu, 28 Nov 2024 18:13:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732845555; x=1733450355; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1732846408; x=1733451208; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fzO6VXHjHdzTlhh2EE5SsrFQEUBPsjVZ9JE0iRQcsK0=;
-        b=HXEmgGFNcouoI84MVYEwHniYtaOnqGMj1fCRGpt6z72Wn8Ue6ej+Cv2iI6JjtenRd4
-         IPjh6OWsmur5bozAqGPzyI1BXOvrDqaPNCGbYd5jJhIZ6nOKE5xXJnzQ8UYplSraLp56
-         Kg3guClHcoXBcUD+7vhBahKRxFLPjLyvzN0RCKI3BTL+Q5zjbaQCf1437nYvRYyh9+Xz
-         eIsQOwke+6Oc1KkFYuqboJJ9lX7LuMYOfxUss30BddkekyNJkmYYkbg7GnQ/GIdXpA4T
-         mzhA101p/GSCBTkUwtwO/1H5uAzzgEpWqIIx4W2HXt+IENzBkIO4XACvoFBELOrRxMR2
-         57bw==
+        bh=I5D5xIlc/ZBMWEK/AcW6+gAFQKxMNC/t84nQ8vJYuSU=;
+        b=PgvBI4xJHTJfyZatuXm89e3+yMaTbry/fd75Ii8m6AaSP8iRwmEtwPc/PlrJD0P0Dn
+         0QjKXAAXx/LSJ37bwdrkBN2TNqig0SIy35sTvDi/nke0H+QE3t6gU4kA3b+H/o0KLDUs
+         19e9ftdEWGExloRYzZTDq0q/3AZrTEOhQiV/mzi38IFO/7Rr1EcGomfzBhP82Ydgdaie
+         FCFwURZ96pQjHxZF3KbjKQz5WRue832tYTfkjeQStKq2J7GD260mMqwWKj3TDBBdjSC3
+         VKsj2GUjnoOZF5Viu892RgyvvEIJhOF3LCtwg7vJhaRsZIR7XC+HvQ3rIN/yX2kaVof5
+         A9BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732845555; x=1733450355;
+        d=1e100.net; s=20230601; t=1732846408; x=1733451208;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fzO6VXHjHdzTlhh2EE5SsrFQEUBPsjVZ9JE0iRQcsK0=;
-        b=Tim2fsiFnssy7fMiJYzVjgE2OSG1anOIfpKuQSSvt3JgA7kJzJvJKphvp9h8dvz33d
-         5pBopIRL1KsILj8zJfB6FwWHAKji2XQ2y76dk2wR7kBPzq2NVPgIukTCqCMwYb36pxjC
-         jYaWZ4HYunYEg481UZ0ClUcmPzjcAP6Qbolv2RrArc3oilacIIrEFe/91yljgX1Q1Xx/
-         F+M6kqm/WHeOVLREVC1/RFXOEk6QAjCVCxNmhsOyERL7n8gcBc/dc0siinUVWkJGUsdz
-         BprWXqwVScpna5r5eIyBBP+6gy4nWD2JEASCl2TzooMcJyLhSlickgL4l7pAbOOAV+rx
-         gdCQ==
-X-Gm-Message-State: AOJu0YxyYu45f2qg4gE361IqloQ7S8Z6WOAe9PUkAsG3/ZgouFym7GbF
-	hWxwQ5CXVHKxuhwA2UMlGFsl91hQ2erq8/ejqX1GR+Isg4qHrzYL
-X-Gm-Gg: ASbGncu6ZLJO7rZ6U3Wt8W+PUrweKxORBxm06U9cyz0sEDJgnJEWZQeeQN4wPPq1lS6
-	fRZeTiZko6f56RIf3EM002jXH4+55QaeOPxdjQT0Muc5DszRdGpydDsJsii/i7zfkMV+wcpnznw
-	6z4PBxxaJN5euJp3KeiYlu/Yt8MiGlUorZp/ywXvzkZfnmQzCvXNafqD6ChKCBrsxtPswCLGaOG
-	+fFl9M8bCrP+bx/qbY4xjlFew+Flu41Zt4vhoFLygktByK24rDOYSfa
-X-Google-Smtp-Source: AGHT+IGg8DOI+6IfDQ4t3RQCL08qcbfUr98hEEwUys79Yyr+QV3AuWombuRwlGf2y5LhINap+ZrFQQ==
-X-Received: by 2002:a17:903:986:b0:20b:8776:4902 with SMTP id d9443c01a7336-21501b63d3dmr131935355ad.38.1732845554772;
-        Thu, 28 Nov 2024 17:59:14 -0800 (PST)
-Received: from localhost ([2601:647:6881:9060:7990:ba58:c520:e7e8])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21521983555sm20413895ad.172.2024.11.28.17.59.14
+        bh=I5D5xIlc/ZBMWEK/AcW6+gAFQKxMNC/t84nQ8vJYuSU=;
+        b=AUkfPrFKfU39FBTg42bGa1NOI61FGy3UTSQlAklgE3mv+fq+Cp6EbuzOX2hMOoF4LJ
+         +arUJXDIWOh2kozPKb07cxunCw5dEPZG5W+iG1H995ArJ2ti9BVUkIE8iotwyQZfa4xe
+         IxOdVpGO83KiM8piidRNBhVj0CO3NW8jpA/eotqeMgs5UvAoGCxYr1FSOkC/TS26SYul
+         JMga1OC0MBbzoBNVnvaxMAdZIM6daFMsGlVzZF9+Ol/TjUpYMxusoLZaFLR355ISdrnW
+         04f6dXhevzkkZ0PyDMwXPXqBLpCNcKMs/7O3isNHMrJ4AdErNYeAqOzqxrnCKGti+5rY
+         M7mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0LJ3/aLyFIbiCN/7ztrOdwQ1XrsKka1+E41jouZiDoYqVJaxhMYWmECgTy5tgyLBjAmPcsPwB@vger.kernel.org, AJvYcCVSmg4u8ekQkuOhTn4GjP4r84bwjZ/0i5klI3DL0ZqGeocXvbvPl2QxhlzTDpY8y2QXnxCqmHJwdXCXFeni@vger.kernel.org, AJvYcCVVMFhQF/4hWZJZOv/pa9wocBasaYwq3cYHvknONpwwS/funvFrtye5vI6Gwuzx8wqsjZQ=@vger.kernel.org, AJvYcCXufN+wgEqsRGq3D80p47Npc/S+RZTl9+oe24zynQ8BOVRsmGfBOQEVfxLyel4ajr8v1OPk5fV41RVau1Qr@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6VP+MSesCzxEcaiU6/9+B8q1idCYC2pE6RnADsv25t9L2xmej
+	93lbAniZ+TzPYdUMd4oT+mgQKITMgMr6RTcwKjCj4fv8nmUo3QZf
+X-Gm-Gg: ASbGncsHpXMd/s0s1q2nSqEJS9KqhF0VjKftxsZcXb5bPoAxCkJYfn/hILJHBmDzsGj
+	5cgxNeg2HONh6T2F/bo5RhiPWNeBY7lqk6ejXxVm7h2Uw3x/y6NtPbtxe0qI9JQrFQmYFgtY+sY
+	5lDM9wbW1muVu5Dr0P80g4vXvh0WAMr+1cnUsa2pmfRJaes35NbQ9vrhrP+dod0woY8W5IYUy5R
+	0IOGsYdSt17nNhXEQbCUPU8ozuACt3yTMd1wIPNuGSAmw3mPA==
+X-Google-Smtp-Source: AGHT+IGqFTiYoTjvaLKfmNfHn95RvWItWMTQ6GkGXRx6Dzs/7816TwnR2BQ/RSHj0KT2VsnPH5AQoQ==
+X-Received: by 2002:a05:6a00:1d89:b0:725:3bd4:9b96 with SMTP id d2e1a72fcca58-7253bd49d87mr9451378b3a.2.1732846408083;
+        Thu, 28 Nov 2024 18:13:28 -0800 (PST)
+Received: from localhost ([216.228.125.131])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72541762411sm2380319b3a.20.2024.11.28.18.13.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Nov 2024 17:59:14 -0800 (PST)
-Date: Thu, 28 Nov 2024 17:59:13 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net,
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+        Thu, 28 Nov 2024 18:13:27 -0800 (PST)
+Date: Thu, 28 Nov 2024 18:13:25 -0800
+From: Yury Norov <yury.norov@gmail.com>
+To: Michael Kelley <mhklinux@outlook.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	Long Li <longli@microsoft.com>, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Leon Romanovsky <leon@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
-	Davide Caratti <dcaratti@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net] net: sched: fix erspan_opt settings in cls_flower
-Message-ID: <Z0kf8QQjeHjDr6IU@pop-os.localdomain>
-References: <1e82b053724375528e82a4f21fe1778c59bb50c0.1732568211.git.lucien.xin@gmail.com>
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Dexuan Cui <decui@microsoft.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: mana: Fix memory leak in mana_gd_setup_irqs
+Message-ID: <Z0kjRcX1hXYQhw2Q@yury-ThinkPad>
+References: <20241128194300.87605-1-mlevitsk@redhat.com>
+ <SN6PR02MB4157DBBACA455AC00A24EA08D4292@SN6PR02MB4157.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,66 +103,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1e82b053724375528e82a4f21fe1778c59bb50c0.1732568211.git.lucien.xin@gmail.com>
+In-Reply-To: <SN6PR02MB4157DBBACA455AC00A24EA08D4292@SN6PR02MB4157.namprd02.prod.outlook.com>
 
-On Mon, Nov 25, 2024 at 03:56:51PM -0500, Xin Long wrote:
-> When matching erspan_opt in cls_flower, only the (version, dir, hwid)
-> fields are relevant. However, in fl_set_erspan_opt() it initializes
-> all bits of erspan_opt and its mask to 1. This inadvertently requires
-> packets to match not only the (version, dir, hwid) fields but also the
-> other fields that are unexpectedly set to 1.
-
-Do you have a test case for this? Please consider adding one (in a
-separate patch) to tools/testing/selftests/tc-testing/.
-
+On Thu, Nov 28, 2024 at 09:49:35PM +0000, Michael Kelley wrote:
+> From: Maxim Levitsky <mlevitsk@redhat.com> Sent: Thursday, November 28, 2024 11:43 AM
+> > 
+> > Commit 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
+> > added memory allocation in mana_gd_setup_irqs of 'irqs' but the code
+> > doesn't free this temporary array in the success path.
+> > 
+> > This was caught by kmemleak.
+> > 
+> > Fixes: 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  drivers/net/ethernet/microsoft/mana/gdma_main.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > index e97af7ac2bb2..aba188f9f10f 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > @@ -1375,6 +1375,7 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+> >  	gc->max_num_msix = nvec;
+> >  	gc->num_msix_usable = nvec;
+> >  	cpus_read_unlock();
+> > +	kfree(irqs);
+> >  	return 0;
+> > 
+> >  free_irq:
 > 
-> This patch resolves the issue by ensuring that only the (version, dir,
-> hwid) fields are configured in fl_set_erspan_opt(), leaving the other
-> fields to 0 in erspan_opt.
+> FWIW, there's a related error path leak. If the kcalloc() to populate
+> gc->irq_contexts fails, the irqs array is not freed. Probably could
+> extend this patch to fix that leak as well.
 > 
-> Fixes: 79b1011cb33d ("net: sched: allow flower to match erspan options")
-> Reported-by: Shuang Li <shuali@redhat.com>
-> Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> ---
->  net/sched/cls_flower.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-> index e280c27cb9f9..c89161c5a119 100644
-> --- a/net/sched/cls_flower.c
-> +++ b/net/sched/cls_flower.c
-> @@ -1369,7 +1369,6 @@ static int fl_set_erspan_opt(const struct nlattr *nla, struct fl_flow_key *key,
->  	int err;
->  
->  	md = (struct erspan_metadata *)&key->enc_opts.data[key->enc_opts.len];
-> -	memset(md, 0xff, sizeof(*md));
->  	md->version = 1;
->  
->  	if (!depth)
-> @@ -1398,9 +1397,9 @@ static int fl_set_erspan_opt(const struct nlattr *nla, struct fl_flow_key *key,
->  			NL_SET_ERR_MSG(extack, "Missing tunnel key erspan option index");
->  			return -EINVAL;
->  		}
-> +		memset(&md->u.index, 0xff, sizeof(md->u.index));
->  		if (tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_INDEX]) {
->  			nla = tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_INDEX];
-> -			memset(&md->u, 0x00, sizeof(md->u));
->  			md->u.index = nla_get_be32(nla);
->  		}
->  	} else if (md->version == 2) {
-> @@ -1409,10 +1408,12 @@ static int fl_set_erspan_opt(const struct nlattr *nla, struct fl_flow_key *key,
->  			NL_SET_ERR_MSG(extack, "Missing tunnel key erspan option dir or hwid");
->  			return -EINVAL;
->  		}
-> +		md->u.md2.dir = 1;
->  		if (tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_DIR]) {
->  			nla = tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_DIR];
->  			md->u.md2.dir = nla_get_u8(nla);
->  		}
-> +		set_hwid(&md->u.md2, 0x3f);
+> Michael
 
-I think using 0xff is easier to understand, otherwise we would need to
-look into set_hwid() to figure out what 0x3f means. :-/
-
-Thanks!
+That's why we've got a __free() macro in include/linux/cleanup.h
 
