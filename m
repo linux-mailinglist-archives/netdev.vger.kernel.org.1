@@ -1,92 +1,135 @@
-Return-Path: <netdev+bounces-147813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8628C9DBF9F
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 08:08:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 504B79DBFC8
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 08:36:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 425BD164A9B
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 07:08:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1D2516299F
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 07:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D895156646;
-	Fri, 29 Nov 2024 07:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1761537DA;
+	Fri, 29 Nov 2024 07:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="TV2HOj4N"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 674AB1386DA;
-	Fri, 29 Nov 2024 07:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871F3184F
+	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 07:36:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732864099; cv=none; b=KCPGJBdvBWRYdqW0DoO67+vdbeZTQC0qb7XNB0qsUIQT91+nUCSq93KYBOzzWG3vGRpwo6aBvpA9UmlNKiC3qoM5AAlxirmaPrhF/zvwx2jAtazbzi6zPIDBUPiGsJwnXnqlZzzqR/vSNZrEA0N91dlMmSI0/RUcLjzTb4DY2Hs=
+	t=1732865780; cv=none; b=Xw61HHONvepvl4Nf5tl5E1n/iliOIKvUdoONEk+oUHqF/xKPFJFAntYXbK1P4SgY5AVb/cWX6JNOIi/dcYmDVkCFOv+0jxL9ozL92FiJYEYD3yBhdAt28wcrkNQu05w18Qkac9OmlLemj6yPlFRvZ6IqbhOyaSl8Li/87PPc94A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732864099; c=relaxed/simple;
-	bh=0W4gdl3LHtpXQqUcw6Hs+0eg26faz4Iu1fqKfJtsO1Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IHOO5e8KljSU9prUZ8DYm3rHAAMVuYeJLGzwx2bT7DtPFlX39BGex6CbmH+7HL/hyT3OS8gL9oDLhegEAeE7/mUM7Y0h/l2jfoWS5AAe8XN/zQdiLeJM9gwJWJmFtKvhv2Oxu7cQjA9vAAANknVX4unsffomgquHGmzwREKCwgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1tGv6j-0006q3-6S; Fri, 29 Nov 2024 08:08:05 +0100
-Date: Fri, 29 Nov 2024 08:08:05 +0100
-From: Florian Westphal <fw@strlen.de>
-To: =?utf-8?B?U3rFkWtl?= Benjamin <egyszeregy@freemail.hu>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, kadlec@netfilter.org,
-	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] netfilter: uapi: Fix file names for case-insensitive
- filesystem.
-Message-ID: <20241129070805.GA26153@breakpoint.cc>
-References: <20241111163634.1022-1-egyszeregy@freemail.hu>
- <20241111165606.GA21253@breakpoint.cc>
- <ZzJORY4eWl4xEiMG@calendula>
- <5f28d3d4-fa55-425c-9dd2-5616f5d4c0ac@freemail.hu>
+	s=arc-20240116; t=1732865780; c=relaxed/simple;
+	bh=C++RCFCnEmKpxpAcZXP95owrmD3LxrsxtPhDm6kuk44=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=U96iopIc1bKicolf+Nbj/Mv6MV1UxZ4OnRNVvqcgvOifaa51aSfk1SB0+EAFPxcbe9hJKkmuI+FmAoA9L1kbyPnbogN40QOMlM4WE2O5cdw48ASEt5aQtH7dT57jCThGeDpokVlJ/jyh0CO1c6uGSDkIH6AVouJWVMyPg5mRt/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=TV2HOj4N; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1732865778; x=1764401778;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=suiVFLSlVMWuuw5sPLr3XRGL9BvfwNQ36MD1q3sDEWQ=;
+  b=TV2HOj4N360jr9uZgnk4KdGauTta6lxdxgPFTNAXrzpDo0+q+P/EiEg+
+   szukVbZLKJgroKtW+es9Wu8F/GRxSmxcXgNlqOMT9IvdwN+fk7y62GyP9
+   XPL3x5cYD9pNn+unDuvuJoE/9Kl8+NioSleDhe2yK0piYEKPt2daV7Dr3
+   E=;
+X-IronPort-AV: E=Sophos;i="6.12,194,1728950400"; 
+   d="scan'208";a="148886304"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2024 07:36:15 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:40197]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.190:2525] with esmtp (Farcaster)
+ id 99c059aa-9f43-4482-9a77-a74ae7f21ee7; Fri, 29 Nov 2024 07:36:15 +0000 (UTC)
+X-Farcaster-Flow-ID: 99c059aa-9f43-4482-9a77-a74ae7f21ee7
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 29 Nov 2024 07:36:15 +0000
+Received: from 6c7e67c6786f.amazon.com (10.37.244.8) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 29 Nov 2024 07:36:12 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <xiyou.wangcong@gmail.com>
+CC: <cong.wang@bytedance.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<syzbot+21ba4d5adff0b6a7cfc6@syzkaller.appspotmail.com>
+Subject: Re: [Patch net] rtnetlink: catch error pointer for rtnl_link_get_net()
+Date: Fri, 29 Nov 2024 16:36:09 +0900
+Message-ID: <20241129073609.30713-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241129063112.763095-1-xiyou.wangcong@gmail.com>
+References: <20241129063112.763095-1-xiyou.wangcong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <5f28d3d4-fa55-425c-9dd2-5616f5d4c0ac@freemail.hu>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Szőke Benjamin <egyszeregy@freemail.hu> wrote:
-> and lower case *.h files can be merged to a common header files like
-> "xt_dscp_common.h" but what about the *.c sources? For example if xt_DSCP.c
-> removed and its content merged to xt_dscp.c before, what is the plan with
-> kernel config options of CONFIG_NETFILTER_XT_TARGET_DSCP which was made for
-> only xt_DSCP.c source to use in Makefile? Can we remove all of
-> CONFIG_NETFILTER_XT_TARGET* config in the future which will lost their *.c
-> source files?
+From: Cong Wang <xiyou.wangcong@gmail.com>
+Date: Thu, 28 Nov 2024 22:31:12 -0800
+> From: Cong Wang <cong.wang@bytedance.com>
+> 
+> Currently all callers of rtnl_link_get_net() assume that it always
+> returns a valid netns pointer,
 
-Sure.
+because I assume it's always tested in rtnl_add_peer_net()...
 
-> obj-$(CONFIG_NETFILTER_XT_TARGET_DSCP) += xt_DSCP.o
-> ...
 
-This line goes away.
+> when rtnl_link_get_net_ifla() fails,
+> it uses 'src_net' as a fallback.
+> 
+> This is not true,
 
-> obj-$(CONFIG_NETFILTER_XT_MATCH_DSCP) += xt_dscp.o
+because rtnl_link_get_net_ifla() isn't called if (!data ||
+!data[ops->peer_type]),
 
-This line is changed to
+so the correct fix is:
 
-obj-$(CONFIG_NETFILTER_XT_DSCP) += xt_dscp.o
+---8<---
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index dd142f444659..c1f4aaa40823 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -3815,6 +3815,10 @@ static int rtnl_add_peer_net(struct rtnl_nets *rtnl_nets,
+ 	struct net *net;
+ 	int err;
+ 
++	net = rtnl_link_get_net_ifla(tb);
++	if (IS_ERR(net))
++		return PTR_ERR(net);
++
+ 	if (!data || !data[ops->peer_type])
+ 		return 0;
+ 
+@@ -3828,9 +3832,6 @@ static int rtnl_add_peer_net(struct rtnl_nets *rtnl_nets,
+ 			return err;
+ 	}
+ 
+-	net = rtnl_link_get_net_ifla(tb);
+-	if (IS_ERR(net))
+-		return PTR_ERR(net);
+ 	if (net)
+ 		rtnl_nets_add(rtnl_nets, net);
+ 
+---8<---
 
-Kconfig file NETFILTER_XT_TARGET/MATCH_DSCP are changed to
-select new NETFILTER_XT_MATCH_DSCP.
 
-This has been done before, see e.g.
-28b949885f80 ("netfilter: xtables: merge xt_MARK into xt_mark")
-
-you can follow this almost 1:1.
+> because rtnl_link_get_net_ifla() can return an
+> error pointer too, we need to handle this error case and propagate
+> the error code to its callers.
+> 
+> Add a comment to better document its return value.
 
