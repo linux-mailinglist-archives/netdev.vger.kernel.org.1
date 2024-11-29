@@ -1,86 +1,112 @@
-Return-Path: <netdev+bounces-147866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7A7B9DE8FE
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 15:55:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 696039DE929
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 16:15:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31416B21640
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 14:55:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3DB0B22969
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 15:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D7F13B280;
-	Fri, 29 Nov 2024 14:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B1B13BC39;
+	Fri, 29 Nov 2024 15:15:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yzQx5b75"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IhQoyofM"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA7012C54B
-	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 14:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59DC208D7;
+	Fri, 29 Nov 2024 15:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732892131; cv=none; b=BSENGoHPW1DJRHGPwlXPxApVCbiJieZrbRSJ1Fmnf1vOvWT3nvlvShqaQKJkK5vMVbnFNPNecvVdphW9eRgYazh+ddL8xA4fgfYjvZY8flnFIaHl8mGI4h3nSASyDU0JY9mmbyJ4C0C0gSVx5pHMkRkDhT8ikP/PPiNHhWZQBvc=
+	t=1732893344; cv=none; b=BqUtxykCcFKrqod/EZACYcoz2z63xvd+vW6t6ayzLIs+3JR+iU6m532qj4RZUw49GrMEPPwEI3Z2Je03Q5mH89ikJaYIslq+7cqfWh5zvHS1t6AKdtmYazlfJBA95Z6acbAB9JsQhY6FZJFQB8C7AkrcQlrju/yj2N8mxpbisXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732892131; c=relaxed/simple;
-	bh=6D9bHYJhfcicOyo0h+wUK6p2bT4pC0YQsIiDuGkY0dE=;
+	s=arc-20240116; t=1732893344; c=relaxed/simple;
+	bh=rUZ5NIdEIYlCn8HyzSe6zl5HHKhzIBZ4/pYs2KTpGfU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Up/mi44kkhOVCT7EMUk+XlMr5uDPuoJhNmJ71qO59mdww6yr13fyoQs7oXQL6ODdIWR79NWhOKFxejL66rhfU8UNQjVILkIXsxrAfEfWwg/LQD1Yi+1nCZoBGS/N+hhI3A9E90T5DeVhOznSuOMuDTpUfH6FEzI7I2VjuzjAZJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yzQx5b75; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=LWhBnZbM91t20WPiTmjaj75PgKCBemHzVP1BXdO7Jmyqq+sbaiYE3zYA+Hsr81rMFbZ7E/O6+RNexKmhi4fNZiqr2TaYs/RfAPJkaPH7Wbipym5qS9honJWZAS4zqYBX+iUbuHedHfK3qWMjEY2TwdBA+HrN+NU+x6gW551IwS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IhQoyofM; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=Z/MUXJ13C4OYGPKgYFEyHTZYYNTEtrQwRAdBo6EEdLg=; b=yz
-	Qx5b75kH3DcHHbrzVh+BEaVxSU19QPKkXLHiH5Bau/fpwAmAGi3JfRpyeMEy97T139Qchk3Xojpx9
-	Bpp+E3GaHob9pbHRezWM9DCz3JU9ZKMtbOBAP6ORXlAgiiRceJl9Brzg/HgFyXkaywpYJKe+p2MBU
-	/Ji/CuL9UjpIG9I=;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0NBukuuVJgfoFTSUK27Phbsx0LrIXsMWovFBCA0Cxj4=; b=IhQoyofMOjBrm7kgThO9Ko8q2w
+	wvHLp4TacAhK4nI7DHjDhadds602NfZDUog1x0bR/pFqj4iNaEA7UcWIou4uFi/XdpmpDob74cWWL
+	KMSm4lmWHiXH1fHjxZEXBswh1khB3znp/ccOCKERKOLLIMuEHDiP8ZR7G8QtB713DmhY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tH2Oz-00EmG3-Sf; Fri, 29 Nov 2024 15:55:25 +0100
-Date: Fri, 29 Nov 2024 15:55:25 +0100
+	id 1tH2iW-00EmLR-JA; Fri, 29 Nov 2024 16:15:36 +0100
+Date: Fri, 29 Nov 2024 16:15:36 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Michal Kubecek <mkubecek@suse.cz>, kernel@pengutronix.de,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2] ethtool: add support for
- ETHTOOL_A_CABLE_FAULT_LENGTH_SRC and ETHTOOL_A_CABLE_RESULT_SRC
-Message-ID: <3774dd61-6074-4cd9-97e0-aab7a275f428@lunn.ch>
-References: <20241128090111.1974482-1-o.rempel@pengutronix.de>
- <919a9842-f719-41ac-96fb-ae24d2f0798f@lunn.ch>
- <eajj4mhvqkwrl7lmsrmjy32sncanymqefhxkv4cpnjvxnf2v7o@o6vtfpu7pyym>
- <9d8b7d97-75b8-4e39-91c5-dd56b157ce84@lunn.ch>
- <Z0lbGyg99mNN4V7L@pengutronix.de>
+To: Yijie Yang <quic_yijiyang@quicinc.com>
+Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: qcs615-ride: Enable ethernet
+ node
+Message-ID: <e1c192ff-4fe9-4473-92ba-4c3a40ab99da@lunn.ch>
+References: <20241118-dts_qcs615-v2-0-e62b924a3cbd@quicinc.com>
+ <20241118-dts_qcs615-v2-2-e62b924a3cbd@quicinc.com>
+ <ececbbe1-07b3-4050-b3a4-3de9451ac7d7@lunn.ch>
+ <89a4f120-6cfd-416d-ab55-f0bdf069d9ce@quicinc.com>
+ <c2800557-225d-4fbd-83ee-d4b72eb587ce@oss.qualcomm.com>
+ <3c69423e-ba80-487f-b585-1e4ffb4137b6@lunn.ch>
+ <2556b02c-f884-40c2-a0d4-0c87da6e5332@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z0lbGyg99mNN4V7L@pengutronix.de>
+In-Reply-To: <2556b02c-f884-40c2-a0d4-0c87da6e5332@quicinc.com>
 
-On Fri, Nov 29, 2024 at 07:11:39AM +0100, Oleksij Rempel wrote:
-> On Thu, Nov 28, 2024 at 06:41:11PM +0100, Andrew Lunn wrote:
-> > > > ETHTOOL_A_CABLE_RESULT_SRC is a new property, so only newer kernels
-> > > > will report it. I think you need an
-> > > > if (tb[ETHTOOL_A_CABLE_RESULT_SRC]) here, and anywhere else you look for
-> > > > this property?
-> > > 
-> > > Looks like a forgotten edit of copy&pasted text
+> > The usual setting here is 'rgmmii-id', which means something needs to
+> > insert a 2ns delay on the clock lines. This is not always true, a very
+> > small number of boards use extra long clock likes on the PCB to add
+> > the needed 2ns delay.
 > > 
-> > Duh! Yes, i did forget.
+> > Now, if 'rgmii' does work, it means something else is broken
+> > somewhere. I will let you find out what.
 > 
-> Arrr... i check existence of wrong field...  (-‸ლ)
+> The 'rgmii' does function correctly, but it does not necessarily mean that a
+> time delay is required at the board level. The EPHY can also compensate for
+> the time skew.
 
-We all failed the copy/paste test :-(
+Basic definitions for phy-mode:
+
+rgmii: Indicates the board provides the delays, normally via extra
+long clock lines.
+
+rgmii-id: The board does not provide the delay, the software need to
+arrange that either the MAC or the PHY adds the delays.
+
+We then have the values passed between the MAC and the PHY driver:
+PHY_INTERFACE_MODE_RGMII: The PHY should not add delays
+PHY_INTERFACE_MODE_RGMII_ID: The PHY should add delays.
+
+A typical MAC/PHY combination, phy-mode is passed to the PHY, and the
+PHY adds the delays, if needed.
+
+This is why i said there are probably two bugs:
+
+1) phy-mode rgmii should probably be rgmii-id
+
+2) The PHY is adding delays when it should not be, because it is being
+   passed PHY_INTERFACE_MODE_RGMII not PHY_INTERFACE_MODE_RGMII_ID.
 
 	Andrew
 
