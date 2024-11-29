@@ -1,157 +1,120 @@
-Return-Path: <netdev+bounces-147794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 414169DBE45
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 01:43:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35CBF9DBE5C
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 02:22:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C5E02822DE
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 00:43:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB0DE282467
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 01:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E26879CD;
-	Fri, 29 Nov 2024 00:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5782DBA4B;
+	Fri, 29 Nov 2024 01:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="rRNX524R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JRAfjc/1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8AD8BF8
-	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 00:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33B117C69;
+	Fri, 29 Nov 2024 01:22:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732841023; cv=none; b=ExBUf+OjePtKQgDg2ICymw2WHWr8/oV4w6zUlM10AnDs4zfw57IC04pjV7BH7SJOvGMmG5Qvtd+Fu9C/GKqVBRwQh/I/nIIlJJtZuSwLeWpAMZIGXSseaKMxmpw4Pte/MZD4O4Yw2sitXWnMzxZeQiNnGQW280KFKgFRIG4J7Oo=
+	t=1732843356; cv=none; b=ISIco7Km8RzN1Nh1XApl4MFNSQxuxXwccGWbW+q1Q1AS4yKrXoXhwOYdavSyJBH0o7KGVYGNRbtRvway1/TqQRkGoi/IAsDZtK4Utp4W5JJNhPEhi1vwTD235hYo84Cp7AjyLyUtnGsQrADsMtzdwYdmJRMJJkaib2I/JzrfQLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732841023; c=relaxed/simple;
-	bh=NI7Jt8COQZW0XDjMBb3pNri2jT7SnVvPr+A4DJ/I5HI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p5T/vOmf1iOyRUcN4VXw9FzV5/fJE6x36vDXkYld9KEUNRhx0jQwDdfmOnd3JK4ZNTpBpc+4hux2ipHX019CRtfVrQGIs2NorAgcDM5wscyQc/3e1mDN+iIVtVPAgWSX6ZBZq4TfQA/fvq+1aKrSYnquJq5mqUmeekDBBNSytnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=rRNX524R; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21262a191a5so10884395ad.0
-        for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 16:43:42 -0800 (PST)
+	s=arc-20240116; t=1732843356; c=relaxed/simple;
+	bh=ku0TcMbKv4FpUT2iFVlGDk7q+Mvm7FdRUhJy3mXMCJQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=t5kKkHc1hwVnbRqCSXAQRk3y+EMgtH7gtp0ARW2XDySYFb8CNUjezUKvzCixdvTMkD8EbWJJ2HuG8tRYN5iPbomVnJmdLS83t5O+hZBt9kuU5pH1LFSEqITToQWW/cOPrO7003rWJeQ5UnzGLxjA7EfkX97Y1W/KTXP3QgXNWJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JRAfjc/1; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-212581a0b33so10833175ad.0;
+        Thu, 28 Nov 2024 17:22:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1732841022; x=1733445822; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kuPAcNfwMOW7zCG7lnxUINSPtEfZO6aB/M3eaN8CVAs=;
-        b=rRNX524RzCIdg6sSSOr+PmQxZNulgjB/x6b/avQyT9huaCzI5BDQqo8Lb3j5CydQeD
-         RrCQs7NTCAuPq+qjyV42NQnKPVxAOY4AuOplnEn3OfAXJI++z7cvhT2ZQI/vZUJo0AZX
-         gKnw3eoHdMqruJeLt+AKUntkgeNvbvR6151TdCnybX08bCc4svFowVuRom30lXMbpt86
-         agQz8Ar9aVPsAW8FEbfQ/o7qVFvUGPVqFYu/j9abyRDOhI/o3bgBUqJLGrV87sRl9fpH
-         XOESKhEU/uzbyNqCGnd7i/cVPu2piNPsvM1i8Gxq7hK0ceNlsdRBDetO4uzPhBpQ6owt
-         1fTg==
+        d=gmail.com; s=20230601; t=1732843354; x=1733448154; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SOM7mo05xMT3m4k+Q+ep9u+QSSlwZ80ja21NRlm2Jo0=;
+        b=JRAfjc/1N/Dk6bPCo5AQSSs15OZLIySGFqYuxtSbiKA5052qMvhP7nyj2wyPVKUG8F
+         smksOGouiGfYdGxCdF4pOGwSpluz0bUgS3a1kqZiJW4XkW08VaKOHIGwLJ/idEIfVE/J
+         m2Ufc4u+jHetN8zaBh4EUyp/TuzKa4c4jZO10mz2WClFZfrmA2TuhPMdJwrLuYJborKq
+         SbWx69EoHCCpRthE7mXiWtEifh/ibWxxiv+s/4gU6UKzsHl8c20Gi5aJx3BDC/cdaIZP
+         DJfmZPX/4c+21byj67pHC3sHl5ET9MCmm/0RqNPB7taeOp/gkTbozWNmCMazd5CMajXh
+         dJcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732841022; x=1733445822;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kuPAcNfwMOW7zCG7lnxUINSPtEfZO6aB/M3eaN8CVAs=;
-        b=hnFfRSpHC6koApDiM04Qi5ZLKAWSNj6vFZNp3gisi/c4gMEsTz4WCFM8GNTaiaSc9e
-         4Vg7cJQuARsmCShCHzFL0MCbWB2FCPr2A3Hh/glOr/g4Vj96okGJP74WTgFRlnZOK9fH
-         R9r9IKNfpQIfbuCr+oPVwIV6B1rQ831PLBlfcqwMhNfCLxboggJyMv1ZSN0masFTMld3
-         iZarLPQJp4JFqD6eGPU0t/2MC/4Kx2UIgO9k4TRIROj1AljSDKbVt3vHQnzo2vwdgmHk
-         WH67Q84gHJ5hChzKqyxheMyl3IuP2upFVuiGIjuKQp9dtGtUai4VkIIM/4QFBpeAbWsh
-         /NVw==
-X-Gm-Message-State: AOJu0YwjdcfGMxl5t9+TXvqKzaOwbxiL0gCX/Yp6IeYWwNCgXaxaDi0G
-	zzT714kFPK3CkBBvTWUUcPJo6kZ+nAdrI+IK54WeEV4NchkF3HaMa3ST93MoRL8=
-X-Gm-Gg: ASbGncvM9xEsRnzJjBrhlncsA1VbVRiTWoMs9yiypeNzpPqqPhvWVCAVNM0kxlxufJ7
-	lmnQOBTl5/3LkF3ym8vSZKmm3bKFgkWE84p/4HNFvGdr+k/z/5hthATeB3+W1nDxcl8KTNizZ86
-	NVzSHLMJTQ4Bo6slhx0/9dVTk+8hnoR2DiwAxLtzPdOWhnw2XUEBs0+YxFcHcHanRhlwzToGStU
-	IJtdFwLLhNA7kJkNEWcMpeFr26nAMwTUFbJLqWPsFATt53JkAXNU2kI
-X-Google-Smtp-Source: AGHT+IGVAJgXeDKbpDif8vI/Z41UkxsG0Ynz0rkNBDCZtpBWleO3Cg60iKiWGh6DRpbzga6fXzhaHw==
-X-Received: by 2002:a17:902:d4d2:b0:212:26e:7117 with SMTP id d9443c01a7336-21501b3e449mr98147185ad.33.1732841021728;
-        Thu, 28 Nov 2024 16:43:41 -0800 (PST)
-Received: from [192.168.1.12] ([97.126.136.10])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215218f511asm19689415ad.1.2024.11.28.16.43.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Nov 2024 16:43:41 -0800 (PST)
-Message-ID: <c84c5177-2d1b-467f-805b-5cb979edc30a@davidwei.uk>
-Date: Thu, 28 Nov 2024 16:43:40 -0800
+        d=1e100.net; s=20230601; t=1732843354; x=1733448154;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SOM7mo05xMT3m4k+Q+ep9u+QSSlwZ80ja21NRlm2Jo0=;
+        b=r6kTE6UKBimxQmw1kmcxjoiUtI7e+QP32BtNj3tBVJTh34fn84/G/WMQv3JIEnw2Vl
+         7pEKWkjnwVsvLI8IUjLu8Pm4o4rudYNDexayEyGgBx4WgyzuYDlM9uJvZ1YvZB5ewNvi
+         4KjL0AEo+Ha03Y6SmnzLabuBxyHri63p6CLIDEhYmkqokB5euE9j9ID0zDzjz11NaLHS
+         XcwgUQlqzO577wa52jbHIluUT+0okGiHmde/2GEhrVT7xtCo//8fT1qrGBk+c21us531
+         9rIw/OcTOv0qMO0LTZb+mMKEyva7KdAHGolipFJC22VB6MLgG3BJlWR3feBZRMDOB2zg
+         MA6g==
+X-Gm-Message-State: AOJu0Yxd2ASOJ0O4T/SSGEMVvwBAS3Wo8zoOtF7VZbDSs3lsMuvrhhMj
+	Lnd7oy3fE6B0Rv4dZUVDx60+CIj+2fg7GPRo09A8R0spmsOAa6DV1CdDcA==
+X-Gm-Gg: ASbGncsqyQV+70VZzIQS3JMWiTwFsagBFI9BtsTYAGChmH7dX1cO+b/WgAHtC3CrvNf
+	Ew9PnjsZMCvcZHTanl5dmDqOxPCWLq9qv98bl8KPk3wbNOKoBRtst43nr1NoFll9I38cJG6zMAU
+	Bu4/EbidtzQytNrtNdFmzulpBqxs9cRgcqLO/LenIsVD8J4Yc2dXOB+yHe+/8X1KlmU7zPp5z8p
+	yZlXPw7qCZN/bidBwiy4TLXKI9S4UZA0HhAwPjzwdCwf5Glxkzq0l599jJySB1gz40evmYEjw2w
+	5vo=
+X-Google-Smtp-Source: AGHT+IFUiDBCWZiSUK1OGkOK5wZWj05vUZDqXC2vV1bSGcFASLr5822wscQVNcx3TfE0TIqIoKQQLQ==
+X-Received: by 2002:a17:903:244a:b0:20c:9ec9:9a77 with SMTP id d9443c01a7336-21501c5ff2cmr103371205ad.37.1732843353574;
+        Thu, 28 Nov 2024 17:22:33 -0800 (PST)
+Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:7990:ba58:c520:e7e8])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21521905120sm20010215ad.80.2024.11.28.17.22.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Nov 2024 17:22:33 -0800 (PST)
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	Cong Wang <cong.wang@bytedance.com>
+Subject: [Patch bpf v2 0/4] bpf: a bug fix and test cases for bpf_skb_change_tail()
+Date: Thu, 28 Nov 2024 17:22:17 -0800
+Message-Id: <20241129012221.739069-1-xiyou.wangcong@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 3/3] bnxt_en: handle tpa_info in queue API
- implementation
-Content-Language: en-GB
-To: Somnath Kotur <somnath.kotur@broadcom.com>
-Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20241127223855.3496785-1-dw@davidwei.uk>
- <20241127223855.3496785-4-dw@davidwei.uk>
- <CAOBf=muU_fTz-qN=BvNFoGT+h8pykmWe0WX-7tw0ska=hEk=og@mail.gmail.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <CAOBf=muU_fTz-qN=BvNFoGT+h8pykmWe0WX-7tw0ska=hEk=og@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 2024-11-27 19:46, Somnath Kotur wrote:
-> On Thu, Nov 28, 2024 at 4:09 AM David Wei <dw@davidwei.uk> wrote:
->>
->> Commit 7ed816be35ab ("eth: bnxt: use page pool for head frags") added a
->> page pool for header frags, which may be distinct from the existing pool
->> for the aggregation ring. Add support for this head_pool in the queue
->> API.
->>
->> Signed-off-by: David Wei <dw@davidwei.uk>
->> ---
->>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 25 ++++++++++++++++++++---
->>  1 file changed, 22 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->> index 9b079bce1423..08c7d3049562 100644
->> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->> @@ -15382,15 +15382,25 @@ static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
->>                         goto err_free_rx_agg_ring;
->>         }
->>
->> +       if (bp->flags & BNXT_FLAG_TPA) {
->> +               rc = bnxt_alloc_one_tpa_info(bp, clone);
->> +               if (rc)
->> +                       goto err_free_tpa_info;
->> +       }
->> +
->>         bnxt_init_one_rx_ring_rxbd(bp, clone);
->>         bnxt_init_one_rx_agg_ring_rxbd(bp, clone);
->>
->>         bnxt_alloc_one_rx_ring_skb(bp, clone, idx);
->>         if (bp->flags & BNXT_FLAG_AGG_RINGS)
->>                 bnxt_alloc_one_rx_ring_page(bp, clone, idx);
->> +       if (bp->flags & BNXT_FLAG_TPA)
->> +               bnxt_alloc_one_tpa_info_data(bp, clone);
->>
->>         return 0;
->>
->> +err_free_tpa_info:
->> +       bnxt_free_one_tpa_info(bp, clone);
->>  err_free_rx_agg_ring:
->>         bnxt_free_ring(bp, &clone->rx_agg_ring_struct.ring_mem);
->>  err_free_rx_ring:
->> @@ -15398,9 +15408,11 @@ static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
->>  err_rxq_info_unreg:
->>         xdp_rxq_info_unreg(&clone->xdp_rxq);
->>  err_page_pool_destroy:
->> -       clone->page_pool->p.napi = NULL;
->>         page_pool_destroy(clone->page_pool);
->> +       if (clone->page_pool != clone->head_pool)
-> Just curious, why is this check needed everywhere? Is there a case
-> where the 2 page pools can be the same ? I thought either there is a
-> page_pool for the header frags or none at all ?
+From: Cong Wang <cong.wang@bytedance.com>
 
-Yes, frags are always allocated now from head_pool, which is by default
-the same as page_pool.
+This patchset fixes a bug in bpf_skb_change_tail() helper and adds test
+cases for it, as requested by Daniel and John.
 
-If bnxt_separate_head_pool() then they are different.
+---
+v2: added a test case for TC where offsets are positive
+    fixed a typo in 1/4 patch description
+    reduced buffer size in the sockmap test case
+
+Cong Wang (4):
+  bpf: Check negative offsets in __bpf_skb_min_len()
+  selftests/bpf: Add a BPF selftest for bpf_skb_change_tail()
+  selftests/bpf: Introduce socket_helpers.h for TC tests
+  selftests/bpf: Test bpf_skb_change_tail() in TC ingress
+
+ net/core/filter.c                             |  21 +-
+ .../selftests/bpf/prog_tests/socket_helpers.h | 394 ++++++++++++++++++
+ .../selftests/bpf/prog_tests/sockmap_basic.c  |  51 +++
+ .../bpf/prog_tests/sockmap_helpers.h          | 385 +----------------
+ .../selftests/bpf/prog_tests/tc_change_tail.c |  78 ++++
+ .../bpf/progs/test_sockmap_change_tail.c      |  40 ++
+ .../selftests/bpf/progs/test_tc_change_tail.c | 114 +++++
+ 7 files changed, 693 insertions(+), 390 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/socket_helpers.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_change_tail.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_change_tail.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_tc_change_tail.c
+
+-- 
+2.34.1
+
 
