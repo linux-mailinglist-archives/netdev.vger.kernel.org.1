@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-147871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FA3B9DE9EE
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 16:46:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 520439DE9F0
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 16:48:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E478D282A04
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 15:46:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 133D2280D64
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 15:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74518145324;
-	Fri, 29 Nov 2024 15:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F3913D619;
+	Fri, 29 Nov 2024 15:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MQ8D3Pqp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bc9O3DKx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C9113D619
-	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 15:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283DF12C54B
+	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 15:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732895183; cv=none; b=EXMD4P/bkT6cMqgxzC7MjA6a0EjmaBHKofv39yye/ClCk4eGoa8hKZ7M0G6O3dgNLqkS1x2nkC4kovrlxTyPMXflabZP34X//A/LPw3iY8qLwp64GUaEurNsi/NdYdGKZ+lH0N3bBxjYmoY5qDRPynAaFuBfZNcR4IxLjubBmyY=
+	t=1732895316; cv=none; b=XfP+P06qVPcIUxMAXEy9Hj3544CMidF1rkAviZwX454e09+5J7LyFzrlrW8yb3y2KWVbUandUVG34eYL/9/8VfNEvPP7+FMbE2qtyze7sKt5nolkHp0gkLd7yoV1oSLcuTATBv/RR2x3mpJCNa8bHEn0bmzMpOdwp9YDirn1AfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732895183; c=relaxed/simple;
-	bh=6d6VzwdlWq1q354a+1wNljtYfURBDYq0F4W7Ym/7mLQ=;
+	s=arc-20240116; t=1732895316; c=relaxed/simple;
+	bh=g0d8tJLFN5aJdiQfOflzlLhCSXPKEwQEG/2j/vZl8Ys=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=VGBc2mrBB5r7B061LBL1B9MhxL3xDoGB7SH4+4TiA46X80rpyplN1CD1BSyXT4F9Hb/xmAhAYlR0nZ8aa7hOie+GfgOUpj8VE5A8VKuNXOGyNsJje7P8OnvGblpq+cHpbugFjvg94VKXMAsd+B1jDxL6GirFYNUj6QxaUQctOzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MQ8D3Pqp; arc=none smtp.client-ip=209.85.160.170
+	 Mime-Version:Content-Type; b=nNpDbQHKpBbl5sM9EcGjDMgg4mK8DFTss/xiqnCkLIyqXMAauSLGsvXB4/S+7UgnXex4m0MJ9yesm9sOH024QwpwpZdeNnuBJbFWgH+MschjacG40q3A0xjnk843/SYOhIUskkb2qdGkktxISS3uWK5lkRfSemyv9SqrIPS6NIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bc9O3DKx; arc=none smtp.client-ip=209.85.222.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-46695dd02e8so19167511cf.2
-        for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 07:46:21 -0800 (PST)
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7b672a70f4eso137659485a.1
+        for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 07:48:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732895180; x=1733499980; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1732895314; x=1733500114; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rcN/VjQsWEr8cckNhEae5YA0C7hq6vEXjZlBRJIXtGM=;
-        b=MQ8D3PqpD7g7/E1Lk7l724C6tdW2jlK8YqP5LLk1R2T5zTLJXm5LN3fJafl38bG7FE
-         +FH3nj2nyYirvxKlcLlhYshZ9Seim7GsINn9lAMtNqtfCBeF+ga7zpL69YKrA1tDzyj+
-         fXXJ34mW16NnvLNbJfuzua4mK/Gl9FxcxOx5waTBrsBQXLSBn4NfC4nMTMaISy6oFIKO
-         7sZsQ72VFt3FoCAMmCa3SyOtPHJ+YDaeFT5cPOog7n18HFMs647bMiVaO/bs05VD+qJ2
-         b9LQ8bEhdnXkRUuS4WHhKUOwyhms+gug8GBmRO4wXKbEAz6BR49Mv4peZ2OUqTCZQCrK
-         PNig==
+        bh=9fZmFquivfpsRX4ovRuebdXrWSPlFb6167yx7/D4Gv8=;
+        b=bc9O3DKxqdUG4SIqD8AST3Jn5OqYG7R2+/Ex4CEyEnCGTA0gHg794DYQwuuYgjd8ZR
+         v+PzpAzbMs5z/Nx7bDNGVu51/QKyz14rFSHRTjr4gIy6XO7L9DeBQlS7ex8gU9kSiVv+
+         1FX5JpBzgu7/l+tdUloyO+ITAM7cUlXGIQKPpZ6b2pnPfolm5lhdsp8SmYDmqnu/RXTe
+         71ELR+AGBp2L3Wdi6AfBYNWbor6FTVMYFyiYn6oPXvtndrNYY2eXZ61KYmfxo732NhaO
+         GJ2aYGcTS4XkWpL/u6XNwTPVvArpAuuGaLDn1WpHjazH/RIYLKeFvx/NT/aXiZ1FM4Io
+         ieNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732895180; x=1733499980;
+        d=1e100.net; s=20230601; t=1732895314; x=1733500114;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=rcN/VjQsWEr8cckNhEae5YA0C7hq6vEXjZlBRJIXtGM=;
-        b=Z6y/qU9rfGvaHl5Fqbd6xA6niCkNL0Zz1G3V2NC0Wpg8h6qoGefygWYw5D9ezKlOeH
-         mAIrgPSQcH2TOC5ckE/XcoAXZr7x2H8J7YqduZheCreZgIA/IhjnnqJBzhQ/wITKEz3S
-         RwQoXF//VbHpmqqJi3etP8K+x6VZayNj7TO84hTmO0vKWzlgK/KVHJ99bZSc6uRySgTu
-         eGl8zzQA2myhdDv3AtrE+ex/q5jVJxgnVYIn+QepFd8Ojx6xLut3h/O0tLVcN1ycGrBN
-         bqP2K4C0yg+C++jgNZPTDO14Z8khonrPW7V3pIWuiVo0gVs88MbUa6SS2KRnkMWa5mSl
-         voMQ==
-X-Gm-Message-State: AOJu0YwD6nO2bK6uch6SeJZdypKJuho9zrAkAZBPiqxJ4CGu7Qg/Hrgb
-	k2IUfVMPGrkFzcMmB+867eK2YSM/rnK7uX2JUaDIs0EOHR/wJT1y
-X-Gm-Gg: ASbGnculDz8egJsBOA8HBwObBwyIOqRIbFSpcBbLqZ7mgZtskULWnUYO3pqrFJsaLhY
-	Hh1oHMx2+5qXU2PvtgS+fTgsASEQXQ2P0CH3vGza0LgQjkcDXcBQl+ag0nc0X90ZP1Vd5Tg4qGF
-	cvgjMgjxAJUaptp4ZFAhY2v+CTjUqx9LpqzqtEfj/gbflalRfbtFOrUVVjEKR5aSSZfuTMCea1p
-	zRYWjgPvTNLDPtYmCuXzTmBwRCjYea46S8TUEjg99T/OzrNxRB6C4SxCcQool7uWXRoXgxR+QNT
-	bplIAUaUR8PcWPqriaruXA==
-X-Google-Smtp-Source: AGHT+IHYyrbyrklERwq9PyaRMbk3QF4tKiBra/sb4wYtb1bzFFpjwstgScktKEVHHZIRccgHBQEnBg==
-X-Received: by 2002:a05:620a:6086:b0:7b6:6701:7a48 with SMTP id af79cd13be357-7b67c4a0ea8mr1987376985a.61.1732895180542;
-        Fri, 29 Nov 2024 07:46:20 -0800 (PST)
+        bh=9fZmFquivfpsRX4ovRuebdXrWSPlFb6167yx7/D4Gv8=;
+        b=Kd6SnvH3DgtTWcJuLBuhG6gHyetxpO8KIKIiQ3Y2qx+kb9sxuoykAcekI7jf/vQvI4
+         kPiyJ2IQnY2HSzCYaSsOvmBBWlQcjNndstivWgpkSpnmJ3rCRHWUkOjL7S7XVAh5b6Wk
+         3dkO9pts7UChW7FD5Qx6l/gAJCXguqY31Fixu9tK6GMvYnTPREWBttjF7qoqWOI6+7M5
+         /Y4U/Fl+Bh596bIG1y1KgG2FxZq85BAatPw01RW1CdCacebPmGhxX13L4ZoedjrwWTg6
+         ccEZLww41Dl9g27RuSwFPaOP409TMovXYhOHEbBIuddI1nvvlu8TgmKI7ED+UKS0uRMh
+         J5+A==
+X-Gm-Message-State: AOJu0YxscusWzpm9M9CpJckfJe/gZn+dZHTLrz+xYaZG5JCLHt2ljtsH
+	YIA/NadfFr48CTpqPiutVcl/yr4RzvDUlfmlL7JJpXEjwUUfGerz
+X-Gm-Gg: ASbGncvHmR4Z7sarYsu0bcAgcDxDNlh/NMK0EhUEmMSnwMInRELGFyU4+inzN1miLEk
+	YvbcM958+dV3dg4GMgnY0dh/H1rbso6A+4ETWeXAmxmWBH9cZyxiz+FF3mWA6Bf08sCuM4c5Dw4
+	CDeRxBFMyuec7l/fx6zZD66FDwhXc0+wbx3I9RXc42kvoviQnujKJ3XS1MGTos57zzEjz+BRLiD
+	499zef8uGnOKFP4r2Yk64o1DoKodBP/v6MEos2oK1dAEtfhqDLjqniQnXtZ2BJTeu9ZrX5CO6LU
+	BayOJFDqt5HxYKSN7lkBiA==
+X-Google-Smtp-Source: AGHT+IGC0M0tgAcIG7IBoef9nUKFozo8QRmbCfwEMu3jKIF4G/ftFfQgV4H1+wEcw6ICac2x9IABig==
+X-Received: by 2002:a05:6214:a6d:b0:6d8:8256:41d7 with SMTP id 6a1803df08f44-6d88256548dmr59309366d6.33.1732895314141;
+        Fri, 29 Nov 2024 07:48:34 -0800 (PST)
 Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b684946dc0sm150709585a.57.2024.11.29.07.46.19
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d880e81c86sm10972986d6.106.2024.11.29.07.48.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Nov 2024 07:46:20 -0800 (PST)
-Date: Fri, 29 Nov 2024 10:46:19 -0500
+        Fri, 29 Nov 2024 07:48:33 -0800 (PST)
+Date: Fri, 29 Nov 2024 10:48:33 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Milena Olech <milena.olech@intel.com>, 
  intel-wired-lan@lists.osuosl.org
@@ -79,12 +79,12 @@ Cc: netdev@vger.kernel.org,
  anthony.l.nguyen@intel.com, 
  przemyslaw.kitszel@intel.com, 
  Milena Olech <milena.olech@intel.com>, 
- Josh Hay <joshua.a.hay@intel.com>
-Message-ID: <6749e1cb95bed_23772a2944b@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241126035849.6441-9-milena.olech@intel.com>
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+Message-ID: <6749e251407f0_23772a2948f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241126035849.6441-10-milena.olech@intel.com>
 References: <20241126035849.6441-1-milena.olech@intel.com>
- <20241126035849.6441-9-milena.olech@intel.com>
-Subject: Re: [PATCH v2 iwl-next 08/10] idpf: add Tx timestamp flows
+ <20241126035849.6441-10-milena.olech@intel.com>
+Subject: Re: [PATCH v2 iwl-next 09/10] idpf: add support for Rx timestamping
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,160 +96,53 @@ Content-Type: text/plain;
 Content-Transfer-Encoding: 7bit
 
 Milena Olech wrote:
-> Add functions to request Tx timestamp for the PTP packets, read the Tx
-> timestamp when the completion tag for that packet is being received,
-> extend the Tx timestamp value and set the supported timestamping modes.
+> Add Rx timestamp function when the Rx timestamp value is read directly
+> from the Rx descriptor. In order to extend the Rx timestamp value to 64
+> bit in hot path, the PHC time is cached in the receive groups.
+> Add supported Rx timestamp modes.
 > 
-> Tx timestamp is requested for the PTP packets by setting a TSYN bit and
-> index value in the Tx context descriptor. The driver assumption is that
-> the Tx timestamp value is ready to be read when the completion tag is
-> received. Then the driver schedules delayed work and the Tx timestamp
-> value read is requested through virtchnl message. At the end, the Tx
-> timestamp value is extended to 64-bit and provided back to the skb.
-> 
-> Co-developed-by: Josh Hay <joshua.a.hay@intel.com>
-> Signed-off-by: Josh Hay <joshua.a.hay@intel.com>
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 > Signed-off-by: Milena Olech <milena.olech@intel.com>
 > ---
-> v1 -> v2: add timestamping stats, use ndo_hwtamp_get/ndo_hwstamp_set
-
+> v1 -> v2: extend commit message
+> 
+>  drivers/net/ethernet/intel/idpf/idpf_ptp.c  | 77 ++++++++++++++++++++-
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.c | 30 ++++++++
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.h |  7 +-
+>  3 files changed, 111 insertions(+), 3 deletions(-)
+> 
 > +/**
-> + * idpf_set_timestamp_filters - Set the supported timestamping mode
+> + * idpf_ptp_set_rx_tstamp - Enable or disable Rx timestamping
 > + * @vport: Virtual port structure
-> + * @info: ethtool timestamping info structure
-> + *
-> + * Set the Tx/Rx timestamp filters.
+> + * @rx_filter: bool value for whether timestamps are enabled or disabled
 > + */
-> +static void idpf_set_timestamp_filters(const struct idpf_vport *vport,
-> +				       struct kernel_ethtool_ts_info *info)
-
-This is not really a setter. It modifies no vport state.
-
-idpf_get_timestamp_filters? Or just merge into the below caller.
-
+> +static void idpf_ptp_set_rx_tstamp(struct idpf_vport *vport, int rx_filter)
 > +{
-> +	if (!vport->tx_tstamp_caps ||
-> +	    vport->adapter->ptp->tx_tstamp_access == IDPF_PTP_NONE)
+> +	vport->tstamp_config.rx_filter = rx_filter;
+> +
+> +	if (rx_filter == HWTSTAMP_FILTER_NONE)
 > +		return;
 > +
-> +	info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
-> +				SOF_TIMESTAMPING_TX_HARDWARE |
-> +				SOF_TIMESTAMPING_RX_HARDWARE |
-> +				SOF_TIMESTAMPING_RAW_HARDWARE;
+
+Same question as v1:
+
+Should this clear the bit if it was previously set, instead of
+returning immediately?
+
+If not, why not. The function comment says enable or disable.
+
+> +	for (u16 i = 0; i < vport->num_rxq_grp; i++) {
+> +		struct idpf_rxq_group *grp = &vport->rxq_grps[i];
+> +		u16 j;
 > +
-> +	info->tx_types = BIT(HWTSTAMP_TX_OFF) | BIT(HWTSTAMP_TX_ON);
-> +}
-> +
-> +/**
-> + * idpf_get_ts_info - Get device PHC association
-> + * @netdev: network interface device structure
-> + * @info: ethtool timestamping info structure
-> + *
-> + * Return: 0 on success, -errno otherwise.
-> + */
-> +static int idpf_get_ts_info(struct net_device *netdev,
-> +			    struct kernel_ethtool_ts_info *info)
-> +{
-> +	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
-> +	struct idpf_vport *vport;
-> +	int err = 0;
-> +
-> +	idpf_vport_cfg_lock(adapter);
-> +	vport = idpf_netdev_to_vport(netdev);
-> +
-> +	if (!vport->adapter->ptp) {
-> +		err = -EOPNOTSUPP;
-> +		goto unlock;
+> +		if (idpf_is_queue_model_split(vport->rxq_model)) {
+> +			for (j = 0; j < grp->singleq.num_rxq; j++)
+> +				idpf_queue_set(PTP, grp->singleq.rxqs[j]);
+> +		} else {
+> +			for (j = 0; j < grp->splitq.num_rxq_sets; j++)
+> +				idpf_queue_set(PTP,
+> +					       &grp->splitq.rxq_sets[j]->rxq);
+> +		}
 > +	}
-> +
-> +	idpf_set_timestamp_filters(vport, info);
-
-Probably move this in the below if, als it gets entirely overwritten
-if the else is taken.
-> +
-> +	if (idpf_is_cap_ena(vport->adapter, IDPF_OTHER_CAPS, VIRTCHNL2_CAP_PTP) &&
-> +	    vport->adapter->ptp->clock) {
-> +		info->phc_index = ptp_clock_index(vport->adapter->ptp->clock);
-> +	} else {
-> +		pci_dbg(vport->adapter->pdev, "PTP clock not detected\n");
-> +		err = ethtool_op_get_ts_info(netdev, info);
-> +	}
-> +
-> +unlock:
-> +	idpf_vport_cfg_unlock(adapter);
-> +
-> +	return err;
-> +}
-
-> +/**
-> + * idpf_ptp_extend_ts - Convert a 40b timestamp to 64b nanoseconds
-> + * @vport: Virtual port structure
-> + * @in_tstamp: Ingress/egress timestamp value
-> + *
-> + * It is assumed that the caller verifies the timestamp is valid prior to
-> + * calling this function.
-> + *
-> + * Extract the 32bit nominal nanoseconds and extend them. Use the cached PHC
-> + * time stored in the device private PTP structure as the basis for timestamp
-> + * extension.
-> + *
-> + * Return: Tx timestamp value extended to 64 bits.
-> + */
-> +u64 idpf_ptp_extend_ts(struct idpf_vport *vport, u64 in_tstamp)
-> +{
-> +	struct idpf_ptp *ptp = vport->adapter->ptp;
-> +	unsigned long discard_time;
-> +
-> +	discard_time = ptp->cached_phc_jiffies + 2 * HZ;
-> +
-> +	if (time_is_before_jiffies(discard_time)) {
-> +		vport->tstamp_stats.tx_hwtstamp_discarded++;
-> +		return 0;
-> +	}
-> +
-> +	return idpf_ptp_tstamp_extend_32b_to_64b(ptp->cached_phc_time,
-> +						 lower_32_bits(in_tstamp));
-> +}
-
-> +#if (IS_ENABLED(CONFIG_PTP_1588_CLOCK))
-> +/**
-> + * idpf_tx_tstamp - set up context descriptor for hardware timestamp
-> + * @tx_q: queue to send buffer on
-> + * @skb: pointer to the SKB we're sending
-> + * @off: pointer to the offload struct
-> + *
-> + * Return: Positive index number on success, negative otherwise.
-> + */
-> +static int idpf_tx_tstamp(struct idpf_tx_queue *tx_q, struct sk_buff *skb,
-> +			  struct idpf_tx_offload_params *off)
-> +{
-> +	int err, idx;
-> +
-> +	/* only timestamp the outbound packet if the user has requested it */
-> +	if (likely(!(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)))
-> +		return -1;
-> +
-> +	if (!idpf_ptp_get_txq_tstamp_capability(tx_q))
-> +		return -1;
-> +
-> +	/* Tx timestamps cannot be sampled when doing TSO */
-> +	if (off->tx_flags & IDPF_TX_FLAGS_TSO)
-> +		return -1;
-> +
-> +	/* Grab an open timestamp slot */
-> +	err = idpf_ptp_request_ts(tx_q, skb, &idx);
-> +	if (err) {
-> +		tx_q->txq_grp->vport->tstamp_stats.tx_hwtstamp_skipped++;
-
-What is the mutual exclusion on these stats fields?
-
-In ndo_start_xmit the txq lock is held, but no vport wide lock?
-
-> +		return -1;
-> +	}
-> +
-> +	off->tx_flags |= IDPF_TX_FLAGS_TSYN;
-> +
-> +	return idx;
 > +}
 
