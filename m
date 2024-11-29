@@ -1,148 +1,179 @@
-Return-Path: <netdev+bounces-147824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E665C9DC157
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 10:19:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF70E9DC165
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 10:23:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A36C4162B2F
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 09:19:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90C4C1646C3
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 09:23:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C5A170A1A;
-	Fri, 29 Nov 2024 09:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05069170A15;
+	Fri, 29 Nov 2024 09:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LB6a0cM4"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Ddo/KhnB";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tZt1gedD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE21170A15
-	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 09:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90F5156F28;
+	Fri, 29 Nov 2024 09:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732871952; cv=none; b=JUAFSth8ga8SJssRkgm7bABYs73UtVkeCQ5QFaawsUdeH3taiJs1x6fjXjnRvAoH0RdHJdcora2ZSTxQIwnY5gDGyCy02GCO7E/hqFitnklLO1+sAdBHOOb4ZD0GSbKuc/mjloauh7INBF/GFG+PTAGFE/gposyO1gZTOje8Y/8=
+	t=1732872228; cv=none; b=WikJCEf4eglfAAwzIm4jeWP76ftVzYQxQiHuOlcPSuh75pauU5w8rj0BAuwEq2+c8T0Ld/x6slTAL2tV64yj5ZLyL2p6I2zU5+9P5vAmWIRiY0JjIOVW70sfKiFxcvWsRQfmHzgbhubtAR+di0i0BajYfmDOwlTz/CVsgiB+dvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732871952; c=relaxed/simple;
-	bh=g79H7tIgDD6sOOJLZvjgc74BHN39nTif8XwYXNhWZPI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rOqg3Y+2kv4qrMuIrdZajzWJPn5rtJ/AYibpmdfhEsvP7ALocWdT42kRdUE0GDYo6YI/J7GE3oiXHK5Nh4gVdmgy48kOLn+IFsoKOt8bKrj/uBrr+fuxAfS2yR3Azh9fJMn5SVs85ai0tV+vVNxmfSE/dZUwbHWC3Dhm/fn2DYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LB6a0cM4; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aa51bf95ce1so319416566b.3
-        for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 01:19:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732871949; x=1733476749; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aD+G31sh9eiAnBFsgKCay0J/mHjjzI9Np4ku3nZS91I=;
-        b=LB6a0cM4GXWARyRqH1iNff1Z+PwmYV7oiTU5nuCxqnMdTcmUpFkVSLJehmdiklwZyW
-         /PR+v44Vx0/i7mmB1dB0ZPoZw19LxpCTNLucUqqLIW2/bm2KE6Dd+DUm2u4BnH7l5pNX
-         kjN79p3iGfhsbWpnHLcQn7JtlGjPeaAqVvhCrFZKEVKesGlwlKdvmeXdph1rOZA2Xupy
-         hffcaF7IB02GYIEy6gCB/PAsV12G3sECTkpRXEh+PNeo1Immkidl1a44eju2pB1jPCNy
-         k3k0wnux/WMybr0TdRoTtw7uWv6zfmK746j2ai394Ylpt7OgUfmMPRyr9LAm9TLFSdo4
-         nPyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732871949; x=1733476749;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aD+G31sh9eiAnBFsgKCay0J/mHjjzI9Np4ku3nZS91I=;
-        b=bPaOLQOhypB94XM9Jtgj9+QDZSrWg4EbRCdLUnarA/mPk2+DC8szPqO9KBwUfUZ+lW
-         8U4dvfiGtdnrKzDjdh81shqI84a7njgWFGfmoq+DJNJKo4PISmrPtFLg/LXW0HsBkqCO
-         SHLAIcOzcJK6iCkoZV1nY9wxaxPDaCCExjnJhUepx8iDH6r/BWxHf2S8RH5MmBvS/qV6
-         Q0YF+3FUrceop2jyLn2aOilQH1N9XWsBWLwrxAHDz5cKeZcEh8L78l4P6LM5FHvCjdck
-         /8Y2hXBYbJIjehigatC9by/jERsDEVze0fFQdVckp/jBAwbOnkgOq3A7tw1L4hD3GQvY
-         gztw==
-X-Gm-Message-State: AOJu0YywCsySaShXz8tE6h5mR479W4aALyJX/nc42qs8GQjpRO1Y91BU
-	1mK/+6TiwXew+gSbc1/Cipfm/XpTjAvnrI77MPIIsLcGG5p1CjEUVjUclnRLErHqaYhlTjbRlvg
-	hN+RW6F7JwoZYtNNfeglStXDSYxg0TRTCY+3g
-X-Gm-Gg: ASbGncvR3bTX6Wx0UTr2a/NPkeEZW9rvL0U3mpDAO2dWcgpUW7zxn1NeD9nBtUt0UUF
-	E/fsPtlWDy5dinwLumgRaUB7/Trjc7uo=
-X-Google-Smtp-Source: AGHT+IHWERt/0pgD5kLacjbXchmlIltg6Ui9qU0nhvcGZ+VCsHYIfdH8hVFaOO0EB6DrOGFANRVTa1Tdu9myVnsa2RY=
-X-Received: by 2002:a17:906:9350:b0:aa5:427d:b101 with SMTP id
- a640c23a62f3a-aa580f57d4amr1079397266b.36.1732871949390; Fri, 29 Nov 2024
- 01:19:09 -0800 (PST)
+	s=arc-20240116; t=1732872228; c=relaxed/simple;
+	bh=+B/4weM0/EUGguG/BqQcks88RtE9urCqPFe8Kwp9UB4=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Io8EHP/KiFf6j0DecGR0qaSZ+xecyvzAZ09IuVtLR3kUpjItiH1S7uL4EypW0jY1aGM9KEo8VPfeK46UeWmvZtBX3SUlys+pWjVdlEsMNnQ7+GdXb4sRxW9bC3rttIlz43uDW8zM7uuCh62/4I67AZcZ2SicTKujqA0TwxfoKEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Ddo/KhnB; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tZt1gedD; arc=none smtp.client-ip=202.12.124.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 07B7625400F5;
+	Fri, 29 Nov 2024 04:23:45 -0500 (EST)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-10.internal (MEProxy); Fri, 29 Nov 2024 04:23:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1732872224;
+	 x=1732958624; bh=6JoH9bTLLNPgqK4rstk02jf2g1g5I4XEBTfZgtUBOaU=; b=
+	Ddo/KhnB/zvVE0eA+K+XdWB/soHKnOPOOmDyAnGvTKmKSrM80jkWjrdR/eW1a10u
+	hDiS8ZljUw1ee79JC2JMlqXNmoaobS+MDnTY12XV74X4XwLdnde6lu0ZSHSp6FUt
+	zy4ZzgyPR53mKV55Ou4bprp1aNHmKyOveZrnHMV0KkaZMd1OGZD7PHnk4tbbFDzn
+	8AGWRZa+QMcLaqCZwiWqja7Zeeg88A8nO04bShOuxDtdQh3LvhjZpamuiQ34n0Cz
+	q4NJgVcskQ9QlbDExitYtLle3KEwjaVH1TB6yTIVkMdZZAhqR7RGHuc7D9kIcul/
+	t6gRhNARly08EZRGKWmIvQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1732872224; x=
+	1732958624; bh=6JoH9bTLLNPgqK4rstk02jf2g1g5I4XEBTfZgtUBOaU=; b=t
+	Zt1gedD41mirEjCd0k8Ry7bsJ7WNAJ5hzfyvUz1CaQtooYr7s+ENutSJHOma8PNS
+	XJ5XBgvqR3qTGxWzkTyzXnmz1ye31iWQAAauSFLt+z86xdXZSeFbWOOGDK9iFI2v
+	0F8NHUcYiBbgNxium9R7WKhJkShQVxdygDpHesV4HXP398wtx9paTpUnQfp0ArkM
+	Sk54toAgkqETaDfa2mGjiFxF2m3VQmF4N8+sIjOtywV1kVhQlNx39k34xpyhrZfL
+	S8YKy6XHHywCddE90HDC8O/iwgURjsmtPCe5YrbVY5ESGdepUSvWNilT2MS3o6Fi
+	sF3FYFZHRlbSiZq+e2FhQ==
+X-ME-Sender: <xms:H4hJZ2wScKKDoFkbmffti2XgLRon-rOtXwdmdn1I06hG8Y_7Rkiexg>
+    <xme:H4hJZyT8ysWmzOdm8l7RET9uRPFzX65262mo90h_HfZ2znHDnccno0AVXzZl3kqNM
+    MaAu3LYP0ILp3b4t_I>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrheefgddtvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthhqredtredtjeen
+    ucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdrug
+    gvqeenucggtffrrghtthgvrhhnpedvhfdvkeeuudevfffftefgvdevfedvleehvddvgeej
+    vdefhedtgeegveehfeeljeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
+    grihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgtphhtthhopeeffedp
+    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggvrhgvkhdrkhhivghrnhgrnhesrg
+    hmugdrtghomhdprhgtphhtthhopegurhgrghgrnhdrtghvvghtihgtsegrmhgurdgtohhm
+    pdhrtghpthhtohephhgvrhhvvgdrtghoughinhgrsegsohhothhlihhnrdgtohhmpdhrtg
+    hpthhtoheplhhutggrrdgtvghrvghsohhlihessghoohhtlhhinhdrtghomhdprhgtphht
+    thhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtph
+    htthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnugih
+    rdhshhgvvhgthhgvnhhkohesghhmrghilhdrtghomhdprhgtphhtthhopegshhgvlhhgrg
+    grshesghhoohhglhgvrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
+    vgdrtghomh
+X-ME-Proxy: <xmx:H4hJZ4ULhjYre35Nr7LeimF34eDMT9QrYAEfvNLxQ4HCSaTeF-ZLPw>
+    <xmx:H4hJZ8jR697AYXyTB0_yJGKBx7Rr_wRabBiuDS9kaxfe5gelt6ANRA>
+    <xmx:H4hJZ4DGhdlI5HRWqxuGrW0gYHU11SKPh02XxTqCJ0hNpjkNIW8_fQ>
+    <xmx:H4hJZ9IgM013bnDtM7LQ9mwj85lQkdwUQ0OR4axgWyptEYcrYufw7A>
+    <xmx:IIhJZwa_k9cjV1TQWoNQPYleFfTjyB1NFLrbiBqw5uTGZlE1MY0Xmn5N>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id B95212220071; Fri, 29 Nov 2024 04:23:43 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241128085950.GA4505@incl>
-In-Reply-To: <20241128085950.GA4505@incl>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 29 Nov 2024 10:18:58 +0100
-Message-ID: <CANn89iKEbCKUxieR298R5-BaFQUDXV0o+J3bWjHqv4LyaYDMYw@mail.gmail.com>
-Subject: Re: [PATCH v2 net] net/ipv6: release expired exception dst cached in socket
-To: Jiri Wiesner <jwiesner@suse.de>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Xin Long <lucien.xin@gmail.com>, yousaf.kaukab@suse.com, andreas.taschner@suse.com
-Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 29 Nov 2024 10:23:23 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Geert Uytterhoeven" <geert@linux-m68k.org>
+Cc: "Herve Codina" <herve.codina@bootlin.com>,
+ "Michal Kubecek" <mkubecek@suse.cz>,
+ "Andy Shevchenko" <andy.shevchenko@gmail.com>,
+ "Simon Horman" <horms@kernel.org>, "Lee Jones" <lee@kernel.org>,
+ "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
+ "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Bjorn Helgaas" <bhelgaas@google.com>,
+ "Philipp Zabel" <p.zabel@pengutronix.de>,
+ "Lars Povlsen" <lars.povlsen@microchip.com>,
+ "Steen Hegelund" <Steen.Hegelund@microchip.com>,
+ "Daniel Machon" <daniel.machon@microchip.com>,
+ UNGLinuxDriver@microchip.com, "Rob Herring" <robh@kernel.org>,
+ "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
+ "Conor Dooley" <conor+dt@kernel.org>,
+ "Saravana Kannan" <saravanak@google.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>,
+ "Horatiu Vultur" <horatiu.vultur@microchip.com>,
+ "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ "Allan Nielsen" <allan.nielsen@microchip.com>,
+ "Luca Ceresoli" <luca.ceresoli@bootlin.com>,
+ "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>
+Message-Id: <93ad42dc-eac6-4914-a425-6dbcd5dccf44@app.fastmail.com>
+In-Reply-To: 
+ <CAMuHMdWXgXiHNUhrXB9jT4opnOQYUxtW=Vh0yBQT0jJS49+zsw@mail.gmail.com>
+References: <20241010063611.788527-1-herve.codina@bootlin.com>
+ <20241010063611.788527-2-herve.codina@bootlin.com>
+ <dywwnh7ns47ffndsttstpcsw44avxjvzcddmceha7xavqjdi77@cqdgmpdtywol>
+ <20241129091013.029fced3@bootlin.com>
+ <1a895f7c-bbfc-483d-b36b-921788b07b36@app.fastmail.com>
+ <CAMuHMdWXgXiHNUhrXB9jT4opnOQYUxtW=Vh0yBQT0jJS49+zsw@mail.gmail.com>
+Subject: Re: [PATCH v9 1/6] misc: Add support for LAN966x PCI device
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 28, 2024 at 9:59=E2=80=AFAM Jiri Wiesner <jwiesner@suse.de> wro=
-te:
+On Fri, Nov 29, 2024, at 09:44, Geert Uytterhoeven wrote:
+> On Fri, Nov 29, 2024 at 9:25=E2=80=AFAM Arnd Bergmann <arnd@arndb.de> =
+wrote:
+>> On Fri, Nov 29, 2024, at 09:10, Herve Codina wrote:
+>> I would write in two lines as
+>>
+>>         depends on PCI
+>>         depends on OF_OVERLAY
+>>
+>> since OF_OVERLAY already depends on OF, that can be left out.
+>> The effect is the same as your variant though.
 >
-> Dst objects get leaked in ip6_negative_advice() when this function is
-> executed for an expired IPv6 route located in the exception table. There
-> are several conditions that must be fulfilled for the leak to occur:
-> * an ICMPv6 packet indicating a change of the MTU for the path is receive=
-d,
->   resulting in an exception dst being created
-> * a TCP connection that uses the exception dst for routing packets must
->   start timing out so that TCP begins retransmissions
-> * after the exception dst expires, the FIB6 garbage collector must not ru=
-n
->   before TCP executes ip6_negative_advice() for the expired exception dst
+> What about
 >
-> When TCP executes ip6_negative_advice() for an exception dst that has
-> expired and if no other socket holds a reference to the exception dst, th=
-e
-> refcount of the exception dst is 2, which corresponds to the increment
-> made by dst_init() and the increment made by the TCP socket for which the
-> connection is timing out. The refcount made by the socket is never
-> released. The refcount of the dst is decremented in sk_dst_reset() but
-> that decrement is counteracted by a dst_hold() intentionally placed just
-> before the sk_dst_reset() in ip6_negative_advice(). After
-> ip6_negative_advice() has finished, there is no other object tied to the
-> dst. The socket lost its reference stored in sk_dst_cache and the dst is
-> no longer in the exception table. The exception dst becomes a leaked
-> object.
+>     depends on OF
+>     select OF_OVERLAY
 >
-> As a result of this dst leak, an unbalanced refcount is reported for the
-> loopback device of a net namespace being destroyed under kernels that do
-> not contain e5f80fcf869a ("ipv6: give an IPv6 dev to blackhole_netdev"):
-> unregister_netdevice: waiting for lo to become free. Usage count =3D 2
->
-> Fix the dst leak by removing the dst_hold() in ip6_negative_advice(). The
-> patch that introduced the dst_hold() in ip6_negative_advice() was
-> 92f1655aa2b22 ("net: fix __dst_negative_advice() race"). But 92f1655aa2b2=
-2
-> merely refactored the code with regards to the dst refcount so the issue
-> was present even before 92f1655aa2b22. The bug was introduced in
-> 54c1a859efd9f ("ipv6: Don't drop cache route entry unless timer actually
-> expired.") where the expired cached route is deleted and the sk_dst_cache
-> member of the socket is set to NULL by calling dst_negative_advice() but
-> the refcount belonging to the socket is left unbalanced.
->
-> The IPv4 version - ipv4_negative_advice() - is not affected by this bug.
-> When the TCP connection times out ipv4_negative_advice() merely resets th=
-e
-> sk_dst_cache of the socket while decrementing the refcount of the
-> exception dst.
->
-> Fixes: 92f1655aa2b22 ("net: fix __dst_negative_advice() race")
-> Fixes: 54c1a859efd9f ("ipv6: Don't drop cache route entry unless timer ac=
-tually expired.")
-> Link: https://lore.kernel.org/netdev/20241113105611.GA6723@incl/T/#u
-> Signed-off-by: Jiri Wiesner <jwiesner@suse.de>
+> as "OF" is a clear bus dependency, due to the driver providing an OF
+> child bus (cfr. I2C or SPI bus controller drivers depending on I2C or
+> SPI), and OF_OVERLAY is an optional software mechanism?
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+OF_OVERLAY is currently a user visible option, so I think it's
+intended to be used with 'depends on'. The only other callers
+of this interface are the kunit test modules that just leave
+out the overlay code if that is disabled.
 
-Thanks a lot Jiri !
+If we decide to treat OF_OVERLAY as a library instead, it should
+probably become a silent Kconfig option that gets selected by
+all its users including the unit tests, and then we can remove
+the #ifdef checks there.
+
+Since OF_OVERLAY pulls in OF_DYNAMIC, I would still prefer that
+to be a user choice. Silently enabling OF_OVERLAY definitely has
+a risk of introducing regressions since it changes some of the
+interesting code paths in the core, in particular it enables
+reference counting in of_node_get(), which many drivers get wrong.
+
+      Arnd
 
