@@ -1,96 +1,211 @@
-Return-Path: <netdev+bounces-147807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16FB19DBF58
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 06:55:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 140589DBF62
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 07:08:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B509B21C39
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 05:55:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6F18281A5B
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 06:08:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29655155757;
-	Fri, 29 Nov 2024 05:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="b+1zl+B9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C6071531C5;
+	Fri, 29 Nov 2024 06:08:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3C5BA4B;
-	Fri, 29 Nov 2024 05:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DE0184F
+	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 06:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732859713; cv=none; b=ZVBu62oOVDShDTVU7+cBtZpewBleERAuqy4wq4B+xIDxiLT1suo4Wsr889lueFmJdW2DUc+jYcm8bZNYEJaKs6JA0vgACv1BBty2or2RN14KkyvIPs23hqaEG6O8Cc2trCkU0t3I7MTi4wdi1toXxBRD53RXr7gpRktd2pe6QiQ=
+	t=1732860512; cv=none; b=lnslUMCfcNvcloW8Xas8kbZct1QWtnWxz/qcwUqMSJ+0G3YpyY0BcOiIWVyDnGoadtXp8yw5zBaNQbEIeYP5uqJcHFgWCQ/C6aiSf7UoefEb9RSIPt/JoUStk9ymj/jE7gugdaPGQLsamVCaNEr5r0lawaOpZzIHxkWRSxRBHeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732859713; c=relaxed/simple;
-	bh=pjOoYkVFMuHnZj9zsk9+LbQrrWk+4NPvNgihxH/VmY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=IYVdjo7dMaFgnTaCRsxfaoQeB85Q8lT4LfQIwAqNSC1iVvCHGnbOb+PNQhOyz4Z9hR/dKZunfozsCsVN4G1gMlY9vzvrmjFOE4IWpNuZ8jg9tYFNxwBY97eouajqqdrtrVyqI0reSRO8f5QYze/YZgL7/Nl2ANAz1KnsYuvp7+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=b+1zl+B9; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=QnEpyNKBTgXpnhTt/rHf2Kgbpvm7yzHKIG4Rn0/uL8Y=; b=b+1zl+B9rp4eNRqqsocaMKBZTD
-	ACKm2LHEgT1zW3VVWB0Sf4/BxT7z5mO68+yOTE7XMnT0m0GzaWXZJwaQs4Wh9ianQHLKxLJ3QUXkS
-	mrkXJeUKDIB3miwgnYEaa2sUHx6nWj5NfflRO7kgSAjuC4Ln4n0EI4JsuUDMXSclGhgvKWdi6h/R4
-	qa14VyOwT+pmfixEs+/IELjFuviRHND+dXVtqTL4cI8G+Q75CmG7pE8NehbImGw++6pZgrPu9UiO8
-	dDWhfSJqYx6Acd6aIa56OA0/5TdAf0UAxaTW8h6MKxRR7UnT7eTEb5vbXnhi3k0/XbHmDGCD+ufx3
-	/7+Bzgyg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tGtxu-002Kdj-0p;
-	Fri, 29 Nov 2024 13:54:55 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 Nov 2024 13:54:54 +0800
-Date: Fri, 29 Nov 2024 13:54:54 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc: NeilBrown <neilb@suse.de>, Thomas Graf <tgraf@suug.ch>
-Subject: [PATCH] MAINTAINERS: Move rhashtable over to linux-crypto
-Message-ID: <Z0lXLs9Zoo22kH-f@gondor.apana.org.au>
+	s=arc-20240116; t=1732860512; c=relaxed/simple;
+	bh=ornm8GmHDRgYJi/JutasvX4vQMJWYiseRosZ2T5wzEs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=csWAuboKsVyelN/LC92N6BPoD5UGwhhR9/u+HACcgwf9jY6g/1ciEbeyMmnkPkcE169zzmhDX8TU41AZuI5Tpm6/ZXMn1h8RaeLWiFdXiGmo9nUY4F+Z0aSFJpelyDprgDv9lYm4wuS7aBzGw9LkeEOnmPi6Lic4n2Zy7WmjmuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tGuAt-0007pa-32; Fri, 29 Nov 2024 07:08:19 +0100
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tGuAs-000jnD-02;
+	Fri, 29 Nov 2024 07:08:18 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tGuAs-000mIR-2L;
+	Fri, 29 Nov 2024 07:08:18 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	netdev@vger.kernel.org
+Subject: [PATCH ethtool v3] ethtool: add support for ETHTOOL_A_CABLE_FAULT_LENGTH_SRC and ETHTOOL_A_CABLE_RESULT_SRC
+Date: Fri, 29 Nov 2024 07:08:16 +0100
+Message-Id: <20241129060816.185626-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-This patch moves the rhashtable mailing list over to linux-crypto.
-This would allow rhashtable patches to go through my tree instead
-of the networking tree.
+Extend cable test output to include source information, supporting
+diagnostic technologies like TDR (Time Domain Reflectometry) and ALCD
+(Active Link Cable Diagnostic). The source is displayed optionally at
+the end of each result or fault length line.
 
-More uses are popping up outside of the network stack and having it
-under the networking tree no longer makes sense.
+TDR requires interrupting the active link to measure parameters like
+fault location, while ALCD can operate on an active link to provide
+details like cable length without disruption.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Example output:
+Pair B code Open Circuit, source: TDR
+Pair B, fault length: 8.00m, source: TDR
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 48240da01d0c..614a3b561212 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -19835,7 +19835,7 @@ F:	net/rfkill/
- RHASHTABLE
- M:	Thomas Graf <tgraf@suug.ch>
- M:	Herbert Xu <herbert@gondor.apana.org.au>
--L:	netdev@vger.kernel.org
-+L:	linux-crypto@vger.kernel.org
- S:	Maintained
- F:	include/linux/rhashtable-types.h
- F:	include/linux/rhashtable.h
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+changes v3:
+- use proper field validation for ETHTOOL_A_CABLE_*_SRC
+changes v2:
+- s/NLATTR_DESC_U8/NLATTR_DESC_U32
+---
+ netlink/cable_test.c   | 38 ++++++++++++++++++++++++++++++++------
+ netlink/desc-ethtool.c |  2 ++
+ 2 files changed, 34 insertions(+), 6 deletions(-)
+
+diff --git a/netlink/cable_test.c b/netlink/cable_test.c
+index ba21c6cd31e4..fdb046eb52b7 100644
+--- a/netlink/cable_test.c
++++ b/netlink/cable_test.c
+@@ -18,7 +18,7 @@ struct cable_test_context {
+ };
+
+ static int nl_get_cable_test_result(const struct nlattr *nest, uint8_t *pair,
+-				    uint16_t *code)
++				    uint16_t *code, uint32_t *src)
+ {
+ 	const struct nlattr *tb[ETHTOOL_A_CABLE_RESULT_MAX+1] = {};
+ 	DECLARE_ATTR_TB_INFO(tb);
+@@ -32,12 +32,15 @@ static int nl_get_cable_test_result(const struct nlattr *nest, uint8_t *pair,
+
+ 	*pair = mnl_attr_get_u8(tb[ETHTOOL_A_CABLE_RESULT_PAIR]);
+ 	*code = mnl_attr_get_u8(tb[ETHTOOL_A_CABLE_RESULT_CODE]);
++	if (tb[ETHTOOL_A_CABLE_RESULT_SRC])
++		*src = mnl_attr_get_u32(tb[ETHTOOL_A_CABLE_RESULT_SRC]);
+
+ 	return 0;
+ }
+
+ static int nl_get_cable_test_fault_length(const struct nlattr *nest,
+-					  uint8_t *pair, unsigned int *cm)
++					  uint8_t *pair, unsigned int *cm,
++					  uint32_t *src)
+ {
+ 	const struct nlattr *tb[ETHTOOL_A_CABLE_FAULT_LENGTH_MAX+1] = {};
+ 	DECLARE_ATTR_TB_INFO(tb);
+@@ -51,6 +54,8 @@ static int nl_get_cable_test_fault_length(const struct nlattr *nest,
+
+ 	*pair = mnl_attr_get_u8(tb[ETHTOOL_A_CABLE_FAULT_LENGTH_PAIR]);
+ 	*cm = mnl_attr_get_u32(tb[ETHTOOL_A_CABLE_FAULT_LENGTH_CM]);
++	if (tb[ETHTOOL_A_CABLE_FAULT_LENGTH_SRC])
++		*src = mnl_attr_get_u32(tb[ETHTOOL_A_CABLE_FAULT_LENGTH_SRC]);
+
+ 	return 0;
+ }
+@@ -88,33 +93,54 @@ static char *nl_pair2txt(uint8_t pair)
+ 	}
+ }
+
++static char *nl_src2txt(uint32_t src)
++{
++	switch (src) {
++	case ETHTOOL_A_CABLE_INF_SRC_TDR:
++		return "TDR";
++	case ETHTOOL_A_CABLE_INF_SRC_ALCD:
++		return "ALCD";
++	default:
++		return "Unknown";
++	}
++}
++
+ static int nl_cable_test_ntf_attr(struct nlattr *evattr)
+ {
+ 	unsigned int cm;
++	uint32_t src = UINT32_MAX;
+ 	uint16_t code;
+ 	uint8_t pair;
+ 	int ret;
+
+ 	switch (mnl_attr_get_type(evattr)) {
+ 	case ETHTOOL_A_CABLE_NEST_RESULT:
+-		ret = nl_get_cable_test_result(evattr, &pair, &code);
++		ret = nl_get_cable_test_result(evattr, &pair, &code, &src);
+ 		if (ret < 0)
+ 			return ret;
+
+ 		open_json_object(NULL);
+ 		print_string(PRINT_ANY, "pair", "%s ", nl_pair2txt(pair));
+-		print_string(PRINT_ANY, "code", "code %s\n", nl_code2txt(code));
++		print_string(PRINT_ANY, "code", "code %s", nl_code2txt(code));
++		if (src != UINT32_MAX)
++			print_string(PRINT_ANY, "src", ", source: %s",
++				     nl_src2txt(src));
++		print_nl();
+ 		close_json_object();
+ 		break;
+
+ 	case ETHTOOL_A_CABLE_NEST_FAULT_LENGTH:
+-		ret = nl_get_cable_test_fault_length(evattr, &pair, &cm);
++		ret = nl_get_cable_test_fault_length(evattr, &pair, &cm, &src);
+ 		if (ret < 0)
+ 			return ret;
+ 		open_json_object(NULL);
+ 		print_string(PRINT_ANY, "pair", "%s, ", nl_pair2txt(pair));
+-		print_float(PRINT_ANY, "length", "fault length: %0.2fm\n",
++		print_float(PRINT_ANY, "length", "fault length: %0.2fm",
+ 			    (float)cm / 100);
++		if (src != UINT32_MAX)
++			print_string(PRINT_ANY, "src", ", source: %s",
++				     nl_src2txt(src));
++		print_nl();
+ 		close_json_object();
+ 		break;
+ 	}
+diff --git a/netlink/desc-ethtool.c b/netlink/desc-ethtool.c
+index 5c0e1c6f433d..32a9eb36bde6 100644
+--- a/netlink/desc-ethtool.c
++++ b/netlink/desc-ethtool.c
+@@ -252,12 +252,14 @@ static const struct pretty_nla_desc __cable_test_result_desc[] = {
+ 	NLATTR_DESC_INVALID(ETHTOOL_A_CABLE_RESULT_UNSPEC),
+ 	NLATTR_DESC_U8(ETHTOOL_A_CABLE_RESULT_PAIR),
+ 	NLATTR_DESC_U8(ETHTOOL_A_CABLE_RESULT_CODE),
++	NLATTR_DESC_U32(ETHTOOL_A_CABLE_RESULT_SRC),
+ };
+
+ static const struct pretty_nla_desc __cable_test_flength_desc[] = {
+ 	NLATTR_DESC_INVALID(ETHTOOL_A_CABLE_FAULT_LENGTH_UNSPEC),
+ 	NLATTR_DESC_U8(ETHTOOL_A_CABLE_FAULT_LENGTH_PAIR),
+ 	NLATTR_DESC_U32(ETHTOOL_A_CABLE_FAULT_LENGTH_CM),
++	NLATTR_DESC_U32(ETHTOOL_A_CABLE_FAULT_LENGTH_SRC),
+ };
+
+ static const struct pretty_nla_desc __cable_nest_desc[] = {
+--
+2.39.5
+
 
