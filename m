@@ -1,190 +1,118 @@
-Return-Path: <netdev+bounces-147817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D67709DC078
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 09:25:46 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 067F29DC091
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 09:36:06 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 977F8281108
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 08:25:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3C77164851
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 08:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E60515ECD7;
-	Fri, 29 Nov 2024 08:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5F8161311;
+	Fri, 29 Nov 2024 08:36:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="KOJA5EBN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KvA6CDJr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="appCYFW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0B215D5B8;
-	Fri, 29 Nov 2024 08:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B9014B088;
+	Fri, 29 Nov 2024 08:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732868742; cv=none; b=jPUO9to5wYOm6kyLSrYcR16PB+q3GZFmiiH7KswKmMDcBV1XfpwjSqh6I8vEe9/SeO+uK0+VDnsMmBwWxIsN+Udr4HmDNo/1ZgC7D+gWPxfCtrYM0VTX3qrqCyvnCz0GAElX/2LdgP5U/5soyz2NGM2DCN4Eq6qL8iUAPE5BTDw=
+	t=1732869360; cv=none; b=D0obNquZM/Rcs9PP+tTK9JKdoujByXaZtfuTUOgTMjP946n9/jGA9oXEPS2cRa4K8EduhMzIIEiPIvXJNTgEpgZcq+c0Xq1moHuEmoefyBBtUUUuuDpcEMfpL9zPcpczqZc+HIbo2m87AWL0ag3JOTbvh5NH0r60qFaCfkCFlPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732868742; c=relaxed/simple;
-	bh=ZoxfgOCiNBGvc38i9qoSOF38QGUQoZ7MMsUNaUmc7QI=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=RIqc69bC1S7HhUoLLSF3aip/weMrijfs3wqnCvX93/DgqvZ0uLzeTMdu5gR7sOFUka3iY76ekVe5BZEueBKvw+73BYRQN0TgtBw6KGZRFLqxAsWG+G/orwEUq8Nod84SEYDOZycQkDen9cvj1VcpD+6hfaTwkxhHCL4IE8hSpPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=KOJA5EBN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KvA6CDJr; arc=none smtp.client-ip=202.12.124.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 207332540185;
-	Fri, 29 Nov 2024 03:25:37 -0500 (EST)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Fri, 29 Nov 2024 03:25:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1732868736;
-	 x=1732955136; bh=UkrIkZIR81K+8lZR1jV0EYOCaPxA1tf+i52k5/yQXYE=; b=
-	KOJA5EBNlyb8AYL5jSXpuBelBvb73YiE90Wu9UpAMctnOf83Wr1OAy1Ren4m/BV+
-	NvXNTcvq4i1mSgTiixSfE1eI5cupRXteGM85a+ULO8rMY2UtiInKXnYmXb2kAGHG
-	9H9SKLcsNSeqcfEnhqCPb4ypxAkhk8CPxd2UIN1mAdcQUSjofBfVmgSQZuEMOto5
-	+hQIMXRwoV09NYF0hRiqDZQBz8eWRqUIOcpdhaWAZf7LOEeHG9hdxLyaCyKnNh6h
-	KNlC4CVkTgsbPI0tkBo7FtLSXZJi1qFfY3W4ssHMR5WySwW5jzWTnGwtrkUeo+6Y
-	3GQ2cXRER5DyBj7XC3yDhQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1732868736; x=
-	1732955136; bh=UkrIkZIR81K+8lZR1jV0EYOCaPxA1tf+i52k5/yQXYE=; b=K
-	vA6CDJrEiE6pUy3ii7u2JCcRFNVL0TYiIQJsQ7U2DC48SjUIbUlyVWO7bINl3yK3
-	S5kRjCvtDyNJi9Xb402bdO2lQSraWPiOF6mmFzAJdzigD+/UgOah81r6XbL3K2O6
-	MbPhMzXYuIJ0nbZeZERSj8c0+ooB2KdpwxJ1aCEJ/pcRdqgTkKUeE7IvyLLYGTJi
-	Tb70HuKLscGgw200rYY7vsWMlJLfB01LoKSe9un7dLiFD7fFTCR2uSSex6DOP537
-	7i0rLd1+xsh9i0pW1o8Oso2MN7gDN3xSj7UHUKOfIfz9jKS6O5GblcYivoITDRox
-	b3u9Pg7mGZ3bu3HskIkQw==
-X-ME-Sender: <xms:gHpJZ6w2fGfxXS9vV9zMcGq697f78hkVipzcWNWFgb5THIiGOoauCw>
-    <xme:gHpJZ2Trh3-Hm_QKXfhvaQSIZuZSqFZDutp_lV3EUN7YmRRYGI3bkufTEfR0wZwUW
-    -QgDdRvd-UVyL1E1vs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrhedvgdduudeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddt
-    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
-    guvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefg
-    gfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepfeef
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopeguvghrvghkrdhkihgvrhhnrghnse
-    grmhgurdgtohhmpdhrtghpthhtohepughrrghgrghnrdgtvhgvthhitgesrghmugdrtgho
-    mhdprhgtphhtthhopehhvghrvhgvrdgtohguihhnrgessghoohhtlhhinhdrtghomhdprh
-    gtphhtthhopehluhgtrgdrtggvrhgvshholhhisegsohhothhlihhnrdgtohhmpdhrtghp
-    thhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtg
-    hpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgu
-    hidrshhhvghvtghhvghnkhhosehgmhgrihhlrdgtohhmpdhrtghpthhtohepsghhvghlgh
-    grrghssehgohhoghhlvgdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhm
-X-ME-Proxy: <xmx:gHpJZ8Vp6xl2hBMEgs2JSWypxmN9xxYmWwNzFSblFLDZFN8EUfh2dQ>
-    <xmx:gHpJZwhzwiakrGGJbbDZG8Imk_TNKMahRje9dVx4IHugJXrAOPy2JA>
-    <xmx:gHpJZ8Dux2uk2NHsdgnCz72FSpxTT8sKEDntUWZQhKhF583xg70uoQ>
-    <xmx:gHpJZxLEh56i6QWMewaXnEKyWFaDZW1L95TcX5p_WawB0jy13PKZdw>
-    <xmx:gHpJZ0bFHq3GtzEGICp5Hv6ON-0xSNRqOAEy56UGsSJCvhRVmkh2DDD8>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 09DC32220071; Fri, 29 Nov 2024 03:25:35 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1732869360; c=relaxed/simple;
+	bh=1AkRArlPvOhjQTdT/PiFCY7HmB/jjJr3KRQ785jqxDY=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=Vb1ZvJTIRHEKvFNGWZ8b93hthAaYtrurK/go66sy1ZTbboMYbGIAaPphSX/CLOZCE94mc0JNpPpC8/DGVLr+GWBXtGzq7WyiFirUIz6CZsUoObdly8C4RUCeUmbQgrRXyeQnpFYH72J7x7s+w2NchFV0z5ci4ZErJqETHxlKEEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=appCYFW/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56A0EC4CECF;
+	Fri, 29 Nov 2024 08:35:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732869360;
+	bh=1AkRArlPvOhjQTdT/PiFCY7HmB/jjJr3KRQ785jqxDY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=appCYFW/MTYNonIsbMs4g1oEJraLYsnwNPejObwAgyFECUb4kvnYv1ryonkHx6x3v
+	 B/DIA5w5f3AEAY14UgCKShlvfOYn5+jr8BwecuEvOv+G0+Tbd++tedBlrfqTff/PSX
+	 njqegRn5Z36RVrfHWPvNmJ5cLBVq7mSIDboFgmqP09wcSGNCBNvtWj7KzRXfqb3SIx
+	 T6oaIQZhxtyeIzzGvKCgs/a3/MltaXvD7DiJ68fFJc9tBpi27FUO5uAlT56UbAZBq8
+	 qY5auJ/ploEXyLpQgYuMrMVZDV3ewtdQYd52QGkOcPvPuxqC//ZHlZFSzNnJKpHIr2
+	 YwbyzjuW8JW6Q==
+Date: Fri, 29 Nov 2024 17:35:54 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: Ruan Bonan <bonan.ruan@u.nus.edu>
+Cc: "peterz@infradead.org" <peterz@infradead.org>, "mingo@redhat.com"
+ <mingo@redhat.com>, "will@kernel.org" <will@kernel.org>,
+ "longman@redhat.com" <longman@redhat.com>, "boqun.feng@gmail.com"
+ <boqun.feng@gmail.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "kpsingh@kernel.org" <kpsingh@kernel.org>,
+ "mattbobrowski@google.com" <mattbobrowski@google.com>, "ast@kernel.org"
+ <ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ "andrii@kernel.org" <andrii@kernel.org>, "martin.lau@linux.dev"
+ <martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>,
+ "song@kernel.org" <song@kernel.org>, "yonghong.song@linux.dev"
+ <yonghong.song@linux.dev>, "john.fastabend@gmail.com"
+ <john.fastabend@gmail.com>, "sdf@fomichev.me" <sdf@fomichev.me>,
+ "haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org"
+ <jolsa@kernel.org>, "rostedt@goodmis.org" <rostedt@goodmis.org>,
+ "mathieu.desnoyers@efficios.com" <mathieu.desnoyers@efficios.com>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Fu Yeqi
+ <e1374359@u.nus.edu>
+Subject: Re: [BUG] possible deadlock in __schedule (with reproducer
+ available)
+Message-Id: <20241129173554.11e3b2b2f5126c2b72c6a78e@kernel.org>
+In-Reply-To: <24481522-69BF-4CE7-A05D-1E7398400D80@u.nus.edu>
+References: <24481522-69BF-4CE7-A05D-1E7398400D80@u.nus.edu>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Date: Fri, 29 Nov 2024 09:25:15 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Herve Codina" <herve.codina@bootlin.com>,
- "Michal Kubecek" <mkubecek@suse.cz>
-Cc: "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Andy Shevchenko" <andy.shevchenko@gmail.com>,
- "Simon Horman" <horms@kernel.org>, "Lee Jones" <lee@kernel.org>,
- "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
- "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Bjorn Helgaas" <bhelgaas@google.com>,
- "Philipp Zabel" <p.zabel@pengutronix.de>,
- "Lars Povlsen" <lars.povlsen@microchip.com>,
- "Steen Hegelund" <Steen.Hegelund@microchip.com>,
- "Daniel Machon" <daniel.machon@microchip.com>,
- UNGLinuxDriver@microchip.com, "Rob Herring" <robh@kernel.org>,
- "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>,
- "Saravana Kannan" <saravanak@google.com>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>,
- "Horatiu Vultur" <horatiu.vultur@microchip.com>,
- "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- "Allan Nielsen" <allan.nielsen@microchip.com>,
- "Luca Ceresoli" <luca.ceresoli@bootlin.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>
-Message-Id: <1a895f7c-bbfc-483d-b36b-921788b07b36@app.fastmail.com>
-In-Reply-To: <20241129091013.029fced3@bootlin.com>
-References: <20241010063611.788527-1-herve.codina@bootlin.com>
- <20241010063611.788527-2-herve.codina@bootlin.com>
- <dywwnh7ns47ffndsttstpcsw44avxjvzcddmceha7xavqjdi77@cqdgmpdtywol>
- <20241129091013.029fced3@bootlin.com>
-Subject: Re: [PATCH v9 1/6] misc: Add support for LAN966x PCI device
-Content-Type: text/plain
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 29, 2024, at 09:10, Herve Codina wrote:
-> Hi Michal,
-> On Thu, 28 Nov 2024 20:42:53 +0100
-> Michal Kubecek <mkubecek@suse.cz> wrote:
->> > --- a/drivers/misc/Kconfig
->> > +++ b/drivers/misc/Kconfig
->> > @@ -610,6 +610,30 @@ config MARVELL_CN10K_DPI
->> >  	  To compile this driver as a module, choose M here: the module
->> >  	  will be called mrvl_cn10k_dpi.
->> >  
->> > +config MCHP_LAN966X_PCI
->> > +	tristate "Microchip LAN966x PCIe Support"
->> > +	depends on PCI
->> > +	select OF
->> > +	select OF_OVERLAY  
->> 
->> Are these "select" statements what we want? When configuring current
->> mainline snapshot, I accidentally enabled this driver and ended up
->> flooded with an enormous amount of new config options, most of which
->> didn't make much sense on x86_64. It took quite long to investigate why.
->> 
->> Couldn't we rather use
->> 
->> 	depends on PCI && OF && OF_OVERLAY
->> 
->> like other drivers?
+On Sat, 23 Nov 2024 03:39:45 +0000
+Ruan Bonan <bonan.ruan@u.nus.edu> wrote:
 
-Agreed.
+> 
+>        vprintk_emit+0x414/0xb90 kernel/printk/printk.c:2406
+>        _printk+0x7a/0xa0 kernel/printk/printk.c:2432
+>        fail_dump lib/fault-inject.c:46 [inline]
+>        should_fail_ex+0x3be/0x570 lib/fault-inject.c:154
+>        strncpy_from_user+0x36/0x230 lib/strncpy_from_user.c:118
+>        strncpy_from_user_nofault+0x71/0x140 mm/maccess.c:186
+>        bpf_probe_read_user_str_common kernel/trace/bpf_trace.c:215 [inline]
+>        ____bpf_probe_read_user_str kernel/trace/bpf_trace.c:224 [inline]
 
-I would write in two lines as
+Hmm, this is a combination issue of BPF and fault injection.
 
-        depends on PCI
-        depends on OF_OVERLAY
+static void fail_dump(struct fault_attr *attr)
+{
+        if (attr->verbose > 0 && __ratelimit(&attr->ratelimit_state)) {
+                printk(KERN_NOTICE "FAULT_INJECTION: forcing a failure.\n"
+                       "name %pd, interval %lu, probability %lu, "
+                       "space %d, times %d\n", attr->dname,
+                       attr->interval, attr->probability,
+                       atomic_read(&attr->space),
+                       atomic_read(&attr->times));
 
-since OF_OVERLAY already depends on OF, that can be left out.
-The effect is the same as your variant though.
- 
->
-> I don't have a strong opinion on this 'select' vs 'depends on' for those
-> symbols.
->
-> I used select because the dependency is not obvious for a user that just
-> want the driver for the LAN966x PCI device.
+This printk() acquires console lock under rq->lock has been acquired.
 
-The general rules for picking one over the other are:
+This can happen if we use fault injection and trace event too because
+the fault injection caused printk warning.
+I think this should be a bug of the fault injection, not tracing/BPF.
+And to solve this issue, we may be able to check the context and if
+it is tracing/NMI etc, fault injection should NOT make it failure.
 
-- use 'select' for symbols that can not be enabled manually
-- prefer 'depends on' for user-visible options
-- do whatever other driver do for the same symbol, to avoid
-  dependency loops.
+Thank you,
 
-     Arnd
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
 
