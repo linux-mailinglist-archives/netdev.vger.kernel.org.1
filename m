@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-147887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C64C39DEC9D
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 21:10:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66A849DECB9
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 21:37:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 779B028215D
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 20:09:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5CF9B2140D
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 20:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 123A91A0AE1;
-	Fri, 29 Nov 2024 20:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3B11581F2;
+	Fri, 29 Nov 2024 20:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H5qs/CTy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DxrP20O0"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F74313DB9F
-	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 20:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1495714D430
+	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 20:36:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732910996; cv=none; b=bLXfWe0pi7UPMkyusMNxV6nDoxFYPZ0NTQP+3Mia8gMnWjPj0Sfr3Ccjd6JDMuwmFyTzPHjqLowye6GFfhjRWwxOailZutFZGGAy+Z+sEIFT5YTOX4gWVorBylQUmVkv6yIGXQp5RvZ6d71VFY/NhLMD9yZv38wJUKRWpYCrHYU=
+	t=1732912613; cv=none; b=HsjZssza/gFxh0GcOO1Cqpjzkx5qEHhm9TdBwnP/0rQ1xKjDJmkG97L9vnJBONubMqTrHFLoJCW7nBwrsmW/IqpSVfHjJQsV/Dqe3sbOvjMwlIL0vU/Xb9Nqr1HyTafbV5XAaEpuoep5cnFqwjmU9jp2jAjVoSgJ9xFGYfP2GzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732910996; c=relaxed/simple;
-	bh=oXcED2hhWMJEfRkbbOWIsL3bV2xVmkDz/B4XV5Rb6oo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=sqksIvqPwKvHtku4G/3PFoOokcNz2+hP1AH7qNsgEHv72vWyOVIX0slRZTN81yUEPzkGu/5WW94RItERqfr5Rf4xpx9STglyspBWaRimO5SkHdPO9Bf0X7DcRPLXMcxzZRABZ+Lpqp08ri+Kef04pmkcwe+v9B9c+uEIPwca/l0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H5qs/CTy; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1732912613; c=relaxed/simple;
+	bh=YZlE/jBpFo+64Z8yAfT8C1Ta79oTRVsY9z4cyYBUpFg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=IqjaFuEb9mrdOodygTE22M795fYv29fYMmIpWXse2efFEklMCHQSFNHz99i3KfydRxpEK3owpVwhgmO4/uCXpcGelTV4btRkDhBa/K9FJ3HhSOKMvMLIOrB7kqbjkvMTG7AXJrxWqZ5BhE4zh5CBISU9PEyYwmXgONvA2cohsL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DxrP20O0; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732910993;
+	s=mimecast20190719; t=1732912611;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=J+UzbtdXdCwllivvhEkUKFJJlCztT5JWkviudLOf7nk=;
-	b=H5qs/CTyspAxBxwUOiGstk2dO90rZA4dXDKa4eE0qZKgM4diXIfTc1QvBAfhLgHYXSxsXZ
-	HvjRh0T6itpzqaPh3AWDlCCZsHSkDr7n9WyTSQKqSa6ViLQhViXTsggmP0l1NpCnq4XyWk
-	iipiDgSQM4UGtbuoT2agRgqE0dyj6jw=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=/a5M7IdP8lXOGSSM/sXvBBskiEQyvgFUKp3QFL06WRg=;
+	b=DxrP20O0fskGJ3v8vmBNSBZaTSFQ9CPs+ofLCLdIoSbB/IHof5vfNYVFrvRDnN9u2eC/aw
+	XdRtvhMo16tvOyXPeZ5PgVJOpL7HevjcsGGKCNTrv9KO/iLiU5kkxiChvemryqc+7h+OZp
+	1LeifA1gAkcDF/EG/dS+kIBwvvAJK7k=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-510-Hc1Y9N-kOsy3FFSFe4yrgA-1; Fri,
- 29 Nov 2024 15:09:47 -0500
-X-MC-Unique: Hc1Y9N-kOsy3FFSFe4yrgA-1
-X-Mimecast-MFC-AGG-ID: Hc1Y9N-kOsy3FFSFe4yrgA
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-454-jRuj2I_4OEG2qe8KdOixPw-1; Fri,
+ 29 Nov 2024 15:36:45 -0500
+X-MC-Unique: jRuj2I_4OEG2qe8KdOixPw-1
+X-Mimecast-MFC-AGG-ID: jRuj2I_4OEG2qe8KdOixPw
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5009C1956088;
-	Fri, 29 Nov 2024 20:09:45 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E69E1955DCA;
+	Fri, 29 Nov 2024 20:36:43 +0000 (UTC)
 Received: from lszubowi.redhat.com (unknown [10.22.88.155])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 96A8A1955D47;
-	Fri, 29 Nov 2024 20:09:42 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EF86E195605A;
+	Fri, 29 Nov 2024 20:36:40 +0000 (UTC)
 From: Lenny Szubowicz <lszubowi@redhat.com>
 To: pavan.chebbi@broadcom.com,
 	mchan@broadcom.com,
@@ -67,9 +67,9 @@ To: pavan.chebbi@broadcom.com,
 	andrea.fois@eventsense.it,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] tg3: Disable tg3 PCIe AER on system reboot
-Date: Fri, 29 Nov 2024 15:09:41 -0500
-Message-ID: <20241129200941.50217-1-lszubowi@redhat.com>
+Subject: [patch v2] tg3: Disable tg3 PCIe AER on system reboot
+Date: Fri, 29 Nov 2024 15:36:40 -0500
+Message-ID: <20241129203640.54492-1-lszubowi@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,22 +77,22 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
 Disable PCIe AER on the tg3 device on system reboot on a limited
 list of Dell PowerEdge systems. This prevents a fatal PCIe AER event
-on the tg3 device during the ACPI method _PTS (prepare to sleep) S5
-on those systems. The _PTS is invoked by acpi_enter_sleep_state_prep()
+on the tg3 device during the ACPI _PTS (prepare to sleep) method for
+S5 on those systems. The _PTS is invoked by acpi_enter_sleep_state_prep()
 as part of the kernel's reboot sequence as a result of commit
 38f34dba806a ("PM: ACPI: reboot: Reinstate S5 for reboot").
 
 There was an earlier fix for this problem by commit 2ca1c94ce0b6
 ("tg3: Disable tg3 device on system reboot to avoid triggering AER").
 But it was discovered that this earlier fix caused a reboot hang
-when some Dell PowerEdge servers were booted via ipxe. So the earlier
-fix was essentially reverted by commit 9fc3bc764334 ("tg3: power down
-device only on SYSTEM_POWER_OFF") and re-exposed the tg3 PCIe AER on
-reboot.
+when some Dell PowerEdge servers were booted via ipxe. To address
+this reboot hang, the earlier fix was essentially reverted by commit
+9fc3bc764334 ("tg3: power down device only on SYSTEM_POWER_OFF").
+This re-exposed the tg3 PCIe AER on reboot problem.
 
 This fix is not an ideal solution because the root cause of the AER
 is in system firmware. Instead, it's a targeted work-around in the
@@ -104,11 +104,11 @@ if the system is configured to use "firmware first" error handling.
 Fixes: 9fc3bc764334 ("tg3: power down device only on SYSTEM_POWER_OFF")
 Signed-off-by: Lenny Szubowicz <lszubowi@redhat.com>
 ---
- drivers/net/ethernet/broadcom/tg3.c | 50 +++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ drivers/net/ethernet/broadcom/tg3.c | 59 +++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 378815917741..8672e3099d82 100644
+index 9cc8db10a8d6..12ae5a976ca7 100644
 --- a/drivers/net/ethernet/broadcom/tg3.c
 +++ b/drivers/net/ethernet/broadcom/tg3.c
 @@ -55,6 +55,7 @@
@@ -119,10 +119,15 @@ index 378815917741..8672e3099d82 100644
  
  #include <net/checksum.h>
  #include <net/gso.h>
-@@ -18151,6 +18152,46 @@ static int tg3_resume(struct device *device)
+@@ -18192,6 +18193,51 @@ static int tg3_resume(struct device *device)
  
  static SIMPLE_DEV_PM_OPS(tg3_pm_ops, tg3_suspend, tg3_resume);
  
++/*
++ * Systems where ACPI _PTS (Prepare To Sleep) S5 will result in a fatal
++ * PCIe AER event on the tg3 device if the tg3 device is not, or cannot
++ * be, powered down.
++ */
 +static const struct dmi_system_id tg3_restart_aer_quirk_table[] = {
 +	{
 +		.matches = {
@@ -166,13 +171,17 @@ index 378815917741..8672e3099d82 100644
  static void tg3_shutdown(struct pci_dev *pdev)
  {
  	struct net_device *dev = pci_get_drvdata(pdev);
-@@ -18167,6 +18208,15 @@ static void tg3_shutdown(struct pci_dev *pdev)
+@@ -18208,6 +18254,19 @@ static void tg3_shutdown(struct pci_dev *pdev)
  
  	if (system_state == SYSTEM_POWER_OFF)
  		tg3_power_down(tp);
 +	else if (system_state == SYSTEM_RESTART &&
 +		 dmi_first_match(tg3_restart_aer_quirk_table) &&
 +		 pdev->current_state <= PCI_D3hot) {
++		/*
++		 * Disable PCIe AER on the tg3 to avoid a fatal
++		 * error during this system restart.
++		 */
 +		pcie_capability_clear_word(pdev, PCI_EXP_DEVCTL,
 +					   PCI_EXP_DEVCTL_CERE |
 +					   PCI_EXP_DEVCTL_NFERE |
