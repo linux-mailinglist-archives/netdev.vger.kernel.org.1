@@ -1,318 +1,154 @@
-Return-Path: <netdev+bounces-147799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 571989DBE63
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 02:23:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABBA59DBE80
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 02:59:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B585E2823ED
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 01:23:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A4AAB20CE9
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 01:59:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD0B4D8DA;
-	Fri, 29 Nov 2024 01:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 109EC13B7A3;
+	Fri, 29 Nov 2024 01:59:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YwHhdnV1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HXEmgGFN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B894B40BE5;
-	Fri, 29 Nov 2024 01:22:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886FD1386DA
+	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 01:59:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732843361; cv=none; b=KrUtbNQfaOI9rLzUi6LyOVeSRyime4NAdt6jYWPPj8H4pZ4zTSCRRvI0jH0ClDBATmT5XR4qaMPicPhLjog3AC2OETaigEhw+ChA7yeF3CLdTpDwUSkSwv1HChoGrgYBh4mfy5ghIgM9l+CG4JojNoMv8ONneNx1sem/+aDbGhA=
+	t=1732845557; cv=none; b=qZumpcbY4Tht44x2QX7JwbdiU4b4X3dm6i5NtVSiahNAZT0jVP743MabBfEdsFf6J6EFEskAFl2y2n5Hpc+ulYAfee6Dl0vNmE9gfV6vvTo3WtufrbYdwS77owJOyQqa/TemGt7ConcLJyM/Mi8XesbnkD95JTpjd7DHS8/qKHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732843361; c=relaxed/simple;
-	bh=J2jrEWju1jVKn0vlRKQ9FBdIPh81YXEU56bdDxRNoNU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=e+Fz/hIV1zdE/SYSlWI5VZvOp41Xk7dhC1I5T93E2lXQRkuPSVTd715+t+tDgRWiAlNeB6bhqht9B97nRqi9t3n428cVhHCDYhdM7XKXA86pwtlUhUmJ4Xnc20ZMZ+YRHln25agHcaAyHl5RTZybyS5fiD9WVJVRvRRAY/P0oew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YwHhdnV1; arc=none smtp.client-ip=209.85.214.171
+	s=arc-20240116; t=1732845557; c=relaxed/simple;
+	bh=lyDDqU5fPmxLyGjsg7dIl4Yau70OmpuEXhcGX7d0GPk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oE6gTc9e3ErsgIPzZmPEo17McVvD/JUUy2qq5CFEUh/6/PmxdhBIsH9Wh5kCV+BGZxPTw/3rReamsMgQsj9zgp7X7BfGj6pYiYWiNYFWkDX79Tq+62FzbvYGtLdfKRqYwDe6cX7Q3VHiZV+sIUIaVQJa2aylj5I54+NvRSp1gW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HXEmgGFN; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2153a73edd5so2643175ad.2;
-        Thu, 28 Nov 2024 17:22:39 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2124a86f4cbso10116195ad.3
+        for <netdev@vger.kernel.org>; Thu, 28 Nov 2024 17:59:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732843359; x=1733448159; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BBHjmnFgNYCxWG5JxN+rt+rQGcx0todJSez7JTwI7wM=;
-        b=YwHhdnV183bg+EEWCfX6S7LGX3MQFCcB8PmRzz4T8zFlkUjGop1fXyn39H0FNmfsBE
-         K+Phg7rBB2O5OAC7liqmp9gy+UcysKAb2a3xbi0JwKHL41utg3vMNqS63x1sUC75YwFK
-         NYdOAJnES2fC5RTEMnIRyv21b+IA6Vq4IccJ+pg9ZwgJVZFtHGKvUpLhCJMd+I+R2i3j
-         BKz2I6TfRiJuKRQHolflTrFylDGZn3NDzmhdGUjPLWdTvBl3NDOmGJ7nXehwuVv9Ji8t
-         jE19v7jPgfacuK5a9XIYgWQ+XgZEpCbBeWL9M/TCbEP0sGsoAtHGAqI5e95szOgNXvwg
-         kACw==
+        d=gmail.com; s=20230601; t=1732845555; x=1733450355; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fzO6VXHjHdzTlhh2EE5SsrFQEUBPsjVZ9JE0iRQcsK0=;
+        b=HXEmgGFNcouoI84MVYEwHniYtaOnqGMj1fCRGpt6z72Wn8Ue6ej+Cv2iI6JjtenRd4
+         IPjh6OWsmur5bozAqGPzyI1BXOvrDqaPNCGbYd5jJhIZ6nOKE5xXJnzQ8UYplSraLp56
+         Kg3guClHcoXBcUD+7vhBahKRxFLPjLyvzN0RCKI3BTL+Q5zjbaQCf1437nYvRYyh9+Xz
+         eIsQOwke+6Oc1KkFYuqboJJ9lX7LuMYOfxUss30BddkekyNJkmYYkbg7GnQ/GIdXpA4T
+         mzhA101p/GSCBTkUwtwO/1H5uAzzgEpWqIIx4W2HXt+IENzBkIO4XACvoFBELOrRxMR2
+         57bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732843359; x=1733448159;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BBHjmnFgNYCxWG5JxN+rt+rQGcx0todJSez7JTwI7wM=;
-        b=RzXGqjU9+AAnQI4NkO05RRFzuSqQL7jVJy6wZCaFJJG4+LnYRr/5vUd2y0T7R6rnnz
-         Q9c9ubf2cQk9qsLUhSzvZ0PgpvDIdfvuQkvgpBBN1rKR0X0HmJ2JSP/0ESM25J7DZg8X
-         qSyTZ0nw3t2ar7RpHeZYiP6KSUcnB4TF811Xlv/wrby2bN08Xd/n4g72+3lmt12DQP6J
-         /I0aWOIRrVUklfLPS3QfBiEBS5cGgte9pZ+yeGJmos6KK5tLrUa+Gj1R70hzAZ1Z1/9k
-         NnnqH20AYzEeU21nJ1vTrUF0ij5vNvjKJNgR0sFJ9v8+OoFdUyOeXaoGid9BrbKzwugB
-         fwUA==
-X-Gm-Message-State: AOJu0YyjR1wiG/ceC+uliE82rQDB/oD/wHpmPU3N8J4QQ9+IaLXdT1c6
-	rWcZNQ1LuCBv0+jLE11KMExmm7xgILzitrL4sYFoLPC6nIiPrX8IRjpY3g==
-X-Gm-Gg: ASbGncsUEnl/hMaXCXslP+Q3etKbgH2Hpa/o8J8INMJK5iwDYvOnv2tUP277MYs7hxA
-	2CoxEp9IL6nI1xzfOUNhQCT/azexwmyBhin+u85EVv+wj6SZlwtB+QWP4yleXF3u6MD8AM/h532
-	G5fjI36H3IjMHfNvjfj9/BRizWQ+JLKgpplNJzktnocpEay7gZvS2bHyzDhxMynn9rXna1o44gW
-	zdnKtOCnEfAIS+TAct0bFRgEh+29NowMn8QTnLS6kIZZGEe+F9DFHKUiJ6d1AYFh0Gur61w7a1G
-	8wI=
-X-Google-Smtp-Source: AGHT+IHwh700/BckVWRm/rz1ESuNAcWfcqgdTpUXx25M+SH7jPkgDqD/3jgnKuaDATNhGTjxJeYZ8g==
-X-Received: by 2002:a17:902:ec8f:b0:20c:62e1:6361 with SMTP id d9443c01a7336-215018579admr125549245ad.25.1732843358658;
-        Thu, 28 Nov 2024 17:22:38 -0800 (PST)
-Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:7990:ba58:c520:e7e8])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21521905120sm20010215ad.80.2024.11.28.17.22.37
+        d=1e100.net; s=20230601; t=1732845555; x=1733450355;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fzO6VXHjHdzTlhh2EE5SsrFQEUBPsjVZ9JE0iRQcsK0=;
+        b=Tim2fsiFnssy7fMiJYzVjgE2OSG1anOIfpKuQSSvt3JgA7kJzJvJKphvp9h8dvz33d
+         5pBopIRL1KsILj8zJfB6FwWHAKji2XQ2y76dk2wR7kBPzq2NVPgIukTCqCMwYb36pxjC
+         jYaWZ4HYunYEg481UZ0ClUcmPzjcAP6Qbolv2RrArc3oilacIIrEFe/91yljgX1Q1Xx/
+         F+M6kqm/WHeOVLREVC1/RFXOEk6QAjCVCxNmhsOyERL7n8gcBc/dc0siinUVWkJGUsdz
+         BprWXqwVScpna5r5eIyBBP+6gy4nWD2JEASCl2TzooMcJyLhSlickgL4l7pAbOOAV+rx
+         gdCQ==
+X-Gm-Message-State: AOJu0YxyYu45f2qg4gE361IqloQ7S8Z6WOAe9PUkAsG3/ZgouFym7GbF
+	hWxwQ5CXVHKxuhwA2UMlGFsl91hQ2erq8/ejqX1GR+Isg4qHrzYL
+X-Gm-Gg: ASbGncu6ZLJO7rZ6U3Wt8W+PUrweKxORBxm06U9cyz0sEDJgnJEWZQeeQN4wPPq1lS6
+	fRZeTiZko6f56RIf3EM002jXH4+55QaeOPxdjQT0Muc5DszRdGpydDsJsii/i7zfkMV+wcpnznw
+	6z4PBxxaJN5euJp3KeiYlu/Yt8MiGlUorZp/ywXvzkZfnmQzCvXNafqD6ChKCBrsxtPswCLGaOG
+	+fFl9M8bCrP+bx/qbY4xjlFew+Flu41Zt4vhoFLygktByK24rDOYSfa
+X-Google-Smtp-Source: AGHT+IGg8DOI+6IfDQ4t3RQCL08qcbfUr98hEEwUys79Yyr+QV3AuWombuRwlGf2y5LhINap+ZrFQQ==
+X-Received: by 2002:a17:903:986:b0:20b:8776:4902 with SMTP id d9443c01a7336-21501b63d3dmr131935355ad.38.1732845554772;
+        Thu, 28 Nov 2024 17:59:14 -0800 (PST)
+Received: from localhost ([2601:647:6881:9060:7990:ba58:c520:e7e8])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21521983555sm20413895ad.172.2024.11.28.17.59.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Nov 2024 17:22:38 -0800 (PST)
+        Thu, 28 Nov 2024 17:59:14 -0800 (PST)
+Date: Thu, 28 Nov 2024 17:59:13 -0800
 From: Cong Wang <xiyou.wangcong@gmail.com>
-To: netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org,
-	Cong Wang <cong.wang@bytedance.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Zijian Zhang <zijianzhang@bytedance.com>
-Subject: [Patch bpf v2 4/4] selftests/bpf: Test bpf_skb_change_tail() in TC ingress
-Date: Thu, 28 Nov 2024 17:22:21 -0800
-Message-Id: <20241129012221.739069-5-xiyou.wangcong@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241129012221.739069-1-xiyou.wangcong@gmail.com>
-References: <20241129012221.739069-1-xiyou.wangcong@gmail.com>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net,
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
+	Davide Caratti <dcaratti@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net] net: sched: fix erspan_opt settings in cls_flower
+Message-ID: <Z0kf8QQjeHjDr6IU@pop-os.localdomain>
+References: <1e82b053724375528e82a4f21fe1778c59bb50c0.1732568211.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1e82b053724375528e82a4f21fe1778c59bb50c0.1732568211.git.lucien.xin@gmail.com>
 
-From: Cong Wang <cong.wang@bytedance.com>
+On Mon, Nov 25, 2024 at 03:56:51PM -0500, Xin Long wrote:
+> When matching erspan_opt in cls_flower, only the (version, dir, hwid)
+> fields are relevant. However, in fl_set_erspan_opt() it initializes
+> all bits of erspan_opt and its mask to 1. This inadvertently requires
+> packets to match not only the (version, dir, hwid) fields but also the
+> other fields that are unexpectedly set to 1.
 
-Similarly to the previous test, we also need a test case to cover
-positive offsets as well, TC is an excellent hook for this.
+Do you have a test case for this? Please consider adding one (in a
+separate patch) to tools/testing/selftests/tc-testing/.
 
-Cc: John Fastabend <john.fastabend@gmail.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Zijian Zhang <zijianzhang@bytedance.com>
-Signed-off-by: Cong Wang <cong.wang@bytedance.com>
----
- .../selftests/bpf/prog_tests/tc_change_tail.c |  78 ++++++++++++
- .../selftests/bpf/progs/test_tc_change_tail.c | 114 ++++++++++++++++++
- 2 files changed, 192 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_change_tail.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_tc_change_tail.c
+> 
+> This patch resolves the issue by ensuring that only the (version, dir,
+> hwid) fields are configured in fl_set_erspan_opt(), leaving the other
+> fields to 0 in erspan_opt.
+> 
+> Fixes: 79b1011cb33d ("net: sched: allow flower to match erspan options")
+> Reported-by: Shuang Li <shuali@redhat.com>
+> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> ---
+>  net/sched/cls_flower.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+> index e280c27cb9f9..c89161c5a119 100644
+> --- a/net/sched/cls_flower.c
+> +++ b/net/sched/cls_flower.c
+> @@ -1369,7 +1369,6 @@ static int fl_set_erspan_opt(const struct nlattr *nla, struct fl_flow_key *key,
+>  	int err;
+>  
+>  	md = (struct erspan_metadata *)&key->enc_opts.data[key->enc_opts.len];
+> -	memset(md, 0xff, sizeof(*md));
+>  	md->version = 1;
+>  
+>  	if (!depth)
+> @@ -1398,9 +1397,9 @@ static int fl_set_erspan_opt(const struct nlattr *nla, struct fl_flow_key *key,
+>  			NL_SET_ERR_MSG(extack, "Missing tunnel key erspan option index");
+>  			return -EINVAL;
+>  		}
+> +		memset(&md->u.index, 0xff, sizeof(md->u.index));
+>  		if (tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_INDEX]) {
+>  			nla = tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_INDEX];
+> -			memset(&md->u, 0x00, sizeof(md->u));
+>  			md->u.index = nla_get_be32(nla);
+>  		}
+>  	} else if (md->version == 2) {
+> @@ -1409,10 +1408,12 @@ static int fl_set_erspan_opt(const struct nlattr *nla, struct fl_flow_key *key,
+>  			NL_SET_ERR_MSG(extack, "Missing tunnel key erspan option dir or hwid");
+>  			return -EINVAL;
+>  		}
+> +		md->u.md2.dir = 1;
+>  		if (tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_DIR]) {
+>  			nla = tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_DIR];
+>  			md->u.md2.dir = nla_get_u8(nla);
+>  		}
+> +		set_hwid(&md->u.md2, 0x3f);
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/tc_change_tail.c b/tools/testing/selftests/bpf/prog_tests/tc_change_tail.c
-new file mode 100644
-index 000000000000..110f54a71a35
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/tc_change_tail.c
-@@ -0,0 +1,78 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <error.h>
-+#include <test_progs.h>
-+#include <linux/pkt_cls.h>
-+
-+#include "test_tc_change_tail.skel.h"
-+#include "socket_helpers.h"
-+
-+#define LO_IFINDEX 1
-+
-+void test_tc_change_tail(void)
-+{
-+	DECLARE_LIBBPF_OPTS(bpf_tc_hook, hook, .ifindex = LO_IFINDEX,
-+			.attach_point = BPF_TC_INGRESS);
-+	DECLARE_LIBBPF_OPTS(bpf_tc_opts, opts);
-+	struct test_tc_change_tail *skel = NULL;
-+	bool hook_created = false;
-+	int ret, fd;
-+	int c1, p1;
-+	char buf[2];
-+
-+	skel = test_tc_change_tail__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "test_tc_change_tail__open_and_load"))
-+		return;
-+	ret = bpf_tc_hook_create(&hook);
-+	if (ret == 0)
-+		hook_created = true;
-+	ret = ret == -EEXIST ? 0 : ret;
-+	if (!ASSERT_OK(ret, "bpf_tc_hook_create"))
-+		goto destroy;
-+	fd = bpf_program__fd(skel->progs.change_tail);
-+	opts.prog_fd = fd;
-+	opts.handle = 1;
-+	opts.priority = 1;
-+	opts.flags = BPF_TC_F_REPLACE;
-+	ret = bpf_tc_attach(&hook, &opts);
-+	if (!ASSERT_OK(ret, "bpf_tc_attach"))
-+		goto hook_destroy;
-+
-+	ret = create_pair(AF_INET, SOCK_STREAM, &c1, &p1);
-+	if (!ASSERT_OK(ret, "create_pair"))
-+		goto detach;
-+
-+	ret = xsend(p1, "Tr", 2, 0);
-+	ASSERT_EQ(ret, 2, "xsend(p1)");
-+	ret = recv(c1, buf, 2, 0);
-+	ASSERT_EQ(ret, 2, "recv(c1)");
-+	ASSERT_EQ(skel->data->change_tail_ret, 0, "change_tail_ret");
-+
-+	ret = xsend(p1, "G", 1, 0);
-+	ASSERT_EQ(ret, 1, "xsend(p1)");
-+	ret = recv(c1, buf, 1, 0);
-+	ASSERT_EQ(ret, 1, "recv(c1)");
-+	ASSERT_EQ(skel->data->change_tail_ret, 0, "change_tail_ret");
-+
-+	ret = xsend(p1, "E", 1, 0);
-+	ASSERT_EQ(ret, 1, "xsend(p1)");
-+	ret = recv(c1, buf, 1, 0);
-+	ASSERT_EQ(ret, 1, "recv(c1)");
-+	ASSERT_EQ(skel->data->change_tail_ret, -EINVAL, "change_tail_ret");
-+
-+	ret = xsend(p1, "Z", 1, 0);
-+	ASSERT_EQ(ret, 1, "xsend(p1)");
-+	ret = recv(c1, buf, 1, 0);
-+	ASSERT_EQ(ret, 1, "recv(c1)");
-+	ASSERT_EQ(skel->data->change_tail_ret, -EINVAL, "change_tail_ret");
-+
-+	close(c1);
-+	close(p1);
-+detach:
-+	bpf_tc_detach(&hook, &opts);
-+hook_destroy:
-+	if (hook_created)
-+		bpf_tc_hook_destroy(&hook);
-+destroy:
-+	test_tc_change_tail__destroy(skel);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/test_tc_change_tail.c b/tools/testing/selftests/bpf/progs/test_tc_change_tail.c
-new file mode 100644
-index 000000000000..735c7325a2ab
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/test_tc_change_tail.c
-@@ -0,0 +1,114 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <linux/bpf.h>
-+#include <bpf/bpf_helpers.h>
-+#include <linux/if_ether.h>
-+#include <linux/in.h>
-+#include <linux/ip.h>
-+#include <linux/tcp.h>
-+#include <linux/pkt_cls.h>
-+
-+long change_tail_ret = 1;
-+
-+static __always_inline struct iphdr *parse_ip_header(struct __sk_buff *skb, int *ip_proto)
-+{
-+	void *data_end = (void *)(long)skb->data_end;
-+	void *data = (void *)(long)skb->data;
-+	struct ethhdr *eth = data;
-+	struct iphdr *iph;
-+
-+	/* Verify Ethernet header */
-+	if ((void *)(data + sizeof(*eth)) > data_end)
-+		return NULL;
-+
-+	/* Skip Ethernet header to get to IP header */
-+	iph = (void *)(data + sizeof(struct ethhdr));
-+
-+	/* Verify IP header */
-+	if ((void *)(data + sizeof(struct ethhdr) + sizeof(*iph)) > data_end)
-+		return NULL;
-+
-+	/* Basic IP header validation */
-+	if (iph->version != 4)  /* Only support IPv4 */
-+		return NULL;
-+
-+	if (iph->ihl < 5)  /* Minimum IP header length */
-+		return NULL;
-+
-+	*ip_proto = iph->protocol;
-+	return iph;
-+}
-+
-+static __always_inline struct tcphdr *parse_tcp_header(struct __sk_buff *skb, struct iphdr *iph)
-+{
-+	void *data_end = (void *)(long)skb->data_end;
-+	void *hdr = (void *)iph;
-+	struct tcphdr *tcp;
-+
-+	/* Calculate TCP header position */
-+	tcp = hdr + (iph->ihl * 4);
-+	hdr = (void *)tcp;
-+
-+	/* Verify TCP header bounds */
-+	if ((void *)(hdr + sizeof(*tcp)) > data_end)
-+		return NULL;
-+
-+	/* Basic TCP validation */
-+	if (tcp->doff < 5) /* Minimum TCP header length */
-+		return NULL;
-+
-+	/* Success */
-+	return tcp;
-+}
-+
-+SEC("tc")
-+int change_tail(struct __sk_buff *skb)
-+{
-+	int len = skb->len;
-+	struct tcphdr *tcp;
-+	struct iphdr *iph;
-+	void *data_end;
-+	char *payload;
-+	int ip_proto;
-+
-+	bpf_skb_pull_data(skb, len);
-+
-+	data_end = (void *)(long)skb->data_end;
-+	iph = parse_ip_header(skb, &ip_proto);
-+	if (!iph)
-+		return TC_ACT_OK;
-+
-+	if (ip_proto != IPPROTO_TCP) /* Only support TCP packets */
-+		return TC_ACT_OK;
-+
-+	tcp = parse_tcp_header(skb, iph);
-+	if (!tcp)
-+		return TC_ACT_OK;
-+
-+	payload = (char *)tcp + (tcp->doff * 4);
-+	if (payload + 1 > (char *)data_end)
-+		return TC_ACT_OK;
-+
-+	if (payload[0] == 'T') {
-+		change_tail_ret = bpf_skb_change_tail(skb, len - 1, 0);
-+		/* Change it back to make TCP happy */
-+		if (change_tail_ret == 0)
-+			bpf_skb_change_tail(skb, len, 0);
-+		return TC_ACT_OK;
-+	} else if (payload[0] == 'G') {
-+		change_tail_ret = bpf_skb_change_tail(skb, len + 1, 0);
-+		/* Change it back to make TCP happy */
-+		if (change_tail_ret == 0)
-+			bpf_skb_change_tail(skb, len, 0);
-+		return TC_ACT_OK;
-+	} else if (payload[0] == 'E') {
-+		change_tail_ret = bpf_skb_change_tail(skb, 65535, 0); /* Should fail */
-+		return TC_ACT_OK;
-+	} else if (payload[0] == 'Z') {
-+		change_tail_ret = bpf_skb_change_tail(skb, 0, 0); /* Should fail */
-+		return TC_ACT_OK;
-+	}
-+	return TC_ACT_SHOT;
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.34.1
+I think using 0xff is easier to understand, otherwise we would need to
+look into set_hwid() to figure out what 0x3f means. :-/
 
+Thanks!
 
