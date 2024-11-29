@@ -1,138 +1,188 @@
-Return-Path: <netdev+bounces-147877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53B579DEB1C
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 17:35:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1E869DEB61
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 18:00:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D42616132B
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 16:35:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E583416331D
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 17:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F2319F40B;
-	Fri, 29 Nov 2024 16:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE3F149C4D;
+	Fri, 29 Nov 2024 17:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HxDOwPls"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="IELm5I2a";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="raccWWOV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-b7-smtp.messagingengine.com (flow-b7-smtp.messagingengine.com [202.12.124.142])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BC414831E;
-	Fri, 29 Nov 2024 16:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7A13224;
+	Fri, 29 Nov 2024 17:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732898029; cv=none; b=nE5rTlC2wM3N9Kf9gzy++8DvGAzB349XpN1yzdfQZbM6/kAa7A7sMZn+roVzmpOzpjKW21eNsS3ikmTWOMdoeS8upC4QZMXAtzQlcSp0V6mxrVRuC4oqJgX5wusyp/ouSLTMwiX8RcNfRdADutOiFVVgklRCIXcKUkIGmOvOJG0=
+	t=1732899624; cv=none; b=U8jPiEbL0rX0Ert1cjLztLdferR4i62yMryfaJ98itba0W4SPi5MYSxYwoSTKT5veQJ7VmmXKeaxVcn9bfxrYa27HKUzxGyoHihJtvnz1/ZBcc46YPI6BBGuOhjRUXe/11rDuflWOFR5DnMineEelDPKCX8Xhv7CiRxL3B5qaeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732898029; c=relaxed/simple;
-	bh=jV/HJJoyFisUlmpbEwO+vSgy0MZZ5vDW7dpKoJjtGRI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jU7+VqxfS7Ax1s4t69fO0KAjya6EXRTepHJsVlLiSK7gO+241ANDhJD8JfnIBdpeTxagHbdOcXM8DBrzy1/yUzFmeKUJyI9SJMV/XtBgDC+QNe/VxvhaDH6vl3tJvF8UON5Wh65xZzJqP8rFXYwbXhKXOyTlf1PmhIkS5HdA2iM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HxDOwPls; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2ffe2700e91so17496231fa.2;
-        Fri, 29 Nov 2024 08:33:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732898025; x=1733502825; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3o5c5OkJBnxuHx2X8U5fNa7RxI4N2MNNsd2C+SVC6H4=;
-        b=HxDOwPlsOuNayfgqQF/4HcFAN22Bb4SyTY+kvR1RfeDjOizxefu7IPvSnAt9vIfoLp
-         5LKADzcTCqv5llUj7u/0On9zPocv2BXGnsJyge2OYlxy3+y+2gzAKRekavk+AqXCCUjz
-         nteQzH2SBeqXii8rtsFggHya4pAyWAb4kJsXlmNmMAPVwfBMQUpUE0l5JfPmeruo5isR
-         U8KCcOGqCzPfLt478jEy7bSlU0aPQY+Y6GSm4UHKC8jPF9oNSOYyRuDPkTcNAiOXC4oM
-         1Ej4HYjq5NcAjDO/Fq5VnAwl71deLoDI0k/Sn1FMBINezkQXdD6ThhCT7cKKb7/TIrV4
-         xivw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732898025; x=1733502825;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3o5c5OkJBnxuHx2X8U5fNa7RxI4N2MNNsd2C+SVC6H4=;
-        b=fqigoB+nc+VuB9GdJrQJyYgw4tlt/z0SkE/IAmGmtQqOHTqoegh/NJJW6QC6tckm2w
-         SmjNoI6Q1KJnCblJU1iKEaj82jq2Yo+mNre9YN8EAFXgbJlt0uTWCDIQNx9EhxQeSPrW
-         ct05cKckv/2TYJYWfB6RLEbUZKL/Qq6FRIPEO29zHG2GzS5AwmP7HbylUPcs/I76ZHt+
-         Nc9RmRHic5N20NjxctYL/mH7La8Bagnqn43wa4lxLPwe+XTD50xg0sVxd5/5tfAHGbpG
-         mi6H/f0BqmlMHEvNdJD6v/qQ1Ome5qQbKTkJH8ZJwuRamkgBzXT7ozu1WxWW2Cly5x2U
-         q6Rw==
-X-Forwarded-Encrypted: i=1; AJvYcCUMDexXD9KRhQGuBqTw7W4HSR548SuYu2EtQSLgvTADKBXN1ofYBNRa5xTP7IW7wafOYU+A331t11oHkq7z@vger.kernel.org, AJvYcCUcVnSePwPCoHb4rqjbPNKOdCYl1t30nYf/NJFvcwOkE5DgcEpVa5o04ykVacZC6kWXxYxspga2o41Wx4Jg@vger.kernel.org, AJvYcCWvKXNAHV1zlmJUGYVlwA4uqDwZuC2/6QsGaeMB9rVWu5ukAWOvwDb8yWpVok9KHI5ahj7fSIVRd6RuuNnL+6E=@vger.kernel.org, AJvYcCXMwRRabvNq4mGVoR7JybdFEfrPe0BRFq15/2OGVPxwt7Vmf7CfeIlQif1p79sr14fyvS6LeG4XTRDV@vger.kernel.org, AJvYcCXrNR2O809X59JevlCfAaLXWQDZN4cSOMUtbyLVVhehJ49YrNUFwFVtJM5mrg6kZiOJelMPZCcA@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxw/qVdAjVlng84exwc0fxG80dyLhw5hvhQFuNJjx3aZTJ+KgzA
-	DkVGJlnIsHRbR1Q4msYRxl0vQ7DipmAolPWQrwx+HF2X7qiyTnonlAOfg7Mz/ve2GHStjKCJUro
-	vKElRcWcFtNV9cl7l1ZjG6wtY0bs=
-X-Gm-Gg: ASbGncsZhFeP1wnlVX03FwEuxAqG/QDd+Igz0CW+x5uY/T9vTgCoB+1yr6xH1wejpaH
-	xDmp6vpMkkZGHv7pSJvT1qwBMdnecYtQ=
-X-Google-Smtp-Source: AGHT+IFlFVlEhUxi6HFl3pGJQ6QkeeDU+I701r/q00tFH5KVLO7PE8iiSpjGYGZRstbj+0OGHuFgSmi6H+4E2uBgCeM=
-X-Received: by 2002:a2e:a916:0:b0:2fb:4982:daea with SMTP id
- 38308e7fff4ca-2ffd60dbdb9mr82866831fa.32.1732898025269; Fri, 29 Nov 2024
- 08:33:45 -0800 (PST)
+	s=arc-20240116; t=1732899624; c=relaxed/simple;
+	bh=CtNzinqF27+J7mwoo0xd6N7UlEds77+5yvAiOjYpCc4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f4r2UJP3jUstejRBjAmuBOxr48toZvgpQY1Cse19TX4/KATXA3x89x4Lj0n9bHTYLF9DcKtliWSk0c58UvGKflxe/v26PqUGG6AcONKe23Ji1y1vDjClqX5cVZzl9gHmRUyx3b4ywQWZt9bO8iexAG45mgf77tbPNjtDe3y4WgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=IELm5I2a; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=raccWWOV; arc=none smtp.client-ip=202.12.124.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailflow.stl.internal (Postfix) with ESMTP id 0D5981D40E15;
+	Fri, 29 Nov 2024 12:00:19 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-10.internal (MEProxy); Fri, 29 Nov 2024 12:00:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1732899618; x=
+	1732903218; bh=vCE1zA7yi53FRV7humf9JVIisBT66Uzk/D9uQNQavhY=; b=I
+	ELm5I2a5NXbgjCWiWYREEVQZcDrdguNkRHXu6W5IuWZ0nNCWvmD43G7Ib2Klrv2Y
+	n+2eUv8JlHcVCzU4L77YvPl8M6pbUXVPKjAa44i6eklZJU0LnUOVWk4uys8n2FMh
+	3JXGEH3nBTKcM49rk7oeirsswbgbcA+71LQgABi+j35c12Hei/mstreQdj59KDCu
+	3wM5O8VpgQbkKPnZyZSkFrAVQylc9FRJ1aH/nxhF6bdVYQh4uRD2rRy57yRMzfDN
+	wgwqkjHfVUnI4GlZw+KwOcds8GkhTYy2AB8y6bFsuiiOAAaPifMkJHKdO6SF8SWZ
+	RTr5QxrI6CklpX+WParrA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1732899618; x=1732903218; bh=vCE1zA7yi53FRV7humf9JVIisBT66Uzk/D9
+	uQNQavhY=; b=raccWWOVFBvPEEjUI06/G1PUS2N24zz3LJCuvlkhAaHZ6iLfgTZ
+	mCaSzfEIeAnSSVIPuFEYHwm22LmNvct9a1h+fK91XhUyAgz7cCKfKHYvrzA07rxR
+	qeTCA5hlF19NLpBtXFmHZC0ZhMBNDmRZzKAJP2rj8WMVz++Vbbh0LJf2WStP2PLQ
+	yuCkYHpotwj/iKsSZQ5UbqZFrj9341B4p5uMDVZr/CjPJ8gBZKSdwO0BIsikwcA8
+	umMbo03ZDzoCKF6i/5ftDSTSC7lob/GcqvnEa93DWBTMVj+b0L3AarGYEbAsRWAD
+	/g6/Fa/iltagiYYL3oRpi0huEZFGHcBfhMQ==
+X-ME-Sender: <xms:IfNJZwRNfydcXxZb-CUjNYjlEjnAkqHQMiKAGEZxsAyzPyCeThFNWQ>
+    <xme:IfNJZ9x-C_Aq0o-do3WyPXEZsEeX4wuechzypK1VBB3iHx0WqB86yi-UeQoyacloK
+    knJjWPtCtYwMDgtlrU>
+X-ME-Received: <xmr:IfNJZ90DDzs6nCR_kR1o1R1yywUYHWpcMXet-jXlJtZu8ukydvQEABo4Uxzl>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrheefgdelfecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
+    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
+    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
+    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
+    tghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnih
+    hosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
+    vgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhu
+    nhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrd
+    horhhgpdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhr
+    tghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepnhgvthguvghvse
+    hvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:IfNJZ0CffB1Y_xp9dHTt_Ujsf3MyJmCKT-YItExT9FafTjCQ9Bqd-w>
+    <xmx:IfNJZ5gSZxA6E8Ug-KKsXfw_e1W4D5TCG69MHkP_AbwcCVKkZfOXzQ>
+    <xmx:IfNJZwoXngtXpsSlW4IojqsalD8eDc7gQVajDZGHeCzEGRnRJpsvLQ>
+    <xmx:IfNJZ8hc2FYcm3yKsJ8rW1dklHeRYKAUrfB6ClFl3jF8Z-fzh_q1vg>
+    <xmx:IvNJZ6WdqvQKEu_UCIlXiPKXKbHYXft45fx0_yCyLrIM61LIXkwV-iew>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 29 Nov 2024 12:00:16 -0500 (EST)
+Date: Fri, 29 Nov 2024 18:00:14 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v11 18/23] ovpn: implement peer
+ add/get/dump/delete via netlink
+Message-ID: <Z0nzHn3OsNeUIQPZ@hog>
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-18-de4698c73a25@openvpn.net>
+ <ZzIlxRbic7qLVD4F@hog>
+ <136282ad-77d9-4799-bd2d-f3c3c9df99c0@openvpn.net>
+ <ZzSH-Ke4wuJcis0q@hog>
+ <5ae6f624-5196-42f7-a0b8-85e2847b3fdf@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241126172332.112212-1-ubizjak@gmail.com> <20241126172332.112212-7-ubizjak@gmail.com>
- <9CECB9F7-E700-4A92-98B9-6FD027F9CE65@gmail.com>
-In-Reply-To: <9CECB9F7-E700-4A92-98B9-6FD027F9CE65@gmail.com>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Fri, 29 Nov 2024 17:33:33 +0100
-Message-ID: <CAFULd4Zs32G+NToyGSHv8quQbSOfaEC2UjtQ3vwnn9jufK47rA@mail.gmail.com>
-Subject: Re: [PATCH 6/6] percpu/x86: Enable strict percpu checks via named AS qualifiers
-To: Nadav Amit <nadav.amit@gmail.com>
-Cc: "the arch/x86 maintainers" <x86@kernel.org>, linux-sparse@vger.kernel.org, 
-	"open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-bcachefs@vger.kernel.org, 
-	linux-arch@vger.kernel.org, netdev@vger.kernel.org, 
-	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Andy Lutomirski <luto@kernel.org>, 
-	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Brian Gerst <brgerst@gmail.com>, 
-	Peter Zijlstra <peterz@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5ae6f624-5196-42f7-a0b8-85e2847b3fdf@openvpn.net>
 
-On Fri, Nov 29, 2024 at 4:45=E2=80=AFPM Nadav Amit <nadav.amit@gmail.com> w=
-rote:
->
->
-> > On 26 Nov 2024, at 19:21, Uros Bizjak <ubizjak@gmail.com> wrote:
-> >
-> > This patch declares percpu variables in __seg_gs/__seg_fs named AS
-> > and keeps them named AS qualified until they are dereferenced with
-> > percpu accessor. This approach enables various compiler check
-> > for cross-namespace variable assignments.
->
-> [snip]
->
-> > @@ -95,9 +95,19 @@
-> >
-> > #endif /* CONFIG_SMP */
-> >
-> > -#define __my_cpu_type(var) typeof(var) __percpu_seg_override
-> > -#define __my_cpu_ptr(ptr) (__my_cpu_type(*(ptr))*)(__force uintptr_t)(=
-ptr)
-> > -#define __my_cpu_var(var) (*__my_cpu_ptr(&(var)))
-> > +#if defined(CONFIG_USE_X86_SEG_SUPPORT) && \
-> > +    defined(CONFIG_CC_HAS_TYPEOF_UNQUAL) && !defined(__CHECKER__)
->
-> Is the __CHECKER__ check because of sparse, as in patch 2/6 ?
-> If so, do you want to add a similar comment here?
+2024-11-14, 11:32:36 +0100, Antonio Quartulli wrote:
+> On 13/11/2024 12:05, Sabrina Dubroca wrote:
+> > 2024-11-12, 15:26:59 +0100, Antonio Quartulli wrote:
+> > > On 11/11/2024 16:41, Sabrina Dubroca wrote:
+> > > > 2024-10-29, 11:47:31 +0100, Antonio Quartulli wrote:
+> > > > > +void ovpn_peer_hash_vpn_ip(struct ovpn_peer *peer)
+> > > > > +	__must_hold(&peer->ovpn->peers->lock)
+> > > > 
+> > > > Changes to peer->vpn_addrs are not protected by peers->lock, so those
+> > > > could be getting updated while we're rehashing (and taking peer->lock
+> > > > in ovpn_nl_peer_modify as I'm suggesting above also wouldn't prevent
+> > > > that).
+> > > > 
+> > > 
+> > > /me screams :-D
+> > 
+> > Sorry :)
+> > 
+> > > Indeed peers->lock is only about protecting the lists, not the content of
+> > > the listed objects.
+> > > 
+> > > How about acquiring the peers->lock before calling ovpn_nl_peer_modify()?
+> > 
+> > It seems like it would work. Maybe a bit weird to have conditional
+> > locking (MP mode only), but ok. You already have this lock ordering
+> > (hold peers->lock before taking peer->lock) in
+> > ovpn_peer_keepalive_work_mp, so there should be no deadlock from doing
+> > the same thing in the netlink code.
+> 
+> Yeah.
+> 
+> > 
+> > Then I would also do that in ovpn_peer_float to protect that rehash.
+> 
+> I am not extremely comfortable with this, because it means acquiring
+> peers->lock on every packet (right now we do so only on peer->lock) and it
+> may defeat the advantage of the RCU locking on the hashtables.
+> Wouldn't you agree?
 
-Yes, this is the same check. We can declare _percpu variables in
-__seg_gs named address space only when __typeof_unqual__ is used. I
-will add a comment in the next revision of the patchset.
+Hmpf, yeah. Then I think you could keep most of the current code,
+except doing the rehash under both locks (peers + peer), and get
+ss+sa_len for the rehash directly from peer->bind (instead of using
+the ones we just defined locally in ovpn_peer_float, since they may
+have changed while we released peer->lock to grab peers->lock). We may
+end up "rehashing" twice into the same bucket if we have 2 concurrent
+peer_float calls (call 1 sets remote r1, call 2 sets a new one r2,
+call 1 hashes according to r2, call 2 also rehashes based on r2). That
+should be ok (it can happen anyway that a "real" rehash lands in the
+same bucket).
 
-> Other than that, I went over the different patches and it looks good as
-> much as I can tell.
->
-> If it means anything, you have for the series
->
-> Acked-by: Nadav Amit <nadav.amit@gmail.com <mailto:nadav.amit@gmail.com>>
+peer_float {
+  spin_lock(peer)
+  match/update bind
+  spin_unlock(peer)
 
-Thanks!
+  if (MP) {
+    spin_lock(peers)
+    spin_lock(peer)
+    rehash using peer->bind->remote rather than ss
+    spin_unlock(peer)
+    spin_unlock(peers)
+  }
+}
 
-Uros.
+
+Does that sound reasonable?
+
+-- 
+Sabrina
 
