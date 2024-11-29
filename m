@@ -1,118 +1,163 @@
-Return-Path: <netdev+bounces-147818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 067F29DC091
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 09:36:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 298A29DC0AC
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 09:44:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3C77164851
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 08:36:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7057B1625EE
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 08:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5F8161311;
-	Fri, 29 Nov 2024 08:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="appCYFW/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0327166F32;
+	Fri, 29 Nov 2024 08:44:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B9014B088;
-	Fri, 29 Nov 2024 08:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2985161321;
+	Fri, 29 Nov 2024 08:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732869360; cv=none; b=D0obNquZM/Rcs9PP+tTK9JKdoujByXaZtfuTUOgTMjP946n9/jGA9oXEPS2cRa4K8EduhMzIIEiPIvXJNTgEpgZcq+c0Xq1moHuEmoefyBBtUUUuuDpcEMfpL9zPcpczqZc+HIbo2m87AWL0ag3JOTbvh5NH0r60qFaCfkCFlPM=
+	t=1732869868; cv=none; b=unaipGLCCrAdp7m095Le/ARH62+p1IJwh73BKKvn+vzN8yuhMM5ZSoMc5JUUMMES81XrwbRqwx32MowSWuaxcQf2kfbsEuNY2oNittBMowU3qp2Hx6ttl7wbhx2WtOG2TN4DJb2CE2+CXOGy1sTSa0UBAfLoYf882r3K3yDvBak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732869360; c=relaxed/simple;
-	bh=1AkRArlPvOhjQTdT/PiFCY7HmB/jjJr3KRQ785jqxDY=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=Vb1ZvJTIRHEKvFNGWZ8b93hthAaYtrurK/go66sy1ZTbboMYbGIAaPphSX/CLOZCE94mc0JNpPpC8/DGVLr+GWBXtGzq7WyiFirUIz6CZsUoObdly8C4RUCeUmbQgrRXyeQnpFYH72J7x7s+w2NchFV0z5ci4ZErJqETHxlKEEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=appCYFW/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56A0EC4CECF;
-	Fri, 29 Nov 2024 08:35:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732869360;
-	bh=1AkRArlPvOhjQTdT/PiFCY7HmB/jjJr3KRQ785jqxDY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=appCYFW/MTYNonIsbMs4g1oEJraLYsnwNPejObwAgyFECUb4kvnYv1ryonkHx6x3v
-	 B/DIA5w5f3AEAY14UgCKShlvfOYn5+jr8BwecuEvOv+G0+Tbd++tedBlrfqTff/PSX
-	 njqegRn5Z36RVrfHWPvNmJ5cLBVq7mSIDboFgmqP09wcSGNCBNvtWj7KzRXfqb3SIx
-	 T6oaIQZhxtyeIzzGvKCgs/a3/MltaXvD7DiJ68fFJc9tBpi27FUO5uAlT56UbAZBq8
-	 qY5auJ/ploEXyLpQgYuMrMVZDV3ewtdQYd52QGkOcPvPuxqC//ZHlZFSzNnJKpHIr2
-	 YwbyzjuW8JW6Q==
-Date: Fri, 29 Nov 2024 17:35:54 +0900
-From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-To: Ruan Bonan <bonan.ruan@u.nus.edu>
-Cc: "peterz@infradead.org" <peterz@infradead.org>, "mingo@redhat.com"
- <mingo@redhat.com>, "will@kernel.org" <will@kernel.org>,
- "longman@redhat.com" <longman@redhat.com>, "boqun.feng@gmail.com"
- <boqun.feng@gmail.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "kpsingh@kernel.org" <kpsingh@kernel.org>,
- "mattbobrowski@google.com" <mattbobrowski@google.com>, "ast@kernel.org"
- <ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "andrii@kernel.org" <andrii@kernel.org>, "martin.lau@linux.dev"
- <martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>,
- "song@kernel.org" <song@kernel.org>, "yonghong.song@linux.dev"
- <yonghong.song@linux.dev>, "john.fastabend@gmail.com"
- <john.fastabend@gmail.com>, "sdf@fomichev.me" <sdf@fomichev.me>,
- "haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org"
- <jolsa@kernel.org>, "rostedt@goodmis.org" <rostedt@goodmis.org>,
- "mathieu.desnoyers@efficios.com" <mathieu.desnoyers@efficios.com>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Fu Yeqi
- <e1374359@u.nus.edu>
-Subject: Re: [BUG] possible deadlock in __schedule (with reproducer
- available)
-Message-Id: <20241129173554.11e3b2b2f5126c2b72c6a78e@kernel.org>
-In-Reply-To: <24481522-69BF-4CE7-A05D-1E7398400D80@u.nus.edu>
-References: <24481522-69BF-4CE7-A05D-1E7398400D80@u.nus.edu>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1732869868; c=relaxed/simple;
+	bh=5sqR9uQjM/ILZukK9MwwvoCAHBbjzx1SgZRUJfRZKuU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ka+zVcFXmX+UxpI50mmRyd+RUL8ARUpl4YI/K4+JuD6zUlm3msdsQeVqkOa1d9unK5+EDNK1fawJ6Fy59DOWOfK7gKAclmUApZHUdoQqEUlqindorUkfDJ+TBur2MuHdKCY04104BymxjKPul04WQ5Q/jikt9adOZubxVeKFtBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-85b9c456f46so120569241.3;
+        Fri, 29 Nov 2024 00:44:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732869865; x=1733474665;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QeED+wrJM5lj1ej/ygLCajwOh+yVxntCXNjbUrDu5EQ=;
+        b=iC1A+om6WmwwwLA8LzLvylWay5zw3t7H3aZm++DwvbB9vh4XtYNZJxm869vAewkW6V
+         xNZPalwGQO75ikRixKX5qQeJx2PYrGNO3j+h5TLwcvBV4UFq2Pw1P0qPCv37Xy72tgLK
+         TUbf1JS4aU0DMMH4ICdPYF814sDzTJU3oVrpM20g/tJzcTgw66e25hj9wYXdU8QUZbAe
+         pawPlmnPzVD/LMTTlEkJz38kaCRuC6ukeV3PDs1D+z0L1tEIwo9psme71wiuLxp+gN2I
+         fwoxlCQdR0epBLSpB+4mreyrH84uLQ/3H6uXLxKMbQKyzwsUarIeJmZA+UtOfm2G4tfi
+         Nnlw==
+X-Forwarded-Encrypted: i=1; AJvYcCUP4sfAJNJdcouV+l7FPEn7G7TW/lv0jlEjA239cSavA/hKSn2D/6IKO8nPCn5ZHEziBvQrPqD4rb7NlWx5@vger.kernel.org, AJvYcCVuINbme7K8aqUausGmE+xOifeBD82QU9qYQAAsbEYwGn0sKi19qQWY4CzUrzPoqP3HeTBIJ2wGbwc5@vger.kernel.org, AJvYcCWujU5eIvZV63t9kjGwAN+DKgJWCmHTbQ96tFfuqPBGp+gnSHxYirNg/+ZRVZkITbkefaqYQRxk@vger.kernel.org, AJvYcCWzes+ZgN8668INrYgMVYHP9jcuk1Kt2s3t4fnOCnOuQ49jvETJ/BqXKA52CiOl4a2mjW6J6yccqUL8@vger.kernel.org
+X-Gm-Message-State: AOJu0YzICj84xa3zef+7UwOLmku+bAGeubWpr8SfXm5n2Hp7Zvv7ROe6
+	hBsyEE4psJuDZRM47GJ47CeQtn+/k8V3muSufz2aOgJY4EyMB8KwvtDooUp18Ps=
+X-Gm-Gg: ASbGncuK7zIsuGcfNbT7aydZgvYWPj4vqoBw47n2zUmZGIEtr3mcJA5x8cHAlUlwue8
+	UQRQt9T/6cwsh61DGpw4zhvGQRYYBSrntmL8NXlOwDKln5cTqaRrKID1WcN9JivkYmA/Gp/d8K3
+	B/3UYVeXEaJDAWgBz6si68zw2K4769THqAP+5ddVBh5PL8bqws6w/cOw4gOjZx0hE/gSAetCDym
+	/JiFzmuy+Qt9TJSu2dBpoYtqp9Sx2Sl5Sa1BjbVpTa28PciTF/5pDcITe4mPRPIRGNSVBAy0P+W
+	FLDqCyGhjdYK
+X-Google-Smtp-Source: AGHT+IGT3qqJVhbwx4mb8rV4gpFfFkb7AcM5/lsMFvYhcuxpxnktolgSVGHTY4WmlWqcV8QyGlAjgg==
+X-Received: by 2002:a05:6102:370b:b0:4ad:4bfd:5b0d with SMTP id ada2fe7eead31-4af449b8e70mr12728643137.23.1732869864920;
+        Fri, 29 Nov 2024 00:44:24 -0800 (PST)
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com. [209.85.217.51])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-85b82c9135esm660654241.27.2024.11.29.00.44.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Nov 2024 00:44:23 -0800 (PST)
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-4af490d79d4so413059137.0;
+        Fri, 29 Nov 2024 00:44:23 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUfZTEz8UpGtMjnuMnNjfPS5PW7PKRAnVl1EyUF7ym62fG7J5z7jxtkmuYF5dEylIs76nu2e7I1pFVw@vger.kernel.org, AJvYcCVEGd0/50p/NgZ/1auTyFaW7XZvILoYN0wJKDbN41hysdGhC7PvTjcZ+3VNdWV9weL0jvQET5BErQgk@vger.kernel.org, AJvYcCVamZnMylmcmo+kzs1Xk6wR/PLO+fQdtlQiyDLjaWYtInvGY/5s4x2ivIf4sgV7bz7afevVJXcXcV2yPYDV@vger.kernel.org, AJvYcCXjETMPJud9L5Bsg/4S7PBqFzUtDVvw2SggaZFYPt7IgGTR5weWkPR594+B6y+WLtfcs6DNabW+@vger.kernel.org
+X-Received: by 2002:a05:6102:508a:b0:4af:594e:ebdc with SMTP id
+ ada2fe7eead31-4af594ef13amr6615796137.5.1732869863438; Fri, 29 Nov 2024
+ 00:44:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20241010063611.788527-1-herve.codina@bootlin.com>
+ <20241010063611.788527-2-herve.codina@bootlin.com> <dywwnh7ns47ffndsttstpcsw44avxjvzcddmceha7xavqjdi77@cqdgmpdtywol>
+ <20241129091013.029fced3@bootlin.com> <1a895f7c-bbfc-483d-b36b-921788b07b36@app.fastmail.com>
+In-Reply-To: <1a895f7c-bbfc-483d-b36b-921788b07b36@app.fastmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Fri, 29 Nov 2024 09:44:11 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdWXgXiHNUhrXB9jT4opnOQYUxtW=Vh0yBQT0jJS49+zsw@mail.gmail.com>
+Message-ID: <CAMuHMdWXgXiHNUhrXB9jT4opnOQYUxtW=Vh0yBQT0jJS49+zsw@mail.gmail.com>
+Subject: Re: [PATCH v9 1/6] misc: Add support for LAN966x PCI device
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Herve Codina <herve.codina@bootlin.com>, Michal Kubecek <mkubecek@suse.cz>, 
+	Andy Shevchenko <andy.shevchenko@gmail.com>, Simon Horman <horms@kernel.org>, Lee Jones <lee@kernel.org>, 
+	"derek.kiernan@amd.com" <derek.kiernan@amd.com>, "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>, 
+	Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon <daniel.machon@microchip.com>, 
+	UNGLinuxDriver@microchip.com, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Netdev <netdev@vger.kernel.org>, linux-pci@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Allan Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli <luca.ceresoli@bootlin.com>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 23 Nov 2024 03:39:45 +0000
-Ruan Bonan <bonan.ruan@u.nus.edu> wrote:
+On Fri, Nov 29, 2024 at 9:25=E2=80=AFAM Arnd Bergmann <arnd@arndb.de> wrote=
+:
+> On Fri, Nov 29, 2024, at 09:10, Herve Codina wrote:
+> > On Thu, 28 Nov 2024 20:42:53 +0100
+> > Michal Kubecek <mkubecek@suse.cz> wrote:
+> >> > --- a/drivers/misc/Kconfig
+> >> > +++ b/drivers/misc/Kconfig
+> >> > @@ -610,6 +610,30 @@ config MARVELL_CN10K_DPI
+> >> >      To compile this driver as a module, choose M here: the module
+> >> >      will be called mrvl_cn10k_dpi.
+> >> >
+> >> > +config MCHP_LAN966X_PCI
+> >> > +  tristate "Microchip LAN966x PCIe Support"
+> >> > +  depends on PCI
+> >> > +  select OF
+> >> > +  select OF_OVERLAY
+> >>
+> >> Are these "select" statements what we want? When configuring current
+> >> mainline snapshot, I accidentally enabled this driver and ended up
+> >> flooded with an enormous amount of new config options, most of which
+> >> didn't make much sense on x86_64. It took quite long to investigate wh=
+y.
+> >>
+> >> Couldn't we rather use
+> >>
+> >>      depends on PCI && OF && OF_OVERLAY
+> >>
+> >> like other drivers?
+>
+> Agreed.
+>
+> I would write in two lines as
+>
+>         depends on PCI
+>         depends on OF_OVERLAY
+>
+> since OF_OVERLAY already depends on OF, that can be left out.
+> The effect is the same as your variant though.
 
-> 
->        vprintk_emit+0x414/0xb90 kernel/printk/printk.c:2406
->        _printk+0x7a/0xa0 kernel/printk/printk.c:2432
->        fail_dump lib/fault-inject.c:46 [inline]
->        should_fail_ex+0x3be/0x570 lib/fault-inject.c:154
->        strncpy_from_user+0x36/0x230 lib/strncpy_from_user.c:118
->        strncpy_from_user_nofault+0x71/0x140 mm/maccess.c:186
->        bpf_probe_read_user_str_common kernel/trace/bpf_trace.c:215 [inline]
->        ____bpf_probe_read_user_str kernel/trace/bpf_trace.c:224 [inline]
+What about
 
-Hmm, this is a combination issue of BPF and fault injection.
+    depends on OF
+    select OF_OVERLAY
 
-static void fail_dump(struct fault_attr *attr)
-{
-        if (attr->verbose > 0 && __ratelimit(&attr->ratelimit_state)) {
-                printk(KERN_NOTICE "FAULT_INJECTION: forcing a failure.\n"
-                       "name %pd, interval %lu, probability %lu, "
-                       "space %d, times %d\n", attr->dname,
-                       attr->interval, attr->probability,
-                       atomic_read(&attr->space),
-                       atomic_read(&attr->times));
+as "OF" is a clear bus dependency, due to the driver providing an OF
+child bus (cfr. I2C or SPI bus controller drivers depending on I2C or
+SPI), and OF_OVERLAY is an optional software mechanism?
 
-This printk() acquires console lock under rq->lock has been acquired.
+Gr{oetje,eeting}s,
 
-This can happen if we use fault injection and trace event too because
-the fault injection caused printk warning.
-I think this should be a bug of the fault injection, not tracing/BPF.
-And to solve this issue, we may be able to check the context and if
-it is tracing/NMI etc, fault injection should NOT make it failure.
+                        Geert
 
-Thank you,
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
--- 
-Masami Hiramatsu (Google) <mhiramat@kernel.org>
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
