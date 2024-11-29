@@ -1,208 +1,153 @@
-Return-Path: <netdev+bounces-147830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88E939DC31B
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 12:51:38 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 064359DC33B
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 13:10:10 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09DE716435C
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 12:10:04 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8A619D07B;
+	Fri, 29 Nov 2024 12:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LIC54FVV"
+X-Original-To: netdev@vger.kernel.org
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4677E282092
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 11:51:37 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A3801991D2;
-	Fri, 29 Nov 2024 11:51:34 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FC817ADF7
-	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 11:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D8F19CD0B;
+	Fri, 29 Nov 2024 12:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732881094; cv=none; b=dZ1YpejSo5Zohix9Mmrvz2nTRrNVqXM2YNYpeQed8UQ4LSu1JKRptNsymOjwh6JNmjyc+moA+m1abHUgKn3pdcZNhbZBfDiyQEbb2USH4slt25jgf+/+JRKW6EOAu5J/4v8ZMN4HCIPJuqxtU095K2e2XOiKArgzXer3+0FNbLg=
+	t=1732882196; cv=none; b=kAwG+rqz7p1d5XWvJV4+aykLFDyC3+scy6KQfK2Dr0cAi1KlIo02KFwVky+eKOFIsUjqPPtBLXg087Cfkg8OvQW9vRnpJ6E5bSfRAxMJTG2DY3JlQ8R/Kq/8d4z7xkl1331++x1DDwCgdndpu2tRD/1UKV9oXV407Mnw4bdqPQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732881094; c=relaxed/simple;
-	bh=qXFczppavFoU+TdvIIVz1vt4umFSKooy9vTHjdfMqpg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=G7BOPdOrlj1KMSuBf0FYCAdJtZ4ZuiE08+S6V4ZL5Y7hHtyZ7BjMhssXOv1DGdOj3i71quOpJ7TsUX0XE0G9tX03c7MuGf2mwIJkxdjz9AEBFJvX9v5WZrAwEwqnSvTXxZ4LEraXjxNCSJVxkDHwzme8xtFJQTwVApMJbm3xY6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a7cf41b54eso29655965ab.2
-        for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 03:51:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732881092; x=1733485892;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/L696noJTLs7e4Z/ajrqUxPUHx/7g3Ur+MmtyQgO5w4=;
-        b=IV0Ln7LgJ42mYEfgxdxQH/1nd6aAYVRlNWMe7o10WJdTpWwPAw+2Kzcwow1+fkE0Tb
-         zS4N3qvHpCfFf1pBiPUSIANBlY6Bkl6J1QrXh1DyFA5/Kmm2rDZ4kjTwAjRBme8pAsJq
-         J1BjgX3h9pPFJy2cQ9F2S5R6hc0CuzQo2AqldBLXQqxduS7ocnYLTysLQ/KYaoY8TxQ/
-         ynULm1+Zaf2ZgvBRThOe3XycNvYTPkbR2ZhobBzsSzqHDvVj7A0CG7XZXZyfZ8nKD0zq
-         hz5x02FyjMZwcSQ680L7FGACJgAbWDzx3bnApYy6vmeE+waDdkeh9H/UaGUs8nerUDd7
-         ouEg==
-X-Forwarded-Encrypted: i=1; AJvYcCVtnANj6Bj0ZY6qBXd87SIP9BwGhGx/o1G/TUS6xmfEvOgx4U9JyD/atf1o6O+DHss6mPJk4NE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuQSPvTbYeArTN+1smRDKfQhSXd1JEFcPXWMvLwkfi3R/KizXE
-	NRnlRfDTvcJlh2PaAw/rit3cPh6HoUeGk5sKVntS9DIJxiYbBfHuZqvvrVfqiim9AlYgvbv2/AG
-	encgGUuzdXLQc5NkMqm0Z1t3QHrihhnsIgyHefoAqZA12SVuvxyvjp4E=
-X-Google-Smtp-Source: AGHT+IEwWGk72rKN+Gun0tjbX0pc2glLeaa+juovNZHhIkcsUsFFiRpx1nbKZyyGwlb5LRjYkdwJ/DiA3QqHvOp/Hx3fK2GexzJo
+	s=arc-20240116; t=1732882196; c=relaxed/simple;
+	bh=jAJdSp15+3ttSJ3dw0H0gS0lYJCcfjp4txGBVJvg2VE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JEm7619t9u4mvs9uQewQDP+lmpTghNUJeW/NfyhoOj1se+UNo8lLZxO68GGIu7yABdbCidkQxfH5wYD8whFkEOoqOqkyGedFP1mHeKuLsCViUFlSfU4ZY4K6gHrcwTcCSNaSHpS3y+ZMowMuCs4emai7l3AVMw7cppdWixnBkZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LIC54FVV; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=bcF2+uKv+THIH1HdaMT8XOaR+gAw7l3df+j7RVgj46g=; b=LIC54FVVsAQLuUlBTptoz80eFn
+	MSRfSt+dFjzI6lE0IxP4+eO3AfNIPWaPx+KRxNT8QxQRrAANmNBj2pxnj3lVxl+Hg8Dr3tFldMqx2
+	9j8BZBF5GI6L+9YcDR3YSJxRbPfyTzaIksLpIJ3b7TykGXFGuwaT6Cyo+8lMBhezwpj0E5htokGpA
+	QtrEVISprtDXxdtjyG+h4BIoYdQv5mbPn0RqVVm1NdVIfOhJH+Nt9uL6McT3OIXeRjrkjndUappFX
+	4NAC7yxUvnKePBDWqfOX/o6IAy+0So6n+Us+PCVkbbYU1hAvuhQ9jxZVXRHX5WsOZtNkLrg99Bypj
+	RXXlSLPA==;
+Received: from 77-249-17-89.cable.dynamic.v4.ziggo.nl ([77.249.17.89] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tGzoa-00000001je5-2qlb;
+	Fri, 29 Nov 2024 12:09:41 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id DBAC830026A; Fri, 29 Nov 2024 13:09:39 +0100 (CET)
+Date: Fri, 29 Nov 2024 13:09:39 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Masami Hiramatsu <mhiramat@kernel.org>
+Cc: Ruan Bonan <bonan.ruan@u.nus.edu>,
+	"mingo@redhat.com" <mingo@redhat.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"longman@redhat.com" <longman@redhat.com>,
+	"boqun.feng@gmail.com" <boqun.feng@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kpsingh@kernel.org" <kpsingh@kernel.org>,
+	"mattbobrowski@google.com" <mattbobrowski@google.com>,
+	"ast@kernel.org" <ast@kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"andrii@kernel.org" <andrii@kernel.org>,
+	"martin.lau@linux.dev" <martin.lau@linux.dev>,
+	"eddyz87@gmail.com" <eddyz87@gmail.com>,
+	"song@kernel.org" <song@kernel.org>,
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	"sdf@fomichev.me" <sdf@fomichev.me>,
+	"haoluo@google.com" <haoluo@google.com>,
+	"jolsa@kernel.org" <jolsa@kernel.org>,
+	"rostedt@goodmis.org" <rostedt@goodmis.org>,
+	"mathieu.desnoyers@efficios.com" <mathieu.desnoyers@efficios.com>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Fu Yeqi <e1374359@u.nus.edu>, akinobu.mita@gmail.com, tytso@mit.edu,
+	Jason@zx2c4.com
+Subject: Re: [BUG] possible deadlock in __schedule (with reproducer available)
+Message-ID: <20241129120939.GG35539@noisy.programming.kicks-ass.net>
+References: <24481522-69BF-4CE7-A05D-1E7398400D80@u.nus.edu>
+ <20241129173554.11e3b2b2f5126c2b72c6a78e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cdaa:0:b0:3a7:7ded:53b9 with SMTP id
- e9e14a558f8ab-3a7c55ea440mr88474525ab.20.1732881092009; Fri, 29 Nov 2024
- 03:51:32 -0800 (PST)
-Date: Fri, 29 Nov 2024 03:51:31 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6749aac3.050a0220.253251.00b0.GAE@google.com>
-Subject: [syzbot] [wpan?] WARNING in __dev_change_net_namespace (3)
-From: syzbot <syzbot+3344d668bbbc12996d46@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241129173554.11e3b2b2f5126c2b72c6a78e@kernel.org>
 
-Hello,
+On Fri, Nov 29, 2024 at 05:35:54PM +0900, Masami Hiramatsu wrote:
+> On Sat, 23 Nov 2024 03:39:45 +0000
+> Ruan Bonan <bonan.ruan@u.nus.edu> wrote:
+> 
+> > 
+> >        vprintk_emit+0x414/0xb90 kernel/printk/printk.c:2406
+> >        _printk+0x7a/0xa0 kernel/printk/printk.c:2432
+> >        fail_dump lib/fault-inject.c:46 [inline]
+> >        should_fail_ex+0x3be/0x570 lib/fault-inject.c:154
+> >        strncpy_from_user+0x36/0x230 lib/strncpy_from_user.c:118
+> >        strncpy_from_user_nofault+0x71/0x140 mm/maccess.c:186
+> >        bpf_probe_read_user_str_common kernel/trace/bpf_trace.c:215 [inline]
+> >        ____bpf_probe_read_user_str kernel/trace/bpf_trace.c:224 [inline]
+> 
+> Hmm, this is a combination issue of BPF and fault injection.
+> 
+> static void fail_dump(struct fault_attr *attr)
+> {
+>         if (attr->verbose > 0 && __ratelimit(&attr->ratelimit_state)) {
+>                 printk(KERN_NOTICE "FAULT_INJECTION: forcing a failure.\n"
+>                        "name %pd, interval %lu, probability %lu, "
+>                        "space %d, times %d\n", attr->dname,
+>                        attr->interval, attr->probability,
+>                        atomic_read(&attr->space),
+>                        atomic_read(&attr->times));
+> 
+> This printk() acquires console lock under rq->lock has been acquired.
+> 
+> This can happen if we use fault injection and trace event too because
+> the fault injection caused printk warning.
 
-syzbot found the following issue on:
+Ah indeed. Same difference though, if you don't know the context, most
+things are unsafe to do.
 
-HEAD commit:    9f16d5e6f220 Merge tag 'for-linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14e6775f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fb680913ee293bcc
-dashboard link: https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> I think this should be a bug of the fault injection, not tracing/BPF.
+> And to solve this issue, we may be able to check the context and if
+> it is tracing/NMI etc, fault injection should NOT make it failure.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Well, it should be okay to cause the failure, but it must be very
+careful how it goes about doing that. Tripping printk() definitely is
+out.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-9f16d5e6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/15be8a79f63a/vmlinux-9f16d5e6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/82d8dde32162/bzImage-9f16d5e6.xz
+But there's a much bigger problem there, get_random*() is not wait-free,
+in fact it takes a spinlock_t which makes that it is unusable from most
+context, and it's definitely out for tracing.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3344d668bbbc12996d46@syzkaller.appspotmail.com
+Notably, this spinlock_t makes that it is unsafe to use from anything
+that holds a raw_spinlock_t or is from hardirq context, or has
+preempt_disable() -- which is a TON of code.
 
-FAULT_INJECTION: forcing a failure.
-name failslab, interval 1, probability 0, space 0, times 1
-CPU: 0 UID: 0 PID: 5337 Comm: syz.0.0 Not tainted 6.12.0-syzkaller-09073-g9f16d5e6f220 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- fail_dump lib/fault-inject.c:53 [inline]
- should_fail_ex+0x3b0/0x4e0 lib/fault-inject.c:154
- should_failslab+0xac/0x100 mm/failslab.c:46
- slab_pre_alloc_hook mm/slub.c:4038 [inline]
- slab_alloc_node mm/slub.c:4114 [inline]
- __do_kmalloc_node mm/slub.c:4263 [inline]
- __kmalloc_noprof+0xd8/0x400 mm/slub.c:4276
- kmalloc_noprof include/linux/slab.h:883 [inline]
- kobject_rename+0xf2/0x410 lib/kobject.c:495
- device_rename+0x16a/0x200 drivers/base/core.c:4577
- __dev_change_net_namespace+0x11fb/0x1820 net/core/dev.c:11736
- dev_change_net_namespace include/linux/netdevice.h:4018 [inline]
- cfg802154_switch_netns+0xc5/0x3d0 net/ieee802154/core.c:230
- nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2541
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1347
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1891
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2583
- ___sys_sendmsg net/socket.c:2637 [inline]
- __sys_sendmsg+0x269/0x350 net/socket.c:2669
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd56a57e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fd56b299038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fd56a735fa0 RCX: 00007fd56a57e819
-RDX: 0000000000000000 RSI: 0000000020000f40 RDI: 0000000000000004
-RBP: 00007fd56b299090 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
-R13: 0000000000000000 R14: 00007fd56a735fa0 R15: 00007ffe74561238
- </TASK>
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5337 at net/core/dev.c:11738 __dev_change_net_namespace+0x16ed/0x1820 net/core/dev.c:11738
-Modules linked in:
-CPU: 0 UID: 0 PID: 5337 Comm: syz.0.0 Not tainted 6.12.0-syzkaller-09073-g9f16d5e6f220 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:__dev_change_net_namespace+0x16ed/0x1820 net/core/dev.c:11738
-Code: 01 90 48 c7 c7 a0 b6 0e 8d 48 c7 c6 80 b6 0e 8d ba 6f 2d 00 00 e8 33 28 b8 f7 90 0f 0b 90 90 e9 89 ea ff ff e8 14 82 f7 f7 90 <0f> 0b 90 e9 3a fb ff ff e8 06 82 f7 f7 90 0f 0b 90 e9 bc fe ff ff
-RSP: 0018:ffffc9000d2fef80 EFLAGS: 00010293
-RAX: ffffffff899e5dfc RBX: dffffc0000000000 RCX: ffff88801f1c2440
-RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
-RBP: ffffc9000d2ff3b8 R08: ffffffff899e592c R09: 1ffffffff2863f12
-R10: dffffc0000000000 R11: fffffbfff2863f13 R12: ffff888035e841a8
-R13: 1ffff92001a5fe61 R14: ffff888035e84724 R15: 00000000fffffff4
-FS:  00007fd56b2996c0(0000) GS:ffff88801fc00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000056434e74f468 CR3: 0000000040842000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- dev_change_net_namespace include/linux/netdevice.h:4018 [inline]
- cfg802154_switch_netns+0xc5/0x3d0 net/ieee802154/core.c:230
- nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2541
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1347
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1891
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2583
- ___sys_sendmsg net/socket.c:2637 [inline]
- __sys_sendmsg+0x269/0x350 net/socket.c:2669
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd56a57e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fd56b299038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fd56a735fa0 RCX: 00007fd56a57e819
-RDX: 0000000000000000 RSI: 0000000020000f40 RDI: 0000000000000004
-RBP: 00007fd56b299090 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
-R13: 0000000000000000 R14: 00007fd56a735fa0 R15: 00007ffe74561238
- </TASK>
+On this alone I would currently label the whole of fault-injection
+broken. The should_fail() call itself is unsafe where many of its
+callsites are otherwise perfectly fine -- eg. usercopy per the above.
 
+Perhaps it should use a simple PRNG, a simple LFSR should be plenty good
+enough to provide failure conditions.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+And yeah, I would just completely rip out the printk. Trying to figure
+out where and when it's safe to call printk() is non-trivial and just
+not worth the effort imo.
 
