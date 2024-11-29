@@ -1,157 +1,155 @@
-Return-Path: <netdev+bounces-147884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 819609DEBCD
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 18:36:59 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAC4C9DEBE6
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 19:02:50 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABB5CB21B98
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 17:36:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81D18163113
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 18:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8601A00D6;
-	Fri, 29 Nov 2024 17:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A21155326;
+	Fri, 29 Nov 2024 18:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jsfNbPPn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aI/VhO8z"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D6A14B962;
-	Fri, 29 Nov 2024 17:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601311465BA
+	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 18:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732901806; cv=none; b=NVhM7jfXsjkaCbMhetkpi3PXAFPQ8IE71khMSpFfPi/6+LOLkvrg7iqt0WRmbVQ64lyiMe4CzmLsJMDgkAd6LPFmf5FG5CgAU2FKreHuq3K4AJ6WqOZXkug/RbkBLIRPwN45yF8t85g/5fx/q17Zq6g+CXNZ2SNmW1HSoiVKMKU=
+	t=1732903368; cv=none; b=sReOsRbJLNrNhoBU3X7kGG4uXivPn0UPsgH09L/3Y+Sez0uK/Jztyul70dV8kXDACSJD3b3/yyvg3T4OnJI3tNAPUR0Xm5j4tfDGgDiInpOgtPSPtP7NxBodiZ2UQNMWHvHDJaAFj08OIDz//cB4UQSj1V7pIQnYjm7/+RyNwQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732901806; c=relaxed/simple;
-	bh=Am9e06vfxrQwa7zePLWjQsY8vfb6jcJtBoyeRsKXqNc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ep76YtgVEBkulCqL7q2IpQKj697HzSFjKCuYqQzE3GKBu2/7axvtGkrI5ug+uZnExoFk6IEvJTCGlzCwxRw64r2QQ3J6o1aHfc1CHgTC1UkdbmmBurztYoebJFs6yhmhLZROwYHo/z6gDXabUgnk/9bOQMl6E2MnbnAlZbJeMpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jsfNbPPn; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A47B9240015;
-	Fri, 29 Nov 2024 17:36:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1732901800;
+	s=arc-20240116; t=1732903368; c=relaxed/simple;
+	bh=/mdO9e2qLWUWv+8NGCkJc4S0Nd+5M6HFpbDtTG+rYxg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=NiSrnsP4LpdyLHmqwfa4e5inbrPVY2w7A49CeKSWzLbo6xbGhLJBELYjW+R4cr5YghY3AnaSQRApj5e+5aTN6EHzkzoobR2TO81jlAuZ92Ozp9uE6d3ds87+3HQ12VkLaL436NGNvBD/qY7GSrmHQcWS+RbFmSCeNFWbb56Nyvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aI/VhO8z; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732903365;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Z02MjlJuh3b3hDQPFS72EpBOSuOXivey6EAK77/5mEo=;
-	b=jsfNbPPng/GRegUIEJ4p4mxJOa8AY12nYR20XbQ8t3rkvxi4NdJbUYcQ4tQvsVxfaJEpx5
-	OD9BHE20vUPRbjY9K3HLWUewLAcPcTLeIBpdT3VN6pCSeVNisCLFZ0uZd1xQsWAyXCVJGX
-	mYiS1Sz1N3iPyl7AdZ2WC8wFTLlUGWraMIy0SBIkA54GSVixqK0aJZPAjdiXm7Bc6k5HIi
-	Hn5iJf899ZRyhy0R6cvRjOt38EzG/5YZA2sv0hgstXCMZ9fplreT4vwb8ct4D1G9BTqPvN
-	e2FWnmGmQ6zaah6xPjFkOIxCYtVO8hGsdI92t1qD45flUEypQIWtibQRa8/B2g==
-Date: Fri, 29 Nov 2024 18:36:36 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Michal Kubecek <mkubecek@suse.cz>, Andy
- Shevchenko <andy.shevchenko@gmail.com>, Simon Horman <horms@kernel.org>,
- Lee Jones <lee@kernel.org>, "derek.kiernan@amd.com"
- <derek.kiernan@amd.com>, "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Bjorn Helgaas
- <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, Lars Povlsen
- <lars.povlsen@microchip.com>, Steen Hegelund
- <Steen.Hegelund@microchip.com>, Daniel Machon
- <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Saravana Kannan <saravanak@google.com>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
- <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Netdev
- <netdev@vger.kernel.org>, linux-pci@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Allan Nielsen
- <allan.nielsen@microchip.com>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Ricardo Ribalda
- <ribalda@chromium.org>
-Subject: Re: [PATCH v9 1/6] misc: Add support for LAN966x PCI device
-Message-ID: <20241129183636.7043fa66@bootlin.com>
-In-Reply-To: <CAMuHMdWgqEZtd82hSp0iYahtTcTnORFytTm11EiZOjLf8V9tQw@mail.gmail.com>
-References: <20241010063611.788527-1-herve.codina@bootlin.com>
-	<20241010063611.788527-2-herve.codina@bootlin.com>
-	<dywwnh7ns47ffndsttstpcsw44avxjvzcddmceha7xavqjdi77@cqdgmpdtywol>
-	<20241129091013.029fced3@bootlin.com>
-	<1a895f7c-bbfc-483d-b36b-921788b07b36@app.fastmail.com>
-	<CAMuHMdWXgXiHNUhrXB9jT4opnOQYUxtW=Vh0yBQT0jJS49+zsw@mail.gmail.com>
-	<93ad42dc-eac6-4914-a425-6dbcd5dccf44@app.fastmail.com>
-	<CAMuHMdWgqEZtd82hSp0iYahtTcTnORFytTm11EiZOjLf8V9tQw@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	bh=pCGz6TGXnGG/OZd3u/MCxX+mZJ2x1TlmsaGonv5WHnc=;
+	b=aI/VhO8z0RU+uzefbwpPfwTJyaasr7IYBWARCHg0eeAzU5IKfsH3A6BdS5Y9fsl1wNexAD
+	eGTwet20vylVgZfs9P6TmDufea7gnwY8f8bh3Y8mTjV/jXRaydcwmuj3AFLDqBN70jND6c
+	elDmMNh5ck7T15MCwduaUgfVk1mOm4c=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-501-n3Uf_6IUO7CS7BVbBybWFA-1; Fri, 29 Nov 2024 13:02:44 -0500
+X-MC-Unique: n3Uf_6IUO7CS7BVbBybWFA-1
+X-Mimecast-MFC-AGG-ID: n3Uf_6IUO7CS7BVbBybWFA
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43499388faaso16001675e9.3
+        for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 10:02:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732903362; x=1733508162;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pCGz6TGXnGG/OZd3u/MCxX+mZJ2x1TlmsaGonv5WHnc=;
+        b=B8rRRGYoBX6uY0sNz/XkVDnL0FWjrTl+VCCrAyDW5ugCt1rTtjy3VNDDgTakFmt0BB
+         HXpmpfQVfYqLi12sbWHTFl5UrNkVfNWB/bl9ECFN1Imp0NEMd28dmyQd/qx2BROJmx4l
+         aGEU0mG3K9i2OVK9nvdHEEAwNJWGcVmz42xDagrFl6w/Ws+AFqx/FQm7pO6VlJdbxqiW
+         y1aKMagzPsjV1GqlvNx9TuqEZUauoKPPUOJIXu7JE9+n4QzsW1yYmkF6Av186kWz1XCm
+         nqUV4XsC41DSNOk/7PED85MoDtS36l7PRg6rPjD0pODEdL0b5SxlrqgNWWToBflpbyCz
+         oXNA==
+X-Forwarded-Encrypted: i=1; AJvYcCWtEiM91DdNvS/7YR5Q+o/w7+06yatpKve+TaxQGvfWJTsbCRnBTzNSOmUsvQQtG/2WE2f2uAc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuZ3cNLldUEzxgAMX3MptiCdMojtsEcB1fyUyyTCMs3DeA0Gyb
+	W2pAIOm9fiKmWRHmTdkdrNPArQP57M7MajagTMmaQIXWHHMSlYr5FXOkOIwtl0fUik4miGru0Yv
+	CBrt8GimtBviRp4U2ee16IOx2/I1K/wkSsen22IAobyGny5cqmpk4mgMrXJQHjw==
+X-Gm-Gg: ASbGncue9NfiVhgcd6tQMi3wuhzztoOlf8TUF6eC7DQCzms+ui3+dR/ZvbzcsHQj2j0
+	MSTdyR8xSy6KMJd0NbY67iYGk7enkushMe6pIkaSh4JEDLx1z2T6HjhZn1MGopOjxhp+QVGEkbF
+	+si9Cp9D1lHVpnGiFm3SYWIO6IGzoUy0Gm7g9dBqRiiwFWuJ9DTl1weGtgknl2Rw2DdD2TX8ZmC
+	lssjx4hOYCmjhNZMqPb5xjFXsHGy/UzK6JOG7N8my7jvpMTw0s/7dQiDTwW51XtWRXjS5rsGDaO
+X-Received: by 2002:a05:600c:1988:b0:434:9c3b:7564 with SMTP id 5b1f17b1804b1-434a9df71d2mr109937035e9.20.1732903361172;
+        Fri, 29 Nov 2024 10:02:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEzeS/qLX2LHJA77L+VmMNBQOsXUEWFUt1Hfre9KR598u3XejW8ng8g2d+F4ANNeHH3ZB2euQ==
+X-Received: by 2002:a05:600c:1988:b0:434:9c3b:7564 with SMTP id 5b1f17b1804b1-434a9df71d2mr109936615e9.20.1732903360785;
+        Fri, 29 Nov 2024 10:02:40 -0800 (PST)
+Received: from [192.168.88.24] (146-241-38-31.dyn.eolo.it. [146.241.38.31])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434aa7d1a90sm90978955e9.32.2024.11.29.10.02.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Nov 2024 10:02:40 -0800 (PST)
+Message-ID: <14c9b1de-7dd5-4f94-a604-6007991ac17b@redhat.com>
+Date: Fri, 29 Nov 2024 19:02:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ipmr: tune the ipmr_can_free_table() checks.
+From: Paolo Abeni <pabeni@redhat.com>
+To: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>
+References: <fe340d0aaea857d7401b537f1e43e534b69470a2.1732875656.git.pabeni@redhat.com>
+ <a4ad9242-2191-4f64-9a92-25d11941cf2b@kernel.org>
+ <7eec1423-d298-4fc1-bbbd-b4a7ed14d471@redhat.com>
+Content-Language: en-US
+In-Reply-To: <7eec1423-d298-4fc1-bbbd-b4a7ed14d471@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 11/29/24 18:13, Paolo Abeni wrote:
+> On 11/29/24 18:01, David Ahern wrote:
+>> On 11/29/24 3:23 AM, Paolo Abeni wrote:
+>>> diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+>>> index c5b8ec5c0a8c..d814a352cc05 100644
+>>> --- a/net/ipv4/ipmr.c
+>>> +++ b/net/ipv4/ipmr.c
+>>> @@ -122,7 +122,7 @@ static void ipmr_expire_process(struct timer_list *t);
+>>>  
+>>>  static bool ipmr_can_free_table(struct net *net)
+>>>  {
+>>> -	return !check_net(net) || !net->ipv4.mr_rules_ops;
+>>> +	return !check_net(net) || !net->list.next;
+>>>  }
+>>>  
+>>>  static struct mr_table *ipmr_mr_table_iter(struct net *net,
+>>> diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
+>>> index 7f1902ac3586..37224a5f1bbe 100644
+>>> --- a/net/ipv6/ip6mr.c
+>>> +++ b/net/ipv6/ip6mr.c
+>>> @@ -110,7 +110,7 @@ static void ipmr_expire_process(struct timer_list *t);
+>>>  
+>>>  static bool ip6mr_can_free_table(struct net *net)
+>>>  {
+>>> -	return !check_net(net) || !net->ipv6.mr6_rules_ops;
+>>> +	return !check_net(net) || !net->list.next;
+>>>  }
+>>>  
+>>>  static struct mr_table *ip6mr_mr_table_iter(struct net *net,
+>>
+>> this exposes internal namespace details to ipmr code. How about a helper
+>> in net_namespace.h that indicates the intent here?
+> 
+> Makes sense. What about something alike:
+> 
+> static bool net_setup_completed(struct net *net)
+> {
+> 	return net->list.next;
+> }
+> 
+> in net_namespace.h?
+> 
+> The question is mainly about the name, which I'm notably bad to pick.
 
-+Cc Ricardo
+Thinking again about it, I would use 'net_initialized', unless someone
+has a better option.
 
-On Fri, 29 Nov 2024 11:29:44 +0100
-Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+Thanks,
 
-> Hi Arnd,
-> 
-> On Fri, Nov 29, 2024 at 10:23 AM Arnd Bergmann <arnd@arndb.de> wrote:
-> > On Fri, Nov 29, 2024, at 09:44, Geert Uytterhoeven wrote:  
-> > > On Fri, Nov 29, 2024 at 9:25 AM Arnd Bergmann <arnd@arndb.de> wrote:  
-> > >> On Fri, Nov 29, 2024, at 09:10, Herve Codina wrote:
-> > >> I would write in two lines as
-> > >>
-> > >>         depends on PCI
-> > >>         depends on OF_OVERLAY
-> > >>
-> > >> since OF_OVERLAY already depends on OF, that can be left out.
-> > >> The effect is the same as your variant though.  
-> > >
-> > > What about
-> > >
-> > >     depends on OF
-> > >     select OF_OVERLAY
-> > >
-> > > as "OF" is a clear bus dependency, due to the driver providing an OF
-> > > child bus (cfr. I2C or SPI bus controller drivers depending on I2C or
-> > > SPI), and OF_OVERLAY is an optional software mechanism?  
-> >
+Paolo
 
-A patch has be done in that way by Ricardo Ribalda
-  https://lore.kernel.org/all/20241129-lan966x-depend-v1-1-603fc4996c4f@chromium.org/
-
-> > OF_OVERLAY is currently a user visible option, so I think it's
-> > intended to be used with 'depends on'. The only other callers
-> > of this interface are the kunit test modules that just leave
-> > out the overlay code if that is disabled.  
-> 
-> Indeed, there are no real upstream users of OF_OVERLAY left.
-> Until commit 1760eb547276299a ("drm: rcar-du: Drop leftovers
-> dependencies from Kconfig"), the rcar-lvds driver selected OF_OVERLAY
-> to be able to fix up old DTBs.
-> 
-> > If we decide to treat OF_OVERLAY as a library instead, it should
-> > probably become a silent Kconfig option that gets selected by
-> > all its users including the unit tests, and then we can remove
-> > the #ifdef checks there.  
-> 
-> Yep.
-> 
-> > Since OF_OVERLAY pulls in OF_DYNAMIC, I would still prefer that
-> > to be a user choice. Silently enabling OF_OVERLAY definitely has
-> > a risk of introducing regressions since it changes some of the
-> > interesting code paths in the core, in particular it enables
-> > reference counting in of_node_get(), which many drivers get wrong.  
-> 
-> Distro kernels will have to enable this anyway, if they want to
-> support LAN966x...
-> 
-
-Best regards,
-Hervé
 
