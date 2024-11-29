@@ -1,184 +1,176 @@
-Return-Path: <netdev+bounces-147823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874DF9DC14D
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 10:15:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 804A49DC148
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 10:14:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31DF71618A3
-	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 09:15:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FE151621AC
+	for <lists+netdev@lfdr.de>; Fri, 29 Nov 2024 09:14:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5E77170A15;
-	Fri, 29 Nov 2024 09:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471FC170A2C;
+	Fri, 29 Nov 2024 09:14:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZRwAviy9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zgV+m5zx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4546115852E;
-	Fri, 29 Nov 2024 09:15:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6149515820C
+	for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 09:14:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732871733; cv=none; b=PMLbqV3cGq+qQoK6xIIXOVPY8myizKO12UVZQimInJOYD6lfMnqMNwKlgxfSv7D7vI+ABDdHfJM1T1eeO1QGsjThWVf+pQOJ5b20Bxls1MlXm1CAqC4O6EABME6DZGp885BJvFEezQNzOYIyeFPpbROaijDy7DKOW0kye94BlJM=
+	t=1732871689; cv=none; b=AnSw5zIabxqNtkr644LajqNxtppaRx/BfBzXnnHaAbN9d/7B5aDqfbqG8YHJ/Rl1OAsiSxjtp9QbSktGOYd3aoyeD8KDVB9V79WfX1QxONeS7SPlWqbFFR6SDaCuzAX0Q/k4QOdl+/8NrkLb9xtx4mQ6qyMPP5jN6Bc4fkQele0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732871733; c=relaxed/simple;
-	bh=KaqlpHEGYnYZ87Z3/IzbVZ2RzQNqZFTf5v2/p2TYLCY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iGi8u1uCMa8pQGxS2/BT506dZko4tTcMnygAPBsTXz5tWs3a4MzmJeZUuremJy+QmE6nou0yFWlheFO/6s3tzNbdCedhS4mKHOvH1mBFllOe42FkvgxGjwN4c2ws0+ZqGIScBhXQHaPIBQaHZua7b6lWQNK22MANE/7k0ueecek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZRwAviy9; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-21210eaa803so13902335ad.2;
-        Fri, 29 Nov 2024 01:15:31 -0800 (PST)
+	s=arc-20240116; t=1732871689; c=relaxed/simple;
+	bh=YuCYWnWiyUrOvA46Sf7tAuoHbpFAABzCTmo61Q92FH0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UyWTw3JZ2jNdy89YlLZmgATgkS85AvSTnFdwPNVRH8Pq4aZyWDYwhUELXrGG1pwX/7A3g1ES3cjpf5UfTdyHQ6LSn9Q6PCyYrVywEv29ig1HgFt3yf6XQU8ULYMawtPA85KLdX/XTfGF2Hyk2KT1d5TJ+SvVCYVAy15c+v2S87w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zgV+m5zx; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-aa503cced42so225484666b.3
+        for <netdev@vger.kernel.org>; Fri, 29 Nov 2024 01:14:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732871731; x=1733476531; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HUcwmQCkeGqB0StakEVOLLLoTkvnDgPEcHpdDrPO958=;
-        b=ZRwAviy9U3x+3E7ln2aA9DRpCNanp9zlO3g7Y84aXn43C2Hd57Vlx5UWEkJlxTRTew
-         c+IjgKVwURG6Xg0BUouoMQyNzFE/JqN9cFfvs4SqG5LRNAwF89f/yXjXHxPDHtg7M62g
-         VY8oBs6PO2BAqDrVfDduwhrSL5XCoj0sBK5XmwdAlC3FiJg2M4yfRLWt9WsS7GBxy83s
-         dVsiO95uMlZmjIHQT01iR4IAU8a0qjB75HyjZipn+BQGuQPmPozqDHbtZcGPvrUCR8Wg
-         9F2L5feVPetiXE8wmyH2Hno0ZRdg9jTZ018yFHOZ6sUOcWrZr5eY95ouoKoHDDOs0TZd
-         P1EQ==
+        d=google.com; s=20230601; t=1732871686; x=1733476486; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u+M5rEikpzo5V+SqLQ6sSqX/aUjNRgKO1XHt64QPiQY=;
+        b=zgV+m5zxP6q+nKqfl7C2pfXhN1wsb6hnCSvoj0SgnB3xj9GVd5xIj1sIpzP8Z2z2ub
+         P1RGVSLtKuvl+zaNn52MTv+dIxrE7XAiFASnO/jennXCpjhclh78gBBgA6X9hhAUlvFZ
+         Ddq8ZGgacjZn26WRD90QDyVL297LQwCrcWeR40PFEzimsNAh1VIl/gyzYpMZSt+eY+tA
+         KO1cVpn799Z4p+nmQtZIW29ZqmbNt8UoNsAmzApgelC5uubsqD1l/PKoQdWKf5YjRCk4
+         u4qrivz/3R9iKN+RUkbCkgak7m4X9Y+csTWKA5l9FlraikQsezS5i8tGbFdYHimn9OZ5
+         NmLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732871731; x=1733476531;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HUcwmQCkeGqB0StakEVOLLLoTkvnDgPEcHpdDrPO958=;
-        b=w3sHJ2AKSdySm5HdRNH6uoB8/I2wD+jzXvvDgtrPdJ3JblHCQp5OAdW8iBCHp93LV7
-         JpAGIsvgAWDprMtuH7gi9jkSzsIASbmR9BO89sLqikV3KAhnQebBpewb/Pym0VbeXJu6
-         B+7M6cbGEsYzdWmZXIipguPjcHNY42+kkUEUyZ70544eGUEi6HsaAc7JajNnnws7KW0z
-         PQNfqCrPWTVEuDF+KJ3xvD3fzGyvjX6CRrmIaAQZ96VpX4ydK5yt/c+P9fIJ65nobF3c
-         WX0XKEz/uWWgYCDajC84w09cYAHaRJCtineA+mT70N0I97jwraxGW48NwGea2eI9cTTK
-         G+mA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTEJJRPXOOS0cNDzesajDrM4Uy9eeTQFqc7fzvS49edj2jTkZOyvTMctmhUnNHAAVPcKbBQmK5r9+53sI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJFjQwOadTLMgByy+n6J42Z8Q1ej9jE1UsHxjw0Vd7A/0vZizI
-	CRb4LkfXrw6nwnl3RXfn82FDJlyiDNNjiqGRsmgc/Ixc58AvBiCn
-X-Gm-Gg: ASbGncuo6edCnmRm1QV0pMHKbiyqzRW84+08Kxk53uK41CJngAfmcOjRK5AUCINcgL0
-	BeoMaZYOo9zRX66UoLCevwyrX2KtDmk8n/dW6ReNaoUTksO8J4thMtcodrULd81tHLsTHVivES4
-	ICQJHabeuWhrjgnfodZL1Dk/JyGM8w69cizPzoK38KxqJ0Tk1kcOLEgMU1XrL1viJ5VHbCiM4kF
-	hCn9BBhNA0bgxLgdEkVgs6WtXHg8ma1gkMoahY5+5O3hX1NFWzJhPAG5cYBx+eyZaxIVRV/i0ei
-	GNzdVCKfdk8dgIYZEpupkCG23iw=
-X-Google-Smtp-Source: AGHT+IF9d2ojpg7Jhyc7ajdo+FaCJ9zRYOLGCTGSJVFkffaKronYolhITsWDHjFSdXN+lSk9ynSsMg==
-X-Received: by 2002:a17:902:e949:b0:20b:775f:506d with SMTP id d9443c01a7336-215018568dcmr141201435ad.34.1732871731348;
-        Fri, 29 Nov 2024 01:15:31 -0800 (PST)
-Received: from localhost.localdomain (61-220-246-151.hinet-ip.hinet.net. [61.220.246.151])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215475446e0sm5636125ad.92.2024.11.29.01.15.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Nov 2024 01:15:30 -0800 (PST)
-From: Potin Lai <potin.lai.pt@gmail.com>
-Date: Fri, 29 Nov 2024 17:12:56 +0800
-Subject: [PATCH] Revert "net/ncsi: change from ndo_set_mac_address to
- dev_set_mac_address"
+        d=1e100.net; s=20230601; t=1732871686; x=1733476486;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u+M5rEikpzo5V+SqLQ6sSqX/aUjNRgKO1XHt64QPiQY=;
+        b=GFTklQBlpsFtKPHS6mTIzR7F9Et1XvkfrLVLfHJErXyJGfjtWTrcXYpbDdnMGs3+u0
+         Ht5csdHx1gwRF/q+R3LP9dK8cWSFT9X1Q0h8w59i5RdgZk2V4udiQsYTum+3iya2OdC0
+         Ivbx6jpBE2kPvNh+6XuRtTUFrs2sCgq+Jsay5gHWGrEqkahZpAuAio8EJIeo9cKQh915
+         TLF27/yQ9BntRZtKLXt/3QapQaI+a6XUy+KZqm1ftOVpTsnKB/f7zwLeQ8hyP5yNLC5+
+         g/1yfWQp5cZNpwew/ELmbV8QZ3K4sJzc64jBdqr8puCBQmjetfEQzkEADfX7ZKuvKVhX
+         HrdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVHhX+CAhZpRdGx0W5q4RlfiVDqUKTnMB94Fpvbjlb+VB1WqPKMqfuk88/k1hdGXiyqGxgbr04=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYIxqpC+630EnFaCIyKs2fm+G7DybwiF3gUqZHThYw7Hh3+KRh
+	3W3h3T1+7xFV083wySd59LNQQtnziNIXvcm/IK2g4uv62softZ50P6Sw7dFxPi+sb4FF3GbiQ92
+	k9yGV3vZ7IQun+kT8PA36VrO+fUqD0v+F+bqQ
+X-Gm-Gg: ASbGncuQlT3Ql+S09LSnsSmJcBTCzG3+IF0RqD4a1lJ5LY0hIDnIH7gyPgsApGn2Ens
+	oYqcJJpJpY+Yw2GKyNcv689UCMcBYCIc=
+X-Google-Smtp-Source: AGHT+IFP/4Yxgf5No9UVIYTmXc4yG3IxJcA2vYZEnGPhPpjV7rxv2FmagKq4Z30VvIxlWj5jUEC6NZTVoAcIHxQ2e5U=
+X-Received: by 2002:a17:907:7856:b0:aa5:27a8:4cbc with SMTP id
+ a640c23a62f3a-aa580f266c6mr809216166b.15.1732871685549; Fri, 29 Nov 2024
+ 01:14:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241129-potin-revert-ncsi-set-mac-addr-v1-1-94ea2cb596af@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAJeFSWcC/x2NQQqDMBAAvyJ77oJZqka/UnoIyabdg1F2QymIf
- zd4HBhmDjBWYYOlO0D5JyZbaeAeHcRvKB9GSY2Beno6RzPuW5WCTWWtWKIJGldcQ8SQkuLkiDL
- 5eaTBQ4vsyln+9+D1Ps8LBCu133AAAAA=
-To: Samuel Mendoza-Jonas <sam@mendozajonas.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Patrick Williams <patrick@stwcx.xyz>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Cosmo Chou <cosmo.chou@quantatw.com>, Potin Lai <potin.lai@quantatw.com>, 
- Potin Lai <potin.lai.pt@gmail.com>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1732871728; l=3556;
- i=potin.lai.pt@gmail.com; s=20240724; h=from:subject:message-id;
- bh=RuK+WbLgsjHtZ+l4K6wvPZvX+fDp3WNk9HOtKfGMKfU=;
- b=yH8EY9Qu2NPBZZvUmGOSfCB9tx1OahEnESLVkTIzFHdupqIm5Fu0wuIXTJKzd/UJcAbFqZnpi
- lJ8DuRCvejyAL36WpaRQASwkiHiEBHatUNJzlv3FS/Iyl8cCXZjeltx
-X-Developer-Key: i=potin.lai.pt@gmail.com; a=ed25519;
- pk=6Z4H4V4fJwLteH/WzIXSsx6TkuY5FOcBBP+4OflJ5gM=
+References: <20241128123840.49034-1-pablo@netfilter.org> <20241128123840.49034-5-pablo@netfilter.org>
+In-Reply-To: <20241128123840.49034-5-pablo@netfilter.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 29 Nov 2024 10:14:34 +0100
+Message-ID: <CANn89iKGUKxLGY4UG9JrAVQR5bahHrUurf7TVwPcE4rf4g3cAQ@mail.gmail.com>
+Subject: Re: [PATCH net 4/4] netfilter: nft_inner: incorrect percpu area
+ handling under softirq
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net, 
+	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, fw@strlen.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Potin Lai <potin.lai@quantatw.com>
+On Thu, Nov 28, 2024 at 1:38=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.=
+org> wrote:
+>
+> Softirq can interrupt packet from process context which walks over the
+> percpu area.
+>
+> Add routines to disable bh while restoring and saving the tunnel parser
+> context from percpu area to stack. Add a skbuff owner for this percpu
+> area to catch softirq interference to exercise the packet tunnel parser
+> again in such case.
+>
+> Reported-by: syzbot+84d0441b9860f0d63285@syzkaller.appspotmail.com
+> Fixes: 3a07327d10a0 ("netfilter: nft_inner: support for inner tunnel head=
+er matching")
+> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> ---
+>  include/net/netfilter/nf_tables_core.h |  1 +
+>  net/netfilter/nft_inner.c              | 56 ++++++++++++++++++++------
+>  2 files changed, 45 insertions(+), 12 deletions(-)
+>
+> diff --git a/include/net/netfilter/nf_tables_core.h b/include/net/netfilt=
+er/nf_tables_core.h
+> index ff27cb2e1662..dae0e7592934 100644
+> --- a/include/net/netfilter/nf_tables_core.h
+> +++ b/include/net/netfilter/nf_tables_core.h
+> @@ -161,6 +161,7 @@ enum {
+>  };
+>
+>  struct nft_inner_tun_ctx {
+> +       struct sk_buff *skb;    /* percpu area owner */
+>         u16     type;
+>         u16     inner_tunoff;
+>         u16     inner_lloff;
+> diff --git a/net/netfilter/nft_inner.c b/net/netfilter/nft_inner.c
+> index 928312d01eb1..fcaa126ac8da 100644
+> --- a/net/netfilter/nft_inner.c
+> +++ b/net/netfilter/nft_inner.c
+> @@ -210,35 +210,65 @@ static int nft_inner_parse(const struct nft_inner *=
+priv,
+>                            struct nft_pktinfo *pkt,
+>                            struct nft_inner_tun_ctx *tun_ctx)
+>  {
+> -       struct nft_inner_tun_ctx ctx =3D {};
+>         u32 off =3D pkt->inneroff;
+>
+>         if (priv->flags & NFT_INNER_HDRSIZE &&
+> -           nft_inner_parse_tunhdr(priv, pkt, &ctx, &off) < 0)
+> +           nft_inner_parse_tunhdr(priv, pkt, tun_ctx, &off) < 0)
+>                 return -1;
+>
+>         if (priv->flags & (NFT_INNER_LL | NFT_INNER_NH)) {
+> -               if (nft_inner_parse_l2l3(priv, pkt, &ctx, off) < 0)
+> +               if (nft_inner_parse_l2l3(priv, pkt, tun_ctx, off) < 0)
+>                         return -1;
+>         } else if (priv->flags & NFT_INNER_TH) {
+> -               ctx.inner_thoff =3D off;
+> -               ctx.flags |=3D NFT_PAYLOAD_CTX_INNER_TH;
+> +               tun_ctx->inner_thoff =3D off;
+> +               tun_ctx->flags |=3D NFT_PAYLOAD_CTX_INNER_TH;
+>         }
+>
+> -       *tun_ctx =3D ctx;
+>         tun_ctx->type =3D priv->type;
+> +       tun_ctx->skb =3D pkt->skb;
+>         pkt->flags |=3D NFT_PKTINFO_INNER_FULL;
+>
+>         return 0;
+>  }
+>
+> +static bool nft_inner_restore_tun_ctx(const struct nft_pktinfo *pkt,
+> +                                     struct nft_inner_tun_ctx *tun_ctx)
+> +{
+> +       struct nft_inner_tun_ctx *this_cpu_tun_ctx;
+> +
+> +       local_bh_disable();
+> +       this_cpu_tun_ctx =3D this_cpu_ptr(&nft_pcpu_tun_ctx);
+> +       if (this_cpu_tun_ctx->skb !=3D pkt->skb) {
 
-This reverts commit 790071347a0a1a89e618eedcd51c687ea783aeb3.
+I must say I do not understand this patch.
 
-We are seeing kernel panic when enabling two NCSI interfaces at same
-time. It looks like mutex lock is being used in softirq caused the
-issue.
+If a context is used by a save/restore more than one time per packet
+traversal, then this means we can not use per-cpu storage,
+or risk flakes.
 
-Kernel panic log:
-```
-[  224.323380] 8021q: adding VLAN 0 to HW filter on device eth0
-[  224.337533] ftgmac100 1e670000.ethernet eth0: NCSI: Handler for packet type 0x82 returned -19
-[  224.358372] BUG: scheduling while atomic: systemd-network/697/0x00000100
-[  224.373274] Modules linked in:
-[  224.373817] 8021q: adding VLAN 0 to HW filter on device eth1
-[  224.380063] CPU: 0 PID: 697 Comm: systemd-network Tainted: G        W          6.6.62-8ea1fc6-dirty-cbd80d0-gcbd80d04d13c #1
-[  224.380081] Hardware name: Generic DT based system
-[  224.380096]  unwind_backtrace from show_stack+0x18/0x1c
-[  224.439407]  show_stack from dump_stack_lvl+0x40/0x4c
-[  224.450573]  dump_stack_lvl from __schedule_bug+0x5c/0x70
-[  224.462492]  __schedule_bug from __schedule+0x884/0x968
-[  224.474026]  __schedule from schedule+0x58/0xa8
-[  224.484026]  schedule from schedule_preempt_disabled+0x14/0x18
-[  224.496906]  schedule_preempt_disabled from __mutex_lock.constprop.0+0x350/0x76c
-[  224.513235]  __mutex_lock.constprop.0 from ncsi_rsp_handler_oem_gma+0x104/0x1a0
-[  224.529367]  ncsi_rsp_handler_oem_gma from ncsi_rcv_rsp+0x120/0x2cc
-[  224.543195]  ncsi_rcv_rsp from __netif_receive_skb_one_core+0x60/0x84
-[  224.557413]  __netif_receive_skb_one_core from netif_receive_skb+0x38/0x148
-[  224.572779]  netif_receive_skb from ftgmac100_poll+0x358/0x444
-[  224.585656]  ftgmac100_poll from __napi_poll.constprop.0+0x34/0x1d0
-[  224.599490]  __napi_poll.constprop.0 from net_rx_action+0x350/0x43c
-[  224.613325]  net_rx_action from handle_softirqs+0x114/0x32c
-[  224.625624]  handle_softirqs from irq_exit+0x88/0xb8
-[  224.636575]  irq_exit from call_with_stack+0x18/0x20
-[  224.647530]  call_with_stack from __irq_usr+0x78/0xa0
-[  224.658675] Exception stack(0xe075dfb0 to 0xe075dff8)
-[  224.669799] dfa0:                                     00000000 00000000 00000000 00000020
-[  224.687843] dfc0: 00000069 aefde3e0 00000000 00000000 00000000 00000000 00000000 aefde4e4
-[  224.705887] dfe0: 01010101 aefddf20 a6b4331c a6b43618 600f0010 ffffffff
-[  224.721100] ------------[ cut here ]------------
-```
+Also, skb could be freed and re-allocated ?
 
-Signed-off-by: Potin Lai <potin.lai.pt@gmail.com>
----
- net/ncsi/ncsi-rsp.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
-index e28be33bdf2c..0cd7b916d3f8 100644
---- a/net/ncsi/ncsi-rsp.c
-+++ b/net/ncsi/ncsi-rsp.c
-@@ -629,6 +629,7 @@ static int ncsi_rsp_handler_oem_gma(struct ncsi_request *nr, int mfr_id)
- {
- 	struct ncsi_dev_priv *ndp = nr->ndp;
- 	struct net_device *ndev = ndp->ndev.dev;
-+	const struct net_device_ops *ops = ndev->netdev_ops;
- 	struct ncsi_rsp_oem_pkt *rsp;
- 	struct sockaddr saddr;
- 	u32 mac_addr_off = 0;
-@@ -655,9 +656,7 @@ static int ncsi_rsp_handler_oem_gma(struct ncsi_request *nr, int mfr_id)
- 	/* Set the flag for GMA command which should only be called once */
- 	ndp->gma_flag = 1;
- 
--	rtnl_lock();
--	ret = dev_set_mac_address(ndev, &saddr, NULL);
--	rtnl_unlock();
-+	ret = ops->ndo_set_mac_address(ndev, &saddr);
- 	if (ret < 0)
- 		netdev_warn(ndev, "NCSI: 'Writing mac address to device failed\n");
- 
-
----
-base-commit: 59b723cd2adbac2a34fc8e12c74ae26ae45bf230
-change-id: 20241129-potin-revert-ncsi-set-mac-addr-7122f2896258
-
-Best regards,
--- 
-Potin Lai <potin.lai.pt@gmail.com>
-
+Perhaps describe a bit more what is going on in the changelog.
 
