@@ -1,109 +1,66 @@
-Return-Path: <netdev+bounces-147944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA4159DF385
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 23:20:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B7CB9DF387
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 23:24:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FAA4280E75
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 22:20:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7C9BB21434
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 22:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77CC61B4C30;
-	Sat, 30 Nov 2024 22:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2DF41AA1F8;
+	Sat, 30 Nov 2024 22:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cLPWJX3l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JiU/3cGP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526BE1B3B28
-	for <netdev@vger.kernel.org>; Sat, 30 Nov 2024 22:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A27117BD3;
+	Sat, 30 Nov 2024 22:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733005220; cv=none; b=bImCdjwK8Kb0Coygu4E2i4xmCk7TN2ZPmnfDal8j+EWCGbtEqjUN7GCgOdUOeObj5+rebY7ELPzsNCFg9i5yxwbjMsmjIq5U7qlosLXfAzRWZxgaJaF5tDj7J4xIxLcr0GBZ49BtqUdD/sOU+VM/xbTClu7+zsONwJpf3kvFG+Q=
+	t=1733005460; cv=none; b=Q7UqC9vyBP+BFcE16OdgqfZ/idnpw1HcGfE12qBITN0K0PmFQaTCzGTQcErpRntb+iWnqsRhLufTt/bKdYOWf/xievhhbTS1jo6olWl+KoS3I/x2youdEu/e+T8PDH0eJBqMrZ3dfAE+hewhEpFIyj2yTOBZAK39ywzqU+BMQcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733005220; c=relaxed/simple;
-	bh=98HRPumpHVSqqY67GDueYHI2TpKgGKTG6NY4WWqEWy0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KQ/x554GNazq0z77JEZaFfjac6/OaE1cPcO9twbcYoA1b0AwAXOzcHdZ5G3vzWf4sFtSZtBqhcn5anQc7WRuaXWELqe7c8zWmU+Y5jhmtoxnXltQox+jTpC33QcSVy4seJQc2ufha/QUiTKk4hke6FpLZTLpnDkJ9wqGdKfNPx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cLPWJX3l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C63F8C4CECC;
-	Sat, 30 Nov 2024 22:20:18 +0000 (UTC)
+	s=arc-20240116; t=1733005460; c=relaxed/simple;
+	bh=CtM5hOgaiOMLF2wA4W4wZjv192MP7mz4BOIB5kBZ8GI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WEfWjqKTMlAsFYTYtdWjXxtDFcl7coHLC+U97Ii8axqgtVxoaoJUg/v5ODdfdVHvKGKuGikfoY1mmQ5IT3DJdOnxLI7EXaw2tgnHnRsB7I9AOgdC57LvTCyFHxX9yXh2yujdl3d4GvzmIkXOXhLvaeKsa8XVij5XwoUHRlxH1HY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JiU/3cGP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3F7CC4CECC;
+	Sat, 30 Nov 2024 22:24:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733005218;
-	bh=98HRPumpHVSqqY67GDueYHI2TpKgGKTG6NY4WWqEWy0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cLPWJX3l0qCIGzmDxORFfzJKjIOIkJSVVDqVs+MQKk5CoZPob9xK5ee/uAbTtCGll
-	 rnKBXpqTlay8C7t89mFuZ9/8i3AKzyzJGNDpwRTaYOCG1WcEEhQHI9l55xjnnyujao
-	 0h46E1rLUAXOWhPg9yfARMAk5YnPy6cVQG87l9YefhkKoq4eNr8dFlL20J2BXrVvSR
-	 /7Ds6OSvZkTPchOLggv5/VWGlN7H6uLfV+/MeJKUC2smxRNkgpfw8voLgOlxcsZxWt
-	 8ZZA4Olm3O1HVyHYi+WbsJLKR5zv5g38vDKDIyWNJRDDpvaxaO3YGtP6wdmbNHXfUq
-	 8RWelTCwf+C4g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE154380A944;
-	Sat, 30 Nov 2024 22:20:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1733005458;
+	bh=CtM5hOgaiOMLF2wA4W4wZjv192MP7mz4BOIB5kBZ8GI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JiU/3cGPZiRrVXY802/N3juOgbckzY7TQuICeKIQFhQ3ztL/FV57NgRoqdM5nuPCx
+	 QgQxa9RfjGzIM1edqmI/b/CjYKc2MMT8xZgZUDkKccaY4wuo+JU7JI5Q4DFof37LUZ
+	 DriBoWkx0LURi5NXbJ6dSafTyNIdFbWfZuotm5ERAG3zdvGPISuGoBwVHiCcQfJq/Y
+	 fuYXUGSf5IskbSa7RccC6+lXXgT30h+W1T4hYKxn83a98L7YL9Ls7Mws2sXsYAvoHK
+	 C1qobCz841iy4XhasTBkiNrNbKkTH01UL97cP1xgVYrT0T4fHfEZj/MRvAf+QtSHQa
+	 VdhqmuY0ivaGg==
+Date: Sat, 30 Nov 2024 14:24:16 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org,
+ kernel@pengutronix.de
+Subject: Re: [PATCH net 0/14] pull-request: can 2024-11-29
+Message-ID: <20241130142416.66e2caa2@kernel.org>
+In-Reply-To: <20241129122722.1046050-1-mkl@pengutronix.de>
+References: <20241129122722.1046050-1-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: Fix icmp host relookup triggering ip_rt_bug
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173300523224.2492979.16729601076665827822.git-patchwork-notify@kernel.org>
-Date: Sat, 30 Nov 2024 22:20:32 +0000
-References: <20241127040850.1513135-1-dongchenchen2@huawei.com>
-In-Reply-To: <20241127040850.1513135-1-dongchenchen2@huawei.com>
-To: Dong Chenchen <dongchenchen2@huawei.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, herbert@gondor.apana.org.au,
- steffen.klassert@secunet.com, netdev@vger.kernel.org, yuehaibing@huawei.com,
- zhangchangzhong@huawei.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 29 Nov 2024 13:16:47 +0100 Marc Kleine-Budde wrote:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.12-20241104
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 27 Nov 2024 12:08:50 +0800 you wrote:
-> arp link failure may trigger ip_rt_bug while xfrm enabled, call trace is:
-> 
-> WARNING: CPU: 0 PID: 0 at net/ipv4/route.c:1241 ip_rt_bug+0x14/0x20
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.12.0-rc6-00077-g2e1b3cc9d7f7
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-> BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-> RIP: 0010:ip_rt_bug+0x14/0x20
-> Call Trace:
->  <IRQ>
->  ip_send_skb+0x14/0x40
->  __icmp_send+0x42d/0x6a0
->  ipv4_link_failure+0xe2/0x1d0
->  arp_error_report+0x3c/0x50
->  neigh_invalidate+0x8d/0x100
->  neigh_timer_handler+0x2e1/0x330
->  call_timer_fn+0x21/0x120
->  __run_timer_base.part.0+0x1c9/0x270
->  run_timer_softirq+0x4c/0x80
->  handle_softirqs+0xac/0x280
->  irq_exit_rcu+0x62/0x80
->  sysvec_apic_timer_interrupt+0x77/0x90
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v3] net: Fix icmp host relookup triggering ip_rt_bug
-    https://git.kernel.org/netdev/net/c/c44daa7e3c73
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Looks like the tag here is stale?
 
