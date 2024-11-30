@@ -1,133 +1,128 @@
-Return-Path: <netdev+bounces-147948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55DDA9DF39A
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 23:59:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 065F09DF3C4
+	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 00:03:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01F13B2079A
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 22:59:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 419D8B212CF
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 23:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C5A1607B7;
-	Sat, 30 Nov 2024 22:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90AAA1AB51E;
+	Sat, 30 Nov 2024 23:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="wne0II/e"
+	dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b="lq6Fg0Am"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED06915A864
-	for <netdev@vger.kernel.org>; Sat, 30 Nov 2024 22:59:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115E4192D6E
+	for <netdev@vger.kernel.org>; Sat, 30 Nov 2024 23:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733007585; cv=none; b=B1PuxgdjmDGY2onE51g+18Ci5vO9xudYoLhBqUwSzO4W/53pJUlqD9mz7WKjmrkCpe87yhtyLBeHagXeypqSPEPHz00+1mFeTskMYF41pLSQPmitD99dknPmRXM12KlzYI1h02tybPVnRfyD/KYKmGw1IOHh8M82q7gXpaljU9k=
+	t=1733007816; cv=none; b=nOiwTpq5REC3hfulA2vrzyvNd4Qj4W/FTFsX7UxkSl1xzIvihUXyZAJKAgEI/yoNbKL82yUyd+kK9A83Q8k4FLI2k0HXjgk+v2M99BV9nRt2FE1sKQv94+heTTBP/vz3LD7KZVJmwJmRsdkzTsZH4Ll8tp8uQuA1vbQita9SMGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733007585; c=relaxed/simple;
-	bh=6k7mLC4kA33FcxZWMnMueyX+wy13od8KKIpTrv70N+g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZqeJ6x5I0enXKkRkTk43JkrdHU5oBDG/1wDnvY1ZEk4HzW4XnSJheW8XPYZ0e6KyP0CMecVrAOW3bscNjqry7QQzEqHaLa52+h7QUsoemw3/WcL7SO1iKJSo4h4PieGhwAIWucGpiiNm0Eo0Ax3u66EjLhSGfbCln6OXALiVE/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=wne0II/e; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2142214abd2so24211645ad.0
-        for <netdev@vger.kernel.org>; Sat, 30 Nov 2024 14:59:43 -0800 (PST)
+	s=arc-20240116; t=1733007816; c=relaxed/simple;
+	bh=Oj23kvXML5YxbzImIPjLr7bu4A1f9m4DYN95To+LWn4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eez+xYfYUpOIfDlpJm38m5/Lxumds87wNXPmjwbfoc3MMFiQxIXbvO3TNgM4Pmpms6JsbaEF4vvdS1Nud2q6/yE66gzdswMWnXupYR46Qpg6msA7bBs6BSw9Ug3pta+MiBK/ebiuC+g6uw1d8OxKf7V0XE49UR+PKr8dTIAw1WA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com; spf=none smtp.mailfrom=andrewstrohman.com; dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b=lq6Fg0Am; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=andrewstrohman.com
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e3983426f80so1814585276.1
+        for <netdev@vger.kernel.org>; Sat, 30 Nov 2024 15:03:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1733007583; x=1733612383; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gXiZf24JxhP8ou5NHiPugKJGx/AjkR4iHTEWX2K7i0Y=;
-        b=wne0II/e7KvCoQbIkfSsnbPKroQinwsoGKGB5pKXHjmtk1Vt02nSXAgpzZhi6y+HX3
-         1PSryy5RL0ch2jR2qCgGYU4Jl5wWdjvBvZcETi155RWrLJB1jLL4lVzhkHkauIq6scwg
-         rLXIw4RKjcyU7ZndRH72I45aoNHQbiS7qJsB8QTfX5OaEMcvH7UD89xFfnSXw5ODKdPx
-         tdtuRP4TdkiE2+Ckuc0JC94pfI7ZElJwWS6BcMQvyHhkx01ZFGeFtING0zZqRFUSLF6T
-         F0UwDmX4pK6ZojsqaZBydJHcdrHo+loOXPsOsKv78ZCDOH5nc+QFNbnOK48ihIITgACN
-         8JGw==
+        d=andrewstrohman-com.20230601.gappssmtp.com; s=20230601; t=1733007814; x=1733612614; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+lZDk59n4UHv5yZ4bNmxMnAKZtUzjiM3soOA0zJRIR8=;
+        b=lq6Fg0AmWbnv+5LSzi3KTFh3YXayo9bVjWEHegEzKD1fG4lRyPrktXM0BJ5EBwwrDi
+         x11i/bcgfKN9gtiehuyNFu4aW/2EIZtjSM7DdP6Sqq/ePAuPqEUJNYAgL2u70ynu9ODH
+         5CSz4iNHck3I8W+aQIeQ6+2PufnhycaH4xWxeQfUCLVlqt1uQ1JK0zizTHUqv4lO3RRF
+         Qtfz1EfapPUrA2/VYIilB+3jDzSPO1Bq2kFLciSsnDQwLx9gXuMFP5+ifGsLGwQnA+vH
+         8Cwj6X4mzQyOc2S7Jl3/XeW9xwLpzhP7d/t6cvZJP22pzRZUFqYFDNt8ExlMuAiWVD3D
+         x0Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733007583; x=1733612383;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gXiZf24JxhP8ou5NHiPugKJGx/AjkR4iHTEWX2K7i0Y=;
-        b=hir/Gux9WGPkPb68Rj9lM9lTxN8uySLyguqIgtzlmORtnbSJfm0u33K4jE706of/Sx
-         oJov3n02McMzwCdR/Jt7jiQMml+YhdCD01vy9m7wajesLPXWVWkE1JvOYIAhg0cdw7G8
-         2KGrsNDnPDCz+VX08RnK07AAt7cwgw01ESKqRLcjB+/uLH+BVORBHLZXCY5v/okshBWb
-         +CguNC51qMWM/u65mmjm1zkjGxDPUNOHji6epGDpTZe+99R5BdAiJ5EE6ngPO1+QbVC1
-         juoZ21Quxwz9qKVfW5GZ8DG7ERnHWltBMh1z8ACWLg4XKoMr0X9kmCGy+TLx4Yi7tV8A
-         49fA==
-X-Gm-Message-State: AOJu0YwRb61xAOe+K9JiTmNzG43NrxNhwn0fSijFmgpXWE+vnumf/aH3
-	htlFEjPXx0wjJS8h6VA/EEvlH3lGMKojum6oH0MZuAh5Km01zIpqzZ9teqZKQkVlv7clY+YOLuf
-	c/yc=
-X-Gm-Gg: ASbGncueuNf5ItA+gOXb7/opnAdaockJiD1ics4lFfNXGSfkKJ5osjrzrKzQG7HA6ER
-	cPbYVpMWDItGk60GDUSg1Fd5/XO+AN2u9cYGrxtNW3TVS4oBo88WLUScvg07o6T1zbDJkE1D2+0
-	GomHghJHBpnGA5j82MCMOMsEJwlq6gJ67QMjWOuH7kpR/lg9hCWzsDcPdJXAIaHR4HT1HO+A7bl
-	2P+kG8VunqN/6sNDkTS2b2K69Kedu8Zvo9xfL32edrS2RvbZBESZtP4
-X-Google-Smtp-Source: AGHT+IFo2NK9DjW+rQvUWZgyjIVjJ1b12XEgghjxJsDOPmRsTg+76nlN47yXnh7TwrSPYUH1x71smg==
-X-Received: by 2002:a17:903:283:b0:214:f87b:c154 with SMTP id d9443c01a7336-21501087636mr234657855ad.5.1733007583268;
-        Sat, 30 Nov 2024 14:59:43 -0800 (PST)
-Received: from [192.168.1.12] ([97.126.136.10])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215219bd669sm51127105ad.246.2024.11.30.14.59.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Nov 2024 14:59:42 -0800 (PST)
-Message-ID: <60edc790-1485-457c-b024-0314514dced8@davidwei.uk>
-Date: Sat, 30 Nov 2024 14:59:42 -0800
+        d=1e100.net; s=20230601; t=1733007814; x=1733612614;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+lZDk59n4UHv5yZ4bNmxMnAKZtUzjiM3soOA0zJRIR8=;
+        b=qxzfDS7fe4+OFQqPgpY+agjZoWZrZ8aXnjA0vKIHrPK6KtHzyuy9uaXo/T8jB/uJAx
+         L8pPP62uZ/PFU01+irWhvZahkwEHZuHiPP5yINuJMCdYehG1KdsAi4nAJwmG8DD6a/01
+         bxVlnc7DFskJTSlEArOLWGuBkS668/IG6rgp2Mfq4mvZIC3iZV5aQHsump5BZzE1SSYJ
+         UtSdR/lImxSLe0mOCrJlSNHdnsFkA0wBepzDJ3hXFi+bUjIiYn5ClzxIAqal8L6cQJIQ
+         c2eJkbrX4plHhcCvWifRfkxh+e2TEshER5T2PuCL5/zOt+Xmt+0aW4AZ0NX6D/dAVC6P
+         TDHA==
+X-Forwarded-Encrypted: i=1; AJvYcCWECoOI8TALT+nxxsaOKKmO8ZpLD6chKlVHwE4i7qlCzRi+wMyYNeF4eYEQZ6NZmtC7wLLVRm8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGAxuD6jz+qWurT8Xj7MAOV1HQ9RBD8DKXM2pWPJC7HjhSeMjY
+	QMrVZhw73T0aCHbOAEORIybqQGNQ01pkSerEvXyQB2qlDwdwzsvhol6utEDynuhXVbRQ23PhVJE
+	W0HRLu8h5YsCIevxwbRl7dbzQbMLP5F+ItjnBkw==
+X-Gm-Gg: ASbGncvUouFfjYhXLxsa3w81YQKuBz1lhcJyeWZWnSK8JW3VL6sPnLVzK7555NEj1bY
+	2aWPNJOXeTJEW90rGfRuSCYYiC6vmNg8=
+X-Google-Smtp-Source: AGHT+IH81R4XFg2CPj0gwX0HCIBF9TK4lO6eQU9i9Eh6UvUy1XLoSg/49272JtHDhspwSlHmAL7DhLTLqjgun/Hp2yM=
+X-Received: by 2002:a05:6902:1549:b0:e38:c692:14a4 with SMTP id
+ 3f1490d57ef6-e395b93b17dmr15727852276.36.1733007813990; Sat, 30 Nov 2024
+ 15:03:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 3/3] bnxt_en: handle tpa_info in queue API
- implementation
-Content-Language: en-GB
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Somnath Kotur <somnath.kotur@broadcom.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20241127223855.3496785-1-dw@davidwei.uk>
- <20241127223855.3496785-4-dw@davidwei.uk>
- <20241130141531.6fd449e1@kernel.org>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20241130141531.6fd449e1@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241130000802.2822146-1-andrew@andrewstrohman.com>
+ <Z0s3pDGGE0zXq0UE@penguin> <20241130160815.4n5hnr44v6ea3m44@skbuf>
+In-Reply-To: <20241130160815.4n5hnr44v6ea3m44@skbuf>
+From: Andrew Strohman <andrew@andrewstrohman.com>
+Date: Sat, 30 Nov 2024 15:03:23 -0800
+Message-ID: <CAA8ajJ=Grm47nKZ+Yp-TEXAFfyoDOkJ9Kbc+NnUOx6ehg0o=vg@mail.gmail.com>
+Subject: Re: [PATCH net-next] bridge: Make the FDB consider inner tag for Q-in-Q
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, 
+	Petr Machata <petrm@nvidia.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, UNGLinuxDriver@microchip.com, 
+	Shahed Shaikh <shshaikh@marvell.com>, Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com, 
+	Simon Horman <horms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Roopa Prabhu <roopa@nvidia.com>, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	bridge@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On 2024-11-30 14:15, Jakub Kicinski wrote:
-> On Wed, 27 Nov 2024 14:38:55 -0800 David Wei wrote:
->> +	if (bp->flags & BNXT_FLAG_TPA) {
->> +		rc = bnxt_alloc_one_tpa_info(bp, clone);
->> +		if (rc)
->> +			goto err_free_tpa_info;
->> +	}
->> +
->>  	bnxt_init_one_rx_ring_rxbd(bp, clone);
->>  	bnxt_init_one_rx_agg_ring_rxbd(bp, clone);
->>  
->>  	bnxt_alloc_one_rx_ring_skb(bp, clone, idx);
->>  	if (bp->flags & BNXT_FLAG_AGG_RINGS)
->>  		bnxt_alloc_one_rx_ring_page(bp, clone, idx);
->> +	if (bp->flags & BNXT_FLAG_TPA)
->> +		bnxt_alloc_one_tpa_info_data(bp, clone);
-> 
-> Could you explain the TPA related changes in the commit message?
+Hi Vladimir,
 
-Got it, I'll expand on why the TPA changes are made in the commit.
+ Thanks for the review.
 
-> Do we need to realloc the frags now since they don't come from 
-> system memory?
+> I was also going to plan asking Andy what is his plan on making
+> switchdev digest this.
 
-Yes, frags now come from head_pool instead of system memory. The old
-head_pool is freed and a new head_pool is allocated during a queue
-reset. Therefore the old tpa_info with frags allocated from the old
-head_pool must be freed as well, otherwise the driver will attempt to
-return frags back to a different page pool than the one it was allocated
-from. When the frags were allocated from system memory using the generic
-allocators, it didn't matter since they did not have their lifetimes
-tied to page pools.
+Since switchdev switches don't seem to support this, I wasn't planning on
+making switchdev digest this. I was thinking that it should just
+be disabled for those hardware switches.
+
+
+>The switch ASICs I'm most familiar with can learn
+> on inner VID or outer VID, but not both.
+
+I don't know of a switch ASIC that supports this.
+
+Is that a problem? I thought that it would be OK to add features to
+a software bridge that don't exist in any hardware bridge.
+
+I've tried to see if anyone else was facing this same problem.
+All I found were concerns about the fact that the provider bridge
+needed to learn all the customer's MACs.  As a result, it looks
+like 802.1Qay was created.
+
+It seems that 802.1Qay is primarily addressing a concern about TCAM
+limitations, and decoupling the provider and customer networks.
+I think it's possible that 802.1Qay has inadvertently
+fixed this issue for provider backbone bridges. But for my use case,
+I'm not concerned about TCAM usage. I just want isolation between
+the inner vlans.
 
