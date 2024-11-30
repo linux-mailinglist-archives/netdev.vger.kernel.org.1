@@ -1,117 +1,153 @@
-Return-Path: <netdev+bounces-147908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DFAF9DF06C
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 13:55:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35CB39DF08E
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 14:39:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA366B212C4
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 12:55:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA27E281404
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 13:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33776198E74;
-	Sat, 30 Nov 2024 12:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C886419AA72;
+	Sat, 30 Nov 2024 13:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FtWhyN5S"
 X-Original-To: netdev@vger.kernel.org
-Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE6914A60D;
-	Sat, 30 Nov 2024 12:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA5D1990C0;
+	Sat, 30 Nov 2024 13:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732971316; cv=none; b=Yx5sy364qLePxwmO/18B3/YtgZ7X+p9IeZ4iBTYhiKkPJrP47X9nvGERqwl8pKPzHE2s04oYZubyC4YhHLmINvUW7sa5qz+bi954RatooJbf52PvNj1MPTg/EWB/Qq5MyREfhFulV9EUECsU9lW5SE1BT9HHgSZWiafjdXbrsfU=
+	t=1732973954; cv=none; b=XzHuedE8GWYTBVfnsGT2piSPC/RHZJUugXrZpTxJWjsViZT6rMbRmo16Oy7lk/OPgbVU7x8cD+XMs6j5BXSf2SI42BTI77PHeEr+jcOADrSmUi137iS35HqDGBthYL4amXSZIY69B8yZWz4Gok0okLlqB4ZlOocZk09Kg03tf4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732971316; c=relaxed/simple;
-	bh=YxFU9g3nKc0hDKlhwfiZxJLMQMtvK82CvUsbZBzlR+o=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=k3jmiF1JnbW7ZMMJxQ0Z4BhnaR5GPg0bqq5Pwq1p9L9zhsdqOo5zSxb89oruqfu2eITAGp0CDzpGGSFomGroFNhNhNJ/uJmy4DBbhBotEz9lYg/ffDUsmcnwe010q1jREJpsDJrbtA/QB+QwsE7KCDoUttYmLEvUBczRVGYssxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
-Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
- (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Sat, 30 Nov
- 2024 15:55:02 +0300
-Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Sat, 30 Nov
- 2024 15:55:02 +0300
-From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-To: <stable@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Luiz Augusto von Dentz
-	<luiz.von.dentz@intel.com>, Marcel Holtmann <marcel@holtmann.org>, "Johan
- Hedberg" <johan.hedberg@gmail.com>, Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Jakub
- Kicinski" <kuba@kernel.org>, <linux-bluetooth@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH 5.10/5.15] Bluetooth: hci_event: Align BR/EDR JUST_WORKS paring with LE
-Date: Sat, 30 Nov 2024 04:54:57 -0800
-Message-ID: <20241130125457.29343-1-n.zhandarovich@fintech.ru>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1732973954; c=relaxed/simple;
+	bh=AtoMv+qZEg3Jrjb92TD+QP+vPH9tNZ1fEkpRkBwkvCs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=iEuMX3UjzHHjwsUepWWxIWbQlhe6yuiebjI6JoNJHKZvlxP19/qeKmCVZHKklgTgIw+OryTiWzS2q1QxuzX3F18mGORJlSb3E4Ftu9ywOM3v5bJSXchuAFMmcd4ueKU6RXia78zLxT/a4G60XNFOel9phI01GCyroDNWBpKXg7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FtWhyN5S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D313C4CECC;
+	Sat, 30 Nov 2024 13:39:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732973954;
+	bh=AtoMv+qZEg3Jrjb92TD+QP+vPH9tNZ1fEkpRkBwkvCs=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=FtWhyN5SGodUWhs/LCaXDVaYgeAgHu957ETyuDh+cqKsAiU/Y/y7ZddQgta4Fr3Kn
+	 dFWIT5SwX4Pku9jXBJNqZxzmXAUgu0NzHThNgvek0RVG9thWnhZ5+rj8FjOcxiIr3R
+	 hI0ReOZV4veZIAaWmlgz6uh05Fg4gNODOm3BzeaVbzq5W/xUEK/dVLDXwmCA2bGYZw
+	 X9QEs+kU0Lz25wJg8ftS7eFe2ukS3CCzWbaI7GPvbc/9uF6Sa6fSFUhfBr7fn3BMaj
+	 bCxb8SGx0iNmIAxhg0nuLFG15QqudtXD4JSwNBuncuQ3iE4ABRQTIOJAKsQ2EZOtyJ
+	 hq4byjdPNRUTA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 116ABD73607;
+	Sat, 30 Nov 2024 13:39:14 +0000 (UTC)
+From: Levi Zim via B4 Relay <devnull+rsworktech.outlook.com@kernel.org>
+Subject: [PATCH net 0/2] Fix NPE discovered by running bpf kselftest
+Date: Sat, 30 Nov 2024 21:38:21 +0800
+Message-Id: <20241130-tcp-bpf-sendmsg-v1-0-bae583d014f3@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
- (10.0.10.18)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAE0VS2cC/x3MQQqAIBBA0avErBvQjMiuEi1Kx5pFJk5EEN09a
+ fkW/z8glJkEhuqBTBcLH7FA1xW4bY4rIftiaFTTam0Uni7hkgIKRb/LiiEYZ33fUmcNlCplCnz
+ /xxEinTC97wd7UFMuZgAAAA==
+X-Change-ID: 20241130-tcp-bpf-sendmsg-ff3c9d84e693
+To: John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Levi Zim <rsworktech@outlook.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1994;
+ i=rsworktech@outlook.com; h=from:subject:message-id;
+ bh=AtoMv+qZEg3Jrjb92TD+QP+vPH9tNZ1fEkpRkBwkvCs=;
+ b=owEBbQKS/ZANAwAIAW87mNQvxsnYAcsmYgBnSxV3VGLEL49AHZ7R/d7EbVg6R8VkrJZM9QKxj
+ wCbxoE/uROJAjMEAAEIAB0WIQQolnD5HDY18KF0JEVvO5jUL8bJ2AUCZ0sVdwAKCRBvO5jUL8bJ
+ 2HlIEACiRItsYjOk5RJI2/JZUvDi3jlt5j1sj93UCDJRXYAm7dQQpxq38P+uHO3Iyxuz3kgIYfi
+ uZmFtrsoU8/kikiFo+JFV7iMebGXZWugkcZFrZ2TpCWXvpKHd7bU/vwo9KhaeC0gQ2e0wsLI8Ee
+ Y3DRi7EZyxX/mKIWzLxogiHDpT6esl6AslnH+sbdkIgeK9dpBtB1Ni+ligxBduKwgQDAKqM0MqX
+ T1iQoTEAucGQXrAum66ejeeJ81quXXUKl1S/U+rJ0V1Yz2O3m6KZxy8Igz5nxcjbbe5hOHG3xm1
+ JCgRW//D/ixRf4fy75vATRQp9tdQsSD/qp4AYBysk5LeBkvz88im03z2W7INhtzMwoONTwfG9ia
+ rFQRjDvjfnXuTQ6v1P/3DGiXxPSK/VxAeScG5YTuUA62DcC1lZ38ToiL2wEdWfeSQmCd4lIBk8T
+ aBZnwb3dlzy8eXrx/u6CNGIi8N9MWHuTvrdaEHwnXTZat2oLitWCc7ZT5Nmjw/IX7xWnVGKP/R9
+ RmxOW/Xb5tBj2vpmViC61p3JFxeqvVVp4CWp0/3fJ2+pF+5MqusfPNAz17qLUifRFRWvdWFhR5J
+ OG69JQPI8jYZnBJk3hqGtAgAo/OVeDy0Jl5TEiwte8qdOrbAwV9xptooTrXljidJ3iIs8FQNU4W
+ +SqowYYutsCwnIg==
+X-Developer-Key: i=rsworktech@outlook.com; a=openpgp;
+ fpr=17AADD6726DDC58B8EE5881757670CCFA42CCF0A
+X-Endpoint-Received: by B4 Relay for rsworktech@outlook.com/default with
+ auth_id=219
+X-Original-From: Levi Zim <rsworktech@outlook.com>
+Reply-To: rsworktech@outlook.com
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+I found that bpf kselftest sockhash::test_txmsg_cork_hangs in
+test_sockmap.c triggers a kernel NULL pointer dereference:
 
-commit b25e11f978b63cb7857890edb3a698599cddb10e upstream.
+BUG: kernel NULL pointer dereference, address: 0000000000000008
+ ? __die_body+0x6e/0xb0
+ ? __die+0x8b/0xa0
+ ? page_fault_oops+0x358/0x3c0
+ ? local_clock+0x19/0x30
+ ? lock_release+0x11b/0x440
+ ? kernelmode_fixup_or_oops+0x54/0x60
+ ? __bad_area_nosemaphore+0x4f/0x210
+ ? mmap_read_unlock+0x13/0x30
+ ? bad_area_nosemaphore+0x16/0x20
+ ? do_user_addr_fault+0x6fd/0x740
+ ? prb_read_valid+0x1d/0x30
+ ? exc_page_fault+0x55/0xd0
+ ? asm_exc_page_fault+0x2b/0x30
+ ? splice_to_socket+0x52e/0x630
+ ? shmem_file_splice_read+0x2b1/0x310
+ direct_splice_actor+0x47/0x70
+ splice_direct_to_actor+0x133/0x300
+ ? do_splice_direct+0x90/0x90
+ do_splice_direct+0x64/0x90
+ ? __ia32_sys_tee+0x30/0x30
+ do_sendfile+0x214/0x300
+ __se_sys_sendfile64+0x8e/0xb0
+ __x64_sys_sendfile64+0x25/0x30
+ x64_sys_call+0xb82/0x2840
+ do_syscall_64+0x75/0x110
+ entry_SYSCALL_64_after_hwframe+0x4b/0x53
 
-This aligned BR/EDR JUST_WORKS method with LE which since 92516cd97fd4
-("Bluetooth: Always request for user confirmation for Just Works")
-always request user confirmation with confirm_hint set since the
-likes of bluetoothd have dedicated policy around JUST_WORKS method
-(e.g. main.conf:JustWorksRepairing).
+This is caused by tcp_bpf_sendmsg() returning a larger value(12289) than
+size(8192), which causes the while loop in splice_to_socket() to release
+an uninitialized pipe buf.
 
-CVE: CVE-2024-8805
-Cc: stable@vger.kernel.org
-Fixes: ba15a58b179e ("Bluetooth: Fix SSP acceptor just-works confirmation without MITM")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Tested-by: Kiran K <kiran.k@intel.com>
-[Nikita: minor fix to resolve a conflict caused by different debug
-print macros used around the change: keep BT_DBG() instead of
-bt_dev_dbg().]
-Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+The underlying cause is that this code assumes sk_msg_memcopy_from_iter()
+will copy all bytes upon success but it actually might only copy part of
+it.
+
+This series change sk_msg_memcopy_from_iter() to return copied bytes on
+success and tcp_bpf_sendmsg() to use the real copied bytes instead of
+assuming all bytes gets copied.
+
+Signed-off-by: Levi Zim <rsworktech@outlook.com>
 ---
- net/bluetooth/hci_event.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+Levi Zim (2):
+      skmsg: return copied bytes in sk_msg_memcopy_from_iter
+      tcp_bpf: fix copied value in tcp_bpf_sendmsg
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 58c029958759..546795425119 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4751,19 +4751,16 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
- 		goto unlock;
- 	}
- 
--	/* If no side requires MITM protection; auto-accept */
-+	/* If no side requires MITM protection; use JUST_CFM method */
- 	if ((!loc_mitm || conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) &&
- 	    (!rem_mitm || conn->io_capability == HCI_IO_NO_INPUT_OUTPUT)) {
- 
--		/* If we're not the initiators request authorization to
--		 * proceed from user space (mgmt_user_confirm with
--		 * confirm_hint set to 1). The exception is if neither
--		 * side had MITM or if the local IO capability is
--		 * NoInputNoOutput, in which case we do auto-accept
-+		/* If we're not the initiator of request authorization and the
-+		 * local IO capability is not NoInputNoOutput, use JUST_WORKS
-+		 * method (mgmt_user_confirm with confirm_hint set to 1).
- 		 */
- 		if (!test_bit(HCI_CONN_AUTH_PEND, &conn->flags) &&
--		    conn->io_capability != HCI_IO_NO_INPUT_OUTPUT &&
--		    (loc_mitm || rem_mitm)) {
-+		    conn->io_capability != HCI_IO_NO_INPUT_OUTPUT) {
- 			BT_DBG("Confirming auto-accept as acceptor");
- 			confirm_hint = 1;
- 			goto confirm;
+ net/core/skmsg.c   | 5 +++--
+ net/ipv4/tcp_bpf.c | 8 ++++----
+ 2 files changed, 7 insertions(+), 6 deletions(-)
+---
+base-commit: f1cd565ce57760923d5e0fbd9e9914b415c0620a
+change-id: 20241130-tcp-bpf-sendmsg-ff3c9d84e693
+
+Best regards,
 -- 
-2.25.1
+Levi Zim <rsworktech@outlook.com>
+
 
 
