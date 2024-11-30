@@ -1,125 +1,148 @@
-Return-Path: <netdev+bounces-147903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 879109DEFC3
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 11:01:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B00F9DF01F
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 12:33:52 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8A9828163F
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 10:01:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57CC7163877
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 11:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5227C14C59C;
-	Sat, 30 Nov 2024 10:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4CB1885B7;
+	Sat, 30 Nov 2024 11:33:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d1YyKLUz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B6d/Ghp7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C0B14D28C
-	for <netdev@vger.kernel.org>; Sat, 30 Nov 2024 10:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A42141987;
+	Sat, 30 Nov 2024 11:33:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732960869; cv=none; b=WxlOnKCT//bSJINsWWtsRYj8cTQBTLI37XHmWML8s0t1knXt8WQMnnX6RyXxsiyk/+AwwFK/BAU4vioW1zi07xoUnb5NbmaIwPvnV+sTBLkDcQSLRgpErx6q6l50mzt/9KKR5mrXo/SyrQr/QLsMM9tShFXk3jPjy5/KDY8udzo=
+	t=1732966427; cv=none; b=F/UuYxzj6c/HT1j037OFJCVhgVndbLy0ujLNcoktTZqUKwCUGEhJ9gZAMcCH43MtTuj+2V6lrB0LtVBALWY5O4z2GQMeOriLCk3AzVdoWI74qOxbmy5029RZuVAm+KYlltY16spMKqrCemb856NhF6I//kATxxCTXvVyH1O61wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732960869; c=relaxed/simple;
-	bh=/XpaTseG/TEeisBd+wk4TWWeiStEhV6ICnH01fIZSu0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=GH7fEd3B/vkT3VefO10jIkIzvzuMCq7R0sAWdtqtz15O2Nizl0pUCdy5hyflYPKdwfduDlJEDVEwxHAPgdK0P6kgMewBKgQsahJLvz5tHL59PvYzuYzkhmOH8OJp84O9LCf21WtJXZO2whqOFENwJLCKVasYe1T1kpbk8gcbQuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=d1YyKLUz; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d0bdeb0374so1127895a12.0
-        for <netdev@vger.kernel.org>; Sat, 30 Nov 2024 02:01:07 -0800 (PST)
+	s=arc-20240116; t=1732966427; c=relaxed/simple;
+	bh=N7UEnsfZfi3Yu71lo0rhgQTRf0xBgW1a2d9UEsE38T4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EqQdxTXYkw5swRaWKYNypV7IESUcSxU1/hpGMdJFISdP84pTWYP+G0+v6lT8XTH8+Tm+CN2ycA13LMK+avY33aGkeBAjR3bYW0AMuDKC5ge4rjCKaJBSGCHTVNd0B6c9JhkELLApCcR7je3FgXidAtiwSLCfZUVV5Whz/TsKc14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B6d/Ghp7; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-434a1639637so24900835e9.1;
+        Sat, 30 Nov 2024 03:33:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1732960866; x=1733565666; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=a67SmAxg7nZOip6zVhj4ZsmBcbeJIrKRZCIwBRUJFXg=;
-        b=d1YyKLUzWuTjh2B4bEUrPOGTF5zhAiYqp3Ha8yY5Quyjso2KPJm4Yt6xEyzT99yZz2
-         nFTJbNWOzGTTXjU4aPAATBmUn9maJj4zvf1B4UH2+n2o8SSGI5XRf5s0U2ynrVd5ZKuv
-         YUzR+igj4Mu9a8DiHoCfEAWtSUzpMBwqOVMcG6dwxs0d8tGpWBcLnAN7x1FzwIZXFXqs
-         T33rqTeCOZ/nOxYSQbL4xJI4egCBO00mku5/zd8Zpodkuw367jFtr5ktz4QjnNhR5TJ1
-         9Q8N4GlOZI6BhdRzkg8HKX+AwHu4VlfYOohIYLH3AcMBeLpuR7GkjR5Ude0X1SclfK12
-         OCOA==
+        d=gmail.com; s=20230601; t=1732966424; x=1733571224; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EL6KVlYMiRPfIoR2qBsCEcQAjqvcPLAovHyHcOnwcNA=;
+        b=B6d/Ghp75tNuB3E3Nmm5c/PNfURR5O566ey27C70G8CXCjpVAxN9LZT/ILePhk5ic/
+         oIoxvJMC+vB2p0ZeYC3CMe+xCU60QnBit/3zWEJ1elJzKopE5fWRZpeQNHbttsjtI9MR
+         DeJdT3c2CI99dzlTRPchSA9etKCZtQlNP+tFgOtoyrgLlJSs27vh+0TbekjuNredH1+J
+         kTF6FC1sEMRD3zzUlQYrJbfGx2t38hXTBNIo8owK3g4SJOlj4ekDWzALGLadkTPB+x9D
+         9a1ORugbaxm0V363QIN9DhmDfIPTU3poWbs9PyUUpLclDiyXFRV0KiBCQOAu7fKCRp/e
+         uFlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732960866; x=1733565666;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a67SmAxg7nZOip6zVhj4ZsmBcbeJIrKRZCIwBRUJFXg=;
-        b=mTrkiTmGi6LWUjCjz8FzpMrlvGenQ/oDmZvBWCrNqqPhEgahzSFwiA7Y0g6Rayi0hY
-         MZpfMW2tb2feeuzWe3if2QosjmbY8uDmzVozyMGle0i7ZkiWwx+m0rej0rD0/RBCKNbC
-         1BtTVuPHbjVRb34fQ80ZGfl4LW9gisn1loCqkmVsgxPsuz1HH7Mvtlat4zvrsVEf5+hi
-         gU62KtSuKsypmy0KoAp1JLh6nuUMktPMUcVk/8LX++6dVmaFYStJy/+8t0/nQs7/vGJr
-         /M02biRpm1Uq4SeqTb/6UXqYQigmPPP4T4d+ar8zZtaip1hi9QaC40y6UU44f51mnOef
-         4Oqg==
-X-Forwarded-Encrypted: i=1; AJvYcCU6P0nwmqUOPIpx6SrHLlNvjh7E1GJSBD+TcfOKp22qC4I2M+G3BFB+V9Aiq7C8SBAyX73+v7w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDdGq8Z8J1Jew/joadJKH62w+HCI/H45ALIECHoleuIzZMelgB
-	+/AW+nqMIu/4qzlbSDHkYDil0TDmeMa/u6+Mt4xgPXkQ9JncqsoylNDeg/6z3VFn2wDPAXFmy1q
-	VfYIl/w==
-X-Gm-Gg: ASbGnctOIO69Jyj+b/aSlcOJfPjT75ypNePF6nzxIYpZZD77Q4jMI8yg19ZfLJYkxm2
-	EYhlS5LcFHxzjf7+/wbDCFDuBYQXb2UvC2c+gmQzClfsLkB/Vvs/n6eGCoBiyZZMftJicG68e9K
-	jcjCESgRSK63ytgSg8vu7D5DlpPGq9N8t0OouFaAEU4bSuiflKSC8IddwrOaH3KyaLc2XI9Y1Jz
-	c1z6YR3opCUNspqO6gZ79dro0TG9p52IsddJ3HulBqe4PnGkKngfw9OWGjtMOt85UuedGoC
-X-Google-Smtp-Source: AGHT+IHz6Lgpgq1CwlN5SY6GoUtJEsnuXZdZiLP/TvT694J0WqT85iYkJrByZ7WTMbPj28wc6GAvsQ==
-X-Received: by 2002:a05:6402:354c:b0:5cf:e9d6:cc8a with SMTP id 4fb4d7f45d1cf-5d080bd019amr12849937a12.20.1732960865832;
-        Sat, 30 Nov 2024 02:01:05 -0800 (PST)
-Received: from localhost (h1109.n1.ips.mtn.co.ug. [41.210.145.9])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d097dd619bsm2665439a12.39.2024.11.30.02.01.04
+        d=1e100.net; s=20230601; t=1732966424; x=1733571224;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EL6KVlYMiRPfIoR2qBsCEcQAjqvcPLAovHyHcOnwcNA=;
+        b=ayIRKcaZNUgszYIN++Q3NnhBm7tmITczbpNMQe4kwY/RIEHoh9Lvbn8PBlX35rvEyJ
+         PE+SzgiDWfi0bEW6zTBlMNvkWpXVKfJ4rUzYsDp8HdJDZZWjW/ravPdKDn0hA+x3YZ1i
+         5eYQfiUUxmDNKOEuIuskkCj6HKhXeL5kWh6RI+zEIA61Y4KIILnp4icQJdzPcRHV7HP/
+         y0kr5k8uIpdYyaEIdZW1ueRHCDvsp/1PBN7odR4N5CRHDA38QpZGt3RzbtViFxBSCpls
+         g/RhrQo6fHnio9etvCz59CEtpwsSNYEwX7aeWHLjeGe9FzzIZg9It6S65NEXVWxmIlDE
+         SUkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVzZ3x5xoUOHujKhRj4LTdvmKt85iX5O5HJu6xnyDuZYkDv0XvmQimDEcBnkZvBFYrqJ8WPn2jN@vger.kernel.org, AJvYcCWEZYkgLAybjitfs3KWSFHQDUft+s+jWw5fIBe4UA5TI7QCXKNVY1btj8v4n5YiJcJVYvpufH5vjD+pa6zsHQ5c@vger.kernel.org, AJvYcCXxN0YeIJXhK7lbfZi61qWpuzGJM2FJPZ+5ZH6uaog9YnqsiH/lK9IDGaSLba1I+9drHCcxddAFZfILd/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDR6DnxdWBAB1n+ICINrHUhIQaTxJzl12OUtodZs/+3xEDjWZB
+	MA0Md+JtT/5gyVO3TD/Hf3eymfTdGODYS+sp0bDZVkx2Aqa8JJcr
+X-Gm-Gg: ASbGncuCTACsh2ywS2I9JtIOJZR1hSqjgZfamr37HieDe/5QDbM+mT74mfO2EjwUT+4
+	FRyiRc0Mx2swHd9y9X+LOPy1LQwLOs8pzW5OykmVSr4uUjhh3IdvPRBBFvj71KfswcFpaOIFrFr
+	xYqNW3f2Kx6y9ekVo0ykiQY8uUhvZtCuqFchctZm9DNURgSSJ8uyW3aeomsaLWWu4QPxeF4Srd1
+	7W42yINEMvXgXq3amy+X+kHlV/EiDj5uUAdiICHsaWnzaXiCY8UL5ibKZoXCY6q1nUg98w6+C7F
+	srWOi2CjdVGoGaHdylQ=
+X-Google-Smtp-Source: AGHT+IGEquHdV3LyyYusIywiVJxdZDtQStlBx5Sfx3l8/f6Wc0aQaQOyrRPA3gbJCwQZizot/vfuTQ==
+X-Received: by 2002:a05:6000:1448:b0:382:41ad:d8f0 with SMTP id ffacd0b85a97d-385c6ec0e2emr13276066f8f.34.1732966423881;
+        Sat, 30 Nov 2024 03:33:43 -0800 (PST)
+Received: from localhost.localdomain (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-434aa77ffb0sm113506365e9.20.2024.11.30.03.33.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Nov 2024 02:01:05 -0800 (PST)
-Date: Sat, 30 Nov 2024 13:01:01 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Yevgeny Kliteynik <kliteyn@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+        Sat, 30 Nov 2024 03:33:43 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Muhammad Sammar <muhammads@nvidia.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH net] net/mlx5: DR, prevent potential error pointer dereference
-Message-ID: <aadb7736-c497-43db-a93a-4461d1426de4@stanley.mountain>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Petr Machata <petrm@nvidia.com>,
+	Benjamin Poirier <bpoirier@nvidia.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org
+Subject: [net PATCH 1/2] selftests: net: lib: fix broken ping with coreutils ping util
+Date: Sat, 30 Nov 2024 12:33:09 +0100
+Message-ID: <20241130113314.6488-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+Content-Transfer-Encoding: 8bit
 
-The dr_domain_add_vport_cap() function genereally returns NULL on error
-but sometimes we want it to return ERR_PTR(-EBUSY) so the caller can
-retry.  The problem here is that "ret" can be either -EBUSY or -ENOMEM
-and if it's and -ENOMEM then the error pointer is propogated back and
-eventually dereferenced in dr_ste_v0_build_src_gvmi_qpn_tag().
+If the coreutils variant of ping is used instead of the busybox one, the
+ping_do() command is broken. This comes by the fact that for coreutils
+ping, the ping IP needs to be the very last elements.
 
-Fixes: 11a45def2e19 ("net/mlx5: DR, Add support for SF vports")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+To handle this, reorder the ping args and make $dip last element.
+
+The use of coreutils ping might be useful for case where busybox is not
+compiled with float interval support and ping command doesn't support
+0.1 interval. (in such case a dedicated ping utility is installed
+instead)
+
+Cc: stable@vger.kernel.org
+Fixes: 73bae6736b6b ("selftests: forwarding: Add initial testing framework")
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c    | 2 ++
- 1 file changed, 2 insertions(+)
+ tools/testing/selftests/net/forwarding/lib.sh | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
-index 3d74109f8230..a379e8358f82 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
-@@ -297,6 +297,8 @@ dr_domain_add_vport_cap(struct mlx5dr_domain *dmn, u16 vport)
- 	if (ret) {
- 		mlx5dr_dbg(dmn, "Couldn't insert new vport into xarray (%d)\n", ret);
- 		kvfree(vport_caps);
-+		if (ret != -EBUSY)
-+			return NULL;
- 		return ERR_PTR(ret);
- 	}
+diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+index c992e385159c..2060f95d5c62 100644
+--- a/tools/testing/selftests/net/forwarding/lib.sh
++++ b/tools/testing/selftests/net/forwarding/lib.sh
+@@ -1473,8 +1473,8 @@ ping_do()
  
+ 	vrf_name=$(master_name_get $if_name)
+ 	ip vrf exec $vrf_name \
+-		$PING $args $dip -c $PING_COUNT -i 0.1 \
+-		-w $PING_TIMEOUT &> /dev/null
++		$PING $args -c $PING_COUNT -i 0.1 \
++		-w $PING_TIMEOUT $dip &> /dev/null
+ }
+ 
+ ping_test()
+@@ -1504,8 +1504,8 @@ ping6_do()
+ 
+ 	vrf_name=$(master_name_get $if_name)
+ 	ip vrf exec $vrf_name \
+-		$PING6 $args $dip -c $PING_COUNT -i 0.1 \
+-		-w $PING_TIMEOUT &> /dev/null
++		$PING6 $args -c $PING_COUNT -i 0.1 \
++		-w $PING_TIMEOUT $dip &> /dev/null
+ }
+ 
+ ping6_test()
 -- 
 2.45.2
 
