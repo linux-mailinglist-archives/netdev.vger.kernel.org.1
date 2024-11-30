@@ -1,68 +1,58 @@
-Return-Path: <netdev+bounces-147924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BDE29DF295
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 19:37:11 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 893179DF2A7
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 19:42:36 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D787FB20FFC
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 18:37:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D4AE160E34
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 18:42:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95E301A2C3A;
-	Sat, 30 Nov 2024 18:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B7F9154456;
+	Sat, 30 Nov 2024 18:42:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d+XmOBBn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HPOro+Cz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FD6158D87;
-	Sat, 30 Nov 2024 18:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C908468;
+	Sat, 30 Nov 2024 18:42:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732991826; cv=none; b=m9iZuUx40qrzaCOcTn3orIXcsDxij4qxIYVJccglf10BwvvKwTUqxIV/rDhyu9cEMO/vBFb3FAnqRZGtB0F5moUczAAhij9c0q4fefP2EK/g1SP3JlUYiRSuR+naiNTReTKy+S6xiQXdJ+8Y++l+kg5QRffUn6ajdCV/7B3pWw8=
+	t=1732992153; cv=none; b=ClbrWJXJ4/iBMsnjnB89AIZ7JX43WZwpVrnZvAYczL7ASRVET36fUZk+yL5h4/Wtzsn0G2HlDZsK+xWiz9281qYMx8VyW5/4a8OUAYxW9AHOhRmQSExZd/dwe7eg0QWitxT63Mqe7GAKvjmuHoXopTw140Dgyb7kVhXOOr7NslE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732991826; c=relaxed/simple;
-	bh=5CGTaXv3qcM8izuf0G3IuTtdL47UzEnEwiMt4SQGzng=;
+	s=arc-20240116; t=1732992153; c=relaxed/simple;
+	bh=D6p86BJvkO66jl+eFjXlkmkqwKVitCZAmm4xk6RMu0o=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uCNEOCdgPlvwHXM5ppffZOM0TJJHAIg8EeuZS+kpJ93c/2drN80aZLhCIJi1fjIHvUi8I3wlSJCzfixH1j8AlmODN+4yNML7NT0KvmuYj8KN/JEd+bBz4Sf2haO3Xj0c/Rk8Genli6pxfL+zeEOXczfIwoQA6W8yXeT/cnLBKmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d+XmOBBn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56DB7C4CECC;
-	Sat, 30 Nov 2024 18:37:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Lfa7jJptlo5QTK9gCjbDy7zTPvnKDGyRX3jvhzkYR9t2JqwIUswLaVax1xZdecs+Ch0fOiVZRnenA6Q/lxQpiWxAHRpKSRr3F/B+2KqBS1Y1U7b4TK9btqOT921awMUTqlM5hMZEysa5bbL/WOpRoSFzXSjIYkVfkNEQz+w0Ocg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HPOro+Cz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4D63C4CECC;
+	Sat, 30 Nov 2024 18:42:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732991826;
-	bh=5CGTaXv3qcM8izuf0G3IuTtdL47UzEnEwiMt4SQGzng=;
+	s=k20201202; t=1732992153;
+	bh=D6p86BJvkO66jl+eFjXlkmkqwKVitCZAmm4xk6RMu0o=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=d+XmOBBnXCHc8xl+sEgI9y+sZ5RaJrGt+nMaEjJkVWI+Ty3E8L09wNPJyfoLgOBoH
-	 26b4kVnQqfA+A1HDsTVdRTYoZPRt6Rm+hv0DAXA67CBbmA3GoQ7gOXmlFLMTov5fbN
-	 mXNWl6FDYESyMi/HCbpiwBmDgHqZY26Txb9raGcxAnmrWh/SEtndPr39io9ouRqmy4
-	 oJmcTYJungsIFblLM5Vq+xtlGIdT4ZJkCA0U/ottWVndfKk2KLsEBLndE1pVY0g8NE
-	 xLGN/rGljtqhJkbi9C7Y/3O1wdEPGm+3gTp2mYeEtTgLl7sK7Bw8tE4EVi9B5k7ugM
-	 ogPHQGCdM26hg==
-Date: Sat, 30 Nov 2024 10:37:04 -0800
+	b=HPOro+CzO/w/2Ktm3RGB/f2NhVOLXA8ZgN25OS0HqEusWEsMyNeRdc5I2QFhOTw/T
+	 hTbXRoN8Zg/0f283OOmVIZOUxYeWWBJusFOBe4JmENnRlA3C64gmi/dfNuNVTgPl1B
+	 M05FibU4qOjjltMFUTjoSl4QGsa23OdotwrwRsA4nFlkxWx+W7fqTQ5HEJFs4eED2a
+	 qMqLSHsGd8eEHamC/81Js23Kdfgp8ohS+KLyNKE5Btiq0tHqfiBu4JkR1C3I1iOpcX
+	 Ce05ne6zD3q3VuU7ZLYkxTr352BWeyUh2WFTNf5rU4u0R7kgmx3uPFzyHGKJJIrFHE
+	 xnQ5bxN2M+59w==
+Date: Sat, 30 Nov 2024 10:42:31 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Yury Norov <yury.norov@gmail.com>
-Cc: Michael Kelley <mhklinux@outlook.com>, Maxim Levitsky
- <mlevitsk@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Shradha
- Gupta <shradhagupta@linux.microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Haiyang Zhang <haiyangz@microsoft.com>, Konstantin Taranov
- <kotaranov@microsoft.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Eric
- Dumazet <edumazet@google.com>, "linux-hyperv@vger.kernel.org"
- <linux-hyperv@vger.kernel.org>, Long Li <longli@microsoft.com>, "David S.
- Miller" <davem@davemloft.net>, Leon Romanovsky <leon@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Souradeep
- Chakrabarti <schakrabarti@linux.microsoft.com>, Dexuan Cui
- <decui@microsoft.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: mana: Fix memory leak in mana_gd_setup_irqs
-Message-ID: <20241130103704.7129538f@kernel.org>
-In-Reply-To: <Z0kjRcX1hXYQhw2Q@yury-ThinkPad>
-References: <20241128194300.87605-1-mlevitsk@redhat.com>
-	<SN6PR02MB4157DBBACA455AC00A24EA08D4292@SN6PR02MB4157.namprd02.prod.outlook.com>
-	<Z0kjRcX1hXYQhw2Q@yury-ThinkPad>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Linux Crypto Mailing List
+ <linux-crypto@vger.kernel.org>, NeilBrown <neilb@suse.de>, Thomas Graf
+ <tgraf@suug.ch>
+Subject: Re: [PATCH] MAINTAINERS: Move rhashtable over to linux-crypto
+Message-ID: <20241130104231.442cc1cd@kernel.org>
+In-Reply-To: <Z0lXLs9Zoo22kH-f@gondor.apana.org.au>
+References: <Z0lXLs9Zoo22kH-f@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,32 +62,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 28 Nov 2024 18:13:25 -0800 Yury Norov wrote:
-> > FWIW, there's a related error path leak. If the kcalloc() to populate
-> > gc->irq_contexts fails, the irqs array is not freed. Probably could
-> > extend this patch to fix that leak as well.
-> > 
-> > Michael  
+On Fri, 29 Nov 2024 13:54:54 +0800 Herbert Xu wrote:
+> This patch moves the rhashtable mailing list over to linux-crypto.
+> This would allow rhashtable patches to go through my tree instead
+> of the networking tree.
 > 
-> That's why we've got a __free() macro in include/linux/cleanup.h
+> More uses are popping up outside of the network stack and having it
+> under the networking tree no longer makes sense.
 
-Quoting documentation:
+Makes sense:
 
-  Using device-managed and cleanup.h constructs
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-  Netdev remains skeptical about promises of all "auto-cleanup" APIs,
-  including even ``devm_`` helpers, historically. They are not the preferred
-  style of implementation, merely an acceptable one.
-  
-  Use of ``guard()`` is discouraged within any function longer than 20 lines,
-  ``scoped_guard()`` is considered more readable. Using normal lock/unlock is
-  still (weakly) preferred.
-  
-  Low level cleanup constructs (such as ``__free()``) can be used when building
-  APIs and helpers, especially scoped iterators. However, direct use of
-  ``__free()`` within networking core and drivers is discouraged.
-  Similar guidance applies to declaring variables mid-function.
-  
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
+Acked-by: Jakub Kicinski <kuba@kernel.org>
+
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 48240da01d0c..614a3b561212 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -19835,7 +19835,7 @@ F:	net/rfkill/
+>  RHASHTABLE
+>  M:	Thomas Graf <tgraf@suug.ch>
+
+BTW it may also be the right time to move Thomas to AUTHORS :(
+I counted 3 acks from Thomas in the last 7 years. Nothing since 2021.
 
