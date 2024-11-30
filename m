@@ -1,198 +1,224 @@
-Return-Path: <netdev+bounces-147917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D8399DF1DB
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 16:48:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 536A89DF1E7
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 17:05:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03AAB1621DB
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 15:48:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0916C162801
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 16:05:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03101A08AF;
-	Sat, 30 Nov 2024 15:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E9919D8B4;
+	Sat, 30 Nov 2024 16:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="YB55wB9g"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="EUuWDkGn"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2051.outbound.protection.outlook.com [40.107.21.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2ED5433BC;
-	Sat, 30 Nov 2024 15:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732981728; cv=fail; b=eOtPlzS5ldoDRnUkPl2ZbplItC3nSra66gOjinN98GiVkAGV1nrkfYdykwP6sSCnglZIOzgzV4+RkLWqESWyx/TX2vBHye1RVMlKqB8Id13iqACsDJiElLPKNUvgBpPYTg5ClgSsynJHj2oY5hF9i6sav7QPkNdJebxwMxL3qSY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732981728; c=relaxed/simple;
-	bh=XNi9ww78EOlQCuK9vbDb4LLw27HfCOhVIR8ul+wbnec=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=DV45A5mHLQ8GTZ5z1r7q3JLDoeC10aKgyP1Bq4QaXt/rCgly7oXfmSz3Fv2pJIfvn3cSpkXefuymm1lmARLIXE1887fieoHYhuQvgNqZgZzu45xx6HL09kA93gfxbXgC2rCjdczfvPwzc3ENparCmMYr/rJDB5DwMzZMouIFZlc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=YB55wB9g; arc=fail smtp.client-ip=40.107.21.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TlGJgUvhtlQr5FHr+NrvnSQbCCMHAlhtfSZkPvbB338bOGNp9Yz27V2J8peaKuSBuRMjorbjlOGE+ohpbClWZ2DGhVixUTAC6EUDSEsgYxteDOPXGoiMgjUhUbyIVXsAPaaPTCaKWO0xlBuVRPnDBJUr98wLfzHJB9GmTndErzVqOfIuBN0OOOYlkCheRL6Y9eWhW4Jz3JhyNnCZB3EEzLOc5d1/oifYHbDS9QF1+Df8GZ0hY2Idp/C+NgDgE6hNZY1TBSrMB3XVzV5J3nZ7vItE+aQRY3lJkMrWOGUc4c+cNtHLYsSD1k/QXyFOQFTT8ZX2j6jzOZzrMHM1IoWz9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4dgECCUGYaZSnK353NgB3DRzvOM36k7j1Ir/SMGmVOA=;
- b=tWVuyxXkFzHwdMWDgUeiHYVwCUu4DEujVjvmLnj2gryieTDV/TZaNMmbU/6qTA0OYMxK/4HlfEuKkdbgwUWvmJaq9IGdzXSctF7PSM4RRiiU/5nhWFpPC3ITFyOt6pL7El/+uJRGb/qL8mBOc3rhfW56MjUj8ravfLpW621g9BtOo0xNJUBE8tublSp7CS2z3rzEc4mGcxvL+GWbQ+DFPn7j6jYl1fUh4gbn9a+luj1BTXneVkb4jgT9GgSLuYc+OVa8DlED/zOW8HJfRU/mE2LHyY0qVSE0zfYxlJtfhlE0pSgDB9L2LrcibgF0NAVlhaNEDAgT0+O6E5W2TJF2pg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4dgECCUGYaZSnK353NgB3DRzvOM36k7j1Ir/SMGmVOA=;
- b=YB55wB9gir2FfRyqBvIuszBWkNZHdX9Lqz/XbiNAQrZ3TaS+2mWlesZm4EVsiPEVcxokUxeonaM9ZxJeP2dfIkqZo9TeLdTlkfhFy/QMxZhFxyyF77MWy+wKL64E5nm+De6/eatE7mRFHdDZo0o3T6wTrH8zcnZr9WsYbcadSkIH7NVToUKOrtfnuHNHPb4Ue96dvhkfGW4NQYEjVNlSacbxY5qR24CubQ4D50O8g/MVKU7OaKfFESiNpvW0u8Ub1KsFD2UqK3pTbtEX7VWsMsdL0jDewidZqwrW8mG5jAv7I/9Y7rABQTMu0BLfP8PkWAE/VO+a9W8Z+2XFFkwnVA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by VI1PR04MB10074.eurprd04.prod.outlook.com (2603:10a6:800:1d5::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.14; Sat, 30 Nov
- 2024 15:48:43 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8207.017; Sat, 30 Nov 2024
- 15:48:43 +0000
-Date: Sat, 30 Nov 2024 17:48:40 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C67F188CB5
+	for <netdev@vger.kernel.org>; Sat, 30 Nov 2024 16:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732982698; cv=none; b=AM8J3XWYrgOmHDUNxo9440GMnYJkE+mcN3q8cY1IirrgLXWpy52qEdUHKffcB1jjmF3bigHi7ODZ4qAcJIuvXNAxQlmyqqiEy8uY8x5KrfY9QLY02/jw3Ffas3HXsR/8LnyBqeWlZjJS8rUEXOP8ZOQUgFVVXq/qW4rSbHkQbrE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732982698; c=relaxed/simple;
+	bh=Ib0eMIHq4Tud5T3QYMT+FKlg8p3RZjvIuyuFfrCD4Yg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bnHCfWxiPEyzTlPyL8pUlsdEcK/aLYuWE2m5y5oV1OvWLO7Xfghfzwtw8pMys2qDpcUm8dY+H62xnEwmLAQC69kepfjB8cjA/TeVuVvjpBD+eu+5+Tur01lc4b9IEvSHY6a4wjmIllRI1tSwnYOzsanMBbxrfzhHtPEEWyD3JOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=EUuWDkGn; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-53de771c5ebso3180410e87.2
+        for <netdev@vger.kernel.org>; Sat, 30 Nov 2024 08:04:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1732982694; x=1733587494; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CU8Ha8lvwzrUL3wklZxNnby9TbqM0AQPddb/sVDz+Hg=;
+        b=EUuWDkGnkYH+zjeVXwJu30Jx69vHNSu8mOpdyl9FqGq5g/IpMJTbZ5lzq0OwsZdaaF
+         bNEn28D+bhIV/b+bkbcHbLjnAPWia3WSLUe5t3QjkBe2P8wXoITaZAOtvtIfHbUXbf8m
+         2fi/w+tsq0S7YQtF8flHHWuE3u33YDrL80oBGqTOmoIHmJXPSxSs5ubNFkIvRtul8Fy1
+         2mI0F0E40qWKB9qIQTj9nXMU0Z/MKA8pUvHFnHdkZeHGJBNX+Kip2u1IdKcPemkhkeUh
+         UbpALvPU2EjvXBB7NojclL5iHvAvvYO6HKRT+H0i8ZenzOd6/fHtbPA4avNKx9jdR5Lq
+         k2rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732982694; x=1733587494;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CU8Ha8lvwzrUL3wklZxNnby9TbqM0AQPddb/sVDz+Hg=;
+        b=EXQ1CxGckxRJvHanA6N5IhpmRrpB1czuBkvfJR3nEATyT9oszBkqRTs5dWJDPUIHok
+         UgSzGoFYdejOjyIk6Wp+lHXbS1gTPU2sq675tS21wMipDUHtLkxGemAx6+wxCsAOW687
+         k+RlC3XTkBI+EAkttvDi7n89+A16XRSflkQuoD5rMf9Vhmo4sl/i7KBoKkLIsz4QsZkL
+         VeScB3Rpmm9OOtHjv13HN6Z+AnD0NrsnAghdFSauzQ/uH4S74AmHkXRxs9f0ejV950d6
+         5tjM/DRMkfcR4qkOy76seiugXY9J5RwN1/L/Y28eirWDYlAEiSmGNmGwnIFofDD5N22M
+         btfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXMoW5LM0RHgnDwr1LhtcSjIs1tiko4ZPfedaX5X1W8u4iDcQwq1ns4A67whzLCjTEJLRb0Ec4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnwYPa6duh4znT1Ci3c0lVfN1XuePXJGHlKZEiW3QwCYp1tJYt
+	ci7xKPtATDj/xXMs+LN7CdgzmJ4idvvzdzoPntZW5LiWofbQBONCm0p847IXzSI=
+X-Gm-Gg: ASbGnctFEVaNS15P8AXetXO4JXcyfqlRuSM3F7CtYWLWb/gSoI9s1zGuEuRPGR7URFi
+	VbyIuU0NIze9HFnYWSAETMAkYBphZjXkDMNcigSJsRflPrKDdbaNsYcULarfX/ykl65DNA0qHrM
+	MIbaR/vRU720TbB9UT8rAXMEyDHUBjSsdZ1GFfpkcTYbgg0XjWIQ9tXI39VuJ0M0hnoKaG26w/P
+	ZZtG/MuoGyaGm72U1bA50g2jKYFN6zU+4bVs2tleH+4ZXs=
+X-Google-Smtp-Source: AGHT+IHL4oeMU03kLmQ2L0BR3qVJKTiAVIsSPE3HICpdb/3DuaV9c9TIe/hHbGxSndbZ9+FTqZL6rQ==
+X-Received: by 2002:a05:6512:3990:b0:53d:eefc:2b48 with SMTP id 2adb3069b0e04-53df00dc9bamr8384254e87.33.1732982694015;
+        Sat, 30 Nov 2024 08:04:54 -0800 (PST)
+Received: from localhost ([217.199.122.82])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53df646f2adsm808857e87.114.2024.11.30.08.04.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 Nov 2024 08:04:53 -0800 (PST)
+Date: Sat, 30 Nov 2024 18:04:52 +0200
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: Andy Strohman <andrew@andrewstrohman.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
-	Benjamin Poirier <bpoirier@nvidia.com>,
-	Hangbin Liu <liuhangbin@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [net PATCH 1/2] selftests: net: lib: fix broken ping with
- coreutils ping util
-Message-ID: <20241130154840.lv4rmor4dv66cctf@skbuf>
-References: <20241130113314.6488-1-ansuelsmth@gmail.com>
- <20241130154307.cskk55ecltjkinqz@skbuf>
- <674b334a.050a0220.3b307b.ee8b@mx.google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <674b334a.050a0220.3b307b.ee8b@mx.google.com>
-X-ClientProxiedBy: VI1PR09CA0111.eurprd09.prod.outlook.com
- (2603:10a6:803:78::34) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com, Shahed Shaikh <shshaikh@marvell.com>,
+	Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
+	Simon Horman <horms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Roopa Prabhu <roopa@nvidia.com>, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, bridge@lists.linux.dev
+Subject: Re: [PATCH net-next] bridge: Make the FDB consider inner tag for
+ Q-in-Q
+Message-ID: <Z0s3pDGGE0zXq0UE@penguin>
+References: <20241130000802.2822146-1-andrew@andrewstrohman.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|VI1PR04MB10074:EE_
-X-MS-Office365-Filtering-Correlation-Id: cfb278ce-de70-4bd1-79cc-08dd11567819
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?24kq34rAAxW9kgLBQ+dm+E+m5vIQJu/PkbC0Nx62DboHKiMfaw0gftjtzVi5?=
- =?us-ascii?Q?/d4tsHE0/Kyk2l1k0CGqO6lf5iEtuFiFwQV69Js7iQpO30BsTwqF0FsZHuUp?=
- =?us-ascii?Q?iUTrYvuEaJAxsPI0AndE2dsLT4Jz/1wL6/O/N/bJvV39s2SNwxzhZ6JwE7EC?=
- =?us-ascii?Q?rA6e7Lkv8Jds3vEHMeqg5DnNRhGjlMGoLmthwumccdweS53o/Pr9cmzg3lmL?=
- =?us-ascii?Q?HIclSgwfBHa+1jBsTdqcNScFb+9Q4Q+4XGYaOimuKxcBQR5KfXYvKXbBbeU6?=
- =?us-ascii?Q?CGfUoJPuaNbQ9b+rMtmKE7eSat4eab1ldGGFJ3+tNKScv8ulzkYhGHhcR7HX?=
- =?us-ascii?Q?1kudBjy5/i+E6dR3S9KsJJGEnYQh3oQwtXyOpkVTjFeCNo51N+7cgFfrvbF5?=
- =?us-ascii?Q?UFndEBek9Y78hAW/zdA16pOY86W3VM9Nr99W7igaY1A9rUwMGyZQx86rD2yY?=
- =?us-ascii?Q?4vpiddP04JaBp7JeYzDoa/cJwPlGCvvXedc2XITsmVq/b/otfItIDZh6YIdI?=
- =?us-ascii?Q?Vr4f93FjduYKYQV9bU50K0AMWMsFcEj+QX8ml+uy0rCg+ef0tzxSMoA+1txp?=
- =?us-ascii?Q?1rcuZG1EczWJeJhMP8N+CtQYWcJpbHETvy9UEYL5qXYb0wnwz2WfOHvrK36E?=
- =?us-ascii?Q?9Fd0OWFktxhnwHcLMcsxA9hdXhoDKi41rb+G4HAeDIrPoyMg8tpfY/rSY2aT?=
- =?us-ascii?Q?5wT16iepqvYbjL5trwn1QYL19aYOvZug+cKmxX6gwRhgjuDKMWBLSpiXc8AX?=
- =?us-ascii?Q?BYJ6YXYSoeyJPHSNRv2+RxP9snms7DBdS69gLQIse5apO1FiFhhqdA3cldjv?=
- =?us-ascii?Q?eBbqw+fTKFxO0Xm0vP7g5FU9xqwPORL7vGPSRUs/giNO/X5UJXBr7cTkbBEY?=
- =?us-ascii?Q?xga6uSWnz5PiV8OUcpBW65XtLhBDMpTbr/qmLg1bO2ECPLFZC1692hb6+61R?=
- =?us-ascii?Q?AjhNN7+qlxegOJ4p+bPVPtf6IkBLnkWnu/PC49H8Pfhwp7JRv4JN6WEgNI43?=
- =?us-ascii?Q?Z4SelmeGa3bEHTW5c1aHi/AW0fW4rqVnZ3C82nWOvR38iEhL+D7z52pfToA3?=
- =?us-ascii?Q?rxZXIlvlU1zVUvRMjCfrwF2MvxVEMR50B2HuVUdqrugKClusM5GGhl6bw+hB?=
- =?us-ascii?Q?ZI5Eph9vHv9dT+5Q6LUcn3r3i9RQJC57Ucq2WgMF5DtHXpuIVbBWswWLjvQZ?=
- =?us-ascii?Q?2bpClylFihTx2rt60P7ec+B9a4tGAlsyvAZ919hXQqXe4BAXqNK/mhv+ETEo?=
- =?us-ascii?Q?9F4GW2S6fOY94o096GBSCXlh0QS9+N1ZOiMV30meByCdWx3vYTkfhhaB+8df?=
- =?us-ascii?Q?fBuwhureCLJqTIv2C4aLV7ZlTuQg5dX4Bo+IkLvuDNsmcw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?VYMnunJ47snu59tnzGCwmz6Z9cGDoxCbxDKiTSqwQdMTsndke8zPQLnxJ3A5?=
- =?us-ascii?Q?yZ605ZAX1diIIZlKx/xLd/5jEGkhPXtUk2luOBGc7LFRSpy0bFgvSP+L71j7?=
- =?us-ascii?Q?v2VJhFF1PcJfRUOqiI7ofL6BQRyDx/xfiSHw1XqzrxR5mG6D6DBWnDsluZeI?=
- =?us-ascii?Q?y0cCXOBdxGv53dNc22MToJTgnSvaaL2HQHqrwFiqxpH9z+QG924AvYgggl/r?=
- =?us-ascii?Q?624X8V4GXxbBeqBEoyMMaxcs5vvUBu1cxSanCAYjlADHTdu1K3vJNrsaT1zX?=
- =?us-ascii?Q?3/TMRO7bPY4gYi5NzmC71TuuUdzCS0fq8Z9ECUHCN21ZqTjPiygAhR/ysr3/?=
- =?us-ascii?Q?eMt7QIeed/sHv3Ar6tmHTpx8aEoe+tVMuEnozara5UeUwYAWCEIIXp9pSHbm?=
- =?us-ascii?Q?VHe3aaHra+FZ9JU4tWSjYXW9Qbsw18Yhvt8JMPuN9dBFr3ERR/yubZOfn6B/?=
- =?us-ascii?Q?+iyJADamsK/icgKqsAneLcpjHotmLgc51j+8S7slNExdDvr4y81nk+yCPAhx?=
- =?us-ascii?Q?tChMzkBbi7APZNoTegQt+cX8L2jKFaz6e2wjOR7bvTNRb37y8Y973d0vwTwI?=
- =?us-ascii?Q?iRig9SYQJnHTdpJWFYC0Anx6YGIUiDflEiI7/SewfP9/txtYnpJ71sLcQYQE?=
- =?us-ascii?Q?k6HKPipEWgG1YT1FaX6kq/IzpCTHGj8wzhyoB15la9VlQltc9WsIzeNg6+W2?=
- =?us-ascii?Q?9QaQ2R6SCDbEA4AKSHTWQz3/6ugtVqLzRZhXOtkyoEAsVul87Fx+YmC4JOAG?=
- =?us-ascii?Q?H7mNbgDqkD2SJLCHRq+70hITngH0Hh5yvSv70HgpEn/Sg9XhIVx5nnWZgVTY?=
- =?us-ascii?Q?0ws9rRiFXtigJAEagco2Zm3mRxpvn2C5HvRvV+mL6/hPmqonTPlJ6EcqtQEY?=
- =?us-ascii?Q?T/NwL+aRdvfB6AADgrB6m4epLOPjT1ncfAPZEsha97ql6VtQiqMUry+bmLje?=
- =?us-ascii?Q?keLLS0ADD+xwohw8o6YxiFbKXjYs0A3PRQG15+tz+mMOOGumvOB1QvunOCyL?=
- =?us-ascii?Q?Q4EFC7KfjGLG1bvfowXSmPBhI9kmM5vYl670MR+0c+UcabLKIsO2jiV2D443?=
- =?us-ascii?Q?jD13tP+zCg0CIyjWz8fMSDC1kivyFLxtNLbPizt+tEFtczIVTW3Zmv33UjBW?=
- =?us-ascii?Q?YGLLZlQJhIHHVF3i224QtLI/O+j3Jx673mixFvE4teNw7jnLUx9bQ4Ik3Gmp?=
- =?us-ascii?Q?anaxgI5d8atRHufthfs29JueXWa6VIgvM30Lcqy5DZqzIoPu+zoxqoE+d9xd?=
- =?us-ascii?Q?r6+MzcskkX9UYxfQtt3pTxaj96akoXER9mf5IJURjSFPTRMO41Nmt6pxob9F?=
- =?us-ascii?Q?oESPWJdkQPKNp7LsfgY5seTF7XXrn13pMsAdN01HfHbKA2ttB04yFE+JmlVQ?=
- =?us-ascii?Q?/TPjh5d7nvjOS3Yqbix803ThPOQHIyYipmGBP81BLBfk8xfZDXnCL5RiYqsO?=
- =?us-ascii?Q?U36Ve/lOCROfqTeMSJwtYskbqPFpOiwcF81vOxV8M52Ab87Bk8g2UCrlBywU?=
- =?us-ascii?Q?VMY42xy1jOLIlEPLVVg+JjBhRlnqshwZbw3NJ1rI35XIGSzlJPkahBE0fdP9?=
- =?us-ascii?Q?Q37Ac5ERvj3EGDRwqo8qvQhYXBNfH5J4zlGzY3GbYea6Yd6HpF/FgOpUNv7B?=
- =?us-ascii?Q?xg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cfb278ce-de70-4bd1-79cc-08dd11567819
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2024 15:48:43.7651
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /ugL2Ei5sb1aCGIm+V7Gh76v6R9Msz45+ILb7I+Zs844g9DsF+0djQ72TMrqs8Df9bVW9547KxWIyR/r4/Lqmg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB10074
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241130000802.2822146-1-andrew@andrewstrohman.com>
 
-On Sat, Nov 30, 2024 at 04:46:14PM +0100, Christian Marangi wrote:
-> On Sat, Nov 30, 2024 at 05:43:07PM +0200, Vladimir Oltean wrote:
-> > On Sat, Nov 30, 2024 at 12:33:09PM +0100, Christian Marangi wrote:
-> > > If the coreutils variant of ping is used instead of the busybox one, the
-> > > ping_do() command is broken. This comes by the fact that for coreutils
-> > > ping, the ping IP needs to be the very last elements.
-> > > 
-> > > To handle this, reorder the ping args and make $dip last element.
-> > > 
-> > > The use of coreutils ping might be useful for case where busybox is not
-> > > compiled with float interval support and ping command doesn't support
-> > > 0.1 interval. (in such case a dedicated ping utility is installed
-> > > instead)
-> > > 
-> > > Cc: stable@vger.kernel.org
-> > > Fixes: 73bae6736b6b ("selftests: forwarding: Add initial testing framework")
-> > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > > ---
-> > 
-> > Do you mean the other way around? that the busybox ping is the broken one?
-> > And by coreutils ping, you actually mean iputils ping, right?
+On Sat, Nov 30, 2024 at 12:07:57AM +0000, Andy Strohman wrote:
+> 802.1q networks with IVL (independent VLAN learning) can
+> tolerate duplicate MACs as long as the duplicates
+> reside in different VLANs. Similarly, IVL networks
+> allow for L2 hairpining where different VLANs are
+> used for each side of the hairpin in order to not
+> confuse the intermediate bridge's FDBs.
 > 
-> Mhh no busybox ping utility is problematic only if FLOAT INTERVAL is not
-> enabled (aka 0.1 interval are not supported)
+> When these types of networks are inter-connected
+> using 802.1ad or Q-in-Q, only the outer VLAN tag is
+> considered by the 802.1ad bridge during FDB lookup.
 > 
-> Yes I'm referring to iputils ping. With that I notice args are wrongly
-> parsed... especially with the -c option.
+> While traffic segregation by inner and outer VID works as
+> expected, the inner VLAN's independent VLAN learning can
+> be defeated.
+> 
+> The following example describes the issue in terms of
+> duplicate MACS in different VLANs. But, the same concept
+> described in this example also applies L2 hairpining via
+> different VLANs.
+> 
+>                  _______________________
+>                 |  .1ad bridge          |
+> 	        |_______________________|
+>            PVID3|      PVID3|      PVID3|
+>                 |           |           |
+> TAGGED:        7|          8|          8|
+>             ____|____  _____|___   _____|___
+>            | .1q br 1| |.1q br 2|  |.1q br 3|
+>            |_________| |________|  |________|
+>          PVID7 |      PVID8 |      PVID8|
+>              HOST A       HOST B      HOST C
+> 
+> The above diagram depicts a .1ad bridge that has "pvid 3
+> untagged" configured for every member port. These member ports are
+> connected to .1q bridges, named 1, 2 and 3. .1q br 1 allows VID 7 tagged
+> on its port facing the .1ad bridge. .1q bridge 2 and 3 allow
+> VID 8 tagged on their ports that face the .1ad bridge. Host A
+> is connected to .1q br 1 via a port that is configured as "pvid 7
+> untagged". Host B and C are connected to bridges via ports
+> configured as "pvid 8 untagged".
+> 
+> Prior to this change, if host A has the same (duplicate) MAC
+> address as host B, this can disrupt communication between
+> host B and host C. This happens because the .1ad bridge
+> will see the duplicate MAC behind two of its ports
+> within the same VID (3). It's not examining the inner VLAN to
+> know that the hosts are actually reside within in different
+> L2 segments.
+> 
+> With this change, the .1ad bridge uses both the inner and outer VID
+> when looking up the FDB. With this technique, host B and C are
+> able to communicate without disruptions due to the duplicate MAC
+> assigned to host A.
+> 
+> Here is an example FDB dump on a .1ad bridge that is configured like
+> the above diagram:
+> 
+> root@OpenWrt:~# bridge fdb show dynamic
+> f4:a4:54:80:93:2f dev lan3 vlan 3 inner vlan 8 master br-lan
+> f4:a4:54:81:7a:90 dev lan1 vlan 3 inner vlan 7 master br-lan
+> f4:a4:54:81:7a:90 dev lan2 vlan 3 inner vlan 8 master br-lan
+> 
+> Note how duplicate MAC f4:a4:54:81:7a:90 is behind both lan1 and
+> lan2. This FDB dump shows two entries with the same MAC and
+> the same 802.1ad VLAN, 3. Prior to this change, only one fdb entry
+> per MAC/VID would be possible. As such, the bridge would have
+> issues forwarding. After this change, these entries are understood
+> to be distinct as they pertain to different inner vlans, and
+> therefore separate L2 segments.
+> 
+> Signed-off-by: Andy Strohman <andrew@andrewstrohman.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_main.c   |   4 +-
+>  drivers/net/ethernet/intel/ice/ice_main.c     |   6 +-
+>  drivers/net/ethernet/intel/igb/igb_main.c     |   4 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |   4 +-
+>  .../ethernet/mellanox/mlxsw/spectrum_router.c |   4 +-
+>  .../ethernet/mellanox/mlxsw/spectrum_span.c   |   4 +-
+>  .../mellanox/mlxsw/spectrum_switchdev.c       |   2 +-
+>  drivers/net/ethernet/mscc/ocelot_net.c        |   4 +-
+>  .../net/ethernet/qlogic/qlcnic/qlcnic_main.c  |   8 +-
+>  drivers/net/macvlan.c                         |   4 +-
+>  drivers/net/vxlan/vxlan_core.c                |   6 +-
+>  include/linux/if_bridge.h                     |   4 +-
+>  include/linux/netdevice.h                     |   6 +-
+>  include/linux/rtnetlink.h                     |   4 +-
+>  include/trace/events/bridge.h                 |  20 ++--
+>  include/uapi/linux/if_link.h                  |   1 +
+>  include/uapi/linux/neighbour.h                |   1 +
+>  net/bridge/br_arp_nd_proxy.c                  |   8 +-
+>  net/bridge/br_device.c                        |  11 +-
+>  net/bridge/br_fdb.c                           | 107 ++++++++++--------
+>  net/bridge/br_input.c                         |  22 ++--
+>  net/bridge/br_netlink.c                       |  18 ++-
+>  net/bridge/br_private.h                       |  25 ++--
+>  net/bridge/br_vlan.c                          |  34 +++++-
+>  net/core/neighbour.c                          |   1 +
+>  net/core/rtnetlink.c                          |  58 ++++++----
+>  26 files changed, 227 insertions(+), 143 deletions(-)
+> 
 
-But isn't iputils ping what everybody else uses? I'm confused. I have
-this version and the current syntax is not problematic for me.
+Hi,
+This patch makes fdb lookups slower for everybody, ruins the nice key alignment,
+increases the key memory usage and adds more complexity for a corner case, especially
+having 2 different hosts with identical macs sounds weird. Fdb matching on both tags
+isn't a feature I've heard of, I don't know if there are switches that support it.
+Could you point to anywhere in the specs that such support is mentioned?
+Also could you please give more details about the use case? Maybe we can help you solve
+your problem without impacting everyone. Perhaps we can mix vlan-aware bridge and tc
+to solve it. As it stands I'm against adding such matching, but I'd love to hear what
+other people think.
 
-$ ping -V
-ping from iputils 20240905
-libcap: yes, IDN: yes, NLS: no, error.h: yes, getrandom(): yes, __fpending(): yes
+Cheers,
+ Nik
 
