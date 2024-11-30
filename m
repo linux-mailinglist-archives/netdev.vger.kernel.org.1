@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-147942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B64789DF381
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 23:20:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 935509DF383
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 23:20:26 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F04E281464
-	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 22:20:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C081B162C82
+	for <lists+netdev@lfdr.de>; Sat, 30 Nov 2024 22:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C9C1A9B31;
-	Sat, 30 Nov 2024 22:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76761AD5DE;
+	Sat, 30 Nov 2024 22:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O0I1i+eP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A3OnSnMb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C81517BD3
-	for <netdev@vger.kernel.org>; Sat, 30 Nov 2024 22:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36E51ABECB;
+	Sat, 30 Nov 2024 22:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733005216; cv=none; b=nG5UrVbniM5o5QBFTgtRoRRyH2AebEUV1luPFCLNLHnpAsv/nN6rv4WYssVeGlLiX5Dg8Rdtl70IFyXMXUj1HQwFMtsUuxsiOSeHnjeDm0tRJZYihpuAMD/vm1GpXHiTe4WzHf6rc3DywOWQyVUA3aNMxVvNVFvPg/sQCfF2380=
+	t=1733005217; cv=none; b=GBFSTYh/o18Hx6I/PbIck2PP6zSCHUGVad9uqwDU4UPhqQghKImOcCWNFuwRTWqTEugl0kSJ5gI9NQ8AiZlgtgfuBVFpnGUmQ4Fj8gl/iqdq6ZNNB0TUqFDtM1hfyytIyQIls2Q8G2kpMDbDFbOWaJE9V3rZ+Nivu3s6iP8IOuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733005216; c=relaxed/simple;
-	bh=Pna4B1EP8VxoDmjqbb18vam1FBaeZTOvfrev2mEgsw8=;
+	s=arc-20240116; t=1733005217; c=relaxed/simple;
+	bh=zP5GkgptoDq+IpFjIrNPxUyK2+r01cx9H5UxpWRq+/8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=URRRXQmy2FbHbQILpKIE9+SNQEuK4CQFlVgyoHKlr50GY8G6QJUe5OD373rCV8LZT6OcUfJBb60ezsWAJluQME00dbRqvJiLZhow6jQ+S74qVDqjEer7la50Lj9As5K6YC1yLXLp68CnrP2OKu2hBuoNoIMj0xchlyRE33XxC5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O0I1i+eP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08461C4CECC;
-	Sat, 30 Nov 2024 22:20:16 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=W7mQcsDWtSarHbzZerC67pwS1rVm6LNhpxQsQgDp1+4ySmTk2g1drLO4ITgnxgJ6JlId4im30SidMFCxhQOh3JvnvoiloNnf63z1BZimKKqf8oKUMq4lFgAcFS/gCRv2yv03bEi1ChLOCL+kfeFSEatogrZrgz2PBzaj+AxyQeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A3OnSnMb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C52CC4CED4;
+	Sat, 30 Nov 2024 22:20:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733005216;
-	bh=Pna4B1EP8VxoDmjqbb18vam1FBaeZTOvfrev2mEgsw8=;
+	s=k20201202; t=1733005217;
+	bh=zP5GkgptoDq+IpFjIrNPxUyK2+r01cx9H5UxpWRq+/8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=O0I1i+ePqArHsYmNpfIGSTfvr6ZbUTomgwa8hYVfJ+RVtc2qMQ9Btb1n02mX6vIMN
-	 bPcrQIg/mniXkHhkdCiJ3I8azZGUUF9YsBJZ6AYs4aw42bc5BMKfrYtibGKApckDFw
-	 5AxzGLLKBCFcaxv1QL8B53F1mXngH2v2OjgU7BtGaA4tGEfEZuMvvUKeJQOh1qdjp5
-	 8U7e2ByW31kjnY8f4BQvneLFrZKl40+L0H4eqXRmCGqacoRrdoRM574+/q2vbN9n8Y
-	 OkxTLTnJ3Q/iLTA4sZSZMtJzwA7gz75Jl9OmXEM8DNiXFuNf8lSlBin7q343HTJ19z
-	 LTjhd31w1FeeA==
+	b=A3OnSnMbralCzxVcipFzN1Ai21Wv2V4e+3hv2VPqrzeIhxNxk3tZ71DWyyzi5/DGj
+	 2B3KPd1TS2CR2DyGMu2f6cdiEMHo+nYYUhBofEeA+ljZBcPCv7g8dLcE+ir2MLYZlx
+	 UFsB9VLNprxvDCUFK71htMNUjwKocHcS6ycSMeX6oWzSQiMx+H5p5nRdGHQlxPEaDt
+	 U5OvnTaUa0HjQBauoRAcVV3flJ6jExkah5IXtqXOwjHwLXVtZQc1mlzt3PukU4flph
+	 0KyjvsulO71jzDJZb/1SUBeftWTN0WAHZXOIdinKHI/kotUJ85/xvRDW3b/DAAL75t
+	 fIs3we7XJ7HSg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB28B380A944;
-	Sat, 30 Nov 2024 22:20:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EEA380A944;
+	Sat, 30 Nov 2024 22:20:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,63 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: hsr: avoid potential out-of-bound access in
- fill_frame_info()
+Subject: Re: [PATCH net v3 0/2] bnxt: Fix failure to report RSS context in ntuple
+ rule
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173300522975.2492979.17101494144631097796.git-patchwork-notify@kernel.org>
-Date: Sat, 30 Nov 2024 22:20:29 +0000
-References: <20241126144344.4177332-1-edumazet@google.com>
-In-Reply-To: <20241126144344.4177332-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot+671e2853f9851d039551@syzkaller.appspotmail.com, w-kwok2@ti.com,
- m-karicheri2@ti.com, danishanwar@ti.com, jiri@nvidia.com,
- george.mccollister@gmail.com
+ <173300523098.2492979.671614887548460741.git-patchwork-notify@kernel.org>
+Date: Sat, 30 Nov 2024 22:20:30 +0000
+References: <cover.1732748253.git.dxu@dxuuu.xyz>
+In-Reply-To: <cover.1732748253.git.dxu@dxuuu.xyz>
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: pavan.chebbi@broadcom.com, netdev@vger.kernel.org,
+ kalesh-anakkur.purayil@broadcom.com, linux-kselftest@vger.kernel.org,
+ michael.chan@broadcom.com, linux-kernel@vger.kernel.org, kuba@kernel.org,
+ martin.lau@linux.dev, ecree.xilinx@gmail.com, kernel-team@meta.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 26 Nov 2024 14:43:44 +0000 you wrote:
-> syzbot is able to feed a packet with 14 bytes, pretending
-> it is a vlan one.
+On Wed, 27 Nov 2024 15:58:28 -0700 you wrote:
+> This patchset fixes a bug where bnxt driver was failing to report that
+> an ntuple rule is redirecting to an RSS context. First commit is the
+> fix, then second commit extends selftests to detect if other/new drivers
+> are compliant with ntuple/rss_ctx API.
 > 
-> Since fill_frame_info() is relying on skb->mac_len already,
-> extend the check to cover this case.
-> 
-> BUG: KMSAN: uninit-value in fill_frame_info net/hsr/hsr_forward.c:709 [inline]
->  BUG: KMSAN: uninit-value in hsr_forward_skb+0x9ee/0x3b10 net/hsr/hsr_forward.c:724
->   fill_frame_info net/hsr/hsr_forward.c:709 [inline]
->   hsr_forward_skb+0x9ee/0x3b10 net/hsr/hsr_forward.c:724
->   hsr_dev_xmit+0x2f0/0x350 net/hsr/hsr_device.c:235
->   __netdev_start_xmit include/linux/netdevice.h:5002 [inline]
->   netdev_start_xmit include/linux/netdevice.h:5011 [inline]
->   xmit_one net/core/dev.c:3590 [inline]
->   dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3606
->   __dev_queue_xmit+0x366a/0x57d0 net/core/dev.c:4434
->   dev_queue_xmit include/linux/netdevice.h:3168 [inline]
->   packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
->   packet_snd net/packet/af_packet.c:3146 [inline]
->   packet_sendmsg+0x91ae/0xa6f0 net/packet/af_packet.c:3178
->   sock_sendmsg_nosec net/socket.c:711 [inline]
->   __sock_sendmsg+0x30f/0x380 net/socket.c:726
->   __sys_sendto+0x594/0x750 net/socket.c:2197
->   __do_sys_sendto net/socket.c:2204 [inline]
->   __se_sys_sendto net/socket.c:2200 [inline]
->   __x64_sys_sendto+0x125/0x1d0 net/socket.c:2200
->   x64_sys_call+0x346a/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:45
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> === Changelog ===
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: hsr: avoid potential out-of-bound access in fill_frame_info()
-    https://git.kernel.org/netdev/net/c/b9653d19e556
+  - [net,v3,1/2] bnxt_en: ethtool: Supply ntuple rss context action
+    https://git.kernel.org/netdev/net/c/be75cda92a65
+  - [net,v3,2/2] selftests: drv-net: rss_ctx: Add test for ntuple rule
+    https://git.kernel.org/netdev/net/c/7078d43b2374
 
 You are awesome, thank you!
 -- 
