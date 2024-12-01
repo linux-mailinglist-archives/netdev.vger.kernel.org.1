@@ -1,187 +1,187 @@
-Return-Path: <netdev+bounces-147954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2347B9DF63D
-	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 16:28:00 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B806B9DF68D
+	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 18:10:15 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2F66B21496
-	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 15:27:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60D0E162291
+	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 17:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113B51CEAC0;
-	Sun,  1 Dec 2024 15:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2311D6DA5;
+	Sun,  1 Dec 2024 17:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T+gBr7Th"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="yX+sWY3U"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7252AF12
-	for <netdev@vger.kernel.org>; Sun,  1 Dec 2024 15:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF35B33086;
+	Sun,  1 Dec 2024 17:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733066873; cv=none; b=II6GwR+Kp+p4K8ZjxJ4zRTsRb859iAZyB8/ke3GB5/Nx+zViVS15slNkK5wq4xXXbBmg+5vTCJ3eemWdrjQm2oFBjQsa7tBDd+JdxrQTUY+m5jawm3hMUs6evgs821VWujjISg6WuodvZUjPIjwlRdG34uSTFNNcJUQCp1WSfuA=
+	t=1733073010; cv=none; b=e4R7zvaEAP3ASbMlXyw4Q+UG0VHHNpV9tX2uhoL+GmVeDji16hJmwOSYLa6YRrY7keUm5sgY7z7V44V54T42zgY4a2hpONFWsf3phZdxEm+PfplgI70qJ0vbP4si/rBUcB1H//3lduPc2y83aMnSrSw4J/gdgdobhjOX/e1Olpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733066873; c=relaxed/simple;
-	bh=6fxTzoJc3Y99/0hpVgtuy6LFCnnyAcslax14xACw2lw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tiz0iJhTXloCuZ092DIfbzL2g5+QH9scJx87xkRg2nzapmsoBHSJdZwUJHpmtgvTEZI8IHOpiMkJR+sJkIqhO2uSIFWuOrN/H1CfILDl0k6+Ve+YpR5DjX1A73rr7TK1Xjy4GC6QYynNnX4uiJaqJKx1gY/9fPyJDNU8ZTT5hGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T+gBr7Th; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733066870;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=aR5us1W0Gn65QtQ/cPL2gnl8br+TunRBxT3qGj01h1Y=;
-	b=T+gBr7Th9srd9IXgJLuQxdIw+yoe+e/bkypKTeBBKYbtYMz0x0Y23b6Wz9eJXFImVUYUYu
-	I/xfhBkZoctc/U08C0nKFfsAIBcYAvpMbRmWfnz8bYzBep1qENeQaHnurlLZDUGXUtOq+l
-	+eI3KeTr6Jl+aahJRQrxWYgATPsL9D4=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-527-IiY4G3NmMF6MAdS7NOM3fQ-1; Sun, 01 Dec 2024 10:27:49 -0500
-X-MC-Unique: IiY4G3NmMF6MAdS7NOM3fQ-1
-X-Mimecast-MFC-AGG-ID: IiY4G3NmMF6MAdS7NOM3fQ
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-724e4183211so3185141b3a.0
-        for <netdev@vger.kernel.org>; Sun, 01 Dec 2024 07:27:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733066868; x=1733671668;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aR5us1W0Gn65QtQ/cPL2gnl8br+TunRBxT3qGj01h1Y=;
-        b=Xn38kNd2Ql2CWvadi7OjvFwK5ruShlVsRDa0sefu+we87BysgacJvddYYMJ5wMCnzo
-         15N7kW/F0gVGpeYsBQoFC/EVZlcXScufWTIF/vLRwNMB+Y9Jov1A9VsfUB7Uer7bq3Dh
-         RYlbIs9OGinIYUpuK+VYBbo+LLepd552tc/voKkbFCazsfF7JX6eP5f7ryAD2M9Ngn7h
-         AwOH4mzbwwOJeYA44AkDHgkVUzjDzooY2h5yJS5d9X+J5erFtYjZ+q3uG89BcNbiwDm6
-         /6uhtPQyygxd1OHQhZIGG2ru3HdyiGxBBNbbU28BViKiE+hxwHH4AXHInJKgsq+3gl2N
-         /6vg==
-X-Forwarded-Encrypted: i=1; AJvYcCXIVCQuoD043dm5rGm5Fvo1ByuKwa18YHtqbiiJWOJ6D7xZeHKlwO9stYtFktM7Yr0f/u9NJf8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1GYZhVVeQTWHRSb/u/EzNnXlRDmUo/4HPXHbNyBQoi1k61Sdo
-	EU1E8sJnE8374AW4WGB36wyRRBKyeIAI8jTKNTaXKWiJ8cdIm61UegSFS3RJeAoRtQBp5/i6IcP
-	4PBFKb1EizfnRH9gAHxKPcbPJJkGz4oJxI52puhg9oy0aJBuokl1q5Q==
-X-Gm-Gg: ASbGncuMBnZ8/AF7YgLigqSduI2JE/lQW9YhMJ835fViU7EjKq3RVDTdo/ANF0Bo2H+
-	AtiyEIU9FKGwml+zHRU1UCt+GGjzAhR2FhH/DQX644JDT7ebaHkwI5wESHicITy+AWCjIi4amja
-	YxH7sHGNVmuXFYH8aHU7KTaKF75yTS5CKPjZEyEEwzzSl7ApqAYCnysprQ30Zdb7JDsR6AotPuy
-	6y5sV9PQi7QsDVsyNk6EVVvXURiYy3xUj+owc9xRE7TBr7j/X/2//VY+ZHrMvN6FKNdA/4ZZhsz
-	tjsncMI8/HgM7Yo=
-X-Received: by 2002:a05:6a00:1a8b:b0:720:2e44:8781 with SMTP id d2e1a72fcca58-72530074279mr24407107b3a.11.1733066868146;
-        Sun, 01 Dec 2024 07:27:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFW6MWlVfLoHpajZ/LFzE0lA9yOz+rG4Bd2MPD94OOZEk1R1Joia7M7IqxEthR7RYSJzoRuqQ==
-X-Received: by 2002:a05:6a00:1a8b:b0:720:2e44:8781 with SMTP id d2e1a72fcca58-72530074279mr24407065b3a.11.1733066867811;
-        Sun, 01 Dec 2024 07:27:47 -0800 (PST)
-Received: from kernel-devel.local (fp6fd8f7a1.knge301.ap.nuro.jp. [111.216.247.161])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72541762411sm6975447b3a.20.2024.12.01.07.27.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Dec 2024 07:27:47 -0800 (PST)
-From: Shigeru Yoshida <syoshida@redhat.com>
-To: ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	hawk@kernel.org,
-	lorenzo@kernel.org,
-	toke@redhat.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Shigeru Yoshida <syoshida@redhat.com>,
-	syzkaller <syzkaller@googlegroups.com>
-Subject: [PATCH bpf] bpf, test_run: Fix use-after-free issue in eth_skb_pkt_type()
-Date: Mon,  2 Dec 2024 00:27:35 +0900
-Message-ID: <20241201152735.106681-1-syoshida@redhat.com>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1733073010; c=relaxed/simple;
+	bh=AHh6wZo9hURws++aV/42XxavFaokSvbg6imNNWwMBD4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=DiF6+bhz1olrC54E46qT7PVsjQVF+H8uMCGnh3wiiCjHW83GjKU1fjHgLjNwQFQmB4fj4PJKdyiwAqR3QhcB/9rOVK/gRCKKc0TQglBNKf3Lw3v+EqSeuTiOdB8RrNGlMpjXTttSm4X+ZVdtxcR1Ravud3hjiCCgZ1Ig/sfRysc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=yX+sWY3U; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 4B1H9gVu1591953
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 1 Dec 2024 11:09:42 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1733072982;
+	bh=oN/TNhxxv2ynjLBjJ9OZ5gYYDHMlfWmbssUcpigYGIQ=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=yX+sWY3Uf57X38xrsL5qyWcxCiAuJIQ4SxT+dMZ47UNVMJA2eSF3+HbNQZZFZO45U
+	 xHgDghmAbKwAkkiIW9NyBGnKKxbhsCIfxYsyRL0uWQ+Nkh+6KHU3fBC/FvrCtG9vPS
+	 MY1vbgjwd69rNpCZEZeGF2ehHvq4Rs68kgoQm3YY=
+Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4B1H9gSL000899
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Sun, 1 Dec 2024 11:09:42 -0600
+Received: from DFLE113.ent.ti.com (10.64.6.34) by DFLE105.ent.ti.com
+ (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 1
+ Dec 2024 11:09:42 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE113.ent.ti.com
+ (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Sun, 1 Dec 2024 11:09:42 -0600
+Received: from [137.167.1.99] (lt5cg1094w5k.dhcp.ti.com [137.167.1.99])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4B1H9cI6080016;
+	Sun, 1 Dec 2024 11:09:39 -0600
+Message-ID: <39af5076-7e96-4968-943d-bb33359f0573@ti.com>
+Date: Sun, 1 Dec 2024 19:09:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 09/17] wifi: cc33xx: Add main.c
+To: Johannes Berg <johannes@sipsolutions.net>, Kalle Valo <kvalo@kernel.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob
+ Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor
+ Dooley <conor+dt@kernel.org>, <linux-wireless@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: Sabeeh Khan <sabeeh-khan@ti.com>
+References: <20241107125209.1736277-1-michael.nemanov@ti.com>
+ <20241107125209.1736277-10-michael.nemanov@ti.com>
+ <685d782d68bfc664c4fcc594dff96546ffc30e5f.camel@sipsolutions.net>
+Content-Language: en-US
+From: "Nemanov, Michael" <michael.nemanov@ti.com>
+In-Reply-To: <685d782d68bfc664c4fcc594dff96546ffc30e5f.camel@sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-KMSAN reported a use-after-free issue in eth_skb_pkt_type()[1]. The
-cause of the issue was that eth_skb_pkt_type() accessed skb's data
-that didn't contain an Ethernet header. This occurs when
-bpf_prog_test_run_xdp() passes an invalid value as the user_data
-argument to bpf_test_init().
+On 11/8/2024 1:42 PM, Johannes Berg wrote:
+>> +static void cc33xx_rc_update_work(struct work_struct *work)
+>> +{
+>> +	struct cc33xx_vif *wlvif = container_of(work, struct cc33xx_vif,
+>> +						rc_update_work);
+>> +	struct cc33xx *cc = wlvif->cc;
+>> +	struct ieee80211_vif *vif = cc33xx_wlvif_to_vif(wlvif);
+>> +
+>> +	mutex_lock(&cc->mutex);
+> 
+> Given the way the wiphy mutex now works, I'd strongly recommend not
+> having your own mutex any more - it's a huge simplification in a lot of
+> places, and there's very little downside since everything coming from
+> higher layers holds the wiphy mutex already (and almost certainly needs
+> to acquire your own mutex.)
 
-Fix this by returning an error when user_data is less than ETH_HLEN in
-bpf_test_init().
+Yeah I see how it simplifies things. I'll get rid of cc->mutex and use 
+wiphy_lock() for whatever code that is not called exclusively from 
+ieee80211_ops.
 
-[1]
-BUG: KMSAN: use-after-free in eth_skb_pkt_type include/linux/etherdevice.h:627 [inline]
-BUG: KMSAN: use-after-free in eth_type_trans+0x4ee/0x980 net/ethernet/eth.c:165
- eth_skb_pkt_type include/linux/etherdevice.h:627 [inline]
- eth_type_trans+0x4ee/0x980 net/ethernet/eth.c:165
- __xdp_build_skb_from_frame+0x5a8/0xa50 net/core/xdp.c:635
- xdp_recv_frames net/bpf/test_run.c:272 [inline]
- xdp_test_run_batch net/bpf/test_run.c:361 [inline]
- bpf_test_run_xdp_live+0x2954/0x3330 net/bpf/test_run.c:390
- bpf_prog_test_run_xdp+0x148e/0x1b10 net/bpf/test_run.c:1318
- bpf_prog_test_run+0x5b7/0xa30 kernel/bpf/syscall.c:4371
- __sys_bpf+0x6a6/0xe20 kernel/bpf/syscall.c:5777
- __do_sys_bpf kernel/bpf/syscall.c:5866 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5864 [inline]
- __x64_sys_bpf+0xa4/0xf0 kernel/bpf/syscall.c:5864
- x64_sys_call+0x2ea0/0x3d90 arch/x86/include/generated/asm/syscalls_64.h:322
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xd9/0x1d0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>> +static void cc33xx_recovery_work(struct work_struct *work)
+>> +{
+>> +	struct cc33xx *cc = container_of(work, struct cc33xx, recovery_work);
+>> +	struct cc33xx_vif *wlvif;
+>> +	struct ieee80211_vif *vif;
+>> +
+>> +	cc33xx_notice("CC33xx driver attempting recovery");
+>> +
+>> +	if (cc->conf.core.no_recovery) {
+>> +		cc33xx_info("Recovery disabled by configuration, driver will not restart.");
+>> +		return;
+>> +	}
+>> +
+>> +	if (test_bit(CC33XX_FLAG_DRIVER_REMOVED, &cc->flags)) {
+>> +		cc33xx_info("Driver being removed, recovery disabled");
+>> +		return;
+>> +	}
+>> +
+>> +	cc->state = CC33XX_STATE_RESTARTING;
+>> +	set_bit(CC33XX_FLAG_RECOVERY_IN_PROGRESS, &cc->flags);
+>> +
+>> +	mutex_lock(&cc->mutex);
+>> +	while (!list_empty(&cc->wlvif_list)) {
+>> +		wlvif = list_first_entry(&cc->wlvif_list,
+>> +					 struct cc33xx_vif, list);
+>> +		vif = cc33xx_wlvif_to_vif(wlvif);
+>> +
+>> +		if (test_bit(WLVIF_FLAG_STA_ASSOCIATED, &wlvif->flags))
+>> +			ieee80211_connection_loss(vif);
+>> +
+>> +		__cc33xx_op_remove_interface(cc, vif, false);
+>> +	}
+>> +	mutex_unlock(&cc->mutex);
+>> +
+>> +	cc33xx_turn_off(cc);
+>> +	msleep(500);
+>> +
+>> +	mutex_lock(&cc->mutex);
+>> +	cc33xx_init_fw(cc);
+>> +	mutex_unlock(&cc->mutex);
+>> +
+>> +	ieee80211_restart_hw(cc->hw);
+>> +
+>> +	mutex_lock(&cc->mutex);
+>> +	clear_bit(CC33XX_FLAG_RECOVERY_IN_PROGRESS, &cc->flags);
+>> +	mutex_unlock(&cc->mutex);
+> 
+> even more so with the awful locking/unlocking/... here (also no need to
+> unlock to call restart_hw, I think?)
+> 
+> and using both a mutex and atomic ops seems ... odd?
 
-Uninit was created at:
- free_pages_prepare mm/page_alloc.c:1056 [inline]
- free_unref_page+0x156/0x1320 mm/page_alloc.c:2657
- __free_pages+0xa3/0x1b0 mm/page_alloc.c:4838
- bpf_ringbuf_free kernel/bpf/ringbuf.c:226 [inline]
- ringbuf_map_free+0xff/0x1e0 kernel/bpf/ringbuf.c:235
- bpf_map_free kernel/bpf/syscall.c:838 [inline]
- bpf_map_free_deferred+0x17c/0x310 kernel/bpf/syscall.c:862
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa2b/0x1b60 kernel/workqueue.c:3310
- worker_thread+0xedf/0x1550 kernel/workqueue.c:3391
- kthread+0x535/0x6b0 kernel/kthread.c:389
- ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+cc33xx_turn_off() is called in the driver remove path so it expects the 
+mutex to be unlocked while cc33xx_init_fw() touches many driver members 
+and requires the lock.
+OK if i keep it?
 
-CPU: 1 UID: 0 PID: 17276 Comm: syz.1.16450 Not tainted 6.12.0-05490-g9bb88c659673 #8
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-3.fc41 04/01/2014
+Mutex protection for the flags is indeed redundant and will be removed.
 
-Fixes: be3d72a2896c ("bpf: move user_size out of bpf_test_init")
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
----
- net/bpf/test_run.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>> +unlock:
+>> +	mutex_unlock(&cc->mutex);
+>> +
+>> +	cancel_work_sync(&wlvif->rc_update_work);
+>> +	cancel_delayed_work_sync(&wlvif->connection_loss_work);
+>> +	cancel_delayed_work_sync(&wlvif->channel_switch_work);
+>> +	cancel_delayed_work_sync(&wlvif->pending_auth_complete_work);
+>> +	cancel_delayed_work_sync(&wlvif->roc_timeout_work);
+>> +
+>> +	mutex_lock(&cc->mutex);
+> 
+> also this kind of thing ... just use wiphy mutex/work
+>
+Yeah all this work use cc->mutex so it seems safe, will do.
 
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 501ec4249fed..756250aa890f 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -663,7 +663,7 @@ static void *bpf_test_init(const union bpf_attr *kattr, u32 user_size,
- 	if (size < ETH_HLEN || size > PAGE_SIZE - headroom - tailroom)
- 		return ERR_PTR(-EINVAL);
- 
--	if (user_size > size)
-+	if (user_size < ETH_HLEN || user_size > size)
- 		return ERR_PTR(-EMSGSIZE);
- 
- 	size = SKB_DATA_ALIGN(size);
--- 
-2.47.0
-
+Thanks and regards,
+Michael.
 
