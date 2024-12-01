@@ -1,141 +1,157 @@
-Return-Path: <netdev+bounces-147957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1D189DF71A
-	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 21:50:36 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E489DF73C
+	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 22:57:47 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8675D28035A
-	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 20:50:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 583F6162A81
+	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 21:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0EE1D90D4;
-	Sun,  1 Dec 2024 20:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48D21D88DB;
+	Sun,  1 Dec 2024 21:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O2wXfuJf"
+	dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b="MSSvRnxs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from qs51p00im-qukt01071901.me.com (qs51p00im-qukt01071901.me.com [17.57.155.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E4C1D86E8
-	for <netdev@vger.kernel.org>; Sun,  1 Dec 2024 20:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9568718AEA
+	for <netdev@vger.kernel.org>; Sun,  1 Dec 2024 21:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733086215; cv=none; b=max3duOljUnFzHQutnCz6yoFSsQPJmFx5an539Un+VyBJ3H02rPlMfovVp9nthuZwAXTkRAN0rDpglBH9kHkkWaZ1AIhy2HLz4SCQ+Ea0q1ElggOaWrVA9NgKDg32AjK3P6pDWJD88lZpVmVG6HXbUeEsBqZZAPUA7jWKJ2Iur4=
+	t=1733090262; cv=none; b=ayqO5lPph0wOWuxXeHOBAwNqeuZxW5Abkc/HwXWUNNG2ZVkzFTq6j7eij65Pbn0NJD+Hh4SWHMW0QX1ObdzIl9Km3Om3a9bxJMsw6MwYhel/910HD0mTZ1vaxpCli3cU6dx5Vdm3YppFdfolk01Yop7TVW5gy/VrCPTTY/bTq2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733086215; c=relaxed/simple;
-	bh=2c9F0gVkm0osbQhQ/YtLHpEUqGRG2yQ0u65xIov38YQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HFf87oDawwRaSIOb2RcK3mzLDOPEcx8zoiP7v5hU9H3xDaclu4fKNv8KUQeu5WbtJ5hNj+P8YHQ2Kscr37tRaHo/oS2lfrSDUm7INLbDL4rWQjpw5iUULi1GG7l/JWEEltiy0P8gsl/EdUTzxS2bNzoJQETpIJjGF4rLEdMyGLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O2wXfuJf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87703C4CECF;
-	Sun,  1 Dec 2024 20:50:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733086215;
-	bh=2c9F0gVkm0osbQhQ/YtLHpEUqGRG2yQ0u65xIov38YQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=O2wXfuJfTXtsizcboIuHjvO62yU5SKj8MO6kTHWBvsRHjOVGaiJY5mXDXXHSujlPJ
-	 0/chbYAzM1IBqKEk+a208ZLBKtSKqdzXC2nUeE707oitOPtK1U5/FiPnyNJZGDRSy3
-	 MterD2QkfQDdK3e+Ic174MoGxc6qzkjAnLbbS2PmUt5jq3xcPiolfY9sc6nXL+EASY
-	 0i/fGQYRxhVzoewNKmIxBHaD/44klDI1ScnTG2eMIhju4DX5udsAvqGjmR/rU264QC
-	 Ysxkx3fc7KYzY2coOP327eZ4OSjJl00V95d8KJii3Bg3LCPaNoYWApoBeEsRRsrVOF
-	 ksY32818N8x/Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC563806656;
-	Sun,  1 Dec 2024 20:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1733090262; c=relaxed/simple;
+	bh=5ejI8qRyQnF8Rsja0qD9sju8XG2hrWPyxiO64CuBeqk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S0WWmuoP7u8HOUMnbXrE6VpFdml+8D09MHeVHewUOBFB5SNsBOcOVn4wYuds283wWWHF8a+qg4LbbBcbS5ICaFwKWyvErXH96kfD9Ms09pUxWak3CHoQSHG/qboZlcIGYlcZ6rdQh2kQPun4LgkB4Q8TitGvoxqKl3o39JZwV7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy; spf=pass smtp.mailfrom=pen.gy; dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b=MSSvRnxs; arc=none smtp.client-ip=17.57.155.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pen.gy
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pen.gy; s=sig1;
+	t=1733090259; bh=ABrBciAwBhUunaBQ7WqL823Ola3lFqYqfmIalqO+ivU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
+	 x-icloud-hme;
+	b=MSSvRnxsvpzQfCZR9mjOcCvQyDZ6NBNINHXqaW11t5Do2a2urOkMJSvAyYSct99xF
+	 yM8BC0uFxztQMuxJzN7GpGxz3UxW7O+eEbF1XLFrEotjnrHgbkIzuf21LzLEhWbwoR
+	 di0O9WzFXHQE9OYVfqiekPjshqhw8QG3rADOzdBOPd1XpXRtFdRU4rqd2xTNkCMGZB
+	 3EXSMIF0//PJaxHw9SBPIZvFoLilD2ysckpFd+VNVYKkWIMr1tCrLYlfhBe1pqaTtc
+	 rYlNNbJPpLPUrJf/VnvYTmS62qSWm99UObo00a9oeYZZ5VM6qGjt/RqohDcef0rgXj
+	 D5jHfSogbFvuQ==
+Received: from [192.168.40.3] (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
+	by qs51p00im-qukt01071901.me.com (Postfix) with ESMTPSA id E70CB6280352;
+	Sun,  1 Dec 2024 21:57:35 +0000 (UTC)
+Message-ID: <b0052319-dd9f-40e3-a969-4cf6c57dad12@pen.gy>
+Date: Sun, 1 Dec 2024 22:57:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ipv6: avoid possible NULL deref in modify_prefix_route()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173308622923.2752610.10698578868949229080.git-patchwork-notify@kernel.org>
-Date: Sun, 01 Dec 2024 20:50:29 +0000
-References: <20241126192827.797037-1-edumazet@google.com>
-In-Reply-To: <20241126192827.797037-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot+1de74b0794c40c8eb300@syzkaller.appspotmail.com, thinker.li@gmail.com,
- dsahern@kernel.org
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net v3 4/6] usbnet: ipheth: use static NDP16 location in
+ URB
+To: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Georgi Valkov <gvalkov@gmail.com>, Simon Horman <horms@kernel.org>,
+ Oliver Neukum <oneukum@suse.com>, netdev@vger.kernel.org,
+ linux-usb@vger.kernel.org
+References: <20241123235432.821220-1-forst@pen.gy>
+ <20241123235432.821220-4-forst@pen.gy>
+ <kMEBlTaAnz-Ity7mnkhpkSez5G8SW3G5yOsqCErjGdKWgJweOsifjnxY3cHtkiHqMXzMoE8qjDXdkZuEJ4cf8g==@protonmail.internalid>
+ <f3657bf6-7980-4c5f-8c82-66c68beb96e4@redhat.com>
+Content-Language: en-GB
+From: Foster Snowhill <forst@pen.gy>
+In-Reply-To: <f3657bf6-7980-4c5f-8c82-66c68beb96e4@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: kNsGRrFycfYpqSc9dkqnnStCtw_76o90
+X-Proofpoint-GUID: kNsGRrFycfYpqSc9dkqnnStCtw_76o90
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-01_17,2024-11-28_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
+ phishscore=0 suspectscore=0 mlxscore=0 bulkscore=0 clxscore=1030
+ adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2412010191
 
-Hello:
+Hello Paolo,
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue, 26 Nov 2024 19:28:27 +0000 you wrote:
-> syzbot found a NULL deref [1] in modify_prefix_route(), caused by one
-> fib6_info without a fib6_table pointer set.
+On 2024-11-28 10:08, Paolo Abeni wrote:
+>> On iOS devices, the NDP16 header always directly follows NTH16. Rely on
+>> and check for this specific format.
+>> <snip>
 > 
-> This can happen for net->ipv6.fib6_null_entry
+> This choice looks fragile. What if the next iOS version moves around
+> such header?
+
+This is a valid concern, and something I've been pondering myself
+for a while. My thinking so far can be summed up as follows:
+
+"iOS devices aren't fully compliant with NCM for regular tethering (missing
+necessary descriptors, computer->phone not encapsulated at all), so it can't
+be handled by the existing fully-featured spec-compliant `cdc_ncm` driver.
+The `cdc_ncm` driver includes the functionality I need to parse incoming
+NCM data, but I don't see an easy way for me to call that code from `ipheth`.
+I don't want to mess with the `cdc_ncm` driver's code. So I'll approach this
+by implementing the bare minimum of the NCM spec in `ipheth` just to parse
+incoming NCM URBs, relying on the specific URB format that iOS devices have."
+
+I didn't want to reimplement more than I absolutely had to, because that work
+had already been done in `cdc_ncm`. I relied on the specific URB format of
+iOS devices that hasn't changed since the NCM mode was introduced there.
+
+You're right, the URB format can change, without warning. If/when that
+happens, it would be a good time to re-think the approach, and maybe figure
+out a way to make use of the parsing code in `cdc_ncm`.
+
+For now I wanted to limit the scope of changes to "let's make it work with
+the assumptions that hold to this day".
+
+> I think you should add least validate the assumption in the actual URB
+> payload.
+
+This is already validated by checking that ncm0->dwSignature matches
+the four-byte constant defined in the NCM 1.0 spec. However I think you're
+right that it may not be enough, if by some random chance the initial four
+bytes right after NTH16 are set to the desired constant, yet aren't part
+of a real NDP16 header. The condition below should cover it:
+
+	ncmh->wNdpIndex == cpu_to_le16(sizeof(struct usb_cdc_ncm_nth16))
+
+I'll add it in v4.
+
+>> diff --git a/drivers/net/usb/ipheth.c b/drivers/net/usb/ipheth.c
+>> index 48c79e69bb7b..3f9ea6546720 100644
+>> --- a/drivers/net/usb/ipheth.c
+>> +++ b/drivers/net/usb/ipheth.c
+>> @@ -236,16 +236,14 @@ static int ipheth_rcvbulk_callback_ncm(struct urb *urb)
+>>  	}
+>>
+>>  	ncmh = urb->transfer_buffer;
+>> -	if (ncmh->dwSignature != cpu_to_le32(USB_CDC_NCM_NTH16_SIGN) ||
+>> -	    le16_to_cpu(ncmh->wNdpIndex) >= urb->actual_length) {
+>> +	if (ncmh->dwSignature != cpu_to_le32(USB_CDC_NCM_NTH16_SIGN)) {
+>>  		dev->net->stats.rx_errors++;
+>>  		return retval;
+>>  	}
 > 
-> [1]
-> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
-> CPU: 1 UID: 0 PID: 5837 Comm: syz-executor888 Not tainted 6.12.0-syzkaller-09567-g7eef7e306d3c #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
->  RIP: 0010:__lock_acquire+0xe4/0x3c40 kernel/locking/lockdep.c:5089
-> Code: 08 84 d2 0f 85 15 14 00 00 44 8b 0d ca 98 f5 0e 45 85 c9 0f 84 b4 0e 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 0f 85 96 2c 00 00 49 8b 04 24 48 3d a0 07 7f 93 0f 84
-> RSP: 0018:ffffc900035d7268 EFLAGS: 00010006
-> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-> RDX: 0000000000000006 RSI: 1ffff920006bae5f RDI: 0000000000000030
-> RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000001
-> R10: ffffffff90608e17 R11: 0000000000000001 R12: 0000000000000030
-> R13: ffff888036334880 R14: 0000000000000000 R15: 0000000000000000
-> FS:  0000555579e90380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007ffc59cc4278 CR3: 0000000072b54000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->   lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5849
->   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
->   _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
->   spin_lock_bh include/linux/spinlock.h:356 [inline]
->   modify_prefix_route+0x30b/0x8b0 net/ipv6/addrconf.c:4831
->   inet6_addr_modify net/ipv6/addrconf.c:4923 [inline]
->   inet6_rtm_newaddr+0x12c7/0x1ab0 net/ipv6/addrconf.c:5055
->   rtnetlink_rcv_msg+0x3c7/0xea0 net/core/rtnetlink.c:6920
->   netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2541
->   netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
->   netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1347
->   netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1891
->   sock_sendmsg_nosec net/socket.c:711 [inline]
->   __sock_sendmsg net/socket.c:726 [inline]
->   ____sys_sendmsg+0xaaf/0xc90 net/socket.c:2583
->   ___sys_sendmsg+0x135/0x1e0 net/socket.c:2637
->   __sys_sendmsg+0x16e/0x220 net/socket.c:2669
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fd1dcef8b79
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffc59cc4378 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fd1dcef8b79
-> RDX: 0000000000040040 RSI: 0000000020000140 RDI: 0000000000000004
-> RBP: 00000000000113fd R08: 0000000000000006 R09: 0000000000000006
-> R10: 0000000000000006 R11: 0000000000000246 R12: 00007ffc59cc438c
-> R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
->  </TASK>
-> 
-> [...]
+> The URB length is never checked, why it's safe to access (a lot of)
+> bytes inside the URB without any check?
 
-Here is the summary with links:
-  - [net] ipv6: avoid possible NULL deref in modify_prefix_route()
-    https://git.kernel.org/netdev/net/c/a747e02430df
+There is a length check right above this hunk, starting with:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+	if (urb->actual_length < IPHETH_NCM_HEADER_SIZE) {
+
+IPHETH_NCM_HEADER_SIZE is defined in such a way that it covers NTH16,
+the fixed-size NDP16 part plus up to 22 DPEs. This is described in the
+commit message.
 
 
+Thank you,
+Foster.
 
