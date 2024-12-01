@@ -1,152 +1,176 @@
-Return-Path: <netdev+bounces-147952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F5CC9DF525
-	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 10:47:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC0C19DF598
+	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 13:53:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3E312811EE
-	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 09:47:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 767B52815A5
+	for <lists+netdev@lfdr.de>; Sun,  1 Dec 2024 12:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3996281727;
-	Sun,  1 Dec 2024 09:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B781C233C;
+	Sun,  1 Dec 2024 12:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="poc+1Opg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NtpV4EV7"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05CE70834;
-	Sun,  1 Dec 2024 09:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0011C1F32;
+	Sun,  1 Dec 2024 12:53:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733046452; cv=none; b=jr/MfL8Hfu4AdooU7SBkFEY2/HRPPnikItkKFNMyQDTsX+JTfKR7wyE84xCcKm8F1MQpkpv2ltc6lEUYqoihceN9L0p2Vmr0R5xWTmDEn27yZzwwfyyKveDjfA8ylxeb0c6TT8G00jAjYX0rCRsdf1YPYIw5qu4LFncidfHuaM4=
+	t=1733057628; cv=none; b=aaW0fnZC2fpwUzFnhVExLcZYjUfc/kKhrdlBYBp71+A1Za7QrPFJSVMB/3CoIzyHuGxAyQTfJGllTwkRx4UWANgaK/qiFE7g4eRWlOr5+w6I6a0ibQKXXPSrR7bPrH/e4FAZK+ldGP+rs500ctqCII9xinHzelSKwy+nYVLH7bM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733046452; c=relaxed/simple;
-	bh=as5tR6OwsTVcSX5GRX3q+z9vBr6Wgj7yFmegZs8oYs4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=CmvVL4VvwGQxzgeEesUqb3iDiy35SH4mhKt7dWLZ8GoAMe2nWmiBDCQBzBI7j4NBZymDWjJOjtLf/5xP+mDTn7pUq/D6eIf3YcF9HW+kQQlicOrH+jL0efQsxhKReeNbb8DBYCWXM80N1U4qkw3XcqEVDQJg4TxU0cPn/JlB4yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=poc+1Opg; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4B19l6HS036337;
-	Sun, 1 Dec 2024 03:47:06 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1733046426;
-	bh=mX/4YXm19qrr2j4Z5gLyYBNF+BgxM8nmBWvl0k/FUHs=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=poc+1OpgGHeGn2N7HxoqgWr0xsrc6KrrKmsrXQEgfK2VJinjszwQJ6syPntApacgO
-	 Q3T6n7UmDisVeE/jsgtIjn45DCzIOSohPm26bP/SR9cy/YEiA1sC7VHR9vOC3bSp32
-	 2Br4VMTFn9RhydIPC5f9DWHbjt4+2xmnqAM5D9BI=
-Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4B19l6j2003143
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sun, 1 Dec 2024 03:47:06 -0600
-Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE103.ent.ti.com
- (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 1
- Dec 2024 03:47:05 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sun, 1 Dec 2024 03:47:05 -0600
-Received: from [10.250.214.214] ([10.250.214.214])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4B19l2q2015175;
-	Sun, 1 Dec 2024 03:47:02 -0600
-Message-ID: <b3446a0d-43e5-47ea-b3b0-f3e81d9c41c0@ti.com>
-Date: Sun, 1 Dec 2024 11:47:01 +0200
+	s=arc-20240116; t=1733057628; c=relaxed/simple;
+	bh=swYWVztl7R/XV5vyzXdHShiqPYgMrpHNocMOXVqEngI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HpDecCcrsEi8hY8j0bxUez3PDpJVKMQ9RxJzaon/UZ+ZczPaSPhxwEQxffQCksTwVrO9rFbWiGkWqOVyZchPVgMZmsJslxMlBdMhX/SsCyt9NR/DfLyiFZ8orTgEGdu4U19SpBLGWqwBfPRPpVemlf6RJCUjjbZEynqO274mjgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NtpV4EV7; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6d87e0082b8so21274556d6.2;
+        Sun, 01 Dec 2024 04:53:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733057626; x=1733662426; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+GVWtIbIAnpeYXqJoSnTz1UiTRNCVUNdZXjZbPFhtMg=;
+        b=NtpV4EV7UqZYjkAXlT8Hm+LGh0+e1Adf0CNlhjuahZXhU1+VXv5sZyl+VmQur2YuRi
+         iMTRjY+DMHgoXUEjATI1np1LYb30Og4sCPBrY0HiINkut7zMdFXzlcR+SO8yjJ2cwnhg
+         yNSYK4dk9zYS1DGdqHX0Be1DiKSndUbOkOWe3ma7gFdOQxvTucwwhmZOceUDryfrHmlV
+         ojuprmEJMs4SV+EFz53d1him3muJ3Vc5AdAniTBJA1EPWdW2XIK6NHfxDeJpDdHGtpOW
+         U9FqUoX6vF0EihE/JgT3ysfX10gFEthluBZt8oTd6xCyT/VCygr5E61nv5Sa0lXRn+94
+         p8Ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733057626; x=1733662426;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+GVWtIbIAnpeYXqJoSnTz1UiTRNCVUNdZXjZbPFhtMg=;
+        b=i3bfBCPO/eRP3FAwscwXlk1Uynl6LuFG1CGTw4AstDwPRUbn9Ic+WpZojGrDLaBeoP
+         Ng78k7FxzxcXA835mKzo/GfS020jWBLZmou4Iw+vbVmzUdxd7xaKScYYB8uC4WHjl0qF
+         QtlzV5y4Txw/OVY4Bhg14S6Vzhksmeq7qal7vO3bJpjX2gu+K0xbIhAkaHs+b5n6yldP
+         NNMo0CD/zNKc54RnfeDNT5erePGu/97+UbH7rr6Duj4+A+cHygWUTcmqsd9UmBVwnne4
+         5W+8/vIENJRVzoqsZlyGiBjh/o5wxKteXPkWExAwBHPr+LZXIoAr1Oi+Eh6KzjOHQ4vk
+         T7wA==
+X-Forwarded-Encrypted: i=1; AJvYcCVKGYE6KsI0Siqx/cH1LS3Lgr8y7bcnUAso9cv8Dsf2iqaK5mm/TkRpkvVmQvhSNeoZYB6g8rWl@vger.kernel.org, AJvYcCVze4+m6MQhHZkn70F2HXQpbktsW+W8h8xDrDmVK2RgW+FqU2QadC81wRWCbdmE2ZyksC3ldEpkLEKUf5ir2kfjtOk9@vger.kernel.org, AJvYcCWs2A0JI08UQn6sOP8iniAOA1d0FyeP64AyF0+P3dR4CVrg0wAR83oTYVbwnv9eP1JYSTq7u3yx/4SlhVg6@vger.kernel.org, AJvYcCXj25gsphJ3sez9tfawtbIp7qrtGkaNfrHnWrqqSI886ZvlDCb8wgDD8/3P/E+/SntnHGs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyoYzR64IzDma4WRs2h91jKWjhkQsrGS3oPkG364GbPpmHrnwr
+	Pbqws2qkaDXvUgX7y4+NlttlYL+ro8JSaCCbGuO56WPPU2flcYmy3RNc3OxwIJY6GE+JZc/rQFk
+	uv0pRp2h/SjxfKpH+e2Azo8BCVr4=
+X-Gm-Gg: ASbGncuRUzt9KUQwGtT9GcFinJZmto0R94i4EqxT2CReCKeMH9pyx4MeBptoHLRdkx3
+	abUk0GqYrQ1gNX0SKEcfRFZSdti+jEygoBIz7F41s3ER+MJ+1YWBpVJGAXQ==
+X-Google-Smtp-Source: AGHT+IGgwtwOP6tqXQqLQyPFg+9HwWnvlYrKm6Wd3xlS9AEmYhzmzUm0uqeInm+oHP92XrlHvZzF0UtwHtdZBi62qTQ=
+X-Received: by 2002:a05:6214:21e8:b0:6d4:1fbc:2f88 with SMTP id
+ 6a1803df08f44-6d864dac355mr310468856d6.39.1733057625664; Sun, 01 Dec 2024
+ 04:53:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 09/17] wifi: cc33xx: Add main.c
-To: Johannes Berg <johannes@sipsolutions.net>, Kalle Valo <kvalo@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob
- Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor
- Dooley <conor+dt@kernel.org>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Sabeeh Khan <sabeeh-khan@ti.com>
-References: <20241107125209.1736277-1-michael.nemanov@ti.com>
- <20241107125209.1736277-10-michael.nemanov@ti.com>
- <685d782d68bfc664c4fcc594dff96546ffc30e5f.camel@sipsolutions.net>
-Content-Language: en-US
-From: "Nemanov, Michael" <michael.nemanov@ti.com>
-In-Reply-To: <685d782d68bfc664c4fcc594dff96546ffc30e5f.camel@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <24481522-69BF-4CE7-A05D-1E7398400D80@u.nus.edu>
+ <20241129173554.11e3b2b2f5126c2b72c6a78e@kernel.org> <20241129120939.GG35539@noisy.programming.kicks-ass.net>
+In-Reply-To: <20241129120939.GG35539@noisy.programming.kicks-ass.net>
+From: Akinobu Mita <akinobu.mita@gmail.com>
+Date: Sun, 1 Dec 2024 21:53:34 +0900
+Message-ID: <CAC5umyh49maikh0E4pUB_28=rqG1k9rvtQ70XOJNDMxNsu03sg@mail.gmail.com>
+Subject: Re: [BUG] possible deadlock in __schedule (with reproducer available)
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Masami Hiramatsu <mhiramat@kernel.org>, Ruan Bonan <bonan.ruan@u.nus.edu>, 
+	"mingo@redhat.com" <mingo@redhat.com>, "will@kernel.org" <will@kernel.org>, 
+	"longman@redhat.com" <longman@redhat.com>, "boqun.feng@gmail.com" <boqun.feng@gmail.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+	"mattbobrowski@google.com" <mattbobrowski@google.com>, "ast@kernel.org" <ast@kernel.org>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"martin.lau@linux.dev" <martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>, 
+	"song@kernel.org" <song@kernel.org>, "yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "sdf@fomichev.me" <sdf@fomichev.me>, 
+	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org" <jolsa@kernel.org>, 
+	"rostedt@goodmis.org" <rostedt@goodmis.org>, 
+	"mathieu.desnoyers@efficios.com" <mathieu.desnoyers@efficios.com>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Fu Yeqi <e1374359@u.nus.edu>, tytso@mit.edu, 
+	Jason@zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/8/2024 1:42 PM, Johannes Berg wrote:
->> +static void cc33xx_op_tx(struct ieee80211_hw *hw,
->> +			 struct ieee80211_tx_control *control,
->> +			 struct sk_buff *skb)
->> +{
->> +	struct cc33xx *cc = hw->priv;
->> +	struct ieee80211_tx_info *info = IEEE80211_SKB_CB(skb);
->> +	struct ieee80211_vif *vif = info->control.vif;
->> +	struct cc33xx_vif *wlvif = NULL;
->> +	enum cc33xx_queue_stop_reason stop_reason = CC33XX_QUEUE_STOP_REASON_WATERMARK;
->> +	unsigned long flags;
->> +	int q, mapping;
->> +	u8 hlid;
->> +
->> +	if (!vif) {
->> +		ieee80211_free_txskb(hw, skb);
->> +		return;
->> +	}
->> +
->> +	wlvif = cc33xx_vif_to_data(vif);
->> +	mapping = skb_get_queue_mapping(skb);
->> +	q = cc33xx_tx_get_queue(mapping);
->> +
->> +	hlid = cc33xx_tx_get_hlid(cc, wlvif, skb, control->sta);
->> +
->> +	spin_lock_irqsave(&cc->cc_lock, flags);
->> +
->> +	/* drop the packet if the link is invalid or the queue is stopped
->> +	 * for any reason but watermark. Watermark is a "soft"-stop so we
->> +	 * allow these packets through.
->> +	 */
->> +
->> +	if (hlid == CC33XX_INVALID_LINK_ID ||
->> +	    (!test_bit(hlid, wlvif->links_map)) ||
->> +	    (cc33xx_is_queue_stopped_locked(cc, wlvif, q) &&
->> +	    !cc33xx_is_queue_stopped_by_reason_locked(cc, wlvif, q,
->> +						      stop_reason))) {
->> +		cc33xx_debug(DEBUG_TX, "DROP skb hlid %d q %d ", hlid, q);
->> +		ieee80211_free_txskb(hw, skb);
->> +		goto out;
->> +	}
-> 
-> I'd consider converting to itxq APIs, you already use them anyway via
-> ieee80211_handle_wake_tx_queue so you don't gain anything from not doing
-> it, but you gain a lot of flexibility from doing it and don't have to do
-> things like this?
-> 
-> It's not _that_ hard.
+2024=E5=B9=B411=E6=9C=8829=E6=97=A5(=E9=87=91) 21:09 Peter Zijlstra <peterz=
+@infradead.org>:
+>
+> On Fri, Nov 29, 2024 at 05:35:54PM +0900, Masami Hiramatsu wrote:
+> > On Sat, 23 Nov 2024 03:39:45 +0000
+> > Ruan Bonan <bonan.ruan@u.nus.edu> wrote:
+> >
+> > >
+> > >        vprintk_emit+0x414/0xb90 kernel/printk/printk.c:2406
+> > >        _printk+0x7a/0xa0 kernel/printk/printk.c:2432
+> > >        fail_dump lib/fault-inject.c:46 [inline]
+> > >        should_fail_ex+0x3be/0x570 lib/fault-inject.c:154
+> > >        strncpy_from_user+0x36/0x230 lib/strncpy_from_user.c:118
+> > >        strncpy_from_user_nofault+0x71/0x140 mm/maccess.c:186
+> > >        bpf_probe_read_user_str_common kernel/trace/bpf_trace.c:215 [i=
+nline]
+> > >        ____bpf_probe_read_user_str kernel/trace/bpf_trace.c:224 [inli=
+ne]
+> >
+> > Hmm, this is a combination issue of BPF and fault injection.
+> >
+> > static void fail_dump(struct fault_attr *attr)
+> > {
+> >         if (attr->verbose > 0 && __ratelimit(&attr->ratelimit_state)) {
+> >                 printk(KERN_NOTICE "FAULT_INJECTION: forcing a failure.=
+\n"
+> >                        "name %pd, interval %lu, probability %lu, "
+> >                        "space %d, times %d\n", attr->dname,
+> >                        attr->interval, attr->probability,
+> >                        atomic_read(&attr->space),
+> >                        atomic_read(&attr->times));
+> >
+> > This printk() acquires console lock under rq->lock has been acquired.
+> >
+> > This can happen if we use fault injection and trace event too because
+> > the fault injection caused printk warning.
+>
+> Ah indeed. Same difference though, if you don't know the context, most
+> things are unsafe to do.
+>
+> > I think this should be a bug of the fault injection, not tracing/BPF.
+> > And to solve this issue, we may be able to check the context and if
+> > it is tracing/NMI etc, fault injection should NOT make it failure.
+>
+> Well, it should be okay to cause the failure, but it must be very
+> careful how it goes about doing that. Tripping printk() definitely is
+> out.
+>
+> But there's a much bigger problem there, get_random*() is not wait-free,
+> in fact it takes a spinlock_t which makes that it is unusable from most
+> context, and it's definitely out for tracing.
+>
+> Notably, this spinlock_t makes that it is unsafe to use from anything
+> that holds a raw_spinlock_t or is from hardirq context, or has
+> preempt_disable() -- which is a TON of code.
+>
+> On this alone I would currently label the whole of fault-injection
+> broken. The should_fail() call itself is unsafe where many of its
+> callsites are otherwise perfectly fine -- eg. usercopy per the above.
+>
+> Perhaps it should use a simple PRNG, a simple LFSR should be plenty good
+> enough to provide failure conditions.
 
-OK, so just to make sure I understand - mac80211 now has Tx queues per 
-AC (struct ieee80211_txq) and it makes more sense to do something like 
-ath10k ([1])?
+Sounds good.
 
-Frames pushed via original Tx op are non-QoS traffic, right? (i.e, no 
-need to worry about frame order between the two handlers)
+> And yeah, I would just completely rip out the printk. Trying to figure
+> out where and when it's safe to call printk() is non-trivial and just
+> not worth the effort imo.
 
-Thank and regards,
-Michael.
-
-[1] 
-https://elixir.bootlin.com/linux/v6.12/source/drivers/net/wireless/ath/ath10k/mac.c#L4728
-
+Instead of removing the printk completely, How about setting the default va=
+lue
+of the verbose option to zero so it doesn't call printk and gives a loud
+warning when changing the verbose option?
 
