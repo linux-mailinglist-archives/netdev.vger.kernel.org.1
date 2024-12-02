@@ -1,74 +1,57 @@
-Return-Path: <netdev+bounces-148252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F6229E0F02
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:47:49 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 285E49E0F14
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:57:09 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2F0EB22E1A
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 22:47:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E44D21616D2
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 22:57:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89EC1DF747;
-	Mon,  2 Dec 2024 22:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5AB1DF96B;
+	Mon,  2 Dec 2024 22:57:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NQKpE+OQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SHHgGDsF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBA32EAF7;
-	Mon,  2 Dec 2024 22:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D741D79B4;
+	Mon,  2 Dec 2024 22:57:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733179661; cv=none; b=FQkV6nbYSIAGZFguAxoTWFN9C0mP/bj5/Cjazp415XYCNPGegMv1IshCAI57qUcWPOoIm1sW3WQEE7+Bva6976MQEFtUGDGk1+aq1tVS8o0tfIy8YisZuxBYlu//NcL5m4yDNivPQ75mykZRowVvn/nz/nOlsUayy5kWZWd4oEk=
+	t=1733180225; cv=none; b=fzpIbIzO1lhUJlVWdeczkMfyVK86Yed4zauIskr1z/ZnXwob1Ur/hDxY35gwerg4O3Mx1OUd5Gp2GcOj450gTKDGkjokxCdYq7A+mIln7Ypc8ckcjeNii1POLStEcQDOr+61mPiPZkkwYY6hGmAmqXbnc818MQxxQ2xa/rcVmHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733179661; c=relaxed/simple;
-	bh=5V9dNA/lg2vKIQqYisN0pggYDLsi/k90WZhdNW3xD0c=;
+	s=arc-20240116; t=1733180225; c=relaxed/simple;
+	bh=sRnHEAOc8yn9NE0hSsRK5dTFQHwcas3LidqcY45aKFI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bhb0yWKk0d17ePEKrUCUaI76PP9kWbQ4yIzjA6ZwGwcwIlltABcaC2L6H0+eIlYdmIFQ8miXq232JjwQ6h4d5jL+dxzP04uoWaq8xdOfY/GhmLahLImWNNyzqxa52DAMHKFJMUiN56ehKJ2MebZSnBfDj9K/ypemy+mGx4IAkeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NQKpE+OQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B446C4CED1;
-	Mon,  2 Dec 2024 22:47:40 +0000 (UTC)
+	 MIME-Version:Content-Type; b=DziagqE7mAgtwqbW1FMXB0HLSDQLYvMrKvEkGY70jUhJTRlYnTsIi4PtN0T7BfHAS/ztZwZEZX8570RhldDwQrjAhJAwnMgCaeE4PwLHh/I3G2TzeO7+rhx/OsK2IhvSUybn+HafTFF52zCm2toGrdajvzAbRGoiOIFcy01S29M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SHHgGDsF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29177C4CED1;
+	Mon,  2 Dec 2024 22:57:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733179661;
-	bh=5V9dNA/lg2vKIQqYisN0pggYDLsi/k90WZhdNW3xD0c=;
+	s=k20201202; t=1733180224;
+	bh=sRnHEAOc8yn9NE0hSsRK5dTFQHwcas3LidqcY45aKFI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NQKpE+OQHkS0cQU7S6/YePYZeLoIfBoG3D9PYAO/tQo/HxxE+zqAdAmYkblsB1Z72
-	 d+O9L+ogzm+WZQ1UyBAkJQcEUxtQ7ZG5uZe1QxsYElBG9BjnBXeme6YRUEIiIRU01d
-	 OMrPJZs83eyjysnuar6/ynWsOlvtBCJlctS6IcS5S0W7G0nlhuU3PsguSJV808Oa1b
-	 PTGn1auDScjzK/78zbW5tV3jaLkTXfjCe8cq2eODBH1c/UVhMhDYZ9mffQgu6J9ek1
-	 pAgUbsfsKgu876+U1B10+McVJFjdeL52ES9TSphLdtje9DN6738SRySpfNmPFXkZnV
-	 nH8Uw+PeHXjcQ==
-Date: Mon, 2 Dec 2024 14:47:39 -0800
+	b=SHHgGDsFAj3q7QjHMDdrcmgEJW2py+cW+TyShEdPzE18TYTUm5r2JqS87Cqqxt2II
+	 eoSm6e4Jm4KZ5mrlS3yhAvGfPd0FU/gB1ohK1Lq9C83/fSVpllRBR1V7dpbcc2x0fj
+	 6xgRaeOnaLNHaBjEvjWp5Vq29cl5lw1HIyEZQuI/rIxhrTFqRmwvqLOoHH00QSTlLQ
+	 uKCmkSz0LMqPDJryzNl8VsbsBsVuDgNQ4uCk55cPArGFXkuSfTaX1xuN9DHeAg9a/k
+	 SrgK+1z/QRFuK8XSc+OLxJPmre1MXxuW1CGFqDDiH+OS1pwc3VWExNJAYwT1aZ3Pp4
+	 Rlpwg6VBvJseQ==
+Date: Mon, 2 Dec 2024 14:57:03 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, "Lorenzo Bianconi"
- <lorenzo.bianconi@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, "Martin KaFai Lau"
- <martin.lau@linux.dev>, David Miller <davem@davemloft.net>, "Eric Dumazet"
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- <netdev@vger.kernel.org>
-Subject: Re: [RFC/RFT v2 0/3] Introduce GRO support to cpumap codebase
-Message-ID: <20241202144739.7314172d@kernel.org>
-In-Reply-To: <6db67537-6b7b-4700-9801-72b6640fc609@intel.com>
-References: <cover.1726480607.git.lorenzo@kernel.org>
-	<amx5t3imrrh56m7vtsmlhdzlggtv2mlhywk6266syjmijpgs2o@s2z7dollcf7l>
-	<ZwZe6Bg5ZrXLkDGW@lore-desk>
-	<55d2ac1c-0619-4b24-b8ab-6eb5f553c1dd@intel.com>
-	<ZwZ7fr_STZStsnln@lore-desk>
-	<c3e20036-2bb3-4bca-932c-33fd3801f138@intel.com>
-	<c21dc62c-f03e-4b26-b097-562d45407618@intel.com>
-	<01dcfecc-ab8e-43b8-b20c-96cc476a826d@intel.com>
-	<b319014e-519c-4c2d-8b6d-1632357e66cd@app.fastmail.com>
-	<rntmnecd6w7ntnazqloxo44dub2snqf73zn2jqwuur6io2xdv7@4iqbg5odgmfq>
-	<05991551-415c-49d0-8f14-f99cb84fc5cb@intel.com>
-	<a2ebba59-bf19-4bb9-9952-c2f63123b7cd@app.fastmail.com>
-	<6db67537-6b7b-4700-9801-72b6640fc609@intel.com>
+To: Lenny Szubowicz <lszubowi@redhat.com>
+Cc: pavan.chebbi@broadcom.com, mchan@broadcom.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ george.shuklin@gmail.com, andrea.fois@eventsense.it,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [patch v2] tg3: Disable tg3 PCIe AER on system reboot
+Message-ID: <20241202145703.388913d1@kernel.org>
+In-Reply-To: <20241129203640.54492-1-lszubowi@redhat.com>
+References: <20241129203640.54492-1-lszubowi@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,10 +61,32 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 26 Nov 2024 11:36:53 +0100 Alexander Lobakin wrote:
-> > tcp_rr results were unaffected.  
+On Fri, 29 Nov 2024 15:36:40 -0500 Lenny Szubowicz wrote:
+> Disable PCIe AER on the tg3 device on system reboot on a limited
+> list of Dell PowerEdge systems. This prevents a fatal PCIe AER event
+> on the tg3 device during the ACPI _PTS (prepare to sleep) method for
+> S5 on those systems. The _PTS is invoked by acpi_enter_sleep_state_prep()
+> as part of the kernel's reboot sequence as a result of commit
+> 38f34dba806a ("PM: ACPI: reboot: Reinstate S5 for reboot").
 > 
-> @ Jakub,
+> There was an earlier fix for this problem by commit 2ca1c94ce0b6
+> ("tg3: Disable tg3 device on system reboot to avoid triggering AER").
+> But it was discovered that this earlier fix caused a reboot hang
+> when some Dell PowerEdge servers were booted via ipxe. To address
+> this reboot hang, the earlier fix was essentially reverted by commit
+> 9fc3bc764334 ("tg3: power down device only on SYSTEM_POWER_OFF").
+> This re-exposed the tg3 PCIe AER on reboot problem.
+> 
+> This fix is not an ideal solution because the root cause of the AER
+> is in system firmware. Instead, it's a targeted work-around in the
+> tg3 driver.
+> 
+> Note also that the PCIe AER must be disabled on the tg3 device even
+> if the system is configured to use "firmware first" error handling.
 
-Context? What doesn't work and why?
+sparse (make C=1) complains:
+
+drivers/net/ethernet/broadcom/tg3.c:18259:22: warning: restricted pci_power_t degrades to integer
+-- 
+pw-bot: cr
 
