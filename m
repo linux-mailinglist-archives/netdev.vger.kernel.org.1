@@ -1,105 +1,137 @@
-Return-Path: <netdev+bounces-147987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 421849DFB8B
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 08:58:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B95319DFBC3
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 09:18:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92746B2435E
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 07:58:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27A72B21002
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 08:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A90081F943F;
-	Mon,  2 Dec 2024 07:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 332C31F9A8F;
+	Mon,  2 Dec 2024 08:18:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ni.piap.pl (ni.piap.pl [195.187.100.5])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3585D1F8EF0;
-	Mon,  2 Dec 2024 07:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.187.100.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0261D63D2
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 08:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733126292; cv=none; b=AW/MbtIMxdjVkUJ8TzO6ezvqE/XKwvy73BznapXPDg1Nwbw+EJK73d/KCx9modzUGwp+VEydFeFq8Kt663dJtvek0pqxrtvMB/alFcfnWuPcy/3EXRqUDHhimHsyQJ4FClJHI3U+tIjgDNL8u9RAUmSQxO/+ioxOLCNfCtsur8w=
+	t=1733127519; cv=none; b=AIanKqDfMEN97TYBMombmk1mZBxwIzIwSEMvmEZBVTX5L1u1cwidKc59uVysAayokAinDQoDmfthGwwpPrnlT9DlgT6CANwg7jgGqZXM5aabGAp6TLmlqwcygc8ILudTDWFPkzPnDH5YxMeLR/ArPnOYNB+1SIgxSpsYH0i0XcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733126292; c=relaxed/simple;
-	bh=5n73uMdwQbFgV2Fx+/Rw7cLPrVE0hEVu/BDKxMK536I=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ia05bnJjXZ2x5zMUjmFfyo/I+HOVMI0EvVj9FH5wGzSlnvJL77tRiQjwGoTUZc+IEJMTVtYHVYbC2i7vVKrVV4UEvEyfmBCNc8VqPA3VQ6PzB7fTA3HM2h/WkK/zYI7tsA/7E9xUzoHSIFPbLtCwx7YaWaT4ZC2Qw3GTWmQ2d0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=piap.pl; spf=pass smtp.mailfrom=piap.pl; arc=none smtp.client-ip=195.187.100.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=piap.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=piap.pl
-Received: from t19.piap.pl (OSB1819.piap.pl [10.0.9.19])
-	by ni.piap.pl (Postfix) with ESMTPS id ADC37C3EEAC5;
-	Mon,  2 Dec 2024 08:57:59 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ni.piap.pl ADC37C3EEAC5
-From: =?utf-8?Q?Krzysztof_Ha=C5=82asa?= <khalasa@piap.pl>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,  netdev <netdev@vger.kernel.org>,  Oliver
- Neukum <oneukum@suse.com>,  Andrew Lunn <andrew+netdev@lunn.ch>,  "David
- S. Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,
-  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
-  linux-usb@vger.kernel.org,  linux-kernel@vger.kernel.org,  Jose Ignacio
- Tornos Martinez <jtornosm@redhat.com>,  Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH] PHY: Fix no autoneg corner case
-In-Reply-To: <f870d2c7-cf0a-4e78-80d6-faa490a13820@gmail.com> (Heiner
-	Kallweit's message of "Fri, 29 Nov 2024 07:49:32 +0100")
-References: <m3plmhhx6d.fsf@t19.piap.pl>
-	<c57a8f12-744c-4855-bd18-2197a8caf2a2@lunn.ch>
-	<m3wmgnhnsb.fsf@t19.piap.pl>
-	<2428ec56-f2db-4769-aaca-ca09e57b8162@lunn.ch>
-	<m3serah8ch.fsf@t19.piap.pl>
-	<f870d2c7-cf0a-4e78-80d6-faa490a13820@gmail.com>
-Sender: khalasa@piap.pl
-Date: Mon, 02 Dec 2024 08:57:59 +0100
-Message-ID: <m3ldwyh5yw.fsf@t19.piap.pl>
+	s=arc-20240116; t=1733127519; c=relaxed/simple;
+	bh=ReWIu+SyAkv15E2qSKduhEEPr7OW9FuqBsoOCivd9W4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=ncEZPZzKc9ekXj50I6S2HSLX4jopZPF0lWRF3dfGOZHW2L1Rv/idr43q6XvDjy3LlmQazYAHNGrUOElbwnIgkKfRFbRWxoI+4HSKt+fiyDpiCwul7oLbs5PtIEHrXRsI3Z5nyMvM2KDsMSsJRH82v+w+carp+v2fCJMnjNbz9tU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-26-XoLKLSZoNi6PIY7yenUkHg-1; Mon, 02 Dec 2024 08:18:28 +0000
+X-MC-Unique: XoLKLSZoNi6PIY7yenUkHg-1
+X-Mimecast-MFC-AGG-ID: XoLKLSZoNi6PIY7yenUkHg
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 2 Dec
+ 2024 08:17:59 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 2 Dec 2024 08:17:59 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Dominique MARTINET' <dominique.martinet@atmark-techno.com>, Oliver Neukum
+	<oneukum@suse.com>
+CC: "edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Greg Thelen
+	<gthelen@google.com>, John Sperbeck <jsperbeck@google.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>
+Subject: RE: [PATCH net] net: usb: usbnet: fix name regression
+Thread-Topic: [PATCH net] net: usb: usbnet: fix name regression
+Thread-Index: AQHbRG456Phg3HaMXk68vY32fDXRdrLSmKCA
+Date: Mon, 2 Dec 2024 08:17:59 +0000
+Message-ID: <e53631b5108b4d0fb796da2a56bc137f@AcuMS.aculab.com>
+References: <20241017071849.389636-1-oneukum@suse.com>
+ <Z00udyMgW6XnAw6h@atmark-techno.com>
+In-Reply-To: <Z00udyMgW6XnAw6h@atmark-techno.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: Q98dxtw1mmM9DPhgt0JlfyOJq7EBFU8szmL5_YXM9ns_1733127507
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-Heiner,
+RnJvbTogRG9taW5pcXVlIE1BUlRJTkVUDQo+IFNlbnQ6IDAyIERlY2VtYmVyIDIwMjQgMDM6NTAN
+Cj4gDQo+IEhpLA0KPiANCj4gT2xpdmVyIE5ldWt1bSB3cm90ZSBvbiBUaHUsIE9jdCAxNywgMjAy
+NCBhdCAwOToxODozN0FNICswMjAwOg0KPiA+IFRoZSBmaXggZm9yIE1BQyBhZGRyZXNzZXMgYnJv
+a2UgZGV0ZWN0aW9uIG9mIHRoZSBuYW1pbmcgY29udmVudGlvbg0KPiA+IGJlY2F1c2UgaXQgZ2F2
+ZSBuZXR3b3JrIGRldmljZXMgbm8gcmFuZG9tIE1BQyBiZWZvcmUgYmluZCgpDQo+ID4gd2FzIGNh
+bGxlZC4gVGhpcyBtZWFucyB0aGF0IHRoZSBjaGVjayBmb3IgdGhlIGxvY2FsIGFzc2lnbm1lbnQg
+Yml0DQo+ID4gd2FzIGFsd2F5cyBuZWdhdGl2ZSBhcyB0aGUgYWRkcmVzcyB3YXMgemVyb2VkIGZy
+b20gYWxsb2NhdGlvbiwNCj4gPiBpbnN0ZWFkIG9mIGZyb20gb3ZlcndyaXRpbmcgdGhlIE1BQyB3
+aXRoIGEgdW5pcXVlIGhhcmR3YXJlIGFkZHJlc3MuDQo+IA0KPiBTbyB3ZSBoaXQgdGhlIGV4YWN0
+IGludmVyc2UgcHJvYmxlbSB3aXRoIHRoaXMgcGF0Y2g6IG91ciBkZXZpY2Ugc2hpcHMgYW4NCj4g
+TFRFIG1vZGVtIHdoaWNoIGV4cG9zZXMgYSBjZGMtZXRoZXJuZXQgaW50ZXJmYWNlIHRoYXQgaGFk
+IGFsd2F5cyBiZWVuDQo+IG5hbWVkIHVzYjAsIGFuZCB3aXRoIHRoaXMgcGF0Y2ggaXQgc3RhcnRl
+ZCBiZWluZyBuYW1lZCBldGgxLCBicmVha2luZw0KPiB0b28gbWFueSBoYXJkY29kZWQgdGhpbmdz
+IGV4cGVjdGluZyB0aGUgbmFtZSB0byBiZSB1c2IwIGFuZCBtYWtpbmcgb3VyDQo+IGRldmljZXMg
+dW5hYmxlIHRvIGNvbm5lY3QgdG8gdGhlIGludGVybmV0IGFmdGVyIHVwZGF0aW5nIHRoZSBrZXJu
+ZWwuDQoNCkVybSBkb2VzIHRoYXQgbWVhbiB5b3VyIG1vZGVtIGhhcyBhIGxvY2FsbHkgYWRtaW5p
+c3RlcmVkIE1BQyBhZGRyZXNzPw0KSXQgcmVhbGx5IHNob3VsZG4ndC4NCg0KPiBMb25nIHRlcm0g
+d2UnbGwgcHJvYmFibHkgYWRkIGFuIHVkZXYgcnVsZSBvciBzb21ldGhpbmcgdG8gbWFrZSB0aGUg
+bmFtZQ0KPiBleHBsaWNpdCBpbiB1c2Vyc3BhY2UgYW5kIG5vdCByaXNrIHRoaXMgaGFwcGVuaW5n
+IGFnYWluLCBidXQgcGVyaGFwcw0KPiB0aGVyZSdzIGEgYmV0dGVyIHdheSB0byBrZWVwIHRoZSBv
+bGQgYmVoYXZpb3I/DQo+IA0KPiAoSW4gcGFydGljdWxhciB0aGlzIGhpdCBhbGwgc3RhYmxlIGtl
+cm5lbHMgbGFzdCBtb250aCBzbyBJJ20gc3VyZSB3ZQ0KPiB3b24ndCBiZSB0aGUgb25seSBvbmVz
+IGdldHRpbmcgYW5ub3llZCB3aXRoIHRoaXMuLi4gUGVyaGFwcyByZXZlcnRpbmcNCj4gYm90aCBw
+YXRjaGVzIGZvciBzdGFibGUgYnJhbmNoZXMgbWlnaHQgbWFrZSBzZW5zZSBpZiBubyBiZXR0ZXIg
+d2F5DQo+IGZvcndhcmQgaXMgZm91bmQgLS0gSSd2ZSBhZGRlZCBzdGFibGVAIGluIGNjIGZvciBo
+ZWFkcyB1cC9vcGluaW9ucykNCj4gDQo+IA0KPiA+ICsrKyBiL2RyaXZlcnMvbmV0L3VzYi91c2Ju
+ZXQuYw0KPiA+IEBAIC0xNzY3LDcgKzE3NjcsOCBAQCB1c2JuZXRfcHJvYmUgKHN0cnVjdCB1c2Jf
+aW50ZXJmYWNlICp1ZGV2LCBjb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9pZCAqcHJvZCkNCj4gPiAg
+CQkvLyBjYW4gcmVuYW1lIHRoZSBsaW5rIGlmIGl0IGtub3dzIGJldHRlci4NCj4gPiAgCQlpZiAo
+KGRldi0+ZHJpdmVyX2luZm8tPmZsYWdzICYgRkxBR19FVEhFUikgIT0gMCAmJg0KPiA+ICAJCSAg
+ICAoKGRldi0+ZHJpdmVyX2luZm8tPmZsYWdzICYgRkxBR19QT0lOVFRPUE9JTlQpID09IDAgfHwN
+Cj4gPiAtCQkgICAgIChuZXQtPmRldl9hZGRyIFswXSAmIDB4MDIpID09IDApKQ0KPiA+ICsJCSAg
+ICAgLyogc29tZWJvZHkgdG91Y2hlZCBpdCovDQo+ID4gKwkJICAgICAhaXNfemVyb19ldGhlcl9h
+ZGRyKG5ldC0+ZGV2X2FkZHIpKSkNCj4gDQo+IC4uLiBvciBhY3R1YWxseSBub3cgSSdtIGxvb2tp
+bmcgYXQgaXQgYWdhaW4sIHBlcmhhcHMgaXMgdGhlIGNoZWNrIGp1c3QNCj4gYmFja3dhcmRzLCBv
+ciBhbSBJIGdldHRpbmcgdGhpcyB3cm9uZz8NCj4gcHJldmlvdXMgY2hlY2sgd2FzIHJlbmFtZSBp
+ZiAobWFjWzBdICYgMHgyID09IDApLCB3aGljaCByZWFkcyB0byBtZSBhcw0KPiAibm9ib2R5IHNl
+dCB0aGUgMm5kIGJpdCINCj4gbmV3IGNoZWNrIG5vdyByZW5hbWVzIGlmICFpc196ZXJvLCBzbyBy
+ZW5hbWVzIGlmIGl0IHdhcyBzZXQsIHdoaWNoIGlzDQo+IHRoZSBvcHBvc2l0ZT8uLi4NCg0KVGhl
+IDJuZCBiaXQgKGFrYSBtYWNbMF0gJiAyKSBpcyB0aGUgJ2xvY2FsbHkgYWRtaW5pc3RlcmVkJyBi
+aXQuDQpUaGUgaW50ZW50aW9uIG9mIHRoZSBzdGFuZGFyZCB3YXMgdGhhdCBhbGwgbWFudWZhY3R1
+cmVycyB3b3VsZCBnZXQNCmEgdmFsaWQgMTQtYml0IE9VSSBhbmQgdGhlIEVFUFJPTSAob3IgZXF1
+aXZhbGVudCkgd291bGQgY29udGFpbiBhbg0KYWRkcmVzc2VzIHdpdGggdGhhdCBiaXQgY2xlYXIs
+IHN1Y2ggYWRkcmVzc2VzIHNob3VsZCBiZSBnbG9iYWxseSB1bmlxdWUuDQpBbHRlcm5hdGl2ZWx5
+IHRoZSBsb2NhbCBuZXR3b3JrIGFkbWluaXN0cmF0b3IgY291bGQgYXNzaWduIGFuIGFkZHJlc3MN
+CndpdGggdGhhdCBiaXQgc2V0LCByZXF1aXJlZCBieSBwcm90b2NvbHMgbGlrZSBERUNuZXQuDQoN
+ClRoaXMgaGFzIG5ldmVyIGFjdHVhbGx5IGJlZW4gc3RyaWN0bHkgdHJ1ZSwgYSBmZXcgbWFudWZh
+Y3R1cmVycyB1c2VkDQonbG9jYWxseSBhZG1pbmlzdGVyZWQgYWRkcmVzc2VzJyAoMDI6Y2Y6MWY6
+eHg6eHg6eHggY29tZXMgdG8gbWluZCkNCmFuZCBzeXN0ZW1zIHR5cGljYWxseSBhbGxvdyBhbnkg
+KG5vbi1icm9hZGNhc3QpIGJlIHNldC4NCg0KU28gYmFzaW5nIGFueSBkZWNpc2lvbiBvbiB3aGV0
+aGVyIGEgTUFDIGFkZHJlc3MgaXMgbG9jYWwgb3IgZ2xvYmFsDQppcyBhbHdheXMgZ29pbmcgdG8g
+YmUgY29uZnVzaW5nLg0KDQpMaW51eCB3aWxsIGFsbG9jYXRlIGEgcmFuZG9tIChsb2NhbGx5IGFk
+bWluaXN0ZXJlZCkgYWRkcmVzcyBpZiBub25lDQppcyBmb3VuZCAtIHVzdWFsbHkgZHVlIHRvIGEg
+Y29ycnVwdCBlZXByb20uDQoNCglEYXZpZA0KDQo+IA0KPiA+ICAJCQlzdHJzY3B5KG5ldC0+bmFt
+ZSwgImV0aCVkIiwgc2l6ZW9mKG5ldC0+bmFtZSkpOw0KPiA+ICAJCS8qIFdMQU4gZGV2aWNlcyBz
+aG91bGQgYWx3YXlzIGJlIG5hbWVkICJ3bGFuJWQiICovDQo+IA0KPiBUaGFua3MsDQo+IC0tDQo+
+IERvbWluaXF1ZSBNYXJ0aW5ldA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJy
+YW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lz
+dHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
-Heiner Kallweit <hkallweit1@gmail.com> writes:
-
-> If autoneg is supported, then phylib defaults to enable it. I don't see
-> anything wrong with this. BaseT modes from 1000Mbps on require autoneg.
-> Your original commit message seems to refer to a use case where a certain
-> operation mode of the PHY doesn't support autoneg. Then the PHY driver
-> should detect this operation mode and clear the autoneg-supported bit.
-
-I'm not sure about it, but if there is consensus it should stay this
-way, no problem.
-
-WRT specific case, It seems the SFP port doesn't support autoneg on
-AX88772BL (I don't have any SFP copper 10/100 module).
-
-The PHY registers (100BASE-FX, no link currently):
-          x0   x1   x2   x3   x4   x5   x6   x7   x8
-  0000: 2100 7809   3B 1881  501
-  0010:  250  80C 8620   20 2314  3C8 4716 724F 8024
-
-BMCR: fixed speed 100 Mb/s
-      The datasheet says "autoneg is fixed to 1 and speed to 100", but
-      it's apparently the case only with 100BASE-TX, not FX.
-
-      It seems autoneg, speed and duplex bits are read only
-      (bits 13, 12, 9, 8). So, basically, you can't enable autoneg at
-      all and this is maybe the source of the "bug".
-
-BMSR: 10 and 100 Mb/s FD/HD autoneg support indicated. Hmm. R/O.
-
-ANAR: quite standard, but doesn't matter since autoneg is disabled.
-
-I will think about it a bit more.
---=20
-Krzysztof "Chris" Ha=C5=82asa
-
-Sie=C4=87 Badawcza =C5=81ukasiewicz
-Przemys=C5=82owy Instytut Automatyki i Pomiar=C3=B3w PIAP
-Al. Jerozolimskie 202, 02-486 Warszawa
 
