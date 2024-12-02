@@ -1,176 +1,141 @@
-Return-Path: <netdev+bounces-148139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48C969E07AD
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:55:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 073479E0879
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 17:29:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3E8217A41D
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:28:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9A6517968E
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4E320C028;
-	Mon,  2 Dec 2024 15:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D62278C60;
+	Mon,  2 Dec 2024 15:51:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oqVRjmwC"
+	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="PCIWgvSh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB82B20ADEC
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 15:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9901BA53
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 15:51:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733153089; cv=none; b=quK+C4wuqW+6+KZU5OC/dvVoYaKQkKwaKY8RDy8plOPo2R16eLJzA/jvdoIbLCechX7q7eMI6nt3+em6ksXxVTmiWxlp9FXDc/RWO6fl0UrywP0lQ7tfoM/+q53qUQ0Zl2xlIDPvvQlAgu9aqBrXuhZ8CBr7BQKGiRrGul3jfIk=
+	t=1733154715; cv=none; b=LpyS030760D4xqfvb1VqHXuryUO/zPuERmSLjHIpE9itOkEe+87h2vRHDp85lyusSLoKG98nVWWVdQDIfZqTv7luQGbMkSgLAsqFO91Y3Vb0NP7s2YaUI0ZEPFRB7+/WIQfeqJGvyKHYmfEfC/OX9z9GNrwfjxRGqYunEDldBZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733153089; c=relaxed/simple;
-	bh=goFeMCUVRbDjipThdghVVJLskLf8H473+GNXYnXXrDw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ABVj9opwdjRV2wTmutdVNXxWRuLGMtaWicfZr+QUuiACI3aDInSJ0IxHwvVtQJuHIaMUnuqjS9SYUrlUTny/seJeZ77IG3+h9iQZQ+5nS7AbBTLDlHGuTdu2O6WrZBgKkIsOP4swN39e9ToDsr2mxcgmzdNSCOFY3S5r2C8o6eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oqVRjmwC; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6eeffdff41dso36736657b3.3
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 07:24:47 -0800 (PST)
+	s=arc-20240116; t=1733154715; c=relaxed/simple;
+	bh=bL3/xzhTDbzbGTJgjVxoz7qT0Bj5FKuFqnagataC9Bs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MPl1+0Zt3Re9fOIfqsE4uEtN4odb9vKELMEbr9UXaVVpeJKrCx4b5jB+yNqXT1BvDuAjb0qw/+jEr9OJcxZs1wz2n3M61+5bhKpFTtgGQq5bCFr+Dgpl4XnkPbcjJVyF1hMynTLb/hy9EN6wgoJcJ80QvtnYZ7TJzA0nMMvhrXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=PCIWgvSh; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-53dde4f0f23so4392900e87.3
+        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 07:51:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1733153087; x=1733757887; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=05ZXtxtYDYApb+lIzc95yV2LA74LDricN9fUjzTVsRg=;
-        b=oqVRjmwCPFbp8NX13GQ37Knaf7Js6RruA7JsAME9fKoTUAGL/hAHluYy3hssqDdGck
-         G3h2wgUUsarnvqYTXpdtcC7ex9fmfZah+6CcPrjQHRIdDHm5YYD2ZPWCzPyWLSZX+6Wl
-         Ttd2gF3PJx2LHbFghXgX2dyZmsOzrQOFa0InxUkzTh0xRpguw7ISgu8qgM4B0PL1BYAk
-         u2/lj2VSrRMtL+bSn3omEt6j92wabJzeXdNMRiojvlZWxVN6/j0rB5ZgVKGLX7zgR29U
-         clW/0lGnWXGwEgryAo35SEApnH1tAAyBhCWD6+6ugnSKDsCgkQNwbtXI2HeWI15fYVO/
-         e+tQ==
+        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1733154712; x=1733759512; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pPftgg43bq9aqu/m+EeNtGmhyyKJMhRNkMNK3b+tQes=;
+        b=PCIWgvShtXlV7oMfezCNXJfVLunDJ7WaTfheu4p3Bz7RE5lCgh/DW3Pqibw3fRCZsJ
+         +nZmCf6vDXL+LHUJfMOoYvhNqKicsmFu18dd7W+Ac+9TSELrfoPsG0bNJca5lVr/UtLm
+         WXLizMpwWAecikmfVjFWOH9nTTgkxsUwovzDRy0QZZoCCIq+dmW3I+BYoAFB7nnF9Jom
+         P7J0fu0za5EtB+2+nE6byPDSqLCFDFveIAG+G9CidfSVaVDtbt9Rsf9RTJ0iM4fsBv5d
+         t6SzFexAElLvtl8cFyyUeiW5eTM4jNEMYHoppwV384MEE3S/bq/CIcsZ+yLi5VvB7kKA
+         SnBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733153087; x=1733757887;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=05ZXtxtYDYApb+lIzc95yV2LA74LDricN9fUjzTVsRg=;
-        b=xLuv4qH/JROuAA2t8Z1epg5AaSgxUjVliHog8pmzMhwSFVg7pRyAcH9ztcsmhQt5xt
-         kupzh80vGztUhNFez5+h5Gcch5BsQ4C7gOPQDCCy0eXIuHA0Nh/ngXy9WZwNctmRbLHz
-         0PPocQKIlmzpRvQH/gKhmRj+U2SiuSl5lIL0IjZ+XAad4HwPcfRxBNx3s7KcR/7/PtHY
-         ZqjSRtXqZRZQPcJJ2TQYP9XZNMYAuDRIfyyMHO+5z1S0SdTDScSa2XvaI8CIKEHnc5MF
-         t0iKTYOMPFMBUBwbtymfndVvUkp8tUYkg5/HKRIIUwPipF/l0khK193MH9LQYGlda3t1
-         j5MQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW39tGcl5z1WcGPLpCP76L5j9St5Yca4DpzbqVnRH0w1EgzKah0Ay0gJN+R/mHDBKcai+Lwev4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwP5ma9+DtA3IPbVW5NMubnwVy7JIOJhUHwwETFFlowmfv2EwTP
-	0jJyub6HAgten2UMo7HKP6XxS2kHv97G0N5d3mwjd68iHQffox+I4whW75o/8LVJD6zkxHb20wx
-	SHPfE586bemsHbYEK4orMxVyOYuXXnz/kLSWeGA==
-X-Gm-Gg: ASbGnctYnuld9lxPyRXFDQs3FSXrPR0Y3HYzp476RsHh8crzdI6vy6IY40Qlvfdlyxz
-	P2ZUCSUYpbxMIuvVKVhw/1GW/3CtFg3Mt
-X-Google-Smtp-Source: AGHT+IG1/7GNikn+o7qWaeU6OlA3SHIeQqG6VzX6iFXwmrBOhF0bD/LXd61skcVAWua1i/pv/Z75jusfAxofKt3ImP8=
-X-Received: by 2002:a05:6902:2e0e:b0:e39:9b9f:7f87 with SMTP id
- 3f1490d57ef6-e399b9f830cmr6954354276.29.1733153086437; Mon, 02 Dec 2024
- 07:24:46 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733154712; x=1733759512;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pPftgg43bq9aqu/m+EeNtGmhyyKJMhRNkMNK3b+tQes=;
+        b=CCKwg5OVTa32ylaEbZHanL77cWDma/2pWTJNPTW6nb92cmirw6u1CuDYnn4U8iaWth
+         q0IpU8xLbj4vIaIt9apfno3V16tAyLsoDPjfrzao+6QaIDH5ThQmIvOvfhlT+ni2ffZd
+         B/h9/+ZkpQHN7DQHICewUyKze7ifcwpqwCJsSviefCLqWEjgn7JnfgWqGPmxwgNE1yip
+         Zx99BYvDWswkLzGNZFkr2MFhndpXMC/DOlV1dUBpriRzQfvnPq6YBeGn5N+GCEDcYIlS
+         YUpbV2r832cfTGFiiYwjQXQDzUcQbRX4nUwok2pHFc4nGFnYsaIS/aRdaUex0CB8crhP
+         vIog==
+X-Forwarded-Encrypted: i=1; AJvYcCWdoMOO0p5+eC8CnsC8SwNXNxymIHit+ffZy1PKab+vlzE0l4rAQTSfNDL+Fnv4b/EnCkSD1mI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0P5GTVVLucEFCLL96rLWgKpjeIoN7ddUQqOAkHpq5LjYbZ9JD
+	oJLvDYLaor4fAHrPUoTjf+gW0neaIUjSyp/3qQAzgWulp58+gK7Klw8+AOjmBFU=
+X-Gm-Gg: ASbGncsJCB7vy6yupuD8dEIrSSf0SbOPwxlV9ZFPCZwUrg/X+oiXJLP4gLgszyz747E
+	TgHo57Osh3I8DqDpW9V+X4km2y9ZcPuOC4bkZvfZ8cHTWy5oeAso83IsK/0M9SwDVxNd7Gjjt7y
+	sXbPAsUYsKLmUOzDA3xq0g7iGzmu3Agi4r3g67ICNgz6pLK3x0EMKKjNR/hiQCEytxICsGuRGjk
+	PThCepzuBPxnKHS6tno7x/ihLhR5af6UpeTCwISXmOPqOC6v/wFDow2EN5G4xyKeUbPtA==
+X-Google-Smtp-Source: AGHT+IFwu/0m7FiwxwnmhV7gn9N4KqSQds8K2MDB//YnOhqAjuo10Y4Tx57ncNF0LbVlOwX5NtHLsw==
+X-Received: by 2002:a05:6512:3d1d:b0:53d:a99e:b768 with SMTP id 2adb3069b0e04-53df00d9666mr11899727e87.25.1733154711811;
+        Mon, 02 Dec 2024 07:51:51 -0800 (PST)
+Received: from [192.168.0.104] ([91.198.101.25])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53df64311c0sm1502693e87.21.2024.12.02.07.51.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Dec 2024 07:51:51 -0800 (PST)
+Message-ID: <5cef26d0-b24f-48c6-a5e0-f7c9bd0cefec@cogentembedded.com>
+Date: Mon, 2 Dec 2024 20:51:44 +0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241130094758.15553-1-krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20241130094758.15553-1-krzysztof.kozlowski@linaro.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Mon, 2 Dec 2024 16:24:10 +0100
-Message-ID: <CAPDyKFqiar=EKBHG=PHimjNcdLKsVdx+BRZReEJzHr8_qoayeg@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: Drop Bhupesh Sharma from maintainers
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, linux-arm-msm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
-	Bhupesh Sharma <bhupesh.linux@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: phy: phy_ethtool_ksettings_set: Allow any supported
+ speed
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Michael Dege <michael.dege@renesas.com>,
+ Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+ Dennis Ostermann <dennis.ostermann@renesas.com>
+References: <20241202083352.3865373-1-nikita.yoush@cogentembedded.com>
+ <20241202100334.454599a7@fedora.home>
+ <73ca1492-d97b-4120-b662-cc80fc787ffd@cogentembedded.com>
+ <Z02He-kU6jlH-TJb@shell.armlinux.org.uk>
+ <eddde51a-2e0b-48c2-9681-48a95f329f5c@cogentembedded.com>
+ <Z02KoULvRqMQbxR3@shell.armlinux.org.uk>
+ <c1296735-81be-4f7d-a601-bc1a3718a6a2@cogentembedded.com>
+ <Z02oTJgl1Ldw8J6X@shell.armlinux.org.uk>
+Content-Language: en-US, ru-RU
+From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+In-Reply-To: <Z02oTJgl1Ldw8J6X@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, 30 Nov 2024 at 10:48, Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> For more than a year all emails to Bhupesh Sharma's Linaro emails bounce
-> and there were no updates to mailmap.  No reviews from Bhupesh, either,
-> so change the maintainer to Bjorn and Konrad (Qualcomm SoC maintainers).
->
-> Cc: Bhupesh Sharma <bhupesh.linux@gmail.com>
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>> root@vc4-033:~# ethtool tsn0
+>> Settings for tsn0:
+>>          Supported ports: [ MII ]
+>>          Supported link modes:   2500baseT/Full
+>>          Supported pause frame use: Symmetric Receive-only
+>>          Supports auto-negotiation: No
+> 
+> Okay, the PHY can apparently only operate in fixed mode, although I
+> would suggest checking that is actually the case. I suspect that may
+> be a driver bug, especially as...
 
-I have queued this up via my mmc tree for next. If anyone has
-objections to that and wants to funnel this via another tree, please
-let me know!
+My contacts from Renesas say that this PHY chip is an engineering sample.
 
-Kind regards
-Uffe
+I'm not sure about the origin of "driver" for this. I did not look inside before, but now I did, and it 
+is almost completely a stub. Even no init sequence. The only hw operations that this stub does are
+(1) reading bit 0 of register 1.0901 and returning it as link status (phydev->link),
+(2) reading bit 0 of register 1.0000 and returning it as master/slave setting (phydev->master_slave_get 
+/ phydev->master_slave_state)
+(3) applying phydev->master_slave_set via writing to bit 0 of register 1.0000 and then writing 0x200 to 
+register 7.0200
+
+Per standard, writing 0x200 to 7.0200 is autoneg restart, however bit 0 of 1.0000 has nothing to do with 
+master/slave. So what device actually does is unclear. Just a black box that provides 2.5G Base-T1 
+signalling, and software-wise can only report link and accept master-slave configuration.
+
+Not sure if supporting this sort of black box worths kernel changes.
 
 
-> ---
->  Documentation/devicetree/bindings/crypto/qcom-qce.yaml         | 3 ++-
->  Documentation/devicetree/bindings/mmc/sdhci-msm.yaml           | 3 ++-
->  Documentation/devicetree/bindings/net/qcom,ethqos.yaml         | 3 ++-
->  .../devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml        | 3 ++-
->  4 files changed, 8 insertions(+), 4 deletions(-)
->
-> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> index c09be97434ac..62310add2e44 100644
-> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> @@ -7,7 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
->  title: Qualcomm crypto engine driver
->
->  maintainers:
-> -  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> +  - Bjorn Andersson <andersson@kernel.org>
-> +  - Konrad Dybcio <konradybcio@kernel.org>
->
->  description:
->    This document defines the binding for the QCE crypto
-> diff --git a/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml b/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
-> index 8b393e26e025..eed9063e9bb3 100644
-> --- a/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
-> +++ b/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
-> @@ -7,7 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
->  title: Qualcomm SDHCI controller (sdhci-msm)
->
->  maintainers:
-> -  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> +  - Bjorn Andersson <andersson@kernel.org>
-> +  - Konrad Dybcio <konradybcio@kernel.org>
->
->  description:
->    Secure Digital Host Controller Interface (SDHCI) present on
-> diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-> index 0bcd593a7bd0..f117471fb06f 100644
-> --- a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-> +++ b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-> @@ -7,7 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
->  title: Qualcomm Ethernet ETHQOS device
->
->  maintainers:
-> -  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> +  - Bjorn Andersson <andersson@kernel.org>
-> +  - Konrad Dybcio <konradybcio@kernel.org>
->
->  description:
->    dwmmac based Qualcomm ethernet devices which support Gigabit
-> diff --git a/Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml b/Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml
-> index 758adb06c8dd..059cb87b4d6c 100644
-> --- a/Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml
-> +++ b/Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml
-> @@ -7,7 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
->  title: Qualcomm SM6115 Peripheral Authentication Service
->
->  maintainers:
-> -  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> +  - Bjorn Andersson <andersson@kernel.org>
-> +  - Konrad Dybcio <konradybcio@kernel.org>
->
->  description:
->    Qualcomm SM6115 SoC Peripheral Authentication Service loads and boots
-> --
-> 2.43.0
->
->
+> it changes phydev->duplex, which is _not_ supposed to happen if
+> negotiation has been disabled.
+
+There are no writes to phydev->duplex inside the "driver".
+Something in the phy core is changing it.
 
