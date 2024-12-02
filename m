@@ -1,74 +1,76 @@
-Return-Path: <netdev+bounces-148197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE8B09E0D42
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:43:47 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33A699E0C8E
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 20:50:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08C29B253C5
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 19:50:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7F0516544E
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 19:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5AA21DE4E7;
-	Mon,  2 Dec 2024 19:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D891DE8A0;
+	Mon,  2 Dec 2024 19:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LoKHV+nH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FfvV1Qa1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B221632FE;
-	Mon,  2 Dec 2024 19:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5621DE3C1;
+	Mon,  2 Dec 2024 19:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733169037; cv=none; b=h07TkRSs8mI2ZZGxzpJrZRHH+RstfJOoVCFSPDPTkJx0SuDXhBDBtj9E1n6PMVgRzc6tZpLmBfu1gOXnw68jDzEWvd+JcDJkyfaUo+SK6YGXw6SOcT5gdPge7o+ulRVildU+qIOIRat8i8sSnWklqjWtAy4SN94jw5AB0h/iiaI=
+	t=1733169044; cv=none; b=L77dixzx0CkzdB4+M7TH6zWCgkegm9BlNpPuV3ito+GRQW5BTFQPb/Jmv0xcsnck2chkhSb2S+nHnAmRNYPZKT8jlJQ2H0jg3eZ+WA9sarih+3fnASN2kUM0zhUIUAIrfjwVON8HPIkmVw7VtXOOtJBPEFLQWpmJx5A1s1Dx8Ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733169037; c=relaxed/simple;
-	bh=qWmrRSITex0bqNvb4G3jK4p92XZMgKN8OEGETSvrCxs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Yqeu0M1XGOF6jxVl8MoKYJ6X0zeQXd4mJjhyyrQHTRQSHLgwR11wMCsaIhx+3I9Urp5znZjTJVQXGTOFskTsr4yx1TroXRWyxMFmQ2FzTsB5BiQ1aOYIf7bkiwrdc7Ml3DvtFTEMNhe6qdCYqJxL/EgyscR4mlZJgPmkHa78wVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LoKHV+nH; arc=none smtp.client-ip=209.85.214.182
+	s=arc-20240116; t=1733169044; c=relaxed/simple;
+	bh=InhWf2Mvc3p9xuTrYBcwg2Km48DtBd5eBlfiJ9K+wJY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=eT28UkdOnIXNhN4MbPeKfpM18IOlYkDZJh/VWn7YGQz75DuqJEjOz5D2xPsMSdBxmd3r4KGiajCn4hzqh8ApLuBzaJjxJqxIeqluuodVRKkftRYlfxv9OrpIzn2eg4FH+bAscpIqvOoXHRmn3lulqozcYeGdLQTEt8odaEt/bxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FfvV1Qa1; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-215564e34acso4542565ad.3;
-        Mon, 02 Dec 2024 11:50:35 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2155db1c9bdso2360505ad.2;
+        Mon, 02 Dec 2024 11:50:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733169035; x=1733773835; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=j6KU1XTLeOsYpmnp4/FCdzEmkfYdYIrUYSYnSf6Dp50=;
-        b=LoKHV+nHusYzocKaU+W4oKmaYPN0HrulUQsABgxBojS/U993g+WK7qQMlauTvUHQpG
-         5lwdWUKrCQW240kSkcC++efFWKeGROk4HO9c7M3ty7tnJN3V5udP29FgKt99ABi1/C62
-         nQk9ENe3VIXfKPnMwXZsB/tV1VM/Z4yjnXHJ0F3mflMe/+c1WBPniYtg3TRIiXhHq+1F
-         E29EodbBZk8R3/PFn+V9/qTkIX0Pq9YtGBMTcfM7eXmyJQ++w5aKv6fIU9ImcPWs7LAP
-         ImO4IAlfc1JauxQC9iQxBLxnkMZWNryUbzxdlay/2m/ZWn1LgIpoxQ+cgozgbKAxpFcK
-         Wr5Q==
+        d=gmail.com; s=20230601; t=1733169043; x=1733773843; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gzJtZqYA3L83LZnNmBrcuQuakkPZwZ5W+9qyZIqzWOk=;
+        b=FfvV1Qa1YBHAbw79dr6D7VLChccOZXcX7ioh6CppLU4xp164e2XnPBgtIEHiuabprh
+         GunI1e4Zdw/HnvRKcGh6XLG7bEHVTkg9Zx4aWDtF0wLRQiGAj9ul3yO4cjR5h9kYWev8
+         zg976LeTJVF3j5huCn7UhE45YB3jbpZxTkYnD1SlRfSVd3SmD+jpVdXjA5PyQlINRI+u
+         kY9c9ttCy3M+cX9L8rBlHyeEx8nwa9UijGisg/ancgiSnP7hKP/CFIChfOHkmpktco2g
+         gPPypNKqljQkCqfcs/v0vvCGUS50jj1fO04GXSg4jMvHcXNZSnWQlX+fOce/MQkKfP/H
+         N6hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733169035; x=1733773835;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=j6KU1XTLeOsYpmnp4/FCdzEmkfYdYIrUYSYnSf6Dp50=;
-        b=d+gCGg0DTnGzl3tY8Z+GeXTE5yjmpPkfcM5EUCSD6FYMWjUcF1DbxRfAWPOqmK+f8l
-         yE9Z5Dkt50t86r8Ge1C5VbMqu2I6cQW3xgATzs9ybzcv1t8FuUpp2lhxQzA1JWD2zs5/
-         N7+fAxI3NQnsMLMzwIuCOxwO9M7VGA5uobsWT/5vpMZEMzg0cbwYMRYlQ0F+82aw0vPJ
-         b29P371V5eICoPPV5dcK9GT2c0evppKun2n0SeitxE9eeWhGzDoAN6YduyOFuQfO33+1
-         QsjE5/t6YS7DEc9QZ6YwogU8U4nFTbrMdprKFc5+zV2U0Cuax2g5h8rhRZtzcoUxuc3T
-         9Eww==
-X-Forwarded-Encrypted: i=1; AJvYcCU6rqL+//mljpwhr+Xa6g24IqCtEEyJx8GHy3OjamqX5fQs4sIk8+nklpr/8CfC6MhWpS7o95lrBwKvArI=@vger.kernel.org, AJvYcCVVJRuXNDeLCDKkjQs9JWb9Y+FpIq2c7U1OEuw2h+nocS28QbYGB0gHuei19ZIO9ykcTHvS6ETZ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQc54qnDka5/xc6G1ODjh3n5uORgCXujgfCGeP+rR2pWZwr3tx
-	Q+9TmE3Hmim2LM0J5QKrFyx8ywhfp39lGIWDwRpsBSrm8cPa/4OL
-X-Gm-Gg: ASbGncv6yoIb9EK5+tIks0oVSKmkohmIjXbTSThJ2ce5x1cC34bcxqlgdgOYXQj9a6h
-	ftR/oKper+WQ0tCxSiinXlfUQQ6CaGjhITlq4KIB2Ct+W8XVlSVQZc3p1nvfXmXYRBIZgJ2eS8L
-	Q0OJxb8ECVIRUrjGQG2ugnRbhlg0dXMCqWoTY0i+25preIjoflxFUfdol/G9DT+xumwaKln+Bfs
-	X0NZxMJniwMItbNRAM1hLb5liRhuMjUJLvoqwx/rd4xA0JMOGhdi8pXhUgS
-X-Google-Smtp-Source: AGHT+IGI0a0Oq3sOwa8XvTaGf7K2n6fayWnEXM23qQC2B0iYCFKkpAICa7oc7yYzF/YGOCIiZ7IPxg==
-X-Received: by 2002:a17:903:2301:b0:20c:f648:e388 with SMTP id d9443c01a7336-21501384201mr124247075ad.7.1733169035402;
-        Mon, 02 Dec 2024 11:50:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733169043; x=1733773843;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gzJtZqYA3L83LZnNmBrcuQuakkPZwZ5W+9qyZIqzWOk=;
+        b=DYBWYtTl3sem05MpKdQcuE7N9GoeUU2Zbsenmxmclxt6MKPP+LzetgEMH4YgNF0cGZ
+         nQwSyxit7ioaSFWQKtjJuN+vbUuIbtX+xbPXxWQnHPdAC7ZVNCDOD9sCgmRlQ++aVqTU
+         uux/Vno8uPx/ueNos+22CuDHtsfT83V3DHkAsv9CdkXH5nqOOsebPdcRBBE38HhHCp49
+         beT/gzgJY5XRUIXZKm/0uk29YYoHPI5Xffg/oQ1JngAmuk8kFvzMM8SY9uA+iiEz64jz
+         b4L2oQ9dHOebck18tAXAWsTyDXo4QdHF39cue6JVI16pRb7r9wQ1qbzlmCqB5aWBnHAy
+         wrEg==
+X-Forwarded-Encrypted: i=1; AJvYcCVGLz3bS2RshPHgmzuB/DQSHgAWJisn1zZvo7IDek750S7bQQVEYRhVgVoRxz/8hEqNske35gemCVC3Odw=@vger.kernel.org, AJvYcCWtFvgYaDY76HT1M5kJ0nSYwafRNxYJCSRldUjlXYFoYDkNmozLMOjFDrUtQ4RVXErh6ZLIqu6E@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqqkElorh4UvLSZJdGOT8U+8t5N2hythS+LZ/J+SKDKHK0BciU
+	irDDoMmJuA9moumuGp1M+09STWKES0VsjgNa9Bl6E2oa+QJMm4Ke
+X-Gm-Gg: ASbGncsleggMwDV4ofjMIHFRQGvn4PxAXSLVbS/WUF9/bC3ro5mqzBxKcAZbK132wHX
+	+KsU1FfPa8fh4oEhwOh3uHairLSZ4FWcM7cdRGPJkA7eICwa7kFXKHpCpdcbfDNtT/oU0U36ppD
+	bQBQb298nO130bDh43c6UXwJNbWmIC2B8G+FzgNAc55qKNC4lW1lM9+O1lJR3Bq5TLEiDUTyvGK
+	qjKU/K6ZZW08ShIQSmgTJQKLsYcGjONrmr5XPUtCq5H2nBdsXzGg7qwkRkx
+X-Google-Smtp-Source: AGHT+IGGxKhdzMiXncx1CtrIIMJJNAfm+HLlBcWZq9fZ88p6OSgS2i+0jhA7hIqZms3nIwfU1Mx5Vw==
+X-Received: by 2002:a17:902:e547:b0:215:7a16:8389 with SMTP id d9443c01a7336-2157a168657mr42453095ad.3.1733169042553;
+        Mon, 02 Dec 2024 11:50:42 -0800 (PST)
 Received: from nas-server.i.2e4.me ([156.251.176.191])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215218f553fsm81232515ad.6.2024.12.02.11.50.32
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215218f553fsm81232515ad.6.2024.12.02.11.50.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 11:50:35 -0800 (PST)
+        Mon, 02 Dec 2024 11:50:42 -0800 (PST)
 From: Zhiyuan Wan <kmlinuxm@gmail.com>
 To: andrew@lunn.ch
 Cc: kuba@kernel.org,
@@ -77,10 +79,12 @@ Cc: kuba@kernel.org,
 	willy.liu@realtek.com,
 	Zhiyuan Wan <kmlinuxm@gmail.com>,
 	Yuki Lee <febrieac@outlook.com>
-Subject: [PATCH 1/2] net: phy: realtek: add combo mode support for RTL8211FS
-Date: Tue,  3 Dec 2024 03:50:28 +0800
-Message-Id: <20241202195029.2045633-1-kmlinuxm@gmail.com>
+Subject: [PATCH 2/2] net: phy: realtek: add dt property to disable broadcast PHY address
+Date: Tue,  3 Dec 2024 03:50:29 +0800
+Message-Id: <20241202195029.2045633-2-kmlinuxm@gmail.com>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20241202195029.2045633-1-kmlinuxm@gmail.com>
+References: <20241202195029.2045633-1-kmlinuxm@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,128 +93,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The RTL8211FS chip is an ethernet transceiver with both copper MDIX and
-optical (SGMII) port, and it has ability to switch between copper and
-optical mode (combo mode).
+This patch add support to disable 'broadcast PHY address' feature of
+RTL8211F.
 
-On Linux kernel v6.12.1, the driver doesn't support negotiation port mode,
-which causes optical mode unusable, and copper mode works fine.
+This feature is enabled defaultly after a reset of this transceiver.
+When this feature is enabled, the phy not only responds to the
+configuration PHY address by pin states on board, but also responds
+to address 0, the optional broadcast address of the MDIO bus.
 
-This patch solved the issue above by add negotiation phase for this
-transceiver chip, allows this transceiver works in combo mode.
+But not every transceiver supports this feature, when RTL8211
+shares one MDIO bus with other transceivers which doesn't support
+this feature, like mt7530 switch chip (integrated in mt7621 SoC),
+it usually causes address conflict, leads to the
+port of RTL8211FS stops working.
+
+This patch adds dt property `realtek,phyad0-disable` to disable
+broadcast PHY address feature of this transceiver.
+
+This patch did not change the default behavior of this driver.
 
 Signed-off-by: Yuki Lee <febrieac@outlook.com>
 Signed-off-by: Zhiyuan Wan <kmlinuxm@gmail.com>
 ---
- drivers/net/phy/realtek.c | 67 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 66 insertions(+), 1 deletion(-)
+ drivers/net/phy/realtek.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index f65d7f1f3..10a87d58c 100644
+index 10a87d58c..014dd2da1 100644
 --- a/drivers/net/phy/realtek.c
 +++ b/drivers/net/phy/realtek.c
-@@ -32,6 +32,11 @@
+@@ -31,6 +31,7 @@
+ #define RTL8211F_PHYCR1				0x18
  #define RTL8211F_PHYCR2				0x19
  #define RTL8211F_INSR				0x1d
++#define RTL8211F_PHYAD0_EN			BIT(13)
  
-+#define RTL8211FS_FIBER_ESR			0x0F
-+#define RTL8211FS_MODE_MASK			0xC000
-+#define RTL8211FS_MODE_COPPER			0
-+#define RTL8211FS_MODE_FIBER			1
-+
- #define RTL8211F_LEDCR				0x10
- #define RTL8211F_LEDCR_MODE			BIT(15)
- #define RTL8211F_LEDCR_ACT_TXRX			BIT(4)
-@@ -110,6 +115,7 @@ struct rtl821x_priv {
- 	u16 phycr1;
- 	u16 phycr2;
- 	bool has_phycr2;
-+	int lastmode;
- 	struct clk *clk;
- };
- 
-@@ -163,6 +169,44 @@ static int rtl821x_probe(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int rtl8211f_mode(struct phy_device *phydev)
-+{
-+	u16 val;
-+
-+	val = __phy_read(phydev, RTL8211FS_FIBER_ESR);
-+	val &= RTL8211FS_MODE_MASK;
-+
-+	if (val)
-+		return RTL8211FS_MODE_FIBER;
-+	else
-+		return RTL8211FS_MODE_COPPER;
-+}
-+
-+static int rtl8211f_config_aneg(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	struct rtl821x_priv *priv = phydev->priv;
-+
-+	ret = genphy_read_abilities(phydev);
-+	if (ret < 0)
-+		return ret;
-+
-+	linkmode_copy(phydev->advertising, phydev->supported);
-+
-+	if (rtl8211f_mode(phydev) == RTL8211FS_MODE_FIBER) {
-+		dev_dbg(&phydev->mdio.dev, "fiber link up");
-+		priv->lastmode = RTL8211FS_MODE_FIBER;
-+		return genphy_c37_config_aneg(phydev);
-+	}
-+
-+	dev_dbg(&phydev->mdio.dev, "copper link up");
-+
-+	priv->lastmode = RTL8211FS_MODE_COPPER;
-+
-+	return genphy_config_aneg(phydev);
-+}
-+
- static int rtl8201_ack_interrupt(struct phy_device *phydev)
- {
- 	int err;
-@@ -732,6 +776,26 @@ static int rtlgen_read_status(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int rtl8211f_read_status(struct phy_device *phydev)
-+{
-+	int ret;
-+	struct rtl821x_priv *priv = phydev->priv;
-+	bool changed = false;
-+
-+	if (rtl8211f_mode(phydev) != priv->lastmode) {
-+		changed = true;
-+		ret = rtl8211f_config_aneg(phydev);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = genphy_restart_aneg(phydev);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	return genphy_c37_read_status(phydev, &changed);
-+}
-+
- static int rtlgen_read_mmd(struct phy_device *phydev, int devnum, u16 regnum)
- {
+ #define RTL8211FS_FIBER_ESR			0x0F
+ #define RTL8211FS_MODE_MASK			0xC000
+@@ -421,12 +422,18 @@ static int rtl8211f_config_init(struct phy_device *phydev)
+ 	struct device *dev = &phydev->mdio.dev;
+ 	u16 val_txdly, val_rxdly;
  	int ret;
-@@ -1375,7 +1439,8 @@ static struct phy_driver realtek_drvs[] = {
- 		.name		= "RTL8211F Gigabit Ethernet",
- 		.probe		= rtl821x_probe,
- 		.config_init	= &rtl8211f_config_init,
--		.read_status	= rtlgen_read_status,
-+		.config_aneg	= rtl8211f_config_aneg,
-+		.read_status	= rtl8211f_read_status,
- 		.config_intr	= &rtl8211f_config_intr,
- 		.handle_interrupt = rtl8211f_handle_interrupt,
- 		.suspend	= rtl821x_suspend,
++	u16 phyad0_disable = 0;
+ 
++	if (of_property_read_bool(dev->of_node, "realtek,phyad0-disable")) {
++		phyad0_disable = RTL8211F_PHYAD0_EN;
++		dev_dbg(dev, "disabling MDIO address 0 for this phy");
++	}
+ 	ret = phy_modify_paged_changed(phydev, 0xa43, RTL8211F_PHYCR1,
+-				       RTL8211F_ALDPS_PLL_OFF | RTL8211F_ALDPS_ENABLE | RTL8211F_ALDPS_XTAL_OFF,
++				       RTL8211F_ALDPS_PLL_OFF  | RTL8211F_ALDPS_ENABLE |
++				       RTL8211F_ALDPS_XTAL_OFF | phyad0_disable,
+ 				       priv->phycr1);
+ 	if (ret < 0) {
+-		dev_err(dev, "aldps mode  configuration failed: %pe\n",
++		dev_err(dev, "mode configuration failed: %pe\n",
+ 			ERR_PTR(ret));
+ 		return ret;
+ 	}
 -- 
 2.30.2
 
