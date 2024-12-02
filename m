@@ -1,178 +1,109 @@
-Return-Path: <netdev+bounces-147965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1C199DF892
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 02:24:27 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0263D9DF89E
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 02:51:32 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 669FE2814B3
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 01:24:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B852E1621DC
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 01:51:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FFF0EEBA;
-	Mon,  2 Dec 2024 01:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B27D31799B;
+	Mon,  2 Dec 2024 01:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="dMKX7oBo"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2DF8494;
-	Mon,  2 Dec 2024 01:24:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECD8171C9
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 01:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733102665; cv=none; b=emJ8f4kqULuj2fuuPZQxi3+OYEavtB6pipfRKylmGWv0ZsTfVFMbc2sVd57tbJ0L0fQUkiK77p6u/CjrGRGz2j7KKe5qCZ8Ye/ti0BULAjyv8ieI6ONzciNnxOF3brG+18H6gQ9w6yzDYr696mbcoZut7WX/g0PHQeVDN92troc=
+	t=1733104289; cv=none; b=Yx3jSkb2dmNTAJ1qWepdejSJv/N33JhkGygWQoJ2t7hurFRtolCCOeGit18LdJj23AwcdK3/uT8tGFlxEtYy17BFWg+aS0QUmGYCIT4NxxyLuBTubd5yweKi0RGXHyuhICs2Ht//DgAj7/Ubb2NQiGlvnOnL6+sPVEAAZyIbVFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733102665; c=relaxed/simple;
-	bh=4iAz8I7YKusTIe18EUTKqYq8uvOeXleABaLuPL1Tahs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K3dfw/xFvhFS5I9mNBjUVcIbPT1yZ02OmwWr5g9FrRRDz2dhjg+28IvUBlsxjVOu0tZXhHtyohPEDJlJKhWmMI81578iY7dxt1Ah5jD2StlYDnngpSHCUb5GGBw4z/7+WyEV2nkViQwZEmuNBd1SoF3ilZ62vW6dMRLdfTHbK04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.39.247] (port=54636 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1tHvAY-006uNr-LW; Mon, 02 Dec 2024 02:24:12 +0100
-Date: Mon, 2 Dec 2024 02:24:09 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	fw@strlen.de
-Subject: Re: [PATCH net 4/4] netfilter: nft_inner: incorrect percpu area
- handling under softirq
-Message-ID: <Z00MOYmYgmlrrpWN@calendula>
-References: <20241128123840.49034-1-pablo@netfilter.org>
- <20241128123840.49034-5-pablo@netfilter.org>
- <CANn89iKGUKxLGY4UG9JrAVQR5bahHrUurf7TVwPcE4rf4g3cAQ@mail.gmail.com>
+	s=arc-20240116; t=1733104289; c=relaxed/simple;
+	bh=2l3KE7bylHjFVh5AXBsoFd78q2e9cugb2NxB61CQJtc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bXp9SIwcPQNv0/T2XLpOf+wpnyTau3Rueq7tOx4D3gL3btWPhKnDepTWumaHplDKpuWme0qkjEnaKopcNCl4jCwQMbWJXAzL3FY3lKVg/48GC52EMAxmOeeXgpIGMupTZNS3XO6DI2wAHb4fazN4k4cbaMiacNSBJwF5RgvVZgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=dMKX7oBo; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1733104287; x=1764640287;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=XiSLoYsQiWsbbS7djHjMKXWrQNxZdVfh0udBekthVAE=;
+  b=dMKX7oBoOE6TQyrTiFcNgY0EiHGcW56GmT21Hp0WHOg6ovy4lb2mPR9o
+   GZy4J23phl+EhPe/t2iT+l39MOjosOrL3klJiEEPsZUEOLWoe1RmUogkx
+   T0FYR7Ywa+owXGmFycVwlkWbVGyurcTlXx3Bj98OVJP8SdKnawOb/f4W6
+   U=;
+X-IronPort-AV: E=Sophos;i="6.12,201,1728950400"; 
+   d="scan'208";a="442216795"
+Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 01:51:22 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:25731]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.147:2525] with esmtp (Farcaster)
+ id ae2e2f8d-3f30-4193-8ec6-00eed72b1b74; Mon, 2 Dec 2024 01:51:21 +0000 (UTC)
+X-Farcaster-Flow-ID: ae2e2f8d-3f30-4193-8ec6-00eed72b1b74
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 2 Dec 2024 01:51:21 +0000
+Received: from 6c7e67c6786f.amazon.com (10.119.8.244) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Mon, 2 Dec 2024 01:51:18 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <xiyou.wangcong@gmail.com>
+CC: <cong.wang@bytedance.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<syzbot+21ba4d5adff0b6a7cfc6@syzkaller.appspotmail.com>
+Subject: Re: [Patch net v2] rtnetlink: fix double call of rtnl_link_get_net_ifla()
+Date: Mon, 2 Dec 2024 10:51:12 +0900
+Message-ID: <20241202015112.78882-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241129212519.825567-1-xiyou.wangcong@gmail.com>
+References: <20241129212519.825567-1-xiyou.wangcong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iKGUKxLGY4UG9JrAVQR5bahHrUurf7TVwPcE4rf4g3cAQ@mail.gmail.com>
-X-Spam-Score: -1.9 (-)
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D037UWC001.ant.amazon.com (10.13.139.197) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hi Eric,
-
-On Fri, Nov 29, 2024 at 10:14:34AM +0100, Eric Dumazet wrote:
-> On Thu, Nov 28, 2024 at 1:38 PM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> >
-> > Softirq can interrupt packet from process context which walks over the
-> > percpu area.
-> >
-> > Add routines to disable bh while restoring and saving the tunnel parser
-> > context from percpu area to stack. Add a skbuff owner for this percpu
-> > area to catch softirq interference to exercise the packet tunnel parser
-> > again in such case.
-> >
-> > Reported-by: syzbot+84d0441b9860f0d63285@syzkaller.appspotmail.com
-> > Fixes: 3a07327d10a0 ("netfilter: nft_inner: support for inner tunnel header matching")
-> > Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> > ---
-> >  include/net/netfilter/nf_tables_core.h |  1 +
-> >  net/netfilter/nft_inner.c              | 56 ++++++++++++++++++++------
-> >  2 files changed, 45 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/include/net/netfilter/nf_tables_core.h b/include/net/netfilter/nf_tables_core.h
-> > index ff27cb2e1662..dae0e7592934 100644
-> > --- a/include/net/netfilter/nf_tables_core.h
-> > +++ b/include/net/netfilter/nf_tables_core.h
-> > @@ -161,6 +161,7 @@ enum {
-> >  };
-> >
-> >  struct nft_inner_tun_ctx {
-> > +       struct sk_buff *skb;    /* percpu area owner */
-> >         u16     type;
-> >         u16     inner_tunoff;
-> >         u16     inner_lloff;
-> > diff --git a/net/netfilter/nft_inner.c b/net/netfilter/nft_inner.c
-> > index 928312d01eb1..fcaa126ac8da 100644
-> > --- a/net/netfilter/nft_inner.c
-> > +++ b/net/netfilter/nft_inner.c
-> > @@ -210,35 +210,65 @@ static int nft_inner_parse(const struct nft_inner *priv,
-> >                            struct nft_pktinfo *pkt,
-> >                            struct nft_inner_tun_ctx *tun_ctx)
-> >  {
-> > -       struct nft_inner_tun_ctx ctx = {};
-> >         u32 off = pkt->inneroff;
-> >
-> >         if (priv->flags & NFT_INNER_HDRSIZE &&
-> > -           nft_inner_parse_tunhdr(priv, pkt, &ctx, &off) < 0)
-> > +           nft_inner_parse_tunhdr(priv, pkt, tun_ctx, &off) < 0)
-> >                 return -1;
-> >
-> >         if (priv->flags & (NFT_INNER_LL | NFT_INNER_NH)) {
-> > -               if (nft_inner_parse_l2l3(priv, pkt, &ctx, off) < 0)
-> > +               if (nft_inner_parse_l2l3(priv, pkt, tun_ctx, off) < 0)
-> >                         return -1;
-> >         } else if (priv->flags & NFT_INNER_TH) {
-> > -               ctx.inner_thoff = off;
-> > -               ctx.flags |= NFT_PAYLOAD_CTX_INNER_TH;
-> > +               tun_ctx->inner_thoff = off;
-> > +               tun_ctx->flags |= NFT_PAYLOAD_CTX_INNER_TH;
-> >         }
-> >
-> > -       *tun_ctx = ctx;
-> >         tun_ctx->type = priv->type;
-> > +       tun_ctx->skb = pkt->skb;
-> >         pkt->flags |= NFT_PKTINFO_INNER_FULL;
-> >
-> >         return 0;
-> >  }
-> >
-> > +static bool nft_inner_restore_tun_ctx(const struct nft_pktinfo *pkt,
-> > +                                     struct nft_inner_tun_ctx *tun_ctx)
-> > +{
-> > +       struct nft_inner_tun_ctx *this_cpu_tun_ctx;
-> > +
-> > +       local_bh_disable();
-> > +       this_cpu_tun_ctx = this_cpu_ptr(&nft_pcpu_tun_ctx);
-> > +       if (this_cpu_tun_ctx->skb != pkt->skb) {
+From: Cong Wang <xiyou.wangcong@gmail.com>
+Date: Fri, 29 Nov 2024 13:25:19 -0800
+> From: Cong Wang <cong.wang@bytedance.com>
 > 
-> I must say I do not understand this patch.
+> Currently rtnl_link_get_net_ifla() gets called twice when we create
+> peer devices, once in rtnl_add_peer_net() and once in each ->newlink()
+> implementation.
 > 
-> If a context is used by a save/restore more than one time per packet
-> traversal, then this means we can not use per-cpu storage,
-> or risk flakes.
+> This looks safer, however, it leads to a classic Time-of-Check to
+> Time-of-Use (TOCTOU) bug since IFLA_NET_NS_PID is very dynamic. And
+> because of the lack of checking error pointer of the second call, it
+> also leads to a kernel crash as reported by syzbot.
 > 
-> Also, skb could be freed and re-allocated ?
+> Fix this by getting rid of the second call, which already becomes
+> redudant after Kuniyuki's work. We have to propagate the result of the
+> first rtnl_link_get_net_ifla() down to each ->newlink().
 > 
-> Perhaps describe a bit more what is going on in the changelog.
+> Reported-by: syzbot+21ba4d5adff0b6a7cfc6@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=21ba4d5adff0b6a7cfc6
+> Fixes: 0eb87b02a705 ("veth: Set VETH_INFO_PEER to veth_link_ops.peer_type.")
+> Fixes: 6b84e558e95d ("vxcan: Set VXCAN_INFO_PEER to vxcan_link_ops.peer_type.")
+> Fixes: fefd5d082172 ("netkit: Set IFLA_NETKIT_PEER_INFO to netkit_link_ops.peer_type.")
+> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
 
-There is an on-stack nft_pktinfo structure with a flags field. This
-nft_pktinfo is a wrapper for the sk_buff, containing header offsets
-and metainformation. This is initialize when entering this chain.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-If the NFT_PKTINFO_INNER_FULL flag is set on, then the percpu area
-could contain information on the inner header offsets (ie. packet was
-already parsed in this chain).
-
-There is a check to validate that the percpu area refers to this
-skbuff. If there is a mismatch, then this needs to parse the inner
-headers because the data in the percpu area is stale. Otherwise, if
-there is a match, the percpu area is copied on-stack.
-
-After processing (payload/meta fetching), the on-stack copy is stored
-back to the percpu area. I can make an improvement on this patch to
-check if this skbuff still owns the percpu area in the store/exit
-section of this inner evaluation routine, to avoid a unnecessary update.
-
-So, it is basically the NFT_PKTINFO_INNER_FULL flag that handles the
-skbuff reallocation scenario. This is not blindly trusting this percpu
-area per-se.
-
-One comestic change I can apply to this: I can also turn the struct
-sk_buff into unsigned long so it clear to the reader this pointer to
-skbuff is not meant to be used for being dereferenced.
-
-If the explaination above is sufficient, I can revamp to extend the
-changelog as you suggest and post a new version of this patch.
-
-Thanks.
+Thanks for the fix and nice cleanup :)
 
