@@ -1,60 +1,62 @@
-Return-Path: <netdev+bounces-148068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2BBB9E051E
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:34:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B5519E0524
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:36:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17C9D169F46
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 14:31:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4ECF162284
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 14:31:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E40672040A8;
-	Mon,  2 Dec 2024 14:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07749205AB6;
+	Mon,  2 Dec 2024 14:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y4CINhR4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TsvQXZkq"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32752036FE
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 14:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B149204F6B
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 14:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733149872; cv=none; b=buhiLKTm/Rmpmi57f1cedUD6uoqfKw4SH9jmXOEbMfpaTAJG8CbFFtEj95QsjFK0MfqUnPk/lcm1LLkc2/xpdcJbXK5EE4U05GaWHGNnWKZMOP6h8A3WdPHl9MUyeCP2XXWDoZaMX8vLOZUi/8MH/a7fNS3I83zUzeJ+giUlpzU=
+	t=1733149877; cv=none; b=E61kkBwPHeIIbGKsHC6lXSdCEPJU12JR2n32FSjF1dQLcZShxdl839WNz99EbcSdgP+Jtk+TGU9tJSo85H2nDI3XKWp25UoEIiuc3oFpmYVRO0ncet24xHoqgNVLlp2sYc3q8u1o2+t49Xt0m5oSplmcrj9WhpOvEBuyxzL0/5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733149872; c=relaxed/simple;
-	bh=9nTc5lBxm6iQsEI968kaoAmSOgzYL1FCYMc035TxRAM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UtHv8LG7gIaujN9ZawV/LRNZZgpfC0NeZKir3mVnVT3MJwe2/SzWa70nIMGC17SWYrPbKCFaQ1ki3TN2zQ8LnSAOce3Or0qWV9xISj+614YyaGyQ2r/r8IWN+DpX0tdrpGRdVgrvE2s/4remiiVSnEwvLqO2NiMi5IWghx+6k0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y4CINhR4; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1733149877; c=relaxed/simple;
+	bh=LiembOcurmOw4+40ybsntquCMb6mhOp2FYXN7pIggRs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GoEIbor3PmSjU+Fa4XiN9aR5VBhNxIoh6vJ+8lomKbwdmxM96QrYG7PxfLHUwU5S9WyPnCqWs4V15mNALC8nEIYHmMLkgUdz/Uyu1Nq7R+m5mURM9RFPWT2VqUxtaEiyflVMwgm47g3A7mPFhI758DlrFlfZvrixMf1bZkp/vM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TsvQXZkq; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733149869;
+	s=mimecast20190719; t=1733149874;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=d1W05VOqDmoIuUvbLho/+XrpsQQwhtbljwSHTaxp4E8=;
-	b=Y4CINhR4MBmBZfAeItHqLfGzlgY0E4VJwcLGkaeO72u+AJgVisbYtM1fwfRw0IcaEXIY9Z
-	UCFIAn6hJAzLmU8wJYZWST4hF7rCWAPNb4loZMqY3rZaC1FaoSDJG8HKA34CqMoqIYVbf3
-	8uDIb1EMAYmXBlZj/pPWtGGflr0YHx4=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SgDcxHvMPuaNGZPmBKKvBNkHii79DsY2D29vW13rUKI=;
+	b=TsvQXZkqK11mHD7Xwro2MRIiecKAsz2NepbooL4AxXCC8G4h+z5/4tmJ6qJmQ44v4yRN8U
+	7SdTWqYWEpjgK4gBJ66I3tdBy+ZvWWTFB4gs0+zAXXo5j2+8S23JnHPwkcudTql5R3c6KG
+	pOTCHL8AoymzXhXI3kGb9A47bGcOUkE=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-335--myByFoVM7eUeAsWHDDrUg-1; Mon,
- 02 Dec 2024 09:31:05 -0500
-X-MC-Unique: -myByFoVM7eUeAsWHDDrUg-1
-X-Mimecast-MFC-AGG-ID: -myByFoVM7eUeAsWHDDrUg
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-611-5STL2LY6OqKKOrBVvSbyDQ-1; Mon,
+ 02 Dec 2024 09:31:11 -0500
+X-MC-Unique: 5STL2LY6OqKKOrBVvSbyDQ-1
+X-Mimecast-MFC-AGG-ID: 5STL2LY6OqKKOrBVvSbyDQ
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CCDBB195D000;
-	Mon,  2 Dec 2024 14:31:03 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1D88E1945117;
+	Mon,  2 Dec 2024 14:31:08 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.42.28.48])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D03061955D45;
-	Mon,  2 Dec 2024 14:31:00 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 168CF1955D47;
+	Mon,  2 Dec 2024 14:31:04 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -66,9 +68,11 @@ Cc: David Howells <dhowells@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 00/37] rxrpc: Implement jumbo DATA transmission and RACK-TLP
-Date: Mon,  2 Dec 2024 14:30:18 +0000
-Message-ID: <20241202143057.378147-1-dhowells@redhat.com>
+Subject: [PATCH net-next 01/37] rxrpc: Fix handling of received connection abort
+Date: Mon,  2 Dec 2024 14:30:19 +0000
+Message-ID: <20241202143057.378147-2-dhowells@redhat.com>
+In-Reply-To: <20241202143057.378147-1-dhowells@redhat.com>
+References: <20241202143057.378147-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,175 +82,113 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Here's a series of patches to implement two main features:
+Fix the handling of a connection abort that we've received.  Though the
+abort is at the connection level, it needs propagating to the calls on that
+connection.  Whilst the propagation bit is performed, the calls aren't then
+woken up to go and process their termination, and as no further input is
+forthcoming, they just hang.
 
- (1) The transmission of jumbo data packets whereby several DATA packets of
-     a particular size can be glued together into a single UDP packet,
-     allowing us to make use of larger MTU sizes.  The basic jumbo
-     subpacket capacity is 1412 bytes (RXRPC_JUMBO_DATALEN) and, say, an
-     MTU of 8192 allows five of them to be transmitted as one.
+Also add some tracing for the logging of connection aborts.
 
-     An alternative (and possibly more efficient way) would be to
-     expand/shrink the capacity of each DATA packet to match the MTU and
-     thus save on header and tail-gap overhead, but the Rx protocol does
-     not provide a mechanism for splitting the data - especially as the
-     transported data is encrypted per-packet - and so UDP fragmentation
-     would be the only way to handle this.
+Fixes: 248f219cb8bc ("rxrpc: Rewrite the data and ack handling code")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+---
+ include/trace/events/rxrpc.h | 25 +++++++++++++++++++++++++
+ net/rxrpc/conn_event.c       | 12 ++++++++----
+ 2 files changed, 33 insertions(+), 4 deletions(-)
 
-     In fact, in the future, AF_RXRPC also needs to look at shrinking the
-     packet size where the MTU is smaller - for instance in the case of
-     being carried by IPv6 over wifi where there isn't capacity for a 1412
-     byte capacity.
-
- (2) RACK-TLP to manage packet loss and retransmission in conjunction with
-     the congestion control algorithm.
-
-These allow for better data throughput and work towards being able to have
-larger transmission windows.
-
-To this end, the following changes are also made:
-
- (1) Use a single large array of kvec structs for the I/O thread rather
-     than having one per transmission buffer.  We need a much bigger
-     collection of kvecs for ping padding
-
- (2) Implement path-MTU probing by sending padded PING ACK packets and
-     monitoring for PING RESPONSE ACKs.  The pmtud value determined is used
-     to configure the construction of jumbo DATA packets.
-
- (3) The transmission queue is changed from a linked list of transmission
-     buffer structs to a linked list of transmission-queue structs, each of
-     which points to either 32 or 64 transmission buffers (depending on cpu
-     word size) and various bits of metadata are concentrated in the queue
-     structs rather than the buffers to make better use of the cpu cache.
-
- (4) SACK data is stored in the transmission-queue structures in batches of
-     32 or 64 making it faster to process rather than being spread amongst
-     all the individual packet buffers.
-
- (5) Don't change the DF flag on the UDP socket unless we need to - and
-     basically only enable it for path-MTU probing.
-
-There are also some additional bits:
-
- (1) Fix the handling of connection aborts to poke the aborted connections.
-
- (2) Don't set the MORE-PACKETS Rx header flag on the wire.  No one
-     actually checks it and it is, in any case, generated inconsistently
-     between implementations.
-
- (3) Request an ACK when, during call transmission, there's a stall in the
-     app generating the data to be transmitted.
-
- (4) Fix attention starvation in the I/O thread by making sure we go
-     through all outstanding events rather than returning to the beginning
-     of the check cycle after any time we process an event.
-
- (5) Don't use the skbuff timestamp in the calculation of timeouts and RTT
-     as we really should include local processing time in that too.
-     Further, getting receive skbuff timestamps may be expensive.
-
- (6) Make RTT tracking per call with the saving of the value between calls,
-     even within the same connection channel.  The initial call timeout
-     starts off large to allow the server time to set up its state before
-     the initial reply.
-
- (7) Don't allocate txbuf structs for ACK packets, but rather use page
-     frags and MSG_SPLICE_PAGES.
-
- (8) Use irq-disabling locks for interactions between app threads and I/O
-     threads so that the I/O thread doesn't get help up.
-
- (9) Make rxrpc set the REQUEST-ACK flag on an outgoing packet when cwnd is
-     at RXRPC_MIN_CWND (currently 4), not at 2 which it can never reach.
-
-(10) Add some tracing bits and pieces (including displaying the userStatus
-     field in an ACK header) and some more stats counters (including
-     different sizes of jumbo packets sent/received).
-
-The patches can also be found on this branch:
-
-	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-iothread
-
-David
-
-Link: https://lore.kernel.org/r/20240306000655.1100294-1-dhowells@redhat.com/ [1]
-
-David Howells (37):
-  rxrpc: Fix handling of received connection abort
-  rxrpc: Use umin() and umax() rather than min_t()/max_t() where
-    possible
-  rxrpc: Clean up Tx header flags generation handling
-  rxrpc: Don't set the MORE-PACKETS rxrpc wire header flag
-  rxrpc: Show stats counter for received reason-0 ACKs
-  rxrpc: Request an ACK on impending Tx stall
-  rxrpc: Use a large kvec[] in rxrpc_local rather than every rxrpc_txbuf
-  rxrpc: Implement path-MTU probing using padded PING ACKs (RFC8899)
-  rxrpc: Separate the packet length from the data length in rxrpc_txbuf
-  rxrpc: Prepare to be able to send jumbo DATA packets
-  rxrpc: Add a tracepoint to show variables pertinent to jumbo packet
-    size
-  rxrpc: Fix CPU time starvation in I/O thread
-  rxrpc: Fix injection of packet loss
-  rxrpc: Only set DF=1 on initial DATA transmission
-  rxrpc: Timestamp DATA packets before transmitting them
-  rxrpc: Implement progressive transmission queue struct
-  rxrpc: call->acks_hard_ack is now the same call->tx_bottom, so remove
-    it
-  rxrpc: Replace call->acks_first_seq with tracking of the hard ACK
-    point
-  rxrpc: Display stats about jumbo packets transmitted and received
-  rxrpc: Adjust names and types of congestion-related fields
-  rxrpc: Use the new rxrpc_tx_queue struct to more efficiently process
-    ACKs
-  rxrpc: Store the DATA serial in the txqueue and use this in RTT calc
-  rxrpc: Don't use received skbuff timestamps
-  rxrpc: Generate rtt_min
-  rxrpc: Adjust the rxrpc_rtt_rx tracepoint
-  rxrpc: Display userStatus in rxrpc_rx_ack trace
-  rxrpc: Fix the calculation and use of RTO
-  rxrpc: Fix initial resend timeout
-  rxrpc: Send jumbo DATA packets
-  rxrpc: Don't allocate a txbuf for an ACK transmission
-  rxrpc: Use irq-disabling spinlocks between app and I/O thread
-  rxrpc: Tidy up the ACK parsing a bit
-  rxrpc: Add a reason indicator to the tx_data tracepoint
-  rxrpc: Add a reason indicator to the tx_ack tracepoint
-  rxrpc: Manage RTT per-call rather than per-peer
-  rxrpc: Fix request for an ACK when cwnd is minimum
-  rxrpc: Implement RACK/TLP to deal with transmission stalls [RFC8985]
-
- include/trace/events/rxrpc.h | 878 ++++++++++++++++++++++++++++++-----
- lib/win_minmax.c             |   1 +
- net/rxrpc/Makefile           |   1 +
- net/rxrpc/af_rxrpc.c         |   4 +-
- net/rxrpc/ar-internal.h      | 339 +++++++++++---
- net/rxrpc/call_accept.c      |  22 +-
- net/rxrpc/call_event.c       | 385 ++++++++-------
- net/rxrpc/call_object.c      |  67 +--
- net/rxrpc/conn_client.c      |  26 +-
- net/rxrpc/conn_event.c       |  38 +-
- net/rxrpc/conn_object.c      |  14 +-
- net/rxrpc/input.c            | 706 +++++++++++++++++-----------
- net/rxrpc/input_rack.c       | 422 +++++++++++++++++
- net/rxrpc/insecure.c         |   5 +-
- net/rxrpc/io_thread.c        | 109 ++---
- net/rxrpc/local_object.c     |   3 -
- net/rxrpc/misc.c             |   4 +-
- net/rxrpc/output.c           | 557 ++++++++++++++--------
- net/rxrpc/peer_event.c       | 112 ++++-
- net/rxrpc/peer_object.c      |  30 +-
- net/rxrpc/proc.c             |  58 ++-
- net/rxrpc/protocol.h         |  13 +-
- net/rxrpc/recvmsg.c          |  18 +-
- net/rxrpc/rtt.c              | 103 ++--
- net/rxrpc/rxkad.c            |  59 ++-
- net/rxrpc/rxperf.c           |   2 +-
- net/rxrpc/security.c         |   4 +-
- net/rxrpc/sendmsg.c          |  88 +++-
- net/rxrpc/sysctl.c           |   6 +-
- net/rxrpc/txbuf.c            | 127 +----
- 30 files changed, 2968 insertions(+), 1233 deletions(-)
- create mode 100644 net/rxrpc/input_rack.c
+diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
+index d03e0bd8c028..27c23873c881 100644
+--- a/include/trace/events/rxrpc.h
++++ b/include/trace/events/rxrpc.h
+@@ -117,6 +117,7 @@
+ #define rxrpc_call_poke_traces \
+ 	EM(rxrpc_call_poke_abort,		"Abort")	\
+ 	EM(rxrpc_call_poke_complete,		"Compl")	\
++	EM(rxrpc_call_poke_conn_abort,		"Conn-abort")	\
+ 	EM(rxrpc_call_poke_error,		"Error")	\
+ 	EM(rxrpc_call_poke_idle,		"Idle")		\
+ 	EM(rxrpc_call_poke_set_timeout,		"Set-timo")	\
+@@ -282,6 +283,7 @@
+ 	EM(rxrpc_call_see_activate_client,	"SEE act-clnt") \
+ 	EM(rxrpc_call_see_connect_failed,	"SEE con-fail") \
+ 	EM(rxrpc_call_see_connected,		"SEE connect ") \
++	EM(rxrpc_call_see_conn_abort,		"SEE conn-abt") \
+ 	EM(rxrpc_call_see_disconnected,		"SEE disconn ") \
+ 	EM(rxrpc_call_see_distribute_error,	"SEE dist-err") \
+ 	EM(rxrpc_call_see_input,		"SEE input   ") \
+@@ -981,6 +983,29 @@ TRACE_EVENT(rxrpc_rx_abort,
+ 		      __entry->abort_code)
+ 	    );
+ 
++TRACE_EVENT(rxrpc_rx_conn_abort,
++	    TP_PROTO(const struct rxrpc_connection *conn, const struct sk_buff *skb),
++
++	    TP_ARGS(conn, skb),
++
++	    TP_STRUCT__entry(
++		    __field(unsigned int,	conn)
++		    __field(rxrpc_serial_t,	serial)
++		    __field(u32,		abort_code)
++			     ),
++
++	    TP_fast_assign(
++		    __entry->conn = conn->debug_id;
++		    __entry->serial = rxrpc_skb(skb)->hdr.serial;
++		    __entry->abort_code = skb->priority;
++			   ),
++
++	    TP_printk("C=%08x ABORT %08x ac=%d",
++		      __entry->conn,
++		      __entry->serial,
++		      __entry->abort_code)
++	    );
++
+ TRACE_EVENT(rxrpc_rx_challenge,
+ 	    TP_PROTO(struct rxrpc_connection *conn, rxrpc_serial_t serial,
+ 		     u32 version, u32 nonce, u32 min_level),
+diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
+index 598b4ee389fc..2a1396cd892f 100644
+--- a/net/rxrpc/conn_event.c
++++ b/net/rxrpc/conn_event.c
+@@ -63,11 +63,12 @@ int rxrpc_abort_conn(struct rxrpc_connection *conn, struct sk_buff *skb,
+ /*
+  * Mark a connection as being remotely aborted.
+  */
+-static bool rxrpc_input_conn_abort(struct rxrpc_connection *conn,
++static void rxrpc_input_conn_abort(struct rxrpc_connection *conn,
+ 				   struct sk_buff *skb)
+ {
+-	return rxrpc_set_conn_aborted(conn, skb, skb->priority, -ECONNABORTED,
+-				      RXRPC_CALL_REMOTELY_ABORTED);
++	trace_rxrpc_rx_conn_abort(conn, skb);
++	rxrpc_set_conn_aborted(conn, skb, skb->priority, -ECONNABORTED,
++			       RXRPC_CALL_REMOTELY_ABORTED);
+ }
+ 
+ /*
+@@ -202,11 +203,14 @@ static void rxrpc_abort_calls(struct rxrpc_connection *conn)
+ 
+ 	for (i = 0; i < RXRPC_MAXCALLS; i++) {
+ 		call = conn->channels[i].call;
+-		if (call)
++		if (call) {
++			rxrpc_see_call(call, rxrpc_call_see_conn_abort);
+ 			rxrpc_set_call_completion(call,
+ 						  conn->completion,
+ 						  conn->abort_code,
+ 						  conn->error);
++			rxrpc_poke_call(call, rxrpc_call_poke_conn_abort);
++		}
+ 	}
+ 
+ 	_leave("");
 
 
