@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-148214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22FB49E0DBC
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 22:24:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 588F59E0DBE
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 22:24:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B07F2282640
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:24:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1105D28284E
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF9021DFD9A;
-	Mon,  2 Dec 2024 21:23:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 076A71DFE1A;
+	Mon,  2 Dec 2024 21:23:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kpNSlh/V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tg6qpsAz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B0E1DF974;
-	Mon,  2 Dec 2024 21:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2EC1DFD8D;
+	Mon,  2 Dec 2024 21:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733174619; cv=none; b=aBM3qdoctt1ssiBS+66twRG/0d0MwogzmT+70ZAjm9rt+PqJY2ePcEIVb6OAiEwxOqqu/McJcmlVgE21wkgZb4OAbBbqpn4v78FzQ81QUeTHnSp84lVSZDM4i3lrygb99xlNPtliOBLscQesV9YMnoMk5y2M0GSipncXFfYGtX4=
+	t=1733174620; cv=none; b=F2Sw/x6BdZnckoRmrOMfKqX777vmNIzODBEOUk9oAUuXLT/0PLQnJQ34C0txph+yVoXWnfzh8swvcEmmcZ8LPDZqUCKTaTWdN9cRXNW6Qw96Pvj13nUevgX/ZLt+ewSs3fxkFy/VIHjlqorN/aM3vfJ3Fu6dRXu8cZRNir1Y5iU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733174619; c=relaxed/simple;
-	bh=UEe+01wXcA/6Vp2tXaLjKWUBpnQy8abf4E5ymq4FAlE=;
+	s=arc-20240116; t=1733174620; c=relaxed/simple;
+	bh=bxNdSWBFOuU160wYi2ZuwoNG6N1rmqN5rH4LXYxLWWI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dcPdSaVOdpIa2xPeytfQjzkZyRmNqCtdkT/x86libvKLIZ7jOOARi8pcrxRO8wAbOkKh66pNrr4XileDIx+CHbCouphV2OemAuhlPpAlH/Cu35icf3hB6LRTSWJ5iAnXieTtw+wVEI/BwWclgku85pFJbox9FAqXs4bBfOC2Mp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kpNSlh/V; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=lBFphsRHwPCTx/zPPeM4CKMKt5ABEqN9p9B5MFHTZ+jfZ/bHueibs0QpDc7P1wlUzSAIpS/pEupCAM4rcEqOupXLIZ5b1lIRiJZvoboyd4TTmw087lV2yxIHqsktLqy3ttzna9Ld3lJrPXmbzlN1IqWtgxj0qASNGhDqJaGhKno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tg6qpsAz; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21145812538so38297065ad.0;
-        Mon, 02 Dec 2024 13:23:38 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-215b9a754fbso1507515ad.1;
+        Mon, 02 Dec 2024 13:23:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733174617; x=1733779417; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1733174618; x=1733779418; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HCzzR8j2iKtf3UdeUk+5jPhNrUS+V0xjiwUoH7xZuyk=;
-        b=kpNSlh/VDIeEe9yBJOor9nDRSU/yqWWdpHmKuynyymYCKuPfm/7qYa8ktDiB2g9eTi
-         9r+NFooOAyplpXVXaFtO668KmXCm/oVqkVt0eg44+O51Ot0J8/IudI56SGYoJKjoh4cH
-         BDJ6lXAwkrCnQ0IijE+SzISoFsC3pNtcMOzmHuBcaPAC1BZQV+H70A/JtXUx8NYW0dkX
-         tL7WT1vPqKlSXpyBzBjecW5CiqPU/4ODzj+dHXqxmKVoxNmLwNrl1yI8wF5XnFsl7pAU
-         oTIifxWRSmSTXK0l3LEBwl32tFcLMJdPAYtDknEC/tfsllC2la5rebDQJK4FzG/uRAOG
-         HwFg==
+        bh=iQ2w1hRvX2gv5YNJeLZGgNGigEr7WSReYY3PlM5Kufw=;
+        b=Tg6qpsAzEbiJx2Mv9IWz+ilyXGX249HMYWvwDx9JQcCVc8aGyTXZLyMwvvG50wzwH5
+         IF9SXw8ORWDsv5gZdC/hi38xtBwBFBAhj4xLTvi9aWVvA3a2wXE7HWtbBUgROZZ8V+BD
+         E9zTpwl/RneU+QY9kRc2X65EM5ap0xx4ife6AaoJ5Y7WIEljzEEgS2w60KFwAN/Mqsae
+         9ZYTN4S/MU59eoGYx8tXNNyzHEULFf241SJNb8WCeQp/4IXQlWVe5786mRhmiLA3MKpn
+         zDY6JZi+wbIYaa072/goEgVgHlL9BsBBmQA6rn67NlEWFP4xenXh8TNeMrnRDuYo0W3N
+         +E2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733174617; x=1733779417;
+        d=1e100.net; s=20230601; t=1733174618; x=1733779418;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HCzzR8j2iKtf3UdeUk+5jPhNrUS+V0xjiwUoH7xZuyk=;
-        b=sm5lY2it41IEYWhTsMv3LsiBA6/yCeds3XCwEEGKL9CUGai5w3ixEoer2PlmoIR9HM
-         CuJT9mCexH95QUqw75229WHWKxw0uTHzGeaC3NZ6WaHv/d5KZmVEvgtHeIrv/0aranC/
-         V8XV/X3MxNSAP8CazHbJ9IVPkWqxTiAmuFE8bxMJglGZeLgwU3l7FPu5tCmq+/kJjxtG
-         HCwqdPZn/1u9yiPdulbnzXVRaCps1w2jsgz+o4UcSZ/Xl37dn18qK1r6fptx3VFvyX6N
-         oTWSMDBibXBtm4vj+qAo9RkRgggOYfcDrEKRIT5DwYN3hRr0/5BtMavbvzXrfcs7GTms
-         KiBw==
-X-Forwarded-Encrypted: i=1; AJvYcCUpKQ4cu+ZXSBmkfF2mXVMNiRfmSRd5uJG8I0vg8FVEiuW6LUE6WEI7B6w9aO/jZkUpWavepY2/YGZI7AI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyvjddhgdhxl7wf5q5ogjuTTUXnSCu1brJRET/KPPyqtGDrW2Y8
-	4MU/byBHO/AeFlevYBo77uzv/vUEAi73a+CWk3thDL/x7mn2qbF1lEnYADMO
-X-Gm-Gg: ASbGncsuqzr+hBbxcNc40rXTSBG2f/ewEYZJEHCoFAn5ROSQUY1sOs4GWho5dwBlQ3L
-	G7igZq/rPKPrbXUotknO2dJWepv8nYzJ9xcbecteDWIRM4zObPzkc/NInbrMMXxc415LL/GgqjA
-	bxkwvbFLlGcU1YawK/hUHyWy409ramXeV2WLJOcDrdnDzKeKwzcaxAd43kmI4VlO2ZrG21PkNNm
-	/2dw3LsEi7J4WAvl0poMOq3Ug==
-X-Google-Smtp-Source: AGHT+IE4lBI6lzn4RyCfB1wFHwD7sFSecH49TpJcGomfAcAWTV1f9q4iLVA0yjhRU/LwrGSu6p1yig==
-X-Received: by 2002:a17:902:cec7:b0:215:3661:747e with SMTP id d9443c01a7336-215bcfc5c76mr608535ad.8.1733174617312;
-        Mon, 02 Dec 2024 13:23:37 -0800 (PST)
+        bh=iQ2w1hRvX2gv5YNJeLZGgNGigEr7WSReYY3PlM5Kufw=;
+        b=eS7kFa4HwNQk1X9Ks2SOG8D2L/TnxmvOn4/JyG28Yu9NoH6v6iibu23pUXoCcsmvw/
+         OEA5FMQ7w40bu1cTC6h28zL8LM3jARLy2wGdnbSEGXde4z9y6JFr2kaKL/Yf4wcpAtJo
+         irldEqECaK+SIw0HJgXXcRNH980QTjS8EANzeg+ZMpAgKd1pDoOiVdRfTqLD1dfmyuhz
+         yW1Zfw9rA4emVBCSv7t9CEhy5ubJzi3cab2lnSi+emmS2o9L0uiK3+Gc4ue4kam3lShi
+         /dd6NhmyouC1R2kjytV+MCoNzJpq5agycUflbOcpo/Z/9EtK9PaVqiv8wBty09DYOffU
+         PC4g==
+X-Forwarded-Encrypted: i=1; AJvYcCVh2VZa7hZ4FeHQ0FX5RFpBhoApcoM9PCp8ycdiHSv50va3HJYr38w9felxbyBc2kn+EWy2Rji8MFrDEMQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSd5KigPnr533O0B3I/1rin8TFP6RopLbqDVPfHSG98w/QQatr
+	cpQqudkJ+zoz1ZlSJ3ju4J3J0O8K7XMEGlYl5YBO9daHKcnEn/+DXbfjOMy1
+X-Gm-Gg: ASbGnctrzF1iVwlxkqtqInS3mVEhiM1fMIcL/hCE4IdsgN0Iqk/D9UPGT/1v0/gBXvN
+	Ek8xojPJblORPnyQYRz7SfIuwYi/Kfw6j53zIM8UBSceq/+DucrWFrpTVrztz4mx6S57/BQGl2O
+	IiH+gYqoxa8jY/gi1BMQFwys7DyNRFVPRPJlG7sDAMgrqPQBo/Hzltqn+sx4Uzi0W0BcsGn/a9q
+	lKHNhO0PQ/EFya8ON/ZS/3IXA==
+X-Google-Smtp-Source: AGHT+IHkKJR6eZ9FXINF3O++8Jx9b855BP3/uRz999zRe1Uw7yDq0t+se/JtFnPAIWtQTwx2gwmNRw==
+X-Received: by 2002:a17:902:db06:b0:215:7dbf:f3de with SMTP id d9443c01a7336-215bd2005a9mr77445ad.28.1733174618501;
+        Mon, 02 Dec 2024 13:23:38 -0800 (PST)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21598f3281fsm20729515ad.279.2024.12.02.13.23.36
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21598f3281fsm20729515ad.279.2024.12.02.13.23.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 13:23:36 -0800 (PST)
+        Mon, 02 Dec 2024 13:23:38 -0800 (PST)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -80,9 +80,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Claudiu Manoil <claudiu.manoil@nxp.com>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 03/11] net: fsl_pq_mdio: use platform_get_resource
-Date: Mon,  2 Dec 2024 13:23:23 -0800
-Message-ID: <20241202212331.7238-4-rosenp@gmail.com>
+Subject: [PATCH net-next 04/11] net: fsl_pq_mdio: use devm for of_iomap
+Date: Mon,  2 Dec 2024 13:23:24 -0800
+Message-ID: <20241202212331.7238-5-rosenp@gmail.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241202212331.7238-1-rosenp@gmail.com>
 References: <20241202212331.7238-1-rosenp@gmail.com>
@@ -94,73 +94,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Replace of_address_to_resource with platform_get_resource. No need to
-use the of_node when the pdev is sufficient.
+Using devm for of_iomap avoids having to manually iounmap in error paths
+for this simple driver.
+
+Add a note for why not devm_platform helper.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/freescale/fsl_pq_mdio.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/freescale/fsl_pq_mdio.c | 24 ++++++++------------
+ 1 file changed, 9 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/net/ethernet/freescale/fsl_pq_mdio.c b/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-index d7f9d99fe782..f14607555f33 100644
+index f14607555f33..640929a4562d 100644
 --- a/drivers/net/ethernet/freescale/fsl_pq_mdio.c
 +++ b/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-@@ -414,7 +414,7 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
- 	struct device_node *tbi;
- 	struct mii_bus *new_bus;
- 	struct device_node *np;
--	struct resource res;
-+	struct resource *res;
- 	int err;
- 
- 	data = device_get_match_data(dev);
-@@ -433,15 +433,15 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
- 	new_bus->write = &fsl_pq_mdio_write;
- 	new_bus->reset = &fsl_pq_mdio_reset;
- 
--	np = dev->of_node;
--	err = of_address_to_resource(np, 0, &res);
--	if (err < 0) {
-+	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-+	if (!res) {
- 		dev_err(dev, "could not obtain address information\n");
--		return err;
-+		return -ENOMEM;
- 	}
- 
-+	np = dev->of_node;
+@@ -443,7 +443,12 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
  	snprintf(new_bus->id, MII_BUS_ID_SIZE, "%pOFn@%llx", np,
--		 (unsigned long long)res.start);
-+		 (unsigned long long)res->start);
+ 		 (unsigned long long)res->start);
  
- 	priv->map = of_iomap(np, 0);
+-	priv->map = of_iomap(np, 0);
++	/*
++	 * While tempting, this cannot be converted to
++	 * devm_platform_get_and_ioremap_resource as some platforms overlap the
++	 * memory regions with the ethernet node.
++	 */
++	priv->map = devm_of_iomap(dev, np, 0, NULL);
  	if (!priv->map)
-@@ -453,7 +453,7 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
- 	 * contains the offset of the MII registers inside the mapped register
- 	 * space.
+ 		return -ENOMEM;
+ 
+@@ -455,8 +460,7 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
  	 */
--	if (data->mii_offset > resource_size(&res)) {
-+	if (data->mii_offset > resource_size(res)) {
+ 	if (data->mii_offset > resource_size(res)) {
  		dev_err(dev, "invalid register map\n");
- 		err = -EINVAL;
- 		goto error;
-@@ -480,13 +480,12 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
- 				err = -EBUSY;
- 				goto error;
- 			}
--			set_tbipa(*prop, pdev,
--				  data->get_tbipa, priv->map, &res);
-+			set_tbipa(*prop, pdev, data->get_tbipa, priv->map, res);
- 		}
+-		err = -EINVAL;
+-		goto error;
++		return -EINVAL;
  	}
+ 	priv->regs = priv->map + data->mii_offset;
  
- 	if (data->ucc_configure)
--		data->ucc_configure(res.start, res.end);
-+		data->ucc_configure(res->start, res->end);
- 
+@@ -477,8 +481,7 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
+ 				dev_err(dev,
+ 					"missing 'reg' property in node %pOF\n",
+ 					tbi);
+-				err = -EBUSY;
+-				goto error;
++				return -EBUSY;
+ 			}
+ 			set_tbipa(*prop, pdev, data->get_tbipa, priv->map, res);
+ 		}
+@@ -490,16 +493,10 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
  	err = of_mdiobus_register(new_bus, np);
  	if (err) {
+ 		dev_err(dev, "cannot register %s as MDIO bus\n", new_bus->name);
+-		goto error;
++		return err;
+ 	}
+ 
+ 	return 0;
+-
+-error:
+-	if (priv->map)
+-		iounmap(priv->map);
+-
+-	return err;
+ }
+ 
+ 
+@@ -507,11 +504,8 @@ static void fsl_pq_mdio_remove(struct platform_device *pdev)
+ {
+ 	struct device *device = &pdev->dev;
+ 	struct mii_bus *bus = dev_get_drvdata(device);
+-	struct fsl_pq_mdio_priv *priv = bus->priv;
+ 
+ 	mdiobus_unregister(bus);
+-
+-	iounmap(priv->map);
+ }
+ 
+ static struct platform_driver fsl_pq_mdio_driver = {
 -- 
 2.47.0
 
