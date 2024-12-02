@@ -1,90 +1,93 @@
-Return-Path: <netdev+bounces-148228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 837049E0E1B
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 22:48:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9736B9E0E88
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:06:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49D10281FB6
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:48:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 157E4B2CDF5
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58E861DEFC1;
-	Mon,  2 Dec 2024 21:48:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA651DF265;
+	Mon,  2 Dec 2024 21:48:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RjP0r4KN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HLGB32PK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E1C3D97A
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 21:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89EB13D97A
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 21:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733176131; cv=none; b=U2YHYjr/Ja8ibn0aht2TiS8PodvC3I4oQdrLdRd0INi17spD2WnPou83B6BGa55voV6tS79gKVTlCrK+L1TKQ/wfuReoQZj4Mz0e31x3qk9cX//l/W2hcvnfgOB6EB22BkDt1X4m1qk8HxjJ1ndWlOfdZfV8H6L6005DFGxMlGE=
+	t=1733176136; cv=none; b=S1CLAku+6+XgUFg0l3CK8DIhS3AS34Ch3xEfB8OaoqvK4buYFAiyNX8hqTC7WK+0S/FJGbKaoMvquSWWpyz1oP2TTgNGvvg1M3ZEm7jBSugzdng0GOe5YiZR1jlg263MP6WCwBo9MkzXKVRnZ7SVjTeDlhDa41a57GUKEfUQJ7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733176131; c=relaxed/simple;
-	bh=pqzxY3Fiy0Il3ZcDn1bVlNRO9toMiU0vQEfrsOVrnhI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=UMq7gzsDMxea4d35FD0rApr2Vjc4zH/WfyhGU4pnmHBF1vqaFqV4vcKy1OuthcIUg8+jyD/reQNVb0NJPTDFOUn1IEKai+xqy2rTzuB3YGauen6RM0eXIAHs6LvrHs1373urYp3wiTy1RF07UUNkruMVay6p//Fn8VE4PEE2PEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RjP0r4KN; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1733176136; c=relaxed/simple;
+	bh=+mHs2r6xUjQacGAIYT3/iremgeqdvDuqjC/J1K0sk4o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dlXx/VIVeqgiDmQGnu/iKoXuD/PF5PNKxpOfzoxwPewhPO3e0nrbASX3i5YODdSk9oRQK55fszxvmPvsPVwEioN0pi4VjJN5iQxE/06tfWzH/SI38vqERtRa+qegGW9KVhsCcUgrjnyfsbBjMQzHqa5xa07m28KS+FLlSGFenSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HLGB32PK; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733176128;
+	s=mimecast20190719; t=1733176133;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=zHKoQd+8EkiLGBlJ8onKdXukLlB8EPWuW8pKuWyB7Ts=;
-	b=RjP0r4KNdbM96cMy8iI76iPTlotLtbuf1lqlGxZNagzWu2YLZ0QsX1vNh64wa8WioKuqZg
-	aZcCoTaZKDn4+y6qTvPGFOTmmQC7b1VE2dPZppI4Wwi1+EaDp17N2P2upJWGaWMYLgMdaz
-	wXE8/zmfjtF93bcxXK/jknleJ39M9iA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m0AdheSQOy3OPgOR9Sp861yrPuzl1YFO/sM5Oqu+QuI=;
+	b=HLGB32PK6+H3QoM/wg1IjCU+tOyEGCs0JKW1YEDRKRz0otBB+r3lBwcd9mlqayoBg4TpVY
+	ZkK2CCT2r50G6xFrbFe3U656A57ZuLpGcJWgDMxiZAGKhY1AZMucFL4ou1eD5y6U8NRGTL
+	LnqHNsWRBM2nWxx+BO+lVG9WnxJtq00=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-53-bWOA2s5cOhG-gFeNDx3cpQ-1; Mon, 02 Dec 2024 16:48:45 -0500
-X-MC-Unique: bWOA2s5cOhG-gFeNDx3cpQ-1
-X-Mimecast-MFC-AGG-ID: bWOA2s5cOhG-gFeNDx3cpQ
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385d4fa8e19so2511935f8f.2
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 13:48:45 -0800 (PST)
+ us-mta-352-vqziPsdXMMapk7NzqANFzQ-1; Mon, 02 Dec 2024 16:48:52 -0500
+X-MC-Unique: vqziPsdXMMapk7NzqANFzQ-1
+X-Mimecast-MFC-AGG-ID: vqziPsdXMMapk7NzqANFzQ
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43498af7937so39638995e9.1
+        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 13:48:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733176124; x=1733780924;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zHKoQd+8EkiLGBlJ8onKdXukLlB8EPWuW8pKuWyB7Ts=;
-        b=LlSp8/jMTm2XruIQ4ZGVB0hzPQ+NY3xKAWvor8Aq1kGXyuVM/Q1i5J3DjlDQIiPNVi
-         /5AtwEfhyKHiK85FtkUIqS0Y+OD9MqkfjkGYRBW2dW4h1go7JhzOifmKavJi/Y2bcrHP
-         hURhTehGlJc92A9C4ka6UZ6DKEA0Jvg1TJv8QTDfs92HYyKwbq5JZQU25pTBZyVZtgRI
-         7ssK65X4dpmX3mAzExFC5RpvRtV8GU4YpFdoJzxV/jrli16SAdvFdr3kjVwkU1BMxHtK
-         wY8l54yF6YtyaJazKOCpMRtcxhl4bYZv3wSCBoU3AduiMnm2Heo/OqlXDBIcVOJkp6MQ
-         8f3A==
-X-Gm-Message-State: AOJu0YzvUAzYDDhC/Z73nay+72MUO3D4WtkRwSBqZDLOD930L29fTjhN
-	9Zj3U4NEj67c933cWF6SshdFXDwO8x7leKU8QhNP7Mk4gBJr72/odLcMvO2tcUtaFrfNOMJbQTh
-	HBEf5GXUX+6iAphFyu2cg0ffxt6jW8hdBq6WrCeLMx8nuYNy6hiEZ2w==
-X-Gm-Gg: ASbGncuRBmfrkRm9NsFeUHmSZdND6mqhRoX0fUC5AgW0DqQK9MfXfThr2a4/GlVLqz9
-	L3vDdv4y3F9JOLc1X+ggxgOyNCVRag9YSlgl6Q++xTA/YngCihvfb/J/TDdQJEO6dNgBxVOgi2c
-	tgW/QT+U1Qor/QwAricUVmFHytJK1CDg6xqoVEWGN5rkj+v2mm/Dd6hFY6l5lKj6qKEf30CNWkz
-	VH9Uv+tQyMxyqjMxtJhrhokYjeDTQNEmy2LZDdSYF/gHSU09dCLKBoIYVvXgvLox064Y06vHVYj
-	f95ru5p2gujZiDMEm3wjHd0KCrizUw==
-X-Received: by 2002:a05:6000:471c:b0:385:fc8c:24b6 with SMTP id ffacd0b85a97d-385fd3f188bmr38936f8f.27.1733176124547;
-        Mon, 02 Dec 2024 13:48:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG1HjDmZHoZ78XqMSlNB1u8eqYWH/ZFxuWRNPvIPjXKAGrLuhcX4ez0kIdIhtT5UfMGEHQfRg==
-X-Received: by 2002:a05:6000:471c:b0:385:fc8c:24b6 with SMTP id ffacd0b85a97d-385fd3f188bmr38929f8f.27.1733176124222;
-        Mon, 02 Dec 2024 13:48:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733176131; x=1733780931;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m0AdheSQOy3OPgOR9Sp861yrPuzl1YFO/sM5Oqu+QuI=;
+        b=a5rLHUbSXPT2LNYjrwEyf0WV2cTktBY7yXQT0EB4d6pEY332A/NY9ZqzQbWr20ktKs
+         4/kXEukqUmjMe4fiR9H3eQfp6MnwxW83WV88oEv0NAnBQ5VF3PklkkN/xF2fiUt71fQi
+         sO8/JqSe9BmzWtXtoiiz5u61cpQFiRtaqi0bximroqQLiN/xed3QwEfCaPtMciHatkMf
+         DQ1+DsO8mU54XdeAnwKJPKnnk+OrXOncWwEZ+2RrsicDkrw95Ol5A/aAbimJjakZPmr+
+         +cbGOuVaWPCMsmESP48MshpWaqWO7AeJS0D8O3EjseiG7fs1eOARF+QkNM4h96ZIQcBZ
+         Hktw==
+X-Gm-Message-State: AOJu0YyZ8bUKluQInlkZAdQmprOEbkXdv0gMevr4szmfZnadYU2qX3Zk
+	vMdt/eUOa++yImCg2P2tjgTfjqwdu0ioYO+WA2Sh4SbPp8TjSIwjSypqQHKTwI6hTlW4xr7Nutf
+	oh5ZxzaujizpxvYMN85ocYij2e6gIPL4UlqD8OkVcV31tEJo2v0TxJA==
+X-Gm-Gg: ASbGncszC3TIKNEhOzCpQvQRfwnVfHduRiJqdXyKr4tbqacNUb5OQ34krLrErJCRvut
+	kRyxmQ68ZG5RD8vD2JKooBTQyfTJ6JMUDgG7UArj9CGdXujpJR7vwRdphumTslxQ1TQZloY4MAg
+	G+eLIWhBlZ6BLk3ph9sOBmSnwmrrXYV4reUXcGvjsajsEv25GziSrUyizsIX4bXfVMT86En5dM4
+	jocOrougqZcUUusQ5VwCs2mMXFIAVF0yY5cxBlnwBoA58Hu2RXRHdtVyR48wdRKL7xX5TWapCc8
+	YsZz1l/Wp38IrCPBgrz5wkvr9ihtIA==
+X-Received: by 2002:a05:600c:524d:b0:434:a7e3:db5c with SMTP id 5b1f17b1804b1-434d09b6730mr396335e9.11.1733176131115;
+        Mon, 02 Dec 2024 13:48:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFYd6LJOmxiMWl/AJioywKyCSoIXfLi4jOXtzumogsTR6K9uJ4cozkC5iuenGaKdihui8OFzA==
+X-Received: by 2002:a05:600c:524d:b0:434:a7e3:db5c with SMTP id 5b1f17b1804b1-434d09b6730mr396145e9.11.1733176130729;
+        Mon, 02 Dec 2024 13:48:50 -0800 (PST)
 Received: from debian (2a01cb058d23d6001797ea6ce8a6dfab.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:1797:ea6c:e8a6:dfab])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d04e7380sm1695285e9.0.2024.12.02.13.48.43
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434aa763aaesm196906635e9.14.2024.12.02.13.48.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 13:48:43 -0800 (PST)
-Date: Mon, 2 Dec 2024 22:48:41 +0100
+        Mon, 02 Dec 2024 13:48:50 -0800 (PST)
+Date: Mon, 2 Dec 2024 22:48:48 +0100
 From: Guillaume Nault <gnault@redhat.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
 Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
 	David Ahern <dsahern@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: [PATCH net-next 0/4] net: Convert some UDP tunnel drivers to
- NETDEV_PCPU_STAT_DSTATS.
-Message-ID: <cover.1733175419.git.gnault@redhat.com>
+Subject: [PATCH net-next 1/4] vrf: Make pcpu_dstats update functions
+ available to other modules.
+Message-ID: <5e97f1e54e57b0a85e34af87062dc536a28bef34.1733175419.git.gnault@redhat.com>
+References: <cover.1733175419.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,47 +96,171 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1733175419.git.gnault@redhat.com>
 
-VXLAN, Geneve and Bareudp use various device counters for managing
-RX and TX statistics:
+Currently vrf is the only module that uses NETDEV_PCPU_STAT_DSTATS.
+In order to make this kind of statistics available to other modules,
+we need to define the update functions in netdevice.h.
 
-  * VXLAN uses the device core_stats for RX and TX drops, tstats for
-    regular RX/TX counters and DEV_STATS_INC() for various types of
-    RX/TX errors.
+Therefore, let's define dev_dstats_*() functions for RX and TX packet
+updates (packets, bytes and drops). Use these new functions in vrf.c
+instead of vrf_rx_stats() and the other manual counter updates.
 
-  * Geneve uses tstats for regular RX/TX counters and DEV_STATS_INC()
-    for everything else, include RX/TX drops.
+While there, update the type of the "len" variables to "unsigned int",
+so that there're aligned with both skb->len and the new dstats update
+functions.
 
-  * Bareudp, was recently converted to follow VXLAN behaviour, that is,
-    device core_stats for RX and TX drops, tstats for regular RX/TX
-    counters and DEV_STATS_INC() for other counter types.
+Signed-off-by: Guillaume Nault <gnault@redhat.com>
+---
+ drivers/net/vrf.c         | 46 ++++++++++-----------------------------
+ include/linux/netdevice.h | 40 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+), 34 deletions(-)
 
-Let's consolidate statistics management around the dstats counters
-instead. This avoids using core_stats in VXLAN and Bareudp, as
-core_stats is supposed to be used by core networking code only (and not
-in drivers).  This also allows Geneve to avoid using atomic increments
-when updating RX and TX drop counters, as dstats is per-cpu. Finally,
-this also simplifies the code as all three modules now handle stats in
-the same way and with only two different sets of counters (the per-cpu
-dstats and the atomic DEV_STATS_INC()).
-
-Patch 1 creates dstats helper functions that can be used outside of VRF
-(before that, dstats was VRF-specific).
-Patches 2 to 4 convert VXLAN, Geneve and Bareudp, one by one.
-
-Guillaume Nault (4):
-  vrf: Make pcpu_dstats update functions available to other modules.
-  vxlan: Handle stats using NETDEV_PCPU_STAT_DSTATS.
-  geneve: Handle stats using NETDEV_PCPU_STAT_DSTATS.
-  bareudp: Handle stats using NETDEV_PCPU_STAT_DSTATS.
-
- drivers/net/bareudp.c          | 16 ++++++------
- drivers/net/geneve.c           | 12 ++++-----
- drivers/net/vrf.c              | 46 +++++++++-------------------------
- drivers/net/vxlan/vxlan_core.c | 28 ++++++++++-----------
- include/linux/netdevice.h      | 40 +++++++++++++++++++++++++++++
- 5 files changed, 80 insertions(+), 62 deletions(-)
-
+diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+index 67d25f4f94ef..f0c0b3d4d827 100644
+--- a/drivers/net/vrf.c
++++ b/drivers/net/vrf.c
+@@ -122,16 +122,6 @@ struct net_vrf {
+ 	int			ifindex;
+ };
+ 
+-static void vrf_rx_stats(struct net_device *dev, int len)
+-{
+-	struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
+-
+-	u64_stats_update_begin(&dstats->syncp);
+-	u64_stats_inc(&dstats->rx_packets);
+-	u64_stats_add(&dstats->rx_bytes, len);
+-	u64_stats_update_end(&dstats->syncp);
+-}
+-
+ static void vrf_tx_error(struct net_device *vrf_dev, struct sk_buff *skb)
+ {
+ 	vrf_dev->stats.tx_errors++;
+@@ -369,7 +359,7 @@ static bool qdisc_tx_is_default(const struct net_device *dev)
+ static int vrf_local_xmit(struct sk_buff *skb, struct net_device *dev,
+ 			  struct dst_entry *dst)
+ {
+-	int len = skb->len;
++	unsigned int len = skb->len;
+ 
+ 	skb_orphan(skb);
+ 
+@@ -382,15 +372,10 @@ static int vrf_local_xmit(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	skb->protocol = eth_type_trans(skb, dev);
+ 
+-	if (likely(__netif_rx(skb) == NET_RX_SUCCESS)) {
+-		vrf_rx_stats(dev, len);
+-	} else {
+-		struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
+-
+-		u64_stats_update_begin(&dstats->syncp);
+-		u64_stats_inc(&dstats->rx_drops);
+-		u64_stats_update_end(&dstats->syncp);
+-	}
++	if (likely(__netif_rx(skb) == NET_RX_SUCCESS))
++		dev_dstats_rx_add(dev, len);
++	else
++		dev_dstats_rx_dropped(dev);
+ 
+ 	return NETDEV_TX_OK;
+ }
+@@ -578,20 +563,13 @@ static netdev_tx_t is_ip_tx_frame(struct sk_buff *skb, struct net_device *dev)
+ 
+ static netdev_tx_t vrf_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
+-	struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
+-
+-	int len = skb->len;
+ 	netdev_tx_t ret = is_ip_tx_frame(skb, dev);
++	unsigned int len = skb->len;
+ 
+-	u64_stats_update_begin(&dstats->syncp);
+-	if (likely(ret == NET_XMIT_SUCCESS || ret == NET_XMIT_CN)) {
+-
+-		u64_stats_inc(&dstats->tx_packets);
+-		u64_stats_add(&dstats->tx_bytes, len);
+-	} else {
+-		u64_stats_inc(&dstats->tx_drops);
+-	}
+-	u64_stats_update_end(&dstats->syncp);
++	if (likely(ret == NET_XMIT_SUCCESS || ret == NET_XMIT_CN))
++		dev_dstats_tx_add(dev, len);
++	else
++		dev_dstats_tx_dropped(dev);
+ 
+ 	return ret;
+ }
+@@ -1364,7 +1342,7 @@ static struct sk_buff *vrf_ip6_rcv(struct net_device *vrf_dev,
+ 	if (!is_ndisc) {
+ 		struct net_device *orig_dev = skb->dev;
+ 
+-		vrf_rx_stats(vrf_dev, skb->len);
++		dev_dstats_rx_add(vrf_dev, skb->len);
+ 		skb->dev = vrf_dev;
+ 		skb->skb_iif = vrf_dev->ifindex;
+ 
+@@ -1420,7 +1398,7 @@ static struct sk_buff *vrf_ip_rcv(struct net_device *vrf_dev,
+ 		goto out;
+ 	}
+ 
+-	vrf_rx_stats(vrf_dev, skb->len);
++	dev_dstats_rx_add(vrf_dev, skb->len);
+ 
+ 	if (!list_empty(&vrf_dev->ptype_all)) {
+ 		int err;
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index ecc686409161..b49780c724d7 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2854,6 +2854,46 @@ static inline void dev_lstats_add(struct net_device *dev, unsigned int len)
+ 	u64_stats_update_end(&lstats->syncp);
+ }
+ 
++static inline void dev_dstats_rx_add(struct net_device *dev,
++				     unsigned int len)
++{
++	struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
++
++	u64_stats_update_begin(&dstats->syncp);
++	u64_stats_inc(&dstats->rx_packets);
++	u64_stats_add(&dstats->rx_bytes, len);
++	u64_stats_update_end(&dstats->syncp);
++}
++
++static inline void dev_dstats_rx_dropped(struct net_device *dev)
++{
++	struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
++
++	u64_stats_update_begin(&dstats->syncp);
++	u64_stats_inc(&dstats->rx_drops);
++	u64_stats_update_end(&dstats->syncp);
++}
++
++static inline void dev_dstats_tx_add(struct net_device *dev,
++				     unsigned int len)
++{
++	struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
++
++	u64_stats_update_begin(&dstats->syncp);
++	u64_stats_inc(&dstats->tx_packets);
++	u64_stats_add(&dstats->tx_bytes, len);
++	u64_stats_update_end(&dstats->syncp);
++}
++
++static inline void dev_dstats_tx_dropped(struct net_device *dev)
++{
++	struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
++
++	u64_stats_update_begin(&dstats->syncp);
++	u64_stats_inc(&dstats->tx_drops);
++	u64_stats_update_end(&dstats->syncp);
++}
++
+ #define __netdev_alloc_pcpu_stats(type, gfp)				\
+ ({									\
+ 	typeof(type) __percpu *pcpu_stats = alloc_percpu_gfp(type, gfp);\
 -- 
 2.39.2
 
