@@ -1,162 +1,145 @@
-Return-Path: <netdev+bounces-148144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 038209E07C6
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:59:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 901379E07DB
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 17:03:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD315280FA2
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:59:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55F42281CEA
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAC9F13A265;
-	Mon,  2 Dec 2024 15:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7394013AA2D;
+	Mon,  2 Dec 2024 16:03:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="ERjEn8hM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="H0KVIcoM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C32136352;
-	Mon,  2 Dec 2024 15:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6BB13B2A8;
+	Mon,  2 Dec 2024 16:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733155160; cv=none; b=QiwF1FSc0LpCV8Do+rdggRU2YtyYSEi0PQFq6fTKlKdBbVNQnb27UspvbppoQpalPlj047xa5pca4aHTnOz8xglRt299KpnsMMyd7OxzuGBhIQpSX6RmxiCnyqzr7Q82s2WDcEtRvZgrvjaRQX+PLleV81Fj+fNgYVnfoT474e0=
+	t=1733155411; cv=none; b=L872Eie1gW0uHTIn06ELYSkk2Ca79XMTAosX0lJ40qx2MB6PQMUm/H0kjAu1yFGow1didbIrJt4iZnzX3DjyTpD+hF1sVPyhm7eWcinGQatlLjQSc9fE2Vzt0BptaQcX2aihnikZbmxrvZpsNgVTPRGkSsA3R63jR8Y9/VYdpZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733155160; c=relaxed/simple;
-	bh=WaaoFsJl5CaUoadN0kBxGfgIoSYisHkAnX818rLnxho=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=T4b9VUa1f9WChc4qqt1/ITLWLUm3TVk5ek0bzz+vR9oFLMyuUrD7Nzgw613+2fUFfTo/cHRJLJc2V/5WcVueEGjjDkFCY3T7i4vHf+TlIHTem3gBzyuRJcT7ITJNWbvlkB0RzrXOFZTcymaOpn9iEsPixAPG10DRhDzgjxif2vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=ERjEn8hM; arc=none smtp.client-ip=212.227.17.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1733155144; x=1733759944; i=wahrenst@gmx.net;
-	bh=H4JLr3SrVxTDzBPpr7Wwo9dixYFhN95i0//rZi7egss=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:
-	 MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=ERjEn8hMLOoYVrmsOv3gmExeyNc9LrgN8ALCC4uD5ITaaZNhw9A3A8EnP3Kn1mbC
-	 gF/PL2PKYyV19Ck5+GIejlC9DBdg13nqWSRH6GBjIm2hACOWaJFbxHCdxCmyzP+CK
-	 cYgXUW95ZDO7LILLuIaZ4Aiq43yYQ5ex++NclVRGeb/aVFB7j8EvkoH4tF+k6l+Lk
-	 X0kEU61549x6KggiWEBVQEQNO6zVidYk8hCmLiLwlsdrvWH7G2vNhy+n3kBTR0npf
-	 8nFgK0xucsDmM83eO3uuymKj6q33jIE/7lt85DKQJIIm/M94Yra5WqAg1W9SFxArA
-	 MLcVoayWl++0I0e0oA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from stefanw-SCHENKER ([37.4.251.153]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MvK4f-1tZG4P33uz-013UdK; Mon, 02
- Dec 2024 16:59:04 +0100
-From: Stefan Wahren <wahrenst@gmx.net>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1733155411; c=relaxed/simple;
+	bh=STrMM8KN1Ec1+CaLg2m1Kx1Cvn7Z7/lLGkELIAy4GdU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rmBTpD9l6+dJeKHGPEBBU77e8LmwYM2UWNeZFrT+0uhu2EDON+hFxAL8PDiVCA9+Q7uQ0Cq189lfdO/ycNtmKqwIk+IVDgFSFW/RTQZxdyrSNbXYCYuRy6/NqR8A+kh+ijKuJ7u1DHnsIzCEY2YcZQhYkYSzrwdpf22upiuh1AY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=H0KVIcoM; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=J/zMQiaN6dYZzz32+DhTjsqFEPVQYfpeCe+pJ1zng0Q=; b=H0KVIcoMoaicbifVZYQRwnauuq
+	edwE5y3U9lvcgfYQ5wh0G0OPStj2afnd5LHO0DiRpSKotlO03/WvHWoERT5WD80vd/AW+IWqPn991
+	5vwfJaDTuoMVaLbi8Zi0VsTx0JB/42iwgt6IW6hdJncPgdOYSTTmdZ9rv+0bFLLUPGeyqvm+9V+fa
+	nYfJA+lDxtNTio+3QvnmpQNrjpJb/GtGL4yrJY4b3PU+t9g5k4MifIxJderUpqycdG8L6R4Z2xdu+
+	EUgq8o9JEVIC0XZFaAS899kXtHa0Y6+uHmu4U2cv8+8Mdq67sipEPAgOe/G/gVWfwNatOpfd4oeVP
+	OO0/PF+A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35862)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tI8tG-0000LE-1Q;
+	Mon, 02 Dec 2024 16:03:15 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tI8tD-0003hN-0v;
+	Mon, 02 Dec 2024 16:03:11 +0000
+Date: Mon, 2 Dec 2024 16:03:11 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH net] qca_spi: Fix clock speed for multiple QCA7000
-Date: Mon,  2 Dec 2024 16:58:53 +0100
-Message-Id: <20241202155853.5813-1-wahrenst@gmx.net>
-X-Mailer: git-send-email 2.34.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Michael Dege <michael.dege@renesas.com>,
+	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+	Dennis Ostermann <dennis.ostermann@renesas.com>
+Subject: Re: [PATCH] net: phy: phy_ethtool_ksettings_set: Allow any supported
+ speed
+Message-ID: <Z03aPw_QgVYn8WyR@shell.armlinux.org.uk>
+References: <20241202083352.3865373-1-nikita.yoush@cogentembedded.com>
+ <20241202100334.454599a7@fedora.home>
+ <73ca1492-d97b-4120-b662-cc80fc787ffd@cogentembedded.com>
+ <Z02He-kU6jlH-TJb@shell.armlinux.org.uk>
+ <eddde51a-2e0b-48c2-9681-48a95f329f5c@cogentembedded.com>
+ <Z02KoULvRqMQbxR3@shell.armlinux.org.uk>
+ <c1296735-81be-4f7d-a601-bc1a3718a6a2@cogentembedded.com>
+ <Z02oTJgl1Ldw8J6X@shell.armlinux.org.uk>
+ <5cef26d0-b24f-48c6-a5e0-f7c9bd0cefec@cogentembedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:MWFUgtkNVvcJnJL76qJz6ZjTP7OH7g3wsA62/sTYamIZIH887KH
- N9HSrBa3ylT5tlUkM/Fe3dlHUldYVMi7qjBPftTughaJCU743DA6AwOsez7gvZaa04jXpjM
- gLhagrcWTRfICnCsYUtz2ft2IFd+arUu4zejiWB3VST1wML7n6pJy383kbf/JH1WFi57aOU
- c5fkR9kbCh0ivRfEnMVBA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:DbTM6zPP5Fk=;HD//Hop1KWSsq09EpLvleG51+i+
- /kns981u1a9kpzPNPsRU2vKBVNnGS5BxhZ6N8fRRNnGEn7N/B4AgmgWWqZ+e7wH2O59TV0uZx
- 3BewKX6ue1EfRCNlC5XzoC3oExuDq2cQHfzchMYe/JVH04LkLMu/ckqegAWPr3ZmmXwwOl92x
- z1HEd4WRrN+8XePZFKsbp5jo7Crl/J2toGAoLU/Teoiw/VrStyaRZSCnM1ezYZzQ9cEK+c3KZ
- r9j4vtDm9FZHKwbPfltTqOL0vmcWYgnbG7HBz22cdCuFqVkiYlqRFkcVDdkwl6JA7IYq4ntv9
- +OQKDDTILvPUlg0iPThUc9bym3amTUXVL37DnZ4dsU18bQWxmFg0l20KIwTB04eAGUUo7DTF5
- DBvWdErlK3RKNyd5PKM/S41UwzPUC7btSM3oBscjk0IwtghrpBkMZa0P8ZtguHHO7JcB+o+Wy
- cQZp7YcD2LuYTk5Hd52gqMAMOugvf/btzbUNN7JSVASRcp1Dgjtsz2l7osatGeny37Qu3exec
- JGK0cOe68FJ3jb0yYGolppiwRJITmP+LJ8YbExzJSBVqaM0MLzYmUU5hKM8SXir0AGk2Mvx9W
- aEXo7PF4laRl0T2scNK/MGSYrnR+6G2ZdqOS1QzCJRYXUT+vZ8lEGB0MWTTIopJ9b5kii26Ai
- eZZvyriHqBnRYMboK2AdjXVzYFF9srkjhNfzsZzGddR+LH1cE11Kjvt3NQzz/BXUuiVm3pG83
- aTTPOaRiE7lacFJRp/NWgYA/WLa3g0egcSGQJ70HmhlkpTQGr86VFz5bh1MGlPl5yoLblIXS7
- TEbgRicPYc4Zs2UhLGiPUfrGIqUGfDLVXOzZ6NF1ExYKeQl575B7W8Ddgxehsf8pf89GcPEaN
- PtgNw2oHu4SoYRcAg5RUzNCxTSLRt8exyW9FBi+4e8d7pZoiXTgYxIv31vOyq1rKYTxTdFpX0
- GFc7sumZ6TZq268U/Q7FVOuRc09zuNKnSYSlLyiGMDLYZK9o9R04g9N4YkaQwTWeoYctXj0eP
- UnM6npVz2YVjbRfSCYd9Y4DQlO+buRg0sY/CCK/FhlIGxKzjruOM86mhs8I4Sn8tJXUMaC8Ez
- nMnAqGX15Dc1xKFDPvy+qog03GmGFA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5cef26d0-b24f-48c6-a5e0-f7c9bd0cefec@cogentembedded.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Storing the maximum clock speed in module parameter qcaspi_clkspeed
-has the unintended side effect that the first probed instance
-defines the value for all other instances. Fix this issue by storing
-it in max_speed_hz of the relevant SPI device.
+On Mon, Dec 02, 2024 at 08:51:44PM +0500, Nikita Yushchenko wrote:
+> > > root@vc4-033:~# ethtool tsn0
+> > > Settings for tsn0:
+> > >          Supported ports: [ MII ]
+> > >          Supported link modes:   2500baseT/Full
+> > >          Supported pause frame use: Symmetric Receive-only
+> > >          Supports auto-negotiation: No
+> > 
+> > Okay, the PHY can apparently only operate in fixed mode, although I
+> > would suggest checking that is actually the case. I suspect that may
+> > be a driver bug, especially as...
+> 
+> My contacts from Renesas say that this PHY chip is an engineering sample.
+> 
+> I'm not sure about the origin of "driver" for this. I did not look inside
+> before, but now I did, and it is almost completely a stub. Even no init
+> sequence. The only hw operations that this stub does are
+> (1) reading bit 0 of register 1.0901 and returning it as link status (phydev->link),
+> (2) reading bit 0 of register 1.0000 and returning it as master/slave
+> setting (phydev->master_slave_get / phydev->master_slave_state)
+> (3) applying phydev->master_slave_set via writing to bit 0 of register
+> 1.0000 and then writing 0x200 to register 7.0200
+> 
+> Per standard, writing 0x200 to 7.0200 is autoneg restart, however bit 0 of
+> 1.0000 has nothing to do with master/slave. So what device actually does is
+> unclear. Just a black box that provides 2.5G Base-T1 signalling, and
+> software-wise can only report link and accept master-slave configuration.
+> 
+> Not sure if supporting this sort of black box worths kernel changes.
+> 
+> 
+> > it changes phydev->duplex, which is _not_ supposed to happen if
+> > negotiation has been disabled.
+> 
+> There are no writes to phydev->duplex inside the "driver".
+> Something in the phy core is changing it.
 
-This fix keeps the priority of the speed parameter (module parameter,
-device tree property, driver default).
+Maybe it's calling phylib functions? Shrug, I'm losing interest in this
+problem without seeing the driver code. There's just too much unknown
+here.
 
-Fixes: 291ab06ecf67 ("net: qualcomm: new Ethernet over SPI driver for QCA7=
-000")
-Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
-=2D--
- drivers/net/ethernet/qualcomm/qca_spi.c | 25 +++++++++++--------------
- 1 file changed, 11 insertions(+), 14 deletions(-)
+It's not so much about what the driver does with the hardware. We have
+some T1 library functions. We don't know which are being used (if any).
 
-diff --git a/drivers/net/ethernet/qualcomm/qca_spi.c b/drivers/net/etherne=
-t/qualcomm/qca_spi.c
-index ef9c02b000e4..a79fd2d66534 100644
-=2D-- a/drivers/net/ethernet/qualcomm/qca_spi.c
-+++ b/drivers/net/ethernet/qualcomm/qca_spi.c
-@@ -909,17 +909,15 @@ qca_spi_probe(struct spi_device *spi)
- 	legacy_mode =3D of_property_read_bool(spi->dev.of_node,
- 					    "qca,legacy-mode");
+Phylib won't randomly change phydev->duplex unless a library function
+that e.g. reads status from the PHY does it.
 
--	if (qcaspi_clkspeed =3D=3D 0) {
--		if (spi->max_speed_hz)
--			qcaspi_clkspeed =3D spi->max_speed_hz;
--		else
--			qcaspi_clkspeed =3D QCASPI_CLK_SPEED;
--	}
--
--	if ((qcaspi_clkspeed < QCASPI_CLK_SPEED_MIN) ||
--	    (qcaspi_clkspeed > QCASPI_CLK_SPEED_MAX)) {
--		dev_err(&spi->dev, "Invalid clkspeed: %d\n",
--			qcaspi_clkspeed);
-+	if (qcaspi_clkspeed)
-+		spi->max_speed_hz =3D qcaspi_clkspeed;
-+	else if (!spi->max_speed_hz)
-+		spi->max_speed_hz =3D QCASPI_CLK_SPEED;
-+
-+	if (spi->max_speed_hz < QCASPI_CLK_SPEED_MIN ||
-+	    spi->max_speed_hz > QCASPI_CLK_SPEED_MAX) {
-+		dev_err(&spi->dev, "Invalid clkspeed: %u\n",
-+			spi->max_speed_hz);
- 		return -EINVAL;
- 	}
+As I say, need to see the code. Otherwise... sorry, I'm no longer
+interested in your problem.
 
-@@ -944,14 +942,13 @@ qca_spi_probe(struct spi_device *spi)
- 		return -EINVAL;
- 	}
-
--	dev_info(&spi->dev, "ver=3D%s, clkspeed=3D%d, burst_len=3D%d, pluggable=
-=3D%d\n",
-+	dev_info(&spi->dev, "ver=3D%s, clkspeed=3D%u, burst_len=3D%d, pluggable=
-=3D%d\n",
- 		 QCASPI_DRV_VERSION,
--		 qcaspi_clkspeed,
-+		 spi->max_speed_hz,
- 		 qcaspi_burst_len,
- 		 qcaspi_pluggable);
-
- 	spi->mode =3D SPI_MODE_3;
--	spi->max_speed_hz =3D qcaspi_clkspeed;
- 	if (spi_setup(spi) < 0) {
- 		dev_err(&spi->dev, "Unable to setup SPI device\n");
- 		return -EFAULT;
-=2D-
-2.34.1
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
