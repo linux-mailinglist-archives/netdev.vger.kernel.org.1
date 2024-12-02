@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-148164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76DDC9E098A
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 18:13:33 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D3399E098D
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 18:14:09 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 369FB281800
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 17:13:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 098101636A1
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 17:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70EF11DD889;
-	Mon,  2 Dec 2024 17:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0121DDC32;
+	Mon,  2 Dec 2024 17:12:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uWsUteNS"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ZiH9r2E+"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2087.outbound.protection.outlook.com [40.107.102.87])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2060.outbound.protection.outlook.com [40.107.223.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82561DC1B7;
-	Mon,  2 Dec 2024 17:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84AA71B6D0A;
+	Mon,  2 Dec 2024 17:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.60
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733159572; cv=fail; b=mfz+s6GXyrErqaM8GQPa5XmCJLPm13wnnZkfmwST8aVwoyv4fefNKVAye5ckeCNYBluLnUBp0DjvAtn+S3H1l1Hx5vYNRlf5cAnzpkXX3GX8SyJIHqkPey4xx+nL8GG16sQLJuBPCetT+qs6lFMINHcyPCSOsGUnOHKR9wY0OCg=
+	t=1733159576; cv=fail; b=jZBXeKvN55UT40a/l3Pce4SETuG3UQh3gzSwjmHooT4Rk4RepzIlHZACac0jdq+Sx2GJ7RCLr1Cy2Rafk9qmF0LoAv/N+72Fws1Hg0AWVgo2WJTXSgPu8MjiOyFSS2TwaDoLzCB7GFEXtyp1o+USZ3Q3kzog0N7D1Nddnpxf0+w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733159572; c=relaxed/simple;
-	bh=7dJ9SCpR56jPC+onx5S12VipgcO32CPE2cL5ssgk+QQ=;
+	s=arc-20240116; t=1733159576; c=relaxed/simple;
+	bh=8MIy4mhS9InT4qDaJJBoe5oxJ7kQoR8odQLTfvRu9Qg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NpfFRTlb8+zr3TTkkekKd/HPfG5YL6Sk2WCTrmsN9aTAfDaGVhrxp3jIQbKGV/ec342EWHJDXjsIODJVKCWA+1DjuVG+nT1epdmmKH3ExTEOYJacSSux4tIvkPSadgX7gNlaqbomCg67CWSlXtBmgnhc7ny+zM8ej3+fFq7t0Qc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uWsUteNS; arc=fail smtp.client-ip=40.107.102.87
+	 MIME-Version:Content-Type; b=YitJ3RiHr0tD+7L0QURE6Sb+HuMDQ48dKFxxpocIGss1olNf+qXsMWfRgYWX+qcWD4P75287gYIWCi7vTh457GotkDkkLKVvYXpzLMcH7xNhFGU6/8PMP+bhCGnC0Efgh6RziwiTU/x68OpzKlihwZhXLNx8jSptRNSgbQ3W7ic=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ZiH9r2E+; arc=fail smtp.client-ip=40.107.223.60
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cyCinR+lDkSDDnwT/jnnUzpjOFlBjdmI2GDJ/QIm6ETk7WLwk6kLfV+mzmP4zDilIs0QDDJpW1m5jnhf/hoSo5Ba+rOr7Zep8h5eghDM7hz8UNT9/oeEAjr3kOAbkmPLGZ/DGj8mgiDALU26PXAeboGqD9WhjcuVuLwx0zSk172+wbBj/XUx4F6M2w1nnw72KHa9bRu8UMKVkfqZVGHp6A2OnDnE59kV4WjQ0DLm15V3zmZZbqE+2wOHjqCEOngBc9yXjqwiPU0i058T5TPTRvWcf3E1EcFTB6MwW4gTJgAot4S9EfltZ3AdF49u8F6vI8sB0menYa5RyJGGNgz8aQ==
+ b=D9BBoa7IDClesJxFyJdBFcJ5Ev45CVYJaYIPSmJTaFMZqYyY/Bu9M0+nRLsH2B46jfzlhJEuxnWKiimH4JQyUOkGF4tGWotmhwNhf9HBZRYvaj6cx6mHP6JjDw1lhlVepFQ0vm9W9YryxkFakRqepKmrQw6i7F7Czg4nDkhc5XQICz+berrIbuqQYYmxQ4yVM9DMVmNhK04g10t/SOxwhZO1UiwVJ/48+ZYYDqX5WTVrERPdfqRTYY5pQ+ed1Zq3+Euh7pyccbJoFolKslo4NtePxZz91TLdC0pH9G6xfr3aUHP+C0R9LXsZMaXCuawjSqBLp8I4W63ZpPsBwDoYtg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BkFXJXTF1hKUCjyFZna/mfhOgWf0R4Zmv1ecOKxtj+o=;
- b=AJhsjht7x4n8RF6KD1f8fVhw+hL1gLyfbn7OtTtET0trlVVPXnPxrRkfEePpZe5Fu/GOjw2uP+2x7hwC+ChXetyRN3B7n9hFpA1Qv2/IsJBkQgKNNcIoBi7r1QKHVMyx6tidi/a1inxM60wLEq9vH8Uu/ILOwotU7D0j8h4Gf8ve2jWPY5S/B5ZEG6Tzfvl1wakM1auUdPALpaOy13CHgm9XUbZKj5xDPU12rmjQo37u46O1k2jA2KJrq0aG307n40s/M/a2woEkyTU2MGqT2p1YBevlWlHp/XmQMhmXTiPtaMq0Mfha0p7HNUwXomJmQ4wYktAPeosDphxPGW72GA==
+ bh=BDqiyOkYzOZw2HTaMKuN+wpL8mBGD6I6C1rH4H+psjA=;
+ b=wjLcmAVo/R33C4VuGls6TEMiuxLOBxzySGetkVH1fCyHc5wFJUyuofMbcPdwv5VKrU43Ob2NcBZcZiH7Rt2taMQZ8l8KK97iLZc3TUNOSra6vOLLekBJrh84ChvOAbfNK1+IrRNPJAOV/5YvOmHEQb14kBLS8a2kDfX+iykdP9rwzXZOzjVs0o5j+5ce07f5rAHI5VPFSpAO+IVWXRfHrslfd9cw8Fo8n2Be/7y6+arskdaZl7euDze33NetkjlTIl3SCPg54j6EGPOQX4G3sBYWUvElVFMi1cfa5LqiXVYOWUL6sZr5hh4G1LU0oKEGAoDAFwd0/umScYw5/9w1vw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BkFXJXTF1hKUCjyFZna/mfhOgWf0R4Zmv1ecOKxtj+o=;
- b=uWsUteNSOmnV0KAogQ3t6ANiKlBenmQOA+GQj8Ukl2LhYfCXf+UY59Yt2ccK4x0LdbqWfcih4iTaKBl8+Vfit9YLYevx0McdCyi8t2HE5Vz2t586jvJZpwCw51jYTAYzfz4eNICwzT+eTrqa/QoLIv1BV7IspX7AZgAx+X+Hsyk=
-Received: from BN8PR07CA0026.namprd07.prod.outlook.com (2603:10b6:408:ac::39)
- by SA3PR12MB7950.namprd12.prod.outlook.com (2603:10b6:806:31c::13) with
+ bh=BDqiyOkYzOZw2HTaMKuN+wpL8mBGD6I6C1rH4H+psjA=;
+ b=ZiH9r2E+GJs05iQvrxqz2PhfJRct4cXSZ/AL1YU+2DMZsOFOkjyaZIiPBWOymA5Ro2JYOBhs1UIHypwYVHGtjQrkT8rz3aeL/Hwk2WzmdgEcxKhsCyQ7RHezrZorEPDBLL2zcNmbJprMYUsLb1zLf9DEpCfwsG1zIqpKFDOX+TM=
+Received: from BN8PR07CA0031.namprd07.prod.outlook.com (2603:10b6:408:ac::44)
+ by CH3PR12MB8073.namprd12.prod.outlook.com (2603:10b6:610:126::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.18; Mon, 2 Dec
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.17; Mon, 2 Dec
  2024 17:12:47 +0000
 Received: from BN2PEPF000044A9.namprd04.prod.outlook.com
- (2603:10b6:408:ac:cafe::60) by BN8PR07CA0026.outlook.office365.com
- (2603:10b6:408:ac::39) with Microsoft SMTP Server (version=TLS1_3,
+ (2603:10b6:408:ac:cafe::55) by BN8PR07CA0031.outlook.office365.com
+ (2603:10b6:408:ac::44) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8207.16 via Frontend Transport; Mon,
- 2 Dec 2024 17:12:46 +0000
+ 2 Dec 2024 17:12:47 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,24 +65,28 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB03.amd.com (165.204.84.17) by
  BN2PEPF000044A9.mail.protection.outlook.com (10.167.243.103) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8230.7 via Frontend Transport; Mon, 2 Dec 2024 17:12:46 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB03.amd.com
+ 15.20.8230.7 via Frontend Transport; Mon, 2 Dec 2024 17:12:47 +0000
+Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 2 Dec
- 2024 11:12:41 -0600
+ 2024 11:12:43 -0600
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB06.amd.com
+ (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 2 Dec
+ 2024 11:12:42 -0600
 Received: from xcbalucerop41x.xilinx.com (10.180.168.240) by
  SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 2 Dec 2024 11:12:40 -0600
+ 15.1.2507.39 via Frontend Transport; Mon, 2 Dec 2024 11:12:41 -0600
 From: <alejandro.lucero-palau@amd.com>
 To: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
 	<dan.j.williams@intel.com>, <martin.habets@xilinx.com>,
 	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <edumazet@google.com>, <dave.jiang@intel.com>
 CC: Alejandro Lucero <alucerop@amd.com>
-Subject: [PATCH v6 06/28] cxl: add function for type2 cxl regs setup
-Date: Mon, 2 Dec 2024 17:12:00 +0000
-Message-ID: <20241202171222.62595-7-alejandro.lucero-palau@amd.com>
+Subject: [PATCH v6 07/28] sfc: use cxl api for regs setup and checking
+Date: Mon, 2 Dec 2024 17:12:01 +0000
+Message-ID: <20241202171222.62595-8-alejandro.lucero-palau@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
 References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
@@ -93,125 +97,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Received-SPF: None (SATLEXMB03.amd.com: alejandro.lucero-palau@amd.com does
- not designate permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044A9:EE_|SA3PR12MB7950:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7e5aa547-16a0-44d1-3028-08dd12f48afd
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A9:EE_|CH3PR12MB8073:EE_
+X-MS-Office365-Filtering-Correlation-Id: d44ca879-0649-416c-c9d0-08dd12f48b57
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ulMpHYZtC89wTTttexH/IMLv7E4u3zVcD4Dm4U1L+X4x6an9/nUVjxAxicPd?=
- =?us-ascii?Q?4j9827sSU9Sxhg8/RxisqxXdY///OvZHG5+19Ez2Z0/mECvoHbSMLdCB4Oqd?=
- =?us-ascii?Q?hlBGEIy+EjQShakfzUjm8Xo79fDgWkUrtojbuVbCdsAbWso8WMtmsiuWjNjC?=
- =?us-ascii?Q?bNRziy6J7YFnDJJb9fIdEPqJBPn0XmOUVSPnOC9LT/LWAWT9vQGg3V205x64?=
- =?us-ascii?Q?rh+vfJqw3AdaM+PNev3qxQ2vEyCJqLUart+zRKZppMR7pQLzG3xhJzF0KCqa?=
- =?us-ascii?Q?YaG3Y5Ttdj1+MQ4nwxVWwgis/os5CZjtNT0gpI5FFxiT3dc+23E6M3EeFpQw?=
- =?us-ascii?Q?+zJQeYRRTRH1COZFG7ujsEFDrYSamjeqVAzD5+z2UiPdeEiEe0ZVSdFkDzHE?=
- =?us-ascii?Q?d/2GRhh8d9rO1kyj6FbXsf5hM1zhf8IpZ+XYm9yEhpHngYz/PNmsj6p14JrJ?=
- =?us-ascii?Q?MRFmFoUy5takXjIB9rJc1k3AsK62l3RIEfzbW8j6TQ98mwaApvcGHCWKm6Pq?=
- =?us-ascii?Q?uE+N3juhiCCyK2EILBejS31nCF0iKGsAQyOQ7xRIMLaEVihZrNuCXRgFTMRJ?=
- =?us-ascii?Q?PoTINkDoaVBT6tyym6MubaYlFRd9CA6TbNg3iX50jnhvHiYNZYYhDRFP/FEM?=
- =?us-ascii?Q?lyNCIB4e8unQyU2o2+pby9BcdTEI8/6+sR+yzlRdg1JUnVu3TFMLy4WSYky6?=
- =?us-ascii?Q?GMfTLrg5WWZgwtxvSGInnKnCdKinBMRor7UD383VrDlZWg9Tre42c3uWb8H3?=
- =?us-ascii?Q?Shbp19/kcgTUXsYVFgeCXRwx8Nq/NjA6r9x8yT+NvUK2yynLzvz01VdKCf7w?=
- =?us-ascii?Q?WeSsptSEjF/xOeCqna5NIuti09z+W4nBbX9o5GuDVpBX0SZid5hvgNvNyXbQ?=
- =?us-ascii?Q?1Fn5/D6wXtkkDnajukox8/Dux+T0ZIMpuYkHzi+FDgNBCwnZCqPk0PGp+fA/?=
- =?us-ascii?Q?SACJaiIpumbmk4h3+u9qA3Lqkhjfp0r4SCzd12FVFUgTqGu7q1pPfu6XMh4W?=
- =?us-ascii?Q?/EFZHI/yD0KR8uDsczZNrQ3Xn1bn8Cr2ahJ5LeHgTXZzRUzxbe0nQWbDrHy4?=
- =?us-ascii?Q?sgcd/u/Xk2FuLtji+uyAOLAH/TILALFVmjMgF12QEu6t9mvcKBn+PdF9WJwL?=
- =?us-ascii?Q?5lYPgukhKl94vfPsA+U6lugGjjE8JvLdKVMCSvddPiNE/I54+xrrCo5keLn1?=
- =?us-ascii?Q?uUQ2An1TOD0MUkvtFu7X1UjVzIxQ9z35N/Y0vpHfRUDYDiAorpolxkTOUBFK?=
- =?us-ascii?Q?81zxXtIxe4NUBMRo1Mzj8hmwXq2+eUVKbUd1ViwhH4nZDsDG1VweTIt3Fzf5?=
- =?us-ascii?Q?fQ1Cr8uOPyY4BAgTweP+gdinqbforma0bAEgv7t5LUlFs4I3NKopBlvV+YtB?=
- =?us-ascii?Q?yKdQF1yPIRenytjnl5i8SIW10ugJ1+FWTSNZUxySjhUkbYlQ2CafWG/YOJJz?=
- =?us-ascii?Q?72uwPZ/IdGr8wK82bvnq7KuYuKgEYjkdyBl7K4n7O/l2iqHhY0kWPQ=3D=3D?=
+	=?us-ascii?Q?2EMAFOAW3xNyH+EspVU2s8SvvWEqFg2u4GStoERoh2C+moKN9yydu2vOIfKe?=
+ =?us-ascii?Q?1S5mPCkxt5r4GRhESJQISBE3Dmtw6fTluets5PlhLHiNDMI74JAIu99/IaTI?=
+ =?us-ascii?Q?PoCBN3N5iZzkhBhHcowlVOra5CW6ArY1fd9FH6rGFPqemKGtbavaRfB8c29h?=
+ =?us-ascii?Q?WGoezwtz1RoViVQM6MVKJgBgYFqZrjpaUGc/eJRffWrXInYYnuOhICyPhnd/?=
+ =?us-ascii?Q?1eehIMihTLwxfAIJu39Cp+HKq61dO48MluCgYYMHmHmWj37ozcO4uVKO0rXv?=
+ =?us-ascii?Q?PgVKBSzHJBFDSBJ4RC6zGtCqBVq6981HdqOikeiMhJQHnJ/gcpXHRSP6/0XB?=
+ =?us-ascii?Q?yAGvnSIrNZJIodHCKM/yGrPHT5qWGyiJFgRPqR0sjg+8XCwtfw2fJsxAP5Rx?=
+ =?us-ascii?Q?Shzl8Jl77TlW2Q275bcNYe6f2jY7z3deUGL8QF8EXuDXr0dmcPhyqhJn0bW9?=
+ =?us-ascii?Q?FiqyayyJkOkvvwdmwYl/PBT4JNehpGhYRlA0Jh23P+uklGCJIl4sLsxlz4w4?=
+ =?us-ascii?Q?Rx0uyenJ029X5CdpRTi3RcXDLDU+dnbH7GVjFB7XzJffHSHF/R7iMiS7R9N5?=
+ =?us-ascii?Q?VSmtfH4YryMeROpBe/dkIGhdjQJxtrapU9DdJDyzFbE9dRRDXuT5kxZ/Arkp?=
+ =?us-ascii?Q?7tLn0T2glR+RVQI/4sLxiAFvPIKodkGtgPAky5KTOXcU/nxnV/qrG5JuwfEC?=
+ =?us-ascii?Q?3TGkc+/8lk63VoxwEp1Wzjwurboe0Zz3ffYIGNlZzshoy5gJI8gfQ4k+Vt+u?=
+ =?us-ascii?Q?tgAV/jf1AlMafQV/yPSFH8lZs2ev6XU6fkufyH978Y5XbqXyW3BU+nBK5qFV?=
+ =?us-ascii?Q?l2Big5bzLyQobCpM1OltxuV8601OE5N0XpNUdNVgLVvyCUYz17P1P4Ddo2x4?=
+ =?us-ascii?Q?oS+yd3ANdXA64C97p8RZH/QPIbqOX3rNGBTxBaEdYP6ORO5CPUMpmCGJbdh7?=
+ =?us-ascii?Q?1buJdApQAZRCWf3NF8vfhMxpP2Wdcn8BSedlcTZmLsNsNG/7C2WIxqeE6tDf?=
+ =?us-ascii?Q?uzWRAIf2QBeTSaPNDRHAnkxIn4FnnYcxZ6brt13hdW2vC7YDZ4YIEqmGCTpF?=
+ =?us-ascii?Q?MsykfLUFK/4QRHjIxHVxQM5pF6WX1MvarR8WEPd+WWdHq0UBWMKtdzwzQr8m?=
+ =?us-ascii?Q?b5X8nMR3fnUgEF2Yv7lXMolZ+wguvdYot5VpVMIDdgDtmFhySenyJNmfU23o?=
+ =?us-ascii?Q?kvfkpH7DRNlLB8SQuZL9rtARmMbZnCOmQII3xT9WCDThXncy/g4blPOp5o3e?=
+ =?us-ascii?Q?BO1Te8k9ac9R1cUW+Y4KHH9w93BRIfyolJJ0tL80JQzydQpP7zlCX/68i3xk?=
+ =?us-ascii?Q?GzjWYrAONgcBGohJs9ellvXmzGjSHrPnIdS2uQBgk0k6N81cuxMqj3VhdBaV?=
+ =?us-ascii?Q?Oz+rk77wvqINDGWaPu8D0MxS/GCVcKO1VgamjgYlkpNGhvlHys1P9wG+Ts0l?=
+ =?us-ascii?Q?IZ57Tdq0qhqqvokc23DuikOByilnrIltBggJTJitKOPL0q25GCEz7w=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013)(921020);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2024 17:12:46.8866
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2024 17:12:47.4803
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e5aa547-16a0-44d1-3028-08dd12f48afd
+X-MS-Exchange-CrossTenant-Network-Message-Id: d44ca879-0649-416c-c9d0-08dd12f48b57
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	BN2PEPF000044A9.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7950
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8073
 
 From: Alejandro Lucero <alucerop@amd.com>
 
-Create a new function for a type2 device initialising
-cxl_dev_state struct regarding cxl regs setup and mapping.
+Use cxl code for registers discovery and mapping.
+
+Validate capabilities found based on those registers against expected
+capabilities.
 
 Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-Reviewed-by: Dave Jiang <dave.jiang@intel.com>
 ---
- drivers/cxl/core/pci.c | 47 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+ drivers/net/ethernet/sfc/efx_cxl.c | 19 +++++++++++++++++++
+ include/cxl/cxl.h                  |  2 ++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/drivers/cxl/core/pci.c b/drivers/cxl/core/pci.c
-index 378ef2dfb15f..95191dff4dc9 100644
---- a/drivers/cxl/core/pci.c
-+++ b/drivers/cxl/core/pci.c
-@@ -1096,6 +1096,53 @@ int cxl_pci_setup_regs(struct pci_dev *pdev, enum cxl_regloc_type type,
- }
- EXPORT_SYMBOL_NS_GPL(cxl_pci_setup_regs, CXL);
+diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+index 9cfb519e569f..44e1061feba1 100644
+--- a/drivers/net/ethernet/sfc/efx_cxl.c
++++ b/drivers/net/ethernet/sfc/efx_cxl.c
+@@ -21,6 +21,8 @@
+ int efx_cxl_init(struct efx_probe_data *probe_data)
+ {
+ 	struct efx_nic *efx = &probe_data->efx;
++	DECLARE_BITMAP(expected, CXL_MAX_CAPS);
++	DECLARE_BITMAP(found, CXL_MAX_CAPS);
+ 	struct pci_dev *pci_dev;
+ 	struct efx_cxl *cxl;
+ 	struct resource res;
+@@ -65,6 +67,23 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+ 		goto err2;
+ 	}
  
-+static int cxl_pci_setup_memdev_regs(struct pci_dev *pdev,
-+				     struct cxl_dev_state *cxlds)
-+{
-+	struct cxl_register_map map;
-+	int rc;
-+
-+	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map,
-+				cxlds->capabilities);
-+	/*
-+	 * This call returning a non-zero value is not considered an error since
-+	 * these regs are not mandatory for Type2. If they do exist then mapping
-+	 * them should not fail.
-+	 */
-+	if (rc)
-+		return 0;
-+
-+	return cxl_map_device_regs(&map, &cxlds->regs.device_regs);
-+}
-+
-+int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds)
-+{
-+	int rc;
-+
-+	rc = cxl_pci_setup_memdev_regs(pdev, cxlds);
-+	if (rc)
-+		return rc;
-+
-+	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_COMPONENT,
-+				&cxlds->reg_map, cxlds->capabilities);
++	rc = cxl_pci_accel_setup_regs(pci_dev, cxl->cxlds);
 +	if (rc) {
-+		dev_warn(&pdev->dev, "No component registers (%d)\n", rc);
-+		return rc;
++		pci_err(pci_dev, "CXL accel setup regs failed");
++		goto err2;
 +	}
 +
-+	if (!test_bit(CXL_CM_CAP_CAP_ID_RAS, cxlds->capabilities))
-+		return rc;
++	bitmap_clear(expected, 0, CXL_MAX_CAPS);
++	bitmap_set(expected, CXL_DEV_CAP_HDM, 1);
++	bitmap_set(expected, CXL_DEV_CAP_RAS, 1);
 +
-+	rc = cxl_map_component_regs(&cxlds->reg_map,
-+				    &cxlds->regs.component,
-+				    BIT(CXL_CM_CAP_CAP_ID_RAS));
-+	if (rc)
-+		dev_dbg(&pdev->dev, "Failed to map RAS capability.\n");
++	if (!cxl_pci_check_caps(cxl->cxlds, expected, found)) {
++		pci_err(pci_dev,
++			"CXL device capabilities found(%08lx) not as expected(%08lx)",
++			*found, *expected);
++		goto err2;
++	}
 +
-+	return rc;
-+}
-+EXPORT_SYMBOL_NS_GPL(cxl_pci_accel_setup_regs, CXL);
-+
- int cxl_pci_get_bandwidth(struct pci_dev *pdev, struct access_coordinate *c)
- {
- 	int speed, bw;
+ 	probe_data->cxl = cxl;
+ 
+ 	return 0;
+diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+index 05f06bfd2c29..18fb01adcf19 100644
+--- a/include/cxl/cxl.h
++++ b/include/cxl/cxl.h
+@@ -5,6 +5,7 @@
+ #define __CXL_H
+ 
+ #include <linux/ioport.h>
++#include <linux/pci.h>
+ 
+ enum cxl_resource {
+ 	CXL_RES_DPA,
+@@ -40,4 +41,5 @@ int cxl_set_resource(struct cxl_dev_state *cxlds, struct resource res,
+ bool cxl_pci_check_caps(struct cxl_dev_state *cxlds,
+ 			unsigned long *expected_caps,
+ 			unsigned long *current_caps);
++int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds);
+ #endif
 -- 
 2.17.1
 
