@@ -1,145 +1,142 @@
-Return-Path: <netdev+bounces-148145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 901379E07DB
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 17:03:34 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 345ED9E08BF
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 17:37:28 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55F42281CEA
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:03:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4604016B0D5
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7394013AA2D;
-	Mon,  2 Dec 2024 16:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3521925BC;
+	Mon,  2 Dec 2024 16:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="H0KVIcoM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O9/Aq6fw"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6BB13B2A8;
-	Mon,  2 Dec 2024 16:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22571192B65
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 16:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733155411; cv=none; b=L872Eie1gW0uHTIn06ELYSkk2Ca79XMTAosX0lJ40qx2MB6PQMUm/H0kjAu1yFGow1didbIrJt4iZnzX3DjyTpD+hF1sVPyhm7eWcinGQatlLjQSc9fE2Vzt0BptaQcX2aihnikZbmxrvZpsNgVTPRGkSsA3R63jR8Y9/VYdpZM=
+	t=1733156582; cv=none; b=tB+zcRYOtNB+wK0LC5RvKfxwNcOVkrF5JMRssISvsS8rwq6hm748WS5BTCDYHS+uX7qZXy14bRTLZZHpq2+mr7SE92j/+t0mImSM8LsKL8NSB4nWuC6fXTMOIIBeqKbyJSN4A5WektFtF9EFvv3jFUsTr1Q5TWTLvjEOgbFhB5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733155411; c=relaxed/simple;
-	bh=STrMM8KN1Ec1+CaLg2m1Kx1Cvn7Z7/lLGkELIAy4GdU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rmBTpD9l6+dJeKHGPEBBU77e8LmwYM2UWNeZFrT+0uhu2EDON+hFxAL8PDiVCA9+Q7uQ0Cq189lfdO/ycNtmKqwIk+IVDgFSFW/RTQZxdyrSNbXYCYuRy6/NqR8A+kh+ijKuJ7u1DHnsIzCEY2YcZQhYkYSzrwdpf22upiuh1AY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=H0KVIcoM; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=J/zMQiaN6dYZzz32+DhTjsqFEPVQYfpeCe+pJ1zng0Q=; b=H0KVIcoMoaicbifVZYQRwnauuq
-	edwE5y3U9lvcgfYQ5wh0G0OPStj2afnd5LHO0DiRpSKotlO03/WvHWoERT5WD80vd/AW+IWqPn991
-	5vwfJaDTuoMVaLbi8Zi0VsTx0JB/42iwgt6IW6hdJncPgdOYSTTmdZ9rv+0bFLLUPGeyqvm+9V+fa
-	nYfJA+lDxtNTio+3QvnmpQNrjpJb/GtGL4yrJY4b3PU+t9g5k4MifIxJderUpqycdG8L6R4Z2xdu+
-	EUgq8o9JEVIC0XZFaAS899kXtHa0Y6+uHmu4U2cv8+8Mdq67sipEPAgOe/G/gVWfwNatOpfd4oeVP
-	OO0/PF+A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35862)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tI8tG-0000LE-1Q;
-	Mon, 02 Dec 2024 16:03:15 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tI8tD-0003hN-0v;
-	Mon, 02 Dec 2024 16:03:11 +0000
-Date: Mon, 2 Dec 2024 16:03:11 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Michael Dege <michael.dege@renesas.com>,
-	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
-	Dennis Ostermann <dennis.ostermann@renesas.com>
-Subject: Re: [PATCH] net: phy: phy_ethtool_ksettings_set: Allow any supported
- speed
-Message-ID: <Z03aPw_QgVYn8WyR@shell.armlinux.org.uk>
-References: <20241202083352.3865373-1-nikita.yoush@cogentembedded.com>
- <20241202100334.454599a7@fedora.home>
- <73ca1492-d97b-4120-b662-cc80fc787ffd@cogentembedded.com>
- <Z02He-kU6jlH-TJb@shell.armlinux.org.uk>
- <eddde51a-2e0b-48c2-9681-48a95f329f5c@cogentembedded.com>
- <Z02KoULvRqMQbxR3@shell.armlinux.org.uk>
- <c1296735-81be-4f7d-a601-bc1a3718a6a2@cogentembedded.com>
- <Z02oTJgl1Ldw8J6X@shell.armlinux.org.uk>
- <5cef26d0-b24f-48c6-a5e0-f7c9bd0cefec@cogentembedded.com>
+	s=arc-20240116; t=1733156582; c=relaxed/simple;
+	bh=Zsms+C4NOXG/Dy3KLtJWWY/xMoO7EcT/34IHBJcUaRc=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=Su9q8XmWfLPdhK+gYKDEtl7x2Z/RB45qXoxAsyLTfXvChopDZ4ounXPVpjQpVvwNxS6DZOQUyTAJ7X2gpvEOzQBqtk5F85D4D4vv3LRpP/uq1sMLrTic2pOLqAZ+Oh+N9i6JQu1UnV8QPb5wp9mbmi3iujS6nmDRRrVEWUM7uOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O9/Aq6fw; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-434a0fd9778so41385385e9.0
+        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 08:23:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733156579; x=1733761379; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3YxeGxBXYGXTZb93lQ9kig+HGhN+3cwpXcO70XlpyaE=;
+        b=O9/Aq6fwA1vF5+W+MbU/1/vu0BggBMHjcI7HyYGw1+t2R2BX8/qRcRDfIE14eZNhoT
+         GXQSC36ziFv5zVdedDi37MiI+QUktI+kbwOlqZgHArckkBOZGw80c6+jwDBTV/GWwUgT
+         iuKAeYvnAvEzviVUII3UBbaKf4WR1PRc/fWUBacnxjoNN2DSYSIw5dA7P6HTuAT/LrwP
+         7un5YgNoJIuBuwRzn9EGBEafZH64ckFm2UuGtfUuUkNC7YWmX3HJFdaDSLQeVPvlymrX
+         t4TikPfdyfnA7nJDLtm27+KiVmJYkoiBfrUiLm/KZdtoTfhkzUV08imLSzFMmp95W7nJ
+         ydWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733156579; x=1733761379;
+        h=content-transfer-encoding:cc:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3YxeGxBXYGXTZb93lQ9kig+HGhN+3cwpXcO70XlpyaE=;
+        b=meD05P3uvhKwPfcKFdhZzI8mwOlTpT1Od8UpjhaDu1W0DiKfQLEF3DUJKqHf1Sd5w8
+         qNwbkP1TUs6gpbNO/i9uNJnXRKA7Sd3r0FT3HgXFHhu8TKO8kyYZpds7Fbb2X6iCKBw6
+         L/tTKjsoLfKcK9HjNxbuLJEZLps1s+WRk9yhuOf/3vsRv+VBbvRqZyRc2kAHIFPJ5aag
+         wDpIouDlMEKfXct/mPhveyDwhbyGwrucNfgZVir4/VRh978nzSlhA9r96n5SLrAH6/Mp
+         lVx9UUFLwum1eilljfI5DprCz2TKJs3Idfk14A45j97XXnZ6TtfHWLmlGp6SZk+4efyJ
+         GxEA==
+X-Gm-Message-State: AOJu0Yxzng7+zxMqU1zGGdlYuG74bO1IbzBsn68G3V3TmrgKBbVLvE3H
+	sJ8p6+6ih7FH61I+hy4+2uJ+o7+QtpTSF2E9QijSLBheLa/4w4BKjy8jTxu+
+X-Gm-Gg: ASbGncvoMq6fq64SeC+HxJV8eOIfiuuifrgvcGDvfMwvl6wTRuExpiyJssZR2bisxRg
+	Bb/54n2JK9kxHSq+Px3Pa3IQGKQxOi3BZShw6DrfINgbsrjnUAvXYgjIAbgJ31zg8XlPt+rHBdb
+	Alybr/R2s2xpkciA3dL239kAtTxXBaZcdWWrpvRD/KXAOQ1Zxbs6k0b+2zH3kcPWLZ0/d0661Yb
+	eerAHXs0aOYVRQ0+E61e654eVBN+i9wnmAwHgagDmtShbpS81nE6jnjTskquX2Z+mfdqUARUp0o
+	Ds3/HtzdyX8+f3RpZ0r3dK37waD0zvrdVmZEzbk9dOud/Rsisy1PIS+1AR1y/oM3++kVbOGjh10
+	p/Q==
+X-Google-Smtp-Source: AGHT+IHJMnMvpKq7Hj7JyQcmDN/8Ny6qODY6Et1O1ZBQY+4XeadXXH4b5DxlcqU1ywMejxBx32c+8Q==
+X-Received: by 2002:a05:600c:458b:b0:431:5f1c:8359 with SMTP id 5b1f17b1804b1-434a9dcfd5emr222330845e9.15.1733156579093;
+        Mon, 02 Dec 2024 08:22:59 -0800 (PST)
+Received: from ?IPV6:2003:ed:7731:2315:f8e3:ac9e:6d58:8a90? (p200300ed77312315f8e3ac9e6d588a90.dip0.t-ipconnect.de. [2003:ed:7731:2315:f8e3:ac9e:6d58:8a90])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e2c84d52sm8119292f8f.49.2024.12.02.08.22.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Dec 2024 08:22:58 -0800 (PST)
+Message-ID: <6c7ae1c8-8573-4f4a-96cb-0a75eab21516@gmail.com>
+Date: Mon, 2 Dec 2024 17:22:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5cef26d0-b24f-48c6-a5e0-f7c9bd0cefec@cogentembedded.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Lion Ackermann <nnamrec@gmail.com>
+Subject: [PATCH] net: sched: fix ordering of qlen adjustment
+To: netdev@vger.kernel.org
+Cc: toke@toke.dk, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, nnamrec@gmail.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 02, 2024 at 08:51:44PM +0500, Nikita Yushchenko wrote:
-> > > root@vc4-033:~# ethtool tsn0
-> > > Settings for tsn0:
-> > >          Supported ports: [ MII ]
-> > >          Supported link modes:   2500baseT/Full
-> > >          Supported pause frame use: Symmetric Receive-only
-> > >          Supports auto-negotiation: No
-> > 
-> > Okay, the PHY can apparently only operate in fixed mode, although I
-> > would suggest checking that is actually the case. I suspect that may
-> > be a driver bug, especially as...
-> 
-> My contacts from Renesas say that this PHY chip is an engineering sample.
-> 
-> I'm not sure about the origin of "driver" for this. I did not look inside
-> before, but now I did, and it is almost completely a stub. Even no init
-> sequence. The only hw operations that this stub does are
-> (1) reading bit 0 of register 1.0901 and returning it as link status (phydev->link),
-> (2) reading bit 0 of register 1.0000 and returning it as master/slave
-> setting (phydev->master_slave_get / phydev->master_slave_state)
-> (3) applying phydev->master_slave_set via writing to bit 0 of register
-> 1.0000 and then writing 0x200 to register 7.0200
-> 
-> Per standard, writing 0x200 to 7.0200 is autoneg restart, however bit 0 of
-> 1.0000 has nothing to do with master/slave. So what device actually does is
-> unclear. Just a black box that provides 2.5G Base-T1 signalling, and
-> software-wise can only report link and accept master-slave configuration.
-> 
-> Not sure if supporting this sort of black box worths kernel changes.
-> 
-> 
-> > it changes phydev->duplex, which is _not_ supposed to happen if
-> > negotiation has been disabled.
-> 
-> There are no writes to phydev->duplex inside the "driver".
-> Something in the phy core is changing it.
+Changes to sch->q.qlen around qdisc_tree_reduce_backlog() need to happen
+_before_ a call to said function because otherwise it may fail to notify
+parent qdiscs when the child is about to become empty.
 
-Maybe it's calling phylib functions? Shrug, I'm losing interest in this
-problem without seeing the driver code. There's just too much unknown
-here.
+Signed-off-by: Lion Ackermann <nnamrec@gmail.com>
+---
+ net/sched/sch_cake.c  | 2 +-
+ net/sched/sch_choke.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-It's not so much about what the driver does with the hardware. We have
-some T1 library functions. We don't know which are being used (if any).
-
-Phylib won't randomly change phydev->duplex unless a library function
-that e.g. reads status from the PHY does it.
-
-As I say, need to see the code. Otherwise... sorry, I'm no longer
-interested in your problem.
-
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index 30955dd45779..a65fad45d556 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -1542,7 +1542,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+ 	b->backlogs[idx]    -= len;
+ 	b->tin_backlog      -= len;
+ 	sch->qstats.backlog -= len;
+-	qdisc_tree_reduce_backlog(sch, 1, len);
+ 
+ 	flow->dropped++;
+ 	b->tin_dropped++;
+@@ -1553,6 +1552,7 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+ 
+ 	__qdisc_drop(skb, to_free);
+ 	sch->q.qlen--;
++	qdisc_tree_reduce_backlog(sch, 1, len);
+ 
+ 	cake_heapify(q, 0);
+ 
+diff --git a/net/sched/sch_choke.c b/net/sched/sch_choke.c
+index 19c851125901..a91959142208 100644
+--- a/net/sched/sch_choke.c
++++ b/net/sched/sch_choke.c
+@@ -123,10 +123,10 @@ static void choke_drop_by_idx(struct Qdisc *sch, unsigned int idx,
+ 	if (idx == q->tail)
+ 		choke_zap_tail_holes(q);
+ 
++	--sch->q.qlen;
+ 	qdisc_qstats_backlog_dec(sch, skb);
+ 	qdisc_tree_reduce_backlog(sch, 1, qdisc_pkt_len(skb));
+ 	qdisc_drop(skb, sch, to_free);
+-	--sch->q.qlen;
+ }
+ 
+ struct choke_skb_cb {
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.47.0
+
 
