@@ -1,72 +1,142 @@
-Return-Path: <netdev+bounces-148255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D5169E0F35
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:04:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3D909E0F41
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:22:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F7F7281F9E
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:04:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59E15282AF4
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A9C1DF981;
-	Mon,  2 Dec 2024 23:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B261DFE01;
+	Mon,  2 Dec 2024 23:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ma9DtIb4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mb0xsa1x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3EE81DEFC2;
-	Mon,  2 Dec 2024 23:04:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB671DF244;
+	Mon,  2 Dec 2024 23:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733180664; cv=none; b=Iilws4avQVsGnQ5aIuydmf27moFSt45TmR1wNTKSvmwVtMYMgu0S6YU3diifFNJ4qu2tpejZwB4t8TGP0gkpoqwEk17bQnGHvN4WOqdWnp8ULN6gcJraycZ3oekVIlUbOmB/qnIdRfadnlgzA6izmNvjgcdASOpHN3YWN8wuLfY=
+	t=1733181701; cv=none; b=LUvgldSl47SGciFdLAZHL7LElXiGwGvp/H88txVk7QHK8G4AEewDQ+4CMh15NhxhDe4r3hKQgKZ0cFDwLGDeqI8FVmiqnCs6CS9g9LUEKBafES5ZYwAnYWev8F7vX+EPvPleBTS9M02lx8rqZIDZzM6nvkBp9sFn3UibVIpbrWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733180664; c=relaxed/simple;
-	bh=cUcN11o068f8TJvGEYCOeVGL/9NE9jBDPC16oMTHyg4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a5mTuR65M6Wxo6SUkH7DQqoXrYrAasgUKKVieykHqQ5VWS9+7Yrs4EL4f4YbA/0xpFYg7IWIVhnwpgqmsSq1y8poWZ4x5QxYRPr34+pmzFTodK9j+taL4spTSn7BcqADDayeyEiN90inWvO6naNvPiufdjdnS6X5CdeXfbx1Lnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ma9DtIb4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B126CC4CED1;
-	Mon,  2 Dec 2024 23:04:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733180664;
-	bh=cUcN11o068f8TJvGEYCOeVGL/9NE9jBDPC16oMTHyg4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ma9DtIb4yu7nOsCnJfIs4udVB/3JxD3QI8pAF+/6HZDUD75QtUW8AwcwX1sWtpp/O
-	 gO/0Pkpv8CAy6tTfLOxWv5IxPWM1KaDlWtGLz6naPC3k90IWmLM9KGoBocoSPSjaLv
-	 qKbshYXYt/Lt2dKp1UExBBgpeCu8Enmhv6HVNI60j1srRZufQ3vDbIotN+KwHvXs30
-	 kKwJm4ZiKPWNaqei0x6CR5bbTs770J2o2s57mXMpoaTIxINOTulnDL1XZjaWs07rTk
-	 fG2ynxLu/H7xElmUJCvmN7IR1TrQi3ns+OYIDyXuhN29tS+IICdMaCkREbVNgZJ2T0
-	 bTuBFjevHT+0Q==
-Date: Mon, 2 Dec 2024 15:04:22 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Levi Zim via B4 Relay <devnull+rsworktech.outlook.com@kernel.org>
-Cc: rsworktech@outlook.com, John Fastabend <john.fastabend@gmail.com>, Jakub
- Sitnicki <jakub@cloudflare.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 0/2] Fix NPE discovered by running bpf kselftest
-Message-ID: <20241202150422.013b4767@kernel.org>
-In-Reply-To: <20241130-tcp-bpf-sendmsg-v1-0-bae583d014f3@outlook.com>
-References: <20241130-tcp-bpf-sendmsg-v1-0-bae583d014f3@outlook.com>
+	s=arc-20240116; t=1733181701; c=relaxed/simple;
+	bh=T0fJkNN8lmu0yQW5xDMaUNuwSNQGFIOPmvlds70OAcE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lrwZdUX3/VdnL6wp9cm0IChtAgqh5hysh6YrFrSDc3cX74Mprw0qVmkMK06FFmI7pmVDRRzRYRbZWckjrCyw+/+Rh2oP3xMGMkla2IU3MQdQZlTmgoFYXl9eZSx3KIfEmghiFXgISmSsv40sMuDfUgqhR+kM/UR/QIZOPKwEwns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mb0xsa1x; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7242f559a9fso4749262b3a.1;
+        Mon, 02 Dec 2024 15:21:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733181699; x=1733786499; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LyFnOYNR7/uDCGGXOyxce2KX24RRI2ramvA/qoNn6Mw=;
+        b=mb0xsa1xL1zLWAMLj9DAEH7IrSW0MrXC93O6mb1xj13XnX4OYEh7XT5vRT319sNf4V
+         Ue0UfZrd7AQCOlfWAIG8H1YPEO0/f9a7TrmAgjegA+JUbBvNw1ZyZP7HpwpvfwCrzlWr
+         RdB8WBgEodsn3TaqKrxxwNVDUNQPWAMEuE6gXTgRq2DhocMCPQgQHBlt9PBZdB/5ryVg
+         MPHVBbc4iyu/mbKFqg7Uv8zogeFfy2MBNTOKbLtWcWyftF6yJ92fq4WLEY5EmCb4OD8Y
+         a03beInn3bbgjN8M5kNvkqVsh+8AUCZs7dAI+gdqFIU3sy7TdsnXOiMMKLyQrCoi9yi4
+         Id3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733181699; x=1733786499;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LyFnOYNR7/uDCGGXOyxce2KX24RRI2ramvA/qoNn6Mw=;
+        b=QiDzYkdYje4oEwpYj1JfSzg69HleZ0AzBpz95eSl1vnr+pbwN7WuJdaeEBlrvkCKAw
+         vMMtgEgVrUih6Hsdhs03sQTZYU87kFEn1CHVR/0JtqDc0GtR2eQPz1uL7kwdOd4YrLjN
+         VRBaos95QJy21WXifI6xrU9dkAI5T3vCIT9K0yI4mrI7AVyGw7B7YpaAYEbsbikLBKNI
+         ajRLD1MO+XPkeB5ks6ZYITxeUoE1n8r2EyhsubRdqR9u1BKwGOqOeV3ipDIVhWTkaacv
+         x803aiZ1D3JNAj5RPhHcOEgzs9yrA7QgIx6uHgXHHSfe6RxXoSZX+q6YHGQSZYNzm+vQ
+         aJtA==
+X-Forwarded-Encrypted: i=1; AJvYcCU6osT9GONdnk3yCCcqiklwZicvc0bKoEkMOLzqd2+S8oeC2LO2oVQ8EKgiQdmUP7Gmfh9N396ErU6vR1hx@vger.kernel.org, AJvYcCVCKA5/gnpEc89ZcU/jOHl7IYLgPwS1eG0Ek2Kq2dq5WRF35Xatn57AXndrhMCq67qTdVsCWEQ8ww867xKsgCtH@vger.kernel.org, AJvYcCVVIuP5aGDih7gJTWrHBjldwuqdSwllXwLufGNIm71F0cd3EY7g0/gx/BtJsMNJVeld7E5fCxy7lIhO@vger.kernel.org, AJvYcCX0WWAToW8+6VFP53KNH5WymgFd7wJeRIMKQz2tShRZgBGxJ62TO97ya2I9EFNXAyOcdyPYSIkk@vger.kernel.org
+X-Gm-Message-State: AOJu0Yywyyl+feR19dl+b56rD4xBPD3RaiKzKgJIyUoZRBHmKumE0sxE
+	E9oLb8A1MvrQ3OpI7sEnJw7m6oHOPokFy4S5H1ZuPhTz3eYvQMRE
+X-Gm-Gg: ASbGncuPl4tX6wGGmMxJmEtUHQg7EOW+OEZFTFyO03XbM3Jv/nhusxlL2INwoPjKvjJ
+	Ph01V5YV7NRhOJevjwpLyWYv91JhAgGYtGsF8CyNirQUDs9TGr3Cj9sqsndFN1lq62VN1CYUeMJ
+	t+yXKuCqWWFHhAOKXQBriVXhNUYrVCmYV8cUwzoVMGCgSGBj7oFqHlWOg650ETM5Uk9cAUAQHTd
+	4018QtHRCpf/9GObG8ahSlKU0F93PVqy1mL6qzH1OiT9OHryY57yFQX+Ks4k5KRpBr7uijc09LN
+	bN4y1EU3VeqhcTjH+A==
+X-Google-Smtp-Source: AGHT+IEXS03Fw+wgJGBsVZ94KW7dwGXzAeA8iM26jbTjQebKyiUAt9gwXwClHbNDAS7WWsC0K1AuCw==
+X-Received: by 2002:a05:6a00:39a8:b0:725:3fb5:5595 with SMTP id d2e1a72fcca58-7257fa3a10dmr317747b3a.5.1733181699099;
+        Mon, 02 Dec 2024 15:21:39 -0800 (PST)
+Received: from localhost.localdomain ([240d:0:4a45:1d00:4807:3add:383b:ddbc])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7254176fdcbsm9098432b3a.70.2024.12.02.15.21.33
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 02 Dec 2024 15:21:38 -0800 (PST)
+From: Kenjiro Nakayama <nakayamakenjiro@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Andrea Parri <parri.andrea@gmail.com>,
+	Will Deacon <will@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	David Howells <dhowells@redhat.com>,
+	Jade Alglave <j.alglave@ucl.ac.uk>,
+	Luc Maranget <luc.maranget@inria.fr>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Akira Yokosawa <akiyks@gmail.com>,
+	Daniel Lustig <dlustig@nvidia.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Shuah Khan <shuah@kernel.org>
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	lkmm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	Kenjiro Nakayama <nakayamakenjiro@gmail.com>
+Subject: [PATCH] selftests/net: call sendmmsg via udpgso_bench.sh
+Date: Tue,  3 Dec 2024 08:21:29 +0900
+Message-Id: <20241202232129.7139-1-nakayamakenjiro@gmail.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Sat, 30 Nov 2024 21:38:21 +0800 Levi Zim via B4 Relay wrote:
->  net/core/skmsg.c   | 5 +++--
->  net/ipv4/tcp_bpf.c | 8 ++++----
+Currently, sendmmsg is implemented in udpgso_bench_tx.c,
+but it is not called by any test script.
 
-Haven't looked at the code, but these files are BPF related.
-I'll reassign the patch to BPF maintainers, and please use "PATCH bpf"
-instead of "PATCH net" for next revisions.
+This patch adds a test for sendmmsg in udpgso_bench.sh.
+This allows for basic API testing and benchmarking
+comparisons with GSO.
+---
+ tools/testing/selftests/net/udpgso_bench.sh | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tools/testing/selftests/net/udpgso_bench.sh b/tools/testing/selftests/net/udpgso_bench.sh
+index 640bc43452fa..88fa1d53ba2b 100755
+--- a/tools/testing/selftests/net/udpgso_bench.sh
++++ b/tools/testing/selftests/net/udpgso_bench.sh
+@@ -92,6 +92,9 @@ run_udp() {
+ 	echo "udp"
+ 	run_in_netns ${args}
+ 
++	echo "udp sendmmsg"
++	run_in_netns ${args} -m
++
+ 	echo "udp gso"
+ 	run_in_netns ${args} -S 0
+ 
+-- 
+2.39.3 (Apple Git-146)
+
 
