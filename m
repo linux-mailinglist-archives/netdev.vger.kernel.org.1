@@ -1,172 +1,172 @@
-Return-Path: <netdev+bounces-148202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3C169E0CC9
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:08:38 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E089C9E0CD9
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:14:44 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85794165065
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 20:08:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A02E52829C7
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 20:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F231DE4E6;
-	Mon,  2 Dec 2024 20:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1FC91DE4C3;
+	Mon,  2 Dec 2024 20:14:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N+hgGlU1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480441DDC20
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 20:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A25A1DE8B9
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 20:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733170114; cv=none; b=G+DvrwL/LL34sgscohuUfhqDTwob7UxpixJElRwgw1NGPoShQ0cteGS5SDeod6v8lsHUKfjVz39UQt0ZifuA0KefAgR0179dx3WhOdY0fuEJ3AzEOhlyxzc8Ol5EqVKhYcYbOtdTcNJplIFPFwm8vAsTRdlMHJJWSnTQFjaTAmM=
+	t=1733170481; cv=none; b=LCNwjrYdTGYTT1Nl4aSM/DiIKCUx4tE6VJRW0KofrHUT5nY4b75mCEf4QgS0p0Dyu2fB/8aTcpusCqkJWeURCnl4hOYpdqENX3DfJcuZm3y0JJ6v4kb5aLHOoqxyHVQ3NSbAM7TIC93zypmpOcDlihLOA6nDLev/6F6uceoR+p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733170114; c=relaxed/simple;
-	bh=qSiP/DGVB9480yaDs2l5qreFVEdTl016XfrHtwqi0RI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qDGRfgzOJrE4s2dCHZ9EX0E9fv8iZmSrxvaLCVKbOoJet/IdMmZuRz3tSbryomzQCECrGAyMBSJSfi3kNPRufmE34qnfTrOXGadkYzZ041OE/R2ybkiV5Zf+u6GiED85glcmc8jqy5gC4VJtCwIfwT1OQxeKY15bbEncw5yWeZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-8444dc6b982so104495839f.0
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 12:08:33 -0800 (PST)
+	s=arc-20240116; t=1733170481; c=relaxed/simple;
+	bh=PdTZe8OV9cN6Ub3GUsZIpQJWNj/NzhFmn/7ZfX/ezfc=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=Kv9Ow77aAWfYdm5Z5QG+bJ1ySlKttOzIj+OGg/0l9XjTMd/HU23W3EXo4ZUwtJuX+OmCEGgjtVU+J2PRECV6xBUU4FgrQRbag8pjYj476p34/rGyfPwllqBHmhvxgihw4Uuow8cfvSwaulpA03PHO6rJHMXOjbBiFLKDSiw5TIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N+hgGlU1; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa51b8c5f4dso684715266b.2
+        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 12:14:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733170478; x=1733775278; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Lw43y/5CggqMenhKGTSFNqSIF9mYkE7DlGGYGan8s2Q=;
+        b=N+hgGlU1U8b1fCTKrTUTZX7NyCrlfOVUj6hHVwO/keBLixRIaDH8pMB9BfCgYcraqY
+         lPGlTOThDye/FF7g2Xcb+BjxDH85n1pFRxrHe7wMgUDjIO712zHROS65bnyWnfeE8Bmp
+         NYy+RPg+SfgeNMmBTk6cMfrG+9xHiRFRGeOsIEq/ZkwugxW1rnIovoBKpH/nVYainDGd
+         FtT50fsQIlMRGVySgopSocWJym6U6oapZjYaq/fIWaT6XvsTURwKWrTyXT/ePGbP6F7Q
+         B95RupaZi/8pwOyKBGtcKBpBq7a12ET4pfxKrCYLmT7ExGEuAVAH2FLG/dqdnoFb7ukm
+         wHlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733170112; x=1733774912;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1733170478; x=1733775278;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=T2DuQQt4YAp0ub8FM1kAcoO6DJSYOWK+rmFmkB4i84Q=;
-        b=T1fhLpGl//vrdPkD7Tq4+xednB3ZL8W0HYsG2NjQYPOQwtDtQnppdpN0CJW7gTWaCh
-         T8dzs1s6n3WzPQraOxAi5p+0XvroW6nnAfvLD0l7XPCfXD/rAks6bSarUdBlZ2CbweLg
-         Axwxkm+hfEBvYVivxkMJQ6nCH72iLzkVIE3gPijTEXtbHLNPSVs0IV+yutoaPgA7nYn7
-         n5qB+xoSEqOYvqQpmrkzYqnkFMZLEnd+N0TKOFTJTfRKN0evP5k7SIG58wuDpYOjpo2c
-         TYacSeg9AKLimw7E6qVh4eqAV8j2hOjmN0Z/w+Ev+jU6jDFfy1JwDgGYhVrDO0Xuxonc
-         Z02A==
-X-Forwarded-Encrypted: i=1; AJvYcCWKChQP1fDFn5d6R5ref0WAJtP54Km6wCfhdVPT/pFEvNLXxdcZPOOKFqlDZu/RZntMlpo2G1s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeDJqJbBi6iiRa3eK00acXfXyNClSZ/UbCo0L1FVZXl2jQueQ9
-	A3krlHDOT17QpQwCmABGMuAVoBYT3JNshMRc5lpftmR+6a7AYupHe6bQfAaVKtvXGXfD9Gfc9Gr
-	hQ0BGNeTzQXhpRB4fsabyM3l3ZQGyf3zXKPt0cFaw8bB1JPcr/ubY2ZY=
-X-Google-Smtp-Source: AGHT+IFtyxEKBueGdGuMZU4vkQXU0qGEE/smJwJ2rK2FlcJ1e00B+Re17MWU94EgOYeMl7MJ2XuSH9YWJa64AvGK9MUVptgMiJHp
+        bh=Lw43y/5CggqMenhKGTSFNqSIF9mYkE7DlGGYGan8s2Q=;
+        b=Ra2jd/HFfD4TKR+79bOEd/Lyk2iw9ZWZk2yVZFsnOJJtlKsz/HN/Y9ibdBEFHMpzLW
+         Cjn3KUuXrleA62+04YDAG7beieDARzDXvjIVbQy7Df4KNBOGnnD4JYK5OfLqvuJg6UHJ
+         VX/sOLuu1M2L0ODMuk0ySvNC+0yVzlG8VjVi1E2KigZzWI/mgfL0j4CM2+oFL6Q45nyE
+         75QRXny8RIl4k9+5Pg8a2R4KByVEFuJrqPn98qbty9OquD66RdDPLtbQIdK+t2wiNYhT
+         MsQV1IYVNgo/keDxFdYvhW1RqL7sOK2ezwN7vLg07THpOhl3ONadJYlgks4CpHEfrQCQ
+         ZDAg==
+X-Gm-Message-State: AOJu0YwTR+5Gjy/896lMAsbTv4O5N7l8awalnyQBfijk4R1TXN62yAG5
+	rBp47Pqe72us43/iapYurz37GQ6CE13GkKgjpaafWRrQsjaozZ9BfaohSw==
+X-Gm-Gg: ASbGncuBUwaQFv183Nrnn1dgiKKuuDotLosvJtG8qjbin+kcKjUrlvVS7dAcUBxrySk
+	ZH9lg1TTNAY6yJAkKuPxw/FHGBJ3w67dpIS27ZVK6lNJF24ZbyJ79reiEPCBbPnRNQt0fkMkpdN
+	y9CH5fQoHniUZZb/GPxnWDSO1c5K5ehmh7VhUlKY1QXFDelswVVlWhwnD/Ul8Ke+PNNP1zNCfGj
+	UbbAO7o0DCsJq0Bhk/U/Crol6KHF6svynUTe51RyCzq2RippbFMHComb/cMX6KLz0EcR/r9n++k
+	RWX+1WaMjZw7o6tw6Yihg1RZfkoXUteJROGKXaxGffax2+nqNam1RDvpvv6e7KlaeF3vGWEO7+D
+	0bu/Dm4athBCAEQFKLLufETtFTX5jZ0X2A4HACzjpkg==
+X-Google-Smtp-Source: AGHT+IHtX+fOpdjDL5MuW9gw+rrZClTRmYg4kaWVdER+IheDQLwHj7u1oIYs7GM6A9XmrX6qNlBKBA==
+X-Received: by 2002:a17:907:2cd6:b0:aa5:b63e:20f2 with SMTP id a640c23a62f3a-aa5b63e2105mr1261711966b.10.1733170478099;
+        Mon, 02 Dec 2024 12:14:38 -0800 (PST)
+Received: from ?IPV6:2a02:3100:a4d2:4900:2dc5:1fb9:a62c:2977? (dynamic-2a02-3100-a4d2-4900-2dc5-1fb9-a62c-2977.310.pool.telefonica.de. [2a02:3100:a4d2:4900:2dc5:1fb9:a62c:2977])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa5997d55b1sm542609666b.72.2024.12.02.12.14.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Dec 2024 12:14:36 -0800 (PST)
+Message-ID: <d9dd214b-3027-4f60-b0e8-6f34a0c76582@gmail.com>
+Date: Mon, 2 Dec 2024 21:14:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c54a:0:b0:3a7:d02b:f653 with SMTP id
- e9e14a558f8ab-3a7d02bf7ccmr184513945ab.0.1733170112491; Mon, 02 Dec 2024
- 12:08:32 -0800 (PST)
-Date: Mon, 02 Dec 2024 12:08:32 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <674e13c0.050a0220.48a03.0029.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in ip6mr_free_table
-From: syzbot <syzbot+6e8cb445d4b43d006e0c@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] r8169: remove unused flag
+ RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+After 854d71c555dfc3 ("r8169: remove original workaround for RTL8125
+broken rx issue") this flag isn't used any longer. So remove it.
 
-syzbot found the following issue on:
-
-HEAD commit:    7af08b57bcb9 Merge tag 'trace-v6.13-2' of git://git.kernel..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=105733c0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ae452ddde099ccb1
-dashboard link: https://syzkaller.appspot.com/bug?extid=6e8cb445d4b43d006e0c
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16d04d30580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=142fcf78580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/dc5dc75196ac/disk-7af08b57.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/63b4670d0126/vmlinux-7af08b57.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f9d6e3a842d9/bzImage-7af08b57.xz
-
-The issue was bisected to:
-
-commit 11b6e701bce96f98474084f26821157cb0dccf69
-Author: Paolo Abeni <pabeni@redhat.com>
-Date:   Sun Nov 24 15:40:56 2024 +0000
-
-    ipmr: add debug check for mr table cleanup
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1443e9e8580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1643e9e8580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1243e9e8580000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6e8cb445d4b43d006e0c@syzkaller.appspotmail.com
-Fixes: 11b6e701bce9 ("ipmr: add debug check for mr table cleanup")
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 7478 at net/ipv6/ip6mr.c:419 ip6mr_free_table+0xbd/0x120 net/ipv6/ip6mr.c:419
-Modules linked in:
-CPU: 0 UID: 0 PID: 7478 Comm: syz-executor212 Not tainted 6.12.0-syzkaller-10689-g7af08b57bcb9 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:ip6mr_free_table+0xbd/0x120 net/ipv6/ip6mr.c:419
-Code: 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 58 49 83 bc 24 c0 0e 00 00 00 74 09 e8 94 fe a9 f7 90 <0f> 0b 90 e8 8b fe a9 f7 48 8d 7b 38 e8 f2 be 96 f7 48 89 df be 0f
-RSP: 0018:ffffc9000ca37820 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffff888071720000 RCX: ffffffff89e4c674
-RDX: ffff888030d1a440 RSI: ffffffff89e4c6ac RDI: ffff88802b0ccb40
-RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: ffff88802b0cbc80
-R13: ffff888071720000 R14: ffff888071720008 R15: dead000000000100
-FS:  00007f8e0d5626c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffc0ae64c68 CR3: 000000007c576000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ip6mr_rules_exit+0x176/0x2d0 net/ipv6/ip6mr.c:283
- ip6mr_net_exit_batch+0x53/0xa0 net/ipv6/ip6mr.c:1388
- ops_exit_list+0x128/0x180 net/core/net_namespace.c:177
- setup_net+0x4fe/0x860 net/core/net_namespace.c:394
- copy_net_ns+0x2b4/0x6b0 net/core/net_namespace.c:500
- create_new_namespaces+0x3ea/0xad0 kernel/nsproxy.c:110
- copy_namespaces+0x468/0x560 kernel/nsproxy.c:179
- copy_process+0x2a11/0x8df0 kernel/fork.c:2398
- kernel_clone+0xfd/0x960 kernel/fork.c:2807
- __do_sys_clone+0xba/0x100 kernel/fork.c:2950
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8e0d5a7419
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f8e0d562238 EFLAGS: 00000246 ORIG_RAX: 0000000000000038
-RAX: ffffffffffffffda RBX: 00007f8e0d631328 RCX: 00007f8e0d5a7419
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000040020000
-RBP: 00007f8e0d631320 R08: 0000000000000000 R09: 00007f8e0d5626c0
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f8e0d5fe074
-R13: 0000000000000000 R14: 00007ffc0ae64ba0 R15: 00007ffc0ae64c88
- </TASK>
-
-
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/ethernet/realtek/r8169_main.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 739707a7b..4b96b4ad8 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -623,7 +623,6 @@ struct rtl8169_tc_offsets {
+ 
+ enum rtl_flag {
+ 	RTL_FLAG_TASK_RESET_PENDING,
+-	RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE,
+ 	RTL_FLAG_TASK_TX_TIMEOUT,
+ 	RTL_FLAG_MAX
+ };
+@@ -4723,8 +4722,6 @@ static void rtl_task(struct work_struct *work)
+ reset:
+ 		rtl_reset_work(tp);
+ 		netif_wake_queue(tp->dev);
+-	} else if (test_and_clear_bit(RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE, tp->wk.flags)) {
+-		rtl_reset_work(tp);
+ 	}
+ }
+ 
+-- 
+2.47.1
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
