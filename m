@@ -1,196 +1,125 @@
-Return-Path: <netdev+bounces-148036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC9009DFEC7
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:24:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 322EA9DFF0E
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:35:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E00AB2B481
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:15:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84E2DB2C8E8
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A1B1FCCE4;
-	Mon,  2 Dec 2024 10:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D771FBC84;
+	Mon,  2 Dec 2024 10:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="ddMLzbze"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597941E2611
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 10:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9F81FAC52
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 10:17:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733134472; cv=none; b=PQ2Ph4dMktP1mdEctx8Fg4C9zHHQYatYCMlR8QHYOXz/pLTC7FXYGVQ6mStylOZSjXA3TrdWtDMMjNQ1h9nQyFIpLbtRwpjeizproH2F+txBfA7W5e5VBwkKsE+q5X0FCXD0c6euFlm3rR7lx1p+84xYm0gizE/R5xiHNgPR4Xc=
+	t=1733134634; cv=none; b=rQereYGHfU+W+0PIJ9AIAAJVb7ogBs/eJg9c67o1nzRbMR3+3UTlFk5RCnofMQnQjFJkywqiEDydnEXpY1GYAvKFdqBIAB5Txgu2OMnj83fUOgnSlbhCNKO1sIfm8i6bq7v6rsckNlU+wRJvtMRsEqMSgCF7iSxR7laKGxFozrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733134472; c=relaxed/simple;
-	bh=tHFUdCqsMGkg322I+g4Sl3AKyQEATnxh07xEPs9CRlU=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=W7eCNlfxxwfSToAN923qWsvBiJ9mDqLfntCd3BK6Eh5EZmLh1rGVrMBh6cAQWPXq/6L39BlSsCs3CMmnCQRfo9pOtPDzQeuSXXewJiOkLbt/lGdA23QcZqmlp7JtBfD9r1INDOehOY4Mh3+pqdpYSJdJU4hlgKUkF4QKC096wVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-84193bb7ed1so380105839f.1
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 02:14:30 -0800 (PST)
+	s=arc-20240116; t=1733134634; c=relaxed/simple;
+	bh=2r7XimGRWW6H7zYQnhfYnY1sR4668203OHqHzEHk44s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=frvsZ6tqhMONkJ+gcjE9m1/Hd8x/9K+wFdosZ1icDRyKK4QcID/2Y3rUWWpRJwWzVanri00sWDKL9a8VnH8C7bGudvLDLOL/mC5xfMAT490U6S3xKJ2fd8pA3kVzceWdwTjvcVuo91QnqIr1ZXRIAirMxyKyIEhHvbOKbr0y8u0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=ddMLzbze; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-53df63230d0so4792673e87.3
+        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 02:17:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1733134630; x=1733739430; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VFf1RmxuugZ0c4+M7u1ESLX9E9Rswmi2L3SkTIYyIxc=;
+        b=ddMLzbzeBgs21gEJOBojGjWAkF24I8WZYLoApFDjaMRm3htgax5gR73P3G1UREgdpr
+         95+pCHCkqQLt7sxNCDQXAV0gAo+Sk6+Gt9prHDOcmAI7LaD1I2/glFqG3SCMCdlqL8XF
+         oFcEX/fHS5AiD1uieGLw9Hppn++uEGxKYU20XrVXl+U/zG5rFqoRDwHegAheSqbLe8GR
+         iCyR/wP/vDKkL9H4nOLZVUx/ZWpmG/HSB9LB59L79OwexTT98Vwgh4Q3u2B0QFcibw8k
+         WVavUsuB3GqmTs0zv4eKvyEycS6GMKmdGck/jpzuLqsf0YGISHBGoaqNiJzd1qafNm9Z
+         EJ+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733134469; x=1733739269;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1733134630; x=1733739430;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p47V1VHANSclYmrUqc/dOa+k1UPLy90lRLdbDjNFoQA=;
-        b=rCDOfVU7+yq6ssMr27JV7zywBreabg0LDJXyTm9annj4t/EoHbkUjmseNx1garUxUE
-         KbbRA3ncZEL66VlXK1jFl0th0R7xbF6TeH8u0ggbUWgEbe34RfgGTJFJExz0RQeWVN4S
-         dkIvxH+XdI+SrNRZjxieA1IU9/2C61nLxxON91TJ5igEuALsMv3V9k7HNVx3AyLCLa3g
-         hjumUqZYjT6c1GR7C9srSrSaKPb55pipQ9Wr/Jf40TGEPn2N8/79npNgsu7EQGq9+iiE
-         AtPPSwIgAE94miaBWE7ox0gprK0RqentQOaix5OdLplCAqsinYASyJ1lpjqloSc1Vpgx
-         DX1A==
-X-Forwarded-Encrypted: i=1; AJvYcCWyKJ2KLbrQk6+yL86B1iV9+S+WYBEIGngp4GOovx3o38vEBOqvSk4ctu+rYwKEOc+PFNzVS1g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJG/2TOZmip2oCSGBtmwOTWtWjS7AlVCf/+yxDd2zMoVJiavqY
-	U5wwFbERehzu1IPlTdVu6oLhjTofFV3AL5ObZxjuw3xZubR7lBZi+hQqQkocbnkzMuMSwjP8DAP
-	Epn9kJweWpbtnBRYLOXL3tFtfwhVucxv9uYR2dARuKo2Xa7bH2j3Udfc=
-X-Google-Smtp-Source: AGHT+IHTHErrhRpgfZs8MSHh3jjs2tm56HSyOGzMC3El1nvZN9l0REftjS2coA2GIQbra6PS6+YVky2nxMgc5bew3867f389l8G0
+        bh=VFf1RmxuugZ0c4+M7u1ESLX9E9Rswmi2L3SkTIYyIxc=;
+        b=VgQGsZDdXL+SfrsdwRptyZY4AKWzov7VVLVpMNgPoTopLX6dKj1mR8nmidh0yo43xM
+         bYWb6gLD4jAKTiSVSxgAel3Z+GT2kv666OCIcCz/1oMbDu7/sm7q2uEZDLOirIX1KL/8
+         tSc52W7Gxc2UUoHFBoTjpvH4hSx6/5hu4cxpZH5X2XArikuti+vMFRIqr0E9f7A6mc00
+         PkHD8aZmmDRlXTOEkIhFQYu7qg6WzDnCBcuvFRwn9Q2s6ixuFwhE/AaieNo2MM7LKbvF
+         o9knxcybY3DWEZQNF4hn+DN+NGvMF3vDO/UixN3Z1ELSlJVvKK0DcewkgXxUGRk5/PjD
+         0SNA==
+X-Forwarded-Encrypted: i=1; AJvYcCW9gbsW/j/2MOSjQcpvaOGk0+RoloclsDEaqYKe3127oLFsvqyWtLMmlx25/fwvROL0qXQ41tQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzu8QqZEWoDF2v3QYSzXJisJquYRXkrP/tU6emXBkog2jinwakw
+	pgTusVJl2UqWVRoBDz+1/Gu2XHZkDCs2EzvlAAaUuD4zd/XlC5o0d6AnlRjXTr0=
+X-Gm-Gg: ASbGncue0T6bhvweKglsU3izGhs2CSubYX1H0pIFfY5HwmhNwM+h7twBzrqV34aHqig
+	1+WtcXHyDyKQl60RNeN3D+9TMFHtG+BVVs9kTYbZClf4YV039A+IhsK/SdCWJWAEF2af10mLY9S
+	BOuhjXRtb/MEnlu9MXwzhbfD+j1OKsKP81vMlVIdGA1gKHDz5RUmbQRF1/2o1VTM5Qr7u0Ufexu
+	GcvyT0dweTygkNdEu6lrr5TcAA9Y1c1Rp0BkgH8nExaBYf6JbvKZ+06FUgb0F39U+tFKQ==
+X-Google-Smtp-Source: AGHT+IHRZLPNljfKWkzmQ+x7kFH17iWwmYu0Jkgog3BCYQYYWLKCPRTK8cNKNVMxZlCpSaIAKvpw0A==
+X-Received: by 2002:a05:6512:124e:b0:53d:a2a6:ef67 with SMTP id 2adb3069b0e04-53df01121f4mr11899621e87.49.1733134630585;
+        Mon, 02 Dec 2024 02:17:10 -0800 (PST)
+Received: from [192.168.0.104] ([91.198.101.25])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53df644344esm1420887e87.76.2024.12.02.02.17.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Dec 2024 02:17:10 -0800 (PST)
+Message-ID: <eddde51a-2e0b-48c2-9681-48a95f329f5c@cogentembedded.com>
+Date: Mon, 2 Dec 2024 15:17:08 +0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c88:b0:3a7:7ded:5219 with SMTP id
- e9e14a558f8ab-3a7c55eb94emr227256685ab.21.1733134465858; Mon, 02 Dec 2024
- 02:14:25 -0800 (PST)
-Date: Mon, 02 Dec 2024 02:14:25 -0800
-In-Reply-To: <67486b09.050a0220.253251.0084.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <674d8881.050a0220.ad585.004a.GAE@google.com>
-Subject: Re: [syzbot] [bpf?] [trace?] WARNING: locking bug in __lock_task_sighand
-From: syzbot <syzbot+97da3d7e0112d59971de@syzkaller.appspotmail.com>
-To: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org, 
-	bpf@vger.kernel.org, daniel@iogearbox.net, eddyz87@gmail.com, 
-	haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org, 
-	kpsingh@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	mathieu.desnoyers@efficios.com, mattbobrowski@google.com, mhiramat@kernel.org, 
-	netdev@vger.kernel.org, puranjay@kernel.org, rostedt@goodmis.org, 
-	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: phy: phy_ethtool_ksettings_set: Allow any supported
+ speed
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Michael Dege <michael.dege@renesas.com>,
+ Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+ Dennis Ostermann <dennis.ostermann@renesas.com>
+References: <20241202083352.3865373-1-nikita.yoush@cogentembedded.com>
+ <20241202100334.454599a7@fedora.home>
+ <73ca1492-d97b-4120-b662-cc80fc787ffd@cogentembedded.com>
+ <Z02He-kU6jlH-TJb@shell.armlinux.org.uk>
+Content-Language: en-US, ru-RU
+From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+In-Reply-To: <Z02He-kU6jlH-TJb@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-syzbot has found a reproducer for the following issue on:
+>> To get two such PHYs talk to each other, one of the two has to be manually configured as slave.
+>> (e.g. ethtool -s tsn0 master-slave forced-slave).
+> 
+> I don't see what that has to do with whether AN is enabled or not.
+> Forcing master/slave mode is normally independent of whether AN is
+> enabled.
+> 
+> There's four modes for it. MASTER_PREFERRED - this causes the PHY to
+> generate a seed that gives a higher chance that it will be chosen as
+> the master. SLAVE_PREFERRED - ditto but biased towards being a slace.
+> MASTER_FORCE and SLAVE_FORCE does what it says on the tin.
+> 
+> We may not be implementing this for clause 45 PHYs.
 
-HEAD commit:    45e04eb4d9d8 bpf: Refactor bpf_tracing_func_proto() and re..
-git tree:       bpf-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=167e17c0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fb680913ee293bcc
-dashboard link: https://syzkaller.appspot.com/bug?extid=97da3d7e0112d59971de
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=114a7d30580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1395ff78580000
+Right now, 'ethtool -s tsn0 master-slave forced-slave' causes a call to driver's ethtool 
+set_link_ksettings method. Which does error out for me because at the call time, speed field is 2500.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f45e1a59de79/disk-45e04eb4.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/6e2405d2c818/vmlinux-45e04eb4.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2c2415798034/bzImage-45e04eb4.xz
+Do you mean that the actual issue is elsewhere, e.g. the 2.5G PHY driver must not ever allow 
+configuration without autoneg?  Also for Base-T1?
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+97da3d7e0112d59971de@syzkaller.appspotmail.com
-
-=============================
-[ BUG: Invalid wait context ]
-6.12.0-syzkaller-g45e04eb4d9d8 #0 Not tainted
------------------------------
-syz-executor227/5855 is trying to lock:
-ffff8880262a8018 (&sighand->siglock){-...}-{3:3}, at: __lock_task_sighand+0x149/0x2d0 kernel/signal.c:1379
-other info that might help us debug this:
-context-{5:5}
-8 locks held by syz-executor227/5855:
- #0: ffff88802f97ea90 (&vma->vm_lock->lock){++++}-{4:4}, at: vma_start_read include/linux/mm.h:716 [inline]
- #0: ffff88802f97ea90 (&vma->vm_lock->lock){++++}-{4:4}, at: lock_vma_under_rcu+0x34b/0x790 mm/memory.c:6278
- #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: do_fault_around mm/memory.c:5279 [inline]
- #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: do_read_fault mm/memory.c:5313 [inline]
- #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: do_fault mm/memory.c:5456 [inline]
- #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: do_pte_missing mm/memory.c:3979 [inline]
- #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: handle_pte_fault+0x21c3/0x68a0 mm/memory.c:5801
- #2: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #2: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #2: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: filemap_map_pages+0x243/0x20d0 mm/filemap.c:3645
- #3: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #3: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #3: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: __pte_offset_map+0x82/0x380 mm/pgtable-generic.c:287
- #4: ffff8880791b2df8 (ptlock_ptr(ptdesc)#2){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
- #4: ffff8880791b2df8 (ptlock_ptr(ptdesc)#2){+.+.}-{3:3}, at: __pte_offset_map_lock+0x1ba/0x300 mm/pgtable-generic.c:402
- #5: ffffffff8e93c4a0 (rcu_read_lock_sched){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #5: ffffffff8e93c4a0 (rcu_read_lock_sched){....}-{1:2}, at: rcu_read_lock_sched include/linux/rcupdate.h:941 [inline]
- #5: ffffffff8e93c4a0 (rcu_read_lock_sched){....}-{1:2}, at: pfn_valid+0xf6/0x450 include/linux/mmzone.h:2048
- #6: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: trace_call_bpf+0xbc/0x8a0
- #7: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #7: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #7: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: __lock_task_sighand+0x29/0x2d0 kernel/signal.c:1362
-stack backtrace:
-CPU: 0 UID: 0 PID: 5855 Comm: syz-executor227 Not tainted 6.12.0-syzkaller-g45e04eb4d9d8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_lock_invalid_wait_context kernel/locking/lockdep.c:4826 [inline]
- check_wait_context kernel/locking/lockdep.c:4898 [inline]
- __lock_acquire+0x15a8/0x2100 kernel/locking/lockdep.c:5176
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
- __lock_task_sighand+0x149/0x2d0 kernel/signal.c:1379
- lock_task_sighand include/linux/sched/signal.h:743 [inline]
- do_send_sig_info kernel/signal.c:1267 [inline]
- group_send_sig_info+0x274/0x310 kernel/signal.c:1418
- bpf_send_signal_common+0x3c4/0x630 kernel/trace/bpf_trace.c:870
- ____bpf_send_signal_thread kernel/trace/bpf_trace.c:887 [inline]
- bpf_send_signal_thread+0x1a/0x30 kernel/trace/bpf_trace.c:885
- bpf_prog_b7be628660dc1b90+0x23/0x29
- bpf_dispatcher_nop_func include/linux/bpf.h:1290 [inline]
- __bpf_prog_run include/linux/filter.h:701 [inline]
- bpf_prog_run include/linux/filter.h:708 [inline]
- bpf_prog_run_array include/linux/bpf.h:2177 [inline]
- trace_call_bpf+0x369/0x8a0 kernel/trace/bpf_trace.c:146
- perf_trace_run_bpf_submit+0x82/0x180 kernel/events/core.c:10473
- do_perf_trace_lock include/trace/events/lock.h:50 [inline]
- perf_trace_lock+0x388/0x490 include/trace/events/lock.h:50
- trace_lock_release include/trace/events/lock.h:69 [inline]
- lock_release+0x9cc/0xa30 kernel/locking/lockdep.c:5860
- rcu_lock_release include/linux/rcupdate.h:347 [inline]
- rcu_read_unlock_sched include/linux/rcupdate.h:962 [inline]
- pfn_valid+0x3eb/0x450 include/linux/mmzone.h:2058
- page_table_check_set+0x22/0x540 mm/page_table_check.c:110
- __page_table_check_ptes_set+0x30f/0x410 mm/page_table_check.c:225
- page_table_check_ptes_set include/linux/page_table_check.h:74 [inline]
- set_ptes include/linux/pgtable.h:288 [inline]
- set_pte_range+0x724/0x750 mm/memory.c:5067
- filemap_map_order0_folio mm/filemap.c:3624 [inline]
- filemap_map_pages+0x11c6/0x20d0 mm/filemap.c:3678
- do_fault_around mm/memory.c:5280 [inline]
- do_read_fault mm/memory.c:5313 [inline]
- do_fault mm/memory.c:5456 [inline]
- do_pte_missing mm/memory.c:3979 [inline]
- handle_pte_fault+0x31d6/0x68a0 mm/memory.c:5801
- __handle_mm_fault mm/memory.c:5944 [inline]
- handle_mm_fault+0x1106/0x1bb0 mm/memory.c:6112
- do_user_addr_fault arch/x86/mm/fault.c:1338 [inline]
- handle_page_fault arch/x86/mm/fault.c:1481 [inline]
- exc_page_fault+0x459/0x8c0 arch/x86/mm/fault.c:1539
- asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
-RIP: 0033:0x7f2c735865f8
-Code: Unable to access opcode bytes at 0x7f2c735865ce.
-RSP: 002b:00007ffcc6892fb8 EFLAGS: 00010202
-RAX: 00007f2c735b6ad8 RBX: 0000000000000000 RCX: 0000000000000004
-RDX: 00007f2c735b7ce0 RSI: 0000000000000000 RDI: 00007f2c735b6ad8
-RBP: 00007f2c735b5118 R08: 00007f2c7350e2b0 R09: 00007f2c7350e2b0
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f2c735b7cc8
-R13: 0000000000000000 R14: 00007f2c735b7ce0 R15: 00007f2c7350e590
- </TASK>
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Nikita
 
