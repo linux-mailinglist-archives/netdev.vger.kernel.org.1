@@ -1,399 +1,199 @@
-Return-Path: <netdev+bounces-148207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A7429E0D2B
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:41:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26AE69E0D66
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:55:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B8F2165034
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 20:41:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC8231650F8
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 20:55:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B271DE898;
-	Mon,  2 Dec 2024 20:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6155219BBA;
+	Mon,  2 Dec 2024 20:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LZkHnQUE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IkGgz8VU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759701DE4C3
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 20:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D331DE3C1;
+	Mon,  2 Dec 2024 20:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733172090; cv=none; b=PFcATASp5hNzitSMn+hm1RuXcK+7Pdx+YeBMOI3jG76ep7iXZ3i32kcwa6mEcZq2O4iwyPDRCk6ZxH02wPvP3YafNmnLPH23pCukqIF78BAQkSlFGsUCh0/Hn+z03tPyNcwpncA1taj7KL+UkzZc+vdzqRmai8QVr3QMcl8xnuw=
+	t=1733172931; cv=none; b=omx0P132r/5N9RBeEUYXAayxZ89WjlOqkYeJ8E2lrnCslw0I/f5vwv6BmM27RsVLvtNb8aqeZZrni9Kc9Zr4ubDkCYjCrjhd6wbloKq+VA6v4Lv5xsjttF643wA4PSGpoghKheqFGmptcGXp+3JN2dLwcLr7txc9S33Z11ptt1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733172090; c=relaxed/simple;
-	bh=KIdbkdIFaXSbJKucAAX9IC7JO4pcKcJsK9zYppY8ifU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K1loGBuBtP+RtZGMyO1XCHWc4XLaVM37+mwLlF559md+lxkcZcRE5ESTLlFWoFAdQR0ezwDDlCNzfEnDWB2kd1oQF2EA9s4tsHE8EuNR60cJYF2ATyL7wX6al3JCpIkqA9N+6glxRBkjlreS0aMpenEO8knr9+LHV/+I9LM5NQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LZkHnQUE; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5d0f6fa6f8bso1371040a12.0
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 12:41:28 -0800 (PST)
+	s=arc-20240116; t=1733172931; c=relaxed/simple;
+	bh=I6UFKe8dkyc5kPGgizqXsmvegeO2C7hOpnig+uuVm4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EVqAN8L0l24hJTnVfMvQZh0m35HEn3CBTdC1JFgZzzrM9XjVgmMU40p3qztI3Ei3dGyHlF9Pu331JNFx14jvCcgFdwLgylnGCgrXMf2nxZQftgK6S6HXaITG0gtR01GO+cD0+RwW3MYWo5HyCKa4jSHTJtXbHe2QmTl2ySj3Fk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IkGgz8VU; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21578cfad81so14994695ad.3;
+        Mon, 02 Dec 2024 12:55:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733172087; x=1733776887; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0L6ohtx3ayyqt3b2ZEfRw+gjXygT94F18Gbl8j2AkM4=;
-        b=LZkHnQUEtEgpE1URIa/FBKxFC4P/7iHpEovDKi+JvEWL/X9FBnhAox7wxyTSNxUXns
-         hSdczsA3hwUavNjD1jofhkoFdm3OXAuXu1l9c6wJ6V0R+mRW9mlb3a1j+mbzd2nQUrCv
-         dv1OVru3NZC3nFrwI19Tr7sV0JT5oV/dk9Dwqd6r8mX+x/l021LrbSpQ26kckT+DQGfm
-         t6Ax8tWqHRBWOtRwX0GlBagELaGW34Gpb/3b4ppXDNy5nKb2TMPoPAmEE24H8ppJUtln
-         gwtmj+tpFIzu/L38UnhthINEhNOjJnD6I7uxmvT4J7i+U1Zx8YGIkPn9mxfLtB0voFcw
-         hwSA==
+        d=gmail.com; s=20230601; t=1733172929; x=1733777729; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZosFDZP4vQYcO/8JOiXFBV0OyJNAbeoH1oN1YWzR81s=;
+        b=IkGgz8VUjcCN+EDrCUlMxFR2KtF5ULadyzRk8ifpFUKh+iiUQ5qFBFdrjA3pxhc8L6
+         RVMzY4L2FQpjlkJXrX0oHL+nM0CQhvfQNWXI5SsoeLIM99Y89nKEmR6TEK+Adlxoqbze
+         80hEUlJkar5EpsFrglK98MTXGXgsr/YS7mGEK7N16T6cCMYvFbWJd/+Q6otY/E6fJ7WX
+         ktHq5rPr8ZH3V9XSBc7sLK1qN5d8iqGdG/KipJ2rfZpt4A5AkpsNv/tyn1i9mT9ovjtn
+         3+HZd6xkS3s/JkKOyN59WpvrTxDyKG5JqPK8WbR8y0OYkGGkHyu90ooM3mUfRPplPseO
+         muvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733172087; x=1733776887;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1733172929; x=1733777729;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0L6ohtx3ayyqt3b2ZEfRw+gjXygT94F18Gbl8j2AkM4=;
-        b=vZSxZKGFF0iovcCplbmPzSxJ/dY+Ju+rxrbhkgJg0AKPFouTb0U4F3xNMGK2W6lZZF
-         hKOgdj/5l0bWQWFBlctnvqcpMPlAzivSKzt2FsZoWZItnwF4D7XUHQ+j0qqHcySdmPvm
-         TiwSf0AkvysKQ9KOrVjIEwnxgDeuU8bBwAIzOlf9Ae3MqAU3zR5m37rt5ikVUBSi6CPx
-         PrrMsvBxvUY5xGa9H2CM9htYJ0mdgnlskhF+F9LEdD6ZB9olmq958iZXdqM0k3PTm7Rt
-         vAeCZFTjkwqG7Afpz8igMF0Z58aCJSHsG+yNC8SpMZViNUc1BF7BStWdRN5ShyF+HomJ
-         34+w==
-X-Gm-Message-State: AOJu0YyOLEi7GJJcQDEd8NCgzaeO1y56yICyow/1zmo2UPMZZ+2AHxLg
-	DCMRiy2N74HyMINsrNrebGtf8Hf/F3a587Gfx8XgRhWwkKPx+Y/A7cPx6GZKyuPzuoK3Qfk4sU6
-	Rcedmd2seAe01Ek48bZAJHPKQcz3PJ4vIyrs8
-X-Gm-Gg: ASbGncvsbRUZcy5vNCQ/EzZQmehfnaLjWLoJfiHzGtfISjoLkIJdNqnmXrl96VI3Feo
-	ZKCZHpyKIfbZzKOmlMM3dOgqivx0UsVKtgmSnZ38vg5u5m9uC07r1G1SPfGKdCbJ7
-X-Google-Smtp-Source: AGHT+IHFntYZBd9ovLWsYLl4dLpxLDVlUqdEtN5/2Am+3kXZvUTo5iN5wIVX1pBTykkhvbfSK6wipQoZm2mHkfJq9gE=
-X-Received: by 2002:a17:906:23ea:b0:aa5:3ce5:1e2b with SMTP id
- a640c23a62f3a-aa581065a6amr2096345866b.60.1733172086487; Mon, 02 Dec 2024
- 12:41:26 -0800 (PST)
+        bh=ZosFDZP4vQYcO/8JOiXFBV0OyJNAbeoH1oN1YWzR81s=;
+        b=qNFL4eydeVoVLbMYiMRYscdyy4mEoKJZGFM2JDD9tb9cRMiNXoomfTb6LksT/sw2zb
+         Xbre2SKSfymg44Xr2gXsO0qWDe8XeMvqNlFIflT5kNbUDdPtKRYMgQGL4PFVlnTKRjpQ
+         NGb2QQX3+YVbBazySHn2z4wvPUiCx0Ue/IXh1Mx0VTSJ7dxS4TS7E0LTlLpoijmZ+zDw
+         Qi1btbJ2Lttp6BcKmL3ItyD912EFKIRVaow5YVblH/Z6RjIrs3rLHSnBhzGnk3uI2Vvk
+         XGL5wf6D9YJHI7v9EvCElNz0LLE0O71S1pLYN4AHU+jMOsy5sUG2GxFBOped1vpZl3tF
+         X3Fw==
+X-Forwarded-Encrypted: i=1; AJvYcCVYcsRo96Wms2bLLIirJqg6wuA+pPliUO3LsGpFrYaIu+vafVnujttJiobNErj+N6ROtdENS9ofZs5P/EI=@vger.kernel.org, AJvYcCXKMxrTJ4hy7Bvgp3S11STDXJ9o5ngoqA+uztoOv31FovgWzfHkOKom3peAqzt1Uv+PI4xDz0pK@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHub6Jr3P27d0gZhE1iFpD8wRp6Fq/DxTai6d5JLGJiTzlSqHV
+	MZM5QtYV+JvSe1bhYeQu+c0JdKNsnko9qflchukVSz20XQUpMy8b
+X-Gm-Gg: ASbGncv0VHHuyNnU3WtXNg4+axAtVQ61x4MgGgJMUDaPF1MHMWBt1+9FzwSu8lcLhhU
+	WxzphLNq/3BJ3xIhiH5BM8y/YpWXMdm2B0zjSMhQQupmygPHyBvyy99uzz/gWlix6fwO/hon7GY
+	oQE2e6PBOUrRXHbH2jSqmZndyPBzs/CgN0AdB5Twx+e/AioByzoip7xF5594WhywwPzYVC+gVcu
+	+WqPzWwrIHTirKB8NRXd6AKwohuQ42DZNBigHb7TVJdEuThVSjgtkpogMNPBJQ=
+X-Google-Smtp-Source: AGHT+IElGGe59u//tXIW1SDvRdMG0YvH5t0Jv776Opki8hoQ0vLT2C5tixdBFyywAdKgliaQYUenXA==
+X-Received: by 2002:a17:903:2442:b0:215:9a73:6c45 with SMTP id d9443c01a7336-2159a7376e6mr69749205ad.22.1733172928757;
+        Mon, 02 Dec 2024 12:55:28 -0800 (PST)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21589aa5478sm27696925ad.59.2024.12.02.12.55.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Dec 2024 12:55:28 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Mon, 2 Dec 2024 12:55:27 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+	kuba@kernel.org, mkarsten@uwaterloo.ca, stable@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [net] net: Make napi_hash_lock irq safe
+Message-ID: <ddeca293-5938-42f3-9722-748050ab0aa0@roeck-us.net>
+References: <20241202182103.363038-1-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241121215257.3879343-2-wangfe@google.com> <20241124081549.GD160612@unreal>
- <CADsK2K_na0Ugwv2PPT_s4oHSAx2rtZvtYY58C4MQkjE6G5y4Ew@mail.gmail.com> <20241127090032.GD1245331@unreal>
-In-Reply-To: <20241127090032.GD1245331@unreal>
-From: Feng Wang <wangfe@google.com>
-Date: Mon, 2 Dec 2024 12:41:14 -0800
-Message-ID: <CADsK2K85L8Q3Q26w2n3WBDpN4VhY0jB8nQgXOhFmutwEHqk60g@mail.gmail.com>
-Subject: Re: [PATCH v6] xfrm: add SA information to the offloaded packet when
- if_id is set
-To: Leon Romanovsky <leon@kernel.org>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com, 
-	antony.antony@secunet.com, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241202182103.363038-1-jdamato@fastly.com>
 
-Updated the comments, thanks.
+On Mon, Dec 02, 2024 at 06:21:02PM +0000, Joe Damato wrote:
+> Make napi_hash_lock IRQ safe. It is used during the control path, and is
+> taken and released in napi_hash_add and napi_hash_del, which will
+> typically be called by calls to napi_enable and napi_disable.
+> 
+> This change avoids a deadlock in pcnet32 (and other any other drivers
+> which follow the same pattern):
+> 
+>  CPU 0:
+>  pcnet32_open
+>     spin_lock_irqsave(&lp->lock, ...)
+>       napi_enable
+>         napi_hash_add <- before this executes, CPU 1 proceeds
+>           spin_lock(napi_hash_lock)
+>        [...]
+>     spin_unlock_irqrestore(&lp->lock, flags);
+> 
+>  CPU 1:
+>    pcnet32_close
+>      napi_disable
+>        napi_hash_del
+>          spin_lock(napi_hash_lock)
+>           < INTERRUPT >
+>             pcnet32_interrupt
+>               spin_lock(lp->lock) <- DEADLOCK
+> 
+> Changing the napi_hash_lock to be IRQ safe prevents the IRQ from firing
+> on CPU 1 until napi_hash_lock is released, preventing the deadlock.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 86e25f40aa1e ("net: napi: Add napi_config")
+> Reported-by: Guenter Roeck <linux@roeck-us.net>
+> Closes: https://lore.kernel.org/netdev/85dd4590-ea6b-427d-876a-1d8559c7ad82@roeck-us.net/
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
 
-On Wed, Nov 27, 2024 at 1:00=E2=80=AFAM Leon Romanovsky <leon@kernel.org> w=
-rote:
->
-> On Tue, Nov 26, 2024 at 01:54:20PM -0800, Feng Wang wrote:
-> > Please see embedded answers below. Thanks.
-> >
-> > On Sun, Nov 24, 2024 at 12:15=E2=80=AFAM Leon Romanovsky <leon@kernel.o=
-rg> wrote:
-> > >
-> > > On Thu, Nov 21, 2024 at 09:52:58PM +0000, Feng Wang wrote:
-> > > > In packet offload mode, append Security Association (SA) informatio=
-n
-> > > > to each packet, replicating the crypto offload implementation.
-> > >
-> > > Please write explicitly WHY "replicating ..." is right thing to do an=
-d
-> > > why current code is not enough.
-> > >
-> > > The best thing will be to see how packet traversal in the netdev stac=
-k
-> > > till it gets to the wire.
-> > >
-> > I explained why doing this change in the third paragraph based on
-> > Steffen's suggestion, I can move it here.
->
-> Steffen didn't say "let's replicate ...". All that he said that he wants
-> to see API complete.
->
-I will move the third paragraph here to explain the reason.
+Tested-by: Guenter Roeck <linux@roeck-us.net>
 
-> >
-> > > >
-> > > > The XFRM_XMIT flag is set to enable packet to be returned immediate=
-ly
-> > > > from the validate_xmit_xfrm function, thus aligning with the existi=
-ng
-> > > > code path for packet offload mode.
-> > >
-> > > This chunk was dropped mysteriously. It doesn't exist in the current =
-patch.
-> > > What type of testing did you perform? Can you please add it to the
-> > > commit message?
-> > >
-> > I didn't drop any code in the current patch,  I created a test and the
-> > patch will be upstreamed after this change is checked in.
-> > The link is https://lore.kernel.org/all/20241104233315.3387982-1-wangfe=
-@google.com/
-> > Do I need to add the test details in this commit?
->
-> No, you need to create test that knows to handle case with and without
-> if_id properly. You should add test to the patchset as first patch and
-> implementation as second one.
->
-I probably don't fully understand what you mean. Before my CL, there
-is no handling of if_id. My CL adds this handling and my test shows
-how to test it.
-What does a test without if_id handling show? Show the code not unable
-to handle if_id?  And I checked other features, they only add a test
-after a new feature is checked in.
-
-> >
-> > > According to the strongswan documentation https://docs.strongswan.org=
-/docs/5.9/features/routeBasedVpn.html,
-> > > "Traffic that=E2=80=99s routed to an XFRM interface, while no policie=
-s and SAs with matching interface ID exist,
-> > > will be dropped by the kernel."
-> > >
-> > > It looks like the current code doesn't handle this case, does it?
-> > >
-> > The current code will drop the packet if the interface ID is not matche=
-d.
->
-> How? Who will drop it?
->
-The main function is xfrm_policy_match(), you can trace it.
-> >
-> > > >
-> > > > This SA info helps HW offload match packets to their correct securi=
-ty
-> > > > policies. The XFRM interface ID is included, which is used in setup=
-s
-> > > > with multiple XFRM interfaces where source/destination addresses al=
-one
-> > > > can't pinpoint the right policy.
-> > >
-> > > Please add an examples of iproute2 commands on how it is achieved,
-> > > together with tcprdump examples of before and after.
-> > >
-> > A test patch will be upstreamed.  There is no need for tcpdump because
-> > this change won't change packet content.
->
-> Of course it is needed, it will show that without if_id patch packets
-> are unencrypted, while after applying the patch, we will see encrypted
-> packets.
->
-The netdevsim code doesn't really change the packet content because
-there is no real hardware encryption engine.
-So there is no encrypted packet.
-
-> >
-> > > >
-> > > > Enable packet offload mode on netdevsim and add code to check the X=
-FRM
-> > > > interface ID.
-> > >
-> > > You still need to add checks in existing drivers to make sure that SA=
-s
-> > > with if_id won't be offloaded.
-> > >
-> > There is no existing driver supporting packet offload mode except netde=
-vsim.
->
-> It is not true, please check the code.
->
-I have searched the tree,  and there is no packet offload mode driver
-implementation.  If you know it, please let me know.
-> >
-> > > IMHO, netdevsim implementation is not a replacement to support
-> > > out-of-tree code, but a way to help testing features without need to
-> > > have complex HW, but still for the code which is in-tree.
-> > >
-> > We discussed this before, and I followed your and Steffen's comment to
-> > add netdevsim simulation code to satisfy the requirement.
->
-> I didn't suggest netdevsim and always requested to upstream real driver.
-> Netdevsim is Steffen's suggestion to overcome kernel rule of no adding
-> code without in-kernel users.
->
-> Thanks
->
-> >
-> > > Thanks
-> > >
-> >
-> > > >
-> > > > Signed-off-by: wangfe <wangfe@google.com>
-> > > > ---
-> > > > v6: https://lore.kernel.org/all/20241119220411.2961121-1-wangfe@goo=
-gle.com/
-> > > >   - Fix code style to follow reverse x-mas tree order declaration.
-> > > > v5: https://lore.kernel.org/all/20241112192249.341515-1-wangfe@goog=
-le.com/
-> > > >   - Add SA information only when XFRM interface ID is non-zero.
-> > > > v4: https://lore.kernel.org/all/20241104233251.3387719-1-wangfe@goo=
-gle.com/
-> > > >   - Add offload flag check and only doing check when XFRM interface
-> > > >     ID is non-zero.
-> > > > v3: https://lore.kernel.org/all/20240822200252.472298-1-wangfe@goog=
-le.com/
-> > > >   - Add XFRM interface ID checking on netdevsim in the packet offlo=
-ad
-> > > >     mode.
-> > > > v2:
-> > > >   - Add why HW offload requires the SA info to the commit message
-> > > > v1: https://lore.kernel.org/all/20240812182317.1962756-1-wangfe@goo=
-gle.com/
-> > > > ---
-> > > > ---
-> > > >  drivers/net/netdevsim/ipsec.c     | 32 +++++++++++++++++++++++++++=
-+++-
-> > > >  drivers/net/netdevsim/netdevsim.h |  1 +
-> > > >  net/xfrm/xfrm_output.c            | 22 +++++++++++++++++++++
-> > > >  3 files changed, 54 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/drivers/net/netdevsim/ipsec.c b/drivers/net/netdevsim/=
-ipsec.c
-> > > > index 88187dd4eb2d..5677b2acf9c0 100644
-> > > > --- a/drivers/net/netdevsim/ipsec.c
-> > > > +++ b/drivers/net/netdevsim/ipsec.c
-> > > > @@ -153,7 +153,8 @@ static int nsim_ipsec_add_sa(struct xfrm_state =
-*xs,
-> > > >               return -EINVAL;
-> > > >       }
-> > > >
-> > > > -     if (xs->xso.type !=3D XFRM_DEV_OFFLOAD_CRYPTO) {
-> > > > +     if (xs->xso.type !=3D XFRM_DEV_OFFLOAD_CRYPTO &&
-> > > > +         xs->xso.type !=3D XFRM_DEV_OFFLOAD_PACKET) {
-> > > >               NL_SET_ERR_MSG_MOD(extack, "Unsupported ipsec offload=
- type");
-> > > >               return -EINVAL;
-> > > >       }
-> > > > @@ -169,6 +170,7 @@ static int nsim_ipsec_add_sa(struct xfrm_state =
-*xs,
-> > > >       memset(&sa, 0, sizeof(sa));
-> > > >       sa.used =3D true;
-> > > >       sa.xs =3D xs;
-> > > > +     sa.if_id =3D xs->if_id;
-> > > >
-> > > >       if (sa.xs->id.proto & IPPROTO_ESP)
-> > > >               sa.crypt =3D xs->ealg || xs->aead;
-> > > > @@ -227,16 +229,31 @@ static bool nsim_ipsec_offload_ok(struct sk_b=
-uff *skb, struct xfrm_state *xs)
-> > > >       return true;
-> > > >  }
-> > > >
-> > > > +static int nsim_ipsec_add_policy(struct xfrm_policy *policy,
-> > > > +                              struct netlink_ext_ack *extack)
-> > > > +{
-> > > > +     return 0;
-> > > > +}
-> > > > +
-> > > > +static void nsim_ipsec_del_policy(struct xfrm_policy *policy)
-> > > > +{
-> > > > +}
-> > > > +
-> > > >  static const struct xfrmdev_ops nsim_xfrmdev_ops =3D {
-> > > >       .xdo_dev_state_add      =3D nsim_ipsec_add_sa,
-> > > >       .xdo_dev_state_delete   =3D nsim_ipsec_del_sa,
-> > > >       .xdo_dev_offload_ok     =3D nsim_ipsec_offload_ok,
-> > > > +
-> > > > +     .xdo_dev_policy_add     =3D nsim_ipsec_add_policy,
-> > > > +     .xdo_dev_policy_delete  =3D nsim_ipsec_del_policy,
-> > > > +
-> > > >  };
-> > > >
-> > > >  bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_buff *skb)
-> > > >  {
-> > > >       struct sec_path *sp =3D skb_sec_path(skb);
-> > > >       struct nsim_ipsec *ipsec =3D &ns->ipsec;
-> > > > +     struct xfrm_offload *xo;
-> > > >       struct xfrm_state *xs;
-> > > >       struct nsim_sa *tsa;
-> > > >       u32 sa_idx;
-> > > > @@ -275,6 +292,19 @@ bool nsim_ipsec_tx(struct netdevsim *ns, struc=
-t sk_buff *skb)
-> > > >               return false;
-> > > >       }
-> > > >
-> > > > +     if (xs->if_id) {
-> > > > +             if (xs->if_id !=3D tsa->if_id) {
-> > > > +                     netdev_err(ns->netdev, "unmatched if_id %d %d=
-\n",
-> > > > +                                xs->if_id, tsa->if_id);
-> > > > +                     return false;
-> > > > +             }
-> > > > +             xo =3D xfrm_offload(skb);
-> > > > +             if (!xo || !(xo->flags & XFRM_XMIT)) {
-> > > > +                     netdev_err(ns->netdev, "offload flag missing =
-or wrong\n");
-> > > > +                     return false;
-> > > > +             }
-> > > > +     }
-> > > > +
-> > > >       ipsec->tx++;
-> > > >
-> > > >       return true;
-> > > > diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdev=
-sim/netdevsim.h
-> > > > index bf02efa10956..4941b6e46d0a 100644
-> > > > --- a/drivers/net/netdevsim/netdevsim.h
-> > > > +++ b/drivers/net/netdevsim/netdevsim.h
-> > > > @@ -41,6 +41,7 @@ struct nsim_sa {
-> > > >       __be32 ipaddr[4];
-> > > >       u32 key[4];
-> > > >       u32 salt;
-> > > > +     u32 if_id;
-> > > >       bool used;
-> > > >       bool crypt;
-> > > >       bool rx;
-> > > > diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-> > > > index e5722c95b8bb..3e9a1b17f37e 100644
-> > > > --- a/net/xfrm/xfrm_output.c
-> > > > +++ b/net/xfrm/xfrm_output.c
-> > > > @@ -704,6 +704,8 @@ int xfrm_output(struct sock *sk, struct sk_buff=
- *skb)
-> > > >  {
-> > > >       struct net *net =3D dev_net(skb_dst(skb)->dev);
-> > > >       struct xfrm_state *x =3D skb_dst(skb)->xfrm;
-> > > > +     struct xfrm_offload *xo;
-> > > > +     struct sec_path *sp;
-> > > >       int family;
-> > > >       int err;
-> > > >
-> > > > @@ -728,7 +730,27 @@ int xfrm_output(struct sock *sk, struct sk_buf=
-f *skb)
-> > > >                       kfree_skb(skb);
-> > > >                       return -EHOSTUNREACH;
-> > > >               }
-> > > > +             if (x->if_id) {
-> > > > +                     sp =3D secpath_set(skb);
-> > > > +                     if (!sp) {
-> > > > +                             XFRM_INC_STATS(net, LINUX_MIB_XFRMOUT=
-ERROR);
-> > > > +                             kfree_skb(skb);
-> > > > +                             return -ENOMEM;
-> > > > +                     }
-> > > > +
-> > > > +                     sp->olen++;
-> > > > +                     sp->xvec[sp->len++] =3D x;
-> > > > +                     xfrm_state_hold(x);
-> > > >
-> > > > +                     xo =3D xfrm_offload(skb);
-> > > > +                     if (!xo) {
-> > > > +                             secpath_reset(skb);
-> > > > +                             XFRM_INC_STATS(net, LINUX_MIB_XFRMOUT=
-ERROR);
-> > > > +                             kfree_skb(skb);
-> > > > +                             return -EINVAL;
-> > > > +                     }
-> > > > +                     xo->flags |=3D XFRM_XMIT;
-> > > > +             }
-> > > >               return xfrm_output_resume(sk, skb, 0);
-> > > >       }
-> > > >
-> > > > --
-> > > > 2.47.0.371.ga323438b13-goog
-> > > >
-> > > >
+> ---
+>  net/core/dev.c | 18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 13d00fc10f55..45a8c3dd4a64 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -6557,18 +6557,22 @@ static void __napi_hash_add_with_id(struct napi_struct *napi,
+>  static void napi_hash_add_with_id(struct napi_struct *napi,
+>  				  unsigned int napi_id)
+>  {
+> -	spin_lock(&napi_hash_lock);
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(&napi_hash_lock, flags);
+>  	WARN_ON_ONCE(napi_by_id(napi_id));
+>  	__napi_hash_add_with_id(napi, napi_id);
+> -	spin_unlock(&napi_hash_lock);
+> +	spin_unlock_irqrestore(&napi_hash_lock, flags);
+>  }
+>  
+>  static void napi_hash_add(struct napi_struct *napi)
+>  {
+> +	unsigned long flags;
+> +
+>  	if (test_bit(NAPI_STATE_NO_BUSY_POLL, &napi->state))
+>  		return;
+>  
+> -	spin_lock(&napi_hash_lock);
+> +	spin_lock_irqsave(&napi_hash_lock, flags);
+>  
+>  	/* 0..NR_CPUS range is reserved for sender_cpu use */
+>  	do {
+> @@ -6578,7 +6582,7 @@ static void napi_hash_add(struct napi_struct *napi)
+>  
+>  	__napi_hash_add_with_id(napi, napi_gen_id);
+>  
+> -	spin_unlock(&napi_hash_lock);
+> +	spin_unlock_irqrestore(&napi_hash_lock, flags);
+>  }
+>  
+>  /* Warning : caller is responsible to make sure rcu grace period
+> @@ -6586,11 +6590,13 @@ static void napi_hash_add(struct napi_struct *napi)
+>   */
+>  static void napi_hash_del(struct napi_struct *napi)
+>  {
+> -	spin_lock(&napi_hash_lock);
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(&napi_hash_lock, flags);
+>  
+>  	hlist_del_init_rcu(&napi->napi_hash_node);
+>  
+> -	spin_unlock(&napi_hash_lock);
+> +	spin_unlock_irqrestore(&napi_hash_lock, flags);
+>  }
+>  
+>  static enum hrtimer_restart napi_watchdog(struct hrtimer *timer)
+> -- 
+> 2.25.1
+> 
 
