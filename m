@@ -1,372 +1,194 @@
-Return-Path: <netdev+bounces-148045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0C609E01B1
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 13:11:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 299C89E00F4
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 12:52:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B78D6B35DF5
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:35:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2F9B28242F
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6FA51FCF57;
-	Mon,  2 Dec 2024 11:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89581FE45D;
+	Mon,  2 Dec 2024 11:52:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="HJ2xGDX5"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2045.outbound.protection.outlook.com [40.107.22.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6961FA245;
-	Mon,  2 Dec 2024 11:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733139175; cv=none; b=lzdrErMxUf5FW473DIksxT0QLf+7JN7e6XYoatGZNM5ZNjQwr4vhxlCey7RszsacVjXhPxA7i5h4aczFw+613yhGFxZ+pvpuoqgCOF+mBxEljIj6a74H4fi5I4TRojMlxtrTXTg0GC6eaXonsHTka6BPWN22Wcg73WoC2qHz4yA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733139175; c=relaxed/simple;
-	bh=q1oTX19RB5TTGmMPwQPIbTWTnp2rfELwgORKeXdNJfo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=GqxTInc3ZZCo3gBiQ3buBmF7rIeYQfFTvVzsfKcsxtvLTUNySyv1nZLKTbzSuvOFTuMO04OgMBOsc2H8I2EbXGzynPAT2RRGG9JXERKPwb5tBGramSSAPK2KYD276wxykmEusD+xjDp2xBBdFpQ8wCPRkdBeB8QNO+hOyDEzIEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Y21m6713cz6K9Hn;
-	Mon,  2 Dec 2024 19:29:58 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id BEC7E14034E;
-	Mon,  2 Dec 2024 19:32:49 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Mon, 2 Dec 2024 14:32:47 +0300
-Message-ID: <af72be74-50c7-d251-5df3-a2c63c73296a@huawei-partners.com>
-Date: Mon, 2 Dec 2024 14:32:45 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B731FE44D;
+	Mon,  2 Dec 2024 11:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733140361; cv=fail; b=hB/kApt2Oyxjw9JFmAFoSlNiDWtFdUv6iWeKxUEViLIqfpfadK34BebW8ZxWRzXu8Pbh/gdWiVGYqIgPrl8ldgWTY6EE3jMt8c8JlPHmf28LiA/ljWqP/9e10k6/TxlYQG83jRaPcKHfhqKRTTHXVsFW+SfCS9sKarAIX6Mgcxg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733140361; c=relaxed/simple;
+	bh=aTdGSf/0h0+qenmPR+C2rfrL4m25Lnql2eZkh3EcEdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=qNzU+g4OFFlL5TlN2CUypy19LCYpyDpRI1dEfyBzpXsLjPW2vq1pThxGmX86q+wSQsQK4HGUcNBpqCbrmQeJcfYd1skhacwRfrp75nIsZO6ikYvUZ7AwTyGS9JySjh14XjytUHc6NP+6oWgdAtO0PKLRQXdl2UZXy8yMnZiBVAQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=HJ2xGDX5; arc=fail smtp.client-ip=40.107.22.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=voFIewuP5Yr3wzYNZB0PeWNZx3ofcy0RB9XMKqfmwcX1XMgACfn63ckNp8jqgLMayIowZmcHfgS8MrZgTm2ifONR8ZcwI936SZD2+LMP7Pwd5AnagODtJI5S9CQCvXpY0rxoaQPuhA3QQzhfku/3FONMF//JkQvOIIrxsd4686ixy0MY0Hf6ksBmhnQ8zcLXnmxKHZgg7U3NxqIjk4RM1MF0xrd59G0zub8zv2k32nKpI36FqZy4rxW3KSAhCbJdYjesepxMIDbi2q8yV3H+pD7uQ6YVPs/u+L7VraAY7wIbJRz5fWTJncLkXhSVSpWSB0eLr9g5Y2uHHdg4FKAJ9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uU/r13TB6cBCa3BJ+JLp8oM4REbQvqe6mlsotDZwEDc=;
+ b=xO3Z+l5d3i6F+EBw8T0Hkgy43EUMF/1jF1qRYUUU3nxyAO3Kq4a/Hl4KVcCxltrtTi+wOIwjQtFC4vQ7Ru09ybLIBGclT1d0l7zd+/n5Fjnlato0LLb8T5u8tKSmklp1MhrgRlugEA9JFgHzvwJeAI61JU4JXDXBltIpw1LjA22F61LonfpW7tSqghiGH7Np10qXHmRFTGvdC+VYr/8WQNuk6mW29bawexuYgw/l89Ax6j8s2vksta0uWq0hm7hVQFrkJw1xtAo24k0IUCwgMj4qgc7n/ng0UujRtJgD2BfJ9qQIcWJ6j6kHcFsxoaTO1nUExjR8wd8631VNC87Ukg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uU/r13TB6cBCa3BJ+JLp8oM4REbQvqe6mlsotDZwEDc=;
+ b=HJ2xGDX5cjJyvpYcSOdzpmCUqZ0dkaq98107SqSjZDtwS4hCCdmxJrtiQeRNQYClKt9/tTTafx1cr7zrskMnOWUEfBVjtJ+xbMkVZ9oGRMiBpU8xRB9UTG+Kwu3VcEMid1a1O0ThTmXgcDKSTRU746t1C1knN3+oytfftKdeiQ1LDHQAzNMz2YqX5g7x39TN4utB1BYgRs/43eOaehqsLJTwN6+XvSHc80oVn3YCdtc2g3V/TJUec0G3yGIs6EAC21JDGR24rfBN6zZ1nAw0lVt7zxV6EfqZVEorYhMV5RLKN0SkDJ1Q47Z65C3UKF1pdn5QvAcrmbD0KNoWc/jF5Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by AM0PR04MB7027.eurprd04.prod.outlook.com (2603:10a6:208:191::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.18; Mon, 2 Dec
+ 2024 11:52:36 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8207.017; Mon, 2 Dec 2024
+ 11:52:36 +0000
+Date: Mon, 2 Dec 2024 13:52:33 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
+	Benjamin Poirier <bpoirier@nvidia.com>,
+	Hangbin Liu <liuhangbin@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [net PATCH 2/2] selftests: forwarding: local_termination: sleep
+ before starting tests
+Message-ID: <20241202115233.quxeapcw6g3uyj2x@skbuf>
+References: <20241130113314.6488-1-ansuelsmth@gmail.com>
+ <20241130113314.6488-2-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241130113314.6488-2-ansuelsmth@gmail.com>
+X-ClientProxiedBy: VI1PR10CA0110.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:803:28::39) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 01/19] landlock: Support socket access-control
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-CC: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
-	<willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
- <20240904104824.1844082-2-ivanov.mikhail1@huawei-partners.com>
- <ea026af8-bc29-709c-7e04-e145d01fd825@huawei-partners.com>
- <Z0DDQKACIRRDRZRE@google.com>
- <36ac2fde-1344-9055-42e2-db849abf02e0@huawei-partners.com>
- <20241127.oophah4Ueboo@digikod.net>
- <eafd855d-2681-8dfd-a2be-9c02fc07050d@huawei-partners.com>
- <20241128.um9voo5Woo3I@digikod.net>
-Content-Language: ru
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20241128.um9voo5Woo3I@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AM0PR04MB7027:EE_
+X-MS-Office365-Filtering-Correlation-Id: 41cf4673-a371-4489-b7af-08dd12c7d098
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?BglYl7rpzkQfQ3IIfnuvYWOdo6MWTeNT17xzIILAW7ruqpok1tWd+5KF0tES?=
+ =?us-ascii?Q?aXDQg6pDnKisxT5jmqKZYjbmIikBa2kG8OvySBRrHEaqSnG8yqlnVjmQj27R?=
+ =?us-ascii?Q?6W9boSiMNOVJcfFh1dWR9DTYeNLAm6OWPNIVXOZHOM6rhM/hyPKO4Avfe56p?=
+ =?us-ascii?Q?kUtQ6nY9uv6fk4cTh2KqW+WrAo+S5+iL5PZSfZScoWz+3PQFWG9HyzlKghVB?=
+ =?us-ascii?Q?LiMPop2BzmLNEijjiryfQOASxdqjl2R4LPHmBa1QftbRbU0aVv54nLpxFr4/?=
+ =?us-ascii?Q?JW1H3Ezn9XBCjKE21H2JRHVsPCFcEpUcMXuh1MK1yftq4Z6pKnUtjvodO+NT?=
+ =?us-ascii?Q?p610g+MGhi9h8r6FguXRtWKJgq0AzuGPjkB0v06dGBkI+wSvUPXDrIAjrB+4?=
+ =?us-ascii?Q?S9H6DWxMGCcywyBTSrkJ68OuklFFP0O7uWXyk8JMWmjAWNosoG7623Fd2UxA?=
+ =?us-ascii?Q?XgXYTcKsMgFwpleaXA0czccxC1mdjzg5cT4JdJN/n9jeAQj2r1lI5SlamnxM?=
+ =?us-ascii?Q?5J/u0uTownq3DTnICJtkKJW9R9pJUuFCZ89SPb9wwqMF4pkvhfUhSTIVKJhJ?=
+ =?us-ascii?Q?WNN1nUcDBBhI0krq+TUBL/GfV2KrYJoHty8k3P8xF2Uz4znXMBi75qPQbNAQ?=
+ =?us-ascii?Q?KELQIeS4Bb8y5fDnoImfrvSYky6NjypbxNVW7eFpee8ATPryD/AreD7A+QpU?=
+ =?us-ascii?Q?EH7CdCBCyHooDoLs4MzVsClGcVIgf2hShkvR+bi54uyQdHOSKoRFsnzEo8z6?=
+ =?us-ascii?Q?jrpTMjMmyvtsL/a13M+gw+WGqiACAECYm2nIPqC8a8jL1U8qL8NeDDUEFkr6?=
+ =?us-ascii?Q?U/SxGqRoh6YfS9T3Zcj+CmOO6wjocfJpdltaseMuqqiMvr3mx/tWmc5etMY7?=
+ =?us-ascii?Q?4/hYanPR7eUy9wy7AmheeptVE11XimyH2k2ycTj+6d8ectQzzCgFBuB1hnh4?=
+ =?us-ascii?Q?o5BL2qAQyI/8Pwh3o0vF7I0e3EBuKQO8OYHcfuZRakMQ2HhLqhuNtimsr+Yy?=
+ =?us-ascii?Q?VOWNz5eVugLxrSaaXznF6rFWTQ5RTMCFHNZ25ZCGQ7c/tGJfuhX5qr9X9s9N?=
+ =?us-ascii?Q?ZRm+Y7XCpynQsSoCbmPOMFOWgNxqEPHIjU+sGtD8SX+AZk55rJMpFsyHVieZ?=
+ =?us-ascii?Q?MFcYaHPlhH0hxNVXQ8gUBI0y+efT8Gx9n13mni7xxFOMDTNt/JLjq5Tppxu8?=
+ =?us-ascii?Q?CcxdP59PSfgQR9IF455HlYQu8Ift67pOW4okYdul5VCkZKVlD3kmCFHrLoz/?=
+ =?us-ascii?Q?yzrLURbJxopy8fVmdYEtf94UFWs2nMNGTnQMAy7JeIpVwIAc45kBseMdTygj?=
+ =?us-ascii?Q?bXLwACNyKDa6us7a5hoLdz6Ny61l15TvFqbGTxQ8hkqrPA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?1Det040grnyDfnlZUKpyoQJz/L8TYwONEUiW0Xew8MxbkR+BmpcEnysXbUmu?=
+ =?us-ascii?Q?fQwyOKcH7j3drHyZ5VLRAXUebtByoacyhyKoLHqxgGyWQbnvINfMyPB+IfHL?=
+ =?us-ascii?Q?g+NZG3rqiv118NRzx6Z+TOKa85iYfTN6MsFe06axCe9LetRAxjiALXNKjDiC?=
+ =?us-ascii?Q?BxVRzip6dfI4AqfI2cE6tn35VyaXShG/c4KSABwTfgdwwCRGCGcgQ+qqjCe9?=
+ =?us-ascii?Q?HrorvIyjQI4XDM7qBdeidUxfREdPwiHI8I+8xy9X5/IQh1+rdzDw7E5O1oW8?=
+ =?us-ascii?Q?JAX6YziKHy9HrS7KKJ7e6xjcDj9iUDS5ElklcLs2mYQ0kJAS2kb9QvJueF6p?=
+ =?us-ascii?Q?G3oMWVUVnNW3bn4WiqPi1idZBNCt+0J0ty8iGauycdvIReAErHv3EAn/716M?=
+ =?us-ascii?Q?MlizpLi1x9hSjKZk38XjE87BTTuUGpy0Z96dpxXL4DN4EC3Nn7XF9vg/XSqB?=
+ =?us-ascii?Q?fTKCt8CnzqU5t2u0EupjiGOzGfBaqVxB5lU6Cybe4udZfN8UuifAr2sfXIWx?=
+ =?us-ascii?Q?XKM3l9aguW/2uCd/3Gqj+3rGN9kefj8/1N+b4l6eNdbXtW8UbtrvwVkGa1im?=
+ =?us-ascii?Q?0CtLN23g4n5QzYGY2p3KyROqy3Gx9UsEngZpg0YFgbUiz9J4TQnft0jcvtcc?=
+ =?us-ascii?Q?oxRyJDA0Uj8noWj+qkSGlOCWaiGi/4jcgraCVM+iT4HXP+0cd9NShVTp/P2W?=
+ =?us-ascii?Q?vrzLpqFYfiIqZLJc+tAtspDBGPXSqxxySvCHb9DGD9T9yl+oa5Qye7m3+VeB?=
+ =?us-ascii?Q?KwjnPgtAEh6pzuvnry9Qe1qWlPRDz7WdPF7DHHxr7u8uEI085s4XSBSpSMZo?=
+ =?us-ascii?Q?3zVP5ts8epw4MldvxHGiUDyw5DxwfFzEGPdSJLRnRhdWum0Wb4qnPHbqdItm?=
+ =?us-ascii?Q?OMF0LQxsR06mgD1NEF7SoyED7AWxMJv3UkW6kcJRYCrKXHQir2/DUYrxg7JU?=
+ =?us-ascii?Q?eUPPeRfIB1eVxPH8dQ9vm0g/XmQ/iZwuxThhxgyfLN28T+dstNZm/PG8vVeO?=
+ =?us-ascii?Q?AwF7hD+c6pCL7j+RKm2jBKG/6cwdCeOjIxFHenQHT7kp9JFdaRimx4wD/Rl2?=
+ =?us-ascii?Q?4yJfRDLee+204f+FzZ27yTvNWnCzZJX1Fpw3naq1dgEqzPyMIuWqlnrFZBLB?=
+ =?us-ascii?Q?wtAbnSQzhtoNH+L7c/VqWd7dkFN7kyz5gOIkWdEGNeQq2vNkfUMyD29wmoGX?=
+ =?us-ascii?Q?Qzu35c7QQmuac2C4syNgM4SlhnIZ/Sdwa/OESY+HIahgC9qiI8O14tVB3CXY?=
+ =?us-ascii?Q?79cQeGFVjKiTaiF96mclB8fGKiZOFg0n5zG1jz9oLLoq/T7l174k28Qvrwpv?=
+ =?us-ascii?Q?mkKooUs28gIYia040pUAREe1XgCJxWJsw+8Sb8Ol7jzKLizOr6yEYzmRuNis?=
+ =?us-ascii?Q?Mx1Wr0RKMxzXjH03Dq31RvOaWXlHkPtwULbgwlWybLpvgAyBHrSZtH//nU/w?=
+ =?us-ascii?Q?v2HNPAoz/w563Lk7Bi2a+LCACyxpTb+GJp4sVIBEjp07/waGBqKUI72BaiNx?=
+ =?us-ascii?Q?loi+kk2qcSDYFDG8caTzQUYEtclx9iqG5GLhfG5GKgLleuoJju8txupjVpHH?=
+ =?us-ascii?Q?WobOhO6en87L8JuhEGxix3hwuaOPbj7HDbleO0k1hjpCK1rIUqfV3rAEHHtq?=
+ =?us-ascii?Q?Vw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41cf4673-a371-4489-b7af-08dd12c7d098
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2024 11:52:36.5527
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lfTpUCVLPD9R3ZoItyhijJhFntCpOVxAyxlu4V+2FuqdQ7acYfl7NAqWdjsWiQCoK1j2VX3YFV0wxbMdE39Smw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB7027
 
-On 11/28/2024 11:52 PM, Mickaël Salaün wrote:
-> On Thu, Nov 28, 2024 at 03:01:52PM +0300, Mikhail Ivanov wrote:
->> On 11/27/2024 9:43 PM, Mickaël Salaün wrote:
->>> On Mon, Nov 25, 2024 at 02:04:09PM +0300, Mikhail Ivanov wrote:
->>>> On 11/22/2024 8:45 PM, Günther Noack wrote:
->>>>> Hello Mikhail,
->>>>>
->>>>> sorry for the delayed response;
->>>>> I am very happy to see activity on this patch set! :)
->>>>
->>>> Hello Günther,
->>>> No problem, thanks a lot for your feedback!
->>>>
->>>>>
->>>>> On Mon, Nov 11, 2024 at 07:29:49PM +0300, Mikhail Ivanov wrote:
->>>>>> On 9/4/2024 1:48 PM, Mikhail Ivanov wrote:
->>>>>>> Landlock implements the `LANDLOCK_RULE_NET_PORT` rule type, which provides
->>>>>>> fine-grained control of actions for a specific protocol. Any action or
->>>>>>> protocol that is not supported by this rule can not be controlled. As a
->>>>>>> result, protocols for which fine-grained control is not supported can be
->>>>>>> used in a sandboxed system and lead to vulnerabilities or unexpected
->>>>>>> behavior.
->>>>>>>
->>>>>>> Controlling the protocols used will allow to use only those that are
->>>>>>> necessary for the system and/or which have fine-grained Landlock control
->>>>>>> through others types of rules (e.g. TCP bind/connect control with
->>>>>>> `LANDLOCK_RULE_NET_PORT`, UNIX bind control with
->>>>>>> `LANDLOCK_RULE_PATH_BENEATH`). Consider following examples:
->>>>>>>
->>>>>>> * Server may want to use only TCP sockets for which there is fine-grained
->>>>>>>       control of bind(2) and connect(2) actions [1].
->>>>>>> * System that does not need a network or that may want to disable network
->>>>>>>       for security reasons (e.g. [2]) can achieve this by restricting the use
->>>>>>>       of all possible protocols.
->>>>>>>
->>>>>>> This patch implements such control by restricting socket creation in a
->>>>>>> sandboxed process.
->>>>>>>
->>>>>>> Add `LANDLOCK_RULE_SOCKET` rule type that restricts actions on sockets.
->>>>>>> This rule uses values of address family and socket type (Cf. socket(2))
->>>>>>> to determine sockets that should be restricted. This is represented in a
->>>>>>> landlock_socket_attr struct:
->>>>>>>
->>>>>>>       struct landlock_socket_attr {
->>>>>>>         __u64 allowed_access;
->>>>>>>         int family; /* same as domain in socket(2) */
->>>>>>>         int type; /* see socket(2) */
->>>>>>>       };
->>>>>>
->>>>>> Hello! I'd like to consider another approach to define this structure
->>>>>> before sending the next version of this patchset.
->>>>>>
->>>>>> Currently, it has following possible issues:
->>>>>>
->>>>>> First of all, there is a lack of protocol granularity. It's impossible
->>>>>> to (for example) deny creation of ICMP and SCTP sockets and allow TCP
->>>>>> and UDP. Since the values of address family and socket type do not
->>>>>> completely define the protocol for the restriction, we may gain
->>>>>> incomplete control of the network actions. AFAICS, this is limited to
->>>>>> only a couple of IP protocol cases (e.g. it's impossible to deny SCTP
->>>>>> and SMC sockets to only allow TCP, deny ICMP and allow UDP).
->>>>>>
->>>>>> But one of the main advantages of socket access rights is the ability to
->>>>>> allow only those protocols for which there is a fine-grained control
->>>>>> over their actions (TCP bind/connect). It can be inconvenient
->>>>>> (and unsafe) for SCTP to be unrestricted, while sandboxed process only
->>>>>> needs TCP sockets.
->>>>>
->>>>> That is a good observation which I had missed.
->>>>>
->>>>> I agree with your analysis, I also see the main use case of socket()
->>>>> restrictions in:
->>>>>
->>>>>     (a) restricting socket creating altogether
->>>>>     (b) only permitting socket types for which there is fine grained control
->>>>>
->>>>> and I also agree that it would be very surprising when the same socket types
->>>>> that provide fine grained control would also open the door for unrestricted
->>>>> access to SMC, SCTP or other protocols.  We should instead strive for a
->>>>> socket() access control with which these additional protocols weren't
->>>>> accessible.
->>>>>
->>>>>
->>>>>> Adding protocol (Cf. socket(2)) field was considered a bit during the
->>>>>> initial discussion:
->>>>>> https://lore.kernel.org/all/CABi2SkVWU=Wxb2y3fP702twyHBD3kVoySPGSz2X22VckvcHeXw@mail.gmail.com/
->>>>>
->>>>> So adding "protocol" to the rule attributes would suffice to restrict the use of
->>>>> SMC and SCTP then?  (Sorry, I lost context on these protocols a bit in the
->>>>> meantime, I was so far under the impression that these were using different
->>>>> values for family and type than TCP and UDP do.)
->>>>
->>>> Yeap. Following rule will be enough to allow TCP sockets only:
->>>>
->>>> const struct landlock_socket_attr create_socket_attr = {
->>>> 	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->>>> 	.family = AF_INET{,6},
->>>> 	.type = SOCK_STREAM,
->>>> 	.protocol = 0
->>>> };
->>>
->>> We should indeed include the protocol type in the rule definition.
->>>
->>>>
->>>> Btw, creation of SMC sockets via IP stack was added quite recently.
->>>> So far, creation has been possible only with AF_SMC family.
->>>>
->>>> https://lore.kernel.org/all/1718301630-63692-1-git-send-email-alibuda@linux.alibaba.com/
->>>>
->>>>>
->>>>>
->>>>>> Secondly, I'm not really sure if socket type granularity is required
->>>>>> for most of the protocols. It may be more convenient for the end user
->>>>>> to be able to completely restrict the address family without specifying
->>>>>> whether restriction is dedicated to stream or dgram sockets (e.g. for
->>>>>> BLUETOOTH, VSOCK sockets). However, this is not a big issue for the
->>>>>> current design, since address family can be restricted by specifying
->>>>>> type = SOCK_TYPE_MASK.
->>>
->>> It looks like SOCK_TYPE_MASK is not part of UAPI, which means it could
->>> change with kernel versions (even while being in UAPI in fact).  This
->>> new socket creation control should allow to deny any socket creation
->>> known or unknow at the time of the user space program build, and
->>> whatever the available C headers.
->>
->> Agreed
->>
->>>
->>> This also means that Landlock should accept any domain, type, and
->>> protocols defined in rules.  Indeed, we don't want to reject rules for
->>> which some protocols are not allowed.
->>
->> Do you mean that Landlock should not make any assumptions about this
->> values during a build time? Currently, patchset provides boundary checks
->> for domain (< AF_MAX) and type (< SOCK_MAX) in landlock_add_rule().
+On Sat, Nov 30, 2024 at 12:33:10PM +0100, Christian Marangi wrote:
+> It seems real hardware requires some time to stabilize and actually
+> works after an 'ip link up'. This is not the case for veth as everything
+> is simulated but this is a requirement for real hardware to permit
+> receiving packet.
 > 
-> The *running kernel* may not support some socket's domains or types,
-> which may be confusing for users if the rule was tested on a kernel
-> supporting such domains/types. >
-> For the bitmask of domains or types, the issues to keep boundary checks
-> would be when a subset of them is not supported.  Landlock would reject
-> such rule and it would be difficult for users to identify the cause.
+> Without this the very fist test for unicast always fails on real
+> hardware. With the introduced sleep of one second after mc_route_prepare,
+> the test corretly pass as the packet can correctly be delivered.
 
-Ok, I'll remove these checks.
+I think the analysis is not very convincing for the following reason.
 
-> 
-> I'm still wondering if the landlock_append_net_rule()'s -EAFNOSUPPORT
-> return value for kernels without CONFIG_INET was a good idea.  We should
-> probably return 0 in this case, which would be similar to not checking
-> socket's domains nor types.
+To wait after "ip link up", setup_wait() calls setup_wait_dev_with_timeout()
+which waits until "ip link show dev $dev up" reports 'state UP'.
+This comes from IFLA_OPERSTATE, set by linkwatch.
 
-It seems that returning -EAFNOSUPPORT only complicates error checking
-for landlock_append_net_rule() from the user's perspective. Probably the
-only reason to check the correctness of restricted objects in Landlock
-is to provide errors consistency in hooks.
+I remember having this conversation with Danielle Ratson a few years ago:
+https://lore.kernel.org/netdev/20210624151515.794224-1-danieller@nvidia.com/
+but the bottom line should be that, since commit facd15dfd691 ("net:
+core: synchronize link-watch when carrier is queried") AFAIU, an operstate
+of UP really means that the net device is ready of passing traffic. Failure
+to do so should be a device-side problem.
 
-> 
->>
->>>
->>> What about using bitmasks for the domain and type fields (renamed to
->>> "domains" and "types")?  The last protocol is currently 45/MCTP so a
->>> 64-bit field is enough, and 10/SOCK_PACKET also fits for the last socket
->>> type.
->>>
->>> We cannot do the same with the protocol because the higher one is
->>> 262/MPTCP though.  But it looks like a value of 0 (default protocol)
->>> should be enough for most use cases, and users could specify a protocol
->>> (but this time as a number, not a bitmask).
->>>
->>> To sum up, we could have something like this:
->>>
->>>     const struct landlock_socket_attr create_socket_attr = {
->>>     	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->>>     	.families = 1 << AF_INET | 1 << AF_INET6,
->>>     	.types = 1 << SOCK_STREAM,
->>>     	.protocol = IPPROTO_SCTP
->>>     };
->>
->> Looks good! I think it's a nice approach which will provide a sufficient
->> level of flexibility to define a single rule for a specific protocol (or
->> for related protocols).
->>
->> But, this adds possibility to define a single rule for the set of
->> unrelated protocols:
->>
->> /* Allows TCP, UDP and UNIX sockets. */
->> const struct landlock_socket_attr create_socket_attr = {
->> 	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->> 	.families = 1 << AF_INET | 1 << AF_INET6 | 1 << AF_UNIX,
->> 	.types = 1 << SOCK_STREAM | 1 << SOCK_DGRAM,
->> 	.protocol = 0
->> };
->>
->> Perhaps limiting the addition of one rule to only one address family
->> would be more clear in terms of rule semantics?:
->>
->> /* Allows TCP, UDP, UNIX STREAM, UNIX DGRAM sockets. */
->> const struct landlock_socket_attr create_socket_attrs[] = {
->> 	{
->> 		/* Allows IPv4 TCP and UDP sockets. */
->> 		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->> 		.family = AF_INET,
->> 		.types = 1 << SOCK_STREAM | 1 << SOCK_DGRAM,
->> 		.protocol = 0
->> 	},
->> 	{
->> 		/* Allows IPv6 TCP and UDP sockets. */
->> 		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->> 		.family = AF_INET6,
->> 		.types = 1 << SOCK_STREAM | 1 << SOCK_DGRAM,
->> 		.protocol = 0
->> 	},
->> 	{
->> 		/* Allows UNIX sockets. */
->> 		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->> 		.family = AF_UNIX,
->> 		.types = 1 << SOCK_STREAM | 1 << SOCK_DGRAM,
->> 		.protocol = 0
->> 	},
->> };
-> 
-> Because we are already mixing bitmasks and (protocol) value, I'm not
-> sure it will help much.  I think in most cases the "families" bitmask
-> would handle IPv4 and IPv6 the same (e.g. to only allow TCP with one
-> rule).  I think this is also required to be able to have a 1:1 mapping
-> with SELinux's socket_type_to_security_class().
+Then I thought that maybe tcpdump needs some time to set up its filters
+on the receving net device. But tcpdump_start() already has "sleep 1" in it.
+I admit, that was purely empirical and there's no guarantee that tcpdump
+has finished setting up even after 1 second. If you increase it to 2,
+does it also solve your problem?
 
-Ok, agreed
-
-> 
->>
->>>
->>>
->>>>>
->>>>> Whether the user is adding one rule to permit AF_INET+*, or whether the user is
->>>>> adding two rules to permit (1) AF_INET+SOCK_STREAM and (2) AF_INET+SOCK_DGRAM,
->>>>> that does not seem like a big deal to me as long as the list of such
->>>>> combinations is so low?
->>>>
->>>> Agreed
->>>
->>> I also agree, but this might change if users have to set a combination
->>> of families, types, and protocols.  This should be OK with the bitmask
->>> approach though.
->>>
->>>>
->>>>>
->>>>>
->>>>>> I suggest implementing something close to selinux socket classes for the
->>>>>> struct landlock_socket_attr (Cf. socket_type_to_security_class()). This
->>>>>> will provide protocol granularity and may be simpler and more convenient
->>>>>> in the terms of determining access rights. WDYT?
->>>>>
->>>>> I see that this is a longer switch statement that maps to this enum, it would be
->>>>> an additional data table that would have to be documented separately for users.
->>>>
->>>> This table is the general drawback, since it makes API a bit more
->>>> complex.
->>>>
->>>>>
->>>>> Do you have an example for how such a "security class enum" would map to the
->>>>> combinations of family, type and socket for the protocols discussed above?
->>>>
->>>> I think the socket_type_to_security_class() has a pretty good mapping
->>>> for UNIX and IP families.
->>>
->>> The mapping looks good indeed, and it has been tested for a long time
->>> with many applications.  However, this would make the kernel
->>> implementation more complex, and I think this mapping could easily be
->>> implemented in user space libraries with the bitmask approach, if really
->>> needed, which I'm not sure.
->>
->> I agree, implementing this in a library is a better approach. Thanks for
->> the catch!
->>
->>>
->>>>
->>>>>
->>>>> If this is just a matter of actually mapping (family, type, protocol)
->>>>> combinations in a more flexible way, could we get away by allowing a special
->>>>> "wildcard" value for the "protocol" field, when it is used within a ruleset?
->>>>> Then the LSM would have to look up whether there is a rule for (family, type,
->>>>> protocol) and the only change would be that it now needs to also check whether
->>>>> there is a rule for (family, type, *)?
->>>>
->>>> Something like this?
->>>>
->>>> const struct landlock_socket_attr create_socket_attr = {
->>>> 	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->>>> 	.family = AF_INET6,
->>>> 	.type = SOCK_DGRAM,
->>>> 	.protocol = LANDLOCK_SOCKET_PROTO_ALL
->>>> };
->>>>
->>>>>
->>>>> —Günther
->>>>
->>
+Or do you really have to place the sleep call after the mc_route_prepare() calls,
+and any earlier won't help? In that case, it isolates the sleeping
+requirement to the multicast routes themselves?
 
