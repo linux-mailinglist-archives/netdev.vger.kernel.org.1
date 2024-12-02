@@ -1,186 +1,228 @@
-Return-Path: <netdev+bounces-148015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0C569DFCD3
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:12:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0801E9DFCDC
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:17:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C911B20D9A
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 09:12:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB5C9281D16
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 09:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240561FA154;
-	Mon,  2 Dec 2024 09:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA6D1F9EAA;
+	Mon,  2 Dec 2024 09:17:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OWCmBc+f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tiFtGDXK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC6C1D6DB5
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 09:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF2C1F943E
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 09:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733130730; cv=none; b=MofKpb9Jyz//mtqB9o51kMo47JZaSgPz8QXzIO8jr3l+M7e7NB8zA4K8Z3re78vLuUsfxftcGiNz2XavBAwoPGQ2VIDwf6N4+q0f6740gmGtnblaRJ3b7zOhWtjcTACzKnPUR/FjFTNJFLJwFgo1j/1nDWpB+sSXqHlBtiRlHEI=
+	t=1733131045; cv=none; b=oK+V/K8VNTxziVzFPLq7EFR6nPE9emdQ37UMxlN2k+ATjgkb2CgcH/33DCQGTBijqsx3u+7E1Roak3gcbk1SXxWJLcKPfWk4xSavszAoWHdQbtiUqXzBFswt8JpbCXicXuk/RqmFhQ39ENabCFsOygWwT6UDzpiyILsPC7w6NEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733130730; c=relaxed/simple;
-	bh=OPUB++lWXiPKKiYrOdq6xP9jYd3439A88wogpEvRSx8=;
+	s=arc-20240116; t=1733131045; c=relaxed/simple;
+	bh=/9q60xITuihiB2x5RUYBEu35G0+4Mu1zEvnVGD62rlE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sDRPP0/QJkMpLI/CXfuVrIVpM4HJSALTsdnxcghE0PHaMMANTpkXJs8fdiQTc4pybqYNjxDIPZ1NOwjmxBaEHGOZptOtt8jP12VQHx8AlKsSXxKZxQUuk5P/v+//3hYXunHXRImeKeKzyOfmqba5lfjTBfWfhlDN7OXSgk6Lokc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OWCmBc+f; arc=none smtp.client-ip=209.85.208.45
+	 To:Cc:Content-Type; b=GjbqGg6XrtncH/CaBZz1n1swBTmAUc2Tqe592hpGmWC/0Xmu2DN5esAJ1XnmKi+5uGZ6BJ3Rb5HIjTstLOyjX1uMe0QGXT+e9pWTHZcWGI/nJ7MiqwtgpSCfgIy6Abpn1e5pMrLZhOADWRHeCbiv8pQLwQE6N+G5hWOKkOwOJXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tiFtGDXK; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5cec9609303so4739115a12.1
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 01:12:08 -0800 (PST)
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2ffc357ea33so40538821fa.0
+        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 01:17:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733130726; x=1733735526; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1733131042; x=1733735842; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ASgU89klsCyJOGimjcpjVTnKSHB+c5COcKOQEBObRRQ=;
-        b=OWCmBc+ffeMGVDMjRAVCF3V0+pdBxGm9OBTNd0cUjC2sBYMxt4yQebNktZSbSNTj13
-         wH1UqYMQwn7P4fP0GcB2DzQbwnu1uJZCBQedWVGhgNpNfQFGgIociToCIO7PVHwjt2a3
-         Ikor1wyA7cgTCBun6rPDIVTyINvDERGrCHlTUZGO8aIcKIdVPttjg5iLOdznA3MNH7mz
-         rJTq17AlI695s5TFg8M4hEPu/5PxVnY21fpYe8eBsA00f5Hpz4FODvmvJ3nSLxlEJy11
-         YT98BoYgKAOq+RhWR7pr6fhVCvnL025O/eVlbaZ55UpiyyzdkQiv6uQrku3rJv/iRIJ3
-         celg==
+        bh=FJ+S0Fhs1g+ccvTIHmEYibUCAqQP8aYZxwamy8uh644=;
+        b=tiFtGDXKr61Jh2vx1SzX84h5MV3mGkidM7M3B1rkV/qF/KbenbUKHohXj8zP+xl6T1
+         RUC2RlfAMuEb8LFSX/RqnkGtnZyQY8Hl1rKewmqQRaYCH8IkfBtE/8Ihco8/VRPFQMdr
+         1FGhK3bo1uJMR4+ZAKKYLlhg3iJiTFdqlmlbifIHc1ctNniqG8WL3g1sYVS0EPiovWRg
+         57S6/DgxqQ/Znu79PfQfqvUspMi+duyttQj2FMyJaUe9R+4iLADYBHEMKdL22y7NqHPe
+         fYbNAWOVyjq/+7qx8aj3jvCO9aj87wJ6ulOlU9U1sGmW9hns7SoHFU4ymSbAVo13RXIS
+         ORMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733130726; x=1733735526;
+        d=1e100.net; s=20230601; t=1733131042; x=1733735842;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ASgU89klsCyJOGimjcpjVTnKSHB+c5COcKOQEBObRRQ=;
-        b=CyahdilrvFh5ymv+6V+2ZlTy/BDeoyvOBD8R6NK2XIwKvX6R3ws5G1lZyRe9btm+VJ
-         pFBd66HboMbGnipCLpwV92YcBSE9KKXMDGF8gk2lETwNxm6KqrTN4LQjHoCT4CFUgbiJ
-         w/IHL7t37gM9oN/hX/98E3bRgfoJKl7jpkkZn/DPtl9y4XUwHZ341SkLYD4M1xDH0GU9
-         b7afbMSk8wAjH2UqqsfOGO7OSbkYXqJ+zLP4IVBvlnTN7yl1l2scIMvqyastwvgUFNlu
-         W5zGFlD39FESKDEuOfK6eZlHJ2GLS0+SRWrz9ovK9GFuzq5MKExkNWaJ1Pk5iSYgwTAi
-         dBnA==
-X-Gm-Message-State: AOJu0Yx16Kh67d7QfpT8980XeprS3t/yhI/2fzRLfzsBzLZ9f5ci3YW7
-	hX8WP1VMlnTusx5fMpIHca4PZcyY9dH2nshCBIfJ3GNszeIseda9QJcDn4JFmLTN4bnXlx7g2w2
-	3MJUhz80mwmmThQCCQTT9KZ+fmdNoVNhPukmS
-X-Gm-Gg: ASbGncuQ1lIIfo1jHmin0lCx8hxEVRQYr3iHpw3Z/sPtsvyGiY2DFnQBt9i4YuILGtZ
-	a6fNlUrtMKfLIZ/axo45UlN2cVqqXBQ==
-X-Google-Smtp-Source: AGHT+IEbrbrU0n3XbW2eEumbJKfBoBteVIzyiSfnkqgosJ/0mmqaHBPPkFB/X+z+TGp4Ajnk3L0KEkudbe/K1MqAxk4=
-X-Received: by 2002:a05:6402:d07:b0:5cf:9e5:7d20 with SMTP id
- 4fb4d7f45d1cf-5d080bd3c69mr23271899a12.17.1733130726250; Mon, 02 Dec 2024
- 01:12:06 -0800 (PST)
+        bh=FJ+S0Fhs1g+ccvTIHmEYibUCAqQP8aYZxwamy8uh644=;
+        b=V5mgEGBH11cAvZjOUDjc68zReYh1ywbhydLwwfCInMht6bz3ZI38uplgBkld1QjSx3
+         aDsKp9NO9jiLL72OoJdA7TLlAjaEzndXL7+eREQPTuQqVEVUkbFkrTLDPuA3Whv939b/
+         QYhvzodddYXi0wYDHUVLG0hemoGrYkz9z2nHkgEfP8x02ySfHhCzlKVwRG6UCxV9jzBz
+         hos7gDXYWIudHdmdknnPwQ1iKLFhMm7AF0hgE0t4xcGkJ9zewaCXJvCvH8FnlvUP+SYX
+         Nb3LHj1j+RKgLlcV3OXQ0Vo6PUwV9n7SZOVAFU08+X6j+9qJNJOJgUAeuraAsmPKsKCq
+         9loQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWVYwob8mB4AAA4tPNfaxBWc0B7BbL5jjWsM7wsbSUzBCS9r2BC9loQ4waOCIQgFKvKSfdOzxg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2EoLsug2rybgmGeoAUtBo4ImwgDWTbBWfnJTQupDk9CwoDeFb
+	PkrVUYu1wKNs3GD8Mb8cwBubNLLPJ8u6GoX/+0NefbtxHhcmvK5YY7UQkgpQSsVMvvhFtpO9Pst
+	b7bDQ0OSIu4SKbEZtOzhADpZIlhuG/cNri0tU
+X-Gm-Gg: ASbGncuNdE0YC6M8lkSyo+aub+gpklqpqc29SpXbbEME8Snw9OcI4IoIWJuRcTJI35i
+	+UvdTGblp7b4rfi8ypIzDXyVBTNHUyg==
+X-Google-Smtp-Source: AGHT+IEV4/Bp+fN78qACrtcWAVHEc1WPCJ5w/IU3xtm4onOV+GcCm9EI0O1Ws2OkU/ftmZnEW1+KdScotcR8aQOrOVw=
+X-Received: by 2002:a05:651c:a0a:b0:2ff:ef8b:9e6 with SMTP id
+ 38308e7fff4ca-2ffef8b0ac2mr30879001fa.16.1733131041454; Mon, 02 Dec 2024
+ 01:17:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <7d13b21f439acd027e510890ba4b353994bad058.1733129879.git.pabeni@redhat.com>
-In-Reply-To: <7d13b21f439acd027e510890ba4b353994bad058.1733129879.git.pabeni@redhat.com>
+References: <20241128123840.49034-1-pablo@netfilter.org> <20241128123840.49034-5-pablo@netfilter.org>
+ <CANn89iKGUKxLGY4UG9JrAVQR5bahHrUurf7TVwPcE4rf4g3cAQ@mail.gmail.com> <Z00MOYmYgmlrrpWN@calendula>
+In-Reply-To: <Z00MOYmYgmlrrpWN@calendula>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 2 Dec 2024 10:11:55 +0100
-Message-ID: <CANn89iKTA7YN=cZebH5NaNV41LuGKk5GfcZTf3yyrcJJE8EBpQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net] ipmr: tune the ipmr_can_free_table() checks.
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
+Date: Mon, 2 Dec 2024 10:17:10 +0100
+Message-ID: <CANn89i+G3_0QzdOsoCMOk-Qgd+Vv7hKEtogMNJ00pUGC1wX=ow@mail.gmail.com>
+Subject: Re: [PATCH net 4/4] netfilter: nft_inner: incorrect percpu area
+ handling under softirq
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net, 
+	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, fw@strlen.de
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 2, 2024 at 9:59=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
+On Mon, Dec 2, 2024 at 2:24=E2=80=AFAM Pablo Neira Ayuso <pablo@netfilter.o=
+rg> wrote:
 >
-> Eric reported a syzkaller-triggered splat caused by recent ipmr changes:
+> Hi Eric,
 >
-> WARNING: CPU: 2 PID: 6041 at net/ipv6/ip6mr.c:419
-> ip6mr_free_table+0xbd/0x120 net/ipv6/ip6mr.c:419
-> Modules linked in:
-> CPU: 2 UID: 0 PID: 6041 Comm: syz-executor183 Not tainted
-> 6.12.0-syzkaller-10681-g65ae975e97d5 #0
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
-> 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> RIP: 0010:ip6mr_free_table+0xbd/0x120 net/ipv6/ip6mr.c:419
-> Code: 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c
-> 02 00 75 58 49 83 bc 24 c0 0e 00 00 00 74 09 e8 44 ef a9 f7 90 <0f> 0b
-> 90 e8 3b ef a9 f7 48 8d 7b 38 e8 12 a3 96 f7 48 89 df be 0f
-> RSP: 0018:ffffc90004267bd8 EFLAGS: 00010293
-> RAX: 0000000000000000 RBX: ffff88803c710000 RCX: ffffffff89e4d844
-> RDX: ffff88803c52c880 RSI: ffffffff89e4d87c RDI: ffff88803c578ec0
-> RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
-> R10: 0000000000000001 R11: 0000000000000001 R12: ffff88803c578000
-> R13: ffff88803c710000 R14: ffff88803c710008 R15: dead000000000100
-> FS: 00007f7a855ee6c0(0000) GS:ffff88806a800000(0000) knlGS:00000000000000=
-00
-> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007f7a85689938 CR3: 000000003c492000 CR4: 0000000000352ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
-> <TASK>
-> ip6mr_rules_exit+0x176/0x2d0 net/ipv6/ip6mr.c:283
-> ip6mr_net_exit_batch+0x53/0xa0 net/ipv6/ip6mr.c:1388
-> ops_exit_list+0x128/0x180 net/core/net_namespace.c:177
-> setup_net+0x4fe/0x860 net/core/net_namespace.c:394
-> copy_net_ns+0x2b4/0x6b0 net/core/net_namespace.c:500
-> create_new_namespaces+0x3ea/0xad0 kernel/nsproxy.c:110
-> unshare_nsproxy_namespaces+0xc0/0x1f0 kernel/nsproxy.c:228
-> ksys_unshare+0x45d/0xa40 kernel/fork.c:3334
-> __do_sys_unshare kernel/fork.c:3405 [inline]
-> __se_sys_unshare kernel/fork.c:3403 [inline]
-> __x64_sys_unshare+0x31/0x40 kernel/fork.c:3403
-> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-> entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f7a856332d9
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48
-> 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
-> 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007f7a855ee238 EFLAGS: 00000246 ORIG_RAX: 0000000000000110
-> RAX: ffffffffffffffda RBX: 00007f7a856bd308 RCX: 00007f7a856332d9
-> RDX: 00007f7a8560f8c6 RSI: 0000000000000000 RDI: 0000000062040200
-> RBP: 00007f7a856bd300 R08: 00007fff932160a7 R09: 00007f7a855ee6c0
-> R10: 0000000000000000 R11: 0000000000000246 R12: 00007f7a856bd30c
-> R13: 0000000000000000 R14: 00007fff93215fc0 R15: 00007fff932160a8
-> </TASK>
+> On Fri, Nov 29, 2024 at 10:14:34AM +0100, Eric Dumazet wrote:
+> > On Thu, Nov 28, 2024 at 1:38=E2=80=AFPM Pablo Neira Ayuso <pablo@netfil=
+ter.org> wrote:
+> > >
+> > > Softirq can interrupt packet from process context which walks over th=
+e
+> > > percpu area.
+> > >
+> > > Add routines to disable bh while restoring and saving the tunnel pars=
+er
+> > > context from percpu area to stack. Add a skbuff owner for this percpu
+> > > area to catch softirq interference to exercise the packet tunnel pars=
+er
+> > > again in such case.
+> > >
+> > > Reported-by: syzbot+84d0441b9860f0d63285@syzkaller.appspotmail.com
+> > > Fixes: 3a07327d10a0 ("netfilter: nft_inner: support for inner tunnel =
+header matching")
+> > > Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> > > ---
+> > >  include/net/netfilter/nf_tables_core.h |  1 +
+> > >  net/netfilter/nft_inner.c              | 56 ++++++++++++++++++++----=
+--
+> > >  2 files changed, 45 insertions(+), 12 deletions(-)
+> > >
+> > > diff --git a/include/net/netfilter/nf_tables_core.h b/include/net/net=
+filter/nf_tables_core.h
+> > > index ff27cb2e1662..dae0e7592934 100644
+> > > --- a/include/net/netfilter/nf_tables_core.h
+> > > +++ b/include/net/netfilter/nf_tables_core.h
+> > > @@ -161,6 +161,7 @@ enum {
+> > >  };
+> > >
+> > >  struct nft_inner_tun_ctx {
+> > > +       struct sk_buff *skb;    /* percpu area owner */
+> > >         u16     type;
+> > >         u16     inner_tunoff;
+> > >         u16     inner_lloff;
+> > > diff --git a/net/netfilter/nft_inner.c b/net/netfilter/nft_inner.c
+> > > index 928312d01eb1..fcaa126ac8da 100644
+> > > --- a/net/netfilter/nft_inner.c
+> > > +++ b/net/netfilter/nft_inner.c
+> > > @@ -210,35 +210,65 @@ static int nft_inner_parse(const struct nft_inn=
+er *priv,
+> > >                            struct nft_pktinfo *pkt,
+> > >                            struct nft_inner_tun_ctx *tun_ctx)
+> > >  {
+> > > -       struct nft_inner_tun_ctx ctx =3D {};
+> > >         u32 off =3D pkt->inneroff;
+> > >
+> > >         if (priv->flags & NFT_INNER_HDRSIZE &&
+> > > -           nft_inner_parse_tunhdr(priv, pkt, &ctx, &off) < 0)
+> > > +           nft_inner_parse_tunhdr(priv, pkt, tun_ctx, &off) < 0)
+> > >                 return -1;
+> > >
+> > >         if (priv->flags & (NFT_INNER_LL | NFT_INNER_NH)) {
+> > > -               if (nft_inner_parse_l2l3(priv, pkt, &ctx, off) < 0)
+> > > +               if (nft_inner_parse_l2l3(priv, pkt, tun_ctx, off) < 0=
+)
+> > >                         return -1;
+> > >         } else if (priv->flags & NFT_INNER_TH) {
+> > > -               ctx.inner_thoff =3D off;
+> > > -               ctx.flags |=3D NFT_PAYLOAD_CTX_INNER_TH;
+> > > +               tun_ctx->inner_thoff =3D off;
+> > > +               tun_ctx->flags |=3D NFT_PAYLOAD_CTX_INNER_TH;
+> > >         }
+> > >
+> > > -       *tun_ctx =3D ctx;
+> > >         tun_ctx->type =3D priv->type;
+> > > +       tun_ctx->skb =3D pkt->skb;
+> > >         pkt->flags |=3D NFT_PKTINFO_INNER_FULL;
+> > >
+> > >         return 0;
+> > >  }
+> > >
+> > > +static bool nft_inner_restore_tun_ctx(const struct nft_pktinfo *pkt,
+> > > +                                     struct nft_inner_tun_ctx *tun_c=
+tx)
+> > > +{
+> > > +       struct nft_inner_tun_ctx *this_cpu_tun_ctx;
+> > > +
+> > > +       local_bh_disable();
+> > > +       this_cpu_tun_ctx =3D this_cpu_ptr(&nft_pcpu_tun_ctx);
+> > > +       if (this_cpu_tun_ctx->skb !=3D pkt->skb) {
+> >
+> > I must say I do not understand this patch.
+> >
+> > If a context is used by a save/restore more than one time per packet
+> > traversal, then this means we can not use per-cpu storage,
+> > or risk flakes.
+> >
+> > Also, skb could be freed and re-allocated ?
+> >
+> > Perhaps describe a bit more what is going on in the changelog.
 >
-> The root cause is a network namespace creation failing after successful
-> initialization of the ipmr subsystem. Such a case is not currently
-> matched by the ipmr_can_free_table() helper.
+> There is an on-stack nft_pktinfo structure with a flags field. This
+> nft_pktinfo is a wrapper for the sk_buff, containing header offsets
+> and metainformation. This is initialize when entering this chain.
 >
-> New namespaces are zeroed on allocation and inserted into net ns list
-> only after successful creation; when deleting an ipmr table, the list
-> next pointer can be NULL only on netns initialization failure.
+> If the NFT_PKTINFO_INNER_FULL flag is set on, then the percpu area
+> could contain information on the inner header offsets (ie. packet was
+> already parsed in this chain).
 >
-> Update the ipmr_can_free_table() checks leveraging such condition.
+> There is a check to validate that the percpu area refers to this
+> skbuff. If there is a mismatch, then this needs to parse the inner
+> headers because the data in the percpu area is stale. Otherwise, if
+> there is a match, the percpu area is copied on-stack.
 >
-> Reported-by: Eric Dumazet <edumazet@google.com>
-> Fixes: 11b6e701bce9 ("ipmr: add debug check for mr table cleanup")
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
-> v1 -> v2:
->  - move the netns init completed check in a new helper
-> ---
->  include/net/net_namespace.h | 5 +++++
->  net/ipv4/ipmr.c             | 2 +-
->  net/ipv6/ip6mr.c            | 2 +-
->  3 files changed, 7 insertions(+), 2 deletions(-)
+> After processing (payload/meta fetching), the on-stack copy is stored
+> back to the percpu area. I can make an improvement on this patch to
+> check if this skbuff still owns the percpu area in the store/exit
+> section of this inner evaluation routine, to avoid a unnecessary update.
 >
-> diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-> index 873c0f9fdac6..ac301c7d48a4 100644
-> --- a/include/net/net_namespace.h
-> +++ b/include/net/net_namespace.h
-> @@ -325,6 +325,11 @@ static inline int check_net(const struct net *net)
->  #define net_drop_ns NULL
->  #endif
+> So, it is basically the NFT_PKTINFO_INNER_FULL flag that handles the
+> skbuff reallocation scenario. This is not blindly trusting this percpu
+> area per-se.
 >
-> +/* Returns true if the netns initialization is completed successfully */
-> +static inline bool net_initialized(struct net *net)
-> +{
-> +       return net->list.next;
+> One comestic change I can apply to this: I can also turn the struct
+> sk_buff into unsigned long so it clear to the reader this pointer to
+> skbuff is not meant to be used for being dereferenced.
+>
+> If the explaination above is sufficient, I can revamp to extend the
+> changelog as you suggest and post a new version of this patch.
+>
+> Thanks.
 
-It is unclear what lock protects this read (or context it can be used)
+The part I do not understand is that tun_ctx->skb is not cleared at
+the end of processing (or at some point)
 
-Perhaps we could make clear no lock is needed (and add a const qual)
+That would make clear that a future (tun_ctx->skb =3D=3D skb) test is not
+confused by skb reuse (free/alloc).
 
-static inline bool net_initialized(const struct net *net)
-{
-       return READ_ONCE(net->list.next);
-}
+If you use it as a cookie, then we need something else than a pointer.
 
