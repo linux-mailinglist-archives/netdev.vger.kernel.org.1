@@ -1,123 +1,122 @@
-Return-Path: <netdev+bounces-148105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A68449E0613
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:59:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 872039E0580
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:50:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25D8816D286
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 14:46:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BE6D16B875
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 14:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA73821C17F;
-	Mon,  2 Dec 2024 14:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA5B20FABD;
+	Mon,  2 Dec 2024 14:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gRdKLTx3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rzjSVrTq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4812821C169
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 14:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BF420FAA4;
+	Mon,  2 Dec 2024 14:32:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733150021; cv=none; b=gKogsViHf0KgMdThJ+UPAD/ET0lZEoJtRvpWhcPwmeWjk3m6tniLIVaCBpREH43ByY3fs2urpZQwptxCPGBrdMkdarUA8MhO5miPq+zzW8QnG7THuLxPT+17OUcWewCtFIUSo7U935lnNuUwcTsscZblEdnhpbHatprdogM2/Mw=
+	t=1733149963; cv=none; b=PiGF3Rpo/ZThUtaPWdkwI5TWwX+zdbCX6sz6W+dYgdXtVogxAI948/KFKRI5tcoLi3E6U3dX7KRWpQiypm2ZSeqmZMn6i9YAwIxmYiKbxMO+Xg7Gbtdb8M+z5bqHl41pxnuLqFUMO1SYWDCnPxE66Bc2qCnFjAAMcg09PrVQhgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733150021; c=relaxed/simple;
-	bh=4dc+Nkaax4urmXZGQKI75aQvCDUzDWDJU9xnT0gKGJU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FQHnWLPy7KpFc1PjyYvJGLXPQ6HAaAqrqS4j63X4bgNbSbJPHNSjVc0w2ShzxXHmu9NKZMetXEez/1O6Di0efRQMhwyIsFU9lZGqO/xnVvVMBXCuOsd//tDzU1pJwwtanlIIJBxriDdV6vF2qSic3s+wVy5M47pn0GNxy/nrqjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gRdKLTx3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733150019;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9xQ2xdCLYYlx45F0qwkdxOdotOSCgHYTL3xHslEjIPc=;
-	b=gRdKLTx3QFv9d4aLCKszfttEgGIJVxwHlG7IZvq98EzQTUXFAhvEJymwcxW35GGvFED1W6
-	Rnqk3l/d97LO4jZkApfvS0eSsTcwZ/TXxDKE6xey9jJq9Ypll+sP+aOVj+zYPO7v86QNdD
-	jvHyze7w0PD8FyesNW0SV4sZtA+davg=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-103-LsnAEZuCP0mV_DhoqTXxrg-1; Mon,
- 02 Dec 2024 09:33:35 -0500
-X-MC-Unique: LsnAEZuCP0mV_DhoqTXxrg-1
-X-Mimecast-MFC-AGG-ID: LsnAEZuCP0mV_DhoqTXxrg
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5149D191007C;
-	Mon,  2 Dec 2024 14:33:32 +0000 (UTC)
-Received: from warthog.procyon.org.uk.com (unknown [10.42.28.48])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C5F1C195605A;
-	Mon,  2 Dec 2024 14:33:29 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
+	s=arc-20240116; t=1733149963; c=relaxed/simple;
+	bh=IJ1Rrc7KpT8C107R71TYZs9A0BxxfhfJImHlo+06Fxw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JQoLlbmIZYz9Dj1DeWqWq55+2Umax8YT68T5HSatNc0JpZT3RgCnr3Wi/c2LEese3apP+GHvCZhp9GDAdqjLgsaIAdxUE2Z8wBCoTX1rVGAG/GOGzRD2/za96olldAGTn/F+OcZ1KkOUTU9OQB/tF4Umm6a1XMj1AIVpti/Wea4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rzjSVrTq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=QywnUlO+90s8saZdPpnrP4d9TT5pCFNVTXS7DZDgsoU=; b=rzjSVrTqpXXd2IrWGOplMAgOgI
+	UMaFfeD1n5bCrmJ4CxYG7RRwAQ9BUjKNNP35naVgqIVwIsPGOszt7AASAxlEuTSRotK6PYSf+cA9C
+	to4xkuSiUr751CRr5txHzafN/rW2ey4isMsZvjixo4Q039JXDCv8PVLsYwAOn5ZmDJ/g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tI7TH-00Exjr-G3; Mon, 02 Dec 2024 15:32:19 +0100
+Date: Mon, 2 Dec 2024 15:32:19 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 36/37] rxrpc: Fix request for an ACK when cwnd is minimum
-Date: Mon,  2 Dec 2024 14:30:54 +0000
-Message-ID: <20241202143057.378147-37-dhowells@redhat.com>
-In-Reply-To: <20241202143057.378147-1-dhowells@redhat.com>
-References: <20241202143057.378147-1-dhowells@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Michael Dege <michael.dege@renesas.com>,
+	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+	Dennis Ostermann <dennis.ostermann@renesas.com>
+Subject: Re: [PATCH] net: phy: phy_ethtool_ksettings_set: Allow any supported
+ speed
+Message-ID: <3b98a7c5-b8bf-4e96-b969-da1800813251@lunn.ch>
+References: <20241202083352.3865373-1-nikita.yoush@cogentembedded.com>
+ <20241202100334.454599a7@fedora.home>
+ <73ca1492-d97b-4120-b662-cc80fc787ffd@cogentembedded.com>
+ <Z02He-kU6jlH-TJb@shell.armlinux.org.uk>
+ <eddde51a-2e0b-48c2-9681-48a95f329f5c@cogentembedded.com>
+ <Z02KoULvRqMQbxR3@shell.armlinux.org.uk>
+ <c1296735-81be-4f7d-a601-bc1a3718a6a2@cogentembedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c1296735-81be-4f7d-a601-bc1a3718a6a2@cogentembedded.com>
 
-rxrpc_prepare_data_subpacket() sets the REQUEST-ACK flag on the outgoing
-DATA packet under a number of circumstances, including, theoretically, when
-the cwnd is at minimum (or less).  However, the minimum in this function is
-hard-coded as 2, but the actual minimum is RXRPC_MIN_CWND (which is
-currently 4) and so this never occurs.
+On Mon, Dec 02, 2024 at 04:09:43PM +0500, Nikita Yushchenko wrote:
+> > > Right now, 'ethtool -s tsn0 master-slave forced-slave' causes a call to
+> > > driver's ethtool set_link_ksettings method. Which does error out for me
+> > > because at the call time, speed field is 2500.
+> > 
+> > Are you saying that the PHY starts in fixed-speed 2.5G mode?
+> > 
+> > What does ethtool tsn0 say after boot and the link has come up but
+> > before any ethtool settings are changed?
+> 
+> On a freshly booted board, with /etc/systemd/network temporary moved away.
+> 
+> (there are two identical boards, connected to each other)
+> 
+> root@vc4-033:~# ip l show dev tsn0
+> 19: tsn0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+>     link/ether 3a:e3:5c:56:ba:bd brd ff:ff:ff:ff:ff:ff
+> 
+> root@vc4-033:~# ethtool tsn0
+> Settings for tsn0:
+>         Supported ports: [ MII ]
+>         Supported link modes:   2500baseT/Full
 
-Without this, we will miss the request of some ACKs, potentially leading to
-a transmission stall until a timeout occurs on one side or the other that
-leads to an ACK being generated.
+If it is a T1 PHY, we want it reporting 25000BaseT1/Full here.  Having
+T1 then probably allows us to unlock forced master/slave without
+autoneg, and setting speeds above 1G without autoneg.
 
-Fix the function to use RXRPC_MIN_CWND rather than a hard-coded number.
+Given this is an out of tree driver, i can understand why it does not,
+it means patching a number of in tree files.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
----
- net/rxrpc/output.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+https://www.marvell.com/products/automotive/88q4364.html
 
-diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-index 891b85b3b9e7..c8ae59103c21 100644
---- a/net/rxrpc/output.c
-+++ b/net/rxrpc/output.c
-@@ -468,7 +468,7 @@ static size_t rxrpc_prepare_data_subpacket(struct rxrpc_call *call,
- 		why = rxrpc_reqack_ack_lost;
- 	else if (txb->flags & RXRPC_TXBUF_RESENT)
- 		why = rxrpc_reqack_retrans;
--	else if (call->cong_ca_state == RXRPC_CA_SLOW_START && call->cong_cwnd <= 2)
-+	else if (call->cong_ca_state == RXRPC_CA_SLOW_START && call->cong_cwnd <= RXRPC_MIN_CWND)
- 		why = rxrpc_reqack_slow_start;
- 	else if (call->tx_winsize <= 2)
- 		why = rxrpc_reqack_small_txwin;
+says it can actually do 2.5G/5G/10GBASE-T1 as defined by the IEEE
+802.3ch standard.
 
+I would be reluctant to make changes to phylib without a kernel
+quality PHY driver queued for merging. So you might want to spend some
+time cleaning up the code. FYI: I've not looked at 802.3ch, but if
+that defines registers, i would expect the driver patches to actually
+be split into helpers for standard defined registers any 3ch driver
+can use, and a PHY driver gluing those together and accessing marvell
+specific registers.
+
+	 Andrew
 
