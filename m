@@ -1,118 +1,142 @@
-Return-Path: <netdev+bounces-148017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64FB69DFCE9
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:20:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 898A29DFD04
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:24:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3394B281D49
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 09:20:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17699B22167
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 09:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F3861FA15C;
-	Mon,  2 Dec 2024 09:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC85C1FA252;
+	Mon,  2 Dec 2024 09:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="OS0gP45S"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JTPur2Dv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666D71F9F63
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 09:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343E91FA249
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 09:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733131224; cv=none; b=Tlb6Kj57aontVH6K1sBV65HfTM1d9u67uMk7JdPE8bKZd8hb1DVOXIWil4kV3xrsxzKaZtNJ+wsDLQGrFlKtzeGQtTECB4zZqJETa87hr3tzZJVLNYveVXgSQBTxiJqoe1mpoRhn6iVm/5d1vIGjB1h7AdxEZDwp0di9X/exXUo=
+	t=1733131419; cv=none; b=FAMB5HmMZeI8M3bhn8qd1zw+X+oTYjEEkXtjzeVuvh/mIJ6DYvtvRWwS9ZXP4G9awr13lvBLG1HJKBMBAF9PkU1LuaTxBMFSthF0Gyeg0pYhSqvev3WTDqBjYTKWsUo3MFuDgOEyPPHQktwfPxYO+CLTLN28vEdiTfR3XzxEuro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733131224; c=relaxed/simple;
-	bh=SWUOtEZ62ullshonhP4jKBf2d9W2S/E8dA2lk4biI3Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jo60AY4tfIiH3SHTQTAWQRTGp/nY5uZD5ZbI0I3ChQwxGxC/puqT4kSzTiKMlEXWXmHE8wDkdaH5ALwMhHTUmjhibAHv/7i3f2ZL7afwvrMVKG6eratqmfjLWWJYtrc41Q7dUFyjN6Vn9wJcyYsTH7BrOWjgNlDJpAoM5wHsRxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=OS0gP45S; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-53df1d1b6f8so4392079e87.3
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 01:20:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1733131220; x=1733736020; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s1RPkwPp5r2Vbz80qntZnCN8Y+Eqnbh1zwzq5b7urfU=;
-        b=OS0gP45SHpGIie39DH8Z/gOCe7mxiUA0tXy7JPmQ5Jty89gAoyKefrK58Cqvl6gK6f
-         nOSgS1nDFUDxp1HDkoUBC+rKFcxl59Nioo94fAOiDzGzutP7IW5fRvriOfGm0GD/HJTq
-         3kPgkmqywyHHis3JeCMZrDc4AzsysuJLxaNbfh1IYEmDhCc88LaL5V6d5vc1z4SYxAWq
-         Olgmo9WZRZCxy25pmVbC4uF/GkIc3eihls2QApWdTu2PNoiQ4qhIBT8gvQxZUzqDXJNb
-         TglN8C/iIKj4rj/2l3F0lTTN0GbHRUxHMSTzpLCnc2V0VgA+HP0fBj2N0JOHbegUU03o
-         qO3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733131220; x=1733736020;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s1RPkwPp5r2Vbz80qntZnCN8Y+Eqnbh1zwzq5b7urfU=;
-        b=azklCFQ8MwdY0bEuKZF35Th5OjBCGJIudj8FtGMCHZLlC7O+P1xFk2pVtrKlUPrkg6
-         me2myKiTwuKRqyP0zfoaV2TN3++Otpp6Z44Met0aoIgAySVTm0Tennt+WUL05UgUizuJ
-         WIIxlYKZfLJm7Tglre/LtmELosHP/jpoHe9S7pAlVybhq0TijvbJHA3yEzpRwDgC6UbF
-         zFjdCNb6iRkhxX4w70MgROpMQpkStLFKgmjEsa0pW1C4jAbAqGq36cWb12eX9lxtjgn1
-         w6tsZl2J4ZYsYaUd/frKW6A1TR/iny05yxPScOQX2i/QnOSa6puuLC+L8sEdQFpaV9Hx
-         1S+w==
-X-Forwarded-Encrypted: i=1; AJvYcCXyQ/1cN649tF6+eII89p5Cd22SWlMGAu4Wi4mZgExqR9z8p/w1f7/sjOrm3P4IqFSOGus1gME=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOspGhTrzMAX7FL8/LGcmaUWBBTIGCRCtsnQwd2nVnfZJW5QEB
-	nGkNDq3F5nzPr/e2+lwJLQAsOYcC190yMaCnO8k/2ZdbVP1oJTfz6jsVdANgz7A=
-X-Gm-Gg: ASbGncsO0gZnGdng+58vQhHfsLLVQi9FH68qqnkzrzaepaFveIojhdYv+BZrTts9Djw
-	+eQee9sBsLGL6J2v6RYWuF550Ig2CcaUppBDzNBK/XKKHohJe/6gPJ9yrLAqBdXTuvGYaVDp5jG
-	ucbpyelrLgspoPg8HIcyDDPMg6TgdGAVNnz8+PSzCfze6qJG57PD0uZZEfeoBHZtLa0f9DSYQP0
-	hW4HDWoJhtDYaTedRddivhhXfgKOZIazAwggq9TGp/jRDKRI8h6oM5Sb8jp0NK/KDYiSg==
-X-Google-Smtp-Source: AGHT+IE/Ktyy05BNhEHz3SvhbLMz83N6niVppt6d9zUKChiGb2UC5yIq74p4radwagwY843evl9L+g==
-X-Received: by 2002:a05:6512:39d2:b0:53d:a6c8:fb94 with SMTP id 2adb3069b0e04-53df00d9d9dmr9199616e87.28.1733131220488;
-        Mon, 02 Dec 2024 01:20:20 -0800 (PST)
-Received: from [192.168.0.104] ([91.198.101.25])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53df6496a43sm1386017e87.213.2024.12.02.01.20.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Dec 2024 01:20:20 -0800 (PST)
-Message-ID: <73ca1492-d97b-4120-b662-cc80fc787ffd@cogentembedded.com>
-Date: Mon, 2 Dec 2024 14:20:17 +0500
+	s=arc-20240116; t=1733131419; c=relaxed/simple;
+	bh=I7RkWtt4z3d0ENZ+j2JKgjUG/MCG0Gqa1MJKSgg1BKg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VRunoRr+JyVlgGwnes4jYV/YnOOV+kdJSKqX+sMi8T9woQVYZiizKYpFrP8n8e9Mer1uXdY7ghFNHPRC13CkXsEYVvG0iXGyErWvJP97oUzItiA6P2NPcj6TO0kvLLAzWjv+sqgbTQ6i+VgokGfLdcYmhNnk8fG+4xdRz1ixQUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JTPur2Dv; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733131418; x=1764667418;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=I7RkWtt4z3d0ENZ+j2JKgjUG/MCG0Gqa1MJKSgg1BKg=;
+  b=JTPur2DvAT17xOdQajT6jsKlLOTtYDrXWUOeB899UIlGQ9KVyqfRQWA2
+   HWeLdaz6zxf+6910qGpVcbYY2lS0kv91ZiSHh5OgKrxsdJ/wAL9xHoZ+B
+   KCSaGk46M6D0D7LQGEeCBFDa4UD8egwoTsnS9ZuMuo6mEqpIHItI4wbtt
+   MfmjYMoLqxHn0Kw1kb9pZjXF2WbL9jFDtjyx5JV33aZ/yxD30XYwJ/S3x
+   wiksOh5GEYongh0JfqPfNA4ntcdAawNlteaDP9P6JGog6Alk9r8OqA0ay
+   0wsiwCfyTmN3DN93AFT9ALos15T386tAUtvAX+RpYhV3nrZylOl3OXltt
+   g==;
+X-CSE-ConnectionGUID: D5cXITn+QR6fkaybDMv03w==
+X-CSE-MsgGUID: B+0LwoX0RRCLYNHX1NGyXw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11273"; a="32646279"
+X-IronPort-AV: E=Sophos;i="6.12,201,1728975600"; 
+   d="scan'208";a="32646279"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 01:23:38 -0800
+X-CSE-ConnectionGUID: a04rlHaSTQG6GTQUq5g/1w==
+X-CSE-MsgGUID: aq0mliP9T8yRyf34HiyLRg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,201,1728975600"; 
+   d="scan'208";a="130533262"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 01:23:33 -0800
+Date: Mon, 2 Dec 2024 10:20:41 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	pawel.chmielewski@intel.com, sridhar.samudrala@intel.com,
+	jacob.e.keller@intel.com, pio.raczynski@gmail.com,
+	konrad.knitter@intel.com, marcin.szycik@intel.com,
+	wojciech.drewek@intel.com, nex.sw.ncis.nat.hpm.dev@intel.com,
+	przemyslaw.kitszel@intel.com, jiri@resnulli.us, horms@kernel.org,
+	David.Laight@aculab.com, pmenzel@molgen.mpg.de, mschmidt@redhat.com,
+	rafal.romanowski@intel.com
+Subject: Re: [iwl-next v8 0/9] ice: managing MSI-X in driver
+Message-ID: <Z0176Qex/kdZ3JI8@mev-dev.igk.intel.com>
+References: <20241114122009.97416-1-michal.swiatkowski@linux.intel.com>
+ <062b57cf-7f5d-412f-9288-685c4c600d53@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: phy_ethtool_ksettings_set: Allow any supported
- speed
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Michael Dege <michael.dege@renesas.com>,
- Christian Mardmoeller <christian.mardmoeller@renesas.com>,
- Dennis Ostermann <dennis.ostermann@renesas.com>
-References: <20241202083352.3865373-1-nikita.yoush@cogentembedded.com>
- <20241202100334.454599a7@fedora.home>
-Content-Language: en-US, ru-RU
-From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-In-Reply-To: <20241202100334.454599a7@fedora.home>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <062b57cf-7f5d-412f-9288-685c4c600d53@intel.com>
 
-Hello.
+On Mon, Nov 18, 2024 at 03:13:32PM -0800, Tony Nguyen wrote:
+> 
+> 
+> On 11/14/2024 4:18 AM, Michal Swiatkowski wrote:
+> 
+> ...
+> 
+> > Note: previous patchset is on dev-queue. I will be unavailable some
+> > time, so sending fixed next version basing it on Tony main.
+> > 
+> > Michal Swiatkowski (8):
+> >    ice: devlink PF MSI-X max and min parameter
+> >    ice: remove splitting MSI-X between features
+> >    ice: get rid of num_lan_msix field
+> >    ice, irdma: move interrupts code to irdma
+> >    ice: treat dyn_allowed only as suggestion
+> >    ice: enable_rdma devlink param
+> >    ice: simplify VF MSI-X managing
+> >    ice: init flow director before RDMA
+> 
+> It looks like something happened with your series/send. It's marked 0/9,
+> however, there are 8 patches here. Patch 1 in the previous version [1] is
+> not here and patch 8 is on the thread twice (as an 8/8 and a 9/9).
+> Also, it doesn't apply either with or without the previous patch 1.
+> 
+> [1] https://lore.kernel.org/intel-wired-lan/20241104121337.129287-1-michal.swiatkowski@linux.intel.com/
+> 
 
-> What's your use-case to need >1G fixed-settings link ?
+Sorry for that, I were in hurry :( .
 
-My hardware is Renesas VC4 board (based on Renesas S4 SoC), network driver is rswitch, PHY in question 
-is Marvell 88Q3344 (2.5G Base-T1).
+Will send fixed v9, I can remove base-commit now as the previous
+patchset isn't on next-queue.
 
-To get two such PHYs talk to each other, one of the two has to be manually configured as slave.
-(e.g. ethtool -s tsn0 master-slave forced-slave).
+Thanks
 
-This gets handled via driver's ethtool set_link_ksettings method, which is currently set to
-phy_ethtool_ksettings_set().
-
-Writing a custom set_link_ksettings method just to not error out when speed is 2500 looks ugly.
-
-Nikita
+> > 
+> >   Documentation/networking/devlink/ice.rst      |  11 +
+> >   drivers/infiniband/hw/irdma/hw.c              |   2 -
+> >   drivers/infiniband/hw/irdma/main.c            |  46 ++-
+> >   drivers/infiniband/hw/irdma/main.h            |   3 +
+> >   .../net/ethernet/intel/ice/devlink/devlink.c  | 109 +++++++
+> >   drivers/net/ethernet/intel/ice/ice.h          |  21 +-
+> >   drivers/net/ethernet/intel/ice/ice_base.c     |  10 +-
+> >   drivers/net/ethernet/intel/ice/ice_ethtool.c  |   6 +-
+> >   drivers/net/ethernet/intel/ice/ice_idc.c      |  64 +---
+> >   drivers/net/ethernet/intel/ice/ice_irq.c      | 275 ++++++------------
+> >   drivers/net/ethernet/intel/ice/ice_irq.h      |  13 +-
+> >   drivers/net/ethernet/intel/ice/ice_lib.c      |  35 ++-
+> >   drivers/net/ethernet/intel/ice/ice_main.c     |   6 +-
+> >   drivers/net/ethernet/intel/ice/ice_sriov.c    | 154 +---------
+> >   include/linux/net/intel/iidc.h                |   2 +
+> >   15 files changed, 335 insertions(+), 422 deletions(-)
+> > 
+> > 
+> > base-commit: 31a1f8752f7df7e3d8122054fbef02a9a8bff38f
+> 
 
