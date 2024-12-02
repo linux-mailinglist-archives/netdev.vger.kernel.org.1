@@ -1,86 +1,111 @@
-Return-Path: <netdev+bounces-148042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A87B29DFFD6
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 12:11:39 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90A60160614
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:11:31 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320F31FCFFD;
-	Mon,  2 Dec 2024 11:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="I70wTbJM"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A4EA9E0233
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 13:30:10 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78341FA167;
-	Mon,  2 Dec 2024 11:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31D94282501
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 12:30:09 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF571FDE3B;
+	Mon,  2 Dec 2024 12:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="fQ/sPKxh"
+X-Original-To: netdev@vger.kernel.org
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2E91D86C4;
+	Mon,  2 Dec 2024 12:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733137882; cv=none; b=WUdfR0fkwTDMO9iwD0Qpob1nYHpYni6XM4I96NyEY1MTJHvyEnhVKGPszyRGEPseh23MIHF+Hw8PSaAS2yi1Q/ZRk3duSaroS3dYcCN60r25JP9gkHcnLX0hdh7DyBqvMrwS6Uzv7hH/fh2feKbnMFvAiB6s3RVvdtFkw1BJJYw=
+	t=1733142487; cv=none; b=rXUOxu8jSrhEffKA07zguPdhfuCRgYo9e4GiDymPzj8X/fzm2mORb3whpPPNkAyjEV0znct2OWZNTaqTCDa6KiC/ueK+g/+dea9ZzjslkMmm8B7kkZNx65KUGrC65Y+SApMgfXfSv7IvVbTCIhHlokjnVJD0OHdetJqc4pQs35Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733137882; c=relaxed/simple;
-	bh=sQlY9ZcRDmTiTXinK2DlHWEK9pxEuVYAimddKiRGj5Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RqcBW8avDxZbghKvl+ul0ObiiLm02Bb+4Oo4tJ6nGi8glUWjwohoyhdft7I4zdtSHzyHJHZ0fZoPEXYfW5XnjG5VwlkF9RDp+JKzvWUwFmojOcoF2AeaMWvUHd2v1VFzKgHD44tsnjPZ+KE5Ei6gXGj4adloFvCL3LM84S6T1Xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=I70wTbJM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA32DC4CED1;
-	Mon,  2 Dec 2024 11:11:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1733137881;
-	bh=sQlY9ZcRDmTiTXinK2DlHWEK9pxEuVYAimddKiRGj5Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I70wTbJMs1xHUDqFnMkZOFHsaelBP5M3f+rUcgIZCggH1c7dske+VfQF4p+SfD3mz
-	 vxTm73qA57U3wR0CfqKuzp7tQ1K8ngPTZTkb56b4ndDvwkXP3udL1VYWh7KSmnZfNI
-	 8hv+8azXAUaieNJ3Oj5+OZ/iPskWr/AfbiJzZki8=
-Date: Mon, 2 Dec 2024 12:11:17 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Saeed Mirzamohammadi <saeed.mirzamohammadi@oracle.com>
-Cc: Florian Westphal <fw@strlen.de>, Eric Dumazet <edumazet@google.com>,
-	xingwei lee <xrivendell7@gmail.com>,
-	yue sun <samsun1006219@gmail.com>,
-	syzbot+e5167d7144a62715044c@syzkaller.appspotmail.com,
-	Paolo Abeni <pabeni@redhat.com>, stable@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 4.19.y 1/1] inet: inet_defrag: prevent sk release while
- still in use
-Message-ID: <2024120254-glare-crust-e398@gregkh>
-References: <20241125205944.3444476-1-saeed.mirzamohammadi@oracle.com>
+	s=arc-20240116; t=1733142487; c=relaxed/simple;
+	bh=8w0r3ktu1M5FUF105N4Rsn60q1AcX5GbCp8n4ZRd1As=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=u5C9E2o5MeFltbr0vf4Uoxgro1QEjBAi5IQgQDs43J90JN3djmdWCFwlefnySe7RaA0bwr3I2kxwPZ+r8Pi0+xRicO6pISNnvK0vwrZsSdAoFI2+ID+VTYMyrLp+nXBH91QeKCTf7cTFzjXF3rWkk5C7gKkg78IruONoC26KKN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=fQ/sPKxh; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tI4dF-0080pR-Tg; Mon, 02 Dec 2024 12:30:25 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=SC1SAF+IARgGsN+DYWrWfiuj6Ct7UFuzudPQw8Fn9tE=
+	; b=fQ/sPKxh9nul6IWGHhds48hDA3TVcVtByLCZ6ENFVNswVL5jrrGUjkhibQOF4BO8NGxyuGLpp
+	rFsReiga4RfrD30f/WgBgwFH3Wyd8ExZuvwLlhux99QReFEavbs7Wy89FqKDeSTbrGYseF/yim7UO
+	q5U6UDPtYmTw43+RH46czAzy2qgkRFruzw5jez1N1yjDHhzit01E8lZ9A3dB9yQbeBnhfwV5aoE+m
+	KjdG6G6O49g6Yoh6YcRfdzZ1UvtV76FQ6qJntETS3hJEBiNCiE/spSVLcGqVJ1YgP5eB0gUriKjl1
+	geuDdnp2+3qqZo5WlGxuC8pdEfOcp2wBpx7tIQ==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tI4dE-0007ES-Da; Mon, 02 Dec 2024 12:30:24 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tI4d2-007H5a-4r; Mon, 02 Dec 2024 12:30:12 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH bpf 0/3] bpf, sockmap: Fix the element replace
+Date: Mon, 02 Dec 2024 12:29:22 +0100
+Message-Id: <20241202-sockmap-replace-v1-0-1e88579e7bd5@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241125205944.3444476-1-saeed.mirzamohammadi@oracle.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABKaTWcC/x3MTQqAIBBA4avErBP8iYSuEi3MxhoqFYUIxLsnL
+ b/FewUyJsIMU1cg4UOZgm8QfQf2MH5HRlszSC4HIblgOdjzNpEljJexyEZtNdfaKaMEtComdPT
+ +xxnW6GCp9QOSUogNZgAAAA==
+X-Change-ID: 20241201-sockmap-replace-67c7077f3a31
+To: Andrii Nakryiko <andrii@kernel.org>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-On Mon, Nov 25, 2024 at 12:59:37PM -0800, Saeed Mirzamohammadi wrote:
-> From: Florian Westphal <fw@strlen.de>
-> 
-> commit 18685451fc4e546fc0e718580d32df3c0e5c8272 upstream.
+Series takes care of two issues with sockmap update: inconsistent behaviour
+after update with same, and race/refcount imbalance on element replace.
 
-Ok, but then you say:
+I am hesitant if patch 3/3 ("bpf, sockmap: Fix race between element replace
+and close()") is the right approach. I might have missed some detail of the
+current __sock_map_delete() implementation. I'd be grateful for comments,
+thanks.
 
-> (cherry picked from commit 1b6de5e6575b56502665c65cf93b0ae6aa0f51ab)
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Michal Luczaj (3):
+      bpf, sockmap: Fix update element with same
+      selftest/bpf: Extend test for sockmap update with same
+      bpf, sockmap: Fix race between element replace and close()
 
-Can't have it two different ways :(
+ net/core/sock_map.c                                    | 6 +++---
+ tools/testing/selftests/bpf/prog_tests/sockmap_basic.c | 8 +++++---
+ 2 files changed, 8 insertions(+), 6 deletions(-)
+---
+base-commit: 537a2525eaf76ea9b0dca62b994500d8670b39d5
+change-id: 20241201-sockmap-replace-67c7077f3a31
 
-Please fix up properly.
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
 
-thanks,
-
-greg k-h
 
