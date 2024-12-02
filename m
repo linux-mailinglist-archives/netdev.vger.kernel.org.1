@@ -1,178 +1,86 @@
-Return-Path: <netdev+bounces-148041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA7AF9DFFCB
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 12:10:03 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A87B29DFFD6
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 12:11:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90A60160614
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:11:31 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320F31FCFFD;
+	Mon,  2 Dec 2024 11:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="I70wTbJM"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FC42281F23
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:10:02 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0302C1FCFF6;
-	Mon,  2 Dec 2024 11:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="CbdEhWDn"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F7D1FCFE7
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 11:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78341FA167;
+	Mon,  2 Dec 2024 11:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733137789; cv=none; b=sOSyeF0aQKbR+souuUSVaoUBp51GEQdNs86HT9TztDH+eJ8jGSC82aVqLVfF3CcUBtqlb/Avb3b5LkJnXH8xkD3dfsls5C8XALxejjcYrenT0W7wiPsAm2Sqjdva5QUOUPx5uUugY6Pty35SMnHxhkcJcvv6rHGH5jSF/KwWWyc=
+	t=1733137882; cv=none; b=WUdfR0fkwTDMO9iwD0Qpob1nYHpYni6XM4I96NyEY1MTJHvyEnhVKGPszyRGEPseh23MIHF+Hw8PSaAS2yi1Q/ZRk3duSaroS3dYcCN60r25JP9gkHcnLX0hdh7DyBqvMrwS6Uzv7hH/fh2feKbnMFvAiB6s3RVvdtFkw1BJJYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733137789; c=relaxed/simple;
-	bh=qUcESZ0YUaBtbhD+aoGet9WbGSp2Qo1gyt7ZDRohhNI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RWPAHDdyodtFL+gIf3YLbxn6fIlGOwM3Aw+pLxXDPEloac3FbR119bLKXpXgKOzT/rqC47VpFxQCHZnfiG6VNBqw0Cx302D9OqTvWQ7+7Wue7v2rxd+fjna1VbJXreUKtmqVnpxCaFUlaCbgsHBl/nhn0zeuH1c7sYutVhvnm8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=CbdEhWDn; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ffc3f2b3a9so52125381fa.1
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 03:09:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1733137786; x=1733742586; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JIz3utMm0/sU5BMr5sIEd+mlpszlZQSMeIY1+TfyJxY=;
-        b=CbdEhWDnrF5LHf8ong5EQLwqU++3HIUr6JWW9UhSDEUGeGqZ1xZpkSy1qV+nUgc1GQ
-         KmrqeSUDUCn/TbP0SDiCtPDWuOLbf9F2g2v459mK8+QXP08G1cfQPpJ4sfeMjdMMNLlr
-         GC5fhshN6b4Gk8kUr1KOpMGYsHuiga5QmPo7XkxTFcXoEwqlL+pqL96d9SaF1mRrn9L9
-         A3HkCbMu9C/7P21fQmV6R3gjdhrsY2gNVWrzI+3BZn5ami3i/P8xwuQXsKsnAFo2HV69
-         LsZzZjeVo5ZlLZrVBl859FG3+auRIp+a/cKGfXK/KROWiDMPaXbBRNs5rCqbOGEQK7Kr
-         g5IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733137786; x=1733742586;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JIz3utMm0/sU5BMr5sIEd+mlpszlZQSMeIY1+TfyJxY=;
-        b=a7lyMylJjOegQVAeSUMOUPkht/2m4sVi3lvAKRbeuaqjnB9X18UKokaLa1Ids1AAwX
-         I430m3o+lj6VXh0E2g7pa8eAz/HvN0k23jPZQmr1sPezoQcuYLAtqyKABkobW6XK7oS0
-         /PgrruIjNi3cUZTlkJPeYpCI4IOhPwKbfKTrRHeKdvIE01sBigWsID/4nDhPvbcTxpSO
-         f7TZdWgx3vojVkGrQI76p7y5q38uUn85/jHfgn/3KnFeXCKGr7YfTc8A5GCOf/zyr39r
-         LUn5NzXWDDto4RJ5SkWMAd7heHMNcz7woN+PMDZorqhM0OVQ1bArq6hsBc/U7CqPbi4H
-         VZTg==
-X-Forwarded-Encrypted: i=1; AJvYcCXcqmg8nVInQcS/EpJVRd5bcOvqa936BDQvH37bIbyP9wlDJlDJTbCXCltSvUTmuVSKfX4oPgA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzT8DckMSBolE7f325SEGToTGjPN9KSkRGVlYwJqE4IHygVJHSu
-	M2hnm3/lFMC6XjMLKACJzLYaGim2YBRnh9H7rKfe5ztQhfJM43bFlnNvK7phhos=
-X-Gm-Gg: ASbGncsu0YGvTmM0lxd2u7dT5OnboX1xPcHfjgatjGulQrJNSzN67+PfvleS4fKD+0F
-	V/SrNHbA57jTk7Mtwfp4cu/ibbF5FbzkjJHa++DxfDECpNJkktO5NQykbAiXTb/+wp9wMwvLftu
-	InqvKgA/uJ+jbYFxoQrcjAu8jHdmSD5lpT7rX034pE1vAbYqJOgRaA/xMn0r7Y7W19CxYv97w8j
-	yPf3AM7FRUcUkxmf2D0e8tIR4xeoOVlH+qGwuf4Ic+jW55mjgJK/TRbKQiEYFxAera8eA==
-X-Google-Smtp-Source: AGHT+IHAvBtf0OQXFo4WX8SQik/WEe881XNPtRWavelPBjYiw87rg6F4KhsnlxUq7isC2k5Va1zqnw==
-X-Received: by 2002:a05:6512:3e1e:b0:53d:eced:f634 with SMTP id 2adb3069b0e04-53df01171b4mr16308916e87.48.1733137786215;
-        Mon, 02 Dec 2024 03:09:46 -0800 (PST)
-Received: from [192.168.0.104] ([91.198.101.25])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53df649f6dcsm1421513e87.243.2024.12.02.03.09.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Dec 2024 03:09:45 -0800 (PST)
-Message-ID: <c1296735-81be-4f7d-a601-bc1a3718a6a2@cogentembedded.com>
-Date: Mon, 2 Dec 2024 16:09:43 +0500
+	s=arc-20240116; t=1733137882; c=relaxed/simple;
+	bh=sQlY9ZcRDmTiTXinK2DlHWEK9pxEuVYAimddKiRGj5Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RqcBW8avDxZbghKvl+ul0ObiiLm02Bb+4Oo4tJ6nGi8glUWjwohoyhdft7I4zdtSHzyHJHZ0fZoPEXYfW5XnjG5VwlkF9RDp+JKzvWUwFmojOcoF2AeaMWvUHd2v1VFzKgHD44tsnjPZ+KE5Ei6gXGj4adloFvCL3LM84S6T1Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=I70wTbJM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA32DC4CED1;
+	Mon,  2 Dec 2024 11:11:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1733137881;
+	bh=sQlY9ZcRDmTiTXinK2DlHWEK9pxEuVYAimddKiRGj5Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I70wTbJMs1xHUDqFnMkZOFHsaelBP5M3f+rUcgIZCggH1c7dske+VfQF4p+SfD3mz
+	 vxTm73qA57U3wR0CfqKuzp7tQ1K8ngPTZTkb56b4ndDvwkXP3udL1VYWh7KSmnZfNI
+	 8hv+8azXAUaieNJ3Oj5+OZ/iPskWr/AfbiJzZki8=
+Date: Mon, 2 Dec 2024 12:11:17 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Saeed Mirzamohammadi <saeed.mirzamohammadi@oracle.com>
+Cc: Florian Westphal <fw@strlen.de>, Eric Dumazet <edumazet@google.com>,
+	xingwei lee <xrivendell7@gmail.com>,
+	yue sun <samsun1006219@gmail.com>,
+	syzbot+e5167d7144a62715044c@syzkaller.appspotmail.com,
+	Paolo Abeni <pabeni@redhat.com>, stable@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH 4.19.y 1/1] inet: inet_defrag: prevent sk release while
+ still in use
+Message-ID: <2024120254-glare-crust-e398@gregkh>
+References: <20241125205944.3444476-1-saeed.mirzamohammadi@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: phy_ethtool_ksettings_set: Allow any supported
- speed
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Michael Dege <michael.dege@renesas.com>,
- Christian Mardmoeller <christian.mardmoeller@renesas.com>,
- Dennis Ostermann <dennis.ostermann@renesas.com>
-References: <20241202083352.3865373-1-nikita.yoush@cogentembedded.com>
- <20241202100334.454599a7@fedora.home>
- <73ca1492-d97b-4120-b662-cc80fc787ffd@cogentembedded.com>
- <Z02He-kU6jlH-TJb@shell.armlinux.org.uk>
- <eddde51a-2e0b-48c2-9681-48a95f329f5c@cogentembedded.com>
- <Z02KoULvRqMQbxR3@shell.armlinux.org.uk>
-Content-Language: en-US, ru-RU
-From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-In-Reply-To: <Z02KoULvRqMQbxR3@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241125205944.3444476-1-saeed.mirzamohammadi@oracle.com>
 
->> Right now, 'ethtool -s tsn0 master-slave forced-slave' causes a call to
->> driver's ethtool set_link_ksettings method. Which does error out for me
->> because at the call time, speed field is 2500.
+On Mon, Nov 25, 2024 at 12:59:37PM -0800, Saeed Mirzamohammadi wrote:
+> From: Florian Westphal <fw@strlen.de>
 > 
-> Are you saying that the PHY starts in fixed-speed 2.5G mode?
-> 
-> What does ethtool tsn0 say after boot and the link has come up but
-> before any ethtool settings are changed?
+> commit 18685451fc4e546fc0e718580d32df3c0e5c8272 upstream.
 
-On a freshly booted board, with /etc/systemd/network temporary moved away.
+Ok, but then you say:
 
-(there are two identical boards, connected to each other)
+> (cherry picked from commit 1b6de5e6575b56502665c65cf93b0ae6aa0f51ab)
 
-root@vc4-033:~# ip l show dev tsn0
-19: tsn0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-     link/ether 3a:e3:5c:56:ba:bd brd ff:ff:ff:ff:ff:ff
+Can't have it two different ways :(
 
-root@vc4-033:~# ethtool tsn0
-Settings for tsn0:
-         Supported ports: [ MII ]
-         Supported link modes:   2500baseT/Full
-         Supported pause frame use: Symmetric Receive-only
-         Supports auto-negotiation: No
-         Supported FEC modes: Not reported
-         Advertised link modes:  2500baseT/Full
-         Advertised pause frame use: No
-         Advertised auto-negotiation: No
-         Advertised FEC modes: Not reported
-         Speed: 2500Mb/s
-         Duplex: Unknown! (255)
-         Auto-negotiation: off
-         master-slave cfg: unknown
-         Port: Twisted Pair
-         PHYAD: 0
-         Transceiver: external
-         MDI-X: Unknown
+Please fix up properly.
 
-PHY driver is out of tree and can do things wrong. AFAIU it does nothing more than wrapping Marvell 
-setup sequences into a phy driver skeleton.
+thanks,
 
-Still, with the patch in question applied, things just work:
-
-root@vc4-033:~# ip l set dev tsn0 up
-root@vc4-033:~# ethtool -s tsn0 master-slave forced-slave
-[   83.743711] renesas_eth_sw e68c0000.ethernet tsn0: Link is Up - 2.5Gbps/Full - flow control off
-root@vc4-033:~# ethtool tsn0
-Settings for tsn0:
-         Supported ports: [ MII ]
-         Supported link modes:   2500baseT/Full
-         Supported pause frame use: Symmetric Receive-only
-         Supports auto-negotiation: No
-         Supported FEC modes: Not reported
-         Advertised link modes:  2500baseT/Full
-         Advertised pause frame use: No
-         Advertised auto-negotiation: No
-         Advertised FEC modes: Not reported
-         Speed: 2500Mb/s
-         Duplex: Full
-         Auto-negotiation: off
-         master-slave cfg: forced slave
-         master-slave status: slave
-         Port: Twisted Pair
-         PHYAD: 0
-         Transceiver: external
-         MDI-X: Unknown
-
-root@vc4-033:~# ip a add 192.168.70.11/24 dev tsn0
-root@vc4-033:~# ping 192.168.70.10
-PING 192.168.70.10 (192.168.70.10) 56(84) bytes of data.
-64 bytes from 192.168.70.10: icmp_seq=1 ttl=64 time=1.03 ms
-64 bytes from 192.168.70.10: icmp_seq=2 ttl=64 time=0.601 ms
-...
+greg k-h
 
