@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-148218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF95C9E0DC5
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 22:25:33 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B657F9E0E03
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 22:40:25 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE8671657B3
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:25:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BBBAB2C8BB
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33681E0B67;
-	Mon,  2 Dec 2024 21:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B421E0DBD;
+	Mon,  2 Dec 2024 21:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g4yCCVkc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YKJcJmDw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3433C1E0480;
-	Mon,  2 Dec 2024 21:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22F21E0B75;
+	Mon,  2 Dec 2024 21:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733174624; cv=none; b=NK2IfqCxWzTlNX0VRdLT1+MQ9fhCpbBRrwRMV0T3qETBKOPWDEmjNwuLYB2QIl3SuCas8u9uefQCa8eHs+FZjKj11DVLlys4sJxwkuwYq4cx1stJR+xYBa30xl4G8e6mpND8ZlxODVFu61GdBY3q5aMUWn2jBdBxxTvdlGOL+MA=
+	t=1733174626; cv=none; b=ZbFLZEkRMBZx3/pz7Q2sJyF8kEOn+ksxIX4MWbyZr/u4NAOAVnrIzvdAA8Be3ePKXR3Gsy12iiOgO1Sdlktqt+hlKTkJ/9lFVAuv2EffTdsD/B1CMKEhLrqfKxANX9svhnjmIQdgYGsMEy7i25E9I/5tyPrWzcTXYQELR0hk2ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733174624; c=relaxed/simple;
-	bh=IXcltZehn2/3SyvTBeTFQotnSCT34NjXj0QE95LAAds=;
+	s=arc-20240116; t=1733174626; c=relaxed/simple;
+	bh=Hg2YJCbKPvRfVlyXe4AKKc1T/lU4ZsS8zwKr1Q4Wu+c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F0WSQKILXhEtCOcgSIe4ZD7e9HK5mDX2xltOnlY3U2i0tGYDiotKzBljQJYpb8EuhSDyy5xk3w647utSsXHXH89raFMh8ZvCbIMXotMwMq6bkGt4PGCCzH17d+Y7sv1plUJUdFB8PChlPv9xftZ4jVSlr3GjsI80y9NQyKn8QO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g4yCCVkc; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version; b=g7xsVLeABe/ZKJ0KirDRDmv/i+q6VVAGZHOYeHkLpjGa8fHvttluM9zX2Q5WFi/C1/4xgOWci0x+w6hPeqQsR1BgfiYhyoeVsDu5ZgpiHkM8Ll9UvLX6T+qdSyLN/BRUxG+JJYdMM78qiRny45r7S9VHXWPrz+jFWSH0io08VvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YKJcJmDw; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-215b9a754fbso1507975ad.1;
-        Mon, 02 Dec 2024 13:23:43 -0800 (PST)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21561af95c3so20134665ad.3;
+        Mon, 02 Dec 2024 13:23:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733174622; x=1733779422; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1733174624; x=1733779424; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2OGc9m7b1KRhFbZ7uSZDHwwlt5GMFJZQQcjtXg4RTOY=;
-        b=g4yCCVkcCttW5YU6aL5PwYAYMPg81HBwCQ73eNm/BRrxNLX/xIy6MM2E+BtWYu8jM9
-         AnPu0pkda1gxsM8pdgBLIaNNPyA/TejnfU2MNBCA9jToxFD1oW0YInZeS53Yn0mpefDK
-         kitrzR2W/gKJePPS4K7w+3Gi4MXFJ8Q0ThJRcau+wBjbucWNptx22UH4IQWNjfTYgf5+
-         a6Y7KCNr4zL9lNvdg0/AXfp28VYnDRlLdlypzhxRsMKXRgDU+bupH6KP4azWyrHlfAB6
-         bH8c5PTFMybVC+gN5UxHVWLLWJytmQOpgBgKPF7EoqBH9AoOeEj9K6uNKuLPDXr1n4Ny
-         WwNA==
+        bh=JnM6r/uVITTRqw7KKlw64GThaVylgqvEAeVcWJSdEdE=;
+        b=YKJcJmDwVn4dg9K2p+hxY/AcPlnb3oxZv4ryQDLVIaMm6SLHKoc8vRv3SbT0nyPJbr
+         4iCMpA7ZRRyjzjIC8iq9DABtX7A3aOiYXAAZVDcU3rFAxmBGhJ1EHvEu5EjH3faJoMvQ
+         wyWa5QABm8AB1SRFZYNhgBmy2yCuISbk0wtzVKGDOxJk59dDh9vQGye2rzxS8i/na2rC
+         vvUKnDJYpIMeW2PDyiQgC7yNkfYkTGMNRtN5slqn48cTGdKuylfLdKsiXq90fyCZRlIk
+         QQwOJLA2RL47lfK5pae58xU+8DdLCa58yWMOoou1xvo3B/UkBtglx0eEtV2tAhVPTMTa
+         fXAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733174622; x=1733779422;
+        d=1e100.net; s=20230601; t=1733174624; x=1733779424;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2OGc9m7b1KRhFbZ7uSZDHwwlt5GMFJZQQcjtXg4RTOY=;
-        b=sNGdPZsVb6kg8aCJ2b1nFYJStwT6PIpJydJffO51+667SpBNEp7adzmDZypJELIct/
-         gcoSVb5ulDvqjcm3hfYvEmfoa31r9XWPGXgirQE7mZqnpTcEUS+oxI2An5dM7Cel6bT9
-         qDHrcLTbFWAXZouS8fDXLZYFzkVjolzlqL2U1rqHkJXTNm01e5bHU47m0FyMAxwdEM+l
-         l3mtsrpfgI6pW8yCmlmR7NyYm7C6S5L/ULFEZFwb+x0Kr+X1YOjIN9OIUMtLyl3dGYWU
-         h9/lDkDU2Etd6gQxNXbffG+YdfRa6QBax7dD5omnJPl9oZ0tc6KZfH32wjKta5zxwwdz
-         A1wQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4iDTS+GSnqxLFjaxzbLEsgJu9HzclrwoKs9yhuL44PT1iBIE07isjL5WSwpGGHr2LSWnScrQEbWSY1n8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWMFp8XULh9anU7wBeIhBZyfncfYnd9egML1PliBHy6+bDGuiE
-	ngkb13EWDdULQdZK2kUIB0/7f7x7KuuuKk+Rk9Lm3IrQNvxjNlwYZN7e6GVS
-X-Gm-Gg: ASbGncusaFRV7Ym0aORs4PAvPG9lWbte4ZQTM8RWMY5Piu2r+JHPUilhSySYrPMI5GJ
-	8mBl+kOgKotDyyxh1ER6QcBb0VYIpc3ixm9GqxWhe6vbhqTkNx40fwAZ8NLfp+LHT4n0SexZln/
-	fKNVRY3zg5WduNeqXcsy0IGV+m5mx3RKqY0JAcZ2FKea6LdTjZIyuOUtBc5CbSZwpgwZ2y0KOEr
-	GjTeTAbpqIsGlVW68yUWOR8RA==
-X-Google-Smtp-Source: AGHT+IH8hjNECaWA7HdBpu+vfjxaam9yKVKhbl1rSKe8TMovwBq6iDjlz0SSZbFtgiRYxUzjj5zK5Q==
-X-Received: by 2002:a17:902:cec2:b0:215:b8c6:338a with SMTP id d9443c01a7336-215bd1b4373mr290205ad.4.1733174622249;
-        Mon, 02 Dec 2024 13:23:42 -0800 (PST)
+        bh=JnM6r/uVITTRqw7KKlw64GThaVylgqvEAeVcWJSdEdE=;
+        b=PZVgP382VxKs8vWZLVp17/smh/+akEHEniusXgKMkNN0l+0EVCjIIpePQ1nMNtBfId
+         dvjQ0vbp8Va586rrqFA2ZjTAc79DQ6h6NcVoY9Ln8yrJhXX4VN5cVxSyMD1KLlJhuDdz
+         Xb8WSKhpbzSR9PrO+De4s46Z/ow0/ogbBxag1bgxlBYgPpBE83/VNQq3WBbNgq2mJNct
+         whGWQuYtVQVoG7SWrjuoX2gWxWZDlRLMGzo+gNJ2oRNKGxdPeOKJfeFn4cHbsWfhgAJI
+         r4ZKsYLTjQkXb8/mzGGM2SKo0Y9TU/YNMUnMA4soIpTnNzrgpnlY7q5ETad7klrTGjc2
+         AW1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVxk+AKZ/evGpqxoYkF8eBjKkhzOGOmRl/ONJhhQ3aSrmVFiujTRKaxMX50P9gYqwsCJphkzMBFyPZ6Uuc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVRCQR6UG4rs7Puy+lwv4pWtTJMjM6kZBK6sFBoNE4wEvwMX2r
+	0Opn4cU5z5ei+jzLeJOEFZoypkYYiNAsx5BHOG0uijaVvgxDbkKPzxEH/Fnq
+X-Gm-Gg: ASbGncuuAKL95BALcrN+4vCB5VdnrUHBGtjKDBFBcC0xIZo0VWv4U4dcgP1IfYDJKGm
+	IoHRfUp1Dz/3CvgoJquubG+sPYA52+7wfOg7OprnWbFLy0CABD83RgQIsh/cDRaS7p0WAQF9qEs
+	Ll2ZFQmKZ54dgpjjeWxGTIgEgHitzBojMdaEJtl0X0e+VUa+bHCDgK0cngHjf4RgjvPAZu9rMkQ
+	enusfdOwglhxZj0TkamRmysSg==
+X-Google-Smtp-Source: AGHT+IHp5Bvo2l6KxjQOljcmZ82naHQkbnKwlj3SfCeCIggC8uoeNwkOMMZOgZHud27sBM+Kvcakyg==
+X-Received: by 2002:a17:902:d489:b0:215:401b:9535 with SMTP id d9443c01a7336-215bd13edf3mr312885ad.47.1733174624038;
+        Mon, 02 Dec 2024 13:23:44 -0800 (PST)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21598f3281fsm20729515ad.279.2024.12.02.13.23.41
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21598f3281fsm20729515ad.279.2024.12.02.13.23.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 13:23:41 -0800 (PST)
+        Mon, 02 Dec 2024 13:23:43 -0800 (PST)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -80,9 +80,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Claudiu Manoil <claudiu.manoil@nxp.com>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 07/11] net: gianfar: use devm for register_netdev
-Date: Mon,  2 Dec 2024 13:23:27 -0800
-Message-ID: <20241202212331.7238-8-rosenp@gmail.com>
+Subject: [PATCH net-next 08/11] net: gianfar: assign ofdev to priv struct
+Date: Mon,  2 Dec 2024 13:23:28 -0800
+Message-ID: <20241202212331.7238-9-rosenp@gmail.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241202212331.7238-1-rosenp@gmail.com>
 References: <20241202212331.7238-1-rosenp@gmail.com>
@@ -94,34 +94,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Avoid manual unregister of netdev.
+This is done in probe but not of_init. This will be used for further
+devm conversions.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/freescale/gianfar.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/net/ethernet/freescale/gianfar.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
-index e486b77bc6f4..9ff756130ba8 100644
+index 9ff756130ba8..4b023beaa0b1 100644
 --- a/drivers/net/ethernet/freescale/gianfar.c
 +++ b/drivers/net/ethernet/freescale/gianfar.c
-@@ -3305,7 +3305,7 @@ static int gfar_probe(struct platform_device *ofdev)
- 	/* Carrier starts down, phylib will bring it up */
- 	netif_carrier_off(dev);
+@@ -687,6 +687,8 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
  
--	err = register_netdev(dev);
-+	err = devm_register_netdev(&ofdev->dev, dev);
+ 	priv = netdev_priv(dev);
+ 	priv->ndev = dev;
++	priv->ofdev = ofdev;
++	priv->dev = &ofdev->dev;
  
- 	if (err) {
- 		pr_err("%s: Cannot register net device, aborting\n", dev->name);
-@@ -3374,8 +3374,6 @@ static void gfar_remove(struct platform_device *ofdev)
- 	of_node_put(priv->phy_node);
- 	of_node_put(priv->tbi_node);
- 
--	unregister_netdev(priv->ndev);
--
- 	if (of_phy_is_fixed_link(np))
- 		of_phy_deregister_fixed_link(np);
+ 	priv->mode = mode;
  
 -- 
 2.47.0
