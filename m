@@ -1,138 +1,199 @@
-Return-Path: <netdev+bounces-148020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99F069DFD1C
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:27:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 771579DFD1E
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:28:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EC62281E33
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 09:27:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36F5B2816C7
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 09:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B37DC1FA841;
-	Mon,  2 Dec 2024 09:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="V4LHsKFd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F56A1FA244;
+	Mon,  2 Dec 2024 09:28:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8451FA252
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 09:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E0A1F8F14;
+	Mon,  2 Dec 2024 09:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733131652; cv=none; b=in8INkXClrluHiyCiU94lP09Vr6DDW3uXgmZxaI6B1lJHPTJ2ZdClfaLbuRmm9vHosvr4MGEDB1v9nVMj9Xf/giMqemkKRun+luIO5rIPnhkuMfSog9QbuhEl7fukHs+3QuZSLsNlRTytt8LoItnMmGK5m8T3lQqq5T2vl12tf4=
+	t=1733131690; cv=none; b=hb2n9MgsX7BEW/tT90yQx7V60hEiALijnCqaC7FC86Ok91MVZ4BsYZSgBl2RiNhnJIoqIuHAmT9WL+6Ghq+hfLn0YY3sfqcPez1DEMAvj13bl8xspzxhyrPvCYjQwFUErTofPT/lIf0QZjxHh9ncN4p+T3PqPNx5CDsLIoD/WSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733131652; c=relaxed/simple;
-	bh=pl7QvLcG+llVV+JTbsX9ovJ8Bb7kDx0u2bflIzoYcYI=;
+	s=arc-20240116; t=1733131690; c=relaxed/simple;
+	bh=Fty6NLzEluF6NuZI2k03Qx2CBWYkvLTYDJjaWkYQQQw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=puQxWSKqnRm7S+b3ohPCPasIhfO4Qn4lqURuFbHwP/FBl6mXyG/9eZVFjKPC3q3Pf+DwpQs76TvDhx3AqBml308MjidmQXp80epmI58GQ0pxdGBsK3dZ3O794lm6iLY3fgdICxuHYPvJkzpuKPXxG3543knKiftoK8UXr5yc1Qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=V4LHsKFd; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a9e44654ae3so525184366b.1
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 01:27:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1733131649; x=1733736449; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pl7QvLcG+llVV+JTbsX9ovJ8Bb7kDx0u2bflIzoYcYI=;
-        b=V4LHsKFdNLMpnxNUcoBkFMOwyfjhCM7hGwl8AyYz8JDZPRoYbrgARMB7LfMzajn5Eh
-         +uRCoXbPpiWKCAENxRMoPuaQC+mSD4FnrG8DILMUDa5KgIvQ0WomE+AJUBBOIuD9fkIl
-         vYutBSN/Vw0ETxrhNuO5crOX0kwONrPwlR2BuN005lpBZIQWmJay7gCVMgiAGbzlzp6d
-         agCcbYboSH6oi8a6x8oxiiJPiyhV6dc7m/Vq+MjQIDceFypZv+eOqbglVj5oPKWxLXjI
-         Xemc5HylFTVdeQCSNz1OI5xuxRBbTjROQtxiUdzj1bMwtfXMPaqOXS10tL1N30HMeXj/
-         Ni+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733131649; x=1733736449;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pl7QvLcG+llVV+JTbsX9ovJ8Bb7kDx0u2bflIzoYcYI=;
-        b=s3sNfFy6fNXVYPlE49qWtr+Jrd6+EZljOGDmWTvMd0aJuPVz1XVjBvVNisPJQINdWU
-         3K58IJBu4OlruOjmdrrNbj2+b2cuF413xjEKgKTtH7332O5XSRZ49qxvBQRHWvsLrXzV
-         tI1d48GVvgpKETXe/a1RKy13mYS6NsIHbF1csviEMWVTNhGAo1+3HMo7ZyoDWhXQCzhN
-         wxohkyFGb+g4fBudio/YLTbf1dLQO/+X2s3FYQVV4mdAWnhDsYG5CS6DduxmVG3p024h
-         NCPmDhptulAFY/etwPeZ+tF1hm1jQTogKB+LTvwlwhiNO+hbwsa4xI/ag7pqJCGyYxia
-         miEA==
-X-Forwarded-Encrypted: i=1; AJvYcCWYBUeae0aRAFGBj9QBqIJKNezzMURzLMl1wKx3RERbGghoYV9epx9LdMcdrQqcKpje0PXYLL4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqqUCq5z6tkQDF0EYJ6dla8GzUKHIguM7Iu1idgNTiDyNQmHx9
-	LuSEuH7+YPU8v43ut/+o1XVBsOF0RsnQeh/cHK0tKgog+tJ3YrLLKTpeSVEvWsE=
-X-Gm-Gg: ASbGncsbow9aN659H/uYpYmyxy1iP6FSUc4YQXk4iu4k9R79+B7C4xdJvV4khbztlEw
-	A8lAhXuzjn0+YGj/yXtry1WfpZSWobliNQc70reD0vaQtdvuyU0zQOwIOTuW2c59cqoCzcCYzMf
-	curwyoPw3fwyQN5H/XzrK/IJaOcatuZRKmXxMDLyRAzMAVhS5a+Yn99tPZLqXZDHEkqxxqLJzs+
-	O3tFAIg4rX3mafXPvbFx0bxiFPdJxeu4OloL1t1Wfp5eXF2vdVlL4f4gDKh6etqUHM0Ww==
-X-Google-Smtp-Source: AGHT+IHJFEiwo9Lyc15w9Ds/jb9CjQsGIpHj5PkE/zOc5gjY9Jh+95fpF9pzLyoiB9rNK5ro+urwJw==
-X-Received: by 2002:a17:906:329b:b0:aa5:241a:dc75 with SMTP id a640c23a62f3a-aa58103b03amr2063507466b.41.1733131647333;
-        Mon, 02 Dec 2024 01:27:27 -0800 (PST)
-Received: from localhost (89-24-45-172.nat.epc.tmcz.cz. [89.24.45.172])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa5996df78csm492732866b.67.2024.12.02.01.27.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 01:27:26 -0800 (PST)
-Date: Mon, 2 Dec 2024 10:27:25 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Andy Strohman <andrew@andrewstrohman.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] dsa: Make offloading optional on per port basis
-Message-ID: <Z019fbECX6R4HHpm@nanopsycho.orion>
-References: <20241201074212.2833277-1-andrew@andrewstrohman.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PETjmw74K7MWkB57KTUHaK8+qG7eekbDKA4TKPp3CKMdLK7Ty/CYklJHIA00hV9smYEsMuPnz9EFTxmW5c9rxIa9d/Hu94KTKtvSF6XsCEMVs/J2yE00no5YPHggdLL7xFFJryE1zkNv0eKitJt1tFz86VgaEz1gv/BE42ro6xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.39.247] (port=46086 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1tI2io-009Vcu-DW; Mon, 02 Dec 2024 10:28:04 +0100
+Date: Mon, 2 Dec 2024 10:28:01 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	fw@strlen.de
+Subject: Re: [PATCH net 4/4] netfilter: nft_inner: incorrect percpu area
+ handling under softirq
+Message-ID: <Z019oZbqMZUBs3G-@calendula>
+References: <20241128123840.49034-1-pablo@netfilter.org>
+ <20241128123840.49034-5-pablo@netfilter.org>
+ <CANn89iKGUKxLGY4UG9JrAVQR5bahHrUurf7TVwPcE4rf4g3cAQ@mail.gmail.com>
+ <Z00MOYmYgmlrrpWN@calendula>
+ <CANn89i+G3_0QzdOsoCMOk-Qgd+Vv7hKEtogMNJ00pUGC1wX=ow@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241201074212.2833277-1-andrew@andrewstrohman.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+G3_0QzdOsoCMOk-Qgd+Vv7hKEtogMNJ00pUGC1wX=ow@mail.gmail.com>
+X-Spam-Score: -1.9 (-)
 
-Sun, Dec 01, 2024 at 08:42:11AM CET, andrew@andrewstrohman.com wrote:
->The author has a couple use cases for this:
->
->1) Creating a sniffer, or ethernet tap, by bridging two or more
->non-offloaded ports to the bridge, and tcpdump'ing the member
->ports. Along the same lines, it would be nice to have the ability
->to temporarily disable offloading to sniff all traffic for debugging.
->
->2) Work around bugs in the hardware switch or use features
->that are only available in software.
->
->DSA drivers can be modified to remove their port_bridge_join()
->dsa_switch_ops member to accomplish this. But, it would be better
->to make it this runtime configurable, and configurable on a per port
->basis.
->
->The key to signaling that a port is not offloading is by
->ensuring dp->bridge == NULL. With this, the VLAN and FDB
->operations that affect hardware (ie port_fdb_add, port_vlan_del, etc)
->will not run. dsa_user_fdb_event() will bail if !dp->bridge.
->dsa_user_port_obj_add() checks dsa_port_offloads_bridge_port(),
->and dsa_user_host_vlan_add() checks !dp->bridge.
->
->By being configurable on a per port basis (as opposed to switch-wide),
->we can have some subset of a switch's ports offloading and others not.
->
->While this approach is generic, and therefore will be available for all
->dsa switches, I have only tested this on a mt7530 switch. It may not be
->possible or feasible to disable offloading on other switches.
->
->A flags member was added to the dsa user port netdev private data structure
->in order to facilitate adding future dsa specific flags more easily.
->IFLA_VLAN_FLAGS was used as an example when implementing the flags member.
->
->Signed-off-by: Andy Strohman <andrew@andrewstrohman.com>
+On Mon, Dec 02, 2024 at 10:17:10AM +0100, Eric Dumazet wrote:
+> On Mon, Dec 2, 2024 at 2:24 AM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> >
+> > Hi Eric,
+> >
+> > On Fri, Nov 29, 2024 at 10:14:34AM +0100, Eric Dumazet wrote:
+> > > On Thu, Nov 28, 2024 at 1:38 PM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> > > >
+> > > > Softirq can interrupt packet from process context which walks over the
+> > > > percpu area.
+> > > >
+> > > > Add routines to disable bh while restoring and saving the tunnel parser
+> > > > context from percpu area to stack. Add a skbuff owner for this percpu
+> > > > area to catch softirq interference to exercise the packet tunnel parser
+> > > > again in such case.
+> > > >
+> > > > Reported-by: syzbot+84d0441b9860f0d63285@syzkaller.appspotmail.com
+> > > > Fixes: 3a07327d10a0 ("netfilter: nft_inner: support for inner tunnel header matching")
+> > > > Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> > > > ---
+> > > >  include/net/netfilter/nf_tables_core.h |  1 +
+> > > >  net/netfilter/nft_inner.c              | 56 ++++++++++++++++++++------
+> > > >  2 files changed, 45 insertions(+), 12 deletions(-)
+> > > >
+> > > > diff --git a/include/net/netfilter/nf_tables_core.h b/include/net/netfilter/nf_tables_core.h
+> > > > index ff27cb2e1662..dae0e7592934 100644
+> > > > --- a/include/net/netfilter/nf_tables_core.h
+> > > > +++ b/include/net/netfilter/nf_tables_core.h
+> > > > @@ -161,6 +161,7 @@ enum {
+> > > >  };
+> > > >
+> > > >  struct nft_inner_tun_ctx {
+> > > > +       struct sk_buff *skb;    /* percpu area owner */
+> > > >         u16     type;
+> > > >         u16     inner_tunoff;
+> > > >         u16     inner_lloff;
+> > > > diff --git a/net/netfilter/nft_inner.c b/net/netfilter/nft_inner.c
+> > > > index 928312d01eb1..fcaa126ac8da 100644
+> > > > --- a/net/netfilter/nft_inner.c
+> > > > +++ b/net/netfilter/nft_inner.c
+> > > > @@ -210,35 +210,65 @@ static int nft_inner_parse(const struct nft_inner *priv,
+> > > >                            struct nft_pktinfo *pkt,
+> > > >                            struct nft_inner_tun_ctx *tun_ctx)
+> > > >  {
+> > > > -       struct nft_inner_tun_ctx ctx = {};
+> > > >         u32 off = pkt->inneroff;
+> > > >
+> > > >         if (priv->flags & NFT_INNER_HDRSIZE &&
+> > > > -           nft_inner_parse_tunhdr(priv, pkt, &ctx, &off) < 0)
+> > > > +           nft_inner_parse_tunhdr(priv, pkt, tun_ctx, &off) < 0)
+> > > >                 return -1;
+> > > >
+> > > >         if (priv->flags & (NFT_INNER_LL | NFT_INNER_NH)) {
+> > > > -               if (nft_inner_parse_l2l3(priv, pkt, &ctx, off) < 0)
+> > > > +               if (nft_inner_parse_l2l3(priv, pkt, tun_ctx, off) < 0)
+> > > >                         return -1;
+> > > >         } else if (priv->flags & NFT_INNER_TH) {
+> > > > -               ctx.inner_thoff = off;
+> > > > -               ctx.flags |= NFT_PAYLOAD_CTX_INNER_TH;
+> > > > +               tun_ctx->inner_thoff = off;
+> > > > +               tun_ctx->flags |= NFT_PAYLOAD_CTX_INNER_TH;
+> > > >         }
+> > > >
+> > > > -       *tun_ctx = ctx;
+> > > >         tun_ctx->type = priv->type;
+> > > > +       tun_ctx->skb = pkt->skb;
+> > > >         pkt->flags |= NFT_PKTINFO_INNER_FULL;
+> > > >
+> > > >         return 0;
+> > > >  }
+> > > >
+> > > > +static bool nft_inner_restore_tun_ctx(const struct nft_pktinfo *pkt,
+> > > > +                                     struct nft_inner_tun_ctx *tun_ctx)
+> > > > +{
+> > > > +       struct nft_inner_tun_ctx *this_cpu_tun_ctx;
+> > > > +
+> > > > +       local_bh_disable();
+> > > > +       this_cpu_tun_ctx = this_cpu_ptr(&nft_pcpu_tun_ctx);
+> > > > +       if (this_cpu_tun_ctx->skb != pkt->skb) {
+> > >
+> > > I must say I do not understand this patch.
+> > >
+> > > If a context is used by a save/restore more than one time per packet
+> > > traversal, then this means we can not use per-cpu storage,
+> > > or risk flakes.
+> > >
+> > > Also, skb could be freed and re-allocated ?
+> > >
+> > > Perhaps describe a bit more what is going on in the changelog.
+> >
+> > There is an on-stack nft_pktinfo structure with a flags field. This
+> > nft_pktinfo is a wrapper for the sk_buff, containing header offsets
+> > and metainformation. This is initialize when entering this chain.
+> >
+> > If the NFT_PKTINFO_INNER_FULL flag is set on, then the percpu area
+> > could contain information on the inner header offsets (ie. packet was
+> > already parsed in this chain).
+> >
+> > There is a check to validate that the percpu area refers to this
+> > skbuff. If there is a mismatch, then this needs to parse the inner
+> > headers because the data in the percpu area is stale. Otherwise, if
+> > there is a match, the percpu area is copied on-stack.
+> >
+> > After processing (payload/meta fetching), the on-stack copy is stored
+> > back to the percpu area. I can make an improvement on this patch to
+> > check if this skbuff still owns the percpu area in the store/exit
+> > section of this inner evaluation routine, to avoid a unnecessary update.
+> >
+> > So, it is basically the NFT_PKTINFO_INNER_FULL flag that handles the
+> > skbuff reallocation scenario. This is not blindly trusting this percpu
+> > area per-se.
+> >
+> > One comestic change I can apply to this: I can also turn the struct
+> > sk_buff into unsigned long so it clear to the reader this pointer to
+> > skbuff is not meant to be used for being dereferenced.
+> >
+> > If the explaination above is sufficient, I can revamp to extend the
+> > changelog as you suggest and post a new version of this patch.
+> >
+> > Thanks.
+> 
+> The part I do not understand is that tun_ctx->skb is not cleared at
+> the end of processing (or at some point)
 
-Why is this DSA specific? Plus, you say you want to disable offloading
-in general (DSA_FLAG_OFFLOADING_DISABLED), but you check the flag only
-when joining bridge. I mean, shouldn't this be rather something exposed
-by some common UAPI?
+I believe on-stack NFT_PKTINFO_INNER_FULL flag is sufficient, but
+I will clear it as you suggest to make this more robust.
 
-Btw, isn't NETIF_F_HW_L2FW_DOFFLOAD what you are looking for?
+> That would make clear that a future (tun_ctx->skb == skb) test is not
+> confused by skb reuse (free/alloc).
+> 
+> If you use it as a cookie, then we need something else than a pointer.
+
+Yes, this is a cookie, I can turn this field into unsigned long
+instead.
+
+Thanks.
 
