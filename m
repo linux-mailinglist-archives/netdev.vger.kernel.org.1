@@ -1,142 +1,277 @@
-Return-Path: <netdev+bounces-148256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3D909E0F41
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:22:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01EE09E0F46
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:22:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59E15282AF4
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:22:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A43EB24C29
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B261DFE01;
-	Mon,  2 Dec 2024 23:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872FE1DF244;
+	Mon,  2 Dec 2024 23:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mb0xsa1x"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="FWive7kO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2087.outbound.protection.outlook.com [40.107.220.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB671DF244;
-	Mon,  2 Dec 2024 23:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733181701; cv=none; b=LUvgldSl47SGciFdLAZHL7LElXiGwGvp/H88txVk7QHK8G4AEewDQ+4CMh15NhxhDe4r3hKQgKZ0cFDwLGDeqI8FVmiqnCs6CS9g9LUEKBafES5ZYwAnYWev8F7vX+EPvPleBTS9M02lx8rqZIDZzM6nvkBp9sFn3UibVIpbrWc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733181701; c=relaxed/simple;
-	bh=T0fJkNN8lmu0yQW5xDMaUNuwSNQGFIOPmvlds70OAcE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lrwZdUX3/VdnL6wp9cm0IChtAgqh5hysh6YrFrSDc3cX74Mprw0qVmkMK06FFmI7pmVDRRzRYRbZWckjrCyw+/+Rh2oP3xMGMkla2IU3MQdQZlTmgoFYXl9eZSx3KIfEmghiFXgISmSsv40sMuDfUgqhR+kM/UR/QIZOPKwEwns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mb0xsa1x; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7242f559a9fso4749262b3a.1;
-        Mon, 02 Dec 2024 15:21:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733181699; x=1733786499; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LyFnOYNR7/uDCGGXOyxce2KX24RRI2ramvA/qoNn6Mw=;
-        b=mb0xsa1xL1zLWAMLj9DAEH7IrSW0MrXC93O6mb1xj13XnX4OYEh7XT5vRT319sNf4V
-         Ue0UfZrd7AQCOlfWAIG8H1YPEO0/f9a7TrmAgjegA+JUbBvNw1ZyZP7HpwpvfwCrzlWr
-         RdB8WBgEodsn3TaqKrxxwNVDUNQPWAMEuE6gXTgRq2DhocMCPQgQHBlt9PBZdB/5ryVg
-         MPHVBbc4iyu/mbKFqg7Uv8zogeFfy2MBNTOKbLtWcWyftF6yJ92fq4WLEY5EmCb4OD8Y
-         a03beInn3bbgjN8M5kNvkqVsh+8AUCZs7dAI+gdqFIU3sy7TdsnXOiMMKLyQrCoi9yi4
-         Id3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733181699; x=1733786499;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LyFnOYNR7/uDCGGXOyxce2KX24RRI2ramvA/qoNn6Mw=;
-        b=QiDzYkdYje4oEwpYj1JfSzg69HleZ0AzBpz95eSl1vnr+pbwN7WuJdaeEBlrvkCKAw
-         vMMtgEgVrUih6Hsdhs03sQTZYU87kFEn1CHVR/0JtqDc0GtR2eQPz1uL7kwdOd4YrLjN
-         VRBaos95QJy21WXifI6xrU9dkAI5T3vCIT9K0yI4mrI7AVyGw7B7YpaAYEbsbikLBKNI
-         ajRLD1MO+XPkeB5ks6ZYITxeUoE1n8r2EyhsubRdqR9u1BKwGOqOeV3ipDIVhWTkaacv
-         x803aiZ1D3JNAj5RPhHcOEgzs9yrA7QgIx6uHgXHHSfe6RxXoSZX+q6YHGQSZYNzm+vQ
-         aJtA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6osT9GONdnk3yCCcqiklwZicvc0bKoEkMOLzqd2+S8oeC2LO2oVQ8EKgiQdmUP7Gmfh9N396ErU6vR1hx@vger.kernel.org, AJvYcCVCKA5/gnpEc89ZcU/jOHl7IYLgPwS1eG0Ek2Kq2dq5WRF35Xatn57AXndrhMCq67qTdVsCWEQ8ww867xKsgCtH@vger.kernel.org, AJvYcCVVIuP5aGDih7gJTWrHBjldwuqdSwllXwLufGNIm71F0cd3EY7g0/gx/BtJsMNJVeld7E5fCxy7lIhO@vger.kernel.org, AJvYcCX0WWAToW8+6VFP53KNH5WymgFd7wJeRIMKQz2tShRZgBGxJ62TO97ya2I9EFNXAyOcdyPYSIkk@vger.kernel.org
-X-Gm-Message-State: AOJu0Yywyyl+feR19dl+b56rD4xBPD3RaiKzKgJIyUoZRBHmKumE0sxE
-	E9oLb8A1MvrQ3OpI7sEnJw7m6oHOPokFy4S5H1ZuPhTz3eYvQMRE
-X-Gm-Gg: ASbGncuPl4tX6wGGmMxJmEtUHQg7EOW+OEZFTFyO03XbM3Jv/nhusxlL2INwoPjKvjJ
-	Ph01V5YV7NRhOJevjwpLyWYv91JhAgGYtGsF8CyNirQUDs9TGr3Cj9sqsndFN1lq62VN1CYUeMJ
-	t+yXKuCqWWFHhAOKXQBriVXhNUYrVCmYV8cUwzoVMGCgSGBj7oFqHlWOg650ETM5Uk9cAUAQHTd
-	4018QtHRCpf/9GObG8ahSlKU0F93PVqy1mL6qzH1OiT9OHryY57yFQX+Ks4k5KRpBr7uijc09LN
-	bN4y1EU3VeqhcTjH+A==
-X-Google-Smtp-Source: AGHT+IEXS03Fw+wgJGBsVZ94KW7dwGXzAeA8iM26jbTjQebKyiUAt9gwXwClHbNDAS7WWsC0K1AuCw==
-X-Received: by 2002:a05:6a00:39a8:b0:725:3fb5:5595 with SMTP id d2e1a72fcca58-7257fa3a10dmr317747b3a.5.1733181699099;
-        Mon, 02 Dec 2024 15:21:39 -0800 (PST)
-Received: from localhost.localdomain ([240d:0:4a45:1d00:4807:3add:383b:ddbc])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7254176fdcbsm9098432b3a.70.2024.12.02.15.21.33
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 02 Dec 2024 15:21:38 -0800 (PST)
-From: Kenjiro Nakayama <nakayamakenjiro@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Andrea Parri <parri.andrea@gmail.com>,
-	Will Deacon <will@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	David Howells <dhowells@redhat.com>,
-	Jade Alglave <j.alglave@ucl.ac.uk>,
-	Luc Maranget <luc.maranget@inria.fr>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Akira Yokosawa <akiyks@gmail.com>,
-	Daniel Lustig <dlustig@nvidia.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	lkmm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	Kenjiro Nakayama <nakayamakenjiro@gmail.com>
-Subject: [PATCH] selftests/net: call sendmmsg via udpgso_bench.sh
-Date: Tue,  3 Dec 2024 08:21:29 +0900
-Message-Id: <20241202232129.7139-1-nakayamakenjiro@gmail.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BADB1DFE11
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 23:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733181718; cv=fail; b=m69FOZNDddnobkzcRU3lBDsetWcqg+eQhsF9feZ7XVyjkBBeVmc1cCMGbsdf8ocGtbUrkQJpcbuzUBVdMIQmVmJkKaz4PCSPWHQ2EGRc8qdFRzJRGtLDY5i3yfRWd7Oh6K7wcI4i9qj2fbKDjWoBiHx7BMJOChJmxX5JvbnUKj0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733181718; c=relaxed/simple;
+	bh=Bx/omNF8o8y7HLaYN8p3YeKYir+jc3n0HBLAkO80j+w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=t6BAl29N1v4kyIle+db8Exq4m4bUtKDGgOZeW5r+mOlY7mHiKR0K2zZWnI23OVdNVFEvUmcIMM7Sv6sCyMBzdR2KUDx5nuRgEkFZ/8qbqE1T3uikWEIuMpXmnDxxmplFntXRv6ZzUgf5ua0sb6g8D9sLBBofcgqpNKGEm/UisT8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=FWive7kO; arc=fail smtp.client-ip=40.107.220.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TVJnHQxSscmmopW+Gl8Q/az4oO2ivmjJTWMBI/vrHetPxAIgvkGCpcYMbockgR3N5/D6PmHrgH0f+f/+FSLUbL1asZGT/UzYZJpnRjRd0yzt3SNSMTku0MSzpmLrHSr+waFBMmKTJKnIdbLnvF+SnDQtqCchoE+W5ZPdPkTan+ORySFyWg1mkBKkOCosQRigH/OmquVY6/kYb7pcp1MA1z/52V2DGfUWct5Pn8y8mQCBB4Fb/ZPth6unOGZjA+jX+9f61lTvBIsgLaUGU629c97o7ELyc4hZ68hafdJxrfk/i6+Eq1PL+XKPZmlKLLwi5/xfeLWEE4VP3WLBg8sEBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TisgBXY4Qr/ieLRpBmVZxHBKMc4Tnx61Htv5zoaBBFU=;
+ b=V39Vu3/UdFND304CExetaXhmJiDV6LTc8nFDFepgkQ/j6v/D2cRAtLZzW6AXbtFxXqynkSvRxxNtqd7LRRTL/JLs3AQtMXYZTQiSFIUlZf2oHSbihaRAKqfPWfjl0nudiATL6b40gnaf2D3SGeshWvNbr5zGC5GWiDTz7tXqEjZMXKRcCOim2d0nmgoYFkcCUBddkVRUZ4iyBFZYyFGq+TfniP6HJ2pDNcx78z+81rxyUCWi/n0zeOpsRmhsnBieH77LC89vMjdX8tz4DEx3OrCOcTcyBmiYO7cnBaNnMsIJ2hSJNyCm20oj1W7nmhsl3jmdgWOm/HS7qkcDHrw3PA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TisgBXY4Qr/ieLRpBmVZxHBKMc4Tnx61Htv5zoaBBFU=;
+ b=FWive7kOXkqoH0ToeAnyK977ntv3ohHex+CFtfJozC4Sy9u5ZhHEHl2JXLDqtno33NHcFuJXEHRcThNQJ0Vc2zzE7uBSf+irXcp6sPI/+VSqJb1gUqAQ0J7jrjQQPdK2qiN1RaNFbTQFAoBltfRReCs2Em3qFOb04yEydaIi6MNsojTaBZhbke56G9ZJ56LQRuzGLhIc7PZR0RCrTpFkhHv68LCEgMYDvHkKA/vGEiA2qoqdr1iX/9iiaja34di1oSvxSp88Jw8r296GFKYxm8w/oXP7Ulh0ropyMQrmgWKCquVz65ceNf/s/xMn1OVD+3/vZaFaJBlz8hczSzWu6w==
+Received: from DM3PR11MB8736.namprd11.prod.outlook.com (2603:10b6:0:47::9) by
+ PH7PR11MB7607.namprd11.prod.outlook.com (2603:10b6:510:279::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.17; Mon, 2 Dec
+ 2024 23:21:51 +0000
+Received: from DM3PR11MB8736.namprd11.prod.outlook.com
+ ([fe80::b929:8bd0:1449:67f0]) by DM3PR11MB8736.namprd11.prod.outlook.com
+ ([fe80::b929:8bd0:1449:67f0%4]) with mapi id 15.20.8207.017; Mon, 2 Dec 2024
+ 23:21:51 +0000
+From: <Tristram.Ha@microchip.com>
+To: <jesseevg@gmail.com>
+CC: <andrew@lunn.ch>, <olteanv@gmail.com>, <jesse.vangavere@scioteq.com>,
+	<netdev@vger.kernel.org>, <Woojung.Huh@microchip.com>,
+	<UNGLinuxDriver@microchip.com>
+Subject: RE: [PATCH] net: dsa: microchip: KSZ9896 register regmap alignment to
+ 32 bit boundaries
+Thread-Topic: [PATCH] net: dsa: microchip: KSZ9896 register regmap alignment
+ to 32 bit boundaries
+Thread-Index: AQHbQRlZBlDFYrnjzE+ftiaJFVhgfbLTnvdg
+Date: Mon, 2 Dec 2024 23:21:51 +0000
+Message-ID:
+ <DM3PR11MB87361344332FA27FEFA94FDCEC352@DM3PR11MB8736.namprd11.prod.outlook.com>
+References: <20241127221129.46155-1-jesse.vangavere@scioteq.com>
+In-Reply-To: <20241127221129.46155-1-jesse.vangavere@scioteq.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM3PR11MB8736:EE_|PH7PR11MB7607:EE_
+x-ms-office365-filtering-correlation-id: 2100a974-6153-4a5b-d78a-08dd13281a20
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8736.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?WnuC6ku/HRcl04wF5rA/AMIiH1pQ05/Vw6fFO3DLpadCryhHf5YbP+ugKEwj?=
+ =?us-ascii?Q?ZXz3jG1LPVND1Gn85V9YAzAv5w0y8klW6m/C4D46R+kqLpqv3CMSD+H6f4f+?=
+ =?us-ascii?Q?qPFiiDK2Wk1O8T1XbTdZzjtdIubNedyROQzGPK/Vjluf66pQdBImPrhqpSEj?=
+ =?us-ascii?Q?gVeJp6wEeZpDB4LhXIrUdg5beU2uxC/asRNYF7q1M8MLF7phpr0ptd1HqQWm?=
+ =?us-ascii?Q?xFHmvwDdwMhRFGIhMXWpjtsCeFtihg965eGWtuoRy2t2ZuEAbWwUjRgIqqP/?=
+ =?us-ascii?Q?L8vxfCy3xMsCXdcISQCQqH9yobLkafnpSseC8GCaRIrBuVBI+TxGy8kTfo2E?=
+ =?us-ascii?Q?2XLctcxbTwuxN9UIePY64b3efH2f+ngqlx88ZsUYQwT29xR2cT6JQ5H7GZGB?=
+ =?us-ascii?Q?voijy6t+Eapl4gxSIBI0UiXIixVc88vGLZJn02/RabbJe/lVTEfEFKk7deIg?=
+ =?us-ascii?Q?o/N77Sl9z/8lmHB8Q8knIctpSg/sQ0ZizdaMnnCVpMiIKrtF5S3m1XSBzi8P?=
+ =?us-ascii?Q?XA6G6tWeM2gzt3iEZNCkRJ7FRKOsLcnf4VbZ4Y8h6c2UAg7J5Ps24l+tgT/+?=
+ =?us-ascii?Q?nItj9KCGfiU12Cbu/zFQoFuo5NLUTSiGjj73F40niB3tWtDlH4VKYU5ZfePC?=
+ =?us-ascii?Q?VY1MNnvzfL+T2iYqbE3tMR+lUnSaxhcr2leCA1z2UMyL54EJfp0PAObnjgm1?=
+ =?us-ascii?Q?xfdYSBGsJm+IUaqnjzES5+HStklGRtcWAx51WmFgKqrNMAEz8iraa2+F/t+Z?=
+ =?us-ascii?Q?zgYpKyAD90Bx8sxke5/FLJeNz1D/5WLRmDKk8jN1Hh67ZGxc2WRL6/T+wYuY?=
+ =?us-ascii?Q?IV+ySej+EmLBRIxuFkacbBTFaD+koHJjw2/YnIYnM52BCnNEL9JbbW9Z3kTZ?=
+ =?us-ascii?Q?XJ5DOZ5dzIFlOm+fqxAqn2TF7H4nY4Mj1tCbMu1R3x4zKqTtEfFiHAi1Q3+t?=
+ =?us-ascii?Q?j83YtLm2qTPlcKwIbJjYhy8Xfy2w8wXlTHSaIZyEXM6fIRuMC8/ybZkpcLsn?=
+ =?us-ascii?Q?a/2rVyuE5555/CTY0kBn0nAalkX79rwzlIrmtis6MjRB3jox4x9egb0waMiJ?=
+ =?us-ascii?Q?iXyD3SCc6fu1wSZyFuFLnkJOKTtSANOhJNUhHY/nnZYiMgOtBA1xl8PMPdFY?=
+ =?us-ascii?Q?TyRudcXtmPxNDG4td9zbvkuVgz7urlbBJsGAJ227XQNNxrcBNocFNBWQx9IZ?=
+ =?us-ascii?Q?blyCXK0AuQk2dPEkjXkaeXrvHVOjJK6T4aXfG++XyKHDl24qYdzL2Xg2yYGq?=
+ =?us-ascii?Q?VYVSWm4qfKJZ0AtPp3TerYaJQUEHlC8tqSPojlHw/xC8WPAmWG0w+Myx8mIc?=
+ =?us-ascii?Q?JBWB5STmEaWQgJRbdRWDXDwLEM/7H3KOZeHXo5NJxAw/SrA46bKYn6eaKnR3?=
+ =?us-ascii?Q?tx0ZWEgm2u/h0fniIUthjfmP3XarUXUKHgYuZd13A0jRl6pvvw=3D=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?6PaJ158rwgPzyF8guFCQQtsEVo1g6yi2CUsVP1HU4Q0z/ntd0nUkaI8rT3i8?=
+ =?us-ascii?Q?h3abxn6+Xo6IbjCbP9qd9EQdTs0dgEBxXQuO/vA/hjlrqZ8ZHvwF14JnWUPT?=
+ =?us-ascii?Q?m6uUStmPvrZMu97/ZARvFl2CEPKBjSCRLaN29A2baCkmlHUSbE7mF68Mf6vQ?=
+ =?us-ascii?Q?A9ha3zC3dtgfOw6kPPwY5q7n+e72Wy+1F4cBr06gw13nESTjB5li30zB1A5D?=
+ =?us-ascii?Q?viMTUDL4PdBM3AQuSlPuS4iFyzCIPWxyuq9cFbf577e73UceUqpwMn7RmJil?=
+ =?us-ascii?Q?axptaDRTCPlqmx0D0kkYXJBHk+n1sDj1fl1pRoT9qutCHYe8jTyCUNwb1LOX?=
+ =?us-ascii?Q?lVyj46FQ+a/4nVyXrN9XlR7t8luWLbHyZH1m0ovh44vJdOxfTl60eLxIA1SR?=
+ =?us-ascii?Q?/5uBG3JIsFnaPfUt3NUxQHECiBb36A/MzCXcMJBuUadQQ5AuhNKqaFJoFm4U?=
+ =?us-ascii?Q?zxHtB08k4QB8Abk2hXZskk/tBUTN78LjFxke1nJpLryjr+/kRoCzOFukuy6f?=
+ =?us-ascii?Q?1T3ILBiwqK0RKHJFiIsESqggB3Qbmkh1eshivwgw077B0ERqd0m69kMPu8ZQ?=
+ =?us-ascii?Q?QfQqK3bExCC8DPfNQojK8cXtsnm4+SVVybltexc/Tbs7JUteYbX2x3HUKDFN?=
+ =?us-ascii?Q?tCwnrReWn3W0BJjCBTCtAZR+TBT0k8Tpjh9ACZlDUXK1/QZ460Suo6h4WCmF?=
+ =?us-ascii?Q?aLw9zmjGzr68xyREMKFG4ykWauyi6nxIMBcEbSjG3NQvuhzAQ+0sWCn7Olwm?=
+ =?us-ascii?Q?38FuRBskzzROluuSECuvq/gsP85o+JDAQoIVJxWu9qvhwhseeK6ce2gJRFj4?=
+ =?us-ascii?Q?Vbzq1svfTQ4IirqWVQV714sYpTrAP06FFTpclRaATE4+I8XdqYA1sHiGSTY4?=
+ =?us-ascii?Q?c9zugyopyjTrv1EG/CRyvnwt2arfyUqa567diBAfaOMqHNNYPoqTnQLE+fW1?=
+ =?us-ascii?Q?s2hYdNxUt7bP2Vob04z2IKSx+2yRMC/Qg18xghcAIX4D5iEH7swnVA0BFcef?=
+ =?us-ascii?Q?HBSGWk6676G42OsQpEMALcIvk+Nk/wdCIegtigc+VsbJjAg8H9KS2F0oRRy7?=
+ =?us-ascii?Q?lxYFUM5Tg3h9hJmcIFjSOJ4LaZC9DZTFTZLkDy8ELJYju0Obb0j0sRUwGo7H?=
+ =?us-ascii?Q?19KGDDwNTVnPP3xjFjTVE7k+IpI2uj3KohWgJECDuq8Lh3YwbDSvV6fInGPS?=
+ =?us-ascii?Q?oJlHnRWVfFMehWJrhQ0irXV0jb+cu/GSspKzd5kFLsYjQuYTDRmBxT2r+ruf?=
+ =?us-ascii?Q?BULYBSNZhRidTQVBTcIj+P0Mc+6YK48lzvdr+PAiwVMiFocOTyITl8HMSf84?=
+ =?us-ascii?Q?Gf6TrWMLoWhPd+N9L2EHGrpimE1U0qOqSNMvB4U6tH0gJWp17eqZ/YHzAy6/?=
+ =?us-ascii?Q?IOrmY8tAzlX/fVx39uqjJmq1jJ04/CXvyjFf6FUuWvFOFdMvjw9waqJLrqUM?=
+ =?us-ascii?Q?EdEtXzvsJ7tuDOrO/XlFEVNmMjVfNUe1DTKg8QYg0JdzuOsh8HV32al6XZAN?=
+ =?us-ascii?Q?x8t+ElNYg9Crf3IvzpBUaIOvhzNs55e5h65wtEWIl1NWTs1eT15/66q2WilA?=
+ =?us-ascii?Q?myTMoRxKThqVeo+XclQDOghX2PZ1HI/UezxIU6gh?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8736.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2100a974-6153-4a5b-d78a-08dd13281a20
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2024 23:21:51.3880
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cZu9mIMA/q/r3+wHEgKuAIbxNpIkJ3aDQIYDtBhUql2QS84jDNDmhBv9WWTc/KZM/+9K6K4nIA8LGmmf3+n4c0n1civm4NagGHNvMtIP9gg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7607
 
-Currently, sendmmsg is implemented in udpgso_bench_tx.c,
-but it is not called by any test script.
+> Commit (SHA1: 8d7ae22ae9f8c8a4407f8e993df64440bdbd0cee) fixed this issue
+> for the KSZ9477 by adjusting the regmap ranges.
+>=20
+> The same issue presents itself on the KSZ9896 regs and is fixed with
+> the same regmap range modification.
+>=20
+> Signed-off-by: Jesse Van Gavere <jesse.vangavere@scioteq.com>
+> ---
+>  drivers/net/dsa/microchip/ksz_common.c | 42 +++++++++++---------------
+>  1 file changed, 18 insertions(+), 24 deletions(-)
+>=20
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c
+> b/drivers/net/dsa/microchip/ksz_common.c
+> index 920443ee8ffd..8a03baa6aecc 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -1100,10 +1100,9 @@ static const struct regmap_range ksz9896_valid_reg=
+s[] =3D {
+>         regmap_reg_range(0x1030, 0x1030),
+>         regmap_reg_range(0x1100, 0x1115),
+>         regmap_reg_range(0x111a, 0x111f),
+> -       regmap_reg_range(0x1122, 0x1127),
+> -       regmap_reg_range(0x112a, 0x112b),
+> -       regmap_reg_range(0x1136, 0x1139),
+> -       regmap_reg_range(0x113e, 0x113f),
+> +       regmap_reg_range(0x1120, 0x112b),
+> +       regmap_reg_range(0x1134, 0x113b),
+> +       regmap_reg_range(0x113c, 0x113f),
+>         regmap_reg_range(0x1400, 0x1401),
+>         regmap_reg_range(0x1403, 0x1403),
+>         regmap_reg_range(0x1410, 0x1417),
+> @@ -1130,10 +1129,9 @@ static const struct regmap_range ksz9896_valid_reg=
+s[] =3D {
+>         regmap_reg_range(0x2030, 0x2030),
+>         regmap_reg_range(0x2100, 0x2115),
+>         regmap_reg_range(0x211a, 0x211f),
+> -       regmap_reg_range(0x2122, 0x2127),
+> -       regmap_reg_range(0x212a, 0x212b),
+> -       regmap_reg_range(0x2136, 0x2139),
+> -       regmap_reg_range(0x213e, 0x213f),
+> +       regmap_reg_range(0x2120, 0x212b),
+> +       regmap_reg_range(0x2134, 0x213b),
+> +       regmap_reg_range(0x213c, 0x213f),
+>         regmap_reg_range(0x2400, 0x2401),
+>         regmap_reg_range(0x2403, 0x2403),
+>         regmap_reg_range(0x2410, 0x2417),
+> @@ -1160,10 +1158,9 @@ static const struct regmap_range ksz9896_valid_reg=
+s[] =3D {
+>         regmap_reg_range(0x3030, 0x3030),
+>         regmap_reg_range(0x3100, 0x3115),
+>         regmap_reg_range(0x311a, 0x311f),
+> -       regmap_reg_range(0x3122, 0x3127),
+> -       regmap_reg_range(0x312a, 0x312b),
+> -       regmap_reg_range(0x3136, 0x3139),
+> -       regmap_reg_range(0x313e, 0x313f),
+> +       regmap_reg_range(0x3120, 0x312b),
+> +       regmap_reg_range(0x3134, 0x313b),
+> +       regmap_reg_range(0x313c, 0x313f),
+>         regmap_reg_range(0x3400, 0x3401),
+>         regmap_reg_range(0x3403, 0x3403),
+>         regmap_reg_range(0x3410, 0x3417),
+> @@ -1190,10 +1187,9 @@ static const struct regmap_range ksz9896_valid_reg=
+s[] =3D {
+>         regmap_reg_range(0x4030, 0x4030),
+>         regmap_reg_range(0x4100, 0x4115),
+>         regmap_reg_range(0x411a, 0x411f),
+> -       regmap_reg_range(0x4122, 0x4127),
+> -       regmap_reg_range(0x412a, 0x412b),
+> -       regmap_reg_range(0x4136, 0x4139),
+> -       regmap_reg_range(0x413e, 0x413f),
+> +       regmap_reg_range(0x4120, 0x412b),
+> +       regmap_reg_range(0x4134, 0x413b),
+> +       regmap_reg_range(0x413c, 0x413f),
+>         regmap_reg_range(0x4400, 0x4401),
+>         regmap_reg_range(0x4403, 0x4403),
+>         regmap_reg_range(0x4410, 0x4417),
+> @@ -1220,10 +1216,9 @@ static const struct regmap_range ksz9896_valid_reg=
+s[] =3D {
+>         regmap_reg_range(0x5030, 0x5030),
+>         regmap_reg_range(0x5100, 0x5115),
+>         regmap_reg_range(0x511a, 0x511f),
+> -       regmap_reg_range(0x5122, 0x5127),
+> -       regmap_reg_range(0x512a, 0x512b),
+> -       regmap_reg_range(0x5136, 0x5139),
+> -       regmap_reg_range(0x513e, 0x513f),
+> +       regmap_reg_range(0x5120, 0x512b),
+> +       regmap_reg_range(0x5134, 0x513b),
+> +       regmap_reg_range(0x513c, 0x513f),
+>         regmap_reg_range(0x5400, 0x5401),
+>         regmap_reg_range(0x5403, 0x5403),
+>         regmap_reg_range(0x5410, 0x5417),
+> @@ -1250,10 +1245,9 @@ static const struct regmap_range ksz9896_valid_reg=
+s[] =3D {
+>         regmap_reg_range(0x6030, 0x6030),
+>         regmap_reg_range(0x6100, 0x6115),
+>         regmap_reg_range(0x611a, 0x611f),
+> -       regmap_reg_range(0x6122, 0x6127),
+> -       regmap_reg_range(0x612a, 0x612b),
+> -       regmap_reg_range(0x6136, 0x6139),
+> -       regmap_reg_range(0x613e, 0x613f),
+> +       regmap_reg_range(0x6120, 0x612b),
+> +       regmap_reg_range(0x6134, 0x613b),
+> +       regmap_reg_range(0x613c, 0x613f),
+>         regmap_reg_range(0x6300, 0x6301),
+>         regmap_reg_range(0x6400, 0x6401),
+>         regmap_reg_range(0x6403, 0x6403),
 
-This patch adds a test for sendmmsg in udpgso_bench.sh.
-This allows for basic API testing and benchmarking
-comparisons with GSO.
----
- tools/testing/selftests/net/udpgso_bench.sh | 3 +++
- 1 file changed, 3 insertions(+)
+The port address range 0x#100-0x#13F just maps to the PHY registers 0-31,
+so it can be simply one single regmap_reg_range(0x1100, 0x113f) instead
+of many.  I suggest using regmap_reg_range(0x1100, 0x111f) and
+regmap_reg_range(0x1120, 0x113f) to remind people the high range address
+needs special handling.
 
-diff --git a/tools/testing/selftests/net/udpgso_bench.sh b/tools/testing/selftests/net/udpgso_bench.sh
-index 640bc43452fa..88fa1d53ba2b 100755
---- a/tools/testing/selftests/net/udpgso_bench.sh
-+++ b/tools/testing/selftests/net/udpgso_bench.sh
-@@ -92,6 +92,9 @@ run_udp() {
- 	echo "udp"
- 	run_in_netns ${args}
- 
-+	echo "udp sendmmsg"
-+	run_in_netns ${args} -m
-+
- 	echo "udp gso"
- 	run_in_netns ${args} -S 0
- 
--- 
-2.39.3 (Apple Git-146)
+I also do not know why those _register_set are not enforced across all
+KSZ9897 related switches.
 
 
