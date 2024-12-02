@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-148173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA3B9E0998
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 18:15:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8C3A162FB1
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 17:14:53 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2BE1DE4DA;
-	Mon,  2 Dec 2024 17:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="N6YY/zhs"
-X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2051.outbound.protection.outlook.com [40.107.94.51])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 536FF9E0994
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 18:14:54 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835221D8DFE;
-	Mon,  2 Dec 2024 17:13:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.51
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1479C2824EA
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 17:14:53 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ABFF1DE3D8;
+	Mon,  2 Dec 2024 17:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="O6N90wZn"
+X-Original-To: netdev@vger.kernel.org
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2075.outbound.protection.outlook.com [40.107.236.75])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A141DE3DB;
+	Mon,  2 Dec 2024 17:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.75
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733159589; cv=fail; b=uzk/dVvmfBCK78zB8KoZX/c/0jjulyyx+itpGfMujR1oWuR3UeM9s/bFNQKChDyqAC3bOjPZEf19fIOuHiL1tjZX5/GeGVcCbO/ONNHzuRGc8/1a1wPwaN/l/RXiS92mmJbHVg60qjVwq29OcydV1U1KDe94heu2SH/5BHCtJYE=
+	t=1733159589; cv=fail; b=ti8+mUHtj/+6KfVAIL/qflH619H//KPFaBn9VZ/te481J4CxScVluNfVATjlQazViukISLW3Cql2FFa6EGNfvRxku45ei0TJVMa3Y4K5XqiFp09I+XgSgQaBmTHGvdoJlI31XsUAgP4yjB6U9aLRrcyYF04O2hz2YF3lMIn41EY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1733159589; c=relaxed/simple;
-	bh=m8RCPQZ+25SocBXuR321P6iK2gZLhhJSiOL8iRPnGuM=;
+	bh=rtC4unKKcr4+IwQUPkTNvDvWq89erz+BY2vmbNCy9Vg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bq0acmQAG2/i/uvQSlmwIqT4++VS+WUAvtaY5alYGwZ4Ik/xE0jy0zdq8aze5ArRZwm4rX7uBxlGDscIBTahKWbxBSLoZLWNk+HdaBBfTCa6zlbchqqJ0AT93lqiF17vbAAB1/VkAaOWmGXdbBrXsB1P8Fd4+GNnx9gSEvGqDQI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=N6YY/zhs; arc=fail smtp.client-ip=40.107.94.51
+	 MIME-Version:Content-Type; b=rrEDyLSVpVAIAsLlfWWa33ZG7ldr7N5IyqCyQrTsA56TOaKrBSQpbD4o7QkNTTVySN1/Ht2Yf/h1NC0hVhFvI5JYlxqmXIfxAJnn+EnhocYeniE1UE+dhDCRM39cJSLRs2leb6vxiRdzkI7mfJhONtmLyOU1NQOh+3+ITUnVv+4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=O6N90wZn; arc=fail smtp.client-ip=40.107.236.75
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FSnaz0SAtxE1uWx1tc3jwwsc0B2ihdnJIraSt9S0fj74/Tls3mB0EVYQJAJv39eq6SsfhPPDF2hG/hscRVe4wOPzLARZ+A95bVKp7pi5RkaLUC105ZCniL4vXPYfzaZlJ48VCq6QJRl00vopXJgL8MfLKqWmuLUyMFK6X/N2XXmrGYDNdulFYQFuA/1XHDJ6Qga5i0pyADm0X8JBkHluNyemnOYOf/+ei2iFaDDObd2bF++GsOPnTG5K++blTK/LXWq45zXmCLGZ/Me8e/FGXRmfpPt761x+JL4+leAn6+q6iNkfj3jGXC31nq4+9biAs1rtoADe/DEOgK4TcUBOIQ==
+ b=waZnxxEgskZjNNuF6i8AoKexM/F5nfxTk0OtN0otZ7c/yWsCV8ra/bh6C/Swf7Rs4MT6SFmT8rqI6RIygeHsg86sBaiRhkjhbNoa7GPzToFbxltnU5hUb6OuslSkslOIsIZ6i2cxjgAfzoczTSVqhiGmFRhItAb/7kTOIhKYdwB1abPrGy823xuC8dT6Jdtmw1Mo3yz3kOYWLJaUDt3QGGZVwkIPLBCEits/BC+3HkfTyzIvnQmLJZYZTtPDCUNHwme9ho31h9VPl/N7I4qCs8WG2JmGZiY9Nu8dwM3qW3Nlmk404YdcF96xYyPplHQw2SEUPKuBrcb5swJFedRSMQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NuIbdfRvrk2HoiIPc6mN6YkzFGYfGHm4csrTwH5bpLs=;
- b=C0KcBOi/Eckiv8QT0onKlv+sOe3uSf5jGx5qVStfnDAEvPCeIn/g8DwyP2dIF+TxJVvaFuWRmVCPnFWzncoDydQ/M1CH9130OgBmT+tL1MgYjNMVfSdtMFi3WJSXCNwao3Bjsf4IWXoBwVstNx2aL83HJZK707+cb8E3HWg9S1Cq/SaqXipUo7rpn2xj8A11sz0zAFz0PWapTLh2Q5mIZux4YZWF1VWdA+t8j+M1UGzheyg/jUgcoV3wJ57YQdxsjRWX5md7TWWdp8xYJEGaUVIOIex8YyPgaFPgj5fTyyVM3yhecymItk5BGGKP0MciXXf+mI1brNxGdgnD5sT2fQ==
+ bh=Q5hz7WctsyYqzSNvIrR2kbXpYrg/ZIZzxVXRlKRoqg4=;
+ b=hexRCwOtUaDgW0kNkC9O6QHLVFiYqmoGDJzcKtwi1z5Df9UoXiU0y5NARDAmLgjrionl+BqyLwaEfQIVyHwy1KS3Xsq9QWidyogxaJYArIVvDaqKRMguEmb333Bgf6dUE7bjzcGrZLlB65HEPUsOYZoGcvEdpCIGL9ec31RtLixWcyvYf7W0ydI/0KlBFMdEv9NTGIDnkSUqdr9a89C5OtRXK0gn55SNnjnqywW49m9fOe14p5fuBU2BBa0VZBTIBl7+1eXdSktJsEzQAoJlTlc4KLG60Y8wMRzmLLcWjpvj2k/hd9I+itqPwStl2xruj9fKup2g32clLICZOhy+Og==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NuIbdfRvrk2HoiIPc6mN6YkzFGYfGHm4csrTwH5bpLs=;
- b=N6YY/zhspPYER7IewEwajKhIaEnXrE45xsBNNxwa4Ka88txmuqFYpzCpeH448KzgNq3O9aRNcWTEpMj33KmwLolQasAv5+OaQJFgfd0dzYsBH18G6C/02iZ1OE7KiQyofPDJT1X5qB+B5L+gQsX0GEIRHLrr0xn/QVINX9wuXDg=
-Received: from BN9PR03CA0524.namprd03.prod.outlook.com (2603:10b6:408:131::19)
- by BL1PR12MB5851.namprd12.prod.outlook.com (2603:10b6:208:396::13) with
+ bh=Q5hz7WctsyYqzSNvIrR2kbXpYrg/ZIZzxVXRlKRoqg4=;
+ b=O6N90wZnSw5OSYMkd6NV/fYCstJ899v9KFPDxJG7mqur5yNV4xqTKa1mlrRbkRRZnHFDEfS7DhHafwpOnoHIzW9/BhzuL3+Wf8nWsSgbMiPQZCuPQewkRaSyf2Wbl/zA8eDXPELE39raMsX9LeHPZLXY4P1T9TMwaWRCW1DK9NA=
+Received: from BN9PR03CA0518.namprd03.prod.outlook.com (2603:10b6:408:131::13)
+ by PH8PR12MB7445.namprd12.prod.outlook.com (2603:10b6:510:217::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.17; Mon, 2 Dec
- 2024 17:13:01 +0000
+ 2024 17:13:02 +0000
 Received: from BN2PEPF000044AC.namprd04.prod.outlook.com
- (2603:10b6:408:131:cafe::a3) by BN9PR03CA0524.outlook.office365.com
- (2603:10b6:408:131::19) with Microsoft SMTP Server (version=TLS1_3,
+ (2603:10b6:408:131:cafe::b9) by BN9PR03CA0518.outlook.office365.com
+ (2603:10b6:408:131::13) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8207.18 via Frontend Transport; Mon,
- 2 Dec 2024 17:13:01 +0000
+ 2 Dec 2024 17:13:02 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -69,20 +69,20 @@ Received: from SATLEXMB03.amd.com (165.204.84.17) by
 Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 2 Dec
- 2024 11:12:55 -0600
+ 2024 11:12:56 -0600
 Received: from xcbalucerop41x.xilinx.com (10.180.168.240) by
  SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 2 Dec 2024 11:12:53 -0600
+ 15.1.2507.39 via Frontend Transport; Mon, 2 Dec 2024 11:12:55 -0600
 From: <alejandro.lucero-palau@amd.com>
 To: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
 	<dan.j.williams@intel.com>, <martin.habets@xilinx.com>,
 	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <edumazet@google.com>, <dave.jiang@intel.com>
 CC: Alejandro Lucero <alucerop@amd.com>
-Subject: [PATCH v6 15/28] cxl: define a driver interface for HPA free space enumeration
-Date: Mon, 2 Dec 2024 17:12:09 +0000
-Message-ID: <20241202171222.62595-16-alejandro.lucero-palau@amd.com>
+Subject: [PATCH v6 16/28] sfc: obtain root decoder with enough HPA free space
+Date: Mon, 2 Dec 2024 17:12:10 +0000
+Message-ID: <20241202171222.62595-17-alejandro.lucero-palau@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
 References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
@@ -97,270 +97,100 @@ Received-SPF: None (SATLEXMB03.amd.com: alejandro.lucero-palau@amd.com does
  not designate permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044AC:EE_|BL1PR12MB5851:EE_
-X-MS-Office365-Filtering-Correlation-Id: caf3488b-66e6-4ec6-a027-08dd12f493a7
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044AC:EE_|PH8PR12MB7445:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5998c566-57d9-4dbc-b053-08dd12f493f8
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026|921020;
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?aA2jfcjeOwphHTYpUNLZulBZ5TRgUS+T93ZoF28TUEnDc0EQ9s5xAepSDY62?=
- =?us-ascii?Q?ejI7OZHrjFYOVFrL9pH+y5gpTuGNC89RU9vLUyaxwyXmTwC5YlCqH9OMsDfz?=
- =?us-ascii?Q?6NK2M7ryW5g4oqQGYm/QIhpg/8n6e5BEEhY18SJsMd2gBLfz3uTCIz3CY7CX?=
- =?us-ascii?Q?oglkw4nkxe811mem+OsaRlF+QLID87a3NFaK8qfq0seXp+Ozc9BpzOsXGp4F?=
- =?us-ascii?Q?nvo3DS7p3dZ1TQbi+gmxMVFU6a+ejdalq02MivdggSt2HOnMQFqRqVQE8YRp?=
- =?us-ascii?Q?aD0IFdIZr80UJi2unJhShjY5DdNvgD2TNwU737PrNBReKCIZT9wm5WpkaxOC?=
- =?us-ascii?Q?8AtH4xMJqJoJZApLYuNGma9NddtFLrKir/ohg7bcupCKmYKHQOYwxffnUClN?=
- =?us-ascii?Q?RTvgdmcvU7CI0wkf0Eq93GO/sMpSjg+X1KyWGig+j3gq3QCVW96lm3khmaLs?=
- =?us-ascii?Q?JuZOKR8LP2xC4tsXwJb/xpBvsF6k8Gi+Yp+svNpDHWal/cKN5Ipci6/0eyRA?=
- =?us-ascii?Q?N4aNJUt84SbxkxaISyuBhBcvNvZojk8SWUfw2rWBSSoZMhJIx8Mp3i8wtuBt?=
- =?us-ascii?Q?Z9pEUK9Aa+KBTsJMpMcBaVqGzXgrwMmxqOkgEAHCjalcZfH+f++eVFknavJN?=
- =?us-ascii?Q?VnckCx5qwxJ0krJEXpUmXfAvGYLNTJw50h0J/2pyTu4T0blnx5pEyLEqTM9z?=
- =?us-ascii?Q?/0lLPBhxYFnr5vjGS3RVKHv/4Y5Cm803m+qDpPCo9Oz+jZEH6u5NStpwTd0x?=
- =?us-ascii?Q?hi4arSxJ6UXS04WaGJsYU8LjrqJw0EZwoahS2ksto9GLKxb287hDR27vTyFm?=
- =?us-ascii?Q?y03kkmK+H+sLNtfV1nKhe1rwtZN61khoWyqae2kqosLyzB/2JWBSH48DJz9O?=
- =?us-ascii?Q?eLfuuAYI3OlTStuaKoQNzVNn9jzGPomwuFLfXBHXralm6h548YXVyi5UpvQq?=
- =?us-ascii?Q?zW/SDjslJw6zQUjNlAp7MeHQOHK+vUWeRtxssdfGgVGwxVZXwH0CPR2I0bTF?=
- =?us-ascii?Q?htNcj9dyYZwdxXJntJhgINmGnS4MqGsqoBYJE8+5mlqfJsQz0PAQhW86viS3?=
- =?us-ascii?Q?K7/o5ddu48I0vDYYTQK5r+08EjL5epZ9KP26vZc4neh0Hncbr+7rBMtqDnyv?=
- =?us-ascii?Q?1bVYZ3E/GsVXHVGsXsWfSAsVoRZRJ0bPoBsetsFSBc9rYMsX510p8zKqGKwN?=
- =?us-ascii?Q?W0v0hkE5I2QI43PYyZ312P1bXjVGWX7qDhcnf2xh9TakMoe0U8ob5JwMsJaM?=
- =?us-ascii?Q?TrS0UUkmp8gx3TssvW5GPsUUlA2gxq25KOj5twwo7jXC0Iq4ct7a7SD/VJZP?=
- =?us-ascii?Q?86ulSGDONdDXimLW/ybLunByWJV+eZjeK9E1AEJP0nMk7/ixHljGX9G3Y0/c?=
- =?us-ascii?Q?l/faP7EHqYMWTtIiN3iU5vDCax2OF7H4hLq1x9YGLvZ5NnbNz+QeQ6DuET+U?=
- =?us-ascii?Q?eLh0OtsihdubSvk+Qr8tJpGoDrmP2/9+nuzXGt7CWnQKxoE+sH98JQ=3D=3D?=
+	=?us-ascii?Q?qOMdEQkfK8Dj0kQcf8Z9TLA1hjlqWYQ/3CdPUZgFAQ88q+DT2b/+24snOY0f?=
+ =?us-ascii?Q?06v8e2LWXpdb09Jw+mZdrKQGvjfnnqLE+EBzJxOzHR6+MKDRxXaqbhVwPr4h?=
+ =?us-ascii?Q?Hh7Umym/e/ebNIAplNdPFiy8CZ/mAWXtT635NGnNfdrnkWC/e7jFcBy9v2RC?=
+ =?us-ascii?Q?c3EmjOuh4Vh8RuoHhM5wH3Br2Bz6koANYylbw13HU03lyBlFDfAKqlYuWV0j?=
+ =?us-ascii?Q?PTaqXWI6XcVFzk0m4lfQn3zqo+1wFrQzMU61kZlWwJfoM2C/mlmqdsyR+Igg?=
+ =?us-ascii?Q?ZeUCGSiYB5o1nz4BjssQh1uj2BHjaLGz7v/pQu7hfhjHE5nPfXg9LqzMWPmX?=
+ =?us-ascii?Q?pMXVqbEQNndwYzbSbz+WU6iurY30eM9e7SiM5s9Z1TVQO2UIPT7rqUOnQsP5?=
+ =?us-ascii?Q?kuTK4U9Br8JrTBlxOgzDxAlu/hoSdQOG2EVbiLTQZ0O+yEtCooteRqpLwKVy?=
+ =?us-ascii?Q?tSw2XD+uvd+J2wVUTHDlJPkBmf7SBBVVHCn/7b2LahHJKjSPsv4BZz1DOWFd?=
+ =?us-ascii?Q?arGDaTs06Ab94IeJg0v6n55/7HB4s1ItLcZIOjwzjdD4Mr6sfNKYiPdTUA9C?=
+ =?us-ascii?Q?wiuW1Iy2r8X7C+UldUQDdEzCyGMRJanbwebRqUNgaKTDv02g8FNDLcmN2noZ?=
+ =?us-ascii?Q?2iB08G11ktiy+uRcTXGN1CduYkU3hOmQNvcYedNsGELnORboUlU5GTn5kKRl?=
+ =?us-ascii?Q?Izm9Xl/3uscWDFIcMJ3ZXCGWnS0sOqmrJsNtvjBRPONB5PxnjZ8aj6HnwqWv?=
+ =?us-ascii?Q?t2J7l3QelzW2ArjpP1xGTKK3nI2O6CL6Qxpw4ohy+1YDOvuG0SIvKWAgJ+ah?=
+ =?us-ascii?Q?aQIXoKsu7Es5QH+n0BtL69rx5pztl3SU370PcPpCjnQJjUgubNT74Q/fvVuB?=
+ =?us-ascii?Q?T1xqNp0VzxGvkCCutWNr/rcxsrPAFSbcVeJD7+NlOB4qZez5EFapliwXRRJs?=
+ =?us-ascii?Q?+XnheLF/O7s4VaOS2hrdMZOWkVXBB337pUrNQBGVQwBbvIG78+/yDgofVme9?=
+ =?us-ascii?Q?cvfwXy/2VMBuvwn5drA3mf2TS2MAh5MkN7WRUamH0OM/kzcNAj/kBJK02QbR?=
+ =?us-ascii?Q?DmGED/wRHeaOiwR4vxmVpA89Tr4DOz6Kh6Ml+BlNfWlfDZ/ow7WmccsczfhI?=
+ =?us-ascii?Q?xHkEB7ZxsjTOCWUoZKoT6chMMT0VpKKFAFS/yQvWK0yNj/gJjseRlSdvCvTS?=
+ =?us-ascii?Q?wLCokpkcG0GjbrvO0qKZfw8iX2UpZrd6wRfcT6ikm6qwZqddL6V95Ws/DTLG?=
+ =?us-ascii?Q?mka0FNvS2bxf0Cgn21sdL4TaeJdrfioCAXmi6UPEMD9ZgJTl8RPkXVHH0zt0?=
+ =?us-ascii?Q?YgAFEUQk+kNeVRdzG+1UNfyEoh01O6sUSP0x19gUf54V5STbv/xuu4P0GZbT?=
+ =?us-ascii?Q?pLUeSRrgEZmjoytwHUpPsJGNgD0DNoBoCQ4MohvxWnLzcPYddZvMyOWn9Tz+?=
+ =?us-ascii?Q?3ttqmV7TG0sKTPC29XB6c+gjIEpH1tI8jQDJp1+CwgfZ/0fWCSTGpg=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026)(921020);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014)(921020);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2024 17:13:01.4409
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2024 17:13:01.9722
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: caf3488b-66e6-4ec6-a027-08dd12f493a7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5998c566-57d9-4dbc-b053-08dd12f493f8
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	BN2PEPF000044AC.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5851
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7445
 
 From: Alejandro Lucero <alucerop@amd.com>
 
-CXL region creation involves allocating capacity from device DPA
-(device-physical-address space) and assigning it to decode a given HPA
-(host-physical-address space). Before determining how much DPA to
-allocate the amount of available HPA must be determined. Also, not all
-HPA is create equal, some specifically targets RAM, some target PMEM,
-some is prepared for device-memory flows like HDM-D and HDM-DB, and some
-is host-only (HDM-H).
+Asking for availbale HPA space is the previous step to try to obtain
+an HPA range suitable to accel driver purposes.
 
-Wrap all of those concerns into an API that retrieves a root decoder
-(platform CXL window) that fits the specified constraints and the
-capacity available for a new region.
-
-Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
+Add this call to efx cxl initialization.
 
 Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-Co-developed-by: Dan Williams <dan.j.williams@intel.com>
 ---
- drivers/cxl/core/region.c | 145 ++++++++++++++++++++++++++++++++++++++
- drivers/cxl/cxl.h         |   3 +
- include/cxl/cxl.h         |   8 +++
- 3 files changed, 156 insertions(+)
+ drivers/net/ethernet/sfc/efx_cxl.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-index 2a34393e216d..2ddc56c07973 100644
---- a/drivers/cxl/core/region.c
-+++ b/drivers/cxl/core/region.c
-@@ -687,6 +687,151 @@ static int free_hpa(struct cxl_region *cxlr)
- 	return 0;
- }
- 
-+struct cxlrd_max_context {
-+	struct device *host_bridge;
-+	unsigned long flags;
-+	resource_size_t max_hpa;
-+	struct cxl_root_decoder *cxlrd;
-+};
-+
-+static int find_max_hpa(struct device *dev, void *data)
-+{
-+	struct cxlrd_max_context *ctx = data;
-+	struct cxl_switch_decoder *cxlsd;
-+	struct cxl_root_decoder *cxlrd;
-+	struct resource *res, *prev;
-+	struct cxl_decoder *cxld;
+diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+index d03fa9f9c421..79b93d92f9c2 100644
+--- a/drivers/net/ethernet/sfc/efx_cxl.c
++++ b/drivers/net/ethernet/sfc/efx_cxl.c
+@@ -26,6 +26,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+ 	struct pci_dev *pci_dev;
+ 	struct efx_cxl *cxl;
+ 	struct resource res;
 +	resource_size_t max;
-+
-+	if (!is_root_decoder(dev))
-+		return 0;
-+
-+	cxlrd = to_cxl_root_decoder(dev);
-+	cxlsd = &cxlrd->cxlsd;
-+	cxld = &cxlsd->cxld;
-+	if ((cxld->flags & ctx->flags) != ctx->flags) {
-+		dev_dbg(dev, "%s, flags not matching: %08lx vs %08lx\n",
-+			__func__, cxld->flags, ctx->flags);
-+		return 0;
-+	}
-+
-+	/*
-+	 * The CXL specs do not forbid an accelerator being part of an
-+	 * interleaved HPA range, but it is unlikely and because it helps
-+	 * simplifying the code, we assume this being the case by now.
-+	 */
-+	if (cxld->interleave_ways != 1) {
-+		dev_dbg(dev, "%s, interleave_ways not matching\n", __func__);
-+		return 0;
-+	}
-+
-+	guard(rwsem_read)(&cxl_region_rwsem);
-+	if (ctx->host_bridge != cxlsd->target[0]->dport_dev) {
-+		dev_dbg(dev, "%s, host bridge does not match\n", __func__);
-+		return 0;
-+	}
-+
-+	/*
-+	 * Walk the root decoder resource range relying on cxl_region_rwsem to
-+	 * preclude sibling arrival/departure and find the largest free space
-+	 * gap.
-+	 */
-+	lockdep_assert_held_read(&cxl_region_rwsem);
-+	max = 0;
-+	res = cxlrd->res->child;
-+	if (!res)
-+		max = resource_size(cxlrd->res);
-+	else
-+		max = 0;
-+
-+	for (prev = NULL; res; prev = res, res = res->sibling) {
-+		struct resource *next = res->sibling;
-+		resource_size_t free = 0;
-+
-+		if (!prev && res->start > cxlrd->res->start) {
-+			free = res->start - cxlrd->res->start;
-+			max = max(free, max);
-+		}
-+		if (prev && res->start > prev->end + 1) {
-+			free = res->start - prev->end + 1;
-+			max = max(free, max);
-+		}
-+		if (next && res->end + 1 < next->start) {
-+			free = next->start - res->end + 1;
-+			max = max(free, max);
-+		}
-+		if (!next && res->end + 1 < cxlrd->res->end + 1) {
-+			free = cxlrd->res->end + 1 - res->end + 1;
-+			max = max(free, max);
-+		}
-+	}
-+
-+	dev_dbg(CXLRD_DEV(cxlrd), "%s, found %pa bytes of free space\n",
-+		__func__, &max);
-+	if (max > ctx->max_hpa) {
-+		if (ctx->cxlrd)
-+			put_device(CXLRD_DEV(ctx->cxlrd));
-+		get_device(CXLRD_DEV(cxlrd));
-+		ctx->cxlrd = cxlrd;
-+		ctx->max_hpa = max;
-+		dev_dbg(CXLRD_DEV(cxlrd), "%s, found %pa bytes of free space\n",
-+			__func__, &max);
-+	}
-+	return 0;
-+}
-+
-+/**
-+ * cxl_get_hpa_freespace - find a root decoder with free capacity per constraints
-+ * @endpoint: an endpoint that is mapped by the returned decoder
-+ * @flags: CXL_DECODER_F flags for selecting RAM vs PMEM, and HDM-H vs HDM-D[B]
-+ * @max_avail_contig: output parameter of max contiguous bytes available in the
-+ *		      returned decoder
-+ *
-+ * The return tuple of a 'struct cxl_root_decoder' and 'bytes available given
-+ * in (@max_avail_contig))' is a point in time snapshot. If by the time the
-+ * caller goes to use this root decoder's capacity the capacity is reduced then
-+ * caller needs to loop and retry.
-+ *
-+ * The returned root decoder has an elevated reference count that needs to be
-+ * put with put_device(cxlrd_dev(cxlrd)). Locking context is with
-+ * cxl_{acquire,release}_endpoint(), that ensures removal of the root decoder
-+ * does not race.
-+ */
-+struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_memdev *cxlmd,
-+					       unsigned long flags,
-+					       resource_size_t *max_avail_contig)
-+{
-+	struct cxl_port *endpoint = cxlmd->endpoint;
-+	struct cxlrd_max_context ctx = {
-+		.host_bridge = endpoint->host_bridge,
-+		.flags = flags,
-+	};
-+	struct cxl_port *root_port;
-+	struct cxl_root *root __free(put_cxl_root) = find_cxl_root(endpoint);
-+
-+	if (!is_cxl_endpoint(endpoint)) {
-+		dev_dbg(&endpoint->dev, "hpa requestor is not an endpoint\n");
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	if (!root) {
-+		dev_dbg(&endpoint->dev, "endpoint can not be related to a root port\n");
-+		return ERR_PTR(-ENXIO);
-+	}
-+
-+	root_port = &root->port;
-+	down_read(&cxl_region_rwsem);
-+	device_for_each_child(&root_port->dev, &ctx, find_max_hpa);
-+	up_read(&cxl_region_rwsem);
-+
-+	if (!ctx.cxlrd)
-+		return ERR_PTR(-ENOMEM);
-+
-+	*max_avail_contig = ctx.max_hpa;
-+	return ctx.cxlrd;
-+}
-+EXPORT_SYMBOL_NS_GPL(cxl_get_hpa_freespace, CXL);
-+
- static ssize_t size_store(struct device *dev, struct device_attribute *attr,
- 			  const char *buf, size_t len)
- {
-diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
-index 22e787748d79..57d6dda3fb4a 100644
---- a/drivers/cxl/cxl.h
-+++ b/drivers/cxl/cxl.h
-@@ -785,6 +785,9 @@ static inline void cxl_dport_init_ras_reporting(struct cxl_dport *dport,
- struct cxl_decoder *to_cxl_decoder(struct device *dev);
- struct cxl_root_decoder *to_cxl_root_decoder(struct device *dev);
- struct cxl_switch_decoder *to_cxl_switch_decoder(struct device *dev);
-+
-+#define CXLRD_DEV(cxlrd) (&(cxlrd)->cxlsd.cxld.dev)
-+
- struct cxl_endpoint_decoder *to_cxl_endpoint_decoder(struct device *dev);
- bool is_root_decoder(struct device *dev);
- bool is_switch_decoder(struct device *dev);
-diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
-index 26d7735b5f31..eacd5e5e6fe8 100644
---- a/include/cxl/cxl.h
-+++ b/include/cxl/cxl.h
-@@ -7,6 +7,10 @@
- #include <linux/ioport.h>
- #include <linux/pci.h>
+ 	u16 dvsec;
+ 	int rc;
  
-+#define CXL_DECODER_F_RAM   BIT(0)
-+#define CXL_DECODER_F_PMEM  BIT(1)
-+#define CXL_DECODER_F_TYPE2 BIT(2)
+@@ -102,6 +103,23 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+ 		goto err3;
+ 	}
+ 
++	cxl->cxlrd = cxl_get_hpa_freespace(cxl->cxlmd,
++					   CXL_DECODER_F_RAM | CXL_DECODER_F_TYPE2,
++					   &max);
 +
- enum cxl_resource {
- 	CXL_RES_DPA,
- 	CXL_RES_RAM,
-@@ -47,4 +51,8 @@ int cxl_release_resource(struct cxl_dev_state *cxlds, enum cxl_resource type);
- void cxl_set_media_ready(struct cxl_dev_state *cxlds);
- struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
- 				       struct cxl_dev_state *cxlds);
-+struct cxl_port;
-+struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_memdev *cxlmd,
-+					       unsigned long flags,
-+					       resource_size_t *max);
- #endif
++	if (IS_ERR(cxl->cxlrd)) {
++		pci_err(pci_dev, "cxl_get_hpa_freespace failed\n");
++		rc = PTR_ERR(cxl->cxlrd);
++		goto err3;
++	}
++
++	if (max < EFX_CTPIO_BUFFER_SIZE) {
++		pci_err(pci_dev, "%s: no enough free HPA space %llu < %u\n",
++			__func__, max, EFX_CTPIO_BUFFER_SIZE);
++		rc = -ENOSPC;
++		goto err3;
++	}
++
+ 	probe_data->cxl = cxl;
+ 
+ 	return 0;
 -- 
 2.17.1
 
