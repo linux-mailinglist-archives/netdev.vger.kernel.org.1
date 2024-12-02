@@ -1,144 +1,196 @@
-Return-Path: <netdev+bounces-148035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 400E39DFE67
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:12:36 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E0C0163ACA
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:12:23 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EB811FC7FF;
-	Mon,  2 Dec 2024 10:10:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KIbb3Fc+"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC9009DFEC7
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:24:16 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556D21FBEA9;
-	Mon,  2 Dec 2024 10:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E00AB2B481
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:15:04 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A1B1FCCE4;
+	Mon,  2 Dec 2024 10:14:32 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597941E2611
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 10:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733134254; cv=none; b=NXjLc9lyrUKc2KdNn4mcOekO01sW7rG8B0mQIUTfpU5RQ0C9aQfdyWYA9K5fD7uURuZI9bzZfNYVdPXmO4OrUE0CQj0TpSpgi6vhdvcVLnFeFYdVVj+DsNKdab484/cR1xMyEPuBh9CCp2V6RrkpkJeZ74/PbypJQk3py4bdwb0=
+	t=1733134472; cv=none; b=PQ2Ph4dMktP1mdEctx8Fg4C9zHHQYatYCMlR8QHYOXz/pLTC7FXYGVQ6mStylOZSjXA3TrdWtDMMjNQ1h9nQyFIpLbtRwpjeizproH2F+txBfA7W5e5VBwkKsE+q5X0FCXD0c6euFlm3rR7lx1p+84xYm0gizE/R5xiHNgPR4Xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733134254; c=relaxed/simple;
-	bh=K12IWzr7ZzpJLWTT+sNll1SfEYElORyx9EZ8o7u51ME=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Rz75FECQirx/H8Uacb9IhnJEC/SuXwyh9go2DsB3n9FEPHUB5ntmM4UFrLt61XiXaJQ0Rcx+6bgeZ3U55I2UTQBZuzlW+VJ9lrEwyFSQ6JQBTv4M6FRIdcO9e7l4jM44YPPuEkfKyRdvYhZYPKiFh7P5zpmqnxhRv+tR6OjObuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KIbb3Fc+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C29FEC4CED1;
-	Mon,  2 Dec 2024 10:10:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733134253;
-	bh=K12IWzr7ZzpJLWTT+sNll1SfEYElORyx9EZ8o7u51ME=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=KIbb3Fc+KDroWCb3fIq+KTn/HPAhZWNr4o8JQU9cjzJkUPjgdcgYZEe6p0tAurvCj
-	 1eiA6UXh365jffZoNhSk3C2uVdua2ptrmrLMGe4bVhkdYIYb8LtWuvgvpm2DiBzGke
-	 XxR/DMJW32YPCcYzGhnmE1fMztImytGqh5wLaFIPfZX0bstMSdvC50PLyi9UMmi00M
-	 QgRzeO24alFNZo6bSqqnjpj99Y86cQXxItasX0ejTYrYb1We4AvmQAP03VwXao3O8a
-	 edwKtN8Fv4S0eWk1hw5+afahCGMe9Rf4MGiXeM+bofJK+Oq5KN5QMxdfbNrmYjPQ+j
-	 flQek4PPwhbDg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADBF5D73612;
-	Mon,  2 Dec 2024 10:10:53 +0000 (UTC)
-From: Manas via B4 Relay <devnull+manas18244.iiitd.ac.in@kernel.org>
-Date: Mon, 02 Dec 2024 15:40:51 +0530
-Subject: [PATCH net-next RESEND v2] net/smc: Remove unused function
- parameter in __smc_diag_dump
+	s=arc-20240116; t=1733134472; c=relaxed/simple;
+	bh=tHFUdCqsMGkg322I+g4Sl3AKyQEATnxh07xEPs9CRlU=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=W7eCNlfxxwfSToAN923qWsvBiJ9mDqLfntCd3BK6Eh5EZmLh1rGVrMBh6cAQWPXq/6L39BlSsCs3CMmnCQRfo9pOtPDzQeuSXXewJiOkLbt/lGdA23QcZqmlp7JtBfD9r1INDOehOY4Mh3+pqdpYSJdJU4hlgKUkF4QKC096wVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-84193bb7ed1so380105839f.1
+        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 02:14:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733134469; x=1733739269;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=p47V1VHANSclYmrUqc/dOa+k1UPLy90lRLdbDjNFoQA=;
+        b=rCDOfVU7+yq6ssMr27JV7zywBreabg0LDJXyTm9annj4t/EoHbkUjmseNx1garUxUE
+         KbbRA3ncZEL66VlXK1jFl0th0R7xbF6TeH8u0ggbUWgEbe34RfgGTJFJExz0RQeWVN4S
+         dkIvxH+XdI+SrNRZjxieA1IU9/2C61nLxxON91TJ5igEuALsMv3V9k7HNVx3AyLCLa3g
+         hjumUqZYjT6c1GR7C9srSrSaKPb55pipQ9Wr/Jf40TGEPn2N8/79npNgsu7EQGq9+iiE
+         AtPPSwIgAE94miaBWE7ox0gprK0RqentQOaix5OdLplCAqsinYASyJ1lpjqloSc1Vpgx
+         DX1A==
+X-Forwarded-Encrypted: i=1; AJvYcCWyKJ2KLbrQk6+yL86B1iV9+S+WYBEIGngp4GOovx3o38vEBOqvSk4ctu+rYwKEOc+PFNzVS1g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJG/2TOZmip2oCSGBtmwOTWtWjS7AlVCf/+yxDd2zMoVJiavqY
+	U5wwFbERehzu1IPlTdVu6oLhjTofFV3AL5ObZxjuw3xZubR7lBZi+hQqQkocbnkzMuMSwjP8DAP
+	Epn9kJweWpbtnBRYLOXL3tFtfwhVucxv9uYR2dARuKo2Xa7bH2j3Udfc=
+X-Google-Smtp-Source: AGHT+IHTHErrhRpgfZs8MSHh3jjs2tm56HSyOGzMC3El1nvZN9l0REftjS2coA2GIQbra6PS6+YVky2nxMgc5bew3867f389l8G0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241202-fix-oops-__smc_diag_dump-v2-1-119736963ba9@iiitd.ac.in>
-X-B4-Tracking: v=1; b=H4sIAKqHTWcC/4WNMQ+CMBSE/wrpbElbQK2Tg6wOOhpDCn3AGyikr
- QRD+O9WJl00t7zLu/tuJg4sgiOHaCYWRnTYm2DEJiJVq0wDFHXwRDCRcs4krXGifT84WhSuqwq
- Nqin0oxso26oyAakTWack1AcLIbuib8SApwYm/35c8mt+PpF7OFt0vrfPdX3ka/L/0MhpUJVlK
- oEsVTo9IqLXsapiNCt2FB8owX6gREDJHUtKvueSA/tGLcvyAlRntyYhAQAA
-X-Change-ID: 20241109-fix-oops-__smc_diag_dump-06ab3e9d39f4
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>, 
- "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>, 
- Wen Gu <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: Shuah Khan <shuah@kernel.org>, Anup Sharma <anupnewsmail@gmail.com>, 
- linux-s390@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
- Manas <manas18244@iiitd.ac.in>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1733134252; l=1964;
- i=manas18244@iiitd.ac.in; s=20240813; h=from:subject:message-id;
- bh=zCxOxxK4jUmuWneAk7mzPYC43+hjuOr5TSFC2vSGlrc=;
- b=UJ2tqCJTl+Rjxgg3UW7xGs/kWb0PbQKYRae+HCAb15pkoLFCldFgsbURksOSEj2qN4V8BQfaf
- x1Gk5jADLFOCg3tFAZ9B8zgBAYRtO83dl52EQLzyYyK9kv9RtMJ2kB+
-X-Developer-Key: i=manas18244@iiitd.ac.in; a=ed25519;
- pk=pXNEDKd3qTkQe9vsJtBGT9hrfOR7Dph1rfX5ig2AAoM=
-X-Endpoint-Received: by B4 Relay for manas18244@iiitd.ac.in/20240813 with
- auth_id=196
-X-Original-From: Manas <manas18244@iiitd.ac.in>
-Reply-To: manas18244@iiitd.ac.in
+X-Received: by 2002:a05:6e02:1c88:b0:3a7:7ded:5219 with SMTP id
+ e9e14a558f8ab-3a7c55eb94emr227256685ab.21.1733134465858; Mon, 02 Dec 2024
+ 02:14:25 -0800 (PST)
+Date: Mon, 02 Dec 2024 02:14:25 -0800
+In-Reply-To: <67486b09.050a0220.253251.0084.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <674d8881.050a0220.ad585.004a.GAE@google.com>
+Subject: Re: [syzbot] [bpf?] [trace?] WARNING: locking bug in __lock_task_sighand
+From: syzbot <syzbot+97da3d7e0112d59971de@syzkaller.appspotmail.com>
+To: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org, 
+	bpf@vger.kernel.org, daniel@iogearbox.net, eddyz87@gmail.com, 
+	haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org, 
+	kpsingh@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	mathieu.desnoyers@efficios.com, mattbobrowski@google.com, mhiramat@kernel.org, 
+	netdev@vger.kernel.org, puranjay@kernel.org, rostedt@goodmis.org, 
+	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-From: Manas <manas18244@iiitd.ac.in>
+syzbot has found a reproducer for the following issue on:
 
-The last parameter in __smc_diag_dump (struct nlattr *bc) is unused.
-There is only one instance of this function being called and its passed
-with a NULL value in place of bc.
+HEAD commit:    45e04eb4d9d8 bpf: Refactor bpf_tracing_func_proto() and re..
+git tree:       bpf-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=167e17c0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fb680913ee293bcc
+dashboard link: https://syzkaller.appspot.com/bug?extid=97da3d7e0112d59971de
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=114a7d30580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1395ff78580000
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Manas <manas18244@iiitd.ac.in>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f45e1a59de79/disk-45e04eb4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/6e2405d2c818/vmlinux-45e04eb4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2c2415798034/bzImage-45e04eb4.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+97da3d7e0112d59971de@syzkaller.appspotmail.com
+
+=============================
+[ BUG: Invalid wait context ]
+6.12.0-syzkaller-g45e04eb4d9d8 #0 Not tainted
+-----------------------------
+syz-executor227/5855 is trying to lock:
+ffff8880262a8018 (&sighand->siglock){-...}-{3:3}, at: __lock_task_sighand+0x149/0x2d0 kernel/signal.c:1379
+other info that might help us debug this:
+context-{5:5}
+8 locks held by syz-executor227/5855:
+ #0: ffff88802f97ea90 (&vma->vm_lock->lock){++++}-{4:4}, at: vma_start_read include/linux/mm.h:716 [inline]
+ #0: ffff88802f97ea90 (&vma->vm_lock->lock){++++}-{4:4}, at: lock_vma_under_rcu+0x34b/0x790 mm/memory.c:6278
+ #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: do_fault_around mm/memory.c:5279 [inline]
+ #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: do_read_fault mm/memory.c:5313 [inline]
+ #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: do_fault mm/memory.c:5456 [inline]
+ #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: do_pte_missing mm/memory.c:3979 [inline]
+ #1: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: handle_pte_fault+0x21c3/0x68a0 mm/memory.c:5801
+ #2: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #2: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #2: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: filemap_map_pages+0x243/0x20d0 mm/filemap.c:3645
+ #3: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #3: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #3: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: __pte_offset_map+0x82/0x380 mm/pgtable-generic.c:287
+ #4: ffff8880791b2df8 (ptlock_ptr(ptdesc)#2){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ #4: ffff8880791b2df8 (ptlock_ptr(ptdesc)#2){+.+.}-{3:3}, at: __pte_offset_map_lock+0x1ba/0x300 mm/pgtable-generic.c:402
+ #5: ffffffff8e93c4a0 (rcu_read_lock_sched){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #5: ffffffff8e93c4a0 (rcu_read_lock_sched){....}-{1:2}, at: rcu_read_lock_sched include/linux/rcupdate.h:941 [inline]
+ #5: ffffffff8e93c4a0 (rcu_read_lock_sched){....}-{1:2}, at: pfn_valid+0xf6/0x450 include/linux/mmzone.h:2048
+ #6: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: trace_call_bpf+0xbc/0x8a0
+ #7: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #7: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #7: ffffffff8e93c520 (rcu_read_lock){....}-{1:3}, at: __lock_task_sighand+0x29/0x2d0 kernel/signal.c:1362
+stack backtrace:
+CPU: 0 UID: 0 PID: 5855 Comm: syz-executor227 Not tainted 6.12.0-syzkaller-g45e04eb4d9d8 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_lock_invalid_wait_context kernel/locking/lockdep.c:4826 [inline]
+ check_wait_context kernel/locking/lockdep.c:4898 [inline]
+ __lock_acquire+0x15a8/0x2100 kernel/locking/lockdep.c:5176
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+ _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
+ __lock_task_sighand+0x149/0x2d0 kernel/signal.c:1379
+ lock_task_sighand include/linux/sched/signal.h:743 [inline]
+ do_send_sig_info kernel/signal.c:1267 [inline]
+ group_send_sig_info+0x274/0x310 kernel/signal.c:1418
+ bpf_send_signal_common+0x3c4/0x630 kernel/trace/bpf_trace.c:870
+ ____bpf_send_signal_thread kernel/trace/bpf_trace.c:887 [inline]
+ bpf_send_signal_thread+0x1a/0x30 kernel/trace/bpf_trace.c:885
+ bpf_prog_b7be628660dc1b90+0x23/0x29
+ bpf_dispatcher_nop_func include/linux/bpf.h:1290 [inline]
+ __bpf_prog_run include/linux/filter.h:701 [inline]
+ bpf_prog_run include/linux/filter.h:708 [inline]
+ bpf_prog_run_array include/linux/bpf.h:2177 [inline]
+ trace_call_bpf+0x369/0x8a0 kernel/trace/bpf_trace.c:146
+ perf_trace_run_bpf_submit+0x82/0x180 kernel/events/core.c:10473
+ do_perf_trace_lock include/trace/events/lock.h:50 [inline]
+ perf_trace_lock+0x388/0x490 include/trace/events/lock.h:50
+ trace_lock_release include/trace/events/lock.h:69 [inline]
+ lock_release+0x9cc/0xa30 kernel/locking/lockdep.c:5860
+ rcu_lock_release include/linux/rcupdate.h:347 [inline]
+ rcu_read_unlock_sched include/linux/rcupdate.h:962 [inline]
+ pfn_valid+0x3eb/0x450 include/linux/mmzone.h:2058
+ page_table_check_set+0x22/0x540 mm/page_table_check.c:110
+ __page_table_check_ptes_set+0x30f/0x410 mm/page_table_check.c:225
+ page_table_check_ptes_set include/linux/page_table_check.h:74 [inline]
+ set_ptes include/linux/pgtable.h:288 [inline]
+ set_pte_range+0x724/0x750 mm/memory.c:5067
+ filemap_map_order0_folio mm/filemap.c:3624 [inline]
+ filemap_map_pages+0x11c6/0x20d0 mm/filemap.c:3678
+ do_fault_around mm/memory.c:5280 [inline]
+ do_read_fault mm/memory.c:5313 [inline]
+ do_fault mm/memory.c:5456 [inline]
+ do_pte_missing mm/memory.c:3979 [inline]
+ handle_pte_fault+0x31d6/0x68a0 mm/memory.c:5801
+ __handle_mm_fault mm/memory.c:5944 [inline]
+ handle_mm_fault+0x1106/0x1bb0 mm/memory.c:6112
+ do_user_addr_fault arch/x86/mm/fault.c:1338 [inline]
+ handle_page_fault arch/x86/mm/fault.c:1481 [inline]
+ exc_page_fault+0x459/0x8c0 arch/x86/mm/fault.c:1539
+ asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
+RIP: 0033:0x7f2c735865f8
+Code: Unable to access opcode bytes at 0x7f2c735865ce.
+RSP: 002b:00007ffcc6892fb8 EFLAGS: 00010202
+RAX: 00007f2c735b6ad8 RBX: 0000000000000000 RCX: 0000000000000004
+RDX: 00007f2c735b7ce0 RSI: 0000000000000000 RDI: 00007f2c735b6ad8
+RBP: 00007f2c735b5118 R08: 00007f2c7350e2b0 R09: 00007f2c7350e2b0
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f2c735b7cc8
+R13: 0000000000000000 R14: 00007f2c735b7ce0 R15: 00007f2c7350e590
+ </TASK>
+
+
 ---
-Changes in v2:
-- Added target tree and prefix
-- Carried forward Reviewed-by: tag from v1
-- Link to v1: https://lore.kernel.org/r/20241109-fix-oops-__smc_diag_dump-v1-1-1c55a3e54ad4@iiitd.ac.in
----
- net/smc/smc_diag.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/net/smc/smc_diag.c b/net/smc/smc_diag.c
-index 6fdb2d96777ad704c394709ec845f9ddef5e599a..8f7bd40f475945171a0afa5a2cce12d9aa2b1eb4 100644
---- a/net/smc/smc_diag.c
-+++ b/net/smc/smc_diag.c
-@@ -71,8 +71,7 @@ static int smc_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
- 
- static int __smc_diag_dump(struct sock *sk, struct sk_buff *skb,
- 			   struct netlink_callback *cb,
--			   const struct smc_diag_req *req,
--			   struct nlattr *bc)
-+			   const struct smc_diag_req *req)
- {
- 	struct smc_sock *smc = smc_sk(sk);
- 	struct smc_diag_fallback fallback;
-@@ -199,7 +198,6 @@ static int smc_diag_dump_proto(struct proto *prot, struct sk_buff *skb,
- 	struct smc_diag_dump_ctx *cb_ctx = smc_dump_context(cb);
- 	struct net *net = sock_net(skb->sk);
- 	int snum = cb_ctx->pos[p_type];
--	struct nlattr *bc = NULL;
- 	struct hlist_head *head;
- 	int rc = 0, num = 0;
- 	struct sock *sk;
-@@ -214,7 +212,7 @@ static int smc_diag_dump_proto(struct proto *prot, struct sk_buff *skb,
- 			continue;
- 		if (num < snum)
- 			goto next;
--		rc = __smc_diag_dump(sk, skb, cb, nlmsg_data(cb->nlh), bc);
-+		rc = __smc_diag_dump(sk, skb, cb, nlmsg_data(cb->nlh));
- 		if (rc < 0)
- 			goto out;
- next:
-
----
-base-commit: 40384c840ea1944d7c5a392e8975ed088ecf0b37
-change-id: 20241109-fix-oops-__smc_diag_dump-06ab3e9d39f4
-
-Best regards,
--- 
-Manas <manas18244@iiitd.ac.in>
-
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
