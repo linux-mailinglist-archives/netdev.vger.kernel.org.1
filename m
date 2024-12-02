@@ -1,118 +1,186 @@
-Return-Path: <netdev+bounces-148014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D4229DFCBC
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:04:48 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F89A16115A
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 09:04:22 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C201F941B;
-	Mon,  2 Dec 2024 09:04:22 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C569DFCD3
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:12:16 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4E21F8AEE
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 09:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C911B20D9A
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 09:12:14 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240561FA154;
+	Mon,  2 Dec 2024 09:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OWCmBc+f"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC6C1D6DB5
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 09:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733130262; cv=none; b=l4YEZPWDxnleIDjZsK7ltf+nB9Qi/RQ3d6WqwwynGyTOA6ud4v5XKdY8PdKt96aIgjej0IEzOCmWqH4rvOughHH9f3kdIHyIn/O/ge05Saoc4AM3ek3dfDIUQwNl6ZzzAzUrVv+uo39H4okBPOKHkTNN7Cwt0psxPLWH7/bn5FM=
+	t=1733130730; cv=none; b=MofKpb9Jyz//mtqB9o51kMo47JZaSgPz8QXzIO8jr3l+M7e7NB8zA4K8Z3re78vLuUsfxftcGiNz2XavBAwoPGQ2VIDwf6N4+q0f6740gmGtnblaRJ3b7zOhWtjcTACzKnPUR/FjFTNJFLJwFgo1j/1nDWpB+sSXqHlBtiRlHEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733130262; c=relaxed/simple;
-	bh=NyOjJgK3ANMxtijaU7GELZluAOvG0y11W041vDVN7d8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A5Wu9Omp0A5PLaXjCSVjR5l0idZhM3f7f3ZX0Ymfffx66+I+yXwxcrBQFEefbuij4CtalGQyesEAvHbaOqfznvtEoTHQ3BkYKYvyhaNRQxZ7O+jpJjgYZhoECoG6ARfR9gVmd1zr/7sO0WHxvx2Cmt+D7NE1sNQbHK1XGF5TBzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tI2Lp-0001g4-77; Mon, 02 Dec 2024 10:04:17 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tI2Lo-001Ge8-0c;
-	Mon, 02 Dec 2024 10:04:16 +0100
-Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 88005383428;
-	Mon, 02 Dec 2024 09:04:16 +0000 (UTC)
-Date: Mon, 2 Dec 2024 10:04:16 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org, 
-	kernel@pengutronix.de
-Subject: Re: [PATCH net 0/14] pull-request: can 2024-11-29
-Message-ID: <20241202-nickel-panda-of-argument-246281-mkl@pengutronix.de>
-References: <20241129122722.1046050-1-mkl@pengutronix.de>
- <20241130142416.66e2caa2@kernel.org>
+	s=arc-20240116; t=1733130730; c=relaxed/simple;
+	bh=OPUB++lWXiPKKiYrOdq6xP9jYd3439A88wogpEvRSx8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sDRPP0/QJkMpLI/CXfuVrIVpM4HJSALTsdnxcghE0PHaMMANTpkXJs8fdiQTc4pybqYNjxDIPZ1NOwjmxBaEHGOZptOtt8jP12VQHx8AlKsSXxKZxQUuk5P/v+//3hYXunHXRImeKeKzyOfmqba5lfjTBfWfhlDN7OXSgk6Lokc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OWCmBc+f; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5cec9609303so4739115a12.1
+        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 01:12:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733130726; x=1733735526; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ASgU89klsCyJOGimjcpjVTnKSHB+c5COcKOQEBObRRQ=;
+        b=OWCmBc+ffeMGVDMjRAVCF3V0+pdBxGm9OBTNd0cUjC2sBYMxt4yQebNktZSbSNTj13
+         wH1UqYMQwn7P4fP0GcB2DzQbwnu1uJZCBQedWVGhgNpNfQFGgIociToCIO7PVHwjt2a3
+         Ikor1wyA7cgTCBun6rPDIVTyINvDERGrCHlTUZGO8aIcKIdVPttjg5iLOdznA3MNH7mz
+         rJTq17AlI695s5TFg8M4hEPu/5PxVnY21fpYe8eBsA00f5Hpz4FODvmvJ3nSLxlEJy11
+         YT98BoYgKAOq+RhWR7pr6fhVCvnL025O/eVlbaZ55UpiyyzdkQiv6uQrku3rJv/iRIJ3
+         celg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733130726; x=1733735526;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ASgU89klsCyJOGimjcpjVTnKSHB+c5COcKOQEBObRRQ=;
+        b=CyahdilrvFh5ymv+6V+2ZlTy/BDeoyvOBD8R6NK2XIwKvX6R3ws5G1lZyRe9btm+VJ
+         pFBd66HboMbGnipCLpwV92YcBSE9KKXMDGF8gk2lETwNxm6KqrTN4LQjHoCT4CFUgbiJ
+         w/IHL7t37gM9oN/hX/98E3bRgfoJKl7jpkkZn/DPtl9y4XUwHZ341SkLYD4M1xDH0GU9
+         b7afbMSk8wAjH2UqqsfOGO7OSbkYXqJ+zLP4IVBvlnTN7yl1l2scIMvqyastwvgUFNlu
+         W5zGFlD39FESKDEuOfK6eZlHJ2GLS0+SRWrz9ovK9GFuzq5MKExkNWaJ1Pk5iSYgwTAi
+         dBnA==
+X-Gm-Message-State: AOJu0Yx16Kh67d7QfpT8980XeprS3t/yhI/2fzRLfzsBzLZ9f5ci3YW7
+	hX8WP1VMlnTusx5fMpIHca4PZcyY9dH2nshCBIfJ3GNszeIseda9QJcDn4JFmLTN4bnXlx7g2w2
+	3MJUhz80mwmmThQCCQTT9KZ+fmdNoVNhPukmS
+X-Gm-Gg: ASbGncuQ1lIIfo1jHmin0lCx8hxEVRQYr3iHpw3Z/sPtsvyGiY2DFnQBt9i4YuILGtZ
+	a6fNlUrtMKfLIZ/axo45UlN2cVqqXBQ==
+X-Google-Smtp-Source: AGHT+IEbrbrU0n3XbW2eEumbJKfBoBteVIzyiSfnkqgosJ/0mmqaHBPPkFB/X+z+TGp4Ajnk3L0KEkudbe/K1MqAxk4=
+X-Received: by 2002:a05:6402:d07:b0:5cf:9e5:7d20 with SMTP id
+ 4fb4d7f45d1cf-5d080bd3c69mr23271899a12.17.1733130726250; Mon, 02 Dec 2024
+ 01:12:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ukmqvppoufracluz"
-Content-Disposition: inline
-In-Reply-To: <20241130142416.66e2caa2@kernel.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-
-
---ukmqvppoufracluz
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
+References: <7d13b21f439acd027e510890ba4b353994bad058.1733129879.git.pabeni@redhat.com>
+In-Reply-To: <7d13b21f439acd027e510890ba4b353994bad058.1733129879.git.pabeni@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 2 Dec 2024 10:11:55 +0100
+Message-ID: <CANn89iKTA7YN=cZebH5NaNV41LuGKk5GfcZTf3yyrcJJE8EBpQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net] ipmr: tune the ipmr_can_free_table() checks.
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net 0/14] pull-request: can 2024-11-29
-MIME-Version: 1.0
 
-On 30.11.2024 14:24:16, Jakub Kicinski wrote:
-> On Fri, 29 Nov 2024 13:16:47 +0100 Marc Kleine-Budde wrote:
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/=
-linux-can-fixes-for-6.12-20241104
->=20
-> Looks like the tag here is stale?
+On Mon, Dec 2, 2024 at 9:59=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> Eric reported a syzkaller-triggered splat caused by recent ipmr changes:
+>
+> WARNING: CPU: 2 PID: 6041 at net/ipv6/ip6mr.c:419
+> ip6mr_free_table+0xbd/0x120 net/ipv6/ip6mr.c:419
+> Modules linked in:
+> CPU: 2 UID: 0 PID: 6041 Comm: syz-executor183 Not tainted
+> 6.12.0-syzkaller-10681-g65ae975e97d5 #0
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
+> 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+> RIP: 0010:ip6mr_free_table+0xbd/0x120 net/ipv6/ip6mr.c:419
+> Code: 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c
+> 02 00 75 58 49 83 bc 24 c0 0e 00 00 00 74 09 e8 44 ef a9 f7 90 <0f> 0b
+> 90 e8 3b ef a9 f7 48 8d 7b 38 e8 12 a3 96 f7 48 89 df be 0f
+> RSP: 0018:ffffc90004267bd8 EFLAGS: 00010293
+> RAX: 0000000000000000 RBX: ffff88803c710000 RCX: ffffffff89e4d844
+> RDX: ffff88803c52c880 RSI: ffffffff89e4d87c RDI: ffff88803c578ec0
+> RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
+> R10: 0000000000000001 R11: 0000000000000001 R12: ffff88803c578000
+> R13: ffff88803c710000 R14: ffff88803c710008 R15: dead000000000100
+> FS: 00007f7a855ee6c0(0000) GS:ffff88806a800000(0000) knlGS:00000000000000=
+00
+> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f7a85689938 CR3: 000000003c492000 CR4: 0000000000352ef0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+> <TASK>
+> ip6mr_rules_exit+0x176/0x2d0 net/ipv6/ip6mr.c:283
+> ip6mr_net_exit_batch+0x53/0xa0 net/ipv6/ip6mr.c:1388
+> ops_exit_list+0x128/0x180 net/core/net_namespace.c:177
+> setup_net+0x4fe/0x860 net/core/net_namespace.c:394
+> copy_net_ns+0x2b4/0x6b0 net/core/net_namespace.c:500
+> create_new_namespaces+0x3ea/0xad0 kernel/nsproxy.c:110
+> unshare_nsproxy_namespaces+0xc0/0x1f0 kernel/nsproxy.c:228
+> ksys_unshare+0x45d/0xa40 kernel/fork.c:3334
+> __do_sys_unshare kernel/fork.c:3405 [inline]
+> __se_sys_unshare kernel/fork.c:3403 [inline]
+> __x64_sys_unshare+0x31/0x40 kernel/fork.c:3403
+> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+> entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f7a856332d9
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48
+> 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+> 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007f7a855ee238 EFLAGS: 00000246 ORIG_RAX: 0000000000000110
+> RAX: ffffffffffffffda RBX: 00007f7a856bd308 RCX: 00007f7a856332d9
+> RDX: 00007f7a8560f8c6 RSI: 0000000000000000 RDI: 0000000062040200
+> RBP: 00007f7a856bd300 R08: 00007fff932160a7 R09: 00007f7a855ee6c0
+> R10: 0000000000000000 R11: 0000000000000246 R12: 00007f7a856bd30c
+> R13: 0000000000000000 R14: 00007fff93215fc0 R15: 00007fff932160a8
+> </TASK>
+>
+> The root cause is a network namespace creation failing after successful
+> initialization of the ipmr subsystem. Such a case is not currently
+> matched by the ipmr_can_free_table() helper.
+>
+> New namespaces are zeroed on allocation and inserted into net ns list
+> only after successful creation; when deleting an ipmr table, the list
+> next pointer can be NULL only on netns initialization failure.
+>
+> Update the ipmr_can_free_table() checks leveraging such condition.
+>
+> Reported-by: Eric Dumazet <edumazet@google.com>
+> Fixes: 11b6e701bce9 ("ipmr: add debug check for mr table cleanup")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+> v1 -> v2:
+>  - move the netns init completed check in a new helper
+> ---
+>  include/net/net_namespace.h | 5 +++++
+>  net/ipv4/ipmr.c             | 2 +-
+>  net/ipv6/ip6mr.c            | 2 +-
+>  3 files changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
+> index 873c0f9fdac6..ac301c7d48a4 100644
+> --- a/include/net/net_namespace.h
+> +++ b/include/net/net_namespace.h
+> @@ -325,6 +325,11 @@ static inline int check_net(const struct net *net)
+>  #define net_drop_ns NULL
+>  #endif
+>
+> +/* Returns true if the netns initialization is completed successfully */
+> +static inline bool net_initialized(struct net *net)
+> +{
+> +       return net->list.next;
 
-Doh! That was obviously an old tag. I've send an updated PR:
+It is unclear what lock protects this read (or context it can be used)
 
-https://lore.kernel.org/20241202090040.1110280-1-mkl@pengutronix.de
+Perhaps we could make clear no lock is needed (and add a const qual)
 
-Sorry for the noise,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---ukmqvppoufracluz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmdNeAwACgkQKDiiPnot
-vG+QDgf/SazZtYURExNRxKZf1vZnb5dL0o9Y5T1d/7upG9XY90MmpX8Ak6nGjbJg
-KPnWLIa+HtzEANAf9sflfUii3zMcrJGkOX21QkPmvEEskgsPx5Nex3vRZLafuquI
-4QS0N2VZ/8pjy/kffwT8GyxkEZaikd0QXUkaqIIQYpvbRQ+CFp/yoUfNmgH1KE9y
-bzhRtdcj8ja+AIw95zeAMzokNXha1YLuKxzHef/ybOhBmycuYP2HOsVaXS/W4V0b
-s9LGAT2jHEWrnPBpIf6xiwWaAdYMilGrBlFCzaeiBORYAugoyNK0bLmJQa0rSW2E
-Jt3vUfcPLX+i64/qRS5btUybD0IzmQ==
-=Da2m
------END PGP SIGNATURE-----
-
---ukmqvppoufracluz--
+static inline bool net_initialized(const struct net *net)
+{
+       return READ_ONCE(net->list.next);
+}
 
