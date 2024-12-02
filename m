@@ -1,81 +1,78 @@
-Return-Path: <netdev+bounces-148040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9928C9DFF2B
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:42:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA7AF9DFFCB
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 12:10:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41D0FB23A7D
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 10:40:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FC42281F23
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:10:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFDE11FCFC0;
-	Mon,  2 Dec 2024 10:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0302C1FCFF6;
+	Mon,  2 Dec 2024 11:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="CLkHwLFE"
+	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="CbdEhWDn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D631FCCEA
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 10:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F7D1FCFE7
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 11:09:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733135998; cv=none; b=b+Fr8KeB21JzavVFMvFp5rjZ/ZuVSRYhhYA6knwk5VLtJOOlbps2njugH7KSO2bfxFHdJSodTMEyYV5+EQtAqOC3r3cjHYRbsps5blI5V4KBSyOkUKe3ohxNPW3qL+qP54ocgryY2igRhNyS7W9oJvS588PIt5bGrv1Ig8iPULU=
+	t=1733137789; cv=none; b=sOSyeF0aQKbR+souuUSVaoUBp51GEQdNs86HT9TztDH+eJ8jGSC82aVqLVfF3CcUBtqlb/Avb3b5LkJnXH8xkD3dfsls5C8XALxejjcYrenT0W7wiPsAm2Sqjdva5QUOUPx5uUugY6Pty35SMnHxhkcJcvv6rHGH5jSF/KwWWyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733135998; c=relaxed/simple;
-	bh=DYNaZn6TdVJSB3HrT1+ewVokf5PU3016tstmnTWQa0s=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=GyC8ga5kjkXFD+kvP+aIatmNx4N3TMkBV5G6DAZvUcsu6yfEIpntAQhmh50LJcDv8CqS8SQG1QNXFItF0Dvz9ZbVmgwmXLBoqnaJl8TAdOmROlaMOXcwuLUDx+m+KsYHq/Gb1jZQ9XvNJHEnJiVqIpc9gWP5WyIOqxdwATuu3r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=CLkHwLFE; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-385e96a285eso777690f8f.3
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 02:39:56 -0800 (PST)
+	s=arc-20240116; t=1733137789; c=relaxed/simple;
+	bh=qUcESZ0YUaBtbhD+aoGet9WbGSp2Qo1gyt7ZDRohhNI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RWPAHDdyodtFL+gIf3YLbxn6fIlGOwM3Aw+pLxXDPEloac3FbR119bLKXpXgKOzT/rqC47VpFxQCHZnfiG6VNBqw0Cx302D9OqTvWQ7+7Wue7v2rxd+fjna1VbJXreUKtmqVnpxCaFUlaCbgsHBl/nhn0zeuH1c7sYutVhvnm8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=CbdEhWDn; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ffc3f2b3a9so52125381fa.1
+        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 03:09:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1733135995; x=1733740795; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8RX2YCHdx4g9Z1WhkvOgdHooa/D9EB/cVjTLy89IFDI=;
-        b=CLkHwLFEx4JePpoHo205LaMuj2M1OPXxOTdVZwskT2OnVmW6nj8dG/mzWFEx4j7YtM
-         pDxzbuiJgktSXA4sAsWoAt9ZWB6nxERXYt7BnHWwHAIDYnar3MJVgJhxWq++0Pzzi6FS
-         V8ab/TEgyMQSdQqGXgBed8fZ96aQrDmLQEgO8UK+vSLLeCiXgMGYgSHlNNZr24TCW3+p
-         VdAb7wfdugyjLc8evVZ8px3c+fIoBlLCzJHtieYsbiQH+J+Elxwcgw1l6/+D6XXySkEb
-         kmNhZhPURua2omfq0XIkp/p64P7j7tkIHRL2e2tQ78oS+60+TCpI6wqVqvST852pxOkg
-         dNgA==
+        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1733137786; x=1733742586; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JIz3utMm0/sU5BMr5sIEd+mlpszlZQSMeIY1+TfyJxY=;
+        b=CbdEhWDnrF5LHf8ong5EQLwqU++3HIUr6JWW9UhSDEUGeGqZ1xZpkSy1qV+nUgc1GQ
+         KmrqeSUDUCn/TbP0SDiCtPDWuOLbf9F2g2v459mK8+QXP08G1cfQPpJ4sfeMjdMMNLlr
+         GC5fhshN6b4Gk8kUr1KOpMGYsHuiga5QmPo7XkxTFcXoEwqlL+pqL96d9SaF1mRrn9L9
+         A3HkCbMu9C/7P21fQmV6R3gjdhrsY2gNVWrzI+3BZn5ami3i/P8xwuQXsKsnAFo2HV69
+         LsZzZjeVo5ZlLZrVBl859FG3+auRIp+a/cKGfXK/KROWiDMPaXbBRNs5rCqbOGEQK7Kr
+         g5IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733135995; x=1733740795;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8RX2YCHdx4g9Z1WhkvOgdHooa/D9EB/cVjTLy89IFDI=;
-        b=wn9R1gmRrA2Wk/cWhS29OC6pMeEs0xtF6g2ZzVw9hyoZDZyyKO/FJY53Ajyw4y1IR4
-         WgoRhLRlOHspctULhATyHRKBMtaknIwMy1aEDiODTU+3BthPSHAgR/81tWdRz/OVThSc
-         hejduCA6fFZJSVfogXRimbsViFN/rjFM9+gacgb5LTbCsEhOXeYaFtiY04wpBl5nLg/k
-         k5rilkIVlp+5HPWafSYMJBaxL+A+JzZGkCK4bqSXH/fvxPzu7y2IaLi7GfEl1yJoMFCZ
-         o/7hXHFoYbNf1s3ZoK3l8Kisp5/ctKOIvmmUobHCOq4nGTfqIKWPltd3/LB1iMhYyIXl
-         PhWA==
-X-Forwarded-Encrypted: i=1; AJvYcCVmxkXeyMPDB6NBDy9wPtdzvdDpZzrTAsaRSeEIeJOeFGkHWEZ8AjQ/a2ULCJXnC+E2RI+zp4w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvF9XZIuHVYY7+bR2+/0E7PD8WdX+QmPmX+0ThXGhYr3ek4zx0
-	/rEPtJlV3HR1CwMr8hJxwKvsbZKSc/41OQntQ/7GsEgtKlYNvWfS7dR+Hn2E0ck=
-X-Gm-Gg: ASbGncvDKk49axtLIq3GtqDsu4Uag0dyNV8+QytKhUaO0YQlA0BkrdWCCyjA8laD6t0
-	TjKFmEJOHZJzM7nwHWU/Nv2XzsgETkyiY9N3O+gXTXbeAIIOa5KTQZmb5Ri6ZGOFGPk942LPNjy
-	Wsf1XqG6lZDPpo02d5R/xuEJjYqzAeXASv/6PxMlk7unVhPhzB7u/9XlJV+jPSdQKCInHcY9vMG
-	/eto3dHE7pdkhIz45tCRUJaoGDHkzp8MMZg2uN01ViC5inkkFI/64CGaT/pmenYqNxYkTLe159l
-	10rV3NRSBA==
-X-Google-Smtp-Source: AGHT+IEuOgKQVrRqq3CFTMvxvB3bWglZA0FJeYVZhwfg4uT/D5QQjHJ2BfYLevyx6w+QF7nwwpfgBw==
-X-Received: by 2002:a05:6000:178d:b0:385:dfab:1643 with SMTP id ffacd0b85a97d-385dfab180cmr10298039f8f.27.1733135994887;
-        Mon, 02 Dec 2024 02:39:54 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:5d0b:f507:fa8:3b2e? ([2001:67c:2fbc:1:5d0b:f507:fa8:3b2e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434b0d9bc91sm151245135e9.9.2024.12.02.02.39.53
+        d=1e100.net; s=20230601; t=1733137786; x=1733742586;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JIz3utMm0/sU5BMr5sIEd+mlpszlZQSMeIY1+TfyJxY=;
+        b=a7lyMylJjOegQVAeSUMOUPkht/2m4sVi3lvAKRbeuaqjnB9X18UKokaLa1Ids1AAwX
+         I430m3o+lj6VXh0E2g7pa8eAz/HvN0k23jPZQmr1sPezoQcuYLAtqyKABkobW6XK7oS0
+         /PgrruIjNi3cUZTlkJPeYpCI4IOhPwKbfKTrRHeKdvIE01sBigWsID/4nDhPvbcTxpSO
+         f7TZdWgx3vojVkGrQI76p7y5q38uUn85/jHfgn/3KnFeXCKGr7YfTc8A5GCOf/zyr39r
+         LUn5NzXWDDto4RJ5SkWMAd7heHMNcz7woN+PMDZorqhM0OVQ1bArq6hsBc/U7CqPbi4H
+         VZTg==
+X-Forwarded-Encrypted: i=1; AJvYcCXcqmg8nVInQcS/EpJVRd5bcOvqa936BDQvH37bIbyP9wlDJlDJTbCXCltSvUTmuVSKfX4oPgA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzT8DckMSBolE7f325SEGToTGjPN9KSkRGVlYwJqE4IHygVJHSu
+	M2hnm3/lFMC6XjMLKACJzLYaGim2YBRnh9H7rKfe5ztQhfJM43bFlnNvK7phhos=
+X-Gm-Gg: ASbGncsu0YGvTmM0lxd2u7dT5OnboX1xPcHfjgatjGulQrJNSzN67+PfvleS4fKD+0F
+	V/SrNHbA57jTk7Mtwfp4cu/ibbF5FbzkjJHa++DxfDECpNJkktO5NQykbAiXTb/+wp9wMwvLftu
+	InqvKgA/uJ+jbYFxoQrcjAu8jHdmSD5lpT7rX034pE1vAbYqJOgRaA/xMn0r7Y7W19CxYv97w8j
+	yPf3AM7FRUcUkxmf2D0e8tIR4xeoOVlH+qGwuf4Ic+jW55mjgJK/TRbKQiEYFxAera8eA==
+X-Google-Smtp-Source: AGHT+IHAvBtf0OQXFo4WX8SQik/WEe881XNPtRWavelPBjYiw87rg6F4KhsnlxUq7isC2k5Va1zqnw==
+X-Received: by 2002:a05:6512:3e1e:b0:53d:eced:f634 with SMTP id 2adb3069b0e04-53df01171b4mr16308916e87.48.1733137786215;
+        Mon, 02 Dec 2024 03:09:46 -0800 (PST)
+Received: from [192.168.0.104] ([91.198.101.25])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53df649f6dcsm1421513e87.243.2024.12.02.03.09.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Dec 2024 02:39:54 -0800 (PST)
-Message-ID: <b868dcf1-7c0d-4511-8016-89302e7cb9c4@openvpn.net>
-Date: Mon, 2 Dec 2024 11:40:31 +0100
+        Mon, 02 Dec 2024 03:09:45 -0800 (PST)
+Message-ID: <c1296735-81be-4f7d-a601-bc1a3718a6a2@cogentembedded.com>
+Date: Mon, 2 Dec 2024 16:09:43 +0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,115 +80,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 05/23] ovpn: keep carrier always on
-From: Antonio Quartulli <antonio@openvpn.net>
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+Subject: Re: [PATCH] net: phy: phy_ethtool_ksettings_set: Allow any supported
+ speed
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- sd@queasysnail.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-5-de4698c73a25@openvpn.net>
- <6a171cc9-a052-452e-8b3d-273e5b46dae5@gmail.com>
- <89ae26a2-0a09-4758-989e-8f45a707a41b@openvpn.net>
- <e2caab8a-343e-4728-b5a7-b167f05c9bb9@gmail.com>
- <c933e2bf-b19c-4f8b-b2c0-44de50eb4141@openvpn.net>
- <1cf97615-a38d-48c3-9e23-4ba82012b32d@gmail.com>
- <c9185b5b-942d-4927-8171-f3460619aed1@openvpn.net>
- <c62208a4-5396-4116-add1-4ffbc254a09d@gmail.com>
- <cdbeecb8-e468-4925-9ab4-c77accf806b9@openvpn.net>
- <debdfbda-36f8-4c83-bb54-3b48af77e7bd@gmail.com>
- <55d91682-762e-411e-8abc-0790a9d81102@openvpn.net>
-Content-Language: en-US
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <55d91682-762e-411e-8abc-0790a9d81102@openvpn.net>
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Michael Dege <michael.dege@renesas.com>,
+ Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+ Dennis Ostermann <dennis.ostermann@renesas.com>
+References: <20241202083352.3865373-1-nikita.yoush@cogentembedded.com>
+ <20241202100334.454599a7@fedora.home>
+ <73ca1492-d97b-4120-b662-cc80fc787ffd@cogentembedded.com>
+ <Z02He-kU6jlH-TJb@shell.armlinux.org.uk>
+ <eddde51a-2e0b-48c2-9681-48a95f329f5c@cogentembedded.com>
+ <Z02KoULvRqMQbxR3@shell.armlinux.org.uk>
+Content-Language: en-US, ru-RU
+From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+In-Reply-To: <Z02KoULvRqMQbxR3@shell.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 26/11/2024 09:17, Antonio Quartulli wrote:
-[...]
->> It wasn't suggested to destroy the interface in case of interface 
->> becoming non-operational. I apologize if something I wrote earlier 
->> sounded like that. The interface existence stays unquestionable. It's 
->> going to be solid persistent.
->>
->> Back to the proposed rephrasing. If the 'full picture' means forcing 
->> the running state indication even when the netdev is not capable to 
->> deliver packets, then it looks like an attempt to hide the control 
->> knob of the misguiding feature somewhere else.
->>
->> And since the concept of on-purpose false indication is still here, 
->> many words regarding the control plane and a full picture do not sound 
->> good either.
+>> Right now, 'ethtool -s tsn0 master-slave forced-slave' causes a call to
+>> driver's ethtool set_link_ksettings method. Which does error out for me
+>> because at the call time, speed field is 2500.
 > 
+> Are you saying that the PHY starts in fixed-speed 2.5G mode?
+> 
+> What does ethtool tsn0 say after boot and the link has come up but
+> before any ethtool settings are changed?
 
-Sergey,
+On a freshly booted board, with /etc/systemd/network temporary moved away.
 
-I have played a bit with this and, if I understood your idea correctly, 
-the following should be an acceptable design for a P2P interface:
+(there are two identical boards, connected to each other)
 
-* iface created -> netif_carrier_off
-* peer added -> netif_carrier_on
-* peer deleted -> netif_carrier_off
-* iface goes down -> peer deleted -> netif_carrier_off
-* iface goes up -> carrier stays down until peer is added
+root@vc4-033:~# ip l show dev tsn0
+19: tsn0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+     link/ether 3a:e3:5c:56:ba:bd brd ff:ff:ff:ff:ff:ff
 
+root@vc4-033:~# ethtool tsn0
+Settings for tsn0:
+         Supported ports: [ MII ]
+         Supported link modes:   2500baseT/Full
+         Supported pause frame use: Symmetric Receive-only
+         Supports auto-negotiation: No
+         Supported FEC modes: Not reported
+         Advertised link modes:  2500baseT/Full
+         Advertised pause frame use: No
+         Advertised auto-negotiation: No
+         Advertised FEC modes: Not reported
+         Speed: 2500Mb/s
+         Duplex: Unknown! (255)
+         Auto-negotiation: off
+         master-slave cfg: unknown
+         Port: Twisted Pair
+         PHYAD: 0
+         Transceiver: external
+         MDI-X: Unknown
 
-P2MP interface behaviour is not changed: when interface is brought up 
-carrier goes on and it is never turned off.
+PHY driver is out of tree and can do things wrong. AFAIU it does nothing more than wrapping Marvell 
+setup sequences into a phy driver skeleton.
 
-How does it sound?
+Still, with the patch in question applied, things just work:
 
-My main concern was about bringing the interface down, but this is 
-actually not happening. Correct me if I am wrong.
+root@vc4-033:~# ip l set dev tsn0 up
+root@vc4-033:~# ethtool -s tsn0 master-slave forced-slave
+[   83.743711] renesas_eth_sw e68c0000.ethernet tsn0: Link is Up - 2.5Gbps/Full - flow control off
+root@vc4-033:~# ethtool tsn0
+Settings for tsn0:
+         Supported ports: [ MII ]
+         Supported link modes:   2500baseT/Full
+         Supported pause frame use: Symmetric Receive-only
+         Supports auto-negotiation: No
+         Supported FEC modes: Not reported
+         Advertised link modes:  2500baseT/Full
+         Advertised pause frame use: No
+         Advertised auto-negotiation: No
+         Advertised FEC modes: Not reported
+         Speed: 2500Mb/s
+         Duplex: Full
+         Auto-negotiation: off
+         master-slave cfg: forced slave
+         master-slave status: slave
+         Port: Twisted Pair
+         PHYAD: 0
+         Transceiver: external
+         MDI-X: Unknown
 
-Thanks.
-
-Regards,
-
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+root@vc4-033:~# ip a add 192.168.70.11/24 dev tsn0
+root@vc4-033:~# ping 192.168.70.10
+PING 192.168.70.10 (192.168.70.10) 56(84) bytes of data.
+64 bytes from 192.168.70.10: icmp_seq=1 ttl=64 time=1.03 ms
+64 bytes from 192.168.70.10: icmp_seq=2 ttl=64 time=0.601 ms
+...
 
