@@ -1,110 +1,164 @@
-Return-Path: <netdev+bounces-148262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B7F99E0F6A
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:52:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC5829E0F5A
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:40:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F25D0282FDA
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:52:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 499DF282F9B
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:40:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F268B1DFDB4;
-	Mon,  2 Dec 2024 23:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF531DF98D;
+	Mon,  2 Dec 2024 23:40:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="eSrZPkDy"
+	dkim=pass (2048-bit key) header.d=atmark-techno.com header.i=@atmark-techno.com header.b="TsBMBvrs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from gw2.atmark-techno.com (gw2.atmark-techno.com [35.74.137.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609CE1DFD86
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 23:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7989F2C18C
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 23:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.74.137.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733183563; cv=none; b=cBvVca9N/TYp7RoTjvPix5Y7aA8cEXyfbVrQiXEMMizGQwHanwuRzEw1z31ANnqSaOl5FndG8og/Qkx3OfXVxZjVMPNXtV07XIa9ckkMrXjJlg5iRKUTM/iAEYTHUtqjvYfTFR33w6sElcqxCieNLEmSelqBg8MAmuPg/BMDWn0=
+	t=1733182803; cv=none; b=Lh857IxTUXfgetdyVoxfo8VXgS+Ygzvi73QWW71aaAlJg7zwPoN4DfQZzgiBcWf1nrx9ptczUYj9XuC+5SqUJ/mFY6BMcKjQxLI9wYYect8XTKXZ0g1CiTBCUIN97sFVpItOlnHhFyeINz0IWo86dyXOmjZAZl+q/aqXIeH8pPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733183563; c=relaxed/simple;
-	bh=za2cz9ezczXWzWIsh7AglwUckecj/uWKxmHRIJ0+tOE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l2VJZwxJmX5fAPGyV1NJqZGdKcW0AL7zPuqdy4MHtlwq/aRQXrCvgbp5fcO+GmfNHKN96q8s4HeDSyC63qfDeafa049oGyoRAPm9Js7qM9QSRGF/i/1SyyTUiVEzIz7tsVvDqliq3DV5AvpVYstOY3cPTdTpxRDMZMqZmMvsBTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=eSrZPkDy; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=krcAhW83wyDKaQwmQqtFekl0xKkVchV+xRIcnVPYinA=; t=1733183562; x=1734047562; 
-	b=eSrZPkDyvmXDOnOA+qzN9g+YI1qPSMuSO6R14pgfwr8f64FguM/L54sT2Cgc/FIEP18/+wB3Syn
-	1+ZRkvuhbmdOcHqOs7wHsU6cmxapxQwhG4qgEU4dX2pv4kdw+tPytt6g4PEEhRcZ2adlzPgzHRNGn
-	f4SkNng4PCViUzqELuIXcfUlWEb1wZnMp1AL6T9cO+8TlTD7vhAA5mHXm0DI9cl3GHJUOqCitUOEh
-	B4Ft8kgDl97aZQPyV0ATPJ7ht0eUDEIMVClsn+zMzwXxbtUumGySE1cpnIrk9NLiF1NDyklhawzny
-	3vyWEM3LGvUyTMNFX+XUjFp9A/ufU6q9rYew==;
-Received: from mail-ot1-f45.google.com ([209.85.210.45]:61798)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tIFpJ-0008VJ-Fk; Mon, 02 Dec 2024 15:27:38 -0800
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-71d40fdde2fso1777593a34.3;
-        Mon, 02 Dec 2024 15:27:37 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWG6wB7Nh/aD+6/hk8r0Q38Od/7c20/ghHp8YQG4kePVHU+q05YUJuzw8farMxm1Tn1tzbjUO5jrOI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzsz1sYzKOvnHUDHr/ixDG39oOLu5BPO08EhxQ6ZS9dy9AJaaEt
-	7ePIBD+5WnQB3F0ixdGmUqURRg4iap2bITCxMCbUf5BoiP2s2//xJavZFlupDVCdG+x7Qsxe6nq
-	c/N8b5Phm5ENQBvifsC65vkmmk1I=
-X-Google-Smtp-Source: AGHT+IEGY2/Wq4lbXpbFogvVpGkgWVw/q3JJZEXnB39V01T6YUbMSSjTPn5+KKB4HZ3rKrf5wjZkd2GjAoyZqCf5nqA=
-X-Received: by 2002:a05:6830:7310:b0:717:f864:90cb with SMTP id
- 46e09a7af769-71dad5ed63cmr660710a34.4.1733182056937; Mon, 02 Dec 2024
- 15:27:36 -0800 (PST)
+	s=arc-20240116; t=1733182803; c=relaxed/simple;
+	bh=4gjAVY4OYuN50ODxCgl16+VftGhCCo/MUzXgNFT7wZI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BGAJ7kuM6btrxtTaJ8GXOPzX3CkqDOj1HQwV5sbpv1LelBD29c8iQdEQO7r1Jlc1K1iL/waXkHjpdHV9wFnhHluhsyYIPGOByWfV3O3BLLJmUUGvy3wbzPk9Ry8k7fKQbofII+Lo+PBYQkKL83Us9MujURt4vPP4nd+wnO+NzFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=atmark-techno.com; spf=pass smtp.mailfrom=atmark-techno.com; dkim=pass (2048-bit key) header.d=atmark-techno.com header.i=@atmark-techno.com header.b=TsBMBvrs; arc=none smtp.client-ip=35.74.137.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=atmark-techno.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atmark-techno.com
+Authentication-Results: gw2.atmark-techno.com;
+	dkim=pass (2048-bit key; unprotected) header.d=atmark-techno.com header.i=@atmark-techno.com header.a=rsa-sha256 header.s=google header.b=TsBMBvrs;
+	dkim-atps=neutral
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
+	by gw2.atmark-techno.com (Postfix) with ESMTPS id 6E754A5C
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 08:40:00 +0900 (JST)
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2156cb2c3d2so29001875ad.1
+        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 15:40:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atmark-techno.com; s=google; t=1733182799; x=1733787599; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=A57IVvMQMWpZURImpjt3A/mUfeqlUYJ7SlKp08jMs20=;
+        b=TsBMBvrsrNaYm6nJFseiRhLZXP0UrLiH+b3WAbbWFNORLeqgJ2ZAJ08h0WPQU+z40F
+         xjijansele6XeVWK+H1jtlnWExwAburOgTFTCRsYblp2kZII3ywrHMQc4b+XBux+6yOr
+         Gj4wbWMFE2D9UmSDvycn4iF9NTi7EPDa3emGAW7jO0niCM72JFNrd9r2yuarsadPNggP
+         dUpDFSRejOKCRWIqnPZkd3fllbed0OmyAEIYA/fEad/gCF5xA/GjIu4ZGxbpwGrYHB8e
+         t7WunsLK757oDH+HnPWeXjFG2r44T1YfVt3ZR6CY159XlprYVx5EyF+YCEj2vz3hNKvh
+         zypw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733182799; x=1733787599;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A57IVvMQMWpZURImpjt3A/mUfeqlUYJ7SlKp08jMs20=;
+        b=IXL0jbx2qkhiPJS9oemKn6zWGKqu0HPhNNw52uLIuJnyXVPuR0tYUUnZUK3529p2QQ
+         Zq+/2u2Aj7rspuxGirBxEa2rBMsO8ylHv+CLyfWD5DBnmOhKgW8GxqS8QhF0vKkdLy/7
+         d6eIshDExp+oHZoi7awjlA250s48xYOwhR4/vMFmexuB4l+NF9B8TonijXTisa50zcRy
+         pP5WYiu8ggV004sw/VRjAHFNvDylKKIHpNdR1YMIdQ6+L8E/hAdKTpsb4woCQGPWB8Dt
+         2KyUtp3tAjH540nUV52Pkk9TwoztTOSXIXBNLaT8DASA1bXc0vXi5/wLtr2g/vPYqkID
+         z6eg==
+X-Forwarded-Encrypted: i=1; AJvYcCVokP3aZ05u9oXpcQdeEmvvswt8L4ErWCX9GruAoHHBRDjA7ackUdHnqdbZ2n16YYGsNtKjbkQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgTIBbUNkPrgHFdaXFfa5EdPQZnEGJQhsawej9VvRLEm2Dk1lT
+	Ng9WnTQOQkU7YMhiw8IGDAIp8+DFeGFZRBDmhA5aM3zHodnZSRqhd+bAPrPy28jKY4wfZFH2mJt
+	Gxg7o9z1MaYZef389ee5kDslqDaGbVGUoqC2Z6G+YHSMwpu5fMJjyxR0=
+X-Gm-Gg: ASbGncvPoj0JWy29j4TmK4xs0+Htd0LJw3JPcpasnSse93POPBbDkJqYS4CUaU8t1Zq
+	ttSc+9QfhHAEqA7K1mMuuMr1zn4nUg+BcB5/Pv558InlIIG5eXQRoDSJjOKIfiJcfuFdwn3pY0T
+	E/IWHnqMCgJco3OhT7dZvZsVsuVFsHmrYz/jS18aWb84jFVvt2qARSRIAerlSxBqPVdYH3bNiig
+	GirkjCUoPHxbImChCiJOa42qgQyKFTXfC2XNOBy9tte3+8+kNsnjyMQUcCn/Otfd+C1+nAy1/FD
+	Bks7uZyqlWhze1lg3BywETPBJ0kDRxv5EQ==
+X-Received: by 2002:a17:902:e743:b0:214:f87b:9dfb with SMTP id d9443c01a7336-215bd21460bmr5675275ad.30.1733182799370;
+        Mon, 02 Dec 2024 15:39:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHSpv35whPLoYVIW8MOIAvFy4eJtv1taQ80g25b5fafKIkmE78plxhee1SHI5mTvk3cqSdymw==
+X-Received: by 2002:a17:902:e743:b0:214:f87b:9dfb with SMTP id d9443c01a7336-215bd21460bmr5675005ad.30.1733182798959;
+        Mon, 02 Dec 2024 15:39:58 -0800 (PST)
+Received: from localhost (162.198.187.35.bc.googleusercontent.com. [35.187.198.162])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2154e33e47dsm56875505ad.158.2024.12.02.15.39.58
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 02 Dec 2024 15:39:58 -0800 (PST)
+Date: Tue, 3 Dec 2024 08:39:47 +0900
+From: 'Dominique MARTINET' <dominique.martinet@atmark-techno.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Laight <David.Laight@aculab.com>,
+	Oliver Neukum <oneukum@suse.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Greg Thelen <gthelen@google.com>,
+	John Sperbeck <jsperbeck@google.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH net] net: usb: usbnet: fix name regression
+Message-ID: <Z05FQ-Z6yv16lSnY@atmark-techno.com>
+References: <20241017071849.389636-1-oneukum@suse.com>
+ <Z00udyMgW6XnAw6h@atmark-techno.com>
+ <e53631b5108b4d0fb796da2a56bc137f@AcuMS.aculab.com>
+ <Z01xo_7lbjTVkLRt@atmark-techno.com>
+ <20241202065600.4d98a3fe@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241111234006.5942-1-ouster@cs.stanford.edu> <20241111234006.5942-13-ouster@cs.stanford.edu>
- <f81a78ac-b32a-44bf-9375-8ac380bbce74@linux.alibaba.com>
-In-Reply-To: <f81a78ac-b32a-44bf-9375-8ac380bbce74@linux.alibaba.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Mon, 2 Dec 2024 15:27:01 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmzQ=xrpr46aF_qeU3mAwDdCaXWXnRKOc+hG8tyihCW9hw@mail.gmail.com>
-Message-ID: <CAGXJAmzQ=xrpr46aF_qeU3mAwDdCaXWXnRKOc+hG8tyihCW9hw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 12/12] net: homa: create Makefile and Kconfig
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, linux-api@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: 5e15904e367bf57319d290d73554c551
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241202065600.4d98a3fe@kernel.org>
 
-On Mon, Nov 25, 2024 at 8:27=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.com=
-> wrote:
->
-> On 11/12/24 7:40 AM, John Ousterhout wrote:
->
-> A small formatting issue, perhaps you're using spaces?
+Jakub Kicinski wrote on Mon, Dec 02, 2024 at 06:56:00AM -0800:
+> On Mon, 2 Dec 2024 17:36:51 +0900 'Dominique MARTINET' wrote:
+> > The new check however no longer cares about the address globality, and
+> > just basically always renames the interface if the driver provided a
+> > mac ?
+> 
+> Any way we can identify those devices and not read the address from 
+> the device? Reading a locally administered address from the device
+> seems rather pointless, we can generate one ourselves.
 
-Yep; I fixed the formatting in Kconfig based on input from Randy
-Dunlap earlier in this message train.
+Would you want to regenerate a local address on every boot?
 
-> > +menuconfig HOMA
-> > +     tristate "The Homa transport protocol"
-> > +     depends on INET
-> > +     depends on IPV6
->
-> Can HOMA run in an environment without IPv6=EF=BC=88IPv4 only)? If so, de=
-pends is not suitable here. Perhaps
-> what you need is to implement different branches in the code using
->
-> #if IS_ENABLED(CONFIG_IPV6)
+This might not have a properly allocated mac address range but this at
+least has a constant mac, so the devices can be easily identified
+(without looking at serial properties)
+.. I guess the generation might be made to be a hash from ID_USB_SERIAL
+or something like that, but if the device already provides something
+stable I don't see any reason not to use it?
 
-No, Homa really can't run in environments without IPv6: internally,
-Homa stores all addresses as IPv6 addresses, converting to/from IPv4
-at the interfaces with other kernel functions. Hopefully that is not a
-problem? And given that, "depends on IPV6" is OK, right?
+(With that said, I don't see anything in `udevadm info` that'd easily
+point at this being a modem point to point device under the wraps..)
 
--John-
+> > If that is what was intended, I am fine with this, but I think these
+> > local ppp usb interfaces are rather common in the cheap modem world.
+> 
+> Which will work, as long as they are marked appropriately; that is
+> marked with FLAG_POINTTOPOINT.
+
+Hmm, but the check here was either FLAG_POINTTOPOINT being unset or not
+locally administered address, so to keep the usb0 name we need both?
+
+>             if ((dev->driver_info->flags & FLAG_ETHER) != 0 &&
+>                 ((dev->driver_info->flags & FLAG_POINTTOPOINT) == 0 ||
+> -                (net->dev_addr [0] & 0x02) == 0))
+> +                /* somebody touched it*/
+> +                !is_zero_ether_addr(net->dev_addr)))
+>                       strscpy(net->name, "eth%d", sizeof(net->name));
+
+i.e., something that didn't have FLAG_POINTTOPOINT in the first place
+would not get into this mac consideration, so it must be set.
+
+My problematic device here has FLAG_POINTTOPOINT and a (locally
+admistered) mac address set, so it was not renamed up till now,
+but the new check makes the locally admistered mac address being set
+mean that it is no longer eligible to keep the usbX name.
+
+... Would this check just be fine without any mac check at all?
+e.g. anything that's not flagged as point to point will be renamed ethX,
+and all non ethernet or point to point keep usbX.
+
+-- 
+Dominique
 
