@@ -1,175 +1,173 @@
-Return-Path: <netdev+bounces-148146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D669E0ABD
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 19:13:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 758FE9E0B66
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 19:59:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E81ABB38DCB
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:15:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 665A2B3DEE4
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33801175D4F;
-	Mon,  2 Dec 2024 16:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jEXQ+8al"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320CB1AF0AA;
+	Mon,  2 Dec 2024 16:29:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EACA175D29;
-	Mon,  2 Dec 2024 16:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504B81A265B;
+	Mon,  2 Dec 2024 16:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733156148; cv=none; b=QeyVRebC1luZPMbbIz/PISYy1snKoz/55LGNKeqgk0r7zcvMlBFuFMayIjnR8agRctarYxtKK86ijww2oTtE5iw7heOL6f8lYf/oFwu8fvaElRtEbDxWbgkNJ17UWOjPEoOEtAzwOuldUHVIDo8uAuIMhTo8BQSFY8+NaQ4tUno=
+	t=1733156983; cv=none; b=D6WSOPxJEGzDj/g9ZQijWlxL2DO4ZNkPQPDh4vA0MPJxL5F9uAhTdF1mFM4m2vFeX1LCgZj0tkTHO6Ll/i6tnGkfhfXEy3y32ieEWwfgzzgceEYbJ8AHZQEcqI3tCYy2KrYFSRpc/b8XClItA3vosBc/c+365ujZELsmmTT6c/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733156148; c=relaxed/simple;
-	bh=vKH/VyHGs5Vu3c6cGYEA/Eqhr391RwOu84Z53Nh4V3w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fPG92GKII652+oMDrc78buJnv21Qgrcjyt4W62y3NCsijaJSZUsw2u2fasyqDupPIWpFoka0YZdljv1elasYT73bYRMC7agI0UDJbaVubiujtyIg0KhhB+xs1rUK8tI1KQqmtb4VL0BjQw2iYyXqn/zXvOzxiHjJ0HX5VEj7Z7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jEXQ+8al; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1733156983; c=relaxed/simple;
+	bh=nx/1q4UxfEC4CdlsFRFIMhLyLex9mIfjyJUUuj/UgFY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YaBvAPReajufxjpnAu+kSXP0S8COE0Cs1Z+mfs6ApJ0CnNuL3EaPEz5obzESbIF31HQRuyFdu4Gk/suuR9PmSs10603klWuPPmhiPgp3cEAsrJO77HA7X/SaG+1OTHNVw8HVwZ+3/0saeadQmJR9dqrW3uBbbKDKl7N3i+St9vI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7250906bc63so3285598b3a.1;
-        Mon, 02 Dec 2024 08:15:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733156146; x=1733760946; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eW/wfnh8N5no52Gp+owhRKuizaBDFaei5Sky6tMENBs=;
-        b=jEXQ+8alsh6XT1yZJ5IOADOyZKZdlMS7RCyaZb7zT1ErA0FXiORUgOyOBcOxu42mIz
-         rQWJ+rPbGBzzqfDa3HMVPp25No1IZf0QTqYTlHs0MR0E5IWKnEuqjaoyGekEBmRvxPEt
-         nMSsThsFmscn+dMYF1PHddaW6G+yde7Z+ZUNFglwaifJ2fpNmSCxsjFgwyck/atrgkob
-         Bz1FsAqrYIymjeMFrhpMsy1zwRfZwC2oEIG3XoR0jQrzFK/JXCJMe6PUie37hbl86wxX
-         bLpBv+SC20mqjzOxvJNG1r3c1jriIXmkLbMNXtRojitpheKix9yXqG9nDooC92hFSyEN
-         0PMw==
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2e9ff7a778cso4011373a91.1;
+        Mon, 02 Dec 2024 08:29:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733156146; x=1733760946;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eW/wfnh8N5no52Gp+owhRKuizaBDFaei5Sky6tMENBs=;
-        b=XjAbc5ilsOvvy9NE1XRO5liz37Hwl3sWJHxw4ijcnSPVon/k7pTeaLzel9IW66pPkk
-         R7HCBvE4kGTpxn+DSG4HA8ASnFbm+Mnb/igetCtZgsuZSEHtDsbeSfu4bz1w25SdXfIE
-         WumdiePeODgtmNL8U8sILY4IKlstYcAJm1fPv4lfdDOwSP22wbGYsTXuhrRrWiyI++H+
-         RprBWnw5GPJvC0DeoSiUJjYBBBkbK8Ok3Y1XQw7dyK54c9A4zIw1tS7AmN2G73OAon3Q
-         2wbTVpzSG16R+/FF4kBM9mCV+ivd6mVyAsc/8YXhhdxZS4qTjgZkwEmWXepxc22a5CmV
-         9EjA==
-X-Forwarded-Encrypted: i=1; AJvYcCXNcqHzpprLZWLHXLnzaqD7ZPAHffN3Gj2zYagub7/R/ZTZY5xlQhejABBGy6uKXJ5KUQ0=@vger.kernel.org, AJvYcCXz4Z/Qsu3vpTJ5hnGQy8ZUPBBwaHjf7niKqnsoTYPKFCG7btndlwPz/k4SLlLYU7I7OovnnYbQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuA2d+uqeyUuMRn8234BumAuxp++Y/zw5pM/GlVwNLdP0MyylP
-	DXh1ptqYuGIDDjfcCHm60KYu36m25yZvddiOq6Tjh+mWLFqk1Ms=
-X-Gm-Gg: ASbGncvOVMwT/ekfCAPOQHW6JOXPY0J1aOVfuFgmJDLMa8Kcu2avVnevsBry9/KdQ3d
-	g8g0vFRvh38Wxz982Yb+nhgd3ysQKK2dcIFxSbotRcG6GKdTFlfnRYj6rUHwyzJ9DKix+jHTyZh
-	WZGLQsG2ASKTmkNXBr1OpSvAbcAm2aeFfcCjeT0Ja4EtIdZkeNhMPDKl3E4+XzQnRu/sTdA31dx
-	9rjXlMvrIiUC45FWmxZ7mNBbkgJngOkzpxGgENHZZ2yIJDS2g==
-X-Google-Smtp-Source: AGHT+IHdKZ4DjXfo0tLnEtHRICNhBAhY92uoAXU97x9uWgtkTFfPImHj4pxzZtATdJeGIfa2kd0P3A==
-X-Received: by 2002:a05:6a00:22cf:b0:725:37a4:8827 with SMTP id d2e1a72fcca58-7253f2df712mr31237136b3a.3.1733156145693;
-        Mon, 02 Dec 2024 08:15:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733156979; x=1733761779;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aiduPAtZh1MVyOKWslb5l/TwKEKfq1TiSzGE5bgoCZQ=;
+        b=uYQ+b1HG1iKEq96decaM1k9mm5hTYuRL7CPpnHPolYFt9Z6JnjV4GfRQ9BCe4AcupJ
+         NjOSoocVcNBvZtSDYBMOHUp18W4WoYZPevItrorpI3M+l5HvBIgDhSyiaPYLAmlF4AOH
+         o1nfm0NJD+F0JRKBPSDxEik+16ACzxfwF9FwCVtYUTL6yaLfKOJtwl8Oh77qboV7M8sI
+         OI7dwH3ypsw6BlVDeBisVoAUh4mBlXic21liLo5EuN9QQbzDUArhfg7OcD8WwxMHbHQ1
+         V0Dfp43FmpFbvfPcDVvKx6s9JqZQvDFu0E1fLDJTKjTQOxO2pAmWiqHgL8WuwVXWqkEi
+         RBTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWbHQLORefaZt0/8/aDWFnx9OnE+x1Ry7Qv9fstQyuqTufgezwW575l1tJGMwBxLhasRUjLnd7C5fI=@vger.kernel.org, AJvYcCWprQC5mhJ0zMf8BI1FrCO9Tt6V5ovy0iPDJxY8en7OGp9jniYlHXlzYOINA1K91CW7oLRsm9deSNSfaCxY@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2ShK4kauJRWonh/6Q4nwfB5FUGakHrYRbr0Sa/O5oi6eCAPdP
+	DKQooQQxMybtStUCnFDMi/gBNKCGpiuUWYcG4Xly5EpSoBkltsQzwO+AcrA=
+X-Gm-Gg: ASbGncsau8lB3InTIKv8ZOxToBQXFdKTcx0eijH135gDno6KCsqyTRkLvbVW24wqqR4
+	oujJjZHlWicd8JSFJ3J+z87w8NcuO7QfBiCg7ZZa/JNLmTYEC2ppQgGtl8z2jUhF+cAANDjweaK
+	/pFxGWtFuDanFjc0skqB4CO3isruq4FxIMj5c2XGbrCO8DkrqY8fZtdvfxcbxB8kMumomRvKJZC
+	PTfT/w6SPOIayVsyXon7pUUnSq8rozLncF/fEIdSJP5OCT9UA==
+X-Google-Smtp-Source: AGHT+IFhSNGZ2h1sltqYvfBRHuTNb4MkMk6UjjNyguI/8SchjDrm709TOpEs6p8GgHJJD+jYBPf5VA==
+X-Received: by 2002:a17:90b:4d0d:b0:2ea:5fed:4a32 with SMTP id 98e67ed59e1d1-2ee25af2e0bmr28906554a91.11.1733156978873;
+        Mon, 02 Dec 2024 08:29:38 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72541762411sm8970776b3a.20.2024.12.02.08.15.44
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2eea580bfe9sm3195435a91.39.2024.12.02.08.29.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 08:15:45 -0800 (PST)
-Date: Mon, 2 Dec 2024 08:15:43 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Shigeru Yoshida <syoshida@redhat.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
-	yonghong.song@linux.dev, john.fastabend@gmail.com,
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com,
-	jolsa@kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	hawk@kernel.org, lorenzo@kernel.org, toke@redhat.com,
-	bpf@vger.kernel.org, netdev@vger.kernel.org,
-	syzkaller <syzkaller@googlegroups.com>
-Subject: Re: [PATCH bpf] bpf, test_run: Fix use-after-free issue in
- eth_skb_pkt_type()
-Message-ID: <Z03dL0zxEnmzZUN7@mini-arch>
-References: <20241201152735.106681-1-syoshida@redhat.com>
+        Mon, 02 Dec 2024 08:29:38 -0800 (PST)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	corbet@lwn.net,
+	andrew+netdev@lunn.ch,
+	kory.maincent@bootlin.com,
+	sdf@fomichev.me,
+	nicolas.dichtel@6wind.com
+Subject: [PATCH net-next v3 1/8] ynl: support enum-cnt-name attribute in legacy definitions
+Date: Mon,  2 Dec 2024 08:29:29 -0800
+Message-ID: <20241202162936.3778016-2-sdf@fomichev.me>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241202162936.3778016-1-sdf@fomichev.me>
+References: <20241202162936.3778016-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241201152735.106681-1-syoshida@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-On 12/02, Shigeru Yoshida wrote:
-> KMSAN reported a use-after-free issue in eth_skb_pkt_type()[1]. The
-> cause of the issue was that eth_skb_pkt_type() accessed skb's data
-> that didn't contain an Ethernet header. This occurs when
-> bpf_prog_test_run_xdp() passes an invalid value as the user_data
-> argument to bpf_test_init().
-> 
-> Fix this by returning an error when user_data is less than ETH_HLEN in
-> bpf_test_init().
-> 
-> [1]
-> BUG: KMSAN: use-after-free in eth_skb_pkt_type include/linux/etherdevice.h:627 [inline]
-> BUG: KMSAN: use-after-free in eth_type_trans+0x4ee/0x980 net/ethernet/eth.c:165
->  eth_skb_pkt_type include/linux/etherdevice.h:627 [inline]
->  eth_type_trans+0x4ee/0x980 net/ethernet/eth.c:165
->  __xdp_build_skb_from_frame+0x5a8/0xa50 net/core/xdp.c:635
->  xdp_recv_frames net/bpf/test_run.c:272 [inline]
->  xdp_test_run_batch net/bpf/test_run.c:361 [inline]
->  bpf_test_run_xdp_live+0x2954/0x3330 net/bpf/test_run.c:390
->  bpf_prog_test_run_xdp+0x148e/0x1b10 net/bpf/test_run.c:1318
->  bpf_prog_test_run+0x5b7/0xa30 kernel/bpf/syscall.c:4371
->  __sys_bpf+0x6a6/0xe20 kernel/bpf/syscall.c:5777
->  __do_sys_bpf kernel/bpf/syscall.c:5866 [inline]
->  __se_sys_bpf kernel/bpf/syscall.c:5864 [inline]
->  __x64_sys_bpf+0xa4/0xf0 kernel/bpf/syscall.c:5864
->  x64_sys_call+0x2ea0/0x3d90 arch/x86/include/generated/asm/syscalls_64.h:322
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xd9/0x1d0 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Uninit was created at:
->  free_pages_prepare mm/page_alloc.c:1056 [inline]
->  free_unref_page+0x156/0x1320 mm/page_alloc.c:2657
->  __free_pages+0xa3/0x1b0 mm/page_alloc.c:4838
->  bpf_ringbuf_free kernel/bpf/ringbuf.c:226 [inline]
->  ringbuf_map_free+0xff/0x1e0 kernel/bpf/ringbuf.c:235
->  bpf_map_free kernel/bpf/syscall.c:838 [inline]
->  bpf_map_free_deferred+0x17c/0x310 kernel/bpf/syscall.c:862
->  process_one_work kernel/workqueue.c:3229 [inline]
->  process_scheduled_works+0xa2b/0x1b60 kernel/workqueue.c:3310
->  worker_thread+0xedf/0x1550 kernel/workqueue.c:3391
->  kthread+0x535/0x6b0 kernel/kthread.c:389
->  ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-> 
-> CPU: 1 UID: 0 PID: 17276 Comm: syz.1.16450 Not tainted 6.12.0-05490-g9bb88c659673 #8
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-3.fc41 04/01/2014
-> 
-> Fixes: be3d72a2896c ("bpf: move user_size out of bpf_test_init")
-> Reported-by: syzkaller <syzkaller@googlegroups.com>
-> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
-> ---
->  net/bpf/test_run.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-> index 501ec4249fed..756250aa890f 100644
-> --- a/net/bpf/test_run.c
-> +++ b/net/bpf/test_run.c
-> @@ -663,7 +663,7 @@ static void *bpf_test_init(const union bpf_attr *kattr, u32 user_size,
->  	if (size < ETH_HLEN || size > PAGE_SIZE - headroom - tailroom)
->  		return ERR_PTR(-EINVAL);
->  
-> -	if (user_size > size)
-> +	if (user_size < ETH_HLEN || user_size > size)
->  		return ERR_PTR(-EMSGSIZE);
->  
->  	size = SKB_DATA_ALIGN(size);
-> -- 
-> 2.47.0
-> 
+This is similar to existing attr-cnt-name in the attributes
+to allow changing the name of the 'count' enum entry.
 
-I wonder whether 'size < ETH_HLEN' above is needed after your patch.
-Feels like 'user_size < ETH_HLEN' supersedes it.
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ Documentation/netlink/genetlink-c.yaml             | 3 +++
+ Documentation/netlink/genetlink-legacy.yaml        | 3 +++
+ Documentation/userspace-api/netlink/c-code-gen.rst | 4 +++-
+ tools/net/ynl/ynl-gen-c.py                         | 8 ++++++--
+ 4 files changed, 15 insertions(+), 3 deletions(-)
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
+index 4f803eaac6d8..9660ffb1ed6a 100644
+--- a/Documentation/netlink/genetlink-c.yaml
++++ b/Documentation/netlink/genetlink-c.yaml
+@@ -106,6 +106,9 @@ additionalProperties: False
+         name-prefix:
+           description: For enum the prefix of the values, optional.
+           type: string
++        enum-cnt-name:
++          description: Name of the render-max counter enum entry.
++          type: string
+         # End genetlink-c
+ 
+   attribute-sets:
+diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
+index 8db0e22fa72c..16380e12cabe 100644
+--- a/Documentation/netlink/genetlink-legacy.yaml
++++ b/Documentation/netlink/genetlink-legacy.yaml
+@@ -117,6 +117,9 @@ additionalProperties: False
+         name-prefix:
+           description: For enum the prefix of the values, optional.
+           type: string
++        enum-cnt-name:
++          description: Name of the render-max counter enum entry.
++          type: string
+         # End genetlink-c
+         # Start genetlink-legacy
+         members:
+diff --git a/Documentation/userspace-api/netlink/c-code-gen.rst b/Documentation/userspace-api/netlink/c-code-gen.rst
+index 89de42c13350..46415e6d646d 100644
+--- a/Documentation/userspace-api/netlink/c-code-gen.rst
++++ b/Documentation/userspace-api/netlink/c-code-gen.rst
+@@ -56,7 +56,9 @@ If ``name-prefix`` is specified it replaces the ``$family-$enum``
+ portion of the entry name.
+ 
+ Boolean ``render-max`` controls creation of the max values
+-(which are enabled by default for attribute enums).
++(which are enabled by default for attribute enums). These max
++values are named ``__$pfx-MAX`` and ``$pfx-MAX``. The name
++of the first value can be overridden via ``enum-cnt-name`` property.
+ 
+ Attributes
+ ==========
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index d8201c4b1520..bfe95826ae3e 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -801,6 +801,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+             self.user_type = 'int'
+ 
+         self.value_pfx = yaml.get('name-prefix', f"{family.ident_name}-{yaml['name']}-")
++        self.enum_cnt_name = yaml.get('enum-cnt-name', None)
+ 
+         super().__init__(family, yaml)
+ 
+@@ -2472,9 +2473,12 @@ _C_KW = {
+                     max_val = f' = {enum.get_mask()},'
+                     cw.p(max_name + max_val)
+                 else:
++                    cnt_name = enum.enum_cnt_name
+                     max_name = c_upper(name_pfx + 'max')
+-                    cw.p('__' + max_name + ',')
+-                    cw.p(max_name + ' = (__' + max_name + ' - 1)')
++                    if not cnt_name:
++                        cnt_name = '__' + name_pfx + 'max'
++                    cw.p(c_upper(cnt_name) + ',')
++                    cw.p(max_name + ' = (' + c_upper(cnt_name) + ' - 1)')
+             cw.block_end(line=';')
+             cw.nl()
+         elif const['type'] == 'const':
+-- 
+2.47.0
+
 
