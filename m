@@ -1,156 +1,176 @@
-Return-Path: <netdev+bounces-148138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 708EF9E06E6
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:24:51 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C969E07AD
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:55:58 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3782E281E36
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:24:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3E8217A41D
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:28:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517EE20B7F0;
-	Mon,  2 Dec 2024 15:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4E320C028;
+	Mon,  2 Dec 2024 15:24:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iCobbnR1"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oqVRjmwC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB5420B7E0
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 15:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB82B20ADEC
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 15:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733152903; cv=none; b=gzVz4Icvypw1lPYWr9EOm+0zTzogFWy5tfJxxE9iapcGRt2gzMnqizkYrl8dYuRg4/lypdH5a8kTZDWxajzFXbj1QKBF0U1f4/sjkeMmpi4LVivHwZ5/lb547v/B7TT6yrfmpbiRuh4tkp8G69QKUkZGi8yZ5UYr/HC8uPvMF08=
+	t=1733153089; cv=none; b=quK+C4wuqW+6+KZU5OC/dvVoYaKQkKwaKY8RDy8plOPo2R16eLJzA/jvdoIbLCechX7q7eMI6nt3+em6ksXxVTmiWxlp9FXDc/RWO6fl0UrywP0lQ7tfoM/+q53qUQ0Zl2xlIDPvvQlAgu9aqBrXuhZ8CBr7BQKGiRrGul3jfIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733152903; c=relaxed/simple;
-	bh=8g73Nwwl2kczAP/WH2/hx4EaZ5z7xZ/LUOZIJmAeQD8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MwNnKM9mLnEnNEqdQ8Y/t8ZULmgeuT0CzosCMUnRValg235f2w3kbkVSKls52/5gNBoyg3zhjfHwtgG/q0vBTUWjgG8GImI+Vbx9xSvdwkYj9G1yBPhreNcjh4HH1Paxhqyk497zIljTAkTyn30wpNJAKdhmDXlxLZZ/prRbqd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iCobbnR1; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7b673aacf13so464116585a.0
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 07:21:41 -0800 (PST)
+	s=arc-20240116; t=1733153089; c=relaxed/simple;
+	bh=goFeMCUVRbDjipThdghVVJLskLf8H473+GNXYnXXrDw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ABVj9opwdjRV2wTmutdVNXxWRuLGMtaWicfZr+QUuiACI3aDInSJ0IxHwvVtQJuHIaMUnuqjS9SYUrlUTny/seJeZ77IG3+h9iQZQ+5nS7AbBTLDlHGuTdu2O6WrZBgKkIsOP4swN39e9ToDsr2mxcgmzdNSCOFY3S5r2C8o6eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oqVRjmwC; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6eeffdff41dso36736657b3.3
+        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 07:24:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733152900; x=1733757700; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=h4C/z7Ht8LNohyUydKvzhk3FnEvHRt+HolGkLY0PF/U=;
-        b=iCobbnR1gfHxrsWF8l5awyCuUpLaFjYXxWUuopZwxiU/za7pANFw5XbBTRL0EjbfIm
-         aoAJ82BKArRbbQ4nf+Dh09JVjJlqGF/jCFfw6E8HrMLUTMwPpvIdffQQRJrTXvf+LQZ5
-         f2hjla49DdVCzU53gZa7yTvoaUGl6WHGjjVOm77pRbtsSyt/l1kDkzeEAAUUqDVPIEU9
-         PFthzT4HjSBPCEkoOcyRoEGGkVD1LY9gMA10OwKOE5L4pALJmN7DGJ8gpaXwGGAznXNM
-         psEoH+ANvPuPHO+7DY1x+wKZDdpU0P8Gtv2V6WDP7a0tx9ldutsIMzahgyvPuypIragi
-         M44w==
+        d=linaro.org; s=google; t=1733153087; x=1733757887; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=05ZXtxtYDYApb+lIzc95yV2LA74LDricN9fUjzTVsRg=;
+        b=oqVRjmwCPFbp8NX13GQ37Knaf7Js6RruA7JsAME9fKoTUAGL/hAHluYy3hssqDdGck
+         G3h2wgUUsarnvqYTXpdtcC7ex9fmfZah+6CcPrjQHRIdDHm5YYD2ZPWCzPyWLSZX+6Wl
+         Ttd2gF3PJx2LHbFghXgX2dyZmsOzrQOFa0InxUkzTh0xRpguw7ISgu8qgM4B0PL1BYAk
+         u2/lj2VSrRMtL+bSn3omEt6j92wabJzeXdNMRiojvlZWxVN6/j0rB5ZgVKGLX7zgR29U
+         clW/0lGnWXGwEgryAo35SEApnH1tAAyBhCWD6+6ugnSKDsCgkQNwbtXI2HeWI15fYVO/
+         e+tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733152900; x=1733757700;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1733153087; x=1733757887;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=h4C/z7Ht8LNohyUydKvzhk3FnEvHRt+HolGkLY0PF/U=;
-        b=aiHm5ZeTWTuqCyRTFE+9/sP8sdAzlg8eI3Q8Y0zVxHyttqOFdqwNJRUZfBC/6NqBez
-         JicyyEhNPTeewYIgtuxrvuRNey4XUyOfGdfKYv4EqI5/ly84pxokJYBFdto9KKSh6BQ5
-         Lz/rSG7y8IAr/HVgnAuyvo08aL3yiyTudcxJbsPjXsLjjAFdKmBozUqLeJm0QGngHnKP
-         upBq4R2+PBX10PURZ/p5cv6mbkQvV8Tj9tbzIkdqziHhj3WVNm6xge4i0dcmtDuGgRFy
-         bgoYRs+tgE7a1woFAt6qzpjwUCRk+HUzfIba/jNvDYNn+iyUf9xnPfouZ2m0p/efW6/P
-         OQrQ==
-X-Gm-Message-State: AOJu0Yw2gu0dFteXTFZ/42mQvsuUl/zqQyXhga08IM2vPmLLRUT87u8N
-	2NZ8LqZUCZ4k11eKIJGTydN0M/wnvGxz3MAzPQPdp5cNXQV409VR848WMQ==
-X-Gm-Gg: ASbGncvi2ZvCWfbSzryhCOefDp7G1BZy6ErnN7BsP1eDG4gp78pQljtSr8JM6Wtby5W
-	AN74p4ELXEipnhgI4JVwhG/uxf+JVZU59p4Fvhy0wP3j5qAOIiDYxh77GfSVW1ewcIhm4TNhVU1
-	C9HMYTbxifYaocR4XBOCu1QWJqktBKxAIJUGjQ3BhQw9grKtWZD/qvruCO7nTh1yAr4+bV40jd5
-	T+sCFhXHlcBfwB5ZZcdAzxzt+nIha9efoO8kE4Gd4gZeZPoJ4dUgitDgQ80DybNI2Lwe16HtENR
-	Os9/9YAA3w==
-X-Google-Smtp-Source: AGHT+IHiJY1OXGE5KkIxblpdnfu3Biqj64DRplL/L9379kqijy2SGrMIoZ/hr/VK7kmHpcL3okj3Yw==
-X-Received: by 2002:a05:620a:1928:b0:7b3:5c6d:9625 with SMTP id af79cd13be357-7b683a2da31mr3301055985a.16.1733152899998;
-        Mon, 02 Dec 2024 07:21:39 -0800 (PST)
-Received: from wsfd-netdev15.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b68492cb81sm410473085a.34.2024.12.02.07.21.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 07:21:39 -0800 (PST)
-From: Xin Long <lucien.xin@gmail.com>
-To: network dev <netdev@vger.kernel.org>
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Davide Caratti <dcaratti@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuang Li <shuali@redhat.com>
-Subject: [PATCHv2 net] net: sched: fix erspan_opt settings in cls_flower
-Date: Mon,  2 Dec 2024 10:21:38 -0500
-Message-ID: <981381d3d1aaa4f81619145180e06338af487a42.1733152898.git.lucien.xin@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=05ZXtxtYDYApb+lIzc95yV2LA74LDricN9fUjzTVsRg=;
+        b=xLuv4qH/JROuAA2t8Z1epg5AaSgxUjVliHog8pmzMhwSFVg7pRyAcH9ztcsmhQt5xt
+         kupzh80vGztUhNFez5+h5Gcch5BsQ4C7gOPQDCCy0eXIuHA0Nh/ngXy9WZwNctmRbLHz
+         0PPocQKIlmzpRvQH/gKhmRj+U2SiuSl5lIL0IjZ+XAad4HwPcfRxBNx3s7KcR/7/PtHY
+         ZqjSRtXqZRZQPcJJ2TQYP9XZNMYAuDRIfyyMHO+5z1S0SdTDScSa2XvaI8CIKEHnc5MF
+         t0iKTYOMPFMBUBwbtymfndVvUkp8tUYkg5/HKRIIUwPipF/l0khK193MH9LQYGlda3t1
+         j5MQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW39tGcl5z1WcGPLpCP76L5j9St5Yca4DpzbqVnRH0w1EgzKah0Ay0gJN+R/mHDBKcai+Lwev4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwP5ma9+DtA3IPbVW5NMubnwVy7JIOJhUHwwETFFlowmfv2EwTP
+	0jJyub6HAgten2UMo7HKP6XxS2kHv97G0N5d3mwjd68iHQffox+I4whW75o/8LVJD6zkxHb20wx
+	SHPfE586bemsHbYEK4orMxVyOYuXXnz/kLSWeGA==
+X-Gm-Gg: ASbGnctYnuld9lxPyRXFDQs3FSXrPR0Y3HYzp476RsHh8crzdI6vy6IY40Qlvfdlyxz
+	P2ZUCSUYpbxMIuvVKVhw/1GW/3CtFg3Mt
+X-Google-Smtp-Source: AGHT+IG1/7GNikn+o7qWaeU6OlA3SHIeQqG6VzX6iFXwmrBOhF0bD/LXd61skcVAWua1i/pv/Z75jusfAxofKt3ImP8=
+X-Received: by 2002:a05:6902:2e0e:b0:e39:9b9f:7f87 with SMTP id
+ 3f1490d57ef6-e399b9f830cmr6954354276.29.1733153086437; Mon, 02 Dec 2024
+ 07:24:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241130094758.15553-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20241130094758.15553-1-krzysztof.kozlowski@linaro.org>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Mon, 2 Dec 2024 16:24:10 +0100
+Message-ID: <CAPDyKFqiar=EKBHG=PHimjNcdLKsVdx+BRZReEJzHr8_qoayeg@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: Drop Bhupesh Sharma from maintainers
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, linux-arm-msm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+	Bhupesh Sharma <bhupesh.linux@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-When matching erspan_opt in cls_flower, only the (version, dir, hwid)
-fields are relevant. However, in fl_set_erspan_opt() it initializes
-all bits of erspan_opt and its mask to 1. This inadvertently requires
-packets to match not only the (version, dir, hwid) fields but also the
-other fields that are unexpectedly set to 1.
+On Sat, 30 Nov 2024 at 10:48, Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+>
+> For more than a year all emails to Bhupesh Sharma's Linaro emails bounce
+> and there were no updates to mailmap.  No reviews from Bhupesh, either,
+> so change the maintainer to Bjorn and Konrad (Qualcomm SoC maintainers).
+>
+> Cc: Bhupesh Sharma <bhupesh.linux@gmail.com>
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-This patch resolves the issue by ensuring that only the (version, dir,
-hwid) fields are configured in fl_set_erspan_opt(), leaving the other
-fields to 0 in erspan_opt.
+I have queued this up via my mmc tree for next. If anyone has
+objections to that and wants to funnel this via another tree, please
+let me know!
 
-Fixes: 79b1011cb33d ("net: sched: allow flower to match erspan options")
-Reported-by: Shuang Li <shuali@redhat.com>
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
----
-v1 -> v2:
- - Initialize the hwid by invoking set_hwid() with 0xff instead of 0x3f,
-   as suggested by Cong.
----
- net/sched/cls_flower.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Kind regards
+Uffe
 
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index e280c27cb9f9..1008ec8a464c 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -1369,7 +1369,6 @@ static int fl_set_erspan_opt(const struct nlattr *nla, struct fl_flow_key *key,
- 	int err;
- 
- 	md = (struct erspan_metadata *)&key->enc_opts.data[key->enc_opts.len];
--	memset(md, 0xff, sizeof(*md));
- 	md->version = 1;
- 
- 	if (!depth)
-@@ -1398,9 +1397,9 @@ static int fl_set_erspan_opt(const struct nlattr *nla, struct fl_flow_key *key,
- 			NL_SET_ERR_MSG(extack, "Missing tunnel key erspan option index");
- 			return -EINVAL;
- 		}
-+		memset(&md->u.index, 0xff, sizeof(md->u.index));
- 		if (tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_INDEX]) {
- 			nla = tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_INDEX];
--			memset(&md->u, 0x00, sizeof(md->u));
- 			md->u.index = nla_get_be32(nla);
- 		}
- 	} else if (md->version == 2) {
-@@ -1409,10 +1408,12 @@ static int fl_set_erspan_opt(const struct nlattr *nla, struct fl_flow_key *key,
- 			NL_SET_ERR_MSG(extack, "Missing tunnel key erspan option dir or hwid");
- 			return -EINVAL;
- 		}
-+		md->u.md2.dir = 1;
- 		if (tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_DIR]) {
- 			nla = tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_DIR];
- 			md->u.md2.dir = nla_get_u8(nla);
- 		}
-+		set_hwid(&md->u.md2, 0xff);
- 		if (tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_HWID]) {
- 			nla = tb[TCA_FLOWER_KEY_ENC_OPT_ERSPAN_HWID];
- 			set_hwid(&md->u.md2, nla_get_u8(nla));
--- 
-2.43.0
 
+> ---
+>  Documentation/devicetree/bindings/crypto/qcom-qce.yaml         | 3 ++-
+>  Documentation/devicetree/bindings/mmc/sdhci-msm.yaml           | 3 ++-
+>  Documentation/devicetree/bindings/net/qcom,ethqos.yaml         | 3 ++-
+>  .../devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml        | 3 ++-
+>  4 files changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+> index c09be97434ac..62310add2e44 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+> @@ -7,7 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+>  title: Qualcomm crypto engine driver
+>
+>  maintainers:
+> -  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> +  - Bjorn Andersson <andersson@kernel.org>
+> +  - Konrad Dybcio <konradybcio@kernel.org>
+>
+>  description:
+>    This document defines the binding for the QCE crypto
+> diff --git a/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml b/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
+> index 8b393e26e025..eed9063e9bb3 100644
+> --- a/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
+> +++ b/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
+> @@ -7,7 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+>  title: Qualcomm SDHCI controller (sdhci-msm)
+>
+>  maintainers:
+> -  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> +  - Bjorn Andersson <andersson@kernel.org>
+> +  - Konrad Dybcio <konradybcio@kernel.org>
+>
+>  description:
+>    Secure Digital Host Controller Interface (SDHCI) present on
+> diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
+> index 0bcd593a7bd0..f117471fb06f 100644
+> --- a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
+> +++ b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
+> @@ -7,7 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+>  title: Qualcomm Ethernet ETHQOS device
+>
+>  maintainers:
+> -  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> +  - Bjorn Andersson <andersson@kernel.org>
+> +  - Konrad Dybcio <konradybcio@kernel.org>
+>
+>  description:
+>    dwmmac based Qualcomm ethernet devices which support Gigabit
+> diff --git a/Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml b/Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml
+> index 758adb06c8dd..059cb87b4d6c 100644
+> --- a/Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml
+> +++ b/Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml
+> @@ -7,7 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+>  title: Qualcomm SM6115 Peripheral Authentication Service
+>
+>  maintainers:
+> -  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> +  - Bjorn Andersson <andersson@kernel.org>
+> +  - Konrad Dybcio <konradybcio@kernel.org>
+>
+>  description:
+>    Qualcomm SM6115 SoC Peripheral Authentication Service loads and boots
+> --
+> 2.43.0
+>
+>
 
