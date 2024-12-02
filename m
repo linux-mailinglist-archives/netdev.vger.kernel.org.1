@@ -1,328 +1,372 @@
-Return-Path: <netdev+bounces-148043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 968A59E01C5
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 13:12:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0C609E01B1
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 13:11:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4514B289C7
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:35:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B78D6B35DF5
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 11:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952B81FCF7C;
-	Mon,  2 Dec 2024 11:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Jed/pMdz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6FA51FCF57;
+	Mon,  2 Dec 2024 11:32:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799FC1C6F56;
-	Mon,  2 Dec 2024 11:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6961FA245;
+	Mon,  2 Dec 2024 11:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733139044; cv=none; b=uZxuQysL/Oz/BaUmuWjKfwzQUN3ncBMJmGzj8HkJI3VNzjKKcNfYMp7R40R5ILV3XtRPxLmNjI9ggJG/1Dkx6wLTNA9BEwtu5LSyirTXBeX0WBqN5HoiVJuIbhHMXdcIxb/rp+DUbVKUzwnPAhO1buehv0YNGIE11VdlU73+Vrg=
+	t=1733139175; cv=none; b=lzdrErMxUf5FW473DIksxT0QLf+7JN7e6XYoatGZNM5ZNjQwr4vhxlCey7RszsacVjXhPxA7i5h4aczFw+613yhGFxZ+pvpuoqgCOF+mBxEljIj6a74H4fi5I4TRojMlxtrTXTg0GC6eaXonsHTka6BPWN22Wcg73WoC2qHz4yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733139044; c=relaxed/simple;
-	bh=R3raTy+TsyNhkfIZ0aBPxt6o5618wybYnhAizrUINhk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=fdzmRxQ8e6/3MrHMR+ebMe8FNo5rcyIjepp+EV3tAgJQ4d1aQ2rhUlmY1IE9FRpz1PVJt2DF9tkVeF3ZU8x55s16nAKXKViIe0MMocchxkaOoe4mePCC3v+aeH/Qrx8eS4wl7iu7f+QLDPe9Xr8o9T33btdxssYk1gnWiBUagIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Jed/pMdz; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tI4dM-0080q5-SF; Mon, 02 Dec 2024 12:30:32 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=uNFEdS5uGm6Njo4yZYOGUhFLFGeSEmwBt49zd9lx61Q=; b=Jed/pMdzlOGtkIN4p5WMj0koWh
-	Jr4Dz7IjcTqcFFGqvHBDjfWaWgEHpnA8778fzJetjpItXtKThzhErt2R4SD0mINszmbnRV4JLRZCp
-	deEnWeotcGQ+pcFU9WF9vcVusI72hwjIhRBAXN/s//tDKw9OvUt9Ly0lrnwsBZykHDA0jyP4m3Jd4
-	lLm5mdRwLLUD9ZqSmctfhL4UyWpvSxWLYIXIlLyyJJP9AtTSJzsMNwPuoqu4UJ9v0SQYiqQnz1z++
-	uq0TuHMsQKvvMvRQ+nV7IJMLt97uG7InrYLBbfj0wytbQaqeyhjeKzdLtjMKecuL5GH17MNQ6NelK
-	wnO8NXdQ==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tI4dK-0005e5-Ul; Mon, 02 Dec 2024 12:30:32 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tI4d5-007H5a-3p; Mon, 02 Dec 2024 12:30:15 +0100
-From: Michal Luczaj <mhal@rbox.co>
-Date: Mon, 02 Dec 2024 12:29:25 +0100
-Subject: [PATCH bpf 3/3] bpf, sockmap: Fix race between element replace and
- close()
+	s=arc-20240116; t=1733139175; c=relaxed/simple;
+	bh=q1oTX19RB5TTGmMPwQPIbTWTnp2rfELwgORKeXdNJfo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=GqxTInc3ZZCo3gBiQ3buBmF7rIeYQfFTvVzsfKcsxtvLTUNySyv1nZLKTbzSuvOFTuMO04OgMBOsc2H8I2EbXGzynPAT2RRGG9JXERKPwb5tBGramSSAPK2KYD276wxykmEusD+xjDp2xBBdFpQ8wCPRkdBeB8QNO+hOyDEzIEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Y21m6713cz6K9Hn;
+	Mon,  2 Dec 2024 19:29:58 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id BEC7E14034E;
+	Mon,  2 Dec 2024 19:32:49 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Mon, 2 Dec 2024 14:32:47 +0300
+Message-ID: <af72be74-50c7-d251-5df3-a2c63c73296a@huawei-partners.com>
+Date: Mon, 2 Dec 2024 14:32:45 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241202-sockmap-replace-v1-3-1e88579e7bd5@rbox.co>
-References: <20241202-sockmap-replace-v1-0-1e88579e7bd5@rbox.co>
-In-Reply-To: <20241202-sockmap-replace-v1-0-1e88579e7bd5@rbox.co>
-To: Andrii Nakryiko <andrii@kernel.org>, 
- Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, 
- Jakub Sitnicki <jakub@cloudflare.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 01/19] landlock: Support socket access-control
+To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+CC: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
+	<willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+ <20240904104824.1844082-2-ivanov.mikhail1@huawei-partners.com>
+ <ea026af8-bc29-709c-7e04-e145d01fd825@huawei-partners.com>
+ <Z0DDQKACIRRDRZRE@google.com>
+ <36ac2fde-1344-9055-42e2-db849abf02e0@huawei-partners.com>
+ <20241127.oophah4Ueboo@digikod.net>
+ <eafd855d-2681-8dfd-a2be-9c02fc07050d@huawei-partners.com>
+ <20241128.um9voo5Woo3I@digikod.net>
+Content-Language: ru
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20241128.um9voo5Woo3I@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
-Element replace (with a socket different from the one stored) may race with
-socket's close() link popping & unlinking. __sock_map_delete()
-unconditionally unrefs the (wrong) element:
+On 11/28/2024 11:52 PM, Mickaël Salaün wrote:
+> On Thu, Nov 28, 2024 at 03:01:52PM +0300, Mikhail Ivanov wrote:
+>> On 11/27/2024 9:43 PM, Mickaël Salaün wrote:
+>>> On Mon, Nov 25, 2024 at 02:04:09PM +0300, Mikhail Ivanov wrote:
+>>>> On 11/22/2024 8:45 PM, Günther Noack wrote:
+>>>>> Hello Mikhail,
+>>>>>
+>>>>> sorry for the delayed response;
+>>>>> I am very happy to see activity on this patch set! :)
+>>>>
+>>>> Hello Günther,
+>>>> No problem, thanks a lot for your feedback!
+>>>>
+>>>>>
+>>>>> On Mon, Nov 11, 2024 at 07:29:49PM +0300, Mikhail Ivanov wrote:
+>>>>>> On 9/4/2024 1:48 PM, Mikhail Ivanov wrote:
+>>>>>>> Landlock implements the `LANDLOCK_RULE_NET_PORT` rule type, which provides
+>>>>>>> fine-grained control of actions for a specific protocol. Any action or
+>>>>>>> protocol that is not supported by this rule can not be controlled. As a
+>>>>>>> result, protocols for which fine-grained control is not supported can be
+>>>>>>> used in a sandboxed system and lead to vulnerabilities or unexpected
+>>>>>>> behavior.
+>>>>>>>
+>>>>>>> Controlling the protocols used will allow to use only those that are
+>>>>>>> necessary for the system and/or which have fine-grained Landlock control
+>>>>>>> through others types of rules (e.g. TCP bind/connect control with
+>>>>>>> `LANDLOCK_RULE_NET_PORT`, UNIX bind control with
+>>>>>>> `LANDLOCK_RULE_PATH_BENEATH`). Consider following examples:
+>>>>>>>
+>>>>>>> * Server may want to use only TCP sockets for which there is fine-grained
+>>>>>>>       control of bind(2) and connect(2) actions [1].
+>>>>>>> * System that does not need a network or that may want to disable network
+>>>>>>>       for security reasons (e.g. [2]) can achieve this by restricting the use
+>>>>>>>       of all possible protocols.
+>>>>>>>
+>>>>>>> This patch implements such control by restricting socket creation in a
+>>>>>>> sandboxed process.
+>>>>>>>
+>>>>>>> Add `LANDLOCK_RULE_SOCKET` rule type that restricts actions on sockets.
+>>>>>>> This rule uses values of address family and socket type (Cf. socket(2))
+>>>>>>> to determine sockets that should be restricted. This is represented in a
+>>>>>>> landlock_socket_attr struct:
+>>>>>>>
+>>>>>>>       struct landlock_socket_attr {
+>>>>>>>         __u64 allowed_access;
+>>>>>>>         int family; /* same as domain in socket(2) */
+>>>>>>>         int type; /* see socket(2) */
+>>>>>>>       };
+>>>>>>
+>>>>>> Hello! I'd like to consider another approach to define this structure
+>>>>>> before sending the next version of this patchset.
+>>>>>>
+>>>>>> Currently, it has following possible issues:
+>>>>>>
+>>>>>> First of all, there is a lack of protocol granularity. It's impossible
+>>>>>> to (for example) deny creation of ICMP and SCTP sockets and allow TCP
+>>>>>> and UDP. Since the values of address family and socket type do not
+>>>>>> completely define the protocol for the restriction, we may gain
+>>>>>> incomplete control of the network actions. AFAICS, this is limited to
+>>>>>> only a couple of IP protocol cases (e.g. it's impossible to deny SCTP
+>>>>>> and SMC sockets to only allow TCP, deny ICMP and allow UDP).
+>>>>>>
+>>>>>> But one of the main advantages of socket access rights is the ability to
+>>>>>> allow only those protocols for which there is a fine-grained control
+>>>>>> over their actions (TCP bind/connect). It can be inconvenient
+>>>>>> (and unsafe) for SCTP to be unrestricted, while sandboxed process only
+>>>>>> needs TCP sockets.
+>>>>>
+>>>>> That is a good observation which I had missed.
+>>>>>
+>>>>> I agree with your analysis, I also see the main use case of socket()
+>>>>> restrictions in:
+>>>>>
+>>>>>     (a) restricting socket creating altogether
+>>>>>     (b) only permitting socket types for which there is fine grained control
+>>>>>
+>>>>> and I also agree that it would be very surprising when the same socket types
+>>>>> that provide fine grained control would also open the door for unrestricted
+>>>>> access to SMC, SCTP or other protocols.  We should instead strive for a
+>>>>> socket() access control with which these additional protocols weren't
+>>>>> accessible.
+>>>>>
+>>>>>
+>>>>>> Adding protocol (Cf. socket(2)) field was considered a bit during the
+>>>>>> initial discussion:
+>>>>>> https://lore.kernel.org/all/CABi2SkVWU=Wxb2y3fP702twyHBD3kVoySPGSz2X22VckvcHeXw@mail.gmail.com/
+>>>>>
+>>>>> So adding "protocol" to the rule attributes would suffice to restrict the use of
+>>>>> SMC and SCTP then?  (Sorry, I lost context on these protocols a bit in the
+>>>>> meantime, I was so far under the impression that these were using different
+>>>>> values for family and type than TCP and UDP do.)
+>>>>
+>>>> Yeap. Following rule will be enough to allow TCP sockets only:
+>>>>
+>>>> const struct landlock_socket_attr create_socket_attr = {
+>>>> 	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>>>> 	.family = AF_INET{,6},
+>>>> 	.type = SOCK_STREAM,
+>>>> 	.protocol = 0
+>>>> };
+>>>
+>>> We should indeed include the protocol type in the rule definition.
+>>>
+>>>>
+>>>> Btw, creation of SMC sockets via IP stack was added quite recently.
+>>>> So far, creation has been possible only with AF_SMC family.
+>>>>
+>>>> https://lore.kernel.org/all/1718301630-63692-1-git-send-email-alibuda@linux.alibaba.com/
+>>>>
+>>>>>
+>>>>>
+>>>>>> Secondly, I'm not really sure if socket type granularity is required
+>>>>>> for most of the protocols. It may be more convenient for the end user
+>>>>>> to be able to completely restrict the address family without specifying
+>>>>>> whether restriction is dedicated to stream or dgram sockets (e.g. for
+>>>>>> BLUETOOTH, VSOCK sockets). However, this is not a big issue for the
+>>>>>> current design, since address family can be restricted by specifying
+>>>>>> type = SOCK_TYPE_MASK.
+>>>
+>>> It looks like SOCK_TYPE_MASK is not part of UAPI, which means it could
+>>> change with kernel versions (even while being in UAPI in fact).  This
+>>> new socket creation control should allow to deny any socket creation
+>>> known or unknow at the time of the user space program build, and
+>>> whatever the available C headers.
+>>
+>> Agreed
+>>
+>>>
+>>> This also means that Landlock should accept any domain, type, and
+>>> protocols defined in rules.  Indeed, we don't want to reject rules for
+>>> which some protocols are not allowed.
+>>
+>> Do you mean that Landlock should not make any assumptions about this
+>> values during a build time? Currently, patchset provides boundary checks
+>> for domain (< AF_MAX) and type (< SOCK_MAX) in landlock_add_rule().
+> 
+> The *running kernel* may not support some socket's domains or types,
+> which may be confusing for users if the rule was tested on a kernel
+> supporting such domains/types. >
+> For the bitmask of domains or types, the issues to keep boundary checks
+> would be when a subset of them is not supported.  Landlock would reject
+> such rule and it would be difficult for users to identify the cause.
 
-// set map[0] = s0
-map_update_elem(map, 0, s0)
+Ok, I'll remove these checks.
 
-// drop fd of s0
-close(s0)
-  sock_map_close()
-    lock_sock(sk)               (s0!)
-    sock_map_remove_links(sk)
-      link = sk_psock_link_pop()
-      sock_map_unlink(sk, link)
-        sock_map_delete_from_link
-                                        // replace map[0] with s1
-                                        map_update_elem(map, 0, s1)
-                                          sock_map_update_elem
-                                (s1!)       lock_sock(sk)
-                                            sock_map_update_common
-                                              psock = sk_psock(sk)
-                                              spin_lock(&stab->lock)
-                                              osk = stab->sks[idx]
-                                              sock_map_add_link(..., &stab->sks[idx])
-                                              sock_map_unref(osk, &stab->sks[idx])
-                                                psock = sk_psock(osk)
-                                                sk_psock_put(sk, psock)
-                                                  if (refcount_dec_and_test(&psock))
-                                                    sk_psock_drop(sk, psock)
-                                              spin_unlock(&stab->lock)
-                                            unlock_sock(sk)
-          __sock_map_delete
-            spin_lock(&stab->lock)
-            sk = *psk                        // s1 replaced s0; sk == s1
-            if (!sk_test || sk_test == sk)   // sk_test (s0) != sk (s1); no branch
-              sk = xchg(psk, NULL)
-            if (sk)
-              sock_map_unref(sk, psk)        // unref s1; sks[idx] will dangle
-                psock = sk_psock(sk)
-                sk_psock_put(sk, psock)
-                  if (refcount_dec_and_test())
-                    sk_psock_drop(sk, psock)
-            spin_unlock(&stab->lock)
-    release_sock(sk)
+> 
+> I'm still wondering if the landlock_append_net_rule()'s -EAFNOSUPPORT
+> return value for kernels without CONFIG_INET was a good idea.  We should
+> probably return 0 in this case, which would be similar to not checking
+> socket's domains nor types.
 
-Then close(map) enqueues bpf_map_free_deferred, which finally calls
-sock_map_free(). This results in some refcount_t warnings along with a
-KASAN splat[1].
+It seems that returning -EAFNOSUPPORT only complicates error checking
+for landlock_append_net_rule() from the user's perspective. Probably the
+only reason to check the correctness of restricted objects in Landlock
+is to provide errors consistency in hooks.
 
-Fix __sock_map_delete(), do not allow sock_map_unref() on elements that may
-have been replaced.
+> 
+>>
+>>>
+>>> What about using bitmasks for the domain and type fields (renamed to
+>>> "domains" and "types")?  The last protocol is currently 45/MCTP so a
+>>> 64-bit field is enough, and 10/SOCK_PACKET also fits for the last socket
+>>> type.
+>>>
+>>> We cannot do the same with the protocol because the higher one is
+>>> 262/MPTCP though.  But it looks like a value of 0 (default protocol)
+>>> should be enough for most use cases, and users could specify a protocol
+>>> (but this time as a number, not a bitmask).
+>>>
+>>> To sum up, we could have something like this:
+>>>
+>>>     const struct landlock_socket_attr create_socket_attr = {
+>>>     	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>>>     	.families = 1 << AF_INET | 1 << AF_INET6,
+>>>     	.types = 1 << SOCK_STREAM,
+>>>     	.protocol = IPPROTO_SCTP
+>>>     };
+>>
+>> Looks good! I think it's a nice approach which will provide a sufficient
+>> level of flexibility to define a single rule for a specific protocol (or
+>> for related protocols).
+>>
+>> But, this adds possibility to define a single rule for the set of
+>> unrelated protocols:
+>>
+>> /* Allows TCP, UDP and UNIX sockets. */
+>> const struct landlock_socket_attr create_socket_attr = {
+>> 	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>> 	.families = 1 << AF_INET | 1 << AF_INET6 | 1 << AF_UNIX,
+>> 	.types = 1 << SOCK_STREAM | 1 << SOCK_DGRAM,
+>> 	.protocol = 0
+>> };
+>>
+>> Perhaps limiting the addition of one rule to only one address family
+>> would be more clear in terms of rule semantics?:
+>>
+>> /* Allows TCP, UDP, UNIX STREAM, UNIX DGRAM sockets. */
+>> const struct landlock_socket_attr create_socket_attrs[] = {
+>> 	{
+>> 		/* Allows IPv4 TCP and UDP sockets. */
+>> 		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>> 		.family = AF_INET,
+>> 		.types = 1 << SOCK_STREAM | 1 << SOCK_DGRAM,
+>> 		.protocol = 0
+>> 	},
+>> 	{
+>> 		/* Allows IPv6 TCP and UDP sockets. */
+>> 		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>> 		.family = AF_INET6,
+>> 		.types = 1 << SOCK_STREAM | 1 << SOCK_DGRAM,
+>> 		.protocol = 0
+>> 	},
+>> 	{
+>> 		/* Allows UNIX sockets. */
+>> 		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>> 		.family = AF_UNIX,
+>> 		.types = 1 << SOCK_STREAM | 1 << SOCK_DGRAM,
+>> 		.protocol = 0
+>> 	},
+>> };
+> 
+> Because we are already mixing bitmasks and (protocol) value, I'm not
+> sure it will help much.  I think in most cases the "families" bitmask
+> would handle IPv4 and IPv6 the same (e.g. to only allow TCP with one
+> rule).  I think this is also required to be able to have a 1:1 mapping
+> with SELinux's socket_type_to_security_class().
 
-[1]:
-BUG: KASAN: slab-use-after-free in sock_map_free+0x10e/0x330
-Write of size 4 at addr ffff88811f5b9100 by task kworker/u64:12/1063
+Ok, agreed
 
-CPU: 14 UID: 0 PID: 1063 Comm: kworker/u64:12 Not tainted 6.12.0+ #125
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
-Workqueue: events_unbound bpf_map_free_deferred
-Call Trace:
- <TASK>
- dump_stack_lvl+0x68/0x90
- print_report+0x174/0x4f6
- kasan_report+0xb9/0x190
- kasan_check_range+0x10f/0x1e0
- sock_map_free+0x10e/0x330
- bpf_map_free_deferred+0x173/0x320
- process_one_work+0x846/0x1420
- worker_thread+0x5b3/0xf80
- kthread+0x29e/0x360
- ret_from_fork+0x2d/0x70
- ret_from_fork_asm+0x1a/0x30
- </TASK>
-
-Allocated by task 1202:
- kasan_save_stack+0x1e/0x40
- kasan_save_track+0x10/0x30
- __kasan_slab_alloc+0x85/0x90
- kmem_cache_alloc_noprof+0x131/0x450
- sk_prot_alloc+0x5b/0x220
- sk_alloc+0x2c/0x870
- unix_create1+0x88/0x8a0
- unix_create+0xc5/0x180
- __sock_create+0x241/0x650
- __sys_socketpair+0x1ce/0x420
- __x64_sys_socketpair+0x92/0x100
- do_syscall_64+0x93/0x180
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
-Freed by task 46:
- kasan_save_stack+0x1e/0x40
- kasan_save_track+0x10/0x30
- kasan_save_free_info+0x37/0x60
- __kasan_slab_free+0x4b/0x70
- kmem_cache_free+0x1a1/0x590
- __sk_destruct+0x388/0x5a0
- sk_psock_destroy+0x73e/0xa50
- process_one_work+0x846/0x1420
- worker_thread+0x5b3/0xf80
- kthread+0x29e/0x360
- ret_from_fork+0x2d/0x70
- ret_from_fork_asm+0x1a/0x30
-
-The buggy address belongs to the object at ffff88811f5b9080
- which belongs to the cache UNIX-STREAM of size 1984
-The buggy address is located 128 bytes inside of
- freed 1984-byte region [ffff88811f5b9080, ffff88811f5b9840)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x11f5b8
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-memcg:ffff888127d49401
-flags: 0x17ffffc0000040(head|node=0|zone=2|lastcpupid=0x1fffff)
-page_type: f5(slab)
-raw: 0017ffffc0000040 ffff8881042e4500 dead000000000122 0000000000000000
-raw: 0000000000000000 00000000800f000f 00000001f5000000 ffff888127d49401
-head: 0017ffffc0000040 ffff8881042e4500 dead000000000122 0000000000000000
-head: 0000000000000000 00000000800f000f 00000001f5000000 ffff888127d49401
-head: 0017ffffc0000003 ffffea00047d6e01 ffffffffffffffff 0000000000000000
-head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff88811f5b9000: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88811f5b9080: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff88811f5b9100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                   ^
- ffff88811f5b9180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88811f5b9200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-Disabling lock debugging due to kernel taint
-
-refcount_t: addition on 0; use-after-free.
-WARNING: CPU: 14 PID: 1063 at lib/refcount.c:25 refcount_warn_saturate+0xce/0x150
-CPU: 14 UID: 0 PID: 1063 Comm: kworker/u64:12 Tainted: G    B              6.12.0+ #125
-Tainted: [B]=BAD_PAGE
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
-Workqueue: events_unbound bpf_map_free_deferred
-RIP: 0010:refcount_warn_saturate+0xce/0x150
-Code: 34 73 eb 03 01 e8 82 53 ad fe 0f 0b eb b1 80 3d 27 73 eb 03 00 75 a8 48 c7 c7 80 bd 95 84 c6 05 17 73 eb 03 01 e8 62 53 ad fe <0f> 0b eb 91 80 3d 06 73 eb 03 00 75 88 48 c7 c7 e0 bd 95 84 c6 05
-RSP: 0018:ffff88815c49fc70 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffff88811f5b9100 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000004 RDI: 0000000000000001
-RBP: 0000000000000002 R08: 0000000000000001 R09: ffffed10bcde6349
-R10: ffff8885e6f31a4b R11: 0000000000000000 R12: ffff88813be0b000
-R13: ffff88811f5b9100 R14: ffff88811f5b9080 R15: ffff88813be0b024
-FS:  0000000000000000(0000) GS:ffff8885e6f00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055dda99b0250 CR3: 000000015dbac000 CR4: 0000000000752ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? __warn.cold+0x5f/0x1ff
- ? refcount_warn_saturate+0xce/0x150
- ? report_bug+0x1ec/0x390
- ? handle_bug+0x58/0x90
- ? exc_invalid_op+0x13/0x40
- ? asm_exc_invalid_op+0x16/0x20
- ? refcount_warn_saturate+0xce/0x150
- sock_map_free+0x2e5/0x330
- bpf_map_free_deferred+0x173/0x320
- process_one_work+0x846/0x1420
- worker_thread+0x5b3/0xf80
- kthread+0x29e/0x360
- ret_from_fork+0x2d/0x70
- ret_from_fork_asm+0x1a/0x30
- </TASK>
-irq event stamp: 10741
-hardirqs last  enabled at (10741): [<ffffffff84400ec6>] asm_sysvec_apic_timer_interrupt+0x16/0x20
-hardirqs last disabled at (10740): [<ffffffff811e532d>] handle_softirqs+0x60d/0x770
-softirqs last  enabled at (10506): [<ffffffff811e55a9>] __irq_exit_rcu+0x109/0x210
-softirqs last disabled at (10301): [<ffffffff811e55a9>] __irq_exit_rcu+0x109/0x210
-
-refcount_t: underflow; use-after-free.
-WARNING: CPU: 14 PID: 1063 at lib/refcount.c:28 refcount_warn_saturate+0xee/0x150
-CPU: 14 UID: 0 PID: 1063 Comm: kworker/u64:12 Tainted: G    B   W          6.12.0+ #125
-Tainted: [B]=BAD_PAGE, [W]=WARN
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
-Workqueue: events_unbound bpf_map_free_deferred
-RIP: 0010:refcount_warn_saturate+0xee/0x150
-Code: 17 73 eb 03 01 e8 62 53 ad fe 0f 0b eb 91 80 3d 06 73 eb 03 00 75 88 48 c7 c7 e0 bd 95 84 c6 05 f6 72 eb 03 01 e8 42 53 ad fe <0f> 0b e9 6e ff ff ff 80 3d e6 72 eb 03 00 0f 85 61 ff ff ff 48 c7
-RSP: 0018:ffff88815c49fc70 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffff88811f5b9100 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000004 RDI: 0000000000000001
-RBP: 0000000000000003 R08: 0000000000000001 R09: ffffed10bcde6349
-R10: ffff8885e6f31a4b R11: 0000000000000000 R12: ffff88813be0b000
-R13: ffff88811f5b9100 R14: ffff88811f5b9080 R15: ffff88813be0b024
-FS:  0000000000000000(0000) GS:ffff8885e6f00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055dda99b0250 CR3: 000000015dbac000 CR4: 0000000000752ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? __warn.cold+0x5f/0x1ff
- ? refcount_warn_saturate+0xee/0x150
- ? report_bug+0x1ec/0x390
- ? handle_bug+0x58/0x90
- ? exc_invalid_op+0x13/0x40
- ? asm_exc_invalid_op+0x16/0x20
- ? refcount_warn_saturate+0xee/0x150
- sock_map_free+0x2d3/0x330
- bpf_map_free_deferred+0x173/0x320
- process_one_work+0x846/0x1420
- worker_thread+0x5b3/0xf80
- kthread+0x29e/0x360
- ret_from_fork+0x2d/0x70
- ret_from_fork_asm+0x1a/0x30
- </TASK>
-irq event stamp: 10741
-hardirqs last  enabled at (10741): [<ffffffff84400ec6>] asm_sysvec_apic_timer_interrupt+0x16/0x20
-hardirqs last disabled at (10740): [<ffffffff811e532d>] handle_softirqs+0x60d/0x770
-softirqs last  enabled at (10506): [<ffffffff811e55a9>] __irq_exit_rcu+0x109/0x210
-softirqs last disabled at (10301): [<ffffffff811e55a9>] __irq_exit_rcu+0x109/0x210
-
-Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
- net/core/sock_map.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-index 20b348b1964a10a1b0bfbe1a90a4a4cd99715b81..f1b9b3958792cd599efcb591742874e9b3f4a76b 100644
---- a/net/core/sock_map.c
-+++ b/net/core/sock_map.c
-@@ -412,12 +412,11 @@ static void *sock_map_lookup_sys(struct bpf_map *map, void *key)
- static int __sock_map_delete(struct bpf_stab *stab, struct sock *sk_test,
- 			     struct sock **psk)
- {
--	struct sock *sk;
-+	struct sock *sk = NULL;
- 	int err = 0;
- 
- 	spin_lock_bh(&stab->lock);
--	sk = *psk;
--	if (!sk_test || sk_test == sk)
-+	if (!sk_test || sk_test == *psk)
- 		sk = xchg(psk, NULL);
- 
- 	if (likely(sk))
-
--- 
-2.46.2
-
+> 
+>>
+>>>
+>>>
+>>>>>
+>>>>> Whether the user is adding one rule to permit AF_INET+*, or whether the user is
+>>>>> adding two rules to permit (1) AF_INET+SOCK_STREAM and (2) AF_INET+SOCK_DGRAM,
+>>>>> that does not seem like a big deal to me as long as the list of such
+>>>>> combinations is so low?
+>>>>
+>>>> Agreed
+>>>
+>>> I also agree, but this might change if users have to set a combination
+>>> of families, types, and protocols.  This should be OK with the bitmask
+>>> approach though.
+>>>
+>>>>
+>>>>>
+>>>>>
+>>>>>> I suggest implementing something close to selinux socket classes for the
+>>>>>> struct landlock_socket_attr (Cf. socket_type_to_security_class()). This
+>>>>>> will provide protocol granularity and may be simpler and more convenient
+>>>>>> in the terms of determining access rights. WDYT?
+>>>>>
+>>>>> I see that this is a longer switch statement that maps to this enum, it would be
+>>>>> an additional data table that would have to be documented separately for users.
+>>>>
+>>>> This table is the general drawback, since it makes API a bit more
+>>>> complex.
+>>>>
+>>>>>
+>>>>> Do you have an example for how such a "security class enum" would map to the
+>>>>> combinations of family, type and socket for the protocols discussed above?
+>>>>
+>>>> I think the socket_type_to_security_class() has a pretty good mapping
+>>>> for UNIX and IP families.
+>>>
+>>> The mapping looks good indeed, and it has been tested for a long time
+>>> with many applications.  However, this would make the kernel
+>>> implementation more complex, and I think this mapping could easily be
+>>> implemented in user space libraries with the bitmask approach, if really
+>>> needed, which I'm not sure.
+>>
+>> I agree, implementing this in a library is a better approach. Thanks for
+>> the catch!
+>>
+>>>
+>>>>
+>>>>>
+>>>>> If this is just a matter of actually mapping (family, type, protocol)
+>>>>> combinations in a more flexible way, could we get away by allowing a special
+>>>>> "wildcard" value for the "protocol" field, when it is used within a ruleset?
+>>>>> Then the LSM would have to look up whether there is a rule for (family, type,
+>>>>> protocol) and the only change would be that it now needs to also check whether
+>>>>> there is a rule for (family, type, *)?
+>>>>
+>>>> Something like this?
+>>>>
+>>>> const struct landlock_socket_attr create_socket_attr = {
+>>>> 	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>>>> 	.family = AF_INET6,
+>>>> 	.type = SOCK_DGRAM,
+>>>> 	.protocol = LANDLOCK_SOCKET_PROTO_ALL
+>>>> };
+>>>>
+>>>>>
+>>>>> —Günther
+>>>>
+>>
 
