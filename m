@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-148213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3F4E9E0DB9
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 22:24:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22FB49E0DBC
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 22:24:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89A2128289A
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:24:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B07F2282640
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:24:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 934731DF981;
-	Mon,  2 Dec 2024 21:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF9021DFD9A;
+	Mon,  2 Dec 2024 21:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C+Oc3XFW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kpNSlh/V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F091DF740;
-	Mon,  2 Dec 2024 21:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B0E1DF974;
+	Mon,  2 Dec 2024 21:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733174618; cv=none; b=rPJWQLRtPXYDCfiAFUchotJToOTBVd8dLRGt8OqCmZFRVMb723Q4Akpm1JGPZ2HhgCmTxCQDD1GpcB6QgnKTFBuVvTe8YBoHe7slOARgCAijRA2YTpkTG8K+c9J3wQBwJ7UuVx5VGIljiSTBsxT1Getry7zVG/XMtOh3eM5O8JQ=
+	t=1733174619; cv=none; b=aBM3qdoctt1ssiBS+66twRG/0d0MwogzmT+70ZAjm9rt+PqJY2ePcEIVb6OAiEwxOqqu/McJcmlVgE21wkgZb4OAbBbqpn4v78FzQ81QUeTHnSp84lVSZDM4i3lrygb99xlNPtliOBLscQesV9YMnoMk5y2M0GSipncXFfYGtX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733174618; c=relaxed/simple;
-	bh=XL14k83axPDHYcjLckdEaN0RAzq7HGpUmxCP8iY2EFE=;
+	s=arc-20240116; t=1733174619; c=relaxed/simple;
+	bh=UEe+01wXcA/6Vp2tXaLjKWUBpnQy8abf4E5ymq4FAlE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CUs7tRG/yMX3TRuRr1QdrAlhQF3qJ9N93ka2pkf5hQReNJKUeYOtNVFWXlkgfybRiLRHtY+wQj8kb75B5GlKN5PxnGnOj+CxDWnlWy2IvehkQRRhcOJGHGka2lnXIro3OfbaxQaugum+22XLqZiFlwI+dWiFvRu8+/0EAjdKOK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C+Oc3XFW; arc=none smtp.client-ip=209.85.214.179
+	 MIME-Version; b=dcPdSaVOdpIa2xPeytfQjzkZyRmNqCtdkT/x86libvKLIZ7jOOARi8pcrxRO8wAbOkKh66pNrr4XileDIx+CHbCouphV2OemAuhlPpAlH/Cu35icf3hB6LRTSWJ5iAnXieTtw+wVEI/BwWclgku85pFJbox9FAqXs4bBfOC2Mp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kpNSlh/V; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21539e1d09cso43212705ad.1;
-        Mon, 02 Dec 2024 13:23:36 -0800 (PST)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21145812538so38297065ad.0;
+        Mon, 02 Dec 2024 13:23:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733174616; x=1733779416; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1733174617; x=1733779417; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jRRatnkW2FFvyyS1UCowv2cxjzV8z8dktdXmCRcfyfY=;
-        b=C+Oc3XFWDIc9SQoncpRRvNQwqI1dBdzQVtctIDhMpq0T9WpEIK73VHfdBzTBTfPumY
-         EBUSrIxFB33kn6cljayrp4ua2MLZ+FeA+zJUgPDmPhLxlKhNLwLEXQ/J1uye7BWQRvkL
-         3P0aPSLWX0e5FpfzRwMHyjBYRLVhyKlk7BveCOzBt/1TRldqcPi2BXnHokxXKfHZ4U2J
-         4C489UHYwS0ZJOEZ6LwttjEn+jaHp1DBp2zVyCMonaYJfAQsB/QZFYIVPVtFL/nJmJRT
-         MN7RnEdDYAI9CxZwpjz/B7tcuUSyQu7crtrYoSu7N2+QuxCmfXDizqw9wvYr8h85DOBF
-         GwlA==
+        bh=HCzzR8j2iKtf3UdeUk+5jPhNrUS+V0xjiwUoH7xZuyk=;
+        b=kpNSlh/VDIeEe9yBJOor9nDRSU/yqWWdpHmKuynyymYCKuPfm/7qYa8ktDiB2g9eTi
+         9r+NFooOAyplpXVXaFtO668KmXCm/oVqkVt0eg44+O51Ot0J8/IudI56SGYoJKjoh4cH
+         BDJ6lXAwkrCnQ0IijE+SzISoFsC3pNtcMOzmHuBcaPAC1BZQV+H70A/JtXUx8NYW0dkX
+         tL7WT1vPqKlSXpyBzBjecW5CiqPU/4ODzj+dHXqxmKVoxNmLwNrl1yI8wF5XnFsl7pAU
+         oTIifxWRSmSTXK0l3LEBwl32tFcLMJdPAYtDknEC/tfsllC2la5rebDQJK4FzG/uRAOG
+         HwFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733174616; x=1733779416;
+        d=1e100.net; s=20230601; t=1733174617; x=1733779417;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jRRatnkW2FFvyyS1UCowv2cxjzV8z8dktdXmCRcfyfY=;
-        b=UKSeeKVnDsoIAzYVhvanqZTv7XxywCzBZpWaTmqtizs93lbAIyfb9ZKof0jmfq6iVK
-         zdffc5aXqm3knWVLx2dK9FZ0Korl7bCrBqckgKWxhtonVbStjTQAn+FaW5ocGEJXyVcT
-         bLUF+602XN3MDKeAxbtxE1UDf67riYpBhAxtPPUnjYoj5Aq+gKv8103yhHTkn8JTsg68
-         4TpS4aUDQJ9KTvXCN+3hFLMk7AVb0rBucrcfgUKeM+GSJx/N8lwNnkmGZbUtcbA4bYIQ
-         zD6WItnqMnnXtIMcgMaAzDW7gSGWvkuKyic/3j8WbeX/crb8+z64tEvQ1yGvkVIKm1yU
-         n0tg==
-X-Forwarded-Encrypted: i=1; AJvYcCXHlSr4FkVaQD1Jv+5lQ75MdLalZvlqPYbhbDNkML6Dy1CTp/X6KTTq3kTrNDcYSCRbyx4097INYcr1kTM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaeCVrUcpeG52cLAcIf1/62zwpb7Yp7WQVpXNxgovE6voEeAtb
-	loa+tQKJnkvzFmdlE5nQF1DuwuB5DSOAOhMThdzinRle1XyJt92nKudwN0rW
-X-Gm-Gg: ASbGncuf9A4Yo7ct4xp4LbSGYBJlOq3Wk/gCIhaOYuZ27lAsLRAb7DY725KDzDgqE4L
-	NHu55aXE+eYlSb2D+P9JSO3ECvhuleh4YgAq4uznK4UD8HX0quR7ok+5wZCM7IOS71o69eGsVew
-	968hjIzyWyeuDCeBOP+NM21lTKalFwUzus+de/DFqiZajv2eBRS7da6Du6PGYATA94ik+HUUJxt
-	DLwDMSCaV93N7D3y27SDw+89w==
-X-Google-Smtp-Source: AGHT+IHyoADsXSYWCNjOIOEWnMQZv6NkeQvstYGxDU1iCY4YgqIAPemGrKNn5nkNzYwEm7+NYf10iA==
-X-Received: by 2002:a17:902:dacc:b0:215:94eb:adb6 with SMTP id d9443c01a7336-21594ebb238mr83643765ad.40.1733174616073;
-        Mon, 02 Dec 2024 13:23:36 -0800 (PST)
+        bh=HCzzR8j2iKtf3UdeUk+5jPhNrUS+V0xjiwUoH7xZuyk=;
+        b=sm5lY2it41IEYWhTsMv3LsiBA6/yCeds3XCwEEGKL9CUGai5w3ixEoer2PlmoIR9HM
+         CuJT9mCexH95QUqw75229WHWKxw0uTHzGeaC3NZ6WaHv/d5KZmVEvgtHeIrv/0aranC/
+         V8XV/X3MxNSAP8CazHbJ9IVPkWqxTiAmuFE8bxMJglGZeLgwU3l7FPu5tCmq+/kJjxtG
+         HCwqdPZn/1u9yiPdulbnzXVRaCps1w2jsgz+o4UcSZ/Xl37dn18qK1r6fptx3VFvyX6N
+         oTWSMDBibXBtm4vj+qAo9RkRgggOYfcDrEKRIT5DwYN3hRr0/5BtMavbvzXrfcs7GTms
+         KiBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUpKQ4cu+ZXSBmkfF2mXVMNiRfmSRd5uJG8I0vg8FVEiuW6LUE6WEI7B6w9aO/jZkUpWavepY2/YGZI7AI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyvjddhgdhxl7wf5q5ogjuTTUXnSCu1brJRET/KPPyqtGDrW2Y8
+	4MU/byBHO/AeFlevYBo77uzv/vUEAi73a+CWk3thDL/x7mn2qbF1lEnYADMO
+X-Gm-Gg: ASbGncsuqzr+hBbxcNc40rXTSBG2f/ewEYZJEHCoFAn5ROSQUY1sOs4GWho5dwBlQ3L
+	G7igZq/rPKPrbXUotknO2dJWepv8nYzJ9xcbecteDWIRM4zObPzkc/NInbrMMXxc415LL/GgqjA
+	bxkwvbFLlGcU1YawK/hUHyWy409ramXeV2WLJOcDrdnDzKeKwzcaxAd43kmI4VlO2ZrG21PkNNm
+	/2dw3LsEi7J4WAvl0poMOq3Ug==
+X-Google-Smtp-Source: AGHT+IE4lBI6lzn4RyCfB1wFHwD7sFSecH49TpJcGomfAcAWTV1f9q4iLVA0yjhRU/LwrGSu6p1yig==
+X-Received: by 2002:a17:902:cec7:b0:215:3661:747e with SMTP id d9443c01a7336-215bcfc5c76mr608535ad.8.1733174617312;
+        Mon, 02 Dec 2024 13:23:37 -0800 (PST)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21598f3281fsm20729515ad.279.2024.12.02.13.23.34
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21598f3281fsm20729515ad.279.2024.12.02.13.23.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 13:23:35 -0800 (PST)
+        Mon, 02 Dec 2024 13:23:36 -0800 (PST)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -80,9 +80,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Claudiu Manoil <claudiu.manoil@nxp.com>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 02/11] net: fsl_pq_mdio: use devm for mdiobus_alloc_size
-Date: Mon,  2 Dec 2024 13:23:22 -0800
-Message-ID: <20241202212331.7238-3-rosenp@gmail.com>
+Subject: [PATCH net-next 03/11] net: fsl_pq_mdio: use platform_get_resource
+Date: Mon,  2 Dec 2024 13:23:23 -0800
+Message-ID: <20241202212331.7238-4-rosenp@gmail.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241202212331.7238-1-rosenp@gmail.com>
 References: <20241202212331.7238-1-rosenp@gmail.com>
@@ -94,68 +94,73 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Using devm avoids having to manually free. In the case of this driver,
-it's simple enough that it's ideal for devm.
-
-There also seems to be a mistake here. Using kfree instead of
-mdiobus_free.
+Replace of_address_to_resource with platform_get_resource. No need to
+use the of_node when the pdev is sufficient.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/freescale/fsl_pq_mdio.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/freescale/fsl_pq_mdio.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/net/ethernet/freescale/fsl_pq_mdio.c b/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-index 108e760c7a5f..d7f9d99fe782 100644
+index d7f9d99fe782..f14607555f33 100644
 --- a/drivers/net/ethernet/freescale/fsl_pq_mdio.c
 +++ b/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-@@ -423,7 +423,7 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
- 		return -ENODEV;
- 	}
+@@ -414,7 +414,7 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
+ 	struct device_node *tbi;
+ 	struct mii_bus *new_bus;
+ 	struct device_node *np;
+-	struct resource res;
++	struct resource *res;
+ 	int err;
  
--	new_bus = mdiobus_alloc_size(sizeof(*priv));
-+	new_bus = devm_mdiobus_alloc_size(dev, sizeof(*priv));
- 	if (!new_bus)
- 		return -ENOMEM;
+ 	data = device_get_match_data(dev);
+@@ -433,15 +433,15 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
+ 	new_bus->write = &fsl_pq_mdio_write;
+ 	new_bus->reset = &fsl_pq_mdio_reset;
  
-@@ -437,17 +437,15 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
- 	err = of_address_to_resource(np, 0, &res);
- 	if (err < 0) {
+-	np = dev->of_node;
+-	err = of_address_to_resource(np, 0, &res);
+-	if (err < 0) {
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	if (!res) {
  		dev_err(dev, "could not obtain address information\n");
--		goto error;
-+		return err;
+-		return err;
++		return -ENOMEM;
  	}
  
++	np = dev->of_node;
  	snprintf(new_bus->id, MII_BUS_ID_SIZE, "%pOFn@%llx", np,
- 		 (unsigned long long)res.start);
+-		 (unsigned long long)res.start);
++		 (unsigned long long)res->start);
  
  	priv->map = of_iomap(np, 0);
--	if (!priv->map) {
--		err = -ENOMEM;
--		goto error;
--	}
-+	if (!priv->map)
-+		return -ENOMEM;
+ 	if (!priv->map)
+@@ -453,7 +453,7 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
+ 	 * contains the offset of the MII registers inside the mapped register
+ 	 * space.
+ 	 */
+-	if (data->mii_offset > resource_size(&res)) {
++	if (data->mii_offset > resource_size(res)) {
+ 		dev_err(dev, "invalid register map\n");
+ 		err = -EINVAL;
+ 		goto error;
+@@ -480,13 +480,12 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
+ 				err = -EBUSY;
+ 				goto error;
+ 			}
+-			set_tbipa(*prop, pdev,
+-				  data->get_tbipa, priv->map, &res);
++			set_tbipa(*prop, pdev, data->get_tbipa, priv->map, res);
+ 		}
+ 	}
  
- 	/*
- 	 * Some device tree nodes represent only the MII registers, and
-@@ -502,8 +500,6 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
- 	if (priv->map)
- 		iounmap(priv->map);
+ 	if (data->ucc_configure)
+-		data->ucc_configure(res.start, res.end);
++		data->ucc_configure(res->start, res->end);
  
--	kfree(new_bus);
--
- 	return err;
- }
- 
-@@ -517,7 +513,6 @@ static void fsl_pq_mdio_remove(struct platform_device *pdev)
- 	mdiobus_unregister(bus);
- 
- 	iounmap(priv->map);
--	mdiobus_free(bus);
- }
- 
- static struct platform_driver fsl_pq_mdio_driver = {
+ 	err = of_mdiobus_register(new_bus, np);
+ 	if (err) {
 -- 
 2.47.0
 
