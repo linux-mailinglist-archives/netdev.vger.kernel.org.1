@@ -1,141 +1,950 @@
-Return-Path: <netdev+bounces-148147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 345ED9E08BF
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 17:37:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2672D9E08F2
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 17:46:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4604016B0D5
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:23:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E86B16EEC6
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3521925BC;
-	Mon,  2 Dec 2024 16:23:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O9/Aq6fw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6804F1DA11A;
+	Mon,  2 Dec 2024 16:29:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22571192B65
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 16:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401351D90AC;
+	Mon,  2 Dec 2024 16:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733156582; cv=none; b=tB+zcRYOtNB+wK0LC5RvKfxwNcOVkrF5JMRssISvsS8rwq6hm748WS5BTCDYHS+uX7qZXy14bRTLZZHpq2+mr7SE92j/+t0mImSM8LsKL8NSB4nWuC6fXTMOIIBeqKbyJSN4A5WektFtF9EFvv3jFUsTr1Q5TWTLvjEOgbFhB5U=
+	t=1733156986; cv=none; b=nfaMDkLA2Y0mZbpi9ihoOLFAWOHbchd9mRVZrW+LZGGuBrJwwc16crJ3gzAyWLN+zRey71qHdokI8fLiTRhb0DsYK7TrDw4F7zKnSdS0+9+5/kYDfNZjv0XwVuVR0uG4BbEwchzbWZSmFgPEUZrn1fuHU9wyxAbGTQenRErnfxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733156582; c=relaxed/simple;
-	bh=Zsms+C4NOXG/Dy3KLtJWWY/xMoO7EcT/34IHBJcUaRc=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=Su9q8XmWfLPdhK+gYKDEtl7x2Z/RB45qXoxAsyLTfXvChopDZ4ounXPVpjQpVvwNxS6DZOQUyTAJ7X2gpvEOzQBqtk5F85D4D4vv3LRpP/uq1sMLrTic2pOLqAZ+Oh+N9i6JQu1UnV8QPb5wp9mbmi3iujS6nmDRRrVEWUM7uOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O9/Aq6fw; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1733156986; c=relaxed/simple;
+	bh=NmSw+q1isXaiAp2leJ+cQrWBMwxTiP22ffr+z/rMGa0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ft1l75DUzlYwZ5BlIvRS7p6KhMRwZ30UzfKeDlbQe99PNdZ89/NNaRkIp4XrzOrXxj2oAvUncZC9aSSr8AL/8dfymMVvGOlQFdTglKyefXOXldLJFE6czqKqqVZ8WcOo/yparDuHo8TkfoLE16sUlWcmjbEU2C5Wzfw3VUWHNTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-434a0fd9778so41385385e9.0
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 08:23:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733156579; x=1733761379; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3YxeGxBXYGXTZb93lQ9kig+HGhN+3cwpXcO70XlpyaE=;
-        b=O9/Aq6fwA1vF5+W+MbU/1/vu0BggBMHjcI7HyYGw1+t2R2BX8/qRcRDfIE14eZNhoT
-         GXQSC36ziFv5zVdedDi37MiI+QUktI+kbwOlqZgHArckkBOZGw80c6+jwDBTV/GWwUgT
-         iuKAeYvnAvEzviVUII3UBbaKf4WR1PRc/fWUBacnxjoNN2DSYSIw5dA7P6HTuAT/LrwP
-         7un5YgNoJIuBuwRzn9EGBEafZH64ckFm2UuGtfUuUkNC7YWmX3HJFdaDSLQeVPvlymrX
-         t4TikPfdyfnA7nJDLtm27+KiVmJYkoiBfrUiLm/KZdtoTfhkzUV08imLSzFMmp95W7nJ
-         ydWA==
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21561af95c3so17687515ad.3;
+        Mon, 02 Dec 2024 08:29:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733156579; x=1733761379;
-        h=content-transfer-encoding:cc:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3YxeGxBXYGXTZb93lQ9kig+HGhN+3cwpXcO70XlpyaE=;
-        b=meD05P3uvhKwPfcKFdhZzI8mwOlTpT1Od8UpjhaDu1W0DiKfQLEF3DUJKqHf1Sd5w8
-         qNwbkP1TUs6gpbNO/i9uNJnXRKA7Sd3r0FT3HgXFHhu8TKO8kyYZpds7Fbb2X6iCKBw6
-         L/tTKjsoLfKcK9HjNxbuLJEZLps1s+WRk9yhuOf/3vsRv+VBbvRqZyRc2kAHIFPJ5aag
-         wDpIouDlMEKfXct/mPhveyDwhbyGwrucNfgZVir4/VRh978nzSlhA9r96n5SLrAH6/Mp
-         lVx9UUFLwum1eilljfI5DprCz2TKJs3Idfk14A45j97XXnZ6TtfHWLmlGp6SZk+4efyJ
-         GxEA==
-X-Gm-Message-State: AOJu0Yxzng7+zxMqU1zGGdlYuG74bO1IbzBsn68G3V3TmrgKBbVLvE3H
-	sJ8p6+6ih7FH61I+hy4+2uJ+o7+QtpTSF2E9QijSLBheLa/4w4BKjy8jTxu+
-X-Gm-Gg: ASbGncvoMq6fq64SeC+HxJV8eOIfiuuifrgvcGDvfMwvl6wTRuExpiyJssZR2bisxRg
-	Bb/54n2JK9kxHSq+Px3Pa3IQGKQxOi3BZShw6DrfINgbsrjnUAvXYgjIAbgJ31zg8XlPt+rHBdb
-	Alybr/R2s2xpkciA3dL239kAtTxXBaZcdWWrpvRD/KXAOQ1Zxbs6k0b+2zH3kcPWLZ0/d0661Yb
-	eerAHXs0aOYVRQ0+E61e654eVBN+i9wnmAwHgagDmtShbpS81nE6jnjTskquX2Z+mfdqUARUp0o
-	Ds3/HtzdyX8+f3RpZ0r3dK37waD0zvrdVmZEzbk9dOud/Rsisy1PIS+1AR1y/oM3++kVbOGjh10
-	p/Q==
-X-Google-Smtp-Source: AGHT+IHJMnMvpKq7Hj7JyQcmDN/8Ny6qODY6Et1O1ZBQY+4XeadXXH4b5DxlcqU1ywMejxBx32c+8Q==
-X-Received: by 2002:a05:600c:458b:b0:431:5f1c:8359 with SMTP id 5b1f17b1804b1-434a9dcfd5emr222330845e9.15.1733156579093;
-        Mon, 02 Dec 2024 08:22:59 -0800 (PST)
-Received: from ?IPV6:2003:ed:7731:2315:f8e3:ac9e:6d58:8a90? (p200300ed77312315f8e3ac9e6d588a90.dip0.t-ipconnect.de. [2003:ed:7731:2315:f8e3:ac9e:6d58:8a90])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e2c84d52sm8119292f8f.49.2024.12.02.08.22.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Dec 2024 08:22:58 -0800 (PST)
-Message-ID: <6c7ae1c8-8573-4f4a-96cb-0a75eab21516@gmail.com>
-Date: Mon, 2 Dec 2024 17:22:57 +0100
+        d=1e100.net; s=20230601; t=1733156983; x=1733761783;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qqu0iXawGFxj2/+c+jISNhs8tZDONWPWVEAsbnIrSjU=;
+        b=JGOmTFX+X9S5Foo0lqNMOTT/LbaanIaxooymorvVxZuU/oHdzgPgwP1SHDls2FDnOk
+         eGY13xoo7MHosTWclW5yyY5g1uV71Yej1t0TJRFHe7pRk/LEBF7UUMadXYDj/U6A71vS
+         GzGoMbRjKtBi+mzoZmEfHevLWrVf02/ML7iFLs6K5apOOqja6vuCgk5FHX8Eg0F0YQ+c
+         hmNFvlKqCQtGZDtJjqNLegdETW/+fouQb67s9C7bQi+K3WLryM+ooJWpWYRQnfYvPAZG
+         amCEXNluGk0bsvrESJ5pqoTVRUSKWRDR3rC9LrSYMx6sSliDsv8I1oteozZeaw9zAcb/
+         eMQA==
+X-Forwarded-Encrypted: i=1; AJvYcCUkcn57SFbB60jbAVuNJYBuhh+d08CV+kBerEsa0g7R3WdVcZQn/P2CbebjU3T8MXNImB0QmxG7Vu0=@vger.kernel.org, AJvYcCXZ0busGm5rEQAr2VZTOWGwAXNPIluMsFI15iYtiJ3QeeVEzy2DPJGAGXfRdVyyikTkqdgx9Bx2b9MPj0jk@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzE70iJCAqLxa4thgx6z9HnfhRYMepl1H1POBb7mLo6npgIk1x
+	LvfH8rlYhlGBrw4Sura1LOBbec77W4dVkbbnrFNvYEZAgWLR6WEGrq2yKPM=
+X-Gm-Gg: ASbGnculm4CaX7aYSnahlTgUDvkgobH4pZscxN1S6Jm7xIluThPwbhMuqUX86vq4JJ5
+	WbPHuw8rByheghpM2OEGAuJx7hRwJy73WqITDSoz3ChNYz9t7y87o4hiWUtg2NUiKtqFhzociHS
+	d9704aWL49LZfyn2NZMaAetVI9vVHv/07icNjGkofNRLfnzDSvRH+K5PMhx/V8YiJEINTmCyhlO
+	2bG7VadmCwEuMCm8CJ799KDvvOGHX5WdQQ+pZItGuquHdw8ew==
+X-Google-Smtp-Source: AGHT+IGbOd5+q8sALyKzNrESTVdwF3B5m6NwXX4kJoaYv8mOV2b/q0sC7GS1a03WmkW5zCoIqyIBfw==
+X-Received: by 2002:a17:902:ef43:b0:215:5bd8:9f7b with SMTP id d9443c01a7336-2155bd8a314mr158267015ad.15.1733156982892;
+        Mon, 02 Dec 2024 08:29:42 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2156b12f791sm38595185ad.44.2024.12.02.08.29.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Dec 2024 08:29:42 -0800 (PST)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	corbet@lwn.net,
+	andrew+netdev@lunn.ch,
+	kory.maincent@bootlin.com,
+	sdf@fomichev.me,
+	nicolas.dichtel@6wind.com
+Subject: [PATCH net-next v3 4/8] ynl: add missing pieces to ethtool spec to better match uapi header
+Date: Mon,  2 Dec 2024 08:29:32 -0800
+Message-ID: <20241202162936.3778016-5-sdf@fomichev.me>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241202162936.3778016-1-sdf@fomichev.me>
+References: <20241202162936.3778016-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Lion Ackermann <nnamrec@gmail.com>
-Subject: [PATCH] net: sched: fix ordering of qlen adjustment
-To: netdev@vger.kernel.org
-Cc: toke@toke.dk, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, nnamrec@gmail.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Changes to sch->q.qlen around qdisc_tree_reduce_backlog() need to happen
-_before_ a call to said function because otherwise it may fail to notify
-parent qdiscs when the child is about to become empty.
+- __ETHTOOL_UDP_TUNNEL_TYPE_CNT and render max
+- skip rendering stringset (empty enum)
+- skip rendering c33-pse-ext-state (defined in ethtool.h)
+- rename header flags to ethtool-flag-
+- add attr-cnt-name to each attribute to use XXX_CNT instead of XXX_MAX
+- add unspec 0 entry to each attribute
+- carry some doc entries from the existing header
+- tcp-header-split
 
-Signed-off-by: Lion Ackermann <nnamrec@gmail.com>
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- net/sched/sch_cake.c  | 2 +-
- net/sched/sch_choke.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ Documentation/netlink/specs/ethtool.yaml | 354 ++++++++++++++++++++++-
+ 1 file changed, 343 insertions(+), 11 deletions(-)
 
-diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index 30955dd45779..a65fad45d556 100644
---- a/net/sched/sch_cake.c
-+++ b/net/sched/sch_cake.c
-@@ -1542,7 +1542,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
- 	b->backlogs[idx]    -= len;
- 	b->tin_backlog      -= len;
- 	sch->qstats.backlog -= len;
--	qdisc_tree_reduce_backlog(sch, 1, len);
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index 93369f0eb816..efa00665c191 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -5,6 +5,7 @@ name: ethtool
+ protocol: genetlink-legacy
  
- 	flow->dropped++;
- 	b->tin_dropped++;
-@@ -1553,6 +1552,7 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+ doc: Partial family for Ethtool Netlink.
++uapi-header: linux/ethtool_netlink_generated.h
  
- 	__qdisc_drop(skb, to_free);
- 	sch->q.qlen--;
-+	qdisc_tree_reduce_backlog(sch, 1, len);
+ definitions:
+   -
+@@ -12,43 +13,97 @@ doc: Partial family for Ethtool Netlink.
+     enum-name:
+     type: enum
+     entries: [ vxlan, geneve, vxlan-gpe ]
++    enum-cnt-name: __ethtool-udp-tunnel-type-cnt
++    render-max: true
+   -
+     name: stringset
+     type: enum
+     entries: []
++    header: linux/ethtool.h # skip rendering, no actual definition
+   -
+     name: header-flags
+     type: flags
+-    entries: [ compact-bitsets, omit-reply, stats ]
++    name-prefix: ethtool-flag-
++    doc: common ethtool header flags
++    entries:
++      -
++        name: compact-bitsets
++        doc: use compact bitsets in reply
++      -
++        name: omit-reply
++        doc: provide optional reply for SET or ACT requests
++      -
++        name: stats
++        doc: request statistics, if supported by the driver
+   -
+     name: module-fw-flash-status
+     type: enum
+-    entries: [ started, in_progress, completed, error ]
++    doc: plug-in module firmware flashing status
++    header: linux/ethtool.h
++    entries:
++      -
++        name: started
++        doc: The firmware flashing process has started.
++      -
++        name: in_progress
++        doc: The firmware flashing process is in progress.
++      -
++        name: completed
++        doc: The firmware flashing process was completed successfully.
++      -
++        name: error
++        doc: The firmware flashing process was stopped due to an error.
+   -
+     name: c33-pse-ext-state
+-    enum-name:
++    doc: "groups of PSE extended states functions. IEEE 802.3-2022 33.2.4.4 Variables"
+     type: enum
+     name-prefix: ethtool-c33-pse-ext-state-
++    header: linux/ethtool.h
+     entries:
+         - none
+-        - error-condition
+-        - mr-mps-valid
+-        - mr-pse-enable
+-        - option-detect-ted
+-        - option-vport-lim
+-        - ovld-detected
+-        - power-not-available
+-        - short-detected
++        -
++          name: error-condition
++          doc: Group of error_condition states
++        -
++          name: mr-mps-valid
++          doc: Group of mr_mps_valid states
++        -
++          name: mr-pse-enable
++          doc: Group of mr_pse_enable states
++        -
++          name: option-detect-ted
++          doc: Group of option_detect_ted states
++        -
++          name: option-vport-lim
++          doc: Group of option_vport_lim states
++        -
++          name: ovld-detected
++          doc: Group of ovld_detected states
++        -
++          name: power-not-available
++          doc: Group of power_not_available states
++        -
++          name: short-detected
++          doc: Group of short_detected states
+   -
+     name: phy-upstream-type
+     enum-name:
+     type: enum
+     entries: [ mac, phy ]
++  -
++    name: tcp-data-split
++    type: enum
++    entries: [ unknown, disabled, enabled ]
  
- 	cake_heapify(q, 0);
+ attribute-sets:
+   -
+     name: header
++    attr-cnt-name: __ethtool-a-header-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: dev-index
+         type: u32
+@@ -65,7 +120,12 @@ doc: Partial family for Ethtool Netlink.
  
-diff --git a/net/sched/sch_choke.c b/net/sched/sch_choke.c
-index 19c851125901..a91959142208 100644
---- a/net/sched/sch_choke.c
-+++ b/net/sched/sch_choke.c
-@@ -123,10 +123,10 @@ static void choke_drop_by_idx(struct Qdisc *sch, unsigned int idx,
- 	if (idx == q->tail)
- 		choke_zap_tail_holes(q);
+   -
+     name: bitset-bit
++    attr-cnt-name: __ethtool-a-bitset-bit-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: index
+         type: u32
+@@ -77,7 +137,12 @@ doc: Partial family for Ethtool Netlink.
+         type: flag
+   -
+     name: bitset-bits
++    attr-cnt-name: __ethtool-a-bitset-bits-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: bit
+         type: nest
+@@ -85,7 +150,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: bitset-bit
+   -
+     name: bitset
++    attr-cnt-name: __ethtool-a-bitset-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: nomask
+         type: flag
+@@ -104,7 +174,12 @@ doc: Partial family for Ethtool Netlink.
+         type: binary
+   -
+     name: string
++    attr-cnt-name: __ethtool-a-string-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: index
+         type: u32
+@@ -113,7 +188,16 @@ doc: Partial family for Ethtool Netlink.
+         type: string
+   -
+     name: strings
++    attr-cnt-name: __ethtool-a-strings-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: string
+         type: nest
+@@ -121,7 +205,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: string
+   -
+     name: stringset
++    attr-cnt-name: __ethtool-a-stringset-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: id
+         type: u32
+@@ -135,7 +224,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: strings
+   -
+     name: stringsets
++    attr-cnt-name: __ethtool-a-stringsets-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: stringset
+         type: nest
+@@ -143,7 +237,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: stringset
+   -
+     name: strset
++    attr-cnt-name: __ethtool-a-strset-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -158,7 +257,12 @@ doc: Partial family for Ethtool Netlink.
  
-+	--sch->q.qlen;
- 	qdisc_qstats_backlog_dec(sch, skb);
- 	qdisc_tree_reduce_backlog(sch, 1, qdisc_pkt_len(skb));
- 	qdisc_drop(skb, sch, to_free);
--	--sch->q.qlen;
- }
+   -
+     name: privflags
++    attr-cnt-name: __ethtool-a-privflags-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -170,7 +274,12 @@ doc: Partial family for Ethtool Netlink.
  
- struct choke_skb_cb {
+   -
+     name: rings
++    attr-cnt-name: __ethtool-a-rings-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -205,6 +314,7 @@ doc: Partial family for Ethtool Netlink.
+       -
+         name: tcp-data-split
+         type: u8
++        enum: tcp-data-split
+       -
+         name: cqe-size
+         type: u32
+@@ -223,31 +333,48 @@ doc: Partial family for Ethtool Netlink.
+ 
+   -
+     name: mm-stat
++    attr-cnt-name: __ethtool-a-mm-stat-cnt
++    doc: MAC Merge (802.3)
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: pad
+         type: pad
+       -
+         name: reassembly-errors
++        doc: aMACMergeFrameAssErrorCount
+         type: u64
+       -
+         name: smd-errors
++        doc: aMACMergeFrameSmdErrorCount
+         type: u64
+       -
+         name: reassembly-ok
++        doc: aMACMergeFrameAssOkCount
+         type: u64
+       -
+         name: rx-frag-count
++        doc: aMACMergeFragCountRx
+         type: u64
+       -
+         name: tx-frag-count
++        doc: aMACMergeFragCountTx
+         type: u64
+       -
+         name: hold-count
++        doc: aMACMergeHoldCount
+         type: u64
+   -
+     name: mm
++    attr-cnt-name: __ethtool-a-mm-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -285,7 +412,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: mm-stat
+   -
+     name: linkinfo
++    attr-cnt-name: __ethtool-a-linkinfo-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -307,7 +439,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u8
+   -
+     name: linkmodes
++    attr-cnt-name: __ethtool-a-linkmodes-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -343,7 +480,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u8
+   -
+     name: linkstate
++    attr-cnt-name: __ethtool-a-linkstate-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -368,7 +510,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u32
+   -
+     name: debug
++    attr-cnt-name: __ethtool-a-debug-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -379,7 +526,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: bitset
+   -
+     name: wol
++    attr-cnt-name: __ethtool-a-wol-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -393,7 +545,12 @@ doc: Partial family for Ethtool Netlink.
+         type: binary
+   -
+     name: features
++    attr-cnt-name: __ethtool-a-features-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -416,7 +573,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: bitset
+   -
+     name: channels
++    attr-cnt-name: __ethtool-a-channels-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -448,7 +610,12 @@ doc: Partial family for Ethtool Netlink.
+ 
+   -
+     name: irq-moderation
++    attr-cnt-name: __ethtool-a-irq-moderation-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: usec
+         type: u32
+@@ -460,7 +627,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u32
+   -
+     name: profile
++    attr-cnt-name: __ethtool-a-profile-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: irq-moderation
+         type: nest
+@@ -468,7 +640,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: irq-moderation
+   -
+     name: coalesce
++    attr-cnt-name: __ethtool-a-coalesce-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -565,7 +742,12 @@ doc: Partial family for Ethtool Netlink.
+ 
+   -
+     name: pause-stat
++    attr-cnt-name: __ethtool-a-pause-stat-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: pad
+         type: pad
+@@ -577,7 +759,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u64
+   -
+     name: pause
++    attr-cnt-name: __ethtool-a-pause-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -600,7 +787,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u32
+   -
+     name: eee
++    attr-cnt-name: __ethtool-a-eee-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -627,7 +819,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u32
+   -
+     name: ts-stat
++    attr-cnt-name: __ethtool-a-ts-stat-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: tx-pkts
+         type: uint
+@@ -639,7 +836,12 @@ doc: Partial family for Ethtool Netlink.
+         type: uint
+   -
+     name: tsinfo
++    attr-cnt-name: __ethtool-a-tsinfo-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -665,19 +867,32 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: ts-stat
+   -
+     name: cable-result
++    attr-cnt-name: __ethtool-a-cable-result-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: pair
++        doc: ETHTOOL_A_CABLE_PAIR_
+         type: u8
+       -
+         name: code
++        doc: ETHTOOL_A_CABLE_RESULT_CODE_
+         type: u8
+       -
+         name: src
++        doc: ETHTOOL_A_CABLE_INF_SRC_
+         type: u32
+   -
+     name: cable-fault-length
++    attr-cnt-name: __ethtool-a-cable-fault-length-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: pair
+         type: u8
+@@ -689,7 +904,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u32
+   -
+     name: cable-nest
++    attr-cnt-name: __ethtool-a-cable-nest-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: result
+         type: nest
+@@ -700,20 +920,31 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: cable-fault-length
+   -
+     name: cable-test
++    attr-cnt-name: __ethtool-a-cable-test-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+         nested-attributes: header
+   -
+     name: cable-test-ntf
++    attr-cnt-name: __ethtool-a-cable-test-ntf-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+         nested-attributes: header
+       -
+         name: status
++        doc: _STARTED/_COMPLETE
+         type: u8
+       -
+         name: nest
+@@ -721,7 +952,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: cable-nest
+   -
+     name: cable-test-tdr-cfg
++    attr-cnt-name: __ethtool-a-cable-test-tdr-cfg-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: first
+         type: u32
+@@ -736,7 +972,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u8
+   -
+     name: cable-test-tdr-ntf
++    attr-cnt-name: __ethtool-a-cable-test-tdr-ntf-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -750,7 +991,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: cable-nest
+   -
+     name: cable-test-tdr
++    attr-cnt-name: __ethtool-a-cable-test-tdr-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -761,7 +1007,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: cable-test-tdr-cfg
+   -
+     name: tunnel-udp-entry
++    attr-cnt-name: __ethtool-a-tunnel-udp-entry-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: port
+         type: u16
+@@ -772,7 +1023,12 @@ doc: Partial family for Ethtool Netlink.
+         enum: udp-tunnel-type
+   -
+     name: tunnel-udp-table
++    attr-cnt-name: __ethtool-a-tunnel-udp-table-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: size
+         type: u32
+@@ -787,14 +1043,24 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: tunnel-udp-entry
+   -
+     name: tunnel-udp
++    attr-cnt-name: __ethtool-a-tunnel-udp-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: table
+         type: nest
+         nested-attributes: tunnel-udp-table
+   -
+     name: tunnel-info
++    attr-cnt-name: __ethtool-a-tunnel-info-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -805,7 +1071,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: tunnel-udp
+   -
+     name: fec-stat
++    attr-cnt-name: __ethtool-a-fec-stat-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: pad
+         type: pad
+@@ -823,7 +1094,12 @@ doc: Partial family for Ethtool Netlink.
+         sub-type: u64
+   -
+     name: fec
++    attr-cnt-name: __ethtool-a-fec-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -844,7 +1120,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: fec-stat
+   -
+     name: module-eeprom
++    attr-cnt-name: __ethtool-a-module-eeprom-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -869,7 +1150,12 @@ doc: Partial family for Ethtool Netlink.
+         type: binary
+   -
+     name: stats-grp
++    attr-cnt-name: __ethtool-a-stats-grp-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: pad
+         type: pad
+@@ -912,7 +1198,12 @@ doc: Partial family for Ethtool Netlink.
+         name: hist-val
+   -
+     name: stats
++    attr-cnt-name: __ethtool-a-stats-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: pad
+         type: pad
+@@ -933,7 +1224,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u32
+   -
+     name: phc-vclocks
++    attr-cnt-name: __ethtool-a-phc-vclocks-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -947,7 +1243,12 @@ doc: Partial family for Ethtool Netlink.
+         sub-type: s32
+   -
+     name: module
++    attr-cnt-name: __ethtool-a-module-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -960,7 +1261,13 @@ doc: Partial family for Ethtool Netlink.
+         type: u8
+   -
+     name: c33-pse-pw-limit
++    attr-cnt-name: __ethtool-a-c33-pse-pw-limit-cnt
++    attr-max-name: __ethtool-a-c33-pse-pw-limit-max
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: min
+         type: u32
+@@ -969,7 +1276,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u32
+   -
+     name: pse
++    attr-cnt-name: __ethtool-a-pse-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -1027,7 +1339,12 @@ doc: Partial family for Ethtool Netlink.
+         nested-attributes: c33-pse-pw-limit
+   -
+     name: rss
++    attr-cnt-name: __ethtool-a-rss-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -1053,7 +1370,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u32
+   -
+     name: plca
++    attr-cnt-name: __ethtool-a-plca-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -1084,7 +1406,12 @@ doc: Partial family for Ethtool Netlink.
+         type: u32
+   -
+     name: module-fw-flash
++    attr-cnt-name: __ethtool-a-module-fw-flash-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
+@@ -1110,7 +1437,12 @@ doc: Partial family for Ethtool Netlink.
+         type: uint
+   -
+     name: phy
++    attr-cnt-name: __ethtool-a-phy-cnt
+     attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
+       -
+         name: header
+         type: nest
 -- 
 2.47.0
 
