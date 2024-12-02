@@ -1,90 +1,59 @@
-Return-Path: <netdev+bounces-148109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64C2B9E0599
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:54:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE6EB9E059F
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:55:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AB0C28B64D
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 14:54:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9139328CC2A
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 14:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564FE20DD65;
-	Mon,  2 Dec 2024 14:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FE9209697;
+	Mon,  2 Dec 2024 14:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="oMeZ9SGO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TtXSqWRQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862A3209667
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 14:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17340209698;
+	Mon,  2 Dec 2024 14:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733150777; cv=none; b=fCx99xcgd8tco5K2bk+QV0axH0++38HvoXeOgsXw7bcFnrE3++uSDKndSAlyVNiprIbph5dI3FkjiK5AwBTnRXPWYHz1hdoQdCjimhSkA8oQ2uGgpqVbLFIKCRssUwQxu6GE/9rObE1h3otLw5T6yGkLkn4Ju1m4ygr6Bx+pkyM=
+	t=1733150946; cv=none; b=e1lZYV9c2rsjQSA7wpvQpDMJyB6i0XlI7mVRRw6oWz84Kmfe0puSOAXTwoHyrctcPlsf2XU1PJwi8yNE26Yw7YHPu48zqkh8ZojBfDS5ry2SR1ifSFaczujlFk/ULZUcK/5CD2rReT2fOrhMjhtfc3n7On6kKYCD1UYHwaH9ZCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733150777; c=relaxed/simple;
-	bh=iKl4ZZTxTItyR+ijhPG6Nd6Nb2U05AAUvoQZti77rnU=;
+	s=arc-20240116; t=1733150946; c=relaxed/simple;
+	bh=pi5Mf/nr1qoJZfgRUUnsVgusjVAqfgyggwQ5OZJQnTE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ic8SDw5CuXz1NVXUCnHyzylfCzBcaWrj3IE7mQ9gs66UkHC4tZcgvnz0PtH/tAFqxA5odN5x/pKB/jtBhdWIKMypocJJX97TCO57Jyel5tjwPHkiB2CMG81QDlgPShf1HSJ0ttWPHBwBVGgZ0nTTpDhL7YUbl1YAC2tsIkGYLec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=oMeZ9SGO; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4668e48963eso33685841cf.1
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 06:46:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1733150774; x=1733755574; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iKl4ZZTxTItyR+ijhPG6Nd6Nb2U05AAUvoQZti77rnU=;
-        b=oMeZ9SGOpho7Yc/q/bOnnTpdlZtktycloyGopd3BLn3kbXIFx/WBQYSJCtQFkxiL46
-         BxMhTxTYpPjJ+Rt/9zosLt3TGzipr0BOvOgj/w/M0X8phjkjl3WCfG5lMVw+oUn4PWw7
-         0DHmSi/EXEpPgii06LjmpZHdnezn/yrs2Cll6eIqyAUhPI0AEOyme7UybD5qKoIdO7mo
-         8z9TcaqToHv43HihbNlyAF7o/EnHeLu2w02oKjsi+TWh+EusoanJTpIDwXY5uL0NfLMr
-         1C9qMMP1uGBfYwRcYOAW0E+vMrU7Rokf8gGT1FcovzGoZqjrWi6ep1HROKvau+dXIqIR
-         frjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733150774; x=1733755574;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iKl4ZZTxTItyR+ijhPG6Nd6Nb2U05AAUvoQZti77rnU=;
-        b=aPt+g1amUwjCPhPuHmbRMuacQDACLzxadJtbzF490P4r6aXefZLV9QYdfla2OZSdfY
-         jbdg8ON3C2ZyuJU2ZYP+2vjZdGQxwMat86KQfrAGWCSiCD6DHx7rpkxlw57/nnzz5jVS
-         JItqb/UBUB1u7B3YGjZ1pUBB15cr5E6rWV7wr3m1a2ODtLCK7YOYXRRs8qPi9mphkisG
-         CTbAlsNWhIt0zjZNIEb/Sa9MGOaEtWezmwEbqy1zQMw/0q2v9wwN1C7vY6e/kOoOFkHQ
-         +KYBtwHGlgRfbAR595f8KYsJBRvZGT+5sBZU+ZWsknUMryoPda/ixSb+8yLHzJRWpTWl
-         hTEg==
-X-Forwarded-Encrypted: i=1; AJvYcCV39mw+p1VLwP5gU4Ga1RpMiwIAguXrPhwpiRHRSpkEV/qMrYxzSbTPbPf1sJiRLamw/vy4osU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuyFO/9aDDMyUahyLPkKksSzk9iIv12/q81D9ngHSu2oZTEOah
-	ErAFU8V22wVPpmhTQycmdOO0Huz6rC7cV72yuW2ulnjw7kF9Cn6nwR4qGW3kXMI=
-X-Gm-Gg: ASbGncvfH2+++AFcJNWHSU2cEvl5vzGB3v4eyagAz5clwZIiURbNDyOHeqxW7y+dPfB
-	rC6t2LXc3/lWS4C2U5jW0pjFdk9yv9dQ0fLsgI81Xm0JV19j3Bvho5nwKjUYCGt4uKwuLarEpyx
-	PlxkGKbLQyYqJW4zckLxcUZAHwYFoPczeWk2tmmhD/hT7+mXCUtgUEkUAspckzRBrM+AdnYw1eO
-	54LBq5iJTxiQXIuRA6R1Nympb2hQliI3bEjZYMWQejHEx4M1PQ4BDoBlBjWpGktMcTu/vOp+tiF
-	XCyaG6SrS8Lv4RAnCpcEHhE=
-X-Google-Smtp-Source: AGHT+IEuXOONcnxVlr1zPCd80wZ0Z7aTwqF/Kslui/E/Z0xyTI3miI7kqgDU/U2h29/UE6B6MUQmBQ==
-X-Received: by 2002:ac8:5a49:0:b0:466:a9c2:640 with SMTP id d75a77b69052e-466b3656462mr355695531cf.44.1733150774181;
-        Mon, 02 Dec 2024 06:46:14 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-466c4067277sm49044111cf.29.2024.12.02.06.46.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 06:46:12 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tI7gi-00000007E6x-16B1;
-	Mon, 02 Dec 2024 10:46:12 -0400
-Date: Mon, 2 Dec 2024 10:46:12 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: syzbot <syzbot+list61c5ef3632c5b9ec2d7d@syzkaller.appspotmail.com>,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] Monthly rdma report (Nov 2024)
-Message-ID: <20241202144612.GE773835@ziepe.ca>
-References: <67498180.050a0220.253251.00a9.GAE@google.com>
- <4b5cbf38-ce6b-48ee-aa50-e23a64ba7279@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XzgzvV973RaPIYCJ6QQwNOAzBJSAV5xR8wnPAs4n2kdXIFBWBllwKcb/kEZd40+dmwNmhvpVMi2+zuwLQ00dcsXgGke5q03rOKXPxqCsyXcEqYHg/S0kpIJFV4bcirw793Bqj+RlrR2/WTFceL0YtMbx7xJUQL3tPDY4HEE0e6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TtXSqWRQ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=d0sGftyf/7BoaDmfklTa6dQjOZv9IFd5AtZRQ5ymZm4=; b=TtXSqWRQrSMsnARGmMN2W1dkwc
+	Uaj1wl7CiCEu78RVwYbboGQwMTNC3sx2zPGQ7nOof5aD0bIz+6WQI3ZFYHTThV381v4jEmjSEPfdf
+	i1A9ej6h7xQCEFchT3/Z1RMcbgfoFwWa/AXAxpnaRnHE9t1EfxwYTbT2HMXfW90CJssQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tI7jK-00ExwL-BB; Mon, 02 Dec 2024 15:48:54 +0100
+Date: Mon, 2 Dec 2024 15:48:54 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	florian.fainelli@broadcom.com, heiko.stuebner@cherry.de,
+	frank.li@nxp.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Subject: Re: [PATCH v2 net] net: phy: micrel: Dynamically control external
+ clock of KSZ PHY
+Message-ID: <003d5029-2339-4e18-b632-be35384b2f7a@lunn.ch>
+References: <20241202084535.2520151-1-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,19 +62,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4b5cbf38-ce6b-48ee-aa50-e23a64ba7279@linux.dev>
+In-Reply-To: <20241202084535.2520151-1-wei.fang@nxp.com>
 
-On Fri, Nov 29, 2024 at 12:30:37PM +0100, Zhu Yanjun wrote:
+On Mon, Dec 02, 2024 at 04:45:35PM +0800, Wei Fang wrote:
+> On the i.MX6ULL-14x14-EVK board, enet1_ref and enet2_ref are used as the
+> clock sources for two external KSZ PHYs. However, after closing the two
+> FEC ports, the clk_enable_count of the enet1_ref and enet2_ref clocks is
+> not 0. The root cause is that since the commit 985329462723 ("net: phy:
+> micrel: use devm_clk_get_optional_enabled for the rmii-ref clock"), the
+> external clock of KSZ PHY has been enabled when the PHY driver probes,
+> and it can only be disabled when the PHY driver is removed. This causes
+> the clock to continue working when the system is suspended or the network
+> port is down.
 
-> When pd pool is not empty, it seems that at least one pd is not removed when
-> rdma link is removed. The caller should check the application to remove this
-> pd before a rdma link is removed.
+The referenced commit is a one liner:
 
-The bug is that this somehow happened, I think. There should be
-refcounts preventing removal of an ib device while a client is
-attached
+@@ -2001,7 +2001,7 @@ static int kszphy_probe(struct phy_device *phydev)
+ 
+        kszphy_parse_led_mode(phydev);
+ 
+-       clk = devm_clk_get(&phydev->mdio.dev, "rmii-ref");
++       clk = devm_clk_get_optional_enabled(&phydev->mdio.dev, "rmii-ref");
+        /* NOTE: clk may be NULL if building without CONFIG_HAVE_CLK */
 
-Or, perhaps more likely, it is a pd leak on an error path.
+and here you are adding 103 lines as a fix. This seems out of
+proportion. Did this truly work before this change?
 
-Jason
+The commit message says:
+
+    While the external clock input will most likely be enabled, it's not
+    guaranteed and clk_get_rate in some suppliers will even just return
+    valid results when the clock is running.
+
+So it seems like a much simpler fix is to put a
+clock_enable/clock_disable around clk_get_rate.
+
+	Andrew
 
