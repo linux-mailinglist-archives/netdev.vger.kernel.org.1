@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-148071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C78CF9E0756
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:44:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6411A9E074D
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 16:42:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33D38B38BB2
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 14:32:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E580B3231A
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 14:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88FD6207A0D;
-	Mon,  2 Dec 2024 14:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84383207A3B;
+	Mon,  2 Dec 2024 14:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e58GcrO6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbadNAHb"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F89205E37
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 14:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE22207A2B
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 14:31:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733149886; cv=none; b=NagutaeLwP4YkuolQgs5wcUXIdfTF3az9K48cMkFJ+dj0oCEql7VeIQBvWbeApXJZ5uEFEQwxBzhynbX2z7hrnu/RFchzOTyh9MnuK18AapQvcDX0FoIMG9677cHWhAuR17ZLDQy4yR20AkNGMTO82Z7i4l6Vj3YHYzctz6yEIE=
+	t=1733149889; cv=none; b=DzEZaKN4vsI7raYFuwot6EK5QOtTaXbh3e7RX9za+shM+Lz7kVh/LWcwgbWOeoeZorLgBu2THRU8ToErT33vgH6vggEWeIPgSJ0i7kXopa9Wb3ziu88ZRMG1N79cXWSfaT9BXibZT7FxkwTv95OF9aXeRyoJCqiLCcy1JwbcT4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733149886; c=relaxed/simple;
-	bh=bg28pajEEjGjeO4pOGZmHHUzSUhOzQVpV2W5Uqp0eCg=;
+	s=arc-20240116; t=1733149889; c=relaxed/simple;
+	bh=c+yOwyyxQYG08akHuv3PKVnnno4S/E/jkgJR2qyHucM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I1dR6ONnfcFQFcY64wTipuRbe271up3feOPMoiiUxICpHMc2wGXGIzasUMTQ1DVOTYU6Ouz5NzK63zw68ZoeiYjZW5ZYJMkyzB/FgCFVdfsyHzmwg1TxGPh/XzDi79GRvhAae/rbxTMgUQ0hn43GcIx1NQoaHpQzjvp553tpoFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e58GcrO6; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=F/cWugv5sVrX5WCi3D6cf6dp6dbbMkB33ZDgt43WyOUvDvCe/EjH8/+1RKz4Sh0N7iUGSJM4/wIcyx//Osl7j8QjhWQ8+e7A0l6OmTf7ULMl3au4pnyMOn3KZSIZMbFtvJAECeceyVUzkC9ANuS8kqGfDhEYeZTnTgDd8+YbFHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DbadNAHb; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733149883;
+	s=mimecast20190719; t=1733149885;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nQxHiYMs7bpD+fxOYblKM9SE945ZS3Tm4oRrQv3yLdM=;
-	b=e58GcrO68XTx0soDAuKYygPY/my+Caxb6NKFkLmjKa5UPSOGxsUpnFvqvbHOOua+b6bop3
-	b504rUOEbmPLNnrwwisuvKNxAfX+sXroZs1Cajrva5BXv8BR3nHyXRLVar7LcnPDfU/u4P
-	Lr17Qvh5vF+C3Vktgel8Bgbm/TVOdm8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=UxMeOVuQD05rf41KERxBJE40Z+FM1XZR5vvRZvaEiVw=;
+	b=DbadNAHbEboi9FVUchI6440nTv6YCv7Mwga+dZgHW+ouH9NL0crmAsam3AFBGOFcWUSFFt
+	8v4zzIepyIKY1z1dPMjk93cMMOPqUXF34VreYCku93ans/66TjIlClRDmSe8tfUKjs9dvH
+	vOr4FtrZ7W9Tyd1u+aU7qxccnu7DmJ8=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-414-6IsI-hoxNfCBI5bEAUkzWw-1; Mon,
- 02 Dec 2024 09:31:19 -0500
-X-MC-Unique: 6IsI-hoxNfCBI5bEAUkzWw-1
-X-Mimecast-MFC-AGG-ID: 6IsI-hoxNfCBI5bEAUkzWw
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-456-1KS-4Ai1MwWnbcZKnpOTqA-1; Mon,
+ 02 Dec 2024 09:31:22 -0500
+X-MC-Unique: 1KS-4Ai1MwWnbcZKnpOTqA-1
+X-Mimecast-MFC-AGG-ID: 1KS-4Ai1MwWnbcZKnpOTqA
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 681921953954;
-	Mon,  2 Dec 2024 14:31:16 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0846818EBB5B;
+	Mon,  2 Dec 2024 14:31:21 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.42.28.48])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DA5CA30000DF;
-	Mon,  2 Dec 2024 14:31:13 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BCA241955F41;
+	Mon,  2 Dec 2024 14:31:17 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -68,9 +68,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 03/37] rxrpc: Clean up Tx header flags generation handling
-Date: Mon,  2 Dec 2024 14:30:21 +0000
-Message-ID: <20241202143057.378147-4-dhowells@redhat.com>
+Subject: [PATCH net-next 04/37] rxrpc: Don't set the MORE-PACKETS rxrpc wire header flag
+Date: Mon,  2 Dec 2024 14:30:22 +0000
+Message-ID: <20241202143057.378147-5-dhowells@redhat.com>
 In-Reply-To: <20241202143057.378147-1-dhowells@redhat.com>
 References: <20241202143057.378147-1-dhowells@redhat.com>
 Precedence: bulk
@@ -80,24 +80,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Clean up the generation of the header flags when building packet headers
-for transmission:
+The MORE-PACKETS rxrpc header flag hasn't actually been looked at by
+anything since 1988 and not all implementations generate it.
 
- (1) Assemble the flags in a local variable rather than in the txb->flags.
+Change rxrpc so that it doesn't set MORE-PACKETS at all rather than setting
+it inconsistently.
 
- (2) Do the flags masking and JUMBO-PACKET setting in one bit of code for
-     both the main header and the jumbo headers.
-
- (3) Generate the REQUEST-ACK flag afresh each time.  There's a possibility
-     we might want to do jumbo retransmission packets in future.
-
- (4) Pass the local flags variable to the rxrpc_tx_data tracepoint rather
-     than the combination of the txb flags and the wire header flags (the
-     latter belong only to the first subpacket).
-
-Signed-off-by: David Howells <dhowells@redhat.com>
+cc: David Howells <dhowells@redhat.com>
 cc: Marc Dionne <marc.dionne@auristor.com>
 cc: "David S. Miller" <davem@davemloft.net>
 cc: Eric Dumazet <edumazet@google.com>
@@ -106,107 +97,22 @@ cc: Paolo Abeni <pabeni@redhat.com>
 cc: linux-afs@lists.infradead.org
 cc: netdev@vger.kernel.org
 ---
- include/trace/events/rxrpc.h |  1 -
- net/rxrpc/ar-internal.h      |  2 +-
- net/rxrpc/output.c           | 18 ++++++++++++------
- net/rxrpc/proc.c             |  3 +--
- 4 files changed, 14 insertions(+), 10 deletions(-)
+ net/rxrpc/sendmsg.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
-index 27c23873c881..62064f63d6eb 100644
---- a/include/trace/events/rxrpc.h
-+++ b/include/trace/events/rxrpc.h
-@@ -452,7 +452,6 @@
+diff --git a/net/rxrpc/sendmsg.c b/net/rxrpc/sendmsg.c
+index b04afb5df241..546abb463c3f 100644
+--- a/net/rxrpc/sendmsg.c
++++ b/net/rxrpc/sendmsg.c
+@@ -385,9 +385,6 @@ static int rxrpc_send_data(struct rxrpc_sock *rx,
+ 		    (msg_data_left(msg) == 0 && !more)) {
+ 			if (msg_data_left(msg) == 0 && !more)
+ 				txb->flags |= RXRPC_LAST_PACKET;
+-			else if (call->tx_top - call->acks_hard_ack <
+-				 call->tx_winsize)
+-				txb->flags |= RXRPC_MORE_PACKETS;
  
- #define rxrpc_req_ack_traces \
- 	EM(rxrpc_reqack_ack_lost,		"ACK-LOST  ")	\
--	EM(rxrpc_reqack_already_on,		"ALREADY-ON")	\
- 	EM(rxrpc_reqack_more_rtt,		"MORE-RTT  ")	\
- 	EM(rxrpc_reqack_no_srv_last,		"NO-SRVLAST")	\
- 	EM(rxrpc_reqack_old_rtt,		"OLD-RTT   ")	\
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index d0fd37bdcfe9..fcdfbc1d5aaf 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -110,7 +110,7 @@ struct rxrpc_net {
- 	atomic_t		stat_tx_acks[256];
- 	atomic_t		stat_rx_acks[256];
- 
--	atomic_t		stat_why_req_ack[8];
-+	atomic_t		stat_why_req_ack[7];
- 
- 	atomic_t		stat_io_loop;
- };
-diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-index 85112ea31a39..50d5f2a02458 100644
---- a/net/rxrpc/output.c
-+++ b/net/rxrpc/output.c
-@@ -330,6 +330,8 @@ static void rxrpc_prepare_data_subpacket(struct rxrpc_call *call, struct rxrpc_t
- 	struct rxrpc_wire_header *whdr = txb->kvec[0].iov_base;
- 	enum rxrpc_req_ack_trace why;
- 	struct rxrpc_connection *conn = call->conn;
-+	bool last;
-+	u8 flags;
- 
- 	_enter("%x,{%d}", txb->seq, txb->len);
- 
-@@ -339,6 +341,10 @@ static void rxrpc_prepare_data_subpacket(struct rxrpc_call *call, struct rxrpc_t
- 	    txb->seq == 1)
- 		whdr->userStatus = RXRPC_USERSTATUS_SERVICE_UPGRADE;
- 
-+	txb->flags &= ~RXRPC_REQUEST_ACK;
-+	flags = txb->flags & RXRPC_TXBUF_WIRE_FLAGS;
-+	last = txb->flags & RXRPC_LAST_PACKET;
-+
- 	/* If our RTT cache needs working on, request an ACK.  Also request
- 	 * ACKs if a DATA packet appears to have been lost.
- 	 *
-@@ -346,9 +352,7 @@ static void rxrpc_prepare_data_subpacket(struct rxrpc_call *call, struct rxrpc_t
- 	 * service call, lest OpenAFS incorrectly send us an ACK with some
- 	 * soft-ACKs in it and then never follow up with a proper hard ACK.
- 	 */
--	if (txb->flags & RXRPC_REQUEST_ACK)
--		why = rxrpc_reqack_already_on;
--	else if ((txb->flags & RXRPC_LAST_PACKET) && rxrpc_sending_to_client(txb))
-+	if (last && rxrpc_sending_to_client(txb))
- 		why = rxrpc_reqack_no_srv_last;
- 	else if (test_and_clear_bit(RXRPC_CALL_EV_ACK_LOST, &call->events))
- 		why = rxrpc_reqack_ack_lost;
-@@ -367,15 +371,17 @@ static void rxrpc_prepare_data_subpacket(struct rxrpc_call *call, struct rxrpc_t
- 
- 	rxrpc_inc_stat(call->rxnet, stat_why_req_ack[why]);
- 	trace_rxrpc_req_ack(call->debug_id, txb->seq, why);
--	if (why != rxrpc_reqack_no_srv_last)
-+	if (why != rxrpc_reqack_no_srv_last) {
- 		txb->flags |= RXRPC_REQUEST_ACK;
-+		flags |= RXRPC_REQUEST_ACK;
-+	}
- dont_set_request_ack:
- 
--	whdr->flags = txb->flags & RXRPC_TXBUF_WIRE_FLAGS;
-+	whdr->flags	= flags;
- 	whdr->serial	= htonl(txb->serial);
- 	whdr->cksum	= txb->cksum;
- 
--	trace_rxrpc_tx_data(call, txb->seq, txb->serial, txb->flags, false);
-+	trace_rxrpc_tx_data(call, txb->seq, txb->serial, flags, false);
- }
- 
- /*
-diff --git a/net/rxrpc/proc.c b/net/rxrpc/proc.c
-index 263a2251e3d2..3b7e34dd4385 100644
---- a/net/rxrpc/proc.c
-+++ b/net/rxrpc/proc.c
-@@ -519,9 +519,8 @@ int rxrpc_stats_show(struct seq_file *seq, void *v)
- 		   atomic_read(&rxnet->stat_rx_acks[RXRPC_ACK_DELAY]),
- 		   atomic_read(&rxnet->stat_rx_acks[RXRPC_ACK_IDLE]));
- 	seq_printf(seq,
--		   "Why-Req-A: acklost=%u already=%u mrtt=%u ortt=%u\n",
-+		   "Why-Req-A: acklost=%u mrtt=%u ortt=%u\n",
- 		   atomic_read(&rxnet->stat_why_req_ack[rxrpc_reqack_ack_lost]),
--		   atomic_read(&rxnet->stat_why_req_ack[rxrpc_reqack_already_on]),
- 		   atomic_read(&rxnet->stat_why_req_ack[rxrpc_reqack_more_rtt]),
- 		   atomic_read(&rxnet->stat_why_req_ack[rxrpc_reqack_old_rtt]));
- 	seq_printf(seq,
+ 			ret = call->security->secure_packet(call, txb);
+ 			if (ret < 0)
 
 
