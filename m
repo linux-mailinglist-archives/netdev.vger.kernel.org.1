@@ -1,165 +1,161 @@
-Return-Path: <netdev+bounces-148225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C8AB9E0E4F
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:03:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5D5A9E0DFD
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 22:38:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F59EB26253
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:29:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A822281986
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BBDF70804;
-	Mon,  2 Dec 2024 21:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE551DED6B;
+	Mon,  2 Dec 2024 21:38:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="detERBFD"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n6g7sZ4H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6DCC70800;
-	Mon,  2 Dec 2024 21:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4016170800
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 21:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733174978; cv=none; b=CUVBle1r07TsPRUHvUTFCb/uL/I2jCJBos9HRxkvStluXicDOC97vup3l6DUWo6k+V0DR+hk8ZMOvQl2jzopVjFdhxDbuY0G7Svu2od7nphpQaXRZztoZ88Qrup8lUMn9fOErXWXJZnMu5kcChJKURFDbz/+XgJmNIeeJ7fBtgY=
+	t=1733175516; cv=none; b=oAEdcPVHAv+roOvoYucK/owtOgdwEVBYItL6Gpy1mauXU4Q8loY5xfuBUznqoLPV4KXKgvFvFaDbLduSD+vSbAwcv3RypnTsqEt0ZnJwxDF28Ld0G4UIJtNAXw/+29XBXSICiZz8kPNJaTEP4G3Ez/N3FIWtnXnonqGx0VLq5Fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733174978; c=relaxed/simple;
-	bh=pA01rzy1p4KoYHbstqvJ68ET4WBA8g/7Ngoejgshz5I=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZKAktzLQxmxRvIp3mTHAuYfswgSjmtGPPugZOaGlZIr+ZWfNhhuElSJUUeOV6k7Os6PN8J+SsPvIDKUWp/6nQJt72nPsDPJV7wwUVZlNIY4X8suyX4WlYU6Wk/OdI8v2w7ZsFpqVfBEtx2pcp9hse2qalXfk67lL6FAxkZ161jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=detERBFD; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-434a95095efso33999555e9.0;
-        Mon, 02 Dec 2024 13:29:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733174975; x=1733779775; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tKXIynX3xTMREOQazrR7/7aFnk6WYKVc0ZZCHX0QziE=;
-        b=detERBFDvRjL0GmXC36Kx6HIExF8g01taLbOCCTYHXEka+1ERS70xrcqM+XZ+xHmTJ
-         aPnvVQEl750roEadzPNIiCvvoc3KJ97qBtalgIuFkfwZgggGBcWfpFLaKef0yOjutAVo
-         +fHHkfjMCfb8pteroiStPnjElW2ak34Rs2IR5NcHpQMNJu2jposBk2WIXtBNnelOIrJC
-         gCWHZJ/TJ5s61axp41dqukqHnLJia4FGZzks1FACNrv5t/OBL9vUHv34R/2AltmUWrNE
-         l0XMyowiWmjmQr2REWglEV46qPlyWhkJ8qQ91Y3MbO9KEU2QBfg7xOw46XkLNRqgbWlZ
-         RWDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733174975; x=1733779775;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tKXIynX3xTMREOQazrR7/7aFnk6WYKVc0ZZCHX0QziE=;
-        b=DZ5owSuNa4HJnXQVApB5nsAlsYZ8lRl/RPln01EvNdAU01VO+dlJQkxOEX5MTNHeVP
-         veZ4IoLwJrdNpgTVCS82yk8q4sBqqvupPE8sD21qzV11A8yNvUauAJs3lP0DfamnbKSY
-         l0/wdzaQ40ZnhmwqzzQECHxCHqqSa8gyOuaXoY7L/x0j13J6Squ9X4D1I+yJFOKLvpGt
-         f05mEnByzOOGwMvxoHiS/RdW83eFjS1hedpbabn1QdUXo/OlOjvuX+ksTvnRe5BH+HKX
-         c3yjDEaqmfYWhdRmmmapkgFrqsa3DregIpVI4A5CV235wgJqHm/Xv2DMmI79JckXHy8y
-         IQsw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBGgelhFOMJPW9nwvylEdEW8TbqXwJukDmjR+QDldmzacNRYAKbrAsCbefYU3XF4IeqHsZqS/J@vger.kernel.org, AJvYcCURYDYWENQJh9ARi8mwY7y7xyTycEGaTj7Jm0kj132+jbmCz17q6gxYW2o3380UmnLTVWhDNULjjQflofM=@vger.kernel.org, AJvYcCVtWyxbsGoSegDK8SPW44iY9A+IILbzg9/GJOXcTTolb5JbkvtuLR4WgCdwVnmjHxgENUNzfkNSsJQiS+/RMTZs@vger.kernel.org, AJvYcCXZ8yp10l8CZOr+mmm4nf6Z3d+DF/bCikiCBWrIUtW4BtKqSUeDCuTIU603cDkpds23aoOI7dXV@vger.kernel.org
-X-Gm-Message-State: AOJu0YweNvEVHSkAJYw1YTIfio/5HjiLQJ+TJ2sI7qDuC5BYY1dUQ/AA
-	yzOUuBHvMdBPWzg007je8cRQeQBI6Qz683vlkuNYoXudZOxVPXAL
-X-Gm-Gg: ASbGncvrK1jkwTR2oOExQchuwo8Z7+rNkrUKsbKUXBRlJ6KZ6hwsEk794va6MzoyKyT
-	l/zO6SZCYeqWlOrdGnrFV/p/P1kP2AZn4zVsW5K3LZ7b4sBHcIUJ4bcQycsTlu82LEivbIiBFDZ
-	jPH+/cvOJBYkb9XxN4UNEHg/Ixe6LayNRsQta2ufnZezCbjJP0hDux2i0gTWpS2HPBxOFSJ+3sf
-	M6bNxHLVIBj2POVgFQKpFrrg2Z2rIG0e+ugPKQS8gRkqNCMWMUPjpqJBuJTL/u36cAZ22/AnKh8
-	wgbIiw==
-X-Google-Smtp-Source: AGHT+IE0GakqyDv6Fa9rYiQgKyPq8ISDI8KMOPPMBCud5ED+86tSUc516+NQFl9HCZRAh39Mcsmn5g==
-X-Received: by 2002:a05:6000:154e:b0:385:f349:ffe5 with SMTP id ffacd0b85a97d-385f34a030fmr4400876f8f.29.1733174975230;
-        Mon, 02 Dec 2024 13:29:35 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434b0dbe4ccsm164404255e9.13.2024.12.02.13.29.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 13:29:34 -0800 (PST)
-Message-ID: <674e26be.050a0220.2de4c9.13ab@mx.google.com>
-X-Google-Original-Message-ID: <Z04mu7C4KDpKRhW6@Ansuel-XPS.>
-Date: Mon, 2 Dec 2024 22:29:31 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
-	Benjamin Poirier <bpoirier@nvidia.com>,
-	Hangbin Liu <liuhangbin@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [net PATCH 1/2] selftests: net: lib: fix broken ping with
- coreutils ping util
-References: <20241130113314.6488-1-ansuelsmth@gmail.com>
- <20241130154307.cskk55ecltjkinqz@skbuf>
- <674b334a.050a0220.3b307b.ee8b@mx.google.com>
- <20241130154840.lv4rmor4dv66cctf@skbuf>
- <674e1af7.050a0220.3799ad.fa5e@mx.google.com>
- <20241202212429.n4f2ig6mx4fb27dz@skbuf>
- <674e2674.df0a0220.33ed66.d434@mx.google.com>
+	s=arc-20240116; t=1733175516; c=relaxed/simple;
+	bh=7xGM2Zv6VPSBGOYslwq6dEwS0xy0nR+0XcW8sM2oLII=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZFpqyXrXNn5onj1+bVgMew+5v8TnmC+dxS60k7wl1ezxTNaK4nK+/pp70UV75FISJQbn7wccLQuBKEsKqZ6Pk5+GlutcqQFllpwyyNTpRLB6XH6Vt90RUP9hfxKnlW/Hqv4sM+YiOmBR5do1XyauG4tO3TNAr9KDereTL6Vi0jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n6g7sZ4H; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <80d8c4cf-2897-4385-b849-2dbac863ee39@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1733175511;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NmXr80EokHOIDy9EV+L8W5kREfs/44BiSNhckzGGbdQ=;
+	b=n6g7sZ4HAoxcYG1osI6uKNyWpD1HeG1S633MfEzmIhCjorSSHmOxnp/v+wfHtH3JfSReEh
+	Gn9y3qm8M/2O1oS+huWYiDdzdS9i6SQP5CZeaeTSaW+F3mtuM8QPoixx2FaYnPZCoAyZUq
+	4in5gIQcmdRm0zpkTdW7/sRAUhy7AfA=
+Date: Mon, 2 Dec 2024 13:38:17 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <674e2674.df0a0220.33ed66.d434@mx.google.com>
+Subject: Re: [PATCH bpf] bpf, test_run: Fix use-after-free issue in
+ eth_skb_pkt_type()
+To: Stanislav Fomichev <stfomichev@gmail.com>,
+ Shigeru Yoshida <syoshida@redhat.com>
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ hawk@kernel.org, lorenzo@kernel.org, toke@redhat.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, syzkaller <syzkaller@googlegroups.com>
+References: <20241201152735.106681-1-syoshida@redhat.com>
+ <Z03dL0zxEnmzZUN7@mini-arch>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <Z03dL0zxEnmzZUN7@mini-arch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Dec 02, 2024 at 10:28:16PM +0100, Christian Marangi wrote:
-> On Mon, Dec 02, 2024 at 11:24:29PM +0200, Vladimir Oltean wrote:
-> > On Mon, Dec 02, 2024 at 09:39:15PM +0100, Christian Marangi wrote:
-> > > Mhh the problem seems to be -c 
-> > > 
-> > > Let me post some outputs...
-> > > 
-> > > root@OpenWrt:~# ping -V
-> > > ping from iputils 20240117
-> > > libcap: no, IDN: no, NLS: no, error.h: no, getrandom(): yes, __fpending(): yes
-> > > root@OpenWrt:~# ping -c 10 192.168.1.1
-> > > PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
-> > > 64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.102 ms
-> > > 64 bytes from 192.168.1.1: icmp_seq=2 ttl=64 time=0.084 ms
-> > > 64 bytes from 192.168.1.1: icmp_seq=3 ttl=64 time=0.236 ms
-> > > ^C
-> > > --- 192.168.1.1 ping statistics ---
-> > > 3 packets transmitted, 3 received, 0% packet loss, time 2080ms
-> > > rtt min/avg/max/mdev = 0.084/0.140/0.236/0.067 ms
-> > > root@OpenWrt:~# ping 192.168.1.1 -c 10
-> > > ping: -c: Name does not resolve
-> > > 
-> > > As you can see swapping the ip cause this "Name does not resolve" error.
-> > 
-> > Ok, I opened the iputils source code and there isn't any relevant recent
-> > change there. But it uses getopt(3), and that seems to be implemented
-> > more simplistically for musl libc:
-> > https://wiki.musl-libc.org/functional-differences-from-glibc.html
-> > "musl and the POSIX standard getopt stop processing options at the first
-> > non-option argument with no permutation."
-> > 
-> > On GNU libc:
-> > $ ping 192.168.1.1 -c 1
-> > PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
-> > 64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.696 ms
-> > 
-> > --- 192.168.1.1 ping statistics ---
-> > 1 packets transmitted, 1 received, 0% packet loss, time 0ms
-> > rtt min/avg/max/mdev = 0.696/0.696/0.696/0.000 ms
+On 12/2/24 8:15 AM, Stanislav Fomichev wrote:
+> On 12/02, Shigeru Yoshida wrote:
+>> KMSAN reported a use-after-free issue in eth_skb_pkt_type()[1]. The
+>> cause of the issue was that eth_skb_pkt_type() accessed skb's data
+>> that didn't contain an Ethernet header. This occurs when
+>> bpf_prog_test_run_xdp() passes an invalid value as the user_data
+>> argument to bpf_test_init().
+>>
+>> Fix this by returning an error when user_data is less than ETH_HLEN in
+>> bpf_test_init().
+>>
+>> [1]
+>> BUG: KMSAN: use-after-free in eth_skb_pkt_type include/linux/etherdevice.h:627 [inline]
+>> BUG: KMSAN: use-after-free in eth_type_trans+0x4ee/0x980 net/ethernet/eth.c:165
+>>   eth_skb_pkt_type include/linux/etherdevice.h:627 [inline]
+>>   eth_type_trans+0x4ee/0x980 net/ethernet/eth.c:165
+>>   __xdp_build_skb_from_frame+0x5a8/0xa50 net/core/xdp.c:635
+>>   xdp_recv_frames net/bpf/test_run.c:272 [inline]
+>>   xdp_test_run_batch net/bpf/test_run.c:361 [inline]
+>>   bpf_test_run_xdp_live+0x2954/0x3330 net/bpf/test_run.c:390
+>>   bpf_prog_test_run_xdp+0x148e/0x1b10 net/bpf/test_run.c:1318
+>>   bpf_prog_test_run+0x5b7/0xa30 kernel/bpf/syscall.c:4371
+>>   __sys_bpf+0x6a6/0xe20 kernel/bpf/syscall.c:5777
+>>   __do_sys_bpf kernel/bpf/syscall.c:5866 [inline]
+>>   __se_sys_bpf kernel/bpf/syscall.c:5864 [inline]
+>>   __x64_sys_bpf+0xa4/0xf0 kernel/bpf/syscall.c:5864
+>>   x64_sys_call+0x2ea0/0x3d90 arch/x86/include/generated/asm/syscalls_64.h:322
+>>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>>   do_syscall_64+0xd9/0x1d0 arch/x86/entry/common.c:83
+>>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>
+>> Uninit was created at:
+>>   free_pages_prepare mm/page_alloc.c:1056 [inline]
+>>   free_unref_page+0x156/0x1320 mm/page_alloc.c:2657
+>>   __free_pages+0xa3/0x1b0 mm/page_alloc.c:4838
+>>   bpf_ringbuf_free kernel/bpf/ringbuf.c:226 [inline]
+>>   ringbuf_map_free+0xff/0x1e0 kernel/bpf/ringbuf.c:235
+>>   bpf_map_free kernel/bpf/syscall.c:838 [inline]
+>>   bpf_map_free_deferred+0x17c/0x310 kernel/bpf/syscall.c:862
+>>   process_one_work kernel/workqueue.c:3229 [inline]
+>>   process_scheduled_works+0xa2b/0x1b60 kernel/workqueue.c:3310
+>>   worker_thread+0xedf/0x1550 kernel/workqueue.c:3391
+>>   kthread+0x535/0x6b0 kernel/kthread.c:389
+>>   ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:147
+>>   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+>>
+>> CPU: 1 UID: 0 PID: 17276 Comm: syz.1.16450 Not tainted 6.12.0-05490-g9bb88c659673 #8
+>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-3.fc41 04/01/2014
+>>
+>> Fixes: be3d72a2896c ("bpf: move user_size out of bpf_test_init")
+>> Reported-by: syzkaller <syzkaller@googlegroups.com>
+>> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+>> ---
+>>   net/bpf/test_run.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+>> index 501ec4249fed..756250aa890f 100644
+>> --- a/net/bpf/test_run.c
+>> +++ b/net/bpf/test_run.c
+>> @@ -663,7 +663,7 @@ static void *bpf_test_init(const union bpf_attr *kattr, u32 user_size,
+>>   	if (size < ETH_HLEN || size > PAGE_SIZE - headroom - tailroom)
+>>   		return ERR_PTR(-EINVAL);
+>>   
+>> -	if (user_size > size)
+>> +	if (user_size < ETH_HLEN || user_size > size)
+>>   		return ERR_PTR(-EMSGSIZE);
+>>   
+>>   	size = SKB_DATA_ALIGN(size);
+>> -- 
+>> 2.47.0
+>>
 > 
-> Well it's definitely that... As we use musl as glibc is BIIIG and won't
-> ever fit 4mb of flash ahahha
-> 
-> Also I just notice msend suffer the very same problem...
-> 
-> root@OpenWrt:~# ip vrf exec vlan1 msend -g ff2e::0102:0304 -I lan1 -c 1
-> Now sending to multicast group: [ff2e::0102:0304]:4444
-> sendto: Address family not supported by protocol
-> root@OpenWrt:~# ip vrf exec vlan1 msend -I lan1 -c -g 1ff2e::0102:0304
-> Now sending to multicast group: [224.1.1.1]:4444
-> Sending msg 1, TTL 1, to [224.1.1.1]:4444:
-> Sending msg 2, TTL 1, to [224.1.1.1]:4444:
->
+> I wonder whether 'size < ETH_HLEN' above is needed after your patch.
+> Feels like 'user_size < ETH_HLEN' supersedes it.
 
-Ignore the last part about msend... just me messing around...
+May be fixing it by replacing the existing "size" check with "user_size" check? 
+Seems more intuitive that checking is needed on the "user_"size instead of the 
+"size". The "if (user_size > size)" check looks useless also. Something like this?
 
--- 
-	Ansuel
+-	if (size < ETH_HLEN || size > PAGE_SIZE - headroom - tailroom)
++	if (user_size < ETH_HLEN || user_size > PAGE_SIZE - headroom - tailroom)
+		return ERR_PTR(-EINVAL);
+
+-	if (user_size > size)
+-		return ERR_PTR(-EMSGSIZE);
+-
+
 
