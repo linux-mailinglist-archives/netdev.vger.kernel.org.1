@@ -1,163 +1,399 @@
-Return-Path: <netdev+bounces-148206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D65A19E0D16
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:39:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A7429E0D2B
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:41:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 983D816406C
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 20:39:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B8F2165034
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 20:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF34C1DEFC1;
-	Mon,  2 Dec 2024 20:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B271DE898;
+	Mon,  2 Dec 2024 20:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NKtWy9EA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LZkHnQUE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A05E1DA31F;
-	Mon,  2 Dec 2024 20:39:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759701DE4C3
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 20:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733171963; cv=none; b=QN2ECvSoK0h8X67mmjvkgfN4knf/GIQc4nAmAzeYIUMZ6nMpZ0bV/x34XBgiF15WGkHj5LX7gWIPtC4aoD1oGA1yWCJDBA+3rxjtGIRT94DpCjglQRYrX9XKHRS9o/uApqaMttfae2jHr64GrlCkgx9MnqpYfpaOaeAo996+J/k=
+	t=1733172090; cv=none; b=PFcATASp5hNzitSMn+hm1RuXcK+7Pdx+YeBMOI3jG76ep7iXZ3i32kcwa6mEcZq2O4iwyPDRCk6ZxH02wPvP3YafNmnLPH23pCukqIF78BAQkSlFGsUCh0/Hn+z03tPyNcwpncA1taj7KL+UkzZc+vdzqRmai8QVr3QMcl8xnuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733171963; c=relaxed/simple;
-	bh=UexIPcOVmGVtDLsOPzsWm5VC6gwGUpKxpThJKXVNMmQ=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GMw2EJhdWEoqKoBq+eO4d5vzDcj6DYH8nt4F2kH/LagX42ewpC/hg9RO1jLOEQcrtp+vigkBDKOvmQyfABiwbnTFxbxvScO0C9yJtbGXkOSv4K/IGkmNPzGT+SODUo3EYqvOfJcDQw6inUWUyiE96rT3ZFgL2MBXnEbYxtbuuw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NKtWy9EA; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-434a736518eso59429405e9.1;
-        Mon, 02 Dec 2024 12:39:21 -0800 (PST)
+	s=arc-20240116; t=1733172090; c=relaxed/simple;
+	bh=KIdbkdIFaXSbJKucAAX9IC7JO4pcKcJsK9zYppY8ifU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K1loGBuBtP+RtZGMyO1XCHWc4XLaVM37+mwLlF559md+lxkcZcRE5ESTLlFWoFAdQR0ezwDDlCNzfEnDWB2kd1oQF2EA9s4tsHE8EuNR60cJYF2ATyL7wX6al3JCpIkqA9N+6glxRBkjlreS0aMpenEO8knr9+LHV/+I9LM5NQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LZkHnQUE; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5d0f6fa6f8bso1371040a12.0
+        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 12:41:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733171960; x=1733776760; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wPC2r+i+iAeBWO/IBUjUrbII91BfRRAgBAKLUzGncwU=;
-        b=NKtWy9EAMRZvbSKITZqifHAk3fIo3I2lgEc+8A59wM1pboiSu1+PlfeHDKLCdq9stN
-         ICv2xWJxxJArVmcqwj3+nlH1nLT0GfFaW9C1Qvzd/Mcfr658ACXc00KTswqN/+gyY8yY
-         0z8acO77asewseZ7ql1NxLIeqZcjjVrXdjb+lAf/US7lIFe665O0W+V3d8UOQNCOyE93
-         6sK9w6q5+128J2LAA3nRHc8AhA+CHTjF0V+3XUonxvZjsRvKsFvec186VAoGk4EHCPKw
-         AmeacP5CH507VxRL5VOT/nrxBArJr5lbaHt/mjfWcSh+0TGK6GTskaq7MPf9peiOS1Si
-         IAqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733171960; x=1733776760;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1733172087; x=1733776887; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wPC2r+i+iAeBWO/IBUjUrbII91BfRRAgBAKLUzGncwU=;
-        b=JJXprV9xwdrgU45whJeTWbbCbJvoqywcA4a6jsdSTY3nVvOmh6WBu0Y/fElRQ6NcuS
-         t8Axd4IskexwZQwMjyD+pIeMH5ScN9AAFvsIdRu+UPSYMBnDuCMvJvzfesp4cbhckMcG
-         M1+3a3bvKKgKHF5xYtEHrrPQyZcJ2hPwiJfK044iDoIt7j77nFYUPSi4akIuy0VlD60G
-         XDrXN0q9P0tBfJ7muXRdeiSqWBP/+J7qjSjYhM/xyXjObO6QuuQT1Uj4kNRNvu2409tm
-         qPIoRCeCE1nuE4iqdvD/kyZzZ/nDuzGdj5glzbF0Bwmr6mTN3BJXciNnlayVcnQmXhx5
-         fAMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzizjj5ZwRxM4j2piyFvEo5VV2AqlggzPi0vvbaEP8yeOP7eJ2OaBupCH5ZRpOYSE6nDcGupigWUkhcBI=@vger.kernel.org, AJvYcCWALj1Tgqfqb+ItvCTTnx1irgTWNcWFW/Q1hP5zVJ/ScR9/wP2MHg7xeHz+J9PcShVRqOtkcgYO@vger.kernel.org, AJvYcCX/T6cL8i8VeaahO0u93EmtoEBo1uljHyXnVDRTvDyg+RWShhW8UgTWlOXcg4jd4hnst4kGrW1N@vger.kernel.org, AJvYcCXCqp/99lJC+uawEHWrJNII4M5+cBo35HqZEiQbCUC+NoQIjVfhkEuwq83QEqm4OLe879l8PHi/6X7+QI4aZU9J@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGQgJ6ZABCmA68DBKQJ5FZOL2JtrnMlQ/MPzpIWfbbeKb6QPMI
-	fTz0rTNZEQuAYHrqfzSgIVVrmN3hFDOvOrzC7mlv4Qg0AfMaldz6
-X-Gm-Gg: ASbGncsm9KPAYOK4dyT0FFg3fxMYVcleDwKb2REo//mtx5GbrqjeA5CM2vbsFmlADfr
-	LZsOJjYzMxuMLvvTBmZmwVgUKR39I6ucMUaDMabGQ0MgjF211wxZzeWGuhBSiKTadfBtjaV+/wc
-	YFEsS5bz4PNrdw1Nub3t3HJNdecpbSg8GfRFhKNsKNM6+ph3v7tM/JT4uyf+bqUAP/eIEHO59Hb
-	OGarcKKshG+AQEoSCNrTKcbUu3qD2RdDDpr1YoeYltq2u34oR+DY7zcZKnUy0RYL3D0bQ/giXKh
-	KawPwA==
-X-Google-Smtp-Source: AGHT+IFahAlhCBi3m7m9fmhDH9u9C/eQnZ+mRYYsnEkCqBZQga5HZs0ZtIB4FdzPU83TXn8xyQASWA==
-X-Received: by 2002:a05:600c:314a:b0:434:a684:984 with SMTP id 5b1f17b1804b1-434a9dbb5f4mr280129555e9.4.1733171960116;
-        Mon, 02 Dec 2024 12:39:20 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434b0f70d91sm162900245e9.39.2024.12.02.12.39.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 12:39:19 -0800 (PST)
-Message-ID: <674e1af7.050a0220.3799ad.fa5e@mx.google.com>
-X-Google-Original-Message-ID: <Z04a835dybKlDLGR@Ansuel-XPS.>
-Date: Mon, 2 Dec 2024 21:39:15 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
-	Benjamin Poirier <bpoirier@nvidia.com>,
-	Hangbin Liu <liuhangbin@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [net PATCH 1/2] selftests: net: lib: fix broken ping with
- coreutils ping util
-References: <20241130113314.6488-1-ansuelsmth@gmail.com>
- <20241130154307.cskk55ecltjkinqz@skbuf>
- <674b334a.050a0220.3b307b.ee8b@mx.google.com>
- <20241130154840.lv4rmor4dv66cctf@skbuf>
+        bh=0L6ohtx3ayyqt3b2ZEfRw+gjXygT94F18Gbl8j2AkM4=;
+        b=LZkHnQUEtEgpE1URIa/FBKxFC4P/7iHpEovDKi+JvEWL/X9FBnhAox7wxyTSNxUXns
+         hSdczsA3hwUavNjD1jofhkoFdm3OXAuXu1l9c6wJ6V0R+mRW9mlb3a1j+mbzd2nQUrCv
+         dv1OVru3NZC3nFrwI19Tr7sV0JT5oV/dk9Dwqd6r8mX+x/l021LrbSpQ26kckT+DQGfm
+         t6Ax8tWqHRBWOtRwX0GlBagELaGW34Gpb/3b4ppXDNy5nKb2TMPoPAmEE24H8ppJUtln
+         gwtmj+tpFIzu/L38UnhthINEhNOjJnD6I7uxmvT4J7i+U1Zx8YGIkPn9mxfLtB0voFcw
+         hwSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733172087; x=1733776887;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0L6ohtx3ayyqt3b2ZEfRw+gjXygT94F18Gbl8j2AkM4=;
+        b=vZSxZKGFF0iovcCplbmPzSxJ/dY+Ju+rxrbhkgJg0AKPFouTb0U4F3xNMGK2W6lZZF
+         hKOgdj/5l0bWQWFBlctnvqcpMPlAzivSKzt2FsZoWZItnwF4D7XUHQ+j0qqHcySdmPvm
+         TiwSf0AkvysKQ9KOrVjIEwnxgDeuU8bBwAIzOlf9Ae3MqAU3zR5m37rt5ikVUBSi6CPx
+         PrrMsvBxvUY5xGa9H2CM9htYJ0mdgnlskhF+F9LEdD6ZB9olmq958iZXdqM0k3PTm7Rt
+         vAeCZFTjkwqG7Afpz8igMF0Z58aCJSHsG+yNC8SpMZViNUc1BF7BStWdRN5ShyF+HomJ
+         34+w==
+X-Gm-Message-State: AOJu0YyOLEi7GJJcQDEd8NCgzaeO1y56yICyow/1zmo2UPMZZ+2AHxLg
+	DCMRiy2N74HyMINsrNrebGtf8Hf/F3a587Gfx8XgRhWwkKPx+Y/A7cPx6GZKyuPzuoK3Qfk4sU6
+	Rcedmd2seAe01Ek48bZAJHPKQcz3PJ4vIyrs8
+X-Gm-Gg: ASbGncvsbRUZcy5vNCQ/EzZQmehfnaLjWLoJfiHzGtfISjoLkIJdNqnmXrl96VI3Feo
+	ZKCZHpyKIfbZzKOmlMM3dOgqivx0UsVKtgmSnZ38vg5u5m9uC07r1G1SPfGKdCbJ7
+X-Google-Smtp-Source: AGHT+IHFntYZBd9ovLWsYLl4dLpxLDVlUqdEtN5/2Am+3kXZvUTo5iN5wIVX1pBTykkhvbfSK6wipQoZm2mHkfJq9gE=
+X-Received: by 2002:a17:906:23ea:b0:aa5:3ce5:1e2b with SMTP id
+ a640c23a62f3a-aa581065a6amr2096345866b.60.1733172086487; Mon, 02 Dec 2024
+ 12:41:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241130154840.lv4rmor4dv66cctf@skbuf>
+References: <20241121215257.3879343-2-wangfe@google.com> <20241124081549.GD160612@unreal>
+ <CADsK2K_na0Ugwv2PPT_s4oHSAx2rtZvtYY58C4MQkjE6G5y4Ew@mail.gmail.com> <20241127090032.GD1245331@unreal>
+In-Reply-To: <20241127090032.GD1245331@unreal>
+From: Feng Wang <wangfe@google.com>
+Date: Mon, 2 Dec 2024 12:41:14 -0800
+Message-ID: <CADsK2K85L8Q3Q26w2n3WBDpN4VhY0jB8nQgXOhFmutwEHqk60g@mail.gmail.com>
+Subject: Re: [PATCH v6] xfrm: add SA information to the offloaded packet when
+ if_id is set
+To: Leon Romanovsky <leon@kernel.org>
+Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com, 
+	antony.antony@secunet.com, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 30, 2024 at 05:48:40PM +0200, Vladimir Oltean wrote:
-> On Sat, Nov 30, 2024 at 04:46:14PM +0100, Christian Marangi wrote:
-> > On Sat, Nov 30, 2024 at 05:43:07PM +0200, Vladimir Oltean wrote:
-> > > On Sat, Nov 30, 2024 at 12:33:09PM +0100, Christian Marangi wrote:
-> > > > If the coreutils variant of ping is used instead of the busybox one, the
-> > > > ping_do() command is broken. This comes by the fact that for coreutils
-> > > > ping, the ping IP needs to be the very last elements.
-> > > > 
-> > > > To handle this, reorder the ping args and make $dip last element.
-> > > > 
-> > > > The use of coreutils ping might be useful for case where busybox is not
-> > > > compiled with float interval support and ping command doesn't support
-> > > > 0.1 interval. (in such case a dedicated ping utility is installed
-> > > > instead)
-> > > > 
-> > > > Cc: stable@vger.kernel.org
-> > > > Fixes: 73bae6736b6b ("selftests: forwarding: Add initial testing framework")
-> > > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Updated the comments, thanks.
+
+On Wed, Nov 27, 2024 at 1:00=E2=80=AFAM Leon Romanovsky <leon@kernel.org> w=
+rote:
+>
+> On Tue, Nov 26, 2024 at 01:54:20PM -0800, Feng Wang wrote:
+> > Please see embedded answers below. Thanks.
+> >
+> > On Sun, Nov 24, 2024 at 12:15=E2=80=AFAM Leon Romanovsky <leon@kernel.o=
+rg> wrote:
+> > >
+> > > On Thu, Nov 21, 2024 at 09:52:58PM +0000, Feng Wang wrote:
+> > > > In packet offload mode, append Security Association (SA) informatio=
+n
+> > > > to each packet, replicating the crypto offload implementation.
+> > >
+> > > Please write explicitly WHY "replicating ..." is right thing to do an=
+d
+> > > why current code is not enough.
+> > >
+> > > The best thing will be to see how packet traversal in the netdev stac=
+k
+> > > till it gets to the wire.
+> > >
+> > I explained why doing this change in the third paragraph based on
+> > Steffen's suggestion, I can move it here.
+>
+> Steffen didn't say "let's replicate ...". All that he said that he wants
+> to see API complete.
+>
+I will move the third paragraph here to explain the reason.
+
+> >
+> > > >
+> > > > The XFRM_XMIT flag is set to enable packet to be returned immediate=
+ly
+> > > > from the validate_xmit_xfrm function, thus aligning with the existi=
+ng
+> > > > code path for packet offload mode.
+> > >
+> > > This chunk was dropped mysteriously. It doesn't exist in the current =
+patch.
+> > > What type of testing did you perform? Can you please add it to the
+> > > commit message?
+> > >
+> > I didn't drop any code in the current patch,  I created a test and the
+> > patch will be upstreamed after this change is checked in.
+> > The link is https://lore.kernel.org/all/20241104233315.3387982-1-wangfe=
+@google.com/
+> > Do I need to add the test details in this commit?
+>
+> No, you need to create test that knows to handle case with and without
+> if_id properly. You should add test to the patchset as first patch and
+> implementation as second one.
+>
+I probably don't fully understand what you mean. Before my CL, there
+is no handling of if_id. My CL adds this handling and my test shows
+how to test it.
+What does a test without if_id handling show? Show the code not unable
+to handle if_id?  And I checked other features, they only add a test
+after a new feature is checked in.
+
+> >
+> > > According to the strongswan documentation https://docs.strongswan.org=
+/docs/5.9/features/routeBasedVpn.html,
+> > > "Traffic that=E2=80=99s routed to an XFRM interface, while no policie=
+s and SAs with matching interface ID exist,
+> > > will be dropped by the kernel."
+> > >
+> > > It looks like the current code doesn't handle this case, does it?
+> > >
+> > The current code will drop the packet if the interface ID is not matche=
+d.
+>
+> How? Who will drop it?
+>
+The main function is xfrm_policy_match(), you can trace it.
+> >
+> > > >
+> > > > This SA info helps HW offload match packets to their correct securi=
+ty
+> > > > policies. The XFRM interface ID is included, which is used in setup=
+s
+> > > > with multiple XFRM interfaces where source/destination addresses al=
+one
+> > > > can't pinpoint the right policy.
+> > >
+> > > Please add an examples of iproute2 commands on how it is achieved,
+> > > together with tcprdump examples of before and after.
+> > >
+> > A test patch will be upstreamed.  There is no need for tcpdump because
+> > this change won't change packet content.
+>
+> Of course it is needed, it will show that without if_id patch packets
+> are unencrypted, while after applying the patch, we will see encrypted
+> packets.
+>
+The netdevsim code doesn't really change the packet content because
+there is no real hardware encryption engine.
+So there is no encrypted packet.
+
+> >
+> > > >
+> > > > Enable packet offload mode on netdevsim and add code to check the X=
+FRM
+> > > > interface ID.
+> > >
+> > > You still need to add checks in existing drivers to make sure that SA=
+s
+> > > with if_id won't be offloaded.
+> > >
+> > There is no existing driver supporting packet offload mode except netde=
+vsim.
+>
+> It is not true, please check the code.
+>
+I have searched the tree,  and there is no packet offload mode driver
+implementation.  If you know it, please let me know.
+> >
+> > > IMHO, netdevsim implementation is not a replacement to support
+> > > out-of-tree code, but a way to help testing features without need to
+> > > have complex HW, but still for the code which is in-tree.
+> > >
+> > We discussed this before, and I followed your and Steffen's comment to
+> > add netdevsim simulation code to satisfy the requirement.
+>
+> I didn't suggest netdevsim and always requested to upstream real driver.
+> Netdevsim is Steffen's suggestion to overcome kernel rule of no adding
+> code without in-kernel users.
+>
+> Thanks
+>
+> >
+> > > Thanks
+> > >
+> >
+> > > >
+> > > > Signed-off-by: wangfe <wangfe@google.com>
 > > > > ---
-> > > 
-> > > Do you mean the other way around? that the busybox ping is the broken one?
-> > > And by coreutils ping, you actually mean iputils ping, right?
-> > 
-> > Mhh no busybox ping utility is problematic only if FLOAT INTERVAL is not
-> > enabled (aka 0.1 interval are not supported)
-> > 
-> > Yes I'm referring to iputils ping. With that I notice args are wrongly
-> > parsed... especially with the -c option.
-> 
-> But isn't iputils ping what everybody else uses? I'm confused. I have
-> this version and the current syntax is not problematic for me.
-> 
-> $ ping -V
-> ping from iputils 20240905
-> libcap: yes, IDN: yes, NLS: no, error.h: yes, getrandom(): yes, __fpending(): yes
-
-Mhh the problem seems to be -c 
-
-Let me post some outputs...
-
-root@OpenWrt:~# ping -V
-ping from iputils 20240117
-libcap: no, IDN: no, NLS: no, error.h: no, getrandom(): yes, __fpending(): yes
-root@OpenWrt:~# ping -c 10 192.168.1.1
-PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
-64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.102 ms
-64 bytes from 192.168.1.1: icmp_seq=2 ttl=64 time=0.084 ms
-64 bytes from 192.168.1.1: icmp_seq=3 ttl=64 time=0.236 ms
-^C
---- 192.168.1.1 ping statistics ---
-3 packets transmitted, 3 received, 0% packet loss, time 2080ms
-rtt min/avg/max/mdev = 0.084/0.140/0.236/0.067 ms
-root@OpenWrt:~# ping 192.168.1.1 -c 10
-ping: -c: Name does not resolve
-
-As you can see swapping the ip cause this "Name does not resolve" error.
-
--- 
-	Ansuel
+> > > > v6: https://lore.kernel.org/all/20241119220411.2961121-1-wangfe@goo=
+gle.com/
+> > > >   - Fix code style to follow reverse x-mas tree order declaration.
+> > > > v5: https://lore.kernel.org/all/20241112192249.341515-1-wangfe@goog=
+le.com/
+> > > >   - Add SA information only when XFRM interface ID is non-zero.
+> > > > v4: https://lore.kernel.org/all/20241104233251.3387719-1-wangfe@goo=
+gle.com/
+> > > >   - Add offload flag check and only doing check when XFRM interface
+> > > >     ID is non-zero.
+> > > > v3: https://lore.kernel.org/all/20240822200252.472298-1-wangfe@goog=
+le.com/
+> > > >   - Add XFRM interface ID checking on netdevsim in the packet offlo=
+ad
+> > > >     mode.
+> > > > v2:
+> > > >   - Add why HW offload requires the SA info to the commit message
+> > > > v1: https://lore.kernel.org/all/20240812182317.1962756-1-wangfe@goo=
+gle.com/
+> > > > ---
+> > > > ---
+> > > >  drivers/net/netdevsim/ipsec.c     | 32 +++++++++++++++++++++++++++=
++++-
+> > > >  drivers/net/netdevsim/netdevsim.h |  1 +
+> > > >  net/xfrm/xfrm_output.c            | 22 +++++++++++++++++++++
+> > > >  3 files changed, 54 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/drivers/net/netdevsim/ipsec.c b/drivers/net/netdevsim/=
+ipsec.c
+> > > > index 88187dd4eb2d..5677b2acf9c0 100644
+> > > > --- a/drivers/net/netdevsim/ipsec.c
+> > > > +++ b/drivers/net/netdevsim/ipsec.c
+> > > > @@ -153,7 +153,8 @@ static int nsim_ipsec_add_sa(struct xfrm_state =
+*xs,
+> > > >               return -EINVAL;
+> > > >       }
+> > > >
+> > > > -     if (xs->xso.type !=3D XFRM_DEV_OFFLOAD_CRYPTO) {
+> > > > +     if (xs->xso.type !=3D XFRM_DEV_OFFLOAD_CRYPTO &&
+> > > > +         xs->xso.type !=3D XFRM_DEV_OFFLOAD_PACKET) {
+> > > >               NL_SET_ERR_MSG_MOD(extack, "Unsupported ipsec offload=
+ type");
+> > > >               return -EINVAL;
+> > > >       }
+> > > > @@ -169,6 +170,7 @@ static int nsim_ipsec_add_sa(struct xfrm_state =
+*xs,
+> > > >       memset(&sa, 0, sizeof(sa));
+> > > >       sa.used =3D true;
+> > > >       sa.xs =3D xs;
+> > > > +     sa.if_id =3D xs->if_id;
+> > > >
+> > > >       if (sa.xs->id.proto & IPPROTO_ESP)
+> > > >               sa.crypt =3D xs->ealg || xs->aead;
+> > > > @@ -227,16 +229,31 @@ static bool nsim_ipsec_offload_ok(struct sk_b=
+uff *skb, struct xfrm_state *xs)
+> > > >       return true;
+> > > >  }
+> > > >
+> > > > +static int nsim_ipsec_add_policy(struct xfrm_policy *policy,
+> > > > +                              struct netlink_ext_ack *extack)
+> > > > +{
+> > > > +     return 0;
+> > > > +}
+> > > > +
+> > > > +static void nsim_ipsec_del_policy(struct xfrm_policy *policy)
+> > > > +{
+> > > > +}
+> > > > +
+> > > >  static const struct xfrmdev_ops nsim_xfrmdev_ops =3D {
+> > > >       .xdo_dev_state_add      =3D nsim_ipsec_add_sa,
+> > > >       .xdo_dev_state_delete   =3D nsim_ipsec_del_sa,
+> > > >       .xdo_dev_offload_ok     =3D nsim_ipsec_offload_ok,
+> > > > +
+> > > > +     .xdo_dev_policy_add     =3D nsim_ipsec_add_policy,
+> > > > +     .xdo_dev_policy_delete  =3D nsim_ipsec_del_policy,
+> > > > +
+> > > >  };
+> > > >
+> > > >  bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_buff *skb)
+> > > >  {
+> > > >       struct sec_path *sp =3D skb_sec_path(skb);
+> > > >       struct nsim_ipsec *ipsec =3D &ns->ipsec;
+> > > > +     struct xfrm_offload *xo;
+> > > >       struct xfrm_state *xs;
+> > > >       struct nsim_sa *tsa;
+> > > >       u32 sa_idx;
+> > > > @@ -275,6 +292,19 @@ bool nsim_ipsec_tx(struct netdevsim *ns, struc=
+t sk_buff *skb)
+> > > >               return false;
+> > > >       }
+> > > >
+> > > > +     if (xs->if_id) {
+> > > > +             if (xs->if_id !=3D tsa->if_id) {
+> > > > +                     netdev_err(ns->netdev, "unmatched if_id %d %d=
+\n",
+> > > > +                                xs->if_id, tsa->if_id);
+> > > > +                     return false;
+> > > > +             }
+> > > > +             xo =3D xfrm_offload(skb);
+> > > > +             if (!xo || !(xo->flags & XFRM_XMIT)) {
+> > > > +                     netdev_err(ns->netdev, "offload flag missing =
+or wrong\n");
+> > > > +                     return false;
+> > > > +             }
+> > > > +     }
+> > > > +
+> > > >       ipsec->tx++;
+> > > >
+> > > >       return true;
+> > > > diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdev=
+sim/netdevsim.h
+> > > > index bf02efa10956..4941b6e46d0a 100644
+> > > > --- a/drivers/net/netdevsim/netdevsim.h
+> > > > +++ b/drivers/net/netdevsim/netdevsim.h
+> > > > @@ -41,6 +41,7 @@ struct nsim_sa {
+> > > >       __be32 ipaddr[4];
+> > > >       u32 key[4];
+> > > >       u32 salt;
+> > > > +     u32 if_id;
+> > > >       bool used;
+> > > >       bool crypt;
+> > > >       bool rx;
+> > > > diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
+> > > > index e5722c95b8bb..3e9a1b17f37e 100644
+> > > > --- a/net/xfrm/xfrm_output.c
+> > > > +++ b/net/xfrm/xfrm_output.c
+> > > > @@ -704,6 +704,8 @@ int xfrm_output(struct sock *sk, struct sk_buff=
+ *skb)
+> > > >  {
+> > > >       struct net *net =3D dev_net(skb_dst(skb)->dev);
+> > > >       struct xfrm_state *x =3D skb_dst(skb)->xfrm;
+> > > > +     struct xfrm_offload *xo;
+> > > > +     struct sec_path *sp;
+> > > >       int family;
+> > > >       int err;
+> > > >
+> > > > @@ -728,7 +730,27 @@ int xfrm_output(struct sock *sk, struct sk_buf=
+f *skb)
+> > > >                       kfree_skb(skb);
+> > > >                       return -EHOSTUNREACH;
+> > > >               }
+> > > > +             if (x->if_id) {
+> > > > +                     sp =3D secpath_set(skb);
+> > > > +                     if (!sp) {
+> > > > +                             XFRM_INC_STATS(net, LINUX_MIB_XFRMOUT=
+ERROR);
+> > > > +                             kfree_skb(skb);
+> > > > +                             return -ENOMEM;
+> > > > +                     }
+> > > > +
+> > > > +                     sp->olen++;
+> > > > +                     sp->xvec[sp->len++] =3D x;
+> > > > +                     xfrm_state_hold(x);
+> > > >
+> > > > +                     xo =3D xfrm_offload(skb);
+> > > > +                     if (!xo) {
+> > > > +                             secpath_reset(skb);
+> > > > +                             XFRM_INC_STATS(net, LINUX_MIB_XFRMOUT=
+ERROR);
+> > > > +                             kfree_skb(skb);
+> > > > +                             return -EINVAL;
+> > > > +                     }
+> > > > +                     xo->flags |=3D XFRM_XMIT;
+> > > > +             }
+> > > >               return xfrm_output_resume(sk, skb, 0);
+> > > >       }
+> > > >
+> > > > --
+> > > > 2.47.0.371.ga323438b13-goog
+> > > >
+> > > >
 
