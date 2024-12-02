@@ -1,195 +1,218 @@
-Return-Path: <netdev+bounces-148232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0DEA9E0E1E
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 22:49:14 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C00AD9E0E54
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:03:49 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 652F628238F
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 21:49:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80AC2165274
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 22:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840951DF747;
-	Mon,  2 Dec 2024 21:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49561DF966;
+	Mon,  2 Dec 2024 22:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W9bQUHLj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="suBtcrMh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DD81DF721
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 21:49:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EBC51DF73B;
+	Mon,  2 Dec 2024 22:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733176147; cv=none; b=N/KRRMGZYWmWpRalFAIVSB5w6gmqFDKZbfs4hQQHoPl8hoSDQerZRy6uMzNI9nKd9SMWFM0X8gsZ8LpRpasfDLs5OOHMrwTUSSDuJ4m3Og060vPI9tE00DavkN4+aVNtJSgjYhWTf+b0w1Y4iWFXJoxX84LuJbfwY5l2h/cLSb8=
+	t=1733177024; cv=none; b=BanQjJ20hT5UoH006iwnuZ48mZc6hQma9m3tfPBUXGXWQyCosV8cSBt7reGCqvDzhmFdajmJMZIvQXb36HNFhsWD2L1owo83Al6HHPpYE3tEDkWp1WanxePpXl3J62TbttQH9a6E4hV64xBnJi0v7R/L/CyxXipCoSsqlbpKUm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733176147; c=relaxed/simple;
-	bh=8imndJXJX33hJtetZZiHeDN05pdqdgmsj6JDHEhLiCg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=seWCtkFjB6qm2pwbhL04RkQAu4aYhm7tCfhkHYy4iFcKoPWQJdoarww7bQjIiSw7b6p6v0fWLhsc2TeMVw9screNqhmtK8bM5a1wp4sLbr2p3gLkCr1PRn8dI6XJXtl0CyPAMBmuX/zVuL/iv69VTssYaunYz6yOf+eT1+Z1xE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W9bQUHLj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733176145;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EboEf2/84XUCd54dCRY7yzh8509sOYchgZiYAwfhqyY=;
-	b=W9bQUHLjGgwKPDZM0NKJ5fpFFEOY1gQGwBX4gtsVobRJ2Y5iflU9l+MU64ZjzcCtVF9jIJ
-	xvRrG6Xy7f2AKHHsEHMRurjKcHbowRYt5iz3W0U5cYXqZk5LDKBhvqRgmQ5fw4ayE2zcK3
-	JUqGIOjFnQXIVYzHaSTehjVV6kInpOk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-386-M_h6KJyGOuW_b9Lg2paxVw-1; Mon, 02 Dec 2024 16:49:03 -0500
-X-MC-Unique: M_h6KJyGOuW_b9Lg2paxVw-1
-X-Mimecast-MFC-AGG-ID: M_h6KJyGOuW_b9Lg2paxVw
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-434a467e970so33296175e9.2
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 13:49:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733176142; x=1733780942;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EboEf2/84XUCd54dCRY7yzh8509sOYchgZiYAwfhqyY=;
-        b=CCHlk+KfLZfZldXFI/aN68cX5ehz2zJk7N/wA9m3pgVJOTzYV19dviuFh1tGVCB3Fx
-         nh2LD0bcZ+iKTMESe7ZA23gsjWPaDkgCq4i4hWhODTrhaFUKlT0rqlrZTdU5GgyXdnuL
-         8Wsi+0M5vEij2fwyVJqWygpLgR64Sc0E3HOetFaF0gBYcSz9DUlmE0qpVkvu79cRE9/q
-         /wlgyl369jmB37MC6YsrDrYjMjckHUH6e8ySCwxiWWg9G7ZcgaZTTX8+RYh0zCLEpQMf
-         bx94M6okakqVdOYYamREKXAo6FehtviT3V9lGBdgSRwAL8LPgf7e4dAi8SM8noEHkzsJ
-         7tZA==
-X-Gm-Message-State: AOJu0YwtVqJYIq75eqNKBy9VN8v9hLgRMfGI/EV9nqpE7jiR+0VLC/PO
-	DCA3dQj4GUVIwDDHleOJZZGs3Zge4ibgOtT5aSDMatUw7n7xcZ3Bl83Eh3n4JQAbTDE7CdLbybP
-	vHjsoBBLIfpyUZZ2+IZMr+qc3fyw8MNs165u5g/QvzvNTTJDT+9XfnIhfNR5i2Q==
-X-Gm-Gg: ASbGncskEV5/c1WTT+JF9UAj0Q6uTRVMEf80g930S1jZskwal1OxAKxaWjp4YwyW+OW
-	zQFhi1pisNklUzQguYqb8NBhSxwZV52du8UxpeS1r3sbsMI2Tv5fNlO9BUVJW7rLrV/p6Zl6iGO
-	sKe6rpmaTdjhR21NLrxf2kwKkSkj1di9u2ZilGaUuLugFaxbbF1qfsMDjGByXRym2Vj4Jy+7lHY
-	s0CPmJZkpAf5rBaso5oU4HX9otVART3TKP1KY/HuViKTrdHLDQUPKQivJMp0bXfIMswfkRcStgA
-	3fKaBfq/dXcIIMxjAUd+VEGynIICmw==
-X-Received: by 2002:a05:600c:1390:b0:434:a71f:f804 with SMTP id 5b1f17b1804b1-434d09a8e13mr514385e9.3.1733176141830;
-        Mon, 02 Dec 2024 13:49:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFCCidU69+dKT6hCtBKNN8rI/qHWtIiOLHg/Lt8Rqvwd+f3+bg3f6fSvP5j8PD46O+DkwvB9g==
-X-Received: by 2002:a05:600c:1390:b0:434:a71f:f804 with SMTP id 5b1f17b1804b1-434d09a8e13mr514185e9.3.1733176141432;
-        Mon, 02 Dec 2024 13:49:01 -0800 (PST)
-Received: from debian (2a01cb058d23d6001797ea6ce8a6dfab.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:1797:ea6c:e8a6:dfab])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434aa7d1a90sm197019205e9.32.2024.12.02.13.49.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 13:49:00 -0800 (PST)
-Date: Mon, 2 Dec 2024 22:48:59 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: [PATCH net-next 4/4] bareudp: Handle stats using
- NETDEV_PCPU_STAT_DSTATS.
-Message-ID: <37867f0b8dfecd92ddb36ff3711a27a35a93b5ba.1733175419.git.gnault@redhat.com>
-References: <cover.1733175419.git.gnault@redhat.com>
+	s=arc-20240116; t=1733177024; c=relaxed/simple;
+	bh=m97YtqZ0nOeP7DlKMU96/zqeCgvOSU2UBu4HI+SXTrE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Xy+joI22EImmLDiEoyUSR8j8jx/YrP2vy0cA/qBwRvNGATPJLJkLBvk3/+JuQJ8htwhWnFp0P9iQpyEVAQzH+goISzQDhwhYB3prB7gZOyzU4fIO5PZev35yWvDJTkYofV6FTugYX1Yqr40fprhISzyYjBtaxw9rPVnDf1BCJGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=suBtcrMh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 21DA7C4CED2;
+	Mon,  2 Dec 2024 22:03:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733177024;
+	bh=m97YtqZ0nOeP7DlKMU96/zqeCgvOSU2UBu4HI+SXTrE=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=suBtcrMhV2fSZlAboW4SMzYp4uycjSteA321rOR2y3MQy6nRZyGCykqAWRyeOZnL1
+	 Hgwz8cAQkkeUYr3JRXYvW2p7pbjiXUiHiPTi0VyTHKNEoJWl1qsHQXg/PVhly0oGJm
+	 3ZnPS4imCA/chjMTa/5ZncC7XB7w0mXydoewcK8EfZSbVCQ5GGmiuXRbgbbw0szYfz
+	 w31uCh1NtP2HpTmp99XXbh6T2MlK60DyvN2GMlGdtrPehDhyHpPGbKSHxVRQTall0B
+	 p7TI2DzApXS1JGCZ8EbYcEqnmXs2qABO7x/RSagzTmKnTaE0+ZYijv/F+oo7Pkg+nz
+	 0JKYADbX0K1Lw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00CD2E69E92;
+	Mon,  2 Dec 2024 22:03:44 +0000 (UTC)
+From: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
+Subject: [PATCH net-next v7 00/15] Add support for Synopsis DWMAC IP on NXP
+ Automotive SoCs S32G2xx/S32G3xx/S32R45
+Date: Mon, 02 Dec 2024 23:03:39 +0100
+Message-Id: <20241202-upstream_s32cc_gmac-v7-0-bc3e1f9f656e@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1733175419.git.gnault@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALsuTmcC/23PTW6DMBAF4KtEXtfR2MZ/XfUeVRXBME68wCCbI
+ qqIu9dh01Rh+fQ039PcWaEcqbD3051lWmKJY6rBvp0Y3tp0JR77mpkE2YCXin9PZc7UDpeiJOL
+ lOrTIjfOCOqs7IQ2rl1OmENdd/WSJZp5ondlXbW6xzGP+2ecWtfcPWYA4lhfFgfeu6XRrbOcVf
+ IylnNM6nXEcdnFpnhTpjpWmKqCMcEEAKZKviv5ThPDHiq6K7RE9BAyBwqtinhTZHCvm8RFqKxx
+ iABD/lW3bfgH71upxlAEAAA==
+To: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
+ Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, Shawn Guo <shawnguo@kernel.org>, 
+ Sascha Hauer <s.hauer@pengutronix.de>, 
+ Pengutronix Kernel Team <kernel@pengutronix.de>, 
+ Fabio Estevam <festevam@gmail.com>, Emil Renner Berthing <kernel@esmil.dk>, 
+ Minda Chen <minda.chen@starfivetech.com>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Iyappan Subramanian <iyappan@os.amperecomputing.com>, 
+ Keyur Chudgar <keyur@os.amperecomputing.com>, 
+ Quan Nguyen <quan@os.amperecomputing.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, imx@lists.linux.dev, 
+ devicetree@vger.kernel.org, NXP S32 Linux Team <s32@nxp.com>, 
+ 0x1207@gmail.com, fancer.lancer@gmail.com, 
+ "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>, 
+ Jacob Keller <jacob.e.keller@intel.com>, 
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1733177021; l=4944;
+ i=jan.petrous@oss.nxp.com; s=20240922; h=from:subject:message-id;
+ bh=m97YtqZ0nOeP7DlKMU96/zqeCgvOSU2UBu4HI+SXTrE=;
+ b=LRmGIZz1oyy/VKtHAoJ/DaPlHu7EU9479mUEusQCDeEqkwrULahRx/1/l+G9AxGE+is73m0Su
+ mLi9xojFVa1CiygfStQophpuhjf6feJFlQKOt3U21G5ch+PknJ1KOFu
+X-Developer-Key: i=jan.petrous@oss.nxp.com; a=ed25519;
+ pk=Ke3wwK7rb2Me9UQRf6vR8AsfJZfhTyoDaxkUCqmSWYY=
+X-Endpoint-Received: by B4 Relay for jan.petrous@oss.nxp.com/20240922 with
+ auth_id=217
+X-Original-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+Reply-To: jan.petrous@oss.nxp.com
 
-Bareudp uses the TSTATS infrastructure (dev_sw_netstats_*()) for RX
-packet counters. It was also recently converted to use the device core
-stats (dev_core_stats_*()) for RX and TX drops (see commit 788d5d655bc9
-("bareudp: Use pcpu stats to update rx_dropped counter.")).
+The SoC series S32G2xx and S32G3xx feature one DWMAC instance,
+the SoC S32R45 has two instances. The devices can use RGMII/RMII/MII
+interface over Pinctrl device or the output can be routed
+to the embedded SerDes for SGMII connectivity.
 
-Since core stats are to be avoided in drivers, and for consistency with
-VXLAN and Geneve, let's convert packet stats handling to DSTATS, which
-can handle RX/TX stats and packet drops. Statistics that don't fit
-DSTATS are still updated atomically with DEV_STATS_INC().
+The provided stmmac glue code implements only basic functionality,
+interface support is restricted to RGMII only. More, including
+SGMII/SerDes support will come later.
 
-Signed-off-by: Guillaume Nault <gnault@redhat.com>
+This patchset adds stmmac glue driver based on downstream NXP git [0].
+
+[0] https://github.com/nxp-auto-linux/linux
+
+v7:
+- rebased on v6.13-rc1 and removed RFC prefix
+- Link to v6: https://lore.kernel.org/r/20241124-upstream_s32cc_gmac-v6-0-dc5718ccf001@oss.nxp.com
+
+v6:
+- removed dead code in dwmac-intel-plat.c
+- yaml: fix indention
+- validate interface mode in probe
+- dropped patch#16 to fit in max 15 patches in series
+- Link to v5: https://lore.kernel.org/r/20241119-upstream_s32cc_gmac-v5-0-7dcc90fcffef@oss.nxp.com
+
+v5:
+- yaml: refactored compatible string to use fallback
+- yaml: fix indention in example
+- fix xmas tree formating in local variable declarations
+- removed lazy rx clk setup
+- drop PTP clock reading patch and replace it with stmmac_platform fix
+- Link to v4: https://lore.kernel.org/r/20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com
+
+v4:
+- fixed empty commit messages for rgmi_clock() helper patches
+- fixed yaml path in MAINTAINERS
+- switched to platform_driver::remove() as suggested Uwe
+- yaml: returned back all compatibility sting values
+- added better commit description for rgmii_clock() helper
+- Link to v3: https://lore.kernel.org/r/20241013-upstream_s32cc_gmac-v3-0-d84b5a67b930@oss.nxp.com
+
+v3:
+- switched to b4 WoW to overcome threading issue with b4
+- extracted the hunk with the typo fix from v2 patch#1 to separate patch
+  as Jacob suggested
+- removed dead code for RMII/MII support, which will be added alter
+- used new rgmii_clock() helper in other stmmac:dwmac glue drivers
+- yaml: compatible strings compressed to simple one "nxp,s32-dwmac",
+  removed duplicated required properties, already defined in snps,dwmac,
+  fixed example
+
+v2:
+- send to wider audience as first version missed many maintainers
+- created rgmi_clk() helper as Russell suggested (see patch#4)
+- address Andrew's, Russell's, Serge's and Simon's comments
+
+Message-ID: <AM9PR04MB85066576AD6848E2402DA354E2832@AM9PR04MB8506.eurprd04.prod.outlook.com>
+
+Cc: 
+
+Cc: 
+
+Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
 ---
- drivers/net/bareudp.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+---
+Jan Petrous (OSS) (15):
+      net: driver: stmmac: Fix CSR divider comment
+      net: driver: stmmac: Extend CSR calc support
+      net: stmmac: Fix clock rate variables size
+      net: phy: Add helper for mapping RGMII link speed to clock rate
+      net: dwmac-dwc-qos-eth: Use helper rgmii_clock
+      net: dwmac-imx: Use helper rgmii_clock
+      net: dwmac-intel-plat: Use helper rgmii_clock
+      net: dwmac-rk: Use helper rgmii_clock
+      net: dwmac-starfive: Use helper rgmii_clock
+      net: macb: Use helper rgmii_clock
+      net: xgene_enet: Use helper rgmii_clock
+      net: dwmac-sti: Use helper rgmii_clock
+      dt-bindings: net: Add DT bindings for DWMAC on NXP S32G/R SoCs
+      net: stmmac: dwmac-s32: add basic NXP S32G/S32R glue driver
+      MAINTAINERS: Add Jan Petrous as the NXP S32G/R DWMAC driver maintainer
 
-diff --git a/drivers/net/bareudp.c b/drivers/net/bareudp.c
-index a2abfade82dd..70814303aab8 100644
---- a/drivers/net/bareudp.c
-+++ b/drivers/net/bareudp.c
-@@ -84,7 +84,7 @@ static int bareudp_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
- 
- 		if (skb_copy_bits(skb, BAREUDP_BASE_HLEN, &ipversion,
- 				  sizeof(ipversion))) {
--			dev_core_stats_rx_dropped_inc(bareudp->dev);
-+			dev_dstats_rx_dropped(bareudp->dev);
- 			goto drop;
- 		}
- 		ipversion >>= 4;
-@@ -94,7 +94,7 @@ static int bareudp_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
- 		} else if (ipversion == 6 && bareudp->multi_proto_mode) {
- 			proto = htons(ETH_P_IPV6);
- 		} else {
--			dev_core_stats_rx_dropped_inc(bareudp->dev);
-+			dev_dstats_rx_dropped(bareudp->dev);
- 			goto drop;
- 		}
- 	} else if (bareudp->ethertype == htons(ETH_P_MPLS_UC)) {
-@@ -108,7 +108,7 @@ static int bareudp_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
- 				   ipv4_is_multicast(tunnel_hdr->daddr)) {
- 				proto = htons(ETH_P_MPLS_MC);
- 			} else {
--				dev_core_stats_rx_dropped_inc(bareudp->dev);
-+				dev_dstats_rx_dropped(bareudp->dev);
- 				goto drop;
- 			}
- 		} else {
-@@ -124,7 +124,7 @@ static int bareudp_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
- 				   (addr_type & IPV6_ADDR_MULTICAST)) {
- 				proto = htons(ETH_P_MPLS_MC);
- 			} else {
--				dev_core_stats_rx_dropped_inc(bareudp->dev);
-+				dev_dstats_rx_dropped(bareudp->dev);
- 				goto drop;
- 			}
- 		}
-@@ -136,7 +136,7 @@ static int bareudp_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
- 				 proto,
- 				 !net_eq(bareudp->net,
- 				 dev_net(bareudp->dev)))) {
--		dev_core_stats_rx_dropped_inc(bareudp->dev);
-+		dev_dstats_rx_dropped(bareudp->dev);
- 		goto drop;
- 	}
- 
-@@ -144,7 +144,7 @@ static int bareudp_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
- 
- 	tun_dst = udp_tun_rx_dst(skb, family, key, 0, 0);
- 	if (!tun_dst) {
--		dev_core_stats_rx_dropped_inc(bareudp->dev);
-+		dev_dstats_rx_dropped(bareudp->dev);
- 		goto drop;
- 	}
- 	skb_dst_set(skb, &tun_dst->dst);
-@@ -194,7 +194,7 @@ static int bareudp_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
- 	len = skb->len;
- 	err = gro_cells_receive(&bareudp->gro_cells, skb);
- 	if (likely(err == NET_RX_SUCCESS))
--		dev_sw_netstats_rx_add(bareudp->dev, len);
-+		dev_dstats_rx_add(bareudp->dev, len);
- 
- 	return 0;
- drop:
-@@ -589,7 +589,7 @@ static void bareudp_setup(struct net_device *dev)
- 	dev->priv_flags |= IFF_NO_QUEUE;
- 	dev->lltx = true;
- 	dev->flags = IFF_POINTOPOINT | IFF_NOARP | IFF_MULTICAST;
--	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
-+	dev->pcpu_stat_type = NETDEV_PCPU_STAT_DSTATS;
- }
- 
- static int bareudp_validate(struct nlattr *tb[], struct nlattr *data[],
+ .../devicetree/bindings/net/nxp,s32-dwmac.yaml     | 105 ++++++++++++
+ .../devicetree/bindings/net/snps,dwmac.yaml        |   1 +
+ MAINTAINERS                                        |   7 +
+ drivers/net/ethernet/apm/xgene/xgene_enet_hw.c     |  16 +-
+ drivers/net/ethernet/cadence/macb_main.c           |  14 +-
+ drivers/net/ethernet/stmicro/stmmac/Kconfig        |  12 ++
+ drivers/net/ethernet/stmicro/stmmac/Makefile       |   1 +
+ drivers/net/ethernet/stmicro/stmmac/common.h       |   2 +
+ .../ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c    |  11 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c    |  15 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-intel-plat.c |  22 +--
+ .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c     |  30 +---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c    | 189 +++++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/dwmac-starfive.c   |  19 +--
+ drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c    |  18 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |   6 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c  |   2 +-
+ include/linux/phy.h                                |  23 +++
+ include/linux/stmmac.h                             |  10 +-
+ 21 files changed, 386 insertions(+), 121 deletions(-)
+---
+base-commit: 40384c840ea1944d7c5a392e8975ed088ecf0b37
+change-id: 20240923-upstream_s32cc_gmac-6891eb75b126
+
+Best regards,
 -- 
-2.39.2
+Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+
 
 
