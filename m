@@ -1,135 +1,78 @@
-Return-Path: <netdev+bounces-148259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61B7F9E0F61
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:44:40 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EAB09E0F65
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:49:32 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F29B9B203AD
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:44:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EE641653FA
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 23:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEEC61DFD83;
-	Mon,  2 Dec 2024 23:44:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3E771DFE15;
+	Mon,  2 Dec 2024 23:49:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MRhaAcqQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JADszn2g"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B1EA941;
-	Mon,  2 Dec 2024 23:44:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98DC61DFE08;
+	Mon,  2 Dec 2024 23:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733183072; cv=none; b=LJyWGtKAZxGcSRJ2v54WfVrPMSFJKXKxTb0fkUfw0OKpKUBIhSRpeZ3c4RFFQHCWBD8BU1Hfs6JYVvohoe5MfxB+ImaTj43R77v8DKvUGyroNd3jwWGmQB4CWRsPQ7WyamywI644hVNlIEbCc6glfljX9Tw5OYNIo/ZAHqV6/+g=
+	t=1733183364; cv=none; b=lR2G/INV8rn/LuFEXnxhCxZGw5l8T82aZW13BYUujzDTrxEZ/fVNwbbpjXW/epgHsFALLQqnNuu6b3hmKNcUQM8ijAKPEL4dxmC3XkKaRDEx6KV9BxDIqCkE+P1u2+4xTdTcF+6ZnX4oq3RG+8cGqCJ+X7d3O2V8iB7UC7NrKm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733183072; c=relaxed/simple;
-	bh=ItY7NlR2OdXY/n0CZxgvZuVFc2tv+CZC7uSLjDdSoiU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RLGxy6HRKxtDHL6QyFIk/xJcFPLt4kTfpUOCGRVcH9bxPn9xsQPh/y2Tk6CeBMvnklJEWh2E4NsejJmTo/4lep0Eoy8/CnnTU+VyVkWz5Ivlc3zdzfQqWhsGsdsSJwy6cqe7CQwRXe5sOpQWyUexgNsTa447XL+WOg4yxKBghvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MRhaAcqQ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=QmxNh0nYEKdGUUoXGrSxrCnt6J/Rj48T7e6HKqO1/uM=; b=MRhaAcqQWSGy9UX2FETDtrsPq9
-	7OJZyofuu9PD/clwQqMZGu4+A5v4UqUxO9SZLglD5plscdV7pVDyZKDJwRQRg4Itq70Yku//oJ7gp
-	ToRNsw394Vo35QCqfihuvOz2kBGXTNofti4X4ZU30ZyS1cgoYCk1UbDekIiFIhoQMWNk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tIG58-00F0fw-MU; Tue, 03 Dec 2024 00:43:58 +0100
-Date: Tue, 3 Dec 2024 00:43:58 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: jan.petrous@oss.nxp.com
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>, 0x1207@gmail.com,
-	fancer.lancer@gmail.com
-Subject: Re: [PATCH net-next v7 14/15] net: stmmac: dwmac-s32: add basic NXP
- S32G/S32R glue driver
-Message-ID: <b9ad385b-7702-4c71-b14f-64f2714a35a4@lunn.ch>
-References: <20241202-upstream_s32cc_gmac-v7-0-bc3e1f9f656e@oss.nxp.com>
- <20241202-upstream_s32cc_gmac-v7-14-bc3e1f9f656e@oss.nxp.com>
+	s=arc-20240116; t=1733183364; c=relaxed/simple;
+	bh=FCFwNBxV/SVvxKxgaD3PTa1CKJKgeRB7C0C5ytlAONA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=or/AIffGmo5yh7ZUFyMbq+skctWrtr9N2GXTAM8XJwfQ1iP4bhIKIIcQIC5KL0c3F6DLkB15f1rElNvwUEo7ItLxbvVjpEmA7tD5MkQTMoVoDfQoVFIpA/z0Pl+1x1pYp/kLhMDwOh3O4BvtyMBgLOXQObm2VuLP43FTRGs475g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JADszn2g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2831C4CED9;
+	Mon,  2 Dec 2024 23:49:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733183364;
+	bh=FCFwNBxV/SVvxKxgaD3PTa1CKJKgeRB7C0C5ytlAONA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JADszn2gNDQe/7tvQhKve7P0gMYOG3ziNZGMoFbI7O149K8rHgdS13hhO/xkWvfwW
+	 IfsoxVWXKJj1hzpybp8eNCBhyF//ip51SMENhCH4eV7CiPBPxi3oKPtxNdInQfY1/h
+	 DxjSiD8RiJa9rmnkdFewaiduIIh9oBNaKfl+qpQh48bIPSSPAIU2qUmB24c+h9vdGu
+	 KqMJIKx1PYWgng7DLAsAdChg+Bixsvc/3jIi4vbTj8I0CJ1ZQvKIHAbXZaMi5tyt7g
+	 gZVWPm9WuJVTNIcsViJXUKWs0C2171M/dEmg18A7G34yX2TcgTbPYMzv8os5JVagGf
+	 nX+q9/KbWkvKg==
+Date: Mon, 2 Dec 2024 15:49:22 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Potin Lai <potin.lai.pt@gmail.com>
+Cc: Samuel Mendoza-Jonas <sam@mendozajonas.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Patrick Williams
+ <patrick@stwcx.xyz>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Cosmo Chou <cosmo.chou@quantatw.com>, Potin Lai <potin.lai@quantatw.com>
+Subject: Re: [PATCH] Revert "net/ncsi: change from ndo_set_mac_address to
+ dev_set_mac_address"
+Message-ID: <20241202154922.0644c7a9@kernel.org>
+In-Reply-To: <20241129-potin-revert-ncsi-set-mac-addr-v1-1-94ea2cb596af@gmail.com>
+References: <20241129-potin-revert-ncsi-set-mac-addr-v1-1-94ea2cb596af@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241202-upstream_s32cc_gmac-v7-14-bc3e1f9f656e@oss.nxp.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> +static int s32_gmac_init(struct platform_device *pdev, void *priv)
-> +{
-> +	struct s32_priv_data *gmac = priv;
-> +	int ret;
-> +
-> +	ret = clk_set_rate(gmac->tx_clk, GMAC_TX_RATE_125M);
-> +	if (!ret)
-> +		ret = clk_prepare_enable(gmac->tx_clk);
-> +
-> +	if (ret) {
-> +		dev_err(&pdev->dev, "Can't set tx clock\n");
-> +		return ret;
-> +	}
+On Fri, 29 Nov 2024 17:12:56 +0800 Potin Lai wrote:
+> This reverts commit 790071347a0a1a89e618eedcd51c687ea783aeb3.
+> 
+> We are seeing kernel panic when enabling two NCSI interfaces at same
+> time. It looks like mutex lock is being used in softirq caused the
+> issue.
 
-The ordering is a bit odd here. Normally you would test each operation
-individually for errors. So:
-
-	ret = clk_set_rate(gmac->tx_clk, GMAC_TX_RATE_125M);
-	if (ret) {
-		dev_err(&pdev->dev, "Can't set tx clock\n");
-		return ret;
-	}
-	ret = clk_prepare_enable(gmac->tx_clk);
-	if (ret) {
-		dev_err(&pdev->dev, "Can't enable tx clock\n");
-		return ret;
-	}
-
-
-> +
-> +	ret = clk_prepare_enable(gmac->rx_clk);
-> +	if (ret) {
-> +		clk_disable_unprepare(gmac->tx_clk);
-> +		dev_err(&pdev->dev, "Can't set rx clock\n");
-> +		return ret;
-> +	}
-
-Is there no need to set the TX clock rate?
-
-	Andrew
+I agree with Andrew that revert makes sense. On top of his suggestions
+please add a correctly formatted Fixes tag and make sure you CC the
+authors of the buggy change, and post a v2.
+-- 
+pw-bot: cr
 
