@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-148082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC2039E054D
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:42:46 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B40D9164FA6
-	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 14:35:15 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1E020ADC0;
-	Mon,  2 Dec 2024 14:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b/ru6qmK"
-X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D29109E0525
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 15:36:03 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C5B20A5DD
-	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 14:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92A4A2841B2
+	for <lists+netdev@lfdr.de>; Mon,  2 Dec 2024 14:36:02 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E490205E12;
+	Mon,  2 Dec 2024 14:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QyGzS4JU"
+X-Original-To: netdev@vger.kernel.org
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8106120ADF9
+	for <netdev@vger.kernel.org>; Mon,  2 Dec 2024 14:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733149927; cv=none; b=m2VfVAHCXb8vKnKfCpMSUV8pCi0GlWB7uXF1HCkz5wiRQXWdKpFTDsOmQvr/e71Cyv28F9mY6iJlXoG8ZP2dnWX2YuofhN3vBBdYrQOENAYBHbeSfGTHAcv+RcArY0aQ8sMISQIPh1rHxRRUwc9E2kWcGDeiVr9mvO2q6eeE/ZQ=
+	t=1733149933; cv=none; b=dbzEPHueaTr55rw4wSy+GVILoO4vV8ZMMu493CFqudpaL7NBU4STDXOZvBvCAkwHFrI3SXZMtVrssy1XB5Xv8cKGTWPUC7EglkzkD1/ol+ryp2ZCeZ+IA6XkaEHYLLGfb0mxg+Jl3UZmDzwAj21rOutQ4nT12hFVjt5UKAt2RnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733149927; c=relaxed/simple;
-	bh=Xs+zZ+14rHSUFjQox/+UleOe5OHlsnuVDiiYhDy7S8Y=;
+	s=arc-20240116; t=1733149933; c=relaxed/simple;
+	bh=WUchw3APlK4xenHQ9zUUrSG+WmZsP1z8NKu9adpGO4k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ovfwT07Q6QscsmJjYfVT87cu/Pn2saerkoSSthdoVT6P5yf5wgtttATcOoo5b1ji265hqW6MK36pjVjc4wrb9zXA1JEoEAl4qz51i7j/1dihWh/Ov/zJILWxNRweLcrmSDXV9MTlvBpeODXekHZ+Zq19VG3L46wS/u14pI/DXe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b/ru6qmK; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=hMxCzqt33NJNJxgBacdSHRidlkdd3PVsrLwLD82QKnzC2Vmeo28LFV5fuyH0RP9iesWzVL3f8QFy9fTPEb4DlqjEp7A6kNGbGHV/Zgz/RAvBkDkmeYbv3ETmOpo083HSlkFvgyXn4H2rbY1p8zJgod5h/sJ97WC0tryg9vNlMp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QyGzS4JU; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733149925;
+	s=mimecast20190719; t=1733149930;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=X7fFcHxYF8wqhD0Hc9GDfPSIG0dKVa9/JcHHLCXB4yE=;
-	b=b/ru6qmKNdtZAuzuLHMq9ukeA49Uc7oAfmwQGvpztlop1gJmnTklI8YlnHWHD41AdWOmxB
-	0zP0qh+1TO7C9GVD716tjsmX+L/vUAQxuZyUFq0b8gep2WkIeI8IP89jiXvOUz6709Mnun
-	tMr7dqh2y8mNrH8rgzHn2hMcZ1nrFqk=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=yYrcIzROb0Ghl43qdefQjpkSE8C1A8Z1KxBFgwFQKxo=;
+	b=QyGzS4JUS+dtpnE87IT40gyfXnIduGLAtviVvPcLG+v6IdUMYyCJvsjmjqNPf3QUIfsXHN
+	Nhizy7Jt9TtTAc8SuDKAAzT89xjjFQFx0EhOWhwkkCnwQvI+n4X/tw9NOJKryeUrHXNX6B
+	i+e5kT3Jic4gLH9rQ1t8XdhD985j/rg=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-331-uprFzPj1Pw-aGbWrKzRXbw-1; Mon,
- 02 Dec 2024 09:32:03 -0500
-X-MC-Unique: uprFzPj1Pw-aGbWrKzRXbw-1
-X-Mimecast-MFC-AGG-ID: uprFzPj1Pw-aGbWrKzRXbw
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-204-nWdiCAQ-M76V6p3X2EVMTQ-1; Mon,
+ 02 Dec 2024 09:32:07 -0500
+X-MC-Unique: nWdiCAQ-M76V6p3X2EVMTQ-1
+X-Mimecast-MFC-AGG-ID: nWdiCAQ-M76V6p3X2EVMTQ
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CEA641953954;
-	Mon,  2 Dec 2024 14:32:01 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E09351944B23;
+	Mon,  2 Dec 2024 14:32:05 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.42.28.48])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4AFFB30000DF;
-	Mon,  2 Dec 2024 14:31:59 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 60A541955D48;
+	Mon,  2 Dec 2024 14:32:03 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -68,9 +68,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 14/37] rxrpc: Only set DF=1 on initial DATA transmission
-Date: Mon,  2 Dec 2024 14:30:32 +0000
-Message-ID: <20241202143057.378147-15-dhowells@redhat.com>
+Subject: [PATCH net-next 15/37] rxrpc: Timestamp DATA packets before transmitting them
+Date: Mon,  2 Dec 2024 14:30:33 +0000
+Message-ID: <20241202143057.378147-16-dhowells@redhat.com>
 In-Reply-To: <20241202143057.378147-1-dhowells@redhat.com>
 References: <20241202143057.378147-1-dhowells@redhat.com>
 Precedence: bulk
@@ -80,16 +80,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Change how the DF flag is managed on DATA transmissions.  Set it on initial
-transmission and don't set it on retransmissions.  Then remove the handling
-for EMSGSIZE in rxrpc_send_data_packet() and just pretend it didn't happen,
-leaving it to the retransmission path to retry.
-
-The path-MTU discovery using PING ACKs is then used to probe for the
-maximum DATA size - though notification by ICMP will be used if one is
-received.
+Move to setting the timestamp on DATA packets before transmitting them as
+part of the preparation.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Marc Dionne <marc.dionne@auristor.com>
@@ -100,112 +94,131 @@ cc: Paolo Abeni <pabeni@redhat.com>
 cc: linux-afs@lists.infradead.org
 cc: netdev@vger.kernel.org
 ---
- net/rxrpc/ar-internal.h |  1 +
- net/rxrpc/output.c      | 32 ++++++++++++++++----------------
- net/rxrpc/proc.c        |  5 +++--
- 3 files changed, 20 insertions(+), 18 deletions(-)
+ net/rxrpc/output.c | 56 ++++++++++++++--------------------------------
+ 1 file changed, 17 insertions(+), 39 deletions(-)
 
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index 55cc68dd1b40..84efa21f176c 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -98,6 +98,7 @@ struct rxrpc_net {
- 	atomic_t		stat_tx_data_send;
- 	atomic_t		stat_tx_data_send_frag;
- 	atomic_t		stat_tx_data_send_fail;
-+	atomic_t		stat_tx_data_send_msgsize;
- 	atomic_t		stat_tx_data_underflow;
- 	atomic_t		stat_tx_data_cwnd_reset;
- 	atomic_t		stat_rx_data;
 diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-index 56695c441514..95a3819dd85d 100644
+index 95a3819dd85d..7b068a33eb21 100644
 --- a/net/rxrpc/output.c
 +++ b/net/rxrpc/output.c
-@@ -551,16 +551,11 @@ static int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *t
- 	msg.msg_controllen = 0;
- 	msg.msg_flags	= MSG_SPLICE_PAGES;
+@@ -376,7 +376,8 @@ int rxrpc_send_abort_packet(struct rxrpc_call *call)
+  */
+ static size_t rxrpc_prepare_data_subpacket(struct rxrpc_call *call, struct rxrpc_txbuf *txb,
+ 					   rxrpc_serial_t serial,
+-					   int subpkt, int nr_subpkts)
++					   int subpkt, int nr_subpkts,
++					   ktime_t now)
+ {
+ 	struct rxrpc_wire_header *whdr = txb->kvec[0].iov_base;
+ 	struct rxrpc_jumbo_header *jumbo = (void *)(whdr + 1) - sizeof(*jumbo);
+@@ -436,8 +437,9 @@ static size_t rxrpc_prepare_data_subpacket(struct rxrpc_call *call, struct rxrpc
+ 	rxrpc_inc_stat(call->rxnet, stat_why_req_ack[why]);
+ 	trace_rxrpc_req_ack(call->debug_id, txb->seq, why);
+ 	if (why != rxrpc_reqack_no_srv_last) {
+-		txb->flags |= RXRPC_REQUEST_ACK;
+ 		flags |= RXRPC_REQUEST_ACK;
++		rxrpc_begin_rtt_probe(call, serial, now, rxrpc_rtt_tx_data);
++		call->peer->rtt_last_req = now;
+ 	}
+ dont_set_request_ack:
  
--	/* Track what we've attempted to transmit at least once so that the
--	 * retransmission algorithm doesn't try to resend what we haven't sent
--	 * yet.
-+	/* Send the packet with the don't fragment bit set unless we think it's
-+	 * too big or if this is a retransmission.
- 	 */
--	if (txb->seq == call->tx_transmitted + 1)
--		call->tx_transmitted = txb->seq + n - 1;
+@@ -473,49 +475,25 @@ static size_t rxrpc_prepare_data_packet(struct rxrpc_call *call, struct rxrpc_tx
+ {
+ 	struct rxrpc_txbuf *txb = head;
+ 	rxrpc_serial_t serial;
++	ktime_t now = ktime_get_real();
+ 	size_t len = 0;
+ 
+ 	/* Each transmission of a Tx packet needs a new serial number */
+ 	serial = rxrpc_get_next_serials(call->conn, n);
+ 
+ 	for (int i = 0; i < n; i++) {
+-		len += rxrpc_prepare_data_subpacket(call, txb, serial, i, n);
+-		serial++;
+-		txb = list_next_entry(txb, call_link);
+-	}
 -
--	/* send the packet with the don't fragment bit set if we currently
--	 * think it's small enough */
--	if (len >= sizeof(struct rxrpc_wire_header) + call->peer->max_data) {
-+	if (txb->seq == call->tx_transmitted + 1 &&
-+	    len >= sizeof(struct rxrpc_wire_header) + call->peer->max_data) {
- 		rxrpc_local_dont_fragment(conn->local, false);
- 		frag = rxrpc_tx_point_call_data_frag;
- 	} else {
-@@ -568,6 +563,13 @@ static int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *t
- 		frag = rxrpc_tx_point_call_data_nofrag;
+-	return len;
+-}
+-
+-/*
+- * Set timeouts after transmitting a packet.
+- */
+-static void rxrpc_tstamp_data_packets(struct rxrpc_call *call, struct rxrpc_txbuf *txb, int n)
+-{
+-	rxrpc_serial_t serial;
+-	ktime_t now = ktime_get_real();
+-	bool ack_requested = txb->flags & RXRPC_REQUEST_ACK;
+-	int i;
+-
+-	call->tx_last_sent = now;
+-
+-	for (i = 0; i < n; i++) {
+ 		txb->last_sent = now;
+-		ack_requested |= txb->flags & RXRPC_REQUEST_ACK;
+-		serial = txb->serial;
++		len += rxrpc_prepare_data_subpacket(call, txb, serial, i, n, now);
++		serial++;
+ 		txb = list_next_entry(txb, call_link);
  	}
  
-+	/* Track what we've attempted to transmit at least once so that the
-+	 * retransmission algorithm doesn't try to resend what we haven't sent
-+	 * yet.
-+	 */
-+	if (txb->seq == call->tx_transmitted + 1)
-+		call->tx_transmitted = txb->seq + n - 1;
-+
- 	if (IS_ENABLED(CONFIG_AF_RXRPC_INJECT_LOSS)) {
- 		static int lose;
- 		if ((lose++ & 7) == 7) {
-@@ -578,7 +580,6 @@ static int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *t
- 		}
+-	if (ack_requested) {
+-		rxrpc_begin_rtt_probe(call, serial, now, rxrpc_rtt_tx_data);
+-
+-		call->peer->rtt_last_req = now;
+-		if (call->peer->rtt_count > 1) {
+-			ktime_t delay = rxrpc_get_rto_backoff(call->peer, false);
++	/* Set timeouts */
++	if (call->peer->rtt_count > 1) {
++		ktime_t delay = rxrpc_get_rto_backoff(call->peer, false);
+ 
+-			call->ack_lost_at = ktime_add(now, delay);
+-			trace_rxrpc_timer_set(call, delay, rxrpc_timer_trace_lost_ack);
+-		}
++		call->ack_lost_at = ktime_add(now, delay);
++		trace_rxrpc_timer_set(call, delay, rxrpc_timer_trace_lost_ack);
  	}
  
--retry:
- 	/* send the packet by UDP
- 	 * - returns -EMSGSIZE if UDP would have to fragment the packet
- 	 *   to go out of the interface
-@@ -589,7 +590,11 @@ static int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *t
- 	ret = do_udp_sendmsg(conn->local->socket, &msg, len);
- 	conn->peer->last_tx_at = ktime_get_seconds();
- 
--	if (ret < 0) {
-+	if (ret == -EMSGSIZE) {
-+		rxrpc_inc_stat(call->rxnet, stat_tx_data_send_msgsize);
-+		trace_rxrpc_tx_packet(call->debug_id, call->local->kvec[0].iov_base, frag);
-+		ret = 0;
-+	} else if (ret < 0) {
- 		rxrpc_inc_stat(call->rxnet, stat_tx_data_send_fail);
- 		trace_rxrpc_tx_fail(call->debug_id, txb->serial, ret, frag);
- 	} else {
-@@ -597,11 +602,6 @@ static int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *t
+ 	if (!test_and_set_bit(RXRPC_CALL_BEGAN_RX_TIMER, &call->flags)) {
+@@ -526,6 +504,7 @@ static void rxrpc_tstamp_data_packets(struct rxrpc_call *call, struct rxrpc_txbu
  	}
+ 
+ 	rxrpc_set_keepalive(call, now);
++	return len;
+ }
+ 
+ /*
+@@ -537,6 +516,7 @@ static int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *t
+ 	enum rxrpc_tx_point frag;
+ 	struct msghdr msg;
+ 	size_t len;
++	bool new_call = test_bit(RXRPC_CALL_BEGAN_RX_TIMER, &call->flags);
+ 	int ret;
+ 
+ 	_enter("%x,{%d}", txb->seq, txb->pkt_len);
+@@ -603,20 +583,18 @@ static int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *t
  
  	rxrpc_tx_backoff(call, ret);
--	if (ret == -EMSGSIZE && frag == rxrpc_tx_point_call_data_nofrag) {
--		rxrpc_local_dont_fragment(conn->local, false);
--		frag = rxrpc_tx_point_call_data_frag;
--		goto retry;
--	}
  
- done:
- 	if (ret >= 0) {
-diff --git a/net/rxrpc/proc.c b/net/rxrpc/proc.c
-index 1f1387cf62c8..aab392b4281f 100644
---- a/net/rxrpc/proc.c
-+++ b/net/rxrpc/proc.c
-@@ -476,10 +476,11 @@ int rxrpc_stats_show(struct seq_file *seq, void *v)
- 	struct rxrpc_net *rxnet = rxrpc_net(seq_file_single_net(seq));
+-done:
+-	if (ret >= 0) {
+-		rxrpc_tstamp_data_packets(call, txb, n);
+-	} else {
++	if (ret < 0) {
+ 		/* Cancel the call if the initial transmission fails,
+ 		 * particularly if that's due to network routing issues that
+ 		 * aren't going away anytime soon.  The layer above can arrange
+ 		 * the retransmission.
+ 		 */
+-		if (!test_and_set_bit(RXRPC_CALL_BEGAN_RX_TIMER, &call->flags))
++		if (new_call)
+ 			rxrpc_set_call_completion(call, RXRPC_CALL_LOCAL_ERROR,
+ 						  RX_USER_ABORT, ret);
+ 	}
  
- 	seq_printf(seq,
--		   "Data     : send=%u sendf=%u fail=%u\n",
-+		   "Data     : send=%u sendf=%u fail=%u emsz=%u\n",
- 		   atomic_read(&rxnet->stat_tx_data_send),
- 		   atomic_read(&rxnet->stat_tx_data_send_frag),
--		   atomic_read(&rxnet->stat_tx_data_send_fail));
-+		   atomic_read(&rxnet->stat_tx_data_send_fail),
-+		   atomic_read(&rxnet->stat_tx_data_send_msgsize));
- 	seq_printf(seq,
- 		   "Data-Tx  : nr=%u retrans=%u uf=%u cwr=%u\n",
- 		   atomic_read(&rxnet->stat_tx_data),
++done:
+ 	_leave(" = %d [%u]", ret, call->peer->max_data);
+ 	return ret;
+ }
 
 
