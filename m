@@ -1,134 +1,108 @@
-Return-Path: <netdev+bounces-148630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB3689E2AC2
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 19:25:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 73EC19E2AD7
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 19:29:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81030166905
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:25:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49445167A40
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBCC1FCCFE;
-	Tue,  3 Dec 2024 18:25:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE821FBEA7;
+	Tue,  3 Dec 2024 18:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="JUnQT1Vo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E2mDVeSs"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.52])
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4831FCCF9
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 18:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEED2500C4
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 18:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733250343; cv=none; b=gTpzHtDrrhEHWFNFQFshrJKVOrUpzLX+M/uJeE//BMytpdF1PXZQU54aE40Vcz0vq4p3VjMfHJWj/hhIA2VkioDy8Q4Cb1VtRR99fcToLAPdaysSC0fiOVgE96XvvFQiOzCmqCZQ3f6lkCaMMAAHSYz/Bl/NlwBqWcq3bW60/Vg=
+	t=1733250567; cv=none; b=kv7i6ETUm7iycpbLwUO2Z/37Qb1m4b8ET7XNeHf/gtBDYIURXGw7pGq82cFe4EVFHfi1tHlDH422SOOId79NQDZeeXjinsvJRox3H9ZjA5JGs+zpJhcbE85Ozy5urODLZ0HpHmypBfAe5msW3DBzoJ4QFXCRYtZKfuVHLRKkDkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733250343; c=relaxed/simple;
-	bh=Ya0khzmJq24JDEG4oQJVLfPWFJ3vo2WwmYi6qeNRK9g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pq5geqwb+LlPqNr98BDnDaL/LUym2cTZoayLn34cNOyoTc1OtIvi43VXqsjCrWL0ylwDl2C9C+zA+HR3RkFKT8Ijh5zhd0lKRSwGrAnPmlOGE3UAuJYIzNf/6a7DXkSUSB+r6eo//4QHgUgjBFCxjG3xv2GFbQTczP9oS4qfPFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=JUnQT1Vo; arc=none smtp.client-ip=148.163.129.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id BC73EB0008B;
-	Tue,  3 Dec 2024 18:25:32 +0000 (UTC)
-Received: from [192.168.100.159] (unknown [50.251.239.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id EF22313C2B0;
-	Tue,  3 Dec 2024 10:25:30 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com EF22313C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1733250331;
-	bh=Ya0khzmJq24JDEG4oQJVLfPWFJ3vo2WwmYi6qeNRK9g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JUnQT1VoRkGehG7WbmCWvhNSA5ggmG18ebXnlGrwLxaPPZP8Ea/SRltWpLifJSfMh
-	 mGuakcCBLvsAPiZRD5XOXOvFkVi8NUbApvqkiX9gWBDAnZzkIy8WnZluHo4f5OqpzF
-	 2BgkqNY3Vbj7ShYWioEzP9hoK3bEcij5mlZ4RD0c=
-Message-ID: <0d30b5d3-d3ce-f959-e30d-d5ec57f2b2f1@candelatech.com>
-Date: Tue, 3 Dec 2024 10:25:30 -0800
+	s=arc-20240116; t=1733250567; c=relaxed/simple;
+	bh=TcXkRMgHuiDoUboNK6dri87PYojRYGSj8u8wGaDm5Yk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=eeYi7htb9JGA2W3xnjQkJkKKDGPie8B4jxZH2kvyhPacgaB6EqEroQ9a1S61GApXeZHvwGRJ1MR/rI481g4CbgW20+8oN6FJ2iIEft9s092dq/8wxxcNyFw7P9/Uax8tOZ5CgEKD+zdP6+PNSghDt+INwKdXsWyo2ELZCFG1m4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E2mDVeSs; arc=none smtp.client-ip=209.85.161.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5f25da4f999so505747eaf.3
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 10:29:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733250565; x=1733855365; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qoxy0SQLK77e570UrDk72iTCj4CR4wR7BY9j33VGVWY=;
+        b=E2mDVeSsJfsy3+QolAcQpdX0BVDvGPL0fzCkjQbDHU3R2l5eXzSo9dvggBi5RSZ9MC
+         2d3aQUBNJaoTvnWrrJPAF/ikqVlShIjz/NMSMhuloZ+uTuyRHAa48g1tNiPUr27As2+K
+         XFQXrE6ZIK5vwk2r+8HUpIIeKOJShE5w3mQbmsTTRg/a76MBIlbrDL6VMsgwn8agXUqn
+         4D8lIu9B0nUwrdtCAaW5ia9IQ414mkN4GGEHlw2g1gGONW12GQiMmTQi3Ib0u0Ipa30V
+         l78MqJUlmrnl6T9oUsD/g0IR/OjfQ1insTDcawqUFW0x49RVkpFTy52mTDdeAIPY4Sol
+         DA4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733250565; x=1733855365;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Qoxy0SQLK77e570UrDk72iTCj4CR4wR7BY9j33VGVWY=;
+        b=aWL7rackAcEhBP+EPXKxjSndMmbKxNNOlaxetiusBXPI8q4mnpn4hbikIUlpKHcCLs
+         HicaziPrdy+EJCVc4E6vFCbJXJ7bDf22vP06TAW6B2jAwxZkepHdqP8Lg4Bc1U6qytaJ
+         rvvjcPXcXxGHa6cRsQHdCTOaEJE1gzFGewxuVGn4guEWxGCAs6sXZujv8+Laa5I6z1hK
+         4GKKTSQvP3XVPTgUkl9MDoQoosDE54h+HOo+R+V31O/YIqTrA1FGaTJelm1bfFnwGNYV
+         L6NfTcrLH3iP3ipuVQm8a8gsjS+jo9qo01lm6w1MVcpNRZHxoidVsbXzqruhQ9mtQGTt
+         6Zyw==
+X-Gm-Message-State: AOJu0YzimCkivYxvB+qwqace8Zu4P/mr5pimk60tsAyPPwARTxApy1Vp
+	yg/PNN8tns1FEudTYysqY7kmJ48+POk42Kuh+ITq7ijZ5yWyTepr
+X-Gm-Gg: ASbGncsSqFmGWPG5tohrD2a/Ympe7iRNE0pdYLYRB/NGdTkUfYkF1NAE0LMkYnRoN8V
+	obdlu0hDwDkZt7mHior5GGe526zEN86DLAmovvz2ZBWMQaZmIwZioJDbgkgi5FlJjmc7XIRfo4i
+	rLDHcTBkC97Eh+B0H0CeuFA1BTLa+vsWZLrZem4esdGrimTaWZtY02y0hrKxaExdmkFFAL4/CZv
+	J06/Y22JpGS6d4W3CGVXWJFrI+tDO+y3CbqahCeLDXdbz5VvnHXOkga2H5ctWbnlvfMJdFcuVbL
+	Qhlgi67E8lcv3+2pDqXWAA==
+X-Google-Smtp-Source: AGHT+IHPJ3121OYZ0xcG9EVaFsSJnU5idyMP8jdR4Wj/46D8G3UhomIaKwCXgmjRWMPDWJKOSSFysw==
+X-Received: by 2002:a05:6358:d39c:b0:1c5:e2eb:5aad with SMTP id e5c5f4694b2df-1caeac02f27mr379802855d.20.1733250564886;
+        Tue, 03 Dec 2024 10:29:24 -0800 (PST)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b6849b6d11sm534565585a.99.2024.12.03.10.29.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 10:29:24 -0800 (PST)
+Date: Tue, 03 Dec 2024 13:29:23 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Brian Vazquez <brianvv@google.com>
+Message-ID: <674f4e03f0401_2da692949d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241203173617.2595451-1-edumazet@google.com>
+References: <20241203173617.2595451-1-edumazet@google.com>
+Subject: Re: [PATCH net-next] inet: add indirect call wrapper for getfrag()
+ calls
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] net: wireguard: Allow binding to specific ifindex
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Jason@zx2c4.com, wireguard@lists.zx2c4.com,
- dsahern@kernel.org
-References: <20241125212111.1533982-1-greearb@candelatech.com>
- <20241203090927.GA9361@kernel.org>
-From: Ben Greear <greearb@candelatech.com>
-Organization: Candela Technologies
-In-Reply-To: <20241203090927.GA9361@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-MDID: 1733250334-y59WZfVmmPVZ
-X-MDID-O:
- us5;ut7;1733250334;y59WZfVmmPVZ;<greearb@candelatech.com>;2cdb4b4c3b48e22c2b551c41c7959e6e
-X-PPE-TRUSTED: V=1;DIR=OUT;
 
-On 12/3/24 01:09, Simon Horman wrote:
-> On Mon, Nov 25, 2024 at 01:21:11PM -0800, greearb@candelatech.com wrote:
->> From: Ben Greear <greearb@candelatech.com>
->>
->> Which allows us to bind to VRF.
->>
->> Signed-off-by: Ben Greear <greearb@candelatech.com>
->> ---
->>
->> NOTE:  Modified user-space to utilize this may be found here:
->> https://github.com/greearb/wireguard-tools-ct
->> Only the 'wg' part has been tested with this new feature as of today.
+Eric Dumazet wrote:
+> UDP send path suffers from one indirect call to ip_generic_getfrag()
 > 
-> ...
+> We can use INDIRECT_CALL_1() to avoid it.
 > 
->> diff --git a/drivers/net/wireguard/socket.c b/drivers/net/wireguard/socket.c
->> index 0414d7a6ce74..a7cb1c7c3112 100644
->> --- a/drivers/net/wireguard/socket.c
->> +++ b/drivers/net/wireguard/socket.c
->> @@ -25,7 +25,8 @@ static int send4(struct wg_device *wg, struct sk_buff *skb,
->>   		.daddr = endpoint->addr4.sin_addr.s_addr,
->>   		.fl4_dport = endpoint->addr4.sin_port,
->>   		.flowi4_mark = wg->fwmark,
->> -		.flowi4_proto = IPPROTO_UDP
->> +		.flowi4_proto = IPPROTO_UDP,
->> +		.flowi4_oif = wg->lowerdev,
->>   	};
->>   	struct rtable *rt = NULL;
->>   	struct sock *sock;
->> @@ -111,6 +112,9 @@ static int send6(struct wg_device *wg, struct sk_buff *skb,
->>   	struct sock *sock;
->>   	int ret = 0;
->>   
->> +	if (wg->lowerdev)
->> +		fl.flowi6_oif = wg->lowerdev,
-> 
-> Hi Ben,
-> 
-> I think that the trailing ',' on the line above should be a ';'.
-> As written, with a ',', the call to skb_mark_not_on_list()
-> below will be included in the conditional block above.
-> And this doesn't seem to be the intention of the code based on indentation.
-> 
-> Flagged by clang-19 with -Wcomma
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Thank you for noticing that, it was bad copy paste bug on my part.  I'll
-submit a v2.
-
-Thanks,
-Ben
-
--- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
-
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
