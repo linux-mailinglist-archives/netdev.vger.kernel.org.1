@@ -1,250 +1,176 @@
-Return-Path: <netdev+bounces-148688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39C579E2DD6
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:09:38 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 069D79E2E25
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:33:32 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00C56165A7B
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 21:09:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA7B92839FD
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 21:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F521FF7CF;
-	Tue,  3 Dec 2024 21:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DEB61AF0AA;
+	Tue,  3 Dec 2024 21:33:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CqK5uH+s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kLgaVpPf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140E01FCFD9
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 21:09:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F74019259E
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 21:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733260174; cv=none; b=ZcAShfgsnK3do8/8qiljrAkew608rX7hd8yO1+mpah1LR2Jd95n860Oqu+Jz2sShvkhu9siKkjSVtsI8QKjAb64K0hNqyQeoJeQ6woEUa2WU08gq0P7CHTfxKjDBpEwR1o6vhDAHFh+924QHS8Fcmo6Q+z1zciv/l/o1ZBwn0+E=
+	t=1733261608; cv=none; b=RsIMNJVQp4pX5yLEPL0klDMbBRyRtbwxW7gkhKJopmkmEyGEBIsPP0U3GDmMi+jPGco3lZwSzA5O38kFyIMSb0+/DuVVPMXQk8I7TKaA/Q5/zFbW/Wy3UAjXaiDDbYq6OxrSXZEw1IvlKiRzA9stQBsix+cqW03efdeHKI5tycE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733260174; c=relaxed/simple;
-	bh=1Ds94AcozE3f38sb7CuSCG0LhT+JPwIueYtUg9QOCIc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uyzIQaInLsSO1rrGsUYj+CxFNcYwhInPPlODdEZas+90zf75vFouhDSoRSbA1CDVu4XbcBKSNMWMNAckTjyT3yo6Qd6BMGVk41Qgb1jdYe5v27QVxKNJit30uYipv4P0Mm6WP8zU4IbQgCM9Gpb5V2fl1rDtuK3SRKVX4o5sNYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CqK5uH+s; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b35758d690so1014589885a.1
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 13:09:32 -0800 (PST)
+	s=arc-20240116; t=1733261608; c=relaxed/simple;
+	bh=Luwjv6SneKJBECJ3VAshVO0AI1VKlpO/XTuMmQTfjmA=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=HR/JD3vsyc0q06dO9l8Stxnz9Wtels/s//DLWsUuidAbpPYqU7SE7pIwPepbp2nqsbJt2noYbrgD0YldSZbjq6vxO6O7eOqCX6Wg9DZDiAwFkEorJQrlX7eV6oT3HzUFBkA8iXrSg7Uo85MhkAS23tPRytL9JcRkSGTaHtgx9wA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kLgaVpPf; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a9e8522445dso847626966b.1
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 13:33:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733260172; x=1733864972; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+        d=gmail.com; s=20230601; t=1733261605; x=1733866405; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=e/HP5PLaNL9jCvhmPN1UQGOlAGoXFCU75pUewFa+Stg=;
-        b=CqK5uH+sC6kZHNPcM3TglJ0n4mqGR7ch0Pdjq9pEGDhoiCb0rxrkuTcj6uSkqkOAPj
-         XjAMBda+hOOpzTBkkzFhGkI0C0FtpbyLYtAjDcy8EcVkJIKH7ia1no2POiqjEi40U7Ia
-         5UMYx9pk5Np3KzEYBtXYkjyZsnz7XzRoRXKoujSp21IKw+sXKHveCSGRyUYm7XKd822Z
-         Bf4hl4608KMROrXpJKrKvYB0Wghtaa3GGWXDIVtm82Xrnib0oFeM2+3CXCcy3y37EKtP
-         GPwgHjLuFDe7Db7LPHYe3FFUKTlLBT7MNoYrPVpi0jNMNArqPlWUo38H7FZWKNOYJgUq
-         K0LA==
+        bh=qTfvLB6hbCGdFx6h9/iPzG623vWKNqynRGvlP0aSkYA=;
+        b=kLgaVpPfWtH8KLig0B9rY030qxYRGo5FLx92YoMmSXDfuuGUmyVtxC4zD4Fofdzry/
+         JWqoz+2g82rbIwZq/Q5ujty9oZAgAnbk4jsd63lOxYvdjGvF4s1+HA8DE+6LWbGtiLhe
+         basnNXAdOp6Uql0EZhx5DBugFNzEnQQtsMqWbVEyFuoOYhSjkSs2TW3BuSq68t1ZdBKh
+         4aXvZfh/unQFmOMHjnR0nMeI7ymtIK5E7jYnOlTClfviTNik9+yQLhaEzwpcyz8P6UvK
+         rR8E592cnsAQMl0aaXwfCYCApfMv8zkyC+8R5PM8gNpLXXXNMaqhoiB1w9M+Jn3/5MDl
+         HfqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733260172; x=1733864972;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=1e100.net; s=20230601; t=1733261605; x=1733866405;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=e/HP5PLaNL9jCvhmPN1UQGOlAGoXFCU75pUewFa+Stg=;
-        b=OcYIkremcpPb1232xAdWUB7XbTDrbRFRTxQbAvWFb2u+A3+COj8SEUCroFend3rgzo
-         P+omyIQ9SKdEZK7SW4k1e+VHyDmxuVtdGVuASeDHSmV0ovWIngvzGTLOV55I44X0bxdN
-         f8xU+UWK3Qyl/rfWUyabGFRACyXR/9gWD8yXoGwsrRBnnIX61rht77JAkFiHoL1k6SWx
-         Gogv/QWCglWswXCDY5cJMIOqmalZ0+SBNsRkYKQYjkLO49TJe1+JBHhybBmrZmXFInf0
-         A9H2sJo+T0IhBYPQhV3ojjaOa1x2W4UtLaqY/Z1jamolaOq00a9EqEJClf11MwMzfefS
-         jjnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWJnn5dEg6oWj3DffcixLMVqndZlPXGD4beFg0R67p0stvOKr2UR9UIOYQ6+5xCgCAWaMhiq7E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxX5hQhXNjJ6vO85LXnA2ImFJGarObFX+xVGECiBdXmGw4fxJA
-	K8loL3CS3CUFFne+QT3yn41QppQONY8El0wuysa0pc/hNd1WMVHkjVwUSsOdlYvfyWLgOgbr7Tk
-	UCAur/WQkzw==
-X-Google-Smtp-Source: AGHT+IG+yXPlZmZBuzv1BqOOMVtfHl+6kerX4SE5OK9wsg5inqpVntbkEIN+3pKPCGCxtL6OskW0IUyVFNfBlA==
-X-Received: from qkbbp18.prod.google.com ([2002:a05:620a:4592:b0:7b1:6421:b302])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:1996:b0:7b1:1d91:5cf1 with SMTP id af79cd13be357-7b6ababfdfbmr269869385a.1.1733260172055;
- Tue, 03 Dec 2024 13:09:32 -0800 (PST)
-Date: Tue,  3 Dec 2024 21:09:29 +0000
+        bh=qTfvLB6hbCGdFx6h9/iPzG623vWKNqynRGvlP0aSkYA=;
+        b=jXV5YvdBnPkBrcUGzVNZiq9jqLotcYd7jqBB/IptV21uhr0fG1+ouIi6gd1XFaFK77
+         BEiNjc7q0jCFoPS1p1FL5XULcD/sjbo5n9UqWnkbDtWrC08daYqkACHzcC8zLQn3V7n7
+         onlCsBH0Iv4CQVIuVVqtOU2CLzU7O6GY9pxTcLyy9383AWKHeFSrIee0IctEoQK1sMwQ
+         UmTqu3qxO+54e6LxfME17/9BQ/ui/aetEbwVTQMzSfm2XRfnUCI2YWiiz4I9qUpSUyll
+         6WH5nLQJBHeJxC6pc+ILNhObhNrhPCMmHTpEPdAIazZbOGd128fC1OMKcEMZFJ2Hc32L
+         BE6A==
+X-Gm-Message-State: AOJu0YxNG7XJgAoDQejoyeBK5Qh22UjrpooXTZTngLyQfeMD/5kCEjM1
+	CjGZFFwJH+YA08k1Ah8hmUUt+BeJLCYOSnjekjuz7BeTV1WS9Eav
+X-Gm-Gg: ASbGncslJm9ZTTJbhrWSL0vq1HIusLQEs9lEPh0fugm13pYd3nPelJqi2E2j7hHbaN/
+	qtYBiLc4H84fYoZ86IjNuvRWJ27tJffixeNrxw7RmntkT8MVXR1Ppev51KhN6AbyN/YLXTX0u8K
+	eCXN0N97Q7QZEZfmACm+ZWPF76uJu9KhZchyWKM552CimyLumorn8jlcGxoR0tKEnGffi8hotJk
+	EE1711Uss93CftrubvN5NePnKSTsdAOUdTRTVR8PQ7kbyN+x9K7/ExTSu8Ne9AdLDltjce7FJV6
+	EvYkROrcKqH9fUeDop7XJZ+MiZOIWX/uaWXnjc4ym9k1zdC8Ma8vUQu3xf5k+HI7ipIdMDfW/Ld
+	wwNL62zHa5DAb7LH5s6FVzH9b4K8UBYzwkFj7tJzR/Q==
+X-Google-Smtp-Source: AGHT+IFAU2eOu6N8h4M7lXG275sj0k6mUTKzyJIT3Zrn4t2OKsj4v186bYc7NP41wfswuBcJNtn0iw==
+X-Received: by 2002:a17:907:7758:b0:aa5:1617:c162 with SMTP id a640c23a62f3a-aa5f7d1c089mr360365766b.17.1733261604519;
+        Tue, 03 Dec 2024 13:33:24 -0800 (PST)
+Received: from ?IPV6:2a02:3100:9d09:7500:8175:4ab5:e6ba:110b? (dynamic-2a02-3100-9d09-7500-8175-4ab5-e6ba-110b.310.pool.telefonica.de. [2a02:3100:9d09:7500:8175:4ab5:e6ba:110b])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa5996c1413sm656177466b.17.2024.12.03.13.33.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Dec 2024 13:33:23 -0800 (PST)
+Message-ID: <dba77e76-be45-4a30-96c7-45e284072ad2@gmail.com>
+Date: Tue, 3 Dec 2024 22:33:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241203210929.3281461-1-edumazet@google.com>
-Subject: [PATCH net-next] net_sched: sch_fq: add three drop_reason
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] r8169: simplify setting hwmon attribute visibility
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add three new drop_reason, more precise than generic QDISC_DROP:
+Use new member visible to simplify setting the static visibility.
 
-"tc -s qd" show aggregate counters, it might be more useful
-to use drop_reason infrastructure for bug hunting.
-
-1) SKB_DROP_REASON_FQ_DROP_BAND_LIMIT
-   Whenever a packet is added while its band limit is hit.
-   Corresponding value in "tc -s qd" is bandX_drops XXXX
-
-2) SKB_DROP_REASON_FQ_DROP_HORIZON_LIMIT
-   Whenever a packet has a timestamp too far in the future.
-   Corresponding value in "tc -s qd" is horizon_drops XXXX
-
-3) SKB_DROP_REASON_FQ_DROP_FLOW_LIMIT
-   Whenever a flow has reached its limit.
-   Corresponding value in "tc -s qd" is flows_plimit XXXX
-
-Tested:
-tc qd replace dev eth0 root fq flow_limit 10 limit 100000
-perf record -a -e skb:kfree_skb sleep 1; perf script
-
-      udp_stream   12329 [004]   216.929492: skb:kfree_skb: skbaddr=0xffff888eabe17e00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_FLOW_LIMIT
-      udp_stream   12385 [006]   216.929593: skb:kfree_skb: skbaddr=0xffff888ef8827f00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_FLOW_LIMIT
-      udp_stream   12389 [005]   216.929871: skb:kfree_skb: skbaddr=0xffff888ecb9ba500 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_FLOW_LIMIT
-      udp_stream   12316 [009]   216.930398: skb:kfree_skb: skbaddr=0xffff888eca286b00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_FLOW_LIMIT
-      udp_stream   12400 [008]   216.930490: skb:kfree_skb: skbaddr=0xffff888eabf93d00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_FLOW_LIMIT
-
-tc qd replace dev eth1 root fq flow_limit 100 limit 10000
-perf record -a -e skb:kfree_skb sleep 1; perf script
-
-      udp_stream   18074 [001]  1058.318040: skb:kfree_skb: skbaddr=0xffffa23c881fc000 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_BAND_LIMIT
-      udp_stream   18126 [005]  1058.320651: skb:kfree_skb: skbaddr=0xffffa23c6aad4000 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_BAND_LIMIT
-      udp_stream   18118 [006]  1058.321065: skb:kfree_skb: skbaddr=0xffffa23df0d48a00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_BAND_LIMIT
-      udp_stream   18074 [001]  1058.321126: skb:kfree_skb: skbaddr=0xffffa23c881ffa00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_BAND_LIMIT
-      udp_stream   15815 [003]  1058.321224: skb:kfree_skb: skbaddr=0xffffa23c9835db00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_BAND_LIMIT
-
-tc -s -d qd sh dev eth1
-qdisc fq 8023: root refcnt 257 limit 10000p flow_limit 100p buckets 1024 orphan_mask 1023
- bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1 weights 589824 196608 65536 quantum 18Kb
- initial_quantum 92120b low_rate_threshold 550Kbit refill_delay 40ms
- timer_slack 10us horizon 10s horizon_drop
- Sent 492439603330 bytes 336953991 pkt (dropped 61724094, overlimits 0 requeues 4463)
- backlog 14611228b 9995p requeues 4463
-  flows 2965 (inactive 1151 throttled 0) band0_pkts 0 band1_pkts 9993 band2_pkts 0
-  gc 6347 highprio 0 fastpath 30 throttled 5 latency 2.32us flows_plimit 7403693
- band1_drops 54320401
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- include/net/dropreason-core.h | 18 ++++++++++++++++++
- include/net/sch_generic.h     |  9 +++++++++
- net/sched/sch_fq.c            | 14 ++++++++++----
- 3 files changed, 37 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index 6c5a1ea209a22d8702f8c982762ca5f69791b8eb..570605152a2a2d36a698aa062104d59d3aba000b 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -58,6 +58,9 @@
- 	FN(TC_EGRESS)			\
- 	FN(SECURITY_HOOK)		\
- 	FN(QDISC_DROP)			\
-+	FN(FQ_DROP_BAND_LIMIT)		\
-+	FN(FQ_DROP_HORIZON_LIMIT)	\
-+	FN(FQ_DROP_FLOW_LIMIT)		\
- 	FN(CPU_BACKLOG)			\
- 	FN(XDP)				\
- 	FN(TC_INGRESS)			\
-@@ -311,6 +314,21 @@ enum skb_drop_reason {
- 	 * failed to enqueue to current qdisc)
- 	 */
- 	SKB_DROP_REASON_QDISC_DROP,
-+	/**
-+	 * @SKB_DROP_REASON_FQ_DROP_BAND_LIMIT: dropped by fq qdisc when per band
-+	 * limit is reached.
-+	 */
-+	SKB_DROP_REASON_FQ_DROP_BAND_LIMIT,
-+	/**
-+	 * @SKB_DROP_REASON_FQ_DROP_HORIZON_LIMIT: dropped by fq qdisc when packet
-+	 * timestamp is too far in the future.
-+	 */
-+	SKB_DROP_REASON_FQ_DROP_HORIZON_LIMIT,
-+	/**
-+	 * @SKB_DROP_REASON_FQ_DROP_FLOW_LIMIT: dropped by fq qdisc when a flow
-+	 * exceeds its limits.
-+	 */
-+	SKB_DROP_REASON_FQ_DROP_FLOW_LIMIT,
- 	/**
- 	 * @SKB_DROP_REASON_CPU_BACKLOG: failed to enqueue the skb to the per CPU
- 	 * backlog queue. This can be caused by backlog queue full (see
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 5d74fa7e694cc85be91dbf01f0876b9feaa29115..c7a33c2c69830a6cbff8f6359de7cc468c2e845e 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -1245,6 +1245,15 @@ static inline int qdisc_drop(struct sk_buff *skb, struct Qdisc *sch,
- 	return NET_XMIT_DROP;
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index cc14cd540..6934bdee2 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -5332,13 +5332,6 @@ static bool rtl_aspm_is_safe(struct rtl8169_private *tp)
+ 	return false;
  }
  
-+static inline int qdisc_drop_reason(struct sk_buff *skb, struct Qdisc *sch,
-+				    struct sk_buff **to_free,
-+				    enum skb_drop_reason reason)
-+{
-+	tcf_set_drop_reason(skb, reason);
-+	return qdisc_drop(skb, sch, to_free);
-+}
-+
-+
- static inline int qdisc_drop_all(struct sk_buff *skb, struct Qdisc *sch,
- 				 struct sk_buff **to_free)
+-static umode_t r8169_hwmon_is_visible(const void *drvdata,
+-				      enum hwmon_sensor_types type,
+-				      u32 attr, int channel)
+-{
+-	return 0444;
+-}
+-
+ static int r8169_hwmon_read(struct device *dev, enum hwmon_sensor_types type,
+ 			    u32 attr, int channel, long *val)
  {
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index a5e87f9ea9861cbedb7ce858fbbcabb5d67cf821..9180810e39fa230ee2c4b6b94bcb87df388f4df8 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -537,6 +537,8 @@ static bool fq_packet_beyond_horizon(const struct sk_buff *skb,
- 	return unlikely((s64)skb->tstamp > (s64)(now + q->horizon));
+@@ -5355,7 +5348,7 @@ static int r8169_hwmon_read(struct device *dev, enum hwmon_sensor_types type,
  }
  
-+#define FQDR(reason) SKB_DROP_REASON_FQ_DROP_##reason
-+
- static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		      struct sk_buff **to_free)
- {
-@@ -548,7 +550,8 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	band = fq_prio2band(q->prio2band, skb->priority & TC_PRIO_MAX);
- 	if (unlikely(q->band_pkt_count[band] >= sch->limit)) {
- 		q->stat_band_drops[band]++;
--		return qdisc_drop(skb, sch, to_free);
-+		return qdisc_drop_reason(skb, sch, to_free,
-+					 FQDR(BAND_LIMIT));
- 	}
+ static const struct hwmon_ops r8169_hwmon_ops = {
+-	.is_visible =  r8169_hwmon_is_visible,
++	.visible = 0444,
+ 	.read = r8169_hwmon_read,
+ };
  
- 	now = ktime_get_ns();
-@@ -558,8 +561,9 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		/* Check if packet timestamp is too far in the future. */
- 		if (fq_packet_beyond_horizon(skb, q, now)) {
- 			if (q->horizon_drop) {
--					q->stat_horizon_drops++;
--					return qdisc_drop(skb, sch, to_free);
-+				q->stat_horizon_drops++;
-+				return qdisc_drop_reason(skb, sch, to_free,
-+							 FQDR(HORIZON_LIMIT));
- 			}
- 			q->stat_horizon_caps++;
- 			skb->tstamp = now + q->horizon;
-@@ -572,7 +576,8 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	if (f != &q->internal) {
- 		if (unlikely(f->qlen >= q->flow_plimit)) {
- 			q->stat_flows_plimit++;
--			return qdisc_drop(skb, sch, to_free);
-+			return qdisc_drop_reason(skb, sch, to_free,
-+						 FQDR(FLOW_LIMIT));
- 		}
- 
- 		if (fq_flow_is_detached(f)) {
-@@ -597,6 +602,7 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 
- 	return NET_XMIT_SUCCESS;
- }
-+#undef FQDR
- 
- static void fq_check_throttled(struct fq_sched_data *q, u64 now)
- {
 -- 
-2.47.0.338.g60cca15819-goog
+2.47.1
+
+
 
 
