@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-148673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 450119E2D4A
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 21:39:00 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 881D19E2D4E
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 21:39:37 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A34F282D41
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 20:38:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F7B416699C
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 20:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 601A520ADC1;
-	Tue,  3 Dec 2024 20:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13DDE2AF05;
+	Tue,  3 Dec 2024 20:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="C+YJ36PL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dfABRdj2"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD9A20ADEC;
-	Tue,  3 Dec 2024 20:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE861FE473;
+	Tue,  3 Dec 2024 20:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733258267; cv=none; b=hHr8BXHI5rm7NLcTtfBMXWOztkbGGL0nFpOXobQo3A5al+iR2LMlzCBO6HdSDia60biuNQLR0E8DeueyLYFkJneqFFzYOIe5/RP68b9zJl28iLtdOCtY2UZyhvzWMCAKT/rsfeHCwb78fMqRB92dvqbZ+ZKb0OBZy3Y1Ds3n7Rc=
+	t=1733258310; cv=none; b=GvFVlMptDU2QsKF//oaJpISyxDrs6xOVOXtHb/QCJ/SOTM6HdCSyBlhO9tr4SHzyKVaczTuwavMqUfrPu6IpzDnwGPIMJpggJxl9oyarFKcyE2waY0IsR+ao48LW73IFBvYxkFaLxaf8HNZ2SPgsHGjkpHH0zJF6scdh3np/urQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733258267; c=relaxed/simple;
-	bh=YHkHvZnzCr5TBpSlsQ8UKtrQ/4QxPTkzSvSv+lE1diM=;
+	s=arc-20240116; t=1733258310; c=relaxed/simple;
+	bh=QjMlBLc4jEsjzjULoyfWR8+MpO2L+jk5PBiYO3qTM4w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lk0djAEnwm78/wGT8Kqwd9GGOyJbNinAAGFufVZASzFcUTqZNckC+9CXKQ5IRxMmv8h88eG0tdRF7mNhrRQP5qCNH6GXyAZFT+4dOQikJ4q7FmO6xNS38z4GVKkpqsGO31NcNh5UhbPgracoWvdTtRuGpBV0EMubfnJGIDHuAfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=C+YJ36PL; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Of6nETAvzcx2JKu/kbYUSXqXfTx738pcmkCzV45i/DcSPASp9+to7tGGcU/zELj9qsEvTQ/otsFf0l2WYTsQtOsdHVIWpfd/MhEN5yrtTbzkkw1JxK3/qRgAzJ+p98titcQct1elPiw2PXxztLByKqI9UGyAXrDG53OxeiAc48Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dfABRdj2; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=sG14fCx6XdzcEIXgviTaIQL3aL3mihrpCYmdqthB7hY=; b=C+YJ36PLfNyZmIdRKAfjkGXDKM
-	TD3iIfUwVmTkkXvl4bqskw3pQfUsGL2kytYbNzkrqestyTD73wVFaePNe2j0p735jSkN+MbTcvWQC
-	tNCjwHQeOOBLIakp3fG+7WUuaOR4n/n6hm/hi2jT1DNoprce5+munp95A96TpCB1ZUgE=;
+	bh=RZvEElygZ5P6zLhmRuXXHwTgMI6annJ63P6rMkYlTRk=; b=dfABRdj2gjmrzzYbNuentaDq9E
+	RJKYvOQurifADS7MX1G6WtrxNw5bfJSmWvYcR/HLrDghEGcZ+gbrHvTARfcZeqSEyXF8JGX50ybEx
+	B2TrESsQfD9bTDSJOXrjqAdjHA87MBw/n4s03JvjBOIrrs/Dzqi1w9utgSm8PVfPZI48=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tIZeO-00F8Cj-Al; Tue, 03 Dec 2024 21:37:40 +0100
-Date: Tue, 3 Dec 2024 21:37:40 +0100
+	id 1tIZf5-00F8DN-7m; Tue, 03 Dec 2024 21:38:23 +0100
+Date: Tue, 3 Dec 2024 21:38:23 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Oleksij Rempel <o.rempel@pengutronix.de>
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -52,11 +52,11 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Andrew Lunn <andrew+netdev@lunn.ch>, kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
 	UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>
-Subject: Re: [PATCH net-next v1 08/21] net: usb: lan78xx: Add error handling
- to set_rx_max_frame_length and set_mtu
-Message-ID: <8467b5b4-e432-445e-b399-cf30aa32d467@lunn.ch>
+Subject: Re: [PATCH net-next v1 09/21] net: usb: lan78xx: Add error handling
+ to lan78xx_irq_bus_sync_unlock
+Message-ID: <1c7f1754-297c-4132-aee6-582ac8ab032b@lunn.ch>
 References: <20241203072154.2440034-1-o.rempel@pengutronix.de>
- <20241203072154.2440034-9-o.rempel@pengutronix.de>
+ <20241203072154.2440034-10-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,16 +65,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241203072154.2440034-9-o.rempel@pengutronix.de>
+In-Reply-To: <20241203072154.2440034-10-o.rempel@pengutronix.de>
 
-On Tue, Dec 03, 2024 at 08:21:41AM +0100, Oleksij Rempel wrote:
-> Improve error handling in `lan78xx_set_rx_max_frame_length` by:
-> - Checking return values from register read/write operations and
->   propagating errors.
-> - Exiting immediately on failure to ensure proper error reporting.
-> 
-> In `lan78xx_change_mtu`, log errors when changing MTU fails, using `%pe`
-> for clear error representation.
+On Tue, Dec 03, 2024 at 08:21:42AM +0100, Oleksij Rempel wrote:
+> Update `lan78xx_irq_bus_sync_unlock` to handle errors in register
+> read/write operations. If an error occurs, log it and exit the function
+> appropriately.  This ensures proper handling of failures during IRQ
+> synchronization.
 > 
 > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
