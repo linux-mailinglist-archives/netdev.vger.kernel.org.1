@@ -1,353 +1,109 @@
-Return-Path: <netdev+bounces-148616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FFC79E29B1
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:44:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D351B9E2979
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:38:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 602AE285147
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:44:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99C21286164
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D63A20ADE3;
-	Tue,  3 Dec 2024 17:41:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232D81FAC49;
+	Tue,  3 Dec 2024 17:38:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m+oGVyHD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hKCgqcW8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA3220ADC7;
-	Tue,  3 Dec 2024 17:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9331F76CE;
+	Tue,  3 Dec 2024 17:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733247687; cv=none; b=JN0JOvB45t1qgQKKZm8AiWCNplgcSaDTH7+FDjAu/qqPh8ouNTDCwJDD2wjP1ME6+SkiltqxBDN9qd3s3TGa9J9fGArgG0WNNcy8+b/ItNEWpwfFYRruz68WAKaBpfDDSBpTq7rNSnwaUxxA3V5eSbVIO/7igDcW+LEhHRmm+zE=
+	t=1733247512; cv=none; b=JJ75HhQqCsrvnJq8qG9uwPr43Z1T35zEDx2FJfMmIpskubNkyzAcD4csos6Dly2aZU/nkrZTZIPbe/CnsE35YuEfIJU0O58IQ3as8AEcylARuY1eN3CnHjvANCq7cBQGJ+NTAO2iTMFf1mwdeqSLaLI20MRM9zV8I4x9rMf/ur0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733247687; c=relaxed/simple;
-	bh=EWj+eSqqv9vkBNcbHcZd0XKt/9Lfn/yqLyteSTZyC68=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XmfXkhsqr8yNtfdrWHSl/9R+iTsdT3sbYh9zC/uis/4O/Aue9TPWKM+muD2BMmUKfGAEC1oVJ4F4iGte8Q0aTmpih+UlUt+HsVzBiNne6RHlWlsn7DoUpurDGBJ4nze3nUOGqqZ+jSWKswprQpRwwRUlVaz0JjQUJdZY18GiOOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m+oGVyHD; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733247687; x=1764783687;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=EWj+eSqqv9vkBNcbHcZd0XKt/9Lfn/yqLyteSTZyC68=;
-  b=m+oGVyHDP9J1jaZQRmDECR1MsGux46+TVxYxAKMMP7yoh5QsqIAuyFz3
-   Z9dRKhIn+sj9wx2e6niZFle4Dpd5895Dy65uUxHPr4QKFB36R1j5F6k59
-   m8KO46m8Omm3C6mYcU3iLq6y3uLcWuRFlK5BQ/d+TGoC4vKpE8hv8T0UW
-   qF5Ekl2Foln58ZkyImBKKcuSimKWFWK6r4WcsjH0Hu7noSXFuZdsfGWCY
-   IIvCAkZs5BZBJXm+WCXq3jrMlVUSKojB1LLJaWzM9AORHsv/wlKELhc0D
-   qlyhV3reCcnByM/Tk0wDYL7Muzx1lrcJz0ny3ipzIEV1GBFxo12VLUHdL
-   Q==;
-X-CSE-ConnectionGUID: WkFyrUikRjirP4LCK8SeeQ==
-X-CSE-MsgGUID: +54azD4cSPiLLzGSU7M8Eg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11275"; a="37135429"
-X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="37135429"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 09:41:26 -0800
-X-CSE-ConnectionGUID: ypKAqCwBTjmCi/rw8a5GMg==
-X-CSE-MsgGUID: FXTSM9maTWmreoaPP+aYnA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="124337044"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa002.jf.intel.com with ESMTP; 03 Dec 2024 09:41:22 -0800
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v6 09/10] page_pool: allow mixing PPs within one bulk
-Date: Tue,  3 Dec 2024 18:37:32 +0100
-Message-ID: <20241203173733.3181246-10-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
-References: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1733247512; c=relaxed/simple;
+	bh=7BrpCZ2JaT8Bn4r+/fZpw3qYVx7AsWh4zajkUXq+CmM=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=c4qseTbrPqfdty+E8JESMDsLzbhAfLRkB4XJu4k8bPNmUShUfGrzkP6j/9cUrcDasbpnXMer3U9Y/LTx/Xh0v0BUTOqmAUHJB0p7Ckmx2a24w/N/RHSBCacx2syVZKR35EhqjaXLgq7HZba5cEXVHvPTM7WWsRzOvHj9fbEFyj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hKCgqcW8; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-434a90fed23so49293075e9.1;
+        Tue, 03 Dec 2024 09:38:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733247509; x=1733852309; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2i0QYGRPe31dft8XawdbTPYP5t//UlFP6kTyw2o6LzE=;
+        b=hKCgqcW8O6/q1Ep6u8TXxZShGmePw0sRP3W/V7HgXCcVA0T6ijRLToVXLqU8bKXWN1
+         cr8S6T5VU+gAeO7mL545jKs2pKM/2i0v0v9b+seBHx9m8txUkII8mjRayBGrF9OXssIB
+         XVSRcaUf0VM50hwWFbolSomH/ONmdJcOmzrdV/0jfDW8ddte33Ju9+lU3GLRFHDgVrks
+         YtlJN/npennTV+fvk9mD81OvvVlhgnSJC6Wb9cK3v7FS7H6vJT1LqiZanxQO6APKMLfj
+         iwzAlkiVsnIaAf4Yi37USburfYhqme+J5kL8b8I9hUutxDT4czF5e5JEquo6KLesvm5L
+         NvEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733247509; x=1733852309;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2i0QYGRPe31dft8XawdbTPYP5t//UlFP6kTyw2o6LzE=;
+        b=ItGh2mW+hUrFdKBWonH+vJjQPRvC/DXTHnpR+CES6SqfX6QEJE9txn901oxQ/dnMDF
+         WdU7K+RnmF583OAs1dtBF7JFm/VXXIezUfksGPiZQCcHzIoS8H5FeXJFW/tvCTZAByMt
+         +O22lR3NUsMd2ZYIlYaC2qxPeDBighCuxRaTbOaJo1rrG4y78E8Ndd5wQZpkI2lo/Ll+
+         RGBwGTt9R2Ve+Hi7EezwwVDY8Zzx5jeNqz5+nQFDJgRE6n8C1C262A7O+BtuNcySna7p
+         N9I8R/VnwgWOQQbDQxEG0hnaCkDCKOxusIoVFpaeehZ1RHwTEvom5DYJOslPf1hUg614
+         M73w==
+X-Forwarded-Encrypted: i=1; AJvYcCV+N+GRyWmY15qXk6Vyhm9WUWwK+URQQ5F+IFgAZBHjCQUPthCy0TIlPG7AMfReL3rYHkkf9h9R@vger.kernel.org, AJvYcCVPqC4wK4Fr0hlue+kEqy2K6ifRlHpK7U8NwC6ydR776001MCOVr4A4gCc0QpqTBVyoN47ZIF/idOY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywv/mmACQkbTYWwHG4C8iTs6RVSy6Z53fWTod24iPGU2EyZtT5S
+	uOcfYcTNT8lZjF6GiKFD8lfBzKKUWcrRAuhKBbnoKzl8qGqYJXsO
+X-Gm-Gg: ASbGncvIFHTZ8u/AW/Yj3yOGySkG5xzDLklulMwJRj9c0AJnqJi5zoCeN1FxH2zTlhU
+	ilHxlG235Z/cwc4uJ0jDImJMbs2fmnqTJ9Nzuyuu6vxDE+VdMOXVGvLk7r1qrT9MvT3uwTReOnL
+	Qcsg0342BBEDbYANxDFImhuVz+oF4C0TnK+tMz4owa4e1r0GwvqAYEKhbEd44dk91off8SA+C/O
+	VFXMLJDn0II7c5oJoJBVAeKY/WBYK/G2RlIm7IWUtqwIBRZ1pO4m3TOzFIKgKUo2f4/InUfbohD
+	zGTvhkpuwyM1szggnj9KsrhbpNDMqDZg5jUZIA==
+X-Google-Smtp-Source: AGHT+IELfk/rqiYQ2xFCsty4Po/RDV1kpoZIfmvqPBOS1OiRE8cCwmsd9kkcQ9OLbFX2XtV2i12P0A==
+X-Received: by 2002:a05:6000:4013:b0:385:f638:c67b with SMTP id ffacd0b85a97d-385fd3f774amr2815948f8f.35.1733247508378;
+        Tue, 03 Dec 2024 09:38:28 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e5b10478sm10474748f8f.73.2024.12.03.09.38.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Dec 2024 09:38:27 -0800 (PST)
+Subject: Re: [PATCH v6 27/28] sfc: update MCDI protocol headers
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
+Cc: Alejandro Lucero <alucerop@amd.com>
+References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
+ <20241202171222.62595-28-alejandro.lucero-palau@amd.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <8e43ec5e-8ca9-43fe-eb91-f35388a03c1e@gmail.com>
+Date: Tue, 3 Dec 2024 17:38:26 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241202171222.62595-28-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-The main reason for this change was to allow mixing pages from different
-&page_pools within one &xdp_buff/&xdp_frame. Why not? With stuff like
-devmem and io_uring zerocopy Rx, it's required to have separate PPs for
-header buffers and payload buffers.
-Adjust xdp_return_frame_bulk() and page_pool_put_netmem_bulk(), so that
-they won't be tied to a particular pool. Let the latter create a
-separate bulk of pages which's PP is different from the first netmem of
-the bulk and process it after the main loop.
-This greatly optimizes xdp_return_frame_bulk(): no more hashtable
-lookups and forced flushes on PP mismatch. Also make
-xdp_flush_frame_bulk() inline, as it's just one if + function call + one
-u32 read, not worth extending the call ladder.
+On 02/12/2024 17:12, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> The script used to generate these now includes CXL definitions.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 
-Co-developed-by: Toke Høiland-Jørgensen <toke@redhat.com> # iterative
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/net/page_pool/types.h |  6 ++--
- include/net/xdp.h             | 16 ++++++---
- net/core/page_pool.c          | 61 ++++++++++++++++++++++++++---------
- net/core/xdp.c                | 29 +----------------
- 4 files changed, 61 insertions(+), 51 deletions(-)
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 
-diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-index 1ea16b0e9c79..05a864031271 100644
---- a/include/net/page_pool/types.h
-+++ b/include/net/page_pool/types.h
-@@ -259,8 +259,7 @@ void page_pool_disable_direct_recycling(struct page_pool *pool);
- void page_pool_destroy(struct page_pool *pool);
- void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(void *),
- 			   const struct xdp_mem_info *mem);
--void page_pool_put_netmem_bulk(struct page_pool *pool, netmem_ref *data,
--			       u32 count);
-+void page_pool_put_netmem_bulk(netmem_ref *data, u32 count);
- #else
- static inline void page_pool_destroy(struct page_pool *pool)
- {
-@@ -272,8 +271,7 @@ static inline void page_pool_use_xdp_mem(struct page_pool *pool,
- {
- }
- 
--static inline void page_pool_put_netmem_bulk(struct page_pool *pool,
--					     netmem_ref *data, u32 count)
-+static inline void page_pool_put_netmem_bulk(netmem_ref *data, u32 count)
- {
- }
- #endif
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index f4020b29122f..9e7eb8223513 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -11,6 +11,8 @@
- #include <linux/netdevice.h>
- #include <linux/skbuff.h> /* skb_shared_info */
- 
-+#include <net/page_pool/types.h>
-+
- /**
-  * DOC: XDP RX-queue information
-  *
-@@ -193,14 +195,12 @@ xdp_frame_is_frag_pfmemalloc(const struct xdp_frame *frame)
- #define XDP_BULK_QUEUE_SIZE	16
- struct xdp_frame_bulk {
- 	int count;
--	void *xa;
- 	netmem_ref q[XDP_BULK_QUEUE_SIZE];
- };
- 
- static __always_inline void xdp_frame_bulk_init(struct xdp_frame_bulk *bq)
- {
--	/* bq->count will be zero'ed when bq->xa gets updated */
--	bq->xa = NULL;
-+	bq->count = 0;
- }
- 
- static inline struct skb_shared_info *
-@@ -317,10 +317,18 @@ void __xdp_return(void *data, struct xdp_mem_info *mem, bool napi_direct,
- void xdp_return_frame(struct xdp_frame *xdpf);
- void xdp_return_frame_rx_napi(struct xdp_frame *xdpf);
- void xdp_return_buff(struct xdp_buff *xdp);
--void xdp_flush_frame_bulk(struct xdp_frame_bulk *bq);
- void xdp_return_frame_bulk(struct xdp_frame *xdpf,
- 			   struct xdp_frame_bulk *bq);
- 
-+static inline void xdp_flush_frame_bulk(struct xdp_frame_bulk *bq)
-+{
-+	if (unlikely(!bq->count))
-+		return;
-+
-+	page_pool_put_netmem_bulk(bq->q, bq->count);
-+	bq->count = 0;
-+}
-+
- static __always_inline unsigned int
- xdp_get_frame_len(const struct xdp_frame *xdpf)
- {
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 4c85b77cfdac..62cd1fcb9e97 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -841,7 +841,6 @@ EXPORT_SYMBOL(page_pool_put_unrefed_page);
- 
- /**
-  * page_pool_put_netmem_bulk() - release references on multiple netmems
-- * @pool:	pool from which pages were allocated
-  * @data:	array holding netmem references
-  * @count:	number of entries in @data
-  *
-@@ -854,35 +853,58 @@ EXPORT_SYMBOL(page_pool_put_unrefed_page);
-  * Please note the caller must not use data area after running
-  * page_pool_put_netmem_bulk(), as this function overwrites it.
-  */
--void page_pool_put_netmem_bulk(struct page_pool *pool, netmem_ref *data,
--			       u32 count)
-+void page_pool_put_netmem_bulk(netmem_ref *data, u32 count)
- {
--	int i, bulk_len = 0;
--	bool allow_direct;
--	bool in_softirq;
-+	bool allow_direct, in_softirq, again = false;
-+	netmem_ref bulk[XDP_BULK_QUEUE_SIZE];
-+	u32 i, bulk_len, foreign;
-+	struct page_pool *pool;
- 
--	allow_direct = page_pool_napi_local(pool);
-+again:
-+	pool = NULL;
-+	bulk_len = 0;
-+	foreign = 0;
- 
- 	for (i = 0; i < count; i++) {
--		netmem_ref netmem = netmem_compound_head(data[i]);
-+		struct page_pool *netmem_pp;
-+		netmem_ref netmem;
-+
-+		if (!again) {
-+			netmem = netmem_compound_head(data[i]);
- 
--		/* It is not the last user for the page frag case */
--		if (!page_pool_is_last_ref(netmem))
-+			/* It is not the last user for the page frag case */
-+			if (!page_pool_is_last_ref(netmem))
-+				continue;
-+		} else {
-+			netmem = data[i];
-+		}
-+
-+		netmem_pp = netmem_get_pp(netmem);
-+		if (unlikely(!pool)) {
-+			pool = netmem_pp;
-+			allow_direct = page_pool_napi_local(pool);
-+		} else if (netmem_pp != pool) {
-+			/*
-+			 * If the netmem belongs to a different page_pool, save
-+			 * it for another round after the main loop.
-+			 */
-+			data[foreign++] = netmem;
- 			continue;
-+		}
- 
- 		netmem = __page_pool_put_page(pool, netmem, -1, allow_direct);
- 		/* Approved for bulk recycling in ptr_ring cache */
- 		if (netmem)
--			data[bulk_len++] = netmem;
-+			bulk[bulk_len++] = netmem;
- 	}
- 
- 	if (!bulk_len)
--		return;
-+		goto out;
- 
- 	/* Bulk producer into ptr_ring page_pool cache */
- 	in_softirq = page_pool_producer_lock(pool);
- 	for (i = 0; i < bulk_len; i++) {
--		if (__ptr_ring_produce(&pool->ring, (__force void *)data[i])) {
-+		if (__ptr_ring_produce(&pool->ring, (__force void *)bulk[i])) {
- 			/* ring full */
- 			recycle_stat_inc(pool, ring_full);
- 			break;
-@@ -893,13 +915,22 @@ void page_pool_put_netmem_bulk(struct page_pool *pool, netmem_ref *data,
- 
- 	/* Hopefully all pages was return into ptr_ring */
- 	if (likely(i == bulk_len))
--		return;
-+		goto out;
- 
- 	/* ptr_ring cache full, free remaining pages outside producer lock
- 	 * since put_page() with refcnt == 1 can be an expensive operation
- 	 */
- 	for (; i < bulk_len; i++)
--		page_pool_return_page(pool, data[i]);
-+		page_pool_return_page(pool, bulk[i]);
-+
-+out:
-+	if (!foreign)
-+		return;
-+
-+	count = foreign;
-+	again = true;
-+
-+	goto again;
- }
- EXPORT_SYMBOL(page_pool_put_netmem_bulk);
- 
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index 938ad15c9857..56127e8ec85f 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -511,46 +511,19 @@ EXPORT_SYMBOL_GPL(xdp_return_frame_rx_napi);
-  * xdp_frame_bulk is usually stored/allocated on the function
-  * call-stack to avoid locking penalties.
-  */
--void xdp_flush_frame_bulk(struct xdp_frame_bulk *bq)
--{
--	struct xdp_mem_allocator *xa = bq->xa;
--
--	if (unlikely(!xa || !bq->count))
--		return;
--
--	page_pool_put_netmem_bulk(xa->page_pool, bq->q, bq->count);
--	/* bq->xa is not cleared to save lookup, if mem.id same in next bulk */
--	bq->count = 0;
--}
--EXPORT_SYMBOL_GPL(xdp_flush_frame_bulk);
- 
- /* Must be called with rcu_read_lock held */
- void xdp_return_frame_bulk(struct xdp_frame *xdpf,
- 			   struct xdp_frame_bulk *bq)
- {
--	struct xdp_mem_info *mem = &xdpf->mem;
--	struct xdp_mem_allocator *xa;
--
--	if (mem->type != MEM_TYPE_PAGE_POOL) {
-+	if (xdpf->mem.type != MEM_TYPE_PAGE_POOL) {
- 		xdp_return_frame(xdpf);
- 		return;
- 	}
- 
--	xa = bq->xa;
--	if (unlikely(!xa)) {
--		xa = rhashtable_lookup(mem_id_ht, &mem->id, mem_id_rht_params);
--		bq->count = 0;
--		bq->xa = xa;
--	}
--
- 	if (bq->count == XDP_BULK_QUEUE_SIZE)
- 		xdp_flush_frame_bulk(bq);
- 
--	if (unlikely(mem->id != xa->mem.id)) {
--		xdp_flush_frame_bulk(bq);
--		bq->xa = rhashtable_lookup(mem_id_ht, &mem->id, mem_id_rht_params);
--	}
--
- 	if (unlikely(xdp_frame_has_frags(xdpf))) {
- 		struct skb_shared_info *sinfo;
- 		int i;
--- 
-2.47.0
-
+Thanks.
 
