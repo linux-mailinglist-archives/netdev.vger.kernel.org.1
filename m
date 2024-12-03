@@ -1,248 +1,165 @@
-Return-Path: <netdev+bounces-148526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FFAD9E1F5F
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:35:32 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F8389E1F58
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:35:01 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01563283A24
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:35:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4AC1164DBF
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:34:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438C91F6686;
-	Tue,  3 Dec 2024 14:34:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 693E21F7094;
+	Tue,  3 Dec 2024 14:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NynRPKFE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UtZKslRn"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2073.outbound.protection.outlook.com [40.107.93.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8BF1F4704;
-	Tue,  3 Dec 2024 14:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733236471; cv=fail; b=HejtQxegdkbOxfXQnC6fSPxKEud/NKBygnEXwaAvB8sRlTWGbxjkNoTh84lJ4JbYwakkqxNnZLi0Gm6ioo/gDQClLVsfb2hjxh3ks44xzXFr2mTgC2M8Sa0HaAnAfhJCI1VSsWi4YHEEIdiZWr0qiW/QIxkAyI3tNCm658xvFmk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733236471; c=relaxed/simple;
-	bh=RUmjpS00KQPThj9efFSMqJlPjLPKYyp632VyEJwERTY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KgDWw3T5+CrreMuu3cdb+in4icT+FPtkpbTxvmz+tC+YIJREz2NNR/DgAxmPs1r5PGCO00o67gKlJbVHEOG1eizRg7v43yw2FxmfVwX1xNzchEcR/q5xyBWdvGKlltik8VdgcoGKXUM3/dwp2fJRvyVqgm2DTsLj2Yl3Vy7PVeI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NynRPKFE; arc=fail smtp.client-ip=40.107.93.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=b6mwe1CckCOnb9OG+xb8aoTiy313rHwlngCEztfmT4AP8YpCMFXOCBejtxaBXSpLrLzy3UbMEHE0HB3cdL8Z9v/90Z5hfK7vTWoNwj785mlPJAoqzPHRyeLpSMLNv+Wi7/nKOFBEAVCpzIZQ5l6vv+0cvmd+3tjliRD01QrJe9Ofze/djGe8EFZTLaRmUdWXgVgsdHqcXfGvcZj1GBXUiIMUcSEP5z6yt7bOtjjjcNsixBNujeXSH6AFuHq/G7eVydGNxeKll1lwt7MAlRekVcWxNpB+d0sKXrDJnt75cASEK9/cFwJEKxhJLTSkp1wU4ED8CLEBI/HMW9HYui1tbw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iemher0mO6qrlOQ5kx+Fwf3R18yaGpgpyBN2/v8lXvg=;
- b=nbPEJoeRgQgVKoglvxU5qJlsK3I8CpLLp2bRlWs4+7/2nLK2j2BmyMuRR3ARKu30itmyYU5I1hqfSZOWp8qG2GfGn66/oOBGCNyn/JTkEedJIhoJ9IS9ionTdfuEN6vsOaP2C7T2ipfQEIsLFL+gxZ1nqV0KKsP8EM1dQzhHY9s40Eemyku8PMHDSK8o7lxP+BO++bcQq3UtKSlcOWESrA/fUtvkAktDA08bajaT6WjkYJXtejNAuk7LzHb22Z9RQCSHp67xRh81oJ5ObIZuSEpR9whV56AQ8BRDbV1QWHDn3j5Y3Cy0ogBXt/boA9TGys5RTdc5WoRFr1azxSu59w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iemher0mO6qrlOQ5kx+Fwf3R18yaGpgpyBN2/v8lXvg=;
- b=NynRPKFEISn1RRJXqbmWt5rVDfo4IY8X20a0AnURXS/DsY7XRfTluizxI3GDEF/S2sXGzPSXYxileoKvhzkq1Em/Hb5nAdpCJDdSlWYJ+FIzyQqkr2juKqie7LGrW0FHyAzUkMrQjQ1/rIUmxrCEqvJtBCqWOQfCmvxFcGhdWjt9o/6XyyFKR3NPXg5OqTK3vCrPL+o0LrYvy2M5BTcMNmz9vPko1p252jn5HPG9dgI4OQWlO/eGMGHSsdXDsADNCbgISSexMezudRYo0JzroGFvpVHmJTIY9NR/6t5AtoH/Zf6ATmeK72BI8mo1m9RIraUGkTEqfLDDI+BlVkQpyQ==
-Received: from SJ0PR03CA0149.namprd03.prod.outlook.com (2603:10b6:a03:33c::34)
- by PH7PR12MB7377.namprd12.prod.outlook.com (2603:10b6:510:20c::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.18; Tue, 3 Dec
- 2024 14:34:24 +0000
-Received: from SJ1PEPF000023D2.namprd02.prod.outlook.com
- (2603:10b6:a03:33c:cafe::b4) by SJ0PR03CA0149.outlook.office365.com
- (2603:10b6:a03:33c::34) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8207.18 via Frontend Transport; Tue,
- 3 Dec 2024 14:34:24 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ1PEPF000023D2.mail.protection.outlook.com (10.167.244.9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8230.7 via Frontend Transport; Tue, 3 Dec 2024 14:34:24 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 3 Dec 2024
- 06:34:07 -0800
-Received: from localhost.localdomain (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 3 Dec 2024
- 06:34:01 -0800
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, "Petr
- Machata" <petrm@nvidia.com>, <mlxsw@nvidia.com>, Shuah Khan
-	<shuah@kernel.org>, Benjamin Poirier <bpoirier@nvidia.com>, Hangbin Liu
-	<liuhangbin@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
-	<linux-kselftest@vger.kernel.org>
-Subject: [PATCH net-next v1 10/11] selftests: net: lib: Add several autodefer helpers
-Date: Tue, 3 Dec 2024 15:30:36 +0100
-Message-ID: <ac277b17554c618c4fe70c280155081888b84cae.1733235367.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <cover.1733235367.git.petrm@nvidia.com>
-References: <cover.1733235367.git.petrm@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953EF1F7090;
+	Tue,  3 Dec 2024 14:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733236455; cv=none; b=st3ST/AgLxMJRkft41kcNBnXTql0AWzveOCk5adjnpVg8x9NXP4xBDcUbfdHHrkKjNE0wBFbc7F9ED7Xbf7xNyJSZBOoQkiti89g/jAdu5ECzxth9SMZO+7jHyJrDCLsWHoDNiYUiuoXPEJUYeN3XoVQEofXYCyjLi5dfdd1E44=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733236455; c=relaxed/simple;
+	bh=HNvQv4Mn+yRf3AqTo5jKqGJck5Kl0ryooW890A6SVoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gtiNnoqTcU54LF5f7ySDklxmpxPLYEyFX6OXPvB6i0PqDvIuATFnLrK7j0RU+BVemGgZKESPRU58a/IbeVBARRhFZ000Y2VmCyc3xMTKT580uH+bIeMW6nqkfk4pEaltNK+3qV8ajPiRbZByF98Gmf8DAfyo4DKCLyPoGgiBZw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UtZKslRn; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-434a90fed23so47206155e9.1;
+        Tue, 03 Dec 2024 06:34:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733236452; x=1733841252; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vaJmi2F2d7oVyPZ9dEs5lyx3B7MZvf2znAHG2U8SJkE=;
+        b=UtZKslRnw7PvO5YnxvwodwGTWwsV8Ac+1e0kafWnmJi6cG9QARZdODJSBU+iJS/gId
+         6qLHKTqDLtNLVLHFknxfe4A/67lZb6d3rMhY/9f5Z5B4/S++Z4DmcPPRdlytaAiaON3D
+         gyd41Q3sf2+iXQa2OARGfbi/fIjHC5Cn+y7yD2gyXbnFH4Dr3HQVnltFdaZAi6w9W+yJ
+         27xDcUAVBdnEUHSMKQRrIdRwSbxDwe8NbaYEbXEtIES13aBff9cFZIxwAuuIt8abdX6d
+         zMz5bZnWbfQMczEad3yiuWfb31s7EY+RHV+Jah9M35VwdJMYLjBGmg9WMAYcJDUYfUxI
+         pEOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733236452; x=1733841252;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vaJmi2F2d7oVyPZ9dEs5lyx3B7MZvf2znAHG2U8SJkE=;
+        b=mJKPWBtsbeLy4UxJWCg0kxjbjoB/Jf14J9BCAgGwIjtgC0rSn3liWzlTwJabPoS20E
+         htZAdyub2uMrXitoV2/+3V+i6dfmpqIF8VYU9OudExp7UYgk+sb2HjQWEyHSfr5CFwsc
+         DM3NKrrRGj2WRWzSC8JP8HziekfBLxhtzO1rUrMpiEoQAEoUXoGxhvaUBrSh1HScrZe1
+         y1McNiVKdJFbec6QTwvMb03fbg0vNLE8ZrG3cdWuTQsjeONI688o+iyuYRBw2jpYh6qd
+         n5weYswvQjVdLI3uWtZ+F0GPLtbY2rFGZLtaIFcKA1DyfOERBbH7lKq5YAxeD/KIMtN6
+         iPcg==
+X-Forwarded-Encrypted: i=1; AJvYcCX+fQiOygZEPaSCBvRivUXXbQw6LTyiTqXDRKSKi3rdoDtu6xiiJr0VamOYINYNnJkp62dNZec=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwoBx+8/nBMCLJgBg6WkkQOUgQRzVgUf0PdkoYMxdQnGZ/KjXa
+	6us6dAGMQefZVrVlQK6hpJ9UVnOyGeb9soyKILF0bhQ6BZQrxasyDHOiipH2
+X-Gm-Gg: ASbGncv40v3u4F2Lwr52Ixjp7GhdwthHQHfQ2IhL2OBaKCpiruByg121hTjOCCvpd0r
+	URCPV3XLDshNSgTZ7I0ta/cT7VqfYK6YB+drrlinpmLkE1M1qGJsMFOBVlYOb0ImYlpuF+COl7C
+	h0xwx/cFAF6ALl4a/nttKwLdvzAL0NUl/0ogsh3GwkE1yqCRrVZ9Ayf44Jj+SsTOyNmp7Gm3F7n
+	fcRuPVqKp4UOkglVFwtgIgbsBReuisyFfXFTSt2MAvZhOFQ7MU=
+X-Google-Smtp-Source: AGHT+IHXPzxOR5DFEn/MeFs/flkeA4ulBRVyk5qHJg2whXQmSH48mU0TcuNMMQlhQARjWPbyEIw2uA==
+X-Received: by 2002:a05:600c:1f8f:b0:434:a396:9474 with SMTP id 5b1f17b1804b1-434d09cbe39mr25296065e9.18.1733236449638;
+        Tue, 03 Dec 2024 06:34:09 -0800 (PST)
+Received: from localhost ([81.168.73.77])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e2716cedsm10829147f8f.38.2024.12.03.06.34.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 06:34:09 -0800 (PST)
+Date: Tue, 3 Dec 2024 14:34:08 +0000
+From: Martin Habets <habetsm.xilinx@gmail.com>
+To: alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, martin.habets@xilinx.com,
+	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
+	Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v6 16/28] sfc: obtain root decoder with enough HPA free
+ space
+Message-ID: <20241203143408.GF778635@gmail.com>
+Mail-Followup-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+	netdev@vger.kernel.org, dan.j.williams@intel.com,
+	martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	dave.jiang@intel.com, Alejandro Lucero <alucerop@amd.com>
+References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
+ <20241202171222.62595-17-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000023D2:EE_|PH7PR12MB7377:EE_
-X-MS-Office365-Filtering-Correlation-Id: 90241221-1fa7-43cc-fa98-08dd13a7955a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700013|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?mpGc8zrvwKSZeLANWT9Xi1FXfRvboijZ8oCRKnj+ZgAePxVMv/Id/OGZ7DcB?=
- =?us-ascii?Q?FTlPCI2OWLF2Eq9KDUP+sa6yvX27PodQ/ORCVK6oIPaJfIng5g65XLocEOla?=
- =?us-ascii?Q?W9AD2Os5PaG4eMbt2Zd/HC0H0JgOExdv3J7K+K/v/IF7lDb7EeXFXDcMerYX?=
- =?us-ascii?Q?SEKl4cZSkPUK7CrfFVpEwvvZa5PmB03rWKWMa9JhSLF8DVKZZx2OAwXREUnb?=
- =?us-ascii?Q?UoO8qEK7+SW2hQH1JSkInIushnrfJk5wf7frFpN3z+soXsqYCPvu+ic0AZQc?=
- =?us-ascii?Q?NPp8H0gNhhjGEJR8FY1wwVXxyuK6w6sEWi8qc/bKMG0SG41SWMqECt8npBz/?=
- =?us-ascii?Q?JIsHPtpvnimRQ7etUMQf3d6iQHipKV+oGzTsmSVPX8TdqXEf8OvLOdG9+tCQ?=
- =?us-ascii?Q?T0zkOeeQfBUs/25nSwPeJAHlIbplFxRGQdIXvHbzoyHgV6j5J5zYGagQiS+w?=
- =?us-ascii?Q?+634h4VifHNNTMBiI/MmliuQzdY4ztzhua4Bc+PoleEej2USEW/u5F0eNk5K?=
- =?us-ascii?Q?J27CJc7WzcCt8GsVrwplVjQxYFf9wQhH95ZRvHMswnE/GznVu7FWOnfujsQc?=
- =?us-ascii?Q?gE7gBBW9dqdCPlY9EfDapPNn28cdA/NfJMo63zap828t0np0vENgjFuagYEm?=
- =?us-ascii?Q?MNnYuPQDyOUELTCyV6CHVwYjOgtKtnHPxGkj0ZN3+N+CP16OcWU8LB1UOIB+?=
- =?us-ascii?Q?Bj91oL1SsHZqIGJnV7j0xF+cRazR0nHGB5qIkTY1X56KVcEfivcJsWYFbAJW?=
- =?us-ascii?Q?L44JuOyHJNAExdU5VXA0m9ZFz4hLUW2fSKcU2VPGIfyibPoQ5jl6KmLx4QHq?=
- =?us-ascii?Q?jjlJ1pAL4y43dUCwdElCGkr3XM5Haal3Og7hKcfS3vSlZ4HHEyqjqHGv/YkZ?=
- =?us-ascii?Q?KilWLtihM0+jn0KN5J15kn7nRhT3HRixTPVniDegrSO316YOK06oq29Ox1uf?=
- =?us-ascii?Q?WZk0yy3n5mcUqlTjNZCvACEWLOz1zY6EuZ1DgppYLBxzttV//s2teYWTW7lh?=
- =?us-ascii?Q?LARohk/1zfca/5nSsz99d6B8U/dxNxGtadZzOQtihPFkYaWoALcjSodHl4zj?=
- =?us-ascii?Q?SL3BdHepBt9Z7TzRiu6+0jg8SndtI1kLKngsb5fXBG1mrAYx92eCvAABkr/O?=
- =?us-ascii?Q?UMG3IQfxvl0GOxiK/qTkgxVG1u34KjsLFHf+QxCsXKsFZtT6L2Yctdqba/kj?=
- =?us-ascii?Q?8E+FmQjBGnaqj+/lEHql4Hvz6dV5hFk70Iv5a3ZP3j0zdJuAN+v+VnT4xT5A?=
- =?us-ascii?Q?Ozk2SkNWD3jtV6oWs5Q7Vsyga+IL132NRU/LyY3fWbT+7yPe/Q6n3wGS795k?=
- =?us-ascii?Q?w8f6DwO4fjhhQe5zCIH1CiOYFE4A1sBe2X90l1I4hDCWAMQW6vtlWgrdCQ2u?=
- =?us-ascii?Q?JkItX44iXg4KNkj1/4GMp4JdBUAPSPjQCy6gse9kpRW3yz54SbqpIjdAXO7k?=
- =?us-ascii?Q?Yf40LNIxeBnZZfvkJEUUwL/cqt0ONfE+?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700013)(7416014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2024 14:34:24.1462
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 90241221-1fa7-43cc-fa98-08dd13a7955a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000023D2.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7377
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241202171222.62595-17-alejandro.lucero-palau@amd.com>
 
-Add ip_link_set_addr(), ip_link_set_up(), ip_addr_add() and ip_route_add()
-to the suite of helpers that automatically schedule a corresponding
-cleanup.
+On Mon, Dec 02, 2024 at 05:12:10PM +0000, alejandro.lucero-palau@amd.com wrote:
+> 
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Asking for availbale HPA space is the previous step to try to obtain
+> an HPA range suitable to accel driver purposes.
+> 
+> Add this call to efx cxl initialization.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 
-When setting a new MAC, one needs to remember the old address first. Move
-mac_get() from forwarding/ to that end.
+Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
+One comment below.
 
-Signed-off-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
----
+> ---
+>  drivers/net/ethernet/sfc/efx_cxl.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> index d03fa9f9c421..79b93d92f9c2 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -26,6 +26,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  	struct pci_dev *pci_dev;
+>  	struct efx_cxl *cxl;
+>  	struct resource res;
+> +	resource_size_t max;
+>  	u16 dvsec;
+>  	int rc;
+>  
+> @@ -102,6 +103,23 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  		goto err3;
+>  	}
+>  
+> +	cxl->cxlrd = cxl_get_hpa_freespace(cxl->cxlmd,
+> +					   CXL_DECODER_F_RAM | CXL_DECODER_F_TYPE2,
+> +					   &max);
+> +
+> +	if (IS_ERR(cxl->cxlrd)) {
+> +		pci_err(pci_dev, "cxl_get_hpa_freespace failed\n");
+> +		rc = PTR_ERR(cxl->cxlrd);
+> +		goto err3;
+> +	}
+> +
+> +	if (max < EFX_CTPIO_BUFFER_SIZE) {
+> +		pci_err(pci_dev, "%s: no enough free HPA space %llu < %u\n",
+> +			__func__, max, EFX_CTPIO_BUFFER_SIZE);
 
-Notes:
-CC: Shuah Khan <shuah@kernel.org>
-CC: Benjamin Poirier <bpoirier@nvidia.com>
-CC: Hangbin Liu <liuhangbin@gmail.com>
-CC: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: linux-kselftest@vger.kernel.org
+Seems it should use %pa[p] for max here.
 
- tools/testing/selftests/net/forwarding/lib.sh |  7 ----
- tools/testing/selftests/net/lib.sh            | 39 +++++++++++++++++++
- 2 files changed, 39 insertions(+), 7 deletions(-)
+Martin
 
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index 7337f398f9cc..1fd40bada694 100644
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -932,13 +932,6 @@ packets_rate()
- 	echo $(((t1 - t0) / interval))
- }
- 
--mac_get()
--{
--	local if_name=$1
--
--	ip -j link show dev $if_name | jq -r '.[]["address"]'
--}
--
- ether_addr_to_u64()
- {
- 	local addr="$1"
-diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
-index 5ea6537acd2b..2cd5c743b2d9 100644
---- a/tools/testing/selftests/net/lib.sh
-+++ b/tools/testing/selftests/net/lib.sh
-@@ -435,6 +435,13 @@ xfail_on_veth()
- 	fi
- }
- 
-+mac_get()
-+{
-+	local if_name=$1
-+
-+	ip -j link show dev $if_name | jq -r '.[]["address"]'
-+}
-+
- kill_process()
- {
- 	local pid=$1; shift
-@@ -459,3 +466,35 @@ ip_link_set_master()
- 	ip link set dev "$member" master "$master"
- 	defer ip link set dev "$member" nomaster
- }
-+
-+ip_link_set_addr()
-+{
-+	local name=$1; shift
-+	local addr=$1; shift
-+
-+	local old_addr=$(mac_get "$name")
-+	ip link set dev "$name" address "$addr"
-+	defer ip link set dev "$name" address "$old_addr"
-+}
-+
-+ip_link_set_up()
-+{
-+	local name=$1; shift
-+
-+	ip link set dev "$name" up
-+	defer ip link set dev "$name" down
-+}
-+
-+ip_addr_add()
-+{
-+	local name=$1; shift
-+
-+	ip addr add dev "$name" "$@"
-+	defer ip addr del dev "$name" "$@"
-+}
-+
-+ip_route_add()
-+{
-+	ip route add "$@"
-+	defer ip route del "$@"
-+}
--- 
-2.47.0
-
+> +		rc = -ENOSPC;
+> +		goto err3;
+> +	}
+> +
+>  	probe_data->cxl = cxl;
+>  
+>  	return 0;
+> -- 
+> 2.17.1
+> 
+> 
 
