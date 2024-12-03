@@ -1,170 +1,175 @@
-Return-Path: <netdev+bounces-148602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFED79E2919
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:25:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57C529E296D
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:36:26 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A178E282E9F
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:25:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13AE6162BF7
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8924C1FAC45;
-	Tue,  3 Dec 2024 17:25:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B631FAC49;
+	Tue,  3 Dec 2024 17:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="swUKoHjl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3EPfPRkn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584A61F4731
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 17:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295E51F76CE
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 17:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733246705; cv=none; b=giOxN+BvPTTO9qPvWh/w4CL9zjxK/DM+L1VJ8/a8oBdSWPp6tQYcyVbPAzIIz0ISsx/cdySY5La69pWTf1JUdp71/95354qNE9+GmqKWsjdf2qEzL0KeWeTh42zygHn4mcIqVgMEp6zMX4iiH7M8vU97dh9Hg0IY7OOOHx2moxE=
+	t=1733247382; cv=none; b=Xf2lMa6PqIX7x1liVASwEy1R2lamuSTr8yaUKkRdalqEq9jQjmxHMwffjLWDAQlEnyKQIfB4BeZmuIxjygbEDXNw3uHBXhfAqoOXQK+U3fjdIeKedSgdWGgcUqq6x0Cp9HwYpUlYy/+A9oe14kf9ja+iTWvz+7rBymjvQNh0oSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733246705; c=relaxed/simple;
-	bh=S+DV4vomlAhrWT8NL5FQwF27Xis8NyVEDDUdlUYe3hk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LtACPdCdTEsKT6BTdZNWtaFvaEgKCIh3GGZEGrIsj84BsQ7IGr2Pnz1EdxsGzpHMchAl2sRkSRBLyjdOY1Jo31gJU1TQMIEQIUTx5A4mGeJtkLVjAXeEZjUMANiodXPS63NBYlRW/I0jMqSF8SpAU7GxUKe89FNrlDVOYhxN2Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=swUKoHjl; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7fcf59a41ddso93957a12.3
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 09:25:02 -0800 (PST)
+	s=arc-20240116; t=1733247382; c=relaxed/simple;
+	bh=PHYBsi7jyDAeU4n8cwu3t4Nr0+sKhKxPopmY7e4LNIo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jl3zjfRlf/l5xDMtjEk2k0IldA5Xr24fQRfLcBu7/HPmytvrBErjjY+mred0zR1syDDqBbpla4tePOLj2P9GvG79YESTBzuANKZ33ru+d1JpI2wg1DU1vMs/WTDIgI+9UCyP44Fg4d2QW+t3C078jPEUD3OTpULDlXsxSiR/200=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3EPfPRkn; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7b69c165621so359359585a.0
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 09:36:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1733246701; x=1733851501; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WDIAp0k+WulLvelBjh0iQOU14uQ0KAvxIWVqAJex2I8=;
-        b=swUKoHjlhCq4CTm29QqyIPDNg0hvTkNZIBSeepo30ryOb/aaE8JvRt6mlMpvGP2iQe
-         I5TQppJdw0IKoeBmELxHPpmNcdP1S8+ooVgGfnSNgfWrYbsBnXK2oeeIkwaKfR95iQOp
-         yX9ob52SML4TIm7biqV8wydOzM08Ez329oTNMTyhQ4/3sF6NQPIgcB6cLNuPC0JhnT2g
-         VHSR98Xrya6Rfn0qOlSqghjB+PwFIVoN7uAFg4ZpTZD7Bqh3jsjSnkKWPeeFeIAunrc5
-         NylRzO/YT1tVHQq6/zYqj/q3hea73bYEPJuInq7/8kd809xMe2peckF6e7jOqixINfEe
-         0sUQ==
+        d=google.com; s=20230601; t=1733247379; x=1733852179; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XnIKdDm69+K/wCTqYJ2JAyW89fU9l94WPOs9w5mh8gI=;
+        b=3EPfPRkncVYYmYBVh+FC72hvchFtKQx5GXxhyIKIYxuaSCGIiRSBf0FyR32UEPR+PO
+         qSVA2aM4OTYoUIn6320WOulKpsWEqE6O27efWKA/j0gVTcjw90MGnxSWKWvQ2NcwMvJJ
+         BJ+qD6QUgfxexgy+Iht73jknxt1woPuWbZrSHPfj4jYGPjgjFEY/y05NtgixUKZhZYR4
+         DkaMn52aah9U0kQ5pOzL9jAFCxjPpT0Q+7ITXXw9cpma3lSaYc1JOmZanjKs56DQ5Hzh
+         Ssec0NPjuYOfk45Vto8zDJrOa1Di5pUUhSO19s2Bb7OSVgMo0adMjF2lie+ghVLRhbZ7
+         CLBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733246701; x=1733851501;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WDIAp0k+WulLvelBjh0iQOU14uQ0KAvxIWVqAJex2I8=;
-        b=H4VWB5UykL0e1Xh08tIok2U0xa3XQhHI1KsX5mGftkJHL0w9nqkVKDTj/KkINyL+C6
-         cl9rHaEqIHD/2/eI1aUizJ54B0pSYwFuBicIrcPZmVDmMLrdlK8SppIRUs12De8Srd2l
-         m+pAwojzb5iEDJNOJPlqrIWW6JTyaDQqE+xyGfvhe1ndNI2k9C7syb1rPAmHjBwFYRp/
-         aIup+vuY8fiZbRQDGnpanNvJs/7ftIzjMcrewft55ysvcxmbguSamDp7ZuxjdK4QHlVz
-         DoR0t3YG2O0McsrvZpE0MqkBZnsZNO4Q9UNunHNlJpI0SafEy4oG3o85wWvuiG8J41UW
-         qhAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWFMBwZi0GAeKijyNO0RH42dhhltWStp1YFzceK6Ua7xuAwrcOnl9bVVaP1z5/0jD5n4lTZLB8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzu4ID31qYvCvzJJDLpuVRRtKincO9fsfv+1786it7450uqt3be
-	TNapDbdWrX/NBIFg5DPfCXqzEdxQfgqGH5JkqJqC00lG2z+9MSE/r/CKqJEaVPE=
-X-Gm-Gg: ASbGnctYkHv/G2wlzFs6NTgwOQIK72y2fojYhP1giPiGGF2gxudzwUYwqWNyEN6Dhy4
-	3sC/51ndi4SdSdD//xVgfmoief493d4xfpI4ET5haiVue0rTxOXUrikJh/5qr7ZCiV0+IYUQpwk
-	RShtRGyObCS3LVrJF26B72xAUjcY/smo8AttqXh4x+21h3NCZGTbN7ku04x0+Lp7QwhqGCEW2QJ
-	U0uiGmkD3Ls/IV5IiAnNoS0xGbamGbf4uhneunFa+Cd9Wo+6Ydz5bV3QwjgslVv65kqw/jo2xvO
-	GCohG1C65yJgeHCbRhimXIdqRyM=
-X-Google-Smtp-Source: AGHT+IFVttCytH4uriYlAc5b6vwoVfhSr0LlSgnBO9ywPRQ8142EzJA8hps3tzOfjvW84YqxE5vXHw==
-X-Received: by 2002:a05:6a20:c908:b0:1e0:d240:19c with SMTP id adf61e73a8af0-1e16539f323mr5225858637.6.1733246701595;
-        Tue, 03 Dec 2024 09:25:01 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7254176f571sm10707168b3a.58.2024.12.03.09.25.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2024 09:25:01 -0800 (PST)
-Date: Tue, 3 Dec 2024 09:24:56 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Bjorn Helgaas <helgaas@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
- Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?= <kw@linux.com>,
- linux-pci@vger.kernel.org, Ariel Almog <ariela@nvidia.com>, Aditya Prabhune
- <aprabhune@nvidia.com>, Hannes Reinecke <hare@suse.de>, Heiner Kallweit
- <hkallweit1@gmail.com>, Arun Easi <aeasi@marvell.com>, Jonathan Chocron
- <jonnyc@amazon.com>, Bert Kenward <bkenward@solarflare.com>, Matt Carlson
- <mcarlson@broadcom.com>, Kai-Heng Feng <kai.heng.feng@canonical.com>, Jean
- Delvare <jdelvare@suse.de>, Alex Williamson <alex.williamson@redhat.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Jakub Kicinski
- <kuba@kernel.org>, Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?=
- <linux@weissschuh.net>
-Subject: Re: [PATCH v3] PCI/sysfs: Change read permissions for VPD
- attributes
-Message-ID: <20241203092456.5dde2476@hermes.local>
-In-Reply-To: <18f36b3cbe2b7e67eed876337f8ba85afbc12e73.1733227737.git.leon@kernel.org>
-References: <18f36b3cbe2b7e67eed876337f8ba85afbc12e73.1733227737.git.leon@kernel.org>
+        d=1e100.net; s=20230601; t=1733247379; x=1733852179;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XnIKdDm69+K/wCTqYJ2JAyW89fU9l94WPOs9w5mh8gI=;
+        b=fMO5a6FdTzkSYySa2XYYSUmP/dtnas/t8vWypnMpjaqbrMHze8Af0m8eR7AHrpglaO
+         kLrChsd8RJb3tZvl+PgRbMHNE4CRXVAdYj8K+4IlxCIlwblh9Ga47+YLRcg3CIBbK3Jp
+         KWP3X6AlV6mWZy1N52cHf9nJKaaO3A835FhnyB6j0oXxzSlU3bqNEoTeJxi75cDPlu/0
+         yiJQG+JmCNxXQWrekVlhMxPaAJThJpQZsCcibnLEQquwnOuYEAa21OWvAOlZV7fIrFuu
+         679RvdIE5Kn2OIFwwBnv0OPPL4iNCIooAKzT2TNOCpDYZFqvo2TINuhAUyxfc+i1QoGy
+         jgBg==
+X-Gm-Message-State: AOJu0Yx3QqpDMIfErL3zBs9rUyZRPV9X7zYQVlCfYcF0kB3AK7ee7+uZ
+	o8FrlUnF+MvRcYDMhRUmEfGqESPS9138mVe9RAMgMMv4v5u7UpG3/I7KJVnC8iEdhuWtYyqvsQR
+	N/TPbNgqgsg==
+X-Google-Smtp-Source: AGHT+IE7m1MHgecjn80GG002QWqO6t5LnIqSyaKzJ2epoI9gcy+eE3w+70vedzC7mhn5TXQ8N04A36BJ5j07Mw==
+X-Received: from qtbcb20.prod.google.com ([2002:a05:622a:1f94:b0:466:8c54:dc8e])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4103:b0:7b1:45be:2e80 with SMTP id af79cd13be357-7b6ab9a158dmr167167585a.0.1733247379133;
+ Tue, 03 Dec 2024 09:36:19 -0800 (PST)
+Date: Tue,  3 Dec 2024 17:36:17 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241203173617.2595451-1-edumazet@google.com>
+Subject: [PATCH net-next] inet: add indirect call wrapper for getfrag() calls
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Brian Vazquez <brianvv@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue,  3 Dec 2024 14:15:28 +0200
-Leon Romanovsky <leon@kernel.org> wrote:
+UDP send path suffers from one indirect call to ip_generic_getfrag()
 
-> The Vital Product Data (VPD) attribute is not readable by regular
-> user without root permissions. Such restriction is not needed at
-> all for Mellanox devices, as data presented in that VPD is not
-> sensitive and access to the HW is safe and well tested.
-> 
-> This change changes the permissions of the VPD attribute to be accessible
-> for read by all users for Mellanox devices, while write continue to be
-> restricted to root only.
-> 
-> The main use case is to remove need to have root/setuid permissions
-> while using monitoring library [1].
-> 
-> [leonro@vm ~]$ lspci |grep nox
-> 00:09.0 Ethernet controller: Mellanox Technologies MT2910 Family [ConnectX-7]
-> 
-> Before:
-> [leonro@vm ~]$ ls -al /sys/bus/pci/devices/0000:00:09.0/vpd
-> -rw------- 1 root root 0 Nov 13 12:30 /sys/bus/pci/devices/0000:00:09.0/vpd
-> After:
-> [leonro@vm ~]$ ls -al /sys/bus/pci/devices/0000:00:09.0/vpd
-> -rw-r--r-- 1 root root 0 Nov 13 12:30 /sys/bus/pci/devices/0000:00:09.0/vpd
-> 
-> [1] https://developer.nvidia.com/management-library-nvml
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
-> Changelog:
-> v3:
->  * Used | to change file attributes
->  * Remove WARN_ON
-> v2: https://lore.kernel.org/all/61a0fa74461c15edfae76222522fa445c28bec34.1731502431.git.leon@kernel.org
->  * Another implementation to make sure that user is presented with
->    correct permissions without need for driver intervention.
-> v1: https://lore.kernel.org/all/cover.1731005223.git.leonro@nvidia.com
->  * Changed implementation from open-read-to-everyone to be opt-in
->  * Removed stable and Fixes tags, as it seems like feature now.
-> v0:
-> https://lore.kernel.org/all/65791906154e3e5ea12ea49127cf7c707325ca56.1730102428.git.leonro@nvidia.com/
-> ---
->  drivers/pci/vpd.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/drivers/pci/vpd.c b/drivers/pci/vpd.c
-> index a469bcbc0da7..a7aa54203321 100644
-> --- a/drivers/pci/vpd.c
-> +++ b/drivers/pci/vpd.c
-> @@ -332,6 +332,13 @@ static umode_t vpd_attr_is_visible(struct kobject *kobj,
->  	if (!pdev->vpd.cap)
->  		return 0;
->  
-> +	/*
-> +	 * Mellanox devices have implementation that allows VPD read by
-> +	 * unprivileged users, so just add needed bits to allow read.
-> +	 */
-> +	if (unlikely(pdev->vendor == PCI_VENDOR_ID_MELLANOX))
-> +		return a->attr.mode | 0044;
-> +
->  	return a->attr.mode;
->  }
->  
+We can use INDIRECT_CALL_1() to avoid it.
 
-Could this be with other vendor specific quirks instead?
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+Cc: Willem de Bruijn <willemb@google.com>
+Cc: Brian Vazquez <brianvv@google.com>
+---
+ net/ipv4/ip_output.c  | 13 +++++++++----
+ net/ipv6/ip6_output.c | 13 ++++++++-----
+ 2 files changed, 17 insertions(+), 9 deletions(-)
 
-Also, the wording of the comment is awkward. Suggest:
-	On Mellanox devices reading VPD is safe for unprivileged users.
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 0065b1996c947078bea210c9abe5c80fa0e0ab4f..a59204a8d85053a9b8c9e86a404aa4bf2f0d2416 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -1169,7 +1169,10 @@ static int __ip_append_data(struct sock *sk,
+ 			/* [!] NOTE: copy will be negative if pagedlen>0
+ 			 * because then the equation reduces to -fraggap.
+ 			 */
+-			if (copy > 0 && getfrag(from, data + transhdrlen, offset, copy, fraggap, skb) < 0) {
++			if (copy > 0 &&
++			    INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
++					    from, data + transhdrlen, offset,
++					    copy, fraggap, skb) < 0) {
+ 				err = -EFAULT;
+ 				kfree_skb(skb);
+ 				goto error;
+@@ -1213,8 +1216,9 @@ static int __ip_append_data(struct sock *sk,
+ 			unsigned int off;
+ 
+ 			off = skb->len;
+-			if (getfrag(from, skb_put(skb, copy),
+-					offset, copy, off, skb) < 0) {
++			if (INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
++					    from, skb_put(skb, copy),
++					    offset, copy, off, skb) < 0) {
+ 				__skb_trim(skb, off);
+ 				err = -EFAULT;
+ 				goto error;
+@@ -1252,7 +1256,8 @@ static int __ip_append_data(struct sock *sk,
+ 				get_page(pfrag->page);
+ 			}
+ 			copy = min_t(int, copy, pfrag->size - pfrag->offset);
+-			if (getfrag(from,
++			if (INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
++				    from,
+ 				    page_address(pfrag->page) + pfrag->offset,
+ 				    offset, copy, skb->len, skb) < 0)
+ 				goto error_efault;
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index f7b4608bb316ed2114a0e626aad530b62b767fc1..3d672dea9f56284e7a8ebabec037e04e7f3d19f4 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -1697,8 +1697,9 @@ static int __ip6_append_data(struct sock *sk,
+ 				pskb_trim_unique(skb_prev, maxfraglen);
+ 			}
+ 			if (copy > 0 &&
+-			    getfrag(from, data + transhdrlen, offset,
+-				    copy, fraggap, skb) < 0) {
++			    INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
++					   from, data + transhdrlen, offset,
++					   copy, fraggap, skb) < 0) {
+ 				err = -EFAULT;
+ 				kfree_skb(skb);
+ 				goto error;
+@@ -1742,8 +1743,9 @@ static int __ip6_append_data(struct sock *sk,
+ 			unsigned int off;
+ 
+ 			off = skb->len;
+-			if (getfrag(from, skb_put(skb, copy),
+-						offset, copy, off, skb) < 0) {
++			if (INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
++					    from, skb_put(skb, copy),
++					    offset, copy, off, skb) < 0) {
+ 				__skb_trim(skb, off);
+ 				err = -EFAULT;
+ 				goto error;
+@@ -1781,7 +1783,8 @@ static int __ip6_append_data(struct sock *sk,
+ 				get_page(pfrag->page);
+ 			}
+ 			copy = min_t(int, copy, pfrag->size - pfrag->offset);
+-			if (getfrag(from,
++			if (INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
++				    from,
+ 				    page_address(pfrag->page) + pfrag->offset,
+ 				    offset, copy, skb->len, skb) < 0)
+ 				goto error_efault;
+-- 
+2.47.0.338.g60cca15819-goog
+
 
