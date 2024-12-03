@@ -1,75 +1,90 @@
-Return-Path: <netdev+bounces-148475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CBEE9E1CCD
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 13:53:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4608A9E1CCF
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 13:54:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AF9316111E
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 12:53:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AEB7160346
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 12:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39771EBFE6;
-	Tue,  3 Dec 2024 12:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970831EBA0C;
+	Tue,  3 Dec 2024 12:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DAV0if58"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bKGZJ4Cn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3771EBA04
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 12:53:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110651E47BC;
+	Tue,  3 Dec 2024 12:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733230392; cv=none; b=FApOymzJoBLByC3iQ/H/HHj513F9/NqZdpzr5h+n5Uh9e38Yc5j6VIiRr++SYOyC6qSMDw2qh/gn86iYV2G3Spb+36O8RcGtVXrn3yJdr9I+uJJ4+BA9EKyJO0VkfrWzyOeqI2LXIWOWrxn7zzlam6pf5To0OMydRxbarraagt4=
+	t=1733230483; cv=none; b=peb8hcV6blJ/cDktIV07GxKNsBsieBLXuf9L0EmpdIvVXrQ7r5eMizyMUx3mIkAi/+jeAGT/iXpe1iArxZzhZS17vgz0C9wwNXbweDC7NIleCk7fEfEKh+VL+DbBHYdtnJXNrcOMxEGEe96UIriu7hcU5hsu7+PbzIPyaj+1zU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733230392; c=relaxed/simple;
-	bh=wgLQ8u7KRuTAl2laukrQT/h3e2tgwbSrvwrFG+FY6iU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GLEg/XZX2JcUHJTkfYa/5Z/tk+N1YrYwYOXnepFUymUZkU49/CTCNEJB1KaxeoSCIEX9eSQx8y4Vga5agimTUYk/ui4SKLGKu3pu/skVtZAy4cxDLfkQ5cozZ4aH+chCBXOCssmPT0jIszrcvh5dQpvh+L3xhvuV0lIwdfGmTzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DAV0if58; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733230391; x=1764766391;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=wgLQ8u7KRuTAl2laukrQT/h3e2tgwbSrvwrFG+FY6iU=;
-  b=DAV0if58GuMvezA9GT1Ghtqqv7R398pqmPfT0N/s7p7Pa1Sa8Ij2TJy+
-   /aZDQvqP1eBlasRh9A5Z5jiflEUslFOyPJyKz+56y1bcM+tUbCHQ5gYxe
-   ttNgH/gA8i5unSgcbHH+9FNNtWRL9c1usIIsNMT1yUOFLX9yP2ya3Wy09
-   0Wcav2DljWjZtYYkw3cJcF7M1ucugSjOw919dbnVJnt44yu4gxaLdG8SU
-   ZKl13BX7l6ga4Mq4EwFBbCxfgxqM0+elAcM7/BsWALJ2L/V8bBJAmxRPb
-   7JhAWgGuQf37PHyVMM55v76y/R2eR16OleU030j6q+ewLBHuA0ufQntXz
-   Q==;
-X-CSE-ConnectionGUID: wWBIJX9PQsSgUc50VB9L4w==
-X-CSE-MsgGUID: JyzslMAvQ02h4g+k/tKdCQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="44050229"
-X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="44050229"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 04:53:11 -0800
-X-CSE-ConnectionGUID: VRscLp6ZRf6blZMEZARRuw==
-X-CSE-MsgGUID: loQUAiFPRYysEB1/DNNWog==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="93889624"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa009.fm.intel.com with ESMTP; 03 Dec 2024 04:53:09 -0800
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 7BFDC2FC55;
-	Tue,  3 Dec 2024 12:53:08 +0000 (GMT)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v1] ice: Extend ethtool reset support
-Date: Tue,  3 Dec 2024 13:52:55 +0100
-Message-Id: <20241203125255.115651-1-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1733230483; c=relaxed/simple;
+	bh=0/fhiMWG79N4KhH5bKYcGYuR6NMHVODFbh3Ja/rsepQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sOzWWHoyz1bzSR/cFH9lc1tb6/mENXIZeFRT+MKQGtUaZtVB+3CfXTfvaOr+JQBnxXIcUYtFwt4GCxSVhivYwMHTZnbYcicfxlOZ7QNKJ5wgykUPsMlhq4mfKi1b4IRChPKLVfWq191IWbAS1H74DegZl6FQT1Lb1wxsDmn2o5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bKGZJ4Cn; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7257b5736f2so63205b3a.3;
+        Tue, 03 Dec 2024 04:54:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733230481; x=1733835281; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VzF7LXwlE6d2xweHfxZk/Dl9G8oUniKTz7ZkBliProo=;
+        b=bKGZJ4CnAgjeRYBae/c/0HK/St+CJ+MR4hmogvYysn4Qxj2uq8fEegCI65AgZpfrLT
+         lvOcLYihPwMCRjkB5OgJx25CAK6iGQI2JqkAtBXbriazWdXyPpJNEQHSYxh1NFEUJY+H
+         ORvPy8v01oHddt6IS9Ad9W5Rl4vNVtbdLA853QKPvincleDY4ucyAh0RCqjiYvfCM9v9
+         Ru/KuhRrhv7YCXMZEQs6rN7bn6v0dE7KZu7W3ZZSjnLQkdyZAPrkzCcanoC62RVNUWYR
+         6pNx8zvzRxV0tautSulbiI38IKnBsGmgdNMQGIMdB0Rt4Z99I8BlDw3ASzHxAuHh31rw
+         uR3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733230481; x=1733835281;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VzF7LXwlE6d2xweHfxZk/Dl9G8oUniKTz7ZkBliProo=;
+        b=sf0XkOXhgyD4SoxpwB+V5NWGQ5gB7VH7cYY2zILHxLMrWF4NifXkpNaXqXkLfSeJno
+         hPPuilrFMAJ8uFBSwQIySTbZitZZ4cnzbzZeo8HOlr3AWLVrGPRa31W358k9ZCrDWurI
+         CLbjdmPA9WV7n/zPFhMMm0hSaw3+EY5H0vz5VBiX/13oyjgK3KvT0fPAuVHzgNs2sYr/
+         BSppCT8BR7OkbS+zPCAkkm2xcBJBLylVLgbbWrZUDi5yL8L008agE3IjFCxra3MmfskG
+         6OWXRwcRjJd/ZgO23CZGCIDmI7txr+Sp/BAkgFL4XDe+d2pRViJRChLUMVrBGGKmeizo
+         Fxpw==
+X-Forwarded-Encrypted: i=1; AJvYcCVhGoqhoVkJiRII/3v8MeSBpTnG9DzdQItfzCOe0W8NsIyf4zDTdRZq/u8slHkwXuaWgO4MZETS@vger.kernel.org, AJvYcCXMpuCqw0qMn+99jrR67n5ozyHxAauEAkfkgigDgM7/RPR4+CF4VuGX24ESsP3lz0VcT1TSj5EXEhyEJ/g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgM/X7dL9GICcWLDZjwk1hne+SvS45WLmgswqTjmqla79+oqLO
+	aa91sk4U645j+Cy+7Vm/C8Kqd1IB8JU7hNOvw30QjR6jAR4Pb8pd
+X-Gm-Gg: ASbGnctA71K6czm7HrmX1G9Kg0LEim1hHhUX70H4Lm0+BhJ+Qz1dV7tgCb+G0YONd7m
+	Jstt9L1iLLwsUmtl0E3P+UxWA23ex9kTM64uURZxxyxwMUq+Hj+MavtuJlNyCIgkkLCBzagaDG/
+	vp/FG0Au10tKkIBvM1D6CLtluUAgfz8RGtmy659uBYA8VY6/HsBJyWM7tXlt6LJR6kQgtN9kwL+
+	0fSBZffp0q08gVov6WAwJ9HwMLWbH8nwpZvBRwxiQZL3pQo+N0G8fkZcPbR
+X-Google-Smtp-Source: AGHT+IHjnOlm+fJco/YyIPKGG5M4Tap1AmzYTMbe2McRmt0xHTs5Gf+13ljQ3AqWC5BlEA1RoawTVw==
+X-Received: by 2002:a05:6a00:2d20:b0:725:1257:bbc with SMTP id d2e1a72fcca58-7257fcdd318mr1473227b3a.7.1733230481252;
+        Tue, 03 Dec 2024 04:54:41 -0800 (PST)
+Received: from nas-server.i.2e4.me ([156.251.176.191])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7254176f159sm10349342b3a.47.2024.12.03.04.54.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 04:54:40 -0800 (PST)
+From: Zhiyuan Wan <kmlinuxm@gmail.com>
+To: andrew@lunn.ch
+Cc: hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	willy.liu@realtek.com,
+	Zhiyuan Wan <kmlinuxm@gmail.com>
+Subject: [PATCH net-next] net: phy: realtek: disable broadcast address feature of rtl8211f
+Date: Tue,  3 Dec 2024 20:54:30 +0800
+Message-Id: <20241203125430.2078090-1-kmlinuxm@gmail.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,30 +93,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Extend the job done in:
-commit b699c81af068 ("ice: Implement ethtool reset support")
-by adding ethtool reset function for safe mode ops structure.
+This feature is automatically enabled after a reset of this
+transceiver. When this feature is enabled, the phy not only
+responds to the configured PHY address by pin states on board,
+but also responds to address 0, the optional broadcast address
+of the MDIO bus.
 
-Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+But some MDIO device like mt7530 switch chip (integrated in mt7621
+SoC), also use address 0 to configure a specific port, when use
+mt7530 and rtl8211f together, it usually causes address conflict,
+leads to the port of rtl8211f stops working.
+
+This patch disables broadcast address feature of rtl8211f, and
+returns -ENODEV if using broadcast address (0) as phy address.
+
+Hardware design hint:
+This PHY only support address 1-7, and DO NOT tie all PHYAD pins
+ground when you connect more than one PHY on a MDIO bus.
+If you do that, this PHY will automatically take the first address
+appeared on the MDIO bus as it's address, causing address conflict.
+
+Signed-off-by: Zhiyuan Wan <kmlinuxm@gmail.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/phy/realtek.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index b552439fc1f9..d338a5ee8ab2 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -4841,6 +4841,7 @@ static const struct ethtool_ops ice_ethtool_safe_mode_ops = {
- 	.set_ringparam		= ice_set_ringparam,
- 	.nway_reset		= ice_nway_reset,
- 	.get_channels		= ice_get_channels,
-+	.reset			= ice_ethtool_reset,
- };
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index f65d7f1f3..0ef636d7b 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -31,6 +31,7 @@
+ #define RTL8211F_PHYCR1				0x18
+ #define RTL8211F_PHYCR2				0x19
+ #define RTL8211F_INSR				0x1d
++#define RTL8211F_PHYAD0_EN			BIT(13)
  
- /**
+ #define RTL8211F_LEDCR				0x10
+ #define RTL8211F_LEDCR_MODE			BIT(15)
+@@ -139,6 +140,17 @@ static int rtl821x_probe(struct phy_device *phydev)
+ 		return dev_err_probe(dev, PTR_ERR(priv->clk),
+ 				     "failed to get phy clock\n");
+ 
++	dev_dbg(dev, "disabling MDIO address 0 for this phy");
++	ret = phy_modify_paged(phydev, 0xa43, RTL8211F_PHYCR1,
++				       RTL8211F_PHYAD0_EN, 0);
++	if (ret < 0) {
++		return dev_err_probe(dev, PTR_ERR(ret),
++				     "disabling MDIO address 0 failed\n");
++	}
++	/* Deny broadcast address as PHY address */
++	if (phydev->mdio.addr == 0)
++		return -ENODEV;
++
+ 	ret = phy_read_paged(phydev, 0xa43, RTL8211F_PHYCR1);
+ 	if (ret < 0)
+ 		return ret;
 -- 
-2.38.1
+2.30.2
 
 
