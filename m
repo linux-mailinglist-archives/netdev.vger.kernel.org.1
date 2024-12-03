@@ -1,297 +1,386 @@
-Return-Path: <netdev+bounces-148622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1705E9E2A07
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:53:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E6F99E2A16
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:56:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D465D280C9B
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:53:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CE9428448C
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DB51FBE9B;
-	Tue,  3 Dec 2024 17:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 140DA1FBEA5;
+	Tue,  3 Dec 2024 17:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QoOdKiza"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4QbEINUQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE4A1F8ACD
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 17:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733248381; cv=fail; b=rA477iFoL/6ntIBtccV4dHJulcpCB1v7fkJoKzLtgmjvwDT185tjZnSUPSTctwlji/fC6uPx7PAuLt1pUi9me2WOewbVhrtf9n8LYvTC09O7AelywcpiSVtiTvC/bl1QnpJq1UbItK1dePqdtsnIf1+ZBtswF7e8/udDHqZkx5A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733248381; c=relaxed/simple;
-	bh=uDoxGmLmQpukW7RNm/MYAH5+NfdOzqXK6KVRkSkfKeA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lfshhMvJkiHtRa2hP+y3Cp5gn8c6FDqvcW4VU+qOlBIDAr+6GmElOAnuXuVdsnC47Uks/eTQywlzBs0k9wDDO46hlvHUUsPL9Y+srHgeJsznZotzl+J9GCz9TvEeuA1oNobzAuKt06Tho4qLaE39Vn/WoWMOAaI2wh11ZP0RFPI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QoOdKiza; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733248380; x=1764784380;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=uDoxGmLmQpukW7RNm/MYAH5+NfdOzqXK6KVRkSkfKeA=;
-  b=QoOdKizafj4HayOv3VcRt+TGdTE4io05MpPWCIXy5oRBts4pEz0A1ZFT
-   lvqmhS/lheftYTH7ya7V8+tpSX7xr/9Jp570ccoBq1uFgE/PrMtP4f+UM
-   drWKobwsAJlonpVdhMXF52Pfk03NkJf9KxM5OhomyoOv7EeE6B0LAZK07
-   Qrmt+wOxa3Ms6Z1Kb4SMgGJQlopggHg7M0tjG41qMwzopL+/pAG+imDXp
-   MNUqS3AyTH46DkVubzKo5Av9pSInZGqNTeLHe3G9R+AOaxvd7SyJ2IkDU
-   UpLb+0WILYxJB5vhSIbaxYol1kb1ijftchlgJfE5Xsylgty0Ybv39Tm7X
-   A==;
-X-CSE-ConnectionGUID: uvCG+7uZQDC+ujyJlmMIzw==
-X-CSE-MsgGUID: jhWaMEAWSVqc9MqKNHBDag==
-X-IronPort-AV: E=McAfee;i="6700,10204,11275"; a="33631967"
-X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="33631967"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 09:52:53 -0800
-X-CSE-ConnectionGUID: fZDTDARdTT6L7Q6EWwdu9A==
-X-CSE-MsgGUID: 9Q/M6dX6RhOhPBkszyDRpg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="93405175"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Dec 2024 09:52:52 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 3 Dec 2024 09:52:51 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 3 Dec 2024 09:52:51 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.173)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 3 Dec 2024 09:52:51 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jdvRz3DK/yVDCMgAwQ9MI5CxEYQyBZknNbLsQBakXl824bIcTMaSlYZUV88wg+MCMIKa+haUiaEHHDZHLOKzHB67GxA81Sjq7zE0oJlrmuCGyjwVREmYOTI2FBNWjkaMGF6NA81q8N67wp2XbCXmo24eJxuGlik6/f3+qVT+5y3OiG/88oDs9dXUBR87dGaLpy8yKWbkdJ2G8NQHEVwrE995+lCOIwkOOPD/EfSU0mMvsz6VeAk6Q1rZ39vAYEdI6Shzi1Awn0m1HYqMOFKI3EE8MQFjDU7xOjVtowo1dbohd3tjhozR4illGQH4FhZQ7jLDMpJq69RMGGN2v6lOhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uDoxGmLmQpukW7RNm/MYAH5+NfdOzqXK6KVRkSkfKeA=;
- b=MM9vz58oRn5CS8aS7SFSg/vnuyys6CNYBtRwmq9X/8886ZUgbBYbAgYaVOWFl8+80MYcjrn0kQuJtKccV5R5JBl8Qm0Zz9dGUpxWH3GXaHSJ4JGr1otRvzKX3Lfqt6GEERxBOpjJB2v8VErNRiuvFa3BkLaMR4J/v8wrwpZs6aayppHpSoEt+c5Pq3IDcj4OkF/+kDgIM17wW81jodUf2zgH/Q3BIptX7jHrcTBXpZJPEJW8bbtB7wAYXpxdsMppY5U3JOyML9bWbh1p2x/WFOlhjtaqfHPBDoY2qdXMbXwEtLJM8azHhcrmC9F1TYHDyZ8lTkXiVd/Sr2S2frutNg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM4PR11MB6502.namprd11.prod.outlook.com (2603:10b6:8:89::7) by
- IA0PR11MB8378.namprd11.prod.outlook.com (2603:10b6:208:48e::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.16; Tue, 3 Dec
- 2024 17:52:49 +0000
-Received: from DM4PR11MB6502.namprd11.prod.outlook.com
- ([fe80::21e4:2d98:c498:2d7a]) by DM4PR11MB6502.namprd11.prod.outlook.com
- ([fe80::21e4:2d98:c498:2d7a%3]) with mapi id 15.20.8207.017; Tue, 3 Dec 2024
- 17:52:48 +0000
-From: "Hay, Joshua A" <joshua.a.hay@intel.com>
-To: "Lobakin, Aleksander" <aleksander.lobakin@intel.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Kubiak, Michal"
-	<michal.kubiak@intel.com>, "Chittim, Madhu" <madhu.chittim@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [Intel-wired-lan][PATCH iwl-net 2/2] idpf: trigger SW interrupt
- when exiting wb_on_itr mode
-Thread-Topic: [Intel-wired-lan][PATCH iwl-net 2/2] idpf: trigger SW interrupt
- when exiting wb_on_itr mode
-Thread-Index: AQHbP5UHl1TqgZHOE0qF00oZ4nL1Y7LJqUUAgAssq3A=
-Date: Tue, 3 Dec 2024 17:52:30 +0000
-Deferred-Delivery: Tue, 3 Dec 2024 17:52:23 +0000
-Message-ID: <DM4PR11MB6502760769BC51BBBF7D7D75D4362@DM4PR11MB6502.namprd11.prod.outlook.com>
-References: <20241125235855.64850-1-joshua.a.hay@intel.com>
- <20241125235855.64850-3-joshua.a.hay@intel.com>
- <e95977e0-d080-45a1-a82e-e11ee85ce794@intel.com>
-In-Reply-To: <e95977e0-d080-45a1-a82e-e11ee85ce794@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR11MB6502:EE_|IA0PR11MB8378:EE_
-x-ms-office365-filtering-correlation-id: fccddcae-eb30-4da3-4c75-08dd13c34cf5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?aHlsc3pIZ1dpbEJzTlJ4d3BDSVlWUm1GWkVBU2pNMHQwZmYxTFZDOVFhZTV2?=
- =?utf-8?B?V2Z6MDBobytkcGQyUEhlT3Z5KzQ4YkExVnRKTVpxdjAzSHEyVDg4TCtQUHRG?=
- =?utf-8?B?dGZUVTUyZVFSWklZS2JMc2lRbmpPY2dpZkZ5SDFNN2tYNkN0ZStWUzIrTnRn?=
- =?utf-8?B?TEtNRWxUL0JYL0hqMWpwc1lQWlJpdmN0VkIweUxWMXFkOUVjbDduOENkWlA4?=
- =?utf-8?B?V29va3RjeG9PY1NBekd3dm5FVG9STXE2bVUwNW40ZHN6NzRwVVBEM09qYVVk?=
- =?utf-8?B?SnB5Vkl0TGdwb1JhSGZqd3k2QndnbWhlWWlleXIvMXBSNkhvQ2dBZHhCSnIr?=
- =?utf-8?B?QW9uSEVtdGI0R1pjMkkyNys0bDRkdm8zQWtUUHFqcTBzaXFhSEIzYU9sOVo1?=
- =?utf-8?B?RXovdDJzRTNHU2JHT1dPa0NVWVl1Rm11RkQwbDhRalRGaTNzZ2ZYTjdPekhj?=
- =?utf-8?B?a0xPVXoxS0FDNHlTc1F0YlJXb1FxeTJnNUlSOG81SDR0OUZzdk9yMHp4c2Zy?=
- =?utf-8?B?ZXFvcUQxdHpHUXlqZktQdnRZL0NBNGNMbW0rMS9Ceno3ZkZDdytGRG1KWFA1?=
- =?utf-8?B?QWtMOGdFNFQwTGtXNXVydnZQRFBidDdnRzJtTDFCd0FXbUhvZktucFZHQWow?=
- =?utf-8?B?TC9lV3g3NWpMMnZPSFh4bjV4VnpieGwwdVhqS3hlaXNpeDVJWDRRSlFSVTFM?=
- =?utf-8?B?YVgyNFBIVWpzU0U3WE9GVjR2M3NhN3lkSnFmcEFGeDRyV29HVGgxZjlra2xk?=
- =?utf-8?B?aW1tODJFN1J5OFV6NG5KVFFrN3dmRS9nUHZENGVlL2FFMUlmdy9TU2J1a2xY?=
- =?utf-8?B?Nmh5aTZIVzNkMXYyTkZFUEQvcnFMblA0SXBUUUI4ZzZwRkVSNEUzTndLNlBa?=
- =?utf-8?B?S0tnVEhIcis2eGpjOXdLc1hPOVJhcVMzQllsajNlM1lzOGx2dnpiMGxZN3lJ?=
- =?utf-8?B?N2M2TDlDWGxGVmNpSDRtNHVwUTBtSFphQ0FLckkvZnQ0ZFhjMlgzOXMzdnR6?=
- =?utf-8?B?c0tpMHY2RTk4ZVhYeGJRMmFUR1VnNWcra2xFL0RSLytZTWgxM1IrdlJOMVhl?=
- =?utf-8?B?NG5uYUVlVHJDcWJLOWptVkcybkl4QmNPMnJhZEs0b2hqNk5Ba3FuNTdudFNL?=
- =?utf-8?B?V1VWQ0t3di91a0YwQmEwaEkzTFpnb0NVYUdxRUw3TGlwek4zSmxkbGwyYlhM?=
- =?utf-8?B?aC9XLytwQUZ1cjI1dUdDOFlPREtveEN1ZEV6UzgrREZzWkF0OGt3dEdwc0NS?=
- =?utf-8?B?R1NDRm5McmNUaE9KajUzTnducEg1VDFCY3dCTDRCZ05SUGxXSFg1eW0zS1NW?=
- =?utf-8?B?MkpvcEwxZjMzbUNFSkVLMHFqbHhNaGFpOG14N29hZGNQQUtsUDlHWW95S2li?=
- =?utf-8?B?eTFDSjZFeGg3YXkzRnE4MldhSEFjRktrTFFVQXlqblczRUE4ajBCcy9KdUtQ?=
- =?utf-8?B?eXBxZzMxbVlyTmRTTTZUL0VEa0szVDlBVGtnWWZDNUprOVk3b2sxZDdsZFk0?=
- =?utf-8?B?c1dVSVVXY1NuRzRJNmlvenNSbThBS3VZdVlPdm8zR0VnRklJeFpNNGpacU4v?=
- =?utf-8?B?VkFRUnRHbkZRZzNCOUsxdVlxbDZNOUwzVjFmK3ZCNEEzTWlpLzBKRXI2dVNN?=
- =?utf-8?B?VzErQjZOMUQ0enBMT1p3RXFTNDZPTWhqWjEwRDlJbjN0VzdPajVZOHQxWHQx?=
- =?utf-8?B?NlIya2lOVUdDZXgrZEF2Vk14Y1RwZjRvZm9zOHBKdzlxVkYwbWdiNEdFdjc2?=
- =?utf-8?B?VmptQ2xGWDNDT0JMYXNjQnJLTkRCYjhTRFBrU1Q4eklOeisraGFKb1pVNHgv?=
- =?utf-8?B?ZllHcUNLclRRTzBMaEJrcjFIbUl0S2Q5NXdQRWJQY3ZIL3FrNERXdEdEbUhB?=
- =?utf-8?B?STh0a0lQSjlETHIwQVdNbEtSNmV6Z05NejVyR21tem05SHc9PQ==?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6502.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?dmhOOFFiQTg3ZjA3WWJtN2RjQzkrbGxUUGdGNEwxYTZxTHJIOFNzaTlOYlRN?=
- =?utf-8?B?MzdENjZUUytaMytBVnVQN2NTL0ZLTE1lVVpuYkZ1NWdWZlMrVTBkN0ZHbUpt?=
- =?utf-8?B?NlorbklqMWJLMmIvZ2ZYb2VOSUlPb2ZNWFQyQUx1Yy9VajRmQTZpUndxTU9y?=
- =?utf-8?B?M0hTUVo3VmNuc3lCRm1jN2w5MHNLV0xodCs4R3o0R3NxTXFFcWc2d2l3MHRO?=
- =?utf-8?B?bEdkRlVpaml5UWJ1ZU5icDBxWTVydHEvY01BR1IyT3JkNitGQkdCbllqMndN?=
- =?utf-8?B?NWFmcXRrVUlnMUxzYkw3azQxSmFMVEYzTkNpdVZ0eGRNUFNaRnIzOW9ES0F3?=
- =?utf-8?B?bWk5Q3E5YklYclIwdlVtQ3VGcE5DNUxqeUlkZktIcDlGNjBodm1aYVFQZkpX?=
- =?utf-8?B?UkhKQmFJblozTENOb3ZlYUR2bjVESTkrdGVjV3Zneis3eVFtcnNoRjNuNC9N?=
- =?utf-8?B?SXM2eXBSckNyMUhUMWpaN0E5ZkN4MUY0TGZ4QlhWcGFLM21KYUZvSnZVUzBV?=
- =?utf-8?B?dE1JOHcxaHZJbjJnbUc5Qk8vNDhEbHdTUzQ4Q2swTjFWNnFUTXJSNXVGay83?=
- =?utf-8?B?aEs4dkF1ZmlLZER4WVZvZDB4RWxveE9IY3p0ZGgzRTJYSm1WeU5oUm96eVlw?=
- =?utf-8?B?L1B0TTBaRGRydngzT0xTUzBhenZtTHYxanJGYjFxMVI3UTVZVWVEVXlSdk5Z?=
- =?utf-8?B?UlR1dHU0T1lSSWoxd2hjVkVsUjRBM1BsTCtUclZyWEJWMFF1Ui9uNi80N2RX?=
- =?utf-8?B?U0dyekpNOTBlV044ODV1NUxvUEdmZ0NTemtZenc4VnFQb2J3ZDQ1MHNtTGVX?=
- =?utf-8?B?bEpIbzRVd1d0UTVRbndLb1RuODBrNytNRlUyZFVUci9lMGxmYWlmZmF4Q2RX?=
- =?utf-8?B?S2lkK3NFU3VMUStyamxNb1BMb2Y5Tm1obVcraldrbnZ3MXV4Rm9YZXNmdURN?=
- =?utf-8?B?MFNnRGpDcUV5UjNzUVRtR3haRTY4YnRBOU83WllSMVRxdEFXaWcwWUNxK3VE?=
- =?utf-8?B?R2UvNHBZY3BNanlHQWdhSU5scHM3VWozSzR4YTVpMU1LOTlGN080U3FIUE93?=
- =?utf-8?B?SjYrNWpMTDhPZHBTSlVwcm5qU1I5VWZENTV1OUxaMVVkL25HNmw1LzdzWW8r?=
- =?utf-8?B?NmN1Nm9iTGRsYU5COGV3NkpsR1NwNjZVekY3V29jQ2VIN3NwNE1FZ0tSUU42?=
- =?utf-8?B?czFhcyt5Y2pJSTRya052QjNwMXQ2aUp5Z2x0Q3dRTTVOdmF6eFc0dkpySkQ4?=
- =?utf-8?B?UVVXVFBlU1ViMkt2RldWSDY2UDFRbXc1R3FLcjdHbmM5b09LdXFFYldnTzVD?=
- =?utf-8?B?YS93Z3RSd2pERnc0elhHaFdMbjA2SEYrbGVveE5YL0lLRFJqSmkveks1ZlNs?=
- =?utf-8?B?RGRjcUtSbEx6T0VBaXRHbk9KcjAyWXhqaEF3VGdBZHRqeUlGMVhiV28vWmZl?=
- =?utf-8?B?YUNPcmJPeWQ4OXdvczNzWlR2S2t5bFl6NE1acGIwc1lnUTBGMUNmaDluNk5Q?=
- =?utf-8?B?SlJYaGdlVXNvcUR5YU9DWWx6WkVrT0RQK3g2aTRYMHZMaXBNSVlRSHg0OFJq?=
- =?utf-8?B?VG1xZEQ0VUNxZmZ2bGkrK2hienJYQjY4VmN6UzVTaG1pT0RKVkc5aVNXbFFa?=
- =?utf-8?B?M0MzNTIwT2ZDVEoyc2gzR0ZFak9IL24zZDV2Nlg1Z3ZlUUs5d0VyRWNiSmRJ?=
- =?utf-8?B?LzVNTG5wMTROMkxiL3kzK3VVaUExOGlQcWtjaUIwL3lEcHYwUUlsU2c1TFNu?=
- =?utf-8?B?MzJwY3AyU3VFN2FrUjE2NURPSVBqK1RRRGo0MUVRZzlpOXc3YUJOR3FGazlS?=
- =?utf-8?B?ZGZ1N0JkY0pvZnkvNjlHS0hDVWllRzJ1WGFkS2I5NHNybURvMFd2aVBXYlNh?=
- =?utf-8?B?anVDOGpPeDBSOWxodkVMT3Njbm9FeWdlY0xYaTZyeDVFTG1raWVxNUpabEFv?=
- =?utf-8?B?a2hRWCs5ZyttTmFGaG1uODBWOWZFL3RUcm84WStSSWZUMEN3VHNlSjJ2ZTgv?=
- =?utf-8?B?blRvQ3JJejZ6Q2xwZHZHcjFqYTBuaVBlS3FGOFkwLzVBZCtlcEhkTWZybjJT?=
- =?utf-8?B?bTUvaXhtZEdRcTlxN2Q4RTlFdHpBZ1BpVWpjRVR4MUtwMG0vR3JRb2lsTXF5?=
- =?utf-8?Q?MVHWmYGytaM83ZUJcKJiRiVou?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB0B1FA840
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 17:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733248585; cv=none; b=HV/X6YSWQIlGWJ27qlVrnUg9CIywXR6cHNSd7kfSEv3n6l8L/oNbVYFsS4Ju730Drq/GjFCFLPa7OIlq/rRBrZKousoFijLCpGoFQ8qVrnzcUiPTwQ94zIpWAbmJUStNwRghwifkNMd5kkwANahYucI+FbL2F+hb84VDHq3Q3QE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733248585; c=relaxed/simple;
+	bh=wWGzw/UlH111Tq8S1ToGbRIJH5sDACGSsQIvVAIfQVo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l+0YVaNWqtFc0zXibXtEnqwarBmPZBxlhjeKUDm3bkivGSGJPZYKENPKl9lavbGVAnQ4VFk/FAKQ95igwVoDLFI+jvdS/dtK3goIRMfPDhjpvWrmsHnp6bQJtOPpq1G3Fphdqv/O3uMsrArZP8Pj+3suwr7RO3DvGe6xi+qbqD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4QbEINUQ; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aa549d9dffdso936893966b.2
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 09:56:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733248581; x=1733853381; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z2xxYYbaGgBgN1yXahKuxHkveEA2xh24PRMyvstmqN0=;
+        b=4QbEINUQ6MUM2txmNTa63+18GySEIujtYlJKrhYdE0S7HdF6b4THgho+2/eYAwrCIG
+         GY6mVrJnFlxCJ8V3bew4DMfqgNtHDrXwn2AoxxiCwaLDLhBMvlEZjRzVtg1KUw8SIRJz
+         w2zhXSsS51+HRoFTWikUGMPj/2mO55hJCKXo8cbMCLTZuRUjOzwzuvqxrsYZ+4/x/4kq
+         rCqxBQ2t8V8fomKUtTfOyY9QRUTqqwimbTFxiaaaVigu8aw8IaTugw9vER/2Vikbr5n4
+         rCwyMUXr5TSGtDeGZMLmokcfmoDQ4qF03f7NoaftsbmSyRsgvups80RsJTKUyU25aV5b
+         JSDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733248581; x=1733853381;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Z2xxYYbaGgBgN1yXahKuxHkveEA2xh24PRMyvstmqN0=;
+        b=lcqWlvZ99ey/XRXQoIJ7/5s/d20P0dJOkR9Qfy4CSKzyKJHI8N3sRn57wiS/eseaPS
+         6Wr1FbG6RQOicd9HYknsEJJ9PBRuwehjIKWvidmfuNLV/gv3i8QdwpoqzDI2xL6sQssj
+         TsMVpXbcSwhQnZjRfzEwIk6cvdUhjWWLcQ6bHpaGwfuL4LWQ6cIbTUa/H8UMbKoI1sSx
+         BnY+BSjEEghVIcuUXA6dXKMIsbU0/mJQHOvlK8blx4P/wK2M1DiKCIxGxtPnS+wncdUU
+         cnZMOTJ7AcbSaFLHNBuSMSfhWWrYjSRPcJYNYrHEDT65B2sJq5FFfoJN1ByG1u92z4Hw
+         8BgA==
+X-Forwarded-Encrypted: i=1; AJvYcCWQO2ZyhuaDNs36ND5Sr+kHrXG3wsLbz1eLXRcocsJpDAf8cFDPODUli9EBbKPYJqh9Pzzds1I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztHp2IBqSx7XUFw6VcQjy9Et9oQwZBdorBm9O9lNOAj0xxlvy0
+	jkf2tvrecLjgB8Wht1+BagoS0N2ABCJmbyMLaA/v+1HhNa64uyqyCID1fevEBoACzZ8dv2s6cm7
+	DT+Hs3zngDDMVFL/vH6Oth2QyxkGzfhAY6Qx8
+X-Gm-Gg: ASbGncvUZyQLxEgmiVZf5ErdcNmrRE576vXF2g+xF3fJjrT0mwWfoEZLybTKm0RLAW8
+	EUTH0uchJls1rkmjJc+4wwkVKFqO3s17I
+X-Google-Smtp-Source: AGHT+IF03iLHydGq78gTyyzQR9T0ju5O6V53D5QvOQge9Cakt2MdYt4UeIDzZbjgNoa/3FhMrYMlII1oDlJnHnWphY4=
+X-Received: by 2002:a17:906:c10c:b0:aa5:2a57:1779 with SMTP id
+ a640c23a62f3a-aa5f7f4ace8mr298967166b.59.1733248580808; Tue, 03 Dec 2024
+ 09:56:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6502.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fccddcae-eb30-4da3-4c75-08dd13c34cf5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Dec 2024 17:52:48.6714
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lfGNvJppGVwk4fjhuTsVVWdZMpfAB0Q/LUXIOE7O0w0JdkBYHdS+aFvqexX338xee3Ux+AhhQB69pox4HJKYAQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8378
-X-OriginatorOrg: intel.com
+References: <20241203170933.2449307-1-edumazet@google.com> <20241203173718.owpsc6h2kmhdvhy4@skbuf>
+In-Reply-To: <20241203173718.owpsc6h2kmhdvhy4@skbuf>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 3 Dec 2024 18:56:09 +0100
+Message-ID: <CANn89iKpzA=5iam--u8A+GR8F+YZ5DNRdbVk=KniMwgdZWrnuQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: avoid potential UAF in default_operstate()
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	syzbot+1939f24bdb783e9e43d9@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-PiBGcm9tOiBMb2Jha2luLCBBbGVrc2FuZGVyIDxhbGVrc2FuZGVyLmxvYmFraW5AaW50ZWwuY29t
-Pg0KPiBDYzogaW50ZWwtd2lyZWQtbGFuQGxpc3RzLm9zdW9zbC5vcmc7IEtpdHN6ZWwsIFByemVt
-eXNsYXcNCj4gPHByemVteXNsYXcua2l0c3plbEBpbnRlbC5jb20+OyBLdWJpYWssIE1pY2hhbCA8
-bWljaGFsLmt1Ymlha0BpbnRlbC5jb20+Ow0KPiBDaGl0dGltLCBNYWRodSA8bWFkaHUuY2hpdHRp
-bUBpbnRlbC5jb20+OyBuZXRkZXZAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBbSW50
-ZWwtd2lyZWQtbGFuXVtQQVRDSCBpd2wtbmV0IDIvMl0gaWRwZjogdHJpZ2dlciBTVyBpbnRlcnJ1
-cHQNCj4gd2hlbiBleGl0aW5nIHdiX29uX2l0ciBtb2RlDQo+IA0KPiBGcm9tOiBKb3NodWEgSGF5
-IDxqb3NodWEuYS5oYXlAaW50ZWwuY29tPg0KPiBEYXRlOiBNb24sIDI1IE5vdiAyMDI0IDE1OjU4
-OjU1IC0wODAwDQo+IA0KPiA+IFRoZXJlIGlzIGEgcmFjZSBjb25kaXRpb24gYmV0d2VlbiBleGl0
-aW5nIHdiX29uX2l0ciBhbmQgY29tcGxldGlvbiB3cml0ZQ0KPiA+IGJhY2tzLiBGb3IgZXhhbXBs
-ZSwgd2UgYXJlIGluIHdiX29uX2l0ciBtb2RlIGFuZCBhIFR4IGNvbXBsZXRpb24gaXMNCj4gPiBn
-ZW5lcmF0ZWQgYnkgSFcsIHJlYWR5IHRvIGJlIHdyaXR0ZW4gYmFjaywgYXMgd2UgYXJlIHJlLWVu
-YWJsaW5nDQo+ID4gaW50ZXJydXB0czoNCj4gPg0KPiA+IAlIVyAgICAgICAgICAgICAgICAgICAg
-ICBTVw0KPiA+IAl8ICAgICAgICAgICAgICAgICAgICAgICB8DQo+ID4gCXwJCQl8IGlkcGZfdHhf
-c3BsaXRxX2NsZWFuX2FsbA0KPiA+IAl8ICAgICAgICAgICAgICAgICAgICAgICB8IG5hcGlfY29t
-cGxldGVfZG9uZQ0KPiA+IAl8CQkJfA0KPiA+IAl8IHR4X2NvbXBsZXRpb25fd2IgCXwgaWRwZl92
-cG9ydF9pbnRyX3VwZGF0ZV9pdHJfZW5hX2lycQ0KPiA+DQo+ID4gVGhhdCB0eF9jb21wbGV0aW9u
-X3diIGhhcHBlbnMgYmVmb3JlIHRoZSB2ZWN0b3IgaXMgZnVsbHkgcmUtZW5hYmxlZC4NCj4gPiBD
-b250aW51aW5nIHdpdGggdGhpcyBleGFtcGxlLCBpdCBpcyBhIFVEUCBzdHJlYW0gYW5kIHRoZQ0K
-PiA+IHR4X2NvbXBsZXRpb25fd2IgaXMgdGhlIGxhc3Qgb25lIGluIHRoZSBmbG93ICh0aGVyZSBh
-cmUgbm8gcnggcGFja2V0cykuDQo+ID4gQmVjYXVzZSB0aGUgSFcgZ2VuZXJhdGVkIHRoZSBjb21w
-bGV0aW9uIGJlZm9yZSB0aGUgaW50ZXJydXB0IGlzIGZ1bGx5DQo+ID4gZW5hYmxlZCwgdGhlIEhX
-IHdpbGwgbm90IGZpcmUgdGhlIGludGVycnVwdCBvbmNlIHRoZSB0aW1lciBleHBpcmVzIGFuZA0K
-PiA+IHRoZSB3cml0ZSBiYWNrIHdpbGwgbm90IGhhcHBlbi4gTkFQSSBwb2xsIHdvbid0IGJlIGNh
-bGxlZC4gIFdlIGhhdmUNCj4gPiBpbmRpY2F0ZWQgd2UncmUgYmFjayBpbiBpbnRlcnJ1cHQgbW9k
-ZSBidXQgbm90aGluZyBlbHNlIHdpbGwgdHJpZ2dlciB0aGUNCj4gPiBpbnRlcnJ1cHQuIFRoZXJl
-Zm9yZSwgdGhlIGNvbXBsZXRpb24gZ29lcyB1bnByb2Nlc3NlZCwgdHJpZ2dlcmluZyBhIFR4DQo+
-ID4gdGltZW91dC4NCj4gPg0KPiA+IFRvIG1pdGlnYXRlIHRoaXMsIGZpcmUgYSBTVyB0cmlnZ2Vy
-ZWQgaW50ZXJydXB0IHVwb24gZXhpdGluZyB3Yl9vbl9pdHIuDQo+ID4gVGhpcyBpbnRlcnJ1cHQg
-d2lsbCBjYXRjaCB0aGUgcm9ndWUgY29tcGxldGlvbiBhbmQgYXZvaWQgdGhlIHRpbWVvdXQuDQo+
-ID4gQWRkIGxvZ2ljIHRvIHNldCB0aGUgYXBwcm9wcmlhdGUgYml0cyBpbiB0aGUgdmVjdG9yJ3Mg
-ZHluX2N0bCByZWdpc3Rlci4NCj4gPg0KPiA+IEZpeGVzOiA5YzRhMjdkYTBlY2MgKCJpZHBmOiBl
-bmFibGUgV0JfT05fSVRSIikNCj4gPiBSZXZpZXdlZC1ieTogTWFkaHUgQ2hpdHRpbSA8bWFkaHUu
-Y2hpdHRpbUBpbnRlbC5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogSm9zaHVhIEhheSA8am9zaHVh
-LmEuaGF5QGludGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50
-ZWwvaWRwZi9pZHBmX3R4cnguYyB8IDMwICsrKysrKysrKysrKysrLS0tLS0tLQ0KPiA+ICAxIGZp
-bGUgY2hhbmdlZCwgMjAgaW5zZXJ0aW9ucygrKSwgMTAgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBk
-aWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaWRwZi9pZHBmX3R4cnguYw0K
-PiBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2lkcGYvaWRwZl90eHJ4LmMNCj4gPiBpbmRl
-eCBhODk4OWRkOTgyNzIuLjk1NThiOTA0NjljOCAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL25l
-dC9ldGhlcm5ldC9pbnRlbC9pZHBmL2lkcGZfdHhyeC5jDQo+ID4gKysrIGIvZHJpdmVycy9uZXQv
-ZXRoZXJuZXQvaW50ZWwvaWRwZi9pZHBmX3R4cnguYw0KPiA+IEBAIC0zNjA0LDIxICszNjA0LDMy
-IEBAIHN0YXRpYyB2b2lkIGlkcGZfdnBvcnRfaW50cl9kaXNfaXJxX2FsbChzdHJ1Y3QNCj4gaWRw
-Zl92cG9ydCAqdnBvcnQpDQo+ID4gIC8qKg0KPiA+ICAgKiBpZHBmX3Zwb3J0X2ludHJfYnVpbGRy
-ZWdfaXRyIC0gRW5hYmxlIGRlZmF1bHQgaW50ZXJydXB0IGdlbmVyYXRpb24gc2V0dGluZ3MNCj4g
-PiAgICogQHFfdmVjdG9yOiBwb2ludGVyIHRvIHFfdmVjdG9yDQo+ID4gLSAqIEB0eXBlOiBpdHIg
-aW5kZXgNCj4gPiAtICogQGl0cjogaXRyIHZhbHVlDQo+ID4gICAqLw0KPiA+IC1zdGF0aWMgdTMy
-IGlkcGZfdnBvcnRfaW50cl9idWlsZHJlZ19pdHIoc3RydWN0IGlkcGZfcV92ZWN0b3IgKnFfdmVj
-dG9yLA0KPiA+IC0JCQkJCWNvbnN0IGludCB0eXBlLCB1MTYgaXRyKQ0KPiA+ICtzdGF0aWMgdTMy
-IGlkcGZfdnBvcnRfaW50cl9idWlsZHJlZ19pdHIoc3RydWN0IGlkcGZfcV92ZWN0b3IgKnFfdmVj
-dG9yKQ0KPiA+ICB7DQo+ID4gLQl1MzIgaXRyX3ZhbDsNCj4gPiArCXUzMiBpdHJfdmFsID0gcV92
-ZWN0b3ItPmludHJfcmVnLmR5bl9jdGxfaW50ZW5hX207DQo+ID4gKwlpbnQgdHlwZSA9IElEUEZf
-Tk9fSVRSX1VQREFURV9JRFg7DQo+ID4gKwl1MTYgaXRyID0gMDsNCj4gPiArDQo+ID4gKwlpZiAo
-cV92ZWN0b3ItPndiX29uX2l0cikgew0KPiA+ICsJCS8qDQo+ID4gKwkJICogVHJpZ2dlciBhIHNv
-ZnR3YXJlIGludGVycnVwdCB3aGVuIGV4aXRpbmcgd2Jfb25faXRyLCB0byBtYWtlDQo+ID4gKwkJ
-ICogc3VyZSB3ZSBjYXRjaCBhbnkgcGVuZGluZyB3cml0ZSBiYWNrcyB0aGF0IG1pZ2h0IGhhdmUg
-YmVlbg0KPiA+ICsJCSAqIG1pc3NlZCBkdWUgdG8gaW50ZXJydXB0IHN0YXRlIHRyYW5zaXRpb24u
-DQo+ID4gKwkJICovDQo+ID4gKw0KPiANCj4gVGhpcyBlbXB0eSBuZXdsaW5lIGlzIG5vdCBuZWVk
-ZWQgSSdkIHNheS4NCg0KV2lsbCBmaXguDQoNCj4gDQo+ID4gKwkJaXRyX3ZhbCB8PSBxX3ZlY3Rv
-ci0+aW50cl9yZWcuZHluX2N0bF9zd2ludF90cmlnX20gfA0KPiA+ICsJCQkgICBxX3ZlY3Rvci0+
-aW50cl9yZWcuZHluX2N0bF9zd19pdHJpZHhfZW5hX207DQo+ID4gKwkJdHlwZSA9IElEUEZfU1df
-SVRSX1VQREFURV9JRFg7DQo+ID4gKwkJaXRyID0gSURQRl9JVFJfMjBLOw0KPiA+ICsJfQ0KPiA+
-DQo+ID4gIAlpdHIgJj0gSURQRl9JVFJfTUFTSzsNCj4gPiAgCS8qIERvbid0IGNsZWFyIFBCQSBi
-ZWNhdXNlIHRoYXQgY2FuIGNhdXNlIGxvc3QgaW50ZXJydXB0cyB0aGF0DQo+ID4gIAkgKiBjYW1l
-IGluIHdoaWxlIHdlIHdlcmUgY2xlYW5pbmcvcG9sbGluZw0KPiA+ICAJICovDQo+ID4gLQlpdHJf
-dmFsID0gcV92ZWN0b3ItPmludHJfcmVnLmR5bl9jdGxfaW50ZW5hX20gfA0KPiA+IC0JCSAgKHR5
-cGUgPDwgcV92ZWN0b3ItPmludHJfcmVnLmR5bl9jdGxfaXRyaWR4X3MpIHwNCj4gPiAtCQkgIChp
-dHIgPDwgKHFfdmVjdG9yLT5pbnRyX3JlZy5keW5fY3RsX2ludHJ2bF9zIC0gMSkpOw0KPiA+ICsJ
-aXRyX3ZhbCB8PSAodHlwZSA8PCBxX3ZlY3Rvci0+aW50cl9yZWcuZHluX2N0bF9pdHJpZHhfcykg
-fA0KPiA+ICsJCSAgIChpdHIgPDwgKHFfdmVjdG9yLT5pbnRyX3JlZy5keW5fY3RsX2ludHJ2bF9z
-IC0gMSkpOw0KPiA+DQo+ID4gIAlyZXR1cm4gaXRyX3ZhbDsNCj4gPiAgfQ0KPiA+IEBAIC0zNzE2
-LDkgKzM3MjcsOCBAQCB2b2lkIGlkcGZfdnBvcnRfaW50cl91cGRhdGVfaXRyX2VuYV9pcnEoc3Ry
-dWN0DQo+IGlkcGZfcV92ZWN0b3IgKnFfdmVjdG9yKQ0KPiA+ICAJLyogbmV0X2RpbSgpIHVwZGF0
-ZXMgSVRSIG91dC1vZi1iYW5kIHVzaW5nIGEgd29yayBpdGVtICovDQo+ID4gIAlpZHBmX25ldF9k
-aW0ocV92ZWN0b3IpOw0KPiA+DQo+ID4gKwlpbnR2YWwgPSBpZHBmX3Zwb3J0X2ludHJfYnVpbGRy
-ZWdfaXRyKHFfdmVjdG9yKTsNCj4gPiAgCXFfdmVjdG9yLT53Yl9vbl9pdHIgPSBmYWxzZTsNCj4g
-PiAtCWludHZhbCA9IGlkcGZfdnBvcnRfaW50cl9idWlsZHJlZ19pdHIocV92ZWN0b3IsDQo+ID4g
-LQkJCQkJICAgICAgSURQRl9OT19JVFJfVVBEQVRFX0lEWCwgMCk7DQo+IA0KPiBJcyB0aGVyZSBh
-IHJlYXNvbiBmb3IgY2hhbmdpbmcgdGhlIG9yZGVyIG9mIHRoZXNlIHR3bz8NCg0KWWVzLiBUaGUg
-U1cgdHJpZ2dlcmVkIGludGVycnVwdCBpcyBvbmx5IGZpcmVkIGlmIHdlIHdlcmUgaW4gd2Jfb25f
-aXRyIG1vZGUuIFdlIGNhbm5vdCBjbGVhciBpdCB1bnRpbCBhZnRlciBidWlsZHJlZyBzZXRzIHRo
-ZSBkeW5fY3RsIHZhbHVlIGFjY29yZGluZ2x5LiBPdGhlcndpc2UsIHRoZSBTVyBpbnRlcnJ1cHQg
-d2lsbCBuZXZlciBiZSB1c2VkDQoNCj4gDQo+ID4NCj4gPiAgCXdyaXRlbChpbnR2YWwsIHFfdmVj
-dG9yLT5pbnRyX3JlZy5keW5fY3RsKTsNCj4gPiAgfQ0KPiANCj4gVGhhbmtzLA0KPiBPbGVrDQoN
-ClRoYW5rcywNCkpvc2gNCg==
+On Tue, Dec 3, 2024 at 6:37=E2=80=AFPM Vladimir Oltean <vladimir.oltean@nxp=
+.com> wrote:
+>
+> Hi Eric,
+>
+> On Tue, Dec 03, 2024 at 05:09:33PM +0000, Eric Dumazet wrote:
+> > syzbot reported an UAF in default_operstate() [1]
+> >
+> > Issue is a race between device and netns dismantles.
+> >
+> > After calling __rtnl_unlock() from netdev_run_todo(),
+> > we can not assume the netns of each device is still alive.
+> >
+> > Make sure the device is not in NETREG_UNREGISTERED state,
+> > and add an ASSERT_RTNL() before the call to
+> > __dev_get_by_index().
+> >
+> > We might move this ASSERT_RTNL() in __dev_get_by_index()
+> > in the future.
+> >
+> > [1]
+> >
+> > BUG: KASAN: slab-use-after-free in __dev_get_by_index+0x5d/0x110 net/co=
+re/dev.c:852
+> > Read of size 8 at addr ffff888043eba1b0 by task syz.0.0/5339
+> >
+> > CPU: 0 UID: 0 PID: 5339 Comm: syz.0.0 Not tainted 6.12.0-syzkaller-1029=
+6-gaaf20f870da0 #0
+> > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-=
+1.16.3-2~bpo12+1 04/01/2014
+> > Call Trace:
+> >  <TASK>
+> >   __dump_stack lib/dump_stack.c:94 [inline]
+> >   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+> >   print_address_description mm/kasan/report.c:378 [inline]
+> >   print_report+0x169/0x550 mm/kasan/report.c:489
+> >   kasan_report+0x143/0x180 mm/kasan/report.c:602
+> >   __dev_get_by_index+0x5d/0x110 net/core/dev.c:852
+> >   default_operstate net/core/link_watch.c:51 [inline]
+> >   rfc2863_policy+0x224/0x300 net/core/link_watch.c:67
+> >   linkwatch_do_dev+0x3e/0x170 net/core/link_watch.c:170
+> >   netdev_run_todo+0x461/0x1000 net/core/dev.c:10894
+> >   rtnl_unlock net/core/rtnetlink.c:152 [inline]
+> >   rtnl_net_unlock include/linux/rtnetlink.h:133 [inline]
+> >   rtnl_dellink+0x760/0x8d0 net/core/rtnetlink.c:3520
+> >   rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6911
+> >   netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2541
+> >   netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
+> >   netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1347
+> >   netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1891
+> >   sock_sendmsg_nosec net/socket.c:711 [inline]
+> >   __sock_sendmsg+0x221/0x270 net/socket.c:726
+> >   ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2583
+> >   ___sys_sendmsg net/socket.c:2637 [inline]
+> >   __sys_sendmsg+0x269/0x350 net/socket.c:2669
+> >   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> > RIP: 0033:0x7f2a3cb80809
+> > Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89=
+ f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 =
+ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> > RSP: 002b:00007f2a3d9cd058 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> > RAX: ffffffffffffffda RBX: 00007f2a3cd45fa0 RCX: 00007f2a3cb80809
+> > RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000008
+> > RBP: 00007f2a3cbf393e R08: 0000000000000000 R09: 0000000000000000
+> > R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> > R13: 0000000000000000 R14: 00007f2a3cd45fa0 R15: 00007ffd03bc65c8
+> >  </TASK>
+>
+> In the future could you please trim irrelevant stuff from dumps like this=
+?
+
+I prefer the full output, it can be very useful. It is relevant to me at le=
+ast.
+
+>
+> >
+> > Allocated by task 5339:
+> >   kasan_save_stack mm/kasan/common.c:47 [inline]
+> >   kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+> >   poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
+> >   __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:394
+> >   kasan_kmalloc include/linux/kasan.h:260 [inline]
+> >   __kmalloc_cache_noprof+0x243/0x390 mm/slub.c:4314
+> >   kmalloc_noprof include/linux/slab.h:901 [inline]
+> >   kmalloc_array_noprof include/linux/slab.h:945 [inline]
+> >   netdev_create_hash net/core/dev.c:11870 [inline]
+> >   netdev_init+0x10c/0x250 net/core/dev.c:11890
+> >   ops_init+0x31e/0x590 net/core/net_namespace.c:138
+> >   setup_net+0x287/0x9e0 net/core/net_namespace.c:362
+> >   copy_net_ns+0x33f/0x570 net/core/net_namespace.c:500
+> >   create_new_namespaces+0x425/0x7b0 kernel/nsproxy.c:110
+> >   unshare_nsproxy_namespaces+0x124/0x180 kernel/nsproxy.c:228
+> >   ksys_unshare+0x57d/0xa70 kernel/fork.c:3314
+> >   __do_sys_unshare kernel/fork.c:3385 [inline]
+> >   __se_sys_unshare kernel/fork.c:3383 [inline]
+> >   __x64_sys_unshare+0x38/0x40 kernel/fork.c:3383
+> >   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> >
+> > Freed by task 12:
+> >   kasan_save_stack mm/kasan/common.c:47 [inline]
+> >   kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+> >   kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:582
+> >   poison_slab_object mm/kasan/common.c:247 [inline]
+> >   __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
+> >   kasan_slab_free include/linux/kasan.h:233 [inline]
+> >   slab_free_hook mm/slub.c:2338 [inline]
+> >   slab_free mm/slub.c:4598 [inline]
+> >   kfree+0x196/0x420 mm/slub.c:4746
+> >   netdev_exit+0x65/0xd0 net/core/dev.c:11992
+> >   ops_exit_list net/core/net_namespace.c:172 [inline]
+> >   cleanup_net+0x802/0xcc0 net/core/net_namespace.c:632
+> >   process_one_work kernel/workqueue.c:3229 [inline]
+> >   process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+> >   worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+> >   kthread+0x2f0/0x390 kernel/kthread.c:389
+> >   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+> >   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> >
+> > The buggy address belongs to the object at ffff888043eba000
+> >  which belongs to the cache kmalloc-2k of size 2048
+> > The buggy address is located 432 bytes inside of
+> >  freed 2048-byte region [ffff888043eba000, ffff888043eba800)
+> >
+> > The buggy address belongs to the physical page:
+> > page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x43=
+eb8
+> > head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+> > flags: 0x4fff00000000040(head|node=3D1|zone=3D1|lastcpupid=3D0x7ff)
+> > page_type: f5(slab)
+> > raw: 04fff00000000040 ffff88801ac42000 dead000000000122 000000000000000=
+0
+> > raw: 0000000000000000 0000000000080008 00000001f5000000 000000000000000=
+0
+> > head: 04fff00000000040 ffff88801ac42000 dead000000000122 00000000000000=
+00
+> > head: 0000000000000000 0000000000080008 00000001f5000000 00000000000000=
+00
+> > head: 04fff00000000003 ffffea00010fae01 ffffffffffffffff 00000000000000=
+00
+> > head: 0000000000000008 0000000000000000 00000000ffffffff 00000000000000=
+00
+> > page dumped because: kasan: bad access detected
+> > page_owner tracks the page as allocated
+> > page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c=
+0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC)=
+, pid 5339, tgid 5338 (syz.0.0), ts 69674195892, free_ts 69663220888
+> >   set_page_owner include/linux/page_owner.h:32 [inline]
+> >   post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1556
+> >   prep_new_page mm/page_alloc.c:1564 [inline]
+> >   get_page_from_freelist+0x3649/0x3790 mm/page_alloc.c:3474
+> >   __alloc_pages_noprof+0x292/0x710 mm/page_alloc.c:4751
+> >   alloc_pages_mpol_noprof+0x3e8/0x680 mm/mempolicy.c:2265
+> >   alloc_slab_page+0x6a/0x140 mm/slub.c:2408
+> >   allocate_slab+0x5a/0x2f0 mm/slub.c:2574
+> >   new_slab mm/slub.c:2627 [inline]
+> >   ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3815
+> >   __slab_alloc+0x58/0xa0 mm/slub.c:3905
+> >   __slab_alloc_node mm/slub.c:3980 [inline]
+> >   slab_alloc_node mm/slub.c:4141 [inline]
+> >   __do_kmalloc_node mm/slub.c:4282 [inline]
+> >   __kmalloc_noprof+0x2e6/0x4c0 mm/slub.c:4295
+> >   kmalloc_noprof include/linux/slab.h:905 [inline]
+> >   sk_prot_alloc+0xe0/0x210 net/core/sock.c:2165
+> >   sk_alloc+0x38/0x370 net/core/sock.c:2218
+> >   __netlink_create+0x65/0x260 net/netlink/af_netlink.c:629
+> >   __netlink_kernel_create+0x174/0x6f0 net/netlink/af_netlink.c:2015
+> >   netlink_kernel_create include/linux/netlink.h:62 [inline]
+> >   uevent_net_init+0xed/0x2d0 lib/kobject_uevent.c:783
+> >   ops_init+0x31e/0x590 net/core/net_namespace.c:138
+> >   setup_net+0x287/0x9e0 net/core/net_namespace.c:362
+> > page last free pid 1032 tgid 1032 stack trace:
+> >   reset_page_owner include/linux/page_owner.h:25 [inline]
+> >   free_pages_prepare mm/page_alloc.c:1127 [inline]
+> >   free_unref_page+0xdf9/0x1140 mm/page_alloc.c:2657
+> >   __slab_free+0x31b/0x3d0 mm/slub.c:4509
+> >   qlink_free mm/kasan/quarantine.c:163 [inline]
+> >   qlist_free_all+0x9a/0x140 mm/kasan/quarantine.c:179
+> >   kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
+> >   __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:329
+> >   kasan_slab_alloc include/linux/kasan.h:250 [inline]
+> >   slab_post_alloc_hook mm/slub.c:4104 [inline]
+> >   slab_alloc_node mm/slub.c:4153 [inline]
+> >   kmem_cache_alloc_node_noprof+0x1d9/0x380 mm/slub.c:4205
+> >   __alloc_skb+0x1c3/0x440 net/core/skbuff.c:668
+> >   alloc_skb include/linux/skbuff.h:1323 [inline]
+> >   alloc_skb_with_frags+0xc3/0x820 net/core/skbuff.c:6612
+> >   sock_alloc_send_pskb+0x91a/0xa60 net/core/sock.c:2881
+> >   sock_alloc_send_skb include/net/sock.h:1797 [inline]
+> >   mld_newpack+0x1c3/0xaf0 net/ipv6/mcast.c:1747
+> >   add_grhead net/ipv6/mcast.c:1850 [inline]
+> >   add_grec+0x1492/0x19a0 net/ipv6/mcast.c:1988
+> >   mld_send_initial_cr+0x228/0x4b0 net/ipv6/mcast.c:2234
+> >   ipv6_mc_dad_complete+0x88/0x490 net/ipv6/mcast.c:2245
+> >   addrconf_dad_completed+0x712/0xcd0 net/ipv6/addrconf.c:4342
+> >  addrconf_dad_work+0xdc2/0x16f0
+> >   process_one_work kernel/workqueue.c:3229 [inline]
+> >   process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+> >
+> > Memory state around the buggy address:
+> >  ffff888043eba080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> >  ffff888043eba100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> > >ffff888043eba180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> >                                      ^
+> >  ffff888043eba200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> >  ffff888043eba280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> >
+> > Fixes: 8c55facecd7a ("net: linkwatch: only report IF_OPER_LOWERLAYERDOW=
+N if iflink is actually down")
+> > Reported-by: syzbot+1939f24bdb783e9e43d9@syzkaller.appspotmail.com
+> > Closes: https://lore.kernel.org/netdev/674f3a18.050a0220.48a03.0041.GAE=
+@google.com/T/#u
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > ---
+> > Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
+> > ---
+> >  net/core/link_watch.c | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/core/link_watch.c b/net/core/link_watch.c
+> > index ab150641142aa1545c71fc5d3b11db33c70cf437..1b4d39e38084272269a5150=
+3c217fc1e5a1326eb 100644
+> > --- a/net/core/link_watch.c
+> > +++ b/net/core/link_watch.c
+> > @@ -45,9 +45,14 @@ static unsigned int default_operstate(const struct n=
+et_device *dev)
+> >               int iflink =3D dev_get_iflink(dev);
+> >               struct net_device *peer;
+> >
+> > -             if (iflink =3D=3D dev->ifindex)
+> > +             /* If called from netdev_run_todo()/linkwatch_sync_dev(),
+> > +              * dev_net(dev) can be already freed, and RTNL is not hel=
+d.
+> > +              */
+> > +             if (dev->reg_state =3D=3D NETREG_UNREGISTERED ||
+> > +                 iflink =3D=3D dev->ifindex)
+> >                       return IF_OPER_DOWN;
+> >
+> > +             ASSERT_RTNL();
+> >               peer =3D __dev_get_by_index(dev_net(dev), iflink);
+> >               if (!peer)
+> >                       return IF_OPER_DOWN;
+> > --
+> > 2.47.0.338.g60cca15819-goog
+> >
+>
+> Thanks for submitting a patch, the issue makes sense.
+>
+> Question: is the rtnl_mutex actually held in the problematic case though?
+> The netdev_run_todo() call path is:
+
+As explained in the comment, RTNL is not held in this case :
+
+ /* If called from netdev_run_todo()/linkwatch_sync_dev(),
+ * dev_net(dev) can be already freed, and RTNL is not held.
+ */
+
+In the future, we might change default_operstate() to use dev_get_by_index_=
+rcu()
+and not rely on RTNL anymore, but after this patch, the ASSERT_RTNL() is fi=
+ne.
+
+
+>
+>         __rtnl_unlock();                                                <=
+- unlocks
+>
+>         /* Wait for rcu callbacks to finish before next phase */
+>         if (!list_empty(&list))
+>                 rcu_barrier();
+>
+>         list_for_each_entry_safe(dev, tmp, &list, todo_list) {
+>                 if (unlikely(dev->reg_state !=3D NETREG_UNREGISTERING)) {
+>                         netdev_WARN(dev, "run_todo but not unregistering\=
+n");
+>                         list_del(&dev->todo_list);
+>                         continue;
+>                 }
+>
+>                 WRITE_ONCE(dev->reg_state, NETREG_UNREGISTERED);
+
+// reg_state is set to NETREG_UNREGISTERING
+
+>                 linkwatch_sync_dev(dev);                                <=
+- asserts
+>         }
+>
+> And on the same note: does linkwatch not have a chance to run also,
+> concurrently with us, in this timeframe? Could we not catch the
+> dev->reg_state in NETREG_UNREGISTERING?
+
+I guess we can add a READ_ONCE() on many dev->reg_state reads.
+
+The race should not matter for linkwatch, if the device is going away.
 
