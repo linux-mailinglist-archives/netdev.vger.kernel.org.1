@@ -1,187 +1,125 @@
-Return-Path: <netdev+bounces-148467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4D079E1C82
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 13:44:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3D7D9E1C6D
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 13:43:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACE39167256
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 12:44:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8C7216090C
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 12:43:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB571EF081;
-	Tue,  3 Dec 2024 12:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3541E767C;
+	Tue,  3 Dec 2024 12:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DjgLOXrJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQygbgL4"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4124F1EBA1F;
-	Tue,  3 Dec 2024 12:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517651E884B
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 12:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733229814; cv=none; b=qlj0DATvUoJ7Phqin2f9HChyE0puLqiHXoNM4/Fm0+7y/IOVyLAVofmJuIsXNdGlJCsw/1JGbc9/4NxD6YXpxSniQuPOiR51in7SnOOIlKV0MIN8tCSXsqSorZCboSDAwAvzHDMQfmNJ/pjwr4aiVqlAS1RtviWPCSBCsXh4ih0=
+	t=1733229803; cv=none; b=VyleOlk7mXkKL4nYi4YR5h4V7LLycKbWn6oAYVsosDAxvPaIYhZVBPrrX56Xneeo4v4m28zun3/KppPsTGssMxEIGlcU7zV74Yxh/NSqSHFQimnAJcB9uYefsW2jbCC14QYILosE/2gGPaxkeU70gK3vjNdAo1ANXTkgWDb4il4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733229814; c=relaxed/simple;
-	bh=PXWKVwl62xApWqTGPi1niBW1XUPtWCc2rqOsNeVxZNg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c/aLzA4HIthNi8xxkjfX9A6x4xDkzKw9rRaYD3slV5+HUfuCfQDbgTrPRmX/BRpYp1zdbLpQoY1xFn7rp0l6vcLcKeKZGxwn8xCUkkWGg3pV79wdBKOCvrf1L12lUvu65+wMyzGhZRQTSlrSEknfeog0JBT3ndG7Gj9GttUJzDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DjgLOXrJ; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CB54EE0011;
-	Tue,  3 Dec 2024 12:43:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1733229810;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ByxFDbRGglRmvQoEikPNit9LKqTEE83lZSIDoiB4oYY=;
-	b=DjgLOXrJNz8TUFxlQiPVdRxGD+WygJSlZGH7UmOjJ4sBiBJlMAstTFRzK6ZbrHo1kmzHRy
-	w68BD114HEYgmHuhxlmHddMvWRI/6qOfvjvCdlz7feOqNBuPo6xDM2zsFUsB9iX1MQLTOf
-	IpIRRgmVV9zs3LeNJvdIjVYemQztcDfFhmODq+9fJE74gwksm/bWjgDS175i2SDUQ+GJaq
-	320OPVfUqAvS1YxRqa4Zj6d4PvOZH5gP2+BMVle4JO8lKoKu3j4T8Nzw5t72mTMZGKETpX
-	VpDp81I1ayXDcZ8bNhNUx9N4/Tng6ZwoEorw+afPNnOWBpShrd/wQB2qe26NxQ==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1733229803; c=relaxed/simple;
+	bh=GzBvztZIsAnA0j805i0Hdlzz/ySCIXvl+SnZ96ohns8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kV9EjVwPhQpl2NAf7v9bxSx2tCSP2vTrLV3xzogmDYXV6DWv7fZU23LtJRLBSMvo+kUCLfGHSAE5lqBOqiQ911e+si03abwCXOGTk1jtoXsVTUqPU8XvZQq8CI0lXFnqPb9O3pqqsGJlkbvwBvwVU8bVWo/Mocq/q6RoJdBcC9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RQygbgL4; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4349c376d4fso5384375e9.0
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 04:43:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733229799; x=1733834599; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KO5UMHTUP1STwabFpZLUivHeu96b1MzdbWV6oLLApyU=;
+        b=RQygbgL4gaJ08eC1mu4QXbapHPzbXx+ucO+RUEVEmGtIz3g0KN30XWz8rxKkc6g8Ul
+         LFSDG8xD0VCBLk3vUWScHKkDJnnmxISmhyrstunkhRvZB1bl0WSsT7bTxE8p0dze7lw/
+         0z/7Ru8mwDFf1yyo4oA6N6M451f62+/9Zyo01wIzGZFA2VGew+JT2O1T1gbC2vtY5v0H
+         sy6tNP1PrTrxyAP2Z6bCwa+DWR3U8n9Kf8CayijhY6Z4OCZcWccLi4Rvgl/hWzcwqk/U
+         3o1YrEKrXfVSLgHNSlaYEiOEn4MYnhk9SRhfw+GV4kb1CBI7QbQGzmIM+dcmh/ZMZ3Z5
+         Uk/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733229799; x=1733834599;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KO5UMHTUP1STwabFpZLUivHeu96b1MzdbWV6oLLApyU=;
+        b=IXBt3O/RgvgKnluzu/OPK+Gwj1ukCoi672X89JZ8cPU+gAA6kX118nw7NQRP1IyiY9
+         hFnA5k9KwyVNc3Om/3PTE/oU2+xRHgSGq1FfLdfypciVTJiYDD9h4XqYBweB0g4SQ6Y4
+         p06aGfzmiAG1obNqzGUzIesDyEkDRUvx6SqnmX8mXE4XOJzLfhRhoi0cxOa4BcKzUmvp
+         lH18xQLYgGqu8SyYX+iMbPqjcoaQGIoc5kmrBsCr2hIwTIDXptJikQngPBvFHSiYAWfX
+         J+33I5nFkmDg6YhCOhBxg1dP4kbWAWuZhcHzApKmzqmjJ2bGG6ewppgQCSgUW5/cpEsp
+         L+yw==
+X-Forwarded-Encrypted: i=1; AJvYcCUcNIQiI1dsyo31ccIf4dVhLwXBqf0P2L1ZwFxXXdS8u+LsVAcmwfcohV/fuUKh9D8bPrd1JcA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzi8yfPOUvMp4gvokqKmd4Ym4KLE3Yk56vTywk9EnKx1C0LA0ae
+	qn1zNcjbLa+PG4MirYFns+DO9w3C6pQAvw8XomVYx+L/P/Ic/y4C
+X-Gm-Gg: ASbGnctK8HB5NhWJ9AZS5RglucSuVmv/EfAlct/KdfNqJDYYsExafngYw/S6X2asAii
+	VJC5BJ7wKLla3dUR+Rg4gOBOHhmLJu7YJ6CT69V3TUMOOQR/5xww7ym78CBfvWCFvUlbOC4pkOG
+	BNfAZskpRlN+bXzGnq1zmMJL2sJlD5mFXcXrH87+CLv02ORhWiU1UjjlTAwdtTSK31yhSw0Sy07
+	j6Fh6+weY5kjcjWnFiywnnQnDKS8nZo4C2/MRc=
+X-Google-Smtp-Source: AGHT+IE179aeoJVF/xJTXzkRB1047Yc+2x9I2LLqIFSxmadH4ORqjZwu6nWQNf71YbSvfXJP3+THmw==
+X-Received: by 2002:a5d:6d02:0:b0:382:41ad:d8e1 with SMTP id ffacd0b85a97d-385fd42b9ddmr804660f8f.14.1733229799249;
+        Tue, 03 Dec 2024 04:43:19 -0800 (PST)
+Received: from skbuf ([188.25.135.117])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e3cbe250sm9875228f8f.94.2024.12.03.04.43.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 04:43:18 -0800 (PST)
+Date: Tue, 3 Dec 2024 14:43:16 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Simon Horman <horms@kernel.org>,
-	Herve Codina <herve.codina@bootlin.com>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH net-next v3 04/10] net: freescale: ucc_geth: Fix WOL configuration
-Date: Tue,  3 Dec 2024 13:43:15 +0100
-Message-ID: <20241203124323.155866-5-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241203124323.155866-1-maxime.chevallier@bootlin.com>
-References: <20241203124323.155866-1-maxime.chevallier@bootlin.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	netdev <netdev@vger.kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next v7 2/9] lib: packing: demote truncation error in
+ pack() to a warning in __pack()
+Message-ID: <20241203124316.er7w64rdkc4nedno@skbuf>
+References: <20241202-packing-pack-fields-and-ice-implementation-v7-0-ed22e38e6c65@intel.com>
+ <20241202-packing-pack-fields-and-ice-implementation-v7-2-ed22e38e6c65@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241202-packing-pack-fields-and-ice-implementation-v7-2-ed22e38e6c65@intel.com>
 
-The get/set_wol ethtool ops rely on querying the PHY for its WoL
-capabilities, checking for the presence of a PHY and a PHY interrupts
-isn't enough. Address that by cleaning up the WoL configuration
-sequence.
+On Mon, Dec 02, 2024 at 04:26:25PM -0800, Jacob Keller wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> 
+> Most of the sanity checks in pack() and unpack() can be covered at
+> compile time. There is only one exception, and that is truncation of the
+> uval during a pack() operation.
+> 
+> We'd like the error-less __pack() to catch that condition as well. But
+> at the same time, it is currently the responsibility of consumer drivers
+> (currently just sja1105) to print anything at all when this error
+> occurs, and then discard the return code.
+> 
+> We can just print a loud warning in the library code and continue with
+> the truncated __pack() operation. In practice, having the warning is
+> very important, see commit 24deec6b9e4a ("net: dsa: sja1105: disallow
+> C45 transactions on the BASE-TX MDIO bus") where the bug was caught
+> exactly by noticing this print.
+> 
+> Add the first print to the packing library, and at the same time remove
+> the print for the same condition from the sja1105 driver, to avoid
+> double printing.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
-V3: No changes
-
- drivers/net/ethernet/freescale/ucc_geth.c     |  4 +--
- drivers/net/ethernet/freescale/ucc_geth.h     |  1 +
- .../net/ethernet/freescale/ucc_geth_ethtool.c | 36 +++++++++++++++----
- 3 files changed, 32 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
-index cc5f9ca42a78..587bcbc079da 100644
---- a/drivers/net/ethernet/freescale/ucc_geth.c
-+++ b/drivers/net/ethernet/freescale/ucc_geth.c
-@@ -3413,11 +3413,11 @@ static int ucc_geth_suspend(struct platform_device *ofdev, pm_message_t state)
- 	 */
- 	ugeth_disable(ugeth, COMM_DIR_RX_AND_TX);
- 
--	if (ugeth->wol_en & WAKE_MAGIC) {
-+	if (ugeth->wol_en & WAKE_MAGIC && !ugeth->phy_wol_en) {
- 		setbits32(ugeth->uccf->p_uccm, UCC_GETH_UCCE_MPD);
- 		setbits32(&ugeth->ug_regs->maccfg2, MACCFG2_MPE);
- 		ucc_fast_enable(ugeth->uccf, COMM_DIR_RX_AND_TX);
--	} else if (!(ugeth->wol_en & WAKE_PHY)) {
-+	} else if (!ugeth->phy_wol_en) {
- 		phy_stop(ndev->phydev);
- 	}
- 
-diff --git a/drivers/net/ethernet/freescale/ucc_geth.h b/drivers/net/ethernet/freescale/ucc_geth.h
-index c08a56b7c9fe..e08cfc8d8904 100644
---- a/drivers/net/ethernet/freescale/ucc_geth.h
-+++ b/drivers/net/ethernet/freescale/ucc_geth.h
-@@ -1217,6 +1217,7 @@ struct ucc_geth_private {
- 	int oldduplex;
- 	int oldlink;
- 	int wol_en;
-+	u32 phy_wol_en;
- 
- 	struct device_node *node;
- };
-diff --git a/drivers/net/ethernet/freescale/ucc_geth_ethtool.c b/drivers/net/ethernet/freescale/ucc_geth_ethtool.c
-index fb5254d7d1ba..89b323ef8145 100644
---- a/drivers/net/ethernet/freescale/ucc_geth_ethtool.c
-+++ b/drivers/net/ethernet/freescale/ucc_geth_ethtool.c
-@@ -346,26 +346,48 @@ static void uec_get_wol(struct net_device *netdev, struct ethtool_wolinfo *wol)
- 	struct ucc_geth_private *ugeth = netdev_priv(netdev);
- 	struct phy_device *phydev = netdev->phydev;
- 
--	if (phydev && phydev->irq)
--		wol->supported |= WAKE_PHY;
-+	wol->supported = 0;
-+	wol->wolopts = 0;
-+
-+	if (phydev)
-+		phy_ethtool_get_wol(phydev, wol);
-+
- 	if (qe_alive_during_sleep())
- 		wol->supported |= WAKE_MAGIC;
- 
--	wol->wolopts = ugeth->wol_en;
-+	wol->wolopts |= ugeth->wol_en;
- }
- 
- static int uec_set_wol(struct net_device *netdev, struct ethtool_wolinfo *wol)
- {
- 	struct ucc_geth_private *ugeth = netdev_priv(netdev);
- 	struct phy_device *phydev = netdev->phydev;
-+	int ret = 0;
- 
--	if (wol->wolopts & ~(WAKE_PHY | WAKE_MAGIC))
--		return -EINVAL;
--	else if (wol->wolopts & WAKE_PHY && (!phydev || !phydev->irq))
-+	if (phydev) {
-+		ret = phy_ethtool_set_wol(phydev, wol);
-+		if (ret == -EOPNOTSUPP) {
-+			ugeth->phy_wol_en = 0;
-+		} else if (ret) {
-+			return ret;
-+		} else {
-+			ugeth->phy_wol_en = wol->wolopts;
-+			goto out;
-+		}
-+	}
-+
-+	/* If the PHY isn't handling the WoL and the MAC is asked to more than
-+	 * WAKE_MAGIC, error-out
-+	 */
-+	if (!ugeth->phy_wol_en &&
-+	    wol->wolopts & ~WAKE_MAGIC)
- 		return -EINVAL;
--	else if (wol->wolopts & WAKE_MAGIC && !qe_alive_during_sleep())
-+
-+	if (wol->wolopts & WAKE_MAGIC &&
-+	    !qe_alive_during_sleep())
- 		return -EINVAL;
- 
-+out:
- 	ugeth->wol_en = wol->wolopts;
- 	device_set_wakeup_enable(&netdev->dev, ugeth->wol_en);
- 
--- 
-2.47.0
-
+Somehow this is missing your sign off.
 
