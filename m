@@ -1,54 +1,58 @@
-Return-Path: <netdev+bounces-148436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04CF59E1A5E
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 12:07:59 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D9FB9E18D8
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 11:08:38 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98318B32545
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:05:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21FE9166B4D
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:08:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363AC1E0B73;
-	Tue,  3 Dec 2024 10:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F2731E0DD3;
+	Tue,  3 Dec 2024 10:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ck5YN/Wq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ml5auETw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125CC15B12F
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 10:05:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022231E0DB8;
+	Tue,  3 Dec 2024 10:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733220320; cv=none; b=KN6gVxDzfG25mUGwrHh01b7f4G3g0Pec0eTY54VYiHBxefumXc7CojBj15ZirJKZOiUoCeas8kLlfXQcgBsv+HZNvIiT4EpYlP5roqaZ93FcUn1HNEymZZrudemjz1UE+MC/f1YVCZ2M62JpVznVgc0oc2q3bZEOtoSeNz+yV4o=
+	t=1733220516; cv=none; b=QkptNFVEhaspdiZGNp7L77SsKe7M6EUvRPgVBj8g6RsW0aF0/B/2wPr/mAIQwN2QImNMf7iGny4rDT7gFc98bharkuWNg/2+iWaEnho033YV52FVOu0EacbcfKLvViO0xMRs8KtPAELlRal2twBEsSJMyA7mP3/vAzMPscic8vI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733220320; c=relaxed/simple;
-	bh=0dyAFi3mgH37ToqffYxIhXQZMaqsvfnhFo8NhpPxFTk=;
+	s=arc-20240116; t=1733220516; c=relaxed/simple;
+	bh=biskAuw/9n5z2nWODeQ36N+1jPZ/rMIU0+Wyd29MGnE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iNW87gqHxlPwOfIce8x2KyIbrIPgwkzO57t/elf6nwx3n5FB4C1mfYxiX6uHzAek6bpdBbV3v1EuNEeactCpwPEorD3t3hUmSnZM7TI+ax7smH9dusIZjAuk5hhyF9RWfZwId/fL8vBbgtsEzq/O+VHzoSy/s+MG7bS9ClVl840=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ck5YN/Wq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0E48C4CECF;
-	Tue,  3 Dec 2024 10:05:17 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=fX4rWN9+8UGxF8jZUjZVUjK1+/9v4Y0mCSFyQD+7z34Pc/rdefE+EtFAWTjNaG7l/TvNHBqDzWzeHSU6pxRbvMo6t02vgljI6TCam8oPFBbeIasJ2pf+Z9nqwDWD3CwkkWwNadR/ja0td5DZ68O50FGDhcrSxrpKTuepz202084=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ml5auETw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B80FC4CECF;
+	Tue,  3 Dec 2024 10:08:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733220318;
-	bh=0dyAFi3mgH37ToqffYxIhXQZMaqsvfnhFo8NhpPxFTk=;
+	s=k20201202; t=1733220515;
+	bh=biskAuw/9n5z2nWODeQ36N+1jPZ/rMIU0+Wyd29MGnE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ck5YN/WqQdVO6zL80YUzgSdv6CxCAAhxn0MB0RySr3lWO6O2ho/MDJkdJOLj4R4FM
-	 20Qclz6EH2DnesIdRQmaAVyJlhAtuj+VneXnt8cN9jOjSDnU3avU6AnrQIfR5u94zb
-	 vTZIcZOYInJNRTxerimHqMufcdLFRug3v+GIuaCeA3spmEnzv1gBD9xMd6oPg1/3uJ
-	 vdLt+yYJl6R20ILeZKh9FMnPAiek2tSR9DBskVkJx3JqUYvBHjApFmwZGllgMnsuop
-	 jqQwjaSecQTbRkpE+FG5Lwt4J28etY9aUi9pKRcBk2+2vSOzPOgQB9UdFFrtQFPeDo
-	 9tFqT2MbOdsRg==
-Date: Tue, 3 Dec 2024 10:05:15 +0000
+	b=Ml5auETwLlj73XKAOZEmN1cc+QJbmB3q2KmYEjQMPpwZihWB8tmGb6ugNq5DIRbD8
+	 XJIkWqluCLqhFl+jQcf8+VqWlF/SOuLz3yPrJiAAeX/qYCEFJm/pe0JetobbsyMhIV
+	 8HN+QYpPwyom7tiN3OzKptUCVVPkFsCwTjhBJpcK2WcFzcEDWECxjbcVtBuFEV3p/T
+	 0K8VTcUeH6Vw6UtA60XkqNY/gw/xgAf3ZnH9JcJpfpUzOwLPFgRB+EUq9Eir1NQWcL
+	 rlc1sAuGT+oQ2XFi6m/gq84UIcjqbULoEtyLw5xasgf2DrgQRI1WmdnzVq0QbBzKG6
+	 b+SDy3pomSlAQ==
+Date: Tue, 3 Dec 2024 10:08:31 +0000
 From: Simon Horman <horms@kernel.org>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-net] ice: fix max values for dpll pin phase adjust
-Message-ID: <20241203100515.GB9361@kernel.org>
-References: <20241120075112.1662138-1-arkadiusz.kubalewski@intel.com>
+To: jiang.kun2@zte.com.cn
+Cc: pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	tu.qiang35@zte.com.cn, xu.xin16@zte.com.cn
+Subject: Re: [PATCH linux-next] netfilter: nf_tables: remove the genmask
+ parameter
+Message-ID: <20241203100831.GC9361@kernel.org>
+References: <20241125202634242hoMPn5q_ViCvJA9BygRYX@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,55 +61,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241120075112.1662138-1-arkadiusz.kubalewski@intel.com>
+In-Reply-To: <20241125202634242hoMPn5q_ViCvJA9BygRYX@zte.com.cn>
 
-On Wed, Nov 20, 2024 at 08:51:12AM +0100, Arkadiusz Kubalewski wrote:
-> Mask admin command returned max phase adjust value for both input and
-> output pins. Only 31 bits are relevant, last released data sheet wrongly
-> points that 32 bits are valid - see [1] 3.2.6.4.1 Get CCU Capabilities
-> Command for reference. Fix of the datasheet itself is in progress.
+On Mon, Nov 25, 2024 at 08:26:34PM +0800, jiang.kun2@zte.com.cn wrote:
+> From: tuqiang <tu.qiang35@zte.com.cn>
 > 
-> Fix the min/max assignment logic, previously the value was wrongly
-> considered as negative value due to most significant bit being set.
-
-Thanks Arkadiusz,
-
-I understand the most-significant-bit issue and see that is addressed
-through the use of ICE_AQC_GET_CGU_MAX_PHASE_ADJ. I also agree that this is
-a fix.
-
-But, although I like simplification afforded ice_dpll_phase_range_set()
-I'm not convinced it is a part of the fix. Does the code behave correctly
-without those changes? If so, I'm wondering if that part should be broken
-out into a separate follow-up patch for iwl.
-
+> The genmask parameter is not used within the nf_tables_addchain function
+>  body. It should be removed to simplify the function parameter list.
 > 
-> Example of previous broken behavior:
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml \
-> --do pin-get --json '{"id":1}'| grep phase-adjust
->  'phase-adjust': 0,
->  'phase-adjust-max': 16723,
->  'phase-adjust-min': -16723,
+> Signed-off-by: tuqiang <tu.qiang35@zte.com.cn>
+> Signed-off-by: Jiang Kun <jiang.kun2@zte.com.cn>
+> Cc: xu xin <xu.xin16@zte.com.cn>
+> Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+> Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> ---
+>  net/netfilter/nf_tables_api.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
 
-I'm curious to know if the values for max and min above are inverted.
-I.e. if, sude to the most-significant-bit issue they are:
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-  'phase-adjust-max': -16723,
-  'phase-adjust-min': 16723,
-
-> 
-> Correct behavior with the fix:
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml \
-> --do pin-get --json '{"id":1}'| grep phase-adjust
->  'phase-adjust': 0,
->  'phase-adjust-max': 2147466925,
->  'phase-adjust-min': -2147466925,
-> 
-> [1] https://cdrdv2.intel.com/v1/dl/getContent/613875?explicitVersion=true
-> 
-> Fixes: 90e1c90750d7 ("ice: dpll: implement phase related callbacks")
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-
-...
 
