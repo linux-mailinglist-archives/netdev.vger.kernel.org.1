@@ -1,138 +1,92 @@
-Return-Path: <netdev+bounces-148589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89A619E278D
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:33:53 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE25F9E2776
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:30:35 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B42F1164CAB
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:30:32 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA681F4283;
+	Tue,  3 Dec 2024 16:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a5OMEQ7e"
+X-Original-To: netdev@vger.kernel.org
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85757B2635A
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:26:21 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76DF1F8AC9;
-	Tue,  3 Dec 2024 16:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ahu4dCmj"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B411F8933
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 16:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DDD1E2613
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 16:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733243176; cv=none; b=mRixpmmjsaX21NEMh43FFOOG5D/kcH5SQurhhJcTN+tEAWxz6A9orUP1/oZIfBOAXsRNTda/jOcilUDph0fSF1ofo7mQmZEaTVKx9W9a1znNkKwjWbSumlZPxWVU+BSBtIRCE1G3gjLdP62LHUuv147ccwVSafQ3lVpjT6s7Tv4=
+	t=1733243432; cv=none; b=F+2vpQkNV+D38EuSUeR540FZJBNWJaIHR1yc1216RfQ5srY4qsbPpUdzygM2+Y1y4ioE/Egwoj25A6wmjJy/5zQNpMQAsGoZd4hOKexoL9MAbju8OG5IcbDjXqA0tqdpp2b+Ha+fbL+vK/2mTDUmGNxcHX5n2m+1yZqR6Wn47o8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733243176; c=relaxed/simple;
-	bh=iKSwEj1QUd4Z6seRbKb5DsDKmOf5JRe9IWTGuEMsE7I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B6Io7pESfK5rSo9iu5O1o5CpERIbumPa3CjCPqKqN/d4+C/nDYuyA3ziT/W6KDzeHuUkicXo0wfX86N75iHbBoD/npfMSEj2DNn00JHDItkkV8s93p528QeDgetUSaEQ3yZbGyd5t4YW/DLKXLWwqbIm5sugq48uIdIKTYCBrrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ahu4dCmj; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-215b45a40d8so13127625ad.1
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 08:26:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1733243175; x=1733847975; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZVMAhkmNKECc/EhK+RjBpCowxBMGNxsxV6VjcSeAbx0=;
-        b=ahu4dCmjkZTiR4ojorbUJBdR+FTcaT24z/zcQ7esS0rdl8zGd/IKd7emi5GUZ5rm9M
-         Pv7LMHSGqj26NLS6rJyR+u9tJDbvh6vuiD/SqCL0isUYFhtYY28Pt9AgzekZjIHX/Gf1
-         rKfEV3EWt4jGXtaCwUTsl+ZPS8DnuJndnNynk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733243175; x=1733847975;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZVMAhkmNKECc/EhK+RjBpCowxBMGNxsxV6VjcSeAbx0=;
-        b=Dh5SOxQJBkge48naVrsEoXfqVAlFpCMxDdQauolhNAyabfF8/MKkFv3P+ZfvgOiHzb
-         C9kLygezywbont6ad42Xv4/JesVn9HF49D/hRBQNCi8tbfEqGxNxuRcLNEEz4OfD413e
-         UTJs14I6effcHfZ6kuWGqiLHcSooERDsiYmvjoUCZvusdzBNDdiRZvRKR9BUtpa/9i9e
-         zGhoA6M2Q+DXkOMCDzvRPMH61MqodeTtEGWjl2J3ZicTEpdRYcO3yif8MFXUQSIdio2y
-         BYcUbX3eONFA/qsP+QrAg8WbeQzHc4DndtzpePMRG01pzkt9j/TVNUCAwPsPjKIfy6/g
-         AfDQ==
-X-Gm-Message-State: AOJu0YyTMwo6qfW2brw9hFERy2W3Vwo8dx9fNXgo0aSJ7iqGHoyI8DZk
-	fzdV/f8RMpWt7Ui7HosBHEi/M4heNX3yl7hFymfrZjL2KFmReSxIO90ZjAvP3cg=
-X-Gm-Gg: ASbGncsRXv9tEerjsE7ko/T4ntV2jd+RGNWBGdr0vPUWQ4XtjqXis0QHBBxWaI1nn3Z
-	KfRB+Re+c9feIc+ejiMfP4htiPARSbQDr51WZ+TAMbcWcWFXHuCF1hEBibKapKOsL9jgjrAFNpY
-	VLBh0QxNajrk+fIOKEH3GUTYJueKEpGj4ASKYEFqqp6+d2xhUzXHBLlRYWHMl+kqaMHxm+JGkPw
-	ewz/xEgzdAIk2cW5K2Ejb7F7+WRj4X3da/5T6FEVQNBUjZsupuTQdgSb0pChzOWEDfkn1yIRSEE
-	JowYZCG7TafPETM+
-X-Google-Smtp-Source: AGHT+IHbJxCIE7dNvn0u2Dahnh6gAzNdniqSXv5Pmp3C2Lyxfg+sQF/aKgavRzPI6bN7e0mY9bjTHQ==
-X-Received: by 2002:a17:902:f686:b0:215:931c:8fa2 with SMTP id d9443c01a7336-215bd104617mr41724185ad.33.1733243174771;
-        Tue, 03 Dec 2024 08:26:14 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215218f479asm96731665ad.41.2024.12.03.08.26.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2024 08:26:14 -0800 (PST)
-Date: Tue, 3 Dec 2024 08:26:11 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
-	kuba@kernel.org, mkarsten@uwaterloo.ca,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] selftests: net: cleanup busy_poller.c
-Message-ID: <Z08xIyc7OcRoEE-C@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Stanislav Fomichev <stfomichev@gmail.com>, netdev@vger.kernel.org,
-	pabeni@redhat.com, edumazet@google.com, kuba@kernel.org,
-	mkarsten@uwaterloo.ca, "David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20241203012838.182522-1-jdamato@fastly.com>
- <Z06T0uZ6422arNue@mini-arch>
+	s=arc-20240116; t=1733243432; c=relaxed/simple;
+	bh=EIGaosgF4l4A0rjBiun5K8DQn+XPkkXDbvMdDDo68gQ=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=S59Ky+r0u4eCE4qc08cBdaN4tlLMw0i90lvC5J9vASCRoflPOfplHPA2Nuzsd7L9jqhKSHyaswcoV+xxMpiIoH8A9GgPdWCG8iJ2z1FSVjZXrtiV8v4kIArh2OGzsEmYrBsgxso6MmpDvM3bd9ShvI2Bp0bHFCvt5KJ4B5krThs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a5OMEQ7e; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733243429;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gp2UWbsujaypn3YJ/W5a3HP57t0RnBZ4OCvRhCFcrFM=;
+	b=a5OMEQ7erepjln1WwsCBkjJzz7b+gb1yZuFw5Z0uBSlc0yaOIaIBkGyL7UAcWjISITtONe
+	d2bPGEVBiCrxO3dTOY/ENgvFxeVxce2iL8sTPJ22UeylEjZVlUpIXAo/A7RS3a4HmFQJVi
+	xMtZsApqJQjG2ua2fgFVLo20rp+o1Ag=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-317-brpRMCOEOH-S2z9SlUva-A-1; Tue,
+ 03 Dec 2024 11:30:25 -0500
+X-MC-Unique: brpRMCOEOH-S2z9SlUva-A-1
+X-Mimecast-MFC-AGG-ID: brpRMCOEOH-S2z9SlUva-A
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4B0AB1955F3F;
+	Tue,  3 Dec 2024 16:30:24 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.48])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 75A4B1956052;
+	Tue,  3 Dec 2024 16:30:23 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <Z0pMLtmaGPPSR3Ea@xiberoa>
+References: <Z0pMLtmaGPPSR3Ea@xiberoa>
+To: Frederik Deweerdt <deweerdt.lkml@gmail.com>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net] splice: do not checksum AF_UNIX sockets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z06T0uZ6422arNue@mini-arch>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <537171.1733243422.1@warthog.procyon.org.uk>
+Date: Tue, 03 Dec 2024 16:30:22 +0000
+Message-ID: <537172.1733243422@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Mon, Dec 02, 2024 at 09:14:58PM -0800, Stanislav Fomichev wrote:
-> On 12/03, Joe Damato wrote:
-> > Fix various integer type conversions by using strtoull and a temporary
-> > variable which is bounds checked before being casted into the
-> > appropriate cfg_* variable for use by the test program.
-> > 
-> > While here, free the strdup'd cfg string for overall hygenie.
-> 
-> Thank you for fixing this! I also saw them this morning after a net-next
-> pull and was about to post... I also see the following (LLVM=1):
-> 
-> busy_poller.c:237:6: warning: variable 'napi_id' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
->   237 |         if (napi_list->obj._present.id)
->       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
-> busy_poller.c:243:38: note: uninitialized use occurs here
->   243 |         netdev_napi_set_req_set_id(set_req, napi_id);
->       |                                             ^~~~~~~
-> busy_poller.c:237:2: note: remove the 'if' if its condition is always true
->   237 |         if (napi_list->obj._present.id)
->       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   238 |                 napi_id = napi_list->obj.id;
->       |                                            ~
->   239 |         else
->       |         ~~~~
->   240 |                 error(1, 0, "napi ID not present?");
->       |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> busy_poller.c:226:18: note: initialize the variable 'napi_id' to silence this warning
->   226 |         uint32_t napi_id;
->       |                         ^
->       |                          = 0
-> 1 warning generated.
-> 
-> Presumably the compiler can't connect that fact that (!preset.id) ->
-> error. So maybe initialize napi_id to 0 to suppress it as well?
+Frederik Deweerdt <deweerdt.lkml@gmail.com> wrote:
 
-Thanks for the report! Can I ask what compiler and version you are
-using so that I can test before reposting?
+> -			if (skb->ip_summed == CHECKSUM_NONE)
+> +			if (skb->ip_summed == CHECKSUM_NONE && skb->sk->sk_family != AF_UNIX)
+>  				skb_splice_csum_page(skb, page, off, part);
+
+Should AF_UNIX set some other CHECKSUM_* constant indicating that the checksum
+is unnecessary?
+
+David
+
 
