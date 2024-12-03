@@ -1,95 +1,109 @@
-Return-Path: <netdev+bounces-148708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B31C49E2F0D
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 23:27:58 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 418E79E2F17
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 23:30:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D209165CE7
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:27:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35777B2A1A7
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3B2207A3E;
-	Tue,  3 Dec 2024 22:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D58209F58;
+	Tue,  3 Dec 2024 22:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UwOopNkR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AJzoTjec"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06E31F890E;
-	Tue,  3 Dec 2024 22:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4F7202F84;
+	Tue,  3 Dec 2024 22:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733264875; cv=none; b=pPVJhOk4cYqjdeGKMfWW8aVVlTHfE4Crjj/v7S78EBkvUAw0itL8naeaEFHxpIvf810CKC1Q9XKMmAzhgisiIO3J2aq61HOrE7shZcgK8RD1dcOLBpEY45MKho/8f37h0jIV/SQMoF/OkHyLR+uA5/34LVhsofxVlRRnNRBfC1s=
+	t=1733264977; cv=none; b=hXq81poE8MoF4hRF+qeSuIbTOZLXdGunKOiPY+ucPhjm8o6x1q1X8XMBLqeid4+j3Z0ldHputaqr4/VIf2KxF/a8FcMGvyK0CnXaytYr9K0/Nk7QD7SQbiGAyfSgQ4UHlYOYyOk1QDs/9j4DTXrTmFlZ1IUaSS2wfvtTzg01gO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733264875; c=relaxed/simple;
-	bh=u4MrMb8pP0ycl910YF+Oe+hHb6ctrhR5zZlQMGqw8Tk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fs9xTb1WE9dBitqYByV09QWqiBWfimF6uyZE+C29Y4MkqYEExI3GWylojocjD1n/6rSKqF89TtNLBWiaRpiY83g7W5+HxsePZMVXKdjAFhEIVoffqhZRh98gIA5HVO2Wa5idy0XeSgPzly6p8EpXYD0wJqpnhkNHMtzgdY01+5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UwOopNkR; arc=none smtp.client-ip=209.85.210.175
+	s=arc-20240116; t=1733264977; c=relaxed/simple;
+	bh=v1NJNp5Tk7wpwinjGLDTU4LArY+PKjGPBb1DekJ1O6g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WAlcCL537VM+zJJ73QSdiGeifHjGx2QL2Fpo6LDnks8TrTarzy1s5SwEKB8Nude1oUtleaykav4ilbsX6OnusNoxNzvUCH83qPfVXmb8yWlk6of4DrI+NrvwOMD5tOswRjGifmAda8gWfx49J8/wvMSk9mVdW0NJLnEk5iPttz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AJzoTjec; arc=none smtp.client-ip=209.85.215.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-724d23df764so5333306b3a.1;
-        Tue, 03 Dec 2024 14:27:53 -0800 (PST)
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7fc99fc2b16so3640148a12.3;
+        Tue, 03 Dec 2024 14:29:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733264873; x=1733869673; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1733264975; x=1733869775; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=E3cL6Sw5bup7Yp4Jpnuubd25iPid2aDxt+wRriORF54=;
-        b=UwOopNkRSKoI4WUhtNGcy4IJUjdK5XbRwZ6IL+FWmcMy1Oa06UEnOuII4sfz9UNx5x
-         7qIHnTFkPHF4WGOcMuG+m4MIUZyyx3P6vjyT/vwhWmtZC7grLokw91HPrEO/e/680CSV
-         8KnwDcT/9W6LiqEPHLpmEPA45KTMRQco4fGA0Qf7qihphdPNQT+f0NiEf2IObaStihUt
-         UZs7cRy+1oF3c2xpv6Crbtqqd9MlZwtvf9OFTpyRubj9qlFHOvipZGGHBZqYquY3L1hc
-         8SOaMOBjDgyudRkpK5oS+60r+Z5BWpx79bR99VLa0PAh/Pgt87m5FivlKUez5tGHc7CI
-         7rfg==
+        bh=kOQqhZdgI8+JB/qh1dFLYIuDBxbHyOD15IWWEIuDAMg=;
+        b=AJzoTjecKLzsoGsVs3OdruKRC90CUVwafnbgu7PrVrxm59H6H8sXzEbWI2r3eosIwD
+         UNZpD83PKMoxrvQH+4tITghcnenoOkEXD+THCVPTNF1W/t4LdYCrYbqG9QRsXgUykQdz
+         5+Z7zfFIkcbUKwOroyUY22bsuw92cp0cXrFAbf7HGMeCW+zDv1wAqK60lwm+2oj5r2mD
+         /uM60E9YFzB7sBhYRhZueLyY95+zbufnaKfYPtYp8Jgw4ol2vzvAFOXYKMVhhYgNBLlA
+         xUPuLEc6weDXNNrhAd5C7uNGGWX08vCnQo+eyV8SN3KLjUVm09gAZYI2Z13YM/xgxghA
+         ZFpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733264873; x=1733869673;
+        d=1e100.net; s=20230601; t=1733264975; x=1733869775;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=E3cL6Sw5bup7Yp4Jpnuubd25iPid2aDxt+wRriORF54=;
-        b=teZuaco0PsVr8kq9wh48S+ItZSVTmKHglgfZCao2X17UJR/5ZvZ5/VA4OARZpjyfM7
-         49QztFTmHZmoIwWtF8BisJjtcFz4Wiicds0fCK98MDUQRtT9R8Fw5Xs+S7a1ssvR52L3
-         t7cISs6R8OifXFJBYZUwUf8n3xz8RyJI6z/pg2kqNZZiSjlNKs0ShBXP+vi8sombs+4U
-         Qee+LWTWwZ0JOnsWyYQCz9fnp7nzYTrnbEiOeTQwSsmCvMKbyIipHEpkBk2u7qP0xCpT
-         rgTt3RsSVhM8ozhd5Lbu9yFQonNo65adNhpFaQHvuvJ2ZCar4wC18Rjs1jpwBqP5DK7e
-         uZmg==
-X-Forwarded-Encrypted: i=1; AJvYcCUrunR488LQcGO9CbuIHAbkBa5FDDaQ8zEq6PieGEXRwU4rui8bFgrSV/W/PPF1h9XwwunbfAKgEAwowF0=@vger.kernel.org, AJvYcCVsxa21frtckD6KvPYfWvPJ/Czwr12x6GtJnY8obUCMXfaU2MWio5B68Ek6rlumsdjfPaANZdR04M9SevK3jo5aB3c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmcH1GHY8l0QgiaDQQcCFTlkvaGteeSV3QGvM5cuiDuH/Q97l7
-	7od+L8NHjA7AwZ2bFGj1xDg1RQ+ycXl9+1ImbPD/nNXV8/s9sSF95vSLX7L7z2c=
-X-Gm-Gg: ASbGncurqbyx0rOlh00TuE0iVSG+Wq9NVYB8UpQs/HQHk+QF1kNt2faUs25TxKYntHL
-	MfbNweqVeDE4RhnfJbLacNIG6TPupxkK9rmIB8AfMIMRPbMNqFSkn8eSjUWMzpVaqMRxkv53VNu
-	H7al5rjd4oj82vI7gLF3f5EU9ePyYQkbgo/nk4cyKj5FElywnLv479rSOqqIQu23RHlhTAR7wJF
-	Ob8omoXMCMuO0YM8WziRupAkQ==
-X-Google-Smtp-Source: AGHT+IGkp54KERaTLBSrOUDh1m6JJksoi0KcqKrWmnQ6FCRgUKOFSjF+PwDj4dKjUYawAtCTh+vHxA==
-X-Received: by 2002:a17:902:f687:b0:215:b9a6:5cb9 with SMTP id d9443c01a7336-215bcfbce83mr51069785ad.5.1733264872732;
-        Tue, 03 Dec 2024 14:27:52 -0800 (PST)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215a04dc249sm35172245ad.203.2024.12.03.14.27.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2024 14:27:52 -0800 (PST)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Kurt Kanzenbach <kurt@linutronix.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+        bh=kOQqhZdgI8+JB/qh1dFLYIuDBxbHyOD15IWWEIuDAMg=;
+        b=HmdPbpFZmnL4K5XnsjHDBNDORVEmtP2aSYNSGedha6xb2eu+x8jrZo438Fil40ao8K
+         jDxjSb5WgFLfFlwsWVXmJhkpDSAE31GClOcpuDW160fyD+abqYzX67kUUN5YowM1gw1j
+         dllnG/EDyLglgYeG7WbCJHDlEHPpin93jAZ590PXscg74cbM70brFgGESCSd0ZwrmB3A
+         sztQrtQllxsbg3knzBnfwFCvRJVNOgoUEUn06n8mgQQFiRdDcMDB5gpdL7AWy+ys52IS
+         8JJYo0MJBnqgRwmfhZqHYOUoHkc2nkbdueUZu/vrsUQDXNVk4Hd4DWAifGfG1kvu0FQF
+         h8Hg==
+X-Forwarded-Encrypted: i=1; AJvYcCUXtSiF3PVCzaxON6xIRx1wnoS7/w0NpMHez67cW/HuqRF5N6aLO1FFlQFt17FF0muYX0ZMe40dNR/P@vger.kernel.org, AJvYcCUbDgDtPpO0yc+ahIjRdmxFn8v73RKNqzBnQKHdRdDiv/prKTrzruRPrbxoraDDcm/XOtSqsrb0wLEHoekIWChe@vger.kernel.org, AJvYcCV2FqhGei1GjJOumGFyh4ZAnHS6Gnao6D7nvYNe57r36iXkYMKXA3x2tF0dKGCNXt7o8sEfXB1ODtmmpHkn@vger.kernel.org, AJvYcCWCFE9p2ccbH3B8Ax2ZxTyXLebOm7imzYMEAZmQQz5HCtYx602b9DeD+ln8uOPo3OeUMT/bDQSt@vger.kernel.org
+X-Gm-Message-State: AOJu0YxObALbq1K+oSVTR2eSE5Obic4RqLeZEuJrs4NdUdfeJ57Fl670
+	UfOITO+PVQCci9It0IqwRDJEqjQu0BIqSuZEz9c5w4VglsQPEtQm
+X-Gm-Gg: ASbGnctaik9TedA87IH+Crb3ICGPWTZnMef4uBV+XmWURhejxlNhPrOH45ITQ1ZmxFW
+	gr8M3SVcKUr0OV4DH5ddLqqwux9kGN2ULIK2nbuBzS0YN3XCE9E+MRgn5qymXfwLkrlf7vSEdqw
+	LNFlyB0shn2TT3/wG+nWroZhexnqH9cvgSAFSx8b3rvXA2EJ8PjXshnZij/nuNMwyyehQNZ59CI
+	uqRWrKkEtK7c/HQy37HB9xtTvyQVvMo3KB291Tad3vZ1F2AAO55yuv5HxpSlQAWlK51NKPIUlMW
+	F1Uwjm3wd0Ajh7SRWA==
+X-Google-Smtp-Source: AGHT+IGvaKP6B5Mct/zhxb1Oq+XpVrniUhSuQiZr/lzz3hOewfIePelGBKpMi3jZHY3N98/XDM2qYQ==
+X-Received: by 2002:a05:6a20:841f:b0:1e0:c5d2:f215 with SMTP id adf61e73a8af0-1e1653b7c37mr6146784637.12.1733264975288;
+        Tue, 03 Dec 2024 14:29:35 -0800 (PST)
+Received: from localhost.localdomain ([240d:0:4a45:1d00:61fb:e21e:f97a:dd9c])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fc9c3b6ee3sm10055175a12.85.2024.12.03.14.29.29
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 03 Dec 2024 14:29:34 -0800 (PST)
+From: Kenjiro Nakayama <nakayamakenjiro@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Chris Snook <chris.snook@gmail.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-kernel@vger.kernel.org (open list),
-	linux-renesas-soc@vger.kernel.org (open list:RENESAS ETHERNET SWITCH DRIVER)
-Subject: [PATCHv4 net-next] net: modernize ioremap in probe
-Date: Tue,  3 Dec 2024 14:27:50 -0800
-Message-ID: <20241203222750.153272-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.47.0
+	Simon Horman <horms@kernel.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Andrea Parri <parri.andrea@gmail.com>,
+	Will Deacon <will@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	David Howells <dhowells@redhat.com>,
+	Jade Alglave <j.alglave@ucl.ac.uk>,
+	Luc Maranget <luc.maranget@inria.fr>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Akira Yokosawa <akiyks@gmail.com>,
+	Daniel Lustig <dlustig@nvidia.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Shuah Khan <shuah@kernel.org>
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	lkmm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	Kenjiro Nakayama <nakayamakenjiro@gmail.com>
+Subject: [PATCH net-next v2] selftests/net: call sendmmsg via udpgso_bench.sh
+Date: Wed,  4 Dec 2024 07:28:44 +0900
+Message-Id: <20241203222843.26983-1-nakayamakenjiro@gmail.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,207 +112,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-resource aquisition and ioremap can be performed in one step.
+Currently, sendmmsg is implemented in udpgso_bench_tx.c,
+but it is not called by any test script.
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
+This patch adds a test for sendmmsg in udpgso_bench.sh.
+This allows for basic API testing and benchmarking
+comparisons with GSO.
+
+Signed-off-by: Kenjiro Nakayama <nakayamakenjiro@gmail.com>
 ---
- v4: reformatted to 100 column limit
- v3: reworded commit message again. Also removed devm_ioremap
- conversions. Even though they use normal resource, they are not
- the same.
- v2: fixed compilation errors on PPC and reworded commit message
- drivers/net/dsa/hirschmann/hellcreek.c          | 17 ++---------------
- drivers/net/ethernet/atheros/ag71xx.c           | 13 +++++--------
- drivers/net/ethernet/broadcom/bcm63xx_enet.c    |  6 ++----
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 11 +++--------
- drivers/net/ethernet/renesas/rswitch.c          |  9 +--------
- drivers/net/ethernet/renesas/rtsn.c             |  9 +--------
- 6 files changed, 14 insertions(+), 51 deletions(-)
+ tools/testing/selftests/net/udpgso_bench.sh | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/dsa/hirschmann/hellcreek.c b/drivers/net/dsa/hirschmann/hellcreek.c
-index 283ec5a6e23c..3a3e34c1d423 100644
---- a/drivers/net/dsa/hirschmann/hellcreek.c
-+++ b/drivers/net/dsa/hirschmann/hellcreek.c
-@@ -1932,7 +1932,6 @@ static int hellcreek_probe(struct platform_device *pdev)
- {
- 	struct device *dev = &pdev->dev;
- 	struct hellcreek *hellcreek;
--	struct resource *res;
- 	int ret, i;
+diff --git a/tools/testing/selftests/net/udpgso_bench.sh b/tools/testing/selftests/net/udpgso_bench.sh
+index 640bc43452fa..88fa1d53ba2b 100755
+--- a/tools/testing/selftests/net/udpgso_bench.sh
++++ b/tools/testing/selftests/net/udpgso_bench.sh
+@@ -92,6 +92,9 @@ run_udp() {
+ 	echo "udp"
+ 	run_in_netns ${args}
  
- 	hellcreek = devm_kzalloc(dev, sizeof(*hellcreek), GFP_KERNEL);
-@@ -1982,23 +1981,11 @@ static int hellcreek_probe(struct platform_device *pdev)
- 
- 	hellcreek->dev = dev;
- 
--	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "tsn");
--	if (!res) {
--		dev_err(dev, "No memory region provided!\n");
--		return -ENODEV;
--	}
--
--	hellcreek->base = devm_ioremap_resource(dev, res);
-+	hellcreek->base = devm_platform_ioremap_resource_byname(pdev, "tsn");
- 	if (IS_ERR(hellcreek->base))
- 		return PTR_ERR(hellcreek->base);
- 
--	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "ptp");
--	if (!res) {
--		dev_err(dev, "No PTP memory region provided!\n");
--		return -ENODEV;
--	}
--
--	hellcreek->ptp_base = devm_ioremap_resource(dev, res);
-+	hellcreek->ptp_base = devm_platform_ioremap_resource_byname(pdev, "ptp");
- 	if (IS_ERR(hellcreek->ptp_base))
- 		return PTR_ERR(hellcreek->ptp_base);
- 
-diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
-index 3d4c3d8698e2..928d27b51b2a 100644
---- a/drivers/net/ethernet/atheros/ag71xx.c
-+++ b/drivers/net/ethernet/atheros/ag71xx.c
-@@ -1798,15 +1798,16 @@ static int ag71xx_probe(struct platform_device *pdev)
- 	if (!ndev)
- 		return -ENOMEM;
- 
--	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--	if (!res)
--		return -EINVAL;
--
- 	dcfg = of_device_get_match_data(&pdev->dev);
- 	if (!dcfg)
- 		return -EINVAL;
- 
- 	ag = netdev_priv(ndev);
++	echo "udp sendmmsg"
++	run_in_netns ${args} -m
 +
-+	ag->mac_base = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
-+	if (IS_ERR(ag->mac_base))
-+		return PTR_ERR(ag->mac_base);
-+
- 	ag->mac_idx = -1;
- 	for (i = 0; i < ARRAY_SIZE(ar71xx_addr_ar7100); i++) {
- 		if (ar71xx_addr_ar7100[i] == res->start)
-@@ -1836,10 +1837,6 @@ static int ag71xx_probe(struct platform_device *pdev)
- 		return dev_err_probe(&pdev->dev, PTR_ERR(ag->mac_reset),
- 				     "missing mac reset");
+ 	echo "udp gso"
+ 	run_in_netns ${args} -S 0
  
--	ag->mac_base = devm_ioremap_resource(&pdev->dev, res);
--	if (IS_ERR(ag->mac_base))
--		return PTR_ERR(ag->mac_base);
--
- 	/* ensure that HW is in manual polling mode before interrupts are
- 	 * activated. Otherwise ag71xx_interrupt might call napi_schedule
- 	 * before it is initialized by netif_napi_add.
-diff --git a/drivers/net/ethernet/broadcom/bcm63xx_enet.c b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
-index 65e3a0656a4c..420317abe3d2 100644
---- a/drivers/net/ethernet/broadcom/bcm63xx_enet.c
-+++ b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
-@@ -2646,16 +2646,14 @@ static int bcm_enetsw_probe(struct platform_device *pdev)
- 	struct bcm_enet_priv *priv;
- 	struct net_device *dev;
- 	struct bcm63xx_enetsw_platform_data *pd;
--	struct resource *res_mem;
- 	int ret, irq_rx, irq_tx;
- 
- 	if (!bcm_enet_shared_base[0])
- 		return -EPROBE_DEFER;
- 
--	res_mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	irq_rx = platform_get_irq(pdev, 0);
- 	irq_tx = platform_get_irq(pdev, 1);
--	if (!res_mem || irq_rx < 0)
-+	if (irq_rx < 0)
- 		return -ENODEV;
- 
- 	dev = alloc_etherdev(sizeof(*priv));
-@@ -2688,7 +2686,7 @@ static int bcm_enetsw_probe(struct platform_device *pdev)
- 	if (ret)
- 		goto out;
- 
--	priv->base = devm_ioremap_resource(&pdev->dev, res_mem);
-+	priv->base = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(priv->base)) {
- 		ret = PTR_ERR(priv->base);
- 		goto out;
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index 571631a30320..af9291574931 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -7425,21 +7425,16 @@ static int mvpp2_init(struct platform_device *pdev, struct mvpp2 *priv)
- static int mvpp2_get_sram(struct platform_device *pdev,
- 			  struct mvpp2 *priv)
- {
--	struct resource *res;
- 	void __iomem *base;
- 
--	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
--	if (!res) {
-+	base = devm_platform_ioremap_resource(pdev, 2);
-+	if (IS_ERR(base)) {
- 		if (has_acpi_companion(&pdev->dev))
- 			dev_warn(&pdev->dev, "ACPI is too old, Flow control not supported\n");
- 		else
- 			dev_warn(&pdev->dev, "DT is too old, Flow control not supported\n");
--		return 0;
--	}
--
--	base = devm_ioremap_resource(&pdev->dev, res);
--	if (IS_ERR(base))
- 		return PTR_ERR(base);
-+	}
- 
- 	priv->cm3_base = base;
- 	return 0;
-diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index 8d18dae4d8fb..8ef52fc46a01 100644
---- a/drivers/net/ethernet/renesas/rswitch.c
-+++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -2046,15 +2046,8 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
- {
- 	const struct soc_device_attribute *attr;
- 	struct rswitch_private *priv;
--	struct resource *res;
- 	int ret;
- 
--	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "secure_base");
--	if (!res) {
--		dev_err(&pdev->dev, "invalid resource\n");
--		return -EINVAL;
--	}
--
- 	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
- 	if (!priv)
- 		return -ENOMEM;
-@@ -2074,7 +2067,7 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
- 
- 	platform_set_drvdata(pdev, priv);
- 	priv->pdev = pdev;
--	priv->addr = devm_ioremap_resource(&pdev->dev, res);
-+	priv->addr = devm_platform_ioremap_resource_byname(pdev, "secure_base");
- 	if (IS_ERR(priv->addr))
- 		return PTR_ERR(priv->addr);
- 
-diff --git a/drivers/net/ethernet/renesas/rtsn.c b/drivers/net/ethernet/renesas/rtsn.c
-index 6b3f7fca8d15..6a2e9a9cef25 100644
---- a/drivers/net/ethernet/renesas/rtsn.c
-+++ b/drivers/net/ethernet/renesas/rtsn.c
-@@ -1297,14 +1297,7 @@ static int rtsn_probe(struct platform_device *pdev)
- 	ndev->netdev_ops = &rtsn_netdev_ops;
- 	ndev->ethtool_ops = &rtsn_ethtool_ops;
- 
--	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "gptp");
--	if (!res) {
--		dev_err(&pdev->dev, "Can't find gptp resource\n");
--		ret = -EINVAL;
--		goto error_free;
--	}
--
--	priv->ptp_priv->addr = devm_ioremap_resource(&pdev->dev, res);
-+	priv->ptp_priv->addr = devm_platform_ioremap_resource_byname(pdev, "gptp");
- 	if (IS_ERR(priv->ptp_priv->addr)) {
- 		ret = PTR_ERR(priv->ptp_priv->addr);
- 		goto error_free;
 -- 
-2.47.0
+2.39.3 (Apple Git-146)
 
 
