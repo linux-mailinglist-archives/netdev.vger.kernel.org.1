@@ -1,80 +1,148 @@
-Return-Path: <netdev+bounces-148332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4D589E1224
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 04:59:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4C229E1267
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 05:26:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A391280C42
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 03:59:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 436D3B21EB6
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 04:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6053E15B0FE;
-	Tue,  3 Dec 2024 03:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42041146A69;
+	Tue,  3 Dec 2024 04:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E32niqTd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DtleUhES"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC661547CF
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 03:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C886D2BD1D;
+	Tue,  3 Dec 2024 04:26:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733198366; cv=none; b=jdokkDDTR2qdotJkUO2HVc72U8UEw8oxHjkX5AtnRzd1DJwyNzYjtVigd8vXb+ovtRc1L5310JL0cHKdOGXwVPW7zsm6jJdNFYqC8q6strcR3FWetWwJ929y4cpMinov3u+qqioMmDPE+Q54YFpn4FOaEETy8op0CJsnYeA84Ro=
+	t=1733200003; cv=none; b=bxxqikP+0D/9zPW8/DSRI6y8MUKn5e3YzwjV2MiWCZTKJ2/i1QHabC5JCd4fNp0WPPBwg0uMbXp04o92AIjHYGRtYTwtKtWGtL+yNG7HqE9H8pIlTD2hlTrrszCJ3GC8YSK3b0lv57FbhuN0v+jA12SAgZ//m99T/gtSOQ/D9+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733198366; c=relaxed/simple;
-	bh=E5kAmUlOGo0Te27AvXBJ5obE77Xf78EDp8dYpTq86DM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oBNiwH/1/G4Js8XYTiv5bNfa86zsUa9Z4xK/3yZqljZKIxg+RvtkONIyPsx+N1fqiZW+idDf6271uNwFsrV3rcx8a2mfEKjYEgIBmJtThay1zjilNrj+gRUdUoByA4ZziJCQ7VXZVD3e2C9VyhFIxkdVVq23GkITUW6wyspR4BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E32niqTd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FE5EC4CECF;
-	Tue,  3 Dec 2024 03:59:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733198365;
-	bh=E5kAmUlOGo0Te27AvXBJ5obE77Xf78EDp8dYpTq86DM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=E32niqTdueZvnoGE2OG1Kh3ji/KozVQj6Rv923gzyuvXX5yxcbCoHRxEqBdgVo7Lw
-	 ZvWo+LKRjNLMopyBZQ3JGZHeQkIiHgcxc2sVicZ+F5LZmjKGvDqte1C6ZeAJZ0pW1R
-	 v7nVTCoBJqsuwEh8X5wyMPokp1ftNPTbChTXKUJ7uoosAEjIuRqwZnprD7ChPgbtVX
-	 GD2wi6al8AOXI8zuMTak7y0qpvl7Pu2miOGwrAUFjElEHu7ZA5Xg7RqpxgbZTMtaHw
-	 wfyCv1t5BCrWC3O4J5ZazExFqp4StsV5o7G8Z1qfQoML116W7bYQ2de/dA1mynQfKR
-	 GnF1kxWca2/eQ==
-Date: Mon, 2 Dec 2024 19:59:24 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, Simon Horman
- <horms@kernel.org>, David Ahern <dsahern@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net-next 1/4] vrf: Make pcpu_dstats update functions
- available to other modules.
-Message-ID: <20241202195924.30affd25@kernel.org>
-In-Reply-To: <5e97f1e54e57b0a85e34af87062dc536a28bef34.1733175419.git.gnault@redhat.com>
-References: <cover.1733175419.git.gnault@redhat.com>
-	<5e97f1e54e57b0a85e34af87062dc536a28bef34.1733175419.git.gnault@redhat.com>
+	s=arc-20240116; t=1733200003; c=relaxed/simple;
+	bh=K1Vu1L0HLzL1ggJymF4GIWCvoKHTnpnZvrRz8i5oRc0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=f7Kjc2jhquRNdlg8yi94KRvMCE6fGWRcWygBYp/Mk3JW0f35BxYuEzmE2F7XzV6g72C1MlzRFbKmfA4Jmw9eada2D+NoQ1h030kJ14ZcFmz+THdVwVr0g/b045xaML20jOdiAmouQqC0HAW6aIGGl5SIbVcPh1NLh6esuJJPs0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DtleUhES; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2154d8df140so4299075ad.3;
+        Mon, 02 Dec 2024 20:26:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733200001; x=1733804801; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yt0eqAzlepSF0XS40uHuceUpxcC/1vIW2KGLShCrnRY=;
+        b=DtleUhESofzrT3BGzACLMRtZIEdUNCq3p0DH55Wo0bnjIJpckV+XyysCWZFyEa3bmq
+         UArQfXQXT+IbcNYrAyFSG0wDjWhtCsQEqackF47Wgqk7IaNw63zfxoO6rKjzUftDZxTT
+         dNgAXSOG9zZfA6B58OeHSAKmHggd2x/JY4RIlMCtig1w7JA4X4E1GbhOJ/9Pn/viRg1k
+         50m9xZMEX6aY3ZBnvNBz9stbMJiwES/jcEoZRp/Z4inOxAL0q0awPgX6sXSVO2qxE2X3
+         0c+wJxUpYIQB/wx9K0uAaw0I5lWtaX6Tm342DCjsP7dZIf0Bm27WZx/CtXTaNuQqZt74
+         yLIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733200001; x=1733804801;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yt0eqAzlepSF0XS40uHuceUpxcC/1vIW2KGLShCrnRY=;
+        b=QGHzk9KUUEaZM+q9Qxd7cMiQh6eIJxcUTC/P+OoFvR8CzkmAcidS5Ljoa58B1DfDZH
+         dgdHcl0NW2hAJMlxjxHMn5ADBW5qm4aoaxw2xJH2dGDnZ3jUghTpnJEXlQYh9XmUUd6c
+         fXfZp/OI8BZY/aVWzeZagtIpQE5DFAeF0xkjTqSlQMlH++ThMQKVCDznhWbevyVsUPXy
+         rHq097LLD8CvIdTdUF+NXkXSjj+5qXjNPZ+n8aZjldN+/ZqsSwzAfgp0rLiwNTtJnzKd
+         2FRKPMzpVLvfQ0pM9992BKFL7A3RgcKZd3wZ+mSDPJoCMTX0gCRYM6Anxt/nBWrqS7Gw
+         gddw==
+X-Forwarded-Encrypted: i=1; AJvYcCUNceRUeA4FkbOwsnLMhwFpp8nQ05xYCHwy/z+CL6yd62Agf64pmwtIMf2Glf2xexuh99Fu+o+K@vger.kernel.org, AJvYcCUtRygQRLYzQMKo9LcTlHs8C98n9MJwdC3UTg1UA4ipYfuQ/TKMWBSIYlTVbdo8ml2qMc1s9og1ymsSyoE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+wdYz5gKVZi63LXH8rGbonbDiP10lYa1cHUbO4sX3s51Hdukx
+	hg955+l/vt66ZBU4OUULZC6Q/6zOLYbXiT/Rj/bmPoiimn08+ScGz38lq5/Rt9G+lw==
+X-Gm-Gg: ASbGncsAJtI2K7FMtud1/l16wk6d++aIp0ErX3+u+mDbFSLGK4v5SNHm9PXTZ6yJIbF
+	NbiqE1SvfPIsgHXTr1sFA6vIRg2u/JPl9+j9Id6Xt6YjEOB1CBs8PtAakyVAv6a+r/gjaJZ8fL8
+	0ZpNn3OYIlMQbe1pZ/5MlsrXHiS9LEqInDJpcS7ceHLTOaiRMZBgrbdDiFKVcenVhpGBzLnQskH
+	koIV5FAQsXc9rokJtXyvAUqVuMS23mT45FfiP5OpsOlbausUs9tCRgBEAuR
+X-Google-Smtp-Source: AGHT+IE3nK/M7cJqpQVJlVYGk8slh7WMLKkCFhcvzABTJpf+voMAAc8Q5Kx3WUuAbOVvTgny1XeiXA==
+X-Received: by 2002:a17:902:f607:b0:20c:c482:1d6d with SMTP id d9443c01a7336-215bfb0c0aamr4082105ad.8.1733200001049;
+        Mon, 02 Dec 2024 20:26:41 -0800 (PST)
+Received: from nas-server.i.2e4.me ([156.251.176.191])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-725417fbf52sm9365311b3a.119.2024.12.02.20.26.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Dec 2024 20:26:40 -0800 (PST)
+From: Zhiyuan Wan <kmlinuxm@gmail.com>
+To: andrew@lunn.ch
+Cc: kuba@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	willy.liu@realtek.com,
+	Zhiyuan Wan <kmlinuxm@gmail.com>,
+	Yuki Lee <febrieac@outlook.com>
+Subject: [PATCH v3 1/2] net: phy: realtek: disable broadcast address feature of rtl8211f
+Date: Tue,  3 Dec 2024 12:26:31 +0800
+Message-Id: <20241203042631.2061737-1-kmlinuxm@gmail.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <cb8b5a36-fe5c-4b10-ac28-5f31f95262ab@lunn.ch>
+References: <cb8b5a36-fe5c-4b10-ac28-5f31f95262ab@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Mon, 2 Dec 2024 22:48:48 +0100 Guillaume Nault wrote:
-> -	int len = skb->len;
->  	netdev_tx_t ret = is_ip_tx_frame(skb, dev);
-> +	unsigned int len = skb->len;
+This feature is enabled defaultly after a reset of this transceiver.
+When this feature is enabled, the phy not only responds to the
+configuration PHY address by pin states on board, but also responds
+to address 0, the optional broadcast address of the MDIO bus.
 
-You can't reorder skb->len init after is_ip_tx_frame().
-IDK what is_ stands for but that function xmits / frees the skb.
+But some MDIO device like mt7530 switch chip (integrated in mt7621
+SoC), also use address 0 to configure a specific port, when use
+mt7530 and rtl8211f together, it usually causes address conflict,
+leads to the port of RTL8211FS stops working.
 
-You're already making this code cleaner, let's take another step
-forward and move that call out of line. Complex functions should not 
-be called as part of variable init IMHO. It makes the code harder to
-read at best and error prone at worst..
+This patch disables broadcast address feature of rtl8211f, and
+returns -ENODEV if using broadcast address (0) as phy address.
+
+Reviewed-by: Yuki Lee <febrieac@outlook.com>
+Signed-off-by: Zhiyuan Wan <kmlinuxm@gmail.com>
+---
+ drivers/net/phy/realtek.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index f65d7f1f3..8a38b02ad 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -31,6 +31,7 @@
+ #define RTL8211F_PHYCR1				0x18
+ #define RTL8211F_PHYCR2				0x19
+ #define RTL8211F_INSR				0x1d
++#define RTL8211F_PHYAD0_EN			BIT(13)
+ 
+ #define RTL8211F_LEDCR				0x10
+ #define RTL8211F_LEDCR_MODE			BIT(15)
+@@ -139,6 +140,17 @@ static int rtl821x_probe(struct phy_device *phydev)
+ 		return dev_err_probe(dev, PTR_ERR(priv->clk),
+ 				     "failed to get phy clock\n");
+ 
++	dev_dbg(dev, "disabling MDIO address 0 for this phy");
++	ret = phy_modify_paged_changed(phydev, 0xa43, RTL8211F_PHYCR1,
++				       RTL8211F_PHYAD0_EN, 0);
++	if (ret < 0) {
++		dev_err(dev, "disabling MDIO address 0 failed: %pe\n",
++			ERR_PTR(ret));
++	}
++	/* Don't allow using broadcast address as PHY address */
++	if (phydev->mdio.addr == 0)
++		return -ENODEV;
++
+ 	ret = phy_read_paged(phydev, 0xa43, RTL8211F_PHYCR1);
+ 	if (ret < 0)
+ 		return ret;
 -- 
-pw-bot: cr
+2.30.2
+
 
