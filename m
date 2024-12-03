@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-148607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F29429E298E
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:41:01 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 663CB9E2991
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:41:22 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0EF71688BB
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:40:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2994C284097
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:41:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118561FBEA5;
-	Tue,  3 Dec 2024 17:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80BA11FCFD8;
+	Tue,  3 Dec 2024 17:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AVNnOntV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oJrLjLQo"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280EC1FAC51;
-	Tue,  3 Dec 2024 17:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843501FC7DD;
+	Tue,  3 Dec 2024 17:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733247651; cv=none; b=IPfsUpVPLATaEqwXTaSvpuq9UMdcY0H42p3Kbhuc0qsJfRYuGRzYWgeFtqjbgJOz1hu6gmrUiAc1KGl9oQD0KxnKx09aiPg5PHhm8zpTjCMn8sky4rqT83OFPQqqrrQkBdfwwvzRgPiWGDDj04lkhJ4T9JROQvOr/vKqOwd6O5I=
+	t=1733247655; cv=none; b=dQskJyZnje99JqUwv3+fVxmeSrugGkt0uMcY3YZr40d8zDl/OZ13sBAGFB9MOxyq1U559h5wSZRr5NqABRCqFiU+5ugyJDihzDSQhsrOzZImwX6X/alCQ36DJ5qNqCPyvFvEsQJdp+SWci2aGbWJnnGCoXaSEMup2vyW/tZiTS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733247651; c=relaxed/simple;
-	bh=5f8V0ViCWSwHPKr9N1Ee9MvOVQtipiD141WC9doMRfs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=odpbwVu0Nt4Cj5bozIlHnMTy5IYuGG6Ogru5x1yYXyfvlpsLTOxU3ObiSp8eiI72kwk0O74p3D10dUMob9bwD9AcYyAjh28qVTwDNSRVdh7MdjSnOmmzQO7jAXLtfUwTcvtz68loXUA8ApSDkIPy56nBLYTzd9OuJOQ5QBHX8u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AVNnOntV; arc=none smtp.client-ip=198.175.65.15
+	s=arc-20240116; t=1733247655; c=relaxed/simple;
+	bh=hCXkJobN9Y7lj3B9E3KE7PpBF8wrRPXTUlkmt82YSlU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=czkCeKtj84UAFccOhgdAw/NHR1CWJ995r2xyJABFKH0Fj/nuI9yWVWzi1YrdycBOnPmrSIiJ3+o4xrjPzkzr4qEpeSxbI1XQh4ZMep9tH+vK2T7rU28oM/+JJ3kLRy7EmlL1kj/n4LpyaEVn639w8XprTX9CDdhhFOkCAcu8zOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oJrLjLQo; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733247651; x=1764783651;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=5f8V0ViCWSwHPKr9N1Ee9MvOVQtipiD141WC9doMRfs=;
-  b=AVNnOntV90hiZXOqX2mMQps7nFFfPsr4CZQZ02V+Jtc3frAlTu3fbtHL
-   8e4jSxPaVM0p+XUA2diEZgQ3x9NNb8/lAiJroS24espMJ/ARSoZBvUZj1
-   37cDDra1GJUN49Moh/ibskq9DnqJLX+aceYIgMWwOlZx2D8IFeZWKYEVq
-   yczEzDCNSyf5FLuUO9dYeNNoGVcnO+y8RdWRZ41cxC8fXmIr+Se0tDmtp
-   fbnSW0Rvr5s1ChtVHsoxkHOVPjGIgNwCiyM7Fqx7LvbuC+OuGKYMScAg4
-   703Btoti6Bh1a4IEN34A+k2ZMmtYI/0SBeEDKjjvoMnpau9VQa8hZJKes
-   w==;
-X-CSE-ConnectionGUID: mNeqAZu1Tsub2Uf8JAfkUw==
-X-CSE-MsgGUID: LSUlTI4xQkqs8dmZ791XBg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11275"; a="37135271"
+  t=1733247654; x=1764783654;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=hCXkJobN9Y7lj3B9E3KE7PpBF8wrRPXTUlkmt82YSlU=;
+  b=oJrLjLQouqhbXG5pbCwaANacmYYubsnV/Vg2MY7FSYav0WBxXkmps8S+
+   Yk46Z3zeV7jJteSmmTyck3nDym8ZgCG3u2WVvdGCaJFnSq9Y7oj2+PG75
+   RLZ4W1W7Gg/Fc1XS6zZXouEOQ1/69Uk7Iu8t8FFK6J5TLXyp79NscHszh
+   KI6ffpnsXTbCAVtTTxCGamUGwCMhB+wwulX3UldYqK+MgRhLN7t0jhqma
+   UDxbRdA0GxNsaCeFf5X47k4WNWpz/HV3s7oFg8mYmiVUwlRJz9iPVovC3
+   ZNfHZRdeX9HKAUY0cwvlMM5yGC8krAJOqQsW04mYKZiAbx2aqTenMuu+b
+   Q==;
+X-CSE-ConnectionGUID: TKZ60ukqSiylW41U3ibCxw==
+X-CSE-MsgGUID: oC7JNdkgRQKvMB0Gq185xA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11275"; a="37135281"
 X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="37135271"
+   d="scan'208";a="37135281"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 09:40:50 -0800
-X-CSE-ConnectionGUID: y/5LGjzMRACcXQoC2TjPLg==
-X-CSE-MsgGUID: n7FXlJYgTGGlQccDcgKKoQ==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 09:40:54 -0800
+X-CSE-ConnectionGUID: 2zrK6qLoQauoxzNv2bxOLg==
+X-CSE-MsgGUID: 7WiInC6lQbG5Jr+sYX/tZg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="124336982"
+   d="scan'208";a="124336996"
 Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa002.jf.intel.com with ESMTP; 03 Dec 2024 09:40:46 -0800
+  by orviesa002.jf.intel.com with ESMTP; 03 Dec 2024 09:40:50 -0800
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 To: Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
@@ -75,118 +76,50 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v6 00/10] xdp: a fistful of generic changes pt. I
-Date: Tue,  3 Dec 2024 18:37:23 +0100
-Message-ID: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
+Subject: [PATCH net-next v6 01/10] xsk: align &xdp_buff_xsk harder
+Date: Tue,  3 Dec 2024 18:37:24 +0100
+Message-ID: <20241203173733.3181246-2-aleksander.lobakin@intel.com>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
+References: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-XDP for idpf is currently 6 chapters:
-* convert Rx to libeth;
-* convert Tx and stats to libeth;
-* generic XDP and XSk code changes (you are here);
-* generic XDP and XSk code additions;
-* actual XDP for idpf via new libeth_xdp;
-* XSk for idpf (via ^).
+After the series "XSk buff on a diet" by Maciej, the greatest pow-2
+which &xdp_buff_xsk can be divided got reduced from 16 to 8 on x86_64.
+Also, sizeof(xdp_buff_xsk) now is 120 bytes, which, taking the previous
+sentence into account, leads to that it leaves 8 bytes at the end of
+cacheline, which means an array of buffs will have its elements
+messed between the cachelines chaotically.
+Use __aligned_largest for this struct. This alignment is usually 16
+bytes, which makes it fill two full cachelines and align an array
+nicely. ___cacheline_aligned may be excessive here, especially on
+arches with 128-256 byte CLs, as well as 32-bit arches (76 -> 96
+bytes on MIPS32R2), while not doing better than _largest.
 
-Part III does the following:
-* improve &xdp_buff_xsk cacheline placement;
-* does some cleanups with marking read-only bpf_prog and xdp_buff
-  arguments const for some generic functions;
-* allows attaching already registered XDP memory model to RxQ info;
-* makes system percpu page_pools valid XDP memory models;
-* starts using netmems in the XDP core code (1 function);
-* allows mixing pages from several page_pools within one XDP frame;
-* optimizes &xdp_frame layout and removes no-more-used field.
-
-Bullets 4-6 are the most important ones. All of them are prereqs to
-libeth_xdp.
-
-Alexander Lobakin (9):
-  xsk: align &xdp_buff_xsk harder
-  bpf, xdp: constify some bpf_prog * function arguments
-  xdp, xsk: constify read-only arguments of some static inline helpers
-  xdp: allow attaching already registered memory model to xdp_rxq_info
-  xsk: allow attaching XSk pool via xdp_rxq_info_reg_mem_model()
-  netmem: add a couple of page helper wrappers
-  page_pool: make page_pool_put_page_bulk() handle array of netmems
-  page_pool: allow mixing PPs within one bulk
-  xdp: get rid of xdp_frame::mem.id
-
-Toke Høiland-Jørgensen (1):
-  xdp: register system page pool as an XDP memory model
-
- include/net/page_pool/types.h                 |   6 +-
- include/linux/bpf.h                           |  12 +-
- include/linux/filter.h                        |   9 +-
- include/linux/netdevice.h                     |   7 +-
- include/linux/skbuff.h                        |   2 +-
- include/net/netmem.h                          |  78 +++++++++++-
- include/net/xdp.h                             |  93 ++++++++++----
- include/net/xdp_sock_drv.h                    |  11 +-
- include/net/xsk_buff_pool.h                   |   4 +-
- .../net/ethernet/freescale/dpaa/dpaa_eth.c    |   2 +-
- drivers/net/veth.c                            |   4 +-
- kernel/bpf/cpumap.c                           |   2 +-
- kernel/bpf/devmap.c                           |   8 +-
- net/bpf/test_run.c                            |   4 +-
- net/core/dev.c                                |  20 ++-
- net/core/filter.c                             |  41 +++---
- net/core/page_pool.c                          |  79 ++++++++----
- net/core/skbuff.c                             |   2 +-
- net/core/xdp.c                                | 118 +++++++++++-------
- 19 files changed, 348 insertions(+), 154 deletions(-)
-
+Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
-From v5[0]:
-* split the overgrowth series into 2 parts: changes and additions
-  (Jakub);
-* 008: future-proof: make the touched function MP-agnostic to avoid
-  double work in future;
-* send to better fitting now bpf instead of netdev.
+ include/net/xsk_buff_pool.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-From v4[1]:
-* 12: pick RB from Toke;
-* 19: drop redundant ';'s (Jakub);
-* 19: fix a couple context imbalance warnings by moving __acquires() /
-  __releases() to the proper place (smatch);
-* no functional changes.
-
-From v3[2]:
-* rebase on top of the latest net-next to solve conflict (Jakub);
-* 09: use iterative approach instead of recursive to not blow the stack
-  (Toke);
-* 12: rephrase the commitmsg since the functionality changed, so that
-  it's not actual anymore (Toke);
-* align &xdp_buff_xsk a bit harder since its alignment degraded
-  recently;
-* pick RBs from Toke.
-
-From v2[3]:
-* cover: rename the series;
-* collect RBs and Acks from Maciej;
-* 007: reword the commitmsg;
-* 011: fix typos in the commitmsg (M);
-* 012: 'ts' -> 'tsize' (M; not 'truesize' to fit into 80 cols =\);
-* 016: fix the intro sentence (M);
-* no functional changes.
-
-From v1[4]:
-* rebase on top of the latest net-next;
-* no other changes.
-
-[0] https://lore.kernel.org/netdev/20241113152442.4000468-1-aleksander.lobakin@intel.com
-[1] https://lore.kernel.org/netdev/20241107161026.2903044-1-aleksander.lobakin@intel.com
-[2] https://lore.kernel.org/netdev/20241030165201.442301-1-aleksander.lobakin@intel.com
-[3] https://lore.kernel.org/netdev/20241015145350.4077765-1-aleksander.lobakin@intel.com
-[4] https://lore.kernel.org/netdev/20241009152756.3113697-1-aleksander.lobakin@intel.com
+diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
+index bb03cee716b3..7637799b6c19 100644
+--- a/include/net/xsk_buff_pool.h
++++ b/include/net/xsk_buff_pool.h
+@@ -29,7 +29,7 @@ struct xdp_buff_xsk {
+ 	dma_addr_t frame_dma;
+ 	struct xsk_buff_pool *pool;
+ 	struct list_head list_node;
+-};
++} __aligned_largest;
+ 
+ #define XSK_CHECK_PRIV_TYPE(t) BUILD_BUG_ON(sizeof(t) > offsetofend(struct xdp_buff_xsk, cb))
+ #define XSK_TX_COMPL_FITS(t) BUILD_BUG_ON(sizeof(struct xsk_tx_metadata_compl) > sizeof(t))
 -- 
 2.47.0
 
