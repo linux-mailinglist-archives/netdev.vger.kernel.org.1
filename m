@@ -1,136 +1,162 @@
-Return-Path: <netdev+bounces-148583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D86E09E2536
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:58:16 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C53BC16EEC3
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:52:17 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACAB1F76D0;
-	Tue,  3 Dec 2024 15:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fHCeqkM6"
-X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9ED69E2632
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:10:09 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1141E0496;
-	Tue,  3 Dec 2024 15:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAA7C288EE5
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:10:08 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A9481F76D7;
+	Tue,  3 Dec 2024 16:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="CpNww9DN";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XxWEPaY3"
+X-Original-To: netdev@vger.kernel.org
+Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D3881ADA;
+	Tue,  3 Dec 2024 16:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733241116; cv=none; b=jPtaFq+5fFuYxqW8wqbM6wfEOCOpsNE9aH63nJo25+12sYQS130yvQk2uKNCWO0CmAeG+9G39cmTrU48VC1mxEPImZNTOyT7/tkdE6pRtaDk2YckXgqIe2iATGSdPzg4k3H1GonUXH7elXelUqEKPF865PqvgJilAzZCW6k9R7Y=
+	t=1733242207; cv=none; b=i8HZ/K6NhJtlyUx4aWs4nJACHw6JGxU43SVqbf7fpUOWHSK4CFstd1DX2yRdqIzcOLBQpRvmHJFpNlBMHE8JJ8txKvLh51Z538a6G94hB8VGbsW9O98WBdjpx1lTB6Fjy3vGxnpVZsfiqkOr5IbAFv/J5qusUgddtdibWjRbj7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733241116; c=relaxed/simple;
-	bh=bpMNhT7hs+A5dnCGGIqDp8qwNNx3fUETcoweFQOjllk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eqGlhlEN4RqLfuFq17v1l1vha0aNaBUKz6ykXg1CJYbzSK9bGOBRKalyIktZ1UlAsgte6k8K+cWV2DrzLCsvH/+sJVSQysMnLD30OIJXcQCE6njV5tHE5FbNyUJZ7juEWYMhwIm7sudVEI70VcodMhNdQ87930IiArCKvXc6NhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fHCeqkM6; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E8697FF811;
-	Tue,  3 Dec 2024 15:51:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1733241111;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6mUUXlg2Sdr2QZ9xxnJnQJbYN76Rdm3JD+IpxMezPKc=;
-	b=fHCeqkM6Iljfd74vtUc6Go6drgzqlVnBl28AhspXXsK9XVyHDw/IVJcBm9JqWph4Y99KxK
-	4Oro9o3pP/wPORR2+ulupss5Q9szZdXpVRv5q4lBhgqtHRUHexaRBubmlFgh8Yx88ACHrN
-	p67sdXIJNWOhgNSxbFIkX5JYKy6CVzPRqbh4XsfskquLEX4QaJSI3a50jia5diUnqVDPCH
-	YnQ8eWcVajvIpP7Ocm5NhTPzKrUMJlS8eRbBFUUg23B7A6ehwCIsDcQsk39VtL6VyNjWi2
-	iuT79F2GWfUNiGlkYhbyZHqSrZYL+gWTXPDyFVf2XDdLpvkQC/1ZdZIqCH5hPg==
-Date: Tue, 3 Dec 2024 16:51:47 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Dennis Ostermann
- <dennis.ostermann@renesas.com>, "nikita.yoush"
- <nikita.yoush@cogentembedded.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michael Dege
- <michael.dege@renesas.com>, Christian Mardmoeller
- <christian.mardmoeller@renesas.com>
-Subject: Re: [PATCH] net: phy: phy_ethtool_ksettings_set: Allow any
- supported speed
-Message-ID: <20241203165147.4706cc3b@fedora.home>
-In-Reply-To: <Z08h95dUlS7zacTY@shell.armlinux.org.uk>
-References: <73ca1492-d97b-4120-b662-cc80fc787ffd@cogentembedded.com>
-	<Z02He-kU6jlH-TJb@shell.armlinux.org.uk>
-	<eddde51a-2e0b-48c2-9681-48a95f329f5c@cogentembedded.com>
-	<Z02KoULvRqMQbxR3@shell.armlinux.org.uk>
-	<c1296735-81be-4f7d-a601-bc1a3718a6a2@cogentembedded.com>
-	<Z02oTJgl1Ldw8J6X@shell.armlinux.org.uk>
-	<5cef26d0-b24f-48c6-a5e0-f7c9bd0cefec@cogentembedded.com>
-	<Z03aPw_QgVYn8WyR@shell.armlinux.org.uk>
-	<TYCPR01MB1047854DA050E52CADB04393A8E362@TYCPR01MB10478.jpnprd01.prod.outlook.com>
-	<1ff52755-ef24-4e4b-a671-803db37b58fc@lunn.ch>
-	<Z08h95dUlS7zacTY@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1733242207; c=relaxed/simple;
+	bh=8pAHF54ui4zA+Mj4UHdwG1hk0crm6ZJaVaOSy/hclf8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cLI0F0NAGSi6w0ObWhy4BBk1tQZhxSuHv/06BOSWtxau0RU1T5jZujo2PBZ9gcFU+YNIxp78jFwOMZpEll+w9JzFvAi6zN7zQw62RHjTezXAPVr2QKW+Knt7MVCobUr2Xa5VwKHt41om1bgKGWrpOIp+qoTb6XWMqsyYAOVhZSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=CpNww9DN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XxWEPaY3; arc=none smtp.client-ip=103.168.172.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id A812311400E2;
+	Tue,  3 Dec 2024 11:10:02 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Tue, 03 Dec 2024 11:10:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1733242202; x=
+	1733328602; bh=RzGwZAu9mlE2QMETXgnsEf6IwW4zhq+aCq4xASv7ZF0=; b=C
+	pNww9DNQEYeNcbr5JjoNABjeIQu8wjz7pzrXiEjruKGHKH4FPUoNwVtbegy0j1dx
+	WFPe/onNZCH1omZXzQz4HebBWtMxxWvLJJJ+/dieLUrt00RFxGL4KgCrX+cjusxl
+	Pp4IjyX5BeZNl8cPjaOJpSg6HanXOaI8WbeEV/63ppFIzvHW0I7ZX5M79r/4THK0
+	hJTmdFr1UhHO77RGbHEvcX+/cnGtAs31kYD9O5Uhr0xgmuOjUhMhtFHh0DRvP33w
+	eGJKXeKBavXx/jAqM01aSg3lazYa1riVmQwie9OTbjg9/PeRnkf6e7TObJw8eGSX
+	wq/Cfss5OWCPwvYPyFaCw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1733242202; x=1733328602; bh=RzGwZAu9mlE2QMETXgnsEf6IwW4zhq+aCq4
+	xASv7ZF0=; b=XxWEPaY3aeEbK65xYQJpEiZtof3I/2R+fwVMqHU8snwA+BI0t82
+	G0/iZN4M4xMHeg6aYb2Cx0PM5L3V//q1pufcrvQ39ArW47ZspdVttN1szeCwQ8ZC
+	pSoq0fRHb4MlMUeJuNLK0wOkI5Xn2VhPH4+Ez1IZbP4W8jpLgHRCwQh9hGPIZIpw
+	dFRcXS80cxwL6KnuHkPYoSy7ivNX4v16npE4kbYTw7jYzKW/sKq/9ssCEHfkWpOZ
+	Urd6IZ7qt7ANX98E4gHxd36ykdd7Jx6VI4NtYVPQMj24E2VElNRPkd54dX2MA3oo
+	yR41jJFgMWANRX6R+i4GrS9KmDIlxn4Iuug==
+X-ME-Sender: <xms:Wi1PZ-RKs4CV2dw3pvOjr_LldADvLKDNiUPa1QGnEaG0LvbmgqQCig>
+    <xme:Wi1PZzzXxeub_8Y584N2KxRhDk0IlQ_j7Famvf9jBEkWBzlaajckMMxPyeDtREN5F
+    -7f6f7cvJfFomGf01E>
+X-ME-Received: <xmr:Wi1PZ73kTI23uaUr2ChYGeHx1PL3OnP-79Wo7xPQlZ7J-fuOPq64jHvVYbtr>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieefgdehiecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
+    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
+    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
+    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
+    tghpthhtohepuddvpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnih
+    hosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdr
+    tghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtphhtthho
+    pehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnh
+    gvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkshgv
+    lhhfthgvshhtsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrg
+    iivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdho
+    rhhg
+X-ME-Proxy: <xmx:Wi1PZ6CeXkjHU0kiZODljeL8K3ck430Gsw6JoM-Yne3hJGHXq3e9PA>
+    <xmx:Wi1PZ3gOkQpD9mPhOUWKU6u8_GjayXo2glBqcNDxwDk1ejwueXEVZg>
+    <xmx:Wi1PZ2qVSbqD-ihe2WyAr7JNcVMUlKoRDOFVkZ_dFCMZcVTyqaG2xw>
+    <xmx:Wi1PZ6hr54nRYZZRC9QasRt7lCwtH8XDjqe9l-Y1B7AlZVv1tjj8NQ>
+    <xmx:Wi1PZwamZUEZq7Cv_d0iaWEHK60RkI3DAuxLV2jjMWcmU8CQO3ogzfYD>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 3 Dec 2024 11:10:01 -0500 (EST)
+Date: Tue, 3 Dec 2024 17:09:59 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	ryazanov.s.a@gmail.com, Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH net-next v12 13/22] ovpn: implement peer lookup logic
+Message-ID: <Z08tV5vQe2S4iawi@hog>
+References: <20241202-b4-ovpn-v12-0-239ff733bf97@openvpn.net>
+ <20241202-b4-ovpn-v12-13-239ff733bf97@openvpn.net>
+ <5052453b-edd8-44e2-8df7-00ea439805ad@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5052453b-edd8-44e2-8df7-00ea439805ad@openvpn.net>
 
-Hi Andrew,
-
-On Tue, 3 Dec 2024 15:21:27 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-
-> On Tue, Dec 03, 2024 at 03:45:09PM +0100, Andrew Lunn wrote:
-> > On Tue, Dec 03, 2024 at 02:05:07PM +0000, Dennis Ostermann wrote:  
-> > > Hi,
-> > > 
-> > > according to IEE 802.3-2022, ch. 125.2.4.3, Auto-Negotiation is optional for 2.5GBASE-T1
-> > >   
-> > > > 125.2.4.3 Auto-Negotiation, type single differential-pair media
-> > > > Auto-Negotiation (Clause 98) may be used by 2.5GBASE-T1 and 5GBASE-T1 devices to detect the
-> > > > abilities (modes of operation) supported by the device at the other end of a link segment, determine common
-> > > > abilities, and configure for joint operation. Auto-Negotiation is performed upon link startup through the use
-> > > > of half-duplex differential Manchester encoding.
-> > > > The use of Clause 98 Auto-Negotiation is optional for 2.5GBASE-T1 and 5GBASE-T1 PHYs  
-> > > 
-> > > So, purposed change could make sense for T1 PHYs.  
-> > 
-> > The proposed change it too liberal. We need the PHY to say it supports
-> > 2.5GBASE-T1, not 2.5GBASE-T. We can then allow 2.5GBASE-T1 to not use
-> > autoneg, but 2.5GBASE-T has to use autoneg.  
+2024-12-03, 15:58:17 +0100, Antonio Quartulli wrote:
+> On 02/12/2024 16:07, Antonio Quartulli wrote:
+> [...]
+> > +#define ovpn_get_hash_slot(_key, _key_len, _tbl) ({	\
+> > +	typeof(_tbl) *__tbl = &(_tbl);			\
+> > +	jhash(_key, _key_len, 0) % HASH_SIZE(*__tbl);	\
+> > +})
+> > +
+> > +#define ovpn_get_hash_head(_tbl, _key, _key_len) ({		\
+> > +	typeof(_tbl) *__tbl = &(_tbl);				\
+> > +	&(*__tbl)[ovpn_get_hash_slot(_key, _key_len, *__tbl)];	\
+> > +})
 > 
-> I'm wondering whether we should add:
+> clang a reporting various warnings like this:
 > 
-> 	__ETHTOOL_DECLARE_LINK_MODE_MASK(requires_an);
+> ../drivers/net/ovpn/peer.c:406:9: warning: variable '__tbl' is uninitialized
+> when used within its own initialization [-Wuninitialized]
+>   406 |         head = ovpn_get_hash_head(ovpn->peers->by_id, &peer_id,
+>       |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   407 |                                   sizeof(peer_id));
+>       |                                   ~~~~~~~~~~~~~~~~
+> ../drivers/net/ovpn/peer.c:179:48: note: expanded from macro
+> 'ovpn_get_hash_head'
+>   179 |         &(*__tbl)[ovpn_get_hash_slot(_key, _key_len, *__tbl)];  \
+>       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+> ../drivers/net/ovpn/peer.c:173:26: note: expanded from macro
+> 'ovpn_get_hash_slot'
+>   173 |         typeof(_tbl) *__tbl = &(_tbl);                  \
+>       |                       ~~~~~     ^~~~
 > 
-> to struct phy_device, and have phylib populate that by default with all
-> base-T link modes > 1G (which would be the default case as it is now.)
-> Then, PHY drivers can change this bitmap as they need for their device.
-> After the PHY features have been discovered, this should then get
-> AND-ed with the supported bitmap.
+> Anybody willing to help me understand this issue?
+> 
+> I have troubles figuring out how __tbl is being used uninitialized.
+> I wonder if the parameters naming is fooling clang (or me) somehow.
 
-If the standards says that BaseT4 >1G needs aneg, and that we can't
-have it for baseT1, couldn't we just have some lookup table for each
-mode indicating if they need or support aneg ? I'm thinking about
-something similar as the big table in net/ethtool/common.c where we
-have the linkmode - speed - duplex - lanes mapping :
+Not really a solution to this specific issue, but do you actually need
+ovpn_get_hash_slot as a separate macro? AFAICT all users could also be
+converted to ovpn_get_hash_head, then you can merge ovpn_get_hash_slot
+into ovpn_get_hash_head and maybe clang won't get confused?
 
-https://elixir.bootlin.com/linux/v6.12.1/source/net/ethtool/common.c#L270
+No guarantee that this fixes anything (except saving one or two lines
+in a few functions).
 
-maybe looking it up for each config operation would be too expensive ?
-or it maybe isn't flexible enough in case we have to deal with
-phy-pecific quirks...
-
-Maxime
-
-
+-- 
+Sabrina
 
