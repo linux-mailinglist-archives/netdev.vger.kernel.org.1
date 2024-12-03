@@ -1,357 +1,157 @@
-Return-Path: <netdev+bounces-148559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DAFA9E2266
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:24:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 90EA09E2293
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:26:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A624167EB4
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:19:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9001816C82F
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A381F7554;
-	Tue,  3 Dec 2024 15:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64F651F7584;
+	Tue,  3 Dec 2024 15:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cAmdzjr6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l041LLGt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592E01F4709
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 15:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C083D1EF0AE;
+	Tue,  3 Dec 2024 15:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733239194; cv=none; b=TMjpP89QOIaYMWkbX/emZRi9befkcqgYQmjdNtZLPNzpfn6e/7+WsGl1LYReI7thtYHkf5PVCp6fz3N834lbs0XwQOHN44+8nBgGwf6tkrS5PzjLSL+SR7Ei6un749ZawKL54bRo7FgTdUtMVg6/cHW2JJMrqxl6r1XaL8eeyHQ=
+	t=1733239283; cv=none; b=gjl9YOos7gQQ0ULCgjDXPr7gRJUN9nbLMjCJTndQNGq41x+Ess0tUj5ZLQ6fkNmjQ/6X6rrmdCFCd1G5117QnqevJmLpOV3EVMApnEhN3NNFNrPMyH1voMgHvQchGaT7xFa0CVfebB5KlbiuhBH1r5Qhxdk3wnUNXcm8OyDkc7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733239194; c=relaxed/simple;
-	bh=W8qGrXe3bRj1Y5AJQrHiF87Sh1brFktXiqV8GbPDha0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lrG3C9zrQsIicQPPbT0mObAoMgO5LKDVBnUUEnAKHAQZV65+Bff/zDckXK+mGUIXW1V+vCt01tgKbeoNNJkKO9RWHEHdccBM6n3TpZqpESkUc8KS2cNuy+Ocy6tBozCLMR2jahoG06rna0PEqpV8oycRKVy782umOJTvC8lDSrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cAmdzjr6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733239191;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=66p4s8wP06Z+ogr+u1zv8IffffNMECDmCGEmHoHtmxU=;
-	b=cAmdzjr6uWYk7jIpublioV5/U7NmEhi82q2DY7Z8Y6fkn/5Fm72ASZ/XJqWJECoF8kbJC3
-	Zyk1lVncdmmnlvajnjK9c+OW6furDw9RTFvB2VDHwdp5rVLaVrmnDjbuHd/AU4UGewgkIC
-	v3Gb1iF0g6WsI25Fud4GIYUlZxSsoqM=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-327-6sOf3GOmOjCLtVDXXvHF2w-1; Tue, 03 Dec 2024 10:19:50 -0500
-X-MC-Unique: 6sOf3GOmOjCLtVDXXvHF2w-1
-X-Mimecast-MFC-AGG-ID: 6sOf3GOmOjCLtVDXXvHF2w
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7b66f8fb697so621733485a.1
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 07:19:50 -0800 (PST)
+	s=arc-20240116; t=1733239283; c=relaxed/simple;
+	bh=t8yscXsYjfpe/1tcoMvCTfOcyi3GhvMr0P2NT0AZHzk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=NDOTvpYXolAMvRnkODBz9ftwwnokmEUXpBuxvbS6IPchbs0U0sR4z9KRDZh/rmdwxf/ZXpmwy8Y8dJmgBcQh6PItk6N1sWvXmKL05ECSuivB7CmsRwJsKfORn82a+b655/pAmfOrRttyoy0MOtUPi0bQ6xNSa5vpkxJjDaG56TY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l041LLGt; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-466966d8dbaso45712501cf.3;
+        Tue, 03 Dec 2024 07:21:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733239280; x=1733844080; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VqsVHmCOaWiBo6waU1R1vraLU/LK0vRFjavrsVUjZLY=;
+        b=l041LLGtQ09D5k9YVBUQuBVvQ8Q6hMoDvDvrGkEdSwkOK8gnKxMD+RTAhmJ8ioGzNS
+         5Iyt9SRcV/JXbqOP96OJGr/UmP5yyTMfsTcJ4Y2xhovpEDW0UErs1gfmgOJC8iUQulan
+         46EP+dxFoM6ZxrL4s5ILxNK/q4tkEUMXTwI7a3K8qhPo6Tzwbmyy8vaKHgPRwI/P3yT/
+         wJXLQulArcn+0E7DskiJCzgdBidYcFVBlA4Py9q2t9ecekhde5Tmy2GVu5wjJ024984M
+         aExkXDxAYhlVvLN06Mzn4H6Jx6YXZHh2I4H0ORIOrkq3IqW3xOgb8BcSjQhD5Qspx4ww
+         ZWOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733239190; x=1733843990;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=66p4s8wP06Z+ogr+u1zv8IffffNMECDmCGEmHoHtmxU=;
-        b=MdTDba/Kv7Xo8YiA/2FQcud+FQkmzpDDH5Jfd8sHYwkz90CV9B5QYRBtbzXH4XgZWU
-         IQgT6C/Qflk1CNI2jKqwQA6YLum74xPeiZn5iqspUNdQyVeMQrnTlBDOwYPEYXnM8txc
-         g9o5aJyS8sVEO/+tLdSDvCvaqTJO4K/z/SEcLNchxmleZXuD6ghNLfOy50+PKkVlykFi
-         8BGJmwrF9LFhHxhcjq6yWPw4U4AY3l/j5bgFse8WWVs5XkXqL3Jfn5M8auRgQQ98SMK8
-         hDYKSMmjhgLUVBa8xAtcX3fsVKyCsnehy6wbhbu85kgw+X7mmEY4Rg+1oTqWgJw+Gi5g
-         Ehqw==
-X-Forwarded-Encrypted: i=1; AJvYcCVfOsnKdnjl0++MKu0zXCW5yX6n5+4MIy3et5eOK1hmecwwh/VQl4kuUzMFkVR50PkyaYUtz7M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTwou6iyTShlzb9hj2nU6XekayupsvJNxJ6ScPVXCATvwoobhg
-	+cvy6ywybvEsm6hX/NY+1Nf7437R0QVmQmMcXsCEU2GE5iKBJua6RKWYGfQ1CNEe5aem6pHM+8Z
-	jE2HHA9gNw1xmnJBHF2yXTKOF19gd5OXQgsWBnTc8ERqwlredK1xoAA==
-X-Gm-Gg: ASbGncvr7mkXVwzgfZGZORhdLw+vsDml/bMzS5pVRKQahzKXr5vkcj/mAkq2cBOml/4
-	BmX64Dk0nNRUjuEvHPLSeXS9modiIKBww7etljhlWRrXJNRF3b/5QB1R/murywI8qUaBVhdGp/q
-	vWqbqeA18bsScjeaX6zIq4ToCObeqMQkZulRH+s+pPpfAjxKAg+KtPxMjeP+04FdBUGRQ0EaSGv
-	8OJ80RunSWiJA/Hk+4b3lCMQ/9SO2vBfyIVkGlTlYjMnUOsXISSALqXuM63Iw1X1rqpdGj5S6bb
-X-Received: by 2002:a05:620a:4898:b0:7a9:aba6:d037 with SMTP id af79cd13be357-7b6a5d43dc9mr330905085a.13.1733239189731;
-        Tue, 03 Dec 2024 07:19:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHUd+tgeqmGfFLGSGU9BwPAgdjbHK6XPidUMe3MK0uD8X6Akeg8tfjhHGyj6L7JiVZaV5sTgQ==
-X-Received: by 2002:a05:620a:4898:b0:7a9:aba6:d037 with SMTP id af79cd13be357-7b6a5d43dc9mr330900685a.13.1733239189325;
-        Tue, 03 Dec 2024 07:19:49 -0800 (PST)
-Received: from [192.168.88.24] (146-241-38-31.dyn.eolo.it. [146.241.38.31])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b68492f180sm517904385a.44.2024.12.03.07.19.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2024 07:19:48 -0800 (PST)
-Message-ID: <784fddc4-336c-4674-8277-c7cebea6b94f@redhat.com>
-Date: Tue, 3 Dec 2024 16:19:45 +0100
+        d=1e100.net; s=20230601; t=1733239280; x=1733844080;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VqsVHmCOaWiBo6waU1R1vraLU/LK0vRFjavrsVUjZLY=;
+        b=Mexig+DofDUwVTNGN5G8TKshCoajvQvlzcTIFdpDoEbN33+Wpg18Vo4EjbuGXBgIPT
+         3vjRi5E+nnChK9BxdD/WPn6Vlhi/l+YS/cysywCoOF7B3eewDxrcZ4AFhOYaqYXsDgmn
+         aDnIJC7DVrjca0+ooIBQBHLcQr3+maPSI6mPsz1QKeDM/A0YrHAGF3Shps5x7kTOhyUS
+         PFEzmLCLYTURr1lWz7Mr9ZBs47aJjJS/zLdU2NFI+MuUYpFnwJ888vseEkUXy2qO/qeT
+         6oh1ulpQBG84l1gtynB1YVpgigHv/vJCS+1ahx6JI3uZeSt1MseiOy885khYFjYoInLU
+         E83A==
+X-Forwarded-Encrypted: i=1; AJvYcCU5/P+d2WqQgIndwYFoJ8P7ueJ3gqAsO4EYkOgUZIiBgGkAz3rIoipftKar3dD6vhir9iWKTA89@vger.kernel.org, AJvYcCU80hH145bh54fJjVz7ibwQjl/A3ljRFZUdpc5Um6lKDU6LmKFhHmgNGaU5PJSvy2QtfBZtEXAPvAHR5C0O@vger.kernel.org, AJvYcCUKttrQNS2eaPFdJms1IDmY383EE8A1oYSfiAYiiBPTo2mk/LUlfNK3I3/4WRQI9kelh0lM6bs1AUPU@vger.kernel.org, AJvYcCXVNEr2WK+l//1EZ3cnMT2kdAOyvXOClKQwSqHr1HVU3xrwI5Tri7yuYU7vmdpDiBav72p3B0pp7It5+W8m2PIo@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJXIx7Lac+uUo0BHx1Y7QYQU+cyKJqzhpLoFTtuRJEHGDia/HD
+	7grfsPBoHcpBQKHvoxL5aZu0f/tzA9KcxeVHA8H+tofJm/8mylx0
+X-Gm-Gg: ASbGnctU6OSh2uWgz/+vqPFd/lfrqgFGKwu1qQCcyQBAt/qwSUS1rY1T38X/WL55aAj
+	NTxAV4AkeHFbwxuf4KQFdNbldy4lUcIFd0MUHHRqpXoUCtm0IDiLqvsg+ImbOHB1EnO0LAkQfs2
+	D4Bf1p66L5BKUn2gf2wMuYtcc7XPFj6Zc61wRLs4iIP3zYHzccBIAci5QPvuSQVzGFdHavXQ9Px
+	7iyMuNjSta+9Xdoru903ZmR8lL6saX76ZI89RD9MYRx9JenK3jjOtkuNTUUiwKgYLhrQRF+u1Y7
+	tGFft1DxPj6jQkfvJOGf1w==
+X-Google-Smtp-Source: AGHT+IGPHit5+V6UhQpAx4/BlJFXSsgH9I6LPVgBePoc1CSG05dOym+Yqu7WxRzxJcebBY0CylhigA==
+X-Received: by 2002:ad4:5b8f:0:b0:6d8:99cf:d2e3 with SMTP id 6a1803df08f44-6d8b737d8d2mr41162076d6.22.1733239280369;
+        Tue, 03 Dec 2024 07:21:20 -0800 (PST)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d875195da6sm61747786d6.57.2024.12.03.07.21.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 07:21:19 -0800 (PST)
+Date: Tue, 03 Dec 2024 10:21:19 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kenjiro Nakayama <nakayamakenjiro@gmail.com>, 
+ Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Alan Stern <stern@rowland.harvard.edu>, 
+ Andrea Parri <parri.andrea@gmail.com>, 
+ Will Deacon <will@kernel.org>, 
+ Peter Zijlstra <peterz@infradead.org>, 
+ Boqun Feng <boqun.feng@gmail.com>, 
+ Nicholas Piggin <npiggin@gmail.com>, 
+ David Howells <dhowells@redhat.com>, 
+ Jade Alglave <j.alglave@ucl.ac.uk>, 
+ Luc Maranget <luc.maranget@inria.fr>, 
+ "Paul E. McKenney" <paulmck@kernel.org>, 
+ Akira Yokosawa <akiyks@gmail.com>, 
+ Daniel Lustig <dlustig@nvidia.com>, 
+ Joel Fernandes <joel@joelfernandes.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netfilter-devel@vger.kernel.org, 
+ coreteam@netfilter.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-arch@vger.kernel.org, 
+ lkmm@lists.linux.dev, 
+ linux-kselftest@vger.kernel.org, 
+ Kenjiro Nakayama <nakayamakenjiro@gmail.com>
+Message-ID: <674f21ef3048c_19a62294c6@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241202232129.7139-1-nakayamakenjiro@gmail.com>
+References: <20241202232129.7139-1-nakayamakenjiro@gmail.com>
+Subject: Re: [PATCH] selftests/net: call sendmmsg via udpgso_bench.sh
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 11/22] ovpn: implement TCP transport
-To: Antonio Quartulli <antonio@openvpn.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- sd@queasysnail.net, ryazanov.s.a@gmail.com, Andrew Lunn <andrew@lunn.ch>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241202-b4-ovpn-v12-0-239ff733bf97@openvpn.net>
- <20241202-b4-ovpn-v12-11-239ff733bf97@openvpn.net>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241202-b4-ovpn-v12-11-239ff733bf97@openvpn.net>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On 12/2/24 16:07, Antonio Quartulli wrote:
-> +void ovpn_tcp_socket_detach(struct socket *sock)
-> +{
-> +	struct ovpn_socket *ovpn_sock;
-> +	struct ovpn_peer *peer;
-> +
-> +	if (!sock)
-> +		return;
-> +
-> +	rcu_read_lock();
-> +	ovpn_sock = rcu_dereference_sk_user_data(sock->sk);
-> +
-> +	if (!ovpn_sock->peer) {
-> +		rcu_read_unlock();
-> +		return;
-> +	}
-> +
-> +	peer = ovpn_sock->peer;
-> +	strp_stop(&peer->tcp.strp);
-> +
-> +	skb_queue_purge(&peer->tcp.user_queue);
-> +
-> +	/* restore CBs that were saved in ovpn_sock_set_tcp_cb() */
-> +	sock->sk->sk_data_ready = peer->tcp.sk_cb.sk_data_ready;
-> +	sock->sk->sk_write_space = peer->tcp.sk_cb.sk_write_space;
-> +	sock->sk->sk_prot = peer->tcp.sk_cb.prot;
-> +	sock->sk->sk_socket->ops = peer->tcp.sk_cb.ops;
-> +	/* drop reference to peer */
-> +	rcu_assign_sk_user_data(sock->sk, NULL);
-> +
-> +	rcu_read_unlock();
-> +
-> +	barrier();
+Kenjiro Nakayama wrote:
+> Currently, sendmmsg is implemented in udpgso_bench_tx.c,
+> but it is not called by any test script.
+> 
+> This patch adds a test for sendmmsg in udpgso_bench.sh.
+> This allows for basic API testing and benchmarking
+> comparisons with GSO.
 
-It's unclear to me the role of the above barrier. A comment would help
+The change looks fine to me, but the commit is missing your
+Signed-off-by.
 
-> +	/* cancel any ongoing work. Done after removing the CBs so that these
-> +	 * workers cannot be re-armed
-> +	 */
-> +	cancel_work_sync(&peer->tcp.tx_work);
-> +	strp_done(&peer->tcp.strp);
-> +	skb_queue_purge(&peer->tcp.out_queue);
-> +
-> +	ovpn_peer_put(peer);
-> +}
-> +
-> +static void ovpn_tcp_send_sock(struct ovpn_peer *peer)
-> +{
-> +	struct sk_buff *skb = peer->tcp.out_msg.skb;
-> +
-> +	if (!skb)
-> +		return;
-> +
-> +	if (peer->tcp.tx_in_progress)
-> +		return;
-> +
-> +	peer->tcp.tx_in_progress = true;
-> +
-> +	do {
-> +		int ret = skb_send_sock_locked(peer->sock->sock->sk, skb,
-> +					       peer->tcp.out_msg.offset,
-> +					       peer->tcp.out_msg.len);
-> +		if (unlikely(ret < 0)) {
-> +			if (ret == -EAGAIN)
-> +				goto out;
-> +
-> +			net_warn_ratelimited("%s: TCP error to peer %u: %d\n",
-> +					     netdev_name(peer->ovpn->dev),
-> +					     peer->id, ret);
-> +
-> +			/* in case of TCP error we can't recover the VPN
-> +			 * stream therefore we abort the connection
-> +			 */
-> +			ovpn_peer_del(peer,
-> +				      OVPN_DEL_PEER_REASON_TRANSPORT_ERROR);
-> +			break;
-> +		}
-> +
-> +		peer->tcp.out_msg.len -= ret;
-> +		peer->tcp.out_msg.offset += ret;
-> +	} while (peer->tcp.out_msg.len > 0);
-> +
-> +	if (!peer->tcp.out_msg.len)
-> +		dev_sw_netstats_tx_add(peer->ovpn->dev, 1, skb->len);
-> +
-> +	kfree_skb(peer->tcp.out_msg.skb);
-> +	peer->tcp.out_msg.skb = NULL;
-> +	peer->tcp.out_msg.len = 0;
-> +	peer->tcp.out_msg.offset = 0;
-> +
-> +out:
-> +	peer->tcp.tx_in_progress = false;
-> +}
-> +
-> +static void ovpn_tcp_tx_work(struct work_struct *work)
-> +{
-> +	struct ovpn_peer *peer;
-> +
-> +	peer = container_of(work, struct ovpn_peer, tcp.tx_work);
-> +
-> +	lock_sock(peer->sock->sock->sk);
-> +	ovpn_tcp_send_sock(peer);
-> +	release_sock(peer->sock->sock->sk);
-> +}
-> +
-> +static void ovpn_tcp_send_sock_skb(struct ovpn_peer *peer, struct sk_buff *skb)
-> +{
-> +	if (peer->tcp.out_msg.skb)
-> +		ovpn_tcp_send_sock(peer);
-> +
-> +	if (peer->tcp.out_msg.skb) {
-> +		dev_core_stats_rx_dropped_inc(peer->ovpn->dev);
-> +		kfree_skb(skb);
-> +		return;
-> +	}
-> +
-> +	peer->tcp.out_msg.skb = skb;
-> +	peer->tcp.out_msg.len = skb->len;
-> +	peer->tcp.out_msg.offset = 0;
-> +	ovpn_tcp_send_sock(peer);
-> +}
-> +
-> +void ovpn_tcp_send_skb(struct ovpn_peer *peer, struct sk_buff *skb)
-> +{
-> +	u16 len = skb->len;
-> +
-> +	*(__be16 *)__skb_push(skb, sizeof(u16)) = htons(len);
-> +
-> +	bh_lock_sock(peer->sock->sock->sk);
+Also, if resubmitting, please mark [PATCH net-next v2].
 
-Are you sure this runs in BH context? AFAICS we reach here from an AEAD
-callback.
-
-
-
-> +	if (sock_owned_by_user(peer->sock->sock->sk)) {
-> +		if (skb_queue_len(&peer->tcp.out_queue) >=
-> +		    READ_ONCE(net_hotdata.max_backlog)) {
-> +			dev_core_stats_rx_dropped_inc(peer->ovpn->dev);
-> +			kfree_skb(skb);
-> +			goto unlock;
-> +		}
-> +		__skb_queue_tail(&peer->tcp.out_queue, skb);
-> +	} else {
-> +		ovpn_tcp_send_sock_skb(peer, skb);
-> +	}
-> +unlock:
-> +	bh_unlock_sock(peer->sock->sock->sk);
-> +}
-
-[...]
-
-> +static void ovpn_tcp_build_protos(struct proto *new_prot,
-> +				  struct proto_ops *new_ops,
-> +				  const struct proto *orig_prot,
-> +				  const struct proto_ops *orig_ops);
+> ---
+>  tools/testing/selftests/net/udpgso_bench.sh | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/udpgso_bench.sh b/tools/testing/selftests/net/udpgso_bench.sh
+> index 640bc43452fa..88fa1d53ba2b 100755
+> --- a/tools/testing/selftests/net/udpgso_bench.sh
+> +++ b/tools/testing/selftests/net/udpgso_bench.sh
+> @@ -92,6 +92,9 @@ run_udp() {
+>  	echo "udp"
+>  	run_in_netns ${args}
+>  
+> +	echo "udp sendmmsg"
+> +	run_in_netns ${args} -m
 > +
-> +/* Set TCP encapsulation callbacks */
-> +int ovpn_tcp_socket_attach(struct socket *sock, struct ovpn_peer *peer)
-> +{
-> +	struct strp_callbacks cb = {
-> +		.rcv_msg = ovpn_tcp_rcv,
-> +		.parse_msg = ovpn_tcp_parse,
-> +	};
-> +	int ret;
-> +
-> +	/* make sure no pre-existing encapsulation handler exists */
-> +	if (sock->sk->sk_user_data)
-> +		return -EBUSY;
-> +
-> +	/* sanity check */
-> +	if (sock->sk->sk_protocol != IPPROTO_TCP) {
-> +		net_err_ratelimited("%s: provided socket is not TCP as expected\n",
-> +				    netdev_name(peer->ovpn->dev));
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* only a fully connected socket are expected. Connection should be
-> +	 * handled in userspace
-> +	 */
-> +	if (sock->sk->sk_state != TCP_ESTABLISHED) {
-> +		net_err_ratelimited("%s: provided TCP socket is not in ESTABLISHED state: %d\n",
-> +				    netdev_name(peer->ovpn->dev),
-> +				    sock->sk->sk_state);
-> +		return -EINVAL;
-> +	}
-> +
-> +	lock_sock(sock->sk);
-> +
-> +	ret = strp_init(&peer->tcp.strp, sock->sk, &cb);
-> +	if (ret < 0) {
-> +		DEBUG_NET_WARN_ON_ONCE(1);
-> +		release_sock(sock->sk);
-> +		return ret;
-> +	}
-> +
-> +	INIT_WORK(&peer->tcp.tx_work, ovpn_tcp_tx_work);
-> +	__sk_dst_reset(sock->sk);
-> +	skb_queue_head_init(&peer->tcp.user_queue);
-> +	skb_queue_head_init(&peer->tcp.out_queue);
-> +
-> +	/* save current CBs so that they can be restored upon socket release */
-> +	peer->tcp.sk_cb.sk_data_ready = sock->sk->sk_data_ready;
-> +	peer->tcp.sk_cb.sk_write_space = sock->sk->sk_write_space;
-> +	peer->tcp.sk_cb.prot = sock->sk->sk_prot;
-> +	peer->tcp.sk_cb.ops = sock->sk->sk_socket->ops;
-> +
-> +	/* assign our static CBs and prot/ops */
-> +	sock->sk->sk_data_ready = ovpn_tcp_data_ready;
-> +	sock->sk->sk_write_space = ovpn_tcp_write_space;
-> +
-> +	if (sock->sk->sk_family == AF_INET) {
-> +		sock->sk->sk_prot = &ovpn_tcp_prot;
-> +		sock->sk->sk_socket->ops = &ovpn_tcp_ops;
-> +	} else {
-> +		mutex_lock(&tcp6_prot_mutex);
-> +		if (!ovpn_tcp6_prot.recvmsg)
-> +			ovpn_tcp_build_protos(&ovpn_tcp6_prot, &ovpn_tcp6_ops,
-> +					      sock->sk->sk_prot,
-> +					      sock->sk->sk_socket->ops);
-> +		mutex_unlock(&tcp6_prot_mutex);
+>  	echo "udp gso"
+>  	run_in_netns ${args} -S 0
+>  
+> -- 
+> 2.39.3 (Apple Git-146)
+> 
 
-This looks like an hack to avoid a build dependency on IPV6, I think the
-explicit
-
-#if IS_ENABLED(CONFIG_IPV6)
-
-at init time should be preferable
-
-> +
-> +		sock->sk->sk_prot = &ovpn_tcp6_prot;
-> +		sock->sk->sk_socket->ops = &ovpn_tcp6_ops;
-> +	}
-
-[...]
-
-> +static void ovpn_tcp_close(struct sock *sk, long timeout)
-> +{
-> +	struct ovpn_socket *sock;
-> +
-> +	rcu_read_lock();
-> +	sock = rcu_dereference_sk_user_data(sk);
-> +
-> +	strp_stop(&sock->peer->tcp.strp);
-> +	barrier();
-
-Again, is not clear to me the role of the above barrier, please document it.
-
-Thanks,
-
-Paolo
 
 
