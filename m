@@ -1,85 +1,83 @@
-Return-Path: <netdev+bounces-148669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46FA99E2D33
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 21:35:14 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2757F160182
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 20:35:11 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A081E501B;
-	Tue,  3 Dec 2024 20:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="erfYuqSy"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25CCD9E2D36
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 21:35:56 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89BB1A01B9
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 20:35:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF4662821D0
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 20:35:54 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46C7B1EF081;
+	Tue,  3 Dec 2024 20:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QKQo2a1n"
+X-Original-To: netdev@vger.kernel.org
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA743189F56;
+	Tue,  3 Dec 2024 20:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733258111; cv=none; b=kbZBqvC0mMrD6mB2yPn3qPEPdsVrgP8EzQ2sCRBjQC9kcnJ4oll9/cVxvy9FQ/KlGTisdbu1PIIL/LxZ0o3RmOQ1WEmrVxqd+cQRPZL5rqCRFuWy47UlB6btktc22biB3DP2hPhZEBfHaI3mBmGaeMn5V3cNRwZZiuYS8pz2hZs=
+	t=1733258152; cv=none; b=Px9FzYo0qZVrQ5VXOpAeV83rIHhOU56kD0jLRPUNwdKx4x1cGgbv1isaTpfQzCuY7VZmXYm1kTYv7gRhFegW3q354gjUggSl9z+DbaWn8GVIsJ9jW30G8Na3EVBNg5VOmWZ0BLzcgToy7xo8i+0mR9TVl/p/TLPwIrudw5yhdB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733258111; c=relaxed/simple;
-	bh=5xpp5ZE5z0bk8ryEGi+u3xIb0pxyaQCKLxC8nFsMpJc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F+FzDdSMXTM+t5c4ce7SjLpl7E1N9Oi2lYd4RdAp4YmD8873G8ZVxnhSLAlDahgzOxjxD3QPofH61cGB+5LWWwFOmSWfHCFRO3hS+zhiFaN68ct0VzXW5zocH2jRDi2Wox0BIb4a8RPx6Mn7jNdZplMP8HfmZ/yuafHOCnl4ak4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=erfYuqSy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FCDDC4CECF;
-	Tue,  3 Dec 2024 20:35:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733258110;
-	bh=5xpp5ZE5z0bk8ryEGi+u3xIb0pxyaQCKLxC8nFsMpJc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=erfYuqSyhTZ5FD3nR/dn2mCcwJ6LVEpxrsV66CQy6pOV1HJpo97b6WBvqt0ZTDIlc
-	 ZsqX3aX/QeYQPPVX9zNae3lrdvot3gpx+uYc5znMgipUv9eKHQEjh+nCI+criBEtP8
-	 BdVqIf6pERiIQtBNwtSaBSONs0cjYpNs0edtepNV8JJ2ARe/3Bs114s+PGkZHtq9ME
-	 sdhBjCCSVn7XXo9nneqPIfjuQGdUXP1NXj1G6IeSBnBNb3N0sj8Rzr8aj+xKboOPHk
-	 eZU7dZQ+GcQBPYp8JQgYWjBIaGRKiZq6kqQjST5ZGUct0eTFnNxsF482U5ZGLmPEc2
-	 oh5gBe8UuHUzg==
-Message-ID: <d686df42-3f31-4aaa-a9b3-f3fb85c7bf6a@kernel.org>
-Date: Tue, 3 Dec 2024 13:35:09 -0700
+	s=arc-20240116; t=1733258152; c=relaxed/simple;
+	bh=3XFuyDVd24VNId3mtojt/s2zg943OWmadIp5MN1XvSc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HpEZuGAdcx9plywsu4L4P5GbZFzBr92GkDM16EvgrbBsn/ArADnZv0hvtrrATBpyHrd12P69smZclC60sW5pdxYBXYKXbfqMc3gtIp+RKO/UVncjgl4laK42r4dNKmRuZqlwXaxsxQ8BlGBa5LPlvcR9t0kUgzRO+PHPCzceJUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QKQo2a1n; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=XNUfzojEoIvPMsw7o5EQsm4flrwBcXxoTxbRJXaPFAY=; b=QKQo2a1nk6P25Xj4/v/PVvI61b
+	U+IcTWv8NQcLQJVs1rn516ArAyXOtvfrrpRMhBX06ALJ+gn3ZqVb2MSbDZx6+dQ+n6qJmx035Gw3z
+	lxBgDGZCD6jlXf9eLy8pG269wUo4f0tM9PAc5Ba8z7ZxFs/0t/5rTalBR4BRw3V9e9Y4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tIZcV-00F8BB-T5; Tue, 03 Dec 2024 21:35:43 +0100
+Date: Tue, 3 Dec 2024 21:35:43 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>
+Subject: Re: [PATCH net-next v1 06/21] net: usb: lan78xx: Improve error
+ handling in EEPROM and OTP operations
+Message-ID: <ce20c7c4-0cbd-4c19-b695-4916c2d63f78@lunn.ch>
+References: <20241203072154.2440034-1-o.rempel@pengutronix.de>
+ <20241203072154.2440034-7-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: wireguard: Allow binding to specific ifindex
-To: greearb@candelatech.com, netdev@vger.kernel.org
-Cc: Jason@zx2c4.com, wireguard@lists.zx2c4.com
-References: <20241203193939.1953303-1-greearb@candelatech.com>
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20241203193939.1953303-1-greearb@candelatech.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241203072154.2440034-7-o.rempel@pengutronix.de>
 
-On 12/3/24 12:39 PM, greearb@candelatech.com wrote:
-> From: Ben Greear <greearb@candelatech.com>
+On Tue, Dec 03, 2024 at 08:21:39AM +0100, Oleksij Rempel wrote:
+> Refine error handling in EEPROM and OTP read/write functions by:
+> - Return error values immediately upon detection.
+> - Avoid overwriting correct error codes with `-EIO`.
+> - Preserve initial error codes as they were appropriate for specific
+>   failures.
+> - Use `-ETIMEDOUT` for timeout conditions instead of `-EIO`.
 > 
-> Which allows us to bind to VRF.
-> 
-> Signed-off-by: Ben Greear <greearb@candelatech.com>
-> ---
-> 
-> v2:  Fix bad use of comma, semicolon now used instead.
-> 
->  drivers/net/wireguard/device.h  |  1 +
->  drivers/net/wireguard/netlink.c | 12 +++++++++++-
->  drivers/net/wireguard/socket.c  |  8 +++++++-
->  include/uapi/linux/wireguard.h  |  3 +++
->  4 files changed, 22 insertions(+), 2 deletions(-)
-> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-LGTM
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
-be good to throw a test case under selftests
+    Andrew
 
