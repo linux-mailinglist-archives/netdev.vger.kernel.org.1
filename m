@@ -1,162 +1,123 @@
-Return-Path: <netdev+bounces-148438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD84E9E193F
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 11:29:24 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 519859E1956
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 11:33:01 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 723E22879A1
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:29:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25F291641EB
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CD01E1C2D;
-	Tue,  3 Dec 2024 10:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58561E22E9;
+	Tue,  3 Dec 2024 10:32:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GbygLMXz"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="ggZFKTuZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEA51E1C14;
-	Tue,  3 Dec 2024 10:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131591E0DEB;
+	Tue,  3 Dec 2024 10:32:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733221760; cv=none; b=Wiz7laHlsGfdBpPv+LrtzcZ4czVUPZhCHuXOqdpCQ+wnQ1o5j0Zk2zCPPqvcmBNni3a7HmpXOo42AjtW71+oKSRyeGV7+2zgDuiQfc1l3e2Syc9pdhm2Ndg6vxzKkaZ9+2bO2QwRN951vurIOICk+yXFJAJJ76zgXxrVXtdRXrs=
+	t=1733221968; cv=none; b=A69L/DF+H7jmhr3qp2LfQRqfiuanKsw0ekiRpyQMQIlj/5QSnH88NwZwTmwgLOPkhPa1ZB5FBWviBfa+1eME1wc/lqHEBeBJK8mu2nAzwe9NcAL+/8oeBmFZcQEfedxWROLUTRSO+RvnqEDEDQ5qJxDkdFQdxDa0JFKq8cUQpwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733221760; c=relaxed/simple;
-	bh=XUuRyTfQ3tYPh31NVuis3MXPsprCUj4fXIe4ghTE6So=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j88wqb+hIDlfTslcgHT87w5zPUW3tbX1EEXTNJ+RqKLJ895TSJwChQ7ZETfvEGZT0Qx2wCybDURVReXvSjXuhaZg/V8oI2PCc8jj/ZPd9iC04cFyoPn2WKLXsYJ507eVe09JJfjK3u5Mpf1Syvu4Sz+jcysL7ZKEKOghi+baQRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GbygLMXz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D373C4CECF;
-	Tue,  3 Dec 2024 10:29:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733221759;
-	bh=XUuRyTfQ3tYPh31NVuis3MXPsprCUj4fXIe4ghTE6So=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GbygLMXzt9cb60YsDKViS7r1gNVigl/Kx3QUYu5UwTarb4ULm26quG8I4f0MkRjff
-	 6nRFKJq/BG+8IhbhyDc6K7qWgboVadib7eo5IeqbCrMXUDkI6HirEK1DyGM2C31SX+
-	 khqMuHahuG0zH7dH+6hZom80jd1BEuSZC+vYHT9KCkePYHHa46ioaq71ad6MaAhVpj
-	 3gD4Nt6/ZPoYExKYcQ/sASZZd8DaIdHNZEF0cmkFKfKQNq8nwxX/fBzpmW/+Rliuu0
-	 Z28ywNIdJP5MPgUFqhwlc607CJYPKEIqf/93kpzYLcS2s6zLT9e5W4ZyPsbh3FfR0J
-	 ATSXQ4hU9J1qA==
-Date: Tue, 3 Dec 2024 10:29:13 +0000
-From: Simon Horman <horms@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v3 26/27] net: pse-pd: tps23881: Add support
- for static port priority feature
-Message-ID: <20241203102913.GD9361@kernel.org>
-References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
- <20241121-feature_poe_port_prio-v3-26-83299fa6967c@bootlin.com>
+	s=arc-20240116; t=1733221968; c=relaxed/simple;
+	bh=lfZk1PHy+4P1YFdjNi2bdTEnABvSnKLOXNwj20uCDiw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FZdG3yqIz3P/xzm0Q3+oSdFRf7T4ZpWKGy+U0G4+XXPt/Tl13TyP4h3maGl/UMLwtkDauv9uFt1WFJvXXijQM9++wNbi0QRqXbma+Nxr0x2Ige4qJCGcTNdAtbnpSH8lx4tA4dQzfFvhLGPrg+An2+nAG2kch8TbXBO1VGbrz9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=ggZFKTuZ; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4B3AVuBZ23707200, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1733221916; bh=lfZk1PHy+4P1YFdjNi2bdTEnABvSnKLOXNwj20uCDiw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=ggZFKTuZjxm9b9Nand76k6UGBNujO3hWp/6eO3U+P17yQhBu0GtkmeqFzjBYniBgi
+	 MIF3+D+lQS3j3DYaRPRpCVHcjwsdFoZzeWP6c+HApY7xars+Yd2PVwEvCA1ygd+k7/
+	 R1RXtB6tD8/hC8VYpEGB4HUL9+OrIwqQTJhzc7gO0XuuLvjrqCSsVVCC7w4Y24Qp/e
+	 oCODJl2MzqDUIFMKYnFbkiDfJf8oLaLK8/YLlQdgPI5jlKQeVybhawtJDaNEN1F7J8
+	 GC/wyRdbVpzXy0au5qcPSAWRWovhpxTU1kq1maXQ/OoKfvY0mUUlFZtIAsU6b8Nbzf
+	 bNfy5QhMkncIQ==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4B3AVuBZ23707200
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 3 Dec 2024 18:31:56 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 3 Dec 2024 18:31:56 +0800
+Received: from RTDOMAIN (172.21.210.74) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 3 Dec
+ 2024 18:31:55 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <horms@kernel.org>,
+        <michal.kubiak@intel.com>, <pkshih@realtek.com>,
+        <larry.chiu@realtek.com>, Justin Lai
+	<justinlai0215@realtek.com>
+Subject: [PATCH net-next] rtase: Add support for RTL907XD-VA PCIe port
+Date: Tue, 3 Dec 2024 18:31:46 +0800
+Message-ID: <20241203103146.734516-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241121-feature_poe_port_prio-v3-26-83299fa6967c@bootlin.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-On Thu, Nov 21, 2024 at 03:42:52PM +0100, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> 
-> This patch enhances PSE callbacks by introducing support for the static
-> port priority feature. It extends interrupt management to handle and report
-> detection, classification, and disconnection events. Additionally, it
-> introduces the pi_get_pw_req() callback, which provides information about
-> the power requested by the Powered Devices.
-> 
-> Interrupt support is essential for the proper functioning of the TPS23881
-> controller. Without it, after a power-on (PWON), the controller will
-> no longer perform detection and classification. This could lead to
-> potential hazards, such as connecting a non-PoE device after a PoE device,
-> which might result in magic smoke.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
-> 
-> We may need a fix for the interrupt support in old version of Linux.
-> 
-> Change in v3:
-> - New patch
-> ---
->  drivers/net/pse-pd/tps23881.c | 197 ++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 188 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
+1. Add RTL907XD-VA hardware version id.
+2. Add the reported speed for RTL907XD-VA.
 
-...
+Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+---
+ drivers/net/ethernet/realtek/rtase/rtase.h      | 1 +
+ drivers/net/ethernet/realtek/rtase/rtase_main.c | 2 ++
+ 2 files changed, 3 insertions(+)
 
-> +static int tps23881_irq_event_detection(struct tps23881_priv *priv,
-> +					u16 reg_val,
-> +					unsigned long *notifs,
-> +					unsigned long *notifs_mask)
-> +{
-> +	enum ethtool_pse_events event;
-> +	int reg, ret, i, val;
-> +	u8 chans;
-> +
-> +	chans = tps23881_it_export_chans_helper(reg_val, 0);
-> +	for_each_set_bit(i, (unsigned long *)&chans, TPS23881_MAX_CHANS) {
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h b/drivers/net/ethernet/realtek/rtase/rtase.h
+index dbc3f92eebc4..2bbfcad613ab 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase.h
++++ b/drivers/net/ethernet/realtek/rtase/rtase.h
+@@ -13,6 +13,7 @@
+ #define RTASE_HW_VER_906X_7XA 0x00800000
+ #define RTASE_HW_VER_906X_7XC 0x04000000
+ #define RTASE_HW_VER_907XD_V1 0x04800000
++#define RTASE_HW_VER_907XD_VA 0x08000000
+ 
+ #define RTASE_RX_DMA_BURST_256       4
+ #define RTASE_TX_DMA_BURST_UNLIMITED 7
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+index de7f11232593..6106aa5333bc 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
++++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+@@ -1725,6 +1725,7 @@ static int rtase_get_settings(struct net_device *dev,
+ 		cmd->base.speed = SPEED_5000;
+ 		break;
+ 	case RTASE_HW_VER_907XD_V1:
++	case RTASE_HW_VER_907XD_VA:
+ 		cmd->base.speed = SPEED_10000;
+ 		break;
+ 	}
+@@ -1993,6 +1994,7 @@ static int rtase_check_mac_version_valid(struct rtase_private *tp)
+ 	case RTASE_HW_VER_906X_7XA:
+ 	case RTASE_HW_VER_906X_7XC:
+ 	case RTASE_HW_VER_907XD_V1:
++	case RTASE_HW_VER_907XD_VA:
+ 		ret = 0;
+ 		break;
+ 	}
+-- 
+2.34.1
 
-Hi Kory,
-
-The storage size of chans is only 1 byte, but here we are pretending that
-it has more space. Which seems to be a bit of a stretch. Perhaps it would
-be better to simply use unsigned long as the type of chans here and in
-tps23881_irq_event_classification().
-
-W=1 build with gcc-14 on x86_64 complains about this line as follows:
-
-In function 'find_next_bit',
-    inlined from 'tps23881_irq_event_detection' at drivers/net/pse-pd/tps23881.c:1281:2,
-    inlined from 'tps23881_irq_event_handler' at drivers/net/pse-pd/tps23881.c:1363:9,
-    inlined from 'tps23881_irq_handler' at drivers/net/pse-pd/tps23881.c:1400:9:
-./include/linux/find.h:65:23: warning: array subscript 'long unsigned int[0]' is partly outside array bounds of 'u8[1]' {aka 'unsigned char[1]'} [-Warray-bounds=]
-   65 |                 val = *addr & GENMASK(size - 1, offset);
-      |                       ^~~~~
-drivers/net/pse-pd/tps23881.c: In function 'tps23881_irq_handler':
-drivers/net/pse-pd/tps23881.c:1278:12: note: object 'chans' of size 1
- 1278 |         u8 chans;
-      |            ^~~~~
-
-> +		reg = TPS23881_REG_DISC + (i % 4);
-> +		ret = i2c_smbus_read_word_data(priv->client, reg);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		val = tps23881_calc_val(ret, i, 0, 0xf);
-> +		/* If detection valid */
-> +		if (val == 0x4)
-> +			event = ETHTOOL_C33_PSE_EVENT_DETECTION;
-> +		else
-> +			event = ETHTOOL_C33_PSE_EVENT_DISCONNECTION;
-> +
-> +		tps23881_set_notifs_helper(priv, BIT(i), notifs,
-> +					   notifs_mask, event);
-> +	}
-> +
-> +	return 0;
-> +}
-
-...
 
