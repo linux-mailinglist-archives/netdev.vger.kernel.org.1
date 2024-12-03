@@ -1,282 +1,250 @@
-Return-Path: <netdev+bounces-148682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C3BE9E2E77
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:55:12 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39C579E2DD6
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:09:38 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10883B345C0
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 20:50:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00C56165A7B
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 21:09:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAEF3205E1C;
-	Tue,  3 Dec 2024 20:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F521FF7CF;
+	Tue,  3 Dec 2024 21:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Mt+K7SKA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CqK5uH+s"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2076.outbound.protection.outlook.com [40.107.220.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE2B1D79A0
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 20:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733259037; cv=fail; b=M9EyEawF7GMepH8nJFPy58zFC6jv27U/mrRWjlzpTD01CCUXdLWzq6cyH4CA3I1Jrq9jUTuL63t0NrNNGRUVY3zE54j/1JGnLwXD/snPVN3MX7a0wF86+Wu4/SpvzvShxoTEmlCB18sKGmZxuAES9nxIfnSCUMd3ZTn+FdTN/Mc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733259037; c=relaxed/simple;
-	bh=dIy19cxv1jY8jGSsADt+UmVp+zkSj2+DGqjhFyDqh2s=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CWbYcU03bQvkNy4O3vqDN+F2q+wq8Nj+gDkbzvMTm+XavNBxCxSknyJzWz+ljUGVv5zO4bwWHSrhuU2KtsPK5iSMcccVHbO5RUpQw0NBdf4S81R4tw65pBKbWDIewE7FxL2sawLhw95PO/3/G5Ow110oh3+dFwJfQzf5f/YDwks=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Mt+K7SKA; arc=fail smtp.client-ip=40.107.220.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MTmKg02wscwQGtyzifS6MflILAo1Iqwc+lqO1/8T0Ww7o4W/o+6puH0ub43brjirPd/PDxMBk9y+Z8mW2JdHn/Z3VdHzGOzbemOpjl0fLFOjHmuO5z6mHDqIakDDi+uAOAncmSImjqchvYnqxfR8y8FL5T70xob13taw6oDTDNOgBs6eMAXr3HJLFV+6wIKMk66coLZiTwA9WoPqJXdHQTw1mt1ooSlmRefoq/WA3Qqbqe0hHjkgQ5YPMiIhApXprCvKf4OCdWJ9rvJ/RgZ+y1NVXbb25TvfM/QbMa39sXm8VAP5BWMu0oDJt/ysoLD0mXM3Ef5aRGw298NXqkS7Xg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EfiUDM1/vy9D7v2Z/solIi9QNNAH0ekD3nAFAcRaHYk=;
- b=LPBD4k4XmKHwfm4B9EFX3pFrNKpMqHfk3Pq92ackPUkU+fxVFKShPYlTSQOKwuXNYD3bYqSLUXHWF5z1v0cRdAh7y/2kBu28xrnmRlw4/riImV0VMhfgBiHmHSqXjUa+Vvc87XPw9mBgqEN3v9JMV4pqVDkFY+NgiwxQqsOkpws8Hj+G11K/FQdox5vZEsT3W/xwYK9xbBTzsX1kEmA+uKyoUc2TekzLj/CqtHLxN3mbLc/IIMQPIjnibs0/q0NEWgw2OxWCTgf+hOyIS9iVSNXe69EjDGitdQekU/3nF3LXphWqgXLnTnlcs87uE2NipW/GLtJ7Oc/zjuX8OK0aqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EfiUDM1/vy9D7v2Z/solIi9QNNAH0ekD3nAFAcRaHYk=;
- b=Mt+K7SKAk0351KRt8ZceKCzlZHVx8oZeIK81JKDMY213hJ3QmhjsiaJLwjxh3wi01n/pisRWQNf223ACXS9vh4lrY/q68q3cQWRcgXi3hq40q3DOYMrLFsshYeVgK11TGyM/Pxdte6FYcS285qO/r5YGurtYV9+04yyYcQqQ9pRagZNzhmVU3FuO8St0IGM9Bp6d6RIsZyu+/8DKGezmqKr0OcPdmP50olqFNTJxQTiwbyrvg2capHDQPM8EIsCQg7JuR4kGp1vykz+OSkR11WOVOXhPubUsAeh0Cn9CH1R22mLFDMzdXtg9GepTCnu8thuRmb10k3tbvhRX8JOoAQ==
-Received: from CH3P220CA0011.NAMP220.PROD.OUTLOOK.COM (2603:10b6:610:1e8::26)
- by CH0PR12MB8577.namprd12.prod.outlook.com (2603:10b6:610:18b::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.19; Tue, 3 Dec
- 2024 20:50:29 +0000
-Received: from CH1PEPF0000AD7A.namprd04.prod.outlook.com
- (2603:10b6:610:1e8:cafe::53) by CH3P220CA0011.outlook.office365.com
- (2603:10b6:610:1e8::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8207.18 via Frontend Transport; Tue,
- 3 Dec 2024 20:50:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH1PEPF0000AD7A.mail.protection.outlook.com (10.167.244.59) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8230.7 via Frontend Transport; Tue, 3 Dec 2024 20:50:28 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 3 Dec 2024
- 12:50:10 -0800
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 3 Dec 2024
- 12:50:10 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
- with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Tue, 3 Dec
- 2024 12:50:06 -0800
-From: Tariq Toukan <tariqt@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Tariq Toukan
-	<tariqt@nvidia.com>, Lama Kayal <lkayal@nvidia.com>
-Subject: [PATCH net 5/6] net/mlx5e: SD, Use correct mdev to build channel param
-Date: Tue, 3 Dec 2024 22:49:19 +0200
-Message-ID: <20241203204920.232744-6-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20241203204920.232744-1-tariqt@nvidia.com>
-References: <20241203204920.232744-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140E01FCFD9
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 21:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733260174; cv=none; b=ZcAShfgsnK3do8/8qiljrAkew608rX7hd8yO1+mpah1LR2Jd95n860Oqu+Jz2sShvkhu9siKkjSVtsI8QKjAb64K0hNqyQeoJeQ6woEUa2WU08gq0P7CHTfxKjDBpEwR1o6vhDAHFh+924QHS8Fcmo6Q+z1zciv/l/o1ZBwn0+E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733260174; c=relaxed/simple;
+	bh=1Ds94AcozE3f38sb7CuSCG0LhT+JPwIueYtUg9QOCIc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uyzIQaInLsSO1rrGsUYj+CxFNcYwhInPPlODdEZas+90zf75vFouhDSoRSbA1CDVu4XbcBKSNMWMNAckTjyT3yo6Qd6BMGVk41Qgb1jdYe5v27QVxKNJit30uYipv4P0Mm6WP8zU4IbQgCM9Gpb5V2fl1rDtuK3SRKVX4o5sNYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CqK5uH+s; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b35758d690so1014589885a.1
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 13:09:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733260172; x=1733864972; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=e/HP5PLaNL9jCvhmPN1UQGOlAGoXFCU75pUewFa+Stg=;
+        b=CqK5uH+sC6kZHNPcM3TglJ0n4mqGR7ch0Pdjq9pEGDhoiCb0rxrkuTcj6uSkqkOAPj
+         XjAMBda+hOOpzTBkkzFhGkI0C0FtpbyLYtAjDcy8EcVkJIKH7ia1no2POiqjEi40U7Ia
+         5UMYx9pk5Np3KzEYBtXYkjyZsnz7XzRoRXKoujSp21IKw+sXKHveCSGRyUYm7XKd822Z
+         Bf4hl4608KMROrXpJKrKvYB0Wghtaa3GGWXDIVtm82Xrnib0oFeM2+3CXCcy3y37EKtP
+         GPwgHjLuFDe7Db7LPHYe3FFUKTlLBT7MNoYrPVpi0jNMNArqPlWUo38H7FZWKNOYJgUq
+         K0LA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733260172; x=1733864972;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=e/HP5PLaNL9jCvhmPN1UQGOlAGoXFCU75pUewFa+Stg=;
+        b=OcYIkremcpPb1232xAdWUB7XbTDrbRFRTxQbAvWFb2u+A3+COj8SEUCroFend3rgzo
+         P+omyIQ9SKdEZK7SW4k1e+VHyDmxuVtdGVuASeDHSmV0ovWIngvzGTLOV55I44X0bxdN
+         f8xU+UWK3Qyl/rfWUyabGFRACyXR/9gWD8yXoGwsrRBnnIX61rht77JAkFiHoL1k6SWx
+         Gogv/QWCglWswXCDY5cJMIOqmalZ0+SBNsRkYKQYjkLO49TJe1+JBHhybBmrZmXFInf0
+         A9H2sJo+T0IhBYPQhV3ojjaOa1x2W4UtLaqY/Z1jamolaOq00a9EqEJClf11MwMzfefS
+         jjnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWJnn5dEg6oWj3DffcixLMVqndZlPXGD4beFg0R67p0stvOKr2UR9UIOYQ6+5xCgCAWaMhiq7E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxX5hQhXNjJ6vO85LXnA2ImFJGarObFX+xVGECiBdXmGw4fxJA
+	K8loL3CS3CUFFne+QT3yn41QppQONY8El0wuysa0pc/hNd1WMVHkjVwUSsOdlYvfyWLgOgbr7Tk
+	UCAur/WQkzw==
+X-Google-Smtp-Source: AGHT+IG+yXPlZmZBuzv1BqOOMVtfHl+6kerX4SE5OK9wsg5inqpVntbkEIN+3pKPCGCxtL6OskW0IUyVFNfBlA==
+X-Received: from qkbbp18.prod.google.com ([2002:a05:620a:4592:b0:7b1:6421:b302])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:1996:b0:7b1:1d91:5cf1 with SMTP id af79cd13be357-7b6ababfdfbmr269869385a.1.1733260172055;
+ Tue, 03 Dec 2024 13:09:32 -0800 (PST)
+Date: Tue,  3 Dec 2024 21:09:29 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD7A:EE_|CH0PR12MB8577:EE_
-X-MS-Office365-Filtering-Correlation-Id: d1081bf0-caaf-4ee2-349e-08dd13dc1f02
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?bcdGCyNrJxipp522y9TdxukbTQ0wIYQSfGh17ROk9qlRtX/ifmKqJQ5gt32m?=
- =?us-ascii?Q?9WoQ94sxQLF9tupb6srINrD1UGgw3KXrp3l2Trxf/q+ztSCsZzZlq2nMGXxg?=
- =?us-ascii?Q?MtF346GYn4t0McJIGNjOOX+n+xsINDnkYrdsJHVVcE+Pmu9avlUUL2Pv2bKN?=
- =?us-ascii?Q?DjRheL6dJoIjhAR/RkXJtRNCmaGJQyUQ5SRWI44LxdkVn/doQpIbA1FVOTkN?=
- =?us-ascii?Q?fvh5gSOxnWvFdaGx97uQfqiczCdRJNbAppvhCfcEjBw4tCWiUtDEDBC2HJU3?=
- =?us-ascii?Q?1yDMSAFqzwEA6to3NwRZLky+G47gwAGIV4WQTa7rqHq9p1gMIoTsJpUzn1uP?=
- =?us-ascii?Q?leu43V/NZQQ8ZGrx8DYXB/xMdu0iXDKY3cQP08iMSXGI87XN1KJko6VEzC6q?=
- =?us-ascii?Q?j/QRMdz/EJ6v4XevkvZ+r/ro1X0G7jAGEb3CDJrF58U8OaM/BQXa0NzeTV7Y?=
- =?us-ascii?Q?oMP5b47l9T8CWgIK5h7AUoud8Bvh8vu2hnOU86PJQokkCpjp8hnv13vZXDsN?=
- =?us-ascii?Q?NSh9ZJztfOn5mDLicJzGYUtDFW6Rnb3wKKHWKU+slaSoRx6QjsiViEpHqye+?=
- =?us-ascii?Q?3pdc8l9pqUu95YdnIctXHllroQoipWB6I2YiIOSGnyvhqyxFAuzLTPxn28iN?=
- =?us-ascii?Q?NtiO0IkRj4/k9fuBXdvjUXqcBnP8gdsWG184ngjOUoBGTCIc2gHUv0awYXNV?=
- =?us-ascii?Q?I5QoHT3rOMCwhkQa7dAFXoKrRCzafcDjoA9Uhs1APRKu5amtcdRSsFSlCceA?=
- =?us-ascii?Q?/ry/To8CpclBsXdaArs/ATn+OLi5L2FWKTjvWACexPJj34vfhd8CFn7XRl1z?=
- =?us-ascii?Q?oWscV+FjGKBom/SvfRRC1pM2Eemq4Pd4VoqFPlZriDg2mL8UOFTFipSOgP2g?=
- =?us-ascii?Q?RjMzF1nboTqEvkCfXR6mGHeDxk5N5oHXTetXYs/ND8HZR3R4yDfJEoQhGkIb?=
- =?us-ascii?Q?fDeLZjsmXoppy6J/oV4ouXZvGSXsne62MWmuXkwmkp/XtqrB5o9GR3zRjD8Z?=
- =?us-ascii?Q?YUBKnQFiJ6WguPInT0NqNKevd1BllK4WUbkIfxBsRTyRJiU5M5KS0DlI01/Y?=
- =?us-ascii?Q?lUilPAcO6qdMAo10UYwK1/o9GwozJCbW46D4KamK4nOh+ANH833Tb9NYM2No?=
- =?us-ascii?Q?79UQsQff17AFBkRZJoT896AbPHYrJ1XlLUvQNU+mrfz+Q4dODUS6GQ5SPGEM?=
- =?us-ascii?Q?BTUoAlCW4kNXy4BTjgNw6zmbpwpnCw6tsgEx3uP3A/oqiMXkrhnPqjd2RB5l?=
- =?us-ascii?Q?VS9ETGJxClRPdllUG3HnWX0c/mjuIxONeXqNVaxyh1wNzNLSvEok/330XG8o?=
- =?us-ascii?Q?Gm+CEJo974CpdaUcAcGXIgMpEaJgBQSCvii+0LrhDtLnDI8OBVUrdeNM7Uh5?=
- =?us-ascii?Q?C6cN/PAYY1i0YGppzOXkbzcTmHda0BewdvPiXHVrIXOUqOWBSZVyMb3C0vSh?=
- =?us-ascii?Q?e4j1XOuxuzEzuWrsSHkNKAsUP33Q5wxU?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2024 20:50:28.8262
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d1081bf0-caaf-4ee2-349e-08dd13dc1f02
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD7A.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8577
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241203210929.3281461-1-edumazet@google.com>
+Subject: [PATCH net-next] net_sched: sch_fq: add three drop_reason
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-In a multi-PF netdev, each traffic channel creates its own resources
-against a specific PF.
-In the cited commit, where this support was added, the channel_param
-logic was mistakenly kept unchanged, so it always used the primary PF
-which is found at priv->mdev.
-In this patch we fix this by moving the logic to be per-channel, and
-passing the correct mdev instance.
+Add three new drop_reason, more precise than generic QDISC_DROP:
 
-This bug happened to be usually harmless, as the resulting cparam
-structures would be the same for all channels, due to identical FW logic
-and decisions.
-However, in some use cases, like fwreset, this gets broken.
+"tc -s qd" show aggregate counters, it might be more useful
+to use drop_reason infrastructure for bug hunting.
 
-This could lead to different symptoms. Example:
-Error cqe on cqn 0x428, ci 0x0, qn 0x10a9, opcode 0xe, syndrome 0x4,
-vendor syndrome 0x32
+1) SKB_DROP_REASON_FQ_DROP_BAND_LIMIT
+   Whenever a packet is added while its band limit is hit.
+   Corresponding value in "tc -s qd" is bandX_drops XXXX
 
-Fixes: e4f9686bdee7 ("net/mlx5e: Let channels be SD-aware")
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Lama Kayal <lkayal@nvidia.com>
-Reviewed-by: Gal Pressman <gal@nvidia.com>
+2) SKB_DROP_REASON_FQ_DROP_HORIZON_LIMIT
+   Whenever a packet has a timestamp too far in the future.
+   Corresponding value in "tc -s qd" is horizon_drops XXXX
+
+3) SKB_DROP_REASON_FQ_DROP_FLOW_LIMIT
+   Whenever a flow has reached its limit.
+   Corresponding value in "tc -s qd" is flows_plimit XXXX
+
+Tested:
+tc qd replace dev eth0 root fq flow_limit 10 limit 100000
+perf record -a -e skb:kfree_skb sleep 1; perf script
+
+      udp_stream   12329 [004]   216.929492: skb:kfree_skb: skbaddr=0xffff888eabe17e00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_FLOW_LIMIT
+      udp_stream   12385 [006]   216.929593: skb:kfree_skb: skbaddr=0xffff888ef8827f00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_FLOW_LIMIT
+      udp_stream   12389 [005]   216.929871: skb:kfree_skb: skbaddr=0xffff888ecb9ba500 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_FLOW_LIMIT
+      udp_stream   12316 [009]   216.930398: skb:kfree_skb: skbaddr=0xffff888eca286b00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_FLOW_LIMIT
+      udp_stream   12400 [008]   216.930490: skb:kfree_skb: skbaddr=0xffff888eabf93d00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_FLOW_LIMIT
+
+tc qd replace dev eth1 root fq flow_limit 100 limit 10000
+perf record -a -e skb:kfree_skb sleep 1; perf script
+
+      udp_stream   18074 [001]  1058.318040: skb:kfree_skb: skbaddr=0xffffa23c881fc000 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_BAND_LIMIT
+      udp_stream   18126 [005]  1058.320651: skb:kfree_skb: skbaddr=0xffffa23c6aad4000 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_BAND_LIMIT
+      udp_stream   18118 [006]  1058.321065: skb:kfree_skb: skbaddr=0xffffa23df0d48a00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_BAND_LIMIT
+      udp_stream   18074 [001]  1058.321126: skb:kfree_skb: skbaddr=0xffffa23c881ffa00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_BAND_LIMIT
+      udp_stream   15815 [003]  1058.321224: skb:kfree_skb: skbaddr=0xffffa23c9835db00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_DROP_BAND_LIMIT
+
+tc -s -d qd sh dev eth1
+qdisc fq 8023: root refcnt 257 limit 10000p flow_limit 100p buckets 1024 orphan_mask 1023
+ bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1 weights 589824 196608 65536 quantum 18Kb
+ initial_quantum 92120b low_rate_threshold 550Kbit refill_delay 40ms
+ timer_slack 10us horizon 10s horizon_drop
+ Sent 492439603330 bytes 336953991 pkt (dropped 61724094, overlimits 0 requeues 4463)
+ backlog 14611228b 9995p requeues 4463
+  flows 2965 (inactive 1151 throttled 0) band0_pkts 0 band1_pkts 9993 band2_pkts 0
+  gc 6347 highprio 0 fastpath 30 throttled 5 latency 2.32us flows_plimit 7403693
+ band1_drops 54320401
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/en_main.c | 32 ++++++++++---------
- 1 file changed, 17 insertions(+), 15 deletions(-)
+ include/net/dropreason-core.h | 18 ++++++++++++++++++
+ include/net/sch_generic.h     |  9 +++++++++
+ net/sched/sch_fq.c            | 14 ++++++++++----
+ 3 files changed, 37 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index d0b80b520397..dd16d73000c3 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -2680,11 +2680,11 @@ void mlx5e_trigger_napi_sched(struct napi_struct *napi)
- 
- static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
- 			      struct mlx5e_params *params,
--			      struct mlx5e_channel_param *cparam,
- 			      struct xsk_buff_pool *xsk_pool,
- 			      struct mlx5e_channel **cp)
- {
- 	struct net_device *netdev = priv->netdev;
-+	struct mlx5e_channel_param *cparam;
- 	struct mlx5_core_dev *mdev;
- 	struct mlx5e_xsk_param xsk;
- 	struct mlx5e_channel *c;
-@@ -2706,8 +2706,15 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
- 		return err;
- 
- 	c = kvzalloc_node(sizeof(*c), GFP_KERNEL, cpu_to_node(cpu));
--	if (!c)
--		return -ENOMEM;
-+	cparam = kvzalloc(sizeof(*cparam), GFP_KERNEL);
-+	if (!c || !cparam) {
-+		err = -ENOMEM;
-+		goto err_free;
-+	}
-+
-+	err = mlx5e_build_channel_param(mdev, params, cparam);
-+	if (err)
-+		goto err_free;
- 
- 	c->priv     = priv;
- 	c->mdev     = mdev;
-@@ -2741,6 +2748,7 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
- 
- 	*cp = c;
- 
-+	kvfree(cparam);
- 	return 0;
- 
- err_close_queues:
-@@ -2749,6 +2757,8 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
- err_napi_del:
- 	netif_napi_del(&c->napi);
- 
-+err_free:
-+	kvfree(cparam);
- 	kvfree(c);
- 
- 	return err;
-@@ -2807,20 +2817,14 @@ static void mlx5e_close_channel(struct mlx5e_channel *c)
- int mlx5e_open_channels(struct mlx5e_priv *priv,
- 			struct mlx5e_channels *chs)
- {
--	struct mlx5e_channel_param *cparam;
- 	int err = -ENOMEM;
- 	int i;
- 
- 	chs->num = chs->params.num_channels;
- 
- 	chs->c = kcalloc(chs->num, sizeof(struct mlx5e_channel *), GFP_KERNEL);
--	cparam = kvzalloc(sizeof(struct mlx5e_channel_param), GFP_KERNEL);
--	if (!chs->c || !cparam)
--		goto err_free;
--
--	err = mlx5e_build_channel_param(priv->mdev, &chs->params, cparam);
--	if (err)
--		goto err_free;
-+	if (!chs->c)
-+		goto err_out;
- 
- 	for (i = 0; i < chs->num; i++) {
- 		struct xsk_buff_pool *xsk_pool = NULL;
-@@ -2828,7 +2832,7 @@ int mlx5e_open_channels(struct mlx5e_priv *priv,
- 		if (chs->params.xdp_prog)
- 			xsk_pool = mlx5e_xsk_get_pool(&chs->params, chs->params.xsk, i);
- 
--		err = mlx5e_open_channel(priv, i, &chs->params, cparam, xsk_pool, &chs->c[i]);
-+		err = mlx5e_open_channel(priv, i, &chs->params, xsk_pool, &chs->c[i]);
- 		if (err)
- 			goto err_close_channels;
- 	}
-@@ -2846,7 +2850,6 @@ int mlx5e_open_channels(struct mlx5e_priv *priv,
- 	}
- 
- 	mlx5e_health_channels_update(priv);
--	kvfree(cparam);
- 	return 0;
- 
- err_close_ptp:
-@@ -2857,9 +2860,8 @@ int mlx5e_open_channels(struct mlx5e_priv *priv,
- 	for (i--; i >= 0; i--)
- 		mlx5e_close_channel(chs->c[i]);
- 
--err_free:
- 	kfree(chs->c);
--	kvfree(cparam);
-+err_out:
- 	chs->num = 0;
- 	return err;
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index 6c5a1ea209a22d8702f8c982762ca5f69791b8eb..570605152a2a2d36a698aa062104d59d3aba000b 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -58,6 +58,9 @@
+ 	FN(TC_EGRESS)			\
+ 	FN(SECURITY_HOOK)		\
+ 	FN(QDISC_DROP)			\
++	FN(FQ_DROP_BAND_LIMIT)		\
++	FN(FQ_DROP_HORIZON_LIMIT)	\
++	FN(FQ_DROP_FLOW_LIMIT)		\
+ 	FN(CPU_BACKLOG)			\
+ 	FN(XDP)				\
+ 	FN(TC_INGRESS)			\
+@@ -311,6 +314,21 @@ enum skb_drop_reason {
+ 	 * failed to enqueue to current qdisc)
+ 	 */
+ 	SKB_DROP_REASON_QDISC_DROP,
++	/**
++	 * @SKB_DROP_REASON_FQ_DROP_BAND_LIMIT: dropped by fq qdisc when per band
++	 * limit is reached.
++	 */
++	SKB_DROP_REASON_FQ_DROP_BAND_LIMIT,
++	/**
++	 * @SKB_DROP_REASON_FQ_DROP_HORIZON_LIMIT: dropped by fq qdisc when packet
++	 * timestamp is too far in the future.
++	 */
++	SKB_DROP_REASON_FQ_DROP_HORIZON_LIMIT,
++	/**
++	 * @SKB_DROP_REASON_FQ_DROP_FLOW_LIMIT: dropped by fq qdisc when a flow
++	 * exceeds its limits.
++	 */
++	SKB_DROP_REASON_FQ_DROP_FLOW_LIMIT,
+ 	/**
+ 	 * @SKB_DROP_REASON_CPU_BACKLOG: failed to enqueue the skb to the per CPU
+ 	 * backlog queue. This can be caused by backlog queue full (see
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index 5d74fa7e694cc85be91dbf01f0876b9feaa29115..c7a33c2c69830a6cbff8f6359de7cc468c2e845e 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -1245,6 +1245,15 @@ static inline int qdisc_drop(struct sk_buff *skb, struct Qdisc *sch,
+ 	return NET_XMIT_DROP;
  }
+ 
++static inline int qdisc_drop_reason(struct sk_buff *skb, struct Qdisc *sch,
++				    struct sk_buff **to_free,
++				    enum skb_drop_reason reason)
++{
++	tcf_set_drop_reason(skb, reason);
++	return qdisc_drop(skb, sch, to_free);
++}
++
++
+ static inline int qdisc_drop_all(struct sk_buff *skb, struct Qdisc *sch,
+ 				 struct sk_buff **to_free)
+ {
+diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
+index a5e87f9ea9861cbedb7ce858fbbcabb5d67cf821..9180810e39fa230ee2c4b6b94bcb87df388f4df8 100644
+--- a/net/sched/sch_fq.c
++++ b/net/sched/sch_fq.c
+@@ -537,6 +537,8 @@ static bool fq_packet_beyond_horizon(const struct sk_buff *skb,
+ 	return unlikely((s64)skb->tstamp > (s64)(now + q->horizon));
+ }
+ 
++#define FQDR(reason) SKB_DROP_REASON_FQ_DROP_##reason
++
+ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 		      struct sk_buff **to_free)
+ {
+@@ -548,7 +550,8 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	band = fq_prio2band(q->prio2band, skb->priority & TC_PRIO_MAX);
+ 	if (unlikely(q->band_pkt_count[band] >= sch->limit)) {
+ 		q->stat_band_drops[band]++;
+-		return qdisc_drop(skb, sch, to_free);
++		return qdisc_drop_reason(skb, sch, to_free,
++					 FQDR(BAND_LIMIT));
+ 	}
+ 
+ 	now = ktime_get_ns();
+@@ -558,8 +561,9 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 		/* Check if packet timestamp is too far in the future. */
+ 		if (fq_packet_beyond_horizon(skb, q, now)) {
+ 			if (q->horizon_drop) {
+-					q->stat_horizon_drops++;
+-					return qdisc_drop(skb, sch, to_free);
++				q->stat_horizon_drops++;
++				return qdisc_drop_reason(skb, sch, to_free,
++							 FQDR(HORIZON_LIMIT));
+ 			}
+ 			q->stat_horizon_caps++;
+ 			skb->tstamp = now + q->horizon;
+@@ -572,7 +576,8 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	if (f != &q->internal) {
+ 		if (unlikely(f->qlen >= q->flow_plimit)) {
+ 			q->stat_flows_plimit++;
+-			return qdisc_drop(skb, sch, to_free);
++			return qdisc_drop_reason(skb, sch, to_free,
++						 FQDR(FLOW_LIMIT));
+ 		}
+ 
+ 		if (fq_flow_is_detached(f)) {
+@@ -597,6 +602,7 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 
+ 	return NET_XMIT_SUCCESS;
+ }
++#undef FQDR
+ 
+ static void fq_check_throttled(struct fq_sched_data *q, u64 now)
+ {
 -- 
-2.44.0
+2.47.0.338.g60cca15819-goog
 
 
