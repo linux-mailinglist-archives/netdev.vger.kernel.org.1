@@ -1,109 +1,153 @@
-Return-Path: <netdev+bounces-148605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D351B9E2979
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:38:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3389F9E2988
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:40:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99C21286164
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:38:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC81B286CBE
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:40:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232D81FAC49;
-	Tue,  3 Dec 2024 17:38:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 925411FC0E0;
+	Tue,  3 Dec 2024 17:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hKCgqcW8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tIF0xXaJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9331F76CE;
-	Tue,  3 Dec 2024 17:38:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D1B1F8AD2;
+	Tue,  3 Dec 2024 17:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733247512; cv=none; b=JJ75HhQqCsrvnJq8qG9uwPr43Z1T35zEDx2FJfMmIpskubNkyzAcD4csos6Dly2aZU/nkrZTZIPbe/CnsE35YuEfIJU0O58IQ3as8AEcylARuY1eN3CnHjvANCq7cBQGJ+NTAO2iTMFf1mwdeqSLaLI20MRM9zV8I4x9rMf/ur0=
+	t=1733247633; cv=none; b=IwY8YHy277/AbM3CHyMns6pgJyfSlYMvT8tLfutuyuDzAmjfa2+Qn2xUYqXU666ztn5CVFrHT8bizNklb0TwaM6uxfXjo48agUJjYtUoei9hOAd6dA8Ehj29QdDz6F7iMAqdAbsPqELHVgc3BhWKgo/DHGeeK9wdmWb7JIsrYt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733247512; c=relaxed/simple;
-	bh=7BrpCZ2JaT8Bn4r+/fZpw3qYVx7AsWh4zajkUXq+CmM=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=c4qseTbrPqfdty+E8JESMDsLzbhAfLRkB4XJu4k8bPNmUShUfGrzkP6j/9cUrcDasbpnXMer3U9Y/LTx/Xh0v0BUTOqmAUHJB0p7Ckmx2a24w/N/RHSBCacx2syVZKR35EhqjaXLgq7HZba5cEXVHvPTM7WWsRzOvHj9fbEFyj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hKCgqcW8; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-434a90fed23so49293075e9.1;
-        Tue, 03 Dec 2024 09:38:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733247509; x=1733852309; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2i0QYGRPe31dft8XawdbTPYP5t//UlFP6kTyw2o6LzE=;
-        b=hKCgqcW8O6/q1Ep6u8TXxZShGmePw0sRP3W/V7HgXCcVA0T6ijRLToVXLqU8bKXWN1
-         cr8S6T5VU+gAeO7mL545jKs2pKM/2i0v0v9b+seBHx9m8txUkII8mjRayBGrF9OXssIB
-         XVSRcaUf0VM50hwWFbolSomH/ONmdJcOmzrdV/0jfDW8ddte33Ju9+lU3GLRFHDgVrks
-         YtlJN/npennTV+fvk9mD81OvvVlhgnSJC6Wb9cK3v7FS7H6vJT1LqiZanxQO6APKMLfj
-         iwzAlkiVsnIaAf4Yi37USburfYhqme+J5kL8b8I9hUutxDT4czF5e5JEquo6KLesvm5L
-         NvEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733247509; x=1733852309;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2i0QYGRPe31dft8XawdbTPYP5t//UlFP6kTyw2o6LzE=;
-        b=ItGh2mW+hUrFdKBWonH+vJjQPRvC/DXTHnpR+CES6SqfX6QEJE9txn901oxQ/dnMDF
-         WdU7K+RnmF583OAs1dtBF7JFm/VXXIezUfksGPiZQCcHzIoS8H5FeXJFW/tvCTZAByMt
-         +O22lR3NUsMd2ZYIlYaC2qxPeDBighCuxRaTbOaJo1rrG4y78E8Ndd5wQZpkI2lo/Ll+
-         RGBwGTt9R2Ve+Hi7EezwwVDY8Zzx5jeNqz5+nQFDJgRE6n8C1C262A7O+BtuNcySna7p
-         N9I8R/VnwgWOQQbDQxEG0hnaCkDCKOxusIoVFpaeehZ1RHwTEvom5DYJOslPf1hUg614
-         M73w==
-X-Forwarded-Encrypted: i=1; AJvYcCV+N+GRyWmY15qXk6Vyhm9WUWwK+URQQ5F+IFgAZBHjCQUPthCy0TIlPG7AMfReL3rYHkkf9h9R@vger.kernel.org, AJvYcCVPqC4wK4Fr0hlue+kEqy2K6ifRlHpK7U8NwC6ydR776001MCOVr4A4gCc0QpqTBVyoN47ZIF/idOY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywv/mmACQkbTYWwHG4C8iTs6RVSy6Z53fWTod24iPGU2EyZtT5S
-	uOcfYcTNT8lZjF6GiKFD8lfBzKKUWcrRAuhKBbnoKzl8qGqYJXsO
-X-Gm-Gg: ASbGncvIFHTZ8u/AW/Yj3yOGySkG5xzDLklulMwJRj9c0AJnqJi5zoCeN1FxH2zTlhU
-	ilHxlG235Z/cwc4uJ0jDImJMbs2fmnqTJ9Nzuyuu6vxDE+VdMOXVGvLk7r1qrT9MvT3uwTReOnL
-	Qcsg0342BBEDbYANxDFImhuVz+oF4C0TnK+tMz4owa4e1r0GwvqAYEKhbEd44dk91off8SA+C/O
-	VFXMLJDn0II7c5oJoJBVAeKY/WBYK/G2RlIm7IWUtqwIBRZ1pO4m3TOzFIKgKUo2f4/InUfbohD
-	zGTvhkpuwyM1szggnj9KsrhbpNDMqDZg5jUZIA==
-X-Google-Smtp-Source: AGHT+IELfk/rqiYQ2xFCsty4Po/RDV1kpoZIfmvqPBOS1OiRE8cCwmsd9kkcQ9OLbFX2XtV2i12P0A==
-X-Received: by 2002:a05:6000:4013:b0:385:f638:c67b with SMTP id ffacd0b85a97d-385fd3f774amr2815948f8f.35.1733247508378;
-        Tue, 03 Dec 2024 09:38:28 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e5b10478sm10474748f8f.73.2024.12.03.09.38.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2024 09:38:27 -0800 (PST)
-Subject: Re: [PATCH v6 27/28] sfc: update MCDI protocol headers
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-Cc: Alejandro Lucero <alucerop@amd.com>
-References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
- <20241202171222.62595-28-alejandro.lucero-palau@amd.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <8e43ec5e-8ca9-43fe-eb91-f35388a03c1e@gmail.com>
-Date: Tue, 3 Dec 2024 17:38:26 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1733247633; c=relaxed/simple;
+	bh=JVxnQB3YiNFwYmPRcTY5PbfjrO33ScuIbRHk2z9VhNc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GtJnL+90cXtwNDZHkH/K5MytV5TZdjk2yUBCa4Us3VVWLG68ZSRrYJyXlPo/+engOP2UV2CEY01APFBO1KUwxz4uFnQEkN1hy1h2jXjktTpQQ/WXIw7Izsd0MPxDnUY5oHao//kKohr4GiJbg8CM/InTgfV5fFQgM+BpY4dChvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tIF0xXaJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F9EEC4CECF;
+	Tue,  3 Dec 2024 17:40:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733247632;
+	bh=JVxnQB3YiNFwYmPRcTY5PbfjrO33ScuIbRHk2z9VhNc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tIF0xXaJUWSDV3HPcTEmBBjCCzzuroPOVgBSWktcnaRWOSOrebfBkWSEK+oS02taX
+	 f8z4mnuUAOhk+Zx8Oz72U90HVCGv9aDIxylHJFX7t60xEANNf/zB9EKHYr19QxQiMc
+	 fFAT8AYlWWBAZWrdvk+oPHaZ2DP1/6B0TcPOaG1czg8XrixMcN4CW9VtlBBNn3xFug
+	 S3UcRfyDUFNKY6LHYnzVcmZ08Mh43tnGBtOCLrUxVz+DIH034iEOR82tPfol6+GKw8
+	 ibli5PkOAQpF5RivOoj7u75bNlMzb0X1kBYlIAPEr3pG5Kk0oab/ocOw2YZbm7Zc4t
+	 izODEXmjxK+Ew==
+Date: Tue, 3 Dec 2024 19:40:27 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Bjorn Helgaas <helgaas@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	linux-pci@vger.kernel.org, Ariel Almog <ariela@nvidia.com>,
+	Aditya Prabhune <aprabhune@nvidia.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Arun Easi <aeasi@marvell.com>, Jonathan Chocron <jonnyc@amazon.com>,
+	Bert Kenward <bkenward@solarflare.com>,
+	Matt Carlson <mcarlson@broadcom.com>,
+	Kai-Heng Feng <kai.heng.feng@canonical.com>,
+	Jean Delvare <jdelvare@suse.de>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
+Subject: Re: [PATCH v3] PCI/sysfs: Change read permissions for VPD attributes
+Message-ID: <20241203174027.GK1245331@unreal>
+References: <18f36b3cbe2b7e67eed876337f8ba85afbc12e73.1733227737.git.leon@kernel.org>
+ <20241203092456.5dde2476@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241202171222.62595-28-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241203092456.5dde2476@hermes.local>
 
-On 02/12/2024 17:12, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
+On Tue, Dec 03, 2024 at 09:24:56AM -0800, Stephen Hemminger wrote:
+> On Tue,  3 Dec 2024 14:15:28 +0200
+> Leon Romanovsky <leon@kernel.org> wrote:
 > 
-> The script used to generate these now includes CXL definitions.
+> > The Vital Product Data (VPD) attribute is not readable by regular
+> > user without root permissions. Such restriction is not needed at
+> > all for Mellanox devices, as data presented in that VPD is not
+> > sensitive and access to the HW is safe and well tested.
+> > 
+> > This change changes the permissions of the VPD attribute to be accessible
+> > for read by all users for Mellanox devices, while write continue to be
+> > restricted to root only.
+> > 
+> > The main use case is to remove need to have root/setuid permissions
+> > while using monitoring library [1].
+> > 
+> > [leonro@vm ~]$ lspci |grep nox
+> > 00:09.0 Ethernet controller: Mellanox Technologies MT2910 Family [ConnectX-7]
+> > 
+> > Before:
+> > [leonro@vm ~]$ ls -al /sys/bus/pci/devices/0000:00:09.0/vpd
+> > -rw------- 1 root root 0 Nov 13 12:30 /sys/bus/pci/devices/0000:00:09.0/vpd
+> > After:
+> > [leonro@vm ~]$ ls -al /sys/bus/pci/devices/0000:00:09.0/vpd
+> > -rw-r--r-- 1 root root 0 Nov 13 12:30 /sys/bus/pci/devices/0000:00:09.0/vpd
+> > 
+> > [1] https://developer.nvidia.com/management-library-nvml
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> > Changelog:
+> > v3:
+> >  * Used | to change file attributes
+> >  * Remove WARN_ON
+> > v2: https://lore.kernel.org/all/61a0fa74461c15edfae76222522fa445c28bec34.1731502431.git.leon@kernel.org
+> >  * Another implementation to make sure that user is presented with
+> >    correct permissions without need for driver intervention.
+> > v1: https://lore.kernel.org/all/cover.1731005223.git.leonro@nvidia.com
+> >  * Changed implementation from open-read-to-everyone to be opt-in
+> >  * Removed stable and Fixes tags, as it seems like feature now.
+> > v0:
+> > https://lore.kernel.org/all/65791906154e3e5ea12ea49127cf7c707325ca56.1730102428.git.leonro@nvidia.com/
+> > ---
+> >  drivers/pci/vpd.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> > 
+> > diff --git a/drivers/pci/vpd.c b/drivers/pci/vpd.c
+> > index a469bcbc0da7..a7aa54203321 100644
+> > --- a/drivers/pci/vpd.c
+> > +++ b/drivers/pci/vpd.c
+> > @@ -332,6 +332,13 @@ static umode_t vpd_attr_is_visible(struct kobject *kobj,
+> >  	if (!pdev->vpd.cap)
+> >  		return 0;
+> >  
+> > +	/*
+> > +	 * Mellanox devices have implementation that allows VPD read by
+> > +	 * unprivileged users, so just add needed bits to allow read.
+> > +	 */
+> > +	if (unlikely(pdev->vendor == PCI_VENDOR_ID_MELLANOX))
+> > +		return a->attr.mode | 0044;
+> > +
+> >  	return a->attr.mode;
+> >  }
+> >  
 > 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Could this be with other vendor specific quirks instead?
 
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+In previous versions, I asked Bjorn about using quirks and the answer
+was that quirks are mainly to fix HW defects fixes and this change doesn't
+belong to that category.
 
-Thanks.
+https://lore.kernel.org/linux-pci/20241111214804.GA1820183@bhelgaas/
+
+> 
+> Also, the wording of the comment is awkward. Suggest:
+> 	On Mellanox devices reading VPD is safe for unprivileged users.
+
+Thanks
 
