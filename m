@@ -1,52 +1,78 @@
-Return-Path: <netdev+bounces-148483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48D289E1CFB
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:03:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FF5A9E1D28
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:11:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0958C281B0C
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 13:03:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BE74B2B7A1
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 11:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C671EF0A6;
-	Tue,  3 Dec 2024 13:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B52C91E3799;
+	Tue,  3 Dec 2024 11:26:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="Kc4yhuXu"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="ca4rR8Og"
 X-Original-To: netdev@vger.kernel.org
-Received: from mr85p00im-ztdg06021801.me.com (mr85p00im-ztdg06021801.me.com [17.58.23.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC8F1EE00C
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 13:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.23.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC3D1E47A8
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 11:26:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733231024; cv=none; b=K5F2+XsPvbcOPw+ZuotJc8t+8RK4T1H0SXICFHwSfFS14LE3U8scOg/7ybEqywFoEFM0n/qaMdYW4lO1LDiSB6FC1e9Rb9Wm9osN4rHvtXON3/zAUdlmEEEh3UQztp3pDF/ITJj3w/pj2d4wfFgCAZWwhWAoxnEGYX92OAjtm2U=
+	t=1733225165; cv=none; b=UJ7mWRAILForO7qR//MQwUs65Flo2T13v4pNGrnXgNNq50bOUJ2l/ccA47tQdRrZxM1oCNZTbh28rFDoLbmVJxkNdraRjuJgtuKBrlHGG5uQdvZ15qwheqtU4M0Z5zuIWWGKk5sAMWU7GQu3xUXehxFgsE+quqUrR25GLYekDxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733231024; c=relaxed/simple;
-	bh=PMZl124fAJi/9a12repkCEPo/NdFlnbWHM0+eGs6QGw=;
+	s=arc-20240116; t=1733225165; c=relaxed/simple;
+	bh=xOHhJS2e7BRBffjVgA/oI7/rkkIN9hsNagUIadI5S4U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BhU3+2oyBZ9jbiH7DxS4s5utfP/DGBGssciLQm6KyoVYvgdn21rt3kvLkDikGdHUV5Z9GsXTA+gL9rt1cCsjXRWgm+1aVDuhSEUA5bs2391bv4PEuMi/XpUhruvCoTsh2nYx36x+Kla4UUbIqfzaiePU3FMAI3nQYOCNfwfT9+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=Kc4yhuXu; arc=none smtp.client-ip=17.58.23.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1733231020;
-	bh=QEJ75x+TqYUJVxmVF6uQZZWFOEl0WJRfUhXN2h5KpKM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
-	 x-icloud-hme;
-	b=Kc4yhuXugc/D/qtZZ41v8wAnuwEzwggEWUway63IXkClqixwU1cfn/v3YVm8Qsiaw
-	 28NLlORRwJjFZX7JY4DZlIgrQ1s8zKvPJAQ+RXHBAEkcNRuUPk0OyxBiAs9kB0GBL/
-	 4jgwTolEa8TiqyUyeuv6tr/7DG898UMLRPOw8P2qzUVkHb/i6BK0gmuVjOCVuRaOL4
-	 yVOUtS8ijY+iNGs/3oFthLPmtWg3RPz3zQCNIexvybyNTkT8kJ+0hPmRIWLu7xxlpo
-	 9HqUza+TM66+s3TNEHqlu5QAj7PkxbSr1VPZfaRzmcsea2BKweNx4LzKqRftuLVcUB
-	 Ma8BwRHqOq26Q==
-Received: from [192.168.1.26] (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
-	by mr85p00im-ztdg06021801.me.com (Postfix) with ESMTPSA id 67D49442839;
-	Tue,  3 Dec 2024 13:03:18 +0000 (UTC)
-Message-ID: <b9885785-d4d4-4c72-b425-3dc552651d7e@icloud.com>
-Date: Tue, 3 Dec 2024 21:02:59 +0800
+	 In-Reply-To:Content-Type; b=jQxB/NCxAPGY93Q3KW3jMUXv8vQYKO9/RiSYMXpKXCUYjwb5Ks7FlYSVIiX5xtXKqvEsDCVFsvNJRT94kj7lakJebY9ELBQKRimB1eNL1XHU5TJVyim1f4eqpUy3JwF7t7mRQcS9ytX1UauDMu99VLOdAt9dL+utI3kQbaCB3Is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=ca4rR8Og; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-382610c7116so3565659f8f.0
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 03:26:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1733225159; x=1733829959; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EQKk0snMB1vmn3SCZ7cY178GX753db7hlE0FmDcIMDw=;
+        b=ca4rR8Og5EcLGOUnuZ9dTNJvXRTv9AN08eJBMIzn9NVKiBWzJL9Y5x5XuoOe44WFDr
+         mSCMX8MLeokeCyDpoLAD58GyXntnSoZNqh89qCUgSmPC5kwIzO2yvLPm0ZWumsDVLQqw
+         vu6oEsI/lmMeD9j7eJgOqBIqrzkQ+i1lVY5lzaZbZQlbpTkE2OQKefiF+hagsVqVwOks
+         xE3yhmV/miruC0Tqw0rcq11pnR/jBUxuh+9mVwhuygf6lbeM+HxAjobj/c3lCn640q53
+         ISPNSHfCV7Y6GGrlD1gLIsIpO3dSYR56wwKHUZgzoNvyQA15HnkiZKcioVC0OBO16265
+         QGqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733225159; x=1733829959;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EQKk0snMB1vmn3SCZ7cY178GX753db7hlE0FmDcIMDw=;
+        b=d/JrbJikGOAAjSatE/3RBydscDw85T3a27wNy8wPQQLeJ3KOE3rz56OQsFOZSki0Zc
+         0YVL8bkaCiAOtWoncFdHwW5L4dTl8foOscY8n4TP2hj+B5W1wjT8VcqpsDR74XXRUUky
+         iZdtqCmMFPq8ge2kkikT0XmyEJiM6IrFpWkCfSfPCrC/8OxVW/0lEhs0IJufL4O7k2ls
+         lS1/32uvjqGgiq5kYa1gJo0vQ9B4WL4wDN9QY84/6cQFHMn36/zPebUL/Wx6FZylfyAc
+         mKrJOtAh4lsXhuOHL16US1YyVieHv2exn31VC+zON+wwsgvQxQs6a8+FXNKKeoGzTi3D
+         DWmg==
+X-Forwarded-Encrypted: i=1; AJvYcCW3FVYZWrF2E3M2uKSGxtPOlbAe1ZfIFtn2fF+dYJ/NDP80v7cCN8I15pnCqQGWHZjGdNnA8pk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFCqitjznCU6aaa1UIjDnSzDumZ9fv3SOAxoTWCDjwtyKn6Bgc
+	Lv5wGbIxqBIRDts3d3ovqkB5o2cUlNL8IPYLpW/7hNoNFRtIuxAv9NkduuMTGbY=
+X-Gm-Gg: ASbGncvPSnADo5kW2VQkvjqfj+CHHOH6/8jkwINEeZZ0/yBwJ7MvwU868xnnLWJKEqf
+	exD0AZpN7j3MbPed5egDdL18OQXdF39D0f+qEpr01t83s/POzuANR4+Iy6V0xVxNKUU4odogGB4
+	Oj9OdTxoHRYd5n9GglmwbWMZBiG94ntu29DmDNqfEqqEdA844IOZZ9kPu7I/mSenNFyXiDeqOeC
+	2x1assBqz7eMbWnpSjPwkPu49oQpX9ABro+USxNH0Pz5YInBBaC
+X-Google-Smtp-Source: AGHT+IH3FlHetTjK4CzZkif2fE0r9/KIALDBxHfHCk9zvdHQilSiS+hU1hVlXIzPFyEvWRyjrEjC1A==
+X-Received: by 2002:a05:6000:1fa5:b0:385:f560:7911 with SMTP id ffacd0b85a97d-385fd3ce08dmr1925269f8f.10.1733225159151;
+        Tue, 03 Dec 2024 03:25:59 -0800 (PST)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e4a54b71sm9594496f8f.79.2024.12.03.03.25.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Dec 2024 03:25:58 -0800 (PST)
+Message-ID: <12a687d5-cc87-4993-aec2-07ea799ce334@blackwall.org>
+Date: Tue, 3 Dec 2024 13:25:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,117 +80,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/32] driver core: Constify API device_find_child()
- and adapt for various existing usages
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Chun-Kuang Hu <chunkuang.hu@kernel.org>,
- Philipp Zabel <p.zabel@pengutronix.de>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Jean Delvare <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>,
- Martin Tuma <martin.tuma@digiteqautomotive.com>,
- Mauro Carvalho Chehab <mchehab@kernel.org>,
- Andreas Noever <andreas.noever@gmail.com>,
- Michael Jamet <michael.jamet@intel.com>,
- Mika Westerberg <mika.westerberg@linux.intel.com>,
- Yehezkel Bernat <YehezkelShB@gmail.com>,
- Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
- Ira Weiny <ira.weiny@intel.com>, Takashi Sakamoto <o-takashi@sakamocchi.jp>,
- Jiri Slaby <jirislaby@kernel.org>,
- Heikki Krogerus <heikki.krogerus@linux.intel.com>,
- Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
- Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
- Mike Christie <michael.christie@oracle.com>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Nilesh Javali <njavali@marvell.com>,
- Manish Rangankar <mrangankar@marvell.com>,
- GR-QLogic-Storage-Upstream@marvell.com, Davidlohr Bueso <dave@stgolabs.net>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Alison Schofield <alison.schofield@intel.com>,
- Andreas Larsson <andreas@gaisler.com>, Stuart Yoder <stuyoder@gmail.com>,
- Laurentiu Tudor <laurentiu.tudor@nxp.com>, Jens Axboe <axboe@kernel.dk>,
- Sudeep Holla <sudeep.holla@arm.com>,
- Cristian Marussi <cristian.marussi@arm.com>, Ard Biesheuvel
- <ardb@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>, linux-kernel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
- linux-arm-kernel@lists.infradead.org, linux-hwmon@vger.kernel.org,
- linux-media@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
- linux-pwm@vger.kernel.org, nvdimm@lists.linux.dev,
- linux1394-devel@lists.sourceforge.net, linux-serial@vger.kernel.org,
- linux-sound@vger.kernel.org, open-iscsi@googlegroups.com,
- linux-scsi@vger.kernel.org, linux-cxl@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
- arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org,
- linux-remoteproc@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20241203-const_dfc_done-v2-0-7436a98c497f@quicinc.com>
- <g32cigmktmj4egkq2tof27el2yss4liccfxgebkgqvkil32mlb@e3ta4ezv7y4m>
- <9d34bd6f-b120-428a-837b-5a5813e14618@icloud.com>
- <2024120320-manual-jockey-dfd1@gregkh>
+Subject: Re: [PATCH v3 iproute] bridge: dump mcast querier state
+To: Fabian Pfitzner <f.pfitzner@pengutronix.de>, netdev@vger.kernel.org
+Cc: dsahern@gmail.com, entwicklung@pengutronix.de, roopa@nvidia.com,
+ bridge@lists.linux-foundation.org, stephen@networkplumber.org
+References: <20241101115039.2604631-1-f.pfitzner@pengutronix.de>
 Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <2024120320-manual-jockey-dfd1@gregkh>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20241101115039.2604631-1-f.pfitzner@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: CNFmwAOF9NCRr2KajfMjTjtFd_qlM54K
-X-Proofpoint-GUID: CNFmwAOF9NCRr2KajfMjTjtFd_qlM54K
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2024-12-03_02,2024-12-03_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0
- clxscore=1015 malwarescore=0 adultscore=0 phishscore=0 mlxscore=0
- suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2412030113
+Content-Transfer-Encoding: 7bit
 
-On 2024/12/3 20:41, Greg Kroah-Hartman wrote:
-> On Tue, Dec 03, 2024 at 08:23:45PM +0800, Zijun Hu wrote:
->> On 2024/12/3 20:00, Uwe Kleine-König wrote:
->>> Hello,
->>>
->>> On Tue, Dec 03, 2024 at 08:33:22AM +0800, Zijun Hu wrote:
->>>> This patch series is to constify the following API:
->>>> struct device *device_find_child(struct device *dev, void *data,
->>>> 		int (*match)(struct device *dev, void *data));
->>>> To :
->>>> struct device *device_find_child(struct device *dev, const void *data,
->>>> 				 device_match_t match);
->>>> typedef int (*device_match_t)(struct device *dev, const void *data);
->>>
->>> This series isn't bisectible. With only the first two patches applied I
->>> hit:
->>
->> yes. such patch series needs to be merge as atomic way.
->>
->> Hi Greg,
->>
->> is it possible to ONLY merge such patch series by atomic way into your
->> driver-core tree?
+On 01/11/2024 13:50, Fabian Pfitzner wrote:
+> Kernel support for dumping the multicast querier state was added in this
+> commit [1]. As some people might be interested to get this information
+> from userspace, this commit implements the necessary changes to show it
+> via
 > 
-> Nope!
+> ip -d link show [dev]
 > 
->> or squash such patch series into a single patch ?
->>
->> various subsystem maintainers may not like squashing way.
+> The querier state shows the following information for IPv4 and IPv6
+> respectively:
 > 
-> Agreed, so look into either doing it in a bisectable way if at all
-> possible.  As I don't see a full series here, I can't suggest how it
-> needs to happen :(
+> 1) The ip address of the current querier in the network. This could be
+>    ourselves or an external querier.
+> 2) The port on which the querier was seen
+> 3) Querier timeout in seconds
+> 
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c7fa1d9b1fb179375e889ff076a1566ecc997bfc
+> 
+> Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+> ---
+> 
+> v1->v2
+> 	- refactor code
+> 	- link to v1: https://lore.kernel.org/netdev/20241025142836.19946-1-f.pfitzner@pengutronix.de/
+> v2->v3
+> 	- use print_color_string for addresses
+> 	- link to v2: https://lore.kernel.org/netdev/20241030222136.3395120-1-f.pfitzner@pengutronix.de/
+> 
+>  ip/iplink_bridge.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 60 insertions(+)
 > 
 
-let me send you a full series later and discuss how to solve this issue.
+Sorry for the delayed review, I missed the new version.
+I have one small nit if there's another version: drop the extra new line between
+the definition of bqtb and other_time, other than that looks good to me.
 
-> thanks,
-> 
-> greg k-h
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+
 
 
