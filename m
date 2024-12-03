@@ -1,80 +1,89 @@
-Return-Path: <netdev+bounces-148426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B8049E1824
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:47:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2101516667B
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 09:47:17 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC22C1E201D;
-	Tue,  3 Dec 2024 09:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fffq2SAs"
-X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAF4A9E1821
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:46:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F891E22E1;
-	Tue,  3 Dec 2024 09:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F24928645F
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 09:46:56 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B61CB1E0499;
+	Tue,  3 Dec 2024 09:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uV4ME+gR"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1BB11E048B
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 09:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733219126; cv=none; b=VhGrhkk1fPxyWX5G8Ey3e2a28kCfGSes3QyTXvKYNc6ASqB/I5vPA0CdMA7VnvcQi+QaC5ZnLDscpM9bARERfmiTkK8sdUENT4AB+vPWrN48O006SJH0vXlGuhgdl1cEiJqTlGOn3LS2FO7OZQaXRjEhgNYx6aKnVqfFsmJvd+A=
+	t=1733219122; cv=none; b=hQOVN8/yalsyD8ASPAkG//3x9kbn2YLwntng0dbRbeJtgRursGzUJ2okeJTMopqbZfhbI6+oTclK3vYV2wuczcSuwI1AxvgXWH1bM2fXxfYbc8dH+WUto2iW8T5/FnsbUlHUNkwYxlYzF7n5yoOuB87cWFqricWXbKtTtI765nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733219126; c=relaxed/simple;
-	bh=zbvoUGnSNfCih1kEhklJgBJLXZz9g/QO4/mn1ZyxObw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p9Mx4QNy8AsB01hF5xGx8jtRZKvsEg9rftyCZxBV1kOah3NiD6DKFH6AweuCNsdcTY9JdiA1WT1gXZeEcYop0iuvb9zWq+c/gQxO2iFb27i8gBoWvNHLoMfRBjED4c7KHSRO1z1KzPB10Jna404ZsGKKUYjmHvVSg9XD4EL8OvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fffq2SAs; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733219125; x=1764755125;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=zbvoUGnSNfCih1kEhklJgBJLXZz9g/QO4/mn1ZyxObw=;
-  b=fffq2SAsU1ECiaypQ5OBBvnkyfdvT9gGI0wvanLn7e1BirhUHjL2qQZ7
-   /TMbUqrQr+/0CpFNYEPVzQaEC1v0Gethz9qivhGgvAsTfjCk9ZgbwA97O
-   lawdQPqLzE2KxUrWBC3eG6D4QX5v2NLOm8u5XKNUl9ifFi9uN4GIcb/Pa
-   cNKWiLWAEG9Zb1DiRKEdO/SYX0Mp/iy9B6GllKwZVQvff8+jsJ4nnR69E
-   R3mvvJgTx1Xz2ofno/LcQf+m+l5QiM8IsYB9QtA49s+wM6MG8yP3deQ/+
-   OZTbRz/X7LhyhlWL4zGh3t4evD/ihha4f1iO1ewB+E3n2PqoPk5C4UGOe
-   g==;
-X-CSE-ConnectionGUID: ngNUJoMDSc2pdzJFM8Ux5Q==
-X-CSE-MsgGUID: RZg2gOrGRryIVLWdwwOKrQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="44810932"
-X-IronPort-AV: E=Sophos;i="6.12,204,1728975600"; 
-   d="scan'208";a="44810932"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 01:45:24 -0800
-X-CSE-ConnectionGUID: hfSV4T6JSLqyadMoHxrH7A==
-X-CSE-MsgGUID: k6GSCqcASzKLiz2AC487fQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,204,1728975600"; 
-   d="scan'208";a="94217652"
-Received: from lkp-server01.sh.intel.com (HELO 388c121a226b) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 03 Dec 2024 01:45:21 -0800
-Received: from kbuild by 388c121a226b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tIPT4-0000Up-2j;
-	Tue, 03 Dec 2024 09:45:18 +0000
-Date: Tue, 3 Dec 2024 17:44:34 +0800
-From: kernel test robot <lkp@intel.com>
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
-	netdev@vger.kernel.org, dan.j.williams@intel.com,
-	martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	dave.jiang@intel.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v6 15/28] cxl: define a driver interface for HPA free
- space enumeration
-Message-ID: <202412031722.5L3bVD47-lkp@intel.com>
-References: <20241202171222.62595-16-alejandro.lucero-palau@amd.com>
+	s=arc-20240116; t=1733219122; c=relaxed/simple;
+	bh=RJ4dlBGD3salju0V5qaXj8Hlpmx2bDBn5RHAXBda2Hw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=FCLpWOj9PtGbdv9msLhc2gt7SptcJoXIIREUsmyPB9wFZUGcrKERU2CML3G75hAhT8VYrgKuwrK8QifHsTlBIfj1KWgEA9Z046AZXFk1/ENDb6J+2f7w+VKa0eVagtSLoKYnKqaxRnWo0blBZX7hG9suWr7/zTOLRM+PFvhEGL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=uV4ME+gR; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-434a766b475so48688685e9.1
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 01:45:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1733219119; x=1733823919; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6I1Ptmv2KxZJwio/UIsOX+BhzfGwkhQGEzNHEKVRFKU=;
+        b=uV4ME+gRVBtdJasDf2fMwONsoRGQM5JE1tp3+s+c5xfAVh5yqwY3NGe0x9w1ch8Xsk
+         wQZZYyiZiqi/WOgXQiv8X8W7Y4hn13uZRQaHX0fOmwg94V+jIA4llTy5fA8LXnSFDuSw
+         JKvDa0Ttcqn91PKjU6UNi8az4afbfH9bUyq0/Yw1MNUNugheMzK8Y4a3t8TCJswHZZg6
+         RdRxxAZ86ILTnfJm3nhGg6nsjDAfDP1zMahUaEwnBtbGIJ78jz1WdLnGVrJIKosfsE6J
+         yqDpErgO+YhsHYSaNcyuqgcTrqYuVLKvBJTHo7vLPmKkXO2weeqSnHSd9mwL+F4BqB/P
+         dHyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733219119; x=1733823919;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6I1Ptmv2KxZJwio/UIsOX+BhzfGwkhQGEzNHEKVRFKU=;
+        b=fHBsNg9zEWKBZGIwSfn32CNjPU5uKWxMjoIDaZE+uPq1La7Cm/3dt3afxYccl1YjQD
+         aLW0yJcVTlta7UzGbrV98xawyrg6jk1AaSHLLYOq5jomKkhQxnlk4cmvPEQW+7os03Wq
+         HUpVrDgyf+cj07IpsaAJQmSdeYahUu94l+acrnRRB5MjFYQ0sSHf2u4n9juVvtmDQQSa
+         nGg/pRRcu1davdWyz2OelfOrlhBydWgre/g6mrG+JuZHUN4qeYhVl/bSFl7Wk3miuMZz
+         m9PX59s0p9Y/aZcCnLSpMwqqNOZ61YD++ylgINV2A7pyO+3all5Z1ewQor7XFxSdG8aW
+         DKRw==
+X-Forwarded-Encrypted: i=1; AJvYcCWazVB7NS/aBmGFToRdMJmf2j7eTfNcpys2I5TP+0sCgaGpwFqV5yJzX6mzXWvMOiXJxnrYU0E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzW4UetUQIr4SBvBPfcfC3jY7EVAYiHWSBJYz6C30xaBQNZuwW
+	CbLsV4fO28h1eCsnKhEE8fiiz+qy7wtBRShl2LNgWcYh9UItOjEEhTJXnfQmV7o=
+X-Gm-Gg: ASbGncutoZ5WSM8qzhcDTg+Mikis1UtBO/gU+DRqTMf9IlE46U3WFQjxkgC0hBF2b54
+	YzJPZpVoJO74hbCLBId3Zcfcs5KDBX5LvPr1KKbFJhYIKaMb79HzSHItxpmuRuiFUJ5C+NJnDx8
+	vAjvhV8KY9QPjZCYYc2P8OmrV9Owu6d1m2q8swo8p5yeHeH9nrMxEPJf/xjNDtMyGTrRd0QeJ1B
+	rfVoXzaNm+mfh/lXz/5/494uVQOOsRBitbLGTTw6ptfpedCzdripmo=
+X-Google-Smtp-Source: AGHT+IFdpiCjCQ4owJdmqakSIReYwoM3vo6fpku4tNVal18DsXpYtsSKHcj3Ceq2fZLtSh1NDS08JA==
+X-Received: by 2002:a05:600c:19d3:b0:431:58cd:b259 with SMTP id 5b1f17b1804b1-434d0a23b36mr15900425e9.31.1733219119326;
+        Tue, 03 Dec 2024 01:45:19 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434aa78007dsm211772455e9.19.2024.12.03.01.45.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 01:45:18 -0800 (PST)
+Date: Tue, 3 Dec 2024 12:45:14 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Muhammad Sammar <muhammads@nvidia.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH v2 net] net/mlx5: DR, prevent potential error pointer
+ dereference
+Message-ID: <Z07TKoNepxLApF49@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,90 +92,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241202171222.62595-16-alejandro.lucero-palau@amd.com>
 
-Hi,
+The dr_domain_add_vport_cap() function generally returns NULL on error
+but sometimes we want it to return ERR_PTR(-EBUSY) so the caller can
+retry.  The problem here is that "ret" can be either -EBUSY or -ENOMEM
+and if it's and -ENOMEM then the error pointer is propogated back and
+eventually dereferenced in dr_ste_v0_build_src_gvmi_qpn_tag().
 
-kernel test robot noticed the following build warnings:
+Fixes: 11a45def2e19 ("net/mlx5: DR, Add support for SF vports")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+---
+v2: Fix a typo in the commit message.  "generally".
 
-[auto build test WARNING on e70140ba0d2b1a30467d4af6bcfe761327b9ec95]
+ .../net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c    | 2 ++
+ 1 file changed, 2 insertions(+)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/alejandro-lucero-palau-amd-com/cxl-add-type2-device-basic-support/20241203-031134
-base:   e70140ba0d2b1a30467d4af6bcfe761327b9ec95
-patch link:    https://lore.kernel.org/r/20241202171222.62595-16-alejandro.lucero-palau%40amd.com
-patch subject: [PATCH v6 15/28] cxl: define a driver interface for HPA free space enumeration
-config: arm-randconfig-001-20241203 (https://download.01.org/0day-ci/archive/20241203/202412031722.5L3bVD47-lkp@intel.com/config)
-compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 592c0fe55f6d9a811028b5f3507be91458ab2713)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241203/202412031722.5L3bVD47-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412031722.5L3bVD47-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/cxl/core/region.c:803: warning: Function parameter or struct member 'cxlmd' not described in 'cxl_get_hpa_freespace'
->> drivers/cxl/core/region.c:803: warning: Excess function parameter 'endpoint' description in 'cxl_get_hpa_freespace'
-
-
-vim +803 drivers/cxl/core/region.c
-
-   782	
-   783	/**
-   784	 * cxl_get_hpa_freespace - find a root decoder with free capacity per constraints
-   785	 * @endpoint: an endpoint that is mapped by the returned decoder
-   786	 * @flags: CXL_DECODER_F flags for selecting RAM vs PMEM, and HDM-H vs HDM-D[B]
-   787	 * @max_avail_contig: output parameter of max contiguous bytes available in the
-   788	 *		      returned decoder
-   789	 *
-   790	 * The return tuple of a 'struct cxl_root_decoder' and 'bytes available given
-   791	 * in (@max_avail_contig))' is a point in time snapshot. If by the time the
-   792	 * caller goes to use this root decoder's capacity the capacity is reduced then
-   793	 * caller needs to loop and retry.
-   794	 *
-   795	 * The returned root decoder has an elevated reference count that needs to be
-   796	 * put with put_device(cxlrd_dev(cxlrd)). Locking context is with
-   797	 * cxl_{acquire,release}_endpoint(), that ensures removal of the root decoder
-   798	 * does not race.
-   799	 */
-   800	struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_memdev *cxlmd,
-   801						       unsigned long flags,
-   802						       resource_size_t *max_avail_contig)
- > 803	{
-   804		struct cxl_port *endpoint = cxlmd->endpoint;
-   805		struct cxlrd_max_context ctx = {
-   806			.host_bridge = endpoint->host_bridge,
-   807			.flags = flags,
-   808		};
-   809		struct cxl_port *root_port;
-   810		struct cxl_root *root __free(put_cxl_root) = find_cxl_root(endpoint);
-   811	
-   812		if (!is_cxl_endpoint(endpoint)) {
-   813			dev_dbg(&endpoint->dev, "hpa requestor is not an endpoint\n");
-   814			return ERR_PTR(-EINVAL);
-   815		}
-   816	
-   817		if (!root) {
-   818			dev_dbg(&endpoint->dev, "endpoint can not be related to a root port\n");
-   819			return ERR_PTR(-ENXIO);
-   820		}
-   821	
-   822		root_port = &root->port;
-   823		down_read(&cxl_region_rwsem);
-   824		device_for_each_child(&root_port->dev, &ctx, find_max_hpa);
-   825		up_read(&cxl_region_rwsem);
-   826	
-   827		if (!ctx.cxlrd)
-   828			return ERR_PTR(-ENOMEM);
-   829	
-   830		*max_avail_contig = ctx.max_hpa;
-   831		return ctx.cxlrd;
-   832	}
-   833	EXPORT_SYMBOL_NS_GPL(cxl_get_hpa_freespace, CXL);
-   834	
-
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
+index 3d74109f8230..a379e8358f82 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
+@@ -297,6 +297,8 @@ dr_domain_add_vport_cap(struct mlx5dr_domain *dmn, u16 vport)
+ 	if (ret) {
+ 		mlx5dr_dbg(dmn, "Couldn't insert new vport into xarray (%d)\n", ret);
+ 		kvfree(vport_caps);
++		if (ret != -EBUSY)
++			return NULL;
+ 		return ERR_PTR(ret);
+ 	}
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.45.2
 
