@@ -1,378 +1,180 @@
-Return-Path: <netdev+bounces-148617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B75969E2C3B
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 20:44:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD14F9E2CD4
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 21:12:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A0E8BA36B7
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:44:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C62EFB30999
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:47:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F7020B206;
-	Tue,  3 Dec 2024 17:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 597691FBCB3;
+	Tue,  3 Dec 2024 17:46:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ay3xKC5D"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F/fTAeIu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F36520B1ED;
-	Tue,  3 Dec 2024 17:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6EE1FAC5A
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 17:46:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733247692; cv=none; b=oCfBOWRkok8fQbTXOI09tJXmW8SvoYxICA3RvZYaEWd3KiGtKAUY9q5r2ZKX//Ji1X4n5cPl7aAyVFYYx06IdhNE+Ov6GKXJ27RoN1j3E8RRlRrIsz6aHtzMGLuVWzpdYRk9Wjc2kNSEw6yFwPraGpOIIt9SnxnFOk62eOQnlU4=
+	t=1733248011; cv=none; b=SLaO3Y2p85a5KrBuSwwuImlu+d8Apc9xG1IBLtTMfKT8vH4CaXfpXsLtjlozAbZrCzo3QbunZwxbf74G/raFvt653A3e41OMrBSrlFw8WyW/3YTVyzQB5BUUL78xAIwyjiMkm9Ihsm8xdYv5gpwrQPh4NxxOsojEunn+Jk5kHK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733247692; c=relaxed/simple;
-	bh=1LdcmxtUc/nROEDfRAn9MubgF+bGqxg/vqcrOfN8RO8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MsdmHOkctKkwQySTxVaUD5TEagi3fFS8g8cwdxm5a2DOrRysErocOzphmyqtjAqWQ1vBXPUEWuTkE9XEfeEb8BsOcbo+3Al0dhnCo/20rdBye2LD9kRHCW4EhkDl0fL9D+GB2TpnK5VfxsY9BCzNfxgyTYBt3YDSWwhxVcy84PE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ay3xKC5D; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733247691; x=1764783691;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=1LdcmxtUc/nROEDfRAn9MubgF+bGqxg/vqcrOfN8RO8=;
-  b=ay3xKC5DTzPsxGhEx10cGBpBYJIxEOgcH6Xw4bGd8cmBpbCsb4LP0fDZ
-   8ENWz8fUCpw+NxFK94a/IhD7GZdI4jwI8X9DKslgq4EmCKyRcCwK4r1Ga
-   /O8TWAnExe3Fva42ZwQroS2F5o1L8pi1L32KVLLYzYhViwjgM5fnd3ebW
-   m58MutZClhAvpZrIOShoe1lmn8IGFVxCYWbeNzgjqawa5vgupxM8MTedI
-   dhyPe7nbh7vHQUkce8iALKU+/Qx45fCvEIUMTzVx4JWnKWW7CEOPvviXL
-   OcHK2gYMvXpyL1JlBXxiU4B/IzYSnW3LKaJA/oz4WDJWAaIWP67e1nruJ
-   A==;
-X-CSE-ConnectionGUID: YeZAnXlySpetUkz/oeFeHg==
-X-CSE-MsgGUID: jAgOtDgPTeWveB9YI0H2Tw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11275"; a="37135447"
-X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="37135447"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 09:41:30 -0800
-X-CSE-ConnectionGUID: mBcDJkEDT+mfCggAgnMsrQ==
-X-CSE-MsgGUID: gryDdEVTSo63662jvBFDwA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="124337047"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa002.jf.intel.com with ESMTP; 03 Dec 2024 09:41:26 -0800
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v6 10/10] xdp: get rid of xdp_frame::mem.id
-Date: Tue,  3 Dec 2024 18:37:33 +0100
-Message-ID: <20241203173733.3181246-11-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
-References: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1733248011; c=relaxed/simple;
+	bh=50YYxZWRrgFvV7RWzGZagJmm/MIRxY3i13DlmK0l2CQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ctDvgibSr431LuriShOZmEIkESC989KQM+uKPzlrkdCFPYCRkrvjv6MwCTz9M5kxzLewQYzbtq7fHwGedzx5NBWJfu3iAWSE2NVJ72XHte3VN1oHY6QGObOnQXHH3a6bv2CeuMKtX9NfDORcbfHDAjRaxXP5kFH0Xuqc11wN2BU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F/fTAeIu; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733248008;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rSpS4mkww3n7ZfxdPyPAe92ZnrZDWXRdAxdhxgPhie0=;
+	b=F/fTAeIu9y15Fvw+vZZe/j2+i3YH8I6hivYSqIVbIz6kUZrH6w5zyTsf80EH+zfccMFGgD
+	0rMTomLkrtXjvUC4S/OZ8GX/5iLjEQTiM3f874zAgDZpHRMZinVT870KVb0709x9eHyJd0
+	tOO5X/xhJNcINH8yKhHzUGITr7fsLv8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-241-sFmih1MwPy67de4mghUXkg-1; Tue, 03 Dec 2024 12:46:47 -0500
+X-MC-Unique: sFmih1MwPy67de4mghUXkg-1
+X-Mimecast-MFC-AGG-ID: sFmih1MwPy67de4mghUXkg
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43498af79a6so215005e9.0
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 09:46:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733248006; x=1733852806;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rSpS4mkww3n7ZfxdPyPAe92ZnrZDWXRdAxdhxgPhie0=;
+        b=BQgmOoVLocTaUdjUN51CfAA/B5uF4SrU0b+M0Yl9MOcetteVxkf3NDIEL1r53mF4WU
+         Zo+pfXUwxaBG0YVqZIkc5derhRpRhSzyC7mm7nUv7C+40RyHkQpBstjAtL3co3tJh1nE
+         fFFirwNCCZjhtG0QhRi2ySJwNzVbVei7AMPB6JXWVdP428HFpd5B/G9Z20GfK0X4BEoe
+         8TEz4+qwZIdME8F03rIKNENeb3McVYtRLUiYPy968KYM2goL1uez9e/Zr5e2VXCr//TK
+         OHDIuIqzed0ujvGeL8wlBTWDIC4cwaXNvy/cCI3SlxbrxW08tgYeRL3AHN1HrSxb4gi5
+         134A==
+X-Forwarded-Encrypted: i=1; AJvYcCWaYxRE9V7VsS9hwbjiu2xIISw+UusNmD13PbBfSRzUzY/laKBruNYjyoYX1OEoFKOo/ue08PQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAE8Nw/YJQK+TO8cPDLa0oF+t04u/p3IG7UTFJ1Bg1T/KAlxJb
+	iY6TARXzdZct3LCxE+srlOTo4+Amr71YKaZTSU2bhdbcKmVg/eUV3ZmtHrux7zacbLVDEzHkzXT
+	yfg7V95xLtFAy+RBnS4XViw8ImOYwnY84UY7Uq2P2gG7wXVH86ivr3QC7NyvZrQ==
+X-Gm-Gg: ASbGncs9fSxAu6QuTEjGNFdxo3GSZK+J3mniOepecQNfkERcg0k/FlPklCuwU5sU1z0
+	zzfJQ6CIJnd1rBqKNkxnLB0wjpXHgSoScu1SIrnhMf3Msfba7BWViUVCDUmMAN5i1eOIVj5Lgou
+	ZuiApVaouTByTHK9Ty2hGHaAxo7+P82Vi4cuFf//E/FmGZBTn/MXKZSYW55sANIXM1H1JTMoF3s
+	Xd26qn+irT3FdbxrUct1SNK1VhEVNCo9bpMd70c+lI4ZvjOsbH4rUV9sjpNB+rO6514UhFSV/yu
+X-Received: by 2002:a05:600c:4e86:b0:434:9f90:2583 with SMTP id 5b1f17b1804b1-434afc1d39amr204882445e9.11.1733248006242;
+        Tue, 03 Dec 2024 09:46:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IETgA2pFZtAPaTKpdbTBMQYjJVZRs89hmZMU86qmFTgXb6S51/atTKr2YYGr045N/IDGnqPBA==
+X-Received: by 2002:a05:600c:4e86:b0:434:9f90:2583 with SMTP id 5b1f17b1804b1-434afc1d39amr204882335e9.11.1733248005853;
+        Tue, 03 Dec 2024 09:46:45 -0800 (PST)
+Received: from [192.168.88.24] (146-241-38-31.dyn.eolo.it. [146.241.38.31])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e19104a0sm11552257f8f.32.2024.12.03.09.46.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Dec 2024 09:46:45 -0800 (PST)
+Message-ID: <c6ec324f-dcfe-46c0-8bfb-1af77c03cb59@redhat.com>
+Date: Tue, 3 Dec 2024 18:46:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 17/22] ovpn: implement peer
+ add/get/dump/delete via netlink
+To: Antonio Quartulli <antonio@openvpn.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ sd@queasysnail.net, ryazanov.s.a@gmail.com, Andrew Lunn <andrew@lunn.ch>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20241202-b4-ovpn-v12-0-239ff733bf97@openvpn.net>
+ <20241202-b4-ovpn-v12-17-239ff733bf97@openvpn.net>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241202-b4-ovpn-v12-17-239ff733bf97@openvpn.net>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Initially, xdp_frame::mem.id was used to search for the corresponding
-&page_pool to return the page correctly.
-However, after that struct page was extended to have a direct pointer
-to its PP (netmem has it as well), further keeping of this field makes
-no sense. xdp_return_frame_bulk() still used it to do a lookup, and
-this leftover is now removed.
-Remove xdp_frame::mem and replace it with ::mem_type, as only memory
-type still matters and we need to know it to be able to free the frame
-correctly.
-As a cute side effect, we can now make every scalar field in &xdp_frame
-of 4 byte width, speeding up accesses to them.
+On 12/2/24 16:07, Antonio Quartulli wrote:
+> +/**
+> + * ovpn_nl_peer_modify - modify the peer attributes according to the incoming msg
+> + * @peer: the peer to modify
+> + * @info: generic netlink info from the user request
+> + * @attrs: the attributes from the user request
+> + *
+> + * Return: a negative error code in case of failure, 0 on success or 1 on
+> + *	   success and the VPN IPs have been modified (requires rehashing in MP
+> + *	   mode)
+> + */
+> +static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info *info,
+> +			       struct nlattr **attrs)
+> +{
+> +	struct sockaddr_storage ss = {};
+> +	u32 sockfd, interv, timeout;
+> +	struct socket *sock = NULL;
+> +	u8 *local_ip = NULL;
+> +	bool rehash = false;
+> +	int ret;
+> +
+> +	if (attrs[OVPN_A_PEER_SOCKET]) {
+> +		if (peer->sock) {
+> +			NL_SET_ERR_MSG_FMT_MOD(info->extack,
+> +					       "peer socket can't be modified");
+> +			return -EINVAL;
+> +		}
+> +
+> +		/* lookup the fd in the kernel table and extract the socket
+> +		 * object
+> +		 */
+> +		sockfd = nla_get_u32(attrs[OVPN_A_PEER_SOCKET]);
+> +		/* sockfd_lookup() increases sock's refcounter */
+> +		sock = sockfd_lookup(sockfd, &ret);
+> +		if (!sock) {
+> +			NL_SET_ERR_MSG_FMT_MOD(info->extack,
+> +					       "cannot lookup peer socket (fd=%u): %d",
+> +					       sockfd, ret);
+> +			return -ENOTSOCK;
+> +		}
+> +
+> +		/* Only when using UDP as transport protocol the remote endpoint
+> +		 * can be configured so that ovpn knows where to send packets
+> +		 * to.
+> +		 *
+> +		 * In case of TCP, the socket is connected to the peer and ovpn
+> +		 * will just send bytes over it, without the need to specify a
+> +		 * destination.
+> +		 */
+> +		if (sock->sk->sk_protocol != IPPROTO_UDP &&
+> +		    (attrs[OVPN_A_PEER_REMOTE_IPV4] ||
+> +		     attrs[OVPN_A_PEER_REMOTE_IPV6])) {
+> +			NL_SET_ERR_MSG_FMT_MOD(info->extack,
+> +					       "unexpected remote IP address for non UDP socket");
+> +			sockfd_put(sock);
+> +			return -EINVAL;
+> +		}
+> +
+> +		peer->sock = ovpn_socket_new(sock, peer);
+> +		if (IS_ERR(peer->sock)) {
+> +			NL_SET_ERR_MSG_FMT_MOD(info->extack,
+> +					       "cannot encapsulate socket: %ld",
+> +					       PTR_ERR(peer->sock));
+> +			sockfd_put(sock);
+> +			peer->sock = NULL;
 
-Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/net/xdp.h                             | 14 +++++-----
- .../net/ethernet/freescale/dpaa/dpaa_eth.c    |  2 +-
- drivers/net/veth.c                            |  4 +--
- kernel/bpf/cpumap.c                           |  2 +-
- net/bpf/test_run.c                            |  4 +--
- net/core/filter.c                             | 12 ++++----
- net/core/xdp.c                                | 28 +++++++++----------
- 7 files changed, 33 insertions(+), 33 deletions(-)
+This looks race-prone. If any other CPU can do concurrent read access to
+peer->sock it could observe an invalid pointer
+Even if such race does not exist, it would be cleaner store
+ovpn_socket_new() return value in a local variable and set peer->sock
+only on successful creation.
 
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index 9e7eb8223513..1c260869a353 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -169,13 +169,13 @@ xdp_get_buff_len(const struct xdp_buff *xdp)
- 
- struct xdp_frame {
- 	void *data;
--	u16 len;
--	u16 headroom;
-+	u32 len;
-+	u32 headroom;
- 	u32 metasize; /* uses lower 8-bits */
- 	/* Lifetime of xdp_rxq_info is limited to NAPI/enqueue time,
--	 * while mem info is valid on remote CPU.
-+	 * while mem_type is valid on remote CPU.
- 	 */
--	struct xdp_mem_info mem;
-+	enum xdp_mem_type mem_type:32;
- 	struct net_device *dev_rx; /* used by cpumap */
- 	u32 frame_sz;
- 	u32 flags; /* supported values defined in xdp_buff_flags */
-@@ -306,13 +306,13 @@ struct xdp_frame *xdp_convert_buff_to_frame(struct xdp_buff *xdp)
- 	if (unlikely(xdp_update_frame_from_buff(xdp, xdp_frame) < 0))
- 		return NULL;
- 
--	/* rxq only valid until napi_schedule ends, convert to xdp_mem_info */
--	xdp_frame->mem = xdp->rxq->mem;
-+	/* rxq only valid until napi_schedule ends, convert to xdp_mem_type */
-+	xdp_frame->mem_type = xdp->rxq->mem.type;
- 
- 	return xdp_frame;
- }
- 
--void __xdp_return(void *data, struct xdp_mem_info *mem, bool napi_direct,
-+void __xdp_return(void *data, enum xdp_mem_type mem_type, bool napi_direct,
- 		  struct xdp_buff *xdp);
- void xdp_return_frame(struct xdp_frame *xdpf);
- void xdp_return_frame_rx_napi(struct xdp_frame *xdpf);
-diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-index bf5baef5c3e0..4948b4906584 100644
---- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-+++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-@@ -2281,7 +2281,7 @@ static int dpaa_a050385_wa_xdpf(struct dpaa_priv *priv,
- 	new_xdpf->len = xdpf->len;
- 	new_xdpf->headroom = priv->tx_headroom;
- 	new_xdpf->frame_sz = DPAA_BP_RAW_SIZE;
--	new_xdpf->mem.type = MEM_TYPE_PAGE_ORDER0;
-+	new_xdpf->mem_type = MEM_TYPE_PAGE_ORDER0;
- 
- 	/* Release the initial buffer */
- 	xdp_return_frame_rx_napi(xdpf);
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 0d6d0d749d44..048eb599a95a 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -634,7 +634,7 @@ static struct xdp_frame *veth_xdp_rcv_one(struct veth_rq *rq,
- 			break;
- 		case XDP_TX:
- 			orig_frame = *frame;
--			xdp->rxq->mem = frame->mem;
-+			xdp->rxq->mem.type = frame->mem_type;
- 			if (unlikely(veth_xdp_tx(rq, xdp, bq) < 0)) {
- 				trace_xdp_exception(rq->dev, xdp_prog, act);
- 				frame = &orig_frame;
-@@ -646,7 +646,7 @@ static struct xdp_frame *veth_xdp_rcv_one(struct veth_rq *rq,
- 			goto xdp_xmit;
- 		case XDP_REDIRECT:
- 			orig_frame = *frame;
--			xdp->rxq->mem = frame->mem;
-+			xdp->rxq->mem.type = frame->mem_type;
- 			if (xdp_do_redirect(rq->dev, xdp, xdp_prog)) {
- 				frame = &orig_frame;
- 				stats->rx_drops++;
-diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-index a2f46785ac3b..774accbd4a22 100644
---- a/kernel/bpf/cpumap.c
-+++ b/kernel/bpf/cpumap.c
-@@ -190,7 +190,7 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
- 		int err;
- 
- 		rxq.dev = xdpf->dev_rx;
--		rxq.mem = xdpf->mem;
-+		rxq.mem.type = xdpf->mem_type;
- 		/* TODO: report queue_index to xdp_rxq_info */
- 
- 		xdp_convert_frame_to_buff(xdpf, &xdp);
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 501ec4249fed..9ae2a7f1738b 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -153,7 +153,7 @@ static void xdp_test_run_init_page(netmem_ref netmem, void *arg)
- 	new_ctx->data = new_ctx->data_meta + meta_len;
- 
- 	xdp_update_frame_from_buff(new_ctx, frm);
--	frm->mem = new_ctx->rxq->mem;
-+	frm->mem_type = new_ctx->rxq->mem.type;
- 
- 	memcpy(&head->orig_ctx, new_ctx, sizeof(head->orig_ctx));
- }
-@@ -246,7 +246,7 @@ static void reset_ctx(struct xdp_page_head *head)
- 	head->ctx.data_meta = head->orig_ctx.data_meta;
- 	head->ctx.data_end = head->orig_ctx.data_end;
- 	xdp_update_frame_from_buff(&head->ctx, head->frame);
--	head->frame->mem = head->orig_ctx.rxq->mem;
-+	head->frame->mem_type = head->orig_ctx.rxq->mem.type;
- }
- 
- static int xdp_recv_frames(struct xdp_frame **frames, int nframes,
-diff --git a/net/core/filter.c b/net/core/filter.c
-index fac245065b0a..6c036708634b 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -4119,13 +4119,13 @@ static int bpf_xdp_frags_increase_tail(struct xdp_buff *xdp, int offset)
- }
- 
- static void bpf_xdp_shrink_data_zc(struct xdp_buff *xdp, int shrink,
--				   struct xdp_mem_info *mem_info, bool release)
-+				   enum xdp_mem_type mem_type, bool release)
- {
- 	struct xdp_buff *zc_frag = xsk_buff_get_tail(xdp);
- 
- 	if (release) {
- 		xsk_buff_del_tail(zc_frag);
--		__xdp_return(NULL, mem_info, false, zc_frag);
-+		__xdp_return(NULL, mem_type, false, zc_frag);
- 	} else {
- 		zc_frag->data_end -= shrink;
- 	}
-@@ -4134,18 +4134,18 @@ static void bpf_xdp_shrink_data_zc(struct xdp_buff *xdp, int shrink,
- static bool bpf_xdp_shrink_data(struct xdp_buff *xdp, skb_frag_t *frag,
- 				int shrink)
- {
--	struct xdp_mem_info *mem_info = &xdp->rxq->mem;
-+	enum xdp_mem_type mem_type = xdp->rxq->mem.type;
- 	bool release = skb_frag_size(frag) == shrink;
- 
--	if (mem_info->type == MEM_TYPE_XSK_BUFF_POOL) {
--		bpf_xdp_shrink_data_zc(xdp, shrink, mem_info, release);
-+	if (mem_type == MEM_TYPE_XSK_BUFF_POOL) {
-+		bpf_xdp_shrink_data_zc(xdp, shrink, mem_type, release);
- 		goto out;
- 	}
- 
- 	if (release) {
- 		struct page *page = skb_frag_page(frag);
- 
--		__xdp_return(page_address(page), mem_info, false, NULL);
-+		__xdp_return(page_address(page), mem_type, false, NULL);
- 	}
- 
- out:
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index 56127e8ec85f..d367571c5838 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -430,12 +430,12 @@ EXPORT_SYMBOL_GPL(xdp_rxq_info_attach_page_pool);
-  * is used for those calls sites.  Thus, allowing for faster recycling
-  * of xdp_frames/pages in those cases.
-  */
--void __xdp_return(void *data, struct xdp_mem_info *mem, bool napi_direct,
-+void __xdp_return(void *data, enum xdp_mem_type mem_type, bool napi_direct,
- 		  struct xdp_buff *xdp)
- {
- 	struct page *page;
- 
--	switch (mem->type) {
-+	switch (mem_type) {
- 	case MEM_TYPE_PAGE_POOL:
- 		page = virt_to_head_page(data);
- 		if (napi_direct && xdp_return_frame_no_direct())
-@@ -458,7 +458,7 @@ void __xdp_return(void *data, struct xdp_mem_info *mem, bool napi_direct,
- 		break;
- 	default:
- 		/* Not possible, checked in xdp_rxq_info_reg_mem_model() */
--		WARN(1, "Incorrect XDP memory type (%d) usage", mem->type);
-+		WARN(1, "Incorrect XDP memory type (%d) usage", mem_type);
- 		break;
- 	}
- }
-@@ -475,10 +475,10 @@ void xdp_return_frame(struct xdp_frame *xdpf)
- 	for (i = 0; i < sinfo->nr_frags; i++) {
- 		struct page *page = skb_frag_page(&sinfo->frags[i]);
- 
--		__xdp_return(page_address(page), &xdpf->mem, false, NULL);
-+		__xdp_return(page_address(page), xdpf->mem_type, false, NULL);
- 	}
- out:
--	__xdp_return(xdpf->data, &xdpf->mem, false, NULL);
-+	__xdp_return(xdpf->data, xdpf->mem_type, false, NULL);
- }
- EXPORT_SYMBOL_GPL(xdp_return_frame);
- 
-@@ -494,10 +494,10 @@ void xdp_return_frame_rx_napi(struct xdp_frame *xdpf)
- 	for (i = 0; i < sinfo->nr_frags; i++) {
- 		struct page *page = skb_frag_page(&sinfo->frags[i]);
- 
--		__xdp_return(page_address(page), &xdpf->mem, true, NULL);
-+		__xdp_return(page_address(page), xdpf->mem_type, true, NULL);
- 	}
- out:
--	__xdp_return(xdpf->data, &xdpf->mem, true, NULL);
-+	__xdp_return(xdpf->data, xdpf->mem_type, true, NULL);
- }
- EXPORT_SYMBOL_GPL(xdp_return_frame_rx_napi);
- 
-@@ -516,7 +516,7 @@ EXPORT_SYMBOL_GPL(xdp_return_frame_rx_napi);
- void xdp_return_frame_bulk(struct xdp_frame *xdpf,
- 			   struct xdp_frame_bulk *bq)
- {
--	if (xdpf->mem.type != MEM_TYPE_PAGE_POOL) {
-+	if (xdpf->mem_type != MEM_TYPE_PAGE_POOL) {
- 		xdp_return_frame(xdpf);
- 		return;
- 	}
-@@ -553,10 +553,11 @@ void xdp_return_buff(struct xdp_buff *xdp)
- 	for (i = 0; i < sinfo->nr_frags; i++) {
- 		struct page *page = skb_frag_page(&sinfo->frags[i]);
- 
--		__xdp_return(page_address(page), &xdp->rxq->mem, true, xdp);
-+		__xdp_return(page_address(page), xdp->rxq->mem.type, true,
-+			     xdp);
- 	}
- out:
--	__xdp_return(xdp->data, &xdp->rxq->mem, true, xdp);
-+	__xdp_return(xdp->data, xdp->rxq->mem.type, true, xdp);
- }
- EXPORT_SYMBOL_GPL(xdp_return_buff);
- 
-@@ -602,7 +603,7 @@ struct xdp_frame *xdp_convert_zc_to_xdp_frame(struct xdp_buff *xdp)
- 	xdpf->headroom = 0;
- 	xdpf->metasize = metasize;
- 	xdpf->frame_sz = PAGE_SIZE;
--	xdpf->mem.type = MEM_TYPE_PAGE_ORDER0;
-+	xdpf->mem_type = MEM_TYPE_PAGE_ORDER0;
- 
- 	xsk_buff_free(xdp);
- 	return xdpf;
-@@ -672,7 +673,7 @@ struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
- 	 * - RX ring dev queue index	(skb_record_rx_queue)
- 	 */
- 
--	if (xdpf->mem.type == MEM_TYPE_PAGE_POOL)
-+	if (xdpf->mem_type == MEM_TYPE_PAGE_POOL)
- 		skb_mark_for_recycle(skb);
- 
- 	/* Allow SKB to reuse area used by xdp_frame */
-@@ -719,8 +720,7 @@ struct xdp_frame *xdpf_clone(struct xdp_frame *xdpf)
- 	nxdpf = addr;
- 	nxdpf->data = addr + headroom;
- 	nxdpf->frame_sz = PAGE_SIZE;
--	nxdpf->mem.type = MEM_TYPE_PAGE_ORDER0;
--	nxdpf->mem.id = 0;
-+	nxdpf->mem_type = MEM_TYPE_PAGE_ORDER0;
- 
- 	return nxdpf;
- }
--- 
-2.47.0
+/P
 
 
