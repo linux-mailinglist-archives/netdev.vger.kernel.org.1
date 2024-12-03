@@ -1,103 +1,114 @@
-Return-Path: <netdev+bounces-148646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE2309E2C74
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 20:55:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E600E9E2C84
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 20:58:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 831BE280D63
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 19:55:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC04B2843AC
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 19:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41881FDE01;
-	Tue,  3 Dec 2024 19:55:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DDE720371A;
+	Tue,  3 Dec 2024 19:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SZ7BoyxA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HFt2vLXx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E52A1EE039
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 19:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2341EE039;
+	Tue,  3 Dec 2024 19:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733255707; cv=none; b=ond57i5sv1HG8UMDoFoOgRwH+X/z/YGUnqWG1EZ81kBrr4q+YoxMvcPfh+oqO+HArheKRBO03SHTjV4QJ/I+ZNZ4R500Ltd+RavCHMnwoe0c6e3SrdrNCFg2eUd1yqdd4MR03ULpbWmzmDOYddYY2FWHiLmR2vScewRaBrg5D2o=
+	t=1733255880; cv=none; b=lS4pFVlLfofVFih+yyNsNKhNzeeFdruSDzY1NqS4l7xi/4y6WppcHgwiQZQ2DWZLdzGV+vOLpzYeVL6FZTK3ZUph4i8HWEWyj5hK8GE6C8Ag/O3h1fnZaEldDY922FI905s5BspSJ8T00v4duBYMOkciCEje+56E9TH/VJDq0P8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733255707; c=relaxed/simple;
-	bh=N5t+jpeo/Kd0Sj1FWBHjHrKzMTEommNT5RZDIB53iDc=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=ceiqw2KomYK3+iebR96uIml2+fKbt20qQkQdvQ1A7YrHstNrSrfLDAWJqeQKIFD88vzLNK6kuqAEkEdtr01KFHdGiZUUJOOBxpysZdb86pRqBSdz9l8VVJaCPJT6m/k3EiARTiihOS6uatm2OjdtAzsGbnjLDXeByx7Y1algTgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SZ7BoyxA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733255705;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ij8FfaOcSnuZLJFev0ynSdcsTu+uvN40kQmxbAbwMnU=;
-	b=SZ7BoyxABt74o2FXjNAs48AwES/9lADVMaz/KtD1YKPXX+Kw7COn9YzwLMMscsMUq4IzfC
-	O1RPzdjC64R2rU07u5GCxtieoLjsGVvEffxdySmeIscG3ORm1EDt9KxEHWKAI234jSQf2a
-	atpYxIvufBqgU3Fojp2mHutXQ2p9hkA=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-425-k-VvebuwM727CyJ5S1BGkQ-1; Tue,
- 03 Dec 2024 14:55:04 -0500
-X-MC-Unique: k-VvebuwM727CyJ5S1BGkQ-1
-X-Mimecast-MFC-AGG-ID: k-VvebuwM727CyJ5S1BGkQ
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EF680190D5D3;
-	Tue,  3 Dec 2024 19:54:56 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.48])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 20980195606C;
-	Tue,  3 Dec 2024 19:54:53 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20241202194834.67982f7f@kernel.org>
-References: <20241202194834.67982f7f@kernel.org> <20241202143057.378147-1-dhowells@redhat.com> <20241202143057.378147-38-dhowells@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: dhowells@redhat.com, netdev@vger.kernel.org,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Yunsheng Lin <linyunsheng@huawei.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-    linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 37/37] rxrpc: Implement RACK/TLP to deal with transmission stalls [RFC8985]
+	s=arc-20240116; t=1733255880; c=relaxed/simple;
+	bh=SK78w0Rl9WD3OnfNjypBp4Bp599Yq2lSFf2smMGqxhg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=qoDSSAt5rBaEGRRy3K2Y6gbLZ2zncYXz7nQdVRM/UZITQ1YuBXw5HUtZipHEPKzlN/2doFg94wQl+EZi/8oRetkUMCuM5NiD9noNMoFC+Ooeeulmhne7w+W+m0LcwdZUpgMB6hCi6u7lLBRLPViQTiuAuyyGmLHLd3LXlC/QKEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HFt2vLXx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5E1CC4CECF;
+	Tue,  3 Dec 2024 19:57:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733255879;
+	bh=SK78w0Rl9WD3OnfNjypBp4Bp599Yq2lSFf2smMGqxhg=;
+	h=Date:From:To:Cc:Subject:From;
+	b=HFt2vLXxoApCgtvLgjNMDuN6VR9dfPm/I7Sz0LD5crp/ovm5PAzOn3z86Vsq4dR4V
+	 zEpb6mrqqGUmlKOtoJb3NfYNJl1dZZaOmmMTT9VpVI0RA4ZfK2k0xuQ1d+nyqb7fHG
+	 v6or+6LR1zRKl0god0tHTbN8p5XrA2G3Ap2Um0cYHTcRub81pb448vmNwgO9lp86Mc
+	 6b4w969yY5e4+aaKzUWkDr6i9ghczb3H/e3fVCuuax2dN3uprlMh/WnsWRZ8WkHpCA
+	 xkDWCIwTp233jwrsN4p2xvLzrZTaa6dDppBuE/+HVqeQXcTiOm/56iC1cy+AmZXbXd
+	 a9iPRoMe9zLig==
+Date: Tue, 3 Dec 2024 19:57:54 +0000
+From: Mark Brown <broonie@kernel.org>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Networking <netdev@vger.kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>
+Subject: linux-next: manual merge of the net-next tree with the origin tree
+Message-ID: <Z09iwtgMaBZ8d4QY@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <726992.1733255693.1@warthog.procyon.org.uk>
-Date: Tue, 03 Dec 2024 19:54:53 +0000
-Message-ID: <726993.1733255693@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="OvwrEfEnsLb5Nfr6"
+Content-Disposition: inline
 
-Jakub Kicinski <kuba@kernel.org> wrote:
 
-> On Mon,  2 Dec 2024 14:30:55 +0000 David Howells wrote:
-> > +static inline ktime_t us_to_ktime(u64 us)
-> > +{
-> > +	return us * NSEC_PER_USEC;
-> > +}
-> 
-> Is there a reason this doesn't exist in include/linux/ktime.h ?
-> Given ns_to_ktime and ms_to_ktime already exist there adding a local
-> but very similarly named helper in a local file appears questionable.
+--OvwrEfEnsLb5Nfr6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Yeah - I'll move it there.  It's just that winding backwards and forwards
-through the patchset sucks if one of the patches modifies a major header.
+Hi all,
 
-David
+Today's linux-next merge of the net-next tree got a conflict in:
 
+   drivers/ptp/ptp_dte.c
+   drivers/ptp/ptp_ines.c
+
+between commit:
+
+  e70140ba0d2b1 ("Get rid of 'remove_new' relic from platform driver struct=
+")
+
+=66rom the origin tree and commit:
+
+  b32913a5609a3 ("ptp: Switch back to struct platform_driver::remove()")
+
+=66rom the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+(no diff, used Linus' version)
+
+--OvwrEfEnsLb5Nfr6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdPYsEACgkQJNaLcl1U
+h9ATlAf7BlOXwOWpcMW9sRLgOvZKdQ6QiefO4uwjXZwholw3ccuGEBMRCTqJLHxn
+rCgibYaqB7t9ZbTdoTFtdj3wNyBTWGt/V1DeK7g0ysvADYkibP4PnbkOG2oxe54S
+oKdkC/iRfAZAnRXUj+NG+EYK2KP5VUvv82XJi1xsH3jdb5q7kndZcvwB8tD9BCIC
+omoqzc1y7542xXSxYueKFpYSnXcCOYyICvAcZmEYgBN0Y30dGZUebWwYyCut8qAi
+pMnOyVwzj+kxcmmSxWzw74iIxcdxYtVqgkLYTMsRGmCGe4RebwXw1/corUW1MX2T
+FQm9y0GSUh2qhyPnynjwir9odX2/Og==
+=6Fak
+-----END PGP SIGNATURE-----
+
+--OvwrEfEnsLb5Nfr6--
 
