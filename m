@@ -1,148 +1,103 @@
-Return-Path: <netdev+bounces-148333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4C229E1267
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 05:26:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E04389E127E
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 05:42:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 436D3B21EB6
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 04:26:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CB4C282FEF
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 04:42:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42041146A69;
-	Tue,  3 Dec 2024 04:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DB2714F104;
+	Tue,  3 Dec 2024 04:42:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DtleUhES"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T6nGWN8C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C886D2BD1D;
-	Tue,  3 Dec 2024 04:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF831F95A;
+	Tue,  3 Dec 2024 04:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733200003; cv=none; b=bxxqikP+0D/9zPW8/DSRI6y8MUKn5e3YzwjV2MiWCZTKJ2/i1QHabC5JCd4fNp0WPPBwg0uMbXp04o92AIjHYGRtYTwtKtWGtL+yNG7HqE9H8pIlTD2hlTrrszCJ3GC8YSK3b0lv57FbhuN0v+jA12SAgZ//m99T/gtSOQ/D9+c=
+	t=1733200956; cv=none; b=J/FNHvT4jFgreHCbnWnajXestNH/BiAX1r4J1NyG+1baAWChAumuJW2fDSGV46eJFwM4nZ3RAMzbJYeYwPHt7zlEL0b26leea2NqmcGENTrNRB8+7cPTwMq0nettEeEVHz9VUCNrt1JtKcNImPdooTiNu5Qb4Nn+IS7x7eJUOjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733200003; c=relaxed/simple;
-	bh=K1Vu1L0HLzL1ggJymF4GIWCvoKHTnpnZvrRz8i5oRc0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=f7Kjc2jhquRNdlg8yi94KRvMCE6fGWRcWygBYp/Mk3JW0f35BxYuEzmE2F7XzV6g72C1MlzRFbKmfA4Jmw9eada2D+NoQ1h030kJ14ZcFmz+THdVwVr0g/b045xaML20jOdiAmouQqC0HAW6aIGGl5SIbVcPh1NLh6esuJJPs0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DtleUhES; arc=none smtp.client-ip=209.85.214.181
+	s=arc-20240116; t=1733200956; c=relaxed/simple;
+	bh=ViVAqjjZvLV58URuz15D/sZ4aJArxNvxN7MtA8SFwNo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z9oRWGuzw8W6MUrl0ugyJsU7SX33FOr3m2guiQDmdN46UfgeMXeLGyIuc0fP+7XNKnC94nqUzjKHoJ5QxDikfsivLGRHIKv2ftWZ8EJYTqlxG06ydLiuqGnQzGdpAXOX9KhT2Yk1/EVC0zdOSLLJT+ZSdYp3GyR+KCWNFakQNyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T6nGWN8C; arc=none smtp.client-ip=209.85.221.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2154d8df140so4299075ad.3;
-        Mon, 02 Dec 2024 20:26:41 -0800 (PST)
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-51536c8a7bfso57048e0c.1;
+        Mon, 02 Dec 2024 20:42:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733200001; x=1733804801; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yt0eqAzlepSF0XS40uHuceUpxcC/1vIW2KGLShCrnRY=;
-        b=DtleUhESofzrT3BGzACLMRtZIEdUNCq3p0DH55Wo0bnjIJpckV+XyysCWZFyEa3bmq
-         UArQfXQXT+IbcNYrAyFSG0wDjWhtCsQEqackF47Wgqk7IaNw63zfxoO6rKjzUftDZxTT
-         dNgAXSOG9zZfA6B58OeHSAKmHggd2x/JY4RIlMCtig1w7JA4X4E1GbhOJ/9Pn/viRg1k
-         50m9xZMEX6aY3ZBnvNBz9stbMJiwES/jcEoZRp/Z4inOxAL0q0awPgX6sXSVO2qxE2X3
-         0c+wJxUpYIQB/wx9K0uAaw0I5lWtaX6Tm342DCjsP7dZIf0Bm27WZx/CtXTaNuQqZt74
-         yLIw==
+        d=gmail.com; s=20230601; t=1733200953; x=1733805753; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ViVAqjjZvLV58URuz15D/sZ4aJArxNvxN7MtA8SFwNo=;
+        b=T6nGWN8CAFhWYTQZnThNe5nTN4n/4yzHQ5BW9GsRHrxQ28+Hjp7Ct6hg+/9JEsB97M
+         Y37e/Yj2oJbMl/aLXN+b5y43wAFy0gwr6XNLYBIxulmNig+Pyz1uV4dYNVQR73XGbpf8
+         7pFM9Ffj+I6Dfvt07EtieCK92BvphXOk1rYmzG7OftCtp87QpTo6Kz3qIWg7L5J6Dovx
+         EKBeDstyes6vAqysdpO1OEZkpmylRjN/kUU4ZUUH0OZHv4TL+jCLYAG5mDb+jCtZujZD
+         Rhp1uW2ESgfJiRf6wSh10WmFiY/Sd9IkiOamvVKfElhyogdQdxz2/IOyLam2tGmSSrov
+         jJLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733200001; x=1733804801;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yt0eqAzlepSF0XS40uHuceUpxcC/1vIW2KGLShCrnRY=;
-        b=QGHzk9KUUEaZM+q9Qxd7cMiQh6eIJxcUTC/P+OoFvR8CzkmAcidS5Ljoa58B1DfDZH
-         dgdHcl0NW2hAJMlxjxHMn5ADBW5qm4aoaxw2xJH2dGDnZ3jUghTpnJEXlQYh9XmUUd6c
-         fXfZp/OI8BZY/aVWzeZagtIpQE5DFAeF0xkjTqSlQMlH++ThMQKVCDznhWbevyVsUPXy
-         rHq097LLD8CvIdTdUF+NXkXSjj+5qXjNPZ+n8aZjldN+/ZqsSwzAfgp0rLiwNTtJnzKd
-         2FRKPMzpVLvfQ0pM9992BKFL7A3RgcKZd3wZ+mSDPJoCMTX0gCRYM6Anxt/nBWrqS7Gw
-         gddw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNceRUeA4FkbOwsnLMhwFpp8nQ05xYCHwy/z+CL6yd62Agf64pmwtIMf2Glf2xexuh99Fu+o+K@vger.kernel.org, AJvYcCUtRygQRLYzQMKo9LcTlHs8C98n9MJwdC3UTg1UA4ipYfuQ/TKMWBSIYlTVbdo8ml2qMc1s9og1ymsSyoE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+wdYz5gKVZi63LXH8rGbonbDiP10lYa1cHUbO4sX3s51Hdukx
-	hg955+l/vt66ZBU4OUULZC6Q/6zOLYbXiT/Rj/bmPoiimn08+ScGz38lq5/Rt9G+lw==
-X-Gm-Gg: ASbGncsAJtI2K7FMtud1/l16wk6d++aIp0ErX3+u+mDbFSLGK4v5SNHm9PXTZ6yJIbF
-	NbiqE1SvfPIsgHXTr1sFA6vIRg2u/JPl9+j9Id6Xt6YjEOB1CBs8PtAakyVAv6a+r/gjaJZ8fL8
-	0ZpNn3OYIlMQbe1pZ/5MlsrXHiS9LEqInDJpcS7ceHLTOaiRMZBgrbdDiFKVcenVhpGBzLnQskH
-	koIV5FAQsXc9rokJtXyvAUqVuMS23mT45FfiP5OpsOlbausUs9tCRgBEAuR
-X-Google-Smtp-Source: AGHT+IE3nK/M7cJqpQVJlVYGk8slh7WMLKkCFhcvzABTJpf+voMAAc8Q5Kx3WUuAbOVvTgny1XeiXA==
-X-Received: by 2002:a17:902:f607:b0:20c:c482:1d6d with SMTP id d9443c01a7336-215bfb0c0aamr4082105ad.8.1733200001049;
-        Mon, 02 Dec 2024 20:26:41 -0800 (PST)
-Received: from nas-server.i.2e4.me ([156.251.176.191])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-725417fbf52sm9365311b3a.119.2024.12.02.20.26.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 20:26:40 -0800 (PST)
-From: Zhiyuan Wan <kmlinuxm@gmail.com>
-To: andrew@lunn.ch
-Cc: kuba@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	willy.liu@realtek.com,
-	Zhiyuan Wan <kmlinuxm@gmail.com>,
-	Yuki Lee <febrieac@outlook.com>
-Subject: [PATCH v3 1/2] net: phy: realtek: disable broadcast address feature of rtl8211f
-Date: Tue,  3 Dec 2024 12:26:31 +0800
-Message-Id: <20241203042631.2061737-1-kmlinuxm@gmail.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <cb8b5a36-fe5c-4b10-ac28-5f31f95262ab@lunn.ch>
-References: <cb8b5a36-fe5c-4b10-ac28-5f31f95262ab@lunn.ch>
+        d=1e100.net; s=20230601; t=1733200953; x=1733805753;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ViVAqjjZvLV58URuz15D/sZ4aJArxNvxN7MtA8SFwNo=;
+        b=qTbED4E7kQTfm4iw2ewxenXYTLevesetZhBACgC5H2q8O/569JGuaGPuXtrPO2EBrr
+         zY8/moA+CLnj9WJz541XvQqertiM76MIYqfQ9uKlq3pfnL0HfF8T57/3nyPf0JIsz0Ul
+         L3XjBkstVNbTCqyThWnGdyaLfDcMTWWPflQko8pacN00B26IJ1ZyaS0lRrVEt7gEGNFB
+         Vk2Qtt8xeTZu3wlOp8aT3XyjH9TJx1eo43sjdw/97vOHwEztx0Kql3hSrUEGEhl9++Kg
+         qyMeZ32tz9Evs7VJOPCDqvnj9htjySdE78EFdqoKr36iTb7xOyQzh/6q2o1paL8pBV4m
+         R57Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV2lG5994uqd8nCtkNVlEHY38ceUru3o37DibFCRhAYgn2pYAKygY6G3NraT8vxeLC8+xHkF0TX5yuVai4=@vger.kernel.org, AJvYcCXHDtQYEquvV8/7WlVL/vVumRxNMCrWRQtltL2cXRNJ9lyOw4bdG8FM+5p9HVLje7D2zfnxPQ8O@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDzrsdD7TBmbQ75kV7LKnw0TylOyTE6TvNFgGPe858EO8ymIve
+	qy3HixhDUSEiFd8nP6qccFk8RbdksMrtp4PuXYbSJc0Q3xr7Km5ErQx+IPEmYe3+fEeDWz48bcB
+	evkWJIWh6D1KxW0JqMEmlU+xJ4+0=
+X-Gm-Gg: ASbGncsK8iJnPy2h4Fla7siFL7vrKNKz18wSsgkqGCtNZZaFlb4/i0jD/jn4wN3dPto
+	JG7F/RFipMZQ0uFOO/2F97KuGFzKq0CLSpA==
+X-Google-Smtp-Source: AGHT+IHy5MlyFI8+A3Hmc1+MN3o57bD5DE0ACBL7TEQs72+4w5qltLSrPxiJCGtgb8hsoJmY14HNf1fuOt/O4bmHJvI=
+X-Received: by 2002:a05:6102:2ad2:b0:4af:9805:104e with SMTP id
+ ada2fe7eead31-4af9999c611mr313903137.8.1733200953557; Mon, 02 Dec 2024
+ 20:42:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241202195029.2045633-1-kmlinuxm@gmail.com> <690e556f-a486-41e3-99ef-c29cb0a26d83@lunn.ch>
+ <CAHwZ4N3dn+jWG0Hbz2ptPRyA3i1SwCq1F7ipgMdwBaahntqkjA@mail.gmail.com> <aa36e5a4-e7d2-4755-b2a1-58dc5a60af1c@lunn.ch>
+In-Reply-To: <aa36e5a4-e7d2-4755-b2a1-58dc5a60af1c@lunn.ch>
+From: =?UTF-8?B?5LiH6Ie06L+c?= <kmlinuxm@gmail.com>
+Date: Tue, 3 Dec 2024 12:42:23 +0800
+Message-ID: <CAHwZ4N0y9b7XKmkbUWDox0-wga5VW706417X6goNv0LsHwPW2Q@mail.gmail.com>
+Subject: Re: [PATCH 1/2] net: phy: realtek: add combo mode support for RTL8211FS
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	willy.liu@realtek.com, Yuki Lee <febrieac@outlook.com>
+Content-Type: text/plain; charset="UTF-8"
 
-This feature is enabled defaultly after a reset of this transceiver.
-When this feature is enabled, the phy not only responds to the
-configuration PHY address by pin states on board, but also responds
-to address 0, the optional broadcast address of the MDIO bus.
+On 2024/12/3 11:53, Andrew Lunn wrote:
+> No, it needs a lot more work than just that. Spend some time to really
+> understand how the marvell driver handles either copper or fibre, and
+> assume the Rockchip SDK is poor quality code.
+>
+I'm currently busy for a new IC project so I might not have much time
+working on this patch, would you like to accept the another patch about
+broadcasting PHY address?
+> It might also be that the marvell scheme does not work. It will depend
+> on how the PHY actually works.
+In fact I don't familiar with how thisworks and which function will
+handle link-state change callback, yeh, Rockchip SDK is indeed filled
+with low-quality code but it
 
-But some MDIO device like mt7530 switch chip (integrated in mt7621
-SoC), also use address 0 to configure a specific port, when use
-mt7530 and rtl8211f together, it usually causes address conflict,
-leads to the port of RTL8211FS stops working.
-
-This patch disables broadcast address feature of rtl8211f, and
-returns -ENODEV if using broadcast address (0) as phy address.
-
-Reviewed-by: Yuki Lee <febrieac@outlook.com>
-Signed-off-by: Zhiyuan Wan <kmlinuxm@gmail.com>
----
- drivers/net/phy/realtek.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index f65d7f1f3..8a38b02ad 100644
---- a/drivers/net/phy/realtek.c
-+++ b/drivers/net/phy/realtek.c
-@@ -31,6 +31,7 @@
- #define RTL8211F_PHYCR1				0x18
- #define RTL8211F_PHYCR2				0x19
- #define RTL8211F_INSR				0x1d
-+#define RTL8211F_PHYAD0_EN			BIT(13)
- 
- #define RTL8211F_LEDCR				0x10
- #define RTL8211F_LEDCR_MODE			BIT(15)
-@@ -139,6 +140,17 @@ static int rtl821x_probe(struct phy_device *phydev)
- 		return dev_err_probe(dev, PTR_ERR(priv->clk),
- 				     "failed to get phy clock\n");
- 
-+	dev_dbg(dev, "disabling MDIO address 0 for this phy");
-+	ret = phy_modify_paged_changed(phydev, 0xa43, RTL8211F_PHYCR1,
-+				       RTL8211F_PHYAD0_EN, 0);
-+	if (ret < 0) {
-+		dev_err(dev, "disabling MDIO address 0 failed: %pe\n",
-+			ERR_PTR(ret));
-+	}
-+	/* Don't allow using broadcast address as PHY address */
-+	if (phydev->mdio.addr == 0)
-+		return -ENODEV;
-+
- 	ret = phy_read_paged(phydev, 0xa43, RTL8211F_PHYCR1);
- 	if (ret < 0)
- 		return ret;
--- 
-2.30.2
-
+Sincerely,
+Zhiyuan Wan
 
