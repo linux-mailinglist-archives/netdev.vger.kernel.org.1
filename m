@@ -1,114 +1,124 @@
-Return-Path: <netdev+bounces-148441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E04E19E19A8
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 11:45:48 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1D7B9E19EA
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 11:52:08 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A62F0286A77
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:45:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96A0616671B
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C421E3760;
-	Tue,  3 Dec 2024 10:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A891E261D;
+	Tue,  3 Dec 2024 10:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="iLdB6GjU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eTtfinIs"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6761E283C;
-	Tue,  3 Dec 2024 10:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1691E2846
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 10:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733222686; cv=none; b=dvghF/RHcZta1JIKm0RWaaerlf/DXs4Wr3qsNmpxf0W2KobIiT5vlgC1jLMIRdyHw2cbVXNfhJqo322wRb0i/po5XAlgX9rRISi4etHcoxB+A66nW5fGgaEBJ+Fuf3dpDC8KIq1Z+mjVJJ9QMsbkyy9hfRu4DsLXgwTk5+AZjzQ=
+	t=1733223111; cv=none; b=jL+guOaT4ILRl7AsIoCH15XA+K2EdRofk1HQd6qTvvM+RwniaivFgxY1PsTJ1hzWTP+YEOPkbNyGiSp71zmZLrmWI6isrO1YbjBP4VJmsdwIKz1qz2v8PkhhhrfEt5sqZCm10drABpZIptIBUTvuQOmoyJtiIj6j/KPhVTogNM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733222686; c=relaxed/simple;
-	bh=2cf97DStc8SXFvwZ64aN4xBO2VdeZbTFsTd5rBywIxw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TQ5XDpsWm6R1Xp/3ugpxVm/KGTCfOxqKTaiEDaaivBtQRUkJ3volyPZlBQno7MkAovql5NlnOp2fjdkgCwLdI0YaVz3pYBAQrlS0L03fBryiUBaBiEIW8+9IIlFofHJjdLGxvHJ+wThA5sVTHkUJ5ncDEcEWmsJZUsilHGJ0TXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=iLdB6GjU; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5A9CAC0008;
-	Tue,  3 Dec 2024 10:44:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1733222681;
+	s=arc-20240116; t=1733223111; c=relaxed/simple;
+	bh=zCvFg4vEIpOLlT0v1hFR9CAMJ4AmEjDBRmcbbFYBMYc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oVrybNqqYaQyMynvqcn1cpnHKOiryLQ7zI79I34Sw1WWd+ur9xFsvA3ZA0XOoZzEnEV+5+3OUg1Iimjnjnaxn3bMvETGMdFrHUJi1UbHCxDH39Sl4hpsJ9v6WqOKl7mZhk856vXD+9JOhA0k3iEOHjmQvgjWwRn9Lr2zoR2U4TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eTtfinIs; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733223108;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=unHsDZc/1OE8HKcVN8mWXwEJ0vAKQ8TWz8xbclpBxHc=;
-	b=iLdB6GjUhUagX3VUOAGI0cppokeRj3G2mikcZFPSPQ/IAmHHFFo+ppIQxlc+ADQ2VnouQ8
-	yuqC9skT/femZbIR2erDLsU1Z87gESz+k0jI7NxUeFsoxgHSc3gVYHUqlj8ummM+iOMBAl
-	cPxO22wmLlyqCNHR5lFmiSnfMd1aHcq4yj0du9C6OrM6g3Cp3pnPbIkuFBMI4QLlMS7qDo
-	wlCGjTw0bxy/7487JgtVfE4sWKcbY5qRcT391fnXvOuRvUzxFxuR2bcWy5ypgvPsng715p
-	OJPptZicX6jaClf4IhbBNg07ciN9bHXgBf95NUgZbVrUZuZa1ZuZNbZQvGD7rQ==
-Date: Tue, 3 Dec 2024 11:44:38 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
- <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell
- King <linux@armlinux.org.uk>, Liam Girdwood <lgirdwood@gmail.com>, Mark
- Brown <broonie@kernel.org>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>, Dent Project <dentproject@linuxfoundation.org>,
- kernel@pengutronix.de, Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v3 26/27] net: pse-pd: tps23881: Add
- support for static port priority feature
-Message-ID: <20241203114438.4f6d4c36@kmaincent-XPS-13-7390>
-In-Reply-To: <20241203102913.GD9361@kernel.org>
-References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
-	<20241121-feature_poe_port_prio-v3-26-83299fa6967c@bootlin.com>
-	<20241203102913.GD9361@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=vHBxos+o3qrEEMMHC+x3OhB+3sIk8pos47xZWNsi7So=;
+	b=eTtfinIsYRaYh3VM5ONUI4k5DbQhqMcpuJNeE560ntRDk35UjqeTSA208gZ+epa9oNH/0D
+	loSYOS/L99Wbv/QolV9nG6pqKcb+Kxqk012vcmdPwiT921yj9f0L7atYrJ5CLmRSlZXeKz
+	usPfybUeuLiPx11xKUdA1rJZ5A9b3D0=
+Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
+ [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-147-ii9e5qPeNCWI4x9WgI7GJg-1; Tue, 03 Dec 2024 05:51:46 -0500
+X-MC-Unique: ii9e5qPeNCWI4x9WgI7GJg-1
+X-Mimecast-MFC-AGG-ID: ii9e5qPeNCWI4x9WgI7GJg
+Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-515b01f64baso419484e0c.3
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 02:51:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733223106; x=1733827906;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vHBxos+o3qrEEMMHC+x3OhB+3sIk8pos47xZWNsi7So=;
+        b=EJuBmiV6lxwTBkDeMfBHPCqU0dbIG6V7c59rpXLyh4GrEJR8xOGgFxfKK5OwAVEnki
+         aJd/wiiOlGB3Gino+M88ofDEMq/+2G6JePSAnHOjc5JM3dc5AbmJnI7vfl5C2NPZBhlv
+         6+BAsNav77cqdIytJX62zswfPeDbAdO+VHMFzbBhEVqNbdZUHHOY0iq3lU3RR3FlkcWH
+         HVMp1j8yBwi5Q16iYHaahGoOlmhjgkxj2uJuJBn/CNLAdqKPPSPO6wFBYfBOaqzSGi/1
+         8VIGiQeDILzZkJAw0TntFIL9JRwrYnZHlSXdGxZr5Xzkmwd7NUzzZEmh8zhHzW+ZAuMf
+         I6Gw==
+X-Gm-Message-State: AOJu0YxZCq9ELx7jaKyjRd8GjgD8tK+Z2zFmWu3Mip06XAP3qyz38Kr3
+	RUDLexgFieLOX+qJ/t4YVPmgwYbRzUqx3WOwJGQKVr95kd+NGGWKH2CTO1EvRU9WyVsgrRqUHzP
+	IdR83+gsOWf4LRNXWVomtr+K9eYcXjaHNrEuZB+q+ilb+75WkrmHiKw==
+X-Gm-Gg: ASbGncuzBMW+W0Rzxuw04E253lXHGETAiXyuVJV88YNl/ahGe5dw5B5Qn59T8sRqIzL
+	/bhNzR+KB/45PY2qf5ia4xqdj8nwgnsYU1RWdWzkOG6xCoLYQq+FKbnMd2+Pxwi9S1QepnKuosx
+	+kyDQIkEgI0We2Dim3JHSyDPq++dtp58myd1ae4JyzqH7hskqwvwGEldiLR42+2aSAQZ2mZCo6Q
+	rvynbpQvmtuWUaVBoCHOf99TU383IW2AraC6eMkoMl06DqYU0lf7tppADIblWH0xR/GHDRCLQPi
+X-Received: by 2002:a05:6122:2221:b0:50a:b728:5199 with SMTP id 71dfb90a1353d-515bf526dd7mr2760856e0c.7.1733223106208;
+        Tue, 03 Dec 2024 02:51:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHdkOU+cxeVvQy6UeXhx2+etKkA87xrAvza0RmQEt7J0nuUg9/7W+lTdTD8ONvbnM6oW7eaVQ==
+X-Received: by 2002:a05:6122:2221:b0:50a:b728:5199 with SMTP id 71dfb90a1353d-515bf526dd7mr2760843e0c.7.1733223105881;
+        Tue, 03 Dec 2024 02:51:45 -0800 (PST)
+Received: from [192.168.88.24] (146-241-38-31.dyn.eolo.it. [146.241.38.31])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d8a0c9004bsm28533096d6.80.2024.12.03.02.51.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Dec 2024 02:51:45 -0800 (PST)
+Message-ID: <85376cf2-0c95-4a08-bcbb-33c30c2f2c51@redhat.com>
+Date: Tue, 3 Dec 2024 11:51:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ipv4: remove useless arg
+To: tianyu2 <tianyu2@kernelsoft.com>, eric.dumazet@gmail.com,
+ Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netdev@vger.kernel.org
+References: <20241202033230.870313-1-tianyu2@kernelsoft.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241202033230.870313-1-tianyu2@kernelsoft.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 7bit
 
-Hello Simon,
+On 12/2/24 04:32, tianyu2 wrote:
+> The "struct sock *sk" parameter in ip_rcv_finish_core is unused, which
+> leads the compiler to optimize it out. As a result, the
+> "struct sk_buff *skb" parameter is passed using x1. And this make kprobe
+> hard to use.
+> 
+> Signed-off-by: tianyu2 <tianyu2@kernelsoft.com>
 
-On Tue, 3 Dec 2024 10:29:13 +0000
-Simon Horman <horms@kernel.org> wrote:
->=20
-> > +static int tps23881_irq_event_detection(struct tps23881_priv *priv,
-> > +					u16 reg_val,
-> > +					unsigned long *notifs,
-> > +					unsigned long *notifs_mask)
-> > +{
-> > +	enum ethtool_pse_events event;
-> > +	int reg, ret, i, val;
-> > +	u8 chans;
-> > +
-> > +	chans =3D tps23881_it_export_chans_helper(reg_val, 0);
-> > +	for_each_set_bit(i, (unsigned long *)&chans, TPS23881_MAX_CHANS) {
-> > =20
->=20
-> Hi Kory,
->=20
-> The storage size of chans is only 1 byte, but here we are pretending that
-> it has more space. Which seems to be a bit of a stretch. Perhaps it would
-> be better to simply use unsigned long as the type of chans here and in
-> tps23881_irq_event_classification().
+The patch code good, but the above does not look like a real name?!?
 
-Yes indeed. Thanks for the report.
+If so, please re-submit, using your real full name and including the
+target tree (net-next in this case) in the subj prefix.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+See:
+https://elixir.bootlin.com/linux/v6.12.1/source/Documentation/process/submitting-patches.rst#L440
+https://elixir.bootlin.com/linux/v6.12.1/source/Documentation/process/maintainer-netdev.rst#L12
+
+@Pablo: after this change will be merged, I *think* that a possible
+follow-up could drop the 'sk' arg from NF_HOOK_LIST and ip_rcv_finish() too.
+
+Thanks!
+
+Paolo
+
 
