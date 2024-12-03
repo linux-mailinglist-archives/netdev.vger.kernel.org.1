@@ -1,114 +1,99 @@
-Return-Path: <netdev+bounces-148647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E600E9E2C84
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 20:58:03 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE3DF9E2CE3
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 21:16:33 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC04B2843AC
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 19:58:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 633B21642E8
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 20:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DDE720371A;
-	Tue,  3 Dec 2024 19:58:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 980211FDE2C;
+	Tue,  3 Dec 2024 20:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HFt2vLXx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kpcv6Tbd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2341EE039;
-	Tue,  3 Dec 2024 19:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC871FBEAB;
+	Tue,  3 Dec 2024 20:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733255880; cv=none; b=lS4pFVlLfofVFih+yyNsNKhNzeeFdruSDzY1NqS4l7xi/4y6WppcHgwiQZQ2DWZLdzGV+vOLpzYeVL6FZTK3ZUph4i8HWEWyj5hK8GE6C8Ag/O3h1fnZaEldDY922FI905s5BspSJ8T00v4duBYMOkciCEje+56E9TH/VJDq0P8=
+	t=1733256986; cv=none; b=THhMs0X+/ect80VJPaB9jgEkkbRSvvnJDjAGnR2802f+zvECRdMTtnk4SnAD+o/gz8/MhuiWFaj4EIGuVTyoMTOoMOLoopAcEG3ZTTico6XHL0vEfAtnp7U9ZqHs8yq4eDYNk7kC9+EFkWZ4gDEN4ILxdw+5WGCfvI/+TSprSUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733255880; c=relaxed/simple;
-	bh=SK78w0Rl9WD3OnfNjypBp4Bp599Yq2lSFf2smMGqxhg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=qoDSSAt5rBaEGRRy3K2Y6gbLZ2zncYXz7nQdVRM/UZITQ1YuBXw5HUtZipHEPKzlN/2doFg94wQl+EZi/8oRetkUMCuM5NiD9noNMoFC+Ooeeulmhne7w+W+m0LcwdZUpgMB6hCi6u7lLBRLPViQTiuAuyyGmLHLd3LXlC/QKEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HFt2vLXx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5E1CC4CECF;
-	Tue,  3 Dec 2024 19:57:57 +0000 (UTC)
+	s=arc-20240116; t=1733256986; c=relaxed/simple;
+	bh=iUjDkYBI+2a5FDDfq+d0kJqea8wogi+YDcF/o4E/VNs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HDS7A4mT8G8nLz4vHJf0Wdsj4nXiV8gONi3dTbLP7iUV7KlcXlbYfDf/hbSuwjnwJK+hVUVziQnIL5mLTxT5UAUhhsR8ehTmtGrdLOd2mGinLLjmpFSdfaWOl7JNAYbpVktCo3GFwGkpCVJtJ4Cvbea0mmWMMA/fytdKt6qp+5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kpcv6Tbd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA840C4CECF;
+	Tue,  3 Dec 2024 20:16:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733255879;
-	bh=SK78w0Rl9WD3OnfNjypBp4Bp599Yq2lSFf2smMGqxhg=;
-	h=Date:From:To:Cc:Subject:From;
-	b=HFt2vLXxoApCgtvLgjNMDuN6VR9dfPm/I7Sz0LD5crp/ovm5PAzOn3z86Vsq4dR4V
-	 zEpb6mrqqGUmlKOtoJb3NfYNJl1dZZaOmmMTT9VpVI0RA4ZfK2k0xuQ1d+nyqb7fHG
-	 v6or+6LR1zRKl0god0tHTbN8p5XrA2G3Ap2Um0cYHTcRub81pb448vmNwgO9lp86Mc
-	 6b4w969yY5e4+aaKzUWkDr6i9ghczb3H/e3fVCuuax2dN3uprlMh/WnsWRZ8WkHpCA
-	 xkDWCIwTp233jwrsN4p2xvLzrZTaa6dDppBuE/+HVqeQXcTiOm/56iC1cy+AmZXbXd
-	 a9iPRoMe9zLig==
-Date: Tue, 3 Dec 2024 19:57:54 +0000
-From: Mark Brown <broonie@kernel.org>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>
-Subject: linux-next: manual merge of the net-next tree with the origin tree
-Message-ID: <Z09iwtgMaBZ8d4QY@sirena.org.uk>
+	s=k20201202; t=1733256985;
+	bh=iUjDkYBI+2a5FDDfq+d0kJqea8wogi+YDcF/o4E/VNs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Kpcv6TbdV0Q/VfCNwct/grUWd/Uo1UMbk/t9JsyCLXJ0OIkreptVa7t194GDl7zXt
+	 HpHT+Sb2NwhQzTGAMnyVeU20NU3O5tdrSBom/locVuRO6aLFTjcKveZQy/cNmGj0Ni
+	 sEEh9+j1l83xfQyf/7Phb96raOf84/j/Xe3NZR4iHWwn0nhdSneFA7x5GcY3wQlksr
+	 XIARNGRPfYhBBIP8xKRCodcJzMuElkl9lv8Mi7dfCPbBLV9FeW7bVHFI+UmMa5A5Tx
+	 NatwMolI38ZsBDM/Dy7v3YbngxGcG72Ofe/U6MZWJdmBjCfuDVP9Gd2O4Onz082Wvf
+	 CFWeiPf7z7XBA==
+Date: Tue, 3 Dec 2024 10:16:24 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Hao Luo <haoluo@google.com>, Josh Don <joshdon@google.com>,
+	Barret Rhoden <brho@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] rhashtable: Fix potential deadlock by moving
+ schedule_work outside lock
+Message-ID: <Z09nGHvk5YJABZ1d@slm.duckdns.org>
+References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="OvwrEfEnsLb5Nfr6"
-Content-Disposition: inline
-
-
---OvwrEfEnsLb5Nfr6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
 
-Hi all,
+On Thu, Nov 28, 2024 at 04:16:25AM -0800, Breno Leitao wrote:
+> Move the hash table growth check and work scheduling outside the
+> rht lock to prevent a possible circular locking dependency.
+> 
+> The original implementation could trigger a lockdep warning due to
+> a potential deadlock scenario involving nested locks between
+> rhashtable bucket, rq lock, and dsq lock. By relocating the
+> growth check and work scheduling after releasing the rth lock, we break
+> this potential deadlock chain.
+> 
+> This change expands the flexibility of rhashtable by removing
+> restrictive locking that previously limited its use in scheduler
+> and workqueue contexts.
+> 
+> Import to say that this calls rht_grow_above_75(), which reads from
+> struct rhashtable without holding the lock, if this is a problem, we can
+> move the check to the lock, and schedule the workqueue after the lock.
+> 
+> Fixes: f0e1a0643a59 ("sched_ext: Implement BPF extensible scheduler class")
+> Suggested-by: Tejun Heo <tj@kernel.org>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Today's linux-next merge of the net-next tree got a conflict in:
+  Acked-by: Tejun Heo <tj@kernel.org>
 
-   drivers/ptp/ptp_dte.c
-   drivers/ptp/ptp_ines.c
+This solves a possible deadlock for sched_ext and makes rhashtable more
+useful and I don't see any downsides.
 
-between commit:
+Andrew, can you please pick up this one?
 
-  e70140ba0d2b1 ("Get rid of 'remove_new' relic from platform driver struct=
-")
+Thanks.
 
-=66rom the origin tree and commit:
-
-  b32913a5609a3 ("ptp: Switch back to struct platform_driver::remove()")
-
-=66rom the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-(no diff, used Linus' version)
-
---OvwrEfEnsLb5Nfr6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdPYsEACgkQJNaLcl1U
-h9ATlAf7BlOXwOWpcMW9sRLgOvZKdQ6QiefO4uwjXZwholw3ccuGEBMRCTqJLHxn
-rCgibYaqB7t9ZbTdoTFtdj3wNyBTWGt/V1DeK7g0ysvADYkibP4PnbkOG2oxe54S
-oKdkC/iRfAZAnRXUj+NG+EYK2KP5VUvv82XJi1xsH3jdb5q7kndZcvwB8tD9BCIC
-omoqzc1y7542xXSxYueKFpYSnXcCOYyICvAcZmEYgBN0Y30dGZUebWwYyCut8qAi
-pMnOyVwzj+kxcmmSxWzw74iIxcdxYtVqgkLYTMsRGmCGe4RebwXw1/corUW1MX2T
-FQm9y0GSUh2qhyPnynjwir9odX2/Og==
-=6Fak
------END PGP SIGNATURE-----
-
---OvwrEfEnsLb5Nfr6--
+-- 
+tejun
 
