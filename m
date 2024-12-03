@@ -1,156 +1,194 @@
-Return-Path: <netdev+bounces-148530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEB639E2378
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:38:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CC879E2859
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:57:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DD96B80C6D
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:38:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2C0BB44F9F
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:45:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5961F6691;
-	Tue,  3 Dec 2024 14:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D981F4738;
+	Tue,  3 Dec 2024 14:45:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mta84p4f"
+	dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b="FBw04yPx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17F81F667E;
-	Tue,  3 Dec 2024 14:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BEF1DAC9F
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 14:45:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733236674; cv=none; b=BO14pLp2K0g9VKrTNfmbe9+A5htcmkNBDjMLSIc/9zASIcEcOpZY7aMd8LmDLrH0VwYy2nS/63O5+v3zQBbT6V135xTM2ji5NOvlwldGg5kGOKkCv5fV8YoMcCWTrVKLDtxo3ALediO69idQhvyxi1r6pwNiB+q7oIkJloXxfMg=
+	t=1733237142; cv=none; b=Lvr1BrU7qtkHvqoEIvV5qQjFuI9/hYZzxZPOO83PtYM5gVFFbUs102N8ZNxITjn/3Z++MC/cD8od3B8zPuy+X/uwVN9n+6EvHePiZXYfpGS6U8jXpebysPN/GTH69R8qMIpA3pxC9XwF9K47dvsepHP/WCQRClvTtGmaqozZBMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733236674; c=relaxed/simple;
-	bh=DqiY3UAanf00dIqw+RQo8ty085QscpuR2AWemSYwG5M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=goLYGXT4rNZQp7p7WmGNndnuRr0xKUcPo9v5W3PqHOWNoqxKgZtuOZpgUIxMF+57wMcJBVz6BCho5TwUBmOWY41xxqstNfJJxaFFYAEoSr46/bif8NXID3zCsCYc6evVmhnubYh5E22IcaFrjGTQHwD+XCSB/iOTrOGqY7DG0b8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mta84p4f; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-385ddcfc97bso3746817f8f.1;
-        Tue, 03 Dec 2024 06:37:52 -0800 (PST)
+	s=arc-20240116; t=1733237142; c=relaxed/simple;
+	bh=8dZAcCybSyyCbITBqYJytc/CotfK54Ox4Lm254vkMfs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o3L7EfTujsixpTsAwdlCF4jz+ucWQreO1jfDtkHV2dSD+GhWcC4W6/3rRBx8zeQiIMWSVIbh63Py0R/8cOlUQRxujYUxX+u8I9Nftz+qRAdCu5z+w0Pc8LR6ORbfaOZgioreT2JRhsYOChEpMA4q9hw8DK4fcYw3WWBU80+dR4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at; spf=pass smtp.mailfrom=sigma-star.at; dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b=FBw04yPx; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sigma-star.at
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-434aa472617so47829675e9.3
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 06:45:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733236671; x=1733841471; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B6VRfPhQBrvJKtWRzpXQC0tO9V9z0NTMxlObez9peLk=;
-        b=Mta84p4fb6YW8S5lyRDwaHdwfAQ5TAWTFLHa/GO/6nS0UxnBSxgcOVtc5rgmxJKRS/
-         wNzVUyw/vWmbMyxQjZEUVUIDMtalI1StqYqL+NfHAo6WI3W0Vj+/2AZ+tXWXh8phILMs
-         xjaBOaSdjkko01bipCSw7oIqZxyYbdTa3SqKcXjW3doM3Kmk4YeoL0qLdWx7mI4DKS3v
-         R+Qiip68AaD1+uo5Lwvva9VmGZ+XS7Nrfy58SfuRDI1z0n4Hzize9jZN9S1XWlINkTi/
-         cHzzTnd93vUJCOtSwblQXPLL1HSw+mqkVcVQXg3sIV+dPSi5vu74d1tMOhGoYNYO+JlZ
-         pcXA==
+        d=sigma-star.at; s=google; t=1733237138; x=1733841938; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LYUAWSDIdbphZ5G3pOF/T6c6CGV5MMb69iUkbh1uoXk=;
+        b=FBw04yPxapayMEI/Hfp92iF64lphRv30tzwssBm46+MOSJCjFa88BvlfYZ5EW8lGPl
+         mBxRvYkDgcqIvYHrUqhnD7fuHKO/pCfkSmmAxz+sgszBH1dF5dlSrVX20rF/daYnPWS2
+         LtYuR0drXI7HBXwUntbPCKaKSp5ZZrfLJdcFoTm2Q2QhTS5jtz2uhkD6gY5kJkjz2ek0
+         JfQckACfFNMzvtOtY+jwZwPjpXIXvFs3slBWDKZ1mz8Nbc69oD1DZZopOpqaplqkHJT1
+         VDMvM3nK9CQG8E6Rdz87QLPIEw+6BIKq40zDLgu5goHOk1Cxt+evVhiMYPQWW3jBlsIJ
+         vNOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733236671; x=1733841471;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B6VRfPhQBrvJKtWRzpXQC0tO9V9z0NTMxlObez9peLk=;
-        b=FtpbAv1C5hduJWldJ76KGSR+rShIV5M7aBWYJg30vFSNQyRkIVif5QQbXm58CP/YqS
-         g8On4GfBI53H0L60ft3xiurOhRoTAw1Rt63ntFP71C0qfKWY8T2gtdV0vLoPye9eYll2
-         /8XfqaJW+SvrrUdi6mVlG2bPeTWA+wXfvc2SYNjB0B3rGoPfVNqEXUCeJZjUoJ3J7cQ5
-         knT9f+Vpv3HkUpKOBqnsUxWGC2hiOHzuR2EXt541q5A7pPwQNXggtL/gn/I6RH/13g6D
-         F7Z5fVPeQr/zxtTa9MHvjft8OzEaP+E1H+aXQL+kmhh/2Fh37ZNaIhwTHDbWY/mAfWM/
-         kddQ==
-X-Forwarded-Encrypted: i=1; AJvYcCViTjwS9czL1Mb9oWbMKSVkXnU1P3SaxCiQvmwJ/vWpFv7z4ew3OGzuUGLfxYsPS8RmZXKwZR0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4cCbI6P3C2RTQmfvPzWmonyK1EdUMwCz9xu4eUMku3ugTV4/o
-	+G00uwS/1zP6jRlV+NuFfdOKbm+9+oY+SLX25IpS5KJgVKkmMBmveIjkij2V
-X-Gm-Gg: ASbGncuZWEelnWe9XzOOvMh8azkNrUCgYkc+HZyYykkLTymyLNChkfe89kE2nlAjGgA
-	fdDJy9Q8zuYiVQlQ2qAr5ryIwVzbRE9gRJzZOLmgtTpkJU5YHWYNhzgpdVkGEJtJvdC6E/xLL89
-	QOJbyjRpCK6G8gpLVH3NZtFjyLxnc5N5TsGK/QXUXbpBEDOfXc+F+WcXIW68tBmRag8Nn9yWR3H
-	3UbUZlr6B3sXZeOqpQBo6Az0yDUHqnp6jjISiZ53ygUmsOfY1Q=
-X-Google-Smtp-Source: AGHT+IHccbbI9yOqiqQRLIlcqcZQgiCcqeKu9khutfVmht5tn9xnmDxEGKNKj6iLJuToaLvCAgyf9w==
-X-Received: by 2002:a5d:5983:0:b0:382:38e6:1eb3 with SMTP id ffacd0b85a97d-385fd3ee6acmr2110079f8f.30.1733236670839;
-        Tue, 03 Dec 2024 06:37:50 -0800 (PST)
-Received: from localhost ([81.168.73.77])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e0d4778dsm12098730f8f.45.2024.12.03.06.37.50
+        d=1e100.net; s=20230601; t=1733237138; x=1733841938;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LYUAWSDIdbphZ5G3pOF/T6c6CGV5MMb69iUkbh1uoXk=;
+        b=VxWnGK82gXdoMEyi/w4tcm2/kUDM2WDReOBunuzjxqAtaPZYuOoVxWgQojpeQi4MHg
+         3QEyJHfqNE6hPN5n8W8/uyKrLVDjJqHrOjVcJakj+mfyT3a9Loz8nbCCXoN/weikDNhy
+         yHObGe6k/z0zztns2oibrcEig8bnFnb0Oqxw4lGZgoHfn4s4k9aOxiiryph3CNGsELXX
+         dDEKBv4eW1zbBMXNKzuZeHg4sqjKR/BMmOgMnNdxCu7zuqhBk04BkeQMnDXo0SetX+mO
+         nGbW4//X8Zxyyi6Qp1jH7DxEXwwhc1E/eKTBiW2q8SsV/KIXSGg05v2WXth7h3GPF6l5
+         xV9w==
+X-Gm-Message-State: AOJu0Ywyj8FeGx2ewynCAn+QrhXQXSo2ZDozNFDCWXG+vBU9rxVHMz6h
+	2WWw1aIZN1Yi4onz9NPyezM3YKcqaPr2Wo5NhjOxTv5uxH1E64DinsESrNd+AOCCjpyPdgosFjS
+	1UwY=
+X-Gm-Gg: ASbGnctLctGOeclLNjvqgWkJyUWO4VS4F7FFQyWyJsxEnKyQSjXYuvn7Z/oFaoRwxzR
+	2w3X1NxPWn7DHcEubv8nqUvgeWpej1+qWtHI/6qeLPsfAvzM1ngwBRfVBEYO3dqG1fDhYs8rJc3
+	rsj3y51z0QFKCg4nGMhxP3jkxwjmZk6uPrENExRFJDq3QGfl5Eia0SusxExfqCwzTe6ZDLApEWG
+	8ah4AamhyAdJjnNB4AbdqqWWsKiB/nmZeEUgXymR8exCt9flkDFQ96ccUcZRHeUZq5vMJWlT0eT
+	xvg2wyyUIL1GLA==
+X-Google-Smtp-Source: AGHT+IExdHHjexiWRYW0A3yzO/aU99shhOBSmwRHUoZR7Gb39P6gg6MqzgLWtBfZZGTqXTUyZjZmMg==
+X-Received: by 2002:a05:6000:4802:b0:385:e961:6589 with SMTP id ffacd0b85a97d-385fd3cd5f2mr2621165f8f.20.1733237138384;
+        Tue, 03 Dec 2024 06:45:38 -0800 (PST)
+Received: from localtoast.corp.sigma-star.at ([82.150.214.1])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385faec0c9dsm3180818f8f.20.2024.12.03.06.45.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2024 06:37:50 -0800 (PST)
-Date: Tue, 3 Dec 2024 14:37:49 +0000
-From: Martin Habets <habetsm.xilinx@gmail.com>
-To: alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	dan.j.williams@intel.com, martin.habets@xilinx.com,
-	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
-	Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v6 23/28] sfc: create cxl region
-Message-ID: <20241203143749.GH778635@gmail.com>
-Mail-Followup-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
-	netdev@vger.kernel.org, dan.j.williams@intel.com,
-	martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	dave.jiang@intel.com, Alejandro Lucero <alucerop@amd.com>
-References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
- <20241202171222.62595-24-alejandro.lucero-palau@amd.com>
+        Tue, 03 Dec 2024 06:45:38 -0800 (PST)
+From: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+To: netdev@vger.kernel.org,
+	andrew@lunn.ch
+Cc: Julian.FRIEDRICH@frequentis.com,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	upstream+netdev@sigma-star.at,
+	David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+Subject: [PATCH v2] net: dsa: mv88e6xxx: propperly shutdown PPU re-enable timer on destroy
+Date: Tue,  3 Dec 2024 15:43:40 +0100
+Message-ID: <20241203144448.30880-1-david.oberhollenzer@sigma-star.at>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241202171222.62595-24-alejandro.lucero-palau@amd.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 02, 2024 at 05:12:17PM +0000, alejandro.lucero-palau@amd.com wrote:
-> 
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Use cxl api for creating a region using the endpoint decoder related to
-> a DPA range.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+The mv88e6xxx has an internal PPU that polls PHY state. If we want to
+access the internal PHYs, we need to disable it. Because enable/disable
+of the PPU is a slow operation, a 10ms timer is used to re-enable it,
+canceled with every access, so bulk operations effectively only disable
+it once and re-enable it some 10ms after the last access.
 
-Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
-One comment below.
+If a PHY is accessed and then the mv88e6xxx module is removed before
+the 10ms are up, the PPU re-enable ends up accessing a dangling pointer.
 
-> ---
->  drivers/net/ethernet/sfc/efx_cxl.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> index 6ca23874d0c7..3e44c31daf36 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> @@ -128,10 +128,19 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  		goto err3;
->  	}
->  
-> +	cxl->efx_region = cxl_create_region(cxl->cxlrd, cxl->cxled);
-> +	if (!cxl->efx_region) {
-> +		pci_err(pci_dev, "CXL accel create region failed");
+This especially affects probing during bootup. The MDIO bus and PHY
+registration may succeed, but registration with the DSA framework
+may fail later on (e.g. because the CPU port depends on another,
+very slow device that isn't done probing yet, returning -EPROBE_DEFER).
+In this case, probe() fails, but the MDIO subsystem may already have
+accessed the MIDO bus or PHYs, arming timer.
 
-This error would be more meaningful if it printed out the region address and size.
+This is fixed as follows:
+ - If probe fails after mv88e6xxx_phy_init(), make sure we also call
+   mv88e6xxx_phy_destroy() before returning
+ - In mv88e6xxx_phy_destroy(), grab the ppu_mutex to make sure the work
+   function either has already exited, or (should it run) cannot do
+   anything, fails to grab the mutex and returns.
+ - In addition to destroying the timer, also destroy the work item, in
+   case the timer has already fired.
+ - Do all of this synchronously, to make sure timer & work item are
+   destroyed and none of the callbacks are running.
 
-> +		rc = PTR_ERR(cxl->efx_region);
-> +		goto err_region;
-> +	}
-> +
->  	probe_data->cxl = cxl;
->  
->  	return 0;
->  
-> +err_region:
-> +	cxl_dpa_free(cxl->cxled);
->  err3:
->  	cxl_release_resource(cxl->cxlds, CXL_RES_RAM);
->  err2:
-> @@ -144,6 +153,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  void efx_cxl_exit(struct efx_probe_data *probe_data)
->  {
->  	if (probe_data->cxl) {
-> +		cxl_accel_region_detach(probe_data->cxl->cxled);
->  		cxl_dpa_free(probe_data->cxl->cxled);
->  		cxl_release_resource(probe_data->cxl->cxlds, CXL_RES_RAM);
->  		kfree(probe_data->cxl->cxlds);
-> -- 
-> 2.17.1
-> 
-> 
+Fixes: 2e5f032095ff ("dsa: add support for the Marvell 88E6131 switch chip")
+Signed-off-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+---
+FWIW, this is a forward port of a patch I'm using on v6.6.
+
+Thanks,
+
+David
+---
+ drivers/net/dsa/mv88e6xxx/chip.c | 8 +++++---
+ drivers/net/dsa/mv88e6xxx/phy.c  | 3 +++
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 284270a4ade1..c2af69bed660 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -7264,13 +7264,13 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
+ 	err = mv88e6xxx_switch_reset(chip);
+ 	mv88e6xxx_reg_unlock(chip);
+ 	if (err)
+-		goto out;
++		goto out_phy;
+ 
+ 	if (np) {
+ 		chip->irq = of_irq_get(np, 0);
+ 		if (chip->irq == -EPROBE_DEFER) {
+ 			err = chip->irq;
+-			goto out;
++			goto out_phy;
+ 		}
+ 	}
+ 
+@@ -7289,7 +7289,7 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
+ 	mv88e6xxx_reg_unlock(chip);
+ 
+ 	if (err)
+-		goto out;
++		goto out_phy;
+ 
+ 	if (chip->info->g2_irqs > 0) {
+ 		err = mv88e6xxx_g2_irq_setup(chip);
+@@ -7323,6 +7323,8 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
+ 		mv88e6xxx_g1_irq_free(chip);
+ 	else
+ 		mv88e6xxx_irq_poll_free(chip);
++out_phy:
++	mv88e6xxx_phy_destroy(chip);
+ out:
+ 	if (pdata)
+ 		dev_put(pdata->netdev);
+diff --git a/drivers/net/dsa/mv88e6xxx/phy.c b/drivers/net/dsa/mv88e6xxx/phy.c
+index 8bb88b3d900d..ee9e5d7e5277 100644
+--- a/drivers/net/dsa/mv88e6xxx/phy.c
++++ b/drivers/net/dsa/mv88e6xxx/phy.c
+@@ -229,7 +229,10 @@ static void mv88e6xxx_phy_ppu_state_init(struct mv88e6xxx_chip *chip)
+ 
+ static void mv88e6xxx_phy_ppu_state_destroy(struct mv88e6xxx_chip *chip)
+ {
++	mutex_lock(&chip->ppu_mutex);
+ 	del_timer_sync(&chip->ppu_timer);
++	cancel_work_sync(&chip->ppu_work);
++	mutex_unlock(&chip->ppu_mutex);
+ }
+ 
+ int mv88e6185_phy_ppu_read(struct mv88e6xxx_chip *chip, struct mii_bus *bus,
+-- 
+2.47.0
+
 
