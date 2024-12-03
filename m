@@ -1,114 +1,118 @@
-Return-Path: <netdev+bounces-148391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76A449E14A8
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 08:53:28 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49CFF1605E8
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 07:53:25 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D44381BD504;
-	Tue,  3 Dec 2024 07:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gd4K4NOr"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC4969E14B9
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 08:57:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA67C1ABEBD;
-	Tue,  3 Dec 2024 07:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8094028300C
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 07:57:56 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B08171DDC24;
+	Tue,  3 Dec 2024 07:56:44 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0D71D5AC0
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 07:56:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733212387; cv=none; b=oDAmEJz+6eWR1Gqfq/MrsvlGAgVXzykofDOgFWx0zfQS5CNzQ0dEjYyHI0wSP9xneZG5C9j8MLrQoSfLefFQAoyQ4mIHj6hgHoa6Hgirj94qj4kWKmUTW4KhB5T7CtopWyPrx8fmWyXTIAm4hkhHKq2+sW7nweu/+o/mW+gzzSs=
+	t=1733212604; cv=none; b=SoilNk67/HPcL3fKnsAuWSd2Ea0uC93Tm4APPaLq8u8UqzL/1DHMvHInghTgfuSfQeQqGrWSKkO8bmT6tQGlIHXB2KKkmSQLilXIYjy9+m7uSmeem9y9LPoh/Xu/avPxMRhAox8uNLQxQmWrgSscKRBP80yvGRN5/mB49m+d2qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733212387; c=relaxed/simple;
-	bh=JWCeZQU11ARclESWh5HV81vL80HyomnYeUCw3g6Nxy0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Az5jsTIJIW0J/sidRQAeI43FO4PpHPyEMpNc74ZCDS05092U2Lhq5qBRfUIfX1XJofDd+2/MeiFakLciN8a+ihMrh1AmxZvhSPwesJS3GrSLoY4pPaZWODtd9QG47Uzmq2i4QKg1fcc/gUpB94+3WZnko86NpOUhw5ts/KWiTkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gd4K4NOr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F717C4CED8;
-	Tue,  3 Dec 2024 07:53:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733212387;
-	bh=JWCeZQU11ARclESWh5HV81vL80HyomnYeUCw3g6Nxy0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Gd4K4NOrhMpZe6ioTYpFYzP84WJ3CoSZL3qsLGX81ti+LFzoFbQfCbmT2sHgC303h
-	 FTLQ1fzKZOZdhqGjJxXbgzvKcOMYH7QGI1AFsH9p6dJndsB5yKxN+r+WN6vne2o/5K
-	 apYDjKPSg1mcEHXh9SxU24uBt0OtZ3f6qx4MgofOTTnSZgQjgDpvzgRuBGItA8i2IS
-	 xSviofclbAGdXREJzkL2PLdFi7PG7XytDd2UKgIBwYLIEFjR3tq7NUL0jVlE5jf/ms
-	 ExNvU0HXP1xiHOKp/BeZ9Nf/LbHMFOMRiJnzE2g9WhvkFrevkC8BARDoWArq85UgEH
-	 xQq1Rh51berXw==
-Date: Tue, 3 Dec 2024 08:53:04 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1733212604; c=relaxed/simple;
+	bh=HzTAnBGi+AtfJayr1WcgPYLIoo/Uq1BdhrGAJz4lemM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fttNMlyqCybMDwrih2nD1qIxbw4j9ojmcJOu5TSkqbDkOj/RGxVqmQx5MoFeNkpHsVk7r217iu1dGg/qboVfDHTzwdjnBqpX0ZUI3qkdl3MO9CTZ0dMhTGnUPrC17ep6zlYxzfbdere4bY5O3smykTVs9/8cI+EBH4KRgTf9MHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tINlj-000392-Kj; Tue, 03 Dec 2024 08:56:27 +0100
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tINle-001R8u-0P;
+	Tue, 03 Dec 2024 08:56:22 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tINle-00AHve-2f;
+	Tue, 03 Dec 2024 08:56:22 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
 	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Daniel Xu <dxu@dxuuu.xyz>, aleksander.lobakin@intel.com,
-	netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next 3/3] bpf: cpumap: Add gro support
-Message-ID: <Z0644Mp3YaWIXcU5@lore-desk>
-References: <20241130-cpumap-gro-v1-0-c1180b1b5758@kernel.org>
- <20241130-cpumap-gro-v1-3-c1180b1b5758@kernel.org>
- <20241202145854.6677e5fd@kernel.org>
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-doc@vger.kernel.org
+Subject: [PATCH net-next v1 0/7] Introduce unified and structured PHY
+Date: Tue,  3 Dec 2024 08:56:14 +0100
+Message-Id: <20241203075622.2452169-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="zwkk46gi7lJGwzsb"
-Content-Disposition: inline
-In-Reply-To: <20241202145854.6677e5fd@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+This patch set introduces a unified and well-structured interface for
+reporting PHY statistics. Instead of relying on arbitrary strings in PHY
+drivers, this interface provides a consistent and structured way to
+expose PHY statistics to userspace via ethtool.
 
---zwkk46gi7lJGwzsb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The initial groundwork for this effort was laid by Jakub Kicinski, who
+contributed patches to plumb PHY statistics to drivers and added support
+for structured statistics in ethtool. Building on Jakub's work, I tested
+the implementation with several PHYs, addressed a few issues, and added
+support for statistics in two specific PHY drivers.
 
-> On Sat, 30 Nov 2024 00:11:00 +0100 Lorenzo Bianconi wrote:
-> > -	struct task_struct *kthread;
-> > +	struct napi_struct napi;
->=20
-> nack.
-> Please wait for the discussion to finish before you send next version.
+Jakub Kicinski (2):
+  net: ethtool: plumb PHY stats to PHY drivers
+  net: ethtool: add support for structured PHY statistics
 
-ack, fine. I was thinking we decided for this approach. Let's revaluate Ole=
-k's
-solution first.
+Oleksij Rempel (5):
+  phy: replace bitwise flag definitions with BIT() macro
+  phy: introduce optional polling interface for PHY statistics
+  ethtool: add helper to prevent invalid statistics exposure to
+    userspace
+  phy: dp83td510: add statistics support
+  phy: dp83tg720: add statistics support
 
-Regards,
-Lorenzo
+ Documentation/networking/ethtool-netlink.rst |   1 +
+ drivers/net/phy/dp83td510.c                  |  98 ++++++++++++-
+ drivers/net/phy/dp83tg720.c                  | 147 ++++++++++++++++++-
+ drivers/net/phy/phy.c                        |  15 ++
+ include/linux/ethtool.h                      |  39 +++++
+ include/linux/phy.h                          |  27 +++-
+ include/uapi/linux/ethtool.h                 |   2 +
+ include/uapi/linux/ethtool_netlink.h         |  15 ++
+ net/ethtool/linkstate.c                      |  25 +++-
+ net/ethtool/netlink.h                        |   1 +
+ net/ethtool/stats.c                          |  58 ++++++++
+ net/ethtool/strset.c                         |   5 +
+ 12 files changed, 423 insertions(+), 10 deletions(-)
 
-> --=20
-> pw-bot: cr
+--
+2.39.5
 
---zwkk46gi7lJGwzsb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ0644AAKCRA6cBh0uS2t
-rIhwAQDuYFbocZLN9+kEjN4KnPMPWreDu90E8onhmFwldkxKygEA1dWuIJiG0C8+
-V5cP00dYdzmCmILEXoBV8HMs8JPfag0=
-=n0IY
------END PGP SIGNATURE-----
-
---zwkk46gi7lJGwzsb--
 
