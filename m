@@ -1,88 +1,80 @@
-Return-Path: <netdev+bounces-148294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C4BF9E10C3
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 02:28:56 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 126019E10CD
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 02:37:41 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D90551635CC
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 01:37:37 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FA95A7AA;
+	Tue,  3 Dec 2024 01:37:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QEehivrn"
+X-Original-To: netdev@vger.kernel.org
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51107282058
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 01:28:55 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ABE438396;
-	Tue,  3 Dec 2024 01:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="arW77eKu"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8872AF16
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 01:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA692A8D0;
+	Tue,  3 Dec 2024 01:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733189333; cv=none; b=cYN/8y3zAL/l4E0+1vdPEEVIgCRfqeXJbPob0eJGZYcoZDq2612yKWki2hI4ekLpjUm53pLJ3O6nCw0e98ppPm/Ag+j1b49n2MXb68Fy23Q4vNowF0WjJSRb1Q3U1fXTEBCjwQbpx9DcFZyIGPyQo8m2gihUKqLhJph9uHB7lBU=
+	t=1733189857; cv=none; b=cGLiVHy3Y/iwAGaNZDtVWYW2d2B9S/nZy4bqNCynFxKyIh4ZjRXEAi6G5kpwTXtyhDjD4vQlU2gp1vzmBxQ4ElM26uApvWXD3DS03rqYsbjWdMjIk482McdD61kpyRW5E0KB8lA9fP4kaCNu9AKZvQnmwiuUDqfnXvEtlrU2YFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733189333; c=relaxed/simple;
-	bh=8iV3hNlKi9ZAJH64zDJz1j35OcXaCtTfWFhvtZPXAEc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dFMRYKNJMglPysAZYntfA9XNqdgnRjnKSWq6lt4KB4wS/4re4T3YqxvRbegiaQyz2LcbozCZscGScNhLBpqou74RRVRqXHzWptooxKP88RHIrfy/rlMvA2oapOiL9lHS9T/xAD0QMm1uo1l3VrkJaC/I7BRAbYdzIDfTH1WcnhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=arW77eKu; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-215666ea06aso17738105ad.0
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 17:28:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1733189330; x=1733794130; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zWNYXKMiPapz1Mt6v6Pm3WNUSi3yE7uDCRcmv8yYg64=;
-        b=arW77eKuP0QYvhkv7Jp7RqsaMZT+qE/T7r7FgRsIbR82tcgmJkyAc27+O1cRxuWoLh
-         1XodkzKGabGzyusrQ01HyOKlr5mhZxN3NgRpdJzu8S+705FBdiB8tM1xcwMgFT5+kT01
-         iXcaSw7S/JiB7IAOgJZllLRstwyMpOVeX+sDE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733189330; x=1733794130;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zWNYXKMiPapz1Mt6v6Pm3WNUSi3yE7uDCRcmv8yYg64=;
-        b=H/LKurZck8/Hvhzmk4ijIrAwXkg572i8ODs42yp0Dzorr5AKJvvhG3ImLX534lOYc0
-         SvP3OcRvzvTIpaH4DnONGMOsDEUTl1ixEd7B4zstbI5fHwADimOhEQSyn9Sr7KB6s3Kz
-         OcJldTe8wiob1n8PEmGc65LHVumOPszI6Z1XJOigXRvtcZIsy2MvudXGXYgWpMxLKyCz
-         rA6ofnqhzDHdZ48ZlgGmPmMdIXSNawx5Yywf8tVIotvxG/kuqksTGzmkllxjGDiCzf4g
-         VEnKc0rVKaZZR2oAkmNrguCT2qFYf5HIVhvsbs263rb75QaqeMj85nWwex+ZAcjSee3+
-         rctw==
-X-Gm-Message-State: AOJu0YxsjImytbAlbKKBL9tce1W38td3i9JVcj3HHM6WxikmK5AGYywK
-	w9EJJDmlcfKrOI61pV9+M/R0qhTFvxm0KeQuIT/ssDiA8Y/YXb/yqwzV6ODPxf/BZasYnAC0agQ
-	BFizX9ZXtoN/EnrjivFgYZWUKjTlkc/ou3M1nVA5iKif+c8JUj/6LiKnrs7os3H139lFOk6oede
-	T7hRhonC74L1kaeDUQA8/CgQ+TM0i+7A1Tncw=
-X-Gm-Gg: ASbGncvQ+nBI/q0zIVMrw42LxJQGCd6fN/DLCna3RZ8JaXQpxzBpuXzrmTMWaHG3zoZ
-	4vjRAJtC2UYo0vmlrxkXKKzKHtDbN+Oy4f61mXhkugbFAWkhTKCGBGiJXxmtIhacqaNV1xWcDEo
-	SxoEFg15E9GRUCpm+fxVsAxDqLk7todwTNRA6ZCRNxylRnSAguIuyvfleKOXKFAdcvXHA6fCDIp
-	7D/S5Amcma4mS+dKUQ8pr0MhdUTGz6iPwPK81Q2j5jynYELqmaELM8ZOA==
-X-Google-Smtp-Source: AGHT+IGt5WbOAM0L8F7DeypmXThouFU45yqNTHy92A7JuVHfqSlriRd2Dnq7v8Tti+0NfHckZUsSXw==
-X-Received: by 2002:a17:902:c943:b0:215:58be:3349 with SMTP id d9443c01a7336-215bdf0784bmr8410745ad.14.1733189330379;
-        Mon, 02 Dec 2024 17:28:50 -0800 (PST)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215b08965b4sm8846065ad.180.2024.12.02.17.28.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 17:28:49 -0800 (PST)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	mkarsten@uwaterloo.ca,
-	Joe Damato <jdamato@fastly.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] selftests: net: cleanup busy_poller.c
-Date: Tue,  3 Dec 2024 01:28:38 +0000
-Message-Id: <20241203012838.182522-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1733189857; c=relaxed/simple;
+	bh=KvuUWvtZzcGRoFiwHZn+yzfmeEcZFfzxZucwdSWIYAo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dxBt3vszKjZhHR8MfHW/TUnitP+cZZ0GaXg0egNZSb2D+zKwvsJTSQEadKGfstjIWGfo4zgDY+B+vcAq4XzSqeVfIX1pCb5G6sx0kH9sX1XuHyMMSkcjkBChthOrFVRfvZxK4Ms0sAvGJmbOUZEjOQ1eVeMy6pwuQ2uTL3RgFO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QEehivrn; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B2II5MR004750;
+	Tue, 3 Dec 2024 01:37:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=ttPRFtlh9tOm7IOEYokU/ryAJRa/3UU0IUWzaxKLJ
+	SQ=; b=QEehivrnURJqyrDvVDIMAh6yElks0ywkq3H3AtcIVLD01Oa6AVqqT5Egh
+	FVqTjANHGDy7PchCoy4W9ikUGysL8XBvzsNMmOnr9EnXGayNPImIDijtQOh80lVc
+	eB5tkBAoHLOonG2HILtuj6wsm4RrLZmVwcgEODqCLZWD7J6tEY6vSUxFXhl2saJm
+	ekSjHFhjDriDrjn6a28vfK+n/itJ4Ez6Jud4kbsHlmK+7od21EPzvK9/OevoSodH
+	GL5GIt3A86e9oCanYqPy5mbBtkW8GzSrJSRHecBzcJQ5f2vZMbjMVTjhU216KrHG
+	RXpdBeNJyeIl8mhEdAfkFeLL1B/WQ==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 437s4hun5w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 03 Dec 2024 01:37:31 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B3194Gx029465;
+	Tue, 3 Dec 2024 01:37:30 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 438ddybj12-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 03 Dec 2024 01:37:30 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B31bTdp27984612
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 3 Dec 2024 01:37:29 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EE17A5805A;
+	Tue,  3 Dec 2024 01:37:28 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B3CCC58051;
+	Tue,  3 Dec 2024 01:37:28 +0000 (GMT)
+Received: from WIN-DU0DFC9G5VV.ibm.com (unknown [9.61.255.118])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  3 Dec 2024 01:37:28 +0000 (GMT)
+From: Konstantin Shkolnyy <kshk@linux.ibm.com>
+To: sgarzare@redhat.com
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com,
+        Konstantin Shkolnyy <kshk@linux.ibm.com>
+Subject: [PATCH net v7 0/3] vsock/test: fix wrong setsockopt() parameters
+Date: Mon,  2 Dec 2024 19:37:06 -0600
+Message-Id: <20241203013709.232045-1-kshk@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,187 +82,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 6T1AEGEvCiWmjrj4M_soyXgm4Iypfx17
+X-Proofpoint-ORIG-GUID: 6T1AEGEvCiWmjrj4M_soyXgm4Iypfx17
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ adultscore=0 mlxscore=0 mlxlogscore=999 lowpriorityscore=0 bulkscore=0
+ impostorscore=0 phishscore=0 spamscore=0 malwarescore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2412030011
 
-Fix various integer type conversions by using strtoull and a temporary
-variable which is bounds checked before being casted into the
-appropriate cfg_* variable for use by the test program.
+Parameters were created using wrong C types, which caused them to be of
+wrong size on some architectures, causing problems.
 
-While here, free the strdup'd cfg string for overall hygenie.
+The problem with SO_RCVLOWAT was found on s390 (big endian), while x86-64
+didn't show it. After the fix, all tests pass on s390.
+Then Stefano Garzarella pointed out that SO_VM_SOCKETS_* calls might have
+a similar problem, which turned out to be true, hence, the second patch.
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- tools/testing/selftests/net/busy_poller.c | 86 +++++++++++++----------
- 1 file changed, 49 insertions(+), 37 deletions(-)
+Changes for v7:
+- Rebase on top of https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git
+- Add the "net" tags to the subjects
+Changes for v6:
+- rework the patch #3 to avoid creating a new file for new functions,
+and exclude vsock_perf from calling the new functions.
+- add "Reviewed-by:" to the patch #2.
+Changes for v5:
+- in the patch #2 replace the introduced uint64_t with unsigned long long
+to match documentation
+- add a patch #3 that verifies every setsockopt() call.
+Changes for v4:
+- add "Reviewed-by:" to the first patch, and add a second patch fixing
+SO_VM_SOCKETS_* calls, which depends on the first one (hence, it's now
+a patch series.)
+Changes for v3:
+- fix the same problem in vsock_perf and update commit message
+Changes for v2:
+- add "Fixes:" lines to the commit message
 
-diff --git a/tools/testing/selftests/net/busy_poller.c b/tools/testing/selftests/net/busy_poller.c
-index 99b0e8c17fca..ef62d7145598 100644
---- a/tools/testing/selftests/net/busy_poller.c
-+++ b/tools/testing/selftests/net/busy_poller.c
-@@ -54,16 +54,16 @@ struct epoll_params {
- #define EPIOCGPARAMS _IOR(EPOLL_IOC_TYPE, 0x02, struct epoll_params)
- #endif
- 
--static uint32_t cfg_port = 8000;
-+static uint16_t cfg_port = 8000;
- static struct in_addr cfg_bind_addr = { .s_addr = INADDR_ANY };
- static char *cfg_outfile;
- static int cfg_max_events = 8;
--static int cfg_ifindex;
-+static uint32_t cfg_ifindex;
- 
- /* busy poll params */
- static uint32_t cfg_busy_poll_usecs;
--static uint32_t cfg_busy_poll_budget;
--static uint32_t cfg_prefer_busy_poll;
-+static uint16_t cfg_busy_poll_budget;
-+static uint8_t cfg_prefer_busy_poll;
- 
- /* IRQ params */
- static uint32_t cfg_defer_hard_irqs;
-@@ -79,6 +79,7 @@ static void usage(const char *filepath)
- 
- static void parse_opts(int argc, char **argv)
- {
-+	unsigned long long tmp;
- 	int ret;
- 	int c;
- 
-@@ -86,31 +87,40 @@ static void parse_opts(int argc, char **argv)
- 		usage(argv[0]);
- 
- 	while ((c = getopt(argc, argv, "p:m:b:u:P:g:o:d:r:s:i:")) != -1) {
-+		/* most options take integer values, except o and b, so reduce
-+		 * code duplication a bit for the common case by calling
-+		 * strtoull here and leave bounds checking and casting per
-+		 * option below.
-+		 */
-+		if (c != 'o' && c != 'b')
-+			tmp = strtoull(optarg, NULL, 0);
-+
- 		switch (c) {
- 		case 'u':
--			cfg_busy_poll_usecs = strtoul(optarg, NULL, 0);
--			if (cfg_busy_poll_usecs == ULONG_MAX ||
--			    cfg_busy_poll_usecs > UINT32_MAX)
-+			if (tmp == ULLONG_MAX || tmp > UINT32_MAX)
- 				error(1, ERANGE, "busy_poll_usecs too large");
-+
-+			cfg_busy_poll_usecs = (uint32_t)tmp;
- 			break;
- 		case 'P':
--			cfg_prefer_busy_poll = strtoul(optarg, NULL, 0);
--			if (cfg_prefer_busy_poll == ULONG_MAX ||
--			    cfg_prefer_busy_poll > 1)
-+			if (tmp == ULLONG_MAX || tmp > 1)
- 				error(1, ERANGE,
- 				      "prefer busy poll should be 0 or 1");
-+
-+			cfg_prefer_busy_poll = (uint8_t)tmp;
- 			break;
- 		case 'g':
--			cfg_busy_poll_budget = strtoul(optarg, NULL, 0);
--			if (cfg_busy_poll_budget == ULONG_MAX ||
--			    cfg_busy_poll_budget > UINT16_MAX)
-+			if (tmp == ULLONG_MAX || tmp > UINT16_MAX)
- 				error(1, ERANGE,
- 				      "busy poll budget must be [0, UINT16_MAX]");
-+
-+			cfg_busy_poll_budget = (uint16_t)tmp;
- 			break;
- 		case 'p':
--			cfg_port = strtoul(optarg, NULL, 0);
--			if (cfg_port > UINT16_MAX)
-+			if (tmp == ULLONG_MAX || tmp > UINT16_MAX)
- 				error(1, ERANGE, "port must be <= 65535");
-+
-+			cfg_port = (uint16_t)tmp;
- 			break;
- 		case 'b':
- 			ret = inet_aton(optarg, &cfg_bind_addr);
-@@ -124,41 +134,39 @@ static void parse_opts(int argc, char **argv)
- 				error(1, 0, "outfile invalid");
- 			break;
- 		case 'm':
--			cfg_max_events = strtol(optarg, NULL, 0);
--
--			if (cfg_max_events == LONG_MIN ||
--			    cfg_max_events == LONG_MAX ||
--			    cfg_max_events <= 0)
-+			if (tmp == ULLONG_MAX || tmp > INT_MAX)
- 				error(1, ERANGE,
--				      "max events must be > 0 and < LONG_MAX");
-+				      "max events must be > 0 and <= INT_MAX");
-+
-+			cfg_max_events = (int)tmp;
- 			break;
- 		case 'd':
--			cfg_defer_hard_irqs = strtoul(optarg, NULL, 0);
--
--			if (cfg_defer_hard_irqs == ULONG_MAX ||
--			    cfg_defer_hard_irqs > INT32_MAX)
-+			if (tmp == ULLONG_MAX || tmp > INT32_MAX)
- 				error(1, ERANGE,
- 				      "defer_hard_irqs must be <= INT32_MAX");
-+
-+			cfg_defer_hard_irqs = (uint32_t)tmp;
- 			break;
- 		case 'r':
--			cfg_gro_flush_timeout = strtoull(optarg, NULL, 0);
--
--			if (cfg_gro_flush_timeout == ULLONG_MAX)
-+			if (tmp == ULLONG_MAX || tmp > UINT64_MAX)
- 				error(1, ERANGE,
--				      "gro_flush_timeout must be < ULLONG_MAX");
-+				      "gro_flush_timeout must be < UINT64_MAX");
-+
-+			cfg_gro_flush_timeout = (uint64_t)tmp;
- 			break;
- 		case 's':
--			cfg_irq_suspend_timeout = strtoull(optarg, NULL, 0);
--
--			if (cfg_irq_suspend_timeout == ULLONG_MAX)
-+			if (tmp == ULLONG_MAX || tmp > UINT64_MAX)
- 				error(1, ERANGE,
- 				      "irq_suspend_timeout must be < ULLONG_MAX");
-+
-+			cfg_irq_suspend_timeout = (uint64_t)tmp;
- 			break;
- 		case 'i':
--			cfg_ifindex = strtoul(optarg, NULL, 0);
--			if (cfg_ifindex == ULONG_MAX)
-+			if (tmp == ULLONG_MAX || tmp > INT_MAX)
- 				error(1, ERANGE,
--				      "ifindex must be < ULONG_MAX");
-+				      "ifindex must be <= INT_MAX");
-+
-+			cfg_ifindex = (int)tmp;
- 			break;
- 		}
- 	}
-@@ -277,8 +285,8 @@ static void run_poller(void)
- 	 * here
- 	 */
- 	epoll_params.busy_poll_usecs = cfg_busy_poll_usecs;
--	epoll_params.busy_poll_budget = (uint16_t)cfg_busy_poll_budget;
--	epoll_params.prefer_busy_poll = (uint8_t)cfg_prefer_busy_poll;
-+	epoll_params.busy_poll_budget = cfg_busy_poll_budget;
-+	epoll_params.prefer_busy_poll = cfg_prefer_busy_poll;
- 	epoll_params.__pad = 0;
- 
- 	val = 1;
-@@ -342,5 +350,9 @@ int main(int argc, char *argv[])
- 	parse_opts(argc, argv);
- 	setup_queue();
- 	run_poller();
-+
-+	if (cfg_outfile)
-+		free(cfg_outfile);
-+
- 	return 0;
- }
+Konstantin Shkolnyy (3):
+  vsock/test: fix failures due to wrong SO_RCVLOWAT parameter
+  vsock/test: fix parameter types in SO_VM_SOCKETS_* calls
+  vsock/test: verify socket options after setting them
 
-base-commit: 65ae975e97d5aab3ee9dc5ec701b12090572ed43
+ tools/testing/vsock/control.c             |   9 +-
+ tools/testing/vsock/msg_zerocopy_common.c |  10 --
+ tools/testing/vsock/msg_zerocopy_common.h |   1 -
+ tools/testing/vsock/util.c                | 144 ++++++++++++++++++++++
+ tools/testing/vsock/util.h                |   7 ++
+ tools/testing/vsock/vsock_perf.c          |  20 ++-
+ tools/testing/vsock/vsock_test.c          |  73 +++++------
+ tools/testing/vsock/vsock_test_zerocopy.c |   2 +-
+ tools/testing/vsock/vsock_uring_test.c    |   2 +-
+ 9 files changed, 204 insertions(+), 64 deletions(-)
+
 -- 
-2.25.1
+2.34.1
 
 
