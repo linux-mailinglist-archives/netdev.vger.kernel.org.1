@@ -1,119 +1,131 @@
-Return-Path: <netdev+bounces-148413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B49D9E1705
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:18:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0CA29E178B
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:30:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F6B82831E6
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 09:18:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A950CB33456
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 09:27:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4C61DE4F9;
-	Tue,  3 Dec 2024 09:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4931DF977;
+	Tue,  3 Dec 2024 09:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IuKU9OEi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PHFGmCEu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4351DE4DF;
-	Tue,  3 Dec 2024 09:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F50D1DF267
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 09:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733217505; cv=none; b=Ymw6KtWgmcR6h/mU81Xk0mSdIxXXy13VCnwwcDvWrdEb0VhqqvgrCcBzfpBOLVdt0gLlOG5CzKTQe6o01Kt8MH7YvgKvoUGSwaGy75s2CSfAdBSfCD76jFr8dt/yt64T/fDP7KgrAjpp1cIFzGLKUtWPxzsHTwBSYjCCBkmpNiM=
+	t=1733218044; cv=none; b=Kk2AnHZ7+oST2pFp2x6sVTXEh68RzeWAeO+ZSM7/vRFAW62s3yC4eLahKLddEn6et9GPFMKiQ5n86FbPo5n0UkjP4iZMQpH9qV7MLH8Zv4SxQBBtUEm9Y4VDv7WPMGmPgXlg1bB3Pm0Gi5qwvVWzmcqFZfaXntYLhJisarTOQIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733217505; c=relaxed/simple;
-	bh=9yXkUDZMfz4sHLAIVhrP4SvQobY74YVeNzCfgQ8/5Yk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Hmv+sXOpqa6VrDSO0Nq9WPgXgRHT1Txvc19NJHENfPt2VsdtzbWlQpnUCE3lFkdsDtJHx/qRLdpaDb6QSsvPst6b1al9zMsKQSZ8a7aPjuAMFaXygfgvA7AyYpEIhmN3sXPo1QjPJEv7LlykBZ0OG3nS6yzzdw3dj3ChiGnB868=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IuKU9OEi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79E02C4CED6;
-	Tue,  3 Dec 2024 09:18:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733217505;
-	bh=9yXkUDZMfz4sHLAIVhrP4SvQobY74YVeNzCfgQ8/5Yk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IuKU9OEi6YOyfP4tt28au5BelFnO2QY4JyZ4WnZy32qQQ0a9SkoD+MhXW2wrTJ8ZK
-	 SzMfLFjBaMr56rIbGZSj1kFtD86aHi2bLjW2V5WFKTMS35616rf3Qj/g9O7QmZPRRs
-	 c+qnVXiSjTpBM2C+Ufcagq49wVqAZwDyTUN8g2Nqj1upw9IgLaIRU4gXn6J/7sRiyy
-	 6o7dInSwV3jWdhC7mUbC/ryZYYcVDCg9qOw3wnMCVM+yeR33FpbScQFQmHx37n7Yvz
-	 TU59CldolnyyzDnmvsv++DGcuzyt3FUo7IXLxB7ROg4sA00daH1AT5IiI2S5ycvPGX
-	 EYz9tqWydiJlw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1A53806656;
-	Tue,  3 Dec 2024 09:18:40 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1733218044; c=relaxed/simple;
+	bh=Ince3mWEv75RuKdJa0lCInd/VfuFqee8x2RBuI/adjs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=NeU+gJFetxvh8gf+OWK51HxkP2TVPKy88FgWIjPYRDxpyiwptzEBuK50r8t2jc+GRKEpKuBbOLxUdzp7M5a2csiQDE/+zMZ5HgQdV3z1/WZjvjgFl9aJQ6CTSOTE8uKUvAOK6/q6yqwCyF2GLocANR3xO1XPxSG+6zMZTKYuxk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PHFGmCEu; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733218040;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0EK26W2r8agytXtW5C5i2nqLQK7qOjfnw0z/ar6mvxw=;
+	b=PHFGmCEuI7fVFW9iyHKQo7hHAOvkhWolhCkIKlQ8IWZIh70OplaE5YlU4K31bXz/697PzJ
+	vsOkI4fkLyuG4VK6dFcksWmkHQnydRCPdHyxNjmdbYl8AJVzZVF6T6VtUn16zOP86PSXUR
+	8uCVrLajjtqWSLy2wuymcOATxWwlpPg=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-255-xpmqXa0IMDepN6lfWQz1cg-1; Tue,
+ 03 Dec 2024 04:27:17 -0500
+X-MC-Unique: xpmqXa0IMDepN6lfWQz1cg-1
+X-Mimecast-MFC-AGG-ID: xpmqXa0IMDepN6lfWQz1cg
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C75C0192538D;
+	Tue,  3 Dec 2024 09:27:14 +0000 (UTC)
+Received: from t14s.redhat.com (unknown [10.45.224.51])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7D59D1956052;
+	Tue,  3 Dec 2024 09:27:08 +0000 (UTC)
+From: Jan Stancek <jstancek@redhat.com>
+To: donald.hunter@gmail.com,
+	kuba@kernel.org
+Cc: pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	jstancek@redhat.com
+Subject: [PATCH 0/5] tools: ynl: add install target
+Date: Tue,  3 Dec 2024 10:26:59 +0100
+Message-ID: <cover.1733216767.git.jstancek@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-type: text/plain
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] dccp: Fix memory leak in dccp_feat_change_recv
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173321751975.4083494.12180230037136307201.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Dec 2024 09:18:39 +0000
-References: <20241126143902.190853-1-solodovnikov.ia@phystech.edu>
-In-Reply-To: <20241126143902.190853-1-solodovnikov.ia@phystech.edu>
-To: Ivan Solodovnikov <solodovnikov.ia@phystech.edu>
-Cc: gerrit@erg.abdn.ac.uk, davem@davemloft.net, kuba@kernel.org,
- dccp@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- lvc-project@linuxtesting.org
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hello:
+This series adds an install target for ynl. The python code
+is moved to a subdirectory, so it can be used as a package
+with flat layout, as well as directly from the tree.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+To try the install as a non-root user you can run:
+  $ mkdir /tmp/myroot
+  $ make DESTDIR=/tmp/myroot install
 
-On Tue, 26 Nov 2024 17:39:02 +0300 you wrote:
-> If dccp_feat_push_confirm() fails after new value for SP feature was accepted
-> without reconciliation ('entry == NULL' branch), memory allocated for that value
-> with dccp_feat_clone_sp_val() is never freed.
-> 
-> Here is the kmemleak stack for this:
-> 
-> unreferenced object 0xffff88801d4ab488 (size 8):
->   comm "syz-executor310", pid 1127, jiffies 4295085598 (age 41.666s)
->   hex dump (first 8 bytes):
->     01 b4 4a 1d 80 88 ff ff                          ..J.....
->   backtrace:
->     [<00000000db7cabfe>] kmemdup+0x23/0x50 mm/util.c:128
->     [<0000000019b38405>] kmemdup include/linux/string.h:465 [inline]
->     [<0000000019b38405>] dccp_feat_clone_sp_val net/dccp/feat.c:371 [inline]
->     [<0000000019b38405>] dccp_feat_clone_sp_val net/dccp/feat.c:367 [inline]
->     [<0000000019b38405>] dccp_feat_change_recv net/dccp/feat.c:1145 [inline]
->     [<0000000019b38405>] dccp_feat_parse_options+0x1196/0x2180 net/dccp/feat.c:1416
->     [<00000000b1f6d94a>] dccp_parse_options+0xa2a/0x1260 net/dccp/options.c:125
->     [<0000000030d7b621>] dccp_rcv_state_process+0x197/0x13d0 net/dccp/input.c:650
->     [<000000001f74c72e>] dccp_v4_do_rcv+0xf9/0x1a0 net/dccp/ipv4.c:688
->     [<00000000a6c24128>] sk_backlog_rcv include/net/sock.h:1041 [inline]
->     [<00000000a6c24128>] __release_sock+0x139/0x3b0 net/core/sock.c:2570
->     [<00000000cf1f3a53>] release_sock+0x54/0x1b0 net/core/sock.c:3111
->     [<000000008422fa23>] inet_wait_for_connect net/ipv4/af_inet.c:603 [inline]
->     [<000000008422fa23>] __inet_stream_connect+0x5d0/0xf70 net/ipv4/af_inet.c:696
->     [<0000000015b6f64d>] inet_stream_connect+0x53/0xa0 net/ipv4/af_inet.c:735
->     [<0000000010122488>] __sys_connect_file+0x15c/0x1a0 net/socket.c:1865
->     [<00000000b4b70023>] __sys_connect+0x165/0x1a0 net/socket.c:1882
->     [<00000000f4cb3815>] __do_sys_connect net/socket.c:1892 [inline]
->     [<00000000f4cb3815>] __se_sys_connect net/socket.c:1889 [inline]
->     [<00000000f4cb3815>] __x64_sys_connect+0x6e/0xb0 net/socket.c:1889
->     [<00000000e7b1e839>] do_syscall_64+0x33/0x40 arch/x86/entry/common.c:46
->     [<0000000055e91434>] entry_SYSCALL_64_after_hwframe+0x67/0xd1
-> 
-> [...]
+  $ PATH="/tmp/myroot/usr/bin:$PATH" PYTHONPATH="$(ls -1d /tmp/myroot/usr/lib/python*/site-packages)" ynl --help
 
-Here is the summary with links:
-  - [net] dccp: Fix memory leak in dccp_feat_change_recv
-    https://git.kernel.org/netdev/net/c/22be4727a8f8
+Proposed install layout is described in last patch.
 
-You are awesome, thank you!
+Jan Stancek (5):
+  tools: ynl: move python code to separate sub-directory
+  tools: ynl: rename ynl-gen-[c|rst] to ynl_gen_[c|rst]
+  tools: ynl: add initial pyproject.toml for packaging
+  tools: ynl: add install target for specs and docs
+  tools: ynl: add main install target
+
+ tools/net/ynl/Makefile                        | 24 ++++++++++++-
+ tools/net/ynl/generated/.gitignore            |  1 +
+ tools/net/ynl/generated/Makefile              | 36 ++++++++++++++++---
+ tools/net/ynl/lib/.gitignore                  |  1 -
+ tools/net/ynl/lib/Makefile                    |  1 -
+ tools/net/ynl/pyproject.toml                  | 26 ++++++++++++++
+ tools/net/ynl/pyynl/__init__.py               |  0
+ tools/net/ynl/{ => pyynl}/cli.py              |  0
+ tools/net/ynl/{ => pyynl}/ethtool.py          |  0
+ tools/net/ynl/pyynl/lib/.gitignore            |  1 +
+ tools/net/ynl/{ => pyynl}/lib/__init__.py     |  0
+ tools/net/ynl/{ => pyynl}/lib/nlspec.py       |  0
+ tools/net/ynl/{ => pyynl}/lib/ynl.py          |  0
+ .../ynl/{ynl-gen-c.py => pyynl/ynl_gen_c.py}  |  0
+ .../{ynl-gen-rst.py => pyynl/ynl_gen_rst.py}  |  0
+ tools/net/ynl/ynl-regen.sh                    |  2 +-
+ 16 files changed, 84 insertions(+), 8 deletions(-)
+ create mode 100644 tools/net/ynl/pyproject.toml
+ create mode 100644 tools/net/ynl/pyynl/__init__.py
+ rename tools/net/ynl/{ => pyynl}/cli.py (100%)
+ rename tools/net/ynl/{ => pyynl}/ethtool.py (100%)
+ create mode 100644 tools/net/ynl/pyynl/lib/.gitignore
+ rename tools/net/ynl/{ => pyynl}/lib/__init__.py (100%)
+ rename tools/net/ynl/{ => pyynl}/lib/nlspec.py (100%)
+ rename tools/net/ynl/{ => pyynl}/lib/ynl.py (100%)
+ rename tools/net/ynl/{ynl-gen-c.py => pyynl/ynl_gen_c.py} (100%)
+ rename tools/net/ynl/{ynl-gen-rst.py => pyynl/ynl_gen_rst.py} (100%)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
