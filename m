@@ -1,124 +1,112 @@
-Return-Path: <netdev+bounces-148442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1D7B9E19EA
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 11:52:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 315F09E1A1C
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 11:59:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96A0616671B
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:52:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CB46166F79
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:59:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A891E261D;
-	Tue,  3 Dec 2024 10:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110F41E32BE;
+	Tue,  3 Dec 2024 10:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eTtfinIs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JzcN27zg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1691E2846
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 10:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535421E32C5
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 10:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733223111; cv=none; b=jL+guOaT4ILRl7AsIoCH15XA+K2EdRofk1HQd6qTvvM+RwniaivFgxY1PsTJ1hzWTP+YEOPkbNyGiSp71zmZLrmWI6isrO1YbjBP4VJmsdwIKz1qz2v8PkhhhrfEt5sqZCm10drABpZIptIBUTvuQOmoyJtiIj6j/KPhVTogNM0=
+	t=1733223563; cv=none; b=UJBmIdMza3Vj/xJ5NNzv/sMLbL2+p5k4ir6gU2fGcB9EoJGDKwStRV+wB/YdbXkXhs1gXtnL08TUQ8TjN86hP6i7US1qIlRogJeJkn61I69Q+7HHITIwKy5IZQehpK6q9R5mTj8p7alrO07CKUcX1l1cBzkDq553HlqChfPDz9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733223111; c=relaxed/simple;
-	bh=zCvFg4vEIpOLlT0v1hFR9CAMJ4AmEjDBRmcbbFYBMYc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oVrybNqqYaQyMynvqcn1cpnHKOiryLQ7zI79I34Sw1WWd+ur9xFsvA3ZA0XOoZzEnEV+5+3OUg1Iimjnjnaxn3bMvETGMdFrHUJi1UbHCxDH39Sl4hpsJ9v6WqOKl7mZhk856vXD+9JOhA0k3iEOHjmQvgjWwRn9Lr2zoR2U4TI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eTtfinIs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733223108;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vHBxos+o3qrEEMMHC+x3OhB+3sIk8pos47xZWNsi7So=;
-	b=eTtfinIsYRaYh3VM5ONUI4k5DbQhqMcpuJNeE560ntRDk35UjqeTSA208gZ+epa9oNH/0D
-	loSYOS/L99Wbv/QolV9nG6pqKcb+Kxqk012vcmdPwiT921yj9f0L7atYrJ5CLmRSlZXeKz
-	usPfybUeuLiPx11xKUdA1rJZ5A9b3D0=
-Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
- [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-147-ii9e5qPeNCWI4x9WgI7GJg-1; Tue, 03 Dec 2024 05:51:46 -0500
-X-MC-Unique: ii9e5qPeNCWI4x9WgI7GJg-1
-X-Mimecast-MFC-AGG-ID: ii9e5qPeNCWI4x9WgI7GJg
-Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-515b01f64baso419484e0c.3
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 02:51:46 -0800 (PST)
+	s=arc-20240116; t=1733223563; c=relaxed/simple;
+	bh=EDHzjBUASVzIv5XHo01cPBl/mjuy/KS3wSX1QX8rkwk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Laf2W0Pah71gAo+m8bAw4gbRbBKdgT0RusQBpAoU2+pHMTTWTaZPiayrVfRITSmMC5hVXR3qviD2TLjBVEmtQ7CCzwG6H3gmY9Ea/qKSYrGPVkG8d52xjbzLCQsLxCm5XODhCoTdlFvKupR15UcX5HyDRFF/Bkd+reqaLOUkh2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JzcN27zg; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5d0e75335e3so2805828a12.3
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 02:59:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733223559; x=1733828359; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EDHzjBUASVzIv5XHo01cPBl/mjuy/KS3wSX1QX8rkwk=;
+        b=JzcN27zgMQ9tGrH2ZpBU8MZd1l3R/oXDkVtXcv/k0mNWc4yRGNJqcZNjz31z17+oEz
+         JvEZkQDrMZ48DefOiw2605jG6NGiSshNAQlB43aCUwvLyPoqadl+ghIm6093x3DWpF0H
+         tuJCTSgjY8LW6+kknbtzC48ZsKbHHpXkFldDQkcIuASWsAz0a/mrXu+0ijeE7A9h85NU
+         45CBDY28YLUElxDhwL6JflYcZsrqLKMb1JLPklTtxtmWnwlWGvjAuJRZH5A+1F1ZoMDS
+         bbbIIgqSIAGvRyCvBBfD2ErrY/Tpm7kSE5F6u96omcsOplNdTDw5ZWW5iSqgf6+cqP91
+         nZFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733223106; x=1733827906;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vHBxos+o3qrEEMMHC+x3OhB+3sIk8pos47xZWNsi7So=;
-        b=EJuBmiV6lxwTBkDeMfBHPCqU0dbIG6V7c59rpXLyh4GrEJR8xOGgFxfKK5OwAVEnki
-         aJd/wiiOlGB3Gino+M88ofDEMq/+2G6JePSAnHOjc5JM3dc5AbmJnI7vfl5C2NPZBhlv
-         6+BAsNav77cqdIytJX62zswfPeDbAdO+VHMFzbBhEVqNbdZUHHOY0iq3lU3RR3FlkcWH
-         HVMp1j8yBwi5Q16iYHaahGoOlmhjgkxj2uJuJBn/CNLAdqKPPSPO6wFBYfBOaqzSGi/1
-         8VIGiQeDILzZkJAw0TntFIL9JRwrYnZHlSXdGxZr5Xzkmwd7NUzzZEmh8zhHzW+ZAuMf
-         I6Gw==
-X-Gm-Message-State: AOJu0YxZCq9ELx7jaKyjRd8GjgD8tK+Z2zFmWu3Mip06XAP3qyz38Kr3
-	RUDLexgFieLOX+qJ/t4YVPmgwYbRzUqx3WOwJGQKVr95kd+NGGWKH2CTO1EvRU9WyVsgrRqUHzP
-	IdR83+gsOWf4LRNXWVomtr+K9eYcXjaHNrEuZB+q+ilb+75WkrmHiKw==
-X-Gm-Gg: ASbGncuzBMW+W0Rzxuw04E253lXHGETAiXyuVJV88YNl/ahGe5dw5B5Qn59T8sRqIzL
-	/bhNzR+KB/45PY2qf5ia4xqdj8nwgnsYU1RWdWzkOG6xCoLYQq+FKbnMd2+Pxwi9S1QepnKuosx
-	+kyDQIkEgI0We2Dim3JHSyDPq++dtp58myd1ae4JyzqH7hskqwvwGEldiLR42+2aSAQZ2mZCo6Q
-	rvynbpQvmtuWUaVBoCHOf99TU383IW2AraC6eMkoMl06DqYU0lf7tppADIblWH0xR/GHDRCLQPi
-X-Received: by 2002:a05:6122:2221:b0:50a:b728:5199 with SMTP id 71dfb90a1353d-515bf526dd7mr2760856e0c.7.1733223106208;
-        Tue, 03 Dec 2024 02:51:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHdkOU+cxeVvQy6UeXhx2+etKkA87xrAvza0RmQEt7J0nuUg9/7W+lTdTD8ONvbnM6oW7eaVQ==
-X-Received: by 2002:a05:6122:2221:b0:50a:b728:5199 with SMTP id 71dfb90a1353d-515bf526dd7mr2760843e0c.7.1733223105881;
-        Tue, 03 Dec 2024 02:51:45 -0800 (PST)
-Received: from [192.168.88.24] (146-241-38-31.dyn.eolo.it. [146.241.38.31])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d8a0c9004bsm28533096d6.80.2024.12.03.02.51.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2024 02:51:45 -0800 (PST)
-Message-ID: <85376cf2-0c95-4a08-bcbb-33c30c2f2c51@redhat.com>
-Date: Tue, 3 Dec 2024 11:51:43 +0100
+        d=1e100.net; s=20230601; t=1733223559; x=1733828359;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EDHzjBUASVzIv5XHo01cPBl/mjuy/KS3wSX1QX8rkwk=;
+        b=iboNZMcQP+9MsPNoz/F8fV02eSDtjnaJQHCkiKtkSDp6nID8iTVkADUSTfVRJsw+oC
+         s7gmIAMfnhPU35ouh/BnbXmoybU5pdcPRg/cTw2BctRkzdQ2VkJSR+yvlCthRCGgN14T
+         I02NAEciDdVwiNhgJO3XaKkwQwv6WOgu56nZk+vJvMC//H0xwyF6ulWw6OtBFyHp7lc2
+         ZUWYl3q2I1fB11VoSSRSLhMJigbQBQjX0Fuq0M10Sv8505sANiCLs/FzqJ1PTawuaNCI
+         pmjpPh3uPuClBWbk1KI+vczYMaGFKMA/2zT00ljFDWu2EIeq/MAwKWlEcKwOGC7Mtiit
+         gFKQ==
+X-Gm-Message-State: AOJu0YyEAbo6ORaqk7oUy6GZKSk5jyWTzM4syJlxI9ABv5CLoUJ7Au5K
+	ANEDHvv+8nnT93pP3lIBhgwpuHCH/ODNoQ/D3X75xxzLpD1j2kBbZuvUETm4AiHb21x2j3wdhCv
+	lP3S/Wuc7qDTV9J2Bwh579R2KPMh5U5IQfxIp71AYwe2tq1Ft48yN
+X-Gm-Gg: ASbGncv+Am+Z8xJMRxx2yCqo8wLn/MjiKwOON3kwnQNbd/b44C6y2Oz+Z5yBF+/+Abw
+	k9uvhW0BWrTFQwotIIN7+DVUpNRe/4yQ=
+X-Google-Smtp-Source: AGHT+IGyc5NU8ysDL4mfaFsYQbnblxssdT1Yh2ADh4vlkpK2qkF1Pi+zaG1B36thMUxeh7Nb/SoABC0icuY7VRRNpnA=
+X-Received: by 2002:a17:906:2932:b0:aa5:3d3d:f959 with SMTP id
+ a640c23a62f3a-aa5f7dbd388mr142684566b.29.1733223559461; Tue, 03 Dec 2024
+ 02:59:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ipv4: remove useless arg
-To: tianyu2 <tianyu2@kernelsoft.com>, eric.dumazet@gmail.com,
- Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netdev@vger.kernel.org
-References: <20241202033230.870313-1-tianyu2@kernelsoft.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241202033230.870313-1-tianyu2@kernelsoft.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <8bde975e21bbca9d9c27e36209b2dd4f1d7a3f00.1733212078.git.pabeni@redhat.com>
+In-Reply-To: <8bde975e21bbca9d9c27e36209b2dd4f1d7a3f00.1733212078.git.pabeni@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 3 Dec 2024 11:59:08 +0100
+Message-ID: <CANn89iLoQhK36PV6-2iizyK+LnawKaPdqOsXzHCSPt36=Xeacw@mail.gmail.com>
+Subject: Re: [PATCH v3 net] ipmr: tune the ipmr_can_free_table() checks.
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/2/24 04:32, tianyu2 wrote:
-> The "struct sock *sk" parameter in ip_rcv_finish_core is unused, which
-> leads the compiler to optimize it out. As a result, the
-> "struct sk_buff *skb" parameter is passed using x1. And this make kprobe
-> hard to use.
-> 
-> Signed-off-by: tianyu2 <tianyu2@kernelsoft.com>
+On Tue, Dec 3, 2024 at 10:48=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> Eric reported a syzkaller-triggered splat caused by recent ipmr changes:
+>
+>
+> The root cause is a network namespace creation failing after successful
+> initialization of the ipmr subsystem. Such a case is not currently
+> matched by the ipmr_can_free_table() helper.
+>
+> New namespaces are zeroed on allocation and inserted into net ns list
+> only after successful creation; when deleting an ipmr table, the list
+> next pointer can be NULL only on netns initialization failure.
+>
+> Update the ipmr_can_free_table() checks leveraging such condition.
+>
+> Reported-by: Eric Dumazet <edumazet@google.com>
+> Reported-by: syzbot+6e8cb445d4b43d006e0c@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D6e8cb445d4b43d006e0c
+> Fixes: 11b6e701bce9 ("ipmr: add debug check for mr table cleanup")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
-The patch code good, but the above does not look like a real name?!?
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-If so, please re-submit, using your real full name and including the
-target tree (net-next in this case) in the subj prefix.
-
-See:
-https://elixir.bootlin.com/linux/v6.12.1/source/Documentation/process/submitting-patches.rst#L440
-https://elixir.bootlin.com/linux/v6.12.1/source/Documentation/process/maintainer-netdev.rst#L12
-
-@Pablo: after this change will be merged, I *think* that a possible
-follow-up could drop the 'sk' arg from NF_HOOK_LIST and ip_rcv_finish() too.
-
-Thanks!
-
-Paolo
-
+Thanks !
 
