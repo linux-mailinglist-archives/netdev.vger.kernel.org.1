@@ -1,93 +1,98 @@
-Return-Path: <netdev+bounces-148278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DA9A9E0FB5
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 01:30:19 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 614749E0FC0
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 01:33:16 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28E101648FE
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:30:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B5BE281FB6
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:33:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D651EDE;
-	Tue,  3 Dec 2024 00:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0F52500D1;
+	Tue,  3 Dec 2024 00:33:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hisqccDB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4NCaqBH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BCB370;
-	Tue,  3 Dec 2024 00:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D807EDE;
+	Tue,  3 Dec 2024 00:33:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733185815; cv=none; b=rLNxq89JusJJ1cMF8vpL9DbvgnuYQziv28jlW3fldVEoMbJMT/uNjF0y/zu6cwguYq/bsm0LHlnQGNtWgBoiE7vHbjYYmUBXwa/t0whPDfk1le8GcLiMtNyA21zTKTGymRCGtJu6xILiK75XG/5hk4rPg1GNMM/ra3/UE0H18R8=
+	t=1733185992; cv=none; b=NpqEfJyZqrkChVwc3lPzCHz08WwLDFyLe99SH1gZNuZciBwYrJZJy8u7zDI7w0Y2sPaWANGkBhuPlKoAPFb/Rf78d9Tv8pCjXCtqmk1d2IRbzLig+zZdpL9GSMhudEZ+EkRqQNtZF9Aodxixo3CaBhnBPtbShpU5FodIUOBtwA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733185815; c=relaxed/simple;
-	bh=XmhgYk2x7GXJl2A5h4r9Cuq4mZXd4+wTyrcMFjA2fYs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Dt0Bw9Xmml4QXMAcayaoI+qhOdAbG0bJ2JcmN74WzFDAzvvcp24h4C+pb3YZecwcHBQo6QS0WXLabVo7XOD4yeaS0U1wUPcEyyCRzdMmrHbUC3wqO99CzCvRMUl7SgaGG6fGt+4p+iZhgveeHJdeOzKUR1s/E+zGecWqqj5dgbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hisqccDB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D497BC4CED1;
-	Tue,  3 Dec 2024 00:30:14 +0000 (UTC)
+	s=arc-20240116; t=1733185992; c=relaxed/simple;
+	bh=P+cKs927/DzHr7RXmSOFRn/pT0qYBrswblnynVURMiU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aKV+BElRm0iaNfLMVH4cXmd0jEIVZzanAnhgd5P4FwSj9mdD9ylnTp/R07mQopKkAxwnUnDjp3VvCBn2AYY6A5KH3T4QaLGjbKRqBg5vXh30OTGmGne1SR5ApjxkrZMMpLwu7OGFH239Ec0iPwe9poes4W7xhrXnja+kI/NJW6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4NCaqBH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0433C4CED1;
+	Tue,  3 Dec 2024 00:33:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733185814;
-	bh=XmhgYk2x7GXJl2A5h4r9Cuq4mZXd4+wTyrcMFjA2fYs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hisqccDBzdlw503kp2/yMWEQuElW7wbDwOU1b/q2XIZTZc7FeP7ex+cijj3An+KJB
-	 HoTTrJRYsqCGq5yYASZkm93Zkkdy5am97lur0vwT2lBkB1e8Jy9dM7yXWZssXpOUKp
-	 OOoAO3Pt4vXg9rBs2291IeWWSw4uMkgY2D/BUtYdmAfxW1xbd7ORD99aCr9NQPhpuj
-	 0wmzl2+QIoYu5fwY3XvrnvRlw2wu7OAjVTnF5oxHVd9kDCxI4ZCzmS5yXvDEc0ErhB
-	 7umUJNTGBniG1cyzRMBEtFLFMMj97NWFrrQG3zagxQjcsRb2wAw4cPE8ANzk58W1pQ
-	 EKsSJMbMWE4tA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 342303806656;
-	Tue,  3 Dec 2024 00:30:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1733185991;
+	bh=P+cKs927/DzHr7RXmSOFRn/pT0qYBrswblnynVURMiU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=e4NCaqBHn0r9TX+saVe2U42+z147y9cdC8ZqLiVtF1Yo2vKYdm5706b8l6NhTT0lG
+	 aCoFRkZo/8LOiRyNpfGg6d2MLfgnzpXSle4VVoH0Uh08Rw2aWjJGEpj+9y9Nh8Dgxh
+	 R91ouvGM5u6ylzIkH+YDw6+8qokCxXCn5q9quqtsB/O2Gg5IO/F+Qur+1QBIxpWday
+	 QCqmAkoTzyzV3KD3Ts+V0yjuNt1/Ey1sMSQfpSGL4PF5nSNRuL+YLJWo9RDJ6PlzFi
+	 tRwGY7Ie+ybLDWjFlRwYe3vOQehxOKL4h/1nEh6w728JU7cPazg3zrEvo77/Iy7BUQ
+	 LRKjnQriXpnaA==
+Date: Mon, 2 Dec 2024 16:33:09 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Furong Xu <0x1207@gmail.com>
+Cc: Jon Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com, Suraj Jaiswal
+ <quic_jsuraj@quicinc.com>, Thierry Reding <treding@nvidia.com>,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net v1] net: stmmac: TSO: Fix unbalanced DMA map/unmap
+ for non-paged SKB data
+Message-ID: <20241202163309.05603e96@kernel.org>
+In-Reply-To: <20241128144501.0000619b@gmail.com>
+References: <20241021061023.2162701-1-0x1207@gmail.com>
+	<d8112193-0386-4e14-b516-37c2d838171a@nvidia.com>
+	<20241128144501.0000619b@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] ptp: Switch back to struct platform_driver::remove()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173318582905.3964978.17617943251785066504.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Dec 2024 00:30:29 +0000
-References: <20241130145349.899477-2-u.kleine-koenig@baylibre.com>
-In-Reply-To: <20241130145349.899477-2-u.kleine-koenig@baylibre.com>
-To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cu=2Ekleine-koenig=40baylibre=2Ecom=3E?=@codeaurora.org
-Cc: richardcochran@gmail.com, yangbo.lu@nxp.com, dwmw2@infradead.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 30 Nov 2024 15:53:49 +0100 you wrote:
-> After commit 0edb555a65d1 ("platform: Make platform_driver::remove()
-> return void") .remove() is (again) the right callback to implement for
-> platform drivers.
+On Thu, 28 Nov 2024 14:45:01 +0800 Furong Xu wrote:
+> > Let me know if you need any more information.
 > 
-> Convert all platform drivers below drivers/ptp to use .remove(), with
-> the eventual goal to drop struct platform_driver::remove_new(). As
-> .remove() and .remove_new() have the same prototypes, conversion is done
-> by just changing the structure member name in the driver initializer.
+> [  149.986210] dwc-eth-dwmac 2490000.ethernet eth0: Tx DMA map failed
+> and
+> [  245.571688] dwc-eth-dwmac 2490000.ethernet eth0: Tx DMA map failed
+> [  245.575349] dwc-eth-dwmac 2490000.ethernet eth0: Tx DMA map failed
+> are reported by stmmac_xmit() obviously, but not stmmac_tso_xmit().
 > 
-> [...]
+> And these crashes are caused by "Tx DMA map failed", as you can see that
+> current driver code does not handle this kind of failure so well. It is clear
+> that we need to figure out why Tx DMA map failed.
+> 
+> This patch corrects the sequence and timing of DMA unmap by waiting all
+> DMA transmit descriptors to be closed by DMA engine for one DMA map in
+> stmmac_tso_xmit(), it never leaks DMA addresses and never introduces
+> other side effect.
+> 
+> "Tx DMA map failed" is a weird failure, and I cannot reproduce this failure
+> on my device with DWMAC CORE 5.10a(Synopsys ID: 0x51) and DWXGMAC CORE 3.20a.
 
-Here is the summary with links:
-  - ptp: Switch back to struct platform_driver::remove()
-    https://git.kernel.org/netdev/net-next/c/b32913a5609a
+Let me repeat Jon's question - is there any info or test you need from
+Jon to make progress with a fix?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+If Jon's board worked before and doesn't work with this patch we will
+need *a* fix, if no fix is provided our only choice is revert.
 
