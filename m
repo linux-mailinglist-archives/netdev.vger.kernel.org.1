@@ -1,417 +1,662 @@
-Return-Path: <netdev+bounces-148498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D08CD9E1D76
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:23:26 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D66F59E1DAB
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:36:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 918CF281198
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 13:23:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E39B165BDC
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 13:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 073151E5721;
-	Tue,  3 Dec 2024 13:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527BF1EF08F;
+	Tue,  3 Dec 2024 13:36:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B9yNAsPn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l8fCtLok"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D0F1EE00D
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 13:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB37192D98
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 13:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733232204; cv=none; b=XUs4gME5EELUWxiZfxfhNjI4+kT5rjKhdEub/ZHxeZ61GVpwgC3bNyKX8v7GTGFJjKL7YaITrg00PyoCJt/OmCr2Ruamva6IQ3AhhszrgQHOBC0L1f6viz+mRtF0h/yz/TXHRUynO3GgXVkZGflIrxm3T0v6+lR9GQgeWCmAfXw=
+	t=1733232996; cv=none; b=KF2PUPbqb146vejarHkZ5+K+bAD3PDkoehGsbJmcnHP5pO+sFWR33AklnIy6GXHL98ICligdLaAykd10yQ/h0qrreTE/c0Qgh3/pnQ2BCeVjguotd7phGqS1ZUNo3iyAmN+jUsd3Y9hYAbCJLGyDQoJIgI+UQelvPeAN+jxkThw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733232204; c=relaxed/simple;
-	bh=Nr+dM1lnx6dA95NrBDJySoAkIYZQBZZep833WRZWNcI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dN+owGZtqcGUK61f5aagMgv9JJtY/BSoypaLf0L1vLNLTLo1sbN79Q9swv3VXdCEUvKrbFMb1nuvimzaoUJelQgrINQkfVdoqzhtqkMflzpnbSs+FxhGXMOktr51qsPLEckIzLbmdts+L6EWwgP9loZEMZewZt6pKC6M4Xteyz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B9yNAsPn; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5d0e75335e3so2972018a12.3
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 05:23:22 -0800 (PST)
+	s=arc-20240116; t=1733232996; c=relaxed/simple;
+	bh=jNWsPdr4saCtnn86TPErzrzV6o75e5tigSeHxTxMDKA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SeZVdzGCSfHmhA9v806lXpmwusnn6OmqtTmPy7H5PJ8+qN+0R0bFa7YMdJGIl1Ocgfr/1BnZtBNHQ7rGBKpTlzhr/mExY3gCMuTIwZNDTEUVfbBWGymUO3l2tNCXYvhvhG7h+wOFDa0yIXL0CO3YZ8UzuPiELPpSnk70S9YWCDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l8fCtLok; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-385e5b43350so118574f8f.2
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 05:36:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733232201; x=1733837001; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5PbBkZlbczsljYkJKkDmTi4zCydPAq8t8D3jHFuNldM=;
-        b=B9yNAsPnqxjSUJGcWri1YdUhOtfoqgslVBspgdwviXoMrzYn0jmTH21V1rqEdOZQjv
-         FuCK9SaYN0x7uSKPbTX9jj1hiP41pwmrKvBocCQLuJzMXjhnRIoHcCxsOxqmPXViaAd7
-         khFc8IE5tugCbsbRxRj++nqayt8MhakN0fc/tm98UvcJVoOGogUKSYEhkHCMqYfvpGQz
-         L72iPXlbGIhEBPYSoCmtL/GN7duFtWVjkZTlI0WhGJAinlykbQKgYlkMluuRHYjXEo/A
-         +kWeQElpqzyth6XKVCoQlXC+Gge9EyQ42fH6CkVtGAK9oiU/Ginnlml/uEgqI6E4GBmN
-         geYA==
+        d=gmail.com; s=20230601; t=1733232992; x=1733837792; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=95bTS2N7bKNYNHhGvPAl/B+i1U0uHdfp/UTRJacxumA=;
+        b=l8fCtLokj2uXljrqQHQTcs+RNQqgTJ7xLPT2LHht2uR0c9CliJJI0txvELitYn0YFF
+         z8PV64RnwchgHyQ/fK5zvmYA3fQ+FrE9f7oPp2JiDOqxapO4V3ryh9rPzLoKLhholtti
+         8Rw4P2KUVMJ4I5Mdia9ux21rpPrRkWByr4KQDeJ5HqjBLJW15X4VOkfG0OW/WGjiO+6Z
+         1Dad1BqB9P1OXv9/KBJPiE9/MLGq8t8EGr0O/S555twpuDzgMe9Aqboa/sXKAv0H1rmG
+         YVW52kQ3FNhsqME0wbY3gSlAtUrX5/u/bj0dE+iPzqlCY9CrEVFvo/djmSnr7ABlzTPC
+         GDmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733232201; x=1733837001;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5PbBkZlbczsljYkJKkDmTi4zCydPAq8t8D3jHFuNldM=;
-        b=ZA743wygIof8PPpJZf8MPhtGWbfhNKm1z+q8ths1imyBAlI+1X4Uhw0aBzDVCnmuMf
-         lrd+yXdpNw8jGOLdYEWltCAlNSYHjr3/rzysttsEakF85M/ygtGsKv2hDv5k3Jgrj8Ip
-         BxHQWg6v1/oh1TlBA3fWJSe5jBpE1Y8Ujb01qHM8Xaq2XvfYibBx8XmWZQW8uzlRLnK2
-         aNxbHbN4mWRFJuXk28u8ftI4fdUq+4/sgAgRWtMf9l1QRYKLXCw1mt7BrmGScw85QbUm
-         o96pduaP3MBo/18nB/CdH2UWj52LyKcmnDfXvr9WQzcBJEzudRLD6JvypU903FdyEyCk
-         6jjw==
-X-Gm-Message-State: AOJu0YyY6gksW7CgscGl6clvX7iriZawsmkDhNdcR+uoNQAdrD9WaG+5
-	/nMgGxDOwPcEe3WxNLnb7wgwkEGxLm96w+/T71jXaU9l4DQ8pbo4HtNJq7bgH+PEA7hegfESGxh
-	c1Jm6Yb3M2wIIcfbjQC/YyXffLqV6GDZmx6Pj
-X-Gm-Gg: ASbGncuu12JrqlfsnUC6xWnVjGbrPJHUlZsXR4K2TOgJ7tbhuCPYTZuCDXZrX1bDb86
-	BePCiOwH8B5EKYQIPLe87jUCl8qeem/fW
-X-Google-Smtp-Source: AGHT+IHYI+YpdKmFFyJjukPGyKVqDKngfSq/qqNeLwyp/PuWzwyL8L1/Gmosqf+MkOGLA3zRFHpHLFzz1/gVz/IYfhM=
-X-Received: by 2002:a05:6402:2553:b0:5d0:e826:f0f5 with SMTP id
- 4fb4d7f45d1cf-5d10cb4d7f8mr2638522a12.7.1733232200594; Tue, 03 Dec 2024
- 05:23:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733232992; x=1733837792;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=95bTS2N7bKNYNHhGvPAl/B+i1U0uHdfp/UTRJacxumA=;
+        b=lQVkNl0AVrRR5eFp0zvjp8GJq4SGybDxsweUK0CmNqRbzVwsyViZP7mwhuqVoovZLq
+         nnuwUj2qfkdjqyG7o6oDX9nvPz4Evs5aqFx86a5Te43uvOY1vZE2pH1QnyHLNKnLUVec
+         xEqkT97i7tfWDKQvhN3YwBiTbBCkB5sChsXj0MVJl2nu/iPxhNrmUx6vMOcY2g/CqY/m
+         PDk2vMNkQ4ahY3Zxcwy/09oyVzTDqpQF+9naEVyyBC4Nw1EStTUu51e3+Z4bbwiyfg37
+         4drltW0M94qkcbPXbgRH9bQcJ9Yb9djOzYDZbr0pP7/xsSngc4dFng15RaTwqx5/JBmc
+         v4lw==
+X-Forwarded-Encrypted: i=1; AJvYcCWdhBSyQGuqWA2RHmhcnN/jvuw1ftIOBCAP48lNP6lR8za32R7ryDL/em26AyglGqoNsq/5yBw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwK+5hJtqsx5w3VWaKbRjp7BLUeflAaDsW45/paBV9paJCLgcXR
+	S+0KWnZmJI6AdvbxMSbwgVVpKwGNzGpkhvAvmpvAXslnsibtWSpm
+X-Gm-Gg: ASbGncsqMtxuAItCHz13RaP8YQus1lmX7sVklZ28326QxkgdWnzenjpwTem1wjcJA0w
+	Q0z1SgvJDn3dlATdef+svlFdjM5Z2MCh4NinmYDCHeXc2MGXVK5Jfq8Y1XYf8GZbrXfyM/Lrqaz
+	9M+gYi8jjw0IM4p52B6T7Q444ID25STalhx7uXXBKCl+nbuUF0LZYDCtqDESu2qjlW1x0GOQgWj
+	Du7Qj9pyczl04vXfOguJQy6CRbe3uMr56qW6+A=
+X-Google-Smtp-Source: AGHT+IFNVpsQ1SxgOSnHd33anSgu6aiz17MyLpFc8p6+DpYLWnZrtfyreqldKyWeF3yaVqCFlO8jBQ==
+X-Received: by 2002:a5d:5988:0:b0:385:de67:229e with SMTP id ffacd0b85a97d-385fd40b038mr865356f8f.11.1733232991536;
+        Tue, 03 Dec 2024 05:36:31 -0800 (PST)
+Received: from skbuf ([188.25.135.117])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e9c075e8sm8949158f8f.7.2024.12.03.05.36.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 05:36:30 -0800 (PST)
+Date: Tue, 3 Dec 2024 15:36:28 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	netdev <netdev@vger.kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next v7 3/9] lib: packing: add pack_fields() and
+ unpack_fields()
+Message-ID: <20241203133628.lcefexgtwvbgasav@skbuf>
+References: <20241202-packing-pack-fields-and-ice-implementation-v7-0-ed22e38e6c65@intel.com>
+ <20241202-packing-pack-fields-and-ice-implementation-v7-3-ed22e38e6c65@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <d1a7dea8-ce20-4c6f-beed-8a28b07e9468@ovn.org> <672d143c-7ccd-4b77-a843-24d0d60ada14@ovn.org>
-In-Reply-To: <672d143c-7ccd-4b77-a843-24d0d60ada14@ovn.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 3 Dec 2024 14:23:09 +0100
-Message-ID: <CANn89i+FPHAz=O-KfUV5nv8KNVPgpx+PX+2xzm0EwTJs8UqqMg@mail.gmail.com>
-Subject: Re: [v6.12] BUG: KASAN: slab-use-after-free in dst_destroy+0x2e2/0x340
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241202-packing-pack-fields-and-ice-implementation-v7-3-ed22e38e6c65@intel.com>
 
-On Tue, Dec 3, 2024 at 1:15=E2=80=AFPM Ilya Maximets <i.maximets@ovn.org> w=
-rote:
->
-> On 12/3/24 12:58, Ilya Maximets wrote:
-> > Hello there.  I was running some tests with openvswitch+ipsec on v6.12 =
-tag
-> > and got the KASAN UAF splat provided below.  It doesn't seem to be rela=
-ted
-> > to anything specific to openvswitch module, more like core parts of net=
-working.
-> > At lest, at the first glance.
-> >
-> > For the context, what I'm running is an OVS system test that creates 20=
- network
-> > namespaces, starts OVS and Libreswan in each of them, creates a full me=
-sh of
-> > Geneve tunnels with IPsec (a separate tunnel between each pair of names=
-paces),
-> > then checks that pings work through all the tunnels and then deletes al=
-l the
-> > ports, OVS datapath and namespaces.  While removing namespaces, I see t=
-he
-> > following KASAN report in the logs:
-> >
->
-> The decoded trace:
->
-> Dec 03 05:46:17 kernel: genev_sys_6081 (unregistering): left promiscuous =
-mode
-> Dec 03 05:46:17 kernel: br-ipsec: left promiscuous mode
-> Dec 03 05:46:17 kernel: ovs-system: left promiscuous mode
-> Dec 03 05:46:18 kernel: =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> Dec 03 05:46:18 kernel: BUG: KASAN: slab-use-after-free in dst_destroy (n=
-et/core/dst.c:112)
-> Dec 03 05:46:18 kernel: Read of size 8 at addr ffff8882137ccab0 by task s=
-wapper/37/0
-> Dec 03 05:46:18 kernel:
-> Dec 03 05:46:18 kernel: CPU: 37 UID: 0 PID: 0 Comm: swapper/37 Kdump: loa=
-ded Not tainted 6.12.0 #67
-> Dec 03 05:46:18 kernel: Hardware name: Red Hat KVM/RHEL, BIOS 1.16.1-1.el=
-9 04/01/2014
-> Dec 03 05:46:18 kernel: Call Trace:
-> Dec 03 05:46:18 kernel:  <IRQ>
-> Dec 03 05:46:18 kernel: dump_stack_lvl (lib/dump_stack.c:124)
-> Dec 03 05:46:18 kernel: print_address_description.constprop.0 (mm/kasan/r=
-eport.c:378)
-> Dec 03 05:46:18 kernel: ? dst_destroy (net/core/dst.c:112)
-> Dec 03 05:46:18 kernel: print_report (mm/kasan/report.c:489)
-> Dec 03 05:46:18 kernel: ? dst_destroy (net/core/dst.c:112)
-> Dec 03 05:46:18 kernel: ? kasan_addr_to_slab (mm/kasan/common.c:37)
-> Dec 03 05:46:18 kernel: kasan_report (mm/kasan/report.c:603)
-> Dec 03 05:46:18 kernel: ? dst_destroy (net/core/dst.c:112)
-> Dec 03 05:46:18 kernel: ? rcu_do_batch (kernel/rcu/tree.c:2567)
-> Dec 03 05:46:18 kernel: dst_destroy (net/core/dst.c:112)
-> Dec 03 05:46:18 kernel: rcu_do_batch (kernel/rcu/tree.c:2567)
-> Dec 03 05:46:18 kernel: ? __pfx_rcu_do_batch (kernel/rcu/tree.c:2491)
-> Dec 03 05:46:18 kernel: ? lockdep_hardirqs_on_prepare (kernel/locking/loc=
-kdep.c:4339 kernel/locking/lockdep.c:4406)
-> Dec 03 05:46:18 kernel: rcu_core (kernel/rcu/tree.c:2825)
-> Dec 03 05:46:18 kernel: handle_softirqs (kernel/softirq.c:554)
-> Dec 03 05:46:18 kernel: __irq_exit_rcu (kernel/softirq.c:589 kernel/softi=
-rq.c:428 kernel/softirq.c:637)
-> Dec 03 05:46:18 kernel: irq_exit_rcu (kernel/softirq.c:651)
-> Dec 03 05:46:18 kernel: sysvec_apic_timer_interrupt (arch/x86/kernel/apic=
-/apic.c:1049 arch/x86/kernel/apic/apic.c:1049)
-> Dec 03 05:46:18 kernel:  </IRQ>
-> Dec 03 05:46:18 kernel:  <TASK>
-> Dec 03 05:46:18 kernel: asm_sysvec_apic_timer_interrupt (./arch/x86/inclu=
-de/asm/idtentry.h:702)
-> Dec 03 05:46:18 kernel: RIP: 0010:default_idle (./arch/x86/include/asm/ir=
-qflags.h:37 ./arch/x86/include/asm/irqflags.h:92 arch/x86/kernel/process.c:=
-743)
-> Dec 03 05:46:18 kernel: Code: 00 4d 29 c8 4c 01 c7 4c 29 c2 e9 6e ff ff f=
-f 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 90 0f 00 2d c7 c9 27 0=
-0 fb f4 <fa> c3 cc cc cc cc 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 90
-> All code
-> =3D=3D=3D=3D=3D=3D=3D=3D
->    0:   00 4d 29                add    %cl,0x29(%rbp)
->    3:   c8 4c 01 c7             enterq $0x14c,$0xc7
->    7:   4c 29 c2                sub    %r8,%rdx
->    a:   e9 6e ff ff ff          jmpq   0xffffffffffffff7d
->    f:   90                      nop
->   10:   90                      nop
->   11:   90                      nop
->   12:   90                      nop
->   13:   90                      nop
->   14:   90                      nop
->   15:   90                      nop
->   16:   90                      nop
->   17:   90                      nop
->   18:   90                      nop
->   19:   90                      nop
->   1a:   90                      nop
->   1b:   90                      nop
->   1c:   90                      nop
->   1d:   90                      nop
->   1e:   90                      nop
->   1f:   66 90                   xchg   %ax,%ax
->   21:   0f 00 2d c7 c9 27 00    verw   0x27c9c7(%rip)        # 0x27c9ef
->   28:   fb                      sti
->   29:   f4                      hlt
->   2a:*  fa                      cli             <-- trapping instruction
->   2b:   c3                      retq
->   2c:   cc                      int3
->   2d:   cc                      int3
->   2e:   cc                      int3
->   2f:   cc                      int3
->   30:   66 66 2e 0f 1f 84 00    data16 nopw %cs:0x0(%rax,%rax,1)
->   37:   00 00 00 00
->   3b:   0f 1f 40 00             nopl   0x0(%rax)
->   3f:   90                      nop
->
-> Code starting with the faulting instruction
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->    0:   fa                      cli
->    1:   c3                      retq
->    2:   cc                      int3
->    3:   cc                      int3
->    4:   cc                      int3
->    5:   cc                      int3
->    6:   66 66 2e 0f 1f 84 00    data16 nopw %cs:0x0(%rax,%rax,1)
->    d:   00 00 00 00
->   11:   0f 1f 40 00             nopl   0x0(%rax)
->   15:   90                      nop
-> Dec 03 05:46:18 kernel: RSP: 0018:ffff888100d2fe00 EFLAGS: 00000246
-> Dec 03 05:46:18 kernel: RAX: 00000000001870ed RBX: 1ffff110201a5fc2 RCX: =
-ffffffffb61a3e46
-> Dec 03 05:46:18 kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: =
-ffffffffb3d4d123
-> Dec 03 05:46:18 kernel: RBP: 0000000000000000 R08: 0000000000000001 R09: =
-ffffed11c7e1835d
-> Dec 03 05:46:18 kernel: R10: ffff888e3f0c1aeb R11: 0000000000000000 R12: =
-0000000000000000
-> Dec 03 05:46:18 kernel: R13: ffff888100d20000 R14: dffffc0000000000 R15: =
-0000000000000000
-> Dec 03 05:46:18 kernel: ? ct_kernel_exit.constprop.0 (kernel/context_trac=
-king.c:148)
-> Dec 03 05:46:18 kernel: ? cpuidle_idle_call (kernel/sched/idle.c:186)
-> Dec 03 05:46:18 kernel: default_idle_call (./include/linux/cpuidle.h:143 =
-kernel/sched/idle.c:118)
-> Dec 03 05:46:18 kernel: cpuidle_idle_call (kernel/sched/idle.c:186)
-> Dec 03 05:46:18 kernel: ? __pfx_cpuidle_idle_call (kernel/sched/idle.c:16=
-8)
-> Dec 03 05:46:18 kernel: ? lock_release (kernel/locking/lockdep.c:467 kern=
-el/locking/lockdep.c:5848)
-> Dec 03 05:46:18 kernel: ? lockdep_hardirqs_on_prepare (kernel/locking/loc=
-kdep.c:4347 kernel/locking/lockdep.c:4406)
-> Dec 03 05:46:18 kernel: ? tsc_verify_tsc_adjust (arch/x86/kernel/tsc_sync=
-.c:59)
-> Dec 03 05:46:18 kernel: do_idle (kernel/sched/idle.c:326)
-> Dec 03 05:46:18 kernel: cpu_startup_entry (kernel/sched/idle.c:423 (discr=
-iminator 1))
-> Dec 03 05:46:18 kernel: start_secondary (arch/x86/kernel/smpboot.c:202 ar=
-ch/x86/kernel/smpboot.c:282)
-> Dec 03 05:46:18 kernel: ? __pfx_start_secondary (arch/x86/kernel/smpboot.=
-c:232)
-> Dec 03 05:46:18 kernel: ? soft_restart_cpu (arch/x86/kernel/head_64.S:452=
-)
-> Dec 03 05:46:18 kernel: common_startup_64 (arch/x86/kernel/head_64.S:414)
-> Dec 03 05:46:18 kernel:  </TASK>
-> Dec 03 05:46:18 kernel:
-> Dec 03 05:46:18 kernel: Allocated by task 12184:
-> Dec 03 05:46:18 kernel: kasan_save_stack (mm/kasan/common.c:48)
-> Dec 03 05:46:18 kernel: kasan_save_track (./arch/x86/include/asm/current.=
-h:49 mm/kasan/common.c:60 mm/kasan/common.c:69)
-> Dec 03 05:46:18 kernel: __kasan_slab_alloc (mm/kasan/common.c:319 mm/kasa=
-n/common.c:345)
-> Dec 03 05:46:18 kernel: kmem_cache_alloc_noprof (mm/slub.c:4085 mm/slub.c=
-:4134 mm/slub.c:4141)
-> Dec 03 05:46:18 kernel: copy_net_ns (net/core/net_namespace.c:421 net/cor=
-e/net_namespace.c:480)
-> Dec 03 05:46:18 kernel: create_new_namespaces (kernel/nsproxy.c:110)
-> Dec 03 05:46:18 kernel: unshare_nsproxy_namespaces (kernel/nsproxy.c:228 =
-(discriminator 4))
-> Dec 03 05:46:18 kernel: ksys_unshare (kernel/fork.c:3313)
-> Dec 03 05:46:18 kernel: __x64_sys_unshare (kernel/fork.c:3382)
-> Dec 03 05:46:18 kernel: do_syscall_64 (arch/x86/entry/common.c:52 arch/x8=
-6/entry/common.c:83)
-> Dec 03 05:46:18 kernel: entry_SYSCALL_64_after_hwframe (arch/x86/entry/en=
-try_64.S:130)
-> Dec 03 05:46:18 kernel:
-> Dec 03 05:46:18 kernel: Freed by task 11:
-> Dec 03 05:46:18 kernel: kasan_save_stack (mm/kasan/common.c:48)
-> Dec 03 05:46:18 kernel: kasan_save_track (./arch/x86/include/asm/current.=
-h:49 mm/kasan/common.c:60 mm/kasan/common.c:69)
-> Dec 03 05:46:18 kernel: kasan_save_free_info (mm/kasan/generic.c:582)
-> Dec 03 05:46:18 kernel: __kasan_slab_free (mm/kasan/common.c:271)
-> Dec 03 05:46:18 kernel: kmem_cache_free (mm/slub.c:4579 mm/slub.c:4681)
-> Dec 03 05:46:18 kernel: cleanup_net (net/core/net_namespace.c:456 net/cor=
-e/net_namespace.c:446 net/core/net_namespace.c:647)
-> Dec 03 05:46:18 kernel: process_one_work (kernel/workqueue.c:3229)
-> Dec 03 05:46:18 kernel: worker_thread (kernel/workqueue.c:3304 kernel/wor=
-kqueue.c:3391)
-> Dec 03 05:46:18 kernel: kthread (kernel/kthread.c:389)
-> Dec 03 05:46:18 kernel: ret_from_fork (arch/x86/kernel/process.c:147)
-> Dec 03 05:46:18 kernel: ret_from_fork_asm (arch/x86/entry/entry_64.S:257)
-> Dec 03 05:46:18 kernel:
-> Dec 03 05:46:18 kernel: Last potentially related work creation:
-> Dec 03 05:46:18 kernel: kasan_save_stack (mm/kasan/common.c:48)
-> Dec 03 05:46:18 kernel: __kasan_record_aux_stack (mm/kasan/generic.c:541)
-> Dec 03 05:46:18 kernel: insert_work (./include/linux/instrumented.h:68 ./=
-include/asm-generic/bitops/instrumented-non-atomic.h:141 kernel/workqueue.c=
-:788 kernel/workqueue.c:795 kernel/workqueue.c:2186)
-> Dec 03 05:46:18 kernel: __queue_work (kernel/workqueue.c:2340)
-> Dec 03 05:46:18 kernel: queue_work_on (kernel/workqueue.c:2391)
-> Dec 03 05:46:18 kernel: xfrm_policy_insert (net/xfrm/xfrm_policy.c:1610)
-> Dec 03 05:46:18 kernel: xfrm_add_policy (net/xfrm/xfrm_user.c:2116)
-> Dec 03 05:46:18 kernel: xfrm_user_rcv_msg (net/xfrm/xfrm_user.c:3321)
-> Dec 03 05:46:18 kernel: netlink_rcv_skb (net/netlink/af_netlink.c:2536)
-> Dec 03 05:46:18 kernel: xfrm_netlink_rcv (net/xfrm/xfrm_user.c:3344)
-> Dec 03 05:46:18 kernel: netlink_unicast (net/netlink/af_netlink.c:1316 ne=
-t/netlink/af_netlink.c:1342)
-> Dec 03 05:46:18 kernel: netlink_sendmsg (net/netlink/af_netlink.c:1886)
-> Dec 03 05:46:18 kernel: sock_write_iter (net/socket.c:729 net/socket.c:74=
-4 net/socket.c:1165)
-> Dec 03 05:46:18 kernel: vfs_write (fs/read_write.c:590 fs/read_write.c:68=
-3)
-> Dec 03 05:46:18 kernel: ksys_write (fs/read_write.c:736)
-> Dec 03 05:46:18 kernel: do_syscall_64 (arch/x86/entry/common.c:52 arch/x8=
-6/entry/common.c:83)
-> Dec 03 05:46:18 kernel: entry_SYSCALL_64_after_hwframe (arch/x86/entry/en=
-try_64.S:130)
-> Dec 03 05:46:18 kernel:
-> Dec 03 05:46:18 kernel: Second to last potentially related work creation:
-> Dec 03 05:46:18 kernel: kasan_save_stack (mm/kasan/common.c:48)
-> Dec 03 05:46:18 kernel: __kasan_record_aux_stack (mm/kasan/generic.c:541)
-> Dec 03 05:46:18 kernel: insert_work (./include/linux/instrumented.h:68 ./=
-include/asm-generic/bitops/instrumented-non-atomic.h:141 kernel/workqueue.c=
-:788 kernel/workqueue.c:795 kernel/workqueue.c:2186)
-> Dec 03 05:46:18 kernel: __queue_work (kernel/workqueue.c:2340)
-> Dec 03 05:46:18 kernel: queue_work_on (kernel/workqueue.c:2391)
-> Dec 03 05:46:18 kernel: __xfrm_state_insert (./include/linux/workqueue.h:=
-723 net/xfrm/xfrm_state.c:1150 net/xfrm/xfrm_state.c:1145 net/xfrm/xfrm_sta=
-te.c:1513)
-> Dec 03 05:46:18 kernel: xfrm_state_update (./include/linux/spinlock.h:396=
- net/xfrm/xfrm_state.c:1940)
-> Dec 03 05:46:18 kernel: xfrm_add_sa (net/xfrm/xfrm_user.c:912)
-> Dec 03 05:46:18 kernel: xfrm_user_rcv_msg (net/xfrm/xfrm_user.c:3321)
-> Dec 03 05:46:18 kernel: netlink_rcv_skb (net/netlink/af_netlink.c:2536)
-> Dec 03 05:46:18 kernel: xfrm_netlink_rcv (net/xfrm/xfrm_user.c:3344)
-> Dec 03 05:46:18 kernel: netlink_unicast (net/netlink/af_netlink.c:1316 ne=
-t/netlink/af_netlink.c:1342)
-> Dec 03 05:46:18 kernel: netlink_sendmsg (net/netlink/af_netlink.c:1886)
-> Dec 03 05:46:18 kernel: sock_write_iter (net/socket.c:729 net/socket.c:74=
-4 net/socket.c:1165)
-> Dec 03 05:46:18 kernel: vfs_write (fs/read_write.c:590 fs/read_write.c:68=
-3)
-> Dec 03 05:46:18 kernel: ksys_write (fs/read_write.c:736)
-> Dec 03 05:46:18 kernel: do_syscall_64 (arch/x86/entry/common.c:52 arch/x8=
-6/entry/common.c:83)
-> Dec 03 05:46:18 kernel: entry_SYSCALL_64_after_hwframe (arch/x86/entry/en=
-try_64.S:130)
-> Dec 03 05:46:18 kernel:
-> Dec 03 05:46:18 kernel: The buggy address belongs to the object at ffff88=
-82137cb680
-> which belongs to the cache net_namespace of size 6720
-> Dec 03 05:46:18 kernel: The buggy address is located 5168 bytes inside of
-> freed 6720-byte region [ffff8882137cb680, ffff8882137cd0c0)
-> Dec 03 05:46:18 kernel:
-> Dec 03 05:46:18 kernel: The buggy address belongs to the physical page:
-> Dec 03 05:46:18 kernel: page: refcount:1 mapcount:0 mapping:0000000000000=
-000 index:0x0 pfn:0x2137c8
-> Dec 03 05:46:18 kernel: head: order:3 mapcount:0 entire_mapcount:0 nr_pag=
-es_mapped:0 pincount:0
-> Dec 03 05:46:18 kernel: memcg:ffff88812794d901
-> Dec 03 05:46:18 kernel: flags: 0x17ffffc0000040(head|node=3D0|zone=3D2|la=
-stcpupid=3D0x1fffff)
-> Dec 03 05:46:18 kernel: page_type: f5(slab)
-> Dec 03 05:46:18 kernel: raw: 0017ffffc0000040 ffff888100053980 dead000000=
-000122 0000000000000000
-> Dec 03 05:46:18 kernel: raw: 0000000000000000 0000000080040004 00000001f5=
-000000 ffff88812794d901
-> Dec 03 05:46:18 kernel: head: 0017ffffc0000040 ffff888100053980 dead00000=
-0000122 0000000000000000
-> Dec 03 05:46:18 kernel: head: 0000000000000000 0000000080040004 00000001f=
-5000000 ffff88812794d901
-> Dec 03 05:46:18 kernel: head: 0017ffffc0000003 ffffea00084df201 fffffffff=
-fffffff 0000000000000000
-> Dec 03 05:46:18 kernel: head: 0000000000000008 0000000000000000 00000000f=
-fffffff 0000000000000000
-> Dec 03 05:46:18 kernel: page dumped because: kasan: bad access detected
-> Dec 03 05:46:18 kernel:
-> Dec 03 05:46:18 kernel: Memory state around the buggy address:
-> Dec 03 05:46:18 kernel:  ffff8882137cc980: fb fb fb fb fb fb fb fb fb fb =
-fb fb fb fb fb fb
-> Dec 03 05:46:18 kernel:  ffff8882137cca00: fb fb fb fb fb fb fb fb fb fb =
-fb fb fb fb fb fb
-> Dec 03 05:46:18 kernel: >ffff8882137cca80: fb fb fb fb fb fb fb fb fb fb =
-fb fb fb fb fb fb
-> Dec 03 05:46:18 kernel:                                      ^
-> Dec 03 05:46:18 kernel:  ffff8882137ccb00: fb fb fb fb fb fb fb fb fb fb =
-fb fb fb fb fb fb
-> Dec 03 05:46:18 kernel:  ffff8882137ccb80: fb fb fb fb fb fb fb fb fb fb =
-fb fb fb fb fb fb
-> Dec 03 05:46:18 kernel: =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> Best regards, Ilya Maximets.
+On Mon, Dec 02, 2024 at 04:26:26PM -0800, Jacob Keller wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> 
+> This is new API which caters to the following requirements:
+> 
+> - Pack or unpack a large number of fields to/from a buffer with a small
+>   code footprint. The current alternative is to open-code a large number
+>   of calls to pack() and unpack(), or to use packing() to reduce that
+>   number to half. But packing() is not const-correct.
+> 
+> - Use unpacked numbers stored in variables smaller than u64. This
+>   reduces the rodata footprint of the stored field arrays.
+> 
+> - Perform error checking at compile time, rather than runtime, and return
+>   void from the API functions. Because the C preprocessor can't generate
+>   variable length code (loops), this is a bit tricky to do with macros.
+> 
+>   To handle this, implement macros which sanity check the packed field
+>   definitions based on their size. Finally, a single macro with a chain of
+>   __builtin_choose_expr() is used to select the appropriate macros. We
+>   enforce the use of ascending or descending order to avoid O(N^2) scaling
+>   when checking for overlap. Note that the macros are written with care to
+>   ensure that the compilers can correctly evaluate the resulting code at
+>   compile time. In particular, the expressions for the pbuflen and the
+>   ordering check are passed all the way down via macros. Earlier versions
+>   attempted to use statement expressions with local variables, but not all
+>   compilers were able to fully analyze these at compile time, resulting in
+>   BUILD_BUG_ON failures.
+> 
+>   The overlap macro is passed a condition determining whether the fields
+>   are expected to be in ascending or descending order based on the relative
+>   ordering of the first two fields. This allows users to keep the fields in
+>   whichever order is most natural for their hardware, while still keeping
+>   the overlap checks scaling to O(N).
+> 
+>   This method also enables calling CHECK_PACKED_FIELDS directly from within
+>   the pack_fields and unpack_fields macros, ensuring all drivers using this
+>   API will receive type checking, without needing to remember to call the
+>   CHECK_PACKED_FIELDS macro themselves.
+> 
+> - Reduced rodata footprint for the storage of the packed field arrays.
+>   To that end, we have struct packed_field_s (small) and packed_field_m
+>   (medium). More can be added as needed (unlikely for now). On these
+>   types, the same generic pack_fields() and unpack_fields() API can be
+>   used, thanks to the new C11 _Generic() selection feature, which can
+>   call pack_fields_s() or pack_fields_m(), depending on the type of the
+>   "fields" array - a simplistic form of polymorphism. It is evaluated at
+>   compile time which function will actually be called.
+> 
+> Over time, packing() is expected to be completely replaced either with
+> pack() or with pack_fields().
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+>  Makefile                           |    4 +
+>  include/linux/packing.h            |   37 +
+>  include/linux/packing_types.h      | 2831 ++++++++++++++++++++++++++++++++++++
+>  lib/packing.c                      |  145 ++
+>  lib/packing_test.c                 |   61 +
+>  scripts/gen_packed_field_checks.c  |   38 +
+>  Documentation/core-api/packing.rst |   58 +
+>  MAINTAINERS                        |    2 +
+>  scripts/Makefile                   |    2 +-
+>  9 files changed, 3177 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 8129de0b214f5b73a3b1cca0798041d74270836b..58496942a7d13c6a53e4210d83deb2cc2033d00a 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1315,6 +1315,10 @@ PHONY += scripts_unifdef
+>  scripts_unifdef: scripts_basic
+>  	$(Q)$(MAKE) $(build)=scripts scripts/unifdef
+>  
+> +PHONY += scripts_gen_packed_field_checks
+> +scripts_gen_packed_field_checks: scripts_basic
+> +	$(Q)$(MAKE) $(build)=scripts scripts/gen_packed_field_checks
+> +
+>  # ---------------------------------------------------------------------------
+>  # Install
+>  
+> diff --git a/include/linux/packing.h b/include/linux/packing.h
+> index 5d36dcd06f60420325473dae3a0e9ac37d03da4b..f9bfb20060300e33a455b46d3266ea5083a62102 100644
+> --- a/include/linux/packing.h
+> +++ b/include/linux/packing.h
+> @@ -7,6 +7,7 @@
+>  
+>  #include <linux/types.h>
+>  #include <linux/bitops.h>
+> +#include <linux/packing_types.h>
 
-Issue is in xfrm6_net_init() and xfrm4_net_init() :
-They copies xfrm6_dst_ops_template into net->xfrm.xfrm6_dst_ops, (or
-xfrm4_dst_ops_template to net->xfrm.xfrm4_dst_ops)
+I'm unsure of the benefit of splitting the headers in this way, if
+packing_types.h is not going to contain purely auto-generated code and
+is tracked fully by git.
 
-But net structure is freed before all the dst callbacks are called.
+> diff --git a/lib/packing.c b/lib/packing.c
+> index 09a2d195b9433b61c86f3b63ff019ab319c83e97..45164f73fe5bf9f2c547eb22016af7e44fed9eb0 100644
+> --- a/lib/packing.c
+> +++ b/lib/packing.c
+> @@ -5,10 +5,37 @@
+>  #include <linux/packing.h>
+>  #include <linux/module.h>
+>  #include <linux/bitops.h>
+> +#include <linux/bits.h>
+>  #include <linux/errno.h>
+>  #include <linux/types.h>
+>  #include <linux/bitrev.h>
+>  
+> +#define __pack_fields(pbuf, pbuflen, ustruct, fields, num_fields, quirks)	\
+> +	({									\
+> +		for (size_t i = 0; i < (num_fields); i++) {			\
+> +			typeof(&(fields)[0]) field = &(fields)[i];		\
+> +			u64 uval;						\
+> +										\
+> +			uval = ustruct_field_to_u64(ustruct, field->offset, field->size); \
+> +										\
+> +			__pack(pbuf, uval, field->startbit, field->endbit,	\
+> +			       pbuflen, quirks);				\
+> +		}								\
+> +	})
+> +
+> +#define __unpack_fields(pbuf, pbuflen, ustruct, fields, num_fields, quirks)	\
+> +	({									\
+> +		for (size_t i = 0; i < (num_fields); i++) {			\
+> +			typeof(&(fields)[0]) field = &fields[i];		\
+> +			u64 uval;						\
+> +										\
+> +			__unpack(pbuf, &uval, field->startbit, field->endbit,	\
+> +				 pbuflen, quirks);				\
+> +										\
+> +			u64_to_ustruct_field(ustruct, field->offset, field->size, uval); \
+> +		}								\
+> +	})
+> +
+>  /**
+>   * calculate_box_addr - Determine physical location of byte in buffer
+>   * @box: Index of byte within buffer seen as a logical big-endian big number
+> @@ -322,4 +349,122 @@ int packing(void *pbuf, u64 *uval, int startbit, int endbit, size_t pbuflen,
+>  }
+>  EXPORT_SYMBOL(packing);
+>  
+> +static u64 ustruct_field_to_u64(const void *ustruct, size_t field_offset,
+> +				size_t field_size)
+> +{
+> +	switch (field_size) {
+> +	case 1:
+> +		return *((u8 *)(ustruct + field_offset));
+> +	case 2:
+> +		return *((u16 *)(ustruct + field_offset));
+> +	case 4:
+> +		return *((u32 *)(ustruct + field_offset));
+> +	default:
+> +		return *((u64 *)(ustruct + field_offset));
+> +	}
+> +}
+> +
+> +static void u64_to_ustruct_field(void *ustruct, size_t field_offset,
+> +				 size_t field_size, u64 uval)
+> +{
+> +	switch (field_size) {
+> +	case 1:
+> +		*((u8 *)(ustruct + field_offset)) = uval;
+> +		break;
+> +	case 2:
+> +		*((u16 *)(ustruct + field_offset)) = uval;
+> +		break;
+> +	case 4:
+> +		*((u32 *)(ustruct + field_offset)) = uval;
+> +		break;
+> +	default:
+> +		*((u64 *)(ustruct + field_offset)) = uval;
+> +		break;
+> +	}
+> +}
+> +
+> +/**
+> + * pack_fields_s - Pack array of small fields
+> + *
+> + * @pbuf: Pointer to a buffer holding the packed value.
+> + * @pbuflen: The length in bytes of the packed buffer pointed to by @pbuf.
+> + * @ustruct: Pointer to CPU-readable structure holding the unpacked value.
+> + *	     It is expected (but not checked) that this has the same data type
+> + *	     as all struct packed_field_s definitions.
+> + * @fields: Array of small packed fields definition. They must not overlap.
+> + * @num_fields: Length of @fields array.
+> + * @quirks: A bit mask of QUIRK_LITTLE_ENDIAN, QUIRK_LSW32_IS_FIRST and
+> + *	    QUIRK_MSB_ON_THE_RIGHT.
+> + */
+> +void pack_fields_s(void *pbuf, size_t pbuflen, const void *ustruct,
+> +		   const struct packed_field_s *fields, size_t num_fields,
+> +		   u8 quirks)
+> +{
+> +	__pack_fields(pbuf, pbuflen, ustruct, fields, num_fields, quirks);
+> +}
+> +EXPORT_SYMBOL(pack_fields_s);
+> +
+> +/**
+> + * pack_fields_m - Pack array of medium fields
+> + *
+> + * @pbuf: Pointer to a buffer holding the packed value.
+> + * @pbuflen: The length in bytes of the packed buffer pointed to by @pbuf.
+> + * @ustruct: Pointer to CPU-readable structure holding the unpacked value.
+> + *	     It is expected (but not checked) that this has the same data type
+> + *	     as all struct packed_field_s definitions.
+> + * @fields: Array of medium packed fields definition. They must not overlap.
+> + * @num_fields: Length of @fields array.
+> + * @quirks: A bit mask of QUIRK_LITTLE_ENDIAN, QUIRK_LSW32_IS_FIRST and
+> + *	    QUIRK_MSB_ON_THE_RIGHT.
+> + */
+> +void pack_fields_m(void *pbuf, size_t pbuflen, const void *ustruct,
+> +		   const struct packed_field_m *fields, size_t num_fields,
+> +		   u8 quirks)
+> +{
+> +	__pack_fields(pbuf, pbuflen, ustruct, fields, num_fields, quirks);
+> +}
+> +EXPORT_SYMBOL(pack_fields_m);
+> +
+> +/**
+> + * unpack_fields_s - Unpack array of small fields
+> + *
+> + * @pbuf: Pointer to a buffer holding the packed value.
+> + * @pbuflen: The length in bytes of the packed buffer pointed to by @pbuf.
+> + * @ustruct: Pointer to CPU-readable structure holding the unpacked value.
+> + *	     It is expected (but not checked) that this has the same data type
+> + *	     as all struct packed_field_s definitions.
+> + * @fields: Array of small packed fields definition. They must not overlap.
+> + * @num_fields: Length of @fields array.
+> + * @quirks: A bit mask of QUIRK_LITTLE_ENDIAN, QUIRK_LSW32_IS_FIRST and
+> + *	    QUIRK_MSB_ON_THE_RIGHT.
+> + */
+> +void unpack_fields_s(const void *pbuf, size_t pbuflen, void *ustruct,
+> +		     const struct packed_field_s *fields, size_t num_fields,
+> +		     u8 quirks)
+> +{
+> +	__unpack_fields(pbuf, pbuflen, ustruct, fields, num_fields, quirks);
+> +}
+> +EXPORT_SYMBOL(unpack_fields_s);
+> +
+> +/**
+> + * unpack_fields_m - Unpack array of medium fields
+> + *
+> + * @pbuf: Pointer to a buffer holding the packed value.
+> + * @pbuflen: The length in bytes of the packed buffer pointed to by @pbuf.
+> + * @ustruct: Pointer to CPU-readable structure holding the unpacked value.
+> + *	     It is expected (but not checked) that this has the same data type
+> + *	     as all struct packed_field_s definitions.
+> + * @fields: Array of medium packed fields definition. They must not overlap.
+> + * @num_fields: Length of @fields array.
+> + * @quirks: A bit mask of QUIRK_LITTLE_ENDIAN, QUIRK_LSW32_IS_FIRST and
+> + *	    QUIRK_MSB_ON_THE_RIGHT.
+> + */
+> +void unpack_fields_m(const void *pbuf, size_t pbuflen, void *ustruct,
+> +		     const struct packed_field_m *fields, size_t num_fields,
+> +		     u8 quirks)
+> +{
+> +	__unpack_fields(pbuf, pbuflen, ustruct, fields, num_fields, quirks);
+> +}
+> +EXPORT_SYMBOL(unpack_fields_m);
+> +
+>  MODULE_DESCRIPTION("Generic bitfield packing and unpacking");
+> diff --git a/lib/packing_test.c b/lib/packing_test.c
+> index b38ea43c03fd83639f18a6f3e2a42eae36118c45..3b4167ce56bf65fa4d66cb55d3215aecc33f64c4 100644
+> --- a/lib/packing_test.c
+> +++ b/lib/packing_test.c
+> @@ -396,9 +396,70 @@ static void packing_test_unpack(struct kunit *test)
+>  	KUNIT_EXPECT_EQ(test, uval, params->uval);
+>  }
+>  
+> +#define PACKED_BUF_SIZE 8
+> +
+> +typedef struct __packed { u8 buf[PACKED_BUF_SIZE]; } packed_buf_t;
+> +
+> +struct test_data {
+> +	u32 field3;
+> +	u16 field2;
+> +	u16 field4;
+> +	u16 field6;
+> +	u8 field1;
+> +	u8 field5;
+> +};
+> +
+> +static const struct packed_field_s test_fields[] = {
+> +	PACKED_FIELD(63, 61, struct test_data, field1),
+> +	PACKED_FIELD(60, 52, struct test_data, field2),
+> +	PACKED_FIELD(51, 28, struct test_data, field3),
+> +	PACKED_FIELD(27, 14, struct test_data, field4),
+> +	PACKED_FIELD(13, 9, struct test_data, field5),
+> +	PACKED_FIELD(8, 0, struct test_data, field6),
+> +};
+> +
+> +static void packing_test_pack_fields(struct kunit *test)
+> +{
+> +	const struct test_data data = {
+> +		.field1 = 0x2,
+> +		.field2 = 0x100,
+> +		.field3 = 0xF00050,
+> +		.field4 = 0x7D3,
+> +		.field5 = 0x9,
+> +		.field6 = 0x10B,
+> +	};
+> +	packed_buf_t expect = {
+> +		.buf = { 0x50, 0x0F, 0x00, 0x05, 0x01, 0xF4, 0xD3, 0x0B },
+> +	};
+> +	packed_buf_t buf = {};
+> +
+> +	pack_fields(&buf, sizeof(buf), &data, test_fields, 0);
+> +
+> +	KUNIT_EXPECT_MEMEQ(test, &expect, &buf, sizeof(buf));
+> +}
+> +
+> +static void packing_test_unpack_fields(struct kunit *test)
+> +{
+> +	const packed_buf_t buf = {
+> +		.buf = { 0x17, 0x28, 0x10, 0x19, 0x3D, 0xA9, 0x07, 0x9C },
+> +	};
+> +	struct test_data data = {};
+> +
+> +	unpack_fields(&buf, sizeof(buf), &data, test_fields, 0);
+> +
+> +	KUNIT_EXPECT_EQ(test, 0, data.field1);
+> +	KUNIT_EXPECT_EQ(test, 0x172, data.field2);
+> +	KUNIT_EXPECT_EQ(test, 0x810193, data.field3);
+> +	KUNIT_EXPECT_EQ(test, 0x36A4, data.field4);
+> +	KUNIT_EXPECT_EQ(test, 0x3, data.field5);
+> +	KUNIT_EXPECT_EQ(test, 0x19C, data.field6);
+> +}
+> +
+>  static struct kunit_case packing_test_cases[] = {
+>  	KUNIT_CASE_PARAM(packing_test_pack, packing_gen_params),
+>  	KUNIT_CASE_PARAM(packing_test_unpack, packing_gen_params),
+> +	KUNIT_CASE(packing_test_pack_fields),
+> +	KUNIT_CASE(packing_test_unpack_fields),
+>  	{},
+>  };
+>  
+> diff --git a/scripts/gen_packed_field_checks.c b/scripts/gen_packed_field_checks.c
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..09a21afd640bdf37ad5ee9f6cfa1d4b9113efbcd
+> --- /dev/null
+> +++ b/scripts/gen_packed_field_checks.c
+> @@ -0,0 +1,38 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +// Copyright (c) 2024, Intel Corporation
+> +#include <stdbool.h>
+> +#include <stdio.h>
+> +
+> +#define MAX_PACKED_FIELD_SIZE 50
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	for (int i = 1; i <= MAX_PACKED_FIELD_SIZE; i++) {
+> +		printf("#define CHECK_PACKED_FIELDS_%d(fields) ({ \\\n", i);
+> +		printf("\ttypeof(&(fields)[0]) _f = (fields); \\\n");
+> +		printf("\tBUILD_BUG_ON(ARRAY_SIZE(fields) != %d); \\\n", i);
+> +
+> +		for (int j = 0; j < i; j++)
+> +			printf("\tCHECK_PACKED_FIELD(_f[%d]); \\\n", j);
+> +
+> +		for (int j = 1; j < i; j++)
+> +			printf("\tCHECK_PACKED_FIELD_OVERLAP(_f[0].startbit < _f[1].startbit, _f[%d], _f[%d]); \\\n",
+> +			       j - 1, j);
+> +
+> +		printf("})\n\n");
+> +	}
+> +
+> +	printf("#define CHECK_PACKED_FIELDS(fields) \\\n");
+> +
+> +	for (int i = 1; i <= MAX_PACKED_FIELD_SIZE; i++)
+> +		printf("\t__builtin_choose_expr(ARRAY_SIZE(fields) == %d, CHECK_PACKED_FIELDS_%d(fields), \\\n",
+> +		       i, i);
+> +
+> +	printf("\t({ BUILD_BUG_ON_MSG(1, \"CHECK_PACKED_FIELDS() must be regenerated to support array sizes larger than %d.\"); }) \\\n",
+> +	       MAX_PACKED_FIELD_SIZE);
+> +
+> +	for (int i = 1; i <= MAX_PACKED_FIELD_SIZE; i++)
+> +		printf(")");
+> +
+> +	printf("\n");
+> +}
+> diff --git a/Documentation/core-api/packing.rst b/Documentation/core-api/packing.rst
+> index 821691f23c541cee27995bb1d77e23ff04f82433..5f729a9d4e87b438b67ec6b46626403c8f1655c3 100644
+> --- a/Documentation/core-api/packing.rst
+> +++ b/Documentation/core-api/packing.rst
+> @@ -235,3 +235,61 @@ programmer against incorrect API use.  The errors are not expected to occur
+>  during runtime, therefore it is reasonable for xxx_packing() to return void
+>  and simply swallow those errors. Optionally it can dump stack or print the
+>  error description.
+> +
+> +The pack_fields() and unpack_fields() macros automatically select the
+> +appropriate function at compile time based on the type of the fields array
+> +passed in.
+
+This paragraph is out of context (select the appropriate function among
+which options? what fields array?).
+
+May I suggest the following documentation addition instead?
+
+Intended use
+------------
+
+Drivers that opt to use this API first need to identify which of the above 3
+quirk combinations (for a total of 8) match what the hardware documentation
+describes.
+
+There are 3 supported usage patterns, detailed below.
+
+packing()
+^^^^^^^^^
+
+This API function is deprecated.
+
+The packing() function returns an int-encoded error code, which protects the
+programmer against incorrect API use.  The errors are not expected to occur
+during runtime, therefore it is reasonable to wrap packing() into a custom
+function which returns void and simply swallow those errors. Optionally it can
+dump stack or print the error description.
+
+.. code-block:: c
+
+  void my_packing(void *buf, u64 *val, int startbit, int endbit,
+                  size_t len, enum packing_op op)
+  {
+          int err;
+
+          /* Adjust quirks accordingly */
+          err = packing(buf, val, startbit, endbit, len, op, QUIRK_LSW32_IS_FIRST);
+          if (likely(!err))
+                  return;
+
+          if (err == -EINVAL) {
+                  pr_err("Start bit (%d) expected to be larger than end (%d)\n",
+                         startbit, endbit);
+          } else if (err == -ERANGE) {
+                  if ((startbit - endbit + 1) > 64)
+                          pr_err("Field %d-%d too large for 64 bits!\n",
+                                 startbit, endbit);
+                  else
+                          pr_err("Cannot store %llx inside bits %d-%d (would truncate)\n",
+                                 *val, startbit, endbit);
+          }
+          dump_stack();
+  }
+
+pack() and unpack()
+^^^^^^^^^^^^^^^^^^^
+
+These are const-correct variants of packing(), and eliminate the last "enum
+packing_op op" argument.
+
+Calling pack(...) is equivalent, and preferred, to calling packing(..., PACK).
+
+Calling unpack(...) is equivalent, and preferred, to calling packing(..., UNPACK).
+
+pack_fields() and unpack_fields()
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The library exposes optimized functions for the scenario where there are many
+fields represented in a buffer, and it encourages consumer drivers to avoid
+repetitive calls to pack() and unpack() for each field, but instead use
+pack_fields() and unpack_fields(), which reduces the code footprint.
+
+These APIs use field definitions in arrays of ``struct packed_field_s`` (small)
+or ``struct packed_field_m`` (medium), allowing consumer drivers to minimize
+the size of these arrays according to their custom requirements.
+
+The pack_fields() and unpack_fields() API functions are actually macros which
+automatically select the appropriate function at compile time, based on the
+type of the fields array passed in.
+
+An additional benefit over pack() and unpack() is that sanity checks on the
+field definitions are handled at compile time with ``BUILD_BUG_ON`` rather
+than only when the offending code is executed. These functions return void and
+wrapping them to handle unexpected errors is not necessary.
+
+It is recommended, but not required, that you wrap your packed buffer into a
+structured type with a fixed size. This generally makes it easier for the
+compiler to enforce that the correct size buffer is used.
+
+Here is an example of how to use the fields APIs:
+
+.. code-block:: c
+
+   /* Ordering inside the unpacked structure is flexible and can be different
+    * from the packed buffer. Here, it is optimized to reduce padding.
+    */
+   struct data {
+        u64 field3;
+        u32 field4;
+        u16 field1;
+        u8 field2;
+   };
+
+   #define SIZE 13
+
+   typdef struct __packed { u8 buf[SIZE]; } packed_buf_t;
+
+   static const struct packed_field_s fields[] = {
+           PACKED_FIELD(100, 90, struct data, field1),
+           PACKED_FIELD(90, 87, struct data, field2),
+           PACKED_FIELD(86, 30, struct data, field3),
+           PACKED_FIELD(29, 0, struct data, field4),
+   };
+
+   void unpack_your_data(const packed_buf_t *buf, struct data *unpacked)
+   {
+           BUILD_BUG_ON(sizeof(*buf) != SIZE;
+
+           unpack_fields(buf, sizeof(*buf), unpacked, fields,
+                         QUIRK_LITTLE_ENDIAN);
+   }
+
+   void pack_your_data(const struct data *unpacked, packed_buf_t *buf)
+   {
+           BUILD_BUG_ON(sizeof(*buf) != SIZE;
+
+           pack_fields(buf, sizeof(*buf), unpacked, fields,
+                       QUIRK_LITTLE_ENDIAN);
+   }
 
 
-So when dst_destroy() calls later :
+Also, I think this patch could use some de-cluttering by making the
+documentation update separate. We need to document 2 new APIs anyway,
+not just pack_fields() but also pack().
 
-if (dst->ops->destroy)
-    dst->ops->destroy(dst);
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0456a33ef65792bacb5d305a6384d245844fb743..7ef0abcb58c8a42e60222f6fc85df44602c360d5 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -17559,8 +17559,10 @@ L:	netdev@vger.kernel.org
+>  S:	Supported
+>  F:	Documentation/core-api/packing.rst
+>  F:	include/linux/packing.h
+> +F:	include/linux/packing_types.h
+>  F:	lib/packing.c
+>  F:	lib/packing_test.c
+> +F:	scripts/gen_packed_field_checks.c
+>  
+>  PADATA PARALLEL EXECUTION MECHANISM
+>  M:	Steffen Klassert <steffen.klassert@secunet.com>
+> diff --git a/scripts/Makefile b/scripts/Makefile
+> index 6bcda4b9d054021b185488841cd36c6e0fb86d0c..546e8175e1c4c8209e67a7f92f7d1e795a030988 100644
+> --- a/scripts/Makefile
+> +++ b/scripts/Makefile
+> @@ -47,7 +47,7 @@ HOSTCFLAGS_sorttable.o += -DMCOUNT_SORT_ENABLED
+>  endif
+>  
+>  # The following programs are only built on demand
+> -hostprogs += unifdef
+> +hostprogs += unifdef gen_packed_field_checks
 
-dst->ops point to the old net->xfrm.xfrm6_dst_ops, which has been freed.
+I will let those who have been more vocal in their complaints about
+the compile-time checks comment on whether this approach of running
+gen_packed_field_checks on demand rather than during any build is
+acceptable.
 
-See for a similar issue fixed in , and that I warned XFRM maintainers
-at that time:
-
-ac888d58869b net: do not delay dst_entries_add() in dst_release()
-
-A solution could be to queue the 'struct net' to be freed after one
-another cleanup_net() round (and existing rcu barrier)
-
-net_free() would need to not directly call kmem_cache_free(net_cachep, net)=
-.
-
-I can cook a patch, thanks for the report.
+>  
+>  # The module linker script is preprocessed on demand
+>  targets += module.lds
+> 
+> -- 
+> 2.47.0.265.g4ca455297942
+> 
 
