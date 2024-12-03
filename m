@@ -1,116 +1,103 @@
-Return-Path: <netdev+bounces-148313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43BB9E117B
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 03:51:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C34E49E1186
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 03:54:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A3A9283415
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 02:51:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5506FB225DD
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 02:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5C3137C35;
-	Tue,  3 Dec 2024 02:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F78314B942;
+	Tue,  3 Dec 2024 02:54:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/WZcLIs"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Kpz3ts+G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB58E17555
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 02:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E98C1465AD;
+	Tue,  3 Dec 2024 02:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733194293; cv=none; b=sokxH+tgSBvm15b1Qb/D8xHlxSQgeRsj8FyTaMalkqpTqPrdxdHiMBJhBkJMp+6VLg+JFFxsZ5m61vmDX4BSiJ3duit389dXQmhexIla+n6S3+znfl68xOE1xR9GlY5cOA9CBqVMnDlaxD5Hdlchk1h/Gzf72zoic/6+y2Y+ZEs=
+	t=1733194464; cv=none; b=c+oC+e6s9JFLIIVIVyTYDIqVqXi0PfC3oWJQv1TrrFp0rqfsMS+hTiIUnfDIuKs29y3GnBL87wzUkqyCfx+jSzzetUyFoUYhpYp53dMkf3r7qF/2cn27qTVkAD2Vh+uqNL8SHmez3bB4v7PpZSwbwhdoYvtSrU/C0WAZipNy2JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733194293; c=relaxed/simple;
-	bh=vbgyQ03+F6RIwTN0rVhjgurSNi1zMIVch0imO7bXY78=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DXyZ0lhxK4RnQW23c01DswqoBF2rNsNYvW4wuaf4+86Fc2+b4xjRQQ+1jrqbwP1wGzWSPc7D3HZfK0BZyx1wEzYr0KDWEL5hzY7JL0CiKCaKpyc+L/xsmVQUdK/PhvEEL5qzgKXAw2s5erwNRppgLLXxPKrJWIklzZm0ErwP8II=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W/WZcLIs; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-385dbf79881so2397666f8f.1
-        for <netdev@vger.kernel.org>; Mon, 02 Dec 2024 18:51:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733194290; x=1733799090; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=vbgyQ03+F6RIwTN0rVhjgurSNi1zMIVch0imO7bXY78=;
-        b=W/WZcLIsS13GPy2soQ4v7yAwWcYw4QsiJORXc8YogiKH4H5xG3PUTXoC0DxGSL7i2m
-         A75G+YcSdzACKofPEw7/U6YBYov3yoxvlaK4yNOoKGgTI1m3rtj0uZo6NIVL9wjbAbky
-         gqdQZw/2bZrrBYpXAzUmA8NaHXQNgnxxlfQcOg5FT3kIIRQ+A6FIZANuKCCkySOgcmf+
-         3AvW/s7AmdOVd2SE4Dt4kJRl8l4y2WD7u6OPRu1RRpcYQ68U5TgSdW985NFUR+l510DC
-         XM5Kutl+Blle774PiN4wT5sMS5FFsbDj9U1ZtS0bynaJjT8pTkwLNJcWpD6wj9zjObmO
-         in6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733194290; x=1733799090;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vbgyQ03+F6RIwTN0rVhjgurSNi1zMIVch0imO7bXY78=;
-        b=gEjx6VdjkRGWP0S9xUS/OgCg244z28W9JmX2DYw8DXfhIiuCXCx2kqpZM7mA0qtmVY
-         yT1bEtE/v8AD7w6A2QE7pGqUJe/3yzQ5q63nZzS+HTo+J6HhB+HJ3iDOdjLQU2DNdyEf
-         pp+jWzX9nvuVAZWbi0iW79QEZrVQxpIsu7aE+4ehJpNTpG++gzKKmsslRG6eHJmzycPG
-         sABlFewZoGA/HdSS7JxJ+QjiH1oW0i7GbLROqbLovz2HPIdz7k2Qddvxtg7dsRnhlV1F
-         s2gAE1YJfaeWNxcf7Gco2mT46FRsOa3R/uzG4lbByF6h5wzIh/5AS7XlkiHof2/OclZq
-         yn1w==
-X-Gm-Message-State: AOJu0YwlXjacvyBCe5/EMX/8YPX2AIU2WNiJ4+pYCO9V3zX1X92F11iW
-	8dsnAoLVhmXYmD4Pkb0d1Y7e+9DO7VxbkpX4FpqAeCMeMHiaIS+sUQttnphFulH1BpleLIqUTv3
-	6A8Z34BnDZl/iZ9dP9p/A2CR8xAQ=
-X-Gm-Gg: ASbGncuelL2D9IYBte1MhGeCGtrkVgkjHkHT28vTS5uAPea6iCTcF5sRW9oYWP07DGj
-	jEx7U4JzDcYVVDecQ3MgXf6VTDM01AW2IJNVYwrFyee2ZEOKSeHl67PZLERNP0V0=
-X-Google-Smtp-Source: AGHT+IEf8Ogx5BuwDQvaSYp1m+YFD/p5DqTnMDhSgAvD6+8iKnNmd8ANTGT6O/NcbYJa+o2cIkKiKMtq0NMfXzuHAKk=
-X-Received: by 2002:a5d:5f48:0:b0:385:f07a:f4af with SMTP id
- ffacd0b85a97d-385f07af622mr6550626f8f.0.1733194289704; Mon, 02 Dec 2024
- 18:51:29 -0800 (PST)
+	s=arc-20240116; t=1733194464; c=relaxed/simple;
+	bh=I8SirD0yuHcfbPsXm4iZpq51HM5L+c5OfxjNF6/99Cc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fbvlmjv2JfcLKhxiacK/m4Q+VEiK30ZrgtQGYhCejXTcdFBs9HzvpP7igd2ePqAc6zz27Tlpm3MerPWTpBsB5Usrh6CuMtO7yLagfIW0fm/MP1KZk5tJQCJnMedFtEbEyqSkQpr+1UtzdZUWW3jBLG9FzcO3N3UpLUr/U2ctf8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Kpz3ts+G; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9qzV5ByXOmZQgOUKoyAxf8t7EJDqP6dVCVdVgSa0Jtk=; b=Kpz3ts+GahipNYkQ0Btb2bXdb1
+	TBcPbtJXFf1EgOAn6sa7gqHMn+GbWD+3wJwyY1CXtlX38SQCj+wLSJyyeQmyqODSP3gtnxKggcPXG
+	8Rc00wWoYfi2+DzZJ2cFUazfqYPqnHXEufcYp1Pfk91T0RApdE/11DnXeqZV2zyfgYzI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tIJ3J-00F1ZH-ML; Tue, 03 Dec 2024 03:54:17 +0100
+Date: Tue, 3 Dec 2024 03:54:17 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?utf-8?B?5LiH6Ie06L+c?= <kmlinuxm@gmail.com>
+Cc: kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	willy.liu@realtek.com, Yuki Lee <febrieac@outlook.com>
+Subject: Re: [PATCH 2/2] net: phy: realtek: add dt property to disable
+ broadcast PHY address
+Message-ID: <ae46016c-c391-42c1-854e-075e7ee03a62@lunn.ch>
+References: <CAHwZ4N0gbTvXFYCawbOUFWk7yitTeAWwUmfmb7RU68n-md8x4Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241128044340.27897-1-rawal.abhishek92@gmail.com> <20241202112919.01dc7ee7@hermes.local>
-In-Reply-To: <20241202112919.01dc7ee7@hermes.local>
-From: Abhishek Rawal <rawal.abhishek92@gmail.com>
-Date: Tue, 3 Dec 2024 08:21:18 +0530
-Message-ID: <CAO+A8AK1SeBnB5DDq+HPXiMHRreUgHs-f4LE=LkkWp2jz5zPcg@mail.gmail.com>
-Subject: Re: [PATCH next] man: ss.8: add description for SCTP related entries.
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, arawal@redhat.com, 
-	jamie.bainbridge@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHwZ4N0gbTvXFYCawbOUFWk7yitTeAWwUmfmb7RU68n-md8x4Q@mail.gmail.com>
 
-> It is good to have more entries documented, but throwing entries
-> into the "some of the following" list just adds to an already messy section.
-
-Okay, I agree. Thank you for the feedback.
-
-I think of two implementation ideas for v2 :
-a] Create headings per protocol under --info.
-b] Update entire --info section for different protocols & its
-descriptions. Similar to : STATE-FILTER.
-
-May I have your opinion please ? Do you have any other implementation ideas ?
-
-On Tue, 3 Dec 2024 at 00:59, Stephen Hemminger
-<stephen@networkplumber.org> wrote:
->
-> On Thu, 28 Nov 2024 10:13:40 +0530
-> rawal.abhishek92@gmail.com wrote:
->
-> > From: Abhishek Rawal <rawal.abhishek92@gmail.com>
+> > I think you can do this without needing a new property. The DT binding
+> > has:
 > >
-> > SCTP protocol support is included, but manpage lacks
-> > the description for its entries. Add the missing
-> > descriptions so that SCTP information is complete.
+> >             reg = <4>;
 > >
-> > Signed-off-by: Abhishek Rawal <rawal.abhishek92@gmail.com>
-> > Reviewed-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
->
-> It is good to have more entries documented, but throwing entries
-> into the "some of the following" list just adds to an already messy section.
->
-> Similar issue is true for mptcp fields.
+> > This is the address the PHY should respond on. If reg is not 0, then
+> > broadcast is not wanted.
+> >
+> First, broadcast has no relationship with PHY address, it allows MAC
+> broadcast command to all supported PHY on the MDIO bus.
+> 
+> I can't assume that there's no user use this feature to configure multiple
+> PHY devices (e.g. there's like 3 or more PHYs on board, their address
+> represented as 1, 2, 3. When this feature is enabled (default behavior),
+> users can send commands to address 0 to configure common parameters shared
+> by these PHYs) at the same time.
+
+phylib does not do that. Each PHY is considered a single entity. User
+space could in theory do it via phy_do_ioctl(), but that is a very
+risky thing to do, there is no locking, and you are likely to confuse
+phylib and/or the PHY driver.
+
+So we don't actually need the broadcast feature.
+
+> Again, the broadcast address is shared by all PHYs on MDIO which
+> support this feature, it's handy for MAC to change multiple PHYs
+> setting at the same time.
+
+Please point me at a MAC driver doing this.
+
+> I would recommend to add this feature, because it doesn't change the
+> behavior of this driver, and allows this PHY works together with
+> other PHY or switch chip which don't support this feature, like mt7530 or
+> Marvell ones.
+
+I agree we should be disabling this when it is safe to disable, but i
+don't agree we need a new property, reg is sufficient.
+
+	Andrew
 
