@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-148571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 575FA9E2366
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:37:10 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D80819E231C
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:32:29 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7A3D164B52
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:32:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C467282AD6
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845A11F76D5;
-	Tue,  3 Dec 2024 15:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764951F76AC;
+	Tue,  3 Dec 2024 15:31:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="CutcdQcF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="sbDTkIiX"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE83B1F8AED
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 15:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7E2646
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 15:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733239880; cv=none; b=cdQWGnVBqGVmk4+xNHajTBMbDt2bbVMqnTKHd5r1OyO8oVSiLyi5Apg1aqZauxuf2uzEKkpW6Ri9u9v/Vbt4I7RA4nlmox3IErDwxqnuaAIl0/+MN3HriQjq6/bcKAZY9yhURe/qrUXenRTQKPxEkogK5h8thnhJyR5ottGwzCc=
+	t=1733239885; cv=none; b=p5lF+jpMpQN4dLPfpJqen9CrxPdcgmi6CoHpBMQ1g3Q+WWJFUvkyV+4XywCQ6CviFu/WH1dZy5iJy11u2OMlde3U1yU0+mPDjYevim2KVSiIqvCSvps5YIMteHPr/biNCLmmtHCtCs8Hrp1O5edm2tA0o7engBBmHq73CJ+Xgzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733239880; c=relaxed/simple;
-	bh=Q7va0oi0HQUYGZSD7s7fnPmmHlIN+5X7GCpYydXHxWc=;
+	s=arc-20240116; t=1733239885; c=relaxed/simple;
+	bh=HJweVvY2IhHB9kxOfCGnXfRYHZQ1Zqkms35PWQI6RUA=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=JnLaxJ55aFG8mYweB6H4UGhVPnVbIZDwMzKnC57s/bj0PRiFkLwQNH1O/A3wow6pWr49SqUr3r3+HZUyEnMM3dsFV7zFJeSPiNvCjh19ml5a+v03KXVc1+O0X5/0rFpzv4c1oK6Uc1TJTPawQN2eggQJyLopeHhn5Aq3XJvzFNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=CutcdQcF; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=nzCxkt/UTQejoPIltMmJALuRNdEK1kmhK4TeHJvZQ0LO5opvZOo3mQMTlJ/pCsf6+qEIvOwQGgVDA/Bh7xuzwIrTCxSxoHfQ0hY+oQt+BUmyoLYhgdgDb0K5zblqBmhthpgd1oRRtFO1Xdrk98Pj6lTrpPi9rmrJCeIXqoj9bEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=sbDTkIiX; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=waUleP6vSkFH5yAxO/wXeyrEg/nb1nwkAYs0JL7/F0I=; b=CutcdQcFLVORAo490Iy6OkdWAI
-	YWu4BkUU76bHZ9wOdklk4Ya6m7aELhCxFWA35TeQfJluvsAxFMaYuib+Rhx+0tfjaaCvjUAbk/cxJ
-	88aJkiwnYB7LxQvjLkUeyMpZRgWpkCcg4tATen99MitFnyUdPF+1ZpLbl3mIMwgpNgJ3gBLQRrcJ9
-	j7PwPqo+Zc8TIC4DkNygdTlsNmUGd6mLqdMcJa1dZJ7nNfWq4SIZQc3RQSL+ZSKf2Z5khrRjpky1g
-	Ot/XK9RdvA4LfWb0KIAwowtYwZrvafwId0wb9ca+cssKrIEqt6HNTYvKjngDFSuHXsn6oIv/qW+lV
-	uJn6mS5w==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:59302 helo=rmk-PC.armlinux.org.uk)
+	bh=DQs9awcvxtg+eCXqRSOWO22FQ8DMKVImRZu2eJiSHGE=; b=sbDTkIiX0n/afpUGROfh9gSNbA
+	FfSapJbSNowGX5vhS0OC+4qxUqSy7/4FVqmAHsgXa4BC8uPvN4TPP5/4jXvyN93/O5YGw9Zb5HXZg
+	yqirHVmoczUXybyyLNVASATqNHSu6Zo7UEMVkGbTMlYVBQpzmReoaQiplv2OsLd/c/xgAylvWcjwH
+	7AEcthTxnZod247nzgJ9rPU+JyOQace+QlepK6VD5ncMm+yUS7kKspImD/916hfPlzSUv+UoGR76Q
+	3D4p+Db1TXQsiv70Ng+E3TRjBfC7ghuvnI33q+ycMn1PjnPjLSD9JeLCD+9RHF/eYwrgxB8D0ER+5
+	Fc2zJj1g==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:58954 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tIUrq-00028V-01;
-	Tue, 03 Dec 2024 15:31:14 +0000
+	id 1tIUrv-00028h-0d;
+	Tue, 03 Dec 2024 15:31:20 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tIUro-006IUC-Rq; Tue, 03 Dec 2024 15:31:12 +0000
+	id 1tIUru-006IUI-08; Tue, 03 Dec 2024 15:31:18 +0000
 In-Reply-To: <Z08kCwxdkU4n2V6x@shell.armlinux.org.uk>
 References: <Z08kCwxdkU4n2V6x@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -62,8 +62,7 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next 06/13] net: phy: marvell: implement phy_inband_caps()
- method
+Subject: [PATCH net-next 07/13] net: phy: add phy_config_inband()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,68 +72,86 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tIUro-006IUC-Rq@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tIUru-006IUI-08@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 03 Dec 2024 15:31:12 +0000
+Date: Tue, 03 Dec 2024 15:31:18 +0000
 
-Provide an implementation for phy_inband_caps() for Marvell PHYs used
-on SFP modules, so that phylink knows the PHYs capabilities.
+Add a method to configure the PHY's in-band mode.
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/phy/marvell.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ drivers/net/phy/phy.c | 32 ++++++++++++++++++++++++++++++++
+ include/linux/phy.h   |  6 ++++++
+ 2 files changed, 38 insertions(+)
 
-diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
-index cd50cd6a7f75..3075ebc3f964 100644
---- a/drivers/net/phy/marvell.c
-+++ b/drivers/net/phy/marvell.c
-@@ -717,6 +717,20 @@ static int marvell_config_aneg_fiber(struct phy_device *phydev)
- 	return genphy_check_and_restart_aneg(phydev, changed);
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index f42cd6584841..0c228aa18019 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1026,6 +1026,38 @@ unsigned int phy_inband_caps(struct phy_device *phydev,
  }
+ EXPORT_SYMBOL_GPL(phy_inband_caps);
  
-+static unsigned int m88e1111_inband_caps(struct phy_device *phydev,
-+					 phy_interface_t interface)
++/**
++ * phy_config_inband - configure the desired PHY in-band mode
++ * @phydev: the phy_device struct
++ * @modes: in-band modes to configure
++ *
++ * Description: disables, enables or enables-with-bypass in-band signalling
++ *   between the PHY and host system.
++ *
++ * Returns: zero on success, or negative errno value.
++ */
++int phy_config_inband(struct phy_device *phydev, unsigned int modes)
 +{
-+	/* In 1000base-X and SGMII modes, the inband mode can be changed
-+	 * through the Fibre page BMCR ANENABLE bit.
-+	 */
-+	if (interface == PHY_INTERFACE_MODE_1000BASEX ||
-+	    interface == PHY_INTERFACE_MODE_SGMII)
-+		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE |
-+		       LINK_INBAND_BYPASS;
++	int err;
 +
-+	return 0;
++	if (!!(modes & LINK_INBAND_DISABLE) +
++	    !!(modes & LINK_INBAND_ENABLE) +
++	    !!(modes & LINK_INBAND_BYPASS) != 1)
++		return -EINVAL;
++
++	mutex_lock(&phydev->lock);
++	if (!phydev->drv)
++		err = -EIO;
++	else if (!phydev->drv->config_inband)
++		err = -EOPNOTSUPP;
++	else
++		err = phydev->drv->config_inband(phydev, modes);
++	mutex_unlock(&phydev->lock);
++
++	return err;
 +}
++EXPORT_SYMBOL(phy_config_inband);
 +
- static int m88e1111_config_aneg(struct phy_device *phydev)
- {
- 	int extsr = phy_read(phydev, MII_M1111_PHY_EXT_SR);
-@@ -3677,6 +3691,7 @@ static struct phy_driver marvell_drivers[] = {
- 		.name = "Marvell 88E1112",
- 		/* PHY_GBIT_FEATURES */
- 		.probe = marvell_probe,
-+		.inband_caps = m88e1111_inband_caps,
- 		.config_init = m88e1112_config_init,
- 		.config_aneg = marvell_config_aneg,
- 		.config_intr = marvell_config_intr,
-@@ -3698,6 +3713,7 @@ static struct phy_driver marvell_drivers[] = {
- 		/* PHY_GBIT_FEATURES */
- 		.flags = PHY_POLL_CABLE_TEST,
- 		.probe = marvell_probe,
-+		.inband_caps = m88e1111_inband_caps,
- 		.config_init = m88e1111gbe_config_init,
- 		.config_aneg = m88e1111_config_aneg,
- 		.read_status = marvell_read_status,
-@@ -3721,6 +3737,7 @@ static struct phy_driver marvell_drivers[] = {
- 		.name = "Marvell 88E1111 (Finisar)",
- 		/* PHY_GBIT_FEATURES */
- 		.probe = marvell_probe,
-+		.inband_caps = m88e1111_inband_caps,
- 		.config_init = m88e1111gbe_config_init,
- 		.config_aneg = m88e1111_config_aneg,
- 		.read_status = marvell_read_status,
+ /**
+  * _phy_start_aneg - start auto-negotiation for this PHY device
+  * @phydev: the phy_device struct
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index ccb93d892da9..61a1bc81f597 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -982,6 +982,11 @@ struct phy_driver {
+ 	unsigned int (*inband_caps)(struct phy_device *phydev,
+ 				    phy_interface_t interface);
+ 
++	/**
++	 * @config_inband: configure in-band mode for the PHY
++	 */
++	int (*config_inband)(struct phy_device *phydev, unsigned int modes);
++
+ 	/**
+ 	 * @get_rate_matching: Get the supported type of rate matching for a
+ 	 * particular phy interface. This is used by phy consumers to determine
+@@ -1846,6 +1851,7 @@ int phy_start_aneg(struct phy_device *phydev);
+ int phy_aneg_done(struct phy_device *phydev);
+ unsigned int phy_inband_caps(struct phy_device *phydev,
+ 			     phy_interface_t interface);
++int phy_config_inband(struct phy_device *phydev, unsigned int modes);
+ int phy_speed_down(struct phy_device *phydev, bool sync);
+ int phy_speed_up(struct phy_device *phydev);
+ bool phy_check_valid(int speed, int duplex, unsigned long *features);
 -- 
 2.30.2
 
