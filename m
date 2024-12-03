@@ -1,135 +1,371 @@
-Return-Path: <netdev+bounces-148508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A649E1EAA
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:08:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD5E19E1EF7
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:24:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B040283DBA
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:08:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90CEEB271FA
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D038F1F429E;
-	Tue,  3 Dec 2024 14:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D465E1F4299;
+	Tue,  3 Dec 2024 14:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=t-8ch.de header.i=@t-8ch.de header.b="L1SEFC6C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a8fScfzH"
 X-Original-To: netdev@vger.kernel.org
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1859E1F427E;
-	Tue,  3 Dec 2024 14:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44BB1F12FF;
+	Tue,  3 Dec 2024 14:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733234883; cv=none; b=C+f64HY3PmDEcway7F4Ow/a9HNBcn7G0l8bbB3UIqPWZ/N0zlP7uDmT/rKFBHtcYNHTKpZcxrn0c46GZcp3hQZ3QYfUx7lGqA12WgQneV+RwzealkcIvPOs9YRoZeCF7iNCZBEw6dtylFkJPytVo+Zhe3PiQiQs8C+jr1kFuBkY=
+	t=1733235711; cv=none; b=EqAPTii2h0TQNzNyXCmKxrtIU7a8+Z6N3ubib15iwzBN//JeOHQvFxTuCShGFGyoRf4wA6UCIudmcvi9reYGN52usWaDfSQdwtcDYi8ec+zdTLFxuihH/uMU+Nc7MNhgIa97x7aptaj262PPwq2EjvND6A0Zork3ojl8dF/XSfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733234883; c=relaxed/simple;
-	bh=fHTskvsLjld8Oq3wof1WoW/ro1iLNuhMDVshgcSrpsQ=;
+	s=arc-20240116; t=1733235711; c=relaxed/simple;
+	bh=OHw6YLM8WjR8kvo8cEuYBU0H7H+x3Uh9MitmuzFraU0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FaQofOoCigMRMKDsMAcTtZnSKYAnF9JdmD9LKSwjdD9iTopG88TjPRnGkTesBUyzWCTZM8JXNob0bMFp4HCxS2pc2zSY1vHi6LdhYRy3HTafthKOStozkpByTpSLcY+q9QsqCexNn3jCW4O80KwEDG0wtGQ0bz8cVhacy2wOc6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=t-8ch.de; spf=pass smtp.mailfrom=t-8ch.de; dkim=pass (1024-bit key) header.d=t-8ch.de header.i=@t-8ch.de header.b=L1SEFC6C; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=t-8ch.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-8ch.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=t-8ch.de; s=mail;
-	t=1733234875; bh=fHTskvsLjld8Oq3wof1WoW/ro1iLNuhMDVshgcSrpsQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=L1SEFC6CwLYUTcqqqze527r7IWIE4XsyoMQ1CGzSu2Lo7wpen1OO065Nb6zA+snIr
-	 s3/fB4myqry70R09PnBsloM8UYaMMYtq2RVACVaLKZRaHFcnQ6Cg6M23NYb/aG/4oS
-	 rGquyCmF69KPSlVFe8JS1cvEe5EsWFKP+TSwl24Y=
-Date: Tue, 3 Dec 2024 15:07:55 +0100
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas@t-8ch.de>
-To: James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc: Zijun Hu <zijun_hu@icloud.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Chun-Kuang Hu <chunkuang.hu@kernel.org>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Jean Delvare <jdelvare@suse.com>, 
-	Guenter Roeck <linux@roeck-us.net>, Martin Tuma <martin.tuma@digiteqautomotive.com>, 
-	Mauro Carvalho Chehab <mchehab@kernel.org>, Andreas Noever <andreas.noever@gmail.com>, 
-	Michael Jamet <michael.jamet@intel.com>, Mika Westerberg <mika.westerberg@linux.intel.com>, 
-	Yehezkel Bernat <YehezkelShB@gmail.com>, Linus Walleij <linus.walleij@linaro.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Andrew Lunn <andrew@lunn.ch>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Takashi Sakamoto <o-takashi@sakamocchi.jp>, Jiri Slaby <jirislaby@kernel.org>, 
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>, Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>, 
-	Mike Christie <michael.christie@oracle.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Nilesh Javali <njavali@marvell.com>, Manish Rangankar <mrangankar@marvell.com>, 
-	GR-QLogic-Storage-Upstream@marvell.com, Davidlohr Bueso <dave@stgolabs.net>, 
-	Jonathan Cameron <jonathan.cameron@huawei.com>, Alison Schofield <alison.schofield@intel.com>, 
-	Andreas Larsson <andreas@gaisler.com>, Stuart Yoder <stuyoder@gmail.com>, 
-	Laurentiu Tudor <laurentiu.tudor@nxp.com>, Jens Axboe <axboe@kernel.dk>, 
-	Sudeep Holla <sudeep.holla@arm.com>, Cristian Marussi <cristian.marussi@arm.com>, 
-	Ard Biesheuvel <ardb@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linux-mediatek@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	nvdimm@lists.linux.dev, linux1394-devel@lists.sourceforge.net, 
-	linux-serial@vger.kernel.org, linux-sound@vger.kernel.org, open-iscsi@googlegroups.com, 
-	linux-scsi@vger.kernel.org, linux-cxl@vger.kernel.org, sparclinux@vger.kernel.org, 
-	linux-block@vger.kernel.org, arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org, 
-	linux-remoteproc@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: Re: [PATCH v2 00/32] driver core: Constify API device_find_child()
- and adapt for various existing usages
-Message-ID: <8fb887a0-3634-4e07-9f0d-d8d7c72ca802@t-8ch.de>
-References: <20241203-const_dfc_done-v2-0-7436a98c497f@quicinc.com>
- <g32cigmktmj4egkq2tof27el2yss4liccfxgebkgqvkil32mlb@e3ta4ezv7y4m>
- <9d34bd6f-b120-428a-837b-5a5813e14618@icloud.com>
- <2024120320-manual-jockey-dfd1@gregkh>
- <b9885785-d4d4-4c72-b425-3dc552651d7e@icloud.com>
- <8eb7c0c54b280b8eb72f82032ede802c001ab087.camel@HansenPartnership.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gCYje7YPv3KnL1WhfB94te2LWNO2bw2g3rSIsDvy3gYBc6HRDKRR7iCGwNHdlZhDUYPXeWl+Mcp2m2ZV827eglxda3zAHWd0FHzyDx1P2TtB482UKviu7TQNL/BaU+9rtKhywSc2EluJEzbArSh6BAnYMQ0faZ6fqfvtPfD1Kaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a8fScfzH; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-434a736518eso69134295e9.1;
+        Tue, 03 Dec 2024 06:21:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733235708; x=1733840508; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AVfOfPiNuL/Q+GDQ3u9ZeXu8DfNYF8e30EZeReEQ48Y=;
+        b=a8fScfzHGRFziA01bcDqEjvZej76lw8QUQxczteERAnWkeVOV4/6H+8Tysc0D8gqxB
+         QY1O6eSog3sbqz+AD99P1H4XpMh+/ZZk0h4x0laBsf+Seum/uH2OLUnszmAWuMdnWdIw
+         TxzKTj6KgDwhutbIBEvtzUJjssq8/vql+wKPkhdb1VqxFqlUOX70HaldTXXj+W3LE/IJ
+         DU+mJJi35aQ1CBczDJKRFvEy7tmdE7uTYJRAZRP/75kVq4iAk8BvHazdYKE/gym9HAeC
+         TvYh+qKCYoQyGNjLFF0hoIxKmB2UsQHxtGBqH9qx73xjDgvcgEcYprzmlOjgxuSBcpTX
+         l+gA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733235708; x=1733840508;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AVfOfPiNuL/Q+GDQ3u9ZeXu8DfNYF8e30EZeReEQ48Y=;
+        b=lF7WWtM6ZG/+YCf9GWueJJ5Vx7JPP/yDlo4nVb9nLV/V3xNSAtsX5jxjrU32lXXv+C
+         aEGpMcti4PHuZdzg9cL6WHN2kJVnF9LkYgj2NMk/GMe1RI1miBnzR8EuLm0koDKQ1NWf
+         qGHNqpDQlFAI+plgTczSO2ggkmLL+BdYRm4hZZorT0z1L33ZMn7jYFFtsdft0/F7HMPB
+         XGDnrwBWhWFEizFWjqICUq4LRO/SpqHmYitUVVeQI0J1PVWtMpP50QytQLQKGS1sb9Ue
+         AQB1LH4JGXy7pSKMn2YgEoclsXHwpRCnEoE1ugNs92/HLkGNA0qi+t+FPWLgXbm2/p55
+         5VDw==
+X-Forwarded-Encrypted: i=1; AJvYcCVtRppH3+TptnEb7kIz+rXGCmhXf/ZUnT5MEjJYumMnEYpFxDUKycC/TAp/Vez16Vz1/V8OwXA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywkxw32MZGFleMKupeWMVhzP3ZeGSKZnvB1lMRUUQ75veSGToCO
+	BXjqL31Scxr+l2Er8AQ7D158ft4yGmnZl5qvnCzu2fgN0SQ1lpUw
+X-Gm-Gg: ASbGncvvRBTpQ5YFIeOmipfjGYXa3+txanQDR+eKjWr6Wsjy6/N1AOFJtyorp+ATpqB
+	YgLq4sFZbUECAu2usLQWk6wamFgfFaAqROIK/bcj9frj1IEVC+anZTGBum+us/Ph3Qedw+EaB5J
+	cI7EXJU9yoS5pXvIolhuPSyX3l9qUK/OpjwU6G/mY2ApYBYeNp3VHh7YrZumd37OcBfd0CLpsur
+	89TFv7utnemPQy1dGv4I6VIINTE3q0GH2nI1dwi084o3noiMvY=
+X-Google-Smtp-Source: AGHT+IHnj212NxrmgKWxQcscha2F2eHEWZ+PC33JENS2JE9vSLHm8vd54vD7ryIL/mhUzkSsrB8how==
+X-Received: by 2002:a05:600c:6b71:b0:432:d735:cc71 with SMTP id 5b1f17b1804b1-434d0a0e3c4mr24489935e9.25.1733235707679;
+        Tue, 03 Dec 2024 06:21:47 -0800 (PST)
+Received: from localhost ([81.168.73.77])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434aa74efbesm222406835e9.7.2024.12.03.06.21.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 06:21:47 -0800 (PST)
+Date: Tue, 3 Dec 2024 14:21:45 +0000
+From: Martin Habets <habetsm.xilinx@gmail.com>
+To: alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, martin.habets@xilinx.com,
+	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
+	Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v6 02/28] sfc: add cxl support using new CXL API
+Message-ID: <20241203141947.GA778635@gmail.com>
+Mail-Followup-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+	netdev@vger.kernel.org, dan.j.williams@intel.com,
+	martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	dave.jiang@intel.com, Alejandro Lucero <alucerop@amd.com>
+References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
+ <20241202171222.62595-3-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8eb7c0c54b280b8eb72f82032ede802c001ab087.camel@HansenPartnership.com>
+In-Reply-To: <20241202171222.62595-3-alejandro.lucero-palau@amd.com>
 
-On 2024-12-03 08:58:26-0500, James Bottomley wrote:
-> On Tue, 2024-12-03 at 21:02 +0800, Zijun Hu wrote:
-> > On 2024/12/3 20:41, Greg Kroah-Hartman wrote:
-> > > On Tue, Dec 03, 2024 at 08:23:45PM +0800, Zijun Hu wrote:
-> [...]
-> > > > or squash such patch series into a single patch ?
-> > > > 
-> > > > various subsystem maintainers may not like squashing way.
-> > > 
-> > > Agreed, so look into either doing it in a bisectable way if at all
-> > > possible.  As I don't see a full series here, I can't suggest how
-> > > it needs to happen :(
-> > > 
-> > 
-> > let me send you a full series later and discuss how to solve this
-> > issue.
+On Mon, Dec 02, 2024 at 05:11:56PM +0000, alejandro.lucero-palau@amd.com wrote:
 > 
-> It's only slightly more complex than what we normally do: modify all
-> instances and then change the API.  In this case you have an additional
-> problem because the prototype "const void *" will cause a mismatch if a
-> function has "void *".  The easiest way to solve this is probably to
-> make device_find_child a macro that coerces its function argument to
-> having a non const "void *" and then passes off to the real function. 
-> If you do that in the first patch, then you can constify all the
-> consumers and finally remove the macro coercion in the last patch.
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Add CXL initialization based on new CXL API for accel drivers and make
+> it dependable on kernel CXL configuration.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 
-Casting function pointers like that should be detected and trapped by
-control flow integrity checking (KCFI).
+Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
 
-Another possibility would be to use a macro and _Generic to dispatch to
-two different backing functions. See __BIN_ATTR() in
-include/linux/sysfs.h for an inspiration.
-This also enables an incremental migration.
-
-
-Thomas
+> ---
+>  drivers/net/ethernet/sfc/Kconfig      |  7 +++
+>  drivers/net/ethernet/sfc/Makefile     |  1 +
+>  drivers/net/ethernet/sfc/efx.c        | 24 +++++++-
+>  drivers/net/ethernet/sfc/efx_cxl.c    | 87 +++++++++++++++++++++++++++
+>  drivers/net/ethernet/sfc/efx_cxl.h    | 28 +++++++++
+>  drivers/net/ethernet/sfc/net_driver.h | 10 +++
+>  6 files changed, 156 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
+>  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
+> 
+> diff --git a/drivers/net/ethernet/sfc/Kconfig b/drivers/net/ethernet/sfc/Kconfig
+> index 3eb55dcfa8a6..a8bc777baa95 100644
+> --- a/drivers/net/ethernet/sfc/Kconfig
+> +++ b/drivers/net/ethernet/sfc/Kconfig
+> @@ -65,6 +65,13 @@ config SFC_MCDI_LOGGING
+>  	  Driver-Interface) commands and responses, allowing debugging of
+>  	  driver/firmware interaction.  The tracing is actually enabled by
+>  	  a sysfs file 'mcdi_logging' under the PCI device.
+> +config SFC_CXL
+> +	bool "Solarflare SFC9100-family CXL support"
+> +	depends on SFC && CXL_BUS && !(SFC=y && CXL_BUS=m)
+> +	default y
+> +	help
+> +	  This enables CXL support by the driver relying on kernel support
+> +	  and hardware support.
+>  
+>  source "drivers/net/ethernet/sfc/falcon/Kconfig"
+>  source "drivers/net/ethernet/sfc/siena/Kconfig"
+> diff --git a/drivers/net/ethernet/sfc/Makefile b/drivers/net/ethernet/sfc/Makefile
+> index 8f446b9bd5ee..e909cafd5908 100644
+> --- a/drivers/net/ethernet/sfc/Makefile
+> +++ b/drivers/net/ethernet/sfc/Makefile
+> @@ -13,6 +13,7 @@ sfc-$(CONFIG_SFC_SRIOV)	+= sriov.o ef10_sriov.o ef100_sriov.o ef100_rep.o \
+>                             mae.o tc.o tc_bindings.o tc_counters.o \
+>                             tc_encap_actions.o tc_conntrack.o
+>  
+> +sfc-$(CONFIG_SFC_CXL)	+= efx_cxl.o
+>  obj-$(CONFIG_SFC)	+= sfc.o
+>  
+>  obj-$(CONFIG_SFC_FALCON) += falcon/
+> diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
+> index 650136dfc642..ef3f34f0519a 100644
+> --- a/drivers/net/ethernet/sfc/efx.c
+> +++ b/drivers/net/ethernet/sfc/efx.c
+> @@ -34,6 +34,9 @@
+>  #include "selftest.h"
+>  #include "sriov.h"
+>  #include "efx_devlink.h"
+> +#ifdef CONFIG_SFC_CXL
+> +#include "efx_cxl.h"
+> +#endif
+>  
+>  #include "mcdi_port_common.h"
+>  #include "mcdi_pcol.h"
+> @@ -1004,12 +1007,17 @@ static void efx_pci_remove(struct pci_dev *pci_dev)
+>  	efx_pci_remove_main(efx);
+>  
+>  	efx_fini_io(efx);
+> +
+> +	probe_data = container_of(efx, struct efx_probe_data, efx);
+> +#ifdef CONFIG_SFC_CXL
+> +	efx_cxl_exit(probe_data);
+> +#endif
+> +
+>  	pci_dbg(efx->pci_dev, "shutdown successful\n");
+>  
+>  	efx_fini_devlink_and_unlock(efx);
+>  	efx_fini_struct(efx);
+>  	free_netdev(efx->net_dev);
+> -	probe_data = container_of(efx, struct efx_probe_data, efx);
+>  	kfree(probe_data);
+>  };
+>  
+> @@ -1214,6 +1222,17 @@ static int efx_pci_probe(struct pci_dev *pci_dev,
+>  	if (rc)
+>  		goto fail2;
+>  
+> +#ifdef CONFIG_SFC_CXL
+> +	/* A successful cxl initialization implies a CXL region created to be
+> +	 * used for PIO buffers. If there is no CXL support, or initialization
+> +	 * fails, efx_cxl_pio_initialised wll be false and legacy PIO buffers
+> +	 * defined at specific PCI BAR regions will be used.
+> +	 */
+> +	rc = efx_cxl_init(probe_data);
+> +	if (rc)
+> +		pci_err(pci_dev, "CXL initialization failed with error %d\n", rc);
+> +
+> +#endif
+>  	rc = efx_pci_probe_post_io(efx);
+>  	if (rc) {
+>  		/* On failure, retry once immediately.
+> @@ -1485,3 +1504,6 @@ MODULE_AUTHOR("Solarflare Communications and "
+>  MODULE_DESCRIPTION("Solarflare network driver");
+>  MODULE_LICENSE("GPL");
+>  MODULE_DEVICE_TABLE(pci, efx_pci_table);
+> +#ifdef CONFIG_SFC_CXL
+> +MODULE_SOFTDEP("pre: cxl_core cxl_port cxl_acpi cxl-mem");
+> +#endif
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> new file mode 100644
+> index 000000000000..9cfb519e569f
+> --- /dev/null
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -0,0 +1,87 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/****************************************************************************
+> + *
+> + * Driver for AMD network controllers and boards
+> + * Copyright (C) 2024, Advanced Micro Devices, Inc.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License version 2 as published
+> + * by the Free Software Foundation, incorporated herein by reference.
+> + */
+> +
+> +#include <cxl/cxl.h>
+> +#include <cxl/pci.h>
+> +#include <linux/pci.h>
+> +
+> +#include "net_driver.h"
+> +#include "efx_cxl.h"
+> +
+> +#define EFX_CTPIO_BUFFER_SIZE	SZ_256M
+> +
+> +int efx_cxl_init(struct efx_probe_data *probe_data)
+> +{
+> +	struct efx_nic *efx = &probe_data->efx;
+> +	struct pci_dev *pci_dev;
+> +	struct efx_cxl *cxl;
+> +	struct resource res;
+> +	u16 dvsec;
+> +	int rc;
+> +
+> +	pci_dev = efx->pci_dev;
+> +	probe_data->cxl_pio_initialised = false;
+> +
+> +	dvsec = pci_find_dvsec_capability(pci_dev, PCI_VENDOR_ID_CXL,
+> +					  CXL_DVSEC_PCIE_DEVICE);
+> +	if (!dvsec)
+> +		return 0;
+> +
+> +	pci_dbg(pci_dev, "CXL_DVSEC_PCIE_DEVICE capability found\n");
+> +
+> +	cxl = kzalloc(sizeof(*cxl), GFP_KERNEL);
+> +	if (!cxl)
+> +		return -ENOMEM;
+> +
+> +	cxl->cxlds = cxl_accel_state_create(&pci_dev->dev);
+> +	if (IS_ERR(cxl->cxlds)) {
+> +		pci_err(pci_dev, "CXL accel device state failed");
+> +		rc = -ENOMEM;
+> +		goto err1;
+> +	}
+> +
+> +	cxl_set_dvsec(cxl->cxlds, dvsec);
+> +	cxl_set_serial(cxl->cxlds, pci_dev->dev.id);
+> +
+> +	res = DEFINE_RES_MEM(0, EFX_CTPIO_BUFFER_SIZE);
+> +	if (cxl_set_resource(cxl->cxlds, res, CXL_RES_DPA)) {
+> +		pci_err(pci_dev, "cxl_set_resource DPA failed\n");
+> +		rc = -EINVAL;
+> +		goto err2;
+> +	}
+> +
+> +	res = DEFINE_RES_MEM_NAMED(0, EFX_CTPIO_BUFFER_SIZE, "ram");
+> +	if (cxl_set_resource(cxl->cxlds, res, CXL_RES_RAM)) {
+> +		pci_err(pci_dev, "cxl_set_resource RAM failed\n");
+> +		rc = -EINVAL;
+> +		goto err2;
+> +	}
+> +
+> +	probe_data->cxl = cxl;
+> +
+> +	return 0;
+> +
+> +err2:
+> +	kfree(cxl->cxlds);
+> +err1:
+> +	kfree(cxl);
+> +	return rc;
+> +}
+> +
+> +void efx_cxl_exit(struct efx_probe_data *probe_data)
+> +{
+> +	if (probe_data->cxl) {
+> +		kfree(probe_data->cxl->cxlds);
+> +		kfree(probe_data->cxl);
+> +	}
+> +}
+> +
+> +MODULE_IMPORT_NS(CXL);
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.h b/drivers/net/ethernet/sfc/efx_cxl.h
+> new file mode 100644
+> index 000000000000..90fa46bc94db
+> --- /dev/null
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.h
+> @@ -0,0 +1,28 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/****************************************************************************
+> + * Driver for AMD network controllers and boards
+> + * Copyright (C) 2024, Advanced Micro Devices, Inc.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License version 2 as published
+> + * by the Free Software Foundation, incorporated herein by reference.
+> + */
+> +
+> +#ifndef EFX_CXL_H
+> +#define EFX_CXL_H
+> +
+> +struct efx_nic;
+> +
+> +struct efx_cxl {
+> +	struct cxl_dev_state *cxlds;
+> +	struct cxl_memdev *cxlmd;
+> +	struct cxl_root_decoder *cxlrd;
+> +	struct cxl_port *endpoint;
+> +	struct cxl_endpoint_decoder *cxled;
+> +	struct cxl_region *efx_region;
+> +	void __iomem *ctpio_cxl;
+> +};
+> +
+> +int efx_cxl_init(struct efx_probe_data *probe_data);
+> +void efx_cxl_exit(struct efx_probe_data *probe_data);
+> +#endif
+> diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
+> index 620ba6ef3514..7f11ff200c25 100644
+> --- a/drivers/net/ethernet/sfc/net_driver.h
+> +++ b/drivers/net/ethernet/sfc/net_driver.h
+> @@ -1199,14 +1199,24 @@ struct efx_nic {
+>  	atomic_t n_rx_noskb_drops;
+>  };
+>  
+> +#ifdef CONFIG_SFC_CXL
+> +struct efx_cxl;
+> +#endif
+> +
+>  /**
+>   * struct efx_probe_data - State after hardware probe
+>   * @pci_dev: The PCI device
+>   * @efx: Efx NIC details
+> + * @cxl: details of related cxl objects
+> + * @cxl_pio_initialised: cxl initialization outcome.
+>   */
+>  struct efx_probe_data {
+>  	struct pci_dev *pci_dev;
+>  	struct efx_nic efx;
+> +#ifdef CONFIG_SFC_CXL
+> +	struct efx_cxl *cxl;
+> +	bool cxl_pio_initialised;
+> +#endif
+>  };
+>  
+>  static inline struct efx_nic *efx_netdev_priv(struct net_device *dev)
+> -- 
+> 2.17.1
+> 
+> 
 
