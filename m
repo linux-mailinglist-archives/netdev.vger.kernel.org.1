@@ -1,118 +1,194 @@
-Return-Path: <netdev+bounces-148402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1BC49E160D
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 09:43:42 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F40D9E15CD
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 09:30:40 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3CE7B243CC
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 08:28:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02EBC161307
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 08:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49C71D279F;
-	Tue,  3 Dec 2024 08:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7132C1D5AC0;
+	Tue,  3 Dec 2024 08:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JXUHrhhL"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ApT+Kb6p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31CC1CDA17
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 08:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422043F8F7;
+	Tue,  3 Dec 2024 08:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733214487; cv=none; b=ACqRY5MdxACvKgQKkDH2u/xnaJbaAJAz+ZDZwd3C6A/hbx77oiUaMVNZrK0qaAJdfsJShVJUvDxmuuidrc//RXpSsxE/j8MlOWVoQlnq3aVqnRnjQC7u76Mc/xJ3GX40neU2pWvgqNWjP0VhKO0GJC36o+4TK96FWzwx2eULkUs=
+	t=1733214636; cv=none; b=X44rpxUqZtq4dkle7X4h3RJpav5bYKjlmYVtnLvCoahNuE1uqeWkjAl/+0hxDwSBe/YoS9ibpRPyWmsQVbSWrm/cLxKf/azLZ6yUsLM8ILPaiTj3eP72UPh1+xquGalTBDzTADaow3+Zi0FCc7j26BWjmX+hRU8/v14kbRsxEh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733214487; c=relaxed/simple;
-	bh=II6l3Ydybgfvkv2hN8JeiJTpharRPOZoUX5XEw8lMwc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iNg1WtERMrNjhXREHZ/837qck8c7fpugkIE+zsj/cCcbmZ1MgclkOIRPrSLbcGpixQOELSUmDAMSoEa0u28Dd+xPb/mXobPD1f9w5c5v5Djegz213FriDC9mEn4ghuu5xDV4F0DlR3vfFgShIplJLe11stYBI/C+oP5lveF8/zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JXUHrhhL; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733214486; x=1764750486;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=II6l3Ydybgfvkv2hN8JeiJTpharRPOZoUX5XEw8lMwc=;
-  b=JXUHrhhL0f6bpV2JECEuMMPE6Him7bvqunkbHATR2x0kzjjx7dzAgCur
-   O2kIqBuNWAeh//bzNeGBT+/NyKZMGnMti3oWFlCLZUz6QaLFF3yLIW7iN
-   eYn4GeEHUJW3H8Qxk+qVa4uf2uTE2UZsX2OTZwzh836MCzKqmEh9/JrFT
-   2s1l4GvK1gEc3pW/MPCvBB4poU5B1DyIN9llWnnJ6a4OS29AUWyszjSko
-   yqVRHRPn0CnDRflSeFP3LeuZ1NDAQYtOHVPoQRH/JueRpjjqKTROTzSci
-   sx42/H5X35BARKni5D8a5SbPvprZGrtsKV7uQ06kfmR8jQf+kBP25tYQf
-   A==;
-X-CSE-ConnectionGUID: J9hNEIjNQnCGZF4ug4zAFQ==
-X-CSE-MsgGUID: om7Ec5wQQd6W7mpN+dOoCQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="44081447"
-X-IronPort-AV: E=Sophos;i="6.12,204,1728975600"; 
-   d="scan'208";a="44081447"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 00:28:05 -0800
-X-CSE-ConnectionGUID: hAoOTeqKR8Kh+8bWRhxIuw==
-X-CSE-MsgGUID: TgTOXg0SSZ24Wwm0Y74H8A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,204,1728975600"; 
-   d="scan'208";a="93820710"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa009.fm.intel.com with ESMTP; 03 Dec 2024 00:28:03 -0800
-Received: from pkitszel-desk.tendawifi.com (unknown [10.245.246.131])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 141552876E;
-	Tue,  3 Dec 2024 08:28:01 +0000 (GMT)
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: [PATCH iwl-next] fixup! ice: dump ethtool stats and skb by Tx hang devlink health reporter
-Date: Tue,  3 Dec 2024 09:25:33 +0100
-Message-ID: <20241203082753.4831-2-przemyslaw.kitszel@intel.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1733214636; c=relaxed/simple;
+	bh=lLJWoGA5mgYfeIf4wHZFTqCgIgZq+Y5pKhmZrIUvxi8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q4hGtjdQx8nrwGLWcMWh+0R2yW9qln6I3tAkz/nSvAJI6jVE27XwuQYUbRqdu/5LGtbXfpia3etompkLOpxt7Dbqr20iYwYSDT94dTk8IJmptkhkVnjb+QxiBu6G/ISXDBnSUoJeXplKqcmr9kdpe466tg6zSYNrWexQXV9Z54A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ApT+Kb6p; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 12D08FF805;
+	Tue,  3 Dec 2024 08:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1733214631;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wuM3/oVKujOATxnTbh+v+qkfvawpHs2T6Z0xs87aRjs=;
+	b=ApT+Kb6pBSoGn6KFGsCfFuN1b/F+Nn3onYhsoClioTIM9NVAs/80dl5zTMYeuLWB1vaZyv
+	hdUuwEyQ2Tfd3n1gaY0ixl/qSUSJM+eC7tgc+kc1Pd59Xqc5w+TsLGqkKdTvjjwgYURjAH
+	okKd/TddEU2aHnubDBKtL8epjIZlqOrF4x/LSrS7DEIFQFSRqF1eHb9FIz2g+ap6RXMmO/
+	vCC4JeGQwrMJuSrO/drXnvlqwS6OliPBrsEvv3TdQ16vt5AEZdoIR4FkOvVqEjfcDLF/AX
+	cScS0y2kx9z3rqjq7H/0CVPsQ6kaTmwk6WmNy3tL9v6CMeqUCMlD6/5XSbEmpA==
+Date: Tue, 3 Dec 2024 09:30:29 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, Russell King
+ <linux@armlinux.org.uk>, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/7] net: ethtool: plumb PHY stats to PHY
+ drivers
+Message-ID: <20241203093029.60c8b94b@fedora.home>
+In-Reply-To: <20241203075622.2452169-2-o.rempel@pengutronix.de>
+References: <20241203075622.2452169-1-o.rempel@pengutronix.de>
+	<20241203075622.2452169-2-o.rempel@pengutronix.de>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Dan has reported [1] than @event variable is dereferenced before the check
-against NULL, fix that.
-[1]: https://lore.kernel.org/intel-wired-lan/b1453276-9043-49c4-a603-9b6bb41306c7@stanley.mountain
+Hi Oleksij,
 
-Tony please squash this into my devlink-health series (no need to amend
-commit message) that is in your dev-queue.
-The last version of the whole series was send here:
-https://lore.kernel.org/netdev/20240930133724.610512-1-przemyslaw.kitszel@intel.com
+On Tue,  3 Dec 2024 08:56:15 +0100
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-CC: Dan Carpenter <dan.carpenter@linaro.org>
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
- drivers/net/ethernet/intel/ice/devlink/health.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+> From: Jakub Kicinski <kuba@kernel.org>
+> 
+> Feed the existing IEEE PHY counter struct (which currently
+> only has one entry) and link stats into the PHY driver.
+> The MAC driver can override the value if it somehow has a better
+> idea of PHY stats. Since the stats are "undefined" at input
+> the drivers can't += the values, so we should be safe from
+> double-counting.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
-index c7a8b8c9e1ca..d9b852ccf99e 100644
---- a/drivers/net/ethernet/intel/ice/devlink/health.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/health.c
-@@ -163,11 +163,10 @@ static int ice_tx_hang_reporter_dump(struct devlink_health_reporter *reporter,
- 	struct ice_tx_hang_event *event = priv_ctx;
- 	struct sk_buff *skb;
- 
--	skb = event->tx_ring->tx_buf->skb;
--
- 	if (!event)
- 		return 0;
- 
-+	skb = event->tx_ring->tx_buf->skb;
- 	devlink_fmsg_obj_nest_start(fmsg);
- 	ICE_DEVLINK_FMSG_PUT_FIELD(fmsg, event, head);
- 	ICE_DEVLINK_FMSG_PUT_FIELD(fmsg, event, intr);
+[...] 
 
-base-commit: 9e11d56a825f5e927039c285df38c22c20dcb757
--- 
-2.46.0
+> +static void
+> +ethtool_get_phydev_stats(struct net_device *dev,
+> +			 struct linkstate_reply_data *data)
+> +{
+> +	struct phy_device *phydev = dev->phydev;
+> +
+> +	if (!phydev)
+> +		return;
+> +
+> +	if (dev->phydev)
+> +		data->link_stats.link_down_events =
+> +			READ_ONCE(dev->phydev->link_down_events);
+> +
+> +	if (!phydev->drv || !phydev->drv->get_link_stats)
+> +		return;
+> +
+> +	mutex_lock(&phydev->lock);
+> +	phydev->drv->get_link_stats(phydev, &data->link_stats);
+> +	mutex_unlock(&phydev->lock);
+> +}
+> +
+>  static int linkstate_prepare_data(const struct ethnl_req_info *req_base,
+>  				  struct ethnl_reply_data *reply_base,
+>  				  const struct genl_info *info)
+> @@ -127,9 +148,7 @@ static int linkstate_prepare_data(const struct ethnl_req_info *req_base,
+>  			   sizeof(data->link_stats) / 8);
+>  
+>  	if (req_base->flags & ETHTOOL_FLAG_STATS) {
+> -		if (dev->phydev)
+> -			data->link_stats.link_down_events =
+> -				READ_ONCE(dev->phydev->link_down_events);
+> +		ethtool_get_phydev_stats(dev, data);
 
+I'm sorry to bother you with my multi-phy stuff, but I'd like to avoid
+directly accessing netdev->phydev at least in the netlink code.
+
+Could it be possible for you to pass a phydev directly to the
+ethtool_get_phydev_stats() helper you're creating ? That way, you could
+get the stats from other phydevs on the link if userspace passed a phy
+index in the netlink header. You'd get the phydev that way :
+
+phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_LINKSTATE_HEADER,], info->extack);
+
+This is what's done in the pse-pd, plca and cabletest netlink code that
+deals with phydevs.
+
+Note that this helper will fallback to netdev->phydev if user didn't
+pass any PHY index, which I expect to be what people do most of the
+time. However should the netdev have more than 1 PHY, we would be able
+to get the far-away PHY's stats :)
+
+>  
+>  		if (dev->ethtool_ops->get_link_ext_stats)
+>  			dev->ethtool_ops->get_link_ext_stats(dev,
+> diff --git a/net/ethtool/stats.c b/net/ethtool/stats.c
+> index 912f0c4fff2f..cf802b1cda6f 100644
+> --- a/net/ethtool/stats.c
+> +++ b/net/ethtool/stats.c
+> @@ -1,5 +1,7 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
+>  
+> +#include <linux/phy.h>
+> +
+>  #include "netlink.h"
+>  #include "common.h"
+>  #include "bitset.h"
+> @@ -112,6 +114,19 @@ static int stats_parse_request(struct ethnl_req_info *req_base,
+>  	return 0;
+>  }
+>  
+> +static void
+> +ethtool_get_phydev_stats(struct net_device *dev, struct stats_reply_data *data)
+> +{
+> +	struct phy_device *phydev = dev->phydev;
+> +
+> +	if (!phydev || !phydev->drv || !phydev->drv->get_phy_stats)
+> +		return;
+> +
+> +	mutex_lock(&phydev->lock);
+> +	phydev->drv->get_phy_stats(phydev, &data->phy_stats);
+> +	mutex_unlock(&phydev->lock);
+> +}
+> +
+>  static int stats_prepare_data(const struct ethnl_req_info *req_base,
+>  			      struct ethnl_reply_data *reply_base,
+>  			      const struct genl_info *info)
+> @@ -145,6 +160,10 @@ static int stats_prepare_data(const struct ethnl_req_info *req_base,
+>  	data->ctrl_stats.src = src;
+>  	data->rmon_stats.src = src;
+>  
+> +	if (test_bit(ETHTOOL_STATS_ETH_PHY, req_info->stat_mask) &&
+> +	    src == ETHTOOL_MAC_STATS_SRC_AGGREGATE)
+> +		ethtool_get_phydev_stats(dev, data);
+
+Same here :)
+
+Thanks,
+
+Maxime
 
