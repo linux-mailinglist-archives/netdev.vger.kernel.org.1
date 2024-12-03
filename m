@@ -1,85 +1,76 @@
-Return-Path: <netdev+bounces-148711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 031FA9E2F3D
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 23:48:51 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99AC69E2F4A
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 23:52:09 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7133016364C
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:52:06 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8052D207A07;
+	Tue,  3 Dec 2024 22:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ouhaC3mE"
+X-Original-To: netdev@vger.kernel.org
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46061B27220
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:35:47 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A121E0B62;
-	Tue,  3 Dec 2024 22:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VCMlXgfk"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D7F1D8E1E
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 22:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D4A20A5F6;
+	Tue,  3 Dec 2024 22:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733265344; cv=none; b=MLyOY9VMue05MhDn/a3Ij82UbBPtyh7sO3V91YHlBbq+7oelbRmOSCKA/Fl53lNI6d92avJ5xtO/bSpMQmvyW3gdUXslaUzi0dtDmGEw0ilfhNqVMcXTALSpR/Ns2Vg71xCoSedHhhS/hXd5CLfme4fvR4+oxqzNd6ZowFj4mvU=
+	t=1733266319; cv=none; b=j+Vv/1D4/NR/1uVuM+fEqdYcRxOg0fZuuksQiwxqNuCxWsvmkWnBPNbZb0osih46usAHscw8bdo0XpTvXZy60KNcvUuyYBcjgwd8f4l3Bs+RDOgRNjCwVU5nNfGkopvwxusvy04apq13X4QT+70h76P3izvF1lKECM/7jHtQc7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733265344; c=relaxed/simple;
-	bh=kYViiozP3wXER1FMTLl7y1IjqZskGkRhdRjZE2MHPeo=;
+	s=arc-20240116; t=1733266319; c=relaxed/simple;
+	bh=sBe6uk5yYjB2IRt5CMiVOj+qwIU4vaGJSAnksnDHwXQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OcnvSQDeoth3QLouzLJVjtJB1iwSru0tYVzzG6ARz5JLNKRwPuqgHWo+ph9pMEeadNlMNkl7S7TVlb3PQF93rFp4bHlp1ol60yjnkh5VxLN2MfHwFxwkwkqHffywvqtIXGc9lpux9R0gaxjy2mHZjpLC6e3esRhjFGy+tIeXXzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VCMlXgfk; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7256dc42176so3015574b3a.3
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 14:35:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733265342; x=1733870142; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=loBDMJH2zBR8LxlFbyL9wElqOG056//EhC4OoIsws6g=;
-        b=VCMlXgfkk1qfcC0+NOMOw80dLsUcNKuhY2vJ6UPR8nbYK2dlAT2Fh+cSJzhz1TZMY7
-         cSFQhh6zHCjnR70gS6OOY6Hbl5cm8zQ6Wkk1nxtsyM6bZL+OvfzSirAw/zfkiG0EBR0E
-         Z5Y6xhH5shMgicdvwSoaf4OZfjvN24RpbP2Ny788Y3CLZRjTMIpzVoQ2QvxX/+VCGQuM
-         2r3mTIqd6JaVITpJ6PP6AWTkxaqJVSXTvSgV/2Jd3ZHJ9+Tc5BrKNQTPgMAIN01oqxg3
-         Obt3kzThyZ9bdOAo+eGTPLq+B3AjxjUdIGMLD3wYxPFKn5CKZJqAK4rFT60YhN8hCtJZ
-         4m9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733265342; x=1733870142;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=loBDMJH2zBR8LxlFbyL9wElqOG056//EhC4OoIsws6g=;
-        b=GBYRxfuol0jnmgpZ8j+8FKVXEjKmPAlzWoQ0Wvi/lrqFDW7MWdD7D/Ilclkuw0+Kuk
-         Gc7SOEQetSq0lMECyu5BwokPHbKY7dKYZXJy4XvlGdqcccUucLLlSM9iyK++7T21HOYg
-         +TvrW6hqvRUGWaGM1lm3VlH6/myDtGKLd8xbH5FHqEV4G0lWCm1sXYCWPEtE+wPOAY3j
-         stNX9+FM0DD6MOUZ2NwQDzdV8GYCktbPlMILSAvuv9DKgP5Gb0s9Sd+XACDr+iqtcLHY
-         31s12Q2axuZJbl6n+x13yJSmZkJaolV0ZRCoja79tGLnfOasYL9W+fUKLCf3SJMIqFPd
-         sQVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXjOZScMTxri2bFJTl5Kyu+vqpL7FW2N+XMLUtB0p2Ux6Kdp/rglx5bvJzRW9haIBizG3oIIAI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynLvFYiTT2h8DwXuCFt/v7nEwzWsBsX25cnSVU0FIzTWB9ZxaD
-	guxrJ9kDscGU66czljjBwl69THdASTK6g1eMHwUwr9Mqg5NH8Hm9
-X-Gm-Gg: ASbGncs7Wq78v5UxISMLaJhn7O1O4aRxut0XcTaRMnZYQse8TPJVE8HEyS8I5zckzIl
-	GCbmWyT/yRVqJUgITmyATR6XLFZp1ipaEuEbL09zA1DD54Y5Y8WBO+yCiyM0jjiRe1YIe6rh0rk
-	5j2ynY/p7H8fFpYC8DLzr8+5QpdQFfXVSzxFfZ7BSgg30NEB2wcQFHZ9uIaP8q/ciKdcXyykdh7
-	VbwJe/3yJg+oCrwD5SVunCDCk8I5OhdM+1hk+vEBjqOKcYGjdenHtUSbU2pxj+JmWs72f8j4kne
-	xEyDnTN3
-X-Google-Smtp-Source: AGHT+IH8BuwEdeBixD/Zw52WI1Q/MXZtqz2OJHZ1fIPnvP21ppGiNMP3R+n0L/WDaHfUFsuizY3nXQ==
-X-Received: by 2002:a17:902:f684:b0:215:96bc:b680 with SMTP id d9443c01a7336-215bd16f544mr60325935ad.42.1733265342321;
-        Tue, 03 Dec 2024 14:35:42 -0800 (PST)
-Received: from xiberoa (c-76-103-20-67.hsd1.ca.comcast.net. [76.103.20.67])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2156b1601basm59404425ad.196.2024.12.03.14.35.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2024 14:35:40 -0800 (PST)
-Date: Tue, 3 Dec 2024 14:35:38 -0800
-From: Frederik Deweerdt <deweerdt.lkml@gmail.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net] splice: do not checksum AF_UNIX sockets
-Message-ID: <Z0-Huo1aqf2OAtJi@xiberoa>
-References: <Z0pMLtmaGPPSR3Ea@xiberoa>
- <537172.1733243422@warthog.procyon.org.uk>
- <Z098yHlrNYJsdzhM@pop-os.localdomain>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lLqj3oFJwN/BxjqJdlJctdPDrmh4ixvhhwzNIwI245dlh8SO8AQ6k//fT6FimqwjuBb6TJbh6GTB+e13TgsRbxy/KaKm/TOAmyJoOOX6cvzXHaGUuh/e1zCXu/A8Xn7vc5l049F6flIs7FBcKTlnd0Lw7iRviY+YgFV3Mw6D8jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ouhaC3mE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ev3Gbr2iE7d7yRsjXCDKDt4BiErZHh1rq7r5xXLsOgc=; b=ouhaC3mEmmVnsgoqr1kGRqtT4e
+	RxjNpZOgYo5PRxkFEbylTvREBHW2p/vyr6+SDar0jeiItm0xD2EWzykH1inWdkjbpEdQXXylJmbOF
+	64hx4F6i10iqkb/TInLRse87rqesdyTbhPe1x84P5xtgGsYtjAXy2cQSppRvINcyne0eoyuLfs6mH
+	p2QGPiwtDlVK5BpMEWlZtxUIRaypcv3Ta0iPBAO5t82+TWfUtbjxxkz172KGWTIt3FU56/PgBO7k2
+	oUArlTqCFoI1X3e5dE1X8U6WF7ZPei7yhGnOX9rH1udmEwGF6Md48RXPzsUXm44pSgjYxxzfWpBeC
+	VvXbRI1g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36222)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tIbkD-0002aL-0o;
+	Tue, 03 Dec 2024 22:51:49 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tIbk9-0004vo-1v;
+	Tue, 03 Dec 2024 22:51:45 +0000
+Date: Tue, 3 Dec 2024 22:51:45 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Chris Snook <chris.snook@gmail.com>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
+	Richard Cochran <richardcochran@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:RENESAS ETHERNET SWITCH DRIVER" <linux-renesas-soc@vger.kernel.org>
+Subject: Re: [PATCHv4 net-next] net: modernize ioremap in probe
+Message-ID: <Z0-LgWETqKZe2uyV@shell.armlinux.org.uk>
+References: <20241203222750.153272-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,43 +79,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z098yHlrNYJsdzhM@pop-os.localdomain>
+In-Reply-To: <20241203222750.153272-1-rosenp@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Dec 03, 2024 at 01:48:56PM -0800, Cong Wang wrote:
-> On Tue, Dec 03, 2024 at 04:30:22PM +0000, David Howells wrote:
-> > Frederik Deweerdt <deweerdt.lkml@gmail.com> wrote:
-> > 
-> > > -			if (skb->ip_summed == CHECKSUM_NONE)
-> > > +			if (skb->ip_summed == CHECKSUM_NONE && skb->sk->sk_family != AF_UNIX)
-> > >  				skb_splice_csum_page(skb, page, off, part);
-> > 
-> > Should AF_UNIX set some other CHECKSUM_* constant indicating that the checksum
-> > is unnecessary?
-> > 
-> 
-> It already means unnecessary on TX path:
-> 
->  * - %CHECKSUM_NONE
->  *
->  *   The skb was already checksummed by the protocol, or a checksum is not
->  *   required.
-> 
+On Tue, Dec 03, 2024 at 02:27:50PM -0800, Rosen Penev wrote:
+> resource aquisition and ioremap can be performed in one step.
+...
+> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> index 571631a30320..af9291574931 100644
+> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> @@ -7425,21 +7425,16 @@ static int mvpp2_init(struct platform_device *pdev, struct mvpp2 *priv)
+>  static int mvpp2_get_sram(struct platform_device *pdev,
+>  			  struct mvpp2 *priv)
+>  {
+> -	struct resource *res;
+>  	void __iomem *base;
+>  
+> -	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
+> -	if (!res) {
+> +	base = devm_platform_ioremap_resource(pdev, 2);
+> +	if (IS_ERR(base)) {
+>  		if (has_acpi_companion(&pdev->dev))
+>  			dev_warn(&pdev->dev, "ACPI is too old, Flow control not supported\n");
+>  		else
+>  			dev_warn(&pdev->dev, "DT is too old, Flow control not supported\n");
+> -		return 0;
+> -	}
+> -
+> -	base = devm_ioremap_resource(&pdev->dev, res);
+> -	if (IS_ERR(base))
+>  		return PTR_ERR(base);
+> +	}
 
-Looking back at the patch series that introduced the checksumming [1],
-it looks like `ip_output.c::ip_append_page()` was the only path doing
-checksumming, it had similar looking logic:
--
--		if (skb->ip_summed == CHECKSUM_NONE) {
--			__wsum csum;
--			csum = csum_page(page, offset, len);
--			skb->csum = csum_block_add(skb->csum, csum, skb->len);
--		}
--
+This is not equivalent. This means if ioremap() fails inside
+devm_platform_ioremap_resource(), we end up printing a message that
+blames the firmware, which is wrong.
 
-That code in turn has been like this since the git import. I'm not sure
-what that was for and how to test its intent.
+It also changes a "resource missing, proceed anyway" situation into
+a failure situation.
 
-Frederik
+Please drop this change, "cleaning" this up is introducing bugs.
 
-[1] https://patchwork.kernel.org/project/linux-mm/patch/20230522121125.2595254-15-dhowells@redhat.com/
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
