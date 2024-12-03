@@ -1,179 +1,304 @@
-Return-Path: <netdev+bounces-148707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B87C59E2F09
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 23:27:29 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B31C49E2F0D
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 23:27:58 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 777BD28347A
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:27:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D209165CE7
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:27:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E8D207A2E;
-	Tue,  3 Dec 2024 22:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3B2207A3E;
+	Tue,  3 Dec 2024 22:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EAj0nRjH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UwOopNkR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194861DDA3D;
-	Tue,  3 Dec 2024 22:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06E31F890E;
+	Tue,  3 Dec 2024 22:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733264846; cv=none; b=NR/DNFRe8C+awboreAePBPx0CbqTOEe9YrEObLeIWCG+zeTTF4hKRxl9drvcZWZR4Dey20RjdZDTJ3VvzTOiV7d3Rq1+QEZVZLhLN5oSgYow2QzKQjUrlx6iv5OjReT+weikr5B5mbTqw9biUg0plFAD1oeQyQMrK/GqocTk6Fg=
+	t=1733264875; cv=none; b=pPVJhOk4cYqjdeGKMfWW8aVVlTHfE4Crjj/v7S78EBkvUAw0itL8naeaEFHxpIvf810CKC1Q9XKMmAzhgisiIO3J2aq61HOrE7shZcgK8RD1dcOLBpEY45MKho/8f37h0jIV/SQMoF/OkHyLR+uA5/34LVhsofxVlRRnNRBfC1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733264846; c=relaxed/simple;
-	bh=t3U48xN9VjmKqQz4yVAbhOlS0eyYwqFA+BW9Dq6Whmo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ITmxsR6/Mugdm8kSb+MGsrm6kW1vmWfLt8u7ebaAqlaXFNWhv75vQLMemRb4xswk4ubNy9sbor38FgIkIxcCOw5tifzF7Bs3/Sa4ALuSdfMpw/BEps9iZriLA4IPIZbfH7fvuDSA2FfyW8i6mIBEMOI1IXQyxG5GPYlfxvXaQTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EAj0nRjH; arc=none smtp.client-ip=209.85.218.42
+	s=arc-20240116; t=1733264875; c=relaxed/simple;
+	bh=u4MrMb8pP0ycl910YF+Oe+hHb6ctrhR5zZlQMGqw8Tk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fs9xTb1WE9dBitqYByV09QWqiBWfimF6uyZE+C29Y4MkqYEExI3GWylojocjD1n/6rSKqF89TtNLBWiaRpiY83g7W5+HxsePZMVXKdjAFhEIVoffqhZRh98gIA5HVO2Wa5idy0XeSgPzly6p8EpXYD0wJqpnhkNHMtzgdY01+5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UwOopNkR; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a9a977d6cc7so361974866b.3;
-        Tue, 03 Dec 2024 14:27:24 -0800 (PST)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-724d23df764so5333306b3a.1;
+        Tue, 03 Dec 2024 14:27:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733264843; x=1733869643; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=q3wH2fBMSYuu3/Wq89m04+97w1m208obilMzwfiw49o=;
-        b=EAj0nRjHTjGPyhFLElUqf2FvDIvUm7oN2bni6mKO1puk0iBxyVtMNcG1KcXLxjoYhD
-         etSu/7FEGniTqQAXp8TP5AYzDu4LsJ2y1xOsKwOIxDgHTumB+hAzCIQ4du2deNsLlaT1
-         acgoB8OyjKClOq8uHaxoY0Cpjp2zZjtCs0klF5w8fWJvo9wjHa+ApXPbypYkJ9+BzPiy
-         0pA9hAifrUzDSATmtt1SL76ocr5A4HZX2Fd8LuyvpgnlOxVjpTkei4DAYPOjIYSXcTZ2
-         f5rXCYrglYmqB9L29jtIkCsbtkCSMrle0N1WIUysDQSQ1BhFWHPGfqc7TsSHnLAOoLGR
-         g5dw==
+        d=gmail.com; s=20230601; t=1733264873; x=1733869673; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=E3cL6Sw5bup7Yp4Jpnuubd25iPid2aDxt+wRriORF54=;
+        b=UwOopNkRSKoI4WUhtNGcy4IJUjdK5XbRwZ6IL+FWmcMy1Oa06UEnOuII4sfz9UNx5x
+         7qIHnTFkPHF4WGOcMuG+m4MIUZyyx3P6vjyT/vwhWmtZC7grLokw91HPrEO/e/680CSV
+         8KnwDcT/9W6LiqEPHLpmEPA45KTMRQco4fGA0Qf7qihphdPNQT+f0NiEf2IObaStihUt
+         UZs7cRy+1oF3c2xpv6Crbtqqd9MlZwtvf9OFTpyRubj9qlFHOvipZGGHBZqYquY3L1hc
+         8SOaMOBjDgyudRkpK5oS+60r+Z5BWpx79bR99VLa0PAh/Pgt87m5FivlKUez5tGHc7CI
+         7rfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733264843; x=1733869643;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q3wH2fBMSYuu3/Wq89m04+97w1m208obilMzwfiw49o=;
-        b=htUn7KmUgQyaKhSnQifLngDY4gukCsgbPMUIIWYUGtGQyvSQH9yWcAWSrWzliRl1Qr
-         pHVNocdE1BPI6wIIC7dbZgZaSZNr8d8KHRTZFiKV/hY5g7hPp+/4d9TQos3VxLhu2CQg
-         yH/H9nswq1USRRIL4eNHEqxlL0AjbIrx/6VrEHhSzUUt/E+pb7ZYsH34nPTU4UF5utJq
-         are8lGvG83vC+4caTQcse+3J+rDiZ54t0OAacynPiNsOao0UOraPu/RVIndB51lUAjSl
-         wHx23jOedWYUowMpKXMudiS4d3NeJkNkvCJNNEmUqO+WA50QTL9UehVHNAmU/STCedTt
-         a//w==
-X-Forwarded-Encrypted: i=1; AJvYcCVqzX4HtPEIlXwnaRTajQLuClsyf+ohnxoPJ0c454dpZNNlKeKWSrMYEYEXr2sSLF5Jt/YaG87B@vger.kernel.org, AJvYcCXh9D71PXeoffF1q4rqCjA8iOjdWC1VWp2YOmfIVtIcPmbaV/p5Ks/tJGZgUIgSt6STxJ7NW3P3NenIcQM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy57Owsk2O/QdAWMTQDvWh0So+ECYhHL19Qaq4yUY3sh1NjJStR
-	jlf3WnUymxOrn3CoIBPl13SBlH+K+1Nrr8nJ+3RQ7jfu+8akeMF4
-X-Gm-Gg: ASbGncvcSVrRZFQtWTVslSgAL0if4HpRpkAcbSVVXvyD0g9MQo19OZ8ZABHu3ekG53d
-	8T5YT75FRtPQDxMhUxv2+6qT6dj+FkcfPXEz0CBSYGldkZgapAz9uSmIzlHrxUYFrs74MjjCzLF
-	CKPlViFLaQ5q0amYMMSnay3SZLPb0Vlog4aeN5e/4lLquOiafFv2JS+0ZCgRB+M8pUKH25HB80C
-	J/78HG+BE9bmevJRc2WdHMSAZuJEFPzcYTIG+yOhKQL1gYnyhwMbCp/0Z4vxSJ238ZGL6iP+ZjT
-	f9/pnv0lSWqFNgZZHGKsrX4bku2oRkFoPXwatbtA+9D0X+THZ85UXwjwYDlipL8N2RTiQbPyvKu
-	lCWadxuW/jNRQwos7fIPkfsr6f48wvF7JxHZB/IqCag==
-X-Google-Smtp-Source: AGHT+IHh3mK6eq3ZEnPiOEuSCTTBJfxkdjdJBUwnmmPxhBcK/VMSM4Mgl8aNfgkCQ2DTTlus8Vp7eQ==
-X-Received: by 2002:a05:6402:1ecf:b0:5d0:d91d:c197 with SMTP id 4fb4d7f45d1cf-5d10cb801a1mr5205712a12.27.1733264843080;
-        Tue, 03 Dec 2024 14:27:23 -0800 (PST)
-Received: from ?IPV6:2a02:3100:9d09:7500:8175:4ab5:e6ba:110b? (dynamic-2a02-3100-9d09-7500-8175-4ab5-e6ba-110b.310.pool.telefonica.de. [2a02:3100:9d09:7500:8175:4ab5:e6ba:110b])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa5996c11d0sm654105366b.16.2024.12.03.14.27.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2024 14:27:21 -0800 (PST)
-Message-ID: <50e1ec4d-818c-45a8-875b-40f74cca1514@gmail.com>
-Date: Tue, 3 Dec 2024 23:27:20 +0100
+        d=1e100.net; s=20230601; t=1733264873; x=1733869673;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E3cL6Sw5bup7Yp4Jpnuubd25iPid2aDxt+wRriORF54=;
+        b=teZuaco0PsVr8kq9wh48S+ItZSVTmKHglgfZCao2X17UJR/5ZvZ5/VA4OARZpjyfM7
+         49QztFTmHZmoIwWtF8BisJjtcFz4Wiicds0fCK98MDUQRtT9R8Fw5Xs+S7a1ssvR52L3
+         t7cISs6R8OifXFJBYZUwUf8n3xz8RyJI6z/pg2kqNZZiSjlNKs0ShBXP+vi8sombs+4U
+         Qee+LWTWwZ0JOnsWyYQCz9fnp7nzYTrnbEiOeTQwSsmCvMKbyIipHEpkBk2u7qP0xCpT
+         rgTt3RsSVhM8ozhd5Lbu9yFQonNo65adNhpFaQHvuvJ2ZCar4wC18Rjs1jpwBqP5DK7e
+         uZmg==
+X-Forwarded-Encrypted: i=1; AJvYcCUrunR488LQcGO9CbuIHAbkBa5FDDaQ8zEq6PieGEXRwU4rui8bFgrSV/W/PPF1h9XwwunbfAKgEAwowF0=@vger.kernel.org, AJvYcCVsxa21frtckD6KvPYfWvPJ/Czwr12x6GtJnY8obUCMXfaU2MWio5B68Ek6rlumsdjfPaANZdR04M9SevK3jo5aB3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmcH1GHY8l0QgiaDQQcCFTlkvaGteeSV3QGvM5cuiDuH/Q97l7
+	7od+L8NHjA7AwZ2bFGj1xDg1RQ+ycXl9+1ImbPD/nNXV8/s9sSF95vSLX7L7z2c=
+X-Gm-Gg: ASbGncurqbyx0rOlh00TuE0iVSG+Wq9NVYB8UpQs/HQHk+QF1kNt2faUs25TxKYntHL
+	MfbNweqVeDE4RhnfJbLacNIG6TPupxkK9rmIB8AfMIMRPbMNqFSkn8eSjUWMzpVaqMRxkv53VNu
+	H7al5rjd4oj82vI7gLF3f5EU9ePyYQkbgo/nk4cyKj5FElywnLv479rSOqqIQu23RHlhTAR7wJF
+	Ob8omoXMCMuO0YM8WziRupAkQ==
+X-Google-Smtp-Source: AGHT+IGkp54KERaTLBSrOUDh1m6JJksoi0KcqKrWmnQ6FCRgUKOFSjF+PwDj4dKjUYawAtCTh+vHxA==
+X-Received: by 2002:a17:902:f687:b0:215:b9a6:5cb9 with SMTP id d9443c01a7336-215bcfbce83mr51069785ad.5.1733264872732;
+        Tue, 03 Dec 2024 14:27:52 -0800 (PST)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215a04dc249sm35172245ad.203.2024.12.03.14.27.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 14:27:52 -0800 (PST)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Kurt Kanzenbach <kurt@linutronix.de>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Chris Snook <chris.snook@gmail.com>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-kernel@vger.kernel.org (open list),
+	linux-renesas-soc@vger.kernel.org (open list:RENESAS ETHERNET SWITCH DRIVER)
+Subject: [PATCHv4 net-next] net: modernize ioremap in probe
+Date: Tue,  3 Dec 2024 14:27:50 -0800
+Message-ID: <20241203222750.153272-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net: mdio-ipq8064: use platform_get_resource
-To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, ansuelsmth@gmail.com,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- open list <linux-kernel@vger.kernel.org>
-References: <20241203221644.136104-1-rosenp@gmail.com>
- <20241203221644.136104-2-rosenp@gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20241203221644.136104-2-rosenp@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 03.12.2024 23:16, Rosen Penev wrote:
-> There's no need to get the of_node explicitly. platform_get_resource
-> already does this.
-> 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  drivers/net/mdio/mdio-ipq8064.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/mdio/mdio-ipq8064.c b/drivers/net/mdio/mdio-ipq8064.c
-> index 6253a9ab8b69..e3d311ce3810 100644
-> --- a/drivers/net/mdio/mdio-ipq8064.c
-> +++ b/drivers/net/mdio/mdio-ipq8064.c
-> @@ -111,15 +111,16 @@ ipq8064_mdio_probe(struct platform_device *pdev)
->  {
->  	struct device_node *np = pdev->dev.of_node;
->  	struct ipq8064_mdio *priv;
-> -	struct resource res;
-> +	struct resource *res;
->  	struct mii_bus *bus;
->  	void __iomem *base;
->  	int ret;
->  
-> -	if (of_address_to_resource(np, 0, &res))
-> +	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-> +	if (!res)
->  		return -ENOMEM;
->  
-> -	base = devm_ioremap(&pdev->dev, res.start, resource_size(&res));
-> +	base = devm_ioremap(&pdev->dev, res->start, resource_size(res));
->  	if (!base)
->  		return -ENOMEM;
->  
+resource aquisition and ioremap can be performed in one step.
 
-Why not directly switching to devm_platform_get_and_ioremap_resource()?
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ v4: reformatted to 100 column limit
+ v3: reworded commit message again. Also removed devm_ioremap
+ conversions. Even though they use normal resource, they are not
+ the same.
+ v2: fixed compilation errors on PPC and reworded commit message
+ drivers/net/dsa/hirschmann/hellcreek.c          | 17 ++---------------
+ drivers/net/ethernet/atheros/ag71xx.c           | 13 +++++--------
+ drivers/net/ethernet/broadcom/bcm63xx_enet.c    |  6 ++----
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 11 +++--------
+ drivers/net/ethernet/renesas/rswitch.c          |  9 +--------
+ drivers/net/ethernet/renesas/rtsn.c             |  9 +--------
+ 6 files changed, 14 insertions(+), 51 deletions(-)
+
+diff --git a/drivers/net/dsa/hirschmann/hellcreek.c b/drivers/net/dsa/hirschmann/hellcreek.c
+index 283ec5a6e23c..3a3e34c1d423 100644
+--- a/drivers/net/dsa/hirschmann/hellcreek.c
++++ b/drivers/net/dsa/hirschmann/hellcreek.c
+@@ -1932,7 +1932,6 @@ static int hellcreek_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct hellcreek *hellcreek;
+-	struct resource *res;
+ 	int ret, i;
+ 
+ 	hellcreek = devm_kzalloc(dev, sizeof(*hellcreek), GFP_KERNEL);
+@@ -1982,23 +1981,11 @@ static int hellcreek_probe(struct platform_device *pdev)
+ 
+ 	hellcreek->dev = dev;
+ 
+-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "tsn");
+-	if (!res) {
+-		dev_err(dev, "No memory region provided!\n");
+-		return -ENODEV;
+-	}
+-
+-	hellcreek->base = devm_ioremap_resource(dev, res);
++	hellcreek->base = devm_platform_ioremap_resource_byname(pdev, "tsn");
+ 	if (IS_ERR(hellcreek->base))
+ 		return PTR_ERR(hellcreek->base);
+ 
+-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "ptp");
+-	if (!res) {
+-		dev_err(dev, "No PTP memory region provided!\n");
+-		return -ENODEV;
+-	}
+-
+-	hellcreek->ptp_base = devm_ioremap_resource(dev, res);
++	hellcreek->ptp_base = devm_platform_ioremap_resource_byname(pdev, "ptp");
+ 	if (IS_ERR(hellcreek->ptp_base))
+ 		return PTR_ERR(hellcreek->ptp_base);
+ 
+diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
+index 3d4c3d8698e2..928d27b51b2a 100644
+--- a/drivers/net/ethernet/atheros/ag71xx.c
++++ b/drivers/net/ethernet/atheros/ag71xx.c
+@@ -1798,15 +1798,16 @@ static int ag71xx_probe(struct platform_device *pdev)
+ 	if (!ndev)
+ 		return -ENOMEM;
+ 
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (!res)
+-		return -EINVAL;
+-
+ 	dcfg = of_device_get_match_data(&pdev->dev);
+ 	if (!dcfg)
+ 		return -EINVAL;
+ 
+ 	ag = netdev_priv(ndev);
++
++	ag->mac_base = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
++	if (IS_ERR(ag->mac_base))
++		return PTR_ERR(ag->mac_base);
++
+ 	ag->mac_idx = -1;
+ 	for (i = 0; i < ARRAY_SIZE(ar71xx_addr_ar7100); i++) {
+ 		if (ar71xx_addr_ar7100[i] == res->start)
+@@ -1836,10 +1837,6 @@ static int ag71xx_probe(struct platform_device *pdev)
+ 		return dev_err_probe(&pdev->dev, PTR_ERR(ag->mac_reset),
+ 				     "missing mac reset");
+ 
+-	ag->mac_base = devm_ioremap_resource(&pdev->dev, res);
+-	if (IS_ERR(ag->mac_base))
+-		return PTR_ERR(ag->mac_base);
+-
+ 	/* ensure that HW is in manual polling mode before interrupts are
+ 	 * activated. Otherwise ag71xx_interrupt might call napi_schedule
+ 	 * before it is initialized by netif_napi_add.
+diff --git a/drivers/net/ethernet/broadcom/bcm63xx_enet.c b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
+index 65e3a0656a4c..420317abe3d2 100644
+--- a/drivers/net/ethernet/broadcom/bcm63xx_enet.c
++++ b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
+@@ -2646,16 +2646,14 @@ static int bcm_enetsw_probe(struct platform_device *pdev)
+ 	struct bcm_enet_priv *priv;
+ 	struct net_device *dev;
+ 	struct bcm63xx_enetsw_platform_data *pd;
+-	struct resource *res_mem;
+ 	int ret, irq_rx, irq_tx;
+ 
+ 	if (!bcm_enet_shared_base[0])
+ 		return -EPROBE_DEFER;
+ 
+-	res_mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	irq_rx = platform_get_irq(pdev, 0);
+ 	irq_tx = platform_get_irq(pdev, 1);
+-	if (!res_mem || irq_rx < 0)
++	if (irq_rx < 0)
+ 		return -ENODEV;
+ 
+ 	dev = alloc_etherdev(sizeof(*priv));
+@@ -2688,7 +2686,7 @@ static int bcm_enetsw_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		goto out;
+ 
+-	priv->base = devm_ioremap_resource(&pdev->dev, res_mem);
++	priv->base = devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(priv->base)) {
+ 		ret = PTR_ERR(priv->base);
+ 		goto out;
+diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+index 571631a30320..af9291574931 100644
+--- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
++++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+@@ -7425,21 +7425,16 @@ static int mvpp2_init(struct platform_device *pdev, struct mvpp2 *priv)
+ static int mvpp2_get_sram(struct platform_device *pdev,
+ 			  struct mvpp2 *priv)
+ {
+-	struct resource *res;
+ 	void __iomem *base;
+ 
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
+-	if (!res) {
++	base = devm_platform_ioremap_resource(pdev, 2);
++	if (IS_ERR(base)) {
+ 		if (has_acpi_companion(&pdev->dev))
+ 			dev_warn(&pdev->dev, "ACPI is too old, Flow control not supported\n");
+ 		else
+ 			dev_warn(&pdev->dev, "DT is too old, Flow control not supported\n");
+-		return 0;
+-	}
+-
+-	base = devm_ioremap_resource(&pdev->dev, res);
+-	if (IS_ERR(base))
+ 		return PTR_ERR(base);
++	}
+ 
+ 	priv->cm3_base = base;
+ 	return 0;
+diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
+index 8d18dae4d8fb..8ef52fc46a01 100644
+--- a/drivers/net/ethernet/renesas/rswitch.c
++++ b/drivers/net/ethernet/renesas/rswitch.c
+@@ -2046,15 +2046,8 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
+ {
+ 	const struct soc_device_attribute *attr;
+ 	struct rswitch_private *priv;
+-	struct resource *res;
+ 	int ret;
+ 
+-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "secure_base");
+-	if (!res) {
+-		dev_err(&pdev->dev, "invalid resource\n");
+-		return -EINVAL;
+-	}
+-
+ 	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
+ 	if (!priv)
+ 		return -ENOMEM;
+@@ -2074,7 +2067,7 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
+ 
+ 	platform_set_drvdata(pdev, priv);
+ 	priv->pdev = pdev;
+-	priv->addr = devm_ioremap_resource(&pdev->dev, res);
++	priv->addr = devm_platform_ioremap_resource_byname(pdev, "secure_base");
+ 	if (IS_ERR(priv->addr))
+ 		return PTR_ERR(priv->addr);
+ 
+diff --git a/drivers/net/ethernet/renesas/rtsn.c b/drivers/net/ethernet/renesas/rtsn.c
+index 6b3f7fca8d15..6a2e9a9cef25 100644
+--- a/drivers/net/ethernet/renesas/rtsn.c
++++ b/drivers/net/ethernet/renesas/rtsn.c
+@@ -1297,14 +1297,7 @@ static int rtsn_probe(struct platform_device *pdev)
+ 	ndev->netdev_ops = &rtsn_netdev_ops;
+ 	ndev->ethtool_ops = &rtsn_ethtool_ops;
+ 
+-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "gptp");
+-	if (!res) {
+-		dev_err(&pdev->dev, "Can't find gptp resource\n");
+-		ret = -EINVAL;
+-		goto error_free;
+-	}
+-
+-	priv->ptp_priv->addr = devm_ioremap_resource(&pdev->dev, res);
++	priv->ptp_priv->addr = devm_platform_ioremap_resource_byname(pdev, "gptp");
+ 	if (IS_ERR(priv->ptp_priv->addr)) {
+ 		ret = PTR_ERR(priv->ptp_priv->addr);
+ 		goto error_free;
+-- 
+2.47.0
+
 
