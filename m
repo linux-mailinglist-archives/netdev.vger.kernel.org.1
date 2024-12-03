@@ -1,162 +1,134 @@
-Return-Path: <netdev+bounces-148584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9ED69E2632
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:10:09 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C1B99E26DF
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:18:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAA7C288EE5
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:10:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2B3F16872D
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A9481F76D7;
-	Tue,  3 Dec 2024 16:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C5931F8907;
+	Tue,  3 Dec 2024 16:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="CpNww9DN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XxWEPaY3"
+	dkim=pass (2048-bit key) header.d=yourpreston.com header.i=@yourpreston.com header.b="Tiq050f/"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D3881ADA;
-	Tue,  3 Dec 2024 16:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C964C1F76B9
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 16:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733242207; cv=none; b=i8HZ/K6NhJtlyUx4aWs4nJACHw6JGxU43SVqbf7fpUOWHSK4CFstd1DX2yRdqIzcOLBQpRvmHJFpNlBMHE8JJ8txKvLh51Z538a6G94hB8VGbsW9O98WBdjpx1lTB6Fjy3vGxnpVZsfiqkOr5IbAFv/J5qusUgddtdibWjRbj7Q=
+	t=1733242513; cv=none; b=j85pCfOQTVDSg8IEaT+8CpvvxFQCcCEyV2ZVU/OL3WF2sWhr4NGozhpPU7Ak+OsGYC9BJ24f5PY69tmivVy/fW/lvUkFN2wF3ZV5qXsck4RWKouyztlPnLuj2W+9iPsdI4ijFCT+SXB1fwUoBQYBKgsIeG3WJA1gz1AVF9eKsK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733242207; c=relaxed/simple;
-	bh=8pAHF54ui4zA+Mj4UHdwG1hk0crm6ZJaVaOSy/hclf8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cLI0F0NAGSi6w0ObWhy4BBk1tQZhxSuHv/06BOSWtxau0RU1T5jZujo2PBZ9gcFU+YNIxp78jFwOMZpEll+w9JzFvAi6zN7zQw62RHjTezXAPVr2QKW+Knt7MVCobUr2Xa5VwKHt41om1bgKGWrpOIp+qoTb6XWMqsyYAOVhZSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=CpNww9DN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XxWEPaY3; arc=none smtp.client-ip=103.168.172.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id A812311400E2;
-	Tue,  3 Dec 2024 11:10:02 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Tue, 03 Dec 2024 11:10:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1733242202; x=
-	1733328602; bh=RzGwZAu9mlE2QMETXgnsEf6IwW4zhq+aCq4xASv7ZF0=; b=C
-	pNww9DNQEYeNcbr5JjoNABjeIQu8wjz7pzrXiEjruKGHKH4FPUoNwVtbegy0j1dx
-	WFPe/onNZCH1omZXzQz4HebBWtMxxWvLJJJ+/dieLUrt00RFxGL4KgCrX+cjusxl
-	Pp4IjyX5BeZNl8cPjaOJpSg6HanXOaI8WbeEV/63ppFIzvHW0I7ZX5M79r/4THK0
-	hJTmdFr1UhHO77RGbHEvcX+/cnGtAs31kYD9O5Uhr0xgmuOjUhMhtFHh0DRvP33w
-	eGJKXeKBavXx/jAqM01aSg3lazYa1riVmQwie9OTbjg9/PeRnkf6e7TObJw8eGSX
-	wq/Cfss5OWCPwvYPyFaCw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1733242202; x=1733328602; bh=RzGwZAu9mlE2QMETXgnsEf6IwW4zhq+aCq4
-	xASv7ZF0=; b=XxWEPaY3aeEbK65xYQJpEiZtof3I/2R+fwVMqHU8snwA+BI0t82
-	G0/iZN4M4xMHeg6aYb2Cx0PM5L3V//q1pufcrvQ39ArW47ZspdVttN1szeCwQ8ZC
-	pSoq0fRHb4MlMUeJuNLK0wOkI5Xn2VhPH4+Ez1IZbP4W8jpLgHRCwQh9hGPIZIpw
-	dFRcXS80cxwL6KnuHkPYoSy7ivNX4v16npE4kbYTw7jYzKW/sKq/9ssCEHfkWpOZ
-	Urd6IZ7qt7ANX98E4gHxd36ykdd7Jx6VI4NtYVPQMj24E2VElNRPkd54dX2MA3oo
-	yR41jJFgMWANRX6R+i4GrS9KmDIlxn4Iuug==
-X-ME-Sender: <xms:Wi1PZ-RKs4CV2dw3pvOjr_LldADvLKDNiUPa1QGnEaG0LvbmgqQCig>
-    <xme:Wi1PZzzXxeub_8Y584N2KxRhDk0IlQ_j7Famvf9jBEkWBzlaajckMMxPyeDtREN5F
-    -7f6f7cvJfFomGf01E>
-X-ME-Received: <xmr:Wi1PZ73kTI23uaUr2ChYGeHx1PL3OnP-79Wo7xPQlZ7J-fuOPq64jHvVYbtr>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieefgdehiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepuddvpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnih
-    hosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdr
-    tghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtphhtthho
-    pehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnh
-    gvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkshgv
-    lhhfthgvshhtsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrg
-    iivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdho
-    rhhg
-X-ME-Proxy: <xmx:Wi1PZ6CeXkjHU0kiZODljeL8K3ck430Gsw6JoM-Yne3hJGHXq3e9PA>
-    <xmx:Wi1PZ3gOkQpD9mPhOUWKU6u8_GjayXo2glBqcNDxwDk1ejwueXEVZg>
-    <xmx:Wi1PZ2qVSbqD-ihe2WyAr7JNcVMUlKoRDOFVkZ_dFCMZcVTyqaG2xw>
-    <xmx:Wi1PZ6hr54nRYZZRC9QasRt7lCwtH8XDjqe9l-Y1B7AlZVv1tjj8NQ>
-    <xmx:Wi1PZwamZUEZq7Cv_d0iaWEHK60RkI3DAuxLV2jjMWcmU8CQO3ogzfYD>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 3 Dec 2024 11:10:01 -0500 (EST)
-Date: Tue, 3 Dec 2024 17:09:59 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	ryazanov.s.a@gmail.com, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH net-next v12 13/22] ovpn: implement peer lookup logic
-Message-ID: <Z08tV5vQe2S4iawi@hog>
-References: <20241202-b4-ovpn-v12-0-239ff733bf97@openvpn.net>
- <20241202-b4-ovpn-v12-13-239ff733bf97@openvpn.net>
- <5052453b-edd8-44e2-8df7-00ea439805ad@openvpn.net>
+	s=arc-20240116; t=1733242513; c=relaxed/simple;
+	bh=mPUB+I/N0bH1rni/FXNWh0kdv4orytIeUFOw/U3OBug=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=RVkWsGRHtUvmYQyQXfHHC1KskDnQtdR64kxTTSWs0d1PrVLVXlnhlIm3YJQqCF9NqvDHsxVecXM9Fw+hUyXvYJfBdXGZ7JP3zEJDVuC0WMsCKr85a1/iMzLxGPBPa6KvtuxoAWTMbA2wHa86FboMOGjRFmY1NjXKaxZLdSJC4dQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yourpreston.com; spf=pass smtp.mailfrom=yourpreston.com; dkim=pass (2048-bit key) header.d=yourpreston.com header.i=@yourpreston.com header.b=Tiq050f/; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yourpreston.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yourpreston.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6ef402e4589so54869297b3.0
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 08:15:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=yourpreston.com; s=google; t=1733242509; x=1733847309; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mPUB+I/N0bH1rni/FXNWh0kdv4orytIeUFOw/U3OBug=;
+        b=Tiq050f/52Tgc15ZTwlLfes08bUIDJccDXnTLPc2MIYkbnG6hXjFKqEu1vs1fy2G/z
+         QuEWfGulVvo3WaCKOu6BYAV9ixedmC15/l26amMOdYvqkAoKV4JwQ37WQglCy2eEtd8Z
+         l2RzpMaLBQPVrvwPzjpasnKeh2nuElrhdfV85YnALORQvHEdd4rOB1GND2GET75kmKf1
+         GFJZd0/HEvjtg2xNTThVwB1dKL70r2GPbx3MKWxlhEa2e5p8+q8+YhnvzVK+OmBml9jw
+         zGoPuG48dgQI7kY1kWnfnhZpsKbNWkyMq4/FdjT/Xk1CpYuiD23WRHtxxNkqUcuzXauc
+         nKdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733242509; x=1733847309;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mPUB+I/N0bH1rni/FXNWh0kdv4orytIeUFOw/U3OBug=;
+        b=nV7mCIflb0YYVHPbV0dQtNUMd7uOc2KWddQcGeBDG1A6MlTnWbv0O1wyMpBPXRhsww
+         h0Wn5VFLUEPFKDIoOTnQ5no4HpTABsCOS2gDmdm47CXwkHgMs8sxtk+Ix/4+tFS84NEI
+         tRBwRNB3TWg+aMZFDk2aqIGScNzdExW3KZmas8+XkVHbugyRmb2qcADJfGbCcrdDlnd6
+         6tEiHIpnecIDhqXNd0z8flzQnuQ0q5Lha+2+bjSEr+hzuyw1dqwMjx9kmM+MUtdavLzF
+         ZI58dkQ0LkFu+8FJLRbMnLG8wyJ2/7t16LSsY7i3UiaFUdael1XJDCr/pdPm3e723jgR
+         JYpg==
+X-Gm-Message-State: AOJu0YzXenKrXlSXer79U+DhOJ1cAQkiu9pLJW6GHyTMG4jEayxrqc1e
+	rxi+aZU8Lfidh4I1qka15sdxLttz+wgc0qokbcddqIWJKDXlCLKhKCKiVjRGLX9ScYAWqLDxOvu
+	WApfzkf2wHylfwDfaQIVbJYER+TVpW6XZmPu/hl5onIJnGlIYR0E=
+X-Gm-Gg: ASbGncsP/bt3rCD0bHHAbxx+Ekh5L0XoozJLM+HOgHgYt4nnK4zXsJ+IJ1tu01+Wxsk
+	ElXXoVsYJm8zTg9WtARYvk5Jyqnb8NrWrhovT0szHDPyOr7OSX2OdBY/dgzOjRA==
+X-Google-Smtp-Source: AGHT+IETqzUpawg885/kB80keFks80OiJhCCtToTetppLAPr7SD5wI4k21XhpSWzTxnkyn8KcfkmsftsZahe3kq3yHo=
+X-Received: by 2002:a05:690c:360e:b0:6ef:6d61:c254 with SMTP id
+ 00721157ae682-6efad2f794fmr45025087b3.38.1733242509383; Tue, 03 Dec 2024
+ 08:15:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5052453b-edd8-44e2-8df7-00ea439805ad@openvpn.net>
+From: Preston <preston@yourpreston.com>
+Date: Tue, 3 Dec 2024 11:14:58 -0500
+Message-ID: <CABBfiem067qtdVbMeq2bGrn-5bKZsy_M8N-4GkE0BO6Uh7jX1A@mail.gmail.com>
+Subject: ethernet over l2tp with vlan
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-2024-12-03, 15:58:17 +0100, Antonio Quartulli wrote:
-> On 02/12/2024 16:07, Antonio Quartulli wrote:
-> [...]
-> > +#define ovpn_get_hash_slot(_key, _key_len, _tbl) ({	\
-> > +	typeof(_tbl) *__tbl = &(_tbl);			\
-> > +	jhash(_key, _key_len, 0) % HASH_SIZE(*__tbl);	\
-> > +})
-> > +
-> > +#define ovpn_get_hash_head(_tbl, _key, _key_len) ({		\
-> > +	typeof(_tbl) *__tbl = &(_tbl);				\
-> > +	&(*__tbl)[ovpn_get_hash_slot(_key, _key_len, *__tbl)];	\
-> > +})
-> 
-> clang a reporting various warnings like this:
-> 
-> ../drivers/net/ovpn/peer.c:406:9: warning: variable '__tbl' is uninitialized
-> when used within its own initialization [-Wuninitialized]
->   406 |         head = ovpn_get_hash_head(ovpn->peers->by_id, &peer_id,
->       |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   407 |                                   sizeof(peer_id));
->       |                                   ~~~~~~~~~~~~~~~~
-> ../drivers/net/ovpn/peer.c:179:48: note: expanded from macro
-> 'ovpn_get_hash_head'
->   179 |         &(*__tbl)[ovpn_get_hash_slot(_key, _key_len, *__tbl)];  \
->       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
-> ../drivers/net/ovpn/peer.c:173:26: note: expanded from macro
-> 'ovpn_get_hash_slot'
->   173 |         typeof(_tbl) *__tbl = &(_tbl);                  \
->       |                       ~~~~~     ^~~~
-> 
-> Anybody willing to help me understand this issue?
-> 
-> I have troubles figuring out how __tbl is being used uninitialized.
-> I wonder if the parameters naming is fooling clang (or me) somehow.
+Hello folks, please let me know if there=E2=80=99s a more appropriate place=
+ to
+ask this but I believe I=E2=80=99ve found something that isn=E2=80=99t supp=
+orted in
+iproute2 and would like to ask your thoughts.
 
-Not really a solution to this specific issue, but do you actually need
-ovpn_get_hash_slot as a separate macro? AFAICT all users could also be
-converted to ovpn_get_hash_head, then you can merge ovpn_get_hash_slot
-into ovpn_get_hash_head and maybe clang won't get confused?
+I am trying to encapsulate vlan tagged ethernet traffic inside of an
+l2tp tunnel.This is something that is actively used in controllerless
+wifi aggregation in large networks alongside Ethernet over GRE. There
+are draft RFCs that cover it as well. The iproute2 documentation I=E2=80=99=
+ve
+found on this makes it seem that it should work but isn=E2=80=99t explicit.
 
-No guarantee that this fixes anything (except saving one or two lines
-in a few functions).
+Using a freshly compiled iproute2 (on Rocky 8) I am able to make this
+work with GRE without issue. L2tp on the other hand seems to quietly
+drop the vlan header. I=E2=80=99ve tried doing the same with a bridge type
+setup and still see the same behavior. I've been unsuccessful in
+debugging it further, I don=E2=80=99t think the debug flags in iproute2's
+ipl2tp.c are functional and I suppose the issue might instead be in
+the kernel module which isn=E2=80=99t something I=E2=80=99ve tried debuggin=
+g before.
+Is this a bug? Since plain ethernet over l2tp works I assumed vlan
+support as well.
 
--- 
-Sabrina
+
+# Not Working L2TP:
+[root@iperf1 ~]# ip l2tp add tunnel tunnel_id 1 peer_tunnel_id 1 encap
+udp local 2.2.2.2 remote 1.1.1.1 udp_sport 1701 udp_dport 1701
+[root@iperf1 ~]# ip l2tp add session tunnel_id 1 session_id 1 peer_session_=
+id 1
+[root@iperf1 ~]# ip link add link l2tpeth0 name l2tpeth0.1319 type vlan id =
+1319
+[root@iperf1 ~]# ip link set l2tpeth0 up
+[root@iperf1 ~]# ip link set l2tpeth0.1319 up
+Results: (captured at physical interface, change wireshark decoding
+l2tp value 0 if checking yourself)
+VLAN header dropped
+Wireshark screenshot: https://i.ibb.co/stMsRG0/l2tpwireshark.png
+
+
+# Working GRE:
+[root@iperf1 ~]# ip link add name gre1 type gretap remote 1.1.1.1
+[root@iperf1 ~]# ip link add name gre1.120 link gre1 type vlan proto
+802.1q id 120
+[root@iperf1 ~]# ip link set gre1 up
+[root@iperf1 ~]# ip link set gre1.120 up
+Results:
+VLAN header present
+Wireshark screenshot: https://i.ibb.co/6rJWjg9/grewireshark.png
+
+
+-------------------------------------------------------
+~Preston Taylor
 
