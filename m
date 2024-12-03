@@ -1,211 +1,136 @@
-Return-Path: <netdev+bounces-148581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D129E23A1
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:40:46 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D86E09E2536
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:58:16 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04B65282A65
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:40:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C53BC16EEC3
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:52:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06AD20B808;
-	Tue,  3 Dec 2024 15:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACAB1F76D0;
+	Tue,  3 Dec 2024 15:51:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="eZ4U4tRU";
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="eZ4U4tRU"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fHCeqkM6"
 X-Original-To: netdev@vger.kernel.org
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0F820B7F2;
-	Tue,  3 Dec 2024 15:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1141E0496;
+	Tue,  3 Dec 2024 15:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733240099; cv=none; b=LtsNsGvhJHeu81DybNV1Tnad3qIu185S17gjtYYMfeIrQgzLqokNR79DHho68oaMlUZb+lWlwVDODEDmeZQaPwV2CYF2wnfaUadLjEyHfsKQ5H3Jvd5/2zqZXM/yjgQL6zuVBNE6C5qTr8tmjuqNDsY/jYvS3CR50e9S54tAQJ8=
+	t=1733241116; cv=none; b=jPtaFq+5fFuYxqW8wqbM6wfEOCOpsNE9aH63nJo25+12sYQS130yvQk2uKNCWO0CmAeG+9G39cmTrU48VC1mxEPImZNTOyT7/tkdE6pRtaDk2YckXgqIe2iATGSdPzg4k3H1GonUXH7elXelUqEKPF865PqvgJilAzZCW6k9R7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733240099; c=relaxed/simple;
-	bh=L/QXZvHG42gthQ6VgZcE1FVgbBCT68wm3yek2sYu4mw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cmgqloiInue402+/BJHVxQP5t0EI7sL5NRa4fqage/DVyh26AaN6TKl97ZPjT0dlmrn+HEGkp2zFri/+e8Yo5AWz3H/ZvbDnt//uVq19D38t8ZdlC28HxIWRWzuVt2dtSjEABCNQBZOftMpJ3zXsa2H+pxD8rxU6B+G6ok+KLwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=eZ4U4tRU; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=eZ4U4tRU; arc=none smtp.client-ip=96.44.175.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1733240096;
-	bh=L/QXZvHG42gthQ6VgZcE1FVgbBCT68wm3yek2sYu4mw=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=eZ4U4tRU1qIWP3lhCG1NFGqdlkJwbCoeHoXmlbwbm0xojoL7yxF2OmBDrwRg5sJZD
-	 yUR1Ufh9cMTmWMSk/QfvKgX3lU1FOQtEkMYCzG5HJRGBhs9c6tkPAgFURJTLia4EJE
-	 fFgUsJsyCn7Ieybkh2Zt2C6KjPseMR4k9lZkDFPA=
-Received: from localhost (localhost [127.0.0.1])
-	by bedivere.hansenpartnership.com (Postfix) with ESMTP id A95511286A94;
-	Tue, 03 Dec 2024 10:34:56 -0500 (EST)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
- by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
- with ESMTP id Nouo1dbPKzw4; Tue,  3 Dec 2024 10:34:56 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1733240096;
-	bh=L/QXZvHG42gthQ6VgZcE1FVgbBCT68wm3yek2sYu4mw=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=eZ4U4tRU1qIWP3lhCG1NFGqdlkJwbCoeHoXmlbwbm0xojoL7yxF2OmBDrwRg5sJZD
-	 yUR1Ufh9cMTmWMSk/QfvKgX3lU1FOQtEkMYCzG5HJRGBhs9c6tkPAgFURJTLia4EJE
-	 fFgUsJsyCn7Ieybkh2Zt2C6KjPseMR4k9lZkDFPA=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id F32C01286A7D;
-	Tue, 03 Dec 2024 10:34:50 -0500 (EST)
-Message-ID: <108c63c753f2f637a72c2e105ac138f80d4b0859.camel@HansenPartnership.com>
-Subject: Re: [PATCH v2 00/32] driver core: Constify API device_find_child()
- and adapt for various existing usages
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Zijun Hu <zijun_hu@icloud.com>, Thomas =?ISO-8859-1?Q?Wei=DFschuh?=
-	 <thomas@t-8ch.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Uwe
- =?ISO-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Chun-Kuang Hu <chunkuang.hu@kernel.org>, Philipp Zabel
- <p.zabel@pengutronix.de>, David Airlie <airlied@gmail.com>, Simona Vetter
- <simona@ffwll.ch>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Jean
- Delvare <jdelvare@suse.com>,  Guenter Roeck <linux@roeck-us.net>, Martin
- Tuma <martin.tuma@digiteqautomotive.com>, Mauro Carvalho Chehab
- <mchehab@kernel.org>, Andreas Noever <andreas.noever@gmail.com>, Michael
- Jamet <michael.jamet@intel.com>, Mika Westerberg
- <mika.westerberg@linux.intel.com>,  Yehezkel Bernat
- <YehezkelShB@gmail.com>, Linus Walleij <linus.walleij@linaro.org>, Bartosz
- Golaszewski <brgl@bgdev.pl>, Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean
- <olteanv@gmail.com>,  "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	s=arc-20240116; t=1733241116; c=relaxed/simple;
+	bh=bpMNhT7hs+A5dnCGGIqDp8qwNNx3fUETcoweFQOjllk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eqGlhlEN4RqLfuFq17v1l1vha0aNaBUKz6ykXg1CJYbzSK9bGOBRKalyIktZ1UlAsgte6k8K+cWV2DrzLCsvH/+sJVSQysMnLD30OIJXcQCE6njV5tHE5FbNyUJZ7juEWYMhwIm7sudVEI70VcodMhNdQ87930IiArCKvXc6NhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fHCeqkM6; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E8697FF811;
+	Tue,  3 Dec 2024 15:51:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1733241111;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6mUUXlg2Sdr2QZ9xxnJnQJbYN76Rdm3JD+IpxMezPKc=;
+	b=fHCeqkM6Iljfd74vtUc6Go6drgzqlVnBl28AhspXXsK9XVyHDw/IVJcBm9JqWph4Y99KxK
+	4Oro9o3pP/wPORR2+ulupss5Q9szZdXpVRv5q4lBhgqtHRUHexaRBubmlFgh8Yx88ACHrN
+	p67sdXIJNWOhgNSxbFIkX5JYKy6CVzPRqbh4XsfskquLEX4QaJSI3a50jia5diUnqVDPCH
+	YnQ8eWcVajvIpP7Ocm5NhTPzKrUMJlS8eRbBFUUg23B7A6ehwCIsDcQsk39VtL6VyNjWi2
+	iuT79F2GWfUNiGlkYhbyZHqSrZYL+gWTXPDyFVf2XDdLpvkQC/1ZdZIqCH5hPg==
+Date: Tue, 3 Dec 2024 16:51:47 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Dennis Ostermann
+ <dennis.ostermann@renesas.com>, "nikita.yoush"
+ <nikita.yoush@cogentembedded.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
  <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Dan Williams
- <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, Dave
- Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, Takashi
- Sakamoto <o-takashi@sakamocchi.jp>, Jiri Slaby <jirislaby@kernel.org>,
- Heikki Krogerus <heikki.krogerus@linux.intel.com>, Srinivas Kandagatla
- <srinivas.kandagatla@linaro.org>, Lee Duncan <lduncan@suse.com>, Chris
- Leech <cleech@redhat.com>, Mike Christie <michael.christie@oracle.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>, Nilesh Javali
- <njavali@marvell.com>, Manish Rangankar <mrangankar@marvell.com>,
- GR-QLogic-Storage-Upstream@marvell.com, Davidlohr Bueso
- <dave@stgolabs.net>, Jonathan Cameron <jonathan.cameron@huawei.com>, Alison
- Schofield <alison.schofield@intel.com>, Andreas Larsson
- <andreas@gaisler.com>, Stuart Yoder <stuyoder@gmail.com>, Laurentiu Tudor
- <laurentiu.tudor@nxp.com>, Jens Axboe <axboe@kernel.dk>, Sudeep Holla
- <sudeep.holla@arm.com>, Cristian Marussi <cristian.marussi@arm.com>, Ard
- Biesheuvel <ardb@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>, 
- linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
- linux-mediatek@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
- linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org, 
- linux-usb@vger.kernel.org, linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org,  linux-pwm@vger.kernel.org, nvdimm@lists.linux.dev,
-  linux1394-devel@lists.sourceforge.net, linux-serial@vger.kernel.org, 
- linux-sound@vger.kernel.org, open-iscsi@googlegroups.com, 
- linux-scsi@vger.kernel.org, linux-cxl@vger.kernel.org, 
- sparclinux@vger.kernel.org, linux-block@vger.kernel.org, 
- arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org, 
- linux-remoteproc@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-Date: Tue, 03 Dec 2024 10:34:49 -0500
-In-Reply-To: <f5ea7e17-5550-4658-8f4c-1c51827c7627@icloud.com>
-References: <20241203-const_dfc_done-v2-0-7436a98c497f@quicinc.com>
-	 <g32cigmktmj4egkq2tof27el2yss4liccfxgebkgqvkil32mlb@e3ta4ezv7y4m>
-	 <9d34bd6f-b120-428a-837b-5a5813e14618@icloud.com>
-	 <2024120320-manual-jockey-dfd1@gregkh>
-	 <b9885785-d4d4-4c72-b425-3dc552651d7e@icloud.com>
-	 <8eb7c0c54b280b8eb72f82032ede802c001ab087.camel@HansenPartnership.com>
-	 <8fb887a0-3634-4e07-9f0d-d8d7c72ca802@t-8ch.de>
-	 <f5ea7e17-5550-4658-8f4c-1c51827c7627@icloud.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 
+ <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michael Dege
+ <michael.dege@renesas.com>, Christian Mardmoeller
+ <christian.mardmoeller@renesas.com>
+Subject: Re: [PATCH] net: phy: phy_ethtool_ksettings_set: Allow any
+ supported speed
+Message-ID: <20241203165147.4706cc3b@fedora.home>
+In-Reply-To: <Z08h95dUlS7zacTY@shell.armlinux.org.uk>
+References: <73ca1492-d97b-4120-b662-cc80fc787ffd@cogentembedded.com>
+	<Z02He-kU6jlH-TJb@shell.armlinux.org.uk>
+	<eddde51a-2e0b-48c2-9681-48a95f329f5c@cogentembedded.com>
+	<Z02KoULvRqMQbxR3@shell.armlinux.org.uk>
+	<c1296735-81be-4f7d-a601-bc1a3718a6a2@cogentembedded.com>
+	<Z02oTJgl1Ldw8J6X@shell.armlinux.org.uk>
+	<5cef26d0-b24f-48c6-a5e0-f7c9bd0cefec@cogentembedded.com>
+	<Z03aPw_QgVYn8WyR@shell.armlinux.org.uk>
+	<TYCPR01MB1047854DA050E52CADB04393A8E362@TYCPR01MB10478.jpnprd01.prod.outlook.com>
+	<1ff52755-ef24-4e4b-a671-803db37b58fc@lunn.ch>
+	<Z08h95dUlS7zacTY@shell.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Tue, 2024-12-03 at 22:56 +0800, Zijun Hu wrote:
-> On 2024/12/3 22:07, Thomas Weißschuh wrote:
-> > On 2024-12-03 08:58:26-0500, James Bottomley wrote:
-> > > On Tue, 2024-12-03 at 21:02 +0800, Zijun Hu wrote:
-> > > > On 2024/12/3 20:41, Greg Kroah-Hartman wrote:
-> > > > > On Tue, Dec 03, 2024 at 08:23:45PM +0800, Zijun Hu wrote:
-> > > [...]
-> > > > > > or squash such patch series into a single patch ?
-> > > > > > 
-> > > > > > various subsystem maintainers may not like squashing way.
-> > > > > 
-> > > > > Agreed, so look into either doing it in a bisectable way if
-> > > > > at all possible.  As I don't see a full series here, I can't
-> > > > > suggest how it needs to happen :(
-> > > > > 
-> > > > 
-> > > > let me send you a full series later and discuss how to solve
-> > > > this issue.
+Hi Andrew,
+
+On Tue, 3 Dec 2024 15:21:27 +0000
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+
+> On Tue, Dec 03, 2024 at 03:45:09PM +0100, Andrew Lunn wrote:
+> > On Tue, Dec 03, 2024 at 02:05:07PM +0000, Dennis Ostermann wrote:  
+> > > Hi,
 > > > 
-> > > It's only slightly more complex than what we normally do: modify
-> > > all instances and then change the API.  In this case you have an
-> > > additional problem because the prototype "const void *" will
-> > > cause a mismatch if a function has "void *".  The easiest way to
-> > > solve this is probably to make device_find_child a macro that
-> > > coerces its function argument to having a non const "void *" and
-> > > then passes off to the real function.  If you do that in the
-> > > first patch, then you can constify all the consumers and finally
-> > > remove the macro coercion in the last patch.
+> > > according to IEE 802.3-2022, ch. 125.2.4.3, Auto-Negotiation is optional for 2.5GBASE-T1
+> > >   
+> > > > 125.2.4.3 Auto-Negotiation, type single differential-pair media
+> > > > Auto-Negotiation (Clause 98) may be used by 2.5GBASE-T1 and 5GBASE-T1 devices to detect the
+> > > > abilities (modes of operation) supported by the device at the other end of a link segment, determine common
+> > > > abilities, and configure for joint operation. Auto-Negotiation is performed upon link startup through the use
+> > > > of half-duplex differential Manchester encoding.
+> > > > The use of Clause 98 Auto-Negotiation is optional for 2.5GBASE-T1 and 5GBASE-T1 PHYs  
+> > > 
+> > > So, purposed change could make sense for T1 PHYs.  
 > > 
-> > Casting function pointers like that should be detected and trapped
-> > by control flow integrity checking (KCFI).
-> > 
-> > Another possibility would be to use a macro and _Generic to
-> > dispatch to two different backing functions. See __BIN_ATTR() in
-> > include/linux/sysfs.h for an inspiration.
+> > The proposed change it too liberal. We need the PHY to say it supports
+> > 2.5GBASE-T1, not 2.5GBASE-T. We can then allow 2.5GBASE-T1 to not use
+> > autoneg, but 2.5GBASE-T has to use autoneg.  
+> 
+> I'm wondering whether we should add:
+> 
+> 	__ETHTOOL_DECLARE_LINK_MODE_MASK(requires_an);
+> 
+> to struct phy_device, and have phylib populate that by default with all
+> base-T link modes > 1G (which would be the default case as it is now.)
+> Then, PHY drivers can change this bitmap as they need for their device.
+> After the PHY features have been discovered, this should then get
+> AND-ed with the supported bitmap.
 
-That's way over complicated for this conversion: done properly there
-should be no need for _Generic() compile time type matching at all.
+If the standards says that BaseT4 >1G needs aneg, and that we can't
+have it for baseT1, couldn't we just have some lookup table for each
+mode indicating if they need or support aneg ? I'm thinking about
+something similar as the big table in net/ethtool/common.c where we
+have the linkmode - speed - duplex - lanes mapping :
 
-> this way may fix building error issue but does not achieve our
-> purpose. our purpose is that there are only constified
-> device_find_child().
-> 
-> 
-> > This also enables an incremental migration.
-> 
-> change the API prototype from:
-> device_find_child(..., void *data_0, int (*match)(struct device *dev,
-> void *data));
-> 
-> to:
-> device_find_child(..., const void *data_0, int (*match)(struct device
-> *dev, const void *data));
-> 
-> For @data_0,  void * -> const void * is okay.
-> but for @match, the problem is function pointer type incompatibility.
-> 
-> there are two solutions base on discussions.
-> 
-> 1) squashing likewise Greg mentioned.
->    Do all of the "prep work" first, and then
->    do the const change at the very end, all at once.
-> 
-> 2)  as changing platform_driver's remove() prototype.
-> Commit: e70140ba0d2b ("Get rid of 'remove_new' relic from platform
-> driver struct")
-> 
->  introduce extra device_find_child_new() which is constified  -> use
-> *_new() replace ALL device_find_child() instances one by one -> 
-> remove device_find_child() -> rename *_new() to device_find_child()
-> once.
+https://elixir.bootlin.com/linux/v6.12.1/source/net/ethtool/common.c#L270
 
-Why bother with the last step, which churns the entire code base again?
-Why not call the new function device_find_child_const() and simply keep
-it (it's descriptive of its function).  That way you can have a patch
-series without merging and at the end simply remove the old function.
+maybe looking it up for each config operation would be too expensive ?
+or it maybe isn't flexible enough in case we have to deal with
+phy-pecific quirks...
 
-Regards,
+Maxime
 
-James
 
 
