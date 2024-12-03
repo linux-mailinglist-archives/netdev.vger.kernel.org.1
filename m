@@ -1,157 +1,142 @@
-Return-Path: <netdev+bounces-148592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B76129E27AA
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:37:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E96009E282F
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:52:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 771AE286940
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:37:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53024BC2F86
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE12A1F8AD4;
-	Tue,  3 Dec 2024 16:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC001FC0EC;
+	Tue,  3 Dec 2024 16:45:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ftom6kRc"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WdWBTCpu"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7259C1F76BC;
-	Tue,  3 Dec 2024 16:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E5E1FBEA8
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 16:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733243847; cv=none; b=Muw6qKKPdOjZ6t1L6tAye/y6/rQW91F7tmqpL1cVLahdw1A8Jqx57bQmtyvToXKf8I97ezwgn50y2dvDYndymzlIHEcsj8eGrI2zCeZC/KtiXqu9L29WBlJ9PqgswY89bHsc0kRKEZWariznQSrxvgh6q1KmjuFDRedAtS0sIuo=
+	t=1733244350; cv=none; b=TiXVYg1CZyBu1XNnQPc0ptpmdn11OlKeljS9i2TUqMVS9+/a/2K1h5uIUGT+p3WoZh/BUKtqQn3bkWObhEVIma7q4DqHrqe54s3gkEl+PwwVtzEVEcXrKe/hD9g30rU5N/jZozaWaYJebbs0jj7gNglY/JI/wpj0xBNEj2/LL5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733243847; c=relaxed/simple;
-	bh=G7HyrFe72+oitC4q4Te/YLaHT49oETpwcd2VcnKylhY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wbf4f4jpGFQjVhAAODvmnD2zwXKSx5NIx7nDSyFOC8wdGhmqY4yU7CezF7tyEDwvtF2akHlfsUtJAJwcQwj+JDSYFKliWWHjWOcTvNE1YpPiJvOgSB8zy/Ymhe7DUieH8soK5ahVWJJG92v3G9AN8U8nRWodVZZtN/66GxrKKDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ftom6kRc; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=vtg5kgR3ORav6GpvoI4HJZs080IrHQwvmLbc1RQ21fQ=; b=ftom6kRcfoNNnL7M3OobZtc2wW
-	IL6jehD17o658D1VERtVxcVeJaVpojtp0qxgdUGm8PFI2NMw/+uZ1ewKSM9DKzJE5RP4sarkT16J8
-	zV5TjMJhphX+KKLqSrSehiv6St1X79/44h45k5zOzlSbzapyBfodQkeAPUznNdsHwtmtyJYkzTYVx
-	eAi4E8f4SqfYkwsWiEA0QyuOA4xm91LnyP0MpbpEs69PJ/cSxkwCPWniu+EW+pwi+iL9WExlB949B
-	LpwhqTen0RKe8c1rFixbZFcid6L9TICWPFHsNVTBvB+YMsEeZSE3zYwt2p4wNwQcaYbUU8+j59mwN
-	y8jqHFAg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49004)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tIVtj-0002E3-08;
-	Tue, 03 Dec 2024 16:37:15 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tIVte-0004h5-2z;
-	Tue, 03 Dec 2024 16:37:11 +0000
-Date: Tue, 3 Dec 2024 16:37:10 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Dennis Ostermann <dennis.ostermann@renesas.com>,
-	"nikita.yoush" <nikita.yoush@cogentembedded.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Michael Dege <michael.dege@renesas.com>,
-	Christian Mardmoeller <christian.mardmoeller@renesas.com>
-Subject: Re: [PATCH] net: phy: phy_ethtool_ksettings_set: Allow any supported
- speed
-Message-ID: <Z08ztsAG8x8uqCwJ@shell.armlinux.org.uk>
-References: <eddde51a-2e0b-48c2-9681-48a95f329f5c@cogentembedded.com>
- <Z02KoULvRqMQbxR3@shell.armlinux.org.uk>
- <c1296735-81be-4f7d-a601-bc1a3718a6a2@cogentembedded.com>
- <Z02oTJgl1Ldw8J6X@shell.armlinux.org.uk>
- <5cef26d0-b24f-48c6-a5e0-f7c9bd0cefec@cogentembedded.com>
- <Z03aPw_QgVYn8WyR@shell.armlinux.org.uk>
- <TYCPR01MB1047854DA050E52CADB04393A8E362@TYCPR01MB10478.jpnprd01.prod.outlook.com>
- <1ff52755-ef24-4e4b-a671-803db37b58fc@lunn.ch>
- <Z08h95dUlS7zacTY@shell.armlinux.org.uk>
- <20241203165147.4706cc3b@fedora.home>
+	s=arc-20240116; t=1733244350; c=relaxed/simple;
+	bh=8txQri0Jmwt48AK6CtbRreZE0/5HdwYGUUmq7fLofI8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NfRT0H9l5Cxw9tj/p9+fmKdGwyC/36XVb0RzXnZyk9rBnMoHk4oJurErsavsm011qraFKztQ3pmFSP/YjkQ5OVvaaOEHrxyeQ965VpSpzxoEwkJp5grR1ivmQBrK8uYgi0qqwUQuz3TjSBrPOONJnA3Tt3XGMGU90ADjbxFi0ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WdWBTCpu; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7fc22a88bcbso4332987a12.2
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 08:45:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1733244348; x=1733849148; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vqzroi2FrSBFbVBo+3KvSzH84y6uOPLgIyNQPhDZkb0=;
+        b=WdWBTCpu41fAYY9HkjMGwEJ8Uo2Pl8GE9RCh5KbzNmWippvjcBrdPNtRgurq1vyvmx
+         4TyZwGS/jw/NRGj4YNEu3F9vE98t3tJ5c7ZpBxaDaI5VOI0S5Z7SBieHCLtxj6NP4GS5
+         SMHM2jxO37rkMXvAzjccJDjRT3+1IX1Hf7bWA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733244348; x=1733849148;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vqzroi2FrSBFbVBo+3KvSzH84y6uOPLgIyNQPhDZkb0=;
+        b=buqzvK96P5lhalIaQWmzdATAKVklLmxGGWVZH8iStdCmlVsOaJMyzEZQQ2DBvyWUj3
+         seag9YFt141LgrcSfLSb2x90zT/v3kPUMLoy0jV1o6X/zTQUN3GrbRK2HSwoYnm1oNu7
+         8D01FppoR6OZSC93K9S9lgzj8aDOi7HIS+7Lylz9hvnrxVNziBIa1sG46bGAEGbR/N3/
+         NAsQqbmQGLaZd1tyk8or6GMLkVD+zTPcx3+F+WCQ/8FXR0ZZ9ann0UhRz8WkX3PijFG8
+         T8sGPvMROIg80ro/ldnoyun1Ub5KTm8FJV3TWCOPNSrAxaOAE9t2MTBK98EcC0qdX99W
+         B9wA==
+X-Forwarded-Encrypted: i=1; AJvYcCVZnBcfOz3Jjo6n68tAgiW9IVd0uFXgvx0OzUcD5TxFWouAjfyqAM80XWaVLnTfeWOggbnwcrE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyY8gnQ55MR9qsDvP7XxTGk2Hv0pOPIBqkbjFqckqOHVphEh/b4
+	yKZe2dO4m0udwarLiKfhE0/7NrTbTu+wZy1Icb0JfNLB1FAnXxAPuRzH1hN6uFar0RsyIXsyb2c
+	FTA==
+X-Gm-Gg: ASbGncuebNtDrzIohdEq/iAuKqDUFJzWrm3c6+8NzID5Ob+DjUaQ6KfabyUDBVQKZVZ
+	4Jbj4ps295zxgGy8NthAvlHY0ci59njogGemX+wdysDYtCEwKzFX8qmlsXyPTtNF0DDMgtkLP7+
+	xvjhZbERSDU7dWp6KdBLWocqT5MGV7+Uf5deRh+nwbfTN06XDdaWTiTPEzz7SoDZc1FpZ8k2vzI
+	mWUWoJqJ8jwy+ebg09IlIw8fWe+AY2pgXfLt/b9qB2UGQPVWxpjRy9txX/JmXEPuGmu8JYHMwYe
+	844LdV2lw7970A==
+X-Google-Smtp-Source: AGHT+IHy81B9W/Klpa0QcKbJZTdIad+AmSU5nnOj0DjYR160KfbJ28YOLg7kcsWLJH1CuNdZ6TTA1Q==
+X-Received: by 2002:a05:6a20:12d2:b0:1e0:cc21:19a2 with SMTP id adf61e73a8af0-1e1653a6494mr4289618637.1.1733244348551;
+        Tue, 03 Dec 2024 08:45:48 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72541848b36sm11039685b3a.187.2024.12.03.08.45.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Dec 2024 08:45:47 -0800 (PST)
+Message-ID: <fd39b546-3cea-4a4b-b6fc-edb5c2983966@broadcom.com>
+Date: Tue, 3 Dec 2024 08:45:46 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241203165147.4706cc3b@fedora.home>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 05/13] net: phy: bcm84881: implement
+ phy_inband_caps() method
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <Z08kCwxdkU4n2V6x@shell.armlinux.org.uk>
+ <E1tIUrj-006IU6-ON@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <E1tIUrj-006IU6-ON@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 03, 2024 at 04:51:47PM +0100, Maxime Chevallier wrote:
-> Hi Andrew,
+On 12/3/24 07:31, Russell King (Oracle) wrote:
+> BCM84881 has no support for inband signalling, so this is a trivial
+> implementation that returns no support for inband.
 > 
-> On Tue, 3 Dec 2024 15:21:27 +0000
-> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> 
-> > On Tue, Dec 03, 2024 at 03:45:09PM +0100, Andrew Lunn wrote:
-> > > On Tue, Dec 03, 2024 at 02:05:07PM +0000, Dennis Ostermann wrote:  
-> > > > Hi,
-> > > > 
-> > > > according to IEE 802.3-2022, ch. 125.2.4.3, Auto-Negotiation is optional for 2.5GBASE-T1
-> > > >   
-> > > > > 125.2.4.3 Auto-Negotiation, type single differential-pair media
-> > > > > Auto-Negotiation (Clause 98) may be used by 2.5GBASE-T1 and 5GBASE-T1 devices to detect the
-> > > > > abilities (modes of operation) supported by the device at the other end of a link segment, determine common
-> > > > > abilities, and configure for joint operation. Auto-Negotiation is performed upon link startup through the use
-> > > > > of half-duplex differential Manchester encoding.
-> > > > > The use of Clause 98 Auto-Negotiation is optional for 2.5GBASE-T1 and 5GBASE-T1 PHYs  
-> > > > 
-> > > > So, purposed change could make sense for T1 PHYs.  
-> > > 
-> > > The proposed change it too liberal. We need the PHY to say it supports
-> > > 2.5GBASE-T1, not 2.5GBASE-T. We can then allow 2.5GBASE-T1 to not use
-> > > autoneg, but 2.5GBASE-T has to use autoneg.  
-> > 
-> > I'm wondering whether we should add:
-> > 
-> > 	__ETHTOOL_DECLARE_LINK_MODE_MASK(requires_an);
-> > 
-> > to struct phy_device, and have phylib populate that by default with all
-> > base-T link modes > 1G (which would be the default case as it is now.)
-> > Then, PHY drivers can change this bitmap as they need for their device.
-> > After the PHY features have been discovered, this should then get
-> > AND-ed with the supported bitmap.
-> 
-> If the standards says that BaseT4 >1G needs aneg, and that we can't
-> have it for baseT1, couldn't we just have some lookup table for each
-> mode indicating if they need or support aneg ?
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-When operating in !AN mode, all that the ethtool API passes is the
-speed and duplex, with a guess at the advertising mask (which doesn't
-take account of the PHY's supported ethtool link modes.)
-
-If e.g. we have a PHY that supports 1000base-T and 1000base-X, and the
-user attempts to disable AN specifying speed 1000 duplex full, we don't
-know whether the user means 1000base-T (which actually requires AN, but
-we work around that *) or 1000base-X without AN.
-
-Specifying speed + duplex for !AN is nice for humans, but ambiguous
-for computers.
-
-* - the workaround adopted is to do what Marvell PHYs internally do but
-in phylib code, which is to accept the request to disable AN and
-operate at the specified speed, but actually program AN to be enabled
-with only a single speed/duplex that can be negotiated. Without this,
-we end up with hacks in MAC drivers because the PHY they're paired with
-doesn't support AN being disabled at 1G speed. See
-__genphy_config_aneg(). Note: this is probably going to interact badly
-with the baseT1 case.
-
+Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Florian
 
