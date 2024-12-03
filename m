@@ -1,135 +1,115 @@
-Return-Path: <netdev+bounces-148586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E9949E2762
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:27:38 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20A129E273E
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:23:19 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D1D4C0070B
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:17:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 148CD1648C4
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0883A1F893B;
-	Tue,  3 Dec 2024 16:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E041F8921;
+	Tue,  3 Dec 2024 16:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="QyT1FJ2U";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lnJjani1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eQ796POB"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27D21F890F;
-	Tue,  3 Dec 2024 16:16:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30811F76A4;
+	Tue,  3 Dec 2024 16:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733242617; cv=none; b=Ll0yAA27QYAzZpboVADlzItG/Ix4t773FZGJLXpS43hFb/9hwecxYbhqc5BdIQMQHOS3+Upc6FPDpBzA3PHn6gCbilyUwtmsFWvNaHbULURYDe+DYFZfCF/2rA7RQHgeEuOx/PcSNXMhDrXXL4FndocelrenA7gnavCBGNwT/2M=
+	t=1733242873; cv=none; b=Oqrs8jc5F1PiL5N28g3Rtf1Zzo3LjxRA/lKXj1YV2JwUn9PwRGNCqDJgxdkjW5lqNrA03py54HjObYjmlMOXunBv5u2kvsJDtYg0IgRgJZaipdCpjrhi+xTytPZ6uHzzdSWJP3ARFWeJo40wLznY5+wufZARo06HpGUU/kXxLo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733242617; c=relaxed/simple;
-	bh=8bO7rPiHqGcj8rgFexgowDvFuLShceURQRePFZyB4cw=;
+	s=arc-20240116; t=1733242873; c=relaxed/simple;
+	bh=/NcUnBYCseC1c5n4V7Yq6LjgKQASIenEHRjXnxEaO+s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cn+b1zQcfB7j1I7D/Jw27SFNAoIHoJ/Al/9Ga901TY/xDEEdXThaUAoy5wtZAvq/cOqVSwD2GJ+Q9sUvFkjmPmQwotQ2iABG7SL1Ce2RvCm/TeXkgO6I9HWYdNbq2K4kbn/4w8Ad3H8prraBAq+YLs1lgEWjoideL/QpbUT/KPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=QyT1FJ2U; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lnJjani1; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfout.phl.internal (Postfix) with ESMTP id DF70613806F4;
-	Tue,  3 Dec 2024 11:16:54 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Tue, 03 Dec 2024 11:16:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1733242614; x=
-	1733329014; bh=soA7+8FQO1KKs3kc6J6D1x22RsRkfzIXVBpqgSVfyn4=; b=Q
-	yT1FJ2UB006TGQDLzfz6pxPOKKgVCVDna6/mBbqeOoMd7TEc0FpWOpq5gNC3k4wY
-	BRs+jfIEwj1HWvjV7o+vURqytprp/zp0CQEDgtpdxAk5IlxPEj5sQiYKrh4FRjs7
-	gFEzWB/NvygoIRvtxQgxfH0CCQTK0Ff++1OAmldSPYazSvMoYTeBrnT3if1oHnu0
-	/4oDg9frneTebCJnJiNFMln3PRCFTYYmg9fLjRVXq0SFMBXcif6ExHOQUhbwflqX
-	kh1ABS/Sg4w8ndYTPbzuExKIvggmzF4wai4FH5my7oyl6riIXEutY+6LioTIPYuI
-	D8qknvWExZACPxUSXbTIg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1733242614; x=1733329014; bh=soA7+8FQO1KKs3kc6J6D1x22RsRkfzIXVBp
-	qgSVfyn4=; b=lnJjani1FdFQAz8Xah20ibLcD/8VizGfvnmzn3JPIwHu8FwdG6O
-	RtgDNJV5ZR7cLv0107ZfO3jciLxLJUlM6m2uegQ1AqSX8HzOBPumGF2iJNVP0nvP
-	6Th9+N7QuhOXsxHtwKdAhkUL1jVmF6tBA6clq7ulAFHjwsSZqG4l4CxUw3/6k1tt
-	aZ8Hx6CuKOixmXSFEvHfNODFHesH+j1sDAUA3e1FXvcgJUakfKJupxOnqbzBiaP9
-	iQUwYd1Zv7FDXEWvIPXehgUVQhxfm9Te2uYm8GccbvNyoR3w6/JajYglGyXUNvZQ
-	F6Y691xUk818ZuBpYtlbXdgLGzgO4uj2vGw==
-X-ME-Sender: <xms:9i5PZ4YIiorGXqMXrMZ1_F-agbNPBPV08BIbcWB9ua9JLgVllDessw>
-    <xme:9i5PZzYh7FfyCF1lrI7D-HbUfOU5qla6qsC_dky2sv_Yw8cqvAQzKWAkTYbbVE3G_
-    HHlrbgv2Sdp10smd4Q>
-X-ME-Received: <xmr:9i5PZy8Aif6W9tv3ORcBNUhzTLK3VyVtVn3ytzJs25oKHky4M0-scOs6pGAm>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieefgdehjecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehkuhgsrgeskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepvhhfvgguohhrvghnkhhosehnohhvvghkrdhruhdprhgtph
-    htthhopehfkhhrvghniigvlhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhhunhhi
-    hihusegrmhgriihonhdrtghomhdprhgtphhtthhopegrphhoohhrvhhkohesrghmrgiioh
-    hnrdgtohhmpdhrtghpthhtohepsghorhhishhpsehnvhhiughirgdrtghomhdprhgtphht
-    thhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhope
-    hshhhurghhsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:9i5PZyq6tqjeqf-Sl__ztL-Pg_Trmgl-x3G85uwlgQIfxQQwNBqiiQ>
-    <xmx:9i5PZzrECkia_IjbGcVRGvFvrr1o1eG6g-aBFVjNE8EcGF3A__pjUw>
-    <xmx:9i5PZwRFQAvT3TuUXMb1oOhFmWokWtFHU9hBzwAW5Fj3c2cCcaXpxw>
-    <xmx:9i5PZzqMrBJ0fRm_xgbCcGTuedOocInlvczLPc-oESvLXmjkSr_kBg>
-    <xmx:9i5PZ854wzJTkG-feuTQiFVUf9MGQ_47jbk8Df5y-nvtGqyX5PpAs7xv>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 3 Dec 2024 11:16:53 -0500 (EST)
-Date: Tue, 3 Dec 2024 17:16:52 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vfedorenko@novek.ru>,
-	Frantisek Krenzelok <fkrenzel@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Apoorv Kothari <apoorvko@amazon.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v4 0/6] tls: implement key updates for TLS1.3
-Message-ID: <Z08u9FoNOeEbWSM_@hog>
-References: <cover.1731597571.git.sd@queasysnail.net>
- <20241118194158.493e11ec@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MaSFbt5Kp2irIosAaJRcqp343pswZhiiKg6CN27TkfO53oUcWhlmPdah503SbOuabVQeTLhciWefjpPgIxl//Yd/JsBCi2iRlGJuB1gnC+/7r6tV3Ui78l3/sDSpuDDyf6AXY2LFGaEBwQInCJo/4XGEMUAfec2gsK27MH1tISw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eQ796POB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C934C4CECF;
+	Tue,  3 Dec 2024 16:21:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733242873;
+	bh=/NcUnBYCseC1c5n4V7Yq6LjgKQASIenEHRjXnxEaO+s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eQ796POBt2fYvbC3ysEMGNeA5CtoJzxBlDTX6eG+yK39IZOhTMotpSj5tnJk+vwiL
+	 mNZ+IaWjfYhO/8bfOeVH1FjwZ7PuHcN+O3qEcx0evXBNxxHySYDQ/EeI/nmSNZNkwo
+	 Hf4BPc87WAjCZUV6UIGe0wCrZ2xGUBROSyEI5RJchsUoPYnzrnvfkjLYqh0mHdSMdc
+	 2ipa40ettnZd1j8piE131QCLLAalP0opU4TcHfIR7NmTO0k8jeDEDQh8wTfAz1qT2M
+	 kOq6CcpskOJYZgFNos/WOC2f90YAqmD8e/CANI9UrSGok8Uq+xDHjK1aEi48DhKrkT
+	 gMxlq6gF8gJSQ==
+Date: Tue, 3 Dec 2024 16:21:07 +0000
+From: Simon Horman <horms@kernel.org>
+To: Michael Kelley <mhklinux@outlook.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	Long Li <longli@microsoft.com>, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Leon Romanovsky <leon@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Dexuan Cui <decui@microsoft.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: mana: Fix memory leak in mana_gd_setup_irqs
+Message-ID: <20241203162107.GF9361@kernel.org>
+References: <20241128194300.87605-1-mlevitsk@redhat.com>
+ <SN6PR02MB4157DBBACA455AC00A24EA08D4292@SN6PR02MB4157.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241118194158.493e11ec@kernel.org>
+In-Reply-To: <SN6PR02MB4157DBBACA455AC00A24EA08D4292@SN6PR02MB4157.namprd02.prod.outlook.com>
 
-Hey Jakub,
-
-2024-11-18, 19:41:58 -0800, Jakub Kicinski wrote:
-> On Thu, 14 Nov 2024 16:50:47 +0100 Sabrina Dubroca wrote:
-> > This adds support for receiving KeyUpdate messages (RFC 8446, 4.6.3
-> > [1]). A sender transmits a KeyUpdate message and then changes its TX
-> > key. The receiver should react by updating its RX key before
-> > processing the next message.
+On Thu, Nov 28, 2024 at 09:49:35PM +0000, Michael Kelley wrote:
+> From: Maxim Levitsky <mlevitsk@redhat.com> Sent: Thursday, November 28, 2024 11:43 AM
+> > 
+> > Commit 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
+> > added memory allocation in mana_gd_setup_irqs of 'irqs' but the code
+> > doesn't free this temporary array in the success path.
+> > 
+> > This was caught by kmemleak.
+> > 
+> > Fixes: 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  drivers/net/ethernet/microsoft/mana/gdma_main.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > index e97af7ac2bb2..aba188f9f10f 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > @@ -1375,6 +1375,7 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+> >  	gc->max_num_msix = nvec;
+> >  	gc->num_msix_usable = nvec;
+> >  	cpus_read_unlock();
+> > +	kfree(irqs);
+> >  	return 0;
+> > 
+> >  free_irq:
 > 
-> Will review tomorrow/Wednesday but I haven't gotten to this in time 
-> for 6.13, sorry :(
+> FWIW, there's a related error path leak. If the kcalloc() to populate
+> gc->irq_contexts fails, the irqs array is not freed. Probably could
+> extend this patch to fix that leak as well.
 
-Is this still on your todo list, or do you want me to resend? No
-problem either way.
-
--- 
-Sabrina
+Yes, as that problem also appears to be introduced by the cited commit
+I agree it would be good to fix them both in one patch.
 
