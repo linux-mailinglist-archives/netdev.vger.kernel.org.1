@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-148478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B7B39E1CE1
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 13:59:59 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80FC69E1CE2
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:00:00 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50E46282082
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 12:59:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 476A71620F5
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 12:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 921701EC019;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BACA81EE002;
 	Tue,  3 Dec 2024 12:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="W5pj16qL"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="C8rxz9ti"
 X-Original-To: netdev@vger.kernel.org
 Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDE71EB9E5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870C01E53A;
 	Tue,  3 Dec 2024 12:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733230794; cv=none; b=nVAwNGyt2USmyNp+gpAEyrlDMYFQJWRffkcxEI+dEyO96H+cAZ6bNzki89LDNX8TuFd6ZwMQcZW/zkCsuRlkhORumjIaez1VY7svCtGh0e26J7YeRZ30ZmV3FZWVRUO5lg/+a0bMy6mvT0fP0z8BeLDS5f1LE0NpCTqMDB+a9RI=
+	t=1733230794; cv=none; b=cfgkUVj7Z0s31gV8gREhr1rU41PJYDoMkS4Q2CuGwkQSzbKfwMrs/716StNmrZQMzUFO46zNrm7OnR94XJFuoA3Qo1WfQxmdO1zQn2Tkth0VmC0nQYslrfT0WZwU+9AqHa/2uHCo4gq4zV7JflxIJuQYzZBZlquxo/gzbEqiGoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1733230794; c=relaxed/simple;
-	bh=cF1iOYXgx7EUZBi/kFYrkWmAEw8t0MrdXPp2O/hCa+U=;
+	bh=NxyQcAFC+EIcEx4ym0rUYYFqK38LZuoe4X6+NBqzFI8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WaJPbSPI6cVvjl9BksCdiDtHeIZbTrodFnk9ViJplYaU1LJIxKGd4LH5oHff44pBqsBJtaiDIo7y1GqXRVPth4RETBl2GZUb/yRu3kzhEIdQ/zRiIbt7Sd6WtA21+tqAFazcf1rZHm52VwRbw9ph1RVLVrDY/wF2Vx8+1alerwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=W5pj16qL; arc=none smtp.client-ip=139.165.32.111
+	 MIME-Version; b=Cz40q7j+IUSdtwDyhAoT0mjaO6NZ3wGx1ctUPgYuCuYHf72ESzazlA4YwLMwujnGwJiVW3u1f8SkXBbmhBPxWJE6OFAVaWKqsf0Tsa0BrpGSpcn6L+qBCauV2tE0VYn1tPIWq2vdJtsZzH8wAkNruIT/qzdPIWMwWOaYx+lrIp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=C8rxz9ti; arc=none smtp.client-ip=139.165.32.111
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
 Received: from ubuntu.home (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 12ACE200E1E1;
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 66573200E1FD;
 	Tue,  3 Dec 2024 13:49:54 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 12ACE200E1E1
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 66573200E1FD
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
 	s=ulg20190529; t=1733230194;
-	bh=to687Gkwrc1hnQQoEgmLYx3ysEJ7wdMxa7NT5CZGMhM=;
+	bh=mQveZItNLzTIo34Os3uLO1zS26WneyxGStddfBwzByY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=W5pj16qLcx3onLyITgvmUxxBF+/kBPdXGh3BXyvsDk9NgQb6UjAMvN5MrcBxtIICA
-	 tLD0w1u1t6A+uM3G0FHtMT8KFQECKvCw28N2AOUPgjqnS9KPLwCRkFR9Msaqp8/R8u
-	 /5MA47R/mEX4e8C4C53Nhs/0avUxgWuXbq4zpB70zDWBXmwTc6VKDxpy76Fi9FB8Xg
-	 bEhcC6TluGpbfPEiJ3Ui2QZr+kMJtC3SOXra7d5SLT48f5rrxjokooTes5W0Luc9Rr
-	 5JUQm9q+Evkeeuk5MyUcsGmwr8dbh/s5yyD5ARoFjoGqCpWfgYTxjUyxusIix9ARQi
-	 jD3DkyKgm0gxw==
+	b=C8rxz9tifz7t2Kfe0pHs6PzAEWQcj9sBUMn9hS5/R8izQBdPsmoCV7ObTGyZFHeZ6
+	 UlY1lz7kuF4wsIPb029ai8NyJt/Hyy72k4LFgtqWR/sCPLxMVv4mVmccuBJTJwFahU
+	 raVyLBcaoogGvfU0YreNm2FJodoMw6RKGtQD4I6y8RStBxVPL62BJLPFGexcahFRdq
+	 3OIzBzOARPDsBGN5rDspPb72RYkF2rFaZrK9WEHbUo41ke6Tvo2aeAzKWxblUSr+LQ
+	 8jED026kdws+VTPJZ7brl8PPx+joIx4Q9Ivu2485cea7srv69Imr1DS+XfAkf9HPkv
+	 W8zWFNgPJr8dQ==
 From: Justin Iurman <justin.iurman@uliege.be>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -56,12 +56,10 @@ Cc: davem@davemloft.net,
 	pabeni@redhat.com,
 	horms@kernel.org,
 	linux-kernel@vger.kernel.org,
-	justin.iurman@uliege.be,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [RESEND PATCH net-next v5 1/4] include: net: add static inline dst_dev_overhead() to dst.h
-Date: Tue,  3 Dec 2024 13:49:42 +0100
-Message-Id: <20241203124945.22508-2-justin.iurman@uliege.be>
+	justin.iurman@uliege.be
+Subject: [RESEND PATCH net-next v5 2/4] net: ipv6: ioam6_iptunnel: mitigate 2-realloc issue
+Date: Tue,  3 Dec 2024 13:49:43 +0100
+Message-Id: <20241203124945.22508-3-justin.iurman@uliege.be>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241203124945.22508-1-justin.iurman@uliege.be>
 References: <20241203124945.22508-1-justin.iurman@uliege.be>
@@ -73,40 +71,181 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add static inline dst_dev_overhead() function to include/net/dst.h. This
-helper function is used by ioam6_iptunnel, rpl_iptunnel and
-seg6_iptunnel to get the dev's overhead based on a cache entry
-(dst_entry). If the cache is empty, the default and generic value
-skb->mac_len is returned. Otherwise, LL_RESERVED_SPACE() over dst's dev
-is returned.
+This patch mitigates the two-reallocations issue with ioam6_iptunnel by
+providing the dst_entry (in the cache) to the first call to
+skb_cow_head(). As a result, the very first iteration may still trigger
+two reallocations (i.e., empty cache), while next iterations would only
+trigger a single reallocation.
+
+Performance tests before/after applying this patch, which clearly shows
+the improvement:
+- inline mode:
+  - before: https://ibb.co/LhQ8V63
+  - after: https://ibb.co/x5YT2bS
+- encap mode:
+  - before: https://ibb.co/3Cjm5m0
+  - after: https://ibb.co/TwpsxTC
+- encap mode with tunsrc:
+  - before: https://ibb.co/Gpy9QPg
+  - after: https://ibb.co/PW1bZFT
+
+This patch also fixes an incorrect behavior: after the insertion, the
+second call to skb_cow_head() makes sure that the dev has enough
+headroom in the skb for layer 2 and stuff. In that case, the "old"
+dst_entry was used, which is now fixed. After discussing with Paolo, it
+appears that both patches can be merged into a single one -this one-
+(for the sake of readability) and target net-next.
 
 Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
- include/net/dst.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/ipv6/ioam6_iptunnel.c | 73 ++++++++++++++++++++-------------------
+ 1 file changed, 37 insertions(+), 36 deletions(-)
 
-diff --git a/include/net/dst.h b/include/net/dst.h
-index 0f303cc60252..08647c99d79c 100644
---- a/include/net/dst.h
-+++ b/include/net/dst.h
-@@ -440,6 +440,15 @@ static inline void dst_set_expires(struct dst_entry *dst, int timeout)
- 		dst->expires = expires;
+diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
+index 9d8422e350f8..28e5a89dc255 100644
+--- a/net/ipv6/ioam6_iptunnel.c
++++ b/net/ipv6/ioam6_iptunnel.c
+@@ -253,14 +253,15 @@ static int ioam6_do_fill(struct net *net, struct sk_buff *skb)
  }
  
-+static inline unsigned int dst_dev_overhead(struct dst_entry *dst,
-+					    struct sk_buff *skb)
-+{
-+	if (likely(dst))
-+		return LL_RESERVED_SPACE(dst->dev);
+ static int ioam6_do_inline(struct net *net, struct sk_buff *skb,
+-			   struct ioam6_lwt_encap *tuninfo)
++			   struct ioam6_lwt_encap *tuninfo,
++			   struct dst_entry *cache_dst)
+ {
+ 	struct ipv6hdr *oldhdr, *hdr;
+ 	int hdrlen, err;
+ 
+ 	hdrlen = (tuninfo->eh.hdrlen + 1) << 3;
+ 
+-	err = skb_cow_head(skb, hdrlen + skb->mac_len);
++	err = skb_cow_head(skb, hdrlen + dst_dev_overhead(cache_dst, skb));
+ 	if (unlikely(err))
+ 		return err;
+ 
+@@ -291,7 +292,8 @@ static int ioam6_do_encap(struct net *net, struct sk_buff *skb,
+ 			  struct ioam6_lwt_encap *tuninfo,
+ 			  bool has_tunsrc,
+ 			  struct in6_addr *tunsrc,
+-			  struct in6_addr *tundst)
++			  struct in6_addr *tundst,
++			  struct dst_entry *cache_dst)
+ {
+ 	struct dst_entry *dst = skb_dst(skb);
+ 	struct ipv6hdr *hdr, *inner_hdr;
+@@ -300,7 +302,7 @@ static int ioam6_do_encap(struct net *net, struct sk_buff *skb,
+ 	hdrlen = (tuninfo->eh.hdrlen + 1) << 3;
+ 	len = sizeof(*hdr) + hdrlen;
+ 
+-	err = skb_cow_head(skb, len + skb->mac_len);
++	err = skb_cow_head(skb, len + dst_dev_overhead(cache_dst, skb));
+ 	if (unlikely(err))
+ 		return err;
+ 
+@@ -334,7 +336,7 @@ static int ioam6_do_encap(struct net *net, struct sk_buff *skb,
+ 
+ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+-	struct dst_entry *dst = skb_dst(skb);
++	struct dst_entry *dst = skb_dst(skb), *cache_dst;
+ 	struct in6_addr orig_daddr;
+ 	struct ioam6_lwt *ilwt;
+ 	int err = -EINVAL;
+@@ -352,6 +354,10 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 
+ 	orig_daddr = ipv6_hdr(skb)->daddr;
+ 
++	local_bh_disable();
++	cache_dst = dst_cache_get(&ilwt->cache);
++	local_bh_enable();
 +
-+	return skb->mac_len;
-+}
+ 	switch (ilwt->mode) {
+ 	case IOAM6_IPTUNNEL_MODE_INLINE:
+ do_inline:
+@@ -359,7 +365,7 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 		if (ipv6_hdr(skb)->nexthdr == NEXTHDR_HOP)
+ 			goto out;
+ 
+-		err = ioam6_do_inline(net, skb, &ilwt->tuninfo);
++		err = ioam6_do_inline(net, skb, &ilwt->tuninfo, cache_dst);
+ 		if (unlikely(err))
+ 			goto drop;
+ 
+@@ -369,7 +375,7 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 		/* Encapsulation (ip6ip6) */
+ 		err = ioam6_do_encap(net, skb, &ilwt->tuninfo,
+ 				     ilwt->has_tunsrc, &ilwt->tunsrc,
+-				     &ilwt->tundst);
++				     &ilwt->tundst, cache_dst);
+ 		if (unlikely(err))
+ 			goto drop;
+ 
+@@ -387,41 +393,36 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 		goto drop;
+ 	}
+ 
+-	err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
+-	if (unlikely(err))
+-		goto drop;
++	if (unlikely(!cache_dst)) {
++		struct ipv6hdr *hdr = ipv6_hdr(skb);
++		struct flowi6 fl6;
 +
- INDIRECT_CALLABLE_DECLARE(int ip6_output(struct net *, struct sock *,
- 					 struct sk_buff *));
- INDIRECT_CALLABLE_DECLARE(int ip_output(struct net *, struct sock *,
++		memset(&fl6, 0, sizeof(fl6));
++		fl6.daddr = hdr->daddr;
++		fl6.saddr = hdr->saddr;
++		fl6.flowlabel = ip6_flowinfo(hdr);
++		fl6.flowi6_mark = skb->mark;
++		fl6.flowi6_proto = hdr->nexthdr;
++
++		cache_dst = ip6_route_output(net, NULL, &fl6);
++		if (cache_dst->error) {
++			err = cache_dst->error;
++			dst_release(cache_dst);
++			goto drop;
++		}
+ 
+-	if (!ipv6_addr_equal(&orig_daddr, &ipv6_hdr(skb)->daddr)) {
+ 		local_bh_disable();
+-		dst = dst_cache_get(&ilwt->cache);
++		dst_cache_set_ip6(&ilwt->cache, cache_dst, &fl6.saddr);
+ 		local_bh_enable();
+ 
+-		if (unlikely(!dst)) {
+-			struct ipv6hdr *hdr = ipv6_hdr(skb);
+-			struct flowi6 fl6;
+-
+-			memset(&fl6, 0, sizeof(fl6));
+-			fl6.daddr = hdr->daddr;
+-			fl6.saddr = hdr->saddr;
+-			fl6.flowlabel = ip6_flowinfo(hdr);
+-			fl6.flowi6_mark = skb->mark;
+-			fl6.flowi6_proto = hdr->nexthdr;
+-
+-			dst = ip6_route_output(net, NULL, &fl6);
+-			if (dst->error) {
+-				err = dst->error;
+-				dst_release(dst);
+-				goto drop;
+-			}
+-
+-			local_bh_disable();
+-			dst_cache_set_ip6(&ilwt->cache, dst, &fl6.saddr);
+-			local_bh_enable();
+-		}
++		err = skb_cow_head(skb, LL_RESERVED_SPACE(cache_dst->dev));
++		if (unlikely(err))
++			goto drop;
++	}
+ 
++	if (!ipv6_addr_equal(&orig_daddr, &ipv6_hdr(skb)->daddr)) {
+ 		skb_dst_drop(skb);
+-		skb_dst_set(skb, dst);
+-
++		skb_dst_set(skb, cache_dst);
+ 		return dst_output(net, sk, skb);
+ 	}
+ out:
 -- 
 2.34.1
 
