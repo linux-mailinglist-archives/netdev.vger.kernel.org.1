@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-148723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70AC59E301F
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 00:55:19 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 152549E3020
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 00:55:33 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15A6D166FC1
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 23:55:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E82AB26989
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 23:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E390820ADC6;
-	Tue,  3 Dec 2024 23:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA2720B1E6;
+	Tue,  3 Dec 2024 23:55:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NAK1nqzX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CTnOygoU"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC497189F56
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 23:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B05205E2F
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 23:55:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733270112; cv=none; b=pVYCy7C9t5MXU2Jj8/wPWOsgqFfnvavrwuRm/4HSkr5g8eWLioSDAsYu7Ohc4oBk/N0BqUkhbWNQKU3YfEb3zpQ8W2x4OC4vVJxTobcgiDZ0rb1hnVEmcJiGRXWGdvw5N0jb0MWrZ5yZhFLKrFW2+kspAcVxNV2u0cLhnClipWw=
+	t=1733270113; cv=none; b=oyvdEkC80ZlLbiCiZV3ubSEbcYjvkGf9jD/u3MgVfvAmucyNfy4evanMs2INdS1F4pPlPiOidS7nRM8wlC+z+ze3F3ySPwe7CHpzcbRjLneZLA5f15zk/4MAaQfQyxT+sKHmE8BBtSWXNs59mVLPg9AoCMjA6u9ZqLlQVmNo67I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733270112; c=relaxed/simple;
-	bh=OFbXpW4cjMBtIrq5zqseCgEcuoy9/ENqEaEUl+wYd48=;
+	s=arc-20240116; t=1733270113; c=relaxed/simple;
+	bh=jzVsU+tttxm8IfUHHUpvkT2TCP2ifIbrzkPvui9Agp8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jQlfE+WedNEWsNstgDJS4hLWwgNPBqP5CbUl2jCOuogN4IRzMSstSHdEi8U9NwZkyo9dByfKvB23lqTFa0XNKAOrXYJiiVNwORHw4NxLWwg1kTmSTKsSlH2nPiAfz8yXgVQD9Kr1kIOIyuXGO/ceCa1lzzyAzQ7deybmBUaUMLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NAK1nqzX; arc=none smtp.client-ip=192.198.163.7
+	 In-Reply-To:To:Cc; b=tM3ZgI8rwMjYtya5BYVJ6J8Wkcw2gXt3KQIa9M9p3n9UlB7kRPirJeQhwoxRG5IQzRFhUpXnXtqdvOLoMUMH0mCNYC70uNIezlI6mJVrTX+D2R2Own95Md2zeGxwQaBXVliYowzBUqXElPJeD86xNTBjfTdq4ICAzG+Ruox1Gfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CTnOygoU; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733270111; x=1764806111;
+  t=1733270112; x=1764806112;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=OFbXpW4cjMBtIrq5zqseCgEcuoy9/ENqEaEUl+wYd48=;
-  b=NAK1nqzXH+KlyHld8I5TUT0rgIbJ+6bRxtc8dARNPKhiHlCSePVqSIMh
-   myJhcYgV47AU56dSxRas9kHdZVPqmRXdZSW4f8bM8TCoVm5nxObd/2yC0
-   /IQHZAOUxYzbwaj7qlU5Wun6jZUKq9Sji1wIgB3Qb7DIWnYwo/cU5soAq
-   krSY/2qmvlBHfjv/ce2xH3hOV8WBtYS7V9C+hwEuDqAF9YOo18+zZd7Qk
-   iOGePMlrnUPJeuJNEqR6uGGQtqnu3PuPdpRVwJbLzRvs2upvqGwzT0pRZ
-   oFwfyY5gOo8YY/qpM0KeSssb+GLuuMj8hBXlYTO03ArPq/bwFp0pO4nbD
+  bh=jzVsU+tttxm8IfUHHUpvkT2TCP2ifIbrzkPvui9Agp8=;
+  b=CTnOygoUjt/b/1dsMUB1ncaY1Yb+cWV/20oBVdaecZMcJEQYPby/AEvZ
+   1MyYGYzBbMNxDdQpFFuLJnApEE/T892vpiTXlrS+3imQLMyKhrgz66EuT
+   QZlIxwQLpNQWMO0/iaPYwvtvZmBh2VPDp9waK8LcF0TT9ek6bqXQeKnXT
+   YFn5YTpxhKMGB48yEKKYLgwaXjtv4+wS7kUYNtmD6r9hDbXmkyMhQBwxn
+   OD10YZ6K49Et9JLwAKc0NsxXYdnEvtcuqzC6FicNjsg3Fujd61ogMbjaB
+   YbJCYDpC/emb/dR1nk4BJ3Ckk3C2e9zja3gcXNzzubxiLxZO2CruhWgP1
    A==;
-X-CSE-ConnectionGUID: 5fEWQPrMSMeDVQoxbqBiAQ==
-X-CSE-MsgGUID: Td7eAutVQROJrFozMQMgfQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11275"; a="58918422"
+X-CSE-ConnectionGUID: KUqccHmFSxmiapNVU/VJNA==
+X-CSE-MsgGUID: VJmOUltqSQ+4eburyc/Pjg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11275"; a="58918429"
 X-IronPort-AV: E=Sophos;i="6.12,206,1728975600"; 
-   d="scan'208";a="58918422"
+   d="scan'208";a="58918429"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 15:55:08 -0800
-X-CSE-ConnectionGUID: KlsojjvRS4+hqVbLZwux5w==
-X-CSE-MsgGUID: c4gauc8QROWQNrWdR3AO8g==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 15:55:09 -0800
+X-CSE-ConnectionGUID: QBevreATSYmYdPQIq9RRzA==
+X-CSE-MsgGUID: w2KC6j7RQTq0fnyWpusdmw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,206,1728975600"; 
-   d="scan'208";a="93679042"
+   d="scan'208";a="93679045"
 Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
   by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 15:55:08 -0800
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Tue, 03 Dec 2024 15:53:50 -0800
-Subject: [PATCH net-next v8 04/10] lib: packing: document recently added
- APIs
+Date: Tue, 03 Dec 2024 15:53:51 -0800
+Subject: [PATCH net-next v8 05/10] ice: remove int_q_state from
+ ice_tlan_ctx
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241203-packing-pack-fields-and-ice-implementation-v8-4-2ed68edfe583@intel.com>
+Message-Id: <20241203-packing-pack-fields-and-ice-implementation-v8-5-2ed68edfe583@intel.com>
 References: <20241203-packing-pack-fields-and-ice-implementation-v8-0-2ed68edfe583@intel.com>
 In-Reply-To: <20241203-packing-pack-fields-and-ice-implementation-v8-0-2ed68edfe583@intel.com>
 To: Vladimir Oltean <vladimir.oltean@nxp.com>, 
@@ -82,153 +82,43 @@ To: Vladimir Oltean <vladimir.oltean@nxp.com>,
 Cc: Jacob Keller <jacob.e.keller@intel.com>
 X-Mailer: b4 0.14.2
 
-Extend the documentation for the packing library, covering the intended use
-for the recently added APIs. This includes the pack() and unpack() macros,
-as well as the pack_fields() and unpack_fields() macros.
+The int_q_state field of the ice_tlan_ctx structure represents the internal
+queue state. However, we never actually need to assign this or read this
+during normal operation. In fact, trying to unpack it would not be possible
+as it is larger than a u64. Remove this field from the ice_tlan_ctx
+structure, and remove its packing field from the ice_tlan_ctx_info array.
 
-Add a note that the packing() API is now deprecated in favor of pack() and
-unpack().
-
-For the pack_fields() and unpack_fields() APIs, explain the rationale for
-when a driver may want to select this API. Provide an example which shows
-how to define the fields and call the pack_fields() and unpack_fields()
-macros.
-
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- Documentation/core-api/packing.rst | 118 +++++++++++++++++++++++++++++++++++--
- 1 file changed, 113 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h | 1 -
+ drivers/net/ethernet/intel/ice/ice_common.c    | 1 -
+ 2 files changed, 2 deletions(-)
 
-diff --git a/Documentation/core-api/packing.rst b/Documentation/core-api/packing.rst
-index 821691f23c541cee27995bb1d77e23ff04f82433..30fc2328f789920e27a1bcf3945a6793894ef1d4 100644
---- a/Documentation/core-api/packing.rst
-+++ b/Documentation/core-api/packing.rst
-@@ -227,11 +227,119 @@ Intended use
+diff --git a/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h b/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h
+index 611577ebc29d8250c8cce85f58f3477ff3b51a66..0e8ed8c226e68988664d64c1fd3297cee32af020 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h
++++ b/drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h
+@@ -590,7 +590,6 @@ struct ice_tlan_ctx {
+ 	u8 drop_ena;
+ 	u8 cache_prof_idx;
+ 	u8 pkt_shaper_prof_idx;
+-	u8 int_q_state;	/* width not needed - internal - DO NOT WRITE!!! */
+ };
  
- Drivers that opt to use this API first need to identify which of the above 3
- quirk combinations (for a total of 8) match what the hardware documentation
--describes. Then they should wrap the packing() function, creating a new
--xxx_packing() that calls it using the proper QUIRK_* one-hot bits set.
-+describes.
-+
-+There are 3 supported usage patterns, detailed below.
-+
-+packing()
-+^^^^^^^^^
-+
-+This API function is deprecated.
+ #endif /* _ICE_LAN_TX_RX_H_ */
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index b22e71dc59d4e4ec0efea96e5afd812859a98bdd..0f5a80269a7be0a302d4229a42bb8bbfc500905a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -1467,7 +1467,6 @@ const struct ice_ctx_ele ice_tlan_ctx_info[] = {
+ 	ICE_CTX_STORE(ice_tlan_ctx, drop_ena,			1,	165),
+ 	ICE_CTX_STORE(ice_tlan_ctx, cache_prof_idx,		2,	166),
+ 	ICE_CTX_STORE(ice_tlan_ctx, pkt_shaper_prof_idx,	3,	168),
+-	ICE_CTX_STORE(ice_tlan_ctx, int_q_state,		122,	171),
+ 	{ 0 }
+ };
  
- The packing() function returns an int-encoded error code, which protects the
- programmer against incorrect API use.  The errors are not expected to occur
--during runtime, therefore it is reasonable for xxx_packing() to return void
--and simply swallow those errors. Optionally it can dump stack or print the
--error description.
-+during runtime, therefore it is reasonable to wrap packing() into a custom
-+function which returns void and simply swallow those errors. Optionally it can
-+dump stack or print the error description.
-+
-+.. code-block:: c
-+
-+  void my_packing(void *buf, u64 *val, int startbit, int endbit,
-+                  size_t len, enum packing_op op)
-+  {
-+          int err;
-+
-+          /* Adjust quirks accordingly */
-+          err = packing(buf, val, startbit, endbit, len, op, QUIRK_LSW32_IS_FIRST);
-+          if (likely(!err))
-+                  return;
-+
-+          if (err == -EINVAL) {
-+                  pr_err("Start bit (%d) expected to be larger than end (%d)\n",
-+                         startbit, endbit);
-+          } else if (err == -ERANGE) {
-+                  if ((startbit - endbit + 1) > 64)
-+                          pr_err("Field %d-%d too large for 64 bits!\n",
-+                                 startbit, endbit);
-+                  else
-+                          pr_err("Cannot store %llx inside bits %d-%d (would truncate)\n",
-+                                 *val, startbit, endbit);
-+          }
-+          dump_stack();
-+  }
-+
-+pack() and unpack()
-+^^^^^^^^^^^^^^^^^^^
-+
-+These are const-correct variants of packing(), and eliminate the last "enum
-+packing_op op" argument.
-+
-+Calling pack(...) is equivalent, and preferred, to calling packing(..., PACK).
-+
-+Calling unpack(...) is equivalent, and preferred, to calling packing(..., UNPACK).
-+
-+pack_fields() and unpack_fields()
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The library exposes optimized functions for the scenario where there are many
-+fields represented in a buffer, and it encourages consumer drivers to avoid
-+repetitive calls to pack() and unpack() for each field, but instead use
-+pack_fields() and unpack_fields(), which reduces the code footprint.
-+
-+These APIs use field definitions in arrays of ``struct packed_field_s`` (small)
-+or ``struct packed_field_m`` (medium), allowing consumer drivers to minimize
-+the size of these arrays according to their custom requirements.
-+
-+The pack_fields() and unpack_fields() API functions are actually macros which
-+automatically select the appropriate function at compile time, based on the
-+type of the fields array passed in.
-+
-+An additional benefit over pack() and unpack() is that sanity checks on the
-+field definitions are handled at compile time with ``BUILD_BUG_ON`` rather
-+than only when the offending code is executed. These functions return void and
-+wrapping them to handle unexpected errors is not necessary.
-+
-+It is recommended, but not required, that you wrap your packed buffer into a
-+structured type with a fixed size. This generally makes it easier for the
-+compiler to enforce that the correct size buffer is used.
-+
-+Here is an example of how to use the fields APIs:
-+
-+.. code-block:: c
-+
-+   /* Ordering inside the unpacked structure is flexible and can be different
-+    * from the packed buffer. Here, it is optimized to reduce padding.
-+    */
-+   struct data {
-+        u64 field3;
-+        u32 field4;
-+        u16 field1;
-+        u8 field2;
-+   };
-+
-+   #define SIZE 13
-+
-+   typdef struct __packed { u8 buf[SIZE]; } packed_buf_t;
-+
-+   static const struct packed_field_s fields[] = {
-+           PACKED_FIELD(100, 90, struct data, field1),
-+           PACKED_FIELD(90, 87, struct data, field2),
-+           PACKED_FIELD(86, 30, struct data, field3),
-+           PACKED_FIELD(29, 0, struct data, field4),
-+   };
-+
-+   void unpack_your_data(const packed_buf_t *buf, struct data *unpacked)
-+   {
-+           BUILD_BUG_ON(sizeof(*buf) != SIZE;
-+
-+           unpack_fields(buf, sizeof(*buf), unpacked, fields,
-+                         QUIRK_LITTLE_ENDIAN);
-+   }
-+
-+   void pack_your_data(const struct data *unpacked, packed_buf_t *buf)
-+   {
-+           BUILD_BUG_ON(sizeof(*buf) != SIZE;
-+
-+           pack_fields(buf, sizeof(*buf), unpacked, fields,
-+                       QUIRK_LITTLE_ENDIAN);
-+   }
 
 -- 
 2.47.0.265.g4ca455297942
