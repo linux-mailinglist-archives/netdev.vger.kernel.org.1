@@ -1,662 +1,171 @@
-Return-Path: <netdev+bounces-148499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D66F59E1DAB
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:36:39 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 441EF9E1DC9
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:39:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E39B165BDC
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 13:36:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0473C28101D
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 13:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527BF1EF08F;
-	Tue,  3 Dec 2024 13:36:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768841E32CB;
+	Tue,  3 Dec 2024 13:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l8fCtLok"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="TTgAURU+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2085.outbound.protection.outlook.com [40.107.20.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB37192D98
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 13:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733232996; cv=none; b=KF2PUPbqb146vejarHkZ5+K+bAD3PDkoehGsbJmcnHP5pO+sFWR33AklnIy6GXHL98ICligdLaAykd10yQ/h0qrreTE/c0Qgh3/pnQ2BCeVjguotd7phGqS1ZUNo3iyAmN+jUsd3Y9hYAbCJLGyDQoJIgI+UQelvPeAN+jxkThw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733232996; c=relaxed/simple;
-	bh=jNWsPdr4saCtnn86TPErzrzV6o75e5tigSeHxTxMDKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SeZVdzGCSfHmhA9v806lXpmwusnn6OmqtTmPy7H5PJ8+qN+0R0bFa7YMdJGIl1Ocgfr/1BnZtBNHQ7rGBKpTlzhr/mExY3gCMuTIwZNDTEUVfbBWGymUO3l2tNCXYvhvhG7h+wOFDa0yIXL0CO3YZ8UzuPiELPpSnk70S9YWCDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l8fCtLok; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-385e5b43350so118574f8f.2
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 05:36:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733232992; x=1733837792; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=95bTS2N7bKNYNHhGvPAl/B+i1U0uHdfp/UTRJacxumA=;
-        b=l8fCtLokj2uXljrqQHQTcs+RNQqgTJ7xLPT2LHht2uR0c9CliJJI0txvELitYn0YFF
-         z8PV64RnwchgHyQ/fK5zvmYA3fQ+FrE9f7oPp2JiDOqxapO4V3ryh9rPzLoKLhholtti
-         8Rw4P2KUVMJ4I5Mdia9ux21rpPrRkWByr4KQDeJ5HqjBLJW15X4VOkfG0OW/WGjiO+6Z
-         1Dad1BqB9P1OXv9/KBJPiE9/MLGq8t8EGr0O/S555twpuDzgMe9Aqboa/sXKAv0H1rmG
-         YVW52kQ3FNhsqME0wbY3gSlAtUrX5/u/bj0dE+iPzqlCY9CrEVFvo/djmSnr7ABlzTPC
-         GDmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733232992; x=1733837792;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=95bTS2N7bKNYNHhGvPAl/B+i1U0uHdfp/UTRJacxumA=;
-        b=lQVkNl0AVrRR5eFp0zvjp8GJq4SGybDxsweUK0CmNqRbzVwsyViZP7mwhuqVoovZLq
-         nnuwUj2qfkdjqyG7o6oDX9nvPz4Evs5aqFx86a5Te43uvOY1vZE2pH1QnyHLNKnLUVec
-         xEqkT97i7tfWDKQvhN3YwBiTbBCkB5sChsXj0MVJl2nu/iPxhNrmUx6vMOcY2g/CqY/m
-         PDk2vMNkQ4ahY3Zxcwy/09oyVzTDqpQF+9naEVyyBC4Nw1EStTUu51e3+Z4bbwiyfg37
-         4drltW0M94qkcbPXbgRH9bQcJ9Yb9djOzYDZbr0pP7/xsSngc4dFng15RaTwqx5/JBmc
-         v4lw==
-X-Forwarded-Encrypted: i=1; AJvYcCWdhBSyQGuqWA2RHmhcnN/jvuw1ftIOBCAP48lNP6lR8za32R7ryDL/em26AyglGqoNsq/5yBw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwK+5hJtqsx5w3VWaKbRjp7BLUeflAaDsW45/paBV9paJCLgcXR
-	S+0KWnZmJI6AdvbxMSbwgVVpKwGNzGpkhvAvmpvAXslnsibtWSpm
-X-Gm-Gg: ASbGncsqMtxuAItCHz13RaP8YQus1lmX7sVklZ28326QxkgdWnzenjpwTem1wjcJA0w
-	Q0z1SgvJDn3dlATdef+svlFdjM5Z2MCh4NinmYDCHeXc2MGXVK5Jfq8Y1XYf8GZbrXfyM/Lrqaz
-	9M+gYi8jjw0IM4p52B6T7Q444ID25STalhx7uXXBKCl+nbuUF0LZYDCtqDESu2qjlW1x0GOQgWj
-	Du7Qj9pyczl04vXfOguJQy6CRbe3uMr56qW6+A=
-X-Google-Smtp-Source: AGHT+IFNVpsQ1SxgOSnHd33anSgu6aiz17MyLpFc8p6+DpYLWnZrtfyreqldKyWeF3yaVqCFlO8jBQ==
-X-Received: by 2002:a5d:5988:0:b0:385:de67:229e with SMTP id ffacd0b85a97d-385fd40b038mr865356f8f.11.1733232991536;
-        Tue, 03 Dec 2024 05:36:31 -0800 (PST)
-Received: from skbuf ([188.25.135.117])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e9c075e8sm8949158f8f.7.2024.12.03.05.36.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2024 05:36:30 -0800 (PST)
-Date: Tue, 3 Dec 2024 15:36:28 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD241EF0A6
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 13:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733233175; cv=fail; b=PpalLahX4klAkG5wCiFyYZ78G0OS2F74v0QN+62RYJbhCtVFb3jia2Z+ivqAJPUJ8j3ABrTgFDQw2xh2lcOU91/QLeSltfW/6lwEdW55I3FlAk+NK846Tx5aTCLVx1JmsicXs17DOLI1WaW/q24Fg9AgAfxAIZ8hgpHHwAMBLiY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733233175; c=relaxed/simple;
+	bh=fIuzTp7UYG8fblH+/Q0zDdpca3ZQjoYFU/diaRKxqbI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=kJvQodakM4012W24gGuJpx/AM8lxtdaaDvuHDTBw01tvLwliqp3raucX0e/CXuP51ikglaezoslQsVMJhfDhEIN9KXHPqjQCP2bNmftBGSAQnoq4MRMFJfXk6asVH1M78867m3CSN5UtnMIJ4O3vlatq9cJbJuK/VfdXYug0XRQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=TTgAURU+; arc=fail smtp.client-ip=40.107.20.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aMzqRFxCY7b1VrZTlZ6ofrxF6JHT6BFWanOqR/MqwrRp4HYCSTzKrmNrMe5U9HipH55cd2XSbPHljUUcENpjbrqQB+ymtNRDoenTUkf5WlLbcgd/Hs5oCiVW4a1T8OZB5rN4mNaBZWQ19YB77c1N/1aUw4VKMddZEHDo7nlxM6CPjH/VTFbVkjX9QPlc0XnZ1njUHVeJWjJzYmM7zCVK0/2ExUmq6x1lshvzLbPslJV/QjcIGCvfBL5W4BMxRB2k9BIRBKyHThGzewHJiX9HCqV6owEE3lgbFCy53qIIRGjz1Ma8Y4Twp5rJeJEJsVrDp4rTWL/PCDleqIyQAI4zZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fIuzTp7UYG8fblH+/Q0zDdpca3ZQjoYFU/diaRKxqbI=;
+ b=U/0gzh3hIS+PRNuqGmqXJc7q74cv7SZBOUTMqo6Zakm6rKbEDH9Cf2uPJAoJ6iPG73n0HIzRoDGotyLgw+cZn+6s89LeYuMOxTb2IufQhyjEJh2wy6ADUKxfAiqlbm3FEk6A72vKG1wIITIQCNGRKR1GOZMz3kPwJjylJt7fBvQHH4mRcA+4Va7X+ZExivzk4l+TQipRLEPbRrdaWwABdnDOH2iZKs27fLtfewyrb2/I9M5EM9WngfXA1RpEzjjLQluVT80ZXGbSUj1cp7gXWQHRu/t9SxPZF9QiQt3/YK7YF/pajiQpOHRPdnCodVonkWTQvKROabojxhdkktr6tA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fIuzTp7UYG8fblH+/Q0zDdpca3ZQjoYFU/diaRKxqbI=;
+ b=TTgAURU+dOnlnwncG1Sorr7JDFJ6E9Jej1KoiIeKFYT0/vun72FSrOUOiBSow8qPV6ZdyA1JvBhhQIO9wCF81+j59PocMB3g4MrwMKe02IuqR8aLafS3RSqzrVFQzjnLnnGQSEj7U1Z5T/KSOx1TEgab2KO6OeAu49EV/I72PzexCO0r62hE7etH1PEvp6yEXlbfG+hXeNxR44r6lrqha4G0rXyjhDOdO70SnGlAQ1QOdBsUV3W0gTNypeZiK8+ZfxttzmpHy3PwUU4QNU+HHpnOdiCLIo6SC7PJT/7GpnD8XeOd5x3ASLfvRqBNe7nGIX2X74gTlsJSUqVz1dfE+w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by DBAPR04MB7270.eurprd04.prod.outlook.com (2603:10a6:10:1af::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.19; Tue, 3 Dec
+ 2024 13:39:30 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8207.017; Tue, 3 Dec 2024
+ 13:39:30 +0000
+Date: Tue, 3 Dec 2024 15:39:27 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Masahiro Yamada <masahiroy@kernel.org>,
-	netdev <netdev@vger.kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
+	netdev <netdev@vger.kernel.org>
 Subject: Re: [PATCH net-next v7 3/9] lib: packing: add pack_fields() and
  unpack_fields()
-Message-ID: <20241203133628.lcefexgtwvbgasav@skbuf>
+Message-ID: <20241203133927.g6ngln5tjuwrqiu7@skbuf>
 References: <20241202-packing-pack-fields-and-ice-implementation-v7-0-ed22e38e6c65@intel.com>
  <20241202-packing-pack-fields-and-ice-implementation-v7-3-ed22e38e6c65@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241202-packing-pack-fields-and-ice-implementation-v7-3-ed22e38e6c65@intel.com>
+X-ClientProxiedBy: VI1PR09CA0175.eurprd09.prod.outlook.com
+ (2603:10a6:800:120::29) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241202-packing-pack-fields-and-ice-implementation-v7-3-ed22e38e6c65@intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|DBAPR04MB7270:EE_
+X-MS-Office365-Filtering-Correlation-Id: 117d907f-d049-435e-7e18-08dd139fea1f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?6YfxeGXmthVI7sX6RvhRj1NDzjEOYE/6EMyto3o53xBbr3jTznq3AENH6xDq?=
+ =?us-ascii?Q?uhRGGEuflKyA8PDDqztMluybfniSuPNIEzjT1iPP30RV8hIBG917aWzmw+zW?=
+ =?us-ascii?Q?SGO9NLGAacPDkC887BPf9rFEM1AukxaMejDILBKVJV7nlQ6NniR2k0TuWXG6?=
+ =?us-ascii?Q?QQFYcPG3J5jObiHk1iSVuwtCxyFinmcRfn8BqnKYxAqIvvBk3+kIPBpcnNod?=
+ =?us-ascii?Q?qXtidkwv8y4VakaMKuj0gIIeVck89EoDXLrB2JxZxgkpJho7805UteF8whjR?=
+ =?us-ascii?Q?jpcwo/rKvnHbAhrwcsQZy0Y5/rNgYBPvz4Q4Mw1jSnT/J7S2WQtYxk9lkizN?=
+ =?us-ascii?Q?pXlSenLz6+xzGaERjrGIvyf3sbiFTK4zIdxBHvym/JZtgtdxAdg5mfCNDgvg?=
+ =?us-ascii?Q?cY1LidtA5R4VbCW9lnXwfyZmfl5rtwN6sJN7rld3Q4K7EvKskiFl9n679uL+?=
+ =?us-ascii?Q?iru5Ueb7JtVaLwkW6E1TmyWx/ZUigW8RAtJA8YKw1qVg54pFOfj9hzSYpJ+H?=
+ =?us-ascii?Q?bDDfLamc1L2S7cENQfhGZjpUx664EdXIihqcEab59jpxhm19XoU93vMmPdLR?=
+ =?us-ascii?Q?vLJ73Fh76rHZw6s7aArEHvVDzeitFSyOqBQxfBTOfSXdKSV7952xA4DClCXM?=
+ =?us-ascii?Q?42WPBaWGMSgbSJWCMGVkqTI4y23JlN0NJWf78q/Wsgj2A9dY5CJkk+dgrZ4K?=
+ =?us-ascii?Q?/GXxxXXUl4rnLSFhlt+ur5XF0+R+8mWFISVR4jKhlSR+KpiB/3HmFwTUd6oT?=
+ =?us-ascii?Q?fpaIT+SXsV/RqcFFgNkdlDgE2EPiAa54pmGVEWHHAzio7mx7NrGmynKSXjLe?=
+ =?us-ascii?Q?umNSgpRJA9w531ewImTiYU/Qkaey+4h0oTCYzT5WBMPx5Lt6wujtstSoivWp?=
+ =?us-ascii?Q?vxQpFZrXFtnt+J2TGT6idfGF+ypjL/UWjO4ZJFU2/6TQsO9QJpg49ZD6TssR?=
+ =?us-ascii?Q?Yg0y7Vo2hiCU4ry3jE/yBv6ZWk1jb1RNNMiGeu+ZMKAma9Nz3uMQKc8M3o1g?=
+ =?us-ascii?Q?6df9rfFzOsrXG2xbqoML3hDB/PkSe4xLlutfCEcTVdeBu65hke4VVSVrb1g+?=
+ =?us-ascii?Q?pnQot7byv0aFchlDzmm//gzlTFwHpiqafeiEmVTBnFpALthtWQ+G9BZS3VjA?=
+ =?us-ascii?Q?yaUoGFW/AslWjplrIOuYhgK+Z40+v3VqzuqXZfyIdaBcXZfoCyWPJba8eeuj?=
+ =?us-ascii?Q?xw32zd2U1UuY8qH/RxIOEJRGD5dscGYx1DA4oeI2m/AQMGx971vNQ8IkBE65?=
+ =?us-ascii?Q?35sbLk6Kmp+Z/yDMeVHqMp8+lHX9sbsBd057MoXcvDHMjToZnthP3kaohRqk?=
+ =?us-ascii?Q?oHzaSkrfzzdGREWBGIq9oGoqEL7qKeOtkp4q/YHK0oQJNA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?JGrBawjlUa+3x19VyM2LaZv8/bRqaME2X8hy6Hol7sUfr8c31GcNfUGeSsyO?=
+ =?us-ascii?Q?rgCER5A9EcEKx15PJ49sMsZF0RCx6n0N06Wn+xSpp9pzQSI5sKKRrmOfN+xI?=
+ =?us-ascii?Q?tfAufIPDqUvV9EaTDsePYRw13HcgHqamICfj9AGLZ96cukl7zNwRFeKO+9YX?=
+ =?us-ascii?Q?cW368uj0Ck8a1QG0PgL3p0k1kIKePsP8cYiQyHtd7DOa+0dXQIfw+0z6p19m?=
+ =?us-ascii?Q?qXpO3ZwiWYdIsSO5kr8tZN5hLzlBbj0+F1tbxU4btpA3843KVzlxz71JDbiJ?=
+ =?us-ascii?Q?h/nb6bX7f9Y6SAm8AdrtE+YKNHDyVBaLw0aIxk7dlsaUl9anYRRWUrDCGLNJ?=
+ =?us-ascii?Q?KMM/+L1to1IkDJkjA8UX1pmFSZ1bj09qH2bUbmkKLhk598PfFimOaaImUqu9?=
+ =?us-ascii?Q?HktynunHW87RpdgtLXxKjLssmoH0Y++ye8NV37lwNnoHjZz5qfMaTTNDZj5g?=
+ =?us-ascii?Q?jgMpy+OFsTY59eJyc2DvaLzx701huhSwJJg0hFs9+QSxo5r4zW+VWt//z3NE?=
+ =?us-ascii?Q?hUOpyEMdKg+2O2VnlMqj61h6hFu0zxGV0I6F0COxLLifhFSZlcKQD7b00ZbY?=
+ =?us-ascii?Q?0xUJsqvfyr4FQATxEH7IM1QNSBDE8U4NQEs+8pecShHiH3fnLK/89XrexO+g?=
+ =?us-ascii?Q?h5m5qEjBKPpZkZoNUMoa9lMmj2NcNhQsq4AW6sOrkGPGqo8YmQVdZ8mqRgFA?=
+ =?us-ascii?Q?jdFVp14Zv/WfiV94UCT6avmzNRqz+NvDqlYt2SkwOctqS3RkcFRvQ98hjYvV?=
+ =?us-ascii?Q?nJOVeZHV3iMHyheVBkN+b7kfq45zPepq0VyWIOeik27qdgi6xt0NkssD0QXr?=
+ =?us-ascii?Q?l5VOqfbkP0wvR3DQKnLGJIlHHmOTiloVf/59EVI3MY9HxG/JT02koCb4uh0V?=
+ =?us-ascii?Q?LAHvvKmZPOwaEGJc2l4n3aTu54nO1pemM6zg1fE1q9XH/1E3FBmwa0SjItr3?=
+ =?us-ascii?Q?k/TWWY8fGJeCpHintaObRYFQXym+fF0DH3fJY4F1xgMyGzmTC/NRfsEmR+eJ?=
+ =?us-ascii?Q?lNENMulskmTe5/KFJBfNh6atByk52VbxC8lTW1XtVgw61CllND4mVHJ7gROJ?=
+ =?us-ascii?Q?Bgd0YTUlbidlNfLjiBFCldrxMjfG6jdbeF5tUdhW5Nw164MAfYC4EfeyPeNW?=
+ =?us-ascii?Q?/+xmSZfizQNNTh9O32tx4oLDWqd7bnwz0RWzQ3Byz+TXn7i+tvlOUtidGYnj?=
+ =?us-ascii?Q?5OgrLudKwby1vnmobjNanWKEBV5ptmvA/gNulgQdPN+1eC0q/bJVzrC/FM7Z?=
+ =?us-ascii?Q?XUN2BQ+lq0iMdfljIHvPhqN0PkNUqcnXJ1vwLnISjIB0l0MOqa/EaMRKBJxp?=
+ =?us-ascii?Q?wS+1du+08ZBcwJu33yHpaeQby1xdw+2ZXXTz2z0eF4P0NQQ6N3DsxWCZ8zR2?=
+ =?us-ascii?Q?+v8z4R+9yvDE23IBAI/tG6H1dMLUsx55+FPoqwLX8zY22HCqialIkDRVkG2D?=
+ =?us-ascii?Q?jvQqQVjW5fbXGSBpv0zcvvnRmrYrcnvtLjv1VNAHJGBkoNokDKo63SzteQvC?=
+ =?us-ascii?Q?qtbBYdb6AAhLWFCJHW1oH1vM68Kx5/YwlnZfGQgyGWdo1qgLVyWnUDa2GI73?=
+ =?us-ascii?Q?WwR7dauFiJIvrEOfJwo1lGjR0bKi+aqtEvG7eXasiNhLiQE0TVZqPSSHGe9F?=
+ =?us-ascii?Q?yA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 117d907f-d049-435e-7e18-08dd139fea1f
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2024 13:39:30.6700
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZDBqB3//bOQPSOFZycKCK+urX1/OhHkxdcngf/StzgtQ5/PHo2ql86pA+IffZuZ+Dc79v5GWkJ6umaP0Lq7mrA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7270
 
 On Mon, Dec 02, 2024 at 04:26:26PM -0800, Jacob Keller wrote:
-> From: Vladimir Oltean <vladimir.oltean@nxp.com>
-> 
-> This is new API which caters to the following requirements:
-> 
-> - Pack or unpack a large number of fields to/from a buffer with a small
->   code footprint. The current alternative is to open-code a large number
->   of calls to pack() and unpack(), or to use packing() to reduce that
->   number to half. But packing() is not const-correct.
-> 
-> - Use unpacked numbers stored in variables smaller than u64. This
->   reduces the rodata footprint of the stored field arrays.
-> 
-> - Perform error checking at compile time, rather than runtime, and return
->   void from the API functions. Because the C preprocessor can't generate
->   variable length code (loops), this is a bit tricky to do with macros.
-> 
->   To handle this, implement macros which sanity check the packed field
->   definitions based on their size. Finally, a single macro with a chain of
->   __builtin_choose_expr() is used to select the appropriate macros. We
->   enforce the use of ascending or descending order to avoid O(N^2) scaling
->   when checking for overlap. Note that the macros are written with care to
->   ensure that the compilers can correctly evaluate the resulting code at
->   compile time. In particular, the expressions for the pbuflen and the
->   ordering check are passed all the way down via macros. Earlier versions
->   attempted to use statement expressions with local variables, but not all
->   compilers were able to fully analyze these at compile time, resulting in
->   BUILD_BUG_ON failures.
-> 
->   The overlap macro is passed a condition determining whether the fields
->   are expected to be in ascending or descending order based on the relative
->   ordering of the first two fields. This allows users to keep the fields in
->   whichever order is most natural for their hardware, while still keeping
->   the overlap checks scaling to O(N).
-> 
->   This method also enables calling CHECK_PACKED_FIELDS directly from within
->   the pack_fields and unpack_fields macros, ensuring all drivers using this
->   API will receive type checking, without needing to remember to call the
->   CHECK_PACKED_FIELDS macro themselves.
-> 
-> - Reduced rodata footprint for the storage of the packed field arrays.
->   To that end, we have struct packed_field_s (small) and packed_field_m
->   (medium). More can be added as needed (unlikely for now). On these
->   types, the same generic pack_fields() and unpack_fields() API can be
->   used, thanks to the new C11 _Generic() selection feature, which can
->   call pack_fields_s() or pack_fields_m(), depending on the type of the
->   "fields" array - a simplistic form of polymorphism. It is evaluated at
->   compile time which function will actually be called.
-> 
-> Over time, packing() is expected to be completely replaced either with
-> pack() or with pack_fields().
-> 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> ---
->  Makefile                           |    4 +
->  include/linux/packing.h            |   37 +
->  include/linux/packing_types.h      | 2831 ++++++++++++++++++++++++++++++++++++
->  lib/packing.c                      |  145 ++
->  lib/packing_test.c                 |   61 +
->  scripts/gen_packed_field_checks.c  |   38 +
->  Documentation/core-api/packing.rst |   58 +
->  MAINTAINERS                        |    2 +
->  scripts/Makefile                   |    2 +-
->  9 files changed, 3177 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 8129de0b214f5b73a3b1cca0798041d74270836b..58496942a7d13c6a53e4210d83deb2cc2033d00a 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1315,6 +1315,10 @@ PHONY += scripts_unifdef
->  scripts_unifdef: scripts_basic
->  	$(Q)$(MAKE) $(build)=scripts scripts/unifdef
->  
-> +PHONY += scripts_gen_packed_field_checks
-> +scripts_gen_packed_field_checks: scripts_basic
-> +	$(Q)$(MAKE) $(build)=scripts scripts/gen_packed_field_checks
-> +
->  # ---------------------------------------------------------------------------
->  # Install
->  
-> diff --git a/include/linux/packing.h b/include/linux/packing.h
-> index 5d36dcd06f60420325473dae3a0e9ac37d03da4b..f9bfb20060300e33a455b46d3266ea5083a62102 100644
-> --- a/include/linux/packing.h
-> +++ b/include/linux/packing.h
-> @@ -7,6 +7,7 @@
->  
->  #include <linux/types.h>
->  #include <linux/bitops.h>
-> +#include <linux/packing_types.h>
+> +++ b/include/linux/packing_types.h
+> @@ -0,0 +1,2831 @@
+> +/* SPDX-License-Identifier: BSD-3-Clause
+> + * Copyright (c) 2024, Intel Corporation
+> + * Copyright (c) 2024, Vladimir Oltean <olteanv@gmail.com>
 
-I'm unsure of the benefit of splitting the headers in this way, if
-packing_types.h is not going to contain purely auto-generated code and
-is tracked fully by git.
+Not sure how, yet again, I managed to forget to say this.
 
-> diff --git a/lib/packing.c b/lib/packing.c
-> index 09a2d195b9433b61c86f3b63ff019ab319c83e97..45164f73fe5bf9f2c547eb22016af7e44fed9eb0 100644
-> --- a/lib/packing.c
-> +++ b/lib/packing.c
-> @@ -5,10 +5,37 @@
->  #include <linux/packing.h>
->  #include <linux/module.h>
->  #include <linux/bitops.h>
-> +#include <linux/bits.h>
->  #include <linux/errno.h>
->  #include <linux/types.h>
->  #include <linux/bitrev.h>
->  
-> +#define __pack_fields(pbuf, pbuflen, ustruct, fields, num_fields, quirks)	\
-> +	({									\
-> +		for (size_t i = 0; i < (num_fields); i++) {			\
-> +			typeof(&(fields)[0]) field = &(fields)[i];		\
-> +			u64 uval;						\
-> +										\
-> +			uval = ustruct_field_to_u64(ustruct, field->offset, field->size); \
-> +										\
-> +			__pack(pbuf, uval, field->startbit, field->endbit,	\
-> +			       pbuflen, quirks);				\
-> +		}								\
-> +	})
-> +
-> +#define __unpack_fields(pbuf, pbuflen, ustruct, fields, num_fields, quirks)	\
-> +	({									\
-> +		for (size_t i = 0; i < (num_fields); i++) {			\
-> +			typeof(&(fields)[0]) field = &fields[i];		\
-> +			u64 uval;						\
-> +										\
-> +			__unpack(pbuf, &uval, field->startbit, field->endbit,	\
-> +				 pbuflen, quirks);				\
-> +										\
-> +			u64_to_ustruct_field(ustruct, field->offset, field->size, uval); \
-> +		}								\
-> +	})
-> +
->  /**
->   * calculate_box_addr - Determine physical location of byte in buffer
->   * @box: Index of byte within buffer seen as a logical big-endian big number
-> @@ -322,4 +349,122 @@ int packing(void *pbuf, u64 *uval, int startbit, int endbit, size_t pbuflen,
->  }
->  EXPORT_SYMBOL(packing);
->  
-> +static u64 ustruct_field_to_u64(const void *ustruct, size_t field_offset,
-> +				size_t field_size)
-> +{
-> +	switch (field_size) {
-> +	case 1:
-> +		return *((u8 *)(ustruct + field_offset));
-> +	case 2:
-> +		return *((u16 *)(ustruct + field_offset));
-> +	case 4:
-> +		return *((u32 *)(ustruct + field_offset));
-> +	default:
-> +		return *((u64 *)(ustruct + field_offset));
-> +	}
-> +}
-> +
-> +static void u64_to_ustruct_field(void *ustruct, size_t field_offset,
-> +				 size_t field_size, u64 uval)
-> +{
-> +	switch (field_size) {
-> +	case 1:
-> +		*((u8 *)(ustruct + field_offset)) = uval;
-> +		break;
-> +	case 2:
-> +		*((u16 *)(ustruct + field_offset)) = uval;
-> +		break;
-> +	case 4:
-> +		*((u32 *)(ustruct + field_offset)) = uval;
-> +		break;
-> +	default:
-> +		*((u64 *)(ustruct + field_offset)) = uval;
-> +		break;
-> +	}
-> +}
-> +
-> +/**
-> + * pack_fields_s - Pack array of small fields
-> + *
-> + * @pbuf: Pointer to a buffer holding the packed value.
-> + * @pbuflen: The length in bytes of the packed buffer pointed to by @pbuf.
-> + * @ustruct: Pointer to CPU-readable structure holding the unpacked value.
-> + *	     It is expected (but not checked) that this has the same data type
-> + *	     as all struct packed_field_s definitions.
-> + * @fields: Array of small packed fields definition. They must not overlap.
-> + * @num_fields: Length of @fields array.
-> + * @quirks: A bit mask of QUIRK_LITTLE_ENDIAN, QUIRK_LSW32_IS_FIRST and
-> + *	    QUIRK_MSB_ON_THE_RIGHT.
-> + */
-> +void pack_fields_s(void *pbuf, size_t pbuflen, const void *ustruct,
-> +		   const struct packed_field_s *fields, size_t num_fields,
-> +		   u8 quirks)
-> +{
-> +	__pack_fields(pbuf, pbuflen, ustruct, fields, num_fields, quirks);
-> +}
-> +EXPORT_SYMBOL(pack_fields_s);
-> +
-> +/**
-> + * pack_fields_m - Pack array of medium fields
-> + *
-> + * @pbuf: Pointer to a buffer holding the packed value.
-> + * @pbuflen: The length in bytes of the packed buffer pointed to by @pbuf.
-> + * @ustruct: Pointer to CPU-readable structure holding the unpacked value.
-> + *	     It is expected (but not checked) that this has the same data type
-> + *	     as all struct packed_field_s definitions.
-> + * @fields: Array of medium packed fields definition. They must not overlap.
-> + * @num_fields: Length of @fields array.
-> + * @quirks: A bit mask of QUIRK_LITTLE_ENDIAN, QUIRK_LSW32_IS_FIRST and
-> + *	    QUIRK_MSB_ON_THE_RIGHT.
-> + */
-> +void pack_fields_m(void *pbuf, size_t pbuflen, const void *ustruct,
-> +		   const struct packed_field_m *fields, size_t num_fields,
-> +		   u8 quirks)
-> +{
-> +	__pack_fields(pbuf, pbuflen, ustruct, fields, num_fields, quirks);
-> +}
-> +EXPORT_SYMBOL(pack_fields_m);
-> +
-> +/**
-> + * unpack_fields_s - Unpack array of small fields
-> + *
-> + * @pbuf: Pointer to a buffer holding the packed value.
-> + * @pbuflen: The length in bytes of the packed buffer pointed to by @pbuf.
-> + * @ustruct: Pointer to CPU-readable structure holding the unpacked value.
-> + *	     It is expected (but not checked) that this has the same data type
-> + *	     as all struct packed_field_s definitions.
-> + * @fields: Array of small packed fields definition. They must not overlap.
-> + * @num_fields: Length of @fields array.
-> + * @quirks: A bit mask of QUIRK_LITTLE_ENDIAN, QUIRK_LSW32_IS_FIRST and
-> + *	    QUIRK_MSB_ON_THE_RIGHT.
-> + */
-> +void unpack_fields_s(const void *pbuf, size_t pbuflen, void *ustruct,
-> +		     const struct packed_field_s *fields, size_t num_fields,
-> +		     u8 quirks)
-> +{
-> +	__unpack_fields(pbuf, pbuflen, ustruct, fields, num_fields, quirks);
-> +}
-> +EXPORT_SYMBOL(unpack_fields_s);
-> +
-> +/**
-> + * unpack_fields_m - Unpack array of medium fields
-> + *
-> + * @pbuf: Pointer to a buffer holding the packed value.
-> + * @pbuflen: The length in bytes of the packed buffer pointed to by @pbuf.
-> + * @ustruct: Pointer to CPU-readable structure holding the unpacked value.
-> + *	     It is expected (but not checked) that this has the same data type
-> + *	     as all struct packed_field_s definitions.
-> + * @fields: Array of medium packed fields definition. They must not overlap.
-> + * @num_fields: Length of @fields array.
-> + * @quirks: A bit mask of QUIRK_LITTLE_ENDIAN, QUIRK_LSW32_IS_FIRST and
-> + *	    QUIRK_MSB_ON_THE_RIGHT.
-> + */
-> +void unpack_fields_m(const void *pbuf, size_t pbuflen, void *ustruct,
-> +		     const struct packed_field_m *fields, size_t num_fields,
-> +		     u8 quirks)
-> +{
-> +	__unpack_fields(pbuf, pbuflen, ustruct, fields, num_fields, quirks);
-> +}
-> +EXPORT_SYMBOL(unpack_fields_m);
-> +
->  MODULE_DESCRIPTION("Generic bitfield packing and unpacking");
-> diff --git a/lib/packing_test.c b/lib/packing_test.c
-> index b38ea43c03fd83639f18a6f3e2a42eae36118c45..3b4167ce56bf65fa4d66cb55d3215aecc33f64c4 100644
-> --- a/lib/packing_test.c
-> +++ b/lib/packing_test.c
-> @@ -396,9 +396,70 @@ static void packing_test_unpack(struct kunit *test)
->  	KUNIT_EXPECT_EQ(test, uval, params->uval);
->  }
->  
-> +#define PACKED_BUF_SIZE 8
-> +
-> +typedef struct __packed { u8 buf[PACKED_BUF_SIZE]; } packed_buf_t;
-> +
-> +struct test_data {
-> +	u32 field3;
-> +	u16 field2;
-> +	u16 field4;
-> +	u16 field6;
-> +	u8 field1;
-> +	u8 field5;
-> +};
-> +
-> +static const struct packed_field_s test_fields[] = {
-> +	PACKED_FIELD(63, 61, struct test_data, field1),
-> +	PACKED_FIELD(60, 52, struct test_data, field2),
-> +	PACKED_FIELD(51, 28, struct test_data, field3),
-> +	PACKED_FIELD(27, 14, struct test_data, field4),
-> +	PACKED_FIELD(13, 9, struct test_data, field5),
-> +	PACKED_FIELD(8, 0, struct test_data, field6),
-> +};
-> +
-> +static void packing_test_pack_fields(struct kunit *test)
-> +{
-> +	const struct test_data data = {
-> +		.field1 = 0x2,
-> +		.field2 = 0x100,
-> +		.field3 = 0xF00050,
-> +		.field4 = 0x7D3,
-> +		.field5 = 0x9,
-> +		.field6 = 0x10B,
-> +	};
-> +	packed_buf_t expect = {
-> +		.buf = { 0x50, 0x0F, 0x00, 0x05, 0x01, 0xF4, 0xD3, 0x0B },
-> +	};
-> +	packed_buf_t buf = {};
-> +
-> +	pack_fields(&buf, sizeof(buf), &data, test_fields, 0);
-> +
-> +	KUNIT_EXPECT_MEMEQ(test, &expect, &buf, sizeof(buf));
-> +}
-> +
-> +static void packing_test_unpack_fields(struct kunit *test)
-> +{
-> +	const packed_buf_t buf = {
-> +		.buf = { 0x17, 0x28, 0x10, 0x19, 0x3D, 0xA9, 0x07, 0x9C },
-> +	};
-> +	struct test_data data = {};
-> +
-> +	unpack_fields(&buf, sizeof(buf), &data, test_fields, 0);
-> +
-> +	KUNIT_EXPECT_EQ(test, 0, data.field1);
-> +	KUNIT_EXPECT_EQ(test, 0x172, data.field2);
-> +	KUNIT_EXPECT_EQ(test, 0x810193, data.field3);
-> +	KUNIT_EXPECT_EQ(test, 0x36A4, data.field4);
-> +	KUNIT_EXPECT_EQ(test, 0x3, data.field5);
-> +	KUNIT_EXPECT_EQ(test, 0x19C, data.field6);
-> +}
-> +
->  static struct kunit_case packing_test_cases[] = {
->  	KUNIT_CASE_PARAM(packing_test_pack, packing_gen_params),
->  	KUNIT_CASE_PARAM(packing_test_unpack, packing_gen_params),
-> +	KUNIT_CASE(packing_test_pack_fields),
-> +	KUNIT_CASE(packing_test_unpack_fields),
->  	{},
->  };
->  
-> diff --git a/scripts/gen_packed_field_checks.c b/scripts/gen_packed_field_checks.c
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..09a21afd640bdf37ad5ee9f6cfa1d4b9113efbcd
-> --- /dev/null
-> +++ b/scripts/gen_packed_field_checks.c
-> @@ -0,0 +1,38 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +// Copyright (c) 2024, Intel Corporation
-> +#include <stdbool.h>
-> +#include <stdio.h>
-> +
-> +#define MAX_PACKED_FIELD_SIZE 50
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	for (int i = 1; i <= MAX_PACKED_FIELD_SIZE; i++) {
-> +		printf("#define CHECK_PACKED_FIELDS_%d(fields) ({ \\\n", i);
-> +		printf("\ttypeof(&(fields)[0]) _f = (fields); \\\n");
-> +		printf("\tBUILD_BUG_ON(ARRAY_SIZE(fields) != %d); \\\n", i);
-> +
-> +		for (int j = 0; j < i; j++)
-> +			printf("\tCHECK_PACKED_FIELD(_f[%d]); \\\n", j);
-> +
-> +		for (int j = 1; j < i; j++)
-> +			printf("\tCHECK_PACKED_FIELD_OVERLAP(_f[0].startbit < _f[1].startbit, _f[%d], _f[%d]); \\\n",
-> +			       j - 1, j);
-> +
-> +		printf("})\n\n");
-> +	}
-> +
-> +	printf("#define CHECK_PACKED_FIELDS(fields) \\\n");
-> +
-> +	for (int i = 1; i <= MAX_PACKED_FIELD_SIZE; i++)
-> +		printf("\t__builtin_choose_expr(ARRAY_SIZE(fields) == %d, CHECK_PACKED_FIELDS_%d(fields), \\\n",
-> +		       i, i);
-> +
-> +	printf("\t({ BUILD_BUG_ON_MSG(1, \"CHECK_PACKED_FIELDS() must be regenerated to support array sizes larger than %d.\"); }) \\\n",
-> +	       MAX_PACKED_FIELD_SIZE);
-> +
-> +	for (int i = 1; i <= MAX_PACKED_FIELD_SIZE; i++)
-> +		printf(")");
-> +
-> +	printf("\n");
-> +}
-> diff --git a/Documentation/core-api/packing.rst b/Documentation/core-api/packing.rst
-> index 821691f23c541cee27995bb1d77e23ff04f82433..5f729a9d4e87b438b67ec6b46626403c8f1655c3 100644
-> --- a/Documentation/core-api/packing.rst
-> +++ b/Documentation/core-api/packing.rst
-> @@ -235,3 +235,61 @@ programmer against incorrect API use.  The errors are not expected to occur
->  during runtime, therefore it is reasonable for xxx_packing() to return void
->  and simply swallow those errors. Optionally it can dump stack or print the
->  error description.
-> +
-> +The pack_fields() and unpack_fields() macros automatically select the
-> +appropriate function at compile time based on the type of the fields array
-> +passed in.
-
-This paragraph is out of context (select the appropriate function among
-which options? what fields array?).
-
-May I suggest the following documentation addition instead?
-
-Intended use
-------------
-
-Drivers that opt to use this API first need to identify which of the above 3
-quirk combinations (for a total of 8) match what the hardware documentation
-describes.
-
-There are 3 supported usage patterns, detailed below.
-
-packing()
-^^^^^^^^^
-
-This API function is deprecated.
-
-The packing() function returns an int-encoded error code, which protects the
-programmer against incorrect API use.  The errors are not expected to occur
-during runtime, therefore it is reasonable to wrap packing() into a custom
-function which returns void and simply swallow those errors. Optionally it can
-dump stack or print the error description.
-
-.. code-block:: c
-
-  void my_packing(void *buf, u64 *val, int startbit, int endbit,
-                  size_t len, enum packing_op op)
-  {
-          int err;
-
-          /* Adjust quirks accordingly */
-          err = packing(buf, val, startbit, endbit, len, op, QUIRK_LSW32_IS_FIRST);
-          if (likely(!err))
-                  return;
-
-          if (err == -EINVAL) {
-                  pr_err("Start bit (%d) expected to be larger than end (%d)\n",
-                         startbit, endbit);
-          } else if (err == -ERANGE) {
-                  if ((startbit - endbit + 1) > 64)
-                          pr_err("Field %d-%d too large for 64 bits!\n",
-                                 startbit, endbit);
-                  else
-                          pr_err("Cannot store %llx inside bits %d-%d (would truncate)\n",
-                                 *val, startbit, endbit);
-          }
-          dump_stack();
-  }
-
-pack() and unpack()
-^^^^^^^^^^^^^^^^^^^
-
-These are const-correct variants of packing(), and eliminate the last "enum
-packing_op op" argument.
-
-Calling pack(...) is equivalent, and preferred, to calling packing(..., PACK).
-
-Calling unpack(...) is equivalent, and preferred, to calling packing(..., UNPACK).
-
-pack_fields() and unpack_fields()
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The library exposes optimized functions for the scenario where there are many
-fields represented in a buffer, and it encourages consumer drivers to avoid
-repetitive calls to pack() and unpack() for each field, but instead use
-pack_fields() and unpack_fields(), which reduces the code footprint.
-
-These APIs use field definitions in arrays of ``struct packed_field_s`` (small)
-or ``struct packed_field_m`` (medium), allowing consumer drivers to minimize
-the size of these arrays according to their custom requirements.
-
-The pack_fields() and unpack_fields() API functions are actually macros which
-automatically select the appropriate function at compile time, based on the
-type of the fields array passed in.
-
-An additional benefit over pack() and unpack() is that sanity checks on the
-field definitions are handled at compile time with ``BUILD_BUG_ON`` rather
-than only when the offending code is executed. These functions return void and
-wrapping them to handle unexpected errors is not necessary.
-
-It is recommended, but not required, that you wrap your packed buffer into a
-structured type with a fixed size. This generally makes it easier for the
-compiler to enforce that the correct size buffer is used.
-
-Here is an example of how to use the fields APIs:
-
-.. code-block:: c
-
-   /* Ordering inside the unpacked structure is flexible and can be different
-    * from the packed buffer. Here, it is optimized to reduce padding.
-    */
-   struct data {
-        u64 field3;
-        u32 field4;
-        u16 field1;
-        u8 field2;
-   };
-
-   #define SIZE 13
-
-   typdef struct __packed { u8 buf[SIZE]; } packed_buf_t;
-
-   static const struct packed_field_s fields[] = {
-           PACKED_FIELD(100, 90, struct data, field1),
-           PACKED_FIELD(90, 87, struct data, field2),
-           PACKED_FIELD(86, 30, struct data, field3),
-           PACKED_FIELD(29, 0, struct data, field4),
-   };
-
-   void unpack_your_data(const packed_buf_t *buf, struct data *unpacked)
-   {
-           BUILD_BUG_ON(sizeof(*buf) != SIZE;
-
-           unpack_fields(buf, sizeof(*buf), unpacked, fields,
-                         QUIRK_LITTLE_ENDIAN);
-   }
-
-   void pack_your_data(const struct data *unpacked, packed_buf_t *buf)
-   {
-           BUILD_BUG_ON(sizeof(*buf) != SIZE;
-
-           pack_fields(buf, sizeof(*buf), unpacked, fields,
-                       QUIRK_LITTLE_ENDIAN);
-   }
-
-
-Also, I think this patch could use some de-cluttering by making the
-documentation update separate. We need to document 2 new APIs anyway,
-not just pack_fields() but also pack().
-
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0456a33ef65792bacb5d305a6384d245844fb743..7ef0abcb58c8a42e60222f6fc85df44602c360d5 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -17559,8 +17559,10 @@ L:	netdev@vger.kernel.org
->  S:	Supported
->  F:	Documentation/core-api/packing.rst
->  F:	include/linux/packing.h
-> +F:	include/linux/packing_types.h
->  F:	lib/packing.c
->  F:	lib/packing_test.c
-> +F:	scripts/gen_packed_field_checks.c
->  
->  PADATA PARALLEL EXECUTION MECHANISM
->  M:	Steffen Klassert <steffen.klassert@secunet.com>
-> diff --git a/scripts/Makefile b/scripts/Makefile
-> index 6bcda4b9d054021b185488841cd36c6e0fb86d0c..546e8175e1c4c8209e67a7f92f7d1e795a030988 100644
-> --- a/scripts/Makefile
-> +++ b/scripts/Makefile
-> @@ -47,7 +47,7 @@ HOSTCFLAGS_sorttable.o += -DMCOUNT_SORT_ENABLED
->  endif
->  
->  # The following programs are only built on demand
-> -hostprogs += unifdef
-> +hostprogs += unifdef gen_packed_field_checks
-
-I will let those who have been more vocal in their complaints about
-the compile-time checks comment on whether this approach of running
-gen_packed_field_checks on demand rather than during any build is
-acceptable.
-
->  
->  # The module linker script is preprocessed on demand
->  targets += module.lds
-> 
-> -- 
-> 2.47.0.265.g4ca455297942
-> 
+Please use "Copyright 2024 NXP". I used company time for this.
 
