@@ -1,76 +1,88 @@
-Return-Path: <netdev+bounces-148712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99AC69E2F4A
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 23:52:09 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7133016364C
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:52:06 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8052D207A07;
-	Tue,  3 Dec 2024 22:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ouhaC3mE"
-X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9904C9E2F55
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 23:55:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D4A20A5F6;
-	Tue,  3 Dec 2024 22:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E0982819A7
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:55:56 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABAB8207A3E;
+	Tue,  3 Dec 2024 22:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="feZY56eq"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C4913AD1C;
+	Tue,  3 Dec 2024 22:55:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733266319; cv=none; b=j+Vv/1D4/NR/1uVuM+fEqdYcRxOg0fZuuksQiwxqNuCxWsvmkWnBPNbZb0osih46usAHscw8bdo0XpTvXZy60KNcvUuyYBcjgwd8f4l3Bs+RDOgRNjCwVU5nNfGkopvwxusvy04apq13X4QT+70h76P3izvF1lKECM/7jHtQc7A=
+	t=1733266554; cv=none; b=eeWXaHwD1He5k7ufDmV9flxVu+a5saWzAhzrOIWoM0L5U3QnNQmNOT7le3adSiEYoa9JjBPjN7NraoSl2AWrZ5hfLWehNeVyRK+sHR0VvzRwsGJnZd9ZUvVsPLJd31EhKWlKqX5ROWnEbjXjeknNJeNV97ScSEDjryJyOkCEMi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733266319; c=relaxed/simple;
-	bh=sBe6uk5yYjB2IRt5CMiVOj+qwIU4vaGJSAnksnDHwXQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lLqj3oFJwN/BxjqJdlJctdPDrmh4ixvhhwzNIwI245dlh8SO8AQ6k//fT6FimqwjuBb6TJbh6GTB+e13TgsRbxy/KaKm/TOAmyJoOOX6cvzXHaGUuh/e1zCXu/A8Xn7vc5l049F6flIs7FBcKTlnd0Lw7iRviY+YgFV3Mw6D8jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ouhaC3mE; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ev3Gbr2iE7d7yRsjXCDKDt4BiErZHh1rq7r5xXLsOgc=; b=ouhaC3mEmmVnsgoqr1kGRqtT4e
-	RxjNpZOgYo5PRxkFEbylTvREBHW2p/vyr6+SDar0jeiItm0xD2EWzykH1inWdkjbpEdQXXylJmbOF
-	64hx4F6i10iqkb/TInLRse87rqesdyTbhPe1x84P5xtgGsYtjAXy2cQSppRvINcyne0eoyuLfs6mH
-	p2QGPiwtDlVK5BpMEWlZtxUIRaypcv3Ta0iPBAO5t82+TWfUtbjxxkz172KGWTIt3FU56/PgBO7k2
-	oUArlTqCFoI1X3e5dE1X8U6WF7ZPei7yhGnOX9rH1udmEwGF6Md48RXPzsUXm44pSgjYxxzfWpBeC
-	VvXbRI1g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36222)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tIbkD-0002aL-0o;
-	Tue, 03 Dec 2024 22:51:49 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tIbk9-0004vo-1v;
-	Tue, 03 Dec 2024 22:51:45 +0000
-Date: Tue, 3 Dec 2024 22:51:45 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chris Snook <chris.snook@gmail.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
-	Richard Cochran <richardcochran@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:RENESAS ETHERNET SWITCH DRIVER" <linux-renesas-soc@vger.kernel.org>
-Subject: Re: [PATCHv4 net-next] net: modernize ioremap in probe
-Message-ID: <Z0-LgWETqKZe2uyV@shell.armlinux.org.uk>
-References: <20241203222750.153272-1-rosenp@gmail.com>
+	s=arc-20240116; t=1733266554; c=relaxed/simple;
+	bh=UtJ8GUEdiO1IioQArRIlzoBgNQKZhjfkymQq8faQpcY=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dUsIg40pEjhAeHAUDquA/NoMmTNZN2uuiKsYyaGbo9HcUKlAVcXM0CqaKgvjdocJ+U99MLGpY0RaJryodxbUZb6f19J6kgZDY3vkcnGIWwy9YIvM7Hc40ZyL7/ZSz4I76KBN6xKveK1anq1n/ayV/FtNt5JN2pkR11MO2voqDpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=feZY56eq; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-724e14b90cfso6124522b3a.2;
+        Tue, 03 Dec 2024 14:55:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733266552; x=1733871352; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xo4AlQVCclASkVxOb5FJsyufPpNOzRkzyxv+8/vrslY=;
+        b=feZY56eqRrSmmN2ewO65O6AVUN/lPNoUpqaOJPnsrSzWJkymaX3/qnasTL99liJ1uO
+         +1HL0j88actGNoqIaMCPqRB4iq5UJhUG1Mc1tQHjr23/x1xywd0luqIlSYk3d3Mx0Znr
+         6BYojOLB01WkvSim35YymiUO5nToxSguFFSmLmYSZpch6IKWZx45yDuSPk6ZknqnEFKz
+         7zBG5lToExE7A93YYTYrGFG3w2M+0TuHH40RARVXXOYsYkbuwZYXesgeViKpOPCfghnH
+         RJt7dNcxtadw2GaULmAxMFyDF3t1GywUdSzrZ0T6DnhvYSyQZ515H67rDNwIArBvW9hZ
+         ZP5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733266552; x=1733871352;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xo4AlQVCclASkVxOb5FJsyufPpNOzRkzyxv+8/vrslY=;
+        b=tApWMP2BkTafZ2WIF4M4j4S/qKomKluFP1Y99tgL0pwKzx+1G8Vlwjf6+OkBXyZmsk
+         YfxGhVyorSLqydX3FP7XQ9Zv/h5W3c1RNBDU3xjNxaoNRmf2etYCtgBYc3TU43OJ7hF5
+         yqApefNgkHg8gyUgA5dkFJA1kpq+0ZJ94iWpowi+KCUin/lyHv9MSpVivssQzldLVgCV
+         uqKTVKNis8ibRJgUdtwIWhfZ0LoDjxuA2PjhQlugwiVnSrTEoZPguyAHP8yx5goH+Pyn
+         4a8yz7Vl/hsVHfpl33c+V9DcPiMvu5OKUOh9Lg7HO98w/8ewdHdoJ+b01m02g2M8oKEo
+         yySw==
+X-Forwarded-Encrypted: i=1; AJvYcCVjl6L/UvjyeNQmBUdregUFZyFTjgQP0wlGe7GaTZc/gKAy5amwDc+4DgnIDAXaRcAXz5LaKps=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6uoA+EJQYZlISo1GVn0bb5qkHd28M8WTfL8ODXJfSerD9ceT1
+	2uOWFwUehM0s9amiKu/G4vNVOSpyh6xioJ5Q4lckHj4fH5rNXJ/M
+X-Gm-Gg: ASbGncvfK0mZ9Fk2zrnC5kOI19dvYOye0Gitke/gDMfW5vxXKJKke+K21K3Sn85z7T9
+	cj4A6bKiH1SoJgPqP1W4zPkP83lam/rLA+cvSbjtStas7ALaMkyPjgDVVKVVZYk4Uu2ls25Yas7
+	8GIPjnZpOM21vrqTXhvQPn9WVldwqVt7mKAFcPIH3Gqnl3z+QN+gL8jAx83Y/lhRsGpoZQV7ZZO
+	qUbevVJVQbLbiMKOFSIjZIl2zznFBC5+q78dK8I7obdLLYTnVfDIQ==
+X-Google-Smtp-Source: AGHT+IHf8Y6mlT0E/9tS74VLfp3S49niBvr1PpAdwP0HkpIvXn0cbpq3xiSJWO0jaLIXhimrAt3cFg==
+X-Received: by 2002:a05:6a00:39a8:b0:725:3fb5:5595 with SMTP id d2e1a72fcca58-7257fa3a10dmr6612589b3a.5.1733266552252;
+        Tue, 03 Dec 2024 14:55:52 -0800 (PST)
+Received: from smc-140338-bm01 ([149.97.161.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7254176fc93sm11404797b3a.63.2024.12.03.14.55.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 14:55:51 -0800 (PST)
+From: Fan Ni <nifan.cxl@gmail.com>
+X-Google-Original-From: Fan Ni <fan.ni@samsung.com>
+Date: Tue, 3 Dec 2024 22:55:49 +0000
+To: alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, martin.habets@xilinx.com,
+	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
+	Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v6 04/28] cxl/pci: add check for validating capabilities
+Message-ID: <Z0-MddhGPjtO91h_@smc-140338-bm01>
+References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
+ <20241202171222.62595-5-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,51 +91,148 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241203222750.153272-1-rosenp@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20241202171222.62595-5-alejandro.lucero-palau@amd.com>
 
-On Tue, Dec 03, 2024 at 02:27:50PM -0800, Rosen Penev wrote:
-> resource aquisition and ioremap can be performed in one step.
-...
-> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> index 571631a30320..af9291574931 100644
-> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> @@ -7425,21 +7425,16 @@ static int mvpp2_init(struct platform_device *pdev, struct mvpp2 *priv)
->  static int mvpp2_get_sram(struct platform_device *pdev,
->  			  struct mvpp2 *priv)
->  {
-> -	struct resource *res;
->  	void __iomem *base;
+On Mon, Dec 02, 2024 at 05:11:58PM +0000, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> During CXL device initialization supported capabilities by the device
+> are discovered. Type3 and Type2 devices have different mandatory
+> capabilities and a Type2 expects a specific set including optional
+> capabilities.
+> 
+> Add a function for checking expected capabilities against those found
+> during initialization and allow those mandatory/expected capabilities to
+> be a subset of the capabilities found.
+> 
+> Rely on this function for validating capabilities instead of when CXL
+> regs are probed.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> ---
+>  drivers/cxl/core/pci.c  | 16 ++++++++++++++++
+>  drivers/cxl/core/regs.c |  9 ---------
+>  drivers/cxl/pci.c       | 24 ++++++++++++++++++++++++
+>  include/cxl/cxl.h       |  3 +++
+>  4 files changed, 43 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/cxl/core/pci.c b/drivers/cxl/core/pci.c
+> index 7114d632be04..a85b96eebfd3 100644
+> --- a/drivers/cxl/core/pci.c
+> +++ b/drivers/cxl/core/pci.c
+> @@ -8,6 +8,7 @@
+>  #include <linux/pci.h>
+>  #include <linux/pci-doe.h>
+>  #include <linux/aer.h>
+> +#include <cxl/cxl.h>
+>  #include <cxlpci.h>
+>  #include <cxlmem.h>
+>  #include <cxl.h>
+> @@ -1055,3 +1056,18 @@ int cxl_pci_get_bandwidth(struct pci_dev *pdev, struct access_coordinate *c)
 >  
-> -	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
-> -	if (!res) {
-> +	base = devm_platform_ioremap_resource(pdev, 2);
-> +	if (IS_ERR(base)) {
->  		if (has_acpi_companion(&pdev->dev))
->  			dev_warn(&pdev->dev, "ACPI is too old, Flow control not supported\n");
->  		else
->  			dev_warn(&pdev->dev, "DT is too old, Flow control not supported\n");
-> -		return 0;
-> -	}
+>  	return 0;
+>  }
+> +
+> +bool cxl_pci_check_caps(struct cxl_dev_state *cxlds, unsigned long *expected_caps,
+> +			unsigned long *current_caps)
+
+It seems "current_caps" will always be cxlds->capabilities in this
+series, and used only for the error message. Do we expect a case where
+these two can be different? If not, I think we can get rid of it and
+just use cxlds->capabilities directly in the function and in the error
+message below.
+
+Fan
+> +{
+> +
+> +	if (current_caps)
+> +		bitmap_copy(current_caps, cxlds->capabilities, CXL_MAX_CAPS);
+> +
+> +	dev_dbg(cxlds->dev, "Checking cxlds caps 0x%08lx vs expected caps 0x%08lx\n",
+> +		*cxlds->capabilities, *expected_caps);
+> +
+> +	/* Checking a minimum of mandatory/expected capabilities */
+> +	return bitmap_subset(expected_caps, cxlds->capabilities, CXL_MAX_CAPS);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_pci_check_caps, CXL);
+> diff --git a/drivers/cxl/core/regs.c b/drivers/cxl/core/regs.c
+> index fe835f6df866..70378bb80b33 100644
+> --- a/drivers/cxl/core/regs.c
+> +++ b/drivers/cxl/core/regs.c
+> @@ -444,15 +444,6 @@ static int cxl_probe_regs(struct cxl_register_map *map, unsigned long *caps)
+>  	case CXL_REGLOC_RBI_MEMDEV:
+>  		dev_map = &map->device_map;
+>  		cxl_probe_device_regs(host, base, dev_map, caps);
+> -		if (!dev_map->status.valid || !dev_map->mbox.valid ||
+> -		    !dev_map->memdev.valid) {
+> -			dev_err(host, "registers not found: %s%s%s\n",
+> -				!dev_map->status.valid ? "status " : "",
+> -				!dev_map->mbox.valid ? "mbox " : "",
+> -				!dev_map->memdev.valid ? "memdev " : "");
+> -			return -ENXIO;
+> -		}
 > -
-> -	base = devm_ioremap_resource(&pdev->dev, res);
-> -	if (IS_ERR(base))
->  		return PTR_ERR(base);
+>  		dev_dbg(host, "Probing device registers...\n");
+>  		break;
+>  	default:
+> diff --git a/drivers/cxl/pci.c b/drivers/cxl/pci.c
+> index f6071bde437b..822030843b2f 100644
+> --- a/drivers/cxl/pci.c
+> +++ b/drivers/cxl/pci.c
+> @@ -903,6 +903,8 @@ __ATTRIBUTE_GROUPS(cxl_rcd);
+>  static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  {
+>  	struct pci_host_bridge *host_bridge = pci_find_host_bridge(pdev->bus);
+> +	DECLARE_BITMAP(expected, CXL_MAX_CAPS);
+> +	DECLARE_BITMAP(found, CXL_MAX_CAPS);
+>  	struct cxl_memdev_state *mds;
+>  	struct cxl_dev_state *cxlds;
+>  	struct cxl_register_map map;
+> @@ -964,6 +966,28 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  	if (rc)
+>  		dev_dbg(&pdev->dev, "Failed to map RAS capability.\n");
+>  
+> +	bitmap_clear(expected, 0, CXL_MAX_CAPS);
+> +
+> +	/*
+> +	 * These are the mandatory capabilities for a Type3 device.
+> +	 * Only checking capabilities used by current Linux drivers.
+> +	 */
+> +	bitmap_set(expected, CXL_DEV_CAP_HDM, 1);
+> +	bitmap_set(expected, CXL_DEV_CAP_DEV_STATUS, 1);
+> +	bitmap_set(expected, CXL_DEV_CAP_MAILBOX_PRIMARY, 1);
+> +	bitmap_set(expected, CXL_DEV_CAP_DEV_STATUS, 1);
+> +
+> +	/*
+> +	 * Checking mandatory caps are there as, at least, a subset of those
+> +	 * found.
+> +	 */
+> +	if (!cxl_pci_check_caps(cxlds, expected, found)) {
+> +		dev_err(&pdev->dev,
+> +			"Expected mandatory capabilities not found: (%08lx - %08lx)\n",
+> +			*expected, *found);
+> +		return -ENXIO;
 > +	}
-
-This is not equivalent. This means if ioremap() fails inside
-devm_platform_ioremap_resource(), we end up printing a message that
-blames the firmware, which is wrong.
-
-It also changes a "resource missing, proceed anyway" situation into
-a failure situation.
-
-Please drop this change, "cleaning" this up is introducing bugs.
-
-Thanks.
+> +
+>  	rc = cxl_pci_type3_init_mailbox(cxlds);
+>  	if (rc)
+>  		return rc;
+> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+> index f656fcd4945f..05f06bfd2c29 100644
+> --- a/include/cxl/cxl.h
+> +++ b/include/cxl/cxl.h
+> @@ -37,4 +37,7 @@ void cxl_set_dvsec(struct cxl_dev_state *cxlds, u16 dvsec);
+>  void cxl_set_serial(struct cxl_dev_state *cxlds, u64 serial);
+>  int cxl_set_resource(struct cxl_dev_state *cxlds, struct resource res,
+>  		     enum cxl_resource);
+> +bool cxl_pci_check_caps(struct cxl_dev_state *cxlds,
+> +			unsigned long *expected_caps,
+> +			unsigned long *current_caps);
+>  #endif
+> -- 
+> 2.17.1
+> 
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Fan Ni (From gmail)
 
