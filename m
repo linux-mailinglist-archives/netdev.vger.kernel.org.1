@@ -1,209 +1,202 @@
-Return-Path: <netdev+bounces-148539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 660619E2052
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:56:55 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F60416587B
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:56:25 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08E61F7555;
-	Tue,  3 Dec 2024 14:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j10rnBsh"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C2569E2065
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:57:53 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7101F7577
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 14:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C056289CF0
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:57:52 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD7FB1F7599;
+	Tue,  3 Dec 2024 14:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="WJoHxyHP"
+X-Original-To: netdev@vger.kernel.org
+Received: from pv50p00im-zteg10011501.me.com (pv50p00im-zteg10011501.me.com [17.58.6.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5F81F666B
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 14:57:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733237774; cv=none; b=V7CNI7WU2kHcwMfQrB4DYdALGbPtAqa6w+r0VX2hbh0L8aRM8mp0hwE+CBZhB4KXxrsHlcZpKVYkX7JHtaocou8O2C1qCmKvawmLHRK54k5WS3x2yfj7qwcPhX9NQoF/di3Ky2S7G+oVMC004CTcF0B7HuRFixWWADS3QqSc6Ko=
+	t=1733237856; cv=none; b=aYOIJwKu1pi7J+P4RpyhaWX++FmdavakEdN7v5Q9TSB66WBf15581LiAopvEp4XDp1mMcWy2kHQXZb4T70oOLnRIwKk18+7qQlGgkVxtm/P8ULOFBgTeLyTvkI+NegoNlojRb8CkeQkCDRF0Mnh+8Q4cVQuyr7JtFCiihNlD1es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733237774; c=relaxed/simple;
-	bh=vzQli8dvz+E9BCqg5gOlBZoTLEI1uKbE/xAKVWFJlfc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aqrMV/0PVYnstZW2N2VWmbCcJiKRFnnVxZpWS5bwihBJODpd/GFCh/z3iana1THfDg9OsVNWh5ADhDpwdgH1V5VoYSGjvpoGcp5TxAsRGmd/zaaSlvE93uTfd0zdjoW0c/UFjtzZ3qLsHcBikV3szIy5YWWYfcTAsqK0WFL2Pbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j10rnBsh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF395C4CED6;
-	Tue,  3 Dec 2024 14:56:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733237774;
-	bh=vzQli8dvz+E9BCqg5gOlBZoTLEI1uKbE/xAKVWFJlfc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j10rnBshmdtDmXMQ56P2qlcaD0O8YWM0HiX/kgycpwW6nY8FlwmULY3P92/gd3GAE
-	 PPkH2pDmoQQ50Uuf/5Eve8ghI8iV++W0trybzDAOF35p/M/BsO5v2SSwTHl9zkgnPd
-	 hrRw+aWFk1WBbB2MHRlWl0qKJk8J2SoncqgdRTD/60iCuNTrfuwRM1tq6GckNWmqrK
-	 UtwKc4cwR9YqO61UPaoDq+D6q4Sjitx1crWlpUlQL1dUl3ui/hQyJ32ZqmDL2gHkT0
-	 nsKZFNlPo4RstZTCj84dCvw/E5I8wM+e/2RubSxHG7lgAf0W9xkHyskFuGNNsYaiRM
-	 pNIzsM8NlNjAA==
-Date: Tue, 3 Dec 2024 14:56:10 +0000
-From: Simon Horman <horms@kernel.org>
-To: Milena Olech <milena.olech@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Emil Tantilov <emil.s.tantilov@intel.com>,
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-Subject: Re: [PATCH v2 iwl-next 07/10] idpf: add Tx timestamp capabilities
- negotiation
-Message-ID: <20241203145610.GE9361@kernel.org>
-References: <20241126035849.6441-1-milena.olech@intel.com>
- <20241126035849.6441-8-milena.olech@intel.com>
+	s=arc-20240116; t=1733237856; c=relaxed/simple;
+	bh=I1QE9YqXRd/95EuZ6shU92lVYpx6jSwp7U8UdDQ+eqY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e69lvjFmFHx6JLzDLSBKeyBI7aQ4RGP4bvXRjYBxUKB88iKPMTpVfjNaHbF8q3Co/QbgsQ6gyzdp/ekwHHKyKMWTdQZDSuE8HDK7LD+uf1lJcHxJ6GVuAPEjmWfL3nFgfacL+q3MBhIZiKzjG/o5t1S9w+yc5Tq9fNuW/h4pP2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=WJoHxyHP; arc=none smtp.client-ip=17.58.6.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1733237853;
+	bh=zPP2M6RHoQlxRDoHnjCsF/MyKgy2Hv/oTH6yXikXqgI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
+	 x-icloud-hme;
+	b=WJoHxyHPQic0UPYroDs8nCEAWsZm40sH8RhZy74XvLp/u3uVoK8y0NcRam0ip/lrx
+	 bXSlxO0ATLyoBoLBgb1HPjJ6VzOkweGc3d49hUpXLFFHcJz2ky04rRviy7vj4V1Uv0
+	 UrP8xtrDy605sSzzXJfwV92hCnmVSa/In2c5FK+QwsvdkOzwtlVoKR8MfrPuM+OkJ3
+	 kTV9qWoS0uz7z4phORc7Uz1s0gw2Ayri2PFJ13eQLHgrebkECU60pYLHuubiEEJ1y+
+	 pdLr+ixZhVq84c1mKgl9tDNm6hKdk1MRV7Fp8S0cKzjfCmv+0IlvKjaoM5N1+JgTTH
+	 Pur3pBzgfGODA==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-zteg10011501.me.com (Postfix) with ESMTPSA id 367E14A0413;
+	Tue,  3 Dec 2024 14:56:59 +0000 (UTC)
+Message-ID: <f5ea7e17-5550-4658-8f4c-1c51827c7627@icloud.com>
+Date: Tue, 3 Dec 2024 22:56:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241126035849.6441-8-milena.olech@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/32] driver core: Constify API device_find_child()
+ and adapt for various existing usages
+To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>,
+ James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Chun-Kuang Hu <chunkuang.hu@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jean Delvare <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>,
+ Martin Tuma <martin.tuma@digiteqautomotive.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>,
+ Andreas Noever <andreas.noever@gmail.com>,
+ Michael Jamet <michael.jamet@intel.com>,
+ Mika Westerberg <mika.westerberg@linux.intel.com>,
+ Yehezkel Bernat <YehezkelShB@gmail.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+ Jiri Slaby <jirislaby@kernel.org>,
+ Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+ Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+ Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+ Mike Christie <michael.christie@oracle.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Nilesh Javali <njavali@marvell.com>,
+ Manish Rangankar <mrangankar@marvell.com>,
+ GR-QLogic-Storage-Upstream@marvell.com, Davidlohr Bueso <dave@stgolabs.net>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Alison Schofield <alison.schofield@intel.com>,
+ Andreas Larsson <andreas@gaisler.com>, Stuart Yoder <stuyoder@gmail.com>,
+ Laurentiu Tudor <laurentiu.tudor@nxp.com>, Jens Axboe <axboe@kernel.dk>,
+ Sudeep Holla <sudeep.holla@arm.com>,
+ Cristian Marussi <cristian.marussi@arm.com>, Ard Biesheuvel
+ <ardb@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-hwmon@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pwm@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux1394-devel@lists.sourceforge.net, linux-serial@vger.kernel.org,
+ linux-sound@vger.kernel.org, open-iscsi@googlegroups.com,
+ linux-scsi@vger.kernel.org, linux-cxl@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+ arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20241203-const_dfc_done-v2-0-7436a98c497f@quicinc.com>
+ <g32cigmktmj4egkq2tof27el2yss4liccfxgebkgqvkil32mlb@e3ta4ezv7y4m>
+ <9d34bd6f-b120-428a-837b-5a5813e14618@icloud.com>
+ <2024120320-manual-jockey-dfd1@gregkh>
+ <b9885785-d4d4-4c72-b425-3dc552651d7e@icloud.com>
+ <8eb7c0c54b280b8eb72f82032ede802c001ab087.camel@HansenPartnership.com>
+ <8fb887a0-3634-4e07-9f0d-d8d7c72ca802@t-8ch.de>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <8fb887a0-3634-4e07-9f0d-d8d7c72ca802@t-8ch.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: JxnDC87bqdECTEQWZZVsnICFx4KSLLiI
+X-Proofpoint-ORIG-GUID: JxnDC87bqdECTEQWZZVsnICFx4KSLLiI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-03_04,2024-12-03_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 mlxlogscore=999
+ bulkscore=0 clxscore=1011 malwarescore=0 phishscore=0 suspectscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2412030127
 
-On Tue, Nov 26, 2024 at 04:58:53AM +0100, Milena Olech wrote:
-> Tx timestamp capabilities are negotiated for the uplink Vport.
-> Driver receives information about the number of available Tx timestamp
-> latches, the size of Tx timestamp value and the set of indexes used
-> for Tx timestamping.
+On 2024/12/3 22:07, Thomas Weißschuh wrote:
+> On 2024-12-03 08:58:26-0500, James Bottomley wrote:
+>> On Tue, 2024-12-03 at 21:02 +0800, Zijun Hu wrote:
+>>> On 2024/12/3 20:41, Greg Kroah-Hartman wrote:
+>>>> On Tue, Dec 03, 2024 at 08:23:45PM +0800, Zijun Hu wrote:
+>> [...]
+>>>>> or squash such patch series into a single patch ?
+>>>>>
+>>>>> various subsystem maintainers may not like squashing way.
+>>>>
+>>>> Agreed, so look into either doing it in a bisectable way if at all
+>>>> possible.  As I don't see a full series here, I can't suggest how
+>>>> it needs to happen :(
+>>>>
+>>>
+>>> let me send you a full series later and discuss how to solve this
+>>> issue.
+>>
+>> It's only slightly more complex than what we normally do: modify all
+>> instances and then change the API.  In this case you have an additional
+>> problem because the prototype "const void *" will cause a mismatch if a
+>> function has "void *".  The easiest way to solve this is probably to
+>> make device_find_child a macro that coerces its function argument to
+>> having a non const "void *" and then passes off to the real function. 
+>> If you do that in the first patch, then you can constify all the
+>> consumers and finally remove the macro coercion in the last patch.
 > 
-> Add function to get the Tx timestamp capabilities and parse the uplink
-> vport flag.
+> Casting function pointers like that should be detected and trapped by
+> control flow integrity checking (KCFI).
 > 
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Co-developed-by: Emil Tantilov <emil.s.tantilov@intel.com>
-> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
-> Co-developed-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-> Signed-off-by: Milena Olech <milena.olech@intel.com>
-> ---
-> v1 -> v2: change the idpf_for_each_vport macro
+> Another possibility would be to use a macro and _Generic to dispatch to
+> two different backing functions. See __BIN_ATTR() in
+> include/linux/sysfs.h for an inspiration.
 
-Hi Milena,
+this way may fix building error issue but does not achieve our purpose.
+our purpose is that there are only constified device_find_child().
 
-Some minor nits from my side.
 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.h b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
-> index e7ccdcbdbd47..057d1c546417 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_ptp.h
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
-> @@ -83,6 +83,70 @@ struct idpf_ptp_secondary_mbx {
->  	bool valid:1;
->  };
->  
-> +/**
-> + * enum idpf_ptp_tx_tstamp_state - Tx timestamp states
-> + * @IDPF_PTP_FREE: Tx timestamp index free to use
-> + * @IDPF_PTP_REQUEST: Tx timestamp index set to the Tx descriptor
-> + * @IDPF_PTP_READ_VALUE: Tx timestamp value ready to be read
-> + */
-> +enum idpf_ptp_tx_tstamp_state {
-> +	IDPF_PTP_FREE,
-> +	IDPF_PTP_REQUEST,
-> +	IDPF_PTP_READ_VALUE,
-> +};
-> +
-> +/**
-> + * struct idpf_ptp_tx_tstamp_status - Parameters to track Tx timestamp
-> + * @skb: the pointer to the SKB that received the completion tag
-> + * @state: the state of the Tx timestamp
-> + */
-> +struct idpf_ptp_tx_tstamp_status {
-> +	struct sk_buff *skb;
-> +	enum idpf_ptp_tx_tstamp_state state;
-> +};
-> +
-> +/**
-> + * struct idpf_ptp_tx_tstamp - Parameters for Tx timestamping
-> + * @list_member: the list member strutcure
-
-nit: structure
-
-     Flagged by checkpatch.pl --codespell
-
-> + * @tx_latch_reg_offset_l: Tx tstamp latch low register offset
-> + * @tx_latch_reg_offset_h: Tx tstamp latch high register offset
-> + * @skb: the pointer to the SKB for this timestamp request
-> + * @tstamp: the Tx tstamp value
-> + * @idx: the index of the Tx tstamp
-> + */
-> +struct idpf_ptp_tx_tstamp {
-> +	struct list_head list_member;
-> +	u32 tx_latch_reg_offset_l;
-> +	u32 tx_latch_reg_offset_h;
-> +	struct sk_buff *skb;
-> +	u64 tstamp;
-> +	u32 idx;
-> +};
-
-...
-
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-
-...
-
-> @@ -3154,6 +3157,14 @@ void idpf_vport_init(struct idpf_vport *vport, struct idpf_vport_max_q *max_q)
->  	idpf_vport_alloc_vec_indexes(vport);
->  
->  	vport->crc_enable = adapter->crc_enable;
-> +
-> +	if (!(vport_msg->vport_flags &
-> +	      le16_to_cpu(VIRTCHNL2_VPORT_UPLINK_PORT)))
-
-I think this should be cpu_to_le16.
-
-Flagged by Sparse.
-
-> +		return;
-> +
-> +	err = idpf_ptp_get_vport_tstamps_caps(vport);
-> +	if (err)
-> +		pci_dbg(vport->adapter->pdev, "Tx timestamping not supported\n");
->  }
->  
->  /**
-
-...
-
-> diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2.h b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-> index 44a5ee84ed60..fdeebc621bdb 100644
-> --- a/drivers/net/ethernet/intel/idpf/virtchnl2.h
-> +++ b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-> @@ -569,6 +569,14 @@ struct virtchnl2_queue_reg_chunks {
->  };
->  VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_queue_reg_chunks);
->  
-> +/**
-> + * enum virtchnl2_vport_flags - Vport flags that indicate vport capabilities.
-> + * @VIRTCHNL2_VPORT_UPLINK_PORT: Representatives of underlying physical ports
-> + */
-> +enum virtchnl2_vport_flags {
-> +	VIRTCHNL2_VPORT_UPLINK_PORT	= BIT(0),
-> +};
-> +
->  /**
->   * struct virtchnl2_create_vport - Create vport config info.
->   * @vport_type: See enum virtchnl2_vport_type.
-> @@ -620,7 +628,7 @@ struct virtchnl2_create_vport {
->  	__le16 max_mtu;
->  	__le32 vport_id;
->  	u8 default_mac_addr[ETH_ALEN];
-> -	__le16 pad;
-> +	__le16 vport_flags;
-
-The kernel doc for this structure, which is immediately above the
-structure, should also be updated.
-
-Flagged by ./scripts/kernel-doc -none
-
->  	__le64 rx_desc_ids;
->  	__le64 tx_desc_ids;
->  	u8 pad1[72];
-> -- 
-> 2.31.1
+> This also enables an incremental migration.
 > 
 > 
+
+change the API prototype from:
+device_find_child(..., void *data_0, int (*match)(struct device *dev,
+void *data));
+
+to:
+device_find_child(..., const void *data_0, int (*match)(struct device
+*dev, const void *data));
+
+For @data_0,  void * -> const void * is okay.
+but for @match, the problem is function pointer type incompatibility.
+
+there are two solutions base on discussions.
+
+1) squashing likewise Greg mentioned.
+   Do all of the "prep work" first, and then
+   do the const change at the very end, all at once.
+
+2)  as changing platform_driver's remove() prototype.
+Commit: e70140ba0d2b ("Get rid of 'remove_new' relic from platform
+driver struct")
+
+ introduce extra device_find_child_new() which is constified  -> use
+*_new() replace ALL device_find_child() instances one by one ->  remove
+device_find_child() -> rename *_new() to device_find_child() once.
+
+> Thomas
+
 
