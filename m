@@ -1,142 +1,296 @@
-Return-Path: <netdev+bounces-148593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E96009E282F
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:52:40 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45CCA9E2827
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 17:51:49 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53024BC2F86
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:47:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30BB3161753
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC001FC0EC;
-	Tue,  3 Dec 2024 16:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2947C1F8F04;
+	Tue,  3 Dec 2024 16:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WdWBTCpu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1eOvgjyk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E5E1FBEA8
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 16:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286741F8EEE
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 16:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733244350; cv=none; b=TiXVYg1CZyBu1XNnQPc0ptpmdn11OlKeljS9i2TUqMVS9+/a/2K1h5uIUGT+p3WoZh/BUKtqQn3bkWObhEVIma7q4DqHrqe54s3gkEl+PwwVtzEVEcXrKe/hD9g30rU5N/jZozaWaYJebbs0jj7gNglY/JI/wpj0xBNEj2/LL5s=
+	t=1733244653; cv=none; b=TdFSSNAgcFzKNqefi3qoJ1BYJcyI3MTvM9XNU65VuPICuZnOJwaQ+93Yf2fC4PCqBTeBqWIrYxBlnRaIhoKTYChk1Mjd21bZVYo5VdlAXZru8GYZH3yr8fEtiwc4XJ8O34mnOjBc3x7TIJBNeFR6qX1Y3XK07094D4KCFkakANM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733244350; c=relaxed/simple;
-	bh=8txQri0Jmwt48AK6CtbRreZE0/5HdwYGUUmq7fLofI8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NfRT0H9l5Cxw9tj/p9+fmKdGwyC/36XVb0RzXnZyk9rBnMoHk4oJurErsavsm011qraFKztQ3pmFSP/YjkQ5OVvaaOEHrxyeQ965VpSpzxoEwkJp5grR1ivmQBrK8uYgi0qqwUQuz3TjSBrPOONJnA3Tt3XGMGU90ADjbxFi0ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WdWBTCpu; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7fc22a88bcbso4332987a12.2
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 08:45:49 -0800 (PST)
+	s=arc-20240116; t=1733244653; c=relaxed/simple;
+	bh=28OCExHwJJ2LaQi9qemdvsGjyR7KLaTWEag8lagOtCQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LDZ3QU6pJyTibO4cUihw0htxH8rWnNpB2FGGIDbbXtNe9XCezMmSbd3lJtWONv6ZZzLIqbL9zfR4HFpoU7bZpdiYDfs2xp00csKYCpouKX+cBE6aqktwWYLDkvBmDbkIio3F0vKhwIY5++c1cTY3ZzgjiTQjc/ibdLAu9ri0uB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1eOvgjyk; arc=none smtp.client-ip=209.85.210.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-71d49784700so3670122a34.3
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 08:50:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1733244348; x=1733849148; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vqzroi2FrSBFbVBo+3KvSzH84y6uOPLgIyNQPhDZkb0=;
-        b=WdWBTCpu41fAYY9HkjMGwEJ8Uo2Pl8GE9RCh5KbzNmWippvjcBrdPNtRgurq1vyvmx
-         4TyZwGS/jw/NRGj4YNEu3F9vE98t3tJ5c7ZpBxaDaI5VOI0S5Z7SBieHCLtxj6NP4GS5
-         SMHM2jxO37rkMXvAzjccJDjRT3+1IX1Hf7bWA=
+        d=google.com; s=20230601; t=1733244650; x=1733849450; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=5fwdTno1dhXb33AJXJDEYIouSLHCKylp+QM1GEb59FU=;
+        b=1eOvgjyk+4Bs0Cv0FUSulbHaYildw6h43XOUwYdxwR1LZGrwOjFGNXlnDqyJILdCzA
+         JHMGNd8/sOX0l6IkEI6IRxpXsBDytko0ZFCZ6fyw/P5YcD6LJYjqjbSt8skCK4CVzqhg
+         v6CBFm+g25MScAxCabFspvO5NXW3UHGHVteGEsgXjP2enjBO84Cb2gIhvCwanjDcYCAh
+         UeEpx32ToaAVy3Woq87l/s8kTXwcMC0k+vLm34s0fXHN5uzGZylbtAi8/s8I2ewri61K
+         A2zyRAPpCdQ62vUM3Cdc0oapBWfNvofMj1YKOaT16aykYWYPYx48MhtQSABJlYDTHCyR
+         6Cag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733244348; x=1733849148;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vqzroi2FrSBFbVBo+3KvSzH84y6uOPLgIyNQPhDZkb0=;
-        b=buqzvK96P5lhalIaQWmzdATAKVklLmxGGWVZH8iStdCmlVsOaJMyzEZQQ2DBvyWUj3
-         seag9YFt141LgrcSfLSb2x90zT/v3kPUMLoy0jV1o6X/zTQUN3GrbRK2HSwoYnm1oNu7
-         8D01FppoR6OZSC93K9S9lgzj8aDOi7HIS+7Lylz9hvnrxVNziBIa1sG46bGAEGbR/N3/
-         NAsQqbmQGLaZd1tyk8or6GMLkVD+zTPcx3+F+WCQ/8FXR0ZZ9ann0UhRz8WkX3PijFG8
-         T8sGPvMROIg80ro/ldnoyun1Ub5KTm8FJV3TWCOPNSrAxaOAE9t2MTBK98EcC0qdX99W
-         B9wA==
-X-Forwarded-Encrypted: i=1; AJvYcCVZnBcfOz3Jjo6n68tAgiW9IVd0uFXgvx0OzUcD5TxFWouAjfyqAM80XWaVLnTfeWOggbnwcrE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyY8gnQ55MR9qsDvP7XxTGk2Hv0pOPIBqkbjFqckqOHVphEh/b4
-	yKZe2dO4m0udwarLiKfhE0/7NrTbTu+wZy1Icb0JfNLB1FAnXxAPuRzH1hN6uFar0RsyIXsyb2c
-	FTA==
-X-Gm-Gg: ASbGncuebNtDrzIohdEq/iAuKqDUFJzWrm3c6+8NzID5Ob+DjUaQ6KfabyUDBVQKZVZ
-	4Jbj4ps295zxgGy8NthAvlHY0ci59njogGemX+wdysDYtCEwKzFX8qmlsXyPTtNF0DDMgtkLP7+
-	xvjhZbERSDU7dWp6KdBLWocqT5MGV7+Uf5deRh+nwbfTN06XDdaWTiTPEzz7SoDZc1FpZ8k2vzI
-	mWUWoJqJ8jwy+ebg09IlIw8fWe+AY2pgXfLt/b9qB2UGQPVWxpjRy9txX/JmXEPuGmu8JYHMwYe
-	844LdV2lw7970A==
-X-Google-Smtp-Source: AGHT+IHy81B9W/Klpa0QcKbJZTdIad+AmSU5nnOj0DjYR160KfbJ28YOLg7kcsWLJH1CuNdZ6TTA1Q==
-X-Received: by 2002:a05:6a20:12d2:b0:1e0:cc21:19a2 with SMTP id adf61e73a8af0-1e1653a6494mr4289618637.1.1733244348551;
-        Tue, 03 Dec 2024 08:45:48 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72541848b36sm11039685b3a.187.2024.12.03.08.45.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2024 08:45:47 -0800 (PST)
-Message-ID: <fd39b546-3cea-4a4b-b6fc-edb5c2983966@broadcom.com>
-Date: Tue, 3 Dec 2024 08:45:46 -0800
+        d=1e100.net; s=20230601; t=1733244650; x=1733849450;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5fwdTno1dhXb33AJXJDEYIouSLHCKylp+QM1GEb59FU=;
+        b=WDpwsv5oG6J+zCPjHER9VQnlurqeb43WhomtNoYVWq1gC2PphIBda3kAJjWfzP/9if
+         Sr3nszBnmaheJhbzatUvbc/ZBiOcr4ws8a3mbUS3cHYJUdDaMos3fi4vdiKtNmo8/wGh
+         kchdKE75cHmklLrI0eXb1iF2KeYnjXSJpur5Hbw+XZbpFr1Bb3GgnycUFerEom1RvMvC
+         7hYIvmZawzidCGb0XJd15GLsLT2JT3gTvWjNDlbgJI4FcpdNqQ4HAfY4OG2OJ3vGMA6D
+         Z13PnUK5Z8q6q1cD9KIYV6zZLfnzHkEK78nxEHHIMCudxv+gMfy5pvTSe9wGH1Gs4+Si
+         7Kcw==
+X-Gm-Message-State: AOJu0Yz7fssy2TRGYlrrtD4CbpLzwRtyQhWR+BYUTT+dWcdvBU3pKpMR
+	ObFaRYd32yOQD5LxOqhAvxFdQcvbJ+b7ta483BNQcN5ty4DVZuTxfR8xuJopsrLlrPvrRPbNzK7
+	XNv+i3wU0vA==
+X-Google-Smtp-Source: AGHT+IGAL5r7lNeRVQ9WwkQpLzx/+0i6nb0CXGO10JBWEz87yn7iGvMqD8xi8IDiK+jU6QisrOaoaaVKdDTxnA==
+X-Received: from qtbci17.prod.google.com ([2002:a05:622a:2611:b0:466:98d9:81d3])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6359:4107:b0:1b8:f18:3e6e with SMTP id e5c5f4694b2df-1caeaabab2dmr281411155d.12.1733244650126;
+ Tue, 03 Dec 2024 08:50:50 -0800 (PST)
+Date: Tue,  3 Dec 2024 16:50:45 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 05/13] net: phy: bcm84881: implement
- phy_inband_caps() method
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-References: <Z08kCwxdkU4n2V6x@shell.armlinux.org.uk>
- <E1tIUrj-006IU6-ON@rmk-PC.armlinux.org.uk>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <E1tIUrj-006IU6-ON@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241203165045.2428360-1-edumazet@google.com>
+Subject: [PATCH net] net: defer final 'struct net' free in netns dismantle
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Ilya Maximets <i.maximets@ovn.org>, 
+	Dan Streetman <dan.streetman@canonical.com>, 
+	Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 12/3/24 07:31, Russell King (Oracle) wrote:
-> BCM84881 has no support for inband signalling, so this is a trivial
-> implementation that returns no support for inband.
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Ilya reported a slab-use-after-free in dst_destroy [1]
 
-Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Issue is in xfrm6_net_init() and xfrm4_net_init() :
+
+They copy xfrm[46]_dst_ops_template into net->xfrm.xfrm[46]_dst_ops.
+
+But net structure might be freed before all the dst callbacks are
+called. So when dst_destroy() calls later :
+
+if (dst->ops->destroy)
+    dst->ops->destroy(dst);
+
+dst->ops points to the old net->xfrm.xfrm[46]_dst_ops, which has been freed.
+
+See a relevant issue fixed in :
+
+ac888d58869b ("net: do not delay dst_entries_add() in dst_release()")
+
+A fix is to queue the 'struct net' to be freed after one
+another cleanup_net() round (and existing rcu_barrier())
+
+[1]
+
+BUG: KASAN: slab-use-after-free in dst_destroy (net/core/dst.c:112)
+Read of size 8 at addr ffff8882137ccab0 by task swapper/37/0
+Dec 03 05:46:18 kernel:
+CPU: 37 UID: 0 PID: 0 Comm: swapper/37 Kdump: loaded Not tainted 6.12.0 #67
+Hardware name: Red Hat KVM/RHEL, BIOS 1.16.1-1.el9 04/01/2014
+Call Trace:
+ <IRQ>
+dump_stack_lvl (lib/dump_stack.c:124)
+print_address_description.constprop.0 (mm/kasan/report.c:378)
+? dst_destroy (net/core/dst.c:112)
+print_report (mm/kasan/report.c:489)
+? dst_destroy (net/core/dst.c:112)
+? kasan_addr_to_slab (mm/kasan/common.c:37)
+kasan_report (mm/kasan/report.c:603)
+? dst_destroy (net/core/dst.c:112)
+? rcu_do_batch (kernel/rcu/tree.c:2567)
+dst_destroy (net/core/dst.c:112)
+rcu_do_batch (kernel/rcu/tree.c:2567)
+? __pfx_rcu_do_batch (kernel/rcu/tree.c:2491)
+? lockdep_hardirqs_on_prepare (kernel/locking/lockdep.c:4339 kernel/locking/lockdep.c:4406)
+rcu_core (kernel/rcu/tree.c:2825)
+handle_softirqs (kernel/softirq.c:554)
+__irq_exit_rcu (kernel/softirq.c:589 kernel/softirq.c:428 kernel/softirq.c:637)
+irq_exit_rcu (kernel/softirq.c:651)
+sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1049 arch/x86/kernel/apic/apic.c:1049)
+ </IRQ>
+ <TASK>
+asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:702)
+RIP: 0010:default_idle (./arch/x86/include/asm/irqflags.h:37 ./arch/x86/include/asm/irqflags.h:92 arch/x86/kernel/process.c:743)
+Code: 00 4d 29 c8 4c 01 c7 4c 29 c2 e9 6e ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 90 0f 00 2d c7 c9 27 00 fb f4 <fa> c3 cc cc cc cc 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 90
+RSP: 0018:ffff888100d2fe00 EFLAGS: 00000246
+RAX: 00000000001870ed RBX: 1ffff110201a5fc2 RCX: ffffffffb61a3e46
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffffb3d4d123
+RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed11c7e1835d
+R10: ffff888e3f0c1aeb R11: 0000000000000000 R12: 0000000000000000
+R13: ffff888100d20000 R14: dffffc0000000000 R15: 0000000000000000
+? ct_kernel_exit.constprop.0 (kernel/context_tracking.c:148)
+? cpuidle_idle_call (kernel/sched/idle.c:186)
+default_idle_call (./include/linux/cpuidle.h:143 kernel/sched/idle.c:118)
+cpuidle_idle_call (kernel/sched/idle.c:186)
+? __pfx_cpuidle_idle_call (kernel/sched/idle.c:168)
+? lock_release (kernel/locking/lockdep.c:467 kernel/locking/lockdep.c:5848)
+? lockdep_hardirqs_on_prepare (kernel/locking/lockdep.c:4347 kernel/locking/lockdep.c:4406)
+? tsc_verify_tsc_adjust (arch/x86/kernel/tsc_sync.c:59)
+do_idle (kernel/sched/idle.c:326)
+cpu_startup_entry (kernel/sched/idle.c:423 (discriminator 1))
+start_secondary (arch/x86/kernel/smpboot.c:202 arch/x86/kernel/smpboot.c:282)
+? __pfx_start_secondary (arch/x86/kernel/smpboot.c:232)
+? soft_restart_cpu (arch/x86/kernel/head_64.S:452)
+common_startup_64 (arch/x86/kernel/head_64.S:414)
+ </TASK>
+Dec 03 05:46:18 kernel:
+Allocated by task 12184:
+kasan_save_stack (mm/kasan/common.c:48)
+kasan_save_track (./arch/x86/include/asm/current.h:49 mm/kasan/common.c:60 mm/kasan/common.c:69)
+__kasan_slab_alloc (mm/kasan/common.c:319 mm/kasan/common.c:345)
+kmem_cache_alloc_noprof (mm/slub.c:4085 mm/slub.c:4134 mm/slub.c:4141)
+copy_net_ns (net/core/net_namespace.c:421 net/core/net_namespace.c:480)
+create_new_namespaces (kernel/nsproxy.c:110)
+unshare_nsproxy_namespaces (kernel/nsproxy.c:228 (discriminator 4))
+ksys_unshare (kernel/fork.c:3313)
+__x64_sys_unshare (kernel/fork.c:3382)
+do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+Dec 03 05:46:18 kernel:
+Freed by task 11:
+kasan_save_stack (mm/kasan/common.c:48)
+kasan_save_track (./arch/x86/include/asm/current.h:49 mm/kasan/common.c:60 mm/kasan/common.c:69)
+kasan_save_free_info (mm/kasan/generic.c:582)
+__kasan_slab_free (mm/kasan/common.c:271)
+kmem_cache_free (mm/slub.c:4579 mm/slub.c:4681)
+cleanup_net (net/core/net_namespace.c:456 net/core/net_namespace.c:446 net/core/net_namespace.c:647)
+process_one_work (kernel/workqueue.c:3229)
+worker_thread (kernel/workqueue.c:3304 kernel/workqueue.c:3391)
+kthread (kernel/kthread.c:389)
+ret_from_fork (arch/x86/kernel/process.c:147)
+ret_from_fork_asm (arch/x86/entry/entry_64.S:257)
+Dec 03 05:46:18 kernel:
+Last potentially related work creation:
+kasan_save_stack (mm/kasan/common.c:48)
+__kasan_record_aux_stack (mm/kasan/generic.c:541)
+insert_work (./include/linux/instrumented.h:68 ./include/asm-generic/bitops/instrumented-non-atomic.h:141 kernel/workqueue.c:788 kernel/workqueue.c:795 kernel/workqueue.c:2186)
+__queue_work (kernel/workqueue.c:2340)
+queue_work_on (kernel/workqueue.c:2391)
+xfrm_policy_insert (net/xfrm/xfrm_policy.c:1610)
+xfrm_add_policy (net/xfrm/xfrm_user.c:2116)
+xfrm_user_rcv_msg (net/xfrm/xfrm_user.c:3321)
+netlink_rcv_skb (net/netlink/af_netlink.c:2536)
+xfrm_netlink_rcv (net/xfrm/xfrm_user.c:3344)
+netlink_unicast (net/netlink/af_netlink.c:1316 net/netlink/af_netlink.c:1342)
+netlink_sendmsg (net/netlink/af_netlink.c:1886)
+sock_write_iter (net/socket.c:729 net/socket.c:744 net/socket.c:1165)
+vfs_write (fs/read_write.c:590 fs/read_write.c:683)
+ksys_write (fs/read_write.c:736)
+do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+Dec 03 05:46:18 kernel:
+Second to last potentially related work creation:
+kasan_save_stack (mm/kasan/common.c:48)
+__kasan_record_aux_stack (mm/kasan/generic.c:541)
+insert_work (./include/linux/instrumented.h:68 ./include/asm-generic/bitops/instrumented-non-atomic.h:141 kernel/workqueue.c:788 kernel/workqueue.c:795 kernel/workqueue.c:2186)
+__queue_work (kernel/workqueue.c:2340)
+queue_work_on (kernel/workqueue.c:2391)
+__xfrm_state_insert (./include/linux/workqueue.h:723 net/xfrm/xfrm_state.c:1150 net/xfrm/xfrm_state.c:1145 net/xfrm/xfrm_state.c:1513)
+xfrm_state_update (./include/linux/spinlock.h:396 net/xfrm/xfrm_state.c:1940)
+xfrm_add_sa (net/xfrm/xfrm_user.c:912)
+xfrm_user_rcv_msg (net/xfrm/xfrm_user.c:3321)
+netlink_rcv_skb (net/netlink/af_netlink.c:2536)
+xfrm_netlink_rcv (net/xfrm/xfrm_user.c:3344)
+netlink_unicast (net/netlink/af_netlink.c:1316 net/netlink/af_netlink.c:1342)
+netlink_sendmsg (net/netlink/af_netlink.c:1886)
+sock_write_iter (net/socket.c:729 net/socket.c:744 net/socket.c:1165)
+vfs_write (fs/read_write.c:590 fs/read_write.c:683)
+ksys_write (fs/read_write.c:736)
+do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+
+Fixes: a8a572a6b5f2 ("xfrm: dst_entries_init() per-net dst_ops")
+Reported-by: Ilya Maximets <i.maximets@ovn.org>
+Closes: https://lore.kernel.org/netdev/CANn89iKKYDVpB=MtmfH7nyv2p=rJWSLedO5k7wSZgtY_tO8WQg@mail.gmail.com/T/#m02c98c3009fe66382b73cfb4db9cf1df6fab3fbf
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+Cc: Dan Streetman <dan.streetman@canonical.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ include/net/net_namespace.h |  1 +
+ net/core/net_namespace.c    | 20 +++++++++++++++++++-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
+index 873c0f9fdac66397152dcc66dfffe02c82661b21..fcf5195bafa8d308dbd759b855433166c787fb21 100644
+--- a/include/net/net_namespace.h
++++ b/include/net/net_namespace.h
+@@ -80,6 +80,7 @@ struct net {
+ 						 * or to unregister pernet ops
+ 						 * (pernet_ops_rwsem write locked).
+ 						 */
++	struct llist_node	defer_free_list;
+ 	struct llist_node	cleanup_list;	/* namespaces on death row */
+ 
+ #ifdef CONFIG_KEYS
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index ae34ac818cda76493abe2f45a1f6f87ac8398934..825281e08cb46b2fc665dce2b558085710e5695c 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -449,6 +449,21 @@ static struct net *net_alloc(void)
+ 	goto out;
+ }
+ 
++static LLIST_HEAD(defer_free_list);
++
++static void net_complete_free(void)
++{
++	struct llist_node *kill_list;
++	struct net *net;
++
++	/* Get the list of namespaces to free from last round. */
++	kill_list = llist_del_all(&defer_free_list);
++
++	llist_for_each_entry(net, kill_list, defer_free_list)
++		kmem_cache_free(net_cachep, net);
++
++}
++
+ static void net_free(struct net *net)
+ {
+ 	if (refcount_dec_and_test(&net->passive)) {
+@@ -457,7 +472,8 @@ static void net_free(struct net *net)
+ 		/* There should not be any trackers left there. */
+ 		ref_tracker_dir_exit(&net->notrefcnt_tracker);
+ 
+-		kmem_cache_free(net_cachep, net);
++		/* Wait for an extra rcu_barrier() before final free. */
++		llist_add(&net->defer_free_list, &defer_free_list);
+ 	}
+ }
+ 
+@@ -642,6 +658,8 @@ static void cleanup_net(struct work_struct *work)
+ 	 */
+ 	rcu_barrier();
+ 
++	net_complete_free();
++
+ 	/* Finally it is safe to free my network namespace structure */
+ 	list_for_each_entry_safe(net, tmp, &net_exit_list, exit_list) {
+ 		list_del_init(&net->exit_list);
 -- 
-Florian
+2.47.0.338.g60cca15819-goog
+
 
