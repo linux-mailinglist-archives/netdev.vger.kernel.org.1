@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-148273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15D739E0FAB
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 01:27:12 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 086369E0FAD
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 01:27:24 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 301EFB22C4D
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:27:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86A64164F98
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E1C2C18C;
-	Tue,  3 Dec 2024 00:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08EB93BBEB;
+	Tue,  3 Dec 2024 00:26:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bcUkQNSj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KGsjU8J2"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7331E89C
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 00:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D47F29CFB
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 00:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733185605; cv=none; b=Bk6QyS/Z92rZIiFGDhmUIQMEvpbSNJ+RMZ5fByESyHji6xQ0pvlurcFdMHgxUgkOTCh0MN74uBAk4fQjbkLV3djBZk+LPvKWR/0lTqeN1O9XRx+gpmBG8tBJzD6noz+WGTtb44f18JdK34bzdM04OwVfJ7Lu74YBUsOZh+9wCgw=
+	t=1733185606; cv=none; b=QrIfo5gw0oWjv1Fl7ySCgOzW8LaiONYTMhOv5V8aAqQley9ozjuOTvYTvFyUCTBHAJq0FPX2Ryb0f8GYxBj+EiKHBysVepmXsVIv2lCGHTQT6QG2B4bLDBuoVJiNJBtLDwlYM85XA2Roudpe5wfvwjojplB0FrDgNV6oAzopXh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733185605; c=relaxed/simple;
-	bh=vlPTS3FAWdK3o+4cWtfjRMFpmv8SowMTS/b1CJnPmYE=;
+	s=arc-20240116; t=1733185606; c=relaxed/simple;
+	bh=gu20ew2eNe0omuRWZFSExyiSntYD1ab+5kf2dvSDMZo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hPDwL4dMto/vP7FDmWcApjakdBJ7LZ377hm2PhrvGP4RPU7sBgGscNB6oQZbZGnmT3pdq4zbM8EXHwkGdNDag/iAhc7CdUo/D8XjpET1eGrZvW7isH9R5bXXvmnZCOpZGQ3c4x9LF8Hahuu4ayc3NwUJVMN9zVE4riv3Pn0bhv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bcUkQNSj; arc=none smtp.client-ip=192.198.163.15
+	 In-Reply-To:To:Cc; b=DXITTpR4diePdYPIqV/PhxGtlUs2uMxX0ZYmMdAhv0ytCamI2GGAxWm8DXyQvVbBsDQ2OfR2V609rcFsIz1JrBnoJQnEsxXARUP18lW1Vs7otonvNqrEzwVmedtfav+C4Ubxw66SCY4WQ1kOu9yEME5gMBzXAmwxun3c8AGx/Yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KGsjU8J2; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733185604; x=1764721604;
+  t=1733185605; x=1764721605;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=vlPTS3FAWdK3o+4cWtfjRMFpmv8SowMTS/b1CJnPmYE=;
-  b=bcUkQNSjGerG+bkl1zsIU/nMczAzJ/12UThGv0Ll3MRH1AOjUiCNHJV4
-   JlHOD5SIjOO3/F7op/xlME0uVu2izBlMg/FmNc1PyHyvhawGLbfp6VvGH
-   Ci8PV+YcIDKNxCr4sc8KR38gWwFWWj7ClVRAFH/Avjstm+7jvfoapHJYi
-   jcVyw6Y5VvPlHthLutXEqUfqesU6U+7HhqRwQLeTXANVwFQ7cOMAKNgqQ
-   UVAJIe+rGKvBjPsUZuj7ZJvjDIT+a4DsExtQEsnD2y0kcMpf7ZNW7MihR
-   zODjWnghv3zVznx+8bUJxuJuPdBDEiJoEiz62dgdcFu9lMwcgjtRgqpJI
+  bh=gu20ew2eNe0omuRWZFSExyiSntYD1ab+5kf2dvSDMZo=;
+  b=KGsjU8J2uiZdQiGDN9eIcSeSnxDMHqL8EbNLrUKuSEeLqhVgbr25AqFC
+   R9JMSzh2iBfEhdbsIwdDBxOIIUHwloucMIfAj7YSk6FZ4VM3rJU/7K7E9
+   h/FOumDW+ljoWBgBVnGYsgzM5eR2ivyLmjCHLu11fv/gNe72y8nVnF+1h
+   yLvtUy/QZ27to90As5SUJURo2iwSLAVBrcP9ejRns8B3hh93UzXoheSVZ
+   cUEAIxqu0OBR/zarSsZ2QpqzZy7OzaPUXEn4a3blCrJJjEKQVnr3AzeUP
+   J6A9DFJqK5TqNRKui8zrOMOZjO44enubfojmn1bHvMjsM/6W5NjqKbQcl
    g==;
-X-CSE-ConnectionGUID: AUsuJtZrSbyxlzG/vcWg2g==
-X-CSE-MsgGUID: xLfrprD+RsiqdfL0caqEgg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="33509770"
+X-CSE-ConnectionGUID: fUJhmRXyQduqcgaXbxyRFA==
+X-CSE-MsgGUID: fvTu2vBVTY63KB5+ptkNVQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="33509777"
 X-IronPort-AV: E=Sophos;i="6.12,203,1728975600"; 
-   d="scan'208";a="33509770"
+   d="scan'208";a="33509777"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
   by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 16:26:40 -0800
-X-CSE-ConnectionGUID: UgkZXQfhSCKbMP251Lcs9g==
-X-CSE-MsgGUID: rLOE75C7S1abV9TptpS6mg==
+X-CSE-ConnectionGUID: A9xBJPB8Q5mCWx7jtMp5ZQ==
+X-CSE-MsgGUID: ZXS6Lb1hSkeghXnyfw7dCg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,203,1728975600"; 
-   d="scan'208";a="93454805"
+   d="scan'208";a="93454809"
 Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
   by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 16:26:40 -0800
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Mon, 02 Dec 2024 16:26:31 -0800
-Subject: [PATCH net-next v7 8/9] ice: move prefetch enable to
- ice_setup_rx_ctx
+Date: Mon, 02 Dec 2024 16:26:32 -0800
+Subject: [PATCH net-next v7 9/9] ice: cleanup Rx queue context programming
+ functions
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241202-packing-pack-fields-and-ice-implementation-v7-8-ed22e38e6c65@intel.com>
+Message-Id: <20241202-packing-pack-fields-and-ice-implementation-v7-9-ed22e38e6c65@intel.com>
 References: <20241202-packing-pack-fields-and-ice-implementation-v7-0-ed22e38e6c65@intel.com>
 In-Reply-To: <20241202-packing-pack-fields-and-ice-implementation-v7-0-ed22e38e6c65@intel.com>
 To: Vladimir Oltean <olteanv@gmail.com>, 
@@ -82,76 +82,120 @@ To: Vladimir Oltean <olteanv@gmail.com>,
 Cc: Jacob Keller <jacob.e.keller@intel.com>
 X-Mailer: b4 0.14.2
 
-The ice_write_rxq_ctx() function is responsible for programming the Rx
-Queue context into hardware. It receives the configuration in unpacked form
-via the ice_rlan_ctx structure.
+The ice_copy_rxq_ctx_to_hw() and ice_write_rxq_ctx() functions perform some
+defensive checks which are typically frowned upon by kernel style
+guidelines.
 
-This function unconditionally modifies the context to set the prefetch
-enable bit. This was done by commit c31a5c25bb19 ("ice: Always set prefena
-when configuring an Rx queue"). Setting this bit makes sense, since
-prefetching descriptors is almost always the preferred behavior.
+In particular, NULL checks on buffers which point to the stack are
+discouraged, especially when the functions are static and only called once.
+Checks of this sort only serve to hide potential programming error, as we
+will not produce the normal crash dump on a NULL access.
 
-However, the ice_write_rxq_ctx() function is not the place that actually
-defines the queue context. We initialize the Rx Queue context in
-ice_setup_rx_ctx(). It is surprising to have the Rx queue context changed
-by a function who's responsibility is to program the given context to
-hardware.
+In addition, ice_copy_rxq_ctx_to_hw() cannot fail in another way, so could
+be made void.
 
-Following the principle of least surprise, move the setting of the prefetch
-enable bit out of ice_write_rxq_ctx() and into the ice_setup_rx_ctx().
+Future support for VF Live Migration will need to introduce an inverse
+function for reading Rx queue context from HW registers to unpack it, as
+well as functions to pack and unpack Tx queue context from HW.
+
+Rather than copying these style issues into the new functions, lets first
+cleanup the existing code.
+
+For the ice_copy_rxq_ctx_to_hw() function:
+
+ * Move the Rx queue index check out of this function.
+ * Convert the function to a void return.
+ * Use a simple int variable instead of a u8 for the for loop index, and
+   initialize it inside the for loop.
+ * Update the function description to better align with kernel doc style.
+
+For the ice_write_rxq_ctx() function:
+
+ * Move the Rx queue index check into this function.
+ * Update the function description with a Returns: to align with kernel doc
+   style.
+
+These changes align the existing write functions to current kernel
+style, and will align with the style of the new functions added when we
+implement live migration in a future series.
 
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_base.c   | 3 +++
- drivers/net/ethernet/intel/ice/ice_common.c | 9 +++------
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_common.c | 28 +++++++++++-----------------
+ 1 file changed, 11 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index 5fe7b5a100202e6f0c33c617c604d45f9487b1f4..b2af8e3586f7620d372f2055e337485d102d3cbc 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -454,6 +454,9 @@ static int ice_setup_rx_ctx(struct ice_rx_ring *ring)
- 	/* Rx queue threshold in units of 64 */
- 	rlan_ctx.lrxqthresh = 1;
- 
-+	/* Enable descriptor prefetch */
-+	rlan_ctx.prefena = 1;
-+
- 	/* PF acts as uplink for switchdev; set flex descriptor with src_vsi
- 	 * metadata and flags to allow redirecting to PR netdev
- 	 */
 diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 1b013c9c937826633db8cbe29d8e1dc310c7b6f0..379040593d975342eaa2a3032938683b419f4f60 100644
+index 379040593d975342eaa2a3032938683b419f4f60..6c6862beab6a961ce5c0bc34e9c5794ed8cda865 100644
 --- a/drivers/net/ethernet/intel/ice/ice_common.c
 +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1430,14 +1430,13 @@ static void ice_pack_rxq_ctx(const struct ice_rlan_ctx *ctx,
+@@ -1358,32 +1358,23 @@ int ice_reset(struct ice_hw *hw, enum ice_reset_req req)
  }
  
  /**
-- * ice_write_rxq_ctx
-+ * ice_write_rxq_ctx - Write Rx Queue context to hardware
+- * ice_copy_rxq_ctx_to_hw
++ * ice_copy_rxq_ctx_to_hw - Copy packed Rx queue context to HW registers
   * @hw: pointer to the hardware structure
-  * @rlan_ctx: pointer to the rxq context
+  * @rxq_ctx: pointer to the packed Rx queue context
+  * @rxq_index: the index of the Rx queue
+- *
+- * Copies rxq context from dense structure to HW register space
+  */
+-static int ice_copy_rxq_ctx_to_hw(struct ice_hw *hw,
+-				  const ice_rxq_ctx_buf_t *rxq_ctx,
+-				  u32 rxq_index)
++static void ice_copy_rxq_ctx_to_hw(struct ice_hw *hw,
++				   const ice_rxq_ctx_buf_t *rxq_ctx,
++				   u32 rxq_index)
+ {
+-	u8 i;
+-
+-	if (rxq_index > QRX_CTRL_MAX_INDEX)
+-		return -EINVAL;
+-
+ 	/* Copy each dword separately to HW */
+-	for (i = 0; i < ICE_RXQ_CTX_SIZE_DWORDS; i++) {
++	for (int i = 0; i < ICE_RXQ_CTX_SIZE_DWORDS; i++) {
+ 		u32 ctx = ((const u32 *)rxq_ctx)[i];
+ 
+ 		wr32(hw, QRX_CONTEXT(i, rxq_index), ctx);
+ 
+ 		ice_debug(hw, ICE_DBG_QCTX, "qrxdata[%d]: %08X\n", i, ctx);
+ 	}
+-
+-	return 0;
+ }
+ 
+ #define ICE_CTX_STORE(struct_name, struct_field, width, lsb) \
+@@ -1432,23 +1423,26 @@ static void ice_pack_rxq_ctx(const struct ice_rlan_ctx *ctx,
+ /**
+  * ice_write_rxq_ctx - Write Rx Queue context to hardware
+  * @hw: pointer to the hardware structure
+- * @rlan_ctx: pointer to the rxq context
++ * @rlan_ctx: pointer to the unpacked Rx queue context
   * @rxq_index: the index of the Rx queue
   *
-- * Converts rxq context from sparse to dense structure and then writes
-- * it to HW register space and enables the hardware to prefetch descriptors
-- * instead of only fetching them on demand
-+ * Pack the sparse Rx Queue context into dense hardware format and write it
-+ * into the HW register space.
+  * Pack the sparse Rx Queue context into dense hardware format and write it
+  * into the HW register space.
++ *
++ * Return: 0 on success, or -EINVAL if the Rx queue index is invalid.
   */
  int ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
  		      u32 rxq_index)
-@@ -1447,8 +1446,6 @@ int ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
- 	if (!rlan_ctx)
+ {
+ 	ice_rxq_ctx_buf_t buf = {};
+ 
+-	if (!rlan_ctx)
++	if (rxq_index > QRX_CTRL_MAX_INDEX)
  		return -EINVAL;
  
--	rlan_ctx->prefena = 1;
--
  	ice_pack_rxq_ctx(rlan_ctx, &buf);
++	ice_copy_rxq_ctx_to_hw(hw, &buf, rxq_index);
  
- 	return ice_copy_rxq_ctx_to_hw(hw, &buf, rxq_index);
+-	return ice_copy_rxq_ctx_to_hw(hw, &buf, rxq_index);
++	return 0;
+ }
+ 
+ /* LAN Tx Queue Context */
 
 -- 
 2.47.0.265.g4ca455297942
