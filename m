@@ -1,199 +1,221 @@
-Return-Path: <netdev+bounces-148637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A7C79E2B59
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 19:49:37 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91B2B9E2B67
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 19:54:23 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2318D163B78
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:49:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3055E2836E4
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 18:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE121FA177;
-	Tue,  3 Dec 2024 18:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302291FDE01;
+	Tue,  3 Dec 2024 18:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oKbvqtPr"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AfWj23R0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2076.outbound.protection.outlook.com [40.107.93.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1701362
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 18:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733251774; cv=none; b=URQEiye49YRt+0kwOeB4N/mAqkFO/1i/63be3zRjJZLxoyfnI7ykWTAicw4qERzT0VHFhFjBLy2DRs7kB1+k4bM3Np7Ff4P7aNkTD6NzJA4/seVckTSaInoBHFieFCX9zDZG7SWj9UdfyQfuLqysY2NbHBcyTalCL8vbNFNMIK4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733251774; c=relaxed/simple;
-	bh=M4qITtnES7xCFeAZqFvSzz18GVdqf3EvbdoAZGCNTGo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ndMggVgfvpNEzqFkJyDZnrvBK6nTORtOrSD75fd4Rp4hKMY6Uhke4a8npBSQpG0/A7HR5wLktqkHdQEfw29AA5DE2N66HUCQWnL6T56WPmBYHXPwJFyOtbErVuNpOL24EAosxnMfDu82BjwCT08B8ZYjJyNStmwWahKIYsudoJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oKbvqtPr; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-434a8640763so50044725e9.1
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 10:49:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733251771; x=1733856571; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=thSqbQjoOYsFydcpCQhEBnXOUDbYt9Tm54/71p4oXVA=;
-        b=oKbvqtPrJmfHeC8JvDy0SGlau52tQvUD1h3pHtKwTt6oXn0pfJSmEOcQKplLd/Pmau
-         4NV4zFOVdZQfml4L+0hDxNLM9dMkSgdiyXSqot0qdz6e2CD7yTLJ2T8U0pgha7BpAq+4
-         tpaoHXqzt2lFmkJnA7uAzHdzG18keY20sAWsovMa3BHmexkwDBnjku/XuuMuDfOkQxVn
-         USkZJN3j+ml5lvIzgkeHM49x5V6Xl6XdQ27S5BCv+HaQMilesXnKXEoEfOTHpV2UuUrG
-         +JVjXHn7gO6Sd718IoHqLCfyHxwn5Aza8xLXTW6o2t0GF/qH+vGuKLw5szt0qkvFiVYo
-         AaPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733251771; x=1733856571;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=thSqbQjoOYsFydcpCQhEBnXOUDbYt9Tm54/71p4oXVA=;
-        b=j9z99cNFFboEj8LhCbrJNaPbK3luUNmLMl0fUebWNNcLBkpn82B/nCv8Z7rtaFclYs
-         8GZDjXHDQb73T6BHHCEXlJiG06Q0wftFJU5CHyJTpx/PSnhl8gVu7/Z1/2PJ5Cs3F/B+
-         NDMgpiJh4noQiE0Gw4BGuqD++s3wGrD6YG75wse81AW5w/Bozyg7/P7lT3it88l0TBRK
-         oglHo9x00+0EEuSb5ijiERFYjSML9MgL1bSp1vpR7x8O+X3EBO2Zmxv5Kk2PIxpAfYrS
-         AOlm62fCW931TCGu43ZBrOeH1RbtXW2yZROd05uGhFDUXXbwngVLRXO/AXfAOmHhbbWK
-         7Yrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGeKuGbIoGsM6Jl4ZHlwh8NmzJy9jHQxHpSjQbo81yyiHCbd7dLwjE8PrG0fGv2S2l2S7vroM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzreOiaBRsv3bOrAvVT91lcTHIEw35lne7fjIze1Fx12VKWZ7FS
-	lstnPGysbNfhgdbhdeIvwSdBwXGP7jqbOlqbFOfnr9HVCT3CIWJ78r41GsduLAWby5CFmytmWdv
-	Y5h0xYb13RbZapqCj2fBtKbMaePvtEWdPimzfXpABTeSfwG56KQ==
-X-Gm-Gg: ASbGncug9zdnh1fOCkkq2P0GWJtCA3bKlPtfncU5OH27/7aFjtErRpYzSZeFdm1Vvo2
-	spXj2zv/njm90AU0JwDlNRpPEZXw2ik0ePajmjMhXLgaZqokP8DKBYOLdjFBD
-X-Google-Smtp-Source: AGHT+IHpwUj1n3HR/fT6ZhBlnLtRvznJIBv20w7oRFmmrltUqPgU+1F0OlSvDAo1FenF7PIWotv4E5UoxC9yVUZAkm4=
-X-Received: by 2002:a05:600c:3b18:b0:431:5a27:839c with SMTP id
- 5b1f17b1804b1-434d09b1564mr33847945e9.5.1733251770587; Tue, 03 Dec 2024
- 10:49:30 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962031F76D5;
+	Tue,  3 Dec 2024 18:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733252059; cv=fail; b=a6h2pIyrDbVXa94KMxq1VSJ3CSWl2+ybguvsOIKJz0elOrKOLLioosWFVE49xv0PENdyuAoSTvFE6s49XOLyi31O6voqvx71Y/QeyN8dtxuE+CiIezcdEqTn5bjPGrJNgRQ9O7h0INb3+tHVMcGfQ+nqqaLBj2QxgjM2lIe5FQ8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733252059; c=relaxed/simple;
+	bh=iCW5gKROvJUrtJoXXnrW5YWMPC1/53FkPi0qfSFnuFs=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RCp3GAp5hqeR3/GUOh0N3YFHFu9Fm90YOEh14MENgnJvbPVujZkdg+UIKzZ2oGbqkaM4LjQg8yf8z+uLbjfFq4xJSFnoqQYpJqkVvgJn5YPynFSU/EDphag7bDuNjJVcKA09gqEuiajzEHdYrXWUi/EjxqQAVtT/YX/mZp917Hs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AfWj23R0; arc=fail smtp.client-ip=40.107.93.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SqTEY+5lsqq3cU70Fr1uOD/hPffl6V+bEXTWTU14779HymRNMwzn6QoiStVLll3K/ePYooyxxs9yBDQJ/y88NyNgotgQB0O9UUyVDesMp97pwP60E66XSdPDb7BMibftUPAzRvIQLJCnpx//o7PRP0BlNE3eO/RRovsy6/fYmsTgRdm8Q6isVfBBOHiN6QaLJ9heyAMpSx0OI4DH3WGkHU35EWlEQJHEXOesU+sbz+IxpZINrcPw0FZR9qJTnPiRWjQfU4m2NWV59T+gZ0wPr2xZHwA0s0TsA5GP8UwD7ZT3hKduFapnsZOnx/utHiMYbkQhbAoVvxd90j+DolaB3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wHYmcuKZPg4GFCWZr711qmTeCcYKlLe0UJz7mSRgnhE=;
+ b=ExU5hLEH7+/B3P0YijCxF0pGahFgE2qCTrLtzJCNaqPyBdjRZCmY44i4u3AeMgnXNihSC/SaHycbnqx7i5n/DKZ22+camD/JdvDmlRhqH9lAXUDEzXTKp6O+Hy+uQJFi/WKhIJUv2JvpjYWGIGxxEdYkFbWHASPRfGTAkoN20Uid0MtvojrhjClFfqhC7Zzl/sWw/cekQh+gMZJ4Xxm77owTPYrr6CHrzMRH9eiMcQtslXj+RhMgCL8y32ZktfBJq7e8vaAI7oYgo2H8Js7S4z3V7XKZ4ebnfSDIXGXahh/yqdZc8erW1nsr7JdxDD4mTutVIldGviTEAmBbvDFhHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=amd.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wHYmcuKZPg4GFCWZr711qmTeCcYKlLe0UJz7mSRgnhE=;
+ b=AfWj23R0NWHTApKlokvYHmG3MZCNDfLNZSvA4pAcEVjdIZ5fW/unc8DNdm88dUFSpWabLJDY1dIm+gzCpm0uSWwNRjbeLPpIuBfZ0FQ8WCXROALjmTs8a6R37RC/KxWHGLyvJpDEVeBIxzsKDfmCmgJWxbNwMCh+WhmzhHeYUCo0AB4C/EOSRGhbg15aFf8BFYGgVeoDNV73AOCkS9mxwIhCjZqo92T5O+pvMFozxrbUvBpxtpGKaJVpomGBBqqCxl3latW25Xgs12puXzkMiLcdh3kyP+VjYtpB4LJsoOlpmbUtYYlvXjPHaRP2EL6EGHRWEDqvGehSZEjp33QnTg==
+Received: from SJ0PR03CA0012.namprd03.prod.outlook.com (2603:10b6:a03:33a::17)
+ by DM4PR12MB7646.namprd12.prod.outlook.com (2603:10b6:8:106::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.18; Tue, 3 Dec
+ 2024 18:54:09 +0000
+Received: from SJ1PEPF00002310.namprd03.prod.outlook.com
+ (2603:10b6:a03:33a:cafe::ff) by SJ0PR03CA0012.outlook.office365.com
+ (2603:10b6:a03:33a::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8207.17 via Frontend Transport; Tue,
+ 3 Dec 2024 18:54:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ SJ1PEPF00002310.mail.protection.outlook.com (10.167.242.164) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8230.7 via Frontend Transport; Tue, 3 Dec 2024 18:54:09 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 3 Dec 2024
+ 10:53:58 -0800
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 3 Dec 2024 10:53:58 -0800
+Received: from localhost (10.127.8.10) by mail.nvidia.com (10.126.190.182)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Tue, 3 Dec
+ 2024 10:53:55 -0800
+Date: Tue, 3 Dec 2024 20:53:55 +0200
+From: Zhi Wang <zhiw@nvidia.com>
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <martin.habets@xilinx.com>,
+	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <edumazet@google.com>, <dave.jiang@intel.com>,
+	"Alejandro Lucero" <alucerop@amd.com>
+Subject: Re: [PATCH v6 26/28] cxl: add function for obtaining region range
+Message-ID: <20241203205355.000079a4@nvidia.com>
+In-Reply-To: <20241202171222.62595-27-alejandro.lucero-palau@amd.com>
+References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
+	<20241202171222.62595-27-alejandro.lucero-palau@amd.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241203173617.2595451-1-edumazet@google.com>
-In-Reply-To: <20241203173617.2595451-1-edumazet@google.com>
-From: Brian Vazquez <brianvv@google.com>
-Date: Tue, 3 Dec 2024 13:49:18 -0500
-Message-ID: <CAMzD94TUrgWaJ8y-ROYKLCWJCn_9ykf15jTvGs4HYdd=K4_OpA@mail.gmail.com>
-Subject: Re: [PATCH net-next] inet: add indirect call wrapper for getfrag() calls
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002310:EE_|DM4PR12MB7646:EE_
+X-MS-Office365-Filtering-Correlation-Id: bb9d07e7-d02e-4a39-92f1-08dd13cbdedb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700013|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?kRDUjNi/iuDe2BuE0x4PoZEwdXxP+9N+yPeqQ8nMXl103V74U1VCR3GGCuZw?=
+ =?us-ascii?Q?U0HL3HxoQN//47i19bJc4rVt51Ft0RZBH39PlL4CIIagjzAQycpewvpFYnQ6?=
+ =?us-ascii?Q?xbSIXBkThlYILTjF4UpzAln4ur9kJkGHBI3IiijJPVJlMWWR3wMmxL26q8bj?=
+ =?us-ascii?Q?vi3wuaYhAp+GVv5ptIOTWhkzzj2CvBzkoGbWKYi6Oh6MVeMxph1O1g7mCeV8?=
+ =?us-ascii?Q?WAJtBMrTMw7994iDpbqv2PzPHMR1yFcRQHJ/6b3/h1LQD3JTUkve09AA/Y0+?=
+ =?us-ascii?Q?I/Z2PXokzvox81Dvc5S5OV4XzRhb63t/Og9Z339oRORRd5XOxIe1+NNCSep3?=
+ =?us-ascii?Q?ypocDNWNO8pIFMikdABBuopCkZdz9xutO9N0/qGqnVjb8DOoTiMDf2Vl+zkQ?=
+ =?us-ascii?Q?iccH6FNq/g9+ug67LcChlB6F7VOwBaQy1cC7QUnXkSI9BgXGyUW9ty9MigUB?=
+ =?us-ascii?Q?w5TY3UQFRkpEGKTvb/mXbHFbnQ6MYs3XtAvhlLqjYux8AqSozuswK4T/cDG8?=
+ =?us-ascii?Q?AHcEfeXmObJe15zrEL8LoMyVhRDL6vFTB20JThIfnIW6RaIhy5WtTKJZPg0C?=
+ =?us-ascii?Q?hB9+aCaTFsIAQFbc0XpHea6Ch8YAqS7mAZielnuG33mQ0HRTcJTm3DyoTCGc?=
+ =?us-ascii?Q?KHX8T7o/Bkr43T9qC4fFBeZEqiNqWwj7UJi+MBLl2duftsqzFFo3TDCg4VYh?=
+ =?us-ascii?Q?Ove8/+xWTQfb/EDwfhcDVy+rio9IIu2WqD0xh1Z2WtmwGV3JDoDslu2gGxSY?=
+ =?us-ascii?Q?1CTVa9cBu/uM2KFt01lmmL250VbixF6zjycCqIP4HihMXChgMxChzjkN22FW?=
+ =?us-ascii?Q?fc2c6/3+EFaP6rjotINdyctugy3pLn2KlqwPwevhTzjWShp5zCUKgXknx/ki?=
+ =?us-ascii?Q?dS3GyJ+MGq9NzbalLbtWChRDTlKbcjSLvMd/zqSG2Q+tA1pZoXzBXXvPo+El?=
+ =?us-ascii?Q?UDxPDM135pCA5RZ8UsDJqb841eEvfQRuBRf4so5FwF5ewDGSjoompRZHfzsU?=
+ =?us-ascii?Q?IbNOhE1x4BQCFhc6jcHepGxB8EObeuPEoHGIXvl5h4KHOyJ1+YwcjxR8bUaI?=
+ =?us-ascii?Q?YR6SPmyVB1ofRx4SoEm4e8ERU3X/6/4Uwn4rWWGeAJAW2YuChMlxrj+YhNUu?=
+ =?us-ascii?Q?S/Qf4We/8GPmJz+EEq261HqiKryZTpEMuT+gLqo32lTZ13J/8o8Gi71h66Q9?=
+ =?us-ascii?Q?Ks6O90zQ/UjbxlJu2wJanSxQVTdA4DyUSszBlYq9lDXKP5XZ6X3NEW3Citvo?=
+ =?us-ascii?Q?IWCRLfN9L1BOWpMBUy0VbranKJeiUpURrv5gYr0ToZmXcweK9Wc7nZp2Qq2p?=
+ =?us-ascii?Q?bgicS6YMfLRfmwVS/d8Pe7+noAfbGka3Y6WLcyYgaw6PqrEOa/uS0CsJHKXe?=
+ =?us-ascii?Q?7bmUzMgqrnjD3/rJUWidVlKtg+O70ciyWbVt0WDCUu9BLKCmw3Tndtg/Crc2?=
+ =?us-ascii?Q?uHiIligUs0W/hyz+QLAcCc+n2w5iFTix?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700013)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2024 18:54:09.4386
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb9d07e7-d02e-4a39-92f1-08dd13cbdedb
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002310.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7646
 
-On Tue, Dec 3, 2024 at 12:36=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> UDP send path suffers from one indirect call to ip_generic_getfrag()
->
-> We can use INDIRECT_CALL_1() to avoid it.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On Mon, 2 Dec 2024 17:12:20 +0000
+<alejandro.lucero-palau@amd.com> wrote:
 
-Reviewed-by: Brian Vazquez <brianvv@google.com>
-
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> A CXL region struct contains the physical address to work with.
+> 
+> Add a function for getting the cxl region range to be used for mapping
+> such memory range.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 > ---
-> Cc: Willem de Bruijn <willemb@google.com>
-> Cc: Brian Vazquez <brianvv@google.com>
-> ---
->  net/ipv4/ip_output.c  | 13 +++++++++----
->  net/ipv6/ip6_output.c | 13 ++++++++-----
->  2 files changed, 17 insertions(+), 9 deletions(-)
->
-> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-> index 0065b1996c947078bea210c9abe5c80fa0e0ab4f..a59204a8d85053a9b8c9e86a4=
-04aa4bf2f0d2416 100644
-> --- a/net/ipv4/ip_output.c
-> +++ b/net/ipv4/ip_output.c
-> @@ -1169,7 +1169,10 @@ static int __ip_append_data(struct sock *sk,
->                         /* [!] NOTE: copy will be negative if pagedlen>0
->                          * because then the equation reduces to -fraggap.
->                          */
-> -                       if (copy > 0 && getfrag(from, data + transhdrlen,=
- offset, copy, fraggap, skb) < 0) {
-> +                       if (copy > 0 &&
-> +                           INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
-> +                                           from, data + transhdrlen, off=
-set,
-> +                                           copy, fraggap, skb) < 0) {
->                                 err =3D -EFAULT;
->                                 kfree_skb(skb);
->                                 goto error;
-> @@ -1213,8 +1216,9 @@ static int __ip_append_data(struct sock *sk,
->                         unsigned int off;
->
->                         off =3D skb->len;
-> -                       if (getfrag(from, skb_put(skb, copy),
-> -                                       offset, copy, off, skb) < 0) {
-> +                       if (INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
-> +                                           from, skb_put(skb, copy),
-> +                                           offset, copy, off, skb) < 0) =
-{
->                                 __skb_trim(skb, off);
->                                 err =3D -EFAULT;
->                                 goto error;
-> @@ -1252,7 +1256,8 @@ static int __ip_append_data(struct sock *sk,
->                                 get_page(pfrag->page);
->                         }
->                         copy =3D min_t(int, copy, pfrag->size - pfrag->of=
-fset);
-> -                       if (getfrag(from,
-> +                       if (INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
-> +                                   from,
->                                     page_address(pfrag->page) + pfrag->of=
-fset,
->                                     offset, copy, skb->len, skb) < 0)
->                                 goto error_efault;
-> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-> index f7b4608bb316ed2114a0e626aad530b62b767fc1..3d672dea9f56284e7a8ebabec=
-037e04e7f3d19f4 100644
-> --- a/net/ipv6/ip6_output.c
-> +++ b/net/ipv6/ip6_output.c
-> @@ -1697,8 +1697,9 @@ static int __ip6_append_data(struct sock *sk,
->                                 pskb_trim_unique(skb_prev, maxfraglen);
->                         }
->                         if (copy > 0 &&
-> -                           getfrag(from, data + transhdrlen, offset,
-> -                                   copy, fraggap, skb) < 0) {
-> +                           INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
-> +                                          from, data + transhdrlen, offs=
-et,
-> +                                          copy, fraggap, skb) < 0) {
->                                 err =3D -EFAULT;
->                                 kfree_skb(skb);
->                                 goto error;
-> @@ -1742,8 +1743,9 @@ static int __ip6_append_data(struct sock *sk,
->                         unsigned int off;
->
->                         off =3D skb->len;
-> -                       if (getfrag(from, skb_put(skb, copy),
-> -                                               offset, copy, off, skb) <=
- 0) {
-> +                       if (INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
-> +                                           from, skb_put(skb, copy),
-> +                                           offset, copy, off, skb) < 0) =
-{
->                                 __skb_trim(skb, off);
->                                 err =3D -EFAULT;
->                                 goto error;
-> @@ -1781,7 +1783,8 @@ static int __ip6_append_data(struct sock *sk,
->                                 get_page(pfrag->page);
->                         }
->                         copy =3D min_t(int, copy, pfrag->size - pfrag->of=
-fset);
-> -                       if (getfrag(from,
-> +                       if (INDIRECT_CALL_1(getfrag, ip_generic_getfrag,
-> +                                   from,
->                                     page_address(pfrag->page) + pfrag->of=
-fset,
->                                     offset, copy, skb->len, skb) < 0)
->                                 goto error_efault;
-> --
-> 2.47.0.338.g60cca15819-goog
->
+>  drivers/cxl/core/region.c | 15 +++++++++++++++
+>  drivers/cxl/cxl.h         |  1 +
+>  include/cxl/cxl.h         |  1 +
+>  3 files changed, 17 insertions(+)
+> 
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index 5cb7991268ce..021e9b373cdd 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -2667,6 +2667,21 @@ static struct cxl_region *devm_cxl_add_region(struct cxl_root_decoder *cxlrd,
+>  	return ERR_PTR(rc);
+>  }
+>  
+> +int cxl_get_region_range(struct cxl_region *region, struct range *range)
+> +{
+> +	if (!region)
+> +		return -ENODEV;
+> +
+
+I am leaning towards having a WARN_ON_ONCE() above.
+
+> +	if (!region->params.res)
+> +		return -ENOSPC;
+> +
+> +	range->start = region->params.res->start;
+> +	range->end = region->params.res->end;
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_get_region_range, CXL);
+> +
+>  static ssize_t __create_region_show(struct cxl_root_decoder *cxlrd, char *buf)
+>  {
+>  	return sysfs_emit(buf, "region%u\n", atomic_read(&cxlrd->region_id));
+> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
+> index cc9e3d859fa6..32d2bd0520d4 100644
+> --- a/drivers/cxl/cxl.h
+> +++ b/drivers/cxl/cxl.h
+> @@ -920,6 +920,7 @@ void cxl_coordinates_combine(struct access_coordinate *out,
+>  
+>  bool cxl_endpoint_decoder_reset_detected(struct cxl_port *port);
+>  
+> +int cxl_get_region_range(struct cxl_region *region, struct range *range);
+>  /*
+>   * Unit test builds overrides this to __weak, find the 'strong' version
+>   * of these symbols in tools/testing/cxl/.
+> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+> index 14be26358f9c..0ed9e32f25dd 100644
+> --- a/include/cxl/cxl.h
+> +++ b/include/cxl/cxl.h
+> @@ -65,4 +65,5 @@ struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
+>  				     bool no_dax);
+>  
+>  int cxl_accel_region_detach(struct cxl_endpoint_decoder *cxled);
+> +int cxl_get_region_range(struct cxl_region *region, struct range *range);
+>  #endif
+
 
