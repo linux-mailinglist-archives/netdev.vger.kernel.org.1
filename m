@@ -1,147 +1,116 @@
-Return-Path: <netdev+bounces-148311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ECA29E1164
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 03:37:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60A429E1179
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 03:50:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C96B1B22557
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 02:37:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E715EB230C6
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 02:50:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BF8C13AA27;
-	Tue,  3 Dec 2024 02:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D6B9137C35;
+	Tue,  3 Dec 2024 02:49:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gIWS2hT+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R2XshAV+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07EA717555;
-	Tue,  3 Dec 2024 02:37:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1460364AE;
+	Tue,  3 Dec 2024 02:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733193433; cv=none; b=Q607tU4hMNIWRfRrhDygkhkeb9uCgYAaUSQWyLa6tHmMu6v5189yEWWh97z+NFeCZWG1c7n/68OqybTsEBGx8++IMM5YO8kJfY52O4Pz0nay6jtlubWziPdYb2jbcG23HWoP/kQeiSzZNYMUb+FXNwOsbmDjshsTSNq0J2LPO5M=
+	t=1733194197; cv=none; b=Ic8crv6Yf5f8yCsxina5J6FqQwtZEUAXo12xd+G+YL2oMeO6yer7POUldcFmOZCsPop0mDUn9+iS+OSuvvpIHMFnKrmh6JkIj1/Q4ApWFy6CN6dyIbG4dLfjlGSXSyCTy81TMy8wHUc/45c8P7w+Wllc7Nctt2kN85KcDruSNU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733193433; c=relaxed/simple;
-	bh=6Ja4w+58kzvqSCMhVlQfCP1pDkXx6r+Q8RYdMY+p/rc=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ki7NM2iLxwV6bC2cOmTDE/Vyz4XtHYj0VfqTgRnVPNdqsDWLDkX1sremirehpxXqp1KHslbXXvchLWRjyhN1fZsnnpMr25c7MRRC2ic708Uz8vxZGtv+uBNLJBMd+DRHTKf9IC03IGGE0vAL8TL6HgemmtmPn5hOTZtFtGq3mI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gIWS2hT+; arc=none smtp.client-ip=209.85.217.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-4add8596cccso134806137.0;
-        Mon, 02 Dec 2024 18:37:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733193431; x=1733798231; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=GtLF14vm7EJeeDXSwAcjR67YkypYDnF88/MBHtM834c=;
-        b=gIWS2hT+sb/Y1ePZheApd1reoB3eADE5Fi03FRaRPrGBYwwxz6jhNiHFPH2qXH8YAr
-         fRTz1NOGQZVwzLnRHiWNLS8PtnOAr+6ghe6WSsUk2qMvaRKQcwiae0zax/P8qy3bnPWP
-         dqQl5OEgF827Caz+iYOQTt4EMIyZK5uMqAw3e/Uhc5+87eGEk1ILdHQ6JWRPU6QD0Hh6
-         OLJfU19KnZU/EAeJ1yFOd5nY52Ta4jloZ3NgGnBrJbP38lY4ilsCkeHucwKp3YIOG/yE
-         8n2yDYnfGGKtWAS+HpDJGHZK2V66Clu2dQ9/xmMS1K83qk4D2Q8B4xBx1sSyGnd8pc3H
-         fM2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733193431; x=1733798231;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GtLF14vm7EJeeDXSwAcjR67YkypYDnF88/MBHtM834c=;
-        b=nbJS3sUg7J4+90H0Nxhb+0i812ig2I51tFy69wRjHeU4c/2lUTaoRPhiC5FjHWjgrc
-         tyXHlIzn9rLLX3j0STJs7m+UxHAVFF2zPbRDdL/5JvjQO6tXdUv6D0VlU2kgzRTPfkh/
-         OwgRLEm2StZJGEm6Cw7fyYH0qBAk4H1i6pZsmwrJx4B41V4GV0cMC8EUOh1tjmHSzFUq
-         Gjpuv/OhuydXS0bQNb8NYl3S3BsIr7G5l+OVmdij4Z1SsXYsXs8iz0qOT/7QWERDg83v
-         GAXaE+lviUW0Oj9RI7huTJj85xhlGYYjQfl3866oMcBmqF+HGTSPRlkxnchxDW4g5CHz
-         Z9nw==
-X-Forwarded-Encrypted: i=1; AJvYcCVmE6dPiSSyMwb9IX+MM5OtA7U0FahpB6rZTFCZ6I7WqtgpIGDsMbATFSbogqbxHiaLF47EKgoeuzSt2BA=@vger.kernel.org, AJvYcCW6qPKh+8zxZcsoAV65BhPBNUAvXW7NTn5w13f/bVV9nH8DwWLKC8dqm/oKVtbvlEGuJe6Ab26q@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNaDU6B0v++BdEGB9YcdtJ7cp+q7WcBN0PaF0rfeWG3djPI5Vk
-	tCVbTfQlGd9EWqo/Qa4lJn3P7YCGllq/HuqTTJAmiUI85vMLeaIYxizFvx9DQz+B9/v04RtmGuR
-	Jsu6v1u7Y+rIOewCw6qhviJZntVE=
-X-Gm-Gg: ASbGncsXabeq/tLB+5ENSdyItTJdNvSYY3f0xsHF5TmsP+f71iYCn/aNYufkq530+Kd
-	Cl6ytieb3Yg5NzgOPsm1fmjpivHkU9Dan+A==
-X-Google-Smtp-Source: AGHT+IHReezRoW3eC5Hg8cWzDQ7b13LwHDtgUBT/+WZ1p3E0aok+cX8yIGzzysN0TH1L+BC/T0e88MLB9Q/MSYvGUJs=
-X-Received: by 2002:a05:6102:3707:b0:4af:3d99:f591 with SMTP id
- ada2fe7eead31-4af97311588mr602372137.10.1733193430820; Mon, 02 Dec 2024
- 18:37:10 -0800 (PST)
+	s=arc-20240116; t=1733194197; c=relaxed/simple;
+	bh=eDxFHf9TSCQuFWJ4zfQvibZBSMuzLGPxyfHs4io/gPk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ThFzAN5QWTjZriV+UeIHIeYrfah5l9SCWLI6/aNwIygOv/elql12wualM+eYjuh9RKOAsMMU+jy3x7jmalZMcKUTJgSx6LXFR0KzuiISr2tTx52P2L4Gya7uTcqLFGCht+CRPpJsbN2bnwaOBhYtiJ1uF2d9iLXUIdr7P2StunE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R2XshAV+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF00EC4CED2;
+	Tue,  3 Dec 2024 02:49:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733194196;
+	bh=eDxFHf9TSCQuFWJ4zfQvibZBSMuzLGPxyfHs4io/gPk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=R2XshAV+t1lakGhQey2wtEnQMWlpwJHzk0MR0ijYcFL1aUP3TgIRWwq687dS2/hcM
+	 Qyms5M0ywDTXqVrCddy4gwg6geR1fLK3NtNJvuHt185YKm4ox+trfV/i5FBcQx5ucV
+	 vgT/ZgFAKDFlcDn3V/EM7ZpzPLp3AAYZTBzGgQAeTyvMz5b2rStaNeZYZarrPtDICk
+	 CqJQCksTiMyc2kNORtqadu6FlZgiNIMhjdVx73H43Ft447SnTs+oCEkB0ulwBwtu6f
+	 ZB0/Ofh1ivuOMiSS0oqgdsLSHWvPgXvlwBHrklZkyeThLC/sGYjt4hGh2SIvib7c1z
+	 fvxKiFoHUTVNw==
+Date: Mon, 2 Dec 2024 18:49:54 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: <davem@davemloft.net>, <pabeni@redhat.com>, <liuyonglong@huawei.com>,
+ <fanghaiqing@huawei.com>, <zhangkun09@huawei.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Eric Dumazet <edumazet@google.com>, Simon
+ Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RFC v4 1/3] page_pool: fix timing for checking and
+ disabling napi_local
+Message-ID: <20241202184954.3a4095e3@kernel.org>
+In-Reply-To: <20241120103456.396577-2-linyunsheng@huawei.com>
+References: <20241120103456.396577-1-linyunsheng@huawei.com>
+	<20241120103456.396577-2-linyunsheng@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: =?UTF-8?B?5LiH6Ie06L+c?= <kmlinuxm@gmail.com>
-Date: Tue, 3 Dec 2024 10:37:01 +0800
-Message-ID: <CAHwZ4N0gbTvXFYCawbOUFWk7yitTeAWwUmfmb7RU68n-md8x4Q@mail.gmail.com>
-Subject: Re: [PATCH 2/2] net: phy: realtek: add dt property to disable
- broadcast PHY address
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	willy.liu@realtek.com, Yuki Lee <febrieac@outlook.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2024/12/3 8:04, Andrew Lunn wrote:
-> On Tue, Dec 03, 2024 at 03:50:29AM +0800, Zhiyuan Wan wrote:
->> This patch add support to disable 'broadcast PHY address' feature of
->> RTL8211F.
->>
->> This feature is enabled defaultly after a reset of this transceiver.
->> When this feature is enabled, the phy not only responds to the
->> configuration PHY address by pin states on board, but also responds
->> to address 0, the optional broadcast address of the MDIO bus.
->>
->> But not every transceiver supports this feature, when RTL8211
->> shares one MDIO bus with other transceivers which doesn't support
->> this feature, like mt7530 switch chip (integrated in mt7621 SoC),
->> it usually causes address conflict, leads to the
->> port of RTL8211FS stops working.
->
-> I think you can do this without needing a new property. The DT binding
-> has:
->
->             reg = <4>;
->
-> This is the address the PHY should respond on. If reg is not 0, then
-> broadcast is not wanted.
->
-First, broadcast has no relationship with PHY address, it allows MAC
-broadcast command to all supported PHY on the MDIO bus.
+On Wed, 20 Nov 2024 18:34:53 +0800 Yunsheng Lin wrote:
+> page_pool page may be freed from skb_defer_free_flush() in
+> softirq context without binding to any specific napi, it
+> may cause use-after-free problem due to the below time window,
+> as below, CPU1 may still access napi->list_owner after CPU0
+> free the napi memory:
+> 
+>             CPU 0                           CPU1
+>       page_pool_destroy()          skb_defer_free_flush()
+>              .                               .
+>              .                napi = READ_ONCE(pool->p.napi);
+>              .                               .
+> page_pool_disable_direct_recycling()         .
+>    driver free napi memory                   .
+>              .                               .
+>              .       napi && READ_ONCE(napi->list_owner) == cpuid
+>              .                               .
+> 
+> Use rcu mechanism to avoid the above problem.
+> 
+> Note, the above was found during code reviewing on how to fix
+> the problem in [1].
+> 
+> 1. https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
 
-I can't assume that there's no user use this feature to configure multiple
-PHY devices (e.g. there's like 3 or more PHYs on board, their address
-represented as 1, 2, 3. When this feature is enabled (default behavior),
-users can send commands to address 0 to configure common parameters shared
-by these PHYs) at the same time. And they can configure each PHY by it's
-own address without influencing other PHY too.
+Please split it from the rest of the series, it's related but not
+really logically connected (dma mappings and NAPI recycling are 
+different features of page pool).
 
-> If reg is 0, it means one of two things:
->
-> The DT author did not know about this broadcast feature, the PHY
-> appeared at address 0, so they wrote that. It might actually be
-> strapped to another address, but it does not matter.
->
-Well, that's possible. A misconfiguration on DT with only ONE PHY may
-just works, if we disable this feature by default, may cause some device
-stops working.
+> @@ -1126,6 +1133,12 @@ void page_pool_destroy(struct page_pool *pool)
+>  	if (!page_pool_release(pool))
+>  		return;
+>  
+> +	/* Paired with rcu lock in page_pool_napi_local() to enable clearing
+> +	 * of pool->p.napi in page_pool_disable_direct_recycling() is seen
+> +	 * before returning to driver to free the napi instance.
+> +	 */
+> +	synchronize_rcu();
 
-> The DT author wants it to use the broadcast address, it might even be
-> strapped to address 0.
->
-Again, the broadcast address is shared by all PHYs on MDIO which
-support this feature, it's handy for MAC to change multiple PHYs
-setting at the same time. But each PHY must have their own address,
-and the address usually can't be broadcast address (0).
+I don't think this is in the right place.
+Why not inside page_pool_disable_direct_recycling() ?
 
-> Am i missing anything?
->
->       Andrew
-
-I would recommend to add this feature, because it doesn't change the
-behavior of this driver, and allows this PHY works together with
-other PHY or switch chip which don't support this feature, like mt7530 or
-Marvell ones.
-
-Sincerely,
-
-Zhiyuan Wan
+Hopefully this doesn't cause long stalls during reconfig, normally
+NAPIs and page pools are freed together, and NAPI removal implies
+synchronize_rcu(). That's why it's not really a problem for majority
+of drivers. You should perhaps make a note of this in the commit
+message.
 
