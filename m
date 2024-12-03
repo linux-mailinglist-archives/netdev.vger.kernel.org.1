@@ -1,123 +1,114 @@
-Return-Path: <netdev+bounces-148439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 519859E1956
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 11:33:01 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E04E19E19A8
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 11:45:48 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25F291641EB
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:32:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A62F0286A77
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 10:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58561E22E9;
-	Tue,  3 Dec 2024 10:32:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C421E3760;
+	Tue,  3 Dec 2024 10:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="ggZFKTuZ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="iLdB6GjU"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131591E0DEB;
-	Tue,  3 Dec 2024 10:32:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6761E283C;
+	Tue,  3 Dec 2024 10:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733221968; cv=none; b=A69L/DF+H7jmhr3qp2LfQRqfiuanKsw0ekiRpyQMQIlj/5QSnH88NwZwTmwgLOPkhPa1ZB5FBWviBfa+1eME1wc/lqHEBeBJK8mu2nAzwe9NcAL+/8oeBmFZcQEfedxWROLUTRSO+RvnqEDEDQ5qJxDkdFQdxDa0JFKq8cUQpwg=
+	t=1733222686; cv=none; b=dvghF/RHcZta1JIKm0RWaaerlf/DXs4Wr3qsNmpxf0W2KobIiT5vlgC1jLMIRdyHw2cbVXNfhJqo322wRb0i/po5XAlgX9rRISi4etHcoxB+A66nW5fGgaEBJ+Fuf3dpDC8KIq1Z+mjVJJ9QMsbkyy9hfRu4DsLXgwTk5+AZjzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733221968; c=relaxed/simple;
-	bh=lfZk1PHy+4P1YFdjNi2bdTEnABvSnKLOXNwj20uCDiw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FZdG3yqIz3P/xzm0Q3+oSdFRf7T4ZpWKGy+U0G4+XXPt/Tl13TyP4h3maGl/UMLwtkDauv9uFt1WFJvXXijQM9++wNbi0QRqXbma+Nxr0x2Ige4qJCGcTNdAtbnpSH8lx4tA4dQzfFvhLGPrg+An2+nAG2kch8TbXBO1VGbrz9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=ggZFKTuZ; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4B3AVuBZ23707200, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1733221916; bh=lfZk1PHy+4P1YFdjNi2bdTEnABvSnKLOXNwj20uCDiw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=ggZFKTuZjxm9b9Nand76k6UGBNujO3hWp/6eO3U+P17yQhBu0GtkmeqFzjBYniBgi
-	 MIF3+D+lQS3j3DYaRPRpCVHcjwsdFoZzeWP6c+HApY7xars+Yd2PVwEvCA1ygd+k7/
-	 R1RXtB6tD8/hC8VYpEGB4HUL9+OrIwqQTJhzc7gO0XuuLvjrqCSsVVCC7w4Y24Qp/e
-	 oCODJl2MzqDUIFMKYnFbkiDfJf8oLaLK8/YLlQdgPI5jlKQeVybhawtJDaNEN1F7J8
-	 GC/wyRdbVpzXy0au5qcPSAWRWovhpxTU1kq1maXQ/OoKfvY0mUUlFZtIAsU6b8Nbzf
-	 bNfy5QhMkncIQ==
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4B3AVuBZ23707200
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 3 Dec 2024 18:31:56 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 3 Dec 2024 18:31:56 +0800
-Received: from RTDOMAIN (172.21.210.74) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 3 Dec
- 2024 18:31:55 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <horms@kernel.org>,
-        <michal.kubiak@intel.com>, <pkshih@realtek.com>,
-        <larry.chiu@realtek.com>, Justin Lai
-	<justinlai0215@realtek.com>
-Subject: [PATCH net-next] rtase: Add support for RTL907XD-VA PCIe port
-Date: Tue, 3 Dec 2024 18:31:46 +0800
-Message-ID: <20241203103146.734516-1-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1733222686; c=relaxed/simple;
+	bh=2cf97DStc8SXFvwZ64aN4xBO2VdeZbTFsTd5rBywIxw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TQ5XDpsWm6R1Xp/3ugpxVm/KGTCfOxqKTaiEDaaivBtQRUkJ3volyPZlBQno7MkAovql5NlnOp2fjdkgCwLdI0YaVz3pYBAQrlS0L03fBryiUBaBiEIW8+9IIlFofHJjdLGxvHJ+wThA5sVTHkUJ5ncDEcEWmsJZUsilHGJ0TXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=iLdB6GjU; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 5A9CAC0008;
+	Tue,  3 Dec 2024 10:44:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1733222681;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=unHsDZc/1OE8HKcVN8mWXwEJ0vAKQ8TWz8xbclpBxHc=;
+	b=iLdB6GjUhUagX3VUOAGI0cppokeRj3G2mikcZFPSPQ/IAmHHFFo+ppIQxlc+ADQ2VnouQ8
+	yuqC9skT/femZbIR2erDLsU1Z87gESz+k0jI7NxUeFsoxgHSc3gVYHUqlj8ummM+iOMBAl
+	cPxO22wmLlyqCNHR5lFmiSnfMd1aHcq4yj0du9C6OrM6g3Cp3pnPbIkuFBMI4QLlMS7qDo
+	wlCGjTw0bxy/7487JgtVfE4sWKcbY5qRcT391fnXvOuRvUzxFxuR2bcWy5ypgvPsng715p
+	OJPptZicX6jaClf4IhbBNg07ciN9bHXgBf95NUgZbVrUZuZa1ZuZNbZQvGD7rQ==
+Date: Tue, 3 Dec 2024 11:44:38 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
+ <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell
+ King <linux@armlinux.org.uk>, Liam Girdwood <lgirdwood@gmail.com>, Mark
+ Brown <broonie@kernel.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org, Kyle Swenson
+ <kyle.swenson@est.tech>, Dent Project <dentproject@linuxfoundation.org>,
+ kernel@pengutronix.de, Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH RFC net-next v3 26/27] net: pse-pd: tps23881: Add
+ support for static port priority feature
+Message-ID: <20241203114438.4f6d4c36@kmaincent-XPS-13-7390>
+In-Reply-To: <20241203102913.GD9361@kernel.org>
+References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
+	<20241121-feature_poe_port_prio-v3-26-83299fa6967c@bootlin.com>
+	<20241203102913.GD9361@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-1. Add RTL907XD-VA hardware version id.
-2. Add the reported speed for RTL907XD-VA.
+Hello Simon,
 
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
----
- drivers/net/ethernet/realtek/rtase/rtase.h      | 1 +
- drivers/net/ethernet/realtek/rtase/rtase_main.c | 2 ++
- 2 files changed, 3 insertions(+)
+On Tue, 3 Dec 2024 10:29:13 +0000
+Simon Horman <horms@kernel.org> wrote:
+>=20
+> > +static int tps23881_irq_event_detection(struct tps23881_priv *priv,
+> > +					u16 reg_val,
+> > +					unsigned long *notifs,
+> > +					unsigned long *notifs_mask)
+> > +{
+> > +	enum ethtool_pse_events event;
+> > +	int reg, ret, i, val;
+> > +	u8 chans;
+> > +
+> > +	chans =3D tps23881_it_export_chans_helper(reg_val, 0);
+> > +	for_each_set_bit(i, (unsigned long *)&chans, TPS23881_MAX_CHANS) {
+> > =20
+>=20
+> Hi Kory,
+>=20
+> The storage size of chans is only 1 byte, but here we are pretending that
+> it has more space. Which seems to be a bit of a stretch. Perhaps it would
+> be better to simply use unsigned long as the type of chans here and in
+> tps23881_irq_event_classification().
 
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h b/drivers/net/ethernet/realtek/rtase/rtase.h
-index dbc3f92eebc4..2bbfcad613ab 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase.h
-+++ b/drivers/net/ethernet/realtek/rtase/rtase.h
-@@ -13,6 +13,7 @@
- #define RTASE_HW_VER_906X_7XA 0x00800000
- #define RTASE_HW_VER_906X_7XC 0x04000000
- #define RTASE_HW_VER_907XD_V1 0x04800000
-+#define RTASE_HW_VER_907XD_VA 0x08000000
- 
- #define RTASE_RX_DMA_BURST_256       4
- #define RTASE_TX_DMA_BURST_UNLIMITED 7
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-index de7f11232593..6106aa5333bc 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-+++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-@@ -1725,6 +1725,7 @@ static int rtase_get_settings(struct net_device *dev,
- 		cmd->base.speed = SPEED_5000;
- 		break;
- 	case RTASE_HW_VER_907XD_V1:
-+	case RTASE_HW_VER_907XD_VA:
- 		cmd->base.speed = SPEED_10000;
- 		break;
- 	}
-@@ -1993,6 +1994,7 @@ static int rtase_check_mac_version_valid(struct rtase_private *tp)
- 	case RTASE_HW_VER_906X_7XA:
- 	case RTASE_HW_VER_906X_7XC:
- 	case RTASE_HW_VER_907XD_V1:
-+	case RTASE_HW_VER_907XD_VA:
- 		ret = 0;
- 		break;
- 	}
--- 
-2.34.1
+Yes indeed. Thanks for the report.
 
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
