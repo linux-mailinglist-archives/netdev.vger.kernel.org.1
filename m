@@ -1,95 +1,71 @@
-Return-Path: <netdev+bounces-148356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A7B99E13D7
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 08:19:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9761E9E13E3
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 08:22:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6DE3282BD4
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 07:19:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F825B21B18
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 07:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D454D1885B4;
-	Tue,  3 Dec 2024 07:19:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB6C19A297;
+	Tue,  3 Dec 2024 07:21:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aLB2VWqs"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="G1o/iCQ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC002500A8;
-	Tue,  3 Dec 2024 07:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA80E18FC80;
+	Tue,  3 Dec 2024 07:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733210354; cv=none; b=tmwfpe1ivTxsX564Ar8BA9GNLC3OKWo6GU2Q6bldX4b3+gv6y9OI3xQONWXOuuW0UzvaOGIImHUGj4jKGJlnv9DlrKahW8moeIZ5sxL7MMC/lJGVUl/zG+wMROPqr7q9eqekNdTCOEf+g3eh6JmTf77CQz5UIxgI5ZBh6cG3nZs=
+	t=1733210517; cv=none; b=c9lW2vWOBfea1uLSuHSrztzoI3Cis0ZuVgyEmKxuSEMfoFzoVGLrfZT9b/g3Gw8M+fjpUWhHjly4uMH04RSrljvlYYaF9Fz3ccBYYz9BRgxUDlfg2bSj8yJHCNoyy4jbpaeLAeubtHGSm+7xkqbmgXUGsf0z9CLydacLatbgnH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733210354; c=relaxed/simple;
-	bh=K1Vu1L0HLzL1ggJymF4GIWCvoKHTnpnZvrRz8i5oRc0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ld3doFV0fAYmS5jh/CSysD/Mul0OsPC0cx3y7sbhyQVr650y57P3Qi1LeojdSYXFxosIguoqc9yFG5g07tlS++tmDa59XwRwsShfF7d/RN6pLgL8bCSenXbB59Jbv2sg6UT0wOCRfi5fcOR8+CJ/zOwuE5M0RPDbpauS23yAdWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aLB2VWqs; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7ea85fa4f45so408146a12.2;
-        Mon, 02 Dec 2024 23:19:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733210352; x=1733815152; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yt0eqAzlepSF0XS40uHuceUpxcC/1vIW2KGLShCrnRY=;
-        b=aLB2VWqspA8VDWAkrh5g3lfE2fpN0xOnEDKVUHXbaitV3cpBqh0o8gte06KDdf2WwY
-         cV4690ZqOeayL5XahrJ/T46aQGca1P8IC3+QVzsaS0eU3pA1NddTZ0jDCJEsyWM82xcv
-         qqeca2GNHkMKOKAAywXD0z6QzvH6SbIyIbs/GIhrV+Ue6G7e3RNT0gz08yq2cQgXGibn
-         9t84iHmoelZFXbDYy+EHWWtvCu4bbIIae7PEVZvtIaYhNfxy+UNtN0r4YCCpp9ZvxuMA
-         DLbgaNSEAOlXzHCcDLAooC4pQMFXCNAXtN2XnVekkxDyr3im5OQlD+f8icPpDhiMAxk2
-         0QVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733210352; x=1733815152;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yt0eqAzlepSF0XS40uHuceUpxcC/1vIW2KGLShCrnRY=;
-        b=lHKsizfPPhFOVgXbUt0bY+tf8FpicXWcahyjZFWYAettDGWxEnNaQfDTcBGzuqBJ10
-         mH1tKpp3HGl6hl+RqhcAPqRPJybafoIQtkev6dpuwHFHUXbzaa/+FHqMtKUo4qF42Y+D
-         TeRny86maNVpxFHyGzRweuO5sLFDfo6M+lvhUI8uNU46w5fHrWFGWDtaBl0Tx1FnEMEX
-         sgyGcwlUlJMBP5njD2RZ7/t0SVZOEoXtYjyaO48X1dTRs6aBs955+VoCwyBU24kiXICk
-         X64+SMqn4YVTOK+bI1Cxp/984s1+4QWAMqhu/Wmk/hrxIPFCvwm664cC4b/EBCJLlfzB
-         t9EA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+jAnWyorRJRoZx3C4UxwNUuLYMMCzC/GsAMczCjbABtSSLvfi5K9UUrmHZRQNxhEX6cm4AwBpsvpajqQ=@vger.kernel.org, AJvYcCW8QFH+FQXDnJCQvBEyib7ilQV6hp+QO6Yq+QDDxYMYt/vLIPC2aUHmvCSnT4DdpakPqYPZxzJM@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrogFspzd4tx0zJggWJJEvrqun4q+GU/HxWpMK6PkAuult3Byx
-	hbyOlQNskEqzleC8u+JNAIGY/n5LgsTy7Y6LCvdIHzlU92qNI7B2
-X-Gm-Gg: ASbGnctV9M4Qj3e6grfdaAWhUpehwG/5UGB7pmry7vJBScHzyZgHV9QuvmVox0uhSCy
-	EDUIryNfQj/COfqR+LhAFxagz45enVdKcxpDdlEYu54oW/Im2e3mfUjUkoZiDgwvUta2ImzM8FQ
-	UdjWQuEVMK5VqYpJXADd6tT66oiyjxkhRJfMMAKm0HZE9HH4fc5pzliubsL69Q2fDyJrne3ywmk
-	9nMzPa8t/9ou8y383IK3cfHrObiCr/7CCpGDIcOApWgNKtvopLuCnv6v809
-X-Google-Smtp-Source: AGHT+IFiawVIjfTUCmCmFuedXi3MMPJDaws4aM1CWRor1IlvHiH98I1sypOj08nVpTsD3oOX0gAZIw==
-X-Received: by 2002:a05:6a20:840d:b0:1cf:3be6:9f89 with SMTP id adf61e73a8af0-1e165337df6mr1364463637.0.1733210352461;
-        Mon, 02 Dec 2024 23:19:12 -0800 (PST)
-Received: from nas-server.i.2e4.me ([156.251.176.191])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72541847925sm9692329b3a.176.2024.12.02.23.19.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 23:19:12 -0800 (PST)
-From: Zhiyuan Wan <kmlinuxm@gmail.com>
-To: andrew@lunn.ch
-Cc: hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	willy.liu@realtek.com,
-	Zhiyuan Wan <kmlinuxm@gmail.com>,
-	Yuki Lee <febrieac@outlook.com>
-Subject: [PATCH net-next 1/2] net: phy: realtek: disable broadcast address feature of rtl8211f
-Date: Tue,  3 Dec 2024 15:18:53 +0800
-Message-Id: <20241203071853.2067014-1-kmlinuxm@gmail.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <7a322deb-e20e-4b32-9fef-d4a48bf0c128@gmail.com>
-References: <7a322deb-e20e-4b32-9fef-d4a48bf0c128@gmail.com>
+	s=arc-20240116; t=1733210517; c=relaxed/simple;
+	bh=D97lafiK1Dz1T1qMxnfrOPti0xqJ0khVEoxdGNjSRaY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LZqgFqpcnVZ2p+4YKP+7ytag4CcxSz5LzZeQ/aFrmOpKu5cP6FrckRZAi7J8QWs7PflwlnSbXgKpwo2kIfGrvoP62NT0+OYE6UX13rCdomfk3WMpfZuyrzTyGNDAaHgHRXosoFgrp4vKeCpxDqNli4yWeQaOg7IIAvDe54CH4Dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=G1o/iCQ1; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B2JPtbi011753;
+	Mon, 2 Dec 2024 23:21:33 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=Njk/5UtOnXKpvjX/ojP8Ziw
+	q2YByuT5IwXVGUEvz2RQ=; b=G1o/iCQ1ef9Y1I7vIzb1Fu0edLWwvwAqeS1u3fy
+	fYYnghsP4Nm7N2F98aSYQ7i/UdEhgFVM/0oUK3HHCgPNqizjlovW5/ReRIDumwCV
+	dca2nhVv7vma6fPrz5TBOeaGSrKZZJVLs9dmlfrGHqHC5mI5SCMj+0mjkdBIwwjP
+	+WoUTi+9Aaf93QhKOvI/KtHjBPGcbqPrGhjNKuJuXEgWiZUWUBDAZiNmD6drE26D
+	lF7XfUWUMhVIIoh9HnShqGGwyQ5q4fDkzrz/AbXuI6lsiomdqbBAWv0ugQjQ0Arg
+	aa0x4sWq0n4wd6FeTMELe8XCeQhdFwrWfDxST8+qwerFccA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 439b8qa76r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 02 Dec 2024 23:21:33 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 2 Dec 2024 23:21:32 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 2 Dec 2024 23:21:32 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 322505B6952;
+	Mon,  2 Dec 2024 23:21:32 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
+        <thaller@redhat.com>, <wizhao@redhat.com>, <kheib@redhat.com>,
+        <egallen@redhat.com>, <konguyen@redhat.com>, <horms@kernel.org>,
+        <einstein.xue@synaxg.com>, Shinas Rasheed <srasheed@marvell.com>
+Subject: [PATCH net v1 0/4] Fix race conditions in ndo_get_stats64
+Date: Mon, 2 Dec 2024 23:21:26 -0800
+Message-ID: <20241203072130.2316913-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,57 +73,30 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: 3vvjNPXkHXzmUTXfuSUp6mzZ7xN5_RyK
+X-Proofpoint-GUID: 3vvjNPXkHXzmUTXfuSUp6mzZ7xN5_RyK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-This feature is enabled defaultly after a reset of this transceiver.
-When this feature is enabled, the phy not only responds to the
-configuration PHY address by pin states on board, but also responds
-to address 0, the optional broadcast address of the MDIO bus.
+Fix race conditions in ndo_get_stats64 by implementing a state variable
+check, and remove unnecessary firmware stats fetch which is currently
+unnecessary
 
-But some MDIO device like mt7530 switch chip (integrated in mt7621
-SoC), also use address 0 to configure a specific port, when use
-mt7530 and rtl8211f together, it usually causes address conflict,
-leads to the port of RTL8211FS stops working.
+Shinas Rasheed (4):
+  octeon_ep: fix race conditions in ndo_get_stats64
+  octeon_ep: remove firmware stats fetch in ndo_get_stats64
+  octeon_ep_vf: fix race conditions in ndo_get_stats64
+  octeon_ep_vf: remove firmware stats fetch in ndo_get_stats64
 
-This patch disables broadcast address feature of rtl8211f, and
-returns -ENODEV if using broadcast address (0) as phy address.
+ .../ethernet/marvell/octeon_ep/octep_main.c   | 34 ++++++++++++-----
+ .../ethernet/marvell/octeon_ep/octep_main.h   |  8 ++++
+ .../marvell/octeon_ep_vf/octep_vf_main.c      | 37 +++++++++++++++----
+ .../marvell/octeon_ep_vf/octep_vf_main.h      |  9 +++++
+ 4 files changed, 71 insertions(+), 17 deletions(-)
 
-Reviewed-by: Yuki Lee <febrieac@outlook.com>
-Signed-off-by: Zhiyuan Wan <kmlinuxm@gmail.com>
----
- drivers/net/phy/realtek.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index f65d7f1f3..8a38b02ad 100644
---- a/drivers/net/phy/realtek.c
-+++ b/drivers/net/phy/realtek.c
-@@ -31,6 +31,7 @@
- #define RTL8211F_PHYCR1				0x18
- #define RTL8211F_PHYCR2				0x19
- #define RTL8211F_INSR				0x1d
-+#define RTL8211F_PHYAD0_EN			BIT(13)
- 
- #define RTL8211F_LEDCR				0x10
- #define RTL8211F_LEDCR_MODE			BIT(15)
-@@ -139,6 +140,17 @@ static int rtl821x_probe(struct phy_device *phydev)
- 		return dev_err_probe(dev, PTR_ERR(priv->clk),
- 				     "failed to get phy clock\n");
- 
-+	dev_dbg(dev, "disabling MDIO address 0 for this phy");
-+	ret = phy_modify_paged_changed(phydev, 0xa43, RTL8211F_PHYCR1,
-+				       RTL8211F_PHYAD0_EN, 0);
-+	if (ret < 0) {
-+		dev_err(dev, "disabling MDIO address 0 failed: %pe\n",
-+			ERR_PTR(ret));
-+	}
-+	/* Don't allow using broadcast address as PHY address */
-+	if (phydev->mdio.addr == 0)
-+		return -ENODEV;
-+
- 	ret = phy_read_paged(phydev, 0xa43, RTL8211F_PHYCR1);
- 	if (ret < 0)
- 		return ret;
 -- 
-2.30.2
+2.25.1
 
 
