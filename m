@@ -1,140 +1,313 @@
-Return-Path: <netdev+bounces-148710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C04E99E2FB2
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 00:17:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BE2E9E2F93
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 00:13:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5443EB27B85
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 22:32:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 348D5282FA8
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 23:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5231DFE37;
-	Tue,  3 Dec 2024 22:32:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF11209F58;
+	Tue,  3 Dec 2024 23:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UxN8FPVL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hcQxqBma"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1635716DC28;
-	Tue,  3 Dec 2024 22:32:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595391FA167;
+	Tue,  3 Dec 2024 23:13:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733265159; cv=none; b=O14FruVEcrka5MvbdntigbZojM100VvlbwbED0R12mIOahjofwR3lWZqOOL8k5i7fMJJKYBxAJyXj86NLBArTu54AmgxnB36Ksa0P+C4enxfltXB5/e7NUCG6SSf9/CBp/07pk0R0nEM28HzPQQLcadsXHzmtt3NVJnXF9ueHUY=
+	t=1733267622; cv=none; b=t5akf8wiAilhyTOXpG+6eVryd+8ouxrUaLKd9Jotb4cc+ago+DoKIlsXfqs8dcseIqnpnI/SxjDNbt7gpO9NY1xtfvfwOvNCwZeNXoRVX6vBaLNXQNi01bYL4S5AK1MK3hgdSi7TpR/n+u9jUxnmogUtEIdejNxLh59Fco6Kf1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733265159; c=relaxed/simple;
-	bh=/bBqnTfrh3T7UDYQTvCzK5mOHnVENziHCGIZsA8YP3w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hQzEudoX7oCzmtuYvKm4T9W+eYa7knj8LA1JsTmKeY7dizcLXOLVXwegQ052PrYjeh87U6VS4x2NP/GDXzrTLrDrHWfy5uNKOzaSgp1mldEhjVL0fPg/EKwMV8DQaHiooDKSvnr70fj+OibnlgzxO6bU1Ny0HtsZ7nJVdF52s8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UxN8FPVL; arc=none smtp.client-ip=209.85.128.170
+	s=arc-20240116; t=1733267622; c=relaxed/simple;
+	bh=CQTV6hANlHbmQV0FushAnt10SYzeIj1tcBidV6jAct8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M3ZJjrKAMZbxBEma8mvNz8BRVKE5dQaoJUzVEU29KBv5wIG+VmQQuE3emimQzwY989eRIwv93h/sW3XP1iHy3vlvxa9kf3yelgvsAec6/RNDr6fgT5PwZFuDn9GerOWIMBga+lPzDIOtVtwHg0oMKMilMjoohoQ4onHPIs13bcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hcQxqBma; arc=none smtp.client-ip=209.85.215.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6ef4084df4cso54534267b3.1;
-        Tue, 03 Dec 2024 14:32:37 -0800 (PST)
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7fccc26ad01so2719875a12.2;
+        Tue, 03 Dec 2024 15:13:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733265157; x=1733869957; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W3uXVixO2HYoTxZ+HwXw2HKm344cdNU9MSG32y7b4Qk=;
-        b=UxN8FPVLN/knMCNlGw4K5rX+1yfNgOGIXHXgi0KT+2soZ4p+NTNVlrh2SeSfJO8qGG
-         1vbQ0w1ndZbxMjEE2XTUYz8LvBYDqc+9Am6GzT4PA/qS4tnIFI4fspoCd3zgqczY6bRg
-         Mx5VQe1xQGOZMi5mmGmi8cJjhI3eSH2MxxI/5C+Se6lH9K0tUtLWcdufMatcYVoQfhUN
-         cScSeXrxWvhzNrhLDqay5dbMaNTqstDxYIjZax2tNzGz6w2vVth0fnaB8J50QhxU5f+j
-         dMYDSZVoWk+0Wb4QZaQCKW4rEzYSmTZQLrNU21ZSFLy9GwtpjrmpclGk1D3W+wg4vx4T
-         jPNQ==
+        d=gmail.com; s=20230601; t=1733267620; x=1733872420; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=I/qHYHD0j6f2gQG6GHH9ozFcbBg8+qzdyitn+gpcUTU=;
+        b=hcQxqBmaP6fxPLPUnNSkxPOmyIb4qw8Zm+AGK2N+lBPa4y/0K3wg/O2TAPha0Tu1jC
+         LRRjgBSXjykSW6jX8McSSkSTbrbOevANgZEPuAUYiKB+LTsoXLoiTDJhChPpiJh6gQxz
+         jPuOwIZGurmXORkJxmyHKoIkAC27B8CEHvbYeSN0Jg9r+RJVlqHHytambnW+5Ve0fKj0
+         7888apdm0f/G02OY9bIdAJC0n4McD0ttWw9rqoG68V3rtNfgJ0UPwgkhcKyf1H+9xGx2
+         YR2TxdUTGa9ea5g0Z4LUHzzQl/2OsJYMpdp/K4lgP6SgPS5AjIjhGfwNmNJhfm8dOvba
+         Gnsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733265157; x=1733869957;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W3uXVixO2HYoTxZ+HwXw2HKm344cdNU9MSG32y7b4Qk=;
-        b=tDVu/7L6jXDqX8JBkLJONQ4KG3Z5yZrJyoXT5bUzpOUFzb8fbUN1RtlOVHTvdoInnS
-         2EPVeY9y6jfNmTWLUkcdrZM0Xrkx1JAvjuejTFHWP2zUOQdx7x3hHSMAvT2UfnOelBoe
-         Ai4nKHdq0oQXv6XbXYq7VsqyVNxTd0uIhdRDcEVpUeKv6xRTbNi3Rlj8P/t8Esy97rcc
-         54IW064lRSC4KJNbuIiny0YajmYZ5oJ03P9RvcRp28tVRhliFpf8nQ19jwqqVK33Poc2
-         GDPYQpK3bOlO2X5jZe51SVvpLCLqlW6X5f4vkF5YEFY/t4+gE7Obobwi6OnbOMBYbwcf
-         MbCw==
-X-Forwarded-Encrypted: i=1; AJvYcCWu41vo96f0nJwdfSKmkawB0tO/qMrB32zvZvRxiypM/+DhT0rfjxXbrwdwFEOpz6W3oM63FspFJhaw1bM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytMO6nI78b4HyEhWnKEc1g6TNabt8cwC2NfVJacKxeqQbT1CxL
-	e+eQf0n4ndnAt3tE7Dchqk7akNZfloQetNlGO6lSO8i6jUDx7orltzJ8m2ByykKgFdqG1xsXtts
-	V3wtjfXeEPnljjV1mywDew25rSFU=
-X-Gm-Gg: ASbGnctIg4f/aL8eC10Jof5mIHuFqmH347fgfaXRj2f1F3twYv5Dc4V56ZvwBeTGyCB
-	eJy46LPuSmjDiI+Ml9SFI3Vz8zAONtJAmIF6uQoudRxaS
-X-Google-Smtp-Source: AGHT+IHdKPso0Q9UeLbszX084lHd/YkUoSrjxk6qabI3sAwyinBHwJSP95gkdk4ZVgLbdT+D1Gkwjcw7xohft4UO+2I=
-X-Received: by 2002:a05:690c:450f:b0:6ef:6178:404a with SMTP id
- 00721157ae682-6efad2d997dmr52558727b3.33.1733265157005; Tue, 03 Dec 2024
- 14:32:37 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733267620; x=1733872420;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I/qHYHD0j6f2gQG6GHH9ozFcbBg8+qzdyitn+gpcUTU=;
+        b=aekcd4ZJbpHfq6NuELpUUx9fxhgTcUmvRUCtKnysa96fdr4EdGYV5uncTaugcUCg2L
+         NXLIVhnKM/Ff+a8pmp9AdGHJ7+1Nbt04MKp6ZwArcaNBcjQglJ1Dv7I9CpRnLtcMqJvR
+         bDSZT3mia6fZNYb7oF9YN9JhBxuVuFoP6qdxzspIcdtvSrecIDkHR1pZwEgRKkMW/xVW
+         lU5V+18vnMHD3p3XuBu/n3g9Z1H1W8Y9YIlzITwlmg/vsOzideUMg3u6fz38ZXHTH7fI
+         P7ja2mMTHlh0zO4xiFRPAj0s7PzMv1uG5k6u5ONjPmYo7Ri+dtAWq8GWXtmFccfgEWzC
+         lySg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAdBgBP6pepVvjCkojqWXczVpZZl5ZGvt8zMslSz3H0fLPhAuMgtgSBepJbq2vT7suxyA+PnC6Sjvh+qzY@vger.kernel.org, AJvYcCXWNWkQiFvEemrn1Sdvf+52DnIBbgQ7jGzPFq2ygyGrrILcyW43m0ik6wdIu78w8VmsEsnVvDsSgzI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKZckPqVvGI7Sf912Gi1kuVmj8g7SJ9o5D9OyJuQTxNArFbsOb
+	eKX8rt4hVKvwu5C15WAoy1zEB9rDyxjC4K1KfM7emzE7veXz4xCBRFOTg7Tw1Cs=
+X-Gm-Gg: ASbGncvY52UklX9QZa4KTecksejJrE5oZ8hJtEhbtpvqcfYeZan7XGr9k53c4rZ6TWG
+	BP3TfXKO2/S7ddMzgyTYZa/8j859vfcfNJMHnGAmYmCxvznYqL/qGLCdkWzDX4ZX/eBm7z6YCO3
+	B7px9XEuwW17kX6gXCs86zHuH6NzRAU/Fimsj6190VNzOnsPKW2rWVwzrurTGkyBn2DA5TJzC+x
+	DvMo0Oa9CQlnG3Ohw1TcFuUgw==
+X-Google-Smtp-Source: AGHT+IGVMfcDPVtWE3Ol2IqAdbZCOhbiWV6BNBpPBbkgI1j/gpvuoNPAyftsebem+CUwNuUv3WH6aA==
+X-Received: by 2002:a05:6a20:7f87:b0:1e0:d1db:4d8a with SMTP id adf61e73a8af0-1e1653b7c2bmr6353852637.10.1733267620336;
+        Tue, 03 Dec 2024 15:13:40 -0800 (PST)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fc9c30e43csm10132776a12.39.2024.12.03.15.13.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 15:13:39 -0800 (PST)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+	maxime.chevallier@bootlin.com,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Sean Anderson <sean.anderson@seco.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-can@vger.kernel.org (open list:CAN NETWORK DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] net: simplify resource acquisition + ioremap
+Date: Tue,  3 Dec 2024 15:13:37 -0800
+Message-ID: <20241203231337.182391-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241203221644.136104-1-rosenp@gmail.com> <20241203221644.136104-2-rosenp@gmail.com>
- <50e1ec4d-818c-45a8-875b-40f74cca1514@gmail.com>
-In-Reply-To: <50e1ec4d-818c-45a8-875b-40f74cca1514@gmail.com>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Tue, 3 Dec 2024 14:32:26 -0800
-Message-ID: <CAKxU2N_D1vjhfdX=ou2S+rfabe5nM9i=Q6YYYigLJMN3t9JS0g@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] net: mdio-ipq8064: use platform_get_resource
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, ansuelsmth@gmail.com, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 3, 2024 at 2:27=E2=80=AFPM Heiner Kallweit <hkallweit1@gmail.co=
-m> wrote:
->
-> On 03.12.2024 23:16, Rosen Penev wrote:
-> > There's no need to get the of_node explicitly. platform_get_resource
-> > already does this.
-> >
-> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> > ---
-> >  drivers/net/mdio/mdio-ipq8064.c | 7 ++++---
-> >  1 file changed, 4 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/mdio/mdio-ipq8064.c b/drivers/net/mdio/mdio-ip=
-q8064.c
-> > index 6253a9ab8b69..e3d311ce3810 100644
-> > --- a/drivers/net/mdio/mdio-ipq8064.c
-> > +++ b/drivers/net/mdio/mdio-ipq8064.c
-> > @@ -111,15 +111,16 @@ ipq8064_mdio_probe(struct platform_device *pdev)
-> >  {
-> >       struct device_node *np =3D pdev->dev.of_node;
-> >       struct ipq8064_mdio *priv;
-> > -     struct resource res;
-> > +     struct resource *res;
-> >       struct mii_bus *bus;
-> >       void __iomem *base;
-> >       int ret;
-> >
-> > -     if (of_address_to_resource(np, 0, &res))
-> > +     res =3D platform_get_resource(pdev, IORESOURCE_MEM, 0);
-> > +     if (!res)
-> >               return -ENOMEM;
-> >
-> > -     base =3D devm_ioremap(&pdev->dev, res.start, resource_size(&res))=
-;
-> > +     base =3D devm_ioremap(&pdev->dev, res->start, resource_size(res))=
-;
-> >       if (!base)
-> >               return -ENOMEM;
-> >
->
-> Why not directly switching to devm_platform_get_and_ioremap_resource()?
-Because that is not the same.
+get resource + request_mem_region + ioremap can all be done by a single
+function.
 
-devm_platform_get_and_ioremap_resource is
+Replace them with devm_platform_get_and_ioremap_resource or\
+devm_platform_ioremap_resource where res is not used.
 
-platform_get_resource + request_memory_region + ioremap
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/net/can/sja1000/sja1000_platform.c | 15 ++--------
+ drivers/net/ethernet/freescale/fman/fman.c | 35 +++++-----------------
+ drivers/net/ethernet/lantiq_etop.c         | 25 ++--------------
+ drivers/net/mdio/mdio-octeon.c             | 25 +++-------------
+ 4 files changed, 17 insertions(+), 83 deletions(-)
 
-The issue here is the second. This driver (well, platform really) uses
-overlapping memory regions and so request_memory_region will fail.
+diff --git a/drivers/net/can/sja1000/sja1000_platform.c b/drivers/net/can/sja1000/sja1000_platform.c
+index c42ebe9da55a..2d555f854008 100644
+--- a/drivers/net/can/sja1000/sja1000_platform.c
++++ b/drivers/net/can/sja1000/sja1000_platform.c
+@@ -230,18 +230,9 @@ static int sp_probe(struct platform_device *pdev)
+ 		return -ENODEV;
+ 	}
+ 
+-	res_mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (!res_mem)
+-		return -ENODEV;
+-
+-	if (!devm_request_mem_region(&pdev->dev, res_mem->start,
+-				     resource_size(res_mem), DRV_NAME))
+-		return -EBUSY;
+-
+-	addr = devm_ioremap(&pdev->dev, res_mem->start,
+-				    resource_size(res_mem));
+-	if (!addr)
+-		return -ENOMEM;
++	addr = devm_platform_get_and_ioremap_resource(pdev, 0, &res_mem);
++	if (IS_ERR(addr))
++		return PTR_ERR(addr);
+ 
+ 	if (of) {
+ 		irq = platform_get_irq(pdev, 0);
+diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
+index fb416d60dcd7..11887458f050 100644
+--- a/drivers/net/ethernet/freescale/fman/fman.c
++++ b/drivers/net/ethernet/freescale/fman/fman.c
+@@ -2690,13 +2690,12 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
+ {
+ 	struct fman *fman;
+ 	struct device_node *fm_node, *muram_node;
++	void __iomem *base_addr;
+ 	struct resource *res;
+ 	u32 val, range[2];
+ 	int err, irq;
+ 	struct clk *clk;
+ 	u32 clk_rate;
+-	phys_addr_t phys_base_addr;
+-	resource_size_t mem_size;
+ 
+ 	fman = kzalloc(sizeof(*fman), GFP_KERNEL);
+ 	if (!fman)
+@@ -2724,18 +2723,6 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
+ 		goto fman_node_put;
+ 	fman->dts_params.err_irq = err;
+ 
+-	/* Get the FM address */
+-	res = platform_get_resource(of_dev, IORESOURCE_MEM, 0);
+-	if (!res) {
+-		err = -EINVAL;
+-		dev_err(&of_dev->dev, "%s: Can't get FMan memory resource\n",
+-			__func__);
+-		goto fman_node_put;
+-	}
+-
+-	phys_base_addr = res->start;
+-	mem_size = resource_size(res);
+-
+ 	clk = of_clk_get(fm_node, 0);
+ 	if (IS_ERR(clk)) {
+ 		err = PTR_ERR(clk);
+@@ -2803,24 +2790,16 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
+ 		}
+ 	}
+ 
+-	fman->dts_params.res =
+-		devm_request_mem_region(&of_dev->dev, phys_base_addr,
+-					mem_size, "fman");
+-	if (!fman->dts_params.res) {
+-		err = -EBUSY;
+-		dev_err(&of_dev->dev, "%s: request_mem_region() failed\n",
+-			__func__);
+-		goto fman_free;
+-	}
+-
+-	fman->dts_params.base_addr =
+-		devm_ioremap(&of_dev->dev, phys_base_addr, mem_size);
+-	if (!fman->dts_params.base_addr) {
+-		err = -ENOMEM;
++	base_addr = devm_platform_get_and_ioremap_resource(of_dev, 0, &res);
++	if (IS_ERR(base_addr)) {
++		err = PTR_ERR(base_addr);
+ 		dev_err(&of_dev->dev, "%s: devm_ioremap() failed\n", __func__);
+ 		goto fman_free;
+ 	}
+ 
++	fman->dts_params.base_addr = base_addr;
++	fman->dts_params.res = res;
++
+ 	fman->dev = &of_dev->dev;
+ 
+ 	err = of_platform_populate(fm_node, NULL, NULL, &of_dev->dev);
+diff --git a/drivers/net/ethernet/lantiq_etop.c b/drivers/net/ethernet/lantiq_etop.c
+index 660dff5426e7..83ce3bfefa5c 100644
+--- a/drivers/net/ethernet/lantiq_etop.c
++++ b/drivers/net/ethernet/lantiq_etop.c
+@@ -90,7 +90,6 @@ struct ltq_etop_priv {
+ 	struct net_device *netdev;
+ 	struct platform_device *pdev;
+ 	struct ltq_eth_data *pldata;
+-	struct resource *res;
+ 
+ 	struct mii_bus *mii_bus;
+ 
+@@ -643,31 +642,14 @@ ltq_etop_probe(struct platform_device *pdev)
+ {
+ 	struct net_device *dev;
+ 	struct ltq_etop_priv *priv;
+-	struct resource *res;
+ 	int err;
+ 	int i;
+ 
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (!res) {
+-		dev_err(&pdev->dev, "failed to get etop resource\n");
+-		err = -ENOENT;
+-		goto err_out;
+-	}
+-
+-	res = devm_request_mem_region(&pdev->dev, res->start,
+-				      resource_size(res), dev_name(&pdev->dev));
+-	if (!res) {
+-		dev_err(&pdev->dev, "failed to request etop resource\n");
+-		err = -EBUSY;
+-		goto err_out;
+-	}
+-
+-	ltq_etop_membase = devm_ioremap(&pdev->dev, res->start,
+-					resource_size(res));
+-	if (!ltq_etop_membase) {
++	ltq_etop_membase = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(ltq_etop_membase)) {
+ 		dev_err(&pdev->dev, "failed to remap etop engine %d\n",
+ 			pdev->id);
+-		err = -ENOMEM;
++		err = PTR_ERR(ltq_etop_membase);
+ 		goto err_out;
+ 	}
+ 
+@@ -679,7 +661,6 @@ ltq_etop_probe(struct platform_device *pdev)
+ 	dev->netdev_ops = &ltq_eth_netdev_ops;
+ 	dev->ethtool_ops = &ltq_etop_ethtool_ops;
+ 	priv = netdev_priv(dev);
+-	priv->res = res;
+ 	priv->pdev = pdev;
+ 	priv->pldata = dev_get_platdata(&pdev->dev);
+ 	priv->netdev = dev;
+diff --git a/drivers/net/mdio/mdio-octeon.c b/drivers/net/mdio/mdio-octeon.c
+index 2beb83154d39..cb53dccbde1a 100644
+--- a/drivers/net/mdio/mdio-octeon.c
++++ b/drivers/net/mdio/mdio-octeon.c
+@@ -17,37 +17,20 @@ static int octeon_mdiobus_probe(struct platform_device *pdev)
+ {
+ 	struct cavium_mdiobus *bus;
+ 	struct mii_bus *mii_bus;
+-	struct resource *res_mem;
+-	resource_size_t mdio_phys;
+-	resource_size_t regsize;
+ 	union cvmx_smix_en smi_en;
+-	int err = -ENOENT;
++	int err;
+ 
+ 	mii_bus = devm_mdiobus_alloc_size(&pdev->dev, sizeof(*bus));
+ 	if (!mii_bus)
+ 		return -ENOMEM;
+ 
+-	res_mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (res_mem == NULL) {
+-		dev_err(&pdev->dev, "found no memory resource\n");
+-		return -ENXIO;
+-	}
+-
+ 	bus = mii_bus->priv;
+ 	bus->mii_bus = mii_bus;
+-	mdio_phys = res_mem->start;
+-	regsize = resource_size(res_mem);
+ 
+-	if (!devm_request_mem_region(&pdev->dev, mdio_phys, regsize,
+-				     res_mem->name)) {
+-		dev_err(&pdev->dev, "request_mem_region failed\n");
+-		return -ENXIO;
+-	}
+-
+-	bus->register_base = devm_ioremap(&pdev->dev, mdio_phys, regsize);
+-	if (!bus->register_base) {
++	bus->register_base = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(bus->register_base)) {
+ 		dev_err(&pdev->dev, "dev_ioremap failed\n");
+-		return -ENOMEM;
++		return PTR_ERR(bus->register_base);
+ 	}
+ 
+ 	smi_en.u64 = 0;
+-- 
+2.47.0
+
 
