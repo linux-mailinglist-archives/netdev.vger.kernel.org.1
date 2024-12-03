@@ -1,105 +1,93 @@
-Return-Path: <netdev+bounces-148277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 526219E0FB0
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 01:27:31 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DA9A9E0FB5
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 01:30:19 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CE7A28437B
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:27:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28E101648FE
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 00:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02DF2500CA;
-	Tue,  3 Dec 2024 00:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D651EDE;
+	Tue,  3 Dec 2024 00:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VSnk8Vo6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hisqccDB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D542500C4;
-	Tue,  3 Dec 2024 00:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BCB370;
+	Tue,  3 Dec 2024 00:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733185615; cv=none; b=AZgeMPzBHgiys+fm8r0Og4A0fGo9SLnFjut3NVu/mCp3OVCKv0LbOUsZUYAEO301xwiFuoUmQrEXozm0HSRhglohgEXvf6wcxqvAjx/4riR3KsSGxvF9VBaX3xOEHkhg15vKlM2fhS9RItwAcHnzLcNgE7ZzsRPBj+73IrK8Ewc=
+	t=1733185815; cv=none; b=rLNxq89JusJJ1cMF8vpL9DbvgnuYQziv28jlW3fldVEoMbJMT/uNjF0y/zu6cwguYq/bsm0LHlnQGNtWgBoiE7vHbjYYmUBXwa/t0whPDfk1le8GcLiMtNyA21zTKTGymRCGtJu6xILiK75XG/5hk4rPg1GNMM/ra3/UE0H18R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733185615; c=relaxed/simple;
-	bh=qnvfK4tL9vbeAxCoO63Od4BOIO9mCY3QsSroY8yLfOw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BcM+7pPpA3SFR20i7DPOSm9XW2d9npU+7ZIjfBUDSPzgXL22kjoRHp53kEC5xY99G5iS9Anf391nUazZ8aNJ90r22zcuWlBHKEIe4UMPkDCZjchrCBxcUofrj7r3aPBo/GKvPi5x8GK1urDaTs2ijwlwqzMe/Sm9pGSv3mIPXYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VSnk8Vo6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE3F9C4CED2;
-	Tue,  3 Dec 2024 00:26:54 +0000 (UTC)
+	s=arc-20240116; t=1733185815; c=relaxed/simple;
+	bh=XmhgYk2x7GXJl2A5h4r9Cuq4mZXd4+wTyrcMFjA2fYs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Dt0Bw9Xmml4QXMAcayaoI+qhOdAbG0bJ2JcmN74WzFDAzvvcp24h4C+pb3YZecwcHBQo6QS0WXLabVo7XOD4yeaS0U1wUPcEyyCRzdMmrHbUC3wqO99CzCvRMUl7SgaGG6fGt+4p+iZhgveeHJdeOzKUR1s/E+zGecWqqj5dgbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hisqccDB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D497BC4CED1;
+	Tue,  3 Dec 2024 00:30:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733185615;
-	bh=qnvfK4tL9vbeAxCoO63Od4BOIO9mCY3QsSroY8yLfOw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VSnk8Vo6fzOol2IlHcrLLoaZORxtKLxx6ddh0/MNjuiWgbx8dGBBt1Uav/qfzZu/T
-	 r4CrcZSfiaYPPt6C3a865Vx/tR6NWd/U4aZMAhT6fk49WkQFpWZptklFWMJzWNrpSE
-	 57Ko9x3olH7m9OFcTgIqmcjcq84mrx80Q8zPwOhOGANA1LdTdqD6V/hGr+EI+tmYDy
-	 rV0Jj7SS4YKz4Bdt1s6c2lJQ3kFaw0Gj+xF5+ITfyuIhaF05bM1pnJkTtg3p9PtsgA
-	 Kp4D0QaRgtfE5ly2rLlVKQlA26jcQlu4Ud8shESq54h+VVD5ye38ZviFU+oudJsXVS
-	 qty3tOT94HGSw==
-Date: Mon, 2 Dec 2024 16:26:53 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: 'Dominique MARTINET' <dominique.martinet@atmark-techno.com>
-Cc: David Laight <David.Laight@aculab.com>, Oliver Neukum
- <oneukum@suse.com>, "edumazet@google.com" <edumazet@google.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, Greg Thelen <gthelen@google.com>, John Sperbeck
- <jsperbeck@google.com>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH net] net: usb: usbnet: fix name regression
-Message-ID: <20241202162653.62e420c5@kernel.org>
-In-Reply-To: <Z05FQ-Z6yv16lSnY@atmark-techno.com>
-References: <20241017071849.389636-1-oneukum@suse.com>
-	<Z00udyMgW6XnAw6h@atmark-techno.com>
-	<e53631b5108b4d0fb796da2a56bc137f@AcuMS.aculab.com>
-	<Z01xo_7lbjTVkLRt@atmark-techno.com>
-	<20241202065600.4d98a3fe@kernel.org>
-	<Z05FQ-Z6yv16lSnY@atmark-techno.com>
+	s=k20201202; t=1733185814;
+	bh=XmhgYk2x7GXJl2A5h4r9Cuq4mZXd4+wTyrcMFjA2fYs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hisqccDBzdlw503kp2/yMWEQuElW7wbDwOU1b/q2XIZTZc7FeP7ex+cijj3An+KJB
+	 HoTTrJRYsqCGq5yYASZkm93Zkkdy5am97lur0vwT2lBkB1e8Jy9dM7yXWZssXpOUKp
+	 OOoAO3Pt4vXg9rBs2291IeWWSw4uMkgY2D/BUtYdmAfxW1xbd7ORD99aCr9NQPhpuj
+	 0wmzl2+QIoYu5fwY3XvrnvRlw2wu7OAjVTnF5oxHVd9kDCxI4ZCzmS5yXvDEc0ErhB
+	 7umUJNTGBniG1cyzRMBEtFLFMMj97NWFrrQG3zagxQjcsRb2wAw4cPE8ANzk58W1pQ
+	 EKsSJMbMWE4tA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 342303806656;
+	Tue,  3 Dec 2024 00:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] ptp: Switch back to struct platform_driver::remove()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173318582905.3964978.17617943251785066504.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Dec 2024 00:30:29 +0000
+References: <20241130145349.899477-2-u.kleine-koenig@baylibre.com>
+In-Reply-To: <20241130145349.899477-2-u.kleine-koenig@baylibre.com>
+To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cu=2Ekleine-koenig=40baylibre=2Ecom=3E?=@codeaurora.org
+Cc: richardcochran@gmail.com, yangbo.lu@nxp.com, dwmw2@infradead.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, 3 Dec 2024 08:39:47 +0900 'Dominique MARTINET' wrote:
-> > > If that is what was intended, I am fine with this, but I think these
-> > > local ppp usb interfaces are rather common in the cheap modem world.  
-> > 
-> > Which will work, as long as they are marked appropriately; that is
-> > marked with FLAG_POINTTOPOINT.  
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 30 Nov 2024 15:53:49 +0100 you wrote:
+> After commit 0edb555a65d1 ("platform: Make platform_driver::remove()
+> return void") .remove() is (again) the right callback to implement for
+> platform drivers.
 > 
-> Hmm, but the check here was either FLAG_POINTTOPOINT being unset or not
-> locally administered address, so to keep the usb0 name we need both?
+> Convert all platform drivers below drivers/ptp to use .remove(), with
+> the eventual goal to drop struct platform_driver::remove_new(). As
+> .remove() and .remove_new() have the same prototypes, conversion is done
+> by just changing the structure member name in the driver initializer.
 > 
-> >             if ((dev->driver_info->flags & FLAG_ETHER) != 0 &&
-> >                 ((dev->driver_info->flags & FLAG_POINTTOPOINT) == 0 ||
-> > -                (net->dev_addr [0] & 0x02) == 0))
-> > +                /* somebody touched it*/
-> > +                !is_zero_ether_addr(net->dev_addr)))
-> >                       strscpy(net->name, "eth%d", sizeof(net->name));  
-> 
-> i.e., something that didn't have FLAG_POINTTOPOINT in the first place
-> would not get into this mac consideration, so it must be set.
+> [...]
 
-Right! I missed the && plus ||
+Here is the summary with links:
+  - ptp: Switch back to struct platform_driver::remove()
+    https://git.kernel.org/netdev/net-next/c/b32913a5609a
 
-> My problematic device here has FLAG_POINTTOPOINT and a (locally
-> admistered) mac address set, so it was not renamed up till now,
-> but the new check makes the locally admistered mac address being set
-> mean that it is no longer eligible to keep the usbX name.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Ideally, udev would be the best option, like Greg said.
-This driver is already a fragile pile of workarounds.
 
-If you really really want the old behavior tho, let's convert 
-the zero check to  !is_zero_ether_addr() && !is_local_ether_addr().
-Maybe factor out the P2P + address validation to a helper because
-the && vs || is getting complicated.
 
