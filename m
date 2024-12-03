@@ -1,142 +1,140 @@
-Return-Path: <netdev+bounces-148302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30AEF9E1103
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 03:00:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99FF69E1107
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 03:03:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DEA7B222AF
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 02:00:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F532282489
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 02:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B16143AAE;
-	Tue,  3 Dec 2024 02:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB6F6F307;
+	Tue,  3 Dec 2024 02:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HxMTZ6GI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EEphATNF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFAF414A82;
-	Tue,  3 Dec 2024 02:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24D517555;
+	Tue,  3 Dec 2024 02:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733191230; cv=none; b=eAbUU5NttPoi2yXzW/Egr8QDH3Hme5n1IoQsQGys+3aGFdyhSnlErF1pG9IcnaScfIJ5E3eZQzxDMPKWWkcuXnkvnv6ob6G1pbCjYXh86WtPhm4cP7ePszVB0Sm6vEy8+LTcYpUqkbe/ppNicM5E1NeheKMsmMc/EWkTurBsKJo=
+	t=1733191424; cv=none; b=sdw0gPSlm0r3/4kgyEnDP73mpSzOnrwx1Rz74eYOkIxJsPT62FLiT2mijEbRPyC56Z56p3PKlYmU4YxMD+oI29fUgQfnrLtJICS9bAU86RtImDuKllTEF4LbemZaqBrc+TJYt6Uq6IvBiMo8LK8t8CI79wtZJS0XNRhvwlmz/VE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733191230; c=relaxed/simple;
-	bh=EAkYqHxwoA0R0dcqG7W4lfpOriiOfn2sTkhuAvg1mYg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UW4xV4EJckC4a2a/8wiWz6J/N9f7IlT1jFY2YdX849nFc2M51yz2Z8QDcfrWjSXD/Dc7uWG3rddzfHuC2J6CEoWUJQJXar0wQKW37IvpWvW2HsN+5KC+M1PvKq1cvsW98SjGkdaSHijenwEmhxwwYUyNVy7GQ7zIStyUOAYn/is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HxMTZ6GI; arc=none smtp.client-ip=209.85.216.46
+	s=arc-20240116; t=1733191424; c=relaxed/simple;
+	bh=oGkL1VT2CFKlGNx4pw3YpRidsPj6S16ZFLrKXPdlAoA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FdB3Z95TGAMXwO1os3mmlEtSBRCIPk2/ogiUywZf4TSUlY347vDlsMopmvuN3ECPKM+B0UgRTqwCT9Fl3fRk+D/Kuer9QZ/1gIuAqgvkA9DFTTyN49HylmJzjhfAiqjCJ3JruUkIYhwoDqoRboNlglL+t6CwPSYxzXDS89wQ0KA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EEphATNF; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2e56750bb0dso3605037a91.0;
-        Mon, 02 Dec 2024 18:00:28 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-21577f65bdeso14813725ad.0;
+        Mon, 02 Dec 2024 18:03:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733191228; x=1733796028; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ifhyXCPwj2ZS4FThasjY1J6PG/17ZdtDu1I6YUbkxr0=;
-        b=HxMTZ6GImJQWlkN17o/Pknr2ONcCHIl13tPF+JErwWPinscJXZSiT4UE+1debDm0s3
-         zMsgtLr89brCFfXtKs4ixCBO0yGynZZTnt6DsJ3rN0Ysi5AnDpCoo0qq06F26WciYMyF
-         f3y/ZmM4yEEUYLhUTOBqPrSl57QUZOiN6tBwz1mSO2uoeQ8iy1zv/iLDpDEqqJzqcgXE
-         WakD/XJlP+Dv/rkh2S8dF5dgLUu5vq4uQ8TPCKhEul09HZHcQRMbvxBmbSR+ik5F32n8
-         eLFGiqf1D1Tg1OVjt1POeYPVmxotq4lTJOAB7dSBa1g6Dy5lFPCiL3GSqj4fNCqqzgwD
-         dNsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733191228; x=1733796028;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1733191422; x=1733796222; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ifhyXCPwj2ZS4FThasjY1J6PG/17ZdtDu1I6YUbkxr0=;
-        b=Y0OOt3R81xQ/n/Op5oB/2KvI2ftW+8u6XG2j16UiLsf5vn/QdjoWykGohg5xTLqfbB
-         0rv4AXZtOuRUlPIedl3IF1bNWZ55n3zmDzniPHuJRLB6HuMvdltAhijGateX/GquK/8m
-         8Tpv50XPVnDW081k+owv8g0t+mvjbsvYs+vO/MFJ9fGCmzLQ8CF7ymR0P74vkuwlFLem
-         wz1vC0fTTO/0ynqHVNPS4y3yz2MW0NsQtAqMzJh6zHtrRU1Pvomm191K+6XbG8AeKvR6
-         r7RdS2iMKkvkREmkq5+k0MOPUoKQUOxHkwa/ioj7EbO+0T2zE1BW1DClmENlrkdA1pSV
-         3CVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUGR2qqhs+Bte2DAyXw1Ak0JsF8wriwEC5Hj3vArL7w83YmMl+mm30Y+0bCxM0Y8A5jle2rjT/L@vger.kernel.org, AJvYcCV6KT9jPsd0kH5F4sqigXpGYmHtBOrtmKvBs7P6IMsOB/iiIIGF/k8Jg+uU2stEWZlsdkV3+PVGRp9WU7EB@vger.kernel.org, AJvYcCWIyaFM3SasmJrEIL4foueWymvsPFix1TR/PG4yPqgV8OBbpOMZ1yJYmlHSRt9/JFxVcC5yugjxFYQgZDyNCYA1@vger.kernel.org, AJvYcCXIvJuHiKyvc0XdGdkWiyKCA1rcoaKDEwYo39smPbDMfRX/d8cdQEaVx6ZU10Sa05ZiHQg0DbD5eS+Y@vger.kernel.org, AJvYcCXXWjvuGxKjrJv1N+02NUpGCOs1zl5LOEJgJHSQAiwRAl0wSzjxrWPk2vgHgL481tGkS/8P7zelWRo5yzwL4+Bl@vger.kernel.org
-X-Gm-Message-State: AOJu0Yze7xsShEqvIxePgf+CKLn8VI68ZIHFZuE+LLKzXN/mnhE2O0mT
-	aLHVeN+fQvDa/RqqPrBhSZ8tNN6IO2WEcMuSTcoO3+M+ncXu/CPV
-X-Gm-Gg: ASbGncspduNW0rWQApz1evZZzs5JHq9OD/+CRShGWnn1gMbnMGc2QOFp29l6xGD0Q7i
-	2+OwqHEZBsX8K+aTF+d+1dlz2eCfeS+I7m1RcxBFaMya9TInj4GBHOpeUxCpDW+n1cY/A/xie6E
-	/snZvnl+T7e4gHxkO3Lk95GofIO2a2UEOr5PbIE8wgRF2kArbXLHCvnKMzyJSv++VgCHk8tIYwf
-	ME/Pz4I+j2ZSXVBeo2zNNCSkxb6L7ty7gHr7Tt+q/EPfns4qtrJnzc=
-X-Google-Smtp-Source: AGHT+IEe0uogUo+ebVsZ0JC4jhKeRE4kCvwTmE8uI2YOgw7JxmzvRPXAWvNj+Oa2WPogiVf++p7dKQ==
-X-Received: by 2002:a17:90b:1b52:b0:2ee:7a4f:9265 with SMTP id 98e67ed59e1d1-2ef012019a9mr1313043a91.15.1733191228010;
-        Mon, 02 Dec 2024 18:00:28 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2eee1591fbdsm1908976a91.35.2024.12.02.18.00.18
+        bh=ZtsxUMh+XFIIoRCLBTewSQ7foIeXplcGO4qMt8g9uHM=;
+        b=EEphATNFtZgF7FDJvPA9EVX896ymv5PjWHvdfvPGUO4Nmg0vpx4fkbDzea3sPTBgVB
+         6G1+VT71QhmCFFrC9ezo6cMIprowQS+WfzNH0jx3gwvMRvcW5pDlhbTGuOBRlYYci3tr
+         gKT8DUPoRj/6C+fkY1q0QCYKM6V7ZG+Cywhhzbs8KA8vpv8HjgSfmUO5tZmQQyF5gGPa
+         ivGkjEKrVG+oAjt4bezDyHmNbyxtlD5ipKJv5vZr/LapyUsvgFfMLtKyn0dCvnyWSc/7
+         Om4Xz2T2StxUxIIO7P+5nDWyykn5qJZuwVBtn5QMyWSuxOluavW+oRnluquDOGA/sD+y
+         4Y+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733191422; x=1733796222;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZtsxUMh+XFIIoRCLBTewSQ7foIeXplcGO4qMt8g9uHM=;
+        b=pM00d7lOxkMGib9KrxCwkBCLdLjFpkVe4M/1zED+nITF6Ub48L/LTPMHrxlI6kHqiB
+         fooqJpu6lwK5UxdT/30iUSNhDrkj7wDFpkjovMI97rEZcqTuvwa5eoQ4X6cx11ZDddnx
+         cG9D7pCekarJY0ULWYiH41HrejW+QjW0poQxR+I5D3LWQwAO2wPPdI/Ll293MJ54tBgm
+         fSdw1nM/DuJsN8GKK1MlmgcMyHeKahG4t8HALCbqPLdieGvgT0uIsKCuXliRareuvUtx
+         OQbVVaK3tU04qoXCTWed3mSIOnviJ587JnrqdTWc1HcZgwXC0zZZEuVKZuhW7sIbesTt
+         TwvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVRJlHqIwdmK/2uLvR7SAPfqEEyW2bIiyCdPZLSmzM8z3aKCw315+d5oNQUFgqBMzBK2Rk5jZ/Tavj3J24=@vger.kernel.org, AJvYcCX+TLOgbyoqr63Re02mM5R689/CfmEk/zrPp67xkltbCtWsFSP3MIK8mV7aghKgUL9w1aeZd7pu@vger.kernel.org, AJvYcCXQaxwlBMcue6cGFNNaiPEMnU4bzq6P5ZN+8vIlCi/D+kxOK69MpRGn5PgzuN1jXYt+Bh0w2ewi2fLGMt4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKak8uYdOzhb9m160iMocsvIxftH9lPdyEF/KgQhcdGOC+qc8i
+	iOLNW3E5XtYrd64A3s04QD89FBmuo1Tz4wZ5Jr0CsC9vBtbgFJRFK/5Q4A==
+X-Gm-Gg: ASbGncvab3CxUFsO+c9Z7QrGxr33p9z0ERUyIIHmXuFi8ac5FK6OWi/tgXtSH/2h0np
+	PVhbWHjwXM4uvkyH13rWVkhK6CqCmSbJ0Yp+Z1q6Jg06/zwpiPYrfTiKor3Hm5eq0A2GEh10Oxr
+	o+s+l5P5euRkEuf3YKLL0xKyrRORC3fGXWlHFRuMUvWx75fPcNP7B3E6HrcNinGAQmB7Tp8UnjO
+	tTZYYNaFwXb5JSH5+eCjAEBFkXnAr8FakwXL+nbCxbYteI=
+X-Google-Smtp-Source: AGHT+IGntlHzteD8zmiU7Ily9CXIelHYFGfjQVFqN0cuB4JWz37qzC5Ex1Ovks7LVjLzw+N8Yz3xAw==
+X-Received: by 2002:a17:903:186:b0:215:9eac:1857 with SMTP id d9443c01a7336-2159eac1b3fmr83999545ad.5.1733191421771;
+        Mon, 02 Dec 2024 18:03:41 -0800 (PST)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2154764f312sm63036215ad.102.2024.12.02.18.03.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 18:00:27 -0800 (PST)
-Date: Tue, 3 Dec 2024 02:00:15 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Kenjiro Nakayama <nakayamakenjiro@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Andrea Parri <parri.andrea@gmail.com>,
-	Will Deacon <will@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	David Howells <dhowells@redhat.com>,
-	Jade Alglave <j.alglave@ucl.ac.uk>,
-	Luc Maranget <luc.maranget@inria.fr>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Akira Yokosawa <akiyks@gmail.com>,
-	Daniel Lustig <dlustig@nvidia.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Shuah Khan <shuah@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arch@vger.kernel.org,
-	lkmm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] selftests/net: call sendmmsg via udpgso_bench.sh
-Message-ID: <Z05mL1WQHBLRkIw1@fedora>
-References: <20241202232129.7139-1-nakayamakenjiro@gmail.com>
+        Mon, 02 Dec 2024 18:03:41 -0800 (PST)
+Date: Tue, 3 Dec 2024 10:03:31 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jon Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com, Suraj Jaiswal
+ <quic_jsuraj@quicinc.com>, Thierry Reding <treding@nvidia.com>,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net v1] net: stmmac: TSO: Fix unbalanced DMA map/unmap
+ for non-paged SKB data
+Message-ID: <20241203100331.00007580@gmail.com>
+In-Reply-To: <20241202163309.05603e96@kernel.org>
+References: <20241021061023.2162701-1-0x1207@gmail.com>
+	<d8112193-0386-4e14-b516-37c2d838171a@nvidia.com>
+	<20241128144501.0000619b@gmail.com>
+	<20241202163309.05603e96@kernel.org>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241202232129.7139-1-nakayamakenjiro@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 03, 2024 at 08:21:29AM +0900, Kenjiro Nakayama wrote:
-> Currently, sendmmsg is implemented in udpgso_bench_tx.c,
-> but it is not called by any test script.
-> 
-> This patch adds a test for sendmmsg in udpgso_bench.sh.
-> This allows for basic API testing and benchmarking
-> comparisons with GSO.
-> ---
->  tools/testing/selftests/net/udpgso_bench.sh | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/udpgso_bench.sh b/tools/testing/selftests/net/udpgso_bench.sh
-> index 640bc43452fa..88fa1d53ba2b 100755
-> --- a/tools/testing/selftests/net/udpgso_bench.sh
-> +++ b/tools/testing/selftests/net/udpgso_bench.sh
-> @@ -92,6 +92,9 @@ run_udp() {
->  	echo "udp"
->  	run_in_netns ${args}
->  
-> +	echo "udp sendmmsg"
-> +	run_in_netns ${args} -m
-> +
->  	echo "udp gso"
->  	run_in_netns ${args} -S 0
->  
-> -- 
-> 2.39.3 (Apple Git-146)
-> 
+Hi Jakub,
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+On Mon, 2 Dec 2024 16:33:09 -0800, Jakub Kicinski <kuba@kernel.org> wrote:
+> On Thu, 28 Nov 2024 14:45:01 +0800 Furong Xu wrote:
+> > > Let me know if you need any more information.  
+> > 
+> > [  149.986210] dwc-eth-dwmac 2490000.ethernet eth0: Tx DMA map failed
+> > and
+> > [  245.571688] dwc-eth-dwmac 2490000.ethernet eth0: Tx DMA map failed
+> > [  245.575349] dwc-eth-dwmac 2490000.ethernet eth0: Tx DMA map failed
+> > are reported by stmmac_xmit() obviously, but not stmmac_tso_xmit().
+> > 
+> > And these crashes are caused by "Tx DMA map failed", as you can see that
+> > current driver code does not handle this kind of failure so well. It is clear
+> > that we need to figure out why Tx DMA map failed.
+> > 
+> > This patch corrects the sequence and timing of DMA unmap by waiting all
+> > DMA transmit descriptors to be closed by DMA engine for one DMA map in
+> > stmmac_tso_xmit(), it never leaks DMA addresses and never introduces
+> > other side effect.
+> > 
+> > "Tx DMA map failed" is a weird failure, and I cannot reproduce this failure
+> > on my device with DWMAC CORE 5.10a(Synopsys ID: 0x51) and DWXGMAC CORE 3.20a.  
+> 
+> Let me repeat Jon's question - is there any info or test you need from
+> Jon to make progress with a fix?
+> 
+> If Jon's board worked before and doesn't work with this patch we will
+> need *a* fix, if no fix is provided our only choice is revert.
+
+Thanks for your attention to this issue.
+
+I requested Jon to provide more info about "Tx DMA map failed" in previous
+reply, and he does not respond yet.
+This seems to be a device-specific issue, no fix can be provided without
+his reply :(
 
