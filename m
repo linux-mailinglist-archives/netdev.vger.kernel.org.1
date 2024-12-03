@@ -1,123 +1,206 @@
-Return-Path: <netdev+bounces-148444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 398849E1A33
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 12:02:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EDD129E1A5C
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 12:07:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F20BC2855AF
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 11:02:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE33F284F83
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 11:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D231E3799;
-	Tue,  3 Dec 2024 11:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143C41E3777;
+	Tue,  3 Dec 2024 11:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="DftX99mk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="flu+bSU6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529CB1E32CC
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 11:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3859F1E25E5
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 11:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733223723; cv=none; b=ZRXQ9TbCt+dE+zA4JfHBzlkC++tvV9Rxfsryr2eGvDcKYKaPVVB/zyjnFCopDrpWl9deNXxn9G8Hyl55fprjonVrax0UYtFMhTuplKe0sg6OuEf5aDDsRB97AdOP3Z63+yDdCakTfJTBCbmVHyeJvCe7wXx53XtZefxgVC9JZfE=
+	t=1733224040; cv=none; b=fppWRjV7oTnjpwYByBPtn9gwZT5cosDpZ/TUvzjOHAMUeGljdvQJOtXQG+ZC5njY910Hnfrod5m5PaVc9uBIcpX5IeAdNHVXgcV3gmzbtEbiTaOle5yQA2s8LV0LZmejhaSpOHk1768RdjMTC0H2sJBlVvBI0dusnes2zGmZq6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733223723; c=relaxed/simple;
-	bh=fl/jjt8B3Y5c8ftzhZ3EbC8pUQ9jZIM3s420nl7R1OU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hvo9yDVtDpIRPyueQmQSBSZ1r89kjgthLB/081fKZNH68BsqMWdJkFXeW6At6dPiopMyOdxREgQB1QGpbdQ5dIWPjmv/C65lxTuaFscxKIUm1lwrs9ggRiB02xIMgI/S9R7KuOWSWZPRImQu/RzPhA11KJAdysxlxtWHoOMQs5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=DftX99mk; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-53df1d1b6e8so5509622e87.1
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 03:02:01 -0800 (PST)
+	s=arc-20240116; t=1733224040; c=relaxed/simple;
+	bh=BcLFJqF5R9LBzw/ZSdK7+ys5w76GtCBHQbe2mYPuFWI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FW58xwprdGAfwWfhCi2LGXUp+QhWfynzWDCfOhKUJ9u6MRH8+cFhADajQfBmebuHxnlq9eP16Q6hy4sCUoGTHu/Hsrm34dfoXzeQIiMlfrPRnywxshgS5CimeZMM4CNu8cMUSNs6i8J7t+gRJhIxBGru2FXr42xsGk1ci/K1288=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=flu+bSU6; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aa539d2b4b2so964970466b.1
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 03:07:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1733223719; x=1733828519; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IkfRDwLNElVEohls3fZ8jYZMP3zjOs98ZJxmQX82x2w=;
-        b=DftX99mkF3zwF2uemf/8EA4psKLuyrbRpot1beNbWd4nliz03HVuicmIsx7WC2KNHR
-         CE1HxDB98xT7pCFVE7mlCW0BebwIahxUAsZ6anNLlo/pfqT1PdsG8NleXvRSBS3ctHiJ
-         La31yi2Jiik88zkvaNW4ilLD6UuN7UeRWhtvgodGNg0UnRMymuMulXlaIv/MonCKsBDI
-         F64cL6mhiiwY8GCk6G8QOZDbIFLMpT8VNPlMe/kXIDk9tS6jtwbmOUVp4F2833ue8yOg
-         rzIg3wFEQPFodMJRLJl/K5kxUvsexsyuZqcPgGWVuiJBk/CMkOriDMqx3MxX+Ic3Cuz2
-         ur3Q==
+        d=google.com; s=20230601; t=1733224036; x=1733828836; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BxFrxVDfrOwjFXl5KkCLHRbcRXZZT5T9BXx+SADM3Uo=;
+        b=flu+bSU6ZEl+AeU3y/jEL+bAY/q9dC1UbYOKCYt7PuiOwtZcFHLRhxslWVWWal9vy7
+         vS10kxstb/PoIfZqeikr8AC2a/ASErX7Y/VGnw4uwp5cv2+Sl5LvUc0x1JSVyMvEKKMD
+         F1pMK0zobYiLDzRju913j5G6po7uxXX38QKY7CxsEKhiFgREowyzG8Es6qX6fluNkQ3P
+         tuGQmLRjr3Z/2875+lJNUBNuW1DbrQX1X7c9IYvbAwpDdGnwNkFk3JZVq/PKBw0GF/HB
+         pjl+psix9j1ywyE8aQMXGPJr+uwGhLHVD/ma4NNsIMcVC56mi/adHwJftMZGSHhSlR28
+         JHWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733223719; x=1733828519;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IkfRDwLNElVEohls3fZ8jYZMP3zjOs98ZJxmQX82x2w=;
-        b=bStFlxbZEACuh189czfvxqdO6Pku/pOg42oTHy8dLihkump33iD9B4vK5MaGj4eJtw
-         3XQObEBwi/6nRNB4nn4ymBrXWBMWuPpPLqQIYXw2PciJRWfHxOV+v4lGz8+l5d4m6lN0
-         2xv5nImfhSJaaVXr5Cjug82TXNeYnkI9+5LBqYqGWRlKq209cCuCajY27SpzQq+bYJpN
-         HGZ+K9K/MjrgEURmH6t5X18SAysQmvhtdejpn8zdQ1E8b8ijw4Sfrsou+Qp10k9dMRKa
-         bpVz1P1jm1EHlTsnoQO+3bXZQNxws71NLyc+cw5tGToHeJnYBeqVCVH3WwfJ1OjNYjBH
-         aUqA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+RvAPw2DNeWfUlCKOO0NnYVltv/RzAoTv/fQCFJ9c1unlWf0V0xuxLxZRB+2UZRPIZSpFds0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxf/KcszqqF0JqBJ+v4ilx/yc0DZgCtcJqDNgv/OVhNdsfK3Nuk
-	vG7JJmsI2PBn0AoCB+vx3l0BTGwMv5FSoeYLu29o4RMYqYC+W0DrLqYZVQGlpVY=
-X-Gm-Gg: ASbGncuR7mPxlTbrw/mEiRDdpi/PFB0QHzjA4KRnjkkzPDDu6xlACMJZMJS+xA2nu36
-	CVcnTPSb9nAAk5zx88ph1gMYXNrmPAtXJri+TOOXcXOPhkbdPEqzqQE0djm60WcpvH2RtiRKNKL
-	jkCrE1Ve6QN2tTzPFnHeVNww+Yrrs2h4xWzyUYPCeLhe9TesZrApNG07zzD/QSCUp822rFJWwQ6
-	OHtSCTD1wmxLWZMTH7Le0cRZAK8a8ngPzW/TqEFDACz6YRNgS3cGlhG2aTobL9LWfh8EQ==
-X-Google-Smtp-Source: AGHT+IHem3Ue+RglvZ1YfQRNySVN7U9r/Ly1NJZ0174YWN+P0LBRHTYGbG0LFxzanq20fmr2QPSrGQ==
-X-Received: by 2002:a05:6512:280b:b0:53d:cb7e:225a with SMTP id 2adb3069b0e04-53e129ff454mr794482e87.24.1733223719329;
-        Tue, 03 Dec 2024 03:01:59 -0800 (PST)
-Received: from [192.168.0.104] ([91.198.101.25])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53e14f97649sm139843e87.146.2024.12.03.03.01.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2024 03:01:59 -0800 (PST)
-Message-ID: <2836f456-aac4-4925-97d6-25f6613fe998@cogentembedded.com>
-Date: Tue, 3 Dec 2024 16:01:56 +0500
+        d=1e100.net; s=20230601; t=1733224036; x=1733828836;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BxFrxVDfrOwjFXl5KkCLHRbcRXZZT5T9BXx+SADM3Uo=;
+        b=US66RTNRwjHZY59L0/m1+uTpF73uFC+/3zSjgqkETx3zFqC5KTwq1zprupF2CVuyFH
+         UtIKOnuGcNLE3Bj+txrXkaro131+jWv9kSd/Gq7lZsSa0M6Lw9jqXMOPYmZZvuRfez7W
+         pXyniGHutdSzjdO53PMQ+rDCqJh84EMIjJiINS1p7GaUDnbTN2gPtIt8995P+z+6l92F
+         y1OeHYnaIT3SeBBMfmJq3+GpZcQyJE4Qo63KdUWso9f7xB35ylWu5GAOXt+l5ER3hPTl
+         dk4LkQ3XATd21J1OU/svYOxRPmD3FBbak6lbQNXdb93rwccYx1J98KOHDTF5Llw1p+Pr
+         H+Qw==
+X-Forwarded-Encrypted: i=1; AJvYcCWQSHV+VuYarnbsMtcAolQMINuqA/ichvG6fpFkPtGdRgnSEefRik3kGiYGO2cWGV80NA0A6xo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwH/5HbCG3YfSx3HQ8j/GxVnDIjOMi5x40xsYbTXsxKjReh15un
+	ooR/b3UZ59WtdtJu6KB2UxCItE7rCUXV44tm7AW+9d1hEQXD7S+HXnwPlFX4HPf6uxMBbN9vCF9
+	TyoAYDLp2F7Dz4yL6xJU0rbXVn38ArXHelfuP
+X-Gm-Gg: ASbGnctA4MZBUFHKQID8MyW8xVItrbbzQEq7WWDYXo8PEo2eB7kY2/413i9AL3zBuon
+	sLCBxFUfgzAUKy3tsMTEHXq1aY069lX8=
+X-Google-Smtp-Source: AGHT+IFNBPCDBSWJ2rlSUeXx0fiZoz6zwSFf96PshdUcfQi7cbCtRJboavISixKJf7zAhgvyP4zRsca5clzUuPnPnFg=
+X-Received: by 2002:a17:907:3e95:b0:aa5:ef1c:9dfc with SMTP id
+ a640c23a62f3a-aa5ef1c9ee3mr464606566b.8.1733224036444; Tue, 03 Dec 2024
+ 03:07:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: phy_ethtool_ksettings_set: Allow any supported
- speed
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Michael Dege <michael.dege@renesas.com>,
- Christian Mardmoeller <christian.mardmoeller@renesas.com>,
- Dennis Ostermann <dennis.ostermann@renesas.com>
-References: <20241202083352.3865373-1-nikita.yoush@cogentembedded.com>
- <20241202100334.454599a7@fedora.home>
- <73ca1492-d97b-4120-b662-cc80fc787ffd@cogentembedded.com>
- <Z02He-kU6jlH-TJb@shell.armlinux.org.uk>
- <eddde51a-2e0b-48c2-9681-48a95f329f5c@cogentembedded.com>
- <Z02KoULvRqMQbxR3@shell.armlinux.org.uk>
- <c1296735-81be-4f7d-a601-bc1a3718a6a2@cogentembedded.com>
- <Z02oTJgl1Ldw8J6X@shell.armlinux.org.uk>
- <5cef26d0-b24f-48c6-a5e0-f7c9bd0cefec@cogentembedded.com>
- <Z03aPw_QgVYn8WyR@shell.armlinux.org.uk>
-Content-Language: en-US, ru-RU
-From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-In-Reply-To: <Z03aPw_QgVYn8WyR@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CGME20241203081005epcas2p247b3d05bc767b1a50ba85c4433657295@epcas2p2.samsung.com>
+ <20241203081247.1533534-1-youngmin.nam@samsung.com>
+In-Reply-To: <20241203081247.1533534-1-youngmin.nam@samsung.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 3 Dec 2024 12:07:05 +0100
+Message-ID: <CANn89iK+7CKO31=3EvNo6-raUzyibwRRN8HkNXeqzuP9q8k_tA@mail.gmail.com>
+Subject: Re: [PATCH] tcp: check socket state before calling WARN_ON
+To: Youngmin Nam <youngmin.nam@samsung.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, dujeong.lee@samsung.com, 
+	guo88.liu@samsung.com, yiwang.cai@samsung.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, joonki.min@samsung.com, hajun.sung@samsung.com, 
+	d7271.choe@samsung.com, sw.ju@samsung.com, 
+	Neal Cardwell <ncardwell@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> As I say, need to see the code. Otherwise... sorry, I'm no longer
-> interested in your problem.
+On Tue, Dec 3, 2024 at 9:10=E2=80=AFAM Youngmin Nam <youngmin.nam@samsung.c=
+om> wrote:
+>
+> We encountered the following WARNINGs
+> in tcp_sacktag_write_queue()/tcp_fastretrans_alert()
+> which triggered a kernel panic due to panic_on_warn.
+>
+> case 1.
+> ------------[ cut here ]------------
+> WARNING: CPU: 4 PID: 453 at net/ipv4/tcp_input.c:2026
+> Call trace:
+>  tcp_sacktag_write_queue+0xae8/0xb60
+>  tcp_ack+0x4ec/0x12b8
+>  tcp_rcv_state_process+0x22c/0xd38
+>  tcp_v4_do_rcv+0x220/0x300
+>  tcp_v4_rcv+0xa5c/0xbb4
+>  ip_protocol_deliver_rcu+0x198/0x34c
+>  ip_local_deliver_finish+0x94/0xc4
+>  ip_local_deliver+0x74/0x10c
+>  ip_rcv+0xa0/0x13c
+> Kernel panic - not syncing: kernel: panic_on_warn set ...
+>
+> case 2.
+> ------------[ cut here ]------------
+> WARNING: CPU: 0 PID: 648 at net/ipv4/tcp_input.c:3004
+> Call trace:
+>  tcp_fastretrans_alert+0x8ac/0xa74
+>  tcp_ack+0x904/0x12b8
+>  tcp_rcv_state_process+0x22c/0xd38
+>  tcp_v4_do_rcv+0x220/0x300
+>  tcp_v4_rcv+0xa5c/0xbb4
+>  ip_protocol_deliver_rcu+0x198/0x34c
+>  ip_local_deliver_finish+0x94/0xc4
+>  ip_local_deliver+0x74/0x10c
+>  ip_rcv+0xa0/0x13c
+> Kernel panic - not syncing: kernel: panic_on_warn set ...
+>
 
-We already got valuable information.
+I have not seen these warnings firing. Neal, have you seen this in the past=
+ ?
 
-I agree that the patch I tried to submit is a wrong way to handle the issue we have. Instead, need to 
-improve the PHY driver stub, such that it does not declare no autoneg support for 2.5G Base-T1 PHY.
+Please provide the kernel version (this must be a pristine LTS one).
+and symbolized stack traces using scripts/decode_stacktrace.sh
 
-(creating a real driver for the PHY is not possible at this time due to lack of technical information)
+If this warning was easy to trigger, please provide a packetdrill test ?
 
-Thank you.
 
-Nikita
+
+> When we check the socket state value at the time of the issue,
+> it was 0x4.
+>
+> skc_state =3D 0x4,
+>
+> This is "TCP_FIN_WAIT1" and which means the device closed its socket.
+>
+> enum {
+>         TCP_ESTABLISHED =3D 1,
+>         TCP_SYN_SENT,
+>         TCP_SYN_RECV,
+>         TCP_FIN_WAIT1,
+>
+> And also this means tp->packets_out was initialized as 0
+> by tcp_write_queue_purge().
+
+What stack trace leads to this tcp_write_queue_purge() exactly ?
+
+>
+> In a congested network situation, a TCP ACK for
+> an already closed session may be received with a delay from the peer.
+> This can trigger the WARN_ON macro to help debug the situation.
+>
+> To make this situation more meaningful, we would like to call
+> WARN_ON only when the state of the socket is "TCP_ESTABLISHED".
+> This will prevent the kernel from triggering a panic
+> due to panic_on_warn.
+>
+> Signed-off-by: Youngmin Nam <youngmin.nam@samsung.com>
+> ---
+>  net/ipv4/tcp_input.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 5bdf13ac26ef..62f4c285ab80 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -2037,7 +2037,8 @@ tcp_sacktag_write_queue(struct sock *sk, const stru=
+ct sk_buff *ack_skb,
+>         WARN_ON((int)tp->sacked_out < 0);
+>         WARN_ON((int)tp->lost_out < 0);
+>         WARN_ON((int)tp->retrans_out < 0);
+> -       WARN_ON((int)tcp_packets_in_flight(tp) < 0);
+> +       if (sk->sk_state =3D=3D TCP_ESTABLISHED)
+
+In any case this test on sk_state is too specific.
+
+> +               WARN_ON((int)tcp_packets_in_flight(tp) < 0);
+>  #endif
+>         return state->flag;
+>  }
+> @@ -3080,7 +3081,8 @@ static void tcp_fastretrans_alert(struct sock *sk, =
+const u32 prior_snd_una,
+>                 return;
+>
+>         /* C. Check consistency of the current state. */
+> -       tcp_verify_left_out(tp);
+> +       if (sk->sk_state =3D=3D TCP_ESTABLISHED)
+> +               tcp_verify_left_out(tp);
+>
+>         /* D. Check state exit conditions. State can be terminated
+>          *    when high_seq is ACKed. */
+> --
+> 2.39.2
+>
 
