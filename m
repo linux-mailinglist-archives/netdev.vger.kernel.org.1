@@ -1,65 +1,89 @@
-Return-Path: <netdev+bounces-148493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4ACA9E1D83
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 14:26:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9A959E2082
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:59:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF1C7B25D32
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 13:12:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21274B25372
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 13:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8D81EE00D;
-	Tue,  3 Dec 2024 13:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C04B71EBA1C;
+	Tue,  3 Dec 2024 13:07:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="HQ+Q1qIJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="boNrvG3g"
 X-Original-To: netdev@vger.kernel.org
-Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A38919A297;
-	Tue,  3 Dec 2024 13:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6681E47C4;
+	Tue,  3 Dec 2024 13:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733231552; cv=none; b=TMlrqHKbOTMsrtocdcds7Q6jB+SRIoEaU39OLP632dkQTooZdbJaDXfH02MQ76PJKieYkN1g27Z1EbjknS0mTt4FSlfVXbhHbeNuYT6/o/+r0R8HNrY59n3BRDvSxhAP1yQn5QNUJQy7JPYZPwbX93lITSF6LVKo69lg6rIIMeM=
+	t=1733231226; cv=none; b=kbsDSHJQvYcs++idKHP+zSw8Juiq4L+dTLidVgupjXRUJIHugX56xrs93QnqWLGIFdGEJyy2/gMqQ3U4bePnmcOEnTv4Ft+h92WC+EzJjXvsPpGAtzJY726pmjEk/9hdIodEPYGODOKv9kBGGpD/58km2XS8R5YRh/yX5zU6YI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733231552; c=relaxed/simple;
-	bh=g5hIXz2ZdFqiQ/fjDhOmrfPEjwRDaOZ0QCeYZ3p65as=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SN2Iy6TRXEBcSezuvVIheFpJ3QazHlPlux4EmyarKfALazC2smhgc628vlWpYmjdTx86j0Q4aeYCWrlIgptgI8W30LEm0APqw8L0UALpDZATfgL10fsBsKPB4OZol0cbz85Z4J7Zs6MbyUHWfkWzB+GhcfKQeyXvFnHnhW5yPQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=HQ+Q1qIJ; arc=none smtp.client-ip=62.210.214.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
-Received: from gaia.codewreck.org (localhost [127.0.0.1])
-	by submarine.notk.org (Postfix) with ESMTPS id DEFF014C1E1;
-	Tue,  3 Dec 2024 14:05:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
-	s=2; t=1733231117;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=XkzHgQVBOQbV299nGM1TYNeg3mTKbniIxeYpdBTzdO8=;
-	b=HQ+Q1qIJ43ImBUjy19f+FduPW3HekLc7QhEwJfYqEKmnJxu51fITz/dPokP+VZ/PCelpeX
-	o4ujPw7I+AeOrPyzHD8EXGfVQWE+2VlbtgGeUcF2qPP4tCozA9X4WJoxMFws5S/aEiMOgs
-	27v9vH+bECgSpIBGaWPH1m+0d5CXWyfiTNX2yX6J2FGXRnXOOuWGO7E7T4aAxwdCLxiyAw
-	+7Lk1AS+DXtF1Aao6SrWqeN2U1rmNF+REeafnCv9U7xLPGIf3Nbe1tnGzoI2ljEUHhuewj
-	+7yEER7WhLzh3SDfXRLw6SAdhhO+Ura1tXN3Nc4W6w9JyzFwPqCz4Yqe817ywA==
-Received: from gaia.codewreck.org (localhost.lan [::1])
-	by gaia.codewreck.org (OpenSMTPD) with ESMTP id 62ef6977;
-	Tue, 3 Dec 2024 13:05:13 +0000 (UTC)
-From: Dominique Martinet <asmadeus@codewreck.org>
-To: Oliver Neukum <oneukum@suse.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1733231226; c=relaxed/simple;
+	bh=13AvOjllZFtUPseTAIkpqJNhcrRiFcBFx1+nJUBP8Rc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=keJYV/3tG2Q6eD5TJ/Mqhdn3gFkaIhv+yE00iOrFfpu9+sbmi6/qmfAidOrgLcSTlrxVUrOc53+HfinX5ODCqtoe9s8XCzCjyNMK2jyqouIWAUhr3PvS0MqBl3ZohZfl1WAICie+tbcGq3BNkhhgpP/EuC8FdUk0v8Gp/kJ9w+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=boNrvG3g; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-434aa472617so46936685e9.3;
+        Tue, 03 Dec 2024 05:07:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733231223; x=1733836023; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sKfu+etQ5ANxcOuW4h0fJXGVNERyNRtmAMyY5LefJQY=;
+        b=boNrvG3g++eAOBhaJDtUfwb68Qr3oB3nUb9ntsammY1jC0kvRlhA6KxJs849Um7cT4
+         eBpA75Uu62611k2Ezv0yLqGVl6YbJdxC2PMpMfpTxRmnP2HveNRNOfKU9HONAUQuhX3V
+         gWCZK8ztJoc++3rvKh5Fx1ehGMSUYu8O7kvfj77GqiEC2pgN2DvVMMk2DfgjklHmOpwv
+         YPQ21Mu/TWb7IFt9/Z/+xNCi95YqK6ONV/sE/mKOr2SVR2Fp7wgvYBUgQMUPDxevx/yK
+         K2X6itQfUBhbHJNsTsUL7T+JBlVze7lzJ2FIDo76asvZmBQRETjfRHDaPu6yW3jBcT7c
+         eyPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733231223; x=1733836023;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sKfu+etQ5ANxcOuW4h0fJXGVNERyNRtmAMyY5LefJQY=;
+        b=wWj1DyDLIg9cEQo0rXlg2yIHW1+3qtsm1f53l6nrt4sst+k8flsT3aPYCOn7Z1mFSr
+         27YqV8gYM374F92HWap73KpBS6Nl8mPXgTscSvxpR1I/ySWGtvk2Zk9QDdRiQTrx6o4h
+         QQyqxhw23sNF8jBZ/1h8rF5a8heqgjeXov/XTIvdthCxGLpz10sWgzfYe+AlYEVXvnFI
+         C7dbcAF8OXGgpYrZHED15MbcDJhIvdHzHSaUsB29HGVjT7U6YP3IUJOdimrSFTtN6IYm
+         tBqGjAGc1fY0Y5LRWvDB9hUZYkoAsw2ZpwmpNmpeIRbhFajzbngFIWPj3Wp+M0AVYoCf
+         WMTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWl8amAmTOt7WIt7gK1ljfFPg2CrAq/qq45E9bXIGBuqeIangC79T9VhUNkL11/rfrfO91gKz2vrs+zNZlGrA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJOjgCO3wZlJtemeCQLjK3MdKXz6iAOEPVDNOe8TJOcxvqc9SI
+	nzO1kC8UqzhW7c18KQ2z1hrTm9CCYU3mJVAmEfa0uLrmLH0lXFzrVk7dzA==
+X-Gm-Gg: ASbGncvEcoebu0sYFYusAtHKyc8LF28H/nIFXfTib/JD3omJuhw+Rgw8MCJhVeiw4YZ
+	hRoie7Z8eUHqw9PVynRokif4p6Qei+/5frDF7qGyoz83w/Di3FCg41PBIyMe7b/oNXTgOltI2fJ
+	SPzDXhIYYIVKp7yD/uBt8xKEzqtKfqNF7sy48j3RFl2+8HeMHYbdTvtLopUSi9msJYrYY2fHt/Y
+	IwryY7mxszzECF3OUPaNqrZCMj1kUh33/rP4A/Ggbl/O87vgB5dpLeA6wD6RTAWCH4=
+X-Google-Smtp-Source: AGHT+IHzNPKTBGNXnOjpWN1ppThaEh7Y2/EUOJW84nb0Yj5tjocTMudOght1ODqNrNFOZj+kfWRU1w==
+X-Received: by 2002:a05:600c:1c8b:b0:434:a386:6ae with SMTP id 5b1f17b1804b1-434d09b14c7mr20224995e9.7.1733231222527;
+        Tue, 03 Dec 2024 05:07:02 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:6140:2ef3:aaa:55ca])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434aa7e4d42sm219142365e9.37.2024.12.03.05.07.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 05:07:02 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Dominique Martinet <dominique.martinet@atmark-techno.com>,
-	netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: usb: usbnet: restore usb%d name exception for local mac addresses
-Date: Tue,  3 Dec 2024 22:04:55 +0900
-Message-ID: <20241203130457.904325-1-asmadeus@codewreck.org>
-X-Mailer: git-send-email 2.47.0
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	linux-wireless@vger.kernel.org
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 0/7] netlink: specs: add a spec for nl80211 wiphy
+Date: Tue,  3 Dec 2024 13:06:48 +0000
+Message-ID: <20241203130655.45293-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,64 +92,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Dominique Martinet <dominique.martinet@atmark-techno.com>
+Add a rudimentary YNL spec for nl80211 that includes get-wiphy and
+get-interface, along with some required enhancements to YNL and the
+netlink schemas.
 
-The previous commit assumed that local addresses always came from the
-kernel, but some devices hand out local mac addresses so we ended up
-with point-to-point devices with a mac set by the driver, renaming to
-eth%d when they used to be named usb%d.
+Patch 1 is a minor cleanup to prepare for patch 2
+Patches 2-4 are new features for YNL
+Patches 5-6 are schema updates for feature parity
+Patch 7 is the new nl80211 spec
 
-Userspace should not rely on device name, but for the sake of stability
-restore the local mac address check portion of the naming exception:
-point to point devices which either have no mac set by the driver or
-have a local mac handed out by the driver will keep the usb%d name.
+Donald Hunter (7):
+  tools/net/ynl: remove extraneous plural from variable names
+  tools/net/ynl: support decoding indexed arrays as enums
+  tools/net/ynl: support decoding C arrays as enums
+  tools/net/ynl: accept IP string inputs
+  netlink: specs: support nested structs in genetlink legacy
+  netlink: specs: add s8, s16 to genetlink schemas
+  netlink: specs: wireless: add a spec for nl80211
 
-Fixes: 8a7d12d674ac ("net: usb: usbnet: fix name regression")
-Signed-off-by: Dominique Martinet <dominique.martinet@atmark-techno.com>
----
- drivers/net/usb/usbnet.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+ Documentation/netlink/genetlink-c.yaml      |    2 +-
+ Documentation/netlink/genetlink-legacy.yaml |    5 +-
+ Documentation/netlink/genetlink.yaml        |    2 +-
+ Documentation/netlink/specs/nl80211.yaml    | 1775 +++++++++++++++++++
+ tools/net/ynl/lib/ynl.py                    |   42 +-
+ 5 files changed, 1812 insertions(+), 14 deletions(-)
+ create mode 100644 Documentation/netlink/specs/nl80211.yaml
 
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index 44179f4e807f..d044dc7b7622 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -178,6 +178,17 @@ int usbnet_get_ethernet_addr(struct usbnet *dev, int iMACAddress)
- }
- EXPORT_SYMBOL_GPL(usbnet_get_ethernet_addr);
- 
-+static bool usbnet_needs_usb_name_format(struct usbnet *dev, struct net_device *net)
-+{
-+	/* Point to point devices which don't have a real MAC address
-+	 * (or report a fake local one) have historically used the usb%d
-+	 * naming. Preserve this..
-+	 */
-+	return (dev->driver_info->flags & FLAG_POINTTOPOINT) != 0 &&
-+		(is_zero_ether_addr(net->dev_addr) ||
-+		 is_local_ether_addr(net->dev_addr));
-+}
-+
- static void intr_complete (struct urb *urb)
- {
- 	struct usbnet	*dev = urb->context;
-@@ -1762,13 +1773,10 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
- 		if (status < 0)
- 			goto out1;
- 
--		// heuristic:  "usb%d" for links we know are two-host,
--		// else "eth%d" when there's reasonable doubt.  userspace
--		// can rename the link if it knows better.
-+		/* heuristic: rename to "eth%d" if we are not sure this link
-+		 * is two-host (these links keep "usb%d") */
- 		if ((dev->driver_info->flags & FLAG_ETHER) != 0 &&
--		    ((dev->driver_info->flags & FLAG_POINTTOPOINT) == 0 ||
--		     /* somebody touched it*/
--		     !is_zero_ether_addr(net->dev_addr)))
-+		    !usbnet_needs_usb_name_format(dev, net))
- 			strscpy(net->name, "eth%d", sizeof(net->name));
- 		/* WLAN devices should always be named "wlan%d" */
- 		if ((dev->driver_info->flags & FLAG_WLAN) != 0)
 -- 
-2.47.0
+2.47.1
 
 
