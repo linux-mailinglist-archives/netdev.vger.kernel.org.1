@@ -1,201 +1,253 @@
-Return-Path: <netdev+bounces-148345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 406489E1388
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 07:50:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DCF49E139D
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 07:58:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E430B21D16
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 06:50:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E19D282573
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 06:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E1818132F;
-	Tue,  3 Dec 2024 06:50:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61331865EA;
+	Tue,  3 Dec 2024 06:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDjh6ejV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RUtz5e4f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBF614F104;
-	Tue,  3 Dec 2024 06:50:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A5E176AA1
+	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 06:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733208646; cv=none; b=j1bWCfSprNvIawcpVIRnBXb/aKnR48m6AZSj9KqsmNyX6GeI1M/gamABOojEJsTbLROcowPMMUZinmoOBQMwjpMlvx/1Aw83a0OFkD/ohv8lWHnsY1kXzhdaUBcmjYQAggsg8ZU1Sqn9DCWUQ+Iurz8PwpO68P6czl13zr3Pdi4=
+	t=1733209104; cv=none; b=pep2J8oH/F3nwdxryvczpuoljfjN2Zg1LFAGO6UVzqAbHz6gWas4uZrYMDrQ9jVhbkV3+9SMR0/yF4Exi02oHD0QEtDFf87wad+mWPQJJBhAbEDEvOUQJ3nULn86Pk+jXB+fE00GhU44dgFGkoq9rcL2IPrGGZbBDm3uNR2AiGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733208646; c=relaxed/simple;
-	bh=JSHruDBztrs/q8PI7b7ZROkSdM4VTDPtybEgr9mzyRI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MdMKxaeDkl6Kh8Yiv2PdumukHRzh4kHGCUZ6P9HrSJjP+WIuCy+JjjYT3cMcllkrFTA3AAHFVDD/ZIU3Oqrpt2+6yNDtZr1zgczVhQ1P3iaijZTs1turb1OGg0vOmewEfx8v8/4cXr9F0EoM/lJhN6UDsMQ1YRmUzf7KrO5mkEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EDjh6ejV; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5d0cfb9fecaso4080280a12.2;
-        Mon, 02 Dec 2024 22:50:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733208643; x=1733813443; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NI/werPgmltxPsDMyZ5Steam/JI1907/cU3EYFBKodA=;
-        b=EDjh6ejVBBPdGSh/im0GUEI9HIn2YcHClv6xEqPsw3TikLGqY/5b8LCAYULOCKLnF1
-         NMC4yAEov1WNoGOFAsIdRIJWiXGP6Ct4iCEYELJhnuyZOe9vWX2UJxEE74XnfWfs1lIE
-         h4px/HGZElYMGQ4u3ShLYG8Mi7eRJNfxJttHLftusnmYQN5XoHFLC58X94l6JD386LfL
-         31FKlYxngCjeDVk9TLq+tj9a0QspRRobaUp79JSiD+eVX7BgeGIrPLB776sy3RbdFz5D
-         wFYT3+1tyn2ARtuC/VvNl3Cbsdp8qKXttJa9rN3BKqx6YKMSk00fBE98SpTgPeeAwi1q
-         wBgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733208643; x=1733813443;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NI/werPgmltxPsDMyZ5Steam/JI1907/cU3EYFBKodA=;
-        b=okkdaikfTyykyUUp4G0xU9mZ0F7XfwI8jExt2TVZ5X8KC0FD94hFk8B5ULPbHvf7wJ
-         932Y3yb7fh1KjrYS+WoAU384gUqWwIe64s737DGYL4BfZbBfFS1/fFHwXN6G2MBc5/OI
-         fYOv3EdCp29/vw0XPH9isjJQrtcHXYRfXcfAkxQrUVkeWy/6SdPbq21f3PczV9GclAlM
-         dAPpwG4B/fWvXQiu1LLEAX32FYoI7pMQZNFWG12hNDzYqCDwdD5MFr5owMj8Y05crBVO
-         DpXl4G69lndZPUsHJadpXC8lQJvD0QDnnXcSWCStOKIndmg9/kJjjgMA6Ok963hcJ6cG
-         FN7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUhKQ6UPKpfHGGP3blDKYHVX0LUkWoTslCf+irs7zdntcObP6W9Ab62V2Id5dDf83Pai041JFwh@vger.kernel.org, AJvYcCXF9hDgwpiv2/P740gBQ6FVLVsO/MHLF5oUl8qJey/hBFY7dy8yyKo2EjKGuJAkO8jZPE1vreaSboNennk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmrcsVqV7p8GJISyT9ijpysfrSqcwuq6hqOxu6THeXoiFbR10x
-	UJgjilMBsHpZtDSXTDStEEiDaus7wKZ3HJSxSxCVlF4Iv8hOQp/f
-X-Gm-Gg: ASbGncsc9uTxWorg0qbacUsNcH248at1f4BzipmOrjhR46ivk55QC7uzgamCVbSCuem
-	i5HryqGmKyWYMhRNXIlm7UWoHD5fjx7x3yBQm/SrEEunb0IKeB15pbOUzXv1iuz+sU2g3RM1YNt
-	ocij6qqqHBrMPqyRDgLs0DWtisBaVCk8k9bre1JjwJwbH7pkgcYkXJkR5+CXptwCgzK3vs/xwR5
-	sMMaUP3mIh+8SLU3k/z5+VzwcUuiBgkYPRfc+KEEEJjvt4OzP2r9j+obIJg6NGqcTZXr2vnlKjE
-	5/xYc/gVnuB+C6+dLiEb7bFjpsBlAwHJ0MzCm7qjsSxj5z1G6qfj/byJ8eHKEUyCPFdPOMyhUYb
-	LDxx1jaU9IARF1K67vTkrr5v0bMG3cbve5a48LxU=
-X-Google-Smtp-Source: AGHT+IGcaH2H6IltS88+VsO3IgzpTZmbGobwHpKZsc+psm7G+ViCqqDF2MyAMurUyiW+FfzU6XdKYQ==
-X-Received: by 2002:a05:6402:26c1:b0:5d0:cc0d:9935 with SMTP id 4fb4d7f45d1cf-5d10cb55a03mr924793a12.9.1733208642458;
-        Mon, 02 Dec 2024 22:50:42 -0800 (PST)
-Received: from ?IPV6:2a02:3100:9d09:7500:e91b:2682:897:11e8? (dynamic-2a02-3100-9d09-7500-e91b-2682-0897-11e8.310.pool.telefonica.de. [2a02:3100:9d09:7500:e91b:2682:897:11e8])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5d0c6999e45sm4084026a12.52.2024.12.02.22.50.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Dec 2024 22:50:41 -0800 (PST)
-Message-ID: <7a322deb-e20e-4b32-9fef-d4a48bf0c128@gmail.com>
-Date: Tue, 3 Dec 2024 07:50:40 +0100
+	s=arc-20240116; t=1733209104; c=relaxed/simple;
+	bh=m7WjI6nwHce7B+Dt0tXOtDlBdaAbIGqHWDR7PhiBjjo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CmSalSifCk1NFJnODyx2xyXpEbwEuIUQBYaOL4JEmtP9zYk16twaikgs1xPdf6hnDKMVn7hRp8ZC2fIXwCpA116KnAgML2xZY08OO5CuKFLSvlwQSWELKBoHWEfl9NbYNUIk7CBQOY2a3OJ8218x47312TJ1SqGsrV23kpP3Pos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RUtz5e4f; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733209103; x=1764745103;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=m7WjI6nwHce7B+Dt0tXOtDlBdaAbIGqHWDR7PhiBjjo=;
+  b=RUtz5e4fjgvPDftecE3z+upmJrytv4C1DdpZX65GtL84tr2Pwc67hj5N
+   VXO3Qju3NlnnrTZrLxG+cUeCECsr2QFxoxVXOTA45LHs5B+l1NQ0w//Ev
+   eP+oa97mHPRNGNu+3z406N0F/kGtfStflZy3t5zQmAFHGgCGwxuJIr6Wr
+   hvYxrzWI7EcLzGlDHwOcCHlKen8RyImq0uzH4xvlkEHfo9avU6uJjphvR
+   itYBi7WBjx6auwDpyFSckzGR4u2EnT6lxIMcHzPsqs/LJjAfmleurkVZZ
+   w03shybjKb3IElxIgi0lv/lg0bqGwicEz+d3pIH/UFsOhWkrb+IdxqvXa
+   Q==;
+X-CSE-ConnectionGUID: fY55sAtuQ0uZ+jsWpbW/sg==
+X-CSE-MsgGUID: XnamjMTwSxqW44FIH6uZ3g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="33330455"
+X-IronPort-AV: E=Sophos;i="6.12,204,1728975600"; 
+   d="scan'208";a="33330455"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 22:58:22 -0800
+X-CSE-ConnectionGUID: nN48hy6oTzqhGx52p6NnBg==
+X-CSE-MsgGUID: 3YNjMIcoRkuG+RfntT9pkg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,204,1728975600"; 
+   d="scan'208";a="93673670"
+Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
+  by fmviesa010.fm.intel.com with ESMTP; 02 Dec 2024 22:58:18 -0800
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	pawel.chmielewski@intel.com,
+	sridhar.samudrala@intel.com,
+	jacob.e.keller@intel.com,
+	pio.raczynski@gmail.com,
+	konrad.knitter@intel.com,
+	marcin.szycik@intel.com,
+	wojciech.drewek@intel.com,
+	nex.sw.ncis.nat.hpm.dev@intel.com,
+	przemyslaw.kitszel@intel.com,
+	jiri@resnulli.us,
+	horms@kernel.org,
+	David.Laight@ACULAB.COM,
+	pmenzel@molgen.mpg.de,
+	mschmidt@redhat.com,
+	himasekharx.reddy.pucha@intel.com,
+	rafal.romanowski@intel.com
+Subject: [iwl-next v9 0/9] ice: managing MSI-X in driver
+Date: Tue,  3 Dec 2024 07:58:08 +0100
+Message-ID: <20241203065817.13475-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/2] net: phy: realtek: disable broadcast address
- feature of rtl8211f
-To: Zhiyuan Wan <kmlinuxm@gmail.com>, andrew@lunn.ch
-Cc: kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- willy.liu@realtek.com, Yuki Lee <febrieac@outlook.com>
-References: <cb8b5a36-fe5c-4b10-ac28-5f31f95262ab@lunn.ch>
- <20241203042631.2061737-1-kmlinuxm@gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20241203042631.2061737-1-kmlinuxm@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 03.12.2024 05:26, Zhiyuan Wan wrote:
-> This feature is enabled defaultly after a reset of this transceiver.
-> When this feature is enabled, the phy not only responds to the
-> configuration PHY address by pin states on board, but also responds
-> to address 0, the optional broadcast address of the MDIO bus.
-> 
-> But some MDIO device like mt7530 switch chip (integrated in mt7621
-> SoC), also use address 0 to configure a specific port, when use
-> mt7530 and rtl8211f together, it usually causes address conflict,
-> leads to the port of RTL8211FS stops working.
-> 
-> This patch disables broadcast address feature of rtl8211f, and
-> returns -ENODEV if using broadcast address (0) as phy address.
-> 
-> Reviewed-by: Yuki Lee <febrieac@outlook.com>
-> Signed-off-by: Zhiyuan Wan <kmlinuxm@gmail.com>
-> ---
->  drivers/net/phy/realtek.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-> index f65d7f1f3..8a38b02ad 100644
-> --- a/drivers/net/phy/realtek.c
-> +++ b/drivers/net/phy/realtek.c
-> @@ -31,6 +31,7 @@
->  #define RTL8211F_PHYCR1				0x18
->  #define RTL8211F_PHYCR2				0x19
->  #define RTL8211F_INSR				0x1d
-> +#define RTL8211F_PHYAD0_EN			BIT(13)
->  
->  #define RTL8211F_LEDCR				0x10
->  #define RTL8211F_LEDCR_MODE			BIT(15)
-> @@ -139,6 +140,17 @@ static int rtl821x_probe(struct phy_device *phydev)
->  		return dev_err_probe(dev, PTR_ERR(priv->clk),
->  				     "failed to get phy clock\n");
->  
-> +	dev_dbg(dev, "disabling MDIO address 0 for this phy");
-> +	ret = phy_modify_paged_changed(phydev, 0xa43, RTL8211F_PHYCR1,
-> +				       RTL8211F_PHYAD0_EN, 0);
+Hi,
 
-Why do you use the _changed version if you don't use the related feature?
+It is another try to allow user to manage amount of MSI-X used for each
+feature in ice. First was via devlink resources API, it wasn't accepted
+in upstream. Also static MSI-X allocation using devlink resources isn't
+really user friendly.
 
-And formal aspects:
-- patch should be annotated net-next
-- you missed to address all maintainers, use the get_maintainers.pl
-  script
+This try is using more dynamic way. "Dynamic" across whole kernel when
+platform supports it and "dynamic" across the driver when not.
 
-> +	if (ret < 0) {
-> +		dev_err(dev, "disabling MDIO address 0 failed: %pe\n",
-> +			ERR_PTR(ret));
-> +	}
-> +	/* Don't allow using broadcast address as PHY address */
-> +	if (phydev->mdio.addr == 0)
-> +		return -ENODEV;
-> +
->  	ret = phy_read_paged(phydev, 0xa43, RTL8211F_PHYCR1);
->  	if (ret < 0)
->  		return ret;
+To achieve that reuse global devlink parameter pf_msix_max and
+pf_msix_min. It fits how ice hardware counts MSI-X. In case of ice amount
+of MSI-X reported on PCI is a whole MSI-X for the card (with MSI-X for
+VFs also). Having pf_msix_max allow user to statically set how many
+MSI-X he wants on PF and how many should be reserved for VFs.
+
+pf_msix_min is used to set minimum number of MSI-X with which ice driver
+should probe correctly.
+
+Meaning of this field in case of dynamic vs static allocation:
+- on system with dynamic MSI-X allocation support
+ * alloc pf_msix_min as static, rest will be allocated dynamically
+- on system without dynamic MSI-X allocation support
+ * try alloc pf_msix_max as static, minimum acceptable result is
+ pf_msix_min
+
+As Jesse and Piotr suggested pf_msix_max and pf_msix_min can (an
+probably should) be stored in NVM. This patchset isn't implementing
+that.
+
+Dynamic (kernel or driver) way means that splitting MSI-X across the
+RDMA and eth in case there is a MSI-X shortage isn't correct. Can work
+when dynamic is only on driver site, but can't when dynamic is on kernel
+site.
+
+Let's remove this code and move to MSI-X allocation feature by feature.
+If there is no more MSI-X for a feature, a feature is working with less
+MSI-X or it is turned off.
+
+There is a regression here. With MSI-X splitting user can run RDMA and
+eth even on system with not enough MSI-X. Now only eth will work. RDMA
+can be turned on by changing number of PF queues (lowering) and reprobe
+RDMA driver.
+
+Example:
+72 CPU number, eth, RDMA and flow director (1 MSI-X), 1 MSI-X for OICR
+on PF, and 1 more for RDMA. Card is using 1 + 72 + 1 + 72 + 1 = 147.
+
+We set pf_msix_min = 2, pf_msix_max = 128
+
+OICR: 1
+eth: 72
+flow director: 1
+RDMA: 128 - 74 = 54
+
+We can change number of queues on pf to 36 and do devlink reinit
+
+OICR: 1
+eth: 36
+RDMA: 73
+flow director: 1
+
+We can also (implemented in "ice: enable_rdma devlink param") turned
+RDMA off.
+
+OICR: 1
+eth: 72
+RDMA: 0 (turned off)
+flow director: 1
+
+After this changes we have a static base vector for SRIOV (SIOV probably
+in the feature). Last patch from this series is simplifying managing VF
+MSI-X code based on static vector.
+
+Now changing queues using ethtool is also changing MSI-X. If there is
+enough MSI-X it is always one to one. When there is not enough there
+will be more queues than MSI-X. There is a lack of ability to set how
+many queues should be used per MSI-X. Maybe we should introduce another
+ethtool param for it? Sth like queues_per_vector?
+
+v8 --> v9: [8]
+ * add tested-by tags
+ * v8 was send incorrect, fix it here
+
+v7 --> v8: [7]
+ * fix unrolling in devlink parameters register function (patch 2)
+
+v6 --> v7: [6]
+ * use vu32 for devlink MSI-X parameters instead of u16 (patch 2)
+ * < instead of <= for MSI-X min parameter validation (patch 2)
+ * use u32 for MSI-X values (patch 2, 8)
+
+v5 --> v6: [5]
+ * set default MSI-X max value based on needs instead of const define
+   (patch 3)
+
+v4 --> v5: [4]
+ * count combined queues in ethtool for case the vectors aren't mapped
+   1:1 to queues (patch 1)
+ * change min_t to min where the casting isn't needed (and can hide
+   problems) (patch 4)
+ * load msix_max and msix_min value after devlink reload; it accidentally
+   wasn't added after removing loading in probe path to mitigate error
+   from devl_para_driverinit...() (patch 2)
+ * add documentation in develink/ice for new parameters (patch 2)
+
+v3 --> v4: [3]
+ * drop unnecessary text in devlink validation comments
+ * assume that devl_param_driverinit...() shouldn't return error in
+   normal execution path
+
+v2 --> v3: [2]
+ * move flow director init before RDMA init
+ * fix unrolling RDMA MSI-X allocation
+ * add comment in commit message about lowering control RDMA MSI-X
+   amount
+
+v1 --> v2: [1]
+ * change permanent MSI-X cmode parameters to driverinit
+ * remove locking during devlink parameter registration (it is now
+   locked for whole init/deinit part)
+
+[8] https://lore.kernel.org/netdev/20241114122009.97416-1-michal.swiatkowski@linux.intel.com/
+[7] https://lore.kernel.org/netdev/20241104121337.129287-1-michal.swiatkowski@linux.intel.com/
+[6] https://lore.kernel.org/netdev/20241028100341.16631-1-michal.swiatkowski@linux.intel.com/
+[5] https://lore.kernel.org/netdev/20241024121230.5861-1-michal.swiatkowski@linux.intel.com/T/#t
+[4] https://lore.kernel.org/netdev/20240930120402.3468-1-michal.swiatkowski@linux.intel.com/
+[3] https://lore.kernel.org/netdev/20240808072016.10321-1-michal.swiatkowski@linux.intel.com/
+[2] https://lore.kernel.org/netdev/20240801093115.8553-1-michal.swiatkowski@linux.intel.com/
+[1] https://lore.kernel.org/netdev/20240213073509.77622-1-michal.swiatkowski@linux.intel.com/
+
+Michal Swiatkowski (9):
+  ice: count combined queues using Rx/Tx count
+  ice: devlink PF MSI-X max and min parameter
+  ice: remove splitting MSI-X between features
+  ice: get rid of num_lan_msix field
+  ice, irdma: move interrupts code to irdma
+  ice: treat dyn_allowed only as suggestion
+  ice: enable_rdma devlink param
+  ice: simplify VF MSI-X managing
+  ice: init flow director before RDMA
+
+ Documentation/networking/devlink/ice.rst      |  11 +
+ drivers/infiniband/hw/irdma/main.h            |   3 +
+ drivers/net/ethernet/intel/ice/ice.h          |  21 +-
+ drivers/net/ethernet/intel/ice/ice_irq.h      |  13 +-
+ include/linux/net/intel/iidc.h                |   2 +
+ drivers/infiniband/hw/irdma/hw.c              |   2 -
+ drivers/infiniband/hw/irdma/main.c            |  46 ++-
+ .../net/ethernet/intel/ice/devlink/devlink.c  | 109 +++++++
+ drivers/net/ethernet/intel/ice/ice_base.c     |  10 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |   9 +-
+ drivers/net/ethernet/intel/ice/ice_idc.c      |  64 +---
+ drivers/net/ethernet/intel/ice/ice_irq.c      | 275 ++++++------------
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  35 ++-
+ drivers/net/ethernet/intel/ice/ice_main.c     |   6 +-
+ drivers/net/ethernet/intel/ice/ice_sriov.c    | 154 +---------
+ 15 files changed, 336 insertions(+), 424 deletions(-)
+
+-- 
+2.42.0
 
 
