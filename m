@@ -1,180 +1,148 @@
-Return-Path: <netdev+bounces-148544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B171D9E20CC
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:03:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93D629E2114
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 16:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7002F28676F
-	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:03:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A5572856AC
+	for <lists+netdev@lfdr.de>; Tue,  3 Dec 2024 15:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 204171E3DF9;
-	Tue,  3 Dec 2024 15:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4241F706B;
+	Tue,  3 Dec 2024 15:07:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="aLeULJb6"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Kgiv7uJQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7EB1F7065
-	for <netdev@vger.kernel.org>; Tue,  3 Dec 2024 15:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC59D1F7540;
+	Tue,  3 Dec 2024 15:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733238218; cv=none; b=gg990RoWxkY2AYak2pQktxGcNywJoDEY7S4rMibyr6b61geWbxdxeM8kE2U2ZFcdXT57I69SZNqwHEG0APmlKQiEqg01TTjiEC/yxdfEvoA17+Zwkrb2+RAIao3gNdSBI52kT54yec4TTcjQ15xq5H+5vrOglpOVJYjnREczVC8=
+	t=1733238446; cv=none; b=CWVtGCz876mwbkk0czyUwrpW4dCEbeL7YvNBlbB7pOQ0TcbHa1W4rgmji8nX+7K3z3A6ziv24f5VBbMjWptekC/sOA38NRbOq1c51r+6JhsZQtKXmZzU+fNaC7irZLF+aBeQ7rimhFn3U5r+TBkrQVdQbINeqVEeSoYeMTGsYuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733238218; c=relaxed/simple;
-	bh=Y+Nv76JuimdwOlgZdxhPKuAZhbr3eXr/RrZVVR1Jszc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dd8d1G68DXXzH0i7U/TQAN1vbHZy7JD3v1ppaFM9mP7xWTK3ohX8rCuccfLOH9imlcH8edeQyqKo0mdW0yCEUqIU1RiMoEP9zBNMkGlewSs8qvyaSbjhHlFYb51r5EFhRvCsU8DHHgy10CTTtIbxshHdd2E2Ht1lZQ0qIdl2A6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=aLeULJb6; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-385eaecc213so1540737f8f.1
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 07:03:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1733238214; x=1733843014; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=UUc2U6b8AsvwMKbUGdD9RXYUFtONNeSR6k1MPBCihcM=;
-        b=aLeULJb6Bgh7WyL+VeFoJp9l0qCJsv7OvahlhAXcQhy37SJoRHTblnXpqdcbTzvXbe
-         Zmae/ZNIenjrvbN1IjPrW6ifBMReqXde1eCzHfP8/ga8CDFU1Y148BTarBJjqs5ofCsK
-         2DhP4k8t1KV0qmgSlkzGOoXz1IYwxYo4mi4GAO+WU5Khzl4Tx4jb/onJkAgvOQH5sygU
-         aYdy6zjUxoGzSPuzBbH3QI6TgheVHBYM32yJbdvYSdQCb81ZcuUkKbi5p+3cd3XjfESQ
-         SlWHGBewuXdqrpRH8C9F5kl5/0UJ+3tXWQ/Ln7RgMHzco+xH+vo5HbmDRo98XufHC8N5
-         9mxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733238214; x=1733843014;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UUc2U6b8AsvwMKbUGdD9RXYUFtONNeSR6k1MPBCihcM=;
-        b=Cs9HzTKdi7dQcdgTXsYONjXCDXb8V/Exb39T7VfVQSvxPR5M4XO/69CQuuK6JVXPGw
-         sZgAB1FpAZA9y94KJdAhCni/ZWBhond2ssy6/F6A6R/8Bu9i4S1SQuXK4AUEQacjxk7j
-         0x4xZ58xCEbjPzdPHxKP5BC/GsYTwdgLbqitbG+4Y4Ox5ekq/m2jhg++x8uCqqocc0po
-         dqV230Ry1U/bL1EqI+pK4IL6F3ykTFuQE6O+PXtpYfm6KlQXV2s9/AxvgbkTanvo6J8K
-         UMqX18jd8qa3YjkQXYCNo4hzmGPJHglt+bEXS3/RAR0ZWygo3a5kxZjc9108UN1Ob/fI
-         DXrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXIVogIuZ1aMcu1c21freiKXTo04MmlCeKLh7NPFkCpWKK4s7LQL74hIYKjWwudXviiAAjlsdU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzm6ItFQqKTToa3D1LLJzqJ7q9nXbZMjq/4yoDrDd42Ka2j/emi
-	D/gZYhqs7PbOkSA05tn5/0I5CW4TgANtId+GhlSpp63PSz608QwgQ0MYrETu4xg=
-X-Gm-Gg: ASbGncu3xj74HtITx3+3+yNvYQpDYTCOuf1lJH/IsqhYL+59g/M75RyeMTZiOETrsKA
-	tQCgr5/iab7MyD0Tx7AE+ryqLyhVNPNIqMBdu+djEsQftibr/2u2o2cljQqVySLWTY+nXWRywvp
-	a9cfvzqnBC3rrvx6yQG3n3eCG6Xg6ahaQtroYyqm6MiGWoduBojCzD4xB1zaLaVCN/WnMULkSXK
-	3eMTvYybZaumt9sjGVtqDsccL6GgsUs6j5fasV/ZDqH5MEt+Up0oILlADZGyYlFfTPJmEEg8V32
-	2+jjuhdXhyux
-X-Google-Smtp-Source: AGHT+IGX4qlJajenQzrAt/pIuQUZzcr+mvo9oyzKhTai61NwFS1z9iEGZQMMyKzVXX2SQcLM+nGCGw==
-X-Received: by 2002:a5d:5c05:0:b0:385:d7f9:f15f with SMTP id ffacd0b85a97d-385d7f9f229mr18702317f8f.19.1733238213983;
-        Tue, 03 Dec 2024 07:03:33 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:138c:c1e3:75bf:72b5? ([2001:67c:2fbc:1:138c:c1e3:75bf:72b5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434aa76b52bsm224254745e9.18.2024.12.03.07.03.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2024 07:03:33 -0800 (PST)
-Message-ID: <943b6994-f87b-4e8b-a5ff-3f6680070cc4@openvpn.net>
-Date: Tue, 3 Dec 2024 16:04:12 +0100
+	s=arc-20240116; t=1733238446; c=relaxed/simple;
+	bh=xXBcRnIrgD8fUS7wJkQhYHbIlIYiSrOXiVG5OTk4puw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dpcdIVIpTIBg/VWitNjyACzo4cwfYu0WoiuhvRfRyU066A+a/IHYLv5qZadboYzJSPJP642ej8klDiymAtKStROAketf+H1vskTlGvomUdA9sEzEoPEFP1cEJkznx+61mOztWpxUAexdbF4RvgriWKYrDouz5WgbrGdb7JDzpgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Kgiv7uJQ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B3CqjqX006057;
+	Tue, 3 Dec 2024 15:07:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=EBeg1vG5lRLRHAXtCgvc7vaKkuAzgvRHDGs4CzG1w
+	IQ=; b=Kgiv7uJQUAYKj3wSbowUMbFpmN1o67PQNcjGZfLEerNl7VttPiarqBFJh
+	5berVvKUG8Is0aBPKtzwbDhoGGTGJZEzpLGluGuJzaxvkNJmR5YH5g8zLS4nm3ND
+	+bzMfJQ4jz0dv3EYtlDJDE8F7kRtM24H9i+nWOdSwYQJQubFuu9gUjH3sXG868Km
+	FwCpPmcnLr3TuVktToo4FBXVmHXlKw9OhI81/jw0QB/IQ+DioW/cTig+N+s+ZP9Z
+	Iz2j6Wkvw0xQsIayRzYN6XCkRjh2vMOeY4KKYd1PFv7RkacP+A4jqwRUoUByqZKP
+	R5yH8I1jyqNnTS6CmnpLGT6P7xYXg==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 437te9377n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 03 Dec 2024 15:07:13 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B3CuJbx017943;
+	Tue, 3 Dec 2024 15:07:12 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 438d1s9dy9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 03 Dec 2024 15:07:12 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B3F7Bpr30999152
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 3 Dec 2024 15:07:11 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C4BA65805D;
+	Tue,  3 Dec 2024 15:07:11 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7FB1858055;
+	Tue,  3 Dec 2024 15:07:11 +0000 (GMT)
+Received: from WIN-DU0DFC9G5VV.austin.ibm.com (unknown [9.41.105.143])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  3 Dec 2024 15:07:11 +0000 (GMT)
+From: Konstantin Shkolnyy <kshk@linux.ibm.com>
+To: sgarzare@redhat.com
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com,
+        pabeni@redhat.com, AVKrasnov@sberdevices.ru, mst@redhat.com,
+        Konstantin Shkolnyy <kshk@linux.ibm.com>
+Subject: [PATCH net v8 0/3] vsock/test: fix wrong setsockopt() parameters
+Date: Tue,  3 Dec 2024 09:06:53 -0600
+Message-Id: <20241203150656.287028-1-kshk@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 09/22] ovpn: implement packet processing
-To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com,
- Andrew Lunn <andrew@lunn.ch>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241202-b4-ovpn-v12-0-239ff733bf97@openvpn.net>
- <20241202-b4-ovpn-v12-9-239ff733bf97@openvpn.net>
- <d3d942c0-ceed-484f-8f2a-28abbdd132aa@redhat.com>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <d3d942c0-ceed-484f-8f2a-28abbdd132aa@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: YwUmdkGzaDqznwyC0CZJ4YEwt5aVopW4
+X-Proofpoint-ORIG-GUID: YwUmdkGzaDqznwyC0CZJ4YEwt5aVopW4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 mlxlogscore=999 impostorscore=0 lowpriorityscore=0
+ mlxscore=0 phishscore=0 adultscore=0 clxscore=1011 spamscore=0
+ malwarescore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412030127
 
-On 03/12/2024 15:58, Paolo Abeni wrote:
-> On 12/2/24 16:07, Antonio Quartulli wrote:
->> @@ -286,6 +292,31 @@ struct ovpn_peer *ovpn_peer_get_by_dst(struct ovpn_priv *ovpn,
->>   	return peer;
->>   }
->>   
->> +/**
->> + * ovpn_peer_check_by_src - check that skb source is routed via peer
->> + * @ovpn: the openvpn instance to search
->> + * @skb: the packet to extract source address from
->> + * @peer: the peer to check against the source address
->> + *
->> + * Return: true if the peer is matching or false otherwise
->> + */
->> +bool ovpn_peer_check_by_src(struct ovpn_priv *ovpn, struct sk_buff *skb,
->> +			    struct ovpn_peer *peer)
->> +{
->> +	bool match = false;
->> +
->> +	if (ovpn->mode == OVPN_MODE_P2P) {
->> +		/* in P2P mode, no matter the destination, packets are always
->> +		 * sent to the single peer listening on the other side
->> +		 */
->> +		rcu_read_lock();
->> +		match = (peer == rcu_dereference(ovpn->peer));
->> +		rcu_read_unlock();
-> 
-> Here you are not dereferencing ovpn->peer, so you can use
-> rcu_access_pointer() instead and avoid the rcu_read_lock/unlock() pair.
+Parameters were created using wrong C types, which caused them to be of
+wrong size on some architectures, causing problems.
 
-I see - thanks for pointing this out!
-Will switch to rcu_access_pointer().
+The problem with SO_RCVLOWAT was found on s390 (big endian), while x86-64
+didn't show it. After the fix, all tests pass on s390.
+Then Stefano Garzarella pointed out that SO_VM_SOCKETS_* calls might have
+a similar problem, which turned out to be true, hence, the second patch.
 
-Regards,
+Changes for v8:
+- Fix whitespace warnings from "checkpatch.pl --strict"
+- Add maintainers to Cc:
+Changes for v7:
+- Rebase on top of https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git
+- Add the "net" tags to the subjects
+Changes for v6:
+- rework the patch #3 to avoid creating a new file for new functions,
+and exclude vsock_perf from calling the new functions.
+- add "Reviewed-by:" to the patch #2.
+Changes for v5:
+- in the patch #2 replace the introduced uint64_t with unsigned long long
+to match documentation
+- add a patch #3 that verifies every setsockopt() call.
+Changes for v4:
+- add "Reviewed-by:" to the first patch, and add a second patch fixing
+SO_VM_SOCKETS_* calls, which depends on the first one (hence, it's now
+a patch series.)
+Changes for v3:
+- fix the same problem in vsock_perf and update commit message
+Changes for v2:
+- add "Fixes:" lines to the commit message
+
+Konstantin Shkolnyy (3):
+  vsock/test: fix failures due to wrong SO_RCVLOWAT parameter
+  vsock/test: fix parameter types in SO_VM_SOCKETS_* calls
+  vsock/test: verify socket options after setting them
+
+ tools/testing/vsock/control.c             |   9 +-
+ tools/testing/vsock/msg_zerocopy_common.c |  10 --
+ tools/testing/vsock/msg_zerocopy_common.h |   1 -
+ tools/testing/vsock/util.c                | 142 ++++++++++++++++++++++
+ tools/testing/vsock/util.h                |   7 ++
+ tools/testing/vsock/vsock_perf.c          |  20 ++-
+ tools/testing/vsock/vsock_test.c          |  75 ++++++------
+ tools/testing/vsock/vsock_test_zerocopy.c |   2 +-
+ tools/testing/vsock/vsock_uring_test.c    |   2 +-
+ 9 files changed, 204 insertions(+), 64 deletions(-)
 
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+2.34.1
 
 
