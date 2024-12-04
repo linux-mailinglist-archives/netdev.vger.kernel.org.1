@@ -1,74 +1,71 @@
-Return-Path: <netdev+bounces-149019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E40669E3CD8
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:33:23 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 926CE9E3CDA
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:33:31 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F164F1640F1
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:33:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52939283D85
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69BA720A5E5;
-	Wed,  4 Dec 2024 14:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5472120ADD2;
+	Wed,  4 Dec 2024 14:33:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XMoikW7P"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AwJ9YFAv"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810AE209671
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB15C20A5C3
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:33:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733322789; cv=none; b=qjwMw6Sfz01o57c8EgKo2eEwp/muyc3kgRXLqh+XBRMewlY5zVaSFj7wmUfB37QyI25u7akUkrDsu4h2sz37+QEhZ0VEnZ52ZRScA+tJxnFvYwL23bSY4OFpcbpwbm13TNQ0ioZSlAfLZih3g2xPLO8JqHLQWIPg/fpTfoDqJbs=
+	t=1733322793; cv=none; b=V3dej7zDWuYat+QsLiOazhtJlhMpwzL8R8uEW9eR0grh/jpQUkGFz1NFsMJgU6oYk4ja04c/fAAfYAwwP+EIAvh8FLSoKMs34gCHC2hkQQvm9CQCtPu1U0xP7ufqOvtl5NVkxAYhPUjzozsVACvfmHD95MOQ+2duVPhw3siB2aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733322789; c=relaxed/simple;
-	bh=sQ6Z2k8ZTh3SXcZYXjTntib3M5oZgJmZSCzafWYkf2k=;
+	s=arc-20240116; t=1733322793; c=relaxed/simple;
+	bh=3bDeFwvAxQpwhTqS+naTgeHPWQZXlwaQCZQSnPeKaw4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bKXb/UYvKIK6yyS4kSomJkPAJuuNUa7mhL8Pa6/rRWN9m3FAfBz95fv32UwTuahh9VnEZLcJs/aAfm7TRGca5tbC+bxxrRcpn9CCW/9WUglVdWxLRO1f5TWJ4COvUEEkoUdEIzdTIZL+MhdTrtDKhJS+pqevAgdOW2x54a1qbOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XMoikW7P; arc=none smtp.client-ip=198.175.65.13
+	 MIME-Version; b=Ymneu60z6V+HND9LYbfgX7XpQ59pD4Fuy14k4AOFFTj2xY+ICSgomT3TDTduuasPT7KJnSQSLTKcZlA3qC6y1q5vCR7QcjgjuhIE5b1uCPgP5c9TCkvEswsqpJh0yil8Wod13x+1pGP8jUbuH859pJU1LhC7mGkq4tED/GexHJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AwJ9YFAv; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733322788; x=1764858788;
+  t=1733322792; x=1764858792;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=sQ6Z2k8ZTh3SXcZYXjTntib3M5oZgJmZSCzafWYkf2k=;
-  b=XMoikW7P7ITRsJI+49dTblmAumay1gFTDmwR3BYffsUj7iQ+HEffpNvu
-   sxFtmExIXSbxFmDGcmc7IDhZFywYH9JuHlXS0bRMGv4LluIJDkUXu0DPV
-   MQbe/AD6z0WtWzsv6fddyLvpwAs0VsmO+t+56rWWMh3zCUxmfshtnsmUy
-   E4ra6xhCBCQhRNRr/TR2MN7/PqZOx21JU83pHnJorLd11QWIfRtVo4xOR
-   XC1Go9sxdpuNJUKyvaMVi5XhSPe3BqenTIngPiHW0FRRtpY2xw4LBUJJf
-   U8du3DApjDJJDd1X9S7+wViU4E/RdJ5D+G/YbNlFH9Synn3M9dgo5ikNE
+  bh=3bDeFwvAxQpwhTqS+naTgeHPWQZXlwaQCZQSnPeKaw4=;
+  b=AwJ9YFAv/BdaEOvGqFgaYdNlaG9FsAJyI3WcmJ6pvMosYMIDK5tJWdfi
+   95GptLZaL5iAo2JgJDNbDmtQ24SoKno9z6vu1zfrKf978kp1hLWZccP1k
+   8eLefyAFw3p7YM+jxNKAk5NPSOYpbek6C0Vxzu1/0sUjPevdRGdE/7/nj
+   AN7eEdeBQIVDmXE+xpL9nvmv05buC3G2AT5jgks/kWGUq5tRkcpyxsanE
+   RAthqO4l0WmiRl4tWSvhrMktySgmMv/ZsS2vdGIk7SiIQi5sSabNYdACg
+   5Q5YabMDJf3T/hALq/cuGlvoxHyOI5V6MEFJTtWN5q7dLQyVa7GFcNE1W
    w==;
-X-CSE-ConnectionGUID: xTQfE8WkSDGZJ6ZQCIVhsw==
-X-CSE-MsgGUID: S9jVv+xIScCHboJK5TM9+w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="44621839"
+X-CSE-ConnectionGUID: XRZGzmXHSw+LEu/UC1FbWw==
+X-CSE-MsgGUID: x1YWerJkSX6M/cvZd7YjMg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="44621849"
 X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="44621839"
+   d="scan'208";a="44621849"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 06:33:07 -0800
-X-CSE-ConnectionGUID: lDNVg/s6S+mkiJtZpGb9qQ==
-X-CSE-MsgGUID: uQdjzAqORIqR6v8Ct15iZA==
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 06:33:12 -0800
+X-CSE-ConnectionGUID: HMMfnvVOTXOJ3Jbf/waJfg==
+X-CSE-MsgGUID: 8zQA6SZwSfy//v6f9YmT3g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="93456565"
+   d="scan'208";a="93456620"
 Received: from pkwapuli-mobl1.ger.corp.intel.com (HELO vbox-pkwap.ger.corp.intel.com) ([10.245.87.141])
-  by fmviesa006.fm.intel.com with ESMTP; 04 Dec 2024 06:33:05 -0800
+  by fmviesa006.fm.intel.com with ESMTP; 04 Dec 2024 06:33:10 -0800
 From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	Stefan Wegrzyn <stefan.wegrzyn@intel.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH iwl-next v11 4/8] ixgbe: Add support for NVM handling in E610 device
-Date: Wed,  4 Dec 2024 15:31:08 +0100
-Message-ID: <20241204143112.29411-5-piotr.kwapulinski@intel.com>
+Subject: [PATCH iwl-next v11 6/8] ixgbe: Add ixgbe_x540 multiple header inclusion protection
+Date: Wed,  4 Dec 2024 15:31:10 +0100
+Message-ID: <20241204143112.29411-7-piotr.kwapulinski@intel.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20241204143112.29411-1-piotr.kwapulinski@intel.com>
 References: <20241204143112.29411-1-piotr.kwapulinski@intel.com>
@@ -80,346 +77,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add low level support for accessing NVM in E610 device. NVM operations are
-handled via the Admin Command Interface. Add the following NVM specific
-operations:
-- acquire, release, read
-- validate checksum
-- read shadow ram
+Required to adopt x540 specific functions by E610 device.
 
-Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 291 ++++++++++++++++++
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |  12 +
- 2 files changed, 303 insertions(+)
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.h | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index 1c50005..0542b4b 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -2102,3 +2102,294 @@ int ixgbe_aci_get_netlist_node(struct ixgbe_hw *hw,
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.h
+index b69a680..6ed360c 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.h
+@@ -1,5 +1,8 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+-/* Copyright(c) 1999 - 2018 Intel Corporation. */
++/* Copyright(c) 1999 - 2024 Intel Corporation. */
++
++#ifndef _IXGBE_X540_H_
++#define _IXGBE_X540_H_
  
- 	return 0;
- }
-+
-+/**
-+ * ixgbe_acquire_nvm - Generic request for acquiring the NVM ownership
-+ * @hw: pointer to the HW structure
-+ * @access: NVM access type (read or write)
-+ *
-+ * Request NVM ownership.
-+ *
-+ * Return: the exit code of the operation.
-+ */
-+int ixgbe_acquire_nvm(struct ixgbe_hw *hw,
-+		      enum ixgbe_aci_res_access_type access)
-+{
-+	u32 fla;
-+
-+	/* Skip if we are in blank NVM programming mode */
-+	fla = IXGBE_READ_REG(hw, IXGBE_GLNVM_FLA);
-+	if ((fla & IXGBE_GLNVM_FLA_LOCKED_M) == 0)
-+		return 0;
-+
-+	return ixgbe_acquire_res(hw, IXGBE_NVM_RES_ID, access,
-+				 IXGBE_NVM_TIMEOUT);
-+}
-+
-+/**
-+ * ixgbe_release_nvm - Generic request for releasing the NVM ownership
-+ * @hw: pointer to the HW structure
-+ *
-+ * Release NVM ownership.
-+ */
-+void ixgbe_release_nvm(struct ixgbe_hw *hw)
-+{
-+	u32 fla;
-+
-+	/* Skip if we are in blank NVM programming mode */
-+	fla = IXGBE_READ_REG(hw, IXGBE_GLNVM_FLA);
-+	if ((fla & IXGBE_GLNVM_FLA_LOCKED_M) == 0)
-+		return;
-+
-+	ixgbe_release_res(hw, IXGBE_NVM_RES_ID);
-+}
-+
-+/**
-+ * ixgbe_aci_read_nvm - read NVM
-+ * @hw: pointer to the HW struct
-+ * @module_typeid: module pointer location in words from the NVM beginning
-+ * @offset: byte offset from the module beginning
-+ * @length: length of the section to be read (in bytes from the offset)
-+ * @data: command buffer (size [bytes] = length)
-+ * @last_command: tells if this is the last command in a series
-+ * @read_shadow_ram: tell if this is a shadow RAM read
-+ *
-+ * Read the NVM using ACI command (0x0701).
-+ *
-+ * Return: the exit code of the operation.
-+ */
-+int ixgbe_aci_read_nvm(struct ixgbe_hw *hw, u16 module_typeid, u32 offset,
-+		       u16 length, void *data, bool last_command,
-+		       bool read_shadow_ram)
-+{
-+	struct ixgbe_aci_cmd_nvm *cmd;
-+	struct ixgbe_aci_desc desc;
-+
-+	if (offset > IXGBE_ACI_NVM_MAX_OFFSET)
-+		return -EINVAL;
-+
-+	cmd = &desc.params.nvm;
-+
-+	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_nvm_read);
-+
-+	if (!read_shadow_ram && module_typeid == IXGBE_ACI_NVM_START_POINT)
-+		cmd->cmd_flags |= IXGBE_ACI_NVM_FLASH_ONLY;
-+
-+	/* If this is the last command in a series, set the proper flag. */
-+	if (last_command)
-+		cmd->cmd_flags |= IXGBE_ACI_NVM_LAST_CMD;
-+	cmd->module_typeid = cpu_to_le16(module_typeid);
-+	cmd->offset_low = cpu_to_le16(offset & 0xFFFF);
-+	cmd->offset_high = (offset >> 16) & 0xFF;
-+	cmd->length = cpu_to_le16(length);
-+
-+	return ixgbe_aci_send_cmd(hw, &desc, data, length);
-+}
-+
-+/**
-+ * ixgbe_nvm_validate_checksum - validate checksum
-+ * @hw: pointer to the HW struct
-+ *
-+ * Verify NVM PFA checksum validity using ACI command (0x0706).
-+ * If the checksum verification failed, IXGBE_ERR_NVM_CHECKSUM is returned.
-+ * The function acquires and then releases the NVM ownership.
-+ *
-+ * Return: the exit code of the operation.
-+ */
-+int ixgbe_nvm_validate_checksum(struct ixgbe_hw *hw)
-+{
-+	struct ixgbe_aci_cmd_nvm_checksum *cmd;
-+	struct ixgbe_aci_desc desc;
-+	int err;
-+
-+	err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
-+	if (err)
-+		return err;
-+
-+	cmd = &desc.params.nvm_checksum;
-+
-+	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_nvm_checksum);
-+	cmd->flags = IXGBE_ACI_NVM_CHECKSUM_VERIFY;
-+
-+	err = ixgbe_aci_send_cmd(hw, &desc, NULL, 0);
-+
-+	ixgbe_release_nvm(hw);
-+
-+	if (!err && cmd->checksum !=
-+		cpu_to_le16(IXGBE_ACI_NVM_CHECKSUM_CORRECT)) {
-+		struct ixgbe_adapter *adapter = container_of(hw, struct ixgbe_adapter,
-+							     hw);
-+
-+		err = -EIO;
-+		netdev_err(adapter->netdev, "Invalid Shadow Ram checksum");
-+	}
-+
-+	return err;
-+}
-+
-+/**
-+ * ixgbe_read_sr_word_aci - Reads Shadow RAM via ACI
-+ * @hw: pointer to the HW structure
-+ * @offset: offset of the Shadow RAM word to read (0x000000 - 0x001FFF)
-+ * @data: word read from the Shadow RAM
-+ *
-+ * Reads one 16 bit word from the Shadow RAM using ixgbe_read_flat_nvm.
-+ *
-+ * Return: the exit code of the operation.
-+ */
-+int ixgbe_read_sr_word_aci(struct ixgbe_hw  *hw, u16 offset, u16 *data)
-+{
-+	u32 bytes = sizeof(u16);
-+	u16 data_local;
-+	int err;
-+
-+	err = ixgbe_read_flat_nvm(hw, offset * sizeof(u16), &bytes,
-+				  (u8 *)&data_local, true);
-+	if (err)
-+		return err;
-+
-+	*data = data_local;
-+	return 0;
-+}
-+
-+/**
-+ * ixgbe_read_flat_nvm - Read portion of NVM by flat offset
-+ * @hw: pointer to the HW struct
-+ * @offset: offset from beginning of NVM
-+ * @length: (in) number of bytes to read; (out) number of bytes actually read
-+ * @data: buffer to return data in (sized to fit the specified length)
-+ * @read_shadow_ram: if true, read from shadow RAM instead of NVM
-+ *
-+ * Reads a portion of the NVM, as a flat memory space. This function correctly
-+ * breaks read requests across Shadow RAM sectors, prevents Shadow RAM size
-+ * from being exceeded in case of Shadow RAM read requests and ensures that no
-+ * single read request exceeds the maximum 4KB read for a single admin command.
-+ *
-+ * Returns an error code on failure. Note that the data pointer may be
-+ * partially updated if some reads succeed before a failure.
-+ *
-+ * Return: the exit code of the operation.
-+ */
-+int ixgbe_read_flat_nvm(struct ixgbe_hw  *hw, u32 offset, u32 *length,
-+			u8 *data, bool read_shadow_ram)
-+{
-+	u32 inlen = *length;
-+	u32 bytes_read = 0;
-+	bool last_cmd;
-+	int err;
-+
-+	/* Verify the length of the read if this is for the Shadow RAM */
-+	if (read_shadow_ram && ((offset + inlen) >
-+				(hw->eeprom.word_size * 2u)))
-+		return -EINVAL;
-+
-+	do {
-+		u32 read_size, sector_offset;
-+
-+		/* ixgbe_aci_read_nvm cannot read more than 4KB at a time.
-+		 * Additionally, a read from the Shadow RAM may not cross over
-+		 * a sector boundary. Conveniently, the sector size is also 4KB.
-+		 */
-+		sector_offset = offset % IXGBE_ACI_MAX_BUFFER_SIZE;
-+		read_size = min_t(u32,
-+				  IXGBE_ACI_MAX_BUFFER_SIZE - sector_offset,
-+				  inlen - bytes_read);
-+
-+		last_cmd = !(bytes_read + read_size < inlen);
-+
-+		/* ixgbe_aci_read_nvm takes the length as a u16. Our read_size
-+		 * is calculated using a u32, but the IXGBE_ACI_MAX_BUFFER_SIZE
-+		 * maximum size guarantees that it will fit within the 2 bytes.
-+		 */
-+		err = ixgbe_aci_read_nvm(hw, IXGBE_ACI_NVM_START_POINT,
-+					 offset, (u16)read_size,
-+					 data + bytes_read, last_cmd,
-+					 read_shadow_ram);
-+		if (err)
-+			break;
-+
-+		bytes_read += read_size;
-+		offset += read_size;
-+	} while (!last_cmd);
-+
-+	*length = bytes_read;
-+	return err;
-+}
-+
-+/**
-+ * ixgbe_read_ee_aci_e610 - Read EEPROM word using the admin command.
-+ * @hw: pointer to hardware structure
-+ * @offset: offset of  word in the EEPROM to read
-+ * @data: word read from the EEPROM
-+ *
-+ * Reads a 16 bit word from the EEPROM using the ACI.
-+ * If the EEPROM params are not initialized, the function
-+ * initialize them before proceeding with reading.
-+ * The function acquires and then releases the NVM ownership.
-+ *
-+ * Return: the exit code of the operation.
-+ */
-+int ixgbe_read_ee_aci_e610(struct ixgbe_hw *hw, u16 offset, u16 *data)
-+{
-+	int err;
-+
-+	if (hw->eeprom.type == ixgbe_eeprom_uninitialized) {
-+		err = hw->eeprom.ops.init_params(hw);
-+		if (err)
-+			return err;
-+	}
-+
-+	err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
-+	if (err)
-+		return err;
-+
-+	err = ixgbe_read_sr_word_aci(hw, offset, data);
-+	ixgbe_release_nvm(hw);
-+
-+	return err;
-+}
-+
-+/**
-+ * ixgbe_validate_eeprom_checksum_e610 - Validate EEPROM checksum
-+ * @hw: pointer to hardware structure
-+ * @checksum_val: calculated checksum
-+ *
-+ * Performs checksum calculation and validates the EEPROM checksum. If the
-+ * caller does not need checksum_val, the value can be NULL.
-+ * If the EEPROM params are not initialized, the function
-+ * initialize them before proceeding.
-+ * The function acquires and then releases the NVM ownership.
-+ *
-+ * Return: the exit code of the operation.
-+ */
-+int ixgbe_validate_eeprom_checksum_e610(struct ixgbe_hw *hw, u16 *checksum_val)
-+{
-+	int err;
-+
-+	if (hw->eeprom.type == ixgbe_eeprom_uninitialized) {
-+		err = hw->eeprom.ops.init_params(hw);
-+		if (err)
-+			return err;
-+	}
-+
-+	err = ixgbe_nvm_validate_checksum(hw);
-+	if (err)
-+		return err;
-+
-+	if (checksum_val) {
-+		u16 tmp_checksum;
-+
-+		err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
-+		if (err)
-+			return err;
-+
-+		err = ixgbe_read_sr_word_aci(hw, E610_SR_SW_CHECKSUM_WORD,
-+					     &tmp_checksum);
-+		ixgbe_release_nvm(hw);
-+
-+		if (!err)
-+			*checksum_val = tmp_checksum;
-+	}
-+
-+	return err;
-+}
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
-index 4a4f969..412ddd1 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
-@@ -59,5 +59,17 @@ int ixgbe_enter_lplu_e610(struct ixgbe_hw *hw);
- int ixgbe_aci_get_netlist_node(struct ixgbe_hw *hw,
- 			       struct ixgbe_aci_cmd_get_link_topo *cmd,
- 			       u8 *node_part_number, u16 *node_handle);
-+int ixgbe_acquire_nvm(struct ixgbe_hw *hw,
-+		      enum ixgbe_aci_res_access_type access);
-+void ixgbe_release_nvm(struct ixgbe_hw *hw);
-+int ixgbe_aci_read_nvm(struct ixgbe_hw *hw, u16 module_typeid, u32 offset,
-+		       u16 length, void *data, bool last_command,
-+		       bool read_shadow_ram);
-+int ixgbe_nvm_validate_checksum(struct ixgbe_hw *hw);
-+int ixgbe_read_sr_word_aci(struct ixgbe_hw  *hw, u16 offset, u16 *data);
-+int ixgbe_read_flat_nvm(struct ixgbe_hw  *hw, u32 offset, u32 *length,
-+			u8 *data, bool read_shadow_ram);
-+int ixgbe_read_ee_aci_e610(struct ixgbe_hw *hw, u16 offset, u16 *data);
-+int ixgbe_validate_eeprom_checksum_e610(struct ixgbe_hw *hw, u16 *checksum_val);
+ #include "ixgbe_type.h"
  
- #endif /* _IXGBE_E610_H_ */
+@@ -17,3 +20,5 @@ int ixgbe_acquire_swfw_sync_X540(struct ixgbe_hw *hw, u32 mask);
+ void ixgbe_release_swfw_sync_X540(struct ixgbe_hw *hw, u32 mask);
+ void ixgbe_init_swfw_sync_X540(struct ixgbe_hw *hw);
+ int ixgbe_init_eeprom_params_X540(struct ixgbe_hw *hw);
++
++#endif /* _IXGBE_X540_H_ */
 -- 
 2.43.0
 
