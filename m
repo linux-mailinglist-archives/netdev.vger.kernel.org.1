@@ -1,71 +1,85 @@
-Return-Path: <netdev+bounces-148759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F09A69E3121
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 03:08:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86C8B9E3138
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 03:13:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CC01B28056
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 02:08:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F177AB2438F
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 02:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5661A22094;
-	Wed,  4 Dec 2024 02:08:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1E12746C;
+	Wed,  4 Dec 2024 02:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kLMU9adE"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pS0cvsX1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DAE41A296;
-	Wed,  4 Dec 2024 02:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843D533997;
+	Wed,  4 Dec 2024 02:12:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733278089; cv=none; b=AfmcgUdHkCO12KE/CPWkrOT8WidBaJ09+Jg1B9Ey4e2nQjVNZnL688RmKFdy3JX317lt++kJgsDYuq94lQVaprg4axmrIW9aBaD8Wli1UumP20nHzjaCGB3FrQWuYNPhref3l9180InkjPRyDfLhY21aQ3nvlLOBgj6OW+mmPwc=
+	t=1733278374; cv=none; b=YPVpnYH/yAWaCPyiQOBg4Pe43kXzOx2eOGi6zzBWiDRsvxpgE3vAy9eaUz8Se0UI7/AAjPNiObptZAq2HNcIBFgXuPK5u/ivp+wwa/YwVSLcrhzp5hpyseCfzbCWFF8tP89w5EZIDk+7neM0xZLdSzCv869Q7svXdIsDnSLhHQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733278089; c=relaxed/simple;
-	bh=hd1/msMOulHJcaxIISi6QmyLYUJzfSJUMaX3HYjuCPs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NzAcrQrjt85MHQzIU8ddhz0HAyb4CK7+4pgGDyX4SFm+ODbNyxkf+vG3X7DwTPwHV79X8akn6l+DnZB4wjJXeYIe9OUImweBIUR7bRLK0JbEE2IPOWLF3S5kwaWSnJnefEaIkjdzAIwEtCCvuLjL0a2+aQNHOGe0duNBxqcfzB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kLMU9adE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 598EBC4CEDC;
-	Wed,  4 Dec 2024 02:08:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733278086;
-	bh=hd1/msMOulHJcaxIISi6QmyLYUJzfSJUMaX3HYjuCPs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kLMU9adE3hS5kUhr/aesVrPjRFqCvuj/7PJJwDJTmfvTc62qHfnfJCetjs7HA1Vum
-	 PoIcy3UZSaOQL/BV0x+kAEk6L51oZGvrUx+gqssXmKD81duPJzpJgMQkOANo9BMkUZ
-	 Fz08H1ODR481V18uzFNz/UUwt7Kb80IRPp3mLZUpHWWA6VrRRWioFxG5LqTTTJokgF
-	 ukZ0wtr6JIOHKJsGVKCS14FbkFtV09daeJIr6264GTKOifkL8yDEGgPZWZtdC4GnNr
-	 d37P9JTcXrLNvn5Hk9hxUI6a/AX/ZW264lipEo+C6AG8k24k4XQCoHZiPessd7eURb
-	 ytEIqzhxz5jQQ==
-Date: Tue, 3 Dec 2024 18:08:05 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Johannes Berg <johannes@sipsolutions.net>,
- linux-wireless@vger.kernel.org, donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 6/7] netlink: specs: add s8, s16 to
- genetlink schemas
-Message-ID: <20241203180805.5bff1afe@kernel.org>
-In-Reply-To: <20241203130655.45293-7-donald.hunter@gmail.com>
-References: <20241203130655.45293-1-donald.hunter@gmail.com>
-	<20241203130655.45293-7-donald.hunter@gmail.com>
+	s=arc-20240116; t=1733278374; c=relaxed/simple;
+	bh=nzMIw0KbP3XVmkyQRBJ2Xc5seay5ZA4k2nCkj/vMQCI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WdcILbY6dIJFHKdDLLUGgYwzbxC2w5d5ESz0yM+9dtTVz7UEdrIxpLLHj2YzmueOBJvtJjcLgNV+jYQSVu4T0OKlzVo6F2WlSBbDyAXzgQm+xAAuhe6NNeVZjijrKlkRKxbLUzftbg8kS+Lta3J/4z8pqnFie2DK3Nyf1pSj9HI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pS0cvsX1; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=pHK0bIhHd1w9mxfIUlOYvQ9+doQOP9AE+twlL5gInvk=; b=pS0cvsX1lotpceJXuCs/uT77rj
+	C5Rtl+fE/THt9xXx4N2ok37im8zDIahySax/ZhF3ciuyDoup07npK5JqnQ8AIieZT90BJGu48VEF6
+	77ZH177IIsQgvCUsfXd0MHbqcu8n22L387wA2JYYLGFfq3Y+elglJtEI8V3i9reh74Xw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tIesf-00F9fr-KT; Wed, 04 Dec 2024 03:12:45 +0100
+Date: Wed, 4 Dec 2024 03:12:45 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Simon Horman <horms@kernel.org>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
+	linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH net-next v3 08/10] net: freescale: ucc_geth: Move the
+ serdes configuration around
+Message-ID: <38636fbf-f047-4764-bb04-104ecac2481b@lunn.ch>
+References: <20241203124323.155866-1-maxime.chevallier@bootlin.com>
+ <20241203124323.155866-9-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241203124323.155866-9-maxime.chevallier@bootlin.com>
 
-On Tue,  3 Dec 2024 13:06:54 +0000 Donald Hunter wrote:
-> Add s8 and s16 types to the genetlink schemas to align scalar types
-> across all schemas.
+On Tue, Dec 03, 2024 at 01:43:19PM +0100, Maxime Chevallier wrote:
+> The uec_configure_serdes() function deals with serialized linkmodes
+> settings. It's used during the link bringup sequence. It is planned to
+> be used during the phylink conversion for mac configuration, but it
+> needs to me moved around in the process. To make the phylink port
+> clearer, this commit moves the function without any feature change.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
