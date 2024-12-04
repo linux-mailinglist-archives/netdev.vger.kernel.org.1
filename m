@@ -1,220 +1,144 @@
-Return-Path: <netdev+bounces-148994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDFAE9E3C06
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:03:43 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C5AE16A404
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:03:09 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2021E570E;
-	Wed,  4 Dec 2024 14:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dVie2Qfk"
-X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA72C9E3C04
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:03:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF07C1CEADF;
-	Wed,  4 Dec 2024 14:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90DFE281E54
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:03:38 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE1A1FA252;
+	Wed,  4 Dec 2024 14:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Er7TdoqP"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9B61F943D;
+	Wed,  4 Dec 2024 14:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733320980; cv=none; b=u8sG5ChJ34ztIX0lCI1dbDZjr+ZpnirSm15nwiCw7R1a2Jyqiu6K6LbP8z2xOeTl2rDoXjFme7wdaQcyi7XxuYwa1sHFT7SztdgnuzdlIeArIU9Apkg7G5SSdU0C2q99fcIH8Wx5xxrIQDC5OHRHrYvZGXD5bl8+DUdiAYdF2XI=
+	t=1733320993; cv=none; b=M7dwLceiCVcQ2gM6l2u5d95Lor+2X749+EePnVEG5KUytkbQMl6YMfuDcp7/YjX/htADf8cNDjrmWt/1WEZzuBP5anDCTkQOAWWMB7VJ8cgUwOBhBRTFsewVuCZxEW0CK6tJdloWD16z7ogimqzi4an8gzTAXdPssFozjVTD7MM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733320980; c=relaxed/simple;
-	bh=y0oAHHEAf/jLUw+oPniy2chA+dzwlDRLzGB7DxkGF4c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WShepuYQw7tWdVYX/LlfAVksFNVxLiOqfXx2qQY+lydX6737nQkgpcsNDeFII23WD1ku1HLctQBzEVgezt1PgiiacoW8qWOtY3OvVf+S2R5sgJ9WB5xzz4XMjAeu8jxqptKow/vB8blSJ6Hm8GobLG7vFVvPTYcjJTbj1if4UZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dVie2Qfk; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B480N9t005582;
-	Wed, 4 Dec 2024 14:02:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=kc+cLkePYKI1a0U9UKKEWLLtvUq4zsoHCKdEMA4A0
-	r4=; b=dVie2Qfk6MeL5ZJx9WHYQ/hkZJ+5jpHKQUbqaTwXi7pK3c2SdkY1GjFHh
-	geodkw/oOdQgDLqlp9cHHfV3pdthrc/7L4s1SL1CnK7hSyIvrLCl0IRcSX7i1pq+
-	09M7th65LYiMWKhOm2Xizv3rtbiIIwx00OQ0kzg58Qyo+7NtmJOKO2pkn4Kc38OH
-	2wGS+q9k6iDHarkP7z6dKlLrMwdPwWaO9TG5LrX7gN8Za1GbhGCA4GV17cVg63Sb
-	wrDoLHj8IZav77h7ddFGQA87sqmWvVTCdmjY8nOK20gGoh6yJc/k6FIZaC9UiM+H
-	M68UHB0ZvYw0vmmiGoArmuX1jAbtA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 437te98xd2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Dec 2024 14:02:36 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B4DxFAF009627;
-	Wed, 4 Dec 2024 14:02:35 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 437te98xcx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Dec 2024 14:02:35 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B4APEX7007467;
-	Wed, 4 Dec 2024 14:02:34 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 438f8jn0xv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Dec 2024 14:02:34 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B4E2Vgn21234168
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 4 Dec 2024 14:02:31 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 401C02004B;
-	Wed,  4 Dec 2024 14:02:31 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 28BF320040;
-	Wed,  4 Dec 2024 14:02:31 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed,  4 Dec 2024 14:02:31 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
-	id BA37DE0788; Wed, 04 Dec 2024 15:02:30 +0100 (CET)
-From: Alexandra Winter <wintera@linux.ibm.com>
-To: Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-        Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>, David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Nils Hoppmann <niho@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next] net/mlx5e: Transmit small messages in linear skb
-Date: Wed,  4 Dec 2024 15:02:30 +0100
-Message-ID: <20241204140230.23858-1-wintera@linux.ibm.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1733320993; c=relaxed/simple;
+	bh=wiR5htVN+22hbXfWg7ML4jVM0P0Y7+RaaSQ2h6rUHR4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fLYOWMWnEVpdXEjdDHf2xtaECjnK5JFRzjaR4NFG2r+H2F7rJcfry0YURHIbtAaWy3s/VVukhk5D/bA9AP+meTBtrEsn0srhWpBKP7kSTsrNvun51/n5dOBoc+FyJ+yjZgh5xzqQVUVvx+iIvhCEWimQ3capxfYi4hz7l/niYG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Er7TdoqP; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7252f48acf2so5007521b3a.2;
+        Wed, 04 Dec 2024 06:03:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733320990; x=1733925790; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0SkLnU8JcXk82S6VfOwZc1CCUFMw4TrFjPFHV116tyI=;
+        b=Er7TdoqP+PeyhGDdrO09WzCjhyJMA2N9eIGSzvTcgdNPToFGyCZhMt8dA16RyxrA2L
+         QW+JmMrysUGUJAyA8+LP+U+RTF5xhpSXDqq49/pKlE0pHTuBPre5eNtBRfGmJYotOn0W
+         z/34vh+yNMDm8DTGHcVKxDV96/nkINDNvpnpn98IfjtGYBJUagbngbg04V6ZiKU3ZERD
+         nB5CV+pdWgzlyfY9Fr5MINiKc22vPtPvcJc+Kc7nksFgfBSqQOHliUsyxPPAexSVxRnS
+         pavjQlLUmUg3ZDEMt8lxCsjS/BybXLZXInwzGAmuFbSTQ6Asr/C/IhDagPQ38TEhQIJU
+         /iXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733320991; x=1733925791;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0SkLnU8JcXk82S6VfOwZc1CCUFMw4TrFjPFHV116tyI=;
+        b=D77/jEnysl+lOkX3lvnPCTXp2NnqFijOrg0eqCFwIYxI++a+NwnXeX0oCvdANE4qQD
+         UEdc6Tl5KxmmfiR13kLxQWTATg3VEoImLk1FXVpXvirkzSlG43BUECOa3HKwutGefYFQ
+         bPo5tRibZIuJyfNpSrn7rPRtDqKoEUDpmUOw9/UQ0J821HXQosvjwou3ejnptILJxYsh
+         4k6N7XowAN3Vw/C6QB3UYrkQlEyCl6qIFAeEOOy33FxkFHwiZjwmFZZIM3prUquVw1Bj
+         EYWrN/tyRLg2Vk4hX6D2az+ep8jf5+ammIAV+IVHy+7Keipg+lUnsDqbK8aFZQttkfn1
+         A4gg==
+X-Forwarded-Encrypted: i=1; AJvYcCU8evdWcpme1BA7FCJSeEPjzxh85oLlgY9wm6OuVkG+NEhEImyTcgZ+BYxMrptkJzkUf5ByonikeEvvoOUoZjv/@vger.kernel.org, AJvYcCUZb8yHjQg/Ug1VxzLrBb+HoGPE9/mPJSOE7/0XO/2fotxqbXWfOiiW91rZaXttXn9DQ5xAvHpeBGeB4JFd@vger.kernel.org, AJvYcCV0Q94XUQlGQZuOlcD3P7TqF0Q+geVhXn0J9G4wDhemrlOdoVVYbw641Yb/9oX17k1qTfsug/eZn/rM@vger.kernel.org, AJvYcCW2d0Ap2YZZY3i6U9F/r1rm8g8p5rDl+iqyIe6lUrUmGkYTcsWqAUzYUfvoqjZESBxAGfOccY/yaxktSqe0YDwy@vger.kernel.org, AJvYcCWQgBITDpsyRmD2QiwKKlkJAAksc+vQVx1NDnVibdPpWBa1JuiZiVuSPEWMniog7IX6upmiL74R@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFMVowSzTlNueGjBS7Sr4Bg+GURMynFvIK9XDhTKta+ZkiUm/S
+	YhiwxBJVlYV0GW0jxwa7LyBdM2C27DYtP+6EzyzIou33smfO2dwm
+X-Gm-Gg: ASbGncu9srxqV8li3BvcrtTk4lSzCLE61b4u5ATI9OvT6jr+wuEg7qT9OBJJYVp2UwY
+	pM+5aCx+7jy61Qze28HQb97BeJpi9woEE1e75IsTzDVg/IO8VYAFm7i9rNghruRArEfWeVCvybO
+	clOIaaa3oIeZVkrFtr5Ydw9YIDY3Ayo3Ln7spF+QfxAcrFi/t29e0M6Y6w/qlavx3flWlJqS2f/
+	F5cMupOcKp1DP3SllL3OO6CC5ubSEkILcX3Yj4Odt01sAREI25bPKY=
+X-Google-Smtp-Source: AGHT+IEUKdzmeAo1eoMyTnSkc02brGe/K04CdFfkaSutlwK1ABZqZrvFGOq8UuSIGqZcRz48RNbWJg==
+X-Received: by 2002:aa7:8888:0:b0:71e:41b3:a56b with SMTP id d2e1a72fcca58-72587f9083amr6136440b3a.24.1733320990387;
+        Wed, 04 Dec 2024 06:03:10 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-725417612b5sm12374317b3a.30.2024.12.04.06.02.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 06:03:09 -0800 (PST)
+Date: Wed, 4 Dec 2024 14:02:57 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Kenjiro Nakayama <nakayamakenjiro@gmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Andrea Parri <parri.andrea@gmail.com>,
+	Will Deacon <will@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	David Howells <dhowells@redhat.com>,
+	Jade Alglave <j.alglave@ucl.ac.uk>,
+	Luc Maranget <luc.maranget@inria.fr>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Akira Yokosawa <akiyks@gmail.com>,
+	Daniel Lustig <dlustig@nvidia.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Shuah Khan <shuah@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arch@vger.kernel.org,
+	lkmm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2] selftests/net: call sendmmsg via
+ udpgso_bench.sh
+Message-ID: <Z1BhEQ5RsJqB2ugr@fedora>
+References: <20241203222843.26983-1-nakayamakenjiro@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 49W39RiHlGhq9C68PtpvaJtRfl09BlnE
-X-Proofpoint-ORIG-GUID: kU1xrMSuKHv2JksqzIUyy2V3I12o5UpA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 mlxlogscore=999 impostorscore=0 lowpriorityscore=0
- mlxscore=0 phishscore=0 adultscore=0 clxscore=1011 spamscore=0
- malwarescore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412040107
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241203222843.26983-1-nakayamakenjiro@gmail.com>
 
-Linearize the skb if the device uses IOMMU and the data buffer can fit
-into one page. So messages can be transferred in one transfer to the card
-instead of two.
-
-Performance issue:
-------------------
-Since commit 472c2e07eef0 ("tcp: add one skb cache for tx")
-tcp skbs are always non-linear. Especially on platforms with IOMMU,
-mapping and unmapping two pages instead of one per transfer can make a
-noticeable difference. On s390 we saw a 13% degradation in throughput,
-when running uperf with a request-response pattern with 1k payload and
-250 connections parallel. See [0] for a discussion.
-
-This patch mitigates these effects using a work-around in the mlx5 driver.
-
-Notes on implementation:
-------------------------
-TCP skbs never contain any tailroom, so skb_linearize() will allocate a
-new data buffer.
-No need to handle rc of skb_linearize(). If it fails, we continue with the
-unchanged skb.
-
-As mentioned in the discussion, an alternative, but more invasive approach
-would be: premapping a coherent piece of memory in which you can copy
-small skbs.
-
-Measurement results:
---------------------
-We see an improvement in throughput of up to 16% compared to kernel v6.12.
-We measured throughput and CPU consumption of uperf benchmarks with
-ConnectX-6 cards on s390 architecture and compared results of kernel v6.12
-with and without this patch.
-
-+------------------------------------------+
-| Transactions per Second - Deviation in % |
-+-------------------+----------------------+
-| Workload          |                      |
-|  rr1c-1x1--50     |          4.75        |
-|  rr1c-1x1-250     |         14.53        |
-| rr1c-200x1000--50 |          2.22        |
-| rr1c-200x1000-250 |         12.24        |
-+-------------------+----------------------+
-| Server CPU Consumption - Deviation in %  |
-+-------------------+----------------------+
-| Workload          |                      |
-|  rr1c-1x1--50     |         -1.66        |
-|  rr1c-1x1-250     |        -10.00        |
-| rr1c-200x1000--50 |         -0.83        |
-| rr1c-200x1000-250 |         -8.71        |
-+-------------------+----------------------+
-
-Note:
-- CPU consumption: less is better
-- Client CPU consumption is similar
-- Workload:
-  rr1c-<bytes send>x<bytes received>-<parallel connections>
-
-  Highly transactional small data sizes (rr1c-1x1)
-    This is a Request & Response (RR) test that sends a 1-byte request
-    from the client and receives a 1-byte response from the server. This
-    is the smallest possible transactional workload test and is smaller
-    than most customer workloads. This test represents the RR overhead
-    costs.
-  Highly transactional medium data sizes (rr1c-200x1000)
-    Request & Response (RR) test that sends a 200-byte request from the
-    client and receives a 1000-byte response from the server. This test
-    should be representative of a typical user's interaction with a remote
-    web site.
-
-Link: https://lore.kernel.org/netdev/20220907122505.26953-1-wintera@linux.ibm.com/#t [0]
-Suggested-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-Co-developed-by: Nils Hoppmann <niho@linux.ibm.com>
-Signed-off-by: Nils Hoppmann <niho@linux.ibm.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_tx.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-index f8c7912abe0e..421ba6798ca7 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-@@ -32,6 +32,7 @@
- 
- #include <linux/tcp.h>
- #include <linux/if_vlan.h>
-+#include <linux/iommu-dma.h>
- #include <net/geneve.h>
- #include <net/dsfield.h>
- #include "en.h"
-@@ -269,6 +270,10 @@ static void mlx5e_sq_xmit_prepare(struct mlx5e_txqsq *sq, struct sk_buff *skb,
- {
- 	struct mlx5e_sq_stats *stats = sq->stats;
- 
-+	/* Don't require 2 IOMMU TLB entries, if one is sufficient */
-+	if (use_dma_iommu(sq->pdev) && skb->truesize <= PAGE_SIZE)
-+		skb_linearize(skb);
-+
- 	if (skb_is_gso(skb)) {
- 		int hopbyhop;
- 		u16 ihs = mlx5e_tx_get_gso_ihs(sq, skb, &hopbyhop);
--- 
-2.45.2
-
+On Wed, Dec 04, 2024 at 07:28:44AM +0900, Kenjiro Nakayama wrote:
+> Currently, sendmmsg is implemented in udpgso_bench_tx.c,
+> but it is not called by any test script.
+> 
+> This patch adds a test for sendmmsg in udpgso_bench.sh.
+> This allows for basic API testing and benchmarking
+> comparisons with GSO.
+> 
+> Signed-off-by: Kenjiro Nakayama <nakayamakenjiro@gmail.com>
+> ---
+>  tools/testing/selftests/net/udpgso_bench.sh | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/udpgso_bench.sh b/tools/testing/selftests/net/udpgso_bench.sh
+> index 640bc43452fa..88fa1d53ba2b 100755
+> --- a/tools/testing/selftests/net/udpgso_bench.sh
+> +++ b/tools/testing/selftests/net/udpgso_bench.sh
+> @@ -92,6 +92,9 @@ run_udp() {
+>  	echo "udp"
+>  	run_in_netns ${args}
+>  
+> +	echo "udp sendmmsg"
+> +	run_in_netns ${args} -m
+> +
+>  	echo "udp gso"
+>  	run_in_netns ${args} -S 0
+>  
+> -- 
+> 2.39.3 (Apple Git-146)
+> 
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
