@@ -1,112 +1,137 @@
-Return-Path: <netdev+bounces-149120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED7DE9E4661
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 22:14:30 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCF209E4839
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 23:58:55 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8EF6B29032
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 19:30:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36E2C168E65
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 22:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 645B4188A3B;
-	Wed,  4 Dec 2024 19:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7266F202C22;
+	Wed,  4 Dec 2024 22:58:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="BkCq5gqR"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="fuT6POE0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-42ac.mail.infomaniak.ch (smtp-42ac.mail.infomaniak.ch [84.16.66.172])
+Received: from mx16lb.world4you.com (mx16lb.world4you.com [81.19.149.126])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA201C3BF3
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 19:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C66118DF6D
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 22:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.126
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733340607; cv=none; b=g8SWsHuNTlSH3CqTCifnzcasbsNr5knIStB3GnGPkZHUBpINpNejFfqiaBrc6lOCBTqzdAsps7vLyrdtOHql9FYI5EHNSyl4XL7WnvWb0GKJ255OpIW8FjHHEQKZ0Xf73rqfOh7KnE4e4Y7hPnuE+aSFZu19ONP7ODxpwyP5CNU=
+	t=1733353128; cv=none; b=DJFfcndwHUkrVzycj3f68gyX5fEnmwSifq/Ce7QwT7CsYQfRdtpYFZweV85HDzfy0+pHbsqKMKEGFDMEe7ZUgufXTXtb3QR2lsLLPhJ8sxViz8ncZwr/eXew7UaIuE0efb1fwE1NW/sJk26VeXkUsBqzSli2nSd0Qma7wXu4uwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733340607; c=relaxed/simple;
-	bh=LcDk5KO2Oc82UySI5qieVXpafwd2XawQaaqaN2L3wkw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NMRJs8K4+z4sGrQ9ezz60D9bhov+TllrARvGhgeNGYek28xw222CpcooCAo9mJ2aBkeIS22eu5+ZqH4iKZO7zHVuVkh95yDoy1m2OWUa1OHKZ4urcRe8sWen5hGALulutNyAo3BiezgyZfmx/r42QvzHKcF/1Oe+Ex0ijhqVtHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=BkCq5gqR; arc=none smtp.client-ip=84.16.66.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246c])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Y3SK44jjMzbQB;
-	Wed,  4 Dec 2024 20:30:00 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1733340600;
-	bh=0GUHqg8GRL6pMGjl2BkgeJR/txAYeha7tu4vGhGYsAg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BkCq5gqRTNaKQozPGyXhmNdzDIHJm9EMl92rYK8iEe2pl2/PWN0s5U7S8uiufIW8r
-	 Tzzyc9tyY2elm36ow9kIi98YiFTpNTlA/tStDIDLOGefPOcpkS3AcrVSK++3EteSUs
-	 ryYOYPU64cwkad6bauYVseIx22hrz9YyvnnUMu/U=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Y3SK417hgz1Rv;
-	Wed,  4 Dec 2024 20:30:00 +0100 (CET)
-Date: Wed, 4 Dec 2024 20:29:59 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: David Laight <David.Laight@aculab.com>
-Cc: 'Mikhail Ivanov' <ivanov.mikhail1@huawei-partners.com>, 
-	Matthieu Baerts <matttbe@kernel.org>, "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>, 
-	"gnoack@google.com" <gnoack@google.com>, 
-	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, "matthieu@buffet.re" <matthieu@buffet.re>, 
-	"linux-security-module@vger.kernel.org" <linux-security-module@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>, "yusongping@huawei.com" <yusongping@huawei.com>, 
-	"artem.kuzin@huawei.com" <artem.kuzin@huawei.com>, 
-	"konstantin.meskhidze@huawei.com" <konstantin.meskhidze@huawei.com>, MPTCP Linux <mptcp@lists.linux.dev>
-Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
-Message-ID: <20241204.ipheevic6eeB@digikod.net>
-References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
- <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
- <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
- <20241018.Kahdeik0aaCh@digikod.net>
- <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
- <ed94e1e51c4545a7b4be6a756dcdc44d@AcuMS.aculab.com>
+	s=arc-20240116; t=1733353128; c=relaxed/simple;
+	bh=gVKgzwl8ntKSWrOvFXyw8Z1n3CN0L59sb1DqfCJu1e4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EVPWqn+Xz8ctUuKCo6kDiUvc32IBh7IzcdBFg1glmzh6BdOPpgbTWmzeDW0s1Kya9PKkzzpFjoC0dJXuLA6D8OWLyRKWfOLTdggZ4ZN8Bt+w20wbxdeAI+KZPZwcEexZ4yoYxZWJ1WWUUZrcm6+yu5tw3TC4b93TQrcHOZmOLnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=fuT6POE0; arc=none smtp.client-ip=81.19.149.126
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=GirAyz2Vc6AyIWO7DCGREizNgX08C+P2Yh6QCGAaJaw=; b=fuT6POE0pV8AZkqh/tVR5YynqL
+	ybsdQqZJkfj7yzQWM6Hb+vxiIHHM9chdE+auV+4txYxCGITqr4hBNupqwXlvbbKx+auJjGlMucEzg
+	XZ3MRbMQAicd1V+mSnOBnkaVL7Mk54ygvfhPW5oJV2vNtBlwzLVE8z6kP4aaYq+/mDUk=;
+Received: from [88.117.62.55] (helo=[10.0.0.160])
+	by mx16lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tIvsb-000000008U2-1ODm;
+	Wed, 04 Dec 2024 21:21:50 +0100
+Message-ID: <06edcab8-280d-4397-8df2-58a35eb094ec@engleder-embedded.com>
+Date: Wed, 4 Dec 2024 21:21:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] e1000e: Fix real-time violations on link up
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch,
+ netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, Gerhard Engleder <eg@keba.com>,
+ Vitaly Lifshits <vitaly.lifshits@intel.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+References: <20241203202814.56140-1-gerhard@engleder-embedded.com>
+ <ef87bd20-6fda-4839-8cff-4ab10bf500a7@intel.com>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <ef87bd20-6fda-4839-8cff-4ab10bf500a7@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ed94e1e51c4545a7b4be6a756dcdc44d@AcuMS.aculab.com>
-X-Infomaniak-Routing: alpha
+X-AV-Do-Run: Yes
 
-On Fri, Nov 08, 2024 at 05:16:50PM +0000, David Laight wrote:
-> From: Mikhail Ivanov
-> > Sent: 31 October 2024 16:22
-> > 
-> > On 10/18/2024 9:08 PM, Mickaël Salaün wrote:
-> > > On Thu, Oct 17, 2024 at 02:59:48PM +0200, Matthieu Baerts wrote:
-> > >> Hi Mikhail and Landlock maintainers,
-> > >>
-> > >> +cc MPTCP list.
-> > >
-> > > Thanks, we should include this list in the next series.
-> > >
-> > >>
-> > >> On 17/10/2024 13:04, Mikhail Ivanov wrote:
-> > >>> Do not check TCP access right if socket protocol is not IPPROTO_TCP.
-> > >>> LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
-> > >>> should not restrict bind(2) and connect(2) for non-TCP protocols
-> > >>> (SCTP, MPTCP, SMC).
+On 04.12.24 11:10, Przemek Kitszel wrote:
+> On 12/3/24 21:28, Gerhard Engleder wrote:
+>> From: Gerhard Engleder <eg@keba.com>
+>>
+>> From: Gerhard Engleder <eg@keba.com>
 > 
-> I suspect you should check all IP protocols.
-> After all if TCP is banned why should SCTP be allowed?
-> Maybe you should have a different (probably more severe) restriction on SCTP.
-> You'd also need to look at the socket options used to add additional
-> local and remote IP addresses to a connect attempt.
+> duplicated From: line
 
-Indeed, setsockopt()'s SCTP_SOCKOPT_BINDX_ADD and SCTP_SOCKOPT_CONNECTX
-don't go through the socket_bind() nor socket_connect() LSM hooks bu the
-security_sctp_bind_connect() hook instead.  This SCTP-specific hook is
-not implemented for Landlock and the current implementation only
-partially control such operations for SCTP.  This also make it clear
-that we really need to stick to TCP-only for the TCP access rights.
+Nervous fingers, sorry, will be fixed.
 
-It would be nice to add support for SCTP but we'll need to implement
-security_sctp_bind_connect() and new tests with the setsockopt()
-commands.
+>>
+>> Link down and up triggers update of MTA table. This update executes many
+>> PCIe writes and a final flush. Thus, PCIe will be blocked until all 
+>> writes
+>> are flushed. As a result, DMA transfers of other targets suffer from 
+>> delay
+>> in the range of 50us. This results in timing violations on real-time
+>> systems during link down and up of e1000e.
+>>
+>> A flush after a low enough number of PCIe writes eliminates the delay
+>> but also increases the time needed for MTA table update. The following
+>> measurements were done on i3-2310E with e1000e for 128 MTA table entries:
+>>
+>> Single flush after all writes: 106us
+>> Flush after every write:       429us
+>> Flush after every 2nd write:   266us
+>> Flush after every 4th write:   180us
+>> Flush after every 8th write:   141us
+>> Flush after every 16th write:  121us
+>>
+>> A flush after every 8th write delays the link up by 35us and the
+>> negative impact to DMA transfers of other targets is still tolerable.
+>>
+>> Execute a flush after every 8th write. This prevents overloading the
+>> interconnect with posted writes. As this also increases the time spent 
+>> for
+>> MTA table update considerable this change is limited to PREEMPT_RT.
+> 
+> hmm, why to limit this to PREEMPT_RT, the change sounds resonable also
+> for the standard kernel, at last for me
+> (perhaps with every 16th write instead)
+
+As Andrew argumented similar, I will remove the PREEMPT_RT dependency
+with the next version. This is not the hot path, so the additional delay
+of <<1ms for boot and interface up is negligible.
+
+> with that said, I'm fine with this patch as is too
+> 
+>>
+>> Signed-off-by: Gerhard Engleder <eg@keba.com>
+> 
+> would be good to add link to your RFC
+> https://lore.kernel.org/netdev/f8fe665a-5e6c-4f95-b47a-2f3281aa0e6c@lunn.ch/T/
+> 
+> and also CC Vitaly who participated there (done),
+> same for IWL mailing list (also CCd), and use iwl-next tag for your
+> future contributions to intel ethernet
+
+Will be done.
+
+Thank you for the review!
+
+Gerhard
 
