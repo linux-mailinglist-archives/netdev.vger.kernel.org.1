@@ -1,107 +1,114 @@
-Return-Path: <netdev+bounces-148789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AB449E3239
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 04:44:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F3619E3244
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 04:47:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E8A0B271E1
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 03:44:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7103280FF9
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 03:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7914F155747;
-	Wed,  4 Dec 2024 03:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239CF7DA62;
+	Wed,  4 Dec 2024 03:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="UIvrkUQv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jiZUFoaj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC58615573F
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 03:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE59F17BA1;
+	Wed,  4 Dec 2024 03:47:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733283853; cv=none; b=FpfVvozsdiZOLG2bPLNDLXqldeW1hNxrhZU7MiwapPBqQ449MJiCkx447Hy0yTVHvqH9exCqeQnESlqi3SsKAjiezI7veOofCjtaLjGpnx7BnWSA+ZFX60cbJZZgn95eObBDrY5UW+/3eRSBk8PWnLxLBUU96Ar5QE5tl3YrIkY=
+	t=1733284023; cv=none; b=gc6B3CqIIG1B+Xex/OT2E78vz0TN+ntWoH6LlBi2el3VZ7NwY700K6tqN6a3bOi8IvHEu+byC8a0eFCBIrOGKjJjdphcc1S4wKrZrDhKdmcKFF/da908hZ5tYBZ2E2oSedQIVGDIgHoVnFQ0bOKT2nCvjcQx6ipeA8PHJIFEAcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733283853; c=relaxed/simple;
-	bh=sSOfX/VJkWpJudyMdwZbnqRn3MPlXSopwU2F416vkiY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lHGye3j+Om4n3T9prL89wddcFtt/UVp02OlJzWLRJK+UZ7dfFKB6ZLbe4bxz4Nso5+kc+wQbz1zLR2yuB7GrW41cVWx0G+vzUpE+A4vw94O5LuwutQstddSUkjb9VFAXWM9JMVmI2uomQKOHJTAuC1IoVLefFcaPBluCooop+bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=UIvrkUQv; arc=none smtp.client-ip=209.85.219.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e38df4166c7so5317039276.0
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 19:44:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1733283851; x=1733888651; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sSOfX/VJkWpJudyMdwZbnqRn3MPlXSopwU2F416vkiY=;
-        b=UIvrkUQvCbBdnBxYE1xsHl5ao9zOa5/gt4pzRn0okLYXQbQtrbXnvhR9jpiDbK1nXH
-         JmLFoC505gagmLHxS+yNV/xyiAL3Da0oeEwHpIAWtL40AZBvv/0feLNFJerPZigcN7m6
-         tXkPHlboHl/9lMhW+QlrXo6VBdoC8Pb+jII7AfhlRswGU1VUWLuc39s//ZVyKY2iwFyw
-         U+z4H4lsi2fJZ0FHs800rYIjRjAQHq3S5eGBvf/GIwIJFpyXZ3WmYH+oEn2xsn1QAdBC
-         ns35Pz7YMEmcb5V9UpHGZn3UPSpYWxiIXw9vGQvTNES+HsJYZCNIr1u1R0nPGdZ5ou2W
-         /OBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733283851; x=1733888651;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sSOfX/VJkWpJudyMdwZbnqRn3MPlXSopwU2F416vkiY=;
-        b=I/kEaxPmqri/6zKAYSQg9g2SeHwEjPoBLpRz0VlKrwlvINCj8g+QvaAhhEZjj3ar+6
-         E8PdUJ0pOx0zB74AbXNRANEcb19SxXrYa4jt1cjxQa53bHxU1jarSj4J+WPitoVKfMJX
-         3tcnl4TDsna6sYdF962lcPLzjgmF1enKrksgEKsx6uH4CZNcc1RSz9FoSSjEfuBmHURV
-         Het2WKR6DSdgYbYllLW/i8aZFsr3YfRK/F8UW5qKL+3BE8qufkbi9dh7gSO1zFG8x56A
-         7PfxAyIdtlR/mUngJDkBfK1BtDXkW9u7SSYiVXl6JxDXKQ0PmLo2h2sdyvLjvjXidNqj
-         YWdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV51e61dkngb93E0auL5Led7bOLrRMaSEFC53giPmT58mqRxE6TfgYv6n4pXQHXkixU64VGUyM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIHeL8ghErr9gqemMF8AS4xWeJyIYOBHvbWTQlx4mFEanUo5WG
-	TpIjMlkgOnVWuZgQ3XLVtq7BX7zfZrUF6IWKyN3z/vWpTHZNV4yOw5lmDCq3I3yQ5wQwXNLlULM
-	d19ImzFiHHhhOO3wxNPUijo8vO5UfJDhXtTGR
-X-Gm-Gg: ASbGnctzqWOE3z803BdJpBn+quW7/lqzJq2JkiHouOZ8UqRVAVHQloeK9LWYcQ2nezG
-	+RuMSlH3hrOuJQTLpZ68C+Heo56onDQ==
-X-Google-Smtp-Source: AGHT+IHegUUBo1xF0JACvyh6HPUnWPYgI5rSYqQsByt8khZRn6ygnWTVW10hnY5SDDp01LxjUmTWNgUuz86mybiFo2A=
-X-Received: by 2002:a05:6902:2d86:b0:e38:8749:815e with SMTP id
- 3f1490d57ef6-e39d3e1c716mr3895579276.30.1733283850958; Tue, 03 Dec 2024
- 19:44:10 -0800 (PST)
+	s=arc-20240116; t=1733284023; c=relaxed/simple;
+	bh=rV2kU3EXJi1nCePhMpNyNdzmMfRJXruCC3USeEGD31I=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tJK6H/lnDJZ9cutIXV21cemDeoqQ+z4yyDERRa4WJC4S8O10fENER/lZLC0cNqcV5ljnIGVOfp4WJcyAz2pH2sr9NGtcoaGZp7IjFGe1kkOc+roo0hAqPFlQnF9sIKTo+8Wyzzq9CIQzBJDo5ec71ibSzkeQqgA3xCqecUCLySE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jiZUFoaj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F5FCC4CED1;
+	Wed,  4 Dec 2024 03:47:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733284022;
+	bh=rV2kU3EXJi1nCePhMpNyNdzmMfRJXruCC3USeEGD31I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jiZUFoajZ1VdviSWCV/zCWDPWG/1oOFQDpiDcFsI1RCBRxLCvQEwK9hOn7koG0Dq3
+	 mKMlCNOjDcZb25GXAy+rw0uZKwmMAq+f9tmk6BlKeyA58LAlWyDC3yfi8D7F/VAkSW
+	 uJuKMkl9GPHZuAXfcA8mzAfisM5tKXCTJn795gtBZmAdsRTnZ8mQ0e/WNagXd0tvD1
+	 IDn3XMWRIHn7EWwO6tzr9lZYSbDVhL3AASR0NBnxQTh9Az7L65/vfgIxmbqQr7Tufq
+	 KSTR37Mdg1CbprUX7jYXDGEXHkUEW6r5aHSfeW6uZPjcFnQM0c7+mrD+COjAj9nEtA
+	 /JNNsENNecjbA==
+Date: Tue, 3 Dec 2024 19:47:01 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vfedorenko@novek.ru>, Frantisek
+ Krenzelok <fkrenzel@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Apoorv Kothari <apoorvko@amazon.com>, Boris Pismenny <borisp@nvidia.com>,
+ John Fastabend <john.fastabend@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Marcel
+ Holtmann <marcel@holtmann.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v4 1/6] tls: block decryption when a rekey is
+ pending
+Message-ID: <20241203194701.48e74c8e@kernel.org>
+In-Reply-To: <327cb575d15fa5c5379f9c38a5132d78953fb648.1731597571.git.sd@queasysnail.net>
+References: <cover.1731597571.git.sd@queasysnail.net>
+	<327cb575d15fa5c5379f9c38a5132d78953fb648.1731597571.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241126145911.4187198-1-edumazet@google.com> <173300343374.2487269.7082262124805020262.git-patchwork-notify@kernel.org>
- <CAHC9VhQFEsPfAZ2MLw7mB7xwOFHPA+TXf9fv9JQDMEFfsZDWJQ@mail.gmail.com> <20241203165552.07ba0619@kernel.org>
-In-Reply-To: <20241203165552.07ba0619@kernel.org>
-From: Paul Moore <paul@paul-moore.com>
-Date: Tue, 3 Dec 2024 22:44:00 -0500
-Message-ID: <CAHC9VhQpRa4nOunEpz2tc9G2yiO08o+EJPHs_uZhqCVbXw7C-Q@mail.gmail.com>
-Subject: Re: [PATCH net] selinux: use sk_to_full_sk() in selinux_ip_output()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, Eric Dumazet <edumazet@google.com>, pabeni@redhat.com, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot+2d9f5f948c31dcb7745e@syzkaller.appspotmail.com, 
-	stephen.smalley.work@gmail.com, omosnace@redhat.com, selinux@vger.kernel.org, 
-	kuniyu@amazon.com, brianvv@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 3, 2024 at 7:55=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Tue, 3 Dec 2024 15:50:46 -0500 Paul Moore wrote:
-> > > This patch was applied to netdev/net.git (main)
-> > > by Jakub Kicinski <kuba@kernel.org>:
-> >
-> > Jakub, do you know when we can expect to see this sent up to Linus?
->
-> If I'm looking at our schedule right - Thursday (5th) evening EU time.
+On Thu, 14 Nov 2024 16:50:48 +0100 Sabrina Dubroca wrote:
+> +static int tls_check_pending_rekey(struct tls_context *ctx, struct sk_buff *skb)
+> +{
+> +	const struct tls_msg *tlm = tls_msg(skb);
+> +	const struct strp_msg *rxm = strp_msg(skb);
+> +	char hs_type;
+> +	int err;
+> +
+> +	if (likely(tlm->control != TLS_RECORD_TYPE_HANDSHAKE))
+> +		return 0;
+> +
+> +	if (rxm->full_len < 1)
+> +		return -EINVAL;
+> +
+> +	err = skb_copy_bits(skb, rxm->offset, &hs_type, 1);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	if (hs_type == TLS_HANDSHAKE_KEYUPDATE) {
+> +		struct tls_sw_context_rx *rx_ctx = ctx->priv_ctx_rx;
+> +
+> +		WRITE_ONCE(rx_ctx->key_update_pending, true);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int tls_rx_one_record(struct sock *sk, struct msghdr *msg,
+>  			     struct tls_decrypt_arg *darg)
+>  {
+> @@ -1739,6 +1769,10 @@ static int tls_rx_one_record(struct sock *sk, struct msghdr *msg,
+>  	rxm->full_len -= prot->overhead_size;
+>  	tls_advance_record_sn(sk, prot, &tls_ctx->rx);
+>  
+> +	err = tls_check_pending_rekey(tls_ctx, darg->skb);
+> +	if (err < 0)
+> +		return err;
 
-Thanks.
+Sorry if I already asked this, is this 100% safe to error out from here
+after we decrypted the record? Normally once we successfully decrypted
+and pulled the message header / trailer we always call tls_rx_rec_done()
 
---=20
-paul-moore.com
+The only reason the check_pending_rekey() can fail is if the message is
+mis-formatted, I wonder if we are better off ignoring mis-formatted
+rekeys? User space will see them and break the connection, anyway.
+Alternatively - we could add a selftest for this.
 
