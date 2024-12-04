@@ -1,130 +1,163 @@
-Return-Path: <netdev+bounces-148934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED23E9E3822
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 12:01:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F1BB9E3883
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 12:15:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1A7C285FEA
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:01:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3144EB2F328
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72F901B2182;
-	Wed,  4 Dec 2024 11:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89FF1B2187;
+	Wed,  4 Dec 2024 11:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pkh4e012"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921761AF0AE;
-	Wed,  4 Dec 2024 11:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5FB1AF0AE;
+	Wed,  4 Dec 2024 11:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733310080; cv=none; b=anb2AbjQf62nBkvp+Zjmw9jlM9kmZTykCPf69FCTwQaxbKtBc9LIQIOtZ52ONuCzaFxfGvZ9HINSMHZ/IE7R/SNlZw/5KwRCPlaUQo9Y1gyjkcnBEipq8P4I6IYagmxFa4PpTG+YuTNz4Flp9zqATfGyE6xmsCj9MwxHcfpR9+g=
+	t=1733310098; cv=none; b=uPOKtkE8KVvWwAPOT6HGOZ9EHHMxZdH/Q/78xR42USdxPNORVZSIWUUG4tnt/3aCfJ/iba3iZ9VwNuetkSXF1nZm5B/iYDbjoqYuMUbhUJI1qoHuKUfwob21qwYiIvJA38XpN8JRQ9S/EHZaWVesnTAtPNp+Swz/7Ob4DJ7h8XM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733310080; c=relaxed/simple;
-	bh=c2NvD8YPqwoJEBvfGdqJXIumIQ7XNQdIdtsGxgK/kP4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=GZ1MFoCH5/jgKSNArckPolUvnBu9X2uhhcvk64MNbW9Rv98Xb2Zc0e6vO6eK5OHL7hIhF5JqcAL20PX9ObF099HspSHmeDsvnyIpqPqA+rZUTVnenR+vdkbocxkUOcRsUszfnIEWZhC/hCXNpQrZPU5E172ND9c7FozxdBtK1h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Y3DzP6TNzz2GcVp;
-	Wed,  4 Dec 2024 18:58:57 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id C003714011B;
-	Wed,  4 Dec 2024 19:01:14 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 4 Dec 2024 19:01:14 +0800
-Message-ID: <e053e75a-bde1-4e69-9a8d-d1f54be06bdb@huawei.com>
-Date: Wed, 4 Dec 2024 19:01:14 +0800
+	s=arc-20240116; t=1733310098; c=relaxed/simple;
+	bh=z1HFY+L1IO4WPUG9WzHJoKxu2wP+G47aGlRxHp7HWF8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oe7CttzIIVwJZRaNDfBoyxFjnMR+COladEXdF3mPsvm2hN76Td4QCHYMS2gbyvzg3+9k97ECeU7kUrU8UTBAYp55M2Sv0FnFDvib+Qc2J7Rjl6o2r/xWMiRvZT9YzToL3xjWvRicbHVOvlNMvumjZ6GlO9lnY8WnS6OYmZ6u6iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pkh4e012; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31192C4CED1;
+	Wed,  4 Dec 2024 11:01:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733310098;
+	bh=z1HFY+L1IO4WPUG9WzHJoKxu2wP+G47aGlRxHp7HWF8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Pkh4e012awYuobGmVqxNqBoekFIvIsI0yCxWj1ISx9OgkGJWLQUTT/vgX4D9ukvyO
+	 ps8Ii7qwjm4XRj0J/MPFPIiOunjW38AcrAakW7sJjGnn9c+vtjrbsbZmcrEc4P8WwE
+	 2uL3vB84zpzBS373JgGy4k1Ca592sqNMKmaMe6i9BmusaZyTQPak5OxmS74dWfIZok
+	 mt0KKEzDLamXQPv4Z4sccQ5c7DnTl3Y4DxYbRlVI1o1CJ+0vd4Tu49sP7G3OQ+j5Su
+	 plLJHwIoAJaJpA+Uwzh9I2wnCOIkVtqZ9upYnsu+WV3G6zBcL06c8jviD1zCeMrcvt
+	 4oCd8BtR+0wPg==
+Message-ID: <80b6603d-ed52-43b7-a434-0253e5de784a@kernel.org>
+Date: Wed, 4 Dec 2024 12:01:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v4 1/3] page_pool: fix timing for checking and
- disabling napi_local
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <pabeni@redhat.com>, <liuyonglong@huawei.com>,
-	<fanghaiqing@huawei.com>, <zhangkun09@huawei.com>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, Eric Dumazet <edumazet@google.com>, Simon
- Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20241120103456.396577-1-linyunsheng@huawei.com>
- <20241120103456.396577-2-linyunsheng@huawei.com>
- <20241202184954.3a4095e3@kernel.org>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20241202184954.3a4095e3@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next] tcp: Check space before adding MPTCP options
+Content-Language: en-GB
+To: MoYuanhao <moyuanhao3676@163.com>, edumazet@google.com,
+ davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ martineau@kernel.org, geliang@kernel.org, MPTCP Linux <mptcp@lists.linux.dev>
+References: <20241204085801.11563-1-moyuanhao3676@163.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
+ YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
+ c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
+ WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
+ CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
+ nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
+ TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
+ nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
+ VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
+ 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
+ YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
+ AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
+ EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
+ /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
+ MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
+ cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
+ iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
+ jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
+ 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
+ VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
+ BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
+ ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
+ 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
+ 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
+ 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
+ mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
+ Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
+ Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
+ Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
+ x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
+ V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
+ Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
+ HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
+ 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
+ Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
+ voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
+ KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
+ UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
+ vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
+ mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
+ JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20241204085801.11563-1-moyuanhao3676@163.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 2024/12/3 10:49, Jakub Kicinski wrote:
-> On Wed, 20 Nov 2024 18:34:53 +0800 Yunsheng Lin wrote:
->> page_pool page may be freed from skb_defer_free_flush() in
->> softirq context without binding to any specific napi, it
->> may cause use-after-free problem due to the below time window,
->> as below, CPU1 may still access napi->list_owner after CPU0
->> free the napi memory:
->>
->>             CPU 0                           CPU1
->>       page_pool_destroy()          skb_defer_free_flush()
->>              .                               .
->>              .                napi = READ_ONCE(pool->p.napi);
->>              .                               .
->> page_pool_disable_direct_recycling()         .
->>    driver free napi memory                   .
->>              .                               .
->>              .       napi && READ_ONCE(napi->list_owner) == cpuid
->>              .                               .
->>
->> Use rcu mechanism to avoid the above problem.
->>
->> Note, the above was found during code reviewing on how to fix
->> the problem in [1].
->>
->> 1. https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
-> 
-> Please split it from the rest of the series, it's related but not
-> really logically connected (dma mappings and NAPI recycling are 
-> different features of page pool).
-> 
->> @@ -1126,6 +1133,12 @@ void page_pool_destroy(struct page_pool *pool)
->>  	if (!page_pool_release(pool))
->>  		return;
->>  
->> +	/* Paired with rcu lock in page_pool_napi_local() to enable clearing
->> +	 * of pool->p.napi in page_pool_disable_direct_recycling() is seen
->> +	 * before returning to driver to free the napi instance.
->> +	 */
->> +	synchronize_rcu();
-> 
-> I don't think this is in the right place.
-> Why not inside page_pool_disable_direct_recycling() ?
+Hi MoYuanhao,
 
-It is in page_pool_destroy() mostly because:
-1. Only call synchronize_rcu() when there is inflight pages, which should
-   be an unlikely case, and  synchronize_rcu() might need to be called at
-   least for the case of pool->p.napi not being NULL if it is called inside
-   page_pool_disable_direct_recycling().
-2. the above synchronize_rcu() in page_pool_destroy() is also reused
-   for the fixing of dma unmappings.
++Cc MPTCP mailing list.
 
-> 
-> Hopefully this doesn't cause long stalls during reconfig, normally
-> NAPIs and page pools are freed together, and NAPI removal implies
-> synchronize_rcu(). That's why it's not really a problem for majority
-> of drivers. You should perhaps make a note of this in the commit
-> message.
-> 
+(Please cc the MPTCP list next time)
+
+On 04/12/2024 09:58, MoYuanhao wrote:
+> Ensure enough space before adding MPTCP options in tcp_syn_options()
+> Added a check to verify sufficient remaining space
+> before inserting MPTCP options in SYN packets.
+> This prevents issues when space is insufficient.
+
+Thank you for this patch. I'm surprised we all missed this check, but
+yes it is missing.
+
+As mentioned by Eric in his previous email, please add a 'Fixes' tag.
+For bug-fixes, you should also Cc stable and target 'net', not 'net-next':
+
+Fixes: cec37a6e41aa ("mptcp: Handle MP_CAPABLE options for outgoing
+connections")
+Cc: stable@vger.kernel.org
+
+
+Regarding the code, it looks OK to me, as we did exactly that with
+mptcp_synack_options(). In mptcp_established_options(), we pass
+'remaining' because many MPTCP options can be set, but not here. So I
+guess that's fine to keep the code like that, especially for the 'net' tree.
+
+
+Also, and linked to Eric's email, did you have an issue with that, or is
+it to prevent issues in the future?
+
+
+One last thing, please don’t repost your patches within one 24h period, see:
+
+  https://docs.kernel.org/process/maintainer-netdev.html
+
+
+Because the code is OK to me, and the same patch has already been sent
+twice to the netdev ML within a few hours, I'm going to apply this patch
+in our MPTCP tree with the suggested modifications. Later on, we will
+send it for inclusion in the net tree.
+
+pw-bot: awaiting-upstream
+
+(Not sure this pw-bot instruction will work as no net/mptcp/* files have
+been modified)
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
