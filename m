@@ -1,183 +1,237 @@
-Return-Path: <netdev+bounces-149026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E73DD9E3CE3
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:35:32 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B61321620EA
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:35:29 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8A220899C;
-	Wed,  4 Dec 2024 14:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="daJTnd2i"
-X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2047.outbound.protection.outlook.com [40.107.20.47])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84AB39E3CE7
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:36:46 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EAB21FC7D0
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733322929; cv=fail; b=O3SMNQjoSR4ELDrgdcgXkRt9MLVGolFrI8liQnfSlQnR4C2m4fKKiIruQ04obEnmiAv5XfTkDKmULENHNwNxwcMgnAFiY7vh95K4JkHSuESYGEqAPVWZSdIV9ubtq2hmAT3J1dKLooC7IrhlruQErAev7NlEvsJnIKqkoBoBfi0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733322929; c=relaxed/simple;
-	bh=cbAE3aLqGVuOsyLAqW0ALNAquVgKoK16IXp/B1AEgXI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=UVue42PSFFKSP6DAFz6JAGITR4jJ9T3kNuDXxeINnTpBisyBl9PMJZgU6u1gjv6Wx9fadkiY+OeX2Hp0d3UG7UPwC7WR+4tRaxKBngDW6ROP92C4EV3CpbLgD/nnCy1JUtruHSot4dWMT4BNMOAO3BCFpUDt39ieejhYX8ev368=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=daJTnd2i; arc=fail smtp.client-ip=40.107.20.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bk+vDfjvfO6ltpsrCLZC22yja1OxOzXg3kP5kPI08taEb04U/prKYHB6wjFQFHszk/ASz7isinH0Qrybf7q3LBvWAtnwyuSoeJsgIgWFeO85uTkC0BzOzF3IOTj0KZJlS33ak1eREqczZovmEg45ezSXrxnkHM8SF9MeS4j81/gNNAZedM2S4C0j5CdHmc4ea3O2axWSjWMOTKkXd8qmZEgBpHgUKhtVSeJcXimJ2+d1vp/QYiXfV2urpRI628Wu+5WOGvdAYX1qwPkzb7YzE2HoBjeaQwxyTOZzBFeDFjA/KtmHOZTRBi6Zy+4mQi8EY6YWwjtSptNmSsayvmRBOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lc6SPQdgesBJAhx2RAwY3HtO1D2R2r8vFoRipd1j87U=;
- b=TYME6yeX8wHli0jH52yEWSqNIzPbeDG3kN4/RUBJESA2Efi/KaqK4ZFaAiyGXZAEx3VVWpDmCa4Ad3iHIgMT0z2gbzvEqz+6vIXwXwApWxrRPgEiTsu0NaiUi1m6Pc7rSTGYfb8lUm1BzItI7dmVYa+rrUt1CgL03CFDgB4R4vfVJEPPO9+lvd4QxnoCol6YydgkurWHvFI0ERtODOO0EPpeeBLkf1cBxP7y7KUwEBcFuPuUK8RvAnFaNh3BwHE5cqsCc4PJYcovgPkmL9jPMAZ7gA4lo9snuttUT3BaS2GRpAsVm7CQ00sVohsQzXjy0cldZVSV7u3563u+lPkoSQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lc6SPQdgesBJAhx2RAwY3HtO1D2R2r8vFoRipd1j87U=;
- b=daJTnd2itwt/a+8b3lzxF0tP8aK2tfP2HgOjEsvxZTun93ygr87VBbjHw1Qms6Rt5DU0jP7BGLFB4aBFWQMjcUPjPkTiJV3K3ssNqxcWVA/D0yllkGudzvDqQymayLwqWWbmbOdzzKQWq/QsYE4k8C1rimCcW4aDdq1vDeCehgTGph6gmOwKXaMzhhRPfd7EfNbL+MJfYyXXC1zMogsLcm0zTG1NI9TdopPWx0JY6TAcrv4z4W7XoG0B0WYbvCPjAKMYr3CdrBAOvXizAMJIFUfD2fuxI7U9Q4xNB28+Cf9/9G87C1D+yeeloHIFIGaZiKoaw+E9lNlIMY+/zA07ZQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by AM9PR04MB8620.eurprd04.prod.outlook.com (2603:10a6:20b:43b::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.20; Wed, 4 Dec
- 2024 14:35:24 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8207.017; Wed, 4 Dec 2024
- 14:35:24 +0000
-Date: Wed, 4 Dec 2024 16:35:21 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	syzbot+1939f24bdb783e9e43d9@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] net: avoid potential UAF in default_operstate()
-Message-ID: <20241204143521.z5hccxlz2vnyuwz5@skbuf>
-References: <20241203170933.2449307-1-edumazet@google.com>
- <20241203170933.2449307-1-edumazet@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241203170933.2449307-1-edumazet@google.com>
- <20241203170933.2449307-1-edumazet@google.com>
-X-ClientProxiedBy: VI1P195CA0084.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:802:59::37) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1337B26C86
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:36:15 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31B21F7090;
+	Wed,  4 Dec 2024 14:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JAEsalhY"
+X-Original-To: netdev@vger.kernel.org
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D6E1B4157;
+	Wed,  4 Dec 2024 14:36:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733322972; cv=none; b=DWWSVgCGv5jsiC2MDMQ7tljP/5gOQyeUPO+SrSKP+oRz1joLIvJ4GADh0GUZ5YEhVBjK3vDtdenKJddg8XLp9zUBNosWf7iu1RPNACPNoOv8c6sKYKItIQ97RT/oIL7nJNHkLGv1Njhig+gOj0ohEfiBK/JXsZxHBKIcjgGBQiY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733322972; c=relaxed/simple;
+	bh=d3Ybl+4JRFJo/qSqSOV8Vfacbb0/9YOqhmMPa+w3Ny4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t5n/C3Jt69c9pmOfBgB9fBWbVCYufTZIurjQJWd3BqIRXu1BIzuiU8JUX4A631xUfaT3PFHQG51/8MvCsrfNI1e5tyBO7JxrKW8aEmxWRrcYP2KOIv720Xmr0/JfS70zbUNByfrlhpQp2G8gVlUpoVsZkTb/UIDBi/DPfh+eM0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JAEsalhY; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B47JGW0014551;
+	Wed, 4 Dec 2024 14:36:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=kWKmVk
+	pn9dsIpKUTg9GEBYZZ8bylZlf2JofZkEPwfA8=; b=JAEsalhYJOYcrFbQiWJbVQ
+	eS1lwjAUpMHicsq11kG3AC4KnqfKCFx4vpprFxuYBzl2LifY5uZaK3IuDgYXGuXb
+	eX9ws9cpvpnegoAnpnVYv6/M0hJxN1qkJVSX+i5ytM7KrtfG/zfQxOEA9YG3eKKp
+	zZmq0Lzdgk72byXcwqrEd8lcgFBXISBOaOHkVcNZrEsO0skfYiJEMCww6zRkH1kq
+	D8jzB2NHt07r1T1vWbV2iF/jVAothZvU2GTq7Ssg+Fl8X0wAn4CKJCztVhC41yt+
+	VbQbPGYKwiyiPXc2v8xPTnjq9rKl9GGSlz93EqfM8QeZHJE8msTGtBXRgRb238ag
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 437tbxqy99-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 04 Dec 2024 14:36:01 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B4Ea06v019114;
+	Wed, 4 Dec 2024 14:36:00 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 437tbxqy97-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 04 Dec 2024 14:36:00 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B4Cmrdu020564;
+	Wed, 4 Dec 2024 14:35:59 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 438d1sdb45-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 04 Dec 2024 14:35:59 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B4EZufe54919608
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 4 Dec 2024 14:35:56 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 570A220040;
+	Wed,  4 Dec 2024 14:35:56 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EF74120043;
+	Wed,  4 Dec 2024 14:35:55 +0000 (GMT)
+Received: from [9.152.224.44] (unknown [9.152.224.44])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  4 Dec 2024 14:35:55 +0000 (GMT)
+Message-ID: <eb29649e-836e-44b8-b364-2ed736bad3ee@linux.ibm.com>
+Date: Wed, 4 Dec 2024 15:35:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AM9PR04MB8620:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2449268a-9709-4947-e8bd-08dd1470e337
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ndpDhfce/yh4L0gjA7B0qDe3q+7KH0m9AOfRF/iwX+BQSpS0zFK/u7WUMj/w?=
- =?us-ascii?Q?T0+Zri/UiOBKrec2SFka4Iy+uBukmd8mgascJ8J6vrVlNRG3bYR9eEoTWqZ+?=
- =?us-ascii?Q?j1Kr+rLa0QDyh3IEd9uOCiX/PsnPZaFEAIAfFExh936mUNAlugYoikb3M126?=
- =?us-ascii?Q?NICCG9rLkx5CicviebmVsDYskSG30vzawGFmC7tmhbBMgC8AckQ5QKtCC9HL?=
- =?us-ascii?Q?YJiYrpmmT3HD0kpQT1vVCBENi7HAZN81VlsLzpEF3JaByMXsSXnMrkPd/emp?=
- =?us-ascii?Q?rdYB7NgzwTD1KQijfIdOL0ZpVnGUwnF6GeBOK67SyJ1DvYMwLPEugVLyTOkV?=
- =?us-ascii?Q?S75TfQRRh6hsfEOVFncII0SiHONjm5YFD561ugYf2X0EK2tx3/85HIQEzpyp?=
- =?us-ascii?Q?qLckx+v1xiBwf3sU5JjArc2PehdwX78R+oK+972rRqi+kUObEbIWE1dtJzCG?=
- =?us-ascii?Q?4kFp31dv/jP93Dsw1I+AqwHLXv/zge1A1f0PrZ9bJvVnJUK40QoIy9REq2np?=
- =?us-ascii?Q?HExGC9gYG5qFDrLMQJt7PW95SdaSPtQhEmtRmsAILkgIyxiKYUIa50oniEkR?=
- =?us-ascii?Q?ZR9gewFDnT22KnKKjHmHzUsZfZ9T8Dgml2dA3a37+DVTRUKmph/8yO12U+6l?=
- =?us-ascii?Q?cITi6tQEc6jv8OrOsYd2+9pyWxiVdAMJOfyYM5SmEPeORtlQ/+FVeyuL/6YE?=
- =?us-ascii?Q?hEXB0HR2oVi1pg/dxR+KXZh5pDBJ5hCebbZEhnckkLxxAJNJ+zQnufWb+aUs?=
- =?us-ascii?Q?N5Q3PGVWZLu13MX5+eaEkCAJuhAsBV3DlSR5IB5/uV3q2sZT12vRaTkHWY66?=
- =?us-ascii?Q?IRkQjtpZxTKFG8qx3dEcPvTiTM9agtdLEqhQkYKhUPKrryg3RW4r8W8g1nOd?=
- =?us-ascii?Q?Qa0MN/1uX9n1ry0hm232vWTa5PXNavquYB85CiINTXlq84Mvo8kRHHQGSqg3?=
- =?us-ascii?Q?j4LEDXVT7SZS4QiPLV3WXEo+p2pgRicUREOAjZ5L8b8p48A3Fja86xvNQUML?=
- =?us-ascii?Q?3xIaPeefYqmNO7b2vEHETeBSRMd1P1Ji9UMIDsJCtDNiFrDcTXurlzRNHs9/?=
- =?us-ascii?Q?mWjKS8m5ik5kOKxWp6y9mVn2ePrkss5g+uP8D6KhZLR8h4fi34V8b3GOO9uF?=
- =?us-ascii?Q?7hGxsfyxU4mXVytIyOfqTAH2xafAE0Gwj0BqoP5fEXR8E0QZ5s4dvy15JBJw?=
- =?us-ascii?Q?FwGq0lyqWsjbdel5zFDRoWFxOUe7Ea81PKcrFJ9+cVnIAgDcdPpVu5hFuN9d?=
- =?us-ascii?Q?x9oDAhT2lez2hI1QYOpufJ6zVkrgluqlAvKy6OYoLx1V/a3J09i3mnNJIR3G?=
- =?us-ascii?Q?zYQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?/gI2d0thC3kPi9W0RXiIcr/gfTxsyuXnKo6YTBf3gE7F0BK9GCM4nDXIePNj?=
- =?us-ascii?Q?S2+JxJkCKexiqpI5R8bzUNnCH9Y+aIqG9M6ACuHHDzWX+vTlHjKMy32QrAQ4?=
- =?us-ascii?Q?CraXSUToxeNoCoFuM4IbD4zotIN1eo0gKLkxTr32hztmYGkJsMElLX6S0hfM?=
- =?us-ascii?Q?lPqHqjjNzU56IcT7erkqwzu7tNoxA4Rbc6mqkJTk8amJ4j63GBGcsHxvJhJk?=
- =?us-ascii?Q?wljNti/JNJFRWzvoqyeTXvrtiEIwO2opWFMQ09Bv0ibNBHJGQ16tW0B7jOFJ?=
- =?us-ascii?Q?DW4fTr2prAV1m2TNf3dFY2DuoDiO1g1OjQ8VYhgkpAENO6+xaFYvpp0wrQ8c?=
- =?us-ascii?Q?A6vssNwhEkXbOjrPgwdEzitt309K9WjJGbeS++CdW/psNRX3NlSOWIrsmBYf?=
- =?us-ascii?Q?zzcxWVsRKh3iDLD4KCgYtzd6jC3IpefStwiOEoWdcgwoy4k42/JeMEaO/2sq?=
- =?us-ascii?Q?lSZ1MrgraTv8hthxjnszKU7XGjSWnTLfBD4WHlH37DRhWATpw2GYA3fV3C9r?=
- =?us-ascii?Q?Jmm6/8gozG9nOJqT0jf2lv1Amyx3LiglaxFey9GKIDK2O4lva1YOGGfAwsDr?=
- =?us-ascii?Q?1YqJdbKfRt9+UrFkGp4yajjaWCfda35gOI8y6hritguZVXq5swk/PsdBSx/j?=
- =?us-ascii?Q?A+84wscb7SjqfejX++wSbgo6I7K2NCaQ8GioIbaV++ej9E1dNU46UP1sLboV?=
- =?us-ascii?Q?z26vTIlalWIFGihkn8KGZBA8NDOIbaAnARJwo+vqEIfFZ9FtJyIt0lVtONR8?=
- =?us-ascii?Q?QGvxDMKS93H5Grd99ld9mcZzFT5K1FxvLtMnHdpoJe8DN2+6f0dH+qHTpeAo?=
- =?us-ascii?Q?vj3CQ3Dt6ROqSPVqhQztcwNOSfgxGWOur4Z1CcjEyuSN5z8M/1FYybIoHGKy?=
- =?us-ascii?Q?oMmf20ImF/tFKEjiRhlNFmYPwp2aj5j099etOCBDdxP6qtOtpHd2a9gSGbbe?=
- =?us-ascii?Q?LZFmQlg6cpAJxWryHeHMhLZQNIKW/IUuWYmXiQfl40AtjZAjCF95Hx0X8e5I?=
- =?us-ascii?Q?Hu3Q9P+3XsHfRSe42sQGXerHM3dzFdnHslfIsX4u29VJzvdasrTxqpXDETXK?=
- =?us-ascii?Q?poN3CuArft7RXrKtT/tlgFdM0NYpBSU+ISojma5JcfZSBr6p+0dlnmwe6ghj?=
- =?us-ascii?Q?ra/ZOLlTIxx5d3NGgzo34JIMw78TLss+DVYCaoss1BiM6RPXmFM0g5gYnp1x?=
- =?us-ascii?Q?GbOwS/Z+of608I3h+KVQkU1yckJifQ+EmBWR/VJR9k8oroQVTVG78jV6kf1B?=
- =?us-ascii?Q?slXYTooZfBIrzkIxHWTSfRpyNlKMIK7tXUmhKnpbn0mIyZCH3uKaISr7MW6G?=
- =?us-ascii?Q?2nYKH9BqTGGW9S3wNacysiKdEautIdU+kxkZBL91PRnWVSVfsXbvWxlYPpd0?=
- =?us-ascii?Q?vzPweJewnGnKpwbL0hZj+b87wZnAXiXCf+ZFVezNNsqRmFfPeGkAOHmaQMgC?=
- =?us-ascii?Q?3vniE6z1QvfoplENxuds+KdqWJxHDYVxtg2Oi3S3KrI69Ba3HVG/KUe25+j/?=
- =?us-ascii?Q?Jna4UNKX9hrhu2TR6jCLmxgyHqD6UK91ZE+UssNNh8b99EoIq/XTV5ii0wxN?=
- =?us-ascii?Q?ovxdYYi40Ui9dk96YCiYoaND7JepHhcPof36uXwQhv0Frsp7/PLerKQUftjb?=
- =?us-ascii?Q?Cg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2449268a-9709-4947-e8bd-08dd1470e337
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2024 14:35:23.8750
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UfTCzGJg6jJRwhYIBNiusui+nO22s9wn/WwcxlFbOW/Eept2WoibrOuQ6kP80LoPH1DgZZHEvGxQafB+NAHsNw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8620
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/mlx5e: Transmit small messages in linear skb
+To: Eric Dumazet <edumazet@google.com>
+Cc: Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+        Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>, David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Nils Hoppmann <niho@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Simon Horman <horms@kernel.org>
+References: <20241204140230.23858-1-wintera@linux.ibm.com>
+ <CANn89i+DX-b4PM4R2uqtcPmztCxe_Onp7Vk+uHU4E6eW1H+=zA@mail.gmail.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <CANn89i+DX-b4PM4R2uqtcPmztCxe_Onp7Vk+uHU4E6eW1H+=zA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: e30OMQwLtXMFbu8-rabShM7QgoEo7-O-
+X-Proofpoint-GUID: ZDK2tRl4_Y2hy2-s_vuTKD_ROHFCqmph
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ mlxscore=0 suspectscore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0
+ phishscore=0 adultscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2412040111
 
-On Tue, Dec 03, 2024 at 05:09:33PM +0000, Eric Dumazet wrote:
-> syzbot reported an UAF in default_operstate() [1]
-> 
-> Issue is a race between device and netns dismantles.
-> 
-> After calling __rtnl_unlock() from netdev_run_todo(),
-> we can not assume the netns of each device is still alive.
-> 
-> Make sure the device is not in NETREG_UNREGISTERED state,
-> and add an ASSERT_RTNL() before the call to
-> __dev_get_by_index().
-> 
-> We might move this ASSERT_RTNL() in __dev_get_by_index()
-> in the future.
-> 
-> Fixes: 8c55facecd7a ("net: linkwatch: only report IF_OPER_LOWERLAYERDOWN if iflink is actually down")
-> Reported-by: syzbot+1939f24bdb783e9e43d9@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/674f3a18.050a0220.48a03.0041.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
-> Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
-> ---
 
-For now:
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+On 04.12.24 15:16, Eric Dumazet wrote:
+> On Wed, Dec 4, 2024 at 3:02 PM Alexandra Winter <wintera@linux.ibm.com> wrote:
+>>
+>> Linearize the skb if the device uses IOMMU and the data buffer can fit
+>> into one page. So messages can be transferred in one transfer to the card
+>> instead of two.
+>>
+>> Performance issue:
+>> ------------------
+>> Since commit 472c2e07eef0 ("tcp: add one skb cache for tx")
+>> tcp skbs are always non-linear. Especially on platforms with IOMMU,
+>> mapping and unmapping two pages instead of one per transfer can make a
+>> noticeable difference. On s390 we saw a 13% degradation in throughput,
+>> when running uperf with a request-response pattern with 1k payload and
+>> 250 connections parallel. See [0] for a discussion.
+>>
+>> This patch mitigates these effects using a work-around in the mlx5 driver.
+>>
+>> Notes on implementation:
+>> ------------------------
+>> TCP skbs never contain any tailroom, so skb_linearize() will allocate a
+>> new data buffer.
+>> No need to handle rc of skb_linearize(). If it fails, we continue with the
+>> unchanged skb.
+>>
+>> As mentioned in the discussion, an alternative, but more invasive approach
+>> would be: premapping a coherent piece of memory in which you can copy
+>> small skbs.
+>>
+>> Measurement results:
+>> --------------------
+>> We see an improvement in throughput of up to 16% compared to kernel v6.12.
+>> We measured throughput and CPU consumption of uperf benchmarks with
+>> ConnectX-6 cards on s390 architecture and compared results of kernel v6.12
+>> with and without this patch.
+>>
+>> +------------------------------------------+
+>> | Transactions per Second - Deviation in % |
+>> +-------------------+----------------------+
+>> | Workload          |                      |
+>> |  rr1c-1x1--50     |          4.75        |
+>> |  rr1c-1x1-250     |         14.53        |
+>> | rr1c-200x1000--50 |          2.22        |
+>> | rr1c-200x1000-250 |         12.24        |
+>> +-------------------+----------------------+
+>> | Server CPU Consumption - Deviation in %  |
+>> +-------------------+----------------------+
+>> | Workload          |                      |
+>> |  rr1c-1x1--50     |         -1.66        |
+>> |  rr1c-1x1-250     |        -10.00        |
+>> | rr1c-200x1000--50 |         -0.83        |
+>> | rr1c-200x1000-250 |         -8.71        |
+>> +-------------------+----------------------+
+>>
+>> Note:
+>> - CPU consumption: less is better
+>> - Client CPU consumption is similar
+>> - Workload:
+>>   rr1c-<bytes send>x<bytes received>-<parallel connections>
+>>
+>>   Highly transactional small data sizes (rr1c-1x1)
+>>     This is a Request & Response (RR) test that sends a 1-byte request
+>>     from the client and receives a 1-byte response from the server. This
+>>     is the smallest possible transactional workload test and is smaller
+>>     than most customer workloads. This test represents the RR overhead
+>>     costs.
+>>   Highly transactional medium data sizes (rr1c-200x1000)
+>>     Request & Response (RR) test that sends a 200-byte request from the
+>>     client and receives a 1000-byte response from the server. This test
+>>     should be representative of a typical user's interaction with a remote
+>>     web site.
+>>
+>> Link: https://lore.kernel.org/netdev/20220907122505.26953-1-wintera@linux.ibm.com/#t [0]
+>> Suggested-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+>> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+>> Co-developed-by: Nils Hoppmann <niho@linux.ibm.com>
+>> Signed-off-by: Nils Hoppmann <niho@linux.ibm.com>
+>> ---
+>>  drivers/net/ethernet/mellanox/mlx5/core/en_tx.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+>> index f8c7912abe0e..421ba6798ca7 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+>> @@ -32,6 +32,7 @@
+>>
+>>  #include <linux/tcp.h>
+>>  #include <linux/if_vlan.h>
+>> +#include <linux/iommu-dma.h>
+>>  #include <net/geneve.h>
+>>  #include <net/dsfield.h>
+>>  #include "en.h"
+>> @@ -269,6 +270,10 @@ static void mlx5e_sq_xmit_prepare(struct mlx5e_txqsq *sq, struct sk_buff *skb,
+>>  {
+>>         struct mlx5e_sq_stats *stats = sq->stats;
+>>
+>> +       /* Don't require 2 IOMMU TLB entries, if one is sufficient */
+>> +       if (use_dma_iommu(sq->pdev) && skb->truesize <= PAGE_SIZE)
+>> +               skb_linearize(skb);
+>> +
+>>         if (skb_is_gso(skb)) {
+>>                 int hopbyhop;
+>>                 u16 ihs = mlx5e_tx_get_gso_ihs(sq, skb, &hopbyhop);
+>> --
+>> 2.45.2
+> 
+> 
+> Was this tested on x86_64 or any other arch than s390, especially ones
+> with PAGE_SIZE = 65536 ?
+> 
+
+No, I don't have a mlx5 card in an x86_64.
+Rahul, could you test this patch?
 
