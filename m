@@ -1,183 +1,187 @@
-Return-Path: <netdev+bounces-148998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BAA79E3C26
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:07:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D9DA9E3C2A
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:07:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 904961651F1
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:06:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A208B165D1B
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3949C1F7084;
-	Wed,  4 Dec 2024 14:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF291F7084;
+	Wed,  4 Dec 2024 14:07:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E881F7077;
-	Wed,  4 Dec 2024 14:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA521F7077
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733321171; cv=none; b=suX+ueN52brdIbJ2iuTQW1VNPLl5hVB6n1zncWEO+1c1RXh3w7VM9mukDVGUhzrRMW2y39+SmV4mJITHpwFqOy2t91Hwd1bijxCj9qzRm8SqvXVR32dfUHj9VFVC96sjcdeZDDutJgdEiYJIaMopUGUZbmlQXPFa1ukqxl8AJ3A=
+	t=1733321251; cv=none; b=tPhsN6Xr9xE4OQ1/zNW4U506zxceaGPfOEB+IEZNyLgUkAS6pafaV6jvS+guEu3yveg5xdlktMSlDQA/NbNrKYevt+tB7KVLjF4jiSuSQKI8Fnb67jFhpIBuPfSSai2m/2Eg0eduXXCQ+8H2vHi9jjonryLQGmB452SBLyv5+VE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733321171; c=relaxed/simple;
-	bh=RWNa4SBIrFNFQj0FDse5D5NKKNuZ/AmE2EIPJPiv8x4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eOCLXGHVas7/dn8munlnUSqO2DFIFm+TFXKqSwL1rXbHHPIERE6Qge14Wcl+XfZ2BdFXysMTYkpvkUjrg3gPoCaht6+1FTmawwdJvy0F/TNcglqz2z+L/Yc1P8dDULqNkjrFtBPDe/WSO5YCFNSalQ+K1wIG1cUNaYusHnkEpZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A6871063;
-	Wed,  4 Dec 2024 06:06:35 -0800 (PST)
-Received: from [10.57.91.76] (unknown [10.57.91.76])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B03393F71E;
-	Wed,  4 Dec 2024 06:06:03 -0800 (PST)
-Message-ID: <df3a6a9d-4b53-4338-9bc5-c4eea48b8a40@arm.com>
-Date: Wed, 4 Dec 2024 14:06:00 +0000
+	s=arc-20240116; t=1733321251; c=relaxed/simple;
+	bh=khYYIL1AZfAz810shLu16zsq05uZ/Al2OnFFyM9OP3M=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=lRsNIbNHiEKLeDGdyvAcMDCQiE1ucNrhTHokYhcAn2X/M4usgvh1YqOH5+OiJqxBrAMQwuBCtEvghlsYxzi6SKDy/KukNNvTAHcttCjgGHgWKk9wU3iP25o/2aK+Tzv57UPooLCSYqPOkCOkfftqUO94O87muTjSMqKhOeid7KE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3a7e0d5899bso105004265ab.0
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 06:07:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733321248; x=1733926048;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=x2Ud3SMcdhxbmWry956o5qPU/FAuzuJBhulUZrst800=;
+        b=g6cWYsjRjO2ttNouEt2ZTB1xrjs1oFRxCuH/CMeXybF1tua/yoD6Tqd01cuedabGKK
+         cDLYrf6uGIW098Jb0ey1WFrYaPgAnCMJK91PyTnjrmaaRKD30d2eOCIZ4NqsJpXJKHVH
+         iklcnM/upGvRCEDD1K9VLzhuOuNiLtOhR+rYStZkJndozhKFZV1P8FrmdFFpOxl35v39
+         LZR2QdtVDLt7fnXyKNAAEUOEGgbtf6IJNYQVN1dr/BPNbswnedUVdsv5+Ncn0ecf3B9u
+         4nmahlAit7yMduyF47vVbpKsBKMZHQXla0TDRynuTAmgvljrzMSYLZd0l9mBlZ2UU1Pl
+         hTCA==
+X-Forwarded-Encrypted: i=1; AJvYcCUCq0d+PTbDUFNX1M3n5J6oS0a5XvCvNiP0k8PjkxwJI2dxzl1jQROIVxEAG6LCdBrw8/0bDNM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywl9b0Xzt/3S64A3gtD2mq3i0ZHYDjL9juF2xq73B4ZIzivxYRY
+	9x35arV4rF7z1i+PrN2FyD2MPrSvO64ChHBdVbXXdvydc8xpbJ7y1IG55AulRyDClzHELJjs0Am
+	SF6roH3QYExGtXcL56+k5HpcBngJQRyb4mIbQCyGkex+nBILijrlBN6Y=
+X-Google-Smtp-Source: AGHT+IEwK46Ytw4aWCL8G5SMWrsrfyDiV8Cg33EL5pES+dlcrO2kpEydm1Tor8HWPEvDkZcP3R2SpYwLZ6zYfp+COfLG5hFpuGNM
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v1] net: stmmac: TSO: Fix unbalanced DMA map/unmap for
- non-paged SKB data
-To: Thierry Reding <thierry.reding@gmail.com>, Furong Xu <0x1207@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com,
- Suraj Jaiswal <quic_jsuraj@quicinc.com>, Thierry Reding
- <treding@nvidia.com>,
- "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
- Will Deacon <will@kernel.org>
-References: <20241021061023.2162701-1-0x1207@gmail.com>
- <d8112193-0386-4e14-b516-37c2d838171a@nvidia.com>
- <20241128144501.0000619b@gmail.com> <20241202163309.05603e96@kernel.org>
- <20241203100331.00007580@gmail.com> <20241202183425.4021d14c@kernel.org>
- <20241203111637.000023fe@gmail.com>
- <klkzp5yn5kq5efgtrow6wbvnc46bcqfxs65nz3qy77ujr5turc@bwwhelz2l4dw>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <klkzp5yn5kq5efgtrow6wbvnc46bcqfxs65nz3qy77ujr5turc@bwwhelz2l4dw>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1947:b0:3a7:7d26:4ce4 with SMTP id
+ e9e14a558f8ab-3a7fecc8ddemr49118315ab.9.1733321248416; Wed, 04 Dec 2024
+ 06:07:28 -0800 (PST)
+Date: Wed, 04 Dec 2024 06:07:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67506220.050a0220.17bd51.006c.GAE@google.com>
+Subject: [syzbot] [hams?] kernel BUG in nr_header
+From: syzbot <syzbot+fb99d1b0c0f81d94a5e2@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, ralf@linux-mips.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 2024-12-04 1:57 pm, Thierry Reding wrote:
-> On Tue, Dec 03, 2024 at 11:16:37AM +0800, Furong Xu wrote:
->> On Mon, 2 Dec 2024 18:34:25 -0800, Jakub Kicinski <kuba@kernel.org> wrote:
->>
->>> On Tue, 3 Dec 2024 10:03:31 +0800 Furong Xu wrote:
->>>> I requested Jon to provide more info about "Tx DMA map failed" in previous
->>>> reply, and he does not respond yet.
->>>
->>> What does it mean to provide "more info" about a print statement from
->>> the driver? Is there a Kconfig which he needs to set to get more info?
->>> Perhaps you should provide a debug patch he can apply on his tree, that
->>> will print info about (1) which buffer mapping failed (head or frags);
->>> (2) what the physical address was of the buffer that couldn't be mapped.
->>
->> A debug patch to print info about buffer makes no sense here.
->> Both Tegra186 Jetson TX2(tegra186-p2771-0000) and Tegra194 Jetson AGX Xavier
->> (tegra194-p2972-0000) enable IOMMU/SMMU for stmmac in its device-tree node,
->> buffer info should be investigated with detailed IOMMU/SMMU debug info from
->> drivers/iommu/arm/arm-smmu/arm-smmu-nvidia.c together.
->>
->> I am not an expert in IOMMU, so I cannot help more.
->>
->> Without the help from Jon, our only choice is revert as you said.
-> 
-> I was able to reproduce this locally and I get this splat:
-> 
-> --- >8 ---
-> [  228.179234] WARNING: CPU: 0 PID: 0 at drivers/iommu/io-pgtable-arm.c:346 __arm_lpae_map+0x388/0x4e4
-> [  228.188300] Modules linked in: snd_soc_tegra210_mixer snd_soc_tegra210_admaif snd_soc_tegra_pcm snd_soc_tegra186_asrc snd_soc_tegra210_ope snd_soc_tegra210_adx snd_soc_tegra210_mvc snd_soc_tegra210_dmic snd_soc_tegra186_dspk snd_soc_tegra210_sfc snd_soc_tegra210_amx snd_soc_tegra210_i2s tegra_drm drm_dp_aux_bus cec drm_display_helper drm_client_lib tegra210_adma snd_soc_tegra210_ahub drm_kms_helper snd_hda_codec_hdmi snd_hda_tegra snd_soc_tegra_audio_graph_card at24 snd_hda_codec ina3221 snd_soc_audio_graph_card snd_soc_simple_card_utils tegra_bpmp_thermal tegra_xudc snd_hda_core tegra_aconnect host1x fuse drm backlight ipv6
-> [  228.243750] CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G S                 6.13.0-rc1-next-20241203 #30
-> [  228.253412] Tainted: [S]=CPU_OUT_OF_SPEC
-> [  228.257336] Hardware name: nvidia NVIDIA P2771-0000-500/NVIDIA P2771-0000-500, BIOS 2025.01-rc3-00040-g36352ae2e68e-dirty 01/01/2025
-> [  228.269239] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> [  228.276205] pc : __arm_lpae_map+0x388/0x4e4
-> [  228.280398] lr : __arm_lpae_map+0x120/0x4e4
-> [  228.284587] sp : ffff8000800037f0
-> [  228.287901] x29: ffff800080003800 x28: 0000000000000002 x27: 0000000000000001
-> [  228.295050] x26: 0000000000000001 x25: 0000000111580000 x24: 0000000000001000
-> [  228.302197] x23: 000000ffffc72000 x22: 0000000000000ec0 x21: 0000000000000003
-> [  228.309342] x20: 0000000000000001 x19: ffff00008574b000 x18: 0000000000000001
-> [  228.316486] x17: 0000000000000000 x16: 0000000000000001 x15: ffff800080003ad0
-> [  228.323631] x14: ffff00008574d000 x13: 0000000000000000 x12: 0000000000000001
-> [  228.330775] x11: 0000000000000001 x10: 0000000000000001 x9 : 0000000000001000
-> [  228.337921] x8 : ffff00008674c390 x7 : ffff00008674c000 x6 : 0000000000000003
-> [  228.345066] x5 : 0000000000000003 x4 : 0000000000000001 x3 : 0000000000000002
-> [  228.352209] x2 : 0000000000000001 x1 : 0000000000000000 x0 : ffff00008574b000
-> [  228.359356] Call trace:
-> [  228.361807]  __arm_lpae_map+0x388/0x4e4 (P)
-> [  228.366002]  __arm_lpae_map+0x120/0x4e4 (L)
-> [  228.370198]  __arm_lpae_map+0x120/0x4e4
-> [  228.374042]  __arm_lpae_map+0x120/0x4e4
-> [  228.377886]  __arm_lpae_map+0x120/0x4e4
-> [  228.381730]  arm_lpae_map_pages+0x108/0x250
-> [  228.385922]  arm_smmu_map_pages+0x40/0x120
-> [  228.390029]  __iommu_map+0xfc/0x1bc
-> [  228.393525]  iommu_map+0x38/0xc0
-> [  228.396759]  __iommu_dma_map+0xb4/0x1a4
-> [  228.400604]  iommu_dma_map_page+0x14c/0x27c
-> [  228.404795]  dma_map_page_attrs+0x1fc/0x280
-> [  228.408987]  stmmac_tso_xmit+0x2d0/0xbac
-> [  228.412920]  stmmac_xmit+0x230/0xd14
-> [  228.416505]  dev_hard_start_xmit+0x94/0x11c
-> [  228.420697]  sch_direct_xmit+0x8c/0x380
-> [  228.424540]  __qdisc_run+0x11c/0x66c
-> [  228.428121]  net_tx_action+0x168/0x228
-> [  228.431875]  handle_softirqs+0x100/0x244
-> [  228.435809]  __do_softirq+0x14/0x20
-> [  228.439303]  ____do_softirq+0x10/0x20
-> [  228.442972]  call_on_irq_stack+0x24/0x64
-> [  228.446903]  do_softirq_own_stack+0x1c/0x40
-> [  228.451091]  __irq_exit_rcu+0xd4/0x10c
-> [  228.454847]  irq_exit_rcu+0x10/0x1c
-> [  228.458343]  el1_interrupt+0x38/0x68
-> [  228.461927]  el1h_64_irq_handler+0x18/0x24
-> [  228.466032]  el1h_64_irq+0x6c/0x70
-> [  228.469438]  default_idle_call+0x28/0x58 (P)
-> [  228.473718]  default_idle_call+0x24/0x58 (L)
-> [  228.477998]  do_idle+0x1fc/0x260
-> [  228.481234]  cpu_startup_entry+0x34/0x3c
-> [  228.485163]  rest_init+0xdc/0xe0
-> [  228.488401]  console_on_rootfs+0x0/0x6c
-> [  228.492250]  __primary_switched+0x88/0x90
-> [  228.496270] ---[ end trace 0000000000000000 ]---
-> [  228.500950] dwc-eth-dwmac 2490000.ethernet: Tx dma map failed
-> --- >8 ---
-> 
-> This looks to be slightly different from what Jon was seeing. Looking at
-> the WARN_ON() that triggers this, it seems like for some reason the page
-> is getting mapped twice.
-> 
-> Not exactly sure why that would be happening, so adding Robin and Will,
-> maybe they can shed some light on this from the ARM SMMU side.
-> 
-> Robin, Will, any idea who could be the culprit here? Is this a map/unmap
-> imbalance or something else entirely?
+Hello,
 
-If valid PTEs are getting left behind in the pagetable, that would 
-indicate that a previous dma_unmap_page() was called with a size smaller 
-than its original dma_map_page(). Throwing CONFIG_DMA_API_DEBUG at it 
-should hopefully shed more light.
+syzbot found the following issue on:
 
-Cheers,
-Robin.
+HEAD commit:    fb24560f31f9 Merge tag 'lsm-pr-20240830' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10da2925980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=62bf36773c1381f1
+dashboard link: https://syzkaller.appspot.com/bug?extid=fb99d1b0c0f81d94a5e2
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-> A lot of the context isn't present in this thread anymore, but here's a
-> link to the top of the thread:
-> 
-> 	https://lore.kernel.org/netdev/d8112193-0386-4e14-b516-37c2d838171a@nvidia.com/T/
-> 
-> Thanks,
-> Thierry
+Unfortunately, I don't have any reproducer for this issue yet.
 
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-fb24560f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c32289df6ffb/vmlinux-fb24560f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4010abcccd39/bzImage-fb24560f.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fb99d1b0c0f81d94a5e2@syzkaller.appspotmail.com
+
+skbuff: skb_under_panic: text:ffffffff89fd546a len:24 put:20 head:ffff88802a0b9b00 data:ffff88802a0b9afe tail:0x16 end:0x140 dev:nr0.2
+------------[ cut here ]------------
+kernel BUG at net/core/skbuff.c:205!
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN NOPTI
+CPU: 2 UID: 0 PID: 5056 Comm: dhcpcd Not tainted 6.11.0-rc5-syzkaller-00207-gfb24560f31f9 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:skb_panic+0x157/0x1d0 net/core/skbuff.c:205
+Code: b6 04 01 84 c0 74 04 3c 03 7e 21 8b 4b 70 41 56 45 89 e8 48 c7 c7 80 3f 7a 8c 41 57 56 48 89 ee 52 4c 89 e2 e8 0a ee 83 f8 90 <0f> 0b 4c 89 4c 24 10 48 89 54 24 08 48 89 34 24 e8 04 38 02 f9 4c
+RSP: 0018:ffffc9000404f668 EFLAGS: 00010286
+RAX: 0000000000000086 RBX: ffff88802335c780 RCX: ffffffff816c4a19
+RDX: 0000000000000000 RSI: ffffffff816cde56 RDI: 0000000000000005
+RBP: ffffffff8c7a52a0 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000201 R11: 0000000000000000 R12: ffffffff89fd546a
+R13: 0000000000000014 R14: ffff88805209a130 R15: 0000000000000140
+FS:  00007f4e4cfb9740(0000) GS:ffff88806a800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000203e9000 CR3: 0000000028878000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 000000000000000e DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ skb_under_panic net/core/skbuff.c:215 [inline]
+ skb_push+0xca/0xf0 net/core/skbuff.c:2617
+ nr_header+0x2a/0x3e0 net/netrom/nr_dev.c:69
+ dev_hard_header include/linux/netdevice.h:3159 [inline]
+ vlan_dev_hard_header+0x13f/0x520 net/8021q/vlan_dev.c:83
+ dev_hard_header include/linux/netdevice.h:3159 [inline]
+ lapbeth_data_transmit+0x2a0/0x350 drivers/net/wan/lapbether.c:257
+ lapb_data_transmit+0x93/0xc0 net/lapb/lapb_iface.c:447
+ lapb_transmit_buffer+0xce/0x390 net/lapb/lapb_out.c:149
+ lapb_send_control+0x1c8/0x320 net/lapb/lapb_subr.c:251
+ lapb_establish_data_link+0xeb/0x110 net/lapb/lapb_out.c:163
+ lapb_device_event+0x398/0x570 net/lapb/lapb_iface.c:512
+ notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
+ call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1994
+ call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
+ call_netdevice_notifiers net/core/dev.c:2046 [inline]
+ __dev_notify_flags+0x12d/0x2e0 net/core/dev.c:8877
+ dev_change_flags+0x10c/0x160 net/core/dev.c:8915
+ devinet_ioctl+0x127a/0x1f10 net/ipv4/devinet.c:1177
+ inet_ioctl+0x3aa/0x3f0 net/ipv4/af_inet.c:1003
+ sock_do_ioctl+0x116/0x280 net/socket.c:1222
+ sock_ioctl+0x22e/0x6c0 net/socket.c:1341
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl fs/ioctl.c:893 [inline]
+ __x64_sys_ioctl+0x193/0x220 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f4e4d087d49
+Code: 5c c3 48 8d 44 24 08 48 89 54 24 e0 48 89 44 24 c0 48 8d 44 24 d0 48 89 44 24 c8 b8 10 00 00 00 c7 44 24 b8 10 00 00 00 0f 05 <41> 89 c0 3d 00 f0 ff ff 76 10 48 8b 15 ae 60 0d 00 f7 d8 41 83 c8
+RSP: 002b:00007ffeb96a1d98 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f4e4cfb96c0 RCX: 00007f4e4d087d49
+RDX: 00007ffeb96b1f88 RSI: 0000000000008914 RDI: 000000000000001b
+RBP: 00007ffeb96c2148 R08: 00007ffeb96b1f48 R09: 00007ffeb96b1ef8
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffeb96b1f88 R14: 0000000000000028 R15: 0000000000008914
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:skb_panic+0x157/0x1d0 net/core/skbuff.c:205
+Code: b6 04 01 84 c0 74 04 3c 03 7e 21 8b 4b 70 41 56 45 89 e8 48 c7 c7 80 3f 7a 8c 41 57 56 48 89 ee 52 4c 89 e2 e8 0a ee 83 f8 90 <0f> 0b 4c 89 4c 24 10 48 89 54 24 08 48 89 34 24 e8 04 38 02 f9 4c
+RSP: 0018:ffffc9000404f668 EFLAGS: 00010286
+RAX: 0000000000000086 RBX: ffff88802335c780 RCX: ffffffff816c4a19
+RDX: 0000000000000000 RSI: ffffffff816cde56 RDI: 0000000000000005
+RBP: ffffffff8c7a52a0 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000201 R11: 0000000000000000 R12: ffffffff89fd546a
+R13: 0000000000000014 R14: ffff88805209a130 R15: 0000000000000140
+FS:  00007f4e4cfb9740(0000) GS:ffff88806a800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000203e9000 CR3: 0000000028878000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 000000000000000e DR6: 00000000ffff0ff0 DR7: 0000000000000400
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
