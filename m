@@ -1,254 +1,167 @@
-Return-Path: <netdev+bounces-149078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7296C9E4185
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 18:29:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 759829E4355
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 19:26:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95DAAB6016A
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 16:43:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7985B28569
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 16:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F7920CCC5;
-	Wed,  4 Dec 2024 16:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D073420C473;
+	Wed,  4 Dec 2024 16:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="eKahpvPI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ta8+rhef"
 X-Original-To: netdev@vger.kernel.org
-Received: from master.debian.org (master.debian.org [82.195.75.110])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795324A28;
-	Wed,  4 Dec 2024 16:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503BE15B10D;
+	Wed,  4 Dec 2024 16:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733330594; cv=none; b=jJfDd3vmU/BFGTcIRQoQvRz1BxyedqOaWYwnFC6fqMuROfI9/uRRPVNqfhkaMxXtKbmfWg771KtHsWo7jZIxkmo6jcpkZn/GYrvTs/F4+NNp8CyDSjX+uiDtuPrqNeN9q8xun2b2ABIcR/P4PPyEBH8jdrKxgp2MpRkTLv+B0KE=
+	t=1733330398; cv=none; b=b3QWKxAEAd9us2T3wxJfOu1ycwEpYEg6DNqKNKQwgBEoLAGycG2bgiiRoNgmJaoiKS03UcbC2IxJ2R8G2m3qNc71pWNHZEZ5RcxCZ41vVevUtkbaODwavSyRz12lJ5kN7/zSapgZyulnspZVvBfwkXzQuLrAe76andf6DZsQaws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733330594; c=relaxed/simple;
-	bh=4tT1xTsxXZUI5Me8CpxOiXh3OyZEi6xFVGPDWXNILGs=;
+	s=arc-20240116; t=1733330398; c=relaxed/simple;
+	bh=LI0f/8L5VMaa8rlarlrPNXlZjnS/iGICZEw87IVicV0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YLrNSjFfbyDr15Pdf6jPPcetAqEdRigytn4yJTBV31uZb4LFwU7dV97DshsrQNGUwMQy2csl1wYQvUj6/wKI5oIvC4lsA4PrhQSeS1tzKAF/80jLlOkAMildveBZgYkRkrHfrEmMjL7FY0m1KYTbC052GO9xKfLSYQSraBebXcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=master.debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=eKahpvPI; arc=none smtp.client-ip=82.195.75.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=master.debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.master; h=In-Reply-To:Content-Type:MIME-Version:References:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description;
-	bh=hSp0xWyYxAqanUPupWSJ2QUcd1qQP8zfPnZwqCrb51E=; b=eKahpvPI8v0ItV9zLwcMXCsJoT
-	pq9msAVeID6nZD5j+pNM05LsGkW2k+b5XRWG/Ydr2413QMs4hmH4NoHpcXbVjw0HLCfqjrSR+RUyn
-	8msd5D2TckXIBokSoptmKw1di8McWLybY16z1cdRbMYbpLOyJMF0l5JFc2om3qqeSFrTQ73s5DZX5
-	tsd731J6rxoOSoPqAVGlTxtp6gITnP+yXQZhFX7UCAPQy/qav13XGotVAIb87ifdNpQp7Hfgano+4
-	xt0HM4bzEqaL1HNEnP8YFxG3zSfxz1QNsP1Sp1NTnt9SOfxscHPVV6OdZhjKUGiIB7NqWE1QrxNtQ
-	670fg5HQ==;
-Received: from ukleinek by master.debian.org with local (Exim 4.94.2)
-	(envelope-from <ukleinek@master.debian.org>)
-	id 1tIsN8-00EObM-IS; Wed, 04 Dec 2024 16:37:06 +0000
-Date: Wed, 4 Dec 2024 17:37:05 +0100
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@debian.org>
-To: Francesco Poli <invernomuto@paranoici.org>
-Cc: Leon Romanovsky <leonro@nvidia.com>, 
-	"1086520@bugs.debian.org Mark Zhang" <markzhang@nvidia.com>, linux-rdma@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: Bug#1086520: linux-image-6.11.2-amd64: makes opensm fail to start
-Message-ID: <acpo6ocggcl66fjdllk5zrfs2vwiivpetd5ierdek5ruxvdbyl@tfbc3mfnp23o>
-References: <20241113231503.54d12ed5b5d0c8fa9b7d9806@paranoici.org>
- <3wfi2j7jn2f7rajabfcengubgtyt3wkuin6hqepdoe5dlvfhvn@2clhco3z6fuw>
- <173040083268.16618.7451145398661885923.reportbug@crunch>
- <20241118200616.865cb4c869e693b19529df36@paranoici.org>
- <nvs4i2v7o6vn6zhmtq4sgazy2hu5kiulukxcntdelggmznnl7h@so3oul6uwgbl>
- <20241125195443.0ddf0d0176d7c34bd29942c7@paranoici.org>
- <20241125193837.GH160612@unreal>
- <20241127184803.75086499e71c6b1588a4fb5a@paranoici.org>
- <173040083268.16618.7451145398661885923.reportbug@crunch>
- <20241127200413.GE1245331@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LreL2G8rh+OXbzv19nMkIHrB0MHhg3RQ0bzU9f/efq9mn7HA9CRZ1TjbZGv0aXSvFMyHmhIbQp8VMaKnGMy2yNCic+RFaZPJuZm54RDHqXt74VlaQRz4I39qAtl94jnMh2jDuLnDTw6TUTEDgglL4kDMnYCNdueb+B3DO20fnkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ta8+rhef; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=t8Qpni1g+CTP4DtqlAKjnlwu/KLFrA6csbzYi4hK4/c=; b=ta8+rhefvAfTVON2qkfHns8aKZ
+	M3XgNBM1LKMVU/0hPzAABXNPwE1ahhu39CoKAY6ro8Z5K5XSyjrV2mUmNVjMLoH8iRUQ175ViA3ai
+	Cjy25bi6xMVT0qJmza5h/5eTycpxyifsdFrPNu6Onj1aLEoBNw3U1Povys8tefq3W+sxf3HOM0wSm
+	p74skew5erUlsSllvX8L2IxRjnCSrszXm+ncYbx4w6JqSayC1b+GLpdPhtab9hx0vdbDUJFtD18IW
+	AZ30ZID3dKWRdEpD9Cipoh79ds1zjZ2Z5HL8F4GtBH9RWrGu/2wMDE+MIkxmtKUWOzLkMs7MsSRRY
+	m0bccgOw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43724)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tIsPk-0003eW-0H;
+	Wed, 04 Dec 2024 16:39:48 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tIsPf-0005hd-1N;
+	Wed, 04 Dec 2024 16:39:43 +0000
+Date: Wed, 4 Dec 2024 16:39:43 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Thierry Reding <thierry.reding@gmail.com>
+Cc: Robin Murphy <robin.murphy@arm.com>, Furong Xu <0x1207@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com,
+	Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+	Thierry Reding <treding@nvidia.com>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH net v1] net: stmmac: TSO: Fix unbalanced DMA map/unmap
+ for non-paged SKB data
+Message-ID: <Z1CFz7GpeIzkDro1@shell.armlinux.org.uk>
+References: <20241021061023.2162701-1-0x1207@gmail.com>
+ <d8112193-0386-4e14-b516-37c2d838171a@nvidia.com>
+ <20241128144501.0000619b@gmail.com>
+ <20241202163309.05603e96@kernel.org>
+ <20241203100331.00007580@gmail.com>
+ <20241202183425.4021d14c@kernel.org>
+ <20241203111637.000023fe@gmail.com>
+ <klkzp5yn5kq5efgtrow6wbvnc46bcqfxs65nz3qy77ujr5turc@bwwhelz2l4dw>
+ <df3a6a9d-4b53-4338-9bc5-c4eea48b8a40@arm.com>
+ <2g2lp3bkadc4wpeslmdoexpidoiqzt7vejar5xhjx5ayt3uox3@dqdyfzn6khn6>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="eq7qn5hdhaesruc2"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241127200413.GE1245331@unreal>
+In-Reply-To: <2g2lp3bkadc4wpeslmdoexpidoiqzt7vejar5xhjx5ayt3uox3@dqdyfzn6khn6>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Wed, Dec 04, 2024 at 04:58:34PM +0100, Thierry Reding wrote:
+> This doesn't match the location from earlier, but at least there's
+> something afoot here that needs fixing. I suppose this could simply be
+> hiding any subsequent errors, so once this is fixed we might see other
+> similar issues.
 
---eq7qn5hdhaesruc2
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: Bug#1086520: linux-image-6.11.2-amd64: makes opensm fail to start
-MIME-Version: 1.0
+Well, having a quick look at this, the first thing which stands out is:
 
-Hello Francesco,
+In stmmac_tx_clean(), we have:
 
-On Wed, Nov 27, 2024 at 10:04:13PM +0200, Leon Romanovsky wrote:
-> On Wed, Nov 27, 2024 at 06:48:03PM +0100, Francesco Poli wrote:
-> > On Mon, 25 Nov 2024 21:38:37 +0200 Leon Romanovsky wrote:
-> >=20
-> > > On Mon, Nov 25, 2024 at 07:54:43PM +0100, Francesco Poli wrote:
-> > [...]
-> > > > I will try to continue to bisect by testing the resulting kernels o=
-n a
-> > > > compute node: there's no OpenSM there and it cannot run anyway, if
-> > > > there's another OpenSM on the same InfiniBand network.
-> > > > However, I can check whether those issm* symlinks are created in
-> > > > /sys/class/infiniband_mad/=20
-> > > > I really hope that this is enough to pinpoint the first bad
-> > > > commit...
-> > >=20
-> > > Yes, these symlinks should be there. Your test scenario is correct on=
-e.
-> >=20
-> > OK, I have completed the bisect on a compute node without OpenSM, by
-> > looking at the issm* symlinks, as I said.
-> >=20
-> > See below.
-> >=20
-> > >=20
-> > > >=20
-> > > > Any better ideas?
-> > >=20
-> > > I think that commit: 2a5db20fa532 ("RDMA/mlx5: Add support to multi-p=
-lane device and port")
-> > > is the one which is causing to troubles, which leads me to suspect FW.
-> > [...]
-> >=20
-> > Thanks to your guess about the possibly troublesome commit, the bisect =
-was completed in a few steps:
-> >=20
-> >   $ git checkout 2a5db20fa532
-> >   $ make -j 12 my_defconfig bindeb-pkg
-> >  =20
-> >   [install this version on a compute node test image and reboot
-> >   one compute node with that image: the InfiniBand network was
-> >   working for that node, that's no surprise, since OpenSM was running
-> >   on the head node, but no issm* symlink was created; please note
-> >   that, surprisingly, the Ethernet network was not working, I mean
-> >   that the Ethernet interfaces were not found by the kernel...]
-> >  =20
-> >   root@node # ls -altrF /sys/class/infiniband_mad/
-> >   total 0
-> >   drwxr-xr-x 60 root root    0 Nov 26 17:06 ../
-> >   lrwxrwxrwx  1 root root    0 Nov 26 17:06 umad0 -> ../../devices/pci0=
-000:00/0000:00:01.1/0000:01:00.0/infiniband_mad/umad0/
-> >   -r--r--r--  1 root root 4096 Nov 26 17:06 abi_version
-> >   lrwxrwxrwx  1 root root    0 Nov 26 17:06 umad1 -> ../../devices/pci0=
-000:00/0000:00:01.1/0000:01:00.1/infiniband_mad/umad1/
-> >   drwxr-xr-x  2 root root    0 Nov 26 17:08 ./
-> >  =20
-> >   $ git bisect bad
-> >   Bisecting: 0 revisions left to test after this (roughly 0 steps)
-> >   [65528cfb21fdb68de8ae6dccae19af180d93e143] net/mlx5: mlx5_ifc update =
-for multi-plane support
-> >   $ make -j 12 my_defconfig bindeb-pkg
-> >  =20
-> >   [install this version on the compute node test image and reboot
-> >   one compute node with that image: the InfiniBand network again
-> >   working for that node, issm* symlinks were created;
-> >   Ethernet network again not working for that node...]
-> >  =20
-> >   root@node # ls -altrF /sys/class/infiniband_mad/
-> >   total 0
-> >   drwxr-xr-x 60 root root    0 Nov 26 17:31 ../
-> >   lrwxrwxrwx  1 root root    0 Nov 26 17:31 umad0 -> ../../devices/pci0=
-000:00/0000:00:01.1/0000:01:00.0/infiniband_mad/umad0/
-> >   -r--r--r--  1 root root 4096 Nov 26 17:31 abi_version
-> >   lrwxrwxrwx  1 root root    0 Nov 26 17:31 umad1 -> ../../devices/pci0=
-000:00/0000:00:01.1/0000:01:00.1/infiniband_mad/umad1/
-> >   lrwxrwxrwx  1 root root    0 Nov 26 17:36 issm1 -> ../../devices/pci0=
-000:00/0000:00:01.1/0000:01:00.1/infiniband_mad/issm1/
-> >   lrwxrwxrwx  1 root root    0 Nov 26 17:36 issm0 -> ../../devices/pci0=
-000:00/0000:00:01.1/0000:01:00.0/infiniband_mad/issm0/
-> >   drwxr-xr-x  2 root root    0 Nov 26 17:36 ./
-> >  =20
-> >   $ git bisect good
-> >   2a5db20fa532198639671713c6213f96ff285b85 is the first bad commit
-> >   commit 2a5db20fa532198639671713c6213f96ff285b85
-> >   Author: Mark Zhang <markzhang@nvidia.com>
-> >   Date:   Sun Jun 16 19:08:35 2024 +0300
-> >  =20
-> >       RDMA/mlx5: Add support to multi-plane device and port
-> >  =20
-> >       When multi-plane is supported, a logical port, which is aggregati=
-on of
-> >       multiple physical plane ports, is exposed for data transmission.
-> >       Compared with a normal mlx5 IB port, this logical port supports a=
-ll
-> >       functionalities except Subnet Management.
-> >  =20
-> >       Signed-off-by: Mark Zhang <markzhang@nvidia.com>
-> >       Link: https://lore.kernel.org/r/7e37c06c9cb243be9ac79930cd1705390=
-3785b95.1718553901.git.leon@kernel.org
-> >       Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> >  =20
-> >    drivers/infiniband/hw/mlx5/main.c               | 60 +++++++++++++++=
-++++++----
-> >    drivers/infiniband/hw/mlx5/mlx5_ib.h            |  2 +
-> >    drivers/net/ethernet/mellanox/mlx5/core/vport.c |  1 +
-> >    include/linux/mlx5/driver.h                     |  1 +
-> >    4 files changed, 55 insertions(+), 9 deletions(-)
-> >=20
-> >=20
-> > In other words, bingo!, your guess looks correct, the first bad commit
-> > is the one you mentioned.
-> >=20
-> >=20
-> > Now, I will try to upgrade the firmware of the InfiniBand NICs, as you
-> > suggested, and check whether this solves the issue with the recent
-> > Linux kernel versions.
-> >=20
-> > Please confirm that the procedure to be followed is the one described in
-> > <https://docs.nvidia.com/networking/display/ubuntu2204/firmware+burning>
->=20
-> Yes, it looks correct procedure.
-> If you didn't upgrade FW, this diff will achieve same result for you:
->=20
-> diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/ml=
-x5/main.c
-> index c2314797afc9..110ce177c305 100644
-> --- a/drivers/infiniband/hw/mlx5/main.c
-> +++ b/drivers/infiniband/hw/mlx5/main.c
-> @@ -2846,7 +2846,7 @@ static int mlx5_ib_get_plane_num(struct mlx5_core_d=
-ev *mdev, u8 *num_plane)
->         if (err)
->                 return err;
->=20
-> -       *num_plane =3D vport_ctx.num_plane;
-> +       *num_plane =3D (vport_ctx.num_plane > 1) ? vport_ctx.num_plane : =
-0;
->         return 0;
->  }
->=20
-> The culprit of your issue that in some FW versions, the vport_ctx.num_pla=
-ne
-> was 1 and not 0 for devices which don't support that mode, while for the =
-driver
-> everything that is not 0 means supported.
+                if (likely(tx_q->tx_skbuff_dma[entry].buf &&
+                           tx_q->tx_skbuff_dma[entry].buf_type != STMMAC_TXBUF_T
+_XDP_TX)) {
+                        if (tx_q->tx_skbuff_dma[entry].map_as_page)
+                                dma_unmap_page(priv->device,
+                                               tx_q->tx_skbuff_dma[entry].buf,
+                                               tx_q->tx_skbuff_dma[entry].len,
+                                               DMA_TO_DEVICE);
+                        else
+                                dma_unmap_single(priv->device,
+                                                 tx_q->tx_skbuff_dma[entry].buf,
+                                                 tx_q->tx_skbuff_dma[entry].len,
+                                                 DMA_TO_DEVICE);
+                        tx_q->tx_skbuff_dma[entry].buf = 0;
+                        tx_q->tx_skbuff_dma[entry].len = 0;
+                        tx_q->tx_skbuff_dma[entry].map_as_page = false;
+                }
 
-I wonder if you could test a firmware upgrade or the above patch. Would
-be nice to know if there are still some things to do for us (=3D Debian
-kernel team) here.
+So, tx_skbuff_dma[entry].buf is expected to point appropriately to the
+DMA region.
 
-If everything is fine for you, I'd like to close this bug.
+Now if we look at stmmac_tso_xmit():
 
-Best regards
-Uwe
+        des = dma_map_single(priv->device, skb->data, skb_headlen(skb),
+                             DMA_TO_DEVICE);
+        if (dma_mapping_error(priv->device, des))
+                goto dma_map_err;
 
---eq7qn5hdhaesruc2
-Content-Type: application/pgp-signature; name="signature.asc"
+        if (priv->dma_cap.addr64 <= 32) {
+...
+        } else {
+...
+                des += proto_hdr_len;
+...
+	}
 
------BEGIN PGP SIGNATURE-----
+        tx_q->tx_skbuff_dma[tx_q->cur_tx].buf = des;
+        tx_q->tx_skbuff_dma[tx_q->cur_tx].len = skb_headlen(skb);
+        tx_q->tx_skbuff_dma[tx_q->cur_tx].map_as_page = false;
+        tx_q->tx_skbuff_dma[tx_q->cur_tx].buf_type = STMMAC_TXBUF_T_SKB;
 
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmdQhS4ACgkQj4D7WH0S
-/k78mggAgQeh/GCn2XHHJQ4qCF+fi4lbYa4h5vWY3TeUfVkO5sd3qEXjcnYYi2D8
-XjMPToRyBws3qsHdtzVP70mHZJIPbtSf2Ah22n4PUtf1St/j+o6MkgUWgviYPiO2
-y0Ayux/2aFXLhdTHuM44jXVkGJU5nCv9gpO9aiSb8wdwy3Kif0vzgAnj1uXxbNXC
-/sfCk9lhOz6HQZGldDNL5fudAMFWwt3DJb0BxpvVe8XzE9Uradsh7pUWs7K6rRLj
-yurlX9SxYhQ0oWycTsmHxcvwz5ltdXQ4Veb3gJbsLntmDofsiMHw1YhJqKPUCMVp
-jrGokmLt57u6GaWz+ZKnhC40q9vVNQ==
-=RBHV
------END PGP SIGNATURE-----
+This will result in stmmac_tx_clean() calling dma_unmap_single() using
+"des" and "skb_headlen(skb)" as the buffer start and length.
 
---eq7qn5hdhaesruc2--
+One of the requirements of the DMA mapping API is that the DMA handle
+returned by the map operation will be passed into the unmap function.
+Not something that was offset. The length will also be the same.
+
+We can clearly see above that there is a case where the DMA handle has
+been offset by proto_hdr_len, and when this is so, the value that is
+passed into the unmap operation no longer matches this requirement.
+
+So, a question to the reporter - what is the value of
+priv->dma_cap.addr64 in your failing case? You should see the value
+in the "Using %d/%d bits DMA host/device width" kernel message.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
