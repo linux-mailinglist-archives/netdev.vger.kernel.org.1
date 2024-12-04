@@ -1,213 +1,155 @@
-Return-Path: <netdev+bounces-149129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C9439E4639
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 22:01:41 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF957168753
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 21:01:35 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080B41917D7;
-	Wed,  4 Dec 2024 21:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nNSRR48i"
-X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 418D29E463F
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 22:02:48 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3742918DF81;
-	Wed,  4 Dec 2024 21:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 023EE284096
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 21:02:47 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB81E18C900;
+	Wed,  4 Dec 2024 21:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yrBCUM6f"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A72918DF81
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 21:02:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733346089; cv=none; b=ToBsswANOLXscQ4bDSfPXHd7W/kwT8Op8Q5MBNV+eBaXyxrEYjw0rluBqe/Il4bzZTJYNwTysUce8/KtpeFcdz709tYZ+ZKCdAYY3QkIwKe2J42sTfmPj2ufuRxdZfVD1Zf0TgL022UCIc4Gb9R1f1npnTNaHvVzpr/zMZiwVvg=
+	t=1733346164; cv=none; b=rtrtNFb2z4oT4fgq9u+L2NYNvJlfXVoltb4cT+iVvACCWiW69FLP6VTAIs3l4WXG8I6gjsp7wUcpZPVp9IJqp/ho2qV9DNuhotSrWRdj9Rq90iBwrRKF4N+UdCxaa8/Pgaa33nvKczKDkzEzTBJNn90qm8aHGByC+FJ0tRM3/DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733346089; c=relaxed/simple;
-	bh=YYisex5fANxvp1J7FXSt2wFTYyLxl4fy8A9aDQDg1FQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CNvrbLHg+1IuHwK6kwlRGa4AJjhPGK2Weg1G0uCFHS0JO8ri9aQuoYKRCwKyQUkl5aMDzkYgRV/mH1JC/bStrTF7fGQsVlsomLui2poeiWOdxzTAW/iEH90SOvbG1gAmND1s4seez4+UGFchNsZ9D44r87Zbo10SHKB7oLg6zg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nNSRR48i; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733346088; x=1764882088;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YYisex5fANxvp1J7FXSt2wFTYyLxl4fy8A9aDQDg1FQ=;
-  b=nNSRR48i5t9Qm9/t5po/KTw13GNfQkhEabEwgZE/trvtAd5kVzZAzFkB
-   pNr9Provy09XZweEesbuoDeqHlPiCrM0O0NXLBwon3VXoY1xzi3Dn4FNt
-   duTbwgU331MHNg/jPABW7ZbO6n2cPqYWWnGyGfGP/WFdFoKLmS0yNsTo1
-   A+R+W/Khlv+oLJKkAcADYc1WSxeUDo4cFSKgXLFNwEuJ1r8rPzi1zu3SV
-   d2G+7yuulEG3IYIoRQWm2BpY9OhHMA9SvFVkmYAsiAl6ov7HPUc190y2K
-   yQshcoHESyxoin+aDII00rgsVDIw+di0evf+V/B4a7luXLobrjmwbx5ft
-   A==;
-X-CSE-ConnectionGUID: dW3lS1L2R7iWSW1w8WfVLg==
-X-CSE-MsgGUID: pAWn637UTgSHidUSV8nRlw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="33376974"
-X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
-   d="scan'208";a="33376974"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 13:01:25 -0800
-X-CSE-ConnectionGUID: QWS2hJyNQWOxHgI42sEvdA==
-X-CSE-MsgGUID: 21i45RZzRYqLQ7OlhLyg3A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
-   d="scan'208";a="97937245"
-Received: from lkp-server02.sh.intel.com (HELO 1f5a171d57e2) ([10.239.97.151])
-  by fmviesa003.fm.intel.com with ESMTP; 04 Dec 2024 13:01:21 -0800
-Received: from kbuild by 1f5a171d57e2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tIwUo-0003UD-2j;
-	Wed, 04 Dec 2024 21:01:18 +0000
-Date: Thu, 5 Dec 2024 05:00:58 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tariq Toukan <tariqt@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
-	linux-rdma@vger.kernel.org, Carolina Jubran <cjubran@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net-next V4 07/11] devlink: Extend devlink rate API with
- traffic classes bandwidth management
-Message-ID: <202412050416.e7egEz4f-lkp@intel.com>
-References: <20241203202924.228440-8-tariqt@nvidia.com>
+	s=arc-20240116; t=1733346164; c=relaxed/simple;
+	bh=tNCQRmA7uVZfWXZM1ueV0TK3opBAR/9bLL/BlNT0JbI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Uq5xVDOv5cwWiy2vU1o2nts7NVfM6tN/AM3gvZMui9wVVUGjN5tzQ5zsqI3uYha88cI43NQ12ihaQvDgii6jQ90bTvwxcgeQQ49qRgLqQHubd/NgwGBXhhfqrN6BVDZIapl1opKurEIz8j618cbuaprhb7LFJ8vHro/LiFGHbd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yrBCUM6f; arc=none smtp.client-ip=209.85.219.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-6d894e3fb33so6511236d6.2
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 13:02:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733346162; x=1733950962; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GNRPDIvz3xNKk/kgnn/P6cIj2qZh/XeTmjHX6t36200=;
+        b=yrBCUM6f5Nf8UgFz3+G3Yldodhh3k/XdEE6yZmMF1yLh14cPzqpG3ncy9W+zcJlKun
+         etVbBZqDo1pbZD9JJM/negQo/L1upDWE0QoBeZRv5lYeUrByJO2WQ85ng/k0LsIX9Dwe
+         aA8crLehuJoSt0mifp1srsefyDQiU5gLtLOxWbNA6ncGDRTTZsFlQ/Ycix1vb67AYjV3
+         NC8J9ywS1rtGYQIwbIDgRXGqk0pEj9fYziIujBmZ85lGb1myZEDnesDButOtLCBrC6gH
+         KEJ0gBnK9UuirsAggjPVeormiin00tif49e3eSSVU2UPX0zOP9hjRvBL0ikggSDZcY02
+         SqwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733346162; x=1733950962;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GNRPDIvz3xNKk/kgnn/P6cIj2qZh/XeTmjHX6t36200=;
+        b=DmE6+MAjgdm6CSdRTdr67HQOPaUWSyKDsmRfuoz3fO+TIbTrzsK5gG0YRCXLGbZGPe
+         ia6SVEdsiqQc1+wrmc1GpZCQwo/2hCzoZil+3Q4S85/XFHw4kfU76FUICzNoI2VcubhQ
+         N676xNb7qF160LVibG6bGfE0I/Bqh3Y+ckLdvF/eoJ1g4KkJs89phkYGxTdrIq/pIXN2
+         qb1kE+YfW9ZgbrrpG6BQ8R68KL9kWBPsLZar/6j4D0su0SEtR71yJHcSdX5xV11R5+6u
+         B0kWyGFDdZsGB4OsjgbhILQP4RWbjAGMVQfKTlQuOlWvhKkTjuqlTcgbdtPynkzgwJCe
+         M3Cw==
+X-Gm-Message-State: AOJu0YxDj7Z3qYI3jmVRDJZroDQzZnOLNimAODHiDyPeaoyLY2HfytAY
+	0hmp42PDb0eXW2by+6tgquQ55oy0qvZs5nvyTUYdI56gvcJovIRmcPSqvh0+tuM3kz9hAa1QldF
+	yB7HG7+jO7g==
+X-Google-Smtp-Source: AGHT+IHrC3VX/WMNa5f6Ore2z04+9N1Rz39ldJ8xGmvmYlY/Jv0qlWYh+Vs5dtK4SDiYrfL6/wsEP5JiPM6xVQ==
+X-Received: from qvbqy5.prod.google.com ([2002:a05:6214:4d05:b0:6d8:adbe:3a8b])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ad4:5bcd:0:b0:6d8:aba8:8393 with SMTP id 6a1803df08f44-6d8b74039f9mr100891226d6.44.1733346162288;
+ Wed, 04 Dec 2024 13:02:42 -0800 (PST)
+Date: Wed,  4 Dec 2024 21:02:34 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241203202924.228440-8-tariqt@nvidia.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241204210234.319484-1-edumazet@google.com>
+Subject: [PATCH net-next] net: tipc: remove one synchronize_net() from tipc_nametbl_stop()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Jon Maloy <jmaloy@redhat.com>, 
+	Ying Xue <ying.xue@windriver.com>, tipc-discussion@lists.sourceforge.net
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Tariq,
+tipc_exit_net() is very slow and is abused by syzbot.
 
-kernel test robot noticed the following build warnings:
+tipc_nametbl_stop() is called for each netns being dismantled.
 
-[auto build test WARNING on net-next/main]
+Calling synchronize_net() right before freeing tn->nametbl
+is a big hammer.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tariq-Toukan/net-mlx5-ifc-Reorganize-mlx5_ifc_flow_table_context_bits/20241204-124235
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241203202924.228440-8-tariqt%40nvidia.com
-patch subject: [PATCH net-next V4 07/11] devlink: Extend devlink rate API with traffic classes bandwidth management
-config: x86_64-buildonly-randconfig-001-20241205 (https://download.01.org/0day-ci/archive/20241205/202412050416.e7egEz4f-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241205/202412050416.e7egEz4f-lkp@intel.com/reproduce)
+Replace this with kfree_rcu().
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412050416.e7egEz4f-lkp@intel.com/
+Note that RCU is not properly used here, otherwise
+tn->nametbl should be cleared before the synchronize_net()
+or kfree_rcu(), or even before the cleanup loop.
 
-All warnings (new ones prefixed by >>):
+We might need to fix this at some point.
 
-   In file included from net/devlink/rate.c:7:
-   In file included from net/devlink/devl_internal.h:7:
-   In file included from include/linux/etherdevice.h:20:
-   In file included from include/linux/if_ether.h:19:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/x86/include/asm/cacheflush.h:5:
-   In file included from include/linux/mm.h:2223:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   In file included from net/devlink/rate.c:7:
-   net/devlink/devl_internal.h:29:19: warning: arithmetic between different enumeration types ('enum devlink_reload_limit' and 'enum devlink_reload_action') [-Wenum-enum-conversion]
-      29 |         u32 reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
-         |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:26:30: note: expanded from macro 'DEVLINK_RELOAD_STATS_ARRAY_SIZE'
-      26 |         (__DEVLINK_RELOAD_LIMIT_MAX * __DEVLINK_RELOAD_ACTION_MAX)
-         |          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:30:26: warning: arithmetic between different enumeration types ('enum devlink_reload_limit' and 'enum devlink_reload_action') [-Wenum-enum-conversion]
-      30 |         u32 remote_reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
-         |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:26:30: note: expanded from macro 'DEVLINK_RELOAD_STATS_ARRAY_SIZE'
-      26 |         (__DEVLINK_RELOAD_LIMIT_MAX * __DEVLINK_RELOAD_ACTION_MAX)
-         |          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> net/devlink/rate.c:403:4: warning: 'snprintf' will always be truncated; specified size is 80, but format string expands to at least 83 [-Wformat-truncation]
-     403 |                         NL_SET_ERR_MSG_FMT(info->extack,
-         |                         ^
-   include/linux/netlink.h:116:6: note: expanded from macro 'NL_SET_ERR_MSG_FMT'
-     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
-         |             ^
-   7 warnings generated.
+Also note tipc uses other synchronize_rcu() calls,
+more work is needed to make tipc_exit_net() much faster.
 
+List of remaining calls to synchronize_rcu()
 
-vim +/snprintf +403 net/devlink/rate.c
+  tipc_detach_loopback() (dev_remove_pack())
+  tipc_bcast_stop()
+  tipc_sk_rht_destroy()
 
-   381	
-   382	static int devlink_nl_rate_tc_bw_set(struct devlink_rate *devlink_rate,
-   383					     struct genl_info *info)
-   384	{
-   385		DECLARE_BITMAP(bitmap, IEEE_8021QAZ_MAX_TCS) = {};
-   386		struct devlink *devlink = devlink_rate->devlink;
-   387		const struct devlink_ops *ops = devlink->ops;
-   388		u32 tc_bw[IEEE_8021QAZ_MAX_TCS] = {};
-   389		int rem, err = -EOPNOTSUPP, i;
-   390		struct nlattr *attr;
-   391	
-   392		nla_for_each_attr(attr, genlmsg_data(info->genlhdr),
-   393				  genlmsg_len(info->genlhdr), rem) {
-   394			if (nla_type(attr) == DEVLINK_ATTR_RATE_TC_BWS) {
-   395				err = devlink_nl_rate_tc_bw_parse(attr, tc_bw, bitmap, info->extack);
-   396				if (err)
-   397					return err;
-   398			}
-   399		}
-   400	
-   401		for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
-   402			if (!test_bit(i, bitmap)) {
- > 403				NL_SET_ERR_MSG_FMT(info->extack,
-   404						   "Incomplete traffic class bandwidth values, all %u traffic classes must be specified",
-   405						   IEEE_8021QAZ_MAX_TCS);
-   406				return -EINVAL;
-   407			}
-   408		}
-   409	
-   410		if (devlink_rate_is_leaf(devlink_rate))
-   411			err = ops->rate_leaf_tc_bw_set(devlink_rate, devlink_rate->priv, tc_bw,
-   412						       info->extack);
-   413		else if (devlink_rate_is_node(devlink_rate))
-   414			err = ops->rate_node_tc_bw_set(devlink_rate, devlink_rate->priv, tc_bw,
-   415						       info->extack);
-   416	
-   417		if (err)
-   418			return err;
-   419	
-   420		memcpy(devlink_rate->tc_bw, tc_bw, sizeof(tc_bw));
-   421	
-   422		return 0;
-   423	}
-   424	
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+Cc: Jon Maloy <jmaloy@redhat.com>
+Cc: Ying Xue <ying.xue@windriver.com>
+Cc: tipc-discussion@lists.sourceforge.net
+---
+ net/tipc/name_table.c | 4 ++--
+ net/tipc/name_table.h | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
+diff --git a/net/tipc/name_table.c b/net/tipc/name_table.c
+index d1180370fdf41cb05c86522b4da6aa412a54cce9..e74940eab3a47901d49b552767b16793c4459aa2 100644
+--- a/net/tipc/name_table.c
++++ b/net/tipc/name_table.c
+@@ -949,8 +949,8 @@ void tipc_nametbl_stop(struct net *net)
+ 	}
+ 	spin_unlock_bh(&tn->nametbl_lock);
+ 
+-	synchronize_net();
+-	kfree(nt);
++	/* TODO: clear tn->nametbl, implement proper RCU rules ? */
++	kfree_rcu(nt, rcu);
+ }
+ 
+ static int __tipc_nl_add_nametable_publ(struct tipc_nl_msg *msg,
+diff --git a/net/tipc/name_table.h b/net/tipc/name_table.h
+index 3bcd9ef8cee3046f09b07901b87e344f42253d69..7ff6eeebaae643c31f8395cb14d3b6b8d8cd2610 100644
+--- a/net/tipc/name_table.h
++++ b/net/tipc/name_table.h
+@@ -90,6 +90,7 @@ struct publication {
+ 
+ /**
+  * struct name_table - table containing all existing port name publications
++ * @rcu: RCU callback head used for deferred freeing
+  * @services: name sequence hash lists
+  * @node_scope: all local publications with node scope
+  *               - used by name_distr during re-init of name table
+@@ -102,6 +103,7 @@ struct publication {
+  * @snd_nxt: next sequence number to be used
+  */
+ struct name_table {
++	struct rcu_head rcu;
+ 	struct hlist_head services[TIPC_NAMETBL_SIZE];
+ 	struct list_head node_scope;
+ 	struct list_head cluster_scope;
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.47.0.338.g60cca15819-goog
+
 
