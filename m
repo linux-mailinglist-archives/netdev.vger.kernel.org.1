@@ -1,125 +1,112 @@
-Return-Path: <netdev+bounces-148769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92B469E3180
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 03:39:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CED709E3187
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 03:45:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3277CB25E1F
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 02:39:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9412E28504C
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 02:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E912D43166;
-	Wed,  4 Dec 2024 02:39:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4134842A92;
+	Wed,  4 Dec 2024 02:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TANkfJTH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bd853IoJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29894A1A;
-	Wed,  4 Dec 2024 02:39:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819B88172A
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 02:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733279947; cv=none; b=bXe7zSVejkmDGY3M6pTk8KZaZ7W4Na1z97JbgMAbgVxWVToWnHngNRIbwX4/3iodrRjhtXfrpY5/aKyh2lVvndQb3DO0DZUnWNAbTMAYc93a7k7AbGTwpoSZGDSljr3sHXzPVKLTqOyjGdIWvgYhEwSfUbJc20xGBfmaXjh5HlQ=
+	t=1733280309; cv=none; b=mR9Zurvos11gKpspE3iX3XakG4wxVmB5Roc5gYQoSMgN5cr5HS1G6TOMeV+M0gaBU9QMdqJILUDQrDfnG3rjJt2/ZIFhPji9Q4u0+BjNLf0mbMptmZvnGlw5UOEBw04CMK7dVLhWVEef5zhhZV+/617GeocxQh/ubiqupNE1sWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733279947; c=relaxed/simple;
-	bh=YfGuKivpCnaAxscooG0Rdp9GxjweDHDwFPdmw4ZztZU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nYwGhZ2/+mI/EXhha7Q5Vs6Fnvfc4b4xdbiOJtIzPK6rVcclzUynVayUH/2l8v1yjOUpBd8CF28HxsLeEKCOxjxL4IXWJMudLmCcOI4swt5KIiGT/0JzteMtRLs1OxW04CEwWcoVC1vxs1tMzDdPNOjwmnanYNqJotfSgHFE6Cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TANkfJTH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9064FC4CEDC;
-	Wed,  4 Dec 2024 02:39:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733279947;
-	bh=YfGuKivpCnaAxscooG0Rdp9GxjweDHDwFPdmw4ZztZU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TANkfJTHmIIRKBk9HgnjAY5n2wORlf0cFoNmi0k6Xel/i3704XlgWVAX1JTVsAJeH
-	 PM2lmbuBkoYqW38YGJO826fZ7aD9nmXudC6rWDJb2OPW08CDtITHevui7fXIsTCuQU
-	 Q9LteOeZQu01BQuxe760/kOxHqIlaZFS9ZqAWusi+T0fcpuA6ngwDlnDlVLdBxSzBM
-	 Wyx+uIdnagluxHMPxQY+7u1q+OqYCVj67LdlxaYUeh+1I5PDA5ztfjV1h4tUaEErAd
-	 E6Z1da9O5cY51TM2fP63VKhYOrCnvb4ZoKxEVIaIjvi61ahen5rNLYmYf5ZsoGf7kB
-	 x4fwrdHfwcrzQ==
-Date: Tue, 3 Dec 2024 18:39:05 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, horms@kernel.org,
- donald.hunter@gmail.com, corbet@lwn.net, andrew+netdev@lunn.ch,
- kory.maincent@bootlin.com, nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next v3 0/8] ethtool: generate uapi header from the
- spec
-Message-ID: <20241203183905.3343d9a5@kernel.org>
-In-Reply-To: <Z06SGszVaXopVlhR@mini-arch>
-References: <20241202162936.3778016-1-sdf@fomichev.me>
-	<20241202195228.65c9a49a@kernel.org>
-	<Z06SGszVaXopVlhR@mini-arch>
+	s=arc-20240116; t=1733280309; c=relaxed/simple;
+	bh=XbnQOq3MesemtOcTeCYxeKP2DW43Br9wh3sOMpJ7Mmo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MJanI4t3F8xlbisj33M0y+7daoFBHEkBIBx9ES9FpGJYNszVA2Dz3dhHnibRfRu2WqyKJXymJd96zLLpdRnrr8orMyMSdYnqpG3B5NG63fEw7XwhBhZUIIY2R4bd4cpJJG3jIcqX7o5dfiXhRsjVe0uClx9xqMMlgLJoUJC5GuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bd853IoJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733280306;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XbnQOq3MesemtOcTeCYxeKP2DW43Br9wh3sOMpJ7Mmo=;
+	b=bd853IoJ9M59Vi9SDpGb7XLU+BKP1IUEcsm4ilm7ZGWRgzZXcoIeouF+dii64J+ZGWpn4/
+	Ke+0XLv+nH3u/cWMdIEh5WnkzpXnTPjC/5IpE0rVZfQ0FwIHG8e2aFGaaiTOgRZSrItOnQ
+	PCSDVY8pR4pWFWrWenB2dF9DOV5s1hA=
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
+ [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-149-WYl6DKmyNW2mAdOsoLipqQ-1; Tue, 03 Dec 2024 21:45:04 -0500
+X-MC-Unique: WYl6DKmyNW2mAdOsoLipqQ-1
+X-Mimecast-MFC-AGG-ID: WYl6DKmyNW2mAdOsoLipqQ
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-85b8c9b0ff3so491539241.3
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 18:45:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733280303; x=1733885103;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XbnQOq3MesemtOcTeCYxeKP2DW43Br9wh3sOMpJ7Mmo=;
+        b=F3CmUBwy9DzEGhBqjQVqkL/LY6yOwL/cw+GT0lhKSecUlOQTRb+gU6nfkGzOhS7ard
+         k3N0HAvuQzkkb2wxGBJ9GBG4PKfHGWarbP9PJivW7xBnVdwzk+xoFfjkeGXeGgSygkDe
+         qZ2qnaWv43E5hKwemB3Kd9ryBaAzVTZEP0FemZJCmedyYOp4/n4IknCz+0RxHPUigs9z
+         FD/q7h+4eMXqU93YpKbu64OnsOThbg9mPF87jClalLA966xz63WwVI73NheXS1TPNnCH
+         5BeQ7onZyXEOEvNXweyoUqE2lMqiepr62XnfvPJC3jHwtMitnamQlqPoTg8rt0jBKM2k
+         xG7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU0e0WxK8KKiHFe6M2QAKqCJehHM6azVE32R7YaePddMaZeZfIxFrPbJE0lU9mFC9dW358lT7o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2b5sMdyF99ApU251oOKRvzGm9EPD2wy9ngDhKA3e9Xv6IQl89
+	5V2CiDayOvAPOxKj/hEiqZrzrjJ7w/8+2Oc21uhnLS2cSLXcB1n9UmC2oBQ/hEzPnictlALG/cz
+	AR4sPvKsBaIy80tcwXCyTfyegw21/TsxrYsGdIFj2Af2Wbx3qs/lQ2dqhVbqlYfAORwxRAcLDj7
+	FSlO+Vrd5qHAYPjZfSXCZDfuwRmkpK
+X-Gm-Gg: ASbGncuTXUJdH+72EyE5+jEo+GAQyAQmxcNfpAmN/CuZhspXA7jFl1/TyE4M7ncRcvR
+	DyYwxorfml0RrxqbV0oK3ra2hUG2DkaQH
+X-Received: by 2002:a05:6102:5489:b0:4af:aaa4:dd9a with SMTP id ada2fe7eead31-4afaaa51842mr2184613137.10.1733280303454;
+        Tue, 03 Dec 2024 18:45:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEnv582pmJNRSCddpQRIMLUIrhRF1VM316y4CUO+jOhzMa7TrksbE6s7FhVZ/bBvYjjr0SiWjodQSlPoQUf1dM=
+X-Received: by 2002:a05:6102:5489:b0:4af:aaa4:dd9a with SMTP id
+ ada2fe7eead31-4afaaa51842mr2184605137.10.1733280303130; Tue, 03 Dec 2024
+ 18:45:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241203073025.67065-1-koichiro.den@canonical.com> <20241203073025.67065-3-koichiro.den@canonical.com>
+In-Reply-To: <20241203073025.67065-3-koichiro.den@canonical.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 4 Dec 2024 10:44:50 +0800
+Message-ID: <CACGkMEu=zjbnyLGLESsSUx_J_KkcKHYo2dBDuQ_evvkOuJ=bEw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/5] virtio_ring: add 'flushed' as an argument
+ to virtqueue_resize()
+To: Koichiro Den <koichiro.den@canonical.com>
+Cc: virtualization@lists.linux.dev, mst@redhat.com, xuanzhuo@linux.alibaba.com, 
+	eperezma@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2 Dec 2024 21:07:38 -0800 Stanislav Fomichev wrote:
-> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-> index efa00665c191..859ae0cb1fd8 100644
-> --- a/Documentation/netlink/specs/ethtool.yaml
-> +++ b/Documentation/netlink/specs/ethtool.yaml
-> @@ -60,7 +60,8 @@ uapi-header: linux/ethtool_netlink_generated.h
->      name-prefix: ethtool-c33-pse-ext-state-
->      header: linux/ethtool.h
->      entries:
-> -        - none
-> +        - name: none
-> +          doc: none
-> 
-> The first one fixes the bullet list (seems like mixing entries with and
-> without docs confuses ynl-gen-rst.py). 
-
-Ah, yes, that makes sense, either all entries should be objects or all
-should be strings. I will spare you trying to figure out how to enforce
-that in jsonschema :)
-
-nit: "-" and "name: none" on separate lines
-
->          -
->            name: error-condition
->            doc: Group of error_condition states
-> @@ -875,15 +876,15 @@ uapi-header: linux/ethtool_netlink_generated.h
->          value: 0
->        -
->          name: pair
-> -        doc: ETHTOOL_A_CABLE_PAIR_
-> +        doc: ETHTOOL_A_CABLE_PAIR
->          type: u8
->        -
->          name: code
-> -        doc: ETHTOOL_A_CABLE_RESULT_CODE_
-> +        doc: ETHTOOL_A_CABLE_RESULT_CODE
->          type: u8
->        -
->          name: src
-> -        doc: ETHTOOL_A_CABLE_INF_SRC_
-> +        doc: ETHTOOL_A_CABLE_INF_SRC
->          type: u32
->    -
->      name: cable-fault-length
+On Tue, Dec 3, 2024 at 3:31=E2=80=AFPM Koichiro Den <koichiro.den@canonical=
+.com> wrote:
 >
-> And removing trailing _ fixes the rest (don't know why).
+> When virtqueue_resize() has actually recycled all unused buffers,
+> additional work may be required in some cases. Relying solely on its
+> return status is fragile, so introduce a new argument 'flushed' to
+> explicitly indicate whether it has really occurred.
+>
+> Signed-off-by: Koichiro Den <koichiro.den@canonical.com>
 
-Mmm. Trailing _ must mean something in ReST.
-Can't decide now whether we care more about supporting ReST formatting
-in YAML docs or protecting unsuspecting developers from this sort of a
-surprise. So let's do the easier thing for now.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-> Any objections to folding it as is into v4? I can go on and try to
-> understand why ynl-gen-rst.py behaves exactly that way, but not sure
-> it would buy us anything?
+Thanks
 
-Yup, v4 with more or less the diff above SGTM!
 
