@@ -1,203 +1,154 @@
-Return-Path: <netdev+bounces-149136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAF1C9E4740
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 22:51:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7128C9E474D
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 22:58:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86D6E280CCC
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 21:51:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DBAF284894
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 21:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5E218FC83;
-	Wed,  4 Dec 2024 21:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7910118FC83;
+	Wed,  4 Dec 2024 21:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="p+pGhvgX";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Hv68a2qi"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="YM/fuyd/"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA0923919F;
-	Wed,  4 Dec 2024 21:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983B91925B4
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 21:58:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733349108; cv=none; b=m/XEHb0J/tjNxpzdXKVAw+Tjzte/ZRmL8/PA3GJY/g4Is4D4ntI5iz5t7TTrM/c9jo3PY/ZIFQTOpvuMHh1vK90qNPWJ4gF3SPFZVPz4OKHe7878sSFUz4V+ZzsnJlYPED4zBzb1QJ/UZHXKtZ5ZqTaU6kwebSu1BzBAm2nAVJg=
+	t=1733349502; cv=none; b=b7Ckh5+qy9m/E8dIQW3Nv+yIspFHZv2CB0U9LJdksp8BLUmAzg+pGMH4gXh10QiQ/TPKDuRMlG4FrT5pYDPmv6PKA+Fac10V2pGoD22gWyIVL9D8RgmfGoHX5pbXMKjWA+ntIdn0qWB+yy5bHKAL8SgrC0bSxtBB4ycwFzdLco4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733349108; c=relaxed/simple;
-	bh=/HKw8fVOd9hxl8YjiMKFb/5bYW2ramI7WzJsThdTDx0=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=FOadCxN5+tvgUFAC/sxaTrAD7gNmYorroiccH5idZNklLDGU9a2bepLfwCQxdEzGi4JQD+ga/K4PjUSHOA/L5jWeI7IOJZZqGmXXJoo5RUw1KwpsGth2s/zwtVyv5us2EehOibPEDzDZhmOb1bU1MVVeaciw8pBRzAzkW0O5XaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=p+pGhvgX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Hv68a2qi; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 535AE114010D;
-	Wed,  4 Dec 2024 16:51:44 -0500 (EST)
-Received: from phl-imap-08 ([10.202.2.84])
-  by phl-compute-03.internal (MEProxy); Wed, 04 Dec 2024 16:51:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1733349104;
-	 x=1733435504; bh=TE15c1mpZH7CypQLn1ar+nihRkaQdamdfMzIXkoHuG4=; b=
-	p+pGhvgXHAsirYusuAwwvCUKogVt1Bnl0Ax2aBRXCuqKM8JFWXvPfJqBm8SIXDxf
-	WA8uhdrIMQjK7sqi/DSHYakcPBkbijr3Pokob2Gg7ptriEin/Dt0iqh2mznJ9zun
-	B3Z+Oxzl16quAEzsll5kOmZkSi82oAZMzs5CAsNMmgBkCvIDbNcqepEORYA4Dqw8
-	ClTchY+PR053mhAN0iYi3cEXH7fkoYNldhebusJJGqVO+478phlZFIEkt7CLUAOo
-	8vXHVFOmprNmepZ1frmsuqLTOKlDpPSaJR+iz85I1LQllD2o8Goaaqo/ngz+CXa+
-	VwJ+9NfOpJVabDxBR6PNrw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1733349104; x=
-	1733435504; bh=TE15c1mpZH7CypQLn1ar+nihRkaQdamdfMzIXkoHuG4=; b=H
-	v68a2qiovpvri1Gvnsp/jI4ao72O/CXjCUIV9Y26kYU8KTUXu/mIwDXunO0lmB7B
-	WbzHWY7UlWrL8p+qc7kyBCuYOWQnsdYPaGaXWFd30BxDvmq5aQhtVe0mpe9vpsw7
-	oevgEmrC7def13K35J9z/iAGpVbdr2XwhTQ7gdiuOgyrofRshtAaM8+j+0n6GpaP
-	NF7yNwtBW+uwJicniSEqbFLSI/SKNb6UBK6mxv5ZMSANg47O0nSIbet/9fOkK2CF
-	jF1BAWZUQarORzoPeFrXSY+mDzUaajf0Qjtnx4Hco37uqLF0WFFr861swIBxsLF7
-	4mV2g5ZbSSqQhP7ZCoBJA==
-X-ME-Sender: <xms:785QZ-xWbahP2uFDkK5KXajVcWSU3Vp1RqEhA-t8vNJKeY1xB3t8zQ>
-    <xme:785QZ6QmLAQQTVqrEVsXdDpIcgwn1lgBXTYcgmJs7GJ3MOXDX3gWkFUasgsImHkxi
-    oPPzW96zx2ymxWRxg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieehgdduhedtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnegfrhhlucfvnfffucdlfeehmdenucfjughrpefoggffhffvvefk
-    jghfufgtgfesthejredtredttdenucfhrhhomhepfdffrghnihgvlhcuighufdcuoegugi
-    husegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpeegleeifffhudduueekhfei
-    fefgffegudelveejfeffueekgfdtledvvdeffeeiudenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiiipdhnsggp
-    rhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmh
-    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehjohhhnhdrfhgrshhtrggsvghn
-    ugesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtoheprghlvghkshgrnhguvghrrdhlohgsrghkihhnsehinhhtvghl
-    rdgtohhmpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtg
-    hpthhtoheprghnughrihhisehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrshhtsehk
-    vghrnhgvlhdrohhrghdprhgtphhtthhopehhrgifkheskhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:785QZwUkFEDF_3Zpm5cMM4lsR1T1ToptQ1hleRr8xUn6YXKzyPBNJw>
-    <xmx:785QZ0hAbzDWB9EMMzFWJu_f_tLaofTRt4T1fNZ_afh5Tu2jZZRVPA>
-    <xmx:785QZwDTwoEj_wEmAmRtyKvIke7eBTecruoyZrhiIaTqq7H5qYE3dw>
-    <xmx:785QZ1JzbE5gCxnHtSjM-UTC5_HKTBOCkZ63BfIZ017rgv805pR3nw>
-    <xmx:8M5QZ4YPOXyi42i8Hv-AVl9TkhxeUxHERO06-2ARaIZh077oFmkWl9IY>
-Feedback-ID: i6a694271:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 7D97E18A0068; Wed,  4 Dec 2024 16:51:43 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1733349502; c=relaxed/simple;
+	bh=YNU8dUInl9AZqwZ37UDnNRSpRh7LTzNeuRcGGlg7F/E=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=YuknCgCtS/IWBhQ1HMYSqZqW/y1eG/8lvJH3NUJgKkbUTkYBEySVdxagSnQvslqmXRz8iwQtquzDDBcIkHfcPs5JYSdQyGEPB9FHHbX52vgF4uSy54AjruLfGfagOUYr6ht+ObOwEJu+6iB0039NPumkRSsVj9gzJssiSw3llqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=YM/fuyd/; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa543c4db92so41688066b.0
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 13:58:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1733349499; x=1733954299; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Co7uzDnHgh2YDKoN9WoWe1UJ0uiY9Mm/vQX5j9kVtAY=;
+        b=YM/fuyd/z8SPlphL+Hy7U4wPvzAZIRkSPOpZbT5JaOyrJrzknuZlcyyLU9/fQB4iGm
+         Oq0muDH3Im+/ZHpD5dcbLbPG1buqNjeOjfhQzmbICQSJBEirRuX4VFR/sqwVjg4kcWdj
+         smYgRez0LzEnEyTalO9Cxn4J18rQ66Ushyz7mYlEcQSLKOU4FRYF9IEIHMB2YNTGqVc1
+         5DCh3slnUM9O8twZUnQ/9q1k9m6GK0I7SikfIsB/B0rOuuw9xx9KQ1Pi8CSmYl5DMujz
+         J/GaCpQAZJXVxpm+ImvmVD+UJw2fMlbsp5kqFk+8x6YcEi+wOrSGMbF9D1QZHdrLcd9I
+         uY3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733349499; x=1733954299;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Co7uzDnHgh2YDKoN9WoWe1UJ0uiY9Mm/vQX5j9kVtAY=;
+        b=VoY+TdX1fMp7Cbjrrde+xOrYt56fJUcQea36NoT32VbDnI2xzMx7FcHzBMogSK7wuF
+         NnGO08XpZiAg77qFbhYNarMdQRBfvWWUUwVWJ1hIQ7wWCqVkirWpRHRJPTMZQ8tslnzE
+         7Yxf9fMYTmsl94DDQAKSLEMsGsMqKXcrQY04VZ/4NfmUGVTYXMbt6L0yCFQtWYl7lOoj
+         hbwYh5YdxhMavtPHQsXKIY26vr223Pohc2yM2uSiN+QNB3SDbIqEhWnjjZ+POUeMCndJ
+         514GJAxaaNUeZ06z6DXN/JRuxHYcCJqA5okLjzV1a+gDJx+o/KZSRsxXTy7GTnv5XJZ7
+         /kvQ==
+X-Gm-Message-State: AOJu0YxddiJClEFW8oeFgPLN8AZgEEu3Ks3WE3YCT7/JLkIggY4pKrla
+	x0xNfK9+FE2J3f8eXbzxGBLCDGTIBNSX3PX+ogSSI7nQ2a31kZ7Lt5PEfL4U5WA=
+X-Gm-Gg: ASbGncuz9Ll6hralw5fN6wk2T47UF8yObVxx7iuymSwzfOp/1NB6joIQGkyCP3olxIT
+	W2dN9uYBbCOr3JoFqoWECJqRGKZdaaslxmMxrASHeF9TXN5zIezCXt9gtKF1Fh8f1z/T9t/9Qnx
+	S/SA/Mf6dZMz7IGu5dvhV/tbUTr+wMAJB2vbtEget95tTREnQwKnvh30DrOoFF8S/5Qb9DWQMAR
+	GqWyOfu5b5MhiW6U8PDiPEQaBwWB2n15jsWbFL7sQ==
+X-Google-Smtp-Source: AGHT+IGYSf4AzfGABf0jNyjn5A6fYtPEq4D39rnv6Co6YgRHOLftKPwlP8kur3B/zexT8mKyKO6vlw==
+X-Received: by 2002:a17:906:3103:b0:aa6:18b6:310e with SMTP id a640c23a62f3a-aa618b63362mr198410766b.38.1733349498779;
+        Wed, 04 Dec 2024 13:58:18 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:506b:2dc::49:15e])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa625e58e0asm6653666b.5.2024.12.04.13.58.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 13:58:18 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org,  Jason Xing <kerneljasonxing@gmail.com>,  Adrien
+ Vasseur <avasseur@cloudflare.com>,  Lee Valentine
+ <lvalentine@cloudflare.com>,  kernel-team@cloudflare.com
+Subject: Re: [PATCH net-next 1/2] tcp: Measure TIME-WAIT reuse delay with
+ millisecond precision
+In-Reply-To: <CANn89iL5oE79_qtNUFFsyxLXoJALJCZgawsubuvn1XOcOuOzFw@mail.gmail.com>
+	(Eric Dumazet's message of "Wed, 4 Dec 2024 20:22:36 +0100")
+References: <20241204-jakub-krn-909-poc-msec-tw-tstamp-v1-0-8b54467a0f34@cloudflare.com>
+	<20241204-jakub-krn-909-poc-msec-tw-tstamp-v1-1-8b54467a0f34@cloudflare.com>
+	<CANn89iL5oE79_qtNUFFsyxLXoJALJCZgawsubuvn1XOcOuOzFw@mail.gmail.com>
+Date: Wed, 04 Dec 2024 22:58:16 +0100
+Message-ID: <87ed2naz5z.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 04 Dec 2024 13:51:08 -0800
-From: "Daniel Xu" <dxu@dxuuu.xyz>
-To: "Alexander Lobakin" <aleksander.lobakin@intel.com>,
- "Jakub Kicinski" <kuba@kernel.org>
-Cc: "Lorenzo Bianconi" <lorenzo.bianconi@redhat.com>,
- "Lorenzo Bianconi" <lorenzo@kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>,
- "Andrii Nakryiko" <andrii@kernel.org>,
- "John Fastabend" <john.fastabend@gmail.com>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>,
- "Martin KaFai Lau" <martin.lau@linux.dev>,
- "David Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org
-Message-Id: <ad43f37e-6e39-4443-9d42-61ebe8f78c54@app.fastmail.com>
-In-Reply-To: <a0f4d9d8-86da-41f1-848d-32e53c092b34@intel.com>
-References: <cover.1726480607.git.lorenzo@kernel.org>
- <amx5t3imrrh56m7vtsmlhdzlggtv2mlhywk6266syjmijpgs2o@s2z7dollcf7l>
- <ZwZe6Bg5ZrXLkDGW@lore-desk> <55d2ac1c-0619-4b24-b8ab-6eb5f553c1dd@intel.com>
- <ZwZ7fr_STZStsnln@lore-desk> <c3e20036-2bb3-4bca-932c-33fd3801f138@intel.com>
- <c21dc62c-f03e-4b26-b097-562d45407618@intel.com>
- <01dcfecc-ab8e-43b8-b20c-96cc476a826d@intel.com>
- <b319014e-519c-4c2d-8b6d-1632357e66cd@app.fastmail.com>
- <rntmnecd6w7ntnazqloxo44dub2snqf73zn2jqwuur6io2xdv7@4iqbg5odgmfq>
- <05991551-415c-49d0-8f14-f99cb84fc5cb@intel.com>
- <a2ebba59-bf19-4bb9-9952-c2f63123b7cd@app.fastmail.com>
- <6db67537-6b7b-4700-9801-72b6640fc609@intel.com>
- <20241202144739.7314172d@kernel.org>
- <4f49d319-bd12-4e81-9516-afd1f1a1d345@intel.com>
- <20241203165157.19a85915@kernel.org>
- <a0f4d9d8-86da-41f1-848d-32e53c092b34@intel.com>
-Subject: Re: [RFC/RFT v2 0/3] Introduce GRO support to cpumap codebase
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On Wed, Dec 4, 2024, at 8:42 AM, Alexander Lobakin wrote:
-> From: Jakub Kicinski <kuba@kernel.org>
-> Date: Tue, 3 Dec 2024 16:51:57 -0800
+On Wed, Dec 04, 2024 at 08:22 PM +01, Eric Dumazet wrote:
+> On Wed, Dec 4, 2024 at 7:53=E2=80=AFPM Jakub Sitnicki <jakub@cloudflare.c=
+om> wrote:
 >
->> On Tue, 3 Dec 2024 12:01:16 +0100 Alexander Lobakin wrote:
->>>>> @ Jakub,  
->>>>
->>>> Context? What doesn't work and why?  
->>>
->>> My tests show the same perf as on Lorenzo's series, but I test with UDP
->>> trafficgen. Daniel tests TCP and the results are much worse than with
->>> Lorenzo's implementation.
->>> I suspect this is related to that how NAPI performs flushes / decides
->>> whether to repoll again or exit vs how kthread does that (even though I
->>> also try to flush only every 64 frames or when the ring is empty). Or
->>> maybe to that part of the kthread happens in process context outside any
->>> softirq, while when using NAPI, the whole loop is inside RX softirq.
->>>
->>> Jesper said that he'd like to see cpumap still using own kthread, so
->>> that its priority can be boosted separately from the backlog. That's why
->>> we asked you whether it would be fine to have cpumap as threaded NAPI in
->>> regards to all this :D
->> 
->> Certainly not without a clear understanding what the problem with 
->> a kthread is.
+>> A low effort alternative would be to introduce a new field to hold a
+>> millisecond timestamp for measuring the TW reuse delay. However, this wo=
+uld
+>> cause the struct tcp_timewait_socket size to go over 256 bytes and overf=
+low
+>> into another cache line.
 >
-> Yes, sure thing.
+> s/tcp_timewait_socket/tcp_timewait_sock/
 >
-> Bad thing's that I can't reproduce Daniel's problem >_< Previously, I
-> was testing with the UDP trafficgen and got up to 80% improvement over
-> the baseline. Now I tested TCP and got up to 70% improvement, no
-> regressions whatsoever =\
+> Can you elaborate on this ?
 >
-> I don't know where this regression on Daniel's setup comes from. Is it
-> multi-thread or single-thread test? 
-
-8 threads with 16 flows over them (-T8 -F16)
-
-> What app do you use: iperf, netperf,
-> neper, Microsoft's app (forgot the name)?
-
-neper, tcp_stream.
-
-> Do you have multiple NUMA
-> nodes on your system, are you sure you didn't cross the node when
-> redirecting with the GRO patches / no other NUMA mismatches happened?
-
-Single node. Technically EPYC NPS=1. So there are some numa characteristics
-but I think the interconnect is supposed to hide it fairly efficiently.
-
-> Some other random stuff like RSS hash key, which affects flow steering?
-
-Whatever the default is - I'd be willing to be Kuba set up the configuration
-at one point or another so it's probably sane. And with 5 runs it seems
-unlikely the hashing would get unlucky and cause an imbalance.
-
+> Due to SLUB management, note that timewait_sockets are not cache
+> aligned, and use 264 bytes already:
 >
-> Thanks,
-> Olek
+> # grep tw_sock_TCP /proc/slabinfo
+> tw_sock_TCPv6       3596   3596    264   62    4 : tunables    0    0
+>   0 : slabdata     58     58      0
+> tw_sock_TCP            0      0    264   62    4 : tunables    0    0
+>   0 : slabdata      0      0      0
+>
+> In any case, there is one 4 byte hole in struct inet_timewait_sock
+> after tw_priority
 
-Since I've got the setup handy and am motivated to see this work land,
-do you have any other pointers for things I should look for? I'll spend some
-time looking at profiles to see if I can identify any hot spots compared to
-softirq based GRO.
+You're right. <facepalm> Thanks for keeping me honest here.
 
-Thanks,
-Daniel
+I must have checked pahole on the host (Ubuntu LTS kernel) instead of
+inside the dev VM, which shows:
+
+# grep tw_sock_TCP /proc/slabinfo
+tw_sock_TCPv6          0      0    288   28    2 : tunables    0    0    0 =
+: slabdata      0      0      0
+tw_sock_TCP            0      0    288   28    2 : tunables    0    0    0 =
+: slabdata      0      0      0
+# pahole -C tcp_timewait_sock
+struct tcp_timewait_sock {
+        struct inet_timewait_sock  tw_sk;                /*     0   256 */
+        /* --- cacheline 4 boundary (256 bytes) --- */
+        u32                        tw_rcv_wnd;           /*   256     4 */
+        u32                        tw_ts_offset;         /*   260     4 */
+        u32                        tw_ts_recent;         /*   264     4 */
+        u32                        tw_last_oow_ack_time; /*   268     4 */
+        u32                        tw_ts_recent_stamp;   /*   272     4 */
+        u32                        tw_tx_delay;          /*   276     4 */
+
+        /* size: 280, cachelines: 5, members: 7 */
+        /* last cacheline: 24 bytes */
+};
+
+#
+
+Let me pivot to the simplest approach then and make use of that 4-byte
+hole in inet_timewait_sock. (Which I didn't consider either, so thank
+you for the idea.) This would save me from having to touch the PAWS
+code.
 
