@@ -1,257 +1,189 @@
-Return-Path: <netdev+bounces-148996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8353E9E3C18
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:06:41 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55CCB9E3C8A
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:19:15 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D103E16A1CA
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:06:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FF5AB3A973
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:06:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80B61F7082;
-	Wed,  4 Dec 2024 14:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205561F758D;
+	Wed,  4 Dec 2024 14:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="guytGOAZ"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="HJYcQjq/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2046.outbound.protection.outlook.com [40.107.22.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FDD1F707A
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:05:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733321151; cv=none; b=leS4EO0Ae/0NqQDl0CPft3CS/rqVxFiPyzQxczzDq6RnBgTuqiqgkAoAkkoRlmq+E312QJKQyNA6iuXzHrBP1X4IVi5Z6kTueUMgjGwAVXtVO/y8MyWbkWztQLCcS/lM6tQNbKGSXenl6FhJevmZgLqZ8mSvjprCjpq/RNMOtYY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733321151; c=relaxed/simple;
-	bh=tki7XHcKFqOgzp9rosUkkTuXm8CLxaszaBf5O7gJpf8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BQiN05V5gdGzuKZbBfAiX7el1Hzg5HLTZcYI8JMVxxXvqT0B8CW4wxT8M0p2ahpxJpohztNYgUC40e4Rk8XnduifMcthrc1Bp4tTM2m8Ut0Itd4HtzKgRiSR0FT12/j3TGAGZpNlI4L8qJaA5N85zmhR8+LTtDi0s+peUBT3TX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=guytGOAZ; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-53ddfc5901eso7e87.0
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 06:05:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733321148; x=1733925948; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YuJtspqLOkwmkVmX0MvsB/cYISuv0uBQVHGtS3SGQiw=;
-        b=guytGOAZacvdesmO7XzfnldEY6jpH5DqiN0E1viL4W3glpMPhzdsGKXZQlfiDOOsc6
-         zA7OTduu+RBJMsrP1c/KZua8FlMkb3fEMW1Q6SARHmDZYKuwYT1+wMyT6t8nRiYJDIW1
-         d7jYrD133sSQt6jepJMnxUQfYgTshdOF8tok3zWiMxkoAk3palGYt0Cb4g5ZSfqDDwxw
-         X3fIVogn6uP4bpqi6g+0U+Qjtx6o4s5QOIQldODdLdXcyu75BfznGOsRZ0+KNPpR2SKj
-         NiTQRDwFnmmFsmK5nMFSqyGqYPzh61G3SD8f0jwkqFDG4a1Sy8rELi6nfF/f5mlMZhCa
-         xdew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733321148; x=1733925948;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YuJtspqLOkwmkVmX0MvsB/cYISuv0uBQVHGtS3SGQiw=;
-        b=NQvAdycXlDH2RXWf5f87XtBxYIOdCTslcccU9TUBrcDNJDjaWe/RTm9c3B4flukg32
-         4nf6Y0P9vKvpn2k4lgASoxcfpswitaUX2uaY0Sm2Y2ksIA43DJg3SdGAqO5V8AD6IzsL
-         /zS7tqdiDOMQJiDxn5Qm5hafdNhw0plGf0hXuaI9CQwPLsoE4/FKCj2HpR+gLxNvxPqC
-         5DG3DAXG1l+b5+4waWbkuoezbqAQcUJJe9iik8ljsGHYTJYFPgDelrcLxkLRuF2TCRX8
-         UVoN6WlYpVMnbOY1CvD+k52cV7KucFAtI00UwyfoWqW2c3m1U40g9Pa2HdQRsNdhOOQh
-         LAVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWBYzbUlO9WTlYLfrdz6sxdvGA5ARwfqSvsqe4vXdZvS2wlkPE+WbE0BMCMCbkZtFpIXP4A5SM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywik6/hmf81qREqSvOGia/qusNyXnvnWEmVDf8yDLkqyWL55FCu
-	EpXz0oS4dngQg5eFTMWqHxsZhp81I/a28evIYdS3pcmm7tgVMH9dAnEY1JK3ml/pNs8+QNirvNU
-	XiIytmAAgUjYGvCdGyoN2ekmrsBpidWrtPFaI
-X-Gm-Gg: ASbGncu0fyvM9uofeVPh/cvZ8xd9YkhUIVIoleGYg/DqowABY0Hsc3n+zPupOdn+Vtd
-	Qt8cV8SkOOU0mV0qMzV5ICUDpjZM87yxSZMrw4HSpAvnNRKF46rBiH0kK8oq4kM2u
-X-Google-Smtp-Source: AGHT+IHQG0namdU9K5p6gxlQbAyfWU7iX/frllabvqGmOp28JzpNKVcRJaSY138me8ohorlLmC1z4ySpLLaIlAtf2Yk=
-X-Received: by 2002:a19:7704:0:b0:53d:ff0a:249d with SMTP id
- 2adb3069b0e04-53e20c75e2fmr64e87.2.1733321145117; Wed, 04 Dec 2024 06:05:45
- -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58CB1F707A
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733321156; cv=fail; b=A3w/pvPoc8FZQhj5RmD2XyEQotl/FNx5rrB1ehThv0Wg1gwFIp5+FT+Qfg7bJ5ghfvIBM0CvRexNoBioNoWvWSQyGMM8clpO2fKixNLVZ/WjIljOWp8LpM3zo0bosQzBJVBqSt+bfBzzOq81+0ZzqT0Im7NzamT3KzSR8SpcTIk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733321156; c=relaxed/simple;
+	bh=UAZZWr6YXGMnaDSgdCPZ9u8n9nEyEUKcbKQY9VCs20A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Gi6POES5QSoX4gxXt+Jw3W2dWxX3oARKZSQ6PxIYfXqhUxOKp/U/1bWKrOck/auc5BsRHYkun+rgYVrbru0jztqJc9keu3Y/A9v/BYtaQhW9WvRyndZMs3kiTtDkHEtm8vjDK6BUoy+VdaLKcF9Nwe03WbmEutCefDrbiji9kOI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=HJYcQjq/; arc=fail smtp.client-ip=40.107.22.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aOdEFmu2JytGQYWNs35GGeCIzGfQ0fWH16caIEIR997+AarkUaUV+PqunJCtHy5GEJUmVHghfxIK5UfAVqbRGCGh0Im7RRx/SGqSq0IkSBd7Slbk3n91Lv2vgOZJAU6hlSH/KoEUi1gcpizwsf2KuDHVp3h9njUO0PiiFJa/H5PMg9JcdCtDGm+01VBEie6uJwY28weH72x8FvGARbTYHQq1PBbflAb8Lv/veo7xKryFt2/bT+o/Cv5nLsDKihfb9lRacdBKzf/rYtqdqApq+c10jT8tCqWo47MlnqJt9KMYct0WOSzGk3d3qzxYhOv7FuxV1GVbVjolXvLUKgDhwg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pr6sszUBaSCU+GNSDK4kOQmbJz8SLsWGAyv1pjQP1n8=;
+ b=OdLZCgkNiKkIAFiPX7cyoslXqjpgxaPX9ocYua5VFKYqoFHLjsAWtYRX1mpUTtgBQjyXpVSFu+4gISZWFwYZkwD9xQjyhQmp4XXvy9d9PlJic1TTuY+4tTs4df26ihozBI4x+1hoPjbGtdnKfBWczKLmN1FHFvp6zgJIcmQtzyeo/lBwhSPW5O3jMdmW3sGphE2GEgBPWDfPfoRgOujAgUJKJkfNmSCs5fLfP/A6ao1FQaS7J226LuvmIRDw8uWYpasKl7XfAsqeob6harYoDshLzvWzBqrBqb+0uvxV7sFWKvp/UUP5voWRxEblAN/DB3F9g5r59/PPoDznB0jvGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pr6sszUBaSCU+GNSDK4kOQmbJz8SLsWGAyv1pjQP1n8=;
+ b=HJYcQjq/wvPhe8p29rF8Iow2vad64fdn1PLhNvDvZyD54Ge+6QH7/qoitEnI710IKlLVIEJN8GAOFcNJ9TUakGOh8i2p9k1CUqCza8t5EhyizAgE+6ErAuWPOWr/tzQUdePwOFS7w+eoXNsx1MK92YqvXzS2YAAYvGkKAfzJF6r1/TwebLIto5YYEcI/NsCc5ZskwH6VmvihYJ/uWo2qYwQ6l1TQdCh9Q6z4vCBtAVY/KLG6z+QFri0w+WfIv8kDbeJHW5ciAUXvox6i9uS2p2Yaxo/VgeUIHQkoqCHTZj2h4UGMi6qvVmaa7J3BVFvw4P2Hhs0T4L7ubkNEAMHa0Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by GV1PR04MB10524.eurprd04.prod.outlook.com (2603:10a6:150:1d0::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.11; Wed, 4 Dec
+ 2024 14:05:50 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8207.017; Wed, 4 Dec 2024
+ 14:05:50 +0000
+Date: Wed, 4 Dec 2024 16:05:47 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
+	Yangbo Lu <yangbo.lu@nxp.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH net] net: mscc: ocelot: be resilient to loss of PTP
+ packets during transmission
+Message-ID: <20241204140547.6epegdjf7i4swsfc@skbuf>
+References: <20241203164755.16115-1-vladimir.oltean@nxp.com>
+ <20241203164755.16115-1-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241203164755.16115-1-vladimir.oltean@nxp.com>
+ <20241203164755.16115-1-vladimir.oltean@nxp.com>
+X-ClientProxiedBy: VI1P189CA0035.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:802:2a::48) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241204134752.2691102-1-yuyanghuang@google.com> <6cb2b3e2-d3ce-427e-9809-5b81474b80e4@6wind.com>
-In-Reply-To: <6cb2b3e2-d3ce-427e-9809-5b81474b80e4@6wind.com>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Wed, 4 Dec 2024 23:05:06 +0900
-X-Gm-Features: AZHOrDmW3V8HdGmjrV_EE8QPglkUa6Yv0bGjozVCn2M3LZ49ycqkSI5cUaY9ERQ
-Message-ID: <CADXeF1EfgSKcz-zF24rsHUZiF+vUkiPsTmdFw=rf3EWCtcSk-A@mail.gmail.com>
-Subject: Re: [PATCH net-next, v4] netlink: add IGMP/MLD join/leave notifications
-To: nicolas.dichtel@6wind.com
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, jiri@resnulli.us, 
-	stephen@networkplumber.org, jimictw@google.com, prohr@google.com, 
-	liuhangbin@gmail.com, andrew@lunn.ch, netdev@vger.kernel.org, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>, Patrick Ruddy <pruddy@vyatta.att-mail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|GV1PR04MB10524:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52c84d88-968d-4302-6d55-08dd146cc254
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?C4Dh1zA3wuLIRoDNt/A/aff3AE9JPt9h6wUISGo/cfBRZCwwDdkf8VYSUJqY?=
+ =?us-ascii?Q?6znV2mxIMX0DtVQqTz+4gX80d9lSlgwdlFUc5kLtgkGrwNJqLpEjDLMg9ocD?=
+ =?us-ascii?Q?O6I9eyfuifr9T9ePQSR5YwN3ksUp+D9Eq0IWJLfpWxy1ifQZmzz6Evaj3zBY?=
+ =?us-ascii?Q?nOPHqeCsDnb7Dg/6w/tTgatomH+7ltMaUnlmC3AO+ZOjT91IB7OunrzGp9eK?=
+ =?us-ascii?Q?zV9a/zHOZ6TL+xTDijwVSW0o1OXE5OtVNrxSKBKrI6laa/t0UHGOiXleSwPi?=
+ =?us-ascii?Q?BC41ZI/jyd5J45J0e6PQaoDCFTNSJlJhcTN45V7uXArwgVG98tX3aawV007c?=
+ =?us-ascii?Q?afpSKMiWqIGGdtsgUAgNbZFb3vJi+oOQT8V1JZdKTnP7dSTijxZfiU7rIN0e?=
+ =?us-ascii?Q?R0bLb1T809Eu3Equtvd5zdbi9/EapZUNJ4ExlWHHQyMhFIOByzTpZdoUHnay?=
+ =?us-ascii?Q?mstKmX/zs4UXaMrMnRcpkyHZQ8wAIPSSgQQ19a3tuWfDjoDvnDKzj9RFFt/v?=
+ =?us-ascii?Q?oFhbo/c1H1meDXbz4Op6C5/aE3nrxcol4u09Zab7Fy7e8gs8AUkqhnUOAIwo?=
+ =?us-ascii?Q?fF49VnvwW4eJUdr3HNtVUZXEKk7O8CTOAZBUJg4jN31hCFIq9LFC0g69lZ90?=
+ =?us-ascii?Q?QemD+EtPJBfcvoL4yDM15floZseIeOgEa7y62tKXggfoJmSThL+rn8TByydc?=
+ =?us-ascii?Q?ytduoGj6YQEWmjdfXdGN6v2hdmMTw/3e/usX/mXIVJIM4H9BpNauVRhnXSoh?=
+ =?us-ascii?Q?RIORnuQxrtrqz3gN/LHmgk8fZtR11Ly+NUZwGidvGhWd/QNufQcyMCOdm+nr?=
+ =?us-ascii?Q?MUjR1W0QFA/ZeYIoX2KMrEeGShf9XeOZUfpzGe9KjXw50pLoLG0PvWMLso7n?=
+ =?us-ascii?Q?jonPWRy9syyYuO/k8Nt74UEYIICYVyB8jBEI4ZRb89Ya6LfsPiUSj2IsXyFh?=
+ =?us-ascii?Q?BQFWJHKAXSwwh0hgf302UgzZY4Qeri+KZNjP0qRpGo4uY2u6Q8VjbRH3P9FI?=
+ =?us-ascii?Q?5+T+eUjGuJyNNDs7+mKZDsEL1Qdk2lKrhW6QXdya6kacsvoOg3ze8/tAhUJU?=
+ =?us-ascii?Q?M/MJer8/aIPCEm2AcirtKG8GDLkVV2QbrEImAF+POkQqDfaRZcrkTtnz20Hi?=
+ =?us-ascii?Q?WqhtW8BZoTcDlwjegUbsdAqvk37nEqqSg736ryQoYW1fUzmQewseF8MXkw7G?=
+ =?us-ascii?Q?aDCXx8KpSNQ9hizquGrA+EWUVXDK0jvDTKmdqKMzqkZUgnCmjfK7pRcqlA1t?=
+ =?us-ascii?Q?F8+4wQ9DkuzQK/0Zczoy7gw5EawgwCEfYvzfCY6BcE43SFkQ6eEHpdsWsPEP?=
+ =?us-ascii?Q?/soDXrmDXNuLmU6sRpxUfEa++hhQErmnLSxYiyRcYBGGEw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?M3/8Xwim0ZqDwg/+Lmrm/bZZvrL8neC7kThslNgjIfYMKC8L6jhRQueCJUrB?=
+ =?us-ascii?Q?ODdF1gThvy49mXxDoXeD54l/xvBq7fi9ulGgoPafXNo0mRvAbBUf89hPC5r6?=
+ =?us-ascii?Q?LPyNvMN8Xma64Mg82QCYN51Y6qSLoFBBtloSeRE2tz4oWin/r7GL0W3IMRYo?=
+ =?us-ascii?Q?OT0UY4rJ6uzIE8wYqUt/lE6swhXAYTHhKb0wtPu8QgM39xqfpKeMga+6CLVW?=
+ =?us-ascii?Q?mhH4iOF6Qzhy9JsWzbAgGZt+MxiGqwg6nUYSdqE6ayIOfsISBgDR1aobTTaX?=
+ =?us-ascii?Q?xTqyf1OAO1SKSlBN8ScpGvxxu+IPnJduTQ3FQ4zoR3f8N2rV03kOMrMI+N+V?=
+ =?us-ascii?Q?n0hOvjTKnIMQ/QDdnGJ4DIXAoLAz5vdVZQdYc3Schr09MRxCap7wQbmMfoRl?=
+ =?us-ascii?Q?wk7aaCSgFtluq+Suldk9pkwluCYikv8iBW/ffchMwzVWSF0Hd1laPAM68Ai7?=
+ =?us-ascii?Q?xigIB3lxxtvyclo3gTyqEtVBYrQSKBLUvomEU4cjZFm2kzWddzw2cqUBtNAj?=
+ =?us-ascii?Q?WS+4APoow2MCFCBrcnvrotAtSQJOjc0N1iC/J5twHSL2DFX3ad61aQxxibE9?=
+ =?us-ascii?Q?Vr00ODwk+q89wtnZIi51uSrkl+56GWDtwGc0TY73NMSRttZt2elSKliOsgiI?=
+ =?us-ascii?Q?gvgChml7FUaCI9B4UmSlu6bYTxy6ewK5WsbUZgU3S/chaOEWITqgr2s3vBfn?=
+ =?us-ascii?Q?XuRO6zD4RSU6eW1GzpOIdurE6zLTxcpPcLz4lkxfvF0LxajkdOyudYS8jEH3?=
+ =?us-ascii?Q?1M7ECUEqJL1K/RjoQhkF1sqIVIpTHQCjqizW/bD3KlDEEanWXcLcgEUB3Q6i?=
+ =?us-ascii?Q?ry4OcGl1IwnOn+x32qtG5+7Ms1rPp5zmjWOFiU8hYhGAKLnq8MzkjM8k6pH4?=
+ =?us-ascii?Q?mQs4LZtcVPX3lxdvm4svOW5bJ/SHlTwTEDzThnXTtbTNRsGhxtVfrSJdmBVy?=
+ =?us-ascii?Q?iYDo0LqWCu6O8DBB7r00MIgArrvRtih6MHU0r0yoWS+MW4c8oTPOnCkLOZYI?=
+ =?us-ascii?Q?9j6JjnXJuarmp7YBTDvBKoFNv/d6VYgPXPlTnPHFLksnMXbvyrAFjGDQohjH?=
+ =?us-ascii?Q?30u/nDrkQ6chZPu16dkz8FpAk1Bi3bTQD0kJCE2hJ4Q/m5acwePkEhmP9ZBp?=
+ =?us-ascii?Q?hYq/1tPGElMDn3n3ca+sf2lroIarAzNdzu4UE36SVzh17u9tp8feerMBjS05?=
+ =?us-ascii?Q?wgsyRzpl37jhj7WM79up9DWGvX5+53M5ZTeCU1FNy+r9upoGXgDN6sDWa6lz?=
+ =?us-ascii?Q?TLg088PHd8gzUrbtrlGffPrukpDqNCaLGMMQ4iaav0fB8o4qggquYKLGoysE?=
+ =?us-ascii?Q?kuDN5pMIyd3JrdgyTl2frgw/ywsjXpgi0PK60hRm87DAYVB0INOL3C/NLiqJ?=
+ =?us-ascii?Q?jHyLkHh3N6hjV3Xx2MAjx2zJ4+a6QLwE8lCN542t5JcWP/ifTdepVdYRtHae?=
+ =?us-ascii?Q?THyYPuorZVe44qICUg+HQHRjEcoEfpthL3osu2YFYWCSpkl4sD1RWwHmZVn+?=
+ =?us-ascii?Q?jgAVp84XWLh6i1VW393d6yayoQr5tCoH7vsevmiJXoC6EvzO1TTm5RrCKzxf?=
+ =?us-ascii?Q?H9ESn+DHXccTR6JQF85eJMXxT3cCHf0EtFNlxOIu/mCa/Q5RNAJXd8/o+JXh?=
+ =?us-ascii?Q?0Q=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52c84d88-968d-4302-6d55-08dd146cc254
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2024 14:05:50.7287
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: R/hRCg+w6QdMMitnxr5ZaFyXzBRUAeTuzrKYAhaQH/RVzj0RSBIEaemsGEhwGGFYjTPuJbP96UMX0WJNTzfmgQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB10524
 
->Maybe WARN_ON_ONCE() is enough?
+On Tue, Dec 03, 2024 at 06:47:55PM +0200, Vladimir Oltean wrote:
+> @@ -687,10 +743,12 @@ int ocelot_port_txtstamp_request(struct ocelot *ocelot, int port,
+>  		if (!(*clone))
+>  			return -ENOMEM;
+>  
+> -		err = ocelot_port_add_txtstamp_skb(ocelot, port, *clone);
+> +		/* Store timestamp ID in OCELOT_SKB_CB(clone)->ts_id */
+> +		err = ocelot_port_queue_ptp_tx_skb(ocelot, port, *clone);
+>  		if (err)
+>  			return err;
 
-Thank you very much for the prompt review feedback. Will update in patch v5=
-.
+There was a pre-existing memory leak here.
+If ocelot_port_add_txtstamp_skb() fails, we have to undo skb_clone_sk()
+using dev_kfree_skb_any(*clone).
 
-Thanks,
-Yuyang
+If there are no other comments, I'll resend at the 24 hour mark.
 
+pw-bot: cr
 
-On Wed, Dec 4, 2024 at 10:54=E2=80=AFPM Nicolas Dichtel
-<nicolas.dichtel@6wind.com> wrote:
->
-> Le 04/12/2024 =C3=A0 14:47, Yuyang Huang a =C3=A9crit :
-> > This change introduces netlink notifications for multicast address
-> > changes. The following features are included:
-> > * Addition and deletion of multicast addresses are reported using
-> >   RTM_NEWMULTICAST and RTM_DELMULTICAST messages with AF_INET and
-> >   AF_INET6.
-> > * Two new notification groups: RTNLGRP_IPV4_MCADDR and
-> >   RTNLGRP_IPV6_MCADDR are introduced for receiving these events.
-> >
-> > This change allows user space applications (e.g., ip monitor) to
-> > efficiently track multicast group memberships by listening for netlink
-> > events. Previously, applications relied on inefficient polling of
-> > procfs, introducing delays. With netlink notifications, applications
-> > receive realtime updates on multicast group membership changes,
-> > enabling more precise metrics collection and system monitoring.
-> >
-> > This change also unlocks the potential for implementing a wide range
-> > of sophisticated multicast related features in user space by allowing
-> > applications to combine kernel provided multicast address information
-> > with user space data and communicate decisions back to the kernel for
-> > more fine grained control. This mechanism can be used for various
-> > purposes, including multicast filtering, IGMP/MLD offload, and
-> > IGMP/MLD snooping.
-> >
-> > Cc: Maciej =C5=BBenczykowski <maze@google.com>
-> > Cc: Lorenzo Colitti <lorenzo@google.com>
-> > Co-developed-by: Patrick Ruddy <pruddy@vyatta.att-mail.com>
-> > Signed-off-by: Patrick Ruddy <pruddy@vyatta.att-mail.com>
-> > Link: https://lore.kernel.org/r/20180906091056.21109-1-pruddy@vyatta.at=
-t-mail.com
-> > Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
->
-> A minor comment below and then:
-> Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
->
-> > ---
-> >
-> > Changelog since v3:
-> > - Remove unused variable 'scope' declaration.
-> > - Align RTM_NEWMULTICAST and RTM_GETMULTICAST enum definitions with
-> >   existing code style.
-> >
-> > Changelog since v2:
-> > - Use RT_SCOPE_UNIVERSE for both IGMP and MLD notification messages for
-> >   consistency.
-> >
-> > Changelog since v1:
-> > - Implement MLD join/leave notifications.
-> > - Revise the comment message to make it generic.
-> > - Fix netdev/source_inline error.
-> > - Reorder local variables according to "reverse xmas tree=E2=80=9D styl=
-e.
-> >
-> >  include/uapi/linux/rtnetlink.h | 10 +++++-
-> >  net/ipv4/igmp.c                | 53 +++++++++++++++++++++++++++++++
-> >  net/ipv6/mcast.c               | 57 ++++++++++++++++++++++++++++++++++
-> >  3 files changed, 119 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetl=
-ink.h
-> > index db7254d52d93..eccc0e7dcb7d 100644
-> > --- a/include/uapi/linux/rtnetlink.h
-> > +++ b/include/uapi/linux/rtnetlink.h
-> > @@ -93,7 +93,11 @@ enum {
-> >       RTM_NEWPREFIX   =3D 52,
-> >  #define RTM_NEWPREFIX        RTM_NEWPREFIX
-> >
-> > -     RTM_GETMULTICAST =3D 58,
-> > +     RTM_NEWMULTICAST =3D 56,
-> > +#define RTM_NEWMULTICAST RTM_NEWMULTICAST
-> > +     RTM_DELMULTICAST,
-> > +#define RTM_DELMULTICAST RTM_DELMULTICAST
-> > +     RTM_GETMULTICAST,
-> >  #define RTM_GETMULTICAST RTM_GETMULTICAST
-> >
-> >       RTM_GETANYCAST  =3D 62,
-> > @@ -774,6 +778,10 @@ enum rtnetlink_groups {
-> >  #define RTNLGRP_TUNNEL               RTNLGRP_TUNNEL
-> >       RTNLGRP_STATS,
-> >  #define RTNLGRP_STATS                RTNLGRP_STATS
-> > +     RTNLGRP_IPV4_MCADDR,
-> > +#define RTNLGRP_IPV4_MCADDR  RTNLGRP_IPV4_MCADDR
-> > +     RTNLGRP_IPV6_MCADDR,
-> > +#define RTNLGRP_IPV6_MCADDR  RTNLGRP_IPV6_MCADDR
-> >       __RTNLGRP_MAX
-> >  };
-> >  #define RTNLGRP_MAX  (__RTNLGRP_MAX - 1)
-> > diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-> > index 6a238398acc9..8d6ee19864c6 100644
-> > --- a/net/ipv4/igmp.c
-> > +++ b/net/ipv4/igmp.c
-> > @@ -88,6 +88,7 @@
-> >  #include <linux/byteorder/generic.h>
-> >
-> >  #include <net/net_namespace.h>
-> > +#include <net/netlink.h>
-> >  #include <net/arp.h>
-> >  #include <net/ip.h>
-> >  #include <net/protocol.h>
-> > @@ -1430,6 +1431,55 @@ static void ip_mc_hash_remove(struct in_device *=
-in_dev,
-> >       *mc_hash =3D im->next_hash;
-> >  }
-> >
-> > +static int inet_fill_ifmcaddr(struct sk_buff *skb, struct net_device *=
-dev,
-> > +                           __be32 addr, int event)
-> > +{
-> > +     struct ifaddrmsg *ifm;
-> > +     struct nlmsghdr *nlh;
-> > +
-> > +     nlh =3D nlmsg_put(skb, 0, 0, event, sizeof(struct ifaddrmsg), 0);
-> > +     if (!nlh)
-> > +             return -EMSGSIZE;
-> > +
-> > +     ifm =3D nlmsg_data(nlh);
-> > +     ifm->ifa_family =3D AF_INET;
-> > +     ifm->ifa_prefixlen =3D 32;
-> > +     ifm->ifa_flags =3D IFA_F_PERMANENT;
-> > +     ifm->ifa_scope =3D RT_SCOPE_UNIVERSE;
-> > +     ifm->ifa_index =3D dev->ifindex;
-> > +
-> > +     if (nla_put_in_addr(skb, IFA_MULTICAST, addr) < 0) {
-> > +             nlmsg_cancel(skb, nlh);
-> > +             return -EMSGSIZE;
-> > +     }
-> > +
-> > +     nlmsg_end(skb, nlh);
-> > +     return 0;
-> > +}
-> > +
-> > +static void inet_ifmcaddr_notify(struct net_device *dev, __be32 addr, =
-int event)
-> > +{
-> > +     struct net *net =3D dev_net(dev);
-> > +     struct sk_buff *skb;
-> > +     int err =3D -ENOBUFS;
-> > +
-> > +     skb =3D nlmsg_new(NLMSG_ALIGN(sizeof(struct ifaddrmsg))
-> > +                     + nla_total_size(sizeof(__be32)), GFP_ATOMIC);
-> > +     if (!skb)
-> > +             goto error;
-> > +
-> > +     err =3D inet_fill_ifmcaddr(skb, dev, addr, event);
-> > +     if (err < 0) {
-> > +             WARN_ON(err =3D=3D -EMSGSIZE);
-> Maybe WARN_ON_ONCE() is enough?
->
->
-> Regards,
-> Nicolas
+>  
+> +		skb_shinfo(*clone)->tx_flags |= SKBTX_IN_PROGRESS;
+>  		OCELOT_SKB_CB(skb)->ptp_cmd = ptp_cmd;
+>  		OCELOT_SKB_CB(*clone)->ptp_class = ptp_class;
+>  	}
 
