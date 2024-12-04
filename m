@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-149158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92DBA9E4829
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 23:52:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C7389E486E
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 00:08:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0A031880410
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 22:52:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0551169439
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 23:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FFCC1F541A;
-	Wed,  4 Dec 2024 22:52:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9B41F5422;
+	Wed,  4 Dec 2024 23:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="PJMZgcOa"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="DwT8O8Iu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2EC23918D
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 22:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4F11A8F94
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 23:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733352727; cv=none; b=BJ+GVqACU+KP+tmu2dAIJVNzNLC7g+DKilT2n+kqJUupS2w9iWpqO+8+EGamQYRSHlJUTln/q0euMcwuRcagIoh4su3Ig1fd+mQCoQ20tHISoMd536vqSIqCZQOOQzfbuZfNXtpaOhMcGXt/y2lRtmBElHAHvLtucj5SqgAbis0=
+	t=1733353734; cv=none; b=nSX9uuFQacJpBpFu291qvPkBcGEM9yTutOT3zXRxF7OPQ1s6V1v1O2ukcl6aeCbEH32X6xlRgqiaxf1WpdC88jeiW9lV8L0oktfUWCYaGJWqhDEaHr+DuQxxIRp/qRD9D6k60I6rriFYkzNtUi7q2sGjrL2r5ZGZaEuSYqzJiMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733352727; c=relaxed/simple;
-	bh=BbpJCvn1MXnXbQgrGMkRVTBZLntlssDle2nhEWUHgOQ=;
+	s=arc-20240116; t=1733353734; c=relaxed/simple;
+	bh=F0NJ97nCPumDckOXtjnziKIoa/qCK2OpTeS1VsR6/mY=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=kzCYrzcotdgiNL8+cZ+ol0A61l9V8IW/QrXpoELwFY7bq1UNdUR7pw5Gm5MeywjNzi4kHSzvnlfmyMljbFUPhzX1xPViOidDbrfdxvTqqN3g5VhBZ4qDX/frXU96vcDxi2VptCzUb8yAnPpPesMBM0IDdc+IQhceThxQNTuAY3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=PJMZgcOa; arc=none smtp.client-ip=209.85.128.47
+	 In-Reply-To:Content-Type; b=QdCpb92TaaVoIGoS7ptqGtVwTsht9NlSnz9fmX6hZMuWQDY6hwkSoFIeGdEQuTt/swwTdGHdevA+56o979KtynOX6ti1of9xRGji6hFnpVSzAavJYjSlAYGK4hQtvJbfMQ1gI59yG4lnuqpVcyc4XjXnFpfXtZ44DAFK1ud1o/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=DwT8O8Iu; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-434a1833367so1853905e9.1
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 14:52:05 -0800 (PST)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-aa54adcb894so41341766b.0
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 15:08:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1733352724; x=1733957524; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1733353731; x=1733958531; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:references:cc:to:from:subject:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=QJY4PGEWGLtki4js6cDocdleyzRKIiiLi+utb9IeRFw=;
-        b=PJMZgcOaZa+nlhakIYl1e6CtGmQGbwC8CwDnKgkyU6NxtFMGIec8Q4kbjsXkG8HA5m
-         mdm+Y0mhgJvJKWgsQuB0iKwa88irR9fdiMl1Jp71OJ3ClgJ1Q/Xu6WgcfnDQV0x6Z3+A
-         FFxmeXID7XmTONVN4WPFa6WETx6nmYCK8Bxbcy6FsZ5xuiz4ZBJmlhOR7H5BU1Y5prZV
-         C4updvjWN/3r8lasnhFORYfz3ZxOlB/Rbj5WNtLiY5TXQQ/BWtupDyieMKqfFfmO+xS4
-         rE7MnogdtPEoHNRNrtw0cgdaAYE03byb9VVeAl84SZoL8Jq7Tox71nndKX0M4L5adATE
-         X5wQ==
+        bh=cKBLckwxwL3XkslyANGTh154PJ60a+jIScsVyxn68Vk=;
+        b=DwT8O8IuhXEkGVjbav8JZkUTs1S49S4y7UKJcs+bhlTGQgsUIt2I5vyC8y4EzW+AM+
+         Mo4G8U2OMb21Nd0JF2z24r1ymBBkXcA+ZFbsmbwEyOz4W8NUndxdj6Y6ImaXd2pMVAPY
+         bORpL72buIBbKq7MpzjgmiQQeLjLu2sNK4g2/3hyhknO6OUXmmAGedDgwe5H33q/MYo3
+         VhwrDR9eYG1YOak/W0ZFLTJHESU4U1aTnmA3wSgX5ZbdVGhWMcgGDL/dTjJ4RGZYp0/E
+         uQJAoN4eope32YIXhEc3gcg3v3MZyn8jdjg0XMPZ76k62Sk1QTWjVE6thweVQiUq6SnT
+         0Lqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733352724; x=1733957524;
+        d=1e100.net; s=20230601; t=1733353731; x=1733958531;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:references:cc:to:from:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=QJY4PGEWGLtki4js6cDocdleyzRKIiiLi+utb9IeRFw=;
-        b=NV/fGCuwGinBzDSaRxic7iczERjJJA/MMWlY3Z9X6QtqbXJ0iFtS2P997nHpl3Kqz1
-         /d4nozxjnMie805LD3Upxbrd4JgY/m091BlVunI2/F2maN8EsRK4ZafQnos13Md5q4o7
-         /iMDgAp99s8TyFPCb5trnMfTM0AtVEtnLlqUH0sBejDAMZOgvwboRSbRxa8bZlQyWPp5
-         0jNOFzmthS82n5J3XBZF5j1A9h415VEBG1Ay2lQxbQ8gsn0E2VITNukjx/zCNIaLhP0w
-         rphYncJMxPqLem0LMGrsmk4nR/EuQGEvI5TpYaA1HcL88/NV6aMPZ0vRE4n6NGgRCmdb
-         E1NA==
-X-Forwarded-Encrypted: i=1; AJvYcCVMQAhXiriBft9ljepQonHb6b/lPW3noKaGQfFbe6tb4x4GD/rIcyqLYZqUhraAzjPo5bl64RE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb11rkCEsZs//5DEYM03Ex8dRqx7dVZmvENUflrNAFNBpOM7+e
-	F8cvQh3w2ttzrK5fC3r8pf07N0cl7iQZCxw0FsYB7QGmb7S/CV88soVxptmCvnY=
-X-Gm-Gg: ASbGncv3cI5X4NpVv3UpbU5ahgnTY2DJXyNaLcNxy97bLWCY0HECKpeIIKmvDfkoQ1C
-	fY3xo/6bXgYIK3ORpwIRTRePuN7gdsB2uvt2FsDgmyXcTEZgn5Z1hvCyrewAIt4s6lc3a8MqWHB
-	Hu/04Boobokxx0z7q0MSPiNKK4/xrbFAaVWVoxLB+glSrvIlOw4IWVjsB7SkGdXJ49ZdYT+eBGy
-	MSbhbRFF6VPTC9a011dWDYWx7S3O2x0iCJaJEUmTEtHmebjYm7OthWbvwKqzTD/evWwomk2BKfE
-	BBLrzAFH690p
-X-Google-Smtp-Source: AGHT+IGJvHmmwLo8TCWd+PrCzT2NE0wYUpSiiKV93ZLkT6NdCnrMxrorsSCHOXAsAtRXhafH20MZlw==
-X-Received: by 2002:a05:600c:1c88:b0:434:9dcb:2f84 with SMTP id 5b1f17b1804b1-434d9253d19mr7729455e9.2.1733352724248;
-        Wed, 04 Dec 2024 14:52:04 -0800 (PST)
+        bh=cKBLckwxwL3XkslyANGTh154PJ60a+jIScsVyxn68Vk=;
+        b=ZmIG2wQYgTYeZZLkMWdHoHBfmL+KIUERYmV6pESSxmW9WuMU5S/cdJzsdTDmtF/y2W
+         7RHdzetK7TsJl2tc1+51yZbtNwJUvTDh99p43rKjJdk25l/jBJxmnky/mNkZ2/cRm5B3
+         8hJGQ5Hc3KsHkydQmWWoOGKdzzp7RePXKa54OBCjYJZ8b48HPhPoqyrfgpGk0lfFCAYT
+         3HRY4YVvj2lqW48nn9H10aaGrcnJrhrd47RrB8zQGg3Gbr6fk3bBwLgaWEwgXMDpdXpx
+         Ou3CWL7fkA+UzlQ9wmEJ7EDHyJh/kNqZH1FRgrDVty41n74d9gqmM8WgCaVoOq+HtAZP
+         VbPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV5ulAk1Rlwyh5x5PBKAfZLUxvgtmOciG4vSsq0MzItIxnW/Zypr6fwz5fwb8VRE11AVz/TxmI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwA3IJycX3sTGN2Z3zFrJQWdJ0BBJrrSI3lhGVTHCbglr7SZ5CP
+	BWUZfPR/IWpw7CAMqS7u+9s8qb2Hh3uoZUrIrA3u4//wcmIAS9hzAKFGsS7OHdg=
+X-Gm-Gg: ASbGncu0A2r9c13HkY3Q6xfkOkU+EYTvkTNW0iXM55csDUEpoy//u2c2cujjaXSBvK4
+	WzuI91h1rxKuEW/tjxpkyhBd7RcxLqSGbWKIHYPoL6Nn17No+NANOQQ8MNQqz35ghOzOCOO+vGK
+	dEBfdas9wIRe+/xFCnFuY3sRv+OvkgrJY686oR43IRAMyXFIsVoens9Oq8kY6a9gcaKZqEqYROf
+	EHV8KR4s6m73d9Udd6tgQ1zLMzA9HUbyPqAiM2JZOrSjUH/hUdrjSfA7Ld0Fq1uIxCOEb3erqWv
+	G4kS1wWOKwiZ
+X-Google-Smtp-Source: AGHT+IH69+zo0MA6o8lLr+64n7CFOdLqMrTUeqDDP42MbL7K6OX9M+e7TDBwqfrIzYhIfWUgmiWCBQ==
+X-Received: by 2002:a17:907:7746:b0:aa6:26d1:b5b3 with SMTP id a640c23a62f3a-aa626d1b716mr25348166b.18.1733353730706;
+        Wed, 04 Dec 2024 15:08:50 -0800 (PST)
 Received: from ?IPV6:2001:67c:2fbc:1:9715:a35f:73a4:7403? ([2001:67c:2fbc:1:9715:a35f:73a4:7403])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d43809fdsm25998785e9.1.2024.12.04.14.52.03
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa625ea38d0sm11700066b.73.2024.12.04.15.08.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2024 14:52:03 -0800 (PST)
-Message-ID: <8714deae-c1f7-42ff-9e76-fabd9ca5188b@openvpn.net>
-Date: Wed, 4 Dec 2024 23:52:43 +0100
+        Wed, 04 Dec 2024 15:08:50 -0800 (PST)
+Message-ID: <17e7d4c6-4912-4d5e-8723-45a06a1ad529@openvpn.net>
+Date: Thu, 5 Dec 2024 00:09:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,6 +95,7 @@ References: <20241202-b4-ovpn-v12-0-239ff733bf97@openvpn.net>
  <20241202-b4-ovpn-v12-11-239ff733bf97@openvpn.net>
  <784fddc4-336c-4674-8277-c7cebea6b94f@redhat.com>
  <2a1b614c-c52d-44c7-8cb8-c68a8864508d@openvpn.net>
+ <8714deae-c1f7-42ff-9e76-fabd9ca5188b@openvpn.net>
 Content-Language: en-US
 Autocrypt: addr=antonio@openvpn.net; keydata=
  xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
@@ -136,43 +137,45 @@ Autocrypt: addr=antonio@openvpn.net; keydata=
  BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
  +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
 Organization: OpenVPN Inc.
-In-Reply-To: <2a1b614c-c52d-44c7-8cb8-c68a8864508d@openvpn.net>
+In-Reply-To: <8714deae-c1f7-42ff-9e76-fabd9ca5188b@openvpn.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Paolo,
-
-On 04/12/2024 12:15, Antonio Quartulli wrote:
-[...]
->>> +        mutex_lock(&tcp6_prot_mutex);
->>> +        if (!ovpn_tcp6_prot.recvmsg)
->>> +            ovpn_tcp_build_protos(&ovpn_tcp6_prot, &ovpn_tcp6_ops,
->>> +                          sock->sk->sk_prot,
->>> +                          sock->sk->sk_socket->ops);
->>> +        mutex_unlock(&tcp6_prot_mutex);
->>
->> This looks like an hack to avoid a build dependency on IPV6, I think the
->> explicit
+On 04/12/2024 23:52, Antonio Quartulli wrote:
+> Paolo,
 > 
-> I happily copied this approach from espintcp.c:espintcp_init_sk() :-D
+> On 04/12/2024 12:15, Antonio Quartulli wrote:
+> [...]
+>>>> +        mutex_lock(&tcp6_prot_mutex);
+>>>> +        if (!ovpn_tcp6_prot.recvmsg)
+>>>> +            ovpn_tcp_build_protos(&ovpn_tcp6_prot, &ovpn_tcp6_ops,
+>>>> +                          sock->sk->sk_prot,
+>>>> +                          sock->sk->sk_socket->ops);
+>>>> +        mutex_unlock(&tcp6_prot_mutex);
+>>>
+>>> This looks like an hack to avoid a build dependency on IPV6, I think the
+>>> explicit
+>>
+>> I happily copied this approach from espintcp.c:espintcp_init_sk() :-D
+>>
+>>>
+>>> #if IS_ENABLED(CONFIG_IPV6)
+>>>
+>>> at init time should be preferable
 > 
->>
->> #if IS_ENABLED(CONFIG_IPV6)
->>
->> at init time should be preferable
+> To get this done at init time I need inet6_stream_ops to be accessible, 
+> but it seems there is no EXPORT_SYMBOL() for this object.
+> 
+> However, I see that mptcp/protocol.c is happily accessing it.
+> Any clue how this is possible?
 
-To get this done at init time I need inet6_stream_ops to be accessible, 
-but it seems there is no EXPORT_SYMBOL() for this object.
+I answer myself: mptcp is not tristate and it can only be compiled as 
+built-in.
 
-However, I see that mptcp/protocol.c is happily accessing it.
-Any clue how this is possible?
+If I compile ovpn as built-in I also get everything built fine.
 
-If I try to access it within ovpn I get the usual error:
-ERROR: modpost: "inet6_stream_ops" [drivers/net/ovpn/ovpn.ko] undefined!
-
-but mptcp compiles just fine.
-
-Any hint?
+Paolo, do you have any recommendation?
+Should I patch net/ipv6/af_inet6.c and add the missing EXPORT_SYMBOL()?
 
 Regards,
 
