@@ -1,163 +1,434 @@
-Return-Path: <netdev+bounces-148935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F1BB9E3883
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 12:15:06 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21BD69E3890
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 12:16:50 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3144EB2F328
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:01:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FB9B1639DB
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89FF1B2187;
-	Wed,  4 Dec 2024 11:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C819A1B3925;
+	Wed,  4 Dec 2024 11:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pkh4e012"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="DHcbSxTn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5FB1AF0AE;
-	Wed,  4 Dec 2024 11:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568721B0103
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 11:14:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733310098; cv=none; b=uPOKtkE8KVvWwAPOT6HGOZ9EHHMxZdH/Q/78xR42USdxPNORVZSIWUUG4tnt/3aCfJ/iba3iZ9VwNuetkSXF1nZm5B/iYDbjoqYuMUbhUJI1qoHuKUfwob21qwYiIvJA38XpN8JRQ9S/EHZaWVesnTAtPNp+Swz/7Ob4DJ7h8XM=
+	t=1733310882; cv=none; b=Vc3yvC/hrNmpzL6CcqjtpJfiGIDXwP4bHP/flKz2pTX3TDlyu8iXaEc0c/UR6jLUeqHvb3XmFqTjwBwyyGY7+nUxTtb7BV+Pcj9yBJ2vaCtaTubSrL3X5ueivwUv5+MQO2NHuIQ67kzrGlCvvN1NEXXgZXrtARiE2XW2hYeHJhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733310098; c=relaxed/simple;
-	bh=z1HFY+L1IO4WPUG9WzHJoKxu2wP+G47aGlRxHp7HWF8=;
+	s=arc-20240116; t=1733310882; c=relaxed/simple;
+	bh=9OLhs2SzV/pCzSUkig7J9m6Sox+2hEhjUdbeM9Ztw2Y=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oe7CttzIIVwJZRaNDfBoyxFjnMR+COladEXdF3mPsvm2hN76Td4QCHYMS2gbyvzg3+9k97ECeU7kUrU8UTBAYp55M2Sv0FnFDvib+Qc2J7Rjl6o2r/xWMiRvZT9YzToL3xjWvRicbHVOvlNMvumjZ6GlO9lnY8WnS6OYmZ6u6iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pkh4e012; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31192C4CED1;
-	Wed,  4 Dec 2024 11:01:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733310098;
-	bh=z1HFY+L1IO4WPUG9WzHJoKxu2wP+G47aGlRxHp7HWF8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Pkh4e012awYuobGmVqxNqBoekFIvIsI0yCxWj1ISx9OgkGJWLQUTT/vgX4D9ukvyO
-	 ps8Ii7qwjm4XRj0J/MPFPIiOunjW38AcrAakW7sJjGnn9c+vtjrbsbZmcrEc4P8WwE
-	 2uL3vB84zpzBS373JgGy4k1Ca592sqNMKmaMe6i9BmusaZyTQPak5OxmS74dWfIZok
-	 mt0KKEzDLamXQPv4Z4sccQ5c7DnTl3Y4DxYbRlVI1o1CJ+0vd4Tu49sP7G3OQ+j5Su
-	 plLJHwIoAJaJpA+Uwzh9I2wnCOIkVtqZ9upYnsu+WV3G6zBcL06c8jviD1zCeMrcvt
-	 4oCd8BtR+0wPg==
-Message-ID: <80b6603d-ed52-43b7-a434-0253e5de784a@kernel.org>
-Date: Wed, 4 Dec 2024 12:01:32 +0100
+	 In-Reply-To:Content-Type; b=bZOI/TlVDlNXNGC1stCpJ8Ua0VukwIOvm3DowYIx+a5YONPPP55CJjBi1MIBY2ur9lCdn22M3XXFF8Fl0Ty0jMwXaUKB0C8hrh5Zf3525EaJQ7xBsuUH7NoitZ7sGxRLQIDsvAd3smI+HJJVfMAfIKFVK1QB+YH0GCzpEaaqh2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=DHcbSxTn; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2ffc1009a06so97697731fa.2
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 03:14:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1733310878; x=1733915678; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ez2v/hFK48GJBwcBEU6ORn4LsLhEflZ+7+C1VR4AmbE=;
+        b=DHcbSxTnRWfR74T4K+DSrnKQ7X3Hjtu/9vMoVGk4rnI7NHF998POYiEQ7STuaA4s5l
+         2ibeeBBOt+V2FugFDxAWgQha0LyCHc81OYFBSax3m2c7rn8ji/j43j3/Pj0q53UMA8jC
+         VqqfYygguOKMyGvD38rPsL6dRCObZC8gboFfc+sRmuJxIwYh2p03oqO5Ln8GsCvSDIcv
+         s58AgVfPIrtVhW1z1O0tLahpqGjqmOPSQWzDEizSQbn/7WDjtmSz4pmOAwB+uocaPVXt
+         Hb7RqcVfbD6Nr6wvKh+XLAN60zhvWjmAPt6NxvWIPCYgfUv+mZCe4xhRSz+n96CYVgn0
+         X64A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733310878; x=1733915678;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ez2v/hFK48GJBwcBEU6ORn4LsLhEflZ+7+C1VR4AmbE=;
+        b=h7cUUTiFCo0I/tG51AMgObGL2reeY8g3H7w7VLdKU19ieciyJjK16jNJPmLq7Xb5nK
+         yPIixubOsJjFfqbF4IHwC7iBoep3iRDi/34OzVWLGTlUaQj9zDs3g3xypkgS1z6e1vzN
+         vSg/7itaeC/G1KuvojgvNt6K53jKKIFQ9thcuyCsJADpFL9/Yjr82tzgXdh40Y2v7UyP
+         pWW3xNC/usixMj6aTWRPCfDUB3DkjifObQp7z4uFP1k+Ay6CD1SulwzWIBoxrMQv/06N
+         sNS6hAayh22R+CbGGMxz4R44saCA5M6AdbFQrTNVysbZ4vQ37T1+45TR0UIhMm5i0+uL
+         yllg==
+X-Forwarded-Encrypted: i=1; AJvYcCUCRVNTA1bbpN1G7WkGssIwJig4xzHNVkuLuG4zYaWkdH0Tptgo2xue9wxQ4MMFQ64TULd8hpo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzu2TVZTOyoOC+5K2tZK4Kg9i/2JAI5fwlJuft4mOnux69CWCel
+	tRSzgn+DPJNLb/MisZ/S2ETevXYxLRgjCYuVqGLjmslRGYfUYCNnmysKeFRcN4goI/NmvMtbRHb
+	t
+X-Gm-Gg: ASbGncvABOz+fhE95iZFkzbY8TLp38bJmes6W+UfrEEA1A2tahbYPojbDIzSY3wbgKv
+	lC6jpkn1zUA94ep7+8usvDM3gdLMaBKOCy72YLjitoPKaXcl+KB/PaAymICrQRBKFoZAJe9PJQK
+	NM7TgNJc0ZKMs14wCtOEIJjgl8xuXkJDJqGbUZwcoMw/UkuFLStQhFG20mF4Uybsp48UVwAV76Q
+	Kv6sKATOHLkagt/iM7za9BkROY9AnhaYLx+5DE536goqPvpWp/w2QxWzi4KckzycLKDUWcfomTj
+	D4LZHzOgZnJF
+X-Google-Smtp-Source: AGHT+IHjWaqG1rXyWFR8Wi2Ha3hd2f8CVysn1B6oBnd2IW0Yh1Bn5HcpN52v67q0BsPdR2Y8WU7QnA==
+X-Received: by 2002:a05:6512:3e06:b0:53d:d3cb:d90b with SMTP id 2adb3069b0e04-53e12a38999mr5628954e87.47.1733310878264;
+        Wed, 04 Dec 2024 03:14:38 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:85f4:5278:b2f6:64fb? ([2001:67c:2fbc:1:85f4:5278:b2f6:64fb])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa5996c192fsm730780566b.27.2024.12.04.03.14.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Dec 2024 03:14:37 -0800 (PST)
+Message-ID: <2a1b614c-c52d-44c7-8cb8-c68a8864508d@openvpn.net>
+Date: Wed, 4 Dec 2024 12:15:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next] tcp: Check space before adding MPTCP options
-Content-Language: en-GB
-To: MoYuanhao <moyuanhao3676@163.com>, edumazet@google.com,
- davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- martineau@kernel.org, geliang@kernel.org, MPTCP Linux <mptcp@lists.linux.dev>
-References: <20241204085801.11563-1-moyuanhao3676@163.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20241204085801.11563-1-moyuanhao3676@163.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 11/22] ovpn: implement TCP transport
+To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20241202-b4-ovpn-v12-0-239ff733bf97@openvpn.net>
+ <20241202-b4-ovpn-v12-11-239ff733bf97@openvpn.net>
+ <784fddc4-336c-4674-8277-c7cebea6b94f@redhat.com>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <784fddc4-336c-4674-8277-c7cebea6b94f@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi MoYuanhao,
+On 03/12/2024 16:19, Paolo Abeni wrote:
+> On 12/2/24 16:07, Antonio Quartulli wrote:
+>> +void ovpn_tcp_socket_detach(struct socket *sock)
+>> +{
+>> +	struct ovpn_socket *ovpn_sock;
+>> +	struct ovpn_peer *peer;
+>> +
+>> +	if (!sock)
+>> +		return;
+>> +
+>> +	rcu_read_lock();
+>> +	ovpn_sock = rcu_dereference_sk_user_data(sock->sk);
+>> +
+>> +	if (!ovpn_sock->peer) {
+>> +		rcu_read_unlock();
+>> +		return;
+>> +	}
+>> +
+>> +	peer = ovpn_sock->peer;
+>> +	strp_stop(&peer->tcp.strp);
+>> +
+>> +	skb_queue_purge(&peer->tcp.user_queue);
+>> +
+>> +	/* restore CBs that were saved in ovpn_sock_set_tcp_cb() */
+>> +	sock->sk->sk_data_ready = peer->tcp.sk_cb.sk_data_ready;
+>> +	sock->sk->sk_write_space = peer->tcp.sk_cb.sk_write_space;
+>> +	sock->sk->sk_prot = peer->tcp.sk_cb.prot;
+>> +	sock->sk->sk_socket->ops = peer->tcp.sk_cb.ops;
+>> +	/* drop reference to peer */
+>> +	rcu_assign_sk_user_data(sock->sk, NULL);
+>> +
+>> +	rcu_read_unlock();
+>> +
+>> +	barrier();
+> 
+> It's unclear to me the role of the above barrier. A comment would help
 
-+Cc MPTCP mailing list.
+Unless I misinterpreted Sabrina's previous comment, the barrier() is 
+needed to prevent reordering and therefore ensure that the assumption 
+described in the comment below is true.
 
-(Please cc the MPTCP list next time)
+I can re-arrange the comment to make it clear that the barrier() is 
+serving this specific purpose.
 
-On 04/12/2024 09:58, MoYuanhao wrote:
-> Ensure enough space before adding MPTCP options in tcp_syn_options()
-> Added a check to verify sufficient remaining space
-> before inserting MPTCP options in SYN packets.
-> This prevents issues when space is insufficient.
+> 
+>> +	/* cancel any ongoing work. Done after removing the CBs so that these
+>> +	 * workers cannot be re-armed
+>> +	 */
+>> +	cancel_work_sync(&peer->tcp.tx_work);
+>> +	strp_done(&peer->tcp.strp);
+>> +	skb_queue_purge(&peer->tcp.out_queue);
+>> +
+>> +	ovpn_peer_put(peer);
+>> +}
+>> +
+>> +static void ovpn_tcp_send_sock(struct ovpn_peer *peer)
+>> +{
+>> +	struct sk_buff *skb = peer->tcp.out_msg.skb;
+>> +
+>> +	if (!skb)
+>> +		return;
+>> +
+>> +	if (peer->tcp.tx_in_progress)
+>> +		return;
+>> +
+>> +	peer->tcp.tx_in_progress = true;
+>> +
+>> +	do {
+>> +		int ret = skb_send_sock_locked(peer->sock->sock->sk, skb,
+>> +					       peer->tcp.out_msg.offset,
+>> +					       peer->tcp.out_msg.len);
+>> +		if (unlikely(ret < 0)) {
+>> +			if (ret == -EAGAIN)
+>> +				goto out;
+>> +
+>> +			net_warn_ratelimited("%s: TCP error to peer %u: %d\n",
+>> +					     netdev_name(peer->ovpn->dev),
+>> +					     peer->id, ret);
+>> +
+>> +			/* in case of TCP error we can't recover the VPN
+>> +			 * stream therefore we abort the connection
+>> +			 */
+>> +			ovpn_peer_del(peer,
+>> +				      OVPN_DEL_PEER_REASON_TRANSPORT_ERROR);
+>> +			break;
+>> +		}
+>> +
+>> +		peer->tcp.out_msg.len -= ret;
+>> +		peer->tcp.out_msg.offset += ret;
+>> +	} while (peer->tcp.out_msg.len > 0);
+>> +
+>> +	if (!peer->tcp.out_msg.len)
+>> +		dev_sw_netstats_tx_add(peer->ovpn->dev, 1, skb->len);
+>> +
+>> +	kfree_skb(peer->tcp.out_msg.skb);
+>> +	peer->tcp.out_msg.skb = NULL;
+>> +	peer->tcp.out_msg.len = 0;
+>> +	peer->tcp.out_msg.offset = 0;
+>> +
+>> +out:
+>> +	peer->tcp.tx_in_progress = false;
+>> +}
+>> +
+>> +static void ovpn_tcp_tx_work(struct work_struct *work)
+>> +{
+>> +	struct ovpn_peer *peer;
+>> +
+>> +	peer = container_of(work, struct ovpn_peer, tcp.tx_work);
+>> +
+>> +	lock_sock(peer->sock->sock->sk);
+>> +	ovpn_tcp_send_sock(peer);
+>> +	release_sock(peer->sock->sock->sk);
+>> +}
+>> +
+>> +static void ovpn_tcp_send_sock_skb(struct ovpn_peer *peer, struct sk_buff *skb)
+>> +{
+>> +	if (peer->tcp.out_msg.skb)
+>> +		ovpn_tcp_send_sock(peer);
+>> +
+>> +	if (peer->tcp.out_msg.skb) {
+>> +		dev_core_stats_rx_dropped_inc(peer->ovpn->dev);
+>> +		kfree_skb(skb);
+>> +		return;
+>> +	}
+>> +
+>> +	peer->tcp.out_msg.skb = skb;
+>> +	peer->tcp.out_msg.len = skb->len;
+>> +	peer->tcp.out_msg.offset = 0;
+>> +	ovpn_tcp_send_sock(peer);
+>> +}
+>> +
+>> +void ovpn_tcp_send_skb(struct ovpn_peer *peer, struct sk_buff *skb)
+>> +{
+>> +	u16 len = skb->len;
+>> +
+>> +	*(__be16 *)__skb_push(skb, sizeof(u16)) = htons(len);
+>> +
+>> +	bh_lock_sock(peer->sock->sock->sk);
+> 
+> Are you sure this runs in BH context? AFAICS we reach here from an AEAD
+> callback.
 
-Thank you for this patch. I'm surprised we all missed this check, but
-yes it is missing.
+It could be from the AEAD callback (crypto async case), but it may also 
+be directly from the packet RX path (crypto sync case).
 
-As mentioned by Eric in his previous email, please add a 'Fixes' tag.
-For bug-fixes, you should also Cc stable and target 'net', not 'net-next':
+If I am not wrong, in the latter case we are in BH context.
 
-Fixes: cec37a6e41aa ("mptcp: Handle MP_CAPABLE options for outgoing
-connections")
-Cc: stable@vger.kernel.org
+> 
+> 
+> 
+>> +	if (sock_owned_by_user(peer->sock->sock->sk)) {
+>> +		if (skb_queue_len(&peer->tcp.out_queue) >=
+>> +		    READ_ONCE(net_hotdata.max_backlog)) {
+>> +			dev_core_stats_rx_dropped_inc(peer->ovpn->dev);
+>> +			kfree_skb(skb);
+>> +			goto unlock;
+>> +		}
+>> +		__skb_queue_tail(&peer->tcp.out_queue, skb);
+>> +	} else {
+>> +		ovpn_tcp_send_sock_skb(peer, skb);
+>> +	}
+>> +unlock:
+>> +	bh_unlock_sock(peer->sock->sock->sk);
+>> +}
+> 
+> [...]
+> 
+>> +static void ovpn_tcp_build_protos(struct proto *new_prot,
+>> +				  struct proto_ops *new_ops,
+>> +				  const struct proto *orig_prot,
+>> +				  const struct proto_ops *orig_ops);
+>> +
+>> +/* Set TCP encapsulation callbacks */
+>> +int ovpn_tcp_socket_attach(struct socket *sock, struct ovpn_peer *peer)
+>> +{
+>> +	struct strp_callbacks cb = {
+>> +		.rcv_msg = ovpn_tcp_rcv,
+>> +		.parse_msg = ovpn_tcp_parse,
+>> +	};
+>> +	int ret;
+>> +
+>> +	/* make sure no pre-existing encapsulation handler exists */
+>> +	if (sock->sk->sk_user_data)
+>> +		return -EBUSY;
+>> +
+>> +	/* sanity check */
+>> +	if (sock->sk->sk_protocol != IPPROTO_TCP) {
+>> +		net_err_ratelimited("%s: provided socket is not TCP as expected\n",
+>> +				    netdev_name(peer->ovpn->dev));
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	/* only a fully connected socket are expected. Connection should be
+>> +	 * handled in userspace
+>> +	 */
+>> +	if (sock->sk->sk_state != TCP_ESTABLISHED) {
+>> +		net_err_ratelimited("%s: provided TCP socket is not in ESTABLISHED state: %d\n",
+>> +				    netdev_name(peer->ovpn->dev),
+>> +				    sock->sk->sk_state);
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	lock_sock(sock->sk);
+>> +
+>> +	ret = strp_init(&peer->tcp.strp, sock->sk, &cb);
+>> +	if (ret < 0) {
+>> +		DEBUG_NET_WARN_ON_ONCE(1);
+>> +		release_sock(sock->sk);
+>> +		return ret;
+>> +	}
+>> +
+>> +	INIT_WORK(&peer->tcp.tx_work, ovpn_tcp_tx_work);
+>> +	__sk_dst_reset(sock->sk);
+>> +	skb_queue_head_init(&peer->tcp.user_queue);
+>> +	skb_queue_head_init(&peer->tcp.out_queue);
+>> +
+>> +	/* save current CBs so that they can be restored upon socket release */
+>> +	peer->tcp.sk_cb.sk_data_ready = sock->sk->sk_data_ready;
+>> +	peer->tcp.sk_cb.sk_write_space = sock->sk->sk_write_space;
+>> +	peer->tcp.sk_cb.prot = sock->sk->sk_prot;
+>> +	peer->tcp.sk_cb.ops = sock->sk->sk_socket->ops;
+>> +
+>> +	/* assign our static CBs and prot/ops */
+>> +	sock->sk->sk_data_ready = ovpn_tcp_data_ready;
+>> +	sock->sk->sk_write_space = ovpn_tcp_write_space;
+>> +
+>> +	if (sock->sk->sk_family == AF_INET) {
+>> +		sock->sk->sk_prot = &ovpn_tcp_prot;
+>> +		sock->sk->sk_socket->ops = &ovpn_tcp_ops;
+>> +	} else {
+>> +		mutex_lock(&tcp6_prot_mutex);
+>> +		if (!ovpn_tcp6_prot.recvmsg)
+>> +			ovpn_tcp_build_protos(&ovpn_tcp6_prot, &ovpn_tcp6_ops,
+>> +					      sock->sk->sk_prot,
+>> +					      sock->sk->sk_socket->ops);
+>> +		mutex_unlock(&tcp6_prot_mutex);
+> 
+> This looks like an hack to avoid a build dependency on IPV6, I think the
+> explicit
+
+I happily copied this approach from espintcp.c:espintcp_init_sk() :-D
+
+> 
+> #if IS_ENABLED(CONFIG_IPV6)
+> 
+> at init time should be preferable
+
+Ok, will try to take this other approach.
+
+I also have the feeling that by going this way I can get rid of the 
+checkpatch warning about proto_ops not being consts.
+
+> 
+>> +
+>> +		sock->sk->sk_prot = &ovpn_tcp6_prot;
+>> +		sock->sk->sk_socket->ops = &ovpn_tcp6_ops;
+>> +	}
+> 
+> [...]
+> 
+>> +static void ovpn_tcp_close(struct sock *sk, long timeout)
+>> +{
+>> +	struct ovpn_socket *sock;
+>> +
+>> +	rcu_read_lock();
+>> +	sock = rcu_dereference_sk_user_data(sk);
+>> +
+>> +	strp_stop(&sock->peer->tcp.strp);
+>> +	barrier();
+> 
+> Again, is not clear to me the role of the above barrier, please document it.
+
+Also taken from espintcp_close(), with the idea to avoid reordering 
+during the shut down sequence.
+
+Will add a comment here too.
 
 
-Regarding the code, it looks OK to me, as we did exactly that with
-mptcp_synack_options(). In mptcp_established_options(), we pass
-'remaining' because many MPTCP options can be set, but not here. So I
-guess that's fine to keep the code like that, especially for the 'net' tree.
+Thanks a lot.
 
+Regards,
 
-Also, and linked to Eric's email, did you have an issue with that, or is
-it to prevent issues in the future?
+> 
+> Thanks,
+> 
+> Paolo
+> 
 
-
-One last thing, please don’t repost your patches within one 24h period, see:
-
-  https://docs.kernel.org/process/maintainer-netdev.html
-
-
-Because the code is OK to me, and the same patch has already been sent
-twice to the netdev ML within a few hours, I'm going to apply this patch
-in our MPTCP tree with the suggested modifications. Later on, we will
-send it for inclusion in the net tree.
-
-pw-bot: awaiting-upstream
-
-(Not sure this pw-bot instruction will work as no net/mptcp/* files have
-been modified)
-
-Cheers,
-Matt
 -- 
-Sponsored by the NGI0 Core fund.
+Antonio Quartulli
+OpenVPN Inc.
 
 
