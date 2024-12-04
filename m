@@ -1,208 +1,213 @@
-Return-Path: <netdev+bounces-149127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E69BE9E4602
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 21:43:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C9439E4639
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 22:01:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEB4E169D82
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 20:43:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF957168753
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 21:01:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE9A18FC70;
-	Wed,  4 Dec 2024 20:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080B41917D7;
+	Wed,  4 Dec 2024 21:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nNSRR48i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154E518E379
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 20:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3742918DF81;
+	Wed,  4 Dec 2024 21:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733345010; cv=none; b=hZtHgUDt8jk4uwPOsGWpBeC6lB9Gg8Fsu87W1CT7vuep9xco9ms8lf5pIwXBcDxMEutUHWQb2u2APLxI9FZkC8Sho3/3k4W45VJXcz/3prtZK5QyUMKQjSOrTx2AweVFbulKdelCvvnjGq1gPWWjvoOCwb6UJDHxrM682arO7YA=
+	t=1733346089; cv=none; b=ToBsswANOLXscQ4bDSfPXHd7W/kwT8Op8Q5MBNV+eBaXyxrEYjw0rluBqe/Il4bzZTJYNwTysUce8/KtpeFcdz709tYZ+ZKCdAYY3QkIwKe2J42sTfmPj2ufuRxdZfVD1Zf0TgL022UCIc4Gb9R1f1npnTNaHvVzpr/zMZiwVvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733345010; c=relaxed/simple;
-	bh=MxqrL7P+q5TtbAG4Bjz4LhtI/kOkk5CviQKzYIdVOEo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FL4FB+f+Ps9GRXby4V6PATCJpEaP5aW1Wbu8LxMgbG6GTvXgGz8jV3knC9jklRZe+QMSysj9NEgxiwspTLZwpMgCooemlACiHqW+kmAYy3UKBS8fjVj2mLJ4Wu0WBQRUkG1+eeodd9hNr+1Esp0G13vKCSGto6Ie/3VMkSbFn90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3a7de3ab182so2409785ab.1
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 12:43:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733345008; x=1733949808;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6k9FdKQ2cY0hs7m3TWq6tSTQAE+PkoV2U5ODf+4lDTE=;
-        b=noGshyWfnpwIYzVfGye9vO++zZ32dtaQS6nwgp4uYNj9ZCJThRr+MKY1PipMLyKE5U
-         i2oZM6pAp8BCdeGODo4F4he4kTpSOvyBHALShA75Q51NDEgo4BmsQwcsLLQESzeJiXF/
-         QDVcq7kgA1tBHiWsU2/ju/iS04har2vEZC475cgOUyMp2n65oCs/zkJFsAxSUlZT/A07
-         78nV/0UdXBIk1BpCCMDp1zG8wj0wNkUfTFjXImEtDjEvON1GrlFTmAqpGMR+sjGobcek
-         5KpOiK0zN0Xkm8FookUcRp62/sSdU1DHKKLK/AWiZ3d+8EjWP3iLGXqzpSA70JM5gvjN
-         elyw==
-X-Forwarded-Encrypted: i=1; AJvYcCWtt1jQEJWfruuDqBHeiHbc7TlxXCYPJD4hDgfgVRfTydUhZDLc53lZacF6YUzWUXeWJgteow8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJWEv9oJRHDD2pLypELk0+L+AEUu51OATBwqxy4RUTApTaOQWC
-	Pu4haV766NdC9WMhsWKnLfgGr31KB2uf7s7TN7Ah8TUgiTq3UZtViXEpsheeTfuNIvmiyptl+9a
-	OBn2X1lS+GV7M7LIMnZy2bB4jDHjDg7KH2sxShBFD020JgjqirD7ijEE=
-X-Google-Smtp-Source: AGHT+IGzcfQlcveK056IjyzEAo6BuiDtS7T5gBiKtK++qt8PMl5gkvyuubW/bOBIEUWrnazFAgccABw+QgUre2ueSmGU7oZrkqBW
+	s=arc-20240116; t=1733346089; c=relaxed/simple;
+	bh=YYisex5fANxvp1J7FXSt2wFTYyLxl4fy8A9aDQDg1FQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CNvrbLHg+1IuHwK6kwlRGa4AJjhPGK2Weg1G0uCFHS0JO8ri9aQuoYKRCwKyQUkl5aMDzkYgRV/mH1JC/bStrTF7fGQsVlsomLui2poeiWOdxzTAW/iEH90SOvbG1gAmND1s4seez4+UGFchNsZ9D44r87Zbo10SHKB7oLg6zg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nNSRR48i; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733346088; x=1764882088;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YYisex5fANxvp1J7FXSt2wFTYyLxl4fy8A9aDQDg1FQ=;
+  b=nNSRR48i5t9Qm9/t5po/KTw13GNfQkhEabEwgZE/trvtAd5kVzZAzFkB
+   pNr9Provy09XZweEesbuoDeqHlPiCrM0O0NXLBwon3VXoY1xzi3Dn4FNt
+   duTbwgU331MHNg/jPABW7ZbO6n2cPqYWWnGyGfGP/WFdFoKLmS0yNsTo1
+   A+R+W/Khlv+oLJKkAcADYc1WSxeUDo4cFSKgXLFNwEuJ1r8rPzi1zu3SV
+   d2G+7yuulEG3IYIoRQWm2BpY9OhHMA9SvFVkmYAsiAl6ov7HPUc190y2K
+   yQshcoHESyxoin+aDII00rgsVDIw+di0evf+V/B4a7luXLobrjmwbx5ft
+   A==;
+X-CSE-ConnectionGUID: dW3lS1L2R7iWSW1w8WfVLg==
+X-CSE-MsgGUID: pAWn637UTgSHidUSV8nRlw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="33376974"
+X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
+   d="scan'208";a="33376974"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 13:01:25 -0800
+X-CSE-ConnectionGUID: QWS2hJyNQWOxHgI42sEvdA==
+X-CSE-MsgGUID: 21i45RZzRYqLQ7OlhLyg3A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
+   d="scan'208";a="97937245"
+Received: from lkp-server02.sh.intel.com (HELO 1f5a171d57e2) ([10.239.97.151])
+  by fmviesa003.fm.intel.com with ESMTP; 04 Dec 2024 13:01:21 -0800
+Received: from kbuild by 1f5a171d57e2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tIwUo-0003UD-2j;
+	Wed, 04 Dec 2024 21:01:18 +0000
+Date: Thu, 5 Dec 2024 05:00:58 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tariq Toukan <tariqt@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+	linux-rdma@vger.kernel.org, Carolina Jubran <cjubran@nvidia.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next V4 07/11] devlink: Extend devlink rate API with
+ traffic classes bandwidth management
+Message-ID: <202412050416.e7egEz4f-lkp@intel.com>
+References: <20241203202924.228440-8-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c246:0:b0:3a6:c98d:86bc with SMTP id
- e9e14a558f8ab-3a7f9a3838cmr101282705ab.1.1733345008365; Wed, 04 Dec 2024
- 12:43:28 -0800 (PST)
-Date: Wed, 04 Dec 2024 12:43:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6750bef0.050a0220.17bd51.007a.GAE@google.com>
-Subject: [syzbot] [wireless?] [ext4?] general protection fault in pcpu_alloc
-From: syzbot <syzbot+e874685d80aae83785cc@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-ext4@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241203202924.228440-8-tariqt@nvidia.com>
 
-Hello,
+Hi Tariq,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build warnings:
 
-HEAD commit:    bcc8eda6d349 Merge tag 'turbostat-2024.11.30' of git://git..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=128dbf78580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=53ebff8e07a0ee6f
-dashboard link: https://syzkaller.appspot.com/bug?extid=e874685d80aae83785cc
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14bd15e8580000
+[auto build test WARNING on net-next/main]
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/7dd7042cbaae/disk-bcc8eda6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/48269d20d4af/vmlinux-bcc8eda6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/010f2b2a997f/bzImage-bcc8eda6.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/73a779ed9f88/mount_0.gz
+url:    https://github.com/intel-lab-lkp/linux/commits/Tariq-Toukan/net-mlx5-ifc-Reorganize-mlx5_ifc_flow_table_context_bits/20241204-124235
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241203202924.228440-8-tariqt%40nvidia.com
+patch subject: [PATCH net-next V4 07/11] devlink: Extend devlink rate API with traffic classes bandwidth management
+config: x86_64-buildonly-randconfig-001-20241205 (https://download.01.org/0day-ci/archive/20241205/202412050416.e7egEz4f-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241205/202412050416.e7egEz4f-lkp@intel.com/reproduce)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e874685d80aae83785cc@syzkaller.appspotmail.com
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412050416.e7egEz4f-lkp@intel.com/
 
-Oops: general protection fault, probably for non-canonical address 0xec2c282c2c2c2c2d: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: maybe wild-memory-access in range [0x6161616161616168-0x616161616161616f]
-CPU: 0 UID: 0 PID: 5926 Comm: syz-executor Not tainted 6.12.0-syzkaller-12113-gbcc8eda6d349 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:__hlist_del include/linux/list.h:982 [inline]
-RIP: 0010:hlist_del include/linux/list.h:994 [inline]
-RIP: 0010:__alloc_object lib/debugobjects.c:232 [inline]
-RIP: 0010:pcpu_alloc+0x1a8/0x300 lib/debugobjects.c:256
-Code: 2e 4c 89 e8 48 c1 e8 03 80 3c 28 00 74 08 4c 89 ef e8 0c d2 3e fd 49 89 5d 00 48 85 db 74 1c 48 83 c3 08 48 89 d8 48 c1 e8 03 <80> 3c 28 00 74 08 48 89 df e8 ea d1 3e fd 4c 89 2b 41 80 3c 2f 00
-RSP: 0018:ffffc900038a6f60 EFLAGS: 00010006
-RAX: 0c2c2c2c2c2c2c2d RBX: 6161616161616169 RCX: 0000000000000001
-RDX: ffffffff8c09c480 RSI: ffffffff8c5e9080 RDI: ffffffff8c5e9040
-RBP: dffffc0000000000 R08: 0000000000000003 R09: fffff52000714ddc
-R10: dffffc0000000000 R11: fffff52000714ddc R12: 1ffff1100f228801
-R13: ffff8880b863fe00 R14: ffff888079144008 R15: 1ffff1100f228800
-FS:  000055555fac2500(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005555915bb808 CR3: 000000001cad4000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- alloc_object+0xbf/0x310 lib/debugobjects.c:458
- lookup_object_or_alloc lib/debugobjects.c:685 [inline]
- __debug_object_init+0x185/0x470 lib/debugobjects.c:743
- ieee80211_alloc_hw_nm+0x126e/0x1ea0 net/mac80211/main.c:976
- mac80211_hwsim_new_radio+0x1db/0x4a90 drivers/net/wireless/virtual/mac80211_hwsim.c:5146
- hwsim_new_radio_nl+0xece/0x2290 drivers/net/wireless/virtual/mac80211_hwsim.c:6203
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2542
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1347
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1891
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:726
- __sys_sendto+0x363/0x4c0 net/socket.c:2197
- __do_sys_sendto net/socket.c:2204 [inline]
- __se_sys_sendto net/socket.c:2200 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2200
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f811ad826dc
-Code: 2a 5a 02 00 44 8b 4c 24 2c 4c 8b 44 24 20 89 c5 44 8b 54 24 28 48 8b 54 24 18 b8 2c 00 00 00 48 8b 74 24 10 8b 7c 24 08 0f 05 <48> 3d 00 f0 ff ff 77 34 89 ef 48 89 44 24 08 e8 70 5a 02 00 48 8b
-RSP: 002b:00007ffd7f24e760 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f811ba74620 RCX: 00007f811ad826dc
-RDX: 0000000000000024 RSI: 00007f811ba74670 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 00007ffd7f24e7b4 R09: 000000000000000c
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
-R13: 0000000000000000 R14: 00007f811ba74670 R15: 0000000000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__hlist_del include/linux/list.h:982 [inline]
-RIP: 0010:hlist_del include/linux/list.h:994 [inline]
-RIP: 0010:__alloc_object lib/debugobjects.c:232 [inline]
-RIP: 0010:pcpu_alloc+0x1a8/0x300 lib/debugobjects.c:256
-Code: 2e 4c 89 e8 48 c1 e8 03 80 3c 28 00 74 08 4c 89 ef e8 0c d2 3e fd 49 89 5d 00 48 85 db 74 1c 48 83 c3 08 48 89 d8 48 c1 e8 03 <80> 3c 28 00 74 08 48 89 df e8 ea d1 3e fd 4c 89 2b 41 80 3c 2f 00
-RSP: 0018:ffffc900038a6f60 EFLAGS: 00010006
-RAX: 0c2c2c2c2c2c2c2d RBX: 6161616161616169 RCX: 0000000000000001
-RDX: ffffffff8c09c480 RSI: ffffffff8c5e9080 RDI: ffffffff8c5e9040
-RBP: dffffc0000000000 R08: 0000000000000003 R09: fffff52000714ddc
-R10: dffffc0000000000 R11: fffff52000714ddc R12: 1ffff1100f228801
-R13: ffff8880b863fe00 R14: ffff888079144008 R15: 1ffff1100f228800
-FS:  000055555fac2500(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005555915bb808 CR3: 000000001cad4000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	2e 4c 89 e8          	cs mov %r13,%rax
-   4:	48 c1 e8 03          	shr    $0x3,%rax
-   8:	80 3c 28 00          	cmpb   $0x0,(%rax,%rbp,1)
-   c:	74 08                	je     0x16
-   e:	4c 89 ef             	mov    %r13,%rdi
-  11:	e8 0c d2 3e fd       	call   0xfd3ed222
-  16:	49 89 5d 00          	mov    %rbx,0x0(%r13)
-  1a:	48 85 db             	test   %rbx,%rbx
-  1d:	74 1c                	je     0x3b
-  1f:	48 83 c3 08          	add    $0x8,%rbx
-  23:	48 89 d8             	mov    %rbx,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	80 3c 28 00          	cmpb   $0x0,(%rax,%rbp,1) <-- trapping instruction
-  2e:	74 08                	je     0x38
-  30:	48 89 df             	mov    %rbx,%rdi
-  33:	e8 ea d1 3e fd       	call   0xfd3ed222
-  38:	4c 89 2b             	mov    %r13,(%rbx)
-  3b:	41 80 3c 2f 00       	cmpb   $0x0,(%r15,%rbp,1)
+All warnings (new ones prefixed by >>):
+
+   In file included from net/devlink/rate.c:7:
+   In file included from net/devlink/devl_internal.h:7:
+   In file included from include/linux/etherdevice.h:20:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:8:
+   In file included from include/linux/cacheflush.h:5:
+   In file included from arch/x86/include/asm/cacheflush.h:5:
+   In file included from include/linux/mm.h:2223:
+   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     505 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     512 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     525 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   In file included from net/devlink/rate.c:7:
+   net/devlink/devl_internal.h:29:19: warning: arithmetic between different enumeration types ('enum devlink_reload_limit' and 'enum devlink_reload_action') [-Wenum-enum-conversion]
+      29 |         u32 reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
+         |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   net/devlink/devl_internal.h:26:30: note: expanded from macro 'DEVLINK_RELOAD_STATS_ARRAY_SIZE'
+      26 |         (__DEVLINK_RELOAD_LIMIT_MAX * __DEVLINK_RELOAD_ACTION_MAX)
+         |          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   net/devlink/devl_internal.h:30:26: warning: arithmetic between different enumeration types ('enum devlink_reload_limit' and 'enum devlink_reload_action') [-Wenum-enum-conversion]
+      30 |         u32 remote_reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   net/devlink/devl_internal.h:26:30: note: expanded from macro 'DEVLINK_RELOAD_STATS_ARRAY_SIZE'
+      26 |         (__DEVLINK_RELOAD_LIMIT_MAX * __DEVLINK_RELOAD_ACTION_MAX)
+         |          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> net/devlink/rate.c:403:4: warning: 'snprintf' will always be truncated; specified size is 80, but format string expands to at least 83 [-Wformat-truncation]
+     403 |                         NL_SET_ERR_MSG_FMT(info->extack,
+         |                         ^
+   include/linux/netlink.h:116:6: note: expanded from macro 'NL_SET_ERR_MSG_FMT'
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^
+   7 warnings generated.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+vim +/snprintf +403 net/devlink/rate.c
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+   381	
+   382	static int devlink_nl_rate_tc_bw_set(struct devlink_rate *devlink_rate,
+   383					     struct genl_info *info)
+   384	{
+   385		DECLARE_BITMAP(bitmap, IEEE_8021QAZ_MAX_TCS) = {};
+   386		struct devlink *devlink = devlink_rate->devlink;
+   387		const struct devlink_ops *ops = devlink->ops;
+   388		u32 tc_bw[IEEE_8021QAZ_MAX_TCS] = {};
+   389		int rem, err = -EOPNOTSUPP, i;
+   390		struct nlattr *attr;
+   391	
+   392		nla_for_each_attr(attr, genlmsg_data(info->genlhdr),
+   393				  genlmsg_len(info->genlhdr), rem) {
+   394			if (nla_type(attr) == DEVLINK_ATTR_RATE_TC_BWS) {
+   395				err = devlink_nl_rate_tc_bw_parse(attr, tc_bw, bitmap, info->extack);
+   396				if (err)
+   397					return err;
+   398			}
+   399		}
+   400	
+   401		for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
+   402			if (!test_bit(i, bitmap)) {
+ > 403				NL_SET_ERR_MSG_FMT(info->extack,
+   404						   "Incomplete traffic class bandwidth values, all %u traffic classes must be specified",
+   405						   IEEE_8021QAZ_MAX_TCS);
+   406				return -EINVAL;
+   407			}
+   408		}
+   409	
+   410		if (devlink_rate_is_leaf(devlink_rate))
+   411			err = ops->rate_leaf_tc_bw_set(devlink_rate, devlink_rate->priv, tc_bw,
+   412						       info->extack);
+   413		else if (devlink_rate_is_node(devlink_rate))
+   414			err = ops->rate_node_tc_bw_set(devlink_rate, devlink_rate->priv, tc_bw,
+   415						       info->extack);
+   416	
+   417		if (err)
+   418			return err;
+   419	
+   420		memcpy(devlink_rate->tc_bw, tc_bw, sizeof(tc_bw));
+   421	
+   422		return 0;
+   423	}
+   424	
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
