@@ -1,171 +1,139 @@
-Return-Path: <netdev+bounces-148931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A9319E3810
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:57:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 674949E37DC
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:49:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60CECB33429
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 10:55:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C02A2818BF
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 10:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDABF1B0F0A;
-	Wed,  4 Dec 2024 10:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B574F1AF0DB;
+	Wed,  4 Dec 2024 10:49:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="RSaOtjdB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HYQnrOXT"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward204a.mail.yandex.net (forward204a.mail.yandex.net [178.154.239.89])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD7C1B140D
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 10:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B55F1AC88B
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 10:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733309712; cv=none; b=eW4HyiAn4mGgyt4+/Ye+3xJKvTyd4/NMmJ/NyE8ja7ADuUvS8bs0u7HKa8OsFfAAl5Z7gAXjmA9XY7ReK3uBCMxv2P6k9bQDFJphbkAJ1KvXNu73Zjbu2IwHy0h8CHmtEW+Ux5oppa+fpTMMgnMi95lxRvicEctHBI8XnAhQT/s=
+	t=1733309353; cv=none; b=mnrGL30fbJi9Sy8h+9mUAy59T2FHUbpYn6y47RqjTps4tOKfVH1wuiruuIAGFOABVSRBVAvwvj+dk5AYws3utUSR98yA4vxN7eilHazGNnCRC2LCOTdxd6RUbXv3MjdfbYDqG3AMZ0Ma1+289fJgyNLFQvGN4Z7jarQikRPSpBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733309712; c=relaxed/simple;
-	bh=mGjmol7mtj75oQcPC+Gs7G/orwGpufLqFDaiyl/+OTs=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=QlH48qcZjDgv55vrs202XGqWPcGFhwD7wmI6nPrJs4olBjoMFDC/Z6nn2bIMjNKk89QkfRklqpIoVXlSfOHxTHp+vtChSlo2p2uXlNeXaddcSMHuTwvsgwftx81IhNv3ltkSseAj0owhycOvbE5Ur/XnEOBGl/IeqRgYOrsk6uc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=RSaOtjdB; arc=none smtp.client-ip=178.154.239.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward100a.mail.yandex.net (forward100a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d100])
-	by forward204a.mail.yandex.net (Yandex) with ESMTPS id 33F72693A5
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 13:47:21 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-51.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-51.vla.yp-c.yandex.net [IPv6:2a02:6b8:c0f:2f03:0:640:5d54:0])
-	by forward100a.mail.yandex.net (Yandex) with ESMTPS id E8A464737E;
-	Wed,  4 Dec 2024 13:47:11 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-51.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 9ldGNK4OqOs0-G0Ag3KJd;
-	Wed, 04 Dec 2024 13:47:11 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1733309231; bh=hXlp3UDedban6VzaEZLEg5Zqkta80zn1WVvsYI3JLHg=;
-	h=Subject:To:From:Cc:Date:Message-ID;
-	b=RSaOtjdBvQiEFk8TbyQX4qErVw6x04FP+mLb6KhHi3phBBqKD9bhv0dqskLEnNd6B
-	 X5vuD8TQkkpJCuwklIEqg9qUQ9Tt4HKW+UDR8e0O3Qh9cDFkvGmtfVKBP5kUP74JUA
-	 JDid9q7XYrLVaf7i+vObXaZeNrSRJ652iN1Q9/bc=
-Authentication-Results: mail-nwsmtp-smtp-production-main-51.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <99b9f7b6-0be5-445a-8bac-1d3f5d67a818@yandex.ru>
-Date: Wed, 4 Dec 2024 13:47:09 +0300
+	s=arc-20240116; t=1733309353; c=relaxed/simple;
+	bh=bGyB4438J81jRH4x6gWKO6BpBH8blrXI02fUkyoMcgo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=E/zW5YLKORmQIQDKeYy1wbUwi3IkSEPjwMask4tLR9BuAx35Ww6z1CmxhjN64ko90UZ3BBlVFmUPYxHUAcw7gTstq9Dm7ZOZgFoRpmr2N9Btl1QZFksFehQFdhvwXdkihhSTsSLxRtm57Nhp07rY3ICqdhLzKOMWMU8mUH4aebU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HYQnrOXT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733309351;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gTz3waxgahN3oOX83LVGcoQz1BmDfZdx8p5FTeZL4LM=;
+	b=HYQnrOXT4gK1jXJZ6Phz4bDdhK3JXseFPQb9cFwEm1dR/hn1vEVqUp/D7LbV4IND4d5WrJ
+	74skfoQBUTGrTwzA1YbZkOJLhMvVDoOlEp4LCPTXCjnkXM+PpocMQihFvbMZ+NEUs7a0lC
+	6i5/i8a04hN2apIu8wJzXcNOjRlJinw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-391-PX1vnPeJMPmT6wju_zmaAA-1; Wed, 04 Dec 2024 05:49:09 -0500
+X-MC-Unique: PX1vnPeJMPmT6wju_zmaAA-1
+X-Mimecast-MFC-AGG-ID: PX1vnPeJMPmT6wju_zmaAA
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-385e9c698e7so458071f8f.0
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 02:49:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733309348; x=1733914148;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gTz3waxgahN3oOX83LVGcoQz1BmDfZdx8p5FTeZL4LM=;
+        b=OuW+O5SWC+i9riVxeCmJanJ+HR6zM0ZNda0Iei3o45Heosn8CiKd8PjDYIUZLtqRZg
+         oGEOhw1h8BKVA6PPpwXrH15gMryjkT18DABXkaeYxOI/ecmqE4vGyIdPI5awyANPfdxa
+         1M0bbJ+7dcwHvuZhwaA6OkMRpCdalIhxGYv/h7VwB0H+o/r2g70tv3SpCirMMrDdNiCT
+         BA1RoXcAMd6u0xhQjq+bmExq4tvBZj/pQWgsP6QzuWE5LkRXSzQuwfUaLF/3kK8sYVVv
+         bxGz1QYAnLruexO/MpJ1ppwwfm8A4w+J15eAPPq8CG8sw/C8GsiFaUbG82Vw8hGAMfoO
+         lPIg==
+X-Forwarded-Encrypted: i=1; AJvYcCWN9Li4NNW94kW8jyl4v3sZ6r1YCMxZSvKMMnboXUbYYI66xOR6UPhg/VbmQEMcjTMDQFey4Z8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwD7JNcCFtvfYm0z8f2sIPJ1wLGSapMe/IJIFdHL9no8se767LM
+	7ftRyGauerb83rEX1ectASiHiqCras0kNLHH4mtaKVYTI4VBWYxeHQpY4pAugBQBERXMctyZZE+
+	u4YMW/s8h5l/6vkSvhG6amuZjfpBHfvT+Zj71ahDjRecofqMN30CjtQ==
+X-Gm-Gg: ASbGncuh7IPX7GEEnrn7Fk5jYH0+u9mFGpRcKf6M05QrodjSrzfSkVQaSYkDvTz5uBB
+	gnTpXX140iMBq75/AIxQ7Ew2Ym/YL1/Drapp84O3MgLGIjtKY67oDsHWbTM9J37/b/gu4GKxvt/
+	BEmum9+Vpa5UKQ4SGmzcOQpI84w4Bvt7Y17btrJykxDHWZTLXfofzVNBkauI0e8cyEb4QpD56UU
+	AFzpMCEU/szt101abbRjjfoAMviha7vd8qkZewXBTTt7uE=
+X-Received: by 2002:a05:6000:401f:b0:385:ef14:3b55 with SMTP id ffacd0b85a97d-385fd9abb87mr4384222f8f.19.1733309348365;
+        Wed, 04 Dec 2024 02:49:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHcEgMypYhXM56G/nD3wm0gwci3A8/obXgJv7EiRTyM21DWn6RxvvWTZKFaMDEAHFySbGhZ5A==
+X-Received: by 2002:a05:6000:401f:b0:385:ef14:3b55 with SMTP id ffacd0b85a97d-385fd9abb87mr4384198f8f.19.1733309348033;
+        Wed, 04 Dec 2024 02:49:08 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385ccd36b80sm17799002f8f.29.2024.12.04.02.49.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 02:49:07 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 8C43016BD10C; Wed, 04 Dec 2024 11:49:06 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
+ <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6 07/10] netmem: add a couple of page helper
+ wrappers
+In-Reply-To: <20241203173733.3181246-8-aleksander.lobakin@intel.com>
+References: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
+ <20241203173733.3181246-8-aleksander.lobakin@intel.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 04 Dec 2024 11:49:06 +0100
+Message-ID: <87ttbjafkt.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-MW
-To: Yuqi Jin <jinyuqi@huawei.com>
-Cc: Shaokun Zhang <zhangshaokun@hisilicon.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org
-From: Dmitry Antipov <dmantipov@yandex.ru>
-Subject: On a6211caa634d ("net: revert "net: get rid of an,signed integer
- overflow in ip_idents_reserve()")
-Autocrypt: addr=dmantipov@yandex.ru; keydata=
- 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
- A/UwwXBRuvydGV0=
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Could you please (re)consider a6211caa634d ("net: revert "net: get rid of an
-signed integer overflow in ip_idents_reserve()") one more time? With clang
-19.1.4 as distributed by LLVM project:
+Alexander Lobakin <aleksander.lobakin@intel.com> writes:
 
-clang version 19.1.4 (/home/runner/work/llvm-project/llvm-project/clang aadaa00de76ed0c4987b97450dd638f63a385bed)
-Target: x86_64-unknown-linux-gnu
-Thread model: posix
-InstalledDir: /home/antipov/.local/LLVM-19.1.4-Linux-X64/bin
+> Add the following netmem counterparts:
+>
+> * virt_to_netmem() -- simple page_to_netmem(virt_to_page()) wrapper;
+> * netmem_is_pfmemalloc() -- page_is_pfmemalloc() for page-backed
+> 			    netmems, false otherwise;
+>
+> and the following "unsafe" versions:
+>
+> * __netmem_to_page()
+> * __netmem_get_pp()
+> * __netmem_address()
+>
+> They do the same as their non-underscored buddies, but assume the netmem
+> is always page-backed. When working with header &page_pools, you don't
+> need to check whether netmem belongs to the host memory and you can
+> never get NULL instead of &page. Checks for the LSB, clearing the LSB,
+> branches take cycles and increase object code size, sometimes
+> significantly. When you're sure your PP is always host, you can avoid
+> this by using the underscored counterparts.
+>
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-I've hit the following UBSAN warning on 6.13.0-rc1:
+Makes sense to have these as helpers, spelling out the constraints
 
-UBSAN: signed-integer-overflow in ./arch/x86/include/asm/atomic.h:85:11
-1584476935 + 1988933977 cannot be represented in type 'int'
-CPU: 2 UID: 0 PID: 169 Comm: kworker/u17:5 Not tainted 6.13.0-rc1-00026-gd7fa4bf3dc47-dirty #2
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-3.fc41 04/01/2014
-Workqueue: wg-kex-wg0 wg_packet_handshake_send_worker
-Call Trace:
-  <TASK>
-  dump_stack_lvl+0x1c2/0x2a0
-  ? __pfx_dump_stack_lvl+0x10/0x10
-  ? __pfx__printk+0x10/0x10
-  ? __asan_memset+0x22/0x50
-  handle_overflow+0x1d0/0x210
-  __ip_select_ident+0x323/0x360
-  iptunnel_xmit+0x55e/0xa00
-  udp_tunnel_xmit_skb+0x264/0x3c0
-  send4+0x7d2/0xbd0
-  ? send4+0x1d8/0xbd0
-  ? __pfx_send4+0x10/0x10
-  ? wg_socket_send_buffer_to_peer+0x13b/0x1c0
-  wg_socket_send_skb_to_peer+0xd1/0x1d0
-  wg_packet_handshake_send_worker+0x1dc/0x320
-  ? __pfx_wg_packet_handshake_send_worker+0x10/0x10
-  ? _raw_spin_unlock_irq+0x23/0x50
-  ? process_scheduled_works+0x976/0x1700
-  ? process_scheduled_works+0x976/0x1700
-  process_scheduled_works+0xa56/0x1700
-  ? __pfx_process_scheduled_works+0x10/0x10
-  ? assign_work+0x3d0/0x440
-  worker_thread+0x8be/0xe30
-  ? __pfx__raw_spin_unlock_irqrestore+0x10/0x10
-  ? _raw_spin_unlock_irqrestore+0xae/0x110
-  ? __kthread_parkme+0x7b/0x1c0
-  kthread+0x2c6/0x360
-  ? __pfx_worker_thread+0x10/0x10
-  ? __pfx_kthread+0x10/0x10
-  ret_from_fork+0x4e/0x80
-  ? __pfx_kthread+0x10/0x10
-  ret_from_fork_asm+0x1a/0x30
-  </TASK>
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-Command line is:
-
-clang -E -D__GENKSYMS__ -Wp,-MMD,net/ipv4/.route.o.d -nostdinc -I./arch/x86/include -I./arch/x86/include/generated -I./include -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi 
--I./include/uapi -I./include/generated/uapi -include ./include/linux/compiler-version.h -include ./include/linux/kconfig.h -include ./include/linux/compiler_types.h -D__KERNEL__ 
---target=x86_64-linux-gnu -fintegrated-as -Werror=unknown-warning-option -Werror=ignored-optimization-argument -Werror=option-ignored -Werror=unused-command-line-argument -Wundef -DKBUILD_EXTRA_WARN1 
--std=gnu11 -fshort-wchar -funsigned-char -fno-common -fno-PIE -fno-strict-aliasing -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -fcf-protection=branch -fno-jump-tables -m64 -falign-loops=1 
--mno-80387 -mno-fp-ret-in-387 -mstack-alignment=8 -mskip-rax-setup -march=core2 -mno-red-zone -mcmodel=kernel -Wno-sign-compare -fno-asynchronous-unwind-tables -mretpoline-external-thunk 
--mindirect-branch-cs-prefix -mfunction-return=thunk-extern -fpatchable-function-entry=16,16 -fno-delete-null-pointer-checks -O2 -fstack-protector-strong -fomit-frame-pointer 
--ftrivial-auto-var-init=zero -fno-stack-clash-protection -falign-functions=16 -fstrict-flex-arrays=3 -fno-strict-overflow -fno-stack-check -Wall -Wundef -Werror=implicit-function-declaration 
--Werror=implicit-int -Werror=return-type -Werror=strict-prototypes -Wno-format-security -Wno-trigraphs -Wno-frame-address -Wno-address-of-packed-member -Wmissing-declarations -Wmissing-prototypes 
--Wframe-larger-than=2048 -Wno-gnu -Wvla -Wno-pointer-sign -Wcast-function-type -Wimplicit-fallthrough -Werror=date-time -Werror=incompatible-pointer-types -Wextra -Wunused -Wmissing-format-attribute 
--Wmissing-include-dirs -Wunused-const-variable -Wno-missing-field-initializers -Wno-type-limits -Wno-shift-negative-value -Wno-sign-compare -Wno-unused-parameter -g -gdwarf-4 
--fsanitize=kernel-address -mllvm -asan-mapping-offset=0xdffffc0000000000  -mllvm -asan-instrumentation-with-call-threshold=10000  -mllvm -asan-stack=1    -mllvm -asan-globals=1  -mllvm 
--asan-kernel-mem-intrinsic-prefix=1  -fsanitize=array-bounds -fsanitize=shift  -fsanitize=signed-integer-overflow  -fsanitize-coverage=trace-pc -fsanitize-coverage=trace-cmp 
--DKBUILD_MODFILE='"net/ipv4/route"' -DKBUILD_BASENAME='"route"' -DKBUILD_MODNAME='"route"' -D__KBUILD_MODNAME=kmod_route net/ipv4/route.c
-
-Dmitry
 
