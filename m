@@ -1,189 +1,183 @@
-Return-Path: <netdev+bounces-148997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55CCB9E3C8A
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:19:15 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BAA79E3C26
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:07:05 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FF5AB3A973
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:06:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 904961651F1
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205561F758D;
-	Wed,  4 Dec 2024 14:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="HJYcQjq/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3949C1F7084;
+	Wed,  4 Dec 2024 14:06:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2046.outbound.protection.outlook.com [40.107.22.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58CB1F707A
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733321156; cv=fail; b=A3w/pvPoc8FZQhj5RmD2XyEQotl/FNx5rrB1ehThv0Wg1gwFIp5+FT+Qfg7bJ5ghfvIBM0CvRexNoBioNoWvWSQyGMM8clpO2fKixNLVZ/WjIljOWp8LpM3zo0bosQzBJVBqSt+bfBzzOq81+0ZzqT0Im7NzamT3KzSR8SpcTIk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733321156; c=relaxed/simple;
-	bh=UAZZWr6YXGMnaDSgdCPZ9u8n9nEyEUKcbKQY9VCs20A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Gi6POES5QSoX4gxXt+Jw3W2dWxX3oARKZSQ6PxIYfXqhUxOKp/U/1bWKrOck/auc5BsRHYkun+rgYVrbru0jztqJc9keu3Y/A9v/BYtaQhW9WvRyndZMs3kiTtDkHEtm8vjDK6BUoy+VdaLKcF9Nwe03WbmEutCefDrbiji9kOI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=HJYcQjq/; arc=fail smtp.client-ip=40.107.22.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aOdEFmu2JytGQYWNs35GGeCIzGfQ0fWH16caIEIR997+AarkUaUV+PqunJCtHy5GEJUmVHghfxIK5UfAVqbRGCGh0Im7RRx/SGqSq0IkSBd7Slbk3n91Lv2vgOZJAU6hlSH/KoEUi1gcpizwsf2KuDHVp3h9njUO0PiiFJa/H5PMg9JcdCtDGm+01VBEie6uJwY28weH72x8FvGARbTYHQq1PBbflAb8Lv/veo7xKryFt2/bT+o/Cv5nLsDKihfb9lRacdBKzf/rYtqdqApq+c10jT8tCqWo47MlnqJt9KMYct0WOSzGk3d3qzxYhOv7FuxV1GVbVjolXvLUKgDhwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pr6sszUBaSCU+GNSDK4kOQmbJz8SLsWGAyv1pjQP1n8=;
- b=OdLZCgkNiKkIAFiPX7cyoslXqjpgxaPX9ocYua5VFKYqoFHLjsAWtYRX1mpUTtgBQjyXpVSFu+4gISZWFwYZkwD9xQjyhQmp4XXvy9d9PlJic1TTuY+4tTs4df26ihozBI4x+1hoPjbGtdnKfBWczKLmN1FHFvp6zgJIcmQtzyeo/lBwhSPW5O3jMdmW3sGphE2GEgBPWDfPfoRgOujAgUJKJkfNmSCs5fLfP/A6ao1FQaS7J226LuvmIRDw8uWYpasKl7XfAsqeob6harYoDshLzvWzBqrBqb+0uvxV7sFWKvp/UUP5voWRxEblAN/DB3F9g5r59/PPoDznB0jvGw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pr6sszUBaSCU+GNSDK4kOQmbJz8SLsWGAyv1pjQP1n8=;
- b=HJYcQjq/wvPhe8p29rF8Iow2vad64fdn1PLhNvDvZyD54Ge+6QH7/qoitEnI710IKlLVIEJN8GAOFcNJ9TUakGOh8i2p9k1CUqCza8t5EhyizAgE+6ErAuWPOWr/tzQUdePwOFS7w+eoXNsx1MK92YqvXzS2YAAYvGkKAfzJF6r1/TwebLIto5YYEcI/NsCc5ZskwH6VmvihYJ/uWo2qYwQ6l1TQdCh9Q6z4vCBtAVY/KLG6z+QFri0w+WfIv8kDbeJHW5ciAUXvox6i9uS2p2Yaxo/VgeUIHQkoqCHTZj2h4UGMi6qvVmaa7J3BVFvw4P2Hhs0T4L7ubkNEAMHa0Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by GV1PR04MB10524.eurprd04.prod.outlook.com (2603:10a6:150:1d0::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.11; Wed, 4 Dec
- 2024 14:05:50 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8207.017; Wed, 4 Dec 2024
- 14:05:50 +0000
-Date: Wed, 4 Dec 2024 16:05:47 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
-	Yangbo Lu <yangbo.lu@nxp.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH net] net: mscc: ocelot: be resilient to loss of PTP
- packets during transmission
-Message-ID: <20241204140547.6epegdjf7i4swsfc@skbuf>
-References: <20241203164755.16115-1-vladimir.oltean@nxp.com>
- <20241203164755.16115-1-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241203164755.16115-1-vladimir.oltean@nxp.com>
- <20241203164755.16115-1-vladimir.oltean@nxp.com>
-X-ClientProxiedBy: VI1P189CA0035.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:802:2a::48) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E881F7077;
+	Wed,  4 Dec 2024 14:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733321171; cv=none; b=suX+ueN52brdIbJ2iuTQW1VNPLl5hVB6n1zncWEO+1c1RXh3w7VM9mukDVGUhzrRMW2y39+SmV4mJITHpwFqOy2t91Hwd1bijxCj9qzRm8SqvXVR32dfUHj9VFVC96sjcdeZDDutJgdEiYJIaMopUGUZbmlQXPFa1ukqxl8AJ3A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733321171; c=relaxed/simple;
+	bh=RWNa4SBIrFNFQj0FDse5D5NKKNuZ/AmE2EIPJPiv8x4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eOCLXGHVas7/dn8munlnUSqO2DFIFm+TFXKqSwL1rXbHHPIERE6Qge14Wcl+XfZ2BdFXysMTYkpvkUjrg3gPoCaht6+1FTmawwdJvy0F/TNcglqz2z+L/Yc1P8dDULqNkjrFtBPDe/WSO5YCFNSalQ+K1wIG1cUNaYusHnkEpZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A6871063;
+	Wed,  4 Dec 2024 06:06:35 -0800 (PST)
+Received: from [10.57.91.76] (unknown [10.57.91.76])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B03393F71E;
+	Wed,  4 Dec 2024 06:06:03 -0800 (PST)
+Message-ID: <df3a6a9d-4b53-4338-9bc5-c4eea48b8a40@arm.com>
+Date: Wed, 4 Dec 2024 14:06:00 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|GV1PR04MB10524:EE_
-X-MS-Office365-Filtering-Correlation-Id: 52c84d88-968d-4302-6d55-08dd146cc254
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?C4Dh1zA3wuLIRoDNt/A/aff3AE9JPt9h6wUISGo/cfBRZCwwDdkf8VYSUJqY?=
- =?us-ascii?Q?6znV2mxIMX0DtVQqTz+4gX80d9lSlgwdlFUc5kLtgkGrwNJqLpEjDLMg9ocD?=
- =?us-ascii?Q?O6I9eyfuifr9T9ePQSR5YwN3ksUp+D9Eq0IWJLfpWxy1ifQZmzz6Evaj3zBY?=
- =?us-ascii?Q?nOPHqeCsDnb7Dg/6w/tTgatomH+7ltMaUnlmC3AO+ZOjT91IB7OunrzGp9eK?=
- =?us-ascii?Q?zV9a/zHOZ6TL+xTDijwVSW0o1OXE5OtVNrxSKBKrI6laa/t0UHGOiXleSwPi?=
- =?us-ascii?Q?BC41ZI/jyd5J45J0e6PQaoDCFTNSJlJhcTN45V7uXArwgVG98tX3aawV007c?=
- =?us-ascii?Q?afpSKMiWqIGGdtsgUAgNbZFb3vJi+oOQT8V1JZdKTnP7dSTijxZfiU7rIN0e?=
- =?us-ascii?Q?R0bLb1T809Eu3Equtvd5zdbi9/EapZUNJ4ExlWHHQyMhFIOByzTpZdoUHnay?=
- =?us-ascii?Q?mstKmX/zs4UXaMrMnRcpkyHZQ8wAIPSSgQQ19a3tuWfDjoDvnDKzj9RFFt/v?=
- =?us-ascii?Q?oFhbo/c1H1meDXbz4Op6C5/aE3nrxcol4u09Zab7Fy7e8gs8AUkqhnUOAIwo?=
- =?us-ascii?Q?fF49VnvwW4eJUdr3HNtVUZXEKk7O8CTOAZBUJg4jN31hCFIq9LFC0g69lZ90?=
- =?us-ascii?Q?QemD+EtPJBfcvoL4yDM15floZseIeOgEa7y62tKXggfoJmSThL+rn8TByydc?=
- =?us-ascii?Q?ytduoGj6YQEWmjdfXdGN6v2hdmMTw/3e/usX/mXIVJIM4H9BpNauVRhnXSoh?=
- =?us-ascii?Q?RIORnuQxrtrqz3gN/LHmgk8fZtR11Ly+NUZwGidvGhWd/QNufQcyMCOdm+nr?=
- =?us-ascii?Q?MUjR1W0QFA/ZeYIoX2KMrEeGShf9XeOZUfpzGe9KjXw50pLoLG0PvWMLso7n?=
- =?us-ascii?Q?jonPWRy9syyYuO/k8Nt74UEYIICYVyB8jBEI4ZRb89Ya6LfsPiUSj2IsXyFh?=
- =?us-ascii?Q?BQFWJHKAXSwwh0hgf302UgzZY4Qeri+KZNjP0qRpGo4uY2u6Q8VjbRH3P9FI?=
- =?us-ascii?Q?5+T+eUjGuJyNNDs7+mKZDsEL1Qdk2lKrhW6QXdya6kacsvoOg3ze8/tAhUJU?=
- =?us-ascii?Q?M/MJer8/aIPCEm2AcirtKG8GDLkVV2QbrEImAF+POkQqDfaRZcrkTtnz20Hi?=
- =?us-ascii?Q?WqhtW8BZoTcDlwjegUbsdAqvk37nEqqSg736ryQoYW1fUzmQewseF8MXkw7G?=
- =?us-ascii?Q?aDCXx8KpSNQ9hizquGrA+EWUVXDK0jvDTKmdqKMzqkZUgnCmjfK7pRcqlA1t?=
- =?us-ascii?Q?F8+4wQ9DkuzQK/0Zczoy7gw5EawgwCEfYvzfCY6BcE43SFkQ6eEHpdsWsPEP?=
- =?us-ascii?Q?/soDXrmDXNuLmU6sRpxUfEa++hhQErmnLSxYiyRcYBGGEw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?M3/8Xwim0ZqDwg/+Lmrm/bZZvrL8neC7kThslNgjIfYMKC8L6jhRQueCJUrB?=
- =?us-ascii?Q?ODdF1gThvy49mXxDoXeD54l/xvBq7fi9ulGgoPafXNo0mRvAbBUf89hPC5r6?=
- =?us-ascii?Q?LPyNvMN8Xma64Mg82QCYN51Y6qSLoFBBtloSeRE2tz4oWin/r7GL0W3IMRYo?=
- =?us-ascii?Q?OT0UY4rJ6uzIE8wYqUt/lE6swhXAYTHhKb0wtPu8QgM39xqfpKeMga+6CLVW?=
- =?us-ascii?Q?mhH4iOF6Qzhy9JsWzbAgGZt+MxiGqwg6nUYSdqE6ayIOfsISBgDR1aobTTaX?=
- =?us-ascii?Q?xTqyf1OAO1SKSlBN8ScpGvxxu+IPnJduTQ3FQ4zoR3f8N2rV03kOMrMI+N+V?=
- =?us-ascii?Q?n0hOvjTKnIMQ/QDdnGJ4DIXAoLAz5vdVZQdYc3Schr09MRxCap7wQbmMfoRl?=
- =?us-ascii?Q?wk7aaCSgFtluq+Suldk9pkwluCYikv8iBW/ffchMwzVWSF0Hd1laPAM68Ai7?=
- =?us-ascii?Q?xigIB3lxxtvyclo3gTyqEtVBYrQSKBLUvomEU4cjZFm2kzWddzw2cqUBtNAj?=
- =?us-ascii?Q?WS+4APoow2MCFCBrcnvrotAtSQJOjc0N1iC/J5twHSL2DFX3ad61aQxxibE9?=
- =?us-ascii?Q?Vr00ODwk+q89wtnZIi51uSrkl+56GWDtwGc0TY73NMSRttZt2elSKliOsgiI?=
- =?us-ascii?Q?gvgChml7FUaCI9B4UmSlu6bYTxy6ewK5WsbUZgU3S/chaOEWITqgr2s3vBfn?=
- =?us-ascii?Q?XuRO6zD4RSU6eW1GzpOIdurE6zLTxcpPcLz4lkxfvF0LxajkdOyudYS8jEH3?=
- =?us-ascii?Q?1M7ECUEqJL1K/RjoQhkF1sqIVIpTHQCjqizW/bD3KlDEEanWXcLcgEUB3Q6i?=
- =?us-ascii?Q?ry4OcGl1IwnOn+x32qtG5+7Ms1rPp5zmjWOFiU8hYhGAKLnq8MzkjM8k6pH4?=
- =?us-ascii?Q?mQs4LZtcVPX3lxdvm4svOW5bJ/SHlTwTEDzThnXTtbTNRsGhxtVfrSJdmBVy?=
- =?us-ascii?Q?iYDo0LqWCu6O8DBB7r00MIgArrvRtih6MHU0r0yoWS+MW4c8oTPOnCkLOZYI?=
- =?us-ascii?Q?9j6JjnXJuarmp7YBTDvBKoFNv/d6VYgPXPlTnPHFLksnMXbvyrAFjGDQohjH?=
- =?us-ascii?Q?30u/nDrkQ6chZPu16dkz8FpAk1Bi3bTQD0kJCE2hJ4Q/m5acwePkEhmP9ZBp?=
- =?us-ascii?Q?hYq/1tPGElMDn3n3ca+sf2lroIarAzNdzu4UE36SVzh17u9tp8feerMBjS05?=
- =?us-ascii?Q?wgsyRzpl37jhj7WM79up9DWGvX5+53M5ZTeCU1FNy+r9upoGXgDN6sDWa6lz?=
- =?us-ascii?Q?TLg088PHd8gzUrbtrlGffPrukpDqNCaLGMMQ4iaav0fB8o4qggquYKLGoysE?=
- =?us-ascii?Q?kuDN5pMIyd3JrdgyTl2frgw/ywsjXpgi0PK60hRm87DAYVB0INOL3C/NLiqJ?=
- =?us-ascii?Q?jHyLkHh3N6hjV3Xx2MAjx2zJ4+a6QLwE8lCN542t5JcWP/ifTdepVdYRtHae?=
- =?us-ascii?Q?THyYPuorZVe44qICUg+HQHRjEcoEfpthL3osu2YFYWCSpkl4sD1RWwHmZVn+?=
- =?us-ascii?Q?jgAVp84XWLh6i1VW393d6yayoQr5tCoH7vsevmiJXoC6EvzO1TTm5RrCKzxf?=
- =?us-ascii?Q?H9ESn+DHXccTR6JQF85eJMXxT3cCHf0EtFNlxOIu/mCa/Q5RNAJXd8/o+JXh?=
- =?us-ascii?Q?0Q=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 52c84d88-968d-4302-6d55-08dd146cc254
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2024 14:05:50.7287
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: R/hRCg+w6QdMMitnxr5ZaFyXzBRUAeTuzrKYAhaQH/RVzj0RSBIEaemsGEhwGGFYjTPuJbP96UMX0WJNTzfmgQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB10524
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1] net: stmmac: TSO: Fix unbalanced DMA map/unmap for
+ non-paged SKB data
+To: Thierry Reding <thierry.reding@gmail.com>, Furong Xu <0x1207@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com,
+ Suraj Jaiswal <quic_jsuraj@quicinc.com>, Thierry Reding
+ <treding@nvidia.com>,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+ Will Deacon <will@kernel.org>
+References: <20241021061023.2162701-1-0x1207@gmail.com>
+ <d8112193-0386-4e14-b516-37c2d838171a@nvidia.com>
+ <20241128144501.0000619b@gmail.com> <20241202163309.05603e96@kernel.org>
+ <20241203100331.00007580@gmail.com> <20241202183425.4021d14c@kernel.org>
+ <20241203111637.000023fe@gmail.com>
+ <klkzp5yn5kq5efgtrow6wbvnc46bcqfxs65nz3qy77ujr5turc@bwwhelz2l4dw>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <klkzp5yn5kq5efgtrow6wbvnc46bcqfxs65nz3qy77ujr5turc@bwwhelz2l4dw>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 03, 2024 at 06:47:55PM +0200, Vladimir Oltean wrote:
-> @@ -687,10 +743,12 @@ int ocelot_port_txtstamp_request(struct ocelot *ocelot, int port,
->  		if (!(*clone))
->  			return -ENOMEM;
->  
-> -		err = ocelot_port_add_txtstamp_skb(ocelot, port, *clone);
-> +		/* Store timestamp ID in OCELOT_SKB_CB(clone)->ts_id */
-> +		err = ocelot_port_queue_ptp_tx_skb(ocelot, port, *clone);
->  		if (err)
->  			return err;
+On 2024-12-04 1:57 pm, Thierry Reding wrote:
+> On Tue, Dec 03, 2024 at 11:16:37AM +0800, Furong Xu wrote:
+>> On Mon, 2 Dec 2024 18:34:25 -0800, Jakub Kicinski <kuba@kernel.org> wrote:
+>>
+>>> On Tue, 3 Dec 2024 10:03:31 +0800 Furong Xu wrote:
+>>>> I requested Jon to provide more info about "Tx DMA map failed" in previous
+>>>> reply, and he does not respond yet.
+>>>
+>>> What does it mean to provide "more info" about a print statement from
+>>> the driver? Is there a Kconfig which he needs to set to get more info?
+>>> Perhaps you should provide a debug patch he can apply on his tree, that
+>>> will print info about (1) which buffer mapping failed (head or frags);
+>>> (2) what the physical address was of the buffer that couldn't be mapped.
+>>
+>> A debug patch to print info about buffer makes no sense here.
+>> Both Tegra186 Jetson TX2(tegra186-p2771-0000) and Tegra194 Jetson AGX Xavier
+>> (tegra194-p2972-0000) enable IOMMU/SMMU for stmmac in its device-tree node,
+>> buffer info should be investigated with detailed IOMMU/SMMU debug info from
+>> drivers/iommu/arm/arm-smmu/arm-smmu-nvidia.c together.
+>>
+>> I am not an expert in IOMMU, so I cannot help more.
+>>
+>> Without the help from Jon, our only choice is revert as you said.
+> 
+> I was able to reproduce this locally and I get this splat:
+> 
+> --- >8 ---
+> [  228.179234] WARNING: CPU: 0 PID: 0 at drivers/iommu/io-pgtable-arm.c:346 __arm_lpae_map+0x388/0x4e4
+> [  228.188300] Modules linked in: snd_soc_tegra210_mixer snd_soc_tegra210_admaif snd_soc_tegra_pcm snd_soc_tegra186_asrc snd_soc_tegra210_ope snd_soc_tegra210_adx snd_soc_tegra210_mvc snd_soc_tegra210_dmic snd_soc_tegra186_dspk snd_soc_tegra210_sfc snd_soc_tegra210_amx snd_soc_tegra210_i2s tegra_drm drm_dp_aux_bus cec drm_display_helper drm_client_lib tegra210_adma snd_soc_tegra210_ahub drm_kms_helper snd_hda_codec_hdmi snd_hda_tegra snd_soc_tegra_audio_graph_card at24 snd_hda_codec ina3221 snd_soc_audio_graph_card snd_soc_simple_card_utils tegra_bpmp_thermal tegra_xudc snd_hda_core tegra_aconnect host1x fuse drm backlight ipv6
+> [  228.243750] CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G S                 6.13.0-rc1-next-20241203 #30
+> [  228.253412] Tainted: [S]=CPU_OUT_OF_SPEC
+> [  228.257336] Hardware name: nvidia NVIDIA P2771-0000-500/NVIDIA P2771-0000-500, BIOS 2025.01-rc3-00040-g36352ae2e68e-dirty 01/01/2025
+> [  228.269239] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> [  228.276205] pc : __arm_lpae_map+0x388/0x4e4
+> [  228.280398] lr : __arm_lpae_map+0x120/0x4e4
+> [  228.284587] sp : ffff8000800037f0
+> [  228.287901] x29: ffff800080003800 x28: 0000000000000002 x27: 0000000000000001
+> [  228.295050] x26: 0000000000000001 x25: 0000000111580000 x24: 0000000000001000
+> [  228.302197] x23: 000000ffffc72000 x22: 0000000000000ec0 x21: 0000000000000003
+> [  228.309342] x20: 0000000000000001 x19: ffff00008574b000 x18: 0000000000000001
+> [  228.316486] x17: 0000000000000000 x16: 0000000000000001 x15: ffff800080003ad0
+> [  228.323631] x14: ffff00008574d000 x13: 0000000000000000 x12: 0000000000000001
+> [  228.330775] x11: 0000000000000001 x10: 0000000000000001 x9 : 0000000000001000
+> [  228.337921] x8 : ffff00008674c390 x7 : ffff00008674c000 x6 : 0000000000000003
+> [  228.345066] x5 : 0000000000000003 x4 : 0000000000000001 x3 : 0000000000000002
+> [  228.352209] x2 : 0000000000000001 x1 : 0000000000000000 x0 : ffff00008574b000
+> [  228.359356] Call trace:
+> [  228.361807]  __arm_lpae_map+0x388/0x4e4 (P)
+> [  228.366002]  __arm_lpae_map+0x120/0x4e4 (L)
+> [  228.370198]  __arm_lpae_map+0x120/0x4e4
+> [  228.374042]  __arm_lpae_map+0x120/0x4e4
+> [  228.377886]  __arm_lpae_map+0x120/0x4e4
+> [  228.381730]  arm_lpae_map_pages+0x108/0x250
+> [  228.385922]  arm_smmu_map_pages+0x40/0x120
+> [  228.390029]  __iommu_map+0xfc/0x1bc
+> [  228.393525]  iommu_map+0x38/0xc0
+> [  228.396759]  __iommu_dma_map+0xb4/0x1a4
+> [  228.400604]  iommu_dma_map_page+0x14c/0x27c
+> [  228.404795]  dma_map_page_attrs+0x1fc/0x280
+> [  228.408987]  stmmac_tso_xmit+0x2d0/0xbac
+> [  228.412920]  stmmac_xmit+0x230/0xd14
+> [  228.416505]  dev_hard_start_xmit+0x94/0x11c
+> [  228.420697]  sch_direct_xmit+0x8c/0x380
+> [  228.424540]  __qdisc_run+0x11c/0x66c
+> [  228.428121]  net_tx_action+0x168/0x228
+> [  228.431875]  handle_softirqs+0x100/0x244
+> [  228.435809]  __do_softirq+0x14/0x20
+> [  228.439303]  ____do_softirq+0x10/0x20
+> [  228.442972]  call_on_irq_stack+0x24/0x64
+> [  228.446903]  do_softirq_own_stack+0x1c/0x40
+> [  228.451091]  __irq_exit_rcu+0xd4/0x10c
+> [  228.454847]  irq_exit_rcu+0x10/0x1c
+> [  228.458343]  el1_interrupt+0x38/0x68
+> [  228.461927]  el1h_64_irq_handler+0x18/0x24
+> [  228.466032]  el1h_64_irq+0x6c/0x70
+> [  228.469438]  default_idle_call+0x28/0x58 (P)
+> [  228.473718]  default_idle_call+0x24/0x58 (L)
+> [  228.477998]  do_idle+0x1fc/0x260
+> [  228.481234]  cpu_startup_entry+0x34/0x3c
+> [  228.485163]  rest_init+0xdc/0xe0
+> [  228.488401]  console_on_rootfs+0x0/0x6c
+> [  228.492250]  __primary_switched+0x88/0x90
+> [  228.496270] ---[ end trace 0000000000000000 ]---
+> [  228.500950] dwc-eth-dwmac 2490000.ethernet: Tx dma map failed
+> --- >8 ---
+> 
+> This looks to be slightly different from what Jon was seeing. Looking at
+> the WARN_ON() that triggers this, it seems like for some reason the page
+> is getting mapped twice.
+> 
+> Not exactly sure why that would be happening, so adding Robin and Will,
+> maybe they can shed some light on this from the ARM SMMU side.
+> 
+> Robin, Will, any idea who could be the culprit here? Is this a map/unmap
+> imbalance or something else entirely?
 
-There was a pre-existing memory leak here.
-If ocelot_port_add_txtstamp_skb() fails, we have to undo skb_clone_sk()
-using dev_kfree_skb_any(*clone).
+If valid PTEs are getting left behind in the pagetable, that would 
+indicate that a previous dma_unmap_page() was called with a size smaller 
+than its original dma_map_page(). Throwing CONFIG_DMA_API_DEBUG at it 
+should hopefully shed more light.
 
-If there are no other comments, I'll resend at the 24 hour mark.
+Cheers,
+Robin.
 
-pw-bot: cr
+> A lot of the context isn't present in this thread anymore, but here's a
+> link to the top of the thread:
+> 
+> 	https://lore.kernel.org/netdev/d8112193-0386-4e14-b516-37c2d838171a@nvidia.com/T/
+> 
+> Thanks,
+> Thierry
 
->  
-> +		skb_shinfo(*clone)->tx_flags |= SKBTX_IN_PROGRESS;
->  		OCELOT_SKB_CB(skb)->ptp_cmd = ptp_cmd;
->  		OCELOT_SKB_CB(*clone)->ptp_class = ptp_class;
->  	}
 
