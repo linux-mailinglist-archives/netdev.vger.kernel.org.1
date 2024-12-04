@@ -1,79 +1,67 @@
-Return-Path: <netdev+bounces-149048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 704719E3E76
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 16:38:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BB9E9E3FEC
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 17:42:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3103B2810C9
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:38:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51C6CB38D80
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:42:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EAF20C023;
-	Wed,  4 Dec 2024 15:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A1920C48A;
+	Wed,  4 Dec 2024 15:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="02rvrkDS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rYB0+3jl"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E471182D9;
-	Wed,  4 Dec 2024 15:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D623020C032;
+	Wed,  4 Dec 2024 15:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733326699; cv=none; b=fqYgU6Vkl8utRQ3lsur3bUsD8ERtlO1Fu8vLHDxaGvIxtnRWHSbET5YSM8jZVytqL0ld7kSfZ4OtWrQzDJX7TJhpqwcqVJCt+WPdzl6Bzs1d2ZYPWWVW4WKx7t2TUgWM9ferJzJBeFC2A+7EMNSim7qJ5BnaTrRjpfUJi6iU70U=
+	t=1733326911; cv=none; b=o1h4jhpLOHMpaoukS9S8BUwlfyd8nS6t6uG0YlwGIdIUGnoYwwsyP3rZDt3j1degwo6ENn9p/Szdu3xptCaO770FoPZEu9yFehkak6cspoxbjh/pf7TwrnqB/m441f8dSeNgWX7WtoiLXgt4grl9duw7/7n/aVX5epGDKy20bVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733326699; c=relaxed/simple;
-	bh=aLTGmo+zw8z6O/58DWYLUBRS/El7YvYIzfUNwf8G+3k=;
+	s=arc-20240116; t=1733326911; c=relaxed/simple;
+	bh=9qC5XFIeEPv6fJHRL8DG9WVlABEvegbM6MfO+F5o+Wg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mp0FRydZgDBvYf2NCwNx1+qk+72HRn4lGlPKA6o165UJXrAIT/FlJmrfmZH9Y4aoIDXYycQghUgVahB36MxFx8HHakZAq1iSOQawcZpNxcB07mfJYLBPyrTS/vjSAEft6rCr4hHbY/cyv1f1T2kYgXr+2Ink+Eymi3Ikn5RTEso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=02rvrkDS; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=y+7N7+5QStwcc/a083bbUwTVwKjG0kqhPvCzgW5P96c=; b=02rvrkDSQ9aAS5MdtVQ9x3/LTf
-	PZlFa5m+RlE1GJAUGW9mwJGNwO7LSPcON+LNivBhGKLdZ0Gc2PfRMAnbxFjQiwLiaTewptOokwC79
-	b7u5AYaAGixlisI48ZNLtOcXjLFyRzGEeiqggG/X+G4yEUeXww3Bnw6JvTox95NwXOaqq8pkvggxs
-	uErG0xPiPZFZIgK6CvFH3wUt6cCRqfMIznBbl31AZmaa1a8ZRNNadiFRsDRHaRXzIxdO2PdYLJSC0
-	pq+r/mkCesXufVhMDXbnjtl2+GTMNX4bjSjNo9ulekn8IlEfh9GYYpwCfehOIYS82s074ZGoOha7B
-	6WKlaPjQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48622)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tIrS2-0003Wg-0Y;
-	Wed, 04 Dec 2024 15:38:06 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tIrRz-0005e9-36;
-	Wed, 04 Dec 2024 15:38:03 +0000
-Date: Wed, 4 Dec 2024 15:38:03 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Lei Wei <quic_leiwei@quicinc.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=QKD5CEfawMqiB6FUAIwHnmTX7ZWrAxTaWYicIAs84Xmm/WJT5WuvIBfHaegdfuUy0e7+mzkPRoAdAS0eOYfYBYldtD8UKUpYzvvAavNLXMy+35Z/17rv5ry/lIbd9XRP5H+4hONFzFzsM+9ynnYehhvHnfd7VSv4RIv7OthuM/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rYB0+3jl; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8JU87dSOgGQ075F3cYH/0T2VM64sEmEqoWMT1OVF2IM=; b=rYB0+3jlJp0NLAn7kVWU+IS3/b
+	6J6OdNYPyDJWBkGBE5JB2BP1/4WXwZv/Hr9DUXjtex+ZKCa7ipsABYcqAGgMugEHhAz4UaJaNwZnJ
+	WWEUa2B49PipFPPSnLJ/bZ4GwUesKkvcanU/UswuvCI+KR7oiLbuHOrnLoegi6BiJ23o=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tIrVN-00FE0Q-0y; Wed, 04 Dec 2024 16:41:33 +0100
+Date: Wed, 4 Dec 2024 16:41:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
 	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com,
-	quic_pavir@quicinc.com, quic_linchen@quicinc.com,
-	quic_luoj@quicinc.com, srinivas.kandagatla@linaro.org,
-	bartosz.golaszewski@linaro.org, vsmuthu@qti.qualcomm.com,
-	john@phrozen.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH net-next v2 4/5] net: pcs: qcom-ipq9574: Add USXGMII
- interface mode support
-Message-ID: <Z1B3W94-8qjn17Sj@shell.armlinux.org.uk>
-References: <20241204-ipq_pcs_rc1-v2-0-26155f5364a1@quicinc.com>
- <20241204-ipq_pcs_rc1-v2-4-26155f5364a1@quicinc.com>
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Simon Horman <horms@kernel.org>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
+	linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH net-next v3 09/10] net: freescale: ucc_geth: Introduce a
+ helper to check Reduced modes
+Message-ID: <49fbbbf8-ec21-41a6-b87e-0172d0a4a2b3@lunn.ch>
+References: <20241203124323.155866-1-maxime.chevallier@bootlin.com>
+ <20241203124323.155866-10-maxime.chevallier@bootlin.com>
+ <ce002489-2a88-47e3-ba9a-926c3a71dea9@lunn.ch>
+ <20241204092232.02b8fb9a@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,25 +70,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241204-ipq_pcs_rc1-v2-4-26155f5364a1@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20241204092232.02b8fb9a@fedora.home>
 
-On Wed, Dec 04, 2024 at 10:43:56PM +0800, Lei Wei wrote:
-> +static int ipq_pcs_link_up_config_usxgmii(struct ipq_pcs *qpcs, int speed)
-> +{
-...
-> +	/* USXGMII only support full duplex mode */
-> +	val |= XPCS_DUPLEX_FULL;
+On Wed, Dec 04, 2024 at 09:22:32AM +0100, Maxime Chevallier wrote:
+> Hello Andrew,
+> 
+> On Wed, 4 Dec 2024 03:15:52 +0100
+> Andrew Lunn <andrew@lunn.ch> wrote:
+> 
+> > > +static bool phy_interface_mode_is_reduced(phy_interface_t interface)
+> > > +{
+> > > +	return phy_interface_mode_is_rgmii(interface) ||
+> > > +	       interface == PHY_INTERFACE_MODE_RMII ||
+> > > +	       interface == PHY_INTERFACE_MODE_RTBI;
+> > > +}  
+> > 
+> > I wounder if this is useful anywhere else? Did you take a look around
+> > other MAC drivers? Maybe this should be in phy.h?
+> 
+> Yes I did consider it but it looks like ucc_geth is the only driver
+> that has a configuration that applies to all R(MII/GMII/TBI) interfaces
 
-Again... this restriction needs to be implemented in .pcs_validate() by
-knocking out the half-duplex link modes when using USXGMII mode.
+O.K. What is important is you considered it. Thanks. Too many
+developers are focus on just their driver and don't think about other
+drivers and code reuse.
 
-.pcs_validate() needs to be implemented whenever the PCS has
-restrictions beyond what is standard for the PHY interface mode.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+    Andrew
 
