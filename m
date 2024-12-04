@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-148846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8906B9E3464
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 08:48:00 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DFF99E3466
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 08:48:14 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41E61168617
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 07:47:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 755CBB2AF4E
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 07:48:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC2218FDC8;
-	Wed,  4 Dec 2024 07:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30EC419048D;
+	Wed,  4 Dec 2024 07:47:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EHFsZQDO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="civFoOvu"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755C418FC8C
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 07:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BCA190059
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 07:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733298453; cv=none; b=m7MpvM+Z7UjQ6NkA/o2rt2LGtl/H47qV6DEZPVJXK1yYTGS1tA/V//E/bwpKHS6HP8eYvP7DLK4jxdPUiRdVZt/FyAQsUWJNL35bmahHj77kUB9kEbBLOO4GGOjMDrctFechxGACr4D60OpwM4bIXDltV62v0BmVhyQ+LwJ2HpE=
+	t=1733298456; cv=none; b=JBNkdl9mtVEjAI20S10A6ZtlIwH+pMwoXu3iizMnTDq4xiYyG4IP6ZBnerXL2xT1Kiuo1doXgkzLtsGipYRTH/yH7fvNFHktgqDe6f6wIJTUgm1f3nn7GFd9sSRgNJ/5MN7Q3fP4ENyPl+Jul6nFbnTesc2o24HJXl2wwI7Wfrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733298453; c=relaxed/simple;
-	bh=LiembOcurmOw4+40ybsntquCMb6mhOp2FYXN7pIggRs=;
+	s=arc-20240116; t=1733298456; c=relaxed/simple;
+	bh=Ajr6EJYUikw3/5g4fJy9d6ePJmsXOdDxMyw8WEJtZ1Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sTaLvyscT0nDMqKArMUMlok95QedrN1/7GHY/w0HOJyKWZjTo2UlCT7AFzRih78GkMYKkbtyk0YyxkU2vSdliY3U5GMzZBSG3iuMLsxg18D93+todY64vIdjbD0A8e09Io2h0vemqsF5YJb3F4q1nCPyCmYTX8kISpZJUgjdTz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EHFsZQDO; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=mSca1Xopv61dN34HbhJGWDktdMJaLfxnwWHUn1+KlKUq7vNN4m9xP8ST5S6QeiGD9iTO78ZFSxoLqYjvNPdxTnZBsO9qjCaYhC3MxtxgFr4RjtqM+2uZmeD4StONDKgTv2kleK5LPHuPgS3Kpd0y0in0WN/Y9JX27i4fkV7lKFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=civFoOvu; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733298450;
+	s=mimecast20190719; t=1733298453;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SgDcxHvMPuaNGZPmBKKvBNkHii79DsY2D29vW13rUKI=;
-	b=EHFsZQDOV4JQ7ffXhk9FZuq/cj0emjkqhYZ9CAsm7BpkCXRvls10nO8I510r92efUwGwV/
-	gis89vVFnL27ohBpDoS95/1dia+NQ4IXyjkgtl6kVRrtvoqCk1sr9OSC2BcHPQiZrfWYOZ
-	zStm0njG0xco+lOOvE8mo0NF/mAON90=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=7W+ovC1/MZN/VGq8X1RAdXcqzCIH+5G/UI+MbcPx/zU=;
+	b=civFoOvu1iinnWBn0htXBhkfe29RD7gyCiR+R1YD1DnVQvHSzCG4fXdpbCVeY/9V/oqx/Z
+	w3mCUmlRqXLKyhV9hMOm6xzgMh8lSyznN/kPLYxf8p1k8amaEmtws+AzH8dVLyvyV85cuH
+	YMJLSVRoLAujvUOQp5pV+xBQTt4IfYY=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-671-lMc423foOGCfWEJEdVllBw-1; Wed,
- 04 Dec 2024 02:47:27 -0500
-X-MC-Unique: lMc423foOGCfWEJEdVllBw-1
-X-Mimecast-MFC-AGG-ID: lMc423foOGCfWEJEdVllBw
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-201-oOG-94YcNmqcvA7pBMIHLQ-1; Wed,
+ 04 Dec 2024 02:47:31 -0500
+X-MC-Unique: oOG-94YcNmqcvA7pBMIHLQ-1
+X-Mimecast-MFC-AGG-ID: oOG-94YcNmqcvA7pBMIHLQ
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BB24C1955DD3;
-	Wed,  4 Dec 2024 07:47:25 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3724D195420F;
+	Wed,  4 Dec 2024 07:47:30 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.42.28.48])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0CCA11956048;
-	Wed,  4 Dec 2024 07:47:22 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 362DE1956094;
+	Wed,  4 Dec 2024 07:47:27 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -68,9 +68,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 02/39] rxrpc: Fix handling of received connection abort
-Date: Wed,  4 Dec 2024 07:46:30 +0000
-Message-ID: <20241204074710.990092-3-dhowells@redhat.com>
+Subject: [PATCH net-next v2 03/39] rxrpc: Use umin() and umax() rather than min_t()/max_t() where possible
+Date: Wed,  4 Dec 2024 07:46:31 +0000
+Message-ID: <20241204074710.990092-4-dhowells@redhat.com>
 In-Reply-To: <20241204074710.990092-1-dhowells@redhat.com>
 References: <20241204074710.990092-1-dhowells@redhat.com>
 Precedence: bulk
@@ -80,17 +80,11 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Fix the handling of a connection abort that we've received.  Though the
-abort is at the connection level, it needs propagating to the calls on that
-connection.  Whilst the propagation bit is performed, the calls aren't then
-woken up to go and process their termination, and as no further input is
-forthcoming, they just hang.
+Use umin() and umax() rather than min_t()/max_t() where the type specified
+is an unsigned type.
 
-Also add some tracing for the logging of connection aborts.
-
-Fixes: 248f219cb8bc ("rxrpc: Rewrite the data and ack handling code")
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Marc Dionne <marc.dionne@auristor.com>
 cc: "David S. Miller" <davem@davemloft.net>
@@ -100,95 +94,234 @@ cc: Paolo Abeni <pabeni@redhat.com>
 cc: linux-afs@lists.infradead.org
 cc: netdev@vger.kernel.org
 ---
- include/trace/events/rxrpc.h | 25 +++++++++++++++++++++++++
- net/rxrpc/conn_event.c       | 12 ++++++++----
- 2 files changed, 33 insertions(+), 4 deletions(-)
+ net/rxrpc/call_event.c  |  5 ++---
+ net/rxrpc/call_object.c |  4 ++--
+ net/rxrpc/conn_client.c |  2 +-
+ net/rxrpc/input.c       | 13 +++++--------
+ net/rxrpc/insecure.c    |  2 +-
+ net/rxrpc/io_thread.c   |  2 +-
+ net/rxrpc/output.c      |  2 +-
+ net/rxrpc/rtt.c         |  6 +++---
+ net/rxrpc/rxkad.c       |  6 +++---
+ net/rxrpc/rxperf.c      |  2 +-
+ net/rxrpc/sendmsg.c     |  2 +-
+ 11 files changed, 21 insertions(+), 25 deletions(-)
 
-diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
-index d03e0bd8c028..27c23873c881 100644
---- a/include/trace/events/rxrpc.h
-+++ b/include/trace/events/rxrpc.h
-@@ -117,6 +117,7 @@
- #define rxrpc_call_poke_traces \
- 	EM(rxrpc_call_poke_abort,		"Abort")	\
- 	EM(rxrpc_call_poke_complete,		"Compl")	\
-+	EM(rxrpc_call_poke_conn_abort,		"Conn-abort")	\
- 	EM(rxrpc_call_poke_error,		"Error")	\
- 	EM(rxrpc_call_poke_idle,		"Idle")		\
- 	EM(rxrpc_call_poke_set_timeout,		"Set-timo")	\
-@@ -282,6 +283,7 @@
- 	EM(rxrpc_call_see_activate_client,	"SEE act-clnt") \
- 	EM(rxrpc_call_see_connect_failed,	"SEE con-fail") \
- 	EM(rxrpc_call_see_connected,		"SEE connect ") \
-+	EM(rxrpc_call_see_conn_abort,		"SEE conn-abt") \
- 	EM(rxrpc_call_see_disconnected,		"SEE disconn ") \
- 	EM(rxrpc_call_see_distribute_error,	"SEE dist-err") \
- 	EM(rxrpc_call_see_input,		"SEE input   ") \
-@@ -981,6 +983,29 @@ TRACE_EVENT(rxrpc_rx_abort,
- 		      __entry->abort_code)
- 	    );
+diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
+index 7bbb68504766..c4754cc9b8d4 100644
+--- a/net/rxrpc/call_event.c
++++ b/net/rxrpc/call_event.c
+@@ -233,8 +233,7 @@ static void rxrpc_close_tx_phase(struct rxrpc_call *call)
  
-+TRACE_EVENT(rxrpc_rx_conn_abort,
-+	    TP_PROTO(const struct rxrpc_connection *conn, const struct sk_buff *skb),
-+
-+	    TP_ARGS(conn, skb),
-+
-+	    TP_STRUCT__entry(
-+		    __field(unsigned int,	conn)
-+		    __field(rxrpc_serial_t,	serial)
-+		    __field(u32,		abort_code)
-+			     ),
-+
-+	    TP_fast_assign(
-+		    __entry->conn = conn->debug_id;
-+		    __entry->serial = rxrpc_skb(skb)->hdr.serial;
-+		    __entry->abort_code = skb->priority;
-+			   ),
-+
-+	    TP_printk("C=%08x ABORT %08x ac=%d",
-+		      __entry->conn,
-+		      __entry->serial,
-+		      __entry->abort_code)
-+	    );
-+
- TRACE_EVENT(rxrpc_rx_challenge,
- 	    TP_PROTO(struct rxrpc_connection *conn, rxrpc_serial_t serial,
- 		     u32 version, u32 nonce, u32 min_level),
-diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
-index 598b4ee389fc..2a1396cd892f 100644
---- a/net/rxrpc/conn_event.c
-+++ b/net/rxrpc/conn_event.c
-@@ -63,11 +63,12 @@ int rxrpc_abort_conn(struct rxrpc_connection *conn, struct sk_buff *skb,
- /*
-  * Mark a connection as being remotely aborted.
-  */
--static bool rxrpc_input_conn_abort(struct rxrpc_connection *conn,
-+static void rxrpc_input_conn_abort(struct rxrpc_connection *conn,
- 				   struct sk_buff *skb)
+ static bool rxrpc_tx_window_has_space(struct rxrpc_call *call)
  {
--	return rxrpc_set_conn_aborted(conn, skb, skb->priority, -ECONNABORTED,
--				      RXRPC_CALL_REMOTELY_ABORTED);
-+	trace_rxrpc_rx_conn_abort(conn, skb);
-+	rxrpc_set_conn_aborted(conn, skb, skb->priority, -ECONNABORTED,
-+			       RXRPC_CALL_REMOTELY_ABORTED);
+-	unsigned int winsize = min_t(unsigned int, call->tx_winsize,
+-				     call->cong_cwnd + call->cong_extra);
++	unsigned int winsize = umin(call->tx_winsize, call->cong_cwnd + call->cong_extra);
+ 	rxrpc_seq_t window = call->acks_hard_ack, wtop = window + winsize;
+ 	rxrpc_seq_t tx_top = call->tx_top;
+ 	int space;
+@@ -467,7 +466,7 @@ bool rxrpc_input_call_event(struct rxrpc_call *call, struct sk_buff *skb)
+ 		} else {
+ 			unsigned long nowj = jiffies, delayj, nextj;
+ 
+-			delayj = max(nsecs_to_jiffies(delay), 1);
++			delayj = umax(nsecs_to_jiffies(delay), 1);
+ 			nextj = nowj + delayj;
+ 			if (time_before(nextj, call->timer.expires) ||
+ 			    !timer_pending(&call->timer)) {
+diff --git a/net/rxrpc/call_object.c b/net/rxrpc/call_object.c
+index f9e983a12c14..0df647d1d3a2 100644
+--- a/net/rxrpc/call_object.c
++++ b/net/rxrpc/call_object.c
+@@ -220,9 +220,9 @@ static struct rxrpc_call *rxrpc_alloc_client_call(struct rxrpc_sock *rx,
+ 		__set_bit(RXRPC_CALL_EXCLUSIVE, &call->flags);
+ 
+ 	if (p->timeouts.normal)
+-		call->next_rx_timo = min(p->timeouts.normal, 1);
++		call->next_rx_timo = umin(p->timeouts.normal, 1);
+ 	if (p->timeouts.idle)
+-		call->next_req_timo = min(p->timeouts.idle, 1);
++		call->next_req_timo = umin(p->timeouts.idle, 1);
+ 	if (p->timeouts.hard)
+ 		call->hard_timo = p->timeouts.hard;
+ 
+diff --git a/net/rxrpc/conn_client.c b/net/rxrpc/conn_client.c
+index bb11e8289d6d..86fb18bcd188 100644
+--- a/net/rxrpc/conn_client.c
++++ b/net/rxrpc/conn_client.c
+@@ -231,7 +231,7 @@ static bool rxrpc_may_reuse_conn(struct rxrpc_connection *conn)
+ 	distance = id - id_cursor;
+ 	if (distance < 0)
+ 		distance = -distance;
+-	limit = max_t(unsigned long, atomic_read(&rxnet->nr_conns) * 4, 1024);
++	limit = umax(atomic_read(&rxnet->nr_conns) * 4, 1024);
+ 	if (distance > limit)
+ 		goto mark_dont_reuse;
+ 
+diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
+index 16d49a861dbb..49e35be7dc13 100644
+--- a/net/rxrpc/input.c
++++ b/net/rxrpc/input.c
+@@ -44,8 +44,7 @@ static void rxrpc_congestion_management(struct rxrpc_call *call,
+ 
+ 	if (test_and_clear_bit(RXRPC_CALL_RETRANS_TIMEOUT, &call->flags)) {
+ 		summary->retrans_timeo = true;
+-		call->cong_ssthresh = max_t(unsigned int,
+-					    summary->flight_size / 2, 2);
++		call->cong_ssthresh = umax(summary->flight_size / 2, 2);
+ 		cwnd = 1;
+ 		if (cwnd >= call->cong_ssthresh &&
+ 		    call->cong_mode == RXRPC_CALL_SLOW_START) {
+@@ -113,8 +112,7 @@ static void rxrpc_congestion_management(struct rxrpc_call *call,
+ 
+ 		change = rxrpc_cong_begin_retransmission;
+ 		call->cong_mode = RXRPC_CALL_FAST_RETRANSMIT;
+-		call->cong_ssthresh = max_t(unsigned int,
+-					    summary->flight_size / 2, 2);
++		call->cong_ssthresh = umax(summary->flight_size / 2, 2);
+ 		cwnd = call->cong_ssthresh + 3;
+ 		call->cong_extra = 0;
+ 		call->cong_dup_acks = 0;
+@@ -206,9 +204,8 @@ void rxrpc_congestion_degrade(struct rxrpc_call *call)
+ 	rxrpc_inc_stat(call->rxnet, stat_tx_data_cwnd_reset);
+ 	call->tx_last_sent = now;
+ 	call->cong_mode = RXRPC_CALL_SLOW_START;
+-	call->cong_ssthresh = max_t(unsigned int, call->cong_ssthresh,
+-				    call->cong_cwnd * 3 / 4);
+-	call->cong_cwnd = max_t(unsigned int, call->cong_cwnd / 2, RXRPC_MIN_CWND);
++	call->cong_ssthresh = umax(call->cong_ssthresh, call->cong_cwnd * 3 / 4);
++	call->cong_cwnd = umax(call->cong_cwnd / 2, RXRPC_MIN_CWND);
  }
  
  /*
-@@ -202,11 +203,14 @@ static void rxrpc_abort_calls(struct rxrpc_connection *conn)
- 
- 	for (i = 0; i < RXRPC_MAXCALLS; i++) {
- 		call = conn->channels[i].call;
--		if (call)
-+		if (call) {
-+			rxrpc_see_call(call, rxrpc_call_see_conn_abort);
- 			rxrpc_set_call_completion(call,
- 						  conn->completion,
- 						  conn->abort_code,
- 						  conn->error);
-+			rxrpc_poke_call(call, rxrpc_call_poke_conn_abort);
-+		}
+@@ -709,7 +706,7 @@ static void rxrpc_input_ack_trailer(struct rxrpc_call *call, struct sk_buff *skb
+ 		call->tx_winsize = rwind;
  	}
  
- 	_leave("");
+-	mtu = min(ntohl(trailer->maxMTU), ntohl(trailer->ifMTU));
++	mtu = umin(ntohl(trailer->maxMTU), ntohl(trailer->ifMTU));
+ 
+ 	peer = call->peer;
+ 	if (mtu < peer->maxdata) {
+diff --git a/net/rxrpc/insecure.c b/net/rxrpc/insecure.c
+index 6716c021a532..751eb621021d 100644
+--- a/net/rxrpc/insecure.c
++++ b/net/rxrpc/insecure.c
+@@ -19,7 +19,7 @@ static int none_init_connection_security(struct rxrpc_connection *conn,
+  */
+ static struct rxrpc_txbuf *none_alloc_txbuf(struct rxrpc_call *call, size_t remain, gfp_t gfp)
+ {
+-	return rxrpc_alloc_data_txbuf(call, min_t(size_t, remain, RXRPC_JUMBO_DATALEN), 1, gfp);
++	return rxrpc_alloc_data_txbuf(call, umin(remain, RXRPC_JUMBO_DATALEN), 1, gfp);
+ }
+ 
+ static int none_secure_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
+diff --git a/net/rxrpc/io_thread.c b/net/rxrpc/io_thread.c
+index 07c74c77d802..7af5adf53b25 100644
+--- a/net/rxrpc/io_thread.c
++++ b/net/rxrpc/io_thread.c
+@@ -558,7 +558,7 @@ int rxrpc_io_thread(void *data)
+ 			}
+ 
+ 			timeout = nsecs_to_jiffies(delay_ns);
+-			timeout = max(timeout, 1UL);
++			timeout = umax(timeout, 1);
+ 			schedule_timeout(timeout);
+ 			__set_current_state(TASK_RUNNING);
+ 			continue;
+diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
+index 5ea9601efd05..85112ea31a39 100644
+--- a/net/rxrpc/output.c
++++ b/net/rxrpc/output.c
+@@ -118,7 +118,7 @@ static void rxrpc_fill_out_ack(struct rxrpc_call *call,
+ 		txb->kvec[1].iov_len = ack->nAcks;
+ 
+ 		wrap = RXRPC_SACK_SIZE - sack;
+-		to = min_t(unsigned int, ack->nAcks, RXRPC_SACK_SIZE);
++		to = umin(ack->nAcks, RXRPC_SACK_SIZE);
+ 
+ 		if (sack + ack->nAcks <= RXRPC_SACK_SIZE) {
+ 			memcpy(sackp, call->ackr_sack_table + sack, ack->nAcks);
+diff --git a/net/rxrpc/rtt.c b/net/rxrpc/rtt.c
+index cdab7b7d08a0..6dc51486b5a6 100644
+--- a/net/rxrpc/rtt.c
++++ b/net/rxrpc/rtt.c
+@@ -27,7 +27,7 @@ static u32 __rxrpc_set_rto(const struct rxrpc_peer *peer)
+ 
+ static u32 rxrpc_bound_rto(u32 rto)
+ {
+-	return min(rto, RXRPC_RTO_MAX);
++	return umin(rto, RXRPC_RTO_MAX);
+ }
+ 
+ /*
+@@ -91,11 +91,11 @@ static void rxrpc_rtt_estimator(struct rxrpc_peer *peer, long sample_rtt_us)
+ 		/* no previous measure. */
+ 		srtt = m << 3;		/* take the measured time to be rtt */
+ 		peer->mdev_us = m << 1;	/* make sure rto = 3*rtt */
+-		peer->rttvar_us = max(peer->mdev_us, rxrpc_rto_min_us(peer));
++		peer->rttvar_us = umax(peer->mdev_us, rxrpc_rto_min_us(peer));
+ 		peer->mdev_max_us = peer->rttvar_us;
+ 	}
+ 
+-	peer->srtt_us = max(1U, srtt);
++	peer->srtt_us = umax(srtt, 1);
+ }
+ 
+ /*
+diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
+index 48a1475e6b06..e3194d73dd84 100644
+--- a/net/rxrpc/rxkad.c
++++ b/net/rxrpc/rxkad.c
+@@ -150,11 +150,11 @@ static struct rxrpc_txbuf *rxkad_alloc_txbuf(struct rxrpc_call *call, size_t rem
+ 	struct rxrpc_txbuf *txb;
+ 	size_t shdr, space;
+ 
+-	remain = min(remain, 65535 - sizeof(struct rxrpc_wire_header));
++	remain = umin(remain, 65535 - sizeof(struct rxrpc_wire_header));
+ 
+ 	switch (call->conn->security_level) {
+ 	default:
+-		space = min_t(size_t, remain, RXRPC_JUMBO_DATALEN);
++		space = umin(remain, RXRPC_JUMBO_DATALEN);
+ 		return rxrpc_alloc_data_txbuf(call, space, 1, gfp);
+ 	case RXRPC_SECURITY_AUTH:
+ 		shdr = sizeof(struct rxkad_level1_hdr);
+@@ -164,7 +164,7 @@ static struct rxrpc_txbuf *rxkad_alloc_txbuf(struct rxrpc_call *call, size_t rem
+ 		break;
+ 	}
+ 
+-	space = min_t(size_t, round_down(RXRPC_JUMBO_DATALEN, RXKAD_ALIGN), remain + shdr);
++	space = umin(round_down(RXRPC_JUMBO_DATALEN, RXKAD_ALIGN), remain + shdr);
+ 	space = round_up(space, RXKAD_ALIGN);
+ 
+ 	txb = rxrpc_alloc_data_txbuf(call, space, RXKAD_ALIGN, gfp);
+diff --git a/net/rxrpc/rxperf.c b/net/rxrpc/rxperf.c
+index 085e7892d310..7ef93407be83 100644
+--- a/net/rxrpc/rxperf.c
++++ b/net/rxrpc/rxperf.c
+@@ -503,7 +503,7 @@ static int rxperf_process_call(struct rxperf_call *call)
+ 				   reply_len + sizeof(rxperf_magic_cookie));
+ 
+ 	while (reply_len > 0) {
+-		len = min_t(size_t, reply_len, PAGE_SIZE);
++		len = umin(reply_len, PAGE_SIZE);
+ 		bvec_set_page(&bv, ZERO_PAGE(0), len, 0);
+ 		iov_iter_bvec(&msg.msg_iter, WRITE, &bv, 1, len);
+ 		msg.msg_flags = MSG_MORE;
+diff --git a/net/rxrpc/sendmsg.c b/net/rxrpc/sendmsg.c
+index 6abb8eec1b2b..b04afb5df241 100644
+--- a/net/rxrpc/sendmsg.c
++++ b/net/rxrpc/sendmsg.c
+@@ -360,7 +360,7 @@ static int rxrpc_send_data(struct rxrpc_sock *rx,
+ 
+ 		/* append next segment of data to the current buffer */
+ 		if (msg_data_left(msg) > 0) {
+-			size_t copy = min_t(size_t, txb->space, msg_data_left(msg));
++			size_t copy = umin(txb->space, msg_data_left(msg));
+ 
+ 			_debug("add %zu", copy);
+ 			if (!copy_from_iter_full(txb->kvec[0].iov_base + txb->offset,
 
 
