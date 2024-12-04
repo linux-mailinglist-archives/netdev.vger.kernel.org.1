@@ -1,131 +1,214 @@
-Return-Path: <netdev+bounces-148986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 338C79E3B69
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:38:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66E389E3BDD
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:58:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDEB7285AB7
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:38:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF9E2B36D00
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0D91DFE15;
-	Wed,  4 Dec 2024 13:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FCD6EAF6;
+	Wed,  4 Dec 2024 13:47:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wkfuKB2c"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dgYaxFZj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570511DF745
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 13:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AD915E97
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 13:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733319509; cv=none; b=pnGYHLcYrXPOamms/poPRnoIsqBSzQQrYQ73ZUkuY/o3hoCiw566siZZwFvX1aDXP7wnHwNIKdxdEUv35t3xNGwulegxXO5MhFWE8rxatTVjRs7OPpHe9V1sEXHOnPD1nsLlYzEO9N2dGkKPOX365A/ykVbBUw2ILynD4zBuIa4=
+	t=1733320052; cv=none; b=MpetqO2n7rDx3/oW4B/5zDBwSHbEnoRv9lcEv6I9J+piSCM93uddKKzyDGXkSDJHRk4jzcO78yHAm84Y9QXQ2PFWc9YoJWsKVaO9McZhZOlArAoMB3/gvmvClfPOHPJUFKv3pqrmsDoenX9yR136tDUX6sPUYi0jlakANLw+8LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733319509; c=relaxed/simple;
-	bh=QuFnu3L3Jd2ulTeMmHAFsUR7/FkSIt3YcvUlyBFhi3A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yg4D4xb/hDQaDS3pz/21N41fXfj9JPVCF8n6B++y+KwWoJ2b7ykhIILVhHdb5+nWy2jyC+azLFI4PFiTYhulHVf3YiFekgkqib0mhhUwOxGcPWtWHJcqjyuIeyOrcfxdch6PIkF+9M1+tv7uYTJ2pPkdoYOYyDS5g3z4AZ8PelM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wkfuKB2c; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a9f1d76dab1so481866466b.0
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 05:38:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733319505; x=1733924305; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QuFnu3L3Jd2ulTeMmHAFsUR7/FkSIt3YcvUlyBFhi3A=;
-        b=wkfuKB2c/kTF5LMYcomYWTZ1lXLs+qmdy0uBQVeljiBBaXd6QlvfTVq2S7MRGEL97q
-         o+O0RBjX5pD1NfKcO1PYd7nK2WENVtHwy2fm/RUysPb/VMFCueG7555pPl+VTi/V8Og3
-         XtFgrClbwdyDGn8izAMFn5WR5B1GqM9nLqrpRabYQ+zPzecmomSwau2t9YvWTyNYRBCP
-         H/cnPqbCmYx71CK7B/Jkp3mPEn95Lf+GFT5L6o+EZtEtCL889GS2nkRDFMsAtw/IEqfE
-         BsaaTuU15GbecnolKLCgW1ypI7J4cG7tJBYsotPwKl16WCqwdOkCOcNCaaRBjTydFgqj
-         Oi7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733319505; x=1733924305;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QuFnu3L3Jd2ulTeMmHAFsUR7/FkSIt3YcvUlyBFhi3A=;
-        b=Morv5a8wOTp9g8EV/OZd/duaHtnZ3ovPvHYJrHgh8XWL4EaCRFDuAipWyAbFZoh5vs
-         81XZfnQTp9j6MaW0Xf3bCvQvvNJHVChFQrVfyO33ZJclJ9NM4u2fwoZKcPCaNFwVkSWt
-         LEtVrbyadHCkgGONkWMISdKLnbcl6SdVVeywDclg1VL13F7HzZJWzEoejTn60iv4naDB
-         QKvyvflCBSStAm1F1FxKPaMMtYtiqPMhNg1x32fwNBGM5i3jzOaO/B4SHrVz80muLLHA
-         IFBRKt9H6ZW6/+LJ2TduLjZj8G23I9wNmbUOxnBpb4OzfjtzSSeftNzAbm2S1Qp2Evsf
-         j0nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUFG4jDfz2qyerSN5ZvVoMbBfLupNJRD+IeJLBVHWr9ZZaYz44zLQNjwGjnPmXO/zXPNlCILdk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSgasKZKqCCVdV1ekYuil16ts3NqUJVQvaHOcGsIjvtyJn7x4J
-	Ds016Fpy/x7zk7+h4QwVmHM4d5YVpQcNu1U+p82g1TNDxUkg0Ns9Z8TlSYjjkJki0zBgivnigmq
-	xkL9j+930mrFnLaunDjwk3ErR9Z5Bosbks3Fy
-X-Gm-Gg: ASbGncv9ZIbuePpRczW+XsFKY9Md0h6cO29BjNSx8AeciZpSad4tLePIMBeiVNsoVTe
-	ioaJpsrYT3RE89YSOVnEe1hQT3O+/GpkA
-X-Google-Smtp-Source: AGHT+IF7RwvxlZD2PQdHXCgeP4HVt2yLSK+7YDK1+JcTpVU7zRalcku3n3HDgBLco8/sDIP+L+e4aznX1Arbf5nGkjA=
-X-Received: by 2002:a17:906:32ca:b0:aa5:3853:553e with SMTP id
- a640c23a62f3a-aa6018d89dcmr459108866b.47.1733319505410; Wed, 04 Dec 2024
- 05:38:25 -0800 (PST)
+	s=arc-20240116; t=1733320052; c=relaxed/simple;
+	bh=SboXOZ9mXCjsZVOfuERGZFZkIX96mrZkgW6frAHJHgs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s9gptXuzKMrMbnKThGZm0Tiir7ZlK2DPWNRaIt0TV6QK1+IdX03ruzQhu5brRvw38zZDCtyIb1UjqMsKPU7O/niYDRAbASuPT1141OIWnPgG48UyY2Q82Y7gNPShWTodKph/aB8vt44JkLqAvrtNSowk2EjBsLkb8tWolhyc2uQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dgYaxFZj; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b466b028-018b-4ae2-9b96-994081e4ebf6@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1733320046;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OX+0intpKB5YjI4aa/yS+ZMctcorKNmMPEqW438sPJU=;
+	b=dgYaxFZj28Twz/syT1nFAv6y4ppH3aGfx2BZqlLT+US9Cvt7JHy02oZOMCpBWgQzFDB8nf
+	SxUDwsZoGOQ8p0hxEjfZyrAYE08FcAJ/24XYvu786QpYnEqdN2eLi/6rRHKuGjTiqC5nIx
+	itZwUEp8NqL9qVJ9u/6aYdkwegkgKTw=
+Date: Wed, 4 Dec 2024 14:47:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241203170933.2449307-1-edumazet@google.com> <20241203173718.owpsc6h2kmhdvhy4@skbuf>
- <CANn89iKpzA=5iam--u8A+GR8F+YZ5DNRdbVk=KniMwgdZWrnuQ@mail.gmail.com>
- <20241204114121.hzqtiscwfdyvicym@skbuf> <CANn89i+hjGLeGd-wFi+CS=HkrvcHtTso74qJVFLk44cVqid92g@mail.gmail.com>
- <20241204125717.6wxa4llwpdhv5hon@skbuf>
-In-Reply-To: <20241204125717.6wxa4llwpdhv5hon@skbuf>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 4 Dec 2024 14:38:14 +0100
-Message-ID: <CANn89iL+2NeV59p57bN+hc+vWB61DWWjRKAoit-=QHXC0C=RBg@mail.gmail.com>
-Subject: Re: [PATCH net] net: avoid potential UAF in default_operstate()
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot+1939f24bdb783e9e43d9@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next V4 00/11] net/mlx5: ConnectX-8 SW Steering + Rate
+ management on traffic classes
+To: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ linux-rdma@vger.kernel.org
+References: <20241203202924.228440-1-tariqt@nvidia.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20241203202924.228440-1-tariqt@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Dec 4, 2024 at 1:57=E2=80=AFPM Vladimir Oltean <vladimir.oltean@nxp=
-.com> wrote:
->
-> On Wed, Dec 04, 2024 at 12:46:11PM +0100, Eric Dumazet wrote:
-> > On Wed, Dec 4, 2024 at 12:41=C3=A2=E2=82=AC=C2=AFPM Vladimir Oltean <vl=
-adimir.oltean@nxp.com> wrote:
-> > >
-> > > I meant: linkwatch runs periodically, via linkwatch_event(). Isn't th=
-ere
-> > > a chance that linkwatch_event() can run once, immediately after
-> > > __rtnl_unlock() in netdev_run_todo(), while the netdev is in the
-> > > NETREG_UNREGISTERING state? Won't that create problems for __dev_get_=
-by_index()
-> > > too? I guess it depends on when the netns is torn down, which I could=
-n't find.
-> >
-> > I think lweventlist_lock and dev->link_watch_list are supposed to
-> > synchronize things.
-> >
-> > linkwatch_sync_dev() only calls linkwatch_do_dev() if the device was
-> > atomically unlinked from lweventlist
->
-> No, I don't mean calls from linkwatch_sync_dev(). I mean other call
-> paths towards linkwatch_do_dev(), like for example linkwatch_fire_event()=
- -
-> carrier down, whatever. Can't these be pending on an unregistering
-> net_device at the time we run __rtnl_unlock() in netdev_run_todo?
-> Otherwise, why would netdev_wait_allrefs_any() have a linkwatch_run_queue=
-()
-> call just later?
+On 03.12.24 21:29, Tariq Toukan wrote:
+> Hi,
+> 
+> This patchset starts with 3 patches that modify the IFC, targeted to
+> mlx5-next in order to be taken to rdma-next branch side sooner than in
+> the next merge window.
+> 
+> This patchset consists of two features:
+> 1. In patches 4-5, Itamar adds SW Steering support for ConnectX-8.
+> 2. Followed by patches by Carolina that add rate management support on
+> traffic classes in devlink and mlx5, more details below [1].
+> 
+> Series generated against:
+> commit e8e7be7d212d ("mctp i2c: drop check because i2c_unregister_device() is NULL safe")
 
-I do not know, this predates git history.
+ From the link 
+https://people.kernel.org/monsieuricon/all-patches-must-include-base-commit-info, 
 
-All these questions seem orthogonal.
-My patch fixes an issue added recently. not something added 10 years ago.
-I suggest we fix proven issues first, step by step.
-If you want to take over and send a series, just say so.
 
-Thank you.
+If we use --base=auto or the commit id (in this patch, the commit id 
+should be e8e7be7d212d), then we will notice that the commits will have 
+the base-commit: tailer at the very bottom.
+
+This seems somewhat professional compared to the above. ^_^
+
+Best Regards,
+Zhu Yanjun
+
+> 
+> Regards,
+> Tariq
+> 
+> V4:
+> - Renamed the nested attribute for traffic class bandwidth to
+>    DEVLINK_ATTR_RATE_TC_BWS.
+> - Changed the order of the attributes in `devlink.h`.
+> - Refactored the initialization tc-bw array in
+>    devlink_nl_rate_tc_bw_set().
+> - Added extack messages to provide clear feedback on issues with tc-bw
+>    arguments.
+> - Updated `rate-tc-bws` to support a multi-attr set, where each
+>    attribute includes an index and the corresponding bandwidth for that
+>    traffic class.
+> - Handled the issue where the user could provide
+>    DEVLINK_ATTR_RATE_TC_BWS with duplicate indices.
+> - Provided ynl exmaples in devlink patch commit message.
+> - Take IFC patches to beginning of the series, targeted for mlx5-next.
+> 
+> 
+> V3:
+> - Dropped rate-tc-index, using tc-bw array index instead.
+> - Renamed rate-bw to rate-tc-bw.
+> - Documneted what the rate-tc-bw represents and added a range check for
+>    validation.
+> - Intorduced devlink_nl_rate_tc_bw_set() to parse and set the TC
+>    bandwidth values.
+> - Updated the user API in the commit message of patch 1/6 to ensure
+>    bandwidths sum equals 100.
+> - Fixed missing filling of rate-parent in devlink_nl_rate_fill().
+> 
+> V2:
+> - Included <linux/dcbnl.h> in devlink.h to resolve missing
+>    IEEE_8021QAZ_MAX_TCS definition.
+> - Refactored the rate-tc-bw attribute structure to use a separate
+>    rate-tc-index.
+> - Updated patch 2/6 title.
+> 
+> 
+> [1]
+> This patch series extends the devlink-rate API to support traffic class
+> (TC) bandwidth management, enabling more granular control over traffic
+> shaping and rate limiting across multiple TCs. The API now allows users
+> to specify bandwidth proportions for different traffic classes in a
+> single command. This is particularly useful for managing Enhanced
+> Transmission Selection (ETS) for groups of Virtual Functions (VFs),
+> allowing precise bandwidth allocation across traffic classes.
+> 
+> Additionally the series refines the QoS handling in net/mlx5 to support
+> TC arbitration and bandwidth management on vports and rate nodes.
+> 
+> Extend devlink-rate API to support rate management on TCs:
+> - devlink: Extend the devlink rate API to support traffic class
+>    bandwidth management
+> 
+> Introduce a no-op implementation:
+> - net/mlx5: Add no-op implementation for setting tc-bw on rate objects
+> 
+> Add support for enabling and disabling TC QoS on vports and nodes:
+> - net/mlx5: Add support for setting tc-bw on nodes
+> - net/mlx5: Add traffic class scheduling support for vport QoS
+> 
+> Support for setting tc-bw on rate objects:
+> - net/mlx5: Manage TC arbiter nodes and implement full support for
+>    tc-bw
+> 
+> Carolina Jubran (6):
+>    net/mlx5: Add support for new scheduling elements
+>    devlink: Extend devlink rate API with traffic classes bandwidth
+>      management
+>    net/mlx5: Add no-op implementation for setting tc-bw on rate objects
+>    net/mlx5: Add support for setting tc-bw on nodes
+>    net/mlx5: Add traffic class scheduling support for vport QoS
+>    net/mlx5: Manage TC arbiter nodes and implement full support for tc-bw
+> 
+> Cosmin Ratiu (2):
+>    net/mlx5: ifc: Reorganize mlx5_ifc_flow_table_context_bits
+>    net/mlx5: qos: Add ifc support for cross-esw scheduling
+> 
+> Itamar Gozlan (2):
+>    net/mlx5: DR, Expand SWS STE callbacks and consolidate common structs
+>    net/mlx5: DR, Add support for ConnectX-8 steering
+> 
+> Yevgeny Kliteynik (1):
+>    net/mlx5: Add ConnectX-8 device to ifc
+> 
+>   Documentation/netlink/specs/devlink.yaml      |  28 +-
+>   .../net/ethernet/mellanox/mlx5/core/Makefile  |   1 +
+>   .../net/ethernet/mellanox/mlx5/core/devlink.c |   2 +
+>   .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 795 +++++++++++++++++-
+>   .../net/ethernet/mellanox/mlx5/core/esw/qos.h |   4 +
+>   .../net/ethernet/mellanox/mlx5/core/eswitch.h |  13 +-
+>   drivers/net/ethernet/mellanox/mlx5/core/rl.c  |   4 +
+>   .../mlx5/core/steering/sws/dr_domain.c        |   2 +-
+>   .../mellanox/mlx5/core/steering/sws/dr_ste.c  |   6 +-
+>   .../mellanox/mlx5/core/steering/sws/dr_ste.h  |  19 +-
+>   .../mlx5/core/steering/sws/dr_ste_v0.c        |   6 +-
+>   .../mlx5/core/steering/sws/dr_ste_v1.c        | 207 +----
+>   .../mlx5/core/steering/sws/dr_ste_v1.h        | 147 +++-
+>   .../mlx5/core/steering/sws/dr_ste_v2.c        | 169 +---
+>   .../mlx5/core/steering/sws/dr_ste_v2.h        | 168 ++++
+>   .../mlx5/core/steering/sws/dr_ste_v3.c        | 221 +++++
+>   .../mlx5/core/steering/sws/mlx5_ifc_dr.h      |  40 +
+>   .../mellanox/mlx5/core/steering/sws/mlx5dr.h  |   2 +-
+>   include/linux/mlx5/mlx5_ifc.h                 |  56 +-
+>   include/net/devlink.h                         |   7 +
+>   include/uapi/linux/devlink.h                  |   4 +
+>   net/devlink/netlink_gen.c                     |  15 +-
+>   net/devlink/netlink_gen.h                     |   1 +
+>   net/devlink/rate.c                            | 124 +++
+>   24 files changed, 1645 insertions(+), 396 deletions(-)
+>   create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_ste_v2.h
+>   create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_ste_v3.c
+> 
+
 
