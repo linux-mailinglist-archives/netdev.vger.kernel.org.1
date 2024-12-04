@@ -1,106 +1,117 @@
-Return-Path: <netdev+bounces-148946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2D249E392A
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 12:46:29 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FC0D9E3955
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 12:56:38 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF636166FAB
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:46:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 455C228237A
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:56:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84E91AF0C1;
-	Wed,  4 Dec 2024 11:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4B41B3952;
+	Wed,  4 Dec 2024 11:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XjB7oVFn"
+	dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b="DZd7wSIk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx-rz-2.rrze.uni-erlangen.de (mx-rz-2.rrze.uni-erlangen.de [131.188.11.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D291AC892
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 11:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B1A1B3950;
+	Wed,  4 Dec 2024 11:56:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=131.188.11.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733312786; cv=none; b=bK4hdWXVWlJy3DDEJjPOYDfci4tjmFr8JpdAjRL91B8cu/CjGEhu1g2ijwPImZRMMKsB9oWFnp2ljFdUQhPQd+JDbuVW2T+JwcseAZfMb74TrU3Wkjq3FukGwhYD3t86Q7Gg92StzkoOb6d1nL9PzezcE9mUbDJc1PJPasRPYbI=
+	t=1733313394; cv=none; b=o8AdxHppkYFgPqBocgMJb57f6ny52lAqGJ6kLVWNuaXNSovcuMFiaiJVWwMqQbn1Fpw5TDKBjeZI8Q0oatoXeUNbbtVhVWlPjPMVYAGrH8T3h4vgBA2t47rhPD41LR+l3uOeQ6lC4SBNZ6zuiwfo4utlGGM4C3P1XPCHWT+cmb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733312786; c=relaxed/simple;
-	bh=tLzuj7jI0In6lkLDKCs8PLeJG/36uTxGBTe59rUT1tM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sal2ecboYM3ZRdLwvvaOx7brR3Hv/7bX1n+RJYZ4tUL5Kbu7GQLHHVfo3LhS9kafDp7UY7hW6CLGq0vL0dMdhJ8kcq/PTo6IIYhe4k0utOCUFYxviWWHW786qxFqNT0lElq2fj6pV54/n92XSby0lI9OMCFgLJejbw3XuOqlpX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XjB7oVFn; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2ffdbc0c103so95599041fa.3
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 03:46:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733312783; x=1733917583; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tLzuj7jI0In6lkLDKCs8PLeJG/36uTxGBTe59rUT1tM=;
-        b=XjB7oVFnXGYlDgqx6d4yyb2utVV4Y6sSdU9i1tl4RwgxmEePf4nPsSLhfnfYVrAa9K
-         clwJhfCzp8+RCEukvHaX2sXdIp6+WcZ/v3XogtATJmg8UIwOGxMKuN49j5y9/7FD6YQo
-         uClyUUTQ5ZJV/LEnf3h+JpuF+F4o53pdH5A5h/sotcbQzQcTcRekAbeipY7rXvF3wgX+
-         sKpMQ0Z47xdFliND481z8qmD/+dA76OUNsLUWYzZgNd5E8k+KnaHrOPnGbCF10g21636
-         3eDY+5xgFhPy48enwbgV1d6lFZY19QD7yEwhToXrajmL0IIl4MJPhHhGjhWW+yT8j71A
-         iq9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733312783; x=1733917583;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tLzuj7jI0In6lkLDKCs8PLeJG/36uTxGBTe59rUT1tM=;
-        b=quR5EiUikgP4RrQZrXLzeOJl8LEJPuVdDVcACWGvo6gATH+Yn1vSBV3bIhXy5G1UcE
-         G2SpmNFYV+TsJo17vCj7ks9J+NlmlEF6cKoH/a4+6CIzf/Ap0vOSROoCCTS2fDsnlEnC
-         ZulM+MQctiI9qnx1ikij7v2wtAeD/ZoACvfD9VW153CdCFkLvHPPIzHB2LtH8P7MHcrL
-         +8/2reofaUnUlIopBbf7pjBisYJ93OQvjuSKsm2JduQ1dRNF8VRH9T8IbzLRp1NmZnti
-         CN5mdwDoygkOZ925etowOqMWeLpdtm9eG5/FrJ2KCaQItDgscbSVK4eXhRyVT3vfCI/m
-         ttQg==
-X-Forwarded-Encrypted: i=1; AJvYcCUMioyIa8j2t7JdaFZsQX8+2fV0++EuatpDM3lzlbaS4ezNbQaSDF2a6bVxe1HNkjDo8/vMPPE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0B77djrhtHe6Uz0PiHv9iVz4s1reYHwV1L0nrZ2JbU5xodr44
-	YFASPPTS3rXGK0jaIwwOaSTFKJFpxtQm+/5yTXSOhVnMXxs2HT1muIN3f/YIMEHsDONvN2P8wDV
-	6cVy+qfdrpIcVuZS3Sl3QqJelyf6aZEBZ7d6n
-X-Gm-Gg: ASbGncs8WjCGg09DifxKiYSDGQAWKQaNCKIvVzXpsVK0mCRo1MCOwhR1CEcAlL6aZRd
-	yywRadf+5Ddi1/LmYzx52DVJEJxBMKxaK
-X-Google-Smtp-Source: AGHT+IGsROMlnEvaRPRfh9bYY21kAbwsNpu+ZR78zK1fxbhvKexY5nhSovqhk7yS+IZKve/TlJdig8MDDhYhBnTXjIM=
-X-Received: by 2002:a05:651c:546:b0:2ff:d36a:2b31 with SMTP id
- 38308e7fff4ca-30009c4649cmr53725771fa.6.1733312782913; Wed, 04 Dec 2024
- 03:46:22 -0800 (PST)
+	s=arc-20240116; t=1733313394; c=relaxed/simple;
+	bh=gfrZtkK4A+DOGZgYgjVo7j3CV+EEQ4cZ7jeW9wIdt5w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JKWrHOzGdkt15T2MxVRpe68s5sPbDxzIzawMa5T1Yxg2kELGjFnnE0EhA8KC77aMiChJgUfjdTCQRSWcRIZ027o+g+K91OOlzoZDWzTXBByhPzYK2yKvNOsum819gZc3iXMOhdVZD70QXN8ROmpYKeWw/bUglTnImnYHwO/E2x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de; spf=pass smtp.mailfrom=fau.de; dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b=DZd7wSIk; arc=none smtp.client-ip=131.188.11.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fau.de
+Received: from mx-rz-smart.rrze.uni-erlangen.de (mx-rz-smart.rrze.uni-erlangen.de [IPv6:2001:638:a000:1025::1e])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-rz-2.rrze.uni-erlangen.de (Postfix) with ESMTPS id 4Y3G3B0qktzPk68;
+	Wed,  4 Dec 2024 12:47:18 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fau.de; s=fau-2021;
+	t=1733312838; bh=gfrZtkK4A+DOGZgYgjVo7j3CV+EEQ4cZ7jeW9wIdt5w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From:To:CC:
+	 Subject;
+	b=DZd7wSIkv3/2Bo17KZyUK+M4I12AusFLMbl7/xkJGRxWEaQiOZSMLxZsSq97WfoIe
+	 xCtO+mNR1btfdG0KMG7ZRmCKkqizO0LmQQVVjKyOhmVvQOC2MTQ+DJEjBgDGerCxBH
+	 WSG5ItX77bL4K0alAUoE3mRAw9zgZ8MppkthHJXt+ZnE141KxJejQpHtuYBkUJSXe4
+	 GBpmsAaPOX2vrtIpCo7BrHmasRwlLxcpmw5Fd8sob9j6YxPdVi8wrhUtgUOh8ldJIJ
+	 +Ntw7gLEmCOD15F5k0CWCA7AmBV2OjYXAZBOTk1aev7Hall1AE4Y160UydnmJAw87o
+	 ENwrdWn1nEgCQ==
+X-Virus-Scanned: amavisd-new at boeck4.rrze.uni-erlangen.de (RRZE)
+X-RRZE-Flag: Not-Spam
+X-RRZE-Submit-IP: 131.188.37.42
+Received: from [131.188.37.42] (faui7y.informatik.uni-erlangen.de [131.188.37.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: U2FsdGVkX1/suPM4bff5/GBbiflfuJQPB+JDQHv2SKk=)
+	by smtp-auth.uni-erlangen.de (Postfix) with ESMTPSA id 4Y3G374hqTzPkl7;
+	Wed,  4 Dec 2024 12:47:15 +0100 (CET)
+Message-ID: <ce09216d-ccb2-4cf3-8c68-4de468411db5@fau.de>
+Date: Wed, 4 Dec 2024 12:47:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241203170933.2449307-1-edumazet@google.com> <20241203173718.owpsc6h2kmhdvhy4@skbuf>
- <CANn89iKpzA=5iam--u8A+GR8F+YZ5DNRdbVk=KniMwgdZWrnuQ@mail.gmail.com> <20241204114121.hzqtiscwfdyvicym@skbuf>
-In-Reply-To: <20241204114121.hzqtiscwfdyvicym@skbuf>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 4 Dec 2024 12:46:11 +0100
-Message-ID: <CANn89i+hjGLeGd-wFi+CS=HkrvcHtTso74qJVFLk44cVqid92g@mail.gmail.com>
-Subject: Re: [PATCH net] net: avoid potential UAF in default_operstate()
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot+1939f24bdb783e9e43d9@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/sched: netem: account for backlog updates from child
+ qdisc
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241125231825.2586179-1-martin.ottens@fau.de>
+ <20241202191312.3d3c8097@kernel.org>
+Content-Language: en-US, de-DE
+From: Martin Ottens <martin.ottens@fau.de>
+In-Reply-To: <20241202191312.3d3c8097@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 4, 2024 at 12:41=E2=80=AFPM Vladimir Oltean <vladimir.oltean@nx=
-p.com> wrote:
->
-> I meant: linkwatch runs periodically, via linkwatch_event(). Isn't there
-> a chance that linkwatch_event() can run once, immediately after
-> __rtnl_unlock() in netdev_run_todo(), while the netdev is in the
-> NETREG_UNREGISTERING state? Won't that create problems for __dev_get_by_i=
-ndex()
-> too? I guess it depends on when the netns is torn down, which I couldn't =
-find.
+On 03.12.24 04:13, Jakub Kicinski wrote:
+> I don't understand why we need to perform packet accounting=20
+> in a separate new member (t_len). You seem to fix qlen accounting,
+> anyway, and I think sch->limit should apply to the qdisc and all
+> its children. Not just qdisc directly (since most classful qdiscs
+> don't hold packets).
 
-I think lweventlist_lock and dev->link_watch_list are supposed to
-synchronize things.
+Netem is a classful qdisc but different from others because it holds=20
+packets in its internal tfifo and optional additionally in a child=20
+qdisc. However, sch->limit currently only considers the packets in=20
+the tfifo and not the packets hold by a child, but child qdiscs=20
+expect this value to refer to the number of packets that are in=20
+netem and all its children together. If the children change this=20
+value (using 'qdisc_tree_reduce_backlog'), then the number of=20
+packets in the tfifo no longer matches sch->limit.
+By adding t_len, the number of packets in the tfifo will be tracked=20
+independently from sch->limit therefore sch->limit can be changes=20
+by children without unwanted behavior. t_len is required, because=20
+currently the limit option of netem refers to the maximum number=20
+of packets in the tfifo - therefore the behavior of netem is not
+changed by this patch.
 
-linkwatch_sync_dev() only calls linkwatch_do_dev() if the device was
-atomically unlinked from lweventlist
+> I'm not a qdisc expert, so if you feel confident about this code you
+> need to explain the thinking in the commit message..
+
+With the patch I try to fix the error without changing the behavior=20
+of netem (e.g., change the meaning of the limit option to apply to=20
+the tfifo length and the packets in the child qdisc). Maybe there=20
+are even better approaches - I am happy about any feedback. I will=20
+revise the explanation in the patch to make this clearer and=20
+resubmit it.
 
