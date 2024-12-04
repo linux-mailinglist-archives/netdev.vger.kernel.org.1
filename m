@@ -1,260 +1,176 @@
-Return-Path: <netdev+bounces-149020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F4DE9E3DFF
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 16:17:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3BA99E3E46
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 16:27:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3E72B36BA7
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:33:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C18D8B42E7D
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F1B9209F5B;
-	Wed,  4 Dec 2024 14:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37A520B803;
+	Wed,  4 Dec 2024 14:53:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TDrs7lF6"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="gA03IGoy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DCF208997
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C78A20A5E7;
+	Wed,  4 Dec 2024 14:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733322791; cv=none; b=VyyOKSaFFC97T612DwobMokKzDFae5aEXOo78QpvKEy2ueoLFLpqZ6POb6MfNTBKtT6dz18pHaRDYIPYOPaAULxiu/aXfVBEMMFOLRV1jHEnVbtB77ymPqmWlDYSdljmn4URFXOxdRBR+R9Q96ODEG2SOsbGaABqSJD7jrywL6c=
+	t=1733323986; cv=none; b=khI3/sVB6fm9VSnztHedaZp0bCS2k6ucC/0DI/etpil9Z4BpVjkWE+dTBsFFZmaqU6Ie8FXNAZxAAmcj+EyFexSFvuX4m2CNsBUEkIvpBGmjWwYm8J2A4lxbXV0gkwl4KEUfwYqPFvAko9H/e/gYuUlLPDB/eqb8Ie4W4uUPhQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733322791; c=relaxed/simple;
-	bh=TZd6v4WISf8ar3vaZLQT0ooYqtYeGrgBhdjf32uWuBs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nMBERc/z0iQ7fAZi4Md5ovX96hzTxeXJ4EIo+VQ4Os2rugJ7u+lmGOaKu8oj2JdL/iyIJZTrzG4/rUU217Jz9uOPBGMLNw1fkklYHby8IE1g9BfNGOm+HEbHM0/QdeBfnemKIfiJ8paP/uVKCzK/cwUcbrzlAOirO6VM6fFKohI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TDrs7lF6; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733322790; x=1764858790;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=TZd6v4WISf8ar3vaZLQT0ooYqtYeGrgBhdjf32uWuBs=;
-  b=TDrs7lF6j03kej3q1fIfeanAKEo2IG3MMann8n8EwaCQGBVS8ZoloFDp
-   mgXUR2+dnIGhSRoIuIFgEXp81EQVJDMBoHduJ1uap+YDpTUw6whVZbxmj
-   8AtjuM1vuOdmDXpFbi0e2vKsrirtujXhfBLUpb1YQOUMwTONQrAj/L/dJ
-   p2WDyFCPUlEQOIteLtqZdLVFtxLXjs2F93Av6HlGQbD5WUh7MivqkvGWd
-   adFP6eE+MuAvIwS8mbks1WSXovMo5q8AdDoieNChNc7waJG/WS4fiqeYE
-   h8mDzhVdMDG+0FPXamm/5QX88wyVkkGURGp9HEK8qJbPMDBIK6BvE/L/B
-   Q==;
-X-CSE-ConnectionGUID: NVCVoDpuTHSnH6JxzI+Lcg==
-X-CSE-MsgGUID: CbRPN1KuTXCkAIVZTPEAgQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="44621846"
-X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="44621846"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 06:33:10 -0800
-X-CSE-ConnectionGUID: XaXOjI38R6i31IUn3ziSgQ==
-X-CSE-MsgGUID: GcRW3XuTRm6PeWKXoMuStw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="93456584"
-Received: from pkwapuli-mobl1.ger.corp.intel.com (HELO vbox-pkwap.ger.corp.intel.com) ([10.245.87.141])
-  by fmviesa006.fm.intel.com with ESMTP; 04 Dec 2024 06:33:08 -0800
-From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-Subject: [PATCH iwl-next v11 5/8] ixgbe: Add support for EEPROM dump in E610 device
-Date: Wed,  4 Dec 2024 15:31:09 +0100
-Message-ID: <20241204143112.29411-6-piotr.kwapulinski@intel.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241204143112.29411-1-piotr.kwapulinski@intel.com>
-References: <20241204143112.29411-1-piotr.kwapulinski@intel.com>
+	s=arc-20240116; t=1733323986; c=relaxed/simple;
+	bh=9S0hchzxez9pNCIR/AUpcl6f3DdTEiAyq8NPSfzzvbk=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=aG96ZQbG7ZdJsFYQ69m3zCeRR3o3Xk6nP2yKCDFvJ+P19rUXcQ8pQT1+8prixRtJsX2Z+E7B3QLFsrbYR8kU7qQaf1pl0IjKZj54ea4aPMecvPS1q8k9CkzFIfR2/mK6Od50NO3i3/DKP/zFpts4ClSR1OMEoP5rWiYhiR7+N9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=gA03IGoy; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B45xt8Z010494;
+	Wed, 4 Dec 2024 14:52:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=v0Q3KIInuD+e/4A2nf8kVW
+	+ZNT1dMVERaJJR2vF10wk=; b=gA03IGoy4GSBCSLOot9ZJvb5H4Rr74w+yi9Klt
+	IaqduRyXNiiHZq/5d44QX8Rtu4hHwO4Kg9jf5PUAF0nH5ov0jgX8cOyyGnqA059C
+	903l48Z5lcxcYXNWDuJq1cA1QtEh3YrlcwS9O3rFU82fz5Ssc5AOpCfPgfYPuYYV
+	YMwGosb2jS7tjB1KMs61MGCW/+tutuVaBIHt0NT6unZG1jxNpEcjKoctYrQUhbz8
+	Jbo+IxqKCdnZdRhA9OtjuPIEhHH0NzEHgBuVJJdYJAikAJUQVFngTIxCvM5LvBZV
+	3yGfq+uOpZgFDJKgv8NEokHiVk46ZcdHR+H/aF0FB5pGSiCw==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 439v7yvq7a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 04 Dec 2024 14:52:45 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B4EqiSR030728
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 4 Dec 2024 14:52:44 GMT
+Received: from nsssdc-sh01-lnx.ap.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Wed, 4 Dec 2024 06:52:38 -0800
+From: Lei Wei <quic_leiwei@quicinc.com>
+Subject: [PATCH net-next v2 0/5] Add PCS support for Qualcomm IPQ9574 SoC
+Date: Wed, 4 Dec 2024 22:43:52 +0800
+Message-ID: <20241204-ipq_pcs_rc1-v2-0-26155f5364a1@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKlqUGcC/22NQQ6CMBBFr0JmbU2nCCor72EIIcNUZmGBFhsM4
+ e42Xbt8efnv7xDYCwdoih08RwkyuQTmVACNvXuxkiExGG0uiBqVzEs3U+g8oTJ1z3gr6U51CWk
+ xe7ay5doTHK/K8bZCm8woYZ38N99EzP5vMaLSyg5sq2tVG032sXyExNGZpje0x3H8AHm9lFOyA
+ AAA
+To: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, Andrew Lunn
+	<andrew@lunn.ch>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King
+	<linux@armlinux.org.uk>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
+        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_linchen@quicinc.com>, <quic_luoj@quicinc.com>,
+        <quic_leiwei@quicinc.com>, <srinivas.kandagatla@linaro.org>,
+        <bartosz.golaszewski@linaro.org>, <vsmuthu@qti.qualcomm.com>,
+        <john@phrozen.org>, <linux-arm-msm@vger.kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1733323958; l=2722;
+ i=quic_leiwei@quicinc.com; s=20240829; h=from:subject:message-id;
+ bh=9S0hchzxez9pNCIR/AUpcl6f3DdTEiAyq8NPSfzzvbk=;
+ b=TwiQqbN21gN2NUDoQT9bnnN0+W5SjHXUHaBqyo04LIwEqTEbB815Y6gocFsjmF/bt78JFlf46
+ G3r9RuRLxa0BFd0fNxpp8o/YlTLyoJH9xh/doLpq72YB9qGtZLF5PaF
+X-Developer-Key: i=quic_leiwei@quicinc.com; a=ed25519;
+ pk=uFXBHtxtDjtIrTKpDEZlMLSn1i/sonZepYO8yioKACM=
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: jTDta9_5_Do2iZCtEpTmO0sx1vys-34K
+X-Proofpoint-GUID: jTDta9_5_Do2iZCtEpTmO0sx1vys-34K
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ impostorscore=0 adultscore=0 priorityscore=1501 clxscore=1011
+ lowpriorityscore=0 suspectscore=0 mlxlogscore=999 malwarescore=0
+ bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412040114
 
-Add low level support for EEPROM dump for the specified network device.
+The 'UNIPHY' PCS block in the Qualcomm IPQ9574 SoC provides Ethernet
+PCS and SerDes functions. It supports 1Gbps mode PCS and 10-Gigabit
+mode PCS (XPCS) functions, and supports various interface modes for
+the connectivity between the Ethernet MAC and the external PHYs/Switch.
+There are three UNIPHY (PCS) instances in IPQ9574, supporting the six
+Ethernet ports.
 
-Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+This patch series adds base driver support for initializing the PCS,
+and PCS phylink ops for managing the PCS modes/states. Support for
+SGMII/QSGMII (PCS) and USXGMII (XPCS) modes is being added initially.
+
+The Ethernet driver which handles the MAC operations will create the
+PCS instances and phylink for the MAC, by utilizing the API exported
+by this driver.
+
+While support is being added initially for IPQ9574, the driver is
+expected to be easily extendable later for other SoCs in the IPQ
+family such as IPQ5332.
+
+Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 93 +++++++++++++++++++
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |  5 +
- .../ethernet/intel/ixgbe/ixgbe_type_e610.h    |  8 ++
- 3 files changed, 106 insertions(+)
+Changes in v2:
+- dtbindings updates
+  a.) Rename dt-binding header file to match binding file name.
+  b.) Drop unused labels and the redundant examples.
+  c.) Rename "mii_rx"/"mii_tx" clock names to "rx"/"tx".
+- Rename "PCS_QCOM_IPQ" with specific name "PCS_QCOM_IPQ9574" in
+  Kconfig.
+- Remove interface mode check for the PCS lock.
+- Use Cisco SGMII AN mode as default SGMII/QSGMII AN mode.
+- Instantiate MII PCS instances in probe and export "ipq_pcs_get" and
+  "ipq_pcs_put" APIs.
+- Move MII RX and TX clock enable and disable to "pcs_enable" and
+  "pcs_disable" methods.
+- Change "dev_dbg" to "dev_dbg_ratelimited" in "pcs_get_state" method.
+- Link to v1: https://lore.kernel.org/r/20241101-ipq_pcs_rc1-v1-0-fdef575620cf@quicinc.com
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index 0542b4b..503a047 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -2070,6 +2070,38 @@ int ixgbe_enter_lplu_e610(struct ixgbe_hw *hw)
- 	return ixgbe_aci_set_phy_cfg(hw, &phy_cfg);
- }
- 
-+/**
-+ * ixgbe_init_eeprom_params_E610 - Initialize EEPROM params
-+ * @hw: pointer to hardware structure
-+ *
-+ * Initialize the EEPROM parameters ixgbe_eeprom_info within the ixgbe_hw
-+ * struct in order to set up EEPROM access.
-+ *
-+ * Return: the operation exit code
-+ */
-+int ixgbe_init_eeprom_params_e610(struct ixgbe_hw *hw)
-+{
-+	struct ixgbe_eeprom_info *eeprom = &hw->eeprom;
-+	u32 gens_stat;
-+	u8 sr_size;
-+
-+	if (eeprom->type != ixgbe_eeprom_uninitialized)
-+		return 0;
-+
-+	eeprom->type = ixgbe_flash;
-+
-+	gens_stat = IXGBE_READ_REG(hw, GLNVM_GENS);
-+	sr_size = FIELD_GET(GLNVM_GENS_SR_SIZE_M, gens_stat);
-+
-+	/* Switching to words (sr_size contains power of 2). */
-+	eeprom->word_size = BIT(sr_size) * IXGBE_SR_WORDS_IN_1KB;
-+
-+	hw_dbg(hw, "Eeprom params: type = %d, size = %d\n", eeprom->type,
-+	       eeprom->word_size);
-+
-+	return 0;
-+}
-+
- /**
-  * ixgbe_aci_get_netlist_node - get a node handle
-  * @hw: pointer to the hw struct
-@@ -2316,6 +2348,34 @@ int ixgbe_read_flat_nvm(struct ixgbe_hw  *hw, u32 offset, u32 *length,
- 	return err;
- }
- 
-+/**
-+ * ixgbe_read_sr_buf_aci - Read Shadow RAM buffer via ACI
-+ * @hw: pointer to the HW structure
-+ * @offset: offset of the Shadow RAM words to read (0x000000 - 0x001FFF)
-+ * @words: (in) number of words to read; (out) number of words actually read
-+ * @data: words read from the Shadow RAM
-+ *
-+ * Read 16 bit words (data buf) from the Shadow RAM. Acquire/release the NVM
-+ * ownership.
-+ *
-+ * Return: the operation exit code
-+ */
-+int ixgbe_read_sr_buf_aci(struct ixgbe_hw *hw, u16 offset, u16 *words,
-+			  u16 *data)
-+{
-+	u32 bytes = *words * 2, i;
-+	int err;
-+
-+	err = ixgbe_read_flat_nvm(hw, offset * 2, &bytes, (u8 *)data, true);
-+
-+	*words = bytes / 2;
-+
-+	for (i = 0; i < *words; i++)
-+		data[i] = le16_to_cpu(((__le16 *)data)[i]);
-+
-+	return err;
-+}
-+
- /**
-  * ixgbe_read_ee_aci_e610 - Read EEPROM word using the admin command.
-  * @hw: pointer to hardware structure
-@@ -2349,6 +2409,39 @@ int ixgbe_read_ee_aci_e610(struct ixgbe_hw *hw, u16 offset, u16 *data)
- 	return err;
- }
- 
-+/**
-+ * ixgbe_read_ee_aci_buffer_e610 - Read EEPROM words via ACI
-+ * @hw: pointer to hardware structure
-+ * @offset: offset of words in the EEPROM to read
-+ * @words: number of words to read
-+ * @data: words to read from the EEPROM
-+ *
-+ * Read 16 bit words from the EEPROM via the ACI. Initialize the EEPROM params
-+ * prior to the read. Acquire/release the NVM ownership.
-+ *
-+ * Return: the operation exit code
-+ */
-+int ixgbe_read_ee_aci_buffer_e610(struct ixgbe_hw *hw, u16 offset,
-+				  u16 words, u16 *data)
-+{
-+	int err;
-+
-+	if (hw->eeprom.type == ixgbe_eeprom_uninitialized) {
-+		err = hw->eeprom.ops.init_params(hw);
-+		if (err)
-+			return err;
-+	}
-+
-+	err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
-+	if (err)
-+		return err;
-+
-+	err = ixgbe_read_sr_buf_aci(hw, offset, &words, data);
-+	ixgbe_release_nvm(hw);
-+
-+	return err;
-+}
-+
- /**
-  * ixgbe_validate_eeprom_checksum_e610 - Validate EEPROM checksum
-  * @hw: pointer to hardware structure
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
-index 412ddd1..9cfcfee 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
-@@ -56,6 +56,7 @@ int ixgbe_identify_module_e610(struct ixgbe_hw *hw);
- int ixgbe_setup_phy_link_e610(struct ixgbe_hw *hw);
- int ixgbe_set_phy_power_e610(struct ixgbe_hw *hw, bool on);
- int ixgbe_enter_lplu_e610(struct ixgbe_hw *hw);
-+int ixgbe_init_eeprom_params_e610(struct ixgbe_hw *hw);
- int ixgbe_aci_get_netlist_node(struct ixgbe_hw *hw,
- 			       struct ixgbe_aci_cmd_get_link_topo *cmd,
- 			       u8 *node_part_number, u16 *node_handle);
-@@ -69,7 +70,11 @@ int ixgbe_nvm_validate_checksum(struct ixgbe_hw *hw);
- int ixgbe_read_sr_word_aci(struct ixgbe_hw  *hw, u16 offset, u16 *data);
- int ixgbe_read_flat_nvm(struct ixgbe_hw  *hw, u32 offset, u32 *length,
- 			u8 *data, bool read_shadow_ram);
-+int ixgbe_read_sr_buf_aci(struct ixgbe_hw *hw, u16 offset, u16 *words,
-+			  u16 *data);
- int ixgbe_read_ee_aci_e610(struct ixgbe_hw *hw, u16 offset, u16 *data);
-+int ixgbe_read_ee_aci_buffer_e610(struct ixgbe_hw *hw, u16 offset,
-+				  u16 words, u16 *data);
- int ixgbe_validate_eeprom_checksum_e610(struct ixgbe_hw *hw, u16 *checksum_val);
- 
- #endif /* _IXGBE_E610_H_ */
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-index ecc3fc8..9dba8b5 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-@@ -12,11 +12,19 @@
- /* Checksum and Shadow RAM pointers */
- #define E610_SR_SW_CHECKSUM_WORD		0x3F
- 
-+/* Shadow RAM related */
-+#define IXGBE_SR_WORDS_IN_1KB	512
-+
- /* Firmware Status Register (GL_FWSTS) */
- #define GL_FWSTS		0x00083048 /* Reset Source: POR */
- #define GL_FWSTS_EP_PF0		BIT(24)
- #define GL_FWSTS_EP_PF1		BIT(25)
- 
-+/* Global NVM General Status Register */
-+#define GLNVM_GENS		0x000B6100 /* Reset Source: POR */
-+#define GLNVM_GENS_SR_SIZE_S	5
-+#define GLNVM_GENS_SR_SIZE_M	GENMASK(7, 5)
-+
- /* Flash Access Register */
- #define IXGBE_GLNVM_FLA			0x000B6108 /* Reset Source: POR */
- #define IXGBE_GLNVM_FLA_LOCKED_S	6
+---
+Lei Wei (5):
+      dt-bindings: net: pcs: Add Ethernet PCS for Qualcomm IPQ9574 SoC
+      net: pcs: Add PCS driver for Qualcomm IPQ9574 SoC
+      net: pcs: qcom-ipq9574: Add PCS instantiation and phylink operations
+      net: pcs: qcom-ipq9574: Add USXGMII interface mode support
+      MAINTAINERS: Add maintainer for Qualcomm IPQ9574 PCS driver
+
+ .../bindings/net/pcs/qcom,ipq9574-pcs.yaml         | 190 +++++
+ MAINTAINERS                                        |   9 +
+ drivers/net/pcs/Kconfig                            |   9 +
+ drivers/net/pcs/Makefile                           |   1 +
+ drivers/net/pcs/pcs-qcom-ipq9574.c                 | 884 +++++++++++++++++++++
+ include/dt-bindings/net/qcom,ipq9574-pcs.h         |  15 +
+ include/linux/pcs/pcs-qcom-ipq9574.h               |  16 +
+ 7 files changed, 1124 insertions(+)
+---
+base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
+change-id: 20241101-ipq_pcs_rc1-26ae183c9c63
+
+Best regards,
 -- 
-2.43.0
+Lei Wei <quic_leiwei@quicinc.com>
 
 
