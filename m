@@ -1,403 +1,332 @@
-Return-Path: <netdev+bounces-148909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B4AB9E361F
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 10:03:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C8419E3630
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 10:08:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF528280C47
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 09:03:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 984BBB26357
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 08:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B158D18D649;
-	Wed,  4 Dec 2024 09:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A1951991CB;
+	Wed,  4 Dec 2024 08:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kCY89UIE"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="EgdJdSui"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2078.outbound.protection.outlook.com [40.107.93.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3142500C8
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 09:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733303009; cv=none; b=Nl60fp+4GYx1oohhfzJMxzcEP6+pW3rMh85vbb8KxZrg64rrOPCF3l6DGZWLCKDD1nf/u6FWr4sBz/A3kjy8TUjmBp6Is4Jm4Y6xMJ51ctj8jl7z+mqpIjX/eCUx6c/FyrxFTT2uThK3TMgiLcvtiG7+aXvPtA+BAPrrLRQnlcM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733303009; c=relaxed/simple;
-	bh=U3exSd67Bg0H9ndMzrzeN58hbc4uyawb1SjPIXhFQhw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LNQCrGNOpMDYkhiYa0x/+QOQ3cWz/9hwqbowYX+OMsvl59PzgjXiiPqOP9NkMi98kGQTMto5p1NTEu6VmLNcT4X3StMvqTXYVwqJiBfe4R6iqeTvDVXKgFhZwGIkf9rdd9hGP0b17X5qataopr2kAwt1/7j0X593DDHLK4xdn6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kCY89UIE; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aa549f2fa32so968555266b.0
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 01:03:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733303006; x=1733907806; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IPA5toiVxXUHE/tQE67BPR/az6YfNeLKTCP+d7Cb8Pk=;
-        b=kCY89UIEQ7c16O3AioqYeIqc3PQYq8ocLFqRyb33ihA8rT5yjmOdTpDCKx2Gw+O8Mu
-         u4/eOyWn6niQhcZZqMZEhuL8RThPlstoTJmaRxSiAaLTdScoraciYng79bVHjrTNX2+Y
-         JkCxXAiBhCs28NBSkM9yeAaXCKjQcSFTe83ogxAzIPu/y5xRRJPRfStWjnKc7pLwmghT
-         qi8j7e2zvPTUGgiANq2RUP+8k9mXMyC4vgFSULGwnQwopK6B5b5EnfRawPqSm1C9T2Vj
-         j1A5Rob3z7j5SlUYTjqDheIXwjwevLdSZMekKFuvuyLV2eR735Ua1LSP6vGn+H400YFw
-         1TkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733303006; x=1733907806;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IPA5toiVxXUHE/tQE67BPR/az6YfNeLKTCP+d7Cb8Pk=;
-        b=N0kcPuVZrjVy7j07g8HG1eCEhU0Q4Dl4qqGop0Ikf8k1pkBBfq8nj/szIgMIXZj474
-         iGWyrNa3SvuthDL72vItvp0H6Y9ZaiUjwi/iyyXRSgB9XJLUWK4z/S0KMbtGTBadGIT6
-         G06xo7EvyZgDNFU0RdF8gyVlP4hugMG3RAD7CZBh7D0BHlU0OZr/S7zT9B5rEfRPez8b
-         1JCOpBRca3OLNKu6eh1WocO9xiBAPDscC+N5KIbsOk8fw0CiSaIGLUhgPymGxf/SxESq
-         RMuK2ymTf83pjzGqd3wjumLIbaetkC1TbqQpBAT/ot2Mw1EjmKeN7cRf2Z6QZYsgW0ts
-         Ppmw==
-X-Forwarded-Encrypted: i=1; AJvYcCVWaGathfb9XtOjn/5kFvrm00djIJtHhUU6wWqpaip9z9pnCKvF9FZhP2RCQnY+S1YcNifdj1I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeNo0C7f0mcSUNTqwvU0DApBwLGZHMOPsK4ZVRz76RxyenKAIt
-	wi88c9qdVnnry7aWX/cMeJFJ67MtLLxYn9EoCn2EKzD64omkpk3EGDtNDrHr9F2Z0WKhr+HRArz
-	PixWa4sgPsnjj7ZL0UKMqNm8I+hbj7t95jlAQ
-X-Gm-Gg: ASbGncseRJSW4/FvKMkUW5g9YpnNgH2o+LIeUhGBVbs+kIh9tiQOQuzIk3NqJaw4s3g
-	KDFm39DTrbsLalHepr8MxZsBk/gIW3ujs
-X-Google-Smtp-Source: AGHT+IHSBFbQAqAfBoEnqan6Som7MtDbq8ZIromdhALOi+EDSTwgyJ1nfgSILZGTHRjmNzRqZ1cLZdoRE5X7gWrynWc=
-X-Received: by 2002:a17:906:6a18:b0:a9e:c267:78c5 with SMTP id
- a640c23a62f3a-aa5f7f19e62mr569963566b.55.1733303005354; Wed, 04 Dec 2024
- 01:03:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1A6194A59;
+	Wed,  4 Dec 2024 08:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733302726; cv=fail; b=fxngD+PIsOw2LQwPOHnFOD0p7GMRTrqFpfAKLdnreHK3O5qjV7XHwC94jGwElz4Phvn+e3MldTl7cpCwFIzqa5AVb3rYydwB9X9/ELTe+guFYrGZ4LOIcLK+a/r/tpGGNNnkpbY1cg3ZoINKi+D0kx6Bh8mVf7iVjAkOa0hpruA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733302726; c=relaxed/simple;
+	bh=YdLvDVJogoaOs4OvAUcnB7YqsUBN8whAL2T0rx0+IQU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=uy0OVM62HaWjhYcsSgGda5hQ8GY+M77P3bwghXpRrAK3Rc8Be502iIdeNStnK5vg+teVfrPhd0AGKnsEzYOcn14jAJ1JENrtOKtVurQwNMb50WPHGxZOoC1vmKDhyt0zKZK8JW15HNXrLTfQ4txSewPWZ5oJNtqHQ+YYERr7rKg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=EgdJdSui; arc=fail smtp.client-ip=40.107.93.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=btwiSRL/TzJBeGXLAhQx3ZoN4JLTH4L9JJdj+LJOnDSL+CbPwOKhuvQ+RgNCR/af0kwwTzIhnCtVU9W+15uXjxxvmFHUImVn7C78GfKkjUPN371Zr4ZbzTbqU4GYAXIn/xuqvd9pqKMXffsv90W6BpwzeQJx2wvwce3OMsDQZ0etJmcNu4mAu3JSGbbHQizFNtzLMj3EKZzzvD+OjNNZz3hclShI2AFdaTU3p3pSDcrYlChf+AI0oFHEkt0oMZbB+zvCGWwsWHg2UpsZlXBUs7nvKVfUyXFL57+IuS0TXSRocam6KXm5EN206uoJreGyIA6DuLfauJUXvMepF22PRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/M/dTgFN2WlIpnDsoRd0WSMlk05y/PsnChBH8jnY6AM=;
+ b=reJC6KvxCg1vKMalERVF6aZ0wCfrJ3zNG5y/9LmYSRNmn/p2t8U12FOOR4Q/XC0gJITji/948IGFX98b9GkbnW9864xBsAA0YUvexoHUAJpfZ1sWaucUmtVKFOpSzEWKbYFUVqxR0dWIjP+Jc2U+waUzchQUg6bntTBfHRY/l/OFkb/0RtIaCsI9KkKonsjY6B7Kk17C6pMXp7q5gPxuC2reeCfOxG7BCr8MEXPrMyEx4BY9PaiJWuR6/U22bfJolmPORJcS0PAlLPPJQNVsGh5a9dCrCHECv79X6cGBRHYZUsXOYTW+dkJwhzkRMKsgHscmLM7eowVjKVv1g/0Gog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/M/dTgFN2WlIpnDsoRd0WSMlk05y/PsnChBH8jnY6AM=;
+ b=EgdJdSuiFc72qdoqwVOMZF4RDH6cEsQ1pmysAAztzBjWgLDGu59mvByBd2dnw8viujTwu2AXf84BKFdVMyiTmIeGPJVKayMCr9l5oQ4TwFvpRb+T3e3JtfuNXA03xlLe0QKECd3HYGCQWtCld76Xn6jnnN/zehP+foIoTwXlVXc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by IA1PR12MB7638.namprd12.prod.outlook.com (2603:10b6:208:426::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.19; Wed, 4 Dec
+ 2024 08:58:41 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.8207.017; Wed, 4 Dec 2024
+ 08:58:41 +0000
+Message-ID: <bae25f0e-26c9-d051-731d-c87260cf120f@amd.com>
+Date: Wed, 4 Dec 2024 08:58:36 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v6 04/28] cxl/pci: add check for validating capabilities
+Content-Language: en-US
+To: Fan Ni <nifan.cxl@gmail.com>, alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, dave.jiang@intel.com
+References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
+ <20241202171222.62595-5-alejandro.lucero-palau@amd.com>
+ <Z0-MddhGPjtO91h_@smc-140338-bm01>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <Z0-MddhGPjtO91h_@smc-140338-bm01>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P265CA0251.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:350::19) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CGME20241203081005epcas2p247b3d05bc767b1a50ba85c4433657295@epcas2p2.samsung.com>
- <20241203081247.1533534-1-youngmin.nam@samsung.com> <CANn89iK+7CKO31=3EvNo6-raUzyibwRRN8HkNXeqzuP9q8k_tA@mail.gmail.com>
- <Z0/HyztKs8UFBOa0@perf>
-In-Reply-To: <Z0/HyztKs8UFBOa0@perf>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 4 Dec 2024 10:03:14 +0100
-Message-ID: <CANn89iLSMKNsmtvD=d+_3CNBbDhBQ+41R_tesVUYO50S72-YWg@mail.gmail.com>
-Subject: Re: [PATCH] tcp: check socket state before calling WARN_ON
-To: Youngmin Nam <youngmin.nam@samsung.com>
-Cc: Neal Cardwell <ncardwell@google.com>, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, dujeong.lee@samsung.com, 
-	guo88.liu@samsung.com, yiwang.cai@samsung.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, joonki.min@samsung.com, hajun.sung@samsung.com, 
-	d7271.choe@samsung.com, sw.ju@samsung.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|IA1PR12MB7638:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9df065f4-1f0b-4eac-cf2d-08dd1441d9a1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?dWQ2M1J2QTZGRERvQ1ZjSW5RT0pxdHEySDFIaVI0dERnY3U1akM5elN5Ymcv?=
+ =?utf-8?B?dk9oa20vczFnTUpBUElZbW5lRmZLa1NWY0pBQ1ErUE5wWU8vOFdrVkY5NCtK?=
+ =?utf-8?B?TFN4UitHUzlFbU03TkdtR3JYN3BzVVRnWU9NZTFWemFWcjlJUG5KNWJCbkR0?=
+ =?utf-8?B?U1hlTEhGWm9yTDQ3YzJkMnVJbDFZWkVyaktKdENqUE1wYW5oU1kvdGZab0Vz?=
+ =?utf-8?B?UjNJOURNOFJ5UDlpSlZkQWVlTGVvUGwyNWZGejI5bXdOK1VScnhxWmltQlps?=
+ =?utf-8?B?bkx6eVN0YzV3aXNtZ1FqM0V1cG9zOFV2cldRT3lPbkJ1Yy9xNTQ5dnYxVUYz?=
+ =?utf-8?B?Q0VJdkhKc21nWFNCc0lQbjJITHEwNXVLcXZQb2V3SWdTcndLWElablZyb3ho?=
+ =?utf-8?B?NjB5Qmd4c3FUTHJES09ra2F2bWc2TFNmcDI0VGlVOHpqNktySGxxYzZiUWR6?=
+ =?utf-8?B?SFkvcllXMHR5WVF2bWl2TXdaUXl6TFc0TlhmOXVnNFgyL2FXR2poaGt4cHI1?=
+ =?utf-8?B?aXdOS25yNGI4OUJoNjd1N1RjMGdJMnk5eFFwN0ZxMkozaEdabmF3Nk5JZnBa?=
+ =?utf-8?B?b3M2M1dUNmgyb1ZnODVqRHFhaVdrYUltU3FmcWh2QWxEMHhxWWpLNEJnOE5W?=
+ =?utf-8?B?QnlKR1AvTFd5cVpHOEpPZkdBQXVKVUhORlNjY0JDc1U1ZE9EZjkwRE52VWd6?=
+ =?utf-8?B?M0VUazJacFg0enBuUWp5SGs1cnR0L3Q1SHZ0UjF3bUVaT05GRGtGQ3pUemFn?=
+ =?utf-8?B?RThwekZKVmd6QUlHZDRZM2VHbjNaL29mRzd6VWltSDdEQzJHZWwxS1U2VnI5?=
+ =?utf-8?B?aVNsaTk4NCs5NVdJNkd4TWszZ0xGeVRtN2UyR3ArczRrV01JZ1kxVE5mMmNZ?=
+ =?utf-8?B?bmF3VEo2UUx1VDRmdGpKMTRMRjFUS2N4b2IydDdiZzg0dzZrWDBzMnJJazJC?=
+ =?utf-8?B?cXRkb1VTQldGOC9jTGZQcnpiajhESU9JbTNkdEtHbVYzbUZORUF6dFdjMHlx?=
+ =?utf-8?B?d05Td3ZaWGc3S1k5bjE0OFE0bGpKcVNuVlhPQkhjRnFKanU2cko0emhuU2x4?=
+ =?utf-8?B?clgxR25aWENtU3hYRzliZmNJQXYxOW9Oa1RVb2tZQWVUUGZLejlRa3A5RDZC?=
+ =?utf-8?B?alJMNjNOVkNsSS9Yc3c1Z1VSS2lNd3FSZysvWDN2bTJMVVkydml2eFFzKzV3?=
+ =?utf-8?B?TUdoQWtCNW5pYytmMjlPcmF4YXh4dU9OMVl4dVU4UmxvU0dGejdsR2NwM0JQ?=
+ =?utf-8?B?QmtnWm4zMjUyMThKT29KbWxZSTRCZEt6ZnpxVEVYNEhRSmp4RTc1ZWhzUU9V?=
+ =?utf-8?B?UUh0bXBCWDZrYkRWMi9zNmx6bmJyQVBJTEZKODNCOFRONENiQ1dPYkUweVpj?=
+ =?utf-8?B?REE1NXBqQmgvZEEyai9waWQxMWlKSGozcHp6NnY3VE1ZWVhiVFk4UkQrN25S?=
+ =?utf-8?B?aWhyTjJpeEpsYXVIci9pUDFVQVlDTWNYV3JDUDU1cHVzZHloS3ZrMW5hT3Zv?=
+ =?utf-8?B?aUxuT24xSHBYbEVlV1NXbzQ5WFVJTlNPL1JZT0pyY0plQWRhZlhKRHRXS2Fv?=
+ =?utf-8?B?QmRCWk0yMHEvaG1JYk5lM2ZRRTUzMForcjBoZEt4UzJMamdsczV0ZUZzWnpz?=
+ =?utf-8?B?c0RneEdZbjVjOWI0RFY4UXpkYkRzR1ZJWmRaYU5iaDdHdnMvVzZJQ1FVVmlN?=
+ =?utf-8?B?WEcycWtxZGdvRm53bDVGbGJ3cytoaDRuUDA4UzNmazBEWGxvZTFhbGJTNkdl?=
+ =?utf-8?B?clpMYnArODdMNHpRYW84WnhuNUlDNEc4SzV1TjZXM2hVQ09oZ1Fmc1N5R1VT?=
+ =?utf-8?B?Yk1BVUhsNEN0RXI5Zjdidz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?b2grbi9iakxhcjBNSVVxbEhNQ3VHNzM3TjJCakxWaGtGbzM0SGJwV2Q3UUdi?=
+ =?utf-8?B?TEpSUWxzaE4wVGh6cGUwVE9IalU1b01GQUVoUlhxNmU1akc5SWhQbnlnSFlT?=
+ =?utf-8?B?OWNNelNxdDRuUE9rTzRyWHFMajlDcEFhWEJRamJXQVJiMlRuSnh2QmtLa1Ju?=
+ =?utf-8?B?L3BwZWxRdi9keld0dDRkYTBEZS9JYmcwbmdPdjZyRGZjVldYeHJCQXhxb3Iv?=
+ =?utf-8?B?VG5vRGFHM2NZcUR1azkvb2ZoUUlBVnBCVTY2bFJneXJ0TCtLNkYwaFMyeFNP?=
+ =?utf-8?B?dDE0STltelZuamgraVpiN1pLVEROVU9SRzVkZHBFS1BXNjNzWS9pVlNGdDJ2?=
+ =?utf-8?B?Q29wUzVleWxHYy9laHZpR2hnaTNhcGdjNVZZWEN4TUhJNGs0OGZPazBqOWRq?=
+ =?utf-8?B?S01waWM5QUhsa2l2bG5melNZNG1OQVBvOCt2YzlHek5YTWZ1TU9xN0dJMk1G?=
+ =?utf-8?B?YW5SUEFPM3Y4N2E1aXpCakVvbFo4eStOS3c3V2dmamFvblFsUkhNNjZiUVEv?=
+ =?utf-8?B?anpRR3NpRDVuRzM3bnVZUTIzbUpxM0MyeHkwZGZEbFo0Z2RqWERVVFBVZXF5?=
+ =?utf-8?B?YURRbWRXZVppaTdBK2FVeWp0Y3U4YVlrMEE4enUxa3RMZGRhNE81bytKcXAy?=
+ =?utf-8?B?bERFZGRFank0VHVmd3lBVGdESVFPS3hzaS9FT0FMbWFwcnhrdDl6dGd2QlR6?=
+ =?utf-8?B?dURzRHAwOTkxQU0va0MyVVU3eVN3MWJNcnVIUTE3M3JnQVNPSEhNZnhIZVcr?=
+ =?utf-8?B?VkphVzZHZWJLcEhtNzRFVXJ0b1NaRmcvM3RwaTlBTnJuMXEyc0NBdXNiREdv?=
+ =?utf-8?B?MzVYaDh6dDhGb0c3d1JHam1KM2pCYzRiTU5wWktrSXZ4eWszV2pieWtlR0U4?=
+ =?utf-8?B?d3I4QkI5dlF0RkZvaEh4U3BKTXBjbG5WWEVXbmJRWDNyUy9vRWNuZUtyNkh1?=
+ =?utf-8?B?MVBCaFdnQ2hXVTBxMUMxa2NtaGdBWWljUUdUQ2RlK1Z3dEdIVDg5ZkZRRXI5?=
+ =?utf-8?B?VVo3eWlJZlNLNzVTcUhrSXV6RytzZzY4QUNmOExtOVRtQ1FhZ25BN2JWR0RH?=
+ =?utf-8?B?ZHlUK2JZQVI0MkZrYjNMMHc2RXg2dHBTUW9samZQQU5vNzVoQm1CSHAvSGNZ?=
+ =?utf-8?B?eHhJYkJFWHpOTzhxVThGczNuYVhEU0F0V3E2SWtrRmZUUzZjSXhzalNKVVZC?=
+ =?utf-8?B?RlpLQ3BYTmZEUDd2Tmo3LzBVa281RGN4T2plai9TbUVKeElGaGU5NkNrZTRU?=
+ =?utf-8?B?STFuMUhBa2ZwMmhwdjkwT041SmU3NGRSUmM4bFNBMi83OEJCZW1RUzQrSUpR?=
+ =?utf-8?B?N2QzZFNSMmxYZWYvZS9IcnRsZU8rd1F2d1hrblA0MmcvNkcvTzRZTVRiUDBT?=
+ =?utf-8?B?R1RXZDQxUkE2WDlOY21MNkRQekNEQUpNd0RMck42U1R2TzViaHVIZW5vMy9G?=
+ =?utf-8?B?dnJCSVlNckxIUVpSUVBZOUVQc3lwWk5hc3ZZeEdLWnFka1BhVnM1OU5neFkz?=
+ =?utf-8?B?bENJT2xROGczcjVERE41bGFOYjZDdExrZ0ExQTROZ1dYZFRvcXhHTWhkMVFM?=
+ =?utf-8?B?ci84Q1ZJcjJvMUNSeE9EOGhiRGpOcGdxUnRIQWFqSTUyOXdrMXM4eDBHRGlk?=
+ =?utf-8?B?am5zNVVrY1RidDYvTnJhYW4yVFVIQVlZdFIzOFlZR0Q5ZEE0RmJkdEZLL1pH?=
+ =?utf-8?B?dHZRNFZaRVdROCtjUlRZYWVyZGpRWmFPZUJFbzYwcjZWb2tLRGNmSXhVR25u?=
+ =?utf-8?B?Q1ZndEc5SVJuVXhHYTFWWWU2a1lnNUtTRko1Wm16Q2g1ZlFiaXRGQlByMVRC?=
+ =?utf-8?B?K3lFM0pGdUI2b01pbEsxK0tlaGZYQVVBbUZ3aXkzVFFQWktEaWJ2aEU3YkZ5?=
+ =?utf-8?B?bE1LNDBMTWN3MGdjcHJ4MnVCZVdVWnFJWFdsaDRsd29ncW9hSUF6YUl4TDJJ?=
+ =?utf-8?B?VmRleHE1bENadHZiRGJDalBMNjRldFozRG1TeVRNZWFPR29vem5UQW1GMytm?=
+ =?utf-8?B?RG5pWVYrSCs2SU5LR2M5TTR1YVRwdTBqQ3VpTjk3QmVzSm5ueTI5dFhweEZI?=
+ =?utf-8?B?c05xNlduN051OXQwRGJHdW5WU1FhbFQ5TjhMMDdpTExOeitYd3RmZDhXRUhR?=
+ =?utf-8?Q?AwmjncPTY+ctC0UPRy9jn9RF1?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9df065f4-1f0b-4eac-cf2d-08dd1441d9a1
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2024 08:58:41.5680
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: A6WPuFxbWCXF5fHOn5vP+i5VybwZcED+o7BfLfWIZpSdrthTwkdZJv0X58ZNhC2UL9FeLABYozhGoMUjIyD2eQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7638
 
-On Wed, Dec 4, 2024 at 4:05=E2=80=AFAM Youngmin Nam <youngmin.nam@samsung.c=
-om> wrote:
->
-> Hi Eric.
-> Thanks for looking at this issue.
->
-> On Tue, Dec 03, 2024 at 12:07:05PM +0100, Eric Dumazet wrote:
-> > On Tue, Dec 3, 2024 at 9:10=E2=80=AFAM Youngmin Nam <youngmin.nam@samsu=
-ng.com> wrote:
-> > >
-> > > We encountered the following WARNINGs
-> > > in tcp_sacktag_write_queue()/tcp_fastretrans_alert()
-> > > which triggered a kernel panic due to panic_on_warn.
-> > >
-> > > case 1.
-> > > ------------[ cut here ]------------
-> > > WARNING: CPU: 4 PID: 453 at net/ipv4/tcp_input.c:2026
-> > > Call trace:
-> > >  tcp_sacktag_write_queue+0xae8/0xb60
-> > >  tcp_ack+0x4ec/0x12b8
-> > >  tcp_rcv_state_process+0x22c/0xd38
-> > >  tcp_v4_do_rcv+0x220/0x300
-> > >  tcp_v4_rcv+0xa5c/0xbb4
-> > >  ip_protocol_deliver_rcu+0x198/0x34c
-> > >  ip_local_deliver_finish+0x94/0xc4
-> > >  ip_local_deliver+0x74/0x10c
-> > >  ip_rcv+0xa0/0x13c
-> > > Kernel panic - not syncing: kernel: panic_on_warn set ...
-> > >
-> > > case 2.
-> > > ------------[ cut here ]------------
-> > > WARNING: CPU: 0 PID: 648 at net/ipv4/tcp_input.c:3004
-> > > Call trace:
-> > >  tcp_fastretrans_alert+0x8ac/0xa74
-> > >  tcp_ack+0x904/0x12b8
-> > >  tcp_rcv_state_process+0x22c/0xd38
-> > >  tcp_v4_do_rcv+0x220/0x300
-> > >  tcp_v4_rcv+0xa5c/0xbb4
-> > >  ip_protocol_deliver_rcu+0x198/0x34c
-> > >  ip_local_deliver_finish+0x94/0xc4
-> > >  ip_local_deliver+0x74/0x10c
-> > >  ip_rcv+0xa0/0x13c
-> > > Kernel panic - not syncing: kernel: panic_on_warn set ...
-> > >
-> >
-> > I have not seen these warnings firing. Neal, have you seen this in the =
-past ?
-> >
-> > Please provide the kernel version (this must be a pristine LTS one).
-> We are running Android kernel for Android mobile device which is based on=
- LTS kernel 6.6-30.
-> But we've seen this issue since kernel 5.15 LTS.
->
-> > and symbolized stack traces using scripts/decode_stacktrace.sh
-> Unfortunately, we don't have the matched vmlinux right now. So we need to=
- rebuild and reproduce.
-> >
-> > If this warning was easy to trigger, please provide a packetdrill test =
-?
-> I'm not sure if we can run packetdrill test on Android device. Anyway let=
- me check.
->
-> FYI, Here are more detailed logs.
->
-> Case 1.
-> [26496.422651]I[4:  napi/wlan0-33:  467] ------------[ cut here ]--------=
-----
-> [26496.422665]I[4:  napi/wlan0-33:  467] WARNING: CPU: 4 PID: 467 at net/=
-ipv4/tcp_input.c:2026 tcp_sacktag_write_queue+0xae8/0xb60
-> [26496.423420]I[4:  napi/wlan0-33:  467] CPU: 4 PID: 467 Comm: napi/wlan0=
--33 Tainted: G S         OE      6.6.30-android15-8-geeceb2c9cdf1-ab2024093=
-0.125201-4k #1 a1c80b36942fa6e9575b2544032a7536ed502804
-> [26496.423427]I[4:  napi/wlan0-33:  467] Hardware name: Samsung ERD9955 b=
-oard based on S5E9955 (DT)
-> [26496.423432]I[4:  napi/wlan0-33:  467] pstate: 83400005 (Nzcv daif +PAN=
- -UAO +TCO +DIT -SSBS BTYPE=3D--)
-> [26496.423438]I[4:  napi/wlan0-33:  467] pc : tcp_sacktag_write_queue+0xa=
-e8/0xb60
-> [26496.423446]I[4:  napi/wlan0-33:  467] lr : tcp_ack+0x4ec/0x12b8
-> [26496.423455]I[4:  napi/wlan0-33:  467] sp : ffffffc096b8b690
-> [26496.423458]I[4:  napi/wlan0-33:  467] x29: ffffffc096b8b710 x28: 00000=
-00000008001 x27: 000000005526d635
-> [26496.423469]I[4:  napi/wlan0-33:  467] x26: ffffff8a19079684 x25: 00000=
-0005526dbfd x24: 0000000000000001
-> [26496.423480]I[4:  napi/wlan0-33:  467] x23: 000000000000000a x22: fffff=
-f88e5f5b680 x21: 000000005526dbc9
-> [26496.423489]I[4:  napi/wlan0-33:  467] x20: ffffff8a19078d80 x19: fffff=
-f88e9f4193e x18: ffffffd083114c80
-> [26496.423499]I[4:  napi/wlan0-33:  467] x17: 00000000529c6ef0 x16: 00000=
-0000000ff8b x15: 0000000000000000
-> [26496.423508]I[4:  napi/wlan0-33:  467] x14: 0000000000000001 x13: 00000=
-00000000001 x12: 0000000000000000
-> [26496.423517]I[4:  napi/wlan0-33:  467] x11: 0000000000000000 x10: 00000=
-00000000001 x9 : 00000000fffffffd
-> [26496.423526]I[4:  napi/wlan0-33:  467] x8 : 0000000000000001 x7 : 00000=
-00000000000 x6 : ffffffd081ec0bc4
-> [26496.423536]I[4:  napi/wlan0-33:  467] x5 : 0000000000000000 x4 : 00000=
-00000000000 x3 : ffffffc096b8b818
-> [26496.423545]I[4:  napi/wlan0-33:  467] x2 : 000000005526d635 x1 : fffff=
-f88e5f5b680 x0 : ffffff8a19078d80
-> [26496.423555]I[4:  napi/wlan0-33:  467] Call trace:
-> [26496.423558]I[4:  napi/wlan0-33:  467]  tcp_sacktag_write_queue+0xae8/0=
-xb60
-> [26496.423566]I[4:  napi/wlan0-33:  467]  tcp_ack+0x4ec/0x12b8
-> [26496.423573]I[4:  napi/wlan0-33:  467]  tcp_rcv_state_process+0x22c/0xd=
-38
-> [26496.423580]I[4:  napi/wlan0-33:  467]  tcp_v4_do_rcv+0x220/0x300
-> [26496.423590]I[4:  napi/wlan0-33:  467]  tcp_v4_rcv+0xa5c/0xbb4
-> [26496.423596]I[4:  napi/wlan0-33:  467]  ip_protocol_deliver_rcu+0x198/0=
-x34c
-> [26496.423607]I[4:  napi/wlan0-33:  467]  ip_local_deliver_finish+0x94/0x=
-c4
-> [26496.423614]I[4:  napi/wlan0-33:  467]  ip_local_deliver+0x74/0x10c
-> [26496.423620]I[4:  napi/wlan0-33:  467]  ip_rcv+0xa0/0x13c
-> [26496.423625]I[4:  napi/wlan0-33:  467]  __netif_receive_skb_core+0xe14/=
-0x1104
-> [26496.423642]I[4:  napi/wlan0-33:  467]  __netif_receive_skb_list_core+0=
-xb8/0x2dc
-> [26496.423649]I[4:  napi/wlan0-33:  467]  netif_receive_skb_list_internal=
-+0x234/0x320
-> [26496.423655]I[4:  napi/wlan0-33:  467]  napi_complete_done+0xb4/0x1a0
-> [26496.423660]I[4:  napi/wlan0-33:  467]  slsi_rx_netif_napi_poll+0x22c/0=
-x258 [scsc_wlan 16ac2100e65b7c78ce863cecc238b39b162dbe82]
-> [26496.423822]I[4:  napi/wlan0-33:  467]  __napi_poll+0x5c/0x238
-> [26496.423829]I[4:  napi/wlan0-33:  467]  napi_threaded_poll+0x110/0x204
-> [26496.423836]I[4:  napi/wlan0-33:  467]  kthread+0x114/0x138
-> [26496.423845]I[4:  napi/wlan0-33:  467]  ret_from_fork+0x10/0x20
-> [26496.423856]I[4:  napi/wlan0-33:  467] Kernel panic - not syncing: kern=
-el: panic_on_warn set ..
->
-> Case 2.
-> [ 1843.463330]I[0: surfaceflinger:  648] ------------[ cut here ]--------=
-----
-> [ 1843.463355]I[0: surfaceflinger:  648] WARNING: CPU: 0 PID: 648 at net/=
-ipv4/tcp_input.c:3004 tcp_fastretrans_alert+0x8ac/0xa74
-> [ 1843.464508]I[0: surfaceflinger:  648] CPU: 0 PID: 648 Comm: surfacefli=
-nger Tainted: G S         OE      6.6.30-android15-8-geeceb2c9cdf1-ab202410=
-17.075836-4k #1 de751202c2c5ab3ec352a00ae470fc5e907bdcfe
-> [ 1843.464520]I[0: surfaceflinger:  648] Hardware name: Samsung ERD8855 b=
-oard based on S5E8855 (DT)
-> [ 1843.464527]I[0: surfaceflinger:  648] pstate: 23400005 (nzCv daif +PAN=
- -UAO +TCO +DIT -SSBS BTYPE=3D--)
-> [ 1843.464535]I[0: surfaceflinger:  648] pc : tcp_fastretrans_alert+0x8ac=
-/0xa74
-> [ 1843.464548]I[0: surfaceflinger:  648] lr : tcp_ack+0x904/0x12b8
-> [ 1843.464556]I[0: surfaceflinger:  648] sp : ffffffc0800036e0
-> [ 1843.464561]I[0: surfaceflinger:  648] x29: ffffffc0800036e0 x28: 00000=
-00000008005 x27: 000000001bc05562
-> [ 1843.464579]I[0: surfaceflinger:  648] x26: ffffff890418a3c4 x25: 00000=
-00000000000 x24: 000000000000cd02
-> [ 1843.464595]I[0: surfaceflinger:  648] x23: 000000001bc05562 x22: 00000=
-00000000000 x21: ffffffc080003800
-> [ 1843.464611]I[0: surfaceflinger:  648] x20: ffffffc08000378c x19: fffff=
-f8904189ac0 x18: 0000000000000000
-> [ 1843.464627]I[0: surfaceflinger:  648] x17: 00000000529c6ef0 x16: 00000=
-0000000ff8b x15: 0000000000000001
-> [ 1843.464642]I[0: surfaceflinger:  648] x14: 0000000000000001 x13: 00000=
-00000000001 x12: 0000000000000000
-> [ 1843.464658]I[0: surfaceflinger:  648] x11: ffffff883e9c9540 x10: 00000=
-00000000001 x9 : 0000000000000001
-> [ 1843.464673]I[0: surfaceflinger:  648] x8 : 0000000000000000 x7 : 00000=
-00000000000 x6 : ffffffd081ec0bc4
-> [ 1843.464689]I[0: surfaceflinger:  648] x5 : 0000000000000000 x4 : fffff=
-fc08000378c x3 : ffffffc080003800
-> [ 1843.464704]I[0: surfaceflinger:  648] x2 : 0000000000000000 x1 : 00000=
-0001bc05562 x0 : ffffff8904189ac0
-> [ 1843.464720]I[0: surfaceflinger:  648] Call trace:
-> [ 1843.464725]I[0: surfaceflinger:  648]  tcp_fastretrans_alert+0x8ac/0xa=
-74
-> [ 1843.464735]I[0: surfaceflinger:  648]  tcp_ack+0x904/0x12b8
-> [ 1843.464743]I[0: surfaceflinger:  648]  tcp_rcv_state_process+0x22c/0xd=
-38
-> [ 1843.464751]I[0: surfaceflinger:  648]  tcp_v4_do_rcv+0x220/0x300
-> [ 1843.464760]I[0: surfaceflinger:  648]  tcp_v4_rcv+0xa5c/0xbb4
-> [ 1843.464767]I[0: surfaceflinger:  648]  ip_protocol_deliver_rcu+0x198/0=
-x34c
-> [ 1843.464776]I[0: surfaceflinger:  648]  ip_local_deliver_finish+0x94/0x=
-c4
-> [ 1843.464784]I[0: surfaceflinger:  648]  ip_local_deliver+0x74/0x10c
-> [ 1843.464791]I[0: surfaceflinger:  648]  ip_rcv+0xa0/0x13c
-> [ 1843.464799]I[0: surfaceflinger:  648]  __netif_receive_skb_core+0xe14/=
-0x1104
-> [ 1843.464810]I[0: surfaceflinger:  648]  __netif_receive_skb+0x40/0x124
-> [ 1843.464818]I[0: surfaceflinger:  648]  netif_receive_skb+0x7c/0x234
-> [ 1843.464825]I[0: surfaceflinger:  648]  slsi_rx_data_deliver_skb+0x1e0/=
-0xdbc [scsc_wlan 12b378a8d5cf5e6cd833136fc49079d43751bd28]
-> [ 1843.465025]I[0: surfaceflinger:  648]  slsi_ba_process_complete+0x70/0=
-xa4 [scsc_wlan 12b378a8d5cf5e6cd833136fc49079d43751bd28]
-> [ 1843.465219]I[0: surfaceflinger:  648]  slsi_ba_aging_timeout_handler+0=
-x324/0x354 [scsc_wlan 12b378a8d5cf5e6cd833136fc49079d43751bd28]
-> [ 1843.465410]I[0: surfaceflinger:  648]  call_timer_fn+0xd0/0x360
-> [ 1843.465423]I[0: surfaceflinger:  648]  __run_timers+0x1b4/0x268
-> [ 1843.465432]I[0: surfaceflinger:  648]  run_timer_softirq+0x24/0x4c
-> [ 1843.465440]I[0: surfaceflinger:  648]  __do_softirq+0x158/0x45c
-> [ 1843.465448]I[0: surfaceflinger:  648]  ____do_softirq+0x10/0x20
-> [ 1843.465455]I[0: surfaceflinger:  648]  call_on_irq_stack+0x3c/0x74
-> [ 1843.465463]I[0: surfaceflinger:  648]  do_softirq_own_stack+0x1c/0x2c
-> [ 1843.465470]I[0: surfaceflinger:  648]  __irq_exit_rcu+0x54/0xb4
-> [ 1843.465480]I[0: surfaceflinger:  648]  irq_exit_rcu+0x10/0x1c
-> [ 1843.465489]I[0: surfaceflinger:  648]  el0_interrupt+0x54/0xe0
-> [ 1843.465499]I[0: surfaceflinger:  648]  __el0_irq_handler_common+0x18/0=
-x28
-> [ 1843.465508]I[0: surfaceflinger:  648]  el0t_64_irq_handler+0x10/0x1c
-> [ 1843.465516]I[0: surfaceflinger:  648]  el0t_64_irq+0x1a8/0x1ac
-> [ 1843.465525]I[0: surfaceflinger:  648] Kernel panic - not syncing: kern=
-el: panic_on_warn set ...
->
-> > > When we check the socket state value at the time of the issue,
-> > > it was 0x4.
-> > >
-> > > skc_state =3D 0x4,
-> > >
-> > > This is "TCP_FIN_WAIT1" and which means the device closed its socket.
-> > >
-> > > enum {
-> > >         TCP_ESTABLISHED =3D 1,
-> > >         TCP_SYN_SENT,
-> > >         TCP_SYN_RECV,
-> > >         TCP_FIN_WAIT1,
-> > >
-> > > And also this means tp->packets_out was initialized as 0
-> > > by tcp_write_queue_purge().
-> >
-> > What stack trace leads to this tcp_write_queue_purge() exactly ?
-> I couldn't find the exact call stack to this.
-> But I just thought that the function would be called based on ramdump sna=
-pshot.
->
-> (*(struct tcp_sock *)(0xFFFFFF800467AB00)).packets_out =3D 0
-> (*(struct inet_connection_sock *)0xFFFFFF800467AB00).icsk_backoff =3D 0
 
-TCP_FIN_WAIT1 is set whenever the application does a shutdown(fd, SHUT_WR);
+On 12/3/24 22:55, Fan Ni wrote:
+> On Mon, Dec 02, 2024 at 05:11:58PM +0000, alejandro.lucero-palau@amd.com wrote:
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> During CXL device initialization supported capabilities by the device
+>> are discovered. Type3 and Type2 devices have different mandatory
+>> capabilities and a Type2 expects a specific set including optional
+>> capabilities.
+>>
+>> Add a function for checking expected capabilities against those found
+>> during initialization and allow those mandatory/expected capabilities to
+>> be a subset of the capabilities found.
+>>
+>> Rely on this function for validating capabilities instead of when CXL
+>> regs are probed.
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> ---
+>>   drivers/cxl/core/pci.c  | 16 ++++++++++++++++
+>>   drivers/cxl/core/regs.c |  9 ---------
+>>   drivers/cxl/pci.c       | 24 ++++++++++++++++++++++++
+>>   include/cxl/cxl.h       |  3 +++
+>>   4 files changed, 43 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/drivers/cxl/core/pci.c b/drivers/cxl/core/pci.c
+>> index 7114d632be04..a85b96eebfd3 100644
+>> --- a/drivers/cxl/core/pci.c
+>> +++ b/drivers/cxl/core/pci.c
+>> @@ -8,6 +8,7 @@
+>>   #include <linux/pci.h>
+>>   #include <linux/pci-doe.h>
+>>   #include <linux/aer.h>
+>> +#include <cxl/cxl.h>
+>>   #include <cxlpci.h>
+>>   #include <cxlmem.h>
+>>   #include <cxl.h>
+>> @@ -1055,3 +1056,18 @@ int cxl_pci_get_bandwidth(struct pci_dev *pdev, struct access_coordinate *c)
+>>   
+>>   	return 0;
+>>   }
+>> +
+>> +bool cxl_pci_check_caps(struct cxl_dev_state *cxlds, unsigned long *expected_caps,
+>> +			unsigned long *current_caps)
+> It seems "current_caps" will always be cxlds->capabilities in this
+> series, and used only for the error message. Do we expect a case where
+> these two can be different? If not, I think we can get rid of it and
+> just use cxlds->capabilities directly in the function and in the error
+> message below.
 
-This means that all bytes in the send queue and retransmit queue
-should be kept, and will eventually be sent.
 
- tcp_write_queue_purge() must not be called until we receive some
-valid RST packet or fatal timeout.
+They are the same because current_caps is the way the client obtains the 
+information, being a pointer to a capabilities bitmap allocated by the 
+client.
 
-6.6.30 is old, LTS 6.6.63 has some TCP changes that might br related.
+The point being, the client can not access the capabilities from the 
+cxlds as it is opaque for him on purpose.
 
-$ git log --oneline v6.6.30..v6.6.63 -- net/ipv4/tcp*c
-229dfdc36f31a8d47433438bc0e6e1662c4ab404 tcp: fix mptcp DSS corruption
-due to large pmtu xmit
-2daffbd861de532172079dceef5c0f36a26eee14 tcp: fix TFO SYN_RECV to not
-zero retrans_stamp with retransmits out
-718c49f840ef4e451bf44a8a62aae89ebdd5a687 tcp: new TCP_INFO stats for RTO ev=
-ents
-04dce9a120502aea4ca66eebf501f404a22cd493 tcp: fix tcp_enter_recovery()
-to zero retrans_stamp when it's safe
-e676ca60ad2a6fdeb718b5e7a337a8fb1591d45f tcp: fix to allow timestamp
-undo if no retransmits were sent
-5cce1c07bf8972d3ab94c25aa9fb6170f99082e0 tcp: avoid reusing FIN_WAIT2
-when trying to find port in connect() process
-4fe707a2978929b498d3730d77a6ab103881420d tcp: process the 3rd ACK with
-sk_socket for TFO/MPTCP
-9fd29738377c10749cb292510ebc202988ea0a31 tcp: Don't drop SYN+ACK for
-simultaneous connect().
-c8219a27fa43a2cbf99f5176f6dddfe73e7a24ae tcp_bpf: fix return value of
-tcp_bpf_sendmsg()
-69f397e60c3be615c32142682d62fc0b6d5d5d67 net: remove NULL-pointer net
-parameter in ip_metrics_convert
-f0974e6bc385f0e53034af17abbb86ac0246ef1c tcp: do not export tcp_twsk_purge(=
-)
-99580ae890ec8bd98b21a2a9c6668f8f1555b62e tcp: prevent concurrent
-execution of tcp_sk_exit_batch
-7348061662c7149b81e38e545d5dd6bd427bec81 tcp/dccp: do not care about
-families in inet_twsk_purge()
-227355ad4e4a6da5435451b3cc7f3ed9091288fa tcp: Update window clamping condit=
-ion
-77100f2e8412dbb84b3e7f1b947c9531cb509492 tcp_metrics: optimize
-tcp_metrics_flush_all()
-6772c4868a8e7ad5305957cdb834ce881793acb7 net: drop bad gso csum_start
-and offset in virtio_net_hdr
-1cfdc250b3d210acd5a4a47337b654e04693cf7f tcp: Adjust clamping window
-for applications specifying SO_RCVBUF
-f9fef23a81db9adc1773979fabf921eba679d5e7 tcp: annotate data-races
-around tp->window_clamp
-44aa1e461ccd1c2e49cffad5e75e1b944ec590ef tcp: fix races in tcp_v[46]_err()
-bc4f9c2ccd68afec3a8395d08fd329af2022c7e8 tcp: fix race in tcp_write_err()
-ecc6836d63513fb4857a7525608d7fdd0c837cb3 tcp: add tcp_done_with_error() hel=
-per
-dfcdd7f89e401d2c6616be90c76c2fac3fa98fde tcp: avoid too many retransmit pac=
-kets
-b75f281bddebdcf363884f0d53c562366e9ead99 tcp: use signed arithmetic in
-tcp_rtx_probe0_timed_out()
-124886cf20599024eb33608a2c3608b7abf3839b tcp: fix incorrect undo
-caused by DSACK of TLP retransmit
-8c2debdd170e395934ac0e039748576dfde14e99 tcp_metrics: validate source
-addr length
-8a7fc2362d6d234befde681ea4fb6c45c1789ed5 UPSTREAM: tcp: fix DSACK undo
-in fast recovery to call tcp_try_to_open()
-b4b26d23a1e2bc188cec8592e111d68d83b9031f tcp: fix
-tcp_rcv_fastopen_synack() to enter TCP_CA_Loss for failed TFO
-fdae4d139f4778b20a40c60705c53f5f146459b5 Fix race for duplicate reqsk
-on identical SYN
-250fad18b0c959b137ad745428fb411f1ac1bbc6 tcp: clear tp->retrans_stamp
-in tcp_rcv_fastopen_synack()
-acdf17546ef8ee73c94e442e3f4b933e42c3dfac tcp: count CLOSE-WAIT sockets
-for TCP_MIB_CURRESTAB
-50569d12945f86fa4b321c4b1c3005874dbaa0f1 net: tls: fix marking packets
-as decrypted
-02261d3f9dc7d1d7be7d778f839e3404ab99034c tcp: Fix shift-out-of-bounds
-in dctcp_update_alpha().
-00bb933578acd88395bf6e770cacdbe2d6a0be86 tcp: avoid premature drops in
-tcp_add_backlog()
-6e48faad92be13166184d21506e4e54c79c13adc tcp: Use
-refcount_inc_not_zero() in tcp_twsk_unique().
-f47d0d32fa94e815fdd78b8b88684873e67939f4 tcp: defer
-shutdown(SEND_SHUTDOWN) for TCP_SYN_RECV sockets
+If the capabilities check returns error, the client can show/compare 
+those discovered by the CXL core code and those expected.
+
+I hope this clarifies it.
+
+Thanks
+
+
+> Fan
+>> +{
+>> +
+>> +	if (current_caps)
+>> +		bitmap_copy(current_caps, cxlds->capabilities, CXL_MAX_CAPS);
+>> +
+>> +	dev_dbg(cxlds->dev, "Checking cxlds caps 0x%08lx vs expected caps 0x%08lx\n",
+>> +		*cxlds->capabilities, *expected_caps);
+>> +
+>> +	/* Checking a minimum of mandatory/expected capabilities */
+>> +	return bitmap_subset(expected_caps, cxlds->capabilities, CXL_MAX_CAPS);
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(cxl_pci_check_caps, CXL);
+>> diff --git a/drivers/cxl/core/regs.c b/drivers/cxl/core/regs.c
+>> index fe835f6df866..70378bb80b33 100644
+>> --- a/drivers/cxl/core/regs.c
+>> +++ b/drivers/cxl/core/regs.c
+>> @@ -444,15 +444,6 @@ static int cxl_probe_regs(struct cxl_register_map *map, unsigned long *caps)
+>>   	case CXL_REGLOC_RBI_MEMDEV:
+>>   		dev_map = &map->device_map;
+>>   		cxl_probe_device_regs(host, base, dev_map, caps);
+>> -		if (!dev_map->status.valid || !dev_map->mbox.valid ||
+>> -		    !dev_map->memdev.valid) {
+>> -			dev_err(host, "registers not found: %s%s%s\n",
+>> -				!dev_map->status.valid ? "status " : "",
+>> -				!dev_map->mbox.valid ? "mbox " : "",
+>> -				!dev_map->memdev.valid ? "memdev " : "");
+>> -			return -ENXIO;
+>> -		}
+>> -
+>>   		dev_dbg(host, "Probing device registers...\n");
+>>   		break;
+>>   	default:
+>> diff --git a/drivers/cxl/pci.c b/drivers/cxl/pci.c
+>> index f6071bde437b..822030843b2f 100644
+>> --- a/drivers/cxl/pci.c
+>> +++ b/drivers/cxl/pci.c
+>> @@ -903,6 +903,8 @@ __ATTRIBUTE_GROUPS(cxl_rcd);
+>>   static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>>   {
+>>   	struct pci_host_bridge *host_bridge = pci_find_host_bridge(pdev->bus);
+>> +	DECLARE_BITMAP(expected, CXL_MAX_CAPS);
+>> +	DECLARE_BITMAP(found, CXL_MAX_CAPS);
+>>   	struct cxl_memdev_state *mds;
+>>   	struct cxl_dev_state *cxlds;
+>>   	struct cxl_register_map map;
+>> @@ -964,6 +966,28 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>>   	if (rc)
+>>   		dev_dbg(&pdev->dev, "Failed to map RAS capability.\n");
+>>   
+>> +	bitmap_clear(expected, 0, CXL_MAX_CAPS);
+>> +
+>> +	/*
+>> +	 * These are the mandatory capabilities for a Type3 device.
+>> +	 * Only checking capabilities used by current Linux drivers.
+>> +	 */
+>> +	bitmap_set(expected, CXL_DEV_CAP_HDM, 1);
+>> +	bitmap_set(expected, CXL_DEV_CAP_DEV_STATUS, 1);
+>> +	bitmap_set(expected, CXL_DEV_CAP_MAILBOX_PRIMARY, 1);
+>> +	bitmap_set(expected, CXL_DEV_CAP_DEV_STATUS, 1);
+>> +
+>> +	/*
+>> +	 * Checking mandatory caps are there as, at least, a subset of those
+>> +	 * found.
+>> +	 */
+>> +	if (!cxl_pci_check_caps(cxlds, expected, found)) {
+>> +		dev_err(&pdev->dev,
+>> +			"Expected mandatory capabilities not found: (%08lx - %08lx)\n",
+>> +			*expected, *found);
+>> +		return -ENXIO;
+>> +	}
+>> +
+>>   	rc = cxl_pci_type3_init_mailbox(cxlds);
+>>   	if (rc)
+>>   		return rc;
+>> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+>> index f656fcd4945f..05f06bfd2c29 100644
+>> --- a/include/cxl/cxl.h
+>> +++ b/include/cxl/cxl.h
+>> @@ -37,4 +37,7 @@ void cxl_set_dvsec(struct cxl_dev_state *cxlds, u16 dvsec);
+>>   void cxl_set_serial(struct cxl_dev_state *cxlds, u64 serial);
+>>   int cxl_set_resource(struct cxl_dev_state *cxlds, struct resource res,
+>>   		     enum cxl_resource);
+>> +bool cxl_pci_check_caps(struct cxl_dev_state *cxlds,
+>> +			unsigned long *expected_caps,
+>> +			unsigned long *current_caps);
+>>   #endif
+>> -- 
+>> 2.17.1
+>>
 
