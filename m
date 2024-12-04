@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-149095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 109AA9E4293
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 18:57:27 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5952E9E4295
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 18:57:38 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C059E2835BB
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 17:57:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 809F7169016
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 17:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68E12144C7;
-	Wed,  4 Dec 2024 17:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E5E214A83;
+	Wed,  4 Dec 2024 17:22:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="OxZni3Gl"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="LjebwYQO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469952144DC
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 17:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E7D214A75
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 17:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733332971; cv=none; b=NeELzlZcJWpYPyfKEO8+QEjtxzoCq2bL1wHfY96w5OqYdwF3/y5HSDQ/AcmkDz8MXCnALYAuymMCoKQth3pUKgHxpGSs0FPxml8sGcuoKD2aHrWZDdRHnRHqLSrBHlwurn2lVHHG3LhQ/u6ii8H9o2XQZc4Bk3YGsp8lpov3Hmw=
+	t=1733332973; cv=none; b=ZhObGGRPrYDS/OiDtKgrZR2a5KDH7fI4Y5OfdFVLLkZE6YjUgJfmHE+C0bfvPKhoBIMwl1OmeCu/x5vROOya65ArVBqf3O+qmLpBw7dAE+lTwMTB22QrkmUwegvsBlSZxWyaZfmDd0WH35PS+GJC7VVT1Kl/iW6xppAp5kJLEW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733332971; c=relaxed/simple;
-	bh=2Ly0e5Yijxu/LfGPalbYYW0IDXn2bJJLdjQ35I/F9lc=;
+	s=arc-20240116; t=1733332973; c=relaxed/simple;
+	bh=U4Cdy5bsVigQBeIL6KWDF95WYZe8Tqk1pM22YTjXHD8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N/fhlgTEbR1ywtrpALnyJMKWwhU71zTM8avnBKZHWOZtw2IRY+mq22IZGgX+fYK+13PEda6r09ojKpUwmOFui2TuXr/QKmVtbEtWmm5WeP15RLm6ST/768lG6hK4E5fX722J4D0PMV/Rw4evH+QvcH6vxUquypm4XGHwfzvnodc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=OxZni3Gl; arc=none smtp.client-ip=209.85.216.44
+	 MIME-Version; b=LROKsfiTNzursMQBGMjdvvuVr42AVYNI0W8sVySmuo5jvUnAjHPCs0U+WAQLByC/eZM6JxmkYFSs0kKblUNQSYCDBasXZTQ4Gt9l3qq0dPpX5EYUNSKhY1l9K+RE/1OlBWd/00K87nx0Ezbm0yb5OR2KCjYimzR154Zzyo3v7Ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=LjebwYQO; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ee989553c1so50603a91.3
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 09:22:50 -0800 (PST)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7250c199602so62666b3a.1
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 09:22:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1733332970; x=1733937770; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1733332972; x=1733937772; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vVA+/b4qCsGeF/r3+y87HajxoHUhHCxTyMRpyjDTudI=;
-        b=OxZni3GluqnhCSfAC2Z1Kc277FqzUyf6VKnVMYqXM5rI+eZLuiG2nwAgKSVosuAVg0
-         WbLkVx3S4Suk0nPcbyKvIrKi/N2K8wUtox1nKDXYbwWcBl72lsg2CQoILEUfTpJMmjdF
-         2nhR64Cuo3WYDKBiNaJvpH2hUoDq81Y0/3bYyk5Ciqge0q8jFjLOD/VLGRq9j+nFjeaq
-         Oo1lSWhNl8zPQyH8WrsgdXN/H0erUEvhyTPc12oRFE7XzRQ7MvWTaBVX09eXEY7+5pai
-         naeM+5sorHse8Mjucwp2kvtSBIvhJ5LMGTHEnlpiPcmqm5Q7EJ7N6+qWXbKd/DR7ivZ3
-         V+Fg==
+        bh=Ull/mV+AjRgR++Q1JZdqTKwRQ/UNffKR3r7S+Qmcp54=;
+        b=LjebwYQOznhQZqGz3L5QGY0WtGz4sfW/bhxQm9Lc0T2AIiBxedJZfmsdfOmkvgHlcU
+         i9jqss4VwofNqphP1xFgxCSTqswIAmJ7h1b1BemvAOfqdNjmkkkSPeUfAJYGkVH9b+Nx
+         qp/NXYa+xYKQrzY9jDjMzPJtGASJbLvftURBEF06+hymTsRJlM2tuThVJYGqMQAwof+Y
+         K4vNCOKVjUlxsbLq2fdnvDhYQzKY41Wlvd77F15Q+8HJNNnD8uSoulfsMkvh3TRMSVR0
+         kEiTH88QX53NPNDOsZ5HQR710T78TmoU72OUxGsQ4EZv9e9Nxx8sRWMf7IeQbTpgmUCK
+         tgIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733332970; x=1733937770;
+        d=1e100.net; s=20230601; t=1733332972; x=1733937772;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vVA+/b4qCsGeF/r3+y87HajxoHUhHCxTyMRpyjDTudI=;
-        b=ijR4DM5xZ1QXSCtBkfo9JFZ+QeDJQNNhdq6DruHp03I9Pzs/SHAkRj8uDYlToFIPBb
-         5lsfFmEEvDcIo+/NtIKu1TdMhVbGSIICJaYntnGWSmaFjI94/KNR63w6tqn6N4asK27H
-         DO/j6skZuGCC8TFf/B3YcJOimvRNDxLwknQjhuzF/CHHSsbybQReSemHEah/Rc7sfjja
-         +1GIcaBsL9Z6Cw7rABo0uQAuC54gGdRTiPbm9Th2V9MtAODko2ZtLmASZ4UTrIQQ39SK
-         ZLQcIwJgSjBkDz652q9xWfQBYVCaZSLSS9ZhxsydHw4YKAqK4yCxIOr3zPYLwx2xMdzq
-         PHaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWmMTZ/aiNSa3iekzx+IVRCuBlejAF19BHuB5hgNoEoZE7LpI1yOXhlLp/Y9K+E5MyG+5v3MbU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydyNczUfFd0gspaJmT8caA0/0iXpYPn80D2fJDCEyi+HdCbDsp
-	BtBqjSG8l+JBaTZE1DkUBksv5ebq5VTcE+gyQKEaJNvTvT54RaCZLKl9cUuFIno=
-X-Gm-Gg: ASbGncs2PQ1yIT3RzU6Gy9Nu6/V3cEXcCwWrRynofvpaemO3rsCOQUEaVSz2WWtJ5tJ
-	BcOhlmns8iGQHBriuDg54usyPJSip+z9TpdUQj7isVwNoQRcNHHd4danpAy9WTk/OxHeac0+RKK
-	CzxFh/kMLxFqIaDoPvhiMIEV4/4JzyHDXm63r2pCV9tsutXe65+O2NyFinSHLR/F+2VhS5LYv8y
-	uNY7biBUGLWjhBycl8SYi/V6W8lxDsitsc=
-X-Google-Smtp-Source: AGHT+IEuhl76LZuTMA9l7NFby+dpNqNLOXPZPUIKpzVvQ3cP55eSMyTH71gxdXUKQ8wKcIyAwFFBwA==
-X-Received: by 2002:a17:90b:2547:b0:2ee:fa3f:4740 with SMTP id 98e67ed59e1d1-2ef012759b6mr11280221a91.35.1733332969694;
-        Wed, 04 Dec 2024 09:22:49 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:16::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ef2701d9a2sm1681179a91.28.2024.12.04.09.22.48
+        bh=Ull/mV+AjRgR++Q1JZdqTKwRQ/UNffKR3r7S+Qmcp54=;
+        b=gzO3230QzAEYLugN05wO9QCrecAT5OOZ2tbIQfgzeUFn5Z020Gc9BAnCeUMA8NYgD+
+         QKxHJvFU+yXoczbxTVCaEECDxk6TULReqZn+LqCusxbV1XmZneQGr9IFwIiBk2hRk3E4
+         TAkfTvDSTeZ7id5iIOhuWKNBZ07Tkw1r0GvOcK9UcH//53g3vTR9yugHfFH07sXBzhbp
+         HpkgdU39Lw7/AsT2Vfm7Pb9tqmUZF0gzkQ5JMGxRciCfX3q8P9aJygUQ2pxdzoUO2cOG
+         y/9iWV9pcSuRWUt4Y+tDv6NoDrxc9SN3XRXx2EdV89v6dVDQrTZzq1mmpg86TtfMYE1r
+         yNzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUVPt+2jxwRGRF9YqCwIh9RHIc40wObo6b4PGdQ/fkY7KqTj6Wz8VL8s+XL7L3F4p/y8CABU9w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/1iu/EAGtOGSf8kzvtHJICn2m8jPsW0w1w8r0jh9tOguQUGdF
+	bbeDH+JoMI8/AlEcN9WlvMghysSyBeS5WgfOKNocb66jQHRe5mXl9U/DBdOXJzc=
+X-Gm-Gg: ASbGncvAbZExkPMdvRVktL0+onFGeByEUg7be2LI68pAQmEFugRQqgavyRCpCiDiTnh
+	WDtPjFY1LnZN5zimi1OMFTAsfnjQJFN+kqJspBl+WN7K8mrr2cmUCtOvhJALW41KOL8g0cnYLoE
+	keiIaNdAeJIhaMUI8T+IOb8Jb7EdqteIlzc0s/hUOD7lDMZoYUZpzxeppijYPmLWcBOrQlzlsBx
+	tsWZ2c+//PQQbayI7aXZDuSZr+o1AR9W5w=
+X-Google-Smtp-Source: AGHT+IGOTgkLRnA4czWTMkZeEXKvCq1PTMgt5kmHHIjqfFD7w7UmXVYqNmZZa5sXoC8Pmg6yWW7SZw==
+X-Received: by 2002:a05:6a00:1487:b0:725:3bd4:9b56 with SMTP id d2e1a72fcca58-7257fa44e93mr10562740b3a.5.1733332970951;
+        Wed, 04 Dec 2024 09:22:50 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:74::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fc9c2e1b2fsm11784589a12.20.2024.12.04.09.22.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2024 09:22:49 -0800 (PST)
+        Wed, 04 Dec 2024 09:22:50 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: io-uring@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -86,9 +86,9 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	Stanislav Fomichev <stfomichev@gmail.com>,
 	Joe Damato <jdamato@fastly.com>,
 	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next v8 06/17] net: page pool: add helper creating area from pages
-Date: Wed,  4 Dec 2024 09:21:45 -0800
-Message-ID: <20241204172204.4180482-7-dw@davidwei.uk>
+Subject: [PATCH net-next v8 07/17] net: page_pool: introduce page_pool_mp_return_in_cache
+Date: Wed,  4 Dec 2024 09:21:46 -0800
+Message-ID: <20241204172204.4180482-8-dw@davidwei.uk>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20241204172204.4180482-1-dw@davidwei.uk>
 References: <20241204172204.4180482-1-dw@davidwei.uk>
@@ -102,136 +102,59 @@ Content-Transfer-Encoding: 8bit
 
 From: Pavel Begunkov <asml.silence@gmail.com>
 
-Add a helper that takes an array of pages and initialises passed in
-memory provider's area with them, where each net_iov takes one page.
-It's also responsible for setting up dma mappings.
-
-We keep it in page_pool.c not to leak netmem details to outside
-providers like io_uring, which don't have access to netmem_priv.h
-and other private helpers.
+Add a helper that allows a page pool memory provider to efficiently
+return a netmem off the allocation callback.
 
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- include/net/page_pool/memory_provider.h | 10 ++++
- net/core/page_pool.c                    | 63 ++++++++++++++++++++++++-
- 2 files changed, 71 insertions(+), 2 deletions(-)
- create mode 100644 include/net/page_pool/memory_provider.h
+ include/net/page_pool/memory_provider.h |  4 ++++
+ net/core/page_pool.c                    | 19 +++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
 diff --git a/include/net/page_pool/memory_provider.h b/include/net/page_pool/memory_provider.h
-new file mode 100644
-index 000000000000..83d7eec0058d
---- /dev/null
+index 83d7eec0058d..352b3a35d31c 100644
+--- a/include/net/page_pool/memory_provider.h
 +++ b/include/net/page_pool/memory_provider.h
-@@ -0,0 +1,10 @@
-+#ifndef _NET_PAGE_POOL_MEMORY_PROVIDER_H
-+#define _NET_PAGE_POOL_MEMORY_PROVIDER_H
+@@ -1,3 +1,5 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
 +
-+int page_pool_mp_init_paged_area(struct page_pool *pool,
-+				struct net_iov_area *area,
-+				struct page **pages);
-+void page_pool_mp_release_area(struct page_pool *pool,
-+				struct net_iov_area *area);
+ #ifndef _NET_PAGE_POOL_MEMORY_PROVIDER_H
+ #define _NET_PAGE_POOL_MEMORY_PROVIDER_H
+ 
+@@ -7,4 +9,6 @@ int page_pool_mp_init_paged_area(struct page_pool *pool,
+ void page_pool_mp_release_area(struct page_pool *pool,
+ 				struct net_iov_area *area);
+ 
++void page_pool_mp_return_in_cache(struct page_pool *pool, netmem_ref netmem);
 +
-+#endif
+ #endif
 diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 13f1a4a63760..d17e536ba8b8 100644
+index d17e536ba8b8..24f29bdd70ab 100644
 --- a/net/core/page_pool.c
 +++ b/net/core/page_pool.c
-@@ -13,6 +13,7 @@
- 
- #include <net/netdev_rx_queue.h>
- #include <net/page_pool/helpers.h>
-+#include <net/page_pool/memory_provider.h>
- #include <net/xdp.h>
- 
- #include <linux/dma-direction.h>
-@@ -459,7 +460,8 @@ page_pool_dma_sync_for_device(const struct page_pool *pool,
- 		__page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
- }
- 
--static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem)
-+static bool page_pool_dma_map_page(struct page_pool *pool, netmem_ref netmem,
-+				   struct page *page)
- {
- 	dma_addr_t dma;
- 
-@@ -468,7 +470,7 @@ static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem)
- 	 * into page private data (i.e 32bit cpu with 64bit DMA caps)
- 	 * This mapping is kept for lifetime of page, until leaving pool.
- 	 */
--	dma = dma_map_page_attrs(pool->p.dev, netmem_to_page(netmem), 0,
-+	dma = dma_map_page_attrs(pool->p.dev, page, 0,
- 				 (PAGE_SIZE << pool->p.order), pool->p.dma_dir,
- 				 DMA_ATTR_SKIP_CPU_SYNC |
- 					 DMA_ATTR_WEAK_ORDERING);
-@@ -490,6 +492,11 @@ static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem)
- 	return false;
- }
- 
-+static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem)
-+{
-+	return page_pool_dma_map_page(pool, netmem, netmem_to_page(netmem));
-+}
-+
- static struct page *__page_pool_alloc_page_order(struct page_pool *pool,
- 						 gfp_t gfp)
- {
-@@ -1154,3 +1161,55 @@ void page_pool_update_nid(struct page_pool *pool, int new_nid)
+@@ -1213,3 +1213,22 @@ void page_pool_mp_release_area(struct page_pool *pool,
+ 		page_pool_release_page_dma(pool, net_iov_to_netmem(niov));
  	}
  }
- EXPORT_SYMBOL(page_pool_update_nid);
 +
-+static void page_pool_release_page_dma(struct page_pool *pool,
-+				       netmem_ref netmem)
++/*
++ * page_pool_mp_return_in_cache() - return a netmem to the allocation cache.
++ * @pool:	pool from which pages were allocated
++ * @netmem:	netmem to return
++ *
++ * Return already allocated and accounted netmem to the page pool's allocation
++ * cache. The function doesn't provide synchronisation and must only be called
++ * from the napi context.
++ */
++void page_pool_mp_return_in_cache(struct page_pool *pool, netmem_ref netmem)
 +{
-+	__page_pool_release_page_dma(pool, netmem);
-+}
-+
-+int page_pool_mp_init_paged_area(struct page_pool *pool,
-+				 struct net_iov_area *area,
-+				 struct page **pages)
-+{
-+	struct net_iov *niov;
-+	netmem_ref netmem;
-+	int i, ret = 0;
-+
-+	if (!pool->dma_map)
-+		return -EOPNOTSUPP;
-+
-+	for (i = 0; i < area->num_niovs; i++) {
-+		niov = &area->niovs[i];
-+		netmem = net_iov_to_netmem(niov);
-+
-+		page_pool_set_pp_info(pool, netmem);
-+		if (!page_pool_dma_map_page(pool, netmem, pages[i])) {
-+			ret = -EINVAL;
-+			goto err_unmap_dma;
-+		}
-+	}
-+	return 0;
-+
-+err_unmap_dma:
-+	while (i--) {
-+		netmem = net_iov_to_netmem(&area->niovs[i]);
-+		page_pool_release_page_dma(pool, netmem);
-+	}
-+	return ret;
-+}
-+
-+void page_pool_mp_release_area(struct page_pool *pool,
-+			       struct net_iov_area *area)
-+{
-+	int i;
-+
-+	if (!pool->dma_map)
++	if (WARN_ON_ONCE(pool->alloc.count >= PP_ALLOC_CACHE_REFILL))
 +		return;
 +
-+	for (i = 0; i < area->num_niovs; i++) {
-+		struct net_iov *niov = &area->niovs[i];
-+
-+		page_pool_release_page_dma(pool, net_iov_to_netmem(niov));
-+	}
++	page_pool_dma_sync_for_device(pool, netmem, -1);
++	page_pool_fragment_netmem(netmem, 1);
++	pool->alloc.cache[pool->alloc.count++] = netmem;
 +}
 -- 
 2.43.5
