@@ -1,80 +1,103 @@
-Return-Path: <netdev+bounces-148746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F3EC9E30AF
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 02:19:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76BDF9E30B9
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 02:23:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9832C283B2D
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 01:19:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01689B23215
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 01:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAEC523A;
-	Wed,  4 Dec 2024 01:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FFD79F5;
+	Wed,  4 Dec 2024 01:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QguQQjyQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OssZ8Eqr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04626FC3;
-	Wed,  4 Dec 2024 01:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C20523A
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 01:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733275151; cv=none; b=fVtAgg/ghSf3rG81OkSWvElJ4ow1ThUQaLSyQUSbHqZPOUg56pgw8YZHG3np9dtsi8SijYlBk3ruZG0YlyumNv/hu4BAdDd+5NP8BYWfIXa18+kihrEOvK69rtMRsoBWqhBO9FrtQBEEoq833U6l55z+tpxjCeNYSAfx0LZHPPA=
+	t=1733275414; cv=none; b=dnfHE7k8CW+iz9EpVYOTuCeMmmNxlAkpKx4hrN4PYqzv4rJSLu6r51f0UcNrHy/ZljEMOrDBTJDUThfks+NrGkZPmgOE5CiOsyK66sDkFx5irMXXKQnEP1/md1gFdhmcCngZSfK0bmQq4d8nI1IFfc2EN2VzDYUnTj6lmiFkOE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733275151; c=relaxed/simple;
-	bh=D1JTVh2llkGP7M08LB8Jrx4grDf8oiYimk21RcwDoDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BG8RGYcRfe26OFDeGb153NTWmxO8v/dAhWhHhEgI2dZES7es0kvKMRUQ0Bc9benelOLdTZiTH+ZUqedRBT+Q/c4kEFBanxzySaxfistEqjqTMcw3bdmAFEayTSeo2XlqMn9tszBSuXO8DGaYM9bIkExFxPoiNw/prh/Syct0nzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QguQQjyQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22819C4CEDC;
-	Wed,  4 Dec 2024 01:19:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733275151;
-	bh=D1JTVh2llkGP7M08LB8Jrx4grDf8oiYimk21RcwDoDM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QguQQjyQdmGjTP38ssKqc5gs45y6/T3xU1DpE/IVKjroimS80v+P8wLrHEuvrSb+h
-	 B+8ZiWHQLLvWBM4vRAVtxEemxhfkICv2pVXZQe9EHSFQ5q2tY7Osy21n4/yRwuIhaD
-	 WN0h0bizQB1WXT03jZRkrZPApFGOjvz4G/OmR2sQJlUhiS13xqpcvtp3St87isF5Wo
-	 QxW68jYWlH4a/RAWSwwo7mwr1Mk78q4c5Epr0EbcQRwrjWu9RJ31UX3F8+vT4bnUGx
-	 2xU+DPYKFyIvytDfS7pgwt2FkjNH1KwvSpwdexYhbSqrD0no3MGd+pRI2fGHtP+jUq
-	 tVqvW5B/Xbkzw==
-Date: Tue, 3 Dec 2024 17:19:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@baylibre.com>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, richardcochran@gmail.com,
- yangbo.lu@nxp.com, dwmw2@infradead.org, Linus Torvalds
- <torvalds@linux-foundation.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Linux-Next <linux-next@vger.kernel.org>
-Subject: Re: [PATCH] ptp: Switch back to struct platform_driver::remove()
-Message-ID: <20241203171910.27c0a170@kernel.org>
-In-Reply-To: <5qiehbnmzufzqjgn2l4jcghebdx7llr52lgl7hi2jizpg7gfnd@c73bpxxxdeiv>
-References: <20241130145349.899477-2-u.kleine-koenig@baylibre.com>
-	<173318582905.3964978.17617943251785066504.git-patchwork-notify@kernel.org>
-	<CAMuHMdV3J=o2x9G=1t_y97iv9eLsPfiej108vU6JHnn=AR-Nvw@mail.gmail.com>
-	<5qiehbnmzufzqjgn2l4jcghebdx7llr52lgl7hi2jizpg7gfnd@c73bpxxxdeiv>
+	s=arc-20240116; t=1733275414; c=relaxed/simple;
+	bh=+7qu2OdkMDrWyEA/AbNp/Eldt4Pq/+jBPwLnQKSEnQk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L5Imnc2g0dSG97QBroi0PfzCHgz1R1tPwGQ7kNUNnamnEYv7kywS9COwotJbEP0FmxOu3m6hJr43UIK6GwUAnyjFciAuIRhDnohiJcIVHVEx48tqbfyZftxhEKXqXnRgo2QnrxWKMgkKdycJ39L+io9ZTx8Tq4Q6+1dER6/3C7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OssZ8Eqr; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-215740b7fb8so37645ad.0
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 17:23:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733275413; x=1733880213; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+7qu2OdkMDrWyEA/AbNp/Eldt4Pq/+jBPwLnQKSEnQk=;
+        b=OssZ8EqrNvOyNMZVXB8a0DK/P1EsUCSmrDWW+TJqqBj7w7N1NVMTT4o6ZjqpDW0+yh
+         XZa+h6L/R6dOUjR1eRz/RiPuXuvBmf3rdNOe0tEUF9jM032goRChfZoBEJIs4K33AJ4d
+         lUcdx7UWPtCUiUWWCJ+mQ+biWnFUAZnJfUzlNncuDo8DqaZA/7/B7TQ8i1io+yzuABQV
+         NuFtE6YCfDWdwUs4nbf82yNCZppfL+s0hi4pgYKDHhT+Rf5J9aRvmWNGdSNZQk7dYDB5
+         MooYUt4He+4MxEs+BEU/2vjTd6FqJC/lgxp4DtBRG4LL6Del0GgNvb0dwRSbi7bP60N9
+         chOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733275413; x=1733880213;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+7qu2OdkMDrWyEA/AbNp/Eldt4Pq/+jBPwLnQKSEnQk=;
+        b=nc0kR1HHB9bGDPsjls/oRxOd/v2n5bODhfcNW5RsxuvwHb/zYuRM+agza+qWGA0aMn
+         GnrqL4YkrAGHFLDNxIL4QbN159Knx2wcAwWk0Z8KrYdiSrg/2c/ZmlglYPzjYD/MYQqu
+         ca7LhUkjpZaqES+AAAPbP9aMHaIXFa//WKo/cnL1P5yduBA3asl7ttW6tqeVCb01x7ht
+         Gt9zPK993B/NsOQTeJR5LQnBH5bqDJt6lv/3mHO+AyPGG5lFiNF6Z1ReHxW9i05jTUZD
+         cPbY9YTF9K3U8Vaqki6wuyyo5ZJj5sjECIjZXiRqztdrwnj8JzGkFt75gx6UE5xQzzi5
+         Ex0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUsztM+KLQcG5SA/qYV8kKc3Kjjsi9gw4fRSpLln7Y8uxZPyvHFl3/8S3qPD2LnYcwpYIm8iuo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUFZMv5CvPBLecRNgkIbNBYDEVlU5Cw6UKaKd83gV0NoTXibId
+	GwLocz9dsVMwWuilL7l3cx9KH+Ok5b5SAhSnCjZ1NTDhqq1qsqnbyNu6Twmn33y7J7rA6j2LbZ+
+	KOSRlgbirRUYj5xgM1FyjVAuhiB0mkGr6hOVA
+X-Gm-Gg: ASbGncuzNst6vdCLPyZS/uy8tFEyFajtjuUIS2c6xJVD1Re4m0qPf+znBPVsLzZwhyj
+	GtyDHFdMAJRhzV1dTDYZG1r7qZjNyH9unN/0NBdMN9wABVlr90vjbrVECQRccjA==
+X-Google-Smtp-Source: AGHT+IGD28NPEj4py7ZE6t7UOPJEzjj4CwV1nKf1e4xWMi3ISwCNz9WuJpdVSU42ZLi15gw0WaF/NMUP2mbpoyKo0J0=
+X-Received: by 2002:a17:903:2a83:b0:20c:e262:2570 with SMTP id
+ d9443c01a7336-215d6c3ec59mr1174565ad.8.1733275412322; Tue, 03 Dec 2024
+ 17:23:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <CADKFtnTThMBDKCXufNaeci5uCeddOgLvXmqszyJoT6N=6xtWug@mail.gmail.com>
+ <20241127232133.3928793-1-jrife@google.com> <20241130095624.1c34a12c@kernel.org>
+In-Reply-To: <20241130095624.1c34a12c@kernel.org>
+From: Jordan Rife <jrife@google.com>
+Date: Tue, 3 Dec 2024 17:23:20 -0800
+Message-ID: <CADKFtnQTWLyTej3cf+SJMWHNMPvZetfW9pUMH0K-tBOGxXLZRA@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] wireguard: allowedips: Add
+ WGALLOWEDIP_F_REMOVE_ME flag
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jason@zx2c4.com, davem@davemloft.net, edumazet@google.com, 
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	shuah@kernel.org, wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 3 Dec 2024 12:49:54 +0100 Uwe Kleine-K=C3=B6nig wrote:
-> > Resolution: just take the version from upstream. =20
->=20
-> But IMHO my variant is better than Linus's. After Linus' change the =3D
-> for .probe and .remove are aligned in the conflicting files. However the
-> other members initialized there are only using a single space before the
-> =3D. My change used the single space variant consistently for the whole
-> initializer.
->=20
-> So I suggest to either drop my change, or in the conflict resolution
-> take my variant and not Linus's.
+> Better still use NLA_POLICY_MASK() so that nla_parse_nested() can
+> perform the validation and attach a machine readable info about
+> the failure.
 
-I'll revert, it's less work.
+This is definitely cleaner for the new WGALLOWEDIP_A_FLAGS parameter.
+Thanks for the suggestion.
+
+Applying this to WGPEER_A_FLAGS would simplify the existing validation
+logic as well, although I think it changes the error code returned if
+a user provides an invalid flag from EOPNOTSUPP to EINVAL. I'm not
+sure if there's anything relying on this behavior. I'll let Jason make
+the final call there.
+
+-Jordan
 
