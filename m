@@ -1,98 +1,80 @@
-Return-Path: <netdev+bounces-148792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C0C39E324C
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 04:52:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23E089E324B
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 04:51:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A19828427C
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 03:52:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7487B228E7
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 03:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BA741514CC;
-	Wed,  4 Dec 2024 03:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 064C914D6F9;
+	Wed,  4 Dec 2024 03:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="RN+42dGA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VTGybN7h"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C6A14A4FF;
-	Wed,  4 Dec 2024 03:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE42317BA1;
+	Wed,  4 Dec 2024 03:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733284336; cv=none; b=HlIsvKdksYa6kb/nWnvhM1GQlOpJjQJ3M06cI75PLT/z6vLEdw/RLKcKCP7nAZQgwZrvsSAEaVU7mIma+2WrkVwle4oCDK+aJUUZoIR9MpoFx4qSKh3fuLdpAbF/R2se5lynSIqa7PxYyfnkOVgjbtwske2ArxBtEKkZt+ndFyo=
+	t=1733284290; cv=none; b=lI9MckT0DMZb5Ag6cpG95VFA+bEJM3r2VWWZCxDDr4WxqUCINGEHRgUEeeJsk1eaLyIqNYDL5zXJTr2Sq7zJ29sHSClMBrYKQTqChdmI3CG8EizrzUianiTU0wrgb+3HbdGwCgObnLMPT9w8o2cOa10wWD0/MXpdh4mVkEmjawQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733284336; c=relaxed/simple;
-	bh=fLYACWwFucewfXjZr5YEb2nJPip67Lv2+g81QB2bxzc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ta/Zm1jCgWD8Yqdlc7ZLHaLjJQlMX8r1e4Fv6Yu8OZzQZDq6nCE8YALgTKhNWRqp4YCwL3/Osx9pq0kRKP/j4aaTqJor3jqUH02F5oXyAYvHZDIrpt5sbT0v7Hy3/Tvqv5sQxq1wlgYHo6S0KHL3ZWD+JJvEBsLVqDGMIsM41Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=RN+42dGA; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=jnuZr
-	+sMFHO3kQXK5Q3ZVgkSaE9cD/7A4wzl+1kx1sc=; b=RN+42dGAMOqXyOOZFxQF3
-	AYgGCCrl4MnabwV+A2l+ZnXjlOB3G2/NOYN8RDN8PdBdypf9djkTJVsx85wuTEKP
-	EUAOHppbqmukufSC3xCsKUfottMauxd8ZYbfB662x5qKa5X1DJGQUbEANhlB/Ar3
-	/aTzHqrvgDKSwOAwijIBFs=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wDHd1Zc0U9nHxKYBA--.64832S2;
-	Wed, 04 Dec 2024 11:49:49 +0800 (CST)
-From: MoYuanhao <moyuanhao3676@163.com>
-To: edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	MoYuanhao <moyuanhao3676@163.com>
-Subject: [PATCH net-next] tcp: Check space before adding MPTCP options
-Date: Wed,  4 Dec 2024 11:49:46 +0800
-Message-Id: <20241204034946.10794-1-moyuanhao3676@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1733284290; c=relaxed/simple;
+	bh=bkl1fC1asdNySiWZpwGEDHKtEKnC7uWcPKi06Qhd4pw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pabh9wBAKAxbjzXdvrfrV8kt+xeEoA8XQWnMCgcIyB+cXvx3UdKSK9fdyDrblAM7jBv8UxRgnVVKDkB60HgFpdbM1NJJuvUKrq9PiOKbNPcSZJJ/scvgGV6JXfiSrobkkU9ASmDAgO5+N5delbS6AFfeOujAEq58GsMQZKyhCmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VTGybN7h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8966C4CED1;
+	Wed,  4 Dec 2024 03:51:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733284290;
+	bh=bkl1fC1asdNySiWZpwGEDHKtEKnC7uWcPKi06Qhd4pw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VTGybN7huQju9hzuBIgw7miuofMsj6QHx2Wb93mWNe27HTY5EsOAamNaOR9x8lS37
+	 rhu0Q8PlqWujhCl6mwHAVPLL2vIVqzHmHOuuF0i7QQUdLaw6/mW7JIQnJIIasg7eRw
+	 QytdcjR8Bg2sVzggbkWNEDJ2/exzmzyp69EdPDrAnQmdE6BXhwVagMuYhvLtKSfjjK
+	 SLZgZF+FsHZyfI1SngSonZxlvEqTasQAjYgpy6vn1E/7sEI1CG4rxricqFaAkfX/cO
+	 6jBTbkI70dJQ9xRzqP7/03S63SJIdRA+xPOQLINWuxqy2blrg3X/06if4FwexnKwFF
+	 XPK6doEsrLIlw==
+Date: Tue, 3 Dec 2024 19:51:29 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vfedorenko@novek.ru>, Frantisek
+ Krenzelok <fkrenzel@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Apoorv Kothari <apoorvko@amazon.com>, Boris Pismenny <borisp@nvidia.com>,
+ John Fastabend <john.fastabend@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Marcel
+ Holtmann <marcel@holtmann.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v4 4/6] docs: tls: document TLS1.3 key updates
+Message-ID: <20241203195129.25e07e53@kernel.org>
+In-Reply-To: <6baaaaf467845c56d7ec47250aaa2138de948003.1731597571.git.sd@queasysnail.net>
+References: <cover.1731597571.git.sd@queasysnail.net>
+	<6baaaaf467845c56d7ec47250aaa2138de948003.1731597571.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDHd1Zc0U9nHxKYBA--.64832S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrZr1DJF13tr4kWr4rArW3GFg_yoWfXrb_Aw
-	n7Kr4kGr4rZrn2yF4kCF45AFWIgrWa9a1vgr1Skasrt348ZF1qgr4kJr93J3Z7CF45Ary7
-	Jwn8JrWfWry3ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUUxnY3UUUUU==
-X-CM-SenderInfo: 5pr13t5qkd0jqwxwqiywtou0bp/1tbiNhKrfmdPyhvF7AAAsh
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Ensure enough space before adding MPTCP options in tcp_syn_options()
-Added a check to verify sufficient remaining space
-before inserting MPTCP options in SYN packets.
-This prevents issues when space is insufficient.
+On Thu, 14 Nov 2024 16:50:51 +0100 Sabrina Dubroca wrote:
+> +To prevent attempting to decrypt incoming records using the wrong key,
+> +decryption will be paused when a KeyUpdate message is received by the
+> +kernel, until the new key has been provided using the TLS_RX socket
+> +option. Any read occurring after the KeyUpdate has been read and
+> +before the new key is provided will fail with EKEYEXPIRED. Poll()'ing
+> +the socket will also sleep until the new key is provided. There is no
+> +pausing on the transmit side.
 
-Signed-off-by: MoYuanhao <moyuanhao3676@163.com>
----
- net/ipv4/tcp_output.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 5485a70b5fe5..0e5b9a654254 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -883,8 +883,10 @@ static unsigned int tcp_syn_options(struct sock *sk, struct sk_buff *skb,
- 		unsigned int size;
- 
- 		if (mptcp_syn_options(sk, skb, &size, &opts->mptcp)) {
--			opts->options |= OPTION_MPTCP;
--			remaining -= size;
-+			if (remaining >= size) {
-+				opts->options |= OPTION_MPTCP;
-+				remaining -= size;
-+			}
- 		}
- 	}
- 
--- 
-2.25.1
-
+Thanks for the doc update, very useful. I'm not a socket expert so dunno
+if suppressing POLLIN is the right thing to do. But a nit on the
+phrasing - I'd say "poll() will not report any events from the socket
+until.." ? Could be just me but sleep is a second order effect.
 
