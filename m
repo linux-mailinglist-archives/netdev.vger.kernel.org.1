@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-148929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 674949E37DC
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:49:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7E2A9E37DF
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:50:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C02A2818BF
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 10:49:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 397882809A6
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 10:50:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B574F1AF0DB;
-	Wed,  4 Dec 2024 10:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34233187555;
+	Wed,  4 Dec 2024 10:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HYQnrOXT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KB7E5aLB"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B55F1AC88B
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 10:49:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E04E1AC88B
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 10:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733309353; cv=none; b=mnrGL30fbJi9Sy8h+9mUAy59T2FHUbpYn6y47RqjTps4tOKfVH1wuiruuIAGFOABVSRBVAvwvj+dk5AYws3utUSR98yA4vxN7eilHazGNnCRC2LCOTdxd6RUbXv3MjdfbYDqG3AMZ0Ma1+289fJgyNLFQvGN4Z7jarQikRPSpBk=
+	t=1733309419; cv=none; b=mSjEfWCo90bW5H2xUeVN44odW7LkcJhzqiMQqG+jvPKL7ak8FVPLaWy5GNYfjlHhZUO6+WJwS8H4PqJHxXmz+8e8r2bfj65sO/07esrq8fVxyuF0532hDGZzspcqU1imrMvZap53VEK6/8ISQzNQsC4wAZvCs+JfmGEOlq1TK0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733309353; c=relaxed/simple;
-	bh=bGyB4438J81jRH4x6gWKO6BpBH8blrXI02fUkyoMcgo=;
+	s=arc-20240116; t=1733309419; c=relaxed/simple;
+	bh=O7AAxs6vW2+RO41dDnaUkO1eKDddNfEdy9sdkaeIrj8=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=E/zW5YLKORmQIQDKeYy1wbUwi3IkSEPjwMask4tLR9BuAx35Ww6z1CmxhjN64ko90UZ3BBlVFmUPYxHUAcw7gTstq9Dm7ZOZgFoRpmr2N9Btl1QZFksFehQFdhvwXdkihhSTsSLxRtm57Nhp07rY3ICqdhLzKOMWMU8mUH4aebU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HYQnrOXT; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=WTgivnopc5LLOP1/sCMpJg/h+ESCljecSKz95xElMNn10EfOVk/0LLraAwPsx+Yb8I6JlhpKsJycUAxj5Qx4Pe3cORxlpM+CMIvAq1SZGY+X1zqC4+Wd6WNMsiIH9K23AB0lu9G7nI+sX1s024tIaH+jWbCQ3IeP4WgRIPDu79M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KB7E5aLB; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733309351;
+	s=mimecast20190719; t=1733309416;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gTz3waxgahN3oOX83LVGcoQz1BmDfZdx8p5FTeZL4LM=;
-	b=HYQnrOXT4gK1jXJZ6Phz4bDdhK3JXseFPQb9cFwEm1dR/hn1vEVqUp/D7LbV4IND4d5WrJ
-	74skfoQBUTGrTwzA1YbZkOJLhMvVDoOlEp4LCPTXCjnkXM+PpocMQihFvbMZ+NEUs7a0lC
-	6i5/i8a04hN2apIu8wJzXcNOjRlJinw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=O7AAxs6vW2+RO41dDnaUkO1eKDddNfEdy9sdkaeIrj8=;
+	b=KB7E5aLBHCgKZ3EpzCB0MaC385AS7BbH7BQDPDAcssAqALFvp96GjBXUYSXq6WMa1bdQOA
+	JfjldVgQaXsYWP7Yb7hvkPzv9vj6VY/W3DBCDZk3fFdEIb1bwulnXH+XzbXJ3mv45ta2dM
+	+6jWQ/5w/deqLhY4Qg/Xf0BlJ2gAXpg=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-391-PX1vnPeJMPmT6wju_zmaAA-1; Wed, 04 Dec 2024 05:49:09 -0500
-X-MC-Unique: PX1vnPeJMPmT6wju_zmaAA-1
-X-Mimecast-MFC-AGG-ID: PX1vnPeJMPmT6wju_zmaAA
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-385e9c698e7so458071f8f.0
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 02:49:09 -0800 (PST)
+ us-mta-393-3ziiAD2yPx2Wn9OqqLJohw-1; Wed, 04 Dec 2024 05:50:15 -0500
+X-MC-Unique: 3ziiAD2yPx2Wn9OqqLJohw-1
+X-Mimecast-MFC-AGG-ID: 3ziiAD2yPx2Wn9OqqLJohw
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2ff13df3759so46533031fa.0
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 02:50:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733309348; x=1733914148;
+        d=1e100.net; s=20230601; t=1733309414; x=1733914214;
         h=content-transfer-encoding:mime-version:message-id:date:references
          :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gTz3waxgahN3oOX83LVGcoQz1BmDfZdx8p5FTeZL4LM=;
-        b=OuW+O5SWC+i9riVxeCmJanJ+HR6zM0ZNda0Iei3o45Heosn8CiKd8PjDYIUZLtqRZg
-         oGEOhw1h8BKVA6PPpwXrH15gMryjkT18DABXkaeYxOI/ecmqE4vGyIdPI5awyANPfdxa
-         1M0bbJ+7dcwHvuZhwaA6OkMRpCdalIhxGYv/h7VwB0H+o/r2g70tv3SpCirMMrDdNiCT
-         BA1RoXcAMd6u0xhQjq+bmExq4tvBZj/pQWgsP6QzuWE5LkRXSzQuwfUaLF/3kK8sYVVv
-         bxGz1QYAnLruexO/MpJ1ppwwfm8A4w+J15eAPPq8CG8sw/C8GsiFaUbG82Vw8hGAMfoO
-         lPIg==
-X-Forwarded-Encrypted: i=1; AJvYcCWN9Li4NNW94kW8jyl4v3sZ6r1YCMxZSvKMMnboXUbYYI66xOR6UPhg/VbmQEMcjTMDQFey4Z8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD7JNcCFtvfYm0z8f2sIPJ1wLGSapMe/IJIFdHL9no8se767LM
-	7ftRyGauerb83rEX1ectASiHiqCras0kNLHH4mtaKVYTI4VBWYxeHQpY4pAugBQBERXMctyZZE+
-	u4YMW/s8h5l/6vkSvhG6amuZjfpBHfvT+Zj71ahDjRecofqMN30CjtQ==
-X-Gm-Gg: ASbGncuh7IPX7GEEnrn7Fk5jYH0+u9mFGpRcKf6M05QrodjSrzfSkVQaSYkDvTz5uBB
-	gnTpXX140iMBq75/AIxQ7Ew2Ym/YL1/Drapp84O3MgLGIjtKY67oDsHWbTM9J37/b/gu4GKxvt/
-	BEmum9+Vpa5UKQ4SGmzcOQpI84w4Bvt7Y17btrJykxDHWZTLXfofzVNBkauI0e8cyEb4QpD56UU
-	AFzpMCEU/szt101abbRjjfoAMviha7vd8qkZewXBTTt7uE=
-X-Received: by 2002:a05:6000:401f:b0:385:ef14:3b55 with SMTP id ffacd0b85a97d-385fd9abb87mr4384222f8f.19.1733309348365;
-        Wed, 04 Dec 2024 02:49:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHcEgMypYhXM56G/nD3wm0gwci3A8/obXgJv7EiRTyM21DWn6RxvvWTZKFaMDEAHFySbGhZ5A==
-X-Received: by 2002:a05:6000:401f:b0:385:ef14:3b55 with SMTP id ffacd0b85a97d-385fd9abb87mr4384198f8f.19.1733309348033;
-        Wed, 04 Dec 2024 02:49:08 -0800 (PST)
+        bh=O7AAxs6vW2+RO41dDnaUkO1eKDddNfEdy9sdkaeIrj8=;
+        b=k2t63G52SyK4E8CmTBbzEQmKrP3Zu8CwFCa+75xZD8oLBbKd/wRi//pVHua5gDStNM
+         xxQq4Xf6xkPRX4g1Ogp0zpQBKynJTqLlHjX77lLfMwmSo35z6ovN443lw0icaHf5cIRM
+         tuLKA0o2wXDf0+ihjQjTBB57qvaSljHiz3lWNsZxcD9B/+fLJhlbJ3yTwmSYVRYhIUu/
+         h1vyHWHMhuFJ2oQGjF+RujCi14M94IzhMdxzdvHw7krhK6O5mnL6LYP+hWDzdidetjQd
+         /qoWPe5QhbvOfquQVtveRJIrU2vNrH21GOP7sPPoeN/BP2KCZ/v5VysH4VLIG6Sj0vSX
+         wH7A==
+X-Forwarded-Encrypted: i=1; AJvYcCWcwqz7eAVDixrbtjOHV+Ka2KsqdcCmBqJRRVTGpYEgv4GpLDkRUpdaIxSGutwaSuY+CpYSLI0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxjc6MRrwGppMaAkp9x+3eLUt+SggJsellotU8/kayDBEHT0XOE
+	hmWHF27DLzt91waMpzy2GVvKV1urWhaLlRrPmpEwjWLZGwozpAvrNF8u8aqoDdI6Jin/8aWYv6e
+	6MR7LVQ9EM5XxL2ha7ZzGTgORKXddzk9snI4+lCqBGk61mRBrQOiMDw==
+X-Gm-Gg: ASbGncsEiRFjpPLW31w5wc/QFEdKckGk6UdhETY4RJXDOIM8FUlDIsbkyO/pEoOxIko
+	IjRn5v5BjFIjNmLyU61IzFvRm11jJNYxD83VSnPEdfNoQvPYx+NXGTCNDb90W4j8QuSE8qr5Wl8
+	MgHRfTWIZRnNsgACzr7NbpnbQGc/kWRHGC5MfwX9Kx5OJrZg5N6tqK/B2E65YMA9+9ICUvO1mU/
+	F7YMdfH8eTc4Ql54f8goAaAHkN74Lg4hLJOwqLmomc9OXo=
+X-Received: by 2002:a2e:a58e:0:b0:2ff:d7e8:bbbc with SMTP id 38308e7fff4ca-30009ce0bacmr53657441fa.27.1733309413919;
+        Wed, 04 Dec 2024 02:50:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHfxB9/ZapzifOSM+BxHGW3corqQgL/f1b34L8O3QJCLkSmKjBpOXgMxOQShubXYhGxcR45sA==
+X-Received: by 2002:a2e:a58e:0:b0:2ff:d7e8:bbbc with SMTP id 38308e7fff4ca-30009ce0bacmr53657081fa.27.1733309413497;
+        Wed, 04 Dec 2024 02:50:13 -0800 (PST)
 Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385ccd36b80sm17799002f8f.29.2024.12.04.02.49.07
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa599973202sm712069266b.198.2024.12.04.02.50.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2024 02:49:07 -0800 (PST)
+        Wed, 04 Dec 2024 02:50:12 -0800 (PST)
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 8C43016BD10C; Wed, 04 Dec 2024 11:49:06 +0100 (CET)
+	id F2BBA16BD10E; Wed, 04 Dec 2024 11:50:11 +0100 (CET)
 From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
 To: Alexander Lobakin <aleksander.lobakin@intel.com>, Alexei Starovoitov
  <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
@@ -91,14 +91,14 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
  Magnus Karlsson <magnus.karlsson@intel.com>,
  nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 07/10] netmem: add a couple of page helper
- wrappers
-In-Reply-To: <20241203173733.3181246-8-aleksander.lobakin@intel.com>
+Subject: Re: [PATCH net-next v6 08/10] page_pool: make
+ page_pool_put_page_bulk() handle array of netmems
+In-Reply-To: <20241203173733.3181246-9-aleksander.lobakin@intel.com>
 References: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
- <20241203173733.3181246-8-aleksander.lobakin@intel.com>
+ <20241203173733.3181246-9-aleksander.lobakin@intel.com>
 X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 04 Dec 2024 11:49:06 +0100
-Message-ID: <87ttbjafkt.fsf@toke.dk>
+Date: Wed, 04 Dec 2024 11:50:11 +0100
+Message-ID: <87r06nafj0.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,29 +110,19 @@ Content-Transfer-Encoding: quoted-printable
 
 Alexander Lobakin <aleksander.lobakin@intel.com> writes:
 
-> Add the following netmem counterparts:
->
-> * virt_to_netmem() -- simple page_to_netmem(virt_to_page()) wrapper;
-> * netmem_is_pfmemalloc() -- page_is_pfmemalloc() for page-backed
-> 			    netmems, false otherwise;
->
-> and the following "unsafe" versions:
->
-> * __netmem_to_page()
-> * __netmem_get_pp()
-> * __netmem_address()
->
-> They do the same as their non-underscored buddies, but assume the netmem
-> is always page-backed. When working with header &page_pools, you don't
-> need to check whether netmem belongs to the host memory and you can
-> never get NULL instead of &page. Checks for the LSB, clearing the LSB,
-> branches take cycles and increase object code size, sometimes
-> significantly. When you're sure your PP is always host, you can avoid
-> this by using the underscored counterparts.
+> Currently, page_pool_put_page_bulk() indeed takes an array of pointers
+> to the data, not pages, despite the name. As one side effect, when
+> you're freeing frags from &skb_shared_info, xdp_return_frame_bulk()
+> converts page pointers to virtual addresses and then
+> page_pool_put_page_bulk() converts them back. Moreover, data pointers
+> assume every frag is placed in the host memory, making this function
+> non-universal.
+> Make page_pool_put_page_bulk() handle array of netmems. Pass frag
+> netmems directly and use virt_to_netmem() when freeing xdpf->data,
+> so that the PP core will then get the compound netmem and take care
+> of the rest.
 >
 > Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-
-Makes sense to have these as helpers, spelling out the constraints
 
 Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
