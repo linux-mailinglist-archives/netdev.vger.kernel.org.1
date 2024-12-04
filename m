@@ -1,120 +1,126 @@
-Return-Path: <netdev+bounces-148832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E64119E33E3
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 08:12:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9847C9E33EA
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 08:13:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73EDBB23AF4
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 07:12:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1346BB27618
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 07:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFBB18B482;
-	Wed,  4 Dec 2024 07:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BE517C7CA;
+	Wed,  4 Dec 2024 07:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="JnriCWgG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c/SM1mTQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B161E522;
-	Wed,  4 Dec 2024 07:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD47184
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 07:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733296371; cv=none; b=Kcgf5hplf7txFlRxBJT+2Xi0++0fK3qpE6D5iXFDvZ2Yl+r0cLAM4u9o04dic32x+1dvvSa0bdFkyHnOZ00MNoAUazffMHivuWOiloVq4nXXfkcrWbWs8HqIDcOsglFdNlW47iiRiEVG1l2nntH68DQO2FZKmsnDATO7H5Amk/I=
+	t=1733296428; cv=none; b=R/zwzMLt/b6Ku3Zb8xKVv8QmJpIGTlFFLkdYQeMgO918kxZs4ilTqaa+KyJtbQ3bYoy9aYgyBcSALTIwfLlBiQcLOOBbvde2gw0XT/63fx8xT/WivNOcylsKab+OL4PBQgLyA2cu4wKLuAVySFDqjk8AtxtcNNHvxv9fBm2ZMRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733296371; c=relaxed/simple;
-	bh=Zba78+gYrWAoBfrxNZ7VQ+Kvb5wQPYUwdoQFXqA5xpc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DGeemOZD9ItTui++m4ShkxVE1/YiTZZnZe3bYWEFbQTJqLupWzDCWmPYoXo2kocqM54jeQEa0ycPXmRGqvgLYuB0+nfTbOP7cQZx45U/OlX/IW6KrG2okUYEn76KgFvrQyaRcrp1WMMkYJxMOAbRNoH1KmOyBCdntbJWWOxzVAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=JnriCWgG; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1733296365; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=R2wd7f4YKjWBjF5YWtj+hMQ427DiXvpVSrWDNNtOBuo=;
-	b=JnriCWgGaGnqW5P0YPyY9ZfrgGT9s2kK4juO5hAfDS4w/UBXiRZjWsVtSCSZQbZXr1X1IHX95zeHPcADUTaTXVyPWcTJf+mNqFfN+HfteL8Sbr8d5GKAjA9kQ4i8KgU7Bc3B7Sg+TMuAy8K5u0ajIa6NJeHzuY0uC8cE3km4GiI=
-Received: from 30.221.101.58(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WKp7DFJ_1733296363 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 04 Dec 2024 15:12:44 +0800
-Message-ID: <2b9d0b12-6830-48d5-ad65-49f401c4e365@linux.alibaba.com>
-Date: Wed, 4 Dec 2024 15:12:42 +0800
+	s=arc-20240116; t=1733296428; c=relaxed/simple;
+	bh=RxK6ig1QG+U8Gkee48Ihs9mYUQ0cpt0lc9NWykqma0c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m4xGZ26oNWTh45Qa9IA7EFdWhpOmiBqI9ugEvHdwX2/CaX/lmglbW3sobkz4m8EI/VashvSRQuP+HNv7Ds/JpHLihC1wloN7HURxEWhmGRgldP0ejDVcUW0bgNDptHPr+y890RGdeML7Zo9+UccSzUQSY8AG0sGoDobah9IDUbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c/SM1mTQ; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-aa5500f7a75so987467166b.0
+        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 23:13:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733296425; x=1733901225; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RxK6ig1QG+U8Gkee48Ihs9mYUQ0cpt0lc9NWykqma0c=;
+        b=c/SM1mTQCNi1BRG5gr2jnjn9LWceB37b/kEgyDeLgewUmNY7hcNwVsqZhQkkl1ef39
+         J02QB9IIlldGV8UD0Pya8Z1MQOuQtHtch8TlT++2Fl5yHHpMNrWwuorJmFgEGNgaAwMn
+         1AU+zyvAG88sRz8icTg2PFU8t7GEueHSag6j+zcQvQeKk+7yayjY3W67u1755qyGytzn
+         LLPQ1+S7J8acIeUHPHsbcJyub/jO5M6h3vtcRCF12Q7nBk/1RrTbdwt5uQbl+lzZCiWu
+         M3ak1vhv00ePCG2t5ln/A5nLI3KW67RC7Qt1I8Dv8wHnHCswTn0n1484HfUg0YNCTU+q
+         0vCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733296425; x=1733901225;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RxK6ig1QG+U8Gkee48Ihs9mYUQ0cpt0lc9NWykqma0c=;
+        b=Xvtn1vem4DoLDglMG2CR+jTLjM144mYF0tyrawgk9EREko1qKpLyKldD2MJQwGokG+
+         4BMNTw7wo9VblpREzoVMBS8cjg2eZsVtNe4B1vQwbBmatu4djpjwp60EgxpaTT6Nqwbw
+         6C1bQufQ86LnZSUi350t7e9XPH6hSJRYUSRveiqujhBSS7KL9EMRvdlbEMtf/rYNRpFv
+         brlZjfFRmySjKOGtKOu5Qz/9SFVAXnZZXPNBq9UJyWeK4R7u9igl2OBQ85c7MegkJ31C
+         0nB9a6P7igitK98P6QF/5qnaLLneHu0XBG5qQ09fl1vNC71auZYGhMdr0K07HhsjBGFL
+         OiLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUqpiO3uf+3bXoWoVSBfQe9vKb0IhHSwsLLUetA0VQvdtU9mRPaWg2XeEs7n89fL3s/lhh652A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6hFBk1dTJ+gypQLzYZ24Se9cjvxjCkyPPOHAtiwNTgsefauHK
+	dojiBhQP4n7ycRxIqnZhIQtLTe0wgldlSAmHW8IUiLCLcTf1vEy5oHlUeXcDAcV4bIm1Rm/Kpf2
+	yZDxGxhm2c4L870jtQvGQ+TPAxwWFrppH78Dr
+X-Gm-Gg: ASbGncvaPxviE5bni6WqHRDUaV1mJ8gcsL19MrNEn+IhSMhnwoud6BGRwSdQ3FQv+ib
+	kX+AAZQVh51gPVuRdLY5WqcXea+1Wd3jf
+X-Google-Smtp-Source: AGHT+IFATKxKfipZD99t365IMpaLI/oEJaHPn7WUhe0I6xggt9vUtHK+D1UfTTWoa0bMN20yK7uOATQvS1VqNPkyQTw=
+X-Received: by 2002:a17:906:319a:b0:aa5:f288:e7e3 with SMTP id
+ a640c23a62f3a-aa5f7d15684mr462806366b.15.1733296424653; Tue, 03 Dec 2024
+ 23:13:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/6] net/smc: set SOCK_NOSPACE when send_remaining but
- no sndbuf_space left
-To: Paolo Abeni <pabeni@redhat.com>, wenjia@linux.ibm.com,
- jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, horms@kernel.org
-Cc: linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241128121435.73071-1-guangguan.wang@linux.alibaba.com>
- <20241128121435.73071-3-guangguan.wang@linux.alibaba.com>
- <62cd6d62-b233-4906-af4a-72127fc4c0f4@redhat.com>
-Content-Language: en-US
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <62cd6d62-b233-4906-af4a-72127fc4c0f4@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CGME20241203081005epcas2p247b3d05bc767b1a50ba85c4433657295@epcas2p2.samsung.com>
+ <20241203081247.1533534-1-youngmin.nam@samsung.com> <CANn89iK+7CKO31=3EvNo6-raUzyibwRRN8HkNXeqzuP9q8k_tA@mail.gmail.com>
+ <CADVnQynUspJL4e3UnZTKps9WmgnE-0ngQnQmn=8gjSmyg4fQ5A@mail.gmail.com>
+ <20241203181839.7d0ed41c@kernel.org> <Z0/O1ivIwiVVNRf0@perf>
+In-Reply-To: <Z0/O1ivIwiVVNRf0@perf>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 4 Dec 2024 08:13:33 +0100
+Message-ID: <CANn89iKms_9EX+wArf1FK7Cy3-Cr_ryX+MJ2YC8yt1xmvpY=Uw@mail.gmail.com>
+Subject: Re: [PATCH] tcp: check socket state before calling WARN_ON
+To: Youngmin Nam <youngmin.nam@samsung.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>, davem@davemloft.net, 
+	dsahern@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	dujeong.lee@samsung.com, guo88.liu@samsung.com, yiwang.cai@samsung.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, joonki.min@samsung.com, 
+	hajun.sung@samsung.com, d7271.choe@samsung.com, sw.ju@samsung.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Dec 4, 2024 at 4:35=E2=80=AFAM Youngmin Nam <youngmin.nam@samsung.c=
+om> wrote:
+>
+> On Tue, Dec 03, 2024 at 06:18:39PM -0800, Jakub Kicinski wrote:
+> > On Tue, 3 Dec 2024 10:34:46 -0500 Neal Cardwell wrote:
+> > > > I have not seen these warnings firing. Neal, have you seen this in =
+the past ?
+> > >
+> > > I can't recall seeing these warnings over the past 5 years or so, and
+> > > (from checking our monitoring) they don't seem to be firing in our
+> > > fleet recently.
+> >
+> > FWIW I see this at Meta on 5.12 kernels, but nothing since.
+> > Could be that one of our workloads is pinned to 5.12.
+> > Youngmin, what's the newest kernel you can repro this on?
+> >
+> Hi Jakub.
+> Thank you for taking an interest in this issue.
+>
+> We've seen this issue since 5.15 kernel.
+> Now, we can see this on 6.6 kernel which is the newest kernel we are runn=
+ing.
 
+The fact that we are processing ACK packets after the write queue has
+been purged would be a serious bug.
 
-On 2024/12/3 18:04, Paolo Abeni wrote:
-> 
-> 
-> On 11/28/24 13:14, Guangguan Wang wrote:
->> When application sending data more than sndbuf_space, there have chances
->> application will sleep in epoll_wait, and will never be wakeup again. This
->> is caused by a race between smc_poll and smc_cdc_tx_handler.
->>
->> application                                      tasklet
->> smc_tx_sendmsg(len > sndbuf_space)   |
->> epoll_wait for EPOLL_OUT,timeout=0   |
->>   smc_poll                           |
->>     if (!smc->conn.sndbuf_space)     |
->>                                      |  smc_cdc_tx_handler
->>                                      |    atomic_add sndbuf_space
->>                                      |    smc_tx_sndbuf_nonfull
->>                                      |      if (!test_bit SOCK_NOSPACE)
->>                                      |        do not sk_write_space;
->>       set_bit SOCK_NOSPACE;          |
->>     return mask=0;                   |
->>
->> Application will sleep in epoll_wait as smc_poll returns 0. And
->> smc_cdc_tx_handler will not call sk_write_space because the SOCK_NOSPACE
->> has not be set. If there is no inflight cdc msg, sk_write_space will not be
->> called any more, and application will sleep in epoll_wait forever.
->> So set SOCK_NOSPACE when send_remaining but no sndbuf_space left in
->> smc_tx_sendmsg, to ensure call sk_write_space in smc_cdc_tx_handler
->> even when the above race happens.
-> 
-> I think it should be preferable to address the mentioned race the same
-> way as tcp_poll(). i.e. checking again smc->conn.sndbuf_space after
-> setting the NOSPACE bit with appropriate barrier, see:
-> 
-> https://elixir.bootlin.com/linux/v6.12.1/source/net/ipv4/tcp.c#L590
-> 
-> that will avoid additional, possibly unneeded atomic operation in the tx
-> path (the application could do the next sendmsg()/poll() call after that
-> the send buf has been freed) and will avoid some code duplication.
-> 
-> Cheers,
-> 
-> Paolo
+Thus the WARN() makes sense to us.
 
-Hi, Paolo
+It would be easy to build a packetdrill test. Please do so, then we
+can fix the root cause.
 
-Thanks for advice, and the way in tcp_poll() seems a better solution for this race.
-I will retest it, and resend a new version of patch if it works.
-
-Thanks,
-Guangguan Wang
+Thank you !
 
