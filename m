@@ -1,146 +1,155 @@
-Return-Path: <netdev+bounces-149001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA8E09E3C39
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:09:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E91089E3C54
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:12:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4647916532A
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:09:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D38D916A435
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B26520899B;
-	Wed,  4 Dec 2024 14:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B1791F7589;
+	Wed,  4 Dec 2024 14:10:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SZNvK6XS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MNKkOQus"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4561F7096;
-	Wed,  4 Dec 2024 14:08:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8C31F8901
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733321330; cv=none; b=jfpH/V8jmXo8BlQtkjQ8Vzzilfs6tUi5jRCH4W9ttuu/LezVL6DtErddp4JAXbJbzsGjD4uY2bF31yR3w2XjbAl2YjvbFD1pQixhMP32cCST/OfHcVL2ecJAjfg5pYVrwDm4/L4Iw3AGICDxQbeytTUj998j7KdEczJrjrLoGS8=
+	t=1733321435; cv=none; b=ZiENfurbRfYwV9/q4Ymt/Uua7aenxO2Tw1yG4soZYX9F+K6yo8sbSqNYE2W6o9PRC/jA4/TdJhAjORCd5fst8IiqTcZX4U6d9ih3RjfVsgQEXqs5yTkGtNTeJsclr53y8chtIveF8tKZ+o8vJ+VPdDMS2j/W/iCj4tyEPj/IFR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733321330; c=relaxed/simple;
-	bh=1okdIYs91H96snC5/ndQeyXzr6F826zbfhNCRycItLc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QdeGfuM3idVTb9isfoZe0IqjQXRu/FvksxrlRktACXNHe5ObTOn99jnSegvHVXiaoJ2AAh8Q5TGVADQp1y0+1Oy7oplDeXvrsCTTr7yI1yA5GYbr3I2mBb4gmWgcSd5LRd1NQ7dNxiLddmADt9RVAbD8N9C686nd64kdWL/fMhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SZNvK6XS; arc=none smtp.client-ip=209.85.161.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5f1e79c2f81so3215739eaf.2;
-        Wed, 04 Dec 2024 06:08:48 -0800 (PST)
+	s=arc-20240116; t=1733321435; c=relaxed/simple;
+	bh=GVDsDE1B8g+/VPEJrLRC1jffhk036aDFnGYidI+v76s=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qNM206OYu5cAo6sYhoEbrNDWp+GPGtMRBbMryUwNv+gKnlF05WUTBd7m6bMvU3xRdqgJWTwAeaM2Exg3S/SNz9LB/PrlQApMd3gM7CKE7wTRuMJZDQmqJ9yHjxPyh75mJX8QwxLU3Vdc1cuW70GMRKFrDK197MLpHsufhCponJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MNKkOQus; arc=none smtp.client-ip=209.85.160.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4668d3833a4so141258201cf.1
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 06:10:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733321327; x=1733926127; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=vx0u3vo0+JUIMPSAFw/f3+EyZZy7ixLIYC9U8AZ9zVg=;
-        b=SZNvK6XSLRaGKZoji3Kq5o5BhKpbEIXrFxLtqcxY9lLRfW/T3vwIjWOkGTDRR6Tol9
-         VR6bAOpsXGzohUvo5QUp+aLIEg4RHVr3FyZIPg/1QZMR8+y5ecVHYlUq2n8Aunz580gX
-         Gzf6koUYSzCsuSw0zC6VTgp91yc+IF5yEcI4jEnRWQENoNa2vX+HkCrLJLKrTkGyqrYg
-         SQm5TXIQ84Uko1TFEuqk1MILtFjpK0YgYC+nUNckqtrka6eh+B7XTULgPkDtIfIzGbNW
-         ik5KegMTAB81GNqPp2rqTNgnYzHDXkfQ3QYifd7vsGUlBywdmBBPVFTYVgKW97ixRaFb
-         EBTQ==
+        d=google.com; s=20230601; t=1733321432; x=1733926232; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IW6Gotd2j4I5hRdGOPLy0chScrPfpQfQ+DQAd6uG4e8=;
+        b=MNKkOQusZvYDlhQnMaE8GLib+BYZSQi44NytM/hUqEi4oXkX3qhVihwv9XDEkeZWaa
+         +K4Qvtjdp1j55/zBM44BAWcutnjkVyIhudRM5znTFwd/WF8t4Iu3yMV6b5PE+VGwzAD0
+         5QEMaL8zNtVVX8VBA9mmTlvuwp0E9o0+2I68EBgclbuvA+T9J5KtdoabcEPxupWfFo99
+         lNXMk6MQ5U+DUPQ3a+ckxH8dbsAIxrCq3E4PIpAJgRJsVHlbA6KwDcBlxpnzLQxso1II
+         iLB+CyXFfTsZOhj1uPNLxlJQXQpop5WXtN1imsAiWI4rFpfBb05onVnHSM8Rn0w33Tzo
+         26qQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733321327; x=1733926127;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vx0u3vo0+JUIMPSAFw/f3+EyZZy7ixLIYC9U8AZ9zVg=;
-        b=bS0k+rYB1pSv4R8/s9Tw6axvUiClJpjf8PoAb6up5v65mTG85Bx30kqk8ws+48uKL/
-         sZ6BKOCIfcIFj26EAEHnrLKqKkIURtrHS6xPk/8ChVdD4D53RARmR75fziA/Iwlj0V3M
-         Z5ORpKoSPedr8Z8+R9pIpFk1JX++/OvkT0RBXAKX2ehCzvNxbiWoC445cXerq9YB9GJY
-         iAXg5FUZJk/089XXKgy74JzSKaClIwMEYnC0TYx+PIwG2kOzspikWefd8WmSSheKWmhN
-         BV50Z+wS0GYVT7Ufs+N2Wdj/5BHx7bkisA/JwPJ7tAxcuvrA7xzmZLNDAIkdF9QfjcLW
-         CMrg==
-X-Forwarded-Encrypted: i=1; AJvYcCXXJiOKvkdoq54gvREGdLjg733X5hZItI1c9+kC/e3ytVW6nR1RW+7VsIKkmYQs76Yzg8vN8xfFzfARK58y6A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIoAByv+duatNOgItrl/3IuWGXTy4Hj2rMp1OwZVrYYYwyItHX
-	KoLpzhpdfqNppE/6r4htDrEUzY9jsA21oXnuGGe+eGtOJQmaQ8qZbpYMjJdZCK7wdeoMv80grG2
-	DCKYdvWx5ru1c3oxeNGANTRMS9EgRAw==
-X-Gm-Gg: ASbGncvYPNr/YnPqs6YcJFq5EUk16tIK+vG7ZU1zWrkmLFGsgVm/n4ETie6ZGeOfRrK
-	fgXro2MAFHQhA3DNInzf4JD1aUR7GYltCFhnhdieOoXzlb/fmV/ILCFTDz6UDdw==
-X-Google-Smtp-Source: AGHT+IF0BqOExzj4u/H/mCCNIyAfyv+H3I4HsOxvBOgLtMLfNdBmAHGcjzh4GFjo5NNZ7IxIn7jIpmEBATx1iNJ0RT8=
-X-Received: by 2002:a05:6830:490d:b0:71d:634a:e0d6 with SMTP id
- 46e09a7af769-71dad6069d1mr8141136a34.6.1733321327458; Wed, 04 Dec 2024
- 06:08:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733321432; x=1733926232;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IW6Gotd2j4I5hRdGOPLy0chScrPfpQfQ+DQAd6uG4e8=;
+        b=k3/yv/dNLjMbHiDl4N51xzOlnvRsJS1l5JVBf2oXTJEl0lajDfLViJ/U8UamGkNk8C
+         sif94knIPZmpg+Q+As2SblkvvDeZ1wASke707+VRQU3Ava0FNfF8PvwIyT8PmlbFRyKI
+         AWlwB0BNm0/i56CxrqU995WisgHref6GGTUJDFpfYNNp2PuwTeb/AHE9tzgGQKdcqMPX
+         +9piMPoPma0663hUKZ8pWZ0Jy8ywUjaTrFD/bv+M2atnpJ/51Q2rx425toNR+QAVflX6
+         XmKs5KqbtyMWYxj0pAuHeFtyFEn0j74AYvfQMqHBaQ8ro7qg6+2zVT4xLg+dgr0C7YyN
+         60Pg==
+X-Gm-Message-State: AOJu0Yx2+Hwlz72otjggj+rWnM9lKEAA/kMlZOUoprO7ULqwziv0PoJm
+	BhJzMMDqYYwPxmt2lCaOpzWulZh0Q1r1BNJCk5krs8IbytcWF9L7iKMOnSVeajBvejsVZdmWlmO
+	/xpFdws8u8A==
+X-Google-Smtp-Source: AGHT+IG7yKzAWcBQ+CZG6p2WusnRE6cXRNGl8vvzhapiBZk+Sx5s6KdIUBa3ZMZdwIBGDlPY6YsREd+FPZKOvg==
+X-Received: from qtbfk14.prod.google.com ([2002:a05:622a:558e:b0:463:5a79:2fa5])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ac8:574e:0:b0:466:a41a:6448 with SMTP id d75a77b69052e-4670c141187mr91162371cf.18.1733321432290;
+ Wed, 04 Dec 2024 06:10:32 -0800 (PST)
+Date: Wed,  4 Dec 2024 14:10:31 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241203130655.45293-1-donald.hunter@gmail.com>
- <20241203130655.45293-8-donald.hunter@gmail.com> <016ba49a8b072f89fc4340341be166e26cc1b9a8.camel@sipsolutions.net>
- <CAD4GDZyCPiw1r02BHA_atDQdhsyVhxg=W1dnwi-Bc_tnkxtVeA@mail.gmail.com> <cc0a13f9674238d3b7607e9d9b58ee6e5cc4aa5c.camel@sipsolutions.net>
-In-Reply-To: <cc0a13f9674238d3b7607e9d9b58ee6e5cc4aa5c.camel@sipsolutions.net>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Wed, 4 Dec 2024 14:08:36 +0000
-Message-ID: <CAD4GDZxa-=_8DcVjz+=AQAyyiORey2U2sv6qmayoF34nTTN_cA@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 7/7] netlink: specs: wireless: add a spec for nl80211
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-wireless@vger.kernel.org, 
-	donald.hunter@redhat.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241204141031.4030267-1-edumazet@google.com>
+Subject: [PATCH net] net: lapb: increase LAPB_HEADER_LEN
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+fb99d1b0c0f81d94a5e2@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 4 Dec 2024 at 13:28, Johannes Berg <johannes@sipsolutions.net> wrote:
->
-> > > Also, I don't know how we will maintain this if it's not tied to any
-> > > kernel code. What do you suggest? Do you want to just maintain it
-> > > following the nl80211.h spec all the time?
-> >
-> > It's a good question. I am okay with maintaining it alongside the
-> > nl80211.h file, which will likely motivate me to write some automation
-> > at least for notifying any divergence. There might come a time when it
-> > becomes desirable to generate some of nl80211.h from the spec, as
-> > Stanislav Fomichev is doing for ethtool here:
-> >
-> > https://lore.kernel.org/netdev/20241202162936.3778016-1-sdf@fomichev.me/
->
-> I think I wouldn't mind that - I'm hoping it'll also generate policies
-> etc.? Though on that front we probably have weird quirks too ...
+It is unclear if net/lapb code is supposed to be ready for 8021q.
 
-Yes, the policies are generated, quirks notwithstanding ;-)
+We can at least avoid crashes like the following :
 
-> But until then I guess someone's going to have to maintain it, and I'm
-> not sure I want that to be me right now :)
+skbuff: skb_under_panic: text:ffffffff8aabe1f6 len:24 put:20 head:ffff88802824a400 data:ffff88802824a3fe tail:0x16 end:0x140 dev:nr0.2
+------------[ cut here ]------------
+ kernel BUG at net/core/skbuff.c:206 !
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 1 UID: 0 PID: 5508 Comm: dhcpcd Not tainted 6.12.0-rc7-syzkaller-00144-g66418447d27b #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
+ RIP: 0010:skb_panic net/core/skbuff.c:206 [inline]
+ RIP: 0010:skb_under_panic+0x14b/0x150 net/core/skbuff.c:216
+Code: 0d 8d 48 c7 c6 2e 9e 29 8e 48 8b 54 24 08 8b 0c 24 44 8b 44 24 04 4d 89 e9 50 41 54 41 57 41 56 e8 1a 6f 37 02 48 83 c4 20 90 <0f> 0b 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3
+RSP: 0018:ffffc90002ddf638 EFLAGS: 00010282
+RAX: 0000000000000086 RBX: dffffc0000000000 RCX: 7a24750e538ff600
+RDX: 0000000000000000 RSI: 0000000000000201 RDI: 0000000000000000
+RBP: ffff888034a86650 R08: ffffffff8174b13c R09: 1ffff920005bbe60
+R10: dffffc0000000000 R11: fffff520005bbe61 R12: 0000000000000140
+R13: ffff88802824a400 R14: ffff88802824a3fe R15: 0000000000000016
+FS:  00007f2a5990d740(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000110c2631fd CR3: 0000000029504000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+  skb_push+0xe5/0x100 net/core/skbuff.c:2636
+  nr_header+0x36/0x320 net/netrom/nr_dev.c:69
+  dev_hard_header include/linux/netdevice.h:3148 [inline]
+  vlan_dev_hard_header+0x359/0x480 net/8021q/vlan_dev.c:83
+  dev_hard_header include/linux/netdevice.h:3148 [inline]
+  lapbeth_data_transmit+0x1f6/0x2a0 drivers/net/wan/lapbether.c:257
+  lapb_data_transmit+0x91/0xb0 net/lapb/lapb_iface.c:447
+  lapb_transmit_buffer+0x168/0x1f0 net/lapb/lapb_out.c:149
+ lapb_establish_data_link+0x84/0xd0
+ lapb_device_event+0x4e0/0x670
+  notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
+ __dev_notify_flags+0x207/0x400
+  dev_change_flags+0xf0/0x1a0 net/core/dev.c:8922
+  devinet_ioctl+0xa4e/0x1aa0 net/ipv4/devinet.c:1188
+  inet_ioctl+0x3d7/0x4f0 net/ipv4/af_inet.c:1003
+  sock_do_ioctl+0x158/0x460 net/socket.c:1227
+  sock_ioctl+0x626/0x8e0 net/socket.c:1346
+  vfs_ioctl fs/ioctl.c:51 [inline]
+  __do_sys_ioctl fs/ioctl.c:907 [inline]
+  __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
 
-Ack that. The burden is on me.
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot+fb99d1b0c0f81d94a5e2@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/67506220.050a0220.17bd51.006c.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/lapb.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > > > +      name: get-wiphy
-> > > > +      doc: Get information about a wiphy or dump a list of all wiphys
-> > > > +      attribute-set: nl80211-attrs
-> > > > +      do:
-> > > > +        request:
-> > > > +          value: 1
-> > > > +          attributes:
-> > > > +            - wiphy
-> > > > +        reply:
-> > > > +          value: 3
-> > > > +      dump:
-> > > > +        request:
-> > > > +          attributes:
-> > > > +            - wiphy
-> > > >
-> > >
-> > > This already seems wrong - dump wiphy really should unconditionally
-> > > include NL80211_ATTR_SPLIT_WIPHY_DUMP these days.
-> >
-> > Yes, the valid parameter attributes should be wiphy, wdev, ifindex and
-> > split-wiphy-dump by the look of it.
->
-> Well there's that about valid parameters, but also no (new) tools today
-> should ever *not* include the split-wiphy-dump attribute. I guess that
-> can't be expressed here, but it's a gotcha for implementers that just
-> follow the YNL spec?
+diff --git a/include/net/lapb.h b/include/net/lapb.h
+index 124ee122f2c8f8e08f4b1a093673ab330996fe39..6c07420644e45aa3eec64dbd2cf520b14dc8b9e0 100644
+--- a/include/net/lapb.h
++++ b/include/net/lapb.h
+@@ -4,7 +4,7 @@
+ #include <linux/lapb.h>
+ #include <linux/refcount.h>
+ 
+-#define	LAPB_HEADER_LEN	20		/* LAPB over Ethernet + a bit more */
++#define	LAPB_HEADER_LEN MAX_HEADER		/* LAPB over Ethernet + a bit more */
+ 
+ #define	LAPB_ACK_PENDING_CONDITION	0x01
+ #define	LAPB_REJECT_CONDITION		0x02
+-- 
+2.47.0.338.g60cca15819-goog
 
-There's no way to specify that, but the constraint can be described
-clearly in the doc string. I'll do that for v2.
-
-Thanks,
-Donald.
 
