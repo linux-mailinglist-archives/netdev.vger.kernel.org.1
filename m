@@ -1,106 +1,144 @@
-Return-Path: <netdev+bounces-148977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 863AA9E3B2E
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:21:41 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB0079E3B99
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:46:21 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0A73164847
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:21:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8FA33B23E94
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78861D6193;
-	Wed,  4 Dec 2024 13:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC8B51AF0CD;
+	Wed,  4 Dec 2024 13:22:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hLl8WkiH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XlIe41K3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408331CDFCE;
-	Wed,  4 Dec 2024 13:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB59189F57
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 13:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733318435; cv=none; b=r/7m5kv3eoSb36e3A+zOE33TAyS5xQO9AxaGDzOak6hg8qXSLv+dOXJPOzYZmH0WzXcRHE9tVy13sI8XOUxmibXEIlghw2qi1iB/0JIKYYEN9xzP/TTsKRhCnXNOfXADiIKS7kvqio/QrDLQpvex7X4bw38xkR20UdCPBWxUle8=
+	t=1733318555; cv=none; b=ggdOQpNVi45q2+c8UhEXaBKngTCe/2Tu63fMeQKTfmAz5Up7rIDQlJN4GSFl1fldbPjnWkZaeya+YwYO1kHaqZwJyby+F1kD/rAXwvPPvWE+PcbH/1puphI8F8pcKgnWhpaaswSuD/4RrynpY5BlBJPz3UH0KabSUN/YTWGvRjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733318435; c=relaxed/simple;
-	bh=0TxWXdNFkki88u5J/bhHHT4PpXFvvjxKAI5piXepKc8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jmDw8nguBO2rGM7HmlwTWKDnBYS32J2WkrQ/aXZDENnUUWzg9l9fM+6toVfK3CbHZRgXruc2OsyUNT4ip3e5LoqvtaxVTyUaBX2AnkO/fChSu68XoQ+TLkfFs5fPUYrVgPILriN3/mJlB+vuHqYDTJWyTRpQ4PMn5fftqW61oOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hLl8WkiH; arc=none smtp.client-ip=209.85.167.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3ea45abb4e1so2866403b6e.3;
-        Wed, 04 Dec 2024 05:20:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733318433; x=1733923233; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QRlTkMqs9ZfBQR47T3aGcTc0QhtFrpV0/8QrOOsn3DQ=;
-        b=hLl8WkiHOZsi7AIq0MxAuPYvELZi+0+7geTrr9y57qYyKZXGiJ+vXIjTgasC/LLJ76
-         bcsWnDSDpCOQtavJBvdMVHBWvSYhp7ZGyKQ+RNcCsUgvTwQLOBvJ9XFsBnIQsfsTK96o
-         l1/c2oRE6Lq5TGHBJTCR8uEWWRjnKTlNx7xqEjv93bcNP6f6YJxgYprMRbIMlQToHrQV
-         tAm4hXiS+uX33S4pFCs6RgWa+316BmOHRCDheGuI6k3F1sU8W5ovvknK2ohaVD3qfRGa
-         E0zfJn/pAQ/7/Dr/lieQ/SVd3CVY4M0Z0e1n1xSdDe0e9Sj8PSyS8NTgDFdtndyGZlqG
-         oLkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733318433; x=1733923233;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QRlTkMqs9ZfBQR47T3aGcTc0QhtFrpV0/8QrOOsn3DQ=;
-        b=LPZAQ86U9ZhEtOyG+gpnjjM9kYk5XHQutXDPbo9KyZf1rMAXDo8R5BWMe17SWyYjWW
-         qXdYJrCYdbZFMX/422/eHly4u7AKo/6xFSeH0U1Os5dZVXonM81EcsKxm42HucXd0Zj8
-         4gCeZ8T/mE/L3jp2sMT1gbmd7mH/3xiZ6uJPA9kZGANTLZ2/p9Hx3L6RqIBt20NN84vE
-         jLnixxhB4XQrOnPPKzvJa+jLzALvJfVURUL5k9IcRaEW+xAAd3UQ8Jwwoxzr4RWHXK6K
-         QMkyB/yIQsch1Ixelzg2qbvjFndOaX0mr0V+npuoBb8cL8E5ac1+sYISXZ/Qdp9rL8iE
-         wjHA==
-X-Forwarded-Encrypted: i=1; AJvYcCWqsScDkXFdJv4ieK7E8QDysErqNEt3aRyjDwCJmrO6sI8pecK/FOKmpTW4/zF10aVGJpNc9BSM6GauuOYFwg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxA1AgoSMLGd1ew7jWLrfU3N2s8tojxZPiMQ1ISPjY8vxORSuQR
-	S7+Zhy32MUuQ/WzXpOFMVYlJrO6+H1kzSxThckVehkVlMs1ad/HvwI2Hz4kySpppfxb0U4oEL0l
-	C1vM2sq6yAHk5+oOCpzYoVYFVk9s=
-X-Gm-Gg: ASbGnctQbAE2TKYsEsaIMA4zBKKKHL7OCRSI2M8Yqk6l1pI+M1okc6xaZf9idtA/WKd
-	COyLJMxYjeQ90ySb6I4FjBxfgX4g0g/HTzetBhEntc4sL6D5ElUv/8RbRjy5UZA==
-X-Google-Smtp-Source: AGHT+IGym5HijAH6xZgFbwx7wkr5e+fjQxB5fmzYUz/Lq2LCltytJWzJhJu2LJrm/Vrxd98GVE0VCYf2njyfreUHaTM=
-X-Received: by 2002:a05:6808:238a:b0:3ea:3f06:4302 with SMTP id
- 5614622812f47-3eae50ab5f9mr6914568b6e.33.1733318433276; Wed, 04 Dec 2024
- 05:20:33 -0800 (PST)
+	s=arc-20240116; t=1733318555; c=relaxed/simple;
+	bh=xjbVOAw11UkVjMBe9c9V269dVjQ70I1jCvLYv7Db78c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rNNiC8Ltkz9AK3JBpa766NSCimpdiHcaYVXDmG8xn7BB/2RsF5HLKK//YRWeTNF/ZLbi9VpsMnkTTj//hCn5DWGsFDI7sZzAGZ2DreAaLKjWTReAuyhVHOAARXvvIqKtwCYoXjSfn4twHaDlVzSp1eUxNCxYAupWdDVQf8Wvi3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XlIe41K3; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733318554; x=1764854554;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xjbVOAw11UkVjMBe9c9V269dVjQ70I1jCvLYv7Db78c=;
+  b=XlIe41K36XqwD3FMumE/6D5n7w9RskOtNy8YOymRspj9yfQx0uIZiKJX
+   1z4lNTVUHCrjj4OJPvZ4pBVLl1E5rCw4+mdeAN+1M7YdcIdgP782P1HSq
+   i1FR8l2wBKDDcRcQ3bLNDNybKZyVlhau7UtI2KSnQttIwcP6A1jf04Yj1
+   z2Hd0eHGvUG92m5UfAhSX96mJxcVsAKcsXosAtwHqbk2KVZ9+zF3mT/J4
+   au1NAymg2IL1k+ASXWKUvlXv8roG5LdWDBx9fjellokDZmRivGWsOq7fd
+   QNtFR1hSJlSOU4U+FQR/iujQghNLHPPqJ3DNi0NE2i5EhUXmYqTrUMjll
+   g==;
+X-CSE-ConnectionGUID: 7fcJra4sQDGPxtNWKhJkhQ==
+X-CSE-MsgGUID: 2CXVlFkwSKSdBDCGFce4+w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="44193996"
+X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
+   d="scan'208";a="44193996"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 05:22:33 -0800
+X-CSE-ConnectionGUID: Jzkjqa9qQRyWhIwNsfSBgA==
+X-CSE-MsgGUID: NhqA2S8TR6e75c5kZdSRAg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="98785944"
+Received: from pae-dbg-r750-02-263.igk.intel.com ([172.28.191.215])
+  by orviesa003.jf.intel.com with ESMTP; 04 Dec 2024 05:22:30 -0800
+From: Przemyslaw Korba <przemyslaw.korba@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	richardcochran@gmail.com,
+	andrew@lunn.ch,
+	olteanv@gmail.com,
+	milena.olech@intel.com,
+	pmenzel@molgen.mpg.de,
+	Przemyslaw Korba <przemyslaw.korba@intel.com>
+Subject: [PATCH iwl-net v2] ice: fix incorrect PHY settings for 100 GB/s
+Date: Wed,  4 Dec 2024 14:22:18 +0100
+Message-Id: <20241204132218.1060616-1-przemyslaw.korba@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241203130655.45293-1-donald.hunter@gmail.com>
- <20241203130655.45293-3-donald.hunter@gmail.com> <20241203180008.64720493@kernel.org>
-In-Reply-To: <20241203180008.64720493@kernel.org>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Wed, 4 Dec 2024 13:20:22 +0000
-Message-ID: <CAD4GDZxU-nafwtf2-NaB75hnOKkJo401sD0UWk2E30iHm1uwYg@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 2/7] tools/net/ynl: support decoding indexed
- arrays as enums
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Johannes Berg <johannes@sipsolutions.net>, linux-wireless@vger.kernel.org, 
-	donald.hunter@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, 4 Dec 2024 at 02:00, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Tue,  3 Dec 2024 13:06:50 +0000 Donald Hunter wrote:
-> > When decoding an indexed-array with a scalar subtype, it is currently
-> > only possible to add a display-hint. Add support for decoding each value
-> > as an enum.
->
-> Makes me wonder if we should factor this code out into a helper.
-> But there aren't too many sites with this code so fine either way:
+ptp4l application reports too high offset when ran on E823 device
+with a 100GB/s link. Those values cannot go under 100ns, like in a
+working case when using 100 GB/s cable.
 
-I'll look at potential refactoring as a follow up.
+This is due to incorrect frequency settings on the PHY clocks for
+100 GB/s speed. Changes are introduced to align with the internal
+hardware documentation, and correctly initialize frequency in PHY
+clocks with the frequency values that are in our HW spec.
 
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
+To reproduce the issue run ptp4l as a Time Receiver on E823 device,
+and observe the offset, which will never approach values seen
+in the PTP working case.
 
-Thanks,
-Donald.
+Reproduction output:
+ptp4l -i enp137s0f3 -m -2 -s -f /etc/ptp4l_8275.conf
+ptp4l[5278.775]: master offset      12470 s2 freq  +41288 path delay -3002
+ptp4l[5278.837]: master offset      10525 s2 freq  +39202 path delay -3002
+ptp4l[5278.900]: master offset     -24840 s2 freq  -20130 path delay -3002
+ptp4l[5278.963]: master offset      10597 s2 freq  +37908 path delay -3002
+ptp4l[5279.025]: master offset       8883 s2 freq  +36031 path delay -3002
+ptp4l[5279.088]: master offset       7267 s2 freq  +34151 path delay -3002
+ptp4l[5279.150]: master offset       5771 s2 freq  +32316 path delay -3002
+ptp4l[5279.213]: master offset       4388 s2 freq  +30526 path delay -3002
+ptp4l[5279.275]: master offset     -30434 s2 freq  -28485 path delay -3002
+ptp4l[5279.338]: master offset     -28041 s2 freq  -27412 path delay -3002
+ptp4l[5279.400]: master offset       7870 s2 freq  +31118 path delay -3002
+
+Fixes: 3a7496234d17 ("ice: implement basic E822 PTP support")
+Reviewed-by: Milena Olech <milena.olech@intel.com>
+Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+---
+Changelog:
+v2:
+change commit message
+v1:
+https://lore.kernel.org/intel-wired-lan/20241126102311.344972-1-przemyslaw.korba@intel.com/
+---
+ drivers/net/ethernet/intel/ice/ice_ptp_consts.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
+index 6620642077bb..bdb1020147d1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
+@@ -761,9 +761,9 @@ const struct ice_vernier_info_e82x e822_vernier[NUM_ICE_PTP_LNK_SPD] = {
+ 		/* rx_desk_rsgb_par */
+ 		644531250, /* 644.53125 MHz Reed Solomon gearbox */
+ 		/* tx_desk_rsgb_pcs */
+-		644531250, /* 644.53125 MHz Reed Solomon gearbox */
++		390625000, /* 390.625 MHz Reed Solomon gearbox */
+ 		/* rx_desk_rsgb_pcs */
+-		644531250, /* 644.53125 MHz Reed Solomon gearbox */
++		390625000, /* 390.625 MHz Reed Solomon gearbox */
+ 		/* tx_fixed_delay */
+ 		1620,
+ 		/* pmd_adj_divisor */
+
+base-commit: 6ef5f61a4aa7d4df94a855a44f996bff08b0be83
+-- 
+2.31.1
+
 
