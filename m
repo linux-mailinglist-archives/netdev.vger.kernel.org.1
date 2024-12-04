@@ -1,163 +1,130 @@
-Return-Path: <netdev+bounces-148924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EDDB9E3747
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:12:38 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E75FB9E3790
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:34:41 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1F0E165A5C
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 10:12:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79BC6B2D0B2
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 10:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84FFE1ADFF1;
-	Wed,  4 Dec 2024 10:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8AD1AE850;
+	Wed,  4 Dec 2024 10:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b="EzytqyZx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cTu10DPk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5781AB528
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 10:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E8918CBF2
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 10:27:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733307152; cv=none; b=rNBZ2ZJ/TE+eW+qOm3KUuryd+CEQo4FClfNP+TWuHVDp/pPgLc5qfK0XBnj9ARML0AqMncEr4cpDYjXgw/XGiSx6C8BzuZTX9MUIukd1SWlpWG/uH7NuZkUviJa4ilIoj1od61wqgczNNGS8BElgWQwUv+AVpshjOj5ZpdBCVMc=
+	t=1733308032; cv=none; b=qk9gCM5KKkd8zGk3eCcycJISsrbksDIeM1ILxUI7pOpFkCbK555dAOaB9BGISD5KOljYvcHVO6HpRlcW1usz8/GSuqCscHJFRPbo+FOtF4y1fWuUbga/dY4FIMDQuSdrDiHL6qCOwrB3y4MTQI0/SmaZDHo6/g1IK7FGVkW0YzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733307152; c=relaxed/simple;
-	bh=bDcBWgVILMB12NHWB4fcs1W4araBsBKWumSB2kQnUP8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d1LsZEdk6xvHxJB9nuAdo727z2hpZCfFNsPp55J1o9YjMsZ9gLhm8TihT75JyZgDDxSiF7RZHGuLzL208rfXOzDUQsdShSAvMdbG1t+FlmEXMcYqvHhRo73K3dVWCprM/0d23aZHyogdZBv/kEtEd1kZD+UERH5Rmh1jKDuc4eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com; spf=none smtp.mailfrom=andrewstrohman.com; dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b=EzytqyZx; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=andrewstrohman.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-6ef402e4589so63795807b3.0
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 02:12:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=andrewstrohman-com.20230601.gappssmtp.com; s=20230601; t=1733307149; x=1733911949; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=r8yJtp0VtRWCyGUDMUPSKyYrOKeXIERy5/6YkYGZGIw=;
-        b=EzytqyZxKNKvA5/TqCooxuF2jLO+c5FGJAlsaYPPTuSi8ZC68Q26O5WRzENi6ZIOz1
-         qgCYcZMKs1BbKetL0drec+uD6DyIDMyeLda9n6pseBqHz4ILj8DpDVKMnoRLBpB0uMBj
-         tA6FbPb+FahgWhkDVFGsS7kqQVaoboyPDjZeLmtwuE+9BLN03zXy2S7XfV16hIsDU8QF
-         FObGw7bQuSPuQlOH6rhV6F5sIH6UCQ56VK7+awQ/ftuDAEXu/ifqENySMtt3T7Sl6uyp
-         uBOTD6YqwZsykpshi4ZZYcYfuuz9wkzTr3Qo19wmImXonJOGeFVGVKHLPl0WvqX6zvN8
-         fNAQ==
+	s=arc-20240116; t=1733308032; c=relaxed/simple;
+	bh=TcvLj2S2OjDxK6FFIIsAz8V5/hiEAxoKPJXKYM4G2K4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=TZdGU0dO0/ZNFxQChRMVN3ViI6+TORHikndNXyhrwydg7H55WGBkDq4vZAhY4JDDjaliagy9PIGg+cjZX1rRWdfiGbvRQw1QTouJYqSK6YRJsAgrAOFqrPHGmxVML5fTMByaFTMxoLwJagduDXR6I9IAmxuTG6A6GkdIeiwPALQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cTu10DPk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733308025;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TcvLj2S2OjDxK6FFIIsAz8V5/hiEAxoKPJXKYM4G2K4=;
+	b=cTu10DPkaZMuj859idm4LCfo+z+ZGb+FgCEYwILtpsq69mnr5taWzgw5qMooCIF9Blt6Kh
+	XgPgkIYF3sebDr11jSseDEvxxku2jydcEhVumlyjo46caDjLrG8eTLVwYFComa3NAl7V2H
+	xL9SI3JIhAZoaywsAQUjgaq4wXrQ90E=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-669-QctEnXUEMbih85ju2TuESA-1; Wed, 04 Dec 2024 05:27:04 -0500
+X-MC-Unique: QctEnXUEMbih85ju2TuESA-1
+X-Mimecast-MFC-AGG-ID: QctEnXUEMbih85ju2TuESA
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-434a96889baso37581985e9.2
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 02:27:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733307149; x=1733911949;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r8yJtp0VtRWCyGUDMUPSKyYrOKeXIERy5/6YkYGZGIw=;
-        b=l12iaoid4X0rRH+3SNnIRpSPgnjcfiBI1QqiR0043AKuERKxJgE1ZhmuWc25DnA7Uk
-         TAEKdzWAjvZOEsfNjd2yC6GBpCoy1MpT43luqFBLevA0I4y8ruTBrlLaND/iRHlFAdUG
-         bLY3c7WTmrn/gZmov5OA9NOYdNnkKCZaQKAfl2HgltLYGAo32IHHUQnk0SmAfNcDJg7v
-         caBJ7x7R99loZlTUiXyEii8UYjMEEznAiNUHkJEAEjznmEURUux4laPbkdhyP9G9mq+t
-         y32Eo0bfXF1dNHwekrxsIsfsTmPLVXwfolYQSfUc+Guuvuc/DHZnjufJQJLDTA4UmdWH
-         Z9hA==
-X-Forwarded-Encrypted: i=1; AJvYcCWPVLzwzINdkzXVX62+e8NesPHCEqbSBEQyxb4jbUIMdK2g7ZdP3tz63dDSlL6UbMg06mUc21o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxD8DrF1qQuhesRXWCc0bdC7MalvVNyYuOT6ck4svITMU8t4+nm
-	/iT6nuArnYVGqX6xZ/7uQhmBX3g/TJtZ1X5Qa0XwHsazKUVY82+OaWZutfF0KTjbgzjj2/ZeEgo
-	17bJOEukAC+5s3YGiYrWizrD0xw5SNhpTrbBh1A==
-X-Gm-Gg: ASbGncveSCXidZ+FoeW+V9n/R/5ywPsMHsdTT4kjjg4lBM6LfuM8KRvflwqGiJ9Evzo
-	7IQC2sNl70ii+o/8GfPKEtNA6Ua0GAmg=
-X-Google-Smtp-Source: AGHT+IFiZwav0lkXcdEoC0k0swq2tYz4RZsKxcJnENpHGhhnbUCXatljeleEVM5PesTsKopimNNDdHD+hwBm2MoI2HY=
-X-Received: by 2002:a05:690c:46c7:b0:6ef:69b2:eac with SMTP id
- 00721157ae682-6eface0164dmr68389077b3.4.1733307149315; Wed, 04 Dec 2024
- 02:12:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733308023; x=1733912823;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TcvLj2S2OjDxK6FFIIsAz8V5/hiEAxoKPJXKYM4G2K4=;
+        b=rQM/+KXLoRHHiJHC6BqDkxgu8d2AsiYuzVumKd1EmOrjXS6e95T5r3eTsppcL/DTNo
+         TimF/QsYYAMcaI9pXkxUMyn+GE6IIUl8dFcJhMnQ3pkLj6ynedE7ekfp2w5zljS6gDyd
+         Cl0Yw/jPkCpYdhK13OdlBzp9VQVp/iI2DOSn5siTj+5lcxQ8psAtMRufoc98WuXyzbSn
+         MFdPSL6OoClQVPeOeKW3eFr/aLkOZ4s4zjxfB8cVWyXyiQHNFk+CKwuRMpeJiEBu3Ljg
+         yU7l5SR3gdGF/gjcQIaQEbUzzWY3jO5LMRgBb+uIavOXKkuw4eMgkU7cLPMMyG7Tclvg
+         UKtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWLFQamo3+GTgHiU9yJKT4ZIJFo1KI2gECNS879iD5oEw6WLhayhcfJU621EcAlYxb7kMbAm7I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdA4SZPwDsLp6ulcWvmWpxflFScAsgwTyumiMQqnkzQR2NYrQZ
+	E5Jiu4hO94z9gXaQ6W49gmA7Q7Xn/ODplMFW5fyURLgs1eAlhSPQtAhtIcxD/3IgK+uBvyizWp6
+	l4G4LDdimA677wko+YIrQwZT+tSZIyGCOzYoqPnAiXnQa66Ook30xEA==
+X-Gm-Gg: ASbGncuT+nRhzAzyGqQFmbR5I7tvk6WUdT3KSd6G5rZgzE8vB94vFQdb92H8R6OSoRm
+	FYXItYlkoSCd5Lh5xwd8LxDEYNryB3Xi9MYVst4po/rm8a5A65y4JnPV+zYl5HUjP3i4XpdTo3Q
+	kGN631ia6u5YrlPb/75N8oRUXic80hGbXurFVxUlXrON1P30fKSiEoDpH/o8Gzsi/upuoFrbeuV
+	qbXY29IltgHYmLqtHacwYlMyd9SukK5uiWDnWd6B+iKhlE=
+X-Received: by 2002:a7b:cb53:0:b0:434:a0fd:f9d1 with SMTP id 5b1f17b1804b1-434d3fcc5a1mr27614155e9.20.1733308022855;
+        Wed, 04 Dec 2024 02:27:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGrwtYSrQPLjelyylTwa5mbuvmc0j1pKxbIGN9w4X2omiDFt+X87GdnSjiNK+8A1PwN0nLaeg==
+X-Received: by 2002:a7b:cb53:0:b0:434:a0fd:f9d1 with SMTP id 5b1f17b1804b1-434d3fcc5a1mr27613995e9.20.1733308022549;
+        Wed, 04 Dec 2024 02:27:02 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d527e8besm19322735e9.13.2024.12.04.02.27.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 02:27:01 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 0AA1416BD104; Wed, 04 Dec 2024 11:27:01 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
+ <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6 01/10] xsk: align &xdp_buff_xsk harder
+In-Reply-To: <20241203173733.3181246-2-aleksander.lobakin@intel.com>
+References: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
+ <20241203173733.3181246-2-aleksander.lobakin@intel.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 04 Dec 2024 11:27:01 +0100
+Message-ID: <87wmgfaglm.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241130000802.2822146-1-andrew@andrewstrohman.com>
- <Z0s3pDGGE0zXq0UE@penguin> <CAA8ajJmn-jWTweDMO48y7Dtk3XPEhnH0QbFj5J5RH4KgXog4ZQ@mail.gmail.com>
- <20241202100635.hkowskequgsrqqkf@skbuf> <CAA8ajJkPzpGRXO6tX5CkgX7DjGwR6bPyT4AXjZ0z8kXBk8Vr_g@mail.gmail.com>
- <20241204084817.g7tort3v3gwdzeic@skbuf>
-In-Reply-To: <20241204084817.g7tort3v3gwdzeic@skbuf>
-From: Andrew Strohman <andrew@andrewstrohman.com>
-Date: Wed, 4 Dec 2024 02:12:18 -0800
-Message-ID: <CAA8ajJnRPB=KRcDpQiAJww3Apv6ZGqWaAg5stSjOE99BOmkCjg@mail.gmail.com>
-Subject: Re: [PATCH net-next] bridge: Make the FDB consider inner tag for Q-in-Q
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, 
-	Petr Machata <petrm@nvidia.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, UNGLinuxDriver@microchip.com, 
-	Shahed Shaikh <shshaikh@marvell.com>, Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com, 
-	Simon Horman <horms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Roopa Prabhu <roopa@nvidia.com>, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	bridge@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> I didn't say "tagged". I just said "not PVID". There are 2 independent
-> bridge VLAN attributes: "pvid" and [egress-]"untagged". I am suggesting
-> that packets in VID 3, 4, 5 all exit the 802.1ad bridge untagged, but
-> every bridge port has a unique PVID from this range.
+Alexander Lobakin <aleksander.lobakin@intel.com> writes:
+
+> After the series "XSk buff on a diet" by Maciej, the greatest pow-2
+> which &xdp_buff_xsk can be divided got reduced from 16 to 8 on x86_64.
+> Also, sizeof(xdp_buff_xsk) now is 120 bytes, which, taking the previous
+> sentence into account, leads to that it leaves 8 bytes at the end of
+> cacheline, which means an array of buffs will have its elements
+> messed between the cachelines chaotically.
+> Use __aligned_largest for this struct. This alignment is usually 16
+> bytes, which makes it fill two full cachelines and align an array
+> nicely. ___cacheline_aligned may be excessive here, especially on
+> arches with 128-256 byte CLs, as well as 32-bit arches (76 -> 96
+> bytes on MIPS32R2), while not doing better than _largest.
 >
-> bridge vlan add dev port1 vid 3 pvid untagged
-> bridge vlan add dev port1 vid 4 untagged
-> bridge vlan add dev port1 vid 5 untagged
->
-> bridge vlan add dev port1 vid 3 untagged
-> bridge vlan add dev port1 vid 4 pvid untagged
-> bridge vlan add dev port1 vid 5 untagged
->
-> bridge vlan add dev port1 vid 3 untagged
-> bridge vlan add dev port1 vid 4 untagged
-> bridge vlan add dev port1 vid 5 pvid untagged
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-Thanks for the clarification. I think you meant to have the second
-set of three commands affect port2 and the third set of three
-commands affect port3. Please let me know if I'm wrong
-about this.
+Ohh, didn't know about that attribute - neat!
 
-I gave this a try:
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-root@OpenWrt:~# bridge vlan show
-port              vlan-id
-lan1              3 PVID Egress Untagged
-                  4 Egress Untagged
-                  5 Egress Untagged
-lan2              3 Egress Untagged
-                  4 PVID Egress Untagged
-                  5 Egress Untagged
-lan3              3 Egress Untagged
-                  4 Egress Untagged
-                  5 PVID Egress Untagged
-root@OpenWrt:~# bridge fdb show dynamic
-f4:a4:54:80:93:2f dev lan1 vlan 3 master br-lan
-e0:3f:49:47:9a:38 dev lan2 vlan 4 master br-lan
-f4:a4:54:81:7a:90 dev lan3 vlan 5 master br-lan
-
-Like you said, this has a FDB per port. But I think
-I need to have a FDB per inner/outer VLAN combination.
-
-Connectiving works as expected in the above example,
-but only because of unknown-unicast flood, which of course,
-is suboptimal. The switch is acting like a hub.
-
-For example, ever time the host behind lan1 sends a frame
-to the host behind lan2, the bridge is not able to find an FDB
-entry for the VID corresponding to PVID of lan1 and the MAC
-of the host behind lan2. The only FDB entry for the MAC
-corresponding to the host behind lan2 is associated with
-the VID corresponding to the PVID of lan2 (which is a
-different VID than what the packet arrived on).
-Hence, there is constant unicast flood.
-
-I also don't think that this solves the issue for
-https://docs.google.com/drawings/d/1FybJP3UyCPxVQRGxAqGztO4Qc5mgXclV4m-QEyfUFQ8
-. If you like, I'm happy to explain why. But before I do, I want to
-make sure we are on the same page before going further.
-
-Thanks,
-
-Andy
 
