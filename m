@@ -1,168 +1,398 @@
-Return-Path: <netdev+bounces-148918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74D429E36BD
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 10:34:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B4AC9E36F0
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 10:51:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 357D42818C7
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 09:34:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 168A3B242C3
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 09:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8604C1AF0BA;
-	Wed,  4 Dec 2024 09:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41B818A6BC;
+	Wed,  4 Dec 2024 09:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AclPQvOS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eUd79Txz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C012B1AB6D8;
-	Wed,  4 Dec 2024 09:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9501B7442F
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 09:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733304821; cv=none; b=AJonBSqHQtJ/uAaPVI67TiCb5dRfoWuOAI9bUjabXJWR9f5zOo2t7UxrtC1TVoeqWm+Q0w7bExtTovFvjfjgMwH2dOBYL4e8pmMVzFARUkFS6PS4/FFKixJgNSbQsh9S3tLVirNZ3xePINXjE3oxLZHbotnniKnvnPuDHPMcb1Y=
+	t=1733305705; cv=none; b=QslOyEL5IhKTsjFz6wJl3LitsLnUVsPYABAniaxrwZU0bPsrZgdAW02Np+do6TzUl+yVoxnYvO5McMKdY3KvTGBb7PYgOvLBrmXtqG9eFTeg7nAXFJIMkzfdGdv/tfpuEjn0ZsqK3MJ2jzet24VnesEX+nktS3rKOC3CgH34lH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733304821; c=relaxed/simple;
-	bh=RIZW/WfNZyrOeWlTB6eYY7isnBUW5eKR31/FdBoXGbU=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=caRmsv9JQ13G7l3qIM8c1rGSh1ckc29j+9GMg3RyrE8Z1SWy3476lwLqF+//kFav+tpOqebprVNKUAwAQbe01siAmtk8LjFIeOmM+0ZtmudtftCJqI3IqJHfJUJZLGjD/MOao275P3oZuwxzvB2BbE4Fe/8MIzbFMbtWzI+zo4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AclPQvOS; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4349e1467fbso57746875e9.1;
-        Wed, 04 Dec 2024 01:33:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733304818; x=1733909618; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0lKyObJsYIZ+s7QoNlqdjkApw/9Igt91fCr/HAkbPEo=;
-        b=AclPQvOSnDs6Eot11Eslrl9aTk4FbseOfLmUcDa8q2pOZUNcMvyXl8cgfmfTbeV0q0
-         atelsTER5fnWYUUMKdVrpOMtNzXGSvt6bOxMFIem0sf4YUctzs24xVJCbapdu3GtsIS1
-         WZElSm6zE2DqNM1aw/LTkwIZfaoZGE0TOGVZsK78yvXRTQhVZKVoqDV3R2B8Y9XBRfHE
-         mUnIEa7C2NS0/i2+2j/HzF2Mnf9PCdkRZfH1tUIcaQGrwFBfQU8yjyP6v7FJfm/gh9yi
-         1sLFKl3O1jPiSN6naPziMv4YB7SEfhM/jmCr/PsXsRIMbCqgjWdxWIntVSsHbN3bUJzJ
-         0Kow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733304818; x=1733909618;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0lKyObJsYIZ+s7QoNlqdjkApw/9Igt91fCr/HAkbPEo=;
-        b=aEFhbmG1uhK1m38GN0pgpkFqhZujk/0b02PGlRvgGRSTZp8Rdb2LpY/hslDAshNRE4
-         TigrTpRsgJcfseTmJCfSfT2n8xq7Ry1xvUFYl9kdBX53xVXZgvZlcxpbk7aq02gsq64j
-         f6Fr5tnlGUx34C31jIeALhvlcxt/VixqwOTE60Gxgvysq2c8N3QbLlmMSAN1mp5y8WxE
-         lnkoG0UhXmlpPXTZQcX55YNNAWUGQsBivInDjvJx6JqJlCkMBD7/D77nXSYXBeREshDH
-         qYM7h6koOXHMKXtdTEkujeR2Y6surylHvMGiP8MfClAaIp271+ZhBJbOvUTJ8nIcqldq
-         2O8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ8TwlKdtzvvG5kgEpdDT2gaBLQk5bj7Gt61/IzFx7Ff2ZaiNM93HXUDG6X8IUTSkFThU9uVGHXVeUIdSn@vger.kernel.org, AJvYcCWcBj1BxEVOY1JNMpDosE0PUalNJ/Cd3YWo948bHYYX5zP4YoF7hsdHMKzXcQrOAzWxIbS2YDgLgoyF@vger.kernel.org, AJvYcCXPvH76srWyF7W3RVoNjcXQjmeOlhHBz+nS5I84HCcK9h9q4z+X46EILWe2DhrDWaSLB2pz0Js/@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFBhRirTWj3Xj6XQSpB/7YbGBkl1xe8QtXOB94kyawNd5e1nw4
-	dV+FRcwi76iSXcED4yRhf5RnYgqDld/qVyH7fh0P2OdJwKb5e1PzI/SOZA==
-X-Gm-Gg: ASbGncuS+3Ax7vax7IMtsIOhMB8Oqb82zAkgPw+JeOtc4/pNHQxP96dEdA7rhfZUgrQ
-	64ZIrmwhWLNpy1Eu02/Ra3tXgvIi/uGz1muoXYOAIysiS3qnDYclYqdR14Zp7/Y4+oh8XawYm6e
-	b+en3d1YCsgLF8OCerTJ3WN8pyHgBpiEal1WGe59UJatdTHDs/rIX1uVqSobB5rXfLuWpxYGOBr
-	NvO6QKCB0XxnSN4vOrKbqmtobTE/WhSRqPLsDliF7EMqVwJ7KEG3OSW9n1Kf9bpLwpi4QFMK7JU
-	ypXrhQ==
-X-Google-Smtp-Source: AGHT+IH/s8dECPHycbZW4A5CqIvcbgj0fpA7rWE3Kg3D1zgk6Q5Z6J5agkhMd5wneZvBY5ksUhkntA==
-X-Received: by 2002:a05:600c:3596:b0:431:50cb:2398 with SMTP id 5b1f17b1804b1-434d48291b5mr18322755e9.2.1733304817815;
-        Wed, 04 Dec 2024 01:33:37 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d526b14csm18364155e9.2.2024.12.04.01.33.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2024 01:33:37 -0800 (PST)
-Message-ID: <675021f1.050a0220.34c00a.3a0c@mx.google.com>
-X-Google-Original-Message-ID: <Z1Ah7YFSAGnTlWfw@Ansuel-XPS.>
-Date: Wed, 4 Dec 2024 10:33:33 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v8 3/4] net: dsa: Add Airoha AN8855 5-Port
- Gigabit DSA Switch driver
-References: <20241204072427.17778-1-ansuelsmth@gmail.com>
- <20241204072427.17778-4-ansuelsmth@gmail.com>
- <20241204100922.0af25d7e@fedora.home>
- <67501d7b.050a0220.3390ac.353c@mx.google.com>
- <Z1Af3YaN3xjq_Gtb@shell.armlinux.org.uk>
+	s=arc-20240116; t=1733305705; c=relaxed/simple;
+	bh=2tY6kQCLtEPbCrPcxjIdFKsuqIsXtAQSPJMhwqxJRQ0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DF5YBr5IwqESfLHdEu7QpSfxRqjiHi2RT8lEwzldrfdmLdKHMv5T4xHOlOtsw1FpXR2uuymZYyK7Tljhw3OB9WNiR+gXvs24kUEfe+vkubVnly1qMwzTQ74c5u7xrvdScRNpTZy7w1lk4hkWMWy8/VCEq+USxvNUhGDmiNPCTcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eUd79Txz; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733305703; x=1764841703;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2tY6kQCLtEPbCrPcxjIdFKsuqIsXtAQSPJMhwqxJRQ0=;
+  b=eUd79Txz28vkapmcEIfp2ACbqW0soX+2WiLRWBstTIJtwi8WR8VRCCCc
+   17K1Fsv1rUg49qUjsRMQ2AoNyw1t6ZbO6m9aDcHUTSn86SneQ5svBhD73
+   re2T7VDgKruEPazvpiR2zlnFDw5kvKSp6MEw6kjWCg4VQiLb+AK8hjFG8
+   1DxEmjMhHusqIgSZWb4R5kfvl3TwR21FvEt+tkTw4uoZq9cVIf3bQdBdo
+   TZXB11JJErmkE+Uuko1IKpx45erMHMoF+l6npREmswLN6J2reHvf1AaQ6
+   FJCg0hmjB/Utbk39tValPWi0b6FdPn4NInWUe1SuqdUpR6LEL6fDFcpDB
+   Q==;
+X-CSE-ConnectionGUID: F9msF4S1SMyjypq+xK1pRA==
+X-CSE-MsgGUID: NA/vk+ZGQuGJqXPXZcPGfw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11275"; a="44226547"
+X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
+   d="scan'208";a="44226547"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 01:48:22 -0800
+X-CSE-ConnectionGUID: qEBVk4oMSjCerb0GVgLYaQ==
+X-CSE-MsgGUID: 0Er58sZfRoGC16Vlm8AoCw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
+   d="scan'208";a="94143038"
+Received: from kkolacin-desk1.ger.corp.intel.com (HELO kkolacin-desk1.igk.intel.com) ([10.217.160.108])
+  by orviesa007.jf.intel.com with ESMTP; 04 Dec 2024 01:48:21 -0800
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH v3 iwl-next] ice: Add in/out PTP pin delays
+Date: Wed,  4 Dec 2024 10:46:11 +0100
+Message-ID: <20241204094816.337884-2-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z1Af3YaN3xjq_Gtb@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 04, 2024 at 09:24:45AM +0000, Russell King (Oracle) wrote:
-> On Wed, Dec 04, 2024 at 10:14:31AM +0100, Christian Marangi wrote:
-> > On Wed, Dec 04, 2024 at 10:09:22AM +0100, Maxime Chevallier wrote:
-> > > > +	case 5:
-> > > > +		phy_interface_set_rgmii(config->supported_interfaces);
-> > > > +		__set_bit(PHY_INTERFACE_MODE_SGMII,
-> > > > +			  config->supported_interfaces);
-> > > > +		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
-> > > > +			  config->supported_interfaces);
-> > > > +		break;
-> > > > +	}
-> > > > +
-> > > > +	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-> > > > +				   MAC_10 | MAC_100 | MAC_1000FD;
-> > > 
-> > > For port 5, you may also add the MAC_2500FD capability as it supports
-> > > 2500BASEX ?
-> > > 
-> > 
-> > I didn't account for the CPU port that runs at 2.5. The LAN port are
-> > only 1g. Will add or maybe add the 2500FD only for cpu port?
-> > 
-> > Maybe Russel can help in this?
-> 
-> *ll* please.
+HW can have different input/output delays for each of the pins.
 
-emabrassing... sorry.
+Currently, only E82X adapters have delay compensation based on TSPLL
+config and E810 adapters have constant 1 ms compensation, both cases
+only for output delays and the same one for all pins.
 
-> 
-> Well, 2500BASE-X runs at 2.5G, so if MAC_2500FD isn't set in the mask,
-> validation will fail for 2500BASE-X.
-> 
-> > > > +		case SPEED_5000:
-> > > > +			reg |= AN8855_PMCR_FORCE_SPEED_5000;
-> > > > +			break;
-> > > 
-> > > There's no mention of any mode that can give support for the 5000Mbps
-> > > speed, is it a leftover from previous work on the driver ?
-> > > 
-> > 
-> > Added 5000 as this is present in documentation bits but CPU can only go
-> > up to 2.5. Should I drop it? Idea was to futureproof it since it really
-> > seems they added these bits with the intention of having a newer switch
-> > with more advanced ports.
-> 
-> Is there any mention of supporting interfaces faster than 2500BASE-X ?
->
+E825 adapters have different delays for SDP and other pins. Those
+delays are also based on direction and input delays are different than
+output ones. This is the main reason for moving delays to pin
+description structure.
 
-In MAC Layer function description, they say:
-- Support 10/100/1000/2500/5000 Mbps bit rates
+Add a field in ice_ptp_pin_desc structure to reflect that. Delay values
+are based on approximate calculations of HW delays based on HW spec.
 
-So in theory it can support up to that speed.
+Implement external timestamp (input) delay compensation.
 
+Remove existing definitions and wrappers for periodic output propagation
+delays.
+
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+---
+V2 -> V3: rebased, renamed prop_delay to prop_delay_ns, reworded commit
+          message to be more descriptive
+V1 -> V2: removed duplicate gpio_pin variable and restored missing
+          ICE_E810_E830_SYNC_DELAY
+
+ drivers/net/ethernet/intel/ice/ice_ptp.c      | 82 +++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |  2 +
+ .../net/ethernet/intel/ice/ice_ptp_consts.h   | 12 ---
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   | 23 ------
+ 4 files changed, 49 insertions(+), 70 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index d8ed4240f225..b2dba54e6457 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -16,28 +16,28 @@ static const char ice_pin_names[][64] = {
+ };
+ 
+ static const struct ice_ptp_pin_desc ice_pin_desc_e82x[] = {
+-	/* name,        gpio */
+-	{  TIME_SYNC, {  4, -1 }},
+-	{  ONE_PPS,   { -1,  5 }},
++	/* name,        gpio,       delay */
++	{  TIME_SYNC, {  4, -1 }, { 0,  0 }},
++	{  ONE_PPS,   { -1,  5 }, { 0, 11 }},
+ };
+ 
+ static const struct ice_ptp_pin_desc ice_pin_desc_e825c[] = {
+-	/* name,        gpio */
+-	{  SDP0,      {  0,  0 }},
+-	{  SDP1,      {  1,  1 }},
+-	{  SDP2,      {  2,  2 }},
+-	{  SDP3,      {  3,  3 }},
+-	{  TIME_SYNC, {  4, -1 }},
+-	{  ONE_PPS,   { -1,  5 }},
++	/* name,        gpio,       delay */
++	{  SDP0,      {  0,  0 }, { 15, 14 }},
++	{  SDP1,      {  1,  1 }, { 15, 14 }},
++	{  SDP2,      {  2,  2 }, { 15, 14 }},
++	{  SDP3,      {  3,  3 }, { 15, 14 }},
++	{  TIME_SYNC, {  4, -1 }, { 11,  0 }},
++	{  ONE_PPS,   { -1,  5 }, {  0,  9 }},
+ };
+ 
+ static const struct ice_ptp_pin_desc ice_pin_desc_e810[] = {
+-	/* name,      gpio */
+-	{  SDP0,    {  0, 0 }},
+-	{  SDP1,    {  1, 1 }},
+-	{  SDP2,    {  2, 2 }},
+-	{  SDP3,    {  3, 3 }},
+-	{  ONE_PPS, { -1, 5 }},
++	/* name,        gpio,       delay */
++	{  SDP0,      {  0,  0 }, { 0, 1 }},
++	{  SDP1,      {  1,  1 }, { 0, 1 }},
++	{  SDP2,      {  2,  2 }, { 0, 1 }},
++	{  SDP3,      {  3,  3 }, { 0, 1 }},
++	{  ONE_PPS,   { -1,  5 }, { 0, 1 }},
+ };
+ 
+ static const char ice_pin_names_nvm[][64] = {
+@@ -49,12 +49,12 @@ static const char ice_pin_names_nvm[][64] = {
+ };
+ 
+ static const struct ice_ptp_pin_desc ice_pin_desc_e810_sma[] = {
+-	/* name,   gpio */
+-	{  GNSS, {  1, -1 }},
+-	{  SMA1, {  1,  0 }},
+-	{  UFL1, { -1,  0 }},
+-	{  SMA2, {  3,  2 }},
+-	{  UFL2, {  3, -1 }},
++	/* name,   gpio,       delay */
++	{  GNSS, {  1, -1 }, { 0, 0 }},
++	{  SMA1, {  1,  0 }, { 0, 1 }},
++	{  UFL1, { -1,  0 }, { 0, 1 }},
++	{  SMA2, {  3,  2 }, { 0, 1 }},
++	{  UFL2, {  3, -1 }, { 0, 0 }},
+ };
+ 
+ static struct ice_pf *ice_get_ctrl_pf(struct ice_pf *pf)
+@@ -1561,18 +1561,29 @@ void ice_ptp_extts_event(struct ice_pf *pf)
+ 	 * Event is defined in GLTSYN_EVNT_0 register
+ 	 */
+ 	for (chan = 0; chan < GLTSYN_EVNT_H_IDX_MAX; chan++) {
++		int pin_desc_idx;
++
+ 		/* Check if channel is enabled */
+-		if (pf->ptp.ext_ts_irq & (1 << chan)) {
+-			lo = rd32(hw, GLTSYN_EVNT_L(chan, tmr_idx));
+-			hi = rd32(hw, GLTSYN_EVNT_H(chan, tmr_idx));
+-			event.timestamp = (((u64)hi) << 32) | lo;
+-			event.type = PTP_CLOCK_EXTTS;
+-			event.index = chan;
+-
+-			/* Fire event */
+-			ptp_clock_event(pf->ptp.clock, &event);
+-			pf->ptp.ext_ts_irq &= ~(1 << chan);
++		if (!(pf->ptp.ext_ts_irq & (1 << chan)))
++			continue;
++
++		lo = rd32(hw, GLTSYN_EVNT_L(chan, tmr_idx));
++		hi = rd32(hw, GLTSYN_EVNT_H(chan, tmr_idx));
++		event.timestamp = (u64)hi << 32 | lo;
++
++		/* Add delay compensation */
++		pin_desc_idx = ice_ptp_find_pin_idx(pf, PTP_PF_EXTTS, chan);
++		if (pin_desc_idx >= 0) {
++			const struct ice_ptp_pin_desc *desc;
++
++			desc = &pf->ptp.ice_pin_desc[pin_desc_idx];
++			event.timestamp -= desc->delay[0];
+ 		}
++
++		event.type = PTP_CLOCK_EXTTS;
++		event.index = chan;
++		pf->ptp.ext_ts_irq &= ~(1 << chan);
++		ptp_clock_event(pf->ptp.clock, &event);
+ 	}
+ }
+ 
+@@ -1767,9 +1778,9 @@ static int ice_ptp_write_perout(struct ice_hw *hw, unsigned int chan,
+ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
+ 			      int on)
+ {
++	unsigned int gpio_pin, prop_delay_ns;
+ 	u64 clk, period, start, phase;
+ 	struct ice_hw *hw = &pf->hw;
+-	unsigned int gpio_pin;
+ 	int pin_desc_idx;
+ 
+ 	if (rq->flags & ~PTP_PEROUT_PHASE)
+@@ -1780,6 +1791,7 @@ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
+ 		return -EIO;
+ 
+ 	gpio_pin = pf->ptp.ice_pin_desc[pin_desc_idx].gpio[1];
++	prop_delay_ns = pf->ptp.ice_pin_desc[pin_desc_idx].delay[1];
+ 	period = rq->period.sec * NSEC_PER_SEC + rq->period.nsec;
+ 
+ 	/* If we're disabling the output or period is 0, clear out CLKO and TGT
+@@ -1811,11 +1823,11 @@ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
+ 	 * at the next multiple of period, maintaining phase.
+ 	 */
+ 	clk = ice_ptp_read_src_clk_reg(pf, NULL);
+-	if (rq->flags & PTP_PEROUT_PHASE || start <= clk - ice_prop_delay(hw))
++	if (rq->flags & PTP_PEROUT_PHASE || start <= clk - prop_delay_ns)
+ 		start = div64_u64(clk + period - 1, period) * period + phase;
+ 
+ 	/* Compensate for propagation delay from the generator to the pin. */
+-	start -= ice_prop_delay(hw);
++	start -= prop_delay_ns;
+ 
+ 	return ice_ptp_write_perout(hw, rq->index, gpio_pin, start, period);
+ }
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+index 99d48cf15ddc..56c480bb29ad 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+@@ -210,6 +210,7 @@ enum ice_ptp_pin_nvm {
+  * struct ice_ptp_pin_desc - hardware pin description data
+  * @name_idx: index of the name of pin in ice_pin_names
+  * @gpio: the associated GPIO input and output pins
++ * @delay: input and output signal delays in nanoseconds
+  *
+  * Structure describing a PTP-capable GPIO pin that extends ptp_pin_desc array
+  * for the device. Device families have separate sets of available pins with
+@@ -218,6 +219,7 @@ enum ice_ptp_pin_nvm {
+ struct ice_ptp_pin_desc {
+ 	int name_idx;
+ 	int gpio[2];
++	unsigned int delay[2];
+ };
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
+index 585ce200c60f..c3e9b78087a8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
+@@ -341,8 +341,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
+ 		823437500, /* 823.4375 MHz PLL */
+ 		/* nominal_incval */
+ 		0x136e44fabULL,
+-		/* pps_delay */
+-		11,
+ 	},
+ 
+ 	/* ICE_TIME_REF_FREQ_122_880 -> 122.88 MHz */
+@@ -351,8 +349,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
+ 		783360000, /* 783.36 MHz */
+ 		/* nominal_incval */
+ 		0x146cc2177ULL,
+-		/* pps_delay */
+-		12,
+ 	},
+ 
+ 	/* ICE_TIME_REF_FREQ_125_000 -> 125 MHz */
+@@ -361,8 +357,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
+ 		796875000, /* 796.875 MHz */
+ 		/* nominal_incval */
+ 		0x141414141ULL,
+-		/* pps_delay */
+-		12,
+ 	},
+ 
+ 	/* ICE_TIME_REF_FREQ_153_600 -> 153.6 MHz */
+@@ -371,8 +365,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
+ 		816000000, /* 816 MHz */
+ 		/* nominal_incval */
+ 		0x139b9b9baULL,
+-		/* pps_delay */
+-		12,
+ 	},
+ 
+ 	/* ICE_TIME_REF_FREQ_156_250 -> 156.25 MHz */
+@@ -381,8 +373,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
+ 		830078125, /* 830.78125 MHz */
+ 		/* nominal_incval */
+ 		0x134679aceULL,
+-		/* pps_delay */
+-		11,
+ 	},
+ 
+ 	/* ICE_TIME_REF_FREQ_245_760 -> 245.76 MHz */
+@@ -391,8 +381,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
+ 		783360000, /* 783.36 MHz */
+ 		/* nominal_incval */
+ 		0x146cc2177ULL,
+-		/* pps_delay */
+-		12,
+ 	},
+ };
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+index 5c11d8a69fd3..5b4dc921deee 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+@@ -80,7 +80,6 @@ struct ice_phy_reg_info_eth56g {
+  * struct ice_time_ref_info_e82x
+  * @pll_freq: Frequency of PLL that drives timer ticks in Hz
+  * @nominal_incval: increment to generate nanoseconds in GLTSYN_TIME_L
+- * @pps_delay: propagation delay of the PPS output signal
+  *
+  * Characteristic information for the various TIME_REF sources possible in the
+  * E822 devices
+@@ -88,7 +87,6 @@ struct ice_phy_reg_info_eth56g {
+ struct ice_time_ref_info_e82x {
+ 	u64 pll_freq;
+ 	u64 nominal_incval;
+-	u8 pps_delay;
+ };
+ 
+ /**
+@@ -326,9 +324,7 @@ extern const struct ice_vernier_info_e82x e822_vernier[NUM_ICE_PTP_LNK_SPD];
+  */
+ #define ICE_E810_PLL_FREQ		812500000
+ #define ICE_PTP_NOMINAL_INCVAL_E810	0x13b13b13bULL
+-#define ICE_E810_OUT_PROP_DELAY_NS	1
+ #define ICE_E810_E830_SYNC_DELAY	0
+-#define ICE_E825C_OUT_PROP_DELAY_NS	11
+ 
+ /* Device agnostic functions */
+ u8 ice_get_ptp_src_clock_index(struct ice_hw *hw);
+@@ -390,11 +386,6 @@ static inline u64 ice_e82x_nominal_incval(enum ice_time_ref_freq time_ref)
+ 	return e82x_time_ref[time_ref].nominal_incval;
+ }
+ 
+-static inline u64 ice_e82x_pps_delay(enum ice_time_ref_freq time_ref)
+-{
+-	return e82x_time_ref[time_ref].pps_delay;
+-}
+-
+ /* E822 Vernier calibration functions */
+ int ice_stop_phy_timer_e82x(struct ice_hw *hw, u8 port, bool soft_reset);
+ int ice_start_phy_timer_e82x(struct ice_hw *hw, u8 port);
+@@ -432,20 +423,6 @@ int ice_phy_cfg_ptp_1step_eth56g(struct ice_hw *hw, u8 port);
+ #define ICE_ETH56G_NOMINAL_THRESH4	0x7777
+ #define ICE_ETH56G_NOMINAL_TX_THRESH	0x6
+ 
+-static inline u64 ice_prop_delay(const struct ice_hw *hw)
+-{
+-	switch (hw->mac_type) {
+-	case ICE_MAC_E810:
+-		return ICE_E810_OUT_PROP_DELAY_NS;
+-	case ICE_MAC_GENERIC:
+-		return ice_e82x_pps_delay(ice_e82x_time_ref(hw));
+-	case ICE_MAC_GENERIC_3K_E825:
+-		return ICE_E825C_OUT_PROP_DELAY_NS;
+-	default:
+-		return 0;
+-	}
+-}
+-
+ /**
+  * ice_get_base_incval - Get base clock increment value
+  * @hw: pointer to the HW struct
+
+base-commit: 4376b34cf49c2f38e761beacd173d1dc15a255fd
 -- 
-	Ansuel
+2.47.1
+
 
