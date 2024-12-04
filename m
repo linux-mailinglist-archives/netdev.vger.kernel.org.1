@@ -1,140 +1,117 @@
-Return-Path: <netdev+bounces-149036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6DBC9E3D2C
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:48:59 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B655A9E3D6C
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:55:30 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A52671601B5
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:48:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 771EA280FC6
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7906203718;
-	Wed,  4 Dec 2024 14:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F1D20C461;
+	Wed,  4 Dec 2024 14:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e5fPhC5f"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OcJLKbdM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE2B1BC9F0
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2931420D514
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:53:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733323736; cv=none; b=RutNPFcsfj7BshzvDnZJRiSC448vKJ6sSoejn9Ac1aXB51qAMSeCdmA+RqGjjWM+mHYEg0xSlXPITg10jvSjmDeEiGPniq0LfGuXFaJ8vF0bPPuNul0dmIrjWRTEUna4So7auqxfKA0PwhjK9SqIENDvkynDrF4t67uwvHDFUhg=
+	t=1733324030; cv=none; b=M4tNOXSa9RILRv0ZKqZYxwhh0rDC2dC/Z4WErEdFMYXrET+Um7f2+5ezsJUxZ50HSysIk+i67sPUw9NLaeL3JMNTh/SjVOAYXEc3nPOjoO71tbfoPDRs/VlfCjKc3+hxsliD6XQr/0RlBFyGzmH92GIJjQB67Ww0QW9SFxHT5gQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733323736; c=relaxed/simple;
-	bh=exNkTbJgEBjjF/1XzUa1Clyd15Medxdg99b4b89dyTY=;
+	s=arc-20240116; t=1733324030; c=relaxed/simple;
+	bh=K7kBGbl/wdP2nCgoFHgNguRbgX9tLrTyha54rTPE+sk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sCgA5YJC+AlPDJiUiHj83r27uqG4+4g5+FuTULtNhceUNipfKhTpqVbTbHtB1OCgAUv4swDNTg6aPnqrh/6bAwWf8+St5nREiK7kaYB6qXoIJghrb3QcK4D9pzdy0Q09qWNUcIaf/2/NUMZapnzIYlVJSqe0m9ADNDtENyxyTHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e5fPhC5f; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-53ddfc5901eso9e87.0
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 06:48:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733323733; x=1733928533; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=exNkTbJgEBjjF/1XzUa1Clyd15Medxdg99b4b89dyTY=;
-        b=e5fPhC5fdThhIFaD/nW2P1mkTSjQq+aP892J5M+xl2O3vjPlHotfoBZULuDNFlFBjw
-         7FB+jD24xoZBVrUaNcmYO6+1ylEQ+wE5L11tW3/ubEJgUhRzGzDdpGWqWoDvncvz8SaA
-         JZdit1n3/3VBJ/536r3uN0T769KFsYSnF6bJOKU9ibNhsQovjKCD4e9f1eXYB6a029su
-         ymjT1WrslaDR/zqAT3Tm6pjQJ7iTkCg4AEPLIs2yLPR4yqFAIX+qsfkNuK6F1j2ZSttT
-         ISDDbKa6B100OPL6emQJQBxTts4po7QBaWUqH4GZoFotsF/6ClH9mj/5t2lmIrnGnuZU
-         UN1A==
+	 To:Cc:Content-Type; b=HRx738t9dtflthoceQPphdlG0YoAthf5nV5Er6N3VeeOob9PIKJZaagZcEf35D8zzQ5r6B2iM02ae5tdVs5Q71WF8JAtEVW4cvu1QPXAAs3wawA37Ajg64rI7a0yZhEyWjaes2JXrROKNC+8jf2VV8Z7DU1G1//uFlhYMb/yXRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OcJLKbdM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733324026;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K7kBGbl/wdP2nCgoFHgNguRbgX9tLrTyha54rTPE+sk=;
+	b=OcJLKbdM+VguAJilLK0lv/E0CLM9YnvjqWMNHySZedzGHawMwBokNPx15XXJlAcVTcCnnk
+	6TL+SuqJll7pOSqLaXoUF4f6gKUc9XKWG0e2EKPUjlx3wOmfjG+qtEg85BOPR0d7TGn/f3
+	EsQR709MI6WtduHXrRj0kuB1qpMLLUM=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-284-wV6gv0THPcKK7k96ViL00A-1; Wed, 04 Dec 2024 09:53:42 -0500
+X-MC-Unique: wV6gv0THPcKK7k96ViL00A-1
+X-Mimecast-MFC-AGG-ID: wV6gv0THPcKK7k96ViL00A
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-71d557437e0so4394726a34.3
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 06:53:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733323733; x=1733928533;
+        d=1e100.net; s=20230601; t=1733324021; x=1733928821;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=exNkTbJgEBjjF/1XzUa1Clyd15Medxdg99b4b89dyTY=;
-        b=RkywYdWNFk2alHvvipvegqhC+u/ga8iOaeOmNC/H87v+GIEj9g9UaMEiVVzg/7FcpQ
-         tnSepNPPOxvFadNocsiMAWxlCagPTN1cIdJNx9TmMY1ayLi7xqJiI6kaVsA3BmwrK3pI
-         ga2aYVlGtq8lqTeXZPM5o3t035V6cL0hC/4kAMerFBQzVbJab6EFJKB1j5t01FI/qjyu
-         7i27NUX2JHZr+1L/l6XX/vS3cX48DMUSLanLde2VJZHQkplIc6X4lCG2j6jwjrMHcI4W
-         6ofUpoaKbQVFln3bWOCOuM+zvN/TbxkEVwmcCZDfSWPmAfihkCMEFKyWHM1Q5DkYBd8n
-         w+sg==
-X-Forwarded-Encrypted: i=1; AJvYcCW6TzsxF58aTbEmwLlqAj84H9ymqGPtEbtG8ZyTJlhwlDtSilRa8wXZ+ZH8KfAET0IPau2IZmU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPii8jbf2WEJMqUBRZKU1FvPoUE45dNnQh2gFlIUjzLUn7UFx8
-	Om4+Dqdtr6Q30WDPtHBZUMcoWCX4qEBf2guX4WmgL5U8cZA9mAuqidHcwD8vxrD+VSLYfJNSkUZ
-	P+GupEiJYnCZr7j+b/MqgmBPJMBPDYeZNRKPD
-X-Gm-Gg: ASbGncvNQyMpdleOeAPBYZKzDBZCsil+TyS0EfV/wrNEzUTOu1Xn25JZJ5nnXNWxVEF
-	aJB7iMdIxW6ekmNkwOmBwMn7oEUtiFtlhiQ1Di4QaclM+t+Oac43JPhrv2jwg2IRZ
-X-Google-Smtp-Source: AGHT+IHTwaGeK8ug66PK5JqxNCfQyINVfppfW8hITLpxJV46Y/5CqoUKfS162sDG/pcbDw1/Nf3ldb3ENNdE1nExxfQ=
-X-Received: by 2002:a05:6512:405:b0:53e:c5b:5752 with SMTP id
- 2adb3069b0e04-53e20c1e405mr2189e87.0.1733323732248; Wed, 04 Dec 2024 06:48:52
- -0800 (PST)
+        bh=K7kBGbl/wdP2nCgoFHgNguRbgX9tLrTyha54rTPE+sk=;
+        b=agfGyrbGH8zcEw03yuEbh3uoVaDx3UuPCtgyun8o5lljzaAfO7etIdXan401LkFSan
+         tpPlcKkmLCBrtfm+Wxij39MsfZGebn9JqeN2V3h9G4Z6z5fpQm0HJCKnRufYwhqiUC4/
+         eO76Xlj71R6M+X4b4hbqUXSzxUiDHYmrXIPoWskrN56PQnySZ58fk8dl0F+JS5nhU0m/
+         Jsw4WOAGlKMw2Uy99wEKpV7+VhRWQiRYNP5zAeJqtB/50bmlKsS+ZmuQQS61XcPqSwB1
+         bB+OKW0rMDFedip0xHpcKBt/KLJkFPRhh6j0jpDKfDadyV19qxbhDUB3exC3RkpgeQ4M
+         xGHg==
+X-Forwarded-Encrypted: i=1; AJvYcCWR6P64gUAmyc9lOj4XEMfHFWsGaxo63GvaveI76hTQXxlWwyHb5ot5wdV9dxifbRS0DSxCVUw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAQLvmpKvYig7SIg/jkds/LYcEhDHCtqqGdJHH3Mnlcfn945Ey
+	OEWxrdXs530zDZwhB+leJXWMVwCMUi+EZ/sRGUJ4KDVuMeEsN+ZuGGmX6/UGQnKNYMGO3PQ4zaA
+	U7Li/eTGSJJnHMogmExsX+pClmz76cNwbR8FFLZADxYo3GafuTRz8CW1CMyxPML4ht9KynLU+FQ
+	5gvMI2hpZGEfPGhjyxOEXy4mHO7pme
+X-Gm-Gg: ASbGncsPCVzPe9BYYYTcl/bdVAYAqK3YLBdGRYKzWerH6tZOGvSuFptiYrOxdpfpU/y
+	10kgD6wBd1ak//GqJRGvDb6ZMOeuTmXU=
+X-Received: by 2002:a05:6830:388b:b0:71d:576f:29e4 with SMTP id 46e09a7af769-71dad4adba6mr6442249a34.0.1733324020845;
+        Wed, 04 Dec 2024 06:53:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHFS0oFHuIGv/zbXpCZrw4VpD3aJ8iYW3+nmQO54xHnhiT/5bN8TcEUROIJsrOy9LsBSbug6MeMRE0DrorOzYI=
+X-Received: by 2002:a05:6830:388b:b0:71d:576f:29e4 with SMTP id
+ 46e09a7af769-71dad4adba6mr6442234a34.0.1733324020668; Wed, 04 Dec 2024
+ 06:53:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241204140208.2701268-1-yuyanghuang@google.com>
- <20241204140208.2701268-2-yuyanghuang@google.com> <7057e5e0-c42b-4ae5-a709-61c6938a0316@6wind.com>
-In-Reply-To: <7057e5e0-c42b-4ae5-a709-61c6938a0316@6wind.com>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Wed, 4 Dec 2024 23:48:13 +0900
-X-Gm-Features: AZHOrDkpQa5jqpVzZFVPjszcYzApHloRrCYLswgO4jgQh3N8OFfED6kpbP5x29U
-Message-ID: <CADXeF1GSgVfBZo+BmkRzCT06dSEU2CEU0Pxy=3fYbJrZipoytQ@mail.gmail.com>
-Subject: Re: [PATCH iproute2-next, v3 2/2] iproute2: add 'ip monitor mcaddr' support
-To: nicolas.dichtel@6wind.com
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, jiri@resnulli.us, 
-	stephen@networkplumber.org, jimictw@google.com, prohr@google.com, 
-	liuhangbin@gmail.com, andrew@lunn.ch, netdev@vger.kernel.org, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>
+References: <cover.1733216767.git.jstancek@redhat.com> <20b2bdfe94fed5b9694e22c79c79858502f5e014.1733216767.git.jstancek@redhat.com>
+ <Z083YZoAQEn9zrjM@mini-arch>
+In-Reply-To: <Z083YZoAQEn9zrjM@mini-arch>
+From: Jan Stancek <jstancek@redhat.com>
+Date: Wed, 4 Dec 2024 15:53:25 +0100
+Message-ID: <CAASaF6wX1GnXd3=Ue-yuCgGWNgKLy1+ChkydvYJ0dODBtcJL4A@mail.gmail.com>
+Subject: Re: [PATCH 1/5] tools: ynl: move python code to separate sub-directory
+To: Stanislav Fomichev <stfomichev@gmail.com>, donald.hunter@gmail.com
+Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
+	edumazet@google.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Thanks for the review feedback.
+On Tue, Dec 3, 2024 at 5:52=E2=80=AFPM Stanislav Fomichev <stfomichev@gmail=
+.com> wrote:
+>
+> On 12/03, Jan Stancek wrote:
+> > Move python code to a separate directory so it can be
+> > packaged as a python module.
+>
+> There is a bunch of selftests that depend on this location:
 
->Note that 'ip maddr' (see 'man ip-maddress') already exists. Using 'mcaddr=
-' for
->'ip monitor' is confusing.
+Sorry about that, I haven't realized other places it's already used at.
 
-Please allow me to confirm the suggestion, would it be less confusing
-if I use 'ip monitor maddr' here, or should I use a completely
-different name?
+> Perhaps we could have a symlink to cli.py from the original location
+> for compatibility with existing in-place usage. Same for ethtool.py
+> and other user-facing scripts.
 
-> You could also update man/man8/ip-monitor.8
-
-Acked, I will update the document in the next version of the patch.
+I can add those, but I'd still update docs references with new path.
 
 Thanks,
-Yuyang
+Jan
 
-
-
-On Wed, Dec 4, 2024 at 11:17=E2=80=AFPM Nicolas Dichtel
-<nicolas.dichtel@6wind.com> wrote:
->
-> Le 04/12/2024 =C3=A0 15:02, Yuyang Huang a =C3=A9crit :
-> > Enhanced the 'ip monitor' command to track changes in IPv4 and IPv6
-> > multicast addresses. This update allows the command to listen for
-> > events related to multicast address additions and deletions by
-> > registering to the newly introduced RTNLGRP_IPV4_MCADDR and
-> > RTNLGRP_IPV6_MCADDR netlink groups.
-> >
-> > This patch depends on the kernel patch that adds RTNLGRP_IPV4_MCADDR
-> > and RTNLGRP_IPV6_MCADDR being merged first.
-> >
-> > Here is an example usage:
-> >
-> > root@uml-x86-64:/# ip monitor mcaddr
->
-> Note that 'ip maddr' (see 'man ip-maddress') already exists. Using 'mcadd=
-r' for
-> 'ip monitor' is confusing.
->
-> You could also update man/man8/ip-monitor.8
->
->
-> Regards,
-> Nicolas
 
