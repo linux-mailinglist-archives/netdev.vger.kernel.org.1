@@ -1,198 +1,107 @@
-Return-Path: <netdev+bounces-148802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EBC09E32B0
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 05:41:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BFE689E32AD
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 05:37:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FE43284A01
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 04:41:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 859442835EA
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 04:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A9D15442D;
-	Wed,  4 Dec 2024 04:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6DC015442D;
+	Wed,  4 Dec 2024 04:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="EksffH91"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="lUm+2gP1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9776038385
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 04:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733287272; cv=none; b=scuklXugsDZVkl4fRUgHjIxU7B8Yj1PuHtZbQKPwAu7UgiC3KK7VVcrgLoxrsuUdgUd58E5sD5eJ+gIP8nW3knwoHp+TFjWiGvkL6RgNFrFWvZi6MZxIWYDJMagjCeR1UgGkD0hqEayNvmvGiNZKVu/Xge2mLZCbUE/D85lGYF0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733287272; c=relaxed/simple;
-	bh=IrUEeeXk0XqjRNrEb78avFaZBzk2PWSNq8LbhH2Q5vc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tr6ziFm436mKNTyImEo1A0WkMF3ltsOeBJ57MSSGu159DdcR+MbVYI0YzDo6RCXakOAhECKn2ss4UlVLJmMlluZsaOj/O7oS2WmshKXTZctz0uQp6FjBSvIm1i9vA/hIW45JmTzU23+IB/HioRWg82oO+l6CG+i/CK4PlKOvGbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=EksffH91; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from out.smtpout.orange.fr (out-14.smtpout.orange.fr [193.252.22.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id BE1573F767
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 04:14:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1733285695;
-	bh=Q24GDRfJXQyjTe8o63+C0HsFRR+/g6kWIzNile+zMUE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:In-Reply-To;
-	b=EksffH91slgbCiU5/TxXHLq6LFOPz/G9JiNodlPs8f/6TwGRKYNLTfesbFWx3F98C
-	 2xMupUMvs1i1Uk74Vi3kwbO4HKEbBx8XWkqQiAFjv+KAIebkBbailN1HWybNRCZDpD
-	 Y/+7TLfKoA7/1c62zV72V5PZhLoyzPvSj85iU5cR2PjETiUvhzqee+u5ZOOJrixil9
-	 0XTaQyTsT4XVPnYiHitPGCw4kDg9QgHF9LOGKuGZWeHJlHuWGcvXBS15Nl6tlrDCAH
-	 paap9DNWku8yTSFlfBFTfoFOFIYupBXpmUI/MvPF8cl/TDBya7D7M/yTUVmJWwSPp1
-	 sd8VOnOYIUV1g==
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2ee31227b58so5665165a91.3
-        for <netdev@vger.kernel.org>; Tue, 03 Dec 2024 20:14:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733285694; x=1733890494;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q24GDRfJXQyjTe8o63+C0HsFRR+/g6kWIzNile+zMUE=;
-        b=stoMJmhM2uZc3PVE9Fcxsxf2CFHlwcidvC6j//nAAx8ntUfZZayBedQVGanpIS0rPv
-         kUfQlZRUrg8ctqodYKhYapEcaPS6FZLwQM+udfUHnkRWSP3C0O0kksRFBEFaaYGobSQz
-         /yRrods4ux/3ADyuHmAXEUgqueIewj8Khns7XUz0I0vPfKN/PWwwuh2C+Cxu6nAEQYYC
-         /8dBRg/FpBYx/ETBj8SCRECXYkwm6ZvUOqkFtuPsXv37Gjs4uHZN9eRXEZz5r2uH399S
-         oGeW334NhSuaT4W8t3Sqf0p6tQrIZ7ewUFPN3HRVJjIzFVIsKf7XPg3uNXFqwp0LGnGI
-         EaIw==
-X-Forwarded-Encrypted: i=1; AJvYcCUHB3TEdfxNEiHKkwqoms+1/7GzJ5vunGbF9bMsz5+8dTQ1djFZI1Yrhy0nv8umq4pxjFvLRqc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0ERwlhNu/l/n4Z2slNUNjBlvc6oYhuZs+DrNLWvKiw0AzIs9v
-	F2X5MteZd4GMrx1T+uVVLpnrAdb/tD4vsDbjLpdp//99j6vYo+U52f59ZPGHCS2Hg7tiwlUiSC+
-	ktAfGTytaV4mLSHa+CU2qe8lz6f8xzUVu4GQOIGNxMAcJ2mITeL3bhmAL08yWK0IgVmr6mg==
-X-Gm-Gg: ASbGncvAaDcdxuDSOGk+klAX0McwfNcqIMnjTcfnTujrN8aug4aUOWT9TIZGwHOiXO/
-	p95uMoBPkTfuJ9s1Kyx5eW1Qc0YA/2YY0A8cSysmpcI8JiDgfm3Y5NtcnRBCQBIFK3MEAr+3Y54
-	SNiq0+IPzNolV7XzBT8N5QAVQKSgOifOfKKzHCOZSGga3FfatfJ9my6stdHfSsw1vVjUhLHaqrv
-	H67b6ioImI0zA8u0TacsN4mBz1LT9zwjvkxxfvsJBfSzSMFIJTT
-X-Received: by 2002:a17:90a:e70c:b0:2ee:f440:53ed with SMTP id 98e67ed59e1d1-2ef0127597bmr5969997a91.31.1733285694369;
-        Tue, 03 Dec 2024 20:14:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHmmxQJst2LuugrSZJhqPzCTrbLye21ezDzuZBBWTLDHpaGBRfvTE3sFkECyoe3UpjTjDpNpw==
-X-Received: by 2002:a17:90a:e70c:b0:2ee:f440:53ed with SMTP id 98e67ed59e1d1-2ef0127597bmr5969973a91.31.1733285694019;
-        Tue, 03 Dec 2024 20:14:54 -0800 (PST)
-Received: from localhost ([240f:74:7be:1:9c88:3d14:cbea:e537])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ef27050103sm388122a91.41.2024.12.03.20.14.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2024 20:14:53 -0800 (PST)
-Date: Wed, 4 Dec 2024 13:14:51 +0900
-From: Koichiro Den <koichiro.den@canonical.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux.dev, mst@redhat.com, 
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net-next v2 4/5] virtio_ring: add 'flushed' as an
- argument to virtqueue_reset()
-Message-ID: <ub7pbfodhjpubwixxsbxlkiclthp3adbxin7etff5seoxqs5i7@aj3c7tpeirwq>
-References: <20241203073025.67065-1-koichiro.den@canonical.com>
- <20241203073025.67065-5-koichiro.den@canonical.com>
- <CACGkMEuUa+6_uaa7H2CSvUnfNzBr-rdoQ+cp8eZD+Ay1CZ=A-g@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA79A41C85;
+	Wed,  4 Dec 2024 04:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733287075; cv=none; b=fChxFtLNXwZYmJGyWJk3SgKhrqHxoA8UK9IXH5h7a2L/TZcl2WBpI7tCKXM2CT4s9eb4r1CPJgVGikgNTRW8n8GVrJeV8BLROZuHPgzsejsuA/geysFzNuAoxS9i7iwNYQXn8GB3AXB7QtEYt5+vGSvm7pwBLUz/XQare6i323Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733287075; c=relaxed/simple;
+	bh=KVaE46aHebdCh6WZ9W4YES3U6O7EbJ4RLpIJXCR51X0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BVq8ax2ha0YfoUKi/tCtLGVlyq1Rn86Vo0Xs5Tf+Sv4DsZi/vXF1YFtrVzHbXY0dayUpdFanXMTt0+W2b7tAKblFhM3CwrsS/GQUzmLQqHk8Wc8TfVw7ULCSfRKSiUtmDQ8hQL6+hcwPr93PWT2t7AIrm3BDO0WWe+l7NrFgg+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=lUm+2gP1; arc=none smtp.client-ip=193.252.22.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from mail-ej1-f49.google.com ([209.85.218.49])
+	by smtp.orange.fr with ESMTPSA
+	id Ih93tvZCrLhLoIh93tPDae; Wed, 04 Dec 2024 05:37:49 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1733287069;
+	bh=K0YcF5eBl3Z11+dKfpTGFzHX2+zdqIzQuZXVH2EgLzY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To;
+	b=lUm+2gP1XxmDOD/LyukD+yOciYXGCF8ew4ME+OIKlJrSkUZCGRrz7vJVcy5UGncS6
+	 pdjRk9d3rZ/crJ+mf2joE75Jl2Jkp5qrZIa46hQ0bdXdvjoI2vOOMU4ei1h7N+98zE
+	 eQjf5yUlhb04cuEcRoMroivgel217zXK6Y22DA3TWEqC8BuBb4BbaEmmAh1NViDMcq
+	 i/yk57L7vsWrs4rdprmNWcXttneEGFH7XzcOcPvBpyYgY142oijskD69bVWn/HE7PI
+	 5TqNdbL4NOHHHRM/riAJLukC2q2ov0re+QaqVKXOYd1+vCvnu4Me0dVfglyHt5B4ok
+	 MB2cF5tmeomlQ==
+X-ME-Helo: mail-ej1-f49.google.com
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Wed, 04 Dec 2024 05:37:49 +0100
+X-ME-IP: 209.85.218.49
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-aa549d9dffdso1005130366b.2;
+        Tue, 03 Dec 2024 20:37:49 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV4eNQxzeWQ3vsWT20h+lgCRlG1pCiESTQbsCQKQF2SLPNLbtr5m3qCFf8zJ6jBwjcAVZwivzYJeiE=@vger.kernel.org, AJvYcCXe/R6ZZjXzBl3aqblCWtnTrq8XgUpmTFTQS1WXFHYLJusaRmjeFU1NOQo2wzzcjvTJptU+F9i9Xh+6EKjU@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXuZ82DoBAJ8Y+xEF3Cm2Oc3xU/wSVkCcANoBRRTMuq5ul9n0O
+	xYFX7wYQ9Mp9EhmeJxKg8v/QIHjcRhAdVhrxK9S2CY7aye48CwsCyVDBokgnXsoR1Oph+VihK9W
+	jb34TUL5RVleEYOnkn/AgRn1PTCk=
+X-Google-Smtp-Source: AGHT+IHcBOtplu5vcO94r/xRZCoJTOHel8JRhuKlEs+VKsq8ZPQd0iWFLejRKIealVsnlL0S/aZeCDYmgY5iNzmogOU=
+X-Received: by 2002:a17:907:7d94:b0:a99:fc3d:7c76 with SMTP id
+ a640c23a62f3a-aa5f7f007e6mr472251266b.37.1733287069264; Tue, 03 Dec 2024
+ 20:37:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEuUa+6_uaa7H2CSvUnfNzBr-rdoQ+cp8eZD+Ay1CZ=A-g@mail.gmail.com>
+References: <20241203231337.182391-1-rosenp@gmail.com>
+In-Reply-To: <20241203231337.182391-1-rosenp@gmail.com>
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Date: Wed, 4 Dec 2024 13:37:38 +0900
+X-Gmail-Original-Message-ID: <CAMZ6Rq+ykc4xNbGC52cgjw6uLFXZKwkeGDWk=19=nZMnvq_L+A@mail.gmail.com>
+Message-ID: <CAMZ6Rq+ykc4xNbGC52cgjw6uLFXZKwkeGDWk=19=nZMnvq_L+A@mail.gmail.com>
+Subject: Re: [PATCH] net: simplify resource acquisition + ioremap
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>, 
+	maxime.chevallier@bootlin.com, Madalin Bucur <madalin.bucur@nxp.com>, 
+	Sean Anderson <sean.anderson@seco.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"open list:CAN NETWORK DRIVERS" <linux-can@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Dec 04, 2024 at 10:49:02AM +0800, Jason Wang wrote:
-> On Tue, Dec 3, 2024 at 3:31 PM Koichiro Den <koichiro.den@canonical.com> wrote:
-> >
-> > When virtqueue_reset() has actually recycled all unused buffers,
-> > additional work may be required in some cases. Relying solely on its
-> > return status is fragile, so introduce a new argument 'flushed' to
-> > explicitly indicate whether it has really occurred.
-> >
-> > Signed-off-by: Koichiro Den <koichiro.den@canonical.com>
-> > ---
-> >  drivers/net/virtio_net.c     | 6 ++++--
-> >  drivers/virtio/virtio_ring.c | 6 +++++-
-> >  include/linux/virtio.h       | 3 ++-
-> >  3 files changed, 11 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 0103d7990e44..d5240a03b7d6 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -5695,6 +5695,7 @@ static int virtnet_rq_bind_xsk_pool(struct virtnet_info *vi, struct receive_queu
-> >                                     struct xsk_buff_pool *pool)
-> >  {
-> >         int err, qindex;
-> > +       bool flushed;
-> >
-> >         qindex = rq - vi->rq;
-> >
-> > @@ -5713,7 +5714,7 @@ static int virtnet_rq_bind_xsk_pool(struct virtnet_info *vi, struct receive_queu
-> >
-> >         virtnet_rx_pause(vi, rq);
-> >
-> > -       err = virtqueue_reset(rq->vq, virtnet_rq_unmap_free_buf);
-> > +       err = virtqueue_reset(rq->vq, virtnet_rq_unmap_free_buf, &flushed);
-> >         if (err) {
-> >                 netdev_err(vi->dev, "reset rx fail: rx queue index: %d err: %d\n", qindex, err);
-> >
-> > @@ -5737,12 +5738,13 @@ static int virtnet_sq_bind_xsk_pool(struct virtnet_info *vi,
-> >                                     struct xsk_buff_pool *pool)
-> >  {
-> >         int err, qindex;
-> > +       bool flushed;
-> >
-> >         qindex = sq - vi->sq;
-> >
-> >         virtnet_tx_pause(vi, sq);
-> >
-> > -       err = virtqueue_reset(sq->vq, virtnet_sq_free_unused_buf);
-> > +       err = virtqueue_reset(sq->vq, virtnet_sq_free_unused_buf, &flushed);
-> >         if (err) {
-> >                 netdev_err(vi->dev, "reset tx fail: tx queue index: %d err: %d\n", qindex, err);
-> >                 pool = NULL;
-> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> > index 34a068d401ec..b522ef798946 100644
-> > --- a/drivers/virtio/virtio_ring.c
-> > +++ b/drivers/virtio/virtio_ring.c
-> > @@ -2828,6 +2828,7 @@ EXPORT_SYMBOL_GPL(virtqueue_resize);
-> >   * virtqueue_reset - detach and recycle all unused buffers
-> >   * @_vq: the struct virtqueue we're talking about.
-> >   * @recycle: callback to recycle unused buffers
-> > + * @flushed: whether or not unused buffers are all flushed
-> >   *
-> >   * Caller must ensure we don't call this with other virtqueue operations
-> >   * at the same time (except where noted).
-> > @@ -2839,14 +2840,17 @@ EXPORT_SYMBOL_GPL(virtqueue_resize);
-> >   * -EPERM: Operation not permitted
-> >   */
-> >  int virtqueue_reset(struct virtqueue *_vq,
-> > -                   void (*recycle)(struct virtqueue *vq, void *buf))
-> > +                   void (*recycle)(struct virtqueue *vq, void *buf),
-> > +                   bool *flushed)
-> >  {
-> >         struct vring_virtqueue *vq = to_vvq(_vq);
-> >         int err;
-> >
-> > +       *flushed = false;
-> >         err = virtqueue_disable_and_recycle(_vq, recycle);
-> >         if (err)
-> >                 return err;
-> > +       *flushed = true;
-> >
-> 
-> This makes me think if it would be easier if we just find a way to
-> reset the tx queue inside virtqueue_disable_and_recycle().
-> 
-> For example, introducing a recycle_done callback?
+Hi Rosen,
 
-It sounds reasonable and much cleaner. I'll prepare and send v3 shortly.
-Thanks for the review.
+Thanks for the patch!
 
--Koichiro Den
+On Wed. 4 Dec. 2024 at 08:13, Rosen Penev <rosenp@gmail.com> wrote:
+> get resource + request_mem_region + ioremap can all be done by a single
+> function.
+>
+> Replace them with devm_platform_get_and_ioremap_resource or\
+> devm_platform_ioremap_resource where res is not used.
+>
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> ---
+>  drivers/net/can/sja1000/sja1000_platform.c | 15 ++--------
 
-> 
-> Thanks
-> 
+For the can driver only:
+
+Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr> # sja1000_platform.c
+
+>  drivers/net/ethernet/freescale/fman/fman.c | 35 +++++-----------------
+>  drivers/net/ethernet/lantiq_etop.c         | 25 ++--------------
+>  drivers/net/mdio/mdio-octeon.c             | 25 +++-------------
+>  4 files changed, 17 insertions(+), 83 deletions(-)
 
