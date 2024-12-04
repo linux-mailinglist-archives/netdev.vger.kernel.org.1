@@ -1,65 +1,52 @@
-Return-Path: <netdev+bounces-149042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E27489E3D68
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:55:01 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C42D160550
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:54:55 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C08E920B7ED;
-	Wed,  4 Dec 2024 14:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="kzvavOIH"
-X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB3719E3D13
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:45:29 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A3A20ADF2;
-	Wed,  4 Dec 2024 14:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A659E2820C6
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:45:28 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20FEB20B7E2;
+	Wed,  4 Dec 2024 14:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="R4s585G3"
+X-Original-To: netdev@vger.kernel.org
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C103A20ADCF;
+	Wed,  4 Dec 2024 14:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733324022; cv=none; b=fbWPOjHMZV2+sqaTRu8cUCcjKMDvVx4RcMYW71H8oQZrUXhh+Zp3RiygZJ1Vhwsx8caJIBDoToanuI8zO2jbIwYgcggvI58e4ScE8rR/TVvm14K6lNHbddvCxOEOryoDyxQ19MP1TFxaeo50cx+Z35aY2L4TCWXvSlnak2w20XY=
+	t=1733323510; cv=none; b=c1j0JqjlVAaW2piLTF7YILUzuNMp01Yhy2VjdU3e5U4uPFtkZOdIvnvylW7cufWlkmQSBIG/KLiMp08vX4cG3U0QWc3YVTxeLU3hN/Rm7PUHNBtsbBvHjQ/WcgyxCkdLeRC3lLN3GTwW4+9mnZqZ1YeblFLVGULl8C70jO2X8TI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733324022; c=relaxed/simple;
-	bh=+s1Akq84IIyT8pCTQiEDo6Zt/nb8OW5mR9Yly7SUG9E=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=nVHWO7C/hnl7H4I3Ia/kwH9YTBU2XNCqBv5HrHtnqxxJRcyKOtlKpm9D13egADTSLSoE4qpBZSLhquZTZWzVOU+GvgVPPrvBQeyL+n27DqnG9HHvl4jLAWJHARpSmmYD6WY5Ah9FLLg3kUZOFwDTeK7OvkfjswYX5yFvAQkxyIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=kzvavOIH; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B46kg8i023340;
-	Wed, 4 Dec 2024 14:53:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	drtWFiFON4ugZEisuLBAAdelrnN5zG/TKJ/SOlfxmBU=; b=kzvavOIHoE4mzbHc
-	DXfXYwBfJA3COVAMrVF7Wd4o8FqJdfmal1FzKY91z2Tl0Pd04PIIQSUSlyV2pdPi
-	8RnbWCTGOxsKa0K+dzdlI10KDzsCZMQ/W7dPwwPWBmFmeODXWHJ3LHxyy4nIVtQd
-	0d0kegbC5DP8rf4udn0rORwq2WTvfj+yPwMRX54sp6MyEEcl8z8kte7Nzpn46NyL
-	MHgDddWp2na0phwCqy5zCHrMgy0/dT+RAUrEBz7iBab/VWKrig+9NmuMY3j5CmV4
-	syp1Oem279wu0vWGNpa/Miq8o3Knh4d7NbV6a3t6zhiPfdzhK4ZBTyqpugxKIByq
-	B+fXEw==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43aj4298gj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Dec 2024 14:53:27 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B4ErQF0022114
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 4 Dec 2024 14:53:26 GMT
-Received: from nsssdc-sh01-lnx.ap.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 4 Dec 2024 06:53:06 -0800
-From: Lei Wei <quic_leiwei@quicinc.com>
-Date: Wed, 4 Dec 2024 22:43:57 +0800
-Subject: [PATCH net-next v2 5/5] MAINTAINERS: Add maintainer for Qualcomm
- IPQ9574 PCS driver
+	s=arc-20240116; t=1733323510; c=relaxed/simple;
+	bh=0q2kdb9ndDTRdruJhrVZO9ZNSvWgKMLJ1kjhyBsmvDM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ueS128pYeKFIou/FP+6fChHSkKnCv+rFSB1U/0CNCB+75pcRPtqncGUGshmOkeIsCkwO87k0/XiMjWsbkIB/lAc4DQCng4TkLyYrR1UNQEHEfxheu7yjN0oGA/jOS6X5n9hXkU27KIUBaY8/iRy4bfitVssn/NKcuKU18wDH52U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=R4s585G3; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id F375024000A;
+	Wed,  4 Dec 2024 14:45:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1733323504;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AAX+jkumoVPKbPb3R17m7b0uzquPU2OrziaqtblcuSc=;
+	b=R4s585G3BJWL4cgXLIyRskocu8PxUt7uHTvuRMxMob8SnkbKtAgpd534WleeV0i1/imIuO
+	z833hqHvS+H9WyswOz19dtBID0psasTlFAb8sCHoYZstAP6M5yJZZf+BdHEqhYaiwF9u9m
+	XTtGKkxjF0wxnYUZG/F61nKanmV+m+CCk7Jj5A5YOwOeGJGrV7z/JGuH5/dbf/wCPLH76I
+	rxgRjNrzU/OknUiGb5zIp/bW+R+y7Jy3po4GhFQ8QMsP3gvhCVwu25fau8mIUxlLy4B3dX
+	MJT3n6UJ+T4qCUrl3g0hxDeTK1Enjpo74Nw1qssE3uuJ3Eq6limUQ2mL8AVVaQ==
+From: Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH net-next v20 0/6] net: Make timestamping selectable
+Date: Wed, 04 Dec 2024 15:44:41 +0100
+Message-Id: <20241204-feature_ptp_netnext-v20-0-9bd99dc8a867@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,82 +54,209 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20241204-ipq_pcs_rc1-v2-5-26155f5364a1@quicinc.com>
-References: <20241204-ipq_pcs_rc1-v2-0-26155f5364a1@quicinc.com>
-In-Reply-To: <20241204-ipq_pcs_rc1-v2-0-26155f5364a1@quicinc.com>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, Andrew Lunn
-	<andrew@lunn.ch>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King
-	<linux@armlinux.org.uk>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
-        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>,
-        <quic_linchen@quicinc.com>, <quic_luoj@quicinc.com>,
-        <quic_leiwei@quicinc.com>, <srinivas.kandagatla@linaro.org>,
-        <bartosz.golaszewski@linaro.org>, <vsmuthu@qti.qualcomm.com>,
-        <john@phrozen.org>, <linux-arm-msm@vger.kernel.org>
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIANlqUGcC/43TzYrcMAwA4FcZct4US5b801PfoyyLHdvdQJsMm
+ XTYZZl3rzK0JMvY0GNs+YslSx/dJS9jvnRfTx/dkq/jZZwn+UD1dOqG1zD9yP2YZKFDhRoUQF9
+ yWH8v+eW8nl+mvE75be11QevYuuwodnLyvOQyvt3Z750E9VtU9yw7r+NlnZf3+/+u5r7/V/ZV+
+ Wp61VsIpQxoo8r8Lc7z+nOcvgzzr7t4tbsCQHXFikIWs7WeIZN6VNw/hRSCqStOFAZVCAsRlfi
+ o+IOCDcVvd2E2AEy+IDwqoHaGVKMwoMRRJWAOPDgffMWBg4PYcECcApIQFAyQXMXBg6NVw0Fxc
+ OCCFE3wQBVH7w5jKy8tjskpUCJJj0rFod0xqvHk0grSOTaaYrIE1N4c+OBAqz4sTsSgnEEWTlc
+ csztWccPZOpmTBdZSHMm/4tij06rP1sshh+h8ooj0eSKeTv9zPLIGW1glefHKNfZZAJmqhrMNQ
+ 06eXNHROGcrjj84zbbZxsFTcSGkwScePju32+0PKigLxqQEAAA=
+To: Florian Fainelli <florian.fainelli@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, 
+ Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
+ Simon Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
+ donald.hunter@gmail.com, danieller@nvidia.com, ecree.xilinx@gmail.com, 
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-doc@vger.kernel.org, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Shannon Nelson <shannon.nelson@amd.com>, 
+ Alexandra Winter <wintera@linux.ibm.com>, 
+ Kory Maincent <kory.maincent@bootlin.com>, 
+ Jacob Keller <jacob.e.keller@intel.com>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1733323958; l=960;
- i=quic_leiwei@quicinc.com; s=20240829; h=from:subject:message-id;
- bh=+s1Akq84IIyT8pCTQiEDo6Zt/nb8OW5mR9Yly7SUG9E=;
- b=7YteXcZv/ctSOIsE3AdT1lqxh+/M/SxN8cIw2hfMO1otCAm3vzx/JmIYsyKecS0i7fBqq1kSx
- wHDb6e7i2UfCTH66c6Zs6oSWX+4IZID1sJMsagrmEn5pAMT+WmfBjVC
-X-Developer-Key: i=quic_leiwei@quicinc.com; a=ed25519;
- pk=uFXBHtxtDjtIrTKpDEZlMLSn1i/sonZepYO8yioKACM=
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: Z_nexa7FyoPQDzAXntihMYC8E41nBBV3
-X-Proofpoint-ORIG-GUID: Z_nexa7FyoPQDzAXntihMYC8E41nBBV3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- mlxscore=0 mlxlogscore=828 lowpriorityscore=0 clxscore=1015 malwarescore=0
- priorityscore=1501 spamscore=0 adultscore=0 suspectscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2412040114
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Add maintainer for the Ethernet PCS driver supported for Qualcomm
-IPQ9574 SoC.
+Up until now, there was no way to let the user select the hardware
+PTP provider at which time stamping occurs. The stack assumed that PHY time
+stamping is always preferred, but some MAC/PHY combinations were buggy.
 
-Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
+This series updates the default MAC/PHY default timestamping and aims to
+allow the user to select the desired hwtstamp provider administratively.
+
+Changes in v20:
+- Change hwtstamp provider design to avoid saving "user" (phy or net) in
+  the ptp clock structure.
+- Link to v19: https://lore.kernel.org/r/20241030-feature_ptp_netnext-v19-0-94f8aadc9d5c@bootlin.com
+
+Changes in v19:
+- Rebase on net-next
+- Link to v18: https://lore.kernel.org/r/20241023-feature_ptp_netnext-v18-0-ed948f3b6887@bootlin.com
+
+Changes in v18:
+- Few changes in the tsconfig-set ethtool command.
+- Add tsconfig-set-reply ethtool netlink socket.
+- Add missing netlink tsconfig documentation
+- Link to v17: https://lore.kernel.org/r/20240709-feature_ptp_netnext-v17-0-b5317f50df2a@bootlin.com
+
+Changes in v17:
+- Fix a documentation nit.
+- Add a missing kernel_ethtool_tsinfo update from a new MAC driver.
+- Link to v16: https://lore.kernel.org/r/20240705-feature_ptp_netnext-v16-0-5d7153914052@bootlin.com
+
+Changes in v16:
+- Add a new patch to separate tsinfo into a new tsconfig command to get
+  and set the hwtstamp config.
+- Used call_rcu() instead of synchronize_rcu() to free the hwtstamp_provider
+- Moved net core changes of patch 12 directly to patch 8.
+- Link to v15: https://lore.kernel.org/r/20240612-feature_ptp_netnext-v15-0-b2a086257b63@bootlin.com
+
+Changes in v15:
+- Fix uninitialized ethtool_ts_info structure.
+- Link to v14: https://lore.kernel.org/r/20240604-feature_ptp_netnext-v14-0-77b6f6efea40@bootlin.com
+
+Changes in v14:
+- Add back an EXPORT_SYMBOL() missing.
+- Link to v13: https://lore.kernel.org/r/20240529-feature_ptp_netnext-v13-0-6eda4d40fa4f@bootlin.com
+
+Changes in v13:
+- Add PTP builtin code to fix build errors when building PTP as a module.
+- Fix error spotted by smatch and sparse.
+- Link to v12: https://lore.kernel.org/r/20240430-feature_ptp_netnext-v12-0-2c5f24b6a914@bootlin.com
+
+Changes in v12:
+- Add missing return description in the kdoc.
+- Fix few nit.
+- Link to v11: https://lore.kernel.org/r/20240422-feature_ptp_netnext-v11-0-f14441f2a1d8@bootlin.com
+
+Changes in v11:
+- Add netlink examples.
+- Remove a change of my out of tree marvell_ptp patch in the patch series.
+- Remove useless extern.
+- Link to v10: https://lore.kernel.org/r/20240409-feature_ptp_netnext-v10-0-0fa2ea5c89a9@bootlin.com
+
+Changes in v10:
+- Move declarations to net/core/dev.h instead of netdevice.h
+- Add netlink documentation.
+- Add ETHTOOL_A_TSINFO_GHWTSTAMP netlink attributes instead of a bit in
+  ETHTOOL_A_TSINFO_TIMESTAMPING bitset.
+- Send "Move from simple ida to xarray" patch standalone.
+- Add tsinfo ntf command.
+- Add rcu_lock protection mechanism to avoid memory leak.
+- Fixed doc and kdoc issue.
+- Link to v9: https://lore.kernel.org/r/20240226-feature_ptp_netnext-v9-0-455611549f21@bootlin.com
+
+Changes in v9:
+- Remove the RFC prefix.
+- Correct few NIT fixes.
+- Link to v8: https://lore.kernel.org/r/20240216-feature_ptp_netnext-v8-0-510f42f444fb@bootlin.com
+
+Changes in v8:
+- Drop the 6 first patch as they are now merged.
+- Change the full implementation to not be based on the hwtstamp layer
+  (MAC/PHY) but on the hwtstamp provider which mean a ptp clock and a
+  phc qualifier.
+- Made some patch to prepare the new implementation.
+- Expand netlink tsinfo instead of a new ts command for new hwtstamp
+  configuration uAPI and for dumping tsinfo of specific hwtstamp provider.
+- Link to v7: https://lore.kernel.org/r/20231114-feature_ptp_netnext-v7-0-472e77951e40@bootlin.com
+
+Changes in v7:
+- Fix a temporary build error.
+- Link to v6: https://lore.kernel.org/r/20231019-feature_ptp_netnext-v6-0-71affc27b0e5@bootlin.com
+
+Changes in v6:
+- Few fixes from the reviews.
+- Replace the allowlist to default_timestamp flag to know which phy is
+  using old API behavior.
+- Rename the timestamping layer enum values.
+- Move to a simple enum instead of the mix between enum and bitfield.
+- Update ts_info and ts-set in software timestamping case.
+
+Changes in v5:
+- Update to ndo_hwstamp_get/set. This bring several new patches.
+- Add few patches to make the glue.
+- Convert macb to ndo_hwstamp_get/set.
+- Add netlink specs description of new ethtool commands.
+- Removed netdev notifier.
+- Split the patches that expose the timestamping to userspace to separate
+  the core and ethtool development.
+- Add description of software timestamping.
+- Convert PHYs hwtstamp callback to use kernel_hwtstamp_config.
+
+Changes in v4:
+- Move on to ethtool netlink instead of ioctl.
+- Add a netdev notifier to allow packet trapping by the MAC in case of PHY
+  time stamping.
+- Add a PHY whitelist to not break the old PHY default time-stamping
+  preference API.
+
+Changes in v3:
+- Expose the PTP choice to ethtool instead of sysfs.
+  You can test it with the ethtool source on branch feature_ptp of:
+  https://github.com/kmaincent/ethtool
+- Added a devicetree binding to select the preferred timestamp.
+
+Changes in v2:
+- Move selected_timestamping_layer variable of the concerned patch.
+- Use sysfs_streq instead of strmcmp.
+- Use the PHY timestamp only if available.
+
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Kory Maincent (6):
+      net: Make dev_get_hwtstamp_phylib accessible
+      net: Make net_hwtstamp_validate accessible
+      net: Add the possibility to support a selected hwtstamp in netdevice
+      net: ethtool: tsinfo: Enhance tsinfo to support several hwtstamp by net topology
+      net: ethtool: Add support for tsconfig command to get/set hwtstamp config
+      netlink: specs: Enhance tsinfo netlink attributes and add a tsconfig set command
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c27f3190737f..c76348387326 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -19164,6 +19164,15 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/regulator/vqmmc-ipq4019-regulator.yaml
- F:	drivers/regulator/vqmmc-ipq4019-regulator.c
- 
-+QUALCOMM IPQ9574 Ethernet PCS DRIVER
-+M:	Lei Wei <quic_leiwei@quicinc.com>
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	Documentation/devicetree/bindings/net/pcs/qcom,ipq9574-pcs.yaml
-+F:	drivers/net/pcs/pcs-qcom-ipq9574.c
-+F:	include/dt-bindings/net/qcom,ipq9574-pcs.h
-+F:	include/linux/pcs/pcs-qcom-ipq9574.h
-+
- QUALCOMM NAND CONTROLLER DRIVER
- M:	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
- L:	linux-mtd@lists.infradead.org
+ Documentation/netlink/specs/ethtool.yaml     |  66 ++++
+ Documentation/networking/ethtool-netlink.rst |  82 ++++-
+ Documentation/networking/timestamping.rst    |  38 ++-
+ drivers/net/phy/phy_device.c                 |  10 +
+ include/linux/ethtool.h                      |   4 +
+ include/linux/net_tstamp.h                   |  29 ++
+ include/linux/netdevice.h                    |   4 +
+ include/uapi/linux/ethtool_netlink.h         |  29 +-
+ include/uapi/linux/net_tstamp.h              |  11 +
+ net/core/dev.h                               |   3 +
+ net/core/dev_ioctl.c                         |  47 ++-
+ net/core/timestamping.c                      |  52 +++-
+ net/ethtool/Makefile                         |   2 +-
+ net/ethtool/common.c                         | 148 ++++++++-
+ net/ethtool/common.h                         |  13 +
+ net/ethtool/netlink.c                        |  24 +-
+ net/ethtool/netlink.h                        |   8 +-
+ net/ethtool/ts.h                             |  21 ++
+ net/ethtool/tsconfig.c                       | 443 +++++++++++++++++++++++++++
+ net/ethtool/tsinfo.c                         | 358 +++++++++++++++++++++-
+ 20 files changed, 1345 insertions(+), 47 deletions(-)
+---
+base-commit: 645738c83f82fb2495813a100799a50c0c08028e
+change-id: 20231011-feature_ptp_netnext-3f278578e84b
 
+Best regards,
 -- 
-2.34.1
+Köry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
 
