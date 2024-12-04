@@ -1,186 +1,279 @@
-Return-Path: <netdev+bounces-149160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C7389E486E
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 00:08:58 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08D8C9E48C5
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 00:25:21 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0551169439
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 23:08:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B80ED28116C
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 23:25:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9B41F5422;
-	Wed,  4 Dec 2024 23:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C031F03FF;
+	Wed,  4 Dec 2024 23:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="DwT8O8Iu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H0lcsHvz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4F11A8F94
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 23:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733353734; cv=none; b=nSX9uuFQacJpBpFu291qvPkBcGEM9yTutOT3zXRxF7OPQ1s6V1v1O2ukcl6aeCbEH32X6xlRgqiaxf1WpdC88jeiW9lV8L0oktfUWCYaGJWqhDEaHr+DuQxxIRp/qRD9D6k60I6rriFYkzNtUi7q2sGjrL2r5ZGZaEuSYqzJiMw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733353734; c=relaxed/simple;
-	bh=F0NJ97nCPumDckOXtjnziKIoa/qCK2OpTeS1VsR6/mY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=QdCpb92TaaVoIGoS7ptqGtVwTsht9NlSnz9fmX6hZMuWQDY6hwkSoFIeGdEQuTt/swwTdGHdevA+56o979KtynOX6ti1of9xRGji6hFnpVSzAavJYjSlAYGK4hQtvJbfMQ1gI59yG4lnuqpVcyc4XjXnFpfXtZ44DAFK1ud1o/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=DwT8O8Iu; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-aa54adcb894so41341766b.0
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 15:08:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1733353731; x=1733958531; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cKBLckwxwL3XkslyANGTh154PJ60a+jIScsVyxn68Vk=;
-        b=DwT8O8IuhXEkGVjbav8JZkUTs1S49S4y7UKJcs+bhlTGQgsUIt2I5vyC8y4EzW+AM+
-         Mo4G8U2OMb21Nd0JF2z24r1ymBBkXcA+ZFbsmbwEyOz4W8NUndxdj6Y6ImaXd2pMVAPY
-         bORpL72buIBbKq7MpzjgmiQQeLjLu2sNK4g2/3hyhknO6OUXmmAGedDgwe5H33q/MYo3
-         VhwrDR9eYG1YOak/W0ZFLTJHESU4U1aTnmA3wSgX5ZbdVGhWMcgGDL/dTjJ4RGZYp0/E
-         uQJAoN4eope32YIXhEc3gcg3v3MZyn8jdjg0XMPZ76k62Sk1QTWjVE6thweVQiUq6SnT
-         0Lqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733353731; x=1733958531;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=cKBLckwxwL3XkslyANGTh154PJ60a+jIScsVyxn68Vk=;
-        b=ZmIG2wQYgTYeZZLkMWdHoHBfmL+KIUERYmV6pESSxmW9WuMU5S/cdJzsdTDmtF/y2W
-         7RHdzetK7TsJl2tc1+51yZbtNwJUvTDh99p43rKjJdk25l/jBJxmnky/mNkZ2/cRm5B3
-         8hJGQ5Hc3KsHkydQmWWoOGKdzzp7RePXKa54OBCjYJZ8b48HPhPoqyrfgpGk0lfFCAYT
-         3HRY4YVvj2lqW48nn9H10aaGrcnJrhrd47RrB8zQGg3Gbr6fk3bBwLgaWEwgXMDpdXpx
-         Ou3CWL7fkA+UzlQ9wmEJ7EDHyJh/kNqZH1FRgrDVty41n74d9gqmM8WgCaVoOq+HtAZP
-         VbPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV5ulAk1Rlwyh5x5PBKAfZLUxvgtmOciG4vSsq0MzItIxnW/Zypr6fwz5fwb8VRE11AVz/TxmI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwA3IJycX3sTGN2Z3zFrJQWdJ0BBJrrSI3lhGVTHCbglr7SZ5CP
-	BWUZfPR/IWpw7CAMqS7u+9s8qb2Hh3uoZUrIrA3u4//wcmIAS9hzAKFGsS7OHdg=
-X-Gm-Gg: ASbGncu0A2r9c13HkY3Q6xfkOkU+EYTvkTNW0iXM55csDUEpoy//u2c2cujjaXSBvK4
-	WzuI91h1rxKuEW/tjxpkyhBd7RcxLqSGbWKIHYPoL6Nn17No+NANOQQ8MNQqz35ghOzOCOO+vGK
-	dEBfdas9wIRe+/xFCnFuY3sRv+OvkgrJY686oR43IRAMyXFIsVoens9Oq8kY6a9gcaKZqEqYROf
-	EHV8KR4s6m73d9Udd6tgQ1zLMzA9HUbyPqAiM2JZOrSjUH/hUdrjSfA7Ld0Fq1uIxCOEb3erqWv
-	G4kS1wWOKwiZ
-X-Google-Smtp-Source: AGHT+IH69+zo0MA6o8lLr+64n7CFOdLqMrTUeqDDP42MbL7K6OX9M+e7TDBwqfrIzYhIfWUgmiWCBQ==
-X-Received: by 2002:a17:907:7746:b0:aa6:26d1:b5b3 with SMTP id a640c23a62f3a-aa626d1b716mr25348166b.18.1733353730706;
-        Wed, 04 Dec 2024 15:08:50 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:9715:a35f:73a4:7403? ([2001:67c:2fbc:1:9715:a35f:73a4:7403])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa625ea38d0sm11700066b.73.2024.12.04.15.08.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2024 15:08:50 -0800 (PST)
-Message-ID: <17e7d4c6-4912-4d5e-8723-45a06a1ad529@openvpn.net>
-Date: Thu, 5 Dec 2024 00:09:30 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3D619DF66
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 23:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733354717; cv=fail; b=SAAJXDLhq5jJCGDVMZigfUBHvDBrQMWiReQfqnb+Z6HgQ5bFznNC9QckaemkU+1vWX4w40OLtFqpkE6XpaXEVlenc3tWZikC/OpFo8m0d8TlpuOTZfREyzfSmSIDxoGdpXUj97OrQ3xP+ediV9WfAAXwFCwlQv0hqjC+OkkiMtE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733354717; c=relaxed/simple;
+	bh=STGiIxGmcUZuIf1K1IVwTNDmuZjrel/Ds0iBE9258Ro=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Sb7UbkNhwqrrm78pWixBDD55lpFaOPNnm5DdZKe2g9VNJuSBQN7ofZI2HFjxNZYlJ2nEb1x5AfxFTSqtWh1t4+JO/XRit1Gsl3mjDJ0kW5zcxdCEbTA4wWbKJYd/fsEJSwUBiWGD1r80CVK68K24HNlGyfehBUHhaFATF9mBp3w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H0lcsHvz; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733354716; x=1764890716;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=STGiIxGmcUZuIf1K1IVwTNDmuZjrel/Ds0iBE9258Ro=;
+  b=H0lcsHvzREMPnowAa0D9YTGIS6fM+VCBopQEWOy3mXG+SQdjNdot5xnB
+   hK4oNpkMNJY+ID+rcWkjcNrSzW8cXe1y1/MghijFjsSxDlspG9qrEkCBi
+   kEXwyVAOUXBBcQcDrw+BnURU+21JSfiDM93ocYUq+mfKWsBtwX5gRqGUy
+   h9zsAEQbVb7F4RlrvNoX2qpd/2y6jxqxNJRVEULIrErk7RFxADGsXPYyd
+   VLWBV3UzhISmvDS6Sq4G4xQov0SM7BspQuzg5hZXoGVb5T4Heyscu08D3
+   4G0a1QolZn/K6I/nMgELLoAyMCjRhUTYdFcr+h3H1D5lAHL3J5PbuXxPe
+   Q==;
+X-CSE-ConnectionGUID: BSBwdKrCT/GjKErWpgXXBg==
+X-CSE-MsgGUID: RsxXAG1eQrG6mTE1iCPcIw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="45022275"
+X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
+   d="scan'208";a="45022275"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 15:25:15 -0800
+X-CSE-ConnectionGUID: wzbJQBATTG6taubZWVJOMw==
+X-CSE-MsgGUID: BdIEv4Q9TzStI+aApp14Tg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
+   d="scan'208";a="94744571"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Dec 2024 15:25:14 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 4 Dec 2024 15:25:13 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 4 Dec 2024 15:25:13 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.49) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 4 Dec 2024 15:25:04 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=S2NEVqa6RejNsItTXLOH2zRICs0pq7CUVVNzSkHLMn1BlNxjZq+CRwyoIduvcZYS+86dwGxyv4DTLxBs65lewkSQB9IUtejlArwGW9T4AQXA0oEBr6rRrizC04m7yLtDsygUaAxtZj9J/yeoC836B72AHqOT4y5ye/YTCBTPaP95cUoboIm1kpsdpqCmL4yoWlwfGL/Yt71i7Wd7lqaVlUZDaqen0kd6L4YHxbpBk39XSQNFzkg7JhyFwE6R5jr0jxpdZHbmQGLgLnF+whfKVSnuD7eEdmwgbb13/FHhz91HCM4DJF2bnMCpk/NScNinwSxypSKf+zlhZWgQHh+0wA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zaryoqLxK2cNZTAdT1T/wWUUTYWGFNjzsGPx4gCwSr0=;
+ b=A57SOC/k7QYo7QuyR3CiBKlhloIzbDUoYbF3NJ8oQ+B7vEG3uMuppTNNtiSFN2BZA0P2gBCjALSnD8TeGGYzELeB8X2GhKzPyZ8db6sefDmwvDR/4KQE05gaQyF/4bB5G+ySdVAT8kjO2ad6ALMUbFojmSo8huSSfn+AdhhlAruR9zg64dd0ocJc88SaTLolBtBH4cn4D78maI5j/sqAdNfdG0a9xFpyjj3osbtFUubcrbMngBgpnQHjgIPjQV6QhPJAGQJF7ufR7YR9/WeItcN8x5ezsFg3NyA+AM6RejdmfjWFE5LqQtOEW+1jqJ+5xrnD84Oa4oTwVYgtV0N0qw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by BN9PR11MB5257.namprd11.prod.outlook.com (2603:10b6:408:132::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.20; Wed, 4 Dec
+ 2024 23:25:02 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8230.010; Wed, 4 Dec 2024
+ 23:25:01 +0000
+Message-ID: <998519c0-a03f-4190-a090-f8ada78ea376@intel.com>
+Date: Wed, 4 Dec 2024 15:24:59 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 03/10] lib: packing: add pack_fields() and
+ unpack_fields()
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Przemek
+ Kitszel" <przemyslaw.kitszel@intel.com>, Masahiro Yamada
+	<masahiroy@kernel.org>, netdev <netdev@vger.kernel.org>
+References: <20241203-packing-pack-fields-and-ice-implementation-v8-0-2ed68edfe583@intel.com>
+ <20241203-packing-pack-fields-and-ice-implementation-v8-3-2ed68edfe583@intel.com>
+ <20241204171215.hb5v74kebekwhca4@skbuf>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20241204171215.hb5v74kebekwhca4@skbuf>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4P223CA0003.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:303:80::8) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 11/22] ovpn: implement TCP transport
-From: Antonio Quartulli <antonio@openvpn.net>
-To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com,
- Andrew Lunn <andrew@lunn.ch>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241202-b4-ovpn-v12-0-239ff733bf97@openvpn.net>
- <20241202-b4-ovpn-v12-11-239ff733bf97@openvpn.net>
- <784fddc4-336c-4674-8277-c7cebea6b94f@redhat.com>
- <2a1b614c-c52d-44c7-8cb8-c68a8864508d@openvpn.net>
- <8714deae-c1f7-42ff-9e76-fabd9ca5188b@openvpn.net>
-Content-Language: en-US
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <8714deae-c1f7-42ff-9e76-fabd9ca5188b@openvpn.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|BN9PR11MB5257:EE_
+X-MS-Office365-Filtering-Correlation-Id: dcd848b5-2d6d-4b82-f96e-08dd14badff3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?WHZPKzI1aG5pY1FtNEdYaXFkdVZLVlRGS1M3dmIxQjB5eEwwRG5Jc21zZTFM?=
+ =?utf-8?B?Vjk5UDh2V1dFZTBuYlZKNnlmOEU3S2s3NnljS1haWmtyd093akQ2b3Q4UXBN?=
+ =?utf-8?B?V0dsbUJBNkxZcXdoRGJrLzFvcEs4YjUvY2tsVnBRaTlMQTdPOFhNUGpJSzdG?=
+ =?utf-8?B?amNFM0MwYTlLK0FRUEJyTWZDdm9LKzhTZ0NEZFVzU3RKYzkwbTBKK1kyUlBM?=
+ =?utf-8?B?amh4UkhLOWlWc0dKV3J0a0R6cTRIcXlSQ3BrWFZlR0FlSjFOSnhKa2M5TFBj?=
+ =?utf-8?B?bk5ZK1hoWGtERlZwdzhadVZXaE4zUXRIYjRBOHZIRDVjQjdmNFZIeXlrM3J4?=
+ =?utf-8?B?ZWlYUEFnYmxrVDRXKytUWUhsejJTaVVkazVYc0pzRjJRemtBUlVzZTZ6bE5Y?=
+ =?utf-8?B?anM5eWl4Y2UyZzM4bUlNZG01aHJRYXM2U2dSMjJtZUNLNUg5eSt2a3F0d2Zq?=
+ =?utf-8?B?TUc5blBYa0grRVptUERMN0pFUGF0TzN1SEZNSmxFU2VsUXZVcGh6WnJxNVNG?=
+ =?utf-8?B?Ni9FL1V1bzA1Y0RPQlc0VUdsYWFjUUV1NzNPeVo2WFA5TnJLRU5vTkpvVWN6?=
+ =?utf-8?B?NFBuL013bktJRDFYQ1hPSWVOOVRDeHo0MkM0cXFhVmtwUHk5dUJyNjNwUFJN?=
+ =?utf-8?B?UW9ubktRNURtT3lkTVZyZWVMV1RtVXVoWXhHN3ZVSjZROEZ5bTRzQ1hJUHd5?=
+ =?utf-8?B?QzM2eDBwQUY5QklmbHFxWlhDdWFDTEpwTDZqTmNKUUhBeFdRc2V6R2dPVFMr?=
+ =?utf-8?B?TFlIZ25UTzRnWGJJczlQSXpRNG5uRUlId2NOOWRVbVZndnVNTVliNjJrbEZi?=
+ =?utf-8?B?QjliajhWUFNLUnFxV0VKekRRSndhWUo3eFpudEJId0JQRVRJMmJwOWNPWWlr?=
+ =?utf-8?B?aDNjR2Z0alNraTdGRzdadVF0dkdiQWxWeW1rdFNxUUdSMWJKbHFZMm1LSlRl?=
+ =?utf-8?B?RlkzMGFQN3ZmYUFsb2hiaGFINE15VmU0ZzB3bWdtMWRySXBVMEJZWjNPY0tM?=
+ =?utf-8?B?bEV6MTIzeDZwcWMyY0RXZUZyM3B6RWw4dERxS1djbHVDM2JCSmxWOGFZUXU3?=
+ =?utf-8?B?TVJnaHpaNzk4RStJaUJNelNJZjREUjEwaUViWGZZOG9iZG5NZHpuM3FLTEM1?=
+ =?utf-8?B?d3VORG5WUi9veEhqMXlIaXNXdmNzY0F5WVBERzRzOGUwRHVZQnRTVEp0TFlF?=
+ =?utf-8?B?YkR4aTNaZGp2RW9CQTJJMlcwSWRWMjhHQWxjdGZzbU4wWm1xQjJVQm9FVlZn?=
+ =?utf-8?B?VVB5UUVvVlh0YlBSakN0a1N6b2dZWmlsTEpqL252OXRBUWtUUW1NSEZFaGI5?=
+ =?utf-8?B?VWpQUExFalFzeGIwUFZwOFpXRkd4dG1LNmlNcjl2YUJlOEdtajhmcVhOa2dB?=
+ =?utf-8?B?bkUzczF5djhZTDM0elhreUxBbkdoNFJWcnN5YkVlWjRkYnNVM2RTTGtTdlVG?=
+ =?utf-8?B?QUVaSE8raDRVcnhXMXhGYjlzRFNiZ0tVeEg3eWRtRWZCcVpMOXZNbGtVYUl1?=
+ =?utf-8?B?NUNWQlpLQTkyQUkwZ2k2UVRZS3llVnZOTEQzK1lOa25OTXNkMWN1aDltLzI1?=
+ =?utf-8?B?VlNOZ3BFc2IrSnZlUEp5Zkt4bzNDNkZYUjNYcDBVYUNmUHdJbWtHck5NcHVP?=
+ =?utf-8?B?RjJaMFMzRmJ5S0pybUpPaVFGR0ZxRDYyYytCd0p2RXdtdnpPcytCQW8vVmtJ?=
+ =?utf-8?B?TlRYY0NkVEtpMTRCYTZFUDRWRWtMaktQU0gxZ045R0N5U0RJVXVONjdveVB4?=
+ =?utf-8?B?YTcvb0lMYk91MWlEUmw2TVViTkkrd2czZVRMSjBVWld2NXgzb2JiYURuRVNa?=
+ =?utf-8?B?bTZ4Uk93ZDJTVUJyVm82UT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?clh1YUNydk9FcmxZbWlpMmVEUVRMalRBeUtKb3ZDTzRCRjNlZ0xjTTIxWGdN?=
+ =?utf-8?B?UDZQbGZydHRodkUvL3RwNXV5VElKK2FodVI5di9jbmk4TkJXTGRIcEovSEJ2?=
+ =?utf-8?B?VFdNMm1Cb2R3enNhUk0vc2tvNFBRTTZ0Wm9jdkZrM2lMZE5vemU1Wlo2VUdW?=
+ =?utf-8?B?QURyZzA1V3RzeE5BSFJiNEdKWEdnWnVkSEszZlIwclI3NVZFTnVaZnBUQlVG?=
+ =?utf-8?B?azg1Wk8ycDlhQ2s3SXRzMkZKUWpqRU5TQitUVk11bkNUY2IrYTZPVk9lZFVm?=
+ =?utf-8?B?Q0k3MzRhYmpEY21xWDl1TElSaFlMNTBzUndzYVRPc0I5VHp4bHNVSDVDWlQ1?=
+ =?utf-8?B?YWpHTnA2UVFxbDRSN0YvTGJ2dUpwWk14aUhFcWs5VGhuMjQyUHRvL0xhQ0hJ?=
+ =?utf-8?B?YmMzb3F1TDhhbklpSGplNzBTRm5YeEFFeGpIYXdUcEJ4VVkyYnpCWEhFZFZN?=
+ =?utf-8?B?VkpjaEg0TmMyRWZjUnVkbHE5dUt4RGtkWU9LTk1XM0gyTlB5eExuRjBLL1J1?=
+ =?utf-8?B?YjlpWWpVZ2ZrQ2ZaZFRrNDFBVXdRcEpEWkZUZkp2YjMrbkdpMTVxOU4yalIw?=
+ =?utf-8?B?ZlpvaGpCYzJmbkxUOXRqRTdXVWtzWXFoWUoxVmVBYU5UMmZDcjFpLy9pdkEx?=
+ =?utf-8?B?aHhqbUpZTGdhRlJXZGhWd3RONzhZYVMwTEF6TEJnSm8wRjQ2MUFkYVlnL2RS?=
+ =?utf-8?B?Q0xDb1ByWVJLem51OWtIS005NjQxeTBPMzNLZDJCWExwVWVCa2JaUEFVUEkz?=
+ =?utf-8?B?YmhTeHFYeWxCRklmdm9QT0hWRk10eGNOd0JYWFZ5eTJFeXFobFE4WVR0YTdJ?=
+ =?utf-8?B?MXdEMCswaVBTa1R3WWthcGc5NCszdUNPaEhsYlRzU2hySGxxa3RYZzcxS2l5?=
+ =?utf-8?B?bEZTSDBsZGpmQm5jOWE5cXM5VTJ6WTlHVFc4SkgxcWxGaTBkMFo3S1FuZWl4?=
+ =?utf-8?B?Z3V0cUU2ekdDRXVWUys2MEh5TjRodnUwWTB3WU1tL1pybGoxVDkveGE3d010?=
+ =?utf-8?B?NGJmOFFyaEtQdmpOK2I0eXJwNDVlM2ZvR2FLbFNWUUhUcEFVNko5V1VoMUlv?=
+ =?utf-8?B?OXp3Z0NBY243ZlBmYm9qek1CRlE4ZzhBaHhqbmVLZTl2Y1J5Yll3eER6d3RM?=
+ =?utf-8?B?RUxkUXduc2M5cDd6QlVUT1pGZklVMUczVmZncllyQ25ubmV4QUFXbVF0NXZS?=
+ =?utf-8?B?Y0t4SDVZclE0N0w0Y3ZQbnBhcThJbGtpcVZUMFB5d05ZaVBqQmhNdUNXM0xQ?=
+ =?utf-8?B?M1llQzd3RklOTmFmR1g4NnNKcEptbC93eFpNNUxMRGtLSGl2am1BT09HcVVC?=
+ =?utf-8?B?ZVhSVyttR0Z2a0VnUk9IclBPTVNtUWhIOHJTQkhXdFNteGtvc3Z3TmJ4dVZh?=
+ =?utf-8?B?MjJRTC9hSExSOEtRT1NFT3liVllZRFJRU1lvUm8wSWNEVDNXbUxEajc5Q1J2?=
+ =?utf-8?B?MVVvNWg2TUFZb2p3eUc1a0ljamRlTEd2aGMyUUhiMWptQXJjZ0lKKytWdWpV?=
+ =?utf-8?B?N1M3dWtHbmxidE9HbVJNQjFlLzVmK2ZLeGRnL1U2cEpTMDJPMUR1WGdXM2RL?=
+ =?utf-8?B?WHRBYjJwbGpiWllzRDhzYllxVGU1ZmVNMDBqOVgrNzhrL2xNWHJRd0ZPMkxt?=
+ =?utf-8?B?M1lVUVBxV0tvZ3FuZDF3Q1VtVGhDVitDdHlLMytjVUV5aXpaWnhiblBxbzZz?=
+ =?utf-8?B?R2FGZUkrR1FkWVM3N2FtQjdMM1QvQ2JXZlhmcm42emlqZHJpVEZUOUhQc3Iv?=
+ =?utf-8?B?OXdCTTg4ZG1DajZ6ZFJBZml0b2crLythK1N5Y2F5TDdGK1ZiTmx3eUVtTVli?=
+ =?utf-8?B?U0s1SDlVMWp1cFI3R0IyL21wUXE4ZDlBUUMyWXEvR1lEdFdWYmMwQlpOM2xM?=
+ =?utf-8?B?NTZPTkVkNXRrVE55SjZEbnVYN2NDYjhZa0FoWE0xc0d6ZFU5djFKSkpwOGcx?=
+ =?utf-8?B?M0tCN2NwQVc0WDlJVEI2YkF1eEJaUDJFZ1dkeGZBR0dUVng2NWNxZDRkVGZC?=
+ =?utf-8?B?amhwVWRjeW1PWW9Rekd4UjIxWnFET3A0ak8vNkJ3ZDNaVUhqRlp6U091UUJz?=
+ =?utf-8?B?bCs3ZVpwU3VaRzExK1JXY1QrV2IzNjB6TWx6VmVObTUxNlBGVFhyOERycnBK?=
+ =?utf-8?B?ZzMrdG1JMUwycU8yajYxMnBHUDgvejg2a2F2T0RORlB6UklreWhYSkpDam5m?=
+ =?utf-8?B?RUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: dcd848b5-2d6d-4b82-f96e-08dd14badff3
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2024 23:25:01.1443
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kcOJcOnW5rdFznKX58a0wAOA9HGkuEIjrWMrcDgZFKqhIaf6RdTp8tWHjmRNM8/H6W9Jwwgwm8bSq8R/kkhOCulhsmju9EjoGO9vTrKIY+4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5257
+X-OriginatorOrg: intel.com
 
-On 04/12/2024 23:52, Antonio Quartulli wrote:
-> Paolo,
+
+
+On 12/4/2024 9:12 AM, Vladimir Oltean wrote:
+> And there's one more thing I tried, which mostly worked. That was to
+> express CHECK_PACKED_FIELDS_N in terms of CHECK_PACKED_FIELDS_N-1.
+> This further reduced the auto-generated code size from 1478 lines to 302
+> lines, which I think is appealing.
 > 
-> On 04/12/2024 12:15, Antonio Quartulli wrote:
-> [...]
->>>> +        mutex_lock(&tcp6_prot_mutex);
->>>> +        if (!ovpn_tcp6_prot.recvmsg)
->>>> +            ovpn_tcp_build_protos(&ovpn_tcp6_prot, &ovpn_tcp6_ops,
->>>> +                          sock->sk->sk_prot,
->>>> +                          sock->sk->sk_socket->ops);
->>>> +        mutex_unlock(&tcp6_prot_mutex);
->>>
->>> This looks like an hack to avoid a build dependency on IPV6, I think the
->>> explicit
->>
->> I happily copied this approach from espintcp.c:espintcp_init_sk() :-D
->>
->>>
->>> #if IS_ENABLED(CONFIG_IPV6)
->>>
->>> at init time should be preferable
+
+I figured it out! There are two key issues involved:
+
+> diff --git a/scripts/gen_packed_field_checks.c b/scripts/gen_packed_field_checks.c
+> index fabbb741c9a8..bac85c04ef20 100644
+> --- a/scripts/gen_packed_field_checks.c
+> +++ b/scripts/gen_packed_field_checks.c
+> @@ -10,9 +10,10 @@ int main(int argc, char **argv)
+>  	for (int i = 1; i <= MAX_PACKED_FIELD_SIZE; i++) {
+>  		printf("#define CHECK_PACKED_FIELDS_%d(fields) ({ \\\n", i);
+>  
+> -		for (int j = 0; j < i; j++)
+> -			printf("\tCHECK_PACKED_FIELD(fields, %d); \\\n", j);
+> +		if (i != 1)
+> +			printf("\tCHECK_PACKED_FIELDS_%d(fields); \\\n", i - 1);
+>  
+> +		printf("\tCHECK_PACKED_FIELD(fields, %d); \\\n", i);
+
+This needs to be i - 1, since arrays are 0-indexed, so this code expands
+to checking the wrong value.
+
+CHECK_PACKED_FIELDS_1 needs to become
+
+CHECK_PACKED_FIELD(fields, 0)
+
+but this code makes it:
+
+CHECK_PACKED_FIELD(fields, 1)
+
+Thus, all the array definitions are off-by-one, leading to the last one
+being out-of-bounds.
+
+>  		printf("})\n\n");
+>  	}
+>  
 > 
-> To get this done at init time I need inet6_stream_ops to be accessible, 
-> but it seems there is no EXPORT_SYMBOL() for this object.
+> The problem is that, for some reason, it introduces this sparse warning:
 > 
-> However, I see that mptcp/protocol.c is happily accessing it.
-> Any clue how this is possible?
+> ../lib/packing_test.c:436:9: warning: invalid access past the end of 'test_fields' (24 24)
+> ../lib/packing_test.c:448:9: warning: invalid access past the end of 'test_fields' (24 24)
+> 
+> Nobody accesses past element 6 (ARRAY_SIZE) of test_fields[]. I ran the
 
-I answer myself: mptcp is not tristate and it can only be compiled as 
-built-in.
+The array size is 6, but we try to access element 6 which is one past
+the array... good old off-by-one error :)
 
-If I compile ovpn as built-in I also get everything built fine.
+There is one further complication which is that the nested statement
+expressions ({ ... }) for each CHECK_PACKED_FIELD_N eventually make GCC
+confused, as it doesn't seem to keep track of the types very well.
 
-Paolo, do you have any recommendation?
-Should I patch net/ipv6/af_inet6.c and add the missing EXPORT_SYMBOL()?
+I fixed that by changing the individual CHECK_PACKED_FIELD_N to be
+non-statement expressions, and then wrapping their calls in the
+builtin_choose_expr() with ({ ... }), which prevents us from creating
+too many expression layers for GCC. It actually results in identical
+code being evaluated as with the old version but now with a constant
+scaling of the text size: 2 lines per additional check. Of course the
+complexity scales linearly, but that means our text size no longer
+scales with O(n*log(n)) but just as O(N).
 
-Regards,
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+Its fantastic improvement, thanks for the suggestion. I'll have v9 out
+with these improvements soon.
 
