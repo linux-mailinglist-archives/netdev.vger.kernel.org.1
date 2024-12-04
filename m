@@ -1,79 +1,83 @@
-Return-Path: <netdev+bounces-148992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB5259E3BF9
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:02:36 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 341669E3C00
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:03:35 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AF75280C80
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:02:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D3FF16A146
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:03:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D4D1F7086;
-	Wed,  4 Dec 2024 14:02:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6817D1FBEBF;
+	Wed,  4 Dec 2024 14:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4ieuEd1V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HWNo3kY4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FB01F7083
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:02:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D891FE444
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733320936; cv=none; b=Il5IFkXTPM7ibwl+48NlsVn23wP3r5u27xsD1jqjbQORSPJm3X0hehVLbf8LSAwR4mC8IVUNM9XaK6Eo7640ya21EFc7GvHDHjXjESyZoQiEfpXLWQb6q8/yaVeksyOA7XzGqNJ+x+nflX8lM9bmYRV9qx++KJ9UH0XM5Y6Qisc=
+	t=1733320942; cv=none; b=mPAoFwaNC5xk82t23aUGQKH/6l/3kVAXXqvy7bxKz5X36UIsWheDe3j2OYPthhIlBVUBWakbVdYEX22g8zqNpHHswyuelhJrsN7vcTxAiR6UpgsAALZYUWVQwokjHKfg05OJ7ZmpTBKfN+Ei2QH82G1ijbPfPhJsQtGSU/IFUlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733320936; c=relaxed/simple;
-	bh=NTx5bH5I9pgr5modJ9vq7mgo1kwCUmKeLwlZ0Ni+atM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fC3gGsXRKNhLoBzVghBee6kYMUgpcyyC971Bwx0laBOCq6CWPlu8floje+aW+zwVTKemvqZNNlskntM/4ViHWH6tJ7qDEq86nOP4DKVkjI/kry27MJqLP43lAypuoGrJ0eEp7TmCBZyIdNP2eWO/yPLIhhugaNp9ttx14yooRac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4ieuEd1V; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1733320942; c=relaxed/simple;
+	bh=1wM0WDuV5V94OxCNQLDI2O+YQYh+UWUwxu4FRerbMjk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nrcTTOBwz1wyiMLNR3o6q58xqkcw+YulH3Pli3XWHoPo5YU2d2Gp63A2NAc4taHgQUJxo94j13Qitw8yT3PPAqf7iH3sdgDUf1+gyVwHbcOwA58zUrmQ3Jqt6k1IF5Lejj4jdnjKVD88tUkLTh2Xlyjyh2+l+SXLbhgWa7gkhro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HWNo3kY4; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-72501c1609dso6814465b3a.2
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 06:02:14 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2158c589cd0so36182735ad.1
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 06:02:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733320934; x=1733925734; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6zuZyPX8da6qL0JlvYVBXZyCB52f+7jTWfs55cORTM0=;
-        b=4ieuEd1VMGLgbSVEFfCerq6AOW+RPfGzqp6QwAteWPWLN56t9gFThjURm8SChNnIoC
-         Qo9YReWmd8wEBtkMfaVV1SxhphKa4C2/ieTkcOFf8PKD0Drn3aBhl6PsUFDtUGNNHOpg
-         dhYh5+rxGI9/EkUITmzJ7SYxd2sDIila3jC4uatEy9qaUh5WaAMb9SU4o96PvPKZr5ST
-         aiNBVYnQE53X474WITp7hMjm9GW5f9vWoXXMqaCUYYF3AU4PuNVwHVaKwadyXGrwepb+
-         9yVYJHH9hEGrHn8XKSfj9kS0OMAc8cT20X8rJpSybSexEYJr40COgz/fwONYdlhF8ONe
-         hNxg==
+        d=google.com; s=20230601; t=1733320940; x=1733925740; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UHNdmNDMtPaWmA8LMhB2fS18TWlGBB16yfWTVr8FLt8=;
+        b=HWNo3kY4Zdjz/k7x4s4D9xDT+SzYAbu8KEGdfiB56c7GR7WRm5H8rUx5KckKGJMAHH
+         ahVJa7aU73ImICaP4cRKXZzcu+ZSqCqrcbahDLHZDsjafEg2jiojGCyCAUpD4h/naT8o
+         oZt0WFa0PAgHZGJafiB92X8zpuweJHXN+IXnXbz7cC8heEEXtq5Cg7qdzLy2bZkXsCWN
+         Pb+RqgORamZg4xx8G24R9Hn7qTKA1YL7k9BIXGOYTmSHYGtWbG36RxuJHXyJVQUt1jgM
+         OrF11sHBm7+eG3/7mpu1wsJrod0Q9U/8HOX4T5IUaSJM3cvk+JBhZVGfzT/ZKwDzGLFV
+         IW8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733320934; x=1733925734;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6zuZyPX8da6qL0JlvYVBXZyCB52f+7jTWfs55cORTM0=;
-        b=OQjwYSyG9YWHPbDe9BHevJGWKxnBYbn5VsjDM2FuVIccEYq0dSjvzVFVma1Qsfa/qi
-         Y7BWx6VvM0Hy6KoQDBmfyvluSumNT/CYGdvJ/iAXKtynFxp2YeN/vSO4RPMSB8dXywXM
-         mf1LWfNupunYW6aaGQ7D1Cu36sDnHwTS6ksCp+xV8e6G8tQXqjOkcmA50n5/Oh5L9EeF
-         W/ov5fJ3U6s+5L2+PrEvpBFFjy8w2xOUz0scUkg3bvaEUdO0bkfI/Dah+567yovKRlpX
-         DSU4aj9gvCvxfpagxMJPAkm/ap/DBihzqDMJ+HIaYuOEWNBsIOEgYFJ4X++DvhgOEHdd
-         k3Rw==
-X-Forwarded-Encrypted: i=1; AJvYcCXoMe1thJ8HGZIH+wsbtlQS+8JG5OdLwLoXTZkrSLSc3nlAeEUpKwTnt9tahLO/pPsgszaHz7U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDOTCERtaVMBDID+TPp8MH0PkaM4ITOBA5t+WWDCSkK95+0HTT
-	eqVPJYEsiviYyLQIV52kCUOEUUjTbJNF96/C59qbvzVr1dgpeuIO1Dc5ReTDd0cYnc0n3ETHWmu
-	W4q8v6eMaLgHu1f6B6Bdsvg==
-X-Google-Smtp-Source: AGHT+IEp9PdPD6CGniZDUxnjuRM6z9U8YkTeTStWLecer8uJir7XRqV28fPqDC4vusdrdOn3X5xF7fAjbEO4mdzVAw==
-X-Received: from pfbbd16.prod.google.com ([2002:a05:6a00:2790:b0:724:facc:74ab])
+        d=1e100.net; s=20230601; t=1733320940; x=1733925740;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UHNdmNDMtPaWmA8LMhB2fS18TWlGBB16yfWTVr8FLt8=;
+        b=EuHmggWtllPPwky/+024b/R5q3BdsAdAIPYjSm8TNbKsFklb1Irm0czck0owqdzu6y
+         49csrQLBsxrdyLaOdj3BWxacy+onmJvvZIHzDH2Dgi5tL1eZERunleBbMyGoMFAoWR+7
+         WEBssZcpxPRkeezKimdLtW1xNH/GQwr3QC7dNnO83V140M4tvafkq4RdUORF3Pclxr5R
+         hpjscXKqNaKcCCzoOwFtR8tnqwGNyjQM1trTx7eT7JhFFbnK8sKz6+4IQboDRU5Yatom
+         oHWciRgInMK8we7IlumNejhWkI/cahfObR0KPDCHL1ezZBuVozFwwMFyq/q/IQwZZ/hM
+         NGwg==
+X-Forwarded-Encrypted: i=1; AJvYcCX07bCXBQZpUwkJLRv/0DttQVIM6GF45lw5v4Krb9wV2i1IaoLmwGMkWCXYPsROfuHCq+lSo2A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUaea7fKslsvXTsPHFR8kWyBl2tLk+QZFdJdBKVyY8t36YYuRt
+	ECJR24Sq4cuTl6tgcx9vH7WbxQrm1UKz64T6uJ+Nf+y08ZnwYYgdKMxYddx4sjQ2UsS6Hn7W9Mh
+	hnFPT1xJ3utfTPpIqkyGPZg==
+X-Google-Smtp-Source: AGHT+IH9aQ5wZjRyiZ6KI60pX7ycY2gorhMVpdBr27K5u1/f8PhfN11oazwUtKN1R3rMAuqgMYQY6B98pX3m4ROsvg==
+X-Received: from plbme8.prod.google.com ([2002:a17:902:fc48:b0:215:4daf:8d9b])
  (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:1496:b0:724:f8d4:2b6e with SMTP id d2e1a72fcca58-7257fa3f671mr8569825b3a.4.1733320934150;
- Wed, 04 Dec 2024 06:02:14 -0800 (PST)
-Date: Wed,  4 Dec 2024 23:02:07 +0900
+ 2002:a17:903:228c:b0:215:58f0:2620 with SMTP id d9443c01a7336-215bd0ce98bmr100748985ad.30.1733320939989;
+ Wed, 04 Dec 2024 06:02:19 -0800 (PST)
+Date: Wed,  4 Dec 2024 23:02:08 +0900
+In-Reply-To: <20241204140208.2701268-1-yuyanghuang@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20241204140208.2701268-1-yuyanghuang@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241204140208.2701268-1-yuyanghuang@google.com>
-Subject: [PATCH iproute2-next, v3 1/2] iproute2: expose netlink constants in UAPI
+Message-ID: <20241204140208.2701268-2-yuyanghuang@google.com>
+Subject: [PATCH iproute2-next, v3 2/2] iproute2: add 'ip monitor mcaddr' support
 From: Yuyang Huang <yuyanghuang@google.com>
 To: Yuyang Huang <yuyanghuang@google.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -86,58 +90,147 @@ Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-This change adds the following multicast related netlink constants to
-the UAPI:
+Enhanced the 'ip monitor' command to track changes in IPv4 and IPv6
+multicast addresses. This update allows the command to listen for
+events related to multicast address additions and deletions by
+registering to the newly introduced RTNLGRP_IPV4_MCADDR and
+RTNLGRP_IPV6_MCADDR netlink groups.
 
-* RTNLGRP_IPV4_MCADDR and RTNLGRP_IPV6_MCADDR: Netlink multicast
-  groups for IPv4 and IPv6 multicast address changes.
-* RTM_NEWMULTICAST and RTM_DELMULTICAST: Netlink message types for
-  multicast address additions and deletions.
+This patch depends on the kernel patch that adds RTNLGRP_IPV4_MCADDR
+and RTNLGRP_IPV6_MCADDR being merged first.
 
-Exposing these constants in the UAPI enables ip monitor to effectively
-monitor and manage multicast group memberships.
+Here is an example usage:
+
+root@uml-x86-64:/# ip monitor mcaddr
+8: nettest123    inet6 mcast ff01::1 scope global
+8: nettest123    inet6 mcast ff02::1 scope global
+8: nettest123    inet mcast 224.0.0.1 scope global
+8: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
+Deleted 8: nettest123    inet mcast 224.0.0.1 scope global
+Deleted 8: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
+Deleted 8: nettest123    inet6 mcast ff02::1 scope global
 
 Cc: Maciej =C5=BBenczykowski <maze@google.com>
 Cc: Lorenzo Colitti <lorenzo@google.com>
 Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
 ---
 
-Changelog since v2:
-- Align RTM_NEWMULTICAST and RTM_GETMULTICAST enum definitions with
-  existing code style.
+Changelog since v1:
+- Move the UAPI constants to a separate patch.
+- Update the commit message.
+- Fix the indentation format.
 
- include/uapi/linux/rtnetlink.h | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ ip/ipaddress.c | 17 +++++++++++++++--
+ ip/ipmonitor.c | 25 ++++++++++++++++++++++++-
+ 2 files changed, 39 insertions(+), 3 deletions(-)
 
-diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetlink.=
-h
-index 4e6c8e14..04be20ee 100644
---- a/include/uapi/linux/rtnetlink.h
-+++ b/include/uapi/linux/rtnetlink.h
-@@ -93,7 +93,11 @@ enum {
- 	RTM_NEWPREFIX	=3D 52,
- #define RTM_NEWPREFIX	RTM_NEWPREFIX
+diff --git a/ip/ipaddress.c b/ip/ipaddress.c
+index d90ba94d..373f613f 100644
+--- a/ip/ipaddress.c
++++ b/ip/ipaddress.c
+@@ -1504,7 +1504,10 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
 =20
--	RTM_GETMULTICAST =3D 58,
-+	RTM_NEWMULTICAST =3D 56,
-+#define RTM_NEWMULTICAST RTM_NEWMULTICAST
-+	RTM_DELMULTICAST,
-+#define RTM_DELMULTICAST RTM_DELMULTICAST
-+	RTM_GETMULTICAST,
- #define RTM_GETMULTICAST RTM_GETMULTICAST
+ 	SPRINT_BUF(b1);
 =20
- 	RTM_GETANYCAST	=3D 62,
-@@ -772,6 +776,10 @@ enum rtnetlink_groups {
- #define RTNLGRP_TUNNEL		RTNLGRP_TUNNEL
- 	RTNLGRP_STATS,
- #define RTNLGRP_STATS		RTNLGRP_STATS
-+	RTNLGRP_IPV4_MCADDR,
-+#define RTNLGRP_IPV4_MCADDR	RTNLGRP_IPV4_MCADDR
-+	RTNLGRP_IPV6_MCADDR,
-+#define RTNLGRP_IPV6_MCADDR    RTNLGRP_IPV6_MCADDR
- 	__RTNLGRP_MAX
- };
- #define RTNLGRP_MAX	(__RTNLGRP_MAX - 1)
+-	if (n->nlmsg_type !=3D RTM_NEWADDR && n->nlmsg_type !=3D RTM_DELADDR)
++	if (n->nlmsg_type !=3D RTM_NEWADDR
++	    && n->nlmsg_type !=3D RTM_DELADDR
++	    && n->nlmsg_type !=3D RTM_NEWMULTICAST
++	    && n->nlmsg_type !=3D RTM_DELMULTICAST)
+ 		return 0;
+ 	len -=3D NLMSG_LENGTH(sizeof(*ifa));
+ 	if (len < 0) {
+@@ -1564,7 +1567,7 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
+=20
+ 	print_headers(fp, "[ADDR]");
+=20
+-	if (n->nlmsg_type =3D=3D RTM_DELADDR)
++	if (n->nlmsg_type =3D=3D RTM_DELADDR || n->nlmsg_type =3D=3D RTM_DELMULTI=
+CAST)
+ 		print_bool(PRINT_ANY, "deleted", "Deleted ", true);
+=20
+ 	if (!brief) {
+@@ -1639,6 +1642,16 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
+ 						   rta_tb[IFA_ANYCAST]));
+ 	}
+=20
++	if (rta_tb[IFA_MULTICAST]) {
++		print_string(PRINT_FP, NULL, "%s ", "mcast");
++		print_color_string(PRINT_ANY,
++				   ifa_family_color(ifa->ifa_family),
++				   "multicast",
++				   "%s ",
++				   format_host_rta(ifa->ifa_family,
++						   rta_tb[IFA_MULTICAST]));
++	}
++
+ 	print_string(PRINT_ANY,
+ 		     "scope",
+ 		     "scope %s ",
+diff --git a/ip/ipmonitor.c b/ip/ipmonitor.c
+index de67f2c9..4743b3e1 100644
+--- a/ip/ipmonitor.c
++++ b/ip/ipmonitor.c
+@@ -30,7 +30,7 @@ static void usage(void)
+ 	fprintf(stderr,
+ 		"Usage: ip monitor [ all | OBJECTS ] [ FILE ] [ label ] [ all-nsid ]\n"
+ 		"                  [ dev DEVICE ]\n"
+-		"OBJECTS :=3D  address | link | mroute | neigh | netconf |\n"
++		"OBJECTS :=3D  address | link | mroute | mcaddr | neigh | netconf |\n"
+ 		"            nexthop | nsid | prefix | route | rule | stats\n"
+ 		"FILE :=3D file FILENAME\n");
+ 	exit(-1);
+@@ -152,6 +152,11 @@ static int accept_msg(struct rtnl_ctrl_data *ctrl,
+ 		ipstats_print(n, arg);
+ 		return 0;
+=20
++	case RTM_DELMULTICAST:
++	case RTM_NEWMULTICAST:
++		print_addrinfo(n, arg);
++		return 0;
++
+ 	case NLMSG_ERROR:
+ 	case NLMSG_NOOP:
+ 	case NLMSG_DONE:
+@@ -178,6 +183,7 @@ static int accept_msg(struct rtnl_ctrl_data *ctrl,
+ #define IPMON_LRULE		BIT(8)
+ #define IPMON_LNSID		BIT(9)
+ #define IPMON_LNEXTHOP		BIT(10)
++#define IPMON_LMCADDR		BIT(11)
+=20
+ #define IPMON_L_ALL		(~0)
+=20
+@@ -220,6 +226,8 @@ int do_ipmonitor(int argc, char **argv)
+ 			lmask |=3D IPMON_LNEXTHOP;
+ 		} else if (strcmp(*argv, "stats") =3D=3D 0) {
+ 			lmask |=3D IPMON_LSTATS;
++		} else if (strcmp(*argv, "mcaddr") =3D=3D 0) {
++			lmask |=3D IPMON_LMCADDR;
+ 		} else if (strcmp(*argv, "all") =3D=3D 0) {
+ 			prefix_banner =3D 1;
+ 		} else if (matches(*argv, "all-nsid") =3D=3D 0) {
+@@ -326,6 +334,21 @@ int do_ipmonitor(int argc, char **argv)
+ 		exit(1);
+ 	}
+=20
++	if (lmask & IPMON_LMCADDR) {
++		if ((!preferred_family || preferred_family =3D=3D AF_INET) &&
++		    rtnl_add_nl_group(&rth, RTNLGRP_IPV4_MCADDR) < 0) {
++			fprintf(stderr,
++				"Failed to add ipv4 mcaddr group to list\n");
++			exit(1);
++		}
++		if ((!preferred_family || preferred_family =3D=3D AF_INET6) &&
++		    rtnl_add_nl_group(&rth, RTNLGRP_IPV6_MCADDR) < 0) {
++			fprintf(stderr,
++				"Failed to add ipv6 mcaddr group to list\n");
++			exit(1);
++		}
++	}
++
+ 	if (listen_all_nsid && rtnl_listen_all_nsid(&rth) < 0)
+ 		exit(1);
+=20
 --=20
 2.47.0.338.g60cca15819-goog
 
