@@ -1,154 +1,185 @@
-Return-Path: <netdev+bounces-149086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B1399E42C1
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 19:02:45 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEA229E42A6
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 18:58:50 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66832169DA4
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 17:58:47 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2852165FA;
+	Wed,  4 Dec 2024 17:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=paranoici.org header.i=@paranoici.org header.b="fJn7q2lb"
+X-Original-To: netdev@vger.kernel.org
+Received: from devianza.investici.org (devianza.investici.org [198.167.222.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8E13BA20D0
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 17:36:18 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2A6227B9F;
-	Wed,  4 Dec 2024 17:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lakVjt3g"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740C8227B80
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 17:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7C6215F74;
+	Wed,  4 Dec 2024 17:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.167.222.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733331953; cv=none; b=WaUS0VItF4eQzoOzPw9fdwKlxx+BzWYyQygbHdiJU3IANLcNCfAhUgIzNG+2Vrv5avU1fS8Zu4VYHG29TXnkoU7Vgp642isB+EtHzcDOp44dlMKSFvCOiFt2L2eRF2HVG7meOwSwvmlW8KLVye/PrCFr0EmnNQHvkhDLhrBhxY0=
+	t=1733332987; cv=none; b=R11gcHJ0mLKvUhNc2nt1iZ8Ghedm8triLNzcKl2oikJRU8dIBBRlhhIDdlVNf5jJsCpanssAx+fRu3boSzPR01LWGKn3IVXmwkGDyetYSaltW3jVxAkFBNbcdHHSRTGFGl6fOUZLCmKMEWMd8Bsji/qu+YLHHNrRPVI/cDXbaHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733331953; c=relaxed/simple;
-	bh=IegG3mIQXanxKFWATok8kFRHSRMOBCpG/dWiBSjDsy8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=YIdHk5uWKQgXxAEL3tX6LgKRhfBjovqbcx8jlM4hugTheH5CKDxqDm2vFm6binQIX7ZxtMsM79OyOhjXs1xSf5xrWaZ95gLeY/eLIqao1Aw2+hWJ1zeisO/rj1nXLqoVtcyQ8rPIeKKts4XJ10YzEdPuYSTX2jNf40Tf0jqMLOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lakVjt3g; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4669b6cb826so131866041cf.3
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 09:05:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733331950; x=1733936750; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=OBxlJzlqlh/d4rVVKRBPjJYRRbVSJFIRW82i3s/Bhf4=;
-        b=lakVjt3gdtz+kHrOlLUnWgWqPVHQRsQHWwY0nmN42T8lQ+D6l43IriBUi8fqoM5Ned
-         QAFT++B1Ps6x5F0angAa6XlTQpwJTwc7KQiwIo9HaeDKM/mX50cInY8EaESCjiEzaLPX
-         Cx0YXrIBId4DVGLvCHx/OATZwAtZ3nlt3RZmPa+AFfIwWsR8EQUb0MdZjAhmbfCi749Q
-         9WpMFaKeHm6jW1maiqjSTtB1W799E97qvJ3vCvk0ctgjVmf7Jmp/Bqu6fjiwtSdR8qHv
-         8ANGnG4nB49WD5c5y9KknyTyNJBkDTCV97RIekenNVmjOM9QhhHKwXcVBm5+xM5PTGrE
-         9diQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733331950; x=1733936750;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OBxlJzlqlh/d4rVVKRBPjJYRRbVSJFIRW82i3s/Bhf4=;
-        b=JCBG4FbD0D5ObZcpvyXHlntxm9+L7PDBa/gqtzvnNTc4tn8/ISJSTf97UbRkEJjRku
-         pui6aneCBU3b2uHmv0+YgFwfE/HuuJ64/WwrlxVLNCg8GoFeAc9/UCScM15HUKvXcIFB
-         l+aKZcuMc7LuddvYFj1HsrmApbnU2ztNC2FNbpkR8MMZT7t8EZWEJ+ECxprU013XtNVi
-         8EkBzG6vttistfDOsq3k2xc3J2riNP7f1JU0cN7scbykQkQMsn3Kp1r3LglD1xE4IHsb
-         AJJh6cR7/KQesww33xlA62yZM2e9yQjZvFLn0gquNH1hRHg8LnYVIsnhy7LE7eRCj2mH
-         ZbSw==
-X-Gm-Message-State: AOJu0YwbYeQaplZPBa18QrzTGyJYvEPBmuX2J0cr5hojfK0zSfTKODIq
-	ZwYE9UEzOJHVmgxbSRLL/p0Voo3cfaStFh+fBsapKTojSDFAWmwcmDurLzbeIfRR0RcVL10Te3S
-	Pq/+4b1JUnQ==
-X-Google-Smtp-Source: AGHT+IFUyWbYF1FknHI+AmNLA9H3H9FTA9peMKHqodHm8q7gpy23A7QQqS3X2oPeEbuHWFGlXRas8I8C+w2XBw==
-X-Received: from qtbge24.prod.google.com ([2002:a05:622a:5c98:b0:466:ac09:3a10])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7f0f:0:b0:466:8cc1:623b with SMTP id d75a77b69052e-4670c0a8261mr81187831cf.28.1733331950436;
- Wed, 04 Dec 2024 09:05:50 -0800 (PST)
-Date: Wed,  4 Dec 2024 17:05:48 +0000
+	s=arc-20240116; t=1733332987; c=relaxed/simple;
+	bh=8HO3mm3jNM/ZIi+ulQAkDTTq+p4TEOdSZ5DMUDAq2Vg=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=NWS5tHJADo4oYKCLMvmJTmy8jgazd+ocE447RVL4NL0zWuYhs0Tw1TVA+x9Z9WoR3Td38DQcoucpBXUtyU0mKVTQlWoFs/AIbWm4xnL3ZV34d8EV67md+9pvn6TbDvjQiPxQSu8BO2ENWFK/VkgQYfFO+FSs02W6u/s/sexXQLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paranoici.org; spf=pass smtp.mailfrom=paranoici.org; dkim=pass (1024-bit key) header.d=paranoici.org header.i=@paranoici.org header.b=fJn7q2lb; arc=none smtp.client-ip=198.167.222.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paranoici.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paranoici.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=paranoici.org;
+	s=stigmate; t=1733332478;
+	bh=0QrBbFQ1Yk43wtEVuPMTkfoJbcLfYpa5h2xyKqF9TXQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fJn7q2lb6Sq30r4i7Hi1Idj/7Fj1J3PmPVtm/N7w9ggFeeYS6lWZ65FwuKrpRkF+K
+	 OIQ10ChwvBTbmF0gZWZyxven9Hcs5bhfJqy2jjLlnXDWRUYrjK/srEWd7Yiohr1cdS
+	 lJiDni5XC+IMba7+VMn3aNxn4Z6EyzxIvGN2+UQk=
+Received: from mx2.investici.org (unknown [127.0.0.1])
+	by devianza.investici.org (Postfix) with ESMTP id 4Y3PJt0MCvz6vVX;
+	Wed,  4 Dec 2024 17:14:38 +0000 (UTC)
+Received: from [198.167.222.108] (mx2.investici.org [198.167.222.108]) (Authenticated sender: invernomuto@paranoici.org) by localhost (Postfix) with ESMTPSA id 4Y3PJs70sJz6vVW;
+	Wed,  4 Dec 2024 17:14:37 +0000 (UTC)
+Received: from frx by crunch with local (Exim 4.98)
+	(envelope-from <invernomuto@paranoici.org>)
+	id 1tIsxQ-000000003X3-30eO;
+	Wed, 04 Dec 2024 18:14:36 +0100
+Date: Wed, 4 Dec 2024 18:13:56 +0100
+From: Francesco Poli <invernomuto@paranoici.org>
+To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <ukleinek@debian.org>
+Cc: Leon Romanovsky <leonro@nvidia.com>, 1086520-done@bugs.debian.org, Mark
+ Zhang <markzhang@nvidia.com>, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: Bug#1086520: linux-image-6.11.2-amd64: makes opensm fail to
+ start
+Message-Id: <20241204181356.932c49619598e04d8ad412e0@paranoici.org>
+In-Reply-To: <acpo6ocggcl66fjdllk5zrfs2vwiivpetd5ierdek5ruxvdbyl@tfbc3mfnp23o>
+References: <20241113231503.54d12ed5b5d0c8fa9b7d9806@paranoici.org>
+	<3wfi2j7jn2f7rajabfcengubgtyt3wkuin6hqepdoe5dlvfhvn@2clhco3z6fuw>
+	<173040083268.16618.7451145398661885923.reportbug@crunch>
+	<20241118200616.865cb4c869e693b19529df36@paranoici.org>
+	<nvs4i2v7o6vn6zhmtq4sgazy2hu5kiulukxcntdelggmznnl7h@so3oul6uwgbl>
+	<20241125195443.0ddf0d0176d7c34bd29942c7@paranoici.org>
+	<20241125193837.GH160612@unreal>
+	<20241127184803.75086499e71c6b1588a4fb5a@paranoici.org>
+	<173040083268.16618.7451145398661885923.reportbug@crunch>
+	<20241127200413.GE1245331@unreal>
+	<acpo6ocggcl66fjdllk5zrfs2vwiivpetd5ierdek5ruxvdbyl@tfbc3mfnp23o>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241204170548.4152658-1-edumazet@google.com>
-Subject: [PATCH net] tipc: fix NULL deref in cleanup_bearer()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+46aa5474f179dacd1a3b@syzkaller.appspotmail.com, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA512";
+ boundary="Signature=_Wed__4_Dec_2024_18_13_56_+0100_OXoMkKkJzsj06Qbl"
 
-syzbot found [1] that after blamed commit, ub->ubsock->sk
-was NULL when attempting the atomic_dec() :
+--Signature=_Wed__4_Dec_2024_18_13_56_+0100_OXoMkKkJzsj06Qbl
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-atomic_dec(&tipc_net(sock_net(ub->ubsock->sk))->wq_count);
+On Wed, 4 Dec 2024 17:37:05 +0100 Uwe Kleine-K=C3=B6nig wrote:
 
-Fix this by caching the tipc_net pointer.
+> Hello Francesco,
 
-[1]
+Hello Uwe,
 
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
-CPU: 0 UID: 0 PID: 5896 Comm: kworker/0:3 Not tainted 6.13.0-rc1-next-20241203-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: events cleanup_bearer
- RIP: 0010:read_pnet include/net/net_namespace.h:387 [inline]
- RIP: 0010:sock_net include/net/sock.h:655 [inline]
- RIP: 0010:cleanup_bearer+0x1f7/0x280 net/tipc/udp_media.c:820
-Code: 18 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 3c f7 99 f6 48 8b 1b 48 83 c3 30 e8 f0 e4 60 00 48 89 d8 48 c1 e8 03 <42> 80 3c 28 00 74 08 48 89 df e8 1a f7 99 f6 49 83 c7 e8 48 8b 1b
-RSP: 0018:ffffc9000410fb70 EFLAGS: 00010206
-RAX: 0000000000000006 RBX: 0000000000000030 RCX: ffff88802fe45a00
-RDX: 0000000000000001 RSI: 0000000000000008 RDI: ffffc9000410f900
-RBP: ffff88807e1f0908 R08: ffffc9000410f907 R09: 1ffff92000821f20
-R10: dffffc0000000000 R11: fffff52000821f21 R12: ffff888031d19980
-R13: dffffc0000000000 R14: dffffc0000000000 R15: ffff88807e1f0918
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000556ca050b000 CR3: 0000000031c0c000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[...]
+> I wonder if you could test a firmware upgrade or the above patch. Would
+> be nice to know if there are still some things to do for us (=3D Debian
+> kernel team) here.
 
-Fixes: 6a2fa13312e5 ("tipc: Fix use-after-free of kernel socket in cleanup_bearer().")
-Reported-by: syzbot+46aa5474f179dacd1a3b@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/67508b5f.050a0220.17bd51.0070.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/tipc/udp_media.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Yes, I've finally got around to upgrading the firmware.
 
-diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c
-index b7e25e7e9933b69aa6a3364e3287c358b7ac9421..108a4cc2e001077169a4e4c3bebd42715db9a803 100644
---- a/net/tipc/udp_media.c
-+++ b/net/tipc/udp_media.c
-@@ -807,6 +807,7 @@ static void cleanup_bearer(struct work_struct *work)
- {
- 	struct udp_bearer *ub = container_of(work, struct udp_bearer, work);
- 	struct udp_replicast *rcast, *tmp;
-+	struct tipc_net *tn;
- 
- 	list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
- 		dst_cache_destroy(&rcast->dst_cache);
-@@ -814,10 +815,14 @@ static void cleanup_bearer(struct work_struct *work)
- 		kfree_rcu(rcast, rcu);
- 	}
- 
-+	tn = tipc_net(sock_net(ub->ubsock->sk));
-+
- 	dst_cache_destroy(&ub->rcast.dst_cache);
- 	udp_tunnel_sock_release(ub->ubsock);
-+
-+	/* Note: could use a call_rcu() to avoid another synchronize_net() */
- 	synchronize_net();
--	atomic_dec(&tipc_net(sock_net(ub->ubsock->sk))->wq_count);
-+	atomic_dec(&tn->wq_count);
- 	kfree(ub);
- }
- 
--- 
-2.47.0.338.g60cca15819-goog
+And today I had a time window, where I could reboot the cluster head
+node.
+After the reboot, the InfiniBand network works correctly:
 
+  $ uname -v
+  #1 SMP PREEMPT_DYNAMIC Debian 6.11.10-1 (2024-11-23)
+  $ ls -altrF /sys/class/infiniband_mad/
+  total 0
+  lrwxrwxrwx  1 root root    0 Dec  4 10:15 umad0 -> ../../devices/pci0000:=
+80/0000:80:01.1/0000:81:00.0/infiniband_mad/umad0/
+  lrwxrwxrwx  1 root root    0 Dec  4 10:15 umad1 -> ../../devices/pci0000:=
+80/0000:80:01.1/0000:81:00.1/infiniband_mad/umad1/
+  drwxr-xr-x  2 root root    0 Dec  4 10:17 ./
+  drwxr-xr-x 73 root root    0 Dec  4 10:17 ../
+  -r--r--r--  1 root root 4096 Dec  4 10:17 abi_version
+  lrwxrwxrwx  1 root root    0 Dec  4 18:08 issm1 -> ../../devices/pci0000:=
+80/0000:80:01.1/0000:81:00.1/infiniband_mad/issm1/
+  lrwxrwxrwx  1 root root    0 Dec  4 18:08 issm0 -> ../../devices/pci0000:=
+80/0000:80:01.1/0000:81:00.0/infiniband_mad/issm0/
+  # ethtool -i ibp129s0f0
+  driver: mlx5_core[ib_ipoib]
+  version: 6.11.10-amd64
+  firmware-version: 20.43.1014 (MT_0000000224)
+  expansion-rom-version:
+  bus-info: 0000:81:00.0
+  supports-statistics: yes
+  supports-test: yes
+  supports-eeprom-access: no
+  supports-register-dump: no
+  supports-priv-flags: yes
+  # ethtool -i ibp129s0f1
+  driver: mlx5_core[ib_ipoib]
+  version: 6.11.10-amd64
+  firmware-version: 20.43.1014 (MT_0000000224)
+  expansion-rom-version:
+  bus-info: 0000:81:00.1
+  supports-statistics: yes
+  supports-test: yes
+  supports-eeprom-access: no
+  supports-register-dump: no
+  supports-priv-flags: yes
+  $ ps aux | grep opens[m]
+  root        1150  0.0  0.0 1560776 3636 ?        Ssl  10:15   0:00 /usr/s=
+bin/opensm --guid 0x9c63c00300033240 --log_file /var/log/opensm.0x9c63c0030=
+0033240.log
+
+
+>=20
+> If everything is fine for you, I'd like to close this bug.
+
+I am closing the Debian bug report right now.
+Thanks to everyone who has been involved for the great and kind help!
+
+>=20
+> Best regards
+
+Have a nice evening.   :-)
+
+--=20
+ http://www.inventati.org/frx/
+ There's not a second to spare! To the laboratory!
+..................................................... Francesco Poli .
+ GnuPG key fpr =3D=3D CA01 1147 9CD2 EFDF FB82  3925 3E1C 27E1 1F69 BFFE
+
+--Signature=_Wed__4_Dec_2024_18_13_56_+0100_OXoMkKkJzsj06Qbl
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEygERR5zS79/7gjklPhwn4R9pv/4FAmdQjdQACgkQPhwn4R9p
+v/6AoA//TkOwnWjH5D4ks5SUi1DDiHU1IFfS/ix9o3TA2oWmP9/tQzIWV/ACfbbK
+5QBHtVb6lFSte9kIxSgc/mXP06PicFpsxOjByJ4Kwq8dlz9ksQqC/biF0h0PmKZt
+hRFVC0F69vDgUeUhREOQn6a3KscUv6pl9bEkUBmMjcXmdLkgPaFkMWt4jlopXhig
+w2U7vKhLFo+caw1WM3e4OJpF6iPXF4G6lyEOvXIo7zKohVwChVjH5rwUuIXmd0Q2
+ltvu8ZGcx0+wor5zoUORt1hYLXjOZ4jtJLAEgrvZNoa6eUGw1NPaNInwyjDo2hFS
+EidbgtJY3UFa3mytTbkQO4alfagC52CfjmxJfNC3dGqyBDHS5j2uXPB0V5NWbDWq
+lX7k1DcfBS9rJgNs+kBL5/aoU1KHWSCqdUbniomv3iba5thfmWpHF+mki5cJr/6+
+VIkARDEnLuk86nVm8dOVwm/jFLyerDXP6XzAdUjw4xPeBzib+dPlaD29r39YrvMf
+aRqSe8azvg7t+XFGpmfbXTnGgCUgv/YIACUtrs/ffif8ffTl9FC+8xMsgCH638J3
+nP7Sd1yVPzynZHshH1lGv+k7VSAZqGq2550hdAvmXs4pUPt/ow/3A2tBdNo8j00U
+GbZtEnbMp/i1nOZB/NOaTdmyT0Y5VEqqPmdkfL1KKASTSVK59Zw=
+=aoBA
+-----END PGP SIGNATURE-----
+
+--Signature=_Wed__4_Dec_2024_18_13_56_+0100_OXoMkKkJzsj06Qbl--
 
