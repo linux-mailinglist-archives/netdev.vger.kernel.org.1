@@ -1,144 +1,108 @@
-Return-Path: <netdev+bounces-148980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47F459E3B77
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:40:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 86B869E3BA2
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:48:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B805B26ADB
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:28:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63BE4B2ECA2
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:36:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27961B983E;
-	Wed,  4 Dec 2024 13:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31971DF745;
+	Wed,  4 Dec 2024 13:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="I9f/1e1k"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="CUvdaZZV"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AAD61B4F02;
-	Wed,  4 Dec 2024 13:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A6B1DC182;
+	Wed,  4 Dec 2024 13:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733318935; cv=none; b=SAHcqOzuxPP+5KMj4DxSq1FCxUaOQhOok0SrMLKp4l2wkAd+7zU7we9z9GxVsP/EpSGEMDYvWtabqgWRBB4hzsWnRXIjv8/Z8tJ5KInVHX4osHJqvQRDeq7+JQKcpnaULBbVzym4Ik0J8L4C0T6FdkYqNWAowaEwY5giygazZr0=
+	t=1733319368; cv=none; b=gttZXvdS8bqATvspPuYqYs3bmen9Fgbyvg6xjO7nCMxrXAj/DS5tViMnqXwxolwmQQez1oSkg8hTtEqccUIhrXjNMwC54Yp7YuwPSPUn4K/p1+usVhUhFNp6LltLnhqFZnrkhtz3LWrA32RBeipA/4zb2PyZDMNlU9/QNLZEMT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733318935; c=relaxed/simple;
-	bh=JFMEaqJARTgv5xD0VK6lGzTRXH+hjD5csEE/MmFFaWI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bTwP2dulHNu9Si8ryFo7mBfP7XYUkeFlQYwsgJAL9XIDB2ojN6h8BhSTRBr1fMejKAK4cDi6nWWKusAOoefxk4wHR11L28XQ0JnJ2myYxpkfeL8Zq0JKV8izN7MdEJq9vRjGHaIGj3HsRg/on8SsULmYAixDKCkVpZ/q6Ti3C0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=I9f/1e1k; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=4LmJ93oPNxvI+0AIIhL25FFOu/bFnhYn5Nx8R+9oCn8=;
-	t=1733318934; x=1734528534; b=I9f/1e1ksBRPdUDlFXvH/HnDesJrnDMorx7/NduDuwO+HCK
-	9yvpJl2anEFA9CZgA0DsemJWXekj5LYFMomlSQ8jFjnAQYMy0nI9yAG1w93HyoQjSFNbdXUdHNhNy
-	fYRJYDrc2sFTWaeLVKAGJL2+hrS3kYsfVxQkm728zjl6gA17ihfH/salvqZr6cNZModwHn7KknGdX
-	aoUDB3LyS/rWXmPgCfPxWgFsw5vihsvu4r84OUzOuzLVbX6yaJKlGY87jJbR6LsL5FUFiQqC0sNCK
-	2pp2otM6p7YRZF2twLMifFxUhjpKXekC1ZHpln3eD3Vu39k5oEYDRIbE1dZqjrhw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1tIpQp-00000006UlJ-0HWQ;
-	Wed, 04 Dec 2024 14:28:43 +0100
-Message-ID: <cc0a13f9674238d3b7607e9d9b58ee6e5cc4aa5c.camel@sipsolutions.net>
-Subject: Re: [PATCH net-next v1 7/7] netlink: specs: wireless: add a spec
- for nl80211
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- linux-wireless@vger.kernel.org, donald.hunter@redhat.com
-Date: Wed, 04 Dec 2024 14:28:42 +0100
-In-Reply-To: <CAD4GDZyCPiw1r02BHA_atDQdhsyVhxg=W1dnwi-Bc_tnkxtVeA@mail.gmail.com>
-References: <20241203130655.45293-1-donald.hunter@gmail.com>
-	 <20241203130655.45293-8-donald.hunter@gmail.com>
-	 <016ba49a8b072f89fc4340341be166e26cc1b9a8.camel@sipsolutions.net>
-	 <CAD4GDZyCPiw1r02BHA_atDQdhsyVhxg=W1dnwi-Bc_tnkxtVeA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	s=arc-20240116; t=1733319368; c=relaxed/simple;
+	bh=UgXVV6RLZ12V1O6hvyVUVDCgJcOXxL/7UflkUTNl2tY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oVGZdFEiyPAG3NUb9ieUFEKJNBHz6F+HAnNMeFZ034XOeAP/pPsJP6Prv2V2aiuho9gHl1gisATwI7AkNsW1yPPl7zUL9RzELbvJpI/FfRkPX8E9XUCzVAGo44vHMcVtxh8/J4+oLHfSg9t8f4wdnjO1bLXdL2N+D3HxGZB017I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=CUvdaZZV; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1733319367; x=1764855367;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=UgXVV6RLZ12V1O6hvyVUVDCgJcOXxL/7UflkUTNl2tY=;
+  b=CUvdaZZVCDSVUlDGi9GrYY4jGTHpUba6DKZQKzsBJr2GR/Lq0ZKzIKuA
+   F8yaGqcTNEc6BGPf10/xhXqdpR/wgirYP3nSL2jXF03B2drsdUK/X2Ryu
+   6cmvGOI+zGD+3RkDEqQrXp9ZeSpo2OSaN1wk6JRBFbc6Y+Xg8/igfkF53
+   nKYmhOAIbDTM8VKR5ld3TO2GsB3vpX6h6gM4f00r+ZbotODU7Z3qia6c4
+   iSDuVIKoBMg0pdNdRnnGJ4592QEw+C/bqSeogxrJyv5Cz5Yd7v6LOEulM
+   9Nr+YdzQ8LKSNOtGJ4WBReL0YaUNDO/qsC1zwmoXUUSZ8z4NwByhHhJep
+   g==;
+X-CSE-ConnectionGUID: rlrAe6FFQQitUQtWMxh7nA==
+X-CSE-MsgGUID: o9tbbCM4SGq3h+dZB4QYzA==
+X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
+   d="scan'208";a="266321980"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Dec 2024 06:36:06 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 4 Dec 2024 06:35:25 -0700
+Received: from che-ll-i17164.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 4 Dec 2024 06:35:22 -0700
+From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <parthiban.veerasooran@microchip.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>,
+	<jacob.e.keller@intel.com>
+Subject: [PATCH net v3 0/2] Fixes on the OPEN Alliance TC6 10BASE-T1x MAC-PHY support generic lib
+Date: Wed, 4 Dec 2024 19:05:16 +0530
+Message-ID: <20241204133518.581207-1-parthiban.veerasooran@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Wed, 2024-12-04 at 13:12 +0000, Donald Hunter wrote:
-> My main motivation is coverage, for 2 reasons: firstly to flush out
-> any feature gaps in YNL such as the ones I fixed in this series
+This patch series contain the below fixes.
 
-Yeah, OK, though I'm not sure YNL is really meant to be feature complete
-for everything netlink may be doing, rather than for what's needed - and
-some of the things we did may even be things that are not meant to be
-done any more (e.g. nested array vs. multi-attr arrays.)
+- Infinite loop error when tx credits becomes 0.
+- Race condition between tx skb reference pointers.
 
-> and
-> secondly to achieve a critical mass of YNL specs that encourages
-> people to build more tooling around the specs.
+v2:
+- Added mutex lock to protect tx skb reference handling.
 
-OK, fair :)
+v3:
+- Added mutex protection in assigning new tx skb to waiting_tx_skb
+  pointer.
+- Explained the possible scenario for the race condition with the time
+  diagram in the commit message.
 
-> YNL is already used for
-> in-tree test automation and documentation generation. There is
-> potential for generating strace dumpers and people are starting to use
-> generated user space code.
 
-Right.
+Parthiban Veerasooran (2):
+  net: ethernet: oa_tc6: fix infinite loop error when tx credits becomes
+    0
+  net: ethernet: oa_tc6: fix tx skb race condition between reference
+    pointers
 
-> > Also, I don't know how we will maintain this if it's not tied to any
-> > kernel code. What do you suggest? Do you want to just maintain it
-> > following the nl80211.h spec all the time?
->=20
-> It's a good question. I am okay with maintaining it alongside the
-> nl80211.h file, which will likely motivate me to write some automation
-> at least for notifying any divergence. There might come a time when it
-> becomes desirable to generate some of nl80211.h from the spec, as
-> Stanislav Fomichev is doing for ethtool here:
->=20
-> https://lore.kernel.org/netdev/20241202162936.3778016-1-sdf@fomichev.me/
+ drivers/net/ethernet/oa_tc6.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-I think I wouldn't mind that - I'm hoping it'll also generate policies
-etc.? Though on that front we probably have weird quirks too ...
 
-But until then I guess someone's going to have to maintain it, and I'm
-not sure I want that to be me right now :)
+base-commit: bb18265c3aba92b91a1355609769f3e967b65dee
+-- 
+2.34.1
 
-> > > +      name: get-wiphy
-> > > +      doc: Get information about a wiphy or dump a list of all wiphy=
-s
-> > > +      attribute-set: nl80211-attrs
-> > > +      do:
-> > > +        request:
-> > > +          value: 1
-> > > +          attributes:
-> > > +            - wiphy
-> > > +        reply:
-> > > +          value: 3
-> > > +      dump:
-> > > +        request:
-> > > +          attributes:
-> > > +            - wiphy
-> > >=20
-> >=20
-> > This already seems wrong - dump wiphy really should unconditionally
-> > include NL80211_ATTR_SPLIT_WIPHY_DUMP these days.
->=20
-> Yes, the valid parameter attributes should be wiphy, wdev, ifindex and
-> split-wiphy-dump by the look of it.
-
-Well there's that about valid parameters, but also no (new) tools today
-should ever *not* include the split-wiphy-dump attribute. I guess that
-can't be expressed here, but it's a gotcha for implementers that just
-follow the YNL spec?
-
-johannes
 
