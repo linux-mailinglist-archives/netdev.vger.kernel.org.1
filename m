@@ -1,76 +1,60 @@
-Return-Path: <netdev+bounces-148742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C69F09E307B
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 01:52:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1F769E308B
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 01:55:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92F722831E4
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 00:52:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86700283309
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 00:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5572500BA;
-	Wed,  4 Dec 2024 00:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614A42500D2;
+	Wed,  4 Dec 2024 00:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h5FcLY/N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IauoFxdK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C4B4C6E;
-	Wed,  4 Dec 2024 00:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BC17F9;
+	Wed,  4 Dec 2024 00:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733273519; cv=none; b=CtZVnRv9ovia/cYjDsnDMnCQzUdtvaMohVF/v8+O97o3xjOpRA5cn82jk2mA5QCNchMPSwJuPuRImE7s9AS+wM1kVEJF4Oj0O4g+xZdT5J7LtBRUoZ/4FvAtcFcNS0cnz3DHeT4sJ7KK0lg9JF6HFsps2/DHE+hGDMxjM76rRu0=
+	t=1733273754; cv=none; b=IWHO1NRzyHt9c8p+sclqLvxs7wTm+kFyZABrrLdVQ/ZmAYEOrjH7gWmosDn6VEqWq0SRkB8MXfg1jJgrLYXkFepcDbU9TrGquGX7t2M232hoSG9Hi/qV3byuz48JwI5NSzW99dt794RY9x1rBmCAF9J2/8mvqhMtxQaipYSwZyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733273519; c=relaxed/simple;
-	bh=couke5zqObDh6jfTvyi0RoSa3UQwJPldsoPVcoy3YNg=;
+	s=arc-20240116; t=1733273754; c=relaxed/simple;
+	bh=VoiVy/YggsyxE8Q9d5aC0EsZoTIb9mFcAscWf9rm1h8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F3xxKkFqxt3LHk4WiGDB/tyWCqVAQtdzvAXJ2ure3YCYXlnEBhIC5wspq1O6fBDRTmjo1X7CuxO2b1QItm9eDwYBlCBfFXkhhzRU4bh70kgWuZNZtZO0Huk5IJtvwvVz+QPEEqOwjeuPDV2dV7gf8qVaC2sr2fuFJOrVMW8Om8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h5FcLY/N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7689FC4CEDC;
-	Wed,  4 Dec 2024 00:51:58 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CrkAFUmpqAiAh+5uxNEAdyd4MPc/+j+svTAXvSV2R5BuHYJgAiBqC0vE42iwnXfI9PoJe9rAif74gUsxqw06LxV/p6mhXcPSuXaDqh2QPeELdymJwtTx7rxmug4kYqY4oSaafrG4HJMHS5SxpY8MdOEZ96wBB5yf1sxYqEKbupQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IauoFxdK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66258C4CEDC;
+	Wed,  4 Dec 2024 00:55:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733273519;
-	bh=couke5zqObDh6jfTvyi0RoSa3UQwJPldsoPVcoy3YNg=;
+	s=k20201202; t=1733273753;
+	bh=VoiVy/YggsyxE8Q9d5aC0EsZoTIb9mFcAscWf9rm1h8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h5FcLY/NdEHm4JxdBMdSDwV3OOZPqzN1QrAQl82nEqJUPqTXu1AKhp+rvlEY6MnJO
-	 TqFMiJVfW9HwXw4xk9iJx7Cf/Eb2V/R8JZadrd2stYabeg2uENy0P2J0ikV/o0RVjJ
-	 5ZK7X2RjTKRAVoR1ovqVBJWplkuU7gqDUHNyQO2zunBuaHz8SKXWighBactEEZJirT
-	 vjDgptqU8IE5QFsZqUA6n3u/6sM3TJC8QovauP5HHwbIBn78hfbmSIjPyJ2US2KopJ
-	 pFs0rx/ML5yEA51oxK6vhezgNI5lYlIMRCrgDvMTFZQinlq6aqA1Dx0yGq+LugOzD5
-	 rgBDw0wM3Czkg==
-Date: Tue, 3 Dec 2024 16:51:57 -0800
+	b=IauoFxdKBgckRWMimIuEJ3aaks3OeF9XRd3tZ689vj7EGe7WKIP1N5x/15jUNhcH7
+	 gP/6PBIAgFcI4Ur2IVJnxqMy0qPn0cxUrPCJYIdGliwxbYYNZBBuLP9ywZUtVGxnBR
+	 ZpB1fpZCaGfLT8bmUpHGc48oYhBiUKit4M3aEStqLvDO+EGwqUuu4TGt3HIoalsm4N
+	 QRhfDyiKO+weHvX0/35XI5ABxLk9XYSp9EN0Ny6wBaeobyARYfr0wAgsXwxZ3L1PJi
+	 //ifysel+iL0klQ7CrCxlOd2DCgipmH3qK0SoPcbt9gA3VFP7gxzIjAUW8v5DEBM4D
+	 83gms16v05lWA==
+Date: Tue, 3 Dec 2024 16:55:52 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, Lorenzo Bianconi
- <lorenzo.bianconi@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, "Martin KaFai Lau"
- <martin.lau@linux.dev>, David Miller <davem@davemloft.net>, "Eric Dumazet"
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- <netdev@vger.kernel.org>
-Subject: Re: [RFC/RFT v2 0/3] Introduce GRO support to cpumap codebase
-Message-ID: <20241203165157.19a85915@kernel.org>
-In-Reply-To: <4f49d319-bd12-4e81-9516-afd1f1a1d345@intel.com>
-References: <cover.1726480607.git.lorenzo@kernel.org>
-	<amx5t3imrrh56m7vtsmlhdzlggtv2mlhywk6266syjmijpgs2o@s2z7dollcf7l>
-	<ZwZe6Bg5ZrXLkDGW@lore-desk>
-	<55d2ac1c-0619-4b24-b8ab-6eb5f553c1dd@intel.com>
-	<ZwZ7fr_STZStsnln@lore-desk>
-	<c3e20036-2bb3-4bca-932c-33fd3801f138@intel.com>
-	<c21dc62c-f03e-4b26-b097-562d45407618@intel.com>
-	<01dcfecc-ab8e-43b8-b20c-96cc476a826d@intel.com>
-	<b319014e-519c-4c2d-8b6d-1632357e66cd@app.fastmail.com>
-	<rntmnecd6w7ntnazqloxo44dub2snqf73zn2jqwuur6io2xdv7@4iqbg5odgmfq>
-	<05991551-415c-49d0-8f14-f99cb84fc5cb@intel.com>
-	<a2ebba59-bf19-4bb9-9952-c2f63123b7cd@app.fastmail.com>
-	<6db67537-6b7b-4700-9801-72b6640fc609@intel.com>
-	<20241202144739.7314172d@kernel.org>
-	<4f49d319-bd12-4e81-9516-afd1f1a1d345@intel.com>
+To: Paul Moore <paul@paul-moore.com>
+Cc: davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ pabeni@redhat.com, netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+2d9f5f948c31dcb7745e@syzkaller.appspotmail.com,
+ stephen.smalley.work@gmail.com, omosnace@redhat.com,
+ selinux@vger.kernel.org, kuniyu@amazon.com, brianvv@google.com
+Subject: Re: [PATCH net] selinux: use sk_to_full_sk() in selinux_ip_output()
+Message-ID: <20241203165552.07ba0619@kernel.org>
+In-Reply-To: <CAHC9VhQFEsPfAZ2MLw7mB7xwOFHPA+TXf9fv9JQDMEFfsZDWJQ@mail.gmail.com>
+References: <20241126145911.4187198-1-edumazet@google.com>
+	<173300343374.2487269.7082262124805020262.git-patchwork-notify@kernel.org>
+	<CAHC9VhQFEsPfAZ2MLw7mB7xwOFHPA+TXf9fv9JQDMEFfsZDWJQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,25 +64,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 3 Dec 2024 12:01:16 +0100 Alexander Lobakin wrote:
-> >> @ Jakub,  
-> > 
-> > Context? What doesn't work and why?  
+On Tue, 3 Dec 2024 15:50:46 -0500 Paul Moore wrote:
+> > This patch was applied to netdev/net.git (main)
+> > by Jakub Kicinski <kuba@kernel.org>:  
 > 
-> My tests show the same perf as on Lorenzo's series, but I test with UDP
-> trafficgen. Daniel tests TCP and the results are much worse than with
-> Lorenzo's implementation.
-> I suspect this is related to that how NAPI performs flushes / decides
-> whether to repoll again or exit vs how kthread does that (even though I
-> also try to flush only every 64 frames or when the ring is empty). Or
-> maybe to that part of the kthread happens in process context outside any
-> softirq, while when using NAPI, the whole loop is inside RX softirq.
-> 
-> Jesper said that he'd like to see cpumap still using own kthread, so
-> that its priority can be boosted separately from the backlog. That's why
-> we asked you whether it would be fine to have cpumap as threaded NAPI in
-> regards to all this :D
+> Jakub, do you know when we can expect to see this sent up to Linus?
 
-Certainly not without a clear understanding what the problem with 
-a kthread is.
+If I'm looking at our schedule right - Thursday (5th) evening EU time.
 
