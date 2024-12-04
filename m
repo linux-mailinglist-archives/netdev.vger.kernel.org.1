@@ -1,253 +1,301 @@
-Return-Path: <netdev+bounces-149088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AE399E4629
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 21:58:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D706D9E444E
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 20:15:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EDA3BC8048
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 17:55:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96CBBB47910
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 17:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C47F20E71B;
-	Wed,  4 Dec 2024 17:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836F12144A8;
+	Wed,  4 Dec 2024 17:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HFLUr/4f"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="a5kyLfUP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5655320DD5B
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 17:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95B7213258
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 17:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733332794; cv=none; b=uP56ds7d8eCiWHwaE2HQkzbCKFEaAWrS16ZGj0IOhuULEUYZqd6SqFPisCW0qlGmjZb89IPAW3LilKaB99JiKaTuTRiOI+GYdAcRZvpI8nwZ70kqiDTCfEflCVcaeHNKzrbZiPb/FjXN7Y6osBvihLwKmUZq5pem78DN/IfjTho=
+	t=1733332966; cv=none; b=N+ge6ZDwYUgPGhF4T/gmiZDlgNW8hhs23UPSqPQAskHNC90d3Ozmaefp5gUiqpBg8c8NhfkG9Woh3OwZuOxRx3WzDzL0hQyPkvzI1hcbE0wv6mIQiri3vUe9JXF7wfZSy5uJasKp6yk0MqS6wTZByVUT7+unodkDXrCo07x89XY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733332794; c=relaxed/simple;
-	bh=vTr1igLhIDtfKINzt7pPA2LIHaCiS9UDZmVN/VLa30g=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sifLvxnbxODMlT1WYzCI1WuLpehY02c1P0BbVrC/q/Hz5T+tunq/gpTSFYl7SZLvWNIYeVYspFBLOD3xOkQ6I35/+ZhIvYuvjuXqA0XjFgnzBj4+Y65NdoeTT5sZS2DYC4rcUVUI7dFM05ftRXKv4xQyyKjlvs7uKCowK/n+f0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HFLUr/4f; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6ef590f5321so90143577b3.0
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 09:19:52 -0800 (PST)
+	s=arc-20240116; t=1733332966; c=relaxed/simple;
+	bh=frqeAzwkJ9oMlnR6KCmqaH2uYtAqksDh6+nrwl2/U64=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mI24x+bpb5/WxK/Tm9GRds+tIv3s/Rvl8WU8hGhPcmtYdJ0W9l2bUPGqOOML+uS9VbBKdwLeNLRDnB44Exo1PA0iQRSYqZZTAcLGcitpEFvc5ROum96zwdsuITgBFJwGVpHTQtWIawn+A540gCzlwYMHQvPV0tEzvxc3rP32JgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=a5kyLfUP; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7fd10cd5b10so23552a12.2
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 09:22:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733332791; x=1733937591; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ThCuNupMzkORQUCZ2snpPbXOuVyinHnt+ntQhdrZzRI=;
-        b=HFLUr/4fMqXoCxzb5JaIUlM1I6LIXSAoJQEclaf2Fx5FP54SJ7l0Wrs1jpZZ4voRIZ
-         JZfYsnUJdhmO2B0Us0hvzLryAGJaoiL9C8TIhZ9qa7H4XUjql99oftLDwaRfNvDiFnNp
-         vZ27Eq0a+kEYc+XPeUsVsQl3K+1GGPNph8sfGpu8BF3PuQ2h0rLqHP4EbutG5VViQoZ9
-         LTbojwAidVBfRDDEqqKktnJa/KNaa2Y/ygUBKb+6E0KAIa36FyIcwl3ntaMoZsT+CMZu
-         K9j1lFc1K4ogd5l5E3uMXj2HYlgYQGA8OzYS6M97/p5rRp9dactz/nfori/5nrFIFhQt
-         gWNQ==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1733332964; x=1733937764; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nsSDsak9FzFqdyI2Y+zWFMkiWrzR17UOTNp3LeYZscU=;
+        b=a5kyLfUP0QNGoxXgbrrkF55HxlzVfpm/W62HRfVIqX/iIQxX1oZlv5xOPp+e9n5tgz
+         HYYsFytDurN6+WbrtwjRXp7g7EhXcHq8HOnOWGap5BjUK41T129b5VrKr0XLvf2tHVf/
+         iAGKwOHzKVCc01aQY1kDKGd3l1/Sbx03aVNYdYr/s4QVD8a+cWp9GrbhOc9e6AvrQADZ
+         EpEi/F3Hk42zBRXWvsMdDuMQlj3aFh/936QzXAWGCXFQZwnl28NxsLIkgPvvSzHlPZtQ
+         vHjoDV5NsTfRenisbiQWkB1DVVP/Cosfxjdz3OErQdkR8K/xRT/aGLxutYx/d2ODMPJp
+         JfqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733332791; x=1733937591;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ThCuNupMzkORQUCZ2snpPbXOuVyinHnt+ntQhdrZzRI=;
-        b=eENr10++WGGp/9viJ6S1bAlyLUbVOBs7eli4iznJDsinJCDZDsfydDFjTLXHWRQs3A
-         aMyftNqOQciAJZf63PrvPS8tR5wY34hQBmDe17QvWzWzzfKZpVfmOqgE9pl6bCoTNx/i
-         dKa+QHNFhELPd/yKzGYUkLhHxe61tGEtGgMMFiaXLiH5kx7ZLdqAuXE9udzw9HMF5liV
-         PE+5n6A83A+VkrowQdh4WtcJx/vUMoc9mKFN8vx2/letF25n1CP/poJvfl7hF1/5uVEs
-         5SwJOAtmoGKP5N9kY0meEzqW6n8Xaar7B7yt0F4nS/lLQPeW8/8JXys8OSyvqjh7a4/+
-         tdqw==
-X-Forwarded-Encrypted: i=1; AJvYcCWcO/0Or9QSIV9UAbZbbAYzJPHyD74nsTiN50XT+FtHBhR8iJCVgeCj9cgH6Kx8CJhtBHqE1ak=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznFGnka1DZvKwvm4GpKsW+ibLHfjHCcaAbg+MBY5wzQv1Vv9r6
-	05U9adFtl3Kj2gEzISVwDhtzd1osNX+vSUY3gmr/a4O4c9HOQaQ0AuuM5tW030QBEFmUqy1Ydkf
-	oWM94/wlOpg==
-X-Google-Smtp-Source: AGHT+IHBiI2gaV4W2E+oryz9BtbnOw193W9PcT0tZj12W3CSDbuknqFkNbetMpz5VER2OQw8oQ0HYLpQWHjD+g==
-X-Received: from ywbet19.prod.google.com ([2002:a05:690c:2e13:b0:6ef:60b5:32b0])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690c:6382:b0:6ef:5ab8:2c53 with SMTP id 00721157ae682-6efad1be626mr75865177b3.19.1733332791302;
- Wed, 04 Dec 2024 09:19:51 -0800 (PST)
-Date: Wed,  4 Dec 2024 17:19:50 +0000
+        d=1e100.net; s=20230601; t=1733332964; x=1733937764;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nsSDsak9FzFqdyI2Y+zWFMkiWrzR17UOTNp3LeYZscU=;
+        b=LrEPqppPMnhRNZG0AWSC5TivN5OTIzP4qqZmzNCH8937KCvzGy9B9gsb5+dp0/PUu8
+         lKfi62fhG/+p1wc49ET/kJ5QTtkGzVdqTHH1WCeSeloK2OrzbxnTVJh19Yw3IS2NYjRI
+         A+o8uuNyA6A1Yn2OezzLfGb+pqx9hNFeIgClVIADcesjeFjJKKH6wTXA02BuTYm9WMbm
+         5uv6JCLUe/ODOknXFfLAJqfyy3Dk2L8mj76sDIuiBcAwFVQY4h61X9GyAukRVsrqkr2K
+         5/T5UuFsWS4NNt6WTofebOjJJ8vKFen/m5i8rU5r3yLX3MzXG4ZzJDUh3/tT2d6qMRCX
+         ZmfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUbSj8rvtfRGJK2mF7COl3izH2RHxrWVDmWOpT3hDzfRW6p8xBT6B8R7FqfjlsXzE/1JuZAv3M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPb7U/+8dyRJtS4rcBh0TWZ+eNAICSEqnyU2uRh/Go1qhjxUoP
+	n4lnKn6XDaZ98i+xqiGi1k9RRB0zhcIUco0St3gdu15EjT3QtS97TH7oPbqUpgI=
+X-Gm-Gg: ASbGncurLs3QvSD/M66xxUC5nnk3gDroiwzhBNL7FJuD8kC3m36ZDjj/50UfTANazg7
+	AhRwuY+OmDw+LdWZFzxxwfV3xTL0HbiGwNOV9EXNuOaHX0wmDU/vsbWZkDblJErG9S8pXDdMl66
+	ij0eIPoQK6yKLj3l/Lko8sPdD/mcjqhsxT5RobyOkffWvh1bc5FbsoqSb4oknFNsgM1QYXh+WX2
+	CKR7ee/OMmk3QYls+ZZKWglF6G/lkzSYw==
+X-Google-Smtp-Source: AGHT+IEC4bk4CdmOVdnpPRWZFJhbzn+ahGy9UpBnkTNPDZgSdGijktQsaZAHSW0Pbhm4QCPQ6BVQNA==
+X-Received: by 2002:a05:6a20:9144:b0:1e0:d796:b079 with SMTP id adf61e73a8af0-1e1653bb99dmr11860869637.17.1733332964158;
+        Wed, 04 Dec 2024 09:22:44 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:6::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fc9c2d4bc6sm11747507a12.9.2024.12.04.09.22.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 09:22:43 -0800 (PST)
+From: David Wei <dw@davidwei.uk>
+To: io-uring@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Joe Damato <jdamato@fastly.com>,
+	Pedro Tammela <pctammela@mojatatu.com>
+Subject: [PATCH net-next v8 02/17] net: generalise net_iov chunk owners
+Date: Wed,  4 Dec 2024 09:21:41 -0800
+Message-ID: <20241204172204.4180482-3-dw@davidwei.uk>
+X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20241204172204.4180482-1-dw@davidwei.uk>
+References: <20241204172204.4180482-1-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241204171950.89829-1-edumazet@google.com>
-Subject: [PATCH v2 net-next] net_sched: sch_fq: add three drop_reason
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Add three new drop_reason, more precise than generic QDISC_DROP:
+From: Pavel Begunkov <asml.silence@gmail.com>
 
-"tc -s qd" show aggregate counters, it might be more useful
-to use drop_reason infrastructure for bug hunting.
+Currently net_iov stores a pointer to struct dmabuf_genpool_chunk_owner,
+which serves as a useful abstraction to share data and provide a
+context. However, it's too devmem specific, and we want to reuse it for
+other memory providers, and for that we need to decouple net_iov from
+devmem. Make net_iov to point to a new base structure called
+net_iov_area, which dmabuf_genpool_chunk_owner extends.
 
-1) SKB_DROP_REASON_FQ_BAND_LIMIT
-   Whenever a packet is added while its band limit is hit.
-   Corresponding value in "tc -s qd" is bandX_drops XXXX
-
-2) SKB_DROP_REASON_FQ_HORIZON_LIMIT
-   Whenever a packet has a timestamp too far in the future.
-   Corresponding value in "tc -s qd" is horizon_drops XXXX
-
-3) SKB_DROP_REASON_FQ_FLOW_LIMIT
-   Whenever a flow has reached its limit.
-   Corresponding value in "tc -s qd" is flows_plimit XXXX
-
-Tested:
-tc qd replace dev eth1 root fq flow_limit 10 limit 100000
-perf record -a -e skb:kfree_skb sleep 1; perf script
-
-      udp_stream   12329 [004]   216.929492: skb:kfree_skb: skbaddr=0xffff888eabe17e00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_FLOW_LIMIT
-      udp_stream   12385 [006]   216.929593: skb:kfree_skb: skbaddr=0xffff888ef8827f00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_FLOW_LIMIT
-      udp_stream   12389 [005]   216.929871: skb:kfree_skb: skbaddr=0xffff888ecb9ba500 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_FLOW_LIMIT
-      udp_stream   12316 [009]   216.930398: skb:kfree_skb: skbaddr=0xffff888eca286b00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_FLOW_LIMIT
-      udp_stream   12400 [008]   216.930490: skb:kfree_skb: skbaddr=0xffff888eabf93d00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_FLOW_LIMIT
-
-tc qd replace dev eth1 root fq flow_limit 100 limit 10000
-perf record -a -e skb:kfree_skb sleep 1; perf script
-
-      udp_stream   18074 [001]  1058.318040: skb:kfree_skb: skbaddr=0xffffa23c881fc000 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_BAND_LIMIT
-      udp_stream   18126 [005]  1058.320651: skb:kfree_skb: skbaddr=0xffffa23c6aad4000 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_BAND_LIMIT
-      udp_stream   18118 [006]  1058.321065: skb:kfree_skb: skbaddr=0xffffa23df0d48a00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_BAND_LIMIT
-      udp_stream   18074 [001]  1058.321126: skb:kfree_skb: skbaddr=0xffffa23c881ffa00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_BAND_LIMIT
-      udp_stream   15815 [003]  1058.321224: skb:kfree_skb: skbaddr=0xffffa23c9835db00 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x9d9 reason: FQ_BAND_LIMIT
-
-tc -s -d qd sh dev eth1
-qdisc fq 8023: root refcnt 257 limit 10000p flow_limit 100p buckets 1024 orphan_mask 1023
- bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1 weights 589824 196608 65536 quantum 18Kb
- initial_quantum 92120b low_rate_threshold 550Kbit refill_delay 40ms
- timer_slack 10us horizon 10s horizon_drop
- Sent 492439603330 bytes 336953991 pkt (dropped 61724094, overlimits 0 requeues 4463)
- backlog 14611228b 9995p requeues 4463
-  flows 2965 (inactive 1151 throttled 0) band0_pkts 0 band1_pkts 9993 band2_pkts 0
-  gc 6347 highprio 0 fastpath 30 throttled 5 latency 2.32us flows_plimit 7403693
- band1_drops 54320401
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+Signed-off-by: David Wei <dw@davidwei.uk>
 ---
-v2: Addressed Cong feedback from v1
-    v1: https://lore.kernel.org/netdev/CANn89iLofU1dnwAf-4ezn08h=o82ZPCHc3QJSMUdC+5aUhRsgA@mail.gmail.com/T/#t
----
- include/net/dropreason-core.h | 18 ++++++++++++++++++
- include/net/sch_generic.h     |  9 +++++++++
- net/sched/sch_fq.c            | 14 ++++++++++----
- 3 files changed, 37 insertions(+), 4 deletions(-)
+ include/net/netmem.h | 21 ++++++++++++++++++++-
+ net/core/devmem.c    | 25 +++++++++++++------------
+ net/core/devmem.h    | 25 +++++++++----------------
+ 3 files changed, 42 insertions(+), 29 deletions(-)
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index 6c5a1ea209a22d8702f8c982762ca5f69791b8eb..c29282fabae6cdf9dd79f698b92b4b8f57156b1e 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -58,6 +58,9 @@
- 	FN(TC_EGRESS)			\
- 	FN(SECURITY_HOOK)		\
- 	FN(QDISC_DROP)			\
-+	FN(FQ_BAND_LIMIT)		\
-+	FN(FQ_HORIZON_LIMIT)		\
-+	FN(FQ_FLOW_LIMIT)		\
- 	FN(CPU_BACKLOG)			\
- 	FN(XDP)				\
- 	FN(TC_INGRESS)			\
-@@ -311,6 +314,21 @@ enum skb_drop_reason {
- 	 * failed to enqueue to current qdisc)
- 	 */
- 	SKB_DROP_REASON_QDISC_DROP,
-+	/**
-+	 * @SKB_DROP_REASON_FQ_BAND_LIMIT: dropped by fq qdisc when per band
-+	 * limit is reached.
-+	 */
-+	SKB_DROP_REASON_FQ_BAND_LIMIT,
-+	/**
-+	 * @SKB_DROP_REASON_FQ_HORIZON_LIMIT: dropped by fq qdisc when packet
-+	 * timestamp is too far in the future.
-+	 */
-+	SKB_DROP_REASON_FQ_HORIZON_LIMIT,
-+	/**
-+	 * @SKB_DROP_REASON_FQ_FLOW_LIMIT: dropped by fq qdisc when a flow
-+	 * exceeds its limits.
-+	 */
-+	SKB_DROP_REASON_FQ_FLOW_LIMIT,
- 	/**
- 	 * @SKB_DROP_REASON_CPU_BACKLOG: failed to enqueue the skb to the per CPU
- 	 * backlog queue. This can be caused by backlog queue full (see
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 5d74fa7e694cc85be91dbf01f0876b9feaa29115..c7a33c2c69830a6cbff8f6359de7cc468c2e845e 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -1245,6 +1245,15 @@ static inline int qdisc_drop(struct sk_buff *skb, struct Qdisc *sch,
- 	return NET_XMIT_DROP;
- }
+diff --git a/include/net/netmem.h b/include/net/netmem.h
+index 8a6e20be4b9d..3795ded30d2c 100644
+--- a/include/net/netmem.h
++++ b/include/net/netmem.h
+@@ -24,11 +24,20 @@ struct net_iov {
+ 	unsigned long __unused_padding;
+ 	unsigned long pp_magic;
+ 	struct page_pool *pp;
+-	struct dmabuf_genpool_chunk_owner *owner;
++	struct net_iov_area *owner;
+ 	unsigned long dma_addr;
+ 	atomic_long_t pp_ref_count;
+ };
  
-+static inline int qdisc_drop_reason(struct sk_buff *skb, struct Qdisc *sch,
-+				    struct sk_buff **to_free,
-+				    enum skb_drop_reason reason)
++struct net_iov_area {
++	/* Array of net_iovs for this area. */
++	struct net_iov *niovs;
++	size_t num_niovs;
++
++	/* Offset into the dma-buf where this chunk starts.  */
++	unsigned long base_virtual;
++};
++
+ /* These fields in struct page are used by the page_pool and net stack:
+  *
+  *        struct {
+@@ -54,6 +63,16 @@ NET_IOV_ASSERT_OFFSET(dma_addr, dma_addr);
+ NET_IOV_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
+ #undef NET_IOV_ASSERT_OFFSET
+ 
++static inline struct net_iov_area *net_iov_owner(const struct net_iov *niov)
 +{
-+	tcf_set_drop_reason(skb, reason);
-+	return qdisc_drop(skb, sch, to_free);
++	return niov->owner;
 +}
 +
++static inline unsigned int net_iov_idx(const struct net_iov *niov)
++{
++	return niov - net_iov_owner(niov)->niovs;
++}
 +
- static inline int qdisc_drop_all(struct sk_buff *skb, struct Qdisc *sch,
- 				 struct sk_buff **to_free)
+ /* netmem */
+ 
+ /**
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index 858982858f81..5c10cf0e2a18 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -32,14 +32,15 @@ static void net_devmem_dmabuf_free_chunk_owner(struct gen_pool *genpool,
  {
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index a5e87f9ea9861cbedb7ce858fbbcabb5d67cf821..2ca5332cfcc5c52bf30e6f8337814a656b919b17 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -537,6 +537,8 @@ static bool fq_packet_beyond_horizon(const struct sk_buff *skb,
- 	return unlikely((s64)skb->tstamp > (s64)(now + q->horizon));
+ 	struct dmabuf_genpool_chunk_owner *owner = chunk->owner;
+ 
+-	kvfree(owner->niovs);
++	kvfree(owner->area.niovs);
+ 	kfree(owner);
  }
  
-+#define FQDR(reason) SKB_DROP_REASON_FQ_##reason
-+
- static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		      struct sk_buff **to_free)
+ static dma_addr_t net_devmem_get_dma_addr(const struct net_iov *niov)
  {
-@@ -548,7 +550,8 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	band = fq_prio2band(q->prio2band, skb->priority & TC_PRIO_MAX);
- 	if (unlikely(q->band_pkt_count[band] >= sch->limit)) {
- 		q->stat_band_drops[band]++;
--		return qdisc_drop(skb, sch, to_free);
-+		return qdisc_drop_reason(skb, sch, to_free,
-+					 FQDR(BAND_LIMIT));
- 	}
+-	struct dmabuf_genpool_chunk_owner *owner = net_iov_owner(niov);
++	struct dmabuf_genpool_chunk_owner *owner;
  
- 	now = ktime_get_ns();
-@@ -558,8 +561,9 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		/* Check if packet timestamp is too far in the future. */
- 		if (fq_packet_beyond_horizon(skb, q, now)) {
- 			if (q->horizon_drop) {
--					q->stat_horizon_drops++;
--					return qdisc_drop(skb, sch, to_free);
-+				q->stat_horizon_drops++;
-+				return qdisc_drop_reason(skb, sch, to_free,
-+							 FQDR(HORIZON_LIMIT));
- 			}
- 			q->stat_horizon_caps++;
- 			skb->tstamp = now + q->horizon;
-@@ -572,7 +576,8 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	if (f != &q->internal) {
- 		if (unlikely(f->qlen >= q->flow_plimit)) {
- 			q->stat_flows_plimit++;
--			return qdisc_drop(skb, sch, to_free);
-+			return qdisc_drop_reason(skb, sch, to_free,
-+						 FQDR(FLOW_LIMIT));
++	owner = net_devmem_iov_to_chunk_owner(niov);
+ 	return owner->base_dma_addr +
+ 	       ((dma_addr_t)net_iov_idx(niov) << PAGE_SHIFT);
+ }
+@@ -82,7 +83,7 @@ net_devmem_alloc_dmabuf(struct net_devmem_dmabuf_binding *binding)
+ 
+ 	offset = dma_addr - owner->base_dma_addr;
+ 	index = offset / PAGE_SIZE;
+-	niov = &owner->niovs[index];
++	niov = &owner->area.niovs[index];
+ 
+ 	niov->pp_magic = 0;
+ 	niov->pp = NULL;
+@@ -250,9 +251,9 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+ 			goto err_free_chunks;
  		}
  
- 		if (fq_flow_is_detached(f)) {
-@@ -597,6 +602,7 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+-		owner->base_virtual = virtual;
++		owner->area.base_virtual = virtual;
+ 		owner->base_dma_addr = dma_addr;
+-		owner->num_niovs = len / PAGE_SIZE;
++		owner->area.num_niovs = len / PAGE_SIZE;
+ 		owner->binding = binding;
  
- 	return NET_XMIT_SUCCESS;
- }
-+#undef FQDR
+ 		err = gen_pool_add_owner(binding->chunk_pool, dma_addr,
+@@ -264,17 +265,17 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+ 			goto err_free_chunks;
+ 		}
  
- static void fq_check_throttled(struct fq_sched_data *q, u64 now)
+-		owner->niovs = kvmalloc_array(owner->num_niovs,
+-					      sizeof(*owner->niovs),
+-					      GFP_KERNEL);
+-		if (!owner->niovs) {
++		owner->area.niovs = kvmalloc_array(owner->area.num_niovs,
++						   sizeof(*owner->area.niovs),
++						   GFP_KERNEL);
++		if (!owner->area.niovs) {
+ 			err = -ENOMEM;
+ 			goto err_free_chunks;
+ 		}
+ 
+-		for (i = 0; i < owner->num_niovs; i++) {
+-			niov = &owner->niovs[i];
+-			niov->owner = owner;
++		for (i = 0; i < owner->area.num_niovs; i++) {
++			niov = &owner->area.niovs[i];
++			niov->owner = &owner->area;
+ 			page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
+ 						      net_devmem_get_dma_addr(niov));
+ 		}
+diff --git a/net/core/devmem.h b/net/core/devmem.h
+index 99782ddeca40..a2b9913e9a17 100644
+--- a/net/core/devmem.h
++++ b/net/core/devmem.h
+@@ -10,6 +10,8 @@
+ #ifndef _NET_DEVMEM_H
+ #define _NET_DEVMEM_H
+ 
++#include <net/netmem.h>
++
+ struct netlink_ext_ack;
+ 
+ struct net_devmem_dmabuf_binding {
+@@ -51,17 +53,11 @@ struct net_devmem_dmabuf_binding {
+  * allocations from this chunk.
+  */
+ struct dmabuf_genpool_chunk_owner {
+-	/* Offset into the dma-buf where this chunk starts.  */
+-	unsigned long base_virtual;
++	struct net_iov_area area;
++	struct net_devmem_dmabuf_binding *binding;
+ 
+ 	/* dma_addr of the start of the chunk.  */
+ 	dma_addr_t base_dma_addr;
+-
+-	/* Array of net_iovs for this chunk. */
+-	struct net_iov *niovs;
+-	size_t num_niovs;
+-
+-	struct net_devmem_dmabuf_binding *binding;
+ };
+ 
+ void __net_devmem_dmabuf_binding_free(struct net_devmem_dmabuf_binding *binding);
+@@ -75,20 +71,17 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+ void dev_dmabuf_uninstall(struct net_device *dev);
+ 
+ static inline struct dmabuf_genpool_chunk_owner *
+-net_iov_owner(const struct net_iov *niov)
++net_devmem_iov_to_chunk_owner(const struct net_iov *niov)
  {
+-	return niov->owner;
+-}
++	struct net_iov_area *owner = net_iov_owner(niov);
+ 
+-static inline unsigned int net_iov_idx(const struct net_iov *niov)
+-{
+-	return niov - net_iov_owner(niov)->niovs;
++	return container_of(owner, struct dmabuf_genpool_chunk_owner, area);
+ }
+ 
+ static inline struct net_devmem_dmabuf_binding *
+ net_devmem_iov_binding(const struct net_iov *niov)
+ {
+-	return net_iov_owner(niov)->binding;
++	return net_devmem_iov_to_chunk_owner(niov)->binding;
+ }
+ 
+ static inline u32 net_devmem_iov_binding_id(const struct net_iov *niov)
+@@ -98,7 +91,7 @@ static inline u32 net_devmem_iov_binding_id(const struct net_iov *niov)
+ 
+ static inline unsigned long net_iov_virtual_addr(const struct net_iov *niov)
+ {
+-	struct dmabuf_genpool_chunk_owner *owner = net_iov_owner(niov);
++	struct net_iov_area *owner = net_iov_owner(niov);
+ 
+ 	return owner->base_virtual +
+ 	       ((unsigned long)net_iov_idx(niov) << PAGE_SHIFT);
 -- 
-2.47.0.338.g60cca15819-goog
+2.43.5
 
 
