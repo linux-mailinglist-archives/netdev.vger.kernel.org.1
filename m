@@ -1,185 +1,347 @@
-Return-Path: <netdev+bounces-149107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEA229E42A6
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 18:58:50 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66832169DA4
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 17:58:47 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2852165FA;
-	Wed,  4 Dec 2024 17:23:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=paranoici.org header.i=@paranoici.org header.b="fJn7q2lb"
-X-Original-To: netdev@vger.kernel.org
-Received: from devianza.investici.org (devianza.investici.org [198.167.222.108])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E4B39E4286
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 18:56:46 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7C6215F74;
-	Wed,  4 Dec 2024 17:23:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.167.222.108
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58832281676
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 17:56:45 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B991A20DD6F;
+	Wed,  4 Dec 2024 17:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="F1JNElXV"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E68220DD6D
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 17:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733332987; cv=none; b=R11gcHJ0mLKvUhNc2nt1iZ8Ghedm8triLNzcKl2oikJRU8dIBBRlhhIDdlVNf5jJsCpanssAx+fRu3boSzPR01LWGKn3IVXmwkGDyetYSaltW3jVxAkFBNbcdHHSRTGFGl6fOUZLCmKMEWMd8Bsji/qu+YLHHNrRPVI/cDXbaHA=
+	t=1733332964; cv=none; b=oPiUUjT1hv9rG7r7TE8X9Q/fl9NVlRsHNJhHo7Yh+dsSz/Y6Lnx0FLMYwCs8cWAebtu/cq9jEZ5yk0kzEsGuy4Qja/SRfJQvmmSdcdBS0ZGolaPh9cTGj44pa5J9tXTEdFkzE/0H3Dr8RjOvGrk5fGVs2X670mnAFN7DsnhlxkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733332987; c=relaxed/simple;
-	bh=8HO3mm3jNM/ZIi+ulQAkDTTq+p4TEOdSZ5DMUDAq2Vg=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=NWS5tHJADo4oYKCLMvmJTmy8jgazd+ocE447RVL4NL0zWuYhs0Tw1TVA+x9Z9WoR3Td38DQcoucpBXUtyU0mKVTQlWoFs/AIbWm4xnL3ZV34d8EV67md+9pvn6TbDvjQiPxQSu8BO2ENWFK/VkgQYfFO+FSs02W6u/s/sexXQLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paranoici.org; spf=pass smtp.mailfrom=paranoici.org; dkim=pass (1024-bit key) header.d=paranoici.org header.i=@paranoici.org header.b=fJn7q2lb; arc=none smtp.client-ip=198.167.222.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paranoici.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paranoici.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=paranoici.org;
-	s=stigmate; t=1733332478;
-	bh=0QrBbFQ1Yk43wtEVuPMTkfoJbcLfYpa5h2xyKqF9TXQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fJn7q2lb6Sq30r4i7Hi1Idj/7Fj1J3PmPVtm/N7w9ggFeeYS6lWZ65FwuKrpRkF+K
-	 OIQ10ChwvBTbmF0gZWZyxven9Hcs5bhfJqy2jjLlnXDWRUYrjK/srEWd7Yiohr1cdS
-	 lJiDni5XC+IMba7+VMn3aNxn4Z6EyzxIvGN2+UQk=
-Received: from mx2.investici.org (unknown [127.0.0.1])
-	by devianza.investici.org (Postfix) with ESMTP id 4Y3PJt0MCvz6vVX;
-	Wed,  4 Dec 2024 17:14:38 +0000 (UTC)
-Received: from [198.167.222.108] (mx2.investici.org [198.167.222.108]) (Authenticated sender: invernomuto@paranoici.org) by localhost (Postfix) with ESMTPSA id 4Y3PJs70sJz6vVW;
-	Wed,  4 Dec 2024 17:14:37 +0000 (UTC)
-Received: from frx by crunch with local (Exim 4.98)
-	(envelope-from <invernomuto@paranoici.org>)
-	id 1tIsxQ-000000003X3-30eO;
-	Wed, 04 Dec 2024 18:14:36 +0100
-Date: Wed, 4 Dec 2024 18:13:56 +0100
-From: Francesco Poli <invernomuto@paranoici.org>
-To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <ukleinek@debian.org>
-Cc: Leon Romanovsky <leonro@nvidia.com>, 1086520-done@bugs.debian.org, Mark
- Zhang <markzhang@nvidia.com>, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: Bug#1086520: linux-image-6.11.2-amd64: makes opensm fail to
- start
-Message-Id: <20241204181356.932c49619598e04d8ad412e0@paranoici.org>
-In-Reply-To: <acpo6ocggcl66fjdllk5zrfs2vwiivpetd5ierdek5ruxvdbyl@tfbc3mfnp23o>
-References: <20241113231503.54d12ed5b5d0c8fa9b7d9806@paranoici.org>
-	<3wfi2j7jn2f7rajabfcengubgtyt3wkuin6hqepdoe5dlvfhvn@2clhco3z6fuw>
-	<173040083268.16618.7451145398661885923.reportbug@crunch>
-	<20241118200616.865cb4c869e693b19529df36@paranoici.org>
-	<nvs4i2v7o6vn6zhmtq4sgazy2hu5kiulukxcntdelggmznnl7h@so3oul6uwgbl>
-	<20241125195443.0ddf0d0176d7c34bd29942c7@paranoici.org>
-	<20241125193837.GH160612@unreal>
-	<20241127184803.75086499e71c6b1588a4fb5a@paranoici.org>
-	<173040083268.16618.7451145398661885923.reportbug@crunch>
-	<20241127200413.GE1245331@unreal>
-	<acpo6ocggcl66fjdllk5zrfs2vwiivpetd5ierdek5ruxvdbyl@tfbc3mfnp23o>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1733332964; c=relaxed/simple;
+	bh=CQ/5YfEJvkG5WscL4093Y9mZyhtCYa/aZu85bhnRsoc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=acPTEH8ZX7OEO4+gUuy+CnmSfcy6ezEZNH2LBHKAD1k2XnaPe2yJh0pZ53+lQcOZgbpPxXyC7UTJ3Buh6HPi9YELH2JMvEnMeCM+iiyOIw+FUiE1zkejiRpvgjMh2A68gEoGxgqk7GHtassGHbv9aFYiJnO0DQ4nzWLXDi3drsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=F1JNElXV; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7fd10cd5b10so23504a12.2
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 09:22:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1733332961; x=1733937761; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GzUZlML4zdc55ZOBuwqdAZPFhGyN3Gd9Cwr1/cz4A38=;
+        b=F1JNElXV4EumbE5RZ0YuoX+hycd5YS0aB3on3XlelSvoN+H79oGAazvrNSnekid2b8
+         2Y2XRXdx64JjC+OlYx5yZnHrtwyuurXTCZcMUtUM44k7teFSKlVPvxP3kyrDFmdvJCRS
+         PaIaqTe05FGsAdsGukA8QYzuenLYMchb6ikS1Os1ZraJucbIp7PSqhRIb39jzWzXcCd5
+         wgYnqtCz+7YH/f9S47OXFlzOxo1zIUWKr2QtgEaqMLyDe3F87yo4UWEcxeDI3e+/YgKQ
+         AUlP/du125/6gjA37dStCUMJqY3aCtv7jtkm8qu7w51QWJCcj9dK/N7dBdzJJv0BQ0H9
+         lIkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733332961; x=1733937761;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GzUZlML4zdc55ZOBuwqdAZPFhGyN3Gd9Cwr1/cz4A38=;
+        b=mhtOAf7LvlHEoLfF2ohN2bw52x1P7D1pZFuV4aUABJm/Xpm8SYCSkVgLcSHecvIEux
+         4WxeFyMOJ/Lrj5h+ZgLtv570So5LQYRYD2G8tP6XLQa7xtVIft/8Ap4v0kAWO0YK6Khi
+         buE4PsZ9b7gutAnnXfSTjloJlhDWxG2eVzvQLZ1KmyuF1FvA97PDp/KHigYtki6JTsZW
+         +T851XCY3uG7JyrJ+VMqHtBjQgrYUkhGAMPGdMIlijZE8z4q9NS5VLFg4ROaA+fFAYa5
+         IjhWDEli/8tL3RBJFd3z97VF7ltRI4bqlQBultgOQE2hyK/6J+yvF0Udfmm3TpxDk++p
+         sAJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU+1fkgKYQlCIIZ+JFVAMUK31uVRin4nk5cy7PWTC2IXN6nMErNk2KihnB0l4xsXlXah5LmzZ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJcPCUl2r+vfuaJW0TK7TNvgZC4ac9oqmAKnbPjbfdHRbwd6pl
+	SpqtAPCQzMubuZckAZpuOuaBIdy+ERt5NBCQ5U3Kx8Cuc+6FUVNZ41YL92cuxqw=
+X-Gm-Gg: ASbGncuJop91uZ6HgGbyginBX/Q/LTTAZaF187LLhrWaOtyJCvb6svRYga+FC0OvfmP
+	WNafTN4v+VUbWntl4j8SitIoipwYPL4Ikirw7uIlJfdym2RJCANfo2w/Y3jLpNvOXvJM7prOiGh
+	d6C91dfqKQNCod4LTQvC3kM6A2TMb5DONWmjBG8nAM9+adClJbWNq7wqOf5Em4SZso7axl1o7PU
+	4g9QEJ7ia6TFvG1CwVp9RQVb5Nt1Souixs=
+X-Google-Smtp-Source: AGHT+IGI20u7e5CYbx/vBstDIX2y0Y4Q3dUiNYLAKbvvnNhfjri8X2hV8ZElUBh79vdJpj9GHWDjZQ==
+X-Received: by 2002:a05:6a21:7e85:b0:1e1:7536:87d2 with SMTP id adf61e73a8af0-1e175368d60mr3181694637.44.1733332961451;
+        Wed, 04 Dec 2024 09:22:41 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:19::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fc9c32250asm11705361a12.46.2024.12.04.09.22.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 09:22:40 -0800 (PST)
+From: David Wei <dw@davidwei.uk>
+To: io-uring@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Joe Damato <jdamato@fastly.com>,
+	Pedro Tammela <pctammela@mojatatu.com>
+Subject: [PATCH net-next v8 00/17] io_uring zero copy rx
+Date: Wed,  4 Dec 2024 09:21:39 -0800
+Message-ID: <20241204172204.4180482-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA512";
- boundary="Signature=_Wed__4_Dec_2024_18_13_56_+0100_OXoMkKkJzsj06Qbl"
-
---Signature=_Wed__4_Dec_2024_18_13_56_+0100_OXoMkKkJzsj06Qbl
+MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, 4 Dec 2024 17:37:05 +0100 Uwe Kleine-K=C3=B6nig wrote:
+This patchset adds support for zero copy rx into userspace pages using
+io_uring, eliminating a kernel to user copy.
 
-> Hello Francesco,
+We configure a page pool that a driver uses to fill a hw rx queue to
+hand out user pages instead of kernel pages. Any data that ends up
+hitting this hw rx queue will thus be dma'd into userspace memory
+directly, without needing to be bounced through kernel memory. 'Reading'
+data out of a socket instead becomes a _notification_ mechanism, where
+the kernel tells userspace where the data is. The overall approach is
+similar to the devmem TCP proposal.
 
-Hello Uwe,
+This relies on hw header/data split, flow steering and RSS to ensure
+packet headers remain in kernel memory and only desired flows hit a hw
+rx queue configured for zero copy. Configuring this is outside of the
+scope of this patchset.
 
-[...]
-> I wonder if you could test a firmware upgrade or the above patch. Would
-> be nice to know if there are still some things to do for us (=3D Debian
-> kernel team) here.
+We share netdev core infra with devmem TCP. The main difference is that
+io_uring is used for the uAPI and the lifetime of all objects are bound
+to an io_uring instance. Data is 'read' using a new io_uring request
+type. When done, data is returned via a new shared refill queue. A zero
+copy page pool refills a hw rx queue from this refill queue directly. Of
+course, the lifetime of these data buffers are managed by io_uring
+rather than the networking stack, with different refcounting rules.
 
-Yes, I've finally got around to upgrading the firmware.
+This patchset is the first step adding basic zero copy support. We will
+extend this iteratively with new features e.g. dynamically allocated
+zero copy areas, THP support, dmabuf support, improved copy fallback,
+general optimisations and more.
 
-And today I had a time window, where I could reboot the cluster head
-node.
-After the reboot, the InfiniBand network works correctly:
+In terms of netdev support, we're first targeting Broadcom bnxt. Patches
+aren't included since Taehee Yoo has already sent a more comprehensive
+patchset adding support in [1]. Google gve should already support this,
+and Mellanox mlx5 support is WIP pending driver changes.
 
-  $ uname -v
-  #1 SMP PREEMPT_DYNAMIC Debian 6.11.10-1 (2024-11-23)
-  $ ls -altrF /sys/class/infiniband_mad/
-  total 0
-  lrwxrwxrwx  1 root root    0 Dec  4 10:15 umad0 -> ../../devices/pci0000:=
-80/0000:80:01.1/0000:81:00.0/infiniband_mad/umad0/
-  lrwxrwxrwx  1 root root    0 Dec  4 10:15 umad1 -> ../../devices/pci0000:=
-80/0000:80:01.1/0000:81:00.1/infiniband_mad/umad1/
-  drwxr-xr-x  2 root root    0 Dec  4 10:17 ./
-  drwxr-xr-x 73 root root    0 Dec  4 10:17 ../
-  -r--r--r--  1 root root 4096 Dec  4 10:17 abi_version
-  lrwxrwxrwx  1 root root    0 Dec  4 18:08 issm1 -> ../../devices/pci0000:=
-80/0000:80:01.1/0000:81:00.1/infiniband_mad/issm1/
-  lrwxrwxrwx  1 root root    0 Dec  4 18:08 issm0 -> ../../devices/pci0000:=
-80/0000:80:01.1/0000:81:00.0/infiniband_mad/issm0/
-  # ethtool -i ibp129s0f0
-  driver: mlx5_core[ib_ipoib]
-  version: 6.11.10-amd64
-  firmware-version: 20.43.1014 (MT_0000000224)
-  expansion-rom-version:
-  bus-info: 0000:81:00.0
-  supports-statistics: yes
-  supports-test: yes
-  supports-eeprom-access: no
-  supports-register-dump: no
-  supports-priv-flags: yes
-  # ethtool -i ibp129s0f1
-  driver: mlx5_core[ib_ipoib]
-  version: 6.11.10-amd64
-  firmware-version: 20.43.1014 (MT_0000000224)
-  expansion-rom-version:
-  bus-info: 0000:81:00.1
-  supports-statistics: yes
-  supports-test: yes
-  supports-eeprom-access: no
-  supports-register-dump: no
-  supports-priv-flags: yes
-  $ ps aux | grep opens[m]
-  root        1150  0.0  0.0 1560776 3636 ?        Ssl  10:15   0:00 /usr/s=
-bin/opensm --guid 0x9c63c00300033240 --log_file /var/log/opensm.0x9c63c0030=
-0033240.log
+===========
+Performance
+===========
 
+Note: Comparison with epoll + TCP_ZEROCOPY_RECEIVE isn't done yet.
 
->=20
-> If everything is fine for you, I'd like to close this bug.
+Test setup:
+* AMD EPYC 9454
+* Broadcom BCM957508 200G
+* Kernel v6.11 base [2]
+* liburing fork [3]
+* kperf fork [4]
+* 4K MTU
+* Single TCP flow
 
-I am closing the Debian bug report right now.
-Thanks to everyone who has been involved for the great and kind help!
+With application thread + net rx softirq pinned to _different_ cores:
 
->=20
-> Best regards
++-------------------------------+
+| epoll     | io_uring          |
+|-----------|-------------------|
+| 82.2 Gbps | 116.2 Gbps (+41%) |
++-------------------------------+
 
-Have a nice evening.   :-)
+Pinned to _same_ core:
 
---=20
- http://www.inventati.org/frx/
- There's not a second to spare! To the laboratory!
-..................................................... Francesco Poli .
- GnuPG key fpr =3D=3D CA01 1147 9CD2 EFDF FB82  3925 3E1C 27E1 1F69 BFFE
++-------------------------------+
+| epoll     | io_uring          |
+|-----------|-------------------|
+| 62.6 Gbps | 80.9 Gbps (+29%)  |
++-------------------------------+
 
---Signature=_Wed__4_Dec_2024_18_13_56_+0100_OXoMkKkJzsj06Qbl
-Content-Type: application/pgp-signature
+==============
+Patch overview
+==============
 
------BEGIN PGP SIGNATURE-----
+Networking folks would be mostly interested in patches 1-8, 11, 12 and
+14. Patches 1-8 make the necessary prerequisite changes in netdev core.
 
-iQIzBAEBCgAdFiEEygERR5zS79/7gjklPhwn4R9pv/4FAmdQjdQACgkQPhwn4R9p
-v/6AoA//TkOwnWjH5D4ks5SUi1DDiHU1IFfS/ix9o3TA2oWmP9/tQzIWV/ACfbbK
-5QBHtVb6lFSte9kIxSgc/mXP06PicFpsxOjByJ4Kwq8dlz9ksQqC/biF0h0PmKZt
-hRFVC0F69vDgUeUhREOQn6a3KscUv6pl9bEkUBmMjcXmdLkgPaFkMWt4jlopXhig
-w2U7vKhLFo+caw1WM3e4OJpF6iPXF4G6lyEOvXIo7zKohVwChVjH5rwUuIXmd0Q2
-ltvu8ZGcx0+wor5zoUORt1hYLXjOZ4jtJLAEgrvZNoa6eUGw1NPaNInwyjDo2hFS
-EidbgtJY3UFa3mytTbkQO4alfagC52CfjmxJfNC3dGqyBDHS5j2uXPB0V5NWbDWq
-lX7k1DcfBS9rJgNs+kBL5/aoU1KHWSCqdUbniomv3iba5thfmWpHF+mki5cJr/6+
-VIkARDEnLuk86nVm8dOVwm/jFLyerDXP6XzAdUjw4xPeBzib+dPlaD29r39YrvMf
-aRqSe8azvg7t+XFGpmfbXTnGgCUgv/YIACUtrs/ffif8ffTl9FC+8xMsgCH638J3
-nP7Sd1yVPzynZHshH1lGv+k7VSAZqGq2550hdAvmXs4pUPt/ow/3A2tBdNo8j00U
-GbZtEnbMp/i1nOZB/NOaTdmyT0Y5VEqqPmdkfL1KKASTSVK59Zw=
-=aoBA
------END PGP SIGNATURE-----
+Patch 11 implements struct memory_provider_ops, patch 12 adds a
+recv_actor_t func used with tcp_read_sock(), and patch 14 passes it all
+to netdev via the queue API.
 
---Signature=_Wed__4_Dec_2024_18_13_56_+0100_OXoMkKkJzsj06Qbl--
+io_uring folks would be mostly interested in patches 9-15:
+
+* Initial registration that sets up a hw rx queue.
+* Shared ringbuf for userspace to return buffers.
+* New request type for doing zero copy rx reads.
+
+=====
+Links
+=====
+
+Broadcom bnxt support:
+[1]: https://lore.kernel.org/netdev/20241003160620.1521626-8-ap420073@gmail.com/
+
+Linux kernel branch:
+[2]: https://github.com/spikeh/linux.git zcrx/next
+
+liburing for testing:
+[3]: https://github.com/isilence/liburing.git zcrx/next
+
+kperf for testing:
+[4]: https://git.kernel.dk/kperf.git
+
+Changes in v8:
+--------------
+* add documentation and selftest
+* use io_uring regions for the refill ring
+
+Changes in v7:
+--------------
+net:
+* Use NAPI_F_PREFER_BUSY_POLL for napi_execute + stylistics changes.
+
+Changes in v6:
+--------------
+Please note: Comparison with TCP_ZEROCOPY_RECEIVE isn't done yet.
+
+net:
+* Drop a devmem.h clean up patch.
+* Migrate to netdev_get_by_index from deprecated API.
+* Fix !CONFIG_NET_DEVMEM build.
+* Don’t return into the page pool cache directly, use a new helper 
+* Refactor napi_execute
+
+io_uring:
+* Require IORING_RECV_MULTISHOT flag set.
+* Add unselectable CONFIG_IO_URING_ZCRX.
+* Pulled latest io_uring changes.
+* Unexport io_uring_pp_zc_ops.
+
+Changes in v5:
+--------------
+* Rebase on top of merged net_iov + netmem infra.
+* Decouple net_iov from devmem TCP.
+* Use netdev queue API to allocate an rx queue.
+* Minor uAPI enhancements for future extensibility.
+* QoS improvements with request throttling.
+
+Changes in RFC v4:
+------------------
+* Rebased on top of Mina Almasry's TCP devmem patchset and latest
+  net-next, now sharing common infra e.g.:
+    * netmem_t and net_iovs
+    * Page pool memory provider
+* The registered buffer (rbuf) completion queue where completions from
+  io_recvzc requests are posted is removed. Now these post into the main
+  completion queue, using big (32-byte) CQEs. The first 16 bytes is an
+  ordinary CQE, while the latter 16 bytes contain the io_uring_rbuf_cqe
+  as before. This vastly simplifies the uAPI and removes a level of
+  indirection in userspace when looking for payloads.
+  * The rbuf refill queue is still needed for userspace to return
+    buffers to kernel.
+* Simplified code and uAPI on the io_uring side, particularly
+  io_recvzc() and io_zc_rx_recv(). Many unnecessary lines were removed
+  e.g. extra msg flags, readlen, etc.
+
+Changes in RFC v3:
+------------------
+* Rebased on top of Jakub Kicinski's memory provider API RFC. The ZC
+  pool added is now a backend for memory provider.
+* We're also reusing ppiov infrastructure. The refcounting rules stay
+  the same but it's shifted into ppiov->refcount. That lets us to
+  flexibly manage buffer lifetimes without adding any extra code to the
+  common networking paths. It'd also make it easier to support dmabufs
+  and device memory in the future.
+  * io_uring also knows about pages, and so ppiovs might unnecessarily
+    break tools inspecting data, that can easily be solved later.
+
+Many patches are not for upstream as they depend on work in progress,
+namely from Mina:
+
+* struct netmem_t
+* Driver ndo commands for Rx queue configs
+* struct page_pool_iov and shared pp infra
+
+Changes in RFC v2:
+------------------
+* Added copy fallback support if userspace memory allocated for ZC Rx
+  runs out, or if header splitting or flow steering fails.
+* Added veth support for ZC Rx, for testing and demonstration. We will
+  need to figure out what driver would be best for such testing
+  functionality in the future. Perhaps netdevsim?
+* Added socket registration API to io_uring to associate specific
+  sockets with ifqs/Rx queues for ZC.
+* Added multi-socket support, such that multiple connections can be
+  steered into the same hardware Rx queue.
+* Added Netbench server/client support.
+
+David Wei (6):
+  io_uring/zcrx: add interface queue and refill queue
+  io_uring/zcrx: add io_zcrx_area
+  io_uring/zcrx: add io_recvzc request
+  io_uring/zcrx: set pp memory provider for an rx queue
+  net: add documentation for io_uring zcrx
+  io_uring/zcrx: add selftest
+
+Jakub Kicinski (1):
+  net: page_pool: create hooks for custom page providers
+
+Pavel Begunkov (10):
+  net: prefix devmem specific helpers
+  net: generalise net_iov chunk owners
+  net: prepare for non devmem TCP memory providers
+  net: page_pool: add ->scrub mem provider callback
+  net: page pool: add helper creating area from pages
+  net: page_pool: introduce page_pool_mp_return_in_cache
+  net: add helper executing custom callback from napi
+  io_uring/zcrx: implement zerocopy receive pp memory provider
+  io_uring/zcrx: add copy fallback
+  io_uring/zcrx: throttle receive requests
+
+ Documentation/networking/iou-zcrx.rst         | 201 +++++
+ Kconfig                                       |   2 +
+ include/linux/io_uring_types.h                |   4 +
+ include/net/busy_poll.h                       |   6 +
+ include/net/netmem.h                          |  21 +-
+ include/net/page_pool/memory_provider.h       |  14 +
+ include/net/page_pool/types.h                 |  10 +
+ include/uapi/linux/io_uring.h                 |  54 +-
+ io_uring/KConfig                              |  10 +
+ io_uring/Makefile                             |   1 +
+ io_uring/io_uring.c                           |   7 +
+ io_uring/io_uring.h                           |  10 +
+ io_uring/net.c                                |  74 ++
+ io_uring/opdef.c                              |  16 +
+ io_uring/register.c                           |   7 +
+ io_uring/rsrc.c                               |   2 +-
+ io_uring/rsrc.h                               |   1 +
+ io_uring/zcrx.c                               | 845 ++++++++++++++++++
+ io_uring/zcrx.h                               |  75 ++
+ net/core/dev.c                                |  81 +-
+ net/core/devmem.c                             |  51 +-
+ net/core/devmem.h                             |  45 +-
+ net/core/page_pool.c                          | 102 ++-
+ net/core/page_pool_user.c                     |  15 +-
+ net/ipv4/tcp.c                                |   8 +-
+ .../selftests/drivers/net/hw/.gitignore       |   2 +
+ .../testing/selftests/drivers/net/hw/Makefile |   6 +
+ .../selftests/drivers/net/hw/iou-zcrx.c       | 432 +++++++++
+ .../selftests/drivers/net/hw/iou-zcrx.py      |  64 ++
+ 29 files changed, 2091 insertions(+), 75 deletions(-)
+ create mode 100644 Documentation/networking/iou-zcrx.rst
+ create mode 100644 include/net/page_pool/memory_provider.h
+ create mode 100644 io_uring/KConfig
+ create mode 100644 io_uring/zcrx.c
+ create mode 100644 io_uring/zcrx.h
+ create mode 100644 tools/testing/selftests/drivers/net/hw/iou-zcrx.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+
+-- 
+2.43.5
+
 
