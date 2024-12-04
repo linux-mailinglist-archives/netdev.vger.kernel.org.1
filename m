@@ -1,155 +1,213 @@
-Return-Path: <netdev+bounces-149008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E91089E3C54
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:12:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50AC69E3C59
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:13:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D38D916A435
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:12:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C715C1661B0
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:13:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B1791F7589;
-	Wed,  4 Dec 2024 14:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473F61F8913;
+	Wed,  4 Dec 2024 14:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MNKkOQus"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="U1WW9Sti"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8C31F8901
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151F81F707A
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 14:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733321435; cv=none; b=ZiENfurbRfYwV9/q4Ymt/Uua7aenxO2Tw1yG4soZYX9F+K6yo8sbSqNYE2W6o9PRC/jA4/TdJhAjORCd5fst8IiqTcZX4U6d9ih3RjfVsgQEXqs5yTkGtNTeJsclr53y8chtIveF8tKZ+o8vJ+VPdDMS2j/W/iCj4tyEPj/IFR8=
+	t=1733321559; cv=none; b=NcknUcv/Ewl73VoCXiYFDktlxjqEVFjBT6vL5KljoPEF4bR1xhbNmeJzJgjKyu+k51Ox+2u9HAUQFm6Wu0Xi8tIGBUtjZFuuRyzMxhxg8AAcWJpGJF/VtmozMYwih6NP7FdPB0bbJBz/vGIifikeHrrWkzGgRG2bHr+Jx430GnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733321435; c=relaxed/simple;
-	bh=GVDsDE1B8g+/VPEJrLRC1jffhk036aDFnGYidI+v76s=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qNM206OYu5cAo6sYhoEbrNDWp+GPGtMRBbMryUwNv+gKnlF05WUTBd7m6bMvU3xRdqgJWTwAeaM2Exg3S/SNz9LB/PrlQApMd3gM7CKE7wTRuMJZDQmqJ9yHjxPyh75mJX8QwxLU3Vdc1cuW70GMRKFrDK197MLpHsufhCponJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MNKkOQus; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4668d3833a4so141258201cf.1
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 06:10:33 -0800 (PST)
+	s=arc-20240116; t=1733321559; c=relaxed/simple;
+	bh=LAFRiXoR1eyxZsUiSRybV2rO5rZ40IaIIYJpcZeGuP0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=QkYE+8sz+wXKK8Ffd/N30aB2VJZzAguIRG1SGH7sK68YEDjPmDsZDnJK+YvOc6QDuW+gf+oSTI78iocW7hQR+QrGO96HJRSUdIa3qDTSdbGK+S4t9hm8N0RNIwT6ONb5PJu6fdqT6QCd6PxXBKqWRqRLqkONXaPpoXSWtrzGkb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=U1WW9Sti; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-aa55171d73cso178104066b.0
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 06:12:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733321432; x=1733926232; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=IW6Gotd2j4I5hRdGOPLy0chScrPfpQfQ+DQAd6uG4e8=;
-        b=MNKkOQusZvYDlhQnMaE8GLib+BYZSQi44NytM/hUqEi4oXkX3qhVihwv9XDEkeZWaa
-         +K4Qvtjdp1j55/zBM44BAWcutnjkVyIhudRM5znTFwd/WF8t4Iu3yMV6b5PE+VGwzAD0
-         5QEMaL8zNtVVX8VBA9mmTlvuwp0E9o0+2I68EBgclbuvA+T9J5KtdoabcEPxupWfFo99
-         lNXMk6MQ5U+DUPQ3a+ckxH8dbsAIxrCq3E4PIpAJgRJsVHlbA6KwDcBlxpnzLQxso1II
-         iLB+CyXFfTsZOhj1uPNLxlJQXQpop5WXtN1imsAiWI4rFpfBb05onVnHSM8Rn0w33Tzo
-         26qQ==
+        d=openvpn.net; s=google; t=1733321555; x=1733926355; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:from:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=T36hNeDh4s4ctdjTEG4EQB7Xp8fYpuEsKp+LcwDEnrs=;
+        b=U1WW9Stiae7zmDripK8w2eMLSs1/rH0KLL7EApRDMTh2h+KTPZBzgHY0nRytWdp0xW
+         PBrVqPsAR59cydJYHencOiLEaASxPhnmSt1mrDngrbNZmV6l67g97/H6qveO9si+v+vr
+         jdMrH8wUcS2SsiWrqvgiwQqMF0I+O/MmwgcqrVgVSsmZpsH49WrFjviQKE8nRlZYiViO
+         9r4se3RvqN56s8xRBOaBDoGz3XbHaaH0VUK3VCFVz/moEQ54i3KkbPd+jNIEl/84hNu7
+         dhc5Kh99k+0kNn4WkVyNOJDGgO3ZgaG30YKx6n+SWvtpYxCU6+XOCP6eAAw0xR51zJUd
+         aT5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733321432; x=1733926232;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IW6Gotd2j4I5hRdGOPLy0chScrPfpQfQ+DQAd6uG4e8=;
-        b=k3/yv/dNLjMbHiDl4N51xzOlnvRsJS1l5JVBf2oXTJEl0lajDfLViJ/U8UamGkNk8C
-         sif94knIPZmpg+Q+As2SblkvvDeZ1wASke707+VRQU3Ava0FNfF8PvwIyT8PmlbFRyKI
-         AWlwB0BNm0/i56CxrqU995WisgHref6GGTUJDFpfYNNp2PuwTeb/AHE9tzgGQKdcqMPX
-         +9piMPoPma0663hUKZ8pWZ0Jy8ywUjaTrFD/bv+M2atnpJ/51Q2rx425toNR+QAVflX6
-         XmKs5KqbtyMWYxj0pAuHeFtyFEn0j74AYvfQMqHBaQ8ro7qg6+2zVT4xLg+dgr0C7YyN
-         60Pg==
-X-Gm-Message-State: AOJu0Yx2+Hwlz72otjggj+rWnM9lKEAA/kMlZOUoprO7ULqwziv0PoJm
-	BhJzMMDqYYwPxmt2lCaOpzWulZh0Q1r1BNJCk5krs8IbytcWF9L7iKMOnSVeajBvejsVZdmWlmO
-	/xpFdws8u8A==
-X-Google-Smtp-Source: AGHT+IG7yKzAWcBQ+CZG6p2WusnRE6cXRNGl8vvzhapiBZk+Sx5s6KdIUBa3ZMZdwIBGDlPY6YsREd+FPZKOvg==
-X-Received: from qtbfk14.prod.google.com ([2002:a05:622a:558e:b0:463:5a79:2fa5])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:574e:0:b0:466:a41a:6448 with SMTP id d75a77b69052e-4670c141187mr91162371cf.18.1733321432290;
- Wed, 04 Dec 2024 06:10:32 -0800 (PST)
-Date: Wed,  4 Dec 2024 14:10:31 +0000
+        d=1e100.net; s=20230601; t=1733321555; x=1733926355;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:from:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=T36hNeDh4s4ctdjTEG4EQB7Xp8fYpuEsKp+LcwDEnrs=;
+        b=ZDWm/0kpBU4gj3rAkAyfro8tQoHUUteQBsAZt6byf8ta1LV95Vc9y2jti4Ko4VFQO5
+         RB+4846ahb/Z6b6Y1u/mB97pOpkGvmPXBdWXDt5nhnJyfQMAURN+u3pySO7cXxCY57GW
+         KPv0bP7mVHGMLczW3Cq/NlcezT9rfkDdrq+laNN94YGkcDW5/y2LH5ylvb628JXK1ZSB
+         H+VgaM0yRzWUYMPNsPQMhvbYXCXImkEgZZrcOLCDfLeEwk7liO+rqTt7chqL7+g8Jf2C
+         I2uG4bcNhpd0WozAgbopfB0nS0tMbaEGzO7phGO1P0rkMlQSGAkRgxkTKW+Xz5Y+Bxfi
+         FHAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCViAT4shOQ8CwN3Drv2ag7YZaB5XxiyWN19U0xvxmZTqn/KfTaoQ0V1GyDb91Ay4xffDLYBeFE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZ5kJbog8DjbJHQmEfdeXvS5tiOyHSDoUxU2R3Lh7E8vLyQJ9+
+	oEi5LSx/Cmqlohti7ERbOkd54/l6+SNu+ucjG0BWYmEkHWO+BnMxEFc2iqn0CgMpEeasrYmEnKE
+	d
+X-Gm-Gg: ASbGncuNRQKcqx8VP76WmODm5COdcMvJAryJ5hWqU3XAKG/+06ZIQ+rVxJtUuK2+RdH
+	Y2Mets2WAgwtmIU7EPjT6beDxNvTGUTgjLbw8WLj5Iy337xnBAXA5IyKTCF8P2DYfRQls2OkdIs
+	SbdOGuArDahMHAtyxGF/TL29eavGtP9j7oT3Gx+Ie9gYT5AF1AeSW87QzbLS/rJ+SIN+zt7Fus0
+	qHz8WfqyhbrLhEc9X/KNer0OGQbCmqwQXuAaUnqk7kM8zrab9YDku6jYeey4xqqVrxl9Sj2IHT1
+	YCZG5rhJi9C/
+X-Google-Smtp-Source: AGHT+IFDpFDh2hT5bc54V4RHf7eiVb15vsRRml8Z5zP57LBHiQjS1dQpicFqMeRkHePjXUbJdALHIw==
+X-Received: by 2002:a17:906:31ce:b0:aa5:4d1c:78aa with SMTP id a640c23a62f3a-aa5f70da47bmr651138966b.5.1733321555424;
+        Wed, 04 Dec 2024 06:12:35 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:85f4:5278:b2f6:64fb? ([2001:67c:2fbc:1:85f4:5278:b2f6:64fb])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa5998e6345sm738249566b.109.2024.12.04.06.12.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Dec 2024 06:12:34 -0800 (PST)
+Message-ID: <5ad48b64-1f83-4a62-addd-3008d5faa2f5@openvpn.net>
+Date: Wed, 4 Dec 2024 15:13:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241204141031.4030267-1-edumazet@google.com>
-Subject: [PATCH net] net: lapb: increase LAPB_HEADER_LEN
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+fb99d1b0c0f81d94a5e2@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 13/22] ovpn: implement peer lookup logic
+From: Antonio Quartulli <antonio@openvpn.net>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ ryazanov.s.a@gmail.com, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>
+References: <20241202-b4-ovpn-v12-0-239ff733bf97@openvpn.net>
+ <20241202-b4-ovpn-v12-13-239ff733bf97@openvpn.net>
+ <5052453b-edd8-44e2-8df7-00ea439805ad@openvpn.net> <Z08tV5vQe2S4iawi@hog>
+ <b4627d32-8d17-4253-8687-a451d7a1052e@openvpn.net>
+Content-Language: en-US
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <b4627d32-8d17-4253-8687-a451d7a1052e@openvpn.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-It is unclear if net/lapb code is supposed to be ready for 8021q.
+On 04/12/2024 09:28, Antonio Quartulli wrote:
+> On 03/12/2024 17:09, Sabrina Dubroca wrote:
+>> 2024-12-03, 15:58:17 +0100, Antonio Quartulli wrote:
+>>> On 02/12/2024 16:07, Antonio Quartulli wrote:
+>>> [...]
+>>>> +#define ovpn_get_hash_slot(_key, _key_len, _tbl) ({    \
+>>>> +    typeof(_tbl) *__tbl = &(_tbl);            \
+>>>> +    jhash(_key, _key_len, 0) % HASH_SIZE(*__tbl);    \
+>>>> +})
+>>>> +
+>>>> +#define ovpn_get_hash_head(_tbl, _key, _key_len) ({        \
+>>>> +    typeof(_tbl) *__tbl = &(_tbl);                \
+>>>> +    &(*__tbl)[ovpn_get_hash_slot(_key, _key_len, *__tbl)];    \
+>>>> +})
+>>>
+>>> clang a reporting various warnings like this:
+>>>
+>>> ../drivers/net/ovpn/peer.c:406:9: warning: variable '__tbl' is 
+>>> uninitialized
+>>> when used within its own initialization [-Wuninitialized]
+>>>    406 |         head = ovpn_get_hash_head(ovpn->peers->by_id, &peer_id,
+>>>        |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>    407 |                                   sizeof(peer_id));
+>>>        |                                   ~~~~~~~~~~~~~~~~
+>>> ../drivers/net/ovpn/peer.c:179:48: note: expanded from macro
+>>> 'ovpn_get_hash_head'
+>>>    179 |         &(*__tbl)[ovpn_get_hash_slot(_key, _key_len, 
+>>> *__tbl)];  \
+>>>        |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+>>> ../drivers/net/ovpn/peer.c:173:26: note: expanded from macro
+>>> 'ovpn_get_hash_slot'
+>>>    173 |         typeof(_tbl) *__tbl = &(_tbl);                  \
+>>>        |                       ~~~~~     ^~~~
+>>>
+>>> Anybody willing to help me understand this issue?
+>>>
+>>> I have troubles figuring out how __tbl is being used uninitialized.
+>>> I wonder if the parameters naming is fooling clang (or me) somehow.
+>>
+>> Not really a solution to this specific issue, but do you actually need
+>> ovpn_get_hash_slot as a separate macro? AFAICT all users could also be
+>> converted to ovpn_get_hash_head, then you can merge ovpn_get_hash_slot
+>> into ovpn_get_hash_head and maybe clang won't get confused?
+>>
+>> No guarantee that this fixes anything (except saving one or two lines
+>> in a few functions).
+> 
+> This is what it used to be before (and no error was reported), but I had 
+> to split the macro because I need to isolate the slot computation for 
+> nulls comparison. So there are some users for ovpn_get_hash_slot()
+> 
+> I will quickly try changing the naming and see if clang gets happier.
 
-We can at least avoid crashes like the following :
+Indeed it's the declaration of __tbl in ovpn_get_hash_slot() that 
+confuses clang.
+I'll rename both __tbl and add a comment to remember why we did that.
 
-skbuff: skb_under_panic: text:ffffffff8aabe1f6 len:24 put:20 head:ffff88802824a400 data:ffff88802824a3fe tail:0x16 end:0x140 dev:nr0.2
-------------[ cut here ]------------
- kernel BUG at net/core/skbuff.c:206 !
-Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 1 UID: 0 PID: 5508 Comm: dhcpcd Not tainted 6.12.0-rc7-syzkaller-00144-g66418447d27b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
- RIP: 0010:skb_panic net/core/skbuff.c:206 [inline]
- RIP: 0010:skb_under_panic+0x14b/0x150 net/core/skbuff.c:216
-Code: 0d 8d 48 c7 c6 2e 9e 29 8e 48 8b 54 24 08 8b 0c 24 44 8b 44 24 04 4d 89 e9 50 41 54 41 57 41 56 e8 1a 6f 37 02 48 83 c4 20 90 <0f> 0b 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3
-RSP: 0018:ffffc90002ddf638 EFLAGS: 00010282
-RAX: 0000000000000086 RBX: dffffc0000000000 RCX: 7a24750e538ff600
-RDX: 0000000000000000 RSI: 0000000000000201 RDI: 0000000000000000
-RBP: ffff888034a86650 R08: ffffffff8174b13c R09: 1ffff920005bbe60
-R10: dffffc0000000000 R11: fffff520005bbe61 R12: 0000000000000140
-R13: ffff88802824a400 R14: ffff88802824a3fe R15: 0000000000000016
-FS:  00007f2a5990d740(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c2631fd CR3: 0000000029504000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
-  skb_push+0xe5/0x100 net/core/skbuff.c:2636
-  nr_header+0x36/0x320 net/netrom/nr_dev.c:69
-  dev_hard_header include/linux/netdevice.h:3148 [inline]
-  vlan_dev_hard_header+0x359/0x480 net/8021q/vlan_dev.c:83
-  dev_hard_header include/linux/netdevice.h:3148 [inline]
-  lapbeth_data_transmit+0x1f6/0x2a0 drivers/net/wan/lapbether.c:257
-  lapb_data_transmit+0x91/0xb0 net/lapb/lapb_iface.c:447
-  lapb_transmit_buffer+0x168/0x1f0 net/lapb/lapb_out.c:149
- lapb_establish_data_link+0x84/0xd0
- lapb_device_event+0x4e0/0x670
-  notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
- __dev_notify_flags+0x207/0x400
-  dev_change_flags+0xf0/0x1a0 net/core/dev.c:8922
-  devinet_ioctl+0xa4e/0x1aa0 net/ipv4/devinet.c:1188
-  inet_ioctl+0x3d7/0x4f0 net/ipv4/af_inet.c:1003
-  sock_do_ioctl+0x158/0x460 net/socket.c:1227
-  sock_ioctl+0x626/0x8e0 net/socket.c:1346
-  vfs_ioctl fs/ioctl.c:51 [inline]
-  __do_sys_ioctl fs/ioctl.c:907 [inline]
-  __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+Regards,
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+fb99d1b0c0f81d94a5e2@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/67506220.050a0220.17bd51.006c.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/lapb.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> Regards,
+> 
+> 
 
-diff --git a/include/net/lapb.h b/include/net/lapb.h
-index 124ee122f2c8f8e08f4b1a093673ab330996fe39..6c07420644e45aa3eec64dbd2cf520b14dc8b9e0 100644
---- a/include/net/lapb.h
-+++ b/include/net/lapb.h
-@@ -4,7 +4,7 @@
- #include <linux/lapb.h>
- #include <linux/refcount.h>
- 
--#define	LAPB_HEADER_LEN	20		/* LAPB over Ethernet + a bit more */
-+#define	LAPB_HEADER_LEN MAX_HEADER		/* LAPB over Ethernet + a bit more */
- 
- #define	LAPB_ACK_PENDING_CONDITION	0x01
- #define	LAPB_REJECT_CONDITION		0x02
 -- 
-2.47.0.338.g60cca15819-goog
+Antonio Quartulli
+OpenVPN Inc.
 
 
