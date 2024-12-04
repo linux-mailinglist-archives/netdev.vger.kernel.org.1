@@ -1,92 +1,125 @@
-Return-Path: <netdev+bounces-149051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F52E9E3EA4
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 16:48:37 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 711569E3EA7
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 16:48:54 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F92F2812BA
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:48:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25AFB16737E
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6902B20C46E;
-	Wed,  4 Dec 2024 15:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 005D020C477;
+	Wed,  4 Dec 2024 15:48:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wXP9JVK9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BwNLZIxE"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B2D1768FD;
-	Wed,  4 Dec 2024 15:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B46A209F5B;
+	Wed,  4 Dec 2024 15:48:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733327312; cv=none; b=WxwVZ7D+WGiczVbVLBY9GZqx1CFxLAeLXrg97trdH+m9s/MRE/mF/XG3Vg3SEyc8vPhL+wJA4hmlWxkc3DYuP0S7owTT7zCxoMWXl0Z5FXl0+i9iosHv98MOKu3i86kvTzHe6xtWcYPRwsYhcCXCWzTtXIzmepaK74FF/5gm7Ss=
+	t=1733327318; cv=none; b=ncjWabkNtzCiMrN3bWxL/SX6gS5N//VktWathDBcpFC5JwhIaE1L+0YqA6+V+XU/6zwStHGoi7JO+oEDQ/tIFDxMHCdL8fA4dr1BG+81UBljcyvqOCoMu2GBnxXrONMlwHTy32S7pTiIcN4JXncYPQiI9zSEIxf3QhzZ+Cdz7kU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733327312; c=relaxed/simple;
-	bh=WyVwOXbEbLOHvXOlA0Zg/YSNUMqxvNUXgbxJRVH3qqA=;
+	s=arc-20240116; t=1733327318; c=relaxed/simple;
+	bh=ddIIs2MMrdU+TTF+qZ8Me6qlDgdA32VPibL4i1IWt/g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hld4gAuKLXYo2WtS54RBvFUuz4JuFZU0pezPOIBoq6tfuMJ/gCYrCAmzP5k/XfwWYOX/V7ANEUkzx6okeYCwbt+HrtZVvVCdrMtpnls0nbRqYfT4ord8NA9bBFpzQ501/0IJYqwuFUDlFyS82ARc8jh8TJm95R+poe/udj62yEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wXP9JVK9; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SiIlk/FEAmgdvplpgvduA7wwa6KAo49gIMe+ijciV2U=; b=wXP9JVK9S2ioX6EyNKlr+dmzS2
-	mYdH7i78kdizKRgc569heQlzOBvygoPMqcAGtglYh2BU1jAyFbSoyTRiTNFOQZ+kgPXAYqFg3e5MQ
-	jIBNm2/yl7xysLVtzrkB52We+Lvbpk+86HPRefEsEN+L+0h3RHD7qia5oyMpxDtoXLqk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tIrbt-00FE2Z-5y; Wed, 04 Dec 2024 16:48:17 +0100
-Date: Wed, 4 Dec 2024 16:48:17 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v8 3/4] net: dsa: Add Airoha AN8855 5-Port
- Gigabit DSA Switch driver
-Message-ID: <af078f6a-08ba-4a68-ae54-2d49a59ce1bb@lunn.ch>
-References: <20241204072427.17778-1-ansuelsmth@gmail.com>
- <20241204072427.17778-4-ansuelsmth@gmail.com>
- <20241204100922.0af25d7e@fedora.home>
- <67501d7b.050a0220.3390ac.353c@mx.google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DEILv22rGXcMWtdvqGfcisz8CUcdrBQod74bfm6rl/CSzQQHtJJh9mCv3oOA+aUXadUMXKvG0JEzi+h6R+/913gJX7DxDwxjSJhcwj0JCjBomwgT/8ntZh5DigmMhAvnOgmPWj4tfIZRkvkJ5Pk5riUyB4nIoEjT8ZmW66VhZwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BwNLZIxE; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2155157c58cso36160945ad.0;
+        Wed, 04 Dec 2024 07:48:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733327316; x=1733932116; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JnCHEz4Gh7akoOewhOyufWncAXhN1SKzUf/9Phjsxl0=;
+        b=BwNLZIxEspc/7LjDcmz+JY5wTMG1X4mOvUFJWOS3Jw0u/S2+/F8MHdGUSI3swLyEXd
+         C7Q0HtXgBKlTqEhik2+acYakI7skSHQPXWwiyifv8Ch4sCLC9m2z98OeMYN+q0KPDB7o
+         MdEvBoET8ePEiG6ZEOMhwUzaIE/Cwp+5If529wYu48W2JXQtLQbpYJntJmw6ddJAUXXl
+         Mt31Q0MmwfWX1U2I60dslvz9ffeZ9raJiERBB/Fu4uBHIyp1BL/1WytcqTEvcsNWcNQN
+         VJqCTOV0xFBx93cnAMvJn56rqnL6MqWYsBwJJo8RoRBhmFnRz2JnJXsAm6dyEgHUbisj
+         V3NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733327316; x=1733932116;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JnCHEz4Gh7akoOewhOyufWncAXhN1SKzUf/9Phjsxl0=;
+        b=uJsDPKbcXNTm1ONO8NMXbWMb56CtA8BzG6Uy8p3NqHxyKfoI35hB3LbWnbCsOR5/sH
+         /W7zrgWZ553vOsiBmwBbvBeYrVbeAddgfeeuCrkxLaZWcOeFwK7WkLozOrZcexOm4h4Z
+         7AlklYKtzMlRi1G2T3z+IoQXaYqlX6GDbGoGUVVAJt9LV+JKf7Aymm7HPQJjFeVgis9O
+         xP4TsU2/tMTBWl4jsCprKLT5D2vQRvP5ZEw1CNKlxl1y7MogqGSQ5i3eepd2cAAgm7L6
+         YqXhocYhyCKLUl6rmn7WPyJiBnFctI/cu88/sbB5foMkpuZZ70h39B5GjfR2alaH7xCT
+         eqiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVwk8IHXMzKHYFsZmMYvSmlgzfyvZh0HhXeWPfgtOKeiRWON/etLYNMe9XbUANlqlwb06c=@vger.kernel.org, AJvYcCVyBIk4WBJ8zXW/jXAoESykUCmNyMsOfa/bIzlc2ppxj0rbDAhEaaeRqGo536t87hX6I+8Sj/kKV2Nl8k9g1OSN@vger.kernel.org, AJvYcCX6bnOXyG+T8VbaPBCiFaxpaGiNQ7o77dJbEVmcJADAEPLWArRAG2Gm3k6afYGK7qscFMtZE58yqDEAn6tT@vger.kernel.org, AJvYcCXbFCO6RDXIgMcmjxM2jgvQtPBwGSiNt7G35V6EdFE4vbyD7IH2wU5PrTexgKxEWa9LQi2t/Yi6@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjzBVHYGe/amdSY9FlqMDRFysmJ9OYUOMlDacFfNqU0NqL5or8
+	8iVGWvxOmSj0SVKbPp5DbeFZGTD57JgSkZFWrc/KI1ImlWyxAGA=
+X-Gm-Gg: ASbGncu3mrHGznIvC2HQXSXgoHRmYLcnu/F+1W08J2Q/C5tUPi5lQzju1YyiiScg0zI
+	35oDgK3DeopezMFRduug6GiPRRP6HGkJo8GyAsCzSlXsWAcbiDrq/TFD8ABfkvwHwONHi4RCepu
+	xNN4gnuTwWYByfIgJLB84EK+DLmPCzYx+SI7ylf3e+LsGANrwQboP2lkgkbWIrvJGo6Cc/zd/nL
+	TCulBqhEv5I4bOHdbM7lbsSaSlGc3/VJf/NcMsef9Q00InP0g==
+X-Google-Smtp-Source: AGHT+IEP1xSLasVS7/Eh+0BFE6F4XD6Q3rr3wy2zzlq0Xnmtaud9x1YoV3SSGm2oWHby4PT3mFPSWw==
+X-Received: by 2002:a17:902:cf0c:b0:215:4fbf:11da with SMTP id d9443c01a7336-215bd0f10c1mr85383305ad.21.1733327316519;
+        Wed, 04 Dec 2024 07:48:36 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21521904caasm113537035ad.60.2024.12.04.07.48.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 07:48:36 -0800 (PST)
+Date: Wed, 4 Dec 2024 07:48:35 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Song Yoong Siang <yoong.siang.song@intel.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next 1/1] selftests/bpf: Enable Tx hwtstamp in
+ xdp_hw_metadata
+Message-ID: <Z1B50w1jzHFt-LuA@mini-arch>
+References: <20241204115715.3148412-1-yoong.siang.song@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <67501d7b.050a0220.3390ac.353c@mx.google.com>
+In-Reply-To: <20241204115715.3148412-1-yoong.siang.song@intel.com>
 
-> Added 5000 as this is present in documentation bits but CPU can only go
-> up to 2.5. Should I drop it? Idea was to futureproof it since it really
-> seems they added these bits with the intention of having a newer switch
-> with more advanced ports.
+On 12/04, Song Yoong Siang wrote:
+> Set tx_type to HWTSTAMP_TX_ON to enable hardware timestamping for all
+> outgoing packets.
+> 
+> Besides, set XDP_UMEM_TX_METADATA_LEN flag to reserve tx_metadata_len bytes
+> of per-chunk metadata.
 
-The other way to future proof this is to have a dev_err() and
--EINVAL. Testing will then quickly find any missing places in the
-code.
+XDP_UMEM_TX_METADATA_LEN is missing after d5e726d9143c ("xsk: Require
+XDP_UMEM_TX_METADATA_LEN to actuate tx_metadata_len"), so that make
+sense. Maybe add a fixes tag?
 
-	Andrew
+And I don't see mlx5 looking at HWTSTAMP_TX anywhere in the drivers,
+so I'm assuming that's why I didn't need HWTSTAMP_TX_ON during my tests..
+Which device are you testing against? I do see some hwts_tx_en
+checks in the stfmmac at least... Can you add these details to the
+commit message and respin?
+
+With the above addressed:
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
