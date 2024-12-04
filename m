@@ -1,74 +1,95 @@
-Return-Path: <netdev+bounces-148752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D52819E30F6
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 02:57:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 922679E30FF
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 02:59:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DF4AB227EA
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 01:56:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 571AC283F89
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 01:59:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7240F171CD;
-	Wed,  4 Dec 2024 01:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E1B17BCA;
+	Wed,  4 Dec 2024 01:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GHgx9Ad1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Pky3cQsb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2A35227;
-	Wed,  4 Dec 2024 01:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4ADE175AB;
+	Wed,  4 Dec 2024 01:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733277414; cv=none; b=Q3HXjUdcr/xgF5ME/wywCJCUq+oYeDYw9WTCJ0B+kFD0lsJmWljBbFyRS3KtVlMEV7P7WTGiYH3gLnEUurYsx1Dk03dpKt6Tzq23B62K73r08lA0DMZLmB7PTPiRXy6F7e979BQ+PJqx4okcmzrX5e7QBvNfrXrOZ6vicRfmbD0=
+	t=1733277544; cv=none; b=hUUMbLerMaIS3GEiIFZK/AMAhepghLWFGcvXvfUEORdpvfFCK8+LID2T/RLZAVaiULEMlEZeRMDLe9JvJiyKRe28StHYm857TmuYLxslqBqa2+UTWD+6YSiQJMoBGaxoA5f6B0NEzfh5VYZ0Ni6HW1v5IF6fvKtKBQzTQ3u2cgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733277414; c=relaxed/simple;
-	bh=SpsBIF4YNr8yx+67TWJ8Q3zaHqwesUotMLtLAVgtTPk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PY+MJ7I9fP8SOLaTzCvhsPoLCp8LIXTdbPC+IA0ChL/o0cCpKXxdMVZR5Ms+d9nsQkIZ0vFkc/EM0aZNguGP64+2I0OSsR7RAF/IU2WC41aNYyiP/+vleYrYtnpul/q0NYknhmSR0etz4iS/2olcGYVKXVFkd17utESZbl73cIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GHgx9Ad1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F9A7C4CEDC;
-	Wed,  4 Dec 2024 01:56:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733277413;
-	bh=SpsBIF4YNr8yx+67TWJ8Q3zaHqwesUotMLtLAVgtTPk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GHgx9Ad194MzNjZUBlQ6Q/fXp9uF692DDWoDQWrGgcSlklmQRuXfHbLUfCq5Yc8IM
-	 /iDr4DWULD1vYIbsWiUFUd1KPnrqptb9oQJIq2XBNFTycUiCXDiad7bft8dfcO9fni
-	 FKiDCnKY+kG5l1AqH1s2zMpfKTXzD3UMF5cuL6RrFY+Oz4iMCPSElnDE1i3fglEIVo
-	 PSFfR5Ph0KId92Xt+b+QXw8LjmKr8XIwx5QkcAlYk2FQkSN9fdpZ2TQb1y7+qzr6Kb
-	 CYnnIfC8+6U8TyuwFOyKfp9u0nuNvohZbYs2H/XLvYNIOvYNQiu+7/8mdgXy+QlMxv
-	 Ks7ZIw4LclgGA==
-Date: Tue, 3 Dec 2024 17:56:52 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Johannes Berg <johannes@sipsolutions.net>,
- linux-wireless@vger.kernel.org, donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 1/7] tools/net/ynl: remove extraneous plural
- from variable names
-Message-ID: <20241203175652.5cf2434b@kernel.org>
-In-Reply-To: <20241203130655.45293-2-donald.hunter@gmail.com>
-References: <20241203130655.45293-1-donald.hunter@gmail.com>
-	<20241203130655.45293-2-donald.hunter@gmail.com>
+	s=arc-20240116; t=1733277544; c=relaxed/simple;
+	bh=a4OZ1LAsIhpvqDIbwxI6lO+bUIIMhMLh2jh+/n5Pwik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZQqgJkyot1E6FuRxhBMXA/G644nstPaZfCS7XBmSlY+RaFlienRW8MJ/cqETID6VyR0HATxpAId9iSHjNhO2MgAj5rCyoFwka/x0nQ74S1CvoR2U+uGNQ3G0SuMwlZdw5CqupGKN+/NVQHqtG0VCsoGnHAEaz8dl6N5oUQBjI9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Pky3cQsb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=4Gc5eRUdt6i47eRmmyZftOhvRJWmkHfc+4Lk40uszfU=; b=Pky3cQsb6N0D7N39MRKMYgnan4
+	3qv32+LdLkRz/XAqE7Tp4Dn5PrGFpqxAa2Y998SJZi8w8KRRZmTWUhB2zn8YaSThwkDuYggvSowof
+	CooDXXCavKYEBYa2KLUqx4Gj8ZNnq3VFPwrPL2uw1THrWl9EYMs+ICT5t1xyuU1Aehu4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tIefG-00F9bS-8D; Wed, 04 Dec 2024 02:58:54 +0100
+Date: Wed, 4 Dec 2024 02:58:54 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Simon Horman <horms@kernel.org>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
+	linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH net-next v3 04/10] net: freescale: ucc_geth: Fix WOL
+ configuration
+Message-ID: <179742dc-2df2-4d69-99ac-4951dc36aa71@lunn.ch>
+References: <20241203124323.155866-1-maxime.chevallier@bootlin.com>
+ <20241203124323.155866-5-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241203124323.155866-5-maxime.chevallier@bootlin.com>
 
-On Tue,  3 Dec 2024 13:06:49 +0000 Donald Hunter wrote:
-> _decode_array_attr() uses variable subattrs in every branch when only
-> one branch decodes more than a single attribute.
+On Tue, Dec 03, 2024 at 01:43:15PM +0100, Maxime Chevallier wrote:
+> The get/set_wol ethtool ops rely on querying the PHY for its WoL
+> capabilities, checking for the presence of a PHY and a PHY interrupts
+> isn't enough. Address that by cleaning up the WoL configuration
+> sequence.
 > 
-> Change the variable name to subattr in the branches that only decode a
-> single attribute so that the intent is more obvious.
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+This at least looks sensible.
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+I don't think we are going to get a perfect implementation until we
+move most of the logic into phylink. We need the MAC to declare a
+bitmap of what WoL options it supports. And we need the PHY to declare
+the same. And the core can then figure out which of the enabled WoL
+options the PHY should do, which the MAC should do, if the MAC can be
+powered off, etc.
+
+But i doubt that will get implemented any time soon.
+
+	Andrew
 
