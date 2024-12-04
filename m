@@ -1,166 +1,112 @@
-Return-Path: <netdev+bounces-149131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 207509E4641
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 22:05:17 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED7DE9E4661
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 22:14:30 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBEC616566A
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 21:05:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8EF6B29032
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 19:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F21019007D;
-	Wed,  4 Dec 2024 21:05:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 645B4188A3B;
+	Wed,  4 Dec 2024 19:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yourpreston.com header.i=@yourpreston.com header.b="gdcb+PUw"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="BkCq5gqR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-42ac.mail.infomaniak.ch (smtp-42ac.mail.infomaniak.ch [84.16.66.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54AA218C345
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 21:05:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA201C3BF3
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 19:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733346311; cv=none; b=C2xQlG0TVmYGPOOebH4bBYjjnHXLiq6Tq24zsViUI/TYx11UFOLRXzKs6HxQFzzwuPo0QgiKxTgkwus9VFn7j9eoMXkLq9eIR0OdqdlH7q1MRTGPDqW0XI21ojzqzP0iJA9fUZI7hPP8E195RXB5v+wFOiJ8l+Mcr1CbEyCB/Oo=
+	t=1733340607; cv=none; b=g8SWsHuNTlSH3CqTCifnzcasbsNr5knIStB3GnGPkZHUBpINpNejFfqiaBrc6lOCBTqzdAsps7vLyrdtOHql9FYI5EHNSyl4XL7WnvWb0GKJ255OpIW8FjHHEQKZ0Xf73rqfOh7KnE4e4Y7hPnuE+aSFZu19ONP7ODxpwyP5CNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733346311; c=relaxed/simple;
-	bh=HPP95/V3ZgiBzsuRrCJ27jnNYObM+Jwaft4QXccC/z8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H9ZNvoJYIN4GLx6MCfh/IkdI4B7jdaDyPZnDuUfGyXAROMWS9jvGE18oOM5qdKSCMGUlWNLCgm5N2EdqzOeF9rBiy8iq9+GYapAiQ09I0EGAmsZJtNQXW/YlWZ2kXmapBllgJcCdwqZs+vRd+oOmUs86Ylr3eTKEnLnAVeqhIQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yourpreston.com; spf=pass smtp.mailfrom=yourpreston.com; dkim=pass (2048-bit key) header.d=yourpreston.com header.i=@yourpreston.com header.b=gdcb+PUw; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yourpreston.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yourpreston.com
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e3983426f80so287961276.1
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 13:05:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=yourpreston.com; s=google; t=1733346308; x=1733951108; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HPP95/V3ZgiBzsuRrCJ27jnNYObM+Jwaft4QXccC/z8=;
-        b=gdcb+PUwc+MEXTS2i0Qz/1XAbpXlGJCVWST1hefTCoATmoy0gwAVvbbgZdq71n1A1A
-         4vjS8Vby7yJHRzNYPaFpLzEu+q94XzJ/77X6mfNpjql491HPe+NQOIK1kEQVKAL0iB16
-         gtnUMz7898HlMXOqvF2EBU99SpRp5gb/bi9FUA2aSFWBEvEC/mD7pGHKwYCHyEt6Imsv
-         KXswj/555DorhJyQKScUiSOfjj2m6HBfj9Qpq3gb/CBPV1d4ybd46hzfZ+Zu2kGiyp4x
-         ovjdaeyS7B0Jf3c71QcRdJ8A+L1rKRYOx+O39OnkdxjHvX4Q3wCEHYZhJM+VFXK/TzG5
-         hw5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733346308; x=1733951108;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HPP95/V3ZgiBzsuRrCJ27jnNYObM+Jwaft4QXccC/z8=;
-        b=PwT+JWyz3STBSssmFa3umRXTsILpxzXemMMxIEOHvFuCabu+eBgaFygsywmmEMmVVJ
-         JBZ9x9ikpnBOD7hsloIxjAidvRcmaAHE6Z889Yjc8K41TN6lAwKI0C1rNHDfuR4gtJ19
-         0Ka73W1jUyxivGP4mvHamuUDlLuF/F1s+INNiBA7xS4SZEcwFTwnGsWDJyjO0deyBhu7
-         vL3dOW9hMgE/tQN15bBzXpCWcGjM+GDiw6Tam9Mfj3R21zUk8WBzGRWQ5huqlLIhgIIQ
-         itG+hqV8ddmDXFK3wbJb4felskgtdIDkDLmmVlKbNeobCP+p6QS/rBWn2+fPLuhOLiQD
-         /5OA==
-X-Gm-Message-State: AOJu0YxAe1FGVJftBNR99ujHkhoOgpVTDhpB5ii68V/i1+9tmapN64Fr
-	qRdfyxWA+mP+raXY11RpoeIlWTSgemk1VwtYdeI+hOcjWm8KLe6OpAf9aepkcu5ISxI/IR8MI1n
-	DChjYgCjhkDigeB6lQxrB9BW+o+1uTy2QzxclNTXvTS4HAVYO
-X-Gm-Gg: ASbGncuAaZXK1/daYu/QakEh8cfapkh76l6IRJthy8dZkLpBbEWEjKW15FJah/eDPuC
-	FdZRDEKMGt/nwh1ELTLR1+fW2SVylRySbPUawqko3/SSBATTukA3UgIZaMDI0sQ==
-X-Google-Smtp-Source: AGHT+IGlk1ZpGnFl7WAP3x8Zv1q10Uv0TSuwr0MS3/ol7YnQqLyxXbrm4Z2zN5zVz4xPQZyGGLtOQiKKotZcSMFjKeQ=
-X-Received: by 2002:a05:690c:6012:b0:6ef:96f9:2f48 with SMTP id
- 00721157ae682-6efad3591b2mr98678207b3.37.1733346308149; Wed, 04 Dec 2024
- 13:05:08 -0800 (PST)
+	s=arc-20240116; t=1733340607; c=relaxed/simple;
+	bh=LcDk5KO2Oc82UySI5qieVXpafwd2XawQaaqaN2L3wkw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NMRJs8K4+z4sGrQ9ezz60D9bhov+TllrARvGhgeNGYek28xw222CpcooCAo9mJ2aBkeIS22eu5+ZqH4iKZO7zHVuVkh95yDoy1m2OWUa1OHKZ4urcRe8sWen5hGALulutNyAo3BiezgyZfmx/r42QvzHKcF/1Oe+Ex0ijhqVtHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=BkCq5gqR; arc=none smtp.client-ip=84.16.66.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246c])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Y3SK44jjMzbQB;
+	Wed,  4 Dec 2024 20:30:00 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1733340600;
+	bh=0GUHqg8GRL6pMGjl2BkgeJR/txAYeha7tu4vGhGYsAg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BkCq5gqRTNaKQozPGyXhmNdzDIHJm9EMl92rYK8iEe2pl2/PWN0s5U7S8uiufIW8r
+	 Tzzyc9tyY2elm36ow9kIi98YiFTpNTlA/tStDIDLOGefPOcpkS3AcrVSK++3EteSUs
+	 ryYOYPU64cwkad6bauYVseIx22hrz9YyvnnUMu/U=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Y3SK417hgz1Rv;
+	Wed,  4 Dec 2024 20:30:00 +0100 (CET)
+Date: Wed, 4 Dec 2024 20:29:59 +0100
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: David Laight <David.Laight@aculab.com>
+Cc: 'Mikhail Ivanov' <ivanov.mikhail1@huawei-partners.com>, 
+	Matthieu Baerts <matttbe@kernel.org>, "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>, 
+	"gnoack@google.com" <gnoack@google.com>, 
+	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, "matthieu@buffet.re" <matthieu@buffet.re>, 
+	"linux-security-module@vger.kernel.org" <linux-security-module@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>, "yusongping@huawei.com" <yusongping@huawei.com>, 
+	"artem.kuzin@huawei.com" <artem.kuzin@huawei.com>, 
+	"konstantin.meskhidze@huawei.com" <konstantin.meskhidze@huawei.com>, MPTCP Linux <mptcp@lists.linux.dev>
+Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
+Message-ID: <20241204.ipheevic6eeB@digikod.net>
+References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
+ <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
+ <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
+ <20241018.Kahdeik0aaCh@digikod.net>
+ <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
+ <ed94e1e51c4545a7b4be6a756dcdc44d@AcuMS.aculab.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABBfiem067qtdVbMeq2bGrn-5bKZsy_M8N-4GkE0BO6Uh7jX1A@mail.gmail.com>
- <3e6af55f-3270-604b-c134-456200188f94@katalix.com>
-In-Reply-To: <3e6af55f-3270-604b-c134-456200188f94@katalix.com>
-From: Preston <preston@yourpreston.com>
-Date: Wed, 4 Dec 2024 16:04:57 -0500
-Message-ID: <CABBfie=3+NBmjpVHn8Ji7VakEo9-JMKDH3ut5d1nXnDneC0tPw@mail.gmail.com>
-Subject: Re: ethernet over l2tp with vlan
-To: James Chapman <jchapman@katalix.com>
-Cc: netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ed94e1e51c4545a7b4be6a756dcdc44d@AcuMS.aculab.com>
+X-Infomaniak-Routing: alpha
 
-l2tpeth0 is not attached to anything, it's created by the `ip l2tp`
-commands. But since it's encapsulating and setting a new destination
-IP address, packets are referred to the route table.
+On Fri, Nov 08, 2024 at 05:16:50PM +0000, David Laight wrote:
+> From: Mikhail Ivanov
+> > Sent: 31 October 2024 16:22
+> > 
+> > On 10/18/2024 9:08 PM, Mickaël Salaün wrote:
+> > > On Thu, Oct 17, 2024 at 02:59:48PM +0200, Matthieu Baerts wrote:
+> > >> Hi Mikhail and Landlock maintainers,
+> > >>
+> > >> +cc MPTCP list.
+> > >
+> > > Thanks, we should include this list in the next series.
+> > >
+> > >>
+> > >> On 17/10/2024 13:04, Mikhail Ivanov wrote:
+> > >>> Do not check TCP access right if socket protocol is not IPPROTO_TCP.
+> > >>> LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
+> > >>> should not restrict bind(2) and connect(2) for non-TCP protocols
+> > >>> (SCTP, MPTCP, SMC).
+> 
+> I suspect you should check all IP protocols.
+> After all if TCP is banned why should SCTP be allowed?
+> Maybe you should have a different (probably more severe) restriction on SCTP.
+> You'd also need to look at the socket options used to add additional
+> local and remote IP addresses to a connect attempt.
 
-On Wed, Dec 4, 2024 at 6:48=E2=80=AFAM James Chapman <jchapman@katalix.com>=
- wrote:
->
-> On 03/12/2024 16:14, Preston wrote:
-> > Hello folks, please let me know if there=E2=80=99s a more appropriate p=
-lace to
-> > ask this but I believe I=E2=80=99ve found something that isn=E2=80=99t =
-supported in
-> > iproute2 and would like to ask your thoughts.
->
-> Thanks for reaching out.
->
-> > I am trying to encapsulate vlan tagged ethernet traffic inside of an
-> > l2tp tunnel.This is something that is actively used in controllerless
-> > wifi aggregation in large networks alongside Ethernet over GRE. There
-> > are draft RFCs that cover it as well. The iproute2 documentation I=E2=
-=80=99ve
-> > found on this makes it seem that it should work but isn=E2=80=99t expli=
-cit.
-> >
-> > Using a freshly compiled iproute2 (on Rocky 8) I am able to make this
-> > work with GRE without issue. L2tp on the other hand seems to quietly
-> > drop the vlan header. I=E2=80=99ve tried doing the same with a bridge t=
-ype
-> > setup and still see the same behavior. I've been unsuccessful in
-> > debugging it further, I don=E2=80=99t think the debug flags in iproute2=
-'s
-> > ipl2tp.c are functional and I suppose the issue might instead be in
-> > the kernel module which isn=E2=80=99t something I=E2=80=99ve tried debu=
-gging before.
-> > Is this a bug? Since plain ethernet over l2tp works I assumed vlan
-> > support as well.
-> >
-> >
-> > # Not Working L2TP:
-> > [root@iperf1 ~]# ip l2tp add tunnel tunnel_id 1 peer_tunnel_id 1 encap
-> > udp local 2.2.2.2 remote 1.1.1.1 udp_sport 1701 udp_dport 1701
-> > [root@iperf1 ~]# ip l2tp add session tunnel_id 1 session_id 1 peer_sess=
-ion_id 1
-> > [root@iperf1 ~]# ip link add link l2tpeth0 name l2tpeth0.1319 type vlan=
- id 1319
-> > [root@iperf1 ~]# ip link set l2tpeth0 up
-> > [root@iperf1 ~]# ip link set l2tpeth0.1319 up
-> > Results: (captured at physical interface, change wireshark decoding
-> > l2tp value 0 if checking yourself)
-> > VLAN header dropped
-> > Wireshark screenshot: https://i.ibb.co/stMsRG0/l2tpwireshark.png
->
-> This should work.
->
-> In your test network, how is the virtual interface l2tpeth0 connected to
-> the physical interface which you are using to capture packets?
->
-> >
-> >
-> > # Working GRE:
-> > [root@iperf1 ~]# ip link add name gre1 type gretap remote 1.1.1.1
-> > [root@iperf1 ~]# ip link add name gre1.120 link gre1 type vlan proto
-> > 802.1q id 120
-> > [root@iperf1 ~]# ip link set gre1 up
-> > [root@iperf1 ~]# ip link set gre1.120 up
-> > Results:
-> > VLAN header present
-> > Wireshark screenshot: https://i.ibb.co/6rJWjg9/grewireshark.png
-> >
-> >
-> > -------------------------------------------------------
-> > ~Preston Taylor
-> >
->
+Indeed, setsockopt()'s SCTP_SOCKOPT_BINDX_ADD and SCTP_SOCKOPT_CONNECTX
+don't go through the socket_bind() nor socket_connect() LSM hooks bu the
+security_sctp_bind_connect() hook instead.  This SCTP-specific hook is
+not implemented for Landlock and the current implementation only
+partially control such operations for SCTP.  This also make it clear
+that we really need to stick to TCP-only for the TCP access rights.
 
-
---=20
--------------------------------------------------------
-~Preston Taylor
+It would be nice to add support for SCTP but we'll need to implement
+security_sctp_bind_connect() and new tests with the setsockopt()
+commands.
 
