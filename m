@@ -1,148 +1,150 @@
-Return-Path: <netdev+bounces-149125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DC799E4524
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 20:55:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4885B9E45B5
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 21:30:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58E1E281662
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 19:55:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F30FB28522F
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 20:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8801D13D246;
-	Wed,  4 Dec 2024 19:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1103152E1C;
+	Wed,  4 Dec 2024 20:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="gMPQYgah"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nC6RrKHz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12ED1E2306
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 19:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C89EE2391A2
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 20:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733342144; cv=none; b=Ku/RZEf7+Kw1RwS1jzhjLQv14JOZPp3zMH6kqSBfn6oIIR8YF4b2FkMYlB1Kui3n/BFQpZuYhmVapPZPuz6VmfR3FNFl9Os1Z+a+7JwqZbX4Xgm/1/k53oWOvfD74GH9XNL6/1iyjr3IdXch6ixHxNUHvLaWi7W5Mb3sNw9uzZ4=
+	t=1733344222; cv=none; b=EYTcw9x+0Z1Q5cRcgnfjb042O1Jl62jkJpE30mFdci6da21xZus3zcsRPsqj8UJdkF3CCdhWG53ue6GB2XtZ4jh13SeKG44xHGsSKv0YgZIjrkbQqz+s3qc0tV305T2fIhr62DTJskqtlo/yiK++BqtWal0PLgRlY1wuIcDwrls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733342144; c=relaxed/simple;
-	bh=CeOjBpeAAe/HE62wEdy3wZFXQqIvcF+KJeEvW/pHdkI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JbgGi7VrZKta11PBC3Ke5NqFfAvO9m50uY7pzxX6xWnVvmsd8x9xVravmTG/AlOkajK6JlN4f2wmheWGoArS5u36TaZ/FdOpu4MVQIjCRHDujxuzzvQhw7tCC6Bx/ord25B7RpBpXVp/TL9p+s8dVzgxPssdzxW4mlE9Osv5gvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=gMPQYgah; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=18XpUNT0IQJaXnPA4auNYUD5Yk/7gx4IhcNkBHdEn5Y=; t=1733342142; x=1734206142; 
-	b=gMPQYgah5XEcjIuMerm20sW41AN9pvQcz+Sy5w4VsMvBQ+WJjwuWs6THN/9ngPHQn4bhYlcX3UX
-	i1OAMugH4UkwUmm2s1cdOo87g7sIgn/onSDd1Cm+TcB9BMq9n3rqDXodtVCgavVxeoLX6mPB9iQ41
-	Po0Zzfu89MdE2sMyfW18ddhEpqrQGR0lXO8Xstijnq0Hv0gXbFfXNajw11SnbGu6qSbyI/QeQJue7
-	WzCUI2mh8H9YIFDH3jzD2ziCi3vAzmN1YCtWGJEE+uefhOFFbpKiC7v/dGME/RB+qTpeVh4RN16Cz
-	neCFhnuDTNmF4JsNBulXfLuovhE3owFCmihw==;
-Received: from mail-oi1-f170.google.com ([209.85.167.170]:48260)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tIvTD-0000QJ-Je; Wed, 04 Dec 2024 11:55:36 -0800
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3ea5a7a5e48so115220b6e.0;
-        Wed, 04 Dec 2024 11:55:35 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWEMLX60Ys/UcSS5wUABLHXMSGl5KKrZ98GBeusosk+ColsZ2ruNo82eGHdpCL8HPYu71TIWTVXP6E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKfNXICknPUJ0Y+Hxw0j0QvvPikG4rcPVI/WaE6F7+ri7yO0vk
-	stlgOnD4M4JDrk794ctCyH4TA5DSc/zBpIucAyveB/RXTvCltxsQv5xHQbfa53yoHTlPlDbPYGs
-	rNHG2y+YGrOZbx00qLRnCKZTHXOo=
-X-Google-Smtp-Source: AGHT+IERmTpmkeV9y3TwKdPJYkPBPA77GwicIQKzVVsNG4qD0TfFmlSvdSlUWkMVuClVnWxMBu2Lg6gURQopRu1Jzy0=
-X-Received: by 2002:a05:6808:191e:b0:3e7:9f1f:b84a with SMTP id
- 5614622812f47-3eae4f87a19mr6226697b6e.21.1733342135051; Wed, 04 Dec 2024
- 11:55:35 -0800 (PST)
+	s=arc-20240116; t=1733344222; c=relaxed/simple;
+	bh=Hqvk2t+BsLSphs4WfQUre5lwOKVlFGQ6Nxe5CPShoMA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i/sFRCEeOr//XzHWq8Wk2MBsyn+1M+SR9hiYWx+h1+HrkBT6ZXHUkatP89z09nivlYKlj7A7Doetv2ze1SNam7a2QtMEXZzUFVnLzkAqKFDQe3ijEMcrNa5WtiIzQWO9vBOS665NiHHxV6oBO2OifQY+H9cyO8yx4Fq2l8s2Nek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nC6RrKHz; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733344220; x=1764880220;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Hqvk2t+BsLSphs4WfQUre5lwOKVlFGQ6Nxe5CPShoMA=;
+  b=nC6RrKHzVubJUglLj+0DqckszGyN5hubIROfoScUgpTfOEZK5q3TnWoS
+   nTluqMFiYjnE+4oUkfgDXWUWMCIzYpf57NQnYAoyVcMDrDkgvcRSJ0UbC
+   ljwTJLyVoPQAmyDl5HTNuqza7r5owbpAidVnLV3uq6HOp5xs55wu0AGFe
+   vHCJSfpNPbPTtxtU0fczZmYBT24MCmyZhxJkYf8Lcn6/sz+Zlq55m8kyr
+   A6wdXL9Gi6M4lt3mECyLNBhEpDX1Prxpj7F0mWqzAPT4LY46rx12sZXsg
+   QK8EGYEvFr1aNGCn5TcFP/zfwAaGukIQJKuIU6BLax1aL4sLdKecONRAl
+   g==;
+X-CSE-ConnectionGUID: TE/v5xJnQRa2kime5XkjIw==
+X-CSE-MsgGUID: zA6dHgNvRT2j2NozS5mjFA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="33550822"
+X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
+   d="scan'208";a="33550822"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 12:30:20 -0800
+X-CSE-ConnectionGUID: IrFc6JW0RjSOHUrx4Mgv3w==
+X-CSE-MsgGUID: adn2N2IWTPuik/VHoASs1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
+   d="scan'208";a="93951250"
+Received: from lkp-server02.sh.intel.com (HELO 1f5a171d57e2) ([10.239.97.151])
+  by orviesa006.jf.intel.com with ESMTP; 04 Dec 2024 12:30:19 -0800
+Received: from kbuild by 1f5a171d57e2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tIw0m-0003Sf-0y;
+	Wed, 04 Dec 2024 20:30:16 +0000
+Date: Thu, 5 Dec 2024 04:29:39 +0800
+From: kernel test robot <lkp@intel.com>
+To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	Stefan Wegrzyn <stefan.wegrzyn@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v11 5/8] ixgbe: Add support
+ for EEPROM dump in E610 device
+Message-ID: <202412050450.s26ZxK1U-lkp@intel.com>
+References: <20241204143112.29411-6-piotr.kwapulinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241111234006.5942-1-ouster@cs.stanford.edu> <20241111234006.5942-12-ouster@cs.stanford.edu>
- <07647363-622b-4023-ba71-da213754a7ae@linux.alibaba.com>
-In-Reply-To: <07647363-622b-4023-ba71-da213754a7ae@linux.alibaba.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Wed, 4 Dec 2024 11:54:59 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmysiRx3VNDxXitPOn+yg2ck_+7fbd1XSsQQqZnwUEkvPQ@mail.gmail.com>
-Message-ID: <CAGXJAmysiRx3VNDxXitPOn+yg2ck_+7fbd1XSsQQqZnwUEkvPQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 11/12] net: homa: create homa_plumbing.c homa_utils.c
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, linux-api@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: 5c460fe7d3aaafaf78d72307c0bc7e10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241204143112.29411-6-piotr.kwapulinski@intel.com>
 
-On Mon, Nov 25, 2024 at 9:32=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.com=
-> wrote:
-> On 11/12/24 7:40 AM, John Ousterhout wrote:
-> > +static struct proto homav6_prot =3D {
-> > ...
-> > +     .obj_size          =3D sizeof(struct homa_sock) + sizeof(struct i=
-pv6_pinfo),
->
-> The implementation of inet6_sk_generic() has already changed, you should =
-set
-> .ipv6_pinfo_offset.
+Hi Piotr,
 
-Fixed.
+kernel test robot noticed the following build warnings:
 
-> > +static int __init homa_load(void)
-> > ...
-> > +     inet_register_protosw(&homa_protosw);
-> > +     inet6_register_protosw(&homav6_protosw);
->
->
-> better to check the retval of inet6_register_protosw().
+[auto build test WARNING on tnguy-next-queue/dev-queue]
 
-Fixed.
+url:    https://github.com/intel-lab-lkp/linux/commits/Piotr-Kwapulinski/ixgbe-Add-support-for-E610-FW-Admin-Command-Interface/20241204-223603
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
+patch link:    https://lore.kernel.org/r/20241204143112.29411-6-piotr.kwapulinski%40intel.com
+patch subject: [Intel-wired-lan] [PATCH iwl-next v11 5/8] ixgbe: Add support for EEPROM dump in E610 device
+config: i386-buildonly-randconfig-003 (https://download.01.org/0day-ci/archive/20241205/202412050450.s26ZxK1U-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241205/202412050450.s26ZxK1U-lkp@intel.com/reproduce)
 
-> > +out_cleanup:
-> > +     homa_destroy(homa);
-> > +     inet_del_protocol(&homa_protocol, IPPROTO_HOMA);
-> > +     inet_unregister_protosw(&homa_protosw);
-> > +     inet6_del_protocol(&homav6_protocol, IPPROTO_HOMA);
-> > +     inet6_unregister_protosw(&homav6_protosw);
-> > +     proto_unregister(&homa_prot);
-> > +     proto_unregister(&homav6_prot);
->
->
-> It's a bit strange for me that this relies on a premise: that every rever=
-se operation can correctly
-> identify whether the corresponding forward operation has been executed. C=
-urrently, perhaps every
-> function includes this capability. It's up to you, I don't insist.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412050450.s26ZxK1U-lkp@intel.com/
 
-Actually, not all of the cleanup functions are safe if the initializer
-hasn't been invoked; good catch. I've fixed this now.
+All warnings (new ones prefixed by >>):
 
-> Perhaps you can try adding MODULE_ALIAS_NET_PF_PROTO_TYPE so that the ker=
-nel will automatically load
-> the module when creating IPPROTO_HOMA socket. A functional suggestion, It=
-'s up to you.
+>> drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c:2083: warning: expecting prototype for ixgbe_init_eeprom_params_E610(). Prototype was for ixgbe_init_eeprom_params_e610() instead
 
-Done; thanks for the suggestion (I wasn't aware of this feature).
 
-> Is binding multiple times legal? For example, bind 80 first and then bind=
- 8080. If not, I think
-> you might need to check the inet_num.
+vim +2083 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
 
-Yes, it's legal.
+  2072	
+  2073	/**
+  2074	 * ixgbe_init_eeprom_params_E610 - Initialize EEPROM params
+  2075	 * @hw: pointer to hardware structure
+  2076	 *
+  2077	 * Initialize the EEPROM parameters ixgbe_eeprom_info within the ixgbe_hw
+  2078	 * struct in order to set up EEPROM access.
+  2079	 *
+  2080	 * Return: the operation exit code
+  2081	 */
+  2082	int ixgbe_init_eeprom_params_e610(struct ixgbe_hw *hw)
+> 2083	{
+  2084		struct ixgbe_eeprom_info *eeprom = &hw->eeprom;
+  2085		u32 gens_stat;
+  2086		u8 sr_size;
+  2087	
+  2088		if (eeprom->type != ixgbe_eeprom_uninitialized)
+  2089			return 0;
+  2090	
+  2091		eeprom->type = ixgbe_flash;
+  2092	
+  2093		gens_stat = IXGBE_READ_REG(hw, GLNVM_GENS);
+  2094		sr_size = FIELD_GET(GLNVM_GENS_SR_SIZE_M, gens_stat);
+  2095	
+  2096		/* Switching to words (sr_size contains power of 2). */
+  2097		eeprom->word_size = BIT(sr_size) * IXGBE_SR_WORDS_IN_1KB;
+  2098	
+  2099		hw_dbg(hw, "Eeprom params: type = %d, size = %d\n", eeprom->type,
+  2100		       eeprom->word_size);
+  2101	
+  2102		return 0;
+  2103	}
+  2104	
 
-> I noticed that homa_sock_init() contains a memory allocation action, perh=
-aps you should add a return
-> value check.
-
-Oops; I've fixed this now.
-
-Thanks for all the comments.
-
--John-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
