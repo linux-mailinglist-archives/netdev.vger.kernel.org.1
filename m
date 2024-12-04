@@ -1,167 +1,119 @@
-Return-Path: <netdev+bounces-148891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0293C9E357F
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 09:33:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3EE79E3593
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 09:37:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C488E1611AB
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 08:33:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF32116027D
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 08:37:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E19944F;
-	Wed,  4 Dec 2024 08:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD54195B37;
+	Wed,  4 Dec 2024 08:37:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jejwctSc"
+	dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b="ytvZW3X3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9AE194147;
-	Wed,  4 Dec 2024 08:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5540818C03B
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 08:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733301204; cv=none; b=AjP1dSxGQsQuTU+HmYsQaeaXDoz+IeiU8lr0mDdxh+BtH0x4IcYwvYQC5P9oI7cxQgPsgxK47LkSEdyT4kJ5FzZP9TLfo+vRjPBc6oZYVFckBjkC+qdrq3arbftyMuCs3EMbZGznA1HeqQtWR0siB2EtjSPCQjD5E/8CvREOhbw=
+	t=1733301457; cv=none; b=QoZJ7gtJ72LOkEgtugGVJJ4lUxgO4KdBVjxn+aUB5HqG0U9RdEi86OK4GB6tR85luXoFBenKGRcVJY+pQcdhdS+qjP3ImQg2lpEcNyE2fd6+sC+Y2MhQa1uaXLn46C17l1slYqNJUsYFDiszy7pJ1QC6R5dQSv2prI4shNP4wC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733301204; c=relaxed/simple;
-	bh=qtKWy1+3TKEbOo8X493bzRcNN46Y+m4kM9GVR6iOJk8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lwhvBZaEWLMrM/qjEYYagxFC4QQIvt+JOdcSykMZ5jejoLfDBw3cclfbGmDV4uhK7snTC+pbpL6pKDRLaC0QvgCMOOQfFJXueq0fCNOZLzXn8POhNO9+9Hqu73ToEcBlMVH7fJ1n3zNSfEkEoeqfW8lzCqSK9ccSSS8vjdWDseM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jejwctSc; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-385f06d0c8eso2189886f8f.0;
-        Wed, 04 Dec 2024 00:33:22 -0800 (PST)
+	s=arc-20240116; t=1733301457; c=relaxed/simple;
+	bh=EoVke9SqFUpCaQKo+qnhyQ0iycqkcohJkC/+ji9nimc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jeEoX1ffp370en+n4BZ/QB8G7J29UrxMHx02wrUtD8UqnmGvTSXLCjsnEmJi8QogGWlvpFpZZQEur/CcQHWTURw/AgcMEzGN6m9ZfoMgmJj6JAjHeaISlzyzXvM9ogJFfoAvCUw1j63Qc1g2lIeRFSGea8lP+LcOcmu1JDLjC5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com; spf=none smtp.mailfrom=andrewstrohman.com; dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b=ytvZW3X3; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=andrewstrohman.com
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e3997835700so3347577276.2
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 00:37:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733301201; x=1733906001; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wpH2cFjmsRs5iOKVHt+Ux3PzJGbqCr566H1JMqhK6/k=;
-        b=jejwctScso1ueVsmvk8VrJVhQ9JsosEsaOiKJ10U56YFnhD8XDWA4pWXXyFE9WWp5B
-         qdaJVK7mkJpXaq3WimT1WZo5GWLCQlVSmu/72sVzi8f7DVR2y2XM4itdxbVxvMYtiAJ5
-         33CXkjAOy8SPc7sSGCv3dsfyHBYNk7dArHKAL/YzU1O6cd7cNU45ltPGv2y1Ud0V/VbY
-         3nGJtSvo2fm937H+ptB0pyeWUuiAUyk7wFKcDLMNrWNGm6Hvw3/J3sgxFFT9jKEn6u2C
-         whpSgoLcpTQYKtZc7OasPNe2Wl7fd/7jVp0LVpkN2XG9C8wT97qfsd+BE0EGjENfh/ry
-         +mEw==
+        d=andrewstrohman-com.20230601.gappssmtp.com; s=20230601; t=1733301455; x=1733906255; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EoVke9SqFUpCaQKo+qnhyQ0iycqkcohJkC/+ji9nimc=;
+        b=ytvZW3X3oQHrPd7ygT0R8/0HSkVFbHIAiODywwp2E5FlD7hmU5U+E/ZYl4dJYT2vr1
+         T/4ESlFZbanOn+Ip/n3bBHXOhM99SUIEMQ5Y2oidmeYModjTpEH5tMjUDvPnAygNJvOp
+         eBtVi2ZYiZI4TH2yK2lrqrFbhxt5kpydRTXuiXdbh9D4/LzNMCP6ebRlaH+wIfabItRz
+         WFlc01suVPmv1uvj134eGowQWoesCT6ekqETucRKsEEZ2StmJXwyrMtfYuzOLAUtEWFy
+         FQvTD8hzoeAlyIwiykeTjVobuvzzICfaYJw2/SDfZI/QItHWuvUggariM/43StsYaWn2
+         0wiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733301201; x=1733906001;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wpH2cFjmsRs5iOKVHt+Ux3PzJGbqCr566H1JMqhK6/k=;
-        b=LvW2fWEEPciMrS+JFYKJUSqNft3rKGJk3co0LtjRykjj2KcWE4l1m8lwEQxFJycn//
-         Pti1SEtzOCK71D9JVgJblN8NgtOxoQuh/20/q+cTdLbCK8SDPfz0dSQT7l1D3I/Jq2mG
-         gd4YxATL8GIDOpHFzHNVejWg6tfrPm86WVc5Wbpn//pug15ixmb7ma7ocgsLTN4paKIJ
-         uVNQ3sG45VZ5qAPlDeT5/UBE17MXc2IenyCdH+dcdBqJjkYMuftnaCfjdVpPa65uhILS
-         aaG8sOyvprIZ5NtsK+d882KS3Y0xibxSMHZaq38liLdvW0OzkYEKo06JoHKoh4ESrxoQ
-         CECg==
-X-Forwarded-Encrypted: i=1; AJvYcCX/q58b5I7dlffo1HFQevzPv35qKlAFbss+AhkISJBVTDpjbbzTlt1cJ26fc6vTp+sJMTkG00qesI4=@vger.kernel.org, AJvYcCXcHTHglj9Bdhsk/C6hM+NfByxtRAyDwmtz9lUH1Z34dtaZobaVfifbypw/DElokg6yBDiA3Vmy@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6XtTGZTRcZpGEPapkjlXEPJhRNgI6Vx6SDndI41tdhaHO+8pL
-	khH4HvfMnG0MUsmzP3KFFE3yX3KiHNogHFS5t1V5rrj+J8vFykuUi4rkUw==
-X-Gm-Gg: ASbGncszALUN+YeTUwUhSn/QK/Gz3+TUpRwuDfUoTL/rWq+StSicpI/kWLf4T9+XmqQ
-	+v7u7SWRKn2PbRIrFMTljmaszOYZXe8HQH83NpS6rq9XNgS4FMia/66QHTWkmkvckXGVd2Ebihf
-	WTbkT0QZCau3f0LoYwjvPdTszsYYulcqfoWcP+e/nYi98BvQKdn1SO8w40tznmsWh6uY3fuGIVJ
-	SIeYvyKn8AtT0INmdWJ/GZ3r9a+NY5NHU8LcryrYd6XKtwvLWs=
-X-Google-Smtp-Source: AGHT+IFE2pGcS4AkKwzeCHdkt5QwQXOZnVFjzA1hG6M5E6ERfTgRD/qkS6g0O4V2Po2aTc3HWGoTxQ==
-X-Received: by 2002:a05:6000:1787:b0:385:f16d:48aa with SMTP id ffacd0b85a97d-385fd3e8906mr5088317f8f.15.1733301200805;
-        Wed, 04 Dec 2024 00:33:20 -0800 (PST)
-Received: from localhost ([81.168.73.77])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e1824ec4sm13228947f8f.108.2024.12.04.00.33.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2024 00:33:19 -0800 (PST)
-Date: Wed, 4 Dec 2024 08:33:21 +0000
-From: Martin Habets <habetsm.xilinx@gmail.com>
-To: Alejandro Lucero Palau <alucerop@amd.com>
-Cc: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
-	netdev@vger.kernel.org, dan.j.williams@intel.com,
-	martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	dave.jiang@intel.com
-Subject: Re: [PATCH v6 23/28] sfc: create cxl region
-Message-ID: <20241204083321.GA792395@gmail.com>
-Mail-Followup-To: Alejandro Lucero Palau <alucerop@amd.com>,
-	alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
-	netdev@vger.kernel.org, dan.j.williams@intel.com,
-	martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	dave.jiang@intel.com
-References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
- <20241202171222.62595-24-alejandro.lucero-palau@amd.com>
- <20241203143749.GH778635@gmail.com>
- <19ccef4d-fcf9-d772-4a5a-4e57779ecae6@amd.com>
+        d=1e100.net; s=20230601; t=1733301455; x=1733906255;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EoVke9SqFUpCaQKo+qnhyQ0iycqkcohJkC/+ji9nimc=;
+        b=sUsorNdBwb7jaDhylQZv7114tEzGf2/Fy9MmmfDXKl1AwYVKfrr+YhLcXsUdZqwPVt
+         cpoYnfRI7FtvFP6LfvIcB9g3Gx/d4IQUcWIvQaA1AVNXcssQOg6iwVoVZjO+QvIduGSm
+         baSzBZjpsOLeU4vsD9ehLtPdARtzkUHiC9E3yneFsUHC71mii8JpYeGiQlBytF3UKtT6
+         M4b+RADxS571clOCLpx8ne6VdR9HRVCVXFZqew2wjNUSGljh5f1dHXA9JNcXDf+vlsXS
+         yR6zkEF1Smy4lqYYMuSWJydW/B7i54WkCiHYT7GjIDlqoFIFOAmU/Bf6O4ccLnGIrqjD
+         4qiw==
+X-Forwarded-Encrypted: i=1; AJvYcCVh8r4FbLXcSsFxu0VDq8Hpcg+HbJY86EiqnUQ39xTRp22Qi10RlgtXX0HDXYUyUWFhG90biWY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXHS4yp1xeE1Teve0Ar/RJbXn3uoBoJWRrrddPwmRaXrl8FxYg
+	7i/ld2AqmHUcEL0LUn7bx5M+FIBj2UAjES8ijzEv8zdg8PuTn33GN6qKWY/6DYrcvaI57jP24qo
+	o8x7LgX6TiuUtiJbM9lnCSTAJ7MlqRYX96+8yhA==
+X-Gm-Gg: ASbGnctiRjpMP74nA/Pxn0ttZPdQwsyx2TWCC2QdaqBXmZE5P3D1jE3S+P4c315WxGs
+	yGDr1TMA/U+HLuolmzoXjgA/j3iKLwAA=
+X-Google-Smtp-Source: AGHT+IHrKkSgA4hGlK8jn7mrWKSIy07H4RXZ4L/gvYx86xaKYNomvgbtV66jTpE9OVKxPCEslG9WFAbqVeHjvw6aGX0=
+X-Received: by 2002:a05:6902:150a:b0:e39:9032:122 with SMTP id
+ 3f1490d57ef6-e39d4389535mr7493688276.44.1733301455300; Wed, 04 Dec 2024
+ 00:37:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <19ccef4d-fcf9-d772-4a5a-4e57779ecae6@amd.com>
+References: <20241130000802.2822146-1-andrew@andrewstrohman.com>
+ <Z0s3pDGGE0zXq0UE@penguin> <CAA8ajJmn-jWTweDMO48y7Dtk3XPEhnH0QbFj5J5RH4KgXog4ZQ@mail.gmail.com>
+ <20241202100635.hkowskequgsrqqkf@skbuf>
+In-Reply-To: <20241202100635.hkowskequgsrqqkf@skbuf>
+From: Andrew Strohman <andrew@andrewstrohman.com>
+Date: Wed, 4 Dec 2024 00:37:24 -0800
+Message-ID: <CAA8ajJkPzpGRXO6tX5CkgX7DjGwR6bPyT4AXjZ0z8kXBk8Vr_g@mail.gmail.com>
+Subject: Re: [PATCH net-next] bridge: Make the FDB consider inner tag for Q-in-Q
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, 
+	Petr Machata <petrm@nvidia.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, UNGLinuxDriver@microchip.com, 
+	Shahed Shaikh <shshaikh@marvell.com>, Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com, 
+	Simon Horman <horms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Roopa Prabhu <roopa@nvidia.com>, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	bridge@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Dec 03, 2024 at 03:25:27PM +0000, Alejandro Lucero Palau wrote:
-> 
-> 
-> On 12/3/24 14:37, Martin Habets wrote:
-> > On Mon, Dec 02, 2024 at 05:12:17PM +0000, alejandro.lucero-palau@amd.com wrote:
-> > > From: Alejandro Lucero <alucerop@amd.com>
-> > > 
-> > > Use cxl api for creating a region using the endpoint decoder related to
-> > > a DPA range.
-> > > 
-> > > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> > Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
-> > One comment below.
-> > 
-> > > ---
-> > >   drivers/net/ethernet/sfc/efx_cxl.c | 10 ++++++++++
-> > >   1 file changed, 10 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> > > index 6ca23874d0c7..3e44c31daf36 100644
-> > > --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> > > +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> > > @@ -128,10 +128,19 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
-> > >   		goto err3;
-> > >   	}
-> > > +	cxl->efx_region = cxl_create_region(cxl->cxlrd, cxl->cxled);
-> > > +	if (!cxl->efx_region) {
-> > > +		pci_err(pci_dev, "CXL accel create region failed");
-> > This error would be more meaningful if it printed out the region address and size.
-> > 
-> 
-> The region can not be created so we have not that info.
+> What stops you from changing the 802.1ad bridge port pvids to unique
+> values, like 3, 4, 5... instead of 3, 3, 3, and making each other
+> j != i bridge port be a non-pvid member of port i's pvid?
 
-Ahh, ok.
+I'm not sure if I understand this suggestion.
 
-Martin
+I tried to draw out what you described here:
+https://docs.google.com/drawings/d/1UcOpENFgr-s6p8Ypwo-l4yTvtUZFM6vSLxLiX2FOMLU
 
-> 
-> 
-> > > +		rc = PTR_ERR(cxl->efx_region);
-> > > +		goto err_region;
-> > > +	}
-> > > +
-> > >   	probe_data->cxl = cxl;
-> > >   	return 0;
-> > > +err_region:
-> > > +	cxl_dpa_free(cxl->cxled);
-> > >   err3:
-> > >   	cxl_release_resource(cxl->cxlds, CXL_RES_RAM);
-> > >   err2:
-> > > @@ -144,6 +153,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
-> > >   void efx_cxl_exit(struct efx_probe_data *probe_data)
-> > >   {
-> > >   	if (probe_data->cxl) {
-> > > +		cxl_accel_region_detach(probe_data->cxl->cxled);
-> > >   		cxl_dpa_free(probe_data->cxl->cxled);
-> > >   		cxl_release_resource(probe_data->cxl->cxlds, CXL_RES_RAM);
-> > >   		kfree(probe_data->cxl->cxlds);
-> > > -- 
-> > > 2.17.1
-> > > 
-> > > 
-> 
+I'm not sure how host A can communicate with B with this configuration.
+
+Consider host A transmitting towards host B. When the frame leaves
+".1q bridge 3",
+it will be tagged with .1q tag vid 7. When the frame leaves the .1ad bridge
+heading toward ".1q bridge 2", it will be tagged again with an outer
+.1ad tag vid 3.
+
+So ".1q bridge 2" will see the frame as having an outer tag of .1ad vid 3 and
+inner tag of .1q vid 7.
+
+Is that what you are thinking, or something else?
 
