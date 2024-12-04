@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-148956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A08CB9E3987
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:09:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F40DB9E3988
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:09:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB7841693F7
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 12:09:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 779B51693D9
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 12:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2661B6CF4;
-	Wed,  4 Dec 2024 12:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3DF01B6CE7;
+	Wed,  4 Dec 2024 12:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FK1G2WR8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hGYjKMGq"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F085B1B5823
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 12:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E6C1B87CD
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 12:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733314158; cv=none; b=KXoD25ANNN128CUdEp0aqYtk9rB/uDe/Y7jICcLrXjDx9AiMUE9Wc2rBzUyDc7ZNQWJWOrPAP/OdhIafGK1dLBnCsT6diuKn+/TJ848odSpvO2qeQznTzfOQJiJXTsfxZZpd/seRi1Hn4HZE4BucDO+P0gmXaD1VpIOzSO6YkjY=
+	t=1733314160; cv=none; b=qQ6fJnH1S7e610xB85aLg5HZH253wTIm2oy5tzIMhmfEZsCvf5smQByPDRaUK7AB63HXiNUdK0TzrCdiYrabiJXKbh807pWtHdY4icesULdw3ILM9+eErtjFzGiKzsDABsCiKKgFuIDeLiOvFUFqvHkXkkQjwpt9ghWi/80qmZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733314158; c=relaxed/simple;
-	bh=8YPJ8S89aDDsQR15gSKT9hmG6XV1TCpJ9ZS2i8RPLGY=;
+	s=arc-20240116; t=1733314160; c=relaxed/simple;
+	bh=lT+Ayyo1NsfkzOHaNIvpQd02/Q4fftifKNcdVE3ZQZs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V5Cl+FgnprMUo3nT7y0S/SL2Bv8wUFUHPs6uS0CpwWfs54spQePsgSEzBendQ3PV8AL96vi3Xnmg32sR2EqkZl/eQeKMC3MY8Qlh/K2dOnlCPTIC6YU0NhTpqNAttsAonxaGYUJ3N1WiUijLl3ZVyqf6viYAakSwnGC/mszZ4nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FK1G2WR8; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=BUqu794UN7KRkx7SluovqCl+CSznbmGlJmQE61mQmZV7jr213/A1bU1/3uxVHbl3m8kb7Agp9XNt4s86i/oTPVRH1gkg17AagnwU1Sa0HmCt8urFU7Z5iG5QsdZlstoDLKTjDQC9yIOEIT75BE/jqQAVXZHAcuFnJo8LWKdNfHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hGYjKMGq; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733314157; x=1764850157;
+  t=1733314159; x=1764850159;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8YPJ8S89aDDsQR15gSKT9hmG6XV1TCpJ9ZS2i8RPLGY=;
-  b=FK1G2WR8S5E4bAEDeQj0Aw8aK5fyVHMKc7zVM5Nn9g96tCmZYo3F8lKH
-   VXCrluEPa56ryTrpNInrzViMDDI90/MaC59crC4aOztaDgMDfzMKpHY29
-   MMGw8CZgJqF5dUgwArYPdNrM36ZBLfAmHosjLmyumQSwmQiO5eWOysrPE
-   BdICzIRbAcKnj4X7i9RyfOCYkNf21UZWDmFvqtGcmCj9hV46HEngnL1vR
-   lfovd6LUT0f6y3X2kQPHbpSX0gMG0oi1nbMxh9MCqLVw37NceezrLEy8T
-   47kQt0v0YoyEqLu/tkY0aue+uKsLzDgH1MJ8WLCDMIG8d+Vo+E3/QBQ3p
-   w==;
-X-CSE-ConnectionGUID: 1eoRM7IGTcmMjtXjjl6HRA==
-X-CSE-MsgGUID: 3i9sEYdGQAmZs2uhXjYj2Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="32918439"
+  bh=lT+Ayyo1NsfkzOHaNIvpQd02/Q4fftifKNcdVE3ZQZs=;
+  b=hGYjKMGq2wQpfUG5ze3SvawfiimetrNMZ3NxmoXedQ+y3yTFov0xPsdu
+   knVLSqgAz+bmf62K7JQJmLGiKhEHMUwdTl3mnvtj1wzuke7W3L8w21Fcu
+   TwvkFYvP01K5MghuMX6H9i9c4W078icZe9nmsco7WBxpm4EqfPskKtLvj
+   pLo3HWnWkXtcTHWZ2klYlb/lEWpbbHYEf+JXQ9Pvnz0p4cVI3T1thb3vb
+   DGT0hUyAABCvd8N3hw8a6oX7h/HBSNZDI1t7ndt0xylaqh6ZOvFT0jWWS
+   Q+aHTSc58vqxh+e9SbwYAhW0rM5vG0vXMTDhd7cjDZeW7NyKAfKhIGofk
+   Q==;
+X-CSE-ConnectionGUID: GE0QEK73S4S6PtfO0SP0cA==
+X-CSE-MsgGUID: GPSmSyyBT0SKtF43d1XfJw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="32918444"
 X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="32918439"
+   d="scan'208";a="32918444"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 04:09:17 -0800
-X-CSE-ConnectionGUID: wgVt0cyIQNCCJGuw6aLfrQ==
-X-CSE-MsgGUID: nn85YdrtTH6D7jAF4WWWjg==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 04:09:19 -0800
+X-CSE-ConnectionGUID: q4EKv2yWTM+7PA4jgPPG8Q==
+X-CSE-MsgGUID: svlFj3bjR3WOHS41NozASQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="116994588"
+   d="scan'208";a="116994599"
 Received: from host61.igk.intel.com ([10.123.220.61])
-  by fmviesa002.fm.intel.com with ESMTP; 04 Dec 2024 04:09:15 -0800
+  by fmviesa002.fm.intel.com with ESMTP; 04 Dec 2024 04:09:17 -0800
 From: Anton Nadezhdin <anton.nadezhdin@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -65,11 +65,12 @@ Cc: netdev@vger.kernel.org,
 	przemyslaw.kitszel@intel.com,
 	richardcochran@gmail.com,
 	Jacob Keller <jacob.e.keller@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
 	Milena Olech <milena.olech@intel.com>,
 	Anton Nadezhdin <anton.nadezhdin@intel.com>
-Subject: [PATCH iwl-next 3/5] ice: add lock to protect low latency interface
-Date: Wed,  4 Dec 2024 13:03:46 -0500
-Message-ID: <20241204180709.307607-4-anton.nadezhdin@intel.com>
+Subject: [PATCH iwl-next 4/5] ice: check low latency PHY timer update firmware capability
+Date: Wed,  4 Dec 2024 13:03:47 -0500
+Message-ID: <20241204180709.307607-5-anton.nadezhdin@intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20241204180709.307607-1-anton.nadezhdin@intel.com>
 References: <20241204180709.307607-1-anton.nadezhdin@intel.com>
@@ -84,248 +85,61 @@ Content-Transfer-Encoding: 8bit
 
 From: Jacob Keller <jacob.e.keller@intel.com>
 
-Newer firmware for the E810 devices support a 'low latency' interface to
-interact with the PHY without using the Admin Queue. This is interacted
-with via the REG_LL_PROXY_L and REG_LL_PROXY_H registers.
+Newer versions of firmware support programming the PHY timer via the low
+latency interface exposed over REG_LL_PROXY_L and REG_LL_PROXY_H. Add
+support for checking the device capabilities for this feature.
 
-Currently, this interface is only used for Tx timestamps. There are two
-different mechanisms, including one which uses an interrupt for firmware to
-signal completion. However, these two methods are mutually exclusive, so no
-synchronization between them was necessary.
-
-This low latency interface is being extended in future firmware to support
-also programming the PHY timers. Use of the interface for PHY timers will
-need synchronization to ensure there is no overlap with a Tx timestamp.
-
-The interrupt-based response complicates the locking somewhat. We can't use
-a simple spinlock. This would require being acquired in
-ice_ptp_req_tx_single_tstamp, and released in
-ice_ptp_complete_tx_single_tstamp. The ice_ptp_req_tx_single_tstamp
-function is called from the threaded IRQ, and the
-ice_ptp_complete_tx_single_stamp is called from the low latency IRQ, so we
-would need to acquire the lock with IRQs disabled.
-
-To handle this, we'll use a wait queue along with
-wait_event_interruptible_locked_irq in the update flows which don't use the
-interrupt.
-
-The interrupt flow will acquire the wait queue lock, set the
-ATQBAL_FLAGS_INTR_IN_PROGRESS, and then initiate the firmware low latency
-request, and unlock the wait queue lock.
-
-Upon receipt of the low latency interrupt, the lock will be acquired, the
-ATQBAL_FLAGS_INTR_IN_PROGRESS bit will be cleared, and the firmware
-response will be captured, and wake_up_locked() will be called on the wait
-queue.
-
-The other flows will use wait_event_interruptible_locked_irq() to wait
-until the ATQBAL_FLAGS_INTR_IN_PROGRESS is clear. This function checks the
-condition under lock, but does not hold the lock while waiting. On return,
-the lock is held, and a return of zero indicates we hold the lock and the
-in-progress flag is not set.
-
-This will ensure that threads which need to use the low latency interface
-will sleep until they can acquire the lock without any pending low latency
-interrupt flow interfering.
-
+Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Milena Olech <milena.olech@intel.com>
 Signed-off-by: Anton Nadezhdin <anton.nadezhdin@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ptp.c    | 42 +++++++++++++++++----
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 18 +++++++++
- drivers/net/ethernet/intel/ice/ice_type.h   | 10 +++++
- 3 files changed, 62 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_common.c | 3 +++
+ drivers/net/ethernet/intel/ice/ice_type.h   | 2 ++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 3c81d98883c0..75d4e77b1167 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -473,7 +473,9 @@ ice_ptp_is_tx_tracker_up(struct ice_ptp_tx *tx)
-  */
- void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx)
- {
-+	struct ice_e810_params *params;
- 	struct ice_ptp_port *ptp_port;
-+	unsigned long flags;
- 	struct sk_buff *skb;
- 	struct ice_pf *pf;
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index faba09b9d880..d23f413740c4 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -2507,6 +2507,7 @@ ice_parse_1588_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
  
-@@ -482,6 +484,7 @@ void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx)
+ 	info->ts_ll_read = ((number & ICE_TS_LL_TX_TS_READ_M) != 0);
+ 	info->ts_ll_int_read = ((number & ICE_TS_LL_TX_TS_INT_READ_M) != 0);
++	info->ll_phy_tmr_update = ((number & ICE_TS_LL_PHY_TMR_UPDATE_M) != 0);
  
- 	ptp_port = container_of(tx, struct ice_ptp_port, tx);
- 	pf = ptp_port_to_pf(ptp_port);
-+	params = &pf->hw.ptp.phy.e810;
- 
- 	/* Drop packets which have waited for more than 2 seconds */
- 	if (time_is_before_jiffies(tx->tstamps[idx].start + 2 * HZ)) {
-@@ -498,11 +501,17 @@ void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx)
- 
- 	ice_trace(tx_tstamp_fw_req, tx->tstamps[idx].skb, idx);
- 
-+	spin_lock_irqsave(&params->atqbal_wq.lock, flags);
-+
-+	params->atqbal_flags |= ATQBAL_FLAGS_INTR_IN_PROGRESS;
-+
- 	/* Write TS index to read to the PF register so the FW can read it */
- 	wr32(&pf->hw, REG_LL_PROXY_H,
- 	     REG_LL_PROXY_H_TS_INTR_ENA | FIELD_PREP(REG_LL_PROXY_H_TS_IDX, idx) |
- 	     REG_LL_PROXY_H_EXEC);
- 	tx->last_ll_ts_idx_read = idx;
-+
-+	spin_unlock_irqrestore(&params->atqbal_wq.lock, flags);
- }
- 
- /**
-@@ -513,35 +522,52 @@ void ice_ptp_complete_tx_single_tstamp(struct ice_ptp_tx *tx)
- {
- 	struct skb_shared_hwtstamps shhwtstamps = {};
- 	u8 idx = tx->last_ll_ts_idx_read;
-+	struct ice_e810_params *params;
- 	struct ice_ptp_port *ptp_port;
- 	u64 raw_tstamp, tstamp;
- 	bool drop_ts = false;
- 	struct sk_buff *skb;
-+	unsigned long flags;
-+	struct device *dev;
- 	struct ice_pf *pf;
--	u32 val;
-+	u32 reg_ll_high;
- 
- 	if (!tx->init || tx->last_ll_ts_idx_read < 0)
- 		return;
- 
- 	ptp_port = container_of(tx, struct ice_ptp_port, tx);
- 	pf = ptp_port_to_pf(ptp_port);
-+	dev = ice_pf_to_dev(pf);
-+	params = &pf->hw.ptp.phy.e810;
- 
- 	ice_trace(tx_tstamp_fw_done, tx->tstamps[idx].skb, idx);
- 
--	val = rd32(&pf->hw, REG_LL_PROXY_H);
-+	spin_lock_irqsave(&params->atqbal_wq.lock, flags);
-+
-+	if (!(params->atqbal_flags & ATQBAL_FLAGS_INTR_IN_PROGRESS))
-+		dev_dbg(dev, "%s: low latency interrupt request not in progress?\n",
-+			__func__);
-+
-+	/* Read the low 32 bit value */
-+	raw_tstamp = rd32(&pf->hw, REG_LL_PROXY_L);
-+	/* Read the status together with high TS part */
-+	reg_ll_high = rd32(&pf->hw, REG_LL_PROXY_H);
-+
-+	/* Wake up threads waiting on low latency interface */
-+	params->atqbal_flags &= ~ATQBAL_FLAGS_INTR_IN_PROGRESS;
-+
-+	wake_up_locked(&params->atqbal_wq);
-+
-+	spin_unlock_irqrestore(&params->atqbal_wq.lock, flags);
- 
- 	/* When the bit is cleared, the TS is ready in the register */
--	if (val & REG_LL_PROXY_H_EXEC) {
-+	if (reg_ll_high & REG_LL_PROXY_H_EXEC) {
- 		dev_err(ice_pf_to_dev(pf), "Failed to get the Tx tstamp - FW not ready");
- 		return;
- 	}
- 
- 	/* High 8 bit value of the TS is on the bits 16:23 */
--	raw_tstamp = FIELD_GET(REG_LL_PROXY_H_TS_HIGH, val);
--	raw_tstamp <<= 32;
--
--	/* Read the low 32 bit value */
--	raw_tstamp |= (u64)rd32(&pf->hw, REG_LL_PROXY_L);
-+	raw_tstamp |= ((u64)FIELD_GET(REG_LL_PROXY_H_TS_HIGH, reg_ll_high)) << 32;
- 
- 	/* Devices using this interface always verify the timestamp differs
- 	 * relative to the last cached timestamp value.
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 06a0c78cd491..d4c831b6eb6d 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -4867,9 +4867,22 @@ static int ice_write_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 val)
- static int
- ice_read_phy_tstamp_ll_e810(struct ice_hw *hw, u8 idx, u8 *hi, u32 *lo)
- {
-+	struct ice_e810_params *params = &hw->ptp.phy.e810;
-+	unsigned long flags;
- 	u32 val;
- 	u8 err;
- 
-+	spin_lock_irqsave(&params->atqbal_wq.lock, flags);
-+
-+	/* Wait for any pending in-progress low latency interrupt */
-+	err = wait_event_interruptible_locked_irq(params->atqbal_wq,
-+						  !(params->atqbal_flags &
-+						    ATQBAL_FLAGS_INTR_IN_PROGRESS));
-+	if (err) {
-+		spin_unlock_irqrestore(&params->atqbal_wq.lock, flags);
-+		return err;
-+	}
-+
- 	/* Write TS index to read to the PF register so the FW can read it */
- 	val = FIELD_PREP(REG_LL_PROXY_H_TS_IDX, idx) | REG_LL_PROXY_H_EXEC;
- 	wr32(hw, REG_LL_PROXY_H, val);
-@@ -4880,6 +4893,7 @@ ice_read_phy_tstamp_ll_e810(struct ice_hw *hw, u8 idx, u8 *hi, u32 *lo)
- 				       10, REG_LL_PROXY_H_TIMEOUT_US);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to read PTP timestamp using low latency read\n");
-+		spin_unlock_irqrestore(&params->atqbal_wq.lock, flags);
- 		return err;
- 	}
- 
-@@ -4889,6 +4903,8 @@ ice_read_phy_tstamp_ll_e810(struct ice_hw *hw, u8 idx, u8 *hi, u32 *lo)
- 	/* Read the low 32 bit value and set the TS valid bit */
- 	*lo = rd32(hw, REG_LL_PROXY_L) | TS_VALID;
- 
-+	spin_unlock_irqrestore(&params->atqbal_wq.lock, flags);
-+
- 	return 0;
- }
- 
-@@ -5316,6 +5332,8 @@ static void ice_ptp_init_phy_e810(struct ice_ptp_hw *ptp)
- {
- 	ptp->num_lports = 8;
- 	ptp->ports_per_phy = 4;
-+
-+	init_waitqueue_head(&ptp->phy.e810.atqbal_wq);
- }
- 
- /* E830 functions
+ 	info->ena_ports = logical_id;
+ 	info->tmr_own_map = phys_id;
+@@ -2529,6 +2530,8 @@ ice_parse_1588_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
+ 		  info->ts_ll_read);
+ 	ice_debug(hw, ICE_DBG_INIT, "dev caps: ts_ll_int_read = %u\n",
+ 		  info->ts_ll_int_read);
++	ice_debug(hw, ICE_DBG_INIT, "dev caps: ll_phy_tmr_update = %u\n",
++		  info->ll_phy_tmr_update);
+ 	ice_debug(hw, ICE_DBG_INIT, "dev caps: ieee_1588 ena_ports = %u\n",
+ 		  info->ena_ports);
+ 	ice_debug(hw, ICE_DBG_INIT, "dev caps: tmr_own_map = %u\n",
 diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index e2e6b2119889..5f3af5f3d2cb 100644
+index 5f3af5f3d2cb..25d6dad1852b 100644
 --- a/drivers/net/ethernet/intel/ice/ice_type.h
 +++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -18,6 +18,7 @@
- #include "ice_sbq_cmd.h"
- #include "ice_vlan_mode.h"
- #include "ice_fwlog.h"
-+#include <linux/wait.h>
+@@ -369,6 +369,7 @@ struct ice_ts_func_info {
+ #define ICE_TS_TMR1_ENA_M		BIT(26)
+ #define ICE_TS_LL_TX_TS_READ_M		BIT(28)
+ #define ICE_TS_LL_TX_TS_INT_READ_M	BIT(29)
++#define ICE_TS_LL_PHY_TMR_UPDATE_M	BIT(30)
  
- static inline bool ice_is_tc_ena(unsigned long bitmap, u8 tc)
- {
-@@ -848,6 +849,14 @@ struct ice_mbx_data {
- #define ICE_PORTS_PER_QUAD	4
- #define ICE_GET_QUAD_NUM(port) ((port) / ICE_PORTS_PER_QUAD)
- 
-+#define ATQBAL_FLAGS_INTR_IN_PROGRESS	BIT(0)
-+
-+struct ice_e810_params {
-+	/* The wait queue lock also protects the low latency interface */
-+	wait_queue_head_t atqbal_wq;
-+	unsigned int atqbal_flags;
-+};
-+
- struct ice_eth56g_params {
- 	u8 num_phys;
- 	u8 phy_addr[2];
-@@ -857,6 +866,7 @@ struct ice_eth56g_params {
+ struct ice_ts_dev_info {
+ 	/* Device specific info */
+@@ -383,6 +384,7 @@ struct ice_ts_dev_info {
+ 	u8 tmr1_ena;
+ 	u8 ts_ll_read;
+ 	u8 ts_ll_int_read;
++	u8 ll_phy_tmr_update;
  };
  
- union ice_phy_params {
-+	struct ice_e810_params e810;
- 	struct ice_eth56g_params eth56g;
- };
- 
+ #define ICE_NAC_TOPO_PRIMARY_M	BIT(0)
 -- 
 2.42.0
 
