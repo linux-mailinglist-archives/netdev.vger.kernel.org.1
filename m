@@ -1,176 +1,112 @@
-Return-Path: <netdev+bounces-149038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3BA99E3E46
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 16:27:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40F649E3EAB
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 16:50:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C18D8B42E7D
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:53:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACF83B474FC
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37A520B803;
-	Wed,  4 Dec 2024 14:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="gA03IGoy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BFE20B1EC;
+	Wed,  4 Dec 2024 15:05:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C78A20A5E7;
-	Wed,  4 Dec 2024 14:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B42B1FECCF
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 15:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733323986; cv=none; b=khI3/sVB6fm9VSnztHedaZp0bCS2k6ucC/0DI/etpil9Z4BpVjkWE+dTBsFFZmaqU6Ie8FXNAZxAAmcj+EyFexSFvuX4m2CNsBUEkIvpBGmjWwYm8J2A4lxbXV0gkwl4KEUfwYqPFvAko9H/e/gYuUlLPDB/eqb8Ie4W4uUPhQc=
+	t=1733324733; cv=none; b=ZlwZt718xnX0vRJxDp3FdZXk8QsJFavP/ihH2QgbcnYfyfS46EPv4I+MNcWqatBiKEYQIGVRGGcVkKOcXiJGF96dOcvEnxVTZFYozRMthOfoi4ppCG1kKr1ZhDr9tesrUqXEk3/KXu+Mt9wyrEJ+tWnK1u2fZq1rEwkmUCPBjvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733323986; c=relaxed/simple;
-	bh=9S0hchzxez9pNCIR/AUpcl6f3DdTEiAyq8NPSfzzvbk=;
-	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=aG96ZQbG7ZdJsFYQ69m3zCeRR3o3Xk6nP2yKCDFvJ+P19rUXcQ8pQT1+8prixRtJsX2Z+E7B3QLFsrbYR8kU7qQaf1pl0IjKZj54ea4aPMecvPS1q8k9CkzFIfR2/mK6Od50NO3i3/DKP/zFpts4ClSR1OMEoP5rWiYhiR7+N9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=gA03IGoy; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B45xt8Z010494;
-	Wed, 4 Dec 2024 14:52:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=v0Q3KIInuD+e/4A2nf8kVW
-	+ZNT1dMVERaJJR2vF10wk=; b=gA03IGoy4GSBCSLOot9ZJvb5H4Rr74w+yi9Klt
-	IaqduRyXNiiHZq/5d44QX8Rtu4hHwO4Kg9jf5PUAF0nH5ov0jgX8cOyyGnqA059C
-	903l48Z5lcxcYXNWDuJq1cA1QtEh3YrlcwS9O3rFU82fz5Ssc5AOpCfPgfYPuYYV
-	YMwGosb2jS7tjB1KMs61MGCW/+tutuVaBIHt0NT6unZG1jxNpEcjKoctYrQUhbz8
-	Jbo+IxqKCdnZdRhA9OtjuPIEhHH0NzEHgBuVJJdYJAikAJUQVFngTIxCvM5LvBZV
-	3yGfq+uOpZgFDJKgv8NEokHiVk46ZcdHR+H/aF0FB5pGSiCw==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 439v7yvq7a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Dec 2024 14:52:45 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B4EqiSR030728
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 4 Dec 2024 14:52:44 GMT
-Received: from nsssdc-sh01-lnx.ap.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 4 Dec 2024 06:52:38 -0800
-From: Lei Wei <quic_leiwei@quicinc.com>
-Subject: [PATCH net-next v2 0/5] Add PCS support for Qualcomm IPQ9574 SoC
-Date: Wed, 4 Dec 2024 22:43:52 +0800
-Message-ID: <20241204-ipq_pcs_rc1-v2-0-26155f5364a1@quicinc.com>
+	s=arc-20240116; t=1733324733; c=relaxed/simple;
+	bh=ayicYYVSFQvgHq3DJstUtSqUM355N67uvzqrp9QyLNY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LJwiNSrgiSVI/LkiOGpu6k/yPlYEdqICZvDueAgz64Y9ufkaVRoKdqs3/8LEwDDnMki1f+bWcsjOM8iXGQ2Q32n5j/zqXHNdw01bW/Yo00XSyqHl7YVCbZaNU7dF/FAtMIpVoRj5w4gv4emMV4eeNB+Aq/9REaHQHAmUJwyJTP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.2] (ip5f5af1e1.dynamic.kabel-deutschland.de [95.90.241.225])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 34F6F61E64778;
+	Wed, 04 Dec 2024 16:05:05 +0100 (CET)
+Message-ID: <f684e517-19c5-4dd9-9de6-34aefe289552@molgen.mpg.de>
+Date: Wed, 4 Dec 2024 16:05:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAKlqUGcC/22NQQ6CMBBFr0JmbU2nCCor72EIIcNUZmGBFhsM4
- e42Xbt8efnv7xDYCwdoih08RwkyuQTmVACNvXuxkiExGG0uiBqVzEs3U+g8oTJ1z3gr6U51CWk
- xe7ay5doTHK/K8bZCm8woYZ38N99EzP5vMaLSyg5sq2tVG032sXyExNGZpje0x3H8AHm9lFOyA
- AAA
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, Andrew Lunn
-	<andrew@lunn.ch>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King
-	<linux@armlinux.org.uk>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
-        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>,
-        <quic_linchen@quicinc.com>, <quic_luoj@quicinc.com>,
-        <quic_leiwei@quicinc.com>, <srinivas.kandagatla@linaro.org>,
-        <bartosz.golaszewski@linaro.org>, <vsmuthu@qti.qualcomm.com>,
-        <john@phrozen.org>, <linux-arm-msm@vger.kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1733323958; l=2722;
- i=quic_leiwei@quicinc.com; s=20240829; h=from:subject:message-id;
- bh=9S0hchzxez9pNCIR/AUpcl6f3DdTEiAyq8NPSfzzvbk=;
- b=TwiQqbN21gN2NUDoQT9bnnN0+W5SjHXUHaBqyo04LIwEqTEbB815Y6gocFsjmF/bt78JFlf46
- G3r9RuRLxa0BFd0fNxpp8o/YlTLyoJH9xh/doLpq72YB9qGtZLF5PaF
-X-Developer-Key: i=quic_leiwei@quicinc.com; a=ed25519;
- pk=uFXBHtxtDjtIrTKpDEZlMLSn1i/sonZepYO8yioKACM=
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: jTDta9_5_Do2iZCtEpTmO0sx1vys-34K
-X-Proofpoint-GUID: jTDta9_5_Do2iZCtEpTmO0sx1vys-34K
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- impostorscore=0 adultscore=0 priorityscore=1501 clxscore=1011
- lowpriorityscore=0 suspectscore=0 mlxlogscore=999 malwarescore=0
- bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412040114
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] ice: move static_assert to
+ declaration section
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ Marcin Szycik <marcin.szycik@linux.intel.com>
+References: <20241204150224.346606-1-mateusz.polchlopek@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20241204150224.346606-1-mateusz.polchlopek@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-The 'UNIPHY' PCS block in the Qualcomm IPQ9574 SoC provides Ethernet
-PCS and SerDes functions. It supports 1Gbps mode PCS and 10-Gigabit
-mode PCS (XPCS) functions, and supports various interface modes for
-the connectivity between the Ethernet MAC and the external PHYs/Switch.
-There are three UNIPHY (PCS) instances in IPQ9574, supporting the six
-Ethernet ports.
+Dear Mateusz,
 
-This patch series adds base driver support for initializing the PCS,
-and PCS phylink ops for managing the PCS modes/states. Support for
-SGMII/QSGMII (PCS) and USXGMII (XPCS) modes is being added initially.
 
-The Ethernet driver which handles the MAC operations will create the
-PCS instances and phylink for the MAC, by utilizing the API exported
-by this driver.
+Thank you for the patch.
 
-While support is being added initially for IPQ9574, the driver is
-expected to be easily extendable later for other SoCs in the IPQ
-family such as IPQ5332.
+Am 04.12.24 um 16:02 schrieb Mateusz Polchlopek:
+> static_assert() needs to be placed in the declaration section,
+> so move it there in ice_cfg_tx_topo() function.
+> 
+> Current code causes following warnings on some gcc versions:
 
-Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
----
-Changes in v2:
-- dtbindings updates
-  a.) Rename dt-binding header file to match binding file name.
-  b.) Drop unused labels and the redundant examples.
-  c.) Rename "mii_rx"/"mii_tx" clock names to "rx"/"tx".
-- Rename "PCS_QCOM_IPQ" with specific name "PCS_QCOM_IPQ9574" in
-  Kconfig.
-- Remove interface mode check for the PCS lock.
-- Use Cisco SGMII AN mode as default SGMII/QSGMII AN mode.
-- Instantiate MII PCS instances in probe and export "ipq_pcs_get" and
-  "ipq_pcs_put" APIs.
-- Move MII RX and TX clock enable and disable to "pcs_enable" and
-  "pcs_disable" methods.
-- Change "dev_dbg" to "dev_dbg_ratelimited" in "pcs_get_state" method.
-- Link to v1: https://lore.kernel.org/r/20241101-ipq_pcs_rc1-v1-0-fdef575620cf@quicinc.com
+Please list the versions you know of.
 
----
-Lei Wei (5):
-      dt-bindings: net: pcs: Add Ethernet PCS for Qualcomm IPQ9574 SoC
-      net: pcs: Add PCS driver for Qualcomm IPQ9574 SoC
-      net: pcs: qcom-ipq9574: Add PCS instantiation and phylink operations
-      net: pcs: qcom-ipq9574: Add USXGMII interface mode support
-      MAINTAINERS: Add maintainer for Qualcomm IPQ9574 PCS driver
+> error: ISO C90 forbids mixed declarations and code
+> [-Werror=declaration-after-statement]
 
- .../bindings/net/pcs/qcom,ipq9574-pcs.yaml         | 190 +++++
- MAINTAINERS                                        |   9 +
- drivers/net/pcs/Kconfig                            |   9 +
- drivers/net/pcs/Makefile                           |   1 +
- drivers/net/pcs/pcs-qcom-ipq9574.c                 | 884 +++++++++++++++++++++
- include/dt-bindings/net/qcom,ipq9574-pcs.h         |  15 +
- include/linux/pcs/pcs-qcom-ipq9574.h               |  16 +
- 7 files changed, 1124 insertions(+)
----
-base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
-change-id: 20241101-ipq_pcs_rc1-26ae183c9c63
+The above could be in one line, as it’s pasted.
 
-Best regards,
--- 
-Lei Wei <quic_leiwei@quicinc.com>
+> Fixes: c188afdc3611 ("ice: fix memleak in ice_init_tx_topology()")
+> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice_ddp.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
+> index 69d5b1a28491..e885f84520ba 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ddp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
+> @@ -2388,6 +2388,8 @@ int ice_cfg_tx_topo(struct ice_hw *hw, const void *buf, u32 len)
+>   	int status;
+>   	u8 flags;
+>   
+> +	static_assert(ICE_PKG_BUF_SIZE == ICE_AQ_MAX_BUF_LEN);
+> +
+>   	if (!buf || !len)
+>   		return -EINVAL;
+>   
+> @@ -2482,7 +2484,6 @@ int ice_cfg_tx_topo(struct ice_hw *hw, const void *buf, u32 len)
+>   	}
+>   
+>   	/* Get the new topology buffer, reuse current topo copy mem */
+> -	static_assert(ICE_PKG_BUF_SIZE == ICE_AQ_MAX_BUF_LEN);
+>   	new_topo = topo;
+>   	memcpy(new_topo, (u8 *)section + offset, size);
 
+The diff looks good.
+
+
+Kind regards,
+
+Paul
 
