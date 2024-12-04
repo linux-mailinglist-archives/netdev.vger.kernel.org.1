@@ -1,232 +1,701 @@
-Return-Path: <netdev+bounces-148969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 024A49E3A10
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:36:51 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D41D99E3A0F
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:36:01 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7C29286102
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 12:36:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FDB21605EE
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 12:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2F41B4135;
-	Wed,  4 Dec 2024 12:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b="j5web6Zl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBBDF1B218D;
+	Wed,  4 Dec 2024 12:35:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx-rz-1.rrze.uni-erlangen.de (mx-rz-1.rrze.uni-erlangen.de [131.188.11.20])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3E61AF0BE;
-	Wed,  4 Dec 2024 12:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=131.188.11.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF081B395D
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 12:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733315807; cv=none; b=eg14No3SwVZNpoGjBhxwoKGRZQaOnmQyyRkpU0pJl/6kYguwpQcFX6mbxkz0ItmGhIc5wiNcd5hYbJxVAodmmR2QMQN2Cqok3I3Af9+Iwgkmcnjc26x721YRi3U/2gxCj2PWV2GUROVYOZLRU05Px3RlOz1dhurEGFS01wvSxNY=
+	t=1733315758; cv=none; b=mA6q7TKOXFmfFAasESEcjiLOhZQooUMDtY/sEvnHvVFCwVJSBulBUWtEA4GbaxY4jIhAPPmGvishBHV5x+Ab8nGrJxTMm0m3aACCqWYiAhwZNgx+LUH/t3YVeGhhoYB1Lp+2Xi/R706NzE3PesKdnsvXoAN83VmDP/UmzF+3mEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733315807; c=relaxed/simple;
-	bh=IEmkH8GSW9/Y3OBntL3jN3DJgggJ54xA6hhNJT1vCLQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KrAzEVPYYscb1NpolZSkEdV+mpqzT0mPjZZDpi8tZ41T5c/tFBLlDdKaTy0WwTKAdhTmaaVXZmFdpiDLZl3IZxnNIIXjzNsQN6sznxEwIS25HkaVYr2n+3KAqIYg4vgcjyWAr/g54jZekJ3icPt60z0IdVINFFhXd2Nzyzz9KvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de; spf=pass smtp.mailfrom=fau.de; dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b=j5web6Zl; arc=none smtp.client-ip=131.188.11.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fau.de
-Received: from mx-rz-smart.rrze.uni-erlangen.de (mx-rz-smart.rrze.uni-erlangen.de [IPv6:2001:638:a000:1025::1e])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	s=arc-20240116; t=1733315758; c=relaxed/simple;
+	bh=mXmVtRA5p3zVuJUBBHza+bRD3EdPK+SdgcO0xPQMCPg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=b2/SJLugrFrDTnATLqMASIQNR0Ub9R4xo7uhgUgk1JNiNqwVCx3wQMK3osVGdizh/HMzgH4bLT2FH31YGZvOjsQz/YuqAN1ActU1tLGXGepzp7vMP39N6e57kMezVvFS8bJzmVs2JbdXgsU9lsBY9HNr8kMGINkHidywRg9Wx2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.2] (ip5f5af1e1.dynamic.kabel-deutschland.de [95.90.241.225])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-rz-1.rrze.uni-erlangen.de (Postfix) with ESMTPS id 4Y3H070tSfz8tX0;
-	Wed,  4 Dec 2024 13:29:43 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fau.de; s=fau-2021;
-	t=1733315383; bh=GzLRBhecWewOSKJk7GdiLRVGMSTktg2TiiUmTGfAi24=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From:To:CC:
-	 Subject;
-	b=j5web6ZlH+nobHJly+RcWyf9VYJLJPv19smEPJKfeqYK2NDC6NyR8jN+YpjQlJpB+
-	 gErueCeECfXfirKpoFx6LgDvYL2EdFOFFr2t2LQNpysWPSHSl5L+KxsCfGrt28ctvm
-	 N56K3jGiIK7v9euRD/mVqHB2aD3ngw7z3QrIC+ggMALPr/Hlq/CR+3QzcvaLRKmZaV
-	 ihoaJUvLPoyZjSeKDebcS0iEDMQvtlmGys7FZQZJQpUoIJU7BXwD3UbTR6LrMHueVl
-	 or/3Ep+VqSoWlRtgcM8jpOhwsR8a6GRpWah77iFXyJpFfoTf2bmS4/GYNcH47ayDKm
-	 wYHogMW37/WUg==
-X-Virus-Scanned: amavisd-new at boeck1.rrze.uni-erlangen.de (RRZE)
-X-RRZE-Flag: Not-Spam
-X-RRZE-Submit-IP: 131.188.47.107
-Received: from faui76b (faui76b.informatik.uni-erlangen.de [131.188.47.107])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: U2FsdGVkX1+h1vXgyFd22LVdiaXYJGWnfnea6/l2Vfw=)
-	by smtp-auth.uni-erlangen.de (Postfix) with ESMTPSA id 4Y3H044FBpz8tZf;
-	Wed,  4 Dec 2024 13:29:40 +0100 (CET)
-From: Martin Ottens <martin.ottens@fau.de>
-To: 
-Cc: Martin Ottens <martin.ottens@fau.de>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] net/sched: netem: account for backlog updates from child qdisc
-Date: Wed,  4 Dec 2024 13:29:29 +0100
-Message-Id: <20241204122929.3492005-1-martin.ottens@fau.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241202191312.3d3c8097@kernel.org>
-References: <20241202191312.3d3c8097@kernel.org>
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 1D44D61E6477C;
+	Wed, 04 Dec 2024 13:35:00 +0100 (CET)
+Message-ID: <f3fa2895-a739-497a-b75a-c0e1193f4f97@molgen.mpg.de>
+Date: Wed, 4 Dec 2024 13:34:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ice: fw and port health
+ status
+To: Konrad Knitter <konrad.knitter@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, netdev@vger.kernel.org, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
+ andrew+netdev@lunn.ch, Sharon Haroni <sharon.haroni@intel.com>,
+ Nicholas Nunley <nicholas.d.nunley@intel.com>,
+ Brett Creeley <brett.creeley@intel.com>
+References: <20241204122738.114511-1-konrad.knitter@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20241204122738.114511-1-konrad.knitter@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-In general, 'qlen' of any classful qdisc should keep track of the
-number of packets that the qdisc itself and all of its children holds.
-In case of netem, 'qlen' only accounts for the packets in its internal
-tfifo. When netem is used with a child qdisc, the child qdisc can use
-'qdisc_tree_reduce_backlog' to inform its parent, netem, about created
-or dropped SKBs. This function updates 'qlen' and the backlog statistics
-of netem, but netem does not account for changes made by a child qdisc.
-'qlen' then indicates the wrong number of packets in the tfifo.
-If a child qdisc creates new SKBs during enqueue and informs its parent
-about this, netem's 'qlen' value is increased. When netem dequeues the
-newly created SKBs from the child, the 'qlen' in netem is not updated.
-If 'qlen' reaches the configured sch->limit, the enqueue function stops
-working, even though the tfifo is not full.
+Dear Konrad,
 
-Reproduce the bug:
-Ensure that the sender machine has GSO enabled. Configure netem as root
-qdisc and tbf as its child on the outgoing interface of the machine
-as follows:
-$ tc qdisc add dev <oif> root handle 1: netem delay 100ms limit 100
-$ tc qdisc add dev <oif> parent 1:0 tbf rate 50Mbit burst 1542 latency 50ms
 
-Send bulk TCP traffic out via this interface, e.g., by running an iPerf3
-client on the machine. Check the qdisc statistics:
-$ tc -s qdisc show dev <oif>
+Thank you for your patch. It’d be great if you made the commit message 
+summary/title a statement by adding a verb (in imperative mood). Maybe:
 
-tbf segments the GSO SKBs (tbf_segment) and updates the netem's 'qlen'.
-The interface fully stops transferring packets and "locks". In this case,
-the child qdisc and tfifo are empty, but 'qlen' indicates the tfifo is at
-its limit and no more packets are accepted.
+ice: Support for fw and port health status
 
-This patch adds a counter for the entries in the tfifo. Netem's 'qlen' is
-only decreased when a packet is returned by its dequeue function, and not
-during enqueuing into the child qdisc. External updates to 'qlen' are thus
-accounted for and only the behavior of the backlog statistics changes. As
-in other qdiscs, 'qlen' then keeps track of  how many packets are held in
-netem and all of its children. As before, sch->limit remains as the
-maximum number of packets in the tfifo. The same applies to netem's
-backlog statistics.
-(Note: the 'backlog' byte-statistic of netem is incorrect in the example
-above even after the patch is applied due to a bug in tbf. See my
-previous patch ([PATCH] net/sched: tbf: correct backlog statistic for
-GSO packets)).
 
-Signed-off-by: Martin Ottens <martin.ottens@fau.de>
----
- net/sched/sch_netem.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+Am 04.12.24 um 13:27 schrieb Konrad Knitter:
+> Firmware generates events for global events or port specific events.
+> 
+> Driver shall subscribe for health status events from firmware on supported
+> FW versions >= 1.7.6.
 
-diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index fe6fed291a7b..71ec9986ed37 100644
---- a/net/sched/sch_netem.c
-+++ b/net/sched/sch_netem.c
-@@ -79,6 +79,8 @@ struct netem_sched_data {
- 	struct sk_buff	*t_head;
- 	struct sk_buff	*t_tail;
- 
-+	u32 t_len;
-+
- 	/* optional qdisc for classful handling (NULL at netem init) */
- 	struct Qdisc	*qdisc;
- 
-@@ -383,6 +385,7 @@ static void tfifo_reset(struct Qdisc *sch)
- 	rtnl_kfree_skbs(q->t_head, q->t_tail);
- 	q->t_head = NULL;
- 	q->t_tail = NULL;
-+	q->t_len = 0;
- }
- 
- static void tfifo_enqueue(struct sk_buff *nskb, struct Qdisc *sch)
-@@ -412,6 +415,7 @@ static void tfifo_enqueue(struct sk_buff *nskb, struct Qdisc *sch)
- 		rb_link_node(&nskb->rbnode, parent, p);
- 		rb_insert_color(&nskb->rbnode, &q->t_root);
- 	}
-+	q->t_len++;
- 	sch->q.qlen++;
- }
- 
-@@ -518,7 +522,7 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 			1<<get_random_u32_below(8);
- 	}
- 
--	if (unlikely(sch->q.qlen >= sch->limit)) {
-+	if (unlikely(q->t_len >= sch->limit)) {
- 		/* re-link segs, so that qdisc_drop_all() frees them all */
- 		skb->next = segs;
- 		qdisc_drop_all(skb, sch, to_free);
-@@ -702,8 +706,8 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
- tfifo_dequeue:
- 	skb = __qdisc_dequeue_head(&sch->q);
- 	if (skb) {
--		qdisc_qstats_backlog_dec(sch, skb);
- deliver:
-+		qdisc_qstats_backlog_dec(sch, skb);
- 		qdisc_bstats_update(sch, skb);
- 		return skb;
- 	}
-@@ -719,8 +723,7 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
- 
- 		if (time_to_send <= now && q->slot.slot_next <= now) {
- 			netem_erase_head(q, skb);
--			sch->q.qlen--;
--			qdisc_qstats_backlog_dec(sch, skb);
-+			q->t_len--;
- 			skb->next = NULL;
- 			skb->prev = NULL;
- 			/* skb->dev shares skb->rbnode area,
-@@ -747,16 +750,21 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
- 					if (net_xmit_drop_count(err))
- 						qdisc_qstats_drop(sch);
- 					qdisc_tree_reduce_backlog(sch, 1, pkt_len);
-+					sch->qstats.backlog -= pkt_len;
-+					sch->q.qlen--;
- 				}
- 				goto tfifo_dequeue;
- 			}
-+			sch->q.qlen--;
- 			goto deliver;
- 		}
- 
- 		if (q->qdisc) {
- 			skb = q->qdisc->ops->dequeue(q->qdisc);
--			if (skb)
-+			if (skb) {
-+				sch->q.qlen--;
- 				goto deliver;
-+			}
- 		}
- 
- 		qdisc_watchdog_schedule_ns(&q->watchdog,
-@@ -766,8 +774,10 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
- 
- 	if (q->qdisc) {
- 		skb = q->qdisc->ops->dequeue(q->qdisc);
--		if (skb)
-+		if (skb) {
-+			sch->q.qlen--;
- 			goto deliver;
-+		}
- 	}
- 	return NULL;
- }
--- 
-2.39.5
+Please add a blank line between paragraphs, or do not break the line 
+just because a new sentence starts.
 
+> Driver shall expose those under specific health reporter, two new
+> reporters are introduced:
+> - FW health reporter shall represent global events (problems with the
+> image, recovery mode);
+> - Port health reporter shall represent port-specific events (module
+> failure).
+> 
+> Firmware only reports problems when those are detected, it does not store
+> active fault list.
+> Driver will hold only last global and last port-specific event.
+> Driver will report all events via devlink health report,
+> so in case of multiple events of the same source they can be reviewed
+> using devlink autodump feature.
+> 
+> $ devlink health
+> 
+> pci/0000:b1:00.3:
+>    reporter fw
+>      state healthy error 0 recover 0 auto_dump true
+>    reporter port
+>      state error error 1 recover 0 last_dump_date 2024-03-17
+> 	last_dump_time 09:29:29 auto_dump true
+> 
+> $ devlink health diagnose pci/0000:b1:00.3 reporter port
+> 
+>    Syndrome: 262
+>    Description: Module is not present.
+>    Possible Solution: Check that the module is inserted correctly.
+>    Port Number: 0
+> 
+> Tested on Intel Corporation Ethernet Controller E810-C for SFP
+
+Thank you for adding the above information.
+
+> Co-developed-by: Sharon Haroni <sharon.haroni@intel.com>
+> Signed-off-by: Sharon Haroni <sharon.haroni@intel.com>
+> Co-developed-by: Nicholas Nunley <nicholas.d.nunley@intel.com>
+> Signed-off-by: Nicholas Nunley <nicholas.d.nunley@intel.com>
+> Co-developed-by: Brett Creeley <brett.creeley@intel.com>
+> Signed-off-by: Brett Creeley <brett.creeley@intel.com>
+> Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
+> ---
+> v2:
+> - Removal of __VA_OPS__ usage. Style fixes.
+> Depends-on: https://lore.kernel.org/netdev/20240930133724.610512-1-przemyslaw.kitszel@intel.com/T/
+> ---
+>   .../net/ethernet/intel/ice/devlink/health.c   | 253 +++++++++++++++++-
+>   .../net/ethernet/intel/ice/devlink/health.h   |  14 +-
+>   .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  87 ++++++
+>   drivers/net/ethernet/intel/ice/ice_common.c   |  38 +++
+>   drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
+>   drivers/net/ethernet/intel/ice/ice_main.c     |   3 +
+>   drivers/net/ethernet/intel/ice/ice_type.h     |   5 +
+>   7 files changed, 400 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
+> index c7a8b8c9e1ca..c5a16879c916 100644
+> --- a/drivers/net/ethernet/intel/ice/devlink/health.c
+> +++ b/drivers/net/ethernet/intel/ice/devlink/health.c
+> @@ -1,13 +1,251 @@
+>   // SPDX-License-Identifier: GPL-2.0
+>   /* Copyright (c) 2024, Intel Corporation. */
+>   
+> -#include "health.h"
+>   #include "ice.h"
+> +#include "ice_adminq_cmd.h" /* for enum ice_aqc_health_status_elem */
+> +#include "health.h"
+>   #include "ice_ethtool_common.h"
+>   
+>   #define ICE_DEVLINK_FMSG_PUT_FIELD(fmsg, obj, name) \
+>   	devlink_fmsg_put(fmsg, #name, (obj)->name)
+>   
+> +#define ICE_HEALTH_STATUS_DATA_SIZE 2
+> +
+> +struct ice_health_status {
+> +	enum ice_aqc_health_status code;
+> +	const char *description;
+> +	const char *solution;
+> +	const char *data_label[ICE_HEALTH_STATUS_DATA_SIZE];
+> +};
+> +
+> +/*
+> + * In addition to the health status codes provided below, the firmware might
+> + * generate Health Status Codes that are not pertinent to the end-user.
+> + * For instance, Health Code 0x1002 is triggered when the command fails.
+> + * Such codes should be disregarded by the end-user.
+> + * The below lookup requires to be sorted by code.
+> + */
+> +
+> +static const char *const ice_common_port_solutions =
+> +	"Check your cable connection. Change or replace the module or cable. Manually set speed and duplex.";
+> +static const char *const ice_port_number_label = "Port Number";
+> +static const char *const ice_update_nvm_solution = "Update to the latest NVM image.";
+> +
+> +static const struct ice_health_status ice_health_status_lookup[] = {
+> +	{ICE_AQC_HEALTH_STATUS_ERR_UNKNOWN_MOD_STRICT, "An unsupported module was detected",
+> +		ice_common_port_solutions, {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_MOD_TYPE, "Module type is not supported.",
+> +		"Change or replace the module or cable.", {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_MOD_QUAL, "Module is not qualified.",
+> +		ice_common_port_solutions, {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_MOD_COMM,
+> +		"Device cannot communicate with the module.",
+> +		"Check your cable connection. Change or replace the module or cable. Manually set speed and duplex.",
+> +		{ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_MOD_CONFLICT, "Unresolved module conflict.",
+> +		"Manually set speed/duplex or change the port option. If the problem persists, use a cable/module that is found in the supported modules and cables list for this device.",
+> +		{ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_MOD_NOT_PRESENT, "Module is not present.",
+> +		"Check that the module is inserted correctly. If the problem persists, use a cable/module that is found in the supported modules and cables list for this device.",
+> +		{ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_INFO_MOD_UNDERUTILIZED, "Underutilized module.",
+> +		"Change or replace the module or cable. Change the port option",
+> +		{ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_UNKNOWN_MOD_LENIENT, "An unsupported module was detected",
+> +		ice_common_port_solutions, {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_INVALID_LINK_CFG, "Invalid link configuration.",
+> +		NULL, {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_PORT_ACCESS, "Port hardware access error.",
+
+Sometimes there are dots/periods at the end, and sometimes there are 
+none. It’d be great if it were consistent.
+
+> +		ice_update_nvm_solution, {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_PORT_UNREACHABLE, "A port is unreachable.",
+> +		"Change the port option. Update to the latest NVM image."},
+> +	{ICE_AQC_HEALTH_STATUS_INFO_PORT_SPEED_MOD_LIMITED, "Port speed is limited due to module.",
+> +		"Change the module or configure the port option to match the current module speed. Change the port option.",
+> +		{ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_PARALLEL_FAULT,
+> +		"All configured link modes were attempted but failed to establish link. The device will restart the process to establish link.",
+> +		"Check link partner connection and configuration.",
+> +		{ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_INFO_PORT_SPEED_PHY_LIMITED,
+> +		"Port speed is limited by PHY capabilities.",
+> +		"Change the module to align to port option.", {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_NETLIST_TOPO, "LOM topology netlist is corrupted.",
+> +		ice_update_nvm_solution, {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_NETLIST, "Unrecoverable netlist error.",
+> +		ice_update_nvm_solution, {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_TOPO_CONFLICT, "Port topology conflict.",
+> +		"Change the port option. Update to the latest NVM image."},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_LINK_HW_ACCESS, "Unrecoverable hardware access error.",
+> +		ice_update_nvm_solution, {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_LINK_RUNTIME, "Unrecoverable runtime error.",
+> +		ice_update_nvm_solution, {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_DNL_INIT, "Link management engine failed to initialize.",
+> +		ice_update_nvm_solution, {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_PHY_FW_LOAD,
+> +		"Failed to load the firmware image in the external PHY.",
+> +		ice_update_nvm_solution, {ice_port_number_label}},
+> +	{ICE_AQC_HEALTH_STATUS_INFO_RECOVERY, "The device is in firmware recovery mode.",
+> +		ice_update_nvm_solution, {"Extended Error"}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_FLASH_ACCESS, "The flash chip cannot be accessed.",
+> +		"If issue persists, call customer support.", {"Access Type"}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_NVM_AUTH, "NVM authentication failed.",
+> +		ice_update_nvm_solution},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_OROM_AUTH, "Option ROM authentication failed",
+> +		ice_update_nvm_solution},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_DDP_AUTH, "DDP package authentication failed.",
+> +		"Update to latest base driver and DDP package."},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_NVM_COMPAT, "NVM image is incompatible.",
+> +		ice_update_nvm_solution},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_OROM_COMPAT, "Option ROM is incompatible.",
+> +		ice_update_nvm_solution, {"Expected PCI Device ID", "Expected Module ID"}},
+> +	{ICE_AQC_HEALTH_STATUS_ERR_DCB_MIB,
+> +		"Supplied MIB file is invalid. DCB reverted to default configuration.",
+> +		"Disable FW-LLDP and check DCBx system configuration.",
+> +		{ice_port_number_label, "MIB ID"}},
+> +};
+> +
+> +static int ice_health_status_lookup_compare(const void *a, const void *b)
+> +{
+> +	return ((struct ice_health_status *)a)->code - ((struct ice_health_status *)b)->code;
+> +}
+> +
+> +static const struct ice_health_status *ice_get_health_status(u16 code)
+> +{
+> +	struct ice_health_status key = { .code = code };
+> +
+> +	return bsearch(&key, ice_health_status_lookup, ARRAY_SIZE(ice_health_status_lookup),
+> +		       sizeof(struct ice_health_status), ice_health_status_lookup_compare);
+> +}
+> +
+> +static void ice_describe_status_code(struct devlink_fmsg *fmsg,
+> +				     struct ice_aqc_health_status_elem *hse)
+> +{
+> +	static const char *const aux_label[] = { "Aux Data 1", "Aux Data 2" };
+> +	const struct ice_health_status *health_code;
+> +	u32 internal_data[2];
+> +	u16 status_code;
+> +
+> +	status_code = le16_to_cpu(hse->health_status_code);
+> +
+> +	devlink_fmsg_put(fmsg, "Syndrome", status_code);
+> +	if (status_code) {
+> +		internal_data[0] = le32_to_cpu(hse->internal_data1);
+> +		internal_data[1] = le32_to_cpu(hse->internal_data2);
+> +
+> +		health_code = ice_get_health_status(status_code);
+> +		if (!health_code)
+> +			return;
+> +
+> +		devlink_fmsg_string_pair_put(fmsg, "Description", health_code->description);
+> +		if (health_code->solution)
+> +			devlink_fmsg_string_pair_put(fmsg, "Possible Solution",
+> +						     health_code->solution);
+> +
+> +		for (int i = 0; i < ICE_HEALTH_STATUS_DATA_SIZE; i++) {
+
+Use size_t?
+
+> +			if (internal_data[i] != ICE_AQC_HEALTH_STATUS_UNDEFINED_DATA)
+> +				devlink_fmsg_u32_pair_put(fmsg,
+> +							  health_code->data_label[i] ?
+> +							  health_code->data_label[i] :
+> +							  aux_label[i],
+> +							  internal_data[i]);
+> +		}
+> +	}
+> +}
+> +
+> +static int
+> +ice_port_reporter_dump(struct devlink_health_reporter *reporter, struct devlink_fmsg *fmsg,
+> +		       void *priv_ctx, struct netlink_ext_ack __always_unused *extack)
+> +{
+> +	struct ice_pf *pf = devlink_health_reporter_priv(reporter);
+> +
+> +	ice_describe_status_code(fmsg, &pf->health_reporters.port_status);
+> +	return 0;
+> +}
+> +
+> +static int
+> +ice_fw_reporter_dump(struct devlink_health_reporter *reporter, struct devlink_fmsg *fmsg,
+> +		     void *priv_ctx, struct netlink_ext_ack *extack)
+> +{
+> +	struct ice_pf *pf = devlink_health_reporter_priv(reporter);
+> +
+> +	ice_describe_status_code(fmsg, &pf->health_reporters.fw_status);
+> +	return 0;
+> +}
+> +
+> +static void ice_config_health_events(struct ice_pf *pf, bool enable)
+> +{
+> +	u8 enable_bits = 0;
+> +	int ret;
+> +
+> +	if (enable)
+> +		enable_bits = ICE_AQC_HEALTH_STATUS_SET_PF_SPECIFIC_MASK |
+> +			      ICE_AQC_HEALTH_STATUS_SET_GLOBAL_MASK;
+> +
+> +	ret = ice_aq_set_health_status_cfg(&pf->hw, enable_bits);
+> +	if (ret)
+> +		dev_err(ice_pf_to_dev(pf), "Failed to %s firmware health events, err %d aq_err %s\n",
+> +			str_enable_disable(enable), ret,
+> +			ice_aq_str(pf->hw.adminq.sq_last_status));
+> +}
+> +
+> +/**
+> + * ice_process_health_status_event - Process the health status event from FW
+> + * @pf: pointer to the PF structure
+> + * @event: event structure containing the Health Status Event opcode
+> + *
+> + * Decode the Health Status Events and print the associated messages
+> + */
+> +void ice_process_health_status_event(struct ice_pf *pf, struct ice_rq_event_info *event)
+> +{
+> +	const struct ice_aqc_health_status_elem *health_info;
+> +	u16 count;
+
+Why fix the length?
+
+> +
+> +	health_info = (struct ice_aqc_health_status_elem *)event->msg_buf;
+> +	count = le16_to_cpu(event->desc.params.get_health_status.health_status_count);
+> +
+> +	if (count > (event->buf_len / sizeof(*health_info))) {
+> +		dev_err(ice_pf_to_dev(pf), "Received a health status event with invalid element count\n");
+> +		return;
+> +	}
+> +
+> +	for (int i = 0; i < count; i++) {
+> +		const struct ice_health_status *health_code;
+> +		u16 status_code;
+> +
+> +		status_code = le16_to_cpu(health_info->health_status_code);
+> +		health_code = ice_get_health_status(status_code);
+> +
+> +		if (health_code) {
+> +			switch (health_info->event_source) {
+> +			case ICE_AQC_HEALTH_STATUS_GLOBAL:
+> +				pf->health_reporters.fw_status = *health_info;
+> +				devlink_health_report(pf->health_reporters.fw,
+> +						      "FW syndrome reported", NULL);
+> +				break;
+> +			case ICE_AQC_HEALTH_STATUS_PF:
+> +			case ICE_AQC_HEALTH_STATUS_PORT:
+> +				pf->health_reporters.port_status = *health_info;
+> +				devlink_health_report(pf->health_reporters.port,
+> +						      "Port syndrome reported", NULL);
+> +				break;
+> +			default:
+> +				dev_err(ice_pf_to_dev(pf), "Health code with unknown source\n");
+> +			}
+> +		} else {
+> +			u32 data1, data2;
+> +			u16 source;
+> +
+> +			source = le16_to_cpu(health_info->event_source);
+> +			data1 = le32_to_cpu(health_info->internal_data1);
+> +			data2 = le32_to_cpu(health_info->internal_data2);
+> +			dev_dbg(ice_pf_to_dev(pf),
+> +				"Received internal health status code 0x%08x, source: 0x%08x, data1: 0x%08x, data2: 0x%08x",
+> +				status_code, source, data1, data2);
+> +		}
+> +		health_info++;
+> +	}
+> +}
+> +
+>   /**
+>    * ice_devlink_health_report - boilerplate to call given @reporter
+>    *
+> @@ -244,6 +482,8 @@ ice_init_devlink_rep(struct ice_pf *pf,
+>   
+>   ICE_DEFINE_HEALTH_REPORTER_OPS(mdd);
+>   ICE_DEFINE_HEALTH_REPORTER_OPS(tx_hang);
+> +ICE_DEFINE_HEALTH_REPORTER_OPS(fw);
+> +ICE_DEFINE_HEALTH_REPORTER_OPS(port);
+>   
+>   /**
+>    * ice_health_init - allocate and init all ice devlink health reporters and
+> @@ -257,6 +497,12 @@ void ice_health_init(struct ice_pf *pf)
+>   
+>   	reps->mdd = ice_init_devlink_rep(pf, &ice_mdd_reporter_ops);
+>   	reps->tx_hang = ice_init_devlink_rep(pf, &ice_tx_hang_reporter_ops);
+> +
+> +	if (ice_is_fw_health_report_supported(&pf->hw)) {
+> +		reps->fw = ice_init_devlink_rep(pf, &ice_fw_reporter_ops);
+> +		reps->port = ice_init_devlink_rep(pf, &ice_port_reporter_ops);
+> +		ice_config_health_events(pf, true);
+> +	}
+>   }
+>   
+>   /**
+> @@ -279,6 +525,11 @@ void ice_health_deinit(struct ice_pf *pf)
+>   {
+>   	ice_deinit_devl_reporter(pf->health_reporters.mdd);
+>   	ice_deinit_devl_reporter(pf->health_reporters.tx_hang);
+> +	if (ice_is_fw_health_report_supported(&pf->hw)) {
+> +		ice_deinit_devl_reporter(pf->health_reporters.fw);
+> +		ice_deinit_devl_reporter(pf->health_reporters.port);
+> +		ice_config_health_events(pf, false);
+> +	}
+>   }
+>   
+>   static
+> diff --git a/drivers/net/ethernet/intel/ice/devlink/health.h b/drivers/net/ethernet/intel/ice/devlink/health.h
+> index a08c7bd174cf..280c429feec8 100644
+> --- a/drivers/net/ethernet/intel/ice/devlink/health.h
+> +++ b/drivers/net/ethernet/intel/ice/devlink/health.h
+> @@ -13,8 +13,10 @@
+>    * devlink health mechanism for ice driver.
+>    */
+>   
+> +struct ice_aqc_health_status_elem;
+>   struct ice_pf;
+>   struct ice_tx_ring;
+> +struct ice_rq_event_info;
+>   
+>   enum ice_mdd_src {
+>   	ICE_MDD_SRC_TX_PQM,
+> @@ -25,17 +27,23 @@ enum ice_mdd_src {
+>   
+>   /**
+>    * struct ice_health - stores ice devlink health reporters and accompanied data
+> - * @tx_hang: devlink health reporter for tx_hang event
+> + * @fw: devlink health reporter for FW Health Status events
+>    * @mdd: devlink health reporter for MDD detection event
+> + * @port: devlink health reporter for Port Health Status events
+> + * @tx_hang: devlink health reporter for tx_hang event
+>    * @tx_hang_buf: pre-allocated place to put info for Tx hang reporter from
+>    *               non-sleeping context
+>    * @tx_ring: ring that the hang occured on
+>    * @head: descriptior head
+>    * @intr: interrupt register value
+>    * @vsi_num: VSI owning the queue that the hang occured on
+> + * @fw_status: buffer for last received FW Status event
+> + * @port_status: buffer for last received Port Status event
+>    */
+>   struct ice_health {
+> +	struct devlink_health_reporter *fw;
+>   	struct devlink_health_reporter *mdd;
+> +	struct devlink_health_reporter *port;
+>   	struct devlink_health_reporter *tx_hang;
+>   	struct_group_tagged(ice_health_tx_hang_buf, tx_hang_buf,
+>   		struct ice_tx_ring *tx_ring;
+> @@ -43,8 +51,12 @@ struct ice_health {
+>   		u32 intr;
+>   		u16 vsi_num;
+>   	);
+> +	struct ice_aqc_health_status_elem fw_status;
+> +	struct ice_aqc_health_status_elem port_status;
+>   };
+>   
+> +void ice_process_health_status_event(struct ice_pf *pf,
+> +				     struct ice_rq_event_info *event);
+>   
+>   void ice_health_init(struct ice_pf *pf);
+>   void ice_health_deinit(struct ice_pf *pf);
+> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> index ce590991de38..232a1facf397 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> @@ -2511,6 +2511,87 @@ enum ice_aqc_fw_logging_mod {
+>   	ICE_AQC_FW_LOG_ID_MAX,
+>   };
+>   
+> +enum ice_aqc_health_status_mask {
+> +	ICE_AQC_HEALTH_STATUS_SET_PF_SPECIFIC_MASK = BIT(0),
+> +	ICE_AQC_HEALTH_STATUS_SET_ALL_PF_MASK      = BIT(1),
+> +	ICE_AQC_HEALTH_STATUS_SET_GLOBAL_MASK      = BIT(2),
+> +};
+> +
+> +/* Set Health Status (direct 0xFF20) */
+> +struct ice_aqc_set_health_status_cfg {
+> +	u8 event_source;
+> +	u8 reserved[15];
+> +};
+> +
+> +enum ice_aqc_health_status {
+> +	ICE_AQC_HEALTH_STATUS_ERR_UNKNOWN_MOD_STRICT		= 0x101,
+> +	ICE_AQC_HEALTH_STATUS_ERR_MOD_TYPE			= 0x102,
+> +	ICE_AQC_HEALTH_STATUS_ERR_MOD_QUAL			= 0x103,
+> +	ICE_AQC_HEALTH_STATUS_ERR_MOD_COMM			= 0x104,
+> +	ICE_AQC_HEALTH_STATUS_ERR_MOD_CONFLICT			= 0x105,
+> +	ICE_AQC_HEALTH_STATUS_ERR_MOD_NOT_PRESENT		= 0x106,
+> +	ICE_AQC_HEALTH_STATUS_INFO_MOD_UNDERUTILIZED		= 0x107,
+> +	ICE_AQC_HEALTH_STATUS_ERR_UNKNOWN_MOD_LENIENT		= 0x108,
+> +	ICE_AQC_HEALTH_STATUS_ERR_MOD_DIAGNOSTIC_FEATURE	= 0x109,
+> +	ICE_AQC_HEALTH_STATUS_ERR_INVALID_LINK_CFG		= 0x10B,
+> +	ICE_AQC_HEALTH_STATUS_ERR_PORT_ACCESS			= 0x10C,
+> +	ICE_AQC_HEALTH_STATUS_ERR_PORT_UNREACHABLE		= 0x10D,
+> +	ICE_AQC_HEALTH_STATUS_INFO_PORT_SPEED_MOD_LIMITED	= 0x10F,
+> +	ICE_AQC_HEALTH_STATUS_ERR_PARALLEL_FAULT		= 0x110,
+> +	ICE_AQC_HEALTH_STATUS_INFO_PORT_SPEED_PHY_LIMITED	= 0x111,
+> +	ICE_AQC_HEALTH_STATUS_ERR_NETLIST_TOPO			= 0x112,
+> +	ICE_AQC_HEALTH_STATUS_ERR_NETLIST			= 0x113,
+> +	ICE_AQC_HEALTH_STATUS_ERR_TOPO_CONFLICT			= 0x114,
+> +	ICE_AQC_HEALTH_STATUS_ERR_LINK_HW_ACCESS		= 0x115,
+> +	ICE_AQC_HEALTH_STATUS_ERR_LINK_RUNTIME			= 0x116,
+> +	ICE_AQC_HEALTH_STATUS_ERR_DNL_INIT			= 0x117,
+> +	ICE_AQC_HEALTH_STATUS_ERR_PHY_NVM_PROG			= 0x120,
+> +	ICE_AQC_HEALTH_STATUS_ERR_PHY_FW_LOAD			= 0x121,
+> +	ICE_AQC_HEALTH_STATUS_INFO_RECOVERY			= 0x500,
+> +	ICE_AQC_HEALTH_STATUS_ERR_FLASH_ACCESS			= 0x501,
+> +	ICE_AQC_HEALTH_STATUS_ERR_NVM_AUTH			= 0x502,
+> +	ICE_AQC_HEALTH_STATUS_ERR_OROM_AUTH			= 0x503,
+> +	ICE_AQC_HEALTH_STATUS_ERR_DDP_AUTH			= 0x504,
+> +	ICE_AQC_HEALTH_STATUS_ERR_NVM_COMPAT			= 0x505,
+> +	ICE_AQC_HEALTH_STATUS_ERR_OROM_COMPAT			= 0x506,
+> +	ICE_AQC_HEALTH_STATUS_ERR_NVM_SEC_VIOLATION		= 0x507,
+> +	ICE_AQC_HEALTH_STATUS_ERR_OROM_SEC_VIOLATION		= 0x508,
+> +	ICE_AQC_HEALTH_STATUS_ERR_DCB_MIB			= 0x509,
+> +	ICE_AQC_HEALTH_STATUS_ERR_MNG_TIMEOUT			= 0x50A,
+> +	ICE_AQC_HEALTH_STATUS_ERR_BMC_RESET			= 0x50B,
+> +	ICE_AQC_HEALTH_STATUS_ERR_LAST_MNG_FAIL			= 0x50C,
+> +	ICE_AQC_HEALTH_STATUS_ERR_RESOURCE_ALLOC_FAIL		= 0x50D,
+> +	ICE_AQC_HEALTH_STATUS_ERR_FW_LOOP			= 0x1000,
+> +	ICE_AQC_HEALTH_STATUS_ERR_FW_PFR_FAIL			= 0x1001,
+> +	ICE_AQC_HEALTH_STATUS_ERR_LAST_FAIL_AQ			= 0x1002,
+> +};
+> +
+> +/* Get Health Status (indirect 0xFF22) */
+> +struct ice_aqc_get_health_status {
+> +	__le16 health_status_count;
+> +	u8 reserved[6];
+> +	__le32 addr_high;
+> +	__le32 addr_low;
+> +};
+> +
+> +enum ice_aqc_health_status_scope {
+> +	ICE_AQC_HEALTH_STATUS_PF	= 0x1,
+> +	ICE_AQC_HEALTH_STATUS_PORT	= 0x2,
+> +	ICE_AQC_HEALTH_STATUS_GLOBAL	= 0x3,
+> +};
+> +
+> +#define ICE_AQC_HEALTH_STATUS_UNDEFINED_DATA	0xDEADBEEF
+> +
+> +/* Get Health Status event buffer entry (0xFF22),
+> + * repeated per reported health status.
+> + */
+> +struct ice_aqc_health_status_elem {
+> +	__le16 health_status_code;
+> +	__le16 event_source;
+> +	__le32 internal_data1;
+> +	__le32 internal_data2;
+> +};
+> +
+>   /* Set FW Logging configuration (indirect 0xFF30)
+>    * Register for FW Logging (indirect 0xFF31)
+>    * Query FW Logging (indirect 0xFF32)
+> @@ -2651,6 +2732,8 @@ struct ice_aq_desc {
+>   		struct ice_aqc_get_link_status get_link_status;
+>   		struct ice_aqc_event_lan_overflow lan_overflow;
+>   		struct ice_aqc_get_link_topo get_link_topo;
+> +		struct ice_aqc_set_health_status_cfg set_health_status_cfg;
+> +		struct ice_aqc_get_health_status get_health_status;
+>   		struct ice_aqc_dnl_call_command dnl_call;
+>   		struct ice_aqc_i2c read_write_i2c;
+>   		struct ice_aqc_read_i2c_resp read_i2c_resp;
+> @@ -2853,6 +2936,10 @@ enum ice_adminq_opc {
+>   	/* Standalone Commands/Events */
+>   	ice_aqc_opc_event_lan_overflow			= 0x1001,
+>   
+> +	/* SystemDiagnostic commands */
+
+Add a space before Diagnostic?
+
+> +	ice_aqc_opc_set_health_status_cfg		= 0xFF20,
+> +	ice_aqc_opc_get_health_status			= 0xFF22,
+> +
+>   	/* FW Logging Commands */
+>   	ice_aqc_opc_fw_logs_config			= 0xFF30,
+>   	ice_aqc_opc_fw_logs_register			= 0xFF31,
+> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+> index faba09b9d880..9c61318d3027 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_common.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
+> @@ -6047,6 +6047,44 @@ bool ice_is_phy_caps_an_enabled(struct ice_aqc_get_phy_caps_data *caps)
+>   	return false;
+>   }
+>   
+> +/**
+> + * ice_is_fw_health_report_supported
+> + * @hw: pointer to the hardware structure
+> + *
+> + * Return: true if firmware supports health status reports,
+> + * false otherwise
+> + */
+> +bool ice_is_fw_health_report_supported(struct ice_hw *hw)
+> +{
+> +	return ice_is_fw_api_min_ver(hw, ICE_FW_API_HEALTH_REPORT_MAJ,
+> +				     ICE_FW_API_HEALTH_REPORT_MIN,
+> +				     ICE_FW_API_HEALTH_REPORT_PATCH);
+> +}
+> +
+> +/**
+> + * ice_aq_set_health_status_cfg - Configure FW health events
+> + * @hw: pointer to the HW struct
+> + * @event_source: type of diagnostic events to enable
+> + *
+> + * Configure the health status event types that the firmware will send to this
+> + * PF. The supported event types are: PF-specific, all PFs, and global.
+> + *
+> + * Return: 0 on success, negative error code otherwise.
+> + */
+> +int ice_aq_set_health_status_cfg(struct ice_hw *hw, u8 event_source)
+> +{
+> +	struct ice_aqc_set_health_status_cfg *cmd;
+> +	struct ice_aq_desc desc;
+> +
+> +	cmd = &desc.params.set_health_status_cfg;
+> +
+> +	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_health_status_cfg);
+> +
+> +	cmd->event_source = event_source;
+> +
+> +	return ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
+> +}
+> +
+>   /**
+>    * ice_aq_set_lldp_mib - Set the LLDP MIB
+>    * @hw: pointer to the HW struct
+> diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
+> index 52a1b72cce26..e132851dc0f0 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_common.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_common.h
+> @@ -141,6 +141,8 @@ int
+>   ice_get_link_default_override(struct ice_link_default_override_tlv *ldo,
+>   			      struct ice_port_info *pi);
+>   bool ice_is_phy_caps_an_enabled(struct ice_aqc_get_phy_caps_data *caps);
+> +bool ice_is_fw_health_report_supported(struct ice_hw *hw);
+> +int ice_aq_set_health_status_cfg(struct ice_hw *hw, u8 event_source);
+>   int ice_aq_get_phy_equalization(struct ice_hw *hw, u16 data_in, u16 op_code,
+>   				u8 serdes_num, int *output);
+>   int
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+> index 7b9be612cf33..36cfbe771d1b 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -1567,6 +1567,9 @@ static int __ice_clean_ctrlq(struct ice_pf *pf, enum ice_ctl_q q_type)
+>   		case ice_aqc_opc_lldp_set_mib_change:
+>   			ice_dcb_process_lldp_set_mib_change(pf, &event);
+>   			break;
+> +		case ice_aqc_opc_get_health_status:
+> +			ice_process_health_status_event(pf, &event);
+> +			break;
+>   		default:
+>   			dev_dbg(dev, "%s Receive Queue unknown event 0x%04x ignored\n",
+>   				qtype, opcode);
+> diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+> index e2e6b2119889..42ac5a9f1cf4 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_type.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_type.h
+> @@ -1207,4 +1207,9 @@ struct ice_aq_get_set_rss_lut_params {
+>   #define ICE_FW_API_REPORT_DFLT_CFG_MIN		7
+>   #define ICE_FW_API_REPORT_DFLT_CFG_PATCH	3
+>   
+> +/* AQ API version for Health Status support */
+> +#define ICE_FW_API_HEALTH_REPORT_MAJ		1
+> +#define ICE_FW_API_HEALTH_REPORT_MIN		7
+> +#define ICE_FW_API_HEALTH_REPORT_PATCH		6
+> +
+>   #endif /* _ICE_TYPE_H_ */
+
+
+Kind regards,
+
+Paul
 
