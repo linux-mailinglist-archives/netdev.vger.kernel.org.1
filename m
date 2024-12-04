@@ -1,133 +1,115 @@
-Return-Path: <netdev+bounces-149118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50C5F9E4472
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 20:19:17 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00D849E4484
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 20:22:54 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A15A161564
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 19:19:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B637528419D
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 19:22:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D98D1F5404;
-	Wed,  4 Dec 2024 19:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EEC1A8F7A;
+	Wed,  4 Dec 2024 19:22:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GfI8Hpr/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kpUE7cDs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6CF1C3C0A;
-	Wed,  4 Dec 2024 19:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18925188724
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 19:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733339779; cv=none; b=Fn8cKJm5q5pzknAe37EXD3QviZ+uJH3CwrNPd9D+mI73qIJpKUoFqEtQ9/xTgXXhdwl5RuFpq1UGv2WJ7WPlXjxNyWY/PR51idqUmRMggPYJ26nvwmvm4Eul6A2Fx/mCVIdhCVrwTtuV2OT/acAvlX69hGUfM5SW8osZ1fz9Jnk=
+	t=1733340170; cv=none; b=YY8iGUxT9j7AEvlb3c172QqVhUXmuUJm0gaExYrOYRr2yvtEHmKIwYM2wjDT4iI1gxfRhGKuXEoRbOI5e2w12Qb6S+YmcEdhQfqxn0Uy0RtoyXs15lu/pA2j0Dn4XK6ZIY+0eWGoTUgKuImApldBuOMDtcgCv4Efq+eDLFDCwsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733339779; c=relaxed/simple;
-	bh=riFR1uFph0+nEzIzgS8wLwTUnFjsEBS3WhqWQhLswo0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=YoXXRsG079rb/MvLDGxTfOC42BBE9JaR/lakBaq9lfszxkFJudXYez4mOggrgXDLqn/kuxUieEMIQ745zfrg8LgT4Q9Uexha20y6O/PBGLjrhv2rUfmESFHctpE13pnxBWhGfIjDxN7D/iVLD5+12qsOUg7ZgCl4pbzzoknTn40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GfI8Hpr/; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4668978858aso655971cf.0;
-        Wed, 04 Dec 2024 11:16:15 -0800 (PST)
+	s=arc-20240116; t=1733340170; c=relaxed/simple;
+	bh=U9MhgtAeffgz+oaC2mlq+05LKyQ195Cfy9Cv4ozv1xE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eCKfmnG//GBY6+Fcsxkx10MrtaHBh9F1/h+KSPWVkIQYQhQ2joet1HPNwE2i1NLR41/b4ffM1FLEpwgF1ApqzrGLP+IPSAAaJ1NV+BUsqGkWuXymthx1C+/NZCoL3FSac/U9WGHJ2LxG3Enn+kfBqP3NFa/i1bX37Vqob3/UrlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kpUE7cDs; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aa5500f7a75so11716166b.0
+        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 11:22:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733339775; x=1733944575; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1733340167; x=1733944967; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Pr0hdtkXWBz6Deg8rD9qqpfL9wDCS2J4zLJaloBbbT4=;
-        b=GfI8Hpr/yGxYX0eVAHWIZr+I3iFzk9APoRut2TBqVBMcJIxjoNq6H2DOfVWST3E6Zu
-         7yCAHaSwqOfOKml2TCcbkfPrpedgTP5rJE+1EG50eXOmBGQFhuFK2NGNOWHaFiyTJNRo
-         +fzPHYjOvC04+iA/PShiwNatJ0uSKb5UXhBRvs6Qaow9HracJ6dPyuoIuccrU8+Q6h0N
-         IZQXGLeQlB8/agMJOitkZw2jSqbhwEv5sOU/3CDFTQMyWqQfItXDCMGjAHHGOQ1kGauC
-         em61nQb4fSZN3b6/7/uasiaoAL8is3KyL1fSCYNfS87Ho+RdtXIdC/fIP5wlJQwKbl9r
-         TwtA==
+        bh=AuQXhHT6k3Zp8vvS2h+zCPYZPZpH3H8+6qtOn00dwzU=;
+        b=kpUE7cDsurERAP/sbB76S6La5s0ZM+YZu+qhzhf9b/b5ROhuo4um81/4mBVgin0KeP
+         Nwg0qiSJFbChRFUoCWjvBnQ4uN2wQrLZ3MuWXdmRIUnFc6Vvjxg9G0OVQv5H/J/Ck43c
+         uF3jsz8ycnhv+X7qXKd+7B3SOX2rJy53RyBolyBb738ScLh8N+F2omICP1O953iY/6zk
+         iHFC8PpnfT9jj+5ZU/K9nkHM0BW1WFC5+XvOTGQjkVPWFi0cc6mzpDE4EzW60nMvTYwb
+         AnqGqYAwlc8wmxbJ8X5zA8qKp1xFZ1NgG++lcblN/QH7uqCIMtEW3UjZ9xrdPnvYSvA9
+         VBoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733339775; x=1733944575;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Pr0hdtkXWBz6Deg8rD9qqpfL9wDCS2J4zLJaloBbbT4=;
-        b=dfFEW2RrENhXPs8Gg4f3+tCc3FwhFM62crD+SSVFmb3aCSTI0gJwBNpdFzn9oZXDcI
-         MkgXvoLgbkfGsTvWQ2KdZ9Fb3WHXStcQRhPz67loO6D9TaVPYoPu5pvDW67Bb5ZhFi+A
-         H0biswxQa+sG6/JRA8D6lFIiuCWkp+x+EsrbD+X4azZXbY8xA4p7S3gB5r06Imw75RFz
-         76xyYQJsIQVUJ73v9rsyZb16ygXVN473G/AOHevGM8eHdvxsQSIAKpLE1qTb+sQ/jsKX
-         i3jEGkTEirxhLjdyaOMofwtS2Ex0gkqyR6fl2HvBR31AFISUh1VOMtD+VzIguVRtJEhx
-         EoSg==
-X-Forwarded-Encrypted: i=1; AJvYcCU3w109YPfqsIrK5/MDShMYrR78LdmYjlKeMmoK7jJxqOyDKJJ3Jmnj6IHrbyYjITDgSENte9Nwa0SWJHLd3X8O@vger.kernel.org, AJvYcCVSYUFLOIWZV2/Iwjl+S6avHQ1QO4ijjOJ5HaGmgan81JuMe7AFKd62IWenS6GJ+Lg071ccZSao@vger.kernel.org, AJvYcCVTyn9ABjI8ySLrsyU80DH3lzW15QkErT6bPhlAnkNpZV/KMHUpyJim0Q4ErqRW9xx9N9zM4niaHIfUG6UJ@vger.kernel.org, AJvYcCXfK+7ZYsHVX9RtMFdHuBfONCYFgIsweVZ9/w9DsM/XGQkG5Iq6O2GpbD2G5zW1R+eFzuKZAO0X2TBT@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyl3XaI3tjnF9HqcEVM/7obrH90CnJXnRWSekpoC3DFgP9oGmMv
-	RAbIjgdumpTWId8GXhl4k3FSeecqFf2AanlyDDpj/JDjx+bVER7b
-X-Gm-Gg: ASbGncsWAVsGmtYg+X27/f+XJ5388Wqh+og+yV+YAFOzy3buNRKuX8pZ6FXe2Dq+yJs
-	JjRpfaiN/p1XoslF71GSQna4MfbR9RPbVMgYcEROfWVCsuYeBBb9vW/FCDjD80qo4QUD7Sjj2tF
-	9dgHTWPVlXZuRufvqMkiiFtkBOmZP2v/QEBHPTEvwuq5m1RLhW0DTNzdcOqNtu7I9OjD4c1Je7d
-	kaEIeczh6K9eZaEK9tZ4BIV8sGVWA5PRvijSf093+09pG+x558TswYYD3TuF9NQq2775o8i0Wf7
-	6ZjQbpGkMcmcIWJb4V9ffw==
-X-Google-Smtp-Source: AGHT+IGvHGN7TJ0teVYRi09OToFGV/F78Y/ZVg2hNhJyImOWe5fuNzGtXanUUzFhOp4XNh/yEmEP6g==
-X-Received: by 2002:a05:622a:50:b0:466:9938:91f6 with SMTP id d75a77b69052e-4670c6c5422mr109547961cf.51.1733339774925;
-        Wed, 04 Dec 2024 11:16:14 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-466c3fa58fesm77103941cf.0.2024.12.04.11.16.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2024 11:16:14 -0800 (PST)
-Date: Wed, 04 Dec 2024 14:16:13 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kenjiro Nakayama <nakayamakenjiro@gmail.com>, 
- Pablo Neira Ayuso <pablo@netfilter.org>, 
- Jozsef Kadlecsik <kadlec@netfilter.org>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Alan Stern <stern@rowland.harvard.edu>, 
- Andrea Parri <parri.andrea@gmail.com>, 
- Will Deacon <will@kernel.org>, 
- Peter Zijlstra <peterz@infradead.org>, 
- Boqun Feng <boqun.feng@gmail.com>, 
- Nicholas Piggin <npiggin@gmail.com>, 
- David Howells <dhowells@redhat.com>, 
- Jade Alglave <j.alglave@ucl.ac.uk>, 
- Luc Maranget <luc.maranget@inria.fr>, 
- "Paul E. McKenney" <paulmck@kernel.org>, 
- Akira Yokosawa <akiyks@gmail.com>, 
- Daniel Lustig <dlustig@nvidia.com>, 
- Joel Fernandes <joel@joelfernandes.org>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netfilter-devel@vger.kernel.org, 
- coreteam@netfilter.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- linux-arch@vger.kernel.org, 
- lkmm@lists.linux.dev, 
- linux-kselftest@vger.kernel.org, 
- Kenjiro Nakayama <nakayamakenjiro@gmail.com>
-Message-ID: <6750aa7dc6dfd_b1fe52945f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241203222843.26983-1-nakayamakenjiro@gmail.com>
-References: <20241203222843.26983-1-nakayamakenjiro@gmail.com>
-Subject: Re: [PATCH net-next v2] selftests/net: call sendmmsg via
- udpgso_bench.sh
+        d=1e100.net; s=20230601; t=1733340167; x=1733944967;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AuQXhHT6k3Zp8vvS2h+zCPYZPZpH3H8+6qtOn00dwzU=;
+        b=thfeCoAzoiYLcspzS6Lv+9PSoIQnB8qHNQrySbjA1HkRIx8fDxzBTT2pYjJ7mWCAYI
+         7BrUGHJCtjfGhUuX7x4ixndMEje0TPcKxB3GHR5ps3/pcvmWov7ieo97BUSKN8LQEU3c
+         yf1ppKOwc55gD/p9vGUyaBxe4fNPSqvh1voLvWILL+qBocCFPW/SIYJEPGABxmoxnUVR
+         +H56RXh/EyGNd5hU3Oork0O2P/bsbhP3JLFho5YdZtk+5iCVUCNCdd6OnFFpkmSLyxJO
+         JvXSHHkC0b9+9oSXBZuIGpciQZD2pF71jnisSxriuXJWodz+9c3u28cFR1JuqhPGhudP
+         qN/A==
+X-Gm-Message-State: AOJu0YwoOniSddXAu5oD0YxSv2odNDsqrsPKb36+1HU8ZZKUXpIIAg+S
+	B4tLOvowBSFBV30EIGegO2kbiKEgGHQJxEQ19R079/q2F9ngorgXeraO6u5SohHQdmy5e2raPAt
+	3QND7mbm3X7uI3mvXFYoRMCgU3LBlUostYMmQ
+X-Gm-Gg: ASbGncuWW4zp5GEsdh83YPlKksWp7y/1yEFBRpkrl6DTzmHp9SHgz3WjqGOz+6JUWLV
+	NGtroIwCeJT3FJMLadr+jd0O7J3a0Vu6B
+X-Google-Smtp-Source: AGHT+IEcFt8n2sUWMMh++hz/kCqbtKVeSdHWuWfpvfwcZ1HSvPh1AGuir6VFsYZNsQFJrohXk6aXBnotOdRly0mJTik=
+X-Received: by 2002:a17:907:5c3:b0:aa6:5ad:9a36 with SMTP id
+ a640c23a62f3a-aa605adeccfmr440723066b.4.1733340167265; Wed, 04 Dec 2024
+ 11:22:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20241204-jakub-krn-909-poc-msec-tw-tstamp-v1-0-8b54467a0f34@cloudflare.com>
+ <20241204-jakub-krn-909-poc-msec-tw-tstamp-v1-1-8b54467a0f34@cloudflare.com>
+In-Reply-To: <20241204-jakub-krn-909-poc-msec-tw-tstamp-v1-1-8b54467a0f34@cloudflare.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 4 Dec 2024 20:22:36 +0100
+Message-ID: <CANn89iL5oE79_qtNUFFsyxLXoJALJCZgawsubuvn1XOcOuOzFw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] tcp: Measure TIME-WAIT reuse delay with
+ millisecond precision
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: netdev@vger.kernel.org, Jason Xing <kerneljasonxing@gmail.com>, 
+	Adrien Vasseur <avasseur@cloudflare.com>, Lee Valentine <lvalentine@cloudflare.com>, 
+	kernel-team@cloudflare.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Kenjiro Nakayama wrote:
-> Currently, sendmmsg is implemented in udpgso_bench_tx.c,
-> but it is not called by any test script.
-> 
-> This patch adds a test for sendmmsg in udpgso_bench.sh.
-> This allows for basic API testing and benchmarking
-> comparisons with GSO.
-> 
-> Signed-off-by: Kenjiro Nakayama <nakayamakenjiro@gmail.com>
+On Wed, Dec 4, 2024 at 7:53=E2=80=AFPM Jakub Sitnicki <jakub@cloudflare.com=
+> wrote:
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+> A low effort alternative would be to introduce a new field to hold a
+> millisecond timestamp for measuring the TW reuse delay. However, this wou=
+ld
+> cause the struct tcp_timewait_socket size to go over 256 bytes and overfl=
+ow
+> into another cache line.
+
+s/tcp_timewait_socket/tcp_timewait_sock/
+
+Can you elaborate on this ?
+
+Due to SLUB management, note that timewait_sockets are not cache
+aligned, and use 264 bytes already:
+
+# grep tw_sock_TCP /proc/slabinfo
+tw_sock_TCPv6       3596   3596    264   62    4 : tunables    0    0
+  0 : slabdata     58     58      0
+tw_sock_TCP            0      0    264   62    4 : tunables    0    0
+  0 : slabdata      0      0      0
+
+In any case, there is one 4 byte hole in struct inet_timewait_sock
+after tw_priority
 
