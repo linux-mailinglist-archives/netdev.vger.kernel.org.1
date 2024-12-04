@@ -1,133 +1,148 @@
-Return-Path: <netdev+bounces-149124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 677BA9E4520
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 20:55:15 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42AF2167F8E
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 19:55:12 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 720E61E2306;
-	Wed,  4 Dec 2024 19:55:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="QMMJPqDy"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fad.mail.infomaniak.ch (smtp-8fad.mail.infomaniak.ch [83.166.143.173])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DC799E4524
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 20:55:48 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F21592391AA
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 19:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.173
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58E1E281662
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 19:55:47 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8801D13D246;
+	Wed,  4 Dec 2024 19:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="gMPQYgah"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12ED1E2306
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 19:55:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733342112; cv=none; b=gDcZrlPcTXSvOkD4fRXXDX7Pmd/KH3FkDrdYu/KPTAjSXqWUI7uGaDFqoO9TuhqEkxqxzd8GLhn/FozjgJVzPUAnU2OWC8WgZw7ULlG7yyElRGzyCvuMMiR5h7DoVL1VcKdy3I18Pvcp7LFGnylQ8l+DgsHs0B1l8tu6D40vgyM=
+	t=1733342144; cv=none; b=Ku/RZEf7+Kw1RwS1jzhjLQv14JOZPp3zMH6kqSBfn6oIIR8YF4b2FkMYlB1Kui3n/BFQpZuYhmVapPZPuz6VmfR3FNFl9Os1Z+a+7JwqZbX4Xgm/1/k53oWOvfD74GH9XNL6/1iyjr3IdXch6ixHxNUHvLaWi7W5Mb3sNw9uzZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733342112; c=relaxed/simple;
-	bh=vHAuC/R6TNyBolNqE628QMEx33T1ss5vZFp90xfN50U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ITwf0nLY4HHdoP8/CX3w4teT3EBHMthIHa4Rd/0SobX/MpsfgEc508LaHKA72Imba0KCrtcDENU8p7uEqLc4vNyKrvs+RmF9EZdyA5E56Dj36fiV1Ru8ZhqEHS/+mnvKewYgRaZdHMYGbtyjzf2Ri3V6RJlG3cGhvJLpMcsmda8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=QMMJPqDy; arc=none smtp.client-ip=83.166.143.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:7:10:40ca:feff:fe05:1])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Y3SRm4ZgbzM9k;
-	Wed,  4 Dec 2024 20:35:48 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1733340948;
-	bh=Ppph290bQK9LzZr8lqrr80UMjEXIdb3L4z4q0DP5jD8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QMMJPqDypdegal0TfnoNs8csaLih6bSKfunCWNtctpuo8a9e3QUU038XqFMwWTytq
-	 rjjObzDC1+LdQAWwsBCWxfPTWTK91DrxYgEQI7OeRtWeooVVgNtWmM5WFgDmX0DUYc
-	 zwANt2rhZSbeJDbyu7oMwYpCDgaXON56Fg4S44Ns=
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Y3SRm1CbTzrlN;
-	Wed,  4 Dec 2024 20:35:48 +0100 (CET)
-Date: Wed, 4 Dec 2024 20:35:47 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
-	gnoack@google.com, willemdebruijn.kernel@gmail.com, matthieu@buffet.re, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
-	MPTCP Linux <mptcp@lists.linux.dev>, David Laight <David.Laight@aculab.com>
-Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
-Message-ID: <20241204.acho8AiGh6ai@digikod.net>
-References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
- <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
- <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
- <20241018.Kahdeik0aaCh@digikod.net>
- <20241204.fahVio7eicim@digikod.net>
+	s=arc-20240116; t=1733342144; c=relaxed/simple;
+	bh=CeOjBpeAAe/HE62wEdy3wZFXQqIvcF+KJeEvW/pHdkI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JbgGi7VrZKta11PBC3Ke5NqFfAvO9m50uY7pzxX6xWnVvmsd8x9xVravmTG/AlOkajK6JlN4f2wmheWGoArS5u36TaZ/FdOpu4MVQIjCRHDujxuzzvQhw7tCC6Bx/ord25B7RpBpXVp/TL9p+s8dVzgxPssdzxW4mlE9Osv5gvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=gMPQYgah; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=18XpUNT0IQJaXnPA4auNYUD5Yk/7gx4IhcNkBHdEn5Y=; t=1733342142; x=1734206142; 
+	b=gMPQYgah5XEcjIuMerm20sW41AN9pvQcz+Sy5w4VsMvBQ+WJjwuWs6THN/9ngPHQn4bhYlcX3UX
+	i1OAMugH4UkwUmm2s1cdOo87g7sIgn/onSDd1Cm+TcB9BMq9n3rqDXodtVCgavVxeoLX6mPB9iQ41
+	Po0Zzfu89MdE2sMyfW18ddhEpqrQGR0lXO8Xstijnq0Hv0gXbFfXNajw11SnbGu6qSbyI/QeQJue7
+	WzCUI2mh8H9YIFDH3jzD2ziCi3vAzmN1YCtWGJEE+uefhOFFbpKiC7v/dGME/RB+qTpeVh4RN16Cz
+	neCFhnuDTNmF4JsNBulXfLuovhE3owFCmihw==;
+Received: from mail-oi1-f170.google.com ([209.85.167.170]:48260)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tIvTD-0000QJ-Je; Wed, 04 Dec 2024 11:55:36 -0800
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3ea5a7a5e48so115220b6e.0;
+        Wed, 04 Dec 2024 11:55:35 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWEMLX60Ys/UcSS5wUABLHXMSGl5KKrZ98GBeusosk+ColsZ2ruNo82eGHdpCL8HPYu71TIWTVXP6E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKfNXICknPUJ0Y+Hxw0j0QvvPikG4rcPVI/WaE6F7+ri7yO0vk
+	stlgOnD4M4JDrk794ctCyH4TA5DSc/zBpIucAyveB/RXTvCltxsQv5xHQbfa53yoHTlPlDbPYGs
+	rNHG2y+YGrOZbx00qLRnCKZTHXOo=
+X-Google-Smtp-Source: AGHT+IERmTpmkeV9y3TwKdPJYkPBPA77GwicIQKzVVsNG4qD0TfFmlSvdSlUWkMVuClVnWxMBu2Lg6gURQopRu1Jzy0=
+X-Received: by 2002:a05:6808:191e:b0:3e7:9f1f:b84a with SMTP id
+ 5614622812f47-3eae4f87a19mr6226697b6e.21.1733342135051; Wed, 04 Dec 2024
+ 11:55:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241204.fahVio7eicim@digikod.net>
-X-Infomaniak-Routing: alpha
+References: <20241111234006.5942-1-ouster@cs.stanford.edu> <20241111234006.5942-12-ouster@cs.stanford.edu>
+ <07647363-622b-4023-ba71-da213754a7ae@linux.alibaba.com>
+In-Reply-To: <07647363-622b-4023-ba71-da213754a7ae@linux.alibaba.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Wed, 4 Dec 2024 11:54:59 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmysiRx3VNDxXitPOn+yg2ck_+7fbd1XSsQQqZnwUEkvPQ@mail.gmail.com>
+Message-ID: <CAGXJAmysiRx3VNDxXitPOn+yg2ck_+7fbd1XSsQQqZnwUEkvPQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 11/12] net: homa: create homa_plumbing.c homa_utils.c
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, linux-api@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 5c460fe7d3aaafaf78d72307c0bc7e10
 
-On Wed, Dec 04, 2024 at 08:27:58PM +0100, Mickaël Salaün wrote:
-> On Fri, Oct 18, 2024 at 08:08:12PM +0200, Mickaël Salaün wrote:
-> > On Thu, Oct 17, 2024 at 02:59:48PM +0200, Matthieu Baerts wrote:
-> > > Hi Mikhail and Landlock maintainers,
-> > > 
-> > > +cc MPTCP list.
-> > 
-> > Thanks, we should include this list in the next series.
-> > 
-> > > 
-> > > On 17/10/2024 13:04, Mikhail Ivanov wrote:
-> > > > Do not check TCP access right if socket protocol is not IPPROTO_TCP.
-> > > > LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
-> > > > should not restrict bind(2) and connect(2) for non-TCP protocols
-> > > > (SCTP, MPTCP, SMC).
-> > > 
-> > > Thank you for the patch!
-> > > 
-> > > I'm part of the MPTCP team, and I'm wondering if MPTCP should not be
-> > > treated like TCP here. MPTCP is an extension to TCP: on the wire, we can
-> > > see TCP packets with extra TCP options. On Linux, there is indeed a
-> > > dedicated MPTCP socket (IPPROTO_MPTCP), but that's just internal,
-> > > because we needed such dedicated socket to talk to the userspace.
-> > > 
-> > > I don't know Landlock well, but I think it is important to know that an
-> > > MPTCP socket can be used to discuss with "plain" TCP packets: the kernel
-> > > will do a fallback to "plain" TCP if MPTCP is not supported by the other
-> > > peer or by a middlebox. It means that with this patch, if TCP is blocked
-> > > by Landlock, someone can simply force an application to create an MPTCP
-> > > socket -- e.g. via LD_PRELOAD -- and bypass the restrictions. It will
-> > > certainly work, even when connecting to a peer not supporting MPTCP.
-> > > 
-> > > Please note that I'm not against this modification -- especially here
-> > > when we remove restrictions around MPTCP sockets :) -- I'm just saying
-> > > it might be less confusing for users if MPTCP is considered as being
-> > > part of TCP. A bit similar to what someone would do with a firewall: if
-> > > TCP is blocked, MPTCP is blocked as well.
-> > 
-> > Good point!  I don't know well MPTCP but I think you're right.  Given
-> > it's close relationship with TCP and the fallback mechanism, it would
-> > make sense for users to not make a difference and it would avoid bypass
-> > of misleading restrictions.  Moreover the Landlock rules are simple and
-> > only control TCP ports, not peer addresses, which seems to be the main
-> > evolution of MPTCP.
-> 
-> Thinking more about this, this makes sense from the point of view of the
-> network stack, but looking at external (potentially bogus) firewalls or
-> malware detection systems, it is something different.  If we don't
-> provide a way for users to differenciate the control of SCTP from TCP,
-> malicious use of SCTP could still bypass this kind of bogus security
-> appliances.  It would then be safer to stick to the protocol semantic by
-> clearly differenciating TCP from MPTCP (or any other protocol).
-> 
-> Mikhail, could you please send a new patch series containing one patch
-> to fix the kernel and another to extend tests?
+On Mon, Nov 25, 2024 at 9:32=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.com=
+> wrote:
+> On 11/12/24 7:40 AM, John Ousterhout wrote:
+> > +static struct proto homav6_prot =3D {
+> > ...
+> > +     .obj_size          =3D sizeof(struct homa_sock) + sizeof(struct i=
+pv6_pinfo),
+>
+> The implementation of inet6_sk_generic() has already changed, you should =
+set
+> .ipv6_pinfo_offset.
 
-No need to squash them in one, please keep the current split of the test
-patches.  However, it would be good to be able to easily backport them,
-or at least the most relevant for this fix, which means to avoid
-extended refactoring.
+Fixed.
+
+> > +static int __init homa_load(void)
+> > ...
+> > +     inet_register_protosw(&homa_protosw);
+> > +     inet6_register_protosw(&homav6_protosw);
+>
+>
+> better to check the retval of inet6_register_protosw().
+
+Fixed.
+
+> > +out_cleanup:
+> > +     homa_destroy(homa);
+> > +     inet_del_protocol(&homa_protocol, IPPROTO_HOMA);
+> > +     inet_unregister_protosw(&homa_protosw);
+> > +     inet6_del_protocol(&homav6_protocol, IPPROTO_HOMA);
+> > +     inet6_unregister_protosw(&homav6_protosw);
+> > +     proto_unregister(&homa_prot);
+> > +     proto_unregister(&homav6_prot);
+>
+>
+> It's a bit strange for me that this relies on a premise: that every rever=
+se operation can correctly
+> identify whether the corresponding forward operation has been executed. C=
+urrently, perhaps every
+> function includes this capability. It's up to you, I don't insist.
+
+Actually, not all of the cleanup functions are safe if the initializer
+hasn't been invoked; good catch. I've fixed this now.
+
+> Perhaps you can try adding MODULE_ALIAS_NET_PF_PROTO_TYPE so that the ker=
+nel will automatically load
+> the module when creating IPPROTO_HOMA socket. A functional suggestion, It=
+'s up to you.
+
+Done; thanks for the suggestion (I wasn't aware of this feature).
+
+> Is binding multiple times legal? For example, bind 80 first and then bind=
+ 8080. If not, I think
+> you might need to check the inet_num.
+
+Yes, it's legal.
+
+> I noticed that homa_sock_init() contains a memory allocation action, perh=
+aps you should add a return
+> value check.
+
+Oops; I've fixed this now.
+
+Thanks for all the comments.
+
+-John-
 
