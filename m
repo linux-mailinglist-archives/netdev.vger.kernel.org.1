@@ -1,144 +1,147 @@
-Return-Path: <netdev+bounces-148940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78A769E390E
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 12:42:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 051559E3982
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DDFD282C6E
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:42:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3E34B248A8
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 11:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1EB1B392F;
-	Wed,  4 Dec 2024 11:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80EB81B392F;
+	Wed,  4 Dec 2024 11:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mgmI0N14"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IsfxExCE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284941AE863;
-	Wed,  4 Dec 2024 11:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3FD1AE863
+	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 11:43:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733312546; cv=none; b=GCTByFqlPt5BiI7X+d6FDYjhQJ6xPEBjEFvQLMSVB8vZjFP96oT+heXhBMmSVUyTp3nmFD+tT5X7mw35K4gAWsubWFudpsyOV7mwhvf+GDn0rDI2dHxPxrlub+lFHxc9YC4LyaPxpJSuSe9U6UI8KcZckm1RcieK4vRTjfOyTmA=
+	t=1733312608; cv=none; b=lwFO3uGK6utz2oIhmOhvL8mFKH5KKXrthp03flHL0V39ZH4xObJIe2oQDtm7bOPZriX9DySQLnG08HXdeRY7czVCHD2Syp/IBjY7RTpUGkNccAZy12k3sJrC49HmXLcOsnNzar62KCFMalKR/5nLFW0D752JcKsIdVXxx1WT/Ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733312546; c=relaxed/simple;
-	bh=JfGLt86JfMp+l2oMWcRQN9UvEP1p3aKLpmiuThKuOCM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d5paqEuaDSt/0SBaKkFyyNaVYDdfX8bVz78Vy6rfDmtbOQ/7140scslB3oJNLdJRVGXqk6Gk5kvkMRJFI/SeqISlNixwB2z7okLPLC4GWze15Lw+JJJlVod8LTOIi2Q4MDUxwab/bupGTX1Mw4pCDZWb2SKco5qlcTpv2pIPAoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mgmI0N14; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-382610c7116so4440746f8f.0;
-        Wed, 04 Dec 2024 03:42:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733312543; x=1733917343; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2UA0b79SK+4P39kH716wuDD02mSgK0ycMPPEkZWb8AU=;
-        b=mgmI0N146rKYkGxUhPJA6q96tNsExqDyueZzA2Ysve7PViwDLInYubENH2DdPl06Ld
-         8GfLCgCf/Az40iXJOBPBNeFQoecnxPeRH9agq4jIdygNQ+xaaY1gUFIpvivxsIOSiPMF
-         0G2n3BPP01xF7Jc4upJ/hgZPMxp6PoOW0kjagvV4PxzGFzo8JvF+vcfZ72eW7Zanao8l
-         xkP1I1owM7B48cPIlDXwRdSL9aQThcj6zbqfqZNpovEk0+5xHytgD4qYeytdNbzH8MOs
-         U7Qryfb5dCiymelSDp4ObQZbX1BKfBcjIKFGpkLW2SmdaWhj6Tlexzt4/CBjPiT/6ZDO
-         ufug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733312543; x=1733917343;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2UA0b79SK+4P39kH716wuDD02mSgK0ycMPPEkZWb8AU=;
-        b=uLD5ZRz7+nSAt/xntsi+ivSCjhhsR6LA23BuUftgWdJxbQMgRt11egpJeuxfv0dK2Z
-         YaTE7vgV/+w2EIQFq3qkTaV7OCOGxkKiXfvccZRu+smExPHjWkfDAaderUZASITOgZqr
-         RDYdSnfT4JU6JMyw/Ge99kdZMxUiH3DD+gNH2gnxQVSJ3lQxPqfxFx4mWX6szIwCiOhL
-         /xGD8rsDi0RjBA+kIIjLsHghtddbTN9EhV/qP5n5UX6OLK8QDZxwNcZDxHUIESTkCgkM
-         1R9dH+zi/qxLCqt0VbpY28mfi43rjFxOcKfN+e5azDOgalie55L7H/NCQup56a3w4nMr
-         2HsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUD2weGQkb+QmjqXzU8jQKLI9qxvEK8n3Tj0U4lAYL09K9Fffhg91K5KAttIOb0A+7CRJxB7UhxpbRfGQ==@vger.kernel.org, AJvYcCUyF2Ijs9e5WmSi/eMtg64Lw8fwvChR1BgVmiRqRXT1Pt4+dYSxJKeuxMr8Ig/jlcF5utFo4SzY1DBBhz8c@vger.kernel.org, AJvYcCWbKYsFM4qEJWdP5pgjRpGKiyquSlMc6SUV2FdwTV01YKQkdvSPAGdVc7WhTsvPxKI3oIVDvnCD@vger.kernel.org, AJvYcCXbtI0hhtOrEzYu9yUWm4RumDOE9aKjGsA6G83xsNOjVHpIoRbsvEVXwlBWbvvx9VdVw58sNdotYFr/RBlFDaY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVLTwLUSgi9dQQE/dPXAm8X7KKqloo5mzlDYXkivRWArksBV62
-	vnN7PswkaY33VMJz0T8IpDC2+XARwuHMuZP0eRGKQHAoQJ0IVXzK
-X-Gm-Gg: ASbGncuu00HbZKfrWmFDj569GgQkn/OYKrtG/Qj3nFE6Q9Aparn3YzGlVnQJTnIxBb5
-	7E8H9Si0Rvo6iDqRFO7WPHcKDswzEiHBUnOoFhtA5O/+DLYbcNafPXgFg1dc5/D2NRTCMMtT8Gn
-	XMov5R1q0LFKjarvjrXxyGNOgqsK6x5ildP4i6RdAQaqtKiYV2zjXtkN12LRvmnu4Q0qVTnyFbj
-	+8twOJzV1jHazuZ2rMDCydjzMa0DDpc31wEkiU9HATcfwcJ/irVY2Z2kb7ndrWxaHs9foE=
-X-Google-Smtp-Source: AGHT+IE0/j/X2n/zINy4aZRLBv+W4/ETg0gFc43Cr7FW8pBuls7jIQHjRV8Rp8rEiiqyXtZBK+15xA==
-X-Received: by 2002:a05:6000:144e:b0:385:ebea:969d with SMTP id ffacd0b85a97d-385fd3ee279mr5260414f8f.22.1733312543032;
-        Wed, 04 Dec 2024 03:42:23 -0800 (PST)
-Received: from [172.27.34.104] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d5280746sm21691035e9.21.2024.12.04.03.42.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2024 03:42:22 -0800 (PST)
-Message-ID: <cd5d7a20-7c34-4d0a-8f75-3cfca5f30b8a@gmail.com>
-Date: Wed, 4 Dec 2024 13:42:14 +0200
+	s=arc-20240116; t=1733312608; c=relaxed/simple;
+	bh=4v0v9qQtQLCUVhLiNStaE4ijGcjZsY4IBnD1mAfV4Ys=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FQxu0fush9XZT9vTFCjybNQYTdnA9l5uI75MXnBEXIkGFFWocM/pMnNtXxMeEpQ5eG5qovlxbcicCS/vZwr2xhHxt0Dw9Pwh/nRZV+94eVCBVCaF9b8EQmnknveivvz344ZO0dWpHj0pAkO3J29196xNLErmI1k1iJfqNSX9uC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IsfxExCE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733312605;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nWlMtLT9W/JE0sDV4ETleqSg3lVaVJyih/3HfM+FmPw=;
+	b=IsfxExCES8pJZNShP79LD9fOk2H/PjV9AYX+nCPjbRdXUCEcB/c7bdKYXKki5qbN0d5GKP
+	JySR4tlLB/x4P9x7o37QCCkLkRdFDnvKaAN18pfEDsTiijI3FLY3qx8+4HD8Oc9+h5IRKQ
+	t9IQk4JgKtwgQyaTnoO7EYonwJTVZlA=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-118-i9Q0F52zP_eqrXOK9_WW0w-1; Wed,
+ 04 Dec 2024 06:43:22 -0500
+X-MC-Unique: i9Q0F52zP_eqrXOK9_WW0w-1
+X-Mimecast-MFC-AGG-ID: i9Q0F52zP_eqrXOK9_WW0w
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BD6861955F39;
+	Wed,  4 Dec 2024 11:43:19 +0000 (UTC)
+Received: from wcosta-thinkpadt14gen4.rmtbr.csb (unknown [10.22.88.52])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 318A53000197;
+	Wed,  4 Dec 2024 11:43:12 +0000 (UTC)
+From: Wander Lairson Costa <wander@redhat.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Jeff Garzik <jgarzik@redhat.com>,
+	Auke Kok <auke-jan.h.kok@intel.com>,
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list),
+	linux-rt-devel@lists.linux.dev (open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT)
+Cc: Wander Lairson Costa <wander@redhat.com>
+Subject: [PATCH iwl-net 0/4] igb: fix igb_msix_other() handling for PREEMPT_RT
+Date: Wed,  4 Dec 2024 08:42:23 -0300
+Message-ID: <20241204114229.21452-1-wander@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] net/mlx5: DR, prevent potential error pointer
- dereference
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- Yevgeny Kliteynik <kliteyn@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Muhammad Sammar <muhammads@nvidia.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org
-References: <Z07TKoNepxLApF49@stanley.mountain>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <Z07TKoNepxLApF49@stanley.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+
+This is the second attempt at fixing the behavior of igb_msix_other()
+for PREEMPT_RT. The previous attempt [1] was reverted [2] following
+concerns raised by Sebastian [3].
+
+The initial approach proposed converting vfs_lock to a raw_spinlock,
+a minor change intended to make it safe. However, it became evident
+that igb_rcv_msg_from_vf() invokes kcalloc with GFP_ATOMIC,
+which is unsafe in interrupt context on PREEMPT_RT systems.
+
+To address this, the solution involves splitting igb_msg_task()
+into two parts:
+
+    * One part invoked from the IRQ context.
+    * Another part called from the threaded interrupt handler.
+
+To accommodate this, vfs_lock has been restructured into a double
+lock: a spinlock_t and a raw_spinlock_t. In the revised design:
+
+    * igb_disable_sriov() locks both spinlocks.
+    * Each part of igb_msg_task() locks the appropriate spinlock for
+    its execution context.
+
+It is worth noting that the double lock mechanism is only active under
+PREEMPT_RT. For non-PREEMPT_RT builds, the additional raw_spinlock_t
+field is ommited.
+
+If the extra raw_spinlock_t field can be tolerated under
+!PREEMPT_RT (even though it remains unused), we can eliminate the
+need for #ifdefs and simplify the code structure.
+
+I will be on vacation from December 7th to Christmas and will address
+review comments upon my return.
+
+If possible, I kindly request the Intel team to perform smoke tests
+on both stock and realtime kernels to catch any potential issues with
+this patch series.
+
+Cheers,
+Wander
+
+[1] https://lore.kernel.org/all/20240920185918.616302-2-wander@redhat.com/
+[2] https://lore.kernel.org/all/20241104124050.22290-1-wander@redhat.com/
+[3] https://lore.kernel.org/all/20241104110708.gFyxRFlC@linutronix.de/
 
 
+Wander Lairson Costa (4):
+  igb: narrow scope of vfs_lock in SR-IOV cleanup
+  igb: introduce raw vfs_lock to igb_adapter
+  igb: split igb_msg_task()
+  igb: fix igb_msix_other() handling for PREEMPT_RT
 
-On 03/12/2024 11:45, Dan Carpenter wrote:
-> The dr_domain_add_vport_cap() function generally returns NULL on error
-> but sometimes we want it to return ERR_PTR(-EBUSY) so the caller can
-> retry.  The problem here is that "ret" can be either -EBUSY or -ENOMEM
-> and if it's and -ENOMEM then the error pointer is propogated back and
-> eventually dereferenced in dr_ste_v0_build_src_gvmi_qpn_tag().
-> 
-> Fixes: 11a45def2e19 ("net/mlx5: DR, Add support for SF vports")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
-> ---
-> v2: Fix a typo in the commit message.  "generally".
-> 
->   .../net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c    | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
-> index 3d74109f8230..a379e8358f82 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
-> @@ -297,6 +297,8 @@ dr_domain_add_vport_cap(struct mlx5dr_domain *dmn, u16 vport)
->   	if (ret) {
->   		mlx5dr_dbg(dmn, "Couldn't insert new vport into xarray (%d)\n", ret);
->   		kvfree(vport_caps);
-> +		if (ret != -EBUSY)
-> +			return NULL;
->   		return ERR_PTR(ret);
->   	}
->   
+ drivers/net/ethernet/intel/igb/igb.h      |   4 +
+ drivers/net/ethernet/intel/igb/igb_main.c | 160 +++++++++++++++++++---
+ 2 files changed, 148 insertions(+), 16 deletions(-)
 
-Thanks for your patch.
-
-It would be clearer to the reader if you test against -EBUSY and return 
-ERR_PTR(-EBUSY).
-Otherwise, return NULL.
-
-Or at least modify ERR_PTR(ret) to be ERR_PTR(-EBUSY).
-
-Keeping "return ERR_PTR(ret);" does not make it clear that we have only 
-2 possible return values here.
+-- 
+2.47.0
 
 
