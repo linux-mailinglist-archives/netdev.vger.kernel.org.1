@@ -1,472 +1,267 @@
-Return-Path: <netdev+bounces-148989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-148991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B5B79E3BAD
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:51:26 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30C62163DB8
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:51:23 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C831BBBD7;
-	Wed,  4 Dec 2024 13:51:23 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from stargate.chelsio.com (stargate.chelsio.com [12.32.117.8])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A312B9E3BD9
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 14:57:32 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425AD1AF0C6
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 13:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=12.32.117.8
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FC7B280D7D
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 13:57:31 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3FB1F6680;
+	Wed,  4 Dec 2024 13:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRg329UB"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C991714CF;
+	Wed,  4 Dec 2024 13:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733320283; cv=none; b=OOl1PjF4hcSMZzXzfJi/muHqdxbcV20d/PX7hdLOE/yKBYDOdQ7UI25ripPZHCSXUi5bRuYDmbdXcbjSB6zqZgnfrNCFMFrCinbuhSdD+++jh9AXaIVnd1IxkSUT/ZNMoLUm4x2Rb4pLf+d9pdMtJ/6jfUGcghZGm1374JTHS/o=
+	t=1733320648; cv=none; b=saUQf3QuKRy4PvVp7MZD5whwWroSFQ2v2zjtrvoGpxS3Ex96tlbOf0NYjg2s+irYRFqs9Sclahuq9ysSxqBJ+iU8/f+RYqjncdMAev8/gaNqokl5pmX+QPJ9rqZDE6wJuRzXCB3BDK7gs9rsnLFFZpJLFL9gnpG6GwxeP59djmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733320283; c=relaxed/simple;
-	bh=4/iY0f+algWqbjlcrCEq9/HqzByTZcj67eoyGs58ghc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d5qGHMUgjJF2CuQUS2RU22ROH85s6y6MxUBx1gQmju359GLNYLwQa1gYIEqe0gjx0llXAE3eUMN2wXaAhVpB/xmt4d5ilkcM/AMzXALLdIM5x/3tYM8g4741sKhHQWCeds48x8fdZjeZd4ClsRxIHHiUCMReX88uIyAbDPOjDwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chelsio.com; spf=pass smtp.mailfrom=chelsio.com; arc=none smtp.client-ip=12.32.117.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chelsio.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chelsio.com
-Received: from beagle5.blr.asicdesigners.com (beagle5.blr.asicdesigners.com [10.193.80.119])
-	by stargate.chelsio.com (8.14.7/8.14.7) with ESMTP id 4B4Dp7RS022573;
-	Wed, 4 Dec 2024 05:51:08 -0800
-From: Anumula Murali Mohan Reddy <anumula@chelsio.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, andrew+netdev@lunn.ch,
-        pabeni@redhat.com, bharat@chelsio.com,
-        Anumula Murali Mohan Reddy <anumula@chelsio.com>
-Subject: [PATCH net-next] cxgb4: add driver support for FW_CLIP2_CMD
-Date: Wed,  4 Dec 2024 19:24:16 +0530
-Message-Id: <20241204135416.14041-1-anumula@chelsio.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1733320648; c=relaxed/simple;
+	bh=6+TBcPrfe/oXABK/XUblh6pvMZCC+EgX4etXvq21B3k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JhGEsn3cofYqbeMnVG3a/y6nWaH+wahAdEWCsu7x85uaX8rPiZDxKQtTcMRu5hDeVQ2DUZ3LZwRV4/Exl+sEjdVQDoXKqxN8O91g1oYFd0nTWHUvol/5vwcjPOBkUCrQww9B6GmY9VZKvAGDDnLpjQncHSAr8inTWFxnPf8QScU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRg329UB; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-434a45f05feso83164745e9.3;
+        Wed, 04 Dec 2024 05:57:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733320645; x=1733925445; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XC2czeLIMR1ljMUddmL8ssFZF/jsYoIl4rjVYGqN4Ys=;
+        b=eRg329UB59PLSJMpFcLpNWeYFGiwiRBx+Rxg3/woRS0EPCVSCKuu7ktAKKmgFdYRfK
+         QEVWnFolZRHQcNtxZRK4WL1hGxHo9T4zgSjcbVtifbBDX9J0FbUhgIuUyNDs5IiR6ABU
+         lQRWduMELRDAzwuKVJFdYxxZqXDRt0/R9lxliCAG8qqgFjSOIY0tww1vCuY+Tck17aqR
+         oUgarrnoGRwbIPp29ehuuN4h4ybwyucWHc/Ldha53pCShTdVL0HFQZyJkFiRKZDlIbpb
+         XPhN8hBzbKtcf8pt2TyND2qhbTOK/j6GPw4KS8JjgIbBbfyXxKsO1q/RiLXrgOgMNpgU
+         1wgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733320645; x=1733925445;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XC2czeLIMR1ljMUddmL8ssFZF/jsYoIl4rjVYGqN4Ys=;
+        b=eQy2gGn/PDD2S6CqJaVpLi/lpB3hN+KZEB1LNHWsgt0BUkCuGzfwZOPX9m9j/lnfki
+         3J1lGK7X90TOI7y79jUp8L/4G+0X5MINMzsU1/qi175emY4j/KI8b6ZLEq1l903c+/F/
+         aUzy0HcKDQZ3/cQZWdteNrRBJy3k+r6LbOl32oekscGIHuqj6LtDvq9O6qKxBntb0e4E
+         aBXZ3B0FHAOovBX3TCz8jx+TxlnLAq67Nj2OM23ZLJsM2buzxqTRm0a61cA8bmh+9gxp
+         DkVMY2InQOLjtAP0j3OEqCdWnD2b9QD94uOzB2RFOSzzVCgh+tx/vvcqHZlnXP16nS6h
+         5ZYg==
+X-Forwarded-Encrypted: i=1; AJvYcCUxfes8xVVSQ+OtOUD6Hxga3qPidBuNPKnNFTR3nSH7N1rydLBkEskGByVXrJVQBp6hfl8UTyhwRzjKGzM=@vger.kernel.org, AJvYcCVDDx1/TUGpqrE9Yta8vM56AI4e0RhJlTZOvPwohXcoOjtUv/BcCi+Y0NWpfDCjOgbDpc3xotwag5ECyyM=@vger.kernel.org, AJvYcCXHDFCA1dgeNN5ztxo4fbmmjwLO2dwofcMqnVkU5iANNnyJMwKgKFVNyb7TQyrsnnc2r2fyueme@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKny65xZGaXcIP+2QhDYDcZc/RMa7fCuSexIVswOJ9He85aNUG
+	L3JT8xj0P8kMQ4HFxD2SQVMcV+U8y2cWHIAPQNJNLaPsutOOKNrgCX+TlQ==
+X-Gm-Gg: ASbGncv2bN6GVa+AqpMTC8r9dH4Ip5qUtbADkNljuBiCA56gX97vGEj37JIVeH/4Df+
+	Gt40LT0dW5qIRqg5dQy3w+4CferDiPU8fOF6gpZHOJ74nhs9t2S4PKwR+Pn4zFDhgmkPC6LS3zj
+	kvO9UA+G2IRYjxIvuI+qNN2nyiS4Zu1spvl8ZJu+2AScXqgr8w1xjr8yB4YCfqBD9oN0xjBmkFh
+	ujS3Jdg7dELb+PE4lCrrhYqcp5AT1DIvouiEVJ4olKeXvf2Ad2CouBDVGj1DKnElXAIwiLGe9mP
+	KGbp+k7/Lnm20pEugtLAPas8ZaPvalIfUiX9
+X-Google-Smtp-Source: AGHT+IESrS7F5pAFW9SFnplSDX50OEMdHr9ntPWIG4+JKzyt3WAMSzmP9BE88ArVJGsaiGG1mZzXtQ==
+X-Received: by 2002:a05:6000:156c:b0:385:df4e:364b with SMTP id ffacd0b85a97d-385fd3cd9edmr6104259f8f.12.1733320645039;
+        Wed, 04 Dec 2024 05:57:25 -0800 (PST)
+Received: from orome (p200300e41f281900f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f28:1900:f22f:74ff:fe1f:3a53])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385e2c84d52sm13683244f8f.49.2024.12.04.05.57.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 05:57:24 -0800 (PST)
+Date: Wed, 4 Dec 2024 14:57:22 +0100
+From: Thierry Reding <thierry.reding@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com, 
+	Suraj Jaiswal <quic_jsuraj@quicinc.com>, Thierry Reding <treding@nvidia.com>, 
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH net v1] net: stmmac: TSO: Fix unbalanced DMA map/unmap
+ for non-paged SKB data
+Message-ID: <klkzp5yn5kq5efgtrow6wbvnc46bcqfxs65nz3qy77ujr5turc@bwwhelz2l4dw>
+References: <20241021061023.2162701-1-0x1207@gmail.com>
+ <d8112193-0386-4e14-b516-37c2d838171a@nvidia.com>
+ <20241128144501.0000619b@gmail.com>
+ <20241202163309.05603e96@kernel.org>
+ <20241203100331.00007580@gmail.com>
+ <20241202183425.4021d14c@kernel.org>
+ <20241203111637.000023fe@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="vsdx7r52oh4np25i"
+Content-Disposition: inline
+In-Reply-To: <20241203111637.000023fe@gmail.com>
 
-Query firmware for FW_CLIP2_CMD support and enable it. FW_CLIP2_CMD
-will be used for setting LIP mask for the corresponding entry in the
-CLIP table. If no LIP mask is specified, a default value of ~0 is
-written for mask.
 
-Signed-off-by: Anumula Murali Mohan Reddy <anumula@chelsio.com>
-Signed-off-by: Potnuri Bharat Teja <bharat@chelsio.com>
----
- drivers/net/ethernet/chelsio/cxgb4/clip_tbl.c | 146 ++++++++++++++----
- drivers/net/ethernet/chelsio/cxgb4/clip_tbl.h |   6 +-
- drivers/net/ethernet/chelsio/cxgb4/cxgb4.h    |   1 +
- .../net/ethernet/chelsio/cxgb4/cxgb4_filter.c |  23 ++-
- .../net/ethernet/chelsio/cxgb4/cxgb4_main.c   |   3 +
- drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h |  12 ++
- 6 files changed, 152 insertions(+), 39 deletions(-)
+--vsdx7r52oh4np25i
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net v1] net: stmmac: TSO: Fix unbalanced DMA map/unmap
+ for non-paged SKB data
+MIME-Version: 1.0
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.c b/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.c
-index 5060d3998889..8da9e7fe7f65 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.c
-@@ -18,6 +18,8 @@
- #include "cxgb4.h"
- #include "clip_tbl.h"
- 
-+static const u64 clip_ipv6_exact_mask[2] = { ~0, ~0 };
-+
- static inline unsigned int ipv4_clip_hash(struct clip_tbl *c, const u32 *key)
- {
- 	unsigned int clipt_size_half = c->clipt_size / 2;
-@@ -42,36 +44,73 @@ static unsigned int clip_addr_hash(struct clip_tbl *ctbl, const u32 *addr,
- }
- 
- static int clip6_get_mbox(const struct net_device *dev,
--			  const struct in6_addr *lip)
-+			  const struct in6_addr *lip,
-+			  const struct in6_addr *lipm)
- {
- 	struct adapter *adap = netdev2adap(dev);
--	struct fw_clip_cmd c;
-+	struct fw_clip2_cmd c;
-+
-+	if (!adap->params.clip2_cmd_support) {
-+		struct fw_clip_cmd old_cmd;
-+
-+		memset(&old_cmd, 0, sizeof(old_cmd));
-+		old_cmd.op_to_write = htonl(FW_CMD_OP_V(FW_CLIP_CMD) |
-+					    FW_CMD_REQUEST_F | FW_CMD_WRITE_F);
-+		old_cmd.alloc_to_len16 = htonl(FW_CLIP_CMD_ALLOC_F |
-+					       FW_LEN16(old_cmd));
-+		*(__be64 *)&old_cmd.ip_hi = *(__be64 *)(lip->s6_addr);
-+		*(__be64 *)&old_cmd.ip_lo = *(__be64 *)(lip->s6_addr + 8);
-+
-+		return t4_wr_mbox_meat(adap, adap->mbox, &old_cmd,
-+				       sizeof(old_cmd), &old_cmd, false);
-+	}
- 
- 	memset(&c, 0, sizeof(c));
--	c.op_to_write = htonl(FW_CMD_OP_V(FW_CLIP_CMD) |
-+	c.op_to_write = htonl(FW_CMD_OP_V(FW_CLIP2_CMD) |
- 			      FW_CMD_REQUEST_F | FW_CMD_WRITE_F);
- 	c.alloc_to_len16 = htonl(FW_CLIP_CMD_ALLOC_F | FW_LEN16(c));
- 	*(__be64 *)&c.ip_hi = *(__be64 *)(lip->s6_addr);
- 	*(__be64 *)&c.ip_lo = *(__be64 *)(lip->s6_addr + 8);
-+	*(__be64 *)&c.ipm_hi = *(__be64 *)(lipm->s6_addr);
-+	*(__be64 *)&c.ipm_lo = *(__be64 *)(lipm->s6_addr + 8);
- 	return t4_wr_mbox_meat(adap, adap->mbox, &c, sizeof(c), &c, false);
- }
- 
- static int clip6_release_mbox(const struct net_device *dev,
--			      const struct in6_addr *lip)
-+			      const struct in6_addr *lip,
-+			      const struct in6_addr *lipm)
- {
- 	struct adapter *adap = netdev2adap(dev);
--	struct fw_clip_cmd c;
-+	struct fw_clip2_cmd c;
-+
-+	if (!adap->params.clip2_cmd_support) {
-+		struct fw_clip_cmd old_cmd;
-+
-+		memset(&old_cmd, 0, sizeof(old_cmd));
-+		old_cmd.op_to_write = htonl(FW_CMD_OP_V(FW_CLIP_CMD) |
-+					    FW_CMD_REQUEST_F | FW_CMD_WRITE_F);
-+		old_cmd.alloc_to_len16 = htonl(FW_CLIP_CMD_FREE_F |
-+					       FW_LEN16(old_cmd));
-+		*(__be64 *)&old_cmd.ip_hi = *(__be64 *)(lip->s6_addr);
-+		*(__be64 *)&old_cmd.ip_lo = *(__be64 *)(lip->s6_addr + 8);
-+
-+		return t4_wr_mbox_meat(adap, adap->mbox, &old_cmd,
-+				       sizeof(old_cmd), &old_cmd, false);
-+	}
- 
- 	memset(&c, 0, sizeof(c));
--	c.op_to_write = htonl(FW_CMD_OP_V(FW_CLIP_CMD) |
--			      FW_CMD_REQUEST_F | FW_CMD_READ_F);
-+	c.op_to_write = htonl(FW_CMD_OP_V(FW_CLIP2_CMD) |
-+			      FW_CMD_REQUEST_F | FW_CMD_WRITE_F);
- 	c.alloc_to_len16 = htonl(FW_CLIP_CMD_FREE_F | FW_LEN16(c));
- 	*(__be64 *)&c.ip_hi = *(__be64 *)(lip->s6_addr);
- 	*(__be64 *)&c.ip_lo = *(__be64 *)(lip->s6_addr + 8);
-+	*(__be64 *)&c.ipm_hi = *(__be64 *)(lipm->s6_addr);
-+	*(__be64 *)&c.ipm_lo = *(__be64 *)(lipm->s6_addr + 8);
-+
- 	return t4_wr_mbox_meat(adap, adap->mbox, &c, sizeof(c), &c, false);
- }
- 
--int cxgb4_clip_get(const struct net_device *dev, const u32 *lip, u8 v6)
-+static int clip_get(const struct net_device *dev, const u32 *lip, const u32 *lipm, u8 v6)
- {
- 	struct adapter *adap = netdev2adap(dev);
- 	struct clip_tbl *ctbl = adap->clipt;
-@@ -82,17 +121,23 @@ int cxgb4_clip_get(const struct net_device *dev, const u32 *lip, u8 v6)
- 
- 	if (!ctbl)
- 		return 0;
-+	if (!lipm)
-+		lipm = (const u32 *)clip_ipv6_exact_mask;
- 
- 	hash = clip_addr_hash(ctbl, addr, v6);
- 
- 	read_lock_bh(&ctbl->lock);
- 	list_for_each_entry(cte, &ctbl->hash_list[hash], list) {
--		if (cte->addr6.sin6_family == AF_INET6 && v6)
--			ret = memcmp(lip, cte->addr6.sin6_addr.s6_addr,
--				     sizeof(struct in6_addr));
--		else if (cte->addr.sin_family == AF_INET && !v6)
--			ret = memcmp(lip, (char *)(&cte->addr.sin_addr),
--				     sizeof(struct in_addr));
-+		if (cte->val.addr6.sin6_family == AF_INET6 && v6)
-+			ret = (memcmp(lip, &cte->val.addr6.sin6_addr.s6_addr,
-+				      sizeof(struct in6_addr)) ||
-+			       memcmp(lipm, &cte->mask.addr6.sin6_addr.s6_addr,
-+				      sizeof(struct in6_addr)));
-+		else if (cte->val.addr.sin_family == AF_INET && !v6)
-+			ret = (memcmp(lip, (char *)(&cte->val.addr.sin_addr),
-+				      sizeof(struct in_addr)) ||
-+			       memcmp(lipm, (char *)(&cte->mask.addr.sin_addr),
-+				      sizeof(struct in_addr)));
- 		if (!ret) {
- 			ce = cte;
- 			read_unlock_bh(&ctbl->lock);
-@@ -112,22 +157,29 @@ int cxgb4_clip_get(const struct net_device *dev, const u32 *lip, u8 v6)
- 		atomic_dec(&ctbl->nfree);
- 		list_add_tail(&ce->list, &ctbl->hash_list[hash]);
- 		if (v6) {
--			ce->addr6.sin6_family = AF_INET6;
--			memcpy(ce->addr6.sin6_addr.s6_addr,
-+			ce->val.addr6.sin6_family = AF_INET6;
-+			ce->mask.addr6.sin6_family = AF_INET6;
-+			memcpy(ce->val.addr6.sin6_addr.s6_addr,
- 			       lip, sizeof(struct in6_addr));
--			ret = clip6_get_mbox(dev, (const struct in6_addr *)lip);
-+			memcpy(ce->mask.addr6.sin6_addr.s6_addr,
-+			       lipm, sizeof(struct in6_addr));
-+			ret = clip6_get_mbox(dev, (const struct in6_addr *)lip,
-+					     (const struct in6_addr *)lipm);
- 			if (ret) {
- 				write_unlock_bh(&ctbl->lock);
- 				dev_err(adap->pdev_dev,
- 					"CLIP FW cmd failed with error %d, "
- 					"Connections using %pI6c won't be "
- 					"offloaded",
--					ret, ce->addr6.sin6_addr.s6_addr);
-+					ret, ce->val.addr6.sin6_addr.s6_addr);
- 				return ret;
- 			}
- 		} else {
--			ce->addr.sin_family = AF_INET;
--			memcpy((char *)(&ce->addr.sin_addr), lip,
-+			ce->val.addr.sin_family = AF_INET;
-+			ce->mask.addr.sin_family = AF_INET;
-+			memcpy((char *)(&ce->val.addr.sin_addr), lip,
-+			       sizeof(struct in_addr));
-+			memcpy((char *)(&ce->mask.addr.sin_addr), lipm,
- 			       sizeof(struct in_addr));
- 		}
- 	} else {
-@@ -141,9 +193,20 @@ int cxgb4_clip_get(const struct net_device *dev, const u32 *lip, u8 v6)
- 	refcount_set(&ce->refcnt, 1);
- 	return 0;
- }
-+
-+int cxgb4_clip_get(const struct net_device *dev, const u32 *lip, u8 v6)
-+{
-+	return clip_get(dev, lip, NULL, v6);
-+}
- EXPORT_SYMBOL(cxgb4_clip_get);
- 
--void cxgb4_clip_release(const struct net_device *dev, const u32 *lip, u8 v6)
-+int cxgb4_clip_get_filter(const struct net_device *dev, const u32 *lip,
-+			  const u32 *lipm, u8 v6)
-+{
-+	return clip_get(dev, lip, lipm, v6);
-+}
-+
-+static void clip_release(const struct net_device *dev, const u32 *lip, const u32 *lipm, u8 v6)
- {
- 	struct adapter *adap = netdev2adap(dev);
- 	struct clip_tbl *ctbl = adap->clipt;
-@@ -154,17 +217,23 @@ void cxgb4_clip_release(const struct net_device *dev, const u32 *lip, u8 v6)
- 
- 	if (!ctbl)
- 		return;
-+	if (!lipm)
-+		lipm = (const u32 *)clip_ipv6_exact_mask;
- 
- 	hash = clip_addr_hash(ctbl, addr, v6);
- 
- 	read_lock_bh(&ctbl->lock);
- 	list_for_each_entry(cte, &ctbl->hash_list[hash], list) {
--		if (cte->addr6.sin6_family == AF_INET6 && v6)
--			ret = memcmp(lip, cte->addr6.sin6_addr.s6_addr,
--				     sizeof(struct in6_addr));
--		else if (cte->addr.sin_family == AF_INET && !v6)
--			ret = memcmp(lip, (char *)(&cte->addr.sin_addr),
--				     sizeof(struct in_addr));
-+		if (cte->val.addr6.sin6_family == AF_INET6 && v6)
-+			ret = (memcmp(lip, &cte->val.addr6.sin6_addr.s6_addr,
-+				      sizeof(struct in6_addr)) ||
-+			       memcmp(lipm, &cte->mask.addr6.sin6_addr.s6_addr,
-+				      sizeof(struct in6_addr)));
-+		else if (cte->val.addr.sin_family == AF_INET && !v6)
-+			ret = (memcmp(lip, (char *)(&cte->val.addr.sin_addr),
-+				      sizeof(struct in_addr)) ||
-+			       memcmp(lipm, (char *)(&cte->mask.addr.sin_addr),
-+				      sizeof(struct in_addr)));
- 		if (!ret) {
- 			ce = cte;
- 			read_unlock_bh(&ctbl->lock);
-@@ -182,13 +251,25 @@ void cxgb4_clip_release(const struct net_device *dev, const u32 *lip, u8 v6)
- 		list_add_tail(&ce->list, &ctbl->ce_free_head);
- 		atomic_inc(&ctbl->nfree);
- 		if (v6)
--			clip6_release_mbox(dev, (const struct in6_addr *)lip);
-+			clip6_release_mbox(dev, (const struct in6_addr *)lip,
-+					   (const struct in6_addr *)lipm);
- 	}
- 	spin_unlock_bh(&ce->lock);
- 	write_unlock_bh(&ctbl->lock);
- }
-+
-+void cxgb4_clip_release(const struct net_device *dev, const u32 *lip, u8 v6)
-+{
-+	return clip_release(dev, lip, NULL, v6);
-+}
- EXPORT_SYMBOL(cxgb4_clip_release);
- 
-+void cxgb4_clip_release_filter(const struct net_device *dev, const u32 *lip,
-+			       const u32 *lipm, u8 v6)
-+{
-+	return clip_release(dev, lip, lipm, v6);
-+}
-+
- /* Retrieves IPv6 addresses from a root device (bond, vlan) associated with
-  * a physical device.
-  * The physical device reference is needed to send the actul CLIP command.
-@@ -252,17 +333,18 @@ int clip_tbl_show(struct seq_file *seq, void *v)
- 	struct adapter *adapter = seq->private;
- 	struct clip_tbl *ctbl = adapter->clipt;
- 	struct clip_entry *ce;
--	char ip[60];
-+	char ip[96];
- 	int i;
- 
- 	read_lock_bh(&ctbl->lock);
- 
--	seq_puts(seq, "IP Address                  Users\n");
-+	seq_printf(seq, "%-83s   %s\n", "IP Address / IP Mask", "Users");
- 	for (i = 0 ; i < ctbl->clipt_size;  ++i) {
- 		list_for_each_entry(ce, &ctbl->hash_list[i], list) {
- 			ip[0] = '\0';
--			sprintf(ip, "%pISc", &ce->addr);
--			seq_printf(seq, "%-25s   %u\n", ip,
-+			sprintf(ip, "%pISc / %pISc", &ce->val.addr,
-+				&ce->mask.addr);
-+			seq_printf(seq, "%-83s   %d\n", ip,
- 				   refcount_read(&ce->refcnt));
- 		}
- 	}
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.h b/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.h
-index 847c7fc2bbd9..dea64bf828b5 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.h
-@@ -19,7 +19,7 @@ struct clip_entry {
- 	union {
- 		struct sockaddr_in addr;
- 		struct sockaddr_in6 addr6;
--	};
-+	} val, mask;
- };
- 
- struct clip_tbl {
-@@ -43,3 +43,7 @@ void cxgb4_clip_release(const struct net_device *dev, const u32 *lip, u8 v6);
- int clip_tbl_show(struct seq_file *seq, void *v);
- int cxgb4_update_root_dev_clip(struct net_device *dev);
- void t4_cleanup_clip_tbl(struct adapter *adap);
-+int cxgb4_clip_get_filter(const struct net_device *dev, const u32 *lip,
-+			  const u32 *lipm, u8 v6);
-+void cxgb4_clip_release_filter(const struct net_device *dev, const u32 *lip,
-+			       const u32 *lipm, u8 v6);
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
-index 75bd69ff61a8..86f46d79e6bc 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
-@@ -487,6 +487,7 @@ struct adapter_params {
- 	u8 mps_bg_map[MAX_NPORTS];	/* MPS Buffer Group Map */
- 	bool write_w_imm_support;       /* FW supports WRITE_WITH_IMMEDIATE */
- 	bool write_cmpl_support;        /* FW supports WRITE_CMPL */
-+	bool clip2_cmd_support;
- };
- 
- /* State needed to monitor the forward progress of SGE Ingress DMA activities
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_filter.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_filter.c
-index dd9e68465e69..4e456f34acbb 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_filter.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_filter.c
-@@ -993,9 +993,10 @@ void clear_filter(struct adapter *adap, struct filter_entry *f)
- 		t4_free_encap_mac_filt(adap, pi->viid,
- 				       f->fs.val.ovlan & 0x1ff, 0);
- 
--	if ((f->fs.hash || is_t6(adap->params.chip)) && f->fs.type)
--		cxgb4_clip_release(f->dev, (const u32 *)&f->fs.val.lip, 1);
--
-+	if ((f->fs.hash || is_t6(adap->params.chip)) && f->fs.type) {
-+		cxgb4_clip_release_filter(f->dev, (const u32 *)&f->fs.val.lip,
-+					  (const u32 *)&f->fs.mask.lip, 1);
-+	}
- 	/* The zeroing of the filter rule below clears the filter valid,
- 	 * pending, locked flags, l2t pointer, etc. so it's all we need for
- 	 * this operation.
-@@ -1463,7 +1464,13 @@ static int cxgb4_set_hash_filter(struct net_device *dev,
- 
- 	size = sizeof(struct cpl_t6_act_open_req);
- 	if (f->fs.type) {
--		ret = cxgb4_clip_get(f->dev, (const u32 *)&f->fs.val.lip, 1);
-+		struct ch_filter_specification *fs = &f->fs;
-+
-+		ret = cxgb4_clip_get_filter(f->dev,
-+					    (const u32 *)&fs->val.lip,
-+					    (const u32 *)&fs->mask.lip,
-+					    1);
-+
- 		if (ret)
- 			goto free_mps;
- 
-@@ -1494,7 +1501,8 @@ static int cxgb4_set_hash_filter(struct net_device *dev,
- 	return 0;
- 
- free_clip:
--	cxgb4_clip_release(f->dev, (const u32 *)&f->fs.val.lip, 1);
-+	cxgb4_clip_release_filter(f->dev, (const u32 *)&f->fs.val.lip,
-+				  (const u32 *)&f->fs.mask.lip, 1);
- 
- free_mps:
- 	if (f->fs.val.encap_vld && f->fs.val.ovlan_vld)
-@@ -1666,7 +1674,10 @@ int __cxgb4_set_filter(struct net_device *dev, int ftid,
- 	if (is_t6(adapter->params.chip) && fs->type &&
- 	    ipv6_addr_type((const struct in6_addr *)fs->val.lip) !=
- 	    IPV6_ADDR_ANY) {
--		ret = cxgb4_clip_get(dev, (const u32 *)&fs->val.lip, 1);
-+		ret = cxgb4_clip_get_filter(dev,
-+					    (const u32 *)&fs->val.lip,
-+					    (const u32 *)&fs->mask.lip,
-+					    1);
- 		if (ret)
- 			goto free_tid;
- 	}
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-index 97a261d5357e..b0ef1d6a5d79 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-@@ -5137,6 +5137,9 @@ static int adap_init0(struct adapter *adap, int vpd_skip)
- 			      1, params, val);
- 	adap->params.viid_smt_extn_support = (ret == 0 && val[0] != 0);
- 
-+	params[0] = FW_PARAM_DEV(CLIP2_CMD);
-+	ret = t4_query_params(adap, adap->mbox, adap->pf, 0, 1, params, val);
-+	adap->params.clip2_cmd_support = (!ret && val[0]);
- 	/*
- 	 * Get device capabilities so we can determine what resources we need
- 	 * to manage.
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h b/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h
-index 2419459a0b85..c93072994f83 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h
-@@ -847,6 +847,7 @@ enum fw_cmd_opcodes {
- 	FW_SCHED_CMD                   = 0x24,
- 	FW_DEVLOG_CMD                  = 0x25,
- 	FW_CLIP_CMD                    = 0x28,
-+	FW_CLIP2_CMD                   = 0x29,
- 	FW_PTP_CMD                     = 0x3e,
- 	FW_HMA_CMD                     = 0x3f,
- 	FW_LASTC2E_CMD                 = 0x40,
-@@ -1226,6 +1227,16 @@ enum fw_memtype_cf {
- 	FW_MEMTYPE_CF_HMA		= 0x7,
- };
- 
-+struct fw_clip2_cmd {
-+	__be32 op_to_write;
-+	__be32 alloc_to_len16;
-+	__be64 ip_hi;
-+	__be64 ip_lo;
-+	__be64 ipm_hi;
-+	__be64 ipm_lo;
-+	__be32 r4[2];
-+};
-+
- struct fw_caps_config_cmd {
- 	__be32 op_to_write;
- 	__be32 cfvalid_to_len16;
-@@ -1331,6 +1342,7 @@ enum fw_params_param_dev {
- 	FW_PARAMS_PARAM_DEV_DBQ_TIMERTICK = 0x2A,
- 	FW_PARAMS_PARAM_DEV_NUM_TM_CLASS = 0x2B,
- 	FW_PARAMS_PARAM_DEV_FILTER = 0x2E,
-+	FW_PARAMS_PARAM_DEV_CLIP2_CMD = 0x2F,
- 	FW_PARAMS_PARAM_DEV_KTLS_HW = 0x31,
- };
- 
--- 
-2.39.3
+On Tue, Dec 03, 2024 at 11:16:37AM +0800, Furong Xu wrote:
+> On Mon, 2 Dec 2024 18:34:25 -0800, Jakub Kicinski <kuba@kernel.org> wrote:
+>=20
+> > On Tue, 3 Dec 2024 10:03:31 +0800 Furong Xu wrote:
+> > > I requested Jon to provide more info about "Tx DMA map failed" in pre=
+vious
+> > > reply, and he does not respond yet. =20
+> >=20
+> > What does it mean to provide "more info" about a print statement from
+> > the driver? Is there a Kconfig which he needs to set to get more info?
+> > Perhaps you should provide a debug patch he can apply on his tree, that
+> > will print info about (1) which buffer mapping failed (head or frags);
+> > (2) what the physical address was of the buffer that couldn't be mapped.
+>=20
+> A debug patch to print info about buffer makes no sense here.
+> Both Tegra186 Jetson TX2(tegra186-p2771-0000) and Tegra194 Jetson AGX Xav=
+ier
+> (tegra194-p2972-0000) enable IOMMU/SMMU for stmmac in its device-tree nod=
+e,
+> buffer info should be investigated with detailed IOMMU/SMMU debug info fr=
+om
+> drivers/iommu/arm/arm-smmu/arm-smmu-nvidia.c together.
+>=20
+> I am not an expert in IOMMU, so I cannot help more.
+>=20
+> Without the help from Jon, our only choice is revert as you said.
 
+I was able to reproduce this locally and I get this splat:
+
+--- >8 ---
+[  228.179234] WARNING: CPU: 0 PID: 0 at drivers/iommu/io-pgtable-arm.c:346=
+ __arm_lpae_map+0x388/0x4e4
+[  228.188300] Modules linked in: snd_soc_tegra210_mixer snd_soc_tegra210_a=
+dmaif snd_soc_tegra_pcm snd_soc_tegra186_asrc snd_soc_tegra210_ope snd_soc_=
+tegra210_adx snd_soc_tegra210_mvc snd_soc_tegra210_dmic snd_soc_tegra186_ds=
+pk snd_soc_tegra210_sfc snd_soc_tegra210_amx snd_soc_tegra210_i2s tegra_drm=
+ drm_dp_aux_bus cec drm_display_helper drm_client_lib tegra210_adma snd_soc=
+_tegra210_ahub drm_kms_helper snd_hda_codec_hdmi snd_hda_tegra snd_soc_tegr=
+a_audio_graph_card at24 snd_hda_codec ina3221 snd_soc_audio_graph_card snd_=
+soc_simple_card_utils tegra_bpmp_thermal tegra_xudc snd_hda_core tegra_acon=
+nect host1x fuse drm backlight ipv6
+[  228.243750] CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G S           =
+      6.13.0-rc1-next-20241203 #30
+[  228.253412] Tainted: [S]=3DCPU_OUT_OF_SPEC
+[  228.257336] Hardware name: nvidia NVIDIA P2771-0000-500/NVIDIA P2771-000=
+0-500, BIOS 2025.01-rc3-00040-g36352ae2e68e-dirty 01/01/2025
+[  228.269239] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=
+=3D--)
+[  228.276205] pc : __arm_lpae_map+0x388/0x4e4
+[  228.280398] lr : __arm_lpae_map+0x120/0x4e4
+[  228.284587] sp : ffff8000800037f0
+[  228.287901] x29: ffff800080003800 x28: 0000000000000002 x27: 00000000000=
+00001
+[  228.295050] x26: 0000000000000001 x25: 0000000111580000 x24: 00000000000=
+01000
+[  228.302197] x23: 000000ffffc72000 x22: 0000000000000ec0 x21: 00000000000=
+00003
+[  228.309342] x20: 0000000000000001 x19: ffff00008574b000 x18: 00000000000=
+00001
+[  228.316486] x17: 0000000000000000 x16: 0000000000000001 x15: ffff8000800=
+03ad0
+[  228.323631] x14: ffff00008574d000 x13: 0000000000000000 x12: 00000000000=
+00001
+[  228.330775] x11: 0000000000000001 x10: 0000000000000001 x9 : 00000000000=
+01000
+[  228.337921] x8 : ffff00008674c390 x7 : ffff00008674c000 x6 : 00000000000=
+00003
+[  228.345066] x5 : 0000000000000003 x4 : 0000000000000001 x3 : 00000000000=
+00002
+[  228.352209] x2 : 0000000000000001 x1 : 0000000000000000 x0 : ffff0000857=
+4b000
+[  228.359356] Call trace:
+[  228.361807]  __arm_lpae_map+0x388/0x4e4 (P)
+[  228.366002]  __arm_lpae_map+0x120/0x4e4 (L)
+[  228.370198]  __arm_lpae_map+0x120/0x4e4
+[  228.374042]  __arm_lpae_map+0x120/0x4e4
+[  228.377886]  __arm_lpae_map+0x120/0x4e4
+[  228.381730]  arm_lpae_map_pages+0x108/0x250
+[  228.385922]  arm_smmu_map_pages+0x40/0x120
+[  228.390029]  __iommu_map+0xfc/0x1bc
+[  228.393525]  iommu_map+0x38/0xc0
+[  228.396759]  __iommu_dma_map+0xb4/0x1a4
+[  228.400604]  iommu_dma_map_page+0x14c/0x27c
+[  228.404795]  dma_map_page_attrs+0x1fc/0x280
+[  228.408987]  stmmac_tso_xmit+0x2d0/0xbac
+[  228.412920]  stmmac_xmit+0x230/0xd14
+[  228.416505]  dev_hard_start_xmit+0x94/0x11c
+[  228.420697]  sch_direct_xmit+0x8c/0x380
+[  228.424540]  __qdisc_run+0x11c/0x66c
+[  228.428121]  net_tx_action+0x168/0x228
+[  228.431875]  handle_softirqs+0x100/0x244
+[  228.435809]  __do_softirq+0x14/0x20
+[  228.439303]  ____do_softirq+0x10/0x20
+[  228.442972]  call_on_irq_stack+0x24/0x64
+[  228.446903]  do_softirq_own_stack+0x1c/0x40
+[  228.451091]  __irq_exit_rcu+0xd4/0x10c
+[  228.454847]  irq_exit_rcu+0x10/0x1c
+[  228.458343]  el1_interrupt+0x38/0x68
+[  228.461927]  el1h_64_irq_handler+0x18/0x24
+[  228.466032]  el1h_64_irq+0x6c/0x70
+[  228.469438]  default_idle_call+0x28/0x58 (P)
+[  228.473718]  default_idle_call+0x24/0x58 (L)
+[  228.477998]  do_idle+0x1fc/0x260
+[  228.481234]  cpu_startup_entry+0x34/0x3c
+[  228.485163]  rest_init+0xdc/0xe0
+[  228.488401]  console_on_rootfs+0x0/0x6c
+[  228.492250]  __primary_switched+0x88/0x90
+[  228.496270] ---[ end trace 0000000000000000 ]---
+[  228.500950] dwc-eth-dwmac 2490000.ethernet: Tx dma map failed
+--- >8 ---
+
+This looks to be slightly different from what Jon was seeing. Looking at
+the WARN_ON() that triggers this, it seems like for some reason the page
+is getting mapped twice.
+
+Not exactly sure why that would be happening, so adding Robin and Will,
+maybe they can shed some light on this from the ARM SMMU side.
+
+Robin, Will, any idea who could be the culprit here? Is this a map/unmap
+imbalance or something else entirely?
+
+A lot of the context isn't present in this thread anymore, but here's a
+link to the top of the thread:
+
+	https://lore.kernel.org/netdev/d8112193-0386-4e14-b516-37c2d838171a@nvidia=
+=2Ecom/T/
+
+Thanks,
+Thierry
+
+--vsdx7r52oh4np25i
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmdQX78ACgkQ3SOs138+
+s6H14A//WJdngiCjkoLaMyqKdSOl9WxX0+1nSuh2I5NrS/SxKcYds82Uk1/5viSs
+JusZ/snx+m5+/RNO+FROgTTJJW0ZydDg7WGmJyRI/9Vg6nFE70uVWinTEsVfH+/7
+f5a3erkivAOBN/TH488Lvrpq5bXxyEaJGh2gbzEHLoHPEh875VA3nZNrwCn+JLUn
+u+eghjKB2I40+GnxwjM7VztGcDg9S7eB3EU4YRfUx87Tqyq7b7UIqa9jjgj4fcU5
+7Bp6B/7cALh5RabcfFVZEIox3JvnYElVTDub1+oO9GYQxOk2T9z18NMi0SRIdwmG
+zLUN+tooFEe9CPpaFwpvZT1MWkYlFVcgivbXx0bi6P8QFCxlUC/YTs1V6wqCUdu1
+SGhWdvmlmP2BuoZL68PsFhdI5+fItGtLwV1vhQUGK3uJeGE8KsBJ37d8JY26ICQ3
++5PwFVcmNq5uzONQ4zwVkCHts7U2rJ4n6bQAkJCKI3D7HDSCtHhprzoL0FqKSi0c
+8iFj1RCXw1NBRk1a8zEsGisDiRkAGYoRU6ZSlNe9rZowQkRfEPa2ojZPLklrwx7k
+nKOyWfgznCB3u3gW5DBq+tuTI8fPkOMthKmq7QtU7WUeDZLZaOop4jmFwqA9z8DC
+e5s9X+4D/lC7eJ8h6DGplrY2aDRYnyAMJHfMZn+i+4IzhZm1MW0=
+=3eW4
+-----END PGP SIGNATURE-----
+
+--vsdx7r52oh4np25i--
 
