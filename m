@@ -1,125 +1,136 @@
-Return-Path: <netdev+bounces-149052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 711569E3EA7
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 16:48:54 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09C349E3EC1
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 16:55:58 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25AFB16737E
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:48:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE68328302D
+	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 15:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 005D020C477;
-	Wed,  4 Dec 2024 15:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BwNLZIxE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A045820C477;
+	Wed,  4 Dec 2024 15:55:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B46A209F5B;
-	Wed,  4 Dec 2024 15:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3114A28;
+	Wed,  4 Dec 2024 15:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733327318; cv=none; b=ncjWabkNtzCiMrN3bWxL/SX6gS5N//VktWathDBcpFC5JwhIaE1L+0YqA6+V+XU/6zwStHGoi7JO+oEDQ/tIFDxMHCdL8fA4dr1BG+81UBljcyvqOCoMu2GBnxXrONMlwHTy32S7pTiIcN4JXncYPQiI9zSEIxf3QhzZ+Cdz7kU=
+	t=1733327753; cv=none; b=fsxy5YzhyT3D7zyAK5l1m4Ox/IVFF27jGAej/jdcACBjNIhcZh+uH6Ecrrws5If2BlGZ9TrOsXpGhVZwSJWCEjie1ZPvFFV36zVL4DvNi4A65XDbNjlELTF0GuK0u47o0iuwRaR7M5ktXZnLvvxYkvEp5tx8UrCsrKCCBLDXIk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733327318; c=relaxed/simple;
-	bh=ddIIs2MMrdU+TTF+qZ8Me6qlDgdA32VPibL4i1IWt/g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DEILv22rGXcMWtdvqGfcisz8CUcdrBQod74bfm6rl/CSzQQHtJJh9mCv3oOA+aUXadUMXKvG0JEzi+h6R+/913gJX7DxDwxjSJhcwj0JCjBomwgT/8ntZh5DigmMhAvnOgmPWj4tfIZRkvkJ5Pk5riUyB4nIoEjT8ZmW66VhZwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BwNLZIxE; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1733327753; c=relaxed/simple;
+	bh=Pihd9l2xmmGC5HSoedNxdaKSkb+sm9Yy2vTemEDtCKU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WTf8c9+jbdNVCMs/Jap47cngdj8Trb+t5E/xVS6N1X6VvYMEmyQ5IaxFRm6QVQVaOly+zdi3oplnDrjKK/x03TpdM5XRCcAm7dNvoQA95C1YiImi9eGr542VL/7lqzwjThByS4L04r7RBd/Z7EI8gcmrpxvVj01Jdn83GqJ8FYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2155157c58cso36160945ad.0;
-        Wed, 04 Dec 2024 07:48:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733327316; x=1733932116; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JnCHEz4Gh7akoOewhOyufWncAXhN1SKzUf/9Phjsxl0=;
-        b=BwNLZIxEspc/7LjDcmz+JY5wTMG1X4mOvUFJWOS3Jw0u/S2+/F8MHdGUSI3swLyEXd
-         C7Q0HtXgBKlTqEhik2+acYakI7skSHQPXWwiyifv8Ch4sCLC9m2z98OeMYN+q0KPDB7o
-         MdEvBoET8ePEiG6ZEOMhwUzaIE/Cwp+5If529wYu48W2JXQtLQbpYJntJmw6ddJAUXXl
-         Mt31Q0MmwfWX1U2I60dslvz9ffeZ9raJiERBB/Fu4uBHIyp1BL/1WytcqTEvcsNWcNQN
-         VJqCTOV0xFBx93cnAMvJn56rqnL6MqWYsBwJJo8RoRBhmFnRz2JnJXsAm6dyEgHUbisj
-         V3NQ==
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7258cf297d4so952544b3a.2;
+        Wed, 04 Dec 2024 07:55:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733327316; x=1733932116;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JnCHEz4Gh7akoOewhOyufWncAXhN1SKzUf/9Phjsxl0=;
-        b=uJsDPKbcXNTm1ONO8NMXbWMb56CtA8BzG6Uy8p3NqHxyKfoI35hB3LbWnbCsOR5/sH
-         /W7zrgWZ553vOsiBmwBbvBeYrVbeAddgfeeuCrkxLaZWcOeFwK7WkLozOrZcexOm4h4Z
-         7AlklYKtzMlRi1G2T3z+IoQXaYqlX6GDbGoGUVVAJt9LV+JKf7Aymm7HPQJjFeVgis9O
-         xP4TsU2/tMTBWl4jsCprKLT5D2vQRvP5ZEw1CNKlxl1y7MogqGSQ5i3eepd2cAAgm7L6
-         YqXhocYhyCKLUl6rmn7WPyJiBnFctI/cu88/sbB5foMkpuZZ70h39B5GjfR2alaH7xCT
-         eqiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVwk8IHXMzKHYFsZmMYvSmlgzfyvZh0HhXeWPfgtOKeiRWON/etLYNMe9XbUANlqlwb06c=@vger.kernel.org, AJvYcCVyBIk4WBJ8zXW/jXAoESykUCmNyMsOfa/bIzlc2ppxj0rbDAhEaaeRqGo536t87hX6I+8Sj/kKV2Nl8k9g1OSN@vger.kernel.org, AJvYcCX6bnOXyG+T8VbaPBCiFaxpaGiNQ7o77dJbEVmcJADAEPLWArRAG2Gm3k6afYGK7qscFMtZE58yqDEAn6tT@vger.kernel.org, AJvYcCXbFCO6RDXIgMcmjxM2jgvQtPBwGSiNt7G35V6EdFE4vbyD7IH2wU5PrTexgKxEWa9LQi2t/Yi6@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjzBVHYGe/amdSY9FlqMDRFysmJ9OYUOMlDacFfNqU0NqL5or8
-	8iVGWvxOmSj0SVKbPp5DbeFZGTD57JgSkZFWrc/KI1ImlWyxAGA=
-X-Gm-Gg: ASbGncu3mrHGznIvC2HQXSXgoHRmYLcnu/F+1W08J2Q/C5tUPi5lQzju1YyiiScg0zI
-	35oDgK3DeopezMFRduug6GiPRRP6HGkJo8GyAsCzSlXsWAcbiDrq/TFD8ABfkvwHwONHi4RCepu
-	xNN4gnuTwWYByfIgJLB84EK+DLmPCzYx+SI7ylf3e+LsGANrwQboP2lkgkbWIrvJGo6Cc/zd/nL
-	TCulBqhEv5I4bOHdbM7lbsSaSlGc3/VJf/NcMsef9Q00InP0g==
-X-Google-Smtp-Source: AGHT+IEP1xSLasVS7/Eh+0BFE6F4XD6Q3rr3wy2zzlq0Xnmtaud9x1YoV3SSGm2oWHby4PT3mFPSWw==
-X-Received: by 2002:a17:902:cf0c:b0:215:4fbf:11da with SMTP id d9443c01a7336-215bd0f10c1mr85383305ad.21.1733327316519;
-        Wed, 04 Dec 2024 07:48:36 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733327751; x=1733932551;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DiWuXy+pQoS8Q9oXJwZIdB/h1k4RcMOYZcel02t32lQ=;
+        b=QbNA83pzwxqSgsfMMrJOJVlzvs3lnT/KdnpwuwriJ+rlshovY8ASkv7JG+x7cjxfQn
+         lI0IKQO0UXW3yV5Yp1m4Gd/VjnSCtu+NtvGUcDm+AWIWPYYEAhw6ZT7nr1itbONLWL+G
+         x7T5jTPDT3l51pgj6Ylcyvg2SA013Jz/NGcM/6tn3T7ZKImtY0UHnpfUF/wzOeR6Be6S
+         sA0+Ls1DPDncfi6hnMWS7gBcuC3Aukxz8gh/Y8J05VQx5KCbIHGx1e+XPPAdRldiA2Tv
+         kaszFyzQ/mZZ1ZOCAjSMY5UvGYT9sHwdeVUqV0aGZDMnKgfGX81UBjLRnPamS/3gPiVT
+         TdVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUXa+hch3O77wVGNOEsfCwDD0VUyfB4YRkdltmjfrLuqNaJilO2oGLBVi1mi+d8rOPyL/oDkt+vmr/PUiE/@vger.kernel.org, AJvYcCVfOkiwIjxpDrTP1zhA+3fPIAfDPGocpGUC3tDMsjr9GDPjYu9nqXHmYGiL9YoNc/Bzv4jgdbE0OB8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJPGLFcscD90j1ioIc7keyPQH1eZlzxaeil9W8CGkd0/XfK2Em
+	q9RhDMvZtIB7fuWpo9j8ojFNMTeJZ80X7Qo46p0wsAcF88pGZ63ZuSLEYR4=
+X-Gm-Gg: ASbGncvSUE3IReC2bJjI9TLGVUZOyfzsxd6HtpQUsFmPrRGquXyzH3lms+2SqRxBKIQ
+	eBOz7ZzzZY+CkrV7RTZ1NCCkOkdWoZRyQvkmodoWpfTBd2+wqt7g5bA407/wB2x3gAIwjB3sDQ4
+	mTdu6RJIZr7FaTzEQAMkAboC5i5X9lAw+ceylj6NIzlOXUbINb0+U+TBmn1WVm+sJYTEyT/WpN/
+	P/8lOoQKsD48dswhdzhegyGwWnNTjNLhRmFm3RrL9PMGtd5PQ==
+X-Google-Smtp-Source: AGHT+IG98ABpTsxIbNqbbMCiEgT/Y60S5rAkzU/yZ2vvkNA0PS5xq7vZFporousGafp6pkCMuGO7IQ==
+X-Received: by 2002:a17:902:f649:b0:20c:6b11:deef with SMTP id d9443c01a7336-215bd24fb57mr88476745ad.48.1733327750591;
+        Wed, 04 Dec 2024 07:55:50 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21521904caasm113537035ad.60.2024.12.04.07.48.35
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21530d2073esm106407045ad.73.2024.12.04.07.55.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2024 07:48:36 -0800 (PST)
-Date: Wed, 4 Dec 2024 07:48:35 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Song Yoong Siang <yoong.siang.song@intel.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next 1/1] selftests/bpf: Enable Tx hwtstamp in
- xdp_hw_metadata
-Message-ID: <Z1B50w1jzHFt-LuA@mini-arch>
-References: <20241204115715.3148412-1-yoong.siang.song@intel.com>
+        Wed, 04 Dec 2024 07:55:50 -0800 (PST)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	corbet@lwn.net,
+	andrew+netdev@lunn.ch,
+	kory.maincent@bootlin.com,
+	sdf@fomichev.me,
+	nicolas.dichtel@6wind.com
+Subject: [PATCH net-next v4 0/8] ethtool: generate uapi header from the spec
+Date: Wed,  4 Dec 2024 07:55:41 -0800
+Message-ID: <20241204155549.641348-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241204115715.3148412-1-yoong.siang.song@intel.com>
+Content-Transfer-Encoding: 8bit
 
-On 12/04, Song Yoong Siang wrote:
-> Set tx_type to HWTSTAMP_TX_ON to enable hardware timestamping for all
-> outgoing packets.
-> 
-> Besides, set XDP_UMEM_TX_METADATA_LEN flag to reserve tx_metadata_len bytes
-> of per-chunk metadata.
+We keep expanding ethtool netlink api surface and this leads to
+constantly playing catchup on the ynl spec side. There are a couple
+of things that prevent us from fully converting to generating
+the header from the spec (stats and cable tests), but we can
+generate 95% of the header which is still better than maintaining
+c header and spec separately. The series adds a couple of missing
+features on the ynl-gen-c side and separates the parts
+that we can generate into new ethtool_netlink_generated.h.
 
-XDP_UMEM_TX_METADATA_LEN is missing after d5e726d9143c ("xsk: Require
-XDP_UMEM_TX_METADATA_LEN to actuate tx_metadata_len"), so that make
-sense. Maybe add a fixes tag?
+v4:
+- add 'none' doc to 'none' entry (Jakub)
+- remove trailing _ from ETHTOOL_A_CABLE_XXX doc entries (Jakub)
 
-And I don't see mlx5 looking at HWTSTAMP_TX anywhere in the drivers,
-so I'm assuming that's why I didn't need HWTSTAMP_TX_ON during my tests..
-Which device are you testing against? I do see some hwts_tx_en
-checks in the stfmmac at least... Can you add these details to the
-commit message and respin?
+v3:
+- s/Unsupported enum-model/Unsupported message enum-model/ (Jakub)
+- add placeholder doc for header-flags (Jakub)
 
-With the above addressed:
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+v2:
+- attr-cnt-name -> enum-cnt-name (Jakub)
+- add enum-cnt-name documentation (Jakub)
+- __ETHTOOL_XXX_CNT -> __ethtool-xxx-cnt + c_upper (Jakub)
+- keep and refine enum model check (Jakub)
+- use 'header' presence as a signal to omit rendering instead of new
+  'render' property (Jakub)
+- new patch to reverse the order of header dependencies in xxx-user.h
+
+Stanislav Fomichev (8):
+  ynl: support enum-cnt-name attribute in legacy definitions
+  ynl: skip rendering attributes with header property in uapi mode
+  ynl: support directional specs in ynl-gen-c.py
+  ynl: add missing pieces to ethtool spec to better match uapi header
+  ynl: include uapi header after all dependencies
+  ethtool: separate definitions that are gonna be generated
+  ethtool: remove the comments that are not gonna be generated
+  ethtool: regenerate uapi header from the spec
+
+ Documentation/netlink/genetlink-c.yaml        |   3 +
+ Documentation/netlink/genetlink-legacy.yaml   |   3 +
+ Documentation/netlink/specs/ethtool.yaml      | 358 ++++++-
+ .../userspace-api/netlink/c-code-gen.rst      |   4 +-
+ MAINTAINERS                                   |   2 +-
+ include/uapi/linux/ethtool_netlink.h          | 893 +-----------------
+ .../uapi/linux/ethtool_netlink_generated.h    | 792 ++++++++++++++++
+ tools/net/ynl/ynl-gen-c.py                    | 139 ++-
+ 8 files changed, 1253 insertions(+), 941 deletions(-)
+ create mode 100644 include/uapi/linux/ethtool_netlink_generated.h
+
+-- 
+2.47.0
+
 
