@@ -1,122 +1,147 @@
-Return-Path: <netdev+bounces-149189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBCD69E4B84
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 01:50:19 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 913A19E4B93
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 02:06:27 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18492281154
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 00:50:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D92F1881585
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 01:06:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45BE217543;
-	Thu,  5 Dec 2024 00:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7892A38DD6;
+	Thu,  5 Dec 2024 01:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bnPhdGy0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aS1YfdXB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A9114286
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 00:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD4C16415;
+	Thu,  5 Dec 2024 01:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733359816; cv=none; b=seMPyIMxuDI9POzz9BfD+ecfCtOc5cAQ8XwqGhw6JqPzHA7ETOhHfZi/MT1BFhH2+pzG2E0A9uFoSlTQYWwcHr1fQPCRWnfBBOThDfGWPw/ZqgMGX8oyG3KXrRUE/eaqE3I3vmBqp+WSH47FTmVj0slDjpRlHOAZwHm1BaTEBbc=
+	t=1733360783; cv=none; b=nwwPr+w/JfCS4Aqh6Jax/0olqT19SoRIw/EImOBqBIjkahqEtUhbLBOe/GBPEjNJvzw/Ciex+ZyFAG2JF2kaShn+FIwu1FiDiyWom5sxZnSGlx3xZimbJm3NC5ff20GpNdELIS47ei4b7P3oSr/pIOvUMd8pdN5qkAVdpB9Y40M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733359816; c=relaxed/simple;
-	bh=t2QyKR+pVHF8+MU8XL2sP9UGIxEza+UXGhPOIPtz/Yg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P1ODPokiksBm7U7HdBzY8ZXmjEKQjJm87B7JyJDiCzvsuFm1Ap0UI2JnJSzyOYJpvnoBPAe0TNZ91dctMJNg84swH4FBnpjPlIisFECBzELxUagV+MfYWmBHobXPgYjJzmUmD31y0arj2goAIxDKFMEqPgfz4IJCx9yR3uJY/Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bnPhdGy0; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1733360783; c=relaxed/simple;
+	bh=QKqR2ZVRmaHoDLx2netLJSiB+3gpaG9hpVtBTEEBqdU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TnlsSYn6J4O+prjMHmogGe5ucvYpt1wM/BGF1Lp9ItV4rPaxbJfNkCFYywuxY/cZxHpTzMFWLJsMKX1+Dw2+rjz1fgb9qPef43i+tnHvDDWEXHsoxN6+Qxo0H/P8lHXywf+34yf7ky3Bfy7YKyZJvDOGCcNLcA5XBHQtxR7mcqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aS1YfdXB; arc=none smtp.client-ip=209.85.219.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e39f43344c5so584407276.1;
+        Wed, 04 Dec 2024 17:06:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1733359814; x=1764895814;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=4Ob04Bz/iSUGb2V0Fk+6eZUOR+CMnQcHYptW8yuck+I=;
-  b=bnPhdGy0kBPM2zBm8P2Wp5yz9+T5vcjcy7XZ9LRfb10FopcEwxq5qTs/
-   3pyB/ZlfDuUT4+S9/xg3HBUN3fqDOaRepOK1pAkLy0X9yKaUiDhQGKXaS
-   EuPTtYI1vuKot+P5OnVrLnilpqOrGMKA63LiYpyfp7oyVlAUHcZMofpxs
-   I=;
-X-IronPort-AV: E=Sophos;i="6.12,209,1728950400"; 
-   d="scan'208";a="700506145"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 00:49:51 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:3297]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.41:2525] with esmtp (Farcaster)
- id 7a331328-60c0-4b97-b9cc-61eb12ff3e41; Thu, 5 Dec 2024 00:49:50 +0000 (UTC)
-X-Farcaster-Flow-ID: 7a331328-60c0-4b97-b9cc-61eb12ff3e41
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 5 Dec 2024 00:49:50 +0000
-Received: from 6c7e67c6786f.amazon.com (10.119.3.161) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Thu, 5 Dec 2024 00:49:46 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzbot+46aa5474f179dacd1a3b@syzkaller.appspotmail.com>
-Subject: Re: [PATCH net] tipc: fix NULL deref in cleanup_bearer()
-Date: Thu, 5 Dec 2024 09:49:41 +0900
-Message-ID: <20241205004941.92382-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241204170548.4152658-1-edumazet@google.com>
-References: <20241204170548.4152658-1-edumazet@google.com>
+        d=gmail.com; s=20230601; t=1733360780; x=1733965580; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QNaROx006A92BJIFhAC3avoJJJdYbGXKC07Oc5xhq/Q=;
+        b=aS1YfdXBTeiAs8d3uolqou9PljHLUi1jKbErBJU5znpxhCZrTV/8nB46FDfwwz0QpV
+         jBRgyq1dRQ4iUjAfynpAtux/kD+C+aBhTBYs7IX01gda+nR2urpIDpuGbtFI9vTOjmk6
+         G3rIdJ65C9voocGVV357zHoppMKuWbbP/dL626b2B93sYZ7Mwq0a4e7+FJgT+0nnNlYy
+         iZHtWgnPy2+/PutCfCEnGtDXwtTdNQ7eRktRnKtzbhoNe+wCxcGZ9MABIP5l39ujS2Lz
+         mWUOOl9eyDCUARCS//QmYW4MJC3Fo8zPo+MlDRRMVe5OMva/MIRy90FzYmrETnlS83M8
+         jRVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733360780; x=1733965580;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QNaROx006A92BJIFhAC3avoJJJdYbGXKC07Oc5xhq/Q=;
+        b=TQ5g8l0c3w+cZ8HDBY7fw3231aFSKtv/Oza4a2tbrwg/Ztg0Xt32FW/43Wzd7eTrkR
+         3KsKDm/9Vo6/Ra9cmTYUduUY6FlQfIWusrhc/0t4FO9pp9lrsvdGjB/TC5oZmg2zt/Al
+         wZ15Ryw6Roj3D11jn3Vhlk1gpuqxUXl5NCVQhMcUgMqbDq5dII/mxdg96U0QDTUGgUcE
+         VvZLqsQk9q359i00NcQFTyVT3dCLqq5W4cIGy8Z7N8zLCD8uH9+G8O/J5tGjsekovPTi
+         bdxPjD5TUPCOGiAmyltugFVvRA8bgg0ELzCpLXWUTNu7/kfndrvCRM4dZGmvQHOJbEWZ
+         OTpA==
+X-Forwarded-Encrypted: i=1; AJvYcCVw5CILTLNebkEaAId585R2eIcFsL7DnLAA5TuCS+W8Gms/hNWlpbOjcV+4t1ajHj2hI35T3w7LX/k0Na7UBJq2H/k=@vger.kernel.org, AJvYcCWQ8z/+A6Dz/4Cn2VpKp28EFh6/2exzDYX+/LzzLPv3ADeHWpu5iIMnZxiuR6QVRI235jszA7Vkb6yaMSk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTwgfUoMMtUWB72kiCYdZsYefWZvWn7Nm8wd3Ogg86Xcez2oiU
+	QLjly7F/tGc+BJEehfGfLPCxWpgTOk19DVE4zVxXrXOV0DpAwKDIwWZXDj+yICWRMBdYSTjBKOk
+	UxNz2TiUOzeNN4aYD6OEphLd2P+s=
+X-Gm-Gg: ASbGnctIJ3UOHnYBccq1BfVccZCPnnwo5sXlzHvU8mGhhDdplEiiKVjkRIG+VFjupa0
+	Ro9yPUJF/u9eF24VRXzLgSyXw+S2K0Q==
+X-Google-Smtp-Source: AGHT+IER+Xi4ZisxufHbQx8cuMyXEouv70C6SIaLOg/n7VBOcw+yR5wvDbJJeAr7BXkvfySexaX38rdEEG0QNP1YDwA=
+X-Received: by 2002:a05:690c:6486:b0:6ef:4cb2:8b4c with SMTP id
+ 00721157ae682-6efad1bc2cemr106996637b3.23.1733360780634; Wed, 04 Dec 2024
+ 17:06:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWA002.ant.amazon.com (10.13.139.81) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20241203222750.153272-1-rosenp@gmail.com> <Z0-LgWETqKZe2uyV@shell.armlinux.org.uk>
+In-Reply-To: <Z0-LgWETqKZe2uyV@shell.armlinux.org.uk>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Wed, 4 Dec 2024 17:06:09 -0800
+Message-ID: <CAKxU2N_x+DaoSZykT--94qphbXgLTU=QHSEQ0FO7VH2oPN=kmQ@mail.gmail.com>
+Subject: Re: [PATCHv4 net-next] net: modernize ioremap in probe
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>, 
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Chris Snook <chris.snook@gmail.com>, 
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
+	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
+	Richard Cochran <richardcochran@gmail.com>, open list <linux-kernel@vger.kernel.org>, 
+	"open list:RENESAS ETHERNET SWITCH DRIVER" <linux-renesas-soc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed,  4 Dec 2024 17:05:48 +0000
-> syzbot found [1] that after blamed commit, ub->ubsock->sk
-> was NULL when attempting the atomic_dec() :
-> 
-> atomic_dec(&tipc_net(sock_net(ub->ubsock->sk))->wq_count);
-> 
-> Fix this by caching the tipc_net pointer.
-> 
-> [1]
-> 
-> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] PREEMPT SMP KASAN PTI
-> KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
-> CPU: 0 UID: 0 PID: 5896 Comm: kworker/0:3 Not tainted 6.13.0-rc1-next-20241203-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-> Workqueue: events cleanup_bearer
->  RIP: 0010:read_pnet include/net/net_namespace.h:387 [inline]
->  RIP: 0010:sock_net include/net/sock.h:655 [inline]
->  RIP: 0010:cleanup_bearer+0x1f7/0x280 net/tipc/udp_media.c:820
-> Code: 18 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 3c f7 99 f6 48 8b 1b 48 83 c3 30 e8 f0 e4 60 00 48 89 d8 48 c1 e8 03 <42> 80 3c 28 00 74 08 48 89 df e8 1a f7 99 f6 49 83 c7 e8 48 8b 1b
-> RSP: 0018:ffffc9000410fb70 EFLAGS: 00010206
-> RAX: 0000000000000006 RBX: 0000000000000030 RCX: ffff88802fe45a00
-> RDX: 0000000000000001 RSI: 0000000000000008 RDI: ffffc9000410f900
-> RBP: ffff88807e1f0908 R08: ffffc9000410f907 R09: 1ffff92000821f20
-> R10: dffffc0000000000 R11: fffff52000821f21 R12: ffff888031d19980
-> R13: dffffc0000000000 R14: dffffc0000000000 R15: ffff88807e1f0918
-> FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000556ca050b000 CR3: 0000000031c0c000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> 
-> Fixes: 6a2fa13312e5 ("tipc: Fix use-after-free of kernel socket in cleanup_bearer().")
-> Reported-by: syzbot+46aa5474f179dacd1a3b@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/67508b5f.050a0220.17bd51.0070.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-Thanks!
+On Tue, Dec 3, 2024 at 2:51=E2=80=AFPM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Tue, Dec 03, 2024 at 02:27:50PM -0800, Rosen Penev wrote:
+> > resource aquisition and ioremap can be performed in one step.
+> ...
+> > diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/=
+net/ethernet/marvell/mvpp2/mvpp2_main.c
+> > index 571631a30320..af9291574931 100644
+> > --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> > +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> > @@ -7425,21 +7425,16 @@ static int mvpp2_init(struct platform_device *p=
+dev, struct mvpp2 *priv)
+> >  static int mvpp2_get_sram(struct platform_device *pdev,
+> >                         struct mvpp2 *priv)
+> >  {
+> > -     struct resource *res;
+> >       void __iomem *base;
+> >
+> > -     res =3D platform_get_resource(pdev, IORESOURCE_MEM, 2);
+> > -     if (!res) {
+> > +     base =3D devm_platform_ioremap_resource(pdev, 2);
+> > +     if (IS_ERR(base)) {
+> >               if (has_acpi_companion(&pdev->dev))
+> >                       dev_warn(&pdev->dev, "ACPI is too old, Flow contr=
+ol not supported\n");
+> >               else
+> >                       dev_warn(&pdev->dev, "DT is too old, Flow control=
+ not supported\n");
+> > -             return 0;
+> > -     }
+> > -
+> > -     base =3D devm_ioremap_resource(&pdev->dev, res);
+> > -     if (IS_ERR(base))
+> >               return PTR_ERR(base);
+> > +     }
+>
+> This is not equivalent. This means if ioremap() fails inside
+> devm_platform_ioremap_resource(), we end up printing a message that
+> blames the firmware, which is wrong.
+>
+> It also changes a "resource missing, proceed anyway" situation into
+> a failure situation.
+>
+> Please drop this change, "cleaning" this up is introducing bugs.
+Will do in v5.
+>
+> Thanks.
+>
+> --
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
