@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-149507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFD549E5E77
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 19:50:51 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A38D49E5EA8
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 20:16:25 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2AC82822A5
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 18:50:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F180169879
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 19:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE6122B8D3;
-	Thu,  5 Dec 2024 18:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BCA1225788;
+	Thu,  5 Dec 2024 19:16:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JmZ3jAlZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AC1yKYF0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537ED218EBC;
-	Thu,  5 Dec 2024 18:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358BE18FDAA;
+	Thu,  5 Dec 2024 19:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733424645; cv=none; b=T/EdoKUx1r+J/bUbkiNMRKu9YxEPlLC1Scx/FDNiKQFFgn3/JobZ3XXBxELW0B7HdoOii4SPE2qlvR0h6C5CKKGCwTBTno4udKKh0bnLCaphtZPQ9vaKcT/St3/nn2azTsssEf2gQnIncZ+on9LiV5G+hol6Ej+hakgZTONGjO8=
+	t=1733426181; cv=none; b=Rij2HNWLKGjs4m9btd5ZGG7FpioAD+RVkgWri2Rd30eiNpppkSvHoY2HsgZh/LSxYmnJdqVoM8CKdaCuWt0ryPajU6ehr39FxRLOqrUXgOBSUYWWXrHkh/3BkxAGb9n0D0gDyRngj9xr2rsMXemiKP49JFktLq8uQMh9Se7kQEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733424645; c=relaxed/simple;
-	bh=JWDj8QlLbidNrhEz6lafRDRkIXsUvesuWlCtZKS2h0I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VFc3PPBtp4pfaSD5tMx8S6SVr//3iMS4kAHA7up89hjNIFRSg9Ap8kmxUGg/sO2fDpKcpLZZi4YBMXbmgK818BA8n8FnUAaUrP8yEZ9M8nPuQik6RCupiw0db3VpXoCx9+gNkUCdQ1EF6OCkHUz90oj7daCUkjN0nnNv1xZ5BvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JmZ3jAlZ; arc=none smtp.client-ip=209.85.208.43
+	s=arc-20240116; t=1733426181; c=relaxed/simple;
+	bh=SmBhLmmKb3/JpxnOaGqkc1Z6xWAgvghhCqLwDySUaxY=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=neFkCl3qLf2CIg0GKzq/SCAeYlVtLy+CA94wTVSlifcMtzI7giW+PVLuDitrT2/ECtEps1Ad3d4P2uq802k5dfvAHK9hY2K5PPEscW9BiRf4jjhnKY+8Wvn959+qmYa3gcJ5G0yAVa32W1wfj9ZHCN2PQHO/uUhny9qC0bBY9Hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AC1yKYF0; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d0cdff12b4so172765a12.1;
-        Thu, 05 Dec 2024 10:50:42 -0800 (PST)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-434a95095efso14928315e9.0;
+        Thu, 05 Dec 2024 11:16:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733424641; x=1734029441; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xuL0vSwcp+HMpPwWDWVKgActioYscbfUsEOUicYp0kE=;
-        b=JmZ3jAlZaxndoWTHGQxz2EAZxg8diDf1gzwWwn16WF6Jhy54RbQVswoYlG4+AcyYGS
-         6Xu8TfQRYDbyQXXkFlYf2BMPlBakjtXo6E+3kpWQT96njYu8EADuj3CRlUG52P7uH3NL
-         WP508hc3+P4ViGlJmTUK4ekBos7zQzBCoLspx0sTLB8mY6/6N8qYc7VBsBpmFgcEejD9
-         0VgNnr8rIAOhV1jAHrej180jQZeTLbsq2Hij6Vlewfp3sYig2PCHb63XegPJmemmiKfQ
-         B9VUdF0k77dqFRN9RBMQOkdaqVHvTHwDuworb7vfHyLTtTfjZOJtuk3jmwyDVrINHK+V
-         8GhA==
+        d=gmail.com; s=20230601; t=1733426178; x=1734030978; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MY4w8h/Y2faTte8A8zuwQmkux3tQ9Zf0xj0qV+I4U4Q=;
+        b=AC1yKYF0pe7oQBTQ7Fi4QAASYqmW+wz1aHSdNl3V1e5ALCA726vZnYXvTR/vkynhza
+         rUOt6UVfcIC6ZGrsXpGnVPudEgyZOU3IwE5C8s4cEbQkTcRf0xRSwodfXwNAinuDQ7UO
+         x+e1INni3oDVTlQSV5w3XXnnaf3Dk8M4wU3nNoHt5F7R2C+dftoonODlHtxo95KEdRIy
+         iPeY7LtolkP4zIkn0KQS8GoWSb2+wpFdWkMkJ/3ueQFg/fuyVY2G3IRrLpJWY6cWyTH5
+         OzpUyMKkZWZCzrfEK/YWU5lzfR7tON3fdL1d7kAgr9M+Ij2PfN+XmksKSmIMRhi2xtXq
+         /zsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733424641; x=1734029441;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1733426178; x=1734030978;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xuL0vSwcp+HMpPwWDWVKgActioYscbfUsEOUicYp0kE=;
-        b=KhmiOjz6jVblghoN88NMqx6a+H1fpO4enaA7em7JZ/UCq29WLAb4rOJO5bll6Kyakd
-         cxXvPpuZlRBXppEbvB4U/33SJ7UssD6l/sFY39M4rjwxsq7NggNcwBN7mo8+2r68Ggjs
-         mXSgObFmik+vUJgBDbMBDQ6lrhEam43oR7cgAiQGjT1LOg3xCLl90xEBGZVMMPcsKgUW
-         FcJtI3wGHXQ3RfKM5g79IfigNUnvr8/T8ffuiJMbRnCC4OEldVhpn8gHqHp7fJhukFNy
-         4qq07WREb9QHQ+cHADbDzhTSb8T0mOCkJNk73HAMclLToUVscrVW0Mg+lgQMLKN5patr
-         i4sw==
-X-Forwarded-Encrypted: i=1; AJvYcCVNzIvzNbBUDYnYAbG5iNxMSOUrqSP3K7ifApqAFCQNfal1UcvNJeLKBRbudapFK5xPajH1PR0pzhtG@vger.kernel.org, AJvYcCWndcC+8gbO1W90Hl63oq4i6xM7TImNhQ+93CBIvrk9r50a/qFdsoidOzEkeMjohppjg1iuT34z@vger.kernel.org, AJvYcCXV9mWgv/IEjc8tomkr5jvXdqgPVvGM3r0JvsGbTIBrGc1TUtf23DHSxUCNnlQ08v0TcrzGFgfIEE/RGk34@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEWUQt7QPKBA5p8HApnrhkyYA7/cA+h1n4ZrHe43bqAHq6AAlm
-	qxHjaB0lkegub92VF+1V/jDbpYQqB4FDyVg0WCCGGovrCraQOpkmgFIEUw==
-X-Gm-Gg: ASbGnctktWZxuU4rQV/x71iwhko1BGP4FbBrfHDxJwmLxExAjczxySyAcShkKZZE5+3
-	5rjtN4Jy3sDdMihyufiC7O2eLynb9knLcUiVO/si9UtRv/PEIZ9StJfWKepMpwrkaShTsRWLg7f
-	YgJHIVFMl6BJwiikHKvKCI3O+LWNxr8zTUsx4Ud43ZDmvOQkvI9ev430ECzZpqlfTLc28TMW3qV
-	MaRSUY2pdFcyP8Mheor9TceYU35X5TaCiYwIck=
-X-Google-Smtp-Source: AGHT+IHXBo4XbdE1KRXT45i7tcr0tQbymXLsF4fYU2CO5TAKnlDgiYLqOd3ZY8+xqizacESzgmiQQg==
-X-Received: by 2002:a17:906:db03:b0:aa5:3b5c:f638 with SMTP id a640c23a62f3a-aa5f7ccc944mr453434466b.1.1733424640392;
-        Thu, 05 Dec 2024 10:50:40 -0800 (PST)
-Received: from skbuf ([188.25.135.117])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa625e972c1sm126626266b.76.2024.12.05.10.50.38
+        bh=MY4w8h/Y2faTte8A8zuwQmkux3tQ9Zf0xj0qV+I4U4Q=;
+        b=plC+R8EWjQtgOvKzLhQxazEaclAWyyl5EK5uFuX48inw3Q1zZ3YGTjsnzC6AKzNjYN
+         O2bUsWYiDz1CeLw3XW25xXNgWkKM0H884Yrk98Hzv5/NTt5Ij7mUgWhjGa1oGAakGx1U
+         Mbyd/D2Ue2/JU0CWMrVHh15maZcap2qCYsBhm/IRcfjnq4eicZ0FpZJ/+L2agmqfvVr/
+         OCjnMSLpINIz8QFE76YMdYhTozRZrw/txifU86+VfXLX7QBZ9QESa/j24UHuNY+OQELj
+         YMdvP0EJamS9VQR+U2GIuemWy85X7Y7DGE8J9dMVxp8qXeErLdYYVXTz5nGrqgxJVCyu
+         +obg==
+X-Forwarded-Encrypted: i=1; AJvYcCUNy5rwCWCR7m9g04D8dqVtVH/kbFpxLRxP6f3s+9ZoP9CxLVC4U/6AERuLMyKUeWvTyFuc5fKKjhJl@vger.kernel.org, AJvYcCUrx8NLATuBhCe5SsuzN9TFOxtrQ0OR5tfcfwTpvjbPhgZRU9iimjXO84tiwJBpeLGWfl9IQp63@vger.kernel.org, AJvYcCV45KJxPOwHPd4+1Fi+5mOWVyoS0UBolApU6c4U6PeCf9629uc/1JObhRDhyubpj4DZ7HxV9uwbWKMWqXcu@vger.kernel.org
+X-Gm-Message-State: AOJu0YwU10Mx4QH6vmFTDNHof15ybmQL1ctcumt2yJJvxU1xSxi/kWeK
+	PS+TUEuMUW52Mjnn7PJADOqD4u9N2ltfYQsiFsgy757psXEQdSYL
+X-Gm-Gg: ASbGncv4c2gZ0Nj7sw+615jQLAGVVZBKlhLF+f3dSWJFf4nid2pnqWB0wSvrxYK9ZVE
+	FBNfJJhVZcoFSXNuBF0sfJTqrFMwC0mk0x4QbyHQimqUtA9h+eyM+i3vT9k4RGQQgFkjI3uo54i
+	jcdqZvQdnYyrMVchyRX1yHiTNkdxWj2iXNmDQhuTEQ75lMJBZKac4HbSMkUGcgaXfYrEZTIijKb
+	03XDloyi+lxkokNFNdojVvIIWIbjTXpqkzre7dTBsStqpcWDAJ9sb4+2cojlfYdylCAO6znM6zB
+	wtuAuA==
+X-Google-Smtp-Source: AGHT+IHZRbJn+9HtrGJ38A8jyPTzo+TDn7EX7QFEByqYqphbe67U5+K0SKR8aakCPuxnrCyTXLoJ7g==
+X-Received: by 2002:a5d:6c66:0:b0:385:e45b:92a2 with SMTP id ffacd0b85a97d-3861bb5c4eamr3657331f8f.7.1733426178337;
+        Thu, 05 Dec 2024 11:16:18 -0800 (PST)
+Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d5280120sm68799815e9.20.2024.12.05.11.16.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2024 10:50:39 -0800 (PST)
-Date: Thu, 5 Dec 2024 20:50:37 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
+        Thu, 05 Dec 2024 11:16:17 -0800 (PST)
+Message-ID: <6751fc01.7b0a0220.1f425b.5416@mx.google.com>
+X-Google-Original-Message-ID: <Z1H7_Z7UsSZ5GEhY@Ansuel-XPS.>
+Date: Thu, 5 Dec 2024 20:16:13 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>
 Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -90,17 +93,11 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
 	upstream@airoha.com
 Subject: Re: [net-next PATCH v9 3/4] net: dsa: Add Airoha AN8855 5-Port
  Gigabit DSA Switch driver
-Message-ID: <20241205185037.g6cqejgad5jamj7r@skbuf>
 References: <20241205145142.29278-1-ansuelsmth@gmail.com>
  <20241205145142.29278-4-ansuelsmth@gmail.com>
- <20241205162759.pm3iz42bhdsvukfm@skbuf>
- <20241205145142.29278-1-ansuelsmth@gmail.com>
- <20241205145142.29278-4-ansuelsmth@gmail.com>
- <20241205162759.pm3iz42bhdsvukfm@skbuf>
- <6751e023.5d0a0220.394b90.7bc9@mx.google.com>
- <6751e023.5d0a0220.394b90.7bc9@mx.google.com>
- <20241205180539.6t5iz2m3wjjwyxp3@skbuf>
- <6751f125.5d0a0220.255b79.7be0@mx.google.com>
+ <20241205170629.ww7qcvgbqdf5ipcj@skbuf>
+ <6751e22d.050a0220.3435c6.57de@mx.google.com>
+ <20241205183403.zla5syfzj3yrinwj@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,67 +106,99 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6751f125.5d0a0220.255b79.7be0@mx.google.com>
+In-Reply-To: <20241205183403.zla5syfzj3yrinwj@skbuf>
 
-On Thu, Dec 05, 2024 at 07:29:53PM +0100, Christian Marangi wrote:
-> Ohhhh ok, wasn't clear to me the MFD driver had to be placed in the mdio
-> node.
+On Thu, Dec 05, 2024 at 08:34:03PM +0200, Vladimir Oltean wrote:
+> On Thu, Dec 05, 2024 at 06:26:01PM +0100, Christian Marangi wrote:
+> > Concept looks handy, ideally I can just assign one ID for each port
+> > like:
+> > port 1 -> FIB 1
+> > port 2 -> FIB 1
+> > port 3 -> FIB 2
+> > 
+> > Question:
+> > Ports of the same bridge should have the same FIB?
 > 
-> To make it clear this would be an implementation.
-> 
-> mdio_bus: mdio-bus {
-> 	#address-cells = <1>;
-> 	#size-cells = <0>;
-> 
-> 	...
-> 
-> 	mfd@1 {
-> 		compatible = "airoha,an8855-mfd";
-> 		reg = <1>;
-> 
-> 		nvmem_node {
-> 			...
-> 		};
-> 
-> 		switch_node {
-> 			...
-> 		};
-> 	};
-> };
+> The answer, as well as many other explanations, is under the "Address
+> databases" section of Documentation/networking/dsa/dsa.rst. Please read
+> it through before starting to implement anything.
+>
 
-I mean, I did mention Documentation/devicetree/bindings/mfd/mscc,ocelot.yaml
-in my initial reply, which has an example with exactly this layout...
+Ok sorry, will read.
 
-> The difficulties I found (and maybe is very easy to solve and I'm
-> missing something here) is that switch and internal PHY port have the
-> same address and conflicts.
+> > What I need to check is how the switch handle this for learning. Does
+> > the switch correctly create FDB entry with the right FIB?
 > 
-> Switch will be at address 1 (or 2 3 4 5... every port can access switch
-> register with page 0x4)
+> You're asking me how an8855 behaves? I have no idea, I never interacted
+> with it :-|
 > 
-> DSA port 0 will be at address 1, that is already occupied by the switch.
+
+Noo it wasn't a question for you, it was really to describe a problem
+that might be present if the switch doesn't account for that and that I
+need to check.
+
+> The idea as far as the DSA API is concerned would be to learn addresses
+> in the bridge database (DSA_DB_BRIDGE) that the user port is configured
+> for, and not learn any addresses in the port-private database (DSA_DB_PORT).
 > 
-> Defining the DSA port node on the host MDIO bus works correctly for
-> every port but for port 0 (the one at address 1), the kernel complains
-> and is not init. (as it does conflict with the switch that is at the
-> same address) (can't remember the exact warning)
+> > If that's not the case then I think assisted_learning is needed and HW
+> > Learn can't be used?
+> 
+> ds->assisted_learning_on_cpu_port applies, as suggested by its name,
+> only on the CPU port. On user ports, address learning should work normally.
+> 
+> As you will find in the documentation, the CPU port is not like a user
+> port, in the sense that it is not configured to service a single address
+> database, but all of them. So, source learning on the CPU port will not
+> work unless the switch knows which address database should each packet
+> be associated with.
 
-Can any of these MDIO addresses (switch or ports) be changed through registers?
+Ok so in such case, learning on CPU needs to be disabled and assisted
+learning enabled.
 
-I guess the non-hack solution would be to permit MDIO buses to have
-#size-cells = 1, and MDIO devices to acquire a range of the address
-space, rather than just one address. Though take this with a grain of
-salt, I have a lot more to learn.
+> 
+> In principle, one way could be to pass, during tagger xmit, the database ID,
+> so that the switch knows that it must learn the MAC SA of this packet in
+> this FID. I don't have the full image of the Mediatek DSA tag format,
+> but if an8855 is anything like mt7530, this option isn't available.
+> Thus, like mt7530, it needs to set ds->assisted_learning_on_cpu_port, so
+> that software will call port_fdb_add() on the CPU port with the correct
+> dsa_db (for the right bridge) as argument. But I don't think that is
+> going to pose any sort of issue.
+> 
 
-If neither of those are options, in principle the hack with just
-selecting, randomly, one of the N internal PHY addresses as the central
-MDIO address should work equally fine regardless of whether we are
-talking about the DSA switch's MDIO address here, or the MFD device's
-MDIO address.
+In theory I might have found just this option. Tagger documentation is
+totally missing but there are some c and header API that define some
+interesting option of the tagger.
 
-With MFD you still have the option of creating a fake MDIO controller
-child device, which has mdio-parent-bus = <&host_bus>, and redirecting
-all user port phy-handles to children of this bus. Since all regmap I/O
-of this fake MDIO bus goes to the MFD driver, you can implement there
-your hacks with page switching etc etc, and it should be equally safe.
+It seems the tagger can work in 3 way:
+- portmap (what we currently use)
+- portid 
+- lookup result
+
+Now the last 2 mode seems very interesting.
+The naming is very confusing but maybe with portid they refer to the
+FIB. I need to check this. If that's the case then it's exactly what we
+need. They set an int so it's definetly an ID.
+
+I assume lookup result is to only use FDB to decide where the packet
+should go. In this mode no ID or port are defined.
+
+So in short lots of tests to do, maybe this can be handled in the
+tagger.
+
+> > (I still need to check if I can assign a default FIB for a port...
+> > Currently the STP register are 2 bit for each FIB id, so 16 different
+> > FIB are possible)
+> > 
+> > Also do we have a script for selft tests? I remember there was one back
+> > in the days for fdb isolation?
+> 
+> I don't remember right now, I don't think we do. I'll try to come up
+> with something in the following days.
+
+Yes that would be handy.
+
+-- 
+	Ansuel
 
