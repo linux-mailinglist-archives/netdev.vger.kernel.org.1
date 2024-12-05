@@ -1,293 +1,371 @@
-Return-Path: <netdev+bounces-149208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 179FE9E4C54
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 03:35:57 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D90A9E4C59
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 03:38:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6800281E68
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 02:35:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5C6618818E3
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 02:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386B71E49F;
-	Thu,  5 Dec 2024 02:35:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CK0CHahT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C5C187848;
+	Thu,  5 Dec 2024 02:38:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A78B4C96;
-	Thu,  5 Dec 2024 02:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767A279DC
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 02:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733366153; cv=none; b=DGlnvp+am2dzx9AsveRZPBiHcA2KOnDoAxQ0yXJ5YP9jkr/PGH+dUmOnTaBsoqZ9louNquYWls03O3uNUXGC48Icb67OyfaUs2q3m2VGmVlUYxZNGoy8Vu/cZ5h0DeL4OAekxEuSzG3rYM4+X/CPL8DUL02stuFR+fYux6oHQiY=
+	t=1733366290; cv=none; b=YTi53GdaNtUFxb/UB9w016/LedyEwdjArqpl7FJsdhsQxkduyv++MxqNs0oFhtPOCDqtA422BJs5Y0e7hBM5HNAqzocG82mT8LJLXSzZWVMecdVt0jeQxv4ooS8sud28y+PnVJR+7soDyGVleciqd+Jw5t//2rYi0ZuZPdPS2NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733366153; c=relaxed/simple;
-	bh=bCFToNXOOk4QUCeXM2IFMAHFOjr+msvvvubD8bYPWQ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rLNf/fG/ahjiT8Pq7oJxNVk1DIYNuTu3scD8CkxXnU/QBc5cJy40Ps+x9FvV3L9UEKGXsIOH7YOJCUHI5TYqiG6B/HclEr8fKEW4nAjGpaHHSW/w1vh2KgNo+rzcC8ak+SzV8aBBzdrQTXeWkk9GGzcRAIldTF/vxKoPKXDv2hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CK0CHahT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A82E1C4CECD;
-	Thu,  5 Dec 2024 02:35:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733366152;
-	bh=bCFToNXOOk4QUCeXM2IFMAHFOjr+msvvvubD8bYPWQ0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CK0CHahTfR9D/E+og6RDoq06SHlrmaVVPgLE9utF54AclobpK8Mqa9VEhCFDiGJcz
-	 NKywClULEvdIBx45u8F5VsNXNMV6RkxCXi93BwLRyy4q4qLIAWV++/R2ksjbr/Xcfo
-	 cX5JzwlUD3GxptnsRFS734/SW3PNEerXWjBWoAmroXd7LBwE6h14P6tYofoT1WPlsx
-	 2L9CgkFyistKY4iIip5VaFWz22biThnTSlMFPBiDnUEOkmdpZ9prO28LPHiHSGNJ4R
-	 7s5LCv5MbYLuadtbEA48bntl0SPIgbanoa1XrdekkIM5yXzXjKsusbBX+wuZTdk+ir
-	 CPOspzOPstKnQ==
-Date: Wed, 4 Dec 2024 18:35:50 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Li Li <dualli@chromium.org>
-Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, donald.hunter@gmail.com,
- gregkh@linuxfoundation.org, arve@android.com, tkjos@android.com,
- maco@android.com, joel@joelfernandes.org, brauner@kernel.org,
- cmllamas@google.com, surenb@google.com, arnd@arndb.de,
- masahiroy@kernel.org, bagasdotme@gmail.com, horms@kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, hridya@google.com, smoreland@google.com,
- kernel-team@android.com
-Subject: Re: [PATCH net-next v8 2/2] binder: report txn errors via generic
- netlink
-Message-ID: <20241204183550.6e9d703f@kernel.org>
-In-Reply-To: <20241113193239.2113577-3-dualli@chromium.org>
-References: <20241113193239.2113577-1-dualli@chromium.org>
-	<20241113193239.2113577-3-dualli@chromium.org>
+	s=arc-20240116; t=1733366290; c=relaxed/simple;
+	bh=Yda4GCF2HtyP7GVJr68aMzyiJwY3DrKYdEBYFINCl1g=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=plbYtqq6u/tGcHxWXLyEZaBrH5iaUXVTr6/OD4D5rlMt1OJ2sXRkBC5MJ9RmEvFW24jLpM8d35j8SvIrTe2NSVij/Ze5Sn9NBTtNxgBERqJkgBMC1YmOce9wZClXtVKV/ZBX2oAqKpKGKESIbjhec7U23dgbK/z3/CaSO2kh0II=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-241-iuV-d_jLMKazjlviFCdpbA-1; Thu, 05 Dec 2024 02:38:02 +0000
+X-MC-Unique: iuV-d_jLMKazjlviFCdpbA-1
+X-Mimecast-MFC-AGG-ID: iuV-d_jLMKazjlviFCdpbA
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 5 Dec
+ 2024 02:37:22 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Thu, 5 Dec 2024 02:37:22 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'David Howells' <dhowells@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: Marc Dionne <marc.dionne@auristor.com>, Yunsheng Lin
+	<linyunsheng@huawei.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "linux-afs@lists.infradead.org"
+	<linux-afs@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net-next 02/37] rxrpc: Use umin() and umax() rather than
+ min_t()/max_t() where possible
+Thread-Topic: [PATCH net-next 02/37] rxrpc: Use umin() and umax() rather than
+ min_t()/max_t() where possible
+Thread-Index: AQHbRMbh0C4h7ofUKUqfMucF4fVa+LLW8I5g
+Date: Thu, 5 Dec 2024 02:37:22 +0000
+Message-ID: <35033e7d707b4c68ae125820230d3cd3@AcuMS.aculab.com>
+References: <20241202143057.378147-1-dhowells@redhat.com>
+ <20241202143057.378147-3-dhowells@redhat.com>
+In-Reply-To: <20241202143057.378147-3-dhowells@redhat.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: 6y1yGbhSFpdh6m2BAY7BGUtyPg4jARNsJ0HhfbUqB9s_1733366281
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 13 Nov 2024 11:32:39 -0800 Li Li wrote:
-> +/**
-> + * binder_find_proc() - set binder report flags
-> + * @pid:	the target process
-> + */
-> +static struct binder_proc *binder_find_proc(int pid)
-> +{
-> +	struct binder_proc *proc;
-> +
-> +	mutex_lock(&binder_procs_lock);
-> +	hlist_for_each_entry(proc, &binder_procs, proc_node) {
-> +		if (proc->pid == pid) {
-> +			mutex_unlock(&binder_procs_lock);
-> +			return proc;
-> +		}
-> +	}
-> +	mutex_unlock(&binder_procs_lock);
-> +
-> +	return NULL;
-> +}
-> +
-> +/**
-> + * binder_genl_set_report() - set binder report flags
-> + * @context:	the binder context to set the flags
-> + * @pid:	the target process
-> + * @flags:	the flags to set
-> + *
-> + * If pid is 0, the flags are applied to the whole binder context.
-> + * Otherwise, the flags are applied to the specific process only.
-> + */
-> +static int binder_genl_set_report(struct binder_context *context, u32 pid,
-> +				  u32 flags)
-> +{
-> +	struct binder_proc *proc;
-> +
-> +	if (flags != (flags & (BINDER_GENL_FLAG_OVERRIDE
-> +			| BINDER_GENL_FLAG_FAILED
-> +			| BINDER_GENL_FLAG_DELAYED
-> +			| BINDER_GENL_FLAG_SPAM))) {
-> +		pr_err("Invalid binder report flags: %u\n", flags);
-> +		return -EINVAL;
+From: David Howells <dhowells@redhat.com>
+> Sent: 02 December 2024 14:30
+>=20
+> Use umin() and umax() rather than min_t()/max_t() where the type specifie=
+d
+> is an unsigned type.
 
-no need, netlink already checks that only bits from the flags are used:
+You are also changing some max() to umax().
+Presumably they have always passed the type check so max() is fine.
+And max(foo, 1) would have required that 'foo' be 'signed int' and could
+potentially be negative when max(-1, 1) will be 1 but umax(-1, 1) is
+undefined.
 
-                                    vvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-+	[BINDER_GENL_A_CMD_FLAGS] = NLA_POLICY_MASK(NLA_U32, 0xf),
+I actually suspect a lot of the min_t/max_t could be plain min/max now.
+It looks like someone couldn't be bothered to generate unsigned constants.
+Now min(unsigned_val, 1) is accepted as well as min(unsigned_val, 1u).
 
-> +	}
-> +
-> +	if (!pid) {
-> +		/* Set the global flags for the whole binder context */
-> +		context->report_flags = flags;
-> +	} else {
-> +		/* Set the per-process flags */
-> +		proc = binder_find_proc(pid);
-> +		if (!proc) {
-> +			pr_err("Invalid binder report pid %u\n", pid);
-> +			return -EINVAL;
-> +		}
-> +
-> +		proc->report_flags = flags;
-> +	}
-> +
-> +	return 0;
-> +}
+=09David
 
-> +static void binder_genl_send_report(struct binder_context *context, u32 err,
-> +				    u32 pid, u32 tid, u32 to_pid, u32 to_tid,
-> +				    u32 reply,
-> +				    struct binder_transaction_data *tr)
-> +{
-> +	int payload;
-> +	int ret;
-> +	struct sk_buff *skb;
-> +	void *hdr;
-> +
-> +	trace_binder_send_report(context->name, err, pid, tid, to_pid, to_tid,
-> +				 reply, tr);
-> +
-> +	payload = nla_total_size(strlen(context->name) + 1) +
-> +		  nla_total_size(sizeof(u32)) * (BINDER_GENL_A_REPORT_MAX - 1);
-> +	skb = genlmsg_new(payload + GENL_HDRLEN, GFP_KERNEL);
 
- genlmsg_new() adds the GENL_HDRLEN already
+>=20
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Marc Dionne <marc.dionne@auristor.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: linux-afs@lists.infradead.org
+> cc: netdev@vger.kernel.org
+> ---
+>  net/rxrpc/call_event.c  |  5 ++---
+>  net/rxrpc/call_object.c |  4 ++--
+>  net/rxrpc/conn_client.c |  2 +-
+>  net/rxrpc/input.c       | 13 +++++--------
+>  net/rxrpc/insecure.c    |  2 +-
+>  net/rxrpc/io_thread.c   |  2 +-
+>  net/rxrpc/output.c      |  2 +-
+>  net/rxrpc/rtt.c         |  6 +++---
+>  net/rxrpc/rxkad.c       |  6 +++---
+>  net/rxrpc/rxperf.c      |  2 +-
+>  net/rxrpc/sendmsg.c     |  2 +-
+>  11 files changed, 21 insertions(+), 25 deletions(-)
+>=20
+> diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
+> index 7bbb68504766..c4754cc9b8d4 100644
+> --- a/net/rxrpc/call_event.c
+> +++ b/net/rxrpc/call_event.c
+> @@ -233,8 +233,7 @@ static void rxrpc_close_tx_phase(struct rxrpc_call *c=
+all)
+>=20
+>  static bool rxrpc_tx_window_has_space(struct rxrpc_call *call)
+>  {
+> -=09unsigned int winsize =3D min_t(unsigned int, call->tx_winsize,
+> -=09=09=09=09     call->cong_cwnd + call->cong_extra);
+> +=09unsigned int winsize =3D umin(call->tx_winsize, call->cong_cwnd + cal=
+l->cong_extra);
+>  =09rxrpc_seq_t window =3D call->acks_hard_ack, wtop =3D window + winsize=
+;
+>  =09rxrpc_seq_t tx_top =3D call->tx_top;
+>  =09int space;
+> @@ -467,7 +466,7 @@ bool rxrpc_input_call_event(struct rxrpc_call *call, =
+struct sk_buff *skb)
+>  =09=09} else {
+>  =09=09=09unsigned long nowj =3D jiffies, delayj, nextj;
+>=20
+> -=09=09=09delayj =3D max(nsecs_to_jiffies(delay), 1);
+> +=09=09=09delayj =3D umax(nsecs_to_jiffies(delay), 1);
+>  =09=09=09nextj =3D nowj + delayj;
+>  =09=09=09if (time_before(nextj, call->timer.expires) ||
+>  =09=09=09    !timer_pending(&call->timer)) {
+> diff --git a/net/rxrpc/call_object.c b/net/rxrpc/call_object.c
+> index f9e983a12c14..0df647d1d3a2 100644
+> --- a/net/rxrpc/call_object.c
+> +++ b/net/rxrpc/call_object.c
+> @@ -220,9 +220,9 @@ static struct rxrpc_call *rxrpc_alloc_client_call(str=
+uct rxrpc_sock *rx,
+>  =09=09__set_bit(RXRPC_CALL_EXCLUSIVE, &call->flags);
+>=20
+>  =09if (p->timeouts.normal)
+> -=09=09call->next_rx_timo =3D min(p->timeouts.normal, 1);
+> +=09=09call->next_rx_timo =3D umin(p->timeouts.normal, 1);
+>  =09if (p->timeouts.idle)
+> -=09=09call->next_req_timo =3D min(p->timeouts.idle, 1);
+> +=09=09call->next_req_timo =3D umin(p->timeouts.idle, 1);
+>  =09if (p->timeouts.hard)
+>  =09=09call->hard_timo =3D p->timeouts.hard;
+>=20
+> diff --git a/net/rxrpc/conn_client.c b/net/rxrpc/conn_client.c
+> index bb11e8289d6d..86fb18bcd188 100644
+> --- a/net/rxrpc/conn_client.c
+> +++ b/net/rxrpc/conn_client.c
+> @@ -231,7 +231,7 @@ static bool rxrpc_may_reuse_conn(struct rxrpc_connect=
+ion *conn)
+>  =09distance =3D id - id_cursor;
+>  =09if (distance < 0)
+>  =09=09distance =3D -distance;
+> -=09limit =3D max_t(unsigned long, atomic_read(&rxnet->nr_conns) * 4, 102=
+4);
+> +=09limit =3D umax(atomic_read(&rxnet->nr_conns) * 4, 1024);
+>  =09if (distance > limit)
+>  =09=09goto mark_dont_reuse;
+>=20
+> diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
+> index 16d49a861dbb..49e35be7dc13 100644
+> --- a/net/rxrpc/input.c
+> +++ b/net/rxrpc/input.c
+> @@ -44,8 +44,7 @@ static void rxrpc_congestion_management(struct rxrpc_ca=
+ll *call,
+>=20
+>  =09if (test_and_clear_bit(RXRPC_CALL_RETRANS_TIMEOUT, &call->flags)) {
+>  =09=09summary->retrans_timeo =3D true;
+> -=09=09call->cong_ssthresh =3D max_t(unsigned int,
+> -=09=09=09=09=09    summary->flight_size / 2, 2);
+> +=09=09call->cong_ssthresh =3D umax(summary->flight_size / 2, 2);
+>  =09=09cwnd =3D 1;
+>  =09=09if (cwnd >=3D call->cong_ssthresh &&
+>  =09=09    call->cong_mode =3D=3D RXRPC_CALL_SLOW_START) {
+> @@ -113,8 +112,7 @@ static void rxrpc_congestion_management(struct rxrpc_=
+call *call,
+>=20
+>  =09=09change =3D rxrpc_cong_begin_retransmission;
+>  =09=09call->cong_mode =3D RXRPC_CALL_FAST_RETRANSMIT;
+> -=09=09call->cong_ssthresh =3D max_t(unsigned int,
+> -=09=09=09=09=09    summary->flight_size / 2, 2);
+> +=09=09call->cong_ssthresh =3D umax(summary->flight_size / 2, 2);
+>  =09=09cwnd =3D call->cong_ssthresh + 3;
+>  =09=09call->cong_extra =3D 0;
+>  =09=09call->cong_dup_acks =3D 0;
+> @@ -206,9 +204,8 @@ void rxrpc_congestion_degrade(struct rxrpc_call *call=
+)
+>  =09rxrpc_inc_stat(call->rxnet, stat_tx_data_cwnd_reset);
+>  =09call->tx_last_sent =3D now;
+>  =09call->cong_mode =3D RXRPC_CALL_SLOW_START;
+> -=09call->cong_ssthresh =3D max_t(unsigned int, call->cong_ssthresh,
+> -=09=09=09=09    call->cong_cwnd * 3 / 4);
+> -=09call->cong_cwnd =3D max_t(unsigned int, call->cong_cwnd / 2, RXRPC_MI=
+N_CWND);
+> +=09call->cong_ssthresh =3D umax(call->cong_ssthresh, call->cong_cwnd * 3=
+ / 4);
+> +=09call->cong_cwnd =3D umax(call->cong_cwnd / 2, RXRPC_MIN_CWND);
+>  }
+>=20
+>  /*
+> @@ -709,7 +706,7 @@ static void rxrpc_input_ack_trailer(struct rxrpc_call=
+ *call, struct sk_buff *skb
+>  =09=09call->tx_winsize =3D rwind;
+>  =09}
+>=20
+> -=09mtu =3D min(ntohl(trailer->maxMTU), ntohl(trailer->ifMTU));
+> +=09mtu =3D umin(ntohl(trailer->maxMTU), ntohl(trailer->ifMTU));
+>=20
+>  =09peer =3D call->peer;
+>  =09if (mtu < peer->maxdata) {
+> diff --git a/net/rxrpc/insecure.c b/net/rxrpc/insecure.c
+> index 6716c021a532..751eb621021d 100644
+> --- a/net/rxrpc/insecure.c
+> +++ b/net/rxrpc/insecure.c
+> @@ -19,7 +19,7 @@ static int none_init_connection_security(struct rxrpc_c=
+onnection *conn,
+>   */
+>  static struct rxrpc_txbuf *none_alloc_txbuf(struct rxrpc_call *call, siz=
+e_t remain, gfp_t gfp)
+>  {
+> -=09return rxrpc_alloc_data_txbuf(call, min_t(size_t, remain, RXRPC_JUMBO=
+_DATALEN), 1, gfp);
+> +=09return rxrpc_alloc_data_txbuf(call, umin(remain, RXRPC_JUMBO_DATALEN)=
+, 1, gfp);
+>  }
+>=20
+>  static int none_secure_packet(struct rxrpc_call *call, struct rxrpc_txbu=
+f *txb)
+> diff --git a/net/rxrpc/io_thread.c b/net/rxrpc/io_thread.c
+> index 07c74c77d802..7af5adf53b25 100644
+> --- a/net/rxrpc/io_thread.c
+> +++ b/net/rxrpc/io_thread.c
+> @@ -558,7 +558,7 @@ int rxrpc_io_thread(void *data)
+>  =09=09=09}
+>=20
+>  =09=09=09timeout =3D nsecs_to_jiffies(delay_ns);
+> -=09=09=09timeout =3D max(timeout, 1UL);
+> +=09=09=09timeout =3D umax(timeout, 1);
+>  =09=09=09schedule_timeout(timeout);
+>  =09=09=09__set_current_state(TASK_RUNNING);
+>  =09=09=09continue;
+> diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
+> index 5ea9601efd05..85112ea31a39 100644
+> --- a/net/rxrpc/output.c
+> +++ b/net/rxrpc/output.c
+> @@ -118,7 +118,7 @@ static void rxrpc_fill_out_ack(struct rxrpc_call *cal=
+l,
+>  =09=09txb->kvec[1].iov_len =3D ack->nAcks;
+>=20
+>  =09=09wrap =3D RXRPC_SACK_SIZE - sack;
+> -=09=09to =3D min_t(unsigned int, ack->nAcks, RXRPC_SACK_SIZE);
+> +=09=09to =3D umin(ack->nAcks, RXRPC_SACK_SIZE);
+>=20
+>  =09=09if (sack + ack->nAcks <=3D RXRPC_SACK_SIZE) {
+>  =09=09=09memcpy(sackp, call->ackr_sack_table + sack, ack->nAcks);
+> diff --git a/net/rxrpc/rtt.c b/net/rxrpc/rtt.c
+> index cdab7b7d08a0..6dc51486b5a6 100644
+> --- a/net/rxrpc/rtt.c
+> +++ b/net/rxrpc/rtt.c
+> @@ -27,7 +27,7 @@ static u32 __rxrpc_set_rto(const struct rxrpc_peer *pee=
+r)
+>=20
+>  static u32 rxrpc_bound_rto(u32 rto)
+>  {
+> -=09return min(rto, RXRPC_RTO_MAX);
+> +=09return umin(rto, RXRPC_RTO_MAX);
+>  }
+>=20
+>  /*
+> @@ -91,11 +91,11 @@ static void rxrpc_rtt_estimator(struct rxrpc_peer *pe=
+er, long sample_rtt_us)
+>  =09=09/* no previous measure. */
+>  =09=09srtt =3D m << 3;=09=09/* take the measured time to be rtt */
+>  =09=09peer->mdev_us =3D m << 1;=09/* make sure rto =3D 3*rtt */
+> -=09=09peer->rttvar_us =3D max(peer->mdev_us, rxrpc_rto_min_us(peer));
+> +=09=09peer->rttvar_us =3D umax(peer->mdev_us, rxrpc_rto_min_us(peer));
+>  =09=09peer->mdev_max_us =3D peer->rttvar_us;
+>  =09}
+>=20
+> -=09peer->srtt_us =3D max(1U, srtt);
+> +=09peer->srtt_us =3D umax(srtt, 1);
+>  }
+>=20
+>  /*
+> diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
+> index 48a1475e6b06..e3194d73dd84 100644
+> --- a/net/rxrpc/rxkad.c
+> +++ b/net/rxrpc/rxkad.c
+> @@ -150,11 +150,11 @@ static struct rxrpc_txbuf *rxkad_alloc_txbuf(struct=
+ rxrpc_call *call, size_t rem
+>  =09struct rxrpc_txbuf *txb;
+>  =09size_t shdr, space;
+>=20
+> -=09remain =3D min(remain, 65535 - sizeof(struct rxrpc_wire_header));
+> +=09remain =3D umin(remain, 65535 - sizeof(struct rxrpc_wire_header));
+>=20
+>  =09switch (call->conn->security_level) {
+>  =09default:
+> -=09=09space =3D min_t(size_t, remain, RXRPC_JUMBO_DATALEN);
+> +=09=09space =3D umin(remain, RXRPC_JUMBO_DATALEN);
+>  =09=09return rxrpc_alloc_data_txbuf(call, space, 1, gfp);
+>  =09case RXRPC_SECURITY_AUTH:
+>  =09=09shdr =3D sizeof(struct rxkad_level1_hdr);
+> @@ -164,7 +164,7 @@ static struct rxrpc_txbuf *rxkad_alloc_txbuf(struct r=
+xrpc_call *call, size_t rem
+>  =09=09break;
+>  =09}
+>=20
+> -=09space =3D min_t(size_t, round_down(RXRPC_JUMBO_DATALEN, RXKAD_ALIGN),=
+ remain + shdr);
+> +=09space =3D umin(round_down(RXRPC_JUMBO_DATALEN, RXKAD_ALIGN), remain +=
+ shdr);
+>  =09space =3D round_up(space, RXKAD_ALIGN);
+>=20
+>  =09txb =3D rxrpc_alloc_data_txbuf(call, space, RXKAD_ALIGN, gfp);
+> diff --git a/net/rxrpc/rxperf.c b/net/rxrpc/rxperf.c
+> index 085e7892d310..7ef93407be83 100644
+> --- a/net/rxrpc/rxperf.c
+> +++ b/net/rxrpc/rxperf.c
+> @@ -503,7 +503,7 @@ static int rxperf_process_call(struct rxperf_call *ca=
+ll)
+>  =09=09=09=09   reply_len + sizeof(rxperf_magic_cookie));
+>=20
+>  =09while (reply_len > 0) {
+> -=09=09len =3D min_t(size_t, reply_len, PAGE_SIZE);
+> +=09=09len =3D umin(reply_len, PAGE_SIZE);
+>  =09=09bvec_set_page(&bv, ZERO_PAGE(0), len, 0);
+>  =09=09iov_iter_bvec(&msg.msg_iter, WRITE, &bv, 1, len);
+>  =09=09msg.msg_flags =3D MSG_MORE;
+> diff --git a/net/rxrpc/sendmsg.c b/net/rxrpc/sendmsg.c
+> index 6abb8eec1b2b..b04afb5df241 100644
+> --- a/net/rxrpc/sendmsg.c
+> +++ b/net/rxrpc/sendmsg.c
+> @@ -360,7 +360,7 @@ static int rxrpc_send_data(struct rxrpc_sock *rx,
+>=20
+>  =09=09/* append next segment of data to the current buffer */
+>  =09=09if (msg_data_left(msg) > 0) {
+> -=09=09=09size_t copy =3D min_t(size_t, txb->space, msg_data_left(msg));
+> +=09=09=09size_t copy =3D umin(txb->space, msg_data_left(msg));
+>=20
+>  =09=09=09_debug("add %zu", copy);
+>  =09=09=09if (!copy_from_iter_full(txb->kvec[0].iov_base + txb->offset,
+>=20
 
-> +	if (!skb) {
-> +		pr_err("Failed to alloc binder genl message\n");
-> +		return;
-> +	}
-> +
-> +	hdr = genlmsg_put(skb, 0, atomic_inc_return(&context->report_seq),
-> +			  &binder_genl_nl_family, 0, BINDER_GENL_CMD_REPORT);
-> +	if (!hdr)
-> +		goto free_skb;
-> +
-> +	if (nla_put_string(skb, BINDER_GENL_A_REPORT_CONTEXT, context->name) ||
-> +	    nla_put_u32(skb, BINDER_GENL_A_REPORT_ERR, err) ||
-> +	    nla_put_u32(skb, BINDER_GENL_A_REPORT_FROM_PID, pid) ||
-> +	    nla_put_u32(skb, BINDER_GENL_A_REPORT_FROM_TID, tid) ||
-> +	    nla_put_u32(skb, BINDER_GENL_A_REPORT_TO_PID, to_pid) ||
-> +	    nla_put_u32(skb, BINDER_GENL_A_REPORT_TO_TID, to_tid) ||
-> +	    nla_put_u32(skb, BINDER_GENL_A_REPORT_REPLY, reply) ||
-> +	    nla_put_u32(skb, BINDER_GENL_A_REPORT_FLAGS, tr->flags) ||
-> +	    nla_put_u32(skb, BINDER_GENL_A_REPORT_CODE, tr->code) ||
-> +	    nla_put_u32(skb, BINDER_GENL_A_REPORT_DATA_SIZE, tr->data_size))
-> +		goto cancel_skb;
-> +
-> +	genlmsg_end(skb, hdr);
-> +
-> +	ret = genlmsg_unicast(&init_net, skb, context->report_portid);
-> +	if (ret < 0)
-> +		pr_err("Failed to send binder genl message to %d: %d\n",
-> +		       context->report_portid, ret);
-> +	return;
-> +
-> +cancel_skb:
-> +	pr_err("Failed to add report attributes to binder genl message\n");
-> +	genlmsg_cancel(skb, hdr);
-> +free_skb:
-> +	pr_err("Free binder genl report message on error\n");
-> +	nlmsg_free(skb);
-> +}
-
-> +/**
-> + * binder_genl_nl_set_doit() - .doit handler for BINDER_GENL_CMD_SET
-> + * @skb:	the metadata struct passed from netlink driver
-> + * @info:	the generic netlink struct passed from netlink driver
-> + *
-> + * Implements the .doit function to process binder genl commands.
-> + */
-> +int binder_genl_nl_set_doit(struct sk_buff *skb, struct genl_info *info)
-> +{
-> +	int payload;
-> +	int portid;
-> +	u32 pid;
-> +	u32 flags;
-> +	void *hdr;
-> +	struct binder_device *device;
-> +	struct binder_context *context = NULL;
-> +
-> +	if (GENL_REQ_ATTR_CHECK(info, BINDER_GENL_A_CMD_CONTEXT) ||
-> +	    GENL_REQ_ATTR_CHECK(info, BINDER_GENL_A_CMD_PID) ||
-> +	    GENL_REQ_ATTR_CHECK(info, BINDER_GENL_A_CMD_FLAGS))
-> +		return -EINVAL;
-> +
-> +	hlist_for_each_entry(device, &binder_devices, hlist) {
-> +		if (!nla_strcmp(info->attrs[BINDER_GENL_A_CMD_CONTEXT],
-> +				device->context.name)) {
-> +			context = &device->context;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (!context) {
-> +		NL_SET_ERR_MSG(info->extack, "Unknown binder context\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	portid = nlmsg_hdr(skb)->nlmsg_pid;
-> +	pid = nla_get_u32(info->attrs[BINDER_GENL_A_CMD_PID]);
-> +	flags = nla_get_u32(info->attrs[BINDER_GENL_A_CMD_FLAGS]);
-> +
-> +	if (context->report_portid && context->report_portid != portid) {
-> +		NL_SET_ERR_MSG_FMT(info->extack,
-> +				   "No permission to set flags from %d\n",
-> +				   portid);
-> +		return -EPERM;
-> +	}
-> +
-> +	if (binder_genl_set_report(context, pid, flags) < 0) {
-> +		pr_err("Failed to set report flags %u for %u\n", flags, pid);
-> +		return -EINVAL;
-> +	}
-> +
-> +	payload = nla_total_size(sizeof(pid)) + nla_total_size(sizeof(flags));
-> +	skb = genlmsg_new(payload + GENL_HDRLEN, GFP_KERNEL);
-> +	if (!skb) {
-> +		pr_err("Failed to alloc binder genl reply message\n");
-> +		return -ENOMEM;
-
-no need for error messages on allocation failures, kernel will print an
-OOM report
-
-> +	}
-> +
-> +	hdr = genlmsg_iput(skb, info);
-> +	if (!hdr)
-> +		goto free_skb;
-> +
-> +	if (nla_put_string(skb, BINDER_GENL_A_CMD_CONTEXT, context->name) ||
-
-Have you counted strlen(context->name) to payload?
-TBH for small messages counting payload size is probably an overkill,
-you can use NLMSG_GOODSIZE as the size of the skb.
-
-> +	    nla_put_u32(skb, BINDER_GENL_A_CMD_PID, pid) ||
-> +	    nla_put_u32(skb, BINDER_GENL_A_CMD_FLAGS, flags))
-> +		goto cancel_skb;
-> +
-> +	genlmsg_end(skb, hdr);
-> +
-> +	if (genlmsg_reply(skb, info)) {
-> +		pr_err("Failed to send binder genl reply message\n");
-> +		return -EFAULT;
-> +	}
-> +
-> +	if (!context->report_portid)
-> +		context->report_portid = portid;
-
-Is there any locking required?
-
-> +	return 0;
-> +
-> +cancel_skb:
-> +	pr_err("Failed to add reply attributes to binder genl message\n");
-> +	genlmsg_cancel(skb, hdr);
-> +free_skb:
-> +	pr_err("Free binder genl reply message on error\n");
-> +	nlmsg_free(skb);
-> +	return -EMSGSIZE;
-> +}
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
 
