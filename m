@@ -1,41 +1,42 @@
-Return-Path: <netdev+bounces-149290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B754B9E50BF
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:09:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D2AA9E50C2
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32FE11882FBB
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 09:09:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C45CE16A038
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 09:09:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C964D1DBB35;
-	Thu,  5 Dec 2024 09:06:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6784B1F03E6;
+	Thu,  5 Dec 2024 09:06:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280251DA0E9
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 09:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2821DB92C
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 09:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733389585; cv=none; b=ucGSczd0p4rfyDv6oK0Wlo1cQjoFtPlJRojYOEDQTORotNOBzaG2JUiS0OgRtYtG6x2ooVVeBRP2jO3X6Dx2srTE62P430+FZ42Qc8LnAQf1KruwIMDrDw44HVX9T3sBbVt58m1mZftbid8EQ3JPJUzgkiyPjc7PbBVnQMcEWr0=
+	t=1733389587; cv=none; b=jxYG1ZrGsZW+AWWp20aM9N84fJWl1t9tWFzRMGHEfD46EzseEsbrgUAfYNKwRSdNyeZXL7CU+/fdjbFiF4g22M8vXBMedwGFHD3bHqhHcoFyTfBv20y0WRL7NPo+GjN7TPkmhf++uVSS3rXWRkovelJ2wVQKw6kluluLIhDshrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733389585; c=relaxed/simple;
-	bh=BrjZih4Ol/B/N7HxsWl8g5R6vYxxpRcHt620HszKJVU=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=SWxUfclhZTDpbW4+ZYd+SNRKZT0yFk3q0sYWyU7KtR5VHlbxNKkmJak4DEHAXwphl6DZ3gXh9JeaFrB+8BJ9Agt3srnF4Q+uYVq5nndYBcs6KFT+OsON5GhpPrem7N21HIlpZoqgxxCBRdLj+pl8vmFsE3ud13bcblojAwmYLtI=
+	s=arc-20240116; t=1733389587; c=relaxed/simple;
+	bh=03WGIBVqEJZPaK9SgPYfCuwS7r2M6ou3hBrVG6tNq4c=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=DeXCNNKKJeUfmZ7eyvbvHCR0vRVSQOAE+bQFC4+vvHgmr5mF2HnhfLjqmfUuBxjRagEcLbeSn9va3N+R5RP/Cs+iYpJxUzKGJ1wYP4v13WBsNn953Kn2AJnWgjS7e0OhkVJAFAi6+VxhPo5PuIktR6MR4gPCJXTktg0Tbbhtg38=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
 Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=ratatoskr.trumtrar.info)
 	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
 	(envelope-from <s.trumtrar@pengutronix.de>)
-	id 1tJ7oQ-0004Ks-Ji; Thu, 05 Dec 2024 10:06:18 +0100
+	id 1tJ7oR-0004Ks-Jk; Thu, 05 Dec 2024 10:06:19 +0100
 From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Subject: [PATCH v3 0/6] ARM64: dts: intel: agilex5: add nodes and new board
-Date: Thu, 05 Dec 2024 10:06:00 +0100
-Message-Id: <20241205-v6-12-topic-socfpga-agilex5-v3-0-2a8cdf73f50a@pengutronix.de>
+Date: Thu, 05 Dec 2024 10:06:01 +0100
+Subject: [PATCH v3 1/6] dt-bindings: net: dwmac: Convert socfpga dwmac to
+ DT schema
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,11 +45,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAPhsUWcC/43NQQ6CMBCF4auQrh3TDlDAlfcwLqAMMImhpMUGQ
- 7i7hY0LE+Pyf4vvrcKTY/LikqzCUWDPdoyRnhJhhnrsCbiNLVBipmQqIWhQCLOd2IC3ppv6Guq
- eH7TkUMmuTduyq0ppRBQmRx0vh367xx7Yz9a9jrOg9vU/NyiQ0GCji6KUpCVdJxr75+zsyMu5J
- bHjAT+gwvw3iBEsdYa5JmOKBr/Abdve+EgsIxwBAAA=
-X-Change-ID: 20241030-v6-12-topic-socfpga-agilex5-90fd3d8f980c
+Message-Id: <20241205-v6-12-topic-socfpga-agilex5-v3-1-2a8cdf73f50a@pengutronix.de>
+References: <20241205-v6-12-topic-socfpga-agilex5-v3-0-2a8cdf73f50a@pengutronix.de>
+In-Reply-To: <20241205-v6-12-topic-socfpga-agilex5-v3-0-2a8cdf73f50a@pengutronix.de>
 To: Dinh Nguyen <dinguyen@kernel.org>, Rob Herring <robh@kernel.org>, 
  Krzysztof Kozlowski <krzk+dt@kernel.org>, 
  Conor Dooley <conor+dt@kernel.org>, 
@@ -57,61 +56,213 @@ To: Dinh Nguyen <dinguyen@kernel.org>, Rob Herring <robh@kernel.org>,
  Stephen Boyd <sboyd@kernel.org>
 Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
  netdev@vger.kernel.org, linux-clk@vger.kernel.org, kernel@pengutronix.de, 
- Steffen Trumtrar <s.trumtrar@pengutronix.de>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+ Steffen Trumtrar <s.trumtrar@pengutronix.de>
 X-Mailer: b4 0.14.2
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
 X-SA-Exim-Mail-From: s.trumtrar@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-This series adds the gpio0 and gmac nodes to the socfpga_agilex5.dtsi.
-As the the socfpga-dwmac binding is still in txt format, convert it to
-yaml, to pass dtb_checks.
-
-An initial devicetree for a new board (Arrow AXE5-Eagle) is also added.
-Currently only QSPI and network are functional as all other hardware
-currently lacks mainline support.
+Changes to the binding while converting:
+- add "snps,dwmac-3.7{0,2,4}a". They are used, but undocumented.
+- altr,f2h_ptp_ref_clk is not a required property but optional.
 
 Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 ---
-Changes in v3:
-- add socfpga-stmmac-agilex5 compatible
-- convert socfpga-dwmac.txt -> yaml
-- add Acked-bys
-- rebase to v6.13-rc1
-- Link to v2: https://lore.kernel.org/r/20241125-v6-12-topic-socfpga-agilex5-v2-0-864256ecc7b2@pengutronix.de
+ .../devicetree/bindings/net/socfpga-dwmac.txt      |  57 ----------
+ .../devicetree/bindings/net/socfpga-dwmac.yaml     | 119 +++++++++++++++++++++
+ 2 files changed, 119 insertions(+), 57 deletions(-)
 
-Changes in v2:
-- fix node names according to dtb_check
-- remove gpio 'status = disabled'
-- mdio0: remove setting of adi,[rt]x-internal-delay-ps. 2000 is the
-  default value
-- add Acked-by to dt-binding
-- Link to v1: https://lore.kernel.org/r/20241030-v6-12-topic-socfpga-agilex5-v1-0-b2b67780e60e@pengutronix.de
+diff --git a/Documentation/devicetree/bindings/net/socfpga-dwmac.txt b/Documentation/devicetree/bindings/net/socfpga-dwmac.txt
+deleted file mode 100644
+index 612a8e8abc88774619f4fd4e9205a3dd32226a9b..0000000000000000000000000000000000000000
+--- a/Documentation/devicetree/bindings/net/socfpga-dwmac.txt
++++ /dev/null
+@@ -1,57 +0,0 @@
+-Altera SOCFPGA SoC DWMAC controller
+-
+-This is a variant of the dwmac/stmmac driver an inherits all descriptions
+-present in Documentation/devicetree/bindings/net/stmmac.txt.
+-
+-The device node has additional properties:
+-
+-Required properties:
+- - compatible	: For Cyclone5/Arria5 SoCs it should contain
+-		  "altr,socfpga-stmmac". For Arria10/Agilex/Stratix10 SoCs
+-		  "altr,socfpga-stmmac-a10-s10".
+-		  Along with "snps,dwmac" and any applicable more detailed
+-		  designware version numbers documented in stmmac.txt
+- - altr,sysmgr-syscon : Should be the phandle to the system manager node that
+-   encompasses the glue register, the register offset, and the register shift.
+-   On Cyclone5/Arria5, the register shift represents the PHY mode bits, while
+-   on the Arria10/Stratix10/Agilex platforms, the register shift represents
+-   bit for each emac to enable/disable signals from the FPGA fabric to the
+-   EMAC modules.
+- - altr,f2h_ptp_ref_clk use f2h_ptp_ref_clk instead of default eosc1 clock
+-   for ptp ref clk. This affects all emacs as the clock is common.
+-
+-Optional properties:
+-altr,emac-splitter: Should be the phandle to the emac splitter soft IP node if
+-		DWMAC controller is connected emac splitter.
+-phy-mode: The phy mode the ethernet operates in
+-altr,sgmii-to-sgmii-converter: phandle to the TSE SGMII converter
+-
+-This device node has additional phandle dependency, the sgmii converter:
+-
+-Required properties:
+- - compatible	: Should be altr,gmii-to-sgmii-2.0
+- - reg-names	: Should be "eth_tse_control_port"
+-
+-Example:
+-
+-gmii_to_sgmii_converter: phy@100000240 {
+-	compatible = "altr,gmii-to-sgmii-2.0";
+-	reg = <0x00000001 0x00000240 0x00000008>,
+-		<0x00000001 0x00000200 0x00000040>;
+-	reg-names = "eth_tse_control_port";
+-	clocks = <&sgmii_1_clk_0 &emac1 1 &sgmii_clk_125 &sgmii_clk_125>;
+-	clock-names = "tse_pcs_ref_clk_clock_connection", "tse_rx_cdr_refclk";
+-};
+-
+-gmac0: ethernet@ff700000 {
+-	compatible = "altr,socfpga-stmmac", "snps,dwmac-3.70a", "snps,dwmac";
+-	altr,sysmgr-syscon = <&sysmgr 0x60 0>;
+-	reg = <0xff700000 0x2000>;
+-	interrupts = <0 115 4>;
+-	interrupt-names = "macirq";
+-	mac-address = [00 00 00 00 00 00];/* Filled in by U-Boot */
+-	clocks = <&emac_0_clk>;
+-	clock-names = "stmmaceth";
+-	phy-mode = "sgmii";
+-	altr,gmii-to-sgmii-converter = <&gmii_to_sgmii_converter>;
+-};
+diff --git a/Documentation/devicetree/bindings/net/socfpga-dwmac.yaml b/Documentation/devicetree/bindings/net/socfpga-dwmac.yaml
+new file mode 100644
+index 0000000000000000000000000000000000000000..022d9eb7011d47666b140aaecf54541ca3dec0ec
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/socfpga-dwmac.yaml
+@@ -0,0 +1,119 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/socfpga-dwmac.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Altera SOCFPGA SoC DWMAC controller
++
++maintainers:
++  - Dinh Nguyen <dinguyen@altera.com>
++
++description:
++  This is a variant of the dwmac/stmmac driver an inherits all descriptions
++  present in Documentation/devicetree/bindings/net/stmmac.txt.
++
++# We need a select here so we don't match all nodes with 'snps,dwmac'
++select:
++  properties:
++    compatible:
++      contains:
++        enum:
++          - altr,socfpga-stmmac # For Cyclone5/Arria5 SoCs
++          - altr,socfpga-stmmac-a10-s10 # For Arria10/Agilex/Stratix10 SoCs
++  required:
++    - compatible
++
++allOf:
++  - $ref: snps,dwmac.yaml#
++
++properties:
++  compatible:
++    oneOf:
++      - items:
++          - enum:
++              - altr,socfpga-stmmac
++          - const: snps,dwmac-3.70a
++      - items:
++          - enum:
++              - altr,socfpga-stmmac-a10-s10
++          - const: snps,dwmac-3.72a
++          - const: snps,dwmac
++      - items:
++          - enum:
++              - altr,socfpga-stmmac-a10-s10
++          - const: snps,dwmac-3.74a
++          - const: snps,dwmac
++
++  altr,sysmgr-syscon:
++    $ref: /schemas/types.yaml#/definitions/phandle-array
++    items:
++      - items:
++          - description: phandle to the sysmgr node
++          - description: register offset that controls the PHY mode or FPGA signals
++          - description: register shift for the PHY mode bits or FPGA signals
++    description:
++      Should be the phandle to the system manager node that
++      encompasses the glue register, the register offset, and the register shift.
++      On Cyclone5/Arria5, the register shift represents the PHY mode bits, while
++      on the Arria10/Stratix10/Agilex platforms, the register shift represents
++      bit for each emac to enable/disable signals from the FPGA fabric to the
++      EMAC modules.
++
++  altr,f2h_ptp_ref_clk:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description:
++      Use f2h_ptp_ref_clk instead of default eosc1 clock
++      for ptp ref clk. This affects all emacs as the clock is common.
++
++  altr,emac-splitter:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description:
++      Should be the phandle to the emac splitter soft IP node if
++      DWMAC controller is connected emac splitter.
++
++  phy-mode:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description:
++      The phy mode the ethernet operates in.
++
++  altr,sgmii-to-sgmii-converter:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description:
++      Phandle to the TSE SGMII converter.
++
++      This device node has additional phandle dependency, the sgmii converter
++        - compatible that should be altr,gmii-to-sgmii-2.0
++        - reg-names that should be "eth_tse_control_port"
++
++required:
++  - compatible
++  - reg
++  - altr,sysmgr-syscon
++
++examples:
++  - |
++    //Example 1
++    gmii_to_sgmii_converter: phy@100000240 {
++          compatible = "altr,gmii-to-sgmii-2.0";
++          reg = <0x00000001 0x00000240 0x00000008>,
++                <0x00000001 0x00000200 0x00000040>;
++          reg-names = "eth_tse_control_port";
++          clocks = <&sgmii_1_clk_0 &emac1 1 &sgmii_clk_125 &sgmii_clk_125>;
++          clock-names = "tse_pcs_ref_clk_clock_connection", "tse_rx_cdr_refclk";
++    };
++
++  - |
++    //Example 2
++    gmac0: ethernet@ff700000 {
++          compatible = "altr,socfpga-stmmac", "snps,dwmac-3.70a", "snps,dwmac";
++          altr,sysmgr-syscon = <&sysmgr 0x60 0>;
++          reg = <0xff700000 0x2000>;
++          interrupts = <0 115 4>;
++          interrupt-names = "macirq";
++          mac-address = [00 00 00 00 00 00];/* Filled in by U-Boot */
++          clocks = <&emac_0_clk>;
++          clock-names = "stmmaceth";
++          phy-mode = "sgmii";
++          altr,gmii-to-sgmii-converter = <&gmii_to_sgmii_converter>;
++    };
 
----
-Steffen Trumtrar (6):
-      dt-bindings: net: dwmac: Convert socfpga dwmac to DT schema
-      dt-bindings: net: dwmac: add compatible for Agilex5
-      arm64: dts: agilex5: add gmac nodes
-      arm64: dts: agilex5: add gpio0
-      dt-bindings: intel: add agilex5-based Arrow AXE5-Eagle
-      arm64: dts: agilex5: initial support for Arrow AXE5-Eagle
-
- .../devicetree/bindings/arm/intel,socfpga.yaml     |   1 +
- .../devicetree/bindings/net/socfpga-dwmac.txt      |  57 ---------
- .../devicetree/bindings/net/socfpga-dwmac.yaml     | 126 +++++++++++++++++++
- arch/arm64/boot/dts/intel/Makefile                 |   1 +
- arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi     | 109 ++++++++++++++++
- .../boot/dts/intel/socfpga_agilex5_axe5_eagle.dts  | 140 +++++++++++++++++++++
- 6 files changed, 377 insertions(+), 57 deletions(-)
----
-base-commit: 40384c840ea1944d7c5a392e8975ed088ecf0b37
-change-id: 20241030-v6-12-topic-socfpga-agilex5-90fd3d8f980c
-
-Best regards,
 -- 
-Steffen Trumtrar <s.trumtrar@pengutronix.de>
+2.46.0
 
 
