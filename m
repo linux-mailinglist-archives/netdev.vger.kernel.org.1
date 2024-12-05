@@ -1,130 +1,119 @@
-Return-Path: <netdev+bounces-149340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505249E52DE
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:47:57 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A3CF9E52DF
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:48:08 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB022188037B
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:46:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E75CE2853BC
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B511DB372;
-	Thu,  5 Dec 2024 10:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8361D63F2;
+	Thu,  5 Dec 2024 10:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jaDtVaSt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mvuOhxsT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E4D1D4600
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 10:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078FA1946B3;
+	Thu,  5 Dec 2024 10:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733395576; cv=none; b=HW5pfvNq7u34zNUa8L0nIrE8zC2krc2RBeckB9dxnF+mLAm0yMaU8qN2Mg2un57XCAD+/3WJw+MAnQ8fXiYlR52TjZcVCotH3635gIVaI5894xlX2/zpUoIeP0yOharjOQXuF0Nq8pmVa6fEwxmTt4wsouL1AD1pzsoQHfbl0Ps=
+	t=1733395685; cv=none; b=uMvUSOPMCpDWqknmd2jbdDVi8hBzCCqUOhUSlWDMi5iGJWg8Msz/Kcn4MSMsKUGpzmnVK1/tv/tXAMKljp42QVW9G3csPJVZzWA6OT7QkFOSyFL3tAv/+gsHUYqMUFvCrLbi2EZPCtIXsBnhKZ/o7OEBgY29snRrHznDRPm3Kvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733395576; c=relaxed/simple;
-	bh=oVNhBXCZHLlY4dxQD5hBqJ1+AxFtxhvl9sk4zboNcUY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NkYiYuQ/ywXIrfKoTkTkNe1qmmuLlsUhC86JK7qINYwAhLokHvqEwOBR8zzS5ZRtFyivZXPFlKc7E+rEHptEDvqNTAJeWCt+5aYDMkCG0f7HTBU39v7Ddh0JmyQB/78XjngxAfJ+v+tdqjc37gEtE+O8QkWbueYnZ0JMBV8Ynqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jaDtVaSt; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-53e21c808ceso5e87.1
-        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 02:46:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733395572; x=1734000372; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oVNhBXCZHLlY4dxQD5hBqJ1+AxFtxhvl9sk4zboNcUY=;
-        b=jaDtVaStIv3PlPacIhPFxMpHi17L94o1bFcYH/HrB9TaHLW2WE1lkBamS7uFC+nYyY
-         yoTFxxdMS5JxBNr8Me1lDf6T3nic3fhyACKyZdx/saTNrv6lnhSdYlDXkKbzqOm7poh8
-         5NGWXM/yRn7tI5HNiMyiZ3nLhQgEn7CgUSmpMRTf07A+kIKIWPYu2lhtpwm5KeAJ7lhQ
-         EkdX/w7g7cqx45BEcE09pIpoPsSVmDPuscxnDDuYUHypIF8zg2e6QKCNYcedeMH5qXF0
-         cejfkhX6NOzBrmubiseMxjtwCiwLOkfxXzRpMoKr8E9rcZEGMpzeJOhoDYYjA3BhCwmi
-         7eLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733395572; x=1734000372;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oVNhBXCZHLlY4dxQD5hBqJ1+AxFtxhvl9sk4zboNcUY=;
-        b=S6UjLg2fuazRi4rcYy75ganGWMCIYnHZIQfVmXKFGEJNOCKegbU3scPWzqhZr2hVrN
-         oZ/eYcWSay/Esnvrx3pTTzjxwwykntX7WI0LH0Avg7rDD3N8cYlQRz7MHHp+3vgwWcin
-         p8aLy76uQFVi3rdUxKqOT/9JCt6HFNhhgIB9l2Mp0UPO95mYL1+YRVzoFlR4QSrkhHfV
-         Dk9DbZAnud7dHnuAny1HfVJMQb7MjaiErPM7oavnQ1jI2qQ8q5pQ0jYtaHil9t8JzkcP
-         FoVaEM3hHOim1VmGhjbKIg7ml/ClJnUd8lUXmxLvUsWFxXNWxfvn01VP1u3Yd6g1shNA
-         Q38g==
-X-Forwarded-Encrypted: i=1; AJvYcCXhGFBY6Y8bh6eKXk9fXqEqON2LBt7gmOE1pjINZJAFNx0ev6qaD73qCHl9m04+0Se7PL0/gnw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwY+t6dGqa5s0aRN/RVkQaihVkVTH/AvLbtA1fGXQMGDH1JrqeX
-	6ZOWxYpWehHmlI7sIqJiw17MJSHggtqquXIS2sE0aq/pxavdPi5ryWfRTBqFRz6rcwC5swjxdfU
-	tWRqVngdqygG64qaMQbduJ9f18O5vD5LmyKK/
-X-Gm-Gg: ASbGnctBCohLoMYRLjWlRUenBceOMRdKR3F3LHVP1TgZhYm1w4Xu8/Pu/mx5WqDUUJc
-	x/o806dXzjkQAXnl/uNNx5qdBeXW6LDmm1xs70fLh/Mtdvv8rzLAq7s1wN5qNpg==
-X-Google-Smtp-Source: AGHT+IFR1pX3AvROCsYtcv9SZ2dU0xebTuhoeACy6GxIh+HqliCoQ59k6kO2zFvrnErJbjYAPkN4FAVr3UX5WjS9Bu0=
-X-Received: by 2002:ac2:44ca:0:b0:53d:e536:c08f with SMTP id
- 2adb3069b0e04-53e284b61fcmr915e87.2.1733395571039; Thu, 05 Dec 2024 02:46:11
- -0800 (PST)
+	s=arc-20240116; t=1733395685; c=relaxed/simple;
+	bh=984bOJSofutD/cKYuwpIYV5GdLZGWe2dvJNXvkaebaU=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=Oie2IYuJaqx5k9IUT8vb/CSdcBYuTNPnSsASG58gokV9t1Wwwk52+QmqVfBX4iK2vB+2qaQw3zvOCAWfG6tkA39n3LvKRutpZ+bzooHMZbPyKSnCSy/qJfsmTSucYTSUEcnjBymkDPXb4z0geZylIVVG/9nVhxrowdc7HWMZ20Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mvuOhxsT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A633C4CED1;
+	Thu,  5 Dec 2024 10:48:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733395684;
+	bh=984bOJSofutD/cKYuwpIYV5GdLZGWe2dvJNXvkaebaU=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=mvuOhxsTG9flwdCTs/hQOE1YYyL8hj/aFKhEG2criZ5g95AMVqfblo2J/OVrkZO9U
+	 fNi1Cv+L4PkI84R1dtCKzBGHsnHLKb8KtKUGbDEa9+7BesQiSc/ektc3BwZgj1Yywr
+	 tMYJ0O8AZDW06vqFCjKLooOUa9gTYfUUleBS6KXudR9nE+k6U2iIaiillY7F3Nacig
+	 D+/VCJaLC5INuQWHg3LZVtCsVYuHriY7RFNvfKg7HtUgfl0wJTXYtvenLhjvbu2n38
+	 aWwRzA/o0Af4/RPNxwOhY1+M6LhN3H+xk013yVa5y5TknAq3nEtBdSMrcHv2ko6bym
+	 1HCuMi0TT+P9A==
+Date: Thu, 05 Dec 2024 04:48:02 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241204140208.2701268-1-yuyanghuang@google.com>
- <20241204140208.2701268-2-yuyanghuang@google.com> <7057e5e0-c42b-4ae5-a709-61c6938a0316@6wind.com>
- <CADXeF1GSgVfBZo+BmkRzCT06dSEU2CEU0Pxy=3fYbJrZipoytQ@mail.gmail.com> <617a5875-30ff-418e-998a-bef3c55924c1@6wind.com>
-In-Reply-To: <617a5875-30ff-418e-998a-bef3c55924c1@6wind.com>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Thu, 5 Dec 2024 19:45:34 +0900
-X-Gm-Features: AZHOrDmkYYiJ95uqo6en8G2yLV58MOdB061PcClxbzxQD0eIkVvjk1Dv-wub--Q
-Message-ID: <CADXeF1E1Ms4=sbUVZWEJ0S4KyY5cyP7hdk2eFnfT=_t+UG=euw@mail.gmail.com>
-Subject: Re: [PATCH iproute2-next, v3 2/2] iproute2: add 'ip monitor mcaddr' support
-To: nicolas.dichtel@6wind.com
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, jiri@resnulli.us, 
-	stephen@networkplumber.org, jimictw@google.com, prohr@google.com, 
-	liuhangbin@gmail.com, andrew@lunn.ch, netdev@vger.kernel.org, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Conor Dooley <conor+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Michael Turquette <mturquette@baylibre.com>, linux-kernel@vger.kernel.org, 
+ kernel@pengutronix.de, Richard Cochran <richardcochran@gmail.com>, 
+ netdev@vger.kernel.org, linux-clk@vger.kernel.org, 
+ Dinh Nguyen <dinguyen@kernel.org>, devicetree@vger.kernel.org, 
+ Stephen Boyd <sboyd@kernel.org>
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+In-Reply-To: <20241205-v6-12-topic-socfpga-agilex5-v3-1-2a8cdf73f50a@pengutronix.de>
+References: <20241205-v6-12-topic-socfpga-agilex5-v3-0-2a8cdf73f50a@pengutronix.de>
+ <20241205-v6-12-topic-socfpga-agilex5-v3-1-2a8cdf73f50a@pengutronix.de>
+Message-Id: <173339568226.2585836.18129717858312736704.robh@kernel.org>
+Subject: Re: [PATCH v3 1/6] dt-bindings: net: dwmac: Convert socfpga dwmac
+ to DT schema
 
->It's not the same API (netlink vs /proc) but the same objects at the end. =
-It
->seems better to me to have the same name. It enables updating the netlink =
-API
->later to get the same info as the one get in /proc.
 
-Thanks for the confirmation. I will use 'ip monitor maddr' in the next
-patch version.
+On Thu, 05 Dec 2024 10:06:01 +0100, Steffen Trumtrar wrote:
+> Changes to the binding while converting:
+> - add "snps,dwmac-3.7{0,2,4}a". They are used, but undocumented.
+> - altr,f2h_ptp_ref_clk is not a required property but optional.
+> 
+> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> ---
+>  .../devicetree/bindings/net/socfpga-dwmac.txt      |  57 ----------
+>  .../devicetree/bindings/net/socfpga-dwmac.yaml     | 119 +++++++++++++++++++++
+>  2 files changed, 119 insertions(+), 57 deletions(-)
+> 
 
-Thanks,
-Yuyang
+My bot found errors running 'make dt_binding_check' on your patch:
 
-On Thu, Dec 5, 2024 at 5:26=E2=80=AFPM Nicolas Dichtel
-<nicolas.dichtel@6wind.com> wrote:
->
-> Le 04/12/2024 =C3=A0 15:48, Yuyang Huang a =C3=A9crit :
-> > Thanks for the review feedback.
-> >
-> >> Note that 'ip maddr' (see 'man ip-maddress') already exists. Using 'mc=
-addr' for
-> >> 'ip monitor' is confusing.
-> >
-> > Please allow me to confirm the suggestion, would it be less confusing
-> > if I use 'ip monitor maddr' here, or should I use a completely
-> > different name?
-> It's not the same API (netlink vs /proc) but the same objects at the end.=
- It
-> seems better to me to have the same name. It enables updating the netlink=
- API
-> later to get the same info as the one get in /proc.
->
->
-> Regards,
-> Nicolas
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/socfpga-dwmac.yaml: 'oneOf' conditional failed, one must be fixed:
+	'unevaluatedProperties' is a required property
+	'additionalProperties' is a required property
+	hint: Either unevaluatedProperties or additionalProperties must be present
+	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
+Documentation/devicetree/bindings/net/socfpga-dwmac.example.dtb: /example-0/phy@100000240: failed to match any schema with compatible: ['altr,gmii-to-sgmii-2.0']
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/socfpga-dwmac.example.dtb: ethernet@ff700000: compatible: 'oneOf' conditional failed, one must be fixed:
+	['altr,socfpga-stmmac', 'snps,dwmac-3.70a', 'snps,dwmac'] is too long
+	'altr,socfpga-stmmac' is not one of ['altr,socfpga-stmmac-a10-s10']
+	'snps,dwmac-3.72a' was expected
+	'snps,dwmac-3.74a' was expected
+	from schema $id: http://devicetree.org/schemas/net/socfpga-dwmac.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/socfpga-dwmac.example.dtb: ethernet@ff700000: phy-mode:0: 'sgmii' is not of type 'array'
+	from schema $id: http://devicetree.org/schemas/net/socfpga-dwmac.yaml#
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20241205-v6-12-topic-socfpga-agilex5-v3-1-2a8cdf73f50a@pengutronix.de
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
