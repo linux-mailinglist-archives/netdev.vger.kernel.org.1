@@ -1,198 +1,113 @@
-Return-Path: <netdev+bounces-149288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E6599E507E
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:02:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76F789E5089
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:04:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D840C1882660
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 09:02:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00DE316A633
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 09:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E121B1D2B13;
-	Thu,  5 Dec 2024 09:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bJTc2oFn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712321D5AA0;
+	Thu,  5 Dec 2024 09:04:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0D936C
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 09:02:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7991D3194
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 09:04:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733389347; cv=none; b=KxtKZKmcPPEdj++so7IsrVBYfO4cMG7D63JjwzgsF0KfW6VeQPK7m7u0ZWY/4Pv4SdBB16EO0sFPpT8ROwomf1Fw06aqPGDhRanKwTDp6hwj/382WUrRkUPgJ7vSgF5Gl9Gc3AeTLjRnXj7kWGvKiUdTca1UwpSz+Q3zyN2Th/s=
+	t=1733389469; cv=none; b=pKu2Xae2KRUji8btvChkydMaErJ7XWK+IHt64/hgg8j6FviHPNq/5pkkgtZMiafAMzHQMqsAdkc0IHclVQd4QIxSoRGQzdg1HnUgASpr9RlbljW0YeoCC+LBxK5W/UDI3CiKF4VmO12BL8V1kNJBgU8PeG/bolFx5T+kW5P++Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733389347; c=relaxed/simple;
-	bh=c3ihmwGHinWwUGH8BGWyGL4CJpaOuDuOscik3gzt1xY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ext6Oi/VKHitwcKqz6/S1KHzjOQFg9XT3fntB3VK9LM6l3WHxcMH99Lo/qCx+kug0R0i1O61PjGs+ReTcAbyQCqq8ufgB50S9oCoF8xXx3ZsKplFgBNYm68hBFeSiF5Y/6XLVZj374k8+qBkow3oOniQuLlqCOcDMoPSWcdUv+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=bJTc2oFn; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-53dd2fdcebcso843069e87.0
-        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 01:02:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1733389344; x=1733994144; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=dNsFfokpHixWPR36co80iR6KpZDENX36B3z1cpv5I6Y=;
-        b=bJTc2oFnrmCY2JXv7qjmx2GMUvq32aVTINMMowRLrs8ZGACNNavEKYtN9JbVtgU7HY
-         xwT6V6Rea5uaH9qh2I3YbncLSC6KmDcbkabGC4vOR/liHP9yJ+6ZP8r2j8wCuoJJ/hq/
-         x8jyNBbjKPkMHWw12KdhSbnXHCQ7RgOvwJlpI=
+	s=arc-20240116; t=1733389469; c=relaxed/simple;
+	bh=zgVVy5XTLk3ptOAekcjfO0olEswNPRCyhZPPRQnNnwQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZWgc3g50i1p8YqEPQdn1Bcof9RriTaPYcj58GpuPZ8xV5wZY4FwpASDfVK+IOGWcWpc9zYHNjCJm8zgdZfKzbFU8MyvXPT0nBckiUs2J02rfutOz0TJS1E50f2dJ2Ie7O9oCcXhFvTscMUP5Lb1FeoMps+Kk+M473n4dRFyCUos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a71bdd158aso6675085ab.1
+        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 01:04:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733389344; x=1733994144;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dNsFfokpHixWPR36co80iR6KpZDENX36B3z1cpv5I6Y=;
-        b=f0a5HxU5fmB0sBTfcL4kSyzeSRuKlO07yOwgSu2xuD3cJE8+Pia/M0QHa86WYTp+az
-         Eq/kCN7Q/udPq2ZFVP+T0+6IPa6M6on6g5wzeIxog/QQab0zo92Iq9IqvGqN5hxJ3Qdf
-         LNRbcFZf06IaAnEEO2tma/Lcoze6GfHjsCfDXuBo1v2S00LoQtSqD69XJGMyBFFAMEiG
-         hkAtYQ30S5T60cXxqj1yf0FNOLSTAfZ/d1f/Vn+5DZ79U61Hjj0aBXCapA3fN3qVYVbD
-         wAkQr6WBM6OSo+DV2MFptwtVrPolUKRrXPcUX6/ruBdJwqR3cdh2UmE0pOHgfkOOK9by
-         dCpA==
-X-Forwarded-Encrypted: i=1; AJvYcCWYPjbVV4yS7I0cYdlzF5UcWTWhCerzVwdOYhtUDpDFy4rCIEL39cH7+mqxaa93gn0AXnmdgYI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzt2ofW47XH1De4XwWMCnUCHa8FwoIZbEK/pGYun5o/Wr6SlKKS
-	SBefBwzDt5qvnzpIraw3+nRo4fwywc/bwBvGQC9XOD1VUEnHdsSTZxMom7sfm+oV8XhhljJKV/2
-	yOo0pr29Xy+XxdL26zsC+0JPDc66ulM9PwnC0
-X-Gm-Gg: ASbGncszJK1EuaJ3AM4Vys0Co2GwS4lLAUyrtvVWeiIFWvK6MY1Of4vCWalVymP0gYI
-	Rx+iAHBNbOa7WML3hKY7Vk8cW6vzLxWQg
-X-Google-Smtp-Source: AGHT+IExNk5hS+elL8msxLnlS1yW6R+sdwfUwZguGMJQmGdp8t4Wj3xbDKU2NKkg7+QSws4ZjlFw0Kiiqf7sP2Ca9xc=
-X-Received: by 2002:a05:6512:3ba6:b0:53d:df9b:ffbb with SMTP id
- 2adb3069b0e04-53e129f3592mr4840145e87.19.1733389344074; Thu, 05 Dec 2024
- 01:02:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733389467; x=1733994267;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=A50ennj8/l5LmpVJOQIb11du27QuZZWN9nvndJYiIt8=;
+        b=uJTc8xfbQOUHr7wvRzB/sO9J3FnS5zF7dXwH5FhoViUgC6zlWbxVph8fcqOYTqSnKH
+         pAWW6I1VF1lg7Ib74eHUS5oMyX16JnVdUkRrGhDVdipBCdfxHJ7tgUDR0QaxIaxewQCJ
+         8j9GT+rml2Nz2HI3NPXsktPfEimqn2QY4TMm6kPzflRO8AMcVs+ds9noRwXB2lTvMaYI
+         QAPABDBD3U1fP6NYEJUoPfob5m66iMzcpuoUcXvZt2QKmB2fCQwd3hW9DBveTJwsHJXJ
+         W4MmGqdMvKvbBYE0QTB7vhHhqVFb6gfiCIZRcGJ18BjH3npNsMoEZtA01MfK+1bS2OUI
+         Pm0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX6OXKrNu8RL8aNYtVj/wl1MJvnAiAFf/EfpKgr3+bh40W3S0O57ExbLfrrrHhdQTpRc8AlyQI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDxZIfOpWz8amke5mH+GFbuFXW8FglT8ol7TLe+hLcEyYkyl5y
+	XOIS0A9ACKjvKhtKlVsx4XbiTRMwIYeW4PDVpHTRSHD+AdHOLx5yf84S1FRvpLjltziN1nn1xvV
+	BD2+dwsKDld5s1QdIP1Nmx/7zVfhRd3PCZK1DAkDQ648b3kFVvPkQ3AA=
+X-Google-Smtp-Source: AGHT+IGkizZga7sN5CYWA5QG1tBS31IluCqSzfXOIYfU5mE+eH6H+k9kkXC3INhDqYtZ1bVXrqsdHzGTV31W1c+dJe40KXNLf+zL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aadb7736-c497-43db-a93a-4461d1426de4@stanley.mountain>
-In-Reply-To: <aadb7736-c497-43db-a93a-4461d1426de4@stanley.mountain>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Thu, 5 Dec 2024 14:32:12 +0530
-Message-ID: <CAH-L+nOskfU6TrXXXULs0q3Kx5dOFbZKy_DKh7hHUVT+hYgkcg@mail.gmail.com>
-Subject: Re: [PATCH net] net/mlx5: DR, prevent potential error pointer dereference
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Yevgeny Kliteynik <kliteyn@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Muhammad Sammar <muhammads@nvidia.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000022334d06288228b6"
-
---00000000000022334d06288228b6
+X-Received: by 2002:a05:6e02:1a02:b0:3a7:c2ea:1095 with SMTP id
+ e9e14a558f8ab-3a7f9a372a3mr133223625ab.1.1733389467082; Thu, 05 Dec 2024
+ 01:04:27 -0800 (PST)
+Date: Thu, 05 Dec 2024 01:04:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67516c9b.050a0220.17bd51.0090.GAE@google.com>
+Subject: [syzbot] Monthly net report (Dec 2024)
+From: syzbot <syzbot+list3c1df63765a7b6dd6d70@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 30, 2024 at 3:31=E2=80=AFPM Dan Carpenter <dan.carpenter@linaro=
-.org> wrote:
->
-> The dr_domain_add_vport_cap() function genereally returns NULL on error
-> but sometimes we want it to return ERR_PTR(-EBUSY) so the caller can
-> retry.  The problem here is that "ret" can be either -EBUSY or -ENOMEM
-> and if it's and -ENOMEM then the error pointer is propogated back and
-> eventually dereferenced in dr_ste_v0_build_src_gvmi_qpn_tag().
->
-> Fixes: 11a45def2e19 ("net/mlx5: DR, Add support for SF vports")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+Hello net maintainers/developers,
 
-couple of typos in commit log?
-s/propogated/propagated
-s/genereally/generally
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
 
-LGTM otherwise
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+During the period, 14 new issues were detected and 8 were fixed.
+In total, 123 issues are still open and 1544 have already been fixed.
 
+Some of the still happening issues:
 
---=20
-Regards,
-Kalesh A P
+Ref  Crashes Repro Title
+<1>  229243  Yes   possible deadlock in team_del_slave (3)
+                   https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
+<2>  31386   Yes   unregister_netdevice: waiting for DEV to become free (8)
+                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+<3>  7345    Yes   possible deadlock in smc_switch_to_fallback (2)
+                   https://syzkaller.appspot.com/bug?extid=bef85a6996d1737c1a2f
+<4>  6028    Yes   WARNING in inet_sock_destruct (4)
+                   https://syzkaller.appspot.com/bug?extid=de6565462ab540f50e47
+<5>  5974    Yes   KMSAN: uninit-value in eth_type_trans (2)
+                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
+<6>  5836    Yes   WARNING: suspicious RCU usage in dev_deactivate_queue
+                   https://syzkaller.appspot.com/bug?extid=ca9ad1d31885c81155b6
+<7>  4913    Yes   possible deadlock in do_ip_setsockopt (4)
+                   https://syzkaller.appspot.com/bug?extid=e4c27043b9315839452d
+<8>  3323    Yes   KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
+                   https://syzkaller.appspot.com/bug?extid=5fe14f2ff4ccbace9a26
+<9>  2606    Yes   possible deadlock in team_port_change_check (2)
+                   https://syzkaller.appspot.com/bug?extid=3c47b5843403a45aef57
+<10> 2505    No    possible deadlock in do_ipv6_setsockopt (4)
+                   https://syzkaller.appspot.com/bug?extid=3433b5cb8b2b70933f8d
 
---00000000000022334d06288228b6
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIKxcwI0dyl78qiboaUUYFinGi7CTQUxf02iA1LBf98tRMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTIwNTA5MDIyNFowaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQC5RFKdjwGz
-MzHGGdj2FpFvPqfBN59v5Yxp2+og3+lfGokWNw1vsBjjOym21zJCZUEhqy2ElSb5OvHQ7dXnd9v9
-OSQq7bJlFG+97Zgf3nnC4GVjPhRBjQEq7+uXBtc21FVBK4pPVth+ck+5T3eCznUkzj9aPl6hH2Vf
-Fi58x6xeIj626h0I2xPbMr27qCbDR2M2N9EgGkXfP1W/ocQmgJgKNeVNEt/QP3c/i3dhv2RSazmq
-J0cYgYKVMTxiyBy6yIcJ8CDb7owfRVLKRpDMYi5PxxavzFo2TcYikPozgjoHBsqUBBPAwufT3AQt
-1hnsgxDC3lOJUVsW0wi1LHI9zXEs
---00000000000022334d06288228b6--
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
