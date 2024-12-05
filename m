@@ -1,138 +1,176 @@
-Return-Path: <netdev+bounces-149492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FCD79E5C76
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 18:02:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6415F9E5C7F
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 18:05:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAE41188378A
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:02:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1773B18836F3
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:05:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80EFE22578C;
-	Thu,  5 Dec 2024 17:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5CF21D5AC;
+	Thu,  5 Dec 2024 17:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ksEiv5H6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GR3cI7pn"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D129B21D586;
-	Thu,  5 Dec 2024 17:01:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B343F4E2
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 17:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733418117; cv=none; b=k76E7cOObn5v0S3XZpL03IE5mwjYzqhBkgFwyKuRH0xlxfxcTEBDyIvYRU1DxiyObf8k86pYGmEHzpo6l38RBPN7r5iBShYzo3sxpUWtHozvLx8zCjX/KMnV85wArjtqN+lY5Hm91RL8gi5fX1LBH6CXqYZePCJ/+k1xw+vtHvI=
+	t=1733418346; cv=none; b=cFB0IS6AOCIpiOMgiMv6cg4r2kTiAa+1m4HuhiexqhqUOUtVVXsL2Ci6jiiYtVPB2EbNEyKUqmDjEHm61BUqPCv2+gd5YffiVA6LqE3deFM4I5Pl8eq2zSZXGGodhs9bbwie/xywfe2R1i3tH9hj0cJJEvsQkxEU0hVX+oBho9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733418117; c=relaxed/simple;
-	bh=VLPu0veF1Y6ejdAlI9VoNPhLNceajAZiJdEd+I/XxdI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AWZ1JNTPb9sXcE2xuhecQ22+DDbmFIg9FwpNWmEw67lq6zNlftaEfwFKiy6cNEgMNZzjKOzrAhxN7KGzhXIeXHCmjAmbzSt8ORFApdDsg2Js9nZ1pqjc9QduGc1mIMAPYbk6R0w1oEtQ1tG9cXh7IS/q229s0ADohYuAJq4bDFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ksEiv5H6; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=p5Iv8mfxtmO9Druz+kkxkhm6XzbPAF2CVdJuZPljSLQ=; b=ksEiv5H68mvOWbi92UT+mbNnPd
-	DiReXQWSRrcoZ58Trb1WbGFudxkZGWdZlKJdS4Lb70jm5B3faZfpTS6yZWSwiqqVnC+J4ItKPPjmh
-	mpmlhnHOOibAknUuMkSkfyXBbuOn+4RyBFOvBs6H08qE0Ygf2QONsbiYWrbg/+zkCLFMZe8YfcE1i
-	JYIsVzWT6XaZME6vhKqlKcXAtEWJYemMxlIRhyOVkDhCSuHlXIl7Jy8un6ry5tBFcXOft2vomZvqe
-	lCdNY2Oknzr9gLUV57jBrO/vxpPNrgCoQI/AXvpscQ+QQ+mhT9/4rDhUfLcXVsRJtQfjxXh8sMGQ5
-	NBcB1HWQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42758)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tJFEG-0005Er-1R;
-	Thu, 05 Dec 2024 17:01:28 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tJFEC-0006i8-04;
-	Thu, 05 Dec 2024 17:01:24 +0000
-Date: Thu, 5 Dec 2024 17:01:23 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jan Petrous <jan.petrous@oss.nxp.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>, 0x1207@gmail.com,
-	fancer.lancer@gmail.com, Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH net-next v8 01/15] net: stmmac: Fix CSR divider comment
-Message-ID: <Z1HcYyNG4FfnN84s@shell.armlinux.org.uk>
-References: <20241205-upstream_s32cc_gmac-v8-0-ec1d180df815@oss.nxp.com>
- <20241205-upstream_s32cc_gmac-v8-1-ec1d180df815@oss.nxp.com>
- <Z1HaB6hT0QX4Jlyx@shell.armlinux.org.uk>
- <Z1Ha+me4+hbOj9JO@lsv051416.swis.nl-cdc01.nxp.com>
+	s=arc-20240116; t=1733418346; c=relaxed/simple;
+	bh=oEOpcOk6JQn+TqC+Y0qyhALWC7OnfGq/On5S3tsDbsM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=HBYxMguXyVK4N/dagli6C5byCgh5TjKz0m2738+00uTlH4SVvijevos0kEvfTBN2F9Oq2En1WJhNAhaA6FZj/+ImchhwGyg48wr2FKhqXyqsc2rQmkMiAItlqws2iEAYmTOCWyYRecZdtqv1EPjL7t1x0d20lVSxjzk8lL6Odz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GR3cI7pn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61033C4CED1;
+	Thu,  5 Dec 2024 17:05:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733418346;
+	bh=oEOpcOk6JQn+TqC+Y0qyhALWC7OnfGq/On5S3tsDbsM=;
+	h=From:Date:Subject:To:Cc:From;
+	b=GR3cI7pnY5AfYgJ4hzaR4nys9Y6sldfYWHYzbYFWxl7O7PsDb5iShLz9JQ4kMpu1Y
+	 /cqUrVMaCwfSdwTQo7FTWUGD/kuIXVcNK/GCCyxj9ngps887BGn0N2LoDciwY7SHd2
+	 Kaedv+1UEW47eH75rUCNTtaVgFH0mvdoubVmxsOyDarPlfDsjzvbbWoN2gzfkvTXSW
+	 BgQSwnOaBzGNQ/WqedO4g4OtUm2g6X8Z4NfE5zX5tMlsOag5bWJfJfhedNh/XXB6wN
+	 7/VY6o6kxXdIm+O4IlEbwmgpFySn772UXz8kN5tCu0cjKk3LJKw2JitX/wW5UTdRyL
+	 Pgd7EnK7bk38w==
+From: Simon Horman <horms@kernel.org>
+Date: Thu, 05 Dec 2024 17:05:23 +0000
+Subject: [PATCH RFC net] net: hibmcge: Release irq resources on error and
+ device tear-down
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z1Ha+me4+hbOj9JO@lsv051416.swis.nl-cdc01.nxp.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241205-hibmcge-free-irq-v1-1-f5103d8d9858@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAFLdUWcC/x2MQQ5AMBBFr9LMWhNt0MRW4gC2YoEOZqGYikjE3
+ U0s33/574GITBihVA8wXhRpCwImUTAufZhRkxcGm9rM2DTXCw3rKPPEKI4P7Zx3hXG9L9CA3Hb
+ Gie4/2UJTVyrgCd37fgvkudhrAAAA
+To: Jijie Shao <shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>, 
+ Salil Mehta <salil.mehta@huawei.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-On Thu, Dec 05, 2024 at 05:55:22PM +0100, Jan Petrous wrote:
-> On Thu, Dec 05, 2024 at 04:51:19PM +0000, Russell King (Oracle) wrote:
-> > On Thu, Dec 05, 2024 at 05:42:58PM +0100, Jan Petrous via B4 Relay wrote:
-> > > From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-> > > 
-> > > The comment in declaration of STMMAC_CSR_250_300M
-> > > incorrectly describes the constant as '/* MDC = clk_scr_i/122 */'
-> > > but the DWC Ether QOS Handbook version 5.20a says it is
-> > > CSR clock/124.
-> > > 
-> > > Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
-> > > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> > 
-> > I gave my reviewed-by for this patch in the previous posting, but you
-> > haven't included it.
-> > 
-> > Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> Hi Russell,
-> sorry for that, I missed it. Should I resend the v8 series?
+This patch addresses two problems related to leaked resources allocated
+by hbg_irq_init().
 
-Patchwork will add it if this series is merged, so there's no immediate
-need to resend. However, please update your series with it in case there
-is another reason to send another version.
+1. On error release allocated resources
+2. Otherwise, release the allocated irq vector on device tear-down
+   by setting-up a devres to do so.
 
-Thanks.
+Found by inspection.
+Compile tested only.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Fixes: 4d089035fa19 ("net: hibmcge: Add interrupt supported in this module")
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c | 57 +++++++++++++++++-------
+ 1 file changed, 42 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
+index 25dd25f096fe..35fedd7e0a33 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
+@@ -83,45 +83,72 @@ static irqreturn_t hbg_irq_handle(int irq_num, void *p)
+ static const char *irq_names_map[HBG_VECTOR_NUM] = { "tx", "rx",
+ 						     "err", "mdio" };
+ 
++static void hbg_free_irq_vectors(void *data)
++{
++	pci_free_irq_vectors(data);
++}
++
+ int hbg_irq_init(struct hbg_priv *priv)
+ {
+ 	struct hbg_vector *vectors = &priv->vectors;
+ 	struct device *dev = &priv->pdev->dev;
+-	int ret, id;
++	int ret, id[HBG_VECTOR_NUM - 1];
+ 	u32 i;
+ 
+ 	/* used pcim_enable_device(),  so the vectors become device managed */
+ 	ret = pci_alloc_irq_vectors(priv->pdev, HBG_VECTOR_NUM, HBG_VECTOR_NUM,
+ 				    PCI_IRQ_MSI | PCI_IRQ_MSIX);
+-	if (ret < 0)
+-		return dev_err_probe(dev, ret, "failed to allocate vectors\n");
++	if (ret < 0) {
++		dev_err(dev, "failed to allocate vectors\n");
++		return ret;
++	}
+ 
+-	if (ret != HBG_VECTOR_NUM)
+-		return dev_err_probe(dev, -EINVAL,
+-				     "requested %u MSI, but allocated %d MSI\n",
+-				     HBG_VECTOR_NUM, ret);
++	if (ret != HBG_VECTOR_NUM) {
++		dev_err(dev, "requested %u MSI, but allocated %d MSI\n",
++			HBG_VECTOR_NUM, ret);
++		ret = -EINVAL;
++		goto err_free_irq_vectors;
++	}
+ 
+ 	/* mdio irq not requested, so the number of requested interrupts
+ 	 * is HBG_VECTOR_NUM - 1.
+ 	 */
+ 	for (i = 0; i < HBG_VECTOR_NUM - 1; i++) {
+-		id = pci_irq_vector(priv->pdev, i);
+-		if (id < 0)
+-			return dev_err_probe(dev, id, "failed to get irq id\n");
++		id[i] = pci_irq_vector(priv->pdev, i);
++		if (id[i] < 0) {
++			dev_err(dev, "failed to get irq id\n");
++			ret = id[i];
++			goto err_free_irqs;
++		}
+ 
+ 		snprintf(vectors->name[i], sizeof(vectors->name[i]), "%s-%s-%s",
+ 			 dev_driver_string(dev), pci_name(priv->pdev),
+ 			 irq_names_map[i]);
+ 
+-		ret = devm_request_irq(dev, id, hbg_irq_handle, 0,
++		ret = devm_request_irq(dev, id[i], hbg_irq_handle, 0,
+ 				       vectors->name[i], priv);
+-		if (ret)
+-			return dev_err_probe(dev, ret,
+-					     "failed to request irq: %s\n",
+-					     irq_names_map[i]);
++		if (ret) {
++			dev_err(dev, "failed to request irq: %s\n",
++				irq_names_map[i]);
++			goto err_free_irqs;
++		}
++	}
++
++	ret = devm_add_action_or_reset(dev, hbg_free_irq_vectors, priv->pdev);
++	if (ret) {
++		dev_err(dev, "Failed adding devres to free irq vectors\n");
++		goto err_free_irqs;
+ 	}
+ 
+ 	vectors->info_array = hbg_irqs;
+ 	vectors->info_array_len = ARRAY_SIZE(hbg_irqs);
+ 	return 0;
++
++err_free_irqs:
++	while (i-- > 0)
++		devm_free_irq(dev, id[i], priv);
++err_free_irq_vectors:
++	pci_free_irq_vectors(priv->pdev);
++
++	return ret;
+ }
+
 
