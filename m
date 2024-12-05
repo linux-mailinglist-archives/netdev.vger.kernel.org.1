@@ -1,113 +1,203 @@
-Return-Path: <netdev+bounces-149289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76F789E5089
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:04:41 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82CF39E51E7
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:17:13 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00DE316A633
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 09:04:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DCD5284196
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:17:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712321D5AA0;
-	Thu,  5 Dec 2024 09:04:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE87C1DB37F;
+	Thu,  5 Dec 2024 09:51:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7991D3194
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 09:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1091D9A4E
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 09:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733389469; cv=none; b=pKu2Xae2KRUji8btvChkydMaErJ7XWK+IHt64/hgg8j6FviHPNq/5pkkgtZMiafAMzHQMqsAdkc0IHclVQd4QIxSoRGQzdg1HnUgASpr9RlbljW0YeoCC+LBxK5W/UDI3CiKF4VmO12BL8V1kNJBgU8PeG/bolFx5T+kW5P++Cw=
+	t=1733392299; cv=none; b=avNDofFqGp+sCSSb5Rvy0WESP9oabkoc6MfOyINdUAUVK1z4isOMFAV/3kgr3tsVQLGY3GrrXv+rVbErrD195gPqBwzQVv8ajW5GRg0uO1baHoW00wk1/AnnhQpM2rSAcp4T+C09PE3xM4oUBD9nSNfgsXuEee7X/mZdstwVCA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733389469; c=relaxed/simple;
-	bh=zgVVy5XTLk3ptOAekcjfO0olEswNPRCyhZPPRQnNnwQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZWgc3g50i1p8YqEPQdn1Bcof9RriTaPYcj58GpuPZ8xV5wZY4FwpASDfVK+IOGWcWpc9zYHNjCJm8zgdZfKzbFU8MyvXPT0nBckiUs2J02rfutOz0TJS1E50f2dJ2Ie7O9oCcXhFvTscMUP5Lb1FeoMps+Kk+M473n4dRFyCUos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a71bdd158aso6675085ab.1
-        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 01:04:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733389467; x=1733994267;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=A50ennj8/l5LmpVJOQIb11du27QuZZWN9nvndJYiIt8=;
-        b=uJTc8xfbQOUHr7wvRzB/sO9J3FnS5zF7dXwH5FhoViUgC6zlWbxVph8fcqOYTqSnKH
-         pAWW6I1VF1lg7Ib74eHUS5oMyX16JnVdUkRrGhDVdipBCdfxHJ7tgUDR0QaxIaxewQCJ
-         8j9GT+rml2Nz2HI3NPXsktPfEimqn2QY4TMm6kPzflRO8AMcVs+ds9noRwXB2lTvMaYI
-         QAPABDBD3U1fP6NYEJUoPfob5m66iMzcpuoUcXvZt2QKmB2fCQwd3hW9DBveTJwsHJXJ
-         W4MmGqdMvKvbBYE0QTB7vhHhqVFb6gfiCIZRcGJ18BjH3npNsMoEZtA01MfK+1bS2OUI
-         Pm0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX6OXKrNu8RL8aNYtVj/wl1MJvnAiAFf/EfpKgr3+bh40W3S0O57ExbLfrrrHhdQTpRc8AlyQI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDxZIfOpWz8amke5mH+GFbuFXW8FglT8ol7TLe+hLcEyYkyl5y
-	XOIS0A9ACKjvKhtKlVsx4XbiTRMwIYeW4PDVpHTRSHD+AdHOLx5yf84S1FRvpLjltziN1nn1xvV
-	BD2+dwsKDld5s1QdIP1Nmx/7zVfhRd3PCZK1DAkDQ648b3kFVvPkQ3AA=
-X-Google-Smtp-Source: AGHT+IGkizZga7sN5CYWA5QG1tBS31IluCqSzfXOIYfU5mE+eH6H+k9kkXC3INhDqYtZ1bVXrqsdHzGTV31W1c+dJe40KXNLf+zL
+	s=arc-20240116; t=1733392299; c=relaxed/simple;
+	bh=kLpngkEs/11Ak9OOYTNMERZLxTu+OUPrakNs9U6Nwlc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ouzGDvy6AwyJRxOIx7z2ogQfRgd/CS5vbVebW5deMX5Yvw00wM5MdHY/uf0SVZxOwpnf53o8UbowfnKIZBEqepzPCTTdbRTT9LOQd9X+lQf/mAa0U6MQvayGsMrcoIUbz3U01GvHziubNIeoTUsAsUVQVo/5xFoYcEWZl5Sxyjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tJ8Vy-0002HX-Gp; Thu, 05 Dec 2024 10:51:18 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tJ8Vv-001nkX-2w;
+	Thu, 05 Dec 2024 10:51:16 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 0C91C3860A2;
+	Thu, 05 Dec 2024 09:01:11 +0000 (UTC)
+Date: Thu, 5 Dec 2024 10:01:10 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, kernel@pengutronix.de, linux-doc@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Simon Horman <horms@kernel.org>, 
+	Russell King <linux@armlinux.org.uk>
+Subject: Re: [PATCH net-next v1 6/7] phy: dp83td510: add statistics support
+Message-ID: <20241205-satisfied-gerbil-of-cookies-471293-mkl@pengutronix.de>
+References: <20241203075622.2452169-1-o.rempel@pengutronix.de>
+ <20241203075622.2452169-7-o.rempel@pengutronix.de>
+ <57a7b3bf-02fa-4b18-bb4b-b11245d3ebfb@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a02:b0:3a7:c2ea:1095 with SMTP id
- e9e14a558f8ab-3a7f9a372a3mr133223625ab.1.1733389467082; Thu, 05 Dec 2024
- 01:04:27 -0800 (PST)
-Date: Thu, 05 Dec 2024 01:04:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67516c9b.050a0220.17bd51.0090.GAE@google.com>
-Subject: [syzbot] Monthly net report (Dec 2024)
-From: syzbot <syzbot+list3c1df63765a7b6dd6d70@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="huwtbf5ra3bpiqrd"
+Content-Disposition: inline
+In-Reply-To: <57a7b3bf-02fa-4b18-bb4b-b11245d3ebfb@intel.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello net maintainers/developers,
 
-This is a 31-day syzbot report for the net subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/net
+--huwtbf5ra3bpiqrd
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next v1 6/7] phy: dp83td510: add statistics support
+MIME-Version: 1.0
 
-During the period, 14 new issues were detected and 8 were fixed.
-In total, 123 issues are still open and 1544 have already been fixed.
+On 05.12.2024 09:43:34, Mateusz Polchlopek wrote:
+>=20
+>=20
+> On 12/3/2024 8:56 AM, Oleksij Rempel wrote:
+> > Add support for reporting PHY statistics in the DP83TD510 driver. This
+> > includes cumulative tracking of transmit/receive packet counts, and
+> > error counts. Implemented functions to update and provide statistics via
+> > ethtool, with optional polling support enabled through `PHY_POLL_STATS`.
+> >=20
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > ---
+> >   drivers/net/phy/dp83td510.c | 98 ++++++++++++++++++++++++++++++++++++-
+> >   1 file changed, 97 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/drivers/net/phy/dp83td510.c b/drivers/net/phy/dp83td510.c
+> > index 92aa3a2b9744..08d61a6a8c61 100644
+> > --- a/drivers/net/phy/dp83td510.c
+> > +++ b/drivers/net/phy/dp83td510.c
+> > @@ -34,6 +34,24 @@
+> >   #define DP83TD510E_CTRL_HW_RESET		BIT(15)
+> >   #define DP83TD510E_CTRL_SW_RESET		BIT(14)
+> > +#define DP83TD510E_PKT_STAT_1			0x12b
+> > +#define DP83TD510E_TX_PKT_CNT_15_0_MASK		GENMASK(15, 0)
+> > +
+> > +#define DP83TD510E_PKT_STAT_2			0x12c
+> > +#define DP83TD510E_TX_PKT_CNT_31_16_MASK	GENMASK(15, 0)
+>=20
+> Shouldn't it be GENMASK(31, 16) ? If not then I think that macro
+> name is a little bit misleading
 
-Some of the still happening issues:
+Yes, the name may be a bit misleading...
 
-Ref  Crashes Repro Title
-<1>  229243  Yes   possible deadlock in team_del_slave (3)
-                   https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
-<2>  31386   Yes   unregister_netdevice: waiting for DEV to become free (8)
-                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
-<3>  7345    Yes   possible deadlock in smc_switch_to_fallback (2)
-                   https://syzkaller.appspot.com/bug?extid=bef85a6996d1737c1a2f
-<4>  6028    Yes   WARNING in inet_sock_destruct (4)
-                   https://syzkaller.appspot.com/bug?extid=de6565462ab540f50e47
-<5>  5974    Yes   KMSAN: uninit-value in eth_type_trans (2)
-                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
-<6>  5836    Yes   WARNING: suspicious RCU usage in dev_deactivate_queue
-                   https://syzkaller.appspot.com/bug?extid=ca9ad1d31885c81155b6
-<7>  4913    Yes   possible deadlock in do_ip_setsockopt (4)
-                   https://syzkaller.appspot.com/bug?extid=e4c27043b9315839452d
-<8>  3323    Yes   KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
-                   https://syzkaller.appspot.com/bug?extid=5fe14f2ff4ccbace9a26
-<9>  2606    Yes   possible deadlock in team_port_change_check (2)
-                   https://syzkaller.appspot.com/bug?extid=3c47b5843403a45aef57
-<10> 2505    No    possible deadlock in do_ipv6_setsockopt (4)
-                   https://syzkaller.appspot.com/bug?extid=3433b5cb8b2b70933f8d
+[...]
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> > + */
+> > +static int dp83td510_update_stats(struct phy_device *phydev)
+> > +{
+> > +	struct dp83td510_priv *priv =3D phydev->priv;
+> > +	u64 count;
+> > +	int ret;
+> > +
+> > +	/* DP83TD510E_PKT_STAT_1 to DP83TD510E_PKT_STAT_6 registers are clear=
+ed
+> > +	 * after reading them in a sequence. A reading of this register not in
+> > +	 * sequence will prevent them from being cleared.
+> > +	 */
+> > +	ret =3D phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_1);
+> > +	if (ret < 0)
+> > +		return ret;
+> > +	count =3D FIELD_GET(DP83TD510E_TX_PKT_CNT_15_0_MASK, ret);
+> > +
+> > +	ret =3D phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_2);
+> > +	if (ret < 0)
+> > +		return ret;
+> > +	count |=3D (u64)FIELD_GET(DP83TD510E_TX_PKT_CNT_31_16_MASK, ret) << 1=
+6;
+>=20
+> Ah... here you do shift. I think it would be better to just define
+>=20
+> #define DP83TD510E_TX_PKT_CNT_31_16_MASK	GENMASK(31, 16)
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+No. This would not be the same.
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+The current code takes the lower 16 bit of "ret" and shifts it left 16
+bits.
 
-You may send multiple commands in a single email message.
+As far as I understand the code DP83TD510E_PKT_STAT_1 contain the lower
+16 bits, while DP83TD510E_PKT_STAT_2 contain the upper 16 bits.
+
+DP83TD510E_PKT_STAT_1 gives 0x????aaaa
+DP83TD510E_PKT_STAT_2 gives 0x????bbbb
+
+count will be 0xbbbbaaaa
+
+This raises another question: Are these values latched?
+
+If not you can get funny results if DP83TD510E_PKT_STAT_1 rolls over. On
+unlatched MMIO busses you first read the upper part, then the lower,
+then the upper again and loop if the value of the upper part changed in
+between. Not sure how much overhead this means for the slow busses.
+
+Consult the doc of the chip if you can read both in one go and if the
+chip latches these values for that access mode.
+
+> instead of shifting, what do you think ?
+
+nope - If you don't want to shift, you can use a combination of
+FIELD_GET() (to extract the relevant 16 bits) and FIELD_PREP() to shift.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--huwtbf5ra3bpiqrd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmdRa9MACgkQKDiiPnot
+vG9nNgf+JnQGbTtZczGIN42CtNQnPQcq46nWZz/ZEHcN4hOvqiglY29fCAPgZWIP
+9bgCBN+vIMNhpdRGxU5IXUCczQ8ydTLUdTRMZAhe9TCBB4T215IniLEGRo9f2+ip
+49ZhquMAFsA8zVzUQdKNVJZy2KruOTA7bpK1aoPaF7+i5crwnuy36ruKjOR1F7il
+OmiCqH2bkQH556J1wxYh/Dm4CX+jkoA//GMYPTeSDX2Prv5vWUdvumufnK3UnhBo
+bLVvf0mqMGqaATaP79mBKjZ+nLZGljElJGDJEDIJxGLZzrSy35IC6rxYwegN5Plt
+3jw1/Q7V32B7MyfAlsTisokhPQiGsg==
+=K6q3
+-----END PGP SIGNATURE-----
+
+--huwtbf5ra3bpiqrd--
 
