@@ -1,114 +1,83 @@
-Return-Path: <netdev+bounces-149488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F9299E5C46
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:55:36 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3AD89E5C4E
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:56:20 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18F7C282BC8
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:55:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F1C61883BAA
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:56:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2598D221476;
-	Thu,  5 Dec 2024 16:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688B922259A;
+	Thu,  5 Dec 2024 16:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FsksfZd0"
 X-Original-To: netdev@vger.kernel.org
-Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A6921C173;
-	Thu,  5 Dec 2024 16:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408D9222593;
+	Thu,  5 Dec 2024 16:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733417732; cv=none; b=O2UO8YrebXj6D6y3JMNWIjvKB3Julecfz78JHtOUd9WlC5PrPMnxn/1R8fhqFUqtHBeJYhTQOurR1N0x745EGLd8SmHPYUXw2hD3F7eKq2xjdTrleQgdxp6+gyo0TuDuhbGR54gjtkJ6O1Kgbsx8fDLpgX81S/s0ud3+hjVLv2Q=
+	t=1733417741; cv=none; b=SUiCwUJ/yvaQuVPEN97OOcwirZkJgg0GPac+hgMk9iARsgAkThA5MgU9kxVWqUTKIiygQBF1gHcjjCkYbFFBJ6ZbvFDNQGcnOM/65I/feDJa6ZiK1eJznZ5VNTygMXS4zgX8H++Az5PTFxE4vZVI+7MilRJYLONIphQXc4ID2T8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733417732; c=relaxed/simple;
-	bh=82W0TyfT2rH+T/IOK0zXh3UFR7FgQxGFGhYdNOUeQck=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QzUDujRTew/TtGPGNO7VuBRi6jTcg3+qHw+aqLTIFwoxKDTUPrS1FprhEGpHBv9sip1nrrittOK2MCWfYZznVTY4jBRRnEXD7SCggDSDDqnKuUwAQcE8meoRuecMWdL8H8/PdohsKcz4lFygGP0KumLYUmJxeasJuZn6JqVIAQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id B7C471A0357;
-	Thu,  5 Dec 2024 17:55:22 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id A00DC1A01D2;
-	Thu,  5 Dec 2024 17:55:22 +0100 (CET)
-Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
-	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id B2763203A7;
-	Thu,  5 Dec 2024 17:55:21 +0100 (CET)
-Date: Thu, 5 Dec 2024 17:55:22 +0100
-From: Jan Petrous <jan.petrous@oss.nxp.com>
+	s=arc-20240116; t=1733417741; c=relaxed/simple;
+	bh=EY2JQ1OUdq1nkq0OdGBKVLh8IN+KP3uYIHf4Esw6NRo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UJKnXqkqcqrxBLYASydxPVMoujq9S4y/91dGHsE7MHhQRZgL01cfMOSJ7+npx/6ashg1yuoci8QNNHZNmSXEAzv9EfbNFwP+YoPDdgPNP13L9CBLlS8YMfEAchdIbGYUjvcPr3k7PM+TlPUaN/14SqQE2Gz+QbJ4TP2eMqWwHYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FsksfZd0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43A48C4CED1;
+	Thu,  5 Dec 2024 16:55:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733417740;
+	bh=EY2JQ1OUdq1nkq0OdGBKVLh8IN+KP3uYIHf4Esw6NRo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FsksfZd0UGkgpt4kFjDeehzYfX1wWHKpJRUTy8PStAUQmjAv0rzo+gYYiM0Kpv8gd
+	 TwSsdqFrZdUqGcTCRan1r1FKO8vrCp3xTCeZpByPwNiIImHynYkIoUE+EYAIJ4TiNz
+	 bwjQnhdE3oi9sBxJen7FRV3c2WxvzrwLpe72KQ11wIqcMcfG4mMefh9IZ0Yqg0XTD3
+	 kz3Sh2R83u3gQU2cA+Cg0ujPk6IM6ih32Uiacv1lH0DKkfin+77+2M/fYrgAS6ZTCc
+	 JxEM2KSVCnU9CkGK/K/Shy2FD3JouWHu0xfygwPBQZ4z9oQHwZqWtDeue+SIByIYFX
+	 n8MdRot1Ly8YQ==
+Date: Thu, 5 Dec 2024 08:55:39 -0800
+From: Jakub Kicinski <kuba@kernel.org>
 To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>, 0x1207@gmail.com,
-	fancer.lancer@gmail.com, Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH net-next v8 01/15] net: stmmac: Fix CSR divider comment
-Message-ID: <Z1Ha+me4+hbOj9JO@lsv051416.swis.nl-cdc01.nxp.com>
-References: <20241205-upstream_s32cc_gmac-v8-0-ec1d180df815@oss.nxp.com>
- <20241205-upstream_s32cc_gmac-v8-1-ec1d180df815@oss.nxp.com>
- <Z1HaB6hT0QX4Jlyx@shell.armlinux.org.uk>
+Cc: Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ andrew+netdev@lunn.ch, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com, Jon Hunter
+ <jonathanh@nvidia.com>, Thierry Reding <thierry.reding@gmail.com>
+Subject: Re: [PATCH net v1] net: stmmac: TSO: Fix unaligned DMA unmap for
+ non-paged SKB data
+Message-ID: <20241205085539.0258e5fb@kernel.org>
+In-Reply-To: <Z1HYKh9eCwkYGlrA@shell.armlinux.org.uk>
+References: <20241205091830.3719609-1-0x1207@gmail.com>
+	<Z1HYKh9eCwkYGlrA@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z1HaB6hT0QX4Jlyx@shell.armlinux.org.uk>
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 05, 2024 at 04:51:19PM +0000, Russell King (Oracle) wrote:
-> On Thu, Dec 05, 2024 at 05:42:58PM +0100, Jan Petrous via B4 Relay wrote:
-> > From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-> > 
-> > The comment in declaration of STMMAC_CSR_250_300M
-> > incorrectly describes the constant as '/* MDC = clk_scr_i/122 */'
-> > but the DWC Ether QOS Handbook version 5.20a says it is
-> > CSR clock/124.
-> > 
-> > Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
-> > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> 
-> I gave my reviewed-by for this patch in the previous posting, but you
-> haven't included it.
-> 
-> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+On Thu, 5 Dec 2024 16:43:22 +0000 Russell King (Oracle) wrote:
+> I'm slightly disappointed to have my patch turned into a commit under
+> someone else's authorship before I've had a chance to do that myself.
+> Next time I won't send a patch out until I've done that.
 
-Hi Russell,
-sorry for that, I missed it. Should I resend the v8 series?
+Yes, this is definitely not okay. LMK if you dropped this from your
+TODO already, otherwise I'm tossing this patch and expecting the fix
+from the real author.
 
-BR.
-/Jan
+Side rant - the Suggested-by tag is completely meaningless, maybe we
+should stop using it. The usage ranges from crediting people pointing
+out issues in basic code review, to crediting authors when stealing
+their code. What is the point.
 
