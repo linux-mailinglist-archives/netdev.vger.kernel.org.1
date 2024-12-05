@@ -1,30 +1,31 @@
-Return-Path: <netdev+bounces-149245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BACD79E4E34
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 08:26:05 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B9699E4E37
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 08:26:21 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7625D284B54
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 07:26:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 245DD168A13
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 07:26:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6AB1AD9F9;
-	Thu,  5 Dec 2024 07:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3221B3920;
+	Thu,  5 Dec 2024 07:26:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C2C17CA17;
-	Thu,  5 Dec 2024 07:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619C71AF0CA;
+	Thu,  5 Dec 2024 07:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733383561; cv=none; b=NhcdxvXXiGvvFaDlw+weJ7wX45qyVepdkidNzUIVeMC+Dj9BLVDENUcWxSKkKqc7pF03fr6ZLCyKsonXJ5/ip5MeQceAqVjtCaHFmimjmVrqbPs7pf6GPvilENNBYXj7td4KWVIwQj9IynMFXnDnborjnECxSYl4j+qOkJh8prs=
+	t=1733383563; cv=none; b=CTBnZqDEO/uIy0Vhsg9onz69KAcE7usQofREJs5Y5QswL+kB9mwv6Hl8ZFiWlFrVgT2/e/+O9q9XJdd8ingAp6mgLV9dX+H5N0x5Lab0RIUh6t7rd//mbMRhd1d7UImcrk+OA7oWy1giC0FQkFFbZW4E9LP1Mov3jh+EJS67TIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733383561; c=relaxed/simple;
-	bh=uLqV/mASobHzVYQQqiUKRDUQqJOd/bhXHsXwED0T4nE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XuKghFDS9iSdMRW1YwTesONSOqz2AMW5jWjLksT8J6YC2ERGJ2ncsQhq++tXbtp6nzX0lTLyJJvX+USANdmoKYDxP7flhdZO2mcZVeG6VbxtLAX25+Z8znoo6ZByvaR1biGV+F5viK8AEqQ8k9r221J0f2tvqnnV6DAOhInZoH8=
+	s=arc-20240116; t=1733383563; c=relaxed/simple;
+	bh=2dNPKqiux3/kj1Fj+yBtelMlWhVcE7qftmpzglA4vfE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rve5vmt+r369dSOIjcWs3+k8xPnIeF2U++9msFClfr1iAL0P1oQXr8nsqH1AdF+Xd1ZqFTa6IoWalNsSzN/Mgfvafb58So512DkSgFuQt5/mazu8QBKP7LFejRMZTh8TXPY4/IL0PHQ1UQHv3+w27UOlx1iub0lOrOYjvx3pK1g=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
@@ -41,11 +42,13 @@ To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <p.zabel@pengutronix.de>,
 	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-CC: <jacky_chou@aspeedtech.com>
-Subject: [PATCH net-next v4 0/7] Add Aspeed G7 FTGMAC100 support
-Date: Thu, 5 Dec 2024 15:20:41 +0800
-Message-ID: <20241205072048.1397570-1-jacky_chou@aspeedtech.com>
+CC: <jacky_chou@aspeedtech.com>, Conor Dooley <conor.dooley@microchip.com>
+Subject: [PATCH net-next v4 1/7] dt-bindings: net: ftgmac100: support for AST2700
+Date: Thu, 5 Dec 2024 15:20:42 +0800
+Message-ID: <20241205072048.1397570-2-jacky_chou@aspeedtech.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20241205072048.1397570-1-jacky_chou@aspeedtech.com>
+References: <20241205072048.1397570-1-jacky_chou@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,39 +58,58 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-The Aspeed 7th generation SoC features three FTGMAC100.
-The main difference from the previous generation is that the
-FTGMAC100 adds support for 64-bit DMA capability. Another change
-is that the RMII/RGMII pin strap configuration is changed to be set
-in the bit 20 fo register 0x50.
+The AST2700 is the 7th generation SoC from Aspeed.
+Add compatible support and resets property for AST2700 in
+yaml.
 
-Jacky Chou (7):
-  dt-bindings: net: ftgmac100: support for AST2700
-  net: faraday: Add ARM64 in FTGMAC100 for AST2700
-  net: ftgmac100: Add reset toggling for Aspeed SOCs
-  net: ftgmac100: Add support for AST2700
-  net: ftgmac100: add pin strap configuration for AST2700
-  net: ftgmac100: Add 64-bit DMA support for AST2700
-  net: ftgmac100: remove extra newline symbols
-
- .../bindings/net/faraday,ftgmac100.yaml       | 17 ++++-
- drivers/net/ethernet/faraday/Kconfig          |  7 +-
- drivers/net/ethernet/faraday/ftgmac100.c      | 75 +++++++++++++++----
- drivers/net/ethernet/faraday/ftgmac100.h      | 10 +++
- 4 files changed, 88 insertions(+), 21 deletions(-)
-
+Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- v2:
-  - Separate old patch to multiple patch
-  - Add more commit information in all patches
-  - Add error handling in ftgmac100.
- v3:
-  - Move reset function to normal probe procedure
-  - Move dma set mask to normal probe procedure
- v4:
-  - Add more information in commit messages
-  - Add resets property in ftgmac100 yaml
-  - Remove more print log from reset flow in ftgmac100 driver
+ .../bindings/net/faraday,ftgmac100.yaml         | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml b/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
+index 9bcbacb6640d..3bba8eee83d6 100644
+--- a/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
++++ b/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
+@@ -21,6 +21,7 @@ properties:
+               - aspeed,ast2400-mac
+               - aspeed,ast2500-mac
+               - aspeed,ast2600-mac
++              - aspeed,ast2700-mac
+           - const: faraday,ftgmac100
+ 
+   reg:
+@@ -33,7 +34,7 @@ properties:
+     minItems: 1
+     items:
+       - description: MAC IP clock
+-      - description: RMII RCLK gate for AST2500/2600
++      - description: RMII RCLK gate for AST2500/2600/2700
+ 
+   clock-names:
+     minItems: 1
+@@ -73,6 +74,20 @@ required:
+ 
+ unevaluatedProperties: false
+ 
++if:
++  properties:
++    compatible:
++      contains:
++        const: aspeed,ast2700-mac
++then:
++  properties:
++    resets:
++      maxItems: 1
++      items:
++        - description: MAC IP reset for AST2700
++  required:
++    - resets
++
+ examples:
+   - |
+     ethernet@1e660000 {
 -- 
 2.25.1
 
