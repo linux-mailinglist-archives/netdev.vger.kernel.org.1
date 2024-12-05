@@ -1,137 +1,164 @@
-Return-Path: <netdev+bounces-149520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D89A9E60AA
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 23:32:35 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D69E81884A5F
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 22:32:33 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 774731CBE8C;
-	Thu,  5 Dec 2024 22:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="f3D9Alux"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3E7A9E60B9
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 23:40:07 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA701A76A4
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 22:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C9E62842A5
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 22:40:06 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8BE1CEEAA;
+	Thu,  5 Dec 2024 22:39:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MOXeMM8O"
+X-Original-To: netdev@vger.kernel.org
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1001B87F5;
+	Thu,  5 Dec 2024 22:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733437951; cv=none; b=fmmQ+rDvpHiaEy7BUugX12AkGdZOxbHFYUrlUAVj4OwMMpz+9zd2P10bGj7Eya4bqs27w5wpKR4QI18ids8FMzLbnKoQ1+A0rmIkxjoX5Lbv9SA8IVWXfJCgZdss4yT0RhZll5vYoEY/Jcx3kwHbQME4FLKYFYYw4yIQ8dzM2+M=
+	t=1733438398; cv=none; b=QiWZCXGOF6zhOirEpOAJvo1uWbKfyjWi3L41pEb8YyKH6jHud5Q8zu+zweCETQBlB7MBpOR5j9V/3eAwUv304FBINN0EYiNpfdPsgv43SIrTCZNR0moIvXvcqrXrFkMiOtvocFvsdhoYtvY9bEwVA6WVPo9eLolPGg0EgSsypXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733437951; c=relaxed/simple;
-	bh=GAQPSL+6KE4W/R3eWmNrtMl1lDlF8aLiHWoaCh81R00=;
+	s=arc-20240116; t=1733438398; c=relaxed/simple;
+	bh=bDWc4rhMgoZqDeL0AXlS3HEyZRI+NGFW7RdxbN26PwE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PigywhrE+yBSahgCkkAdwNy+6f6cHaCELiWMNTBt4tYSbd7vk5F91DFm9RKWZt2rHaW7YrJDRwawTY2ygMzYQ3zp6tGnfkED7YPAMYdRd5IWlYK+ToD4lu/g8JsYa+pbfbwu8Ag+p3uylihYpD8ZcX3NpKkEcXilhbRuiruZ+FI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au; spf=pass smtp.mailfrom=gandalf.ozlabs.org; dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b=f3D9Alux; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gandalf.ozlabs.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=gibson.dropbear.id.au; s=202410; t=1733437940;
-	bh=0oXY7f0Ixis+3QMJvMpgsN0tjG1mpKHcvCpo3mDdgFU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=f3D9AluxvwSpcd3uawaIEUobpvY6ww2dA+PZctgd9Kgzaigeizp5ALPq0p0Zpb3Nm
-	 S+nnsB86R76LSsEQXBrvEQzVzLfZPeNdOtu6QSK8vZBlQ0bEI+xWjnULHJZwHkeM4H
-	 ZD12qs0jJYRVKPupDs6SECzaxkB3tNtXN9c8u1GXAgl7lN1L/XgpCJ4sfyRyp+Efe/
-	 sw6XJ7NIXdVa063/RFhMAfcIIqY+ffSoaZjwbuo/UhAwTdFAchJVa1VJlOGpbcwxpw
-	 /NlsDZXmWGN3luDXdKRhwnFaEZkcUb1/DGOayTbNVUaH/SzpAIThITDZW9y1lbuBQ2
-	 IAlQF3nazmMDQ==
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-	id 4Y48K05cYrz4x68; Fri,  6 Dec 2024 09:32:20 +1100 (AEDT)
-Date: Fri, 6 Dec 2024 09:32:20 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Stefano Brivio <sbrivio@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Mike Manning <mvrmanning@gmail.com>,
-	Paul Holzinger <pholzing@redhat.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Cambda Zhu <cambda@linux.alibaba.com>,
-	Fred Chen <fred.cc@alibaba-inc.com>,
-	Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
-Subject: Re: [PATCH net-next 2/2] datagram, udp: Set local address and rehash
- socket atomically against lookup
-Message-ID: <Z1Ip9Ij8_JpoFu8c@zatzit>
-References: <20241204221254.3537932-1-sbrivio@redhat.com>
- <20241204221254.3537932-3-sbrivio@redhat.com>
- <CANn89i+iULeqTO2GrTCDZEOKPmU_18zwRxG6-P1XoqhP_j1p3A@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FI1Au6DA+JiXtn/+GLlbm46cPPNWiyPJuNTQIl1UVqIqePrLVrkFXe5GaJRaRuO6AKOa1me2KwI1qSI+RVSSUzMMstBn3Xx7HhZSxXRURzRRYGl8reDWI1wDN1UIr8bIC7VP7lj2Bh/5ExjCk2ixdigjpNOOEbtU70R/FzjqP8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MOXeMM8O; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733438397; x=1764974397;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=bDWc4rhMgoZqDeL0AXlS3HEyZRI+NGFW7RdxbN26PwE=;
+  b=MOXeMM8OltAVUE1ZXy0v3rC4jd3oqpFeBYbp7p7K14hLFccePMA/M7Bq
+   bOrDGrK1awvIhAiBS48bHw9nDYPKoEIUYzpildvMOupUBrmKWbIHnFRCa
+   fWSZOGztOHlapz+KacZmMr1DaSoSFs2Je2HsUioQEUqvg//nY1BitDiqE
+   f9tj3jpf5alLYDOZZrwwz/23RJ/YfHMFs8ifT0x33lX1obzKCAjs3k5SK
+   dFvRDbpCjg1BppWTN9ESc9s4e6PWMYSd6H50h0ZvKlfSfIDRwRSn343no
+   KFxLDdI/BlPznvfGZJLwQj5jWIhuyqtpW+ov6qpWqpP+y7BmkY4l5oq6W
+   Q==;
+X-CSE-ConnectionGUID: 4meO4e5XR/uWcMU3EH4Y/w==
+X-CSE-MsgGUID: Y9ev3aQHRr60u6LoUFzwig==
+X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="33660982"
+X-IronPort-AV: E=Sophos;i="6.12,211,1728975600"; 
+   d="scan'208";a="33660982"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 14:39:55 -0800
+X-CSE-ConnectionGUID: s9cK9Ag1RGqhkbjPJGPt5g==
+X-CSE-MsgGUID: +9UlsE4TSWCPuUIT6GPzKw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,211,1728975600"; 
+   d="scan'208";a="99052989"
+Received: from aschofie-mobl2.amr.corp.intel.com (HELO aschofie-mobl2.lan) ([10.125.108.192])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 14:39:53 -0800
+Date: Thu, 5 Dec 2024 14:39:51 -0800
+From: Alison Schofield <alison.schofield@intel.com>
+To: Zijun Hu <zijun_hu@icloud.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas@t-8ch.de>,
+	linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+	linux-sound@vger.kernel.org, sparclinux@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
+	linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org,
+	linux-efi@vger.kernel.org, linux-gpio@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
+	linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+	linux-scsi@vger.kernel.org, open-iscsi@googlegroups.com,
+	linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
+	netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: Re: [PATCH v3 04/11] driver core: Constify API device_find_child()
+ then adapt for various usages
+Message-ID: <Z1IrtwPo4Pj52fuY@aschofie-mobl2.lan>
+References: <20241205-const_dfc_done-v3-0-1611f1486b5a@quicinc.com>
+ <20241205-const_dfc_done-v3-4-1611f1486b5a@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rNHhf7gjjDW4r+9k"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANn89i+iULeqTO2GrTCDZEOKPmU_18zwRxG6-P1XoqhP_j1p3A@mail.gmail.com>
+In-Reply-To: <20241205-const_dfc_done-v3-4-1611f1486b5a@quicinc.com>
+
+On Thu, Dec 05, 2024 at 08:10:13AM +0800, Zijun Hu wrote:
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+> Constify the following API:
+> struct device *device_find_child(struct device *dev, void *data,
+> 		int (*match)(struct device *dev, void *data));
+> To :
+> struct device *device_find_child(struct device *dev, const void *data,
+>                                  device_match_t match);
+> typedef int (*device_match_t)(struct device *dev, const void *data);
+> with the following reasons:
+> 
+> - Protect caller's match data @*data which is for comparison and lookup
+>   and the API does not actually need to modify @*data.
+> 
+> - Make the API's parameters (@match)() and @data have the same type as
+>   all of other device finding APIs (bus|class|driver)_find_device().
+> 
+> - All kinds of existing device match functions can be directly taken
+>   as the API's argument, they were exported by driver core.
+> 
+> Constify the API and adapt for various existing usages by simply making
+> various match functions take 'const void *' as type of match data @data.
+> 
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> ---
+>  arch/sparc/kernel/vio.c                |  6 +++---
+>  drivers/base/core.c                    |  6 +++---
+>  drivers/block/sunvdc.c                 |  6 +++---
+>  drivers/bus/fsl-mc/dprc-driver.c       |  4 ++--
+>  drivers/cxl/core/pci.c                 |  4 ++--
+>  drivers/cxl/core/pmem.c                |  2 +-
+>  drivers/cxl/core/region.c              | 21 ++++++++++++---------
+>  drivers/firewire/core-device.c         |  4 ++--
+>  drivers/firmware/arm_scmi/bus.c        |  4 ++--
+>  drivers/firmware/efi/dev-path-parser.c |  4 ++--
+>  drivers/gpio/gpio-sim.c                |  2 +-
+>  drivers/gpu/drm/mediatek/mtk_drm_drv.c |  2 +-
+>  drivers/hwmon/hwmon.c                  |  2 +-
+>  drivers/media/pci/mgb4/mgb4_core.c     |  4 ++--
+>  drivers/nvdimm/bus.c                   |  2 +-
+>  drivers/pwm/core.c                     |  2 +-
+>  drivers/rpmsg/rpmsg_core.c             |  4 ++--
+>  drivers/scsi/qla4xxx/ql4_os.c          |  3 ++-
+>  drivers/scsi/scsi_transport_iscsi.c    | 10 +++++-----
+>  drivers/slimbus/core.c                 |  8 ++++----
+>  drivers/thunderbolt/retimer.c          |  2 +-
+>  drivers/thunderbolt/xdomain.c          |  2 +-
+>  drivers/tty/serial/serial_core.c       |  4 ++--
+>  drivers/usb/typec/class.c              |  8 ++++----
+>  include/linux/device.h                 |  4 ++--
+>  include/scsi/scsi_transport_iscsi.h    |  4 ++--
+>  net/dsa/dsa.c                          |  2 +-
+>  tools/testing/cxl/test/cxl.c           |  2 +-
+>  28 files changed, 66 insertions(+), 62 deletions(-)
+>
+
+For these cxl and nvdimm pieces:
+
+  drivers/cxl/core/pci.c                 |  4 ++--
+  drivers/cxl/core/pmem.c                |  2 +-
+  drivers/cxl/core/region.c              | 21 ++++++++++++---------
+  drivers/nvdimm/bus.c                   |  2 +-
+  tools/testing/cxl/test/cxl.c           |  2 +-
+
+Reviewed-by: Alison Schofield <alison.schofield@intel.com>
 
 
---rNHhf7gjjDW4r+9k
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+snip to end
 
-On Thu, Dec 05, 2024 at 05:35:52PM +0100, Eric Dumazet wrote:
-> On Wed, Dec 4, 2024 at 11:12=E2=80=AFPM Stefano Brivio <sbrivio@redhat.co=
-m> wrote:
-[snip]
-> > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> > index 6a01905d379f..8490408f6009 100644
-> > --- a/net/ipv4/udp.c
-> > +++ b/net/ipv4/udp.c
-> > @@ -639,18 +639,21 @@ struct sock *__udp4_lib_lookup(const struct net *=
-net, __be32 saddr,
-> >                 int sdif, struct udp_table *udptable, struct sk_buff *s=
-kb)
-> >  {
-> >         unsigned short hnum =3D ntohs(dport);
-> > -       struct udp_hslot *hslot2;
-> > +       struct udp_hslot *hslot, *hslot2;
-> >         struct sock *result, *sk;
-> >         unsigned int hash2;
-> >
-> > +       hslot =3D udp_hashslot(udptable, net, hnum);
-> > +       spin_lock_bh(&hslot->lock);
->=20
-> This is not acceptable.
-> UDP is best effort, packets can be dropped.
-> Please fix user application expectations.
-
-The packets aren't merely dropped, they're rejected with an ICMP Port
-Unreachable.
-
---=20
-David Gibson (he or they)	| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you, not the other way
-				| around.
-http://www.ozlabs.org/~dgibson
-
---rNHhf7gjjDW4r+9k
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEO+dNsU4E3yXUXRK2zQJF27ox2GcFAmdSKe8ACgkQzQJF27ox
-2GfhHBAAo+2dwc0eI19fmPUEIy9Nnzj8xmzWMmxuF+X2gnya6Ja076ulo/+ZiDpm
-VTgwBhrB2qAJ3fS6KSbjdHDahRc6doKSqrZv8PFZ9AA7va1/v3awmMlspoCdgskl
-b4lWl3Sn8nDAUEp7NxRczjCdAr1y4OjgC6IJurJ6FJERNyeE7bSA/3slVH9WTSbo
-vzjnBHP6kzIz2AOSZhqGJhHj6PXb2IqiQ+JRyO7gCAjzHuRpM7t37BMeA2gNQ1Tf
-Y5A0TdHHDhrsjcgE6XNUQbyZS4adxshRgnz4104Y1kEpBBwl/tQy25vuH+WVxhRV
-ntG0PbU7KkQBy9CR6C8eX/ppZC++4Lsv1yJ6u60VTSFqTtCN1a7PQT0nTb+Rdrzj
-94DlvQ6MHXzpOuIU392yaiObfDscfSQZvPbCfOujiV5hwlzMbVLlucYWMtdQNoDZ
-/16+3XjPQ09VWRzHjQtqF7LriqLd77qkctoRPGsmydzwj4lhrQM6DOb0ef1YsYD3
-rhs3x/Ed2ccDjXw5q5eRNFRs0zcbtMDJJPWbgJgUiQusMGTOEDcj/hn0ApjAwXJx
-IYZXgDjTTZacjbOnZywoU5cWmqisKDQn0NuvngJyHNT9kWlDe4bPwlUAOlIxzUzE
-oFDoF+0gWXMVRiGyhHD6nhtwnYOA+dU5xJN9eNMekA9mnvpg+Z0=
-=Qv45
------END PGP SIGNATURE-----
-
---rNHhf7gjjDW4r+9k--
 
