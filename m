@@ -1,119 +1,115 @@
-Return-Path: <netdev+bounces-149341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A3CF9E52DF
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:48:08 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8969B9E52EE
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:50:35 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E75CE2853BC
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:48:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7E5E16783B
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8361D63F2;
-	Thu,  5 Dec 2024 10:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3AC723918F;
+	Thu,  5 Dec 2024 10:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mvuOhxsT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ipEPUsaq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078FA1946B3;
-	Thu,  5 Dec 2024 10:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CAC1D63C1
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 10:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733395685; cv=none; b=uMvUSOPMCpDWqknmd2jbdDVi8hBzCCqUOhUSlWDMi5iGJWg8Msz/Kcn4MSMsKUGpzmnVK1/tv/tXAMKljp42QVW9G3csPJVZzWA6OT7QkFOSyFL3tAv/+gsHUYqMUFvCrLbi2EZPCtIXsBnhKZ/o7OEBgY29snRrHznDRPm3Kvc=
+	t=1733395829; cv=none; b=aMQgnGCBJa4WT9mP7MOMjodP3U2IQ/yWbxes9d/ofRsJ1eva3U62Pp0yW/CEdG9/Lp85jtbnF8jQPj92iLnxhooGp7nZ+7iHdh74h+wVnIpCePs6KcRILNwj7z1W1m++f64KHkHl2KqAD+Y7RctbI7GdHLM7y8/UJGHGqS7YUEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733395685; c=relaxed/simple;
-	bh=984bOJSofutD/cKYuwpIYV5GdLZGWe2dvJNXvkaebaU=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=Oie2IYuJaqx5k9IUT8vb/CSdcBYuTNPnSsASG58gokV9t1Wwwk52+QmqVfBX4iK2vB+2qaQw3zvOCAWfG6tkA39n3LvKRutpZ+bzooHMZbPyKSnCSy/qJfsmTSucYTSUEcnjBymkDPXb4z0geZylIVVG/9nVhxrowdc7HWMZ20Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mvuOhxsT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A633C4CED1;
-	Thu,  5 Dec 2024 10:48:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733395684;
-	bh=984bOJSofutD/cKYuwpIYV5GdLZGWe2dvJNXvkaebaU=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=mvuOhxsTG9flwdCTs/hQOE1YYyL8hj/aFKhEG2criZ5g95AMVqfblo2J/OVrkZO9U
-	 fNi1Cv+L4PkI84R1dtCKzBGHsnHLKb8KtKUGbDEa9+7BesQiSc/ektc3BwZgj1Yywr
-	 tMYJ0O8AZDW06vqFCjKLooOUa9gTYfUUleBS6KXudR9nE+k6U2iIaiillY7F3Nacig
-	 D+/VCJaLC5INuQWHg3LZVtCsVYuHriY7RFNvfKg7HtUgfl0wJTXYtvenLhjvbu2n38
-	 aWwRzA/o0Af4/RPNxwOhY1+M6LhN3H+xk013yVa5y5TknAq3nEtBdSMrcHv2ko6bym
-	 1HCuMi0TT+P9A==
-Date: Thu, 05 Dec 2024 04:48:02 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1733395829; c=relaxed/simple;
+	bh=GAoOlPofgMBqWfJujDwo+YFQ72CJ4IjJ0WUUmmHruTA=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=EjXX8YuiTsIUHP/6qvBzKRTszlzVEJIvCJXoBNN+dVpknhXX1VotR6ANTGtt5wFqMB4Tn2cgJ78i6TddDKlKZXXvHKuMQjvulHm1uBVBe/EVgod0gQ9rv5DoyUmM/UGKPgViQ8ofLCmvv5xVJXIWzdtMeOe6Kr3x2XFRj21KN1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ipEPUsaq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733395827;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ycHOMnBh816FhbuXVET66ivDaiNe7YcgyDVzdCppbeA=;
+	b=ipEPUsaqUjIHO2YasxsrubslGPluwQw3w6vIjH/yZnJ6NzVewF1zBup4SCAnH6+8Ii9oP0
+	a17FqattlQQzhxDaX2JUaX2aHRT9txvdgDAMM+fOsQ/A9Qyvwb73e0+ewLX81NV7H3ugEQ
+	Qo48sQNEXMZFUlxtbK3XkW31EblWE8M=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-379-cgDIirxSN7KzzoulNzp7YA-1; Thu,
+ 05 Dec 2024 05:50:23 -0500
+X-MC-Unique: cgDIirxSN7KzzoulNzp7YA-1
+X-Mimecast-MFC-AGG-ID: cgDIirxSN7KzzoulNzp7YA
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EE7CC1955F68;
+	Thu,  5 Dec 2024 10:50:20 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.48])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6B9F71956052;
+	Thu,  5 Dec 2024 10:50:16 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <35033e7d707b4c68ae125820230d3cd3@AcuMS.aculab.com>
+References: <35033e7d707b4c68ae125820230d3cd3@AcuMS.aculab.com> <20241202143057.378147-1-dhowells@redhat.com> <20241202143057.378147-3-dhowells@redhat.com>
+To: David Laight <David.Laight@ACULAB.COM>
+Cc: dhowells@redhat.com,
+    "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Yunsheng Lin <linyunsheng@huawei.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    "Eric
+ Dumazet" <edumazet@google.com>,
+    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
+    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 02/37] rxrpc: Use umin() and umax() rather than min_t()/max_t() where possible
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Conor Dooley <conor+dt@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Michael Turquette <mturquette@baylibre.com>, linux-kernel@vger.kernel.org, 
- kernel@pengutronix.de, Richard Cochran <richardcochran@gmail.com>, 
- netdev@vger.kernel.org, linux-clk@vger.kernel.org, 
- Dinh Nguyen <dinguyen@kernel.org>, devicetree@vger.kernel.org, 
- Stephen Boyd <sboyd@kernel.org>
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-In-Reply-To: <20241205-v6-12-topic-socfpga-agilex5-v3-1-2a8cdf73f50a@pengutronix.de>
-References: <20241205-v6-12-topic-socfpga-agilex5-v3-0-2a8cdf73f50a@pengutronix.de>
- <20241205-v6-12-topic-socfpga-agilex5-v3-1-2a8cdf73f50a@pengutronix.de>
-Message-Id: <173339568226.2585836.18129717858312736704.robh@kernel.org>
-Subject: Re: [PATCH v3 1/6] dt-bindings: net: dwmac: Convert socfpga dwmac
- to DT schema
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1760514.1733395814.1@warthog.procyon.org.uk>
+Date: Thu, 05 Dec 2024 10:50:14 +0000
+Message-ID: <1760515.1733395814@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
+David Laight <David.Laight@ACULAB.COM> wrote:
 
-On Thu, 05 Dec 2024 10:06:01 +0100, Steffen Trumtrar wrote:
-> Changes to the binding while converting:
-> - add "snps,dwmac-3.7{0,2,4}a". They are used, but undocumented.
-> - altr,f2h_ptp_ref_clk is not a required property but optional.
+> > Use umin() and umax() rather than min_t()/max_t() where the type specified
+> > is an unsigned type.
 > 
-> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-> ---
->  .../devicetree/bindings/net/socfpga-dwmac.txt      |  57 ----------
->  .../devicetree/bindings/net/socfpga-dwmac.yaml     | 119 +++++++++++++++++++++
->  2 files changed, 119 insertions(+), 57 deletions(-)
-> 
+> You are also changing some max() to umax().
 
-My bot found errors running 'make dt_binding_check' on your patch:
+Good point.  If I have to respin my patches again, I'll update that.
 
-yamllint warnings/errors:
+> Presumably they have always passed the type check so max() is fine.
+> And max(foo, 1) would have required that 'foo' be 'signed int' and could
+> potentially be negative when max(-1, 1) will be 1 but umax(-1, 1) is
+> undefined.
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/socfpga-dwmac.yaml: 'oneOf' conditional failed, one must be fixed:
-	'unevaluatedProperties' is a required property
-	'additionalProperties' is a required property
-	hint: Either unevaluatedProperties or additionalProperties must be present
-	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
-Documentation/devicetree/bindings/net/socfpga-dwmac.example.dtb: /example-0/phy@100000240: failed to match any schema with compatible: ['altr,gmii-to-sgmii-2.0']
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/socfpga-dwmac.example.dtb: ethernet@ff700000: compatible: 'oneOf' conditional failed, one must be fixed:
-	['altr,socfpga-stmmac', 'snps,dwmac-3.70a', 'snps,dwmac'] is too long
-	'altr,socfpga-stmmac' is not one of ['altr,socfpga-stmmac-a10-s10']
-	'snps,dwmac-3.72a' was expected
-	'snps,dwmac-3.74a' was expected
-	from schema $id: http://devicetree.org/schemas/net/socfpga-dwmac.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/socfpga-dwmac.example.dtb: ethernet@ff700000: phy-mode:0: 'sgmii' is not of type 'array'
-	from schema $id: http://devicetree.org/schemas/net/socfpga-dwmac.yaml#
+There have been cases like this:
 
-doc reference errors (make refcheckdocs):
+	unsigned long timeout;
+	...
+	timeout = max(timeout, 1);
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20241205-v6-12-topic-socfpga-agilex5-v3-1-2a8cdf73f50a@pengutronix.de
+where the macro would complain because it thought "timeout" and "1" were
+different sizes, so "1UL" had to be used.  Using umax() deals with that issue.
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+David
 
 
