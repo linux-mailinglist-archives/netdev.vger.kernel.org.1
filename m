@@ -1,150 +1,120 @@
-Return-Path: <netdev+bounces-149315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA7F9E51AB
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:48:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 939BC9E51B9
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:07:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41676283352
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 09:48:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C82ED28261C
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8AE1D8DE8;
-	Thu,  5 Dec 2024 09:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6BD01DA309;
+	Thu,  5 Dec 2024 09:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AE3yLg/O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q61MEBf2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD971D63D4
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 09:47:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB851DA0ED;
+	Thu,  5 Dec 2024 09:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733392063; cv=none; b=jJBy2200GEs25/bfJ54UKpofLowsw8e+8pDm2FoUdfRM1rdqgImR59hs7bCwW09K/N4Jpb5gWsGEK28c7puGjLiZHJRdqIanaTco9uqhkzl10Kjs2a/W/xdkYVVBbrayfQMnTHu/Dx3itFN/zQ1I5Dm/xMRgv6QxDl6We6z/4KA=
+	t=1733392298; cv=none; b=fKmNxp5camphklpHdda1xcyWq5rLAMTnQcmzFKHlI2AqD/QGcQ8fDDlvQrDnQDsRVyvfLhIbrkJsnDFOYuit5U1Xz8aSgw/0vxTipQNxW6DlfmLl6qxRabvEPUxOrsNledI+C9zV+qTzQeqg0MsWy/PStz7OW2JT8Q9TztoVgKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733392063; c=relaxed/simple;
-	bh=wjEAfD6wcnNghAmHkwrxJtWCztMHJQ8MKYIBzuIGluE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=r4tJkkzCN9WZi1XMvqtZS+KUwz/EJ+YDVwHmqcKVKYkKrKv/ze1xwz6vhMjv+Eb9IU8KvO38Fjjv0NB5Er+nTXCzpVKUzxUD2+3muaqoKvM5L8jIu1k+jJ7lqXVh6I+5cegjg1v2vHvfRO42vylx9wEQMD8v3RkOq/xGI6rYnSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=unknown smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AE3yLg/O; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=tempfail smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733392046;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JWUkSRUIv2Qev94E+Vreya1sHRnnDj7AgHzjxrRejBo=;
-	b=AE3yLg/O067gikBq2QgxFwwaCrBVRCiuD09P4yYEh61aBSTqC/cVpPm38mtwGl8XcMZmpB
-	ka5ssGF/8vDuIwYN0vPZCTsiZQ0sGspDj2jHSgUc9A60ZlyDCxACLjf/9qL2A7jHlgcjde
-	REonefU09l1RmjYhr6yI6t2ZsXorTsI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-546-eKLc8WoGM_e0dtvtyGmiWQ-1; Thu, 05 Dec 2024 04:47:25 -0500
-X-MC-Unique: eKLc8WoGM_e0dtvtyGmiWQ-1
-X-Mimecast-MFC-AGG-ID: eKLc8WoGM_e0dtvtyGmiWQ
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385df115300so461334f8f.2
-        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 01:47:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733392044; x=1733996844;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JWUkSRUIv2Qev94E+Vreya1sHRnnDj7AgHzjxrRejBo=;
-        b=N9omG/LvXt4J+7W/2EuqpIkuP+DIBxv1knfZmwVi+Ug+zfakqodn/Y9iiJZMNaWMMH
-         /guYczVTT72/OCJj7B5Nvu7o8aUFohzWwL4e9Au3DB2z1k8HQJnEW7Wfu5iPe8b8yk7l
-         ZVE71T24/fVRSTvoxRK6Qsn89bGNcR2urQou9ao4m0r3hO5rAHEV/ihMjFowvJ9LPzYL
-         NkCBcoVkbaSCdAwkVAkQ5fEzWCJUsJ11n4iudXpQjZHV5DZFR+N2YLJ7gzSEwtaFUVuk
-         vQStUj6ZbzTy+EurmkjvS/VYFxq4q6StyAKYydcgStwWyJuiJc9XCS0XEcIcpBvtVgSF
-         V+lg==
-X-Forwarded-Encrypted: i=1; AJvYcCW/Bh/UYPWyZkNgwICwwVAlUgY4w6Enel4Jdfc2vtQ555VSSfg6ZiXlwNr5G/VvqeOdsZ6SboU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxL0k+PBArMxNyPz7BQvPjQaZE7IH4VCKQfEu1fSedFfPhe6jDr
-	h6r43Xr/lWwAH6x1y2Yy9DPpFb67YkOLhP3z1y9d/t9BT/qlhCLYY25JYhZrUm4pXNpyaqcUFfK
-	xSRGK7wZ/TCB6FVy77jUNipgEKH4EVS0XJdfsbYvvMQCey/DWulDBWA==
-X-Gm-Gg: ASbGncuulWUGg6nMf/udunYdNfVKGq2IE3GWNhdWBBTLUBAUutRN9jO5cD3UZ053Xwg
-	Ot7QtAwtacLfDcZX1uf2et4uRdVUbmlUVaJyUcqWBsfe6AVlBbqdRWAU3zqTgSl9pEz/PfjLATe
-	Yx8HxF1WsugAHayHy0Hov+XL3zI06nisox3ERmA5/N1x4gdd8+L+R6VMMFksoptKGl+j6g0AenF
-	Cegx6agP4m9yszmIljMYg0GHhFV46ZAhD9wF58D0PaNx0ZmgVi4b9IX0cx/sBzQlSxkK6J0KGRG
-X-Received: by 2002:a05:6000:2b05:b0:385:ee59:4508 with SMTP id ffacd0b85a97d-385fd3f8e35mr5666649f8f.15.1733392043739;
-        Thu, 05 Dec 2024 01:47:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF3Mp3k22VB7mLeM0ZR6NDs+ALbdZOCqmImOdXeOZGVFr6niHrWzqW/fDZVe8P+oBZgYroXpA==
-X-Received: by 2002:a05:6000:2b05:b0:385:ee59:4508 with SMTP id ffacd0b85a97d-385fd3f8e35mr5666635f8f.15.1733392043282;
-        Thu, 05 Dec 2024 01:47:23 -0800 (PST)
-Received: from [192.168.88.24] (146-241-38-31.dyn.eolo.it. [146.241.38.31])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3861ecf446esm1462734f8f.20.2024.12.05.01.47.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Dec 2024 01:47:22 -0800 (PST)
-Message-ID: <ec73fe36-978b-4e3a-a5de-5aafb54af9a8@redhat.com>
-Date: Thu, 5 Dec 2024 10:47:21 +0100
+	s=arc-20240116; t=1733392298; c=relaxed/simple;
+	bh=wuoye3dUGkRBh7386DHWKpiGlFh08f+epNY8QIOWIEI=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RsYbEjluRUoQcQVgnYRQ+9sIQR8rGwL6WW5kXnOo4vwWbbOjAfDka5/ay4AxY/QSkVc60uc68xUvtDMIxSHg0SyEmKevGdPjBwOEVBdKlLBkd/lC2Md4YGHKdyGVm2jcofTlu/VuY2AbHwiq/+luXmbcDMdzOrHtaj1JPn41utY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q61MEBf2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3594C4CED1;
+	Thu,  5 Dec 2024 09:51:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733392298;
+	bh=wuoye3dUGkRBh7386DHWKpiGlFh08f+epNY8QIOWIEI=;
+	h=Date:From:To:Subject:References:In-Reply-To:From;
+	b=q61MEBf2X5S2oNIn91BYQVCb1YezaWPj69naQ0KkbNLTt/j2aVtcWNRMcEuLwvAJb
+	 pEzVCF2nmQOaFGClPdHXQFEz7SQe9JTK67a/qlkOl/43o8kT7oTuh8qAVR3tlM97ix
+	 o+SjGjkghHzamDvLtB/PdL1L5NZRjEb1uredBKfVkwzn9F7X9bcVYNousEFtYfViIm
+	 6eQgZCaChh181x+zxS/xAShM1PlsINOisopMSQfwiNHnnf38cQshIdHH7QNcsoJ/Db
+	 5mTdK5JAQnUiaQA0kH+AppjmsOC9eM6EsJxiI3KBJ/0HUGnDp1r1l7cuIph3+PkRWb
+	 8tCcofU1CJqaQ==
+Date: Thu, 5 Dec 2024 09:51:33 +0000
+From: Simon Horman <horms@kernel.org>
+To: Joe Damato <jdamato@fastly.com>,
+	Stanislav Fomichev <stfomichev@gmail.com>, netdev@vger.kernel.org,
+	pabeni@redhat.com, edumazet@google.com, kuba@kernel.org,
+	mkarsten@uwaterloo.ca, "David S. Miller" <davem@davemloft.net>,
+	Shuah Khan <shuah@kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] selftests: net: cleanup busy_poller.c
+Message-ID: <20241205095133.GA3382@kernel.org>
+References: <20241203012838.182522-1-jdamato@fastly.com>
+ <Z06T0uZ6422arNue@mini-arch>
+ <Z08xIyc7OcRoEE-C@LQ3V64L9R2>
+ <Z08zacl_IhADP0FZ@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 2/5] net: phy: microchip_ptp : Add ptp library
- for Microchip phys
-To: Divya Koppera <divya.koppera@microchip.com>, andrew@lunn.ch,
- arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
- hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, richardcochran@gmail.com,
- vadim.fedorenko@linux.dev
-References: <20241203085248.14575-1-divya.koppera@microchip.com>
- <20241203085248.14575-3-divya.koppera@microchip.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241203085248.14575-3-divya.koppera@microchip.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z08zacl_IhADP0FZ@LQ3V64L9R2>
 
-On 12/3/24 09:52, Divya Koppera wrote:
-> +struct mchp_ptp_clock *mchp_ptp_probe(struct phy_device *phydev, u8 mmd,
-> +				      u16 clk_base_addr, u16 port_base_addr)
-> +{
-> +	struct mchp_ptp_clock *clock;
-> +	int rc;
-> +
-> +	clock = devm_kzalloc(&phydev->mdio.dev, sizeof(*clock), GFP_KERNEL);
-> +	if (!clock)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	clock->port_base_addr	= port_base_addr;
-> +	clock->clk_base_addr	= clk_base_addr;
-> +	clock->mmd		= mmd;
-> +
-> +	/* Register PTP clock */
-> +	clock->caps.owner          = THIS_MODULE;
-> +	snprintf(clock->caps.name, 30, "%s", phydev->drv->name);
-> +	clock->caps.max_adj        = MCHP_PTP_MAX_ADJ;
-> +	clock->caps.n_ext_ts       = 0;
-> +	clock->caps.pps            = 0;
-> +	clock->caps.adjfine        = mchp_ptp_ltc_adjfine;
-> +	clock->caps.adjtime        = mchp_ptp_ltc_adjtime;
-> +	clock->caps.gettime64      = mchp_ptp_ltc_gettime64;
-> +	clock->caps.settime64      = mchp_ptp_ltc_settime64;
-> +	clock->ptp_clock = ptp_clock_register(&clock->caps,
-> +					      &phydev->mdio.dev);
-> +	if (IS_ERR(clock->ptp_clock))
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	/* Initialize the SW */
-> +	skb_queue_head_init(&clock->tx_queue);
-> +	skb_queue_head_init(&clock->rx_queue);
-> +	INIT_LIST_HEAD(&clock->rx_ts_list);
-> +	spin_lock_init(&clock->rx_ts_lock);
-> +	mutex_init(&clock->ptp_lock);
+On Tue, Dec 03, 2024 at 08:35:53AM -0800, Joe Damato wrote:
+> On Tue, Dec 03, 2024 at 08:26:11AM -0800, Joe Damato wrote:
+> > On Mon, Dec 02, 2024 at 09:14:58PM -0800, Stanislav Fomichev wrote:
+> > > On 12/03, Joe Damato wrote:
+> > > > Fix various integer type conversions by using strtoull and a temporary
+> > > > variable which is bounds checked before being casted into the
+> > > > appropriate cfg_* variable for use by the test program.
+> > > > 
+> > > > While here, free the strdup'd cfg string for overall hygenie.
+> > > 
+> > > Thank you for fixing this! I also saw them this morning after a net-next
+> > > pull and was about to post... I also see the following (LLVM=1):
+> > > 
+> > > busy_poller.c:237:6: warning: variable 'napi_id' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+> > >   237 |         if (napi_list->obj._present.id)
+> > >       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+> > > busy_poller.c:243:38: note: uninitialized use occurs here
+> > >   243 |         netdev_napi_set_req_set_id(set_req, napi_id);
+> > >       |                                             ^~~~~~~
+> > > busy_poller.c:237:2: note: remove the 'if' if its condition is always true
+> > >   237 |         if (napi_list->obj._present.id)
+> > >       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > >   238 |                 napi_id = napi_list->obj.id;
+> > >       |                                            ~
+> > >   239 |         else
+> > >       |         ~~~~
+> > >   240 |                 error(1, 0, "napi ID not present?");
+> > >       |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > > busy_poller.c:226:18: note: initialize the variable 'napi_id' to silence this warning
+> > >   226 |         uint32_t napi_id;
+> > >       |                         ^
+> > >       |                          = 0
+> > > 1 warning generated.
+> > > 
+> > > Presumably the compiler can't connect that fact that (!preset.id) ->
+> > > error. So maybe initialize napi_id to 0 to suppress it as well?
+> > 
+> > Thanks for the report! Can I ask what compiler and version you are
+> > using so that I can test before reposting?
+> 
+> Err, sorry. Haven't had coffee yet. I see you mentioned LLVM=1
+> above. When I use that I also get the same error.
+> 
+> FWIW: I'm using clang version 10.0.0-4ubuntu1 (which as far as I
+> can tell is pretty old). I'll see if I can get a newer version just
+> to make sure no other warnings appear.
 
-The s/w initialization is completed after successfully registering the
-new ptp clock, is that safe? It looks like it may race with ptp callbacks.
+Hi Joe,
 
-Cheers,
-
-Paolo
-
+If you are still looking for recent LLVM toolchains, I suggest taking
+a look at https://mirrors.edge.kernel.org/pub/tools/llvm/
 
