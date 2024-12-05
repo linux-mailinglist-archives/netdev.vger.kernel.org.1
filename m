@@ -1,210 +1,156 @@
-Return-Path: <netdev+bounces-149438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D16D9E5A14
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:46:01 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CAB816D17B
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 15:45:20 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E2F221457;
-	Thu,  5 Dec 2024 15:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tv7W9sEo"
-X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2044.outbound.protection.outlook.com [40.107.244.44])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 830049E59F9
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:43:03 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B0F221442
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 15:43:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733413432; cv=fail; b=iNLz43A34MaZM4MCQRa1GzAYEbRHQPex4tk57EDMc32H6j7OsANYsPi6xq8kPG3m72f8gaAuV9PC6ZOs/YYoCN2IbXwhzt8zjNtqUg9kY29+dtamHOY9xuBIKSL+PdXYOiklulWU6ZMkK3HLHP0/0HpJuSD4HasyD8P7GQBtS0I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733413432; c=relaxed/simple;
-	bh=l/hGMYxsV1+BQfKDPlXhHpfYVA2Zu60ZsNLIFrxMJX0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PfCW4IrgYyWHZC0vXAIA9nKCoR1CWk5A8ePaLjF8hgppKjRP0Zlb38lmxcmWYXydxlkO7f3CKEXhwX/viVG+W4CmsJcNlTzx3zcyEAPlCHjasaKXivNOC8OB5XzHFFoIJU04gVZA17xDgpcdU7QKhlKpIgkP/Nc58HEJLbauJvk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tv7W9sEo; arc=fail smtp.client-ip=40.107.244.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BaGpe/i4pMECYMGwT9ofYwoWMcNKOS+hEJ1A35eMnGuP8uJq1HwFoeSFN7uQEXXkd2WozI7GlWfIm/GzzK1+PelqhnmH+4Q8CkWf+U73Qa+rOAhPVIBdlx2nj83ldJYK8V4Ha13KL9k0gom0ubhq9hWeChH3q5NYhNY+qW7JECV12OyyHXI0Gj17cLEr9lSspRLac6rdfSeQbV7BY99xdK2W7a5l+VRCHqC6WRsKZHS/5Aji/RAdkBRRYCBE0vlCGjS+vCEgaF4pAAgp15uVbDa3d5ORiQAB1Eq5LArhhEMoKLqueJNF129sr9NFCjBE+tbsgnz3zss5uAc5RMzKeQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JW/GRYfLFfomW7u06CId1bfH0ejF+qNwWhOq5l+KzwE=;
- b=t7PLjpsCqGxWDU+NnEUG3wXptU5/uR0KoddvvakgvO+aQVySyumxLz3LjylWC+4QKne28+kfKJK8Uw8f6HAufGmYWXX1Tot9vrMA0ITlc0NZiV03AOdf+7VafRtomgMSTccOBgpDi2EbTrwgvB5GGG8CTOVsgZBXuy8/hBQVDMY1TDzpSKHyuNWSMuhA7gjyLPOKtn0iaGe4bwSWi8IzWyK9m4V0l3EGct6YXi1zkRILVpEjNnpKpMeRLPjB61y6NAwpAQoKzMOI49tcaU9e3ghAFRTOTsZLQ/iSUA+AAMGRDJJkuaA685SnIQKWCIH8Vr/N/ovVTvc7T3MyUqh/wA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JW/GRYfLFfomW7u06CId1bfH0ejF+qNwWhOq5l+KzwE=;
- b=tv7W9sEom3qTHlzjIBFLUW1vvKtBPFsYGAOwrp1oqbIVPdu5jjT2pynVsexqaQlo3T3h50YhheupjAVo9eCKfXtyDjgTSuNUlqFy9qlOrFODFRd4V145GIxt00bPTLCBQxTs51zPQeuyiOrg7VMu1HjSYpWSW3teUsmfkJIxF2BqDUCbeiSRt3EP89T2O5UWg/lWlus/P4TzeGiBV7JEz+MUvneZuytV1xYzCHlX1Np3HcB17IC+3ofi4YWw2WFlvOiSGDPXiwA09eYZNbmXhpqvEkLBwraesaDX7L/Nk3F5qq2WX/vW3LtDel3YQuc+8eXTteFfoDsaHdRB1cLYeQ==
-Received: from DM6PR13CA0029.namprd13.prod.outlook.com (2603:10b6:5:bc::42) by
- DM4PR12MB7719.namprd12.prod.outlook.com (2603:10b6:8:101::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8207.19; Thu, 5 Dec 2024 15:43:41 +0000
-Received: from DS1PEPF00017095.namprd03.prod.outlook.com
- (2603:10b6:5:bc:cafe::ca) by DM6PR13CA0029.outlook.office365.com
- (2603:10b6:5:bc::42) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8230.12 via Frontend Transport; Thu,
- 5 Dec 2024 15:43:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DS1PEPF00017095.mail.protection.outlook.com (10.167.17.138) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8230.7 via Frontend Transport; Thu, 5 Dec 2024 15:43:41 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 5 Dec 2024
- 07:43:26 -0800
-Received: from localhost.localdomain (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 5 Dec 2024
- 07:43:20 -0800
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<netdev@vger.kernel.org>
-CC: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, "Petr
- Machata" <petrm@nvidia.com>, <mlxsw@nvidia.com>, Menglong Dong
-	<menglong8.dong@gmail.com>, Guillaume Nault <gnault@redhat.com>, "Alexander
- Lobakin" <aleksander.lobakin@intel.com>, Breno Leitao <leitao@debian.org>
-Subject: [PATCH net-next v2 01/11] vxlan: In vxlan_rcv(), access flags through the vxlan netdevice
-Date: Thu, 5 Dec 2024 16:40:50 +0100
-Message-ID: <5d237ffd731055e524d7b7c436de43358d8743d2.1733412063.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <cover.1733412063.git.petrm@nvidia.com>
-References: <cover.1733412063.git.petrm@nvidia.com>
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 112C3286C05
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 15:43:02 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F5221CA12;
+	Thu,  5 Dec 2024 15:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gjdi2VHY"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DEAC218E99;
+	Thu,  5 Dec 2024 15:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733413380; cv=none; b=H8lZzhu2urGuxrVlsQXX9eq2GqfchgdMq/jUv3TnNqVs5Mkomz9jIalt9GMyDO6pCtKMmysgHyye1OK0oYiYBUXcfYdFRBTpkosIYYp2/nsOwuxgFKZ04ixso6UrrGVKHT8RRXNtXw5TfWFmDh7gfejzYN0J4BgZUJY9slthfng=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733413380; c=relaxed/simple;
+	bh=5fJNr+uuGbzSucThB4KRt2W6mdssk1rnyKaKs1lG5TA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ETYncBAzq8EPO/BdkcK+fNJ1kFGuVHkLiDWKKvISfSblIsynYQwcOpploGAvOYeavrDXYds7eCuMPOrUbyvQGlcuXy0dSxHeMgkfWBRK8dcXXAqG+rF6dsmf2pkTBlcpcJEVyxFkbJi482/FPzcgWfiEWSuweL6Khv/G3C2PCC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gjdi2VHY; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-385dece873cso599283f8f.0;
+        Thu, 05 Dec 2024 07:42:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733413377; x=1734018177; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qm0xTA7w0trmMS63onZN9A8A0KVvItfxjJ4yazAcGOA=;
+        b=Gjdi2VHYuhpwgxmzcuYW4h0DJyeUFFOGuqSwPdORwp8yuaP1VxV+GTHpm6b1PDZxfJ
+         o4QF7M+hEjIgH4o4+YfeP9Uo9CSQq1XTACp4Z984l4uA8c3IHuEzUSmPVN5SXmam95cB
+         42GpZJLL9m+Leo786binPMjJv6LQjauGmhdV+QIIbeLc8muRAmE3UzdNXBEyVj/s7RiL
+         iGbJX5XXSk5eVjkxfT/5bRJHWdXS8/O9jtjVaZ/VDuJwlBVaQ4URkzpRkHwBTVdv2NsG
+         IbwzhT23AMAqBEbvIiHer5bgKWQqyuHgt7lXwL2Bchs1KQjOZ+ih3hocFygdPZN9ePhD
+         H0fQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733413377; x=1734018177;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Qm0xTA7w0trmMS63onZN9A8A0KVvItfxjJ4yazAcGOA=;
+        b=D3uNlChxeCL5CdBeFbHQ+bdN517Q76Ml5EXsCZxxqyTljC5H582ug6iwTEBjTOryHp
+         eu6A5vi9C/+dNkwSlctnbauaiwQ9djzXN18BeOT2jfLdFfcm6K1UrzwRpfH1thQy74Dz
+         Dh8VYAya1XGK80d8Cqjp0HAOLg0nKLm0kOMUcAFNqsQePa8wUt01+GwAniuNJNEfqpAo
+         0CqJ6QPz5reaemSb6fSf90Mlck+KXFg50r0Ihpr8Js3HJh6dS1TwXMRGv//5FExFIHIL
+         bq8/UOhwyM//8OSOm0eNsnRwprQn8qFTwlGAf5f2H+ePiiY3okJ0w8anGjHA26y/LWxC
+         SPBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUBXIOXX+ebFQGFZh3veSBaav7BHJ3dkrwRCiib3c/ish6Y7sNlLV6STtdKh9kLwdaTYcxDHS1n1nqP3jQX@vger.kernel.org, AJvYcCV19bkoKQmbb0Mhm52MenhAuvTN9ol/JWu0jhzevaGy+SsCmuaK3Yk0Z+eyYpuW9V4jMzsIz3oz@vger.kernel.org, AJvYcCVzFPT1RG4EPPBfK7G+85wr8QpFUjeHGvbEpZHBdFCAADnlDa12izAXx7Z6gxiVbO1g/8+fecGV1mC4cj/EbcM=@vger.kernel.org, AJvYcCXm5y+t6LYSSbm8dEVq6BDjmZXEYb+DeZonNoE9vUhj0KdWG4LOVSe5EcieG9mWCuik1spDCMGidHri@vger.kernel.org
+X-Gm-Message-State: AOJu0YzR864xyUtIb8U2poxxPcCaNcZPQXuD8Wy/AcOscWd7KnrWh8Ur
+	8IMucr5FNiqiWKdOsmNGXbG3WGlCrJv7xQoWPKfJX0C2x4HnGjdZ
+X-Gm-Gg: ASbGncvLCjGgS6rlVJM6TC5UqeQjujL81yKDeR4DYUbupxKPAPS7UHRLtsi22YGOBup
+	iVs67fiw2Er7OpfNSjLDBGBVbzL7akIPIVWYXcYWLUQLEQ2sOUj6urnfetDTY86SWvId+bt+gpT
+	UNmPLRi1+21mFvMi2z7lVVm0iYURY3qIJTO7K6rTBZmXqPuMkBThjod+2nTIWGpEcgjB8DWlmjS
+	Utm9U9wIRGJQrx3FooMVvDI8DEoA8MZBu0sjxwAhglxhGtWmzmdOIABD+4=
+X-Google-Smtp-Source: AGHT+IE1FZ5JkMJKChb9COrcHR93yKEZdHzkg3M98KstBiKvfHSE5uSF5BeN4exQl35vdPQhMGDNYw==
+X-Received: by 2002:a5d:588b:0:b0:385:f114:15d6 with SMTP id ffacd0b85a97d-38607ac1ad6mr7179392f8f.13.1733413376413;
+        Thu, 05 Dec 2024 07:42:56 -0800 (PST)
+Received: from localhost.localdomain ([46.248.82.114])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434da11387dsm27020185e9.30.2024.12.05.07.42.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Dec 2024 07:42:56 -0800 (PST)
+From: Uros Bizjak <ubizjak@gmail.com>
+To: x86@kernel.org,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org,
+	linux-bcachefs@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Uros Bizjak <ubizjak@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Dennis Zhou <dennis@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Christoph Lameter <cl@linux.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Andy Lutomirski <luto@kernel.org>,
+	Ingo Molnar <mingo@kernel.org>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Brian Gerst <brgerst@gmail.com>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH v2 0/6] Enable strict percpu address space checks
+Date: Thu,  5 Dec 2024 16:40:50 +0100
+Message-ID: <20241205154247.43444-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017095:EE_|DM4PR12MB7719:EE_
-X-MS-Office365-Filtering-Correlation-Id: e4dde673-1a1f-4c61-7dd0-08dd154397e4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?FeMhSmeF02TvsWwFVLm58wuHmmemyjwc3aBDAsvJm52YF53LtXt92dDk4Gtp?=
- =?us-ascii?Q?nPcQhGUv+oxe+ryapOT786h/J92GLQXj7KDLQPewtkydJidJqxd25+fFM39Q?=
- =?us-ascii?Q?KMhR5nbpk6/ODTbhIz0oWw4KviEWxZWX+IOcNZfMCXh3gZa+kZPq3qrQ6Hwo?=
- =?us-ascii?Q?MZ2UJygMBnKcBUmMxKxpo4T/eSkRmur04hM68U78p/WYJVutf/HpsWQwlsn3?=
- =?us-ascii?Q?zSNnnEiBZZK94gOa+C0ou1VdNYR0m5ksnfVi03i5xY/W/NRgenn9FaktO3r/?=
- =?us-ascii?Q?KYnwD/3eMBRWozSmHWRz7jARu+OWrjfDOMj96NOcBWAlsZb6YxaFXv4yu4Wv?=
- =?us-ascii?Q?x0t8in6a/ACqUyU7Il2EYHTAVzxfz8b7oHWIjY4HmYkqQM2XVIKzoAQSxP2p?=
- =?us-ascii?Q?uSKsDe9ppHWYRNP33rMnBUwd0X0Lwh1uoE3DoCP/TAa8vA1Q6juGoiBSnbXg?=
- =?us-ascii?Q?fTqWb4QiGng7B0SgYW5PpqVTw/asz+35dyDEe4914LaNqmDVIxXMVKOVaYzY?=
- =?us-ascii?Q?Ee7h7Ha3WC3I7kbTJTpRN/lJOyXSczNtYu+1LJB/zhzRxSk/k8jUFic9NtcA?=
- =?us-ascii?Q?VuLTyCmvgyZ+pgxHobzeAppc6LQ6VsbNCpmstuFSZuVuJxFqqEWqxn0/pqfY?=
- =?us-ascii?Q?C/L/x1CuOwYZqIh2tZNFBusycZDon3kLkIy6k3DJSM7zmKZGSBKiPBASoT01?=
- =?us-ascii?Q?eXD3Kn/lsTW+lQucLMNA2KCfesOaq++Z++ju+59o4kIXNhWnYyHFv6VOL+gs?=
- =?us-ascii?Q?iB21IV4fR+QF/ORodzwpNfA0Rmyff0Bq/o1ifSjUKRJssbe+ZlMhQkwoaXO6?=
- =?us-ascii?Q?VEtn8nO/SD6D4IqS/F/LxwmtJ5awgcllxBDJPZhSrtsbDf2EWb0SIRrbOY8v?=
- =?us-ascii?Q?qP4aMfxZk9b/iOV+1Fwk9lMGKQKLkSVKSS9y0aJT2TadVUW+UflOnefzH3VU?=
- =?us-ascii?Q?iVUAIGAxSR3GsvDNVBOd/3t/o9AKXJPWTYyOkmIdipWqzvRCs1/xBRMeLpIK?=
- =?us-ascii?Q?GNPNuBspO78sLq9qlA6ZYf6QfDpfTV3vRMKn0N1EeITE89F0yiX0IBfYH80g?=
- =?us-ascii?Q?nOriN5m7mVuzE9AgizTokVvenRa7L4tq30AOm/k64Gh+PANi2r8Pm1r9i9st?=
- =?us-ascii?Q?rOEI+pJK5O6OqfpYhR8CgWWjywfK0sm78YoGZJVr+dAZFNw0FUVRLkilITVH?=
- =?us-ascii?Q?+H+fwCD99bnmKXsE26XR5dYb9MGb15otKyo8fha+EBfGlARh1FX0m3zsQ1FE?=
- =?us-ascii?Q?DTxwtcU7/o7C5SZIVjDd377UZO2OH/PlbdLRY9ihdCo4qKKH+SvyGHx/w1va?=
- =?us-ascii?Q?ZCYBWE59ua1BxKTlyTjpZf5B12KEsHrDrbfZUBG2qJhBjnIgXr3ttz4W30X2?=
- =?us-ascii?Q?rpsVvlsmph178jXT/9schoZswx0mgoSC7FpA+QiPINxcfWxwg9cMq+Q0nVC9?=
- =?us-ascii?Q?HvsokNvNGf6jH6EhHxpes9Hi60Nppxqa?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014)(7416014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2024 15:43:41.0242
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4dde673-1a1f-4c61-7dd0-08dd154397e4
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017095.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7719
 
-vxlan_sock.flags is constructed from vxlan_dev.cfg.flags, as the subset of
-flags (named VXLAN_F_RCV_FLAGS) that is important from the point of view of
-socket sharing. Attempts to reconfigure these flags during the vxlan netdev
-lifetime are also bounced. It is therefore immaterial whether we access the
-flags through the vxlan_dev or through the socket.
+This patchset enables strict percpu address space checks via x86 named 
+address space qualifiers. Percpu variables are declared in
+__seg_gs/__seg_fs named AS and kept named AS qualified until they
+are dereferenced via percpu accessor. This approach enables various
+compiler checks for cross-namespace variable assignments.
 
-Convert the socket accesses to netdevice accesses in this separate patch to
-make the conversions that take place in the following patches more obvious.
+Please note that current version of sparse doesn't know anything about
+__typeof_unqual__() operator. Avoid the usage of __typeof_unqual__()
+when sparse checking is active to prevent sparse errors with unknowing
+keyword.
 
-Signed-off-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
----
+v2: - Add comment to remove test for __CHECKER__ once sparse learns
+      about __typeof_unqual__.
+    - Add Acked-by: tags.
 
-Notes:
-CC: Menglong Dong <menglong8.dong@gmail.com>
-CC: Guillaume Nault <gnault@redhat.com>
-CC: Alexander Lobakin <aleksander.lobakin@intel.com>
-CC: Breno Leitao <leitao@debian.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Dennis Zhou <dennis@kernel.org>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Christoph Lameter <cl@linux.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Ingo Molnar <mingo@kernel.org>
+Cc: Nadav Amit <nadav.amit@gmail.com>
+Cc: Brian Gerst <brgerst@gmail.com>
+Cc: H. Peter Anvin <hpa@zytor.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
 
- drivers/net/vxlan/vxlan_core.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Uros Bizjak (6):
+  x86/kgdb: Use IS_ERR_PCPU() macro
+  compiler.h: Introduce TYPEOF_UNQUAL() macro
+  percpu: Use TYPEOF_UNQUAL() in variable declarations
+  percpu: Use TYPEOF_UNQUAL() in *_cpu_ptr() accessors
+  percpu: Repurpose __percpu tag as a named address space qualifier
+  percpu/x86: Enable strict percpu checks via named AS qualifiers
 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 4053bd3f1023..d07d86ac1f03 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -1717,7 +1717,7 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
- 	/* For backwards compatibility, only allow reserved fields to be
- 	 * used by VXLAN extensions if explicitly requested.
- 	 */
--	if (vs->flags & VXLAN_F_GPE) {
-+	if (vxlan->cfg.flags & VXLAN_F_GPE) {
- 		if (!vxlan_parse_gpe_proto(&unparsed, &protocol))
- 			goto drop;
- 		unparsed.vx_flags &= ~VXLAN_GPE_USED_BITS;
-@@ -1730,8 +1730,8 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
- 		goto drop;
- 	}
- 
--	if (vs->flags & VXLAN_F_REMCSUM_RX) {
--		reason = vxlan_remcsum(&unparsed, skb, vs->flags);
-+	if (vxlan->cfg.flags & VXLAN_F_REMCSUM_RX) {
-+		reason = vxlan_remcsum(&unparsed, skb, vxlan->cfg.flags);
- 		if (unlikely(reason))
- 			goto drop;
- 	}
-@@ -1756,8 +1756,8 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
- 		memset(md, 0, sizeof(*md));
- 	}
- 
--	if (vs->flags & VXLAN_F_GBP)
--		vxlan_parse_gbp_hdr(&unparsed, skb, vs->flags, md);
-+	if (vxlan->cfg.flags & VXLAN_F_GBP)
-+		vxlan_parse_gbp_hdr(&unparsed, skb, vxlan->cfg.flags, md);
- 	/* Note that GBP and GPE can never be active together. This is
- 	 * ensured in vxlan_dev_configure.
- 	 */
+ arch/x86/include/asm/percpu.h  | 38 ++++++++++++++++++++++---------
+ arch/x86/kernel/kgdb.c         |  2 +-
+ fs/bcachefs/util.h             |  2 +-
+ include/asm-generic/percpu.h   | 41 +++++++++++++++++++++++-----------
+ include/linux/compiler.h       | 13 +++++++++++
+ include/linux/compiler_types.h |  2 +-
+ include/linux/part_stat.h      |  2 +-
+ include/linux/percpu-defs.h    |  6 ++---
+ include/net/snmp.h             |  5 ++---
+ init/Kconfig                   |  3 +++
+ kernel/locking/percpu-rwsem.c  |  2 +-
+ net/mpls/internal.h            |  4 ++--
+ 12 files changed, 84 insertions(+), 36 deletions(-)
+
 -- 
-2.47.0
+2.42.0
 
 
