@@ -1,252 +1,160 @@
-Return-Path: <netdev+bounces-149308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15FEA9E5157
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:30:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FD679E5172
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:34:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8085D188026F
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 09:30:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B208188168D
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 09:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78CEC190477;
-	Thu,  5 Dec 2024 09:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0921D47A2;
+	Thu,  5 Dec 2024 09:34:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SOMJBsWa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gsP/MMTr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2E818DF81
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 09:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A359A1A8F84;
+	Thu,  5 Dec 2024 09:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733391022; cv=none; b=HzOGhp1JtfusxqF5lxPZS6dlwEhUk1FLNkQll+KGE7v+A+8mNW8lZA3xcMWMKZgjzAqOp4nvgqTvhcc4rJo3Ah3IkUQ6iC2LHSuu63AeMy2xlVpfPB9zh9Jax9kyNNQLLvo7XiUGOshNWztIieBd1catPGNoOOpH7PjpWgLyBwk=
+	t=1733391284; cv=none; b=R5S55ZdrSMNoVOeNmyp8QPVS9p5SXLg5+xQFLgRKjBtiULWNH3M8UeOTXc6l3W3QInZvkqHi5XRNkw3Fxm8oRqB1JmJ1/yksRo+nnPV+uxOFUJzWnZB7sAbdn5BuXMhVqObM9Ga4k/PrvxDBrOE99dHEIngnYvuOlFWKIahvBzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733391022; c=relaxed/simple;
-	bh=NR040Na4ElTzgAf6uqIRVtedzUiCNdGM13uTpTED+7I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SaynymEVX9ulyv5g86l+KWNqhSKp3Cq545lkqrpYbecFzelQ8Oj6mFUiMO71U1A4wp26J9w1eOBk9BHYx4mIj1ikmlyN7E3E7Y1JDzAE6d+17U95m4mgaXzwlqCGpmcwayZwXLWOaTgf8jsHF1/zuFizDFwUJASxigxvO7Hk0PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SOMJBsWa; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733391019;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=//g6HKkuHCsIKaelKXi4Hr4QHnjTryAbrxrjnf5EBhw=;
-	b=SOMJBsWao48Oaq2fL9jJKDXdp3119NynnYGKWUfLAGXAyxfvhBsqlwtP6kq9A2iLdB/g5X
-	xrWYC9jyGNta9SO/gnVCNpfTS9L8TpiB+2drJ1ijGSiYcrOyT2RRlikH8eRTBZkcSlo/u4
-	gOPD813a9M9BCbqjDph81GJScaLh0a0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-17-2H4VOJ0rPeOVCBxK69v13Q-1; Thu, 05 Dec 2024 04:30:18 -0500
-X-MC-Unique: 2H4VOJ0rPeOVCBxK69v13Q-1
-X-Mimecast-MFC-AGG-ID: 2H4VOJ0rPeOVCBxK69v13Q
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385dc37cb3eso430471f8f.0
-        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 01:30:18 -0800 (PST)
+	s=arc-20240116; t=1733391284; c=relaxed/simple;
+	bh=SgjiSFVxnlRVKIIJzqHaBXZJFjFXmkquQB53qoebHPk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=muC+2knvt1ZhnOCIPsskTUG00iE7QZRkgg0BBJ/uL+u4Yu3mZbbAwYnhRRkV5LM/Q69shqU2pi+H9Ydln1OjL76Pn/7preicPZL0Qq8yOJyPTGsRA3xafwHCAWrRzruarCx92j/D+45UGidYzAKefeD+VqAP344pDgX1kj74BEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gsP/MMTr; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-724e1742d0dso632460b3a.0;
+        Thu, 05 Dec 2024 01:34:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733391282; x=1733996082; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=svw3hVWhjLUsKCnyMo5bW6Ng4sD85ogIrMfseX9wbyA=;
+        b=gsP/MMTrj12JVHLsTZfPYK3umou5w/6L9oGZFjvWjP8g44MrGNRWa9gqhakCtQ/Rdj
+         WXLyj4aDGM12cAWXwl967LARkPJGUrFtSZzUjlQb/Nz+/Q8c3x0rhDu2iM2XvSnc5UV+
+         GJaKvDFLASYDLsH6HT1R9LQkgywD6CdHkA6b7PqK7Z5HOlkWdyK6vV6mL/5ctM4h0ir+
+         xkMDQq6uTEL5PG5dXxMePbgdRO7duDBKa1oWyBUFIbtOzBSVL6U1dzXjmTDSckEITTae
+         DLqr64xJI8627lxQUOKsXQiYJT0pQXv779oz8ZO0RldbKBlrsk3FCzGJApZpp7SQwm7O
+         Vrhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733391017; x=1733995817;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=//g6HKkuHCsIKaelKXi4Hr4QHnjTryAbrxrjnf5EBhw=;
-        b=Qr1AIITBJL0wYS7i2PGQB408B1csFZ6lM4k8hpbJJOTYJoUqUMaCEFyvKsOaPZtCIX
-         TOIrfQ8tU77046wPgIhzYQybFjiqHIh+q1YKY20MUXwtTONNSsBUWC96CSqgMNF+eAXz
-         ux/a61qXjd8af4Owm52xJ60JE8ekWjKilu/3lrGEzpD87+gCM6MtbO8wLlbZRYLgeIAz
-         5kvQZXEN/CPLMJShtWg78IUHsNhdk4vsBx+7LnaEp7BQMGavAgd+BUWMia9oaSEaEzm7
-         BI85ZxAbR/UTFFtuw64XMGy9ltD9U/x+dUiP7C4RMbcWuanLBHqcSnuWoDtxmvGA61FY
-         eYDg==
-X-Forwarded-Encrypted: i=1; AJvYcCW/zCFGwynTwK4ZiA9cw3cd+05qYz+SfvBpEeVKHT+m0mBESAuiK8ftk4vs9EuusOAxhjlxTZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9plBbEAlGGEK+Nr/8QrcbUh5yB7D+EeqmvT17V65HqjWr3Knk
-	oY17BSdpX7go8ad8J2465sX1/tS9TLEp0oFHSQsKA55mSSIjPVrDSkyTW6J15dimbBspZYip+iZ
-	S+h/HM77a05FjoMMv48vF+VblIiGQTD2rPGpnIa87+hRp2ZaY5+pwQvyK4ajFkA==
-X-Gm-Gg: ASbGncsRu0airrBOavWdZBwHj2wY1jAefgjOqxGns78eEspJRX8tOAIA98mUWrXZkM1
-	5Qp4mctYH0v7yXWhal6UEbKEW+VIXxUlOasqhpm9SclFW82lqJOrVLjQuVLSuB9mP/bN91T4vLl
-	tbzVkL9nEKuy2bWeUWVTvawLJFP6/h2Q+6kCfMEVJ8D0MP8WiMLyDAHUO580UCS3y12xyV4CRBw
-	j1hWqnf6oqgpzCZ6erONT7pybuseryv6P5Q1ayM465Yw0gR5mBudgf0Jas1dnkZd68PUcOL/5oy
-X-Received: by 2002:a05:6000:1fa3:b0:385:ec8d:8ca9 with SMTP id ffacd0b85a97d-385fd42a6c4mr7386999f8f.42.1733391017142;
-        Thu, 05 Dec 2024 01:30:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHe3eLbz5no4mbmVLofc0xSyd1ztetEorUqecaSNgr3GHNqJyrjUC6+th6e5LadzZ4zGKjccA==
-X-Received: by 2002:a05:6000:1fa3:b0:385:ec8d:8ca9 with SMTP id ffacd0b85a97d-385fd42a6c4mr7386980f8f.42.1733391016708;
-        Thu, 05 Dec 2024 01:30:16 -0800 (PST)
-Received: from [192.168.88.24] (146-241-38-31.dyn.eolo.it. [146.241.38.31])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434da119a58sm17438645e9.41.2024.12.05.01.30.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Dec 2024 01:30:16 -0800 (PST)
-Message-ID: <fa941e0d-2359-4d06-8e61-de40b3d570cb@redhat.com>
-Date: Thu, 5 Dec 2024 10:30:14 +0100
+        d=1e100.net; s=20230601; t=1733391282; x=1733996082;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=svw3hVWhjLUsKCnyMo5bW6Ng4sD85ogIrMfseX9wbyA=;
+        b=oSEdTdvrdjsM0oZiesZOd3zpWXsyRBbvIj0+/xzYqN6HAQLPHXGdcknlg0LUbavd+a
+         nmu8jR+AgPq6t256YQq0qpOm/Ovvk17OvrI6GYQZI45Uxt6jr8vAPUYg+tOOdHSy9193
+         3JmJASH3pzYeUsm+U51cWjbkFKk6UpV4Kx3c19iwdKQJ4T9H6+hQzKaf2PimdWlJQqgi
+         19+qSxW0yjhj/nO7W3d7ZWmsDCEXbUlYPFlw7qrIWk1HeVAzpYrhvGdAivdeMdAY1hgW
+         Tvtl+4JO41QWzO+1biy+I0K82OthByfbjfm1THS521M/srGG/use6OwO2dWnK8Mx2b6S
+         vdBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUC0qaTZyISTWwOyysCOkY3CQdDPYPGHap9Bg4Ifsnbo684DiEH5ZUXi0L43Ir2Y76PBbeDL3IicEaWVbk=@vger.kernel.org, AJvYcCUqp1P2uPdjXu77BzxfNK9E3rPRoMP4FpmFhhyDLgxHkTLoz2jqd0mithRRrXj5zvKhUbIBrM2peU687LQ=@vger.kernel.org, AJvYcCWfA4//H8e4TnjSNc8+WG5mrqsC3N5jRLJzZoGU/rOY8TVr1aVZtBz3GiRxQkv1OS8bontScTNf@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy48HObuvc+CoRn0lt69y1CSdK82+kGSJoqOs49gRpEjFMjfSUo
+	rW+p5sxQpUZxnURP7/GORQHoI6Gpui8fC2VbGA+Km3cyrJOhMIVYFCowBw==
+X-Gm-Gg: ASbGncuZSRENXBAIMMMC/yI/8SvYtxq8aH9QgJmjyTF5P8zV1ahPq7CJ9MavNiqY8oU
+	4fl8SvXsJceJGQrmE8+E1dCwxFmgOINtqpK0uVVxUgog7KWRiVNl/TAn7H1tAjmy8z1o2z1WWhk
+	KtSG9oiJyWcCxKJvI3YiecEeqHXmDW/1KCUR4JyOsiOULJ1ueKXVEEBsnJiAuWTkRwCbhktGWQM
+	Eh8XLx8ZDfNPNm2gJqhP4FN3uLeQxtQHNbx5+PPMq+SdCo=
+X-Google-Smtp-Source: AGHT+IGGByayQpZUFnuuK54B4xfgnuxti4ZXFGpFEg18KahQT7dWybOnF+z1/CV1gszt9ZR4jHsBdg==
+X-Received: by 2002:a17:902:ec8b:b0:215:19ae:77bf with SMTP id d9443c01a7336-215bd0d8999mr134561575ad.19.1733391281860;
+        Thu, 05 Dec 2024 01:34:41 -0800 (PST)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215f8e5f172sm8672215ad.69.2024.12.05.01.34.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Dec 2024 01:34:41 -0800 (PST)
+Date: Thu, 5 Dec 2024 17:34:31 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Jon Hunter <jonathanh@nvidia.com>, Thierry Reding
+ <thierry.reding@gmail.com>, Robin Murphy <robin.murphy@arm.com>, Jakub
+ Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com, Suraj Jaiswal
+ <quic_jsuraj@quicinc.com>, Thierry Reding <treding@nvidia.com>,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>, Will Deacon
+ <will@kernel.org>
+Subject: Re: [PATCH net v1] net: stmmac: TSO: Fix unbalanced DMA map/unmap
+ for non-paged SKB data
+Message-ID: <20241205173431.0000779e@gmail.com>
+In-Reply-To: <Z1CVRzWcSDuPyQZe@shell.armlinux.org.uk>
+References: <20241128144501.0000619b@gmail.com>
+	<20241202163309.05603e96@kernel.org>
+	<20241203100331.00007580@gmail.com>
+	<20241202183425.4021d14c@kernel.org>
+	<20241203111637.000023fe@gmail.com>
+	<klkzp5yn5kq5efgtrow6wbvnc46bcqfxs65nz3qy77ujr5turc@bwwhelz2l4dw>
+	<df3a6a9d-4b53-4338-9bc5-c4eea48b8a40@arm.com>
+	<2g2lp3bkadc4wpeslmdoexpidoiqzt7vejar5xhjx5ayt3uox3@dqdyfzn6khn6>
+	<Z1CFz7GpeIzkDro1@shell.armlinux.org.uk>
+	<9719982a-d40c-4110-9233-def2e6cb4d74@nvidia.com>
+	<Z1CVRzWcSDuPyQZe@shell.armlinux.org.uk>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] datagram, udp: Set local address and rehash
- socket atomically against lookup
-To: Stefano Brivio <sbrivio@redhat.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Mike Manning <mvrmanning@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Paul Holzinger <pholzing@redhat.com>, Philo Lu <lulie@linux.alibaba.com>,
- Cambda Zhu <cambda@linux.alibaba.com>, Fred Chen <fred.cc@alibaba-inc.com>,
- Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
-References: <20241204221254.3537932-1-sbrivio@redhat.com>
- <20241204221254.3537932-3-sbrivio@redhat.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241204221254.3537932-3-sbrivio@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Hi,
+Hi Russell,
 
-On 12/4/24 23:12, Stefano Brivio wrote:
-> If a UDP socket changes its local address while it's receiving
-> datagrams, as a result of connect(), there is a period during which
-> a lookup operation might fail to find it, after the address is changed
-> but before the secondary hash (port and address) and the four-tuple
-> hash (local and remote ports and addresses) are updated.
+On Wed, 4 Dec 2024 17:45:43 +0000, "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> So yes, "des" is being offset, which will upset the unmap operation.
+> Please try the following patch, thanks:
 > 
-> Secondary hash chains were introduced by commit 30fff9231fad ("udp:
-> bind() optimisation") and, as a result, a rehash operation became
-> needed to make a bound socket reachable again after a connect().
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 9b262cdad60b..c81ea8cdfe6e 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -4192,8 +4192,8 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+>  	struct stmmac_txq_stats *txq_stats;
+>  	struct stmmac_tx_queue *tx_q;
+>  	u32 pay_len, mss, queue;
+> +	dma_addr_t tso_des, des;
+>  	u8 proto_hdr_len, hdr;
+> -	dma_addr_t des;
+>  	bool set_ic;
+>  	int i;
+>  
+> @@ -4289,14 +4289,15 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+>  
+>  		/* If needed take extra descriptors to fill the remaining payload */
+>  		tmp_pay_len = pay_len - TSO_MAX_BUFF_SIZE;
+> +		tso_des = des;
+>  	} else {
+>  		stmmac_set_desc_addr(priv, first, des);
+>  		tmp_pay_len = pay_len;
+> -		des += proto_hdr_len;
+> +		tso_des = des + proto_hdr_len;
+>  		pay_len = 0;
+>  	}
+>  
+> -	stmmac_tso_allocator(priv, des, tmp_pay_len, (nfrags == 0), queue);
+> +	stmmac_tso_allocator(priv, tso_des, tmp_pay_len, (nfrags == 0), queue);
+>  
+>  	/* In case two or more DMA transmit descriptors are allocated for this
+>  	 * non-paged SKB data, the DMA buffer address should be saved to
 > 
-> This operation was introduced by commit 719f835853a9 ("udp: add
-> rehash on connect()") which isn't however a complete fix: the
-> socket will be found once the rehashing completes, but not while
-> it's pending.
-> 
-> This is noticeable with a socat(1) server in UDP4-LISTEN mode, and a
-> client sending datagrams to it. After the server receives the first
-> datagram (cf. _xioopen_ipdgram_listen()), it issues a connect() to
-> the address of the sender, in order to set up a directed flow.
-> 
-> Now, if the client, running on a different CPU thread, happens to
-> send a (subsequent) datagram while the server's socket changes its
-> address, but is not rehashed yet, this will result in a failed
-> lookup and a port unreachable error delivered to the client, as
-> apparent from the following reproducer:
-> 
->   LEN=$(($(cat /proc/sys/net/core/wmem_default) / 4))
->   dd if=/dev/urandom bs=1 count=${LEN} of=tmp.in
-> 
->   while :; do
->   	taskset -c 1 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,trunc &
->   	sleep 0.1 || sleep 1
->   	taskset -c 2 socat OPEN:tmp.in UDP4:localhost:1337,shut-null
->   	wait
->   done
-> 
-> where the client will eventually get ECONNREFUSED on a write()
-> (typically the second or third one of a given iteration):
-> 
->   2024/11/13 21:28:23 socat[46901] E write(6, 0x556db2e3c000, 8192): Connection refused
-> 
-> This issue was first observed as a seldom failure in Podman's tests
-> checking UDP functionality while using pasta(1) to connect the
-> container's network namespace, which leads us to a reproducer with
-> the lookup error resulting in an ICMP packet on a tap device:
-> 
->   LOCAL_ADDR="$(ip -j -4 addr show|jq -rM '.[] | .addr_info[0] | select(.scope == "global").local')"
-> 
->   while :; do
->   	./pasta --config-net -p pasta.pcap -u 1337 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,trunc &
->   	sleep 0.2 || sleep 1
->   	socat OPEN:tmp.in UDP4:${LOCAL_ADDR}:1337,shut-null
->   	wait
->   	cmp tmp.in tmp.out
->   done
-> 
-> Once this fails:
-> 
->   tmp.in tmp.out differ: char 8193, line 29
-> 
-> we can finally have a look at what's going on:
-> 
->   $ tshark -r pasta.pcap
->       1   0.000000           :: ? ff02::16     ICMPv6 110 Multicast Listener Report Message v2
->       2   0.168690 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
->       3   0.168767 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
->       4   0.168806 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
->       5   0.168827 c6:47:05:8d:dc:04 ? Broadcast    ARP 42 Who has 88.198.0.161? Tell 88.198.0.164
->       6   0.168851 9a:55:9a:55:9a:55 ? c6:47:05:8d:dc:04 ARP 42 88.198.0.161 is at 9a:55:9a:55:9a:55
->       7   0.168875 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
->       8   0.168896 88.198.0.164 ? 88.198.0.161 ICMP 590 Destination unreachable (Port unreachable)
->       9   0.168926 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
->      10   0.168959 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
->      11   0.168989 88.198.0.161 ? 88.198.0.164 UDP 4138 60260 ? 1337 Len=4096
->      12   0.169010 88.198.0.161 ? 88.198.0.164 UDP 42 60260 ? 1337 Len=0
-> 
-> On the third datagram received, the network namespace of the container
-> initiates an ARP lookup to deliver the ICMP message.
-> 
-> In another variant of this reproducer, starting the client with:
-> 
->   strace -f pasta --config-net -u 1337 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,trunc 2>strace.log &
-> 
-> and connecting to the socat server using a loopback address:
-> 
->   socat OPEN:tmp.in UDP4:localhost:1337,shut-null
-> 
-> we can more clearly observe a sendmmsg() call failing after the
-> first datagram is delivered:
-> 
->   [pid 278012] connect(173, 0x7fff96c95fc0, 16) = 0
->   [...]
->   [pid 278012] recvmmsg(173, 0x7fff96c96020, 1024, MSG_DONTWAIT, NULL) = -1 EAGAIN (Resource temporarily unavailable)
->   [pid 278012] sendmmsg(173, 0x561c5ad0a720, 1, MSG_NOSIGNAL) = 1
->   [...]
->   [pid 278012] sendmmsg(173, 0x561c5ad0a720, 1, MSG_NOSIGNAL) = -1 ECONNREFUSED (Connection refused)
-> 
-> and, somewhat confusingly, after a connect() on the same socket
-> succeeded.
-> 
-> To fix this, replace the rehash operation by a set_rcv_saddr()
-> callback holding the spinlock on the primary hash chain, just like
-> the rehash operation used to do, but also setting the address (via
-> inet_update_saddr(), moved to headers) while holding the spinlock.
-> 
-> To make this atomic against the lookup operation, also acquire the
-> spinlock on the primary chain there.
 
-I'm sorry for the late feedback.
-
-I'm concerned by the unconditional spinlock in __udp4_lib_lookup(). I
-fear it could cause performance regressions in different workloads:
-heavy UDP unicast flow, or even TCP over UDP tunnel when the NIC
-supports RX offload for the relevant UDP tunnel protocol.
-
-In the first case there will be an additional atomic operation per packet.
-
-In the latter the spin_lock will be contended with multiple concurrent
-TCP over UDP tunnel flows: the NIC with UDP tunnel offload can use the
-inner header to compute the RX hash, and use different rx queues for
-such flows.
-
-The GRO stage will perform UDP tunnel socket lookup and will contend the
-bucket lock.
-
-> This results in some awkwardness at a caller site, specifically
-> sock_bindtoindex_locked(), where we really just need to rehash the
-> socket without changing its address. With the new operation, we now
-> need to forcibly set the current address again.
-> 
-> On the other hand, this appears more elegant than alternatives such
-> as fetching the spinlock reference in ip4_datagram_connect() and
-> ip6_datagram_conect(), and keeping the rehash operation around for
-> a single user also seems a tad overkill.
-
-Would such option require the same additional lock at lookup time?
+Much appreciated for your comments and suggestions, I sent a new patch to fix
+this issue. Please let me know if you have any new advice.
+https://lore.kernel.org/netdev/20241205091830.3719609-1-0x1207@gmail.com/
 
 Thanks,
-
-Paolo
-
+Furong
 
