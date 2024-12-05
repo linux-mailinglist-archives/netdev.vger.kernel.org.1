@@ -1,251 +1,187 @@
-Return-Path: <netdev+bounces-149165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D81019E4A29
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 00:53:14 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA68016807A
-	for <lists+netdev@lfdr.de>; Wed,  4 Dec 2024 23:52:17 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 987E02B9B7;
-	Wed,  4 Dec 2024 23:52:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="KUaQM9hN"
-X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2085.outbound.protection.outlook.com [40.107.104.85])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A56669E4A4D
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 01:08:06 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7595C165EFC
-	for <netdev@vger.kernel.org>; Wed,  4 Dec 2024 23:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.104.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733356339; cv=fail; b=tH7yb86OKShWaCAZJ0iGI50f7ye8PrmZiCBNBsjiXglHHpLj/r/tMhHFHW267h0a5hPTYwN0HhnKfWH5xX+rCqcbnVqpcL/ViMbwVCzKwhQTsWIeS4tRPXg8bnXzRdmjsVudy18Fob/XLQqAISVCC/laAH5KVEwsaH8ZxiSWUrs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733356339; c=relaxed/simple;
-	bh=rYxRYwHGlb0IoqqjRqJpX2HxKKQPfQFRaTfDbFtueVE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Wj+yNGZN2EAjaB77DAnbMm94rH/eoumPz04kCx1Mbj763j+4LM3VIdtX+i0C+E4y1dhP3BVbVALe1jx+SO306pnv6slDmDJ3yH7PNZQheCMQJ9BEnbmT2i8eFTHyKJcylFWzkVQkMkt3fAccnVAvMHxanUPe1s0T9uKWdnt47FY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=KUaQM9hN; arc=fail smtp.client-ip=40.107.104.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=O7eOmwZxKQsbW725sLcx629DhoVqiDPACDVdNFJVu4aCZO2nziXtYP6t/4DCtNrvCTkbVC9PDbAn7pjMbhqDXFWXW6y8P3oZNd/iOwSJ2WDctkB9Vj59hf3a95rfsqQcVlCzFnhdsmvIHafgGOxLebUfNwuiR0uBYG/BGk1Ts+NmOBbwOA5Zk9ivEc5SVIbG5KSCfAOgy7vdTjoCiyNiLTMOSptumcJfHG2lauif9vod/GdxT3MJFOd7WPM4wnDNhodo8Zt5VMkwYs8HHYNxAKA3DewZAu2EbHkLI/nBkypHaURf0d479b177jCLrifCN7U/vdhMnPzfQnpJaWGMGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EH+q7QCSXtgh2+K/6eH8kicCWJvu4LT/9UodJSk8lmE=;
- b=Gio6fuUvXvm3f/lM7HDDXIhhbIRcvxzF6qAUuUISEYzIArB9M/xxFqaj3VVx578EtToj4zdFgn/9fimY4ZVoTztQ4wJ56KbuD7quLah8h9BNO5pLztRo1OMRLUN/qhSeEkJO6FoDZi2bih/M0bkESC+Nkl+VNqx2wM/g2AQT1CFicGtqvBkBsOeU5wVOl4ll3kM5szhSRHSI/UGunDyDaRv5Lrd0FrlD3CRxumsNf2Z4WwpE+KN99Bc0I1Ny07wgoeVa67gezsgwXz7XRuZqBka17guiPF9k/MlfDMeffR0/z2pvJ1Wz70VlamUoDzEyLJ/D+94MLjPwY7gbV1P/yA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EH+q7QCSXtgh2+K/6eH8kicCWJvu4LT/9UodJSk8lmE=;
- b=KUaQM9hNqWg7MFG3c/rLwfGxuxEMdfzH19RWhpb9w9F1sVg4El9jEHKPp1tjjr7aexaqAHQZkUUQ7Up8YzlAm1VemBUnx3YKCc+7A55lBKlEJ6z+zSxzrGmyy6RzSJxC1j2xTy1Rxp+FmgfYJSkUFMOscl8Sd+3NzM0nd4OCAaLuv1+0w0qx3KEdBxJqpvjgLs2XN934nEpevpSRqPqYTUFeWuwUL/ChGcGoiTUEjUjUJKvieLdOpdLLwgNPmWU5+0DmHEGPD3c2duYp8HBAbbg3DLvxueM9Uos5JwUVADS+X8N9uO9mLDijdOTuFMI5PJXm/FrQ411oRn0klMfhRg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by AM8PR04MB7938.eurprd04.prod.outlook.com (2603:10a6:20b:24e::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.19; Wed, 4 Dec
- 2024 23:52:13 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8230.010; Wed, 4 Dec 2024
- 23:52:12 +0000
-Date: Thu, 5 Dec 2024 01:52:09 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v8 03/10] lib: packing: add pack_fields() and
- unpack_fields()
-Message-ID: <20241204235209.v4xjweehhp5knbew@skbuf>
-References: <20241203-packing-pack-fields-and-ice-implementation-v8-0-2ed68edfe583@intel.com>
- <20241203-packing-pack-fields-and-ice-implementation-v8-3-2ed68edfe583@intel.com>
- <20241204171215.hb5v74kebekwhca4@skbuf>
- <998519c0-a03f-4190-a090-f8ada78ea376@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <998519c0-a03f-4190-a090-f8ada78ea376@intel.com>
-X-ClientProxiedBy: VI1PR09CA0167.eurprd09.prod.outlook.com
- (2603:10a6:800:120::21) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BCB1283D6E
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 00:08:05 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2977723919B;
+	Thu,  5 Dec 2024 00:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="viUyMPDu"
+X-Original-To: netdev@vger.kernel.org
+Received: from pv50p00im-tydg10011801.me.com (pv50p00im-tydg10011801.me.com [17.58.6.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA065137E
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 00:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733357278; cv=none; b=CgHx3wvnewAcCae13Yth4l8dbGsd7JmP7p0nmhZ3QsFThL5TSwtTgreIDrke5S5vxZkqXlbBKu+S1OGw9jYNA+elz2OFrnDzJiUvvfpNtW1kP+86IQQDW3prKz0tp7LdYi+w9MMfOfDaqS6BQ2ZeAYnfC0BhqksPU40j3tgTZk8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733357278; c=relaxed/simple;
+	bh=jXDu8pWjhuYPdMP7VqE1gBu4NrjerabEKnAlH0ltUtc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ka/GDZR5STnUm7xk67NmWWDUU3Lduypw1gYZSicxIwbFd4N2z2W8OfM+zbHnh5K/Wf9s9AYyx7tdt++5OaM6sdnxrmmDwhaNZ+OOecsw7XxDnifoifvFzvi46wFOhfkztZ61pB+R1uzMIvZqBOd49OFrl8Q04ClkM+BqnOvrYQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=viUyMPDu; arc=none smtp.client-ip=17.58.6.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1733357275;
+	bh=T0i1UIwZu179fqDDvM1SaMgHe4/s268Ao/wTXHvJFpU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
+	 x-icloud-hme;
+	b=viUyMPDupWXi4CsrMrPO0pTZeZeGxPoM+enltzZDnkb+kI0qdByPZT5LU1xBetse2
+	 NtaWPzW2mnfiL0cDcb5AxsMAlW09DyzC74O6RR3cBb+ZzhEN7re48DHO1hdcod+aXb
+	 zbl3rMYxZGrv7wQqdRJsrWCp9PSwtE6uiLaNWgjCRsBT8D1ZUgFnCeCL+arYkrJDex
+	 wriQVWYopBjYxrWk6ouKFvfzOLXBz2VSyl6NuyevHO9GGv1V4cTmquonLgabfDNxjR
+	 5eSkEUOnbtt2Et4RjPSCmjNRxtqblo8cbQN/o+14zsvC0nuehSg5FcL9uofh/yy5ZC
+	 z6tN/Ugl8ZG4Q==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-tydg10011801.me.com (Postfix) with ESMTPSA id 9CBA68001C9;
+	Thu,  5 Dec 2024 00:07:24 +0000 (UTC)
+Message-ID: <3a4de1bb-3eb2-469a-8ff7-ff706804f5bb@icloud.com>
+Date: Thu, 5 Dec 2024 08:07:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AM8PR04MB7938:EE_
-X-MS-Office365-Filtering-Correlation-Id: e04914c1-0e29-47c7-f00c-08dd14beac89
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Wvt3to+mNwvJMyN3rNEk7fpPFl+/rG7pRooRQfNKywmfndhZFJZHz6VIntfY?=
- =?us-ascii?Q?SfHVNiSE57IvDrVoqw9ZdIVekncZzjv8wqOkag+rnh34UqTYJW0IGWkNqkvk?=
- =?us-ascii?Q?RcyalTwmpki5u6zVO6VZ71DUS+9OL/LLmTyRMzXPtE5WI/mshhd5/VhjN6fH?=
- =?us-ascii?Q?sEJKE8Gc7HFjKMeDmlk8jLzwwYafH1S4HaItvEEVme9aJag8zV7PmZGSnKu2?=
- =?us-ascii?Q?fU/D1WDlZ18JKM1mSyIUMFTu82+Nf95agBgq7YPmMIC1kGYdf2/NnmeDgW3o?=
- =?us-ascii?Q?IssxDzJNpAtIPj6SSZj7aBarZYVbBZJFA8JfwsaZhGiP/IQN3Xps4XpjtzKG?=
- =?us-ascii?Q?SzSEL6+rvXFbi6nVQDNBcD2ZcUT86cStnYZhdgVf2+NB8U/QSFTKv5WoU0ax?=
- =?us-ascii?Q?cxiWMU4oBXYIOKqyyS6wdbhLJL2uqYsXzpz9i847zw1GHF0NRHmEJyh2HIIY?=
- =?us-ascii?Q?aZvffHqfxbLhEFLSSEfSj4JTTXuQ4sz065eiVDb06h5nBc2jYgiSqPGbPE4O?=
- =?us-ascii?Q?koi0eMMntEuWB9fOIfIW+wwAmrlIydsZUdk0sQixeaR5V7aI6j7L6mwE5KaP?=
- =?us-ascii?Q?nTD7uM/eZ5UiChfZ7mBGX9IqOb5hrH+WJwt5nlq040y/Cm+YvgHi6Fu2wWjt?=
- =?us-ascii?Q?m2xY8KE6QkWlhW3+Ic1PV/1Ly1kR/LNfcgmPp2jQtNEsS4TfJYifL/osGdkx?=
- =?us-ascii?Q?0CqPBZOzJxVAUSA/FU00n/uCS1VC5i3ytwsx6xGrcJmZETtm2tRg6ubCrmuG?=
- =?us-ascii?Q?9w3uKVHT1S+agyvQCOUweecEBtpKQjf/jfpitlUE78xFmDTiTBWA4vMNCuPm?=
- =?us-ascii?Q?1ZMFiV+z3EuhCpug6sRVfTgK5mGSWea2FiBE3dRXOq8c7O2M1JMKHxbf9tCU?=
- =?us-ascii?Q?tB24zirsW6EDbIggRGQu85jgXHLsqdr8OEUaoJqcGNKs1Qtqkh8sRljrxewB?=
- =?us-ascii?Q?sM82fL0syKxumuqjfWJXVZVawvCPsEKX4ba9Ll9GwFE5m+p9J2kfzfcSyp1t?=
- =?us-ascii?Q?FIAn4bqL/o2EC/Oneo+5Jzeq/ndvx1Gbb1UpagcEraciLVi5Fx910WGU6Pnz?=
- =?us-ascii?Q?MbxYvGTkjTUfeRjmtbCmQFDWG/z3f5gewb3E46Cc9n8SXMCl9WXE1giODuuE?=
- =?us-ascii?Q?opZ+XfwvKE2T3EL7tJL9HcJq1EVogd+oe1hKd30zYzmJuI11i4f8TdxmzZE9?=
- =?us-ascii?Q?xCB1FUqQeYEzZIna1GLaLO/GHUpwwcwBP5F2oCIHm2+/8k2L8jn3BPdhkj8N?=
- =?us-ascii?Q?bSc8tZYazo0F6cnbxTb7+X6r+RUMPHXGgGM2+m/3OEbmh5lbaybeNVbyzKGj?=
- =?us-ascii?Q?Gd+pLc2we1L0GYrMnIF+0vG+/aLa1xkEXZMKCJ1LnWZW3w=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?uKZuZ9w8H0YBcBJoO6M2kUx5wjHgoJmjA8rfWPlhrDAPhcC82RrZNOsVEeYm?=
- =?us-ascii?Q?WJG8Gl3KwSkoZ1gYQAGjMT0kJwVzZJm9FEHJrNctz6mFwvqhah8lyzOuPgkW?=
- =?us-ascii?Q?XS3L/x51I/F1l23SeNrliHb79HuFywEou9Y9yURmDE595MvElVNSkB4Dy1XB?=
- =?us-ascii?Q?Zmzk91eb7Zu+OQgOv7v70SL1o9TtC7vqiEMZXF2mLOiVfstEWW/sYWcQiJHc?=
- =?us-ascii?Q?01ge9NiU4+Y+SgPHsS0tgu+7M00t7MWxj2mPBY1QvBXZFSxwhWXj9+or5a0n?=
- =?us-ascii?Q?3dQbn1kyH0EboZJQnvjeP7bkQtBsNVcHDA0GmOk/0DxW/mZSaIuv7JsH9s64?=
- =?us-ascii?Q?ByiAWJKWgA2j9LYA9bK/aLgA4JcofY+uUUxS15J/QfToyGG4EMdTq5A15ZKl?=
- =?us-ascii?Q?7BkshLxlaDOmZfWhVOajZA0UHkoO3iT4A4cz/o1CYHKmQeiixmjDJUd5tA11?=
- =?us-ascii?Q?zu6w+QAmP6xn+VvPPhnMnE6W3LAu4MGgL/0DXAj055tYBRpKiram6KftrJI4?=
- =?us-ascii?Q?sj/I7HQ9rDHMYcVK2vP/c3ToJE7gk11v2h/nqr8yChSk83oNsaAXaAN/uVgE?=
- =?us-ascii?Q?s6LTO784afu/4gGnOj/5mYQnWHi2Z9Ig5FPLGF9pBQokjYvIZFtN/R6uydOP?=
- =?us-ascii?Q?vQRY9U/eovW725jBSr5BjqUuMJxmqtCJ7lW0t/AJZjCvJxWUuBPaPIcvSc+i?=
- =?us-ascii?Q?Pl8OX3grcf4aKAjW+xS/t53Kj4MXwHKCB14r9F6vTggUePCdASCru4ScrH4j?=
- =?us-ascii?Q?IliQhFr1ERGuIRvDz92g/9X6TZ/CrxMEfexLG9m5T/1n66N24cW0KbYTIHFh?=
- =?us-ascii?Q?oJhb/O+GNmO3CMYIn/0I/nHCPz7KI/FNNH+Os9WSrxlM4PU9n6v7bAW+UJT9?=
- =?us-ascii?Q?gWl1TiylqUi3tqATfWwrkBPsRHP169wi96hbeORn1jBAcavCJRX0oqYcPlv5?=
- =?us-ascii?Q?tDxsDkaMYx6clDf5PjzM/kNVBYXXp/BBpCbhFbt1Ss93vW4mnOLw6cpvCsb5?=
- =?us-ascii?Q?NK+6V4Nf0lYlAuVO2ziaoYRf12UsRkuAuB0jnbbs4PeqCmts4IfHOG69yEX+?=
- =?us-ascii?Q?ry+VDfAcBBPs8CC77w7mjCH6Ho1QzLv0/TzW33gfZ3k0+uU1ysaNG4FP4OyX?=
- =?us-ascii?Q?NyQ5/uj99QSzy3oJ14lGebjU9WJjPHEDID0SVLENFPo+szLHS8FgVdC6IE/H?=
- =?us-ascii?Q?eYJdPyxIg3i2/JM5M/4IerT9cIkIqH8/pw1iBvKVi/YF04C48Z2aXFKsnw2a?=
- =?us-ascii?Q?xEA1JPmWH0DVLsX+zuI/DlrV+qsrOsb0e/a0EhA/3+XB0pQOYhhuchpFFV1h?=
- =?us-ascii?Q?slIoQyJunltUrK9UMPzo98UBTVlILlb/2VA/gB+235r/ygDt2YgoFlcg3cM2?=
- =?us-ascii?Q?qAT88HJ3qRVLkqR16+x0VUo8ncODFYYyoCvuZOz7k+qy1SMFFYeIV/HYqb9N?=
- =?us-ascii?Q?ZIA+zNSpb1FRS0faLAsfbZ+x3Q1OdrOwF//uX03p+Ym3ZHdiry3fp8R/TYvg?=
- =?us-ascii?Q?hpx5EfO66hkaZP84yhd0VsLe62KCki4TVJb02fOK57A4goEKBRXQcJsDfBXO?=
- =?us-ascii?Q?Rdy14zLubHDVYH7HlpzpTi7N5zmNn6UvVxkdX9WKaiBJqEouXZx01g/e6f5h?=
- =?us-ascii?Q?Zw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e04914c1-0e29-47c7-f00c-08dd14beac89
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2024 23:52:12.8706
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6OkbozafyI2cr4/x9CqVnnjrxGSjT7UW/N23jFzD9OzSyi5ZhFPibzR59e0ilqKghxMPUQdqSLzBiAY/MI7xgw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7938
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/32] driver core: Constify API device_find_child()
+ and adapt for various existing usages
+To: James Bottomley <James.Bottomley@HansenPartnership.com>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Chun-Kuang Hu <chunkuang.hu@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jean Delvare <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>,
+ Martin Tuma <martin.tuma@digiteqautomotive.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>,
+ Andreas Noever <andreas.noever@gmail.com>,
+ Michael Jamet <michael.jamet@intel.com>,
+ Mika Westerberg <mika.westerberg@linux.intel.com>,
+ Yehezkel Bernat <YehezkelShB@gmail.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+ Jiri Slaby <jirislaby@kernel.org>,
+ Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+ Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+ Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+ Mike Christie <michael.christie@oracle.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Nilesh Javali <njavali@marvell.com>,
+ Manish Rangankar <mrangankar@marvell.com>,
+ GR-QLogic-Storage-Upstream@marvell.com, Davidlohr Bueso <dave@stgolabs.net>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Alison Schofield <alison.schofield@intel.com>,
+ Andreas Larsson <andreas@gaisler.com>, Stuart Yoder <stuyoder@gmail.com>,
+ Laurentiu Tudor <laurentiu.tudor@nxp.com>, Jens Axboe <axboe@kernel.dk>,
+ Sudeep Holla <sudeep.holla@arm.com>,
+ Cristian Marussi <cristian.marussi@arm.com>, Ard Biesheuvel
+ <ardb@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-hwmon@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pwm@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux1394-devel@lists.sourceforge.net, linux-serial@vger.kernel.org,
+ linux-sound@vger.kernel.org, open-iscsi@googlegroups.com,
+ linux-scsi@vger.kernel.org, linux-cxl@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+ arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20241203-const_dfc_done-v2-0-7436a98c497f@quicinc.com>
+ <g32cigmktmj4egkq2tof27el2yss4liccfxgebkgqvkil32mlb@e3ta4ezv7y4m>
+ <9d34bd6f-b120-428a-837b-5a5813e14618@icloud.com>
+ <2024120320-manual-jockey-dfd1@gregkh>
+ <b9885785-d4d4-4c72-b425-3dc552651d7e@icloud.com>
+ <8eb7c0c54b280b8eb72f82032ede802c001ab087.camel@HansenPartnership.com>
+ <8fb887a0-3634-4e07-9f0d-d8d7c72ca802@t-8ch.de>
+ <f5ea7e17-5550-4658-8f4c-1c51827c7627@icloud.com>
+ <108c63c753f2f637a72c2e105ac138f80d4b0859.camel@HansenPartnership.com>
+ <235ce0a9-1db1-4558-817b-6f92f22be5ab@icloud.com>
+ <5c905df49a332b1136787a524955b46b6153c012.camel@HansenPartnership.com>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <5c905df49a332b1136787a524955b46b6153c012.camel@HansenPartnership.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: SnhSPaefh2SqVr4UPg8Q8Npi4W-Py9Af
+X-Proofpoint-ORIG-GUID: SnhSPaefh2SqVr4UPg8Q8Npi4W-Py9Af
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-04_19,2024-12-04_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0
+ mlxlogscore=999 adultscore=0 suspectscore=0 bulkscore=0 spamscore=0
+ phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2412040186
 
-On Wed, Dec 04, 2024 at 03:24:59PM -0800, Jacob Keller wrote:
-> On 12/4/2024 9:12 AM, Vladimir Oltean wrote:
-> > And there's one more thing I tried, which mostly worked. That was to
-> > express CHECK_PACKED_FIELDS_N in terms of CHECK_PACKED_FIELDS_N-1.
-> > This further reduced the auto-generated code size from 1478 lines to 302
-> > lines, which I think is appealing.
-> > 
+On 2024/12/5 00:42, James Bottomley wrote:
+>>>>  introduce extra device_find_child_new() which is constified  ->
+>>>> use *_new() replace ALL device_find_child() instances one by one
+>>>> -> remove device_find_child() -> rename *_new() to
+>>>> device_find_child() once.
+>>> Why bother with the last step, which churns the entire code base
+>>> again?
+>> keep the good API name device_find_child().
+> Well, I think it's a good opportunity to rename the API better, but if
+> that's the goal, you can still do it with _Generic() without churning
+> the code base a second time.  The example is in
+> slab.h:kmem_cache_create
 > 
-> I figured it out! There are two key issues involved:
-> 
-> > diff --git a/scripts/gen_packed_field_checks.c b/scripts/gen_packed_field_checks.c
-> > index fabbb741c9a8..bac85c04ef20 100644
-> > --- a/scripts/gen_packed_field_checks.c
-> > +++ b/scripts/gen_packed_field_checks.c
-> > @@ -10,9 +10,10 @@ int main(int argc, char **argv)
-> >  	for (int i = 1; i <= MAX_PACKED_FIELD_SIZE; i++) {
-> >  		printf("#define CHECK_PACKED_FIELDS_%d(fields) ({ \\\n", i);
-> >  
-> > -		for (int j = 0; j < i; j++)
-> > -			printf("\tCHECK_PACKED_FIELD(fields, %d); \\\n", j);
-> > +		if (i != 1)
-> > +			printf("\tCHECK_PACKED_FIELDS_%d(fields); \\\n", i - 1);
-> >  
-> > +		printf("\tCHECK_PACKED_FIELD(fields, %d); \\\n", i);
-> 
-> This needs to be i - 1, since arrays are 0-indexed, so this code expands
-> to checking the wrong value.
-> 
-> CHECK_PACKED_FIELDS_1 needs to become
-> 
-> CHECK_PACKED_FIELD(fields, 0)
-> 
-> but this code makes it:
-> 
-> CHECK_PACKED_FIELD(fields, 1)
-> 
-> Thus, all the array definitions are off-by-one, leading to the last one
-> being out-of-bounds.
 
-ah :-/
+i understand these solutions _Generic()/_new/squashing.
+every solutions have its advantages and disadvantages.
 
-I should have paid more attention, sorry.
+i decide to use squashing solution for this concrete scenario after some
+considerations since:
 
-> >  		printf("})\n\n");
-> >  	}
-> >  
-> > 
-> > The problem is that, for some reason, it introduces this sparse warning:
-> > 
-> > ../lib/packing_test.c:436:9: warning: invalid access past the end of 'test_fields' (24 24)
-> > ../lib/packing_test.c:448:9: warning: invalid access past the end of 'test_fields' (24 24)
-> > 
-> > Nobody accesses past element 6 (ARRAY_SIZE) of test_fields[]. I ran the
-> 
-> The array size is 6, but we try to access element 6 which is one past
-> the array... good old off-by-one error :)
-> 
-> There is one further complication which is that the nested statement
-> expressions ({ ... }) for each CHECK_PACKED_FIELD_N eventually make GCC
-> confused, as it doesn't seem to keep track of the types very well.
+1) it has the minimal patch count to achieve target.
+2) every patch is valuable, but other solutions needs to undo beginning
+  patch finally.
+3) for the squashing patch, i will only make the least and simplest
+changes for various match functions, that will compensate its
+disadvantages.
 
-I only tested with clang which didn't complain, sorry.
+>>> Why not call the new function device_find_child_const() and simply
+>>> keep it (it's descriptive of its function).  That way you can have
+>>> a patch series without merging and at the end simply remove the old
+>>> function.
+>> device_find_child is a good name for the API, 'find' already means
+>> const.
+> Not to me it doesn't, but that's actually not what I think is wrong
+> with the API name: it actually only returns the first match, so I'd
+> marginally prefer it to be called device_find_first_child() ... not
+> enough to churn the code to change it, but since you're doing that
+> anyway it might make sense as an update.
 
-> I fixed that by changing the individual CHECK_PACKED_FIELD_N to be
-> non-statement expressions, and then wrapping their calls in the
-> builtin_choose_expr() with ({ ... }), which prevents us from creating
-> too many expression layers for GCC. It actually results in identical
-> code being evaluated as with the old version but now with a constant
-> scaling of the text size: 2 lines per additional check.
+name device_find_child appeared 18 years ago, it is good to keep this
+name developers known about.
 
-Yeah, I think that was the logical next development step. By doing this now,
-I think you just saved an extra patch iteration, thanks.
+the API only return one device *, it should be obvious that it is the
+first device which meet matching condition.
 
-> Of course the complexity scales linearly, but that means our text size
-> no longer scales with O(n*log(n)) but just as O(N).
+Other device finding APIs (bus|class|driver)_find_device() does not have
+concern about 'first'
 
-Well, technically, the number of lines of code required, in "naive" form,
-for overlap checking of arrays up to length N should be N*(N+1)/2, which
-"grows quicker" than N*log(N).
+So, IMO, current name is good.
 
-But I don't think we can talk about algorithmic complexity here (big O
-notation), which stays the same (linear) in both ways of expressing the
-same thing.
-
-> Its fantastic improvement, thanks for the suggestion. I'll have v9 out
-> with these improvements soon.
-
-And thanks for staying online with this effort for more than an entire
-kernel development cycle! Looking forward to v9.
 
