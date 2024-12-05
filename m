@@ -1,184 +1,127 @@
-Return-Path: <netdev+bounces-149391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E81279E5619
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 14:01:31 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38A31188368B
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:00:30 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B61C8218E89;
-	Thu,  5 Dec 2024 12:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aLj91NEv"
-X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD8D39E562B
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 14:04:58 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AE521884B;
-	Thu,  5 Dec 2024 12:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6855A282E97
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:04:57 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA704207DE4;
+	Thu,  5 Dec 2024 13:04:54 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from zg8tmja5ljk3lje4ms43mwaa.icoremail.net (zg8tmja5ljk3lje4ms43mwaa.icoremail.net [209.97.181.73])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 567311C3318
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 13:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.181.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733403554; cv=none; b=pLmGrJ2k4F4yzXdifyuxK2oFauf06K4bb8GzX9FgRYGsVlc6YG9YJ2vESugpT/B2eW9kFZJSeVJM+4cdGdmigTqir0EMoPNfE0CCPYTFKOg2MMmke6k4nyd3R3CRSJxpFBcIeXr5kqp4L6xseap+SWgnXrEZARd77/lNcN+e9ZE=
+	t=1733403894; cv=none; b=PGTtttgcln2+nNWEhAVk/G3jCBX8KEiCI7QcCsYqUpS4K65PL4AiV/syYluf7jME1THnn4K2gjLPfuKCkzZ+nnI7TDHw4S6IrHyQEhoXePqbYeKVDNNjPvBHcYNToW3n/HsP/sO7qlZ9a6j+azf/+aVXo8CVj838ZYolZxsOdgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733403554; c=relaxed/simple;
-	bh=fg07RDDUmuTpQ6lJX/VD2zvAkPFpkUgAQreDDh3h7Jw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QeMpdh34MOx5pq8Dc4UH0JRLTEis2Z2aBORqqUVJCdj+UVmvKSTRvYUt+xwqxnNkhJRBGSzCHwva+1Ga8MzV5QsKcf3Lii4hGFT8NglMPH3zQ0/q+UuPOmyeRyvjRTSMRN7AcqhyYvKUkzLWdYO0dBH67Ph4wONFf7Ex3N76dKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aLj91NEv; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B560br5031839;
-	Thu, 5 Dec 2024 12:59:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=8sbkj9
-	gkyLAobLOZcSqKyA1r9ycFlPZjwRLP/kCuEME=; b=aLj91NEvjY21hhzpjKZMiK
-	u9fH8uA/gvFw+lB8fWxlR++mkjRHZ7ltJokNFYWsKojJLjy8tDEdbE833l/aGaZe
-	h8cHJcWQJKMo8KU4jb9JRjrq1d862XqY7YQzsVJUvVsBTYF8JpngSaK/geetzCFp
-	6yjBuLvbNwGQQitTiDkddrse3bsWkfR6+cazpW7wAT4mk3x6z83tHMw6EM40THel
-	VJ2DRVOTLs0SH8Dh5FM0pZpZhgQMl+eJhQcmvFka0lwyj6+2hU/3MfBWgV16QGCB
-	9Bnyri60Qg7UAn6/DTljrEdmLaCHZRh7tB6+IfZETEdQoesTzAoERYbANVuw8kBQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43b6hb1xpv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Dec 2024 12:59:07 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B5CqLNr016494;
-	Thu, 5 Dec 2024 12:59:07 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43b6hb1xmn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Dec 2024 12:59:07 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5B9N7Y005544;
-	Thu, 5 Dec 2024 12:58:40 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 438fr1sxq1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Dec 2024 12:58:39 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B5CwaRD21233920
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 5 Dec 2024 12:58:36 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4A44020043;
-	Thu,  5 Dec 2024 12:58:36 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3C5C920040;
-	Thu,  5 Dec 2024 12:58:35 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.76.77])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu,  5 Dec 2024 12:58:35 +0000 (GMT)
-Date: Thu, 5 Dec 2024 13:58:33 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: Guangguan Wang <guangguan.wang@linux.alibaba.com>, jaka@linux.ibm.com,
-        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dust Li
- <dust.li@linux.alibaba.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH net-next v2 2/2] net/smc: support ipv4 mapped ipv6 addr
- client for smc-r v2
-Message-ID: <20241205135833.0beafd61.pasic@linux.ibm.com>
-In-Reply-To: <894d640f-d9f6-4851-adb8-779ff3678440@linux.ibm.com>
-References: <20241202125203.48821-1-guangguan.wang@linux.alibaba.com>
-	<20241202125203.48821-3-guangguan.wang@linux.alibaba.com>
-	<894d640f-d9f6-4851-adb8-779ff3678440@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1733403894; c=relaxed/simple;
+	bh=gFgwaufinNULPm9OAtH+5ih4lFacRD4Ah6y4yBq2HNQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MCGrmvyj11Fv7O16p8Vs1Su2NMNOOYTvUNAn0LlnTBa9RcF1b8ZpMHhMkXE4i1kOiuvtG6tbBE98lfspozVJnKJbc8tCucf8f81BxhFEV7gFZquz6A90KwyztTjDsimK6pWOAsBXlfmSXsomoz+JI1S4x5iml08AmZSkvq5Renc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernelsoft.com; spf=pass smtp.mailfrom=kernelsoft.com; arc=none smtp.client-ip=209.97.181.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernelsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernelsoft.com
+Received: from localhost.localdomain (unknown [183.69.133.42])
+	by mail (Coremail) with SMTP id AQAAfwA3tuBKpFFnaTJaAg--.7861S2;
+	Thu, 05 Dec 2024 21:02:03 +0800 (CST)
+From: tianyu2 <tianyu2@kernelsoft.com>
+To: pabeni@redhat.com
+Cc: netdev@vger.kernel.org
+Subject: [PATCH v2 net-next] ipv4: remove useless arg
+Date: Thu,  5 Dec 2024 21:04:54 +0800
+Message-Id: <20241205130454.3226-1-tianyu2@kernelsoft.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: P7wskdYk2e_Iqwnk39ux8NOnVyaYMq6i
-X-Proofpoint-GUID: 6T3slWX1cnSPVrB_IYU9GoSSZxVQA6RU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- adultscore=0 suspectscore=0 mlxlogscore=924 clxscore=1011 impostorscore=0
- malwarescore=0 bulkscore=0 lowpriorityscore=0 spamscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412050094
+X-CM-TRANSID:AQAAfwA3tuBKpFFnaTJaAg--.7861S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cw43Xw1xZw48uF1xCw15Jwb_yoW8trWxpF
+	W5Ka98ArWDWr48Wws2yFZrG34ayw1rWFyak3yrC343Kw1DKr4FgFWDtFWYyr15KrWxW3W2
+	qFy29w45Gw1xAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkSb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwV
+	C2z280aVCY1x0267AKxVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVAC
+	Y4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8Jr
+	0_Cr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY02Avz4vE14v_Xr4l
+	42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJV
+	WUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1Y6r17MIIYrxkI7VAK
+	I48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r
+	4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY
+	6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUyhihUUUUU
+X-CM-SenderInfo: xwld05zxs6yvxuqhz2xriwhudrp/
 
-On Thu, 5 Dec 2024 11:16:27 +0100
-Wenjia Zhang <wenjia@linux.ibm.com> wrote:
+The "struct sock *sk" parameter in ip_rcv_finish_core is unused, which
+leads the compiler to optimize it out. As a result, the
+"struct sk_buff *skb" parameter is passed using x1. And this make kprobe
+hard to use.
 
-> > --- a/net/smc/af_smc.c
-> > +++ b/net/smc/af_smc.c
-> > @@ -1116,7 +1116,12 @@ static int smc_find_proposal_devices(struct
-> > smc_sock *smc, ini->check_smcrv2 = true;
-> >   	ini->smcrv2.saddr = smc->clcsock->sk->sk_rcv_saddr;
-> >   	if (!(ini->smcr_version & SMC_V2) ||
-> > +#if IS_ENABLED(CONFIG_IPV6)
-> > +	    (smc->clcsock->sk->sk_family != AF_INET &&
-> > +
-> > !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||  
-> I think here you want to say !(smc->clcsock->sk->sk_family == AF_INET
-> && ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)), right? If
-> it is, the negativ form of the logical operation (a&&b) is (!a)||(!b),
-> i.e. here should be:
-> （smc->clcsock->sk->sk_family != AF_INET）|| 
-> （!ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)）
+Signed-off-by: tianyu2 <tianyu2@kernelsoft.com>
+---
+ net/ipv4/ip_input.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-Wenjia, I think you happen to confuse something here. The condition
-of this if statement is supposed to evaluate as true iff we don't want
-to propose SMCRv2 because the situation is such that SMCRv2 is not
-supported.
-
-We have a bunch of conditions we need to meet for SMCRv2 so
-logically we have (A && B && C && D). Now since the if is
-about when SMCRv2 is not supported we have a super structure
-that looks like !A || !B || !C || !D. With this patch, if
-CONFIG_IPV6 is not enabled, the sub-condition remains the same:
-if smc->clcsock->sk->sk_family is something else that AF_INET
-the we do not do SMCRv2!
-
-But when we do have CONFIG_IPV6 then we want to do SMCRv2 for
-AF_INET6 sockets too if the addresses used are actually
-v4 mapped addresses.
-
-Now this is where the cognitive dissonance starts on my end. I
-think the author assumes sk_family == AF_INET || sk_family == AF_INET6
-is a tautology in this context. That may be a reasonable thing to
-assume. Under that assumption 
-sk_family != AF_INET &&	!ipv6_addr_v4mapped(addr) (shortened for
-convenience)
-becomes equivalent to
-sk_family == AF_INET6 && !ipv6_addr_v4mapped(addr)
-which means in words if the socket is an IPv6 sockeet and the addr is not
-a v4 mapped v6 address then we *can not* do SMCRv2. And the condition
-when we can is sk_family != AF_INET6 || ipv6_addr_v4mapped(addr) which
-is equivalen to sk_family == AF_INET || ipv6_addr_v4mapped(addr) under
-the aforementioned assumption.
-
-But if we assume sk_family == AF_INET || sk_family == AF_INET6 then
-the #else does not make any sense, because I guess with IPv6 not
-available AF_INET6 is not available ant thus the else is always
-guaranteed to evaluate to false under the assumption made.
-
-Thus I conclude, that I am certainly missing something here. Guangguan,
-do you care to explain?
-
-Regards,
-Halil
-
-
-
+diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
+index f0a4dda246ab..30a5e9460d00 100644
+--- a/net/ipv4/ip_input.c
++++ b/net/ipv4/ip_input.c
+@@ -314,7 +314,7 @@ static bool ip_can_use_hint(const struct sk_buff *skb, const struct iphdr *iph,
+ 
+ int tcp_v4_early_demux(struct sk_buff *skb);
+ int udp_v4_early_demux(struct sk_buff *skb);
+-static int ip_rcv_finish_core(struct net *net, struct sock *sk,
++static int ip_rcv_finish_core(struct net *net,
+ 			      struct sk_buff *skb, struct net_device *dev,
+ 			      const struct sk_buff *hint)
+ {
+@@ -442,7 +442,7 @@ static int ip_rcv_finish(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	if (!skb)
+ 		return NET_RX_SUCCESS;
+ 
+-	ret = ip_rcv_finish_core(net, sk, skb, dev, NULL);
++	ret = ip_rcv_finish_core(net, skb, dev, NULL);
+ 	if (ret != NET_RX_DROP)
+ 		ret = dst_input(skb);
+ 	return ret;
+@@ -589,8 +589,7 @@ static struct sk_buff *ip_extract_route_hint(const struct net *net,
+ 	return skb;
+ }
+ 
+-static void ip_list_rcv_finish(struct net *net, struct sock *sk,
+-			       struct list_head *head)
++static void ip_list_rcv_finish(struct net *net, struct list_head *head)
+ {
+ 	struct sk_buff *skb, *next, *hint = NULL;
+ 	struct dst_entry *curr_dst = NULL;
+@@ -607,7 +606,7 @@ static void ip_list_rcv_finish(struct net *net, struct sock *sk,
+ 		skb = l3mdev_ip_rcv(skb);
+ 		if (!skb)
+ 			continue;
+-		if (ip_rcv_finish_core(net, sk, skb, dev, hint) == NET_RX_DROP)
++		if (ip_rcv_finish_core(net, skb, dev, hint) == NET_RX_DROP)
+ 			continue;
+ 
+ 		dst = skb_dst(skb);
+@@ -633,7 +632,7 @@ static void ip_sublist_rcv(struct list_head *head, struct net_device *dev,
+ {
+ 	NF_HOOK_LIST(NFPROTO_IPV4, NF_INET_PRE_ROUTING, net, NULL,
+ 		     head, dev, NULL, ip_rcv_finish);
+-	ip_list_rcv_finish(net, NULL, head);
++	ip_list_rcv_finish(net, head);
+ }
+ 
+ /* Receive a list of IP packets */
+-- 
+2.27.0
 
 
