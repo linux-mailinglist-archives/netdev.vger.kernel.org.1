@@ -1,132 +1,136 @@
-Return-Path: <netdev+bounces-149360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62BE59E53F2
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:30:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD1D79E540B
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:35:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D7AD162B48
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:30:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A1EB1880742
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6572A202C40;
-	Thu,  5 Dec 2024 11:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719FC1F6679;
+	Thu,  5 Dec 2024 11:35:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Ycqy5JqT";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="b0ZNbm/M"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="P5BD6y9O"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3075A126C0A;
-	Thu,  5 Dec 2024 11:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10621F541C;
+	Thu,  5 Dec 2024 11:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733398151; cv=none; b=RILyzKQdftkkoCKWlH6vsZB19inomz1AIRliMQwAPKmEd95TNLHunDu0B868L9S9mud5XVi+zreN7JJbFlo7QKe80EZGd3Y0bEMhmrDpsEMnpmSBZTZpTjIPMkUttI8Zo4Gdop3w2pNuaZcu8sOR+O3KZOYaN+io/qv+r3vOWBw=
+	t=1733398507; cv=none; b=BRevZJzgy+OhYwGwhSSjkoWpb7Oew7Gnuoi4trXf0ob4UMKZNinpX4w6AcPewhVk7FJUTCyni+7+BH42iFj/CFWUdf0RmOE1rgGljYb23jd+rokxd0RhSYYXfh/sNTlh2d7Nb1CyvHbscWCm3nwbWxbcRWYatVeySbcjvC648nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733398151; c=relaxed/simple;
-	bh=AcZKoyX+fTpzWHOLeqNiGSmun+Txa5OpYZ3E1Dkz6o4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bL/39o3wAUfhQMUFhrSGOom5y59Cj9VB4KV49deIoD2h7/PkBKpvo9Ynuazmo2cSS19XeT+e8RYRmgiz+R5B/9Jn9wSGPsjgEYAoXihEEaUdrSFByB6e1BI9ue1e2M/CeYbBcM04lHu1vr3FLUIKMGxPmpaNwW4QE07Cbk/NH9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Ycqy5JqT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=b0ZNbm/M; arc=none smtp.client-ip=202.12.124.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfout.stl.internal (Postfix) with ESMTP id D12931140229;
-	Thu,  5 Dec 2024 06:29:06 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Thu, 05 Dec 2024 06:29:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1733398146; x=
-	1733484546; bh=Y1RC3KTbpAMHvcOCgPVnTS9sxRcR1Xs58MefRx36B4Y=; b=Y
-	cqy5JqT55G/JDle4Ho2FaWwbrs+q30aG90FHFXJJW0rWKDVtuk1DC09H6zLHPpoR
-	RSb1ZO4GjfoC5b5+K/sHPACRNG2zJxl7ub3ely33LiebcDYRuoTC3rNOBWtzH0L8
-	wkIdTOG2glY6XNXTdyRdBpxvOY+BwThG9fPt++YZ+41uKG8Ojz4c3r3WX0JLj2vZ
-	jYSgj2hLwI2yM/gm1oqjIEvT8CQcqnbcb2eE6ilQgD8bEs+H0/u8WQ4vkQsunOQ9
-	ahmk3OxjYa2PFVAHGLPf1Z8cIN/2yQLLES9uciBg+COQjL1DR/HcIUkuMuzm5mhU
-	6CYvzTWK/JGYZlJu+cL8w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1733398146; x=1733484546; bh=Y1RC3KTbpAMHvcOCgPVnTS9sxRcR1Xs58Me
-	fRx36B4Y=; b=b0ZNbm/MUw+opgqx4fRsGRGxDMFqdvSErvGcN1x8DgDR5RCN1kZ
-	mZi7WqWkiLZJS81/J/QRAFQQ66LbgQeiJhCP3GGXju2wdefc/5f533xgbJzCMybK
-	uKn/S+iJiBPkL+wUtcrVyn+76RN21+tNZmUANfNIyGOpTpA8KMxMzKdXJmrbweEN
-	2B42XLqqaAl2nXFuTu0e7GChUh74oyN3y7S0DlAjEMnMVW01xK+zmuS5SFOaiS7v
-	w6tV/Ezv+zI7Xidy/zBtIZhLuKxVl3tc21lEG0n/IO6/wV3dq8SFldtIyNKnz4M/
-	jSFIie/gKDYLSuF7dErjFyyPabxEZBb8w0w==
-X-ME-Sender: <xms:gY5RZy_N5M_8QUH_1GLJoXmUD-UmFt1J4XgxAZLPTdNLQnRrt0P4FQ>
-    <xme:gY5RZyuzDUYVZ6qMgGAjsnJQt2XTqS9pTRwQkjYcelrpOX9mRtk0dRzvbIDu6zl3L
-    78YNsiwRJOhFnwz0yQ>
-X-ME-Received: <xmr:gY5RZ4BD0o-_3OJ5O2sjmGgACX4_wslrgnAZZWL9CQsei2ZUw9zFnfs5jw1d>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieejgddvjecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehkuhgsrgeskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepvhhfvgguohhrvghnkhhosehnohhvvghkrdhruhdprhgtph
-    htthhopehfkhhrvghniigvlhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhhunhhi
-    hihusegrmhgriihonhdrtghomhdprhgtphhtthhopegrphhoohhrvhhkohesrghmrgiioh
-    hnrdgtohhmpdhrtghpthhtohepsghorhhishhpsehnvhhiughirgdrtghomhdprhgtphht
-    thhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhope
-    hshhhurghhsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:go5RZ6cpD6TMsis6jmn95KfbLydlXi3t3I3caTHcymqEDx856GHSyQ>
-    <xmx:go5RZ3OKGO6gyUFM_2yhljPMl2ePpXLet6j9juWXnKZN7RASFwxCTw>
-    <xmx:go5RZ0nhwElzxnbDshuyDXzRuBq_sQf6-ClpDJNedL5rsXKvUSNrYg>
-    <xmx:go5RZ5sTcSHhyEd5vulgARtR3MAI7Lezky-cK5UUr_lh79OoHd9niA>
-    <xmx:go5RZ1twqajDU4AVMN4R5xJm8RAIZ6wFUvZ3pXt7A7BtpnBsqAEImffQ>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 5 Dec 2024 06:29:05 -0500 (EST)
-Date: Thu, 5 Dec 2024 12:29:03 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vfedorenko@novek.ru>,
-	Frantisek Krenzelok <fkrenzel@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Apoorv Kothari <apoorvko@amazon.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v4 3/6] tls: add counters for rekey
-Message-ID: <Z1GOf3tf1JUkh1Fy@hog>
-References: <cover.1731597571.git.sd@queasysnail.net>
- <2f5b01548afb3795fb5f6aace6c2182ab98b9076.1731597571.git.sd@queasysnail.net>
- <20241203195414.5023d276@kernel.org>
+	s=arc-20240116; t=1733398507; c=relaxed/simple;
+	bh=jx1QpmnWT+BvmW5j+2uyUoTHDLT73WQRHWfndk5Xs18=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fDScd3YkJRQJ3QV1OkK/xl4O0Dhq6yTO5cvq/HNPdOs2Mo312RosBF3WNKI/McTInEzWQVDTavdicXr+lofhPhme/Kn8OypYuVikZ5B5LDxMKrHTLeRKJqZbekvn/DvEPRj2ibrKInpidJTiZSfrB/ugC7gxaGD0l4vZ32qMEDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=P5BD6y9O; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B597xg0008313;
+	Thu, 5 Dec 2024 03:34:42 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=PyBiDkR+sGkaeC+WPOz41eBAz9Ruk1Y87rRuK8KNfsg=; b=P5B
+	D6y9Oea9Tb7g8r9AWBBILA3wY09JVV5qi2UNK/FQx9bvivnTR6zDreqxGFSjMLBg
+	H/Fc0uU7HasrodVVxpFndcMhxTPJ9SyvZvp5YsnlInD26qSYPUcDAHgA29TL50J1
+	7r4cRxXmVarTZa2FeZD7QL1w1RhafuadxzCMtQd+nHiQXCyeLWXuPnxtClePv36F
+	S8zt+tAKo/yrNj1F5duWfa4Jwt6CXzK5XiP4EHoDJcrchsSCfyrXqWzPoJgccU4B
+	dZTBK90dskx2VZ5+a+S0rE0bmHq8JW1HpvCl8KJwG7dqFtAkHJBV9SNusX0NeXTi
+	kVs2VgpOaBDZ6/Lrf7g==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 43b995r7uk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Dec 2024 03:34:41 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 5 Dec 2024 03:34:40 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 5 Dec 2024 03:34:40 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id DAA383F704A;
+	Thu,  5 Dec 2024 03:34:36 -0800 (PST)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <horms@kernel.org>, <andrew+netdev@lunn.ch>, <edumazet@google.com>,
+        <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>
+Subject: [net v2 PATCH] octeontx2-af: Fix installation of PF multicast rule
+Date: Thu, 5 Dec 2024 17:04:35 +0530
+Message-ID: <20241205113435.10601-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241203195414.5023d276@kernel.org>
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: iAo4c7KlL5sEesirEtwNwcHkjNfaPS3m
+X-Proofpoint-GUID: iAo4c7KlL5sEesirEtwNwcHkjNfaPS3m
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
+ definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
 
-2024-12-03, 19:54:14 -0800, Jakub Kicinski wrote:
-> On Thu, 14 Nov 2024 16:50:50 +0100 Sabrina Dubroca wrote:
-> > This introduces 4 counters to keep track of key updates:
-> > Tls{Rx,Tx}Rekey{Ok,Error}.
-> 
-> Possibly track detected rekey messages, too? Could help us identify
-> when kernel blocks the socket but user space doesn't know how to rekey.
+Due to target variable is being reassigned in npc_install_flow()
+function, PF multicast rules are not getting installed.
+This patch addresses the issue by fixing the "IF" condition
+checks when rules are installed by AF.
 
-Right, that makes sense. I'll add TlsRxRekeyReceived unless you have a
-better name to suggest.
+Fixes: 6c40ca957fe5 ("octeontx2-pf: Adds TC offload support").
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+---
 
+v1-v2:
+ -Restructured the code.
+
+ .../ethernet/marvell/octeontx2/af/rvu_npc_fs.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+index da69e454662a..1b765045aa63 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+@@ -1452,23 +1452,21 @@ int rvu_mbox_handler_npc_install_flow(struct rvu *rvu,
+ 	 * hence modify pcifunc accordingly.
+ 	 */
+ 
+-	/* AF installing for a PF/VF */
+-	if (!req->hdr.pcifunc)
++	if (!req->hdr.pcifunc) {
++		/* AF installing for a PF/VF */
+ 		target = req->vf;
+-
+-	/* PF installing for its VF */
+-	if (!from_vf && req->vf && !from_rep_dev) {
++	} else if (!from_vf && req->vf && !from_rep_dev) {
++		/* PF installing for its VF */
+ 		target = (req->hdr.pcifunc & ~RVU_PFVF_FUNC_MASK) | req->vf;
+ 		pf_set_vfs_mac = req->default_rule &&
+ 				(req->features & BIT_ULL(NPC_DMAC));
+-	}
+-
+-	/* Representor device installing for a representee */
+-	if (from_rep_dev && req->vf)
++	} else if (from_rep_dev && req->vf) {
++		/* Representor device installing for a representee */
+ 		target = req->vf;
+-	else
++	} else {
+ 		/* msg received from PF/VF */
+ 		target = req->hdr.pcifunc;
++	}
+ 
+ 	/* ignore chan_mask in case pf func is not AF, revisit later */
+ 	if (!is_pffunc_af(req->hdr.pcifunc))
 -- 
-Sabrina
+2.25.1
+
 
