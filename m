@@ -1,204 +1,275 @@
-Return-Path: <netdev+bounces-149194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A96139E4BAE
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 02:14:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7AF79E4BBE
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 02:23:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEF201881575
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 01:14:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C54116AA92
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 01:23:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0496A33F;
-	Thu,  5 Dec 2024 01:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BBB774E09;
+	Thu,  5 Dec 2024 01:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b="keKc2QXH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M9zT26tG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F1B653
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 01:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B461208A0
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 01:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733361288; cv=none; b=IDpNDPVo28AkuQRpekowFvSSRBj/i71hKwj7gA9QoJNz83LL7IuUFmSXBjtfKHBT9vPt/CCwTVR/FyEzqzDguLmgRYy9HL6vx4A3MzoXG2EKiEmb/0IV+0dcJXxYkfRkRbxrm6Be0u+SUHPux+K8h0154CD0A5xGyPlvzptkqrs=
+	t=1733361782; cv=none; b=peR8a6eEf4p2MwIp5fYGL21OrJSj5T4ZG79bDV/r+hGnHdcfTvzqLurc0QCkP3om9lJezntaSd7PJwQtgotqKJlWGU8GRcWkXmGgXelDphQXvIaaDSGMFudcEUbl3eGDRjlYuP8EDaMki5P5e8rgvFJ7Xjpi+RSzk/QvA8zjrxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733361288; c=relaxed/simple;
-	bh=0eT/Lot6+vqxxD9AP/IubXTEz/4Dzp8TBFGS1OmCoxE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f1/5soX/Y9PjRmoRMOe+aY8YOD9RL5C3TTizTXmwR6PhA5LDfYyHoCEC0CvS/j5DMO+d54wQsFrluYsMIYqQXhLfkCHePERsE/Q4qqlKG1txckh6HlqW5XMvq5SGr06nKTJKrKME1+s+qJIL9EIPcMUbCJmLNMrFxqPxln+hZoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com; spf=none smtp.mailfrom=andrewstrohman.com; dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b=keKc2QXH; arc=none smtp.client-ip=209.85.219.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=andrewstrohman.com
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e396cc8c9a1so659449276.0
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 17:14:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=andrewstrohman-com.20230601.gappssmtp.com; s=20230601; t=1733361285; x=1733966085; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xfZMYXPm/XnOBhZKHxlljIg3cpKjNn+y0on19a7NN2Q=;
-        b=keKc2QXHaPNfIrNxvbcI+0AuChtVT9vTPB2nLrm7Skg736Wr4pykskupJ5bIW0FXgc
-         rAZSqlYscc2FPdvyLHtoXwrwX3pUr6StmdSpMTij9zIXg7hGiTWwRwhF9rmh8dNnULIA
-         mYrtn9HQARMWqvAtdrG13ix+78hXSfmYNYpXqLOFh5YYWmUG7IVRy/4ecu4WGgdeJu+I
-         wdqn+cYBWR4D6lqSN8L6uww4wkeJusnkVnb8BPaH2ovyJdxa/VTG3q0cOTjRmLy3XbuF
-         s6X/FZo6CP6UZk/tQksyb1N1kZSgL/fOSoWxysLlFRi/E4qWByVJVYZE6MWdvoEMhwnC
-         fT8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733361285; x=1733966085;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xfZMYXPm/XnOBhZKHxlljIg3cpKjNn+y0on19a7NN2Q=;
-        b=SPdQ96+9RmW8SlHZm1wUFT2hcrGS1EJgVLPhnHL0+gl0vxCN/Iqu/5seZOOb44u+bp
-         Zd7xGQo2v2nOOobN0/q/xj5a4bf3h3PthD5b/125sC4H57UnJyi0/MDLuiknfSZJEQ1F
-         3uvoYmju9SuOdRNvFdTy7bDKHTcTxZvCdOOjbwQvDXkh9GwnYD/q4kHPQ7hqaE2LRDNC
-         kpqP0RwLoucoi0qi41yTCsDzibRhmaDquwvJVuf1yIvbgCb6B//yZY/j6e7vEHVgvIsX
-         Rnc6sqCfphqnp+jz3taCYLnFX/U2nIjfBKYonM7vAn5MoQzbYZ6118MaPYbqQN30RrNq
-         r6WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUbVgknXEXXUMLX2M+Q8EPv3BYY5CEf4JESq17FIWbPP/r/rp5Hi6Mtptp8/jS6zvPfgNoZzis=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlMvPp6HKxI3O24bFWXwYn8TdKYAN01J9qXRIXBAQbpx7zcHio
-	3+n995skQAGoQx8rLHMlRAN3w8GapeB/aNk3vrXAZFEhDycoAJVU1tRxXEuzVSvodw42JnrU3Zu
-	VsZ39disvEqeJS7QZTjum6Sn+X0Z9nPKBapUTwQ==
-X-Gm-Gg: ASbGncuMvcEUWpgsxMHICBlcuUMRedfgGKG8wX6E+zmJv/CLW5Kz8ZFJd2TYphv9rOR
-	04X7JOG+knxmTjDbH6kUX3Ae8DXYFMmM=
-X-Google-Smtp-Source: AGHT+IHA0+z3aYrs1oHL7bfJ5mmSCDhOEW1KC+mJa23OdZXviguzJEU7KjVhNJq4otCChADvbWMuAWS+kWh7228uAqM=
-X-Received: by 2002:a05:6902:2b01:b0:e38:230d:aee0 with SMTP id
- 3f1490d57ef6-e39f2338efdmr1688035276.23.1733361285485; Wed, 04 Dec 2024
- 17:14:45 -0800 (PST)
+	s=arc-20240116; t=1733361782; c=relaxed/simple;
+	bh=YApce4CAbhMj4xt2nbhXqeUX+ovbWho9UwlSDOzmSlU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CiJziDyn2W+K2lWIaR1GWGW72mdQJ//Vj2T2W3uPXnPgbCcBwW+sHQSNJy+LCqkBRxmZv7eM4tS4j5y2dxcTaQhLv9h6SqBncqma7AS/m2hE5R4hCJFiH8VMLJeDlCicKHrPFHem4vdiVG1umE014xWBSg+boXsuj2bwx7pw5jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M9zT26tG; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733361781; x=1764897781;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=YApce4CAbhMj4xt2nbhXqeUX+ovbWho9UwlSDOzmSlU=;
+  b=M9zT26tGg7NIdzQw8S9d+6ol9vznvxBoyPu8fLaij/XD2zNt2myD2z03
+   8eotBT4CSeJatBL5lC8l49QUH4lfqBq2HdumDy6C3rihGTx0K1V4IvhCV
+   jryc1dxiZ/4NsKI+mRHmQtnYUNFNv+UcintdS68AozzXoafLXfmCLp1Yp
+   N8hUF4Lz0s13J48gG1JqfeDIo5h6CM1hHKOw6CTk3pvC0WIPsKT4kvV91
+   dysaiSHUv68rYqyfHqiVYgq12jXyKgPc/b+v0KfX+HjnV4Tw7spWoEFrA
+   I2pFtA+wrxvJ+8ufDfzniJ2HpuyKjxG+Fa63eXTpSq2XKKOVrReN4NpYJ
+   A==;
+X-CSE-ConnectionGUID: k34TqBN3Seu6RCDliKpYDg==
+X-CSE-MsgGUID: m7EPjLhSSsq0G6hn2TdApg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="32993829"
+X-IronPort-AV: E=Sophos;i="6.12,209,1728975600"; 
+   d="scan'208";a="32993829"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 17:23:00 -0800
+X-CSE-ConnectionGUID: g9+FFzDZRqiIcx51r+xOLQ==
+X-CSE-MsgGUID: srTfk4EFTUS7nxh1H5W+Hg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,209,1728975600"; 
+   d="scan'208";a="98905958"
+Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 17:23:00 -0800
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net-next v9 00/10] lib: packing: introduce and use
+ (un)pack_fields
+Date: Wed, 04 Dec 2024 17:22:46 -0800
+Message-Id: <20241204-packing-pack-fields-and-ice-implementation-v9-0-81c8f2bd7323@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241130000802.2822146-1-andrew@andrewstrohman.com>
- <Z0s3pDGGE0zXq0UE@penguin> <CAA8ajJmn-jWTweDMO48y7Dtk3XPEhnH0QbFj5J5RH4KgXog4ZQ@mail.gmail.com>
- <20241202100635.hkowskequgsrqqkf@skbuf> <CAA8ajJkPzpGRXO6tX5CkgX7DjGwR6bPyT4AXjZ0z8kXBk8Vr_g@mail.gmail.com>
- <20241204084817.g7tort3v3gwdzeic@skbuf> <CAA8ajJnRPB=KRcDpQiAJww3Apv6ZGqWaAg5stSjOE99BOmkCjg@mail.gmail.com>
- <20241204105645.vwhnwyp3gyq5av4m@skbuf>
-In-Reply-To: <20241204105645.vwhnwyp3gyq5av4m@skbuf>
-From: Andrew Strohman <andrew@andrewstrohman.com>
-Date: Wed, 4 Dec 2024 17:14:34 -0800
-Message-ID: <CAA8ajJn0+tBL=5YtuJt5Y6NKWKf_sEctq6Jm=h_Jht4DDnBRkw@mail.gmail.com>
-Subject: Re: [PATCH net-next] bridge: Make the FDB consider inner tag for Q-in-Q
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, 
-	Petr Machata <petrm@nvidia.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, UNGLinuxDriver@microchip.com, 
-	Shahed Shaikh <shshaikh@marvell.com>, Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com, 
-	Simon Horman <horms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Roopa Prabhu <roopa@nvidia.com>, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	bridge@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGcAUWcC/5XRS2rDMBAG4KsEraOi9yOr3qN0IY9GiWiiBNuYl
+ JC7V3EpcZ2VNhLDiG9+NDcyYJ9xILvNjfQ45SGfSy38dkPgEMoeaY61JoIJxRlT9BLgK5f9fNO
+ U8RgHGkqkGerT0+WIJyxjGCtDO27BAjqUVpIKXnpM+ToP+yAFR1rwOpLP2jnkYTz333OKic/93
+ 4GctwycOGU0+o4nqxmzir3nMuLxDc6necwkFrTQTbSotJXKWgPO4SstnzRnpomWlQatggSfuPd
+ 2QW83f6RtJoUFbUwAoaRZp1XLtK6JVpV2PPikBEiGek3rBd24Pv2gGbD6zx5NZ9e0WdJtqU2lT
+ UiuM9oFA3JN2yddjybaVhqjECgdGjAvH+KWtGyi3WONGI3DmFC7f6nv9/sPNuCANL4DAAA=
+X-Change-ID: 20241004-packing-pack-fields-and-ice-implementation-b17c7ce8e373
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, netdev <netdev@vger.kernel.org>
+Cc: Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.14.2
 
-> Here the same thing. The 802.1ad bridge has the same PVID on all ports.
-> Why does the FDB lookup have to be as complex as to take 2 VIDs into
-> consideration, instead of just the inner one?
+This series improves the packing library with a new API for packing or
+unpacking a large number of fields at once with minimal code footprint. The
+API is then used to replace bespoke packing logic in the ice driver,
+preparing it to handle unpacking in the future. Finally, the ice driver has
+a few other cleanups related to the packing logic.
 
-In all my examples I'm using the same PVID, because that's a required
-condition for the issue to happen. I omit that the other .1ad ports in
-could have different .1ad VIDs configured for them, to focus
-on the concept I'm trying to describe.
+The pack_fields and unpack_fields functions have the following improvements
+over the existing pack() and unpack() API:
 
-But other VIDs can be configured on other ports. So, there could be
-collisions of .1q VIDs across different .1ad VIDs. As such,
-I don't want to ignore the outer VID during FDB lookup.
+ 1. Packing or unpacking a large number of fields takes significantly less
+    code. This significantly reduces the .text size for an increase in the
+    .data size which is much smaller.
 
-In my use case (topology-sim) the test fabric consists of .1ad bridges
-that are connected to networking equipment under test.
+ 2. The unpacked data can be stored in sizes smaller than u64 variables.
+    This reduces the storage requirement both for runtime data structures,
+    and for the rodata defining the fields. This scales with the number of
+    fields used.
 
-The topology-sim user configures virtual ethernet cables (point to point)
-and/or L2 IVL ethernet segments between multiple devices under test. They do
-this to construct an arbitrary ethernet topology that they want to test.
-topology-sim assigns / maps each one of these  L2 segments to a unique
-.1ad VID.  This is how it keeps the "virtual wires" from interfering with each
-other.
+ 3. Most of the error checking is done at compile time, rather than
+    runtime, via CHECK_PACKED_FIELD macros.
 
-So if one virtual wire (ie .1ad vid 3) is connecting to a switch under test
-that is emitting frames with .1q vid 7, I want this virtual wire
-to be independent from another virtual wire (ie .1ad vid 4) that is also
-emitting frame with .lq7 vid 7.
+The actual packing and unpacking code still uses the u64 size
+variables. However, these are converted to the appropriate field sizes when
+storing or reading the data from the buffer.
 
-I acknowledge that we shouldn't make this upstream change just for topology-sim,
-considering that I'm the only user of it. But these same problems
-can affect, for example, metro ethernet carriers that use .1ad vlan stacking
-to differentiate between their different customer's sites. I'm not
-trying to claim that
-metro ethernet carriers would be inclined to use this feature -- I'm just
-providing another example to point out that this same concept applies to
-use cases outside of topology-sim, because toplogy-sim uses VLAN
-stacking in a typical, conventional way.
+This version now uses significantly improved macro checks, thanks to the
+work of Vladimir. We now only need 300 lines of macro for the generated
+checks. In addition, each new check only requires 4 lines of code for its
+macro implementation and 1 extra line in the CHECK_PACKED_FIELDS macro.
+This is significantly better than previous versions which required ~2700
+lines.
 
-I'll now proceed to go over my hairpin example,
-https://docs.google.com/drawings/d/1FybJP3UyCPxVQRGxAqGztO4Qc5mgXclV4m-QEyfUFQ8
-in more detail. I think that it will help demonstrate why I want
-to consider the inner tags. It's an example about a circuitous network
-path where the same packet can enter the same .1ad bridge multiple
-times, with the same .1ad VID, but different inner .1q VIDs.
+The CHECK_PACKED_FIELDS macro uses __builtin_choose_expr to select the
+appropriately sized CHECK_PACKED_FIELDS_N macro. This enables directly
+adding CHECK_PACKED_FIELDS calls into the pack_fields and unpack_fields
+macros. Drivers no longer need to call the CHECK_PACKED_FIELDS_N macros
+directly, and we do not need to modify Kbuild or introduce multiple CONFIG
+options.
 
-Like I mentioned before, this network is contrived. I've never seen
-this done, and don't expect that it is a common topology. But my
-goal is to prevent connectivity issues that only arise due to how
-topology-sim constructs the virtual L2 ethernet segments.
+The code for the CHECK_PACKED_FIELDS_(0..50) and CHECK_PACKED_FIELDS itself
+can be generated from the C program in scripts/gen_packed_field_checks.c.
+This little C program may be used in the future to update the checks to
+more sizes if a driver with more than 50 fields appears in the future.
+The total amount of required code is now much smaller, and we don't
+anticipate needing to increase the size very often. Thus, it makes sense to
+simply commit the result directly instead of attempting to modify Kbuild to
+automatically generate it.
 
-The network under test has a bridge mode firewall that is used to inspect
-traffic as it passes from some subset of a L2 segment to another subset
-of the same L2 segment. The way that the network operator achieve this
-goal is by creating separate VLANs for each subset of the L2 segment
-that need firewall interjection. This way, communicate between these
-different subsets are forced though the firewall. The firewall bridges
-the two VLANs to merge them into one L2 segment, one broadcast
-domain.
+This version uses the 5-argument format of pack_fields and unpack_fields,
+with the size of the packed buffer passed as one of the arguments. We do
+enforce that the compiler can tell its a constant using
+__builtin_constant_p(), ensuring that the size checks are handled at
+compile time. We could reduce these to 4 arguments and require that the
+passed in pbuf be of a type which has the appropriate size. I opted against
+that because it makes the API less flexible and a bit less natural to use
+in existing code.
 
-Say the topology-sim user wants to interconnect two .q1 bridges via
-a virtual Ethernet connection. topology-sim accomplishes this by setting
-the same PVID for both ports that that face these .q1 switches under test.
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Changes in v9:
+- Use BUILD_BUG_ON_MSG to provide more useful and detailed error messages,
+  including the field array name, associated field index values, and the
+  actual rule being violated. This improves the usability of the resulting
+  error messages, especially for users unfamiliar with the API
+  requirements.
+- New implementation of CHECK_PACKED_FIELD and CHECK_PACKED_FIELD_OVERLAP,
+  taking the reference of the total array field directly. This allows
+  tail-calling the CHECK_PACKED_FIELD_OVERLAP from within
+  CHECK_PACKED_FIELD, significantly reducing the number of lines required
+  to implement all the macros.
+- Drop the ARRAY_SIZE checks from the CHECK_PACKED_FIELDS_* macros. These
+  were only necessary when users called the macros directly. Now that we
+  always use __builtin_choose_expr to determine which one to call, this is
+  a waste of the CPU cycles.
+- Implement each CHECK_PACKED_FIELD_N recursively, by calling the previous
+  CHECK_PACKED_FIELD_* macro. This means each additional macro now only
+  needs 4 lines of code, instead of scaling linearly with the size of N.
+  This is possible now that we no longer directly check the ARRAY_SIZE in
+  each macro.
+- Use do {} while(0) for implementing the multiline checks in each
+  CHECK_PACKED_FIELD_* macro, instead of statement expressions. This helps
+  with GCC giving up on processing due to the multiple layers of statement
+  expressions when evaluating the CHECK_PACKED_FIELD_* macros.
+- Link to v8: https://lore.kernel.org/r/20241203-packing-pack-fields-and-ice-implementation-v8-0-2ed68edfe583@intel.com
 
-Let's follow what happens when a packets it transmitted from A towards
-B.
+Changes in v8:
+- Add my missing SOB on one of the patches
+- Remove include/linux/packing_types.h and put the generated code directly
+  into include/linux/packing.h
+- Split documentation to its own patch, and use the proposed documentation
+  from Vladimir
+- Link to v7: https://lore.kernel.org/r/20241202-packing-pack-fields-and-ice-implementation-v7-0-ed22e38e6c65@intel.com
 
-When the frame is emitted from ".lq #1", heading toward the .1ad switch,
-it is .1q tagged as 7.  When the .1ad bridge receives the frame, it will
-associate it with .1ad vid 3 and .1q vid 7 can be seen in the packet,
-if desired.
-At this point, the .1ad bridge can either learn that A is behind it's
-left port, for
-.1ad vid 3 (current implementation), or it can learn that
-A is behind the left port only for .1ad vid 3 + inner .1a vid 7
-(proposed functionality).
-When the frame leaves the .1ad switch heading toward
-".1q #2", it will just have .1q vid 7 tag. ".1q #2" sends the packet
-to the firewall,
-via its left port, untagged. The firewall bridges the frame, and
-therefore transmits
-out its right port to ".1q #2", untagged.  ".1q #2" transmits toward
-.1ad with .1q tag
-8. When the .1ad bridge receives the frame, it will associate it with
-.1ad vid 3 and the inner .1q vid 8 can be seen in the packet if
-desired. At this point,
-the .1ad bridge can either learn that A is behind its right port, for
-.1ad vid 3 or it can
-learn that A is behind it's right port, for .1ad vid 3 + .1q inner vid 8.
+Changes in v7:
+- Dropped the RFC tag for submission to net-next
+- Link to v6: https://lore.kernel.org/r/20241118-packing-pack-fields-and-ice-implementation-v6-0-6af8b658a6c3@intel.com
 
-Without my change, the .1ad switch's fdb entry for A's mac, .1ad vid 3, would
-flip continuously between the left and right port.
+Changes in v6:
+- Revert to macro checks similar to v2.
+- Add a __builtin_choose_expr() based macro to automatically select the
+  appropriate size macro.
+- Keep the pbuflen check separate from the main loop check, similar to v5.
+- Link to v5: https://lore.kernel.org/r/20241111-packing-pack-fields-and-ice-implementation-v5-0-80c07349e6b7@intel.com
 
-With my change, for .1ad vid 3, the .1ad bridge will always forward
-packets destined
-to host A's MAC to the right if the inner vid is 8 and will always
-forward host A's MAC
-to the left when the inner vid is 7.
+Changes in v5:
+- Fix printf format specifier for the sym->st_size
+- Link to v4: https://lore.kernel.org/r/20241108-packing-pack-fields-and-ice-implementation-v4-0-81a9f42c30e5@intel.com
 
-I hope this example explains why I want to look at the inner VID. The
-fact that we can have
-inner VID collisions for different outer vids, drives the need to examine the
-outer VID. This is why, collectively I want to consider MAC + inner + outer.
+Changes in v4:
+- Move the buffer size checks to (un)pack_fields() macros.
+- Enforce use of a sized type of the packed buffer, removing the now
+  unnecessary pbuflen argument of (un)pack_fields().
+- Drop exporting the buffer size to modpost.
+- Simplify modpost implementation to directly check each symbol in the
+  handle_packed_field_symbol() function. This removes the need for a hash,
+  and is ultimately much simpler now that modpost doesn't need the size of
+  the target buffer.
+- Fix the width check to correctly calculate the width and compare it
+  properly.
+- Refactor modpost messages to consistently report the module name first,
+  the symbol name second, and the field number 3rd.
+- Correctly implement overlap checks in the modpost, rather than only
+  checking field ordering.
+- Link to v3: https://lore.kernel.org/r/20241107-packing-pack-fields-and-ice-implementation-v3-0-27c566ac2436@intel.com
 
-Does that make sense?
+Changes in v3:
+- Replace macro-based C pre-processor checks with checks implemented in
+  modpost.
+- Move structure definitions into  <linux/packing_types.h> to enable reuse
+  within modpost.
+- Add DECLARE_PACKED_FIELDS_S and DECLARE_PACKED_FIELDS_M to enable
+  automatically generating the buffer size constants and the section
+  attributes.
+- Add additional unit tests for the pack_fields and unpack_fields APIs.
+- Update documentation with an explanation of the new API as well as some
+  example code.
+- Link to v2: https://lore.kernel.org/r/20241025-packing-pack-fields-and-ice-implementation-v2-0-734776c88e40@intel.com
+
+Changes in v2:
+- Add my missing sign-off to the first patch
+- Update the descriptions for a few patches
+- Only generate CHECK_PACKED_FIELDS_N when another module selects it
+- Add a new patch introducing wrapper structures for the packed Tx and Rx
+  queue context, suggested by Vladimir.
+- Drop the now unnecessary macros in ice, thanks to the new types
+- Link to v1: https://lore.kernel.org/r/20241011-packing-pack-fields-and-ice-implementation-v1-0-d9b1f7500740@intel.com
+
+---
+Jacob Keller (7):
+      lib: packing: document recently added APIs
+      ice: remove int_q_state from ice_tlan_ctx
+      ice: use structures to keep track of queue context size
+      ice: use <linux/packing.h> for Tx and Rx queue context data
+      ice: reduce size of queue context fields
+      ice: move prefetch enable to ice_setup_rx_ctx
+      ice: cleanup Rx queue context programming functions
+
+Vladimir Oltean (3):
+      lib: packing: create __pack() and __unpack() variants without error checking
+      lib: packing: demote truncation error in pack() to a warning in __pack()
+      lib: packing: add pack_fields() and unpack_fields()
+
+ Makefile                                        |   4 +
+ drivers/net/ethernet/intel/ice/ice_adminq_cmd.h |  11 +-
+ drivers/net/ethernet/intel/ice/ice_common.h     |   5 +-
+ drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h  |  49 +--
+ include/linux/packing.h                         | 427 ++++++++++++++++++++++++
+ drivers/net/dsa/sja1105/sja1105_static_config.c |   8 +-
+ drivers/net/ethernet/intel/ice/ice_base.c       |   6 +-
+ drivers/net/ethernet/intel/ice/ice_common.c     | 293 ++++------------
+ lib/packing.c                                   | 285 ++++++++++++----
+ lib/packing_test.c                              |  61 ++++
+ scripts/gen_packed_field_checks.c               |  37 ++
+ Documentation/core-api/packing.rst              | 118 ++++++-
+ MAINTAINERS                                     |   1 +
+ drivers/net/ethernet/intel/Kconfig              |   1 +
+ scripts/Makefile                                |   2 +-
+ 15 files changed, 948 insertions(+), 360 deletions(-)
+---
+base-commit: bb18265c3aba92b91a1355609769f3e967b65dee
+change-id: 20241004-packing-pack-fields-and-ice-implementation-b17c7ce8e373
+
+Best regards,
+-- 
+Jacob Keller <jacob.e.keller@intel.com>
+
 
