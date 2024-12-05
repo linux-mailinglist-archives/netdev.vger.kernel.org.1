@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-149427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34F549E5980
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:14:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7853D9E5991
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:18:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C789918807D7
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 15:14:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45C54161BE5
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 15:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E42521C197;
-	Thu,  5 Dec 2024 15:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D58218E83;
+	Thu,  5 Dec 2024 15:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ivpA0Ove"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GmN9FxfQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E6C21A453
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 15:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E6FBE49
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 15:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733411671; cv=none; b=mrIIVO5z/M1FWOxMFIXezZeVHNYf3/KL+Uw6JaUhpBV84tOXqFq7fhPiTxwm2BLpEL+HFIgYna5E3yDBoEMoHldJoEmjemaQGI3fSgEsRUaSiBsP07kfCJ1MXbj5okAfIg17mbR7vxD/I8gMzDNy3JbJId0nOGTtdIXOpYCHbEI=
+	t=1733411889; cv=none; b=K4vNLqsdNFO0PnOYJDOLXp7uqS6UWo+3IPbeucFAIuGAzOLmCEXTzXMKS26CcaxeDWQKx7I/kIsnEuASVcG9k21h73s7Eh1/poX5HeuKeXWrc5Mz6hAPRNB1IoFOobEoOzncALhJY43SPpvhZUKcdVpihGITC7196Kpyrunn/F4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733411671; c=relaxed/simple;
-	bh=7qfp1k43H9fVwZssZV48w2s2pgARIgGzmBQHqyjuHyg=;
+	s=arc-20240116; t=1733411889; c=relaxed/simple;
+	bh=ubhbPtzBn8syqYBtLvmidYf4WZHhwRkbUJb61pjNjr0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V9EKqDC79joYp1is7wK3osfeK5z2kJ4HiQ589HuqA0+olmQVD+NCqL7J8gm+TXs74bxJVQA6t5vOlA0sOSrW1N2Swr5Ihe18vIvw3M6hx4LnmFYpX5oOS6G+tMyd5VojlY5j8xShHnhevHHwZrmbtKuYEWHWeJrZfbUWWDtabOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ivpA0Ove; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=B9vZeAcgov95Jcf5h+mgX1x43elixljY4llZNqv19vsawuG/7S2ecs8p9xa/ONpnAmh/jaPc1tdDEgbBVJlZExUREdy9RW19ATrMIcKUt1vGfgxrXW06KmURnqBc6sk8RbNYEFZQRgl2pypDRdjignV1fTGaBTZ9OpBw5zutLpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GmN9FxfQ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733411667;
+	s=mimecast20190719; t=1733411886;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yZeKHaiPUwdz1Uez2rF+6KJO4fqDMNiUK6EU+5R9bYY=;
-	b=ivpA0OveGsP8ul+5Qu1rFneySdCMbGrqvdTvktgDGiLTvcZmsM80aXNGA0Rfe9wsaj37pt
-	Fnsz5FfN39gX2BUYp396mJiDYtrbepLA+Ox84NorpslDxnAYziobWdZhYA0c/G85UfXgIV
-	Di3EJ3RGwpJzvo4tQWv23fvjE6BD+V8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=JdSji3NGlMnQ1jXsJVZOGl9L1qIEshri+ASXsE86GnI=;
+	b=GmN9FxfQm1JfosRvoSDYZcB9VG1jayfOd1ZhqgCPiHpsentq1NtgK6u0e7ha3rkkbheUwF
+	82/wBOoV9R/uhK1gXELoJskaYJwaR/QuKPMUrgA79kUz2ZD4MzN2qh2rpLAZpXqqcFLc2x
+	HGWvHdr6I1dhDPJlA86e9hkleX9zSEQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-IpNs60RAOIydoIXnGI_9yg-1; Thu, 05 Dec 2024 10:14:26 -0500
-X-MC-Unique: IpNs60RAOIydoIXnGI_9yg-1
-X-Mimecast-MFC-AGG-ID: IpNs60RAOIydoIXnGI_9yg
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5d126a2affeso776594a12.2
-        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 07:14:26 -0800 (PST)
+ us-mta-663-zOtkh1VSPUueGr6Qoehkcw-1; Thu, 05 Dec 2024 10:18:05 -0500
+X-MC-Unique: zOtkh1VSPUueGr6Qoehkcw-1
+X-Mimecast-MFC-AGG-ID: zOtkh1VSPUueGr6Qoehkcw
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385d80576abso813026f8f.3
+        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 07:18:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733411665; x=1734016465;
+        d=1e100.net; s=20230601; t=1733411884; x=1734016684;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yZeKHaiPUwdz1Uez2rF+6KJO4fqDMNiUK6EU+5R9bYY=;
-        b=mOY5UKTlZ/kksh6bZBin6ht2V5lX0g3UJD1otO9dIEDgsGwdUv9nw8t7slLPc9CxKf
-         PYF/27KPvccJGnwDj9/5zg+LBO9bhzo4oUpClIG/V8BVnsVifMMLS7vVAvVtO86BiPrm
-         WJ0CCdSNV6/4jGKAJCSx9KqHp+uVAk32Z83bsVL6SEsGMpBIGkqIqjR9Xwi4sRFbAVgS
-         hSNXd9qFnOjkJVczv9OqtCRshtrO9MM9WVn6bq0yy5e9h54MfAhwPnaBUHjUGrbMToIo
-         pivIrUxAIiOSih3DkzYPo8DgSRELF91YH2t7siQRJld1DK773TnQNfxn8AMipiDRcNKZ
-         9kUA==
-X-Forwarded-Encrypted: i=1; AJvYcCUcnDVTuzJyD9DOv4XmnztuAkmb3RgmockuVwVhkHLlPhDVQ8wT8AVNIEh4enK0uPcgRFCjpS4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBuzPp8Fan+H0nrMDjAaEp/D8MJOXxtcMifbMiGjyjh9PUNrLM
-	f7UJVyQSfuImkQpc1FI1LHcFMSvjuzo48/GYGwbDkflg7bC3zYcrsLdmjshroTA6gqi1l4cy0NT
-	5xtOYKc69cZsGbjYYWcOkC5M9dmO8/WO3HbnxsTvImigUoGFvigie4g==
-X-Gm-Gg: ASbGncvijQy4vnVrwEifURGiviH9DZYzKP97FYLNXqcZhSnFU5wkXUV8noqYbLM/5GD
-	K3ZhQJNNVFhVDbYS1XWhX7ROVKMOT+dfph3n9j9QVm3VCJg6QWCMXEcSMFIkdrGAziJUf/UnBwU
-	jIumxqcQGqHqLfCA2w5nZZ/JLFzH6UMFr4y5DhYNejc/0rtrOj0vy5CRMf4s53/TZeoRpgUiJZ0
-	p8HJsjVzDJhJoQrR0WYFGmKj+5FD3tFidm5uuAlMUY=
-X-Received: by 2002:a17:907:da6:b0:aa4:a3be:28dd with SMTP id a640c23a62f3a-aa5f7f2ac81mr1129713266b.55.1733411665184;
-        Thu, 05 Dec 2024 07:14:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFSaGMrvT1KxkOVkf0k5RNkdCEfFTYsGnhtOTkVXAHsDKc3mjlQMnj61cXOR/TqS7hnkMPHpQ==
-X-Received: by 2002:a17:907:da6:b0:aa4:a3be:28dd with SMTP id a640c23a62f3a-aa5f7f2ac81mr1129707566b.55.1733411664680;
-        Thu, 05 Dec 2024 07:14:24 -0800 (PST)
+        bh=JdSji3NGlMnQ1jXsJVZOGl9L1qIEshri+ASXsE86GnI=;
+        b=Ct8ZlD4oR1z74hX4wEctkBoZyUQSN5IfKCvq5IGdt6RLu47HHEC2STEtf7zfkkB8AR
+         67MhInrImSMHhLr2PuefLrmOwGhQQE+sQYrAS8Qzza2NR6aPb1IAWH66b1joOkeRBRb3
+         cwJCnTZKQjJtp7H1XJrAlmT5CUNek//uUPNH/ROdLiixK/UhaoXZzgrOhXMVPoxOQqTG
+         ty0K37dBmLxc4MgY74EnLTmxQLCQCso9opKX1vW4EAUuZtgMHGEG9T2KkkXj4MiinG6J
+         zg4f1bi7Tvv67sb0a9z0ucSDm+Y4hnZCAMRCLzMDTRpI/HNdJpCDNLWua3PGMr/I27nl
+         5+dg==
+X-Forwarded-Encrypted: i=1; AJvYcCU1aY/TJOyyIL7n9aLSOFRZFpGSkpcdAjplvIb6qnK0Ocx/v61QfPJR7Mi2wEvUulfz9SFJVCA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKtupRK4XG6grxMGd050pVgrJSB2d5Uxo/kQ7bHJ21yPsCYhXc
+	1C9IcuAD32ldV1CQHrtCqnhWgeBUrm6w7Aowe5CVCdmCQgCxwUJl8hLeAeq2V2RVogy1J+yD4XT
+	t9IeMccKuatZB+MQJEU5vNDurfKPuiQ5Zw/DOdRLDHE7h4M3+AkaqOg==
+X-Gm-Gg: ASbGncv6/swALOi0N1KoYMYjfl58TjUU5gEaVXAROUG6PCElMZkAOZuIzgzUKocPPWX
+	JUdGhOtt+2JNw7IKk1An0VInGTaVUpNAFxaLvYubG1aDtReMZCqCti5ci3o2sJW0LBcmmNEuAAO
+	3HBq/45PHEdS5qu1LJ9qTA9E3mAfjD69EjYurDLipWW/+jxs9y1U4oBwIBcX3/WPDxfeI0h0iN3
+	I7pK+Zc9GAA6ip5rS9m05Kl0bjhvYMwrW/Pe9c=
+X-Received: by 2002:a5d:6d03:0:b0:37d:4833:38f5 with SMTP id ffacd0b85a97d-385fd3f2c0emr10797886f8f.30.1733411883942;
+        Thu, 05 Dec 2024 07:18:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGYWGJEpkIfFGXIzPlV7ZnY+sjcPxgdHQ0cw9usI/E0FiDiz746U+r28+u6h6camWH6r8h8KA==
+X-Received: by 2002:a5d:6d03:0:b0:37d:4833:38f5 with SMTP id ffacd0b85a97d-385fd3f2c0emr10797856f8f.30.1733411883555;
+        Thu, 05 Dec 2024 07:18:03 -0800 (PST)
 Received: from redhat.com ([2.55.188.248])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa625e96ab6sm105853266b.60.2024.12.05.07.14.21
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa625e96c2fsm104968066b.62.2024.12.05.07.18.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2024 07:14:23 -0800 (PST)
-Date: Thu, 5 Dec 2024 10:14:19 -0500
+        Thu, 05 Dec 2024 07:18:02 -0800 (PST)
+Date: Thu, 5 Dec 2024 10:17:59 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Koichiro Den <koichiro.den@canonical.com>
 Cc: virtualization@lists.linux.dev, jasowang@redhat.com,
@@ -88,7 +88,7 @@ Cc: virtualization@lists.linux.dev, jasowang@redhat.com,
 	stable@vger.kernel.org
 Subject: Re: [PATCH net-next v3 1/7] virtio_net: correct
  netdev_tx_reset_queue() invocation point
-Message-ID: <20241205101351-mutt-send-email-mst@kernel.org>
+Message-ID: <20241205101611-mutt-send-email-mst@kernel.org>
 References: <20241204050724.307544-1-koichiro.den@canonical.com>
  <20241204050724.307544-2-koichiro.den@canonical.com>
  <20241205052729-mutt-send-email-mst@kernel.org>
@@ -150,7 +150,17 @@ On Thu, Dec 05, 2024 at 10:16:35PM +0900, Koichiro Den wrote:
 > 
 > Hmm, as Jacob pointed out in v1
 > (https://lore.kernel.org/all/20241202181445.0da50076@kernel.org/),
-> it looks better to follow the rule of thumb. Taking both suggestions
+> it looks better to follow the rule of thumb.
+
+OK then. I'm fine with keeping your code as is, just a squash,
+and add a comment
+
+	/*
+	 * Rule of thumb is netdev_tx_reset_queue() should follow any
+	 * skb freeing not followed by netdev_tx_completed_queue()
+	 */
+
+> Taking both suggestions
 > from Jacob and you, adding a loop to remove_vq_common(), just after
 > free_unused_bufs(), seems more fitting now, like this:
 > 
@@ -174,9 +184,7 @@ On Thu, Dec 05, 2024 at 10:16:35PM +0900, Koichiro Den wrote:
 > Thanks,
 > 
 > -Koichiro Den
-
-why in remove_vq_common? It's only used on freeze/restore.
-
+> 
 > > 
 > > > 
 > > > 
