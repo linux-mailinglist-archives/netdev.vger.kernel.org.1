@@ -1,239 +1,351 @@
-Return-Path: <netdev+bounces-149449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 270479E5A2E
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:48:12 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BE729E5A31
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:49:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6281289427
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 15:48:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 762F318817AE
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 15:48:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D9921CA1C;
-	Thu,  5 Dec 2024 15:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5FC21C164;
+	Thu,  5 Dec 2024 15:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="LfvSm1ih"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C7WTE0hR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E48943A268;
-	Thu,  5 Dec 2024 15:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733413683; cv=fail; b=t0igqdXZZMjxy8n1exUG+ibC5YCpt4HZHgiM6AePIEE/wMkQA7wF7RCKAp2EOqsCYkZntoOn1cYCDyLLnnFT4KIgVtoK7EBx1bmJfG/eSBTYOXUhWqJ8bShHYRpClyHhuz+pTcOmNavcBJY4ONJr0E2c9iDV14RCpXBrZqyblks=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733413683; c=relaxed/simple;
-	bh=GGfbu+bTo5UefH+r3UmIjZdGwrGn9Mrd+J9mRlF5/jA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VQkfT+6ponONpa0pZhEmH0L/sbirFZQV+zcYtsW3bWtTSvBBXZXqMjl7T7mhovAHBjU7QFB7YhbefYv4qmFFwLn3zgrbA/sTrmGG3A8mOiddQoYB4ZeYCYakLud6Qfu7VBFYcwHWgdjmP7/mQQk2w/UuwxXxBlsN71KTFi7+iiA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=LfvSm1ih; arc=fail smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5FaWZp016931;
-	Thu, 5 Dec 2024 07:47:34 -0800
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2174.outbound.protection.outlook.com [104.47.55.174])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 43beyf00ud-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Dec 2024 07:47:33 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oqABmNjjJZre38sNI5TyvUWfgt05Q2XkFAEZMkM0EDkycaDnImrEx+c48SjHW8aCIwGf1Lg+qXzTnTDOVjA2j4IO9I9qEyKWOS8oa1cFyxIzLQmlMj9j33pwO0jmDAa3Y/kcG8ecVaH75fHsfq20GpL/026AsY5JvqXCnMJP2jJ90q+WvUrPlzeRYF+FFlFmoy5pGHrsXZBm5JWSRCuqEGhCrUXF2Dcfq6O/nNI27vispUfq7Vf19xPSWe3vn6+y60mEsk5G/sBaan5Cflxj6ZLo3cKwqTyYsoBAsHmbfqSIE+7A6eTuEVhhKdSl8jR4XPsaJKFS3rWyrxZB+YSZ7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GGfbu+bTo5UefH+r3UmIjZdGwrGn9Mrd+J9mRlF5/jA=;
- b=b0wldFI7ZxeUl0PDkFgYyl2Igy+y4ezYQQhwIq17X6pZkYEakhc0cBRinCnDkZRRfD8EFDGjEkKtK1lnhqwAhC98pWHqCUaAezYlK5/AD202ThTMeIYd1DxX9nRw3FHF7qJmfY9xyEoJOyWn6rW6ksTao6QlZrDd3MfWhW4U6K+huP1TCLb1EPkFHyHSUl09Hr6ktpHcVbZOI7Yhn5FlJp6waEh6gU1v0Ug7Yeu9FnhlBSd7mAtgQbqaIljOdKU7U124MJF/OuEKkhSiWRFt9SI/coBNfjYD64lc6sz9vMmXtQ8+hBglThdN8ol8zmIPHDvsPXtnDzfEfq+7I+910A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GGfbu+bTo5UefH+r3UmIjZdGwrGn9Mrd+J9mRlF5/jA=;
- b=LfvSm1ihvzAhZtNfD9XV80ZEoSQBxu3lk5Q1gYgSCDk/ni8xgfSywRhWvfPqg5l115NL+AbuVuDKROYqvUjn0e+ryelb4SwgukUxm+5ckukLGoe1ZYA6FPgI81w3/2/gF0tEX4zpm4ugjsipUOSsFl9mmtygKRA0/UmHRttc2FU=
-Received: from PH0PR18MB4734.namprd18.prod.outlook.com (2603:10b6:510:cd::24)
- by BL4PR18MB6432.namprd18.prod.outlook.com (2603:10b6:208:5a7::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.14; Thu, 5 Dec
- 2024 15:47:30 +0000
-Received: from PH0PR18MB4734.namprd18.prod.outlook.com
- ([fe80::8adb:1ecd:bca9:6dcd]) by PH0PR18MB4734.namprd18.prod.outlook.com
- ([fe80::8adb:1ecd:bca9:6dcd%3]) with mapi id 15.20.8230.010; Thu, 5 Dec 2024
- 15:47:29 +0000
-From: Shinas Rasheed <srasheed@marvell.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Haseeb Gani
-	<hgani@marvell.com>, Sathesh B Edara <sedara@marvell.com>,
-        Vimlesh Kumar
-	<vimleshk@marvell.com>,
-        "thaller@redhat.com" <thaller@redhat.com>,
-        "wizhao@redhat.com" <wizhao@redhat.com>,
-        "kheib@redhat.com"
-	<kheib@redhat.com>,
-        "egallen@redhat.com" <egallen@redhat.com>,
-        "konguyen@redhat.com" <konguyen@redhat.com>,
-        "horms@kernel.org"
-	<horms@kernel.org>,
-        "einstein.xue@synaxg.com" <einstein.xue@synaxg.com>,
-        Veerasenareddy Burru <vburru@marvell.com>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: RE: [EXTERNAL] Re: [PATCH net-next v3 RESEND] octeon_ep: add ndo ops
- for VFs in PF driver
-Thread-Topic: [EXTERNAL] Re: [PATCH net-next v3 RESEND] octeon_ep: add ndo ops
- for VFs in PF driver
-Thread-Index: AQHbROiK4G9UfreQbkSH43B1xsIrdrLVX/AAgAJuthA=
-Date: Thu, 5 Dec 2024 15:47:29 +0000
-Message-ID:
- <PH0PR18MB47342ED76DCB583E62078808C7302@PH0PR18MB4734.namprd18.prod.outlook.com>
-References: <20241202183219.2312114-1-srasheed@marvell.com>
- <20241203183318.16f378d1@kernel.org>
-In-Reply-To: <20241203183318.16f378d1@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR18MB4734:EE_|BL4PR18MB6432:EE_
-x-ms-office365-filtering-correlation-id: 697949cb-7979-4e3b-1f6f-08dd1544202f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?cERSbWRSZDd6QXlTeTFpTDMzNms1S3I2K1ZKVDhLWUJ3b2Z2UlVqZFhacElr?=
- =?utf-8?B?eno3cGpZUTRQQ2tsY1dHWnpObjdMUTNxYU1GMTBmMjFjQTZQSEVnOXIwcTF4?=
- =?utf-8?B?Z1Y0UEorUjJqVE1IZjNkYVBRSldNTG92YWNOaWpnOUtacjhEcHZOU3hhQXJK?=
- =?utf-8?B?ZWk1dmk5N081SWxKVW03VHh6SkprWTdMcU5rbDF3VUdMT00vSlpFazlwNGRh?=
- =?utf-8?B?c210dW9Ma1UwZUg2cnlKdUdFWXhESXpQVmNubjB6TkNhRW9BdXlHYkxDYjJS?=
- =?utf-8?B?OUtKdldnaVd1TndDQWVpdjdwYitxdHEzMS9hRXdSc2tTOVgrNmZMQmpzb0Ja?=
- =?utf-8?B?ck1Da2tKSzAxZ1k1NVBnLzZBcFFFM0t6cXVZSkx6UHFmbzUzSEpSUzJhbjdp?=
- =?utf-8?B?NVBpeEVpbmhMWkVqUjFrWGxnME82OENHRkNEYTA4WExHaElqR3R5ZDJUYmNu?=
- =?utf-8?B?SnNwOWJodzBJVWk0UVJVcWthUnVnZmhwY3laeGRkVHBBRnFrZDU5cURHMnQz?=
- =?utf-8?B?RExxcHRRTFpXbnloYTRDa2NUQW9pZXdySkZTZ0JweHpiWk5xczFTcmZEUmJH?=
- =?utf-8?B?NXdLaU5BZWdydEpUMVN4RldKOUxkMm8zTi9nVE9WUnlmQURFSks3VkdVdUg2?=
- =?utf-8?B?b3dvRjUzZ0NFd3VmWnZkWUNSVkRDUEJJTWZRaG4rMnJIVEVrQ0MrWFozYnhT?=
- =?utf-8?B?a0lidWhnT1prM2JWNDlrdUEwZkI1c2IxdXUrQWZsaERQdDY2cE9TS1A1TkFP?=
- =?utf-8?B?M1IxVFkrOEt5SFl3TU1UeEFKMU0wZjVjVGZ5Q0VGQmpKSTc1V2EvYW51ai81?=
- =?utf-8?B?cXdzL1lCUUhGRkhhZENmbU42THFhS3F4ZkNWeURuSktldm9INHhPL3RTTU9l?=
- =?utf-8?B?RjRDdmVIWGQxeVpoR29LenNnTm9NOWZlRU1lWE1hTU16dlQwZjdTL0FQUjZP?=
- =?utf-8?B?aWtWZWlJOGQ0NDN3MmZDL2pDVG9sUzB1cTVBK2hoQ2tSWFJza1oyaGxpdnZh?=
- =?utf-8?B?Q0NkN0NsdVd3cVBIU3FwVDNXL00yam5jZmZtcWo2eXduZWxpQk9RSmhQb2kr?=
- =?utf-8?B?Nyt5NDFOYS8zRnVoTzJxalA4SStsbjVJZWJsNVFjY3Z4U1NBMUN2VnlXTG54?=
- =?utf-8?B?eFhCcFRpZlZPVnY1NTdycWJRTWFYQWVBVFN6eHVTL1RBOHd6YXFlZWI4R2tU?=
- =?utf-8?B?UWpBTTN5SlA1Ungyb29HbTJxbWYyS1htczNNdTRSOEZjV0EzanRybDFMTG9w?=
- =?utf-8?B?VlkyNkJjWnRGNkxYTmdtck5aenZVZ2FGNWtCM213ak1RcE1hZk5zYk9vSTJQ?=
- =?utf-8?B?UE5JRlJudEE3c2JKMGJiUzArNWw5Sm9iQU5YOVRseFEzYXhWdmZnWm9lRFVI?=
- =?utf-8?B?eGdLa1RUMmJibTZaaWxvekYzckp4cWFTWlpNWE9rQ09nYkhhem9VamhOTFlk?=
- =?utf-8?B?Ynl4dHlIb2J0Z0l4bUxFWjNVaTI0dWRZTGlrUjZFS3VzUVFYbjlrVGxEQUdT?=
- =?utf-8?B?cHVITzFSQTI5dzAyeS81Z04xY2thUytpSEtEdnJEU2lIVllJVzZBS3luWGZt?=
- =?utf-8?B?d0k2SWNSNG9rS1BsVjR0bmVJK0MyUVJwT3pxTmJVQmR6VVQ5TjIwczhHNTFP?=
- =?utf-8?B?OTJFdzVjbWVuS2dUZ01rUnZuVXh0M0lNTlN4TlNBUXRYQjBvSTZLUk9vR3px?=
- =?utf-8?B?MmFYUCtNMFVUTkhuYlBieGdWSVF0TW5rRVN1ZWdkdW9xY2xmK0NOVUxFNmhl?=
- =?utf-8?B?MG9JWW5NdTJGemlXblg5L1owaDBCTzNiNjB5bjN4UC8za2x2YzVFMGZ0ZUJq?=
- =?utf-8?B?RXpwMytRV0tycGpGYy9adzJLUVZjY0t5WERGUDdCdXhLNWZtUE5RV1pDTUZu?=
- =?utf-8?B?czJta3ZPZUJjOGM4Y2x0NmhjM2gxaWdXRG1GZjFkY3dJRlE9PQ==?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4734.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?dVJ1eHJMT0xQdm14VUh4RE1mcmo0dzNXYkg1S3psL0xnbElvT2ZwVVBFTW1U?=
- =?utf-8?B?YkFGaCtQSlE1TWxuSDR6S2JXM2FDdHRGUnNBRkhpMlVzMlpWSVY4QnlDQTc4?=
- =?utf-8?B?cmV6cFJsTWRqNHVpbzlSa2hnK1IwU0FmR2N5eVgxQmZxSG1zclRzS0wyR2lk?=
- =?utf-8?B?ZW5GRG5HSGIwRG9hM0RYanc3ci9OeFRud3ZRaFlmN2JtTHFndUZLVHJTODdB?=
- =?utf-8?B?dm1Dc2dOM3hOeWlqUC9GSjB6QkFJMVFTR3lKRUJybXRQMWdxOFpOeVR3SGFN?=
- =?utf-8?B?NzZmSE9NV2dFUzM3VjJVUGtrenpTOUtTeDdBbHhQYzRGakxjOU5Hb0orTUFu?=
- =?utf-8?B?aWUwUVY2c0NUNk82dXUxUWtQeEZVNCtJaFJJbERQT2hSdlQ5c3NsaXUxZmFG?=
- =?utf-8?B?T3RSTWVzaVBCU3ZVS1BJL0xFNWdFWUFuQ2M5ZzBEYU42b0dMS1BIQmdkZkla?=
- =?utf-8?B?QmpTZ25TOFhGLzlXYmtvRVVSWkNVT0NOMFAwTmRKYU41cHFyc1pvYTN0U09i?=
- =?utf-8?B?Wm5vSjk0WTR6YTN5TVQ1SE1iVy8wbzYrdTJkQ2FUZEJZNEtaUERNanJjVDJu?=
- =?utf-8?B?WVhjZW9EU3c3TlE4RnRlVUhsMTRyaVFnb2hDcnVxNjljMXFJbjJseTNKNElV?=
- =?utf-8?B?VDg1eGFpYVB1TE02bkR0VVVmVzNYWTJ4SjcwbW4vSU5HMDc0SUt3aFhnWlYx?=
- =?utf-8?B?MUJzcE1kYXpsNWZLOXFpTERoU1FBSVkyR25LZE1qLzAzbzRsTmxUR1ZTZXZo?=
- =?utf-8?B?Z0JGNXoxTkUvZWs1ZmRIakdjQTFhOUZyQnEydTVrUkNuK0N0TEFIdmJqNWdq?=
- =?utf-8?B?dmhMNTRGZ1lzQ3drZlBPaUM2bUdUQnVBbGR2YVhLQWJvV2NnWnpDc3FzUW1W?=
- =?utf-8?B?N3k1UXpTc2d4S1FyRThvOEJ4amFGbWVla2dCVmNFYW5aeUFpeUJBaThYcmVa?=
- =?utf-8?B?WUU4eWQzQlQxa2hrVk5MU2R1ajY0YXFPYlY0bTc5R2NHOWR4U3pQU1YwdVB1?=
- =?utf-8?B?bE5tbXEwQm5BZ0k5ZitNcy8xL21tOFlUZ2t3TUZFWUNISVZNWkFLTDZNMW94?=
- =?utf-8?B?aUptaHR2RVNjZG5DejhlVzVFeVBRNk05MVBRUWJ3eW9WUCtXSUp0TThIRGpZ?=
- =?utf-8?B?bTJvUGVmYUQ0UENwQlZCc0tvK2lVUWkxM2VTM1lyTE92RVZicHZxMDZrbno0?=
- =?utf-8?B?SEdsVTM2a3IvLzNsVXg5MWxjdjd1S2grQTBEaEVpTUo2RnZkNXVqNUdaMUdI?=
- =?utf-8?B?bWRGSDNyR1dpZ1VaVVU1NFpqWjdNcmxRaVByZS9oMkVDUGtYajZ5dmN3N3N0?=
- =?utf-8?B?S1VvMjdIcjMwUzJ5VmhnUjQwdnFGTVF1UUpJaXpKTGxHbWpVWk5OdGlzSDVO?=
- =?utf-8?B?ZDhUN0VHVTJnbHZuTVBnNUhESDhma0RDKzQrZDNuK3MvZld3dmhvemhiaTZk?=
- =?utf-8?B?OTErbjd5KzQ1Y1RBdSswZHZPNWRPNzMvdzlPeU1wLzVSUTRzZE41alF1Z0dh?=
- =?utf-8?B?RTVkaTVwTUVMM2RZM2p0ZFI3YWJnTmhRRjRIK01wSWZSeU9EMXNwaUN0NURq?=
- =?utf-8?B?cy9JdGNMeUhzL2JncTZhNHl4Mm5mYm9jVU5Nam9NYkdtR0lFVVcrZm51TXB3?=
- =?utf-8?B?SG9aOWs4R285RXdZdjlQWFBVMDJscnlHK0kyNzczYVFoRWtqU3QrSE95MzdP?=
- =?utf-8?B?RGc5cVhtcW1ncTFJeHlwSGhidzZQc0xJRTJMNFB3QmMvS0ZjYk1FV1NiU0hl?=
- =?utf-8?B?czM1MThzcXRpYWpMV0c2Um5kdVVkK0hKQytWRHVLZHFEKzY4ZUd5SldQVmdC?=
- =?utf-8?B?Yko5RERsSFJIZHdKdW5PQkU5N1NtR1RHTlZKWmlBbklySFJaa2JEYkhaY1M0?=
- =?utf-8?B?d0lJOEhTSmpZMHhkck9LdERmTkFQdG1CcUljNnJxUkdoNi84VzJSUVliNDZa?=
- =?utf-8?B?R044eDJvZlNGb1BJbmFhV28rbTJyK3ZOaWw3UkxqTytRczNBMzExelpVazJp?=
- =?utf-8?B?L1NKY3JCRVo3Yiszcm5SRTFHWlZWUklqUFFGVWNVMzExcHRMWjRxN1VaT1Ev?=
- =?utf-8?B?THpKYkFwbEhQK1pUNXhzSHpuaEdJUVQrOGc5Skp5YXJ4YWVZemNiTFkrbTZ1?=
- =?utf-8?Q?j6X4B9aS9FacIxi5fnznAmroL?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2161D515B
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 15:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733413731; cv=none; b=cwMto5zfh4cnL0m0S2zUcaKYs0pROgZEaNWEV98ib78M3hRGJ6mayk8Lpt4KKFAWK/tS4+3qqg9GTOskoPE2k+6VJ4WkTNHp1J43t0PWBzHXYcn2lU5owBUGGwuhzXKL3ga0Y4whxkVPZp4KLMOW9DomBIzclaH1UYz1M42GrjE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733413731; c=relaxed/simple;
+	bh=FVETqPaNbDJA0GbmT6XrNaS9JqjCL2hEt0mD7BWC3p0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=bdPUenmG5uYHFxX37oBFvHxVTpw/gEt/4o1Sff+TjzjYaI/onLcjvyd5HAQYoYAzza1YDzbEMzz65hJB9oHga8cudKCKUD9H8hUWTXA3ZDM9ZuY5DEwOElAufLS2vfpSjfujjFkqobzAr4MMMrgP+ZkvafeArrg6hlEAK8VfKhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C7WTE0hR; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7b65f2daae6so110337985a.1
+        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 07:48:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733413728; x=1734018528; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tX2u4qfDrn/4zXFOMD3/KGXPVFWMSazAQdnVQPExMs4=;
+        b=C7WTE0hRpb72Xs1wXunyN+RxKwKBV/Z67bAmlVhaKiVGIVPNMBzHEKzl6Sts06Zgwm
+         5Bpwr7Y5//2mDj0/z68fLTzzkVNed1ScJK0rFJJFugqJ6eBPrSlh0YJVOBRW4Dis4Tya
+         nh3DN5m06pHmef2V0cDLi5K3EaZC3k4og+ZD4n/3elxDWXCdarZ/snG1/6VIdrBjOO77
+         sLzbrtiT7YBsjFQygbZpM3BV4kaTkm+QFvNAYhkJEivRD/sN+PnLTg//+IOQ+lKkkaA2
+         dT2i0viOTuSlNLu9bRkgGMgspzvVdw8ebZhNMW5bzU0z96IPQAdfg5FLovt9tpkER+ly
+         uaGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733413728; x=1734018528;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=tX2u4qfDrn/4zXFOMD3/KGXPVFWMSazAQdnVQPExMs4=;
+        b=PVobmBXJ+W1oHXpTXeqlaJVWJ1ginGa/8qG3XbWv0p69Aypad6g7d3wR0SdrZkCFHR
+         6S0HtMs5kSrvmk+wiHKZZmWydVRgAcy+9GjOJtdazKhtkUfQdhPfNl/X91zixfK0ehCl
+         CCujXk7Pm3h6ZPSk+0yI99xRWR/Pb9nyNUqk3GvYRn/qZRx/VRimv8z/L7F4oj6lMXQC
+         bdEtb9arQEIPYH+NrHm2YHuEjEMshnhXUsyvE/at89RZzTDwvQWK7WWeZsJIan//WKDN
+         s0i40tQz0FKmsTQn5MH/OYbM1Msa7eIogbiWbvSwv2C+EtxCVsJwMN8c6FYdEemEbNfm
+         sJuw==
+X-Forwarded-Encrypted: i=1; AJvYcCXIS5c+Bh8TK32g7xjEtT80+H4xA4PBuEJy0ym5j/Il4ZZYWDtCjmEaL5nqWCo4L6WVNJxbeF0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzibnx/OKDJiP5OOCoGZy2BBkQ/t7jSCp0xc65Oa+8Pd1OURwzp
+	n2QXN5eOAph7dsvNA0Wm/118YXbtF7xI622SGdJFzehp5SJGAWu1
+X-Gm-Gg: ASbGncu5nFLZpLHKtbknDwOgMWEMbZ48f7xCo7KhAs0E/od19qT3bvSJrlbyrZljDRl
+	OkoC1JD82ZbJvgwnX38pbVI2hepGdXCzZzLpAL/mKAtQmd/r3IqZoX8tmsH0fCwzWBzVfPJxOrM
+	1M/Dtm1FtIyNCcBX8vqUXqRWg9SXex2F1v8M8gRTFCnaBK0A6cMWs8RBGZosYUnoZKkcrLcVokp
+	B+kvXyvFK5BgtkGvjtEN5Cl1HgOlGehXuAVQak8w/UYybH7PsZ6JlKweSAKjpTEya+9U51hzvtO
+	Ga9t3O9qWa7yOaa7nljwCA==
+X-Google-Smtp-Source: AGHT+IGHGIfiwOx6OzfJICyk1Pek1ZkjsN9ntVSUtbivIgBiGVcOGoh7wxnEa26ZKy/+eBptc0nOZg==
+X-Received: by 2002:a05:620a:1a26:b0:7b6:7332:f25e with SMTP id af79cd13be357-7b6a619acbfmr1445098785a.38.1733413728578;
+        Thu, 05 Dec 2024 07:48:48 -0800 (PST)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b6b5a9eb25sm70814685a.102.2024.12.05.07.48.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Dec 2024 07:48:47 -0800 (PST)
+Date: Thu, 05 Dec 2024 10:48:47 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Anna Emese Nyiri <annaemesenyiri@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: fejes@inf.elte.hu, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ willemb@google.com, 
+ idosch@idosch.org, 
+ Anna Emese Nyiri <annaemesenyiri@gmail.com>
+Message-ID: <6751cb5f3c7d3_119ae629480@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241205133112.17903-4-annaemesenyiri@gmail.com>
+References: <20241205133112.17903-1-annaemesenyiri@gmail.com>
+ <20241205133112.17903-4-annaemesenyiri@gmail.com>
+Subject: Re: [PATCH net-next v5 3/4] selftests: net: test SO_PRIORITY
+ ancillary data with cmsg_sender
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4734.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 697949cb-7979-4e3b-1f6f-08dd1544202f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2024 15:47:29.7998
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BkSML3mOeM8/qWdVPGCaKztzPOrwe3pMwJvnwanODLi5C6qPmnjkrK+Vg2n9ViARrej7xPHVB/m/2xaOdPfgkA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4PR18MB6432
-X-Proofpoint-ORIG-GUID: NX6dUhTFI3SeqEZnGRsAu8m-CNQUITB3
-X-Proofpoint-GUID: NX6dUhTFI3SeqEZnGRsAu8m-CNQUITB3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
- definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-SGkgSmFrdWIsDQoNCj4gT24gTW9uLCAyIERlYyAyMDI0IDEwOjMyOjE4IC0wODAwIFNoaW5hcyBS
-YXNoZWVkIHdyb3RlOg0KPiA+IFRoZXNlIEFQSXMgYXJlIG5lZWRlZCB0byBzdXBwb3J0IGFwcGxp
-Y2F0aW9ucyB0aGF0IHVzZSBuZXRsaW5rIHRvIGdldCBWRg0KPiA+IGluZm9ybWF0aW9uIGZyb20g
-YSBQRiBkcml2ZXIuDQo+IA0KPiA+ICsJaXZpLT52ZiA9IHZmOw0KPiA+ICsJZXRoZXJfYWRkcl9j
-b3B5KGl2aS0+bWFjLCBvY3QtPnZmX2luZm9bdmZdLm1hY19hZGRyKTsNCj4gPiArCWl2aS0+c3Bv
-b2ZjaGsgPSB0cnVlOw0KPiA+ICsJaXZpLT5saW5rc3RhdGUgPSBJRkxBX1ZGX0xJTktfU1RBVEVf
-RU5BQkxFOw0KPiA+ICsJaXZpLT50cnVzdGVkID0gb2N0LT52Zl9pbmZvW3ZmXS50cnVzdGVkOw0K
-PiA+ICsJaXZpLT5tYXhfdHhfcmF0ZSA9IDEwMDAwOw0KPiANCj4gSSBzdGlsbCBmZWVsIGxpa2Ug
-dGhpcyBpcyB1c2luZyB0aGUgcmF0ZSBsaW1pdGluZyBBUEkgdG8gcmVwb3J0IGZpeGVkDQo+IGxp
-bmsgc3BlZWQsIHdoaWNoIGlzIHRhbmdlbnRpYWwgdG8gcmF0ZSBsaW1pdGluZy4uDQo+IA0KPiBV
-bmxlc3MgdGhlIHVzZXIgY2FuIHNldCB0aGUgbWF4X3R4X3JhdGUgd2h5IHdvdWxkIHRoZXkgd2Fu
-dCB0byBrbm93DQo+IHdoYXQgdGhlIGxpbWl0IGlzIGF0PyBJZGVhbGx5IHJlcG9ydGluZyByYXRl
-IGxpbWl0IHdvdWxkIGJlIGRvbmUNCj4gaW4gYSBwYXRjaCBzZXQgd2hpY2ggc3VwcG9ydHMgc2V0
-dGluZyBpdC4NCj4gDQpBY2sNCj4gPiArCWl2aS0+bWluX3R4X3JhdGUgPSAwOw0KPiANCj4gTm8g
-bmVlZCB0byBzZXQgdGhpcyB0byAwLCBBRkFJUiBjb3JlIGluaXRpYWxpemVzIHRvIDAuDQpBY2sN
-Cj4gPiAgLyoqDQo+ID4gQEAgLTE1NjAsOSArMTYwMSwxMiBAQCBzdGF0aWMgdm9pZCBvY3RlcF9y
-ZW1vdmUoc3RydWN0IHBjaV9kZXYgKnBkZXYpDQo+ID4gIHN0YXRpYyBpbnQgb2N0ZXBfc3Jpb3Zf
-ZW5hYmxlKHN0cnVjdCBvY3RlcF9kZXZpY2UgKm9jdCwgaW50IG51bV92ZnMpDQo+ID4gIHsNCj4g
-PiAgCXN0cnVjdCBwY2lfZGV2ICpwZGV2ID0gb2N0LT5wZGV2Ow0KPiA+IC0JaW50IGVycjsNCj4g
-PiArCWludCBpLCBlcnI7DQo+ID4NCj4gPiAgCUNGR19HRVRfQUNUSVZFX1ZGUyhvY3QtPmNvbmYp
-ID0gbnVtX3ZmczsNCj4gPiArCWZvciAoaSA9IDA7IGkgPCBudW1fdmZzOyBpKyspDQo+ID4gKwkJ
-b2N0LT52Zl9pbmZvW2ldLnRydXN0ZWQgPSBmYWxzZTsNCj4gDQo+IEkgZG9uJ3Qgc2VlIGl0IGV2
-ZXIgZ2V0dGluZyBzZXQgdG8gdHJ1ZSwgd2h5IHRyYWNrIGl0IGlmIGl0J3MgYWx3YXlzDQo+IGZh
-bHNlPw0KPiANCg0KSW4gY2FzZSB3ZSBuZWVkIHRvIHN1cHBvcnQgdGhlIGFwaSBpbiB0aGUgZnV0
-dXJlLCBqdXN0IGFkZGVkIHRoZSBjb3JyZXNwb25kaW5nIGRhdGEgc3RydWN0dXJlIHRvIHRyYWNr
-IGl0LiBQZXJoYXBzIGlmIHlvdSB0aGluaw0KdGhhdOKAmXMgd2FycmFudGVkIG9ubHkgJ3doZW4n
-IHdlIHN1cHBvcnQgaXQgdGhlbiwgbWF5YmUgSSBjYW4gcmVtb3ZlIGl0LiBUaGUgZGF0YSBzdHJ1
-Y3R1cmUgd2FzIHVzZWQgdG8gY2hlY2sgZm9yICd0cnVzdGVkJyB3aGVuIHZmIHRyaWVzIHRvIHNl
-dCBpdHMgbWFjLg0KDQo+ID4gIAllcnIgPSBwY2lfZW5hYmxlX3NyaW92KHBkZXYsIG51bV92ZnMp
-Ow0KPiA+ICAJaWYgKGVycikgew0KPiA+ICAJCWRldl93YXJuKCZwZGV2LT5kZXYsICJGYWlsZWQg
-dG8gZW5hYmxlIFNSSU9WIGVycj0lZFxuIiwNCj4gZXJyKTsNCg==
+Anna Emese Nyiri wrote:
+> Extend cmsg_sender.c with a new option '-Q' to send SO_PRIORITY
+> ancillary data.
+> 
+> cmsg_so_priority.sh script added to validate SO_PRIORITY behavior 
+> by creating VLAN device with egress QoS mapping and testing packet
+> priorities using flower filters. Verify that packets with different
+> priorities are correctly matched and counted by filters for multiple
+> protocols and IP versions.
+> 
+> Suggested-by: Ido Schimmel <idosch@idosch.org>
+> Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+> ---
+>  tools/testing/selftests/net/Makefile          |   1 +
+>  tools/testing/selftests/net/cmsg_sender.c     |  11 +-
+>  .../testing/selftests/net/cmsg_so_priority.sh | 151 ++++++++++++++++++
+>  3 files changed, 162 insertions(+), 1 deletion(-)
+>  create mode 100755 tools/testing/selftests/net/cmsg_so_priority.sh
+> 
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> index cb2fc601de66..f09bd96cc978 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -32,6 +32,7 @@ TEST_PROGS += ioam6.sh
+>  TEST_PROGS += gro.sh
+>  TEST_PROGS += gre_gso.sh
+>  TEST_PROGS += cmsg_so_mark.sh
+> +TEST_PROGS += cmsg_so_priority.sh
+>  TEST_PROGS += cmsg_time.sh cmsg_ipv6.sh
+>  TEST_PROGS += netns-name.sh
+>  TEST_PROGS += nl_netdev.py
+> diff --git a/tools/testing/selftests/net/cmsg_sender.c b/tools/testing/selftests/net/cmsg_sender.c
+> index 876c2db02a63..99b0788f6f0c 100644
+> --- a/tools/testing/selftests/net/cmsg_sender.c
+> +++ b/tools/testing/selftests/net/cmsg_sender.c
+> @@ -59,6 +59,7 @@ struct options {
+>  		unsigned int proto;
+>  	} sock;
+>  	struct option_cmsg_u32 mark;
+> +	struct option_cmsg_u32 priority;
+>  	struct {
+>  		bool ena;
+>  		unsigned int delay;
+> @@ -97,6 +98,8 @@ static void __attribute__((noreturn)) cs_usage(const char *bin)
+>  	       "\n"
+>  	       "\t\t-m val  Set SO_MARK with given value\n"
+>  	       "\t\t-M val  Set SO_MARK via setsockopt\n"
+> +	       "\t\t-P val  Set SO_PRIORITY via setsockopt\n"
+
+Not in the actual code
+
+> +	       "\t\t-Q val  Set SO_PRIORITY via cmsg\n"
+>  	       "\t\t-d val  Set SO_TXTIME with given delay (usec)\n"
+>  	       "\t\t-t      Enable time stamp reporting\n"
+>  	       "\t\t-f val  Set don't fragment via cmsg\n"
+> @@ -115,7 +118,7 @@ static void cs_parse_args(int argc, char *argv[])
+>  {
+>  	int o;
+>  
+> -	while ((o = getopt(argc, argv, "46sS:p:P:m:M:n:d:tf:F:c:C:l:L:H:")) != -1) {
+> +	while ((o = getopt(argc, argv, "46sS:p:P:m:M:n:d:tf:F:c:C:l:L:H:Q:")) != -1) {
+>  		switch (o) {
+>  		case 's':
+>  			opt.silent_send = true;
+> @@ -148,6 +151,10 @@ static void cs_parse_args(int argc, char *argv[])
+>  			opt.mark.ena = true;
+>  			opt.mark.val = atoi(optarg);
+>  			break;
+> +		case 'Q':
+> +			opt.priority.ena = true;
+> +			opt.priority.val = atoi(optarg);
+> +			break;
+>  		case 'M':
+>  			opt.sockopt.mark = atoi(optarg);
+>  			break;
+> @@ -252,6 +259,8 @@ cs_write_cmsg(int fd, struct msghdr *msg, char *cbuf, size_t cbuf_sz)
+>  
+>  	ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
+>  			  SOL_SOCKET, SO_MARK, &opt.mark);
+> +	ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
+> +			SOL_SOCKET, SO_PRIORITY, &opt.priority);
+>  	ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
+>  			  SOL_IPV6, IPV6_DONTFRAG, &opt.v6.dontfrag);
+>  	ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
+> diff --git a/tools/testing/selftests/net/cmsg_so_priority.sh b/tools/testing/selftests/net/cmsg_so_priority.sh
+> new file mode 100755
+> index 000000000000..016458b219ba
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/cmsg_so_priority.sh
+> @@ -0,0 +1,151 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +source lib.sh
+> +
+> +IP4=192.0.2.1/24
+> +TGT4=192.0.2.2
+> +TGT4_RAW=192.0.2.3
+> +IP6=2001:db8::1/64
+> +TGT6=2001:db8::2
+> +TGT6_RAW=2001:db8::3
+> +PORT=1234
+> +DELAY=4000
+> +TOTAL_TESTS=0
+> +FAILED_TESTS=0
+> +
+> +if ! command -v jq &> /dev/null; then
+> +    echo "Error: jq is not installed." >&2
+> +    exit 1
+
+use KSFT_ and in these cases skip rather than fail.
+
+> +fi
+> +
+> +check_result() {
+> +    ((TOTAL_TESTS++))
+> +    if [ "$1" -ne 0 ]; then
+> +        ((FAILED_TESTS++))
+> +    fi
+> +}
+> +
+> +cleanup()
+> +{
+> +    cleanup_ns $NS
+> +}
+> +
+> +trap cleanup EXIT
+> +
+> +setup_ns NS
+> +
+> +create_filter() {
+> +    local handle=$1
+> +    local vlan_prio=$2
+> +    local ip_type=$3
+> +    local proto=$4
+> +    local dst_ip=$5
+> +    local ip_proto
+> +
+> +    if [[ "$proto" == "u" ]]; then
+> +        ip_proto="udp"
+> +    elif [[ "$ip_type" == "ipv4" && "$proto" == "i" ]]; then
+> +        ip_proto="icmp"
+> +    elif [[ "$ip_type" == "ipv6" && "$proto" == "i" ]]; then
+> +        ip_proto="icmpv6"
+> +    fi
+> +
+> +    tc -n $NS filter add dev dummy1 \
+> +        egress pref 1 handle "$handle" proto 802.1q \
+> +        flower vlan_prio "$vlan_prio" vlan_ethtype "$ip_type" \
+> +        dst_ip "$dst_ip" ${ip_proto:+ip_proto $ip_proto} \
+> +        action pass
+> +}
+> +
+> +ip -n $NS link set dev lo up
+> +ip -n $NS link add name dummy1 up type dummy
+> +
+> +ip -n $NS link add link dummy1 name dummy1.10 up type vlan id 10 \
+> +    egress-qos-map 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
+> +
+> +ip -n $NS address add $IP4 dev dummy1.10
+> +ip -n $NS address add $IP6 dev dummy1.10
+> +
+> +ip netns exec $NS sysctl -wq net.ipv4.ping_group_range='0 2147483647'
+> +
+> +ip -n $NS neigh add $TGT4 lladdr 00:11:22:33:44:55 nud permanent \
+> +    dev dummy1.10
+> +ip -n $NS neigh add $TGT6 lladdr 00:11:22:33:44:55 nud permanent \
+> +    dev dummy1.10
+> +ip -n $NS neigh add $TGT4_RAW lladdr 00:11:22:33:44:66 nud permanent \
+> +    dev dummy1.10
+> +ip -n $NS neigh add $TGT6_RAW lladdr 00:11:22:33:44:66 nud permanent \
+> +    dev dummy1.10
+> +
+> +tc -n $NS qdisc add dev dummy1 clsact
+> +
+> +FILTER_COUNTER=10
+> +
+> +for i in 4 6; do
+> +    for proto in u i r; do
+> +        echo "Test IPV$i, prot: $proto"
+> +        for priority in {0..7}; do
+> +            if [[ $i == 4 && $proto == "r" ]]; then
+> +                TGT=$TGT4_RAW
+> +            elif [[ $i == 6 && $proto == "r" ]]; then
+> +                TGT=$TGT6_RAW
+> +            elif [ $i == 4 ]; then
+> +                TGT=$TGT4
+> +            else
+> +                TGT=$TGT6
+> +            fi
+> +
+> +            handle="${FILTER_COUNTER}${priority}"
+> +
+> +            create_filter $handle $priority ipv$i $proto $TGT
+> +
+> +            pkts=$(tc -n $NS -j -s filter show dev dummy1 egress \
+> +                | jq ".[] | select(.options.handle == ${handle}) | \
+> +                .options.actions[0].stats.packets")
+> +
+> +            if [[ $pkts == 0 ]]; then
+> +                check_result 0
+> +            else
+> +                echo "prio $priority: expected 0, got $pkts"
+> +                check_result 1
+> +            fi
+> +
+> +            ip netns exec $NS ./cmsg_sender -$i -Q $priority -d "${DELAY}" \
+> +	            -p $proto $TGT $PORT
+> +
+> +            pkts=$(tc -n $NS -j -s filter show dev dummy1 egress \
+> +                | jq ".[] | select(.options.handle == ${handle}) | \
+> +                .options.actions[0].stats.packets")
+> +            if [[ $pkts == 1 ]]; then
+> +                check_result 0
+> +            else
+> +                echo "prio $priority -Q: expected 1, got $pkts"
+> +                check_result 1
+> +            fi
+> +
+> +            ip netns exec $NS ./cmsg_sender -$i -P $priority -d "${DELAY}" \
+> +	            -p $proto $TGT $PORT
+> +
+> +            pkts=$(tc -n $NS -j -s filter show dev dummy1 egress \
+> +                | jq ".[] | select(.options.handle == ${handle}) | \
+> +                .options.actions[0].stats.packets")
+> +            if [[ $pkts == 2 ]]; then
+> +                check_result 0
+> +            else
+> +                echo "prio $priority -P: expected 2, got $pkts"
+> +                check_result 1
+> +            fi
+> +        done
+> +        FILTER_COUNTER=$((FILTER_COUNTER + 10))
+> +    done
+> +done
+> +
+> +if [ $FAILED_TESTS -ne 0 ]; then
+> +    echo "FAIL - $FAILED_TESTS/$TOTAL_TESTS tests failed"
+> +    exit 1
+> +else
+> +    echo "OK - All $TOTAL_TESTS tests passed"
+> +    exit 0
+> +fi
+> +
+> -- 
+> 2.43.0
+> 
+
+
 
