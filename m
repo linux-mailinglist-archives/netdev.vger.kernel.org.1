@@ -1,268 +1,178 @@
-Return-Path: <netdev+bounces-149381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BAEA9E55A8
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:40:37 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2122A9E55B6
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:42:05 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE2CD18834C0
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:40:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0D12288579
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DB78218837;
-	Thu,  5 Dec 2024 12:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A197C217673;
+	Thu,  5 Dec 2024 12:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Z4wio/5U"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="HmNEKWo+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E938217F3A
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 12:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14E01FA179
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 12:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733402432; cv=none; b=L3XDjU03Kcki+UgiML3xjfZS0I1JInOO87EmYDiOxodjU4rYbR14unpWCVXR+KL07JiMj0wFmaTbqJNFjdg4bjAzlk8TXOpChortnl5cymHMtckG96VwKiVrXYlgDHiBma/r2iX38XPkPrqtGZmRtOK9C9PAr+WCjsvr0Qeh5CI=
+	t=1733402518; cv=none; b=qeUnyadGU8Oc7ISUAWXd5jrcFZJ9YbXfeIcXGIrhTGoo5iAXor1w/JpvK0gvxgnAwPE8GV+0BkyR6t6VywGPKKKn7dqrViO+u/fAWvlE1Rn80gEmcM/bvG8dDdJ4Ug/EPnPE85ivKAs/No4+4jK9L6ogqxoriFSK+Ps3kTPSaOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733402432; c=relaxed/simple;
-	bh=8teM+tYFKC3gz+lI+q7ZDVC3v8srrnlmFPP4pk5HH+s=;
+	s=arc-20240116; t=1733402518; c=relaxed/simple;
+	bh=BNhaJs6CiOdZd+7hAJ8eeOI6tdwXFJAOWkrm+D4bzV0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Jz3JmVqDtLuRMJKU1pXEECr77dAUc5kYAg6GCwMQLHGXjfuHwVF6OR2/7g3JPEzGHy39hsc2eI9KP7bQ/l+BpR4kk22BSMtaSct4JTyBzYn2CRbOM1buD06T6sJcxLpLlG+cvqhnpS5hTu2vXDI7Yex3zGvL+Slh3MKU0lZq9UE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=Z4wio/5U; arc=none smtp.client-ip=209.85.215.170
+	 To:Cc:Content-Type; b=jGy548qINRXVpfrKbo/b2DopS1R4vQ+od9GrwTg0TzHHokbWKDwzCTDWrkoYPqrxSz940+7nNMsNSAjZccFmyW5VIxfdRzxuqhNMf0lZtRhGuH6ZVnEVQE+atc707hC1KicylWLlA3t8azB1Fpw/pROZqMjxglh4AJ95AQ+UvNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=HmNEKWo+; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7ee11ff7210so730981a12.1
-        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 04:40:29 -0800 (PST)
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7f46d5d1ad5so711350a12.3
+        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 04:41:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1733402429; x=1734007229; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1733402516; x=1734007316; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=p3Rr39nApyxiB7ik1EiA3DIS+dkPqrRM18nbLw6gT9E=;
-        b=Z4wio/5U5p3+5wYKFSuAv0BRP4K47pAIeKdBsLZssXbWmxS/zc7kGiVt9a7b30kU87
-         z5xqA0eBAdvrSvuY475wSeT7x+vmnvN5ddgpwzk5z/WewypGun5ATitI3UOC/c39MVhX
-         fFuPpmYuS/iPlRk8BBuxETl+2fdPKMP8K+dfMkXjX7RbOAksnH1N8RZ2JkY+vSFmCYAF
-         gD9M1TkNF8oJZcu1hUk2tBJ31B3uCb850KEDyR/t3UZv/t0Qa3CPJX37Jv298HidR76R
-         Sjbwllm39ftGdrHx5bOIl7EGt5CJC7Qvhy3ABmszmihhvz5H9qEY+pIx9tLS9AN94Zx5
-         eNjA==
+        bh=5aXJhFe+Fkc/ZHmNrbnqLxgMJow0Ch+8KNQzyLfTpLs=;
+        b=HmNEKWo+EdjSk0dtYIpNarQupiSGgwdrWKROQ5ZEBnS0YLtSF96qtkRiBxOIsjzOuK
+         tYE4QfJCrKuPMAVmUYOOymVzBxvgj6dJYmuYSA/X/fq8FAevyjlWS2pjR/PrlOlyYrAB
+         /LwQ5K21hH8weL+0LCs15Cxhhg0/ZneuLU/SDda44xVJW54nMREJbArY+4l4qP6g36dM
+         qyivVHXJqCrngscjjzLoLBxvRW5mI/TgOvg+5HmVWYwrWkhFFgGl08tGGkeIZ5CO4/6P
+         njK2SYODDxhm3FgKm3nw7q9mEXfSVIbxAZpwhCYQTuELuy1pJT44Xyr/BbdmOD2E4JsO
+         GvUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733402429; x=1734007229;
+        d=1e100.net; s=20230601; t=1733402516; x=1734007316;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=p3Rr39nApyxiB7ik1EiA3DIS+dkPqrRM18nbLw6gT9E=;
-        b=P1S3RDgTQPtj9Wn1yBlGLQXZKYDMEsR3ZeUB6rTvGFQ9ucggmHe0xww0wkSm5b8ywz
-         Nzq2sY7HBq0o5a0HmjDolC1r8x8p35eSxQUzmJZuYdg8FHg2ZBg9UFfgFW87xL/Mwg1V
-         chpKEY2vBNYsMfkRIl9G12T3liIwnDtcvdXXCnL6M5vZEMFsanlr8mGNhVv8IuL+CkJs
-         kYcQVVWofrPOu9LRJOBm8iCOIas3aQG1xcaH7aQf3RHb2TcFqHbtLSHHUoLHpt5BUdAh
-         Y1JrZCxdKBkyaxGPGEvEGocmv2T/IeEzL2kSbe4zhclvBsiN22RcwX8A4oBSGQH2VADG
-         tB8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUblciiaFdI2wwdO9V+F8AbQluf/R3vw8zwIgOTmvZOKllQTNGzai1nQvKo6RJIzks0il6ynoI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJ8qkjG6wLwRcKDatXxBb5gqpCO46n8Yolbx+hM4LrD+UYZVTb
-	c6FGEhFimPkxj32BCcIEcVN8OmL97IaGQ3FKGFTrqS6G0rrSyj3hM7zd0kPcYWUS3BtCdI+4k/t
-	ttyTdjzuEx5xNWnH7PmnErE6lUFZ7wnCxqrBg
-X-Gm-Gg: ASbGncvhQEkEU4/QLwIJspWPpFWCZjOigbuqCV7ftDSz8XL6qpO3FEe5N7dvTJT1Tc8
-	mFUl3TthypuocrdGgaAsjp7b48jLB0w==
-X-Google-Smtp-Source: AGHT+IE0sx1c3w3bHsB7XeDnk6EsrFSpfu/VUPUGIjz9glqTFeQY3gehshIFrU8Snd0DouWY3r5xw5RRlhOvpqyCX9w=
-X-Received: by 2002:a05:6a20:7485:b0:1d9:2ba5:912b with SMTP id
- adf61e73a8af0-1e1653f3db9mr15920950637.36.1733402429294; Thu, 05 Dec 2024
- 04:40:29 -0800 (PST)
+        bh=5aXJhFe+Fkc/ZHmNrbnqLxgMJow0Ch+8KNQzyLfTpLs=;
+        b=gNKp8OY5dAiO3KKr6ZIkg0zq/KsQ+0vosv1ETA/PIjJe3NgverVlFf+7X7aMHOUojF
+         ExPV/KSE0eZHN0Tm/J5oWDVt4WCBE8U5PDqhhk4x4JcyKOEAN6M59DCBS8dTOFY60E1l
+         HWyzWrNmb8z9kQeKFM2R9KG3YFKv+CRrhPELgn4YvzI1ERvccU6JM0Cal3mzZq0tthnC
+         ThM2iG2GvftaQFl8MZaZz4gy1uOj80VEy+TuKCw1Ojw5Qsnsw/N7glBVZBGWkCV8YIiG
+         CisCuE91TTWc4IlGnK6fp2OLTp4zjNTAPoQZQ36+4Uvemd4S07jirPrehHFJHf/+Ivu6
+         8aSg==
+X-Forwarded-Encrypted: i=1; AJvYcCWz9l5tvSzoaIXexjvNKCO5uur5aSQiibK3Shlunhm5qb7Gdp6unDTKsYy6SYmzD3/8tNg/htg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMuC+3BSLgwK8VY4WLoQPojWnyA1tAcLoM+hYkPy3KTWvRRB8R
+	qOYXK1KswfaBYH5dy2yLikAEktROP20pPk629DDHo+Dl90tdNotzNK8/owvCaX3fKIXbnAQmiNE
+	IIO//HCUCcwpV2pDVrzjrcmFUkLkfKUvRkSDS
+X-Gm-Gg: ASbGncuptxnAWw4BmTrY73bRhEe+FvnFgJBKSdd/GJU2PXZhzmAuF9D11hopbCcbbCq
+	JDzZHKTdkhZuklQ/lUha7fYnZ0MxFtg==
+X-Google-Smtp-Source: AGHT+IGqHv0JpW1eJ6ICz/Zq+CmhpbP7WfJ0Fq5xRXEXEvAlm2Uah35cYl+he1CTRKKIgdO3vKSemVHwsH4GkWq7XxM=
+X-Received: by 2002:a17:90b:33cd:b0:2ee:9d49:3ae6 with SMTP id
+ 98e67ed59e1d1-2ef011fb9d8mr14429048a91.10.1733402516128; Thu, 05 Dec 2024
+ 04:41:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241202191312.3d3c8097@kernel.org> <20241204122929.3492005-1-martin.ottens@fau.de>
-In-Reply-To: <20241204122929.3492005-1-martin.ottens@fau.de>
+References: <20241204171950.89829-1-edumazet@google.com> <875xny9wbx.fsf@toke.dk>
+In-Reply-To: <875xny9wbx.fsf@toke.dk>
 From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 5 Dec 2024 07:40:17 -0500
-Message-ID: <CAM0EoMnTTQ-BtS0EBqB-5yNAAmvk9r67oX7n7S0Ywhc23s49EQ@mail.gmail.com>
-Subject: Re: [PATCH v2] net/sched: netem: account for backlog updates from
- child qdisc
-To: Martin Ottens <martin.ottens@fau.de>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Thu, 5 Dec 2024 07:41:45 -0500
+Message-ID: <CAM0EoMksqZLU9yu7x3kaueK5OPEjHKQgvYi_kDvMjD4OEknaqQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] net_sched: sch_fq: add three drop_reason
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 4, 2024 at 7:29=E2=80=AFAM Martin Ottens <martin.ottens@fau.de>=
- wrote:
+On Thu, Dec 5, 2024 at 6:57=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <to=
+ke@redhat.com> wrote:
 >
-> In general, 'qlen' of any classful qdisc should keep track of the
-> number of packets that the qdisc itself and all of its children holds.
-> In case of netem, 'qlen' only accounts for the packets in its internal
-> tfifo. When netem is used with a child qdisc, the child qdisc can use
-> 'qdisc_tree_reduce_backlog' to inform its parent, netem, about created
-> or dropped SKBs. This function updates 'qlen' and the backlog statistics
-> of netem, but netem does not account for changes made by a child qdisc.
-> 'qlen' then indicates the wrong number of packets in the tfifo.
-> If a child qdisc creates new SKBs during enqueue and informs its parent
-> about this, netem's 'qlen' value is increased. When netem dequeues the
-> newly created SKBs from the child, the 'qlen' in netem is not updated.
-> If 'qlen' reaches the configured sch->limit, the enqueue function stops
-> working, even though the tfifo is not full.
+> Eric Dumazet <edumazet@google.com> writes:
 >
-> Reproduce the bug:
-> Ensure that the sender machine has GSO enabled. Configure netem as root
-> qdisc and tbf as its child on the outgoing interface of the machine
-> as follows:
-> $ tc qdisc add dev <oif> root handle 1: netem delay 100ms limit 100
-> $ tc qdisc add dev <oif> parent 1:0 tbf rate 50Mbit burst 1542 latency 50=
-ms
+> > Add three new drop_reason, more precise than generic QDISC_DROP:
+> >
+> > "tc -s qd" show aggregate counters, it might be more useful
+> > to use drop_reason infrastructure for bug hunting.
+> >
+> > 1) SKB_DROP_REASON_FQ_BAND_LIMIT
+> >    Whenever a packet is added while its band limit is hit.
+> >    Corresponding value in "tc -s qd" is bandX_drops XXXX
+> >
+> > 2) SKB_DROP_REASON_FQ_HORIZON_LIMIT
+> >    Whenever a packet has a timestamp too far in the future.
+> >    Corresponding value in "tc -s qd" is horizon_drops XXXX
+> >
+> > 3) SKB_DROP_REASON_FQ_FLOW_LIMIT
+> >    Whenever a flow has reached its limit.
+> >    Corresponding value in "tc -s qd" is flows_plimit XXXX
+> >
+> > Tested:
+> > tc qd replace dev eth1 root fq flow_limit 10 limit 100000
+> > perf record -a -e skb:kfree_skb sleep 1; perf script
+> >
+> >       udp_stream   12329 [004]   216.929492: skb:kfree_skb: skbaddr=3D0=
+xffff888eabe17e00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
+t+0x9d9 reason: FQ_FLOW_LIMIT
+> >       udp_stream   12385 [006]   216.929593: skb:kfree_skb: skbaddr=3D0=
+xffff888ef8827f00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
+t+0x9d9 reason: FQ_FLOW_LIMIT
+> >       udp_stream   12389 [005]   216.929871: skb:kfree_skb: skbaddr=3D0=
+xffff888ecb9ba500 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
+t+0x9d9 reason: FQ_FLOW_LIMIT
+> >       udp_stream   12316 [009]   216.930398: skb:kfree_skb: skbaddr=3D0=
+xffff888eca286b00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
+t+0x9d9 reason: FQ_FLOW_LIMIT
+> >       udp_stream   12400 [008]   216.930490: skb:kfree_skb: skbaddr=3D0=
+xffff888eabf93d00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
+t+0x9d9 reason: FQ_FLOW_LIMIT
+> >
+> > tc qd replace dev eth1 root fq flow_limit 100 limit 10000
+> > perf record -a -e skb:kfree_skb sleep 1; perf script
+> >
+> >       udp_stream   18074 [001]  1058.318040: skb:kfree_skb: skbaddr=3D0=
+xffffa23c881fc000 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
+t+0x9d9 reason: FQ_BAND_LIMIT
+> >       udp_stream   18126 [005]  1058.320651: skb:kfree_skb: skbaddr=3D0=
+xffffa23c6aad4000 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
+t+0x9d9 reason: FQ_BAND_LIMIT
+> >       udp_stream   18118 [006]  1058.321065: skb:kfree_skb: skbaddr=3D0=
+xffffa23df0d48a00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
+t+0x9d9 reason: FQ_BAND_LIMIT
+> >       udp_stream   18074 [001]  1058.321126: skb:kfree_skb: skbaddr=3D0=
+xffffa23c881ffa00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
+t+0x9d9 reason: FQ_BAND_LIMIT
+> >       udp_stream   15815 [003]  1058.321224: skb:kfree_skb: skbaddr=3D0=
+xffffa23c9835db00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
+t+0x9d9 reason: FQ_BAND_LIMIT
+> >
+> > tc -s -d qd sh dev eth1
+> > qdisc fq 8023: root refcnt 257 limit 10000p flow_limit 100p buckets 102=
+4 orphan_mask 1023
+> >  bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1 weights 589824 196608 =
+65536 quantum 18Kb
+> >  initial_quantum 92120b low_rate_threshold 550Kbit refill_delay 40ms
+> >  timer_slack 10us horizon 10s horizon_drop
+> >  Sent 492439603330 bytes 336953991 pkt (dropped 61724094, overlimits 0 =
+requeues 4463)
+> >  backlog 14611228b 9995p requeues 4463
+> >   flows 2965 (inactive 1151 throttled 0) band0_pkts 0 band1_pkts 9993 b=
+and2_pkts 0
+> >   gc 6347 highprio 0 fastpath 30 throttled 5 latency 2.32us flows_plimi=
+t 7403693
+> >  band1_drops 54320401
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
 >
-> Send bulk TCP traffic out via this interface, e.g., by running an iPerf3
-> client on the machine. Check the qdisc statistics:
-> $ tc -s qdisc show dev <oif>
+> Nice to see qdisc-specific drop reasons - guess I should look at this
+> for sch_cake as well!
 >
-> tbf segments the GSO SKBs (tbf_segment) and updates the netem's 'qlen'.
-> The interface fully stops transferring packets and "locks". In this case,
-> the child qdisc and tfifo are empty, but 'qlen' indicates the tfifo is at
-> its limit and no more packets are accepted.
->
+> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-Would be nice to see the before and after (your change) output of the
-stats to illustrate
-
-> This patch adds a counter for the entries in the tfifo. Netem's 'qlen' is
-> only decreased when a packet is returned by its dequeue function, and not
-> during enqueuing into the child qdisc. External updates to 'qlen' are thu=
-s
-> accounted for and only the behavior of the backlog statistics changes. As
-> in other qdiscs, 'qlen' then keeps track of  how many packets are held in
-> netem and all of its children. As before, sch->limit remains as the
-> maximum number of packets in the tfifo. The same applies to netem's
-> backlog statistics.
-> (Note: the 'backlog' byte-statistic of netem is incorrect in the example
-> above even after the patch is applied due to a bug in tbf. See my
-> previous patch ([PATCH] net/sched: tbf: correct backlog statistic for
-> GSO packets)).
->
-> Signed-off-by: Martin Ottens <martin.ottens@fau.de>
-
-Fixes missing - probably since 2.6.x. Stephen?
-
-Your fix seems reasonable but I am curious: does this only happen with
-TCP? If yes, perhaps the
-GSO handling maybe contributing?
-Can you run iperf with udp and see if the issue shows up again? Or
-ping -f with size 1024.
-You can slow down tbf for example with something like: tbf rate 20kbit
-buffer 1600 limit 3000
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
 cheers,
 jamal
-
-
-> ---
->  net/sched/sch_netem.c | 22 ++++++++++++++++------
->  1 file changed, 16 insertions(+), 6 deletions(-)
->
-> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> index fe6fed291a7b..71ec9986ed37 100644
-> --- a/net/sched/sch_netem.c
-> +++ b/net/sched/sch_netem.c
-> @@ -79,6 +79,8 @@ struct netem_sched_data {
->         struct sk_buff  *t_head;
->         struct sk_buff  *t_tail;
->
-> +       u32 t_len;
-> +
->         /* optional qdisc for classful handling (NULL at netem init) */
->         struct Qdisc    *qdisc;
->
-> @@ -383,6 +385,7 @@ static void tfifo_reset(struct Qdisc *sch)
->         rtnl_kfree_skbs(q->t_head, q->t_tail);
->         q->t_head =3D NULL;
->         q->t_tail =3D NULL;
-> +       q->t_len =3D 0;
->  }
->
->  static void tfifo_enqueue(struct sk_buff *nskb, struct Qdisc *sch)
-> @@ -412,6 +415,7 @@ static void tfifo_enqueue(struct sk_buff *nskb, struc=
-t Qdisc *sch)
->                 rb_link_node(&nskb->rbnode, parent, p);
->                 rb_insert_color(&nskb->rbnode, &q->t_root);
->         }
-> +       q->t_len++;
->         sch->q.qlen++;
->  }
->
-> @@ -518,7 +522,7 @@ static int netem_enqueue(struct sk_buff *skb, struct =
-Qdisc *sch,
->                         1<<get_random_u32_below(8);
->         }
->
-> -       if (unlikely(sch->q.qlen >=3D sch->limit)) {
-> +       if (unlikely(q->t_len >=3D sch->limit)) {
->                 /* re-link segs, so that qdisc_drop_all() frees them all =
-*/
->                 skb->next =3D segs;
->                 qdisc_drop_all(skb, sch, to_free);
-> @@ -702,8 +706,8 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sc=
-h)
->  tfifo_dequeue:
->         skb =3D __qdisc_dequeue_head(&sch->q);
->         if (skb) {
-> -               qdisc_qstats_backlog_dec(sch, skb);
->  deliver:
-> +               qdisc_qstats_backlog_dec(sch, skb);
->                 qdisc_bstats_update(sch, skb);
->                 return skb;
->         }
-> @@ -719,8 +723,7 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sc=
-h)
->
->                 if (time_to_send <=3D now && q->slot.slot_next <=3D now) =
-{
->                         netem_erase_head(q, skb);
-> -                       sch->q.qlen--;
-> -                       qdisc_qstats_backlog_dec(sch, skb);
-> +                       q->t_len--;
->                         skb->next =3D NULL;
->                         skb->prev =3D NULL;
->                         /* skb->dev shares skb->rbnode area,
-> @@ -747,16 +750,21 @@ static struct sk_buff *netem_dequeue(struct Qdisc *=
-sch)
->                                         if (net_xmit_drop_count(err))
->                                                 qdisc_qstats_drop(sch);
->                                         qdisc_tree_reduce_backlog(sch, 1,=
- pkt_len);
-> +                                       sch->qstats.backlog -=3D pkt_len;
-> +                                       sch->q.qlen--;
->                                 }
->                                 goto tfifo_dequeue;
->                         }
-> +                       sch->q.qlen--;
->                         goto deliver;
->                 }
->
->                 if (q->qdisc) {
->                         skb =3D q->qdisc->ops->dequeue(q->qdisc);
-> -                       if (skb)
-> +                       if (skb) {
-> +                               sch->q.qlen--;
->                                 goto deliver;
-> +                       }
->                 }
->
->                 qdisc_watchdog_schedule_ns(&q->watchdog,
-> @@ -766,8 +774,10 @@ static struct sk_buff *netem_dequeue(struct Qdisc *s=
-ch)
->
->         if (q->qdisc) {
->                 skb =3D q->qdisc->ops->dequeue(q->qdisc);
-> -               if (skb)
-> +               if (skb) {
-> +                       sch->q.qlen--;
->                         goto deliver;
-> +               }
->         }
->         return NULL;
->  }
-> --
-> 2.39.5
->
 
