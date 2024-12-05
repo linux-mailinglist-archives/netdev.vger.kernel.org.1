@@ -1,204 +1,150 @@
-Return-Path: <netdev+bounces-149508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A38D49E5EA8
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 20:16:25 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A62429E5EBD
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 20:25:42 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F180169879
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 19:16:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53C402864C3
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 19:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BCA1225788;
-	Thu,  5 Dec 2024 19:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61AD822D4DB;
+	Thu,  5 Dec 2024 19:25:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AC1yKYF0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HWG5Ftnz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358BE18FDAA;
-	Thu,  5 Dec 2024 19:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16E582C60;
+	Thu,  5 Dec 2024 19:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733426181; cv=none; b=Rij2HNWLKGjs4m9btd5ZGG7FpioAD+RVkgWri2Rd30eiNpppkSvHoY2HsgZh/LSxYmnJdqVoM8CKdaCuWt0ryPajU6ehr39FxRLOqrUXgOBSUYWWXrHkh/3BkxAGb9n0D0gDyRngj9xr2rsMXemiKP49JFktLq8uQMh9Se7kQEY=
+	t=1733426738; cv=none; b=eCgqlfKSiQ7+ttQ447n+LbrWgwM08QXNRPA4t6eVf3fSUJHWFE2yxEFJrP2SJrtV7ye2yw2B0zgYn+sap9dUXBAHh6Oi6XBH9mR/A6ozuYstHNXChoxdY6hlGcrt4klIj5o4tnSdKDX294UfaPhhL4Rwc8MxqGsOXDwUc7EoJSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733426181; c=relaxed/simple;
-	bh=SmBhLmmKb3/JpxnOaGqkc1Z6xWAgvghhCqLwDySUaxY=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=neFkCl3qLf2CIg0GKzq/SCAeYlVtLy+CA94wTVSlifcMtzI7giW+PVLuDitrT2/ECtEps1Ad3d4P2uq802k5dfvAHK9hY2K5PPEscW9BiRf4jjhnKY+8Wvn959+qmYa3gcJ5G0yAVa32W1wfj9ZHCN2PQHO/uUhny9qC0bBY9Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AC1yKYF0; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1733426738; c=relaxed/simple;
+	bh=lzRObk1OQda7uwxIVMTX2lnVJNKKZqxd7bc76bx7fwM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=np7DK+yWuLkdQGecoGoTc3wzItkafztoP2w8YOTYMzIVAyLfkRKLzhbQ+HsoSLOhBzwSRwfhbjp4aAS65ucAF4oxjwSA2HDwu1lleY4CecKJFKH99PLDf0LlR1NVoxKA5ZnOWPAcbRn3W0vHIyqTbQmrfbBqtP6eS4tiMlV8VVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HWG5Ftnz; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-434a95095efso14928315e9.0;
-        Thu, 05 Dec 2024 11:16:19 -0800 (PST)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-215c54e5f24so12124245ad.2;
+        Thu, 05 Dec 2024 11:25:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733426178; x=1734030978; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=MY4w8h/Y2faTte8A8zuwQmkux3tQ9Zf0xj0qV+I4U4Q=;
-        b=AC1yKYF0pe7oQBTQ7Fi4QAASYqmW+wz1aHSdNl3V1e5ALCA726vZnYXvTR/vkynhza
-         rUOt6UVfcIC6ZGrsXpGnVPudEgyZOU3IwE5C8s4cEbQkTcRf0xRSwodfXwNAinuDQ7UO
-         x+e1INni3oDVTlQSV5w3XXnnaf3Dk8M4wU3nNoHt5F7R2C+dftoonODlHtxo95KEdRIy
-         iPeY7LtolkP4zIkn0KQS8GoWSb2+wpFdWkMkJ/3ueQFg/fuyVY2G3IRrLpJWY6cWyTH5
-         OzpUyMKkZWZCzrfEK/YWU5lzfR7tON3fdL1d7kAgr9M+Ij2PfN+XmksKSmIMRhi2xtXq
-         /zsg==
+        d=gmail.com; s=20230601; t=1733426736; x=1734031536; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=K9jjQW8IdRZWXe/1Rghl+cVLFwOuY8dBG/5fqWQmio8=;
+        b=HWG5FtnzKePLGWU5vl5gwIqaCBw+zz540iZrjCC9Sq8XeqnwZ1gkk+mfTExIbevMMV
+         WvaDOcvxr96GnFXQZHTne8dFhmuvcwcPTu0E+MYEqY8Opqdc7hgB+Xfp/FMCxg94NSL0
+         kysKj9C6sD4wWfK8O5/WeV6zZMZrsDPsFY533sKIMlXHQBc8IY5eGtpXmI7674N3SpY4
+         1x/4M/KSkXBcAz9LfZxS74Ksqa6x2WhlMm4xWzMNc/Pw4Zt3C2eQHrMJ2GUsYbXrUvlY
+         RNo76Vk73yYkZX4wAP4ONWqCqPxOjYwArASK0AhCgNdRpxZ9RQM1tl6sMYc+TjNcWnq7
+         mzXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733426178; x=1734030978;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1733426736; x=1734031536;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MY4w8h/Y2faTte8A8zuwQmkux3tQ9Zf0xj0qV+I4U4Q=;
-        b=plC+R8EWjQtgOvKzLhQxazEaclAWyyl5EK5uFuX48inw3Q1zZ3YGTjsnzC6AKzNjYN
-         O2bUsWYiDz1CeLw3XW25xXNgWkKM0H884Yrk98Hzv5/NTt5Ij7mUgWhjGa1oGAakGx1U
-         Mbyd/D2Ue2/JU0CWMrVHh15maZcap2qCYsBhm/IRcfjnq4eicZ0FpZJ/+L2agmqfvVr/
-         OCjnMSLpINIz8QFE76YMdYhTozRZrw/txifU86+VfXLX7QBZ9QESa/j24UHuNY+OQELj
-         YMdvP0EJamS9VQR+U2GIuemWy85X7Y7DGE8J9dMVxp8qXeErLdYYVXTz5nGrqgxJVCyu
-         +obg==
-X-Forwarded-Encrypted: i=1; AJvYcCUNy5rwCWCR7m9g04D8dqVtVH/kbFpxLRxP6f3s+9ZoP9CxLVC4U/6AERuLMyKUeWvTyFuc5fKKjhJl@vger.kernel.org, AJvYcCUrx8NLATuBhCe5SsuzN9TFOxtrQ0OR5tfcfwTpvjbPhgZRU9iimjXO84tiwJBpeLGWfl9IQp63@vger.kernel.org, AJvYcCV45KJxPOwHPd4+1Fi+5mOWVyoS0UBolApU6c4U6PeCf9629uc/1JObhRDhyubpj4DZ7HxV9uwbWKMWqXcu@vger.kernel.org
-X-Gm-Message-State: AOJu0YwU10Mx4QH6vmFTDNHof15ybmQL1ctcumt2yJJvxU1xSxi/kWeK
-	PS+TUEuMUW52Mjnn7PJADOqD4u9N2ltfYQsiFsgy757psXEQdSYL
-X-Gm-Gg: ASbGncv4c2gZ0Nj7sw+615jQLAGVVZBKlhLF+f3dSWJFf4nid2pnqWB0wSvrxYK9ZVE
-	FBNfJJhVZcoFSXNuBF0sfJTqrFMwC0mk0x4QbyHQimqUtA9h+eyM+i3vT9k4RGQQgFkjI3uo54i
-	jcdqZvQdnYyrMVchyRX1yHiTNkdxWj2iXNmDQhuTEQ75lMJBZKac4HbSMkUGcgaXfYrEZTIijKb
-	03XDloyi+lxkokNFNdojVvIIWIbjTXpqkzre7dTBsStqpcWDAJ9sb4+2cojlfYdylCAO6znM6zB
-	wtuAuA==
-X-Google-Smtp-Source: AGHT+IHZRbJn+9HtrGJ38A8jyPTzo+TDn7EX7QFEByqYqphbe67U5+K0SKR8aakCPuxnrCyTXLoJ7g==
-X-Received: by 2002:a5d:6c66:0:b0:385:e45b:92a2 with SMTP id ffacd0b85a97d-3861bb5c4eamr3657331f8f.7.1733426178337;
-        Thu, 05 Dec 2024 11:16:18 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d5280120sm68799815e9.20.2024.12.05.11.16.17
+        bh=K9jjQW8IdRZWXe/1Rghl+cVLFwOuY8dBG/5fqWQmio8=;
+        b=IXSn4GlDPP3fd7t3yzj7PkjqpVc9X7LbyJwStWe7mVFT2EgRVXbr4X32Qnwc8QsRBT
+         yZlpe5CIgJaB6QOkfNbuSg0Etg2q6LQ9nDUg7UU2oSL5PO2GyP98j2+4FL05OTlCnXHW
+         8LQ0sBg+m5uZtsu6XPGXxQZMuP4iXH9JAsFo3AZsBfPi6IYig6iXwwkJ0WmWe7P3clQc
+         sVrgqmLhjVz5PiKmGfC42S3ZjJtYDDxe9Q7BNaiWrt8ASkbWwZiWH9fO+9pzekoX+Ggq
+         +oY9C0mIW0bt6eLaYt7fsNK62yx5pvWAByBw1w5jRFazWiVMOqi4k+DjGbgYSoC+YniQ
+         vfsA==
+X-Forwarded-Encrypted: i=1; AJvYcCUWwfdw9I4Rf+y3Zoj2wKA8W2xZaRoUqbHUvgUhF0y8zt85zdOUKsAM4ZSzQvTGhInJOZAHhiqcJXNSSvsnxWCn@vger.kernel.org, AJvYcCUkNvyca9M71vqd9MDDIfa4AM3e74TxB4ozzqU+nupCJmeKb/UsJxQdt7uOGmPXRdbpAi8=@vger.kernel.org, AJvYcCV+bwuslJ7yBbVFId3PkPsFH6vJyU5pFWiV8MGJku0UwsPOs8i9rSzMlnxvY9Ihyhd5qHlnJMGj@vger.kernel.org, AJvYcCWNR5h/Vr5Yq2DU2IqBiNH7VmcRWc1jcDxZ5qQMI/mfcOs7dBonFCmju2s21uUx6i74xmN9FMimRCgEaTy6@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSs0mChE6Mr9UK77ud2T/VWXaMBZioL8X0wPYAyMBuOfmHNT7C
+	it/Pwi2IT969jI+S8ETdFpJeCQJt3f0UUwkeugGR6v+tZlVJ+YE=
+X-Gm-Gg: ASbGncvGlGPgwTfQD9S4B+gVXapo1RuMRiAL+PadMA2TpAoqjUfevOh6MrsQ1dFtTbu
+	GSd5+816giNz6q8eEmP46j1NnXYFkzff/8NrZgi1K8YMFJFW4adS8sv4+XMc31kLPRPWJloYbOX
+	xXmjk5ZiAaKpLsLnhRkgCo7pr3xToMyf4ZFyZWaneqhgw+2aNmxcSo4qzUdOkov4Z/32r6DKWCw
+	lU+lAmoHRuwJ2OMqk2aCUWz2KhKRGNZgaHB9blo10bCKBJnqw==
+X-Google-Smtp-Source: AGHT+IEPVDXET7pdSwy1/WJhUkp6RadfluLFGLOsExuVjvgUir+tZD5xuakR6jagV/Zw7Ox1Fdi4JQ==
+X-Received: by 2002:a17:902:cecc:b0:215:b468:1a33 with SMTP id d9443c01a7336-21614d1ed2fmr924575ad.4.1733426736147;
+        Thu, 05 Dec 2024 11:25:36 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215f8ef9485sm15926125ad.157.2024.12.05.11.25.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2024 11:16:17 -0800 (PST)
-Message-ID: <6751fc01.7b0a0220.1f425b.5416@mx.google.com>
-X-Google-Original-Message-ID: <Z1H7_Z7UsSZ5GEhY@Ansuel-XPS.>
-Date: Thu, 5 Dec 2024 20:16:13 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v9 3/4] net: dsa: Add Airoha AN8855 5-Port
- Gigabit DSA Switch driver
-References: <20241205145142.29278-1-ansuelsmth@gmail.com>
- <20241205145142.29278-4-ansuelsmth@gmail.com>
- <20241205170629.ww7qcvgbqdf5ipcj@skbuf>
- <6751e22d.050a0220.3435c6.57de@mx.google.com>
- <20241205183403.zla5syfzj3yrinwj@skbuf>
+        Thu, 05 Dec 2024 11:25:35 -0800 (PST)
+Date: Thu, 5 Dec 2024 11:25:35 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: "Song, Yoong Siang" <yoong.siang.song@intel.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH bpf-next 1/1] selftests/bpf: Enable Tx hwtstamp in
+ xdp_hw_metadata
+Message-ID: <Z1H-L3BkxnjVr5Qy@mini-arch>
+References: <20241204115715.3148412-1-yoong.siang.song@intel.com>
+ <Z1B50w1jzHFt-LuA@mini-arch>
+ <PH0PR11MB58309455A6E72493687D0515D8302@PH0PR11MB5830.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241205183403.zla5syfzj3yrinwj@skbuf>
+In-Reply-To: <PH0PR11MB58309455A6E72493687D0515D8302@PH0PR11MB5830.namprd11.prod.outlook.com>
 
-On Thu, Dec 05, 2024 at 08:34:03PM +0200, Vladimir Oltean wrote:
-> On Thu, Dec 05, 2024 at 06:26:01PM +0100, Christian Marangi wrote:
-> > Concept looks handy, ideally I can just assign one ID for each port
-> > like:
-> > port 1 -> FIB 1
-> > port 2 -> FIB 1
-> > port 3 -> FIB 2
-> > 
-> > Question:
-> > Ports of the same bridge should have the same FIB?
+On 12/05, Song, Yoong Siang wrote:
+> On Wednesday, December 4, 2024 11:49 PM, Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> >On 12/04, Song Yoong Siang wrote:
+> >> Set tx_type to HWTSTAMP_TX_ON to enable hardware timestamping for all
+> >> outgoing packets.
+> >>
+> >> Besides, set XDP_UMEM_TX_METADATA_LEN flag to reserve tx_metadata_len bytes
+> >> of per-chunk metadata.
+> >
+> >XDP_UMEM_TX_METADATA_LEN is missing after d5e726d9143c ("xsk: Require
+> >XDP_UMEM_TX_METADATA_LEN to actuate tx_metadata_len"), so that make
+> >sense. Maybe add a fixes tag?
+> >
 > 
-> The answer, as well as many other explanations, is under the "Address
-> databases" section of Documentation/networking/dsa/dsa.rst. Please read
-> it through before starting to implement anything.
->
-
-Ok sorry, will read.
-
-> > What I need to check is how the switch handle this for learning. Does
-> > the switch correctly create FDB entry with the right FIB?
+> Sure. I will add the fixes tag and submit with "PATCH bpf" prefix
+> in next version.
 > 
-> You're asking me how an8855 behaves? I have no idea, I never interacted
-> with it :-|
+> >And I don't see mlx5 looking at HWTSTAMP_TX anywhere in the drivers,
+> >so I'm assuming that's why I didn't need HWTSTAMP_TX_ON during my tests..
+> >Which device are you testing against? I do see some hwts_tx_en
+> >checks in the stfmmac at least... Can you add these details to the
+> >commit message and respin?
+> >
 > 
-
-Noo it wasn't a question for you, it was really to describe a problem
-that might be present if the switch doesn't account for that and that I
-need to check.
-
-> The idea as far as the DSA API is concerned would be to learn addresses
-> in the bridge database (DSA_DB_BRIDGE) that the user port is configured
-> for, and not learn any addresses in the port-private database (DSA_DB_PORT).
+> I am testing on stmmac and igc drivers.
+> You are right, stmmac needs it for hwts_tx_en check.
+> Besides, igc needs it to set IGC_RING_FLAG_TX_HWTSTAMP flag.
 > 
-> > If that's not the case then I think assisted_learning is needed and HW
-> > Learn can't be used?
+> Without this patch, user will need to manually enable tx hwts using
+> command: sudo hwstamp_ctl -i eth0 -t 1 -r 1
+> after start xdp_hw_metadata.
 > 
-> ds->assisted_learning_on_cpu_port applies, as suggested by its name,
-> only on the CPU port. On user ports, address learning should work normally.
+> Therefore, adding HWTSTAMP_TX_ON is not a bug fix solution.
+> I will separate this as another new patch to "PATCH bpf-next"
+> and provide detail in commit message.
 > 
-> As you will find in the documentation, the CPU port is not like a user
-> port, in the sense that it is not configured to service a single address
-> database, but all of them. So, source learning on the CPU port will not
-> work unless the switch knows which address database should each packet
-> be associated with.
+> Btw, is mlx5 driver always enable Tx HWTS?
 
-Ok so in such case, learning on CPU needs to be disabled and assisted
-learning enabled.
-
-> 
-> In principle, one way could be to pass, during tagger xmit, the database ID,
-> so that the switch knows that it must learn the MAC SA of this packet in
-> this FID. I don't have the full image of the Mediatek DSA tag format,
-> but if an8855 is anything like mt7530, this option isn't available.
-> Thus, like mt7530, it needs to set ds->assisted_learning_on_cpu_port, so
-> that software will call port_fdb_add() on the CPU port with the correct
-> dsa_db (for the right bridge) as argument. But I don't think that is
-> going to pose any sort of issue.
-> 
-
-In theory I might have found just this option. Tagger documentation is
-totally missing but there are some c and header API that define some
-interesting option of the tagger.
-
-It seems the tagger can work in 3 way:
-- portmap (what we currently use)
-- portid 
-- lookup result
-
-Now the last 2 mode seems very interesting.
-The naming is very confusing but maybe with portid they refer to the
-FIB. I need to check this. If that's the case then it's exactly what we
-need. They set an int so it's definetly an ID.
-
-I assume lookup result is to only use FDB to decide where the packet
-should go. In this mode no ID or port are defined.
-
-So in short lots of tests to do, maybe this can be handled in the
-tagger.
-
-> > (I still need to check if I can assign a default FIB for a port...
-> > Currently the STP register are 2 bit for each FIB id, so 16 different
-> > FIB are possible)
-> > 
-> > Also do we have a script for selft tests? I remember there was one back
-> > in the days for fdb isolation?
-> 
-> I don't remember right now, I don't think we do. I'll try to come up
-> with something in the following days.
-
-Yes that would be handy.
-
--- 
-	Ansuel
+I don't remember doing anything special to enable it. And looking at
+the code I also don't see any conditionals on HWTSTAMP_TX_ON.
 
