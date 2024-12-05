@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-149346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0CC9E5337
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:00:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C801A9E5339
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:00:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB0B1163452
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:00:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06670167500
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE301DC1A2;
-	Thu,  5 Dec 2024 11:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE9F1DCB2D;
+	Thu,  5 Dec 2024 11:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wkb6DbDx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UhU0dryU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546531DC198;
-	Thu,  5 Dec 2024 11:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0531DCB0E
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 11:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733396418; cv=none; b=VbMeTuCs4ygo+nG8ZcaQAdvUA7yHbG6HWDkXNYeKpuBV9kpF8sWlwQr41+QftpOWFc5HPMy42nkpGrN6AImj2w9fZCDGSAk5LOMhWDom2SyFMj3jesUerFL/YJeO4WncGnr/XZ75Y9iq5F7dhLkq2pPL/EuF3U4cNL6aSLMHBoA=
+	t=1733396419; cv=none; b=DgK7tDcEQZXgdWKxGMy8u1if4y4+8R3gmsP/8iTDxG44s8N0MRcM3xKL2KoX+p+9NTbG58LYnypTRNHQWLTNIPWWp/u5H7+hkx3EqCA/EuLQSMtU8RW13abPnfElfJUwb452L3R0ORtAThhBBtthoJt/2t/c6GF21+vU77OJiM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733396418; c=relaxed/simple;
-	bh=zVUEksxV6lsfNmbMbA2clqzcZx3+KejHMgQTLDo6Y88=;
+	s=arc-20240116; t=1733396419; c=relaxed/simple;
+	bh=J9mjWOIDcisekw9n3ITByY1jEYymu7qNRbIFDRf8N7U=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lrmM45gUitNUDq5TwcEK8RVLuT+lLpJmW8oGazkI4T8TOeOwwiXs5D2WT1BzwPloYM5+fMcTwVUbR2sAUY9emWwpWRvnGQTQK1I39ex+TgAJ3uoM1AQO3FYRs81lKueNfP5NuxV0CGs+uPEIY2S3vRQCEEwvA3GUHMTbeAMx56c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wkb6DbDx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB0C8C4CED6;
-	Thu,  5 Dec 2024 11:00:17 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=XATb98vl6KhCQbn4BQVrjLbQq/dA5//086K+vtG+64rob00oy31UnbP7rnieUgg5ajIJ0q5cpl93OasZM9pZQVWWyILJQroXIjJaxTUH5yQGtGKy2D+vqUiwVETmk0Wey0LvBE99BV6ATXtIlqKsSxgHLWFBBWSzAhz3/6Tei1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UhU0dryU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D52BC4CED6;
+	Thu,  5 Dec 2024 11:00:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733396417;
-	bh=zVUEksxV6lsfNmbMbA2clqzcZx3+KejHMgQTLDo6Y88=;
+	s=k20201202; t=1733396419;
+	bh=J9mjWOIDcisekw9n3ITByY1jEYymu7qNRbIFDRf8N7U=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Wkb6DbDxAsIIYCEpukjBsHZ6v6CgRMyQTdmIZvHsr6xq6/Aw7kImFK/Kr3Jb7wBSU
-	 pP0iSroYprYS6v82EVQ02TJsGToUQz/zZrh9kAZ95o0dxeQcgznoKCu4qe5Cma3irp
-	 UrOos88ycRfBWpZnIQ2LXRPDytOQ3Sn87scLfC54JwJ6+ZaRBr3CeCQ1vF65LH0lKB
-	 5Agv5XuFqMcxv1OkgtvsrtlG/VrejGGGR5d1/JKz0AkqFPDNXe7bqoRU/rmmw00WBy
-	 5gh0Vgww2SRDK0jRRYaBn5GGwjTyvo5V2SJaDzYzhJsBukF8C/2qHQg39Pf9HnOMWl
-	 5xQam7+1n5cAg==
+	b=UhU0dryU+BzkalbKM4hFybGEws9MJGiwJQvyf7Cduw2lHbanYcHKFGZ3EIgpMpX4D
+	 DFLfdLI/pWlXyDyfPdAGizxjICZs0lbcTZ8rrn7VMzH7llpy6wUE/KlRE6gS8Sf3nu
+	 YZksaNpb92E2tdElQy7MFkkYqRqXcV1oT8drny85FA4hoMoiwaYF0Qar2uXirLu3Rj
+	 74MlyXdzVsViTxNiDvy2reClPV21pyvUHr5zqubJpkTMIiGVWKN8HB9e8NOsC2sBs2
+	 OBkf9ht1whqkkxZD82SXUhBqw9yHwDVgEWaCcaRT2xY/ear9YJIxAEYXg7dBrBTIN6
+	 i/ISAGQBl5ORw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE2F380A94D;
-	Thu,  5 Dec 2024 11:00:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 342BD380A94D;
+	Thu,  5 Dec 2024 11:00:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,47 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/6] ipvs: fix UB due to uninitialized stack access in
- ip_vs_protocol_init()
+Subject: Re: [PATCH net] net: avoid potential UAF in default_operstate()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173339643252.1549157.5671627566293760631.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Dec 2024 11:00:32 +0000
-References: <20241205002854.162490-2-pablo@netfilter.org>
-In-Reply-To: <20241205002854.162490-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+ <173339643375.1549157.2163133507378717165.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Dec 2024 11:00:33 +0000
+References: <20241203170933.2449307-1-edumazet@google.com>
+In-Reply-To: <20241203170933.2449307-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+1939f24bdb783e9e43d9@syzkaller.appspotmail.com,
+ vladimir.oltean@nxp.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On Thu,  5 Dec 2024 01:28:49 +0100 you wrote:
-> From: Jinghao Jia <jinghao7@illinois.edu>
+On Tue,  3 Dec 2024 17:09:33 +0000 you wrote:
+> syzbot reported an UAF in default_operstate() [1]
 > 
-> Under certain kernel configurations when building with Clang/LLVM, the
-> compiler does not generate a return or jump as the terminator
-> instruction for ip_vs_protocol_init(), triggering the following objtool
-> warning during build time:
+> Issue is a race between device and netns dismantles.
+> 
+> After calling __rtnl_unlock() from netdev_run_todo(),
+> we can not assume the netns of each device is still alive.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/6] ipvs: fix UB due to uninitialized stack access in ip_vs_protocol_init()
-    https://git.kernel.org/netdev/net/c/146b6f1112eb
-  - [net,2/6] netfilter: x_tables: fix LED ID check in led_tg_check()
-    https://git.kernel.org/netdev/net/c/04317f4eb2aa
-  - [net,3/6] netfilter: nft_socket: remove WARN_ON_ONCE on maximum cgroup level
-    https://git.kernel.org/netdev/net/c/b7529880cb96
-  - [net,4/6] netfilter: nft_inner: incorrect percpu area handling under softirq
-    https://git.kernel.org/netdev/net/c/7b1d83da254b
-  - [net,5/6] netfilter: ipset: Hold module reference while requesting a module
-    https://git.kernel.org/netdev/net/c/456f010bfaef
-  - [net,6/6] netfilter: nft_set_hash: skip duplicated elements pending gc run
-    https://git.kernel.org/netdev/net/c/7ffc7481153b
+  - [net] net: avoid potential UAF in default_operstate()
+    https://git.kernel.org/netdev/net/c/750e51603395
 
 You are awesome, thank you!
 -- 
