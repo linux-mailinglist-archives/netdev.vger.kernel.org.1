@@ -1,421 +1,222 @@
-Return-Path: <netdev+bounces-149433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 208B39E5A05
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:44:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED1649E5A1A
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:46:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A442718852E0
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 15:43:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A345616C1C3
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 15:45:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C162222578;
-	Thu,  5 Dec 2024 15:43:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9035C21CA1C;
+	Thu,  5 Dec 2024 15:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KmBBzpEI"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="upViCKvR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2072.outbound.protection.outlook.com [40.107.220.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36429221449;
-	Thu,  5 Dec 2024 15:43:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733413385; cv=none; b=qXjsdypJqxEd8cVYd2QSSam93nEbH0uFQLdt3wbPLcM4rjjO5w3PTwVsGniiaa2lSPKhrmobKBrOr3AA/cPMJvB+5+dvFkFFzVNoss+8C2Xj7Pp+s7nEmaZk5Mu0wQKf/naY5KnELFquGFU99oBhwZDnsm9mCoJYDuRnwwhHGSA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733413385; c=relaxed/simple;
-	bh=X8NiumfnTTX9YgbmHddxFsVSlZc7+dDUKK6o7LQP9GM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IXCLbbKPb0MtKt+z4JuqfCs0xWKS/MI5XCv6RPJuTXpMRPflOZyuxhNT8t5gAt4pFnmHKPlhPs+Wv2xyTXxmQyPQHi8n9+aBRHcRaV4Eja48FkgNCPYUpxpL74xHzS6aKJZvskQxRs1iGu5pRX521kg7h8EcneBRV3ngp/NG1tE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KmBBzpEI; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-434a9f2da82so7459515e9.2;
-        Thu, 05 Dec 2024 07:43:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733413381; x=1734018181; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZP45adl0m/JgLHunU63kkKsbCdYBQc86IYFQ7X6p794=;
-        b=KmBBzpEIN09nzeZG/UAhJ8DLPdS2bX74dB5mRx3Hz846DrENlihy63TVT2Ts70CgoF
-         ExQGzahnvtKfn25QvYEvDQe4cbDvEpkv5DaFU0WOczHq5HG3SUEwN0mjle9Q3T+Ivu4k
-         XvugqFpgjtdnkH3RQkRlWxvgNNrdTnGynBY4lyJBpGfyMkMG1s9BQnzSeUeVsM+yWqxH
-         8vP7wNkWvWn8NAcpoqKAneBF16J8BffTTKowwUB/2GKAgFrjmWp9UgHV3CC5GMKHScFC
-         /AoM57rCI6zsCJRdcgHeD3ejBfl5YzjoGhKFZacB+6ocmuBx43irguvtPnTkJSWDVQjn
-         5j/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733413381; x=1734018181;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZP45adl0m/JgLHunU63kkKsbCdYBQc86IYFQ7X6p794=;
-        b=BJOzpe/oJ42YRwBGMo6z0/72Q2F9ZsepOZVVFvl89iICrBLGgbK4vWnPHtnQae5uiB
-         PygH4TE3ArXPLa0btEO1DftObqV41Bcseffo22QiLI5WKIufHZuz6Jg+j6o9Cq29rtls
-         oDcFALCeXMrkpYDcS9NiYK3s0Aaw9tuZBf1+RkSGlxKf64vqqWxmzfo//9evzN1tHsuH
-         LBZGhB6qOz6qis0lfoY0e0uAmnC7o52mCczzBEUeLXo9kL/5sOUa7GCRpV5eMiB6czJG
-         VEa15ophDyOVy7i9gUWx0HYqaq37A4dzcZFc8dJd3eNcntJ76U2HDEQcNo6gOL631i0X
-         F6Uw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNt34kKS5q+7L+MoxN4/HLH4YBWRn1Vb9UOO1fzKKOnz71ndl1WoKAfog38DB63U2I9VtV84CWt5RnefijtYE=@vger.kernel.org, AJvYcCWFA5UCgkXxRIZDkTtZY5/TOKPuo2qoC4Xanizs+0jnywlgxlbkgsXva6IHQ/GnG0QJhgRVSPS0Sbh+99Ct@vger.kernel.org, AJvYcCXFybuiH3O9KQxhNAfGUx5wbIo4Rw3SECT+37jlIFMkMZ72fBVAOfAtX8rz2On8dMQBct+6cLMPksvk@vger.kernel.org, AJvYcCXmGLSxM6a6HIl9OnmpnjZKy1zG8tfgwfnUH8itgPZD8qEhpupxNQKzl46bQLEsTPyT20TOOEw7@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7DEfdQ6qstIraUEBGfJZ+auNlQY+VNM8E6RCL/LW5dgErxCHo
-	hxoU3J6XKPQjTBLf/bfolkHleSnjgu018yCopU5wl4jar1muQgQz
-X-Gm-Gg: ASbGncu0O4UqGyH+KYFOCaG/tbgsa9gmr3fUv/zyT+zOiKZRxqVutj+CffC0VJY58KR
-	O2uqRor/NhSPEgXufZ/XxBPC+whMZnrqMpfL2muDWqLwYL0Rqao/S9NW+I8QZn/h8IF0Cx7mGLb
-	AEv9Xl/AvKuZ2OzlRFknap+2Me1UOtL8VJ+XXxeclC8SMM/ivf4weuAIYElOfJUAKSVscRuPYnb
-	3NG9wMkZpTC10jfq+7qcJiY/wPYgsyJ2jhb+l1Bh0ZX+qi+EWZhvTmkjlE=
-X-Google-Smtp-Source: AGHT+IHlSg504pBumLfceXQFWDia6MAuCEjJGazacj++iFQVK3VDRzhe2tl+FybaLA5HFJZH550yXg==
-X-Received: by 2002:a05:600c:570a:b0:434:9f81:76d5 with SMTP id 5b1f17b1804b1-434d0a06619mr87843265e9.22.1733413381210;
-        Thu, 05 Dec 2024 07:43:01 -0800 (PST)
-Received: from localhost.localdomain ([46.248.82.114])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434da11387dsm27020185e9.30.2024.12.05.07.42.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2024 07:43:00 -0800 (PST)
-From: Uros Bizjak <ubizjak@gmail.com>
-To: x86@kernel.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	linux-bcachefs@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Uros Bizjak <ubizjak@gmail.com>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Dennis Zhou <dennis@kernel.org>,
-	Tejun Heo <tj@kernel.org>,
-	Christoph Lameter <cl@linux.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Brian Gerst <brgerst@gmail.com>
-Subject: [PATCH v2 3/6] percpu: Use TYPEOF_UNQUAL() in variable declarations
-Date: Thu,  5 Dec 2024 16:40:53 +0100
-Message-ID: <20241205154247.43444-4-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20241205154247.43444-1-ubizjak@gmail.com>
-References: <20241205154247.43444-1-ubizjak@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEEA6222568
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 15:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.72
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733413445; cv=fail; b=Ewf1AoQ7tYYxZlIvvqwu6DI+df5Sai3vysSPJYZiufU77yLtWWVxr5Z+WQJaSQvYcMZwSEqePcdEF/daCRIXs4/zhK5qghRLKLvDOsV1Yxf+3BphXxHrCJ5ont8HIU9X/QNj9zOoHbu1IFwOb3TlRjhgQZZKggd80gACngAgTII=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733413445; c=relaxed/simple;
+	bh=fl9ReNOQ49ijU8XnRf3AgHatzeL6YYoJ0y4O95CUc2k=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=byAl5Htazm5h8sCaNt4N10VFKozKXYNE9ymIFh6wMK1AdsQ8VLhUQw2gF5O5pxuioT+U3f7xUvtha/ZGRf58/uNKKjGGFEvjzukY4H+fpkwoet7jJl/pgzHFdqj/dSTK5LTVvVqEDhZ4RdG7YVRuOWgawYmBPFhlDevml+m5os8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=upViCKvR; arc=fail smtp.client-ip=40.107.220.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DTEqReG5zhy1P1WVGGzqtQiDpqp5IcMPDyJnPULpQ1y5G6/aCHRS7/jJzhZBWZFy/QXaWJ0cnjcE55b9VKlLpeIh4RRMo7yeif6DMlMm1D4+qewVwHhQUkYBLefVHhzHVIuETqQgleTh8BELkq/eCAdt/Hy6xK8ylrNQJW5tLYxaaSSI71J3Y5ZtX+oc4ePU7hphjC30YDoyuSXgytr4vi0/5hjmObG+pk4MBudLnmRNZqg02D1MmN1Jc7MfsH/1kSi73+41bnKK3ZEUWCPkeo3gqvWdqxUUMCaG3msXgD+V6wym0RpNnLXeUrsSW26HbnBcy4P15+L5j1H71+ThTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NcwhpM17a1BbHMHgsknwcWdF6ZbnNiXn27D68zYlWNM=;
+ b=y/UCRybhmioICkKFpIpKCT6MungAd1bd4QmrDjBnGU+bpCLNaMWtfKGpGXLM44ezI0SF0aTBqSqScOv0Vfss/t6REgUUcP55C+5JlTiNxsnodFjUehGQZdstO1KSH/P5m0NUNqIMSd0+5tJencHZfIlEMiw/7UpZR30APuyv84iqFD3gGGgquqdNaRnPrNLGmwxJ9IEu10zx0oeudet4o3BRgbXeOfCOZPgnM2efK6Leu7ksewkugnRctEiQcXGmjVqjkHa2SkhInol8TCIqQYxeZW6iBGcFmpP/sp55EnatbRTN57y5BReAYG8apzmUN51ggTD7IUvfd3t7jlsycw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NcwhpM17a1BbHMHgsknwcWdF6ZbnNiXn27D68zYlWNM=;
+ b=upViCKvRaZp8bEDQuIndKM1gJ2AFX3tXJQ7RfIBYvl55/n61aiLHxec2bj7Vsn5F5xE4RYaRX6AFoOzBeGCm87aXsRfPNO+mCDgcRv1+Hy5NFMxYwELDLA3QOYhqIZEg0H5U+sT0HPitV1M3FWBU0lyIiBHMaB8e6QKhE4DoHMzulj7QZsdG9VNVbv6n8xTndic2EPLHgnosiiUkmDbzbJBRSig6xVVlegHc8oeySYwHzZUQjPa7MGPLfNl+ehhroCsA7FRrJ1AwLENElF3OEIZYoFCCg/FOng/455Aw/hYN62GcvnibjYqlm4jW08qOlPkO+bTkh5HoQOJcJ6VCEQ==
+Received: from MW4PR04CA0334.namprd04.prod.outlook.com (2603:10b6:303:8a::9)
+ by CYYPR12MB8891.namprd12.prod.outlook.com (2603:10b6:930:c0::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.19; Thu, 5 Dec
+ 2024 15:43:58 +0000
+Received: from CO1PEPF000044F3.namprd05.prod.outlook.com
+ (2603:10b6:303:8a:cafe::70) by MW4PR04CA0334.outlook.office365.com
+ (2603:10b6:303:8a::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8207.19 via Frontend Transport; Thu,
+ 5 Dec 2024 15:43:58 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000044F3.mail.protection.outlook.com (10.167.241.73) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8230.7 via Frontend Transport; Thu, 5 Dec 2024 15:43:58 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 5 Dec 2024
+ 07:43:47 -0800
+Received: from localhost.localdomain (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 5 Dec 2024
+ 07:43:40 -0800
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<netdev@vger.kernel.org>
+CC: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, "Petr
+ Machata" <petrm@nvidia.com>, <mlxsw@nvidia.com>, Mateusz Polchlopek
+	<mateusz.polchlopek@intel.com>, Menglong Dong <menglong8.dong@gmail.com>,
+	Guillaume Nault <gnault@redhat.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v2 04/11] vxlan: vxlan_rcv(): Extract vxlan_hdr(skb) to a named variable
+Date: Thu, 5 Dec 2024 16:40:53 +0100
+Message-ID: <2a0a940e883c435a0fdbcdc1d03c4858957ad00e.1733412063.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <cover.1733412063.git.petrm@nvidia.com>
+References: <cover.1733412063.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F3:EE_|CYYPR12MB8891:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3ff56120-55b2-43bd-6e49-08dd1543a238
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|7416014|376014|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?gQ8Zl+mdNMjGk6bMYMaEVr9gBXS7ux2bspArs7t1tLm45lVXhkoYkz2DOUNG?=
+ =?us-ascii?Q?i5ZJnW6kUYGsSdmILGnRkrVXGIvhTMYvDLl3M1GXHPHPyv7zR9ANkZCfczQX?=
+ =?us-ascii?Q?A+Y+akO7iC67K60G0c+luabL94rAGuQ8nduzYkPzKPHysexVzLj4x+0qwZ9o?=
+ =?us-ascii?Q?UAVEVO9yA1xIHPj2RXplQWrQ1P1CLeTLCi/oA9RASx2mygjsm9dhINfEpHqJ?=
+ =?us-ascii?Q?jtLcRr5tmVU/MDcYCYwDrYGL+0rxeIsy88tE8hk/wuBqTz2M82aEPBAkb1Ue?=
+ =?us-ascii?Q?G7kijRXyj7ugJiNFup32qgzrXUhbx00rDtL2jV/Uao5dCJYi1V8fok9gqXoS?=
+ =?us-ascii?Q?3bThKDUG3sUYpobYdCCPRu+ZmyD8s+yYckoZ+0rMFknT2zyXNic9Xl+AA5Wr?=
+ =?us-ascii?Q?+WCkMCRIRMiKneifjVFp9a8PSO50n5MNTOO1crPATQUr3AtdgPVi4Xmt1ulp?=
+ =?us-ascii?Q?kJF8HHrev2tfKgCrqVyBnTfDRsMycc7CK9CnfvgPTUAhomw/8A9Su3FUtize?=
+ =?us-ascii?Q?hPI2GZ3DTbK0S8Tx5yHgI1iNPPaI3ovBmKqpgAH3sCqy1Cbelxir43wqXgGm?=
+ =?us-ascii?Q?dk6VceAtfLdB68ImEkb1hvoH35IwCxA8+GR7HBESi3WuLvhtwdilTVuZNp9d?=
+ =?us-ascii?Q?bS1lTxBLUtaa3NUhHMkirFplqpcT5w5mWI3sQONw4h6jpKEqGGQ2YIwGpHH1?=
+ =?us-ascii?Q?xS0/WPt5REPvfw1eUMrhgYJR5k4vm3psQKaf59VNRp+yVbYkVTwjFFfbTjPR?=
+ =?us-ascii?Q?JjijjAjEGMXi0tQmGWzUaz4ywH8CUh8/HGYZf33nLbEN3GKoSqisCLhhDBvG?=
+ =?us-ascii?Q?Nh882k87bPKrW0ac5HshJ2y4FAgnFJBzCQ1AwojbcSbLGgciFopFDZafGoq0?=
+ =?us-ascii?Q?qTIjTItfKbrcM6124wz6Q6YxXflDMDl2hsZxEBOd4t52cBR2M4arr/WGcyXs?=
+ =?us-ascii?Q?YQu+mGuVahOQhcL/SLNka0nvRXelCgCDSL0wVcuJrSUWM5Z3t0l1HLsgkjD0?=
+ =?us-ascii?Q?86fh08UHWjipMbNBl0D1cbXPsf0EHfvJn3AHFp37DnzY+N3w0eE49hPZ0ZyY?=
+ =?us-ascii?Q?BDvTJD9DQyyXVvQuUVgkJpIx07GUQwrVKrPSK/be+F6OGZ5zg5Gtg4F4VYiI?=
+ =?us-ascii?Q?rfYVnHCOE58vnfrKSFq7TQqE4UkOS13EfpIEM1ziduDbjVha44xZ5hYFONg4?=
+ =?us-ascii?Q?Lu8mgzpupyValgPrw+aC+TMxTdJ6mwXBI4Pw0ihClWsQLJMGtfpBQItSrr0X?=
+ =?us-ascii?Q?XoqnZ6JUfR6+s/JRjQUziec5K8wHNtXBMhLNUYbI5v4wAmUQgMvcdd9awtw9?=
+ =?us-ascii?Q?BPZegPMwCCbmcYYzr5rtjRx/0oR+b5FnCXQHZFpB8Qi8a6fwI65dAxNiPrNj?=
+ =?us-ascii?Q?WISS5T3Ae73YNW1V+UwsvSUQwMk9knkomLrqBpSp7GELp1XwCul6AUBKPt6T?=
+ =?us-ascii?Q?lKHALDOhC16zG6mAiyq23D/ez7SsQ0XA?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2024 15:43:58.4609
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ff56120-55b2-43bd-6e49-08dd1543a238
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044F3.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8891
 
-Use TYPEOF_UNQUAL() to declare variables as a corresponding
-type without named address space qualifier to avoid
-"‘__seg_gs’ specified for auto variable ‘var’" errors.
+Having a named reference to the VXLAN header is more handy than having to
+conjure it anew through vxlan_hdr() on every use. Add a new variable and
+convert several open-coded sites.
 
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-Acked-by: Nadav Amit <nadav.amit@gmail.com>
-Cc: Dennis Zhou <dennis@kernel.org>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Christoph Lameter <cl@linux.com>
-Cc: Andy Lutomirski <luto@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@kernel.org>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Will Deacon <will@kernel.org>
-Cc: Waiman Long <longman@redhat.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Brian Gerst <brgerst@gmail.com>
+Additionally, convert one "unparsed" use to the new variable as well. Thus
+the only "unparsed" uses that remain are the flag-clearing and the header
+validity check at the end.
+
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 ---
- arch/x86/include/asm/percpu.h | 10 +++++-----
- fs/bcachefs/util.h            |  2 +-
- include/asm-generic/percpu.h  | 26 +++++++++++++-------------
- include/linux/part_stat.h     |  2 +-
- include/linux/percpu-defs.h   |  4 ++--
- include/net/snmp.h            |  5 ++---
- kernel/locking/percpu-rwsem.c |  2 +-
- net/mpls/internal.h           |  4 ++--
- 8 files changed, 27 insertions(+), 28 deletions(-)
 
-diff --git a/arch/x86/include/asm/percpu.h b/arch/x86/include/asm/percpu.h
-index e525cd85f999..666e4137b09f 100644
---- a/arch/x86/include/asm/percpu.h
-+++ b/arch/x86/include/asm/percpu.h
-@@ -180,7 +180,7 @@ do {									\
- 	__pcpu_type_##size pto_val__ = __pcpu_cast_##size(_val);	\
- 									\
- 	if (0) {		                                        \
--		typeof(_var) pto_tmp__;					\
-+		TYPEOF_UNQUAL(_var) pto_tmp__;				\
- 		pto_tmp__ = (_val);					\
- 		(void)pto_tmp__;					\
- 	}								\
-@@ -219,7 +219,7 @@ do {									\
- 	__pcpu_type_##size pto_val__ = __pcpu_cast_##size(_val);	\
- 									\
- 	if (0) {		                                        \
--		typeof(_var) pto_tmp__;					\
-+		TYPEOF_UNQUAL(_var) pto_tmp__;				\
- 		pto_tmp__ = (_val);					\
- 		(void)pto_tmp__;					\
- 	}								\
-@@ -240,7 +240,7 @@ do {									\
- 			 (val) == (typeof(val))-1)) ? (int)(val) : 0;	\
- 									\
- 	if (0) {							\
--		typeof(var) pao_tmp__;					\
-+		TYPEOF_UNQUAL(var) pao_tmp__;				\
- 		pao_tmp__ = (val);					\
- 		(void)pao_tmp__;					\
- 	}								\
-@@ -273,7 +273,7 @@ do {									\
-  */
- #define raw_percpu_xchg_op(_var, _nval)					\
- ({									\
--	typeof(_var) pxo_old__ = raw_cpu_read(_var);			\
-+	TYPEOF_UNQUAL(_var) pxo_old__ = raw_cpu_read(_var);		\
- 									\
- 	raw_cpu_write(_var, _nval);					\
- 									\
-@@ -287,7 +287,7 @@ do {									\
-  */
- #define this_percpu_xchg_op(_var, _nval)				\
- ({									\
--	typeof(_var) pxo_old__ = this_cpu_read(_var);			\
-+	TYPEOF_UNQUAL(_var) pxo_old__ = this_cpu_read(_var);		\
- 									\
- 	do { } while (!this_cpu_try_cmpxchg(_var, &pxo_old__, _nval));	\
- 									\
-diff --git a/fs/bcachefs/util.h b/fs/bcachefs/util.h
-index fb02c1c36004..415a5803b8f4 100644
---- a/fs/bcachefs/util.h
-+++ b/fs/bcachefs/util.h
-@@ -586,7 +586,7 @@ do {									\
+Notes:
+CC: Menglong Dong <menglong8.dong@gmail.com>
+CC: Guillaume Nault <gnault@redhat.com>
+CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: Breno Leitao <leitao@debian.org>
+
+ drivers/net/vxlan/vxlan_core.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 4905ed1c5e20..257411d1ccca 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -1667,6 +1667,7 @@ static bool vxlan_ecn_decapsulate(struct vxlan_sock *vs, void *oiph,
+ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct vxlan_vni_node *vninode = NULL;
++	const struct vxlanhdr *vh;
+ 	struct vxlan_dev *vxlan;
+ 	struct vxlan_sock *vs;
+ 	struct vxlanhdr unparsed;
+@@ -1685,11 +1686,11 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
+ 		goto drop;
  
- #define per_cpu_sum(_p)							\
- ({									\
--	typeof(*_p) _ret = 0;						\
-+	TYPEOF_UNQUAL(*_p) _ret = 0;					\
- 									\
- 	int cpu;							\
- 	for_each_possible_cpu(cpu)					\
-diff --git a/include/asm-generic/percpu.h b/include/asm-generic/percpu.h
-index 94cbd50cc870..50597b975a49 100644
---- a/include/asm-generic/percpu.h
-+++ b/include/asm-generic/percpu.h
-@@ -74,7 +74,7 @@ do {									\
+ 	unparsed = *vxlan_hdr(skb);
++	vh = vxlan_hdr(skb);
+ 	/* VNI flag always required to be set */
+-	if (!(unparsed.vx_flags & VXLAN_HF_VNI)) {
++	if (!(vh->vx_flags & VXLAN_HF_VNI)) {
+ 		netdev_dbg(skb->dev, "invalid vxlan flags=%#x vni=%#x\n",
+-			   ntohl(vxlan_hdr(skb)->vx_flags),
+-			   ntohl(vxlan_hdr(skb)->vx_vni));
++			   ntohl(vh->vx_flags), ntohl(vh->vx_vni));
+ 		reason = SKB_DROP_REASON_VXLAN_INVALID_HDR;
+ 		/* Return non vxlan pkt */
+ 		goto drop;
+@@ -1701,7 +1702,7 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
+ 	if (!vs)
+ 		goto drop;
  
- #define raw_cpu_generic_add_return(pcp, val)				\
- ({									\
--	typeof(pcp) *__p = raw_cpu_ptr(&(pcp));				\
-+	TYPEOF_UNQUAL(pcp) *__p = raw_cpu_ptr(&(pcp));			\
- 									\
- 	*__p += val;							\
- 	*__p;								\
-@@ -82,8 +82,8 @@ do {									\
+-	vni = vxlan_vni(vxlan_hdr(skb)->vx_vni);
++	vni = vxlan_vni(vh->vx_vni);
  
- #define raw_cpu_generic_xchg(pcp, nval)					\
- ({									\
--	typeof(pcp) *__p = raw_cpu_ptr(&(pcp));				\
--	typeof(pcp) __ret;						\
-+	TYPEOF_UNQUAL(pcp) *__p = raw_cpu_ptr(&(pcp));			\
-+	TYPEOF_UNQUAL(pcp) __ret;					\
- 	__ret = *__p;							\
- 	*__p = nval;							\
- 	__ret;								\
-@@ -91,7 +91,7 @@ do {									\
- 
- #define __cpu_fallback_try_cmpxchg(pcp, ovalp, nval, _cmpxchg)		\
- ({									\
--	typeof(pcp) __val, __old = *(ovalp);				\
-+	TYPEOF_UNQUAL(pcp) __val, __old = *(ovalp);			\
- 	__val = _cmpxchg(pcp, __old, nval);				\
- 	if (__val != __old)						\
- 		*(ovalp) = __val;					\
-@@ -100,8 +100,8 @@ do {									\
- 
- #define raw_cpu_generic_try_cmpxchg(pcp, ovalp, nval)			\
- ({									\
--	typeof(pcp) *__p = raw_cpu_ptr(&(pcp));				\
--	typeof(pcp) __val = *__p, ___old = *(ovalp);			\
-+	TYPEOF_UNQUAL(pcp) *__p = raw_cpu_ptr(&(pcp));			\
-+	TYPEOF_UNQUAL(pcp) __val = *__p, ___old = *(ovalp);		\
- 	bool __ret;							\
- 	if (__val == ___old) {						\
- 		*__p = nval;						\
-@@ -115,14 +115,14 @@ do {									\
- 
- #define raw_cpu_generic_cmpxchg(pcp, oval, nval)			\
- ({									\
--	typeof(pcp) __old = (oval);					\
-+	TYPEOF_UNQUAL(pcp) __old = (oval);				\
- 	raw_cpu_generic_try_cmpxchg(pcp, &__old, nval);			\
- 	__old;								\
- })
- 
- #define __this_cpu_generic_read_nopreempt(pcp)				\
- ({									\
--	typeof(pcp) ___ret;						\
-+	TYPEOF_UNQUAL(pcp) ___ret;					\
- 	preempt_disable_notrace();					\
- 	___ret = READ_ONCE(*raw_cpu_ptr(&(pcp)));			\
- 	preempt_enable_notrace();					\
-@@ -131,7 +131,7 @@ do {									\
- 
- #define __this_cpu_generic_read_noirq(pcp)				\
- ({									\
--	typeof(pcp) ___ret;						\
-+	TYPEOF_UNQUAL(pcp) ___ret;					\
- 	unsigned long ___flags;						\
- 	raw_local_irq_save(___flags);					\
- 	___ret = raw_cpu_generic_read(pcp);				\
-@@ -141,7 +141,7 @@ do {									\
- 
- #define this_cpu_generic_read(pcp)					\
- ({									\
--	typeof(pcp) __ret;						\
-+	TYPEOF_UNQUAL(pcp) __ret;					\
- 	if (__native_word(pcp))						\
- 		__ret = __this_cpu_generic_read_nopreempt(pcp);		\
- 	else								\
-@@ -160,7 +160,7 @@ do {									\
- 
- #define this_cpu_generic_add_return(pcp, val)				\
- ({									\
--	typeof(pcp) __ret;						\
-+	TYPEOF_UNQUAL(pcp) __ret;					\
- 	unsigned long __flags;						\
- 	raw_local_irq_save(__flags);					\
- 	__ret = raw_cpu_generic_add_return(pcp, val);			\
-@@ -170,7 +170,7 @@ do {									\
- 
- #define this_cpu_generic_xchg(pcp, nval)				\
- ({									\
--	typeof(pcp) __ret;						\
-+	TYPEOF_UNQUAL(pcp) __ret;					\
- 	unsigned long __flags;						\
- 	raw_local_irq_save(__flags);					\
- 	__ret = raw_cpu_generic_xchg(pcp, nval);			\
-@@ -190,7 +190,7 @@ do {									\
- 
- #define this_cpu_generic_cmpxchg(pcp, oval, nval)			\
- ({									\
--	typeof(pcp) __ret;						\
-+	TYPEOF_UNQUAL(pcp) __ret;					\
- 	unsigned long __flags;						\
- 	raw_local_irq_save(__flags);					\
- 	__ret = raw_cpu_generic_cmpxchg(pcp, oval, nval);		\
-diff --git a/include/linux/part_stat.h b/include/linux/part_stat.h
-index ac8c44dd8237..c5e9cac0575e 100644
---- a/include/linux/part_stat.h
-+++ b/include/linux/part_stat.h
-@@ -33,7 +33,7 @@ struct disk_stats {
- 
- #define part_stat_read(part, field)					\
- ({									\
--	typeof((part)->bd_stats->field) res = 0;			\
-+	TYPEOF_UNQUAL((part)->bd_stats->field) res = 0;			\
- 	unsigned int _cpu;						\
- 	for_each_possible_cpu(_cpu)					\
- 		res += per_cpu_ptr((part)->bd_stats, _cpu)->field; \
-diff --git a/include/linux/percpu-defs.h b/include/linux/percpu-defs.h
-index 35842d1e3879..266297b21a5d 100644
---- a/include/linux/percpu-defs.h
-+++ b/include/linux/percpu-defs.h
-@@ -320,7 +320,7 @@ static __always_inline void __this_cpu_preempt_check(const char *op) { }
- 
- #define __pcpu_size_call_return(stem, variable)				\
- ({									\
--	typeof(variable) pscr_ret__;					\
-+	TYPEOF_UNQUAL(variable) pscr_ret__;				\
- 	__verify_pcpu_ptr(&(variable));					\
- 	switch(sizeof(variable)) {					\
- 	case 1: pscr_ret__ = stem##1(variable); break;			\
-@@ -335,7 +335,7 @@ static __always_inline void __this_cpu_preempt_check(const char *op) { }
- 
- #define __pcpu_size_call_return2(stem, variable, ...)			\
- ({									\
--	typeof(variable) pscr2_ret__;					\
-+	TYPEOF_UNQUAL(variable) pscr2_ret__;				\
- 	__verify_pcpu_ptr(&(variable));					\
- 	switch(sizeof(variable)) {					\
- 	case 1: pscr2_ret__ = stem##1(variable, __VA_ARGS__); break;	\
-diff --git a/include/net/snmp.h b/include/net/snmp.h
-index 468a67836e2f..4cb4326dfebe 100644
---- a/include/net/snmp.h
-+++ b/include/net/snmp.h
-@@ -159,7 +159,7 @@ struct linux_tls_mib {
- 
- #define __SNMP_ADD_STATS64(mib, field, addend) 				\
- 	do {								\
--		__typeof__(*mib) *ptr = raw_cpu_ptr(mib);		\
-+		TYPEOF_UNQUAL(*mib) *ptr = raw_cpu_ptr(mib);		\
- 		u64_stats_update_begin(&ptr->syncp);			\
- 		ptr->mibs[field] += addend;				\
- 		u64_stats_update_end(&ptr->syncp);			\
-@@ -176,8 +176,7 @@ struct linux_tls_mib {
- #define SNMP_INC_STATS64(mib, field) SNMP_ADD_STATS64(mib, field, 1)
- #define __SNMP_UPD_PO_STATS64(mib, basefield, addend)			\
- 	do {								\
--		__typeof__(*mib) *ptr;				\
--		ptr = raw_cpu_ptr((mib));				\
-+		TYPEOF_UNQUAL(*mib) *ptr = raw_cpu_ptr(mib);		\
- 		u64_stats_update_begin(&ptr->syncp);			\
- 		ptr->mibs[basefield##PKTS]++;				\
- 		ptr->mibs[basefield##OCTETS] += addend;			\
-diff --git a/kernel/locking/percpu-rwsem.c b/kernel/locking/percpu-rwsem.c
-index 6083883c4fe0..d6964fc29f51 100644
---- a/kernel/locking/percpu-rwsem.c
-+++ b/kernel/locking/percpu-rwsem.c
-@@ -184,7 +184,7 @@ EXPORT_SYMBOL_GPL(__percpu_down_read);
- 
- #define per_cpu_sum(var)						\
- ({									\
--	typeof(var) __sum = 0;						\
-+	TYPEOF_UNQUAL(var) __sum = 0;					\
- 	int cpu;							\
- 	compiletime_assert_atomic_type(__sum);				\
- 	for_each_possible_cpu(cpu)					\
-diff --git a/net/mpls/internal.h b/net/mpls/internal.h
-index b9f492ddf93b..83c629529b57 100644
---- a/net/mpls/internal.h
-+++ b/net/mpls/internal.h
-@@ -33,7 +33,7 @@ struct mpls_dev {
- 
- #define MPLS_INC_STATS_LEN(mdev, len, pkts_field, bytes_field)		\
- 	do {								\
--		__typeof__(*(mdev)->stats) *ptr =			\
-+		TYPEOF_UNQUAL(*(mdev)->stats) *ptr =			\
- 			raw_cpu_ptr((mdev)->stats);			\
- 		local_bh_disable();					\
- 		u64_stats_update_begin(&ptr->syncp);			\
-@@ -45,7 +45,7 @@ struct mpls_dev {
- 
- #define MPLS_INC_STATS(mdev, field)					\
- 	do {								\
--		__typeof__(*(mdev)->stats) *ptr =			\
-+		TYPEOF_UNQUAL(*(mdev)->stats) *ptr =			\
- 			raw_cpu_ptr((mdev)->stats);			\
- 		local_bh_disable();					\
- 		u64_stats_update_begin(&ptr->syncp);			\
+ 	vxlan = vxlan_vs_find_vni(vs, skb->dev->ifindex, vni, &vninode);
+ 	if (!vxlan) {
+@@ -1713,7 +1714,7 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
+ 	 * used by VXLAN extensions if explicitly requested.
+ 	 */
+ 	if (vxlan->cfg.flags & VXLAN_F_GPE) {
+-		if (!vxlan_parse_gpe_proto(vxlan_hdr(skb), &protocol))
++		if (!vxlan_parse_gpe_proto(vh, &protocol))
+ 			goto drop;
+ 		unparsed.vx_flags &= ~VXLAN_GPE_USED_BITS;
+ 		raw_proto = true;
 -- 
-2.42.0
+2.47.0
 
 
