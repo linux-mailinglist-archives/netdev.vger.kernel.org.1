@@ -1,115 +1,129 @@
-Return-Path: <netdev+bounces-149243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C27469E4E23
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 08:23:25 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5360718818C2
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 07:22:54 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A36D1A0700;
-	Thu,  5 Dec 2024 07:22:14 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E5419E4E45
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 08:27:28 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CECE51B4F0F;
-	Thu,  5 Dec 2024 07:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDF07286462
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 07:27:26 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 547E61B0F37;
+	Thu,  5 Dec 2024 07:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KhOo0obg"
+X-Original-To: netdev@vger.kernel.org
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DC05028C;
+	Thu,  5 Dec 2024 07:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733383334; cv=none; b=CRkRjb/OyazDupuhBybx/yPXciV2qGBCnLtVg3CkS4E/8z+pnmsactVn7sJ7JNli95Nf7KpMpv13B8yt4HWJgAXJkWSIM7xTcblNSlPhHo8yYbzizwjRC8zkQQc6k24mqRfRJXvaeis80qvkstNlyEcnDnI+a0L6CC9dQhwgaoc=
+	t=1733383641; cv=none; b=DP5TAhqruspvjyiQbXXsKGWjKF6FFIjkJ6bJ4v+cFEYzaPJPBPdVvkSniR8/56FQVum6JFdM6v546f3ygce/ogaWtYUbORwbyLcy4hgp+3SmeV/rh6gHzQH+K/GDCtNI/3ylfQ7sgbNF8puAyP00Dhl4Qu/PVer7aWP2EeONmUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733383334; c=relaxed/simple;
-	bh=CYrgK0GZef4qd4DylejgFhuD+iymzjGbUbnw1d4ueFA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sZa2IFkdbdb7WSM54N3W7NP1OP2eoHPHAlIdBb1w1BCQgelc4kPHPMxwOP7BgnzOExxVLBHic5GcD/60ULKGHXopUpWesJcTpC4jSrgHA8yrpd810M12pE83M/+QudPJDk7oK1eMkkQIAxSmjGmIuXhANtcbzTYa5XRZOv/AgJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
-Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Thu, 5 Dec
- 2024 15:20:49 +0800
-Received: from mail.aspeedtech.com (192.168.10.10) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
- Transport; Thu, 5 Dec 2024 15:20:49 +0800
-From: Jacky Chou <jacky_chou@aspeedtech.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
-	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <p.zabel@pengutronix.de>,
-	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <jacky_chou@aspeedtech.com>
-Subject: [PATCH net-next v4 7/7] net: ftgmac100: remove extra newline symbols
-Date: Thu, 5 Dec 2024 15:20:48 +0800
-Message-ID: <20241205072048.1397570-8-jacky_chou@aspeedtech.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241205072048.1397570-1-jacky_chou@aspeedtech.com>
-References: <20241205072048.1397570-1-jacky_chou@aspeedtech.com>
+	s=arc-20240116; t=1733383641; c=relaxed/simple;
+	bh=TjmcgDp9KFitTQb0NHqg3c27lZHbkp5In9e/mJ+vCMg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KJdIkux8FMUl4VlvMeJMMHfGqgXhNj+dGbSCC6uRYTmQtuJcphhanLRAo2/u3OYea85+o0xFPV9HockOfAzv9jIG1qGTgKfCRlUyvPq3yMzRKuTRrjje8EKz6OiaJBD5p1VqcFKjr3d39BjJ+9FhpX5Z7mqbJGpKwnuapvPopJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KhOo0obg; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B510NAA010702;
+	Thu, 5 Dec 2024 07:27:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=NFrIAp
+	QEAFs/nBrx48aIshjgRWcHcvvRKe3JlV2Z3dw=; b=KhOo0obg17FvCASIwEuozs
+	oWueRDnc9ZD1AOHeIlX+ZJdZ0HfZXtIx2XnAZeT6EcBXAOCTT6u5PM1tXM9+tB1o
+	/lgOAV/NV1VP2vAzm71HtAffTp261uEHD5qWkOm42vls86DITSGF8pZHgcXmEzre
+	fuHcx9vVYHhOSB+bBSr4zsT+mjbbcMW7g+IkOHxZDNm159WYS57qbN0bNy44LpCZ
+	ckC7BD71z+ZMPO8arWcyHSwZGNKe/ttxYVXHnAID/IAWoTc1UUMclv9A3rPBp6EF
+	T3HU0gXjmq1D/O8LyEivlFrdzZXHHy+kjTOmeSb3br0g9WJdMmsXoM+xeUqKTDBw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43b24r9a1y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Dec 2024 07:27:13 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B57RCk9020989;
+	Thu, 5 Dec 2024 07:27:12 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43b24r9a1u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Dec 2024 07:27:12 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B545WEG007478;
+	Thu, 5 Dec 2024 07:27:11 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 438f8jrn3m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Dec 2024 07:27:11 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B57RAsZ23266016
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 5 Dec 2024 07:27:11 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9FDB558923;
+	Thu,  5 Dec 2024 07:27:10 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AB30758926;
+	Thu,  5 Dec 2024 07:27:08 +0000 (GMT)
+Received: from [9.152.224.33] (unknown [9.152.224.33])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  5 Dec 2024 07:27:08 +0000 (GMT)
+Message-ID: <4658d918-4473-4920-b49f-7c4fe34c7ccb@linux.ibm.com>
+Date: Thu, 5 Dec 2024 08:27:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/2] net/smc: Two features for smc-r
+To: Jakub Kicinski <kuba@kernel.org>, jaka@linux.ibm.com
+Cc: Guangguan Wang <guangguan.wang@linux.alibaba.com>,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
+        pabeni@redhat.com, horms@kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20241202125203.48821-1-guangguan.wang@linux.alibaba.com>
+ <20241204183945.47759ac5@kernel.org>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <20241204183945.47759ac5@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _uZ9YnCtAUjEF3TZY-jNVW5iC6SrPccN
+X-Proofpoint-ORIG-GUID: oV7gDylWdmaXrjleQJ1V6MhpPz5ODIL7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ bulkscore=0 adultscore=0 impostorscore=0 priorityscore=1501
+ lowpriorityscore=0 clxscore=1015 mlxscore=0 spamscore=0 malwarescore=0
+ mlxlogscore=582 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412050052
 
-Remove some unnecessary newline symbols in code.
 
-Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
----
- drivers/net/ethernet/faraday/ftgmac100.c | 5 -----
- 1 file changed, 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index 11a81f75ed4e..5a0a94c3b1eb 100644
---- a/drivers/net/ethernet/faraday/ftgmac100.c
-+++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -575,7 +575,6 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
- 	dma_unmap_single(priv->dev, map, RX_BUF_SIZE, DMA_FROM_DEVICE);
- #endif
- 
--
- 	/* Resplenish rx ring */
- 	ftgmac100_alloc_rx_buf(priv, pointer, rxdes, GFP_ATOMIC);
- 	priv->rx_pointer = ftgmac100_next_rx_pointer(priv, pointer);
-@@ -1273,7 +1272,6 @@ static int ftgmac100_poll(struct napi_struct *napi, int budget)
- 		more = ftgmac100_rx_packet(priv, &work_done);
- 	} while (more && work_done < budget);
- 
--
- 	/* The interrupt is telling us to kick the MAC back to life
- 	 * after an RX overflow
- 	 */
-@@ -1363,7 +1361,6 @@ static void ftgmac100_reset(struct ftgmac100 *priv)
- 	if (priv->mii_bus)
- 		mutex_lock(&priv->mii_bus->mdio_lock);
- 
--
- 	/* Check if the interface is still up */
- 	if (!netif_running(netdev))
- 		goto bail;
-@@ -1462,7 +1459,6 @@ static void ftgmac100_adjust_link(struct net_device *netdev)
- 
- 	if (netdev->phydev)
- 		mutex_lock(&netdev->phydev->lock);
--
- }
- 
- static int ftgmac100_mii_probe(struct net_device *netdev)
-@@ -1990,7 +1986,6 @@ static int ftgmac100_probe(struct platform_device *pdev)
- 			dev_err(priv->dev, "MII probe failed!\n");
- 			goto err_ncsi_dev;
- 		}
--
- 	}
- 
- 	if (priv->is_aspeed) {
--- 
-2.25.1
+On 05.12.24 03:39, Jakub Kicinski wrote:
+> On Mon,  2 Dec 2024 20:52:01 +0800 Guangguan Wang wrote:
+>> net/smc: Two features for smc-r
+> 
+> changes look relatively straightforward, IBM folks do you need more
+> time to review?
 
+Hi Jakub,
+
+Thank you for the reminder! Yes, we still need a bit more time.
+
+Thanks,
+Wenjia
 
