@@ -1,283 +1,414 @@
-Return-Path: <netdev+bounces-149424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 884B69E58FA
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 15:56:17 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7CB31882C82
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 14:56:04 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59F821C199;
-	Thu,  5 Dec 2024 14:55:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="bJSK1vsj"
-X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2085.outbound.protection.outlook.com [40.107.20.85])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F7519E58FE
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 15:57:00 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A59E21C18D
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 14:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733410547; cv=fail; b=jxXZn51scMx5E72uDHX0HA7yxz93//iRRnLs2QY29WlAGc6A2H3A8wbz+eJ0+8bEKKC9EAVE4sDMP7N51ZNnSeLq5j1tInBb7ASl27u+ZbT9X56MoLIN9Df+sVRERVhOwJaXoAbIqNl0y0JwIImVxIsTdbu6ccTIhTks3PAMqQg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733410547; c=relaxed/simple;
-	bh=9CjP2YUL/DCuo6RTJF4tuxeGc0FiaGlbb6Dgpc34PRI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FgHocmjoNRtkojz+QGyHchwWNBR26YU3Dp06hlWBxZzDPYm15cP0fIp8M8s2U5Luo5tEthFJGVN5GSPnfpp9Uzl+y+nSqBLwhdvERVtGwfZnFlitZNYIxaKbhRbI1SkwSKW+VoJFA9ydLVBahNV41HjosFpQKYN34FT3m7U/EDE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=bJSK1vsj; arc=fail smtp.client-ip=40.107.20.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tuqiEowmU3rZeCo8I7tjhBhxrN8iNeZFdDoRk2TmhMlFes+cZPfRJuxibYuO5wlHmOM3oPZpDhoORgn6t0+7/NT7c4uijLUUjxXxaZCnuxrJT0h5NRHqTp02/y6tnAUu1Y5ffmGhcQ5p3tvdFqdZI6pfgKexwkSOVs78AbYun3DnVn18oMUWgKouPFgAkdZvvy81nMPc6KOCh0RNnwrMUnjMLKM4iukP+Vs4v2H19nF+07lW6i5P/L+uU/ssO3kTPPKwtcGPgjPKtvA5lFfmsKlANNOGoiNqxsDRXsadSLwRdl2MDCCFcsGE7N1SfdoD5r7G+VS0gB6/UiNUtRkXNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9RIu6EzsfsW9e2/TiGgmXSEoa6r62GIPswR/YnwcFr8=;
- b=jA418kKt+TZlm/7WrhycdFWWqyYgrdsdeU5adVidk9/zJNzp/iU3DPaJ3vHteQpniqPTc1P7lkBsmbkJEH5yT59Dyu3jrLsmzfRfSn1tO4t23HmapmjtYWxf2RYhofbuSShrkMmFoQoqIe3UlLRCDwRBa0Lr4DCHglpILTHOnyF44TkGNMdYdTaZXJiNNI4ZOoYjK2Y7CerVTogvd2NBjwzceTnVNPT/V8gY9rkzeXhLtSChoPbA/qQ3TrlTnP+vCgvb+fy3HyvBQrtyfdbpfuwsb8yuv4Lwl34B0sPWk5AiYAmHpYIlnrBtltTEoLv+c/jNEnRGkBxqIcKlTKSlyg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9RIu6EzsfsW9e2/TiGgmXSEoa6r62GIPswR/YnwcFr8=;
- b=bJSK1vsjCSkMyfqg4p3sjQaJRPu5AgukoD7HPeOasPhmryZH6oZ3kH3EaIdYkyyF4KEDnnj2Fa14Uj2zKD/ua+69+nXbgf5HXT8BvFcgFKxTO0YZJckXTmf6sZ/iddT1sm6HH24Y7/9JYY/+FmXh4FnPE6iWqf6C0QqIT6tA4pPxE1iMNSY+Y8uNCb+0bGs/uHQZLYZHCeeGwzqI4Hxq8wCmQMh7rR/KfXmjdyK9cGN4mFD6WwS58Bid1v4hhri6SFrjOl/9WTWkoXTwg6YdNEOK/NZgxd/sZFhsYV1/04lcP5P2MkUcG6rnx2OE7HHegd7Kli1uaCNgd2MM39/qNQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by PA1PR04MB10443.eurprd04.prod.outlook.com (2603:10a6:102:450::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.12; Thu, 5 Dec
- 2024 14:55:34 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8230.010; Thu, 5 Dec 2024
- 14:55:34 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
-	Yangbo Lu <yangbo.lu@nxp.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: [PATCH v2 net 5/5] net: mscc: ocelot: perform error cleanup in ocelot_hwstamp_set()
-Date: Thu,  5 Dec 2024 16:55:19 +0200
-Message-ID: <20241205145519.1236778-6-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241205145519.1236778-1-vladimir.oltean@nxp.com>
-References: <20241205145519.1236778-1-vladimir.oltean@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: VI1PR10CA0118.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:803:28::47) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FAAD285C77
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 14:56:59 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8765821C195;
+	Thu,  5 Dec 2024 14:56:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CY4ChA6y"
+X-Original-To: netdev@vger.kernel.org
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773271B0F22
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 14:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733410615; cv=none; b=Rc/IGyP13dKcu18LbTX39rOslLYm1dPRu0vINq4d/NVO/Q2dahJa4Z/SbiGJLK9TZJBsmBB/e159o6AsPEYU99wZDx8U7itxS7AyXxvoqpKnhMddOKmLU9YQG3+DitlWXabSK4ymD/uD+HSh2P57CinHsuUq+tpWAdSikzGxFBY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733410615; c=relaxed/simple;
+	bh=O3AictZnwwdzBNmqYePdc1bEAfNfPUaShjj+kc4or5w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XHkiLpkfDjgVIdkXJpxRP8sqmzu3SMqymTjkbGeTkC82ya7o/H9u3N9rQ9dHL8hZ+2LHghdZnOV8zdd6YFIeXM2ZI7ndX87wMCeUFvGjH6y9QVtFsSbXl0F9JtZ5VpV9ANapmzuoOwZFjpfO1i6ItJi6W33EdPdkwwtfe0YijEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CY4ChA6y; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733410612;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=o7x+dQLzoUfE1chSNUNoG6EijuRVKSV36Vs0MFnyPBY=;
+	b=CY4ChA6ylB7+fZ7Wny9ROCZroHNDihvqJZpEv1BS63TJMSJr3O5unYxdbkcQcuDu3MChx+
+	0S8HMkGVgcUZedIcjbzn0g+uyvc5duFjSMkWcs/NUdKkxQYV088GfbbZT6KJvlAT2MD1iI
+	5mVGNc2Ki+L4QnEslQEviKIYFjRUBb0=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-458-qD-s7LQ9PkaIim-xUafrrw-1; Thu,
+ 05 Dec 2024 09:56:45 -0500
+X-MC-Unique: qD-s7LQ9PkaIim-xUafrrw-1
+X-Mimecast-MFC-AGG-ID: qD-s7LQ9PkaIim-xUafrrw
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 87FCA195608A;
+	Thu,  5 Dec 2024 14:56:43 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.39.193.31])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 97A9E1956094;
+	Thu,  5 Dec 2024 14:56:41 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.13-rc2
+Date: Thu,  5 Dec 2024 15:56:05 +0100
+Message-ID: <20241205145605.209744-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|PA1PR04MB10443:EE_
-X-MS-Office365-Filtering-Correlation-Id: ce1d1ebd-cef0-47c7-8c2c-08dd153cdf63
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|52116014|366016|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?YF/mmgv7fqpWsBWMKwf0/+biZpI+9+u1BMl3rHeTkqLIJOmSWvQgW+PqFY9x?=
- =?us-ascii?Q?11dw0CbLPOfMremanAq3G3P0DBSXNiWsHytXIHXzKVQ32Tafint0XIeAJpLC?=
- =?us-ascii?Q?o5lcUq0cXcpUnC4NA8qd4GStJhLIf+sZcs4DIbd4xbR9U9nlu1LZIuZbukdc?=
- =?us-ascii?Q?WJv2LJ9NHA/YqFJUJjROdYhD5VvpTuPCxBVqPQ5PO+dzR/wieXO6aBuMLyf+?=
- =?us-ascii?Q?5HPpZ1xlZ3qGfRdWo31nIirTDsYVZwyjDq44eanGkqupVLtJKHnSs1Fb2jjS?=
- =?us-ascii?Q?bmnUuX2PrtfTI1PRXREUWI5t2/9yoMpHhG0NUmAFjYedlj6TLxDusAQf6whF?=
- =?us-ascii?Q?jJaJ0EauwvemQAjjLNKKd/DqAXPea6vgM4IPCzZ8ZsLqO8EO14QSvc7jFo+Y?=
- =?us-ascii?Q?DvfPSDWHziCJrAHXiXyVDrzLdHy7cKuTKUWbQ4rGdWeI2IMBuEWVpK2Nb7wa?=
- =?us-ascii?Q?RFIVSrNpIqZBJCNrgjBkJWcfKc9JSJ5bxZSpy23rhsqHaPwEfA8cAzWt9QaQ?=
- =?us-ascii?Q?JIvGzSjgJAick3fnUMBpcVExdRL1R1iLhsBhHfLMwePQdWEuON7JnjvepyWG?=
- =?us-ascii?Q?j0GuywC8dv/LhCPskcOx0xu5/WLjQb47GDDKebD63U+KeeGXFNY4eDBYC0bc?=
- =?us-ascii?Q?jbHLg8c8vrl8talzPYOa8oyrhRiaWdcHUinoro1Yb0v7wlzipmgpXiYhPNas?=
- =?us-ascii?Q?E87KiJqPK/lKxOTfJtWL9V6TPPhgxbP1Tj5LXZNLK2lr7jq/zxe2cEa+43fs?=
- =?us-ascii?Q?EX1p82JMEbcQr9IbeVmSDmxpRsmPCVsMHh6qZT6xuo9VlXhuRjawlfd8wNgs?=
- =?us-ascii?Q?GRExgdfCdYA7LS1BX8uUy76+W4B7u64/XSjM5UO6Gqsv7CsQUL+bUCM2JLrL?=
- =?us-ascii?Q?CgCkq2A6mmtLHyVA79wG8qU2M7LMMSfeQC4gfx/SGdtZAvHiUYYkmXi9giAV?=
- =?us-ascii?Q?a8IK/L+pYm76i1226tVZlXGIGk6dnLWgOFeV7xCHzASbt05+e3wBn/aEG3HA?=
- =?us-ascii?Q?iPD55a9cu2EUcRrrdx09KfSPAF6iSMQkHp0RRaiXLbv/JXhzNjE03dp88HG2?=
- =?us-ascii?Q?bL/qm/5rX+kndXsC4q737H87RLQd10NINOWRTaY/7E8+w++SOyV5Mj5j22hB?=
- =?us-ascii?Q?iMKK8W+vdfh4UwwmMxJn9hJkiq5xHEtfdybsFn0fO0rC8OmHrVIp35AfHSdd?=
- =?us-ascii?Q?aZ8F0PcRSoepa1EYUY/2e2tvT5KNT9q+YfagtCaKlZ3NKo8rwYFRcyNGeuZW?=
- =?us-ascii?Q?YlQToZ/72tKrNe7Avuhzh+Zyx7GPhF7FoQGRcEO4g27/senFMeWRnf4wE/ga?=
- =?us-ascii?Q?9Qm1WunYqfJOJArTkHsOZdGA2BB30oHQ6tcqITABpLmYIPaf+aduyUh159Ja?=
- =?us-ascii?Q?Aais4yHZgLs9OmTJYfC9XgU4I1X2dA7BNcgHlNzH/tW0IAz2Ew=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(52116014)(366016)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ufTqthYS707YDFyOxsa/TE5zlpeswy4OvZXWnYj/K1mKbYj99WElS1CHPwJk?=
- =?us-ascii?Q?yI9MuwPOhnFt/yGX1TDFjeuU70V+uEGhMJBERDUN98zahkeoBzzUgq/PoSJg?=
- =?us-ascii?Q?xhoY8IyrPu4Fp9++bxp1N7kRbhHq9iDCACkmdXqeyyFBfTWgi53I2rzWuusQ?=
- =?us-ascii?Q?YGQ3SnRo2xseEz4Y6aR+SDhfplawNXpZ5bH8U7ZZb2e1Wga+3eZAvq2SElqO?=
- =?us-ascii?Q?DUOKief9tbLbYcJPSh8eq8QDL/Xec3whzufi5WU7l1WqAuzKh3Jf6tdgEdgN?=
- =?us-ascii?Q?efqwKmMppS4QX66SwmpiljjV+I80n8AEdpXwH7E2pNwypd6ZF4jfUZzRLlyp?=
- =?us-ascii?Q?ccm222hs3GRRpQxq6GWOPEV7wgsD5inVIq14RrkJsrTsLLx8QNMYEMzx7fPF?=
- =?us-ascii?Q?6CmkuBkLfeIlFjbNUCX9Q7uk2vvnCl/VXXiwmwNGRN+95eiLylvS4FlHSMFX?=
- =?us-ascii?Q?4ehTOdt41d3hFbe4bb/OW4E059/Wy+qtMtV0sppBpIv8HtxgJB9qI5e7ZG5a?=
- =?us-ascii?Q?ZFe/mO/vvHqo/5J3At/aWhtz0gwbd8SWP7dkCZF21oZbSdKeS6w/lfhqvSfw?=
- =?us-ascii?Q?9GY5ASpR0VE3WOPylBksYqTbOSOnSqRbvDKS3NeCfy5TcNBOZUMDdT+3DMmd?=
- =?us-ascii?Q?38Gwgwg+W4cA5GC7GihYIJts1qBaiEW2cpPcDaup+0mGm1EEXnbtcdHz2w1j?=
- =?us-ascii?Q?UPTzkD35UZlF54vlMZGFaBWWkp+DSnONIbbf4N2mVnUWouRFB1fXvzxOpmQj?=
- =?us-ascii?Q?ELExqxlfa5Uez0Eu5ZoIlexaDaY1urzmogyNbn2GZyVR+967Vm8QVpVOOsse?=
- =?us-ascii?Q?Gqf8JuERX3r36DNwWrEof+g0linZL81hd1NsGZlixWTOM3/vhLXwGzRoyHQW?=
- =?us-ascii?Q?LVOmAZivukCaiAkeK0qmifVa12Aq1Q9JLielxZIcYGlPAHQyXbVRWT9zNs6S?=
- =?us-ascii?Q?miuDsUmyiapjmMGPDv2/JM55OBlvg/RGysDanKnA1MjF8lSS0K1g9R/5imNF?=
- =?us-ascii?Q?qn/rNsqq9qEkTgyMzUb1HBWjSsEdvRRBifBxhyB9GrJWvcGPUNujnoThVOKP?=
- =?us-ascii?Q?lGu1SEWUB0TETWOkuEaaPDS0HV/MBTzr/xIlRoDlxYJTQTUMldpNgLinvu9A?=
- =?us-ascii?Q?UnAn+qNTMuRYBIBgSJs5FRCd0UAmXsaC/O50aegiHMayIaP3aHPc5UFa0/fW?=
- =?us-ascii?Q?nU+kDNwM7VXD7GrPMPqWRqQtZojKOXQdVzSCP97fvHs5pl8b9G+HCNAUZK7u?=
- =?us-ascii?Q?nH9wpdbqEKOTayjeOf+twwPkyRmq7gNfyurbByE+PtAJ667Srxj0+oizKVU1?=
- =?us-ascii?Q?YfG3uosgARjXiWeWc/vTT8F9b4JTuJeK4qD69Dui2st18IzoJIDMeSpNsDZG?=
- =?us-ascii?Q?a8DJnQCjDUOJvSwqCVNj+x8YsdnsPxMZMsjXqXghla7u32D9Vdx95wQxf98+?=
- =?us-ascii?Q?TZJj6oDRpXKXZL4v0LVgnAGosBy185oEIc+PlzKfzUoOioCVxFxK9nIG8K6l?=
- =?us-ascii?Q?qLjDSPNIJNP11tXH7/RcNMHx/y5E2Y+WLpZs8M2L4jZcluHbBxO1RDD5uD6G?=
- =?us-ascii?Q?ClZfYaxY7qfdzJDo+Qn41QDt4wxflx9WMGsvbUtmJc+EzXEXTuBE+oxnWwr8?=
- =?us-ascii?Q?Sw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce1d1ebd-cef0-47c7-8c2c-08dd153cdf63
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2024 14:55:34.8729
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QfahUaZAURzfddhzsWsjV1okOLyZb8SNGQexyPCXbauxqEa/w6JyULK9IAiiA0IVx9tyL6RkBQ+UikvyJsSnxA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB10443
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-An unsupported RX filter will leave the port with TX timestamping still
-applied as per the new request, rather than the old setting. When
-parsing the tx_type, don't apply it just yet, but delay that until after
-we've parsed the rx_filter as well (and potentially returned -ERANGE for
-that).
+Hi Linus!
 
-Similarly, copy_to_user() may fail, which is a rare occurrence, but
-should still be treated by unwinding what was done.
+The following changes since commit 65ae975e97d5aab3ee9dc5ec701b12090572ed43:
 
-Fixes: 96ca08c05838 ("net: mscc: ocelot: set up traps for PTP packets")
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/ethernet/mscc/ocelot_ptp.c | 59 ++++++++++++++++++--------
- 1 file changed, 42 insertions(+), 17 deletions(-)
+  Merge tag 'net-6.13-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-11-28 10:15:20 -0800)
 
-diff --git a/drivers/net/ethernet/mscc/ocelot_ptp.c b/drivers/net/ethernet/mscc/ocelot_ptp.c
-index 7eb01d1e1ecd..808ce8e68d39 100644
---- a/drivers/net/ethernet/mscc/ocelot_ptp.c
-+++ b/drivers/net/ethernet/mscc/ocelot_ptp.c
-@@ -497,6 +497,28 @@ static int ocelot_traps_to_ptp_rx_filter(unsigned int proto)
- 	return HWTSTAMP_FILTER_NONE;
- }
- 
-+static int ocelot_ptp_tx_type_to_cmd(int tx_type, int *ptp_cmd)
-+{
-+	switch (tx_type) {
-+	case HWTSTAMP_TX_ON:
-+		*ptp_cmd = IFH_REW_OP_TWO_STEP_PTP;
-+		break;
-+	case HWTSTAMP_TX_ONESTEP_SYNC:
-+		/* IFH_REW_OP_ONE_STEP_PTP updates the correctionField,
-+		 * what we need to update is the originTimestamp.
-+		 */
-+		*ptp_cmd = IFH_REW_OP_ORIGIN_PTP;
-+		break;
-+	case HWTSTAMP_TX_OFF:
-+		*ptp_cmd = 0;
-+		break;
-+	default:
-+		return -ERANGE;
-+	}
-+
-+	return 0;
-+}
-+
- int ocelot_hwstamp_get(struct ocelot *ocelot, int port, struct ifreq *ifr)
- {
- 	struct ocelot_port *ocelot_port = ocelot->ports[port];
-@@ -523,30 +545,19 @@ EXPORT_SYMBOL(ocelot_hwstamp_get);
- int ocelot_hwstamp_set(struct ocelot *ocelot, int port, struct ifreq *ifr)
- {
- 	struct ocelot_port *ocelot_port = ocelot->ports[port];
-+	int ptp_cmd, old_ptp_cmd = ocelot_port->ptp_cmd;
- 	bool l2 = false, l4 = false;
- 	struct hwtstamp_config cfg;
-+	bool old_l2, old_l4;
- 	int err;
- 
- 	if (copy_from_user(&cfg, ifr->ifr_data, sizeof(cfg)))
- 		return -EFAULT;
- 
- 	/* Tx type sanity check */
--	switch (cfg.tx_type) {
--	case HWTSTAMP_TX_ON:
--		ocelot_port->ptp_cmd = IFH_REW_OP_TWO_STEP_PTP;
--		break;
--	case HWTSTAMP_TX_ONESTEP_SYNC:
--		/* IFH_REW_OP_ONE_STEP_PTP updates the correctional field, we
--		 * need to update the origin time.
--		 */
--		ocelot_port->ptp_cmd = IFH_REW_OP_ORIGIN_PTP;
--		break;
--	case HWTSTAMP_TX_OFF:
--		ocelot_port->ptp_cmd = 0;
--		break;
--	default:
--		return -ERANGE;
--	}
-+	err = ocelot_ptp_tx_type_to_cmd(cfg.tx_type, &ptp_cmd);
-+	if (err)
-+		return err;
- 
- 	switch (cfg.rx_filter) {
- 	case HWTSTAMP_FILTER_NONE:
-@@ -571,13 +582,27 @@ int ocelot_hwstamp_set(struct ocelot *ocelot, int port, struct ifreq *ifr)
- 		return -ERANGE;
- 	}
- 
-+	old_l2 = ocelot_port->trap_proto & OCELOT_PROTO_PTP_L2;
-+	old_l4 = ocelot_port->trap_proto & OCELOT_PROTO_PTP_L4;
-+
- 	err = ocelot_setup_ptp_traps(ocelot, port, l2, l4);
- 	if (err)
- 		return err;
- 
-+	ocelot_port->ptp_cmd = ptp_cmd;
-+
- 	cfg.rx_filter = ocelot_traps_to_ptp_rx_filter(ocelot_port->trap_proto);
- 
--	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
-+	if (copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg))) {
-+		err = -EFAULT;
-+		goto out_restore_ptp_traps;
-+	}
-+
-+	return 0;
-+out_restore_ptp_traps:
-+	ocelot_setup_ptp_traps(ocelot, port, old_l2, old_l4);
-+	ocelot_port->ptp_cmd = old_ptp_cmd;
-+	return err;
- }
- EXPORT_SYMBOL(ocelot_hwstamp_set);
- 
--- 
-2.43.0
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.13-rc2
+
+for you to fetch changes up to 31f1b55d5d7e531cd827419e5d71c19f24de161c:
+
+  net :mana :Request a V2 response version for MANA_QUERY_GF_STAT (2024-12-05 12:02:15 +0100)
+
+----------------------------------------------------------------
+Including fixes from can and netfilter.
+
+Current release - regressions:
+
+  - rtnetlink: fix double call of rtnl_link_get_net_ifla()
+
+  - tcp: populate XPS related fields of timewait sockets
+
+  - ethtool: fix access to uninitialized fields in set RXNFC command
+
+  - selinux: use sk_to_full_sk() in selinux_ip_output()
+
+Current release - new code bugs:
+
+  - net: make napi_hash_lock irq safe
+
+  - eth: bnxt_en: support header page pool in queue API
+
+  - eth: ice: fix NULL pointer dereference in switchdev
+
+Previous releases - regressions:
+
+  - core: fix icmp host relookup triggering ip_rt_bug
+
+  - ipv6:
+    - avoid possible NULL deref in modify_prefix_route()
+    - release expired exception dst cached in socket
+
+  - smc: fix LGR and link use-after-free issue
+
+  - hsr: avoid potential out-of-bound access in fill_frame_info()
+
+  - can: hi311x: fix potential use-after-free
+
+  - eth: ice: fix VLAN pruning in switchdev mode
+
+Previous releases - always broken:
+
+  - netfilter:
+    - ipset: hold module reference while requesting a module
+    - nft_inner: incorrect percpu area handling under softirq
+
+  - can: j1939: fix skb reference counting
+
+  - eth: mlxsw: use correct key block on Spectrum-4
+
+  - eth: mlx5: fix memory leak in mlx5hws_definer_calc_layout
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Ajay Kaher (1):
+      ptp: Add error handling for adjfine callback in ptp_clock_adjtime
+
+Alexander Kozhinov (1):
+      can: gs_usb: add usb endpoint address detection at driver probe step
+
+Arkadiusz Kubalewski (1):
+      ice: fix PHY Clock Recovery availability check
+
+Cong Wang (1):
+      rtnetlink: fix double call of rtnl_link_get_net_ifla()
+
+Cosmin Ratiu (2):
+      net/mlx5: HWS: Fix memory leak in mlx5hws_definer_calc_layout
+      net/mlx5: HWS: Properly set bwc queue locks lock classes
+
+Daniel Xu (2):
+      bnxt_en: ethtool: Supply ntuple rss context action
+      selftests: drv-net: rss_ctx: Add test for ntuple rule
+
+Dario Binacchi (11):
+      can: c_can: c_can_handle_bus_err(): update statistics if skb allocation fails
+      can: sun4i_can: sun4i_can_err(): call can_change_state() even if cf is NULL
+      can: hi311x: hi3110_can_ist(): fix potential use-after-free
+      can: hi311x: hi3110_can_ist(): update state error statistics if skb allocation fails
+      can: m_can: m_can_handle_lec_err(): fix {rx,tx}_errors statistics
+      can: ifi_canfd: ifi_canfd_handle_lec_err(): fix {rx,tx}_errors statistics
+      can: hi311x: hi3110_can_ist(): fix {rx,tx}_errors statistics
+      can: sja1000: sja1000_err(): fix {rx,tx}_errors statistics
+      can: sun4i_can: sun4i_can_err(): fix {rx,tx}_errors statistics
+      can: ems_usb: ems_usb_rx_err(): fix {rx,tx}_errors statistics
+      can: f81604: f81604_handle_can_bus_errors(): fix {rx,tx}_errors statistics
+
+David S. Miller (1):
+      Merge branch 'enetc-mqprio-fixes' Wei Fang sayus:
+
+David Wei (3):
+      bnxt_en: refactor tpa_info alloc/free into helpers
+      bnxt_en: refactor bnxt_alloc_rx_rings() to call bnxt_alloc_rx_agg_bmap()
+      bnxt_en: handle tpa_info in queue API implementation
+
+Dmitry Antipov (2):
+      netfilter: x_tables: fix LED ID check in led_tg_check()
+      can: j1939: j1939_session_new(): fix skb reference counting
+
+Dong Chenchen (1):
+      net: Fix icmp host relookup triggering ip_rt_bug
+
+Eric Dumazet (7):
+      tcp: populate XPS related fields of timewait sockets
+      selinux: use sk_to_full_sk() in selinux_ip_output()
+      net: hsr: avoid potential out-of-bound access in fill_frame_info()
+      ipv6: avoid possible NULL deref in modify_prefix_route()
+      net: hsr: must allocate more bytes for RedBox support
+      geneve: do not assume mac header is set in geneve_xmit_skb()
+      net: avoid potential UAF in default_operstate()
+
+Fernando Fernandez Mancera (1):
+      Revert "udp: avoid calling sock_def_readable() if possible"
+
+Gal Pressman (1):
+      ethtool: Fix access to uninitialized fields in set RXNFC command
+
+Geetha sowjanya (1):
+      octeontx2-af: Fix SDP MAC link credits configuration
+
+Ido Schimmel (1):
+      mlxsw: spectrum_acl_flex_keys: Use correct key block on Spectrum-4
+
+Ivan Solodovnikov (1):
+      dccp: Fix memory leak in dccp_feat_change_recv
+
+Jacob Keller (2):
+      ixgbevf: stop attempting IPSEC offload on Mailbox API 1.5
+      ixgbe: downgrade logging of unsupported VF API version to debug
+
+Jakub Kicinski (6):
+      Merge branch 'bnxt-fix-failure-to-report-rss-context-in-ntuple-rule'
+      MAINTAINERS: list PTP drivers under networking
+      Merge tag 'linux-can-fixes-for-6.13-20241202' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
+      Merge branch 'bnxt_en-support-header-page-pool-in-queue-api'
+      Merge branch 'mlx5-misc-fixes-2024-12-03'
+      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+
+Jianbo Liu (1):
+      net/mlx5e: Remove workaround to avoid syndrome for internal port
+
+Jinghao Jia (1):
+      ipvs: fix UB due to uninitialized stack access in ip_vs_protocol_init()
+
+Jiri Wiesner (1):
+      net/ipv6: release expired exception dst cached in socket
+
+Joe Damato (1):
+      net: Make napi_hash_lock irq safe
+
+Joshua Hay (1):
+      idpf: set completion tag for "empty" bufs associated with a packet
+
+Konstantin Shkolnyy (3):
+      vsock/test: fix failures due to wrong SO_RCVLOWAT parameter
+      vsock/test: fix parameter types in SO_VM_SOCKETS_* calls
+      vsock/test: verify socket options after setting them
+
+Kory Maincent (1):
+      ethtool: Fix wrong mod state in case of verbose and no_mask bitset
+
+Kuniyuki Iwashima (1):
+      tipc: Fix use-after-free of kernel socket in cleanup_bearer().
+
+Lion Ackermann (1):
+      net: sched: fix ordering of qlen adjustment
+
+Louis Leseur (1):
+      net/qed: allow old cards not supporting "num_images" to work
+
+Marc Kleine-Budde (3):
+      can: dev: can_set_termination(): allow sleeping GPIOs
+      Merge patch series "Fix {rx,tx}_errors CAN statistics"
+      can: mcp251xfd: mcp251xfd_get_tef_len(): work around erratum DS80000789E 6.
+
+Marcin Szycik (1):
+      ice: Fix VLAN pruning in switchdev mode
+
+Martin Ottens (1):
+      net/sched: tbf: correct backlog statistic for GSO packets
+
+Oleksij Rempel (1):
+      net: phy: microchip: Reset LAN88xx PHY to ensure clean link state on LAN7800/7850
+
+Pablo Neira Ayuso (3):
+      netfilter: nft_socket: remove WARN_ON_ONCE on maximum cgroup level
+      netfilter: nft_inner: incorrect percpu area handling under softirq
+      netfilter: nft_set_hash: skip duplicated elements pending gc run
+
+Paolo Abeni (4):
+      Merge branch 'two-fixes-for-smc'
+      ipmr: tune the ipmr_can_free_table() checks.
+      Merge branch 'vsock-test-fix-wrong-setsockopt-parameters'
+      Merge tag 'nf-24-12-05' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+
+Patrisious Haddad (2):
+      net/mlx5: E-Switch, Fix switching to switchdev mode with IB device disabled
+      net/mlx5: E-Switch, Fix switching to switchdev mode in MPV
+
+Phil Sutter (1):
+      netfilter: ipset: Hold module reference while requesting a module
+
+Przemyslaw Korba (1):
+      ice: fix PHY timestamp extraction for ETH56G
+
+Shradha Gupta (1):
+      net :mana :Request a V2 response version for MANA_QUERY_GF_STAT
+
+Tariq Toukan (1):
+      net/mlx5e: SD, Use correct mdev to build channel param
+
+Tore Amundsen (1):
+      ixgbe: Correct BASE-BX10 compliance code
+
+Vladimir Oltean (1):
+      net: enetc: read TSN capabilities from port register, not SI
+
+Vyshnav Ajith (1):
+      docs: net: bareudp: fix spelling and grammar mistakes
+
+Wei Fang (1):
+      net: enetc: Do not configure preemptible TCs if SIs do not support
+
+Wen Gu (2):
+      net/smc: initialize close_work early to avoid warning
+      net/smc: fix LGR and link use-after-free issue
+
+Wojciech Drewek (1):
+      ice: Fix NULL pointer dereference in switchdev
+
+Xin Long (1):
+      net: sched: fix erspan_opt settings in cls_flower
+
+Yuan Can (1):
+      igb: Fix potential invalid memory access in igb_init_module()
+
+ Documentation/networking/bareudp.rst               |  11 +-
+ MAINTAINERS                                        |   1 +
+ drivers/net/can/c_can/c_can_main.c                 |  26 ++-
+ drivers/net/can/dev/dev.c                          |   2 +-
+ drivers/net/can/ifi_canfd/ifi_canfd.c              |  58 ++++--
+ drivers/net/can/m_can/m_can.c                      |  33 +++-
+ drivers/net/can/sja1000/sja1000.c                  |  67 ++++---
+ drivers/net/can/spi/hi311x.c                       |  55 +++---
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c      |  29 ++-
+ drivers/net/can/sun4i_can.c                        |  22 ++-
+ drivers/net/can/usb/ems_usb.c                      |  58 +++---
+ drivers/net/can/usb/f81604.c                       |  10 +-
+ drivers/net/can/usb/gs_usb.c                       |  25 ++-
+ drivers/net/can/vxcan.c                            |  10 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          | 205 +++++++++++++--------
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c  |   8 +-
+ drivers/net/ethernet/freescale/enetc/enetc.c       |  12 +-
+ drivers/net/ethernet/freescale/enetc/enetc_hw.h    |   6 +-
+ drivers/net/ethernet/freescale/enetc/enetc_pf.c    |  19 ++
+ drivers/net/ethernet/intel/ice/ice_common.c        |  25 ++-
+ drivers/net/ethernet/intel/ice/ice_main.c          |   8 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c        |   3 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h        |   5 +-
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c      |   6 +
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c        |   1 +
+ drivers/net/ethernet/intel/igb/igb_main.c          |   4 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_common.h    |   2 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h       |   2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c     |   2 +-
+ drivers/net/ethernet/intel/ixgbevf/ipsec.c         |   1 -
+ drivers/net/ethernet/marvell/octeontx2/af/common.h |   1 +
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |   3 +
+ .../ethernet/mellanox/mlx5/core/en/tc_tun_encap.c  |  13 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |  32 ++--
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |   5 +-
+ .../mellanox/mlx5/core/steering/hws/bwc_complex.c  |   2 +
+ .../mellanox/mlx5/core/steering/hws/send.c         |   1 +
+ .../mellanox/mlxsw/spectrum_acl_flex_keys.c        |   6 +-
+ drivers/net/ethernet/microsoft/mana/mana_en.c      |   1 +
+ drivers/net/ethernet/qlogic/qed/qed_mcp.c          |   4 +-
+ drivers/net/geneve.c                               |   2 +-
+ drivers/net/netkit.c                               |  11 +-
+ drivers/net/phy/microchip.c                        |  21 +++
+ drivers/net/veth.c                                 |  12 +-
+ drivers/ptp/ptp_clock.c                            |   3 +-
+ include/net/inet_timewait_sock.h                   |   2 +
+ include/net/net_namespace.h                        |   5 +
+ include/net/netfilter/nf_tables_core.h             |   1 +
+ net/can/j1939/transport.c                          |   2 +-
+ net/core/dev.c                                     |  18 +-
+ net/core/link_watch.c                              |   7 +-
+ net/core/rtnetlink.c                               |  44 ++---
+ net/dccp/feat.c                                    |   6 +-
+ net/ethtool/bitset.c                               |  48 ++++-
+ net/ethtool/ioctl.c                                |   3 +-
+ net/hsr/hsr_device.c                               |  19 +-
+ net/hsr/hsr_forward.c                              |   2 +
+ net/ipv4/icmp.c                                    |   3 +
+ net/ipv4/ipmr.c                                    |   2 +-
+ net/ipv4/tcp_minisocks.c                           |   4 +
+ net/ipv4/udp.c                                     |  14 +-
+ net/ipv6/addrconf.c                                |  13 +-
+ net/ipv6/ip6mr.c                                   |   2 +-
+ net/ipv6/route.c                                   |   6 +-
+ net/netfilter/ipset/ip_set_core.c                  |   5 +
+ net/netfilter/ipvs/ip_vs_proto.c                   |   4 +-
+ net/netfilter/nft_inner.c                          |  57 ++++--
+ net/netfilter/nft_set_hash.c                       |  16 ++
+ net/netfilter/nft_socket.c                         |   2 +-
+ net/netfilter/xt_LED.c                             |   4 +-
+ net/sched/cls_flower.c                             |   5 +-
+ net/sched/sch_cake.c                               |   2 +-
+ net/sched/sch_choke.c                              |   2 +-
+ net/sched/sch_tbf.c                                |  18 +-
+ net/smc/af_smc.c                                   |   6 +-
+ net/tipc/udp_media.c                               |   2 +-
+ security/selinux/hooks.c                           |   2 +-
+ tools/testing/selftests/drivers/net/hw/rss_ctx.py  |  12 +-
+ tools/testing/vsock/control.c                      |   9 +-
+ tools/testing/vsock/msg_zerocopy_common.c          |  10 -
+ tools/testing/vsock/msg_zerocopy_common.h          |   1 -
+ tools/testing/vsock/util.c                         | 142 ++++++++++++++
+ tools/testing/vsock/util.h                         |   7 +
+ tools/testing/vsock/vsock_perf.c                   |  20 +-
+ tools/testing/vsock/vsock_test.c                   |  75 ++++----
+ tools/testing/vsock/vsock_test_zerocopy.c          |   2 +-
+ tools/testing/vsock/vsock_uring_test.c             |   2 +-
+ 87 files changed, 985 insertions(+), 454 deletions(-)
 
 
