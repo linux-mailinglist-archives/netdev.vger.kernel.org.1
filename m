@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-149216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A8D99E4C8D
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 04:10:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E2F39E4C96
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 04:20:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0ECD1881698
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 03:10:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F13C5168349
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 03:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 878843EA9A;
-	Thu,  5 Dec 2024 03:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDCF15B980;
+	Thu,  5 Dec 2024 03:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C9un34IZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vPCzmvLf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEC92F22;
-	Thu,  5 Dec 2024 03:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D071238C;
+	Thu,  5 Dec 2024 03:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733368215; cv=none; b=Q6BNQSvHKxMkfZf3cfdehqtcopO3zVZSNqzHQlytardgUsQEpcPdMvVL19ldu7/amRBMnlsXT6sdESXVZKSJwULSmVD2fbtemMAGB2cioul5ngTnPVYCGjLi3yop0lrHiv48A4W35oV0gjVWXgvjkmGhg+Tk9WKjtQqot1b8NMQ=
+	t=1733368818; cv=none; b=FdP+OrkBvmYuBFJkP4ZB1WR8yVRBvvxgPcN0g5wuAHy62Op8aFRMp18iqVvO2qqCsg/MXyooPl7EGIkMYvNjHosjGPPlXqBKnssZHH2Q/0AVsGuQg7pvDRE7m7nLrQk2ZtDg9T6ox6OEVldkNkYVtLGK3egILmEtFCmADL1KA6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733368215; c=relaxed/simple;
-	bh=Q0Zqwi+W+tMMxdrdG4WcjLTM9JVFeBUjyln2Ywvijrc=;
+	s=arc-20240116; t=1733368818; c=relaxed/simple;
+	bh=t0xFVOPHaEG0gdPwQnZdswE/D5MNP32oEBiWtJIcnSk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CzdLZaq9nH5gtIFQQNDF/ix68+yRNnpfgJ3TejwkTpCDK0/y1hLBjDaPKIxlyj37J5NGM7KgaKDUWAORIiaRUTOq98AmXenA/nAjyuimLpOmvR5kmd52A8RKppuLr0C3eBH/RMbi0Jd9f3H1BzsrjsslGCmIytcq3JV2GLiuzOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C9un34IZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4C4BC4CED6;
-	Thu,  5 Dec 2024 03:10:14 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=N06/kWvoaJJldFu32WOkKv2KkHKpj+ssv3LtSn/x7/sCxZrvlL+jwJ0Rg0kabYnyEiIA1LDqeWB8V1tiu8RQkYFubRkLMKUgj127vcCzge07XtaZfp6Nin1X/XszgcdissrBkIInJg/SGq09KeZy57OjC6BiBscTiKRh6xolN7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vPCzmvLf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E7DEC4CED6;
+	Thu,  5 Dec 2024 03:20:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733368214;
-	bh=Q0Zqwi+W+tMMxdrdG4WcjLTM9JVFeBUjyln2Ywvijrc=;
+	s=k20201202; t=1733368818;
+	bh=t0xFVOPHaEG0gdPwQnZdswE/D5MNP32oEBiWtJIcnSk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=C9un34IZoh+rmddxVwZoOds2JxMnYW6kO5HEaNxxEoG8bSCp8CudWxEx32rqaze5N
-	 eRxWRTtDWeJUZIo1CPfw4rHUJ/gt4AwJM4dF+e+08SVPQfJGp3vx+P34j2OhAkOlB5
-	 evwjz8AZ7a0Ql0m/yJ/XYUfS7OgAhneocCevF4Z3+Xt7wInueZnbmJoaHUMMd1hg+9
-	 RFTe8ovHehDQwm8aVZTe5OCjcgzzXiTQom/z5UDKRnPHTvcLfGAN5cEejcp0fftdpT
-	 5X4AeWynkKy2xbehGyQfZFfNALR7ZQ7OIoWwmrccdJryo46MmCPhNOUkz0TI5/aDQz
-	 KdJ+AvH/BnbLQ==
+	b=vPCzmvLfpZ4JCSL5khkNMEHBVawjcTvU1Zc+epQY3x1ggNJVQtWy6Cxf0c8lRL5pC
+	 qTmK+SoEI5upMayAzc4QSVgHsmP7OOLqrWGIKDd/q+3BbLJAoK/0GkhwVRwovxXPxi
+	 BhNxM0MTBRy1dulC0zrkOqvU23G5m01X84XxmnkuoFTLX1C+qTg6sh7+dsqzF+9yoF
+	 zGA2bR8+vNqKyEMTPn9Vth6P74sXnFG4YN2XikgZ3yF6Qe8ZMFP+z89Iorzd5bv83y
+	 mvDLgFhadhlAMKx05tcDvRUbzqQxZTeJFv0Qmf8Q+jEBoufNOmD1TMcUHgWUUBWrCJ
+	 DfkAFuG2idasw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFF3380A94C;
-	Thu,  5 Dec 2024 03:10:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 35657380A950;
+	Thu,  5 Dec 2024 03:20:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND net-next v2] netpoll: Use rtnl_dereference() for
- npinfo pointer access
+Subject: Re: [PATCH net v4] ethtool: Fix wrong mod state in case of verbose and
+ no_mask bitset
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173336822932.1425191.15392762054831061043.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Dec 2024 03:10:29 +0000
-References: <20241202-netpoll_rcu_herbet_fix-v2-1-2b9d58edc76a@debian.org>
-In-Reply-To: <20241202-netpoll_rcu_herbet_fix-v2-1-2b9d58edc76a@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, michal.kubiak@intel.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- herbert@gondor.apana.org.au, jacob.e.keller@intel.com
+ <173336883303.1427062.8314508421207042104.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Dec 2024 03:20:33 +0000
+References: <20241202153358.1142095-1-kory.maincent@bootlin.com>
+In-Reply-To: <20241202153358.1142095-1-kory.maincent@bootlin.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: mkubecek@suse.cz, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, o.rempel@pengutronix.de,
+ thomas.petazzoni@bootlin.com, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, richardcochran@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 02 Dec 2024 16:22:05 -0800 you wrote:
-> In the __netpoll_setup() function, when accessing the device's npinfo
-> pointer, replace rcu_access_pointer() with rtnl_dereference(). This
-> change is more appropriate, as suggested by Herbert Xu[1].
-> 
-> The function is called with the RTNL mutex held, and the pointer is
-> being dereferenced later, so, dereference earlier and just reuse the
-> pointer for the if/else.
+On Mon,  2 Dec 2024 16:33:57 +0100 you wrote:
+> A bitset without mask in a _SET request means we want exactly the bits in
+> the bitset to be set. This works correctly for compact format but when
+> verbose format is parsed, ethnl_update_bitset32_verbose() only sets the
+> bits present in the request bitset but does not clear the rest. The commit
+> 6699170376ab ("ethtool: fix application of verbose no_mask bitset") fixes
+> this issue by clearing the whole target bitmap before we start iterating.
+> The solution proposed brought an issue with the behavior of the mod
+> variable. As the bitset is always cleared the old value will always
+> differ to the new value.
 > 
 > [...]
 
 Here is the summary with links:
-  - [RESEND,net-next,v2] netpoll: Use rtnl_dereference() for npinfo pointer access
-    https://git.kernel.org/netdev/net-next/c/a9ab02ed97c6
+  - [net,v4] ethtool: Fix wrong mod state in case of verbose and no_mask bitset
+    https://git.kernel.org/netdev/net/c/910c4788d615
 
 You are awesome, thank you!
 -- 
