@@ -1,83 +1,124 @@
-Return-Path: <netdev+bounces-149489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3AD89E5C4E
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:56:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A65029E5C5C
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:58:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F1C61883BAA
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:56:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E15C71882547
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688B922259A;
-	Thu,  5 Dec 2024 16:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA2A8222572;
+	Thu,  5 Dec 2024 16:58:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FsksfZd0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="OZSDhWSI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408D9222593;
-	Thu,  5 Dec 2024 16:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18AD165EFC;
+	Thu,  5 Dec 2024 16:58:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733417741; cv=none; b=SUiCwUJ/yvaQuVPEN97OOcwirZkJgg0GPac+hgMk9iARsgAkThA5MgU9kxVWqUTKIiygQBF1gHcjjCkYbFFBJ6ZbvFDNQGcnOM/65I/feDJa6ZiK1eJznZ5VNTygMXS4zgX8H++Az5PTFxE4vZVI+7MilRJYLONIphQXc4ID2T8=
+	t=1733417917; cv=none; b=Qzo5DDuTF97Tz2L2JnijY8aFr2VKG3i4A8M7AgroO6WVmhX8LUiASNMo33Az1UjXRKkNQ73lDssgajpEFLh6z3kW27juXnYYkra1UoG7FtAW0zvKGsZDpdClKVdngigPFGWaLis1Y6D20Y2gFowQJna9vvnlrJ+AjEt0DwGnW0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733417741; c=relaxed/simple;
-	bh=EY2JQ1OUdq1nkq0OdGBKVLh8IN+KP3uYIHf4Esw6NRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UJKnXqkqcqrxBLYASydxPVMoujq9S4y/91dGHsE7MHhQRZgL01cfMOSJ7+npx/6ashg1yuoci8QNNHZNmSXEAzv9EfbNFwP+YoPDdgPNP13L9CBLlS8YMfEAchdIbGYUjvcPr3k7PM+TlPUaN/14SqQE2Gz+QbJ4TP2eMqWwHYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FsksfZd0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43A48C4CED1;
-	Thu,  5 Dec 2024 16:55:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733417740;
-	bh=EY2JQ1OUdq1nkq0OdGBKVLh8IN+KP3uYIHf4Esw6NRo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FsksfZd0UGkgpt4kFjDeehzYfX1wWHKpJRUTy8PStAUQmjAv0rzo+gYYiM0Kpv8gd
-	 TwSsdqFrZdUqGcTCRan1r1FKO8vrCp3xTCeZpByPwNiIImHynYkIoUE+EYAIJ4TiNz
-	 bwjQnhdE3oi9sBxJen7FRV3c2WxvzrwLpe72KQ11wIqcMcfG4mMefh9IZ0Yqg0XTD3
-	 kz3Sh2R83u3gQU2cA+Cg0ujPk6IM6ih32Uiacv1lH0DKkfin+77+2M/fYrgAS6ZTCc
-	 JxEM2KSVCnU9CkGK/K/Shy2FD3JouWHu0xfygwPBQZ4z9oQHwZqWtDeue+SIByIYFX
-	 n8MdRot1Ly8YQ==
-Date: Thu, 5 Dec 2024 08:55:39 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- andrew+netdev@lunn.ch, Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com, Jon Hunter
- <jonathanh@nvidia.com>, Thierry Reding <thierry.reding@gmail.com>
-Subject: Re: [PATCH net v1] net: stmmac: TSO: Fix unaligned DMA unmap for
- non-paged SKB data
-Message-ID: <20241205085539.0258e5fb@kernel.org>
-In-Reply-To: <Z1HYKh9eCwkYGlrA@shell.armlinux.org.uk>
-References: <20241205091830.3719609-1-0x1207@gmail.com>
-	<Z1HYKh9eCwkYGlrA@shell.armlinux.org.uk>
+	s=arc-20240116; t=1733417917; c=relaxed/simple;
+	bh=r+M1B2fNSe91EZkTdXggMhb7GCJ7g56x/PAojdaLcj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bbOLuXZgVpsVxdn3aFg2hfhWRqtuSBQ44QIdF4mC/h9RcwKYAHQOasoBW3DAmEZ2S+KIUiLccNX7LOJ/MgL7CxB3qqLrThocOUIBDe5KHcyaKf1SgyYjfHMbm3BNT9KrmphzhyuxD/5FIvAoPDAc0Wda5BC6LN792PP2cDB/wUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=OZSDhWSI; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=DeVYKYC++7v89xWZg/BcHEQbyOA06uBwOslFWdgxmWk=; b=OZSDhWSIwfVVoNU6oJeFFY4S3C
+	Gkx3Gf35uXSOQKkOCtwwxjjqNS7bAD1esQHNqxmmrD7B25BMjjPHMjT+pLCeKKHyLTtrqxLHCjIxV
+	psKOPBrUr1K5fn5rQTIu1Dho1jBsNH4Z4jifB7a4PalNMywQhJNcM9CtEijT8s9vfUGqET7fL5lI0
+	IAwU4C+ikgjy0YYDAVdlvgVPqOykILXsFDUIlvlHZpbbOfmmHOD0xli3299wsOmHBFn5bltsiu6He
+	WUQspi6XYQKPlIJ4hvFX1XIyo4Ldcpg0Zz3pIKclCFJtuRfjwVxSMsKzG0RQ6wRJNd4s4wbTYuh+z
+	RfxnpLHQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46892)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tJFB1-0005Do-1t;
+	Thu, 05 Dec 2024 16:58:08 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tJFAw-0006hx-2L;
+	Thu, 05 Dec 2024 16:58:02 +0000
+Date: Thu, 5 Dec 2024 16:58:02 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: jan.petrous@oss.nxp.com
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>, 0x1207@gmail.com,
+	fancer.lancer@gmail.com
+Subject: Re: [PATCH net-next v8 07/15] net: dwmac-intel-plat: Use helper
+ rgmii_clock
+Message-ID: <Z1Hbml22IgrTyzeN@shell.armlinux.org.uk>
+References: <20241205-upstream_s32cc_gmac-v8-0-ec1d180df815@oss.nxp.com>
+ <20241205-upstream_s32cc_gmac-v8-7-ec1d180df815@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241205-upstream_s32cc_gmac-v8-7-ec1d180df815@oss.nxp.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, 5 Dec 2024 16:43:22 +0000 Russell King (Oracle) wrote:
-> I'm slightly disappointed to have my patch turned into a commit under
-> someone else's authorship before I've had a chance to do that myself.
-> Next time I won't send a patch out until I've done that.
+On Thu, Dec 05, 2024 at 05:43:04PM +0100, Jan Petrous via B4 Relay wrote:
+> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+> 
+> Utilize a new helper function rgmii_clock().
+> 
+> When in, remove dead code in kmb_eth_fix_mac_speed().
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
 
-Yes, this is definitely not okay. LMK if you dropped this from your
-TODO already, otherwise I'm tossing this patch and expecting the fix
-from the real author.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Side rant - the Suggested-by tag is completely meaningless, maybe we
-should stop using it. The usage ranges from crediting people pointing
-out issues in basic code review, to crediting authors when stealing
-their code. What is the point.
+Thanks!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
