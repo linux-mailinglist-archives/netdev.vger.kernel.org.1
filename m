@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-149241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A1729E4E1D
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 08:22:33 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 094479E4E1F
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 08:22:41 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1E8C1881A2F
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 07:22:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3900284E0C
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 07:22:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299C61B2183;
-	Thu,  5 Dec 2024 07:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A81B21B414D;
+	Thu,  5 Dec 2024 07:22:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DFE1AB510;
-	Thu,  5 Dec 2024 07:22:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD4F1B2194;
+	Thu,  5 Dec 2024 07:22:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733383330; cv=none; b=Vg4ZLGvouSAMjHOsADcmSMP2c7pJmsXWblQxqZunGC9/9WTWbHT5n6sEsHN8E2tPOtB5rlegqlbqWE5ryKnsDD/+P5C4WCSsB8MnancGM4AomVU2ABSqrjEz6sP5Nzs5wAiOQLBlYkcqg1gL9x8pCps/+gZsY85OGdrRob2XBNI=
+	t=1733383332; cv=none; b=OP970ea50dt9FpXgEmqpn3AYTXqmfjFUjd1N1uVllXo/9TRYE+KNc+GqW6KewUG/X9be75QT5Nsf4uXE9hE64ZAZn1RndDlr2xzAIoKsfZbftMGBMIBeb+h/GG2tBY0hdobBVQK/O0xpwifoMfRcVPwn7ebf/jKPlFSSdRtVgLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733383330; c=relaxed/simple;
-	bh=Dj9AAR6qPKTUh2KtZ7JY6BYTjL6njVKcVqNOH11sqfc=;
+	s=arc-20240116; t=1733383332; c=relaxed/simple;
+	bh=TGpKUxiN3tXZ0dN2+1GOV5WymAQo95c1XOXWJxWJqVM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZGlqDdLk0JG7bD0VQWHPQtsYLAX3gk5pMP1tjnihPAJmrHQQscXcC1OccIlpLuxpFxIafg+4qaC/Kabd1iAvYQvSaHoXRkomYIdtFoY/0ZnF4GkeOCj2wE3OGSrLVdTyNhj3ZLnki8EMv4tpyfHlTxpjnZODUjcqqOrlHUIOX0Y=
+	 MIME-Version:Content-Type; b=eRob6jvcHON617pZduMC8Bhev6o1Qxv8NEq4yme56a64sSVe3hyMiIrFTiGoznIB8lNQUU7L1VF76idLIT7WXaucE78tu/DopRGgZGht47Le+pHG4vuZsIyUBL4x4/2pKIfMXGygpMV2NHl8x6m8yY4IfWGnTSG/DTcvx9KLlYA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
@@ -43,9 +43,9 @@ To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
 CC: <jacky_chou@aspeedtech.com>
-Subject: [PATCH net-next v4 5/7] net: ftgmac100: add pin strap configuration for AST2700
-Date: Thu, 5 Dec 2024 15:20:46 +0800
-Message-ID: <20241205072048.1397570-6-jacky_chou@aspeedtech.com>
+Subject: [PATCH net-next v4 6/7] net: ftgmac100: Add 64-bit DMA support for AST2700
+Date: Thu, 5 Dec 2024 15:20:47 +0800
+Message-ID: <20241205072048.1397570-7-jacky_chou@aspeedtech.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241205072048.1397570-1-jacky_chou@aspeedtech.com>
 References: <20241205072048.1397570-1-jacky_chou@aspeedtech.com>
@@ -58,52 +58,166 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-On AST2700, the RMII/RGMII pin strap is configured by setting
-MAC 0x50 bit 20. Set to 0 is RGMII and set to 1 is RMII.
-Use compatible property to distinguish different generations for
-configuration.
+In 7th generation of Aspeed, the ftgmac100 supports 64-bit
+DMA operations because it is 64-bit SoC.
+Add the high address base registers for TX/RX description and
+add the high address base fields for packet buffer in TX/RX description.
+These added registers and fields are reserved in older generations and
+they will not affect older hardware for accessing read/write
+operations to them.
+We have verified these patches in older generations, link AST2600.
+Run iperf3, tftp, ping and dhcp etc. to confirm that it works normally
+on the new generation and older generation.
+
+In TX/RX description, software will reuse the packet buffer address
+fields to construct the dma information to unmap these dma region.
+Filling in these high address fields in tx/rxdesc2 is software, and the
+hardware just use it to do DMA operation and it does not modify these
+fields.
+And, in older generation, the software will assign to ZERO to the
+fields that added in 7th gereration. Because these older SoCs are 32-bit
+platforms, the high address will always be ZERO.
+
+Therefore, avoid using a lot of conditions to set the physical address
+on old and new generations.
 
 Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 ---
- drivers/net/ethernet/faraday/ftgmac100.c | 5 +++++
- drivers/net/ethernet/faraday/ftgmac100.h | 1 +
- 2 files changed, 6 insertions(+)
+ drivers/net/ethernet/faraday/ftgmac100.c | 35 ++++++++++++++++++------
+ drivers/net/ethernet/faraday/ftgmac100.h |  9 ++++++
+ 2 files changed, 35 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index c0540645d151..abee1ef1e293 100644
+index abee1ef1e293..11a81f75ed4e 100644
 --- a/drivers/net/ethernet/faraday/ftgmac100.c
 +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -323,6 +323,7 @@ static void ftgmac100_init_hw(struct ftgmac100 *priv)
- static void ftgmac100_start_hw(struct ftgmac100 *priv)
+@@ -267,10 +267,12 @@ static void ftgmac100_init_hw(struct ftgmac100 *priv)
+ 	iowrite32(reg, priv->base + FTGMAC100_OFFSET_ISR);
+ 
+ 	/* Setup RX ring buffer base */
+-	iowrite32(priv->rxdes_dma, priv->base + FTGMAC100_OFFSET_RXR_BADR);
++	iowrite32(lower_32_bits(priv->rxdes_dma), priv->base + FTGMAC100_OFFSET_RXR_BADR);
++	iowrite32(upper_32_bits(priv->rxdes_dma), priv->base + FTGMAC100_OFFSET_RXR_BADDR_HIGH);
+ 
+ 	/* Setup TX ring buffer base */
+-	iowrite32(priv->txdes_dma, priv->base + FTGMAC100_OFFSET_NPTXR_BADR);
++	iowrite32(lower_32_bits(priv->txdes_dma), priv->base + FTGMAC100_OFFSET_NPTXR_BADR);
++	iowrite32(upper_32_bits(priv->txdes_dma), priv->base + FTGMAC100_OFFSET_TXR_BADDR_HIGH);
+ 
+ 	/* Configure RX buffer size */
+ 	iowrite32(FTGMAC100_RBSR_SIZE(RX_BUF_SIZE),
+@@ -432,7 +434,9 @@ static int ftgmac100_alloc_rx_buf(struct ftgmac100 *priv, unsigned int entry,
+ 	priv->rx_skbs[entry] = skb;
+ 
+ 	/* Store DMA address into RX desc */
+-	rxdes->rxdes3 = cpu_to_le32(map);
++	rxdes->rxdes2 = cpu_to_le32(FIELD_PREP(FTGMAC100_RXDES2_RXBUF_BADR_HI,
++					       upper_32_bits(map)));
++	rxdes->rxdes3 = cpu_to_le32(lower_32_bits(map));
+ 
+ 	/* Ensure the above is ordered vs clearing the OWN bit */
+ 	dma_wmb();
+@@ -558,7 +562,8 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
+ 				       csum_vlan & 0xffff);
+ 
+ 	/* Tear down DMA mapping, do necessary cache management */
+-	map = le32_to_cpu(rxdes->rxdes3);
++	map = le32_to_cpu(rxdes->rxdes3) |
++	      ((le32_to_cpu(rxdes->rxdes2) & FTGMAC100_RXDES2_RXBUF_BADR_HI) << 16);
+ 
+ #if defined(CONFIG_ARM) && !defined(CONFIG_ARM_DMA_USE_IOMMU)
+ 	/* When we don't have an iommu, we can save cycles by not
+@@ -635,9 +640,12 @@ static void ftgmac100_free_tx_packet(struct ftgmac100 *priv,
+ 				     struct ftgmac100_txdes *txdes,
+ 				     u32 ctl_stat)
  {
- 	u32 maccr = ioread32(priv->base + FTGMAC100_OFFSET_MACCR);
-+	struct phy_device *phydev = priv->netdev->phydev;
+-	dma_addr_t map = le32_to_cpu(txdes->txdes3);
++	dma_addr_t map;
+ 	size_t len;
  
- 	/* Keep the original GMAC and FAST bits */
- 	maccr &= (FTGMAC100_MACCR_FAST_MODE | FTGMAC100_MACCR_GIGA_MODE);
-@@ -351,6 +352,10 @@ static void ftgmac100_start_hw(struct ftgmac100 *priv)
- 	if (priv->netdev->features & NETIF_F_HW_VLAN_CTAG_RX)
- 		maccr |= FTGMAC100_MACCR_RM_VLAN;
- 
-+	if (of_device_is_compatible(priv->dev->of_node, "aspeed,ast2700-mac") &&
-+	    phydev && phydev->interface == PHY_INTERFACE_MODE_RMII)
-+		maccr |= FTGMAC100_MACCR_RMII_ENABLE;
++	map = le32_to_cpu(txdes->txdes3) |
++	      ((le32_to_cpu(txdes->txdes2) & FTGMAC100_TXDES2_TXBUF_BADR_HI) << 16);
 +
- 	/* Hit the HW */
- 	iowrite32(maccr, priv->base + FTGMAC100_OFFSET_MACCR);
- }
+ 	if (ctl_stat & FTGMAC100_TXDES0_FTS) {
+ 		len = skb_headlen(skb);
+ 		dma_unmap_single(priv->dev, map, len, DMA_TO_DEVICE);
+@@ -791,7 +799,9 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
+ 	f_ctl_stat |= FTGMAC100_TXDES0_FTS;
+ 	if (nfrags == 0)
+ 		f_ctl_stat |= FTGMAC100_TXDES0_LTS;
+-	txdes->txdes3 = cpu_to_le32(map);
++	txdes->txdes2 = cpu_to_le32(FIELD_PREP(FTGMAC100_TXDES2_TXBUF_BADR_HI,
++					       upper_32_bits((ulong)map)));
++	txdes->txdes3 = cpu_to_le32(lower_32_bits(map));
+ 	txdes->txdes1 = cpu_to_le32(csum_vlan);
+ 
+ 	/* Next descriptor */
+@@ -819,7 +829,9 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
+ 			ctl_stat |= FTGMAC100_TXDES0_LTS;
+ 		txdes->txdes0 = cpu_to_le32(ctl_stat);
+ 		txdes->txdes1 = 0;
+-		txdes->txdes3 = cpu_to_le32(map);
++		txdes->txdes2 = cpu_to_le32(FIELD_PREP(FTGMAC100_TXDES2_TXBUF_BADR_HI,
++						       upper_32_bits((ulong)map)));
++		txdes->txdes3 = cpu_to_le32(lower_32_bits(map));
+ 
+ 		/* Next one */
+ 		pointer = ftgmac100_next_tx_pointer(priv, pointer);
+@@ -894,7 +906,10 @@ static void ftgmac100_free_buffers(struct ftgmac100 *priv)
+ 	for (i = 0; i < priv->rx_q_entries; i++) {
+ 		struct ftgmac100_rxdes *rxdes = &priv->rxdes[i];
+ 		struct sk_buff *skb = priv->rx_skbs[i];
+-		dma_addr_t map = le32_to_cpu(rxdes->rxdes3);
++		dma_addr_t map;
++
++		map = le32_to_cpu(rxdes->rxdes3) |
++		      ((le32_to_cpu(rxdes->rxdes2) & FTGMAC100_RXDES2_RXBUF_BADR_HI) << 16);
+ 
+ 		if (!skb)
+ 			continue;
+@@ -993,7 +1008,9 @@ static void ftgmac100_init_rings(struct ftgmac100 *priv)
+ 	for (i = 0; i < priv->rx_q_entries; i++) {
+ 		rxdes = &priv->rxdes[i];
+ 		rxdes->rxdes0 = 0;
+-		rxdes->rxdes3 = cpu_to_le32(priv->rx_scratch_dma);
++		rxdes->rxdes2 =	cpu_to_le32(FIELD_PREP(FTGMAC100_RXDES2_RXBUF_BADR_HI,
++						       upper_32_bits(priv->rx_scratch_dma)));
++		rxdes->rxdes3 =	cpu_to_le32(lower_32_bits(priv->rx_scratch_dma));
+ 	}
+ 	/* Mark the end of the ring */
+ 	rxdes->rxdes0 |= cpu_to_le32(priv->rxdes0_edorr_mask);
 diff --git a/drivers/net/ethernet/faraday/ftgmac100.h b/drivers/net/ethernet/faraday/ftgmac100.h
-index 4968f6f0bdbc..c87aa7d7f14c 100644
+index c87aa7d7f14c..ac39b864a80c 100644
 --- a/drivers/net/ethernet/faraday/ftgmac100.h
 +++ b/drivers/net/ethernet/faraday/ftgmac100.h
-@@ -166,6 +166,7 @@
- #define FTGMAC100_MACCR_RX_MULTIPKT	(1 << 16)
- #define FTGMAC100_MACCR_RX_BROADPKT	(1 << 17)
- #define FTGMAC100_MACCR_DISCARD_CRCERR	(1 << 18)
-+#define FTGMAC100_MACCR_RMII_ENABLE	(1 << 20) /* defined in ast2700 */
- #define FTGMAC100_MACCR_FAST_MODE	(1 << 19)
- #define FTGMAC100_MACCR_SW_RST		(1 << 31)
+@@ -57,6 +57,13 @@
+ #define FTGMAC100_OFFSET_RX_RUNT	0xc0
+ #define FTGMAC100_OFFSET_RX_CRCER_FTL	0xc4
+ #define FTGMAC100_OFFSET_RX_COL_LOST	0xc8
++/* reserved 0xcc - 0x174 */
++#define FTGMAC100_OFFSET_TXR_BADDR_LOW		0x178	/* ast2700 */
++#define FTGMAC100_OFFSET_TXR_BADDR_HIGH		0x17c	/* ast2700 */
++#define FTGMAC100_OFFSET_HPTXR_BADDR_LOW	0x180	/* ast2700 */
++#define FTGMAC100_OFFSET_HPTXR_BADDR_HIGH	0x184	/* ast2700 */
++#define FTGMAC100_OFFSET_RXR_BADDR_LOW		0x188	/* ast2700 */
++#define FTGMAC100_OFFSET_RXR_BADDR_HIGH		0x18C	/* ast2700 */
  
+ /*
+  * Interrupt status register & interrupt enable register
+@@ -226,6 +233,7 @@ struct ftgmac100_txdes {
+ #define FTGMAC100_TXDES1_TX2FIC		(1 << 30)
+ #define FTGMAC100_TXDES1_TXIC		(1 << 31)
+ 
++#define FTGMAC100_TXDES2_TXBUF_BADR_HI	GENMASK(18, 16)
+ /*
+  * Receive descriptor, aligned to 16 bytes
+  */
+@@ -272,4 +280,5 @@ struct ftgmac100_rxdes {
+ #define FTGMAC100_RXDES1_UDP_CHKSUM_ERR	(1 << 26)
+ #define FTGMAC100_RXDES1_IP_CHKSUM_ERR	(1 << 27)
+ 
++#define FTGMAC100_RXDES2_RXBUF_BADR_HI	GENMASK(18, 16)
+ #endif /* __FTGMAC100_H */
 -- 
 2.25.1
 
