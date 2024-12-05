@@ -1,216 +1,159 @@
-Return-Path: <netdev+bounces-149260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DFCC9E4EFF
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 08:55:00 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C119A9E4F0C
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 09:00:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C558161945
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 08:00:15 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943A31C7B62;
+	Thu,  5 Dec 2024 08:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="R2whUccQ"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15E7728358E
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 07:54:59 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445A51C2323;
-	Thu,  5 Dec 2024 07:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gx5jrvcw"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 443541BD9E9
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 07:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB4F1C5799
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 08:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733385295; cv=none; b=FD1hXm383OdRtBdmPd6IbGope0sccvQ7zPDUexL8NV1wSl/OreVwmFPUUdu42NYByE+AkInedjA77KKT0JGJbYGLhFEX2p6elKkZ3i5jxv9aSYK04l6QaIpEMmD1bHEcI3g2Ji9jadQb47NZhcct9NTZdcylbg73VdU5MFRDAqY=
+	t=1733385609; cv=none; b=FIR+gUnKFs9B2X5PQCoEoC/D55ha4bhQ148EAp0pZdBujN3fqY7UzrlI6gCMVuMo4gu4FYLz01d4t0YYZ6ZuCQVScae/+xH+d3milAcjaX54YgioynxfrO8F2mMMeen0d+sR9xLsNegQIz16Jq7V1Fe85DajCvG7jNVtt6EP7Y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733385295; c=relaxed/simple;
-	bh=vx5+qBh850FNYmcGamqyfPmnZAHBfCD8QuI0kcDQPpI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I01sMfZuJv0ZJZifWdZ1LLVriRrtmOUslzwFB0ZKcG6Lu+MdaEbvvngifZEBZ+ZZLhuqTF4cjYxY5Sva2Q/jI7wA2MWsOf6r0WFwbiarb7+MswbPY64BKXQF3IOcXBfb/NjQJr1p0Ymngedkaumgg/783Wkv6yMA/L4uGZwmo9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gx5jrvcw; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-aa629402b53so48340566b.3
-        for <netdev@vger.kernel.org>; Wed, 04 Dec 2024 23:54:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733385292; x=1733990092; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iPoveC5NiFJebUr6H/XvuyS4HCl5gaDQMYyE2e5JSYo=;
-        b=gx5jrvcwJH+rruOI62eLrlf2k7FMmh3eiIA5/Ws5U6OXXkWGgEslWHHogq3MKzb0CP
-         hOcC2Mq4D0FOuw2CJKaIg3CwedpLs/rk09Kq3AW5CLwTIL5EoYg7SP+2Wmr55tidKToM
-         717Hoiye2CNNzDf5c1Tagf3XCxB+Gvt7B2CRqaMzKN91fgQJNnMS4cXZmnghsgqG8+MA
-         q6/mdb5HoGljY61rmp/qiDYEfxA3m9/KJ9YNWEEpFj9jG6RS+mnkFPCXwEOHuPj/xz5H
-         PIU+L5ZQqsuMnGJ/ALiGYlNLncXtfquv6EHghSdgYLthNZmkRDH2eZN5+gOOPhVo8NYE
-         v0zA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733385292; x=1733990092;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iPoveC5NiFJebUr6H/XvuyS4HCl5gaDQMYyE2e5JSYo=;
-        b=cYNSVTA5FB/T+xWV+V8bXA7tEZvucZizS8VEIIcj2K9p9XWUL4ZVXVlIClXWUFgh+g
-         53rF5gEC1MqByURfi0Q65zITCbruD9V7g8BiX0AE0zLz0S/tVXDK9LoVvVXcn4p/NDdu
-         KzcSH+Z6/Chc8oP7MTyw0xabaX+Q31GXR8Ynd07yYPU/a2CPswMu91ejibZlkPypBVao
-         JZhiD8gD7A6At/Z3X/fsfYYwAlWIL8A3oWwKcflrd1/GJLCdWQeLxZ72rt5KkHJ3NxZr
-         pv+q5wFbDDFIX4nJ1gGA88arhE9py7cqfnIwIMXOAUetC84/jv69ZAHPxuKaK1xOjK0Q
-         ZN9w==
-X-Forwarded-Encrypted: i=1; AJvYcCW9NPmRhX0WFDeu0NGhcTV9KM75Tevr68NSchVLKsQbYnBD6FOPQb7pLnevJTij0FV/iQxVOCE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxptlKrO0NidIPSFlsaclmiUVKp5L34EYvLHu792YjwJ2PBGQp3
-	B6NvX0r3Meus38Mf6CJsnMSc6qZwQmWO9O/HSqOj8u2o4180hPswOqbPgHYOu5AKb/LOHwXwTpA
-	2BebXIzzrcC1NxdKjMCmMfp/V2tHhM20xmgYL
-X-Gm-Gg: ASbGncvrbYrMLfg71qLTxpWPLEta+9NRQxSPZrthRGaQpOwx3oloHkE+gSmcCe64pX0
-	sJj7cbJcd8RurRpWl9gtUsPiW+e37oU4=
-X-Google-Smtp-Source: AGHT+IEkMEJuQYoavObqjfF1Dm1ARxtTM3In+7tdetfMxymzqpHnS3ICi4gVSe4yccpc3ySQA05ZVBU8SNk46yxZksY=
-X-Received: by 2002:a17:906:23f1:b0:aa5:639d:7cdb with SMTP id
- a640c23a62f3a-aa5f7d4ec79mr647034466b.22.1733385291482; Wed, 04 Dec 2024
- 23:54:51 -0800 (PST)
+	s=arc-20240116; t=1733385609; c=relaxed/simple;
+	bh=kL7pEKBBJtnWKca+DEkPqpnopJI7pltEg6bMWuR80r8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=E5Of9TFojHFOWsAhI/HPljvHRX8v33/aHT0F/9BepbA4EBnifOWjwi0r1DaMB0GEXVriJL5jX9welUtBS4t8gDEI4NuXnHM1r29TZdXY+BUDChot5renhirIgOGW0P4KCdxkTJkp/Z+QlGRizdYYXMKPrH0bEcmsrQWAIIE6584=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=R2whUccQ; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from [IPV6:2a02:8010:6359:2:9c63:293c:9db9:bde3] (unknown [IPv6:2a02:8010:6359:2:9c63:293c:9db9:bde3])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id 88CC27DD24;
+	Thu,  5 Dec 2024 08:00:05 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1733385605; bh=kL7pEKBBJtnWKca+DEkPqpnopJI7pltEg6bMWuR80r8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:From;
+	z=Message-ID:=20<ed0ffb72-3848-d1be-6903-d6ab21a0f77f@katalix.com>|
+	 Date:=20Thu,=205=20Dec=202024=2008:00:05=20+0000|MIME-Version:=201
+	 .0|To:=20Preston=20<preston@yourpreston.com>|Cc:=20netdev=20<netde
+	 v@vger.kernel.org>|References:=20<CABBfiem067qtdVbMeq2bGrn-5bKZsy_
+	 M8N-4GkE0BO6Uh7jX1A@mail.gmail.com>=0D=0A=20<3e6af55f-3270-604b-c1
+	 34-456200188f94@katalix.com>=0D=0A=20<CABBfie=3D3+NBmjpVHn8Ji7VakE
+	 o9-JMKDH3ut5d1nXnDneC0tPw@mail.gmail.com>|From:=20James=20Chapman=
+	 20<jchapman@katalix.com>|Subject:=20Re:=20ethernet=20over=20l2tp=2
+	 0with=20vlan|In-Reply-To:=20<CABBfie=3D3+NBmjpVHn8Ji7VakEo9-JMKDH3
+	 ut5d1nXnDneC0tPw@mail.gmail.com>;
+	b=R2whUccQF6GAdbOPedBmKibG7d7L9RhTZ91lzHolIpaa/cVQv9G0fkS2QCahl4l7A
+	 CQG34ZG8bIqhmTYBkySXvrOPuV9dh1dOV9kMV/B6cF2in5UDQfrwtmFPfo91lhV4uM
+	 ArB1lybCIC7/ZABlxki5GRb/Ar/+NcVqtRdX8YkPrVr133HoE2wyCXer4YnA2LE5xS
+	 Wg7wsT0kydVOPnd+9ytSIe6qqCc1X5JdUjdE1rrf3TG/VIABzspXqetJu1GD5iHhrm
+	 ANBmxbYECqQsd4ls/uLA9svDUQKP2r6WsIo5qAGjjjcfAcJcR0OWBcLklxs6snb+57
+	 MQMZFfQc0FLKw==
+Message-ID: <ed0ffb72-3848-d1be-6903-d6ab21a0f77f@katalix.com>
+Date: Thu, 5 Dec 2024 08:00:05 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241204085801.11563-1-moyuanhao3676@163.com> <80b6603d-ed52-43b7-a434-0253e5de784a@kernel.org>
- <dcdeaf17-c3ce-4677-a0c0-c391d8bd951f@163.com>
-In-Reply-To: <dcdeaf17-c3ce-4677-a0c0-c391d8bd951f@163.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 5 Dec 2024 08:54:40 +0100
-Message-ID: <CANn89iLjhnxkOY7p3zQsyupGowjMt0beWE3=WHTVC2NSM_-2hw@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: Check space before adding MPTCP options
-To: Mo Yuanhao <moyuanhao3676@163.com>
-Cc: matttbe@kernel.org, martineau@kernel.org, geliang@kernel.org, 
-	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mptcp@lists.linux.dev, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Content-Language: en-US
+To: Preston <preston@yourpreston.com>
+Cc: netdev <netdev@vger.kernel.org>
+References: <CABBfiem067qtdVbMeq2bGrn-5bKZsy_M8N-4GkE0BO6Uh7jX1A@mail.gmail.com>
+ <3e6af55f-3270-604b-c134-456200188f94@katalix.com>
+ <CABBfie=3+NBmjpVHn8Ji7VakEo9-JMKDH3ut5d1nXnDneC0tPw@mail.gmail.com>
+From: James Chapman <jchapman@katalix.com>
+Organization: Katalix Systems Ltd
+Subject: Re: ethernet over l2tp with vlan
+In-Reply-To: <CABBfie=3+NBmjpVHn8Ji7VakEo9-JMKDH3ut5d1nXnDneC0tPw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 5, 2024 at 8:31=E2=80=AFAM Mo Yuanhao <moyuanhao3676@163.com> w=
-rote:
->
-> =E5=9C=A8 2024/12/4 19:01, Matthieu Baerts =E5=86=99=E9=81=93:
-> > Hi MoYuanhao,
-> >
-> > +Cc MPTCP mailing list.
-> >
-> > (Please cc the MPTCP list next time)
-> >
-> > On 04/12/2024 09:58, MoYuanhao wrote:
-> >> Ensure enough space before adding MPTCP options in tcp_syn_options()
-> >> Added a check to verify sufficient remaining space
-> >> before inserting MPTCP options in SYN packets.
-> >> This prevents issues when space is insufficient.
-> >
-> > Thank you for this patch. I'm surprised we all missed this check, but
-> > yes it is missing.
-> >
-> > As mentioned by Eric in his previous email, please add a 'Fixes' tag.
-> > For bug-fixes, you should also Cc stable and target 'net', not 'net-nex=
-t':
-> >
-> > Fixes: cec37a6e41aa ("mptcp: Handle MP_CAPABLE options for outgoing
-> > connections")
-> > Cc: stable@vger.kernel.org
-> >
-> >
-> > Regarding the code, it looks OK to me, as we did exactly that with
-> > mptcp_synack_options(). In mptcp_established_options(), we pass
-> > 'remaining' because many MPTCP options can be set, but not here. So I
-> > guess that's fine to keep the code like that, especially for the 'net' =
-tree.
-> >
-> >
-> > Also, and linked to Eric's email, did you have an issue with that, or i=
-s
-> > it to prevent issues in the future?
-> >
-> >
-> > One last thing, please don=E2=80=99t repost your patches within one 24h=
- period, see:
-> >
-> >    https://docs.kernel.org/process/maintainer-netdev.html
-> >
-> >
-> > Because the code is OK to me, and the same patch has already been sent
-> > twice to the netdev ML within a few hours, I'm going to apply this patc=
-h
-> > in our MPTCP tree with the suggested modifications. Later on, we will
-> > send it for inclusion in the net tree.
-> >
-> > pw-bot: awaiting-upstream
-> >
-> > (Not sure this pw-bot instruction will work as no net/mptcp/* files hav=
-e
-> > been modified)
-> >
-> > Cheers,
-> > Matt
-> Hi Matt,
->
-> Thank you for your feedback!
->
-> I have made the suggested updates to the patch (version 2):
->
-> I=E2=80=99ve added the Fixes tag and Cc'd the stable@vger.kernel.org list=
-.
-> The target branch has been adjusted to net as per your suggestion.
-> I will make sure to Cc the MPTCP list in future submissions.
->
-> Regarding your question, this patch was created to prevent potential
-> issues related to insufficient space for MPTCP options in the future. I
-> didn't encounter a specific issue, but it seemed like a necessary
-> safeguard to ensure robustness when handling SYN packets with MPTCP optio=
-ns.
->
-> Additionally, I have made further optimizations to the patch, which are
-> included in the attached version. I believe it would be more elegant to
-> introduce a new function, mptcp_set_option(), similar to
-> mptcp_set_option_cond(), to handle MPTCP options.
->
-> This is my first time replying to a message in a Linux mailing list, so
-> if there are any formatting issues or mistakes, please point them out
-> and I will make sure to correct them in future submissions.
->
-> Thanks again for your review and suggestions. Looking forward to seeing
-> the patch applied to the MPTCP tree and later inclusion in the net tree.
+On 04/12/2024 21:04, Preston wrote:
+> l2tpeth0 is not attached to anything, it's created by the `ip l2tp`
+> commands. But since it's encapsulating and setting a new destination
+> IP address, packets are referred to the route table.
 
-We usually do not refactor for a patch targeting a net tree.
+Please don't top-post. It makes it much harder for other readers to 
+follow the discussion. I'll repaste your reply below this time.
 
-Also, please do not add attachments, we need the patch inline as you did in=
- v1.
+> On Wed, Dec 4, 2024 at 6:48 AM James Chapman <jchapman@katalix.com> wrote:
+>>
+>> On 03/12/2024 16:14, Preston wrote:
+>>> Hello folks, please let me know if there’s a more appropriate place to
+>>> ask this but I believe I’ve found something that isn’t supported in
+>>> iproute2 and would like to ask your thoughts.
+>>
+>> Thanks for reaching out.
+>>
+>>> I am trying to encapsulate vlan tagged ethernet traffic inside of an
+>>> l2tp tunnel.This is something that is actively used in controllerless
+>>> wifi aggregation in large networks alongside Ethernet over GRE. There
+>>> are draft RFCs that cover it as well. The iproute2 documentation I’ve
+>>> found on this makes it seem that it should work but isn’t explicit.
+>>>
+>>> Using a freshly compiled iproute2 (on Rocky 8) I am able to make this
+>>> work with GRE without issue. L2tp on the other hand seems to quietly
+>>> drop the vlan header. I’ve tried doing the same with a bridge type
+>>> setup and still see the same behavior. I've been unsuccessful in
+>>> debugging it further, I don’t think the debug flags in iproute2's
+>>> ipl2tp.c are functional and I suppose the issue might instead be in
+>>> the kernel module which isn’t something I’ve tried debugging before.
+>>> Is this a bug? Since plain ethernet over l2tp works I assumed vlan
+>>> support as well.
+>>>
+>>>
+>>> # Not Working L2TP:
+>>> [root@iperf1 ~]# ip l2tp add tunnel tunnel_id 1 peer_tunnel_id 1 encap
+>>> udp local 2.2.2.2 remote 1.1.1.1 udp_sport 1701 udp_dport 1701
+>>> [root@iperf1 ~]# ip l2tp add session tunnel_id 1 session_id 1 peer_session_id 1
+>>> [root@iperf1 ~]# ip link add link l2tpeth0 name l2tpeth0.1319 type vlan id 1319
+>>> [root@iperf1 ~]# ip link set l2tpeth0 up
+>>> [root@iperf1 ~]# ip link set l2tpeth0.1319 up
+>>> Results: (captured at physical interface, change wireshark decoding
+>>> l2tp value 0 if checking yourself)
+>>> VLAN header dropped
+>>> Wireshark screenshot: https://i.ibb.co/stMsRG0/l2tpwireshark.png
+>>
+>> This should work.
+>>
+>> In your test network, how is the virtual interface l2tpeth0 connected to
+>> the physical interface which you are using to capture packets?
+ >
+ > l2tpeth0 is not attached to anything, it's created by the `ip l2tp`
+ > commands. But since it's encapsulating and setting a new destination
+ > IP address, packets are referred to the route table.
 
-As you can see, v2 is not avail in
-https://patchwork.kernel.org/project/netdevbpf/list/
+Are you configuring an IP address on l2tpeth0.1319 and capturing on 
+l2tpeth0?
 
-Documentation/process/submitting-patches.rst
+>>
+>>>
+>>>
+>>> # Working GRE:
+>>> [root@iperf1 ~]# ip link add name gre1 type gretap remote 1.1.1.1
+>>> [root@iperf1 ~]# ip link add name gre1.120 link gre1 type vlan proto
+>>> 802.1q id 120
+>>> [root@iperf1 ~]# ip link set gre1 up
+>>> [root@iperf1 ~]# ip link set gre1.120 up
+>>> Results:
+>>> VLAN header present
+>>> Wireshark screenshot: https://i.ibb.co/6rJWjg9/grewireshark.png
+>>>
+>>>
+>>> -------------------------------------------------------
+>>> ~Preston Taylor
+>>>
+>>
+> 
 
-No MIME, no links, no compression, no attachments.  Just plain text
--------------------------------------------------------------------
-
-Linus and other kernel developers need to be able to read and comment
-on the changes you are submitting.  It is important for a kernel
-developer to be able to "quote" your changes, using standard e-mail
-tools, so that they may comment on specific portions of your code.
-
-For this reason, all patches should be submitted by e-mail "inline". The
-easiest way to do this is with ``git send-email``, which is strongly
-recommended.  An interactive tutorial for ``git send-email`` is available a=
-t
-https://git-send-email.io.
-
-If you choose not to use ``git send-email``:
-
-.. warning::
-
-  Be wary of your editor's word-wrap corrupting your patch,
-  if you choose to cut-n-paste your patch.
-
-Do not attach the patch as a MIME attachment, compressed or not.
-Many popular e-mail applications will not always transmit a MIME
-attachment as plain text, making it impossible to comment on your
-code.  A MIME attachment also takes Linus a bit more time to process,
-decreasing the likelihood of your MIME-attached change being accepted.
 
