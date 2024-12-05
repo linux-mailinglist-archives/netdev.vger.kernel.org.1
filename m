@@ -1,132 +1,125 @@
-Return-Path: <netdev+bounces-149484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DDF29E5C20
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:51:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E060E9E5C37
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:53:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B148E18842C0
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:51:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE580164BD7
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:53:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 953DE224AEB;
-	Thu,  5 Dec 2024 16:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD11229B07;
+	Thu,  5 Dec 2024 16:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VUyaeouY"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UzoJTvjX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E4F17E473;
-	Thu,  5 Dec 2024 16:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B76222561;
+	Thu,  5 Dec 2024 16:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733417449; cv=none; b=BKrIPay/asOLquPUVlURdcw+4ruoQzhuJTvPvpQGF+Ti9Sl5ruGDm07b4mHUIJZci2s0sxxQ3+geUm+ucBRD2Tx1XJjMZ/9nETr3iisQjSFJpIWvVuf0EicJCnLGApTcs1VU+MoEJu4CINPf7TS1gaQfBBjcDz8SBsI6qUIEn+o=
+	t=1733417519; cv=none; b=mkmwQGQyHVYwK9kTQ/QMwBXZqJvFEteUQHGYGdk1D20v1wQUMi2rMLU1d9aoVgDYJQ1EP3+G2myYYLqniUlJUoDCQi1UdSRFRa6xkVH15fgAlQ7qndtLx586NFGenJk0Jj9d+0mgHgRNBaUFpddKFlM+DYyn+d8eV6fFZ6hL2AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733417449; c=relaxed/simple;
-	bh=oGfWW60F9GXeis13WJQH1YWP9uI8wK159nVr4TCspJk=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=AuCXVvpMwacI3KwN4LiUSzkOtOxSJITqysyI853sQGNdn7v/EVc3DRcWvN46P9TnU4S6TJ+DGtLkvmtJxzsXryBHqqBCyG5wi7DmsyvU2vesCCXbTmrfU8s56L4ihrVI5bxNOpPYYwbKHj0j0JXA8h4BjYsYCffJTFc8wikjVfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VUyaeouY; arc=none smtp.client-ip=209.85.217.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-4afa525d6bdso326600137.3;
-        Thu, 05 Dec 2024 08:50:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733417447; x=1734022247; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4ip7g8ZBAyv55LDWoEeh4pNG9nPsy9ulRpf+djAImBI=;
-        b=VUyaeouYGVVEdUlTiFV2iVA7/n/1mK2AetRwEmYDd8bJRv87WcqCDL+qKUKmTIEwZq
-         WRzWIhBYjxz3yTFR8GE0zzvQB4gawVDWq9Vemw15BcCmficUHJ3lkyYy65b33NvWecwz
-         RPsSsFmQbu8411tQQbiUOuHxbUow+6Y0alQpHqAfeXOFUYnpH46NW9KmgNovTzI03FEi
-         cwKjqyDLi3xpbC/D60/rwkpnQEVMF0grShwkRr742DR3qiPfl/mEz/ZIhLSTiCliqOEq
-         skxvI8WNPYUEK6JOSP0Hw0yi2uWMlv0ud5WmoewUrDANhiSzZKNWe5da18TiwmaD7WXY
-         m7dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733417447; x=1734022247;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=4ip7g8ZBAyv55LDWoEeh4pNG9nPsy9ulRpf+djAImBI=;
-        b=PhxWnNdS7wOrN+EDJTvz548/p0MRNVECnOGZLakQ3Kj49U6oUwU+ayI9fFc8AMZlff
-         /UP+7AjjSaYhkVWBC9t1Trm/DklgLEWZEChjMFmSryyNiIIWPss6mUewe4K4fvCN6ehI
-         au602LloOJqxAOBLjoLPKnDERMa5kzCWpYyFnGvT0fscbl3qmaS6CNJQltNicEHRGcqY
-         7vGlxJSfMtE4efcqnI22oLknDr+9WGQSKJ7ZP91QJpkZstk69rR7CdoqEJl7rhMmKPZU
-         t+PRVbkoqrlACimNtrxUSePgYnXiDe1m7BcACU1IKF38t8n+33tT+7JjJzHLWOHGmHcH
-         U23Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVLmL2JkQEfWp2ik6GE9X8wDcukOKkEmsb4pHAEvwuKzhc5/W3XNad+w+bi1iR1uucFYo/nSg4n@vger.kernel.org, AJvYcCVR1bwzoHQJ9HNxgJIuV+XHwyRHbILXw7c8kbCew1rt3Rkg3lHmh89cWPMDtTK8KrOVFZkTOIYksQRT9SE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxpx97e+xLmsxWD2d50V5OGu/aJdlZJSh56s6vAH1rn8HIE7vFB
-	TLzghATBE0NmoOBFPpIKwvHOUopsXwJRu9UYaSIKDsnNgRrvm6H1SHVGsg==
-X-Gm-Gg: ASbGncsVqRxiJHM1qTWgolYuTuvmJtaqbFbhiVpZc0TUHgRlQyEUw/6l4S4cGamyqmK
-	OasdpczDZQ6cNpBf1nzT+5wOS66tPd5oX8rlyaYlKj22USr+VMKONnOiM9sGT46ScrFgyBGgWUj
-	yYMUprCRI467KzHBG01S8poWSJMqFMDM+A/nYmXglF7iK0udkMe3dQBJkGwTOlOVt0bLEq8dE6T
-	viJUAk7Wc99hUlSnG2XMfAM6qZTRNIQFD3S5RMj3LRucq/2kwBPVBAWpA9T75DqeAyOQ7orKROe
-	vKDZ4ZmStnGgdMzJX5PvxQ==
-X-Google-Smtp-Source: AGHT+IHokD67x/rwM1UuTEmWeEKMCDNmnPwBDnY+8t30KDYA5tginYlfFZxDnAm4nG2hv2sAzxdyCQ==
-X-Received: by 2002:a05:6102:5128:b0:4af:597b:f6 with SMTP id ada2fe7eead31-4afcaa10028mr6691137.4.1733417446716;
-        Thu, 05 Dec 2024 08:50:46 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4afbc5e6e22sm244771137.15.2024.12.05.08.50.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2024 08:50:45 -0800 (PST)
-Date: Thu, 05 Dec 2024 11:50:45 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Stas Sergeev <stsp2@yandex.ru>, 
- netdev@vger.kernel.org
-Cc: Stas Sergeev <stsp2@yandex.ru>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- linux-kernel@vger.kernel.org
-Message-ID: <6751d9e5254ac_119ae629486@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241205073614.294773-1-stsp2@yandex.ru>
-References: <20241205073614.294773-1-stsp2@yandex.ru>
-Subject: Re: [PATCH net-next] tun: fix group permission check
+	s=arc-20240116; t=1733417519; c=relaxed/simple;
+	bh=P9EPHJQc4bTsB4hGE5HCvIT64O7CFyXT6mNMwFFliCQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GdCqrMyTduDoPSWxtJovhsQsX5Yq+jJVUPQZFtygMOj4nVD3MQcZBhA8U0abHoNHLCZlvPkHkqYa/j1GkpKjwIjYByMZpFxIqqhJNUtxMHvpnoZoERhW7A9IJu/EB/mVCB87s/w5hCnYKDhRHk1iVc3R9w0L/4hBxpQfYJsRogc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UzoJTvjX; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=eY09Fm627PVbCKVl5kryyt7XcMRMEBR6XVqQMDGQMZE=; b=UzoJTvjX8sDdc8D0FXaOQM39se
+	W3x2k2ogf9ZBC+mZBz9SUkt3/NCvftbFiRdTvbWNpv1zyDAvyAbIs84WVYV7GKQJ+0ygPMYN9vJsI
+	l7CgtULAUpjRc8DzGm/omRupqYRQCs5DW2XQUXazA2zBONtMFNQCHJ99csaZEZur/XwWMmMo+uAUv
+	DDRn7ag7oPIiUQsfmrhzGd7SqjV9feBGJVn4/tz1XwWx4v/mCki28Z9cRfGT5+ecyprrHmj8o5ouM
+	Ld2Iwa1ZNPijv/wQTouGcuvJ/s+pbw92672l7j7juT74dY/W8QEC/oZK8kWjhS/yX4SLg5im7vdNC
+	1v97PjnQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41306)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tJF4Y-0005C1-1d;
+	Thu, 05 Dec 2024 16:51:27 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tJF4R-0006ho-15;
+	Thu, 05 Dec 2024 16:51:19 +0000
+Date: Thu, 5 Dec 2024 16:51:19 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: jan.petrous@oss.nxp.com
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>, 0x1207@gmail.com,
+	fancer.lancer@gmail.com, Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next v8 01/15] net: stmmac: Fix CSR divider comment
+Message-ID: <Z1HaB6hT0QX4Jlyx@shell.armlinux.org.uk>
+References: <20241205-upstream_s32cc_gmac-v8-0-ec1d180df815@oss.nxp.com>
+ <20241205-upstream_s32cc_gmac-v8-1-ec1d180df815@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241205-upstream_s32cc_gmac-v8-1-ec1d180df815@oss.nxp.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Stas Sergeev wrote:
-> Currently tun checks the group permission even if the user have matched.
-> Besides going against the usual permission semantic, this has a
-> very interesting implication: if the tun group is not among the
-> supplementary groups of the tun user, then effectively no one can
-> access the tun device. CAP_SYS_ADMIN still can, but its the same as
-> not setting the tun ownership.
+On Thu, Dec 05, 2024 at 05:42:58PM +0100, Jan Petrous via B4 Relay wrote:
+> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
 > 
-> This patch relaxes the group checking so that either the user match
-> or the group match is enough. This avoids the situation when no one
-> can access the device even though the ownership is properly set.
+> The comment in declaration of STMMAC_CSR_250_300M
+> incorrectly describes the constant as '/* MDC = clk_scr_i/122 */'
+> but the DWC Ether QOS Handbook version 5.20a says it is
+> CSR clock/124.
 > 
-> Also I simplified the logic by removing the redundant inversions:
-> tun_not_capable() --> !tun_capable()
-> 
-> Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
-> 
-> CC: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> CC: Jason Wang <jasowang@redhat.com>
-> CC: Andrew Lunn <andrew+netdev@lunn.ch>
-> CC: "David S. Miller" <davem@davemloft.net>
-> CC: Eric Dumazet <edumazet@google.com>
-> CC: Jakub Kicinski <kuba@kernel.org>
-> CC: Paolo Abeni <pabeni@redhat.com>
-> CC: netdev@vger.kernel.org
-> CC: linux-kernel@vger.kernel.org
+> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+I gave my reviewed-by for this patch in the previous posting, but you
+haven't included it.
 
-A lot more readable this way too.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
