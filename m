@@ -1,178 +1,290 @@
-Return-Path: <netdev+bounces-149382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2122A9E55B6
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:42:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0880F9E55BF
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:43:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0D12288579
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:42:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B01DB281C14
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A197C217673;
-	Thu,  5 Dec 2024 12:41:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5642D21885A;
+	Thu,  5 Dec 2024 12:43:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="HmNEKWo+"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="G5rY/ON5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14E01FA179
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 12:41:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE97207DE4
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 12:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733402518; cv=none; b=qeUnyadGU8Oc7ISUAWXd5jrcFZJ9YbXfeIcXGIrhTGoo5iAXor1w/JpvK0gvxgnAwPE8GV+0BkyR6t6VywGPKKKn7dqrViO+u/fAWvlE1Rn80gEmcM/bvG8dDdJ4Ug/EPnPE85ivKAs/No4+4jK9L6ogqxoriFSK+Ps3kTPSaOA=
+	t=1733402628; cv=none; b=e51tTHMaxNaLOOV2VckUUEItsw/222HSEb5EyM/TzgSYvdYfQBjn8ZYRKuY9ekDNMBR4DIwZRbnNdPIel0InPrRkJLqUK1RJqHlkbcUx9PIjDSaoFrizIOCpX5BH1Q/c41u+nR1V0i1AC6C0ra0Zpva5pc4FCXlOr7KTpEcMBWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733402518; c=relaxed/simple;
-	bh=BNhaJs6CiOdZd+7hAJ8eeOI6tdwXFJAOWkrm+D4bzV0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jGy548qINRXVpfrKbo/b2DopS1R4vQ+od9GrwTg0TzHHokbWKDwzCTDWrkoYPqrxSz940+7nNMsNSAjZccFmyW5VIxfdRzxuqhNMf0lZtRhGuH6ZVnEVQE+atc707hC1KicylWLlA3t8azB1Fpw/pROZqMjxglh4AJ95AQ+UvNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=HmNEKWo+; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7f46d5d1ad5so711350a12.3
-        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 04:41:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1733402516; x=1734007316; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5aXJhFe+Fkc/ZHmNrbnqLxgMJow0Ch+8KNQzyLfTpLs=;
-        b=HmNEKWo+EdjSk0dtYIpNarQupiSGgwdrWKROQ5ZEBnS0YLtSF96qtkRiBxOIsjzOuK
-         tYE4QfJCrKuPMAVmUYOOymVzBxvgj6dJYmuYSA/X/fq8FAevyjlWS2pjR/PrlOlyYrAB
-         /LwQ5K21hH8weL+0LCs15Cxhhg0/ZneuLU/SDda44xVJW54nMREJbArY+4l4qP6g36dM
-         qyivVHXJqCrngscjjzLoLBxvRW5mI/TgOvg+5HmVWYwrWkhFFgGl08tGGkeIZ5CO4/6P
-         njK2SYODDxhm3FgKm3nw7q9mEXfSVIbxAZpwhCYQTuELuy1pJT44Xyr/BbdmOD2E4JsO
-         GvUQ==
+	s=arc-20240116; t=1733402628; c=relaxed/simple;
+	bh=vW9GQJigjdwRD4FsD4GygypImVKzczlZLBM8ZzID4cw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PqKsG3ctPGBeSfRMxP9BhQ6Jf6SpZXIncAfabVfIat3P9JSmq7D+7yO9h1WYW5Dhp/StOjWeLpDFho65yar/DNFKzuuL2E87u97d4U5qF88PRp5uaRAC3V+OJdFxnWpBWo0imZgIj8+VJm/650hvOWCKeSHVXiMbbLGe/4aKWL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=G5rY/ON5; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 334A540C4B
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 12:43:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1733402622;
+	bh=gghjUl2efuNX9zk6+YIusQVHafrNkDYz6uTaEu8bci8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:In-Reply-To;
+	b=G5rY/ON5JdnG22pbtMjZk7aHmrb+2TdUr7AgQZNWmUj4PYdA/QDpiWnhLo9M9bFWF
+	 FvUkjdYldSrf5emy4HqFrnTvb0h+Yn1sNVS5MdQKJOJFmYKMW2ethemv3tC8C49m2o
+	 1lasvF7t/oQ0cctJ7oxlxb1vx3Hqha49H/PAXk2TPIrzlNKLIsASeGv24jlAuNaTWf
+	 KtwrmTHNn4DJ9SjjhK8FXhd66dhwfqizrAREXnTBfYibiR8oJbuIsCiWj7n+dEsX7k
+	 Jo8kaemwAuqTQUJAnrh6BnWPMU9h63/HwMGnBAgrxG4gU6hVIlr8eEv5z4wMp0U9/V
+	 Psf1mU87SB2vA==
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-7fbbb61a67cso571341a12.3
+        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 04:43:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733402516; x=1734007316;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5aXJhFe+Fkc/ZHmNrbnqLxgMJow0Ch+8KNQzyLfTpLs=;
-        b=gNKp8OY5dAiO3KKr6ZIkg0zq/KsQ+0vosv1ETA/PIjJe3NgverVlFf+7X7aMHOUojF
-         ExPV/KSE0eZHN0Tm/J5oWDVt4WCBE8U5PDqhhk4x4JcyKOEAN6M59DCBS8dTOFY60E1l
-         HWyzWrNmb8z9kQeKFM2R9KG3YFKv+CRrhPELgn4YvzI1ERvccU6JM0Cal3mzZq0tthnC
-         ThM2iG2GvftaQFl8MZaZz4gy1uOj80VEy+TuKCw1Ojw5Qsnsw/N7glBVZBGWkCV8YIiG
-         CisCuE91TTWc4IlGnK6fp2OLTp4zjNTAPoQZQ36+4Uvemd4S07jirPrehHFJHf/+Ivu6
-         8aSg==
-X-Forwarded-Encrypted: i=1; AJvYcCWz9l5tvSzoaIXexjvNKCO5uur5aSQiibK3Shlunhm5qb7Gdp6unDTKsYy6SYmzD3/8tNg/htg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMuC+3BSLgwK8VY4WLoQPojWnyA1tAcLoM+hYkPy3KTWvRRB8R
-	qOYXK1KswfaBYH5dy2yLikAEktROP20pPk629DDHo+Dl90tdNotzNK8/owvCaX3fKIXbnAQmiNE
-	IIO//HCUCcwpV2pDVrzjrcmFUkLkfKUvRkSDS
-X-Gm-Gg: ASbGncuptxnAWw4BmTrY73bRhEe+FvnFgJBKSdd/GJU2PXZhzmAuF9D11hopbCcbbCq
-	JDzZHKTdkhZuklQ/lUha7fYnZ0MxFtg==
-X-Google-Smtp-Source: AGHT+IGqHv0JpW1eJ6ICz/Zq+CmhpbP7WfJ0Fq5xRXEXEvAlm2Uah35cYl+he1CTRKKIgdO3vKSemVHwsH4GkWq7XxM=
-X-Received: by 2002:a17:90b:33cd:b0:2ee:9d49:3ae6 with SMTP id
- 98e67ed59e1d1-2ef011fb9d8mr14429048a91.10.1733402516128; Thu, 05 Dec 2024
- 04:41:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733402621; x=1734007421;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gghjUl2efuNX9zk6+YIusQVHafrNkDYz6uTaEu8bci8=;
+        b=hbfB9LmBm5MEnqppuprhp7c88L7r0SJ2LBmhgZQlwRwGY2Xqvlqslt0lbwgg4GsjGS
+         yw5DPgANeyRrFHEPALQnnctkhFEAbTJBp1BoADlpb/HGcEoRoQfChnG2lfQA7LKp5bhE
+         rrbNN11GcNFNNraw7xQKwHFUELpPmRWafrMwjKpNnOL7DCALqLkG+Irh0nSezEST6K7D
+         EcYghBCoCP+k116LOCxKCTeQhMFu3FFbznKUAlHddkukWhBxtIiRkt0DmM17yy8UPVDT
+         1AGRO1u0fDCCSVnDmHz320WXun9vcbmw84JXUg3XAq0Bpba+FLLLVKllspcrHXHc50LA
+         sKdg==
+X-Forwarded-Encrypted: i=1; AJvYcCXZ7Al/9hu77adEIjT5wXBo0O5tpoaIpN5Iil8K++KS2t1QJTMhQ2+/SI29MNH9oGhJK7VgwBM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwacguJ5U10zo34a8IR0fdmIH9BPIOhNOVXhas7er1AnTvr8BwT
+	8NTPC1wwKS/Z/HwZ0xV5lT6fuGn1W4dv5GGSkhShPOTgQTnGampGCRPaahSFlAsjRwE9k6vSu1W
+	CAMxlvdY5xyfx8jYpmaPaQXI8sRCdjwQX85BgP9aA5zbJa4OSD6KHCMv2B8fFpiVZen88WA==
+X-Gm-Gg: ASbGncsUhWOhFGMCTUwLDMrR9MfzeVgtTa16F6JLoMl7cStj5oHBlqYfyhvnxjW4ZSD
+	skcYAERijq4TQ0z7H/3EOQC+slBof18bdHJftzGES1C8dnCtdY11rCFEfxU6yzdyY9D2ajokJFj
+	SwhcyJsDe1qvdIgRdFqfsQqQKsZAYt0dSWoxSPvxQp8ti+65dJr9D5JBQI1jtjKGZMEbcMmDQaV
+	/ddVO3YdPPktwg5juYkfj9z70JBdZH60oH6PKUFcax6m/+faw0=
+X-Received: by 2002:a05:6a20:7f8f:b0:1e0:d32f:24e2 with SMTP id adf61e73a8af0-1e16bef1948mr14633077637.38.1733402620598;
+        Thu, 05 Dec 2024 04:43:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFoJnSph31BZhex2k2fKJG0j/HLtL8tRny7Lw7OsT+xm6yLvzymCy0iPB4owoRWvv7wjJq9/g==
+X-Received: by 2002:a05:6a20:7f8f:b0:1e0:d32f:24e2 with SMTP id adf61e73a8af0-1e16bef1948mr14633030637.38.1733402620156;
+        Thu, 05 Dec 2024 04:43:40 -0800 (PST)
+Received: from localhost ([240f:74:7be:1:d88b:a41e:6f7b:abf])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-725a2a17efcsm1147678b3a.87.2024.12.05.04.43.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Dec 2024 04:43:39 -0800 (PST)
+Date: Thu, 5 Dec 2024 21:43:38 +0900
+From: Koichiro Den <koichiro.den@canonical.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtualization@lists.linux.dev, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/7] virtio_net: correct
+ netdev_tx_reset_queue() invocation point
+Message-ID: <nmjiptygbpqfcveclpzmpgczd3geir72kkczqixfucpgrl3g7u@6dzpd7qijvdm>
+References: <20241204050724.307544-1-koichiro.den@canonical.com>
+ <20241204050724.307544-2-koichiro.den@canonical.com>
+ <20241205052729-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241204171950.89829-1-edumazet@google.com> <875xny9wbx.fsf@toke.dk>
-In-Reply-To: <875xny9wbx.fsf@toke.dk>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 5 Dec 2024 07:41:45 -0500
-Message-ID: <CAM0EoMksqZLU9yu7x3kaueK5OPEjHKQgvYi_kDvMjD4OEknaqQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] net_sched: sch_fq: add three drop_reason
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241205052729-mutt-send-email-mst@kernel.org>
 
-On Thu, Dec 5, 2024 at 6:57=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <to=
-ke@redhat.com> wrote:
->
-> Eric Dumazet <edumazet@google.com> writes:
->
-> > Add three new drop_reason, more precise than generic QDISC_DROP:
-> >
-> > "tc -s qd" show aggregate counters, it might be more useful
-> > to use drop_reason infrastructure for bug hunting.
-> >
-> > 1) SKB_DROP_REASON_FQ_BAND_LIMIT
-> >    Whenever a packet is added while its band limit is hit.
-> >    Corresponding value in "tc -s qd" is bandX_drops XXXX
-> >
-> > 2) SKB_DROP_REASON_FQ_HORIZON_LIMIT
-> >    Whenever a packet has a timestamp too far in the future.
-> >    Corresponding value in "tc -s qd" is horizon_drops XXXX
-> >
-> > 3) SKB_DROP_REASON_FQ_FLOW_LIMIT
-> >    Whenever a flow has reached its limit.
-> >    Corresponding value in "tc -s qd" is flows_plimit XXXX
-> >
-> > Tested:
-> > tc qd replace dev eth1 root fq flow_limit 10 limit 100000
-> > perf record -a -e skb:kfree_skb sleep 1; perf script
-> >
-> >       udp_stream   12329 [004]   216.929492: skb:kfree_skb: skbaddr=3D0=
-xffff888eabe17e00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
-t+0x9d9 reason: FQ_FLOW_LIMIT
-> >       udp_stream   12385 [006]   216.929593: skb:kfree_skb: skbaddr=3D0=
-xffff888ef8827f00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
-t+0x9d9 reason: FQ_FLOW_LIMIT
-> >       udp_stream   12389 [005]   216.929871: skb:kfree_skb: skbaddr=3D0=
-xffff888ecb9ba500 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
-t+0x9d9 reason: FQ_FLOW_LIMIT
-> >       udp_stream   12316 [009]   216.930398: skb:kfree_skb: skbaddr=3D0=
-xffff888eca286b00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
-t+0x9d9 reason: FQ_FLOW_LIMIT
-> >       udp_stream   12400 [008]   216.930490: skb:kfree_skb: skbaddr=3D0=
-xffff888eabf93d00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
-t+0x9d9 reason: FQ_FLOW_LIMIT
-> >
-> > tc qd replace dev eth1 root fq flow_limit 100 limit 10000
-> > perf record -a -e skb:kfree_skb sleep 1; perf script
-> >
-> >       udp_stream   18074 [001]  1058.318040: skb:kfree_skb: skbaddr=3D0=
-xffffa23c881fc000 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
-t+0x9d9 reason: FQ_BAND_LIMIT
-> >       udp_stream   18126 [005]  1058.320651: skb:kfree_skb: skbaddr=3D0=
-xffffa23c6aad4000 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
-t+0x9d9 reason: FQ_BAND_LIMIT
-> >       udp_stream   18118 [006]  1058.321065: skb:kfree_skb: skbaddr=3D0=
-xffffa23df0d48a00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
-t+0x9d9 reason: FQ_BAND_LIMIT
-> >       udp_stream   18074 [001]  1058.321126: skb:kfree_skb: skbaddr=3D0=
-xffffa23c881ffa00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
-t+0x9d9 reason: FQ_BAND_LIMIT
-> >       udp_stream   15815 [003]  1058.321224: skb:kfree_skb: skbaddr=3D0=
-xffffa23c9835db00 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmi=
-t+0x9d9 reason: FQ_BAND_LIMIT
-> >
-> > tc -s -d qd sh dev eth1
-> > qdisc fq 8023: root refcnt 257 limit 10000p flow_limit 100p buckets 102=
-4 orphan_mask 1023
-> >  bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1 weights 589824 196608 =
-65536 quantum 18Kb
-> >  initial_quantum 92120b low_rate_threshold 550Kbit refill_delay 40ms
-> >  timer_slack 10us horizon 10s horizon_drop
-> >  Sent 492439603330 bytes 336953991 pkt (dropped 61724094, overlimits 0 =
-requeues 4463)
-> >  backlog 14611228b 9995p requeues 4463
-> >   flows 2965 (inactive 1151 throttled 0) band0_pkts 0 band1_pkts 9993 b=
-and2_pkts 0
-> >   gc 6347 highprio 0 fastpath 30 throttled 5 latency 2.32us flows_plimi=
-t 7403693
-> >  band1_drops 54320401
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
->
-> Nice to see qdisc-specific drop reasons - guess I should look at this
-> for sch_cake as well!
->
-> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+On Thu, Dec 05, 2024 at 05:33:36AM -0500, Michael S. Tsirkin wrote:
+> On Wed, Dec 04, 2024 at 02:07:18PM +0900, Koichiro Den wrote:
+> > When virtnet_close is followed by virtnet_open, some TX completions can
+> > possibly remain unconsumed, until they are finally processed during the
+> > first NAPI poll after the netdev_tx_reset_queue(), resulting in a crash
+> > [1].
+> 
+> 
+> So it's a bugfix. Why net-next not net?
 
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+I was mistaken (I just read netdev-FAQ again). I'll resend to net, with
+adjustments reflecting your feedback.
 
-cheers,
-jamal
+> 
+> > Commit b96ed2c97c79 ("virtio_net: move netdev_tx_reset_queue() call
+> > before RX napi enable") was not sufficient to eliminate all BQL crash
+> > cases for virtio-net.
+> > 
+> > This issue can be reproduced with the latest net-next master by running:
+> > `while :; do ip l set DEV down; ip l set DEV up; done` under heavy network
+> > TX load from inside the machine.
+> > 
+> > netdev_tx_reset_queue() can actually be dropped from virtnet_open path;
+> > the device is not stopped in any case. For BQL core part, it's just like
+> > traffic nearly ceases to exist for some period. For stall detector added
+> > to BQL, even if virtnet_close could somehow lead to some TX completions
+> > delayed for long, followed by virtnet_open, we can just take it as stall
+> > as mentioned in commit 6025b9135f7a ("net: dqs: add NIC stall detector
+> > based on BQL"). Note also that users can still reset stall_max via sysfs.
+> > 
+> > So, drop netdev_tx_reset_queue() from virtnet_enable_queue_pair(). This
+> > eliminates the BQL crashes. Note that netdev_tx_reset_queue() is now
+> > explicitly required in freeze/restore path, so this patch adds it to
+> > free_unused_bufs().
+> 
+> I don't much like that free_unused_bufs now has this side effect.
+> I think would be better to just add a loop in virtnet_restore.
+> Or if you want to keep it there, pls rename the function
+> to hint it does more.
+
+It makes sense. I would go for the former. Thanks.
+
+> 
+> 
+> > 
+> > [1]:
+> > ------------[ cut here ]------------
+> > kernel BUG at lib/dynamic_queue_limits.c:99!
+> > Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+> > CPU: 7 UID: 0 PID: 1598 Comm: ip Tainted: G    N 6.12.0net-next_main+ #2
+> > Tainted: [N]=TEST
+> > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), \
+> > BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+> > RIP: 0010:dql_completed+0x26b/0x290
+> > Code: b7 c2 49 89 e9 44 89 da 89 c6 4c 89 d7 e8 ed 17 47 00 58 65 ff 0d
+> > 4d 27 90 7e 0f 85 fd fe ff ff e8 ea 53 8d ff e9 f3 fe ff ff <0f> 0b 01
+> > d2 44 89 d1 29 d1 ba 00 00 00 00 0f 48 ca e9 28 ff ff ff
+> > RSP: 0018:ffffc900002b0d08 EFLAGS: 00010297
+> > RAX: 0000000000000000 RBX: ffff888102398c80 RCX: 0000000080190009
+> > RDX: 0000000000000000 RSI: 000000000000006a RDI: 0000000000000000
+> > RBP: ffff888102398c00 R08: 0000000000000000 R09: 0000000000000000
+> > R10: 00000000000000ca R11: 0000000000015681 R12: 0000000000000001
+> > R13: ffffc900002b0d68 R14: ffff88811115e000 R15: ffff8881107aca40
+> > FS:  00007f41ded69500(0000) GS:ffff888667dc0000(0000)
+> > knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 0000556ccc2dc1a0 CR3: 0000000104fd8003 CR4: 0000000000772ef0
+> > PKRU: 55555554
+> > Call Trace:
+> >  <IRQ>
+> >  ? die+0x32/0x80
+> >  ? do_trap+0xd9/0x100
+> >  ? dql_completed+0x26b/0x290
+> >  ? dql_completed+0x26b/0x290
+> >  ? do_error_trap+0x6d/0xb0
+> >  ? dql_completed+0x26b/0x290
+> >  ? exc_invalid_op+0x4c/0x60
+> >  ? dql_completed+0x26b/0x290
+> >  ? asm_exc_invalid_op+0x16/0x20
+> >  ? dql_completed+0x26b/0x290
+> >  __free_old_xmit+0xff/0x170 [virtio_net]
+> >  free_old_xmit+0x54/0xc0 [virtio_net]
+> >  virtnet_poll+0xf4/0xe30 [virtio_net]
+> >  ? __update_load_avg_cfs_rq+0x264/0x2d0
+> >  ? update_curr+0x35/0x260
+> >  ? reweight_entity+0x1be/0x260
+> >  __napi_poll.constprop.0+0x28/0x1c0
+> >  net_rx_action+0x329/0x420
+> >  ? enqueue_hrtimer+0x35/0x90
+> >  ? trace_hardirqs_on+0x1d/0x80
+> >  ? kvm_sched_clock_read+0xd/0x20
+> >  ? sched_clock+0xc/0x30
+> >  ? kvm_sched_clock_read+0xd/0x20
+> >  ? sched_clock+0xc/0x30
+> >  ? sched_clock_cpu+0xd/0x1a0
+> >  handle_softirqs+0x138/0x3e0
+> >  do_softirq.part.0+0x89/0xc0
+> >  </IRQ>
+> >  <TASK>
+> >  __local_bh_enable_ip+0xa7/0xb0
+> >  virtnet_open+0xc8/0x310 [virtio_net]
+> >  __dev_open+0xfa/0x1b0
+> >  __dev_change_flags+0x1de/0x250
+> >  dev_change_flags+0x22/0x60
+> >  do_setlink.isra.0+0x2df/0x10b0
+> >  ? rtnetlink_rcv_msg+0x34f/0x3f0
+> >  ? netlink_rcv_skb+0x54/0x100
+> >  ? netlink_unicast+0x23e/0x390
+> >  ? netlink_sendmsg+0x21e/0x490
+> >  ? ____sys_sendmsg+0x31b/0x350
+> >  ? avc_has_perm_noaudit+0x67/0xf0
+> >  ? cred_has_capability.isra.0+0x75/0x110
+> >  ? __nla_validate_parse+0x5f/0xee0
+> >  ? __pfx___probestub_irq_enable+0x3/0x10
+> >  ? __create_object+0x5e/0x90
+> >  ? security_capable+0x3b/0x70
+> >  rtnl_newlink+0x784/0xaf0
+> >  ? avc_has_perm_noaudit+0x67/0xf0
+> >  ? cred_has_capability.isra.0+0x75/0x110
+> >  ? stack_depot_save_flags+0x24/0x6d0
+> >  ? __pfx_rtnl_newlink+0x10/0x10
+> >  rtnetlink_rcv_msg+0x34f/0x3f0
+> >  ? do_syscall_64+0x6c/0x180
+> >  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> >  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+> >  netlink_rcv_skb+0x54/0x100
+> >  netlink_unicast+0x23e/0x390
+> >  netlink_sendmsg+0x21e/0x490
+> >  ____sys_sendmsg+0x31b/0x350
+> >  ? copy_msghdr_from_user+0x6d/0xa0
+> >  ___sys_sendmsg+0x86/0xd0
+> >  ? __pte_offset_map+0x17/0x160
+> >  ? preempt_count_add+0x69/0xa0
+> >  ? __call_rcu_common.constprop.0+0x147/0x610
+> >  ? preempt_count_add+0x69/0xa0
+> >  ? preempt_count_add+0x69/0xa0
+> >  ? _raw_spin_trylock+0x13/0x60
+> >  ? trace_hardirqs_on+0x1d/0x80
+> >  __sys_sendmsg+0x66/0xc0
+> >  do_syscall_64+0x6c/0x180
+> >  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> > RIP: 0033:0x7f41defe5b34
+> > Code: 15 e1 12 0f 00 f7 d8 64 89 02 b8 ff ff ff ff eb bf 0f 1f 44 00 00
+> > f3 0f 1e fa 80 3d 35 95 0f 00 00 74 13 b8 2e 00 00 00 0f 05 <48> 3d 00
+> > f0 ff ff 77 4c c3 0f 1f 00 55 48 89 e5 48 83 ec 20 89 55
+> > RSP: 002b:00007ffe5336ecc8 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
+> > RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f41defe5b34
+> > RDX: 0000000000000000 RSI: 00007ffe5336ed30 RDI: 0000000000000003
+> > RBP: 00007ffe5336eda0 R08: 0000000000000010 R09: 0000000000000001
+> > R10: 00007ffe5336f6f9 R11: 0000000000000202 R12: 0000000000000003
+> > R13: 0000000067452259 R14: 0000556ccc28b040 R15: 0000000000000000
+> >  </TASK>
+> > [...]
+> > ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+> > 
+> > Fixes: c8bd1f7f3e61 ("virtio_net: add support for Byte Queue Limits")
+> > Cc: <stable@vger.kernel.org> # v6.11+
+> > Signed-off-by: Koichiro Den <koichiro.den@canonical.com>
+> > ---
+> >  drivers/net/virtio_net.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 64c87bb48a41..48ce8b3881b6 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -3054,7 +3054,6 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
+> >  	if (err < 0)
+> >  		goto err_xdp_reg_mem_model;
+> >  
+> > -	netdev_tx_reset_queue(netdev_get_tx_queue(vi->dev, qp_index));
+> >  	virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
+> >  	virtnet_napi_tx_enable(vi, vi->sq[qp_index].vq, &vi->sq[qp_index].napi);
+> >  
+> > @@ -6243,6 +6242,7 @@ static void free_unused_bufs(struct virtnet_info *vi)
+> >  		struct virtqueue *vq = vi->sq[i].vq;
+> >  		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL)
+> >  			virtnet_sq_free_unused_buf(vq, buf);
+> > +		netdev_tx_reset_queue(netdev_get_tx_queue(vi->dev, i));
+> >  		cond_resched();
+> >  	}
+> >  
+> > -- 
+> > 2.43.0
+> 
 
