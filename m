@@ -1,74 +1,101 @@
-Return-Path: <netdev+bounces-149390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F313C9E55FA
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:58:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E81279E5619
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 14:01:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAC37165F02
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:58:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38A31188368B
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB0321A447;
-	Thu,  5 Dec 2024 12:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B61C8218E89;
+	Thu,  5 Dec 2024 12:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aLj91NEv"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F80E218EA5
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 12:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AE521884B;
+	Thu,  5 Dec 2024 12:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733403422; cv=none; b=roOT3/ZBl7GDbcyQVZIhnazuY15ggD1kQou8E7PWjCsg1kPtA+55uvZOgjU2OwzO5y1kk9h7rD28Ln8ek8jUdpfK6fXPyf57kyPQhizPFFJJLGz19EG0Tt62r/uPesQPAHoswLVO4osddmSfYENtczve9z52gohRnAylq+01yS8=
+	t=1733403554; cv=none; b=pLmGrJ2k4F4yzXdifyuxK2oFauf06K4bb8GzX9FgRYGsVlc6YG9YJ2vESugpT/B2eW9kFZJSeVJM+4cdGdmigTqir0EMoPNfE0CCPYTFKOg2MMmke6k4nyd3R3CRSJxpFBcIeXr5kqp4L6xseap+SWgnXrEZARd77/lNcN+e9ZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733403422; c=relaxed/simple;
-	bh=Pv1y2rUk4D7YIRTWWFsMKM9CRt6p2zuOxY5NCh5B+JA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PmYLlkbWBiHZZkXSZsAoKRDZIjup8w1gevvCLQNZrF2CrVwJdC9CmMOMfecCaWLxkeVpe5uBrwTD415QtxCnz7Sj/zHeeHWPuhN/y9c0+k1Cz/RJS+VhpYSj1kQ6E/APhoyRMJvor+u2xoGz9VG/cVZeQ3Eap+bJykLeee2jBK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tJBPP-0006PL-Ix; Thu, 05 Dec 2024 13:56:43 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tJBPN-001pLM-0g;
-	Thu, 05 Dec 2024 13:56:41 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tJBPN-005GFB-2t;
-	Thu, 05 Dec 2024 13:56:41 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Roan van Dijk <roan@protonic.nl>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH v1 5/5] arm: dts: stm32: Add Priva E-Measuringbox devicetree
-Date: Thu,  5 Dec 2024 13:56:40 +0100
-Message-Id: <20241205125640.1253996-6-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241205125640.1253996-1-o.rempel@pengutronix.de>
-References: <20241205125640.1253996-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1733403554; c=relaxed/simple;
+	bh=fg07RDDUmuTpQ6lJX/VD2zvAkPFpkUgAQreDDh3h7Jw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QeMpdh34MOx5pq8Dc4UH0JRLTEis2Z2aBORqqUVJCdj+UVmvKSTRvYUt+xwqxnNkhJRBGSzCHwva+1Ga8MzV5QsKcf3Lii4hGFT8NglMPH3zQ0/q+UuPOmyeRyvjRTSMRN7AcqhyYvKUkzLWdYO0dBH67Ph4wONFf7Ex3N76dKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aLj91NEv; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B560br5031839;
+	Thu, 5 Dec 2024 12:59:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=8sbkj9
+	gkyLAobLOZcSqKyA1r9ycFlPZjwRLP/kCuEME=; b=aLj91NEvjY21hhzpjKZMiK
+	u9fH8uA/gvFw+lB8fWxlR++mkjRHZ7ltJokNFYWsKojJLjy8tDEdbE833l/aGaZe
+	h8cHJcWQJKMo8KU4jb9JRjrq1d862XqY7YQzsVJUvVsBTYF8JpngSaK/geetzCFp
+	6yjBuLvbNwGQQitTiDkddrse3bsWkfR6+cazpW7wAT4mk3x6z83tHMw6EM40THel
+	VJ2DRVOTLs0SH8Dh5FM0pZpZhgQMl+eJhQcmvFka0lwyj6+2hU/3MfBWgV16QGCB
+	9Bnyri60Qg7UAn6/DTljrEdmLaCHZRh7tB6+IfZETEdQoesTzAoERYbANVuw8kBQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43b6hb1xpv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Dec 2024 12:59:07 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B5CqLNr016494;
+	Thu, 5 Dec 2024 12:59:07 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43b6hb1xmn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Dec 2024 12:59:07 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5B9N7Y005544;
+	Thu, 5 Dec 2024 12:58:40 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 438fr1sxq1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Dec 2024 12:58:39 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B5CwaRD21233920
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 5 Dec 2024 12:58:36 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4A44020043;
+	Thu,  5 Dec 2024 12:58:36 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3C5C920040;
+	Thu,  5 Dec 2024 12:58:35 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.76.77])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu,  5 Dec 2024 12:58:35 +0000 (GMT)
+Date: Thu, 5 Dec 2024 13:58:33 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Wenjia Zhang <wenjia@linux.ibm.com>
+Cc: Guangguan Wang <guangguan.wang@linux.alibaba.com>, jaka@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dust Li
+ <dust.li@linux.alibaba.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH net-next v2 2/2] net/smc: support ipv4 mapped ipv6 addr
+ client for smc-r v2
+Message-ID: <20241205135833.0beafd61.pasic@linux.ibm.com>
+In-Reply-To: <894d640f-d9f6-4851-adb8-779ff3678440@linux.ibm.com>
+References: <20241202125203.48821-1-guangguan.wang@linux.alibaba.com>
+	<20241202125203.48821-3-guangguan.wang@linux.alibaba.com>
+	<894d640f-d9f6-4851-adb8-779ff3678440@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,539 +104,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: P7wskdYk2e_Iqwnk39ux8NOnVyaYMq6i
+X-Proofpoint-GUID: 6T3slWX1cnSPVrB_IYU9GoSSZxVQA6RU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ adultscore=0 suspectscore=0 mlxlogscore=924 clxscore=1011 impostorscore=0
+ malwarescore=0 bulkscore=0 lowpriorityscore=0 spamscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412050094
 
-From: Roan van Dijk <roan@protonic.nl>
+On Thu, 5 Dec 2024 11:16:27 +0100
+Wenjia Zhang <wenjia@linux.ibm.com> wrote:
 
-Introduce the devicetree for the Priva E-Measuringbox board
-(stm32mp133c-prihmb), based on the STM32MP133 SoC.
+> > --- a/net/smc/af_smc.c
+> > +++ b/net/smc/af_smc.c
+> > @@ -1116,7 +1116,12 @@ static int smc_find_proposal_devices(struct
+> > smc_sock *smc, ini->check_smcrv2 = true;
+> >   	ini->smcrv2.saddr = smc->clcsock->sk->sk_rcv_saddr;
+> >   	if (!(ini->smcr_version & SMC_V2) ||
+> > +#if IS_ENABLED(CONFIG_IPV6)
+> > +	    (smc->clcsock->sk->sk_family != AF_INET &&
+> > +
+> > !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||  
+> I think here you want to say !(smc->clcsock->sk->sk_family == AF_INET
+> && ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)), right? If
+> it is, the negativ form of the logical operation (a&&b) is (!a)||(!b),
+> i.e. here should be:
+> （smc->clcsock->sk->sk_family != AF_INET）|| 
+> （!ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)）
 
-Signed-off-by: Roan van Dijk <roan@protonic.nl>
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- arch/arm/boot/dts/st/Makefile               |   1 +
- arch/arm/boot/dts/st/stm32mp133c-prihmb.dts | 496 ++++++++++++++++++++
- 2 files changed, 497 insertions(+)
- create mode 100644 arch/arm/boot/dts/st/stm32mp133c-prihmb.dts
+Wenjia, I think you happen to confuse something here. The condition
+of this if statement is supposed to evaluate as true iff we don't want
+to propose SMCRv2 because the situation is such that SMCRv2 is not
+supported.
 
-diff --git a/arch/arm/boot/dts/st/Makefile b/arch/arm/boot/dts/st/Makefile
-index eab3a9bd435f..c4c01415fa85 100644
---- a/arch/arm/boot/dts/st/Makefile
-+++ b/arch/arm/boot/dts/st/Makefile
-@@ -29,6 +29,7 @@ dtb-$(CONFIG_ARCH_STM32) += \
- 	stm32h743i-eval.dtb \
- 	stm32h743i-disco.dtb \
- 	stm32h750i-art-pi.dtb \
-+	stm32mp133c-prihmb.dtb \
- 	stm32mp135f-dhcor-dhsbc.dtb \
- 	stm32mp135f-dk.dtb \
- 	stm32mp151a-prtt1a.dtb \
-diff --git a/arch/arm/boot/dts/st/stm32mp133c-prihmb.dts b/arch/arm/boot/dts/st/stm32mp133c-prihmb.dts
-new file mode 100644
-index 000000000000..663b6de1b814
---- /dev/null
-+++ b/arch/arm/boot/dts/st/stm32mp133c-prihmb.dts
-@@ -0,0 +1,496 @@
-+// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
-+/dts-v1/;
-+
-+#include <dt-bindings/gpio/gpio.h>
-+#include <dt-bindings/input/input.h>
-+#include <dt-bindings/leds/common.h>
-+#include <dt-bindings/regulator/st,stm32mp13-regulator.h>
-+#include "stm32mp133.dtsi"
-+#include "stm32mp13xc.dtsi"
-+#include "stm32mp13-pinctrl.dtsi"
-+
-+/ {
-+	model = "Priva E-Measuringbox board";
-+	compatible = "pri,prihmb", "st,stm32mp133";
-+
-+	aliases {
-+		ethernet0 = &ethernet1;
-+		mdio-gpio0 = &mdio0;
-+		mmc0 = &sdmmc1;
-+		mmc1 = &sdmmc2;
-+		serial0 = &uart4;
-+		serial1 = &usart6;
-+		serial2 = &uart7;
-+	};
-+
-+	chosen {
-+		stdout-path = "serial0:115200n8";
-+	};
-+
-+	counter-0 {
-+		compatible = "interrupt-counter";
-+		gpios = <&gpioa 11 GPIO_ACTIVE_HIGH>;
-+	};
-+
-+	gpio-keys {
-+		compatible = "gpio-keys";
-+		autorepeat;
-+
-+		button-reset {
-+			label = "reset-button";
-+			linux,code = <BTN_1>;
-+			gpios = <&gpioi 7 GPIO_ACTIVE_LOW>;
-+		};
-+	};
-+
-+	leds {
-+		compatible = "gpio-leds";
-+
-+		led-blue {
-+			function = LED_FUNCTION_HEARTBEAT;
-+			color = <LED_COLOR_ID_BLUE>;
-+			gpios = <&gpioa 14 GPIO_ACTIVE_LOW>;
-+			linux,default-trigger = "heartbeat";
-+			default-state = "off";
-+		};
-+	};
-+
-+	led-controller-0 {
-+		compatible = "pwm-leds-multicolor";
-+
-+		multi-led {
-+			color = <LED_COLOR_ID_RGB>;
-+			function = LED_FUNCTION_STATUS;
-+			max-brightness = <255>;
-+
-+			led-red {
-+				active-low;
-+				color = <LED_COLOR_ID_RED>;
-+				pwms = <&pwm2 2 1000000 1>;
-+			};
-+
-+			led-green {
-+				active-low;
-+				color = <LED_COLOR_ID_GREEN>;
-+				pwms = <&pwm1 1 1000000 1>;
-+			};
-+
-+			led-blue {
-+				active-low;
-+				color = <LED_COLOR_ID_BLUE>;
-+				pwms = <&pwm1 2 1000000 1>;
-+			};
-+		};
-+	};
-+
-+	led-controller-1 {
-+		compatible = "pwm-leds-multicolor";
-+
-+		multi-led {
-+			color = <LED_COLOR_ID_RGB>;
-+			function = LED_FUNCTION_STATUS;
-+			max-brightness = <255>;
-+
-+			led-red {
-+				active-low;
-+				color = <LED_COLOR_ID_RED>;
-+				pwms = <&pwm1 0 1000000 1>;
-+			};
-+
-+			led-green {
-+				active-low;
-+				color = <LED_COLOR_ID_GREEN>;
-+				pwms = <&pwm2 0 1000000 1>;
-+			};
-+
-+			led-blue {
-+				active-low;
-+				color = <LED_COLOR_ID_BLUE>;
-+				pwms = <&pwm2 1 1000000 1>;
-+			};
-+		};
-+	};
-+
-+	/* DP83TD510E PHYs have max MDC rate of 1.75MHz. Since we can't reduce
-+	 * stmmac MDC clock without reducing system bus rate, we need to use
-+	 * gpio based MDIO bus.
-+	 */
-+	mdio0: mdio {
-+		compatible = "virtual,mdio-gpio";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		gpios = <&gpiog 2 GPIO_ACTIVE_HIGH
-+			 &gpioa 2 GPIO_ACTIVE_HIGH>;
-+
-+		/* TI DP83TD510E */
-+		phy0: ethernet-phy@0 {
-+			compatible = "ethernet-phy-id2000.0181";
-+			reg = <0>;
-+			interrupts-extended = <&gpioa 4 IRQ_TYPE_LEVEL_LOW>;
-+			reset-gpios = <&gpioa 3 GPIO_ACTIVE_LOW>;
-+			reset-assert-us = <10>;
-+			reset-deassert-us = <35>;
-+		};
-+	};
-+
-+	memory@c0000000 {
-+		device_type = "memory";
-+		reg = <0xc0000000 0x10000000>;
-+	};
-+
-+	reg_3v3: regulator-3v3 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "3v3";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+	};
-+
-+	reserved-memory {
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+		ranges;
-+
-+		optee@ce000000 {
-+			reg = <0xce000000 0x02000000>;
-+			no-map;
-+		};
-+	};
-+};
-+
-+&adc_1 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&adc_1_pins_a>;
-+	vdda-supply = <&reg_3v3>;
-+	vref-supply = <&reg_3v3>;
-+	status = "okay";
-+};
-+
-+&adc1 {
-+	status = "okay";
-+
-+	channel@0 { /* Fan current PC0*/
-+		reg = <0>;
-+		st,min-sample-time-ns = <10000>;  /* 10µs sampling time */
-+	};
-+	channel@11 { /* Fan voltage */
-+		reg = <11>;
-+		st,min-sample-time-ns = <10000>;  /* 10µs sampling time */
-+	};
-+	channel@15 { /* Supply voltage */
-+		reg = <15>;
-+		st,min-sample-time-ns = <10000>;  /* 10µs sampling time */
-+	};
-+};
-+
-+&dts {
-+	status = "okay";
-+};
-+
-+&ethernet1 {
-+	status = "okay";
-+	pinctrl-0 = <&ethernet1_rmii_pins_a>;
-+	pinctrl-1 = <&ethernet1_rmii_sleep_pins_a>;
-+	pinctrl-names = "default", "sleep";
-+	phy-mode = "rmii";
-+	phy-handle = <&phy0>;
-+};
-+
-+&i2c1 {
-+	pinctrl-names = "default", "sleep";
-+	pinctrl-0 = <&i2c1_pins_a>;
-+	pinctrl-1 = <&i2c1_sleep_pins_a>;
-+	clock-frequency = <100000>;
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+	status = "okay";
-+
-+	board-sensor@48 {
-+		compatible = "ti,tmp1075";
-+		reg = <0x48>;
-+		vs-supply = <&reg_3v3>;
-+	};
-+};
-+
-+&{i2c1_pins_a/pins} {
-+	pinmux = <STM32_PINMUX('D', 3, AF5)>, /* I2C1_SCL */
-+		 <STM32_PINMUX('B', 8, AF4)>; /* I2C1_SDA */
-+	bias-disable;
-+	drive-open-drain;
-+	slew-rate = <0>;
-+};
-+
-+&{i2c1_sleep_pins_a/pins} {
-+	pinmux = <STM32_PINMUX('D', 3, ANALOG)>, /* I2C1_SCL */
-+		 <STM32_PINMUX('B', 8, ANALOG)>; /* I2C1_SDA */
-+};
-+
-+&iwdg2 {
-+	timeout-sec = <32>;
-+	status = "okay";
-+};
-+
-+/* SD card without Card-detect */
-+&sdmmc1 {
-+	pinctrl-names = "default", "opendrain", "sleep";
-+	pinctrl-0 = <&sdmmc1_b4_pins_a &sdmmc1_clk_pins_a>;
-+	pinctrl-1 = <&sdmmc1_b4_od_pins_a &sdmmc1_clk_pins_a>;
-+	pinctrl-2 = <&sdmmc1_b4_sleep_pins_a>;
-+	broken-cd;
-+	no-sdio;
-+	no-1-8-v;
-+	st,neg-edge;
-+	bus-width = <4>;
-+	vmmc-supply = <&reg_3v3>;
-+	status = "okay";
-+};
-+
-+/* EMMC */
-+&sdmmc2 {
-+	pinctrl-names = "default", "opendrain", "sleep";
-+	pinctrl-0 = <&sdmmc2_b4_pins_a &sdmmc2_d47_pins_a &sdmmc2_clk_pins_a>;
-+	pinctrl-1 = <&sdmmc2_b4_od_pins_a &sdmmc2_d47_pins_a &sdmmc2_clk_pins_a>;
-+	pinctrl-2 = <&sdmmc2_b4_sleep_pins_a &sdmmc2_d47_sleep_pins_a>;
-+	non-removable;
-+	no-sd;
-+	no-sdio;
-+	no-1-8-v;
-+	st,neg-edge;
-+	mmc-ddr-3_3v;
-+	bus-width = <8>;
-+	vmmc-supply = <&reg_3v3>;
-+	status = "okay";
-+};
-+
-+&timers1 {
-+	status = "okay";
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+
-+	pwm1: pwm {
-+		pinctrl-0 = <&pwm1_pins_a>;
-+		pinctrl-1 = <&pwm1_sleep_pins_a>;
-+		pinctrl-names = "default", "sleep";
-+		status = "okay";
-+	};
-+};
-+
-+&timers4 {
-+	status = "okay";
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+
-+	pwm2: pwm {
-+		pinctrl-0 = <&pwm4_pins_a>;
-+		pinctrl-1 = <&pwm4_sleep_pins_a>;
-+		pinctrl-names = "default", "sleep";
-+		status = "okay";
-+	};
-+};
-+
-+/* Fan PWM */
-+&timers5 {
-+	status = "okay";
-+
-+	pwm3: pwm {
-+		pinctrl-0 = <&pwm5_pins_a>;
-+		pinctrl-1 = <&pwm5_sleep_pins_a>;
-+		pinctrl-names = "default", "sleep";
-+		status = "okay";
-+	};
-+};
-+
-+&timers2 {
-+	status = "okay";
-+
-+	timer@1 {
-+		status = "okay";
-+	};
-+};
-+
-+&uart4 {
-+	pinctrl-names = "default", "sleep", "idle";
-+	pinctrl-0 = <&uart4_pins_a>;
-+	pinctrl-1 = <&uart4_sleep_pins_a>;
-+	pinctrl-2 = <&uart4_idle_pins_a>;
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+	status = "okay";
-+};
-+
-+&uart7 {
-+	pinctrl-names = "default", "sleep", "idle";
-+	pinctrl-0 = <&uart7_pins_a>;
-+	pinctrl-1 = <&uart7_sleep_pins_a>;
-+	pinctrl-2 = <&uart7_idle_pins_a>;
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+	status = "okay";
-+};
-+
-+&usart6 {
-+	pinctrl-names = "default", "sleep", "idle";
-+	pinctrl-0 = <&usart6_pins_a>;
-+	pinctrl-1 = <&usart6_sleep_pins_a>;
-+	pinctrl-2 = <&usart6_idle_pins_a>;
-+	linux,rs485-enabled-at-boot-time;
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+	status = "okay";
-+};
-+
-+&pinctrl {
-+	adc_1_pins_a: adc1-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('C', 0, ANALOG)>, /* ADC1 in0 */
-+				 <STM32_PINMUX('C', 2, ANALOG)>, /* ADC1 in15 */
-+				 <STM32_PINMUX('F', 13, ANALOG)>; /* ADC1 in11 */
-+		};
-+	};
-+
-+	ethernet1_rmii_pins_a: rmii-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('G', 13, AF11)>, /* ETH1_RMII_TXD0 */
-+				 <STM32_PINMUX('G', 14, AF11)>, /* ETH1_RMII_TXD1 */
-+				 <STM32_PINMUX('B', 11, AF11)>, /* ETH1_RMII_TX_EN */
-+				 <STM32_PINMUX('A', 1, AF11)>;   /* ETH1_RMII_REF_CLK */
-+			bias-disable;
-+			drive-push-pull;
-+			slew-rate = <2>;
-+		};
-+		pins2 {
-+			pinmux = <STM32_PINMUX('C', 4, AF11)>,  /* ETH1_RMII_RXD0 */
-+				 <STM32_PINMUX('C', 5, AF11)>,  /* ETH1_RMII_RXD1 */
-+				 <STM32_PINMUX('A', 7, AF11)>;  /* ETH1_RMII_CRS_DV */
-+			bias-disable;
-+		};
-+	};
-+
-+	ethernet1_rmii_sleep_pins_a: rmii-sleep-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('G', 13, ANALOG)>, /* ETH1_RMII_TXD0 */
-+				 <STM32_PINMUX('G', 14, ANALOG)>, /* ETH1_RMII_TXD1 */
-+				 <STM32_PINMUX('B', 11, ANALOG)>, /* ETH1_RMII_TX_EN */
-+				 <STM32_PINMUX('C', 4, ANALOG)>,  /* ETH1_RMII_RXD0 */
-+				 <STM32_PINMUX('C', 5, ANALOG)>,  /* ETH1_RMII_RXD1 */
-+				 <STM32_PINMUX('A', 1, ANALOG)>,  /* ETH1_RMII_REF_CLK */
-+				 <STM32_PINMUX('A', 7, ANALOG)>;  /* ETH1_RMII_CRS_DV */
-+		};
-+	};
-+
-+	pwm1_pins_a: pwm1-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('E', 9, AF1)>, /* TIM1_CH1 */
-+				 <STM32_PINMUX('E', 11, AF1)>, /* TIM1_CH2 */
-+				 <STM32_PINMUX('E', 13, AF1)>; /* TIM1_CH3 */
-+			bias-pull-down;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+	};
-+
-+	pwm1_sleep_pins_a: pwm1-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('E', 9, ANALOG)>, /* TIM1_CH1 */
-+				 <STM32_PINMUX('E', 11, ANALOG)>, /* TIM1_CH2 */
-+				 <STM32_PINMUX('E', 13, ANALOG)>; /* TIM1_CH3 */
-+		};
-+	};
-+
-+	pwm4_pins_a: pwm4-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('D', 12, AF2)>, /* TIM4_CH1 */
-+				 <STM32_PINMUX('B', 7, AF2)>, /* TIM4_CH2 */
-+				 <STM32_PINMUX('D', 14, AF2)>; /* TIM4_CH3 */
-+			bias-pull-down;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+	};
-+
-+	pwm4_sleep_pins_a: pwm4-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('D', 12, ANALOG)>, /* TIM4_CH1 */
-+				 <STM32_PINMUX('B', 7, ANALOG)>, /* TIM4_CH2 */
-+				 <STM32_PINMUX('D', 14, ANALOG)>; /* TIM4_CH3 */
-+		};
-+	};
-+	pwm5_pins_a: pwm5-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('A', 0, AF2)>; /* TIM5_CH1 */
-+		};
-+	};
-+
-+	pwm5_sleep_pins_a: pwm5-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('A', 0, ANALOG)>; /* TIM5_CH1 */
-+		};
-+	};
-+
-+	uart7_pins_a: uart7-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('E', 8, AF7)>; /* UART_TX */
-+			bias-disable;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+		pins2 {
-+			pinmux = <STM32_PINMUX('E', 10, AF7)>; /* UART7_RX */
-+			bias-pull-up;
-+		};
-+	};
-+
-+	uart7_idle_pins_a: uart7-idle-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('E', 8, ANALOG)>; /* UART7_TX */
-+		};
-+		pins2 {
-+			pinmux = <STM32_PINMUX('E', 10, AF7)>; /* UART7_RX */
-+			bias-pull-up;
-+		};
-+	};
-+
-+	uart7_sleep_pins_a: uart7-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('E', 8, ANALOG)>, /* UART7_TX */
-+				 <STM32_PINMUX('E', 10, ANALOG)>; /* UART7_RX */
-+		};
-+	};
-+
-+	usart6_pins_a: usart6-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('F', 8, AF7)>, /* USART6_TX */
-+				 <STM32_PINMUX('F', 10, AF7)>; /* USART6_DE */
-+			bias-disable;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+		pins2 {
-+			pinmux = <STM32_PINMUX('H', 11, AF7)>; /* USART6_RX */
-+			bias-disable;
-+		};
-+	};
-+
-+	usart6_idle_pins_a: usart6-idle-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('F', 8, ANALOG)>; /* USART6_TX */
-+		};
-+		pins2 {
-+			pinmux = <STM32_PINMUX('F', 10, AF7)>; /* USART6_DE */
-+			bias-disable;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+		pins3 {
-+			pinmux = <STM32_PINMUX('H', 11, AF7)>; /* USART6_RX */
-+			bias-disable;
-+		};
-+	};
-+
-+	usart6_sleep_pins_a: usart6-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('F', 8, ANALOG)>, /* USART6_TX */
-+				 <STM32_PINMUX('F', 10, ANALOG)>, /* USART6_DE */
-+				 <STM32_PINMUX('H', 11, ANALOG)>; /* USART6_RX */
-+		};
-+	};
-+};
--- 
-2.39.5
+We have a bunch of conditions we need to meet for SMCRv2 so
+logically we have (A && B && C && D). Now since the if is
+about when SMCRv2 is not supported we have a super structure
+that looks like !A || !B || !C || !D. With this patch, if
+CONFIG_IPV6 is not enabled, the sub-condition remains the same:
+if smc->clcsock->sk->sk_family is something else that AF_INET
+the we do not do SMCRv2!
+
+But when we do have CONFIG_IPV6 then we want to do SMCRv2 for
+AF_INET6 sockets too if the addresses used are actually
+v4 mapped addresses.
+
+Now this is where the cognitive dissonance starts on my end. I
+think the author assumes sk_family == AF_INET || sk_family == AF_INET6
+is a tautology in this context. That may be a reasonable thing to
+assume. Under that assumption 
+sk_family != AF_INET &&	!ipv6_addr_v4mapped(addr) (shortened for
+convenience)
+becomes equivalent to
+sk_family == AF_INET6 && !ipv6_addr_v4mapped(addr)
+which means in words if the socket is an IPv6 sockeet and the addr is not
+a v4 mapped v6 address then we *can not* do SMCRv2. And the condition
+when we can is sk_family != AF_INET6 || ipv6_addr_v4mapped(addr) which
+is equivalen to sk_family == AF_INET || ipv6_addr_v4mapped(addr) under
+the aforementioned assumption.
+
+But if we assume sk_family == AF_INET || sk_family == AF_INET6 then
+the #else does not make any sense, because I guess with IPv6 not
+available AF_INET6 is not available ant thus the else is always
+guaranteed to evaluate to false under the assumption made.
+
+Thus I conclude, that I am certainly missing something here. Guangguan,
+do you care to explain?
+
+Regards,
+Halil
+
+
+
 
 
