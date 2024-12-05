@@ -1,120 +1,91 @@
-Return-Path: <netdev+bounces-149410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 510269E5807
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 14:59:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F3509E5893
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 15:35:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B32F16BF7E
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:58:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3F891884131
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 14:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB74219A73;
-	Thu,  5 Dec 2024 13:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1135D219A97;
+	Thu,  5 Dec 2024 14:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="adzPbIsD"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD57E219A6B
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 13:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7398149C64;
+	Thu,  5 Dec 2024 14:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733407093; cv=none; b=Hw3DfiPl1jmnTbG9wyxU3egcjumGkFLYtR+UbLEb2POnBFwXGEiYe2/ZVFg1YckqG9mTNrhqhiQm6/hn/AdTlXkYoC+jGyWZImR2OgYz9hvedA1VdutKbsyvcv4EGT1iBdYzPHwFd7Dprfw9D1nl/segHMRkPW2L146WWeeGV14=
+	t=1733409356; cv=none; b=sre4ElYa5UABRVKIrWT+54zoJ81Pe1kKZMgGWRSgLne6HugiUiw5ogJ4rQ7doxjD770jp6JUwImPBc9cxiybLVzMM+QcCw5oOjVWQbIOzk+3Jw5w0UOcXjvYKZzeDBtsRkvKryI8UyUiPDnuARi2h4cZJCb6Ap7dQmOAIv74cZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733407093; c=relaxed/simple;
-	bh=Whztqzqhd31DO6J1pWBJGbIcubmLvvZmURKz55fjQck=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dj66ajrysOxDd3p3oWRxua9hYwpT3AHWmhooFZK1l438bOa7SbeFk/SMMrTzY8BCOCyhNOhCWYG0eZZft9nqW/3JiLbA58VUSt/5oPNt49uvw6Z00R9MPl7zYjbQewguF90KQU3fD00nN0yC8MQLVKvq8nPtB7gb1ts4SXzSIxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1tJCMh-0000kQ-S9; Thu, 05 Dec 2024 14:57:59 +0100
-Message-ID: <361b3a14-db86-4c3c-9f07-4ebc1dd40d0e@pengutronix.de>
-Date: Thu, 5 Dec 2024 14:57:59 +0100
+	s=arc-20240116; t=1733409356; c=relaxed/simple;
+	bh=PAZGxlGUEOmZxRs5D6wMPERed/sa/ryvKJ7XsU6KiyY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lmANl+Smjnzcm5TN1Ne1ZezeNXogt5o9CohPu2X+iER07EGihFSfh0DRTWD+ln/Vm99SAiG0JphZODdAJ3zpRI+N0a0pnSlWaj4fVEkNt68Ofb3OPS1jzKttWEZkX1PjisVLX+qW+7a7a64smcZEWqYXKWwyDH5VpZHxZ5t0QKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=adzPbIsD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=akiezOi0AjI2v1AZmbfpW1eWcU7uuOXw1StSELrCSBw=; b=adzPbIsD7Zlz6bScvSSLfQYwQz
+	Fq159kqAu3B0ml/1jxYWe35asoT7hNNigSxcE3/v8RKx1HZn8Y3AO4XaUx9W7hmWevouNsYRXpksg
+	PREHuCUn21GSJxhSfKDKLRsXJkOGgnr9JZtnHulcCnrsD4c+40g9EhKj6jsjN537RABA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tJCxA-00FKIc-1G; Thu, 05 Dec 2024 15:35:40 +0100
+Date: Thu, 5 Dec 2024 15:35:40 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Divya.Koppera@microchip.com
+Cc: Arun.Ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
+	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	richardcochran@gmail.com, vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net-next v5 3/5] net: phy: Kconfig: Add ptp library
+ support and 1588 optional flag in Microchip phys
+Message-ID: <05eecef6-f6be-4fcd-9896-df4e04bbde19@lunn.ch>
+References: <20241203085248.14575-1-divya.koppera@microchip.com>
+ <20241203085248.14575-4-divya.koppera@microchip.com>
+ <67b0c8ac-5079-478c-9495-d255f063a828@lunn.ch>
+ <CO1PR11MB47710AF4F801CB2EF586D453E2372@CO1PR11MB4771.namprd11.prod.outlook.com>
+ <ee883c7a-f8af-4de6-b7d3-90e883af7dec@lunn.ch>
+ <CO1PR11MB4771EDCFF242B8D8E5A0A1E0E2302@CO1PR11MB4771.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] arm: dts: st: stm32mp151a-prtt1l: Fix QSPI
- configuration
-To: Alexandre TORGUE <alexandre.torgue@foss.st.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>
-Cc: devicetree@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel@pengutronix.de,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20240806120517.406714-1-o.rempel@pengutronix.de>
- <20dc2cd4-7684-4894-9db3-23c3f4abd661@pengutronix.de>
- <a483fb50-f978-4e48-b38e-6d79632540f1@foss.st.com>
-Content-Language: en-US
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <a483fb50-f978-4e48-b38e-6d79632540f1@foss.st.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CO1PR11MB4771EDCFF242B8D8E5A0A1E0E2302@CO1PR11MB4771.namprd11.prod.outlook.com>
 
-Hello Alex,
-
-On 29.10.24 16:39, Alexandre TORGUE wrote:
-> On 8/7/24 11:38, Ahmad Fatoum wrote:
->> Hello Oleksij,
->>
->> On 06.08.24 14:05, Oleksij Rempel wrote:
->> There's bias-disable in stm32mp15-pinctrl.dtsi. You may want to add
->> a /delete-property/ for that to make sure, it's not up to the driver
->> which one has priority.
->>
->>>           drive-push-pull;
->>>           slew-rate = <1>;
->>
->> These are already in qspi_bk1_pins_a. If repeating those is ok, why
->> not go a step further and just duplicate the pinmux property and stay
->> clear of this issue altogether, provided Alex is amenable to changing
->> his mind regarding pinctrl groups in board device trees.
-> 
-> I still prefer to have pin configuration defined in pinctrl dtsi file and I'll continue like this for ST board. The reason is that we try to reuse as much as possible pins when we create a new board and so it is easier to maintain if we declare them only one time.
-
-I can see the point for ST evaluation kits as ST customer hardware
-will often copy the reference designs.
-
-> But, I'm not blocked for "other" boards based on STM32 SoC. I mean, if it is simpler for you and above all if it avoid issues/complexities then, you can declare some pin groups in your board dts file. In this case we need to take care of the IO groups label name.
-
-That's good to hear and what I wanted to clarify. Especially for things like
-ADCs, there are so many possible permutations that there is no point for
-boards to add their pinctrl group to the main DTSI instead of just listing
-their specific pin configuration in the board DTS.
-
-Thanks,
-Ahmad
-
-> 
-> regards
-> alex
-> 
->>
->>
->> Cheers,
->> Ahmad
->>
+> > And has Microchip finial decided not to keep reinventing the wheel, and there
+> > will never be a new PHY implementation? I ask, because what would its
+> > KCONFIG symbol be?
+> > 
 > 
 
+> For all future Microchip PHYs PTP IP will be same, hence the
+> implementation and kconfig symbol is under MICROCHIP_PHYPTP to keep
+> it more generic.
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+So you would be happy for me to NACK all new PHY PTP implementations?
+
+Are you management happy with this statement?
+
+Even if they are, i still think you need a less generic KCONFIG
+symbol, i doubt somebody somewhere in Microchip can resist making yet
+another PTP implementation.
+
+	Andrew
 
