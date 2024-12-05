@@ -1,154 +1,161 @@
-Return-Path: <netdev+bounces-149457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2B599E5B63
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:28:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B8499E5B85
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:34:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68C921885FE5
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:28:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F07D1638A4
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:34:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640CA217735;
-	Thu,  5 Dec 2024 16:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334D321D5AC;
+	Thu,  5 Dec 2024 16:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KtWveSTL"
+	dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b="rCPZEs6y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp052.goneo.de (smtp052.goneo.de [85.220.129.60])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAC221C197;
-	Thu,  5 Dec 2024 16:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2318814A8B;
+	Thu,  5 Dec 2024 16:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.220.129.60
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733416086; cv=none; b=XlypWvK5Jq27WD4c73JvaMemF+v/rHL/+Dqb1oT51A0bDkf1bsp6gUNIyGhuKR0W07yOwLl3FGyVuup+WuU3zhTPEvf2UaFMR0sQniBSsfXO3Cl8Q6p5xbTQvGM/0Vjh1g3/1DThsaXkWD1b/E3eu2m6C8mMWZ6vMeyot010voo=
+	t=1733416460; cv=none; b=d2ss6JgGlmWgf8dj+Jxj2KvjSImzT4wk7uttKXLX3F7D7dxqDnnwq8htyo+psdEVKwlIrElv20sWngO2qgPdnEmkC40AAD9QaRbhXXyzA0gnl7f4HHcW/b0Pv2RO8w3AliWbvoIHtVjpBr98CFYoulR5mZgO6sT9lIkS/h7EDXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733416086; c=relaxed/simple;
-	bh=/xJ3xaMYdGaw1aBEs70Kib26Ogo2MTy5725TA2ft150=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jLFgI092P3s3/VUYrNou/w+ReuqYwMG6Q8MutcuPiG20V1DmFCyQYsa5uDdex0n0fq4R9M0J3x22cTPtf7RYvpFTURe7H5wyfIFwxbvco4yXVJ3i2Y3StN3KYDhXT0m5pKg2VHTT6snE//L5QPm+z/gy2LcuqGrf10qk1QxdZ5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KtWveSTL; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-aa62fc2675cso8107566b.1;
-        Thu, 05 Dec 2024 08:28:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733416083; x=1734020883; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xPXoJcPeSQwufs65dme8yzbSHiM4hQw48CgHRQis7MU=;
-        b=KtWveSTLXNB1KUzT1SXTfAhbDuU7jOt/n3VQdZB7BVXiCoJOdtZl+Ip8WBvhCFK/RU
-         IhXDQfPnPImbB4L81NwWscpYG0Qxxv9NUt8+p9VXxI3vZi0k4ylgWIXBCgVuhYNvkp+u
-         sHcHF3iGxXPjuYg5AmZCJbrFd48v+fZhgyK+ZBl9jWW6Y3lUrFjJTkE2VRg5R3geoBlK
-         1XCE67ujpqhLy6PjuFy5jjaoC00UEzjtiG9ZzFHJ3EtJmL1ZAKVW72gqPKVqQIzPfOO8
-         FeLebQOpmjPGv36yQiX+HOlAtrdFByT8c1CE0n17VIslQx5Hul33Q74LZ/CkvA77no6P
-         e7dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733416083; x=1734020883;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xPXoJcPeSQwufs65dme8yzbSHiM4hQw48CgHRQis7MU=;
-        b=AVutGVWEnKDcEUb787RkiZ94VatTuRymhrj1ezALd59cZm4JYVopebLCShwFTD680g
-         4/hz1QDSyS9HiVkkXz/IxTCwJ2yfyqlQRZPrZzjSJ0euCErwnTPSjCYAdbvVSA6OUDeW
-         vZeVcVSMpFCgI7if5rJMzg/Pa8QOvZ0NtLzGd507DPPc9MgBmgSeeT+XAiiGs6jODQhX
-         NyLTR1qZBeZAbHsLBpfWapcFNibgmVQqen5Q8tYKU26R/lvpu/PfDZ+B+y3AEso3gdPA
-         0SeTkmvZsM1AJ1hQNKBr4Os/owxdXPc9vNYVWmmscLUE1B7tamVGZtTMTFUK+GEMxPAy
-         rLKg==
-X-Forwarded-Encrypted: i=1; AJvYcCWT+r/qygbyzR5WaBGuX792VIle01rY+w0CYZS/xUkbiQKl7dGCnkggwzPkTW9FDSj6xDNVBUVgPXfVyGhM@vger.kernel.org, AJvYcCWZEhqZZuN/ez3nt/69yXmo6WPNqHNGwNIurlN7JBuEtLTqGTR9mMf2I8IN3Mj9XrYGGEyhMilC@vger.kernel.org, AJvYcCX8beG9RQ+lC6h4I9T24OzN2SY4lga/FCQvbhv3Kg0QfqrTtulEBuGRw+Jlc9mbed5Z9QT+CdX1e4/r@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqfijVM/inCscB0YkbUiNDnL0eynRRqQvlLDoF72UWnxVluA1q
-	xyOzwx0vntmyxsZ2xUAT15JrfmA4MIBeKZ71Horh7jnvZRKd7GHU
-X-Gm-Gg: ASbGncsSWwpv8V0jSwzBbFD8DTYAEvMn9p0CCb7ilkHsGeA/M6nuiIyAUgWZGYL//Wc
-	cDUCrBdv/G1M7OxOTg4scbjCn9RyxWCgKx8kbM0Cb7lynu8lJYGUgdhk3yQU0lyXWtv0rn/4P6A
-	2+Y2H73bj5zGspxIugvUhQ14o0aJUi00QlnXgxuKjv0bcEoc1u7KY2GVYrsSU2qFsnpg2wg1C0u
-	ONk5KFHLVNcjcXzkxivfI2NMzw8RjEwxYE+m/4=
-X-Google-Smtp-Source: AGHT+IFXo8dPa3kP8TWBFDql5AxNgfAf43Sw1KmsQzDEJFJ2Gu14qwW18WvRihEawx3T8P1t1NEPUw==
-X-Received: by 2002:a17:907:7b85:b0:a99:f230:8d6e with SMTP id a640c23a62f3a-aa5f7d9a1c9mr486801166b.7.1733416082676;
-        Thu, 05 Dec 2024 08:28:02 -0800 (PST)
-Received: from skbuf ([188.25.135.117])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa62601b5ddsm111902466b.118.2024.12.05.08.28.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2024 08:28:02 -0800 (PST)
-Date: Thu, 5 Dec 2024 18:27:59 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v9 3/4] net: dsa: Add Airoha AN8855 5-Port
- Gigabit DSA Switch driver
-Message-ID: <20241205162759.pm3iz42bhdsvukfm@skbuf>
-References: <20241205145142.29278-1-ansuelsmth@gmail.com>
- <20241205145142.29278-4-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1733416460; c=relaxed/simple;
+	bh=0lswcrrrf/epOFGJdVWca3PuFg+KtbXYaCM3HgesehQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=boWgPS10TUunQfWK+96QvyjWRlTwLY3Ez2pvgMm70UHiOb4v9vEZ2BBYXOVVMk+vnz/uBWi3lyhsNoBe05aL05PTxZR2McacA0R/fqJuiPoiHbLnxaagPl+IE/kmlq/4yyDrM61lV/s33oLhn7eeaIq+6qQ9bnagSQiABHXQL/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tk154.de; spf=pass smtp.mailfrom=tk154.de; dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b=rCPZEs6y; arc=none smtp.client-ip=85.220.129.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tk154.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tk154.de
+Received: from hub2.goneo.de (hub2.goneo.de [IPv6:2001:1640:5::8:53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	by smtp5.goneo.de (Postfix) with ESMTPS id AE94E240E27;
+	Thu,  5 Dec 2024 17:28:57 +0100 (CET)
+Received: from hub2.goneo.de (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	by hub2.goneo.de (Postfix) with ESMTPS id D58022403E9;
+	Thu,  5 Dec 2024 17:28:55 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tk154.de; s=DKIM001;
+	t=1733416135;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8wbYhcwj77z2TOLb2TYf0vGG0ElaCD4syUYO4qjcAdU=;
+	b=rCPZEs6y1TtoeQUjUIlXzARZlVvsqqv76nJY8JGLTxcU59QtEo/Xs15n7/NwT9EaDQM/pC
+	RnVsKWkIRN0+X3JbZHVoiXBZfq2UNB0NrsENqUVIgM6D74bG0KVNr1egu11sM56MNxyIN5
+	TZpR/rL1XR8PPRmr2WFD4UKxkSM0jhAt4QZ24Zik5MNDR6yADzf2wxeAoSTJFPVkiAVp/x
+	bxEWxEhl1ayHirGsJDHM8NSwBSN9NpRY5LBypXwGtPYOClSBXYVqqIoI1JVj7sU9El1nY7
+	MozX5msAirwNMHjb/u6fcP0ySpx+R2N7ZMqCMbSfMZmUaAg+SiQoVV946aI+FA==
+Received: from [10.10.34.132] (unknown [195.37.88.189])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by hub2.goneo.de (Postfix) with ESMTPSA id 4DDE32405C5;
+	Thu,  5 Dec 2024 17:28:54 +0100 (CET)
+Message-ID: <665459ff-9e99-4d22-9aeb-69c34be3db6b@tk154.de>
+Date: Thu, 5 Dec 2024 17:28:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241205145142.29278-4-ansuelsmth@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: sysfs: also pass network device driver
+ to uevent
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ gregkh@linuxfoundation.org, idosch@nvidia.com, petrm@nvidia.com
+References: <20241115140621.45c39269@kernel.org>
+ <20241116163206.7585-1-mail@tk154.de> <20241116163206.7585-2-mail@tk154.de>
+ <20241118175543.1fbcab44@kernel.org>
+Content-Language: en-US, de-DE
+From: Til Kaiser <mail@tk154.de>
+In-Reply-To: <20241118175543.1fbcab44@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-UID: e2e151
+X-Rspamd-UID: 9a904b
 
-On Thu, Dec 05, 2024 at 03:51:33PM +0100, Christian Marangi wrote:
-> +static int an8855_efuse_read(void *context, unsigned int offset,
-> +			     void *val, size_t bytes)
-> +{
-> +	struct an8855_priv *priv = context;
-> +
-> +	return regmap_bulk_read(priv->regmap, AN8855_EFUSE_DATA0 + offset,
-> +				val, bytes / sizeof(u32));
-> +}
-> +
-> +static struct nvmem_config an8855_nvmem_config = {
-> +	.name = "an8855-efuse",
-> +	.size = AN8855_EFUSE_CELL * sizeof(u32),
-> +	.stride = sizeof(u32),
-> +	.word_size = sizeof(u32),
-> +	.reg_read = an8855_efuse_read,
-> +};
-> +
-> +static int an8855_sw_register_nvmem(struct an8855_priv *priv)
-> +{
-> +	struct nvmem_device *nvmem;
-> +
-> +	an8855_nvmem_config.priv = priv;
-> +	an8855_nvmem_config.dev = priv->dev;
-> +	nvmem = devm_nvmem_register(priv->dev, &an8855_nvmem_config);
-> +	if (IS_ERR(nvmem))
-> +		return PTR_ERR(nvmem);
-> +
-> +	return 0;
-> +}
+On 19.11.24 02:55, Jakub Kicinski wrote:
+> On Sat, 16 Nov 2024 17:30:30 +0100 Til Kaiser wrote:
+>> Currently, for uevent, the interface name and
+>> index are passed via shell variables.
+>>
+>> This commit also passes the network device
+>> driver as a shell variable to uevent.
+>>
+>> One way to retrieve a network interface's driver
+>> name is to resolve its sysfs device/driver symlink
+>> and then substitute leading directory components.
+>>
+>> You could implement this yourself (e.g., like udev from
+>> systemd does) or with Linux tools by using a combination
+>> of readlink and shell substitution or basename.
+>>
+>> The advantages of passing the driver directly through uevent are:
+>>   - Linux distributions don't need to implement additional code
+>>     to retrieve the driver when, e.g., interface events happen.
+>>   - There is no need to create additional process forks in shell
+>>     scripts for readlink or basename.
+>>   - If a user wants to check his network interface's driver on the
+>>     command line, he can directly read it from the sysfs uevent file.
+> 
+> Thanks for the info, since you're working on an open source project
+> - I assume your exact use case is not secret, could you spell it
+> out directly? What device naming are you trying to achieve based on
+> what device drivers? In my naive view we have 200+ Ethernet drivers
+> so listing Ethernet is not scalable. I'm curious what you're matching,
+> how many drivers you need to list, and whether we could instead add a
+> more general attribute...
+> 
+> Those questions aside, I'd like to get an ack from core driver experts
+> like GregKH on this. IDK what (if any) rules there are on uevents.
+> The merge window has started so we are very unlikely to hear from them
+> now, all maintainers will be very busy. Please repost v3 in >=two weeks
+> and CC Greg (and whoever else is reviewing driver core and/or uevent
+> changes according to git logs).
 
-At some point we should enforce the rule that new drivers for switch
-SoCs with complex peripherals should use MFD and move all non-networking
-peripherals to drivers handled by their respective subsystems.
+We have some Mellanox Spectrum Switches here whose network interface 
+names don't match their faceplate. They are called eth... and their 
+numbering is also out of order, so we would like to rename them 
+accordingly. They are using the mlxsw_spectrum driver.
 
-I don't have the expertise to review a nvmem driver, and the majority of
-them are in drivers/nvmem, with a dedicated subsystem and maintainer.
-In general I want to make sure it is clear that I don't encourage the
-model where DSA owns the entire mdio_device.
+Generally, you could do that once at boot time, but those Spectrum 
+Switches also support port splitting. That means you can attach a 
+breakout cable to one of its ports and then use the devlink tool to 
+split the network interface into multiple ones in Linux. But the split 
+network interfaces are then called eth... again:
 
-What other peripherals are there on this SoC other than an MDIO bus and
-an EFUSE? IRQCHIP, GPIOs, LED controller, sensors?
+root@SN2100:~# ip l | tail -n2
+26: swp1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN qlen 1000
+     link/ether 50:6b:4b:9f:04:59 brd ff:ff:ff:ff:ff:ff
+root@SN2100:~# devlink port split swp1 count 4
+root@SN2100:~# ip l | tail -n8
+27: eth0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN qlen 1000
+     link/ether 50:6b:4b:9f:04:59 brd ff:ff:ff:ff:ff:ff
+28: eth1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN qlen 1000
+     link/ether 50:6b:4b:9f:04:5a brd ff:ff:ff:ff:ff:ff
+29: eth2: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN qlen 1000
+     link/ether 50:6b:4b:9f:04:5b brd ff:ff:ff:ff:ff:ff
+30: eth3: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN qlen 1000
+     link/ether 50:6b:4b:9f:04:5c brd ff:ff:ff:ff:ff:ff
 
-You can take a look at drivers/mfd/ocelot* and
-Documentation/devicetree/bindings/mfd/mscc,ocelot.yaml for an example on
-how to use mfd for the top-level MDIO device, and DSA as just the driver
-for the Ethernet switch component (which will be represented as a
-platform_device).
+In their GitHub wiki [1], Mellanox recommends using a udev rule for 
+renaming. udev has its implementation for retrieving the driver of a 
+network interface, whereas OpenWrt's hotplug doesn't have such an 
+implementation. With this patch, the driver name would be already 
+available inside such hotplug scripts.
+
+[1] 
+https://github.com/Mellanox/mlxsw/wiki/Switch-Port-Configuration#using-udev-rules
 
