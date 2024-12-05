@@ -1,136 +1,109 @@
-Return-Path: <netdev+bounces-149361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD1D79E540B
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:35:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFBAB9E543E
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:43:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A1EB1880742
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:35:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D048818832F6
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:43:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719FC1F6679;
-	Thu,  5 Dec 2024 11:35:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="P5BD6y9O"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA0220CCC8;
+	Thu,  5 Dec 2024 11:43:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10621F541C;
-	Thu,  5 Dec 2024 11:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC44220B7E4;
+	Thu,  5 Dec 2024 11:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733398507; cv=none; b=BRevZJzgy+OhYwGwhSSjkoWpb7Oew7Gnuoi4trXf0ob4UMKZNinpX4w6AcPewhVk7FJUTCyni+7+BH42iFj/CFWUdf0RmOE1rgGljYb23jd+rokxd0RhSYYXfh/sNTlh2d7Nb1CyvHbscWCm3nwbWxbcRWYatVeySbcjvC648nQ=
+	t=1733399011; cv=none; b=PYGOvPPfZNcMb1/piWBW7mF2in91V/6/apwMhvQ3haeFW3MUUIrVurR16tH1LNWiLL/Zmqhc/0atsnZ6X/5EYuZcnIl7wPa/svcTrpg8V0Tdx9npe03dwszveDfkK5tIWoK7eoOQ2q2f8VIX2VLqdKMjszKhqx9itA5p0sKUW9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733398507; c=relaxed/simple;
-	bh=jx1QpmnWT+BvmW5j+2uyUoTHDLT73WQRHWfndk5Xs18=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fDScd3YkJRQJ3QV1OkK/xl4O0Dhq6yTO5cvq/HNPdOs2Mo312RosBF3WNKI/McTInEzWQVDTavdicXr+lofhPhme/Kn8OypYuVikZ5B5LDxMKrHTLeRKJqZbekvn/DvEPRj2ibrKInpidJTiZSfrB/ugC7gxaGD0l4vZ32qMEDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=P5BD6y9O; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B597xg0008313;
-	Thu, 5 Dec 2024 03:34:42 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	pfpt0220; bh=PyBiDkR+sGkaeC+WPOz41eBAz9Ruk1Y87rRuK8KNfsg=; b=P5B
-	D6y9Oea9Tb7g8r9AWBBILA3wY09JVV5qi2UNK/FQx9bvivnTR6zDreqxGFSjMLBg
-	H/Fc0uU7HasrodVVxpFndcMhxTPJ9SyvZvp5YsnlInD26qSYPUcDAHgA29TL50J1
-	7r4cRxXmVarTZa2FeZD7QL1w1RhafuadxzCMtQd+nHiQXCyeLWXuPnxtClePv36F
-	S8zt+tAKo/yrNj1F5duWfa4Jwt6CXzK5XiP4EHoDJcrchsSCfyrXqWzPoJgccU4B
-	dZTBK90dskx2VZ5+a+S0rE0bmHq8JW1HpvCl8KJwG7dqFtAkHJBV9SNusX0NeXTi
-	kVs2VgpOaBDZ6/Lrf7g==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 43b995r7uk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Dec 2024 03:34:41 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+	s=arc-20240116; t=1733399011; c=relaxed/simple;
+	bh=KvQRWLsup4OMLK/V+HPoYCMUgmDbNgo8ZVUt7YlTwrY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lZMtt16G+hW0WntyI5vOUxrxzuloEjTxyN2/RCCF+7oxHNbCJmd83A9BLWRlB1l9/p+skgSfcw/+qQJs2buG6qUeh6fsmX0A1WjtpiiLrEpOcrwefgeeKEMKPuH+VHeQ8p4nKRwWoUpjVixwM5x70HaOFIWRyJbm+bYxEsfsGPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Y3st92JBWzqTVc;
+	Thu,  5 Dec 2024 19:41:37 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id BA712140391;
+	Thu,  5 Dec 2024 19:43:25 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 5 Dec 2024 03:34:40 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 5 Dec 2024 03:34:40 -0800
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id DAA383F704A;
-	Thu,  5 Dec 2024 03:34:36 -0800 (PST)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <horms@kernel.org>, <andrew+netdev@lunn.ch>, <edumazet@google.com>,
-        <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>
-Subject: [net v2 PATCH] octeontx2-af: Fix installation of PF multicast rule
-Date: Thu, 5 Dec 2024 17:04:35 +0530
-Message-ID: <20241205113435.10601-1-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
+ 15.2.1544.11; Thu, 5 Dec 2024 19:43:25 +0800
+Message-ID: <70aefeb1-6a78-494c-9d5b-e03696948d11@huawei.com>
+Date: Thu, 5 Dec 2024 19:43:25 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: iAo4c7KlL5sEesirEtwNwcHkjNfaPS3m
-X-Proofpoint-GUID: iAo4c7KlL5sEesirEtwNwcHkjNfaPS3m
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
- definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v4 1/3] page_pool: fix timing for checking and
+ disabling napi_local
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <pabeni@redhat.com>, <liuyonglong@huawei.com>,
+	<fanghaiqing@huawei.com>, <zhangkun09@huawei.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, Eric Dumazet <edumazet@google.com>, Simon
+ Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20241120103456.396577-1-linyunsheng@huawei.com>
+ <20241120103456.396577-2-linyunsheng@huawei.com>
+ <20241202184954.3a4095e3@kernel.org>
+ <e053e75a-bde1-4e69-9a8d-d1f54be06bdb@huawei.com>
+ <20241204172846.5b360d32@kernel.org>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <20241204172846.5b360d32@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-Due to target variable is being reassigned in npc_install_flow()
-function, PF multicast rules are not getting installed.
-This patch addresses the issue by fixing the "IF" condition
-checks when rules are installed by AF.
+On 2024/12/5 9:28, Jakub Kicinski wrote:
+> On Wed, 4 Dec 2024 19:01:14 +0800 Yunsheng Lin wrote:
+>>> I don't think this is in the right place.
+>>> Why not inside page_pool_disable_direct_recycling() ?  
+>>
+>> It is in page_pool_destroy() mostly because:
+>> 1. Only call synchronize_rcu() when there is inflight pages, which should
+>>    be an unlikely case, and  synchronize_rcu() might need to be called at
+>>    least for the case of pool->p.napi not being NULL if it is called inside
+>>    page_pool_disable_direct_recycling().
+> 
+> Right, my point was that page_pool_disable_direct_recycling() 
+> is an exported function, its callers also need to be protected.
 
-Fixes: 6c40ca957fe5 ("octeontx2-pf: Adds TC offload support").
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
----
+It depends on what is the callers is trying to protect by calling
+page_pool_disable_direct_recycling().
 
-v1-v2:
- -Restructured the code.
+It seems the use case for the only user of the API in bnxt driver
+is about reuseing the same NAPI for different page_pool instances.
 
- .../ethernet/marvell/octeontx2/af/rvu_npc_fs.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+According to the steps in netdev_rx_queue.c:
+1. allocate new queue memory & create page_pool
+2. stop old rx queue.
+3. start new rx queue with new page_pool
+4. free old queue memory + destroy page_pool.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-index da69e454662a..1b765045aa63 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-@@ -1452,23 +1452,21 @@ int rvu_mbox_handler_npc_install_flow(struct rvu *rvu,
- 	 * hence modify pcifunc accordingly.
- 	 */
- 
--	/* AF installing for a PF/VF */
--	if (!req->hdr.pcifunc)
-+	if (!req->hdr.pcifunc) {
-+		/* AF installing for a PF/VF */
- 		target = req->vf;
--
--	/* PF installing for its VF */
--	if (!from_vf && req->vf && !from_rep_dev) {
-+	} else if (!from_vf && req->vf && !from_rep_dev) {
-+		/* PF installing for its VF */
- 		target = (req->hdr.pcifunc & ~RVU_PFVF_FUNC_MASK) | req->vf;
- 		pf_set_vfs_mac = req->default_rule &&
- 				(req->features & BIT_ULL(NPC_DMAC));
--	}
--
--	/* Representor device installing for a representee */
--	if (from_rep_dev && req->vf)
-+	} else if (from_rep_dev && req->vf) {
-+		/* Representor device installing for a representee */
- 		target = req->vf;
--	else
-+	} else {
- 		/* msg received from PF/VF */
- 		target = req->hdr.pcifunc;
-+	}
- 
- 	/* ignore chan_mask in case pf func is not AF, revisit later */
- 	if (!is_pffunc_af(req->hdr.pcifunc))
--- 
-2.25.1
+The page_pool_disable_direct_recycling() is called in step 2, I am
+not sure how napi_enable() & napi_disable() are called in the above
+flow, but it seems there is no use-after-free problem this patch is
+trying to fix for the above flow.
 
+It doesn't seems to have any concurrent access problem if napi->list_owner
+is set to -1 before napi_disable() returns and the napi_enable() for the
+new queue is called after page_pool_disable_direct_recycling() is called
+in step 2.
 
