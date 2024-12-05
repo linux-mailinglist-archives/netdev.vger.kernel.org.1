@@ -1,176 +1,118 @@
-Return-Path: <netdev+bounces-149493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6415F9E5C7F
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 18:05:50 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1773B18836F3
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:05:50 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5CF21D5AC;
-	Thu,  5 Dec 2024 17:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GR3cI7pn"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A65189E5C84
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 18:06:40 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B343F4E2
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 17:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 657E8285656
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:06:39 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9459221475;
+	Thu,  5 Dec 2024 17:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TgRMLaLh"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DEE3218AD3;
+	Thu,  5 Dec 2024 17:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733418346; cv=none; b=cFB0IS6AOCIpiOMgiMv6cg4r2kTiAa+1m4HuhiexqhqUOUtVVXsL2Ci6jiiYtVPB2EbNEyKUqmDjEHm61BUqPCv2+gd5YffiVA6LqE3deFM4I5Pl8eq2zSZXGGodhs9bbwie/xywfe2R1i3tH9hj0cJJEvsQkxEU0hVX+oBho9A=
+	t=1733418396; cv=none; b=o0HvxZjCXlxLdqvQciulbhVJTya5AcXcF6p1bxIStpqzFNGiuFIpi0s6l9rft5+UmXUBv1demYKKlAEpuICw1s93TJ3fCNMF9H2jC7D5YEcfnNjqndX05YYhds4ZSHeK/tR6hN9ju6iFYdP89L31E1FUM8hDp1kt0GzvUMsARmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733418346; c=relaxed/simple;
-	bh=oEOpcOk6JQn+TqC+Y0qyhALWC7OnfGq/On5S3tsDbsM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=HBYxMguXyVK4N/dagli6C5byCgh5TjKz0m2738+00uTlH4SVvijevos0kEvfTBN2F9Oq2En1WJhNAhaA6FZj/+ImchhwGyg48wr2FKhqXyqsc2rQmkMiAItlqws2iEAYmTOCWyYRecZdtqv1EPjL7t1x0d20lVSxjzk8lL6Odz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GR3cI7pn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61033C4CED1;
-	Thu,  5 Dec 2024 17:05:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733418346;
-	bh=oEOpcOk6JQn+TqC+Y0qyhALWC7OnfGq/On5S3tsDbsM=;
-	h=From:Date:Subject:To:Cc:From;
-	b=GR3cI7pnY5AfYgJ4hzaR4nys9Y6sldfYWHYzbYFWxl7O7PsDb5iShLz9JQ4kMpu1Y
-	 /cqUrVMaCwfSdwTQo7FTWUGD/kuIXVcNK/GCCyxj9ngps887BGn0N2LoDciwY7SHd2
-	 Kaedv+1UEW47eH75rUCNTtaVgFH0mvdoubVmxsOyDarPlfDsjzvbbWoN2gzfkvTXSW
-	 BgQSwnOaBzGNQ/WqedO4g4OtUm2g6X8Z4NfE5zX5tMlsOag5bWJfJfhedNh/XXB6wN
-	 7/VY6o6kxXdIm+O4IlEbwmgpFySn772UXz8kN5tCu0cjKk3LJKw2JitX/wW5UTdRyL
-	 Pgd7EnK7bk38w==
-From: Simon Horman <horms@kernel.org>
-Date: Thu, 05 Dec 2024 17:05:23 +0000
-Subject: [PATCH RFC net] net: hibmcge: Release irq resources on error and
- device tear-down
+	s=arc-20240116; t=1733418396; c=relaxed/simple;
+	bh=iPT5M0klK62MYU+wd2cp4IU14x9+Ef4oWIX3kmTIAto=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UxbHos+YzT0pgtVd+R5pbfnYp0lAY72WKWc5rvJjdJcos6n5e0yE8mM6yMmXUGQI0lgXIymMxBBc42l1/u3+g4DSuZ+KZS12ZoZaFqaU7keLonbu6klDDpMqooHUUs2TaUtwLaKugFdBgDiCmQMBBB78re5Ee7mBN59Ap3BpTRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TgRMLaLh; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d0d81eff58so177761a12.0;
+        Thu, 05 Dec 2024 09:06:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733418393; x=1734023193; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vjMs6gUjd0BG/RW8WnCIcN/BRNzXbUwn3T+OLY++VM8=;
+        b=TgRMLaLhOIh379PtsnLvA/oD4ZFISLefQn20q2Pqc+iDGd4kXGeC+f891ZXLzKNT1o
+         V7/uo0iqs3qw0RrMwrsZsruwIv2zWNCcmCCJSFlVurP/0d/q0H/Djuo/zUMJK4icNY9t
+         Jd5yI1nxbE8Ry9Wtc+S/1ENeYekis5KO2Zyy2lnrwjCNdcD/vV9Lkyxqgpaki/ZQTgX7
+         seJ2l2HrTMikyfqryOSfFUdFNoYRt/IjQMkp0ciVAJAezTJhTD6RNswNqJ7+/XV9Dx0u
+         xRkDyL1EW9LRBvLrbDjBtj8VegAab0NCKTrUO9Ku4jKqVRkKwrcHR68OzJkGvEtDnQTC
+         Nxyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733418393; x=1734023193;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vjMs6gUjd0BG/RW8WnCIcN/BRNzXbUwn3T+OLY++VM8=;
+        b=RSmYF7nIxQ47FVEUWwUvdts5vrQiSJ+sbTL6O+csAb6RlNQoKJJi8Ss/fcd3CYnmZY
+         qxirRc3j6b+WDzuyDR7CpPqf9aeVq3pKgMFycYUG3RN2sbCpwj+S9UoKNjXReh5dPQP7
+         FwIQqR/5YH6OEfd+MIeDBy0MI6H3CcUzRiJZou27ZMQUFjSOd8ZF/55XXISLVc1/aCAL
+         iQKZlsb3Dyj4q1KdMxHOLygKyHwouHuwd/9YQDJ1nd/FqcwhhEvEfvjffHOI5I2r5QP8
+         R9ZEAi+MjbPZ0cIV+0EUt/ILsRnZirfoVgmfq0xDEUzNdPjwBIYMr66+zij0XHThRJ9N
+         44bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVH1PBCOliaWow7S2vHC89V9tF/YU/KvZ4rIl07WDwLYE3NHxRhjRVjsC2OkgA87Yjqyw9bJIFTClsZ@vger.kernel.org, AJvYcCVgHccQot2CsFfTPIuSt14kctKeLZA15NyxBkQD09pIvZbvbpgi9d4lVYJjlWj2njc7UrHc7CXU@vger.kernel.org, AJvYcCVzc6jTNSOuVUVAwn3KCk9vFsV8blLfWdrYg3v0nhLB5xCeoynrDa0yAKXB0lt7wLbWIhf11Q8qYh2xQyVi@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5mNJNxKzKlgwCl7V4c9WVPE0JL9A5HuwLv8bf46hUuG10qexB
+	yUvyDsJWKuPvGXfnAN5Jo+TNZKXqRCkyZNXbKn57QgOf3du1BsL7
+X-Gm-Gg: ASbGncv3DiwDL9zegCJWTfbMfZWA7h4A7Hxr1JN11vXc3ZA2J8w2IVlBA9Vrp1O/zXy
+	NMN529iW1BsHIHpSmzQtz6gpvTPDDq2bsqxbXAVic+OWKCQ1xsS4cdO2aELmQnj2ODSj/iB6CRC
+	MyU4EMl+m5n8g79WV4/Sy2oWvXg48T/oqjoi94SnbEiXPV2FFxOpwnD763GSKAiTBjXl4sKjurf
+	x3XtFBVpqNbTTJWgPzk+Qbc0NZGfR2GYDyjE0A=
+X-Google-Smtp-Source: AGHT+IGVP0gMvyh1uwNQ7wahF1r0luVrywYn93gUAbNzVHLatXVRhr85Yq515hba/uh806NJI4WL+A==
+X-Received: by 2002:a17:907:2d8b:b0:a99:f388:6f49 with SMTP id a640c23a62f3a-aa5f7ece4c5mr459441866b.9.1733418393054;
+        Thu, 05 Dec 2024 09:06:33 -0800 (PST)
+Received: from skbuf ([188.25.135.117])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa625e972absm116213166b.70.2024.12.05.09.06.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Dec 2024 09:06:32 -0800 (PST)
+Date: Thu, 5 Dec 2024 19:06:29 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH v9 3/4] net: dsa: Add Airoha AN8855 5-Port
+ Gigabit DSA Switch driver
+Message-ID: <20241205170629.ww7qcvgbqdf5ipcj@skbuf>
+References: <20241205145142.29278-1-ansuelsmth@gmail.com>
+ <20241205145142.29278-4-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241205-hibmcge-free-irq-v1-1-f5103d8d9858@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAFLdUWcC/x2MQQ5AMBBFr9LMWhNt0MRW4gC2YoEOZqGYikjE3
- U0s33/574GITBihVA8wXhRpCwImUTAufZhRkxcGm9rM2DTXCw3rKPPEKI4P7Zx3hXG9L9CA3Hb
- Gie4/2UJTVyrgCd37fgvkudhrAAAA
-To: Jijie Shao <shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>, 
- Salil Mehta <salil.mehta@huawei.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org
-X-Mailer: b4 0.14.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241205145142.29278-4-ansuelsmth@gmail.com>
 
-This patch addresses two problems related to leaked resources allocated
-by hbg_irq_init().
+On Thu, Dec 05, 2024 at 03:51:33PM +0100, Christian Marangi wrote:
+> +	.port_fdb_add = an8855_port_fdb_add,
+> +	.port_fdb_del = an8855_port_fdb_del,
+> +	.port_fdb_dump = an8855_port_fdb_dump,
+> +	.port_mdb_add = an8855_port_mdb_add,
+> +	.port_mdb_del = an8855_port_mdb_del,
 
-1. On error release allocated resources
-2. Otherwise, release the allocated irq vector on device tear-down
-   by setting-up a devres to do so.
-
-Found by inspection.
-Compile tested only.
-
-Fixes: 4d089035fa19 ("net: hibmcge: Add interrupt supported in this module")
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c | 57 +++++++++++++++++-------
- 1 file changed, 42 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
-index 25dd25f096fe..35fedd7e0a33 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
-@@ -83,45 +83,72 @@ static irqreturn_t hbg_irq_handle(int irq_num, void *p)
- static const char *irq_names_map[HBG_VECTOR_NUM] = { "tx", "rx",
- 						     "err", "mdio" };
- 
-+static void hbg_free_irq_vectors(void *data)
-+{
-+	pci_free_irq_vectors(data);
-+}
-+
- int hbg_irq_init(struct hbg_priv *priv)
- {
- 	struct hbg_vector *vectors = &priv->vectors;
- 	struct device *dev = &priv->pdev->dev;
--	int ret, id;
-+	int ret, id[HBG_VECTOR_NUM - 1];
- 	u32 i;
- 
- 	/* used pcim_enable_device(),  so the vectors become device managed */
- 	ret = pci_alloc_irq_vectors(priv->pdev, HBG_VECTOR_NUM, HBG_VECTOR_NUM,
- 				    PCI_IRQ_MSI | PCI_IRQ_MSIX);
--	if (ret < 0)
--		return dev_err_probe(dev, ret, "failed to allocate vectors\n");
-+	if (ret < 0) {
-+		dev_err(dev, "failed to allocate vectors\n");
-+		return ret;
-+	}
- 
--	if (ret != HBG_VECTOR_NUM)
--		return dev_err_probe(dev, -EINVAL,
--				     "requested %u MSI, but allocated %d MSI\n",
--				     HBG_VECTOR_NUM, ret);
-+	if (ret != HBG_VECTOR_NUM) {
-+		dev_err(dev, "requested %u MSI, but allocated %d MSI\n",
-+			HBG_VECTOR_NUM, ret);
-+		ret = -EINVAL;
-+		goto err_free_irq_vectors;
-+	}
- 
- 	/* mdio irq not requested, so the number of requested interrupts
- 	 * is HBG_VECTOR_NUM - 1.
- 	 */
- 	for (i = 0; i < HBG_VECTOR_NUM - 1; i++) {
--		id = pci_irq_vector(priv->pdev, i);
--		if (id < 0)
--			return dev_err_probe(dev, id, "failed to get irq id\n");
-+		id[i] = pci_irq_vector(priv->pdev, i);
-+		if (id[i] < 0) {
-+			dev_err(dev, "failed to get irq id\n");
-+			ret = id[i];
-+			goto err_free_irqs;
-+		}
- 
- 		snprintf(vectors->name[i], sizeof(vectors->name[i]), "%s-%s-%s",
- 			 dev_driver_string(dev), pci_name(priv->pdev),
- 			 irq_names_map[i]);
- 
--		ret = devm_request_irq(dev, id, hbg_irq_handle, 0,
-+		ret = devm_request_irq(dev, id[i], hbg_irq_handle, 0,
- 				       vectors->name[i], priv);
--		if (ret)
--			return dev_err_probe(dev, ret,
--					     "failed to request irq: %s\n",
--					     irq_names_map[i]);
-+		if (ret) {
-+			dev_err(dev, "failed to request irq: %s\n",
-+				irq_names_map[i]);
-+			goto err_free_irqs;
-+		}
-+	}
-+
-+	ret = devm_add_action_or_reset(dev, hbg_free_irq_vectors, priv->pdev);
-+	if (ret) {
-+		dev_err(dev, "Failed adding devres to free irq vectors\n");
-+		goto err_free_irqs;
- 	}
- 
- 	vectors->info_array = hbg_irqs;
- 	vectors->info_array_len = ARRAY_SIZE(hbg_irqs);
- 	return 0;
-+
-+err_free_irqs:
-+	while (i-- > 0)
-+		devm_free_irq(dev, id[i], priv);
-+err_free_irq_vectors:
-+	pci_free_irq_vectors(priv->pdev);
-+
-+	return ret;
- }
-
+Please handle the "struct dsa_db" argument of these functions, so that
+you can turn on ds->fdb_isolation. It is likely that instead of a single
+AN8855_FID_BRIDGED, there needs to be a unique FID allocated for each
+VLAN-unaware bridge in order for their FDBs to be isolated from each
+other, and so that the same MAC address could live under both bridges.
 
