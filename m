@@ -1,100 +1,120 @@
-Return-Path: <netdev+bounces-149356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E8059E536A
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:10:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0729A9E5376
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:14:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D7B91643EF
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:10:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4CD01641DE
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C2B1DDA3A;
-	Thu,  5 Dec 2024 11:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vPO3cKKP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08F71DE2B1;
+	Thu,  5 Dec 2024 11:14:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D14B1DD0C7;
-	Thu,  5 Dec 2024 11:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B1618DF6E
+	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 11:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733397019; cv=none; b=qHGMoAdUNMaa9lxa417wZu+lQ6qsuvshwm9sdyFGoVKBqydwmVzWlOUiyGDesNeZRzQkzmRn1cYBd9i7e0IrAqhh5KCAWOCfyH9v9Xtlnxtbod6NWHE32/PihE5CsLZxtnl2M1ddVkuHxjz9o6pxYFGrA2sTFXatnow+vTXAIkY=
+	t=1733397249; cv=none; b=klWM/UH9mySQSQL5eKeeuBjqmmSFNzDs22qwL743yKuk07qHpVgXB1C67Lu/rxFVFgD+mLTrWN4op2Ti6EXdY7T5RhTQgXiFascRzZ17WpLKtE3Rgkm03NeVIU7gkAHgEdXyj43PEuwnu6CzMIc24g7faqmI7PF/UnEIvcoQYE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733397019; c=relaxed/simple;
-	bh=i90CknQg+VPzlddK+0B4sQpYQFC/5UYP4mum2Dngnms=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uz5GMcyRiQYTbJXeGYHPdn3cgX9Vchv3gpoLS71x+F4Kuenmh9qvbfHk1zvJY0ZLvj1nUKAjTFCSa/5DbGdqa/0rvT8Q9KyQFXIHQ1bhFf1HOsRp3/AI+Nso5Y8o8UuFgrRYhKW2Ma53rKxyUUnMxWQVpdRtcVY6pZNyg+CrBsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vPO3cKKP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D78EFC4CED1;
-	Thu,  5 Dec 2024 11:10:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733397017;
-	bh=i90CknQg+VPzlddK+0B4sQpYQFC/5UYP4mum2Dngnms=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=vPO3cKKPB/dLcHcik30htLZZpUGrRmJyOdKiRPuTsmCJD9GlnbhIAI+JIzfAA/LmX
-	 OX8U3NISGIRS25sW0hEbYD/9CtRRe+TzIEZPXCxEPXvyDq5t6mOZc3rTUwl2h9wfAO
-	 7o9wV8/xCVfLBeEQKzYtsZMGKoOEaWn5HlFd+uowkj0qlpaxCWV6nacmeGqqu2OrfT
-	 PK8+vnLkqlH6HoixCRABcwcQhfL1FtYLiIxJxfJ69LARy/aXxBXZSLHj/Ch2Yo64Qb
-	 0gC9wyFMp+EEXUfyD/BkQiMrVJHLxumOhwHUxX6TOsz+0YpJ2bb4yYa7py9CwCCNuG
-	 lWJXJOY4/ZGtQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE291380A94D;
-	Thu,  5 Dec 2024 11:10:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1733397249; c=relaxed/simple;
+	bh=3+xpRgcjCsuz/2mGkng/3o13JlvFt9F6+oJkb+OFlVI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NOnDIHgM68OlaxY4Qxmt3GomWF4ICMPIM8NXyhn0FpaPw4Sy7ztLWaaUQUxA4XIz7dfP0C9lHvS6CM1QMFuAhdhQSzqb0H5oNZpQwe4qUysXuwZTFMNoN4OLQXOFUbgon/Eyt764gOQjg/lJ6RebHEuINd5JV5y+3Vy+ZtRv3XM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tJ9nw-0006Ic-Qg; Thu, 05 Dec 2024 12:13:56 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tJ9nv-001oZL-1N;
+	Thu, 05 Dec 2024 12:13:56 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tJ9nw-00GR6P-0H;
+	Thu, 05 Dec 2024 12:13:56 +0100
+Date: Thu, 5 Dec 2024 12:13:56 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: David Laight <David.Laight@aculab.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"kernel@pengutronix.de" <kernel@pengutronix.de>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
+Subject: Re: [PATCH net-next v1 3/7] phy: replace bitwise flag definitions
+ with BIT() macro
+Message-ID: <Z1GK9Aklzs-a2oPQ@pengutronix.de>
+References: <20241203075622.2452169-1-o.rempel@pengutronix.de>
+ <20241203075622.2452169-4-o.rempel@pengutronix.de>
+ <5fbf293df6bf4bf79f9a8ffd728c6e2c@AcuMS.aculab.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net :mana :Request a V2 response version for
- MANA_QUERY_GF_STAT
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173339703253.1552278.3279028556184368012.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Dec 2024 11:10:32 +0000
-References: <1733291300-12593-1-git-send-email-shradhagupta@linux.microsoft.com>
-In-Reply-To: <1733291300-12593-1-git-send-email-shradhagupta@linux.microsoft.com>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
- wei.liu@kernel.org, decui@microsoft.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- longli@microsoft.com, kotaranov@microsoft.com,
- schakrabarti@linux.microsoft.com, erick.archer@outlook.com,
- shradhagupta@microsoft.com, stable@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5fbf293df6bf4bf79f9a8ffd728c6e2c@AcuMS.aculab.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue,  3 Dec 2024 21:48:20 -0800 you wrote:
-> The current requested response version(V1) for MANA_QUERY_GF_STAT query
-> results in STATISTICS_FLAGS_TX_ERRORS_GDMA_ERROR value being set to
-> 0 always.
-> In order to get the correct value for this counter we request the response
-> version to be V2.
+On Thu, Dec 05, 2024 at 02:50:32AM +0000, David Laight wrote:
+> From: Oleksij Rempel
+> > Sent: 03 December 2024 07:56
+> > 
+> > Convert the PHY flag definitions to use the BIT() macro instead of
+> > hexadecimal values. This improves readability and maintainability.
+> > 
+> > No functional changes are introduced by this modification.
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: e1df5202e879 ("net :mana :Add remaining GDMA stats for MANA to ethtool")
-> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> 
-> [...]
+> Are you absolutely sure.
+> You are changing the type of the constants from 'signed int' to
+> 'unsigned long' and that can easily have unexpected consequences.
+> Especially since MDIO_DEVICE_IS_PHY was negative.
 
-Here is the summary with links:
-  - [net] net :mana :Request a V2 response version for MANA_QUERY_GF_STAT
-    https://git.kernel.org/netdev/net/c/31f1b55d5d7e
+In current kernel code following flags are assigned to u32 variable: 
 
-You are awesome, thank you!
+> > -#define PHY_IS_INTERNAL		0x00000001
+> > -#define PHY_RST_AFTER_CLK_EN	0x00000002
+> > -#define PHY_POLL_CABLE_TEST	0x00000004
+> > -#define PHY_ALWAYS_CALL_SUSPEND	0x00000008
+
+phydrv->flags (u32)
+
+This one is assigned to an int:
+> > -#define MDIO_DEVICE_IS_PHY	0x80000000
+
+mdiodrv->flags (int)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
