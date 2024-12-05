@@ -1,281 +1,264 @@
-Return-Path: <netdev+bounces-149465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C16C19E5B96
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:39:12 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89E82166CBE
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:39:08 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45260221449;
-	Thu,  5 Dec 2024 16:39:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Wxx3g6gV"
-X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2073.outbound.protection.outlook.com [40.107.223.73])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D00B09E5BC6
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 17:43:55 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAE98F54;
-	Thu,  5 Dec 2024 16:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733416750; cv=fail; b=ZSVhAZEDnSZLSN3Dj2dAnwBG+JsC6Oexl5wMWcHUQS/BC2prj6tyYSgPYkkgfiom+ZzrebQc6qDW77eGSmizV5VjcHcxEZZFC4jboNyhCZ0n6B6vVy1V5G3GWv7vyyPcDCxsv40gZQBmIKolEjWLEnBCYhjdnX+CD/Ni8cOnERc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733416750; c=relaxed/simple;
-	bh=gn3Qx77bag29bpsqdRmMEJhMfnZkFuWR/AVScEgtj2Y=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Scw9RklmQUniCD9QXAQ4PS7Oec4ROkrCk7UTAfOVBGQzZsRFVsRYl+HDXQf2hMOM7czfnyymN62+9EuTAUNQOFzWAt65jghFiiUJI06NQuxTYtUx/32e4iFQpbi2brW8XwNKJLn596Nt7qJfBu9awzwvyutRVLAnK6GKJLH+F7Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Wxx3g6gV; arc=fail smtp.client-ip=40.107.223.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GD5WM7bYRplXRDH5rG6+9xyCFTmYpO8L/jUYQDejK2+OsT3AAz6KY6MwEQbR35lo7PjdfVlk/HoviNphVW0+MuUo8MYnWfZEVUOnndeTqnT1NwNERquYmIe3epw/U2Q8i9mEmZGp0NKL23uojOR7WeKi6zHZMmM1ps5tzKTa06PZN7FOceRYLTe2gwqt6akJc3c2l/1rgPVXJDgKc5/PV65nVMNXBHeO2DBkJRb10aGkSK2GpZtqx7ZtPouYy9hRecyRqufIUcH8ii+ILw8XITRpBo+r4gzmLnAZPSsnN/7+Qf064AlQJMR1fTxPFwoZl7aJvuZoBcpRFGeZNEsprw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5gvj5mjwuZH37HoV6Vcicj+p3zWGHCTIJeChPB4uTtA=;
- b=VMFR7dfu5IVkBmPuLvM4ce75KK3tCFJq6UuTjw+X5wqtpHbiciDIN3rP3diN8vEW2obS6YiI6oWav0RkvJHKZZXHUtucGzkBHBLuYRHimqIEH8KOHO2atxKmhP53Isrja7+oz2KKt8WJO2SfyJpxjQWRGRFmtXf5wfD8YyiuglqU/nIZTtMavbENsSC+3WNkMCq5cxXveHGHW0s5rky4Kbtjt4xgAd9XcOt6JgtSi/q5FIHASTChWsfk76YTspe11kG/n10XEiFEFg2GchuhqMHpWMwbCIl2JhTrwTSUQjj5szc4n9hznVqjQN4PI8vpaxFvhc3u5aEs5JMu1KLG/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5gvj5mjwuZH37HoV6Vcicj+p3zWGHCTIJeChPB4uTtA=;
- b=Wxx3g6gVY32G4lj7ytoqPzwGk9ZOBhU5CUU6YEPj3X2N74MPd7jpT/1QgdYXM6NKAQEbFUQMSGEkg/fXePIW7/PGpRV7hF3q8JelwCeB2Dhr2UrmXdcS8VT9m1bVdNMiHvTP39WiF7hVwPqymNb1+35yoybpxnnd724pOHOKaq1itEW1x3PdU7pKbgBXYHhr7UCBsMjqxCsGt+M0u+df8obYxWsxBSuNVePwMXwTVNW0or+pnntP5CXFdT6b5NpOMCnY/yx7SWebC2pITbYwc66ErfExllnbd9Jf7VtcRkD3MPah4GvnfPUokcmGb9+I1iuytAgju210wKykXCKCOQ==
-Received: from SJ0PR13CA0165.namprd13.prod.outlook.com (2603:10b6:a03:2c7::20)
- by SN7PR12MB7912.namprd12.prod.outlook.com (2603:10b6:806:341::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.12; Thu, 5 Dec
- 2024 16:39:03 +0000
-Received: from SJ1PEPF00001CE1.namprd05.prod.outlook.com
- (2603:10b6:a03:2c7:cafe::26) by SJ0PR13CA0165.outlook.office365.com
- (2603:10b6:a03:2c7::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8230.10 via Frontend Transport; Thu,
- 5 Dec 2024 16:39:03 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ1PEPF00001CE1.mail.protection.outlook.com (10.167.242.9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8230.7 via Frontend Transport; Thu, 5 Dec 2024 16:39:02 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 5 Dec 2024
- 08:38:47 -0800
-Received: from localhost.localdomain (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 5 Dec 2024
- 08:38:41 -0800
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<netdev@vger.kernel.org>
-CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Danielle Ratson <danieller@nvidia.com>, Jiri Pirko <jiri@resnulli.us>, "Shuah
- Khan" <shuah@kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<mlxsw@nvidia.com>
-Subject: [PATCH net 3/3] selftests: mlxsw: sharedbuffer: Ensure no extra packets are counted
-Date: Thu, 5 Dec 2024 17:36:01 +0100
-Message-ID: <64c28bc9b1cc1d78c4a73feda7cedbe9526ccf8b.1733414773.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <cover.1733414773.git.petrm@nvidia.com>
-References: <cover.1733414773.git.petrm@nvidia.com>
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8676E28AE19
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 16:43:54 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748FD224B1E;
+	Thu,  5 Dec 2024 16:43:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QJC69m5g"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA6E221458;
+	Thu,  5 Dec 2024 16:43:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733417012; cv=none; b=oKbSoZWLDw3elCbVZRV4+EKEHdV2g094cfU8A184xsbgF2DMlwdH1LBetVJT0xzW81kH1uCqPJtrm4OdIupDHZcOP+5NiFxFn+qf3Y/vD+uKaArdcZZMF9UuC1v8KCw07oH4PtPtdZzgsTl8NgMQdZAeWd5H93SXeF9pxV5aOlQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733417012; c=relaxed/simple;
+	bh=Tl/s8JiV2SmGTZhlUaKGgX3/7+W6B+dH6noXJZ++bs4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Ud8xZz4ixOgDixxz3HJYEVCyAAbInghte5ilxrtxejqwoMuCdfs5TVnumOgZ+VU4/Q1XYLfVow2cCXL1Rv0XKvkK8/xO36DoO9DYt00Sk+YJv6W3HTLTBWA4UxNeMR3ZKsQEtuCpTgTBCSJKrbQnNkw3YvCg8go4VBzQRgFyWw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QJC69m5g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A17C7C4CEDC;
+	Thu,  5 Dec 2024 16:43:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733417011;
+	bh=Tl/s8JiV2SmGTZhlUaKGgX3/7+W6B+dH6noXJZ++bs4=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=QJC69m5gichtZOBgjEl2dZk9CJJIUDa6+pBYXdrcVifpcFvSe8yaCISj/42BzaKZs
+	 3nNadWCf4B7lTb069UdDHTlH7HX0OES9dCiZkbv0iHeyJJGZU4SRFb2lQbcgvhoa16
+	 QUGDQA9ZYOAfW6csl2U4zN5UJ9lKJoMMRpADI1O4JPSWSWeAWYhSfkxb7lk9nx9/0a
+	 IcKvskvjNFHxrpju9SLFcvEu0cdQqkjoR0nMOKXZO/aiHZ5MDOA4yG4fl8GDfhGiAf
+	 pqOvOzt4gc+XiU6kgXd6kDPBBbxxxdvEVkp/amjxjY3OXhw24Gs6RpiKTj05Amlqao
+	 jSKfa/NetnCzQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2C8E7716E;
+	Thu,  5 Dec 2024 16:43:31 +0000 (UTC)
+From: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
+Subject: [PATCH net-next v8 00/15] Add support for Synopsis DWMAC IP on NXP
+ Automotive SoCs S32G2xx/S32G3xx/S32R45
+Date: Thu, 05 Dec 2024 17:42:57 +0100
+Message-Id: <20241205-upstream_s32cc_gmac-v8-0-ec1d180df815@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE1:EE_|SN7PR12MB7912:EE_
-X-MS-Office365-Filtering-Correlation-Id: e8de4849-2849-4945-1cc7-08dd154b5396
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?3I2WixEqbhlu+xv+TkQ07DGrU2x5e8ZNa279pFrWwC4c4SQyCrfwrOyWXuVg?=
- =?us-ascii?Q?pJ4YUjvTRFdcKavcCr4XgbEMjWhSuVa/tEHbYTn4qfoLuvoI0g5tfMopwJXE?=
- =?us-ascii?Q?uwgrRz1j40rUg2QzQqUi0I6R5BE/r9+8ZFz2KHa+h74ZpnuBCf0A5Cmurr4N?=
- =?us-ascii?Q?IjW52wEfE5DdeTHz5Tsn4+B271NlmPrF+EN9kXG3/cInRgT/yBlPOXQC6gDj?=
- =?us-ascii?Q?0nPOK+8OCHdUq46IAQeSMese0NGeS+kg6Ds7dSJAHJrBZCXttPeO81i+Ebuc?=
- =?us-ascii?Q?hPlz8ve0fKcHFCrqZBrfINnn4/1Cqp3MH5lILqB77arO0ryY7a7FdnbKExpb?=
- =?us-ascii?Q?Z2t7R3BOFUvSBf3h9DD9nZGRs5cPdYj2QHbcFXff1GcDUm25wdd88WQOcBBS?=
- =?us-ascii?Q?8JQgvTnsOcNuFt5euKfn3ENiuv7DEO8HbCjcdf4IUb+5QG6MzApg99fquP5M?=
- =?us-ascii?Q?rilLNcKWgs3o4ZJ8Tq98hPJUh+cwMqXnAR9A27SlIz+FvCA8uSw1g/XNTlDL?=
- =?us-ascii?Q?5+0WFmqNKV5fO77OcNMluUy5NuP20BPTxTwOynOEv79o5etHmI25JLvXbCJg?=
- =?us-ascii?Q?DCMBzelCgTOdiQbNJGc6bCdeBbXyVS/8AP/2TFNPETmhvgQzTd6IfrAidA9w?=
- =?us-ascii?Q?OWz1BtfbnqB8pigTopJB7RyidL4vA/KSnY6vKnGztTylDupDuXP8S4he7lyn?=
- =?us-ascii?Q?T33xC790YnPyVJJr52tJ8m0GY585AxCNrEjt0jERisGLXbI3C1VuGPuLzUUE?=
- =?us-ascii?Q?56QbxhgRIfsVPVjygqEkx2M67FXHsGlAKCP/P9+wszHXzWehd3KhYBorvMNz?=
- =?us-ascii?Q?WRyryT8fU4qY62fOV7K5hPeCmBguGrFPgrNSsQu93B6mEyHtFcc1rpR/9z6W?=
- =?us-ascii?Q?zkD8RNdKiYYzfqmS3Zzog1akTdg/atpmDV5I1jG9no9gZyq2mUGqiwKOZg1B?=
- =?us-ascii?Q?5ZdRsqK/k/NK2lrMZZ2xH3Y1xoWkjD1kEwWl72KVSkmQYxMYusB4u17z+O/p?=
- =?us-ascii?Q?dxkCpoWzFl96f7oQVlNpE0Au0d4PIgTvSCd2QGA5OTyIkRODvUv8ciWfOwtS?=
- =?us-ascii?Q?HlSkY03eKe8SzV9QrVE0Wi1KME/n/ZP+NfokiyY1mLKLRb4m7tvcJ5r6CYqH?=
- =?us-ascii?Q?eXYx5BOehw2KifhHRwCQwIY26W1dAAyZjMhfekPhhyDNuvCvvXABeHg+xcYc?=
- =?us-ascii?Q?6d0YRG3FMfEZB2sbqn8IHhIJy3lSg43wudG+zHiXK25SubQ5uVNQcemZtLp+?=
- =?us-ascii?Q?mFnL6eoBqHzcGSVGESPoTVvwMc78VzB7m/gmXcehGhoZNWDaIWgAtvYbuwVa?=
- =?us-ascii?Q?OBSG1auY7yYdTcWCRcyjo0AHAb+T6bJA+u70DumQz6ZMxJBOj6L3zyEgbH+r?=
- =?us-ascii?Q?81VA0G7H9ceKI9fVSDkKy5kDL436P/iaMhlB/ZyppVyM8nNlDNBnm+2hr5dR?=
- =?us-ascii?Q?A62Zilb4pdrGFMPvWrv5/SGrgAcpHF/8?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2024 16:39:02.5243
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e8de4849-2849-4945-1cc7-08dd154b5396
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7912
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABHYUWcC/23Py2rDMBAF0F8JWldBo7ey6n+UEuzxKNHCDyzXu
+ AT/exVvkmJvBi6XOcM8WKYxUWaX04ONNKec+q4E/3FieK+6G/HUlMykkFoEqfjPkKeRqvaalUS
+ 83toKufUBqHamBmlZ2RxGimnZ1C/W0cQ7Wib2XZp7ylM//m7nZrX1TxkEHMuz4oI3Xtemsq4OS
+ nz2OZ+7ZThj327irN8U6Y8VXRShLPgIghTJvWJeCkA4VkxRXIMYRMQYKe4V+6ZIfazY50doHHj
+ EKATsFfdSyjhWXFFqVAQxRGss/VfWdf0D8zuZmdoBAAA=
+To: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
+ Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, Shawn Guo <shawnguo@kernel.org>, 
+ Sascha Hauer <s.hauer@pengutronix.de>, 
+ Pengutronix Kernel Team <kernel@pengutronix.de>, 
+ Fabio Estevam <festevam@gmail.com>, Emil Renner Berthing <kernel@esmil.dk>, 
+ Minda Chen <minda.chen@starfivetech.com>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Iyappan Subramanian <iyappan@os.amperecomputing.com>, 
+ Keyur Chudgar <keyur@os.amperecomputing.com>, 
+ Quan Nguyen <quan@os.amperecomputing.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, imx@lists.linux.dev, 
+ devicetree@vger.kernel.org, NXP S32 Linux Team <s32@nxp.com>, 
+ 0x1207@gmail.com, fancer.lancer@gmail.com, 
+ "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>, 
+ Jacob Keller <jacob.e.keller@intel.com>, 
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
+ Emil Renner Berthing <emil.renner.berthing@canonical.com>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1733417009; l=6670;
+ i=jan.petrous@oss.nxp.com; s=20240922; h=from:subject:message-id;
+ bh=Tl/s8JiV2SmGTZhlUaKGgX3/7+W6B+dH6noXJZ++bs4=;
+ b=jqz5a1dhjZiXqKcL3y2gtJfIRnyu4VHGYnJ6F8wTkQVkurHP9vUPM/EvymoExsa9f6VWqis4z
+ iDIN2RYSxzVDn6mpr8/S5oI+NqZxvDfHbbq0RAUDemu2LbwTE1Mnw33
+X-Developer-Key: i=jan.petrous@oss.nxp.com; a=ed25519;
+ pk=Ke3wwK7rb2Me9UQRf6vR8AsfJZfhTyoDaxkUCqmSWYY=
+X-Endpoint-Received: by B4 Relay for jan.petrous@oss.nxp.com/20240922 with
+ auth_id=217
+X-Original-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+Reply-To: jan.petrous@oss.nxp.com
 
-From: Danielle Ratson <danieller@nvidia.com>
+The SoC series S32G2xx and S32G3xx feature one DWMAC instance,
+the SoC S32R45 has two instances. The devices can use RGMII/RMII/MII
+interface over Pinctrl device or the output can be routed
+to the embedded SerDes for SGMII connectivity.
 
-The test assumes that the packet it is sending is the only packet being
-passed to the device.
+The provided stmmac glue code implements only basic functionality,
+interface support is restricted to RGMII only. More, including
+SGMII/SerDes support will come later.
 
-However, it is not the case and so other packets are filling the buffers
-as well. Therefore, the test sometimes fails because it is reading a
-maximum occupancy that is larger than expected.
+This patchset adds stmmac glue driver based on downstream NXP git [0].
 
-Add egress filters on $h1 and $h2 that will guarantee the above.
+[0] https://github.com/nxp-auto-linux/linux
 
-Fixes: a865ad999603 ("selftests: mlxsw: Add shared buffer traffic test")
-Signed-off-by: Danielle Ratson <danieller@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Signed-off-by: Petr Machata <petrm@nvidia.com>
+v8:
+- dropped 'driver' in patch subject
+- fixed interface rx/tx clock init
+- Link to v7: https://lore.kernel.org/r/20241202-upstream_s32cc_gmac-v7-0-bc3e1f9f656e@oss.nxp.com
+
+v7:
+- rebased on v6.13-rc1 and removed RFC prefix
+- Link to v6: https://lore.kernel.org/r/20241124-upstream_s32cc_gmac-v6-0-dc5718ccf001@oss.nxp.com
+
+v6:
+- removed dead code in dwmac-intel-plat.c
+- yaml: fix indention
+- validate interface mode in probe
+- dropped patch#16 to fit in max 15 patches in series
+- Link to v5: https://lore.kernel.org/r/20241119-upstream_s32cc_gmac-v5-0-7dcc90fcffef@oss.nxp.com
+
+v5:
+- yaml: refactored compatible string to use fallback
+- yaml: fix indention in example
+- fix xmas tree formating in local variable declarations
+- removed lazy rx clk setup
+- drop PTP clock reading patch and replace it with stmmac_platform fix
+- Link to v4: https://lore.kernel.org/r/20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com
+
+v4:
+- fixed empty commit messages for rgmi_clock() helper patches
+- fixed yaml path in MAINTAINERS
+- switched to platform_driver::remove() as suggested Uwe
+- yaml: returned back all compatibility sting values
+- added better commit description for rgmii_clock() helper
+- Link to v3: https://lore.kernel.org/r/20241013-upstream_s32cc_gmac-v3-0-d84b5a67b930@oss.nxp.com
+
+v3:
+- switched to b4 WoW to overcome threading issue with b4
+- extracted the hunk with the typo fix from v2 patch#1 to separate patch
+  as Jacob suggested
+- removed dead code for RMII/MII support, which will be added alter
+- used new rgmii_clock() helper in other stmmac:dwmac glue drivers
+- yaml: compatible strings compressed to simple one "nxp,s32-dwmac",
+  removed duplicated required properties, already defined in snps,dwmac,
+  fixed example
+
+v2:
+- send to wider audience as first version missed many maintainers
+- created rgmi_clk() helper as Russell suggested (see patch#4)
+- address Andrew's, Russell's, Serge's and Simon's comments
+
+Message-ID: <AM9PR04MB85066576AD6848E2402DA354E2832@AM9PR04MB8506.eurprd04.prod.outlook.com>
+
+Cc: 
+
+Cc:
+
 ---
- .../drivers/net/mlxsw/sharedbuffer.sh         | 40 +++++++++++++++++++
- 1 file changed, 40 insertions(+)
+To: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>
+To: Jose Abreu <joabreu@synopsys.com>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Vinod Koul <vkoul@kernel.org>
+To: Richard Cochran <richardcochran@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+To: Russell King <linux@armlinux.org.uk>
+To: Shawn Guo <shawnguo@kernel.org>
+To: Sascha Hauer <s.hauer@pengutronix.de>
+To: Pengutronix Kernel Team <kernel@pengutronix.de>
+To: Fabio Estevam <festevam@gmail.com>
+To: Emil Renner Berthing <kernel@esmil.dk>
+To: Minda Chen <minda.chen@starfivetech.com>
+To: Nicolas Ferre <nicolas.ferre@microchip.com>
+To: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+To: Iyappan Subramanian <iyappan@os.amperecomputing.com>
+To: Keyur Chudgar <keyur@os.amperecomputing.com>
+To: Quan Nguyen <quan@os.amperecomputing.com>
+To: Rob Herring <robh@kernel.org>
+To: Krzysztof Kozlowski <krzk+dt@kernel.org>
+To: Conor Dooley <conor+dt@kernel.org>
+To: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: linux-stm32@st-md-mailman.stormreply.com
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-arm-msm@vger.kernel.org
+Cc: imx@lists.linux.dev
+Cc: devicetree@vger.kernel.org
+Cc: NXP S32 Linux Team <s32@nxp.com>
+Cc: 0x1207@gmail.com
+Cc: fancer.lancer@gmail.com
+Cc: 
+Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
 
-diff --git a/tools/testing/selftests/drivers/net/mlxsw/sharedbuffer.sh b/tools/testing/selftests/drivers/net/mlxsw/sharedbuffer.sh
-index 21bebc5726f6..c068e6c2a580 100755
---- a/tools/testing/selftests/drivers/net/mlxsw/sharedbuffer.sh
-+++ b/tools/testing/selftests/drivers/net/mlxsw/sharedbuffer.sh
-@@ -22,20 +22,34 @@ SB_ITC=0
- h1_create()
- {
- 	simple_if_init $h1 192.0.1.1/24
-+	tc qdisc add dev $h1 clsact
-+
-+	# Add egress filter on $h1 that will guarantee that the packet sent,
-+	# will be the only packet being passed to the device.
-+	tc filter add dev $h1 egress pref 2 handle 102 matchall action drop
- }
- 
- h1_destroy()
- {
-+	tc filter del dev $h1 egress pref 2 handle 102 matchall action drop
-+	tc qdisc del dev $h1 clsact
- 	simple_if_fini $h1 192.0.1.1/24
- }
- 
- h2_create()
- {
- 	simple_if_init $h2 192.0.1.2/24
-+	tc qdisc add dev $h2 clsact
-+
-+	# Add egress filter on $h2 that will guarantee that the packet sent,
-+	# will be the only packet being passed to the device.
-+	tc filter add dev $h2 egress pref 1 handle 101 matchall action drop
- }
- 
- h2_destroy()
- {
-+	tc filter del dev $h2 egress pref 1 handle 101 matchall action drop
-+	tc qdisc del dev $h2 clsact
- 	simple_if_fini $h2 192.0.1.2/24
- }
- 
-@@ -101,6 +115,11 @@ port_pool_test()
- 	local exp_max_occ=$(devlink_cell_size_get)
- 	local max_occ
- 
-+	tc filter add dev $h1 egress protocol ip pref 1 handle 101 flower \
-+		src_mac $h1mac dst_mac $h2mac \
-+		src_ip 192.0.1.1 dst_ip 192.0.1.2 \
-+		action pass
-+
- 	devlink sb occupancy clearmax $DEVLINK_DEV
- 
- 	$MZ $h1 -c 1 -p 10 -a $h1mac -b $h2mac -A 192.0.1.1 -B 192.0.1.2 \
-@@ -117,6 +136,11 @@ port_pool_test()
- 	max_occ=$(sb_occ_pool_check $cpu_dl_port $SB_POOL_EGR_CPU $exp_max_occ)
- 	check_err $? "Expected ePool($SB_POOL_EGR_CPU) max occupancy to be $exp_max_occ, but got $max_occ"
- 	log_test "CPU port's egress pool"
-+
-+	tc filter del dev $h1 egress protocol ip pref 1 handle 101 flower \
-+		src_mac $h1mac dst_mac $h2mac \
-+		src_ip 192.0.1.1 dst_ip 192.0.1.2 \
-+		action pass
- }
- 
- port_tc_ip_test()
-@@ -124,6 +148,11 @@ port_tc_ip_test()
- 	local exp_max_occ=$(devlink_cell_size_get)
- 	local max_occ
- 
-+	tc filter add dev $h1 egress protocol ip pref 1 handle 101 flower \
-+		src_mac $h1mac dst_mac $h2mac \
-+		src_ip 192.0.1.1 dst_ip 192.0.1.2 \
-+		action pass
-+
- 	devlink sb occupancy clearmax $DEVLINK_DEV
- 
- 	$MZ $h1 -c 1 -p 10 -a $h1mac -b $h2mac -A 192.0.1.1 -B 192.0.1.2 \
-@@ -140,6 +169,11 @@ port_tc_ip_test()
- 	max_occ=$(sb_occ_etc_check $cpu_dl_port $SB_ITC_CPU_IP $exp_max_occ)
- 	check_err $? "Expected egress TC($SB_ITC_CPU_IP) max occupancy to be $exp_max_occ, but got $max_occ"
- 	log_test "CPU port's egress TC - IP packet"
-+
-+	tc filter del dev $h1 egress protocol ip pref 1 handle 101 flower \
-+		src_mac $h1mac dst_mac $h2mac \
-+		src_ip 192.0.1.1 dst_ip 192.0.1.2 \
-+		action pass
- }
- 
- port_tc_arp_test()
-@@ -147,6 +181,9 @@ port_tc_arp_test()
- 	local exp_max_occ=$(devlink_cell_size_get)
- 	local max_occ
- 
-+	tc filter add dev $h1 egress protocol arp pref 1 handle 101 flower \
-+		src_mac $h1mac action pass
-+
- 	devlink sb occupancy clearmax $DEVLINK_DEV
- 
- 	$MZ $h1 -c 1 -p 10 -a $h1mac -A 192.0.1.1 -t arp -q
-@@ -162,6 +199,9 @@ port_tc_arp_test()
- 	max_occ=$(sb_occ_etc_check $cpu_dl_port $SB_ITC_CPU_ARP $exp_max_occ)
- 	check_err $? "Expected egress TC($SB_ITC_IP2ME) max occupancy to be $exp_max_occ, but got $max_occ"
- 	log_test "CPU port's egress TC - ARP packet"
-+
-+	tc filter del dev $h1 egress protocol arp pref 1 handle 101 flower \
-+		src_mac $h1mac action pass
- }
- 
- setup_prepare()
+---
+Jan Petrous (OSS) (15):
+      net: stmmac: Fix CSR divider comment
+      net: stmmac: Extend CSR calc support
+      net: stmmac: Fix clock rate variables size
+      net: phy: Add helper for mapping RGMII link speed to clock rate
+      net: dwmac-dwc-qos-eth: Use helper rgmii_clock
+      net: dwmac-imx: Use helper rgmii_clock
+      net: dwmac-intel-plat: Use helper rgmii_clock
+      net: dwmac-rk: Use helper rgmii_clock
+      net: dwmac-starfive: Use helper rgmii_clock
+      net: macb: Use helper rgmii_clock
+      net: xgene_enet: Use helper rgmii_clock
+      net: dwmac-sti: Use helper rgmii_clock
+      dt-bindings: net: Add DT bindings for DWMAC on NXP S32G/R SoCs
+      net: stmmac: dwmac-s32: add basic NXP S32G/S32R glue driver
+      MAINTAINERS: Add Jan Petrous as the NXP S32G/R DWMAC driver maintainer
+
+ .../devicetree/bindings/net/nxp,s32-dwmac.yaml     | 105 +++++++++++
+ .../devicetree/bindings/net/snps,dwmac.yaml        |   1 +
+ MAINTAINERS                                        |   7 +
+ drivers/net/ethernet/apm/xgene/xgene_enet_hw.c     |  16 +-
+ drivers/net/ethernet/cadence/macb_main.c           |  14 +-
+ drivers/net/ethernet/stmicro/stmmac/Kconfig        |  12 ++
+ drivers/net/ethernet/stmicro/stmmac/Makefile       |   1 +
+ drivers/net/ethernet/stmicro/stmmac/common.h       |   2 +
+ .../ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c    |  11 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c    |  15 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-intel-plat.c |  22 +--
+ .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c     |  30 +--
+ drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c    | 202 +++++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/dwmac-starfive.c   |  19 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c    |  18 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |   6 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c  |   2 +-
+ include/linux/phy.h                                |  23 +++
+ include/linux/stmmac.h                             |  10 +-
+ 21 files changed, 399 insertions(+), 121 deletions(-)
+---
+base-commit: 40384c840ea1944d7c5a392e8975ed088ecf0b37
+change-id: 20240923-upstream_s32cc_gmac-6891eb75b126
+
+Best regards,
 -- 
-2.47.0
+Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+
 
 
