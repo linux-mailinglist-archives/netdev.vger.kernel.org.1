@@ -1,133 +1,127 @@
-Return-Path: <netdev+bounces-149328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDBD99E5265
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:34:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B5BE9E527A
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:37:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67F2C1882250
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:34:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13EF0165A5A
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 10:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3E61D89E9;
-	Thu,  5 Dec 2024 10:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B64331D8E01;
+	Thu,  5 Dec 2024 10:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hLVFVg+B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="guWl3kaO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 158921946B3
-	for <netdev@vger.kernel.org>; Thu,  5 Dec 2024 10:34:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387291D3566;
+	Thu,  5 Dec 2024 10:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733394851; cv=none; b=uvKFPHx8oZW2VzlqT8oCbzV94Et3sEBArSRkKUsUAA4vEO7l6QSHE9OBk105avmkcko1zVQJnDDcRo93vDaj3igqjXU1DYBOxYi0oCIdM+MNQY0J8IMwzEw5KluUMS5zKcGrtdI44TL9YmSa/l6dTxMOnq8lHw0soosVCA90hB0=
+	t=1733395052; cv=none; b=ZUeEyGfyrhBpNHb6vQQyfLdJTIDJRXQUHgU6ZOBFr1vBV67tCnXM3LkPogLxrOCEt7aZ1t6PTfG+bgO3QRblaHi0e3OgW5ttH1J5v3Sfnk4qkFNgS1gRjdDqiwD+OQgWKvE4hJOwhtdT+HCXEaI7A3Saxakp882G0gnV1QbHUKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733394851; c=relaxed/simple;
-	bh=4iSivaet3eWbcYQfu+va8eySU1IR4UGuLLebIGaqXaU=;
+	s=arc-20240116; t=1733395052; c=relaxed/simple;
+	bh=k0Ri1gJvfMPkkmwOG5H5IkESAn8lv1SqrkOcLFEGEog=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IFc0dcHIiSJWAFG+wUB4kMTMu0SC/TilcUsh0k8brGMFBCQ/tzJTIis/uaG9uiST9AB66sN6hOUMzDlTYw3RFWk+zxxNmiv+TLW4HEuN9GpiVWATYT4ww82QbuQniHMlm5XJAeAqUT1O7IdWzhd53r3Ow/HInUzI8JWElkjU13A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hLVFVg+B; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733394848;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tDeeDy80KRfvjt8kuE4hEk8FzYVKJ9eiZDXqXeHcTmI=;
-	b=hLVFVg+BOVMljeoA00eQgysoxre3Uowf1+7ZiHJOcRKgFmpxqO+bf+ccNyvVA5MUKZTbK2
-	UEHdDE4K1sY/c6fnqA1HYY39mVmwuTf+d1wuXVGtj4Yv2EuU9l9RjweThJr93Z3Y/af2UP
-	kHhgc/kZvaAIUIP1tIu3Ebzh+W+Tp4Y=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-345-XT43NBdtM1CWMPkCYB7K5w-1; Thu, 05 Dec 2024 05:34:07 -0500
-X-MC-Unique: XT43NBdtM1CWMPkCYB7K5w-1
-X-Mimecast-MFC-AGG-ID: XT43NBdtM1CWMPkCYB7K5w
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-385e49efd59so309346f8f.0
-        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 02:34:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733394846; x=1733999646;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tDeeDy80KRfvjt8kuE4hEk8FzYVKJ9eiZDXqXeHcTmI=;
-        b=CwgVzWf1XlC+otZRmnd+Fr6UUjZDAHT8dXFzCvYojX2VwvnaZ8j991dmXf7/COIh4a
-         KiAVZ96PN/HrOrAyZ+EC4bRy40DbZs03GfIYZ+KDLIoyb5RZLwOES6ZPFaJWR+au/i3f
-         hMqL4g8jp/xffJJruN1UbAlqFxsG2BWLE0Bb2jVLJvVyvyMQttEG6O/UM4Ci9pysHYCx
-         QN8L6Q3425MiIxIaOZrn3QLYsYWZb6Io+iFi20idvBNVc/BcGqXANoxPhNLV77bL+W/7
-         yJl4K1gdPEFq7sE9TgzZ9L+H5pIhwgbAPFv2q/Sb5RpukOlQmIY05wZ5ebcmfBCOkRgT
-         4hPg==
-X-Forwarded-Encrypted: i=1; AJvYcCVIraf+ltBGzM6UOxGomHZT3TznnvhNIH1QO3a2YiQ7Yg5H48o7S6HfVXAgyBGYD0FGjpzZo3I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKJZgdB8OpcBehaTADN+XQcG7KvwBzVe3yWAfKosCzfqu+G5ye
-	gJ+QCArns79xuPas5ANSBJZTzZqC7hfzVKm3/yhOchYsFi/cYQwRyJ1bI7mi3G0qhtK0DlS+Mnp
-	af0pEEuYQlepcieMk2SSTg7GmxjWYbXOslbETTpY+C9I6Xtavmtlvog==
-X-Gm-Gg: ASbGncuyKFcfkvbarCZrqf3C+f4UhkS3oHUKy3MrCeE8tRXe1LVciBsDu9/HtHXAYW4
-	O97moaHQ/suaCUw/woVv1gYh1Jss81cPWfhwVbT6BaDpKb/Q5GSFcOrnQrKBo5MYIV7DSyHMCcK
-	YIj3mZO+tv4FOVMCojDAGBcLZ+oxvJC2licUY0siQgtGjiSAlcTxpQgSOBIfGubRYQTVJt9EAJ8
-	lF6JmHuOhE1suWRx79nADbUJ1BRiZKAsoqa0XA=
-X-Received: by 2002:a05:6000:1a88:b0:385:e30a:3945 with SMTP id ffacd0b85a97d-385fd3e9cafmr8027398f8f.23.1733394845863;
-        Thu, 05 Dec 2024 02:34:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHJNPFWgvbSY2I3/I8jqi8rh7xZnIPunyw/bGll0UrDgSSCV6D1wzgUrHuDPt3xOF7WivnpAg==
-X-Received: by 2002:a05:6000:1a88:b0:385:e30a:3945 with SMTP id ffacd0b85a97d-385fd3e9cafmr8027369f8f.23.1733394845539;
-        Thu, 05 Dec 2024 02:34:05 -0800 (PST)
-Received: from redhat.com ([2.55.188.248])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38621909952sm1556182f8f.69.2024.12.05.02.34.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2024 02:34:04 -0800 (PST)
-Date: Thu, 5 Dec 2024 05:34:01 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Koichiro Den <koichiro.den@canonical.com>
-Cc: virtualization@lists.linux.dev, jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/7] virtio_net: replace vq2rxq with vq2txq
- where appropriate
-Message-ID: <20241205053355-mutt-send-email-mst@kernel.org>
-References: <20241204050724.307544-1-koichiro.den@canonical.com>
- <20241204050724.307544-3-koichiro.den@canonical.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GhAYxoL7+WcdIHF1+5N4BwfzLBUQvE+KMxh8x9XANRk/hHxLWFRVVLZwpiPkVFJM2iPTLiRumMG7lv7zFyflgWx81gI4Se2z17zXBjawaFnHl6wbeV36pLzHYkxiuHBoHp84nP+VElKCuIRlXfgiYwvNHWqKFHID/71xyY+Ec9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=guWl3kaO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 853FDC4CED1;
+	Thu,  5 Dec 2024 10:37:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733395052;
+	bh=k0Ri1gJvfMPkkmwOG5H5IkESAn8lv1SqrkOcLFEGEog=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=guWl3kaOoGEK+6hAPbImxmyWGcZsuvgDfS+SvtpN9yapsfB7pqHGGfp5hVdYv+Q5w
+	 vuRJCFOEzZPcd6Zebd/3fx8AKcwYYRIt2OSrHd1J3yxUb8h1Rom0Xy/H5DqebnGf5X
+	 2dcCaDOq9qqgy/7JnLhrUhhwK5k8bnLOoFX2Tzhd9Y9CvAuLbKVQ0fdaEysiLRWUwk
+	 SYb80dJWMM3YYx1tkOF51oLUhxScy1I23lx2EE8ZPxRTsY8jpWX6xygI0m+rKvAwdl
+	 2OBp+y6LpIANTG9T4G1GK6HuX4jdFpJVpP8FmAHs6E8qRz13DpF2xkEdujO4j3Rh0T
+	 szxkvQEuQm43Q==
+Date: Thu, 5 Dec 2024 11:37:29 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
+To: quic_zijuhu <quic_zijuhu@quicinc.com>
+Cc: Zijun Hu <zijun_hu@icloud.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, James Bottomley <James.Bottomley@hansenpartnership.com>, 
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas@t-8ch.de>, linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev, 
+	linux-sound@vger.kernel.org, sparclinux@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-cxl@vger.kernel.org, linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org, 
+	linux-efi@vger.kernel.org, linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linux-mediatek@lists.infradead.org, linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	open-iscsi@googlegroups.com, linux-usb@vger.kernel.org, linux-serial@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 08/11] gpio: sim: Remove gpio_sim_dev_match_fwnode()
+Message-ID: <eyu7nm5hvwfqxgysnrzsvianzf7abvlovpxfo7snsxowmuuhpj@tah3gkqm5ldj>
+References: <20241205-const_dfc_done-v3-0-1611f1486b5a@quicinc.com>
+ <20241205-const_dfc_done-v3-8-1611f1486b5a@quicinc.com>
+ <7ugfaj2h3sy77jpaadco5xtjalnten3gmvozowcle3g7zcdqs4@sqf5l47onbsi>
+ <ac42e652-4128-44ea-976e-5234360d8183@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ak6zeaiacfbfwyki"
 Content-Disposition: inline
-In-Reply-To: <20241204050724.307544-3-koichiro.den@canonical.com>
+In-Reply-To: <ac42e652-4128-44ea-976e-5234360d8183@quicinc.com>
 
-On Wed, Dec 04, 2024 at 02:07:19PM +0900, Koichiro Den wrote:
-> While not harmful, using vq2rxq where it's always sq appears odd.
-> Replace it with the more appropriate vq2txq for clarity and correctness.
-> 
-> Fixes: 89f86675cb03 ("virtio_net: xsk: tx: support xmit xsk buffer")
-> Signed-off-by: Koichiro Den <koichiro.den@canonical.com>
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+--ak6zeaiacfbfwyki
+Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v3 08/11] gpio: sim: Remove gpio_sim_dev_match_fwnode()
+MIME-Version: 1.0
 
-> ---
->  drivers/net/virtio_net.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 48ce8b3881b6..1b7a85e75e14 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -6213,7 +6213,7 @@ static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
->  {
->  	struct virtnet_info *vi = vq->vdev->priv;
->  	struct send_queue *sq;
-> -	int i = vq2rxq(vq);
-> +	int i = vq2txq(vq);
->  
->  	sq = &vi->sq[i];
->  
-> -- 
-> 2.43.0
+On Thu, Dec 05, 2024 at 04:37:08PM +0800, quic_zijuhu wrote:
+> On 12/5/2024 4:10 PM, Uwe Kleine-K=F6nig wrote:
+> > On Thu, Dec 05, 2024 at 08:10:17AM +0800, Zijun Hu wrote:
+> >> From: Zijun Hu <quic_zijuhu@quicinc.com>
+> >>
+> >> gpio_sim_dev_match_fwnode() is a simple wrapper of device_match_fwnode=
+()
+> >> Remvoe the unnecessary wrapper.
 
+Just spotted: s/Remvoe/Remove/
+
+> >> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> >> ---
+> >>  drivers/gpio/gpio-sim.c | 7 +------
+> >=20
+> > I think if you move this patch before patch #4 in your series, you only
+> > have to touch this file once.
+>=20
+> the precondition of this change is patch #4, it will have building error
+> if moving it before #4.
+>=20
+> actually, we can only do simplifications with benefits brought by #4.
+
+Ah I see. I thought that device_match_fwnode only got the const for the
+2nd parameter in patch #4.
+
+Best regards
+Uwe
+
+--ak6zeaiacfbfwyki
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmdRgmcACgkQj4D7WH0S
+/k6zeggAlBhwMJaGpQIgAi04teyouKX4a/XAJG3tLwpz4YweEcrMm/fv0N42hp/d
+7zUKHjQRRcVM6+TSObZ6uKEFMpac+G1YG1Fze2rNPdlf5IUOCrpKqKUaziMyvEc+
+hhaccpLCXjp9gi7H7tEBDfmrR6/S3i1nnYOeDn6tYmhKVx14uA57l4Isj2h+CIax
+P5d+Gq9NQl5IXDnqiEez80oo8LFhLQQIjIeO1YQM7GrbXaqoD+CfZTGXe4/woRc5
+JjzksiJqSccUbPlwM+90bh5Oj0H2VARUaJTRcHTRANM4ZFTSfWCep0Wkg8DSw343
+fYW4rY4vIXpWKVG9LM4j7NAoluIWvQ==
+=myq/
+-----END PGP SIGNATURE-----
+
+--ak6zeaiacfbfwyki--
 
