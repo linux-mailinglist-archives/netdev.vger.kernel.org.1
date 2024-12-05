@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-149377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A309E550F
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:10:14 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 026959E5534
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:16:23 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1F64280DFD
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:10:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95D0E1881F49
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2231B217F2A;
-	Thu,  5 Dec 2024 12:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D26C218E84;
+	Thu,  5 Dec 2024 12:15:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="IUs8BUFf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TmBQ7r1p"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE076217721;
-	Thu,  5 Dec 2024 12:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272EC218AD1;
+	Thu,  5 Dec 2024 12:15:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733400610; cv=none; b=EV4MhCgya1P0JlZrSkhMwHvB72LCUFyo43cVGmqDilKgGM/IRMvt4aZap5MrnyjWgdc0ih1ockSAgYC0Z2Ia1Q4FT064fRxzc1uMm79ZfCf2ZsK+TZ77ouxCnEBFMt+hjvMdzXs2z5Lbk5JqalUvNKw9vM2vs0iixHVp2KHhlAE=
+	t=1733400931; cv=none; b=jN1kZ4JKkYZb896EAsqkulamEuVG3D9ciNACD03zHLR6L2wIlx/Zh+mZzS26AlrbfhUSfuw371gQBhR3ic4VpHFGTWrMZIH04YSROaVrm6czDKD6az7Zm6ozUjJCA+S35aHrbWPbq807nUagnL8OMpAGneBptkUxYgc9fF5MN9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733400610; c=relaxed/simple;
-	bh=nSw2S081MxgrHQoHqBdbl/8uu8jfUiCqYx4YvPZLeIg=;
+	s=arc-20240116; t=1733400931; c=relaxed/simple;
+	bh=/29uYNfB4jsLibyobe2nNI/2TzDkendtERkhqweYv+g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LwM7sEtLmMBjrD02I1GNlY1CmdKJPmEWL26GVNBn4jkBvh9nrUKJ75Td9nLXFuugmZ/jiVjaqqaUY4n0MT2KhErylV396apK5mMgoCkZ0NhY8jfxzVvxRl9yQcVLzmoZ58sRiNR7cvTNvIrEuLvH1CzwsCQw4BJ3CqUl3x+02kY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=IUs8BUFf; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=XZewc7zVw9bh9pCIF4owCXoaUB53GA1HM92PddlJjjRibafIoB/hngifnfeVsOAEBvd31sdnWu0K4yIDOaMpyBJOG6Lbt7kYZy1OSBa2ZsOy1SWj0BQn47pZTYG4Ouxrpa9fuoCepWi9THNQrN1OCHNIEzSs5ex4kckWVp5jEXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TmBQ7r1p; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,27 +37,26 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=R0B5oB9aAdPieEE1LiKNCZn6NUPOqq3DmQIQCxFphuw=; b=IUs8BUFfac62xpFcOL+XmmpeXR
-	X/nNP2vla5fKVcOzODcgoG3ekTWl7hd4kjDvDSBsdK8aA6V1OCm0VB8XqlZw6t3m1+PAp+d/4pAzq
-	SlpqHjeM2JcGlT8PSTO0oqZ6qthBt0ZCh5LVUV9HayS+3kC6j1bO6+OyHO/tsWg2G1wJf60mh7CNl
-	25TI3jZHzUSbf08E+gpR011c885Hd5paL2b3wyJ6YJptx0yNg3L8q2Sk+QEIVuesgpCf9HLYA8K4w
-	vmK3/FGMN7os0wdsvzZL/wPCBP0tok1HXzK/BkpCrEP6VVP2dgldmshylW/+74PUaRQk1MK3AYw60
-	FmC2ptlQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45496)
+	bh=c2uRpWQzrgsevOGntiKGOMAAWqRJBifNOKZIBOx/xX0=; b=TmBQ7r1pewYBgLyGRI3YeehQf3
+	8XCeKdAYF++k8YWHUnLn0LFIFBOOVKPeOaaJtK8b1ZkiZ+GVvLUZZvlzGlUOG2uKwubbDfS5ehoqB
+	n/slnEBsqCHkDn20CrQ0DC+734SXz1s795git2wBOl16lJ4NU5MRuJ3kHwjHVqblHHJ0nW7Yj1HMv
+	VU8DxCz5npDfHRH30WNphV5WM9UXY3h3fw/nfZQJLM+Jq1Ns7rvSGZTgMolmBdnqECwgrL5K4qqwm
+	QF+R0jF4a9zP9ZQlwrTVz+5Y9nwxVRfgpkOcQxQH3Euy4etYXvjPwGDlIwdbJPXXpg4cW65339uTt
+	Y6oPUmHw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40184)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1tJAg9-0004lB-1i;
-	Thu, 05 Dec 2024 12:09:58 +0000
+	id 1tJAlL-0004m7-04;
+	Thu, 05 Dec 2024 12:15:19 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tJAg7-0006Xr-2o;
-	Thu, 05 Dec 2024 12:09:55 +0000
-Date: Thu, 5 Dec 2024 12:09:55 +0000
+	id 1tJAlJ-0006Y7-1G;
+	Thu, 05 Dec 2024 12:15:17 +0000
+Date: Thu, 5 Dec 2024 12:15:17 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -67,12 +66,10 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	Simon Horman <horms@kernel.org>,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v1 4/7] phy: introduce optional polling
- interface for PHY statistics
-Message-ID: <Z1GYEyQ6vxK67Yh1@shell.armlinux.org.uk>
+Subject: Re: [PATCH net-next v1 6/7] phy: dp83td510: add statistics support
+Message-ID: <Z1GZVf7R9AYeRJAF@shell.armlinux.org.uk>
 References: <20241203075622.2452169-1-o.rempel@pengutronix.de>
- <20241203075622.2452169-5-o.rempel@pengutronix.de>
- <87c2743c-1ee0-4c6c-b20d-e8e4a4141d43@intel.com>
+ <20241203075622.2452169-7-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,55 +78,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87c2743c-1ee0-4c6c-b20d-e8e4a4141d43@intel.com>
+In-Reply-To: <20241203075622.2452169-7-o.rempel@pengutronix.de>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Dec 05, 2024 at 09:14:08AM +0100, Mateusz Polchlopek wrote:
-> On 12/3/2024 8:56 AM, Oleksij Rempel wrote:
-> > Add an optional polling interface for PHY statistics to simplify driver
-> > implementation. Drivers can request the PHYlib to handle the polling task by
-> > explicitly setting the `PHY_POLL_STATS` flag in their driver configuration.
-> > 
-> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> > ---
-> >   drivers/net/phy/phy.c | 15 +++++++++++++++
-> >   include/linux/phy.h   |  6 ++++++
-> >   2 files changed, 21 insertions(+)
-> > 
-> > diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-> > index 0d20b534122b..b10ee9223fc9 100644
-> > --- a/drivers/net/phy/phy.c
-> > +++ b/drivers/net/phy/phy.c
-> > @@ -1346,6 +1346,18 @@ static int phy_enable_interrupts(struct phy_device *phydev)
-> >   	return phy_config_interrupt(phydev, PHY_INTERRUPT_ENABLED);
-> >   }
-> > +/**
-> > + * phy_update_stats - update the PHY statistics
-> > + * @phydev: target phy_device struct
-> > + */
+On Tue, Dec 03, 2024 at 08:56:20AM +0100, Oleksij Rempel wrote:
+> Add support for reporting PHY statistics in the DP83TD510 driver. This
+> includes cumulative tracking of transmit/receive packet counts, and
+> error counts. Implemented functions to update and provide statistics via
+> ethtool, with optional polling support enabled through `PHY_POLL_STATS`.
 > 
-> As this is newly intoduced function I would love to see the full
-> kdoc header, with information what the function returns, like here:
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  drivers/net/phy/dp83td510.c | 98 ++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 97 insertions(+), 1 deletion(-)
 > 
-> https://docs.kernel.org/doc-guide/kernel-doc.html#function-documentation
+> diff --git a/drivers/net/phy/dp83td510.c b/drivers/net/phy/dp83td510.c
+> index 92aa3a2b9744..08d61a6a8c61 100644
+> --- a/drivers/net/phy/dp83td510.c
+> +++ b/drivers/net/phy/dp83td510.c
+> @@ -34,6 +34,24 @@
+>  #define DP83TD510E_CTRL_HW_RESET		BIT(15)
+>  #define DP83TD510E_CTRL_SW_RESET		BIT(14)
+>  
+> +#define DP83TD510E_PKT_STAT_1			0x12b
+> +#define DP83TD510E_TX_PKT_CNT_15_0_MASK		GENMASK(15, 0)
+> +
+> +#define DP83TD510E_PKT_STAT_2			0x12c
+> +#define DP83TD510E_TX_PKT_CNT_31_16_MASK	GENMASK(15, 0)
+> +
+> +#define DP83TD510E_PKT_STAT_3			0x12d
+> +#define DP83TD510E_TX_ERR_PKT_CNT_MASK		GENMASK(15, 0)
+> +
+> +#define DP83TD510E_PKT_STAT_4			0x12e
+> +#define DP83TD510E_RX_PKT_CNT_15_0_MASK		GENMASK(15, 0)
+> +
+> +#define DP83TD510E_PKT_STAT_5			0x12f
+> +#define DP83TD510E_RX_PKT_CNT_31_16_MASK	GENMASK(15, 0)
+> +
+> +#define DP83TD510E_PKT_STAT_6			0x130
+> +#define DP83TD510E_RX_ERR_PKT_CNT_MASK		GENMASK(15, 0)
 
-As it's an internal phylib function, I don't think there's any need for
-kernel-doc unless it's something more complex. It's obvious what the
-function itself is doing.
-
-What would be more helpful is to properly document the "update_stats"
-method, since that is what PHY drivers are going to implement. Yes, I
-know kernel-doc isn't good at that, but look at phylink.h to see how
-to do it.
-
-> > @@ -1591,6 +1594,9 @@ static inline bool phy_polling_mode(struct phy_device *phydev)
-> >   		if (phydev->drv->flags & PHY_POLL_CABLE_TEST)
-> >   			return true;
-> > +	if (phydev->drv->update_stats && phydev->drv->flags & PHY_POLL_STATS)
-> > +		return true;
-
-Is there a case where ->update_stats would be implemented but we
-wouldn't have PHY_POLL_STATS set?
+I'm not sure I like this pattern of _MASK here. Why not call these
+registers e.g. DP83TD510E_RX_PKT_CNT_31_16 ? Given that the full
+register value is used, I don't see the need for _MASK and the
+FIELD_GET()s, which just add extra complexity to the code and
+reduce readability.
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
