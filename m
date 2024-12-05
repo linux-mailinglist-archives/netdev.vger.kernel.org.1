@@ -1,153 +1,113 @@
-Return-Path: <netdev+bounces-149352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08D2B9E5357
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:06:56 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B63169E535A
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 12:07:41 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBB8F28441A
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:06:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57DF11881D50
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 11:07:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB0B1DDA21;
-	Thu,  5 Dec 2024 11:06:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2E11DB929;
+	Thu,  5 Dec 2024 11:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="VzRF0sfd";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ERU7VtQR"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="AIb/bUr4"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8AC31D89E9;
-	Thu,  5 Dec 2024 11:06:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9161DD0C7;
+	Thu,  5 Dec 2024 11:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733396806; cv=none; b=ePKP5Ua/uxdsuDOynwkcgBexBKVpGv6+V3dF50t3mcoHyPuNxmeKq0I3AzTnFmddgjx4+utjGNAZWUYUgJzdCWNmNz53XaoVY70xAnBnM7NkQOeve44Qa3S9uNHP94BZE4RSksaFSRerl+ZhUW211iRGcLc3K6E+sYRFsXZOO8E=
+	t=1733396858; cv=none; b=QWxIFYbQbsU6gZclBkDF9pPiiN54Gbk1ZdAQhNEXv+i4q/5eATYO9Obs5DEt8jWUqi7mfYoggo1CsVFBnL3oXFhNKNXLS4VWVQo+yLrvcQI4HxHbSQIjI7TxAPcUfMrNcTGCwWzQE8W1hdxSJ3r0I4yypJYxTkkoqDZAS6/UxoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733396806; c=relaxed/simple;
-	bh=ktlFxxr9tgG6IXtx8PkYv3KGn8bo719VqDm2lM/J6pg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e7UGr6TNYjILrRpFmR+0LpE7jc38nPEBZvlo0pyXb4+W2WJII0XENgrVk15VejsWRSMVLrolfUSMVnGPjH94VYZZINdvocz1oivxUYT+XPRTAqK6zvu4K4vkTyQsBThAhqllGepMgF4QeNgK6LNN0j/DRNiHakBMiZ9dd6GZH5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=VzRF0sfd; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ERU7VtQR; arc=none smtp.client-ip=202.12.124.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfout.stl.internal (Postfix) with ESMTP id 55D22114023C;
-	Thu,  5 Dec 2024 06:06:41 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Thu, 05 Dec 2024 06:06:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1733396801; x=
-	1733483201; bh=SKHY22/a1FrbM5ccTkJMU55h4ZUMLTrDJL+VybDLaeM=; b=V
-	zRF0sfdFuqDJGzSEUKPhuJDKjARPq2DAkExCVmT15DryJcnBmGab4Wu/8jVmRxwp
-	5+kxcDDQ6GG3vMUVUttqcBPWYpo8tgPaVdvtDuYy+M3mf2Sb4UC8R9eJOid39AFS
-	447AyrceVb3sVjagrG9Et/2OA94/efBrQu3XlOeC2d/O/RxkEXjBfdQyQ1EbjEW6
-	I5fV/K7FBv6gljn2Us1GwWn/s8JkbdKJ+2aQXq/IslefE6C8wb7k65OYHeScJ0Kq
-	TLB50jHiOGD0SkenlSSOTcaE8KRRtF+WvK636ad3ZrOp8mEcXH81BtgcS2VrSojh
-	/R9nNorxwnFKlS7uYNNkQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1733396801; x=1733483201; bh=SKHY22/a1FrbM5ccTkJMU55h4ZUMLTrDJL+
-	VybDLaeM=; b=ERU7VtQRZUKpmqhT9gqPsWq+x31oRdxpL8JCEmvmLt8MPj9Zg6/
-	/a1qXaLLCqMJKD6gx9sXD51l2Yq2gk4gmkk5x8xc2nKmV1Yd6024eWyhVQqgYBaQ
-	SbvJTHCXwx3KAiZh31YnpCwSpqOX9tAwN/TAZ+w0dU6DADOIchJIk9dU/UX+LZaB
-	v0+sxR3BNoGx4d+UZEahyXRhCgiB+f9r0WVejd+FHWGQM1g5cF+7sQmhZtzIaF/G
-	DMv37KpzOZjWPhGtTQPbd9PePNJuIThQkA7tyzMB5Ymt0HN4pFvYb3Jr6G1NkwGi
-	O50OdOzCNFGlIt/ZwX5hM/LiKmOk3vGL1og==
-X-ME-Sender: <xms:QIlRZ5QkKnm5_gh0uXTaauHUjomUblaoB7yeWZCcGKHXB7UB7Juzcg>
-    <xme:QIlRZyynNMzFDtCTGcN20TX486acnIZRIGPNbrZU26xDMX6MH7SI8MSvTilBtRR3p
-    OYBjhB1-OObhAQtJ-g>
-X-ME-Received: <xmr:QIlRZ-0NjXwOJH-mQP5aScbcBlRXEYWOVrbGNn82tvSp4rnA_6g8QHtx6iKe>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrieejgddvvdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehkuhgsrgeskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepvhhfvgguohhrvghnkhhosehnohhvvghkrdhruhdprhgtph
-    htthhopehfkhhrvghniigvlhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhhunhhi
-    hihusegrmhgriihonhdrtghomhdprhgtphhtthhopegrphhoohhrvhhkohesrghmrgiioh
-    hnrdgtohhmpdhrtghpthhtohepsghorhhishhpsehnvhhiughirgdrtghomhdprhgtphht
-    thhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhope
-    hshhhurghhsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:QIlRZxBI8WMEUCi8kM9oLS1EJLL77XW1_88zzMuVIe-5EI0KNUYOPQ>
-    <xmx:QIlRZyjTfd-Ln2Fjc5EXmB1BJ-44HgQlKxaTpSvIHZP4wt4ddF5Xsg>
-    <xmx:QIlRZ1p0Dw47OJkGGrF2JitvXfMaPTcSAPTfMRQK1oEWEPC0FU3eTg>
-    <xmx:QIlRZ9j3sqBTyCkDUEE5Gq4UqJbvaCBOGh6vIHzUFqAJS5HE1qALGg>
-    <xmx:QYlRZ5RcDa5kEMyg7iVw7jMQURqY9WRbqPo0SrJnLR4X83uhe4ywEKFN>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 5 Dec 2024 06:06:40 -0500 (EST)
-Date: Thu, 5 Dec 2024 12:06:37 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vfedorenko@novek.ru>,
-	Frantisek Krenzelok <fkrenzel@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Apoorv Kothari <apoorvko@amazon.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v4 4/6] docs: tls: document TLS1.3 key updates
-Message-ID: <Z1GJPUUR-wllqX3w@hog>
-References: <cover.1731597571.git.sd@queasysnail.net>
- <6baaaaf467845c56d7ec47250aaa2138de948003.1731597571.git.sd@queasysnail.net>
- <20241203195129.25e07e53@kernel.org>
+	s=arc-20240116; t=1733396858; c=relaxed/simple;
+	bh=7bFBc3/3uDOJYg0WdMsRPAxsNz08WlwezQMA83Qbl+I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A8JOaKg1ivVbVsYIrbaM1RE7bl0vPQpda3WDXPkkN/BDGNJ7xwRi5DHpfH4zPllpkNEx7vFxFdVRRRv+kQKJ4gLljCoSZtmXM9abZLsWX6OUMg8breuvnt7RqvU6C5/pbYptuHDvBPs6DmkA+sKytRNNDDF6kXpXAfggGMyfUPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=AIb/bUr4; arc=none smtp.client-ip=212.227.15.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1733396842; x=1734001642; i=wahrenst@gmx.net;
+	bh=NLarr+ntzxVvGLWqrHEgsyePTJ1n/hSq++kop0hKzcw=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=AIb/bUr4am9zGbNSXcb585+iqo1eqvv4mLcAnZiWH++Zn5OH/FuRhZK9GeOgeeiW
+	 WRVLyLo2W/Q3VkNBxQ8MEpZUKxTqnw5RrKa75RXlT0AHFeMMDnaooRORME6nvwynT
+	 cJXDMnGcrYF8QmafW28/NbR+pLrLvNeQkgbMMRLscI2JWRRpUsKWBCzaqQpNRP60p
+	 XntUvoAPAjVIly2BLFo2s8mpuCrtwXSp6YmR8Z+Xpvu5+B7bUHOgWBFvzLCmRp4tk
+	 Q8NL7FFjmDVSnn+lzObeiDMLwPAaIKisfbQOb/ihduZUbyd2RtJYcNoLRvLT1jB+k
+	 oPvDuHjNZ7wXI1l/vQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.1.106] ([37.4.251.153]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MV67o-1tC7CO2bn4-00NM2Z; Thu, 05
+ Dec 2024 12:07:22 +0100
+Message-ID: <90137949-650d-4cc0-b40f-9b8a99a5e7e1@gmx.net>
+Date: Thu, 5 Dec 2024 12:07:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241203195129.25e07e53@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] qca_spi: Fix clock speed for multiple QCA7000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241202155853.5813-1-wahrenst@gmx.net>
+ <20241204184849.4fff5c89@kernel.org>
+Content-Language: en-US
+From: Stefan Wahren <wahrenst@gmx.net>
+In-Reply-To: <20241204184849.4fff5c89@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:/w9J199l9P6ialYPW5/C4wBTspmuXr6rPkuL+iSILJL580PP4i3
+ e/DZZvwGjEv7LJfjlX/cN78n/hS87+4nPQxsflq3cJqnf3XLtlcCpCacfy3I8LBsPIuGxr4
+ r1tcl7+5hQ65Nkm9jfGfmbv5ApBPKSxk2HJpnRvdTlN7nYpX+14roYOXcphj0Z72V+a5PXa
+ /KymYu6J+5rTT5R9paUvg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:uB7ZbMisOMs=;FFwutNRPc80u1x2yma38LxUq1iE
+ nLNXGMICLsEb3FKRZ5+3tBKX7HfRsngbiZJow7S08Wb8qefhtNDiX291C0IOuL/Mr4d3Tu2XM
+ oyNNtXYWG+RFKO2mEgckJ927KhQfcsdSvwi/Da0+ud4ol8wB0FzdiomU6IUd9N8m0ThC2knYX
+ zwYcbaa6Tv9YezmyKsummxCzHvMjlw0WnIcjE8nwmii9GOdSDkwU/3Yri92DfC1ohg1VGJP02
+ DHzskCbQAmx/ChCuM/3QJ7+QpSuR/WHwD3UfhNabpdXoqQToHWvqa6y5OTnYn+6TZ2q2eSNPY
+ fS87CNLK7+iS3c0qPDBlDp3XnPgyCCO0wJCEIOa21iQppJsCOKyCjxj+7IBhnbP+FBMJeK0UF
+ CbyR5lLxrXrIVmsLl0LSTmMUKmzZcud5NqCSgxFJUyi0ntXQUPNWZo7wmigA6Gwdv5ec9UfS5
+ J8fSKvr9+8XShFKnY+Cr1YjTQN6348SpbOrrK2BX7MK5B37rz3aLD1gqoLMYxyUR7kYN+iRFr
+ N446mewjl2wOa062o3tdDLEsKR2zSkjnfg1p9y6ZfgiWuqtUA+vJJGwvu8Av6GoCoEINzWqYa
+ yo7NtVkfq2TZiuoUczXNKu0WPa77QYwt4UOIwfm1gyY7TxKaVJYDlJMaYtONzkROw1Q6gAMzJ
+ QkDLmsgitgljuSU2+95QdzKV/bQ7bbLRJIgbuCG3rI6CSGBrQiZMuytQ78FdAMBJE+S5s2NJT
+ wLdFu9FNwmpPgZJ5VS1agIGSO/XwOVvvmwlkrhd/jPPfVOOlEXE+9kUx532rzWlkgnDKqozw5
+ Pt9xQRShAyfPllhf8jSg5dEiY7mOHFLsJv7i2wiCskcWipiFusCO6qwPaUkKKHfoX8zIVZ7Cd
+ UVhTPC9hp6wHdG3+iz43+sMGkGnfyhkwWkL8fvWa6RLBZZevY9IyMvnh+zouLgh/WTPaZPHCN
+ 9Kuq9Vgu7KPJTbOITLJ2CwsW4doxb3VGDfXdMmaWnlb1tHF2LpKAlVE4BkxFAip11rX/MZrGg
+ up3T5irm5HnJbZwYewcbC4ng0u/1JTm9V3ueoY+UqH9bQDpk5jjCPMWVedMvb/3f5UBb+v3vd
+ NZ7sxqJPUt2dIoj1VcV4DfaPMwHi2g
 
-2024-12-03, 19:51:29 -0800, Jakub Kicinski wrote:
-> On Thu, 14 Nov 2024 16:50:51 +0100 Sabrina Dubroca wrote:
-> > +To prevent attempting to decrypt incoming records using the wrong key,
-> > +decryption will be paused when a KeyUpdate message is received by the
-> > +kernel, until the new key has been provided using the TLS_RX socket
-> > +option. Any read occurring after the KeyUpdate has been read and
-> > +before the new key is provided will fail with EKEYEXPIRED. Poll()'ing
-> > +the socket will also sleep until the new key is provided. There is no
-> > +pausing on the transmit side.
-> 
-> Thanks for the doc update, very useful. I'm not a socket expert so dunno
-> if suppressing POLLIN is the right thing to do.
+Hi Jakub,
 
-Not an expert either. I picked that because there's no data to be
-read, which is what POLLIN should mean.
-
-man 2 poll:
-       POLLIN There is data to read.
-
-man 3 poll:
-       POLLIN      Data other than high-priority data may be read
-                   without blocking.
-
-Based on this, reporting POLLIN seems wrong to me.
-
-> But a nit on the
-> phrasing - I'd say "poll() will not report any events from the socket
-> until.." ? Could be just me but sleep is a second order effect.
-
-Agree, thanks for the suggestion. Maybe actually "will not report read
-events"? Other events are unaffected by a pending rekey.
-
--- 
-Sabrina
+Am 05.12.24 um 03:48 schrieb Jakub Kicinski:
+> On Mon,  2 Dec 2024 16:58:53 +0100 Stefan Wahren wrote:
+>> Storing the maximum clock speed in module parameter qcaspi_clkspeed
+>> has the unintended side effect that the first probed instance
+>> defines the value for all other instances. Fix this issue by storing
+>> it in max_speed_hz of the relevant SPI device.
+>>
+>> This fix keeps the priority of the speed parameter (module parameter,
+>> device tree property, driver default).
+> I think we should also delete the (seemingly unused?) qca->clkspeed
+> in this change. Otherwise it looks surprising that we still assign
+> the module param to it?
+Good catch! But shouldn't this be a separate clean-up, because the
+clkspeed was already unused before?
 
