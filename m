@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-149405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67A0A9E57F5
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 14:56:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C16A9E57F8
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 14:56:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 674B0169F61
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:56:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 747DD1883D98
+	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 13:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D81A21A443;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A8921A454;
 	Thu,  5 Dec 2024 13:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="RkRHYQoq"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Y47SDJ6l"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64959219A70;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F48D21A42A;
 	Thu,  5 Dec 2024 13:55:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733406945; cv=none; b=a41EyIJWpd7x4jc1yAsGus9RxAUIY8y8SENIg9qcGe8T61m7aX3MlWtzesq1UExQeKMPqckHky5rIYRMSYt3Dkv25WbEPVC/qM/Gc695pDnIM7vgvgyi/bR+vv1u/GCpjf9remU+SlEeCIPAx724ie3DRq2gVsUG+W3LBMGxls4=
+	t=1733406945; cv=none; b=BtTOVmnRRRueHkjmlMZ6TUhdNfSP0lkRyrcM6PSBX2Hzj63NGYqDh61oQulcBmokcrf8wPfekdcSVRllCSmiBOweL5ZoEMhk0fSZG0eGcQSxr9gjiHzJ49QDZKFqpYU6kbLMJL+2+0L+alJZ0eESh52D7MceJNpkCiozFKGOdVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1733406945; c=relaxed/simple;
-	bh=k2uyYdC8wALllRKsK0v7WW1DX6DY5ZwM7HHpcSIknjU=;
+	bh=0oKgcrkZi8Q7zAmrkKmMg4EAU89Jf7N07xhOp2/GiHA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=bMUbs1WEczEfbyKeh4Fp4wwAEC/ujMnbbuIy+rNnZTdxcwUeqDa89fiWQFwa76Ll38jHyt/vdIT6sJ26lA19ITMVOwUst6YRhxR34YQNmKi92BTV/h0nQegPuzRJjHtzq07zsv7Ykqt7KEqXk5XBbtKvkojehnrkdeUbRcRQo+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=RkRHYQoq; arc=none smtp.client-ip=68.232.154.123
+	 In-Reply-To:To:CC; b=NN/k8+1Di8ZIKr7Zq3EkydezTDyHryAtwpltQqThBujRyDJQ6mCLl3kNIylLoLosfykX8X2gN9l/HeCv42f12QCbCoyHhI3k4hQ6/VebMbd7tnnr2R3uTTSZ/OjPf73o6ihqeJ73XVeDeZ/Z+9m2AaWQ253iVK/iV5ZYVSijNjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Y47SDJ6l; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1733406943; x=1764942943;
+  t=1733406944; x=1764942944;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=k2uyYdC8wALllRKsK0v7WW1DX6DY5ZwM7HHpcSIknjU=;
-  b=RkRHYQoqWRFIW9sjV8TPcrgnv1xmvT7XLgmiq2uERE4cvr1upDeMm1Yi
-   D/eEuUtRwyVVkAEB9YtSXQJ7QDjFVlRx48s7O+Sxn/4Wp9vFolWqrGs5S
-   +c4C4iFjB+4FxAxU3wYfEzQjPitanOXyx4Pzk3SrIu6NI+Mu1sBI/y1Y2
-   Me/bbO98UBZFNVIoJz41mv7C15hbyugfrN9A4bAkbL4CVegAAl1bHyId2
-   2xy5Qmlzwb3Rl4W0y/n8Hsbr2rytZdUxJrPOPOK/jvOGHp/4sKlf1t8Ls
-   y0eUgUnPhZ71joqknq9bPEfJNn7hzaG+LV5Wpdfstc4FdDPsHW0OLMbTZ
-   Q==;
+  bh=0oKgcrkZi8Q7zAmrkKmMg4EAU89Jf7N07xhOp2/GiHA=;
+  b=Y47SDJ6lsU+y3czO7ZaHKnKdMrShQicJZjpsaPedZlNLlsqUEhAk1wx7
+   jxnhrUQ7F+0AelUMnvLydIF9C7pfsOZ/EGwr8sA7oXe7x5WkMfF1xCOoJ
+   fxNaqKt231afrqiiroXU9gVYspGUxPk95z49Pkb4bPQ9P75+B+tt46f/Y
+   aGvCtAU3aHCIs6+ouAXEgP3h1php1S9P3+c0yL57HjtX0BP4726LK2pJu
+   ePyOCoomGxodWYi4zFCNiNH8YYiFFOHBl5ui+3nGEKQ4iIwmTSkUGnT+S
+   epgTxqytPUlK20/MLDL7A+BPYvRJOaVFKNqLrCnV4vAv3y9rrfZTMK37m
+   A==;
 X-CSE-ConnectionGUID: 7ioOcpSzQfuJnUZ0WQ6I1Q==
-X-CSE-MsgGUID: 1CMFdT0eRHyhGeZ9reiYPQ==
+X-CSE-MsgGUID: 6MGhBgw7Qlie2uWE/2VadQ==
 X-IronPort-AV: E=Sophos;i="6.12,210,1728975600"; 
-   d="scan'208";a="34869390"
+   d="scan'208";a="34869392"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Dec 2024 06:55:34 -0700
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Dec 2024 06:55:35 -0700
 Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
  chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 5 Dec 2024 06:55:29 -0700
+ 15.1.2507.35; Thu, 5 Dec 2024 06:55:33 -0700
 Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Thu, 5 Dec 2024 06:55:26 -0700
+ 15.1.2507.35 via Frontend Transport; Thu, 5 Dec 2024 06:55:29 -0700
 From: Daniel Machon <daniel.machon@microchip.com>
-Date: Thu, 5 Dec 2024 14:54:26 +0100
-Subject: [PATCH net 3/5] net: sparx5: fix FDMA performance issue
+Date: Thu, 5 Dec 2024 14:54:27 +0100
+Subject: [PATCH net 4/5] net: sparx5: fix default value of monitor ports
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +69,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20241205-sparx5-lan969x-misc-fixes-v1-3-575ff3d0b022@microchip.com>
+Message-ID: <20241205-sparx5-lan969x-misc-fixes-v1-4-575ff3d0b022@microchip.com>
 References: <20241205-sparx5-lan969x-misc-fixes-v1-0-575ff3d0b022@microchip.com>
 In-Reply-To: <20241205-sparx5-lan969x-misc-fixes-v1-0-575ff3d0b022@microchip.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
@@ -86,55 +86,44 @@ CC: Calvin Owens <calvin@wbinvd.org>, Muhammad Usama Anjum
 	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
 X-Mailer: b4 0.14-dev
 
-The FDMA handler is responsible for scheduling a NAPI poll, which will
-eventually fetch RX packets from the FDMA queue. Currently, the FDMA
-handler is run in a threaded context. For some reason, this kills
-performance.  Admittedly, I did not do a thorough investigation to see
-exactly what causes the issue, however, I noticed that in the other
-driver utilizing the same FDMA engine, we run the FDMA handler in hard
-IRQ context.
+When doing port mirroring, the physical port to send the frame to, is
+written to the FRMC_PORT_VAL field of the QFWD_FRAME_COPY_CFG register.
+This field is 7 bits wide on sparx5 and 6 bits wide on lan969x, and has
+a default value of 65 and 30, respectively (the number of front ports).
 
-Fix this performance issue, by  running the FDMA handler in hard IRQ
-context, not deferring any work to a thread.
+On mirror deletion, we set the default value of the monitor port to
+65 for this field, in case no more ports exists for the mirror. Needless
+to say, this will not fit the 6 bits on lan969x.
 
-Prior to this change, the RX UDP performance was:
+Fix this by correctly using the n_ports constant instead.
 
-Interval           Transfer     Bitrate         Jitter
-0.00-10.20  sec    44.6 MBytes  36.7 Mbits/sec  0.027 ms
-
-After this change, the rx UDP performance is:
-
-Interval           Transfer     Bitrate         Jitter
-0.00-9.12   sec    1.01 GBytes  953 Mbits/sec   0.020 ms
-
-Fixes: 10615907e9b5 ("net: sparx5: switchdev: adding frame DMA functionality")
+Fixes: 3f9e46347a46 ("net: sparx5: use SPX5_CONST for constants which already have a symbol")
 Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 ---
- drivers/net/ethernet/microchip/sparx5/sparx5_main.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-index 2b58fcb9422e..f61aa15beab7 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-@@ -780,12 +780,11 @@ static int sparx5_start(struct sparx5 *sparx5)
- 	err = -ENXIO;
- 	if (sparx5->fdma_irq >= 0 && is_sparx5(sparx5)) {
- 		if (GCB_CHIP_ID_REV_ID_GET(sparx5->chip_id) > 0)
--			err = devm_request_threaded_irq(sparx5->dev,
--							sparx5->fdma_irq,
--							NULL,
--							sparx5_fdma_handler,
--							IRQF_ONESHOT,
--							"sparx5-fdma", sparx5);
-+			err = devm_request_irq(sparx5->dev,
-+					       sparx5->fdma_irq,
-+					       sparx5_fdma_handler,
-+					       0,
-+					       "sparx5-fdma", sparx5);
- 		if (!err)
- 			err = sparx5_fdma_start(sparx5);
- 		if (err)
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c b/drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c
+index 9806729e9c62..76097761fa97 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c
+@@ -12,7 +12,6 @@
+ #define SPX5_MIRROR_DISABLED 0
+ #define SPX5_MIRROR_EGRESS 1
+ #define SPX5_MIRROR_INGRESS 2
+-#define SPX5_MIRROR_MONITOR_PORT_DEFAULT 65
+ #define SPX5_QFWD_MP_OFFSET 9 /* Mirror port offset in the QFWD register */
+ 
+ /* Convert from bool ingress/egress to mirror direction */
+@@ -200,7 +199,7 @@ void sparx5_mirror_del(struct sparx5_mall_entry *entry)
+ 
+ 	sparx5_mirror_monitor_set(sparx5,
+ 				  mirror_idx,
+-				  SPX5_MIRROR_MONITOR_PORT_DEFAULT);
++				  sparx5->data->consts->n_ports);
+ }
+ 
+ void sparx5_mirror_stats(struct sparx5_mall_entry *entry,
 
 -- 
 2.34.1
