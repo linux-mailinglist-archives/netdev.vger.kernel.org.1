@@ -1,132 +1,112 @@
-Return-Path: <netdev+bounces-149792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B44849E7841
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 19:43:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B75929E7858
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 19:47:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7633618868E2
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 18:43:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C000F16DA43
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 18:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD891D9359;
-	Fri,  6 Dec 2024 18:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C761FFC6D;
+	Fri,  6 Dec 2024 18:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RJ5lXDmq"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="XSXqNBol"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC13195FF0;
-	Fri,  6 Dec 2024 18:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01661D4359;
+	Fri,  6 Dec 2024 18:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733510579; cv=none; b=QDxmx34J82Jkx4i3y5YglVviV9JJT34ec1qtq584pKF//Tm1of7axoBZ2uE/U7qlAS29PJhznsW7udpn1A1zJ3TJI6C1B3sDFeAioXCuRZZ7Hne6I23fuGFnxV/NwsiAR2WkSGhp2NbjF/u5XrNsbsIVZ4e3qcuk2bCHH05G10Q=
+	t=1733510826; cv=none; b=FpLhR69v8sYt+lx1h4FR4T7JbUfLir3SKfHCYnFtgQS2lKDzHdMW6TB7x0zwlRZ8HaOwcmMf0ap7YE1grq3z+BjTcIgEykpCxc/yZB8fInHsUCI+Efn7L6vxx0ELKYejGRO32/XYzghN+yEzVcz21AaEtrceP6U2AR9Pp1fHj9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733510579; c=relaxed/simple;
-	bh=icpeG6rZXi919HAXSM1rD/h5KtAwpDPXQFR2vC1cLKk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WAKjf2okeVF+weDgyeQH0Vs8pKwseiwojodRI1tI7qNSfWmHwbGa0Pg6cKTnQGQRGHsyL5oFc09hs7lLp5I067IwueDwvakgm2lDIhtLRXetZyAeaKooet/yfK+BMY24Dot05sN3P4bkEFIUSHAXWRs1Nk+1ZksgarJpcF1F2vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RJ5lXDmq; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2eecc01b5ebso2092603a91.1;
-        Fri, 06 Dec 2024 10:42:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733510577; x=1734115377; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b2d53tzOymB0sMAyzB4RRSbvFWayMED1FyCRdpH4jKs=;
-        b=RJ5lXDmqi2rY4ETUNoIPWeexIVGg4MOSGK17X7HeB5/7VnnYflJ+mP0e2y0sg18pNv
-         ZyibKzCl1PX5Xhhi47uTQxEMrrLIrTgSEY5QHpHEErsyHsPPHRTDtAUjD8WvcPDSpcKW
-         NpnyI09xuikLj9u+AjshzAKykVxbnRs9NQXn0MPDj3nhiJLYQ0EBgxCkhj+7d4v5+sOT
-         piHI3oXIE8cDmN7DT/IR5DJKJHNkZFJWlSVhdEe8/P4pHTJMOyGALsAyjyUAe7TNEytj
-         1VMm48f48t3EYu1+WrciMI7R8NARCWfOKRve1Z+IW6mqblx69ics+p8y/BQxu7lTpkbf
-         IKRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733510577; x=1734115377;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b2d53tzOymB0sMAyzB4RRSbvFWayMED1FyCRdpH4jKs=;
-        b=UjMwtRAvOBMsb50gGn/GTUFjzq85QOka3bRtwuPpSvSYpC2QzSthAB/oc47R6lxMR1
-         QEokQbEHAAtH9uOePn4Ms8tWN7eqzeY6I7EGXn6pH/8ylHeiCPhPs2BtqC15DvWJt1Rf
-         jCIIZIibLZxoBh9dSlnpmiIFglpVxOLvL7rhh71dr1VfBwC9qtfwbFLuaxKkdILXo/jK
-         RfgwmuZCvo4vwf3TDC3dPl+Uw7N10jpNakngTYjcuNRo6ajAHyzRtCaJKUd69zTZVIdu
-         jNu+pFUK6uxstQwcfus0NwZVsSxEJCrbr8Zj7RKSCkIiPaqNnaGS1IK6BmxhL3hgVdXr
-         CEnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVpAt/UyMEgBGegEmFspGvaj0gqOMF17TiG5jsPBQyPYtf8yzgh2FbuRc8RPavQWYuCh8Gz16pF@vger.kernel.org, AJvYcCVrpjvGKAHsszOxkkbt2OT1fKqf8xe9oP1wkNo4La743gIxx7JCvs2YdQeOlqMaqKePctQ=@vger.kernel.org, AJvYcCX6rwcrZ8ikEzfKTtcWa65cx1b8Mz0i+P2ueStT6dN/L4b7XUUbwEWYY24wF2Ors46/3zdXMG2joJLSTp3P@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4cZoR8s8Lzl74KqaHiAbjQGpAb2TigJLGisesozXRHIsjhVXZ
-	dLdlUBcfYgBH0bUSc/GQamevV4roB25LHguSpyVulOp7yxvvZaf1kW9K7B6hXY7qoL9hRBvOiwp
-	K+Eh6KvNNwUB6GfwQE7g//hlefxU=
-X-Gm-Gg: ASbGncuXDmamutapYsSOVx3PtoVJM2Cm452zXKf1NPO7YuuRQ8P8e2N/FDVC8CgxcLL
-	UPur/XjCDr1Zayzh25XMgE2QSpyO2hH/JwBNbqcIiZXR+orc=
-X-Google-Smtp-Source: AGHT+IHJsYAFQYMbWI7hn6EpMZ+O9odRsbqsvX09MOzFQuhCR/3Uq6XwUqsr0upKweJVXpYxZIhkD2/+ILrgk/811Go=
-X-Received: by 2002:a17:90b:4fcd:b0:2ea:3d2e:a0d7 with SMTP id
- 98e67ed59e1d1-2ef69e154e1mr7173941a91.15.1733510577232; Fri, 06 Dec 2024
- 10:42:57 -0800 (PST)
+	s=arc-20240116; t=1733510826; c=relaxed/simple;
+	bh=KownpJjuhG1Vzre4NX9kPtuNAnHdGmVtan08w5kfTxI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XrLW9GToGQJuNW60+NM1yiDvo7uJsI9v58HgK+2M5Kr49+HCghgZke86SylyRfj/QPv55vlyM+kQS28a5/76tH9C03jiAMP2ZYm6xoSEEBahl5nXcmRT/NAgkwhEbSNN9HfJSPVrzTrZubmtxVpoW6p2LekKQoEGqCi7polvz1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=XSXqNBol; arc=none smtp.client-ip=212.227.15.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1733510812; x=1734115612; i=wahrenst@gmx.net;
+	bh=XuarqVQ6ECgriRQe74xwJU1j0fNdYk9PZcUyFe4MIHk=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:
+	 MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=XSXqNBol+DbQXU12yB4BR1QfygMIyV3Z2p1KZNaohniia/NXwDIcFy9tkXD7b2UJ
+	 ChbbjD4TPiCgqm2AJDRffJt7M+kKmN1v9nF6BWSiQZbc/jpVlm+csyVhrHYDljrIS
+	 r8NhPcj0M0cttDoKed3UAoc/cmCn6bC6llcUpY5qjGY6+GTNrmM9zrQAj4C9vuQF/
+	 jLT0YBogVlhVdS0C9Daz6msoIMC+7i07XvZkrljGK5LKkyWrGFkwIA/2mlLqE5tTP
+	 haoxrTRMd0jqSIda2F4IRRwKjXSLRcbTdlpeFpJpFbeStG698hDO0mVS0tGAI0/1i
+	 ZRz8MTDJobnCseZOzQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from stefanw-SCHENKER ([37.4.251.153]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MfHEP-1tpy5f1PkR-00qgEv; Fri, 06
+ Dec 2024 19:46:52 +0100
+From: Stefan Wahren <wahrenst@gmx.net>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: chf.fritz@googlemail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: [PATCH V2 net 0/2] qca_spi: Fix SPI specific issues
+Date: Fri,  6 Dec 2024 19:46:41 +0100
+Message-Id: <20241206184643.123399-1-wahrenst@gmx.net>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241206023046.2539-1-liujing@cmss.chinamobile.com>
-In-Reply-To: <20241206023046.2539-1-liujing@cmss.chinamobile.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 6 Dec 2024 10:42:45 -0800
-Message-ID: <CAEf4Bzaxp5c9SpUO_aecpPeXqUEy4JwQzqWyKHpY36PtvXKkNw@mail.gmail.com>
-Subject: Re: [PATCH] samples/bpf: Modify the incorrect format specifier
-To: liujing <liujing@cmss.chinamobile.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, 
-	hawk@kernel.org, john.fastabend@gmail.com, andrii@kernel.org, 
-	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:hib0uNNzpZ4WsqhgVQ7cqQ9iGPWOxFR9bBWHOmiIgsRBjPis/UX
+ O43azoGadi0jB4kXw3+RYojCn9/k5RHjxFG5X3bKgmKrILCxfrgYKtQuXOAjrPc89crVZXB
+ qmhOfRPPdgs7vpE0Zy1jP+zNBrNHZ/uxqVW/X5aNnJ67dTrFIxTwV3oeIPQI5xLjexHfIdH
+ Y00GmKYNjBoizAzv4r2mA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:GAFB2MpxR7g=;Kd24l2kvRNSWmRpZiHhtNDnnhz+
+ lqtn2oHs6SVVcuqMhwIhYnMiI3htQCJzvNU5AHBUg/vghHNYxaJVrlUdfM/sb8d/x+FRA10+2
+ ByAXn05KxIbwOcJ3/dp0TOhOQLvP42ntOYnP0S28OoZdD3DVbVW30+D6ywdFyfSL5yIBCjrlC
+ zr+0TJUwP4wrTmDSirSnuirWo3PLB4EBszQ7SsG9lMzSkzq2x7Ro5FfjeWKFxJxmi97Bl6wGm
+ 8/BzZC95VXCB5zSvDV9HkdNn5dortVzlRdPlOfiifpXZSCE2KbQsZlVRJMbCYT7j5O8JgSsRQ
+ sPfcNZjnG7ss3ZA0H5VghEYbLHy/AWYumwovjY5hZNAk9J38tqALSvKks9u+gU3xlGs7mSlc3
+ D0E13uoy23yCW9sNA3e0z+r4U2HH+6+X3sBThg6PI3G2ApnlS6lmABaKqdH8zGe5nMzXPZuln
+ blw79FQCXP23bdSTHhbQoWTUTaYgBl8mhD6/oYwo5Sbl2ADw31QnjeywxWQzD6hISFY3xbvS5
+ ZAh0zTdxC4W4TJVc4SLG68ePWlAAXLGIHVWRzMkOP60zTnz0r1NHnSEeBgLsBVp3lMu7KTacA
+ YaQbG7yfnXGnpVQCE8i0bQZJAZaMIi8edN5jwi2pFJ8q9evHme/XeYF49X0+iVomx3e6wXY7i
+ YjKB4KlhhcMi4bkOPK5hF5sqYkwZvhY8d7QtilTe4Gmbusw7HXRskZLPw+61+SFiy3zdbQl5T
+ v6huM84Hllykonf5B0d0FL8kYQI9BMhHjj6bhXbJcMLGl9JY4buiAHOPNbLSyQbn7pDB5MNOv
+ uChCLpUGE2UDu0nWXehQ1+zJMtuMCvGZ5dsbJe0OtDLpzzUQWkU43mXF1j/IXiWdI+2R7bVAd
+ YlqfQSOtdekTTdj3ghUxyOb7c14hesOXJmCKPrxYnghfSQX46ClP/jBvH0oFfIP7goqhokalM
+ DFg7RHdvjIaxi5hdDXCrHI1yhauuMdya3DvlsYbI8kJCJDOQswrQ79b9eXWwq5NQORml5osLr
+ /c13RcXWdPHUDQEW//eOUULel+AfYWjquB6Nf8tiYlA+V4ZIod31YSe3slPCZJRosXIfTqoby
+ kCML8vGTgtre0tJVfjA7VfGm4RKm9f
 
-On Thu, Dec 5, 2024 at 6:31=E2=80=AFPM liujing <liujing@cmss.chinamobile.co=
-m> wrote:
->
-> Replace %d with %u in snprintf() because it is "unsigned int".
+This small series address two annoying SPI specific issues of
+the qca_spi driver.
 
-The code change is fine, but the explanation is ambiguous and hard to
-follow. Just mention that we are printing integers, so we need %d
-instead of %u for snprintf. As you wrote it above, it reads as if we
-are printing unsigned int, yet code contradicts that.
+Changes in V2:
+- drop member clkspeed from struct qcaspi as suggested by Jakub Kicinski
+- add new patch "Make driver probing reliable"
 
-pw-bot: cr
+Stefan Wahren (2):
+  qca_spi: Fix clock speed for multiple QCA7000
+  qca_spi: Make driver probing reliable
 
->
-> Signed-off-by: liujing <liujing@cmss.chinamobile.com>
->
-> diff --git a/samples/bpf/xdp_router_ipv4_user.c b/samples/bpf/xdp_router_=
-ipv4_user.c
-> index 266fdd0b025d..3fc1d37fee7c 100644
-> --- a/samples/bpf/xdp_router_ipv4_user.c
-> +++ b/samples/bpf/xdp_router_ipv4_user.c
-> @@ -134,11 +134,11 @@ static void read_route(struct nlmsghdr *nh, int nll=
-)
->                                         *((__be32 *)RTA_DATA(rt_attr)));
->                                 break;
->                         case RTA_OIF:
-> -                               sprintf(ifs, "%u",
-> +                               sprintf(ifs, "%d",
->                                         *((int *)RTA_DATA(rt_attr)));
->                                 break;
->                         case RTA_METRICS:
-> -                               sprintf(metrics, "%u",
-> +                               sprintf(metrics, "%d",
->                                         *((int *)RTA_DATA(rt_attr)));
->                         default:
->                                 break;
-> --
-> 2.27.0
->
->
->
+ drivers/net/ethernet/qualcomm/qca_spi.c | 26 +++++++++++--------------
+ drivers/net/ethernet/qualcomm/qca_spi.h |  1 -
+ 2 files changed, 11 insertions(+), 16 deletions(-)
+
+=2D-
+2.34.1
+
 
