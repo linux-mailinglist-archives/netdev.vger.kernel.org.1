@@ -1,78 +1,77 @@
-Return-Path: <netdev+bounces-149723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B29C69E6EF2
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 14:09:53 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBB139E6F0E
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 14:14:56 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C2E4281C06
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 13:09:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17357168AE0
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 13:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62F9B206F35;
-	Fri,  6 Dec 2024 13:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6999A207641;
+	Fri,  6 Dec 2024 13:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="fKOSxBX5"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="HTvnwFZR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C671EE02E
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 13:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E86207654
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 13:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733490580; cv=none; b=lqFWuiOImlrth9c1iE/aEcbP7P7tBCI124TjgTuZW5vfWFSludQBRNi7Hy2tsioq15SlrRbPRaP1/H644dxG7SVGU6HXkTDZWlu833caSVJKge3LsQVrMJXCjpVCN4mFy1BOyjp7+tUflNAgUwc4sVOSf70q38TxAGsmJx8dHYc=
+	t=1733490584; cv=none; b=ZxwZmTBdptWaJmN7ghIwbuaOdEV5coCHIvZ6P+IvUv3ATE4g9gO2qp0MTT7umfel79e7zwrZ9oEQptxF/nxuEB2rUuqxSRkMRwZ6wBN6Y6li9Dvhz5iP0UdQ7iOvbZyikX+U1ITqXO4lPhi7TboQnJolgJ8laptUP56Nd6+SOEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733490580; c=relaxed/simple;
-	bh=FKO1yTpCxcxBhtBAips3l/holB9+UDZ+2V1hv302F1g=;
+	s=arc-20240116; t=1733490584; c=relaxed/simple;
+	bh=hGRahh+MmHr3pi2zSs+l8nFA1RB34OaWlfrzTP+9vTk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BH3nWoDytIs6Y4Tv2fhxcM6SddwzPd2iCjxg5nI6YJjWJcjpoSVSYuqjaxqTl3lJMS5Crj6xATWwZ0reZBJdcGcTneaxzjJOjbA0uFRmW+SdwLXpqDmGjP1EjoxFiUVlslNH8AaupInVIqHN+Ht6UhoUux8magoRzaTCaH6XsCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=fKOSxBX5; arc=none smtp.client-ip=209.85.208.169
+	 MIME-Version; b=Ki7XWbIfJDlwhACLr2HMVs6DLd8lGmNvJzNed8o/fDsIOBpVsVaHR7o/TxHi6UZJ/7FPx0sUO4KYvmFrNo474gd27VQxACZnXUbgCT2w2AyvVEB6q50rxAIqpQrmy/Z6QKBkVWyH9p/k38Syg5W5wxr7WTDHFensmzj3FeZ+y8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=HTvnwFZR; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ffc80318c9so17648151fa.2
-        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 05:09:38 -0800 (PST)
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2ffc76368c6so18862161fa.0
+        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 05:09:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1733490576; x=1734095376; darn=vger.kernel.org;
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1733490580; x=1734095380; darn=vger.kernel.org;
         h=content-transfer-encoding:organization:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=qCZZqWJYXyTrAZAPIAwDCKjjcnwn+ysQvEOzOvXeE28=;
-        b=fKOSxBX5aVlFdpfxn20ognKyC3mtKbDrzyZr59vKRLCzFZslnmkSwNX3IQElR0NquX
-         Z8qB+yyucMYg1WSG5aD9ob8cCwvxsFBDcaG1SVOFpFGpATqRhmF2OE3J3Lvgm28NAxRF
-         oTcAnJiVcnmo0jbpbl80X8Zq5rfjgAiQawpU56TOC3ax7xfPQeMlQL8s/7h6SQVLw2OW
-         pU4+rHjDrrQ27z3Ujg/aD7rKB+isgiVNgsMPWd10F9MtYs/IUV4SabGmd2tsMf3rb1jV
-         ILeOuKL7UO0b4DcIeOsZvVVcpnWI4+kpVzNhESysWd/WDLXB5LlwlrPGVyJc1ap8/5sx
-         21vQ==
+        bh=6Gg3jMAkj0630p11Re7U3Vu4L1SZj1y7XR1d9VO0IIE=;
+        b=HTvnwFZRA8ecVSTjEgkrCmsuVTy0vFpqrnybGc38HkGoF5oNbxzUraODLgPkJVautq
+         IC1lAwhrSEawCi4Ah797ZyUHtnroufLqpzuvpi9XY0RsrVfVsa+RtzP2PXYRXo0NcfW+
+         Qqsms52NyFWxlsNj1m2BEVNGxkpUGiYVWKyMLjgWpILb4nJ5hu+nGBjuaeo/wfpDAaj+
+         hbpo15Tr0lVka+muUGfrlMaPjTAD1J1XKmCPwOWiHoNrnr/B4i2Jf21YItUahQmYtBD9
+         2BgJeeJbN4qpsVKV4XiJtx3tlTeee+s4251bvjSzOT2Kr77P2hb0100S1ViBekKCcHRd
+         2Blg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733490576; x=1734095376;
+        d=1e100.net; s=20230601; t=1733490580; x=1734095380;
         h=content-transfer-encoding:organization:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=qCZZqWJYXyTrAZAPIAwDCKjjcnwn+ysQvEOzOvXeE28=;
-        b=J/Tz72ovKGGzq7DBaJrifkSCwFHFmcQifZhiMHgv+a88Tmqei8uUl7YJZi6QnVy3H7
-         ZhFywGXIIgTGcwXU/Si93+JMD4tu9YnE/gr8SdXjw+tsj1BA1O4aNZ63xgDSS4p0xzCH
-         FAkEH41jCI8JfXRXIGCMhEc2usSeeES2fQ1lxv2HOKP2acQzYh1AAVDjR4yh01sZRpnj
-         q+Rf01SxGFP3Kds+HaRxR7+bf8F7Pj6hlyDz2eMLAr2b4Fr/DBrNPri1hdmz+cI6d8yZ
-         j4tgr4dg3Vzy0aDxsBInsBCXPnoRPam/fFx+sRgaXYQKVm4dP0EuU2LuT4kYo95hZZTZ
-         Nrug==
-X-Forwarded-Encrypted: i=1; AJvYcCVwO6IlewNSbcuAShsEJheFBpaKdqwmgzxWEB+b8aea4EysHf+tokpbBjrLsPPjrjnDx5d1pCY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzaoj0iVsp0DZoCKNwh0I5GbfGH2YG1q7e7PL//aaWQVnzmllhG
-	ULwWD2ZGZLbyP5KxHzJebTbXnmLJid7ncLZhW52O4Toa7OKZ7efjGNo6p3hmJ5afousVVgcJjNe
-	b
-X-Gm-Gg: ASbGnctCZXNHv6qqJ9GF98TXb64ex1v4KE7qGFz3VaO/SwPHoAO3hesOGjTGHlJyGls
-	1rMtJUuCgyn4afDO5yhnqObVrGolfHqnuFCe+21lW2CeijbC+9vQvHQU3Y+rxUDwdn/VbGJw6EE
-	Os4agVXr+rNrvFQxWKzsdKYcFL3ADBoiM91ej3Z48FCCpUvqbYJpagcdgDtyC5LxJQpkSYln7hB
-	I1iM8nfJ5uY2KML+P5gb/M246goFKQkXAvYqmwAH8OIyUglAAluJo0LfdrgmUYtGOWEBau0qYS7
-	kmsNhxQ00g==
-X-Google-Smtp-Source: AGHT+IGq4fxmo1GEb+TViIER5G0ld3v0DW/rLfop51z2NEWIAHSR9rhipecNsBEutje7Yd3XFLpd/A==
-X-Received: by 2002:a05:651c:505:b0:300:1cdb:6652 with SMTP id 38308e7fff4ca-3002fcec2a4mr8356021fa.31.1733490576419;
-        Fri, 06 Dec 2024 05:09:36 -0800 (PST)
+        bh=6Gg3jMAkj0630p11Re7U3Vu4L1SZj1y7XR1d9VO0IIE=;
+        b=bTOJIiDwiSWLxXFx4R9+HsQdf9NAo78eZL91+dyKqNac9dUJG1RaCmz7tciZvIe262
+         oF04ccbcvVFCCmZlYtWh8HKQ3k6GC9eCZD4xO3JJZNX8A/qOULuVokCHpOAbtxvKjzwc
+         RIxO8r02yqPevPBRG0a3HmM8NfUBlsygW27OXRcDztNP95oBb+YK9N8s9xzSJwZN9dzs
+         r8EXpAIbouJDovtizBgbV8aCcYsffvD0z2qbphFgA7hD7riMAg5f5kqsXFGwidzvjsfI
+         nGTB6G2ZV9DxTIOLoyjX0KUvtayBh6J7SPkFS4Cec3RxmNP1Uhm+cPw5w5gnz4BBPQFo
+         pi4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWE3/7+uUg/dTvGaM244p3KWgc+AI1WJL+H2/aN4qULt8Uf6t8If+cCDlpBLoD58cRszgptmE8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwglFyVUt5i7cUDhA3t1UUCie5BZqbtVOCrEu54z+E95RhVWaVe
+	116lie0pIzmFUVY6mZxiV18LEZTXZc17HkQm/sLZLqeQGbmp+OaYfMroLRdj5rk=
+X-Gm-Gg: ASbGncuuzmdGUmuRhqk8VRu1JdoACf3v4s6dJDR1OR610+x6zQWCfSiwqm1Tzw5mdh3
+	FUhK9tNx//VP85+HB6GxzV6A4ydDD/anHMHQX63oQjdPcd/FtVVJGoCmvlJ0KNbhLXgKVdjkF9E
+	GSV9tvnLAWcaMAViGqQvsu/1C5yHkCGk8CKJse1/uodnsX/X0mEWk5xMhMKH1JHQismb0laDlW0
+	s0NIjoWmm5lelMtEIRNq6mvhW/Kdm+WBl0q2LyhwGZNO43VxyZs1ofUCNgpv428eFQzEVolSVLz
+	WWOORiOpHg==
+X-Google-Smtp-Source: AGHT+IEFHpPPM1Wx3A6WdEo1T1OpnseTHYVgTATXBJCK48hAGL7QSzQehwcTYFOmDUyqoFBIEY5+hQ==
+X-Received: by 2002:a2e:b88c:0:b0:300:3a15:8f2d with SMTP id 38308e7fff4ca-3003a159340mr3885451fa.34.1733490579685;
+        Fri, 06 Dec 2024 05:09:39 -0800 (PST)
 Received: from wkz-x13.. (h-176-10-159-15.NA.cust.bahnhof.se. [176.10.159.15])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30020e21704sm4527401fa.90.2024.12.06.05.09.33
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30020e21704sm4527401fa.90.2024.12.06.05.09.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Dec 2024 05:09:34 -0800 (PST)
+        Fri, 06 Dec 2024 05:09:38 -0800 (PST)
 From: Tobias Waldekranz <tobias@waldekranz.com>
 To: davem@davemloft.net,
 	kuba@kernel.org
@@ -82,9 +81,9 @@ Cc: andrew@lunn.ch,
 	netdev@vger.kernel.org,
 	linux@armlinux.org.uk,
 	chris.packham@alliedtelesis.co.nz
-Subject: [PATCH net 2/4] net: dsa: mv88e6xxx: Give chips more time to activate their PPUs
-Date: Fri,  6 Dec 2024 14:07:34 +0100
-Message-ID: <20241206130824.3784213-3-tobias@waldekranz.com>
+Subject: [PATCH net 3/4] net: dsa: mv88e6xxx: Never force link on in-band managed MACs
+Date: Fri,  6 Dec 2024 14:07:35 +0100
+Message-ID: <20241206130824.3784213-4-tobias@waldekranz.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241206130824.3784213-1-tobias@waldekranz.com>
 References: <20241206130824.3784213-1-tobias@waldekranz.com>
@@ -97,77 +96,340 @@ MIME-Version: 1.0
 Organization: Addiva Elektronik
 Content-Transfer-Encoding: 8bit
 
-In a daisy-chain of three 6393X devices, delays of up to 750ms are
-sometimes observed before completion of PPU initialization (Global 1,
-register 0, bit 15) is signaled. Therefore, allow chips more time
-before giving up.
+NOTE: This issue was addressed in the referenced commit, but a
+conservative approach was chosen, where only 6095, 6097 and 6185 got
+the fix.
 
+Before the referenced commit, in the following setup, when the PHY
+detected loss of link on the MDI, mv88e6xxx would force the MAC
+down. If the MDI-side link was then re-established later on, there was
+no longer any MII link over which the PHY could communicate that
+information back to the MAC.
+
+        .-SGMII/USXGMII
+        |
+.-----. v .-----.   .--------------.
+| MAC +---+ PHY +---+ MDI (Cu/SFP) |
+'-----'   '-----'   '--------------'
+
+Since this a generic problem on all MACs connected to a SERDES - which
+is the only time when in-band-status is used - move all chips to a
+common mv88e6xxx_port_sync_link() implementation which avoids forcing
+links on _all_ in-band managed ports.
+
+Fixes: 4efe76629036 ("net: dsa: mv88e6xxx: Don't force link when using in-band-status")
 Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c    |  4 ++--
- drivers/net/dsa/mv88e6xxx/chip.h    |  2 ++
- drivers/net/dsa/mv88e6xxx/global1.c | 19 ++++++++++++++++++-
- 3 files changed, 22 insertions(+), 3 deletions(-)
+ drivers/net/dsa/mv88e6xxx/chip.c | 35 +++-----------------------------
+ drivers/net/dsa/mv88e6xxx/chip.h |  4 ----
+ drivers/net/dsa/mv88e6xxx/port.c | 17 ----------------
+ drivers/net/dsa/mv88e6xxx/port.h |  1 -
+ 4 files changed, 3 insertions(+), 54 deletions(-)
 
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 16fc9a21dc59..20cd25fb4b75 100644
+index 20cd25fb4b75..13a97e6314ed 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.c
 +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -145,8 +145,8 @@ int mv88e6xxx_wait_mask(struct mv88e6xxx_chip *chip, int addr, int reg,
- 	return err;
- }
+@@ -1013,8 +1013,8 @@ static void mv88e6xxx_mac_link_down(struct phylink_config *config,
+ 	 * updated by the switch or if we are using fixed-link mode.
+ 	 */
+ 	if ((!mv88e6xxx_port_ppu_updates(chip, port) ||
+-	     mode == MLO_AN_FIXED) && ops->port_sync_link)
+-		err = ops->port_sync_link(chip, port, mode, false);
++	     mode == MLO_AN_FIXED))
++		err = mv88e6xxx_port_sync_link(chip, port, mode, false);
  
--static int _mv88e6xxx_wait_bit(struct mv88e6xxx_chip *chip, int addr, int reg,
--			       int bit, int val, u16 *last)
-+int _mv88e6xxx_wait_bit(struct mv88e6xxx_chip *chip, int addr, int reg,
-+			int bit, int val, u16 *last)
- {
- 	return _mv88e6xxx_wait_mask(chip, addr, reg, BIT(bit),
- 				   val ? BIT(bit) : 0x0000, last);
+ 	if (!err && ops->port_set_speed_duplex)
+ 		err = ops->port_set_speed_duplex(chip, port, SPEED_UNFORCED,
+@@ -1054,8 +1054,7 @@ static void mv88e6xxx_mac_link_up(struct phylink_config *config,
+ 				goto error;
+ 		}
+ 
+-		if (ops->port_sync_link)
+-			err = ops->port_sync_link(chip, port, mode, true);
++		err = mv88e6xxx_port_sync_link(chip, port, mode, true);
+ 	}
+ error:
+ 	mv88e6xxx_reg_unlock(chip);
+@@ -4219,7 +4218,6 @@ static const struct mv88e6xxx_ops mv88e6085_ops = {
+ 	.phy_read = mv88e6185_phy_ppu_read,
+ 	.phy_write = mv88e6185_phy_ppu_write,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+ 	.port_set_policy = mv88e6352_port_set_policy,
+@@ -4263,7 +4261,6 @@ static const struct mv88e6xxx_ops mv88e6095_ops = {
+ 	.phy_read = mv88e6185_phy_ppu_read,
+ 	.phy_write = mv88e6185_phy_ppu_write,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6185_port_sync_link,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_set_frame_mode = mv88e6085_port_set_frame_mode,
+ 	.port_set_ucast_flood = mv88e6185_port_set_forward_unknown,
+@@ -4298,7 +4295,6 @@ static const struct mv88e6xxx_ops mv88e6097_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6185_port_sync_link,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+ 	.port_set_policy = mv88e6352_port_set_policy,
+@@ -4345,7 +4341,6 @@ static const struct mv88e6xxx_ops mv88e6123_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_set_frame_mode = mv88e6085_port_set_frame_mode,
+ 	.port_set_ucast_flood = mv88e6352_port_set_ucast_flood,
+@@ -4383,7 +4378,6 @@ static const struct mv88e6xxx_ops mv88e6131_ops = {
+ 	.phy_read = mv88e6185_phy_ppu_read,
+ 	.phy_write = mv88e6185_phy_ppu_write,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+ 	.port_set_frame_mode = mv88e6351_port_set_frame_mode,
+@@ -4428,7 +4422,6 @@ static const struct mv88e6xxx_ops mv88e6141_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6341_port_set_speed_duplex,
+ 	.port_max_speed_mode = mv88e6341_port_max_speed_mode,
+@@ -4489,7 +4482,6 @@ static const struct mv88e6xxx_ops mv88e6161_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+ 	.port_set_policy = mv88e6352_port_set_policy,
+@@ -4535,7 +4527,6 @@ static const struct mv88e6xxx_ops mv88e6165_ops = {
+ 	.phy_read = mv88e6165_phy_read,
+ 	.phy_write = mv88e6165_phy_write,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_disable_learn_limit = mv88e6xxx_port_disable_learn_limit,
+ 	.port_disable_pri_override = mv88e6xxx_port_disable_pri_override,
+@@ -4574,7 +4565,6 @@ static const struct mv88e6xxx_ops mv88e6171_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6352_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+@@ -4622,7 +4612,6 @@ static const struct mv88e6xxx_ops mv88e6172_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6352_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6352_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+@@ -4677,7 +4666,6 @@ static const struct mv88e6xxx_ops mv88e6175_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6352_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+@@ -4725,7 +4713,6 @@ static const struct mv88e6xxx_ops mv88e6176_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6352_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6352_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+@@ -4779,7 +4766,6 @@ static const struct mv88e6xxx_ops mv88e6185_ops = {
+ 	.phy_read = mv88e6185_phy_ppu_read,
+ 	.phy_write = mv88e6185_phy_ppu_write,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6185_port_sync_link,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_set_frame_mode = mv88e6085_port_set_frame_mode,
+ 	.port_set_ucast_flood = mv88e6185_port_set_forward_unknown,
+@@ -4821,7 +4807,6 @@ static const struct mv88e6xxx_ops mv88e6190_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6390_port_set_speed_duplex,
+ 	.port_max_speed_mode = mv88e6390_port_max_speed_mode,
+@@ -4881,7 +4866,6 @@ static const struct mv88e6xxx_ops mv88e6190x_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6390x_port_set_speed_duplex,
+ 	.port_max_speed_mode = mv88e6390x_port_max_speed_mode,
+@@ -4941,7 +4925,6 @@ static const struct mv88e6xxx_ops mv88e6191_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6390_port_set_speed_duplex,
+ 	.port_max_speed_mode = mv88e6390_port_max_speed_mode,
+@@ -5001,7 +4984,6 @@ static const struct mv88e6xxx_ops mv88e6240_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6352_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6352_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+@@ -5062,7 +5044,6 @@ static const struct mv88e6xxx_ops mv88e6250_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6352_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6250_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+@@ -5106,7 +5087,6 @@ static const struct mv88e6xxx_ops mv88e6290_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6390_port_set_speed_duplex,
+ 	.port_max_speed_mode = mv88e6390_port_max_speed_mode,
+@@ -5168,7 +5148,6 @@ static const struct mv88e6xxx_ops mv88e6320_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6320_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+@@ -5217,7 +5196,6 @@ static const struct mv88e6xxx_ops mv88e6321_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6320_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+@@ -5265,7 +5243,6 @@ static const struct mv88e6xxx_ops mv88e6341_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6341_port_set_speed_duplex,
+ 	.port_max_speed_mode = mv88e6341_port_max_speed_mode,
+@@ -5328,7 +5305,6 @@ static const struct mv88e6xxx_ops mv88e6350_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6352_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+@@ -5374,7 +5350,6 @@ static const struct mv88e6xxx_ops mv88e6351_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6352_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6185_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+@@ -5424,7 +5399,6 @@ static const struct mv88e6xxx_ops mv88e6352_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6352_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6352_port_set_speed_duplex,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+@@ -5487,7 +5461,6 @@ static const struct mv88e6xxx_ops mv88e6390_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6390_port_set_speed_duplex,
+ 	.port_max_speed_mode = mv88e6390_port_max_speed_mode,
+@@ -5551,7 +5524,6 @@ static const struct mv88e6xxx_ops mv88e6390x_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6390x_port_set_speed_duplex,
+ 	.port_max_speed_mode = mv88e6390x_port_max_speed_mode,
+@@ -5614,7 +5586,6 @@ static const struct mv88e6xxx_ops mv88e6393x_ops = {
+ 	.phy_read_c45 = mv88e6xxx_g2_smi_phy_read_c45,
+ 	.phy_write_c45 = mv88e6xxx_g2_smi_phy_write_c45,
+ 	.port_set_link = mv88e6xxx_port_set_link,
+-	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6393x_port_set_speed_duplex,
+ 	.port_max_speed_mode = mv88e6393x_port_max_speed_mode,
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index 9fe8e8a7856b..dfdb0380e664 100644
+index dfdb0380e664..23a9466aa01d 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.h
 +++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -824,6 +824,8 @@ int mv88e6xxx_read(struct mv88e6xxx_chip *chip, int addr, int reg, u16 *val);
- int mv88e6xxx_write(struct mv88e6xxx_chip *chip, int addr, int reg, u16 val);
- int mv88e6xxx_wait_mask(struct mv88e6xxx_chip *chip, int addr, int reg,
- 			u16 mask, u16 val);
-+int _mv88e6xxx_wait_bit(struct mv88e6xxx_chip *chip, int addr, int reg,
-+			int bit, int val, u16 *last);
- int mv88e6xxx_wait_bit(struct mv88e6xxx_chip *chip, int addr, int reg,
- 		       int bit, int val);
- struct mii_bus *mv88e6xxx_default_mdio_bus(struct mv88e6xxx_chip *chip);
-diff --git a/drivers/net/dsa/mv88e6xxx/global1.c b/drivers/net/dsa/mv88e6xxx/global1.c
-index 9820cd596757..27e98e729563 100644
---- a/drivers/net/dsa/mv88e6xxx/global1.c
-+++ b/drivers/net/dsa/mv88e6xxx/global1.c
-@@ -60,8 +60,25 @@ static int mv88e6185_g1_wait_ppu_polling(struct mv88e6xxx_chip *chip)
- static int mv88e6352_g1_wait_ppu_polling(struct mv88e6xxx_chip *chip)
- {
- 	int bit = __bf_shf(MV88E6352_G1_STS_PPU_STATE);
-+	int err, i;
+@@ -525,10 +525,6 @@ struct mv88e6xxx_ops {
+ 	 */
+ 	int (*port_set_link)(struct mv88e6xxx_chip *chip, int port, int link);
  
--	return mv88e6xxx_g1_wait_bit(chip, MV88E6XXX_G1_STS, bit, 1);
-+	for (i = 0; i < 20; i++) {
-+		err = _mv88e6xxx_wait_bit(chip, chip->info->global1_addr,
-+					  MV88E6XXX_G1_STS, bit, 1, NULL);
-+		if (err != -ETIMEDOUT)
-+			break;
-+	}
-+
-+	if (err) {
-+		dev_err(chip->dev, "PPU did not come online: %d\n", err);
-+		return err;
-+	}
-+
-+	if (i)
-+		dev_warn(chip->dev,
-+			 "PPU was slow to come online, retried %d times\n", i);
-+
-+	return 0;
- }
+-	/* Synchronise the port link state with that of the SERDES
+-	 */
+-	int (*port_sync_link)(struct mv88e6xxx_chip *chip, int port, unsigned int mode, bool isup);
+-
+ #define PAUSE_ON		1
+ #define PAUSE_OFF		0
  
- static int mv88e6xxx_g1_wait_init_ready(struct mv88e6xxx_chip *chip)
+diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
+index dc777ddce1f3..56ed2f57fef8 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.c
++++ b/drivers/net/dsa/mv88e6xxx/port.c
+@@ -187,23 +187,6 @@ int mv88e6xxx_port_sync_link(struct mv88e6xxx_chip *chip, int port, unsigned int
+ 	int err = 0;
+ 	int link;
+ 
+-	if (isup)
+-		link = LINK_FORCED_UP;
+-	else
+-		link = LINK_FORCED_DOWN;
+-
+-	if (ops->port_set_link)
+-		err = ops->port_set_link(chip, port, link);
+-
+-	return err;
+-}
+-
+-int mv88e6185_port_sync_link(struct mv88e6xxx_chip *chip, int port, unsigned int mode, bool isup)
+-{
+-	const struct mv88e6xxx_ops *ops = chip->info->ops;
+-	int err = 0;
+-	int link;
+-
+ 	if (mode == MLO_AN_INBAND)
+ 		link = LINK_UNFORCED;
+ 	else if (isup)
+diff --git a/drivers/net/dsa/mv88e6xxx/port.h b/drivers/net/dsa/mv88e6xxx/port.h
+index c1d2f99efb1c..26452e0a8448 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.h
++++ b/drivers/net/dsa/mv88e6xxx/port.h
+@@ -484,7 +484,6 @@ int mv88e6390_port_set_rgmii_delay(struct mv88e6xxx_chip *chip, int port,
+ int mv88e6xxx_port_set_link(struct mv88e6xxx_chip *chip, int port, int link);
+ 
+ int mv88e6xxx_port_sync_link(struct mv88e6xxx_chip *chip, int port, unsigned int mode, bool isup);
+-int mv88e6185_port_sync_link(struct mv88e6xxx_chip *chip, int port, unsigned int mode, bool isup);
+ 
+ int mv88e6185_port_set_speed_duplex(struct mv88e6xxx_chip *chip, int port,
+ 				    int speed, int duplex);
 -- 
 2.43.0
 
