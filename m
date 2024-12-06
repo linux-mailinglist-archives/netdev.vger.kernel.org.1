@@ -1,169 +1,207 @@
-Return-Path: <netdev+bounces-149815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E8599E79D0
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 21:07:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A679E79E1
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 21:13:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93DD316BB8A
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 20:06:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4006A16C8E1
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 20:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481E61FFC7C;
-	Fri,  6 Dec 2024 20:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20CCB1D90BD;
+	Fri,  6 Dec 2024 20:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b="CWCIrYfm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m1oB/ZI0"
 X-Original-To: netdev@vger.kernel.org
-Received: from bout3.ijzerbout.nl (bout3.ijzerbout.nl [136.144.140.114])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFA411C5490;
-	Fri,  6 Dec 2024 20:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.144.140.114
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E95D1C5490;
+	Fri,  6 Dec 2024 20:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733515559; cv=none; b=fezHinubyyXaRNDAO8BbAGnuIcP4VWje2ZigeQamOX61v5L/NiYSdePPycJ/7YeTa5Hgn0ftBJ0RZDsLbYLj6h3Sec5QNwUE4Khrbg1g2kKkQtri2ENFgigjJEGWNVupJvcbKzZVztqLZnCFrZvT7jmInNvs/HBlaO0/ffGw+L4=
+	t=1733515994; cv=none; b=IJRfdC8+hn2dkpKx8foKIfaJj0/ruaS4naC3/vRitlRurPrPhgRDwbLqA2whyhddp3I98zsflCY4LhooHURzh6f8smIuMww/YBQR07RHTzBlvAD32HTUuyO6Xvr2nR8qKwmIM1YhqGDSwCDxJSX1fZCRlDa1URKaRxoHEssagoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733515559; c=relaxed/simple;
-	bh=ZkAyDHoiZXuUqwRzLPJuGNgHzpQ9dkeWgabZ4ONtDhs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f10ReLtH48PgmacPgTKDQGeXJZYaShg4XHOcZzGziyc3GhK7+373SQFDaZU0Z00Uf1bGmZKwRZyn0+b99Ipelnu78g6vBE3HKCTDa1Lz6VwxFfVgTGzadKUN+1dtON29oEecPyX6Gzz4womWSr8l6FlKmOa7heE3AS0Ca646WoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl; spf=pass smtp.mailfrom=ijzerbout.nl; dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b=CWCIrYfm; arc=none smtp.client-ip=136.144.140.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ijzerbout.nl
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ijzerbout.nl; s=key;
-	t=1733515553; bh=ZkAyDHoiZXuUqwRzLPJuGNgHzpQ9dkeWgabZ4ONtDhs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CWCIrYfmr4jBC7IfciYLfthTNr3fRCZQuFiQb/5JiI+9MeVtS+CxqdqSpOoyuGKE7
-	 DlVJxMOPjRYLPv6YnBABHRCG2SEWR4hfWWnbVvfMkb2QV+dyOYvdRSVmIhpZGU/qpR
-	 hO+qaD1n98xGGxo1CsojlHhKYNPpddoQmTGX+ldloYg3gd00An3fytXUh1HHQ1MbXy
-	 wcRcCIm+tChRGZwXXEEg8evuUvKGbteKTiAqabQoWmDeRp/s/IrJRJAh75v8pK31PQ
-	 AxoQpd1VvXOyCi9EcJLTqZtQRLw1Hy3un+MZou8Duo6bMnWEVrkur1uiNdN7CDlWtT
-	 7Cx4FjMUpUict119Nk61mgxeFjcuw8uMKJn6U6PQUh6hP4K/+nvWHm1tRrEWeyklfx
-	 0KpOqK0iBXBoaxpc3rEWECr4RZMz0+pgUbVXWdtLEwz1m1BLyFAodQpQ5ZzqX5wFFH
-	 UE8fOEKdTb34c0hXAZJJXX1ymS7XFGNqEdFiu5btb8APtZ9rRJyqWZRTdEhQ6dasgI
-	 LVu2QwED1oxbrXaxP+u3MrpxV671szViq8vPCZUX1GUKDEJ6UC1x9eLsXK1QkawAiP
-	 YRAR9VlJKbNNeKeQtzZY09mX838PgPspseu1w2kv92vvdm0YheiixZP/8Jol2fqaM4
-	 FYPPHN8uRmabUmCVZGhZ91EI=
-Received: from [IPV6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a] (racer.ijzerbout.nl [IPv6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a])
-	by bout3.ijzerbout.nl (Postfix) with ESMTPSA id B604218E22A;
-	Fri,  6 Dec 2024 21:05:52 +0100 (CET)
-Message-ID: <78666cf5-2214-413f-9450-19377a06049e@ijzerbout.nl>
-Date: Fri, 6 Dec 2024 21:05:50 +0100
+	s=arc-20240116; t=1733515994; c=relaxed/simple;
+	bh=RAnkvM/BvCShbirWZQVBaFP+0SeE2bPdrROWZ73tLWQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cbcB4y5lWLXahkhqJuGJt/DgvNWkaByOYF+dykuREE37LnH5MRY3zg2P6Tv04EP5XVHlOuHzNKeWK2HZ5DyKHaw/dpaRGr+Njf5b4YgSs8qQCcTHUuDNiHpY4xepP7SGYFecP+gBH8GR1jBp3swLPFQ8l6jPKAr4dIDZlmlW2Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m1oB/ZI0; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-30033e07ef3so8605641fa.0;
+        Fri, 06 Dec 2024 12:13:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733515990; x=1734120790; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ig8zvMrquNxr9h6es/FC4GH4Fy/YJCq5InLvynwUlIw=;
+        b=m1oB/ZI0rU/y7vGbAGA9x6PgiETQSzUCdllkN4Cz4fTR79o+eB6xRc72OjUv49n70P
+         My6cwETGnu4dfbIlcHbVFJJm7FAiYMUpPTAg2Z4yR8c80SjOagWNzbO5OizAClb9NjaS
+         tUYGI+WhXIPLld80GBkIoOLJIy8eLWx0kjD5x+KI7gSMFbzS/ft3xA/87LQ89v6h0g/I
+         B0Fu/FaA0Gv1TXga3dUbSH8P4OK2Sqbo2ec5ClEAO2HCyUELtmCu/MoNWuLmX9wQVy3A
+         EhAH9gzjQkB5U/CpY98Sda2OYKjYr4eaht5NIdWEJWXKipbsiJBp4WFNJOhIic0gCNIj
+         3vsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733515990; x=1734120790;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ig8zvMrquNxr9h6es/FC4GH4Fy/YJCq5InLvynwUlIw=;
+        b=xGE8X3kcYQvOtzIpGGZS0eBjt+wwuovJJRHtXWIE9L+btC/8Cbs+gdjBacD7JXFmbw
+         h2IkNnmkDwJsrom85YCcLai9YdMhYOtxqFPnt5WqAgzhrkcHHVzmeT9VV2+72Z4lfbcI
+         Rcu4WkHP9m/dsZkx6EPHFmsrv5vjrEpqeDIVP8np1A6tcqnustLZ+0HqOH5TcGVdf1g5
+         t0T2rr9eB/Wli/FNx7PV6SBe69COmrCUH/mekp2z6z+1ktMO2UwumDHukydWSqVA3zhm
+         Xk4u76JX411d/WNvWRFGsybZ9GLVq4fkvGPhGlVl/m1EDdunjTt4t6zHWdEMfu05u4tA
+         rGUA==
+X-Forwarded-Encrypted: i=1; AJvYcCVEZ+sa3HwDabIUMuWxj3a+ETeJTcJQzcxdFX/qBFBGCa2PH7RplgDhTkck1UO/lhlxVimffLB6@vger.kernel.org, AJvYcCWhdyjxL7R/+gEg+6fUfyY1wFftcZoGSUlh4yi4u2/BbLpeD/DJ4qr8ON1dysg54mvuIgBypLMxylILfQZ5@vger.kernel.org, AJvYcCWzD1INquHxnbfDS0CcSBrEyUhDQjJRjrEOnYox7ltUyGCFHswjnxpTGr77jDFbTCornHkP2AlEJQY2dJVek88=@vger.kernel.org, AJvYcCXmdFvgJaTcWdXEo5o5sxvNJsuybxwZCu5fn7vV3d8S//quE8TTuguu0amvFOtV5tqema1DouL6TnQq@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxgmb8TVbqTbAbdYmVg2vkdMl8NekOHY2OFMl5sI0DpNGPukH7Y
+	jZg9FLySkrgH5fwDL4v8p0mz51PvlOg5i2edYs7vxDK857aHUSTfU6xHoAPJkM7b0jtnhNrkVxP
+	NVCVVAYSkIvTQ8P0x2+yIGPJOI3o=
+X-Gm-Gg: ASbGncsfEKdIS1gSw7BQ4UgBirmOBIvHwLuhl5fH5b36rrDfYmbwkJEn40WKNtLP6Y+
+	uojfUT0yasuU93T/130O5tYfwh/qUgqE=
+X-Google-Smtp-Source: AGHT+IFIz0aMhmjz3POY4AtV1zcbOoDHMMbGiot4T8nIxNJKxQFlR1A64t6StVNw5SBiP8Mwz8JQRkkcRW8pMZUf+r4=
+X-Received: by 2002:a2e:8058:0:b0:300:324e:34e2 with SMTP id
+ 38308e7fff4ca-300324e371fmr9329211fa.16.1733515989826; Fri, 06 Dec 2024
+ 12:13:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/5] LSM: Ensure the correct LSM context releaser
-To: Casey Schaufler <casey@schaufler-ca.com>, paul@paul-moore.com,
- linux-security-module@vger.kernel.org
-Cc: jmorris@namei.org, serge@hallyn.com, keescook@chromium.org,
- john.johansen@canonical.com, penguin-kernel@i-love.sakura.ne.jp,
- stephen.smalley.work@gmail.com, linux-kernel@vger.kernel.org,
- selinux@vger.kernel.org, mic@digikod.net, linux-integrity@vger.kernel.org,
- netdev@vger.kernel.org, audit@vger.kernel.org,
- netfilter-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
- Todd Kjos <tkjos@google.com>
-References: <20241023212158.18718-1-casey@schaufler-ca.com>
- <20241023212158.18718-2-casey@schaufler-ca.com>
-Content-Language: en-US
-From: Kees Bakker <kees@ijzerbout.nl>
-In-Reply-To: <20241023212158.18718-2-casey@schaufler-ca.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241205154247.43444-1-ubizjak@gmail.com> <20241205154247.43444-6-ubizjak@gmail.com>
+ <Z1KpWenJGqhjtNL9@V92F7Y9K0C.lan>
+In-Reply-To: <Z1KpWenJGqhjtNL9@V92F7Y9K0C.lan>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Fri, 6 Dec 2024 21:13:03 +0100
+Message-ID: <CAFULd4ardZ1GT0a9E_Bnu+8VAbxXTcFfvU7QrC14p+XbwdgC2A@mail.gmail.com>
+Subject: Re: [PATCH v2 5/6] percpu: Repurpose __percpu tag as a named address
+ space qualifier
+To: Dennis Zhou <dennis@kernel.org>
+Cc: x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	linux-bcachefs@vger.kernel.org, linux-arch@vger.kernel.org, 
+	netdev@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>, Tejun Heo <tj@kernel.org>, 
+	Christoph Lameter <cl@linux.com>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, Brian Gerst <brgerst@gmail.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Op 23-10-2024 om 23:21 schreef Casey Schaufler:
-> Add a new lsm_context data structure to hold all the information about a
-> "security context", including the string, its size and which LSM allocated
-> the string. The allocation information is necessary because LSMs have
-> different policies regarding the lifecycle of these strings. SELinux
-> allocates and destroys them on each use, whereas Smack provides a pointer
-> to an entry in a list that never goes away.
+On Fri, Dec 6, 2024 at 8:35=E2=80=AFAM Dennis Zhou <dennis@kernel.org> wrot=
+e:
 >
-> Update security_release_secctx() to use the lsm_context instead of a
-> (char *, len) pair. Change its callers to do likewise.  The LSMs
-> supporting this hook have had comments added to remind the developer
-> that there is more work to be done.
+> Hi Uros,
 >
-> The BPF security module provides all LSM hooks. While there has yet to
-> be a known instance of a BPF configuration that uses security contexts,
-> the possibility is real. In the existing implementation there is
-> potential for multiple frees in that case.
+> On Thu, Dec 05, 2024 at 04:40:55PM +0100, Uros Bizjak wrote:
+> > The patch introduces per_cpu_qual define and repurposes __percpu
+> > tag as a named address space qualifier using the new define.
+> >
+> > Arches can now conditionally define __per_cpu_qual as their
+> > named address space qualifier for percpu variables.
+> >
+> > Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> > Acked-by: Nadav Amit <nadav.amit@gmail.com>
+> > Cc: Arnd Bergmann <arnd@arndb.de>
+> > Cc: Thomas Gleixner <tglx@linutronix.de>
+> > Cc: Dennis Zhou <dennis@kernel.org>
+> > Cc: Tejun Heo <tj@kernel.org>
+> > Cc: Christoph Lameter <cl@linux.com>
+> > Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> > Cc: Andy Lutomirski <luto@kernel.org>
+> > Cc: Ingo Molnar <mingo@kernel.org>
+> > Cc: Brian Gerst <brgerst@gmail.com>
+> > Cc: "H. Peter Anvin" <hpa@zytor.com>
+> > Cc: Peter Zijlstra <peterz@infradead.org>
+> > ---
+> >  include/asm-generic/percpu.h   | 15 +++++++++++++++
+> >  include/linux/compiler_types.h |  2 +-
+> >  2 files changed, 16 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/asm-generic/percpu.h b/include/asm-generic/percpu.=
+h
+> > index 50597b975a49..3b93b168faa1 100644
+> > --- a/include/asm-generic/percpu.h
+> > +++ b/include/asm-generic/percpu.h
+> > @@ -6,6 +6,21 @@
+> >  #include <linux/threads.h>
+> >  #include <linux/percpu-defs.h>
+> >
+> > +/*
+> > + * per_cpu_qual is the qualifier for the percpu named address space.
+> > + *
+> > + * Most arches use generic named address space for percpu variables bu=
+t
+> > + * some arches define percpu variables in different named address spac=
+e
+> > + * (on the x86 arch, percpu variable may be declared as being relative
+> > + * to the %fs or %gs segments using __seg_fs or __seg_gs named address
+> > + * space qualifier).
+> > + */
+> > +#ifdef __per_cpu_qual
 >
-> Signed-off-by: Casey Schaufler <casey@schaufler-ca.com>
-> Cc: linux-integrity@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: audit@vger.kernel.org
-> Cc: netfilter-devel@vger.kernel.org
-> To: Pablo Neira Ayuso <pablo@netfilter.org>
-> Cc: linux-nfs@vger.kernel.org
-> Cc: Todd Kjos <tkjos@google.com>
-> ---
->   drivers/android/binder.c                | 24 +++++++--------
->   fs/ceph/xattr.c                         |  6 +++-
->   fs/nfs/nfs4proc.c                       |  8 +++--
->   fs/nfsd/nfs4xdr.c                       |  8 +++--
->   include/linux/lsm_hook_defs.h           |  2 +-
->   include/linux/security.h                | 35 ++++++++++++++++++++--
->   include/net/scm.h                       | 11 +++----
->   kernel/audit.c                          | 30 +++++++++----------
->   kernel/auditsc.c                        | 23 +++++++-------
->   net/ipv4/ip_sockglue.c                  | 10 +++----
->   net/netfilter/nf_conntrack_netlink.c    | 10 +++----
->   net/netfilter/nf_conntrack_standalone.c |  9 +++---
->   net/netfilter/nfnetlink_queue.c         | 13 +++++---
->   net/netlabel/netlabel_unlabeled.c       | 40 +++++++++++--------------
->   net/netlabel/netlabel_user.c            | 11 ++++---
->   security/apparmor/include/secid.h       |  2 +-
->   security/apparmor/secid.c               | 11 +++++--
->   security/security.c                     |  8 ++---
->   security/selinux/hooks.c                | 11 +++++--
->   19 files changed, 165 insertions(+), 107 deletions(-)
->
-> diff --git a/drivers/android/binder.c b/drivers/android/binder.c
-> index 978740537a1a..d4229bf6f789 100644
-> --- a/drivers/android/binder.c
-> +++ b/drivers/android/binder.c
-> @@ -3011,8 +3011,7 @@ static void binder_transaction(struct binder_proc *proc,
->   	struct binder_context *context = proc->context;
->   	int t_debug_id = atomic_inc_return(&binder_last_id);
->   	ktime_t t_start_time = ktime_get();
-> -	char *secctx = NULL;
-> -	u32 secctx_sz = 0;
-> +	struct lsm_context lsmctx;
-Not initialized ?
->   	struct list_head sgc_head;
->   	struct list_head pf_head;
->   	const void __user *user_buffer = (const void __user *)
-> @@ -3291,7 +3290,8 @@ static void binder_transaction(struct binder_proc *proc,
->   		size_t added_size;
->   
->   		security_cred_getsecid(proc->cred, &secid);
-> -		ret = security_secid_to_secctx(secid, &secctx, &secctx_sz);
-> +		ret = security_secid_to_secctx(secid, &lsmctx.context,
-> +					       &lsmctx.len);
->   		if (ret) {
->   			binder_txn_error("%d:%d failed to get security context\n",
->   				thread->pid, proc->pid);
-> @@ -3300,7 +3300,7 @@ static void binder_transaction(struct binder_proc *proc,
->   			return_error_line = __LINE__;
->   			goto err_get_secctx_failed;
->   		}
-> -		added_size = ALIGN(secctx_sz, sizeof(u64));
-> +		added_size = ALIGN(lsmctx.len, sizeof(u64));
->   		extra_buffers_size += added_size;
->   		if (extra_buffers_size < added_size) {
->   			binder_txn_error("%d:%d integer overflow of extra_buffers_size\n",
-> @@ -3334,23 +3334,23 @@ static void binder_transaction(struct binder_proc *proc,
->   		t->buffer = NULL;
->   		goto err_binder_alloc_buf_failed;
->   	}
-> -	if (secctx) {
-> +	if (lsmctx.context) {
- From code inspection it is not immediately obvious. Can you
-guarantee that lsmctx is always initialized when the code
-gets to this point? Perhaps it is safer to just initialize when
-it is defined above (line 3014).
+> I read through the series and I think my only nit would be here. Can we
+> name this __percpu_qual? My thoughts are that it keeps it consistent
+> with the old address space identifier and largely most of the core
+> percpu stuff is defined with percpu as the naming scheme.
 
+I based the approach on the definition of per_cpu_offset() a few lines
+bellow in include/asm-generic/percpu.h:
+
+--q--
+#ifndef __per_cpu_offset
+extern unsigned long __per_cpu_offset[NR_CPUS];
+
+#define per_cpu_offset(x) (__per_cpu_offset[x])
+#endif
+--/q--
+
+Sure, we can call this __percpu_qual. So, the definition in
+arch/x86/include/asm/percpu.h would read as:
+
+# define __percpu_qual      __percpu_seg_override
+
+> > +# define per_cpu_qual __per_cpu_qual
+> > +#else
+> > +# define per_cpu_qual
+> > +#endif
+
+The above part could be recoded as:
+
+#ifndef __percpu_qual
+# define __percpu_qual
+#endif
+
+while the line below would become:
+
+# define __percpu    __percpu_qual BTF_TYPE_TAG(percpu)
+
+> > +
+> >  #ifdef CONFIG_SMP
+> >
+> >  /*
+> > diff --git a/include/linux/compiler_types.h b/include/linux/compiler_ty=
+pes.h
+> > index 981cc3d7e3aa..877fe0c43c5d 100644
+> > --- a/include/linux/compiler_types.h
+> > +++ b/include/linux/compiler_types.h
+> > @@ -57,7 +57,7 @@ static inline void __chk_io_ptr(const volatile void _=
+_iomem *ptr) { }
+> >  #  define __user     BTF_TYPE_TAG(user)
+> >  # endif
+> >  # define __iomem
+> > -# define __percpu    BTF_TYPE_TAG(percpu)
+> > +# define __percpu    per_cpu_qual BTF_TYPE_TAG(percpu)
+> >  # define __rcu               BTF_TYPE_TAG(rcu)
+> >
+> >  # define __chk_user_ptr(x)   (void)0
+
+Let me test these changes a bit, I'll send a v3 in a couple of days.
+
+Thanks,
+Uros.
 
