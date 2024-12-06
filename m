@@ -1,146 +1,163 @@
-Return-Path: <netdev+bounces-149697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE2969E6E20
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 13:29:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB72A9E6E2A
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 13:30:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3B82188340B
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 12:29:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 953A81626C0
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 12:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0549520124E;
-	Fri,  6 Dec 2024 12:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDA81DDA30;
+	Fri,  6 Dec 2024 12:30:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rx8YRFDe"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40163201113;
-	Fri,  6 Dec 2024 12:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC54D189912;
+	Fri,  6 Dec 2024 12:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733488188; cv=none; b=thODb/fcRs5hNE5JR9FZM+mbmnoWzen/58TlapY6nfvH+2yjciWUpySnmhiAQlSGA8k1MxI2WMDSxKVnmIP/hfDOV0PrIjnYxdekrn8XsNLW7qjrmwPQPuXT6kPtBhurlezLUISF2CVUQNPwzpQZZLH2QPbIiTBIXZ+BcTakVXQ=
+	t=1733488236; cv=none; b=avioXFt5oMRcbANbFpITaxthgmgAN7DLL1N+ettRsB/KJAngcow6NHnnWKPI0UVtSaeUkYMF47XBsjVNYf05H0/2xQznWkafsfAzYcVrki9FfKfdqGVcTUFxOFxC8M1ijp4Nqq6B2EenmfTteu3Dr/BqIGXH/fvy1B9XH8GFas0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733488188; c=relaxed/simple;
-	bh=Sn0W2n3Nmn4M+B+vsFN5ieoRowmKkyBRsaa5O53+g6o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=LkGhavO5JG9ScOUgo44mxi/2sPvOzJIgIWB7Rz1kokTudfNFxnQLnt1pxtyurB0PFiXs9vAFaZ5MrBsuZTxF/GNbdw215kfONKEmFvseRwVcyJftZHzw9kw2mXbWIrVR933t4+LVFcrcazuSt6XmKl75QMoPizm76hWbSgXyy1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Y4VrT2SPBz1T6VK;
-	Fri,  6 Dec 2024 20:27:21 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 69E3C1402C4;
-	Fri,  6 Dec 2024 20:29:41 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 6 Dec 2024 20:29:41 +0800
-Message-ID: <c2b306af-4817-4169-814b-adbf25803919@huawei.com>
-Date: Fri, 6 Dec 2024 20:29:40 +0800
+	s=arc-20240116; t=1733488236; c=relaxed/simple;
+	bh=2SybpJ75fYsgju996eI5B6rZW6Vasmh/0y64HEmorP4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C53j4S8QKCDETPiT4UKZ5gMvxb2vhCiZBrXO0LymFE18st11wKh6+njHZ4iKPvAlgmR2fmygZB413CZl3+CBO6b7T2ZQhMuie4MuU52qZRYATVre0+t9tXeOADrUeO5WCJIgenm7IdZUw87JVPHJ1X6+/rFFcEzPrSKX9xmYNNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rx8YRFDe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1435C4CED1;
+	Fri,  6 Dec 2024 12:30:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733488235;
+	bh=2SybpJ75fYsgju996eI5B6rZW6Vasmh/0y64HEmorP4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rx8YRFDenjNPSg5EDwgAon21iwlHBcuwKtlnJR0w4VZ4S/KmX03qrL4hyyaJe9/gC
+	 jnfMG1TXWWR8cNILNWX20yTblC3fq+RBykko4SU0x0D09nt4BJVFX8XJ1N7aoiXlmC
+	 yU4tAIOsOsjkuSJF4KDOOZuax56pIjkqPAdu4QTRc+Iy47H4oun1djTulTFBAmZW2Q
+	 kLLh7ugN+hoqTBCl8R80bZYjU0EvJe0D+v0Hq5+UgkBDRYQlWJdZG45V1ecglxteFd
+	 UuV/gbOgllDcis7793OG4Abjc/RRPgKqCF2KFlU0oHl2iuL0iN0gAYbAiWCjWzxyXY
+	 idmJvLYqRqLDQ==
+Date: Fri, 6 Dec 2024 12:30:30 +0000
+From: Simon Horman <horms@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Frank Li <frank.li@nxp.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>
+Subject: Re: [PATCH v6 RESEND net-next 1/5] net: enetc: add Rx checksum
+ offload for i.MX95 ENETC
+Message-ID: <20241206123030.GM2581@kernel.org>
+References: <20241204052932.112446-1-wei.fang@nxp.com>
+ <20241204052932.112446-2-wei.fang@nxp.com>
+ <20241206092329.GH2581@kernel.org>
+ <PAXPR04MB85101D0EE82ED8EEF48A588988312@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v4 1/3] page_pool: fix timing for checking and
- disabling napi_local
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <pabeni@redhat.com>, <liuyonglong@huawei.com>,
-	<fanghaiqing@huawei.com>, <zhangkun09@huawei.com>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, Eric Dumazet <edumazet@google.com>, Simon
- Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20241120103456.396577-1-linyunsheng@huawei.com>
- <20241120103456.396577-2-linyunsheng@huawei.com>
- <20241202184954.3a4095e3@kernel.org>
- <e053e75a-bde1-4e69-9a8d-d1f54be06bdb@huawei.com>
- <20241204172846.5b360d32@kernel.org>
- <70aefeb1-6a78-494c-9d5b-e03696948d11@huawei.com>
- <20241205164233.64512141@kernel.org>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20241205164233.64512141@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <PAXPR04MB85101D0EE82ED8EEF48A588988312@PAXPR04MB8510.eurprd04.prod.outlook.com>
 
-On 2024/12/6 8:42, Jakub Kicinski wrote:
-> On Thu, 5 Dec 2024 19:43:25 +0800 Yunsheng Lin wrote:
->> It depends on what is the callers is trying to protect by calling
->> page_pool_disable_direct_recycling().
->>
->> It seems the use case for the only user of the API in bnxt driver
->> is about reuseing the same NAPI for different page_pool instances.
->>
->> According to the steps in netdev_rx_queue.c:
->> 1. allocate new queue memory & create page_pool
->> 2. stop old rx queue.
->> 3. start new rx queue with new page_pool
->> 4. free old queue memory + destroy page_pool.
->>
->> The page_pool_disable_direct_recycling() is called in step 2, I am
->> not sure how napi_enable() & napi_disable() are called in the above
->> flow, but it seems there is no use-after-free problem this patch is
->> trying to fix for the above flow.
->>
->> It doesn't seems to have any concurrent access problem if napi->list_owner
->> is set to -1 before napi_disable() returns and the napi_enable() for the
->> new queue is called after page_pool_disable_direct_recycling() is called
->> in step 2.
+On Fri, Dec 06, 2024 at 10:33:15AM +0000, Wei Fang wrote:
+> > -----Original Message-----
+> > From: Simon Horman <horms@kernel.org>
+> > Sent: 2024年12月6日 17:23
+> > To: Wei Fang <wei.fang@nxp.com>
+> > Cc: Claudiu Manoil <claudiu.manoil@nxp.com>; Vladimir Oltean
+> > <vladimir.oltean@nxp.com>; Clark Wang <xiaoning.wang@nxp.com>;
+> > andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
+> > kuba@kernel.org; pabeni@redhat.com; Frank Li <frank.li@nxp.com>;
+> > netdev@vger.kernel.org; linux-kernel@vger.kernel.org; imx@lists.linux.dev
+> > Subject: Re: [PATCH v6 RESEND net-next 1/5] net: enetc: add Rx checksum
+> > offload for i.MX95 ENETC
+> > 
+> > On Wed, Dec 04, 2024 at 01:29:28PM +0800, Wei Fang wrote:
+> > > ENETC rev 4.1 supports TCP and UDP checksum offload for receive, the bit
+> > > 108 of the Rx BD will be set if the TCP/UDP checksum is correct. Since
+> > > this capability is not defined in register, the rx_csum bit is added to
+> > > struct enetc_drvdata to indicate whether the device supports Rx checksum
+> > > offload.
+> > >
+> > > Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> > > Reviewed-by: Frank Li <Frank.Li@nxp.com>
+> > > Reviewed-by: Claudiu Manoil <claudiu.manoil@nxp.com>
+> > > ---
+> > > v2: no changes
+> > > v3: no changes
+> > > v4: no changes
+> > > v5: no changes
+> > > v6: no changes
+> > > ---
+> > >  drivers/net/ethernet/freescale/enetc/enetc.c       | 14 ++++++++++----
+> > >  drivers/net/ethernet/freescale/enetc/enetc.h       |  2 ++
+> > >  drivers/net/ethernet/freescale/enetc/enetc_hw.h    |  2 ++
+> > >  .../net/ethernet/freescale/enetc/enetc_pf_common.c |  3 +++
+> > >  4 files changed, 17 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c
+> > b/drivers/net/ethernet/freescale/enetc/enetc.c
+> > > index 35634c516e26..3137b6ee62d3 100644
+> > > --- a/drivers/net/ethernet/freescale/enetc/enetc.c
+> > > +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+> > > @@ -1011,10 +1011,15 @@ static void enetc_get_offloads(struct enetc_bdr
+> > *rx_ring,
+> > >
+> > >  	/* TODO: hashing */
+> > >  	if (rx_ring->ndev->features & NETIF_F_RXCSUM) {
+> > > -		u16 inet_csum = le16_to_cpu(rxbd->r.inet_csum);
+> > > -
+> > > -		skb->csum = csum_unfold((__force __sum16)~htons(inet_csum));
+> > > -		skb->ip_summed = CHECKSUM_COMPLETE;
+> > > +		if (priv->active_offloads & ENETC_F_RXCSUM &&
+> > > +		    le16_to_cpu(rxbd->r.flags) & ENETC_RXBD_FLAG_L4_CSUM_OK)
+> > {
+> > > +			skb->ip_summed = CHECKSUM_UNNECESSARY;
+> > > +		} else {
+> > > +			u16 inet_csum = le16_to_cpu(rxbd->r.inet_csum);
+> > > +
+> > > +			skb->csum = csum_unfold((__force __sum16)~htons(inet_csum));
+> > > +			skb->ip_summed = CHECKSUM_COMPLETE;
+> > > +		}
+> > >  	}
+> > 
+> > Hi Wei,
+> > 
+> > I am wondering about the relationship between the above and
+> > hardware support for CHECKSUM_COMPLETE.
+> > 
+> > Prior to this patch CHECKSUM_COMPLETE was always used, which seems
+> > desirable. But with this patch, CHECKSUM_UNNECESSARY is conditionally used.
+> > 
+> > If those cases don't work with CHECKSUM_COMPLETE then is this a bug-fix?
+> > 
+> > Or, alternatively, if those cases do work with CHECKSUM_COMPLETE, then
+> > I'm unsure why this change is necessary or desirable. It's my understanding
+> > that from the Kernel's perspective CHECKSUM_COMPLETE is preferable to
+> > CHECKSUM_UNNECESSARY.
+> > 
+> > ...
 > 
-> The fix is presupposing there is long delay between fetching of
-> the NAPI pointer and its access. The concern is that NAPI gets
-> restarted in step 3 after we already READ_ONCE()'ed the pointer,
-> then we access it and judge it to be running on the same core.
-> Then we put the page into the fast cache which will never get
-> flushed.
-
-It seems the napi_disable() is called before netdev_rx_queue_restart()
-and napi_enable() and ____napi_schedule() are called after
-netdev_rx_queue_restart() as there is no napi API called in the
-implementation of 'netdev_queue_mgmt_ops' for bnxt driver?
-
-If yes, napi->list_owner is set to -1 before step 1 and only set to
-a valid cpu in step 6 as below:
-1. napi_disable()
-2. allocate new queue memory & create new page_pool.
-3. stop old rx queue.
-4. start new rx queue with new page_pool.
-5. free old queue memory + destroy old page_pool.
-6. napi_enable() & ____napi_schedule()
-
-And there are at least three flows involved here:
-flow 1: calling napi_complete_done() and set napi->list_owner to -1.
-flow 2: calling netdev_rx_queue_restart().
-flow 3: calling skb_defer_free_flush() with the page belonging to the old
-       page_pool.
-
-The only case of page_pool_napi_local() returning true in flow 3 I can
-think of is that flow 1 and flow 3 might need to be called in the softirq
-of the same CPU and flow 3 might need to be called before flow 1.
-
-It seems impossible that page_pool_napi_local() will return true between
-step 1 and step 6 as updated napi->list_owner is always seen by flow 3
-when they are both called in the softirq context of the same CPU or
-napi->list_owner != CPU that calling flow 3, which seems like an implicit
-assumption for the case of napi scheduling between different cpus too.
-
-And old page_pool is destroyed in step 5, I am not sure if it is necessary
-to call page_pool_disable_direct_recycling() in step 3 if page_pool_destroy()
-already have the synchronize_rcu() in step 5 before enabling napi.
-
-If not, maybe I am missing something here. It would be good to be more specific
-about the timing window that page_pool_napi_local() returning true for the old
-page_pool.
-
+> Rx checksum offload is a new feature of ENETC v4. We would like to exploit this
+> capability of the hardware to save CPU cycles in calculating and verifying checksum.
 > 
+
+Understood, but CHECKSUM_UNNECESSARY is usually the preferred option as it
+is more flexible, e.g. allowing low-cost calculation of inner checksums
+in the presence of encapsulation.
 
