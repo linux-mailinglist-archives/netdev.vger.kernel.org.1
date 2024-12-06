@@ -1,154 +1,94 @@
-Return-Path: <netdev+bounces-149576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 982229E646F
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:50:31 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02D449E646E
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:50:28 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54D8D28482F
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:50:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7576F169C40
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9283E1741D2;
-	Fri,  6 Dec 2024 02:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85DB170A11;
+	Fri,  6 Dec 2024 02:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Mk/fzamn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StwyXFVo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECC913C677;
-	Fri,  6 Dec 2024 02:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF1D15534E
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 02:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733453425; cv=none; b=LQfe0rpviiDCQHMuIG3cjs5ES7sjxuncw1ZVwXQlfD28mjeMAjm3A+R7VK6RvSoxYr14cwJzdV2yI2Y1fRUKJa9WgzOjTmgHx5m4kN677Y78x1Z9kIYmoC84JFHYVf8fmiFwcY1gUWBnAR36j+4u+ctZWEupARlkUSjX9w+kQ+4=
+	t=1733453415; cv=none; b=WSO0FFa8pLQpmdm2zTxjTbBYubId36D/pJsBZmK1T+8ZedrXEKYEIE1yGEYrl9+XXdUuFhc1YXZHnwGjZcmHVWdANOWnwHoElZg4TC6PAu1SdlPfDOe3aBBinHIOG3I+2vTMg22R5fCi4ExGJ+5/ULLrAldoD1MDkBxdy5dZkZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733453425; c=relaxed/simple;
-	bh=Ndn2jxtEqosWyoI28JUucb4KFXtu4aIp4wE7cHQ5Apo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Al0UB/6s+9Y2D3uSceZ636FYRAWt713p07LGzQWcPvo93O2RpQMEAXw/bxNMDmZer1BlGTlDsZobMnsNfKsxjg20hB41YeGA10py4txugI3ZK501RWbddJi4lc5TzFSIFkzmsBPXaVOm8Qbr7V9Sm7PjLgrROA4LXgxEoeqizRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Mk/fzamn; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5HaO3R005965;
-	Fri, 6 Dec 2024 02:50:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Zcm4DqSYOflesfW7kwRW3Z1Ht0YyrkJRhNXH8J1FOEw=; b=Mk/fzamnUDHwWH1T
-	k8WrikGVvbEH9PTQqBTG4xU/Uy9ziSDiJRxuW8O4hydVL4iBal4XxvgkLL+EUUwH
-	TAJESiZAnW6EL+9nAflA/6VjYL3qL/RlSSn2kLmor+O+XKbgDFypZoIIUG30mNyb
-	5whicFXkQ2kRL/Dl9FvMZD7BScfUsFz4P10uvg/tq/GdDzmseD38umX64i5JGPWX
-	akKtXcqgDmkdpX3SeoIlmlmZhA/zmqPuTDneqKYc4HNTf0jHMCYqDxRCL/NT9xaU
-	0kKtasdZa9pHnD/zeDohaPLFuVGhGhgCHMxtPURulH9l32r/xdsBv6BxCkQ4dIKi
-	4KB9wg==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43ayemby3m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Dec 2024 02:50:20 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B62oJSW022937
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 6 Dec 2024 02:50:19 GMT
-Received: from [10.253.33.254] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 5 Dec 2024
- 18:50:16 -0800
-Message-ID: <4ebf9f1d-74a9-451b-91a5-fe38a0d48e24@quicinc.com>
-Date: Fri, 6 Dec 2024 10:50:08 +0800
+	s=arc-20240116; t=1733453415; c=relaxed/simple;
+	bh=sXnijNJrqVTBektyw43E80qkvshBqy60uezbzdBy7ik=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=m6XEI1nz+VLx6JG9HFzAVfFElQkVq233DDGQ+2b7xyueyCresqKuMrh7FHgUh9xaUAZPAXCj72cwr9DjmFG/YejdQ8bkk1OQxVmlcCq+oEfOFRmvSIvRMIx6AbwH+02jmt36GvmcLj/2va2/wbzr1DJ/FFgMPwfXwgnTR5CfZFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StwyXFVo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B64BC4CED1;
+	Fri,  6 Dec 2024 02:50:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733453415;
+	bh=sXnijNJrqVTBektyw43E80qkvshBqy60uezbzdBy7ik=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=StwyXFVoFMLeSd6cHqZ1jkIdJce5TU3L7+suMmC1VasC6h1ca6rjI539fQkJYwuuZ
+	 JGYCDm5OYemsm81lFZ0vE9+Ay1+ityWEt0uJFyXZ2Ox9T7ECZxBB1rN9vc2Uu8tUP9
+	 zWbtB9cV1fQJgAUiHXJjVRvCpsMMlrpr4bageT29FOHV0bKal0lh8ZGHUFWNdFEiu6
+	 If74U0hsFvOWWmJZHdAq+/oICXZc/79CVYsmpqGFOm/wHIZmKZs/vM72nPR+qUKyyN
+	 bSW8P0Ph0vS9tzzQRzJlXqCXhcQMt1ae7b781FsZN+fEAqT+nO+/uQsXMnz6mg6u1d
+	 Hx8AvtrEJkvYA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34CFE380A953;
+	Fri,  6 Dec 2024 02:50:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/2] Enable ethernet for qcs8300
-To: Tingwei Zhang <quic_tingweiz@quicinc.com>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>
-CC: <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Konrad Dybcio
-	<konrad.dybcio@oss.qualcomm.com>
-References: <20241206-dts_qcs8300-v5-0-422e4fda292d@quicinc.com>
- <87c9ebb9-36b2-4891-8800-2896d6d9bbfc@quicinc.com>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <87c9ebb9-36b2-4891-8800-2896d6d9bbfc@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 6IGmeDmEgFV6xmkInLCHROVJh7DiU6zI
-X-Proofpoint-ORIG-GUID: 6IGmeDmEgFV6xmkInLCHROVJh7DiU6zI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 mlxlogscore=514 phishscore=0 malwarescore=0 mlxscore=0
- adultscore=0 lowpriorityscore=0 bulkscore=0 suspectscore=0 spamscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412060019
+Subject: Re: [PATCH net-next 0/2] net_sched: sch_sfq: reject limit of 1
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173345343001.2168521.15925898547780682340.git-patchwork-notify@kernel.org>
+Date: Fri, 06 Dec 2024 02:50:30 +0000
+References: <20241204030520.2084663-1-tavip@google.com>
+In-Reply-To: <20241204030520.2084663-1-tavip@google.com>
+To: Octavian Purdila <tavip@google.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On 2024-12-06 10:37, Tingwei Zhang wrote:
-> On 12/6/2024 9:35 AM, Yijie Yang wrote:
->> Add dts nodes to enable ethernet interface on qcs8300-ride.
->> The EMAC, SerDes and EPHY version are the same as those in sa8775p.
->>
->> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
->> ---
->> This patch series depends on below patch series:
->> https://lore.kernel.org/all/20240925-qcs8300_initial_dtsi- 
->> v2-0-494c40fa2a42@quicinc.com/ - Reviewed
+On Tue,  3 Dec 2024 19:05:18 -0800 you wrote:
+> The implementation does not properly support limits of 1. Add an
+> in-kernel check, in addition to existing iproute2 check, since other
+> tools may be used for configuration.
 > 
-> Above series was already applied. I would say there's no dependency to 
-> block this series to be applied now. No need to respin for this but 
-> update the dependency status if a new version is required.
+> This patch set also adds a selfcheck to test that a limit of 1 is
+> rejected.
 > 
+> [...]
 
-I will take care of it next time.
+Here is the summary with links:
+  - [net-next,1/2] net_sched: sch_sfq: don't allow 1 packet limit
+    https://git.kernel.org/netdev/net-next/c/10685681bafc
+  - [net-next,2/2] selftests/tc-testing: sfq: test that kernel rejects limit of 1
+    https://git.kernel.org/netdev/net-next/c/1e7e1f0e8be1
 
->> https://lore.kernel.org/all/20241010-schema- 
->> v1-0-98b2d0a2f7a2@quicinc.com/ - Applied
->>
->> Changes in v5:
->> - Pad the register with zero for both 'ethernet0' and 'serdes0'.
->> - Change PHY name from 'sgmii_phy0' to 'phy0'.
->> - Link to v4: https://lore.kernel.org/r/20241123-dts_qcs8300-v4-0- 
->> b10b8ac634a9@quicinc.com
->>
->> ---
->> Yijie Yang (2):
->>        arm64: dts: qcom: qcs8300: add the first 2.5G ethernet
->>        arm64: dts: qcom: qcs8300-ride: enable ethernet0
->>
->>   arch/arm64/boot/dts/qcom/qcs8300-ride.dts | 112 ++++++++++++++++++++ 
->> ++++++++++
->>   arch/arm64/boot/dts/qcom/qcs8300.dtsi     |  43 ++++++++++++
->>   2 files changed, 155 insertions(+)
->> ---
->> base-commit: c83f0b825741bcb9d8a7be67c63f6b9045d30f5a
->> change-id: 20241111-dts_qcs8300-f8383ef0f5ef
->>
->> Best regards,
-> 
-> 
-
+You are awesome, thank you!
 -- 
-Best Regards,
-Yijie
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
