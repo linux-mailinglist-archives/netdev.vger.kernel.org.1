@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-149698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB72A9E6E2A
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 13:30:39 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 626CB9E6E33
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 13:32:31 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 953A81626C0
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 12:30:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 245CF2810C7
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 12:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDA81DDA30;
-	Fri,  6 Dec 2024 12:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B026E20124E;
+	Fri,  6 Dec 2024 12:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rx8YRFDe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DPR3kDjQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC54D189912;
-	Fri,  6 Dec 2024 12:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC2E200135;
+	Fri,  6 Dec 2024 12:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733488236; cv=none; b=avioXFt5oMRcbANbFpITaxthgmgAN7DLL1N+ettRsB/KJAngcow6NHnnWKPI0UVtSaeUkYMF47XBsjVNYf05H0/2xQznWkafsfAzYcVrki9FfKfdqGVcTUFxOFxC8M1ijp4Nqq6B2EenmfTteu3Dr/BqIGXH/fvy1B9XH8GFas0=
+	t=1733488344; cv=none; b=MSbFAQwFuvwgDm56SM/vRcSWUWyKFq36nMSVVNHzJDaV1IBzce1ixMKkimngzIRa58FT2ElFqom5a3SnfMUNK17yGcb/IVaRAsFmVS48nFYNq1BfltF3b0e5DjJbZV7hfc7X+VxYiILvfvVJ4JGEMfthj8sodfKw2P2ekwGJAkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733488236; c=relaxed/simple;
-	bh=2SybpJ75fYsgju996eI5B6rZW6Vasmh/0y64HEmorP4=;
+	s=arc-20240116; t=1733488344; c=relaxed/simple;
+	bh=w/ls8XXs5aUyevc75S13Ak3D8BY0kudJCVt5TOtgEQM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C53j4S8QKCDETPiT4UKZ5gMvxb2vhCiZBrXO0LymFE18st11wKh6+njHZ4iKPvAlgmR2fmygZB413CZl3+CBO6b7T2ZQhMuie4MuU52qZRYATVre0+t9tXeOADrUeO5WCJIgenm7IdZUw87JVPHJ1X6+/rFFcEzPrSKX9xmYNNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rx8YRFDe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1435C4CED1;
-	Fri,  6 Dec 2024 12:30:32 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=PcFqSwgm9nZuhekuh4U0KLvAUfkyvPQl6/HqtW0fmtPA79jq3XSn5VqcPdzsCOcWqN+8+0SRaHIzyWmR7RYkQwUDw5r5YQ2wJwglHabYtUiWxfGPRoCOdDSX48pjSA7v05x2VFEY0dStBLG5OqDYpcTkyvLe5olGux95t8hUkfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DPR3kDjQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92E3EC4CED1;
+	Fri,  6 Dec 2024 12:32:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733488235;
-	bh=2SybpJ75fYsgju996eI5B6rZW6Vasmh/0y64HEmorP4=;
+	s=k20201202; t=1733488344;
+	bh=w/ls8XXs5aUyevc75S13Ak3D8BY0kudJCVt5TOtgEQM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rx8YRFDenjNPSg5EDwgAon21iwlHBcuwKtlnJR0w4VZ4S/KmX03qrL4hyyaJe9/gC
-	 jnfMG1TXWWR8cNILNWX20yTblC3fq+RBykko4SU0x0D09nt4BJVFX8XJ1N7aoiXlmC
-	 yU4tAIOsOsjkuSJF4KDOOZuax56pIjkqPAdu4QTRc+Iy47H4oun1djTulTFBAmZW2Q
-	 kLLh7ugN+hoqTBCl8R80bZYjU0EvJe0D+v0Hq5+UgkBDRYQlWJdZG45V1ecglxteFd
-	 UuV/gbOgllDcis7793OG4Abjc/RRPgKqCF2KFlU0oHl2iuL0iN0gAYbAiWCjWzxyXY
-	 idmJvLYqRqLDQ==
-Date: Fri, 6 Dec 2024 12:30:30 +0000
+	b=DPR3kDjQz0Sb6HZVaCIGX8RIv6cIFwyCtU+CqXdLr0vHVbeOa+Up2HBiKBlzJzn1H
+	 AQ7GqKPTAYSQjtkb8G9udoz7OsYSc0lRZl4da7b41QvDepcbU9tQWM8K/L5CbPi9e+
+	 3LZQQt6Kf2yBZ+tcEOVX6TP7BCw3YVgNzj21FH/d636HTKkImyctF3uFjisdYzAFcx
+	 AuaH/BfMibdJltJcgVlBbwem3DMjgyFCxgd7cBbf2w/0B76IxYxM7gS+HlH81f/1KU
+	 okFSnxuxwnTdf7e3s6YtltHck/TvZhNp1G6QJzCVvoxNsJXJbWuUBSsxHh+YfIP/6D
+	 YBPpXt2KaAP5g==
+Date: Fri, 6 Dec 2024 12:32:19 +0000
 From: Simon Horman <horms@kernel.org>
 To: Wei Fang <wei.fang@nxp.com>
 Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
@@ -56,13 +56,13 @@ Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
 	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"imx@lists.linux.dev" <imx@lists.linux.dev>
-Subject: Re: [PATCH v6 RESEND net-next 1/5] net: enetc: add Rx checksum
+Subject: Re: [PATCH v6 RESEND net-next 2/5] net: enetc: add Tx checksum
  offload for i.MX95 ENETC
-Message-ID: <20241206123030.GM2581@kernel.org>
+Message-ID: <20241206123219.GN2581@kernel.org>
 References: <20241204052932.112446-1-wei.fang@nxp.com>
- <20241204052932.112446-2-wei.fang@nxp.com>
- <20241206092329.GH2581@kernel.org>
- <PAXPR04MB85101D0EE82ED8EEF48A588988312@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20241204052932.112446-3-wei.fang@nxp.com>
+ <20241206093708.GI2581@kernel.org>
+ <PAXPR04MB8510D797ABEFA1D6153A3C9A88312@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,92 +72,75 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <PAXPR04MB85101D0EE82ED8EEF48A588988312@PAXPR04MB8510.eurprd04.prod.outlook.com>
+In-Reply-To: <PAXPR04MB8510D797ABEFA1D6153A3C9A88312@PAXPR04MB8510.eurprd04.prod.outlook.com>
 
-On Fri, Dec 06, 2024 at 10:33:15AM +0000, Wei Fang wrote:
+On Fri, Dec 06, 2024 at 10:46:49AM +0000, Wei Fang wrote:
 > > -----Original Message-----
 > > From: Simon Horman <horms@kernel.org>
-> > Sent: 2024年12月6日 17:23
+> > Sent: 2024年12月6日 17:37
 > > To: Wei Fang <wei.fang@nxp.com>
 > > Cc: Claudiu Manoil <claudiu.manoil@nxp.com>; Vladimir Oltean
 > > <vladimir.oltean@nxp.com>; Clark Wang <xiaoning.wang@nxp.com>;
 > > andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
 > > kuba@kernel.org; pabeni@redhat.com; Frank Li <frank.li@nxp.com>;
 > > netdev@vger.kernel.org; linux-kernel@vger.kernel.org; imx@lists.linux.dev
-> > Subject: Re: [PATCH v6 RESEND net-next 1/5] net: enetc: add Rx checksum
+> > Subject: Re: [PATCH v6 RESEND net-next 2/5] net: enetc: add Tx checksum
 > > offload for i.MX95 ENETC
 > > 
-> > On Wed, Dec 04, 2024 at 01:29:28PM +0800, Wei Fang wrote:
-> > > ENETC rev 4.1 supports TCP and UDP checksum offload for receive, the bit
-> > > 108 of the Rx BD will be set if the TCP/UDP checksum is correct. Since
-> > > this capability is not defined in register, the rx_csum bit is added to
-> > > struct enetc_drvdata to indicate whether the device supports Rx checksum
-> > > offload.
+> > On Wed, Dec 04, 2024 at 01:29:29PM +0800, Wei Fang wrote:
+> > > In addition to supporting Rx checksum offload, i.MX95 ENETC also supports
+> > > Tx checksum offload. The transmit checksum offload is implemented through
+> > > the Tx BD. To support Tx checksum offload, software needs to fill some
+> > > auxiliary information in Tx BD, such as IP version, IP header offset and
+> > > size, whether L4 is UDP or TCP, etc.
+> > >
+> > > Same as Rx checksum offload, Tx checksum offload capability isn't defined
+> > > in register, so tx_csum bit is added to struct enetc_drvdata to indicate
+> > > whether the device supports Tx checksum offload.
 > > >
 > > > Signed-off-by: Wei Fang <wei.fang@nxp.com>
 > > > Reviewed-by: Frank Li <Frank.Li@nxp.com>
 > > > Reviewed-by: Claudiu Manoil <claudiu.manoil@nxp.com>
-> > > ---
-> > > v2: no changes
-> > > v3: no changes
-> > > v4: no changes
-> > > v5: no changes
-> > > v6: no changes
-> > > ---
-> > >  drivers/net/ethernet/freescale/enetc/enetc.c       | 14 ++++++++++----
-> > >  drivers/net/ethernet/freescale/enetc/enetc.h       |  2 ++
-> > >  drivers/net/ethernet/freescale/enetc/enetc_hw.h    |  2 ++
-> > >  .../net/ethernet/freescale/enetc/enetc_pf_common.c |  3 +++
-> > >  4 files changed, 17 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c
-> > b/drivers/net/ethernet/freescale/enetc/enetc.c
-> > > index 35634c516e26..3137b6ee62d3 100644
-> > > --- a/drivers/net/ethernet/freescale/enetc/enetc.c
-> > > +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-> > > @@ -1011,10 +1011,15 @@ static void enetc_get_offloads(struct enetc_bdr
-> > *rx_ring,
-> > >
-> > >  	/* TODO: hashing */
-> > >  	if (rx_ring->ndev->features & NETIF_F_RXCSUM) {
-> > > -		u16 inet_csum = le16_to_cpu(rxbd->r.inet_csum);
-> > > -
-> > > -		skb->csum = csum_unfold((__force __sum16)~htons(inet_csum));
-> > > -		skb->ip_summed = CHECKSUM_COMPLETE;
-> > > +		if (priv->active_offloads & ENETC_F_RXCSUM &&
-> > > +		    le16_to_cpu(rxbd->r.flags) & ENETC_RXBD_FLAG_L4_CSUM_OK)
-> > {
-> > > +			skb->ip_summed = CHECKSUM_UNNECESSARY;
-> > > +		} else {
-> > > +			u16 inet_csum = le16_to_cpu(rxbd->r.inet_csum);
-> > > +
-> > > +			skb->csum = csum_unfold((__force __sum16)~htons(inet_csum));
-> > > +			skb->ip_summed = CHECKSUM_COMPLETE;
-> > > +		}
-> > >  	}
+> > 
+> > ...
+> > 
+> > > diff --git a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> > b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> > > index 4b8fd1879005..590b1412fadf 100644
+> > > --- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> > > +++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> > > @@ -558,7 +558,12 @@ union enetc_tx_bd {
+> > >  		__le16 frm_len;
+> > >  		union {
+> > >  			struct {
+> > > -				u8 reserved[3];
+> > > +				u8 l3_start:7;
+> > > +				u8 ipcs:1;
+> > > +				u8 l3_hdr_size:7;
+> > > +				u8 l3t:1;
+> > > +				u8 resv:5;
+> > > +				u8 l4t:3;
+> > >  				u8 flags;
+> > >  			}; /* default layout */
 > > 
 > > Hi Wei,
 > > 
-> > I am wondering about the relationship between the above and
-> > hardware support for CHECKSUM_COMPLETE.
+> > Given that little-endian types are used elsewhere in this structure
+> > I am guessing that the layout above works for little-endian hosts
+> > but will not work on big-endian hosts.
 > > 
-> > Prior to this patch CHECKSUM_COMPLETE was always used, which seems
-> > desirable. But with this patch, CHECKSUM_UNNECESSARY is conditionally used.
-> > 
-> > If those cases don't work with CHECKSUM_COMPLETE then is this a bug-fix?
-> > 
-> > Or, alternatively, if those cases do work with CHECKSUM_COMPLETE, then
-> > I'm unsure why this change is necessary or desirable. It's my understanding
-> > that from the Kernel's perspective CHECKSUM_COMPLETE is preferable to
-> > CHECKSUM_UNNECESSARY.
+> > If so, I would suggest an alternate approach of using a single 32-bit
+> > word and accessing it using a combination of FIELD_PREP() and FIELD_GET()
+> > using masks created using GENMASK() and BIT().
+> 
+> Good suggestion, I will refine it, thanks.
+
+Thanks. I forgot to mention that you will likely also need to add
+cpu_to_le32 and le32_to_cpu to the mix.
+
+> > Or, less desirably IMHO, by providing an alternate layout for
+> > the embedded struct for big endian systems.
 > > 
 > > ...
 > 
-> Rx checksum offload is a new feature of ENETC v4. We would like to exploit this
-> capability of the hardware to save CPU cycles in calculating and verifying checksum.
-> 
-
-Understood, but CHECKSUM_UNNECESSARY is usually the preferred option as it
-is more flexible, e.g. allowing low-cost calculation of inner checksums
-in the presence of encapsulation.
 
