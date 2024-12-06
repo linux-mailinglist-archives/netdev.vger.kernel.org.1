@@ -1,134 +1,100 @@
-Return-Path: <netdev+bounces-149542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A92BF9E62BB
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 01:58:50 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 164C99E62C4
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:00:21 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 614E7284063
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 00:58:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEBE11884EE2
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 01:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB3447F53;
-	Fri,  6 Dec 2024 00:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394CB20322;
+	Fri,  6 Dec 2024 01:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WEEcZQ9P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkwkSNtm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DCB8193;
-	Fri,  6 Dec 2024 00:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BAB4C62;
+	Fri,  6 Dec 2024 01:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733446727; cv=none; b=JLtQPEJ8v6P7bpz0Air2CQbLuEAFPDeSt7eXLnn7l24VRbT5G76hBOBGMYya0loOmFlxhlMjSXVH0tCJfX2ZzT7f8HTvbe9h6tbamiUGE9Wsd52nFZ8M7+ojY9v16Rhx8AtHPoWNVijlfdb/N0oumE1tUhU8KGEMdrvPfE1v+sc=
+	t=1733446817; cv=none; b=qL854V464WLm7F9YOZHyzD+yFwGUOBYvKUuZ/whHLvrymbm+xNZrqqt9rvSlBOdb2NxD27EkZJCH4Fn+lrLgK4HnxHE4n4CJohuQBFOnc1sHmdqkQSWE7y7y1Uvkt4xtcUlehe1BLXUEjJuzcIl/Bqm5sg7k/IoFh9Zobv32chg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733446727; c=relaxed/simple;
-	bh=LbVTTNf9deDecb9jxHiZ7X3/6utGjYJ2dpOMPg8rKec=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=g8+PWLwta34iesL1WIU/I6bb8lkpoZqo/34LZ7RyIzKspcjz4iyvxlG11WRyudCIkeXd8QBQ9i77TbvpMSoXmqrt1OGCn9SHCZ/3YMNr6cRnu1bin0Q5viO/YDiaf2tjnNSyRTzJgPkEydlzevdxXjzFIB7sszTMoLKWMVSVg9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WEEcZQ9P; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5HaLbR006904;
-	Fri, 6 Dec 2024 00:58:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	nlcCtZFcIuIC2GCOMVB7E7zkahROSsp0KC0iSEP4E5U=; b=WEEcZQ9PHOaTUP5B
-	n2vCsunLjLIvayKIfokxCIFxbnOPameFNw3m7qLKIhe7CE3iaYgPwSHrNgdDAN5s
-	lpcp3wK2+CqDDNiECOnwj7n8xn6NC30laYVXTPsvsvKsmCPQ+wwU4HhnpsqESoPo
-	vuxyAZW/LrFRh5gUq8PvwugZz1ouPKbaBCgSY06qH89AJvMQ3PDe9hk3fJitMni2
-	5844btik+avw1Bav5/cUOPC/rFhgHqVe3r/qv3xHvfWiMeu1O1+o06E3TXlA0FxK
-	LtLI18Qjxc13F9oEKNc+is7mQzY5VTk43IFfd05ZTmIyAeKh49M+lGmxRw7yPkPa
-	tyubdA==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43ben89aat-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Dec 2024 00:58:40 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B60wdV4013982
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 6 Dec 2024 00:58:39 GMT
-Received: from [10.253.33.254] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 5 Dec 2024
- 16:58:35 -0800
-Message-ID: <323eee41-70f2-48f5-8705-a0d30666c1d3@quicinc.com>
-Date: Fri, 6 Dec 2024 08:58:33 +0800
+	s=arc-20240116; t=1733446817; c=relaxed/simple;
+	bh=RRp/+FLPo/bs5FepXu5/siU2ckJNsKC5qSbR8wuh9EA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fAG3u4yuYff2LwWgCx39hs+MLvCbteqchoseY2G0NwqsvuGp8Ch98omOSeJPFIW/a9CbJ6xFzihgUAgPn+oHGeFQh4qAkSlnSppvbcQl7VY7cVm2GlLqOCGuvGd7dRl6GfAlHzN1XYO6Wct1C+dVHRTzZ2l4NPklXXYBcYBTbb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PkwkSNtm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A5DFC4CED6;
+	Fri,  6 Dec 2024 01:00:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733446816;
+	bh=RRp/+FLPo/bs5FepXu5/siU2ckJNsKC5qSbR8wuh9EA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PkwkSNtm81/RZ4kXvDC+d9znuMKDLyxEbhETfw3wO7h3gSjm6LtKaFZqsVT/UpoNH
+	 5Gxpj8kGtkwMwbDi5vQz0+OL2s2ARxUoNQefeA5idmWb561heqCOvB4PaQYfVNEzd8
+	 h9MEIFtKLt+5gI/zBJSsx3fuqqxHwHp9c2ORGQPYb8tqOk1QLfa1vUJihPy94mAzwf
+	 Dvp4L17ci+K7Wvh/rndMZtOJRbXBUMcvt6WNso9mRzCuirhdpgkMbcxEVS+Kcm+snw
+	 t1E/EWFor2xGV/K9aU4zNBc1jwOl7EdMuW0Ua10lYcs+2X5JL6J5gKPFcVTRH5SpZj
+	 kcLk/okFKrsiw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7155C380A953;
+	Fri,  6 Dec 2024 01:00:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/2] arm64: dts: qcom: qcs8300-ride: enable ethernet0
-To: Andrew Lunn <andrew@lunn.ch>,
-        Konrad Dybcio
-	<konrad.dybcio@oss.qualcomm.com>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <20241123-dts_qcs8300-v4-0-b10b8ac634a9@quicinc.com>
- <20241123-dts_qcs8300-v4-2-b10b8ac634a9@quicinc.com>
- <cbd696c0-3b25-438b-a279-a4263308323a@lunn.ch>
- <14682c2b-c0bc-4347-bcf2-9e4b243969a7@oss.qualcomm.com>
- <4ecd23e2-0975-47cb-a1ea-ef0be25c93c6@lunn.ch>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <4ecd23e2-0975-47cb-a1ea-ef0be25c93c6@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: g1faQMUgjurLLQJQr8c2flsXYVVjb7A1
-X-Proofpoint-GUID: g1faQMUgjurLLQJQr8c2flsXYVVjb7A1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- priorityscore=1501 impostorscore=0 mlxlogscore=570 clxscore=1015
- malwarescore=0 suspectscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412060007
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v2 1/1] selftests/bpf: Enable Tx hwtstamp in
+ xdp_hw_metadata
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173344683126.2140008.17912475384599050958.git-patchwork-notify@kernel.org>
+Date: Fri, 06 Dec 2024 01:00:31 +0000
+References: <20241205051936.3156307-1-yoong.siang.song@intel.com>
+In-Reply-To: <20241205051936.3156307-1-yoong.siang.song@intel.com>
+To: Song Yoong Siang <yoong.siang.song@intel.com>
+Cc: ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ kuba@kernel.org, hawk@kernel.org, john.fastabend@gmail.com,
+ andrii@kernel.org, eddyz87@gmail.com, mykolal@fb.com, martin.lau@linux.dev,
+ song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
+Hello:
 
+This patch was applied to bpf/bpf-next.git (net)
+by Martin KaFai Lau <martin.lau@kernel.org>:
 
-On 2024-12-06 07:39, Andrew Lunn wrote:
->>>> +&ethernet0 {
->>>> +	phy-mode = "2500base-x";
->>>> +	phy-handle = <&sgmii_phy0>;
->>>
->>> Nit picking, but your PHY clearly is not an SGMII PHY if it is using
->>> 2500base-x. I would call it just phy0, so avoiding using SGMII
->>> wrongly, which most vendors do use the name SGMII wrongly.
->>
->> Andrew, does that mean the rest of the patch looks ok?
->>
->> If so, I don't have any concerns either.
+On Thu,  5 Dec 2024 13:19:36 +0800 you wrote:
+> Currently, user needs to manually enable transmit hardware timestamp
+> feature of certain Ethernet drivers, e.g. stmmac and igc drivers, through
+> following command after running the xdp_hw_metadata app.
 > 
-> Yes, this is a minor problem, the rest looks O.K, so once this is
-> fixed it can be merged.
+> sudo hwstamp_ctl -i eth0 -t 1
 > 
-> 	Andrew
+> To simplify the step test of xdp_hw_metadata, set tx_type to HWTSTAMP_TX_ON
+> to enable hardware timestamping for all outgoing packets, so that user no
+> longer need to execute hwstamp_ctl command.
+> 
+> [...]
 
+Here is the summary with links:
+  - [bpf-next,v2,1/1] selftests/bpf: Enable Tx hwtstamp in xdp_hw_metadata
+    https://git.kernel.org/bpf/bpf-next/c/2309132fc5d9
 
-I will update the PHY name and pad the register in the next version.
-
+You are awesome, thank you!
 -- 
-Best Regards,
-Yijie
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
