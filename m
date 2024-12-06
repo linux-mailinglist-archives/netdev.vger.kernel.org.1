@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-149656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20AF29E6AF5
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 10:46:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C8A39E6AF3
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 10:46:10 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 261971881F70
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 09:46:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0742E28577C
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 09:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB2F1F9ED3;
-	Fri,  6 Dec 2024 09:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5621DDA3A;
+	Fri,  6 Dec 2024 09:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="wWJIk+lk"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="rxh0kMnX"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C621FA254
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 09:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F4E19F115
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 09:45:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733478303; cv=none; b=sdtbvvxyZOdMeDi6bS7rO0qSq8U/NZPV9u8MLAvwr/yLY+LenpEag8N7s6usY9h1OlvAA3itLJ5RNClaKl18Tmycp7kjrRy1RUjQDjak3/lDMHcYcK5EG8ZFtsj1a0YtC7JS76KPJGaoGfxxMWfNLdk8bp60xWuc0bnGzKe+ofM=
+	t=1733478334; cv=none; b=Tav9NbY8hQ3i0FOh2EJYQwP2aNpJIc4fMWdXsSBEmRtG9wH4teXZ21CaQNZX69QQbyotI+OA+bo8EreGf2wCpvO281Vee11Ax0+coYQCwD49tyBKph2Sr7sFX4cmrs2NcySkzA/PtTME4dCu9vqFkcEC2DxiYOzaEbl4YBxdNHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733478303; c=relaxed/simple;
-	bh=QAHcjiXMcGCYMWRi6b3jIZTIWCzCmJfmJyG5xdDRTSE=;
+	s=arc-20240116; t=1733478334; c=relaxed/simple;
+	bh=KBvV7N3eYiGd6DaFkKtfRkrpGzqYrNr6HDdJyNT4TIg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u891oeLwI5XfmhK7lee+dAns6Qmgwo1J0EzIRh1yoW6VEQOmuTmuqIFIN2wMjqxK49Ip1fsAJ4YC44fmzoi0HKqyFJcuTwQ5gtNcKoI+yRZ7Njqeos1yha6Xxb4RQs6x5s+IZZce/0//y9S0ZBW/U7XLiNRwRZMD8zAHxrN1P+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=wWJIk+lk; arc=none smtp.client-ip=209.85.218.45
+	 In-Reply-To:Content-Type; b=FZEuNd5TabIkOh1w29dCpeby8aUcpV2sRjSkPOzcx4P8h2yNWh4/WuXiW3Opv2nTvZw6z285q3Hz/TAQEeZXYE1hFWTh5LbYCbHS8N2g6FAFNaXi6WTPO+O81I/9VpEmYeZNhI/ZhELX44F2e96RRlfu98Wwnca/BZaxebK+H20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=rxh0kMnX; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a9f1c590ecdso201522666b.1
-        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 01:45:01 -0800 (PST)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aa530a94c0eso373588366b.2
+        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 01:45:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1733478300; x=1734083100; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1733478331; x=1734083131; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ti1qdDktUYvdMf8sBoP76e/SiXinmstLE1fHCLSggDI=;
-        b=wWJIk+lkwPnsBNH5r+uOFrODQo7bDxjx+vFNo2RlnHiDftgyz4xa05v2qWIOGar620
-         C0tcqhmq6SZstWqMQ83MzIBoN6Ewi3U+J4mA9srG6atxIOjstbKX/o8gsnh/34xJymy7
-         9RKcsp+x11+4iJpPoxnxXM0VONvuefRGcAGiz9j3sKR2si+IQ+xh7Zyo4TB7/O0RcOCF
-         bU8QlUrzaSJUnznRbJGq17onXJv0UZ8Wh1OciIGxiStS9X4LGG0fnf/lw/ZSp704fOHZ
-         EX0hUFDhvq5zkHZz6l4hMpWvCOkBvR4QkW7KE8bZ1hBD9bMntzEuVI+DEKKZE/Ao4RtV
-         4iTA==
+        bh=2f6LRWXBbaO0IWNM3IDKbM4jURlGBSHtnIWrgt1bRco=;
+        b=rxh0kMnX5URSD6sLerCSoOPs3dORGSa68lYlm2O3AROF2Hh/JTNzc9jMmOKeuY4U0/
+         qurqDxsgXDROQZUwFlGw7cWHQKywqRKauGRqAbg5E8N+7SKwE1KdeewsRQDdwebRUTIj
+         3zfnktmN5JDY+nHC2uIo88SDvlvn1FAntCVFsxWPr33AgN0O+jABs7o+2Xd80opmtYXf
+         Tvf4IozqRVjjyIIKGCadQwNuVHvOy5wK0s3whTKdAzEtZHH6Gr8qnwZWWLL0apysLKU/
+         OETHMsDiB2q5wX4KL67KrYv6g8r1GwkrZfqrVdznszNOIC5hu/XIx8FpZTQV5DRvK6IO
+         e1vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733478300; x=1734083100;
+        d=1e100.net; s=20230601; t=1733478331; x=1734083131;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ti1qdDktUYvdMf8sBoP76e/SiXinmstLE1fHCLSggDI=;
-        b=t4VKQVxilC/f7uVrNmr5/wllbqwwWlAzvV20KKhFyfA9FDouzhAnv8Qzyjgqcmj0gp
-         qjlylIrikPoORDbF1Q0TTO3C5qU188XHS6MPMZ1fBRrA5zslFeVYNsp+OX6+jD6XAtsP
-         WGtPqiZUV75HY4LqTb+rpQ+ZzptweFUw1j5hxdVaovrapJQzXJFGitTLMc+/fySUR2Ky
-         5bVRI4A4ynQGZWVrrBDUkdVYoxdSq+lT0takbhpsXuT1RlT4dt9tN8nBpAqxJaShSpN/
-         NsL16eDZvIMH7K0IdrqadydklCz4NX7vf95vbD1mlEBIEgv8m9KX1Jar8Ub7P9n5tzCE
-         1Reg==
-X-Forwarded-Encrypted: i=1; AJvYcCWACKCeYk3nQ9HzePpJnJPM0GV5kKHPFPLPleFyLHBswCiBdAt51MHdBjbHyprxU7rdKKqQ9SU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzo3+cmuFqkfJUBPY2CocsTXUXOsOZ3oMtkHsyD2+3cn+ZTxKlA
-	ZVcPAVTaBpMXFcAMsieE6nkApuN3JyyJuyp+Qr0ugKLiD+igCnb2U848AF9dxwk=
-X-Gm-Gg: ASbGncuavkgOZBOn7bpjCOPIK3FR2haMvUreb/5Kkdyh5oWOAjqPIxA8kF261rDwsva
-	+c3PZzrRCBaEJycBetMwmTiq6DeZfwK908iIOOJ8KyDd+3uE8v4DfOwey21HJsqtQ0m3OgWINDE
-	5lKgKujMpvn/LCTUvBNVu8jl62XZtXK7gVLMB3GkY134FVN/KlRQn8uKLoE5DVA6AnUamB2geD/
-	DSJP/pnsC9mCJ+YVEHi/RoAcCUdxR156nlPCVhuvQGSoGeIo9dgmKrN
-X-Google-Smtp-Source: AGHT+IGuBVWRYeq0JkRbHW4GHAGv7e3ocQlGoF8QWE5a93SPWZsYH3oevF+Zld/Wx1kX4gJU0ZGDBg==
-X-Received: by 2002:a17:906:31d3:b0:aa6:303f:6b41 with SMTP id a640c23a62f3a-aa639fa4c68mr181812666b.11.1733478299816;
-        Fri, 06 Dec 2024 01:44:59 -0800 (PST)
+        bh=2f6LRWXBbaO0IWNM3IDKbM4jURlGBSHtnIWrgt1bRco=;
+        b=C0aLjWFwPsUolQetx8HdbJZ176edefpBjktOkL08FdAxsKUVprORA7vyCu6nGSddlb
+         XSyJTQ3y7KK7NQrOMvAF1ciOjOBv3W1g4X5v7FY85puFbgMhpQ4YH1dKq3og/l0lcdyU
+         YCWnNky4s6lNi/qSBkDQ9mSAEPdbYtcISKjOosvKuXWk0kXZA41EQOSGO3ymOkQn/M6P
+         q6/xwFIkQUrrPDMm5hlwmbhKw3myuNxy2xZtaposYBXWGLI6lIyfBMhI7ceeb1xDR5F2
+         Lgu+YP1Fe6GAWNn1MqHapnRupzbgSXq8/i7MY8TXRKvbxwhs3iSSwYh9It2stQY47y2C
+         OzSg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0oDcawWt/CggDIPBIFtPJDZ1LYfJSGEmnP8mA1hvTAsYgBOrIJjLONxpQskIRHsC5F5a7kSM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbA2ov/k1FIwxROGWJCUnnNVum+oHRc+4MTvl2BSCuC10WfMCm
+	z1paYVqdcKyfK7RrRHWKtKDdsMaGhmgOpOCCA+6cnBlDRIpJCTbNu/yb/wGMC28=
+X-Gm-Gg: ASbGncuzQAZvCqaDgSrE2vP4ZyGZZQDmxPqXJFSv/KmSq43FgcxHxh1hFGjMW9vz8st
+	qc3GWPHHr2NZrfgGq8M2e/WfevWgwy9mELycvpm0TrE5A55OGVCsmfer1U2qDJ9K9fzQ8i3Ek89
+	6+rijlHXxbvVXgOfHdWNJAgHp0QNWnhk/3lsHRx3hPVTQ5I+JP1soTiEorzq8v4ZLBa8Ol42DDn
+	4dQkFJ3JF+791YGYOo3WalTP2W5iPU2eXUZ/8NAtd7oTMqAKlS+
+X-Google-Smtp-Source: AGHT+IHcJowf+rPUl7sREKmo+aMdXmeURRag+yH5ghKfbN1cEIr0OSS6L/HO7BQf+NLWTdYhvkbhPQ==
+X-Received: by 2002:a17:906:2932:b0:aa6:412e:8b50 with SMTP id a640c23a62f3a-aa6412e8f24mr102178166b.45.1733478331505;
+        Fri, 06 Dec 2024 01:45:31 -0800 (PST)
 Received: from [192.168.0.123] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa625e4dbfesm213442766b.6.2024.12.06.01.44.58
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa625e6290bsm213663766b.17.2024.12.06.01.45.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Dec 2024 01:44:59 -0800 (PST)
-Message-ID: <6434a8f3-c5c3-42cd-b7b0-c9c06a3eeab0@blackwall.org>
-Date: Fri, 6 Dec 2024 11:44:58 +0200
+        Fri, 06 Dec 2024 01:45:30 -0800 (PST)
+Message-ID: <72040f94-1834-4b4e-a308-a1cfb691e62f@blackwall.org>
+Date: Fri, 6 Dec 2024 11:45:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,8 +80,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 05/11] vxlan: Track reserved bits explicitly
- as part of the configuration
+Subject: Re: [PATCH net-next v2 06/11] vxlan: Bump error counters for header
+ mismatches
 To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -92,29 +92,17 @@ Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
  Alexander Lobakin <aleksander.lobakin@intel.com>,
  Breno Leitao <leitao@debian.org>
 References: <cover.1733412063.git.petrm@nvidia.com>
- <984dbf98d5940d3900268dbffaf70961f731d4a4.1733412063.git.petrm@nvidia.com>
+ <d096084167d56706d620afe5136cf37a2d34d1b9.1733412063.git.petrm@nvidia.com>
 Content-Language: en-US
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <984dbf98d5940d3900268dbffaf70961f731d4a4.1733412063.git.petrm@nvidia.com>
+In-Reply-To: <d096084167d56706d620afe5136cf37a2d34d1b9.1733412063.git.petrm@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 12/5/24 17:40, Petr Machata wrote:
-> In order to make it possible to configure which bits in VXLAN header should
-> be considered reserved, introduce a new field vxlan_config::reserved_bits.
-> Have it cover the whole header, except for the VNI-present bit and the bits
-> for VNI itself, and have individual enabled features clear more bits off
-> reserved_bits.
-> 
-> (This is expressed as first constructing a used_bits set, and then
-> inverting it to get the reserved_bits. The set of used_bits will be useful
-> on its own for validation of user-set reserved_bits in a following patch.)
-> 
-> The patch also moves a comment relevant to the validation from the unparsed
-> validation site up to the new site. Logically this patch should add the new
-> comment, and a later patch that removes the unparsed bits would remove the
-> old comment. But keeping both legs in the same patch is better from the
-> history spelunking point of view.
+> The VXLAN driver so far has not increased the error counters for packets
+> that set reserved bits. It does so for other packet errors, so do it for
+> this case as well.
 > 
 > Signed-off-by: Petr Machata <petrm@nvidia.com>
 > Reviewed-by: Ido Schimmel <idosch@nvidia.com>
@@ -126,57 +114,25 @@ On 12/5/24 17:40, Petr Machata wrote:
 > CC: Alexander Lobakin <aleksander.lobakin@intel.com>
 > CC: Breno Leitao <leitao@debian.org>
 > 
->  drivers/net/vxlan/vxlan_core.c | 41 +++++++++++++++++++++++++---------
->  include/net/vxlan.h            |  1 +
->  2 files changed, 31 insertions(+), 11 deletions(-)
+>  drivers/net/vxlan/vxlan_core.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-
-One very minor nit below, if there's another version. :)
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-
 > diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-> index 257411d1ccca..f6118de81b8a 100644
+> index f6118de81b8a..b8afdcbdf235 100644
 > --- a/drivers/net/vxlan/vxlan_core.c
 > +++ b/drivers/net/vxlan/vxlan_core.c
-[snip]
-> @@ -4080,6 +4083,10 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
->  			 struct net_device *dev, struct vxlan_config *conf,
->  			 bool changelink, struct netlink_ext_ack *extack)
->  {
-> +	struct vxlanhdr used_bits = {
-> +		.vx_flags = VXLAN_HF_VNI,
-> +		.vx_vni = VXLAN_VNI_MASK,
-> +	};
->  	struct vxlan_dev *vxlan = netdev_priv(dev);
->  	int err = 0;
->  
-> @@ -4306,6 +4313,8 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
->  				    extack);
->  		if (err)
->  			return err;
-> +		used_bits.vx_flags |= VXLAN_HF_RCO;
-> +		used_bits.vx_vni |= ~VXLAN_VNI_MASK;
+> @@ -1721,6 +1721,10 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
+>  		 * little more security in adding extensions to VXLAN.
+>  		 */
+>  		reason = SKB_DROP_REASON_VXLAN_INVALID_HDR;
+> +		DEV_STATS_INC(vxlan->dev, rx_frame_errors);
+> +		DEV_STATS_INC(vxlan->dev, rx_errors);
+> +		vxlan_vnifilter_count(vxlan, vni, vninode,
+> +				      VXLAN_VNI_STATS_RX_ERRORS, 0);
+>  		goto drop;
 >  	}
 >  
->  	if (data[IFLA_VXLAN_GBP]) {
-> @@ -4313,6 +4322,7 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
->  				    VXLAN_F_GBP, changelink, false, extack);
->  		if (err)
->  			return err;
-> +		used_bits.vx_flags |= VXLAN_GBP_USED_BITS;
->  	}
->  
->  	if (data[IFLA_VXLAN_GPE]) {
-> @@ -4321,8 +4331,17 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
->  				    extack);
->  		if (err)
->  			return err;
-> +
 
-minor nit: extra newline here, there isn't one above for GBP
-
-> +		used_bits.vx_flags |= VXLAN_GPE_USED_BITS;
->  	}
-
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
