@@ -1,114 +1,115 @@
-Return-Path: <netdev+bounces-149615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B187A9E67A8
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 08:11:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A89A9E67AE
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 08:13:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE92A161700
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 07:11:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C74A1886044
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 07:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC4291E102D;
-	Fri,  6 Dec 2024 07:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA12C1DA0E9;
+	Fri,  6 Dec 2024 07:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tj2XmeJA"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="HvYQ1QxI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C310E1E0E0F;
-	Fri,  6 Dec 2024 07:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8150A1D89F8;
+	Fri,  6 Dec 2024 07:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733469020; cv=none; b=AUNAyXSlfnarfKf9hdOOugwZpNeNwYG4VqmWj3+UtHkPdLyZSirY9dat2qXNpfkQ0r9KR03eyZI1q+5zs9mq2fvZUgf5TLUTxZy3GVK2Mq8msJ2vqtMAiHMn0Ikq3hPv0R3U0DGZ6q5TEW3IT4/BQ3Jt2Y0RO5aio8NSpHPIj8w=
+	t=1733469213; cv=none; b=sC+V3XOk9IvPp0IZjsySH0oommNePeUTJ3r93zXpNwZmht3gCS700q49O+qk8Ox1HKETTUL0CgClrRTYZeecPHqtx3/4Op+k/jaH4ohNT9Uj7EQuj1KtG0NXv8YquIdl/2p9/8zMhn38msO1DROd5Dy9ZOOOHgLpaDqwJtjjjXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733469020; c=relaxed/simple;
-	bh=bgYMmbUmeeNFZfAe6nC7/pJrE+frUhtE8/TYuk75xHc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YYVx2Ow5EqrLGq8D6SJzi4FpimnCCrhTnuoXVPA90J7rMyAYPmC2tXOMCUNNN+qdodXkrz0piqwDLShPiEusHv+jBYpemJCk1kJ+0IAs4M7IFU1zJZsnAsl1cGZUJinJcdCMWn1o6cBB5tTfGAtJVBOkSdZ1fdAg88DAKuPNqe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tj2XmeJA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3366FC4CED1;
-	Fri,  6 Dec 2024 07:10:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733469019;
-	bh=bgYMmbUmeeNFZfAe6nC7/pJrE+frUhtE8/TYuk75xHc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tj2XmeJA/2K+rMzFSiQYGA+zs1Scs+61ar6kzGq8vhjjCnwugHWBcCGRV5CQj0O0K
-	 j0zmkSK9tgMIrMi3CtWerU+mMHg8+IASnxb96itjjrM2gLm/2xlpHUtCjMWy8rCrvP
-	 arrCvzpqIqu/LyHAwj9WtVl7YdxvE4rZ8rt7/K018y/l9CVkedHn7+x5pCq1gZXeIK
-	 vQjxMuHYWqHCq7J8CoamcWsWc+ioJPdffWq17eLBwHs4k9VBq3Ht1ToQf4k1GpVdiY
-	 2VHXS0QHXecO5EwRu/Dxe/7H3Qux9Kqy2cabHhYUUTM4hlphD7S6d2kqZdhoFxGi7H
-	 eXZFbF6y2c9xA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 344FE380A954;
-	Fri,  6 Dec 2024 07:10:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1733469213; c=relaxed/simple;
+	bh=I6togj3rCYdWZizm/vBZ+hpS0EcWywx3tvwMzR/v/Hk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R9Pd10DgwR0oihfBY7Fae6l6nwRUj7nI+0BAUndAU4shHM2j3AEVj3bjPFwM+lH6R1TElackWupry1NA87K/2ZBDMZL0Uvm/QgyPH1RVpUsFFO4I7hq4skHV7otEdFM1E2l55Arl22VBAIVmRPfO+qP01R9T3SiBs8FCrhvvCF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=HvYQ1QxI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A81B6C4CED1;
+	Fri,  6 Dec 2024 07:13:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1733469213;
+	bh=I6togj3rCYdWZizm/vBZ+hpS0EcWywx3tvwMzR/v/Hk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HvYQ1QxIOTib9pAjNiUWByzjxOF8c7ghvkEfuBCoaWWC8LOyet0hvbQ+1/4xCdUbt
+	 m8wOq+nCuIftmqrpkfQqfhzWR+kSpVjq53zjheiabEA7rIwrgZI8+KSbwctU/tNB9e
+	 Ut7dm3jGijwMeC3kEPhSnaUIfc5/vY/tY769B0sE=
+Date: Fri, 6 Dec 2024 08:13:30 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Til Kaiser <mail@tk154.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, idosch@nvidia.com, petrm@nvidia.com
+Subject: Re: [PATCH net-next v2] net: sysfs: also pass network device driver
+ to uevent
+Message-ID: <2024120613-unicycle-abruptly-02d1@gregkh>
+References: <20241115140621.45c39269@kernel.org>
+ <20241116163206.7585-1-mail@tk154.de>
+ <20241116163206.7585-2-mail@tk154.de>
+ <20241118175543.1fbcab44@kernel.org>
+ <665459ff-9e99-4d22-9aeb-69c34be3db6b@tk154.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6 00/10] xdp: a fistful of generic changes pt. I
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173346903398.2224618.4233882857033611315.git-patchwork-notify@kernel.org>
-Date: Fri, 06 Dec 2024 07:10:33 +0000
-References: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
-In-Reply-To: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
- andrii@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, toke@redhat.com, maciej.fijalkowski@intel.com,
- sdf@fomichev.me, magnus.karlsson@intel.com,
- nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <665459ff-9e99-4d22-9aeb-69c34be3db6b@tk154.de>
 
-Hello:
+On Thu, Dec 05, 2024 at 05:28:47PM +0100, Til Kaiser wrote:
+> On 19.11.24 02:55, Jakub Kicinski wrote:
+> > On Sat, 16 Nov 2024 17:30:30 +0100 Til Kaiser wrote:
+> > > Currently, for uevent, the interface name and
+> > > index are passed via shell variables.
+> > > 
+> > > This commit also passes the network device
+> > > driver as a shell variable to uevent.
+> > > 
+> > > One way to retrieve a network interface's driver
+> > > name is to resolve its sysfs device/driver symlink
+> > > and then substitute leading directory components.
+> > > 
+> > > You could implement this yourself (e.g., like udev from
+> > > systemd does) or with Linux tools by using a combination
+> > > of readlink and shell substitution or basename.
+> > > 
+> > > The advantages of passing the driver directly through uevent are:
+> > >   - Linux distributions don't need to implement additional code
+> > >     to retrieve the driver when, e.g., interface events happen.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Why does the driver name matter for something like a network device?
+I.e. why are network devices "special" here and unlike all other class
+devices in the kernel like keyboards, mice, serial ports, etc.?
 
-On Tue,  3 Dec 2024 18:37:23 +0100 you wrote:
-> XDP for idpf is currently 6 chapters:
-> * convert Rx to libeth;
-> * convert Tx and stats to libeth;
-> * generic XDP and XSk code changes (you are here);
-> * generic XDP and XSk code additions;
-> * actual XDP for idpf via new libeth_xdp;
-> * XSk for idpf (via ^).
-> 
-> [...]
+> > >   - There is no need to create additional process forks in shell
+> > >     scripts for readlink or basename.
 
-Here is the summary with links:
-  - [net-next,v6,01/10] xsk: align &xdp_buff_xsk harder
-    https://git.kernel.org/netdev/net-next/c/ca5c94949fac
-  - [net-next,v6,02/10] bpf, xdp: constify some bpf_prog * function arguments
-    https://git.kernel.org/netdev/net-next/c/7cd1107f48e2
-  - [net-next,v6,03/10] xdp, xsk: constify read-only arguments of some static inline helpers
-    https://git.kernel.org/netdev/net-next/c/dcf3827cde86
-  - [net-next,v6,04/10] xdp: allow attaching already registered memory model to xdp_rxq_info
-    https://git.kernel.org/netdev/net-next/c/f65966fe0178
-  - [net-next,v6,05/10] xsk: allow attaching XSk pool via xdp_rxq_info_reg_mem_model()
-    https://git.kernel.org/netdev/net-next/c/9e25dd9d65d2
-  - [net-next,v6,06/10] xdp: register system page pool as an XDP memory model
-    https://git.kernel.org/netdev/net-next/c/e77d9aee9513
-  - [net-next,v6,07/10] netmem: add a couple of page helper wrappers
-    https://git.kernel.org/netdev/net-next/c/9bd9f72a7434
-  - [net-next,v6,08/10] page_pool: make page_pool_put_page_bulk() handle array of netmems
-    https://git.kernel.org/netdev/net-next/c/024bfd2e9d80
-  - [net-next,v6,09/10] page_pool: allow mixing PPs within one bulk
-    (no matching commit)
-  - [net-next,v6,10/10] xdp: get rid of xdp_frame::mem.id
-    (no matching commit)
+"Do it in the kernel and have someone else maintain it for me to make my
+life easier in userspace" isn't always the best reason to do something.
+Generally if "you can do this in userspace" means "you SHOULD do this in
+userspace", it's not a good reason to add it to the kernel.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+And note, driver names change!  How are you going to handle that?
 
+> > >   - If a user wants to check his network interface's driver on the
+> > >     command line, he can directly read it from the sysfs uevent file.
 
+The symlink in sysfs shows this already, no need to
+open/read/parse/close the uevent file.
+
+Also, where did you now document this new user/kernel API that we have
+to maintain for 40+ years?  And what userspace tool is going to use it?
+
+But really, again, why are network devices so special that they need
+this but no other type of device in the kernel does?  And what changed
+to require this suddenly?
+
+thanks,
+
+greg k-h
 
