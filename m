@@ -1,260 +1,95 @@
-Return-Path: <netdev+bounces-149527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4E449E6186
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 00:57:24 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05E069E61F8
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 01:13:16 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D2C21884F1C
-	for <lists+netdev@lfdr.de>; Thu,  5 Dec 2024 23:57:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAC5A280FC9
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 00:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B44941D04A4;
-	Thu,  5 Dec 2024 23:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56491805A;
+	Fri,  6 Dec 2024 00:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hnTO+2Oj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K1H/F7V3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B5849627;
-	Thu,  5 Dec 2024 23:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED02C1A269
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 00:12:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733443039; cv=none; b=Opjw2rW6pdC9CFD5YTBY4jKls2urDxr3w5UJaJeE3cEnVSzTVEC8sXrvnN0O4kDMO5ZdkKhefVgSDfXRtcrwA063JkOrPL/qqZsXUuBxXHa+Pniir/nfFUA/0oM2VAa9M+pyZKpYUz5jlzJx1kAtf9g7FmqJdcBF1lXKxczgsfk=
+	t=1733443940; cv=none; b=ekB8wrxI3ENvtKz6yVjZKk0Nu2wSx4TcVMTwXlgCjJNrI4LM7Gvh9JSmXXgoR5hGjTmyv0H4NBsi6V/lp/dLtq7zPeMemJaghfU8HPvr8B7+F+ZWpZFruMJzwfm4CWNsQrYfREqF/EEErHPP5T7T0Ma6xATqJFzT4j5KV0a8JJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733443039; c=relaxed/simple;
-	bh=Gb9A7IbaXaNn0QmiSU5QWC6XaGim+k77cXLOs53GqPQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VWNoAXnQx+OwBpvOy/2WVe84dqSWsG0ZuCy/+o3psKk7IzMJNfZGLxRP2txqxdbjSYC6/Sg2K87ybXTbwo2dityDn8eA1N7oS5PK2zsxjBMc/qg/S+Q+DCecYSxDNSg/H8EYBJJttDAVRbQX4nnCFuGATPYVaY9O9I0qzP4on84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hnTO+2Oj; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aa62e741fbaso17582666b.1;
-        Thu, 05 Dec 2024 15:57:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733443035; x=1734047835; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MAo9cVc8wqzk5rP3Z3ruoyEUyVoOdbKhUC4uEqSh6TE=;
-        b=hnTO+2OjxcQorQK+4/SnJh/Dk6oPhaRdCGzeF6KDTRS9OCCGW+ycGz13grEn5p6DeZ
-         i3SYQrtMsNQzsxQ+T34Xl91ffJLK/+5sKlCwg3UpQdfaaDlPfJqSJf//f53oePjHGNpv
-         xOtg0aAZ/v12mKz/Q3lutpViH2dBfsYJEXN6kJqX8QVyz4y6SG+CT90KvqxFjRQ4DFDQ
-         nlpWhDt165BtYPTupS9zvfMs/Ua7Op2k+wnly3yojUcUhXzNitWNhvvwwJLNMAldqnFJ
-         f/RSgSGypaGCEWIr/ybJN7vW2aXcElp6lYakPeUNZT4ACn/v1hXY1VUjtXNk7KNunBWp
-         RWUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733443035; x=1734047835;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MAo9cVc8wqzk5rP3Z3ruoyEUyVoOdbKhUC4uEqSh6TE=;
-        b=Gqb1w3bprxsrjFzoGMx1p2Ybu4a+XCw5qSRJeYHZzDSkduAnqOiWEEROvXCxGlnMbk
-         yUz4rq5rPejEEt4BnnNEFGJlbtiy7kZKXf5T/Vi54wveIgM+nHiZ+pB5Obq1Oi8ZPhg5
-         3kxCXhaLmTfm5agcsEJvbikKuzQ8pSrvdOBicLoyrpTKPLBdrNe6eqzA1Glyia5rdHl0
-         zdCbekk6HIJ37NLxq/MgJ1GK2RuxRvJ2fjqAhuyWSnn3421UPh+UHY6VQmNXcKQ6XRuH
-         qlpjvxqN79gd5GjgJvPvr/X67fWWqX/aioa1YuSJ4APy75ZIG8KDoxArl79mRUm3bvSo
-         F/vA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnYtVdeuTvISaKHAl2fnH06r5goHnxWEODEM5IFjS/T4d97tkWdbMpxZpbJn9AyaRj64dODyNWdHPMDOSg@vger.kernel.org, AJvYcCXXldrefZ7w0MfLo3OM5Y4YTopNu/RJvHMrrl5nKcSoFi8DCLTywJzYF0cCpkeOETHZT9y5vdp2@vger.kernel.org, AJvYcCXhL0Rie1VCmM3SSHtNhd9etEqjeGfEOCCJekCJs8BLpGqpoWmlM53KzfiCjg/i0fRsYWlKdduTv+cO@vger.kernel.org
-X-Gm-Message-State: AOJu0YzS2cMY0OqhMe2LqcJepGgVDvgu8iLJI1NwxYNsUrkZpu8uw9S0
-	2c6Lis4CREQom2tzM7tmehU7CYqWX6V0OI0jZB3Va0jS/o+8BXfq
-X-Gm-Gg: ASbGncuI2OL/CX+3j8PfZ2zykIZ1PjmnvNV4KcbAqvDqVe0xvoNKb405YwBrRGjhMT3
-	MZNGV3EzioHU4QJ2bW+L9tkwl/5tXVwySLKM7K9fH5KXmvTTnaFfuiu53guO7BpGG60kec++vye
-	ke/2Py5o03jeLfVLonR08xYPUQrprHEqytUQN7tzr40nbvl8qmAbwdLjzlf7jqOZXLCFqtE6N5N
-	gYSGvzYi0uZnBMNNWeXEYoi4eZyLdWPVPJJpYI=
-X-Google-Smtp-Source: AGHT+IE7dUzMRW5X7ylWUaAfuLQLWmAdBw9QHxuByRnp2/sHxsnIHbysm9CaN6DPwjMSUukK5qW3ng==
-X-Received: by 2002:a17:907:1819:b0:aa5:a36c:88f3 with SMTP id a640c23a62f3a-aa63a20039cmr24798866b.10.1733443034766;
-        Thu, 05 Dec 2024 15:57:14 -0800 (PST)
-Received: from skbuf ([188.25.135.117])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa625e4ed51sm155526866b.31.2024.12.05.15.57.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2024 15:57:13 -0800 (PST)
-Date: Fri, 6 Dec 2024 01:57:09 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v9 3/4] net: dsa: Add Airoha AN8855 5-Port
- Gigabit DSA Switch driver
-Message-ID: <20241205235709.pa5shi7mh26cnjhn@skbuf>
-References: <20241205162759.pm3iz42bhdsvukfm@skbuf>
- <20241205145142.29278-1-ansuelsmth@gmail.com>
- <20241205145142.29278-4-ansuelsmth@gmail.com>
- <20241205162759.pm3iz42bhdsvukfm@skbuf>
- <6751e023.5d0a0220.394b90.7bc9@mx.google.com>
- <6751e023.5d0a0220.394b90.7bc9@mx.google.com>
- <20241205180539.6t5iz2m3wjjwyxp3@skbuf>
- <6751f125.5d0a0220.255b79.7be0@mx.google.com>
- <20241205185037.g6cqejgad5jamj7r@skbuf>
- <675200c3.7b0a0220.236ac3.9edf@mx.google.com>
+	s=arc-20240116; t=1733443940; c=relaxed/simple;
+	bh=UTqJoFiFcb7QWbJLCYZ6vV6S83KBmqu79iJXV1WF98g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SP4Iu7JBE3T+Qc4B0vaFXk45VZn3NH/Isy+r9AhoRF1pK5Wgw8aqkVoJCXfLhcwIXNHIDlPXUwtEirZVuA11o73Guu8/YRnqE7AlULWEqnOeTsReWzWRjy1w5Bvj5nCyxh9npz0qjRENYxsZeueHakQux7t5HZ2bUaks2gr29Rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K1H/F7V3; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733443939; x=1764979939;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=UTqJoFiFcb7QWbJLCYZ6vV6S83KBmqu79iJXV1WF98g=;
+  b=K1H/F7V3Ejsg2FylzfWI4jjq1G31jdPlCiy0Yxf7a4bZ0Gw9BrLguA3Z
+   bF+VSysnnnN28fYTMtKgOkinUXTBKd8XWeRTgEGEAlPyZiuxvAcXfIbal
+   AGOQKnh39yy8H5qqlnmLf2vwAayg6wMoCYf/t4GvLla/KZTS6UKcjY5WW
+   GV/BHSsVdsCbwvvXdxpDZR7yOzltDI0aFY27roPFCG5+QIbjV82JlzjGB
+   /3dnlBYzEcRoEyZlQEXRtf4KVla5dO1bYrFkXUYVlufi78nsjNU4Gz0ID
+   1on/QkPtv+OX2pn2yKD34xa4JQiYi4EhJVsGKGcWSEbsg2E/NpGQkeMiB
+   g==;
+X-CSE-ConnectionGUID: xvSR0y+6QTKTHOqBU8KHUw==
+X-CSE-MsgGUID: dHVnglLJSzaXro5UOLR5Tw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="45162750"
+X-IronPort-AV: E=Sophos;i="6.12,211,1728975600"; 
+   d="scan'208";a="45162750"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 16:12:18 -0800
+X-CSE-ConnectionGUID: UQjJkFFXQb+3UFnATqaG5A==
+X-CSE-MsgGUID: d5avdj05QH62pSTxESEZnQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,211,1728975600"; 
+   d="scan'208";a="98694923"
+Received: from ibganev-mobl.amr.corp.intel.com (HELO azaki-desk1.intel.com) ([10.125.108.131])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 16:12:17 -0800
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: netdev@vger.kernel.org
+Cc: Ahmed Zaki <ahmed.zaki@intel.com>
+Subject: [PATCH RFC net-next 0/2] net: napi: add CPU affinity to napi->config
+Date: Thu,  5 Dec 2024 17:12:07 -0700
+Message-ID: <20241206001209.213168-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <675200c3.7b0a0220.236ac3.9edf@mx.google.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 05, 2024 at 08:36:30PM +0100, Christian Marangi wrote:
-> > I guess the non-hack solution would be to permit MDIO buses to have
-> > #size-cells = 1, and MDIO devices to acquire a range of the address
-> > space, rather than just one address. Though take this with a grain of
-> > salt, I have a lot more to learn.
-> 
-> I remember this was an idea when PHY Package API were proposed and was
-> rejected as we wanted PHY to be single reg.
+As suggested by Jakub, move the CPU affinity mask from the driver to
+napi->config.
 
-Would that effort have helped with MDIO devices, in the way it was proposed?
-Why did it die out?
+Tested on idpf.
+---
+if accepted, will fix all drivers already using netif_napi_set_irq() 
 
-> > If neither of those are options, in principle the hack with just
-> > selecting, randomly, one of the N internal PHY addresses as the central
-> > MDIO address should work equally fine regardless of whether we are
-> > talking about the DSA switch's MDIO address here, or the MFD device's
-> > MDIO address.
-> > 
-> > With MFD you still have the option of creating a fake MDIO controller
-> > child device, which has mdio-parent-bus = <&host_bus>, and redirecting
-> > all user port phy-handles to children of this bus. Since all regmap I/O
-> > of this fake MDIO bus goes to the MFD driver, you can implement there
-> > your hacks with page switching etc etc, and it should be equally
-> > safe.
-> 
-> I wonder if a node like this would be more consistent and descriptive?
-> 
-> mdio_bus: mdio-bus {
->     #address-cells = <1>;
->     #size-cells = <0>;
-> 
->     ...
-> 
->     mfd@1 {
->             compatible = "airoha,an8855-mfd";
->             reg = <1>;
-> 
->             nvmem_node {
->                     ...
->             };
-> 
->             switch_node {
->                 ports {
->                         port@0 {
->                                 phy-handle = <&phy>;
->                         };
-> 
->                         port@1 {
->                                 phy-handle = <&phy_2>;
->                         }
->                 };
->             };
-> 
->             phy: phy_node {
-> 
->             };
->     };
-> 
->     phy_2: phy@2 {
->         reg = <2>;
->     }
-> 
->     phy@3 {
->         reg = <3>;
->     }
-> 
->     ..
-> };
-> 
-> No idea how to register that single phy in mfd... I guess a fake mdio is
-> needed anyway... What do you think of this node example? Or not worth it
-> and better have the fake MDIO with all the switch PHY in it?
+Ahmed Zaki (2):
+  net: napi: add CPU affinity to napi->config
+  idpf: use napi's irq affinity
 
-Could you work with something like this? dtc seems to swallow it without
-any warnings...
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 18 ++++-------------
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h |  6 ++----
+ include/linux/netdevice.h                   | 22 +++++++++++++++++++++
+ net/core/dev.c                              |  7 ++++++-
+ 4 files changed, 34 insertions(+), 19 deletions(-)
 
-mdio_bus: mdio {
-        #address-cells = <1>;
-        #size-cells = <0>;
+-- 
+2.47.0
 
-        soc@1 {
-                compatible = "airoha,an8855";
-                reg = <1>, <2>, <3>, <4>;
-                reg-names = "phy0", "phy1", "phy2", "phy3";
-
-                nvmem {
-                        compatible = "airoha,an8855-nvmem";
-                };
-
-                ethernet-switch {
-                        compatible = "airoha,an8855-switch";
-
-                        ethernet-ports {
-                                #address-cells = <1>;
-                                #size-cells = <0>;
-
-                                ethernet-port@0 {
-                                        reg = <0>;
-                                        phy-handle = <&phy0>;
-                                        phy-mode = "internal";
-                                };
-
-                                ethernet-port@1 {
-                                        reg = <1>;
-                                        phy-handle = <&phy1>;
-                                        phy-mode = "internal";
-                                };
-
-                                ethernet-port@2 {
-                                        reg = <2>;
-                                        phy-handle = <&phy2>;
-                                        phy-mode = "internal";
-                                };
-
-                                ethernet-port@3 {
-                                        reg = <3>;
-                                        phy-handle = <&phy3>;
-                                        phy-mode = "internal";
-                                };
-                        };
-                };
-
-                mdio {
-                        compatible = "airoha,an8855-mdio";
-                        mdio-parent-bus = <&host_mdio>;
-                        #address-cells = <1>;
-                        #size-cells = <0>;
-
-                        phy0: ethernet-phy@1 {
-                                reg = <1>;
-                        };
-
-                        phy1: ethernet-phy@2 {
-                                reg = <2>;
-                        };
-
-                        phy2: ethernet-phy@3 {
-                                reg = <3>;
-                        };
-
-                        phy3: ethernet-phy@4 {
-                                reg = <4>;
-                        };
-                };
-        };
-};
 
