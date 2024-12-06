@@ -1,101 +1,132 @@
-Return-Path: <netdev+bounces-149791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88FFB9E7839
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 19:39:55 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B44849E7841
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 19:43:03 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 497DC2838D9
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 18:39:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7633618868E2
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 18:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AED1D90A9;
-	Fri,  6 Dec 2024 18:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD891D9359;
+	Fri,  6 Dec 2024 18:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="o62otV5b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RJ5lXDmq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB5D1D515D;
-	Fri,  6 Dec 2024 18:39:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC13195FF0;
+	Fri,  6 Dec 2024 18:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733510393; cv=none; b=oLW7mgt30PZMnfx0O3vHW1q+j0slB68I4qCNgXa5FKMrtjbBCrIH9nfu7zPwnzx5THX5weDk7G5LNgQzVTxmtujD5ZiLrbvswZJpXZLn4qIfy7o1bPklcaiTvXv5FF4WDaJ8DIzDjlGflfKAw95VFRMwy3rB44aNaSKGEnTAH48=
+	t=1733510579; cv=none; b=QDxmx34J82Jkx4i3y5YglVviV9JJT34ec1qtq584pKF//Tm1of7axoBZ2uE/U7qlAS29PJhznsW7udpn1A1zJ3TJI6C1B3sDFeAioXCuRZZ7Hne6I23fuGFnxV/NwsiAR2WkSGhp2NbjF/u5XrNsbsIVZ4e3qcuk2bCHH05G10Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733510393; c=relaxed/simple;
-	bh=E2wWjI99kdWUXdSegLXUSROKPLL4L2v5K+qdOzZZzGw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lXe7nYfcVmlaHEp081pvuAUi+YPpaEjXGHfGmKNEVophFK5efT9+HzTNcbu2hwUTRwyNfygszW7eQSmfWvxkGTyi4AvYxyKl3OzYiP/hiMf3NdWg+2UPKuPVRtAF3Z+6L48/wz366/XNyEFZ0garJR2HgYFnhydwwlyZ2wRCJJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=o62otV5b; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tJdEo-004PKx-SK; Fri, 06 Dec 2024 19:39:38 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=+NIUr4L2/mU5OspHum2ca0kQMsGCg5gpDhpnV9PRV+M=; b=o62otV5bl0SQMLz+SN+ibPxsqd
-	kjTHf9j6JhCKoTGv1TbGQBT+UAPymNXJMjClPAQu/33v4bjmxsdMqBGfiov0L//2uJ0mt/9bCKsYw
-	ntV5Oq08QTShWIZ4diA2FeMm01JeP0ij+VzlTLa5mUN13bJp826ljtSinv+UWXODwDGsZXnY2J0fB
-	ZdZmF2z0c7UHwWaeCzuO8by/x7rwnALpmStpGPtEmprHSEUIl49UdpHUBRClXGBlDQ3tQMHt1LLV3
-	XGz9TQuQLrgmQg5hvM31GZctuFq8pewOKUdKr3x4psyoUUJRHnYcLyZLV3po45DDtphFilp5+Emh/
-	pStHfjtw==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tJdEi-0008Vd-IT; Fri, 06 Dec 2024 19:39:32 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tJdEd-008J3Y-58; Fri, 06 Dec 2024 19:39:27 +0100
-Message-ID: <3f1054f1-bb3a-4345-a58d-272704c76f4c@rbox.co>
-Date: Fri, 6 Dec 2024 19:39:25 +0100
+	s=arc-20240116; t=1733510579; c=relaxed/simple;
+	bh=icpeG6rZXi919HAXSM1rD/h5KtAwpDPXQFR2vC1cLKk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WAKjf2okeVF+weDgyeQH0Vs8pKwseiwojodRI1tI7qNSfWmHwbGa0Pg6cKTnQGQRGHsyL5oFc09hs7lLp5I067IwueDwvakgm2lDIhtLRXetZyAeaKooet/yfK+BMY24Dot05sN3P4bkEFIUSHAXWRs1Nk+1ZksgarJpcF1F2vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RJ5lXDmq; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2eecc01b5ebso2092603a91.1;
+        Fri, 06 Dec 2024 10:42:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733510577; x=1734115377; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b2d53tzOymB0sMAyzB4RRSbvFWayMED1FyCRdpH4jKs=;
+        b=RJ5lXDmqi2rY4ETUNoIPWeexIVGg4MOSGK17X7HeB5/7VnnYflJ+mP0e2y0sg18pNv
+         ZyibKzCl1PX5Xhhi47uTQxEMrrLIrTgSEY5QHpHEErsyHsPPHRTDtAUjD8WvcPDSpcKW
+         NpnyI09xuikLj9u+AjshzAKykVxbnRs9NQXn0MPDj3nhiJLYQ0EBgxCkhj+7d4v5+sOT
+         piHI3oXIE8cDmN7DT/IR5DJKJHNkZFJWlSVhdEe8/P4pHTJMOyGALsAyjyUAe7TNEytj
+         1VMm48f48t3EYu1+WrciMI7R8NARCWfOKRve1Z+IW6mqblx69ics+p8y/BQxu7lTpkbf
+         IKRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733510577; x=1734115377;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b2d53tzOymB0sMAyzB4RRSbvFWayMED1FyCRdpH4jKs=;
+        b=UjMwtRAvOBMsb50gGn/GTUFjzq85QOka3bRtwuPpSvSYpC2QzSthAB/oc47R6lxMR1
+         QEokQbEHAAtH9uOePn4Ms8tWN7eqzeY6I7EGXn6pH/8ylHeiCPhPs2BtqC15DvWJt1Rf
+         jCIIZIibLZxoBh9dSlnpmiIFglpVxOLvL7rhh71dr1VfBwC9qtfwbFLuaxKkdILXo/jK
+         RfgwmuZCvo4vwf3TDC3dPl+Uw7N10jpNakngTYjcuNRo6ajAHyzRtCaJKUd69zTZVIdu
+         jNu+pFUK6uxstQwcfus0NwZVsSxEJCrbr8Zj7RKSCkIiPaqNnaGS1IK6BmxhL3hgVdXr
+         CEnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVpAt/UyMEgBGegEmFspGvaj0gqOMF17TiG5jsPBQyPYtf8yzgh2FbuRc8RPavQWYuCh8Gz16pF@vger.kernel.org, AJvYcCVrpjvGKAHsszOxkkbt2OT1fKqf8xe9oP1wkNo4La743gIxx7JCvs2YdQeOlqMaqKePctQ=@vger.kernel.org, AJvYcCX6rwcrZ8ikEzfKTtcWa65cx1b8Mz0i+P2ueStT6dN/L4b7XUUbwEWYY24wF2Ors46/3zdXMG2joJLSTp3P@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4cZoR8s8Lzl74KqaHiAbjQGpAb2TigJLGisesozXRHIsjhVXZ
+	dLdlUBcfYgBH0bUSc/GQamevV4roB25LHguSpyVulOp7yxvvZaf1kW9K7B6hXY7qoL9hRBvOiwp
+	K+Eh6KvNNwUB6GfwQE7g//hlefxU=
+X-Gm-Gg: ASbGncuXDmamutapYsSOVx3PtoVJM2Cm452zXKf1NPO7YuuRQ8P8e2N/FDVC8CgxcLL
+	UPur/XjCDr1Zayzh25XMgE2QSpyO2hH/JwBNbqcIiZXR+orc=
+X-Google-Smtp-Source: AGHT+IHJsYAFQYMbWI7hn6EpMZ+O9odRsbqsvX09MOzFQuhCR/3Uq6XwUqsr0upKweJVXpYxZIhkD2/+ILrgk/811Go=
+X-Received: by 2002:a17:90b:4fcd:b0:2ea:3d2e:a0d7 with SMTP id
+ 98e67ed59e1d1-2ef69e154e1mr7173941a91.15.1733510577232; Fri, 06 Dec 2024
+ 10:42:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 0/3] virtio/vsock: Fix memory leaks
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jia He <justin.he@arm.com>, Arseniy Krasnov <avkrasnov@salutedevices.com>,
- Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>,
- George Zhang <georgezhang@vmware.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org
-References: <20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co>
- <7wixs5lrstuggf2xwgu6qva2t6atqnthcxycg6mpfpx52gl6fq@qmwb6gtgpad2>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <7wixs5lrstuggf2xwgu6qva2t6atqnthcxycg6mpfpx52gl6fq@qmwb6gtgpad2>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241206023046.2539-1-liujing@cmss.chinamobile.com>
+In-Reply-To: <20241206023046.2539-1-liujing@cmss.chinamobile.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 6 Dec 2024 10:42:45 -0800
+Message-ID: <CAEf4Bzaxp5c9SpUO_aecpPeXqUEy4JwQzqWyKHpY36PtvXKkNw@mail.gmail.com>
+Subject: Re: [PATCH] samples/bpf: Modify the incorrect format specifier
+To: liujing <liujing@cmss.chinamobile.com>
+Cc: ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, 
+	hawk@kernel.org, john.fastabend@gmail.com, andrii@kernel.org, 
+	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/19/24 11:31, Stefano Garzarella wrote:
-> Hi Michal,
-> 
-> On Thu, Nov 07, 2024 at 09:46:11PM +0100, Michal Luczaj wrote:
->> Short series fixing some memory leaks that I've stumbled upon while 
->> toying
->> with the selftests.
-> 
-> Are these tests already upstream?
-> I would like to add them to my suite, can you tell me how to run them?
+On Thu, Dec 5, 2024 at 6:31=E2=80=AFPM liujing <liujing@cmss.chinamobile.co=
+m> wrote:
+>
+> Replace %d with %u in snprintf() because it is "unsigned int".
 
-CC got accidentally stripped, sorry.
-Long story short: https://lore.kernel.org/netdev/20241206-test-vsock-leaks-v1-0-c31e8c875797@rbox.co/
+The code change is fine, but the explanation is ambiguous and hard to
+follow. Just mention that we are printing integers, so we need %d
+instead of %u for snprintf. As you wrote it above, it reads as if we
+are printing unsigned int, yet code contradicts that.
 
-Thanks,
-Michal
+pw-bot: cr
 
+>
+> Signed-off-by: liujing <liujing@cmss.chinamobile.com>
+>
+> diff --git a/samples/bpf/xdp_router_ipv4_user.c b/samples/bpf/xdp_router_=
+ipv4_user.c
+> index 266fdd0b025d..3fc1d37fee7c 100644
+> --- a/samples/bpf/xdp_router_ipv4_user.c
+> +++ b/samples/bpf/xdp_router_ipv4_user.c
+> @@ -134,11 +134,11 @@ static void read_route(struct nlmsghdr *nh, int nll=
+)
+>                                         *((__be32 *)RTA_DATA(rt_attr)));
+>                                 break;
+>                         case RTA_OIF:
+> -                               sprintf(ifs, "%u",
+> +                               sprintf(ifs, "%d",
+>                                         *((int *)RTA_DATA(rt_attr)));
+>                                 break;
+>                         case RTA_METRICS:
+> -                               sprintf(metrics, "%u",
+> +                               sprintf(metrics, "%d",
+>                                         *((int *)RTA_DATA(rt_attr)));
+>                         default:
+>                                 break;
+> --
+> 2.27.0
+>
+>
+>
 
