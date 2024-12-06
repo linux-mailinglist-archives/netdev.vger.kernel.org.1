@@ -1,118 +1,90 @@
-Return-Path: <netdev+bounces-149820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB2239E7A44
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 21:58:33 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AA959E7A5B
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 22:09:59 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 874BF284824
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 20:58:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48E8A1887840
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 21:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07DA31AAA29;
-	Fri,  6 Dec 2024 20:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F76B202C50;
+	Fri,  6 Dec 2024 21:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="opdIpAAC"
+	dkim=pass (2048-bit key) header.d=telenet.be header.i=@telenet.be header.b="R4CBPgKZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EADF1F236B;
-	Fri,  6 Dec 2024 20:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from xavier.telenet-ops.be (xavier.telenet-ops.be [195.130.132.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CCB9212F84
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 21:09:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.132.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733518706; cv=none; b=Y1RwqErzoq6ACEd300/kcYN3oX4EV5lZ9B8De2uIPS4LgjuYgwDRaFZnzklNFrK+KbfurHan5GJVEya2SDUSzvO2Cj6o3jbtAcrZAQP81ZPaXqc+BmjlIq7Z+pkJ5vfl+yMvH4PGkY6m+0W6qTSMCVFYiqXtslZa4KvuT/fso3w=
+	t=1733519396; cv=none; b=NlzW0VRzvPBbGt8VnTcwFIpDmNScv6ssHw8Vsr/PEkIoEPPfAX9kAta9DDjJJx6PKSHkPsxozs09wxgfDqUgxolnJWjpWMuVrca2yQf0Umlkh3JDWQ9C2/elpmy6996/1/nBeH1n/Qlfo5uRtql66zFfAQpP2hxwC4c1rDT2aak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733518706; c=relaxed/simple;
-	bh=AoYJEduDKAfmUXw66punVqpLvMHGpz/t+LVYPT/z7pE=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=PTE0LzgcEYhomE5+EfGy48xWLh+cLZxNq/uwTh6WHo6tb9XM1IEmlg6u+0XGOJLMFhShkwNNrnNwypY5CtJyUJCH1WfybwbICchqnIEwswWtdePDXwWQzRero4wKc5NeTVo0coPRFPDKgTxf35um/u/bVOhntIbNICecjFd5/s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=opdIpAAC; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [100.65.128.154] (unknown [20.236.11.102])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 8B63620ACD7A;
-	Fri,  6 Dec 2024 12:58:18 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8B63620ACD7A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1733518699;
-	bh=M9PuEUd7fHK0twjnpmT4sQ2WiGKSyXN5nPrU+06sRxI=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=opdIpAACnQeStJ33oACe6p52ZM8f0Sws7Fv8oVZEtnJ34oxYkj2Ifncn0UBE7+8VM
-	 /Rer5IHWNKL+Om4cBhthsawIs+kQdevr3ykVw21CBvfVnNLhAZ1lcWLQbVr0aJDoH2
-	 0Lv+tHrW7mbf2ysXMzyMfTT7x/zNVB+cEVkkvmJU=
-Message-ID: <dab77729-682f-4182-9fb2-cd522ac29b5f@linux.microsoft.com>
-Date: Fri, 6 Dec 2024 12:58:17 -0800
+	s=arc-20240116; t=1733519396; c=relaxed/simple;
+	bh=NnfoURGNqGV4ItnHh7MeDJ+x6A8SXrC1x4GWhdhtDaw=;
+	h=Content-Type:From:To:Subject:Message-ID:Date:MIME-Version; b=JxQwXBPmGrAiL6yyn3pxLHJCEDJF4jC6fj9HaeV5usw23sHzvnZfpdohUYrCg9/uKCWwl9mzv/bOJX3dMkHXaTyEIrhwEx8skovMnD+L4ZwvkyTY2jhhPeHc5r+GYPzvoRpIyp295Kkc0UOfsXioBZPNUafFg3SfA+dS4C4PL/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=telenet.be; spf=pass smtp.mailfrom=telenet.be; dkim=pass (2048-bit key) header.d=telenet.be header.i=@telenet.be header.b=R4CBPgKZ; arc=none smtp.client-ip=195.130.132.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=telenet.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=telenet.be
+Received: from [127.0.0.1] ([35.205.80.129])
+	by xavier.telenet-ops.be with cmsmtp
+	id lZ9q2D00G2nQEWz01Z9rrW; Fri, 06 Dec 2024 22:09:51 +0100
+Content-Type: text/plain; charset=utf-8
+From: KATHY BARBATA <kevin.verheuve@telenet.be>
+To: netdev@vger.kernel.org
+Reply-To: kathy.barbata@fkrm.com
+Subject: 2024 Taxes New Intake
+Message-ID: <224643ce-e1aa-bdda-8669-ff07fa5250cb@telenet.be>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Dec 2024 21:09:50 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: eahariha@linux.microsoft.com, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
- linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <b9fcb12a-b7a4-4c33-836e-67109ce07deb@intel.com>
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Content-Language: en-US
-In-Reply-To: <b9fcb12a-b7a4-4c33-836e-67109ce07deb@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=telenet.be; s=r24;
+	t=1733519391; bh=NnfoURGNqGV4ItnHh7MeDJ+x6A8SXrC1x4GWhdhtDaw=;
+	h=Content-Type:From:To:Reply-To:Subject:Message-ID:
+	 Content-Transfer-Encoding:Date:MIME-Version:From;
+	b=R4CBPgKZtQi7szojgltyHZTCAefxjNyupkaIHaL2a4RhxRlnpINrXy5B1RnESq3j6
+	 Ite38vDTSJ3PghueEbBq9s9Gqz+vD0efnl4OMMOpKakMC0p+Fzr4BlWX/FD/+nx/aB
+	 dl4C/6KpHrP1Cp4+BIbkuX2SpbU3BXDBPye9mhWpiRatPowNBXO/itR8Mmz8YpHudf
+	 w3jyDuBcGzpV3kJ2pU04KrBgA1yOELA7ZLgWBHUWAJGhtRkCrM8OEQ9uq4GUPvu3mn
+	 qWpa/0szETarAWdK+jQR53NkSDJWe/zzGoPe4Rbj89ShXHOt6Kf1CWCREw48ggy4/P
+	 wZZGjhA9xPcDg==
 
-On 11/29/2024 4:57 AM, Przemek Kitszel wrote:
-> 
-> [removed most non-list recipients, it's just too much]
-> 
-> On 11/15/24 10:26 PM, Easwar Hariharan wrote:
-<snip>
->>
->> ---
->> Changes in v2:
->> - EDITME: describe what is new in this series revision.
->> - EDITME: use bulletpoints and terse descriptions.
->> - Link to v1: https://lore.kernel.org/r/20241115-converge-secs-to-
->> jiffies-v1-0-19aadc34941b@linux.microsoft.com
-> 
-> that is not a proper changelog, you were supposed to edit those
-> placeholder entries; please look around for examples
-> 
-> There is also just too much recipients. Please split up your patches
-> into smaller pieces. You will also learn the process on a smaller
-> sample.
-> 
-> And definitively please wait for 48h before reposting such big series.
+I hope this message finds you well and that you had a wonderful =
+Thanksgiving.
 
-Yes, sorry, I sent out a v2 in a moment of panic on including the
-already accepted patch in v1. I failed to edit the changelog in that
-same panic. I'll try to not panic and do better in the future.
+My name is Kathy, and I am reaching out to inquire about =
+your services for preparing individual tax returns for the 2024 tax year. =
+As a new client, I would greatly appreciate the opportunity to discuss how =
+you can assist me with my tax filing needs.
 
-> 
-> Regarding code - you could also convert msecs_to_jiffies(const * HZ),
-> there are 10 that are greppable.
-> 
+To provide some context, I am =
+seeking professional assistance to ensure that my tax return is filed =
+accurately and efficiently. My previous tax preparer has retired and =
+discontinued their practice, prompting me to seek a new professional to =
+handle my taxes moving forward.
 
-Those seem to be mistakes. const*HZ is a seconds-denominated timeout,
-being passed to msecs_to_jiffies() which will treat it as a
-millisecond-denominated timeout resulting in an excessively long
-timeout. I suppose that's better than a too-short timeout, and
-apparently it's been working fine all along since hardware responds
-before the too-long timeout expires. Half of them are in
-drivers/scsi/arcmsr/arcmsr_hba.c and the pattern has apparently been
-there since 2010.
+Could you kindly confirm if you are =
+currently accepting new clients for the 2024 tax season? If so, I would =
+appreciate guidance on the next steps to get started. Additionally, I would=
+ like to know which documents or information you require to facilitate a =
+smooth and seamless process.
 
-Thanks,
-Easwar
+I am happy to provide a copy of my 2023 tax =
+filing for your review if that would be helpful.
+
+Thank you in advance for =
+your time and assistance. I look forward to the possibility of working with=
+ you.
+
+Best regards,
+Kathy
 
