@@ -1,167 +1,129 @@
-Return-Path: <netdev+bounces-149818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 159C89E7A0F
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 21:35:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E1F19E7A1A
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 21:42:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D08A41881994
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 20:35:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3DD01649C5
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 20:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452CB1CD1E1;
-	Fri,  6 Dec 2024 20:35:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B211DA31D;
+	Fri,  6 Dec 2024 20:42:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iFRwQ4yo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cYhPOr45"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B081B1C5496;
-	Fri,  6 Dec 2024 20:35:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089FA1C5490
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 20:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733517336; cv=none; b=pP8VLPom83IqBWCdyFuiAa1+ycu0E8mXSpzY96CePcD3Esvkpa9RvCh8Lya6yjitUjWBykyP1pZk5oEpKbBy/ULy/LwFi1e1Z5f5+vJek7UHPkMnVX/n3R0rPSxI2YjdZwFRN6b6UfeQaHPovaJKTFJ6JrUq8slL46urTqV7Zf4=
+	t=1733517737; cv=none; b=UmH6P7O+SlAShB8iQDL/PQDT/hUixLSNyRBbMk0193FZ4B6dY3N2iM3lMmFAhY+1jpWdQyWdYkjGLKzXddW0XK3/z7cQY4a6QIYxeGKYgTR1PYIkDMWdr294l9dSVZ0ZspNBSsw6jvrHCjIFSqSn7UARnS2bR6mS/hLoPDxB8Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733517336; c=relaxed/simple;
-	bh=KfHWQu6liIdf7TzsYbc9sbR4p1miYi4VnYm5haG6c2g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MpEon6TM6Sm8/hPwUxNx6ydppQl3uocH5sG4DNS1EUqcrOh0Itw27kQE29hMKg38ccmEbuUQjccsw18AMrv0zkPXHLeRowIx1spi9Ay/zkJ3uek35FyfCkiRS/wHkz+6JFY2NkcdUr4+vuZWMqqiASvez5qJYXOVGinMaFqEI/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iFRwQ4yo; arc=none smtp.client-ip=209.85.216.53
+	s=arc-20240116; t=1733517737; c=relaxed/simple;
+	bh=LOEyhS/zjCu3L7Eg8M0Kw99okKdGsioK8et7GPJo0Nw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ck9E5hA6byQL80lHnqDZDX2h7GO+7i+M4zOypxmlEwP8kJgm4JjXEyzdovgeJR41y9pyuQ3K2nqed5EJs2hNGR8SAFZ0DIdFxEF0aBni/F82lQGL5eLBJh/FOGxd9jzwFv1GBDmNXM1wF4dyTE8Yb+Lpfrwqz+h2IVAHjU66pb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cYhPOr45; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2ee786b3277so2098374a91.1;
-        Fri, 06 Dec 2024 12:35:34 -0800 (PST)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-432d86a3085so16770765e9.2
+        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 12:42:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733517334; x=1734122134; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9WSYKgnoISSMoL6c1SM0OSo8i8y8ZqVOfOOSDtnT9Wo=;
-        b=iFRwQ4yooYMBi6Y4uNDj0IMEZTD75GD7BD8AN+tZ8YBpIcue9FKfanxHigdDiLZaNT
-         EU99mKWX+Myd2DOVrj0/8y3v2fBjybcUPYbbQTp0BPfEhkxuS/W639TEbqoT2IfJSs/I
-         jQlzvgllBEq72u2kZG0cx2Lwmj6BDAB75rTfaZ9p6hePLY89dm0uUO75CE197fPt8Z+z
-         N8TTcuG4tf/6IQMrHpab/mrPfaa33LzX77yk5EV9CW9H20V9W9nqMXFCM7xTBflsLz7f
-         8BLI07q+AHh110zqnrQdLeQ2Vl99TMbuVJ8Lu3RiMt71LRHavzENvjvwY2SRd/Nkz6U+
-         svpw==
+        d=gmail.com; s=20230601; t=1733517734; x=1734122534; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mm6psef4SnBhtrajdIia1L7dedJrpYcJHFECTKa6Qno=;
+        b=cYhPOr45rpl4gpR+exNkRbfJUX4xiZCJZJnryAWAm7MF4NzYPNQSi75FsLWCPdJLyI
+         r5Pnbv/j/iAAhO5krtmlSqleWKY/wVQBM2dL4qiWYw8JOmCW8tTgycVJsSNXh/qowzvd
+         CYiWmny5eyY25G9NdPo5ugafisbJeGrelEwSVVi2z5LoYYemqCwKDtfk1UZpLqw6FGVr
+         /ZlmRqBIyTd7RNT7xigRzUZNmGHPb9uXS+uXPabF0TasZ8wOlGiqeWa3C2ucZG/G/bJc
+         Ixf2w18d2NvEwaa1C9AHj2caIiZzFW8NuTFYWOR+NtfSFZxSHx7gJ7Zu1Gl5CJ4EaCNl
+         pClw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733517334; x=1734122134;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9WSYKgnoISSMoL6c1SM0OSo8i8y8ZqVOfOOSDtnT9Wo=;
-        b=UCKQMSOtXOIY8ALrIyGPxCu77iCEMbu81fEsYJdXpbd8DxpDrRDYnkR6oVw3kPhno/
-         QDSTyYrihxeK/P+Hmn6OLXqrqqmfDM7jiWovqG9N85TLCfXl3YLbeSkRSQGv1UCaZKnD
-         uL1KClIi1pcoLrDeNmk6yYuVvFRfEEum00jnRaYHD8dL0yJw791+7lS/COqJbx2zj7t4
-         YhmSi23c9Nx0ewcOQe5U96F/1ej831DB85Ecv+0ImAXiuRO0Rjqn/xRvcacx3fdTSfPc
-         3cw7ATKdnDS1XiemOzvynRsVkuzDSyAkhZlevk+jwNfXwmepx7guHsPy7gLt3BrQ+zTz
-         FnPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVEZHthPvcMxqY44n7wofi5e3vsdButEnfY6BKUTL857QGNezxr8c8pab29vr4kEkCzRgXuLadH@vger.kernel.org, AJvYcCVr0udokKEg3wsQIeYtPK0zIc1RxihL3aEItMEyyI0yMagE2hH2NGckzhuZrvH3hanX0rOrtUHQ63yvOes=@vger.kernel.org, AJvYcCWa3j9Rsp5aZdLW0ggnkOHpcDIuEQjixSlhQSq5oKKJMXkd47DL9nLbaZabvY25eABBGGktJOCU@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVUn2EX+lGSZq7Igdk5mWy8j/9XOCjrbOb44NdiOYnYF6DsPLE
-	bOhvUNcwuMlpiSDywG45IfyB54xdGvdRLjtQq1bdA9r8fkk7LCrUonWUbR3P9QRLGjIsqgLppnL
-	0aj0KXOf99OHyh/zFlgtvzsEnBDOAgJsVRGM=
-X-Gm-Gg: ASbGncsK7tZzqp/Byf6a477FOYsYW4o6XprD1bVeZrBLvCN0ngmJ+hjU4bnqYQtFrz7
-	S5oV2DiJbsqQWGQOppTX1WwaJ8Gy1gw==
-X-Google-Smtp-Source: AGHT+IEpzaK/NG2+IvtIdZyl1H8wLBBipy2MsvnS1vHIIgei1Y3hj+929YdX4hnkWtIF7aUOoa4AmVt8HXwZErvXBiE=
-X-Received: by 2002:a17:90b:524e:b0:2ea:853b:2761 with SMTP id
- 98e67ed59e1d1-2ef6aaddd08mr5902936a91.37.1733517333959; Fri, 06 Dec 2024
- 12:35:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733517734; x=1734122534;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Mm6psef4SnBhtrajdIia1L7dedJrpYcJHFECTKa6Qno=;
+        b=sMVZm+IfOsVAJPz1x0y1N8VhA9oKgqmLC9XUDJGRHDIXOcc49M+O6I55zz+jmq/Nzo
+         gqZyoFM4X0FrXQaIfkyBr+YLEGNO5dhfxKR5n+gJbrKPJrU+VtGYvtcUw/OkOxOa/oE2
+         2FMg6GD1M1ZvXMCc6pT0GABDaZqbFs/Lmpv1lG5gV2xcrbe3GacU/xHsvhDlRXjR7sSE
+         AKxMgpfyuS4ySXMKsM72wH27XRiWiRciVbO19bISrMeC6yNwmoyRvh9y9Fp9Bq6ldgh7
+         ljX9dpJgvb3kK8CD9MXvaFsQ0Dm1MHs/MMvx5Fhki2FPbMM7+y5uM6uuvW0N0pDNma0b
+         hvhg==
+X-Gm-Message-State: AOJu0YwH3qU/gdoAlq3zCQg9BGTwzWImaPXOQNN9H6YUjX6m2HnVQ+Tx
+	L9ovXIFl4Qd+2d4wUvLCgd+kTRjRgBhS5OS6dXcoV6wNmDATYrB/zdg/aNhc6BE=
+X-Gm-Gg: ASbGncvxlMcfKjQ9edA/nyrE9dTUgAOaDyML21aR2dxzm/VAgJ6834qU/P6v2w1QoIC
+	pnl9yeirLlmzAqGAPEc0sn+DeDXxqqquv8GphlL2QJr8Dt0Utnd0h7oILFTPSKmBiepPqGAxCd0
+	Oq3PXobyA0CI4OV89yEn3HD4hEocUSxrvUM1KyuZctSOffFcRV2B2SVS2snn2xxhedvPUcpMawg
+	nIYFQ++m86/MLlJmvww+0D0GmnrexK7RsnFBjUWmTVJcJL+sDT/k/qB6ZLPx8VWGZcwmoZj7jsB
+	L91YPMowQgXqMGrgJwVFKEZIzVGWcsmrS+SEiZziemyX2g==
+X-Google-Smtp-Source: AGHT+IFxF+pEJq3xOEvE2tSh0+xDK6kcjicK/iELLXm/DSBCSmn3pzQB0jL2KvNfSlAiQld9PcAnwg==
+X-Received: by 2002:a05:600c:1d1b:b0:434:a5e6:64f6 with SMTP id 5b1f17b1804b1-434ddeabcf0mr36592845e9.11.1733517733281;
+        Fri, 06 Dec 2024 12:42:13 -0800 (PST)
+Received: from KJKCLT3928.esterline.net (192.234-180-91.adsl-dyn.isp.belgacom.be. [91.180.234.192])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434da0d6a07sm65508785e9.13.2024.12.06.12.42.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Dec 2024 12:42:12 -0800 (PST)
+From: Jesse Van Gavere <jesseevg@gmail.com>
+X-Google-Original-From: Jesse Van Gavere <jesse.vangavere@scioteq.com>
+To: netdev@vger.kernel.org,
+	woojung.huh@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	andrew@lunn.ch,
+	olteanv@gmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Jesse Van Gavere <jesse.vangavere@scioteq.com>
+Subject: [PATCH net-next v3] net: dsa: microchip: Make MDIO bus name unique
+Date: Fri,  6 Dec 2024 21:42:02 +0100
+Message-Id: <20241206204202.649912-1-jesse.vangavere@scioteq.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241113-tcp-md5-diag-prep-v2-0-00a2a7feb1fa@gmail.com>
- <20241204171351.52b8bb36@kernel.org> <CANn89iL5_2iW5U_8H43g7vXi0Ky=fkwadvTtmT3fvBdbaJ1BAw@mail.gmail.com>
- <CAJwJo6amrAt+uBMWRvwBu=VdcTyDuEMtkAx0=_ittUj0KCa-zw@mail.gmail.com> <CANn89iJzwe+Wds=otY-iFL9C9eNFVqGi62q085AehnYa3sET7w@mail.gmail.com>
-In-Reply-To: <CANn89iJzwe+Wds=otY-iFL9C9eNFVqGi62q085AehnYa3sET7w@mail.gmail.com>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Fri, 6 Dec 2024 20:35:22 +0000
-Message-ID: <CAJwJo6aeza8omfs+GbVz-KoGV-4vgZzBU1oa+PBTxe+W-YxtJw@mail.gmail.com>
-Subject: Re: [PATCH net v2 0/5] Make TCP-MD5-diag slightly less broken
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
-	Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, Ivan Delalande <colona@arista.com>, 
-	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Boris Pismenny <borisp@nvidia.com>, 
-	John Fastabend <john.fastabend@gmail.com>, Davide Caratti <dcaratti@redhat.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mptcp@lists.linux.dev, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, 6 Dec 2024 at 15:15, Eric Dumazet <edumazet@google.com> wrote:
->
-> On Fri, Dec 6, 2024 at 3:49=E2=80=AFAM Dmitry Safonov <0x7f454c46@gmail.c=
-om> wrote:
-> >
- [..]
-> > > @@ -585,8 +589,14 @@ int inet_diag_dump_one_icsk(struct inet_hashinfo=
- *hashinfo,
-> > >
-> > >         err =3D sk_diag_fill(sk, rep, cb, req, 0, net_admin);
-> > >         if (err < 0) {
-> > > -               WARN_ON(err =3D=3D -EMSGSIZE);
-> > >                 nlmsg_free(rep);
-> > > +               if (err =3D=3D -EMSGSIZE) {
-> > > +                       attr_size <<=3D 1;
-> > > +                       if (attr_size + NLMSG_HDRLEN <=3D
-> > > SKB_WITH_OVERHEAD(32768)) {
-> > > +                               cond_resched();
-> > > +                               goto retry;
-> > > +                       }
-> > > +               }
-> > >                 goto out;
-> > >         }
-> > >         err =3D nlmsg_unicast(net->diag_nlsk, rep, NETLINK_CB(in_skb)=
-.portid);
-> >
-> > To my personal taste on larger than 327 md5 keys scale, I'd prefer to
-> > see "dump may be inconsistent, retry if you need consistency" than
-> > -EMSGSIZE fail, yet userspace potentially may use the errno as a
-> > "retry" signal.
-> >
->
-> I do not yet understand this point. I will let you send a patch for
-> further discussion.
+In configurations with 2 or more DSA clusters it will fail to allocate
+unique MDIO bus names as only the switch ID is used, fix this by using
+a combination of the tree ID and switch ID when needed
 
-Let me explain my view. It's based on two points:
-(a) TCP-MD5/AO-diag interfaces are mostly used for
-debugging/investigating/monitoring by tools alike ss. Without a
-side-synchronisation, they can't be used by BGP or other tools/tests
-to make decisions as the socket is controlled by another process and
-the resulting dump may be incomplete, inconsistent or outdated.
-(b) The current default of optmem_max limit (128Kb) allows to allocate
-on a socket 655 TCP-AO keys and even more TCP-MD5 keys. Some of
-Arista's customers (I'd guess the same for other BGP users) have 1000
-peers (for MD5 it's one key per peer on a listen socket, for AO might
-be higher).
+Signed-off-by: Jesse Van Gavere <jesse.vangavere@scioteq.com>
+---
+Changes v2: target net-next, probably an improvement rather than a true bug
+Changes v3: to maintain ABI, only do the two part name when the cluster index
+is not 0
 
-I think the situation that's being addressed here is a race and
-potentially it's rare to hit (I have to run a reproducer in a loop to
-hit it). That's why in my view a re-try jump is too big of a hammer.
-And failing with -EMSGSIZE on 327+ keys scale sounds slighly worse
-than just marking the resulting dump as inconsistent and letting the
-user decide if he wants to re-run the dump or if the dump is "good
-enough" to get a sense of the situation. I would even say "the dump is
-inconsistent" has its value as a signal that the keys on a socket
-change right now, which may be useful.
+ drivers/net/dsa/microchip/ksz_common.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Regarding the patch, my attempt was in this thread:
-https://lore.kernel.org/all/20241113-tcp-md5-diag-prep-v2-1-00a2a7feb1fa@gm=
-ail.com/
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 920443ee8ffd..f5822c57be32 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2550,7 +2550,11 @@ static int ksz_mdio_register(struct ksz_device *dev)
+ 		bus->read = ksz_sw_mdio_read;
+ 		bus->write = ksz_sw_mdio_write;
+ 		bus->name = "ksz user smi";
+-		snprintf(bus->id, MII_BUS_ID_SIZE, "SMI-%d", ds->index);
++		if (ds->dst->index != 0) {
++			snprintf(bus->id, MII_BUS_ID_SIZE, "SMI-%d-%d", ds->dst->index, ds->index);
++		} else {
++			snprintf(bus->id, MII_BUS_ID_SIZE, "SMI-%d", ds->index);
++		}
+ 	}
+ 
+ 	ret = ksz_parse_dt_phy_config(dev, bus, mdio_np);
+-- 
+2.34.1
 
-However, I should note that I'm fine with either of the approaches
-(userspace to retry on EMSGSIZE or to get an inconsistent dump and
-decide what to do with that). I'm somewhat looking forward to
-switching to problems (1)/(3)/(4) from the cover-letter and adding
-TCP-AO-diag, rather than being stuck arguing about what's the best
-solution for quite a rare race :-)
-
-Thanks,
-             Dmitry
 
