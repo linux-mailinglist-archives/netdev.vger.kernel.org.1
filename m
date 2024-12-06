@@ -1,97 +1,143 @@
-Return-Path: <netdev+bounces-149670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 817DD9E6C4C
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 11:33:06 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC5E99E6C54
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 11:34:42 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F4BE28A894
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 10:33:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A540188154D
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 10:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4307720103B;
-	Fri,  6 Dec 2024 10:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D801F9424;
+	Fri,  6 Dec 2024 10:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="rmRrZUOW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XFV/TCXW"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E27320101D
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 10:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A901F03F6;
+	Fri,  6 Dec 2024 10:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733481069; cv=none; b=pyyI/Kj2JKmV0ZcV9QHjglDTgp8I5rQ1mazwF60jtb5nl0EMElXo1NjTlKH4pEc2vkOqPsabyV3QMycp/JtKCnrZST8mH4hd+gp+RU7IrRSCCCiU/a349Gcqyp0nirKpDdE3EkMx+5hsUmDrNhFWf563mVZXR3bIukaYhr5nEeg=
+	t=1733481190; cv=none; b=uzBJ8TKojQnTet+ZCk/vlEJ5EDPVUZfe15qBsS+lxvVR7QVBzYQ2BwLIs5+9NMI32igmU+Iln88Zy44MTnydiX7LeGZnnTWmB6olC2qi0KcYyfZfUa+gAaTa0g/SJWptfELdWrvl7bb2S0CmtfX49x14cyaMZgOD7Tk2kvBnrdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733481069; c=relaxed/simple;
-	bh=5wHuSkoTKs2fs8huMIMitY6ncKHaYkO7sSm8q+QCNJw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nAbJ5ffJfVldpaf0rdyl5yE0EgmgqOzAwaECl33xkLZqaQ/2EvtFCv0rFfM/EthdqHiuJV5HzLIiZ3C5GdGDINzYFxKsytPQf3KeKTrtFAOM5Fas2HLUEs1Agi/+WfN2oLHlwpriy5irNt1ocTIvdhFypLVN5hQDre0Jgbx5oBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=rmRrZUOW; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=DOywnkMYG+BOUZIFGmHoIM9+SasyqyM3GklWGnWOV4w=;
-	t=1733481067; x=1734690667; b=rmRrZUOWzc6jbY0//sPdVWJYXrw4uSkxLItvVqiaXtjgPLw
-	+zNcl+lzDguIEz8meITudYq3gWNl2LNRlOCN4UBjQOKvQ3xf5k5yZYMw+/Di1pVs2xFiamzaFdb78
-	9I3WqzHhTWfLYRYKSIsmDT05cFj0/VkLkse0Xz10xb+/1GAoU5bSA9GYEL3aRi1KjWe0eDUSncjfp
-	Cibdfia4YxWbQWY/hfl5sx4dCZwcB0x9xfk303AP4m4JZ69pbqCbySMEymhcJVySDL3wH/U4NI5FD
-	hrPacxJCA2Y/wfcJi3n5td/pdhlVtqsIWzcKSKGa86LgNFPryyWrawXldQg/a1Wg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1tJVc0-0000000FWya-2RZN;
-	Fri, 06 Dec 2024 11:31:04 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH net-next 2/2] tools: ynl-gen-c: don't require -o argument
-Date: Fri,  6 Dec 2024 11:30:57 +0100
-Message-ID: <20241206113100.89d35bf124d6.I9228fb704e6d5c9d8e046ef15025a47a48439c1e@changeid>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241206113100.e2ab5cf6937c.Ie149a0ca5df713860964b44fe9d9ae547f2e1553@changeid>
-References: <20241206113100.e2ab5cf6937c.Ie149a0ca5df713860964b44fe9d9ae547f2e1553@changeid>
+	s=arc-20240116; t=1733481190; c=relaxed/simple;
+	bh=XuzOwpFB9sywQSU+4oMv/Zl63PkuoIPjymxIiQJreng=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lcWi1MUwxcIGFZvQBabCN3MMcCj5PvzKv7Vc3pOTjOkbWhugglR4dvPHWR534rFsndesn/dOj77jvxh8UcZRn1PSfGNmOiihIrQzH5PF0llGAfXSth0XC5rw94lkyYdc5ELkQVhsbJLlNwv8teLpCoW9MFfN8GctNoY59ykyytU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XFV/TCXW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4779BC4CED1;
+	Fri,  6 Dec 2024 10:33:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733481189;
+	bh=XuzOwpFB9sywQSU+4oMv/Zl63PkuoIPjymxIiQJreng=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XFV/TCXWSx7XOt66H991/1PpIX/WCc5At1/hNxEwTuSlZMdlcuDkORPjhTTRIedPJ
+	 AnZAo9lUxC1jRONO6yKbX+A/KwfppAimbStyhjeu3Yq2K4LtasH+jhCxTD1qfjoFBS
+	 YuF8wfG2RMFoMROXCfYGXgPglwIymc1xG1hc2U6Fwz84q8qUzJkEUovflBUoAhw0ez
+	 +hdcP5HGiw42X9Y5Uk5bCFJpbBlEFBPLg45fpwDqbEub/FVmTkl6/DawPWCrFbSUxi
+	 UsZcXGVSMCWP98h6I3thXdtkeXgdE0QG5mdrAdqCG2yDOlvIEgKDVVg0xdOTP0kc74
+	 RPiOxim3O0rFg==
+Date: Fri, 6 Dec 2024 10:33:05 +0000
+From: Simon Horman <horms@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, frank.li@nxp.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev
+Subject: Re: [PATCH v6 RESEND net-next 4/5] net: enetc: add LSO support for
+ i.MX95 ENETC PF
+Message-ID: <20241206103305.GL2581@kernel.org>
+References: <20241204052932.112446-1-wei.fang@nxp.com>
+ <20241204052932.112446-5-wei.fang@nxp.com>
+ <20241206095938.GJ2581@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241206095938.GJ2581@kernel.org>
 
-From: Johannes Berg <johannes.berg@intel.com>
+On Fri, Dec 06, 2024 at 09:59:38AM +0000, Simon Horman wrote:
+> On Wed, Dec 04, 2024 at 01:29:31PM +0800, Wei Fang wrote:
+> > ENETC rev 4.1 supports large send offload (LSO), segmenting large TCP
+> > and UDP transmit units into multiple Ethernet frames. To support LSO,
+> > software needs to fill some auxiliary information in Tx BD, such as LSO
+> > header length, frame length, LSO maximum segment size, etc.
+> > 
+> > At 1Gbps link rate, TCP segmentation was tested using iperf3, and the
+> > CPU performance before and after applying the patch was compared through
+> > the top command. It can be seen that LSO saves a significant amount of
+> > CPU cycles compared to software TSO.
+> > 
+> > Before applying the patch:
+> > %Cpu(s):  0.1 us,  4.1 sy,  0.0 ni, 85.7 id,  0.0 wa,  0.5 hi,  9.7 si
+> > 
+> > After applying the patch:
+> > %Cpu(s):  0.1 us,  2.3 sy,  0.0 ni, 94.5 id,  0.0 wa,  0.4 hi,  2.6 si
+> > 
+> > Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> > Reviewed-by: Frank Li <Frank.Li@nxp.com>
+> > Reviewed-by: Claudiu Manoil <claudiu.manoil@nxp.com>
+> > ---
+> > v2: no changes
+> > v3: use enetc_skb_is_ipv6() helper fucntion which is added in patch 2
+> > v4: fix a typo
+> > v5: no changes
+> > v6: remove error logs from the datapath
+> > ---
+> >  drivers/net/ethernet/freescale/enetc/enetc.c  | 259 +++++++++++++++++-
+> >  drivers/net/ethernet/freescale/enetc/enetc.h  |  15 +
+> >  .../net/ethernet/freescale/enetc/enetc4_hw.h  |  22 ++
+> >  .../net/ethernet/freescale/enetc/enetc_hw.h   |  15 +-
+> >  .../freescale/enetc/enetc_pf_common.c         |   3 +
+> >  5 files changed, 304 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
+> > index dafe7aeac26b..82a7932725f9 100644
+> > --- a/drivers/net/ethernet/freescale/enetc/enetc.c
+> > +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+> > @@ -523,6 +523,226 @@ static void enetc_tso_complete_csum(struct enetc_bdr *tx_ring, struct tso_t *tso
+> >  	}
+> >  }
+> >  
+> > +static inline int enetc_lso_count_descs(const struct sk_buff *skb)
+> > +{
+> > +	/* 4 BDs: 1 BD for LSO header + 1 BD for extended BD + 1 BD
+> > +	 * for linear area data but not include LSO header, namely
+> > +	 * skb_headlen(skb) - lso_hdr_len. And 1 BD for gap.
+> > +	 */
+> > +	return skb_shinfo(skb)->nr_frags + 4;
+> > +}
+> > +
+> > +static int enetc_lso_get_hdr_len(const struct sk_buff *skb)
+> > +{
+> > +	int hdr_len, tlen;
+> > +
+> > +	tlen = skb_is_gso_tcp(skb) ? tcp_hdrlen(skb) : sizeof(struct udphdr);
+> > +	hdr_len = skb_transport_offset(skb) + tlen;
+> 
+> Hi Wei,
+> 
+> I am wondering if packets that are neither TCP nor UDP can be process
+> by the LSO code added by this patch, and if so, what the implications are.
 
-Without -o the tool currently crashes, but it's not marked
-as required. The only thing we can't do without it is to
-generate the correct #include for user source files, but
-we can put a placeholder instead.
+Sorry, I now realise that the answer to that is rather obvious: no
+due to feature flags. I should have paid more attention to patch 5/5
+before sending the above.
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
- tools/net/ynl/ynl-gen-c.py | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 50ec03056863..5df3370bfc74 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -2697,7 +2697,10 @@ def main():
-         cw.p('#define ' + hdr_prot)
-         cw.nl()
- 
--    hdr_file=os.path.basename(args.out_file[:-2]) + ".h"
-+    if args.out_file:
-+        hdr_file = os.path.basename(args.out_file[:-2]) + ".h"
-+    else:
-+        hdr_file = "generated_header_file.h"
- 
-     if args.mode == 'kernel':
-         cw.p('#include <net/netlink.h>')
--- 
-2.47.1
-
+> 
+> > +
+> > +	return hdr_len;
+> > +}
+> 
+> ...
+> 
 
