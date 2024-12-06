@@ -1,50 +1,74 @@
-Return-Path: <netdev+bounces-149565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58C8C9E63E0
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:10:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D3D6B9E63E6
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:12:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E43116A2C0
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:10:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA69E1688B4
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D29B14A4D1;
-	Fri,  6 Dec 2024 02:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1334213BAC6;
+	Fri,  6 Dec 2024 02:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gA1NhxWv"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="L0fBDCib"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28CE913BAC6
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 02:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F150228684
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 02:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733451015; cv=none; b=URhy9SIfSPi+tgYsVj0saSSQpTQOvD2qMZS3D1yxP44kcGCbQ5D1PJ9Vs3qBlYmPNnlPeq+4OwZJvPQ4DZzZpNTD9LeIQJLf2pWxq0OkLObigtMY8UFspND5U3YTnOlRfZmPkIB+mRU3U+l/oUxNhrxGo2MfXD+fIqT7IXsDSM0=
+	t=1733451174; cv=none; b=WXNk+UGAyKH9+d0vDR+Hg4daLP7423iJ1OpulNbMhCRVGRWrp0HrT4l26fLkDsK3+YtFCiOy94kYK0CDbEHjQ8xxIHjPjKTXCSeA70zZcK+92BButE3KB/d9ZTmE+rQUjyVYjcVnqOl/Dgsqa+EN+Du56iyQXMQSggBYg2Ka9ok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733451015; c=relaxed/simple;
-	bh=YtUEBCE5Fd3UjG3ttl+tv+VOiH2nDO4T9nNpWtQy0Tg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bJTCU8TDkrYiuZ1gfkjU5YAkJPqGW2HjBuIx5xCmCceLS8I1oq8q+rbRXsNATY9qpNolfax296kg9qJCbGF4bsu6aXPNQVZ1uV+qQyjJGPtIuYWkqWoWXv4GMBSh5iajBog8vipiK7xoCRF7QJ86O0xyrEKMHIh6b5HSt36T1xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gA1NhxWv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5AEDC4CED1;
-	Fri,  6 Dec 2024 02:10:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733451014;
-	bh=YtUEBCE5Fd3UjG3ttl+tv+VOiH2nDO4T9nNpWtQy0Tg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gA1NhxWvlvExq81LWQkYY4x902VQoCBCb88Cbo3VFVl7FmrgUVhSOXRRSk2w/GJ6O
-	 CV5lNVbAaTgZW82cgsJiA9/OztJYp4Kln2yoVQ1pc5o5h1etWc9oY4FbWGpapQAgJl
-	 5J5jm7w9Ag8cK0jgzF7lygUYhuXVRrx2nfsZvom14+5mHb8O3jcXrY2nR/nmY+zfqY
-	 pHcIF57Tz8Bt3KTv8oLgI2whPwkvbr1iCFqNKoxF1377N/Oaf9ffB2bNaylMW5Fwbs
-	 Obnf1gRs5OSBhM+gVPBnLke+OHvZZs2B02rbKuESAFupffYKt7u2zliHycNV68KAJ1
-	 QPbKXGO79NzdA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE157380A953;
-	Fri,  6 Dec 2024 02:10:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1733451174; c=relaxed/simple;
+	bh=0WlYUgeq2tqIEgzfD1gsgj76Po36E5TkWvalI0is+ks=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FjcZk3nHTGBmYCdzltiZgXoHLOQlFZwpQUIWrwFyLq7fFhbefKFM9NTFAk48cV66SCm0YOcxZ2CDjBmcYTExV8NugPUEuVJmcQxbFkc38YkHpettU5UG2cTKq8M43ljwUZ/lPphqdF+hg5Vir8/djKULF0pNQFJEw2UO17X5MJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=L0fBDCib; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1733451172; x=1764987172;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=5doeXpC1PCRNGQZcpI1LauMeChUvoeSqg0Aj/yo1Ci0=;
+  b=L0fBDCibrnBD3DKDDw4XY+MDQasOTlM6Yxjg232hnFSkR4DVrAHcF6p7
+   ZP6XO5Wt2uJUYHJ2Rrwy9HXMzT0Q58OSX+iNdqN5sU8871RjyNkLiRCOC
+   mda8dg9TmiZ2R7xBHkBN3GVv3Ul6jwD8aqt2gu4lsEUozqbqXqmLEPdkq
+   4=;
+X-IronPort-AV: E=Sophos;i="6.12,212,1728950400"; 
+   d="scan'208";a="453837267"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2024 02:12:48 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:37933]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.223:2525] with esmtp (Farcaster)
+ id 3c72c947-8145-4ada-b00a-e2da819602c1; Fri, 6 Dec 2024 02:12:46 +0000 (UTC)
+X-Farcaster-Flow-ID: 3c72c947-8145-4ada-b00a-e2da819602c1
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 6 Dec 2024 02:12:44 +0000
+Received: from 6c7e67c6786f.amazon.com (10.119.5.90) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 6 Dec 2024 02:12:41 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <dan.streetman@canonical.com>, <davem@davemloft.net>,
+	<eric.dumazet@gmail.com>, <i.maximets@ovn.org>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<steffen.klassert@secunet.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: Re: [PATCH v2 net] net: defer final 'struct net' free in netns dismantle
+Date: Fri, 6 Dec 2024 11:12:37 +0900
+Message-ID: <20241206021237.81023-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241204125455.3871859-1-edumazet@google.com>
+References: <20241204125455.3871859-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,41 +76,156 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tipc: fix NULL deref in cleanup_bearer()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173345102951.2157140.16749150922708261258.git-patchwork-notify@kernel.org>
-Date: Fri, 06 Dec 2024 02:10:29 +0000
-References: <20241204170548.4152658-1-edumazet@google.com>
-In-Reply-To: <20241204170548.4152658-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot+46aa5474f179dacd1a3b@syzkaller.appspotmail.com, kuniyu@amazon.com
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWB002.ant.amazon.com (10.13.139.139) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed,  4 Dec 2024 17:05:48 +0000 you wrote:
-> syzbot found [1] that after blamed commit, ub->ubsock->sk
-> was NULL when attempting the atomic_dec() :
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed,  4 Dec 2024 12:54:55 +0000
+> Ilya reported a slab-use-after-free in dst_destroy [1]
 > 
-> atomic_dec(&tipc_net(sock_net(ub->ubsock->sk))->wq_count);
+> Issue is in xfrm6_net_init() and xfrm4_net_init() :
 > 
-> Fix this by caching the tipc_net pointer.
+> They copy xfrm[46]_dst_ops_template into net->xfrm.xfrm[46]_dst_ops.
 > 
-> [...]
+> But net structure might be freed before all the dst callbacks are
+> called. So when dst_destroy() calls later :
+> 
+> if (dst->ops->destroy)
+>     dst->ops->destroy(dst);
+> 
+> dst->ops points to the old net->xfrm.xfrm[46]_dst_ops, which has been freed.
+> 
+> See a relevant issue fixed in :
+> 
+> ac888d58869b ("net: do not delay dst_entries_add() in dst_release()")
+> 
+> A fix is to queue the 'struct net' to be freed after one
+> another cleanup_net() round (and existing rcu_barrier())
+> 
+> [1]
+> 
+> BUG: KASAN: slab-use-after-free in dst_destroy (net/core/dst.c:112)
+> Read of size 8 at addr ffff8882137ccab0 by task swapper/37/0
+> Dec 03 05:46:18 kernel:
+> CPU: 37 UID: 0 PID: 0 Comm: swapper/37 Kdump: loaded Not tainted 6.12.0 #67
+> Hardware name: Red Hat KVM/RHEL, BIOS 1.16.1-1.el9 04/01/2014
+> Call Trace:
+>  <IRQ>
+> dump_stack_lvl (lib/dump_stack.c:124)
+> print_address_description.constprop.0 (mm/kasan/report.c:378)
+> ? dst_destroy (net/core/dst.c:112)
+> print_report (mm/kasan/report.c:489)
+> ? dst_destroy (net/core/dst.c:112)
+> ? kasan_addr_to_slab (mm/kasan/common.c:37)
+> kasan_report (mm/kasan/report.c:603)
+> ? dst_destroy (net/core/dst.c:112)
+> ? rcu_do_batch (kernel/rcu/tree.c:2567)
+> dst_destroy (net/core/dst.c:112)
+> rcu_do_batch (kernel/rcu/tree.c:2567)
+> ? __pfx_rcu_do_batch (kernel/rcu/tree.c:2491)
+> ? lockdep_hardirqs_on_prepare (kernel/locking/lockdep.c:4339 kernel/locking/lockdep.c:4406)
+> rcu_core (kernel/rcu/tree.c:2825)
+> handle_softirqs (kernel/softirq.c:554)
+> __irq_exit_rcu (kernel/softirq.c:589 kernel/softirq.c:428 kernel/softirq.c:637)
+> irq_exit_rcu (kernel/softirq.c:651)
+> sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1049 arch/x86/kernel/apic/apic.c:1049)
+>  </IRQ>
+>  <TASK>
+> asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:702)
+> RIP: 0010:default_idle (./arch/x86/include/asm/irqflags.h:37 ./arch/x86/include/asm/irqflags.h:92 arch/x86/kernel/process.c:743)
+> Code: 00 4d 29 c8 4c 01 c7 4c 29 c2 e9 6e ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 90 0f 00 2d c7 c9 27 00 fb f4 <fa> c3 cc cc cc cc 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 90
+> RSP: 0018:ffff888100d2fe00 EFLAGS: 00000246
+> RAX: 00000000001870ed RBX: 1ffff110201a5fc2 RCX: ffffffffb61a3e46
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffffb3d4d123
+> RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed11c7e1835d
+> R10: ffff888e3f0c1aeb R11: 0000000000000000 R12: 0000000000000000
+> R13: ffff888100d20000 R14: dffffc0000000000 R15: 0000000000000000
+> ? ct_kernel_exit.constprop.0 (kernel/context_tracking.c:148)
+> ? cpuidle_idle_call (kernel/sched/idle.c:186)
+> default_idle_call (./include/linux/cpuidle.h:143 kernel/sched/idle.c:118)
+> cpuidle_idle_call (kernel/sched/idle.c:186)
+> ? __pfx_cpuidle_idle_call (kernel/sched/idle.c:168)
+> ? lock_release (kernel/locking/lockdep.c:467 kernel/locking/lockdep.c:5848)
+> ? lockdep_hardirqs_on_prepare (kernel/locking/lockdep.c:4347 kernel/locking/lockdep.c:4406)
+> ? tsc_verify_tsc_adjust (arch/x86/kernel/tsc_sync.c:59)
+> do_idle (kernel/sched/idle.c:326)
+> cpu_startup_entry (kernel/sched/idle.c:423 (discriminator 1))
+> start_secondary (arch/x86/kernel/smpboot.c:202 arch/x86/kernel/smpboot.c:282)
+> ? __pfx_start_secondary (arch/x86/kernel/smpboot.c:232)
+> ? soft_restart_cpu (arch/x86/kernel/head_64.S:452)
+> common_startup_64 (arch/x86/kernel/head_64.S:414)
+>  </TASK>
+> Dec 03 05:46:18 kernel:
+> Allocated by task 12184:
+> kasan_save_stack (mm/kasan/common.c:48)
+> kasan_save_track (./arch/x86/include/asm/current.h:49 mm/kasan/common.c:60 mm/kasan/common.c:69)
+> __kasan_slab_alloc (mm/kasan/common.c:319 mm/kasan/common.c:345)
+> kmem_cache_alloc_noprof (mm/slub.c:4085 mm/slub.c:4134 mm/slub.c:4141)
+> copy_net_ns (net/core/net_namespace.c:421 net/core/net_namespace.c:480)
+> create_new_namespaces (kernel/nsproxy.c:110)
+> unshare_nsproxy_namespaces (kernel/nsproxy.c:228 (discriminator 4))
+> ksys_unshare (kernel/fork.c:3313)
+> __x64_sys_unshare (kernel/fork.c:3382)
+> do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+> entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+> Dec 03 05:46:18 kernel:
+> Freed by task 11:
+> kasan_save_stack (mm/kasan/common.c:48)
+> kasan_save_track (./arch/x86/include/asm/current.h:49 mm/kasan/common.c:60 mm/kasan/common.c:69)
+> kasan_save_free_info (mm/kasan/generic.c:582)
+> __kasan_slab_free (mm/kasan/common.c:271)
+> kmem_cache_free (mm/slub.c:4579 mm/slub.c:4681)
+> cleanup_net (net/core/net_namespace.c:456 net/core/net_namespace.c:446 net/core/net_namespace.c:647)
+> process_one_work (kernel/workqueue.c:3229)
+> worker_thread (kernel/workqueue.c:3304 kernel/workqueue.c:3391)
+> kthread (kernel/kthread.c:389)
+> ret_from_fork (arch/x86/kernel/process.c:147)
+> ret_from_fork_asm (arch/x86/entry/entry_64.S:257)
+> Dec 03 05:46:18 kernel:
+> Last potentially related work creation:
+> kasan_save_stack (mm/kasan/common.c:48)
+> __kasan_record_aux_stack (mm/kasan/generic.c:541)
+> insert_work (./include/linux/instrumented.h:68 ./include/asm-generic/bitops/instrumented-non-atomic.h:141 kernel/workqueue.c:788 kernel/workqueue.c:795 kernel/workqueue.c:2186)
+> __queue_work (kernel/workqueue.c:2340)
+> queue_work_on (kernel/workqueue.c:2391)
+> xfrm_policy_insert (net/xfrm/xfrm_policy.c:1610)
+> xfrm_add_policy (net/xfrm/xfrm_user.c:2116)
+> xfrm_user_rcv_msg (net/xfrm/xfrm_user.c:3321)
+> netlink_rcv_skb (net/netlink/af_netlink.c:2536)
+> xfrm_netlink_rcv (net/xfrm/xfrm_user.c:3344)
+> netlink_unicast (net/netlink/af_netlink.c:1316 net/netlink/af_netlink.c:1342)
+> netlink_sendmsg (net/netlink/af_netlink.c:1886)
+> sock_write_iter (net/socket.c:729 net/socket.c:744 net/socket.c:1165)
+> vfs_write (fs/read_write.c:590 fs/read_write.c:683)
+> ksys_write (fs/read_write.c:736)
+> do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+> entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+> Dec 03 05:46:18 kernel:
+> Second to last potentially related work creation:
+> kasan_save_stack (mm/kasan/common.c:48)
+> __kasan_record_aux_stack (mm/kasan/generic.c:541)
+> insert_work (./include/linux/instrumented.h:68 ./include/asm-generic/bitops/instrumented-non-atomic.h:141 kernel/workqueue.c:788 kernel/workqueue.c:795 kernel/workqueue.c:2186)
+> __queue_work (kernel/workqueue.c:2340)
+> queue_work_on (kernel/workqueue.c:2391)
+> __xfrm_state_insert (./include/linux/workqueue.h:723 net/xfrm/xfrm_state.c:1150 net/xfrm/xfrm_state.c:1145 net/xfrm/xfrm_state.c:1513)
+> xfrm_state_update (./include/linux/spinlock.h:396 net/xfrm/xfrm_state.c:1940)
+> xfrm_add_sa (net/xfrm/xfrm_user.c:912)
+> xfrm_user_rcv_msg (net/xfrm/xfrm_user.c:3321)
+> netlink_rcv_skb (net/netlink/af_netlink.c:2536)
+> xfrm_netlink_rcv (net/xfrm/xfrm_user.c:3344)
+> netlink_unicast (net/netlink/af_netlink.c:1316 net/netlink/af_netlink.c:1342)
+> netlink_sendmsg (net/netlink/af_netlink.c:1886)
+> sock_write_iter (net/socket.c:729 net/socket.c:744 net/socket.c:1165)
+> vfs_write (fs/read_write.c:590 fs/read_write.c:683)
+> ksys_write (fs/read_write.c:736)
+> do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+> entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+> 
+> Fixes: a8a572a6b5f2 ("xfrm: dst_entries_init() per-net dst_ops")
+> Reported-by: Ilya Maximets <i.maximets@ovn.org>
+> Closes: https://lore.kernel.org/netdev/CANn89iKKYDVpB=MtmfH7nyv2p=rJWSLedO5k7wSZgtY_tO8WQg@mail.gmail.com/T/#m02c98c3009fe66382b73cfb4db9cf1df6fab3fbf
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Here is the summary with links:
-  - [net] tipc: fix NULL deref in cleanup_bearer()
-    https://git.kernel.org/netdev/net/c/b04d86fff66b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
