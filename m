@@ -1,183 +1,137 @@
-Return-Path: <netdev+bounces-149572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CE269E644F
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:40:21 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B5599E645F
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:43:07 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0299284B40
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:40:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E15F61881DF8
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:43:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37671714A1;
-	Fri,  6 Dec 2024 02:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C360190063;
+	Fri,  6 Dec 2024 02:42:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TfQNkJHV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V1QppQU/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC18214D433;
-	Fri,  6 Dec 2024 02:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815CF18E373
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 02:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733452818; cv=none; b=LuUvH2k9CkIagEigqRQuKsu3Lkn+8Xqvl9EfMTUv+fEMkSJ2Gx6zlvyKmrKOjg0I7Jt/VzQeHJJ7pvw0Og34dF8M5r7pC/zSdGFc7qZMeCxzLwGiufTWUbA3IGXGQQC8t0Q1cUCNstVUOFME6KSc/4h11nE0diiv59imlC/cpgA=
+	t=1733452964; cv=none; b=IcQiFIgMY3ieIEDzzRYAknl/EDcQUNCFOoMDRQCxI4j2S0O5tRN1Hn8a+lpMmUBAd9TzJyz0KCjZUaZpPpAZMrAsfR12GOWLSLT6Bs+s3/AJ+3Mm4aneDqno12AUcrR+YR+NK1cvd27GE9F0OcETOu0UnjdE0zY5WrNO6qh6wno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733452818; c=relaxed/simple;
-	bh=kutxWliyYMrFZcWXJ006HBnrlV8xm95oCb5CgE0l0ko=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W9w3AcLND7s+Oo5jFh1lM4fWRiwEbe3AuY3U0fCWwaoLlAFHK+NAyjzQgC7KCssBBzk9gea+iHbeIXHNPttAcHfSCnRuvRIwg5jVpt3ER/+dYlFWuxFWDZlH4ql58CVXArJcCuaU3dxAYm/s0m0j+mJyQMIsiC8eEXihYtneeWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TfQNkJHV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7856BC4CED6;
-	Fri,  6 Dec 2024 02:40:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733452818;
-	bh=kutxWliyYMrFZcWXJ006HBnrlV8xm95oCb5CgE0l0ko=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TfQNkJHV8m3/KABqjivX6rNREbRv43EQ8wZPFYT7CfYwmqNAt/sFnkNjeAr5D43fb
-	 jZ9JdvkYkpt9/BXtZxyL8ES61EJLcXubKZ49B4QCB3sNH/bmDHBX+BbrPF87TB1VIa
-	 e5+9Z9BLXkOv0GWslGLYFJe+dKELNbHPpMWwFkd5bDibgmeNq2vePzjaiiybyM8l2h
-	 ZaccR92rEJlsv5UENx3SxK9WUGYv4Xt7PcXVeTmZufGLSNRNJIZ9L7NF4R8z6ELlRQ
-	 N0D7uMW54XgzDJZ04BUyLOOKvqtHBBuSgt5sJRG7uHJxgKai3aOtYoQvNT9vqt/Z5G
-	 r2PBztOUGhgIw==
-Date: Thu, 5 Dec 2024 18:40:16 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, Andrii
- Nakryiko <andrii@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Toke
- =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev
- <sdf@fomichev.me>, Magnus Karlsson <magnus.karlsson@intel.com>,
- nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 09/10] page_pool: allow mixing PPs within
- one bulk
-Message-ID: <20241205184016.6941f504@kernel.org>
-In-Reply-To: <20241203173733.3181246-10-aleksander.lobakin@intel.com>
-References: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
-	<20241203173733.3181246-10-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1733452964; c=relaxed/simple;
+	bh=VapI9BO8bDoxLf+txhz8n6Uf6jhZ1jCyATxFGisXxN4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BqOPQi8oMG/1280aQUDsS97kYx9FK4AVQxo06Oe7pR/40P1WYnVuI1jiiErL6LeBwnIq1VeK8NcImn2e+2z09eNQnA2CqKi7HWI/tht3w6WqYIE0i4W3yYkjtAZFj5oj2ZKoD+5ZVNRHa9Nh4NDPHEn+Dg5/cjJUE4h9CjlOgcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V1QppQU/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733452960;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VapI9BO8bDoxLf+txhz8n6Uf6jhZ1jCyATxFGisXxN4=;
+	b=V1QppQU/iKUDc5MYBPyTSCNsBmAI6XrkZZ/6qYAjbRM9r5piJKNLOMVF3S3yqFxw7pPBxv
+	K+P+7xL8Nto8zJnhPGCHBIkZLsNuJEuglfbCWXREjQ+U7sKquKG4Wihov8tzsFGa5aMQbO
+	k1NRm1ShqpzUA9qB2xkXP37qNI6z7w4=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-558-NQk-3ugBMjWM_SZUkoeigw-1; Thu, 05 Dec 2024 21:42:36 -0500
+X-MC-Unique: NQk-3ugBMjWM_SZUkoeigw-1
+X-Mimecast-MFC-AGG-ID: NQk-3ugBMjWM_SZUkoeigw
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2ee4b1a1057so2626713a91.1
+        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 18:42:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733452956; x=1734057756;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VapI9BO8bDoxLf+txhz8n6Uf6jhZ1jCyATxFGisXxN4=;
+        b=h6C2Z6gIVcbqK0Y4n5cRX9l+HuxClsNksPV/dsCK5sAWICU5DKb19LPvNbv6FfnGSz
+         DDPpCJljzCwTrozZLudxiEREJu+fp8NygsEudfdJaXpT9hSRRzZyrN8d/Vq+cG8C8mrR
+         xKgVYCLX2NuMjmIRllJ0LodmXvbEe5aEyiT9P5rEUtOtP31ezL9bSfg7w0Ra7TSivL5L
+         8qO1esxiuSQ6zIHi4Lz6RZD5g+KiJ0eoGIch8xI3cFgYC9HTA+SkTiBDRXb+gYh4X5a2
+         Z8OHDE+0qTtvNN7mujUguw9eT5Va0yplqxaIYkcClX/k2Jom6UWY2rY8YRaEevm90cQ2
+         Fepw==
+X-Forwarded-Encrypted: i=1; AJvYcCXy2gp6wbnYjORaxRyLexR1+ggi+5Y3S41Hrowzzz1fUEtqAKbyba9NKtVzXFJONnWlKKuzBlo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIWwFiWatBzW/H5Q2/NEup3kUjKTZLIEvCYEEauBBf7Ya7/JNv
+	DkE5l02oYUh9ty+CVtGQb16j14gwaS+khVufApZbBz36GbtjTIEcbpv2YyyosTwCsUrxGpAnM75
+	qxHXUeUHR/YLgKKJL8+hFW6XusHQ3WpCCUSuyUGkc4+JZVpmaBgwvefwe3iMEQl3HENL95uz++r
+	fYzFFHyUXf3V8kaWW6AaRadPgILXYb
+X-Gm-Gg: ASbGnctrGoxlTPdX9wqOT1WFs0uHHqOoai5TxtI56JJc5nQ6GW7U6x6FQ+brLxhj4hj
+	n6KyHeu4XC/9E/PYZ/q2ofDmnufyO/wPwew==
+X-Received: by 2002:a17:90b:4c84:b0:2ee:d63f:d77 with SMTP id 98e67ed59e1d1-2ef69e121d2mr2499909a91.9.1733452955991;
+        Thu, 05 Dec 2024 18:42:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFXC1PaZ/v1xzGb9UHzuP48eKxe8R8L0M0pU/SFP7iOc+J8n98g8ZduoEmx31sFn2mMYoCCNI12FCuwzw5Vn5M=
+X-Received: by 2002:a17:90b:4c84:b0:2ee:d63f:d77 with SMTP id
+ 98e67ed59e1d1-2ef69e121d2mr2499880a91.9.1733452955619; Thu, 05 Dec 2024
+ 18:42:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241205073614.294773-1-stsp2@yandex.ru> <6751d9e5254ac_119ae629486@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6751d9e5254ac_119ae629486@willemb.c.googlers.com.notmuch>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 6 Dec 2024 10:42:23 +0800
+Message-ID: <CACGkMEswqwz_EG0onQcOZdt6pkcaJ7zHsVpm=c2HUkyqdOMTVg@mail.gmail.com>
+Subject: Re: [PATCH net-next] tun: fix group permission check
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Stas Sergeev <stsp2@yandex.ru>, netdev@vger.kernel.org, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Very nice in general, I'll apply the previous 8 but I'd like to offer
-some alternatives here..
+On Fri, Dec 6, 2024 at 12:50=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Stas Sergeev wrote:
+> > Currently tun checks the group permission even if the user have matched=
+.
+> > Besides going against the usual permission semantic, this has a
+> > very interesting implication: if the tun group is not among the
+> > supplementary groups of the tun user, then effectively no one can
+> > access the tun device. CAP_SYS_ADMIN still can, but its the same as
+> > not setting the tun ownership.
+> >
+> > This patch relaxes the group checking so that either the user match
+> > or the group match is enough. This avoids the situation when no one
+> > can access the device even though the ownership is properly set.
+> >
+> > Also I simplified the logic by removing the redundant inversions:
+> > tun_not_capable() --> !tun_capable()
+> >
+> > Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
+> >
+> > CC: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> > CC: Jason Wang <jasowang@redhat.com>
+> > CC: Andrew Lunn <andrew+netdev@lunn.ch>
+> > CC: "David S. Miller" <davem@davemloft.net>
+> > CC: Eric Dumazet <edumazet@google.com>
+> > CC: Jakub Kicinski <kuba@kernel.org>
+> > CC: Paolo Abeni <pabeni@redhat.com>
+> > CC: netdev@vger.kernel.org
+> > CC: linux-kernel@vger.kernel.org
+>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+>
+> A lot more readable this way too.
+>
 
-On Tue,  3 Dec 2024 18:37:32 +0100 Alexander Lobakin wrote:
-> +void page_pool_put_netmem_bulk(netmem_ref *data, u32 count)
->  {
-> -	int i, bulk_len = 0;
-> -	bool allow_direct;
-> -	bool in_softirq;
-> +	bool allow_direct, in_softirq, again = false;
-> +	netmem_ref bulk[XDP_BULK_QUEUE_SIZE];
-> +	u32 i, bulk_len, foreign;
-> +	struct page_pool *pool;
->  
-> -	allow_direct = page_pool_napi_local(pool);
-> +again:
-> +	pool = NULL;
-> +	bulk_len = 0;
-> +	foreign = 0;
->  
->  	for (i = 0; i < count; i++) {
-> -		netmem_ref netmem = netmem_compound_head(data[i]);
-> +		struct page_pool *netmem_pp;
-> +		netmem_ref netmem;
-> +
-> +		if (!again) {
-> +			netmem = netmem_compound_head(data[i]);
->  
-> -		/* It is not the last user for the page frag case */
-> -		if (!page_pool_is_last_ref(netmem))
-> +			/* It is not the last user for the page frag case */
-> +			if (!page_pool_is_last_ref(netmem))
-> +				continue;
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-We check the "again" condition potentially n^2 times, is it written
-this way because we expect no mixing? Would it not be fewer cycles
-to do a first pass, convert all buffers to heads, filter out all
-non-last refs, and delete the "again" check?
+Thanks
 
-Minor benefit is that it removes a few of the long lines so it'd be
-feasible to drop the "goto again" as well and just turn this function
-into a while (count) loop.
-
-> +		} else {
-> +			netmem = data[i];
-> +		}
-> +
-> +		netmem_pp = netmem_get_pp(netmem);
-
-nit: netmem_pp is not a great name. Ain't nothing especially netmem
-about it, it's just the _current_ page pool.
-
-> +		if (unlikely(!pool)) {
-> +			pool = netmem_pp;
-> +			allow_direct = page_pool_napi_local(pool);
-> +		} else if (netmem_pp != pool) {
-> +			/*
-> +			 * If the netmem belongs to a different page_pool, save
-> +			 * it for another round after the main loop.
-> +			 */
-> +			data[foreign++] = netmem;
->  			continue;
-> +		}
->  
->  		netmem = __page_pool_put_page(pool, netmem, -1, allow_direct);
->  		/* Approved for bulk recycling in ptr_ring cache */
->  		if (netmem)
-> -			data[bulk_len++] = netmem;
-> +			bulk[bulk_len++] = netmem;
->  	}
->  
->  	if (!bulk_len)
-
-You can invert this condition, and move all the code from here to the
-out label into a small helper with just 3 params (pool, bulk, bulk_len).
-Naming will be the tricky part but you can save us a bunch of gotos.
-
-> -		return;
-> +		goto out;
->  
->  	/* Bulk producer into ptr_ring page_pool cache */
->  	in_softirq = page_pool_producer_lock(pool);
->  	for (i = 0; i < bulk_len; i++) {
-> -		if (__ptr_ring_produce(&pool->ring, (__force void *)data[i])) {
-> +		if (__ptr_ring_produce(&pool->ring, (__force void *)bulk[i])) {
->  			/* ring full */
->  			recycle_stat_inc(pool, ring_full);
->  			break;
-> @@ -893,13 +915,22 @@ void page_pool_put_netmem_bulk(struct page_pool *pool, netmem_ref *data,
->  
->  	/* Hopefully all pages was return into ptr_ring */
->  	if (likely(i == bulk_len))
-> -		return;
-> +		goto out;
->  
->  	/* ptr_ring cache full, free remaining pages outside producer lock
->  	 * since put_page() with refcnt == 1 can be an expensive operation
->  	 */
->  	for (; i < bulk_len; i++)
-> -		page_pool_return_page(pool, data[i]);
-> +		page_pool_return_page(pool, bulk[i]);
-> +
-> +out:
-> +	if (!foreign)
-> +		return;
-> +
-> +	count = foreign;
-> +	again = true;
-> +
-> +	goto again;
->  }
->  EXPORT_SYMBOL(page_pool_put_netmem_bulk);
 
