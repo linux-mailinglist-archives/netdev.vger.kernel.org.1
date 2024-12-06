@@ -1,89 +1,78 @@
-Return-Path: <netdev+bounces-149848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3677F9E7B13
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 22:36:39 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E1FD9E7B28
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 22:43:30 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FA44166932
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 21:36:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DBFE280C32
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 21:43:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C2031946DA;
-	Fri,  6 Dec 2024 21:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A901AAA3A;
+	Fri,  6 Dec 2024 21:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SMiOE7o2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z8aSPbvo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D414422C6D0;
-	Fri,  6 Dec 2024 21:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66AD22C6DC
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 21:43:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733520995; cv=none; b=iMrgYexY2Lka00Ezf548wVSsJ54QOLlOf42XEhsxSUXsg+lJ2U9Ve0cicVXkwJoVSbCrUX4ae7r4TzCLluYyUH8LtLJ0CENUQogIKBrrTBKWJVH1EINufI/Bckv2X7joLh6drVeB7JwkLnlOJHow6cx4QhmeLRvvDm1NmvAYGUc=
+	t=1733521406; cv=none; b=Bq7Ans9cOng3q2TMmzyfMlOdBWlMnib/h/U1tfMLelLOGJoogSKhKNC2ffmYmTJCa+VND3PeY6d7RAoI8v07R6MYzCvZFTMMNSKDQJKqKr1Cf++fth1oFrWAw7GCvf4Uwl0CzS9Z03gf66MUm0hUWKVRJiYFFzHiHK2ltQQQ6+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733520995; c=relaxed/simple;
-	bh=QPqWR2FDz4pWaP5G6VyIgr7hcD704jyL49nb2VFX11c=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SyKM3qKjYpq2+yiKjU64egjaKbC4mqNqUiqo+JTYG/dDPyjUPZ65UI/uXP8X45zrXW7aMbet3/JDtXUItyxNWkiyjiqsk3q41QMs9w/sUGuL0WOSQSy1Wde08wl3gxgrtOG/BHRnSG9zsbHgCi7RHLmiPvyN5c4+vVinm9nzFsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SMiOE7o2; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2153e642114so26127045ad.0;
-        Fri, 06 Dec 2024 13:36:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733520993; x=1734125793; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3QuTxe5A7kGUrMQS0h4Kp+tU8tD0ghWVw7N4Nu7pm3w=;
-        b=SMiOE7o2wl4hqmbrsAiE6UQyMc+TYja9PD41hYoxaJ7hT7EXBGA85/n93/dW3oRscO
-         fF7Hg0NVEpXLRbj+qrPJ4rwwHWbBLnzHnJ5nKWFFcm3ku9PQhhXhdYYgTBOkTb3eSCLR
-         5nN3Twua+5xIhGBbY+wglPzOkpaB9ME2TU7yA76HJOerfr53la+O6OkV9gHJhGLfAc2K
-         Tp9+8nuCpbzpwvvYFFpLQOiAFiZtziBSDlIJK0fayy6PVuPP/DsokerC9+tEJ2txrnhJ
-         bV5s4lTFsFpL/mHPmi97Flmgj1/2vj8T+55OJrA+qujgo9yLWpXsbVQIuOg4pGnoILg7
-         e/zQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733520993; x=1734125793;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3QuTxe5A7kGUrMQS0h4Kp+tU8tD0ghWVw7N4Nu7pm3w=;
-        b=Lxty6XT9tKbl59hp8esImR2D2iqrOtyoGw/U5r7DRy5q9THmsulYDK4jFtI290RF8q
-         fG0SWy1qFwmKZONj5TF9F7FXFYlAbNtmLUzJc+mw7RXonyH3/fMHK472tGjtf5TbryFr
-         PbkYBY8BpxyyQRRGYSKZ0tjp3NXOo7muDWjegPV25A1Lb+BXzpf3wdNRW5Z+Q+KIYf/k
-         YF9yBrquJtbdsGnjuy5qqSjJaBMEm0ZJ4O7O5Ls2+7x7t2SBmdzNbsFnOk+uopdisTr/
-         E9C1QA+bV7pfZ533q0dyvb72EdxLqD5CFKqr3WT6b/xh4O304izuscH8BCXU2UQ5h+NC
-         eCjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWrwQdjn0HppPr93Aiyyg0heOVOxk98YJxi9JdoSm1YhjLWYjmfbizs8RZtv8adj+4CUFdZt6k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxL7nGV1TPDbc734YYz/pnrpVDeEMAOjb6Sa12Uwv1FsQCzwLW0
-	o1O+BAVddSuYtnsqnp5MgGOctpyHpTvVg+M0wBd728+kmunZHYCg
-X-Gm-Gg: ASbGnctCE0jfYvLDG4peBZVbFS8iTVVQfIQOlgR2tRfZKAMIy1YjNyefFXQ6KCOYwVb
-	sEqPh1o1XlBceFx28Vhs3SbvZK2bwtiNpBrWRJDFVtMSHVy4dp3LclSKbjmrKVE8ASQJMX2hpMi
-	Bqm7n1+IrBST9ORaKe5s6zq5AiL9JAdvGSM++WILC3kQhD4xADT/xRqSiqyEkz0JTx3vgGi5Ygz
-	biOBXm4cHmy3dFO4b2lGgnXBZQd2dGclYmDonmrwA==
-X-Google-Smtp-Source: AGHT+IFQphNBxCq8SCyMh4I1DdGt+dydKcZ99ziCuWxzATcigdfuG2l+zsZAy2HvoHhrZBUe8NvpEA==
-X-Received: by 2002:a17:902:e54b:b0:215:4a4e:9270 with SMTP id d9443c01a7336-21614db9e62mr49328205ad.52.1733520993054;
-        Fri, 06 Dec 2024 13:36:33 -0800 (PST)
-Received: from mini ([2601:646:8f03:9fe0:b125:86cb:737b:2a61])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215f8efc5efsm33065775ad.150.2024.12.06.13.36.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Dec 2024 13:36:32 -0800 (PST)
-From: Fan Ni <nifan.cxl@gmail.com>
-X-Google-Original-From: Fan Ni <fan.ni@samsung.com>
-Date: Fri, 6 Dec 2024 13:36:29 -0800
-To: alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	dan.j.williams@intel.com, martin.habets@xilinx.com,
-	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
-	Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v6 16/28] sfc: obtain root decoder with enough HPA free
- space
-Message-ID: <Z1NuXSKPvND9eqA4@mini>
-References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
- <20241202171222.62595-17-alejandro.lucero-palau@amd.com>
+	s=arc-20240116; t=1733521406; c=relaxed/simple;
+	bh=03PJh/ck6Oij4S/+gjwuYJH+/iN5eJyRrxHvrQa3O+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CvEY7mm21ddwILcWWp0Sa2a4ouaYp351ZmDvmZUCIiD7cxt+30OpFTMFveBGgW5iqgBajrH+10nsr3V3CNrZP2JyOx9p/XUTtmL0lQorTf9QcqYrFRT1Yxa1+3OUgtH9xQxPet3TcdHRC0oEUAOKr9nJ+BE/C9dPw4kv06/tyFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z8aSPbvo; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733521406; x=1765057406;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=03PJh/ck6Oij4S/+gjwuYJH+/iN5eJyRrxHvrQa3O+0=;
+  b=Z8aSPbvowRxIVIHBOiOOcOSmScv+sZ+WHmKQLW1WXSFqkzOsnWGjpuf9
+   BVkGb4Yt1UJ7H82gFiHUQq7XSUDmiuJOTb5YQ/u462tjCjj2sl/136hyS
+   9LFBEc6tSgCwWbloTEwT9EPQyOkQONC0RQpCVTtncFc0rL8l4gVgQCBWv
+   xgH+AlXntQXw2+CO5ayaapGrz3DDcsU27r/FV2sDEjvgdgQPCo8TdLBsa
+   gxwE815YtGK/PEuDsUQV+37ecNRizVIO4Mu3WvpE4gZGpjWsGihxU+5Qr
+   UO0NM/AHmoBUSalqfpyjxAQdplKbow0D2pA0TdpGMWWLzd0uIMb0+ZR77
+   w==;
+X-CSE-ConnectionGUID: 2CivTPJJSv6ZPRw1tbswdw==
+X-CSE-MsgGUID: U/bZH5HhS8yrMbkfzza0FA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11278"; a="45265266"
+X-IronPort-AV: E=Sophos;i="6.12,214,1728975600"; 
+   d="scan'208";a="45265266"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2024 13:43:25 -0800
+X-CSE-ConnectionGUID: vusUvBAWTNeDb+fheG24pQ==
+X-CSE-MsgGUID: Q7HjNLTHTbC5z5ANl21tIw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,214,1728975600"; 
+   d="scan'208";a="94385064"
+Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 06 Dec 2024 13:43:23 -0800
+Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tJg6Z-0002H3-2X;
+	Fri, 06 Dec 2024 21:43:19 +0000
+Date: Sat, 7 Dec 2024 05:43:05 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: Re: [PATCH v1 net-next 08/15] socket: Pass hold_net to sk_alloc().
+Message-ID: <202412070526.FhqWmbBo-lkp@intel.com>
+References: <20241206075504.24153-9-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,61 +81,117 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241202171222.62595-17-alejandro.lucero-palau@amd.com>
+In-Reply-To: <20241206075504.24153-9-kuniyu@amazon.com>
 
-On Mon, Dec 02, 2024 at 05:12:10PM +0000, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Asking for availbale HPA space is the previous step to try to obtain
-/availbale/available/
+Hi Kuniyuki,
 
-Fan
-> an HPA range suitable to accel driver purposes.
-> 
-> Add this call to efx cxl initialization.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> ---
->  drivers/net/ethernet/sfc/efx_cxl.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> index d03fa9f9c421..79b93d92f9c2 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> @@ -26,6 +26,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  	struct pci_dev *pci_dev;
->  	struct efx_cxl *cxl;
->  	struct resource res;
-> +	resource_size_t max;
->  	u16 dvsec;
->  	int rc;
->  
-> @@ -102,6 +103,23 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  		goto err3;
->  	}
->  
-> +	cxl->cxlrd = cxl_get_hpa_freespace(cxl->cxlmd,
-> +					   CXL_DECODER_F_RAM | CXL_DECODER_F_TYPE2,
-> +					   &max);
-> +
-> +	if (IS_ERR(cxl->cxlrd)) {
-> +		pci_err(pci_dev, "cxl_get_hpa_freespace failed\n");
-> +		rc = PTR_ERR(cxl->cxlrd);
-> +		goto err3;
-> +	}
-> +
-> +	if (max < EFX_CTPIO_BUFFER_SIZE) {
-> +		pci_err(pci_dev, "%s: no enough free HPA space %llu < %u\n",
-> +			__func__, max, EFX_CTPIO_BUFFER_SIZE);
-> +		rc = -ENOSPC;
-> +		goto err3;
-> +	}
-> +
->  	probe_data->cxl = cxl;
->  
->  	return 0;
-> -- 
-> 2.17.1
-> 
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/socket-Un-export-__sock_create/20241206-160139
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241206075504.24153-9-kuniyu%40amazon.com
+patch subject: [PATCH v1 net-next 08/15] socket: Pass hold_net to sk_alloc().
+config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20241207/202412070526.FhqWmbBo-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 592c0fe55f6d9a811028b5f3507be91458ab2713)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241207/202412070526.FhqWmbBo-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412070526.FhqWmbBo-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from net/iucv/af_iucv.c:16:
+   In file included from include/linux/filter.h:9:
+   In file included from include/linux/bpf.h:20:
+   In file included from include/linux/module.h:19:
+   In file included from include/linux/elf.h:6:
+   In file included from arch/s390/include/asm/elf.h:181:
+   In file included from arch/s390/include/asm/mmu_context.h:11:
+   In file included from arch/s390/include/asm/pgalloc.h:18:
+   In file included from include/linux/mm.h:2223:
+   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     505 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     512 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     525 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+>> net/iucv/af_iucv.c:455:59: error: too few arguments to function call, expected 6, have 5
+     455 |         sk = sk_alloc(&init_net, PF_IUCV, prio, &iucv_proto, kern);
+         |              ~~~~~~~~                                            ^
+   include/net/sock.h:1745:14: note: 'sk_alloc' declared here
+    1745 | struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
+         |              ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    1746 |                       struct proto *prot, bool kern, bool hold_net);
+         |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 warnings and 1 error generated.
+
+
+vim +455 net/iucv/af_iucv.c
+
+eac3731bd04c713 Jennifer Hunt     2007-02-08  448  
+8424c284851b97e Kuniyuki Iwashima 2024-12-06  449  static struct sock *iucv_sock_alloc(struct socket *sock, int proto, gfp_t prio,
+8424c284851b97e Kuniyuki Iwashima 2024-12-06  450  				    bool kern, bool hold_net)
+eac3731bd04c713 Jennifer Hunt     2007-02-08  451  {
+eac3731bd04c713 Jennifer Hunt     2007-02-08  452  	struct sock *sk;
+493d3971a65c921 Ursula Braun      2011-08-08  453  	struct iucv_sock *iucv;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  454  
+11aa9c28b420924 Eric W. Biederman 2015-05-08 @455  	sk = sk_alloc(&init_net, PF_IUCV, prio, &iucv_proto, kern);
+eac3731bd04c713 Jennifer Hunt     2007-02-08  456  	if (!sk)
+eac3731bd04c713 Jennifer Hunt     2007-02-08  457  		return NULL;
+493d3971a65c921 Ursula Braun      2011-08-08  458  	iucv = iucv_sk(sk);
+eac3731bd04c713 Jennifer Hunt     2007-02-08  459  
+eac3731bd04c713 Jennifer Hunt     2007-02-08  460  	sock_init_data(sock, sk);
+493d3971a65c921 Ursula Braun      2011-08-08  461  	INIT_LIST_HEAD(&iucv->accept_q);
+493d3971a65c921 Ursula Braun      2011-08-08  462  	spin_lock_init(&iucv->accept_q_lock);
+493d3971a65c921 Ursula Braun      2011-08-08  463  	skb_queue_head_init(&iucv->send_skb_q);
+493d3971a65c921 Ursula Braun      2011-08-08  464  	INIT_LIST_HEAD(&iucv->message_q.list);
+493d3971a65c921 Ursula Braun      2011-08-08  465  	spin_lock_init(&iucv->message_q.lock);
+493d3971a65c921 Ursula Braun      2011-08-08  466  	skb_queue_head_init(&iucv->backlog_skb_q);
+493d3971a65c921 Ursula Braun      2011-08-08  467  	iucv->send_tag = 0;
+3881ac441f642d5 Ursula Braun      2011-08-08  468  	atomic_set(&iucv->pendings, 0);
+493d3971a65c921 Ursula Braun      2011-08-08  469  	iucv->flags = 0;
+3881ac441f642d5 Ursula Braun      2011-08-08  470  	iucv->msglimit = 0;
+ef6af7bdb9e6c14 Julian Wiedmann   2021-01-28  471  	atomic_set(&iucv->skbs_in_xmit, 0);
+3881ac441f642d5 Ursula Braun      2011-08-08  472  	atomic_set(&iucv->msg_sent, 0);
+3881ac441f642d5 Ursula Braun      2011-08-08  473  	atomic_set(&iucv->msg_recv, 0);
+493d3971a65c921 Ursula Braun      2011-08-08  474  	iucv->path = NULL;
+3881ac441f642d5 Ursula Braun      2011-08-08  475  	iucv->sk_txnotify = afiucv_hs_callback_txnotify;
+b5d8cf0af167f3a Kees Cook         2021-11-18  476  	memset(&iucv->init, 0, sizeof(iucv->init));
+3881ac441f642d5 Ursula Braun      2011-08-08  477  	if (pr_iucv)
+3881ac441f642d5 Ursula Braun      2011-08-08  478  		iucv->transport = AF_IUCV_TRANS_IUCV;
+3881ac441f642d5 Ursula Braun      2011-08-08  479  	else
+3881ac441f642d5 Ursula Braun      2011-08-08  480  		iucv->transport = AF_IUCV_TRANS_HIPER;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  481  
+eac3731bd04c713 Jennifer Hunt     2007-02-08  482  	sk->sk_destruct = iucv_sock_destruct;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  483  	sk->sk_sndtimeo = IUCV_CONN_TIMEOUT;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  484  
+eac3731bd04c713 Jennifer Hunt     2007-02-08  485  	sock_reset_flag(sk, SOCK_ZAPPED);
+eac3731bd04c713 Jennifer Hunt     2007-02-08  486  
+eac3731bd04c713 Jennifer Hunt     2007-02-08  487  	sk->sk_protocol = proto;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  488  	sk->sk_state	= IUCV_OPEN;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  489  
+eac3731bd04c713 Jennifer Hunt     2007-02-08  490  	iucv_sock_link(&iucv_sk_list, sk);
+eac3731bd04c713 Jennifer Hunt     2007-02-08  491  	return sk;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  492  }
+eac3731bd04c713 Jennifer Hunt     2007-02-08  493  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
