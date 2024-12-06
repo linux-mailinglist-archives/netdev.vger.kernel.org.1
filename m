@@ -1,123 +1,135 @@
-Return-Path: <netdev+bounces-149663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 493F89E6B09
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 10:49:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D7FA9E6B2F
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 10:59:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 308E216A5E0
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 09:49:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5591916784B
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 09:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F871EF0A5;
-	Fri,  6 Dec 2024 09:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C89351F472F;
+	Fri,  6 Dec 2024 09:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="2lIHgRTJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uIqun7C7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0AC61EF0A9
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 09:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905721DB361;
+	Fri,  6 Dec 2024 09:59:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733478585; cv=none; b=COqt8PgYcav96TTRsOZ8bvtiptRR1w9MVVY1WOKka1duCUt4mtdxl2GbkWmwcTyK7ZbtsvXyPcD+ucWQhADOWHOaXqIwVKrgrLUOnyv+Ri9UuuVQ0aTB3sS3RRT/06dSAtLBbGxlwjm/4lWCuo2lP+mVQOIh0T4sGo/b+PR4m48=
+	t=1733479183; cv=none; b=sPmeHGm8SxchaWEvt4DwpfkH28t7FEyT2rr7W5FIXmewhEbjKn+ca4cOH7mexj4JSemR1gMr6/624u3rcw7+pWF7Uo4c2/vx6HhPKyGQ9/EatF5g00L1UC2Sbp2cw9fxOEBjiviB3W+biNcz2EqCKzqnO0ijiwFN1/lL1/dyAZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733478585; c=relaxed/simple;
-	bh=PnDB/sYV9slXqwjdQ+adiYJ8G9BZKP3IlyhMW03My5Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DKQdUGUgM3vofCwwyzChK0Rqvl9Tp7qsQIxNLl6MraApKgBX5Rie4AbBPtZk9Noheg4J10lLagP/wHT4l8WD1fve8gZddV3mxhHyQm+in+jtArHUH0ebqyIEB2eWr9UhREhcCHeL5QuOp991WM8So0J7GzRmHkzQCxo+owZhyHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=2lIHgRTJ; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a9f1d76dab1so359954866b.0
-        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 01:49:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1733478582; x=1734083382; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AuGUFOb/iBY8RJKzowVsntGQmfZkIN8i8d+6WuovufA=;
-        b=2lIHgRTJUVgPiu0QpHE+4HXOrfauynhMdie+Me5alzQIz1fcn1cN2iENiFkYbeFhWb
-         m4gD/XVsHWz49+kem84b/hMyLqctvhisb6wwH9SHtiVHf60Yl8Au4roiDZiE8utlHPE/
-         69zyEWuINXGF9nMEPzJHt7qtLXxFCi9+9ZniHfepNrVTaVcqszJKF1RrdnMchsX6/bjD
-         oSAssq1/4/Y3g5ZTI/PWld9ZaYUktjQsZ+vQ7p99nRL6Le12SnZdHQ2pqxZMYIROvWnf
-         L/JwqEcwMGXx9HtX5k4VQISG9AbgD0QTWSDnkmjayc4XMmQbRmxH+F03mMpkc0QYtvO5
-         LyGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733478582; x=1734083382;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AuGUFOb/iBY8RJKzowVsntGQmfZkIN8i8d+6WuovufA=;
-        b=In9NWFJE4bIpBbrEY640LdFpy2zh5/RDjEX1wQzS9D5XF1fM7cbvtQUoBoY9NROzIZ
-         CTooxDrBok0wKGTfBGUMc+Ya1Zhgh5X4tGZuLzVieFY7Ar6a9MCiggbVi1EfUPFhiVtX
-         zO/BmrIzN+rfIvxDdpCeNqrhd+TjxM3wPi2aS9WPgDSKcE8Sw8MPtao/gidebfm8On0J
-         llPKrOgCPpGgHwbVbI33psc9sTm0VdGiKP9ux75zDOFylO03wk4gSJy92h0k0O7GquVe
-         tHBT3ckJhRs2kIEw3QA4h2++7bdqLjPGURU2o+Wpvggkh32uDO4RRBe5HEObvYzFnC+q
-         UV9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUAhvSOUYw2FsIDDTmHkmGQLnhBIjgEVrh1eByrHviCtt7BFFxSygwVFfnkvgM4BAX16n7sUgA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSCsSXyQf+MmCO+b8rBTpzxV9Jai80xwOlTdZkykKAVRQrX050
-	prm0Iu3VxVPmBKhWnP9BoruRICGRPyggMLS6c5HwWNHoEgPdlq3RCtU6VpXeX2s=
-X-Gm-Gg: ASbGncu4DItkCFo9f2hcIWJWyHJ3th954BDmNiNFfCot+mlkH0otWmm1PcXHQobBhHg
-	y50bN0HF0pEyIx/Iv/NPzxPft3e4j8bZ1VLTQo/N9aJqNf+1M9PJU8OnJJFXXuuD19oh6LqFYJ2
-	NAgIuvj3bsE5xyLYQFw3g1fNqXlGA6fVGK51za6CVDQTMYeawv4JN/xjiDiyA40WHiQEoJC6io3
-	sDyCBDph4Bwpf15vKc7ONbJZXH2hCbkbVFLKQ3LL5n6M7EscizW
-X-Google-Smtp-Source: AGHT+IGlZGYFgwmwFeNFQJwgjuah6WRFJxdm3tfG1ry4p/ogHPRA4+guYXrGWdGdYUv9BzFp83k3/A==
-X-Received: by 2002:a17:907:9145:b0:aa5:630d:7de0 with SMTP id a640c23a62f3a-aa63a26a7c0mr170543066b.44.1733478581999;
-        Fri, 06 Dec 2024 01:49:41 -0800 (PST)
-Received: from [192.168.0.123] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa625e4dc8asm213942166b.35.2024.12.06.01.49.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Dec 2024 01:49:41 -0800 (PST)
-Message-ID: <e7cb6b0b-afce-459e-a781-f78ed0af241a@blackwall.org>
-Date: Fri, 6 Dec 2024 11:49:40 +0200
+	s=arc-20240116; t=1733479183; c=relaxed/simple;
+	bh=CeuSQcHdd8suFTsYTp7/+6YiPo2ymkTlLUJD52XBM8k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k6pmrirCVDVsgS+280lt4fRIiVoAqIERBhfHV9FwcL0wwAJLouEVIvlTPjF5Cm1djUcviVXwnQaOWKrcLcDNjPWaKngxsy/LWeUB4flpUzTnkE3a/h4mmT8h2AbqthYA2GwQcsU3EvhhefiUjZFLQOC/GGW9GZ+I2JIXEKR4sU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uIqun7C7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91B0EC4CED1;
+	Fri,  6 Dec 2024 09:59:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733479183;
+	bh=CeuSQcHdd8suFTsYTp7/+6YiPo2ymkTlLUJD52XBM8k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uIqun7C7IibTb0jfp7wSgQ7Kcvcr5r2h1PJRYE6g6zi+x+RoUpREOld8m/12574xU
+	 cu/HWYNMBCKdc+1UtLKu1aoLsmRkDrBLiUO6hbeAdXBJ+LM7oASh125kjsAyxtwzqH
+	 rjSAO50xTQOJQEcP77zMHifzq+VsHySeluasPvvSNGBRvHKEjvXL6a7MghgsAEb5ng
+	 75AdbWfE+ykTb6I/2XPZwOOKC3LDSJrqmwclJ3XvDDyCOw4SBMEP0rPDr6FBJCJH08
+	 MD0pXj8TcK5nQ3Rq7YtwxA2CICDykehBKzpT+Fs5haXT/NQ76b76/4MaGD8/P7mIX9
+	 /1gPao3+bhvXQ==
+Date: Fri, 6 Dec 2024 09:59:38 +0000
+From: Simon Horman <horms@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, frank.li@nxp.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev
+Subject: Re: [PATCH v6 RESEND net-next 4/5] net: enetc: add LSO support for
+ i.MX95 ENETC PF
+Message-ID: <20241206095938.GJ2581@kernel.org>
+References: <20241204052932.112446-1-wei.fang@nxp.com>
+ <20241204052932.112446-5-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 11/11] selftests: forwarding: Add a selftest
- for the new reserved_bits UAPI
-To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
- mlxsw@nvidia.com, Shuah Khan <shuah@kernel.org>,
- Benjamin Poirier <bpoirier@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, linux-kselftest@vger.kernel.org
-References: <cover.1733412063.git.petrm@nvidia.com>
- <388bef3c30ebc887d4e64cd86a362e2df2f2d2e1.1733412063.git.petrm@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <388bef3c30ebc887d4e64cd86a362e2df2f2d2e1.1733412063.git.petrm@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241204052932.112446-5-wei.fang@nxp.com>
 
-On 12/5/24 17:41, Petr Machata wrote:
-> Run VXLAN packets through a gateway. Flip individual bits of the packet
-> and/or reserved bits of the gateway, and check that the gateway treats the
-> packets as expected.
+On Wed, Dec 04, 2024 at 01:29:31PM +0800, Wei Fang wrote:
+> ENETC rev 4.1 supports large send offload (LSO), segmenting large TCP
+> and UDP transmit units into multiple Ethernet frames. To support LSO,
+> software needs to fill some auxiliary information in Tx BD, such as LSO
+> header length, frame length, LSO maximum segment size, etc.
 > 
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> At 1Gbps link rate, TCP segmentation was tested using iperf3, and the
+> CPU performance before and after applying the patch was compared through
+> the top command. It can be seen that LSO saves a significant amount of
+> CPU cycles compared to software TSO.
+> 
+> Before applying the patch:
+> %Cpu(s):  0.1 us,  4.1 sy,  0.0 ni, 85.7 id,  0.0 wa,  0.5 hi,  9.7 si
+> 
+> After applying the patch:
+> %Cpu(s):  0.1 us,  2.3 sy,  0.0 ni, 94.5 id,  0.0 wa,  0.4 hi,  2.6 si
+> 
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> Reviewed-by: Frank Li <Frank.Li@nxp.com>
+> Reviewed-by: Claudiu Manoil <claudiu.manoil@nxp.com>
 > ---
+> v2: no changes
+> v3: use enetc_skb_is_ipv6() helper fucntion which is added in patch 2
+> v4: fix a typo
+> v5: no changes
+> v6: remove error logs from the datapath
+> ---
+>  drivers/net/ethernet/freescale/enetc/enetc.c  | 259 +++++++++++++++++-
+>  drivers/net/ethernet/freescale/enetc/enetc.h  |  15 +
+>  .../net/ethernet/freescale/enetc/enetc4_hw.h  |  22 ++
+>  .../net/ethernet/freescale/enetc/enetc_hw.h   |  15 +-
+>  .../freescale/enetc/enetc_pf_common.c         |   3 +
+>  5 files changed, 304 insertions(+), 10 deletions(-)
 > 
-> Notes:
->     v2:
->     - Add the new test to Makefile
->     
-> CC: Shuah Khan <shuah@kernel.org>
-> CC: Benjamin Poirier <bpoirier@nvidia.com>
-> CC: Hangbin Liu <liuhangbin@gmail.com>
-> CC: Vladimir Oltean <vladimir.oltean@nxp.com>
-> CC: linux-kselftest@vger.kernel.org
-> 
+> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
+> index dafe7aeac26b..82a7932725f9 100644
+> --- a/drivers/net/ethernet/freescale/enetc/enetc.c
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+> @@ -523,6 +523,226 @@ static void enetc_tso_complete_csum(struct enetc_bdr *tx_ring, struct tso_t *tso
+>  	}
+>  }
+>  
+> +static inline int enetc_lso_count_descs(const struct sk_buff *skb)
+> +{
+> +	/* 4 BDs: 1 BD for LSO header + 1 BD for extended BD + 1 BD
+> +	 * for linear area data but not include LSO header, namely
+> +	 * skb_headlen(skb) - lso_hdr_len. And 1 BD for gap.
+> +	 */
+> +	return skb_shinfo(skb)->nr_frags + 4;
+> +}
+> +
+> +static int enetc_lso_get_hdr_len(const struct sk_buff *skb)
+> +{
+> +	int hdr_len, tlen;
+> +
+> +	tlen = skb_is_gso_tcp(skb) ? tcp_hdrlen(skb) : sizeof(struct udphdr);
+> +	hdr_len = skb_transport_offset(skb) + tlen;
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Hi Wei,
 
+I am wondering if packets that are neither TCP nor UDP can be process
+by the LSO code added by this patch, and if so, what the implications are.
+
+> +
+> +	return hdr_len;
+> +}
+
+...
 
