@@ -1,66 +1,65 @@
-Return-Path: <netdev+bounces-149537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D13A9E625C
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 01:42:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C32049E6265
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 01:47:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17B6B1884F0A
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 00:42:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5F651674CC
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 00:47:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B93200CD;
-	Fri,  6 Dec 2024 00:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C42091CA94;
+	Fri,  6 Dec 2024 00:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/FK0n/C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SAi9e/7M"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A08193;
-	Fri,  6 Dec 2024 00:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950562F32;
+	Fri,  6 Dec 2024 00:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733445755; cv=none; b=l/vK3ij3djrQH7svZZC0I7K8AKFtFd8K0U9zKmv+GKD2F5DpwFpmu2FC6KHvpkwxcVfxS2jVSP1mhn9adw1kna5Pk7qnz4sGrFW0OAvK0D2xO6PtnsVHpSo+JYb6n9TRKIsJX4Mh1Qtrq2ayYMkxTbPXydnfWyT4bZa0D3Ry4JU=
+	t=1733446030; cv=none; b=hCBUVZogzlhIgx31jDdERr3LoMUMpu7809s9E+4cIr8gOls2RX6sFUi26hPl+dVBXVOVfPl3FGUFo5qHVb5cuTPguWxLWKl6zH1SZJqedPz/2qMzNgOd5HBRYm6yHE5PkcapdLGVqxtVQusnyQC3pw34kxhC3+/uSXw0AaB9xw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733445755; c=relaxed/simple;
-	bh=ebDKrFwx+yHkQE3pyL+n7vEbgNtRfc461Tr2UF/oeiw=;
+	s=arc-20240116; t=1733446030; c=relaxed/simple;
+	bh=qTk619EP8BquDWI3RIvDV3o4XR1pfGCPvLu6/s4l0AY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z9bwEZLZt8FZwhTWqiTFCA/gIE9JQ+W/eWeUMoLPBlbNXtTMvw74Ycnr92Is0GcPJnlyRNTqeKGwo5jBottiSQyaem9UmJ44XbdRuVZlfsPPLU6TRtSLCk5+5bKCmkN4zNldwKzIkTvgknkLyvaNcTgzyp9DR3VZu10dCLGy1hU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/FK0n/C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2113CC4CED1;
-	Fri,  6 Dec 2024 00:42:34 +0000 (UTC)
+	 MIME-Version:Content-Type; b=DXPntNt6U+lM7tI1ykU1auCZ3tSoMf5kDOceymC8v/ft61UOyiaQeD3Qweunm8z5HjAaOR8DV9jbLQZqZQjEdYZMTVRTADLhPDISnLv0oFoy8zduCkqZonyMUvZw4ARhVlYrPj5z2iC75wcsBhQNzRjsIyKki4nBwiRcs8OrcMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SAi9e/7M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 874BCC4CED1;
+	Fri,  6 Dec 2024 00:47:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733445754;
-	bh=ebDKrFwx+yHkQE3pyL+n7vEbgNtRfc461Tr2UF/oeiw=;
+	s=k20201202; t=1733446030;
+	bh=qTk619EP8BquDWI3RIvDV3o4XR1pfGCPvLu6/s4l0AY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h/FK0n/CGdMDINIfU/69TQKcb2RW+ajRcI0oxeiJ5CDs2fXE9dBRopsOcj6LElqf9
-	 +NnIDB0GefkECEkIPYIw7kSGzCJpYTZb0hYa2eRrLO5j2h8Fmp1AHbhMeYvKW+aN1d
-	 Z98HSPLYxAj81hSixw1zanDcgVrpKG5OZCiqR+7C/m5XedxhKlMSykzICodjm4y+jw
-	 4Ialgv0GrGIMiyKHDfm9j8FTvltu6/4Kpimv3inmlP6uMCa1A652TQadJELD6+6RV7
-	 OltoQMeifwofHNCe9zHhWfYk7s4ARS45aAFCYMh3IgfJkzMoxeEUPLYsigR6gkMu18
-	 36bKmkSyST8jA==
-Date: Thu, 5 Dec 2024 16:42:33 -0800
+	b=SAi9e/7MlKc7iAR11XIPgE/t2nmmfRtA5qBvhR+r0QOwpfNFKv689H+WtkF0NzMVu
+	 Eu+ViNh69njOGN4T8eP1X3DwxZdbBq/s3Nrm5q2mpvrjvKf5359QlC1iH+UqBuRlCK
+	 2M2KhknAOEFVx1Vz9DMAPB88EJXKpGPI1nJ8wNQZ5SAKTX/kM94QTEPZNJOH0tPSmf
+	 eYGu4JajSKA6LJd4dAfDGGufiNZkwKWCpA9x9jmpK+FLp7t/39RODkPV0DNohOcb70
+	 F78woE/QqBG3075kZt3i/YgW21l+kqwtM3ZKOqZtMHy2jDfq+aaZwjpmanbh36IUwf
+	 3CGmbErfRTipA==
+Date: Thu, 5 Dec 2024 16:47:08 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: <davem@davemloft.net>, <pabeni@redhat.com>, <liuyonglong@huawei.com>,
- <fanghaiqing@huawei.com>, <zhangkun09@huawei.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, Eric Dumazet <edumazet@google.com>, Simon
- Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RFC v4 1/3] page_pool: fix timing for checking and
- disabling napi_local
-Message-ID: <20241205164233.64512141@kernel.org>
-In-Reply-To: <70aefeb1-6a78-494c-9d5b-e03696948d11@huawei.com>
-References: <20241120103456.396577-1-linyunsheng@huawei.com>
-	<20241120103456.396577-2-linyunsheng@huawei.com>
-	<20241202184954.3a4095e3@kernel.org>
-	<e053e75a-bde1-4e69-9a8d-d1f54be06bdb@huawei.com>
-	<20241204172846.5b360d32@kernel.org>
-	<70aefeb1-6a78-494c-9d5b-e03696948d11@huawei.com>
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Andrew Lunn
+ <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Geert Uytterhoeven
+ <geert+renesas@glider.be>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, Michael
+ Dege <michael.dege@renesas.com>, Christian Mardmoeller
+ <christian.mardmoeller@renesas.com>, Dennis Ostermann
+ <dennis.ostermann@renesas.com>
+Subject: Re: [PATCH 2/5] net: renesas: rswitch: fix leaked pointer on error
+ path
+Message-ID: <20241205164708.319cbb92@kernel.org>
+In-Reply-To: <9b2607ac-a577-49ca-8106-b82b25723439@cogentembedded.com>
+References: <20241202134904.3882317-1-nikita.yoush@cogentembedded.com>
+	<20241202134904.3882317-3-nikita.yoush@cogentembedded.com>
+	<20241204194019.43737f84@kernel.org>
+	<9b2607ac-a577-49ca-8106-b82b25723439@cogentembedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,33 +69,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 5 Dec 2024 19:43:25 +0800 Yunsheng Lin wrote:
-> It depends on what is the callers is trying to protect by calling
-> page_pool_disable_direct_recycling().
+On Thu, 5 Dec 2024 08:46:15 +0500 Nikita Yushchenko wrote:
+> > I agree with Jake that patches 4 and 5 don't seem like obvious fixes,
+> > would be great if you could post them as separate series, they need to
+> > go to a different tree.  
 > 
-> It seems the use case for the only user of the API in bnxt driver
-> is about reuseing the same NAPI for different page_pool instances.
+> Ok, will repost.
 > 
-> According to the steps in netdev_rx_queue.c:
-> 1. allocate new queue memory & create page_pool
-> 2. stop old rx queue.
-> 3. start new rx queue with new page_pool
-> 4. free old queue memory + destroy page_pool.
-> 
-> The page_pool_disable_direct_recycling() is called in step 2, I am
-> not sure how napi_enable() & napi_disable() are called in the above
-> flow, but it seems there is no use-after-free problem this patch is
-> trying to fix for the above flow.
-> 
-> It doesn't seems to have any concurrent access problem if napi->list_owner
-> is set to -1 before napi_disable() returns and the napi_enable() for the
-> new queue is called after page_pool_disable_direct_recycling() is called
-> in step 2.
+> Shall I use [PATCH net] for all?
+> Or [PATCH] for fixes and [PATCH net] for improvements?
 
-The fix is presupposing there is long delay between fetching of
-the NAPI pointer and its access. The concern is that NAPI gets
-restarted in step 3 after we already READ_ONCE()'ed the pointer,
-then we access it and judge it to be running on the same core.
-Then we put the page into the fast cache which will never get
-flushed.
+Ideally [PATCH net] for fixes, [PATCH net-next] for improvements.
+But it's not a big deal as long as they are separated.
 
