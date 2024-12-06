@@ -1,173 +1,138 @@
-Return-Path: <netdev+bounces-149772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 702DD9E75D3
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 17:23:32 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 892179E75DA
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 17:24:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2643B28392D
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 16:23:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DBE4188830B
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 16:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5E120E317;
-	Fri,  6 Dec 2024 16:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D3722577D;
+	Fri,  6 Dec 2024 16:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="HQUi70o4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iUvWm7Fx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63DE207E0D;
-	Fri,  6 Dec 2024 16:23:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCCD21C17C
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 16:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733502208; cv=none; b=RAu5WbIl/BQZd8K18ZsKeBvp0y1tM1QQV4kqNJ3Kc1fZSF1iTSmm8GQf0AIZ3LqwJWsdfkC+bBzlhAVzrmlLencA2H8xgkCt5xkr3JwKdo2hbogY7eMZ9IxUc6mAF4t6V8aMAeylMHOlib2nMyi3w8sc/6ku984y57gh/8gHs7Y=
+	t=1733502246; cv=none; b=a0hUQ0dNG8+k1VRRWykDWq/1DTBdhwOroaLXkCS6C0yufc5HLbhcrk/tOs1SgSJKHqZcjgu95mV6Q8rkNr2dmx4aUcErKGx+Qkf+28yJ4CDDoFxYrC4z4geVhqig7PlPil8Q2oLVkFWnPt8EMxr7PoCCpSvv6qdngi+bfmv5HMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733502208; c=relaxed/simple;
-	bh=K3MjHXQZtPWDPl2K6xXNdF3L6j0v60HTDtwhM7VhARo=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=ZZvhrTZpU1P55WQDWH7+llIvNA5FiUwl+mx+4CTLTjtY6zvGnrpaOkd/ghB2sSaARQh13dvpW89QSSIDQ1uWMkSo5FF4nieej14Rt0YuzSxYR3skz1O4+34yMDDQU6SBRkmexdPkbaMTJdVnEswQLWjd41Y5JuXwGZ30TYfxG8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=HQUi70o4; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id E383921D96;
-	Fri,  6 Dec 2024 18:23:23 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=CgMFn6VL5GFx5RytU/0EGmFMlUt3Qngt2zSqkoPE5/Y=; b=HQUi70o4FvhS
-	cYB/jbDWZNy7y7Y0wnXFbM1qfSackMkaIsrqnXlO16IINMJ9dRw5sYmPWzR9fXnC
-	KPGqmxFi/Ym9rQagN9p6nMghefF9h7/8ZAhKu5GNOlC2QxdLuvYrstPODqkXfc6u
-	gXhAukX9GrZdptE4etIdKq4l1PB2nk3/28QZdDczn8vleamPQfevWNnyfZcNwgAz
-	II4GU5JFSVJUwKpG+aJ7fPr3lLYuC5xJmwhvDtPXiAxnCnMqLbfEaNpGIvKIUSDT
-	DIir0w4RQWAIL4flwzjupJ7meqHkbz7ZIuhDyyMFHdHZ+wWpXZywJvGnAzIXitmR
-	7ck2B6tjrUg99kF9vTtbzHcaIh9HvY0juJxHuPcuzZCMy77v/Ifa6Sqdc9Ga9bkP
-	yPR45NwSwtIxFNLuo4Wlm4Z9ACLqzA2kYk0pt/W5/hq1drwzCiggnBY6bBizYRts
-	sKt3/GcJxgEmlBadj752x52QKgCg1+Spe++dmaobPxFk2BRxzNkmqZz6meaypWKU
-	XKZ9T0kSaqOLA+dIN4/kLEZvZ08DYHAEZ/8jwRntDOqQ+48BcOqf/XCooU8WV7a/
-	ubwQHoZvsceIMXOJVDxhY7ZYKNrGPpVJWmscWMFxYa6ZlR4VzPNeypmAFPDDkaH3
-	WFEOG3Snd9faZJsMbczS5ClYFm94/v0=
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Fri,  6 Dec 2024 18:23:23 +0200 (EET)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id E617B15F19;
-	Fri,  6 Dec 2024 18:23:14 +0200 (EET)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 4B6GNBkf041510;
-	Fri, 6 Dec 2024 18:23:12 +0200
-Date: Fri, 6 Dec 2024 18:23:11 +0200 (EET)
-From: Julian Anastasov <ja@ssi.bg>
-To: David Laight <David.Laight@ACULAB.COM>
-cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "'Naresh Kamboju'" <naresh.kamboju@linaro.org>,
-        "'Dan Carpenter'" <dan.carpenter@linaro.org>,
-        "'pablo@netfilter.org'" <pablo@netfilter.org>,
-        "'open list'" <linux-kernel@vger.kernel.org>,
-        "'lkft-triage@lists.linaro.org'" <lkft-triage@lists.linaro.org>,
-        "'Linux Regressions'" <regressions@lists.linux.dev>,
-        "'Linux ARM'" <linux-arm-kernel@lists.infradead.org>,
-        "'netfilter-devel@vger.kernel.org'" <netfilter-devel@vger.kernel.org>,
-        "'Arnd Bergmann'" <arnd@arndb.de>,
-        "'Anders Roxell'" <anders.roxell@linaro.org>,
-        "'Johannes Berg'" <johannes.berg@intel.com>,
-        "'toke@kernel.org'" <toke@kernel.org>,
-        "'Al Viro'" <viro@zeniv.linux.org.uk>,
-        "'kernel@jfarr.cc'" <kernel@jfarr.cc>,
-        "'kees@kernel.org'" <kees@kernel.org>
-Subject: RE: [PATCH net] Fix clamp() of ip_vs_conn_tab on small memory
- systems.
-In-Reply-To: <2a91ee407ed64d24b82e5fc665971add@AcuMS.aculab.com>
-Message-ID: <c0a2ee53-f6ff-f4d4-e9ab-6a3bf850bec5@ssi.bg>
-References: <33893212b1cc4a418cec09aeeed0a9fc@AcuMS.aculab.com> <5ec10e7c-d050-dab8-1f1b-d0ca2d922eef@ssi.bg> <2a91ee407ed64d24b82e5fc665971add@AcuMS.aculab.com>
+	s=arc-20240116; t=1733502246; c=relaxed/simple;
+	bh=LylyRC7S8aID9KJ/4Zw5GxKlPlJIl8jylkHYmoQ5d5U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=onEW4RaGrJrPPx4zRaoAAF0+CO6+kWzg2Ibx0YVjYBdx9Bfj/TkAk8cT8LwsETdayJiPvauGm12pcRY1pnbfMlny+35amLIluPTZtnft8MNBiN7EPg9x7DaWLQ+HY/lu7b6NNoe9OpOYj+EVEcGNGq94bZwvLGfonXfO1Wzt57g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iUvWm7Fx; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733502243;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P0Pkm5wpVBFTjSdlapc+PISm+Z7NDJRJ/aKzGbKMUDc=;
+	b=iUvWm7FxynMC41OvRv4qgB/73KdSAsE99KvCPX8PSWWrUdVV/CIib6xtHmz9bs4+aYB1Tm
+	LUrx//T0nmUOsOmGbxUWkfhKb9YnHG19T2cTw8mMZbc9HzZLUawWV0Al9KFEIXZ8I+T+KS
+	E7kf4Sz/+rlAk5hdFSVuh/TcIXlw4q4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-577-JDqrAY9IO4uQM5QNdCxQrQ-1; Fri, 06 Dec 2024 11:24:02 -0500
+X-MC-Unique: JDqrAY9IO4uQM5QNdCxQrQ-1
+X-Mimecast-MFC-AGG-ID: JDqrAY9IO4uQM5QNdCxQrQ
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-434a104896cso5437145e9.1
+        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 08:24:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733502241; x=1734107041;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P0Pkm5wpVBFTjSdlapc+PISm+Z7NDJRJ/aKzGbKMUDc=;
+        b=PPv3TIh0wb+Wt1Sg31S++sPmrqjHjwRUIzX4Nz6nKxkVm/WQTe+Ki4ww6yEiD643gc
+         Cybih0ggzMLhjhj7AiQmSbm56hb+x0iQYMWn7kZeVhkkIOQz6b7G+kbJK4QOKBbsW506
+         CuPaG4Y6tKpkQny4Xxcd6+OrgBesSLYq3/mT6Wl9o6CtpZEN1pMqzn/quq6cKF7s0uqt
+         COBu4BToaPb+JUosuI73VKyvwKs/zbcEFjuzzxrUjFKHY6lDIp1pnbZ6TTfVexMYWgwa
+         UTlF6BUfk+QxjWaBHc9spdhrp7gJfQFuJoTxkXN1tvHdCbPrTQPwTo4P+motNu5LnRn4
+         VESQ==
+X-Gm-Message-State: AOJu0YxjMeGL09fDY7z83GdlX3IIFKde9UND6gEyXvGyqOiKfLXpeuJK
+	u9klyO6EqUEIVWc3jd0EwX5ixiOVlhEHWtPuJvu2Jl7vk5Bkgu+C1N4dMnE48dsf1RDEDG+IWCV
+	6cKIoW2L0KCU+aZ/HBzlbLkeF2K8Z5EFIo6W3gr5HXN5Skb3MNNf7zQ==
+X-Gm-Gg: ASbGncsHtLeZxl/BD2drAqCMuDoVQE05QTwVUDoHn2x4oQ1w7jhKl7azRRFrH9zd6KJ
+	jHDC8tVFX0sR8Jw9iJR/cNWUYu695QRAdXt53Cb5+aojR6p/xYe3QpUpqK2flqfK0PpmG6U4QYy
+	MWngVwACYXS9jvGpq3dXhwFGZvn0e+qNbRTscCE+Ru+TZGQ6owvFy7juAFYcCPt1ja67oWOroHX
+	myp72Y7dssHkdbvrTOQCO7ejUFkJluNG8E9vId/FDkUGNvajy0zrCKjlD0xRxN2dy7OAGR0DmPO
+X-Received: by 2002:a05:600c:1c1f:b0:431:4e82:ffa6 with SMTP id 5b1f17b1804b1-434ddecb272mr30715405e9.24.1733502241195;
+        Fri, 06 Dec 2024 08:24:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFO+8GjrDukh2BZL4IDQT0hYg/kEnJ5YpyBqy6xKA/QsHN+AOg+gwpgSESvslRXrxmIfz4zVg==
+X-Received: by 2002:a05:600c:1c1f:b0:431:4e82:ffa6 with SMTP id 5b1f17b1804b1-434ddecb272mr30715165e9.24.1733502240828;
+        Fri, 06 Dec 2024 08:24:00 -0800 (PST)
+Received: from [192.168.88.24] (146-241-38-31.dyn.eolo.it. [146.241.38.31])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434da0d2738sm62361955e9.4.2024.12.06.08.23.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Dec 2024 08:24:00 -0800 (PST)
+Message-ID: <b46a7757-f311-4656-a114-68381d9856e3@redhat.com>
+Date: Fri, 6 Dec 2024 17:23:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] udp: fix l4 hash after reconnect
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Fred Chen <fred.cc@alibaba-inc.com>,
+ Cambda Zhu <cambda@linux.alibaba.com>, Willem de Bruijn
+ <willemb@google.com>, Philo Lu <lulie@linux.alibaba.com>,
+ Stefano Brivio <sbrivio@redhat.com>
+References: <4761e466ab9f7542c68cdc95f248987d127044d2.1733499715.git.pabeni@redhat.com>
+ <CANn89i+aKNhzYKo3H3gx5Uhy4iPQ4p=6WDDF-0brGyR=PzJqjQ@mail.gmail.com>
+ <CANn89i+k11E9XeJZwvgZ7VO0yr1nWge8+U-ESw2GLYDq7-sdBw@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CANn89i+k11E9XeJZwvgZ7VO0yr1nWge8+U-ESw2GLYDq7-sdBw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-	Hello,
-
-On Fri, 6 Dec 2024, David Laight wrote:
-
-> From: Julian Anastasov
-> > Sent: 06 December 2024 12:19
-> > 
-> > On Fri, 6 Dec 2024, David Laight wrote:
-> > 
-> > > The intention of the code seems to be that the minimum table
-> > > size should be 256 (1 << min).
-> > > However the code uses max = clamp(20, 5, max_avail) which implies
-> > 
-> > 	Actually, it tries to reduce max=20 (max possible) below
-> > max_avail: [8 .. max_avail]. Not sure what 5 is here...
+On 12/6/24 17:01, Eric Dumazet wrote:
+> On Fri, Dec 6, 2024 at 4:57 PM Eric Dumazet <edumazet@google.com> wrote:
+>> On Fri, Dec 6, 2024 at 4:50 PM Paolo Abeni <pabeni@redhat.com> wrote:
+>>>
+>>> After the blamed commit below, udp_rehash() is supposed to be called
+>>> with both local and remote addresses set.
+>>>
+>>> Currently that is already the case for IPv6 sockets, but for IPv4 the
+>>> destination address is updated after rehashing.
+>>>
+>>> Address the issue moving the destination address and port initialization
+>>> before rehashing.
+>>>
+>>> Fixes: 1b29a730ef8b ("ipv6/udp: Add 4-tuple hash for connected socket")
+>>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>>
+>> Nice catch, thanks !
+>>
+>> Reviewed-by: Eric Dumazet <edumazet@google.com>
 > 
-> Me mistyping values between two windows :-)
-> 
-> Well min(max, max_avail) would be the reduced upper limit.
-> But you'd still fall foul of the compiler propagating the 'n > 1'
-> check in order_base_2() further down the function.
-> 
-> > > the author thought max_avail could be less than 5.
-> > > But clamp(val, min, max) is only well defined for max >= min.
-> > > If max < min whether is returns min or max depends on the order of
-> > > the comparisons.
-> > 
-> > 	Looks like max_avail goes below 8 ? What value you see
-> > for such small system?
-> 
-> I'm not, but clearly you thought the value could be small otherwise
-> the code would only have a 'max' limit.
-> (Apart from a 'sanity' min of maybe 2 to stop the code breaking.)
+> BTW, it seems that udp_lib_rehash() does the udp_rehash4()
+> only if the hash2 has changed.
 
-	I'm not sure how much memory we can see in small system,
-IMHO, problem should not be possible in practice:
+Oh, you are right, that requires a separate fix.
 
-- nobody expects 0 from totalram_pages() in the code
+@Philo: could you please have a look at that? basically you need to
+check separately for hash2 and hash4 changes.
 
-- order_base_2(sizeof(struct ip_vs_conn)) is probably 8 on 32-bit
+Thanks!
 
-- PAGE_SHIFT: 12 (for 4KB) or more?
-
-	So, if totalram_pages() returns below 128 pages (4KB each)
-max_avail will be below 19 (7 + 12), then 19 is reduced with 2 + 1
-and becomes 16, finally with 8 (from the 2nd order_base_2) to reach
-16-8=8. You need a system with less than 512KB (19 bits) to trigger 
-problem in clamp() that will lead to max below 8. Further, without
-checks, for ip_vs_conn_tab_bits=1 we need totalram_pages() to return 0
-pages.
-
-> > > Detected by compile time checks added to clamp(), specifically:
-> > > minmax.h: use BUILD_BUG_ON_MSG() for the lo < hi test in clamp()
-> > 
-> > 	Existing or new check? Does it happen that max_avail
-> > is a constant, so that a compile check triggers?
-> 
-> Is all stems from order_base_2(totalram_pages()).
-> order_base_2(n) is 'n > 1 ? ilog2(n - 1) + 1 : 0'.
-> And the compiler generates two copies of the code that follows
-> for the 'constant zero' and ilog2() values.
-> And the 'zero' case compiles clamp(20, 8, 0) which is errored.
-> Note that it is only executed if totalram_pages() is zero,
-> but it is always compiled 'just in case'.
-
-	I'm confused with these compiler issues, if you
-think we should go with the patch just decide if it is a
-net or net-next material. Your change is safer for bad
-max_avail values but I don't expect to see problem while
-running without the change, except the building bugs.
-
-	Also, please use nf/nf-next tag to avoid any
-confusion with upstreaming...
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
+Paolo
 
 
