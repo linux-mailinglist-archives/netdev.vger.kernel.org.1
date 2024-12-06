@@ -1,195 +1,196 @@
-Return-Path: <netdev+bounces-149725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B5E99E6EF4
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 14:10:03 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9D9E9E6F03
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 14:13:08 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FFFB16BBE0
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 13:08:54 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61442066FD;
+	Fri,  6 Dec 2024 13:08:50 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4F6C282B78
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 13:10:01 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEBE1205AC7;
-	Fri,  6 Dec 2024 13:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="dNkl5ynu"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0DD206F33
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 13:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74201FF7D9
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 13:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733490586; cv=none; b=G+iJgEVoqUOvHZMI1DaJ8Dtwg2yQdjiP3jJYCx+45NLd3ANMtJCLAMNd296PY+k61SbVaEFR2oDd/m9YEy1PgKAXE4LKs0LLFAzNP8hO8e8r8MQev8mCskxlIjLw/nvgZg7eKLYKBMcAGnUxBzZEGdqB9mgrid2pzeP3MkqJY30=
+	t=1733490530; cv=none; b=m5+f0aSFW5RxxuqrjTqzXygBf8MP8eSqObdOvxN1l0RhRwm32RhO/kVS/fpw6SDqh8x5Pb/EUVq6FqwF/MeRCBKux2COvan1dKAyjkWNDJ0RszFyf5ZXhmeYwc7/fBXuGU3n4xIjvFntn/Pl9na/vhc4v1CH/sMynwgAM1ibIOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733490586; c=relaxed/simple;
-	bh=CbzA0ebUpgodKBCOzJODVN++NbuW1U0YDdgtoYEfYpg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qtRy+tTvFgerYCeuHKmW434PH/t962X5ok7kEKlqzucls6CQWP8Q+Pczb96EFgxwtMYb5YBXUHPd0JdHVpFgd8HdO7ediHfSVxosWTkSYSR55ZglLBvYcat9dyE2FXRZZZVPwuLXm2KevACYmS7J48+BRUYuukIVUURG/wfe6Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=dNkl5ynu; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2ffb5b131d0so19992471fa.2
-        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 05:09:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1733490583; x=1734095383; darn=vger.kernel.org;
-        h=content-transfer-encoding:organization:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MVYDwDZ41knrDBuiD+vu8AjdcCDrx177r0ASKL3mDEQ=;
-        b=dNkl5ynuGVeAe5TvFHFUxGg4SORug8K/d73TQ+50SigS5CC0V4aPGe5OXbYXO47KUb
-         CZTKxdwnvGNbNOhzItQz9C0L/1H2cFK2hBce4EY9y7kE+FUYbON5GdG7QlAo9uhPKUPo
-         oZ+1j8mCaNCLudNrHGfa4TrAjNCe8F+dVYiHXp20/Nd/g9hjzq3hd/FBoMyYjlzzEuU/
-         NNDoEyxAps81b8aI5FiYQ9gKRJ9xr7SF6uvRvrOpARiul57rXlRRcfgzJ5ioaCs8fG0z
-         /yOrHwIrwNGvHANRj9ocw8/YOCjDWBrZojKgYL/q1xgK7hamPsLBeISd6lJ39ZJGQkCf
-         yDsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733490583; x=1734095383;
-        h=content-transfer-encoding:organization:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MVYDwDZ41knrDBuiD+vu8AjdcCDrx177r0ASKL3mDEQ=;
-        b=hJWBEDyBon0ant6fa64YdkahyHV2zCWjvOq+x72GMkoX/r3tNn8vfVxejBDnLCXWKJ
-         Z6QEgT8inBQ7FCSGCtDLxL/4vGGweHQw51NYpglGHMDk1Y6S30ri5UFZcEuy+vMWkjXK
-         GOHxL+2W9zRLp2K25WQuzb4Q9QEz0rHoOlaTAV9eo8z6f9sWMMsizgZ0yjni4EfZYYcR
-         BHAj6FaoNTDYPs+g03xJThE7Z+QzB+Fr3UzmgST/PtItbOyw+ddfhsIqoRxwq8vdd5oX
-         BSCfK4IF6zmm4KEGX/2OC2Vt/6CKWZQrdwes8ue8+/M5NLUv5TP1SnShBf7YDK9rftHn
-         sG4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVLH8ZS2ii3/+++OTKiLp6ojcma7J8l4QI7ozcEQ7Ps4Avyuvrn3HOBX9uuS3ODvCkaGG9R+bA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyyo2Cm9j/KUUqEgUUt+b4cLhRM+zKbP4rMloRvQQ9V4382AIlf
-	PbQT8eUVnLtVGIj4n58nkYjzBmLVIp4T580sx8gvFQPFDJQwr67dYAdZZNig9so=
-X-Gm-Gg: ASbGncszMiKD2pNnNbIxQoMQ4bUTo+KX1Ppv9Ezwab/VEcL30PY/bIxKILnLWhs/+qa
-	nCkWQ7THoRmOp7YLkcdfTI1QlsrBgKspGJ0v8GLfu+SsaN3dpb3R6i09Im7szaaKSXJWYWBEFLc
-	TXL8XRhOscGaRnZB+/mIvkua/z+LGqtRi6xtE46nPQhmhOc6STUTMdlePe8JHJ2jg4T6sIkZGEk
-	isYwtPIYcksi4vVmRJI8rKA+KKUaVWyDefpmYoVuuZgsjXSxh29PhCCBkOERODyI0vUbLESMHlJ
-	dZ2/IF16KQ==
-X-Google-Smtp-Source: AGHT+IFLsCfh75pCbkNJ2ktkNSm+j6j2CYTe3tpyg2XxV5Qcx4NDMUBYTRpHgHlhBDfNlBdcbULWaQ==
-X-Received: by 2002:a05:651c:19a5:b0:2fb:2f7c:28dd with SMTP id 38308e7fff4ca-3002f8da8a3mr10646121fa.18.1733490582853;
-        Fri, 06 Dec 2024 05:09:42 -0800 (PST)
-Received: from wkz-x13.. (h-176-10-159-15.NA.cust.bahnhof.se. [176.10.159.15])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30020e21704sm4527401fa.90.2024.12.06.05.09.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Dec 2024 05:09:41 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
-	netdev@vger.kernel.org,
-	linux@armlinux.org.uk,
-	chris.packham@alliedtelesis.co.nz
-Subject: [PATCH net 4/4] net: dsa: mv88e6xxx: Limit rsvd2cpu policy to user ports on 6393X
-Date: Fri,  6 Dec 2024 14:07:36 +0100
-Message-ID: <20241206130824.3784213-5-tobias@waldekranz.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241206130824.3784213-1-tobias@waldekranz.com>
-References: <20241206130824.3784213-1-tobias@waldekranz.com>
+	s=arc-20240116; t=1733490530; c=relaxed/simple;
+	bh=QF8c2MhUemDCUpYqGQBweZ1Ws7IWDc/WAQA2tfJjVVU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=DEnSe9cVif/rYDxU8bxDR4s7Pgq1PPpkjy/mhYlIzkxHZSUh5+3cUAvesvyJk5cuV16jxQgIpLIZ8wf+ftBTZrP5FXWISf/0DxM89uZmb4gHUjxTgk/UGqNBtJhrULvyrM6pK1CyOuwfcrSFGNILHQuR/Ug2YxdoW5nUxHOtNBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-168-rEnKtWNUMFWeQM5TnnsDWQ-1; Fri, 06 Dec 2024 13:08:45 +0000
+X-MC-Unique: rEnKtWNUMFWeQM5TnnsDWQ-1
+X-Mimecast-MFC-AGG-ID: rEnKtWNUMFWeQM5TnnsDWQ
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 6 Dec
+ 2024 13:07:59 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 6 Dec 2024 13:07:59 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Julian Anastasov' <ja@ssi.bg>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 'Naresh Kamboju'
+	<naresh.kamboju@linaro.org>, 'Dan Carpenter' <dan.carpenter@linaro.org>,
+	"'pablo@netfilter.org'" <pablo@netfilter.org>, 'open list'
+	<linux-kernel@vger.kernel.org>, "'lkft-triage@lists.linaro.org'"
+	<lkft-triage@lists.linaro.org>, 'Linux Regressions'
+	<regressions@lists.linux.dev>, 'Linux ARM'
+	<linux-arm-kernel@lists.infradead.org>, "'netfilter-devel@vger.kernel.org'"
+	<netfilter-devel@vger.kernel.org>, 'Arnd Bergmann' <arnd@arndb.de>, "'Anders
+ Roxell'" <anders.roxell@linaro.org>, 'Johannes Berg'
+	<johannes.berg@intel.com>, "'toke@kernel.org'" <toke@kernel.org>, 'Al Viro'
+	<viro@zeniv.linux.org.uk>, "'kernel@jfarr.cc'" <kernel@jfarr.cc>,
+	"'kees@kernel.org'" <kees@kernel.org>
+Subject: RE: [PATCH net] Fix clamp() of ip_vs_conn_tab on small memory
+ systems.
+Thread-Topic: [PATCH net] Fix clamp() of ip_vs_conn_tab on small memory
+ systems.
+Thread-Index: AdtHyTlbE/fm67s0Ria1gsbgnJ6KcgAD9raAAACnwVA=
+Date: Fri, 6 Dec 2024 13:07:59 +0000
+Message-ID: <2a91ee407ed64d24b82e5fc665971add@AcuMS.aculab.com>
+References: <33893212b1cc4a418cec09aeeed0a9fc@AcuMS.aculab.com>
+ <5ec10e7c-d050-dab8-1f1b-d0ca2d922eef@ssi.bg>
+In-Reply-To: <5ec10e7c-d050-dab8-1f1b-d0ca2d922eef@ssi.bg>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Addiva Elektronik
-Content-Transfer-Encoding: 8bit
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: hSGfRIh-mIn234Ffx7NohDXmZPXFts_sAKvYWCtUFmk_1733490524
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-For packets with a DA in the IEEE reserved L2 group range, originating
-from a CPU, forward it as normal, rather than classifying it as
-management.
+From: Julian Anastasov
+> Sent: 06 December 2024 12:19
+>=20
+> On Fri, 6 Dec 2024, David Laight wrote:
+>=20
+> > The intention of the code seems to be that the minimum table
+> > size should be 256 (1 << min).
+> > However the code uses max =3D clamp(20, 5, max_avail) which implies
+>=20
+> =09Actually, it tries to reduce max=3D20 (max possible) below
+> max_avail: [8 .. max_avail]. Not sure what 5 is here...
 
-Example use-case:
+Me mistyping values between two windows :-)
 
-     bridge (group_fwd_mask 0x4000)
-     / |  \
- swp1 swp2 tap0
-   \   /
-(mv88e6xxx)
+Well min(max, max_avail) would be the reduced upper limit.
+But you'd still fall foul of the compiler propagating the 'n > 1'
+check in order_base_2() further down the function.
 
-We've created a bridge with a non-zero group_fwd_mask (allowing LLDP
-in this example) containing a set of ports managed by mv88e6xxx and
-some foreign interface (e.g. an L2 VPN tunnel).
+> > the author thought max_avail could be less than 5.
+> > But clamp(val, min, max) is only well defined for max >=3D min.
+> > If max < min whether is returns min or max depends on the order of
+> > the comparisons.
+>=20
+> =09Looks like max_avail goes below 8 ? What value you see
+> for such small system?
 
-Since an LLDP packet coming in to the bridge from the other side of
-tap0 is eligable for tx forward offloading, a FORWARD frame destined
-for swp1 and swp2 would be send to the conduit interface.
+I'm not, but clearly you thought the value could be small otherwise
+the code would only have a 'max' limit.
+(Apart from a 'sanity' min of maybe 2 to stop the code breaking.)
 
-Before this change, due to rsvd2cpu being enabled on the CPU port, the
-switch would try to trap it back to the CPU. Given that the CPU is
-trusted, instead assume that it indeed meant for the packet to be
-forwarded like any other.
+>=20
+> > Change to clamp(max_avail, 5, 20) which has the expected behaviour.
+>=20
+> =09It should be clamp(max_avail, 8, 20)
+>=20
+> >
+> > Replace the clamp_val() on the line below with clamp().
+> > clamp_val() is just 'an accident waiting to happen' and not needed here=
+.
+>=20
+> =09OK
+>=20
+> > Fixes: 4f325e26277b6
+> > (Although I actually doubt the code is used on small memory systems.)
+> >
+> > Detected by compile time checks added to clamp(), specifically:
+> > minmax.h: use BUILD_BUG_ON_MSG() for the lo < hi test in clamp()
+>=20
+> =09Existing or new check? Does it happen that max_avail
+> is a constant, so that a compile check triggers?
 
-Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
----
- drivers/net/dsa/mv88e6xxx/port.c | 31 +++++++++++++++++++++++++------
- 1 file changed, 25 insertions(+), 6 deletions(-)
+Is all stems from order_base_2(totalram_pages()).
+order_base_2(n) is 'n > 1 ? ilog2(n - 1) + 1 : 0'.
+And the compiler generates two copies of the code that follows
+for the 'constant zero' and ilog2() values.
+And the 'zero' case compiles clamp(20, 8, 0) which is errored.
+Note that it is only executed if totalram_pages() is zero,
+but it is always compiled 'just in case'.
 
-diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
-index 56ed2f57fef8..bf6d558c112c 100644
---- a/drivers/net/dsa/mv88e6xxx/port.c
-+++ b/drivers/net/dsa/mv88e6xxx/port.c
-@@ -1416,6 +1416,23 @@ static int mv88e6393x_port_policy_write_all(struct mv88e6xxx_chip *chip,
- 	return 0;
- }
- 
-+static int mv88e6393x_port_policy_write_user(struct mv88e6xxx_chip *chip,
-+					     u16 pointer, u8 data)
-+{
-+	int err, port;
-+
-+	for (port = 0; port < mv88e6xxx_num_ports(chip); port++) {
-+		if (!dsa_is_user_port(chip->ds, port))
-+			continue;
-+
-+		err = mv88e6393x_port_policy_write(chip, port, pointer, data);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
- int mv88e6393x_set_egress_port(struct mv88e6xxx_chip *chip,
- 			       enum mv88e6xxx_egress_direction direction,
- 			       int port)
-@@ -1457,26 +1474,28 @@ int mv88e6393x_port_mgmt_rsvd2cpu(struct mv88e6xxx_chip *chip)
- 	int err;
- 
- 	/* Consider the frames with reserved multicast destination
--	 * addresses matching 01:80:c2:00:00:00 and
--	 * 01:80:c2:00:00:02 as MGMT.
-+	 * addresses matching 01:80:c2:00:00:00 and 01:80:c2:00:00:02
-+	 * as MGMT when received on user ports. Forward as normal on
-+	 * CPU/DSA ports, to support bridges with non-zero
-+	 * group_fwd_masks.
- 	 */
- 	ptr = MV88E6393X_PORT_POLICY_MGMT_CTL_PTR_01C280000000XLO;
--	err = mv88e6393x_port_policy_write_all(chip, ptr, 0xff);
-+	err = mv88e6393x_port_policy_write_user(chip, ptr, 0xff);
- 	if (err)
- 		return err;
- 
- 	ptr = MV88E6393X_PORT_POLICY_MGMT_CTL_PTR_01C280000000XHI;
--	err = mv88e6393x_port_policy_write_all(chip, ptr, 0xff);
-+	err = mv88e6393x_port_policy_write_user(chip, ptr, 0xff);
- 	if (err)
- 		return err;
- 
- 	ptr = MV88E6393X_PORT_POLICY_MGMT_CTL_PTR_01C280000002XLO;
--	err = mv88e6393x_port_policy_write_all(chip, ptr, 0xff);
-+	err = mv88e6393x_port_policy_write_user(chip, ptr, 0xff);
- 	if (err)
- 		return err;
- 
- 	ptr = MV88E6393X_PORT_POLICY_MGMT_CTL_PTR_01C280000002XHI;
--	err = mv88e6393x_port_policy_write_all(chip, ptr, 0xff);
-+	err = mv88e6393x_port_policy_write_user(chip, ptr, 0xff);
- 	if (err)
- 		return err;
- 
--- 
-2.43.0
+>=20
+> >
+> > Signed-off-by: David Laight <david.laight@aculab.com>
+>=20
+> =09The code below looks ok to me but can you change the
+> comments above to more correctly specify the values and if the
+> problem is that max_avail goes below 8 (min).
+>=20
+> > ---
+> >  net/netfilter/ipvs/ip_vs_conn.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs=
+_conn.c
+> > index 98d7dbe3d787..c0289f83f96d 100644
+> > --- a/net/netfilter/ipvs/ip_vs_conn.c
+> > +++ b/net/netfilter/ipvs/ip_vs_conn.c
+> > @@ -1495,8 +1495,8 @@ int __init ip_vs_conn_init(void)
+> >  =09max_avail -=3D 2;=09=09/* ~4 in hash row */
+> >  =09max_avail -=3D 1;=09=09/* IPVS up to 1/2 of mem */
+> >  =09max_avail -=3D order_base_2(sizeof(struct ip_vs_conn));
+>=20
+> =09More likely we can additionally clamp max_avail here:
+>=20
+> =09max_avail =3D max(min, max_avail);
+>=20
+> =09But your solution solves the problem with less lines.
+
+And less code in the path that is actually executed.
+
+=09David
+
+>=20
+> > -=09max =3D clamp(max, min, max_avail);
+> > -=09ip_vs_conn_tab_bits =3D clamp_val(ip_vs_conn_tab_bits, min, max);
+> > +=09max =3D clamp(max_avail, min, max);
+> > +=09ip_vs_conn_tab_bits =3D clamp(ip_vs_conn_tab_bits, min, max);
+> >  =09ip_vs_conn_tab_size =3D 1 << ip_vs_conn_tab_bits;
+> >  =09ip_vs_conn_tab_mask =3D ip_vs_conn_tab_size - 1;
+> >
+> > --
+> > 2.17.1
+>=20
+> Regards
+>=20
+> --
+> Julian Anastasov <ja@ssi.bg>
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
 
