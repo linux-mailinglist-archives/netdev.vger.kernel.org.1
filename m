@@ -1,203 +1,139 @@
-Return-Path: <netdev+bounces-149567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DE279E63EE
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:16:44 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05426163E6C
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:16:41 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BAF47F69;
-	Fri,  6 Dec 2024 02:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="PnC8sIL8"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6D2D9E640F
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:25:06 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C08018B09
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 02:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9594D284686
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:25:05 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6DA414A4F9;
+	Fri,  6 Dec 2024 02:24:56 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DCF20309
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 02:24:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733451400; cv=none; b=dhbSaKvAHyCkC/z4PnJE/nHnjTNSVaDQO39WHfVTUTn8iajhTh7YWQCrlRTyBR5cPqxPEIMbAg6QMr0Cg3gDWqK0L7tfdLr3MazSvRW5/C46ERzHGZjiGNznekFw4jMdTtv7WbymJbaBo4R6DIjxGtYMrk5ktBgWy3iLdKWbrNg=
+	t=1733451896; cv=none; b=Ai2M1NM5nJhl1XmL5XKZZcC5WGaE0TWtzT5IPbmlPBalSpmC40QNtFxJa/NDpeg547r1AGvEQKjEn++bj2PSSm9sXXjuE7GimW8M9Ivg06uFEzpnA5fbtin+RepdCWK11z5SYI3mLzjJBAkhviOCy+iVice77bPXOyUJ0eYupZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733451400; c=relaxed/simple;
-	bh=On2oRxLyHP05sOalK3nVEblmgUAO744WIOinZ4i+LiM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u9vamxGvqDT/d/bdrlYG37K5NH8ZxImfPzpZSVT50bbyb5pUpJsmbDMe3/j/cgkpGYtR61noJpKlOmuWvWcLWqVQF1ondzlnb8Sz6q9uGWeFTj9KOUMFufaC86YphVV+R7BtIQTSFLZtFi5TjuGNmWiKybji5CrsqxuMqXuNHLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au; spf=pass smtp.mailfrom=gandalf.ozlabs.org; dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b=PnC8sIL8; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gandalf.ozlabs.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=gibson.dropbear.id.au; s=202410; t=1733451384;
-	bh=z03h4bL+QegCodkBmoyKnXXNHAkm5Q2wksSfOXAsu70=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PnC8sIL8pnCoZ3CKvpXpRReGWkfKn1hlnSXFSs7Yio38O67Y0NHFI/rZVIdehm3p2
-	 /QUjtZu0vRFGuChOCegMp2lv9qjRG9GAcvP9tSvnro3KHpchvNM7pnRoIWeYcuFbZD
-	 sCLsfzCPpq7CCAo89RLyUPiAwMXLHCJ+RqPEPPsOput6r6lVrdBGRMvLN9mblIICL9
-	 w++MC83rPBz7MScXtjBgkM1DCeVLw4asaEAs1ZGpSSfvwjVkIlTjUqQ7SryEK5lZSL
-	 YvtDvbGQKgfOgnFBkorKkUk4s97C++Xcrcu4sc98twYRdp6XcqkGWcWUavdAIW1Z3t
-	 uUMuE1hXsVZjQ==
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-	id 4Y4FHX2ksdz4x63; Fri,  6 Dec 2024 13:16:24 +1100 (AEDT)
-Date: Fri, 6 Dec 2024 13:16:24 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Stefano Brivio <sbrivio@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Mike Manning <mvrmanning@gmail.com>,
-	Paul Holzinger <pholzing@redhat.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Cambda Zhu <cambda@linux.alibaba.com>,
-	Fred Chen <fred.cc@alibaba-inc.com>,
-	Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
-Subject: Re: [PATCH net-next 2/2] datagram, udp: Set local address and rehash
- socket atomically against lookup
-Message-ID: <Z1JeePBN5f1YCmYd@zatzit>
-References: <20241204221254.3537932-1-sbrivio@redhat.com>
- <20241204221254.3537932-3-sbrivio@redhat.com>
- <CANn89i+iULeqTO2GrTCDZEOKPmU_18zwRxG6-P1XoqhP_j1p3A@mail.gmail.com>
- <Z1Ip9Ij8_JpoFu8c@zatzit>
- <CANn89i+PCsOHvd02nvM0oRjAXxPTgX6V1Y1-xfRL_43Ew9=H=w@mail.gmail.com>
+	s=arc-20240116; t=1733451896; c=relaxed/simple;
+	bh=ZcZ8ZxNUnrbLdMduJgoj3uWv+kKWhntd+HAILEWm9YQ=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=LVWFeIRlhGBQRvKEatjclX9xAnIOsSvhYKfMS8RD9Qbt12Fzj1WvgUnDpr7YcPzkHCMrJWKTCuxO40JWO/cIok7GBLuS59o5uDE2yPNu9LmPhJBMKBF9CN9saAZ0St51xsd60l+jXTOT2AkafF78pMcpQlRaoHkT0fJu/LjLEbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Y4FQb60XFz2Dh81;
+	Fri,  6 Dec 2024 10:22:31 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id C5C7C140136;
+	Fri,  6 Dec 2024 10:24:50 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 6 Dec 2024 10:24:50 +0800
+Message-ID: <b9db6fe7-6d0c-4f05-96c5-242112e4fc2a@huawei.com>
+Date: Fri, 6 Dec 2024 10:24:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="TM2Q45GO6H13v2TL"
-Content-Disposition: inline
-In-Reply-To: <CANn89i+PCsOHvd02nvM0oRjAXxPTgX6V1Y1-xfRL_43Ew9=H=w@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH RFC net] net: hibmcge: Release irq resources on error and
+ device tear-down
+To: Simon Horman <horms@kernel.org>, Jian Shen <shenjian15@huawei.com>, Salil
+ Mehta <salil.mehta@huawei.com>
+References: <20241205-hibmcge-free-irq-v1-1-f5103d8d9858@kernel.org>
+ <20241205205511.GF2581@kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20241205205511.GF2581@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
 
---TM2Q45GO6H13v2TL
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+on 2024/12/6 4:55, Simon Horman wrote:
+> On Thu, Dec 05, 2024 at 05:05:23PM +0000, Simon Horman wrote:
+>> This patch addresses two problems related to leaked resources allocated
+>> by hbg_irq_init().
+>>
+>> 1. On error release allocated resources
+>> 2. Otherwise, release the allocated irq vector on device tear-down
+>>     by setting-up a devres to do so.
+>>
+>> Found by inspection.
+>> Compile tested only.
+>>
+>> Fixes: 4d089035fa19 ("net: hibmcge: Add interrupt supported in this module")
+>> Signed-off-by: Simon Horman <horms@kernel.org>
+> Sorry for the noise, but on reflection I realise that the devm_free_irq()
+> portion of my patch, which is most of it, is not necessary as the
+> allocations are made using devm_request_irq().  And the driver seems to
+> rely on failure during init resulting in device tear-down, at which point
+> devres will take care of freeing the IRQs.
+>
+> But I don't see where the IRQ vectors are freed, either on error in
+> hbg_irq_init or device tear-down. I think the following, somewhat smaller
+> patch, would be sufficient to address that.
 
-On Thu, Dec 05, 2024 at 11:52:38PM +0100, Eric Dumazet wrote:
-> On Thu, Dec 5, 2024 at 11:32=E2=80=AFPM David Gibson
-> <david@gibson.dropbear.id.au> wrote:
-> >
-> > On Thu, Dec 05, 2024 at 05:35:52PM +0100, Eric Dumazet wrote:
-> > > On Wed, Dec 4, 2024 at 11:12=E2=80=AFPM Stefano Brivio <sbrivio@redha=
-t.com> wrote:
-> > [snip]
-> > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> > > > index 6a01905d379f..8490408f6009 100644
-> > > > --- a/net/ipv4/udp.c
-> > > > +++ b/net/ipv4/udp.c
-> > > > @@ -639,18 +639,21 @@ struct sock *__udp4_lib_lookup(const struct n=
-et *net, __be32 saddr,
-> > > >                 int sdif, struct udp_table *udptable, struct sk_buf=
-f *skb)
-> > > >  {
-> > > >         unsigned short hnum =3D ntohs(dport);
-> > > > -       struct udp_hslot *hslot2;
-> > > > +       struct udp_hslot *hslot, *hslot2;
-> > > >         struct sock *result, *sk;
-> > > >         unsigned int hash2;
-> > > >
-> > > > +       hslot =3D udp_hashslot(udptable, net, hnum);
-> > > > +       spin_lock_bh(&hslot->lock);
-> > >
-> > > This is not acceptable.
-> > > UDP is best effort, packets can be dropped.
-> > > Please fix user application expectations.
-> >
-> > The packets aren't merely dropped, they're rejected with an ICMP Port
-> > Unreachable.
->=20
-> We made UDP stack scalable with RCU, it took years of work.
->=20
-> And this patch is bringing back the UDP stack to horrible performance
-> from more than a decade ago.
-> Everybody will go back to DPDK.
+Thank you for reviewing the code.
 
-It's reasonable to be concerned about the performance impact.  But
-this seems like preamture hyperbole given no-one has numbers yet, or
-has even suggested a specific benchmark to reveal the impact.
+But sorry, it's actually not needed.
 
-> I am pretty certain this can be solved without using a spinlock in the
-> fast path.
+I discussed this with Jakub and Jonathan:
+https://lore.kernel.org/all/383f26a1-aa8f-4fd2-a00a-86abce5942ad@huawei.com/
 
-Quite possibly.  But Stefano has tried, and it certainly wasn't
-trivial.
+I also add a comment in code, But I'm sorry, maybe it's a little subtle.
+  /* used pcim_enable_device(),  so the vectors become device managed */
+  ret = pci_alloc_irq_vectors(priv->pdev, HBG_VECTOR_NUM, HBG_VECTOR_NUM,
+  			     PCI_IRQ_MSI | PCI_IRQ_MSIX);
 
-> Think about UDP DNS/QUIC servers, using SO_REUSEPORT and receiving
-> 10,000,000 packets per second....
->=20
-> Changing source address on an UDP socket is highly unusual, we are not
-> going to slow down UDP for this case.
+Thanks,
+Jijie Shao
 
-Changing in a general way is very rare, one specific case is not.
-Every time you connect() a socket that wasn't previously bound to a
-specific address you get an implicit source address change from
-0.0.0.0 or :: to something that depends on the routing table.
-
-> Application could instead open another socket, and would probably work
-> on old linux versions.
-
-Possibly there's a procedure that would work here, but it's not at all
-obvious:
-
- * Clearly, you can't close the non-connected socket before opening
-   the connected one - that just introduces a new much wider race.  It
-   doesn't even get rid of the existing one, because unless you can
-   independently predict what the correct bound address will be
-   for a given peer address, the second socket will still have an
-   address change when you connect().
-
- * So, you must create the connected socket before closing the
-   unconnected one, meaning you have to use SO_REUSEADDR or
-   SO_REUSEPORT whether or not you otherwise wanted to.
-
- * While both sockets are open, you need to handle the possibility
-   that packets could be delivered to either one.  Doable, but a pain
-   in the arse.
-
- * How do you know when the transition is completed and you can close
-   the unconnected socket?  The fact that the rehashing has completed
-   and all the necessary memory barriers passed isn't something
-   userspace can directly discern.
-
-> If the regression was recent, this would be considered as a normal regres=
-sion,
-> but apparently nobody noticed for 10 years. This should be saying somethi=
-ng...
-
-It does.  But so does the fact that it can be trivially reproduced.
-
---=20
-David Gibson (he or they)	| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you, not the other way
-				| around.
-http://www.ozlabs.org/~dgibson
-
---TM2Q45GO6H13v2TL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEO+dNsU4E3yXUXRK2zQJF27ox2GcFAmdSXnQACgkQzQJF27ox
-2GeeqhAAk2zAF3COOlREAiR/zb2Nss35hRL2mDjLHm+QVMNc8xNiYhmnkhTg9xWZ
-KyqS5nD75xegj2m1tDBGcK+8dF9TCTFloCBb7FizEJjVssbllG9yAOcPD9zaWLhS
-4ytdMPBKitvVzQPJxzfaK/W+sKzO1rVqE0MWr0O7cH3/dsEBKzFfro7AZ+G/Ydju
-q+NC6e8FmnwmQ16lnyOoSH3Myf4oknxzsJfUkrm4h+VBPSRfIgU5MPZPeWZ3iU8y
-ajGTqqAV+wclF3VZr1w0T77HQhYUy9BtaMOGdCgDtHgBsQOEizguvdd99bBbqWrq
-dDCuvok7s0y/Iu9WS/TZaJzeIke5EGNRvBz5p4DlgB6MBI/eiwCZT8177gawhoxH
-ru1YguSvExUy4yHcklVZVcgp2hyqf6J1tCGlwz4zKX2qEKrp2TsT7wdJcayDwIoG
-on8KzBzhgl9gbVWRRKqQVJiwco5Ge18R09zlhzduDytmq93NVe/CWrkqQ2uGebB/
-/kYZVwWPI59W/5Du6vVDFgYbI0eUvfCRHbnmuFhvGC36sl4l0mPtwaS5TFl9B7F0
-xe2nvqrl1vwRtzfTsJ1sRp3TgyiQGMQVWZ67lfxVU0JJDqlSZKzrbUqPrStuLkkL
-unFgi9d3MCC0dQBlHMx6Zq9oJJAWGnIe+Q7IyKw/p0T5eY9+wmc=
-=0pKR
------END PGP SIGNATURE-----
-
---TM2Q45GO6H13v2TL--
+>
+> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
+> index 25dd25f096fe..44294453d0e4 100644
+> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
+> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
+> @@ -83,6 +83,11 @@ static irqreturn_t hbg_irq_handle(int irq_num, void *p)
+>   static const char *irq_names_map[HBG_VECTOR_NUM] = { "tx", "rx",
+>   						     "err", "mdio" };
+>   
+> +static void hbg_free_irq_vectors(void *data)
+> +{
+> +	pci_free_irq_vectors(data);
+> +}
+> +
+>   int hbg_irq_init(struct hbg_priv *priv)
+>   {
+>   	struct hbg_vector *vectors = &priv->vectors;
+> @@ -96,6 +101,13 @@ int hbg_irq_init(struct hbg_priv *priv)
+>   	if (ret < 0)
+>   		return dev_err_probe(dev, ret, "failed to allocate vectors\n");
+>   
+> +	ret = devm_add_action_or_reset(dev, hbg_free_irq_vectors, priv->pdev);
+> +	if (ret) {
+> +		pci_free_irq_vectors(priv->pdev);
+> +		return dev_err_probe(dev, ret,
+> +				     "failed to add devres to free vectors\n");
+> +	}
+> +
+>   	if (ret != HBG_VECTOR_NUM)
+>   		return dev_err_probe(dev, -EINVAL,
+>   				     "requested %u MSI, but allocated %d MSI\n",
 
