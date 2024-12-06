@@ -1,187 +1,194 @@
-Return-Path: <netdev+bounces-149756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 619939E7483
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 16:39:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C4B09E7476
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 16:38:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C305B16E8EB
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 15:38:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05BEE188882F
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 15:37:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9666B20E307;
-	Fri,  6 Dec 2024 15:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067D22066DD;
+	Fri,  6 Dec 2024 15:34:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="hzbUznQC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vGZB5uXl"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5019820E016;
-	Fri,  6 Dec 2024 15:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4273920B1F7
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 15:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733499284; cv=none; b=kw5HAOqMR7VRSx8RogFYKdne8e4iOqEU+zqDrOx2STr7BZbbuVv++kZ3Dz+iOGk3HEx/ur9MCES2E81HLWqbXvCW6XM4RcFo6mhGRUxIkuxsyiD0RiIDOFC4sVyX8urQ0d5UJrs5YEtKNJIFdh9EbTxARIsWCHxt4V/qLn7qUOQ=
+	t=1733499275; cv=none; b=hrMbFBcm4JlqAl0uhBGCGDJUZTcVmxRjzck4lUjJ8kR5su8XLD66Wi4z4QGCM/R+Sgol8hYEpa2uQABdUQC2FUT1lcPPZMF3XvsMgVwW7lXxn/bMq4SOgAC4nY+fTNhwoPqZnTYg/CBl2kNqfPCO0MMPVYeCpnJ6f52o5H8Crew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733499284; c=relaxed/simple;
-	bh=1ITbAn22++Ob7kA1nEk7YQEuphiXTzhZj2P7KDqtLQY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fkeqhu1HsgVZVOEwmc8N4dYJm5a0Xvgd+X5B0WwfyzA8xe7CwG3fWBXFDm9XQ8Ft4vgUEb55Gxwb6D6HG94oW2DeUIdS/fxlr/Hr3zhoAH2NDKbZSr1fjBTAaR9LMasElSon0ECZ2Wh17DTh/jDlkiNCL3ZgXQRXwKQm71YuchI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=hzbUznQC; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=yDvV13jrwvg/8LFAnBn/yTTKslVhcmcZpdcecddhnVw=; b=hzbUznQC2tNOQ2Oolvrlp6bH4J
-	72/NVj7vTywifcs8H7GO74W/4l6j/sCtHNmQgf5Gtog7wZRDWGxXcFy9NIq3+lcJXXckTqI/kLNPF
-	+T8df0sFfVilfwzWjbfKhA3ZtKTYL/M0gSHmWB0pCco0xWGjzev84qhyM34kqV3R6CQBTSbQxJyjD
-	CUJ2X2J7KOIBMcyuRJnF8+/v8Rj4QmaYRw149VKRLeqtsnD5KJFnm+iiRCUSU3TgIeurX+iRVH51l
-	GkIfi+6+lJSaId2vo/2nQI8cHK4pHd7ygPfECyU4fP65qczV5ns1Yckj5hxAtsHFRU1tlh0/+5Z2x
-	jxXVMM9g==;
-Received: from 226.206.1.85.dynamic.cust.swisscom.net ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1tJaLZ-000ESD-0q; Fri, 06 Dec 2024 16:34:25 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: gregkh@linuxfoundation.org
-Cc: stable@vger.kernel.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	leitao@debian.org,
-	martin.lau@linux.dev,
-	peilin.ye@bytedance.com,
-	kuba@kernel.org,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Martin KaFai Lau <martin.lau@kernel.org>
-Subject: [PATCH stable 6.1 3/3] veth: Use tstats per-CPU traffic counters
-Date: Fri,  6 Dec 2024 16:34:03 +0100
-Message-ID: <20241206153403.273068-3-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241206153403.273068-1-daniel@iogearbox.net>
-References: <20241206153403.273068-1-daniel@iogearbox.net>
+	s=arc-20240116; t=1733499275; c=relaxed/simple;
+	bh=/aZqmN3typIBo+zTsoP67GUsfN5kiwlf/t4IXibQPA8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BycjNk4GmOj7CZ81m6KnJVp53BPVFu/d9FrXfM7gCQJg6qLIMn5UTqUZmocx2NOj5kNAIba742ccSVZHc9O0my93fW2FzHzKQh6oDYgtf1o/CXzNZvyMDr0df7hCJ/Cec/hIVBA5WnkVfh7eF24fuAEf3jFQlbANFeplFv0L5bQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vGZB5uXl; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4668caacfb2so234721cf.0
+        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 07:34:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733499273; x=1734104073; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/aZqmN3typIBo+zTsoP67GUsfN5kiwlf/t4IXibQPA8=;
+        b=vGZB5uXl9/n4dgRXOQRMHuiCn9JLOHmTphxADLJBKpQun/plPJrdPchnmMY1eNkWSE
+         HpLDUnvpbe7wR+LwOx/AufuZ916cbgTb6exjH2d6vBhzNmJrgvP6EFqJ5ML4cxBg2TFp
+         2A/VCz1higfVO5ixlyFCN2f6bx9fxNO77o37VOFCYFeIvMSrUc8hwRqv7Z9FwS4jV3Fi
+         j7kXRMCwKYrTxemb9ysF7yX9Gv1flsUAsjtKG7QTCeSQGoABPUQfTFt7ZfIoBEXO5i7r
+         gAjwOcvVNu0cNsfoDWRQZ/Lx9NpwpESKxJTDkVDPMzjSx+mQrTf7BUaq+bIwrcOkfSFR
+         huzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733499273; x=1734104073;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/aZqmN3typIBo+zTsoP67GUsfN5kiwlf/t4IXibQPA8=;
+        b=HHSBm5QvkLMB1uAepypmQalwS3v4Ky5jq6wZ69rXc+mqFRsK1xmfuFPV4PU+3Mc9o+
+         NeFVx4JA/svt6gGw4dq++2DItvv0SlVnMD8iE1e6uQS+b8dgesi50xdMV0x5VMlqdbAV
+         tLRL8w+OQzXdTXxO+va5lZK6zMZBN9jI8G3zlXm1DIWZqaDTgKLof9ZUweGXJelX9FtJ
+         8NrvsBlKinBIdD+Um2CJXlnBYhKZYtcqPQ5nIA3L5eRCY4q/HxgiOqhvF4YGZmsPoDgu
+         2a6ln1nUJ/9tR9NRm+TZkuzsOls+PbkeZjAQob/eVn9zV/2Ui0FyJVTkkoNL4m51AqxY
+         uvjw==
+X-Forwarded-Encrypted: i=1; AJvYcCVjr0kYc6nDTVvXmi7OoPodrcE4l0JSspZlLlNhYfXCLOZ2c/cUfHTyKoYqFlcILVoRhh9WRWY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRHrqlEfwSfiiOwjQWQqHskBaQE7MfWoPU0naDUZaLJ3JbhK/r
+	uoiReurs9M5iziR4mPmcJf2avht8gHKXuekWr51q7+QXu8olv32PVillop4uWmSSE3hkanI5tkF
+	BHhNq0QRA3aN6ps3JEFGG4hS4k8OKis+tusP6
+X-Gm-Gg: ASbGnctyY688puKebOOVDqCpBRCw7EkNP/81KhCUIZfANoEUH0x/FkbY0D4T2pIuzvG
+	WHp2kXPTe3cYf5JfOmyNxaL7dz7T5XwQ7pB2bpDr0o0ZXpx61NBer2JpffmMgG9Ml
+X-Google-Smtp-Source: AGHT+IHyH40yDBwr3/tp4UxKTv5DxHxaEclVdR22FyUDDq3qG3ECWu1DqFPK3/KLnTp+1XnrAUHEC3oXogQBaZU+p54=
+X-Received: by 2002:a05:622a:1c10:b0:466:91fd:74c0 with SMTP id
+ d75a77b69052e-4673535dd73mr4060791cf.0.1733499272923; Fri, 06 Dec 2024
+ 07:34:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27479/Fri Dec  6 10:40:14 2024)
+References: <CGME20241203081005epcas2p247b3d05bc767b1a50ba85c4433657295@epcas2p2.samsung.com>
+ <20241203081247.1533534-1-youngmin.nam@samsung.com> <CANn89iK+7CKO31=3EvNo6-raUzyibwRRN8HkNXeqzuP9q8k_tA@mail.gmail.com>
+ <CADVnQynUspJL4e3UnZTKps9WmgnE-0ngQnQmn=8gjSmyg4fQ5A@mail.gmail.com>
+ <20241203181839.7d0ed41c@kernel.org> <Z0/O1ivIwiVVNRf0@perf>
+ <CANn89iKms_9EX+wArf1FK7Cy3-Cr_ryX+MJ2YC8yt1xmvpY=Uw@mail.gmail.com>
+ <Z1KRaD78T3FMffuX@perf> <CANn89iKOC9busc9G_akT=H45FvfVjWm97gmCyj=s7_zYJ43T3w@mail.gmail.com>
+ <Z1K9WVykZbo6u7uG@perf> <CANn89i+BuU+1__zSWgjshFzfxFUttDEpn90V+p8+mVGCHidYAA@mail.gmail.com>
+In-Reply-To: <CANn89i+BuU+1__zSWgjshFzfxFUttDEpn90V+p8+mVGCHidYAA@mail.gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Fri, 6 Dec 2024 10:34:16 -0500
+Message-ID: <CADVnQykZhXO_k5vKpaQBi+9JnuFt1C5E=20mt=mb-bzXrzfXLw@mail.gmail.com>
+Subject: Re: [PATCH] tcp: check socket state before calling WARN_ON
+To: Eric Dumazet <edumazet@google.com>
+Cc: Youngmin Nam <youngmin.nam@samsung.com>, Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
+	dsahern@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	dujeong.lee@samsung.com, guo88.liu@samsung.com, yiwang.cai@samsung.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, joonki.min@samsung.com, 
+	hajun.sung@samsung.com, d7271.choe@samsung.com, sw.ju@samsung.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Peilin Ye <peilin.ye@bytedance.com>
+On Fri, Dec 6, 2024 at 4:08=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Fri, Dec 6, 2024 at 9:58=E2=80=AFAM Youngmin Nam <youngmin.nam@samsung=
+.com> wrote:
+> >
+> > On Fri, Dec 06, 2024 at 09:35:32AM +0100, Eric Dumazet wrote:
+> > > On Fri, Dec 6, 2024 at 6:50=E2=80=AFAM Youngmin Nam <youngmin.nam@sam=
+sung.com> wrote:
+> > > >
+> > > > On Wed, Dec 04, 2024 at 08:13:33AM +0100, Eric Dumazet wrote:
+> > > > > On Wed, Dec 4, 2024 at 4:35=E2=80=AFAM Youngmin Nam <youngmin.nam=
+@samsung.com> wrote:
+> > > > > >
+> > > > > > On Tue, Dec 03, 2024 at 06:18:39PM -0800, Jakub Kicinski wrote:
+> > > > > > > On Tue, 3 Dec 2024 10:34:46 -0500 Neal Cardwell wrote:
+> > > > > > > > > I have not seen these warnings firing. Neal, have you see=
+n this in the past ?
+> > > > > > > >
+> > > > > > > > I can't recall seeing these warnings over the past 5 years =
+or so, and
+> > > > > > > > (from checking our monitoring) they don't seem to be firing=
+ in our
+> > > > > > > > fleet recently.
+> > > > > > >
+> > > > > > > FWIW I see this at Meta on 5.12 kernels, but nothing since.
+> > > > > > > Could be that one of our workloads is pinned to 5.12.
+> > > > > > > Youngmin, what's the newest kernel you can repro this on?
+> > > > > > >
+> > > > > > Hi Jakub.
+> > > > > > Thank you for taking an interest in this issue.
+> > > > > >
+> > > > > > We've seen this issue since 5.15 kernel.
+> > > > > > Now, we can see this on 6.6 kernel which is the newest kernel w=
+e are running.
+> > > > >
+> > > > > The fact that we are processing ACK packets after the write queue=
+ has
+> > > > > been purged would be a serious bug.
+> > > > >
+> > > > > Thus the WARN() makes sense to us.
+> > > > >
+> > > > > It would be easy to build a packetdrill test. Please do so, then =
+we
+> > > > > can fix the root cause.
+> > > > >
+> > > > > Thank you !
+> > > > >
+> > > >
+> > > > Hi Eric.
+> > > >
+> > > > Unfortunately, we are not familiar with the Packetdrill test.
+> > > > Refering to the official website on Github, I tried to install it o=
+n my device.
+> > > >
+> > > > Here is what I did on my local machine.
+> > > >
+> > > > $ mkdir packetdrill
+> > > > $ cd packetdrill
+> > > > $ git clone https://protect2.fireeye.com/v1/url?k=3D746d28f3-15e63d=
+d6-746ca3bc-74fe485cbff6-e405b48a4881ecfc&q=3D1&e=3Dca164227-d8ec-4d3c-bd27=
+-af2d38964105&u=3Dhttps%3A%2F%2Fgithub.com%2Fgoogle%2Fpacketdrill.git .
+> > > > $ cd gtests/net/packetdrill/
+> > > > $./configure
+> > > > $ make CC=3D/home/youngmin/Downloads/arm-gnu-toolchain-13.3.rel1-x8=
+6_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-gcc
+> > > >
+> > > > $ adb root
+> > > > $ adb push packetdrill /data/
+> > > > $ adb shell
+> > > >
+> > > > And here is what I did on my device
+> > > >
+> > > > erd9955:/data/packetdrill/gtests/net # ./packetdrill/run_all.py -S =
+-v -L -l tcp/
+> > > > /system/bin/sh: ./packetdrill/run_all.py: No such file or directory
+> > > >
+> > > > I'm not sure if this procedure is correct.
+> > > > Could you help us run the Packetdrill on an Android device ?
 
-[ Upstream commit 6f2684bf2b4460c84d0d34612a939f78b96b03fc ]
+BTW, Youngmin, do you have a packet trace (e.g., tcpdump .pcap file)
+of the workload that causes this warning?
 
-Currently veth devices use the lstats per-CPU traffic counters, which only
-cover TX traffic. veth_get_stats64() actually populates RX stats of a veth
-device from its peer's TX counters, based on the assumption that a veth
-device can _only_ receive packets from its peer, which is no longer true:
+If not, in order to construct a packetdrill test to reproduce this
+issue, you may need to:
 
-For example, recent CNIs (like Cilium) can use the bpf_redirect_peer() BPF
-helper to redirect traffic from NIC's tc ingress to veth's tc ingress (in
-a different netns), skipping veth's peer device. Unfortunately, this kind
-of traffic isn't currently accounted for in veth's RX stats.
+(1) add code to the warning to print the local and remote IP address
+and port number when the warning fires (see DBGUNDO() for an example)
 
-In preparation for the fix, use tstats (instead of lstats) to maintain
-both RX and TX counters for each veth device. We'll use RX counters for
-bpf_redirect_peer() traffic, and keep using TX counters for the usual
-"peer-to-peer" traffic. In veth_get_stats64(), calculate RX stats by
-_adding_ RX count to peer's TX count, in order to cover both kinds of
-traffic.
+(2) take a tcpdump .pcap trace of the workload
 
-veth_stats_rx() might need a name change (perhaps to "veth_stats_xdp()")
-for less confusion, but let's leave it to another patch to keep the fix
-minimal.
+Then you can use the {local_ip:local_port, remote_ip:remote_port} info
+from (1) to find the packet trace in (2) that can be used to construct
+a packetdrill test to reproduce this issue.
 
-Signed-off-by: Peilin Ye <peilin.ye@bytedance.com>
-Co-developed-by: Daniel Borkmann <daniel@iogearbox.net>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Link: https://lore.kernel.org/r/20231114004220.6495-5-daniel@iogearbox.net
-Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
- drivers/net/veth.c | 30 +++++++++++-------------------
- 1 file changed, 11 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 0a8154611d7f..e1e7df00e85c 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -342,7 +342,7 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
- 	skb_tx_timestamp(skb);
- 	if (likely(veth_forward_skb(rcv, skb, rq, use_napi) == NET_RX_SUCCESS)) {
- 		if (!use_napi)
--			dev_lstats_add(dev, length);
-+			dev_sw_netstats_tx_add(dev, 1, length);
- 	} else {
- drop:
- 		atomic64_inc(&priv->dropped);
-@@ -357,14 +357,6 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
- 	return ret;
- }
- 
--static u64 veth_stats_tx(struct net_device *dev, u64 *packets, u64 *bytes)
--{
--	struct veth_priv *priv = netdev_priv(dev);
--
--	dev_lstats_read(dev, packets, bytes);
--	return atomic64_read(&priv->dropped);
--}
--
- static void veth_stats_rx(struct veth_stats *result, struct net_device *dev)
- {
- 	struct veth_priv *priv = netdev_priv(dev);
-@@ -402,24 +394,24 @@ static void veth_get_stats64(struct net_device *dev,
- 	struct veth_priv *priv = netdev_priv(dev);
- 	struct net_device *peer;
- 	struct veth_stats rx;
--	u64 packets, bytes;
- 
--	tot->tx_dropped = veth_stats_tx(dev, &packets, &bytes);
--	tot->tx_bytes = bytes;
--	tot->tx_packets = packets;
-+	tot->tx_dropped = atomic64_read(&priv->dropped);
-+	dev_fetch_sw_netstats(tot, dev->tstats);
- 
- 	veth_stats_rx(&rx, dev);
- 	tot->tx_dropped += rx.xdp_tx_err;
- 	tot->rx_dropped = rx.rx_drops + rx.peer_tq_xdp_xmit_err;
--	tot->rx_bytes = rx.xdp_bytes;
--	tot->rx_packets = rx.xdp_packets;
-+	tot->rx_bytes += rx.xdp_bytes;
-+	tot->rx_packets += rx.xdp_packets;
- 
- 	rcu_read_lock();
- 	peer = rcu_dereference(priv->peer);
- 	if (peer) {
--		veth_stats_tx(peer, &packets, &bytes);
--		tot->rx_bytes += bytes;
--		tot->rx_packets += packets;
-+		struct rtnl_link_stats64 tot_peer = {};
-+
-+		dev_fetch_sw_netstats(&tot_peer, peer->tstats);
-+		tot->rx_bytes += tot_peer.tx_bytes;
-+		tot->rx_packets += tot_peer.tx_packets;
- 
- 		veth_stats_rx(&rx, peer);
- 		tot->tx_dropped += rx.peer_tq_xdp_xmit_err;
-@@ -1612,7 +1604,7 @@ static void veth_setup(struct net_device *dev)
- 			       NETIF_F_HW_VLAN_STAG_RX);
- 	dev->needs_free_netdev = true;
- 	dev->priv_destructor = veth_dev_free;
--	dev->pcpu_stat_type = NETDEV_PCPU_STAT_LSTATS;
-+	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
- 	dev->max_mtu = ETH_MAX_MTU;
- 
- 	dev->hw_features = VETH_FEATURES;
--- 
-2.43.0
-
+thanks,
+neal
 
