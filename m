@@ -1,146 +1,109 @@
-Return-Path: <netdev+bounces-149739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B8179E7020
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 15:37:43 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B31319E70DC
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 15:48:31 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 235B528150B
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 14:37:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E398F1883E82
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 14:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559041494D9;
-	Fri,  6 Dec 2024 14:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Y+EBqOYk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D2CE1527AC;
+	Fri,  6 Dec 2024 14:48:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE9C32C8B;
-	Fri,  6 Dec 2024 14:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1390D10E0
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 14:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733495858; cv=none; b=eQaC1MsvRlKYJCiNkhDvJ3JK6xD7ISo+ohLKj5F3DwUxyzng951mjY2/9XwMyIzCzm4eZN3mQ+9629ThbSIB7LYTvZvvE+tA+eJADEiJFn9TQFVDxGC46ncbtaMxL9gqB13MtqJEON+RbOp0LDS2FOdI/ixumTnOY8VXOCisV9M=
+	t=1733496504; cv=none; b=clFpCFMHHhJHbO0+cgCnP2L9PMjaE+2sE3Hztm0e22lv8dq03nssXaUtlmAnUKG9V/Bc2s/5xYsHMMQMkHucLJn+JfcqB4mZCwf680q5yRwDhla20zHvZcDXjuCFpC1CnTRZoUpoxcNYJZ+zN24vjz0LwL105P8y2D2tEf7vAiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733495858; c=relaxed/simple;
-	bh=EYc6l9SCD6Czb0VnSBnT2cByYVTwOsvnkpQWn0OO2MM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K67wT7/KDmoSKwZNks/+/oIL/sF7jLt21Ng3xoRVLhq54bel47zaSWUwCrwLoMmVKvIetdQONJhRUFeYywtqSSWe2NAG4cn8TV0PT0xe9K4FD5QRONZhtAR1zlXWK5reyNxAMotRnRvpi/ADhQKf3AtbBOlOaH647MW09cCwUD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Y+EBqOYk; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 70C83FF808;
-	Fri,  6 Dec 2024 14:37:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1733495853;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0hpnrirAnx2qcYIUqLTdxLNN1wezgoGtkZQYDAkV9Ek=;
-	b=Y+EBqOYkO8pQ8dbSMuodkWyCVV7Vw7MBtrUENujYVIKINF4qg+c2LGFecflUbxtSE0l4qp
-	sciBcpfi2yT3TniLd//Z5hXC5lDvyJrm4zrdmUr/NwCctloRsHM49n+nJ8LKioLSo3IamV
-	c3X7Qr1J3tl+xNE28ZGB+ASd2sfvAIMGxrAM1ct1Bdn48b0mSj6m5C8UrRYm3NX/RI9rqp
-	vKFejzC8L6uzQnBIxpnXa1GjNhGKb/3rfZ5GWGlCvOfflGUZ9EO1wF+RU/VlOq3pIncuDD
-	XL21eC4HiX6eVEXGuPWbzRHNHTyHdgmftlsJPpmQiX+MSdJDnJMGJkjSbySPxw==
-Date: Fri, 6 Dec 2024 15:37:29 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu
- Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh
- <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Vladimir Oltean <vladimir.oltean@nxp.com>,
- donald.hunter@gmail.com, danieller@nvidia.com, ecree.xilinx@gmail.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Willem de Bruijn <willemb@google.com>, Shannon Nelson
- <shannon.nelson@amd.com>, Alexandra Winter <wintera@linux.ibm.com>
-Subject: Re: [PATCH net-next v20 4/6] net: ethtool: tsinfo: Enhance tsinfo
- to support several hwtstamp by net topology
-Message-ID: <20241206153729.2c233b54@kmaincent-XPS-13-7390>
-In-Reply-To: <20241206142716.GT2581@kernel.org>
-References: <20241204-feature_ptp_netnext-v20-0-9bd99dc8a867@bootlin.com>
-	<20241204-feature_ptp_netnext-v20-4-9bd99dc8a867@bootlin.com>
-	<20241206142716.GT2581@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1733496504; c=relaxed/simple;
+	bh=a4VdDgcNRQispJAYUjxPoAHZ3vxUxA88remkA5pmB+0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=mNQgwCWbqFuq3wLgg6u8Cucl2JT4Its43ZIBgriQzdrKT5nuiUsF5cM++moKsUExW1RqQhdcPgpgmq/nwoWIBQy/VmiXM1uSwLrqvTc39zw8Ychu1KIfX9Sg20BbdhfzBStOopwwfc/y1/uC6xBZeeDZ0kqeqhsyqFO1g/znCRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-287-azdpdCQEMWK4TCHGYV3GAg-1; Fri, 06 Dec 2024 14:48:19 +0000
+X-MC-Unique: azdpdCQEMWK4TCHGYV3GAg-1
+X-Mimecast-MFC-AGG-ID: azdpdCQEMWK4TCHGYV3GAg
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 6 Dec
+ 2024 14:47:33 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 6 Dec 2024 14:47:33 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Eric Dumazet' <edumazet@google.com>, Alexandra Winter
+	<wintera@linux.ibm.com>
+CC: Rahul Rameshbabu <rrameshbabu@nvidia.com>, Saeed Mahameed
+	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky
+	<leon@kernel.org>, David Miller <davem@davemloft.net>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Nils Hoppmann <niho@linux.ibm.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>, Heiko Carstens
+	<hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+	<agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>, Thorsten Winkler
+	<twinkler@linux.ibm.com>, Simon Horman <horms@kernel.org>
+Subject: RE: [PATCH net-next] net/mlx5e: Transmit small messages in linear skb
+Thread-Topic: [PATCH net-next] net/mlx5e: Transmit small messages in linear
+ skb
+Thread-Index: AQHbRlnOqxcJ6RUXVkmlcnxPCu2657LZSr5g
+Date: Fri, 6 Dec 2024 14:47:32 +0000
+Message-ID: <138dab5cc2ee40229a72804c2b92dce3@AcuMS.aculab.com>
+References: <20241204140230.23858-1-wintera@linux.ibm.com>
+ <CANn89i+DX-b4PM4R2uqtcPmztCxe_Onp7Vk+uHU4E6eW1H+=zA@mail.gmail.com>
+ <CANn89iJZfKntPrZdC=oc0_8j89a7was90+6Fh=fCf4hR7LZYSQ@mail.gmail.com>
+In-Reply-To: <CANn89iJZfKntPrZdC=oc0_8j89a7was90+6Fh=fCf4hR7LZYSQ@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: ha1j2CjEziWLx9w8rCR78G8NT1uXIvdWmN4AqvgvEFE_1733496498
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: base64
 
-On Fri, 6 Dec 2024 14:27:16 +0000
-Simon Horman <horms@kernel.org> wrote:
+RnJvbTogRXJpYyBEdW1hemV0DQo+IFNlbnQ6IDA0IERlY2VtYmVyIDIwMjQgMTQ6MzYNCi4uLg0K
+PiBJIHdvdWxkIHN1Z2dlc3QgdGhlIG9wcG9zaXRlIDogY29weSB0aGUgaGVhZGVycyAodHlwaWNh
+bGx5IGxlc3MgdGhhbg0KPiAxMjggYnl0ZXMpIG9uIGEgcGllY2Ugb2YgY29oZXJlbnQgbWVtb3J5
+Lg0KDQpBIGxvbmcgdGltZSBhZ28gYSBjb2xsZWFndWUgdGVzdGVkIHRoZSBjdXRvZmYgYmV0d2Vl
+biBjb3B5aW5nIHRvDQphIGZpeGVkIGJ1ZmZlciBhbmQgZG1hIGFjY2VzcyB0byB0aGUga2VybmVs
+IG1lbW9yeSBidWZmZXIgZm9yDQphIHNwYXJjIG1idXMvc2J1cyBzeXN0ZW0gKHdoaWNoIGhhcyBh
+biBpb21tdSkuDQpXaGlsZSBlbnRpcmVseSBkaWZmZXJlbnQgaW4gYWxsIHJlZ2FyZHMgdGhlIGN1
+dG9mZiB3YXMganVzdCBvdmVyIDFrLg0KDQpUaGUgZXRoZXJuZXQgZHJpdmVycyBJIHdyb3RlIGRp
+ZCBhIGRhdGEgY29weSB0by9mcm9tIGEgcHJlLW1hcHBlZA0KYXJlYSBmb3IgYm90aCB0cmFuc21p
+dCBhbmQgcmVjZWl2ZS4NCkkgc3VzcGVjdCB0aGUgc2ltcGxpY2l0eSBvZiB0aGF0IGFsc28gaW1w
+cm92ZWQgdGhpbmdzLg0KDQpUaGVzZSBkYXlzIHlvdSdkIGRlZmluaXRlbHkgd2FudCB0byBtYXAg
+dHNvIGJ1ZmZlcnMuDQpCdXQgdGhlICdjb3B5YnJlYWsnIHNpemUgZm9yIHJlY2VpdmUgY291bGQg
+YmUgcXVpdGUgaGlnaC4NCg0KT24geDg2IGp1c3QgbWFrZSBzdXJlIHRoZSBkZXN0aW5hdGlvbiBh
+ZGRyZXNzIGZvciAncmVwIG1vdnNiJw0KaXMgNjQgYnl0ZSBhbGlnbmVkIC0gaXQgd2lsbCBkb3Vi
+bGUgdGhlIGNvcHkgc3BlZWQuDQpUaGUgc291cmNlIGFsaWdubWVudCBkb2Vzbid0IG1hdHRlciBh
+dCBhbGwuDQooQU1EIGNoaXBzIG1pZ2h0IGJlIGRpZmZlcmVudCwgYnV0IGFuIGFsaWduZWQgY29w
+eSBvZiBhIHdob2xlDQpudW1iZXIgb2YgJ3dvcmRzJyBjYW4gYWx3YXlzIGJlIGRvbmUuKQ0KDQpJ
+J3ZlIGFsc28gd29uZGVyZWQgd2hldGhlciB0aGUgZXRoZXJuZXQgZHJpdmVyIGNvdWxkICdob2xk
+JyB0aGUNCmlvbW11IHBhZ2UgdGFibGUgZW50cmllcyBhZnRlciAoZWcpIGEgcmVjZWl2ZSBmcmFt
+ZSBpcyBwcm9jZXNzZWQNCmFuZCB0aGVuIGRyb3AgdGhlIFBBIG9mIHRoZSByZXBsYWNlbWVudCBi
+dWZmZXIgaW50byB0aGUgc2FtZSBzbG90Lg0KVGhhdCBpcyBsaWtlbHkgdG8gc3BlZWQgdXAgaW9t
+bXUgc2V0dXAuDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJy
+YW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lz
+dHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
-> On Wed, Dec 04, 2024 at 03:44:45PM +0100, Kory Maincent wrote:
-> > Either the MAC or the PHY can provide hwtstamp, so we should be able to
-> > read the tsinfo for any hwtstamp provider.
-> >=20
-> > Enhance 'get' command to retrieve tsinfo of hwtstamp providers within a
-> > network topology.
-> >=20
-> > Add support for a specific dump command to retrieve all hwtstamp
-> > providers within the network topology, with added functionality for
-> > filtered dump to target a single interface.
-> >=20
-> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com> =20
->=20
-> ...
->=20
-> > diff --git a/net/ethtool/ts.h b/net/ethtool/ts.h
-> > new file mode 100644
-> > index 000000000000..b7665dd4330d
-> > --- /dev/null
-> > +++ b/net/ethtool/ts.h
-> > @@ -0,0 +1,21 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +
-> > +#ifndef _NET_ETHTOOL_TS_H
-> > +#define _NET_ETHTOOL_TS_H
-> > +
-> > +#include "netlink.h"
-> > +
-> > +static const struct nla_policy
-> > +ethnl_ts_hwtst_prov_policy[ETHTOOL_A_TS_HWTSTAMP_PROVIDER_MAX + 1] =3D=
- {
-> > +	[ETHTOOL_A_TS_HWTSTAMP_PROVIDER_INDEX] =3D
-> > +		NLA_POLICY_MIN(NLA_S32, 0),
-> > +	[ETHTOOL_A_TS_HWTSTAMP_PROVIDER_QUALIFIER] =3D
-> > +		NLA_POLICY_MAX(NLA_U32, HWTSTAMP_PROVIDER_QUALIFIER_CNT -
-> > 1) +}; =20
->=20
-> Hi Kory,
->=20
-> It looks like ethnl_ts_hwtst_prov_policy is only used in tsinfo.c and cou=
-ld
-> be moved into that file. That would avoid a separate copy for each file
-> that includes ts.h and the following warning flagged by gcc-14 W=3D1 buil=
-ds
-> with patch 5/6 applied.
-
-Oh indeed but the real issue is that it should be used in
-ethnl_tsconfig_set_policy.
-
-Thanks for the report!
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
