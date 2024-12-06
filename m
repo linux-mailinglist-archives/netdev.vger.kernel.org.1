@@ -1,137 +1,223 @@
-Return-Path: <netdev+bounces-149585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB0779E6550
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 05:11:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3414A9E6566
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 05:28:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81BCA2846DD
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 04:11:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA34A282ECC
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 04:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F69C194C9D;
-	Fri,  6 Dec 2024 04:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B42191F78;
+	Fri,  6 Dec 2024 04:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AT6SPxeX"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Qsqt9ZN9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138F9183098;
-	Fri,  6 Dec 2024 04:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97FE18FC75
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 04:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733458246; cv=none; b=MWcsL/GZ03PzGvwzFVjnhoSQavzKR9FsNRBBdIXuvP4yqdbSV/PcQCUgPP01s9rqfbs7mwM2SS/qkXEEWgAWUNfZfsnu2JROg2rttwCjbo/9jyB8Yn35ZRtRA7QKRJTUFg7VmazfugudkpnYnSGPXSr75ic8fnDYn/rGq6oWinY=
+	t=1733459327; cv=none; b=AiNwytnOhKFrOfZnenAi/xINhw+DJtmEKmxZ0pqm0DnEYya6GW1D6oO30S3DiIILIsg93Ngm7tgnhYwbNgbKFGlcm1I082tAkEyrSwsiVwuyolzWEDGSRDxHQPpupl9AsFlnvDWywwml84bcVm2IjnA/yuFoqKAJbTNluSCJbjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733458246; c=relaxed/simple;
-	bh=6MaL9yPxPwL/cMIGWq/VNsyMF3ms/J1O0zP8HGQRDsk=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g1+OuIq187rWsGdeNR5YaFPmTOHlQi6xXtItYsZ2wYy14DHUV069D0f7bElolQ8BvxlQnB5GfDyKHnGBVNE4oG2nV1zLvuQnvP9upVgoJtqt2HyCVPlviy84h1b2l5TTIBK35cjNADDvfifAxZxr+TuSlNW7ZM6rj8WtwAlFW9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AT6SPxeX; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-725b3b9fa6cso746282b3a.3;
-        Thu, 05 Dec 2024 20:10:44 -0800 (PST)
+	s=arc-20240116; t=1733459327; c=relaxed/simple;
+	bh=g8YTgAOiETQV5OxrY6Yv3dmH3wucjRr6MQ84mWrR7p8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Cu8sQ1xfinqqAp53HSg66JUzfTyJwwP6r0g9D0DXEK1HoEBLMm4Tgup9pEaCAIUZrQ9/euNfCC7l9QPvrhtqVf9gW9wz+IoMr26AFK4TlAmuvJZHs10C5SsKM/I7jNEsdvN+MyuUMkav32hl+SQwp4qW8ye00JHLkGr/HAnh5ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Qsqt9ZN9; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53e203d77a9so1469163e87.0
+        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 20:28:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733458244; x=1734063044; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=a1sPGXkajczc/lVBkbp2d+6bdNJtz2tgNlZT4I5e7ow=;
-        b=AT6SPxeXFgRS5Hia2CpjuXI1CdAXc7FTAAv8SGnJuJ1U3r01A2+7Ze+ruN/H7Dzrz5
-         T8UiI9tZT6EtCXrKvSO0GBpnxkxRHq1qERAXQPptkq5RoNa9306OaNYVi9b3yOw8MnOS
-         +nQMr2B9eHRUVr+PQR2mJJzcObza+4/K/y6IzjcWk+iePRiwUcMNYjIu2oPOS6ScjC0R
-         rTFh1WHacW4JAe5xk/HVWNdJqOPBS8JH+aLdzkVZrK4ASdwKWPsptvexzbL4F/jv0jbO
-         GAhPS/UDCHA52U9MiBrgTtMyBKw+TOh89CxtlMNz1uuP7PQZ2VxzX7CLZfgKxPN9/iGv
-         Lrqw==
+        d=broadcom.com; s=google; t=1733459324; x=1734064124; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=2gl2v44rNyQSqDqcmt6r/2zjyzO08uuauTjLU2GDbXM=;
+        b=Qsqt9ZN93TOqQAdEaPtGduWmPBHhTXyOyODK6jJ/wk8DADTaqGIfeRSm8XBpVEpCj+
+         BM86nOflkmXee2nlAQfRqtYkDBr7AXepSrM2H/K3IP1L0NvrjJPgv7e5H4W3KOTtM+wl
+         kTayFFKMjbI5T9rlVHXMaCVGsjSjb6xcuWEBg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733458244; x=1734063044;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a1sPGXkajczc/lVBkbp2d+6bdNJtz2tgNlZT4I5e7ow=;
-        b=FlAFpP9MjDdQ3nchQOJ1nZ+bLdZ2m/S7d2cuzL1m06zhsqt9BlvbhwxyxHlXFJ74BN
-         k1Tik2NDMf5xdDD1p6Kd6W1culfHZF5MMvBjBX8hZbfSg0CAIfged4f2qxf+YX4tA9Iz
-         qJdhAJRchyiGxsZNq4IQTNZk/67f0hDCF578ReIwRl5M5TlXlQAhvr0LA2wIUTbzYzvA
-         5Q4WKFswCkHvJ6jfwwe4iNHsjdGkQMbz/aUZG1lcvhz2VqgC3ExhFay/0r2/ROtfPf2Y
-         YRBEi2YJXsUAiKjeXApQPFjYWpkEF0DYXXi/p899K0akcbV8XvxqAqXQn94ScY0jW03+
-         wCqw==
-X-Forwarded-Encrypted: i=1; AJvYcCWT+AbsZzx0O4kh9r1MairS/IF1+ixDgd49J+nAvN+hKA3DYNNnbVmSx8IIpmKWfWKaRA6kAPo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYK3pncwyxVTpAwqOdSOeFyRmjICpMnA3LiPIgt3AWt0fD37yS
-	lQ3OLCnkDXeQmj/LEsZ3Yug1jQhMDAI0tBuoDa8ggJMS6XkD1vfi
-X-Gm-Gg: ASbGncsOwoqeaMqfjc8RC1KlAWMoEH969QnD+90UJVyCYNDipjsMzJy7Hc+ymPH2Saw
-	MyTZe4DA+0IZBqy9d443K4BMWNB6bZthrfoRebB8ABMb89bf136HUm6KTvhKBTsne86kIXJmZgt
-	Vl1o4eNnOiDCkxG5HaiCZpegljyGZzX88B5EvnTNksaKIzyt59fnNBvWqEQPI4TYxqfcektQBzo
-	djiOdoorV7mneqrYp15EKMa0t86NKwdS7w7iUGt4A==
-X-Google-Smtp-Source: AGHT+IFOs/OqzLx4BlOUbGjgz/Ms6FLoN9EHJyYUjsbIgX1/qVRrxHIYPedrI5l4cjyUGSX3OKo/LQ==
-X-Received: by 2002:a17:902:c40e:b0:215:603e:214a with SMTP id d9443c01a7336-21614d2ec53mr27307785ad.1.1733458244217;
-        Thu, 05 Dec 2024 20:10:44 -0800 (PST)
-Received: from mini ([2607:fb90:8e63:d3d5:60d0:f219:70bf:2a20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215f8f29b4csm20010785ad.245.2024.12.05.20.10.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2024 20:10:43 -0800 (PST)
-From: Fan Ni <nifan.cxl@gmail.com>
-X-Google-Original-From: Fan Ni <fan.ni@samsung.com>
-Date: Thu, 5 Dec 2024 20:10:40 -0800
-To: alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	dan.j.williams@intel.com, martin.habets@xilinx.com,
-	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
-	Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v6 09/28] sfc: request cxl ram resource
-Message-ID: <Z1J5QFZS5ZCDJggn@mini>
-References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
- <20241202171222.62595-10-alejandro.lucero-palau@amd.com>
+        d=1e100.net; s=20230601; t=1733459324; x=1734064124;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2gl2v44rNyQSqDqcmt6r/2zjyzO08uuauTjLU2GDbXM=;
+        b=H+Aw5RXj3z9AY5IB3p0PB8yHodSsH8zNy+VybW1of21HoYTsHpnxn40Mbyg29ymPjC
+         wZZqzIwjTePzEZVEHlv7u7QLhcNvVFbmUFyG4Ejy/kFI8EPn+cNGT/V58tLE4YcQiEw0
+         AdLXusX0QTSnKjsUf5IDAwaUZeQH2Glpm9ZNXMX8gMSZ8wMqVmypjvkySjZpck3hxsUL
+         v6cLpkQ63SwOgvAqEcawxWFGR0Dy4tMlQ94PNfWcPkmn2oGhsuxF2wpStEuHo6HSSD2v
+         dwP1FePtSXobBH7UNdjPlzWJ14GiiEPgFM9sVb7Sy+0m5JG2EJY29/ilc/5r+YUE59lh
+         2WnA==
+X-Forwarded-Encrypted: i=1; AJvYcCVxZ/vq7kzUi1ZIgpOjvErv3ZPOLdJ9ibOwIFy9UwXIGKVodWYfhDWcNvRpoh7goNfzgJ9eWvE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3QZko6McJ31s1zQZA0e+LE28Ahryj9JJqJrk/GWid4XJwv/+X
+	Aj90RA95pc619mocsGUBcVDvocJiQCgiopYOBdB1XI4nIOWz9oNIE5OrAQJHuyHULOgDzx6XpsE
+	WjXu4hBXNiEjtLvqUmycRYcYt2tEcWlanehYR
+X-Gm-Gg: ASbGncvjBKWDx0tBs4s+eA8P0YNsfG+6qBPSuEsL9FcE9wF2Z/if8lC0OuiNA/QmhCz
+	XpkAYe0kejK0UVQBJJ6cw6KMZFDo5nNz5
+X-Google-Smtp-Source: AGHT+IGXQg8ttQPvlhIZzu7UKlrWLQ/SRfzkQji3Z+CEer1i2LPA6ijPiDx9Ma3GRQRtAM8oXEDE28yljLDLZbIuKfA=
+X-Received: by 2002:a05:6512:224b:b0:53d:f8aa:abaf with SMTP id
+ 2adb3069b0e04-53e216fb0cfmr1718407e87.9.1733459323969; Thu, 05 Dec 2024
+ 20:28:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com> <20241202171222.62595-10-alejandro.lucero-palau@amd.com>
 In-Reply-To: <20241202171222.62595-10-alejandro.lucero-palau@amd.com>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Fri, 6 Dec 2024 09:58:33 +0530
+Message-ID: <CAH-L+nPTL0OiN-aCaob714yh91za=uXyOi_MnGKUCL4p5EOW4A@mail.gmail.com>
+Subject: Re: [PATCH v6 09/28] sfc: request cxl ram resource
+To: alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org, 
+	dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, 
+	dave.jiang@intel.com, Alejandro Lucero <alucerop@amd.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000042966a06289273a3"
 
-On Mon, Dec 02, 2024 at 05:12:03PM +0000, alejandro.lucero-palau@amd.com wrote:
+--00000000000042966a06289273a3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Dec 2, 2024 at 10:44=E2=80=AFPM <alejandro.lucero-palau@amd.com> wr=
+ote:
+>
 > From: Alejandro Lucero <alucerop@amd.com>
-> 
+>
 > Use cxl accessor for obtaining the ram resource the device advertises.
-> 
+>
 > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-
-Reviewed-by: Fan Ni <fan.ni@samsung.com>
-
 > ---
 >  drivers/net/ethernet/sfc/efx_cxl.c | 7 +++++++
 >  1 file changed, 7 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+>
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sf=
+c/efx_cxl.c
 > index 44e1061feba1..76ce4c2e587b 100644
 > --- a/drivers/net/ethernet/sfc/efx_cxl.c
 > +++ b/drivers/net/ethernet/sfc/efx_cxl.c
 > @@ -84,6 +84,12 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  		goto err2;
->  	}
->  
-> +	rc = cxl_request_resource(cxl->cxlds, CXL_RES_RAM);
-> +	if (rc) {
-> +		pci_err(pci_dev, "CXL request resource failed");
-> +		goto err2;
-> +	}
+>                 goto err2;
+>         }
+>
+> +       rc =3D cxl_request_resource(cxl->cxlds, CXL_RES_RAM);
+> +       if (rc) {
+> +               pci_err(pci_dev, "CXL request resource failed");
+In case of failure, cxl_request_resource() logs an error message.
+Hence do you really need this duplicate log?
+> +               goto err2;
+> +       }
 > +
->  	probe_data->cxl = cxl;
->  
->  	return 0;
+>         probe_data->cxl =3D cxl;
+>
+>         return 0;
 > @@ -98,6 +104,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
 >  void efx_cxl_exit(struct efx_probe_data *probe_data)
 >  {
->  	if (probe_data->cxl) {
-> +		cxl_release_resource(probe_data->cxl->cxlds, CXL_RES_RAM);
->  		kfree(probe_data->cxl->cxlds);
->  		kfree(probe_data->cxl);
->  	}
-> -- 
+>         if (probe_data->cxl) {
+> +               cxl_release_resource(probe_data->cxl->cxlds, CXL_RES_RAM)=
+;
+>                 kfree(probe_data->cxl->cxlds);
+>                 kfree(probe_data->cxl);
+>         }
+> --
 > 2.17.1
-> 
+>
+>
+
+
+--=20
+Regards,
+Kalesh A P
+
+--00000000000042966a06289273a3
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEIPqGgkco+7QWmuksYKsvE1xkH/zC5ZRrELDZFCUuLBQ9MBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTIwNjA0Mjg0NFowaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBURnSKBDzS
+QVLUEO81YFph9WrgjEavfnhp70iH90/dGrUTApvvPAVQqHLrBaw8crqc1vwSf5gKMgrKdEICBkcM
+ZfHHFUSECyfFLoS078+zwUkTtHOxGLBeD4FxLmOuxxOsFRmrOGDGH/6NQGmqnwInCmsbqwctKKTA
+0ZCECv/kbLTay2OUN4Tvpjh4sQ0wDfDG9ZSCeBHjVsRVq+r1GscqWKtVzZ4kiAPUu0zZf4se3gLo
+AqKNZyntVlXceF3OYpg2S8+4mi3aZiwrP+uXXEB+NPLa8QfCLCc+f1yU/6/axtlp8xAe40gbADEk
+BiHZOLDexBvueYmkcldDzr7/CdlN
+--00000000000042966a06289273a3--
 
