@@ -1,83 +1,86 @@
-Return-Path: <netdev+bounces-149666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1283E9E6B59
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 11:11:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C54C79E6C29
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 11:28:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EED0716ACEB
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 10:11:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D6F916DAC8
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 10:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158A51F4737;
-	Fri,  6 Dec 2024 10:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBP9H2H0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88DC214A94;
+	Fri,  6 Dec 2024 10:18:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7BD1AD9F9;
-	Fri,  6 Dec 2024 10:11:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C84213245;
+	Fri,  6 Dec 2024 10:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733479874; cv=none; b=SW/zfWf73AL3ye4Nw26ts2Y/gAcr7ylAfdCxK/hYGO0etYstKuKHknvr59YUCzgQHlFBUGJnBVTHfAZX55bKgTSExDI97lAVJGo2/YIT4aKpnrtJkPyz7/TvnFUDI06nyiYoSXqukpK+baUVoA2xWISjpEzJEPS3eiVBdnhfSHk=
+	t=1733480316; cv=none; b=ihGC0weTZrXgNMiWOTyV28Bfg5AaxuNbi13lQT+CCydXR/scikw+VWGQuyWAKOrh3I8yG2y2Y4ipBbt9tB6gnucmPkWsoTcpJx3Hr5ZCpSojnRLIG3CaVGw2+zuZ2Xax+u6wJrhavbb0VgFYriEIKEd9im8pDpv5ZtjIoQdm6uQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733479874; c=relaxed/simple;
-	bh=MLNJAgBwRgs2KjM5s4PX7TmimuKXeMg69Vr4tEt3vIU=;
+	s=arc-20240116; t=1733480316; c=relaxed/simple;
+	bh=8SB6tdX0DI5Trz5Fkh+yzJxdlWFNvnxCalYu/COompM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tMrt+p/y0SohUU2rnYHT4lfi4bCcFNDVunR/4N63ZuCfHlpaiK4uryM54n3yWzeE+QnksskaX0cJDtJqF2AcIyUHJ8IxB+rSp+4uPXe98jaKIdyg7a3+9XMWvSLOTpMdlXZYY9b7vsqnK4KBu5yMwDzx8Sm5kbum71xfIR6e7iQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YBP9H2H0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A591C4CED1;
-	Fri,  6 Dec 2024 10:11:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733479873;
-	bh=MLNJAgBwRgs2KjM5s4PX7TmimuKXeMg69Vr4tEt3vIU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YBP9H2H0tqtGwm1CvEqLxfcBJhulgIHIQU5M+lk2sHOvivaDxLZHUmWH/xKxtoUZJ
-	 RM8SdJK9fttmHgrm7fJEgRrFmSHFsXlyuRxfXwoW7qGICZqH0fjniM++fhLaza6mPu
-	 GbwBUhJjh6xRpWZU8IaaIJsB80z5GxnuwnMtze36uwqvw4MNjA1k3LqCqRhisG5T/S
-	 ibwfIcyBpTJeTbO22kikY5pILlQxYK2DJUJYDR48wjI/DvSmjXhQ+JLzPv/2K/pTlx
-	 XdRinRuf57Iq8dfUeAJU3Kz3Kbmd0fD9xHaJJZ88Xe5Ja8WIzRNN7vLHwQJJqL6UCF
-	 TAdA5nXM/N6ZQ==
-Date: Fri, 6 Dec 2024 10:11:09 +0000
-From: Simon Horman <horms@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, frank.li@nxp.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: Re: [PATCH v6 RESEND net-next 3/5] net: enetc: update max chained Tx
- BD number for i.MX95 ENETC
-Message-ID: <20241206101109.GK2581@kernel.org>
-References: <20241204052932.112446-1-wei.fang@nxp.com>
- <20241204052932.112446-4-wei.fang@nxp.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rUc6O3z7sdwe61JBZNh9zBIGSsBYJg4ysPKrMdZpTlZakWmVAqpT1/5n4+MB+G1YWt8Fd08GgKTmIIHLjyAKiOWNwP/8cWIhhJlHSrLI5jcfOX0velXSr2xZqvkqvDOGpSMvDb+N8Uz18fKQaUagDSIrQGDQxrd6sD5bTxPDyFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.39.247] (port=51794 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1tJVPf-005uPb-No; Fri, 06 Dec 2024 11:18:21 +0100
+Date: Fri, 6 Dec 2024 11:18:18 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, Johannes Berg <johannes@sipsolutions.net>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Alexandra Winter <wintera@linux.ibm.com>, loic.poulain@linaro.org,
+	dsahern@kernel.org, hawk@kernel.org, ilias.apalodimas@linaro.org,
+	jhs@mojatatu.com, jiri@resnulli.us, przemyslaw.kitszel@intel.com,
+	netfilter-devel@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: reformat kdoc return statements
+Message-ID: <Z1LPaoazEajgMhp_@calendula>
+References: <20241205165914.1071102-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241204052932.112446-4-wei.fang@nxp.com>
+In-Reply-To: <20241205165914.1071102-1-kuba@kernel.org>
+X-Spam-Score: -1.9 (-)
 
-On Wed, Dec 04, 2024 at 01:29:30PM +0800, Wei Fang wrote:
-> The max chained Tx BDs of latest ENETC (i.MX95 ENETC, rev 4.1) has been
-> increased to 63, but since the range of MAX_SKB_FRAGS is 17~45, so for
-> i.MX95 ENETC and later revision, it is better to set ENETC4_MAX_SKB_FRAGS
-> to MAX_SKB_FRAGS.
+On Thu, Dec 05, 2024 at 08:59:14AM -0800, Jakub Kicinski wrote:
+> kernel-doc -Wall warns about missing Return: statement for non-void
+> functions. We have a number of kdocs in our headers which are missing
+> the colon, IOW they use
+>  * Return some value
+> or
+>  * Returns some value
 > 
-> In addition, add max_frags in struct enetc_drvdata to indicate the max
-> chained BDs supported by device. Because the max number of chained BDs
-> supported by LS1028A and i.MX95 ENETC is different.
+> Having the colon makes some sense, it should help kdoc parser avoid
+> false positives. So add them. This is mostly done with a sed script,
+> and removing the unnecessary cases (mostly the comments which aren't
+> kdoc).
 > 
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> Reviewed-by: Frank Li <Frank.Li@nxp.com>
-> Reviewed-by: Claudiu Manoil <claudiu.manoil@nxp.com>
+> Acked-by: Johannes Berg <johannes@sipsolutions.net>
+> Acked-by: Richard Cochran <richardcochran@gmail.com>
+> Acked-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+> Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+> Acked-by: Alexandra Winter <wintera@linux.ibm.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+For the netfilter chunks:
 
+Acked-by: Pablo Neira Ayuso <pablo@netfilter.org>
 
