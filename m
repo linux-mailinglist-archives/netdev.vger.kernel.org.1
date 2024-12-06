@@ -1,151 +1,206 @@
-Return-Path: <netdev+bounces-149645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D1FD9E6998
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 10:03:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A00BE9E699F
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 10:04:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4F38282435
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 09:03:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C1C2281F89
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 09:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29EBE1DF96F;
-	Fri,  6 Dec 2024 09:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E1241E1022;
+	Fri,  6 Dec 2024 09:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a1xhZt9w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ow9PajWw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0611DE3C7;
-	Fri,  6 Dec 2024 09:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49021CCB4B
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 09:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733475824; cv=none; b=Gkm0lN4b3nFWZbmq80QPrT72Gh1G9eXIhdxVCd69cWlU5lLVE088N0H5cEf5kU8Yoi5w5WJ5zj3IqDXYSUyV/TdTcQ/lYJXcWyls9yokY86Pu48nxQD4ezeFVn6U3SUAqJUnIIWfKmdifIq9FtOptrWQVHjVuJ+pbS1PzME0AHg=
+	t=1733475888; cv=none; b=K8NWUW6tcAgNMrI5IB1nQfhQ87zkI6B9H0zYnCa/iZcpo0QUFUa3yCnj6rEwQDPWNcQ7TunPDFdRpybue9L+zcxFK5K55tRKij2YTiwbREZeqArdRhjareTBIMjgGOJ5Jjjm0he8jgS4tE54yi0OCwJillWyiwPL0ULEHwPKO5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733475824; c=relaxed/simple;
-	bh=9aDqtlCUiJKrKZPRA9Pwb1mlutnI39j9QaNes07JbYY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mXTUWQGgQOFDE66LouOAyh0ZLvFyQtpfRbr5vYrtsqnpvHlucgv70WdXdr+EuHstnjoM+9aC3LBjHH99GGYVVeM6Q6PfoLDwUGSoC8Fyu/UyASj9nMPDcR5ETFV/J6J6P+kWU+ull6l0A7mdL7mPUhSWqtjxXcEO1mW40+HBL8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a1xhZt9w; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-215bebfba73so17262525ad.1;
-        Fri, 06 Dec 2024 01:03:42 -0800 (PST)
+	s=arc-20240116; t=1733475888; c=relaxed/simple;
+	bh=rrQX/O2Ipu+tSsCqX+texkXRgpgQZTDjyjn9A5L0PXc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gEWmMZZ5zwhtY6f3isXMe5O59JaPself1VmMPoxJr/9DGfZJcniZYlRFHqLeAYjB0vK7Pw9BlgFIonRvoffTsuwtnq8dqMvD3QUidQxQIfEt/+DiXyLSAR23cQEhEm/W47yDmp08Ha4CBgH0E1WBdZxBgX7nyNWGXjgAiArnrSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ow9PajWw; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d0e75dd846so2857450a12.3
+        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 01:04:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733475822; x=1734080622; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SNmkcABijER99QBs4F7z9voX03afqB9KDzNNlLM/0Ug=;
-        b=a1xhZt9w2zPQWnvCWTwb6fB32vhNzSvxTtdi/dFXkIwnrgYLhR2262Y0fc3rV2Ey+0
-         YOnEMk1+p9Rca5G965pPscs4tQ3YgHTFNgDR0u5F7/3YAwdwgvqqNmTWvjzTcgGyznv7
-         vpBbpwpasA4+zx64ka/kwCE1FDx/AOQPyJNcX65syioGnVKMroMpRDxKyftAmaAfxKDK
-         jGq9Vc7G7hurXMesFwzJuyVI012E1Co6TVM5elLheu8IGuvjavwNa7dv2eutH2sdmp/i
-         ctqK4e0MOT199KZrSswm4WHWUravZMLwZ/ZBe4YNmQW6bF9qZ7ZRDf0ynNK8a148qat3
-         ieJA==
+        d=google.com; s=20230601; t=1733475885; x=1734080685; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Dldw98h2j18SwRDYnzalr6BvHpYM5yuyIrT2gkwJtHE=;
+        b=ow9PajWwilXtFmS04HUCm7VG4jUyR6raoxRNYdryfxnYNP6npsSx9soJJVFKHB7PWS
+         kE557CLrP8fZ3BxTY64OE9XBQmffLY5ioL1Vb3F3b38cZkJlVJBIHcF9AiaaA44myAji
+         zGoBC/vlglo83cPzLMitc6kzbDLTetpN3eQ9W0d+w/+nfMgX0kj3lwGLsdYuwfMwA7mx
+         qAUnHfgl/emcJGPYDT0DwgyNWbeGNSA37EBimVmLoT8kfqrpGiQ8ZQWWfXYO6RyB1eMr
+         REfWcrsBXtQTGgOD2SlbMcfAyFVDxDqHQGQigF97eKqV5VVBjRyPBmxYvjUbIicxCaE1
+         54yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733475822; x=1734080622;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SNmkcABijER99QBs4F7z9voX03afqB9KDzNNlLM/0Ug=;
-        b=LJY3O9jIWruFlU7qqghKHWoCl8YLUkl+lIe3q+EryBv/VLWbuw8AaILvAalvpb7zZ2
-         O0p9IZZYLGfO+fnPljLC0qzkJs708VQKk/PWuxAKA7oAZG7HwtcEOyT8ulT40H9cPJiX
-         ixGXJPQXEa0fym+MnNKFhkDqNn3XBobebYhyDMqpM3oMvOaEuBe1tQ9S6RHqMu1ptn0T
-         4zcF99PhNNcAetlqu3SqFE+e6I6ThY5NRHFSjTYThb7cb0fsMDKM6JoCIpAB9hdclTyG
-         YOcayfJ+l9EUwRRnk77dlXgVvgj+xrth3Mkl5jXqE+199A8LbiJ+R471wz1pen8jfRnA
-         YJHw==
-X-Forwarded-Encrypted: i=1; AJvYcCWNxbBstPR4HZRicHCNGMqcuUV56qaCKwWq6/T8Jc/1mTV2jMD93vpcuPMH2/cK7m5l5Hr46On4Mvqn@vger.kernel.org
-X-Gm-Message-State: AOJu0YyC5DpsJaih1uw8eb3KJimC3Q6ig+3Xo+nxKnN4NfROYng5/cU5
-	2rGiG5a04oPJnHNWrg4QESB6jKvf4vltYkREJbi0jLYx3nBITV7r
-X-Gm-Gg: ASbGnctJWZCNP6cW6BDoitUnDNphTkqC4ZdpXzQkofixQlSkodXKw6yQpuo2Fe5T1LH
-	Fk7nAPiKV+7EfFbKd8rddOPc5L3J4kr68t+FQa5bmUpw7k7xMda2+/kfEPQzwMcl5wmfhEy5b1W
-	pjEO2Dyr2UKRftgCpEuyvezjtChGjta3eYTj81aO8w0AOgj/5dL9JQE82l1b+9tUA54i5MAq8Fy
-	2cTHvoKbwkiDPs4g/9aM1rrrfNtLAy5y/i/DiF5OfONq9HEYPRX1b/zZoFnl/YQQfuCLfdIZcKv
-X-Google-Smtp-Source: AGHT+IFXJUzXxiixFJYgU2jzZEtyzJ26r56ck1RGtjGbb7M1Eo9JnZ/Qy7y1GpXJEtcGyDHGKK8Rxw==
-X-Received: by 2002:a17:903:245:b0:211:7156:4283 with SMTP id d9443c01a7336-21614dc5181mr26133795ad.43.1733475821697;
-        Fri, 06 Dec 2024 01:03:41 -0800 (PST)
-Received: from localhost.localdomain ([180.159.118.224])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215f8e3ea67sm24632395ad.28.2024.12.06.01.03.34
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 06 Dec 2024 01:03:41 -0800 (PST)
-From: Yafang Shao <laoar.shao@gmail.com>
-To: saeedm@nvidia.com,
-	tariqt@nvidia.com,
-	leon@kernel.org,
-	gal@nvidia.com,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	Yafang Shao <laoar.shao@gmail.com>,
-	Tariq Toukan <ttoukan.linux@gmail.com>
-Subject: [PATCH v3 net-next] net/mlx5e: Report rx_discards_phy via rx_fifo_errors
-Date: Fri,  6 Dec 2024 17:03:28 +0800
-Message-Id: <20241206090328.4758-1-laoar.shao@gmail.com>
-X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
+        d=1e100.net; s=20230601; t=1733475885; x=1734080685;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dldw98h2j18SwRDYnzalr6BvHpYM5yuyIrT2gkwJtHE=;
+        b=Tby8CmifKbxdmdX+b2fZg47Txeu1X4nyNZofsCaiqjK+RqXkAzO40hugVDvHpT3h3u
+         BBqRig4Z5Hy9QPogATDnjq5ppV1VAba+MJbvFyzypkPDd8UZBUlAXV8XvWeE3tGRBdwo
+         QKA+IFGCeaD+sI4BWMME8IktW+CD7vkw+LEtxH11B05A6RQ2oWt7y3l/pZyilRJHqsRs
+         ilaxmzdPNlfWSTRTP4bIAxSFoQZCdfDmikORU9lYejBeuB0dKdhAXNKgUocNzFNHAg6r
+         WR2nVAptlpnhb5T4WM2OjAHf5XBkLdI2Le4MDbHGD/jxVPLhb2wp+U7RNnlehQKAoBx1
+         H2rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVSmSvTaWzf3uZPN/Wbv8zWywDECdSL9cbzll0nmMma5ShrpeJXrblI8Afn1xbQKToDKDvv2Ng=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiD+HHYtpXKSYWranLJ4AUhI+q61eG5cbs9X3lnkjEZTNT7jnx
+	mamNF/Ccp694BLma/Q6rgWjXYkv25/zypym1JlxGrxak+ZB8lLQvA99w/yJdWoJEnXFg7/xqy8H
+	olGVFZ9l9e7o6xI1QVi7AwJKeLlwpJsqElqCR
+X-Gm-Gg: ASbGncvPXPrS0ckMonXZKH/1u0tjkHB8wk/5vfNZSJ7zxpXcCPWnjF30rnW/udPVs/f
+	yicGD2LbpnKZi/NAnQnj2Fwk0FjuudVo=
+X-Google-Smtp-Source: AGHT+IHsX2K6xVWtjaQGnFCaUFIyxSxnueqVZ3RInVi70dICRuZRPYXbqi1gd1cI+ajdnaT7GsVqsRtiM6oOmf0kkgU=
+X-Received: by 2002:a05:6402:40d3:b0:5d3:ba42:e9fe with SMTP id
+ 4fb4d7f45d1cf-5d3be6c4d2cmr2181868a12.12.1733475884924; Fri, 06 Dec 2024
+ 01:04:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241204221254.3537932-1-sbrivio@redhat.com> <20241204221254.3537932-3-sbrivio@redhat.com>
+ <CANn89i+iULeqTO2GrTCDZEOKPmU_18zwRxG6-P1XoqhP_j1p3A@mail.gmail.com>
+ <Z1Ip9Ij8_JpoFu8c@zatzit> <CANn89i+PCsOHvd02nvM0oRjAXxPTgX6V1Y1-xfRL_43Ew9=H=w@mail.gmail.com>
+ <Z1JeePBN5f1YCmYd@zatzit>
+In-Reply-To: <Z1JeePBN5f1YCmYd@zatzit>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 6 Dec 2024 10:04:33 +0100
+Message-ID: <CANn89iJqLU6RuHgdbz3iGNL_K8XaPBYr3pWqQmgth2TFf14obg@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] datagram, udp: Set local address and rehash
+ socket atomically against lookup
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Stefano Brivio <sbrivio@redhat.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Mike Manning <mvrmanning@gmail.com>, Paul Holzinger <pholzing@redhat.com>, 
+	Philo Lu <lulie@linux.alibaba.com>, Cambda Zhu <cambda@linux.alibaba.com>, 
+	Fred Chen <fred.cc@alibaba-inc.com>, Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We observed a high number of rx_discards_phy events on some servers when
-running `ethtool -S`. However, this important counter is not currently
-reflected in the /proc/net/dev statistics file, making it challenging to
-monitor effectively.
+On Fri, Dec 6, 2024 at 3:16=E2=80=AFAM David Gibson <david@gibson.dropbear.=
+id.au> wrote:
+>
+> On Thu, Dec 05, 2024 at 11:52:38PM +0100, Eric Dumazet wrote:
+> > On Thu, Dec 5, 2024 at 11:32=E2=80=AFPM David Gibson
+> > <david@gibson.dropbear.id.au> wrote:
+> > >
+> > > On Thu, Dec 05, 2024 at 05:35:52PM +0100, Eric Dumazet wrote:
+> > > > On Wed, Dec 4, 2024 at 11:12=E2=80=AFPM Stefano Brivio <sbrivio@red=
+hat.com> wrote:
+> > > [snip]
+> > > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > > > index 6a01905d379f..8490408f6009 100644
+> > > > > --- a/net/ipv4/udp.c
+> > > > > +++ b/net/ipv4/udp.c
+> > > > > @@ -639,18 +639,21 @@ struct sock *__udp4_lib_lookup(const struct=
+ net *net, __be32 saddr,
+> > > > >                 int sdif, struct udp_table *udptable, struct sk_b=
+uff *skb)
+> > > > >  {
+> > > > >         unsigned short hnum =3D ntohs(dport);
+> > > > > -       struct udp_hslot *hslot2;
+> > > > > +       struct udp_hslot *hslot, *hslot2;
+> > > > >         struct sock *result, *sk;
+> > > > >         unsigned int hash2;
+> > > > >
+> > > > > +       hslot =3D udp_hashslot(udptable, net, hnum);
+> > > > > +       spin_lock_bh(&hslot->lock);
+> > > >
+> > > > This is not acceptable.
+> > > > UDP is best effort, packets can be dropped.
+> > > > Please fix user application expectations.
+> > >
+> > > The packets aren't merely dropped, they're rejected with an ICMP Port
+> > > Unreachable.
+> >
+> > We made UDP stack scalable with RCU, it took years of work.
+> >
+> > And this patch is bringing back the UDP stack to horrible performance
+> > from more than a decade ago.
+> > Everybody will go back to DPDK.
+>
+> It's reasonable to be concerned about the performance impact.  But
+> this seems like preamture hyperbole given no-one has numbers yet, or
+> has even suggested a specific benchmark to reveal the impact.
+>
+> > I am pretty certain this can be solved without using a spinlock in the
+> > fast path.
+>
+> Quite possibly.  But Stefano has tried, and it certainly wasn't
+> trivial.
+>
+> > Think about UDP DNS/QUIC servers, using SO_REUSEPORT and receiving
+> > 10,000,000 packets per second....
+> >
+> > Changing source address on an UDP socket is highly unusual, we are not
+> > going to slow down UDP for this case.
+>
+> Changing in a general way is very rare, one specific case is not.
+> Every time you connect() a socket that wasn't previously bound to a
+> specific address you get an implicit source address change from
+> 0.0.0.0 or :: to something that depends on the routing table.
+>
+> > Application could instead open another socket, and would probably work
+> > on old linux versions.
+>
+> Possibly there's a procedure that would work here, but it's not at all
+> obvious:
+>
+>  * Clearly, you can't close the non-connected socket before opening
+>    the connected one - that just introduces a new much wider race.  It
+>    doesn't even get rid of the existing one, because unless you can
+>    independently predict what the correct bound address will be
+>    for a given peer address, the second socket will still have an
+>    address change when you connect().
+>
 
-Since rx_fifo_errors represents receive FIFO errors on this network
-deivice, it makes sense to include rx_discards_phy in this counter to
-enhance monitoring visibility. This change will help administrators track
-these events more effectively through standard interfaces.
+The order is kind of obvious.
 
-I have also verified the manual of ethtool counters on mlx5 [0], it seems
-that rx_discards_phy and rx_fifo_errors has the same meaning:
+Kernel does not have to deal with wrong application design.
 
-  rx_discards_phy: The number of received packets dropped due to lack of
-                   buffers on a physical port. If this counter is
-                   increasing, it implies that the adapter is congested and
-                   cannot absorb the traffic coming from the network.
+>  * So, you must create the connected socket before closing the
+>    unconnected one, meaning you have to use SO_REUSEADDR or
+>    SO_REUSEPORT whether or not you otherwise wanted to.
+>
+>  * While both sockets are open, you need to handle the possibility
+>    that packets could be delivered to either one.  Doable, but a pain
+>    in the arse.
 
-                   ConnectX-3 naming : rx_fifo_errors
+Given UDP does not have a proper listen() + accept() model, I am
+afraid this is the only way
 
-Link: https://enterprise-support.nvidia.com/s/article/understanding-mlx5-ethtool-counters [0]
-Suggested-by: Tariq Toukan <ttoukan.linux@gmail.com>
-Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-Cc: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>
-Cc: Gal Pressman <gal@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 1 +
- 1 file changed, 1 insertion(+)
+You need to keep the generic UDP socket as a catch all, and deal with
+packets received on it.
 
-Changes:
-v2->v3:
-- Drop the changes on the Doc
+>
+>  * How do you know when the transition is completed and you can close
+>    the unconnected socket?  The fact that the rehashing has completed
+>    and all the necessary memory barriers passed isn't something
+>    userspace can directly discern.
+>
+> > If the regression was recent, this would be considered as a normal regr=
+ession,
+> > but apparently nobody noticed for 10 years. This should be saying somet=
+hing...
+>
+> It does.  But so does the fact that it can be trivially reproduced.
 
-v1->v2: https://lore.kernel.org/netdev/20241114021711.5691-1-laoar.shao@gmail.com/
-- Use rx_fifo_errors instead (Tariq)
-- Update the if_link.h accordingly
-
-v1: https://lore.kernel.org/netdev/20241106064015.4118-1-laoar.shao@gmail.com/
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index e601324a690a..15b1a3e6e641 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -3916,6 +3916,7 @@ mlx5e_get_stats(struct net_device *dev, struct rtnl_link_stats64 *stats)
- 	}
- 
- 	stats->rx_missed_errors = priv->stats.qcnt.rx_out_of_buffer;
-+	stats->rx_fifo_errors = PPORT_2863_GET(pstats, if_in_discards);
- 
- 	stats->rx_length_errors =
- 		PPORT_802_3_GET(pstats, a_in_range_length_errors) +
--- 
-2.43.5
-
+If a kernel fix is doable without making UDP stack a complete nogo for
+most of us,
+I will be happy to review it.
 
