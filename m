@@ -1,251 +1,202 @@
-Return-Path: <netdev+bounces-149732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5CB39E6F6A
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 14:42:58 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C276316C252
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 13:42:53 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69F9204F90;
-	Fri,  6 Dec 2024 13:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=finest.io header.i=parker@finest.io header.b="YQ90jWMq"
-X-Original-To: netdev@vger.kernel.org
-Received: from mout.perfora.net (mout.perfora.net [74.208.4.196])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9C4F9E6F75
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 14:47:27 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DB81F9EAF;
-	Fri,  6 Dec 2024 13:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.208.4.196
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B1E42834CD
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 13:47:26 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88ED11FCD11;
+	Fri,  6 Dec 2024 13:47:24 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C734C5464A
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 13:47:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733492574; cv=none; b=S5ExyfqX/HbxUG82eOuDwHZi/VWSDtl0R8FBDUicHzUqwqCuKJFgrtw3pAVBPAj2YqNs1cFvBtLSl5RAIkbi0OXsYFKruUqIiy+8nromSiRy8f2Qsrdpgp7cNHkuFNPmlaz+g0wow0MrCsjM+9Vht3+bHnMy2Fkp4PK1kCAfdz4=
+	t=1733492844; cv=none; b=FjRpJZzoAlWCSF6TMesQCfrfxmFj1WBQkTC4g1U85v5Hi5NFq9OURiqLmOWvjB8jVXbWAagMroCl+UVSIDuPb79uAOpjVWP1oRDT4gUVuDvdMR25x1g95QzFrQHub4F4wFzKyZS/0xD6uRIUYJPNtmE4XSPRwnSNcOVXf572qLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733492574; c=relaxed/simple;
-	bh=EfSL0y08AtcW2XFBtS3K8OxlDst2tNPSiyMzYMcNVQ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rb74Kp7t7QDHMzivtUhgsebPtUXzcGp/67t1iJ9iJrHmiTo8DEky91+Q21kIcQ/QvdJo9PYnRMlxYBFjmpC6Ox/nQdLN4kLNgufLX/B0rK4/5KoGzLXQa6ldWquwsOPFFtHXuOvcfNMXo7xNK6pLX1omV1Fh3KMqlRaZXLKrNlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=finest.io; spf=pass smtp.mailfrom=finest.io; dkim=pass (2048-bit key) header.d=finest.io header.i=parker@finest.io header.b=YQ90jWMq; arc=none smtp.client-ip=74.208.4.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=finest.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=finest.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=finest.io;
-	s=s1-ionos; t=1733492527; x=1734097327; i=parker@finest.io;
-	bh=oDF1pej/umtycNfhCuypshXjUCnhQjJmU/FweU7t1Po=;
-	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=YQ90jWMq2rXWFaX438FmYhwwYE9TSB1Ecw8/gunwHNUi0LUFCsiqYQh2nF3qP/+c
-	 xo9rB1QO90fdP+VVzIe8gqqbit8UqIjSGpbRTQO/vRcoH6OOhurCtJTX2WM/ZJxSZ
-	 kuKtWDGjDg7FREGnWFLCQPrmpXSa6Z5LCggcxfalt02afteb5W077iP4Ys9Ir7rn6
-	 5sWD+4pPEFVIHQcAqHtkXEilZh1AnaWyT1173888lDozReuQz1A/lnr2kfE7y9YyU
-	 B8CxCISPxngEKaIbKKz+2IEp6MeL9eSG4AMhnmAfzH6iMDsDE6pOLEooucYL4Hxul
-	 OrxKOEWWyMoFicx6Qg==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from SWDEV2.connecttech.local ([98.159.241.229]) by
- mrelay.perfora.net (mreueus002 [74.208.5.2]) with ESMTPSA (Nemesis) id
- 0MVwAo-1t8Qek45hQ-00Sn2A; Fri, 06 Dec 2024 14:42:07 +0100
-Date: Fri, 6 Dec 2024 08:42:03 -0500
-From: Parker Newman <parker@finest.io>
-To: Thierry Reding <thierry.reding@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>, Alexandre
- Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Jonathan
- Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
- linux-kernel@vger.kernel.org, Parker Newman <pnewman@connecttech.com>
-Subject: Re: [PATCH v1 1/1] net: stmmac: dwmac-tegra: Read iommu stream id
- from device tree
-Message-ID: <20241206084203.2502ab95.parker@finest.io>
-In-Reply-To: <uad6id6omswjm7e4eqwd75c52sy5pddtxru3bcuxlukhecvj4u@klzgrws24r2q>
-References: <ed2ec1c2-65c7-4768-99f1-987e5fa39a54@redhat.com>
-	<20241115135940.5f898781.parker@finest.io>
-	<bb52bdc1-df2e-493d-a58f-df3143715150@lunn.ch>
-	<20241118084400.35f4697a.parker@finest.io>
-	<984a8471-7e49-4549-9d8a-48e1a29950f6@lunn.ch>
-	<20241119131336.371af397.parker@finest.io>
-	<f00bccd3-62d5-46a9-b448-051894267c7a@lunn.ch>
-	<20241119144729.72e048a5.parker@finest.io>
-	<mpgilwqb5zg5kb4n7r6zwbhy4uutdh6rq5s2yc6ndhcj6gqgri@qkfr4qwjj3ym>
-	<20241204115317.008f497c.parker@finest.io>
-	<uad6id6omswjm7e4eqwd75c52sy5pddtxru3bcuxlukhecvj4u@klzgrws24r2q>
-Organization: Connect Tech Inc.
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1733492844; c=relaxed/simple;
+	bh=CGjkfpE/iqpjTkKByuC9/m2KrcsyrYtsoLpoSb7Qy0Q=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EPRu8ahwFtyKC5BXk7L2pQuosWaZAnwa/9U0LzG2/WjphvkcsYbTywM/jaEq1r2FJP7E8oWJtLBOCAeofopIX1jjxCY0OeIIr55Aw5k912I7JugHRDILVgsWoSWXFwnRp58MDiYEIh6WmrqGGenRlMAu+6wNC+Fyh0L0SvZ9swg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3a7d60252cbso19619755ab.0
+        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 05:47:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733492842; x=1734097642;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NuAws6VQ8mGzerpOo6fFbh4rcQNx+TjOqsMRzbhwfg8=;
+        b=MJARdRzQwqRQMUnNBDWuobx4nkBoW6FLDAIPyd4ggMSiaHOTI0arrh4fC+UntOQmS2
+         LY95xxvLgI18r0uk6BzdMCIzBuA0TpOdPD/Cb+cqHUavLfItE1jt3sOidynScVl/9+oj
+         MKrgsGk42DFf34o4XrEFzoy4ImllYAzXVgMYFZFGu9Wbgr4n/HumHIFDRhk7xCNCMBRi
+         FF/plyc3bHl/rS0YPZJxx9y458nJCX2M1JGnwfkRjLH1dDjyxbe/pRGB32EYz7ivjNfH
+         1GORZTFmm1t8wL/bSVDZk6PapAN+l4ZLHRUQH7v97X1ZEkdQ8dSSz4IHaj768mrfHOV/
+         gj0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXziqBeM3H672wNbXTdchVuYsoFC5lZ+gp5JhWv5ghAV5a4m2+pQZjpXSysBAHYd1WgUIybRR8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZ8qIQGLcfz1NHN+B37kempEgiG6QCuNC5oNgT/0DRNxg6xmU0
+	C3qEvNbxSkjitmZ/RO/PchLbUrKtM5pB/j5HTqU2bkWxx7yhaxT5cb/aN6hImn2jO29BbLyVpyO
+	tgPLAygiqeb9jT5dHZf9RwMFTbCBmRQ2ym3z/6EMIbSS25UQsbmezhdc=
+X-Google-Smtp-Source: AGHT+IEzYCyVg0n08ARqutqBP3VrdhRVOZlrvtE48PAkMGLxogk6wmuaeci376uhZ1eQnDEnARYnRMO88MOEkQwlRcvWyLeU9V28
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:GR+U7oNcooRx02NQ+ePVePaP8XU668iNhisc08U9+9BaNkxGndT
- ifm4bBy086QhHHMDrwj2FKqrc9kTkDBAl0YA5Sbq9GlAu3oHD5tvVHQN97Dzr7Asxs1ATVC
- +X8UyGf8bb8rS27CyMUIzTJTa59yKH/O99qCbKdOZTlB6ORrqh9sGVFig7UcNICBawmgl+l
- X3O5EqjU2q5WN8vEBaqag==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:us4J4tAxtOE=;dkxNfRtOIWovCVWfT5CsAqe4xAC
- j/vEtWFMuf0VaSDW7FqfdDV9WKHcGZ68c0pehi9mPt2Vd/Bat3rI+lcbqNKPvGVDljcI+BTQN
- 89k1q3bUkCtEsOj5hRC1V1kaAVVhaudVxEm1RHt3e2NtepesShPp02K7s3M3zp1hOxaePqqPO
- TEJgBwNj8cisc2oucEoAZ4h0L0uWOUAU4EmXIHRy1i6LrsjHpALvb8/abtZ4QB9xU7qQec4TD
- H2l5PabOv5va6EId0BndMKfRxWG3fRa6wNDIjnuTry9SJ208SvMUKMzTrMLVqlrR8/AKIh03o
- ZHxlw4subb9BQ87+qwvx0IB3NDsImsjQjCvcZ0Ur1uZyBVAvr4/A5bWPsZtlLHmQsua9hNBM4
- cSgP0G2HJVJODp5bd9aUKoFiu2Xb/Nf5Ag6NzLJxr8kwupL/cQsoF3JCPeBfwJi//cit8FzWN
- +QI+RUfMBJK7urA758Efx2L02dbaFwjDTGlhHb2cpYp3a+olOwZZ8JyLSEGPW8Dc8JwSabnyo
- VBi8XRegXl7xpTi8KIqDCfqvrwR/Sl4BpCoccO9Qg0fBpaWuKDxwiz7y2jIUGfQ2q8Rp+oUBV
- ipTwLAF2YKYamBf53IB18NO68j42Aib2rH9pHOsAklr3Ew0k5NSoWxnyrdyFdHZ4rYBlDQkx/
- eSI3laW0WCpO8bfjNHP5EvwgImnMoB/MYLTFKCUt1GG7AZjpMJ3iG1tSsAa9sySy0npMgVA14
- 3b+VadvYCr0qEoRquGiZFPKzmfX1url/q7G2Q+LhexpS6i06zfU7bE3AJoEKRXB29p4lqOMpj
- NONu5ea+kwJTiSxIpGJrcpZXNEQYFOxix829XAf6AaTr4hkooWz9ZkHEhU+IGRyWsGNwmznCX
- dzQ6PFhtEzc6T6yUw7L/jRPX1Du6sZoh9ZIEfQwjSNQj9537kUXNlHlGCkBFj/P71jhLS2Eao
- KHqnJZIHdZ1fhGEho1kufqJp8E25v8Us603GzOs7cQqad0NXES20roi5WYfaXbkeAMMDw173Z
- i5YBwkKuUAr48fFIPkbv3MSxuo0isHXiK6zqms3
+X-Received: by 2002:a05:6e02:1aad:b0:3a7:cf75:30b4 with SMTP id
+ e9e14a558f8ab-3a80761d9a4mr85129845ab.10.1733492842016; Fri, 06 Dec 2024
+ 05:47:22 -0800 (PST)
+Date: Fri, 06 Dec 2024 05:47:21 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67530069.050a0220.2477f.0003.GAE@google.com>
+Subject: [syzbot] [bpf?] general protection fault in bpf_prog_array_delete_safe
+From: syzbot <syzbot+2e0d2840414ce817aaac@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 4 Dec 2024 19:06:30 +0100
-Thierry Reding <thierry.reding@gmail.com> wrote:
+Hello,
 
-> On Wed, Dec 04, 2024 at 11:53:17AM -0500, Parker Newman wrote:
-> > On Wed, 4 Dec 2024 17:23:53 +0100
-> > Thierry Reding <thierry.reding@gmail.com> wrote:
-> >
-> > > On Tue, Nov 19, 2024 at 02:47:29PM -0500, Parker Newman wrote:
-> > > > On Tue, 19 Nov 2024 20:18:00 +0100
-> > > > Andrew Lunn <andrew@lunn.ch> wrote:
-> > > >
-> > > > > > I think there is some confusion here. I will try to summarize:
-> > > > > > - Ihe iommu is supported by the Tegra SOC.
-> > > > > > - The way the mgbe driver is written the iommu DT property is =
-REQUIRED.
-> > > > >
-> > > > > If it is required, please also include a patch to
-> > > > > nvidia,tegra234-mgbe.yaml and make iommus required.
-> > > > >
-> > > >
-> > > > I will add this when I submit a v2 of the patch.
-> > > >
-> > > > > > - "iommus" is a SOC DT property and is defined in tegra234.dts=
-i.
-> > > > > > - The mgbe device tree nodes in tegra234.dtsi DO have the iomm=
-us property.
-> > > > > > - There are no device tree changes required to to make this pa=
-tch work.
-> > > > > > - This patch works fine with existing device trees.
-> > > > > >
-> > > > > > I will add the fallback however in case there is changes made =
-to the iommu
-> > > > > > subsystem in the future.
-> > > > >
-> > > > > I would suggest you make iommus a required property and run the =
-tests
-> > > > > over the existing .dts files.
-> > > > >
-> > > > > I looked at the history of tegra234.dtsi. The ethernet nodes wer=
-e
-> > > > > added in:
-> > > > >
-> > > > > 610cdf3186bc604961bf04851e300deefd318038
-> > > > > Author: Thierry Reding <treding@nvidia.com>
-> > > > > Date:   Thu Jul 7 09:48:15 2022 +0200
-> > > > >
-> > > > >     arm64: tegra: Add MGBE nodes on Tegra234
-> > > > >
-> > > > > and the iommus property is present. So the requires is safe.
-> > > > >
-> > > > > Please expand the commit message. It is clear from all the quest=
-ions
-> > > > > and backwards and forwards, it does not provide enough details.
-> > > > >
-> > > >
-> > > > I will add more details when I submit V2.
-> > > >
-> > > > > I just have one open issue. The code has been like this for over=
- 2
-> > > > > years. Why has it only now started crashing?
-> > > > >
-> > > >
-> > > > It is rare for Nvidia Jetson users to use the mainline kernel. Nvi=
-dia
-> > > > provides a custom kernel package with many out of tree drivers inc=
-luding a
-> > > > driver for the mgbe controllers.
-> > > >
-> > > > Also, while the Orin AGX SOC (tegra234) has 4 instances of the mgb=
-e controller,
-> > > > the Nvidia Orin AGX devkit only uses mgbe0. Connect Tech has carri=
-er boards
-> > > > that use 2 or more of the mgbe controllers which is why we found t=
-he bug.
-> > >
-> > > Correct. Also, this was a really stupid thing that I overlooked. I d=
-on't
-> > > recall the exact circumstances, but I vaguely recall there had been
-> > > discussions about adding the tegra_dev_iommu_get_stream_id() helper
-> > > (that this patch uses) around the time that this driver was created.=
- In
-> > > the midst of all of this I likely forgot to update the driver after =
-the
-> > > discussions had settled.
-> > >
-> > > Anyway, I agree with the conclusion that we don't need a compatibili=
-ty
-> > > fallback for this, both because it would be actively wrong to do it =
-and
-> > > we've had the required IOMMU properties in device tree since the sta=
-rt,
-> > > so there can't be any regressions caused by this.
-> > >
-> > > I don't think it's necessary to make the iommus property required,
-> > > though, because there's technically no requirement for these devices=
- to
-> > > be attached to an IOMMU. They usually are, and it's better if they a=
-re,
-> > > but they should be able to work correctly without an IOMMU.
-> > >
-> > Thanks for confirming from the Nvidia side! I wasn't sure if they woul=
-d
-> > work without the iommu. That said, if you did NOT want to use the iomm=
-u
-> > and removed the iommu DT property then the probe will fail after my pa=
-tch.
-> > Would we not need a guard around the writes to MGBE_WRAP_AXI_ASID0_CTR=
-L as well?
->
-> Well... frankly, I don't know. There's an override in the memory
-> controller which we set when a device is attached to an IOMMU. That's
-> usually how the stream ID is programmed. If we don't do that it will
-> typically default to a special passthrough stream ID (technically the
-> firmware can lock down those register and force them to a specific
-> stream ID all the time). I'm not sure what exactly the impact is of
-> these ASID registers (there's a few other instances where those are
-> needed). They are required if you want to use the IOMMU, but I don't
-> know what their meaning is if the IOMMU is not enabled.
->
-> There's also different cases: the IOMMU can be disabled altogether, in
-> which case no page tables and such exist for any device and no
-> translation should happen whatsoever. But there's also the case where an
-> IOMMU is enabled, but certain devices shouldn't attach to them. I should
-> make it very clear that both of these are not recommended setups and I
-> don't know if they'll work. And they are mostly untested. I've been
-> meaning, but haven't found the time, to test some of these cases.
->
+syzbot found the following issue on:
 
-Yes I agree, all of those situations are very niche and not recommended fo=
-r
-a Tegra platform that should always have the iommu enabled anyways. Adding=
- an
-iommu bypass would probably be outside of the scope of this patch.
+HEAD commit:    e2cf913314b9 Merge branch 'fixes-for-stack-with-allow_ptr_..
+git tree:       bpf
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=13b5ede8580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fb680913ee293bcc
+dashboard link: https://syzkaller.appspot.com/bug?extid=2e0d2840414ce817aaac
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=132a2020580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1291d0f8580000
 
-I will not add a patch marking the iommu as required in the device tree
-bindings when I submit v2 unless anyone else feels different.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/487d8ef2aead/disk-e2cf9133.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/899f2234c9d5/vmlinux-e2cf9133.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ea8993a0dfd6/bzImage-e2cf9133.xz
 
-Thanks again,
-Parker
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2e0d2840414ce817aaac@syzkaller.appspotmail.com
+
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
+CPU: 0 UID: 0 PID: 5849 Comm: syz-executor326 Not tainted 6.12.0-syzkaller-09099-ge2cf913314b9 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:bpf_prog_array_delete_safe+0x2d/0xc0 kernel/bpf/core.c:2583
+Code: 00 41 57 41 56 41 55 41 54 53 49 89 f7 49 89 fd 49 bc 00 00 00 00 00 fc ff df e8 ce 84 f0 ff 4d 8d 75 10 4c 89 f0 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 f7 e8 54 6b 5b 00 49 8b 1e 48 85 db 74
+RSP: 0018:ffffc90003807970 EFLAGS: 00010202
+RAX: 0000000000000002 RBX: 1ffff92000700f38 RCX: ffff888034eb8000
+RDX: 0000000000000000 RSI: ffffc90000abe000 RDI: 0000000000000000
+RBP: ffffc90003807a48 R08: ffffffff81a1aa9e R09: 1ffffffff203c816
+R10: dffffc0000000000 R11: fffffbfff203c817 R12: dffffc0000000000
+R13: 0000000000000000 R14: 0000000000000010 R15: ffffc90000abe000
+FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000000e738000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ perf_event_detach_bpf_prog+0x2b0/0x330 kernel/trace/bpf_trace.c:2255
+ perf_event_free_bpf_prog kernel/events/core.c:10801 [inline]
+ _free_event+0xb04/0xf60 kernel/events/core.c:5352
+ put_event kernel/events/core.c:5454 [inline]
+ perf_event_release_kernel+0x7c1/0x850 kernel/events/core.c:5579
+ perf_release+0x38/0x40 kernel/events/core.c:5589
+ __fput+0x23c/0xa50 fs/file_table.c:450
+ task_work_run+0x24f/0x310 kernel/task_work.c:239
+ exit_task_work include/linux/task_work.h:43 [inline]
+ do_exit+0xa2f/0x28e0 kernel/exit.c:938
+ do_group_exit+0x207/0x2c0 kernel/exit.c:1087
+ __do_sys_exit_group kernel/exit.c:1098 [inline]
+ __se_sys_exit_group kernel/exit.c:1096 [inline]
+ __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1096
+ x64_sys_call+0x26a8/0x26b0 arch/x86/include/generated/asm/syscalls_64.h:232
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f9408276e09
+Code: Unable to access opcode bytes at 0x7f9408276ddf.
+RSP: 002b:00007fffe6c98ad8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f9408276e09
+RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
+RBP: 00007f94082f22b0 R08: ffffffffffffffb8 R09: 0000000000000006
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f94082f22b0
+R13: 0000000000000000 R14: 00007f94082f2d00 R15: 00007f9408248040
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:bpf_prog_array_delete_safe+0x2d/0xc0 kernel/bpf/core.c:2583
+Code: 00 41 57 41 56 41 55 41 54 53 49 89 f7 49 89 fd 49 bc 00 00 00 00 00 fc ff df e8 ce 84 f0 ff 4d 8d 75 10 4c 89 f0 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 f7 e8 54 6b 5b 00 49 8b 1e 48 85 db 74
+RSP: 0018:ffffc90003807970 EFLAGS: 00010202
+RAX: 0000000000000002 RBX: 1ffff92000700f38 RCX: ffff888034eb8000
+RDX: 0000000000000000 RSI: ffffc90000abe000 RDI: 0000000000000000
+RBP: ffffc90003807a48 R08: ffffffff81a1aa9e R09: 1ffffffff203c816
+R10: dffffc0000000000 R11: fffffbfff203c817 R12: dffffc0000000000
+R13: 0000000000000000 R14: 0000000000000010 R15: ffffc90000abe000
+FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000007f382000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	00 41 57             	add    %al,0x57(%rcx)
+   3:	41 56                	push   %r14
+   5:	41 55                	push   %r13
+   7:	41 54                	push   %r12
+   9:	53                   	push   %rbx
+   a:	49 89 f7             	mov    %rsi,%r15
+   d:	49 89 fd             	mov    %rdi,%r13
+  10:	49 bc 00 00 00 00 00 	movabs $0xdffffc0000000000,%r12
+  17:	fc ff df
+  1a:	e8 ce 84 f0 ff       	call   0xfff084ed
+  1f:	4d 8d 75 10          	lea    0x10(%r13),%r14
+  23:	4c 89 f0             	mov    %r14,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1) <-- trapping instruction
+  2f:	74 08                	je     0x39
+  31:	4c 89 f7             	mov    %r14,%rdi
+  34:	e8 54 6b 5b 00       	call   0x5b6b8d
+  39:	49 8b 1e             	mov    (%r14),%rbx
+  3c:	48 85 db             	test   %rbx,%rbx
+  3f:	74                   	.byte 0x74
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
