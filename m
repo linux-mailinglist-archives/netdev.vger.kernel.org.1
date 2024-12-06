@@ -1,120 +1,124 @@
-Return-Path: <netdev+bounces-149610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D31329E6732
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 07:13:27 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73B4C9E6740
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 07:17:23 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 276232838A8
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 06:13:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34A3B1882D0F
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 06:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89FFA1D90A9;
-	Fri,  6 Dec 2024 06:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06506198A39;
+	Fri,  6 Dec 2024 06:17:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from stargate.chelsio.com (stargate.chelsio.com [12.32.117.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03751D8DE8
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 06:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC151BC099
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 06:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=12.32.117.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733465603; cv=none; b=kQYnches8uSu0Iybmq1q2CmxpeQw9PKopmxj0f51tDSHWAkY++2+l95UfUlVa2Y4KnRidQpajzPvUUYfF0+Iw/8wcSzFCTcT2JAHAS4MNHISzKiMwt1RghFdn84wlANxL/8a26uO08CF8mesCOZzZkSQIRGTTRIOQFdGpBVtUcg=
+	t=1733465839; cv=none; b=XgCObhi8JKgzPwsa6+24X6nan98+oycFO3b02UgsqXjZJ3f/k8XD4IunYEDLAlpxafIpe66IBizrT+7ldcO8CIHOvVt5pIACpd2WWcCI7s0Yf+X55ssM59A+cRIGJS2+5XXlE1GtdSnkIjtOey420NITdR25ZswPAZ4CCTj/Y/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733465603; c=relaxed/simple;
-	bh=fhnoOtvLjyYbgDKK1hKbkCmQdtfhsc5b6UTarguiEqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DoIF0vsnx1JrWw/aENfvziT+/MNYpKQBlG+DazeNgOi/dGCT4bxC8kIYYrTaW3gc+0+4M9mj/JgcZjSux5DvzQvCA1TSsO908aOCQ56KrQM0MAxEIPWTAlNH1Fjj6jutQosQSJMhr6cvH00pDfSnNWU1jKP2ijzWAQFkiWr8pAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tJRaR-0005UF-LC; Fri, 06 Dec 2024 07:13:11 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tJRaO-001wrV-1O;
-	Fri, 06 Dec 2024 07:13:09 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tJRaP-000huU-0I;
-	Fri, 06 Dec 2024 07:13:09 +0100
-Date: Fri, 6 Dec 2024 07:13:09 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Conor Dooley <conor@kernel.org>
-Cc: Woojung Huh <woojung.huh@microchip.com>, Rob Herring <robh@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, kernel@pengutronix.de,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v1 2/5] dt-bindings: vendor-prefixes: Add prefix for Priva
-Message-ID: <Z1KV9bCW0iafJ2hF@pengutronix.de>
-References: <20241205125640.1253996-1-o.rempel@pengutronix.de>
- <20241205125640.1253996-3-o.rempel@pengutronix.de>
- <20241205-hamstring-mantis-b8b3a25210ef@spud>
+	s=arc-20240116; t=1733465839; c=relaxed/simple;
+	bh=vKYnLuGaP6QXplG0hU3LphRgrn3bsAizmPXiGTL2CKU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=b4G56qazxAdMek9QlFgDMeqJWmKZ+OwyHnovKcHADkA76zaF0rzknSKWcAFlV3z0JLqNLWlpfe+QC2KwWCWAnbjERjq5zqrjoajq/a/TfEZ4YZr/8acEJC+uwbOmXJvcNaiSlsmWXRk3mXJ8iRju4YbTUegBdOo986cbj1DapYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chelsio.com; spf=pass smtp.mailfrom=chelsio.com; arc=none smtp.client-ip=12.32.117.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chelsio.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chelsio.com
+Received: from beagle5.blr.asicdesigners.com (beagle5.blr.asicdesigners.com [10.193.80.119])
+	by stargate.chelsio.com (8.14.7/8.14.7) with ESMTP id 4B66H5oT023511;
+	Thu, 5 Dec 2024 22:17:06 -0800
+From: Anumula Murali Mohan Reddy <anumula@chelsio.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, andrew+netdev@lunn.ch,
+        pabeni@redhat.com, bharat@chelsio.com,
+        Anumula Murali Mohan Reddy <anumula@chelsio.com>
+Subject: [PATCH net v2] cxgb4: use port number to set mac addr
+Date: Fri,  6 Dec 2024 11:50:14 +0530
+Message-Id: <20241206062014.49414-1-anumula@chelsio.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241205-hamstring-mantis-b8b3a25210ef@spud>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 05, 2024 at 05:16:14PM +0000, Conor Dooley wrote:
-> On Thu, Dec 05, 2024 at 01:56:37PM +0100, Oleksij Rempel wrote:
-> > Introduce the 'pri' vendor prefix for Priva, a company specializing in
-> > sustainable solutions for building automation, energy, and climate
-> > control.  More information about Priva can be found at
-> > https://www.priva.com
-> > 
-> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> > ---
-> >  Documentation/devicetree/bindings/vendor-prefixes.yaml | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-> > index da01616802c7..9a9ac3adc5ef 100644
-> > --- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
-> > +++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-> > @@ -1198,6 +1198,8 @@ patternProperties:
-> >      description: Primux Trading, S.L.
-> >    "^probox2,.*":
-> >      description: PROBOX2 (by W2COMP Co., Ltd.)
-> > +  "^pri,.*":
-> > +    description: Priva
-> 
-> Why not "priva"? Saving two chars doesn't seem worth less info.
+t4_set_vf_mac_acl() uses pf to set mac addr, but t4vf_get_vf_mac_acl()
+uses port number to get mac addr, this leads to error when an attempt
+to set MAC address on VF's of PF2 and PF3.
+This patch fixes the issue by using port number to set mac address.
 
-This is typical prefix which is used by this vendor, if it is possible
-i would prefer not to change it. But, last decision is on your side :)
+Fixes: e0cdac65ba26 ("cxgb4vf: configure ports accessible by the VF")
+Signed-off-by: Anumula Murali Mohan Reddy <anumula@chelsio.com>
+Signed-off-by: Potnuri Bharat Teja <bharat@chelsio.com>
+---
+Changes since v1:
+Addressed previous review comments
+---
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4.h      | 2 +-
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c | 2 +-
+ drivers/net/ethernet/chelsio/cxgb4/t4_hw.c      | 5 +++--
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-Regards,
-Oleksij
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
+index 75bd69ff61a8..c7c2c15a1815 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
+@@ -2076,7 +2076,7 @@ void t4_idma_monitor(struct adapter *adapter,
+ 		     struct sge_idma_monitor_state *idma,
+ 		     int hz, int ticks);
+ int t4_set_vf_mac_acl(struct adapter *adapter, unsigned int vf,
+-		      unsigned int naddr, u8 *addr);
++		      u8 start, unsigned int naddr, u8 *addr);
+ void t4_tp_pio_read(struct adapter *adap, u32 *buff, u32 nregs,
+ 		    u32 start_index, bool sleep_ok);
+ void t4_tp_tm_pio_read(struct adapter *adap, u32 *buff, u32 nregs,
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+index 97a261d5357e..bc3af0054406 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+@@ -3234,7 +3234,7 @@ static int cxgb4_mgmt_set_vf_mac(struct net_device *dev, int vf, u8 *mac)
+ 
+ 	dev_info(pi->adapter->pdev_dev,
+ 		 "Setting MAC %pM on VF %d\n", mac, vf);
+-	ret = t4_set_vf_mac_acl(adap, vf + 1, 1, mac);
++	ret = t4_set_vf_mac_acl(adap, vf + 1, pi->lport, 1, mac);
+ 	if (!ret)
+ 		ether_addr_copy(adap->vfinfo[vf].vf_mac_addr, mac);
+ 	return ret;
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c b/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
+index 76de55306c4d..175bf9b13058 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
+@@ -10215,11 +10215,12 @@ int t4_load_cfg(struct adapter *adap, const u8 *cfg_data, unsigned int size)
+  *	t4_set_vf_mac_acl - Set MAC address for the specified VF
+  *	@adapter: The adapter
+  *	@vf: one of the VFs instantiated by the specified PF
++ *	@start: The start port id associated with specified VF
+  *	@naddr: the number of MAC addresses
+  *	@addr: the MAC address(es) to be set to the specified VF
+  */
+ int t4_set_vf_mac_acl(struct adapter *adapter, unsigned int vf,
+-		      unsigned int naddr, u8 *addr)
++		      u8 start, unsigned int naddr, u8 *addr)
+ {
+ 	struct fw_acl_mac_cmd cmd;
+ 
+@@ -10234,7 +10235,7 @@ int t4_set_vf_mac_acl(struct adapter *adapter, unsigned int vf,
+ 	cmd.en_to_len16 = cpu_to_be32((unsigned int)FW_LEN16(cmd));
+ 	cmd.nmac = naddr;
+ 
+-	switch (adapter->pf) {
++	switch (start) {
+ 	case 3:
+ 		memcpy(cmd.macaddr3, addr, sizeof(cmd.macaddr3));
+ 		break;
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.39.3
+
 
