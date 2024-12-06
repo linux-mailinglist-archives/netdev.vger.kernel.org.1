@@ -1,153 +1,154 @@
-Return-Path: <netdev+bounces-149574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2FE99E646B
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:50:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 982229E646F
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:50:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71B5028497C
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:50:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54D8D28482F
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0157D4C9A;
-	Fri,  6 Dec 2024 02:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9283E1741D2;
+	Fri,  6 Dec 2024 02:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTGX1qJR"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Mk/fzamn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731E0188CC6;
-	Fri,  6 Dec 2024 02:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECC913C677;
+	Fri,  6 Dec 2024 02:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733453399; cv=none; b=lYQdbFhwydvo1ob231RqQWMY+oIfGaGh7XOY3gDZEhuAPrxcl1r/ERwNjJlZdNDxQJbvRtubf/c96Q5n0DvYnKpLILfqbpidiyDJ0Vt2n0SM1z2sMTPR70FkUCDzzaVlt+hn4VKZ8Q38bggrnibfOm8BaKdnyRtEHYVslaUGtig=
+	t=1733453425; cv=none; b=LQfe0rpviiDCQHMuIG3cjs5ES7sjxuncw1ZVwXQlfD28mjeMAjm3A+R7VK6RvSoxYr14cwJzdV2yI2Y1fRUKJa9WgzOjTmgHx5m4kN677Y78x1Z9kIYmoC84JFHYVf8fmiFwcY1gUWBnAR36j+4u+ctZWEupARlkUSjX9w+kQ+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733453399; c=relaxed/simple;
-	bh=d1mlV6zQCgCyxHwYY1PXH9w0PynEoomgfBQSdBZwFno=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=npBztaiQRh1jJY45w6sFt3ZoEci3yefqsX7kFq5sQm9uLsbPWIR5QaxoEee+Ky0aUArJmexmdueFJxSuw1b5DCpxKvHlwj2k8cXzFBIY62r4GZRJvDDps654XRMWeQIdFmM+8CuKvE/Gm5RBxoy1f8V3wZETL1mfz8PeNqKmzrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VTGX1qJR; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2eed82ca5b4so1387199a91.2;
-        Thu, 05 Dec 2024 18:49:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733453398; x=1734058198; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jFcBusQAgop/cJ9zHlAC34d6C2cvFm40FRSAV1uCAPY=;
-        b=VTGX1qJRPX47AXTqVOGDViuamU6neySro3ttK0RvwANwuBekx0sV9IJVZKhBujs1D2
-         A02KifHA4ZTl9SAxms6bb7nOlkfGWMiZKIyIZ0oY0dhJKXBwvqnVrZwoIEz3G9Daq9Yo
-         HS6XjgVAwwcvrzlZW0/wXWP/lsfo1TWAanHFaDevBbkauarkReLbcVUH6oTCH2sb1tlg
-         xuZ5m8Ay/+ygVWM1UNaIsYNW3hJKKXMnoUD5ffjBH1UX5HVz7FbFTREk7zoOzC31rsmv
-         FExfgaA+y2Bspq5GLWEKOr8qfia9j7Xq9q2FvisUwQgwnV7V2z2uSpXaXxqcysIJvdbV
-         u1RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733453398; x=1734058198;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jFcBusQAgop/cJ9zHlAC34d6C2cvFm40FRSAV1uCAPY=;
-        b=t3DrjkhbOD7SsX8qKkMtRfGnB0GAWkTPb/eZEcWETW22LAIN51BoM5n9kL8mHtfjVZ
-         rxd8FlnhrBmEUv0Dg3V7KsYQgcPxFnRAIrRnxTucOSwIOZlyxU3wuAxnsqRrLNsO2hOD
-         exIsXpei/4Zpe883Mtp5+m8mI7R1S9Br8NVE7tFDQ+Gm5DGkjVK0oe1Pg1h/xsrryXx9
-         v24SpOZ7MSFuXKv0eW14DR3zeP++ayLyXCE9wfD+EUNIqvCvbducSOiQIcwRi1t5J4ck
-         GuPVwdvHm7tfEVcNJXYXxEx+DyvD4SgHrviI5RnJYFR1DDYu0wEFh3Tmja0+y8c276jL
-         DEbw==
-X-Forwarded-Encrypted: i=1; AJvYcCUaogRd3o0u9Sor3tkqBuoGphl+4+yIjBICD76HC3L5HMncnLSH0pdnkI8CuuVKWe0FbADUnEg6@vger.kernel.org, AJvYcCVUdMNA26MOVK9+nWnHSC31kl8bZQm+1FQAL0VEDmwtEadaDrlwVK41UikDm3F0vq09EjTmyxs6UqjjZ2s=@vger.kernel.org, AJvYcCWyegYLFTjEymg7XSM90ekuPk0APsH2QUqya8U1YjgQ4n9YgzWTqqJNCRWD6fijYPumub55RNZO@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFSciM7823odQzr9D71VF88jiI7FqzV42N6MwobwLDhbknHj4A
-	Ol/a6sUBP6r576h/bwACE9oBXoWNdSHmjXPYQhZT31Y99pW4Ek35dfbhFjbeW83875q9F/dzr/w
-	W1uakrqzYHCJj2ddRzZI1l7ydzzs=
-X-Gm-Gg: ASbGncsZTkwPIfDDbILlT85nI+T96OOq8hLTPxTWCd5oiYVCCRpEKgiBs+QU43teBTs
-	GYnpVKYoKsFInpo79AHBuNcrG63vpGQ==
-X-Google-Smtp-Source: AGHT+IEA11huRP+Trp19deRlrQWYZoOM5ceG9+1zVCv7r7Tsw6HHVVGPX/+z5mIMkkizPeSriAQ8V5bZRdiioL1KesA=
-X-Received: by 2002:a17:90b:33c4:b0:2ee:863e:9fff with SMTP id
- 98e67ed59e1d1-2ef69e15339mr2443280a91.10.1733453397711; Thu, 05 Dec 2024
- 18:49:57 -0800 (PST)
+	s=arc-20240116; t=1733453425; c=relaxed/simple;
+	bh=Ndn2jxtEqosWyoI28JUucb4KFXtu4aIp4wE7cHQ5Apo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Al0UB/6s+9Y2D3uSceZ636FYRAWt713p07LGzQWcPvo93O2RpQMEAXw/bxNMDmZer1BlGTlDsZobMnsNfKsxjg20hB41YeGA10py4txugI3ZK501RWbddJi4lc5TzFSIFkzmsBPXaVOm8Qbr7V9Sm7PjLgrROA4LXgxEoeqizRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Mk/fzamn; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5HaO3R005965;
+	Fri, 6 Dec 2024 02:50:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	Zcm4DqSYOflesfW7kwRW3Z1Ht0YyrkJRhNXH8J1FOEw=; b=Mk/fzamnUDHwWH1T
+	k8WrikGVvbEH9PTQqBTG4xU/Uy9ziSDiJRxuW8O4hydVL4iBal4XxvgkLL+EUUwH
+	TAJESiZAnW6EL+9nAflA/6VjYL3qL/RlSSn2kLmor+O+XKbgDFypZoIIUG30mNyb
+	5whicFXkQ2kRL/Dl9FvMZD7BScfUsFz4P10uvg/tq/GdDzmseD38umX64i5JGPWX
+	akKtXcqgDmkdpX3SeoIlmlmZhA/zmqPuTDneqKYc4HNTf0jHMCYqDxRCL/NT9xaU
+	0kKtasdZa9pHnD/zeDohaPLFuVGhGhgCHMxtPURulH9l32r/xdsBv6BxCkQ4dIKi
+	4KB9wg==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43ayemby3m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Dec 2024 02:50:20 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B62oJSW022937
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 6 Dec 2024 02:50:19 GMT
+Received: from [10.253.33.254] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 5 Dec 2024
+ 18:50:16 -0800
+Message-ID: <4ebf9f1d-74a9-451b-91a5-fe38a0d48e24@quicinc.com>
+Date: Fri, 6 Dec 2024 10:50:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241113-tcp-md5-diag-prep-v2-0-00a2a7feb1fa@gmail.com>
- <20241204171351.52b8bb36@kernel.org> <CANn89iL5_2iW5U_8H43g7vXi0Ky=fkwadvTtmT3fvBdbaJ1BAw@mail.gmail.com>
-In-Reply-To: <CANn89iL5_2iW5U_8H43g7vXi0Ky=fkwadvTtmT3fvBdbaJ1BAw@mail.gmail.com>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Fri, 6 Dec 2024 02:49:46 +0000
-Message-ID: <CAJwJo6amrAt+uBMWRvwBu=VdcTyDuEMtkAx0=_ittUj0KCa-zw@mail.gmail.com>
-Subject: Re: [PATCH net v2 0/5] Make TCP-MD5-diag slightly less broken
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
-	Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, Ivan Delalande <colona@arista.com>, 
-	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Boris Pismenny <borisp@nvidia.com>, 
-	John Fastabend <john.fastabend@gmail.com>, Davide Caratti <dcaratti@redhat.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mptcp@lists.linux.dev, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 0/2] Enable ethernet for qcs8300
+To: Tingwei Zhang <quic_tingweiz@quicinc.com>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>
+CC: <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@oss.qualcomm.com>
+References: <20241206-dts_qcs8300-v5-0-422e4fda292d@quicinc.com>
+ <87c9ebb9-36b2-4891-8800-2896d6d9bbfc@quicinc.com>
+Content-Language: en-US
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+In-Reply-To: <87c9ebb9-36b2-4891-8800-2896d6d9bbfc@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 6IGmeDmEgFV6xmkInLCHROVJh7DiU6zI
+X-Proofpoint-ORIG-GUID: 6IGmeDmEgFV6xmkInLCHROVJh7DiU6zI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 mlxlogscore=514 phishscore=0 malwarescore=0 mlxscore=0
+ adultscore=0 lowpriorityscore=0 bulkscore=0 suspectscore=0 spamscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412060019
 
-Hi Jakub, Eric,
 
-On Thu, 5 Dec 2024 at 09:09, Eric Dumazet <edumazet@google.com> wrote:
-> On Thu, Dec 5, 2024 at 2:13=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
-> >
-> > Hi Eric!
-> >
-> > This was posted while you were away -- any thoughts or recommendation o=
-n
-> > how to address the required nl message size changing? Or other problems
-> > pointed out by Dmitry? My suggestion in the subthread is to re-dump
-> > with a fixed, large buffer on EMSGSIZE, but that's not super clean..
->
-> Hi Jakub
->
-> inet_diag_dump_one_icsk() could retry, doubling the size until the
-> ~32768 byte limit is reached ?
->
-> Also, we could make sure inet_sk_attr_size() returns at least
-> NLMSG_DEFAULT_SIZE, there is no
-> point trying to save memory for a single skb in inet_diag_dump_one_icsk()=
-.
 
-Starting from NLMSG_DEFAULT_SIZE sounds like a really sane idea! :-)
+On 2024-12-06 10:37, Tingwei Zhang wrote:
+> On 12/6/2024 9:35 AM, Yijie Yang wrote:
+>> Add dts nodes to enable ethernet interface on qcs8300-ride.
+>> The EMAC, SerDes and EPHY version are the same as those in sa8775p.
+>>
+>> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+>> ---
+>> This patch series depends on below patch series:
+>> https://lore.kernel.org/all/20240925-qcs8300_initial_dtsi- 
+>> v2-0-494c40fa2a42@quicinc.com/ - Reviewed
+> 
+> Above series was already applied. I would say there's no dependency to 
+> block this series to be applied now. No need to respin for this but 
+> update the dependency status if a new version is required.
+> 
 
-[..]
-> @@ -585,8 +589,14 @@ int inet_diag_dump_one_icsk(struct inet_hashinfo *ha=
-shinfo,
->
->         err =3D sk_diag_fill(sk, rep, cb, req, 0, net_admin);
->         if (err < 0) {
-> -               WARN_ON(err =3D=3D -EMSGSIZE);
->                 nlmsg_free(rep);
-> +               if (err =3D=3D -EMSGSIZE) {
-> +                       attr_size <<=3D 1;
-> +                       if (attr_size + NLMSG_HDRLEN <=3D
-> SKB_WITH_OVERHEAD(32768)) {
-> +                               cond_resched();
-> +                               goto retry;
-> +                       }
-> +               }
->                 goto out;
->         }
->         err =3D nlmsg_unicast(net->diag_nlsk, rep, NETLINK_CB(in_skb).por=
-tid);
+I will take care of it next time.
 
-To my personal taste on larger than 327 md5 keys scale, I'd prefer to
-see "dump may be inconsistent, retry if you need consistency" than
--EMSGSIZE fail, yet userspace potentially may use the errno as a
-"retry" signal.
+>> https://lore.kernel.org/all/20241010-schema- 
+>> v1-0-98b2d0a2f7a2@quicinc.com/ - Applied
+>>
+>> Changes in v5:
+>> - Pad the register with zero for both 'ethernet0' and 'serdes0'.
+>> - Change PHY name from 'sgmii_phy0' to 'phy0'.
+>> - Link to v4: https://lore.kernel.org/r/20241123-dts_qcs8300-v4-0- 
+>> b10b8ac634a9@quicinc.com
+>>
+>> ---
+>> Yijie Yang (2):
+>>        arm64: dts: qcom: qcs8300: add the first 2.5G ethernet
+>>        arm64: dts: qcom: qcs8300-ride: enable ethernet0
+>>
+>>   arch/arm64/boot/dts/qcom/qcs8300-ride.dts | 112 ++++++++++++++++++++ 
+>> ++++++++++
+>>   arch/arm64/boot/dts/qcom/qcs8300.dtsi     |  43 ++++++++++++
+>>   2 files changed, 155 insertions(+)
+>> ---
+>> base-commit: c83f0b825741bcb9d8a7be67c63f6b9045d30f5a
+>> change-id: 20241111-dts_qcs8300-f8383ef0f5ef
+>>
+>> Best regards,
+> 
+> 
 
-Do you plan to re-send it as a proper patch? Or I can send it with my
-next patches for TCP-MD5-diag issues (1), (3), (4) and TCP-AO-diag.
+-- 
+Best Regards,
+Yijie
 
-Thanks,
-             Dmitry
 
