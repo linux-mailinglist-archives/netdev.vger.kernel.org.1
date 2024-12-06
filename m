@@ -1,137 +1,153 @@
-Return-Path: <netdev+bounces-149573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B5599E645F
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:43:07 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E15F61881DF8
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:43:06 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C360190063;
-	Fri,  6 Dec 2024 02:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V1QppQU/"
-X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2FE99E646B
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:50:11 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815CF18E373
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 02:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71B5028497C
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:50:10 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0157D4C9A;
+	Fri,  6 Dec 2024 02:50:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTGX1qJR"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731E0188CC6;
+	Fri,  6 Dec 2024 02:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733452964; cv=none; b=IcQiFIgMY3ieIEDzzRYAknl/EDcQUNCFOoMDRQCxI4j2S0O5tRN1Hn8a+lpMmUBAd9TzJyz0KCjZUaZpPpAZMrAsfR12GOWLSLT6Bs+s3/AJ+3Mm4aneDqno12AUcrR+YR+NK1cvd27GE9F0OcETOu0UnjdE0zY5WrNO6qh6wno=
+	t=1733453399; cv=none; b=lYQdbFhwydvo1ob231RqQWMY+oIfGaGh7XOY3gDZEhuAPrxcl1r/ERwNjJlZdNDxQJbvRtubf/c96Q5n0DvYnKpLILfqbpidiyDJ0Vt2n0SM1z2sMTPR70FkUCDzzaVlt+hn4VKZ8Q38bggrnibfOm8BaKdnyRtEHYVslaUGtig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733452964; c=relaxed/simple;
-	bh=VapI9BO8bDoxLf+txhz8n6Uf6jhZ1jCyATxFGisXxN4=;
+	s=arc-20240116; t=1733453399; c=relaxed/simple;
+	bh=d1mlV6zQCgCyxHwYY1PXH9w0PynEoomgfBQSdBZwFno=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BqOPQi8oMG/1280aQUDsS97kYx9FK4AVQxo06Oe7pR/40P1WYnVuI1jiiErL6LeBwnIq1VeK8NcImn2e+2z09eNQnA2CqKi7HWI/tht3w6WqYIE0i4W3yYkjtAZFj5oj2ZKoD+5ZVNRHa9Nh4NDPHEn+Dg5/cjJUE4h9CjlOgcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V1QppQU/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733452960;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VapI9BO8bDoxLf+txhz8n6Uf6jhZ1jCyATxFGisXxN4=;
-	b=V1QppQU/iKUDc5MYBPyTSCNsBmAI6XrkZZ/6qYAjbRM9r5piJKNLOMVF3S3yqFxw7pPBxv
-	K+P+7xL8Nto8zJnhPGCHBIkZLsNuJEuglfbCWXREjQ+U7sKquKG4Wihov8tzsFGa5aMQbO
-	k1NRm1ShqpzUA9qB2xkXP37qNI6z7w4=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-558-NQk-3ugBMjWM_SZUkoeigw-1; Thu, 05 Dec 2024 21:42:36 -0500
-X-MC-Unique: NQk-3ugBMjWM_SZUkoeigw-1
-X-Mimecast-MFC-AGG-ID: NQk-3ugBMjWM_SZUkoeigw
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2ee4b1a1057so2626713a91.1
-        for <netdev@vger.kernel.org>; Thu, 05 Dec 2024 18:42:36 -0800 (PST)
+	 To:Cc:Content-Type; b=npBztaiQRh1jJY45w6sFt3ZoEci3yefqsX7kFq5sQm9uLsbPWIR5QaxoEee+Ky0aUArJmexmdueFJxSuw1b5DCpxKvHlwj2k8cXzFBIY62r4GZRJvDDps654XRMWeQIdFmM+8CuKvE/Gm5RBxoy1f8V3wZETL1mfz8PeNqKmzrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VTGX1qJR; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2eed82ca5b4so1387199a91.2;
+        Thu, 05 Dec 2024 18:49:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733453398; x=1734058198; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jFcBusQAgop/cJ9zHlAC34d6C2cvFm40FRSAV1uCAPY=;
+        b=VTGX1qJRPX47AXTqVOGDViuamU6neySro3ttK0RvwANwuBekx0sV9IJVZKhBujs1D2
+         A02KifHA4ZTl9SAxms6bb7nOlkfGWMiZKIyIZ0oY0dhJKXBwvqnVrZwoIEz3G9Daq9Yo
+         HS6XjgVAwwcvrzlZW0/wXWP/lsfo1TWAanHFaDevBbkauarkReLbcVUH6oTCH2sb1tlg
+         xuZ5m8Ay/+ygVWM1UNaIsYNW3hJKKXMnoUD5ffjBH1UX5HVz7FbFTREk7zoOzC31rsmv
+         FExfgaA+y2Bspq5GLWEKOr8qfia9j7Xq9q2FvisUwQgwnV7V2z2uSpXaXxqcysIJvdbV
+         u1RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733452956; x=1734057756;
+        d=1e100.net; s=20230601; t=1733453398; x=1734058198;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VapI9BO8bDoxLf+txhz8n6Uf6jhZ1jCyATxFGisXxN4=;
-        b=h6C2Z6gIVcbqK0Y4n5cRX9l+HuxClsNksPV/dsCK5sAWICU5DKb19LPvNbv6FfnGSz
-         DDPpCJljzCwTrozZLudxiEREJu+fp8NygsEudfdJaXpT9hSRRzZyrN8d/Vq+cG8C8mrR
-         xKgVYCLX2NuMjmIRllJ0LodmXvbEe5aEyiT9P5rEUtOtP31ezL9bSfg7w0Ra7TSivL5L
-         8qO1esxiuSQ6zIHi4Lz6RZD5g+KiJ0eoGIch8xI3cFgYC9HTA+SkTiBDRXb+gYh4X5a2
-         Z8OHDE+0qTtvNN7mujUguw9eT5Va0yplqxaIYkcClX/k2Jom6UWY2rY8YRaEevm90cQ2
-         Fepw==
-X-Forwarded-Encrypted: i=1; AJvYcCXy2gp6wbnYjORaxRyLexR1+ggi+5Y3S41Hrowzzz1fUEtqAKbyba9NKtVzXFJONnWlKKuzBlo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIWwFiWatBzW/H5Q2/NEup3kUjKTZLIEvCYEEauBBf7Ya7/JNv
-	DkE5l02oYUh9ty+CVtGQb16j14gwaS+khVufApZbBz36GbtjTIEcbpv2YyyosTwCsUrxGpAnM75
-	qxHXUeUHR/YLgKKJL8+hFW6XusHQ3WpCCUSuyUGkc4+JZVpmaBgwvefwe3iMEQl3HENL95uz++r
-	fYzFFHyUXf3V8kaWW6AaRadPgILXYb
-X-Gm-Gg: ASbGnctrGoxlTPdX9wqOT1WFs0uHHqOoai5TxtI56JJc5nQ6GW7U6x6FQ+brLxhj4hj
-	n6KyHeu4XC/9E/PYZ/q2ofDmnufyO/wPwew==
-X-Received: by 2002:a17:90b:4c84:b0:2ee:d63f:d77 with SMTP id 98e67ed59e1d1-2ef69e121d2mr2499909a91.9.1733452955991;
-        Thu, 05 Dec 2024 18:42:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFXC1PaZ/v1xzGb9UHzuP48eKxe8R8L0M0pU/SFP7iOc+J8n98g8ZduoEmx31sFn2mMYoCCNI12FCuwzw5Vn5M=
-X-Received: by 2002:a17:90b:4c84:b0:2ee:d63f:d77 with SMTP id
- 98e67ed59e1d1-2ef69e121d2mr2499880a91.9.1733452955619; Thu, 05 Dec 2024
- 18:42:35 -0800 (PST)
+        bh=jFcBusQAgop/cJ9zHlAC34d6C2cvFm40FRSAV1uCAPY=;
+        b=t3DrjkhbOD7SsX8qKkMtRfGnB0GAWkTPb/eZEcWETW22LAIN51BoM5n9kL8mHtfjVZ
+         rxd8FlnhrBmEUv0Dg3V7KsYQgcPxFnRAIrRnxTucOSwIOZlyxU3wuAxnsqRrLNsO2hOD
+         exIsXpei/4Zpe883Mtp5+m8mI7R1S9Br8NVE7tFDQ+Gm5DGkjVK0oe1Pg1h/xsrryXx9
+         v24SpOZ7MSFuXKv0eW14DR3zeP++ayLyXCE9wfD+EUNIqvCvbducSOiQIcwRi1t5J4ck
+         GuPVwdvHm7tfEVcNJXYXxEx+DyvD4SgHrviI5RnJYFR1DDYu0wEFh3Tmja0+y8c276jL
+         DEbw==
+X-Forwarded-Encrypted: i=1; AJvYcCUaogRd3o0u9Sor3tkqBuoGphl+4+yIjBICD76HC3L5HMncnLSH0pdnkI8CuuVKWe0FbADUnEg6@vger.kernel.org, AJvYcCVUdMNA26MOVK9+nWnHSC31kl8bZQm+1FQAL0VEDmwtEadaDrlwVK41UikDm3F0vq09EjTmyxs6UqjjZ2s=@vger.kernel.org, AJvYcCWyegYLFTjEymg7XSM90ekuPk0APsH2QUqya8U1YjgQ4n9YgzWTqqJNCRWD6fijYPumub55RNZO@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFSciM7823odQzr9D71VF88jiI7FqzV42N6MwobwLDhbknHj4A
+	Ol/a6sUBP6r576h/bwACE9oBXoWNdSHmjXPYQhZT31Y99pW4Ek35dfbhFjbeW83875q9F/dzr/w
+	W1uakrqzYHCJj2ddRzZI1l7ydzzs=
+X-Gm-Gg: ASbGncsZTkwPIfDDbILlT85nI+T96OOq8hLTPxTWCd5oiYVCCRpEKgiBs+QU43teBTs
+	GYnpVKYoKsFInpo79AHBuNcrG63vpGQ==
+X-Google-Smtp-Source: AGHT+IEA11huRP+Trp19deRlrQWYZoOM5ceG9+1zVCv7r7Tsw6HHVVGPX/+z5mIMkkizPeSriAQ8V5bZRdiioL1KesA=
+X-Received: by 2002:a17:90b:33c4:b0:2ee:863e:9fff with SMTP id
+ 98e67ed59e1d1-2ef69e15339mr2443280a91.10.1733453397711; Thu, 05 Dec 2024
+ 18:49:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241205073614.294773-1-stsp2@yandex.ru> <6751d9e5254ac_119ae629486@willemb.c.googlers.com.notmuch>
-In-Reply-To: <6751d9e5254ac_119ae629486@willemb.c.googlers.com.notmuch>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 6 Dec 2024 10:42:23 +0800
-Message-ID: <CACGkMEswqwz_EG0onQcOZdt6pkcaJ7zHsVpm=c2HUkyqdOMTVg@mail.gmail.com>
-Subject: Re: [PATCH net-next] tun: fix group permission check
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Stas Sergeev <stsp2@yandex.ru>, netdev@vger.kernel.org, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-kernel@vger.kernel.org
+References: <20241113-tcp-md5-diag-prep-v2-0-00a2a7feb1fa@gmail.com>
+ <20241204171351.52b8bb36@kernel.org> <CANn89iL5_2iW5U_8H43g7vXi0Ky=fkwadvTtmT3fvBdbaJ1BAw@mail.gmail.com>
+In-Reply-To: <CANn89iL5_2iW5U_8H43g7vXi0Ky=fkwadvTtmT3fvBdbaJ1BAw@mail.gmail.com>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Fri, 6 Dec 2024 02:49:46 +0000
+Message-ID: <CAJwJo6amrAt+uBMWRvwBu=VdcTyDuEMtkAx0=_ittUj0KCa-zw@mail.gmail.com>
+Subject: Re: [PATCH net v2 0/5] Make TCP-MD5-diag slightly less broken
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+	Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	David Ahern <dsahern@kernel.org>, Ivan Delalande <colona@arista.com>, 
+	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Boris Pismenny <borisp@nvidia.com>, 
+	John Fastabend <john.fastabend@gmail.com>, Davide Caratti <dcaratti@redhat.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mptcp@lists.linux.dev, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 6, 2024 at 12:50=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
+Hi Jakub, Eric,
+
+On Thu, 5 Dec 2024 at 09:09, Eric Dumazet <edumazet@google.com> wrote:
+> On Thu, Dec 5, 2024 at 2:13=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+> >
+> > Hi Eric!
+> >
+> > This was posted while you were away -- any thoughts or recommendation o=
+n
+> > how to address the required nl message size changing? Or other problems
+> > pointed out by Dmitry? My suggestion in the subthread is to re-dump
+> > with a fixed, large buffer on EMSGSIZE, but that's not super clean..
 >
-> Stas Sergeev wrote:
-> > Currently tun checks the group permission even if the user have matched=
+> Hi Jakub
+>
+> inet_diag_dump_one_icsk() could retry, doubling the size until the
+> ~32768 byte limit is reached ?
+>
+> Also, we could make sure inet_sk_attr_size() returns at least
+> NLMSG_DEFAULT_SIZE, there is no
+> point trying to save memory for a single skb in inet_diag_dump_one_icsk()=
 .
-> > Besides going against the usual permission semantic, this has a
-> > very interesting implication: if the tun group is not among the
-> > supplementary groups of the tun user, then effectively no one can
-> > access the tun device. CAP_SYS_ADMIN still can, but its the same as
-> > not setting the tun ownership.
-> >
-> > This patch relaxes the group checking so that either the user match
-> > or the group match is enough. This avoids the situation when no one
-> > can access the device even though the ownership is properly set.
-> >
-> > Also I simplified the logic by removing the redundant inversions:
-> > tun_not_capable() --> !tun_capable()
-> >
-> > Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
-> >
-> > CC: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> > CC: Jason Wang <jasowang@redhat.com>
-> > CC: Andrew Lunn <andrew+netdev@lunn.ch>
-> > CC: "David S. Miller" <davem@davemloft.net>
-> > CC: Eric Dumazet <edumazet@google.com>
-> > CC: Jakub Kicinski <kuba@kernel.org>
-> > CC: Paolo Abeni <pabeni@redhat.com>
-> > CC: netdev@vger.kernel.org
-> > CC: linux-kernel@vger.kernel.org
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
->
-> A lot more readable this way too.
->
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Starting from NLMSG_DEFAULT_SIZE sounds like a really sane idea! :-)
 
-Thanks
+[..]
+> @@ -585,8 +589,14 @@ int inet_diag_dump_one_icsk(struct inet_hashinfo *ha=
+shinfo,
+>
+>         err =3D sk_diag_fill(sk, rep, cb, req, 0, net_admin);
+>         if (err < 0) {
+> -               WARN_ON(err =3D=3D -EMSGSIZE);
+>                 nlmsg_free(rep);
+> +               if (err =3D=3D -EMSGSIZE) {
+> +                       attr_size <<=3D 1;
+> +                       if (attr_size + NLMSG_HDRLEN <=3D
+> SKB_WITH_OVERHEAD(32768)) {
+> +                               cond_resched();
+> +                               goto retry;
+> +                       }
+> +               }
+>                 goto out;
+>         }
+>         err =3D nlmsg_unicast(net->diag_nlsk, rep, NETLINK_CB(in_skb).por=
+tid);
 
+To my personal taste on larger than 327 md5 keys scale, I'd prefer to
+see "dump may be inconsistent, retry if you need consistency" than
+-EMSGSIZE fail, yet userspace potentially may use the errno as a
+"retry" signal.
+
+Do you plan to re-send it as a proper patch? Or I can send it with my
+next patches for TCP-MD5-diag issues (1), (3), (4) and TCP-AO-diag.
+
+Thanks,
+             Dmitry
 
