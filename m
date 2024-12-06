@@ -1,115 +1,134 @@
-Return-Path: <netdev+bounces-149616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A89A9E67AE
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 08:13:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E04949E67D2
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 08:21:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C74A1886044
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 07:13:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81933163C6E
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 07:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA12C1DA0E9;
-	Fri,  6 Dec 2024 07:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BE21DDA0F;
+	Fri,  6 Dec 2024 07:21:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="HvYQ1QxI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o+wG9rcY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8150A1D89F8;
-	Fri,  6 Dec 2024 07:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990E71D63D1;
+	Fri,  6 Dec 2024 07:21:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733469213; cv=none; b=sC+V3XOk9IvPp0IZjsySH0oommNePeUTJ3r93zXpNwZmht3gCS700q49O+qk8Ox1HKETTUL0CgClrRTYZeecPHqtx3/4Op+k/jaH4ohNT9Uj7EQuj1KtG0NXv8YquIdl/2p9/8zMhn38msO1DROd5Dy9ZOOOHgLpaDqwJtjjjXc=
+	t=1733469664; cv=none; b=QfeDiMMWc5Bs0wkk3k2iDmPs19vJFOuy5uQQ10oBSpu8l7bjqNFQCzslVL3uoN3tB3AMQXox7aQT0Djm7ImF8noAnb/ha8N4HYiP7Xi3EndSDIc6DIHd/ei1msZ8pmds4X4iGn3wKdKZKmYD0GUwOGNEkR+LvDnRHBMhRASU7PA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733469213; c=relaxed/simple;
-	bh=I6togj3rCYdWZizm/vBZ+hpS0EcWywx3tvwMzR/v/Hk=;
+	s=arc-20240116; t=1733469664; c=relaxed/simple;
+	bh=eXgkPnSuV1DLMSpxicSxCmpRMc11qSId1Ps39ZgC62E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R9Pd10DgwR0oihfBY7Fae6l6nwRUj7nI+0BAUndAU4shHM2j3AEVj3bjPFwM+lH6R1TElackWupry1NA87K/2ZBDMZL0Uvm/QgyPH1RVpUsFFO4I7hq4skHV7otEdFM1E2l55Arl22VBAIVmRPfO+qP01R9T3SiBs8FCrhvvCF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=HvYQ1QxI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A81B6C4CED1;
-	Fri,  6 Dec 2024 07:13:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1733469213;
-	bh=I6togj3rCYdWZizm/vBZ+hpS0EcWywx3tvwMzR/v/Hk=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=DgGs0eLziaCw/VfWhS12larD8OcwilOKczfSyb5h9dRhYsRfc0T5NRgHEbWMkf4493OE9qUZo90pxQUTG26Pw4MyydRR2weEyiRXY0jX8tUnaDB6EPNvf/kXqmEoLglnFBpZQuvUrJnhLMeLIlzwnpql6qdp6rMooeRPbcGKHWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o+wG9rcY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F657C4CED1;
+	Fri,  6 Dec 2024 07:21:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733469664;
+	bh=eXgkPnSuV1DLMSpxicSxCmpRMc11qSId1Ps39ZgC62E=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HvYQ1QxIOTib9pAjNiUWByzjxOF8c7ghvkEfuBCoaWWC8LOyet0hvbQ+1/4xCdUbt
-	 m8wOq+nCuIftmqrpkfQqfhzWR+kSpVjq53zjheiabEA7rIwrgZI8+KSbwctU/tNB9e
-	 Ut7dm3jGijwMeC3kEPhSnaUIfc5/vY/tY769B0sE=
-Date: Fri, 6 Dec 2024 08:13:30 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Til Kaiser <mail@tk154.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, idosch@nvidia.com, petrm@nvidia.com
-Subject: Re: [PATCH net-next v2] net: sysfs: also pass network device driver
- to uevent
-Message-ID: <2024120613-unicycle-abruptly-02d1@gregkh>
-References: <20241115140621.45c39269@kernel.org>
- <20241116163206.7585-1-mail@tk154.de>
- <20241116163206.7585-2-mail@tk154.de>
- <20241118175543.1fbcab44@kernel.org>
- <665459ff-9e99-4d22-9aeb-69c34be3db6b@tk154.de>
+	b=o+wG9rcYnotlrUeuc0PL7wpQWKlXXxbgXtHgvJy7YCCwHVZ9BkccRLmauWqsz+ZV/
+	 iY49BGCvaEwufLj74wUd4KOO2j4hv4jUIw8urqblrYMJBpAv6CgCbIU/8R6GyV73VK
+	 9c58t+wda7Myy5qJF2WzOXzK3/BQJ0i/AkjHXsZFMr7s3vepRv5asoxKqYToTl/hYB
+	 VNEio9U05OacRjqjaygqmLG9eUZQ17GF0aovEsH5OsM54NY9ccCb7HeNz79C2xEmMj
+	 yLXMkRkJbjJNx0ViCQboZDxE2VKg3DG3+oa6CDnctzD5D0J8giHgftdS96ghXZOqUx
+	 A94yQD2wKTalw==
+Date: Fri, 6 Dec 2024 08:21:01 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
+To: Zijun Hu <zijun_hu@icloud.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas@t-8ch.de>, 
+	linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev, linux-sound@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-block@vger.kernel.org, linux-cxl@vger.kernel.org, 
+	linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linux-mediatek@lists.infradead.org, linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	open-iscsi@googlegroups.com, linux-usb@vger.kernel.org, linux-serial@vger.kernel.org, 
+	netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: Re: [PATCH v3 04/11] driver core: Constify API device_find_child()
+ then adapt for various usages
+Message-ID: <7ylfj462lf6g3ej6d2cmsxadawsmajogbimi7cl4pjemb7df4h@snr73pd7vaid>
+References: <20241205-const_dfc_done-v3-0-1611f1486b5a@quicinc.com>
+ <20241205-const_dfc_done-v3-4-1611f1486b5a@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="owd7bvwanf7sxd4s"
 Content-Disposition: inline
-In-Reply-To: <665459ff-9e99-4d22-9aeb-69c34be3db6b@tk154.de>
+In-Reply-To: <20241205-const_dfc_done-v3-4-1611f1486b5a@quicinc.com>
 
-On Thu, Dec 05, 2024 at 05:28:47PM +0100, Til Kaiser wrote:
-> On 19.11.24 02:55, Jakub Kicinski wrote:
-> > On Sat, 16 Nov 2024 17:30:30 +0100 Til Kaiser wrote:
-> > > Currently, for uevent, the interface name and
-> > > index are passed via shell variables.
-> > > 
-> > > This commit also passes the network device
-> > > driver as a shell variable to uevent.
-> > > 
-> > > One way to retrieve a network interface's driver
-> > > name is to resolve its sysfs device/driver symlink
-> > > and then substitute leading directory components.
-> > > 
-> > > You could implement this yourself (e.g., like udev from
-> > > systemd does) or with Linux tools by using a combination
-> > > of readlink and shell substitution or basename.
-> > > 
-> > > The advantages of passing the driver directly through uevent are:
-> > >   - Linux distributions don't need to implement additional code
-> > >     to retrieve the driver when, e.g., interface events happen.
 
-Why does the driver name matter for something like a network device?
-I.e. why are network devices "special" here and unlike all other class
-devices in the kernel like keyboards, mice, serial ports, etc.?
+--owd7bvwanf7sxd4s
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v3 04/11] driver core: Constify API device_find_child()
+ then adapt for various usages
+MIME-Version: 1.0
 
-> > >   - There is no need to create additional process forks in shell
-> > >     scripts for readlink or basename.
+Hello,
 
-"Do it in the kernel and have someone else maintain it for me to make my
-life easier in userspace" isn't always the best reason to do something.
-Generally if "you can do this in userspace" means "you SHOULD do this in
-userspace", it's not a good reason to add it to the kernel.
+On Thu, Dec 05, 2024 at 08:10:13AM +0800, Zijun Hu wrote:
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
+>=20
+> Constify the following API:
+> struct device *device_find_child(struct device *dev, void *data,
+> 		int (*match)(struct device *dev, void *data));
+> To :
+> struct device *device_find_child(struct device *dev, const void *data,
+>                                  device_match_t match);
+> typedef int (*device_match_t)(struct device *dev, const void *data);
+> with the following reasons:
+>=20
+> - Protect caller's match data @*data which is for comparison and lookup
+>   and the API does not actually need to modify @*data.
+>=20
+> - Make the API's parameters (@match)() and @data have the same type as
+>   all of other device finding APIs (bus|class|driver)_find_device().
+>=20
+> - All kinds of existing device match functions can be directly taken
+>   as the API's argument, they were exported by driver core.
+>=20
+> Constify the API and adapt for various existing usages by simply making
+> various match functions take 'const void *' as type of match data @data.
 
-And note, driver names change!  How are you going to handle that?
+With the discussion that a new name would ease the conversion, maybe
+consider device_find_child_device() to also align the name (somewhat) to
+the above mentioned (bus|class|driver)_find_device()?
 
-> > >   - If a user wants to check his network interface's driver on the
-> > >     command line, he can directly read it from the sysfs uevent file.
+Do you have a merge plan already? I guess this patch will go through
+Greg's driver core tree?
 
-The symlink in sysfs shows this already, no need to
-open/read/parse/close the uevent file.
+Best regards
+Uwe
 
-Also, where did you now document this new user/kernel API that we have
-to maintain for 40+ years?  And what userspace tool is going to use it?
+--owd7bvwanf7sxd4s
+Content-Type: application/pgp-signature; name="signature.asc"
 
-But really, again, why are network devices so special that they need
-this but no other type of device in the kernel does?  And what changed
-to require this suddenly?
+-----BEGIN PGP SIGNATURE-----
 
-thanks,
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmdSpdoACgkQj4D7WH0S
+/k4dIQf/Zne0n0ncNUTb3GbDwFv4sf3wAVH368SbrNYMV23ZdWpNl4KZPovf5L1+
+5nMlPkc2I/CBZGE2OJcZWUhHI7cZ2ZYDHBBAf/TYhsY9f0+6wXgdi2cc+bbbQpo1
+JdabxMtgPX9tQ1Rbtv6jNu1AUvx8pONwQvUe5vmIBeLFDx5+wEwm4LppEVU+x9zB
+dApq6D2VfLguHwMf8HDycoa0nd0GL3R4KIJF4+taiSmhz9q+yjewqiXD2ag3fYrF
+1IeZ6pnyXoaq0aTwLmXXhI6se14Q+IZIVQPRXVQ5i9A8kbsWN0Fj2LfXnnNWhmHl
+YR8uP+UVLcfagxTg7ascr+SuV4OlCw==
+=cpdm
+-----END PGP SIGNATURE-----
 
-greg k-h
+--owd7bvwanf7sxd4s--
 
