@@ -1,116 +1,106 @@
-Return-Path: <netdev+bounces-149785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31F2F9E77F4
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 19:17:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02CD89E7828
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 19:36:08 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1316B1639C3
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 18:17:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7A9628344D
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 18:36:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02F71F3D53;
-	Fri,  6 Dec 2024 18:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88A91D5CC1;
+	Fri,  6 Dec 2024 18:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="ihp5NaUt"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="oMQmg5tP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0069A1F3D2B
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 18:17:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212E11D45F2
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 18:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733509028; cv=none; b=LnMgc6XUNIZKtrZrAFwQ9vQenMWWSXXvX3aFz2eCbS8Za4B/mvLoahM0PpHdbDxH5QTCkws0tQ6Z9VoN/pcuhlC6m96acbxOPtRYlyg8iDIlfhlD3Be9WSqdLc8M7gikESVCYBnuzq6KKAyMAprZM84NkRuoQWUbY76+CsHbQCc=
+	t=1733510163; cv=none; b=MwvmNFzUOsofp4JnauJUM9dpqge2NTtxpxgtD7WFxL0Wm25ZTTJIGt56c6lzlVZ3jT7pIKL6czsaJU9spZQwgTirLPOVm1VlKs6nA4iIeqeg0dVdxcprsO+IQs+LkkNka0IqkeNqL7s7NUoC+3L4ANi6ILxNlqftMO2Q4bo0qes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733509028; c=relaxed/simple;
-	bh=0kmwuOz7qibXuGzXJBalsi9zlGLF7Gq28kA45wgqC4g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iSw78eCfq7O1Zt8jTrqa0I5wVROFkxW7y9vZAL2Drq8A1D8qEsQCb53N2QPaTK1F2tYs/12+FnD+9SinH/TIEWCIO3CpyNAtJgfylmST0z/u2orx6UIO+sQ7z+v+PzpMRHRuYoowKArjmYFb40KkE41TX4wJr8uQSJhRCMMYLNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=ihp5NaUt; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-30033e07ef3so7595071fa.0
-        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 10:17:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1733509025; x=1734113825; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=T6ecbloalYthckNBNhPOKdoCIqqonfcHxmM2rm8Txtw=;
-        b=ihp5NaUtowz+r+K4K4TJxGidG3B0l0vYq75fCy5U0qaDlpayB1vrPqEqGMyD8XKl8E
-         zwRmIZ3aG/A4n8lXj55V0S0SMq2gHI5ZfkE72HLvIMxatAPL/Vbl1x3SD415DyUbJVb7
-         Mdfcj8C5Rn3+NJWFaHaoSbt8otVWeM9fomtOwVMxVUqidmcfWrEmMp5JajX+7U9iyeh7
-         adN8tNA3E+POvtvT1Nh5VfVXgGF9HOFOKbaUOO0d9xtO6poWd8u81wawD1+yB7jZcjxK
-         5nQrm3o+0Ps5cu7fqX1tGIGWU9+H7ZzWBljib5h5IVUYcjCv/cCjg4QxTFJp1+DEC5ft
-         dWzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733509025; x=1734113825;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T6ecbloalYthckNBNhPOKdoCIqqonfcHxmM2rm8Txtw=;
-        b=mzjvkH416E5T9wj2dMeGw4rowdz5QjRFZclfT6VnbrOvBJMIj29cZzswLBVShSVuhM
-         p8ymkT8KJ1nxoAfOVkLA5DIs0EKjP0yVdnsGYaserOMPiTV2MOKFy4vJfi+YyFkHiERZ
-         GRRYqVThjryHAA49ybykKk2QHPf+OkklLNFVDmXqF1O0FV0SxtwMby29uT2dp3IQ75Tr
-         Y2m2JYyk6EIYLYN1ZOksL5W2gT2c5O5QxJh1eHR2egC99d2a/dc69wtgM+VIu0N8mJch
-         vXkHkSmQvr3JZWDV+Gc7N1m3pocGUneSOXFCY7SGZNmpRm1yfyXxE2YP3hz2pp6ffTAq
-         ThPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWGnc2uMwPjjHMKDJI6RYw6Gs26vfdtm6Z/71ERc5YM5X8lQWxaQbAc/eWXrmx5a8q5cBM+G9o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcUCXLAp9s/z3p/V8vCvqV7iTWi32YEBonnGBIOmtvAtElazw9
-	oTyfdMypFXr0SwCqdislO3TCdgn/OxeFxnasnZnmaJnYP0cpXGR4UlFf/H1Zr+8=
-X-Gm-Gg: ASbGnct/H7g9RAeMo9zGeUA2srBnOruscaw652pMnQfPP6XrTqTbYSHyTk81EGkGo+M
-	7113I7wmn8KT+P3dNQpenPf+PT2T/pi9qf14+km86XH7iPrNXB1/E3cz0TtdrX1gOqKbuoFnSwY
-	r3zWxtmDkC1wfB+PqtbTIBJMOSFHCk+hsEUcBZSGsDLK8/CO9hCs8kHAuVZnEhGXO1K8dGMQ8O+
-	A3+fPB1siJyNLm2c4A86c5YrQ1hsOg3z2/e1SRDltwWHsJW/3Bik2mnSiBDtArlr+n8Gg==
-X-Google-Smtp-Source: AGHT+IFSQk4LVXdGCOIZgkcmUG+e+P3Squ0CFAeeVN2glBcgom7D7Xbv7QXnrDJUIxPedfYrmXMMhQ==
-X-Received: by 2002:a05:651c:2119:b0:2ff:db26:2664 with SMTP id 38308e7fff4ca-3002de40268mr13998711fa.6.1733509025014;
-        Fri, 06 Dec 2024 10:17:05 -0800 (PST)
-Received: from [192.168.0.104] ([91.198.101.25])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30020d85076sm5301271fa.23.2024.12.06.10.17.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Dec 2024 10:17:04 -0800 (PST)
-Message-ID: <3796604a-0636-41ac-b7e2-13ccd0694d4d@cogentembedded.com>
-Date: Fri, 6 Dec 2024 23:17:01 +0500
+	s=arc-20240116; t=1733510163; c=relaxed/simple;
+	bh=tyKisxqBAb563Isl8LLOvajWbb+u3mG4SSp/ELJ+qtY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qHd2UJSEOWn1f5iB96Qx0vJC4exirONB0yQT/YQF77Il9ANgg8Rmqwm9jlJS7Yg3akRZJkcS+VBHlFVWxyqRWhK7ZMA73PLCgPqyGNuUQf70XLN0DWOHxB1Y3NGgg6osTKiwwO2u4i0Z6MS5TWCrbDHKWCaVD9JIK95//44ran8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=oMQmg5tP; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tJdB8-004RMe-Md
+	for netdev@vger.kernel.org; Fri, 06 Dec 2024 19:35:50 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=t/+8WnLSAvJNH/PwD2jMJfy8OEHgybPxnjHfzY+9bVs=
+	; b=oMQmg5tP31CJVZkI3k6A/1CTIYrJk1gsXTDz8e1vShrI5tFI/lvBTsngAseKXsG2MG9+c62Fj
+	rmkfKARBLPBscP7vWIuMybCfXvEGpSPya/noqFJ4+vSl/flFREUfKBNJT0jRB/c2FcjTxkQgQ32Hs
+	PHoipWLvhxSbO9jQKE4f5GS+JyJaL5rwekeJ/uJKdhtYNZidohotoEVw8a1dnWsk++hnn8FL2vsJ2
+	kV7yhYTrz+oIRaseOsOIYUz2BOOOd2qsLjfaUDoUJX1k+vtnbBLRzHP/4VeEQkhNr2SfY7mMmV0QI
+	c9xyj0b9gJK9WyYqpedYwX2jP7mjXSGpwI7Jeg==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tJdB8-00073N-B8; Fri, 06 Dec 2024 19:35:50 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tJdAo-007yMC-KU; Fri, 06 Dec 2024 19:35:30 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net-next 0/4] vsock/test: Tests for memory leaks
+Date: Fri, 06 Dec 2024 19:34:50 +0100
+Message-Id: <20241206-test-vsock-leaks-v1-0-c31e8c875797@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] net: renesas: rswitch: fix leaked pointer on error
- path
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Michael Dege <michael.dege@renesas.com>,
- Christian Mardmoeller <christian.mardmoeller@renesas.com>,
- Dennis Ostermann <dennis.ostermann@renesas.com>
-References: <20241202134904.3882317-1-nikita.yoush@cogentembedded.com>
- <20241202134904.3882317-3-nikita.yoush@cogentembedded.com>
- <20241204194019.43737f84@kernel.org>
-Content-Language: en-US, ru-RU
-From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-In-Reply-To: <20241204194019.43737f84@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMpDU2cC/x3MQQqDMBBG4avIrDsQEyO1VykuRP/oYIklE0QI3
+ r2hy2/xXiFFEii9mkIJp6gcsaJ9NDRvU1zBslSTNbZrrXGcoZlPPeadP5h2ZfcMg/dD8L3rqWb
+ fhCDXf/mmiMwRV6bxvn9zIUFIbAAAAA==
+X-Change-ID: 20241203-test-vsock-leaks-38f9559f5636
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-> Why not move the assignment down, then? After we have successfully
-> mapped all entries?
+Series adds tests for recently fixed memory leaks[1]:
 
-Just realized that moving assignment below the loop will open a race window. DT field is set inside the 
-loop, and once it is set, completion interrupt becomes theoretically possible.
+d7b0ff5a8667 ("virtio/vsock: Fix accept_queue memory leak")
+fbf7085b3ad1 ("vsock: Fix sk_error_queue memory leak")
+60cf6206a1f5 ("virtio/vsock: Improve MSG_ZEROCOPY error handling")
 
-Furthermore, realized that existing code already has a race. Interrupt can happen after DT wield was 
-updated but before cur is updated. Then, with the completion code won't check the entry (up to a new 
-interrupt, that can theoretically not happen).
+First patch is a non-functional preparatory cleanup.
 
-Will fix in the updated patches.
+I initially considered triggering (and parsing) a kmemleak scan after each
+test, but ultimately concluded that the slowdown and the required
+privileges would be too much.
 
-Nikita
+[1]: https://lore.kernel.org/netdev/20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co/
+
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Michal Luczaj (4):
+      vsock/test: Use NSEC_PER_SEC
+      vsock/test: Add test for accept_queue memory leak
+      vsock/test: Add test for sk_error_queue memory leak
+      vsock/test: Add test for MSG_ZEROCOPY completion memory leak
+
+ tools/testing/vsock/vsock_test.c | 159 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 157 insertions(+), 2 deletions(-)
+---
+base-commit: 51db5c8943001186be0b5b02456e7d03b3be1f12
+change-id: 20241203-test-vsock-leaks-38f9559f5636
+
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
+
 
