@@ -1,73 +1,74 @@
-Return-Path: <netdev+bounces-149856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B67679E7C5A
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 00:22:02 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2A06168418
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 23:21:59 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707F1206276;
-	Fri,  6 Dec 2024 23:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="mllllqPx"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E3C79E7C62
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 00:27:49 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46BB1F4706
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 23:21:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00173284C00
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 23:27:48 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9648F212FB4;
+	Fri,  6 Dec 2024 23:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="m9i/WufE"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A8522C6DC;
+	Fri,  6 Dec 2024 23:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733527319; cv=none; b=uhPFuG1Wc9MP21sFeyQPsrIRok2x71ptHqr/7cF42ZY29cOAnjkCBsfsBnUrAvykue4VBpNMKl9ege1jDE8FFoGTx5PnYysUxge3YvGV21DF6ghuyAEtF7g6R/uYL3w1n9vjQ6RjeeDe9QMEi6bPOv/PRKvx+p70CdEJxQTogQI=
+	t=1733527666; cv=none; b=GWfiz2Eg4NClZzovjg3Bhkxeu8VvsE2As8SvpaDqGGJEuDCVrOGdytlHrvOa40bw0c7W3KP3o0ACzD3fimRFvz2s+mxt5fHALC1M2fA+blON+L/TcnmG9EAjqcmHpDcmKTUfKI+a2RJRFPk+7zMKBklnPQcMj+a2sarqXJvUsYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733527319; c=relaxed/simple;
-	bh=0bonyb2+WJRzjBdxD+ZrsHEC9us5V65tUoSXK7qfKFc=;
+	s=arc-20240116; t=1733527666; c=relaxed/simple;
+	bh=T/hdbAzVv7g18kp7hxGCuy92NcslPbzZ1NtmtxEqNUE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A3Cp01GGg3N8R7WhwwH/T2UhhEiF/m/eMpDGykFaoIrmw3XHwUno+BCtN0jhjQFzRNDBIWiRdmcU6ZWMVDR/6X29PlSS2zkmwXEQsasLRU6ijhv/j4WQHHK1Gt5kUmDmlIpVFfi+cuIsuHFkEzB8Wso4uaK5cxlPZ4zZeiqsa1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=mllllqPx; arc=none smtp.client-ip=207.171.188.206
+	 MIME-Version:Content-Type; b=n4VtJdUdnYDwzOL4mzJgTuntRKSIizHz9zWVOSBUx6Ze7t0JO7PDWB0ITWNFPKL3h8jqSqRYm821aGNarFjwzPtrhj97AYR+HgQqlJ5PNWkw7d+UIRCbKDrKprxPOGGqpYMXbEkX4oGw1xkEWLmBbis8dT6PhpqinBhrMov3dX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=m9i/WufE; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1733527318; x=1765063318;
+  t=1733527665; x=1765063665;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qe2zMDToM7P32e1KJBNnMK8z2CPgdPUI6k6n83QfRYc=;
-  b=mllllqPxnuM3/uY9dsMtH8sP2HzCBK6vZBmKL6lFWt0P10ArgDON/lo8
-   UckBc4r5nbTrAydlCRBud+fW3Moqy7yW9VFtao+WAIWa9/m20qucRdxDL
-   ki38aUesT31u2sTO72URmjWVykQU2IMnQI3l92x+0KWlZyf0Md5tS4g0j
+  bh=TcejyqLKLMz7bPyWnjBeG1tus8EctKbOLswdbH9vFzM=;
+  b=m9i/WufEOPKqW2vI/r/q/4BFVh6sSO7WhAiPebIaCFWrpnF4CHx3cMhF
+   2w/f6XfS2Pzm6ZkiNWMPjjG7Yy/mu/bnLsjtRvvUGpKxAgYO9V3HX4XCY
+   C6oSmeRCZ8Hq3GEyAJXz7Plkwj6QKR5ZufFpDIv7+66rnfcTSPQ7U84dr
    g=;
 X-IronPort-AV: E=Sophos;i="6.12,214,1728950400"; 
-   d="scan'208";a="781518021"
+   d="scan'208";a="153828443"
 Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2024 23:21:53 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:2904]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.2:2525] with esmtp (Farcaster)
- id a77bb2d8-1215-4311-ab59-6edaaeb0ce36; Fri, 6 Dec 2024 23:21:52 +0000 (UTC)
-X-Farcaster-Flow-ID: a77bb2d8-1215-4311-ab59-6edaaeb0ce36
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2024 23:27:43 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:62272]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.190:2525] with esmtp (Farcaster)
+ id 8c9cc2af-c9e8-477d-a247-3b3a38f3d34d; Fri, 6 Dec 2024 23:27:43 +0000 (UTC)
+X-Farcaster-Flow-ID: 8c9cc2af-c9e8-477d-a247-3b3a38f3d34d
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 6 Dec 2024 23:21:51 +0000
+ Fri, 6 Dec 2024 23:27:41 +0000
 Received: from 6c7e67c6786f.amazon.com (10.118.240.36) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 6 Dec 2024 23:21:48 +0000
+ Fri, 6 Dec 2024 23:27:37 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <lkp@intel.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <llvm@lists.linux.dev>, <netdev@vger.kernel.org>,
-	<oe-kbuild-all@lists.linux.dev>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next 08/15] socket: Pass hold_net to sk_alloc().
-Date: Sat, 7 Dec 2024 08:21:45 +0900
-Message-ID: <20241206232145.37548-1-kuniyu@amazon.com>
+To: <dan.carpenter@linaro.org>
+CC: <cong.wang@bytedance.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<horms@kernel.org>, <idosch@nvidia.com>, <kernel-janitors@vger.kernel.org>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] rtnetlink: fix error code in rtnl_newlink()
+Date: Sat, 7 Dec 2024 08:27:31 +0900
+Message-ID: <20241206232731.38026-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <202412070526.FhqWmbBo-lkp@intel.com>
-References: <202412070526.FhqWmbBo-lkp@intel.com>
+In-Reply-To: <a2d20cd4-387a-4475-887c-bb7d0e88e25a@stanley.mountain>
+References: <a2d20cd4-387a-4475-887c-bb7d0e88e25a@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,20 +77,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB002.ant.amazon.com (10.13.139.179) To
+X-ClientProxiedBy: EX19D037UWB002.ant.amazon.com (10.13.138.121) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: kernel test robot <lkp@intel.com>
-Date: Sat, 7 Dec 2024 05:43:05 +0800
-> >> net/iucv/af_iucv.c:455:59: error: too few arguments to function call, expected 6, have 5
->      455 |         sk = sk_alloc(&init_net, PF_IUCV, prio, &iucv_proto, kern);
->          |              ~~~~~~~~
+> [PATCH net-next] rtnetlink: fix error code in rtnl_newlink()
 
-Oh, PF_IUCV depends on CONFIG_S390, that's why I couldn't catch it
-with allmodconfig and allyesconfig :/
+This should be tagged for net.git.
 
----8<---
-config AFIUCV
-        depends on S390
----8<---
+Otherwise looks good to me.
+
+
+> If rtnl_get_peer_net() fails, then propagate the error code.  Don't
+> return success.
+> 
+> Fixes: 48327566769a ("rtnetlink: fix double call of rtnl_link_get_net_ifla()")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+Thanks!
+
+> ---
+>  net/core/rtnetlink.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> index ab5f201bf0ab..ebcfc2debf1a 100644
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -3972,8 +3972,10 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+>  
+>  		if (ops->peer_type) {
+>  			peer_net = rtnl_get_peer_net(ops, data, extack);
+> -			if (IS_ERR(peer_net))
+> +			if (IS_ERR(peer_net)) {
+> +				ret = PTR_ERR(peer_net);
+>  				goto put_ops;
+> +			}
+>  			if (peer_net)
+>  				rtnl_nets_add(&rtnl_nets, peer_net);
+>  		}
+> -- 
+> 2.45.2
 
