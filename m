@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-149629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6500C9E6852
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 08:58:26 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B38B9E6853
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 08:58:52 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BD67280E7C
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 07:58:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE42818841E6
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 07:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 444591DDC35;
-	Fri,  6 Dec 2024 07:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7002A1DE2DA;
+	Fri,  6 Dec 2024 07:58:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="EnJSLkEP"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gojeFbG0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8511DCB0E
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 07:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF27C1DDA30
+	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 07:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733471903; cv=none; b=eO9x32Fc5L94Y2DoPVuzg14poGNfDvh5HDUP0zJWM8e0frLRr9LgcDU1ogR3RgQ99STp69sx463E629Sq/PLv9McOv/PGhU9cEXf6ZyQAWpNud9nO81fPy8m/G8WImWIe3IDs41qQSW7YsFunzJ1DFwFVfHyAxihnAtiFQQ0bLU=
+	t=1733471928; cv=none; b=kwlQ4Y86gHzLSlHvCGIN+vcmr21/e7yaLfBNOVw1RdBDiliHk1zTzmB+SL/yVDP62c09xUzXWi892PuOAxBXkkWygBS+iyIBBtpiyfLcrgOuE2PoTDVDjDszzm3ShMVp2Zo1wFfZS3iXez0n308w1c4iACXrgX4gjufuuXH9GnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733471903; c=relaxed/simple;
-	bh=Zm9Jq7/V9XZzH/Uk0XlPQKc117CUqd7wpFFdyxWlAVQ=;
+	s=arc-20240116; t=1733471928; c=relaxed/simple;
+	bh=ysJaE9EIgNuyaQbc2OaOuQs9kH9i4orDEPebQG0wnd0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZP7KNmOrOa3Z/D24zEw9AvQJqCeHOGBNR4cugxJeBzJKgGUS02v4Nj6qtG0DFoHv57Z3UrnqCnUwNV3+B2lkB7cnzjdJcwK2y2S3PYT+gMbiKrbufXUw6zhtVvZoPxWVKWmrTlwRaljAiuLFyiYNikHb3KCGW5hmBnm1QT4VakQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=EnJSLkEP; arc=none smtp.client-ip=52.119.213.152
+	 MIME-Version:Content-Type; b=hCWkxcXHuL5riOK/yyMFGbZiVhppaCAH2kkSNxYPThWmxy6JgDPLJOrfXcoHgI/PYMIdZ2xNLqQtJ/Iil2lK+UyJImSX2h62w+tQ6+fS3qfmtfZXjndoxrk5Xs7o5/LJ7qfOEt6xTkDK0hLu1nlov0qy8SkwJD29mg4EArHr2qQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gojeFbG0; arc=none smtp.client-ip=207.171.190.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1733471901; x=1765007901;
+  t=1733471927; x=1765007927;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=MpC9Ly06tWsEP+CE7s+uh4xvlVu/hDAy6+FXQn72DoY=;
-  b=EnJSLkEPW7BSo/mmwTO438WzClbFk7lDwCKWQTBYUC0HLgsJXPrv9Jc5
-   17yApArUzN/aAt/lf/oz0jPUgrGNfjvamCSTJuwE6r1Sz7th0JpqXPdGz
-   Hyquu5Dc650m42C1wayXi79N1IfyiT+UcZXHUT6BjUYnkRNaYeVoeUrNt
-   k=;
+  bh=JrxBmWYkNp7RkQ+3erzUP+TmC3IWZ6gv5Du7HbbRb/Q=;
+  b=gojeFbG0zMvVDYPdX0/ZCo3ytR8q6GAPeG/4QvOmwuzxeRlHBh/gzUnR
+   CYLvVqNIwzxEcgh+wr6OK4qylW8KLVR+ZivdN0ZIBFO0pkW34xpUChAOr
+   bjj/00849ja8GJffLyb0gNx6VwbhPb3Cxwm9/DZtzVg9IobhLwdJTcXuE
+   c=;
 X-IronPort-AV: E=Sophos;i="6.12,212,1728950400"; 
-   d="scan'208";a="47151313"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2024 07:58:19 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:6789]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.32.230:2525] with esmtp (Farcaster)
- id 06437cdb-47c4-4f33-ba01-71a5fc73f3f3; Fri, 6 Dec 2024 07:58:19 +0000 (UTC)
-X-Farcaster-Flow-ID: 06437cdb-47c4-4f33-ba01-71a5fc73f3f3
+   d="scan'208";a="391059367"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2024 07:58:40 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:52091]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.10.101:2525] with esmtp (Farcaster)
+ id 6f8ed07e-f29f-47ac-9bd2-365ec1ab7ce2; Fri, 6 Dec 2024 07:58:39 +0000 (UTC)
+X-Farcaster-Flow-ID: 6f8ed07e-f29f-47ac-9bd2-365ec1ab7ce2
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 6 Dec 2024 07:58:18 +0000
+ Fri, 6 Dec 2024 07:58:39 +0000
 Received: from 6c7e67c6786f.amazon.com (10.118.244.93) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 6 Dec 2024 07:58:15 +0000
+ Fri, 6 Dec 2024 07:58:36 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 09/15] socket: Respect hold_net in sk_alloc().
-Date: Fri, 6 Dec 2024 16:54:58 +0900
-Message-ID: <20241206075504.24153-10-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 10/15] socket: Don't count kernel sockets in /proc/net/sockstat.
+Date: Fri, 6 Dec 2024 16:54:59 +0900
+Message-ID: <20241206075504.24153-11-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241206075504.24153-1-kuniyu@amazon.com>
 References: <20241206075504.24153-1-kuniyu@amazon.com>
@@ -77,45 +77,165 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
+X-ClientProxiedBy: EX19D036UWC004.ant.amazon.com (10.13.139.205) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-We will introduce a new API to create a kernel socket with netns
-refcnt held.
+The first line in /proc/net/sockstat shows the number of
+sockets counted by sock_inuse_add().
 
-sk->sk_net_refcnt was set to 0 when kern was 1 in sk_alloc().
+  $ cat /proc/net/sockstat
+  sockets: used 169
 
-Now we have the hold_net flag in sk_alloc().
+The count initially showed the number of userspace sockets,
+but now it includes some kernel sockets, which is confusing.
 
-Let's set it to sk->sk_net_refcnt and add an assertion to catch
-only one illegal pattern.
+This is because __sk_free() decrements the count based on
+sk->sk_net_refcnt, which should be sk->sk_kern_sock.
 
-No functional change is introduced for now because currently
-hold_net == !kern.
+Let's call sock_inuse_add() based on sk->sk_kern_sock.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/core/sock.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ fs/smb/client/connect.c |  1 -
+ net/core/sock.c         | 17 ++++++++++-------
+ net/mptcp/subflow.c     |  2 +-
+ net/rds/tcp.c           |  1 -
+ net/smc/af_smc.c        |  1 -
+ net/sunrpc/svcsock.c    |  2 +-
+ net/sunrpc/xprtsock.c   |  1 -
+ 7 files changed, 12 insertions(+), 13 deletions(-)
 
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 1efef860d20c..9f6daa32c083 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -3146,7 +3146,6 @@ generic_ip_connect(struct TCP_Server_Info *server)
+ 		__netns_tracker_free(net, &sk->ns_tracker, false);
+ 		sk->sk_net_refcnt = 1;
+ 		get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
+-		sock_inuse_add(net, 1);
+ 
+ 		/* BB other socket options to set KEEPALIVE, NODELAY? */
+ 		cifs_dbg(FYI, "Socket created\n");
 diff --git a/net/core/sock.c b/net/core/sock.c
-index 8546d97cc6ec..11aa6d8c0cdd 100644
+index 11aa6d8c0cdd..4041152c7024 100644
 --- a/net/core/sock.c
 +++ b/net/core/sock.c
-@@ -2224,9 +2224,12 @@ struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
- 		 * why we need sk_prot_creator -acme
- 		 */
- 		sk->sk_prot = sk->sk_prot_creator = prot;
-+
-+		DEBUG_NET_WARN_ON_ONCE(!kern && !hold_net);
+@@ -2227,16 +2227,17 @@ struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
+ 
+ 		DEBUG_NET_WARN_ON_ONCE(!kern && !hold_net);
  		sk->sk_kern_sock = kern;
- 		sock_lock_init(sk);
--		sk->sk_net_refcnt = kern ? 0 : 1;
++		if (likely(!kern))
++			sock_inuse_add(net, 1);
 +
-+		sk->sk_net_refcnt = hold_net;
- 		if (likely(sk->sk_net_refcnt)) {
+ 		sock_lock_init(sk);
+ 
+ 		sk->sk_net_refcnt = hold_net;
+-		if (likely(sk->sk_net_refcnt)) {
++		if (likely(sk->sk_net_refcnt))
  			get_net_track(net, &sk->ns_tracker, priority);
- 			sock_inuse_add(net, 1);
+-			sock_inuse_add(net, 1);
+-		} else {
++		else
+ 			__netns_tracker_alloc(net, &sk->ns_tracker,
+ 					      false, priority);
+-		}
+ 
+ 		sock_net_set(sk, net);
+ 		refcount_set(&sk->sk_wmem_alloc, 1);
+@@ -2314,7 +2315,7 @@ void sk_destruct(struct sock *sk)
+ 
+ static void __sk_free(struct sock *sk)
+ {
+-	if (likely(sk->sk_net_refcnt))
++	if (likely(!sk->sk_kern_sock))
+ 		sock_inuse_add(sock_net(sk), -1);
+ 
+ 	if (unlikely(sk->sk_net_refcnt && sock_diag_has_destroy_listeners(sk)))
+@@ -2383,10 +2384,11 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
+ 
+ 	newsk->sk_prot_creator = prot;
+ 
+-	/* SANITY */
++	if (likely(!sk->sk_kern_sock))
++		sock_inuse_add(sock_net(newsk), 1);
++
+ 	if (likely(newsk->sk_net_refcnt)) {
+ 		get_net_track(sock_net(newsk), &newsk->ns_tracker, priority);
+-		sock_inuse_add(sock_net(newsk), 1);
+ 	} else {
+ 		/* Kernel sockets are not elevating the struct net refcount.
+ 		 * Instead, use a tracker to more easily detect if a layer
+@@ -2396,6 +2398,7 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
+ 		__netns_tracker_alloc(sock_net(newsk), &newsk->ns_tracker,
+ 				      false, priority);
+ 	}
++
+ 	sk_node_init(&newsk->sk_node);
+ 	sock_lock_init(newsk);
+ 	bh_lock_sock(newsk);
+diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+index fd021cf8286e..fc534290f119 100644
+--- a/net/mptcp/subflow.c
++++ b/net/mptcp/subflow.c
+@@ -1775,7 +1775,7 @@ int mptcp_subflow_create_socket(struct sock *sk, unsigned short family,
+ 	__netns_tracker_free(net, &sf->sk->ns_tracker, false);
+ 	sf->sk->sk_net_refcnt = 1;
+ 	get_net_track(net, &sf->sk->ns_tracker, GFP_KERNEL);
+-	sock_inuse_add(net, 1);
++
+ 	err = tcp_set_ulp(sf->sk, "mptcp");
+ 	if (err)
+ 		goto err_free;
+diff --git a/net/rds/tcp.c b/net/rds/tcp.c
+index 351ac1747224..f7e8a309f678 100644
+--- a/net/rds/tcp.c
++++ b/net/rds/tcp.c
+@@ -507,7 +507,6 @@ bool rds_tcp_tune(struct socket *sock)
+ 
+ 		sk->sk_net_refcnt = 1;
+ 		netns_tracker_alloc(net, &sk->ns_tracker, GFP_KERNEL);
+-		sock_inuse_add(net, 1);
+ 	}
+ 	rtn = net_generic(net, rds_tcp_netid);
+ 	if (rtn->sndbuf_size > 0) {
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index 9b5738a55dde..10f9968f87b1 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -3324,7 +3324,6 @@ int smc_create_clcsk(struct net *net, struct sock *sk, int family)
+ 	__netns_tracker_free(net, &sk->ns_tracker, false);
+ 	sk->sk_net_refcnt = 1;
+ 	get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
+-	sock_inuse_add(net, 1);
+ 	return 0;
+ }
+ 
+diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+index 9583bad3d150..bdea406308a8 100644
+--- a/net/sunrpc/svcsock.c
++++ b/net/sunrpc/svcsock.c
+@@ -1554,7 +1554,7 @@ static struct svc_xprt *svc_create_socket(struct svc_serv *serv,
+ 		__netns_tracker_free(net, &sock->sk->ns_tracker, false);
+ 		sock->sk->sk_net_refcnt = 1;
+ 		get_net_track(net, &sock->sk->ns_tracker, GFP_KERNEL);
+-		sock_inuse_add(net, 1);
++
+ 		if ((error = kernel_listen(sock, 64)) < 0)
+ 			goto bummer;
+ 	}
+diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+index feb1768e8a57..1bc3a480d919 100644
+--- a/net/sunrpc/xprtsock.c
++++ b/net/sunrpc/xprtsock.c
+@@ -1945,7 +1945,6 @@ static struct socket *xs_create_sock(struct rpc_xprt *xprt,
+ 		__netns_tracker_free(xprt->xprt_net, &sock->sk->ns_tracker, false);
+ 		sock->sk->sk_net_refcnt = 1;
+ 		get_net_track(xprt->xprt_net, &sock->sk->ns_tracker, GFP_KERNEL);
+-		sock_inuse_add(xprt->xprt_net, 1);
+ 	}
+ 
+ 	filp = sock_alloc_file(sock, O_NONBLOCK, NULL);
 -- 
 2.39.5 (Apple Git-154)
 
