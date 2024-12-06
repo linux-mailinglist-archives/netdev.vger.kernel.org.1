@@ -1,129 +1,168 @@
-Return-Path: <netdev+bounces-149819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E1F19E7A1A
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 21:42:21 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A19689E7A4B
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 21:59:09 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3DD01649C5
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 20:42:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E846284F18
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 20:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B211DA31D;
-	Fri,  6 Dec 2024 20:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D07A212FAB;
+	Fri,  6 Dec 2024 20:58:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cYhPOr45"
+	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="t3UsSFDI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089FA1C5490
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 20:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540E41AAA2B;
+	Fri,  6 Dec 2024 20:58:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733517737; cv=none; b=UmH6P7O+SlAShB8iQDL/PQDT/hUixLSNyRBbMk0193FZ4B6dY3N2iM3lMmFAhY+1jpWdQyWdYkjGLKzXddW0XK3/z7cQY4a6QIYxeGKYgTR1PYIkDMWdr294l9dSVZ0ZspNBSsw6jvrHCjIFSqSn7UARnS2bR6mS/hLoPDxB8Oc=
+	t=1733518719; cv=none; b=NLVaHm7mdd/cMrZaxboj+VdoKT9uK0nQOX/znDyGflM3oeCBCg7nL90oaFYzoF81plANBwCDnB43Zs/nQ9dIsluP/BF9z+tCgXwjxYet1o8kJMPfcErZBq+dk6C9qVb/aZKPpqRrAh+5y4hn5JHZTP0OPXG0aCIbHtXfivuwXlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733517737; c=relaxed/simple;
-	bh=LOEyhS/zjCu3L7Eg8M0Kw99okKdGsioK8et7GPJo0Nw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ck9E5hA6byQL80lHnqDZDX2h7GO+7i+M4zOypxmlEwP8kJgm4JjXEyzdovgeJR41y9pyuQ3K2nqed5EJs2hNGR8SAFZ0DIdFxEF0aBni/F82lQGL5eLBJh/FOGxd9jzwFv1GBDmNXM1wF4dyTE8Yb+Lpfrwqz+h2IVAHjU66pb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cYhPOr45; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-432d86a3085so16770765e9.2
-        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 12:42:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733517734; x=1734122534; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mm6psef4SnBhtrajdIia1L7dedJrpYcJHFECTKa6Qno=;
-        b=cYhPOr45rpl4gpR+exNkRbfJUX4xiZCJZJnryAWAm7MF4NzYPNQSi75FsLWCPdJLyI
-         r5Pnbv/j/iAAhO5krtmlSqleWKY/wVQBM2dL4qiWYw8JOmCW8tTgycVJsSNXh/qowzvd
-         CYiWmny5eyY25G9NdPo5ugafisbJeGrelEwSVVi2z5LoYYemqCwKDtfk1UZpLqw6FGVr
-         /ZlmRqBIyTd7RNT7xigRzUZNmGHPb9uXS+uXPabF0TasZ8wOlGiqeWa3C2ucZG/G/bJc
-         Ixf2w18d2NvEwaa1C9AHj2caIiZzFW8NuTFYWOR+NtfSFZxSHx7gJ7Zu1Gl5CJ4EaCNl
-         pClw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733517734; x=1734122534;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Mm6psef4SnBhtrajdIia1L7dedJrpYcJHFECTKa6Qno=;
-        b=sMVZm+IfOsVAJPz1x0y1N8VhA9oKgqmLC9XUDJGRHDIXOcc49M+O6I55zz+jmq/Nzo
-         gqZyoFM4X0FrXQaIfkyBr+YLEGNO5dhfxKR5n+gJbrKPJrU+VtGYvtcUw/OkOxOa/oE2
-         2FMg6GD1M1ZvXMCc6pT0GABDaZqbFs/Lmpv1lG5gV2xcrbe3GacU/xHsvhDlRXjR7sSE
-         AKxMgpfyuS4ySXMKsM72wH27XRiWiRciVbO19bISrMeC6yNwmoyRvh9y9Fp9Bq6ldgh7
-         ljX9dpJgvb3kK8CD9MXvaFsQ0Dm1MHs/MMvx5Fhki2FPbMM7+y5uM6uuvW0N0pDNma0b
-         hvhg==
-X-Gm-Message-State: AOJu0YwH3qU/gdoAlq3zCQg9BGTwzWImaPXOQNN9H6YUjX6m2HnVQ+Tx
-	L9ovXIFl4Qd+2d4wUvLCgd+kTRjRgBhS5OS6dXcoV6wNmDATYrB/zdg/aNhc6BE=
-X-Gm-Gg: ASbGncvxlMcfKjQ9edA/nyrE9dTUgAOaDyML21aR2dxzm/VAgJ6834qU/P6v2w1QoIC
-	pnl9yeirLlmzAqGAPEc0sn+DeDXxqqquv8GphlL2QJr8Dt0Utnd0h7oILFTPSKmBiepPqGAxCd0
-	Oq3PXobyA0CI4OV89yEn3HD4hEocUSxrvUM1KyuZctSOffFcRV2B2SVS2snn2xxhedvPUcpMawg
-	nIYFQ++m86/MLlJmvww+0D0GmnrexK7RsnFBjUWmTVJcJL+sDT/k/qB6ZLPx8VWGZcwmoZj7jsB
-	L91YPMowQgXqMGrgJwVFKEZIzVGWcsmrS+SEiZziemyX2g==
-X-Google-Smtp-Source: AGHT+IFxF+pEJq3xOEvE2tSh0+xDK6kcjicK/iELLXm/DSBCSmn3pzQB0jL2KvNfSlAiQld9PcAnwg==
-X-Received: by 2002:a05:600c:1d1b:b0:434:a5e6:64f6 with SMTP id 5b1f17b1804b1-434ddeabcf0mr36592845e9.11.1733517733281;
-        Fri, 06 Dec 2024 12:42:13 -0800 (PST)
-Received: from KJKCLT3928.esterline.net (192.234-180-91.adsl-dyn.isp.belgacom.be. [91.180.234.192])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434da0d6a07sm65508785e9.13.2024.12.06.12.42.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Dec 2024 12:42:12 -0800 (PST)
-From: Jesse Van Gavere <jesseevg@gmail.com>
-X-Google-Original-From: Jesse Van Gavere <jesse.vangavere@scioteq.com>
-To: netdev@vger.kernel.org,
-	woojung.huh@microchip.com,
-	UNGLinuxDriver@microchip.com,
-	andrew@lunn.ch,
-	olteanv@gmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Jesse Van Gavere <jesse.vangavere@scioteq.com>
-Subject: [PATCH net-next v3] net: dsa: microchip: Make MDIO bus name unique
-Date: Fri,  6 Dec 2024 21:42:02 +0100
-Message-Id: <20241206204202.649912-1-jesse.vangavere@scioteq.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1733518719; c=relaxed/simple;
+	bh=W2maDa1Gl94YQC1GdMNwaimsBgJBUMXVg6CCTmDJu7I=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=l4MXfjZu7GEeV0bJohdkwSOwES3G/BSI9cFdgrQduZUgHEte9p0ST1naqTrLsx4G4n6DA4bnCRHlcwEK+EPIzHAHu9WK3QYqHVYk81K+WcxglfToIHjT/e4sPQuKSBWXsL8bZkraDuqnTkRJPkzGb9Tq+8qG8mj9EQIpE0yKX3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=t3UsSFDI; arc=none smtp.client-ip=193.238.174.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id 6ECDA21D93;
+	Fri,  6 Dec 2024 22:58:30 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=4mzhTxfyer3pXCCutNPdBm4ebsOpNX+qmHb589hpJEA=; b=t3UsSFDIjjo9
+	9YpFOYo1J/D81iTJz2RzrFXKfmaII/WXesh0Dc5N5on1An9bH1QWb8nB3oGH9Tg2
+	fkjTeWyzosNG0cbUqMOXnl2tGM4hYQ0Vcu1rBhT8A4LZDrdq9M5sQQ/RqQ6cnnSj
+	c0Bqv5LmmMCWq3vN1LqP+9trPWhMEgY2LVp6DkjdNYfgSVxLdoH/7v2lp0045qYk
+	0N+zLxweluiNWZaF98nN4XdK8VIfLEQtOK1+o0AP5utHqlCnK6lWeLGeFp1e9FFO
+	u9fteAPfLaSBSl9IundxYpH2Y/9QtA6MlBZ/3hGleSL6YA5NlgnuZKtlTLMQl2To
+	wTju1EWyMr6FY9eT5SxiEagKeC8mN+qwDD3e6eay06fnLTjqQur7NKPQaIe2fD6a
+	rdOkcJ+jf0moCEVA83RCsajcOJYcDtAqqnvtgyNkCiMD21mS5PkGLpFaNVt/Ks2/
+	+/lkEygRzXTllCnvCiZgSyWdAOMpcGauqlbJcBzyFTqw7dqEd1s//YcqSkCch8fB
+	BLoPR9dEG+4YKgDcyZCXmsHsmXc0Ax35NkPEvvCBSVIPY2vfrsMcHHfz63FshGaw
+	rr11pPRVHEk/KluC97orXlAvJJnCVtGwFl1sVwSGP2ZgfY0hIeRRhp4OKPGFJ+ng
+	1lc0gwoEI8v7LIG4fRcDT+rGr46d9Q0=
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Fri,  6 Dec 2024 22:58:29 +0200 (EET)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 34E4315F19;
+	Fri,  6 Dec 2024 22:58:17 +0200 (EET)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 4B6KwDGo064449;
+	Fri, 6 Dec 2024 22:58:14 +0200
+Date: Fri, 6 Dec 2024 22:58:13 +0200 (EET)
+From: Julian Anastasov <ja@ssi.bg>
+To: David Laight <David.Laight@ACULAB.COM>
+cc: "'Andrew Morton'" <akpm@linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "'Naresh Kamboju'" <naresh.kamboju@linaro.org>,
+        "'Dan Carpenter'" <dan.carpenter@linaro.org>,
+        "'pablo@netfilter.org'" <pablo@netfilter.org>,
+        "'open list'" <linux-kernel@vger.kernel.org>,
+        "'lkft-triage@lists.linaro.org'" <lkft-triage@lists.linaro.org>,
+        "'Linux Regressions'" <regressions@lists.linux.dev>,
+        "'Linux ARM'" <linux-arm-kernel@lists.infradead.org>,
+        "'netfilter-devel@vger.kernel.org'" <netfilter-devel@vger.kernel.org>,
+        "'Arnd Bergmann'" <arnd@arndb.de>,
+        "'Anders Roxell'" <anders.roxell@linaro.org>,
+        "'Johannes Berg'" <johannes.berg@intel.com>,
+        "'toke@kernel.org'" <toke@kernel.org>,
+        "'Al Viro'" <viro@zeniv.linux.org.uk>,
+        "'kernel@jfarr.cc'" <kernel@jfarr.cc>,
+        "'kees@kernel.org'" <kees@kernel.org>
+Subject: RE: [PATCH net] Fix clamp() of ip_vs_conn_tab on small memory
+ systems.
+In-Reply-To: <494a4dc2ba2041dfb9f45d86e972b953@AcuMS.aculab.com>
+Message-ID: <184af1fd-2bc4-11c1-9319-0ca879e53d99@ssi.bg>
+References: <33893212b1cc4a418cec09aeeed0a9fc@AcuMS.aculab.com> <5ec10e7c-d050-dab8-1f1b-d0ca2d922eef@ssi.bg> <2a91ee407ed64d24b82e5fc665971add@AcuMS.aculab.com> <c0a2ee53-f6ff-f4d4-e9ab-6a3bf850bec5@ssi.bg>
+ <494a4dc2ba2041dfb9f45d86e972b953@AcuMS.aculab.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 
-In configurations with 2 or more DSA clusters it will fail to allocate
-unique MDIO bus names as only the switch ID is used, fix this by using
-a combination of the tree ID and switch ID when needed
 
-Signed-off-by: Jesse Van Gavere <jesse.vangavere@scioteq.com>
----
-Changes v2: target net-next, probably an improvement rather than a true bug
-Changes v3: to maintain ABI, only do the two part name when the cluster index
-is not 0
+	Hello,
 
- drivers/net/dsa/microchip/ksz_common.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+On Fri, 6 Dec 2024, David Laight wrote:
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 920443ee8ffd..f5822c57be32 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2550,7 +2550,11 @@ static int ksz_mdio_register(struct ksz_device *dev)
- 		bus->read = ksz_sw_mdio_read;
- 		bus->write = ksz_sw_mdio_write;
- 		bus->name = "ksz user smi";
--		snprintf(bus->id, MII_BUS_ID_SIZE, "SMI-%d", ds->index);
-+		if (ds->dst->index != 0) {
-+			snprintf(bus->id, MII_BUS_ID_SIZE, "SMI-%d-%d", ds->dst->index, ds->index);
-+		} else {
-+			snprintf(bus->id, MII_BUS_ID_SIZE, "SMI-%d", ds->index);
-+		}
- 	}
- 
- 	ret = ksz_parse_dt_phy_config(dev, bus, mdio_np);
--- 
-2.34.1
+> From: Julian Anastasov
+> > Sent: 06 December 2024 16:23
+> ...
+> > 	I'm not sure how much memory we can see in small system,
+> > IMHO, problem should not be possible in practice:
+> > 
+> > - nobody expects 0 from totalram_pages() in the code
+> > 
+> > - order_base_2(sizeof(struct ip_vs_conn)) is probably 8 on 32-bit
+> 
+> It is 0x120 bytes on 64bit, so 8 could well be right.
+
+	That is already for 9 :)
+
+> > > Is all stems from order_base_2(totalram_pages()).
+> > > order_base_2(n) is 'n > 1 ? ilog2(n - 1) + 1 : 0'.
+> > > And the compiler generates two copies of the code that follows
+> > > for the 'constant zero' and ilog2() values.
+> > > And the 'zero' case compiles clamp(20, 8, 0) which is errored.
+> > > Note that it is only executed if totalram_pages() is zero,
+> > > but it is always compiled 'just in case'.
+> > 
+> > 	I'm confused with these compiler issues,
+> 
+> The compiler is just doing its job.
+> Consider this expression:
+> 	(x >= 1 ? 2 * x : 1) - 1
+> It is likely to get converted to:
+> 	(x >= 1 ? 2 * x - 1 : 0)
+> to avoid the subtract when x < 1.
+> 
+> The same thing is happening here.
+> order_base_2() has a (condition ? fn() : 0) in it.
+> All the +/- constants get moved inside, on 64bit that is +12 -2 -1 -9 = 0.
+> Then the clamp() with constants gets moved inside:
+> 	(condition ? clamp(27, 8, fn() + 0) : clamp(27, 8, 0 + 0))
+> Now, at runtime, we know that 'condition' is true and (fn() >= 8)
+> so the first clamp() is valid and the second one never used.
+> But this isn't known by the compiler and clamp() detects the invalid
+> call and generates a warning.
+
+	I see, such optimizations are beyond my expectations,
+I used max_avail var to separate the operations between
+different macro calls but in the end they are mixed together...
+
+> > if you
+> > think we should go with the patch just decide if it is a
+> > net or net-next material. Your change is safer for bad
+> > max_avail values but I don't expect to see problem while
+> > running without the change, except the building bugs.
+> > 
+> > 	Also, please use nf/nf-next tag to avoid any
+> > confusion with upstreaming...
+> 
+> I've copied Andrew M - he's taken the minmax.h change into his mm tree.
+> This is one of the build breakages.
+> 
+> It probably only needs to go into next for now (via some route).
+> But I can image the minmax.h changes getting backported a bit.
+
+	OK, then can you send v2 with Fixes header, precised comments
+and nf tag, it fixes a recent commit, so it can be backported easily...
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
 
 
