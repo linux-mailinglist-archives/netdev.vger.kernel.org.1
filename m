@@ -1,140 +1,183 @@
-Return-Path: <netdev+bounces-149571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 488A59E643B
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:37:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CE269E644F
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:40:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 003FD284820
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:37:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0299284B40
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A3216D9AA;
-	Fri,  6 Dec 2024 02:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37671714A1;
+	Fri,  6 Dec 2024 02:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="M3PhDeVT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TfQNkJHV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E99145A05;
-	Fri,  6 Dec 2024 02:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC18214D433;
+	Fri,  6 Dec 2024 02:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733452657; cv=none; b=lqDLmxUiQsnYkBrAGQQL/15ZCYciXzE9cVeSeEWm6roFaPHLfW8yMrB4LAwYdepR9zgx5nF+1ZUeIrXwJ7IQ4y6hM+FSXeQR1RiF+F5TCXTIxrECnpCmY/TClJJg0xT8PLhrjDWDo4XaY4o/nBUE211fFeed43BQTdrE9CkJhRI=
+	t=1733452818; cv=none; b=LuUvH2k9CkIagEigqRQuKsu3Lkn+8Xqvl9EfMTUv+fEMkSJ2Gx6zlvyKmrKOjg0I7Jt/VzQeHJJ7pvw0Og34dF8M5r7pC/zSdGFc7qZMeCxzLwGiufTWUbA3IGXGQQC8t0Q1cUCNstVUOFME6KSc/4h11nE0diiv59imlC/cpgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733452657; c=relaxed/simple;
-	bh=FbSwe14eb38grB9uW3LvxKjybeQCrOht4PdodHjbv+0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=fr8sgc3qZYLSFAGShcN3kn0qhnjwP22tIu8IS5F0QPCQD8xgJ0pGQw/DYwtuHlCgsuh2kO/bJn+2yGkoU3GOk34g8tZ6EJOYb4dRnwGeLff3PC0ryOE6iwOyvQ33bJ/zmrIlCVXnluN8Ys78Ta+dViEb5+eI5Kgw6ZKl0w36rDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=M3PhDeVT; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5HaFt4003703;
-	Fri, 6 Dec 2024 02:37:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Jb8iLPB5GfyIk7Ci0Qq6vj9qT1mHqgPhhTb6s4iHMwM=; b=M3PhDeVTACu9IkOz
-	L99S8zeUWXiUx1Lp9YpIKuovQeF2ljlVwmBDIJ1b56AjTmsXJl83tk9Iu42c/J8G
-	U3hTiZZf2CRNr+Vqv8FpNl0U1HWi7PR6CMN/TnaKaUZy0n3bP3VkXX744I1fpCk8
-	y5x+svWD3JQ+K9qbwZ5CCjtqmGZwbC0f8sO3MvCxydsOGVWXrI41NtW7uUGNiXb+
-	KG/sifbYDwz5IuFKKIoAPoOfXhiv1Bm1ocS6na7Xsw2gOycXhZ+H/NLoO6U9T87E
-	3a9fd/NK6Ckout7lUyt22TCgbwviwVJvDHElM5vCLPO5krwuBn1Jy9EhSzBchoXO
-	axSHGg==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43ba0kjbmd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Dec 2024 02:37:32 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B62bVaY002235
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 6 Dec 2024 02:37:31 GMT
-Received: from [10.233.17.145] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 5 Dec 2024
- 18:37:27 -0800
-Message-ID: <87c9ebb9-36b2-4891-8800-2896d6d9bbfc@quicinc.com>
-Date: Fri, 6 Dec 2024 10:37:25 +0800
+	s=arc-20240116; t=1733452818; c=relaxed/simple;
+	bh=kutxWliyYMrFZcWXJ006HBnrlV8xm95oCb5CgE0l0ko=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=W9w3AcLND7s+Oo5jFh1lM4fWRiwEbe3AuY3U0fCWwaoLlAFHK+NAyjzQgC7KCssBBzk9gea+iHbeIXHNPttAcHfSCnRuvRIwg5jVpt3ER/+dYlFWuxFWDZlH4ql58CVXArJcCuaU3dxAYm/s0m0j+mJyQMIsiC8eEXihYtneeWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TfQNkJHV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7856BC4CED6;
+	Fri,  6 Dec 2024 02:40:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733452818;
+	bh=kutxWliyYMrFZcWXJ006HBnrlV8xm95oCb5CgE0l0ko=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TfQNkJHV8m3/KABqjivX6rNREbRv43EQ8wZPFYT7CfYwmqNAt/sFnkNjeAr5D43fb
+	 jZ9JdvkYkpt9/BXtZxyL8ES61EJLcXubKZ49B4QCB3sNH/bmDHBX+BbrPF87TB1VIa
+	 e5+9Z9BLXkOv0GWslGLYFJe+dKELNbHPpMWwFkd5bDibgmeNq2vePzjaiiybyM8l2h
+	 ZaccR92rEJlsv5UENx3SxK9WUGYv4Xt7PcXVeTmZufGLSNRNJIZ9L7NF4R8z6ELlRQ
+	 N0D7uMW54XgzDJZ04BUyLOOKvqtHBBuSgt5sJRG7uHJxgKai3aOtYoQvNT9vqt/Z5G
+	 r2PBztOUGhgIw==
+Date: Thu, 5 Dec 2024 18:40:16 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, Andrii
+ Nakryiko <andrii@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Toke
+ =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>, Maciej
+ Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev
+ <sdf@fomichev.me>, Magnus Karlsson <magnus.karlsson@intel.com>,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6 09/10] page_pool: allow mixing PPs within
+ one bulk
+Message-ID: <20241205184016.6941f504@kernel.org>
+In-Reply-To: <20241203173733.3181246-10-aleksander.lobakin@intel.com>
+References: <20241203173733.3181246-1-aleksander.lobakin@intel.com>
+	<20241203173733.3181246-10-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/2] Enable ethernet for qcs8300
-To: Yijie Yang <quic_yijiyang@quicinc.com>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>
-CC: <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Konrad Dybcio
-	<konrad.dybcio@oss.qualcomm.com>
-References: <20241206-dts_qcs8300-v5-0-422e4fda292d@quicinc.com>
-From: Tingwei Zhang <quic_tingweiz@quicinc.com>
-In-Reply-To: <20241206-dts_qcs8300-v5-0-422e4fda292d@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: a-JkyvDQLg4FPm8T5eeu4TC5ookSvh-q
-X-Proofpoint-GUID: a-JkyvDQLg4FPm8T5eeu4TC5ookSvh-q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
- mlxscore=0 bulkscore=0 mlxlogscore=554 spamscore=0 malwarescore=0
- impostorscore=0 lowpriorityscore=0 clxscore=1011 priorityscore=1501
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412060017
 
-On 12/6/2024 9:35 AM, Yijie Yang wrote:
-> Add dts nodes to enable ethernet interface on qcs8300-ride.
-> The EMAC, SerDes and EPHY version are the same as those in sa8775p.
-> 
-> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
-> ---
-> This patch series depends on below patch series:
-> https://lore.kernel.org/all/20240925-qcs8300_initial_dtsi-v2-0-494c40fa2a42@quicinc.com/ - Reviewed
+Very nice in general, I'll apply the previous 8 but I'd like to offer
+some alternatives here..
 
-Above series was already applied. I would say there's no dependency to 
-block this series to be applied now. No need to respin for this but 
-update the dependency status if a new version is required.
+On Tue,  3 Dec 2024 18:37:32 +0100 Alexander Lobakin wrote:
+> +void page_pool_put_netmem_bulk(netmem_ref *data, u32 count)
+>  {
+> -	int i, bulk_len = 0;
+> -	bool allow_direct;
+> -	bool in_softirq;
+> +	bool allow_direct, in_softirq, again = false;
+> +	netmem_ref bulk[XDP_BULK_QUEUE_SIZE];
+> +	u32 i, bulk_len, foreign;
+> +	struct page_pool *pool;
+>  
+> -	allow_direct = page_pool_napi_local(pool);
+> +again:
+> +	pool = NULL;
+> +	bulk_len = 0;
+> +	foreign = 0;
+>  
+>  	for (i = 0; i < count; i++) {
+> -		netmem_ref netmem = netmem_compound_head(data[i]);
+> +		struct page_pool *netmem_pp;
+> +		netmem_ref netmem;
+> +
+> +		if (!again) {
+> +			netmem = netmem_compound_head(data[i]);
+>  
+> -		/* It is not the last user for the page frag case */
+> -		if (!page_pool_is_last_ref(netmem))
+> +			/* It is not the last user for the page frag case */
+> +			if (!page_pool_is_last_ref(netmem))
+> +				continue;
 
-> https://lore.kernel.org/all/20241010-schema-v1-0-98b2d0a2f7a2@quicinc.com/ - Applied
-> 
-> Changes in v5:
-> - Pad the register with zero for both 'ethernet0' and 'serdes0'.
-> - Change PHY name from 'sgmii_phy0' to 'phy0'.
-> - Link to v4: https://lore.kernel.org/r/20241123-dts_qcs8300-v4-0-b10b8ac634a9@quicinc.com
-> 
-> ---
-> Yijie Yang (2):
->        arm64: dts: qcom: qcs8300: add the first 2.5G ethernet
->        arm64: dts: qcom: qcs8300-ride: enable ethernet0
-> 
->   arch/arm64/boot/dts/qcom/qcs8300-ride.dts | 112 ++++++++++++++++++++++++++++++
->   arch/arm64/boot/dts/qcom/qcs8300.dtsi     |  43 ++++++++++++
->   2 files changed, 155 insertions(+)
-> ---
-> base-commit: c83f0b825741bcb9d8a7be67c63f6b9045d30f5a
-> change-id: 20241111-dts_qcs8300-f8383ef0f5ef
-> 
-> Best regards,
+We check the "again" condition potentially n^2 times, is it written
+this way because we expect no mixing? Would it not be fewer cycles
+to do a first pass, convert all buffers to heads, filter out all
+non-last refs, and delete the "again" check?
 
+Minor benefit is that it removes a few of the long lines so it'd be
+feasible to drop the "goto again" as well and just turn this function
+into a while (count) loop.
 
--- 
-Thanks,
-Tingwei
+> +		} else {
+> +			netmem = data[i];
+> +		}
+> +
+> +		netmem_pp = netmem_get_pp(netmem);
+
+nit: netmem_pp is not a great name. Ain't nothing especially netmem
+about it, it's just the _current_ page pool.
+
+> +		if (unlikely(!pool)) {
+> +			pool = netmem_pp;
+> +			allow_direct = page_pool_napi_local(pool);
+> +		} else if (netmem_pp != pool) {
+> +			/*
+> +			 * If the netmem belongs to a different page_pool, save
+> +			 * it for another round after the main loop.
+> +			 */
+> +			data[foreign++] = netmem;
+>  			continue;
+> +		}
+>  
+>  		netmem = __page_pool_put_page(pool, netmem, -1, allow_direct);
+>  		/* Approved for bulk recycling in ptr_ring cache */
+>  		if (netmem)
+> -			data[bulk_len++] = netmem;
+> +			bulk[bulk_len++] = netmem;
+>  	}
+>  
+>  	if (!bulk_len)
+
+You can invert this condition, and move all the code from here to the
+out label into a small helper with just 3 params (pool, bulk, bulk_len).
+Naming will be the tricky part but you can save us a bunch of gotos.
+
+> -		return;
+> +		goto out;
+>  
+>  	/* Bulk producer into ptr_ring page_pool cache */
+>  	in_softirq = page_pool_producer_lock(pool);
+>  	for (i = 0; i < bulk_len; i++) {
+> -		if (__ptr_ring_produce(&pool->ring, (__force void *)data[i])) {
+> +		if (__ptr_ring_produce(&pool->ring, (__force void *)bulk[i])) {
+>  			/* ring full */
+>  			recycle_stat_inc(pool, ring_full);
+>  			break;
+> @@ -893,13 +915,22 @@ void page_pool_put_netmem_bulk(struct page_pool *pool, netmem_ref *data,
+>  
+>  	/* Hopefully all pages was return into ptr_ring */
+>  	if (likely(i == bulk_len))
+> -		return;
+> +		goto out;
+>  
+>  	/* ptr_ring cache full, free remaining pages outside producer lock
+>  	 * since put_page() with refcnt == 1 can be an expensive operation
+>  	 */
+>  	for (; i < bulk_len; i++)
+> -		page_pool_return_page(pool, data[i]);
+> +		page_pool_return_page(pool, bulk[i]);
+> +
+> +out:
+> +	if (!foreign)
+> +		return;
+> +
+> +	count = foreign;
+> +	again = true;
+> +
+> +	goto again;
+>  }
+>  EXPORT_SYMBOL(page_pool_put_netmem_bulk);
 
