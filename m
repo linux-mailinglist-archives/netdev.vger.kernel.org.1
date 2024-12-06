@@ -1,161 +1,161 @@
-Return-Path: <netdev+bounces-149751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 824069E7302
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 16:15:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B7B49E7398
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 16:22:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 008F516C9FE
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 15:15:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1B96168EDE
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 15:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C019A20A5E5;
-	Fri,  6 Dec 2024 15:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B219320A5E5;
+	Fri,  6 Dec 2024 15:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HAZUf5Yi"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KDy8hKgu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C77D207DED
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 15:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC30E209F53;
+	Fri,  6 Dec 2024 15:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733498113; cv=none; b=iQtFo/2Y4IeK++ta7EVpzDQ0ju8ZmQplZTkEaXmd9CbyOgkiCkLYZfpDWD6p96x6KeQJzy2wLdWH9+WNqGkJGsp+a829qZLD0AeySitQHTbCimFySog8gY/hoB0OUlF8uUAY2lziuqObmvuu0jhtMvU/ysGcfMTzr+wK0yn1aMM=
+	t=1733498472; cv=none; b=bSYc2uPNOVEQYP2sOnNpFTbxOZ6+RwQvuU9GTyjoAB4oa/vzS3V7gHeuvsguwXNw7Mr1Yw1kCwyoizjSNK8MUSxPjtRFYbXJih1hpfH7FEzwvHWXwQUUPXh9gWrc6kNg/af5nH3zVh4VXYyi325rPjzEvylSnbZDdGwDusHe+mE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733498113; c=relaxed/simple;
-	bh=Rf6UKchEYwEj7kWnfy7/GJwdbAaaF5fK63RIngHucuM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K5sVsSNvDO6Gign4yhg1aqUVmNis9I25Gm52ZBrHvmW95vsvLAnc453i7qYGxS6/8IeEkO/mNl2SpVchb37qAzMRDW1svbGiJEfJTtAzfq+Cf+4AshIojwioGLp+tD+UgjQbpwEQxjC3+7hNKMoZnqgcxA3s4tvhbq5WIZG0Z2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HAZUf5Yi; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-53dd2fdcebcso2762907e87.0
-        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 07:15:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733498109; x=1734102909; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6Bi85J4Anbz4KnoI5R1OFbqEq2YSaUnMErItaEKHBxE=;
-        b=HAZUf5Yi/x7pPufFqnKzofo90MVN9O20HwDDcDXUJqinTg1DLLfBNSHoDLGB6RdpZb
-         gKdcnsOCBmzyIwt0XDOc1RvizVWPgY2njdxP7ePaMi0bKevVWmGHOAgEI+fUkRbH/rmf
-         dCF7VzguxJcjmsMUQZF2HrwLDHR9uXVixK3wlFoIoZL/Pw4mQvRv3m/VfIk7aB3d4ShB
-         eBv4MItPtKe+DFCEkFbGK65mMDugPmHhSW/Z+4YywDBHMNeriEJH2OjxZePrjO1z7NrG
-         P8+ZIJ66HFHhdGGB7ASeWyfZxV3n0hqWSAtk9zA8PtLpGt/Pnw538lpKpC0593QSAaYN
-         qIYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733498109; x=1734102909;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6Bi85J4Anbz4KnoI5R1OFbqEq2YSaUnMErItaEKHBxE=;
-        b=TDFLUO1lA0CcGS5x4c+l+SqZswzoEQDp33JBurGEAlmJ4BbHy0u01LU7xQWiCUiCKw
-         pt2eldBan+FUMLk2UvYcoEWzV0TUPOFf7okla/4PzWqX1n/NLPHOF4J3snAkIxK987dY
-         QdKavGa6ZdMgFnOAoUZfNAkgCIPzKkvOXIScfdtyr3TqScM0D4BRnZcQ/mrK8st7Cdcl
-         ++H0Sm0eCzRI1W7OGijMghZ7jk579HW0aFmlWcvMvCC66hDyh2tT4cM6dSr49Z/dbypv
-         MqvDQnBAHHYkJvCauY8MXx+ZVKJCSGXojypU+3DFfAiV+VPwU4lPlIE8T3em9x8q/25P
-         JbEg==
-X-Forwarded-Encrypted: i=1; AJvYcCVdO6G01D/nXIV8lpZKc1EEf677fh8JijRv5SSgU0ln1+q3SKUpfcXSQlPjLAVctlb8SW/5Bpo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxg9W+qlkt+f91K5V4faKWYzAaVVNh86JE8idnMW/LMuTRAX5eI
-	H6WJ3/y0QjMT2d8sEh7sutOToyxIP9jvfM145wOobjRQB6AA/e7PNiF7nD5bRQYHD45+2tQw2ZA
-	r9Ma5TFYpAyGq0/pCd9Pc9OShaLsvZmWrwvAj
-X-Gm-Gg: ASbGncubD6xTaUPezZd5wQXAMRYCwTtFOCvverq5r+Y4S170D5m4nZ19eKdJvDAB291
-	fFXnVDD6eLzD6UysfkqjYukTt0cu/Uy0=
-X-Google-Smtp-Source: AGHT+IE1cwLWlIj1GpiqN0fNBxkpgemnySZUfP6KDIPqY4kGmA+U/DT/8PsZJRBrjehxVuks6Jtd7XQt1GDre3GD9fE=
-X-Received: by 2002:a05:6512:3b0b:b0:53d:e669:e7d4 with SMTP id
- 2adb3069b0e04-53e2c2b8efemr2131796e87.16.1733498109407; Fri, 06 Dec 2024
- 07:15:09 -0800 (PST)
+	s=arc-20240116; t=1733498472; c=relaxed/simple;
+	bh=Kr+MAOK28ADUaLgTXLilWUzbX5ty3Lhy72VH3S8siM0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G/Zux8V4TSGcJFPsOBQvqcp/3ppsD1RIxPPvXeTsHprZvRsRY9tGfimueVDi7FS2nYncjG1SZI140tu4C/+uhmbzoEgU+afJJ90L+6LlSoaYaXWRPI+8mcN+6izNC4hwSqLs8zKeoP+qipiGAn2VjhxGmu8wW8I7iRCUVMDnel0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KDy8hKgu; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B67URkb000602;
+	Fri, 6 Dec 2024 15:20:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=mO+VJr
+	+maE/mb/snReBVYCvHVKfou4liBvMuZo9GmYo=; b=KDy8hKguZCaESXlThzI7qw
+	U8x2ZlvDarpoC2md/0UI4cJiQWyNh1ierwpy4hI+/bhnrHGlCfmoHXO9t0PrJKKg
+	ogkcKetGpwN69KBHy/1ztvhI5kjdD8j0vcjH3iOEvSLVMO8pQsjWYCkVz7zJYQjb
+	4AKm/Q0My16kyfCtCW8u8oJG/ZQ7C5dU1HKFjLp0saJBP1g+BDmqfDfnSygG5ERU
+	yi4yFNSq5ueWLCKTVB93z6qySc1IH/XsPXZCX71PhxaTvoizQcgDmgANMN2DAbDP
+	K82MykX24Ga814Nz4WTeRh1ApD4DXbPUYJOrlfgDgME1HVMCth/cY0PCQV9Lq5yQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43bvxksw1c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Dec 2024 15:20:56 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B6FKVeG023598;
+	Fri, 6 Dec 2024 15:20:56 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43bvxksw18-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Dec 2024 15:20:56 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B6EeVsa005273;
+	Fri, 6 Dec 2024 15:20:55 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 438fr1y6ru-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Dec 2024 15:20:55 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B6FKqXN31064432
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 6 Dec 2024 15:20:52 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 01ED32004B;
+	Fri,  6 Dec 2024 15:20:52 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0617820040;
+	Fri,  6 Dec 2024 15:20:51 +0000 (GMT)
+Received: from [9.179.9.40] (unknown [9.179.9.40])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  6 Dec 2024 15:20:50 +0000 (GMT)
+Message-ID: <8e7f3798-c303-44b9-ae3f-5343f7f811e8@linux.ibm.com>
+Date: Fri, 6 Dec 2024 16:20:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241113-tcp-md5-diag-prep-v2-0-00a2a7feb1fa@gmail.com>
- <20241204171351.52b8bb36@kernel.org> <CANn89iL5_2iW5U_8H43g7vXi0Ky=fkwadvTtmT3fvBdbaJ1BAw@mail.gmail.com>
- <CAJwJo6amrAt+uBMWRvwBu=VdcTyDuEMtkAx0=_ittUj0KCa-zw@mail.gmail.com>
-In-Reply-To: <CAJwJo6amrAt+uBMWRvwBu=VdcTyDuEMtkAx0=_ittUj0KCa-zw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 6 Dec 2024 16:14:58 +0100
-Message-ID: <CANn89iJzwe+Wds=otY-iFL9C9eNFVqGi62q085AehnYa3sET7w@mail.gmail.com>
-Subject: Re: [PATCH net v2 0/5] Make TCP-MD5-diag slightly less broken
-To: Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
-	Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, Ivan Delalande <colona@arista.com>, 
-	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Boris Pismenny <borisp@nvidia.com>, 
-	John Fastabend <john.fastabend@gmail.com>, Davide Caratti <dcaratti@redhat.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mptcp@lists.linux.dev, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/mlx5e: Transmit small messages in linear skb
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+        Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>, David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Nils Hoppmann <niho@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Simon Horman <horms@kernel.org>
+References: <20241204140230.23858-1-wintera@linux.ibm.com>
+ <a8e529b2-1454-4c3f-aa49-b3d989e1014a@intel.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <a8e529b2-1454-4c3f-aa49-b3d989e1014a@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: w7PWeg2-DsBijpPSROoWwQfR6ORmVj7F
+X-Proofpoint-ORIG-GUID: O9m8JQeOSvyPJWytUlQbTlKPTewWTjZW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ malwarescore=0 lowpriorityscore=0 mlxscore=0 priorityscore=1501
+ suspectscore=0 spamscore=0 adultscore=0 mlxlogscore=894 bulkscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412060113
 
-On Fri, Dec 6, 2024 at 3:49=E2=80=AFAM Dmitry Safonov <0x7f454c46@gmail.com=
-> wrote:
->
-> Hi Jakub, Eric,
->
-> On Thu, 5 Dec 2024 at 09:09, Eric Dumazet <edumazet@google.com> wrote:
-> > On Thu, Dec 5, 2024 at 2:13=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
- wrote:
-> > >
-> > > Hi Eric!
-> > >
-> > > This was posted while you were away -- any thoughts or recommendation=
- on
-> > > how to address the required nl message size changing? Or other proble=
-ms
-> > > pointed out by Dmitry? My suggestion in the subthread is to re-dump
-> > > with a fixed, large buffer on EMSGSIZE, but that's not super clean..
-> >
-> > Hi Jakub
-> >
-> > inet_diag_dump_one_icsk() could retry, doubling the size until the
-> > ~32768 byte limit is reached ?
-> >
-> > Also, we could make sure inet_sk_attr_size() returns at least
-> > NLMSG_DEFAULT_SIZE, there is no
-> > point trying to save memory for a single skb in inet_diag_dump_one_icsk=
-().
->
-> Starting from NLMSG_DEFAULT_SIZE sounds like a really sane idea! :-)
 
-There is a consensus for this one, I will cook a patch with this part only.
 
->
-> [..]
-> > @@ -585,8 +589,14 @@ int inet_diag_dump_one_icsk(struct inet_hashinfo *=
-hashinfo,
-> >
-> >         err =3D sk_diag_fill(sk, rep, cb, req, 0, net_admin);
-> >         if (err < 0) {
-> > -               WARN_ON(err =3D=3D -EMSGSIZE);
-> >                 nlmsg_free(rep);
-> > +               if (err =3D=3D -EMSGSIZE) {
-> > +                       attr_size <<=3D 1;
-> > +                       if (attr_size + NLMSG_HDRLEN <=3D
-> > SKB_WITH_OVERHEAD(32768)) {
-> > +                               cond_resched();
-> > +                               goto retry;
-> > +                       }
-> > +               }
-> >                 goto out;
-> >         }
-> >         err =3D nlmsg_unicast(net->diag_nlsk, rep, NETLINK_CB(in_skb).p=
-ortid);
->
-> To my personal taste on larger than 327 md5 keys scale, I'd prefer to
-> see "dump may be inconsistent, retry if you need consistency" than
-> -EMSGSIZE fail, yet userspace potentially may use the errno as a
-> "retry" signal.
->
+On 04.12.24 15:32, Alexander Lobakin wrote:
+>> @@ -269,6 +270,10 @@ static void mlx5e_sq_xmit_prepare(struct mlx5e_txqsq *sq, struct sk_buff *skb,
+>>  {
+>>  	struct mlx5e_sq_stats *stats = sq->stats;
+>>  
+>> +	/* Don't require 2 IOMMU TLB entries, if one is sufficient */
+>> +	if (use_dma_iommu(sq->pdev) && skb->truesize <= PAGE_SIZE)
+   +		skb_linearize(skb);
+> 1. What's with the direct DMA? I believe it would benefit, too?
 
-I do not yet understand this point. I will let you send a patch for
-further discussion.
 
-Thanks.
+Removing the use_dma_iommu check is fine with us (s390). It is just a proposal to reduce the impact.
+Any opinions from the NVidia people?
+
+
+> 2. Why truesize, not something like
+> 
+> 	if (skb->len <= some_sane_value_maybe_1k)
+
+
+With (skb->truesize <= PAGE_SIZE) the whole "head" buffer fits into 1 page.
+When we set the threshhold at a smaller value, skb->len makes more sense
+
+
+> 
+> 3. As Eric mentioned, PAGE_SIZE can be up to 256 Kb, I don't think
+>    it's a good idea to rely on this.
+>    Some test-based hardcode would be enough (i.e. threshold on which
+>    DMA mapping starts performing better).
+
+
+A threshhold of 4k is absolutely fine with us (s390). 
+A threshhold of 1k would definitvely improve our situation and bring back the performance for some important scenarios.
+
+
+NVidia people do you have any opinion on a good threshhold?
 
