@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-149568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D2D9E640F
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:25:06 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ADCC9E641F
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 03:29:04 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9594D284686
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:25:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 103601679F2
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6DA414A4F9;
-	Fri,  6 Dec 2024 02:24:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7847C15B102;
+	Fri,  6 Dec 2024 02:29:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DCF20309
-	for <netdev@vger.kernel.org>; Fri,  6 Dec 2024 02:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB293D6B;
+	Fri,  6 Dec 2024 02:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733451896; cv=none; b=Ai2M1NM5nJhl1XmL5XKZZcC5WGaE0TWtzT5IPbmlPBalSpmC40QNtFxJa/NDpeg547r1AGvEQKjEn++bj2PSSm9sXXjuE7GimW8M9Ivg06uFEzpnA5fbtin+RepdCWK11z5SYI3mLzjJBAkhviOCy+iVice77bPXOyUJ0eYupZY=
+	t=1733452141; cv=none; b=Zfitg8zkt9kiVKGh83ewi38FqYUmLKyc3Cs/xM1cK8iogB9In0nUuCeLRRW1onxces+d1HvCyAOVptHQVdNNU6F8tq8igd0pDrZLr3cbU0qlu2QmSwGebhqMHCkAVyUQvc6uChbVJEuH3J9zy/hVCWAwVI5LiupAn8wEsLnmbOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733451896; c=relaxed/simple;
-	bh=ZcZ8ZxNUnrbLdMduJgoj3uWv+kKWhntd+HAILEWm9YQ=;
+	s=arc-20240116; t=1733452141; c=relaxed/simple;
+	bh=wbLhQT3zz+yC6Xn7uDEsUyEfxjn1dhwRYtWQogfi448=;
 	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=LVWFeIRlhGBQRvKEatjclX9xAnIOsSvhYKfMS8RD9Qbt12Fzj1WvgUnDpr7YcPzkHCMrJWKTCuxO40JWO/cIok7GBLuS59o5uDE2yPNu9LmPhJBMKBF9CN9saAZ0St51xsd60l+jXTOT2AkafF78pMcpQlRaoHkT0fJu/LjLEbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	 In-Reply-To:Content-Type; b=hQ1WtKhDX9qjxiykKjo6zKDnoSaj6l4FVnFG/C8OvAExYZL0k5axgieumx5aZLuyEBofZwFhbd07d323gjGjm/1/Ce6CPI3W7iBhorO/5aldUGgQx7L1Yex0j9E0HGDs3ZB9NOnmTnVjisL+s+xRGfrTkEYeZtb+brEjtLkYiho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Y4FQb60XFz2Dh81;
-	Fri,  6 Dec 2024 10:22:31 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Y4FZB0sSFz1yrgv;
+	Fri,  6 Dec 2024 10:29:06 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id C5C7C140136;
-	Fri,  6 Dec 2024 10:24:50 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 2BAB81A016C;
+	Fri,  6 Dec 2024 10:28:50 +0800 (CST)
 Received: from [10.67.120.192] (10.67.120.192) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 6 Dec 2024 10:24:50 +0800
-Message-ID: <b9db6fe7-6d0c-4f05-96c5-242112e4fc2a@huawei.com>
-Date: Fri, 6 Dec 2024 10:24:49 +0800
+ 15.2.1544.11; Fri, 6 Dec 2024 10:28:49 +0800
+Message-ID: <09cd08cf-9c6b-4c5f-b0da-e9a74ef120a5@huawei.com>
+Date: Fri, 6 Dec 2024 10:28:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,92 +48,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH RFC net] net: hibmcge: Release irq resources on error and
- device tear-down
-To: Simon Horman <horms@kernel.org>, Jian Shen <shenjian15@huawei.com>, Salil
- Mehta <salil.mehta@huawei.com>
-References: <20241205-hibmcge-free-irq-v1-1-f5103d8d9858@kernel.org>
- <20241205205511.GF2581@kernel.org>
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <sudongming1@huawei.com>, <xujunsheng@huawei.com>,
+	<shiyongbang@huawei.com>, <libaihan@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <hkelam@marvell.com>
+Subject: Re: [PATCH V4 RESEND net-next 1/7] net: hibmcge: Add debugfs
+ supported in this module
+To: Jakub Kicinski <kuba@kernel.org>, Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>
+References: <20241203150131.3139399-1-shaojijie@huawei.com>
+ <20241203150131.3139399-2-shaojijie@huawei.com>
+ <20241205175006.318f17d9@kernel.org>
 From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20241205205511.GF2581@kernel.org>
+In-Reply-To: <20241205175006.318f17d9@kernel.org>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
 
-on 2024/12/6 4:55, Simon Horman wrote:
-> On Thu, Dec 05, 2024 at 05:05:23PM +0000, Simon Horman wrote:
->> This patch addresses two problems related to leaked resources allocated
->> by hbg_irq_init().
->>
->> 1. On error release allocated resources
->> 2. Otherwise, release the allocated irq vector on device tear-down
->>     by setting-up a devres to do so.
->>
->> Found by inspection.
->> Compile tested only.
->>
->> Fixes: 4d089035fa19 ("net: hibmcge: Add interrupt supported in this module")
->> Signed-off-by: Simon Horman <horms@kernel.org>
-> Sorry for the noise, but on reflection I realise that the devm_free_irq()
-> portion of my patch, which is most of it, is not necessary as the
-> allocations are made using devm_request_irq().  And the driver seems to
-> rely on failure during init resulting in device tear-down, at which point
-> devres will take care of freeing the IRQs.
+on 2024/12/6 9:50, Jakub Kicinski wrote:
+> On Tue, 3 Dec 2024 23:01:25 +0800 Jijie Shao wrote:
+>> +static void hbg_debugfs_uninit(void *data)
+>> +{
+>> +	debugfs_remove_recursive((struct dentry *)data);
+>> +}
+>> +
+>> +void hbg_debugfs_init(struct hbg_priv *priv)
+>> +{
+>> +	const char *name = pci_name(priv->pdev);
+>> +	struct device *dev = &priv->pdev->dev;
+>> +	struct dentry *root;
+>> +	u32 i;
+>> +
+>> +	root = debugfs_create_dir(name, hbg_dbgfs_root);
+>> +
+>> +	for (i = 0; i < ARRAY_SIZE(hbg_dbg_infos); i++)
+>> +		debugfs_create_devm_seqfile(dev, hbg_dbg_infos[i].name,
+>> +					    root, hbg_dbg_infos[i].read);
+>> +
+>> +	/* Ignore the failure because debugfs is not a key feature. */
+>> +	devm_add_action_or_reset(dev, hbg_debugfs_uninit, root);
+> There is nothing specific to this driver in the devm action,
+> also no need to create all files as devm if you remove recursive..
 >
-> But I don't see where the IRQ vectors are freed, either on error in
-> hbg_irq_init or device tear-down. I think the following, somewhat smaller
-> patch, would be sufficient to address that.
+> Hi Greg, are you okay with adding debugfs_create_devm_dir() ?
 
-Thank you for reviewing the code.
-
-But sorry, it's actually not needed.
-
-I discussed this with Jakub and Jonathan:
-https://lore.kernel.org/all/383f26a1-aa8f-4fd2-a00a-86abce5942ad@huawei.com/
-
-I also add a comment in code, But I'm sorry, maybe it's a little subtle.
-  /* used pcim_enable_device(),  so the vectors become device managed */
-  ret = pci_alloc_irq_vectors(priv->pdev, HBG_VECTOR_NUM, HBG_VECTOR_NUM,
-  			     PCI_IRQ_MSI | PCI_IRQ_MSIX);
+Of course, it's my pleasure. I will add a patch in V5 to try to add this interface.
 
 Thanks,
 Jijie Shao
 
->
-> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
-> index 25dd25f096fe..44294453d0e4 100644
-> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
-> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
-> @@ -83,6 +83,11 @@ static irqreturn_t hbg_irq_handle(int irq_num, void *p)
->   static const char *irq_names_map[HBG_VECTOR_NUM] = { "tx", "rx",
->   						     "err", "mdio" };
->   
-> +static void hbg_free_irq_vectors(void *data)
-> +{
-> +	pci_free_irq_vectors(data);
-> +}
-> +
->   int hbg_irq_init(struct hbg_priv *priv)
->   {
->   	struct hbg_vector *vectors = &priv->vectors;
-> @@ -96,6 +101,13 @@ int hbg_irq_init(struct hbg_priv *priv)
->   	if (ret < 0)
->   		return dev_err_probe(dev, ret, "failed to allocate vectors\n");
->   
-> +	ret = devm_add_action_or_reset(dev, hbg_free_irq_vectors, priv->pdev);
-> +	if (ret) {
-> +		pci_free_irq_vectors(priv->pdev);
-> +		return dev_err_probe(dev, ret,
-> +				     "failed to add devres to free vectors\n");
-> +	}
-> +
->   	if (ret != HBG_VECTOR_NUM)
->   		return dev_err_probe(dev, -EINVAL,
->   				     "requested %u MSI, but allocated %d MSI\n",
 
