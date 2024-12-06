@@ -1,250 +1,118 @@
-Return-Path: <netdev+bounces-149557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D2089E6375
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:36:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70CF69E638F
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 02:46:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D1F1169D55
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 01:36:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AF1C1886018
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 01:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98196146A66;
-	Fri,  6 Dec 2024 01:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14AAC17DE2D;
+	Fri,  6 Dec 2024 01:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="i2DZKL2O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h9tUFfbg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB6E76048;
-	Fri,  6 Dec 2024 01:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B5617B418;
+	Fri,  6 Dec 2024 01:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733448971; cv=none; b=b4qiMIQkc1NNM868/YKEp8MCGvn6DM5msPun4OkH7PqcPkPcaEYUNqxgf4i/gQ7sEmEBU2x7OGl0YMybNnUPh3AcF/k3HFZ9oYZvRjrrxOPh5Lahur2ezTQ4OQH+J7KRbKYx6cP2axqXG8InuJIJZSB9qww6zhfXXWlMMipOng0=
+	t=1733449517; cv=none; b=e7XiPKvKlKEG0YJN0zMyVwxf3p7yAZ7Jubd7M8PdsgPGH3JuWANEwPGg01j+nRYbeWaAe5kYbXPTH76TIfekBHXOBLXr/8ES26QQBwUDIfFfFIV9uVBnlSb/Pi0g0atL0ClTNE+qTRz/HdQhdquxj/NObYWTrDaQS4fwA4mMMbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733448971; c=relaxed/simple;
-	bh=ClaGFAjT9OGVQE76hOKxuFpp303e0oLCe8weGGn/BF0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=hq3m97r32Zp5CrpC0N2Wm24dfrLLLN95exIWlFEWyUhXRsA5hNGDlRHG1Y/9CDaeDfhXeWNNdWhVRHF+Na/q8r+zJ5kNVCK22lov1/qziu5krgDVCJOIaQ/leiAgFG29vHTtC3B90TWVOQxu17FZhosNgX1ng8lqy975xGDaN/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=i2DZKL2O; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5Jhls8018707;
-	Fri, 6 Dec 2024 01:36:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	yNYu94Th3Iya8IXrhslB+e6H0wzazy9Px1RZDyHR+wU=; b=i2DZKL2OFQpQSlAE
-	VV5s869xrWJY5GgsolEK4gz7tngMMg3ZD1HFjMMEfJ3ul9D2mkClTdgkeqvNnm9S
-	Nw9VtdPeTUmlvsn37RpKF9KaeDpmcphIXFbxvHVKcZ183JEyjDYdf8kZkexb2HNU
-	ZUdXs5ASLvHmc3YIKqCsoxeJ4gYZytFbbuCPN6iM6PkMsSAe0LkSXKMFbj8UbcWp
-	dFwSVcstyk0lM6DmH8WZysTlm8vcqY4aS23e7GjK2xEuBDEkyAVY2imNRP59Sb1q
-	wdvNVZeQmDuLoHVGjtfEtDBwfAl3hT0VZbNr480YSCsxd9WCrt+lQ4JRcyBOskcW
-	v3j2Kw==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43bjk8rmnm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Dec 2024 01:36:04 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B61a3VT026895
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 6 Dec 2024 01:36:03 GMT
-Received: from yijiyang-gv.ap.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 5 Dec 2024 17:36:00 -0800
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-Date: Fri, 6 Dec 2024 09:35:05 +0800
-Subject: [PATCH v5 2/2] arm64: dts: qcom: qcs8300-ride: enable ethernet0
+	s=arc-20240116; t=1733449517; c=relaxed/simple;
+	bh=h0caQLlQqzGhCPb9mURayuOKsn7HOgiOET5d65osvOw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZbXOt1wBys/Hn9fpkQXSxK4zflPUPerPYULPNukpD/AhdaT2dCS7gjrPE3LTOym8qRZIU18t5GjiQNfxXHbhf166wwEjxtysRB4KYe523cwjo5Ez0RhS7/RD3bCXXepRU4QjOvozC+3XTtf1Ic/0cmV95nlh5qBRy2Ergsscb7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h9tUFfbg; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2ee88b57ac0so1284156a91.0;
+        Thu, 05 Dec 2024 17:45:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733449515; x=1734054315; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+7OGBrM+Ds5/EU59L+lS8dg3ydHTx6BnOQHdjJwv4g8=;
+        b=h9tUFfbgzcuxi+5f464ztwix4OAFFqDRtHyE+JXo3T2VkXbneYGfah3tO9OTy38eRl
+         THzMVxbFHltH9fofP4ZmVHizalTJDMjvO6N3AAA6ejk2oS0qpk8H+lzGb3Yib08ibVNP
+         4clZXz7+jafsUG5c7x4JDFTiNFcPD5MOmlSLwf1dm/jfcwwCIsql05mpO4N024ZIiGBR
+         HWVHD+5coKw16SRXe2MaueBCfwNEgule55cSXDi5q7hSZygB2SQxX//yPArq/PsUA4Jk
+         9LrdE1VHMKIqdDIZ1jUs5PnlEsQ0LkdkHZlh0ORmaut+wmeqzENM1KFhQCTWG7vY1mBy
+         syWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733449515; x=1734054315;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+7OGBrM+Ds5/EU59L+lS8dg3ydHTx6BnOQHdjJwv4g8=;
+        b=hzrALXKJPdpyfKNM2bEi6I1IdnnPffIVfge8vR2CXLoDMEIT+piriKPvpHnlTSF514
+         yMfJyMkvkNtUerU1EvImmbpJCOaqe8aebM2Ihq4PoyRnO05aI63ko6dP9my2SJZSVH5T
+         TpkwdJApz2mdYAXSLmrSShOqpqYR55DOA/xf/hEmf1Mu7CqZXvYT92bnXnxJws5fw+1p
+         9K2soIyhxkQ4JfLkx1wOBiLEL1BRis8Bd0a9vPbf4O8aamQr3Say4OetxnucEBSL0r/k
+         zR0ExnWJFDjyYcTloe6bjTG5ZgguYcB143iJEsnvcEOoEtr+gZadBa0MLQrlGrmsDjOx
+         5O5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXLcW66cGpH6fQhr9ak2R6HU+sz8aR7/T55PEvfZJToOn5e8RCmt0p8586lwtZ+k+gOvDFFOLPFEZzxU7s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyF++DvJLNi8VN774a7wLq0YLyruodlnn/MLZE9C+ACnH/iZ3dY
+	y8iSp67WxUc3wk1g+8B+aMlDvsXQiA+9WUSv9TIiDcaUnYPErEmZ
+X-Gm-Gg: ASbGncvuXLpxtm2X6C8+SmUwsLTxcaNOJ0wLsUzwP6Qkary35tslWqMw5hOp4Gw4wxZ
+	4HP8oLsPu4FcXNdMrk7p2nhL++6PzpjzskLgbyj4RYsRzotKdtpKTT7jJVfaPXfLjzka2glYD/0
+	GfXP+me9vPnJ/qyQIxLv4Bm05/JpMmOkWTKnhunEpSkVZc3YgaGI6aX8j2yY8jyoPv8I1pkQ7gc
+	Q+Hg1oZTlYjtrhn6d5gM+redem7DPoeehNVtAhd1bGnmm4=
+X-Google-Smtp-Source: AGHT+IHFjL05H9QqEdxBhvGferOk0PgAeiYGY9/70kKdEA1TFewoP80NXEZbHvZ4XqWoW1SHDKN0wQ==
+X-Received: by 2002:a17:90b:3f44:b0:2e2:c2b0:d03e with SMTP id 98e67ed59e1d1-2ef68d99261mr2300618a91.5.1733449514616;
+        Thu, 05 Dec 2024 17:45:14 -0800 (PST)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ef2708becesm3962772a91.52.2024.12.05.17.45.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Dec 2024 17:45:14 -0800 (PST)
+Date: Fri, 6 Dec 2024 09:45:02 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ andrew+netdev@lunn.ch, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ xfr@outlook.com, Jon Hunter <jonathanh@nvidia.com>, Thierry Reding
+ <thierry.reding@gmail.com>
+Subject: Re: [PATCH net v1] net: stmmac: TSO: Fix unaligned DMA unmap for
+ non-paged SKB data
+Message-ID: <20241206094502.000062e8@gmail.com>
+In-Reply-To: <Z1HYKh9eCwkYGlrA@shell.armlinux.org.uk>
+References: <20241205091830.3719609-1-0x1207@gmail.com>
+	<Z1HYKh9eCwkYGlrA@shell.armlinux.org.uk>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-ID: <20241206-dts_qcs8300-v5-2-422e4fda292d@quicinc.com>
-References: <20241206-dts_qcs8300-v5-0-422e4fda292d@quicinc.com>
-In-Reply-To: <20241206-dts_qcs8300-v5-0-422e4fda292d@quicinc.com>
-To: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Richard Cochran
-	<richardcochran@gmail.com>
-CC: <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Yijie Yang
-	<quic_yijiyang@quicinc.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1733448952; l=3108;
- i=quic_yijiyang@quicinc.com; s=20240408; h=from:subject:message-id;
- bh=ClaGFAjT9OGVQE76hOKxuFpp303e0oLCe8weGGn/BF0=;
- b=hLHPgWQw7Sh3FtbqC0fsflhj/VE77j1iXd7qPLxEBosRToXZx462MYjvOrzeT9itOIbe+wxHw
- s6UfuBcc4LEDZZcQjdsE9J1FWgCKuhCj9Yfmx1HbOvlmTac9CIfN170
-X-Developer-Key: i=quic_yijiyang@quicinc.com; a=ed25519;
- pk=XvMv0rxjrXLYFdBXoFjTdOdAwDT5SPbQ5uAKGESDihk=
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: XzXVAiHDyQB2hv3MpR8yUC6ispzRnyKG
-X-Proofpoint-GUID: XzXVAiHDyQB2hv3MpR8yUC6ispzRnyKG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- impostorscore=0 bulkscore=0 phishscore=0 suspectscore=0 spamscore=0
- lowpriorityscore=0 adultscore=0 mlxscore=0 mlxlogscore=901
- priorityscore=1501 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2411120000 definitions=main-2412060012
 
-Enable the SerDes PHY on qcs8300-ride. Add the MDC and MDIO pin functions
-for ethernet0 on qcs8300-ride. Enable the ethernet port on qcs8300-ride.
+Hi Russell,
 
-Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
----
- arch/arm64/boot/dts/qcom/qcs8300-ride.dts | 112 ++++++++++++++++++++++++++++++
- 1 file changed, 112 insertions(+)
+On Thu, 5 Dec 2024 16:43:22 +0000, "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> I'm slightly disappointed to have my patch turned into a commit under
+> someone else's authorship before I've had a chance to do that myself.
+> Next time I won't send a patch out until I've done that.
+> 
+I am really sorry for this, I should have requested your permission first.
 
-diff --git a/arch/arm64/boot/dts/qcom/qcs8300-ride.dts b/arch/arm64/boot/dts/qcom/qcs8300-ride.dts
-index 7eed19a694c39dbe791afb6a991db65acb37e597..302542305726da669f0c515da12cbdec51036c51 100644
---- a/arch/arm64/boot/dts/qcom/qcs8300-ride.dts
-+++ b/arch/arm64/boot/dts/qcom/qcs8300-ride.dts
-@@ -210,6 +210,95 @@ vreg_l9c: ldo9 {
- 	};
- };
- 
-+&ethernet0 {
-+	phy-mode = "2500base-x";
-+	phy-handle = <&phy0>;
-+
-+	pinctrl-0 = <&ethernet0_default>;
-+	pinctrl-names = "default";
-+
-+	snps,mtl-rx-config = <&mtl_rx_setup>;
-+	snps,mtl-tx-config = <&mtl_tx_setup>;
-+	snps,ps-speed = <1000>;
-+
-+	status = "okay";
-+
-+	mdio {
-+		compatible = "snps,dwmac-mdio";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		phy0: phy@8 {
-+			compatible = "ethernet-phy-id31c3.1c33";
-+			reg = <0x8>;
-+			device_type = "ethernet-phy";
-+			interrupts-extended = <&tlmm 4 IRQ_TYPE_EDGE_FALLING>;
-+			reset-gpios = <&tlmm 31 GPIO_ACTIVE_LOW>;
-+			reset-assert-us = <11000>;
-+			reset-deassert-us = <70000>;
-+		};
-+	};
-+
-+	mtl_rx_setup: rx-queues-config {
-+		snps,rx-queues-to-use = <4>;
-+		snps,rx-sched-sp;
-+
-+		queue0 {
-+			snps,dcb-algorithm;
-+			snps,map-to-dma-channel = <0x0>;
-+			snps,route-up;
-+			snps,priority = <0x1>;
-+		};
-+
-+		queue1 {
-+			snps,dcb-algorithm;
-+			snps,map-to-dma-channel = <0x1>;
-+			snps,route-ptp;
-+		};
-+
-+		queue2 {
-+			snps,avb-algorithm;
-+			snps,map-to-dma-channel = <0x2>;
-+			snps,route-avcp;
-+		};
-+
-+		queue3 {
-+			snps,avb-algorithm;
-+			snps,map-to-dma-channel = <0x3>;
-+			snps,priority = <0xc>;
-+		};
-+	};
-+
-+	mtl_tx_setup: tx-queues-config {
-+		snps,tx-queues-to-use = <4>;
-+		snps,tx-sched-sp;
-+
-+		queue0 {
-+			snps,dcb-algorithm;
-+		};
-+
-+		queue1 {
-+			snps,dcb-algorithm;
-+		};
-+
-+		queue2 {
-+			snps,avb-algorithm;
-+			snps,send_slope = <0x1000>;
-+			snps,idle_slope = <0x1000>;
-+			snps,high_credit = <0x3e800>;
-+			snps,low_credit = <0xffc18000>;
-+		};
-+
-+		queue3 {
-+			snps,avb-algorithm;
-+			snps,send_slope = <0x1000>;
-+			snps,idle_slope = <0x1000>;
-+			snps,high_credit = <0x3e800>;
-+			snps,low_credit = <0xffc18000>;
-+		};
-+	};
-+};
-+
- &gcc {
- 	clocks = <&rpmhcc RPMH_CXO_CLK>,
- 		 <&sleep_clk>,
-@@ -247,6 +336,29 @@ &rpmhcc {
- 	clock-names = "xo";
- };
- 
-+&serdes0 {
-+	phy-supply = <&vreg_l5a>;
-+	status = "okay";
-+};
-+
-+&tlmm {
-+	ethernet0_default: ethernet0-default-state {
-+		ethernet0_mdc: ethernet0-mdc-pins {
-+			pins = "gpio5";
-+			function = "emac0_mdc";
-+			drive-strength = <16>;
-+			bias-pull-up;
-+		};
-+
-+		ethernet0_mdio: ethernet0-mdio-pins {
-+			pins = "gpio6";
-+			function = "emac0_mdio";
-+			drive-strength = <16>;
-+			bias-pull-up;
-+		};
-+	};
-+};
-+
- &uart7 {
- 	status = "okay";
- };
+> 
+> Please use rmk+kernel@armlinux.org.uk there.
+> 
+So another iteration is required here.
+Would you mind me send the v2 of this fix?
+I will not send v2 without your permission.
 
--- 
-2.34.1
-
+Thanks.
 
