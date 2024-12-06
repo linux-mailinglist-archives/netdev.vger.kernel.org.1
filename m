@@ -1,173 +1,274 @@
-Return-Path: <netdev+bounces-149696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BF0E9E6DEF
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 13:19:57 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C46D59E6E32
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 13:32:27 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE84A2822C5
-	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 12:19:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95AC716677B
+	for <lists+netdev@lfdr.de>; Fri,  6 Dec 2024 12:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04853201004;
-	Fri,  6 Dec 2024 12:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="jTjz4S9w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7853A200103;
+	Fri,  6 Dec 2024 12:32:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296721FCD0F;
-	Fri,  6 Dec 2024 12:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8481FC0F6;
+	Fri,  6 Dec 2024 12:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733487591; cv=none; b=VW5uaGEls3c0W6BmVvD9YY8uHIueg/1O58txXOXcktZLMkgGQT0xubjIoZLEedLZaNlGRphIjkXx7JAE0itO4dgRnXXZjZIsIxBHNXh4KDYAOeUUcLVxCbwsyGIkUSiIrxgCXwuXyr5vjshBocDSKvYDxoroInc8aqTnY1nczqA=
+	t=1733488344; cv=none; b=f6eKgZHBbDrERHxn1E0R9WOnVqWEpFZf83ta/QQrsIzybZGTpkbE0znM2PPKvwpr98XuafL2S3zeKZeqK1kTr+rAFY2a0Y9YB0jHwLmA8l0hVMNHwe/hKUiHnIX4qBmlcev6Ftdz+LJJaMLky2vWWqAg8mG+5TXHvNQrfELMPc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733487591; c=relaxed/simple;
-	bh=4siyzwtx0SoKFEFM6fcZ0GN4NJVmR4GccRdwKuO/JY4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=r3l/32dXs6EMMTp8IALYVm1DySJ7TL9aiM62Em31fhYwg9wN+xJFVlraTwLxQ4hvih5bfLJYNnq7HIcLztsf1IucgDdy8WT+2Y+lrIog5X0ql/pErGLpHQ3XKUhFrjmeEZsRo3vNSj9nc7vHFVMrfqFC7GB6m6OTejqrJoN34ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=jTjz4S9w; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id 5653D21D92;
-	Fri,  6 Dec 2024 14:19:40 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=QvUxd/vxMw8Bwuy6xT8sVlJO+DjkY4zLPCCgu87quuk=; b=jTjz4S9wmd54
-	L6Dz1c6a27LaRJin11iO1/LuIDOevuvoLPkbtFgX8a9QeF+gk3Ke7ELKws4UM/wI
-	Azo277jpuO6dL16+u6kzaO4XWjIKd2oZko3mhOlnhgqboDkTx+QByVc3J0wxQWGv
-	BPhzSfB2p/spiH5Qlj6JavO65+dbOaxEtpzeJyU7aMrTMdcIoQyI02n9V6EC3cpI
-	OFhTpOfPLOUUwI2aDh4SDcYZ0w7LwI6N69heV52JFXt0MJ52b2z5+DC7G2RUU8Pt
-	47r8bhTmj+hf3eM61bUAnMMvdSFeGvqwDKlGOkP8RhoDx+LjFJKcarqGd+8UAsg3
-	5xgDSC1IMtdCP8OTzIitCsAPE8ev+Accj6IoDPSdL6380Io7pOO54slJach30Lps
-	fen1j9m5NDXNr0HLl3mgSb0FWpvM7lNpn393nmw+1ysq9TVZSrfqlxOomwFMYKY/
-	Ub26103Wle4wX/hGBv0s5fi6Qmf/A/yspu9aSOydu6A7KbW1l8hnVDawyWTd2qXQ
-	osu+i30K3PfiMBclcihy81Km6SmmF7a1FhPlBcgePEEd4KxJxJglyRHgbAFvc2eg
-	MrxupfqsU6xYRI9808PMbE/8HxhmTFbbXG2PKeuDIBpHb78GOEfNaBHZRzdY16En
-	gWsUWiNkgzoxMOsC7bIWmgECURJCLUc=
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Fri,  6 Dec 2024 14:19:39 +0200 (EET)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id 4E9EB15F19;
-	Fri,  6 Dec 2024 14:19:31 +0200 (EET)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 4B6CJLt6022576;
-	Fri, 6 Dec 2024 14:19:22 +0200
-Date: Fri, 6 Dec 2024 14:19:21 +0200 (EET)
-From: Julian Anastasov <ja@ssi.bg>
-To: David Laight <David.Laight@ACULAB.COM>
-cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "'Naresh Kamboju'" <naresh.kamboju@linaro.org>,
-        "'Dan Carpenter'" <dan.carpenter@linaro.org>,
-        "'pablo@netfilter.org'" <pablo@netfilter.org>,
-        "'open list'" <linux-kernel@vger.kernel.org>,
-        "'lkft-triage@lists.linaro.org'" <lkft-triage@lists.linaro.org>,
-        "'Linux Regressions'" <regressions@lists.linux.dev>,
-        "'Linux ARM'" <linux-arm-kernel@lists.infradead.org>,
-        "'netfilter-devel@vger.kernel.org'" <netfilter-devel@vger.kernel.org>,
-        "'Arnd Bergmann'" <arnd@arndb.de>,
-        "'Anders Roxell'" <anders.roxell@linaro.org>,
-        "'Johannes Berg'" <johannes.berg@intel.com>,
-        "'toke@kernel.org'" <toke@kernel.org>,
-        "'Al Viro'" <viro@zeniv.linux.org.uk>,
-        "'kernel@jfarr.cc'" <kernel@jfarr.cc>,
-        "'kees@kernel.org'" <kees@kernel.org>
-Subject: Re: [PATCH net] Fix clamp() of ip_vs_conn_tab on small memory
- systems.
-In-Reply-To: <33893212b1cc4a418cec09aeeed0a9fc@AcuMS.aculab.com>
-Message-ID: <5ec10e7c-d050-dab8-1f1b-d0ca2d922eef@ssi.bg>
-References: <33893212b1cc4a418cec09aeeed0a9fc@AcuMS.aculab.com>
+	s=arc-20240116; t=1733488344; c=relaxed/simple;
+	bh=8lchoAWkg6EvNGDRWohDILhUCU4vMmtlP98SiePUPi0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tDrPaAphxgmdkW6wqR2htt63/C+I6UhA2s7vXQUtw83eOHezqfqhjis1BU0N/BHFnQyJmO9zjPLEWJ4n2ZcwvrDSpux4u1yKuuhWXov97n2MG4fnc2naRq3Wlc+h5LI8TkcoXbJihYa7HiQLGRFEoObVofOSuunImBu4UEFR0Lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Y4VvS52Krz1kvGM;
+	Fri,  6 Dec 2024 20:29:56 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 09CB81402E1;
+	Fri,  6 Dec 2024 20:32:16 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 6 Dec 2024 20:32:15 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>, Shuah
+ Khan <skhan@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>,
+	Linux-MM <linux-mm@kvack.org>
+Subject: [PATCH net-next v2 00/10] Replace page_frag with page_frag_cache (Part-2)
+Date: Fri, 6 Dec 2024 20:25:23 +0800
+Message-ID: <20241206122533.3589947-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
+
+This is part 2 of "Replace page_frag with page_frag_cache",
+which introduces the new API and replaces page_frag with
+page_frag_cache for sk_page_frag().
+
+The part 1 of "Replace page_frag with page_frag_cache" is in
+[1].
+
+After [2], there are still two implementations for page frag:
+
+1. mm/page_alloc.c: net stack seems to be using it in the
+   rx part with 'struct page_frag_cache' and the main API
+   being page_frag_alloc_align().
+2. net/core/sock.c: net stack seems to be using it in the
+   tx part with 'struct page_frag' and the main API being
+   skb_page_frag_refill().
+
+This patchset tries to unfiy the page frag implementation
+by replacing page_frag with page_frag_cache for sk_page_frag()
+first. net_high_order_alloc_disable_key for the implementation
+in net/core/sock.c doesn't seems matter that much now as pcp
+is also supported for high-order pages:
+commit 44042b449872 ("mm/page_alloc: allow high-order pages to
+be stored on the per-cpu lists")
+
+As the related change is mostly related to networking, so
+targeting the net-next. And will try to replace the rest
+of page_frag in the follow patchset.
+
+After this patchset:
+1. Unify the page frag implementation by taking the best out of
+   two the existing implementations: we are able to save some space
+   for the 'page_frag_cache' API user, and avoid 'get_page()' for
+   the old 'page_frag' API user.
+2. Future bugfix and performance can be done in one place, hence
+   improving maintainability of page_frag's implementation.
+
+Performance validation for part2:
+1. Using micro-benchmark ko added in patch 1 to test aligned and
+   non-aligned API performance impact for the existing users, there
+   seems to be about 20% performance degradation for refactoring
+   page_frag to support the new API, which seems to nullify most of
+   the performance gain in [3] of part1.
+2. Use the below netcat test case, there seems to be some minor
+   performance gain for replacing 'page_frag' with 'page_frag_cache'
+   using the new page_frag API after this patchset.
+   server: taskset -c 32 nc -l -k 1234 > /dev/null
+   client: perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | taskset -c 1 nc 127.0.0.1 1234
+
+In order to avoid performance noise as much as possible, the testing
+is done in system without any other load and have enough iterations to
+prove the data is stable enough, complete log for testing is below:
+
+perf stat -r 200 -- insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000
+perf stat -r 200 -- insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000 test_align=1
+taskset -c 32 nc -l -k 1234 > /dev/null
+perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | taskset -c 1 nc 127.0.0.1 1234
+
+*After* this patchset:
+
+ Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000' (200 runs):
+
+         18.753187      task-clock (msec)         #    0.003 CPUs utilized            ( +-  0.44% )
+                 8      context-switches          #    0.422 K/sec                    ( +-  0.30% )
+                 0      cpu-migrations            #    0.003 K/sec                    ( +- 32.09% )
+                84      page-faults               #    0.004 M/sec                    ( +-  0.08% )
+          48700826      cycles                    #    2.597 GHz                      ( +-  0.44% )
+          62086543      instructions              #    1.27  insn per cycle           ( +-  0.03% )
+          14869358      branches                  #  792.898 M/sec                    ( +-  0.03% )
+             19639      branch-misses             #    0.13% of all branches          ( +-  0.60% )
+
+       7.035285915 seconds time elapsed                                          ( +-  0.06% )
+
+ Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000 test_align=1' (200 runs):
+
+         18.442151      task-clock (msec)         #    0.006 CPUs utilized            ( +-  0.01% )
+                 8      context-switches          #    0.422 K/sec                    ( +-  0.40% )
+                 0      cpu-migrations            #    0.001 K/sec                    ( +- 57.44% )
+                84      page-faults               #    0.005 M/sec                    ( +-  0.08% )
+          47890149      cycles                    #    2.597 GHz                      ( +-  0.01% )
+          60718325      instructions              #    1.27  insn per cycle           ( +-  0.00% )
+          14570862      branches                  #  790.085 M/sec                    ( +-  0.00% )
+             19613      branch-misses             #    0.13% of all branches          ( +-  0.12% )
+
+       3.210892358 seconds time elapsed                                          ( +-  0.12% )
+
+ Performance counter stats for 'taskset -c 0 head -c 20G /dev/zero' (200 runs):
+
+      16824.017944      task-clock (msec)         #    0.621 CPUs utilized            ( +-  0.02% )
+           2987954      context-switches          #    0.178 M/sec                    ( +-  0.04% )
+                 1      cpu-migrations            #    0.000 K/sec
+                93      page-faults               #    0.006 K/sec                    ( +-  0.09% )
+       31982647267      cycles                    #    1.901 GHz                      ( +-  0.03% )
+       38907812424      instructions              #    1.22  insn per cycle           ( +-  0.02% )
+        7112328962      branches                  #  422.749 M/sec                    ( +-  0.03% )
+          94789062      branch-misses             #    1.33% of all branches          ( +-  0.21% )
+
+      27.104994660 seconds time elapsed                                          ( +-  0.03% )
 
 
-	Hello,
+*Before* this patchset:
 
-On Fri, 6 Dec 2024, David Laight wrote:
+Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000' (200 runs):
 
-> The intention of the code seems to be that the minimum table
-> size should be 256 (1 << min).
-> However the code uses max = clamp(20, 5, max_avail) which implies
+         18.700051      task-clock (msec)         #    0.003 CPUs utilized            ( +-  1.04% )
+                 8      context-switches          #    0.420 K/sec                    ( +-  0.31% )
+                 0      cpu-migrations            #    0.019 K/sec                    ( +- 10.16% )
+                81      page-faults               #    0.004 M/sec                    ( +-  0.09% )
+          48548980      cycles                    #    2.596 GHz                      ( +-  1.04% )
+          61857980      instructions              #    1.27  insn per cycle           ( +-  0.09% )
+          14814201      branches                  #  792.201 M/sec                    ( +-  0.08% )
+             42007      branch-misses             #    0.28% of all branches          ( +-  0.11% )
 
-	Actually, it tries to reduce max=20 (max possible) below
-max_avail: [8 .. max_avail]. Not sure what 5 is here...
+       5.565806266 seconds time elapsed                                          ( +-  0.08% )
 
-> the author thought max_avail could be less than 5.
-> But clamp(val, min, max) is only well defined for max >= min.
-> If max < min whether is returns min or max depends on the order of
-> the comparisons.
+ Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000 test_align=1' (200 runs):
 
-	Looks like max_avail goes below 8 ? What value you see
-for such small system?
+         18.468618      task-clock (msec)         #    0.007 CPUs utilized            ( +-  1.14% )
+                 8      context-switches          #    0.422 K/sec                    ( +-  0.43% )
+                 0      cpu-migrations            #    0.026 K/sec                    ( +-  7.89% )
+                81      page-faults               #    0.004 M/sec                    ( +-  0.08% )
+          47950150      cycles                    #    2.596 GHz                      ( +-  1.14% )
+          61745530      instructions              #    1.29  insn per cycle           ( +-  0.09% )
+          14787783      branches                  #  800.698 M/sec                    ( +-  0.08% )
+             41734      branch-misses             #    0.28% of all branches          ( +-  0.09% )
 
-> Change to clamp(max_avail, 5, 20) which has the expected behaviour.
+       2.584180919 seconds time elapsed                                          ( +-  0.04% )
 
-	It should be clamp(max_avail, 8, 20)
+ Performance counter stats for 'taskset -c 0 head -c 20G /dev/zero' (200 runs):
 
-> 
-> Replace the clamp_val() on the line below with clamp().
-> clamp_val() is just 'an accident waiting to happen' and not needed here.
+      17105.617450      task-clock (msec)         #    0.599 CPUs utilized            ( +-  0.02% )
+           2822654      context-switches          #    0.165 M/sec                    ( +-  0.03% )
+                 1      cpu-migrations            #    0.000 K/sec                    ( +-  0.50% )
+                93      page-faults               #    0.005 K/sec                    ( +-  0.09% )
+       31819244033      cycles                    #    1.860 GHz                      ( +-  0.03% )
+       37297412811      instructions              #    1.17  insn per cycle           ( +-  0.01% )
+        6676699757      branches                  #  390.322 M/sec                    ( +-  0.01% )
+         325102016      branch-misses             #    4.87% of all branches          ( +-  0.06% )
 
-	OK
+      28.568053622 seconds time elapsed                                          ( +-  0.02% )
 
-> Fixes: 4f325e26277b6
-> (Although I actually doubt the code is used on small memory systems.)
-> 
-> Detected by compile time checks added to clamp(), specifically:
-> minmax.h: use BUILD_BUG_ON_MSG() for the lo < hi test in clamp()
+Note, ipv4-udp, ipv6-tcp and ipv6-udp is also tested with the below script:
+nc -u -l -k 1234 > /dev/null
+perf stat -r 4 -- head -c 51200000000 /dev/zero | nc -u 127.0.0.1 1234
 
-	Existing or new check? Does it happen that max_avail
-is a constant, so that a compile check triggers?
+nc -l6 -k 1234 > /dev/null
+perf stat -r 4 -- head -c 51200000000 /dev/zero | nc ::1 1234
 
-> 
-> Signed-off-by: David Laight <david.laight@aculab.com>
+nc -l6 -k -u 1234 > /dev/null
+perf stat -r 4 -- head -c 51200000000 /dev/zero | nc -u ::1 1234
 
-	The code below looks ok to me but can you change the
-comments above to more correctly specify the values and if the
-problem is that max_avail goes below 8 (min).
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+CC: Shuah Khan <skhan@linuxfoundation.org>
+CC: Andrew Morton <akpm@linux-foundation.org>
+CC: Linux-MM <linux-mm@kvack.org>
 
-> ---
->  net/netfilter/ipvs/ip_vs_conn.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
-> index 98d7dbe3d787..c0289f83f96d 100644
-> --- a/net/netfilter/ipvs/ip_vs_conn.c
-> +++ b/net/netfilter/ipvs/ip_vs_conn.c
-> @@ -1495,8 +1495,8 @@ int __init ip_vs_conn_init(void)
->  	max_avail -= 2;		/* ~4 in hash row */
->  	max_avail -= 1;		/* IPVS up to 1/2 of mem */
->  	max_avail -= order_base_2(sizeof(struct ip_vs_conn));
+1. https://lore.kernel.org/all/20241028115343.3405838-1-linyunsheng@huawei.com/
+2. https://lore.kernel.org/all/20240228093013.8263-1-linyunsheng@huawei.com/
+3. https://lore.kernel.org/all/472a7a09-387f-480d-b66c-761e0b6192ef@huawei.com/
 
-	More likely we can additionally clamp max_avail here:
+V2: Repost based on the latest net-next.
 
-	max_avail = max(min, max_avail);
+V1: Rebase on latest net-next tree and redo the performance test.
 
-	But your solution solves the problem with less lines.
+RFC:
+    1. CC Andrew and MM ML explicitly.
+    2. Split into two parts according to the discussion in v22, and this is
+       the part-2.
+    3. Split 'introduce new API' patch to more patches to make more reviewable
+       and easier to discuss.
 
-> -	max = clamp(max, min, max_avail);
-> -	ip_vs_conn_tab_bits = clamp_val(ip_vs_conn_tab_bits, min, max);
-> +	max = clamp(max_avail, min, max);
-> +	ip_vs_conn_tab_bits = clamp(ip_vs_conn_tab_bits, min, max);
->  	ip_vs_conn_tab_size = 1 << ip_vs_conn_tab_bits;
->  	ip_vs_conn_tab_mask = ip_vs_conn_tab_size - 1;
->  
-> -- 
-> 2.17.1
+Yunsheng Lin (10):
+  mm: page_frag: some minor refactoring before adding new API
+  net: rename skb_copy_to_page_nocache() helper
+  mm: page_frag: update documentation for page_frag
+  mm: page_frag: introduce page_frag_alloc_abort() related API
+  mm: page_frag: introduce refill prepare & commit API
+  mm: page_frag: introduce alloc_refill prepare & commit API
+  mm: page_frag: introduce probe related API
+  mm: page_frag: add testing for the newly added API
+  net: replace page_frag with page_frag_cache
+  mm: page_frag: add an entry in MAINTAINERS for page_frag
 
-Regards
+ Documentation/mm/page_frags.rst               | 207 ++++++++++-
+ MAINTAINERS                                   |  12 +
+ .../chelsio/inline_crypto/chtls/chtls.h       |   3 -
+ .../chelsio/inline_crypto/chtls/chtls_io.c    | 101 ++----
+ .../chelsio/inline_crypto/chtls/chtls_main.c  |   3 -
+ drivers/net/tun.c                             |  47 ++-
+ include/linux/page_frag_cache.h               | 330 +++++++++++++++++-
+ include/linux/sched.h                         |   2 +-
+ include/net/sock.h                            |  30 +-
+ kernel/exit.c                                 |   3 +-
+ kernel/fork.c                                 |   3 +-
+ mm/page_frag_cache.c                          | 108 +++++-
+ net/core/skbuff.c                             |  58 +--
+ net/core/skmsg.c                              |  12 +-
+ net/core/sock.c                               |  32 +-
+ net/ipv4/ip_output.c                          |  28 +-
+ net/ipv4/tcp.c                                |  26 +-
+ net/ipv4/tcp_output.c                         |  25 +-
+ net/ipv6/ip6_output.c                         |  28 +-
+ net/kcm/kcmsock.c                             |  21 +-
+ net/mptcp/protocol.c                          |  47 ++-
+ net/tls/tls_device.c                          | 100 ++++--
+ .../selftests/mm/page_frag/page_frag_test.c   |  76 +++-
+ tools/testing/selftests/mm/run_vmtests.sh     |   4 +
+ tools/testing/selftests/mm/test_page_frag.sh  |  27 ++
+ 25 files changed, 1045 insertions(+), 288 deletions(-)
 
---
-Julian Anastasov <ja@ssi.bg>
+-- 
+2.33.0
 
 
