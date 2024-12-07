@@ -1,263 +1,172 @@
-Return-Path: <netdev+bounces-149892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FD3F9E7F5A
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 10:20:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9057D9E7F7C
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 11:13:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A8E61689BA
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 09:20:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 758F21883AD1
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 10:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9648213D53A;
-	Sat,  7 Dec 2024 09:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FC6137750;
+	Sat,  7 Dec 2024 10:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IIv8tNb6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hkOlp2GT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1BA200A0
-	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 09:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BDB126C0D;
+	Sat,  7 Dec 2024 10:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733563219; cv=none; b=AHK3Wv+c4HVUgswwMGliYTObsgwL0TGzKpeynpCW0UxOyC/nGb+zQvl5+ispmK3rm+2PCFE5NsSGLsBFlkY7awBR91XRXtxdMxECoZ2qFzL21qdL18mbmkn4lGSeIeZFVwIG8tXvnVlyz4oitTzlYngWTsbDGSG2dkycQ8rlQ+A=
+	t=1733566413; cv=none; b=jer5JjlqAi4XPItMRwUKuv0mwzd0uA1XtBGdaBBvVvC76O47cMdoLmk1U5BNyuV7lzeCjjVDOQHatGM7sesTrvLojXuFKTgv3PTecsV+lkocEbIDWXIH2RQDeSBvSOLi27GK37t5o6leF1wevfG1ohFZimiJ0nrAbA9UVUaN4Zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733563219; c=relaxed/simple;
-	bh=xyd5FUbiPaY8jcTOneSCg5PU2GDZlgdzlsid8WJRkfA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G9k2Jhx+7nkFu9dsr/D0c1EGY5Glh9SoX+jMXHbQzmCX5qkneoN/GoMXcPzNdr922UsrriBsI8uDEAs3uYwiPyw+iwbHIe6MGcMHwejwgxvwyoBGteimoDAuK3YaPbMjwfseZkCT/Tp/fL+NEkqboGKO9VCro/lSA5RdsyerI4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IIv8tNb6; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-725b37e2b0cso1735772b3a.1
-        for <netdev@vger.kernel.org>; Sat, 07 Dec 2024 01:20:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733563217; x=1734168017; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uk9wnwTSIk7cVUU2owv63/jU7AlcpZe40VG3CwPRjKc=;
-        b=IIv8tNb6kP6NYubP77YpScWhFz+rEM6aQOnTce5yoRAt5awsjkKaqyZPmKbx496mn7
-         agJdS0hOzBlsYoyWxtfmZzXNpObP6dFlY21Zyzilvw/Orl8OH1SJ1EUx3+DY56MqBOB8
-         /YaUDk6EKY1Q8U7vnHH6E2Jy35mifwdbzYUV+PE4erksYzNLzF99W51KRtygqTdPxQyj
-         OOs3FVY2bSaC8zeHE5xTqaf0xP+Y9cPDjzGv704ba4ipQvciKt2KT7NVTaqgSKE5OM8k
-         K/52q6tT6TnIeYnv+T9XaRVaCDQYKQTs4FqE6tCzlfzytRKXBpEJWQtZH/q0UiLu3bn0
-         GOIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733563217; x=1734168017;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uk9wnwTSIk7cVUU2owv63/jU7AlcpZe40VG3CwPRjKc=;
-        b=tbJvc4TYSz5pLoMYlM4uMdyavDFKZpWqpN2aZ3c2QZBmuqHBMGqFvRyAhcC3SL0Qyf
-         YLeupt+1NPrSd32tCWuNOig/MdUKaaQ0xVkcujFnRNxBFTpHdWAv63mpkqWH7n9b5tN7
-         L41hF+jjW7qm4XqlpGCQuPaft69l8lJ7clzbf0oKUR1WNcxtdV/pdxwCjKyrftOMuseJ
-         HO2zKyi3kmGjM4q9qZ9ijziZg/Z9uPysZ3+9aARaDx9lPPguTql2PNHfTPa5jkhn9pIe
-         zmSPFh3Dmpf0x3FzVm7AkctkoIlRdBuJnepD0151y7RIwfDLBorjjQOociyeuNtTMdvt
-         xiIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWum6bN0taj6mZnb+DBigswQRqGoV4r7tyncDDx+jEz2E6TZ3ndGJ+kpg7y2/r7YVW0MCyJQhQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJPX12ylvAciLC4JGlFzbETnMU7u8Bxam2mYhVX1cHoM5qkyCd
-	u6wtx+C2dhKvvmqa9rjOiiiDyYaqaLbZlt7ND+tTQVe3+Hihjjg7sl59CbE372ZUS5IjTYpJr+b
-	wOZrHFNi8ni4Ru+Ig8af4QQ==
-X-Google-Smtp-Source: AGHT+IExRxG2yOaDU+FNIOKgen7ualB/CTMcfn9SYPqXnvtaX8OXyD3XgyYCNsKBhhkMknoYRxqQccTX0Y2GsxMBFQ==
-X-Received: from pfbeg11.prod.google.com ([2002:a05:6a00:800b:b0:724:df8b:ae66])
- (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:c8a:b0:725:9cc4:2354 with SMTP id d2e1a72fcca58-725b8100b9emr9697085b3a.10.1733563217245;
- Sat, 07 Dec 2024 01:20:17 -0800 (PST)
-Date: Sat,  7 Dec 2024 18:20:08 +0900
-In-Reply-To: <20241207092008.752846-1-yuyanghuang@google.com>
+	s=arc-20240116; t=1733566413; c=relaxed/simple;
+	bh=1iTUbXSWwCLDOdH7t33vQs0Dneg7nd5dct2F7dqwPhw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rp4Svwg8QxxogD45L2tnNm9w6jm9AAGd4JeT4ENqqgYsOpZ0uR8yFV763FLV5bFfKn+fVGOqHifRtWYxA47ryoBYEImsQrGQc5xU2EgcQPeyyfUphIJD6GVXtCLqi/E2vMaqS7ECwZJcuofuO1uKmo/Obm+3kf0tZ5hNAAKjGzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hkOlp2GT; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9m4W93mYJLzHPiDSNn2VKBwMS0KHXEKg2K2lKwcgsic=; b=hkOlp2GT+CFyuoN3LOa5axR6b/
+	gUBV11fEHXr4WfIdXtN7VbNn+IVNk/YuLNGLLJtOSH06P+rGRFlNFa5ggxm0jwQhVxLa1D1O8uSuv
+	nrU+Gvk5NwIDU+9H6XFBjCWxPSiFREzlNzKdPrwwQNsAPBP/VYskW7iZWIY9WcjGNyuCkls8GhliI
+	f3eNXluxUoHGtGFZfrelPz99UeEZv3RTLN3lagIHt+eW78ZzhQ9yB8tmMGCwbPgS+b316AQWA7y7d
+	DwMmgy1mzRt2Z0R2Bvc2EmecR2bTnBOuMLQ0sw6wsUhyI6zupSUTfV0F7hsmJv+KDt1hf3ceQV57g
+	c0xrjZ7A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45680)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tJroO-0007FL-2B;
+	Sat, 07 Dec 2024 10:13:21 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tJroI-0008RP-2w;
+	Sat, 07 Dec 2024 10:13:14 +0000
+Date: Sat, 7 Dec 2024 10:13:14 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Furong Xu <0x1207@gmail.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
+Subject: Re: [PATCH net-next v1] net: stmmac: Move extern declarations from
+ common.h to hwif.h
+Message-ID: <Z1QfupFfg07jTMUc@shell.armlinux.org.uk>
+References: <20241207070248.4049877-1-0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241207092008.752846-1-yuyanghuang@google.com>
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241207092008.752846-2-yuyanghuang@google.com>
-Subject: [PATCH iproute2-next, v5 2/2] iproute2: add 'ip monitor maddress' support
-From: Yuyang Huang <yuyanghuang@google.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, jiri@resnulli.us, 
-	stephen@networkplumber.org, jimictw@google.com, prohr@google.com, 
-	liuhangbin@gmail.com, nicolas.dichtel@6wind.com, andrew@lunn.ch, 
-	netdev@vger.kernel.org, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241207070248.4049877-1-0x1207@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Enhanced the 'ip monitor' command to track changes in IPv4 and IPv6
-multicast addresses. This update allows the command to listen for
-events related to multicast address additions and deletions by
-registering to the newly introduced RTNLGRP_IPV4_MCADDR and
-RTNLGRP_IPV6_MCADDR netlink groups.
+On Sat, Dec 07, 2024 at 03:02:48PM +0800, Furong Xu wrote:
+> These extern declarations are referenced in hwif.c only.
+> Move them to hwif.h just like the other extern declarations.
 
-This patch depends on the kernel patch that adds RTNLGRP_IPV4_MCADDR
-and RTNLGRP_IPV6_MCADDR being merged first.
+We normally have declarations in a header file that corresponds to their
+definition, rather than where they are used.
 
-Here is an example usage:
+> Compile tested only.
+> No functional change intended.
+> 
+> Signed-off-by: Furong Xu <0x1207@gmail.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/common.h | 14 --------------
+>  drivers/net/ethernet/stmicro/stmmac/hwif.h   | 14 ++++++++++++++
+>  2 files changed, 14 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+> index 1367fa5c9b8e..fbcf07d201cf 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> @@ -543,18 +543,8 @@ struct dma_features {
+>  #define STMMAC_VLAN_INSERT	0x2
+>  #define STMMAC_VLAN_REPLACE	0x3
+>  
+> -extern const struct stmmac_desc_ops enh_desc_ops;
 
-root@uml-x86-64:/# ip monitor maddress
-8: nettest123    inet6 mcast ff01::1 scope global
-8: nettest123    inet6 mcast ff02::1 scope global
-8: nettest123    inet mcast 224.0.0.1 scope global
-8: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
-Deleted 8: nettest123    inet mcast 224.0.0.1 scope global
-Deleted 8: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
-Deleted 8: nettest123    inet6 mcast ff02::1 scope global
+Defined in enh_desc.c, but no header for it, so either common.h or
+hwif.h seems sensible.
 
-Cc: Maciej =C5=BBenczykowski <maze@google.com>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
----
+> -extern const struct stmmac_desc_ops ndesc_ops;
 
-Changelog since v4:
-- To match the existing code style, move the boolean operator to the end of=
- the
-  line.
-- To match the existing naming pattern, use 'maddress' instead of 'maddr'.
+Defined in norm_desc.c, same situation as previous one.
 
-Changelog since v3:
-- Update man/man8/ip-monitor.8 page.
-- Use 'ip monitor maddr' for naming consistency with 'ip maddr' command.
+> -
+>  struct mac_device_info;
+>  
+> -extern const struct stmmac_hwtimestamp stmmac_ptp;
 
-Changelog since v1:
-- Move the UAPI constants to a separate patch.
-- Update the commit message.
-- Fix the indentation format.
+Defined in stmmac_hwtstamp.c, same as above.
 
- ip/ipaddress.c        | 17 +++++++++++++++--
- ip/ipmonitor.c        | 25 ++++++++++++++++++++++++-
- man/man8/ip-monitor.8 |  2 +-
- 3 files changed, 40 insertions(+), 4 deletions(-)
+> -extern const struct stmmac_hwtimestamp dwmac1000_ptp;
 
-diff --git a/ip/ipaddress.c b/ip/ipaddress.c
-index d90ba94d..679b4c00 100644
---- a/ip/ipaddress.c
-+++ b/ip/ipaddress.c
-@@ -1504,7 +1504,10 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
-=20
- 	SPRINT_BUF(b1);
-=20
--	if (n->nlmsg_type !=3D RTM_NEWADDR && n->nlmsg_type !=3D RTM_DELADDR)
-+	if (n->nlmsg_type !=3D RTM_NEWADDR &&
-+	    n->nlmsg_type !=3D RTM_DELADDR &&
-+	    n->nlmsg_type !=3D RTM_NEWMULTICAST &&
-+	    n->nlmsg_type !=3D RTM_DELMULTICAST)
- 		return 0;
- 	len -=3D NLMSG_LENGTH(sizeof(*ifa));
- 	if (len < 0) {
-@@ -1564,7 +1567,7 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
-=20
- 	print_headers(fp, "[ADDR]");
-=20
--	if (n->nlmsg_type =3D=3D RTM_DELADDR)
-+	if (n->nlmsg_type =3D=3D RTM_DELADDR || n->nlmsg_type =3D=3D RTM_DELMULTI=
-CAST)
- 		print_bool(PRINT_ANY, "deleted", "Deleted ", true);
-=20
- 	if (!brief) {
-@@ -1639,6 +1642,16 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
- 						   rta_tb[IFA_ANYCAST]));
- 	}
-=20
-+	if (rta_tb[IFA_MULTICAST]) {
-+		print_string(PRINT_FP, NULL, "%s ", "mcast");
-+		print_color_string(PRINT_ANY,
-+				   ifa_family_color(ifa->ifa_family),
-+				   "multicast",
-+				   "%s ",
-+				   format_host_rta(ifa->ifa_family,
-+						   rta_tb[IFA_MULTICAST]));
-+	}
-+
- 	print_string(PRINT_ANY,
- 		     "scope",
- 		     "scope %s ",
-diff --git a/ip/ipmonitor.c b/ip/ipmonitor.c
-index de67f2c9..b28faa20 100644
---- a/ip/ipmonitor.c
-+++ b/ip/ipmonitor.c
-@@ -30,7 +30,7 @@ static void usage(void)
- 	fprintf(stderr,
- 		"Usage: ip monitor [ all | OBJECTS ] [ FILE ] [ label ] [ all-nsid ]\n"
- 		"                  [ dev DEVICE ]\n"
--		"OBJECTS :=3D  address | link | mroute | neigh | netconf |\n"
-+		"OBJECTS :=3D  address | link | mroute | maddress | neigh | netconf |\n"
- 		"            nexthop | nsid | prefix | route | rule | stats\n"
- 		"FILE :=3D file FILENAME\n");
- 	exit(-1);
-@@ -152,6 +152,11 @@ static int accept_msg(struct rtnl_ctrl_data *ctrl,
- 		ipstats_print(n, arg);
- 		return 0;
-=20
-+	case RTM_DELMULTICAST:
-+	case RTM_NEWMULTICAST:
-+		print_addrinfo(n, arg);
-+		return 0;
-+
- 	case NLMSG_ERROR:
- 	case NLMSG_NOOP:
- 	case NLMSG_DONE:
-@@ -178,6 +183,7 @@ static int accept_msg(struct rtnl_ctrl_data *ctrl,
- #define IPMON_LRULE		BIT(8)
- #define IPMON_LNSID		BIT(9)
- #define IPMON_LNEXTHOP		BIT(10)
-+#define IPMON_LMADDR		BIT(11)
-=20
- #define IPMON_L_ALL		(~0)
-=20
-@@ -202,6 +208,8 @@ int do_ipmonitor(int argc, char **argv)
- 			lmask |=3D IPMON_LLINK;
- 		} else if (matches(*argv, "address") =3D=3D 0) {
- 			lmask |=3D IPMON_LADDR;
-+		} else if (matches(*argv, "maddress") =3D=3D 0) {
-+			lmask |=3D IPMON_LMADDR;
- 		} else if (matches(*argv, "route") =3D=3D 0) {
- 			lmask |=3D IPMON_LROUTE;
- 		} else if (matches(*argv, "mroute") =3D=3D 0) {
-@@ -326,6 +334,21 @@ int do_ipmonitor(int argc, char **argv)
- 		exit(1);
- 	}
-=20
-+	if (lmask & IPMON_LMADDR) {
-+		if ((!preferred_family || preferred_family =3D=3D AF_INET) &&
-+		    rtnl_add_nl_group(&rth, RTNLGRP_IPV4_MCADDR) < 0) {
-+			fprintf(stderr,
-+				"Failed to add ipv4 mcaddr group to list\n");
-+			exit(1);
-+		}
-+		if ((!preferred_family || preferred_family =3D=3D AF_INET6) &&
-+		    rtnl_add_nl_group(&rth, RTNLGRP_IPV6_MCADDR) < 0) {
-+			fprintf(stderr,
-+				"Failed to add ipv6 mcaddr group to list\n");
-+			exit(1);
-+		}
-+	}
-+
- 	if (listen_all_nsid && rtnl_listen_all_nsid(&rth) < 0)
- 		exit(1);
-=20
-diff --git a/man/man8/ip-monitor.8 b/man/man8/ip-monitor.8
-index ec033c69..a3c099ae 100644
---- a/man/man8/ip-monitor.8
-+++ b/man/man8/ip-monitor.8
-@@ -54,7 +54,7 @@ command is the first in the command line and then the obj=
-ect list follows:
- .I OBJECT-LIST
- is the list of object types that we want to monitor.
- It may contain
--.BR link ", " address ", " route ", " mroute ", " prefix ", "
-+.BR link ", " address ", " route ", " mroute ", " maddress ", " prefix ", =
-"
- .BR neigh ", " netconf ", "  rule ", " stats ", " nsid " and " nexthop "."
- If no
- .B file
---=20
-2.47.0.338.g60cca15819-goog
+Ditto.
 
+> -extern const struct stmmac_mode_ops dwmac4_ring_mode_ops;
+
+Defined in dwmac4_descs.c, maybe dwmac4_descs.h or dwmac4.h would make
+more sense than hwif.c ?
+
+> -
+> -extern const struct ptp_clock_info stmmac_ptp_clock_ops;
+
+Defined in stmmac_ptp.c, and there is stmmac_ptp.h which contains a
+number of function declarations, so maybe moving that there would
+make more sense?
+
+> -extern const struct ptp_clock_info dwmac1000_ptp_clock_ops;
+
+Same as stmmac_ptp_clock_ops.
+
+> -
+>  struct mac_link {
+>  	u32 caps;
+>  	u32 speed_mask;
+> @@ -641,8 +631,4 @@ void stmmac_dwmac4_set_mac(void __iomem *ioaddr, bool enable);
+>  
+>  void dwmac_dma_flush_tx_fifo(void __iomem *ioaddr);
+>  
+> -extern const struct stmmac_mode_ops ring_mode_ops;
+
+Defined in ring_mode.c, same as enh_desc_ops.
+
+> -extern const struct stmmac_mode_ops chain_mode_ops;
+
+Defined in chain_mode.c, same as enh_desc_ops.
+
+> -extern const struct stmmac_desc_ops dwmac4_desc_ops;
+
+Defined in dwmac4_descs.c, similar situation to dwmac4_ring_mode_ops
+above.
+
+
+So I think rather than bulk moving these to hwif.h, where some of them
+remain out of place, maybe placing some in a more appropriate header
+would be better.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
