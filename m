@@ -1,110 +1,137 @@
-Return-Path: <netdev+bounces-149901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E6989E80FF
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 17:23:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 072C69E810B
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 17:46:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17E0A281678
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 16:23:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C6BB281A7C
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 16:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6647C14E2CD;
-	Sat,  7 Dec 2024 16:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03C82CCC0;
+	Sat,  7 Dec 2024 16:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="acBTLjIh"
+	dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b="zSatrhc0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx-rz-3.rrze.uni-erlangen.de (mx-rz-3.rrze.uni-erlangen.de [131.188.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D103114D29B
-	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 16:23:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0673FF1;
+	Sat,  7 Dec 2024 16:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=131.188.11.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733588583; cv=none; b=loZx1PaxEi3mXlHsUOq8sIInFHhAxB/t9qt2ghHvStv7iyew6dpfe0oIZ3AQiEggvTDWEuIWifWYEwUwBOZtwVNCw7rh3M58L4iuoN31g8sF4ZVnn5MRpBRtkftjQVmGl+s7s2lM+E1Fm9nVsPyToHt5fz9vpq0dPiTaV+r3+nY=
+	t=1733589971; cv=none; b=msiLApEV2MzjFHduqIs2MOUqvAYtwaEXglHujcuYIDzlBl5VrCOuMUs6TOZvo+xm7xw2ed0abJUvRZX0oxtFN+hej2xEbjBL94aDQJ+FzoYPTqG4SKIlFcUXtddLa0yM+jZ05+UR2eJ5sTAovoaE5wFCZqNgS8/TOh3bbxinQzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733588583; c=relaxed/simple;
-	bh=LWVBJx/mHg8fZ1laWBOVoZRo452ecAG52axAib24ye4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XE4GYG3RSEJsx3AvjGSFk4jYVd1MTtP1h9wKlxGg06yBSvBU+6Cla67YRZWFhpsouBOgfKRokuhG+BqV4mcCjd5PJGsBYM+czmYHbxxmYGmX2jNDqCrQyaRtUwdmHpB+FKSIPtnWYESkCEcE4lQJK8U2vRu0OoumycMJIpUiwnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=acBTLjIh; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-46752894cb6so7257991cf.1
-        for <netdev@vger.kernel.org>; Sat, 07 Dec 2024 08:23:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733588581; x=1734193381; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P/x1yWtZsJ79zjjGA9KqHWwyoR7sBywej0TPCqjBT9o=;
-        b=acBTLjIhVylqyZXiIsKxpXTUugrU8AGbdfBu0XsEVPnsT+4h5yJLQ/8BkwjFtEeksT
-         a48MstAwdHlyM9xKegr5hhKGVkXEo8fW4i4kMRF6aGJjp0qeFBeY/qfXw0iI/WrC+FWY
-         lXzOFA4lE48Hpgtg8j8IVWZVFFdwQ+lxkLmIOby1WOI+2BTTz7DekmXDkKmkozU5Lxn8
-         fgTCAiY0c65PFsY9wJV03B1tJVt3WEUV+C/DwQUjA3nIoOIARf/h2qwFN1WOkVPbj7tH
-         LjwOjcQHZWqbfQn27+SKvJEDsaQSRNltu52HUiiczZiCLB65zP16XFPa3igDyvlAK3Jo
-         88nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733588581; x=1734193381;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P/x1yWtZsJ79zjjGA9KqHWwyoR7sBywej0TPCqjBT9o=;
-        b=CwZQ3s2Z6znKggzm8uuvTFIG5kGkT9U3/nAGgwBuFp+Bo6Geweh/s+tN4zEPRg+i6L
-         +Wgyp1NN8L4w/ILuR/c+0aWxJzfXRHF46uHkWQYUsWq6IM5H6g1n6pDksALnA+ghMLPQ
-         cmGrTViqp/k64cBrb5SI1nPtnKBSjCABOXaVoI5qRfoI3QqaNLlhnSP+sr8hyM4Vjv5h
-         PuorKf/ANBoc/xY0krSyUYFsekdN7oqSsRGiGwIoUTXkU6oeGoTih3hrDSqmr+ylXjs4
-         vn7w4VlvLO0R9/IqJRYvRAHoVBtOvLjMxgYnJDo4LWMdQTcozj++nx/xrDaAVwE6apWY
-         VCDQ==
-X-Gm-Message-State: AOJu0YyYaTxY0dNLmMUEtQzS1BSaQx8bHXY1RJCJH1M1LJCEKGzUHPWt
-	QJWQ8N3hweZcyUVg//OVZXL2ZzIx/OwUEHvk4efQc9CLMH7bXdMF/lhnEgy/FNE4gWIw1vbc66M
-	y+VkJ+h244A==
-X-Google-Smtp-Source: AGHT+IGPFXO99oeW/46E/PjopjTUg28FlFK/IZpvFaKVndaMdib/6t2Ahpkwcql+uyFkY7aBjCgd/fe5vm6spg==
-X-Received: from qtbcp6.prod.google.com ([2002:a05:622a:4206:b0:462:bcd3:319d])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:2294:b0:460:a928:696f with SMTP id d75a77b69052e-46734cfdd5amr117105931cf.29.1733588581031;
- Sat, 07 Dec 2024 08:23:01 -0800 (PST)
-Date: Sat,  7 Dec 2024 16:22:48 +0000
-In-Reply-To: <20241207162248.18536-1-edumazet@google.com>
+	s=arc-20240116; t=1733589971; c=relaxed/simple;
+	bh=vjo3piGQdxjqRK8NxIaEdi3jtvE1yBamRNmmGNfgHJQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OBaX8G4uGjEgulQ6sbk8GtHYF2uSYkP6lz6YkaFWpqDEYvCDrFxlDbosMEDoT1QDbKEr19v3dnRlrDThPQKAnc1M4H/Mj7jzjAISmv0tEmPVzg6tmH2mZyjtCWQudlFD0mHls04LpwZ+IaRwC18/+idFENGGmoINdHgaj4Vbdeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de; spf=pass smtp.mailfrom=fau.de; dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b=zSatrhc0; arc=none smtp.client-ip=131.188.11.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fau.de
+Received: from mx-rz-smart.rrze.uni-erlangen.de (mx-rz-smart.rrze.uni-erlangen.de [IPv6:2001:638:a000:1025::1e])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-rz-3.rrze.uni-erlangen.de (Postfix) with ESMTPS id 4Y5DLV4sjwz20P9;
+	Sat,  7 Dec 2024 17:37:22 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fau.de; s=fau-2021;
+	t=1733589442; bh=YXarENHHWjbfLniaZIIE4fO22MS5mtbMTeDyQtvYSUU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From:To:CC:
+	 Subject;
+	b=zSatrhc0tBwAC6cWCA/9yvnyX2U501gd1oTUKZOUaFEhpaZAnPccf/S3yioconMZt
+	 OS4lMRrVEh4A5k3AgmK/Lg+2IrgR45pjuWVz9aMdfQYBO9uvXA4DyBImjbWWdZS3T7
+	 VXgcZruuISeXgES7IHCn64NpBQCUEvspdRa0U0klPFkZahUDgG42wISUvGigID3jic
+	 nlrrvN+k7FnH4bj1V17n8fwdnmWk8g+Rl5j482yeL1+L03weEhfWZoAxa/GS3rCr8V
+	 AdRU2xXDWz+zxDQVxVH/O1g37/mnnveZaZrNB8R49/W0ntEe64IGVZ4cPOcZH508IE
+	 VX0qTnflWG+rQ==
+X-Virus-Scanned: amavisd-new at boeck1.rrze.uni-erlangen.de (RRZE)
+X-RRZE-Flag: Not-Spam
+X-RRZE-Submit-IP: 2003:d5:72f:de01:9dee:185f:b8b5:8714
+Received: from [IPV6:2003:d5:72f:de01:9dee:185f:b8b5:8714] (p200300d5072fde019dee185fb8b58714.dip0.t-ipconnect.de [IPv6:2003:d5:72f:de01:9dee:185f:b8b5:8714])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: U2FsdGVkX18vcxNlkZ3YdYeS2ZUx20eBB+l4dsqbtwA=)
+	by smtp-auth.uni-erlangen.de (Postfix) with ESMTPSA id 4Y5DLS0Y5cz20Mr;
+	Sat,  7 Dec 2024 17:37:19 +0100 (CET)
+Message-ID: <b4f59f1c-b368-49ae-a0c4-cf6bf071c693@fau.de>
+Date: Sat, 7 Dec 2024 17:37:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241207162248.18536-1-edumazet@google.com>
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241207162248.18536-4-edumazet@google.com>
-Subject: [PATCH net-next 3/3] rtnetlink: remove pad field in ndo_fdb_dump_context
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Roopa Prabhu <roopa@nvidia.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net/sched: netem: account for backlog updates from
+ child qdisc
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241202191312.3d3c8097@kernel.org>
+ <20241204122929.3492005-1-martin.ottens@fau.de>
+ <CAM0EoMnTTQ-BtS0EBqB-5yNAAmvk9r67oX7n7S0Ywhc23s49EQ@mail.gmail.com>
+Content-Language: de-DE
+From: Martin Ottens <martin.ottens@fau.de>
+In-Reply-To: <CAM0EoMnTTQ-BtS0EBqB-5yNAAmvk9r67oX7n7S0Ywhc23s49EQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-I chose to remove this field in a separate patch to ease
-potential bisection, in case one ndo_fdb_dump() is still
-using the old way (cb->args[2] instead of ctx->fdb_idx)
+On 05.12.24 13:40, Jamal Hadi Salim wrote:
+> Would be nice to see the before and after (your change) output of the
+> stats to illustrate
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/linux/rtnetlink.h | 1 -
- 1 file changed, 1 deletion(-)
+Setup is as described in my patch. I used a larger limit of 
+1000 for netem so that the overshoot of the qlen becomes more 
+visible. Kernel is from the current net-next tree (the patch to 
+sch_tbf referenced in my patch is already applied (1596a135e318)).
 
-diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
-index 2b17d7eebd92342e472b9eb3b2ade84bc8ae2e94..af668b79eb757c86970b2455d9d820c902699a13 100644
---- a/include/linux/rtnetlink.h
-+++ b/include/linux/rtnetlink.h
-@@ -181,7 +181,6 @@ void rtnl_kfree_skbs(struct sk_buff *head, struct sk_buff *tail);
- /* Shared by rtnl_fdb_dump() and various ndo_fdb_dump() helpers. */
- struct ndo_fdb_dump_context {
- 	unsigned long ifindex;
--	unsigned long pad;
- 	unsigned long fdb_idx;
- };
- 
--- 
-2.47.0.338.g60cca15819-goog
 
+TCP before the fix (qlen is 1150p, exceeding the maximum of 1000p, 
+netem qdisc becomes "locked" and stops accepting packets):
+
+qdisc netem 1: root refcnt 2 limit 1000 delay 100ms
+ Sent 2760196 bytes 1843 pkt (dropped 389, overlimits 0 requeues 0)
+ backlog 4294560030b 1150p requeues 0
+qdisc tbf 10: parent 1:1 rate 50Mbit burst 1537b lat 50ms
+ Sent 2760196 bytes 1843 pkt (dropped 327, overlimits 7356 requeues 0)
+ backlog 0b 0p requeues 0
+
+UDP (iperf3 sends 50Mbit/s) before the fix, no issues here:
+
+qdisc netem 1: root refcnt 2 limit 1000 delay 100ms
+ Sent 71917940 bytes 48286 pkt (dropped 2415, overlimits 0 requeues 0)
+ backlog 643680b 432p requeues 0
+qdisc tbf 10: parent 1:1 rate 50Mbit burst 1537b lat 50ms
+ Sent 71917940 bytes 48286 pkt (dropped 2415, overlimits 341057 requeues 0)
+ backlog 311410b 209p requeues 0
+
+TCP after the fix (UDP is not affected by the fix):
+
+qdisc netem 1: root refcnt 2 limit 1000 delay 100ms
+ Sent 94859934 bytes 62676 pkt (dropped 15, overlimits 0 requeues 0)
+ backlog 573806b 130p requeues 0
+qdisc tbf 10: parent 1:1 rate 50Mbit burst 1537b lat 50ms
+ Sent 94859934 bytes 62676 pkt (dropped 324, overlimits 248442 requeues 0)
+ backlog 4542b 3p requeues 0
+
+> Your fix seems reasonable but I am curious: does this only happen with
+> TCP? If yes, perhaps the
+> GSO handling maybe contributing?
+> Can you run iperf with udp and see if the issue shows up again? Or
+> ping -f with size 1024.
+
+I was only able to reproduce this behavior with tbf and it happens 
+only when GSO packets are segmented inside the tbf child qdisc. As 
+shown above, UDP is therefore not affected. The behavior also occurs 
+if this configuration is used on the "outgoing" interface of a system 
+that just forwards packets between two networks and GRO is enabled on 
+the "incoming" interface.
 
