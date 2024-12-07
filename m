@@ -1,264 +1,219 @@
-Return-Path: <netdev+bounces-149925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 703829E826A
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 23:06:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AAA7B9E828A
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 23:44:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25E531884824
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 22:06:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60F1C188492F
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 22:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7417315350B;
-	Sat,  7 Dec 2024 22:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FAE414D2A0;
+	Sat,  7 Dec 2024 22:44:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="kcL8aeKF"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="X1dclN2d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2058.outbound.protection.outlook.com [40.107.21.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7496B22C6CD
-	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 22:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733609190; cv=none; b=NuzfY7/N9OpuLYBup0otdXN/GC252f2IVVgT3Q2dxxtShbNbu/RFxo71Hux9+xKO44bymzfGhIbfmVX7aMkuFZ8a0ESixhHC9uXVB9+CiTwZ6HhVmS5EhqPxiLSG1JyurfKOHv75PXzKkAceDKeAnbwOQf5Ej4gvk2gfEsjYq+c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733609190; c=relaxed/simple;
-	bh=kCWnzjDgmnXfZMhOCbiFoAX0d8iZoouP12awiU1bX+E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BgJ/Xke86HopUhJhqMX3ZiKLp55o8Nj2Hh3MZWoHqk6Dsi+c+filtAPtm5MgfDIY5sZq2AUN+kvbKeHXyJNSMWQh5FAEopAE+cqbHpunAOrnjNOmVdSnumpdiK+BSRNqE70MoR3YMW3OkEF0FuXLD3Nntx0fonU+9uIBmfPrBlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=kcL8aeKF; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-aa530a94c0eso628597166b.2
-        for <netdev@vger.kernel.org>; Sat, 07 Dec 2024 14:06:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1733609185; x=1734213985; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cv48r+Fj8y9l52nXHVpPxH4O5U2fyiQb+2TrK9dhOIw=;
-        b=kcL8aeKFEn31vLT8MsxYXf1g0NceBS1Qbo/wahLVJL6wtjQue3wZgEVmBgqk823D/j
-         jMIyPvaKlYAIfIe3bjKjHG2Z+aJQwWLWW03o1FtHh3vVOkU0wHUCtjEScM4Mduab+KVG
-         wUfHzvPnvCNlzJef/wMgrBgGL0z7UmrMo2bCSfJTfYlkKGraHHg9oGO/NdvGwxgAf3JZ
-         mVGe1GeTrEOd8P3YJgkpZldMxBkQA8Ym6RiVXAZA5C7fw/L0vemvpTx+FCbFIUGycukF
-         vd1f3D6E3NC0femB871Hz+r1ekSYfn+WJw2g6t+tXz3ruadyfjep//FxrJKXaYO0v9+P
-         qPmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733609185; x=1734213985;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Cv48r+Fj8y9l52nXHVpPxH4O5U2fyiQb+2TrK9dhOIw=;
-        b=J69tsBps4u2m58KVm7hceXlmJWNwzfKz1PsR2n2Fk/D05YjWNWf/hsbxokuYzJ2Qct
-         5Mo5skg6xwnHJXO6vSlP8RuUUwFEOxD91v9kTZT1xc7eVRA93YZGfthAS5mqx/nJxrVf
-         HLqtkftxblHcTzHbxQlkbHZScIQErHqqTYtS0T+ybRlUbNaa5QyRKVe933SRqESnw35J
-         Hilhze6JUyXiAWQ9OgKYOpljXW+UqUl0NGHxYwBaR1q2WjSvtCGknVvUh/WlnJGO9tTC
-         XW3x4kQiDOD28Kjzxw+7Ur3Ls6BgXYBmmIzBAu9np6TNE477TjpfPTHxqYjfcP1BUlCg
-         +z7g==
-X-Gm-Message-State: AOJu0YwKb0iZQ6pqtyOomkWASwXF33InflL7qFHu1KOLw6SuEjsm3TrI
-	1fXHWiWV+OurshxZ6aYElP/SSKw8FKJlrvS0/KAV8Jm1QnBoxJOJ0QeKMY96hzojU44rJpG4zhK
-	mwdvx1O6V48nTYHTyL+fR+DV/YPzboE949r8Jo//EB3mZbVUfJ8UkqE6mMSr2lHz+14uli+y+JU
-	6K6oiuH0pszYomf6i0i51Xcwlkf1m10WBHOWVol2DnxA==
-X-Gm-Gg: ASbGnct59T7bNuKjAMRPnq5zsHEvA5njTdE94gvdUlkJfIttr7LUGYEmvadN8VABNdg
-	0JX5R2udmJxZa0J8M1EXU1ZozBfurUiwc6UhqZ6z3guX+fg7oeh4FZPCtsjqP3R2RCoqp1o/2tA
-	Wb7sHririGHimpKJRgYh7qtv+1x1Ng1mvX9UKsvNIl9xNaBY4fUoGz1gBOYI4j9SiCGVUqybivy
-	/OkLKLc63W/AB8DjU8Se6gbnp/7Cmj0ztOBMCs06E4ji/CAO4wYchTwtf7SrtFtZLRQnlAh8nDA
-	jMnLX89SkA==
-X-Google-Smtp-Source: AGHT+IEn8sfspBzJjXlTXy+egVZxR2pEiQYL8GFmJg6bux/hNbEf59nAwSQlrfdVz/ih19WbANH7CA==
-X-Received: by 2002:a17:906:9555:b0:aa6:21ce:cddf with SMTP id a640c23a62f3a-aa63a131011mr738866466b.36.1733609184985;
-        Sat, 07 Dec 2024 14:06:24 -0800 (PST)
-Received: from fedora.. (cpe-109-60-83-93.zg3.cable.xnet.hr. [109.60.83.93])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa66cc544c4sm67183266b.178.2024.12.07.14.06.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Dec 2024 14:06:24 -0800 (PST)
-From: Robert Marko <robert.marko@sartura.hr>
-To: netdev@vger.kernel.org,
-	stephen@networkplumber.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	dsahern@kernel.org,
-	jiri@resnulli.us,
-	andrew@lunn.ch
-Cc: luka.perkov@sartura.hr,
-	Robert Marko <robert.marko@sartura.hr>
-Subject: [iproute2-next v2] ip: link: rmnet: add support for flag handling
-Date: Sat,  7 Dec 2024 23:05:15 +0100
-Message-ID: <20241207220621.3279646-1-robert.marko@sartura.hr>
-X-Mailer: git-send-email 2.47.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDC476034
+	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 22:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733611492; cv=fail; b=k1OZ1U/ZkGdqWsi2TGK3A+kR6UpmTFJnFEHBWx0YW1Fhl3MT+2JMwQgYmrK5Pmzc6d5PhbkY7RYRVUyiv0U9yz5/H2vGFusBzrKcDUaQCsIMDjjreAD81jfm2VE/guFQuaIArfPFWkJ3ZsFufyqf61HBBFYSGZtRQkr5iFNcsLM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733611492; c=relaxed/simple;
+	bh=gvZ34F/IubJgus9Rjvn5OieT5hxXYuodkmoYpxHqpmo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YAn70SEUahWQvgtzWcmODUxd8iW0eKU1qzy8GpGtjc+gmMQsQgTSUFocWhLljrqWP17ceRzAvr3p8Uce4+7JEqqdufzElEYcK5Dt6UPPuWtaUQ1OgnLWfjk/JJ8Wq0zzhSC++P9Fn13stT7NL4YYVSsjug+cM2X1BP9zFPJ8O48=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=X1dclN2d; arc=fail smtp.client-ip=40.107.21.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Zk5TNSrsaP+Bx7a7EVyO+6xMPHklJ93WkuMzL75YcSwWphKke6kllhTu9ommjamTeAa0hM4pPQORMy0PJJ7nbeXzegyiL3AzArcM4hE+lrZJAvRMhpu2SLc6bBoBXd4la6W8rOZGAL6LMTcSelrQ0NhzfOAx9VEY52sGgzahXr548JVCDb06Sz8zyCVTBU2Nu+45E58NYV+68g8kK5z/VEgCtkGyYygutvfmhS0baAkOVUY6ju10rE37YQix//EWM2o1wIePbNvCchuBL2gFeH3azePXHst0cZZE1Onxml6Hkpd6XWOOFoHOhl+s7j4UsCVUXNGgNSe4HKZBotiDug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tlArsTuCRpjNPHiYqPfighrZfKVj1LiLG7vJmZDxDSE=;
+ b=AHZ16jF10yaCjj52p20OfmiW8+1sQE+LVfJfCJhvaW6U6MTBd9/iSlL7o/DWyPg1FequppXfEDqyTrfo1MGzP5230JH3+5nqgTRew2RzUa4YJGRf1td/XE75MYQriDyAtTzKgHbz4QsnNp2YvtQl5c27xx0Kemx3doTJVB1nOdaeoH2irL3jbR15GO8vOYoAkvDs/i7OOYnWCsKy2Ln97u7oYsqGTY2L7tpnvTh5fDOBi7LM5Kr2KO3xEdoZnU3W6OQgbzUT1inCHhrspUfsuzWDoJyxgDjPvs6nv5QA/NjrAIGWwHGxI55UVgCyoRUB/TOZWHgR9YntBSfZ/WN7rg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=lunn.ch smtp.mailfrom=arri.de; dmarc=fail
+ (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
+ not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tlArsTuCRpjNPHiYqPfighrZfKVj1LiLG7vJmZDxDSE=;
+ b=X1dclN2dKdDCB8ueiChWI9lI1PAAT7/2l1k86Lax9+d7ts8C5JL2uGMhBLlUxdziasr3UOYdVBOEvbCbNdgeEbBTpZXk0FiWLPLUL910JmS6fdo9LaW2cids4Fv/fYUiEM6OcD9iIqyaJv1tk1r0BtqzrwY5dG7S8eFlbpli0ak=
+Received: from PAZP264CA0245.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:239::18)
+ by AS8PR07MB9494.eurprd07.prod.outlook.com (2603:10a6:20b:631::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.12; Sat, 7 Dec
+ 2024 22:44:42 +0000
+Received: from AM4PEPF00025F9B.EURPRD83.prod.outlook.com
+ (2603:10a6:102:239:cafe::64) by PAZP264CA0245.outlook.office365.com
+ (2603:10a6:102:239::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8230.14 via Frontend Transport; Sat,
+ 7 Dec 2024 22:44:42 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ AM4PEPF00025F9B.mail.protection.outlook.com (10.167.16.10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8272.0 via Frontend Transport; Sat, 7 Dec 2024 22:44:42 +0000
+Received: from n9w6sw14.localnet (192.168.54.15) by mta.arri.de (10.10.18.5)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Sat, 7 Dec
+ 2024 23:44:41 +0100
+From: Christian Eggers <ceggers@arri.de>
+To: Andrew Lunn <andrew@lunn.ch>, =?ISO-8859-1?Q?J=F6rg?= Sommer
+	<joerg@jo-so.de>
+CC: <netdev@vger.kernel.org>
+Subject: Re: KSZ8795 not detected at start to boot from NFS
+Date: Sat, 7 Dec 2024 23:44:41 +0100
+Message-ID: <7080052.9J7NaK4W3v@n9w6sw14>
+Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
+In-Reply-To: <phab74r5xxbufhe6llruqa3tgkxzalytgzqrko4o2bg2xzizjv@apha3we342xn>
+References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
+ <a578b29f-53f0-4e33-91a4-3932fa759cd1@lunn.ch>
+ <phab74r5xxbufhe6llruqa3tgkxzalytgzqrko4o2bg2xzizjv@apha3we342xn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM4PEPF00025F9B:EE_|AS8PR07MB9494:EE_
+X-MS-Office365-Filtering-Correlation-Id: bc5f3462-dd8b-4584-92d3-08dd1710bd92
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?iso-8859-1?Q?5PJ8rqEf4NS0qjfo0E1J6ypMLgunjqN2l1XNgCLEAvrB6yk3LDNnYK9vKu?=
+ =?iso-8859-1?Q?nch0AI00UTiSA19gfzzp+hAC3fCCkVh3oz9ssNUy1ItMteAvfknJ/ChQrc?=
+ =?iso-8859-1?Q?2xsd98BfYmmKqWZRHtB6LmLPNRcgQAyEdu4ZDTAFumppD7dzNQt6muKAEO?=
+ =?iso-8859-1?Q?uETDqRJFKxnEbY/uSlFS9uRzdHSKx6pGf/aPf4YOPYdtt2t81e8mnFBusx?=
+ =?iso-8859-1?Q?9EJyDM3thUm4Y0YQSeSw57hi1ZNKaqYMZZ4H2Bfgr9VBtYt+9GSONCvXmO?=
+ =?iso-8859-1?Q?22KSVlQWaGlpnggyiT/sza/jNlzOWeoBzffNpxtOv4OU7rFL1sgrJPo+pP?=
+ =?iso-8859-1?Q?g2L7gFj1MFwrPO3pQi10iAuDvxxT5h7h6nXQztX9zLEv0xeGwd47uXB73J?=
+ =?iso-8859-1?Q?dbRECXLXw9UF6vxjFMq2j/4YHD/WWXc6XTsKPjYkIzxmSRXyerUu+i2urs?=
+ =?iso-8859-1?Q?jX9n2YxqP2oGGcS+aiIvPcfxK78OgtQ/7rFJdFMjSiHUa330y+qI4zF0gK?=
+ =?iso-8859-1?Q?jwxhqJhJlvkTblgQ5a8vqKBfygRUxwEe+4axnVtcpSAa6iBNUCdwxcTPob?=
+ =?iso-8859-1?Q?YC0b/tYjYwxLCWMOKrRmlAOUwsEb+J+czTC9aslisZcpAT2QhoNZFv4qkw?=
+ =?iso-8859-1?Q?z9vBsAm0np23NL7Nr7W7qeKR/hPhBJVVF0MhQwo3W+gH0d+pOa4IHtMzKK?=
+ =?iso-8859-1?Q?HATy59DeXRpj8MJSIY86B44lhBP5O4Zod+Kn67cS+sbZ/JEqHdLwbA4vcV?=
+ =?iso-8859-1?Q?AoXa+1pHBtbESynFO8gvLmSwEQSeclD1hIf1wrqH4PbP6JIUfEpPV+aNkJ?=
+ =?iso-8859-1?Q?xzebbyjbxiR+TfAXXii57OTOcp+WUe6UYEXfYJ1a42qbEYk+S1d7QfZyVv?=
+ =?iso-8859-1?Q?HUKHOeUB1CdC9O9+4/PuPPR2BAXKsW87TVO+vMIpMkZsoDDQdiH0OO6t8T?=
+ =?iso-8859-1?Q?ciaBrMU12p8DWz6JZVuCjh2x8vSSGtw5H0UhrtzoSujSmoPYpU2SNfEP5V?=
+ =?iso-8859-1?Q?NNHkYwYmNy/SSTd8jwUGn4yNLx1zuQxifUrWERaKTTqFGPWamJnyTr1/Zb?=
+ =?iso-8859-1?Q?fhPmIGhkJZDH6gvE3Fhh1NuUbvmTbSDvpihRSPH+X0wm4i1MXxEa6Fs0aN?=
+ =?iso-8859-1?Q?0qkgPsVLJuntqCcEl9t9kk8Y30KI+XiabB5z3iBxc0C+idEfXE97rPitVK?=
+ =?iso-8859-1?Q?4MyPJkskSNglOGK9OaFW9O8kGdX/L8HM2mocyeMcbVEIVUJoqRhJ7x9yLq?=
+ =?iso-8859-1?Q?KGMLviWAOmIIAMV/TZH0aO50ugwLLIgJSamtmH35tJUtuM7M8uwzoz8xbM?=
+ =?iso-8859-1?Q?dKMSBRiVAkrQzhZcV/pmAVpG6G+0le9dxNFSgC0NM2nQ6Xmql3aeO4rm1O?=
+ =?iso-8859-1?Q?aDRMugyLxY71vmzouTKqaBXFd/RE7dJx5/A+MJstBIiYwAEmHVtC1lBS4W?=
+ =?iso-8859-1?Q?P+FsWnR5onQ8INWr0cR8+CS2rnHEjcyZ0bfGDLSNsBlz0/1dFFUzvJFA63?=
+ =?iso-8859-1?Q?bOTDW+68lioz35o/ubFWn9?=
+X-Forefront-Antispam-Report:
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Dec 2024 22:44:42.3424
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc5f3462-dd8b-4584-92d3-08dd1710bd92
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource: AM4PEPF00025F9B.EURPRD83.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR07MB9494
 
-Extend the current rmnet support to allow enabling or disabling
-IFLA_RMNET_FLAGS via ip link as well as printing the current settings.
+Hi J=F6rg, hi Andrew,
 
-Signed-off-by: Robert Marko <robert.marko@sartura.hr>
----
-Changes in v2:
-* Use strcmp() instead of matches()
-* Fix disabling flags (Forgotten ~)
-* Separate ingress and egress checksum flags
-* Rename flags to more closely resemble their meaning.
-For example add ingress when they only affect ingress, rename checksm
-flags to mapv4/v5-checksum.
+On Saturday, 7 December 2024, 21:47:31 CET, Andrew Lunn wrote:
+> What i don't understand from your description is why:
+>=20
+> > +       /* setup spi */
+> > +       spi->mode =3D SPI_MODE_3;
+> > +       ret =3D spi_setup(spi);
+> > +       if (ret)
+> > +               return ret;
+> > +
+>=20
+> is causing this issue. Is spi_setup() failing?
 
- ip/iplink_rmnet.c | 101 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 99 insertions(+), 2 deletions(-)
+On Saturday, 7 December 2024, 22:07:23 CET, J=F6rg Sommer wrote:
 
-diff --git a/ip/iplink_rmnet.c b/ip/iplink_rmnet.c
-index 1d16440c..b1fb9f03 100644
---- a/ip/iplink_rmnet.c
-+++ b/ip/iplink_rmnet.c
-@@ -16,6 +16,12 @@ static void print_explain(FILE *f)
- {
- 	fprintf(f,
- 		"Usage: ... rmnet mux_id MUXID\n"
-+		"		[ ingress-deaggregation { on | off } ]\n"
-+		"		[ ingress-commands { on | off } ]\n"
-+		"		[ ingress-mapv4-checksum { on | off } ]\n"
-+		"		[ egress-mapv4-checksum { on | off } ]\n"
-+		"		[ ingress-mapv5-checksum { on | off } ]\n"
-+		"		[ egress-mapv5-checksum { on | off } ]\n"
- 		"\n"
- 		"MUXID := 1-254\n"
- 	);
-@@ -26,18 +32,79 @@ static void explain(void)
- 	print_explain(stderr);
- }
- 
-+static int on_off(const char *msg, const char *arg)
-+{
-+	fprintf(stderr, "Error: argument of \"%s\" must be \"on\" or \"off\", not \"%s\"\n", msg, arg);
-+	return -1;
-+}
-+
- static int rmnet_parse_opt(struct link_util *lu, int argc, char **argv,
- 			   struct nlmsghdr *n)
- {
-+	struct ifla_rmnet_flags flags = { 0 };
- 	__u16 mux_id;
- 
- 	while (argc > 0) {
--		if (matches(*argv, "mux_id") == 0) {
-+		if (strcmp(*argv, "mux_id") == 0) {
- 			NEXT_ARG();
- 			if (get_u16(&mux_id, *argv, 0))
- 				invarg("mux_id is invalid", *argv);
- 			addattr16(n, 1024, IFLA_RMNET_MUX_ID, mux_id);
--		} else if (matches(*argv, "help") == 0) {
-+		} else if (strcmp(*argv, "ingress-deaggregation") == 0) {
-+			NEXT_ARG();
-+			flags.mask |= RMNET_FLAGS_INGRESS_DEAGGREGATION;
-+			if (strcmp(*argv, "on") == 0)
-+				flags.flags |= RMNET_FLAGS_INGRESS_DEAGGREGATION;
-+			else if (strcmp(*argv, "off") == 0)
-+				flags.flags &= ~RMNET_FLAGS_INGRESS_DEAGGREGATION;
-+			else
-+				return on_off("ingress-deaggregation", *argv);
-+		} else if (strcmp(*argv, "ingress-commands") == 0) {
-+			NEXT_ARG();
-+			flags.mask |= RMNET_FLAGS_INGRESS_MAP_COMMANDS;
-+			if (strcmp(*argv, "on") == 0)
-+				flags.flags |= RMNET_FLAGS_INGRESS_MAP_COMMANDS;
-+			else if (strcmp(*argv, "off") == 0)
-+				flags.flags &= ~RMNET_FLAGS_INGRESS_MAP_COMMANDS;
-+			else
-+				return on_off("ingress-commands", *argv);
-+		} else if (strcmp(*argv, "ingress-mapv4-checksum") == 0) {
-+			NEXT_ARG();
-+			flags.mask |= RMNET_FLAGS_INGRESS_MAP_CKSUMV4;
-+			if (strcmp(*argv, "on") == 0)
-+				flags.flags |= RMNET_FLAGS_INGRESS_MAP_CKSUMV4;
-+			else if (strcmp(*argv, "off") == 0)
-+				flags.flags &= ~RMNET_FLAGS_INGRESS_MAP_CKSUMV4;
-+			else
-+				return on_off("ingress-mapv4-checksum", *argv);
-+		} else if (strcmp(*argv, "egress-mapv4-checksum") == 0) {
-+			NEXT_ARG();
-+			flags.mask |= RMNET_FLAGS_EGRESS_MAP_CKSUMV4;
-+			if (strcmp(*argv, "on") == 0)
-+				flags.flags |= RMNET_FLAGS_EGRESS_MAP_CKSUMV4;
-+			else if (strcmp(*argv, "off") == 0)
-+				flags.flags &= ~RMNET_FLAGS_EGRESS_MAP_CKSUMV4;
-+			else
-+				return on_off("egress-mapv4-checksum", *argv);
-+		} else if (strcmp(*argv, "ingress-mapv5-checksum") == 0) {
-+			NEXT_ARG();
-+			flags.mask |= RMNET_FLAGS_INGRESS_MAP_CKSUMV5;
-+			if (strcmp(*argv, "on") == 0)
-+				flags.flags |= RMNET_FLAGS_INGRESS_MAP_CKSUMV5;
-+			else if (strcmp(*argv, "off") == 0)
-+				flags.flags &= ~RMNET_FLAGS_INGRESS_MAP_CKSUMV5;
-+			else
-+				return on_off("ingress-mapv5-checksum", *argv);
-+		} else if (strcmp(*argv, "egress-mapv5-checksum") == 0) {
-+			NEXT_ARG();
-+			flags.mask |= RMNET_FLAGS_EGRESS_MAP_CKSUMV5;
-+			if (strcmp(*argv, "on") == 0)
-+				flags.flags |= RMNET_FLAGS_EGRESS_MAP_CKSUMV5;
-+			else if (strcmp(*argv, "off") == 0)
-+				flags.flags &= ~RMNET_FLAGS_EGRESS_MAP_CKSUMV5;
-+			else
-+				return on_off("egress-mapv5-checksum", *argv);
-+		} else if (strcmp(*argv, "help") == 0) {
- 			explain();
- 			return -1;
- 		} else {
-@@ -48,11 +115,34 @@ static int rmnet_parse_opt(struct link_util *lu, int argc, char **argv,
- 		argc--, argv++;
- 	}
- 
-+	if (flags.mask)
-+		addattr_l(n, 1024, IFLA_RMNET_FLAGS, &flags, sizeof(flags));
-+
- 	return 0;
- }
-+static void rmnet_print_flags(FILE *fp, __u32 flags)
-+{
-+	open_json_array(PRINT_ANY, is_json_context() ? "flags" : "<");
-+#define _PF(f)	if (flags & RMNET_FLAGS_##f) {				\
-+		flags &= ~RMNET_FLAGS_##f;				\
-+		print_string(PRINT_ANY, NULL, flags ? "%s," : "%s", #f); \
-+	}
-+	_PF(INGRESS_DEAGGREGATION);
-+	_PF(INGRESS_MAP_COMMANDS);
-+	_PF(INGRESS_MAP_CKSUMV4);
-+	_PF(EGRESS_MAP_CKSUMV4);
-+	_PF(INGRESS_MAP_CKSUMV5);
-+	_PF(EGRESS_MAP_CKSUMV5);
-+#undef _PF
-+	if (flags)
-+		print_hex(PRINT_ANY, NULL, "%x", flags);
-+	close_json_array(PRINT_ANY, "> ");
-+}
- 
- static void rmnet_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- {
-+	struct ifla_rmnet_flags *flags;
-+
- 	if (!tb)
- 		return;
- 
-@@ -64,6 +154,13 @@ static void rmnet_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 		   "mux_id",
- 		   "mux_id %u ",
- 		   rta_getattr_u16(tb[IFLA_RMNET_MUX_ID]));
-+
-+	if (tb[IFLA_RMNET_FLAGS]) {
-+		if (RTA_PAYLOAD(tb[IFLA_RMNET_FLAGS]) < sizeof(*flags))
-+			return;
-+		flags = RTA_DATA(tb[IFLA_RMNET_FLAGS]);
-+		rmnet_print_flags(f, flags->flags);
-+	}
- }
- 
- static void rmnet_print_help(struct link_util *lu, int argc, char **argv,
--- 
-2.47.1
+> I've added another dev_err() after the spi_setup:
+>=20
+> [    1.680516] ksz8795-switch spi0.1: ksz8795_spi_probe:55: ret of spi_se=
+tup=3D0
+> [    1.819194] ksz8795-switch spi0.1: ksz8795_spi_probe:61: ret=3D-22#
+
+It doesn't look so.
+
+@J=F6rg. You didn't explicitly mention which kernel version you are trying =
+to run.
+But from the line numbers in you log I guess at could be 5.11 or similar.
+
+I guess that the 2nd return code (-22) originates from ksz8795_switch_regis=
+ter()
+which in turn calls ksz_switch_register() [ksz_common.c]. Maybe the -EINVAL=
+ comes from=20
+line 414:
+
+    if (dev->dev_ops->detect(dev))
+        return -EINVAL;
+
+But this is only a guess. Can you please add further debug messages in ksz_=
+switch_register()
+in order to track down were the -EINVAL actually comes from? Maybe it's one=
+ of the
+error returns from ksz8795_register_switch().
+
+My original intention for the mentioned patch presumably was, that always S=
+PI mode 3
+should be configured for this switch (as stated in the data sheet). But may=
+be this
+isn't true for your setup (do you have an inverter in your SPI clock line)?=
+=20
+
+
+> Andrew Lunn schrieb am Sa 07. Dez, 21:47 (+0100):
+> >=20
+> > What i don't understand from your description is why:
+> >=20
+> > > +       /* setup spi */
+> > > +       spi->mode =3D SPI_MODE_3;
+> > > +       ret =3D spi_setup(spi);
+> > > +       if (ret)
+> > > +               return ret;
+> > > +
+> >=20
+> > is causing this issue. Is spi_setup() failing?
+
+Maybe that the configured SPI mode does somehow not work for J=F6rg's setup.
+Perhaps SPI mode 3 on his controller is not the same as for my one (NXP i.M=
+X6).
+This could then cause a mismatch when reading the chip id in ksz8795_switch=
+_detect().
+
+@J=F6rg: Can you please check this? If possible, a measurement of the SPI l=
+ines (with
+an oscilloscope or logic analyzer) would be interesting.
+
+regards,
+Christian
+
 
 
