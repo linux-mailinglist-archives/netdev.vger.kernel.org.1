@@ -1,136 +1,171 @@
-Return-Path: <netdev+bounces-149886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB1C69E7E71
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 06:52:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D4A89E7E9C
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 08:03:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 870042834E4
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 05:52:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C889285DD7
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 07:03:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 468525FB8D;
-	Sat,  7 Dec 2024 05:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621D82D047;
+	Sat,  7 Dec 2024 07:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CUgnodQG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="llKCPWre"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A8912D758;
-	Sat,  7 Dec 2024 05:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD5C81ACA;
+	Sat,  7 Dec 2024 07:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733550755; cv=none; b=qjBWE+1csNPEqlb6bbTWP6QBT78fj2pW52QuhVkQTiCBukCgGdLH9U3YdsFWbDL4unPGBHKwQU9R2EQji5pnaoTTe5wWrYBp+CuTccGGG+A6jrfc7Qd95GzUDxzScahmIqHKKDwuIY41dncBdNk+LNqYt+JIkHFKRUMArtqq7Bw=
+	t=1733555001; cv=none; b=b/I0zLtYowrnWUYa7U8RABd0if4d8UZxzQnDbu5M14xlwoYs5hIeHwizFNOwKrZ98frfjTwiWvqN4MO9CJKBpYxN1tGdRkQ5sumtifxN68a8Ja5nyUunZrUfBdwfEA5so51CCgsegWbN6Y9YlEfTuw7Z3RaLpIW1O4qLq5EpS94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733550755; c=relaxed/simple;
-	bh=t2YjQfD3ZRA6ui1N8vxdn05TPEpVzLwJX1WME5Zlby0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rOab5s/361vnRE/x79lTKQU6cm1ZQp59DAbh9uqkvaHu7qA07r0xbXf/AthJcs6xdb3BkZEPuMCMGUOsEDwQeZ2qHQnFgosbie+YxmUQf11P2g6Ov2RfrcheVzouXuFGQjggSaElQ2a61TrXEulE0Oh/JIvD/oKTuuwxOhS1R+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CUgnodQG; arc=none smtp.client-ip=209.85.215.179
+	s=arc-20240116; t=1733555001; c=relaxed/simple;
+	bh=pddn0gMgqbCFPsbbxgbjcw2YxECn/Ui04cNPs5K7eVM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PZyHzLGd38uSHllse5gg+mYW+D3qbmOYpE3r8C2xJsILlNgHWLs/8YFOF6UCfpK5SnsDoknV0jIBlVwrzjKyX4eNQRSIl+iaedYKQMB0uf1a5e5DIzYkH7lJiOvE3vEujeXDvXkp4gFQfoPjLE9MomrAoG5fNgpbpgoOYK7x0Jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=llKCPWre; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7fc41b4c78bso1827506a12.3;
-        Fri, 06 Dec 2024 21:52:33 -0800 (PST)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-215348d1977so23318205ad.3;
+        Fri, 06 Dec 2024 23:03:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733550753; x=1734155553; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2+IwYaynpcQ+9RTCAJedrXXepYT48CIPEoJXkJRmDR8=;
-        b=CUgnodQGoguSf07Kgmi5Cik3y2Mn6w0WcHMaZOpsv1qKvfNFXozYM4HWOvtXiIA96k
-         Kd3pU+7+4+CeZIjtqrN9wKLgyMizC6vTvdyYulhy/sWw6WDDuTujVNoPmzVd0iGrFQZ4
-         nKTeEftUUvMYi+rxTPNqA6KDedRpOazCknktT98jZjozZdeTcrXOmJrd/3x2T2f57AxK
-         TalLmLCr/N2xSLaSlc4jDWmaMurG4MU+9gZ/3cr6dkmu69N7eJQHw0Nb8LQDCSuMoGsh
-         ZwSARRIPbd5BWL6u7pYAJTi22qqL8S4B5+jV2KnuWzHhdnhE1Y4xHzaJO1Oyes+eGpv+
-         IGqg==
+        d=gmail.com; s=20230601; t=1733554996; x=1734159796; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7VBksAF/T3d2c5+s8Bg+ubv6vEd7NOr/os/9LSHT35Y=;
+        b=llKCPWreM3vismNCm2ann09zawoVIiGrOwLNExs7lue98F+r4mUyQLLjIDMKwVjglx
+         YbEKPfqFqkiUYxdG8xaQKQVkrT7WS6FWr+L7elWudNgcfCmdrPRvDoyOPm1he6Ux3mzg
+         bJEwqYyFm4fVrL11Jfonyt5Nd/nQauqc2vRC9CixkXqWDNyRD0dHrN1pfXjdR2LZLao1
+         r9Ylo/9rzo5zz/sEOmPFTNH8oa3jIyYW+gowOY0UXtVNje56VaA5TViv5PlXISkFA0NP
+         auXWinBKT1AW/QnPMX4fWYS/G5krsxtoytV4RokN0CGfywLtRRkEasDRuIaYvtDjBjzH
+         Z8Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733550753; x=1734155553;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2+IwYaynpcQ+9RTCAJedrXXepYT48CIPEoJXkJRmDR8=;
-        b=lW9kg18NygWAKBexQiZKUihGz4dI7jS7o37JcRtweccVPiDQ8Cxj6co/8xFzlrymn0
-         2Z0aeHcj4kIV/PTdKA1SNAlA0fP+CoIDJlThBO6apI+82zXqgw7eDU4DeRFioirbwSAy
-         oCwwBwbBK+zYiua9uPiSL45RdPD3gJdrptaXb/YpLlHkzQU4qYV6JSv5OfrPloRhfqi1
-         AY4DJ1r8cpvR528/VVJvxLzGDm4r/vBXfNDJKrUFtyKNdiDnzFJUDLAYEr2LxxQ+fhAB
-         9Pf+qliL17u4CPkTrOKvRFSF3NarsAPkmJY9cgOuGZgylUIT5Fsg4RLa4MbUMfBsWp/l
-         l6sw==
-X-Forwarded-Encrypted: i=1; AJvYcCXGL3unPxWCesQp3wUb0aQXoC8c7LNXi5frNAJG2tqQYFp3K+cV9+4/eDrNzUFADCB8wO+Ko/Tmei7a+YI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywir7RVRZmqH9X0+Bk0Po86WN//Z5V+6VPLhpi3uR5DUweJk7lr
-	fxD0qLiA7FTvAhL0hoawfX8+WkmVWkfE21dpiMx2nC7FbmWFvAU6
-X-Gm-Gg: ASbGncuTyTl8NdYxRU/VI0EA0c7CL/5IWhKKPhFLHXGylSh551fGXQR/ZVcBGMCVI12
-	53jhTtyEVnJS+mV1AAoTOO8HNkQrFaNuDJ+/dh4AUNpp60h1TAopHmpiewW0Vx6oJ87BHyiTRxX
-	uf3FYgM9X7L8YUSJ1/s0qQDCz8K5qB4z1pKUno5EHD/aVkyH/WQWL7QK+C/rbR9QBUU67xfKyJQ
-	jyRRpdu9g7BsPiGFywcsH01tSRIkaoKiILceqvNfHpkNZM=
-X-Google-Smtp-Source: AGHT+IFd+wuygMRSPeO8wa52NvVHAGLuFfQ5jfbHspHxQMyW7jzkp1weeY7rmM4U0gg8Uv3suuUZQA==
-X-Received: by 2002:a05:6a21:3e04:b0:1e0:c3bf:7909 with SMTP id adf61e73a8af0-1e187132cf7mr8429490637.41.1733550752776;
-        Fri, 06 Dec 2024 21:52:32 -0800 (PST)
-Received: from localhost ([129.146.253.192])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-725a2a903a3sm3811288b3a.116.2024.12.06.21.52.26
+        d=1e100.net; s=20230601; t=1733554996; x=1734159796;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7VBksAF/T3d2c5+s8Bg+ubv6vEd7NOr/os/9LSHT35Y=;
+        b=ntxIcqcLYTaOVzNbdFxAE6FptVPRPC2KWhe8J1fVBQ3GpNNVmadEm2WVXbKrAfseO3
+         S1QDum/gg2J3q8Cdi4nhk5ignLwWf7N6aRXxB4yJdRGMKXBj5WjLY68O9ePVuMFq+LCM
+         XTLgNtdn5KooQMymnujBB7AJptf84x4UljvZ2ysfzBrGg/kfnhcgsR0ZHeNq9x6K5ROV
+         gcayPtI5VRLeMCNYcoW7KHI1NfjrYAI4wPh1mWopNDnwA2QD5zdYbdAVzXmzqCIOnzrA
+         P7HU5KbwGxy+quYft4fGEyva6luUy6XcdWeSKKRjYbWY8Ka6k1yLFYrsd+oR9lYwwwi/
+         WPZw==
+X-Forwarded-Encrypted: i=1; AJvYcCWMAyrVbC5xcXStqWHrsx8gVBxJbe/WlHDFgnCVKlq0ib2GjYwJNURezg0IWuxuaAIsi8IAVDYqcixY+Dc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKrTgHFdoSyBB6QR14Xw5BqfWP2EUXczdCEwCmfrzhBKzteb10
+	OGu9RkREO4mmhHw7yT3Mm2ffRzNx4Ls16miKkvSA6I/SUReXNnQehvFJkA==
+X-Gm-Gg: ASbGncvnRY0M2pQ23FoVT4PWK80hCNC094ZxSxxRpokXBPD4ZUtY/2fSXWYbefZwCKW
+	t1bxmsPPLyBC/QgqoGGcg8j0YzDXRF+Xr2rP6Kvdld2Ewv5u0t60leKIO3G89Q7AC3+nmrzaOY1
+	kJpH6obKMDZ5ZPTUjqvjT6PGDUpzzhd9CM8ZvHPAX5z+zK8bvXsqmrLqFiXE36Jg367QEvcJPLK
+	D3onAPb8Pi2zeUIsXbbd57MdP9gxDSp0LVhrWGWxjmgUEQkdwNIZZo8nO6WryA=
+X-Google-Smtp-Source: AGHT+IGRLV9tlr/2SHhgZD19JnwDMG0W/wwF7xuVg/N9Skwvi9GkZLfzfL0GTpIhC8/5P3oAOgPTeg==
+X-Received: by 2002:a17:902:f542:b0:215:a60d:bcc9 with SMTP id d9443c01a7336-21614d1ef83mr97323535ad.2.1733554996066;
+        Fri, 06 Dec 2024 23:03:16 -0800 (PST)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-215f8efa2aesm38395105ad.142.2024.12.06.23.03.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Dec 2024 21:52:32 -0800 (PST)
-Date: Sat, 7 Dec 2024 13:52:17 +0800
+        Fri, 06 Dec 2024 23:03:15 -0800 (PST)
 From: Furong Xu <0x1207@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- andrew+netdev@lunn.ch, Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, MaximeCoquelin <mcoquelin.stm32@gmail.com>,
- xfr@outlook.com, Jon Hunter <jonathanh@nvidia.com>, Thierry Reding
- <thierry.reding@gmail.com>, Simon Horman <horms@kernel.org>, Hariprasad
- Kelam <hkelam@marvell.com>
-Subject: Re: [PATCH net] net: stmmac: fix TSO DMA API usage causing oops
-Message-ID: <20241207135217.00000f0f@gmail.com>
-In-Reply-To: <E1tJXcx-006N4Z-PC@rmk-PC.armlinux.org.uk>
-References: <E1tJXcx-006N4Z-PC@rmk-PC.armlinux.org.uk>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+To: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	xfr@outlook.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v1] net: stmmac: Move extern declarations from common.h to hwif.h
+Date: Sat,  7 Dec 2024 15:02:48 +0800
+Message-Id: <20241207070248.4049877-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, 06 Dec 2024 12:40:11 +0000, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
+These extern declarations are referenced in hwif.c only.
+Move them to hwif.h just like the other extern declarations.
 
-> Commit 66600fac7a98 ("net: stmmac: TSO: Fix unbalanced DMA map/unmap
-> for non-paged SKB data") moved the assignment of tx_skbuff_dma[]'s
-> members to be later in stmmac_tso_xmit().
-> 
-> The buf (dma cookie) and len stored in this structure are passed to
-> dma_unmap_single() by stmmac_tx_clean(). The DMA API requires that
-> the dma cookie passed to dma_unmap_single() is the same as the value
-> returned from dma_map_single(). However, by moving the assignment
-> later, this is not the case when priv->dma_cap.addr64 > 32 as "des"
-> is offset by proto_hdr_len.
-> 
-> This causes problems such as:
-> 
->   dwc-eth-dwmac 2490000.ethernet eth0: Tx DMA map failed
-> 
-> and with DMA_API_DEBUG enabled:
-> 
->   DMA-API: dwc-eth-dwmac 2490000.ethernet: device driver tries to +free DMA memory it has not allocated [device address=0x000000ffffcf65c0] [size=66 bytes]
-> 
-> Fix this by maintaining "des" as the original DMA cookie, and use
-> tso_des to pass the offset DMA cookie to stmmac_tso_allocator().
-> 
-> Full details of the crashes can be found at:
-> https://lore.kernel.org/all/d8112193-0386-4e14-b516-37c2d838171a@nvidia.com/
-> https://lore.kernel.org/all/klkzp5yn5kq5efgtrow6wbvnc46bcqfxs65nz3qy77ujr5turc@bwwhelz2l4dw/
-> 
-> Reported-by: Jon Hunter <jonathanh@nvidia.com>
-> Reported-by: Thierry Reding <thierry.reding@gmail.com>
-> Fixes: 66600fac7a98 ("net: stmmac: TSO: Fix unbalanced DMA map/unmap for non-paged SKB data")
+Compile tested only.
+No functional change intended.
 
-Much appreciated for this fix.
+Signed-off-by: Furong Xu <0x1207@gmail.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/common.h | 14 --------------
+ drivers/net/ethernet/stmicro/stmmac/hwif.h   | 14 ++++++++++++++
+ 2 files changed, 14 insertions(+), 14 deletions(-)
 
-Reviewed-by: Furong Xu <0x1207@gmail.com>
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index 1367fa5c9b8e..fbcf07d201cf 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -543,18 +543,8 @@ struct dma_features {
+ #define STMMAC_VLAN_INSERT	0x2
+ #define STMMAC_VLAN_REPLACE	0x3
+ 
+-extern const struct stmmac_desc_ops enh_desc_ops;
+-extern const struct stmmac_desc_ops ndesc_ops;
+-
+ struct mac_device_info;
+ 
+-extern const struct stmmac_hwtimestamp stmmac_ptp;
+-extern const struct stmmac_hwtimestamp dwmac1000_ptp;
+-extern const struct stmmac_mode_ops dwmac4_ring_mode_ops;
+-
+-extern const struct ptp_clock_info stmmac_ptp_clock_ops;
+-extern const struct ptp_clock_info dwmac1000_ptp_clock_ops;
+-
+ struct mac_link {
+ 	u32 caps;
+ 	u32 speed_mask;
+@@ -641,8 +631,4 @@ void stmmac_dwmac4_set_mac(void __iomem *ioaddr, bool enable);
+ 
+ void dwmac_dma_flush_tx_fifo(void __iomem *ioaddr);
+ 
+-extern const struct stmmac_mode_ops ring_mode_ops;
+-extern const struct stmmac_mode_ops chain_mode_ops;
+-extern const struct stmmac_desc_ops dwmac4_desc_ops;
+-
+ #endif /* __COMMON_H__ */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+index 64f8ed67dcc4..58a962e0b768 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+@@ -665,6 +665,20 @@ struct stmmac_regs_off {
+ 	u32 est_off;
+ };
+ 
++extern const struct stmmac_desc_ops ndesc_ops;
++extern const struct stmmac_desc_ops enh_desc_ops;
++extern const struct stmmac_desc_ops dwmac4_desc_ops;
++
++extern const struct stmmac_hwtimestamp stmmac_ptp;
++extern const struct stmmac_hwtimestamp dwmac1000_ptp;
++
++extern const struct ptp_clock_info stmmac_ptp_clock_ops;
++extern const struct ptp_clock_info dwmac1000_ptp_clock_ops;
++
++extern const struct stmmac_mode_ops ring_mode_ops;
++extern const struct stmmac_mode_ops chain_mode_ops;
++extern const struct stmmac_mode_ops dwmac4_ring_mode_ops;
++
+ extern const struct stmmac_ops dwmac100_ops;
+ extern const struct stmmac_dma_ops dwmac100_dma_ops;
+ extern const struct stmmac_ops dwmac1000_ops;
+-- 
+2.34.1
 
 
