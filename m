@@ -1,171 +1,209 @@
-Return-Path: <netdev+bounces-149887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D4A89E7E9C
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 08:03:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C364C9E7ECE
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 08:53:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C889285DD7
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 07:03:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83B04284F60
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 07:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621D82D047;
-	Sat,  7 Dec 2024 07:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="llKCPWre"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9742682C7E;
+	Sat,  7 Dec 2024 07:53:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD5C81ACA;
-	Sat,  7 Dec 2024 07:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3DD823DE
+	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 07:53:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733555001; cv=none; b=b/I0zLtYowrnWUYa7U8RABd0if4d8UZxzQnDbu5M14xlwoYs5hIeHwizFNOwKrZ98frfjTwiWvqN4MO9CJKBpYxN1tGdRkQ5sumtifxN68a8Ja5nyUunZrUfBdwfEA5so51CCgsegWbN6Y9YlEfTuw7Z3RaLpIW1O4qLq5EpS94=
+	t=1733558027; cv=none; b=aKzKou/oWRHKlGI3IbdqJbdvs3Uc/VJXL7OE/CQ4/OocmNYi0DB2JUr+ByAcgzTRa2G7P4bj+vyTm3GCorGI3XzYMizfjFolhej1zeZjhOdMFyZKXdaHiyvD8mt899l20Ipjg91NgKzsT5K+Dvobn5+cR3Rp0BA1fT5s1l0AsUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733555001; c=relaxed/simple;
-	bh=pddn0gMgqbCFPsbbxgbjcw2YxECn/Ui04cNPs5K7eVM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PZyHzLGd38uSHllse5gg+mYW+D3qbmOYpE3r8C2xJsILlNgHWLs/8YFOF6UCfpK5SnsDoknV0jIBlVwrzjKyX4eNQRSIl+iaedYKQMB0uf1a5e5DIzYkH7lJiOvE3vEujeXDvXkp4gFQfoPjLE9MomrAoG5fNgpbpgoOYK7x0Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=llKCPWre; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-215348d1977so23318205ad.3;
-        Fri, 06 Dec 2024 23:03:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733554996; x=1734159796; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7VBksAF/T3d2c5+s8Bg+ubv6vEd7NOr/os/9LSHT35Y=;
-        b=llKCPWreM3vismNCm2ann09zawoVIiGrOwLNExs7lue98F+r4mUyQLLjIDMKwVjglx
-         YbEKPfqFqkiUYxdG8xaQKQVkrT7WS6FWr+L7elWudNgcfCmdrPRvDoyOPm1he6Ux3mzg
-         bJEwqYyFm4fVrL11Jfonyt5Nd/nQauqc2vRC9CixkXqWDNyRD0dHrN1pfXjdR2LZLao1
-         r9Ylo/9rzo5zz/sEOmPFTNH8oa3jIyYW+gowOY0UXtVNje56VaA5TViv5PlXISkFA0NP
-         auXWinBKT1AW/QnPMX4fWYS/G5krsxtoytV4RokN0CGfywLtRRkEasDRuIaYvtDjBjzH
-         Z8Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733554996; x=1734159796;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7VBksAF/T3d2c5+s8Bg+ubv6vEd7NOr/os/9LSHT35Y=;
-        b=ntxIcqcLYTaOVzNbdFxAE6FptVPRPC2KWhe8J1fVBQ3GpNNVmadEm2WVXbKrAfseO3
-         S1QDum/gg2J3q8Cdi4nhk5ignLwWf7N6aRXxB4yJdRGMKXBj5WjLY68O9ePVuMFq+LCM
-         XTLgNtdn5KooQMymnujBB7AJptf84x4UljvZ2ysfzBrGg/kfnhcgsR0ZHeNq9x6K5ROV
-         gcayPtI5VRLeMCNYcoW7KHI1NfjrYAI4wPh1mWopNDnwA2QD5zdYbdAVzXmzqCIOnzrA
-         P7HU5KbwGxy+quYft4fGEyva6luUy6XcdWeSKKRjYbWY8Ka6k1yLFYrsd+oR9lYwwwi/
-         WPZw==
-X-Forwarded-Encrypted: i=1; AJvYcCWMAyrVbC5xcXStqWHrsx8gVBxJbe/WlHDFgnCVKlq0ib2GjYwJNURezg0IWuxuaAIsi8IAVDYqcixY+Dc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKrTgHFdoSyBB6QR14Xw5BqfWP2EUXczdCEwCmfrzhBKzteb10
-	OGu9RkREO4mmhHw7yT3Mm2ffRzNx4Ls16miKkvSA6I/SUReXNnQehvFJkA==
-X-Gm-Gg: ASbGncvnRY0M2pQ23FoVT4PWK80hCNC094ZxSxxRpokXBPD4ZUtY/2fSXWYbefZwCKW
-	t1bxmsPPLyBC/QgqoGGcg8j0YzDXRF+Xr2rP6Kvdld2Ewv5u0t60leKIO3G89Q7AC3+nmrzaOY1
-	kJpH6obKMDZ5ZPTUjqvjT6PGDUpzzhd9CM8ZvHPAX5z+zK8bvXsqmrLqFiXE36Jg367QEvcJPLK
-	D3onAPb8Pi2zeUIsXbbd57MdP9gxDSp0LVhrWGWxjmgUEQkdwNIZZo8nO6WryA=
-X-Google-Smtp-Source: AGHT+IGRLV9tlr/2SHhgZD19JnwDMG0W/wwF7xuVg/N9Skwvi9GkZLfzfL0GTpIhC8/5P3oAOgPTeg==
-X-Received: by 2002:a17:902:f542:b0:215:a60d:bcc9 with SMTP id d9443c01a7336-21614d1ef83mr97323535ad.2.1733554996066;
-        Fri, 06 Dec 2024 23:03:16 -0800 (PST)
-Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-215f8efa2aesm38395105ad.142.2024.12.06.23.03.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Dec 2024 23:03:15 -0800 (PST)
-From: Furong Xu <0x1207@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	xfr@outlook.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next v1] net: stmmac: Move extern declarations from common.h to hwif.h
-Date: Sat,  7 Dec 2024 15:02:48 +0800
-Message-Id: <20241207070248.4049877-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1733558027; c=relaxed/simple;
+	bh=0crVhjekl/TufH0e58YsLfi54DeRvyDwZuVYybgcy9M=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=o3lwqHA1bHOoj7C1fuCCIVdKWXtIovRve9Ty539jPQfcJ/D2f+Tt25AkA0KyGTixkz+YhzImeeJDNbc+8m6QeHoxlj5qekxyuiEytyPPxwaOXxlMuDndI5mynYCbXXD+hyuBXHChbhQp25QJQ6v0DPyClGUD8+EY4qG2cdST980=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
+Received: from mail-relay (helo=jo-so.de)
+	by s1.jo-so.de with local-bsmtp (Exim 4.96)
+	(envelope-from <joerg@jo-so.de>)
+	id 1tJpdC-000d4H-3A;
+	Sat, 07 Dec 2024 08:53:38 +0100
+Received: from joerg by zenbook.jo-so.de with local (Exim 4.98)
+	(envelope-from <joerg@jo-so.de>)
+	id 1tJpdC-00000000s0R-0QLE;
+	Sat, 07 Dec 2024 08:53:38 +0100
+Date: Sat, 7 Dec 2024 08:53:38 +0100
+From: =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
+To: netdev@vger.kernel.org
+Cc: Christian Eggers <ceggers@arri.de>
+Subject: KSZ8795 not detected at start to boot from NFS
+Message-ID: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
+OpenPGP: id=7D2C9A23D1AEA375; url=https://jo-so.de/pgp-key.txt;
+ preference=signencrypt
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="z2zwuqovvefd5sle"
+Content-Disposition: inline
 
-These extern declarations are referenced in hwif.c only.
-Move them to hwif.h just like the other extern declarations.
 
-Compile tested only.
-No functional change intended.
+--z2zwuqovvefd5sle
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: KSZ8795 not detected at start to boot from NFS
+MIME-Version: 1.0
 
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/common.h | 14 --------------
- drivers/net/ethernet/stmicro/stmmac/hwif.h   | 14 ++++++++++++++
- 2 files changed, 14 insertions(+), 14 deletions(-)
+Hi,
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-index 1367fa5c9b8e..fbcf07d201cf 100644
---- a/drivers/net/ethernet/stmicro/stmmac/common.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-@@ -543,18 +543,8 @@ struct dma_features {
- #define STMMAC_VLAN_INSERT	0x2
- #define STMMAC_VLAN_REPLACE	0x3
- 
--extern const struct stmmac_desc_ops enh_desc_ops;
--extern const struct stmmac_desc_ops ndesc_ops;
--
- struct mac_device_info;
- 
--extern const struct stmmac_hwtimestamp stmmac_ptp;
--extern const struct stmmac_hwtimestamp dwmac1000_ptp;
--extern const struct stmmac_mode_ops dwmac4_ring_mode_ops;
--
--extern const struct ptp_clock_info stmmac_ptp_clock_ops;
--extern const struct ptp_clock_info dwmac1000_ptp_clock_ops;
--
- struct mac_link {
- 	u32 caps;
- 	u32 speed_mask;
-@@ -641,8 +631,4 @@ void stmmac_dwmac4_set_mac(void __iomem *ioaddr, bool enable);
- 
- void dwmac_dma_flush_tx_fifo(void __iomem *ioaddr);
- 
--extern const struct stmmac_mode_ops ring_mode_ops;
--extern const struct stmmac_mode_ops chain_mode_ops;
--extern const struct stmmac_desc_ops dwmac4_desc_ops;
--
- #endif /* __COMMON_H__ */
-diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-index 64f8ed67dcc4..58a962e0b768 100644
---- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-@@ -665,6 +665,20 @@ struct stmmac_regs_off {
- 	u32 est_off;
- };
- 
-+extern const struct stmmac_desc_ops ndesc_ops;
-+extern const struct stmmac_desc_ops enh_desc_ops;
-+extern const struct stmmac_desc_ops dwmac4_desc_ops;
+I'm trying to load the root filesystem via NFS with a
+NET_DSA_MICROCHIP_KSZ8795_SPI attached to an TI_DAVINCI_EMAC. With 5.10 it
+works, but with later versions the kernel fails to detect the switch. It is
+since
+
+commit 8c4599f49841dd663402ec52325dc2233add1d32
+Author: Christian Eggers <ceggers@arri.de>
+Date:   Fri Nov 20 12:21:07 2020 +0100
+
+    net: dsa: microchip: ksz8795: setup SPI mode
+
+    This should be done in the device driver instead of the device tree.
+
+    Signed-off-by: Christian Eggers <ceggers@arri.de>
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+diff --git drivers/net/dsa/microchip/ksz8795_spi.c drivers/net/dsa/microchi=
+p/ksz8795_spi.c
+index 8b00f8e6c02f..f98432a3e2b5 100644
+--- drivers/net/dsa/microchip/ksz8795_spi.c
++++ drivers/net/dsa/microchip/ksz8795_spi.c
+@@ -49,6 +49,12 @@ static int ksz8795_spi_probe(struct spi_device *spi)
+        if (spi->dev.platform_data)
+                dev->pdata =3D spi->dev.platform_data;
+
++       /* setup spi */
++       spi->mode =3D SPI_MODE_3;
++       ret =3D spi_setup(spi);
++       if (ret)
++               return ret;
 +
-+extern const struct stmmac_hwtimestamp stmmac_ptp;
-+extern const struct stmmac_hwtimestamp dwmac1000_ptp;
-+
-+extern const struct ptp_clock_info stmmac_ptp_clock_ops;
-+extern const struct ptp_clock_info dwmac1000_ptp_clock_ops;
-+
-+extern const struct stmmac_mode_ops ring_mode_ops;
-+extern const struct stmmac_mode_ops chain_mode_ops;
-+extern const struct stmmac_mode_ops dwmac4_ring_mode_ops;
-+
- extern const struct stmmac_ops dwmac100_ops;
- extern const struct stmmac_dma_ops dwmac100_dma_ops;
- extern const struct stmmac_ops dwmac1000_ops;
--- 
-2.34.1
+        ret =3D ksz8795_switch_register(dev);
 
+        /* Main DSA driver may not be started yet. */
+
+The kernel reports
+
+[    1.912756] ksz8795-switch: probe of spi0.1 failed with error -22
+=E2=80=A6
+[    2.048054] davinci_emac 1e20000.ethernet: incompatible machine/device t=
+ype for reading mac address
+[    2.062352] davinci_emac davinci_emac.1: failed to get EMAC clock
+[    2.068632] davinci_emac: probe of davinci_emac.1 failed with error -16
+
+It tries to initialize the switch before the ethernet of the SoC is ready.
+
+Before this commit the kernel returned EPROBE_DEFER instead of EINVAL (or
+ENODEV) as a quick
+
+```
+dev_err(&spi->dev, "ksz8795_spi_probe:%d: ret of ksz8795_switch_register=3D=
+%d\n", __LINE__, ret);
+```
+
+reveals.
+
+Without 8c4599f49841dd663402ec52325dc2233add1d32:
+
+```
+[    1.809914] ksz8795-switch spi0.1: ksz8795_spi_probe:60: ret of ksz8795_=
+switch_register=3D-517
+=E2=80=A6
+[    2.069770] ksz8795-switch spi0.1: ksz8795_spi_probe:60: ret of ksz8795_=
+switch_register=3D-517
+[    2.209715] ksz8795-switch spi0.1: ksz8795_spi_probe:60: ret of ksz8795_=
+switch_register=3D-517
+[    2.223625] davinci_emac 1e20000.ethernet: incompatible machine/device t=
+ype for reading mac address
+[    3.110937] ksz8795-switch spi0.1 lan-x1 (uninitialized): PHY [dsa-0.0:0=
+0] driver [Generic PHY] (irq=3DPOLL)
+[    3.125766] ksz8795-switch spi0.1 lan-x2 (uninitialized): PHY [dsa-0.0:0=
+1] driver [Generic PHY] (irq=3DPOLL)
+[    3.140779] ksz8795-switch spi0.1 lan-x3 (uninitialized): PHY [dsa-0.0:0=
+2] driver [Generic PHY] (irq=3DPOLL)
+[    3.155026] ksz8795-switch spi0.1 lan-bp (uninitialized): PHY [dsa-0.0:0=
+3] driver [Generic PHY] (irq=3DPOLL)
+[    3.168579] ksz8795-switch spi0.1: configuring for fixed/rmii link mode
+[    3.175324] eth0: mtu greater than device maximum
+[    3.180273] davinci_emac 1e20000.ethernet eth0: error -22 setting MTU to=
+ include DSA overhead
+[    3.189075] DSA: tree 0 setup
+[    3.192155] ksz8795-switch spi0.1: ksz8795_spi_probe:60: ret of ksz8795_=
+switch_register=3D0
+[    3.204819] device eth0 entered promiscuous mode
+[    3.209962] ksz8795-switch spi0.1: Link is Up - 100Mbps/Full - flow cont=
+rol rx/tx
+[    3.221219] davinci_emac 1e20000.ethernet eth0: Link is Up - 100Mbps/Ful=
+l - flow control off
+[    3.232894] ksz8795-switch spi0.1 lan-x1: configuring for phy/gmii link =
+mode
+[    6.409818] ksz8795-switch spi0.1 lan-x1: Link is Up - 100Mbps/Full - fl=
+ow control rx/tx
+```
+
+With 8c4599f49841dd663402ec52325dc2233add1d32:
+
+```
+[    1.808910] ksz8795-switch spi0.1: ksz8795_spi_probe:60: ret of ksz8795_=
+switch_register=3D-22
+[    1.817612] ksz8795-switch: probe of spi0.1 failed with error -22
+[    1.823992] spi_davinci 1f0e000.spi: Controller at 0x(ptrval)
+=E2=80=A6
+[    1.952350] davinci_emac 1e20000.ethernet: incompatible machine/device t=
+ype for reading mac address
+```
+
+So, I inserted these lines and it works.
+
+```
+        ret =3D ksz8_switch_register(dev);
++        if (ret =3D=3D -EINVAL || ret =3D=3D -ENODEV)
++            ret =3D -EPROBE_DEFER;
+```
+
+Is this the correct solution or should it be done something different?
+Something like this is still missing in ksz_spi.c:88-100.
+
+
+Thanks in advance.
+
+Kind regards, J=C3=B6rg
+
+--=20
+Manchmal denke ich, das sicherste Indiz daf=C3=BCr, da=C3=9F anderswo im Un=
+iversum
+intelligentes Leben existiert, ist, da=C3=9F niemand versucht hat, mit uns
+Kontakt aufzunehmen.                           (Calvin und Hobbes)
+
+--z2zwuqovvefd5sle
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABEIAB0WIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCZ1P+/QAKCRB9LJoj0a6j
+dYn4AP9CcxlHDZwt7VVy+Ms5q/aRnPP9vW1bkIFxeAphHujNAwD/UdHk8Lo/VHz3
+rbhcDHOgCzni5vWov9lGTeYuN2zy6SA=
+=TIo5
+-----END PGP SIGNATURE-----
+
+--z2zwuqovvefd5sle--
 
