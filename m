@@ -1,148 +1,195 @@
-Return-Path: <netdev+bounces-149883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC6749E7E43
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 06:10:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EED19E7E6D
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 06:45:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AB4816B926
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 05:10:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D0B918878DF
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 05:45:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E960F335C0;
-	Sat,  7 Dec 2024 05:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A971B17557;
+	Sat,  7 Dec 2024 05:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="D5GE1uWa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFB62747B
-	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 05:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72BD10E0
+	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 05:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733548228; cv=none; b=QdelJH4kKsuTYxWRYOWZVgYub8++n2qAHE9PHgB+ZluPVNsbyXzyHWdk4zqPLOGnZmuYsks95i+WT6PC5BhEcjf6MoK678jAMlAbOCmlbQbF//BLCCGXCpVBvW5j7Iisjb3rTYsgjx8PIDhbwsgvnGfEQLcW2/5M4pASnUZ/XjE=
+	t=1733550351; cv=none; b=Lwg2qNuvH1Wqgt/UnBp9UVVnLfkkikrnHKCjA9WvGDWXjzV1ej4g5KAIaJqIKJDbysiG1lEAM8qk6f4tEwXni4T1sjpMqmRW9G+cycoSHAfjGi4LKNmDJrgnTfe1Gy5o9kjCccdxCfQ9dE41l+9fuZleRxmn46wkIwFC4SChP74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733548228; c=relaxed/simple;
-	bh=et1z/KUmz8usDOn7via7XGKSBW4cSCbTg4tBkTkfDL8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=f1yZA5vb0zATvttx3YLG/Eh6W2TEr50vPSyuwD1b5S/NPiE1/M0rdwJ2j0Sv0hNgdvF2rspBfr3xBpYrsZBdVTvu4LNWMbC/6CM4bIoMVxEL3U4vSJj/Kq+p/b9ajztMx7GaK9Qb+hlJLTqTigk/B7A4J3l/UvPYXFFTry9u8Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a7de3ab182so57597145ab.1
-        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 21:10:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733548225; x=1734153025;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8f2I+1uZRwsWPiIe3GqMd//ZCSLDRADHYVc75cI1Ges=;
-        b=TwbAFrMJS65Br57UzDFqQYrFdUSeevsHXZBI4n94TLvwS+ABXV9uSydaTcV2HTPIsZ
-         C9GbtcnDvq5ETDQx2m4txjwdfF4q1Wvw3jI4jAg+F2tsaooDO6t+trIVkf2mEQyksHjk
-         7stcwrDkcxFmHqOM/bplyRLnDfhBaKDVTwJCSRBTMUm9R5EfKbPaegm+X1U2BSGdal74
-         4HEB0DD7BsAT0ST6NCqNSFRvaX/7S70aQ0R5CfvF437FRhtdk0Ty0R7lTvIFbFKqKN6W
-         SeUM1BqeDq4SIB1g3gZajXPxxNbP8pStNu/x2zviGwUx3FDxhIBoWh/Sx2eXHPO9esjO
-         GsZg==
-X-Forwarded-Encrypted: i=1; AJvYcCVf3Bi/kdqPOZNscf6kOiI3w77v4f7tjzXjLexh4Kle06yeazHcfZhbt/MteFYNdkc7s2SI0Hs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylbLjy4fcj9Xdps6af+pDwF1EV6iXGw7Vud35WzuaXBI1obFBA
-	jP79TgZh8PZ58HIUgSS/VArFAS5MzLQPPGfDCml3SNpfjtQgm4eFwf8SFnpAN6BR19QA+TjFW01
-	oNTy9airz/lTswgi7gOvf3dOz+XYYiI+kEfYOrec/KHHvdkHta/MvI9s=
-X-Google-Smtp-Source: AGHT+IHKs3Fulw6z20FvxC3nCjkPPZgRJVQIWaH8JYYw6aFE/qX9/QQo2Bpa3i3xa8SuyDIF3kNC8FJNEbCfy3s1DIQRvZNybRwh
+	s=arc-20240116; t=1733550351; c=relaxed/simple;
+	bh=TTO3rs+Tq2BdYYFvl+FK6djEajA2C/MCawILVI9rRT8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BSMj6rNMwh1T/L6NyTdKCYZUEqsg8c1hcDVdtL1xshQ9QnCDxdMVXqHKLp7toWXjjybFDJFBeeNqX7IQvQ923ZJ0Z0WLRGjRkPblpwZjYXvCZFq26qArG6k1dl4J4BXOUDFbnFGmszRZ37xnkLhLsSFWtpGgKU6z55PJ9t/LW5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=D5GE1uWa; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1733550350; x=1765086350;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=7gkHPudAL6tdapHDOk7w29KmEYjpR0mtUpI4DOppjUo=;
+  b=D5GE1uWaz3xjkSLJezjn74+XkE7uB/qAHaV4MrLcRGQP0q1+FgNHPWEP
+   aeG0T/WsuKjJlq5Kz/y5C7IPbRYAZHgdTY8MtCwnw3w7tDqMxQCPkCrKV
+   tU49Dccq+r9RHgFTYexNX8uWhJ6xY62p+QF7m3bDnhdD/3wLPXTFyRvTx
+   s=;
+X-IronPort-AV: E=Sophos;i="6.12,215,1728950400"; 
+   d="scan'208";a="47378789"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2024 05:45:46 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:15423]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.76:2525] with esmtp (Farcaster)
+ id 3d868f4f-740a-4035-bfb6-3a36c0da71e2; Sat, 7 Dec 2024 05:45:46 +0000 (UTC)
+X-Farcaster-Flow-ID: 3d868f4f-740a-4035-bfb6-3a36c0da71e2
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Sat, 7 Dec 2024 05:45:45 +0000
+Received: from 6c7e67c6786f.amazon.com (10.118.240.36) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Sat, 7 Dec 2024 05:45:41 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
+	<jk@codeconstruct.com.au>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<matt@codeconstruct.com.au>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] mctp: no longer rely on net->dev_index_head[]
+Date: Sat, 7 Dec 2024 14:45:35 +0900
+Message-ID: <20241207054535.68849-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241206223811.1343076-1-edumazet@google.com>
+References: <20241206223811.1343076-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12c5:b0:3a7:a3a4:2cb3 with SMTP id
- e9e14a558f8ab-3a811e06230mr60927205ab.15.1733548225288; Fri, 06 Dec 2024
- 21:10:25 -0800 (PST)
-Date: Fri, 06 Dec 2024 21:10:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6753d8c1.050a0220.a30f1.0151.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in NUM
-From: syzbot <syzbot+3f059ffbdd539a3f6bc9@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWB004.ant.amazon.com (10.13.139.143) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello,
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri,  6 Dec 2024 22:38:11 +0000
+> mctp_dump_addrinfo() is one of the last users of
+> net->dev_index_head[] in the control path.
+> 
+> Switch to for_each_netdev_dump() for better scalability.
+> 
+> Use C99 for mctp_device_rtnl_msg_handlers[] to prepare
+> future RTNL removal from mctp_dump_addrinfo()
+> 
+> (mdev->addrs is not yet RCU protected)
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-syzbot found the following issue on:
-
-HEAD commit:    cdd30ebb1b9f module: Convert symbol namespace to string li..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=146c8330580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6851fe4f61792030
-dashboard link: https://syzkaller.appspot.com/bug?extid=3f059ffbdd539a3f6bc9
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-cdd30ebb.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/35bb9b3cd157/vmlinux-cdd30ebb.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9c6bbf481907/bzImage-cdd30ebb.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3f059ffbdd539a3f6bc9@syzkaller.appspotmail.com
-
-Dec  3 05:04:02 syzkaller daemon.info dhcpcd[5653]: eth3: IAID d8:df:c9:55
-Dec  3 05:04:02 syzkaller daemon.info dhcpcd[5653]: eth3: adding address fe80::7[   49.690919][ T6466] ------------[ cut here ]------------
-f27:c3e8:bb45:52[   49.693207][ T6466] WARNING: CPU: 3 PID: 6466 at net/ipv6/ip6mr.c:419 ip6mr_free_table+0xbd/0x120 net/ipv6/ip6mr.c:419
-df
-Dec  3 05:04:02 [   49.710042][ T6466] Code: 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 58 49 83 bc 24 c0 0e 00 00 00 74 09 e8 c4 c5 af f7 90 <0f> 0b 90 e8 bb c5 af f7 48 8d 7b 38 e8 22 86 9c f7 48 89 df be 0f
-syzkaller kern.w[   49.717312][ T6466] RSP: 0018:ffffc90003487bd8 EFLAGS: 00010293
-arn kernel: [   [   49.719598][ T6466] RAX: 0000000000000000 RBX: ffff888108508000 RCX: ffffffff89ea4014
-49.690919][ T646[   49.725534][ T6466] RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
-6] ------------[[   49.725548][ T6466] R10: 0000000000000001 R11: 0000000000000001 R12: ffff88804e965ac0
- cut here ]-----[   49.725561][ T6466] R13: ffff888108508000 R14: ffff888108508008 R15: dead000000000100
--------
-Dec  3 05:04:02 [   49.739536][ T6466] CR2: 00007f4fd5157580 CR3: 0000000035ea8000 CR4: 0000000000352ef0
-syzkaller kern.w[   49.742428][ T6466] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-arn kernel: [   [   49.746956][ T6466] Call Trace:
-49.693207][ T646[   49.748809][ T6466]  ? __warn+0xea/0x3c0 kernel/panic.c:746
-6] WARNING: CPU:[   49.750217][ T6466]  ? ip6mr_free_table+0xbd/0x120 net/ipv6/ip6mr.c:419
- 3 PID: 6466 at [   49.751877][ T6466]  ? __report_bug lib/bug.c:199 [inline]
- 3 PID: 6466 at [   49.751877][ T6466]  ? report_bug+0x3c0/0x580 lib/bug.c:219
-net/ipv6/ip6mr.c[   49.751908][ T6466]  ? exc_invalid_op+0x17/0x50 arch/x86/kernel/traps.c:309
-:419 ip6mr_free_[   49.751922][ T6466]  ? asm_exc_invalid_op+0x1a/0x20 arch/x86/include/asm/idtentry.h:621
-table+0xbd/0x120[   49.759463][ T6466]  ? ip6mr_free_table+0xbc/0x120 net/ipv6/ip6mr.c:419
-
-Dec  3 05:04:02 syzkaller kern[   49.762545][ T6466]  ? ip6mr_free_table+0xbc/0x120 net/ipv6/ip6mr.c:419
-.warn kernel: [ [   49.765091][ T6466]  ip6mr_rules_exit+0x176/0x2d0 net/ipv6/ip6mr.c:283
-  49.696818][ T6[   49.767196][ T6466]  ip6mr_net_exit_batch+0x53/0xa0 net/ipv6/ip6mr.c:1388
-466] Modules lin[   49.768971][ T6466]  ? __pfx_ip6mr_net_exit_batch+0x10/0x10 net/ipv6/ip6mr.c:285
-ked in:
-Dec  3 05:04:02 [   49.769038][ T6466]  setup_net+0x4fe/0x860 net/core/net_namespace.c:394
-syzkaller kern.w[   49.769059][ T6466]  ? __pfx_setup_net+0x10/0x10 net/core/net_namespace.c:185
-arn kernel: [   [   49.778049][ T6466]  ? __down_read_common kernel/locking/rwsem.c:1255 [inline]
-arn kernel: [   [   49.778049][ T6466]  ? __down_read_killable kernel/locking/rwsem.c:1271 [inline]
-arn kernel: [   [   49.778049][ T6466]  ? down_read_killable+0xcc/0x380 kernel/locking/rwsem.c:1549
-49.699801][ T646[   49.781754][ T6466]  ? lockdep_init_map_waits include/linux/lockdep.h:135 [inline]
-49.699801][ T646[   49.781754][ T6466]  ? lockdep_init_map_wait include/linux/lockdep.h:142 [inline]
-49.699801][ T646[   49.781754][ T6466]  ? __raw_spin_lock_init+0x3a/0x110 kernel/locking/spinlock_debug.c:25
-6] CPU: 3 UID: 0 PID: 6466 Comm: syz.2.106 Not tainted 6.13.0-rc1-syzkaller-00002-gcdd30ebb1b9f #0
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> Cc: Jeremy Kerr <jk@codeconstruct.com.au>
+> Cc: Matt Johnston <matt@codeconstruct.com.au>
+> ---
+> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  net/mctp/device.c | 50 ++++++++++++++++++-----------------------------
+>  1 file changed, 19 insertions(+), 31 deletions(-)
+> 
+> diff --git a/net/mctp/device.c b/net/mctp/device.c
+> index 26ce34b7e88e174cdb6fa65c0d8e5bf6b5a580d7..8e0724c56723de328592bfe5c6fc8085cd3102fe 100644
+> --- a/net/mctp/device.c
+> +++ b/net/mctp/device.c
+> @@ -20,8 +20,7 @@
+>  #include <net/sock.h>
+>  
+>  struct mctp_dump_cb {
+> -	int h;
+> -	int idx;
+> +	unsigned long ifindex;
+>  	size_t a_idx;
+>  };
+>  
+> @@ -115,43 +114,29 @@ static int mctp_dump_addrinfo(struct sk_buff *skb, struct netlink_callback *cb)
+>  {
+>  	struct mctp_dump_cb *mcb = (void *)cb->ctx;
+>  	struct net *net = sock_net(skb->sk);
+> -	struct hlist_head *head;
+>  	struct net_device *dev;
+>  	struct ifaddrmsg *hdr;
+>  	struct mctp_dev *mdev;
+> -	int ifindex;
+> -	int idx = 0, rc;
+> +	int ifindex, rc;
+>  
+>  	hdr = nlmsg_data(cb->nlh);
+>  	// filter by ifindex if requested
+>  	ifindex = hdr->ifa_index;
+>  
+>  	rcu_read_lock();
+> -	for (; mcb->h < NETDEV_HASHENTRIES; mcb->h++, mcb->idx = 0) {
+> -		idx = 0;
+> -		head = &net->dev_index_head[mcb->h];
+> -		hlist_for_each_entry_rcu(dev, head, index_hlist) {
+> -			if (idx >= mcb->idx &&
+> -			    (ifindex == 0 || ifindex == dev->ifindex)) {
+> -				mdev = __mctp_dev_get(dev);
+> -				if (mdev) {
+> -					rc = mctp_dump_dev_addrinfo(mdev,
+> -								    skb, cb);
+> -					mctp_dev_put(mdev);
+> -					// Error indicates full buffer, this
+> -					// callback will get retried.
+> -					if (rc < 0)
+> -						goto out;
+> -				}
+> -			}
+> -			idx++;
+> -			// reset for next iteration
+> -			mcb->a_idx = 0;
+> -		}
+> +	for_each_netdev_dump(net, dev, mcb->ifindex) {
+> +		if (ifindex && ifindex != dev->ifindex)
+> +			continue;
+> +		mdev = __mctp_dev_get(dev);
+> +		if (!mdev)
+> +			continue;
+> +		rc = mctp_dump_dev_addrinfo(mdev, skb, cb);
+> +		mctp_dev_put(mdev);
+> +		if (rc < 0)
+> +			break;
+> +		mcb->a_idx = 0;
+>  	}
+> -out:
+>  	rcu_read_unlock();
+> -	mcb->idx = idx;
+>  
+>  	return skb->len;
+>  }
+> @@ -531,9 +516,12 @@ static struct notifier_block mctp_dev_nb = {
+>  };
+>  
+>  static const struct rtnl_msg_handler mctp_device_rtnl_msg_handlers[] = {
+> -	{THIS_MODULE, PF_MCTP, RTM_NEWADDR, mctp_rtm_newaddr, NULL, 0},
+> -	{THIS_MODULE, PF_MCTP, RTM_DELADDR, mctp_rtm_deladdr, NULL, 0},
+> -	{THIS_MODULE, PF_MCTP, RTM_GETADDR, NULL, mctp_dump_addrinfo, 0},
+> +	{.owner = THIS_MODULE, .protocol = PF_MCTP, .msgtype = RTM_NEWADDR,
+> +	 .doit = mctp_rtm_newaddr},
+> +	{.owner = THIS_MODULE, .protocol = PF_MCTP, .msgtype = RTM_DELADDR,
+> +	 .doit = mctp_rtm_deladdr},
+> +	{.owner = THIS_MODULE, .protocol = PF_MCTP, .msgtype = RTM_GETADDR,
+> +	 .dumpit = mctp_dump_addrinfo},
+>  };
+>  
+>  int __init mctp_device_init(void)
+> -- 
+> 2.47.0.338.g60cca15819-goog
 
