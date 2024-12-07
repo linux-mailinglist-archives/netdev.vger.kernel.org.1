@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-149917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 300709E81F0
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 21:26:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACAD69E8200
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 21:39:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 193A5164EE8
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 20:26:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 934B71659F8
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 20:39:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D53F3154BF5;
-	Sat,  7 Dec 2024 20:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68471153BC1;
+	Sat,  7 Dec 2024 20:39:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Poap3r8c"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Tb0xHJ86"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F16BD34CC4;
-	Sat,  7 Dec 2024 20:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF2522C6FA;
+	Sat,  7 Dec 2024 20:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733603192; cv=none; b=i3ishPLItsekz8+KbrdFsp8ppynUleCyPo/1V8nJWpXL3pGnwwrjH4fdLHkFdsCKkJRDKhadHHZkHSkhcqRYR7gS4JQ2K0p91hHM6oSGBqnoaSmXQRW3ZBleQ+CbRweI3Qr/TScqe8lpHFdjm6WZBN6kBPNFaq4OtI5Dfk40zAk=
+	t=1733603946; cv=none; b=kPAGvbU+3ne/h7owaWwThUgiW6A3IngLHBPWTvz00EjzY3ZTlnO3ulR/zUnmygNvVQqP3Eq0T8JJXrFNUxb5uPpmE66+f0En1QernfQeBHEGqzaPLS30BA3McajIyxI1oLlNfOYogdApMk3uUswulpjp3qvCS7s9oN/T12ataoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733603192; c=relaxed/simple;
-	bh=uUbianTua1fqJ3xsTd9AIf0EsuQrYK4M6Llw6yFInFw=;
+	s=arc-20240116; t=1733603946; c=relaxed/simple;
+	bh=qL+9ChYPsqY4C77/Sy8OOVm/lI/zb17cDXk+ooYqc5A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iF7Eu00VULn2bKc9zJY73J16Uvs6kaLYyYQXsQlZWrojIrGEjTLLeDqVBaVWa2BdGB50SENA+KMwp7IL5VlXkhMb4vZME+NnRVYmUvCTj1dRXy4T6lv48BRF/h4ExxGa4vgXCWL1C1iy16BjQlsJw3XZbz2/QQBfjboDFtWoiqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Poap3r8c; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=XRnyUIL1cS5Llg/9pMcBf9eAF92vFIQAq8nGYUF/E67jU8sDUGRaXcG553U7hPpKKeL2pYEaghb0g0qhNysBynY1pU2sImvfXc2ziL5OAnLTqD09iVlNTN3WRIdh3ZqMBMx7TBh5Pn/vQQgcvsDW9W3ke0PZ6MNc+MRX2WLM2ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Tb0xHJ86; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,29 +36,30 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=39pDgSNiUk/hOnbnaEPvFVAZbZyU2gLC1/FdQLOqz98=; b=Poap3r8cL36LdEf/kxUIjmPFEK
-	+ENesw96BbTmgqtLpseJlLdjdKhMmrH6YEKBKwIrnpBjDCBfIsv4Zp0k6+TA9Tu+T7lwvoLaTDpRs
-	2v2vfywg8fsbSbAOtdwOwWYXo0LAPwlzKUoes7+/mnEuHUE87wyW51E7QSe8mWT7JYrI=;
+	bh=HS5+8cf/NT9XGki+xRoxATzUF6H4RE8i/SF969wIAc8=; b=Tb0xHJ8619TX2/pPW3q1qBNZW8
+	NRpcElkBH2teVe3cUg3g73tMO4rn7PpO15lfgUmDbL7LD96kGh6EwYPf+KON/NiFFCzJlyaXvMnSU
+	wcNwHCvlpAHW4Ycov7XDpsJi6OZvypnklVq2kvH/9eVF+88i6dA8FK0DLR2l47JwSwd0=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tK1Nj-00FVHZ-L9; Sat, 07 Dec 2024 21:26:27 +0100
-Date: Sat, 7 Dec 2024 21:26:27 +0100
+	id 1tK1Zk-00FVKw-Ba; Sat, 07 Dec 2024 21:38:52 +0100
+Date: Sat, 7 Dec 2024 21:38:52 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Cc: Dinh Nguyen <dinguyen@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, devicetree@vger.kernel.org,
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>, kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-clk@vger.kernel.org, kernel@pengutronix.de,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH v3 6/6] arm64: dts: agilex5: initial support for Arrow
- AXE5-Eagle
-Message-ID: <4ba6d338-9910-487e-8b98-1f576f9f0366@lunn.ch>
-References: <20241205-v6-12-topic-socfpga-agilex5-v3-0-2a8cdf73f50a@pengutronix.de>
- <20241205-v6-12-topic-socfpga-agilex5-v3-6-2a8cdf73f50a@pengutronix.de>
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/1] net: phy: Move callback comments from
+ struct to kernel-doc section
+Message-ID: <1b012a63-c644-4079-b590-34c5f54b207f@lunn.ch>
+References: <20241206113952.406311-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,27 +68,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241205-v6-12-topic-socfpga-agilex5-v3-6-2a8cdf73f50a@pengutronix.de>
+In-Reply-To: <20241206113952.406311-1-o.rempel@pengutronix.de>
 
->    - 2x 1Gb Ethernet
-
-> +&gmac2 {
-> +	status = "okay";
-> +	phy-mode = "rgmii-id";
-> +	phy-handle = <&emac2_phy0>;
+> +#if 0 /* For kernel-doc purposes only. */
 > +
-> +	mdio0 {
-> +		#address-cells = <1>;
-> +		#size-cells = <0>;
-> +		compatible = "snps,dwmac-mdio";
-> +		emac2_phy0: ethernet-phy@1 {
-> +			reg = <0x1>;
-> +		};
-> +	};
-> +};
+> +/**
+> + * soft_reset - Issue a PHY software reset.
+> + * @phydev: The PHY device to reset.
+> + *
+> + * Returns 0 on success or a negative error code on failure.
+> + */
+> +int soft_reset(struct phy_device *phydev);
 
-
-No gmac1?
+We should probably ask the kdoc maintainers about how to do this, or
+if they can extend kdoc for this use case.
 
 	Andrew
 
