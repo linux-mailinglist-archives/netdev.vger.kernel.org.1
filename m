@@ -1,152 +1,264 @@
-Return-Path: <netdev+bounces-149924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E66A9E8237
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 22:19:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 703829E826A
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 23:06:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B81C91884842
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 21:19:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25E531884824
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 22:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5482A15B984;
-	Sat,  7 Dec 2024 21:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7417315350B;
+	Sat,  7 Dec 2024 22:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sWjx1Tc2"
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="kcL8aeKF"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE461917E7;
-	Sat,  7 Dec 2024 21:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7496B22C6CD
+	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 22:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733606358; cv=none; b=A3L7EPF853lqx0D/V9yidhvCCoB0mgEdXhAhsyLKg5G1g+xSj+J71Y4L9+HP13nfuDV2/Ykw7Ah8Rx2yAeUmBHgg0/KZUbV0Tw/6PH1NrvUdtH4r/vbJE8C39pJf9a4+IAPWAwOsBEKCdq8sIlKGNeSV814h3zJZQDgOI8oD0c4=
+	t=1733609190; cv=none; b=NuzfY7/N9OpuLYBup0otdXN/GC252f2IVVgT3Q2dxxtShbNbu/RFxo71Hux9+xKO44bymzfGhIbfmVX7aMkuFZ8a0ESixhHC9uXVB9+CiTwZ6HhVmS5EhqPxiLSG1JyurfKOHv75PXzKkAceDKeAnbwOQf5Ej4gvk2gfEsjYq+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733606358; c=relaxed/simple;
-	bh=7QGpqUHRWPUiCkpx2LYqi43P2eqWVJI/VcZdA9njqo8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dBJDsaKyD8uhstOTJMHVNwYo1dIlGdDx4nK0q+283+0+9UGikhWgteVB4GExZqXJ9ar3L2O2CwNH9ZJEd6UBEAwJbXHJZXh5TvVe5QXW86qG1/HR30Pt4tvToxVVbJzyI0ms1w2PMNT/mn4kUTgAOCy+0TSKiMDdxSTCrb9BOsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sWjx1Tc2; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=VhBcDAuJz6mff0yg2ePXy7mVllSAguIIbreUvrD7GYw=; b=sW
-	jx1Tc28k+KJUbXqWvVMsnU2hOg/qOwjS4/D/bLgtf3w8xu1H1pkK7REom1z/5b7BIWud8059Ks1ah
-	rmawI//qa1JLnjtPacQkOi5s0oELq7zqTw+H4X3EQV/aYk5/JEWUGpXP3TA+jkdQcsjce5UMVDJTk
-	K+BxGX9lQexeZdw=;
-Received: from c-68-46-73-62.hsd1.mn.comcast.net ([68.46.73.62] helo=thinkpad.home.lunn.ch)
-	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tK2Ca-00FVTF-5t; Sat, 07 Dec 2024 22:19:09 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-Date: Sat, 07 Dec 2024 15:18:45 -0600
-Subject: [PATCH 2/2] dsa: mv88e6xxx: Centralise common statistics check
+	s=arc-20240116; t=1733609190; c=relaxed/simple;
+	bh=kCWnzjDgmnXfZMhOCbiFoAX0d8iZoouP12awiU1bX+E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BgJ/Xke86HopUhJhqMX3ZiKLp55o8Nj2Hh3MZWoHqk6Dsi+c+filtAPtm5MgfDIY5sZq2AUN+kvbKeHXyJNSMWQh5FAEopAE+cqbHpunAOrnjNOmVdSnumpdiK+BSRNqE70MoR3YMW3OkEF0FuXLD3Nntx0fonU+9uIBmfPrBlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=kcL8aeKF; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-aa530a94c0eso628597166b.2
+        for <netdev@vger.kernel.org>; Sat, 07 Dec 2024 14:06:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sartura.hr; s=sartura; t=1733609185; x=1734213985; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cv48r+Fj8y9l52nXHVpPxH4O5U2fyiQb+2TrK9dhOIw=;
+        b=kcL8aeKFEn31vLT8MsxYXf1g0NceBS1Qbo/wahLVJL6wtjQue3wZgEVmBgqk823D/j
+         jMIyPvaKlYAIfIe3bjKjHG2Z+aJQwWLWW03o1FtHh3vVOkU0wHUCtjEScM4Mduab+KVG
+         wUfHzvPnvCNlzJef/wMgrBgGL0z7UmrMo2bCSfJTfYlkKGraHHg9oGO/NdvGwxgAf3JZ
+         mVGe1GeTrEOd8P3YJgkpZldMxBkQA8Ym6RiVXAZA5C7fw/L0vemvpTx+FCbFIUGycukF
+         vd1f3D6E3NC0femB871Hz+r1ekSYfn+WJw2g6t+tXz3ruadyfjep//FxrJKXaYO0v9+P
+         qPmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733609185; x=1734213985;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Cv48r+Fj8y9l52nXHVpPxH4O5U2fyiQb+2TrK9dhOIw=;
+        b=J69tsBps4u2m58KVm7hceXlmJWNwzfKz1PsR2n2Fk/D05YjWNWf/hsbxokuYzJ2Qct
+         5Mo5skg6xwnHJXO6vSlP8RuUUwFEOxD91v9kTZT1xc7eVRA93YZGfthAS5mqx/nJxrVf
+         HLqtkftxblHcTzHbxQlkbHZScIQErHqqTYtS0T+ybRlUbNaa5QyRKVe933SRqESnw35J
+         Hilhze6JUyXiAWQ9OgKYOpljXW+UqUl0NGHxYwBaR1q2WjSvtCGknVvUh/WlnJGO9tTC
+         XW3x4kQiDOD28Kjzxw+7Ur3Ls6BgXYBmmIzBAu9np6TNE477TjpfPTHxqYjfcP1BUlCg
+         +z7g==
+X-Gm-Message-State: AOJu0YwKb0iZQ6pqtyOomkWASwXF33InflL7qFHu1KOLw6SuEjsm3TrI
+	1fXHWiWV+OurshxZ6aYElP/SSKw8FKJlrvS0/KAV8Jm1QnBoxJOJ0QeKMY96hzojU44rJpG4zhK
+	mwdvx1O6V48nTYHTyL+fR+DV/YPzboE949r8Jo//EB3mZbVUfJ8UkqE6mMSr2lHz+14uli+y+JU
+	6K6oiuH0pszYomf6i0i51Xcwlkf1m10WBHOWVol2DnxA==
+X-Gm-Gg: ASbGnct59T7bNuKjAMRPnq5zsHEvA5njTdE94gvdUlkJfIttr7LUGYEmvadN8VABNdg
+	0JX5R2udmJxZa0J8M1EXU1ZozBfurUiwc6UhqZ6z3guX+fg7oeh4FZPCtsjqP3R2RCoqp1o/2tA
+	Wb7sHririGHimpKJRgYh7qtv+1x1Ng1mvX9UKsvNIl9xNaBY4fUoGz1gBOYI4j9SiCGVUqybivy
+	/OkLKLc63W/AB8DjU8Se6gbnp/7Cmj0ztOBMCs06E4ji/CAO4wYchTwtf7SrtFtZLRQnlAh8nDA
+	jMnLX89SkA==
+X-Google-Smtp-Source: AGHT+IEn8sfspBzJjXlTXy+egVZxR2pEiQYL8GFmJg6bux/hNbEf59nAwSQlrfdVz/ih19WbANH7CA==
+X-Received: by 2002:a17:906:9555:b0:aa6:21ce:cddf with SMTP id a640c23a62f3a-aa63a131011mr738866466b.36.1733609184985;
+        Sat, 07 Dec 2024 14:06:24 -0800 (PST)
+Received: from fedora.. (cpe-109-60-83-93.zg3.cable.xnet.hr. [109.60.83.93])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa66cc544c4sm67183266b.178.2024.12.07.14.06.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 Dec 2024 14:06:24 -0800 (PST)
+From: Robert Marko <robert.marko@sartura.hr>
+To: netdev@vger.kernel.org,
+	stephen@networkplumber.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	dsahern@kernel.org,
+	jiri@resnulli.us,
+	andrew@lunn.ch
+Cc: luka.perkov@sartura.hr,
+	Robert Marko <robert.marko@sartura.hr>
+Subject: [iproute2-next v2] ip: link: rmnet: add support for flag handling
+Date: Sat,  7 Dec 2024 23:05:15 +0100
+Message-ID: <20241207220621.3279646-1-robert.marko@sartura.hr>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241207-v6-13-rc1-net-next-mv88e6xxx-stats-refactor-v1-2-b9960f839846@lunn.ch>
-References: <20241207-v6-13-rc1-net-next-mv88e6xxx-stats-refactor-v1-0-b9960f839846@lunn.ch>
-In-Reply-To: <20241207-v6-13-rc1-net-next-mv88e6xxx-stats-refactor-v1-0-b9960f839846@lunn.ch>
-To: Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2401; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=7QGpqUHRWPUiCkpx2LYqi43P2eqWVJI/VcZdA9njqo8=;
- b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBnVLvGeieF0fuo4PXmHld+P2IYVVWPGIs8NZvSQ
- 6fMFn9CMQ2JAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZ1S7xgAKCRDmvw3LpmlM
- hF9BD/9A6pz5yjSBrYZFOnzUypErdME2iB+IKGgpMX68yuIaHtdWkBrPWzKhLT8OnQysEDBfHEF
- n/NYozdzpzX1Sl0SkEtwjy1800W5akViZkWwAse1FShd32JtMtmCdDMKPQH3k2QBwVtHsh9HVnJ
- eubbPfHOKYMriY+ldL2KDY1u5yS4gJu643uStu9ismaszzxHUGi8XlilYmkbWhjYcrH/WSEJ/ZQ
- Sp7HsqtBDdeMBLMO6NxpSXhwQ7a3fVJYVJ5ZmNjw4BKGkBWuQTG23r+JKVgmGWQSoHqonLSbJgc
- W4/nt68F98hY/58y3CoPgWf5xsy6Ze3EGQpjItDw8EnWenBPZ/Gv2WsaAwsdEHehWbYygy27X5s
- mKq+54zNUD9IGDco0FRQ+5mfuzN92OTFLf/NRXihylqFLjS0BvICcdLOMJLV+FU8cKKhF6Hy+08
- I7xaX1EwSU0gZKE9C/LybQplRnZ5U57sJFox9OI+aws+aBuDxlsnbDWhZtV491hMIrEbifs2P0L
- dJvjCxsFzoyvWbhE+P1pAUWhmCoSsXMUtvRnkAgmxAAnjrgt7tgMnOajxcgiJqk2cQApzjK0ii4
- CXtv5SkZXd4PURqApsi/r9EKMgIYcdI/P/3ltLF3fg3I96gRMSEkNor+fKKPNl5BMkQ7Tl0k8ym
- BmRAo/O9+Xfc8Hg==
-X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
- fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
+Content-Transfer-Encoding: 8bit
 
-With moving information about available statistics into the info
-structure, the test becomes identical. Consolidate them into a single
-test.
+Extend the current rmnet support to allow enabling or disabling
+IFLA_RMNET_FLAGS via ip link as well as printing the current settings.
 
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Robert Marko <robert.marko@sartura.hr>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c | 15 +++------------
- 1 file changed, 3 insertions(+), 12 deletions(-)
+Changes in v2:
+* Use strcmp() instead of matches()
+* Fix disabling flags (Forgotten ~)
+* Separate ingress and egress checksum flags
+* Rename flags to more closely resemble their meaning.
+For example add ingress when they only affect ingress, rename checksm
+flags to mapv4/v5-checksum.
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 794653b53bb5b822a6163d4f6076f3f9db8aa109..34708c739b0454e6ee435945bf77e3547739b0a3 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -1289,9 +1289,6 @@ static size_t mv88e6095_stats_get_stat(struct mv88e6xxx_chip *chip, int port,
- 				       const struct mv88e6xxx_hw_stat *stat,
- 				       uint64_t *data)
+ ip/iplink_rmnet.c | 101 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 99 insertions(+), 2 deletions(-)
+
+diff --git a/ip/iplink_rmnet.c b/ip/iplink_rmnet.c
+index 1d16440c..b1fb9f03 100644
+--- a/ip/iplink_rmnet.c
++++ b/ip/iplink_rmnet.c
+@@ -16,6 +16,12 @@ static void print_explain(FILE *f)
  {
--	if (!(stat->type & chip->info->stats_type))
--		return 0;
--
- 	*data = _mv88e6xxx_get_ethtool_stat(chip, stat, port, 0,
- 					    MV88E6XXX_G1_STATS_OP_HIST_RX);
- 	return 1;
-@@ -1301,9 +1298,6 @@ static size_t mv88e6250_stats_get_stat(struct mv88e6xxx_chip *chip, int port,
- 				       const struct mv88e6xxx_hw_stat *stat,
- 				       uint64_t *data)
- {
--	if (!(stat->type & chip->info->stats_type))
--		return 0;
--
- 	*data = _mv88e6xxx_get_ethtool_stat(chip, stat, port, 0,
- 					    MV88E6XXX_G1_STATS_OP_HIST_RX);
- 	return 1;
-@@ -1313,9 +1307,6 @@ static size_t mv88e6320_stats_get_stat(struct mv88e6xxx_chip *chip, int port,
- 				       const struct mv88e6xxx_hw_stat *stat,
- 				       uint64_t *data)
- {
--	if (!(stat->type & chip->info->stats_type))
--		return 0;
--
- 	*data = _mv88e6xxx_get_ethtool_stat(chip, stat, port,
- 					    MV88E6XXX_G1_STATS_OP_BANK_1_BIT_9,
- 					    MV88E6XXX_G1_STATS_OP_HIST_RX);
-@@ -1326,9 +1317,6 @@ static size_t mv88e6390_stats_get_stat(struct mv88e6xxx_chip *chip, int port,
- 				       const struct mv88e6xxx_hw_stat *stat,
- 				       uint64_t *data)
- {
--	if (!(stat->type & chip->info->stats_type))
--		return 0;
--
- 	*data = _mv88e6xxx_get_ethtool_stat(chip, stat, port,
- 					    MV88E6XXX_G1_STATS_OP_BANK_1_BIT_10,
- 					    0);
-@@ -1341,6 +1329,9 @@ static size_t mv88e6xxx_stats_get_stat(struct mv88e6xxx_chip *chip, int port,
- {
- 	int ret = 0;
+ 	fprintf(f,
+ 		"Usage: ... rmnet mux_id MUXID\n"
++		"		[ ingress-deaggregation { on | off } ]\n"
++		"		[ ingress-commands { on | off } ]\n"
++		"		[ ingress-mapv4-checksum { on | off } ]\n"
++		"		[ egress-mapv4-checksum { on | off } ]\n"
++		"		[ ingress-mapv5-checksum { on | off } ]\n"
++		"		[ egress-mapv5-checksum { on | off } ]\n"
+ 		"\n"
+ 		"MUXID := 1-254\n"
+ 	);
+@@ -26,18 +32,79 @@ static void explain(void)
+ 	print_explain(stderr);
+ }
  
-+	if (!(stat->type & chip->info->stats_type))
-+		return 0;
++static int on_off(const char *msg, const char *arg)
++{
++	fprintf(stderr, "Error: argument of \"%s\" must be \"on\" or \"off\", not \"%s\"\n", msg, arg);
++	return -1;
++}
 +
- 	if (chip->info->ops->stats_get_stat) {
- 		mv88e6xxx_reg_lock(chip);
- 		ret = chip->info->ops->stats_get_stat(chip, port, stat, data);
-
+ static int rmnet_parse_opt(struct link_util *lu, int argc, char **argv,
+ 			   struct nlmsghdr *n)
+ {
++	struct ifla_rmnet_flags flags = { 0 };
+ 	__u16 mux_id;
+ 
+ 	while (argc > 0) {
+-		if (matches(*argv, "mux_id") == 0) {
++		if (strcmp(*argv, "mux_id") == 0) {
+ 			NEXT_ARG();
+ 			if (get_u16(&mux_id, *argv, 0))
+ 				invarg("mux_id is invalid", *argv);
+ 			addattr16(n, 1024, IFLA_RMNET_MUX_ID, mux_id);
+-		} else if (matches(*argv, "help") == 0) {
++		} else if (strcmp(*argv, "ingress-deaggregation") == 0) {
++			NEXT_ARG();
++			flags.mask |= RMNET_FLAGS_INGRESS_DEAGGREGATION;
++			if (strcmp(*argv, "on") == 0)
++				flags.flags |= RMNET_FLAGS_INGRESS_DEAGGREGATION;
++			else if (strcmp(*argv, "off") == 0)
++				flags.flags &= ~RMNET_FLAGS_INGRESS_DEAGGREGATION;
++			else
++				return on_off("ingress-deaggregation", *argv);
++		} else if (strcmp(*argv, "ingress-commands") == 0) {
++			NEXT_ARG();
++			flags.mask |= RMNET_FLAGS_INGRESS_MAP_COMMANDS;
++			if (strcmp(*argv, "on") == 0)
++				flags.flags |= RMNET_FLAGS_INGRESS_MAP_COMMANDS;
++			else if (strcmp(*argv, "off") == 0)
++				flags.flags &= ~RMNET_FLAGS_INGRESS_MAP_COMMANDS;
++			else
++				return on_off("ingress-commands", *argv);
++		} else if (strcmp(*argv, "ingress-mapv4-checksum") == 0) {
++			NEXT_ARG();
++			flags.mask |= RMNET_FLAGS_INGRESS_MAP_CKSUMV4;
++			if (strcmp(*argv, "on") == 0)
++				flags.flags |= RMNET_FLAGS_INGRESS_MAP_CKSUMV4;
++			else if (strcmp(*argv, "off") == 0)
++				flags.flags &= ~RMNET_FLAGS_INGRESS_MAP_CKSUMV4;
++			else
++				return on_off("ingress-mapv4-checksum", *argv);
++		} else if (strcmp(*argv, "egress-mapv4-checksum") == 0) {
++			NEXT_ARG();
++			flags.mask |= RMNET_FLAGS_EGRESS_MAP_CKSUMV4;
++			if (strcmp(*argv, "on") == 0)
++				flags.flags |= RMNET_FLAGS_EGRESS_MAP_CKSUMV4;
++			else if (strcmp(*argv, "off") == 0)
++				flags.flags &= ~RMNET_FLAGS_EGRESS_MAP_CKSUMV4;
++			else
++				return on_off("egress-mapv4-checksum", *argv);
++		} else if (strcmp(*argv, "ingress-mapv5-checksum") == 0) {
++			NEXT_ARG();
++			flags.mask |= RMNET_FLAGS_INGRESS_MAP_CKSUMV5;
++			if (strcmp(*argv, "on") == 0)
++				flags.flags |= RMNET_FLAGS_INGRESS_MAP_CKSUMV5;
++			else if (strcmp(*argv, "off") == 0)
++				flags.flags &= ~RMNET_FLAGS_INGRESS_MAP_CKSUMV5;
++			else
++				return on_off("ingress-mapv5-checksum", *argv);
++		} else if (strcmp(*argv, "egress-mapv5-checksum") == 0) {
++			NEXT_ARG();
++			flags.mask |= RMNET_FLAGS_EGRESS_MAP_CKSUMV5;
++			if (strcmp(*argv, "on") == 0)
++				flags.flags |= RMNET_FLAGS_EGRESS_MAP_CKSUMV5;
++			else if (strcmp(*argv, "off") == 0)
++				flags.flags &= ~RMNET_FLAGS_EGRESS_MAP_CKSUMV5;
++			else
++				return on_off("egress-mapv5-checksum", *argv);
++		} else if (strcmp(*argv, "help") == 0) {
+ 			explain();
+ 			return -1;
+ 		} else {
+@@ -48,11 +115,34 @@ static int rmnet_parse_opt(struct link_util *lu, int argc, char **argv,
+ 		argc--, argv++;
+ 	}
+ 
++	if (flags.mask)
++		addattr_l(n, 1024, IFLA_RMNET_FLAGS, &flags, sizeof(flags));
++
+ 	return 0;
+ }
++static void rmnet_print_flags(FILE *fp, __u32 flags)
++{
++	open_json_array(PRINT_ANY, is_json_context() ? "flags" : "<");
++#define _PF(f)	if (flags & RMNET_FLAGS_##f) {				\
++		flags &= ~RMNET_FLAGS_##f;				\
++		print_string(PRINT_ANY, NULL, flags ? "%s," : "%s", #f); \
++	}
++	_PF(INGRESS_DEAGGREGATION);
++	_PF(INGRESS_MAP_COMMANDS);
++	_PF(INGRESS_MAP_CKSUMV4);
++	_PF(EGRESS_MAP_CKSUMV4);
++	_PF(INGRESS_MAP_CKSUMV5);
++	_PF(EGRESS_MAP_CKSUMV5);
++#undef _PF
++	if (flags)
++		print_hex(PRINT_ANY, NULL, "%x", flags);
++	close_json_array(PRINT_ANY, "> ");
++}
+ 
+ static void rmnet_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ {
++	struct ifla_rmnet_flags *flags;
++
+ 	if (!tb)
+ 		return;
+ 
+@@ -64,6 +154,13 @@ static void rmnet_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ 		   "mux_id",
+ 		   "mux_id %u ",
+ 		   rta_getattr_u16(tb[IFLA_RMNET_MUX_ID]));
++
++	if (tb[IFLA_RMNET_FLAGS]) {
++		if (RTA_PAYLOAD(tb[IFLA_RMNET_FLAGS]) < sizeof(*flags))
++			return;
++		flags = RTA_DATA(tb[IFLA_RMNET_FLAGS]);
++		rmnet_print_flags(f, flags->flags);
++	}
+ }
+ 
+ static void rmnet_print_help(struct link_util *lu, int argc, char **argv,
 -- 
-2.45.2
+2.47.1
 
 
