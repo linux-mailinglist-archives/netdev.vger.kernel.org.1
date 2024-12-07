@@ -1,144 +1,98 @@
-Return-Path: <netdev+bounces-149861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E6759E7DA0
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 01:49:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C1EA9E7DA4
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 02:01:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 460C01886DA7
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 00:49:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 655CA16CFA0
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 01:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09ABE4C7C;
-	Sat,  7 Dec 2024 00:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XY+yRgC3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B4F22C6E3;
+	Sat,  7 Dec 2024 01:01:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6009E17591
-	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 00:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F598256E
+	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 01:01:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733532560; cv=none; b=GUkUcDxvs8oauJM9Vtrec23ZTozqyS/ojl5oJMSM56ZDbXf2f6qxQz3FpHQnD4KmF/+74whTkPnsS7gukJOdnzZ6vm0pIhwQ2S3zL9+M0YPXW+yEpDjPwkrdEEHeYhaQP/hECvNOZN+kJxBNgDmH3twtF/kugNC8dfdaZQZjBxc=
+	t=1733533264; cv=none; b=bsYsHdCuyO155Vs6iOYWi9YOthYT/AfIdK067gdmjJOAFNHB9KqdEbWthlOI1fLDQj+KRCF82ARHab26H6MFKBnwqIzu9jx+7UTVoPNvBtuuO/zJUlha7lGW7ADTPki030Q7Rd8dXG0vbPyTN0PKCAfeR9ba/+rLjylabK3x5OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733532560; c=relaxed/simple;
-	bh=BvEACG1yhqDi3KOhWejuezXkc0KgaZnygSlKP06JFA8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ArtHzOOH4rc7CPTrKnZscS87TkG152/IjXnTQI2RRccukDL8P+3qLHyo6u/+qFCA+XijO/9a1Ic7DM/rxZZMNMsMuMztWsXAj3BcPNNTXfmm2uOZejJkn1LZI7dLvpI+IFdZ3GMhj+ZWgtDxYpBkHd15kZNL5YJDrHojR7j/qGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XY+yRgC3; arc=none smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6ef9b8b4f13so28353127b3.2
-        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 16:49:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733532558; x=1734137358; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sWkXAS5/d4qY6CPjX+Xs+FfdLRwyQuZ1F6xa14Fxx68=;
-        b=XY+yRgC3/VicAX2obcO9HvbHGug1T82fIzj1BOv4+/Kb97UEqd5mha44btowSxFDOk
-         ltjRr3pCQP4hWaG5gTMrytNsGgwI7KR5JX87Amun/7Xi3yUSrst4nk7Kgor9Gxrk7MSA
-         yM7VTxNIhGYPSbIfOFhJULJcSLkvOEcuyk0nscAmjdoN8+RpZFF/fmYF259UupLeYZuq
-         B3iNSusTJfcMYmh7x3gnYKibQI0f+k5nQG/pFp9QRa/RSzRz71qWr2A9jcJvoTi9vV/p
-         LWJf8NVeFnc/SLT39YcLFk/xz+h/SU4ASuwBwbWpacM0Rx2cI/NdzvyU2yUfrHgwVYUX
-         ryTg==
+	s=arc-20240116; t=1733533264; c=relaxed/simple;
+	bh=u5nYSuuVesD6h7IbFSGckAHDRhurDNBarUCwXsucC0s=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=gpdqwTK5mpC4fkhpi+Wt9OFtcsoCizbA4mqIIfE3W46kmfXhzHPAz1oWpq7FySLfEzMEcBGR0Wx83PzA5zp7xZKxXUpIU+Eeiz7LH3Bnx6ORw/qr1SiYHE5AmXGEgVFrqJylKaXdKqySYgh3bfJyChMqc9r8t1dQ/tV2N3BM88A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a763f42b35so32228475ab.1
+        for <netdev@vger.kernel.org>; Fri, 06 Dec 2024 17:01:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733532558; x=1734137358;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sWkXAS5/d4qY6CPjX+Xs+FfdLRwyQuZ1F6xa14Fxx68=;
-        b=eZqadH3s2HBnq9H2J8j6wgtGRsZaYxS+Ci5HI/RpBlS+Llh2ZVSZj4YvQcxXd/wJmG
-         aQs9BWXD4/4lvfvZSaGVguL0RF4vQTyj/clfue9KFRVCrnOZlFtq00IWacddMlWdNWJS
-         rmlQq58ucoIZ/kqPZ6bYy5Fy7Epp5ec13xzkpS9n5/yqaOz8kbk04kpa4wC2/G/7ErnV
-         SkodDXvnROUeagFoYoHD69bD264OBVsiVBJaQ5kNqt9/cqafdE3/FpBAtcD7arCGMJ6m
-         g+3XqrXDYPaLKJ0B8J+VXdolxVyyF9ds7Hqgs+r7flo08Ofmh5PvhKDJ6K18nqFvyRU3
-         3Drw==
-X-Forwarded-Encrypted: i=1; AJvYcCUSBnEKM4jUORwH2ZBSAUINZa4my9wFeUoE0SFXxPN2SxlvcRVul1CqPV0A3GrvS+U2D48s8wA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzcRNc3tisD1IJdpztlWpA5jtiHtxG6pbSLqObil2TS63ycoA6
-	A54u9bMP4UgWAOHrB/9JSyXQh1IZhFobx5eQM0/wO0C+gbrVuwNywaf0MgSquXRCxiz5hyqSI23
-	eYot6Rkhw7y26PlardfhpFQVT2FE=
-X-Gm-Gg: ASbGncsyvAHH0pnobsaw0EM+Mnp00rbN9ZB6asucUBO2rzPfDFbAHNd6cSlz7+W5EV7
-	azFgocwGDCDwV+78sWUErghydWECX+fdyAYrvTkxHE72j
-X-Google-Smtp-Source: AGHT+IGVAvyFGjlrwDwStyvFoYw/4H+pukPwC1OtZNc7tT/A+6Fi1IMsvs94Nqj0jVa4kd0fb+st7CZiayaSoKlv160=
-X-Received: by 2002:a05:690c:74c4:b0:6ee:7339:ab42 with SMTP id
- 00721157ae682-6efe3bfaefdmr60755937b3.14.1733532558306; Fri, 06 Dec 2024
- 16:49:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733533262; x=1734138062;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JvbLDdytkVXjmJCFEeXCmgooAVyAASqwNDMq6NqMYEQ=;
+        b=wl2JdRbYiqd5pTiZObpM6ib5t1FXZa9QGGcGGOzpVRo7XFB9xlHwvUzbJ+SUrAQmOx
+         tS/DsmDHZ9aC8OKhi86kA1y+U3dDKKbt+cZ4k3WOBI6HqLOEQj9y3H2mYi01JcMqrLYL
+         8ao/u1RjV6H/VSfSWRxRivobkPLX4yHdwc6haAmdVUUVLeXuE8kfPadLT2XKg+QSr5BI
+         MUsicLcsh8dyKaqqb42fG3h0gKx3g3R6Em1Bljs3ZmX/KuHGUe87flbV7zWTarYTH+vp
+         UHgZCA95r/oKeOE/ukIE8w/hr2b34CiCgr9U4kmd6A8ZSd4dDQU7w9YiX6Ap8tcVqFRL
+         Ey1g==
+X-Forwarded-Encrypted: i=1; AJvYcCWhYp6Hx99nIXvEWjFYpBKskNZ1loJqUkR1FY0qBucZJv1uzE5kbgsU9y7ER0GCygxFxgi/ig0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yza+p0LE4EZsjIfBApkpWBjvA6mb2AnQ68k+SQSiSXamGxMrD9P
+	jxlTLA1QsXxYyD39O4jNElppNXXoPnXatSb60w613dfSxTo3XxDFL3WcZ6t26Xe/PsCVHSUkYLX
+	D1dgabklEDmzNnFDxOik0NMTSDrmWnhob+JKyKJk24+yWL11ILkGgow8=
+X-Google-Smtp-Source: AGHT+IGWwrqQngiWMnwECL++Pbfxx6p8Bbp69VM3OYAspBdp6DqhMaIJQSDxdHce6v0Fp9jvolV/mRx9u6SQnKRscTy5tRUzIiys
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241031211413.2219686-1-rosenp@gmail.com> <d97614cb-1798-46d2-a3b8-88fa100d9765@intel.com>
- <94ab7f28-c74b-49c5-920c-a3a881de0b86@intel.com>
-In-Reply-To: <94ab7f28-c74b-49c5-920c-a3a881de0b86@intel.com>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Fri, 6 Dec 2024 16:49:07 -0800
-Message-ID: <CAKxU2N9_HJKPB-jcaT=jqJfZ_KVUj_Y1PC_ZH=8=n+So1MdN3w@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCHv3 net-next iwl-next] net: intel: use
- ethtool string helpers
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, netdev@vger.kernel.org
+X-Received: by 2002:a05:6e02:13a7:b0:3a7:8720:9ea4 with SMTP id
+ e9e14a558f8ab-3a811d77228mr65586115ab.5.1733533262498; Fri, 06 Dec 2024
+ 17:01:02 -0800 (PST)
+Date: Fri, 06 Dec 2024 17:01:02 -0800
+In-Reply-To: <67530069.050a0220.2477f.0003.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67539e4e.050a0220.2477f.000c.GAE@google.com>
+Subject: Re: [syzbot] [bpf?] general protection fault in bpf_prog_array_delete_safe
+From: syzbot <syzbot+2e0d2840414ce817aaac@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	martin.lau@linux.dev, mathieu.desnoyers@efficios.com, 
+	mattbobrowski@google.com, mhiramat@kernel.org, netdev@vger.kernel.org, 
+	olsajiri@gmail.com, rostedt@goodmis.org, sdf@fomichev.me, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 4, 2024 at 1:10=E2=80=AFAM Przemek Kitszel
-<przemyslaw.kitszel@intel.com> wrote:
->
-> On 11/5/24 06:47, Przemek Kitszel wrote:
-> > On 10/31/24 22:14, Rosen Penev wrote:
-> >> The latter is the preferred way to copy ethtool strings.
-> >>
-> >> Avoids manually incrementing the pointer. Cleans up the code quite wel=
-l.
-> >>
-> >> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> >> ---
-> >>   v3: change custom get_strings to u8** to make sure pointer increment=
-s
-> >>   get propagated.
-> >
-> > I'm sorry for misleading you here, or perhaps not being clear enough.
-> >
-> > Let me restate: I'm fine with double pointer, but single pointer is als=
-o
-> > fine, no need to change if not used.
-> >
-> > And my biggest corncern is that you change big chunks of the code for n=
-o
-> > reason, please either drop those changes/those drivers, or adjust to
-> > have only minimal changes.
-> >
-> > please fine this complain embedded in the code inline for ice, igb, igc=
-,
-> > and ixgbe
->
-> I would be happy to accept your changes trimmed to the drivers I didn't
-> complained about, I find that part a valuable contribution from you
-Resent with removed variable renames. Hopefully this gets merged.
->
-> PS. No need to CC XDP/BFP list/people for such changes
-> [removed those]
->
-> >
-> >>   v2: add iwl-next tag. use inline int in for loops.
-> >>   .../net/ethernet/intel/e1000/e1000_ethtool.c  | 10 ++---
-> >>   drivers/net/ethernet/intel/e1000e/ethtool.c   | 14 +++---
-> >>   .../net/ethernet/intel/fm10k/fm10k_ethtool.c  | 10 ++---
-> >>   .../net/ethernet/intel/i40e/i40e_ethtool.c    |  6 +--
-> >>   drivers/net/ethernet/intel/ice/ice_ethtool.c  | 43 +++++++++++------=
---
-> >>   drivers/net/ethernet/intel/igb/igb_ethtool.c  | 35 ++++++++-------
-> >>   drivers/net/ethernet/intel/igbvf/ethtool.c    | 10 ++---
-> >>   drivers/net/ethernet/intel/igc/igc_ethtool.c  | 36 ++++++++--------
-> >>   .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 32 +++++++-------
-> >>   drivers/net/ethernet/intel/ixgbevf/ethtool.c  | 36 ++++++----------
-> >>   10 files changed, 118 insertions(+), 114 deletions(-)
+syzbot has bisected this issue to:
+
+commit 0ee288e69d033850bc87abe0f9cc3ada24763d7f
+Author: Jiri Olsa <jolsa@kernel.org>
+Date:   Wed Oct 23 20:03:52 2024 +0000
+
+    bpf,perf: Fix perf_event_detach_bpf_prog error handling
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=103530f8580000
+start commit:   e2cf913314b9 Merge branch 'fixes-for-stack-with-allow_ptr_..
+git tree:       bpf
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=123530f8580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=143530f8580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fb680913ee293bcc
+dashboard link: https://syzkaller.appspot.com/bug?extid=2e0d2840414ce817aaac
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=132a2020580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1291d0f8580000
+
+Reported-by: syzbot+2e0d2840414ce817aaac@syzkaller.appspotmail.com
+Fixes: 0ee288e69d03 ("bpf,perf: Fix perf_event_detach_bpf_prog error handling")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
