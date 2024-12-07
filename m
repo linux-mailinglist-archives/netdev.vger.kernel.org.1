@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-149867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C49B9E7DC6
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 02:40:27 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C03D89E7DC8
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 02:40:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A025F1884AC1
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 01:40:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8040B285A6B
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 01:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E5AD1798C;
-	Sat,  7 Dec 2024 01:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95DAC28DD0;
+	Sat,  7 Dec 2024 01:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lzq+flkb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kYChboog"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3442317597;
-	Sat,  7 Dec 2024 01:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693B1286A9;
+	Sat,  7 Dec 2024 01:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733535618; cv=none; b=KKx+BL5HA1APdTeaHMqOpigDmej5rWzTq+ZdCSwNRTo1i2uPtMGGNt3ju7mAQ6VKi+vnLnQLgsLHanL+0mLNruKc19ddCB1zQ72h08h77A3XaIK9AK7bb46fo6PfnGs5J0dxdCrIGf20YVESC3vLUSqMxEW/ioXBLodDszoBbO8=
+	t=1733535621; cv=none; b=BnPM2ZPG25yzOTeBXgGKVj7+qnMcSSAPcNXB6PdOD4j/OZ7X27XQFAXf293pDfMMmTO+EJbTnzTnbIFMDlgK+MWwH0SMiBCCR+vYT4dvZfmDW8QZRW+Es6bKxM9tWF9obyxRHXF8xuPsyX1P0CbqrgRBVMZBY0DMy4JuwRNsWU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733535618; c=relaxed/simple;
-	bh=A/0Yl74m2xBiA/+jaRSTm70HYXXe2llIlRgyWbOAj8k=;
+	s=arc-20240116; t=1733535621; c=relaxed/simple;
+	bh=tGYgfxWGm/mx2fdk03Ebej7kD+L949m4rooa93oQzLA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tekm3QVGAa5rNT6cB8LQYuY09Ii+otpi/qKbpVy1bQuJqglDsFHpm2adzgc68d2tTUMRCAMn0xn8vTcXbHB0vimK4sa7THPM5UiABH5YmwZ0bi1nqCwxiJ3jeobnP4lcPFcwMDfcHt9uOu5J72GsM22KPcvsOpQ7piuGpgH9hlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lzq+flkb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B70FAC4CED1;
-	Sat,  7 Dec 2024 01:40:17 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=kQBnwjrimYngzC3+uLJvSLfNsumCDV4bnF6RFLu2jCo9aba+AYFD3eQRLTO2IemieW5D9BDY65u2EwoP28GjJrjdmeLEXVwOWXddS78ZUfrxdrqtPmp1NsR+mKZQGtN1rBC9xxYqC0H1pR2Jgb46PlslreSgpr+8vXHE00+5Y0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kYChboog; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0783BC4CED1;
+	Sat,  7 Dec 2024 01:40:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733535617;
-	bh=A/0Yl74m2xBiA/+jaRSTm70HYXXe2llIlRgyWbOAj8k=;
+	s=k20201202; t=1733535621;
+	bh=tGYgfxWGm/mx2fdk03Ebej7kD+L949m4rooa93oQzLA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lzq+flkbUQjfDw0tQy+ft4Xgf/dVBnuydRKwgHt5iOZfcRssjWSxAHDXcE/Wz8Rwx
-	 CuiHEgQkiDj8ZDtuej/C4Nmw6jt49+XNkO3gAOp9XtZ4YeMAEf/8rRxzZG3wnipSfw
-	 zYQkIRmL4Ta+2YJ4LpHhY/pkOkoKoUGqkQFB+45lE3Gr3YdqY9Q4EaJitnNVpO9bWv
-	 ldDNHQb9a3aN0At47vMZkM0wQStCN8rocee57bXL407hpKL9ftPwJLZrR6uk+18rXQ
-	 +fEo+ogYErrfkfkfly/5qZuEISp6LLnkNETT/xT/4iUXQTew1W3ZBZv5p2ElzSOoq+
-	 L7e66r76KqEjA==
+	b=kYChboogydUaLCqkdMzNKANjnFnpC/U87ScB3lwkj4xGGaaHdkpsLPX5ADSB6jX4L
+	 QpeTsiy/jIUwA6rmLh47roWxjVpF2mcrTLoa2IxiyknLssq9n50VpKiv69VRrcFmCr
+	 tXkgOrxcYSto4ptFtnSpGl5CgndeoR94dAT/j1mVyBFIcCWS6Sbsp6lc4Qf7GsL09L
+	 yJiMW0YFQDaspGLyhXLxUMttSX9ugk1ZV621bFsWCrmEestRxyD4yotwADFGu8clea
+	 +js4hU3I+xRJJFm7HMMxCjN1HU4NcFcSRtW+eoqnS+TS7877wNlL9CeeshMdGTNgg/
+	 snljILPwDzJuA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB387380A95C;
-	Sat,  7 Dec 2024 01:40:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 366A4380A95C;
+	Sat,  7 Dec 2024 01:40:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] ptp: kvm: x86: Return EOPNOTSUPP instead of ENODEV
- from kvm_arch_ptp_init()
+Subject: Re: [PATCH] net: simplify resource acquisition + ioremap
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173353563276.2868165.3680363675119521922.git-patchwork-notify@kernel.org>
-Date: Sat, 07 Dec 2024 01:40:32 +0000
-References: <20241203-kvm_ptp-eopnotsuppp-v2-1-d1d060f27aa6@weissschuh.net>
-In-Reply-To: <20241203-kvm_ptp-eopnotsuppp-v2-1-d1d060f27aa6@weissschuh.net>
-To: =?utf-8?q?Thomas_Wei=C3=9Fschuh_=3Clinux=40weissschuh=2Enet=3E?=@codeaurora.org
-Cc: richardcochran@gmail.com, jonathanh@nvidia.com, maz@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <173353563577.2868165.15707534550533445842.git-patchwork-notify@kernel.org>
+Date: Sat, 07 Dec 2024 01:40:35 +0000
+References: <20241203231337.182391-1-rosenp@gmail.com>
+In-Reply-To: <20241203231337.182391-1-rosenp@gmail.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, mkl@pengutronix.de, maxime.chevallier@bootlin.com,
+ mailhol.vincent@wanadoo.fr, madalin.bucur@nxp.com, sean.anderson@seco.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, linux-can@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 03 Dec 2024 18:09:55 +0100 you wrote:
-> The caller, ptp_kvm_init(), emits a warning if kvm_arch_ptp_init() exits
-> with any error which is not EOPNOTSUPP:
+On Tue,  3 Dec 2024 15:13:37 -0800 you wrote:
+> get resource + request_mem_region + ioremap can all be done by a single
+> function.
 > 
-> 	"fail to initialize ptp_kvm"
+> Replace them with devm_platform_get_and_ioremap_resource or\
+> devm_platform_ioremap_resource where res is not used.
 > 
-> Replace ENODEV with EOPNOTSUPP to avoid this spurious warning,
-> aligning with the ARM implementation.
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] ptp: kvm: x86: Return EOPNOTSUPP instead of ENODEV from kvm_arch_ptp_init()
-    https://git.kernel.org/netdev/net/c/5e7aa97c7acf
+  - net: simplify resource acquisition + ioremap
+    https://git.kernel.org/netdev/net-next/c/e36d46b9af68
 
 You are awesome, thank you!
 -- 
