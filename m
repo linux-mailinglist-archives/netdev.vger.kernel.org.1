@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-149866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 594DA9E7DC5
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 02:40:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C49B9E7DC6
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 02:40:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20E9F1884736
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 01:40:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A025F1884AC1
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 01:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D11BE4F;
-	Sat,  7 Dec 2024 01:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E5AD1798C;
+	Sat,  7 Dec 2024 01:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ye3E6p+p"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lzq+flkb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0578AC2C9;
-	Sat,  7 Dec 2024 01:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3442317597;
+	Sat,  7 Dec 2024 01:40:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733535617; cv=none; b=hp4yBeiu2CqLQWVbUpx9OxcLdfsBf3dqAHbBvGmPidY7zKTkqOkf2J99ZwA9zV7V0O2vFafGfXgoEaslkrEZxaRPLDibMd7WisyKV3juzJVuyLj6ataEeGiPlAKXVsfm96S42PdCQJJSqJH3T80Z3lZYRTv6wq2lgCJpZyUtyoE=
+	t=1733535618; cv=none; b=KKx+BL5HA1APdTeaHMqOpigDmej5rWzTq+ZdCSwNRTo1i2uPtMGGNt3ju7mAQ6VKi+vnLnQLgsLHanL+0mLNruKc19ddCB1zQ72h08h77A3XaIK9AK7bb46fo6PfnGs5J0dxdCrIGf20YVESC3vLUSqMxEW/ioXBLodDszoBbO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733535617; c=relaxed/simple;
-	bh=cpuCrCGDAlMFmRWt4pthFMMyyEO+/k8luPU73jnEclA=;
+	s=arc-20240116; t=1733535618; c=relaxed/simple;
+	bh=A/0Yl74m2xBiA/+jaRSTm70HYXXe2llIlRgyWbOAj8k=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YXy7MpuAqi2YGYnY/oRf2Mjwstj7sk+l/41fX+CXU7iymlh8TYPol8vyylYvzpEKq8ULFQogBpwHFFUGGIRQVjriRKDLB6sNDmqUacXL/zNJ7TdcAR4ZdFdMs4w+1fru4s7Qkoa/hJnJqZ5qzfPCSqNLwa4QMgBxGGjHYtwa9Rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ye3E6p+p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77CE6C4CED1;
-	Sat,  7 Dec 2024 01:40:16 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=tekm3QVGAa5rNT6cB8LQYuY09Ii+otpi/qKbpVy1bQuJqglDsFHpm2adzgc68d2tTUMRCAMn0xn8vTcXbHB0vimK4sa7THPM5UiABH5YmwZ0bi1nqCwxiJ3jeobnP4lcPFcwMDfcHt9uOu5J72GsM22KPcvsOpQ7piuGpgH9hlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lzq+flkb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B70FAC4CED1;
+	Sat,  7 Dec 2024 01:40:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733535616;
-	bh=cpuCrCGDAlMFmRWt4pthFMMyyEO+/k8luPU73jnEclA=;
+	s=k20201202; t=1733535617;
+	bh=A/0Yl74m2xBiA/+jaRSTm70HYXXe2llIlRgyWbOAj8k=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Ye3E6p+pMERvoVx66VzDfCP+9xzPdovDQl0JxpCwrw+zg1ecCDL85fJKv5lybicf5
-	 Bbhpem0mt9Ws596dn33a+9HOCSPUu961MnBnWpW8N8FZ15ZMAgRwXagVSnppPfRaXF
-	 muk4KI3HwGqkSygjINHY9yKR8X7LB6I4mrRKXyG8IM5qKXJ1wbqfZeIX2LQNJbaGxa
-	 DjmsNsrNwCRHhQTdkhSTZ5pVrw8953S6lvgKRFcOGzxA+Demxw8eGF1OCXNg8guOH+
-	 XQrar8gLBbr1w53yJCXBwlBW9SC4QjpIpihUS4C3OcdmYfqYRYfxxs4neC36Xx44hW
-	 zHvnzdBiygbzg==
+	b=lzq+flkbUQjfDw0tQy+ft4Xgf/dVBnuydRKwgHt5iOZfcRssjWSxAHDXcE/Wz8Rwx
+	 CuiHEgQkiDj8ZDtuej/C4Nmw6jt49+XNkO3gAOp9XtZ4YeMAEf/8rRxzZG3wnipSfw
+	 zYQkIRmL4Ta+2YJ4LpHhY/pkOkoKoUGqkQFB+45lE3Gr3YdqY9Q4EaJitnNVpO9bWv
+	 ldDNHQb9a3aN0At47vMZkM0wQStCN8rocee57bXL407hpKL9ftPwJLZrR6uk+18rXQ
+	 +fEo+ogYErrfkfkfly/5qZuEISp6LLnkNETT/xT/4iUXQTew1W3ZBZv5p2ElzSOoq+
+	 L7e66r76KqEjA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AFF34380A95C;
-	Sat,  7 Dec 2024 01:40:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB387380A95C;
+	Sat,  7 Dec 2024 01:40:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] selftests: mlxsw: Add few fixes for sharedbuffer test
+Subject: Re: [PATCH net v2] ptp: kvm: x86: Return EOPNOTSUPP instead of ENODEV
+ from kvm_arch_ptp_init()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173353563151.2868165.5316465937506870618.git-patchwork-notify@kernel.org>
-Date: Sat, 07 Dec 2024 01:40:31 +0000
-References: <cover.1733414773.git.petrm@nvidia.com>
-In-Reply-To: <cover.1733414773.git.petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- idosch@nvidia.com, danieller@nvidia.com, jiri@resnulli.us, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, mlxsw@nvidia.com
+ <173353563276.2868165.3680363675119521922.git-patchwork-notify@kernel.org>
+Date: Sat, 07 Dec 2024 01:40:32 +0000
+References: <20241203-kvm_ptp-eopnotsuppp-v2-1-d1d060f27aa6@weissschuh.net>
+In-Reply-To: <20241203-kvm_ptp-eopnotsuppp-v2-1-d1d060f27aa6@weissschuh.net>
+To: =?utf-8?q?Thomas_Wei=C3=9Fschuh_=3Clinux=40weissschuh=2Enet=3E?=@codeaurora.org
+Cc: richardcochran@gmail.com, jonathanh@nvidia.com, maz@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 5 Dec 2024 17:35:58 +0100 you wrote:
-> Danielle Ratson writes:
+On Tue, 03 Dec 2024 18:09:55 +0100 you wrote:
+> The caller, ptp_kvm_init(), emits a warning if kvm_arch_ptp_init() exits
+> with any error which is not EOPNOTSUPP:
 > 
-> Currently, the sharedbuffer test fails sometimes because it is reading a
-> maximum occupancy that is larger than expected on some different cases.
+> 	"fail to initialize ptp_kvm"
 > 
-> This is happening because the test assumes that the packet it is sending
-> is the only packet being passed to the device.
+> Replace ENODEV with EOPNOTSUPP to avoid this spurious warning,
+> aligning with the ARM implementation.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] selftests: mlxsw: sharedbuffer: Remove h1 ingress test case
-    https://git.kernel.org/netdev/net/c/cf3515c55690
-  - [net,2/3] selftests: mlxsw: sharedbuffer: Remove duplicate test cases
-    https://git.kernel.org/netdev/net/c/6c46ad4d1bb2
-  - [net,3/3] selftests: mlxsw: sharedbuffer: Ensure no extra packets are counted
-    https://git.kernel.org/netdev/net/c/5f2c7ab15fd8
+  - [net,v2] ptp: kvm: x86: Return EOPNOTSUPP instead of ENODEV from kvm_arch_ptp_init()
+    https://git.kernel.org/netdev/net/c/5e7aa97c7acf
 
 You are awesome, thank you!
 -- 
