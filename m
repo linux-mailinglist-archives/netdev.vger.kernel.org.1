@@ -1,96 +1,73 @@
-Return-Path: <netdev+bounces-149869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E7D39E7DD3
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 02:50:18 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C41809E7DD5
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 02:50:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51B521886900
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 01:50:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8484D2827BF
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 01:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEF7C2C9;
-	Sat,  7 Dec 2024 01:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B5D134BD;
+	Sat,  7 Dec 2024 01:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cv6ePFOy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="efQPzkK7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CA018638
-	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 01:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87278F64;
+	Sat,  7 Dec 2024 01:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733536214; cv=none; b=qNfUg96yH9EgpLk/9w1uVEmpy6uN5MY06k1K8tvrk+Vl+1OZDhIwrKKG3bVcH6aXCAa6s/KVx+hK8Euh7uujtygrnA7+tCBgm3jzEEvHlnVOEIwYcYRY5dLZl7S6uTf3zgx87MFUb7xMnBXpenWnjY3YOWQRh+ThuasWdaBwwQE=
+	t=1733536252; cv=none; b=NI1WBHJMEMUFjE3JyIT3uDpP3ZmwUXnozhMZ15UgjmCpwBxdB9DAk7vKp9FLKrMEOPs0PILV0D2NjiV/kGt1meV111vhw9HqI1CRQmlZehZE3DYFwVpjpoRNfa9HzHUPl/H02Pdc4q5NagyCgpenGTLrdQH2O+ZTuLu/GlonnwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733536214; c=relaxed/simple;
-	bh=CokcmhJG5zPtpxGVvlgmSdQ1A4ZGrwynW1VXk3fGv3E=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TVkwsuojH6Fj9a5rWeU5R35xzDMhEH0MYXC0zZIHSBJPFsyTRto5Zzm1vWH+ogL4tIdg5LKckfPEm0sucRbGgDoPd5XDiNOLMoEGVpzF2wRkb1aaTsh74nx+5GJjMgYqtu0RhwCVohfRG0ICJ842A0RaH0UQcOeKnRMjtBV7vjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cv6ePFOy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43A38C4CED1;
-	Sat,  7 Dec 2024 01:50:14 +0000 (UTC)
+	s=arc-20240116; t=1733536252; c=relaxed/simple;
+	bh=kzWxelifGoKO74BTdss29VG8y7iq1uEeYrocjxaQnM0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Fw49qLKTp3KK+KiiYZn9Ef9E5uO4q5+Y19J+h4gqqgms8+BxRPVkOodxRQTwSIxgDE6ewrnS10s1u3NHOfdCQLhIu6XJU9r2xHXOPRv23VzRoY6pkQcaRRQG9EZ83tk4D5xJAdvUnjbvrqLTRv8wcLqg8hVDq/bat0wdOgf73yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=efQPzkK7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C56ABC4CED1;
+	Sat,  7 Dec 2024 01:50:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733536214;
-	bh=CokcmhJG5zPtpxGVvlgmSdQ1A4ZGrwynW1VXk3fGv3E=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cv6ePFOylEPxy+D01MCefIOcPqG5gvbqTs6heHXEfOuScbvzoMaIecZFcjywBsaQX
-	 +w66KiAew8ZBsJpVFxPlflLRgihpcU+u0jAUOpwhr9qnGH3vy9Hc0WinVP601tgD/b
-	 pDFXUVYUo12FLRWHhzN0AGQo7VCmmElTo5FdfYxPAiTIsEjlAC0zZw0MN+PHLkH9cH
-	 W3Gb7RvEtey3rxTLIuqnxnIl9JtiR3JMBiMjYFPkJ8QsoETQ/M2fYz4ysP6wSrvgXe
-	 CEuxh46y/ZeT6s/0fMTyunA7Xeg9VAmEw1xuMyQUgrKx9Y4LkLjSAEJZG4Vx8YG9Uo
-	 WQ9Ka3V/qliow==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713C2380A95C;
-	Sat,  7 Dec 2024 01:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1733536252;
+	bh=kzWxelifGoKO74BTdss29VG8y7iq1uEeYrocjxaQnM0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=efQPzkK7BzO8xnEjJLgGZCosfX3S5GtUf7awwmQAu79igyo8v2gVVoXi8LLj8dbmq
+	 /lMuLFIyjNdtFZ4aWNXn8iL0ITXcLIHqG8xL6AhaEFkTYF+1+kkJI07jhp/W3VWAlw
+	 6qLzJNscba2ylQooiitr7Crz5T57MbDKmvsNGzlCxMK9IvSUteCZVElDRlmyizCuj9
+	 KGk4jk5Cp3AyInG0F9l4r5BydHPwDN60015RL/U1kb736XxQHtZlT2dWeoU73dMRRl
+	 ieNguyhxgqZnK8Bnoqlkex7/oa5kgAsVajvaJnZyVBTF65ehTlblIklBRX+zzj/JL0
+	 qYwc58OaN2Vlw==
+Date: Fri, 6 Dec 2024 17:50:50 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Zhu Jun <zhujun2@cmss.chinamobile.com>, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests: net: Fix typo in psock_tpacket.c
+Message-ID: <20241206175050.28c93659@kernel.org>
+In-Reply-To: <20241206125955.GO2581@kernel.org>
+References: <20241204075756.11561-1-zhujun2@cmss.chinamobile.com>
+	<20241206125955.GO2581@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/2] bnxt_en: Bug fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173353622925.2870054.7390682435717227700.git-patchwork-notify@kernel.org>
-Date: Sat, 07 Dec 2024 01:50:29 +0000
-References: <20241204215918.1692597-1-michael.chan@broadcom.com>
-In-Reply-To: <20241204215918.1692597-1-michael.chan@broadcom.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
- pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 6 Dec 2024 12:59:55 +0000 Simon Horman wrote:
+> FTR, I'm not sure that I understand the grammar in the comment.
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
++1
 
-On Wed,  4 Dec 2024 13:59:16 -0800 you wrote:
-> There are 2 bug fixes in this series.  This first one fixes the issue
-> of setting the gso_type incorrectly for HW GRO packets on 5750X (Thor)
-> chips.  This can cause HW GRO packets to be dropped by the stack if
-> they are re-segmented.  The second one fixes a potential division by
-> zero crash when dumping FW log coredump.
-> 
-> Hongguang Gao (1):
->   bnxt_en: Fix potential crash when dumping FW log coredump
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,1/2] bnxt_en: Fix GSO type for HW GRO packets on 5750X chips
-    https://git.kernel.org/netdev/net/c/de37faf41ac5
-  - [net,2/2] bnxt_en: Fix potential crash when dumping FW log coredump
-    https://git.kernel.org/netdev/net/c/fab4b4d2c903
-
-You are awesome, thank you!
+Looks like the author didn't do much due diligence.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: reject
 
