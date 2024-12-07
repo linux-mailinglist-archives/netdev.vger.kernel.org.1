@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-149874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB4C29E7DEC
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 03:01:51 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA4239E7DEB
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 03:01:48 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82A491889271
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 02:01:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 642272878CA
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 02:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5E23CF73;
-	Sat,  7 Dec 2024 02:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EBAA199B9;
+	Sat,  7 Dec 2024 02:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K9Gmmpm0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pPRJVnZA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C3354673
-	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 02:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545CB323D;
+	Sat,  7 Dec 2024 02:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733536816; cv=none; b=I1MpBz/6Nb/AphmPQrKM/QmCH6CghEKHUvdKAqmo0OjdKc4Cszg3oJ0YpiVntNwpBUjUbfxX4/reQCFA8pA8N7dWjUg7EudNKXSXAmuzZljV6o1U92kO8UnOmHzP7P4cuuFy3hzPSQhJcDN4m30FPD8YRKARTlsRKaqh1r9Xqzc=
+	t=1733536827; cv=none; b=Z0sgbbgb9q3NApubNe3zHBtJ5PDeFHC71WWMFD+7KBwVNYn2pU4wLkTLlaZPUDGMZP9M1NUHDo3EzxPoiaZAa7kWcEkgn4sNZMcdhEI9X6Z5z0ws9+QewxlgZJsOnMEcdg5ou59klaEmO3T/uexR4yGzgaiik8MnnWso8Zfi/Ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733536816; c=relaxed/simple;
-	bh=UWgPJ/hVCEoibMhO2Jpl73iuzlYLeoOKIRUNti5QkJY=;
+	s=arc-20240116; t=1733536827; c=relaxed/simple;
+	bh=of1Lhy0HRvfmZRqXyoQZSMSlYIrBpdpmqDnFTTTpypc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hPANe876iMhoCV0y+xvTYCDxqdET+uhw88mH5wwuW2K7QDSXfIT8znPWKiu1pEwl8OM6Jkf1CEdvuG3ukGHMHzgcN4U2VGnw8PK5vHjJAv66Yv6RpfOy0A7IJAC5x4sI25RDrCTYAvcxDbBVuKwf2AEk0dg3DTvs7c6NmS3S1VE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K9Gmmpm0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3605EC4AF14;
-	Sat,  7 Dec 2024 02:00:16 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=H+5QDi0T8MeButnTjesCC17MsQxdd0cDOG7l3gfUyR0FqZoBfPvz0yQhNAvcWqJLHATlu0VbJ9FFtkVPpuwSwHh0tWHl4ZK327l1M7xUNDAhgFkG5P7zShxN0w+50Bbls5z84Niji0WDwRW8oppQYcM3tYp6gYoLrSlP4619FmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pPRJVnZA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7B73C4CED1;
+	Sat,  7 Dec 2024 02:00:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733536816;
-	bh=UWgPJ/hVCEoibMhO2Jpl73iuzlYLeoOKIRUNti5QkJY=;
+	s=k20201202; t=1733536825;
+	bh=of1Lhy0HRvfmZRqXyoQZSMSlYIrBpdpmqDnFTTTpypc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=K9Gmmpm0UYCzBbhTe7bd6Pukc+CLNcsFai9DLSQHniqbGCU117/0Vo9lmKnDHdQYM
-	 oYM8627Go1iHspK8NdvZO1Fkpgr8F05ST3blRsvkIM+bSRClIS9Cjv9DuvJCWbkSVw
-	 ayIbQjwT1Ff+nnq+5AlfteQ5qUJPZ8qsz4VfHgOxSRnKd4W0UIn8GSFvXelGmNxaYL
-	 lVNAKb2eJH7oQPsNntUxanlnmmz1g+K+03XvtNlNhbavvHWhXOPU6WYszD+jTUkmA8
-	 tLt1VUOlXKig55BtTlPN8SDk3Z6rECClae42pGVh5QZxHXzG+6ozJyQp0PewrEiSaH
-	 dcJHAKaDOaDbA==
+	b=pPRJVnZAQ1QXm/xYNMQjTF11IrSBEWaLBOWJdZg9Fdszhb9cbPV5hENQb7bjIPBhe
+	 yvUtaqQ3/ix6yEZY6/CSefVc4YwiyAJEPm6gO/G7cH2RejKPUZznS2Dtu4GMLZXpB5
+	 zR+p+w2L7xx3EtrwhvP2tyBZS2B0JnDFzf4RiRUBokWqGBUeZOveDh71JIVhGj9VLs
+	 Urd3hmjFQ/MONenrmGlHz2HwYKLXtprg7hzqN1ilnTWskCqxJpmMHjcJkzabilCbSP
+	 g1kuFp9s3CH8uYXrx1YfWfs8DqNp+nSN918OO9fjissn1rsGNhJsKOenso3E3wQI0U
+	 MIAZP76rBgALQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71803380A95C;
-	Sat,  7 Dec 2024 02:00:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF17380A95C;
+	Sat,  7 Dec 2024 02:00:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,78 +52,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: lapb: increase LAPB_HEADER_LEN
+Subject: Re: [PATCH net-next v2 00/21] lan78xx: Preparations for PHYlink
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173353683124.2872036.16757754078248365917.git-patchwork-notify@kernel.org>
-Date: Sat, 07 Dec 2024 02:00:31 +0000
-References: <20241204141031.4030267-1-edumazet@google.com>
-In-Reply-To: <20241204141031.4030267-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot+fb99d1b0c0f81d94a5e2@syzkaller.appspotmail.com
+ <173353684057.2872036.10076013209434482151.git-patchwork-notify@kernel.org>
+Date: Sat, 07 Dec 2024 02:00:40 +0000
+References: <20241204084142.1152696-1-o.rempel@pengutronix.de>
+In-Reply-To: <20241204084142.1152696-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, woojung.huh@microchip.com, andrew+netdev@lunn.ch,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, phil@raspberrypi.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  4 Dec 2024 14:10:31 +0000 you wrote:
-> It is unclear if net/lapb code is supposed to be ready for 8021q.
+On Wed,  4 Dec 2024 09:41:32 +0100 you wrote:
+> changes v2:
+> - split the patch set.
 > 
-> We can at least avoid crashes like the following :
-> 
-> skbuff: skb_under_panic: text:ffffffff8aabe1f6 len:24 put:20 head:ffff88802824a400 data:ffff88802824a3fe tail:0x16 end:0x140 dev:nr0.2
-> ------------[ cut here ]------------
->  kernel BUG at net/core/skbuff.c:206 !
-> Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
-> CPU: 1 UID: 0 PID: 5508 Comm: dhcpcd Not tainted 6.12.0-rc7-syzkaller-00144-g66418447d27b #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
->  RIP: 0010:skb_panic net/core/skbuff.c:206 [inline]
->  RIP: 0010:skb_under_panic+0x14b/0x150 net/core/skbuff.c:216
-> Code: 0d 8d 48 c7 c6 2e 9e 29 8e 48 8b 54 24 08 8b 0c 24 44 8b 44 24 04 4d 89 e9 50 41 54 41 57 41 56 e8 1a 6f 37 02 48 83 c4 20 90 <0f> 0b 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3
-> RSP: 0018:ffffc90002ddf638 EFLAGS: 00010282
-> RAX: 0000000000000086 RBX: dffffc0000000000 RCX: 7a24750e538ff600
-> RDX: 0000000000000000 RSI: 0000000000000201 RDI: 0000000000000000
-> RBP: ffff888034a86650 R08: ffffffff8174b13c R09: 1ffff920005bbe60
-> R10: dffffc0000000000 R11: fffff520005bbe61 R12: 0000000000000140
-> R13: ffff88802824a400 R14: ffff88802824a3fe R15: 0000000000000016
-> FS:  00007f2a5990d740(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000000110c2631fd CR3: 0000000029504000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->   skb_push+0xe5/0x100 net/core/skbuff.c:2636
->   nr_header+0x36/0x320 net/netrom/nr_dev.c:69
->   dev_hard_header include/linux/netdevice.h:3148 [inline]
->   vlan_dev_hard_header+0x359/0x480 net/8021q/vlan_dev.c:83
->   dev_hard_header include/linux/netdevice.h:3148 [inline]
->   lapbeth_data_transmit+0x1f6/0x2a0 drivers/net/wan/lapbether.c:257
->   lapb_data_transmit+0x91/0xb0 net/lapb/lapb_iface.c:447
->   lapb_transmit_buffer+0x168/0x1f0 net/lapb/lapb_out.c:149
->  lapb_establish_data_link+0x84/0xd0
->  lapb_device_event+0x4e0/0x670
->   notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
->  __dev_notify_flags+0x207/0x400
->   dev_change_flags+0xf0/0x1a0 net/core/dev.c:8922
->   devinet_ioctl+0xa4e/0x1aa0 net/ipv4/devinet.c:1188
->   inet_ioctl+0x3d7/0x4f0 net/ipv4/af_inet.c:1003
->   sock_do_ioctl+0x158/0x460 net/socket.c:1227
->   sock_ioctl+0x626/0x8e0 net/socket.c:1346
->   vfs_ioctl fs/ioctl.c:51 [inline]
->   __do_sys_ioctl fs/ioctl.c:907 [inline]
->   __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+> This patch set is part of the preparatory work for migrating the lan78xx
+> USB Ethernet driver to the PHYlink framework. During extensive testing,
+> I observed that resetting the USB adapter can lead to various read/write
+> errors. While the errors themselves are acceptable, they generate
+> excessive log messages, resulting in significant log spam. This set
+> improves error handling to reduce logging noise by addressing errors
+> directly and returning early when necessary.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: lapb: increase LAPB_HEADER_LEN
-    https://git.kernel.org/netdev/net/c/a6d75ecee2bf
+  - [net-next,v2,01/10] net: usb: lan78xx: Remove LAN8835 PHY fixup
+    https://git.kernel.org/netdev/net-next/c/7b60c3bf93fa
+  - [net-next,v2,02/10] net: usb: lan78xx: Remove KSZ9031 PHY fixup
+    https://git.kernel.org/netdev/net-next/c/6782d06a47ad
+  - [net-next,v2,03/10] net: usb: lan78xx: move functions to avoid forward definitions
+    https://git.kernel.org/netdev/net-next/c/39aa1d620d10
+  - [net-next,v2,04/10] net: usb: lan78xx: Improve error reporting with %pe specifier
+    https://git.kernel.org/netdev/net-next/c/9bcdc610cfab
+  - [net-next,v2,05/10] net: usb: lan78xx: Fix error handling in MII read/write functions
+    https://git.kernel.org/netdev/net-next/c/32ee0dc76450
+  - [net-next,v2,06/10] net: usb: lan78xx: Improve error handling in EEPROM and OTP operations
+    https://git.kernel.org/netdev/net-next/c/8b1b2ca83b20
+  - [net-next,v2,07/10] net: usb: lan78xx: Add error handling to lan78xx_init_ltm
+    https://git.kernel.org/netdev/net-next/c/77586156b517
+  - [net-next,v2,08/10] net: usb: lan78xx: Add error handling to set_rx_max_frame_length and set_mtu
+    https://git.kernel.org/netdev/net-next/c/65520a70cb09
+  - [net-next,v2,09/10] net: usb: lan78xx: Add error handling to lan78xx_irq_bus_sync_unlock
+    https://git.kernel.org/netdev/net-next/c/0da202e6a56f
+  - [net-next,v2,10/10] net: usb: lan78xx: Improve error handling in dataport and multicast writes
+    https://git.kernel.org/netdev/net-next/c/48fb3d3c4be6
 
 You are awesome, thank you!
 -- 
