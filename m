@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-149868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C03D89E7DC8
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 02:40:39 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E7D39E7DD3
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 02:50:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8040B285A6B
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 01:40:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51B521886900
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 01:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95DAC28DD0;
-	Sat,  7 Dec 2024 01:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEF7C2C9;
+	Sat,  7 Dec 2024 01:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kYChboog"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cv6ePFOy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693B1286A9;
-	Sat,  7 Dec 2024 01:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CA018638
+	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 01:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733535621; cv=none; b=BnPM2ZPG25yzOTeBXgGKVj7+qnMcSSAPcNXB6PdOD4j/OZ7X27XQFAXf293pDfMMmTO+EJbTnzTnbIFMDlgK+MWwH0SMiBCCR+vYT4dvZfmDW8QZRW+Es6bKxM9tWF9obyxRHXF8xuPsyX1P0CbqrgRBVMZBY0DMy4JuwRNsWU0=
+	t=1733536214; cv=none; b=qNfUg96yH9EgpLk/9w1uVEmpy6uN5MY06k1K8tvrk+Vl+1OZDhIwrKKG3bVcH6aXCAa6s/KVx+hK8Euh7uujtygrnA7+tCBgm3jzEEvHlnVOEIwYcYRY5dLZl7S6uTf3zgx87MFUb7xMnBXpenWnjY3YOWQRh+ThuasWdaBwwQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733535621; c=relaxed/simple;
-	bh=tGYgfxWGm/mx2fdk03Ebej7kD+L949m4rooa93oQzLA=;
+	s=arc-20240116; t=1733536214; c=relaxed/simple;
+	bh=CokcmhJG5zPtpxGVvlgmSdQ1A4ZGrwynW1VXk3fGv3E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kQBnwjrimYngzC3+uLJvSLfNsumCDV4bnF6RFLu2jCo9aba+AYFD3eQRLTO2IemieW5D9BDY65u2EwoP28GjJrjdmeLEXVwOWXddS78ZUfrxdrqtPmp1NsR+mKZQGtN1rBC9xxYqC0H1pR2Jgb46PlslreSgpr+8vXHE00+5Y0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kYChboog; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0783BC4CED1;
-	Sat,  7 Dec 2024 01:40:21 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=TVkwsuojH6Fj9a5rWeU5R35xzDMhEH0MYXC0zZIHSBJPFsyTRto5Zzm1vWH+ogL4tIdg5LKckfPEm0sucRbGgDoPd5XDiNOLMoEGVpzF2wRkb1aaTsh74nx+5GJjMgYqtu0RhwCVohfRG0ICJ842A0RaH0UQcOeKnRMjtBV7vjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cv6ePFOy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43A38C4CED1;
+	Sat,  7 Dec 2024 01:50:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733535621;
-	bh=tGYgfxWGm/mx2fdk03Ebej7kD+L949m4rooa93oQzLA=;
+	s=k20201202; t=1733536214;
+	bh=CokcmhJG5zPtpxGVvlgmSdQ1A4ZGrwynW1VXk3fGv3E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kYChboogydUaLCqkdMzNKANjnFnpC/U87ScB3lwkj4xGGaaHdkpsLPX5ADSB6jX4L
-	 QpeTsiy/jIUwA6rmLh47roWxjVpF2mcrTLoa2IxiyknLssq9n50VpKiv69VRrcFmCr
-	 tXkgOrxcYSto4ptFtnSpGl5CgndeoR94dAT/j1mVyBFIcCWS6Sbsp6lc4Qf7GsL09L
-	 yJiMW0YFQDaspGLyhXLxUMttSX9ugk1ZV621bFsWCrmEestRxyD4yotwADFGu8clea
-	 +js4hU3I+xRJJFm7HMMxCjN1HU4NcFcSRtW+eoqnS+TS7877wNlL9CeeshMdGTNgg/
-	 snljILPwDzJuA==
+	b=cv6ePFOylEPxy+D01MCefIOcPqG5gvbqTs6heHXEfOuScbvzoMaIecZFcjywBsaQX
+	 +w66KiAew8ZBsJpVFxPlflLRgihpcU+u0jAUOpwhr9qnGH3vy9Hc0WinVP601tgD/b
+	 pDFXUVYUo12FLRWHhzN0AGQo7VCmmElTo5FdfYxPAiTIsEjlAC0zZw0MN+PHLkH9cH
+	 W3Gb7RvEtey3rxTLIuqnxnIl9JtiR3JMBiMjYFPkJ8QsoETQ/M2fYz4ysP6wSrvgXe
+	 CEuxh46y/ZeT6s/0fMTyunA7Xeg9VAmEw1xuMyQUgrKx9Y4LkLjSAEJZG4Vx8YG9Uo
+	 WQ9Ka3V/qliow==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 366A4380A95C;
-	Sat,  7 Dec 2024 01:40:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713C2380A95C;
+	Sat,  7 Dec 2024 01:50:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: simplify resource acquisition + ioremap
+Subject: Re: [PATCH net 0/2] bnxt_en: Bug fixes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173353563577.2868165.15707534550533445842.git-patchwork-notify@kernel.org>
-Date: Sat, 07 Dec 2024 01:40:35 +0000
-References: <20241203231337.182391-1-rosenp@gmail.com>
-In-Reply-To: <20241203231337.182391-1-rosenp@gmail.com>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, mkl@pengutronix.de, maxime.chevallier@bootlin.com,
- mailhol.vincent@wanadoo.fr, madalin.bucur@nxp.com, sean.anderson@seco.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, hkallweit1@gmail.com,
- linux@armlinux.org.uk, linux-can@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <173353622925.2870054.7390682435717227700.git-patchwork-notify@kernel.org>
+Date: Sat, 07 Dec 2024 01:50:29 +0000
+References: <20241204215918.1692597-1-michael.chan@broadcom.com>
+In-Reply-To: <20241204215918.1692597-1-michael.chan@broadcom.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  3 Dec 2024 15:13:37 -0800 you wrote:
-> get resource + request_mem_region + ioremap can all be done by a single
-> function.
+On Wed,  4 Dec 2024 13:59:16 -0800 you wrote:
+> There are 2 bug fixes in this series.  This first one fixes the issue
+> of setting the gso_type incorrectly for HW GRO packets on 5750X (Thor)
+> chips.  This can cause HW GRO packets to be dropped by the stack if
+> they are re-segmented.  The second one fixes a potential division by
+> zero crash when dumping FW log coredump.
 > 
-> Replace them with devm_platform_get_and_ioremap_resource or\
-> devm_platform_ioremap_resource where res is not used.
-> 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> Hongguang Gao (1):
+>   bnxt_en: Fix potential crash when dumping FW log coredump
 > 
 > [...]
 
 Here is the summary with links:
-  - net: simplify resource acquisition + ioremap
-    https://git.kernel.org/netdev/net-next/c/e36d46b9af68
+  - [net,1/2] bnxt_en: Fix GSO type for HW GRO packets on 5750X chips
+    https://git.kernel.org/netdev/net/c/de37faf41ac5
+  - [net,2/2] bnxt_en: Fix potential crash when dumping FW log coredump
+    https://git.kernel.org/netdev/net/c/fab4b4d2c903
 
 You are awesome, thank you!
 -- 
