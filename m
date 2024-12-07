@@ -1,97 +1,134 @@
-Return-Path: <netdev+bounces-149920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9FDE9E8224
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 21:58:59 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 676E218842D2
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 20:58:59 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F2ED1547C8;
-	Sat,  7 Dec 2024 20:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xN+prU3T"
-X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B15C9E822D
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 22:07:40 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F05614A4C7
-	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 20:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C0602819CD
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 21:07:39 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1141448DF;
+	Sat,  7 Dec 2024 21:07:37 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DC4179A7
+	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 21:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733605136; cv=none; b=iBOqGNMKsSTb60ayYAGnpQtfGPc0yc85sfV96X2ETywbLMO3JsBJGAU+/GagEFmOz3o5S599eIVq4x8cDQSs/Ze4K9OlbMQ5BYxWw4YA8ceHADZaH1TzMhUTdvKS/QI6oqan8VpOJVOr6ewE+Jm42hPoVwDIL0/hrdGvWE5HSjE=
+	t=1733605657; cv=none; b=Kz5oXuNMjAEtcvegg0UwkhEOG/KzdjqrvzxXeiXSupULSAqyOYGxdlJy5jrLaS1mnomDMhY+LGbBaOTAKyi/RSAYHx/ajWO3ao6aYt/wWHE83Fy3BPzDzw4MtlZDZLMgxM6Dtwqt7xKqvLHL/obxbNclhD/94gMd1HJh2neGqSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733605136; c=relaxed/simple;
-	bh=rciwtYQY+x63l+55XRKtL1FtnUzI6nWzPS4Or9UOSEA=;
+	s=arc-20240116; t=1733605657; c=relaxed/simple;
+	bh=yloHb07/tVztyegzbK7Gc91K7mFA2G42AZ2DPMQlADg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IF3DhKlpMr04VtxzmKp68lpjdJQxFxRtIo30ve/o5uh6zLsxg5mofKqgiivP//iI/2ORCE8EFdMlhwpAvqtJggVmFw9tKahoYPQmO7E8HDE59r0au6TAG602UwCgeqXA3kYiEI8+I+MRGq60CAQNFyFD1K4B25tsZG/RQksD31E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xN+prU3T; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=lIhXs6yCbLlsLP0p2PsU7ZNtz0quwmmK25e3wWUBEic=; b=xN
-	+prU3TgZnLe6Y66EBb2bzoflEmvSXG9PTAurKC7yRaKLpYiFbSJYK7N96I0p6AGKVkQKiutE/5YN+
-	PEOYVmT/3psFwPX6LHmLejXS9PuHA4EYJhTvwtjSNCTv70VQ927UV/yuGqVsKjnas7qNHmqg2w4/Q
-	FEGWGwMG40KqVtM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tK1t6-00FVPv-6N; Sat, 07 Dec 2024 21:58:52 +0100
-Date: Sat, 7 Dec 2024 21:58:52 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?J=F6rg?= Sommer <joerg@jo-so.de>
-Cc: netdev@vger.kernel.org
-Subject: Re: KSZ8795 fixes for v5.15
-Message-ID: <9e0efd14-ea5c-459f-a70c-b34e61bc47b1@lunn.ch>
-References: <uz5k4wl4fka3rxoz2tkvpogiwblokbpo72p3sdjdbakwgfbwfi@bzxazuhkhbps>
+	 Content-Type:Content-Disposition:In-Reply-To; b=h+tYw6m96P4hwfaE3R4p/uVBv5I8pv3Tbx4XaeAvl+eAfleA6JStC+kzo6473uMGUfg8Y/zUQqUjbfjRT/Bp5Z7D+u2v0OKr1hRvyQG58VQdl8V/GkWZohbaBLywGJjJLMriWTVEX0btu4kwfS5VynpqFDxU3j82iRDt7pPyiLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
+Received: from mail-relay (helo=jo-so.de)
+	by s1.jo-so.de with local-bsmtp (Exim 4.96)
+	(envelope-from <joerg@jo-so.de>)
+	id 1tK21M-000jUx-0d;
+	Sat, 07 Dec 2024 22:07:24 +0100
+Received: from joerg by zenbook.jo-so.de with local (Exim 4.98)
+	(envelope-from <joerg@jo-so.de>)
+	id 1tK21L-00000000v2l-2OPi;
+	Sat, 07 Dec 2024 22:07:23 +0100
+Date: Sat, 7 Dec 2024 22:07:23 +0100
+From: =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Christian Eggers <ceggers@arri.de>
+Subject: Re: KSZ8795 not detected at start to boot from NFS
+Message-ID: <phab74r5xxbufhe6llruqa3tgkxzalytgzqrko4o2bg2xzizjv@apha3we342xn>
+References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
+ <a578b29f-53f0-4e33-91a4-3932fa759cd1@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="gmbj3uzmevpz6syt"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <uz5k4wl4fka3rxoz2tkvpogiwblokbpo72p3sdjdbakwgfbwfi@bzxazuhkhbps>
+In-Reply-To: <a578b29f-53f0-4e33-91a4-3932fa759cd1@lunn.ch>
 
-On Sat, Dec 07, 2024 at 09:44:46AM +0100, Jörg Sommer wrote:
-> Hi,
-> 
-> it's me again with the KSZ8795 connected to TI_DAVINCI_EMAC. It works on
-> v5.10.227 and now, I try to get this working on v5.15 (and then later
-> versions). I found this patch [1] in the Microchip forum [2]. Someone put it
-> together to make this chip work with v5.15. I applies fine on v5.15.173 and
-> gets me to a point where the kernel detects the chip during boot. (It still
-> doesn't work, but it's better with this patch than without.)
-> 
-> [1] https://forum.microchip.com/sfc/servlet.shepherd/document/download/0693l00000XiIt9AAF
-> [2] https://forum.microchip.com/s/topic/a5C3l000000MfQkEAK/t388621
-> 
-> The driver code was restructured in 9f73e1 which contained some mistakes.
-> These were fixed later with 4bdf79 (which is part of the patch), but was not
-> backported to v5.15 as a grep shows:
-> 
-> $ git grep STATIC_MAC_TABLE_OVERRIDE'.*2[26]' v5.15.173
-> v5.15.173:drivers/net/dsa/microchip/ksz8795.c:55:       [STATIC_MAC_TABLE_OVERRIDE]     = BIT(26),
-> $ git grep STATIC_MAC_TABLE_OVERRIDE'.*2[26]' v6.6.62
-> v6.6.62:drivers/net/dsa/microchip/ksz_common.c:334:     [STATIC_MAC_TABLE_OVERRIDE]     = BIT(22),
-> 
-> Can someone review this patch and apply it to the v5.15 branch?
 
-Hi Jörg
+--gmbj3uzmevpz6syt
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: KSZ8795 not detected at start to boot from NFS
+MIME-Version: 1.0
 
-Please see:
+Andrew Lunn schrieb am Sa 07. Dez, 21:47 (+0100):
+> On Sat, Dec 07, 2024 at 08:53:38AM +0100, J=C3=B6rg Sommer wrote:
+> > It tries to initialize the switch before the ethernet of the SoC is rea=
+dy.
+> >=20
+> > Before this commit the kernel returned EPROBE_DEFER instead of EINVAL (=
+or
+> > ENODEV) as a quick
+>=20
+> This is often true for DSA switches, that the first probe fails with
+> EPROBE_DEFER, because the conduit ethernet is not ready.
+>=20
+> What i don't understand from your description is why:
+>=20
+> > +       /* setup spi */
+> > +       spi->mode =3D SPI_MODE_3;
+> > +       ret =3D spi_setup(spi);
+> > +       if (ret)
+> > +               return ret;
+> > +
+>=20
+> is causing this issue. Is spi_setup() failing?
 
-https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+I've added another dev_err() after the spi_setup:
 
-Option 2.
+[    1.680516] ksz8795-switch spi0.1: ksz8795_spi_probe:55: ret of spi_setu=
+p=3D0
+[    1.819194] ksz8795-switch spi0.1: ksz8795_spi_probe:61: ret=3D-22
+[    1.825611] spi_davinci 1f0e000.spi: Controller at 0x(ptrval)
+=E2=80=A6
+[    1.949668] ksz8795-switch spi0.1: ksz8795_spi_probe:55: ret of spi_setu=
+p=3D0
+[    2.090136] ksz8795-switch spi0.1: ksz8795_spi_probe:61: ret=3D-517
+[    2.097438] ksz8795-switch spi0.1: ksz8795_spi_probe:55: ret of spi_setu=
+p=3D0
+[    2.230043] ksz8795-switch spi0.1: ksz8795_spi_probe:61: ret=3D-517
+[    2.241625] davinci_emac 1e20000.ethernet: incompatible machine/device t=
+ype for reading mac address
+[    2.255218] ksz8795-switch spi0.1: ksz8795_spi_probe:55: ret of spi_setu=
+p=3D0
+=E2=80=A6
+[    3.121263] libphy: dsa slave smi: probed
+[    3.127206] ksz8795-switch spi0.1 lan-x1 (uninitialized): PHY [dsa-0.0:0=
+0] driver [Generic PHY] (irq=3DPOLL)
+[    3.142775] ksz8795-switch spi0.1 lan-x2 (uninitialized): PHY [dsa-0.0:0=
+1] driver [Generic PHY] (irq=3DPOLL)
 
-       Andrew
+
+
+--=20
+Treffen sich zwei Funktionen.
+Sagt die eine: =E2=80=9EVerschwinde oder ich differenzier' dich!=E2=80=9C
+Erwidert die andere: =E2=80=9E=C3=84tsch, ich bin exponentiell!=E2=80=9C
+
+--gmbj3uzmevpz6syt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABEIAB0WIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCZ1S5CgAKCRB9LJoj0a6j
+dZd9AP4vcEOyEi5oAm8/1EJqW7g0StN5gzrE+u9V2SpWFga7fgD/Y+b85X/wAVum
+AaX5hDah+ZKgGxY5KSF4pzkjln2nvJs=
+=qG2R
+-----END PGP SIGNATURE-----
+
+--gmbj3uzmevpz6syt--
 
