@@ -1,77 +1,80 @@
-Return-Path: <netdev+bounces-149898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 347379E80FE
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 17:23:12 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 801049E80FD
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 17:23:09 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5D121881BB5
-	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 16:23:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36361281F05
+	for <lists+netdev@lfdr.de>; Sat,  7 Dec 2024 16:23:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 545691494AD;
-	Sat,  7 Dec 2024 16:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BA314D2AC;
+	Sat,  7 Dec 2024 16:23:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IKiuvT0g"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SzHhbCpJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48781AAC4
-	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 16:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273FB14C5AA
+	for <netdev@vger.kernel.org>; Sat,  7 Dec 2024 16:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733588579; cv=none; b=UBilbUnBJyo1oD1KxKspvACnRYhXOAfMjiCo+zFWU07z4pGdj5PffMz5kL7a6eRknuLZY5dfM/bh/1+dAS4SIhflzhcfMytF3Flc3rCa/eLr07QtGtLfMztr6xgnZKvNSH9+leP1lpZwPoQqF0NX3khNB1gz8NTTI/5cnz6CimA=
+	t=1733588582; cv=none; b=ZW7ZztD/QgbMrwkAJdm2iMkBK/f+qkNwmkqZJGzCGGFz4gPYWFiAjZbZRInNIe5ZzIaCSgdcTO4IKAWEsnLKZ66fYpKB70L+v7rIRZ+1towWtNI+V5gbQHGacA4o6u5aCInoihUPfdhPTI+BS76xfXxwMqVNr60Aff46YGpsfGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733588579; c=relaxed/simple;
-	bh=zhO5oEg5At6PXtbhlwT18QCmioCBuXqfzExmAOQRJdI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LAslj5Q71dOy6mTrdvyi8slD8dFhXcEnymB78OtMAOeHyaw3bGVbzwK1kcXgh/sv4e6v+P33AMe2lUPqxXiFNqf3k2hfTGzRUNw7T6unIlxIYF0Zn7hT9UTQch4hI8Zl1ww0x8vNri9egSiBrYDRHg3s1q/e4zogrVLdfsd1QJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IKiuvT0g; arc=none smtp.client-ip=209.85.160.202
+	s=arc-20240116; t=1733588582; c=relaxed/simple;
+	bh=mcuxVimTDVFaBUeaYQS0aykEsC4nm5KfQqOK3SnWKCQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=CaioE3SOgzd3dfj78wFmI0evgIsah9r1vV+EPHeOfkujTgamQJadgee5YkwVcRbhWYU6oLJRtiFATZd+OGBi7e3XBJwajiS85heHm8Mr3jokXk6rFoR2KL+99Ii6DePLZfNR5jJ/xqQxz/dGhS/sl/f/a6oTtT1bLPe/xEKI5XY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SzHhbCpJ; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-466911d43f4so58982491cf.3
-        for <netdev@vger.kernel.org>; Sat, 07 Dec 2024 08:22:57 -0800 (PST)
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-466b72ca44eso43360441cf.0
+        for <netdev@vger.kernel.org>; Sat, 07 Dec 2024 08:22:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733588576; x=1734193376; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4TvG+p1C7qCnLqD+Fv8OolvBoauxFac0cbA9qC66rGo=;
-        b=IKiuvT0gGqcO5WrmZz15a3FSwR1G5jlOG3mOt2YmTE/SLV+nskCPp1IuVVK7klx3kJ
-         s3DjIBVDrFlLjicrF+Bp+C99D1O0Fb4FpXw8xx+nCcvC7JkNeIGp60ZQX5Lto3S9/S4M
-         ainGcd8IEcUMPbCAS2gjJk+LR7e3tEftH81vxC/PC9DNP1AMBY0jLLXs8QaFG3Ld+r1Y
-         ifhv6fTvW5rBKwezyopITBB+S4TxLeE3+alnkA9HxPb2637JJu28MPZHiweIWSe3in6p
-         DL7vyr/akbR0wHKGo7iimf4yzXrj44zd5DckNX9qJt7NkIqkpgYl6hHZ5G/ULBsRX2m8
-         5BVA==
+        d=google.com; s=20230601; t=1733588578; x=1734193378; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6QRTawL+6Yqt9YzIX1HcIs3HxK3NWFqJyLbSHBWQpAY=;
+        b=SzHhbCpJgVN0wbxXwTsdeNcSaFanbkcVsfkZk2H0/ffo4EOKbFKAbtVr2JYCiOYEoP
+         G4MNLcHwdnfDzTu7q57iT/cgwvd+HsNsT44DZnPOLTUGMHvDO59Zi12iZPWdU3D22gOq
+         d6xjYs7+0XOMk4ilqO7W22o7bk3qVZAr15ogEEWozSAgj9V83M9WKF5GDeeX3Gf28qu/
+         qw+mPIYtChtwORPQOpv5ypSvPUwJM/7biGo6EJKb1feSgTG0teU7a+3Iav/WAHmsR/xD
+         AAaPfJPP1Uzmb+WXkvYAvv2CwLyci787OAntNaQVpyxOq+ISZGqtSzC+dBZmarXzR/gz
+         1Ikw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733588576; x=1734193376;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4TvG+p1C7qCnLqD+Fv8OolvBoauxFac0cbA9qC66rGo=;
-        b=FBSpLaNJolTpdtcn23rjTpypJGtIqya2kNqua940RUK4hUxJ3AMBCJhpGEdhheeYzK
-         u/d2CVDNJKmZVooprwOELNEVICix10/NzQNqFTRQ7U1Q31i/zLou7BfQGvGZVJeKNN65
-         1CtduN44QACXoh/9+yj8e+lrUalsxZebW6zDSCIgmhtVQeptaPp4O29zYh7jq3GOlA6c
-         GC3bjJUvBP5EcEuHSXGVgHUJ6EpT/vZJh6+71PuFYz0vXgaaSECEs+Qtwu+M6t57lejJ
-         j9A74Sdp28rYJ2sI8+Aifl2vBZomxuMZ1bZRmsAramGUzIJHAzNe4CuALO32WT7w5iq/
-         K2wA==
-X-Gm-Message-State: AOJu0Yz1So8zZ3+CJZKDEnN9kPgSaBftr0BkNZac1Iy4E+PH9mfw8mWB
-	bJ1KAvrYRrN+OBvKJv5Rce9eNzOehxsp0J2DipekZhGF6IHD9gHgvr/JClWZVE3zzy4kgC4u4qQ
-	ZW7m8aES+Vg==
-X-Google-Smtp-Source: AGHT+IFIib9OTt3mIm/Cf+pbY+tjRb7pq5ZyFT6gKe5DGyzxS+d5du0gUVLlNUkkH2sgtC61H4OWhxxKaiPWvg==
-X-Received: from qtcw37.prod.google.com ([2002:a05:622a:1925:b0:462:ac63:5263])
+        d=1e100.net; s=20230601; t=1733588578; x=1734193378;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6QRTawL+6Yqt9YzIX1HcIs3HxK3NWFqJyLbSHBWQpAY=;
+        b=L/aLPbmP8JzJao6SZeJ1JgVOG3WXe5bbCGH+hgmFQ68Mi/jMuFWA2Z8j0SuGdKMKQt
+         w7pLIkfSWxFaeQ3XyEZi8Eh1aVpUcrqvb20AH2mGYbCh1Sa8lTbsH86qK9ws9icGH+UW
+         zTRJ3u2PlDcNYUy/92Pwm2ua7j+QlCHUNDQqWe5pKnICroMQl2UPvLjM3ha+3dDFGE4l
+         s9X7zW6AuWg9Pn6jxUz7W+x3aHYevdTxxisHbjDEhG5ExiZQO3xWN/p09eaxCGVo1blC
+         8f5ETeKmpOwbsptQN9vuP9GybPx/74PyLL8kaZLTwOsq42Vy8UaPX/mUEI+1ewUkEH+0
+         iaxQ==
+X-Gm-Message-State: AOJu0YxkPCc8kCADm4/V+JsUZNJmpKbg1+I4ujjNSQJskvtVasNXLFKo
+	5yUOW+UkXLCij+6s4j68JQ24Mc11QJT3bpJInZi5Pim+QZIhi7/3Ul8RRTuzHd+UVOBDmrdl0+/
+	QogmOIWYUGQ==
+X-Google-Smtp-Source: AGHT+IENcFd1S9aLJ6rnsWr9MY9ihlMhIypdmxNO0B018J2m4HXtjXFufj+60QuamfxUwbdvhe6J5NjCd0fmgQ==
+X-Received: from qtben8.prod.google.com ([2002:a05:622a:5408:b0:466:975f:b220])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:191c:b0:465:3a8b:3fce with SMTP id d75a77b69052e-46734db89b4mr125111791cf.44.1733588576680;
- Sat, 07 Dec 2024 08:22:56 -0800 (PST)
-Date: Sat,  7 Dec 2024 16:22:45 +0000
+ 2002:a05:622a:8e07:b0:467:4f0a:1b5d with SMTP id d75a77b69052e-4674f0a7a43mr28158721cf.42.1733588578056;
+ Sat, 07 Dec 2024 08:22:58 -0800 (PST)
+Date: Sat,  7 Dec 2024 16:22:46 +0000
+In-Reply-To: <20241207162248.18536-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20241207162248.18536-1-edumazet@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241207162248.18536-1-edumazet@google.com>
-Subject: [PATCH net-next 0/3] net: prepare for removal of net->dev_index_head
+Message-ID: <20241207162248.18536-2-edumazet@google.com>
+Subject: [PATCH net-next 1/3] rtnetlink: add ndo_fdb_dump_context
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -80,37 +83,219 @@ Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This series changes rtnl_fdb_dump, last iterator using net->dev_index_head[]
+rtnl_fdb_dump() and various ndo_fdb_dump() helpers share
+a hidden layout of cb->ctx.
 
-First patch creates ndo_fdb_dump_context structure, to no longer
-assume specific layout for the arguments.
+Before switching rtnl_fdb_dump() to for_each_netdev_dump()
+in the following patch, make this more explicit.
 
-Second patch adopts for_each_netdev_dump() in rtnl_fdb_dump(),
-while changing two first fields of ndo_fdb_dump_context.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ .../ethernet/freescale/dpaa2/dpaa2-switch.c   |  3 ++-
+ drivers/net/ethernet/mscc/ocelot_net.c        |  3 ++-
+ drivers/net/vxlan/vxlan_core.c                |  5 ++--
+ include/linux/rtnetlink.h                     |  7 ++++++
+ net/bridge/br_fdb.c                           |  3 ++-
+ net/core/rtnetlink.c                          | 24 +++++++++----------
+ net/dsa/user.c                                |  3 ++-
+ 7 files changed, 30 insertions(+), 18 deletions(-)
 
-Third patch removes the padding, thus changing the location
-of ctx->fdb_idx now that all users agree on how to retrive it.
-
-After this series, the only users of net->dev_index_head
-are __dev_get_by_index() and dev_get_by_index_rcu().
-
-We have to evaluate if switching them to dev_by_index xarray
-would be sensible.
-
-Eric Dumazet (3):
-  rtnetlink: add ndo_fdb_dump_context
-  rtnetlink: switch rtnl_fdb_dump() to for_each_netdev_dump()
-  rtnetlink: remove pad field in ndo_fdb_dump_context
-
- .../ethernet/freescale/dpaa2/dpaa2-switch.c   |   3 +-
- drivers/net/ethernet/mscc/ocelot_net.c        |   3 +-
- drivers/net/vxlan/vxlan_core.c                |   5 +-
- include/linux/rtnetlink.h                     |   6 +
- net/bridge/br_fdb.c                           |   3 +-
- net/core/rtnetlink.c                          | 106 +++++++-----------
- net/dsa/user.c                                |   3 +-
- 7 files changed, 59 insertions(+), 70 deletions(-)
-
+diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+index a293b08f36d46dfde7e25412951da78c15e2dfd6..de383e6c6d523f01f02cb3c3977b1c448a3ac9a7 100644
+--- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
++++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+@@ -781,12 +781,13 @@ static int dpaa2_switch_fdb_dump_nl(struct fdb_dump_entry *entry,
+ 				    struct ethsw_dump_ctx *dump)
+ {
+ 	int is_dynamic = entry->type & DPSW_FDB_ENTRY_DINAMIC;
++	struct ndo_fdb_dump_context *ctx = (void *)dump->cb->ctx;
+ 	u32 portid = NETLINK_CB(dump->cb->skb).portid;
+ 	u32 seq = dump->cb->nlh->nlmsg_seq;
+ 	struct nlmsghdr *nlh;
+ 	struct ndmsg *ndm;
+ 
+-	if (dump->idx < dump->cb->args[2])
++	if (dump->idx < ctx->fdb_idx)
+ 		goto skip;
+ 
+ 	nlh = nlmsg_put(dump->skb, portid, seq, RTM_NEWNEIGH,
+diff --git a/drivers/net/ethernet/mscc/ocelot_net.c b/drivers/net/ethernet/mscc/ocelot_net.c
+index 558e03301aa8ed89e15c5f37d148a287feaf0018..8d48468cddd7cf91fb49ad23a5c57110900160ef 100644
+--- a/drivers/net/ethernet/mscc/ocelot_net.c
++++ b/drivers/net/ethernet/mscc/ocelot_net.c
+@@ -758,12 +758,13 @@ static int ocelot_port_fdb_do_dump(const unsigned char *addr, u16 vid,
+ 				   bool is_static, void *data)
+ {
+ 	struct ocelot_dump_ctx *dump = data;
++	struct ndo_fdb_dump_context *ctx = (void *)dump->cb->ctx;
+ 	u32 portid = NETLINK_CB(dump->cb->skb).portid;
+ 	u32 seq = dump->cb->nlh->nlmsg_seq;
+ 	struct nlmsghdr *nlh;
+ 	struct ndmsg *ndm;
+ 
+-	if (dump->idx < dump->cb->args[2])
++	if (dump->idx < ctx->fdb_idx)
+ 		goto skip;
+ 
+ 	nlh = nlmsg_put(dump->skb, portid, seq, RTM_NEWNEIGH,
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index b46a799bd3904c4183775cb2e86172a0b127bb4f..2cb33c2cb836cf38b6e03b8a620594aa616f00fa 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -1352,6 +1352,7 @@ static int vxlan_fdb_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 			  struct net_device *dev,
+ 			  struct net_device *filter_dev, int *idx)
+ {
++	struct ndo_fdb_dump_context *ctx = (void *)cb->ctx;
+ 	struct vxlan_dev *vxlan = netdev_priv(dev);
+ 	unsigned int h;
+ 	int err = 0;
+@@ -1364,7 +1365,7 @@ static int vxlan_fdb_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 			struct vxlan_rdst *rd;
+ 
+ 			if (rcu_access_pointer(f->nh)) {
+-				if (*idx < cb->args[2])
++				if (*idx < ctx->fdb_idx)
+ 					goto skip_nh;
+ 				err = vxlan_fdb_info(skb, vxlan, f,
+ 						     NETLINK_CB(cb->skb).portid,
+@@ -1381,7 +1382,7 @@ static int vxlan_fdb_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 			}
+ 
+ 			list_for_each_entry_rcu(rd, &f->remotes, list) {
+-				if (*idx < cb->args[2])
++				if (*idx < ctx->fdb_idx)
+ 					goto skip;
+ 
+ 				err = vxlan_fdb_info(skb, vxlan, f,
+diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
+index 14b88f55192085def8f318c7913a76d5447b4975..a91dfea64724615c9db778646e52cb8573f47e06 100644
+--- a/include/linux/rtnetlink.h
++++ b/include/linux/rtnetlink.h
+@@ -178,6 +178,13 @@ void rtnetlink_init(void);
+ void __rtnl_unlock(void);
+ void rtnl_kfree_skbs(struct sk_buff *head, struct sk_buff *tail);
+ 
++/* Shared by rtnl_fdb_dump() and various ndo_fdb_dump() helpers. */
++struct ndo_fdb_dump_context {
++	unsigned long s_h;
++	unsigned long s_idx;
++	unsigned long fdb_idx;
++};
++
+ extern int ndo_dflt_fdb_dump(struct sk_buff *skb,
+ 			     struct netlink_callback *cb,
+ 			     struct net_device *dev,
+diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
+index 82bac2426631bcea63ea834e72f074fa2eaf0cee..902694c0ce643ec448978e4c4625692ccb1facd9 100644
+--- a/net/bridge/br_fdb.c
++++ b/net/bridge/br_fdb.c
+@@ -955,6 +955,7 @@ int br_fdb_dump(struct sk_buff *skb,
+ 		struct net_device *filter_dev,
+ 		int *idx)
+ {
++	struct ndo_fdb_dump_context *ctx = (void *)cb->ctx;
+ 	struct net_bridge *br = netdev_priv(dev);
+ 	struct net_bridge_fdb_entry *f;
+ 	int err = 0;
+@@ -970,7 +971,7 @@ int br_fdb_dump(struct sk_buff *skb,
+ 
+ 	rcu_read_lock();
+ 	hlist_for_each_entry_rcu(f, &br->fdb_list, fdb_node) {
+-		if (*idx < cb->args[2])
++		if (*idx < ctx->fdb_idx)
+ 			goto skip;
+ 		if (filter_dev && (!f->dst || f->dst->dev != filter_dev)) {
+ 			if (filter_dev != dev)
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index ab5f201bf0ab41b463175f501e8560b4d64d9b0a..02791328102e7590465aab9ab949af093721b256 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -4762,15 +4762,16 @@ static int nlmsg_populate_fdb(struct sk_buff *skb,
+ 			      int *idx,
+ 			      struct netdev_hw_addr_list *list)
+ {
++	struct ndo_fdb_dump_context *ctx = (void *)cb->ctx;
+ 	struct netdev_hw_addr *ha;
+-	int err;
+ 	u32 portid, seq;
++	int err;
+ 
+ 	portid = NETLINK_CB(cb->skb).portid;
+ 	seq = cb->nlh->nlmsg_seq;
+ 
+ 	list_for_each_entry(ha, &list->list, list) {
+-		if (*idx < cb->args[2])
++		if (*idx < ctx->fdb_idx)
+ 			goto skip;
+ 
+ 		err = nlmsg_populate_fdb_fill(skb, dev, ha->addr, 0,
+@@ -4909,10 +4910,9 @@ static int valid_fdb_dump_legacy(const struct nlmsghdr *nlh,
+ 
+ static int rtnl_fdb_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ {
+-	struct net_device *dev;
+-	struct net_device *br_dev = NULL;
+-	const struct net_device_ops *ops = NULL;
+-	const struct net_device_ops *cops = NULL;
++	const struct net_device_ops *ops = NULL, *cops = NULL;
++	struct ndo_fdb_dump_context *ctx = (void *)cb->ctx;
++	struct net_device *dev, *br_dev = NULL;
+ 	struct net *net = sock_net(skb->sk);
+ 	struct hlist_head *head;
+ 	int brport_idx = 0;
+@@ -4939,8 +4939,8 @@ static int rtnl_fdb_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 		ops = br_dev->netdev_ops;
+ 	}
+ 
+-	s_h = cb->args[0];
+-	s_idx = cb->args[1];
++	s_h = ctx->s_h;
++	s_idx = ctx->s_idx;
+ 
+ 	for (h = s_h; h < NETDEV_HASHENTRIES; h++, s_idx = 0) {
+ 		idx = 0;
+@@ -4992,7 +4992,7 @@ static int rtnl_fdb_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 			cops = NULL;
+ 
+ 			/* reset fdb offset to 0 for rest of the interfaces */
+-			cb->args[2] = 0;
++			ctx->fdb_idx = 0;
+ 			fidx = 0;
+ cont:
+ 			idx++;
+@@ -5000,9 +5000,9 @@ static int rtnl_fdb_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 	}
+ 
+ out:
+-	cb->args[0] = h;
+-	cb->args[1] = idx;
+-	cb->args[2] = fidx;
++	ctx->s_h = h;
++	ctx->s_idx = idx;
++	ctx->fdb_idx = fidx;
+ 
+ 	return skb->len;
+ }
+diff --git a/net/dsa/user.c b/net/dsa/user.c
+index 06c30a9e29ff820d2dd58fb1801d5e76a5928326..c736c019e2af90747738f10b667e6ad936c9eb0b 100644
+--- a/net/dsa/user.c
++++ b/net/dsa/user.c
+@@ -515,12 +515,13 @@ dsa_user_port_fdb_do_dump(const unsigned char *addr, u16 vid,
+ 			  bool is_static, void *data)
+ {
+ 	struct dsa_user_dump_ctx *dump = data;
++	struct ndo_fdb_dump_context *ctx = (void *)dump->cb->ctx;
+ 	u32 portid = NETLINK_CB(dump->cb->skb).portid;
+ 	u32 seq = dump->cb->nlh->nlmsg_seq;
+ 	struct nlmsghdr *nlh;
+ 	struct ndmsg *ndm;
+ 
+-	if (dump->idx < dump->cb->args[2])
++	if (dump->idx < ctx->fdb_idx)
+ 		goto skip;
+ 
+ 	nlh = nlmsg_put(dump->skb, portid, seq, RTM_NEWNEIGH,
 -- 
 2.47.0.338.g60cca15819-goog
 
