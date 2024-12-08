@@ -1,96 +1,116 @@
-Return-Path: <netdev+bounces-149960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5895D9E834D
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 04:27:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DB6D9E83BC
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 07:02:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46A84164752
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 03:27:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E75881884850
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 06:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790F122097;
-	Sun,  8 Dec 2024 03:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D3C8467;
+	Sun,  8 Dec 2024 06:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="agbI5ClW"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590E246B8
-	for <netdev@vger.kernel.org>; Sun,  8 Dec 2024 03:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30FD22097;
+	Sun,  8 Dec 2024 06:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733628424; cv=none; b=uajjAKiLJ/7aw8YZS0teRgTXYQF8av3IWlR17tHhoPMtofui7Rz2TAKqnB22pIy6IJlWXJD5VXeZpJ1yFUfp7t/PR9Za7vBenI79kofwoutr9bawvHHCYBVraIMiL9WNcvxYxSUOD4lhbpgrW63LSwcfKJGzgxnS9ClXCYTTCyc=
+	t=1733637716; cv=none; b=ZY4Ia8LG65QuYvE2QV8jfPBKfBHkkWJfpG0Rwrpj/sgiZxJzkWT3+86b9bv39TloubQvnbTXkVgTI68GI3jBp64R7GuFQZHru1a+sBaOM5D6y4eS4ccTMethxAer5hrWStX6evjCGhqycEmPgGWZHo5QDCvREUsxIgBieLmK2xA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733628424; c=relaxed/simple;
-	bh=xPxcS+DgpX296WLAauhqmmrHnvlAmFGQynHPtzWY8EY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V5QiMEQWL7sATsA2PKlWEPzDwWclG4r7Wv0lzldSjUpO5mW337N4wsXv3bX4iOXw4XVkOPhLoVJd04DBN71hk3KpoETJJJ9gPsl5lf+3R852+4b898Yo3uXbqk9d6x+In6el7g173qHamO3mIwLF2mSQGLpSf3AKnObFbRJnpO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1tK7YL-000000006ze-18Ds;
-	Sun, 08 Dec 2024 03:01:49 +0000
-Date: Sun, 8 Dec 2024 03:01:38 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next 2/3] net: pcs: pcs-mtk-lynxi: implement
- pcs_inband_caps() method
-Message-ID: <Z1UMEnlZ_ivTsru5@pidgin.makrotopia.org>
-References: <Z1F1b8eh8s8T627j@shell.armlinux.org.uk>
- <E1tJ8NR-006L5P-E3@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1733637716; c=relaxed/simple;
+	bh=oArNqQjCYhIE6H9hZlL4MTeNNdbP0UX/oKnqFDBeM5c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hAYQdmKPcD7hCXCNN1AAUoa6vJwmWUy1NkUg4aCgvYVOujvHd5LCEiCnl8Y0rA2wxIRZfZVNFh8UBapKg5rHrGCy1YZ6HbjIUg1hp/GFwxmHXXAPsFyaZdtLINIFOOmQrMLIAk8166GFCbdFVKUGFiiSYC+PEgTYEjTQtzoJoRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=agbI5ClW; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6d8edbd1a3bso13813146d6.3;
+        Sat, 07 Dec 2024 22:01:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733637713; x=1734242513; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lKZLZ56sRa1nZcH20SLwc98Zabb6zi61xg0ECzpB+68=;
+        b=agbI5ClWzGF1KIpWcq2Qv+3jz5LC+OLJ5QrFXoNDvyTFHBsNolASIYTGkTX3acaHkx
+         G3aVPa0OIxNEuGh6GpzUZ9loljnIOV4tjH8j7/Fi3LhDwgJ8r0HHjYmJ4zfMPgYduyG5
+         9ewa+w/4J+zLIb3Hq3PrO7xgfs3TXSv/2PUJ69qakF88Tb6YLlMs0sjwUknk0AbuM/2B
+         xeMCEQh3WzyYD7Ku+dCQzIGkZug1w1cjSr3OPNk1dcbojIbzNz5I/oY3sSM88cPYsuiJ
+         tmK1fiKBG6KBYMI7pOAXEawKyVdRdoyQ0yG9gkvyzyFgN69stUzDdVFMM+XFez3bMrov
+         sSIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733637713; x=1734242513;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lKZLZ56sRa1nZcH20SLwc98Zabb6zi61xg0ECzpB+68=;
+        b=SXG6LCff0wSV1Q8bHInLSnuNAWW7O0Ei4Mdba61jT4pWTyd6clCa/fxGnV2dfkvYLH
+         VTawIC4Du06+SvWTtEfPxZd4WygeOQHjSWIJv+Eb6jHY6zm/wXjsyQfNXIuPk0QqqNx6
+         UOG6YwEkj61m/IfcgrRxSNhZhRYl3xLOMvfeupKroVeckc7kQ03WZL7xzZx2op819Q9P
+         syEosg43A6gS734KnSiofRuia7yoAjzBpBtus3nmcDcSQxp8aau++wHugEuUAasBOu42
+         UB9eBRzjNfPU/W5TB6XXub0jEIEQH0PiGLofCRyJrGfkAGAsbS3Y/d6K0g3a5CuMDEjy
+         TiGg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAoQTl8+afDXJLRwcLQDhHnMsvdhmD8Z5SSZAjryH75+gaTBFpYOSVXRQ+NraSB0qdaQtVzAZT@vger.kernel.org, AJvYcCXPgJvXsrvByv68w0dKhl417nJ/qHmnkLt3pMzBrmXIqQcxAzsPG526oQlXezIkRIe9+Kmp8KkNb7R8@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzy6b7Nc8z6uoGAjN+DXhoXs7V/wi/3vkUHGIV4zL8WUSp5a72q
+	2b3W/yIb5H/30lJbEs5qPo1XK6w/Xrlg7H5t6N02QB3LRXPV6/QPCCCBChjLIQWwePF1p9ML4YD
+	I77hzVmv17cJU37A5MBwgf6zZmCfFqVt+/9taINlz344=
+X-Gm-Gg: ASbGncvqMztQPiAP2KbJ9FlysQ1X+G7SBWx0fUWZLCVxZyc6/yoqdp2xL11SDGLPTo4
+	I95LrHWbZXk2lIszSrOUw9w0B1wGHhrsptw==
+X-Google-Smtp-Source: AGHT+IG8mnyA5OsLNcMuCdRZpBooTrSm8QVZb1T8OjclK7vmwuAZmrciw2cP6pdsKKkB3Vj4v9MI8sN5Kl52rAI47j4=
+X-Received: by 2002:ad4:5aa9:0:b0:6d8:99cf:77b9 with SMTP id
+ 6a1803df08f44-6d8e71550ebmr164170616d6.19.1733637713623; Sat, 07 Dec 2024
+ 22:01:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1tJ8NR-006L5P-E3@rmk-PC.armlinux.org.uk>
+References: <20241206090328.4758-1-laoar.shao@gmail.com> <20241207173808.5866b5a6@kernel.org>
+In-Reply-To: <20241207173808.5866b5a6@kernel.org>
+From: Yafang Shao <laoar.shao@gmail.com>
+Date: Sun, 8 Dec 2024 14:01:17 +0800
+Message-ID: <CALOAHbCFm6aGm2ZpEBKR2j4cCy8fU0STjmYFOm-fhsH7xmwFUw@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next] net/mlx5e: Report rx_discards_phy via rx_fifo_errors
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: saeedm@nvidia.com, tariqt@nvidia.com, leon@kernel.org, gal@nvidia.com, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	Tariq Toukan <ttoukan.linux@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 05, 2024 at 09:42:29AM +0000, Russell King (Oracle) wrote:
-> Report the PCS in-band capabilities to phylink for the LynxI PCS.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  drivers/net/pcs/pcs-mtk-lynxi.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
-> 
-> diff --git a/drivers/net/pcs/pcs-mtk-lynxi.c b/drivers/net/pcs/pcs-mtk-lynxi.c
-> index 4f63abe638c4..7de804535229 100644
-> --- a/drivers/net/pcs/pcs-mtk-lynxi.c
-> +++ b/drivers/net/pcs/pcs-mtk-lynxi.c
-> @@ -88,6 +88,21 @@ static struct mtk_pcs_lynxi *pcs_to_mtk_pcs_lynxi(struct phylink_pcs *pcs)
->  	return container_of(pcs, struct mtk_pcs_lynxi, pcs);
->  }
->  
-> +static unsigned int mtk_pcs_lynxi_inband_caps(struct phylink_pcs *pcs,
-> +					      phy_interface_t interface)
-> +{
-> +	switch (interface) {
-> +	case PHY_INTERFACE_MODE_1000BASEX:
-> +	case PHY_INTERFACE_MODE_2500BASEX:
-> +	case PHY_INTERFACE_MODE_SGMII:
-> +	case PHY_INTERFACE_MODE_QSGMII:
+On Sun, Dec 8, 2024 at 9:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Fri,  6 Dec 2024 17:03:28 +0800 Yafang Shao wrote:
+> > We observed a high number of rx_discards_phy events on some servers whe=
+n
+> > running `ethtool -S`. However, this important counter is not currently
+> > reflected in the /proc/net/dev statistics file, making it challenging t=
+o
+> > monitor effectively.
+> >
+> > Since rx_fifo_errors represents receive FIFO errors on this network
+> > deivice, it makes sense to include rx_discards_phy in this counter to
+> > enhance monitoring visibility. This change will help administrators tra=
+ck
+> > these events more effectively through standard interfaces.
+>
+> It's not a standard if there is no definition applicable across vendors.
+> Count it as generic rx_dropped.
 
-QSGMII is not supported by this PCS.
+Thank you for your suggestion. I'm okay with counting it as generic
+rx_dropped as long as we have a metric to track it.
+I will send a new version.
 
-Apart from that looks good to me.
-
-Reviewed-by: Daniel Golle <daniel@makrotopia.org>
-
+--
+Regards
+Yafang
 
