@@ -1,100 +1,73 @@
-Return-Path: <netdev+bounces-149943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5F5B9E82FF
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 02:40:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A55C99E8302
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 02:44:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10103281B46
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 01:40:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9746281C92
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 01:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A4F8F77;
-	Sun,  8 Dec 2024 01:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEF29479;
+	Sun,  8 Dec 2024 01:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FsUEyrDI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p1PIfaAe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C814D28F5;
-	Sun,  8 Dec 2024 01:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CD8EAF9;
+	Sun,  8 Dec 2024 01:44:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733622012; cv=none; b=nF+01A3zGnc2KlL0srp1FdOIaGIZ2Z5lExXsJmqORtY980ChhgnZ/xihO8trjBZjgJOvIBEBVqFipbu9Ter1e9v12q2l/d+6d9dCVJXHk0ApNEqYdheYJkDEXO9xnzXd+28TZhXSRwkupW8dyoxxC/RbiuP78oaqLhHeV5DBWZI=
+	t=1733622243; cv=none; b=s6cOfzQ5iw551zBIOFvshUlMuOwmToB64nfS6PRHlmZibuAd79S2I6l9BAKugQftZjKJP6oKlbtPTqshs99JxBDmLYYtecnligDNVxQJ9ds2GOaTFWKW+FacI+teHIZgZyx8+60nu7qYcEEjJCcg7L4XI0YrTSubDL6VYCwFYX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733622012; c=relaxed/simple;
-	bh=VyiblBiYlxn7Uc7Og93Odk9bRuYvCt+pFQYcjLF4aak=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=E5UEwtYeNgb9HQK7v2nPr5quHap9RV6jKMQZzoCHNBRjPxvZ+T19AS/Rao3iUVYObY5tFMDGOwCyDngDlyXMvoqkcmmQff+95GZ9m3N7oQKoMg8WivrRk5kBZIzxx31PCW3+Wlsi86KZbdmB34hF3fm3fdaWHM3BB12oCk8mVo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FsUEyrDI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 455B2C4CECD;
-	Sun,  8 Dec 2024 01:40:12 +0000 (UTC)
+	s=arc-20240116; t=1733622243; c=relaxed/simple;
+	bh=adzW/ONnxxZsPDe+0bRS9bkgHglN5PsSpguw+KNch/4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qE/5g75JWTQ2TgS2PJoYvCshpeWd5IuFP4zRrbxdvRm/tzOT+gakx4U+bSp8zIMl7vU/BtXfwfz5n0eYdA+ORsX7Tkndnzvql+OXzEtpwFEX/W/HnOtA09XiB/BwxN9p/MOHK7JLDCjEBVqhkS9PFUqQg9eVYR+1/m5QODnetus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p1PIfaAe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F2CFC4CECD;
+	Sun,  8 Dec 2024 01:44:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733622012;
-	bh=VyiblBiYlxn7Uc7Og93Odk9bRuYvCt+pFQYcjLF4aak=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FsUEyrDIc2ScY6FxH2CjAQDZ4naGABhNjTw5cFRzwDX6PCnQREtJYZKyrNLnHQS8k
-	 wbFY7pli1+pGibZtL2W6TgPNrZbNCEtdfj3Pjt9rhKB9TDteEZ7vxK4wsPXFCpOjX/
-	 0C2v/QAmDU90Sk850SOcKn63o1MZyzuK1w/snlL3GTKH7R5Vx5ARDHVgi9P6+Qns5a
-	 f70ZQhrXO4PrDl2VEM858n6PF3TjNcMzKZror2MJyq4L0+M4KehUnsMIP4g3POK2FQ
-	 STQbj27fCQxX9IasnwAoWofeBs5pgSa4UyoJ+vmskbwIWWMo+1hfFrzCpeDnWFlTtH
-	 mVnjehQ56KCaA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE941380A95D;
-	Sun,  8 Dec 2024 01:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1733622242;
+	bh=adzW/ONnxxZsPDe+0bRS9bkgHglN5PsSpguw+KNch/4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=p1PIfaAeRHH2a5jH2y7YrUaad3VbF8sabotjLihJ7ifOZd9TnvT9Wij2q1tAjqE6j
+	 THkTJrfpvyOLDBTpMoQ/axHTyqQ3bvS2vmiOyRpDmiqq+Oj2Fd5Mv+jV90Cy5d3Vuv
+	 qo3brKicnq/Idetvs3P21tDvPWtLr4N3rRg3MSUuOCsgX2h2ldtBkIF/7U5WF1OblS
+	 hSbO9qe+CrrAZJfDTO0TgVsS6nvrFZnHegThlX7tPnssivr6Rs0zkib2Gw5C1SpcgL
+	 iWBPFkSARHI7HtxoHJ2Sswy5igeUpC21k2lWQzCSHinMZ+1VPOomJ22b+QyWtbJqNc
+	 e9pDJGmgvCHMw==
+Date: Sat, 7 Dec 2024 17:44:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stas Sergeev <stsp2@yandex.ru>
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] tun: fix group permission check
+Message-ID: <20241207174400.6acdd88f@kernel.org>
+In-Reply-To: <20241205073614.294773-1-stsp2@yandex.ru>
+References: <20241205073614.294773-1-stsp2@yandex.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: stmmac: fix TSO DMA API usage causing oops
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173362202750.3128634.12775021527593555165.git-patchwork-notify@kernel.org>
-Date: Sun, 08 Dec 2024 01:40:27 +0000
-References: <E1tJXcx-006N4Z-PC@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1tJXcx-006N4Z-PC@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- andrew+netdev@lunn.ch, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, xfr@outlook.com, 0x1207@gmail.com,
- jonathanh@nvidia.com, thierry.reding@gmail.com, horms@kernel.org,
- hkelam@marvell.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 06 Dec 2024 12:40:11 +0000 you wrote:
-> Commit 66600fac7a98 ("net: stmmac: TSO: Fix unbalanced DMA map/unmap
-> for non-paged SKB data") moved the assignment of tx_skbuff_dma[]'s
-> members to be later in stmmac_tso_xmit().
+On Thu,  5 Dec 2024 10:36:14 +0300 Stas Sergeev wrote:
+> Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
 > 
-> The buf (dma cookie) and len stored in this structure are passed to
-> dma_unmap_single() by stmmac_tx_clean(). The DMA API requires that
-> the dma cookie passed to dma_unmap_single() is the same as the value
-> returned from dma_map_single(). However, by moving the assignment
-> later, this is not the case when priv->dma_cap.addr64 > 32 as "des"
-> is offset by proto_hdr_len.
-> 
-> [...]
+> CC: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 
-Here is the summary with links:
-  - [net] net: stmmac: fix TSO DMA API usage causing oops
-    https://git.kernel.org/netdev/net/c/4c49f38e20a5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Please avoid empty lines in the future.
+I personally put a --- line between SOB and the CCs.
+That way git am discards the CCs when patch is applied.
 
