@@ -1,60 +1,57 @@
-Return-Path: <netdev+bounces-149957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B46CB9E832A
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 03:41:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60E079E832C
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 03:43:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A61EE1650A0
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 02:41:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5087E1622A7
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 02:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B8C1B960;
-	Sun,  8 Dec 2024 02:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE671CF9B;
+	Sun,  8 Dec 2024 02:43:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tlY5HEZ0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EuQf7pCF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874D222C6E8;
-	Sun,  8 Dec 2024 02:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3FA1B960
+	for <netdev@vger.kernel.org>; Sun,  8 Dec 2024 02:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733625679; cv=none; b=Adw08lvH6w7nKHGbGuqXmLfR3hWh0bnLXZxFu0QbDJm/1GyxbI/S9IOXEHygc0pj1m/x6IeHhUrxM4jIGDn+9Cn4R8ZF5Mqiew1gdTz6E21pdsCVWLBVutWUyY4jSvelcYrta6RXRwLVZI0xKBEWn0CEhx+9vpBTYN43gQ+oWvg=
+	t=1733625835; cv=none; b=KidR4+x8lOCcXED8HRdYfwlVQtx8Qcm8YfEc8enjOwYF1WP5GbenjEFtNk6Li8Y3dppEPSB2vM4UCfDbnIgxHwqk060vyXGCdWRzWCZpstEdqq2z/JPL/Amgq3zdnhqx0jGe57x3Xs2pte7jc8dZjAcYAH6O0SX1nJmp92/4X48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733625679; c=relaxed/simple;
-	bh=cuSBYLZSLuOzhNh5PpSSHcTfcMTle0+dccMUL5XVxTw=;
+	s=arc-20240116; t=1733625835; c=relaxed/simple;
+	bh=HSCzG3w85/vDQDIPfd9TLNOBKR4D6vnGpttqchgottg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PvEm0gH8Vu9qa1+jgoT6UTqRJPrD0ej4FaIEQIp2fhJDnUCJ+h1BAmOU/eP/OBTrC0GxTTyT+hmAcB80VWW3iF8mAe8M8YWpJIzKpVAOTivdfLCXvdLvRnpIDzixALAPwWbt+MEUhhCvO5aRxm5vD591Qy45MzukOQyH/WbS6Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tlY5HEZ0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97A4CC4CECD;
-	Sun,  8 Dec 2024 02:41:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jJ64geYSBI2PdNuAjSf45yHXxQi6LzzQI9JuM+bv34GOQnzsGaulIfr8dhdAart/2REYO0+dJftv6mh4cxPR8w1i32qaiWxhE4Kd3ItcNaEnBi+GSHWifjiUSQDp530cPx/+zLu9Y05C7eBAY1Qb5PuqTRAcKdbovj3DzpbQbU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EuQf7pCF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 244FCC4CECD;
+	Sun,  8 Dec 2024 02:43:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733625679;
-	bh=cuSBYLZSLuOzhNh5PpSSHcTfcMTle0+dccMUL5XVxTw=;
+	s=k20201202; t=1733625833;
+	bh=HSCzG3w85/vDQDIPfd9TLNOBKR4D6vnGpttqchgottg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tlY5HEZ0F+63zCGjbA5acwUyHAvS3GDgVD2G9wFr3ZGKtAIAhXppINeL2JJJt0gKi
-	 +u8JSzg8XONjs97irbXbWSktzQZufJXqkTuu98lTHWK2XaFAUXzXXjL9KU9FmhE/MG
-	 BY1iWdwnBSRjDdDDAnuFN/roXV0pN94GEI5X2MRriAfuaoHBvKjDoAgJWkCApNmBGt
-	 zK72tzTbvNq7ZuwTiCrbmpQFU3e7yCXMnTWkuRmFz0BQ2MYNMiu+2RIp+0RrRa+Ta8
-	 XlavohMJwU6caidYDxJALegEpq6wFNIfaXysy//FCUyjt0nqDA3b8BhUcJgObWERDO
-	 Sa0zqEYWG+Oeg==
-Date: Sat, 7 Dec 2024 18:41:17 -0800
+	b=EuQf7pCFz2UmzlQ7DlthVMGIteaHu82Ug9n5ARYXW9GGZV7hf6bCXF751vy2MLe9C
+	 WHAmnK3yDYSHkxzt8S68xVkbodlGsZR9xmi5AyMHeLv/qC+/oGMxnZzjGlsvy1DtNp
+	 sXIrd/sBS3pEhSV+lIUZtfW6kf2dRiaSvsDoHxnyS16NmVCLiKX7MVf0GiAKhlKIJZ
+	 RAaqUAaeF4028itxakOCzRFt47pfVZZyc4G3wUw2HOlxpvd7kj+FU0eNLY0iRtbaOu
+	 30CK+mf/uASjYWq3/39QXSo+/URReUM+/9HS9udGn9g8DKTZh0xHRh1y4CjPhElBXk
+	 HCY6J8GJkY0kQ==
+Date: Sat, 7 Dec 2024 18:43:52 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Sai Krishna <saikrishnag@marvell.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <sgoutham@marvell.com>, <gakula@marvell.com>, <lcherian@marvell.com>,
- <jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
- <andrew+netdev@lunn.ch>, <kalesh-anakkur.purayil@broadcom.com>
-Subject: Re: [net-next PATCH v5 2/6] octeontx2-af: CN20k basic mbox
- operations and structures
-Message-ID: <20241207184117.4ec188c7@kernel.org>
-In-Reply-To: <20241204140821.1858263-3-saikrishnag@marvell.com>
-References: <20241204140821.1858263-1-saikrishnag@marvell.com>
-	<20241204140821.1858263-3-saikrishnag@marvell.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira
+ <victor@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH v2 net-next] net_sched: sch_fq: add three drop_reason
+Message-ID: <20241207184352.512e5971@kernel.org>
+In-Reply-To: <20241204171950.89829-1-edumazet@google.com>
+References: <20241204171950.89829-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,16 +61,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 4 Dec 2024 19:38:17 +0530 Sai Krishna wrote:
-> -	ret = request_irq(pci_irq_vector(rvu->pdev, RVU_AF_INT_VEC_MBOX),
-> -			  rvu_mbox_pf_intr_handler, 0,
-> -			  &rvu->irq_name[RVU_AF_INT_VEC_MBOX * NAME_SIZE], rvu);
-> +	ret = request_irq(pci_irq_vector
-> +			  (rvu->pdev, RVU_AF_INT_VEC_MBOX),
-> +			  rvu->ng_rvu->rvu_mbox_ops->pf_intr_handler, 0,
-> +			  &rvu->irq_name[RVU_AF_INT_VEC_MBOX *
-> +			  NAME_SIZE], rvu);
+On Wed,  4 Dec 2024 17:19:50 +0000 Eric Dumazet wrote:
+> Add three new drop_reason, more precise than generic QDISC_DROP:
 
-You're breaking these lines in very strange way. AFAICT they fit in 
-80 chars.
+FTR I applied this a while back, thanks!
+-- 
+pw-bot: accept
 
