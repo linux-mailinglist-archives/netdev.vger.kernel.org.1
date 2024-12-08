@@ -1,116 +1,90 @@
-Return-Path: <netdev+bounces-149961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB6D9E83BC
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 07:02:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 551C59E8413
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 07:54:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E75881884850
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 06:01:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FF88165754
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 06:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D3C8467;
-	Sun,  8 Dec 2024 06:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6809460DCF;
+	Sun,  8 Dec 2024 06:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="agbI5ClW"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="N5xT1YQQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward500b.mail.yandex.net (forward500b.mail.yandex.net [178.154.239.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30FD22097;
-	Sun,  8 Dec 2024 06:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7118E9460;
+	Sun,  8 Dec 2024 06:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733637716; cv=none; b=ZY4Ia8LG65QuYvE2QV8jfPBKfBHkkWJfpG0Rwrpj/sgiZxJzkWT3+86b9bv39TloubQvnbTXkVgTI68GI3jBp64R7GuFQZHru1a+sBaOM5D6y4eS4ccTMethxAer5hrWStX6evjCGhqycEmPgGWZHo5QDCvREUsxIgBieLmK2xA=
+	t=1733640836; cv=none; b=sx7pN/FRzszvRrQG9fAgrqBt7HJCRGHIoDic5vlB00n7/l6tue3XQe4V8fgN3HEazAU5vmNmwaxlBPJwi54lVecFy7Z0o14C5fW6SA+GqvE2sYmbSFDYK3BRHNdoo/WNMjlBjXMJ/3zud9kagAHE3eDt61ZXt9+bWH7jaYT4w8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733637716; c=relaxed/simple;
-	bh=oArNqQjCYhIE6H9hZlL4MTeNNdbP0UX/oKnqFDBeM5c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hAYQdmKPcD7hCXCNN1AAUoa6vJwmWUy1NkUg4aCgvYVOujvHd5LCEiCnl8Y0rA2wxIRZfZVNFh8UBapKg5rHrGCy1YZ6HbjIUg1hp/GFwxmHXXAPsFyaZdtLINIFOOmQrMLIAk8166GFCbdFVKUGFiiSYC+PEgTYEjTQtzoJoRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=agbI5ClW; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6d8edbd1a3bso13813146d6.3;
-        Sat, 07 Dec 2024 22:01:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733637713; x=1734242513; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lKZLZ56sRa1nZcH20SLwc98Zabb6zi61xg0ECzpB+68=;
-        b=agbI5ClWzGF1KIpWcq2Qv+3jz5LC+OLJ5QrFXoNDvyTFHBsNolASIYTGkTX3acaHkx
-         G3aVPa0OIxNEuGh6GpzUZ9loljnIOV4tjH8j7/Fi3LhDwgJ8r0HHjYmJ4zfMPgYduyG5
-         9ewa+w/4J+zLIb3Hq3PrO7xgfs3TXSv/2PUJ69qakF88Tb6YLlMs0sjwUknk0AbuM/2B
-         xeMCEQh3WzyYD7Ku+dCQzIGkZug1w1cjSr3OPNk1dcbojIbzNz5I/oY3sSM88cPYsuiJ
-         tmK1fiKBG6KBYMI7pOAXEawKyVdRdoyQ0yG9gkvyzyFgN69stUzDdVFMM+XFez3bMrov
-         sSIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733637713; x=1734242513;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lKZLZ56sRa1nZcH20SLwc98Zabb6zi61xg0ECzpB+68=;
-        b=SXG6LCff0wSV1Q8bHInLSnuNAWW7O0Ei4Mdba61jT4pWTyd6clCa/fxGnV2dfkvYLH
-         VTawIC4Du06+SvWTtEfPxZd4WygeOQHjSWIJv+Eb6jHY6zm/wXjsyQfNXIuPk0QqqNx6
-         UOG6YwEkj61m/IfcgrRxSNhZhRYl3xLOMvfeupKroVeckc7kQ03WZL7xzZx2op819Q9P
-         syEosg43A6gS734KnSiofRuia7yoAjzBpBtus3nmcDcSQxp8aau++wHugEuUAasBOu42
-         UB9eBRzjNfPU/W5TB6XXub0jEIEQH0PiGLofCRyJrGfkAGAsbS3Y/d6K0g3a5CuMDEjy
-         TiGg==
-X-Forwarded-Encrypted: i=1; AJvYcCUAoQTl8+afDXJLRwcLQDhHnMsvdhmD8Z5SSZAjryH75+gaTBFpYOSVXRQ+NraSB0qdaQtVzAZT@vger.kernel.org, AJvYcCXPgJvXsrvByv68w0dKhl417nJ/qHmnkLt3pMzBrmXIqQcxAzsPG526oQlXezIkRIe9+Kmp8KkNb7R8@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzy6b7Nc8z6uoGAjN+DXhoXs7V/wi/3vkUHGIV4zL8WUSp5a72q
-	2b3W/yIb5H/30lJbEs5qPo1XK6w/Xrlg7H5t6N02QB3LRXPV6/QPCCCBChjLIQWwePF1p9ML4YD
-	I77hzVmv17cJU37A5MBwgf6zZmCfFqVt+/9taINlz344=
-X-Gm-Gg: ASbGncvqMztQPiAP2KbJ9FlysQ1X+G7SBWx0fUWZLCVxZyc6/yoqdp2xL11SDGLPTo4
-	I95LrHWbZXk2lIszSrOUw9w0B1wGHhrsptw==
-X-Google-Smtp-Source: AGHT+IG8mnyA5OsLNcMuCdRZpBooTrSm8QVZb1T8OjclK7vmwuAZmrciw2cP6pdsKKkB3Vj4v9MI8sN5Kl52rAI47j4=
-X-Received: by 2002:ad4:5aa9:0:b0:6d8:99cf:77b9 with SMTP id
- 6a1803df08f44-6d8e71550ebmr164170616d6.19.1733637713623; Sat, 07 Dec 2024
- 22:01:53 -0800 (PST)
+	s=arc-20240116; t=1733640836; c=relaxed/simple;
+	bh=oOWHOofsVhYOFM4kFzLpemQtHZHcElqZQXZNe1xRZc8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xe6VGsMFncD6UGl8nH7r7TS4k0ldp+t2jz2DEXfXZcJbaEfjLueRA89SZYJaEyhhDauNIWMcEg7ffPt9ZofmeR3WZVR/v7LaGfRsY99tz/1sPo5QoRnnG8tFtoWNP+gQYoIVePKU2inuDiiMSwq65U4V9M5xfjhRX5rofQlq2uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=N5xT1YQQ; arc=none smtp.client-ip=178.154.239.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-91.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-91.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:b908:0:640:4447:0])
+	by forward500b.mail.yandex.net (Yandex) with ESMTPS id 5076861022;
+	Sun,  8 Dec 2024 09:53:43 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-91.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id erdFpRDOjmI0-TPTyuotn;
+	Sun, 08 Dec 2024 09:53:42 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1733640822; bh=04/FAibtAp8X23ilLM7jhLcfh4M/7cinEjda/eZanaE=;
+	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
+	b=N5xT1YQQmy8wfsSNk/b+vG0v0f9B1rxIWWfLgdLnlesAdSK0L3GDjr1ViJztqd1/6
+	 OhEodt+1BFffqoekiCtJdBBYpX+xrGYkN5biZZwf3CrHIDMkLCqdxOEE9ko4Q2wSLk
+	 7zwBtfHxnahYBXotn4JBcjaJqCksk3+zzLIOk33A=
+Authentication-Results: mail-nwsmtp-smtp-production-main-91.iva.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <062ab380-ee73-45ad-9519-e71bb3059c13@yandex.ru>
+Date: Sun, 8 Dec 2024 09:53:40 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241206090328.4758-1-laoar.shao@gmail.com> <20241207173808.5866b5a6@kernel.org>
-In-Reply-To: <20241207173808.5866b5a6@kernel.org>
-From: Yafang Shao <laoar.shao@gmail.com>
-Date: Sun, 8 Dec 2024 14:01:17 +0800
-Message-ID: <CALOAHbCFm6aGm2ZpEBKR2j4cCy8fU0STjmYFOm-fhsH7xmwFUw@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next] net/mlx5e: Report rx_discards_phy via rx_fifo_errors
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] tun: fix group permission check
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: saeedm@nvidia.com, tariqt@nvidia.com, leon@kernel.org, gal@nvidia.com, 
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	Tariq Toukan <ttoukan.linux@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+References: <20241205073614.294773-1-stsp2@yandex.ru>
+ <20241207174400.6acdd88f@kernel.org>
+Content-Language: en-US
+From: stsp <stsp2@yandex.ru>
+In-Reply-To: <20241207174400.6acdd88f@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, Dec 8, 2024 at 9:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+08.12.2024 04:44, Jakub Kicinski пишет:
+> On Thu,  5 Dec 2024 10:36:14 +0300 Stas Sergeev wrote:
+>> Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
+>>
+>> CC: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> Please avoid empty lines in the future.
+
+Ok.
+
+> I personally put a --- line between SOB and the CCs.
+> That way git am discards the CCs when patch is applied.
 >
-> On Fri,  6 Dec 2024 17:03:28 +0800 Yafang Shao wrote:
-> > We observed a high number of rx_discards_phy events on some servers whe=
-n
-> > running `ethtool -S`. However, this important counter is not currently
-> > reflected in the /proc/net/dev statistics file, making it challenging t=
-o
-> > monitor effectively.
-> >
-> > Since rx_fifo_errors represents receive FIFO errors on this network
-> > deivice, it makes sense to include rx_discards_phy in this counter to
-> > enhance monitoring visibility. This change will help administrators tra=
-ck
-> > these events more effectively through standard interfaces.
->
-> It's not a standard if there is no definition applicable across vendors.
-> Count it as generic rx_dropped.
+I simply used the output of
+get_maintainer.pl and copy/pasted
+it directly to commit msg.
+After doing so, git format-patch
+would put --- after CCs.
+How to do that properly?
 
-Thank you for your suggestion. I'm okay with counting it as generic
-rx_dropped as long as we have a metric to track it.
-I will send a new version.
-
---
-Regards
-Yafang
 
