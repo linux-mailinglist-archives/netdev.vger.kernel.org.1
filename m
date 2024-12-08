@@ -1,276 +1,191 @@
-Return-Path: <netdev+bounces-149990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7B169E86AC
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 17:45:03 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD299E86CD
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 17:59:44 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1EE52812D7
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 16:45:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BECEF188532B
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 16:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2566A1714C8;
-	Sun,  8 Dec 2024 16:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4549187862;
+	Sun,  8 Dec 2024 16:59:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="AOnJoTG9"
 X-Original-To: netdev@vger.kernel.org
-Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08BC2170A15
-	for <netdev@vger.kernel.org>; Sun,  8 Dec 2024 16:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F299418732C
+	for <netdev@vger.kernel.org>; Sun,  8 Dec 2024 16:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733676300; cv=none; b=EZ1kjo67tOgFSSCahxnUkrhbXDfrvu/QZOBk+ZoQx3DKLJ582te94LuIRAZvlHIihy6yMSSnM04I7g5nVZJImDdMW1ajxpEB17FV4oT4SzTJq+YDApQ2FgTh35iWTiXHu1zilhyS0JPXojkU+b+TO/IDnk/8VA//ZOsM05vfLuw=
+	t=1733677176; cv=none; b=mizkFMjhtUou2AOXQsvQvCDJA0PpzpC3BJbx1oYNE4Y+S6xLUmQQ5jdicnlybCMsxjopAitsMNw8IXVAsUJCYqnjTjR+fHdxfAfzADJDR6kDprm1J36MM3OnXCnV8pQ0lpubub9+aWY8s/VQaRXmqXR2On6VoYppKOx75hx45TQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733676300; c=relaxed/simple;
-	bh=jfmjm3q+zevgUeK5fiLyJHXsMDYr2AHDgEVT6cN9f14=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iqEt/rc+23sR7uQtDDtl9a1UOC+1xU6tbmwtdSiOzCXLVS6HDB7kVeRSjONOoE4N9bfP2IVHBc8u1svsnBwZA6opcd5WswEO6odWUhKJe3uJRpl8xvgNtStF+jWF8/tB0EabFCXQnV/Yf08sWAglU76jNXvKWb0b7FIuzKDFpeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
-Received: from mail-relay (helo=jo-so.de)
-	by s1.jo-so.de with local-bsmtp (Exim 4.96)
-	(envelope-from <joerg@jo-so.de>)
-	id 1tKKOo-000vlE-0H;
-	Sun, 08 Dec 2024 17:44:50 +0100
-Received: from joerg by zenbook.jo-so.de with local (Exim 4.98)
-	(envelope-from <joerg@jo-so.de>)
-	id 1tKKOn-000000016DP-1uqb;
-	Sun, 08 Dec 2024 17:44:49 +0100
-Date: Sun, 8 Dec 2024 17:44:49 +0100
-From: =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
-To: Christian Eggers <ceggers@arri.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
-Subject: Re: KSZ8795 not detected at start to boot from NFS
-Message-ID: <zhuujdhxrquhi4u6n25rryx3yw3lm2ceuijcwjmnrr4awt4ys4@53wh2fqxnd6w>
-OpenPGP: id=7D2C9A23D1AEA375; url=https://jo-so.de/pgp-key.txt;
- preference=signencrypt
-References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
- <a578b29f-53f0-4e33-91a4-3932fa759cd1@lunn.ch>
- <phab74r5xxbufhe6llruqa3tgkxzalytgzqrko4o2bg2xzizjv@apha3we342xn>
- <7080052.9J7NaK4W3v@n9w6sw14>
+	s=arc-20240116; t=1733677176; c=relaxed/simple;
+	bh=azq1B8QuNnX4C8HwV3S96dnhxIhN0sy//FVR989QCMw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OCQ3O8FSsiwctdCJSFJaMIieFa0IQPVT+eLWowStHGyKikgB6I9Uo4oDfASVDToxTO9fhlE3HQR5bFXYKnASYal1MJL3MR91fUx60RsrPY0S+GOAnafYY58Jt0apzx+m+gATqW1COuHAzcWGYl2yWPllpTZy/Ojs3L/ltsFxnHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com; spf=pass smtp.mailfrom=amarulasolutions.com; dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b=AOnJoTG9; arc=none smtp.client-ip=209.85.219.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amarulasolutions.com
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e3982e9278bso3659978276.2
+        for <netdev@vger.kernel.org>; Sun, 08 Dec 2024 08:59:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amarulasolutions.com; s=google; t=1733677174; x=1734281974; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AlFfwVqRXK/paRpbQAVFV3F3tMqaWvPJwZQA+19pyHg=;
+        b=AOnJoTG9p2WTiuOX21wG2tfNrHtxElmyUm8i+ieHRJ877b+Fp4/uY74Jyli20N0Dv2
+         KB2Abi53ZVGJznrbhvACI9+nc9YfnO5Mqwrktp6iQjwndUPBT4Tguv+SKN7/trb0QjPK
+         s8TBQfnQqPn06STQn1EJY7t+QPan58cMwgv9E=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733677174; x=1734281974;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AlFfwVqRXK/paRpbQAVFV3F3tMqaWvPJwZQA+19pyHg=;
+        b=bvVKgH5mhazz0nwMhc1czDcq9q+rGu2hApEbwlrgYCUvEClJ20lIBCsG8XCYxkDTrH
+         WPUMtNRXq709RmtY6O1BQlGCIceL2FjKvun15qaP48UecG5sNeGW2zS4EhMLn5Kdv4i2
+         OFFKHsLV0tLkUZlHgEWXi4r4JFSlCg2W4nkU9G2oxYOFnKDIKfy3QRbfyzD5tppB0wyr
+         jWFZtBelltU1YhS61UCWN3tg4hjAnYx+I/WyJVsfokzwET88r3LmOaZweahz82XPgzKO
+         wrIfxc8SDmx9d05efM+utpUTPPRvJZH+jhFsstZV9cYQ/b3qBJkJNCkgPWZkhhu2N/ev
+         pTzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHY1kTveS3w6eLsAQMvrkyW5vT/H8Or0JzeXeIGF8QjMXUlzpm5W1Z8oS87J+haGmDhuwhFiQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnZzxo9a5O6hlSx7L8M3kzzVWE7ltbt3hht680+OqSgmDt4Fsj
+	7Esf0DY9Enubt+JpmLPF4pjfT+NYtZFv15/kGfGOHEEJ7I7Ho1drYSln85DTmpgtGrSauVn6Tj4
+	FMxc88Cmlg+AmTa4jeoQqLbPA5mJovVKQljn7CQ==
+X-Gm-Gg: ASbGncsEl7qGSYIpwtBeHvSRj/fo9QBBdGLynVbbxvLQ2Nc0N342bKoRNjNa6F9a0kI
+	6nB8LEEyes87w9zBkXCfka5Yw+daY
+X-Google-Smtp-Source: AGHT+IHc2fwFI+591nR9iKIG3YHjGTjB6Bxuk5sHYVwNbNdHEzV9blLi8vqQvdYTmxx4bc63U1c9ZKmKAJezuz8XeJ8=
+X-Received: by 2002:a05:6902:268a:b0:e39:6c6a:f2da with SMTP id
+ 3f1490d57ef6-e3a0b0b6415mr8620220276.19.1733677173884; Sun, 08 Dec 2024
+ 08:59:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="7agv62ph3h65dp3d"
-Content-Disposition: inline
-In-Reply-To: <7080052.9J7NaK4W3v@n9w6sw14>
-
-
---7agv62ph3h65dp3d
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
+References: <20241029114622.2989827-1-dario.binacchi@amarulasolutions.com>
+In-Reply-To: <20241029114622.2989827-1-dario.binacchi@amarulasolutions.com>
+From: Dario Binacchi <dario.binacchi@amarulasolutions.com>
+Date: Sun, 8 Dec 2024 17:59:23 +0100
+Message-ID: <CABGWkvp=VdpOUGdHep8E6p8C+gFGsZyhMEtcjkx-zNaG-X_r3g@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 0/6] Add helpers for stats and error frames
+To: linux-kernel@vger.kernel.org
+Cc: linux-amarula@amarulasolutions.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Frank Li <Frank.Li@nxp.com>, 
+	Gal Pressman <gal@nvidia.com>, Haibo Chen <haibo.chen@nxp.com>, Han Xu <han.xu@nxp.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Kory Maincent <kory.maincent@bootlin.com>, 
+	Marc Kleine-Budde <mkl@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>, 
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Rob Herring <robh@kernel.org>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Shannon Nelson <shannon.nelson@amd.com>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: KSZ8795 not detected at start to boot from NFS
-MIME-Version: 1.0
 
-Hi Christian,
+On Tue, Oct 29, 2024 at 12:46=E2=80=AFPM Dario Binacchi
+<dario.binacchi@amarulasolutions.com> wrote:
+>
+> This series originates from some tests I ran on a CAN communication for
+> one of my clients that reports sporadic errors. After enabling BERR
+> reporting, I was surprised that the command:
+>
+> ip -details -statistics link show can0
+>
+> did not display the occurrence of different types of errors, but only the
+> generic ones for reception and transmission. In trying to export this
+> information, I felt that the code related to managing statistics and hand=
+ling
+> CAN errors (CRC, STUF, BIT, ACK, and FORM) was quite duplicated in the
+> implementation of various drivers, and there wasn't a generic function li=
+ke
+> in the case of state changes (i. e. can_change_state). This led to the id=
+ea
+> of adding can_update_bus_error_stats() and the helpers for setting up the
+> CAN error frame.
+>
+> Regarding patch 5/6 ("can: netlink: extend stats to the error types (ack,
+> CRC, form, ..."), I ran
+>
+> ./scripts/check-uapi.sh
+>
+> which found
+>
+> "error - 1/934 UAPI headers compatible with x86 appear _not_ to be backwa=
+rds
+> compatible."
+>
+> I included it in the series because I am currently interested in understa=
+nding
+> whether the idea behind each of the submitted patches makes sense, and I =
+can
+> adjust them later if the response is positive, following your suggestions=
+.
+>
+> Changes in v3:
+> - Drop double assignement of "priv" variable.
+> - Check "dev" parameter is not NULL.
+> - Drop the check of "cf" parameter not NULL
+>
+> Changes in v2:
+> - Replace macros with static inline functions
+> - Update the commit message
+> - Replace the macros with static inline funcions calls.
+> - Update the commit message
+>
+> Dario Binacchi (6):
+>   can: dev: add generic function can_update_bus_error_stats()
+>   can: flexcan: use can_update_bus_error_stats()
+>   can: dev: add helpers to setup an error frame
+>   can: flexcan: use helpers to setup the error frame
+>   can: netlink: extend stats to the error types (ack, CRC, form, ...)
+>   can: dev: update the error types stats (ack, CRC, form, ...)
+>
+>  drivers/net/can/dev/dev.c              | 45 ++++++++++++++++++++++++++
+>  drivers/net/can/flexcan/flexcan-core.c | 29 +++++------------
+>  include/linux/can/dev.h                | 38 ++++++++++++++++++++++
+>  include/uapi/linux/can/netlink.h       |  6 ++++
+>  4 files changed, 97 insertions(+), 21 deletions(-)
+>
+> --
+> 2.43.0
+>
 
-Christian Eggers schrieb am Sa 07. Dez, 23:44 (+0100):
-> On Saturday, 7 December 2024, 21:47:31 CET, Andrew Lunn wrote:
-> > What i don't understand from your description is why:
-> >=20
-> > > +       /* setup spi */
-> > > +       spi->mode =3D SPI_MODE_3;
-> > > +       ret =3D spi_setup(spi);
-> > > +       if (ret)
-> > > +               return ret;
-> > > +
-> >=20
-> > is causing this issue. Is spi_setup() failing?
->=20
-> On Saturday, 7 December 2024, 22:07:23 CET, J=C3=B6rg Sommer wrote:
->=20
-> > I've added another dev_err() after the spi_setup:
-> >=20
-> > [    1.680516] ksz8795-switch spi0.1: ksz8795_spi_probe:55: ret of spi_=
-setup=3D0
-> > [    1.819194] ksz8795-switch spi0.1: ksz8795_spi_probe:61: ret=3D-22#
->=20
-> It doesn't look so.
->=20
-> @J=C3=B6rg. You didn't explicitly mention which kernel version you are tr=
-ying to run.
+A gentle ping to remind you of this series.
 
-I've checked out 8c4599f49841dd663402ec52325dc2233add1d32. But I also have
-to apply the commits 1aa4ee0ec7fe929bd46ae20d9457f0a242115643
-ba6e5af621ab2fb4cd4acb37d4914c832991689c
-f19d8dfad67b641af274a9a317a12f31c430e254, because 5.10 doesn't work without
-them, too, and they where added somewhere in 5.10.223.
+Could this series or some of its patches make sense to consider?
+IMHO, if all the controllers indicate the type of error, I would expect
+the user space to be aware of it as well.
+Or is there something I might be missing?
 
-=46rom 5.10 with these additionally changes I started and found 8c4599.
+Thanks and regards,
+Dario
 
-
-> Maybe the -EINVAL comes from line 414:
->=20
->     if (dev->dev_ops->detect(dev))
->         return -EINVAL;
->=20
-> But this is only a guess.
-
-You're right.
-
-[    1.678236] ksz8795-switch spi0.1: ksz8795_spi_probe:53: spi->mode=3D0 b=
-efore SPI_MODE_3=3D3
-[    1.686754] ksz8795-switch spi0.1: ksz8795_spi_probe:56: spi_setup()=3D0
-[    1.817017] ksz8795-switch spi0.1: ksz8795_switch_detect:1151: id1=3D0 <=
-> FAMILY_ID=3D135, id2=3D0 <> CHIP_ID_94=3D96 && CHIP_ID_95=3D144
-[    1.828812] ksz8795-switch spi0.1: ksz_switch_register:415: dev->dev_ops=
-->detect()c037e47c=3D-19
-[    1.837609] ksz8795-switch spi0.1: ksz8795_spi_probe:62: ksz8795_switch_=
-register()=3D-22
-[    1.845909] spi_davinci 1f0e000.spi: Controller at 0x(ptrval)
-=E2=80=A6
-[    1.969734] ksz8795-switch spi0.1: ksz8795_spi_probe:53: spi->mode=3D3 b=
-efore SPI_MODE_3=3D3
-[    1.978309] ksz8795-switch spi0.1: ksz8795_spi_probe:56: spi_setup()=3D0
-[    2.117906] ksz8795-switch spi0.1: ksz8795_spi_probe:62: ksz8795_switch_=
-register()=3D-517
-[    2.127235] ksz8795-switch spi0.1: ksz8795_spi_probe:53: spi->mode=3D3 b=
-efore SPI_MODE_3=3D3
-[    2.135427] ksz8795-switch spi0.1: ksz8795_spi_probe:56: spi_setup()=3D0
-[    2.267825] ksz8795-switch spi0.1: ksz8795_spi_probe:62: ksz8795_switch_=
-register()=3D-517
-[    2.281336] davinci_emac 1e20000.ethernet: incompatible machine/device t=
-ype for reading mac address
-[    2.294928] ksz8795-switch spi0.1: ksz8795_spi_probe:53: spi->mode=3D3 b=
-efore SPI_MODE_3=3D3
-[    2.305365] ksz8795-switch spi0.1: ksz8795_spi_probe:56: spi_setup()=3D0
-[    2.954286] random: crng init done
-[    3.174408] libphy: dsa slave smi: probed
-[    3.180666] ksz8795-switch spi0.1 lan-x1 (uninitialized): PHY [dsa-0.0:0=
-0] driver [Generic PHY] (irq=3DPOLL)
-
-This is my setting:
-
-git reset --hard 8c4599f49841dd663402ec52325dc2233add1d32
-git cherry-pick -n \
-  1aa4ee0ec7fe929bd46ae20d9457f0a242115643 \
-  f365d53c868725c472d515fa1ce4f57d0eaff5ae \
-  ba6e5af621ab2fb4cd4acb37d4914c832991689c \
-  f19d8dfad67b641af274a9a317a12f31c430e254
-git apply -p0 --ignore-whitespace <<__EOF
-diff --git drivers/net/dsa/microchip/ksz8795.c drivers/net/dsa/microchip/ks=
-z8795.c
-index 1e101ab56cea..4c9f27a061c1 100644
---- drivers/net/dsa/microchip/ksz8795.c
-+++ drivers/net/dsa/microchip/ksz8795.c
-@@ -1147,8 +1147,11 @@ static int ksz8795_switch_detect(struct ksz_device *=
-dev)
-        id1 =3D id16 >> 8;
-        id2 =3D id16 & SW_CHIP_ID_M;
-        if (id1 !=3D FAMILY_ID ||
--           (id2 !=3D CHIP_ID_94 && id2 !=3D CHIP_ID_95))
-+           (id2 !=3D CHIP_ID_94 && id2 !=3D CHIP_ID_95)) {
-+dev_err(dev->dev, "%s:%d: id1=3D%d <> FAMILY_ID=3D%d, id2=3D%d <> CHIP_ID_=
-94=3D%d && CHIP_ID_95=3D%d \n",
-+        __func__, __LINE__, id1, FAMILY_ID, id2, CHIP_ID_94, CHIP_ID_95);
-                return -ENODEV;
-+        }
-
-        dev->mib_port_cnt =3D TOTAL_PORT_NUM;
-        dev->phy_port_cnt =3D SWITCH_PORT_NUM;
-diff --git drivers/net/dsa/microchip/ksz8795_spi.c drivers/net/dsa/microchi=
-p/ksz8795_spi.c
-index 5dab5d36c675..cb812538ec5b 100644
---- drivers/net/dsa/microchip/ksz8795_spi.c
-+++ drivers/net/dsa/microchip/ksz8795_spi.c
-@@ -50,13 +50,19 @@ static int ksz8795_spi_probe(struct spi_device *spi)
-                dev->pdata =3D spi->dev.platform_data;
- =20
-        /* setup spi */
-+        dev_err(&spi->dev, "%s:%d: spi->mode=3D%d before SPI_MODE_3=3D%d\n=
-", __func__, __LINE__, spi->mode, SPI_MODE_3);
-        spi->mode =3D SPI_MODE_3;
-        ret =3D spi_setup(spi);
-+        dev_err(&spi->dev, "%s:%d: spi_setup()=3D%d\n", __func__, __LINE__=
-, ret);
-        if (ret)
-                return ret;
- =20
-        ret =3D ksz8795_switch_register(dev);
- =20
-+        dev_err(&spi->dev, "%s:%d: ksz8795_switch_register()=3D%d\n", __fu=
-nc__, __LINE__, ret);
-+        if (ret =3D=3D -EINVAL || ret =3D=3D -ENODEV)
-+            ret =3D -EPROBE_DEFER;
-+
-        /* Main DSA driver may not be started yet. */
-        if (ret)
-                return ret;
-diff --git drivers/net/dsa/microchip/ksz_common.c drivers/net/dsa/microchip=
-/ksz_common.c
-index 32836450d62c..44b66951c633 100644
---- drivers/net/dsa/microchip/ksz_common.c
-+++ drivers/net/dsa/microchip/ksz_common.c
-@@ -410,8 +410,11 @@ int ksz_switch_register(struct ksz_device *dev,
- =20
-        dev->dev_ops =3D ops;
- =20
--       if (dev->dev_ops->detect(dev))
-+ret =3D dev->dev_ops->detect(dev);
-+       if (ret) {
-+dev_err(dev->dev, "%s:%d: dev->dev_ops->detect()%lx=3D%d\n", __func__, __L=
-INE__, dev->dev_ops->detect, ret);
-                return -EINVAL;
-+        }
- =20
-        ret =3D dev->dev_ops->init(dev);
-        if (ret)
-
-> > Andrew Lunn schrieb am Sa 07. Dez, 21:47 (+0100):
-> > >=20
-> > > What i don't understand from your description is why:
-> > >=20
-> > > > +       /* setup spi */
-> > > > +       spi->mode =3D SPI_MODE_3;
-> > > > +       ret =3D spi_setup(spi);
-> > > > +       if (ret)
-> > > > +               return ret;
-> > > > +
-> > >=20
-> > > is causing this issue. Is spi_setup() failing?
->=20
-> Maybe that the configured SPI mode does somehow not work for J=C3=B6rg's =
-setup.
-> Perhaps SPI mode 3 on his controller is not the same as for my one (NXP i=
-=2EMX6).
-> This could then cause a mismatch when reading the chip id in ksz8795_swit=
-ch_detect().
-
-Or am I missing something in my devicetree to set the SPI to mode=C2=A03?
-
-> @J=C3=B6rg: Can you please check this? If possible, a measurement of the =
-SPI
-> lines (with an oscilloscope or logic analyzer) would be interesting.
-
-I can check this in the next days. I only have remote access to the device.
-
-
-Thanks for helping me.
-
-J=C3=B6rg
 
 --=20
-Ein Mensch sieht ein und das ist wichtig,
-nichts ist ganz falsch und nichts ganz richtig.
-                                               (Eugen Roth)
 
---7agv62ph3h65dp3d
-Content-Type: application/pgp-signature; name="signature.asc"
+Dario Binacchi
 
------BEGIN PGP SIGNATURE-----
+Senior Embedded Linux Developer
 
-iHUEABEIAB0WIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCZ1XNAAAKCRB9LJoj0a6j
-dRTMAP9Sjc3lAUMM36EhSQH/F4RHV69tMeEvJincn7QzudOs5AEAi1ARRAcfqls0
-jJsNwUN+FZwGrYYqbGPjQfL0b1i5Boo=
-=F+qV
------END PGP SIGNATURE-----
+dario.binacchi@amarulasolutions.com
 
---7agv62ph3h65dp3d--
+__________________________________
+
+
+Amarula Solutions SRL
+
+Via Le Canevare 30, 31100 Treviso, Veneto, IT
+
+T. +39 042 243 5310
+info@amarulasolutions.com
+
+www.amarulasolutions.com
 
