@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-149976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC01B9E85C5
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 16:14:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01DC99E85CD
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 16:19:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E7EE164F54
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 15:14:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1067164E8B
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 15:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A249E14B075;
-	Sun,  8 Dec 2024 15:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380061547E9;
+	Sun,  8 Dec 2024 15:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="gO8NLcl6"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="NVD5R1Za"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-24.smtpout.orange.fr [80.12.242.24])
+Received: from smtp.smtpout.orange.fr (smtp-16.smtpout.orange.fr [80.12.242.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8062D149C4D;
-	Sun,  8 Dec 2024 15:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3ECB154423;
+	Sun,  8 Dec 2024 15:18:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733670855; cv=none; b=QTgnS5RbjfoC2Y0LQ+9DcUYb3hCmfRwr5h8Ze+3z/GfRXndOhRx23dhImnZ2ZMPBvr/bpzeHWV4tVLMCpzEYpo0wBIA9nWtnYbMrqli3nvo33r99cSZ13RguqUDsrDIGpkZ8p7N2QQMH48xfQyhf1H6bYMzK5amGOiZ/eoHWaBk=
+	t=1733671130; cv=none; b=nutM4NoO37HEN0w9aI5j/smNzufAgpS/BTDx4tiwxkSRuleE4r0uIxeEohQnEod5WHzHIIMA4bvVfkIhSlNUk9WQWlteVv+29L9ru89JWJ/XkPGXJfHLg7TtoG0Lx9bMq+kVifz82gDCalCPX+76fgznq0SE5xlOLfCN/ePKy5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733670855; c=relaxed/simple;
-	bh=wh/UWvUGZcgZWokg44nR1/nimiwZ3IkP8kiQTpA5G/Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=U7DUDsu5vlRnaHKdrcCrI4YXcffdaBlNDK8EYwVsGm5vEAecKMpi3BxXd9xCqte0m9zS7IwX+Cexm7HJU0xLhHWwmTL2vsN3F43zellMLxRv8ZaOBi/gWA5Zz086cyJatuu/OOoOYfB7B0Nrj/vI6SITsinEiF7dK5D4nC/xmW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=gO8NLcl6; arc=none smtp.client-ip=80.12.242.24
+	s=arc-20240116; t=1733671130; c=relaxed/simple;
+	bh=R5AmzsmOWVfZ+ozwPcT+rU8jRuDjT8WQ01KSM0GE7w0=;
+	h=Message-ID:Date:MIME-Version:Subject:References:From:To:Cc:
+	 In-Reply-To:Content-Type; b=CYG4nhtiM27gB6/vqvCGGepCsjYRCKTcDVf9KvogKSegZ/hcckPqcWkoJLWnNmJX2jp17E2siTc7cl3p8skDLRpuhqbMbgmLAlSIvvVh9WGEP4eWFDIj6JGe75aQG+wa/uU9WCCmxKTxmbXGF823O74wNfrEUASKDLT8LWj6U2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=NVD5R1Za; arc=none smtp.client-ip=80.12.242.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
 Received: from [192.168.1.37] ([90.11.132.44])
 	by smtp.orange.fr with ESMTPA
-	id KIyktPf7LKnkaKIyltSzZs; Sun, 08 Dec 2024 16:13:58 +0100
+	id KJ2Gt4wpMshnBKJ2Htx9HX; Sun, 08 Dec 2024 16:17:36 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1733670838;
-	bh=Pdf86gR/dMKzkGH5bal5f/VQlcSO3nRfeOeV/tWrQ+8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=gO8NLcl6a4c7J73S19642SQgukw51ysvu4UFeYagLERMwA3v+/H7FNR1ucyg22b/O
-	 892EhhwK1nkrqYNwJhWHEnbzX4oz3p6BvqqVU3FrisC8HYPAmGBpaMrQ6HtSNdIiYA
-	 j7ncnZNgxSM46LYgXIc9uEoAHd5zyHrmUWnerYETEQoqdkZmIfl0Kx2c2cdBe9VJ9M
-	 j3ASPrpmR3ch7IO04glAVsZCjNc5V8PP4BuP3rLHtYMjqsjUoeyfaJ9O0Sqp7u1l1a
-	 QA7iQdH1oEq3JfI45mXOdlzcetKOMX9WFrx1J0ViJcjXa5mP3s0QN9rRBi4dyjO21i
-	 wbie9Dv7Q4GvA==
+	s=t20230301; t=1733671056;
+	bh=sYHyziBzei7Ds+fIuSTf10OdyGFX8eHRQWgID6llsSE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To;
+	b=NVD5R1ZaHNxedq1m7chVBNhs7hbkpp7jxcCRsxj/UN9WAhS72VWroeG3C2EuX9RAJ
+	 KGLNCyl18R3YkfyE5pftthLHGSm4jm2vyEJFAyy9kpk7v7ZMplXmt3kOQN5qrOwYvX
+	 H/gjeIPrEN3+AWVs8WJ6AVXkDJ43sjGwBD/FQBfJX0Y5dZOHOMELT9CZjN4EtZMshQ
+	 pL/wh0JKduCo01j9XPUktm8XSrOVoLdC4t37XsrhIGbWXcUJtipFU3QVhH8el3HFvn
+	 KsOzpGHZjHS37PMRyMnHLy2x+sg3tK/OnblTpTzX9yxeKMWJRXqfK657p+E0ZRUj74
+	 f4lPWNHmIUK3w==
 X-ME-Helo: [192.168.1.37]
 X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Sun, 08 Dec 2024 16:13:58 +0100
+X-ME-Date: Sun, 08 Dec 2024 16:17:36 +0100
 X-ME-IP: 90.11.132.44
-Message-ID: <42f11110-7071-43c8-a4fe-df99a60bc12d@wanadoo.fr>
-Date: Sun, 8 Dec 2024 16:13:50 +0100
+Message-ID: <118552cc-e060-45fa-b93f-9187011f2c8c@wanadoo.fr>
+Date: Sun, 8 Dec 2024 16:17:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,127 +57,128 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v10 6/9] net: mdio: Add Airoha AN8855 Switch MDIO
- Passtrough
-To: Christian Marangi <ansuelsmth@gmail.com>, Lee Jones <lee@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+Subject: Re: [net-next PATCH v10 7/9] nvmem: an8855: Add support for Airoha
+ AN8855 Switch EFUSE
+References: <20241208002105.18074-1-ansuelsmth@gmail.com>
+ <20241208002105.18074-8-ansuelsmth@gmail.com>
+Content-Language: en-US, fr-FR
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  Vladimir Oltean <olteanv@gmail.com>,
  Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
  Heiner Kallweit <hkallweit1@gmail.com>, Russell King
  <linux@armlinux.org.uk>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ "AngeloGioacchino Del Regno," <angelogioacchino.delregno@collabora.com>,
  linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
  netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, upstream@airoha.com
-References: <20241208002105.18074-1-ansuelsmth@gmail.com>
- <20241208002105.18074-7-ansuelsmth@gmail.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20241208002105.18074-7-ansuelsmth@gmail.com>
+In-Reply-To: <20241208002105.18074-8-ansuelsmth@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 Le 08/12/2024 à 01:20, Christian Marangi a écrit :
-> Add Airoha AN8855 Switch driver to register a MDIO passtrough as switch
-> address is shared with the internal PHYs and require additional page
-> handling.
+> Add support for Airoha AN8855 Switch EFUSE. These EFUSE might be used
+> for calibration data for the internal switch PHYs.
 > 
-> This requires the upper Switch MFD to be probed and init to actually
-> work.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> Signed-off-by: Christian Marangi <ansuelsmth-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
->   MAINTAINERS                    |   1 +
->   drivers/net/mdio/Kconfig       |   9 +++
->   drivers/net/mdio/Makefile      |   1 +
->   drivers/net/mdio/mdio-an8855.c | 113 +++++++++++++++++++++++++++++++++
->   4 files changed, 124 insertions(+)
->   create mode 100644 drivers/net/mdio/mdio-an8855.c
+>   MAINTAINERS                  |  1 +
+>   drivers/nvmem/Kconfig        | 11 +++++++
+>   drivers/nvmem/Makefile       |  2 ++
+>   drivers/nvmem/an8855-efuse.c | 63 ++++++++++++++++++++++++++++++++++++
+>   4 files changed, 77 insertions(+)
+>   create mode 100644 drivers/nvmem/an8855-efuse.c
 > 
 > diff --git a/MAINTAINERS b/MAINTAINERS
-> index 7f4d7c48b6e1..38c7b2362c92 100644
+> index 38c7b2362c92..a67d147276a1 100644
 > --- a/MAINTAINERS
 > +++ b/MAINTAINERS
-> @@ -722,6 +722,7 @@ F:	Documentation/devicetree/bindings/net/airoha,an8855-mdio.yaml
->   F:	Documentation/devicetree/bindings/net/dsa/airoha,an8855-switch.yaml
+> @@ -723,6 +723,7 @@ F:	Documentation/devicetree/bindings/net/dsa/airoha,an8855-switch.yaml
 >   F:	Documentation/devicetree/bindings/nvmem/airoha,an8855-efuse.yaml
 >   F:	drivers/mfd/airoha-an8855.c
-> +F:	drivers/net/mdio/mdio-an8855.c
+>   F:	drivers/net/mdio/mdio-an8855.c
+> +F:	drivers/nvmem/an8855-efuse.c
 >   
 >   AIROHA ETHERNET DRIVER
->   M:	Lorenzo Bianconi <lorenzo@kernel.org>
-> diff --git a/drivers/net/mdio/Kconfig b/drivers/net/mdio/Kconfig
-> index 4a7a303be2f7..64fc5c3ef38b 100644
-> --- a/drivers/net/mdio/Kconfig
-> +++ b/drivers/net/mdio/Kconfig
-> @@ -61,6 +61,15 @@ config MDIO_XGENE
->   	  This module provides a driver for the MDIO busses found in the
->   	  APM X-Gene SoC's.
+>   M:	Lorenzo Bianconi <lorenzo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+> diff --git a/drivers/nvmem/Kconfig b/drivers/nvmem/Kconfig
+> index 8671b7c974b9..599014970c22 100644
+> --- a/drivers/nvmem/Kconfig
+> +++ b/drivers/nvmem/Kconfig
+> @@ -28,6 +28,17 @@ source "drivers/nvmem/layouts/Kconfig"
 >   
-> +config MDIO_AN8855
-> +	tristate "Airoha AN8855 Switch MDIO bus controller"
-> +	depends on MFD_AIROHA_AN8855
-> +	depends on OF_MDIO
+>   # Devices
+>   
+> +config NVMEM_AN8855_EFUSE
+> +	tristate "Airoha AN8855 eFuse support"
+> +	depends on MFD_AIROHA_AN8855 || COMPILE_TEST
 > +	help
-> +	  This module provides a driver for the Airoha AN8855 Switch
-> +	  that require a MDIO passtrough as switch address is shared
+> +	  Say y here to enable support for reading eFuses on Airoha AN8855
+> +	  Switch. These are e.g. used to store factory programmed
+> +	  calibration data required for the PHY.
+> +
+> +	  This driver can also be built as a module. If so, the module will
+> +	  be called nvmem-apple-efuse.
 
-requires?
-
-> +	  with the internal PHYs and require additional page handling.
-
-requires?
+nvmem-an8855-efuse?
 
 > +
->   config MDIO_ASPEED
->   	tristate "ASPEED MDIO bus controller"
->   	depends on ARCH_ASPEED || COMPILE_TEST
+>   config NVMEM_APPLE_EFUSES
+>   	tristate "Apple eFuse support"
+>   	depends on ARCH_APPLE || COMPILE_TEST
+> diff --git a/drivers/nvmem/Makefile b/drivers/nvmem/Makefile
+> index 5b77bbb6488b..c732132c0e45 100644
+> --- a/drivers/nvmem/Makefile
+> +++ b/drivers/nvmem/Makefile
+> @@ -10,6 +10,8 @@ nvmem_layouts-y			:= layouts.o
+>   obj-y				+= layouts/
+>   
+>   # Devices
+> +obj-$(CONFIG_NVMEM_AN8855_EFUSE)	+= nvmem-an8855-efuse.o
+> +nvmem-an8855-efuse-y 			:= an8855-efuse.o
+>   obj-$(CONFIG_NVMEM_APPLE_EFUSES)	+= nvmem-apple-efuses.o
+>   nvmem-apple-efuses-y 			:= apple-efuses.o
+>   obj-$(CONFIG_NVMEM_BCM_OCOTP)		+= nvmem-bcm-ocotp.o
 
 ...
 
-> +static int an8855_mdio_probe(struct platform_device *pdev)
+> +static int an8855_efuse_probe(struct platform_device *pdev)
 > +{
+> +	struct nvmem_config an8855_nvmem_config = {
+> +		.name = "an8855-efuse",
+> +		.size = AN8855_EFUSE_CELL * sizeof(u32),
+> +		.stride = sizeof(u32),
+> +		.word_size = sizeof(u32),
+> +		.reg_read = an8855_efuse_read,
+> +	};
 > +	struct device *dev = &pdev->dev;
-> +	struct an8855_mfd_priv *priv;
-> +	struct mii_bus *bus;
-> +	int ret;
+> +	struct nvmem_device *nvmem;
 > +
-> +	/* Get priv of MFD */
-> +	priv = dev_get_drvdata(dev->parent);
-
-Ok, forget the related comment made on patch 5/9.
-
+> +	/* Assign NVMEM priv to MFD regmap */
+> +	an8855_nvmem_config.priv = dev_get_regmap(dev->parent, NULL);
+> +	an8855_nvmem_config.dev = dev;
+> +	nvmem = devm_nvmem_register(dev, &an8855_nvmem_config);
 > +
-> +	bus = devm_mdiobus_alloc(dev);
-> +	if (!bus)
-> +		return -ENOMEM;
-> +
-> +	bus->priv = priv;
-> +	bus->name = KBUILD_MODNAME "-mii";
-> +	snprintf(bus->id, MII_BUS_ID_SIZE, KBUILD_MODNAME "-%d",
-> +		 priv->switch_addr);
-> +	bus->parent = dev;
-> +	bus->read = an8855_phy_read;
-> +	bus->write = an8855_phy_write;
-> +
-> +	ret = devm_of_mdiobus_register(dev, bus, dev->of_node);
-> +	if (ret)
-> +		dev_err(dev, "failed to register MDIO bus: %d", ret);
-
-Nitpick: Missing ending \n.
-dev_err_probe() could be used.
-
-> +
-> +	return ret;
+> +	return PTR_ERR_OR_ZERO(nvmem);
 > +}
+> +
+> +static const struct of_device_id an8855_efuse_of_match[] = {
+> +	{ .compatible = "airoha,an8855-efuse", },
+> +	{/* sentinel */},
+
+No need for the ending comma.
+
+> +};
+> +MODULE_DEVICE_TABLE(of, an8855_efuse_of_match);
 
 ...
 
 CJ
-
 
 
 
