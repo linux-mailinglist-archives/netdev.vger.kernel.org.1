@@ -1,186 +1,164 @@
-Return-Path: <netdev+bounces-149971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-149972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EA5B9E848F
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 11:55:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AADB59E855F
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 14:19:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2870316492F
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 10:55:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A45C116467D
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 13:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7716137776;
-	Sun,  8 Dec 2024 10:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4828514D2B9;
+	Sun,  8 Dec 2024 13:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="nsAlKyTz"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+Received: from pv50p00im-zteg10021301.me.com (pv50p00im-zteg10021301.me.com [17.58.6.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8286753389
-	for <netdev@vger.kernel.org>; Sun,  8 Dec 2024 10:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2F7148857
+	for <netdev@vger.kernel.org>; Sun,  8 Dec 2024 13:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733655322; cv=none; b=AWewLOpSYRqv8nJoWXF6GoDXWkHwYaCfontYMoCWeNllj2v8DcrMgoUryUQXZ3eTu6vczZfw66HisYEPuPRwRzt+6hj3VyzU4z9q/OyEXhe1xCREgtBLRf/fvFA0wJf+rEXCuitJg4gqjE4JTdO6YkjDfIJ1o/vt7pe7tOdKnR0=
+	t=1733663954; cv=none; b=Fs7nHslQ+YPSjJBUir6e5MKj998E0lue4HCFrA1sS/EoSt1AmEabVudePUGhDsbyN5yEufpQ1SBnk/WPlJspoFPSiLu30lYH4UrviqKUaPYY/7E3muMaDa7q3a1fkygRvOeHnQ8moaza3JHwTcHCj2wnkztESR3nG+ARE6rS/+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733655322; c=relaxed/simple;
-	bh=lr+TyEqVzpZPbpI51/6LKjVPsP319+dSbF2YokAVsKI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=BxzPWl5KiJPydEwiUeRMFae6pN+eI8GEieaDPcFhmte2tZOvz3fUqqr4yLOfpWqObsaP5VyaFuLPIiMSo8AqUkBvV62ea56YGd7vimxq0goINc++8bczBHL+V72nuBWblEwleZ6a3jkN/F/QozNP8O0XjiKf2AtWEvHNejbMbKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-103-0xfNP5aEOouEojCi3iOoPw-1; Sun, 08 Dec 2024 10:55:17 +0000
-X-MC-Unique: 0xfNP5aEOouEojCi3iOoPw-1
-X-Mimecast-MFC-AGG-ID: 0xfNP5aEOouEojCi3iOoPw
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 8 Dec
- 2024 10:54:23 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Sun, 8 Dec 2024 10:54:23 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Kuniyuki Iwashima' <kuniyu@amazon.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuni1840@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH v1 net-next 00/15] treewide: socket: Clean up
- sock_create() and friends.
-Thread-Topic: [PATCH v1 net-next 00/15] treewide: socket: Clean up
- sock_create() and friends.
-Thread-Index: AQHbR7QcAbstjqGo3EytsBLjYMbb9LLcJTmg
-Date: Sun, 8 Dec 2024 10:54:23 +0000
-Message-ID: <85ad278ad61943938a6537f1405f7814@AcuMS.aculab.com>
-References: <20241206075504.24153-1-kuniyu@amazon.com>
-In-Reply-To: <20241206075504.24153-1-kuniyu@amazon.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1733663954; c=relaxed/simple;
+	bh=v6DuWZtu4YUnrBhocodbi8f07v2ZhN1ZLmNgHMutPlg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=pOZvOpfJpxtPXFvlNdJietcI+NfwmBPnse5Duf7FumQMLsX9lSZvD24HjM97pl3FeBF3RLEkYSuft39iLeeVRGGDG2qXYzZFG1r+KglU+gb+qrFpEf56D0VxkUVaV1m7MhxAwMaIbTcL1oVfoeICE4te0nDk8u5xOT2cquIvijM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=nsAlKyTz; arc=none smtp.client-ip=17.58.6.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1733663951;
+	bh=B9Z7dZW7Hi3Js1z/RCEjU+3M/IjEGHpjDFHWBOHmqc4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
+	 x-icloud-hme;
+	b=nsAlKyTzBjgFKiKK875IKrpeQ6Hv0IpX0ZWERQ6ck5xVT3yTVHF/ma0+sMayke7RA
+	 Mgepn7kdGl4f4KMgfy/ymh+QBWxBeS7/1xqjrAX4SI9iGKKSkpp5xcz5oH/1zd68so
+	 q8B21ej8wfHvQSmqknU2Qp3DQusSq/gzOdhHF5FFhfSN5Qste9Sq1vNahO5iwGakAp
+	 tKQIdEZWB3krUn4WgU7lFUNJY/OoKRT0xs0HLsHhvA1M3HxUyLGgZ/BUmsWP7OKH1i
+	 bCryHNz+PA1BYV/NsVSs5yT/qG6oSWCs9oJcX6JOBLUE0hNVJ8Fz0YBe04unhhDqh2
+	 KUvRd6BwJWVxw==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-zteg10021301.me.com (Postfix) with ESMTPSA id B0625500490;
+	Sun,  8 Dec 2024 13:18:59 +0000 (UTC)
+Message-ID: <7780942a-93cd-4508-be97-fc5e5267c389@icloud.com>
+Date: Sun, 8 Dec 2024 21:18:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: pm3PsDxq1E5lXt9j_wFD1jVDOrODeQlj47YPsXO8nJY_1733655315
-X-Mimecast-Originator: aculab.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 04/11] driver core: Constify API device_find_child()
+ then adapt for various usages
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
+ James Bottomley <James.Bottomley@hansenpartnership.com>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>,
+ linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-sound@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-gpio@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
+ linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+ linux-scsi@vger.kernel.org, open-iscsi@googlegroups.com,
+ linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
+ netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20241205-const_dfc_done-v3-0-1611f1486b5a@quicinc.com>
+ <20241205-const_dfc_done-v3-4-1611f1486b5a@quicinc.com>
+ <20241206135209.GA133715@workstation.local>
 Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <20241206135209.GA133715@workstation.local>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: zq6ALpvY8lzOJgSSQvNtYt-PHDnk_XXq
+X-Proofpoint-GUID: zq6ALpvY8lzOJgSSQvNtYt-PHDnk_XXq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-08_04,2024-12-06_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0 mlxscore=0
+ clxscore=1011 adultscore=0 phishscore=0 malwarescore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2412080111
 
-From: Kuniyuki Iwashima
-> Sent: 06 December 2024 07:55
->=20
-> There are a bunch of weird usages of sock_create() and friends due
-> to poor documentation.
->=20
->   1) some subsystems use __sock_create(), but all of them can be
->      replaced with sock_create_kern()
+On 2024/12/6 21:52, Takashi Sakamoto wrote:
+> Hi,
+> 
+> On Thu, Dec 05, 2024 at 08:10:13AM +0800, Zijun Hu wrote:
+>> From: Zijun Hu <quic_zijuhu@quicinc.com>
+>>
+>> Constify the following API:
+>> struct device *device_find_child(struct device *dev, void *data,
+>> 		int (*match)(struct device *dev, void *data));
+>> To :
+>> struct device *device_find_child(struct device *dev, const void *data,
+>>                                  device_match_t match);
+>> typedef int (*device_match_t)(struct device *dev, const void *data);
+>> with the following reasons:
+>>
+>> - Protect caller's match data @*data which is for comparison and lookup
+>>   and the API does not actually need to modify @*data.
+>>
+>> - Make the API's parameters (@match)() and @data have the same type as
+>>   all of other device finding APIs (bus|class|driver)_find_device().
+>>
+>> - All kinds of existing device match functions can be directly taken
+>>   as the API's argument, they were exported by driver core.
+>>
+>> Constify the API and adapt for various existing usages by simply making
+>> various match functions take 'const void *' as type of match data @data.
+>>
+>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>> ---
+>>  arch/sparc/kernel/vio.c                |  6 +++---
+>>  drivers/base/core.c                    |  6 +++---
+>>  drivers/block/sunvdc.c                 |  6 +++---
+>>  drivers/bus/fsl-mc/dprc-driver.c       |  4 ++--
+>>  drivers/cxl/core/pci.c                 |  4 ++--
+>>  drivers/cxl/core/pmem.c                |  2 +-
+>>  drivers/cxl/core/region.c              | 21 ++++++++++++---------
+>>  drivers/firewire/core-device.c         |  4 ++--
+>>  drivers/firmware/arm_scmi/bus.c        |  4 ++--
+>>  drivers/firmware/efi/dev-path-parser.c |  4 ++--
+>>  drivers/gpio/gpio-sim.c                |  2 +-
+>>  drivers/gpu/drm/mediatek/mtk_drm_drv.c |  2 +-
+>>  drivers/hwmon/hwmon.c                  |  2 +-
+>>  drivers/media/pci/mgb4/mgb4_core.c     |  4 ++--
+>>  drivers/nvdimm/bus.c                   |  2 +-
+>>  drivers/pwm/core.c                     |  2 +-
+>>  drivers/rpmsg/rpmsg_core.c             |  4 ++--
+>>  drivers/scsi/qla4xxx/ql4_os.c          |  3 ++-
+>>  drivers/scsi/scsi_transport_iscsi.c    | 10 +++++-----
+>>  drivers/slimbus/core.c                 |  8 ++++----
+>>  drivers/thunderbolt/retimer.c          |  2 +-
+>>  drivers/thunderbolt/xdomain.c          |  2 +-
+>>  drivers/tty/serial/serial_core.c       |  4 ++--
+>>  drivers/usb/typec/class.c              |  8 ++++----
+>>  include/linux/device.h                 |  4 ++--
+>>  include/scsi/scsi_transport_iscsi.h    |  4 ++--
+>>  net/dsa/dsa.c                          |  2 +-
+>>  tools/testing/cxl/test/cxl.c           |  2 +-
+>>  28 files changed, 66 insertions(+), 62 deletions(-)
+> 
+> For the changes in FireWire subsystem:
+> 
+> Reviewed-by: Takashi Sakamoto <o-takashi@sakamocchi.jp>
+> 
 
-Not currently because sock_create_kern() doesn't increase the ref count
-on the network namespace.
-So I have an out of tree driver that end up using __sock_create() in
-order that the socket holds a reference to the network namespace.
+thank you for code review and previous cooperation to achieve
+this goal (^^).
 
->   2) some subsystems use sock_create(), but most of the sockets are
->      not exposed to userspace via file descriptors but are exposed
->      to some BPF hooks (most likely unintentionally)
-
-AFAIR the 'kern' flag removes some security/permission checks.
-So a socket that is being created to handle user API requests
-(user data might be encapsulated and then sent) probably ought
-to have 'kern =3D=3D 0' even though the socket is not directly exposed
-through the fd table.=20
-
->   3) some subsystems use sock_create_kern() and convert the sockets
->      to hold netns refcnt (cifs, mptcp, rds, smc, and sunrpc)
->=20
->   4) the sockets of 2) and 3) are counted in /proc/net/sockstat even
->      though they are untouchable from userspace
->=20
-> The primary goal is to sort out such confusion and provide enough
-> documentation for future developers to choose an appropriate API.
->=20
-> Regarding 3), we introduce a new API, sock_create_net(), that holds
-> a netns refcnt for kernel socket to remove the socket conversion to
-> avoid use-after-free triggered by TCP kernel socket after commit
-> 26abe14379f8 ("net: Modify sk_alloc to not reference count the netns
-> of kernel sockets.").
->=20
-> Throughout the series, we follow the definition below:
->=20
->   userspace socket:
->     * created by sock_create_user()
->     * holds the reference count of the network namespace
->     * directly linked to a file descriptor
->     * accessed via a file descriptor (and some BPF hooks)
->     * counted in the first line of /proc/net/sockstat.
->=20
->   kernel socket
->     * created by sock_create_net() or sock_create_net_noref()
->       * the former holds the refcnt of netns, but the latter doesn't
->     * not directly exposed to userspace via a file descriptor nor BPF
-
-That isn't really right:
-A 'userspace socket' (kern =3D=3D 0) is a socket created to support a user'=
-s
-API calls. Typically (but not always) directly linked to a file descriptor.
-Security/permission checks include those of the current user/process.
-
-A 'kernel socket' (kern =3D=3D 1) is a socket that isn't related to a user =
-process.
-These fall into two groups:
-1) Normal TCP (etc) sockets used by things like remote filesystems.
-   These need to hold a reference to the network namespace and will stop
-   the namespace being deleted.
-2) Special sockets used internally (perhaps for routing).
-   These don't hold a reference, but require the caller have a callback
-   for the namespace being deleted and must close the socket before
-   the callback returns.
-   The close must be fully synchronous - FIN_WAIT states will break things.
-
-> Note that I didn't CC maintainers for mechanical changes as the CC
-> list explodes.
-
-This whole change (which is probably worth it) need doing in a different
-order.
-Start with the actual change to the socket create code and then work
-back through the callers.
-That may require adding wrapper functions for the existing calls that
-can then finally be deleted in the last patch.
-
-Additionally boolean parameters need to be banned, multiple ones
-are worse - you really can tell from the call site what they mean.
-
-So change the boolean 'kern' parameter to a flags one.
-You then want 0 to be the normal case (user socket that holds a ref).
-Then add (say):
-=09#define SOCK_CREATE_NO_NS_REF 1
-=09#define SOCK_CREATE_KERN      2
-Initially add to the top of sk_alloc():
-=09if (flags & SOCK_CREATE_NOREF)
-=09=09flags |=3D SOCK_CREATE_KERN;
-Now all the code compiles and works as before.
-
-Next find all the call sites (especially those that pass 1)
-and change so they pass the correct flag combination.
-(Some static inlines/#defines might help with long lines.)
-
-Finally change sk_alloc() to return NULL if NO_NS_REF
-is set without KERN.
-
-None of the 'pass through' functions need changing except to
-ensure the parameter is 'unsigned int flags' (not 'bool kern').
-
-=09David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
+> 
+> Thanks
+> 
+> Takashi Sakamoto
 
 
