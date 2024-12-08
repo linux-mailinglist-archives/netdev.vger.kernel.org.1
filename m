@@ -1,155 +1,155 @@
-Return-Path: <netdev+bounces-150009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB51E9E8819
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 22:35:22 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 620DA9E882E
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 22:54:19 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B1D31884775
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 21:35:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A51D2811C6
+	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 21:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5243614F12D;
-	Sun,  8 Dec 2024 21:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 654E913A865;
+	Sun,  8 Dec 2024 21:54:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aZhXlTKF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lKffhqSS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782081DA23;
-	Sun,  8 Dec 2024 21:35:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E83C46B8;
+	Sun,  8 Dec 2024 21:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733693718; cv=none; b=qM8xScoAwKPEDwIeWdivtYAErt+gEG3vgF6uouV9enQQvqbsZz0nN/k3l5861dcag8KCe2YVgBbM0N8UziEw0oLxaYosa1uGa9PSKtrltxBTZa/wd/k+w/g13iwjKm1rEqzRsNgpuFe1MO1fitK+A+wRUfpJ3RD51ASMmo0DgjU=
+	t=1733694853; cv=none; b=Oxq6MRXGOMVANVebOYJveUAdvub49kujfKysVwvVWxBuE0yvJGe7kw8TMctABUr6fydJxgM6B5ctH+F5sOJE5MzL3rgzNcvqJLpsdHMM2iLWvyZK+/bkrDXkOVsd19hsIuCGRspYbyPlOflaanftSPi4oRVKvVWifSjyIx4ikoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733693718; c=relaxed/simple;
-	bh=/kHw29dWI8Jh8neB8uAALi/SMJ13nsCSSY6PHsawVpI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ud/zoBBKav6uCnE6gU3LyH36vVdJD0y6isHe1BQLFEH0jN47zil/BeSFr3HdEGK11p9ATbfwVUFTFO7hmeuYahwtS+d8a4CQb49+bp+iqEbpvCPqCexeU3u+sRpD1zjh4UQgtW3mVPT2Ap0WDgh9fRu+OoTAK+7D15vWjKK+ilo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aZhXlTKF; arc=none smtp.client-ip=209.85.221.51
+	s=arc-20240116; t=1733694853; c=relaxed/simple;
+	bh=Mq+VPWVIG9wr5pqaJFzKdWHDyQDUJXBqwFz/MHb1Q4w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hYI+wZoo7Vp2Ahc+quMaB2pbiqk2R7xuuPzyGD9OlVRnibEAPPJMWsRY6SwL8nYWWsuo+9dj4dhkt5OK9rqglHQ/7IVdOse2Tn6C9OibQxOxcbSnAZu4I8b4BjzZCXyq6hLi5U3vyXjcZDzQv3ZDosgdh1T8ms2E5oOTN+rFUUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lKffhqSS; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3863703258fso579821f8f.1;
-        Sun, 08 Dec 2024 13:35:16 -0800 (PST)
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a9e44654ae3so604181166b.1;
+        Sun, 08 Dec 2024 13:54:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733693715; x=1734298515; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0FT/XI9a4IlI8yhoJOXSguOkbtT9kvc9FGR93LWbKUw=;
-        b=aZhXlTKF3HDr7xMKLg2fEyFWFrX4z+Sl4VVyE56Gcwu2LUFgqZyLxfkZNJ6DBp/LAe
-         nnxiXNLS5ufCWgilDs6XwA5Jb4ioVfBovdJjTHjTT84dgd0DgbE61YrvgtnnXTHbjFui
-         lA9KlfoY14W/avAhelAjO+m8tpJviguLO+uLFuRxhJCcWVP5nnbBWZRVro3yTmAyLSvE
-         fzHOw24ocZFg3TABTAPH6AM/9af3qHTINCmsyc8LPsStD66AVtt1cECoqEGz81WPlgDK
-         m7f8aK+X8txk38TzhWtZ+8vRrfvlDJjTUszZg7gMVLgEuzPyvm1QClf9b0zqRQh6Gd9c
-         4UYA==
+        d=gmail.com; s=20230601; t=1733694850; x=1734299650; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=TrypHxkyw4j+G7IUAR+t3qATf3kM2IpTXn84QXvFgk0=;
+        b=lKffhqSSh5Xzwbk4046JCZk0rb5WT0XiNcYyKLKjzI1uIRr0pJmp7NFhFM0AvJI0e3
+         S2uwP/8YMweXo9xKG2gHg2L8aMIfCKmpcT7/CDKfnqx5xe3E6QJUvjgvOvsAFBxnvJ91
+         nZarajYIaQA4FbA3gDZBPfTG+JR7LPG4BYCN8Yey29TG0/eN1cy2E8YoKMlgSX3Uhc2L
+         xw0BBNWMO+X5z6ePEkvNRhH6Nm6CT9yz6Oo/FulNwNSmgKCTH+00AG+9b2UlPHYg+MVF
+         jlwyo2se6cTA7ob+1wp4WKjTesNPauO0+C7OEXnmanFP3auAMitoTEOTBscQlvo2juD6
+         ojMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733693715; x=1734298515;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0FT/XI9a4IlI8yhoJOXSguOkbtT9kvc9FGR93LWbKUw=;
-        b=pl6yi7hWqetivI5VUV3pHbZxHX8yaBEsQOrBvBZM/xv5+5vS0YlA4/E+TV9YfFRayu
-         /ucu9xm4s2IAyGX6XA0EgAQGOGxMgv7m1Im6hCHNfUTmUjWsbYhMvr9bcr+KXWyFktJ9
-         Su7/7b+RaeuD3w2ITlHQOHYt5U1oznZ8pXvlu+Lfsf/UvkPC8vMSktfBsLekxD4RAtlz
-         nQS4Km6h9S+Yx5cM/VODHyznOEH9yk8bn2CZvmJIIIC6Wwd3XjPfYGpHglY2A1oXmF6n
-         dvj2vScrEVJUSKsDihzbNkKOzU8UzbRML1srvIhQFpW4GQ25ojupUloHBVSExfNluoah
-         bPAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWckkuW0mwsDMD3yTTFi6HidFfYZ4q6JBTLChhJ/HD96abKxFZU1gmF1nYKowTkAOuFDbtPFh1b@vger.kernel.org, AJvYcCXbCJlh/Q4m1rDTB/qh5X1UexERpAdahyISHzCno7sCm6ccSTKPurjOnyOg/X4RQJw+EJSJeqv3xHyVKP4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiRQD/g4Sdg5PUXbTE8fdTZufhgpB4QcBNd9YBFFxDnw/AAr0p
-	rNzKx0ZeCMZOzl8cIToB/1cLq1TPp2Hgl62ep1HrGIMFzcbcXHgDAEsEiwIqZOI5qnUrl7HjuY2
-	5d3WfpPi+QL/H1FS8Q6OleSKjemY=
-X-Gm-Gg: ASbGncsSlbRDKjDDww9NHozEfYQguHIcwSFBwp1P4g4nFGIer/VGkAHDGeAtKJgTMaM
-	T+rhLfwco+l3ltfBMKSIqTcKqpsWGpqd9aTUFhHyz+flQvKT1afOgYDSca6w35d67
-X-Google-Smtp-Source: AGHT+IHwAMsuFqDrdyEJ/KJqrCevVJeBoHHGs8woXmM+cTs5EnO5j/yEIYm8u/K9wJdl+o8mXAyyiIFcxhMlc7tMy/4=
-X-Received: by 2002:a05:6000:1565:b0:385:e95b:bb46 with SMTP id
- ffacd0b85a97d-3862a913e1bmr6301512f8f.22.1733693714512; Sun, 08 Dec 2024
- 13:35:14 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733694850; x=1734299650;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TrypHxkyw4j+G7IUAR+t3qATf3kM2IpTXn84QXvFgk0=;
+        b=qFy3os8sK2g6DUDDnVQ5p265AJdT7RJAd7XMO42qETBQhls5ekZdkgZJWNmwDBcMdV
+         xMKeOgmNIDPuDyTJqCmLLF3Fu73wb8HpH4MEz6TEveKYKa+MIbCQm+5B66oHh0aBk2z0
+         7MqHw8XuNvXOErtj62wo35B7xgZNzCs3HU+6I3/0qaeDseBrVBW9kBAdpwp3iqCO2+6y
+         kvw5yj5wTLkIb5wrgmvLmNFHlr6jyjQ1ggoUv85qnKk8ykqG4AVMQRO6w1MdGP+ExeZ5
+         tbOa2pNaxz8jwTbl4QBbISdSVWFAdCTAFVu+zWFHyZkB3avYWpRXkcd36CWGlnmcOoXe
+         xGbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4qIGo15ZdIzUn1Y06Xdp5eyVIZFXnUrPq82NmEwrg2ZewCa1ZFrM6afLvq+Yci4wuJSSEV9doh+uZhJE=@vger.kernel.org, AJvYcCVXBK9D3WWvu7PizRYBrKumnBGXB5itEGkYCPqiXo04AHfz4NUSS4H1ucNdUrMajw3W21ey6o7r@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBSRDd8Lscqy7ETdoegSd5uoksq3NDpeo8bBBDiLuO85PY/OD2
+	uKQIa2phZsYausa1vYXF2AL0vttOKqopvwJwp1bih/KiEB077+th
+X-Gm-Gg: ASbGncsRgdBuFSebFM4gEpWW7vCDO0CYbdTx3zvNIEb/4X6faq3MhNCJic0zZhWiENW
+	LjrBnr+h7DURZeZY4gCYghfPnUSXNlJPp5YMKfg/mNk1UlrYGjROK+RIUOUYUm2e8oGILAgnX7v
+	odw7uDuhLBJdxKcZpjKGNhLd9rHkSCruh4svG6h2AuWR9mwWaOmPQT2Y4XF5MlQv0bBkMPlAU4i
+	0YnWD8E1Qmg/fM1AkMJa4n9yU2IKddqahmxhJm/hLviVv8atIV323Xnk0yj2u3mScPAyGPgYnii
+	1jiIw6EZ0P6febQbia7rrtTkVVG/egIWsLY8prEtm1lhYchWwZKqzfGdpsQx2d+StHyY236+QrT
+	C9x4u6HY7nfIzxyaQjGroJ5RpoQXJ17WnZ6FBqW4=
+X-Google-Smtp-Source: AGHT+IF3rOtmR070H6E5skFwq7zkuh7wyP/uVgl5djJs94i83xJLZYIyQbetkjbLaIEX6WSKxsvEbw==
+X-Received: by 2002:a17:906:329a:b0:aa6:7d76:f21b with SMTP id a640c23a62f3a-aa67d76f3d5mr291851566b.51.1733694849447;
+        Sun, 08 Dec 2024 13:54:09 -0800 (PST)
+Received: from ?IPV6:2a02:3100:a0a2:300:591f:8fe7:8c1e:2d69? (dynamic-2a02-3100-a0a2-0300-591f-8fe7-8c1e-2d69.310.pool.telefonica.de. [2a02:3100:a0a2:300:591f:8fe7:8c1e:2d69])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa68c4b52b8sm30005466b.52.2024.12.08.13.54.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 08 Dec 2024 13:54:08 -0800 (PST)
+Message-ID: <c33e5b03-ae7a-44a3-88a5-d74d9bf035f9@gmail.com>
+Date: Sun, 8 Dec 2024 22:54:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241206122533.3589947-1-linyunsheng@huawei.com>
-In-Reply-To: <20241206122533.3589947-1-linyunsheng@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Sun, 8 Dec 2024 13:34:38 -0800
-Message-ID: <CAKgT0UeXcsB-HOyeA7kYKHmEUM+d_mbTQJRhXfaiFBg_HcWV0w@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 00/10] Replace page_frag with page_frag_cache (Part-2)
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Shuah Khan <skhan@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Linux-MM <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] r8169: Add quirks to enable ASPM on Dell platforms
+To: Guy Chronister <guyc.linux.patches@gmail.com>
+Cc: nic_swsd@realtek.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Koba Ko <koba.ko@canonical.com>, Timo Aaltonen
+ <timo.aaltonen@canonical.com>, Andrea Righi <andrea.righi@canonical.com>
+References: <20241208191039.2240-1-guyc.linux.patches@gmail.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20241208191039.2240-1-guyc.linux.patches@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 6, 2024 at 4:32=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
->
-> This is part 2 of "Replace page_frag with page_frag_cache",
-> which introduces the new API and replaces page_frag with
-> page_frag_cache for sk_page_frag().
->
-> The part 1 of "Replace page_frag with page_frag_cache" is in
-> [1].
->
-> After [2], there are still two implementations for page frag:
->
-> 1. mm/page_alloc.c: net stack seems to be using it in the
->    rx part with 'struct page_frag_cache' and the main API
->    being page_frag_alloc_align().
-> 2. net/core/sock.c: net stack seems to be using it in the
->    tx part with 'struct page_frag' and the main API being
->    skb_page_frag_refill().
->
-> This patchset tries to unfiy the page frag implementation
-> by replacing page_frag with page_frag_cache for sk_page_frag()
-> first. net_high_order_alloc_disable_key for the implementation
-> in net/core/sock.c doesn't seems matter that much now as pcp
-> is also supported for high-order pages:
-> commit 44042b449872 ("mm/page_alloc: allow high-order pages to
-> be stored on the per-cpu lists")
->
-> As the related change is mostly related to networking, so
-> targeting the net-next. And will try to replace the rest
-> of page_frag in the follow patchset.
->
-> After this patchset:
-> 1. Unify the page frag implementation by taking the best out of
->    two the existing implementations: we are able to save some space
->    for the 'page_frag_cache' API user, and avoid 'get_page()' for
->    the old 'page_frag' API user.
-> 2. Future bugfix and performance can be done in one place, hence
->    improving maintainability of page_frag's implementation.
->
-> Performance validation for part2:
-> 1. Using micro-benchmark ko added in patch 1 to test aligned and
->    non-aligned API performance impact for the existing users, there
->    seems to be about 20% performance degradation for refactoring
->    page_frag to support the new API, which seems to nullify most of
->    the performance gain in [3] of part1.
+On 08.12.2024 20:10, Guy Chronister wrote:
+> Some non-Dell platforms equipped with r8168h/r8111 have issues with ASPM. It's very hard to fix all known issues in a short time and r8168h/r8111 is not a brand new NIC chip, so introduce the quirk for Dell platforms. It's also easier to track the Dell platform and ask for Realtek's effort.
+> Make the original matching logic more explicit.
+> 
+> Signed-off-by: Koba Ko <koba.ko@canonical.com>
+> Signed-off-by: Timo Aaltonen <timo.aaltonen@canonical.com>
+> Signed-off-by: Andrea Righi <andrea.righi@canonical.com>
+> Signed-off-by: Guy Chronister <guyc.linux.patches@gmail.com>
+> ---
 
-So if I am understanding correctly then this is showing a 20%
-performance degradation with this patchset. I would argue that it is
-significant enough that it would be a blocking factor for this patch
-set. I would suggest bisecting the patch set to identify where the
-performance degradation has been added and see what we can do to
-resolve it, and if nothing else document it in that patch so we can
-identify the root cause for the slowdown.
-
-> 2. Use the below netcat test case, there seems to be some minor
->    performance gain for replacing 'page_frag' with 'page_frag_cache'
->    using the new page_frag API after this patchset.
->    server: taskset -c 32 nc -l -k 1234 > /dev/null
->    client: perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | tasks=
-et -c 1 nc 127.0.0.1 1234
-
-This test would barely touch the page pool. The fact is most of the
-overhead for this would likely be things like TCP latency and data
-copy much more than the page allocation. As such fluctuations here are
-likely not related to your changes.
+My response to Koba Ko and Andrea Righi bounced. So it seems they don't work
+for canonical (any longer?).
 
