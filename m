@@ -1,213 +1,129 @@
-Return-Path: <netdev+bounces-150197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B69529E967C
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:22:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F9ED9E9682
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:23:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76446283674
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:22:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6C2D283A81
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1977222D77;
-	Mon,  9 Dec 2024 13:15:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1FA11ACEC9;
+	Mon,  9 Dec 2024 13:17:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XIZMjCkL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OkT4p3Zm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E749D222D64
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 13:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F65D233126;
+	Mon,  9 Dec 2024 13:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733750148; cv=none; b=RwM1UTLtpXnO9nwLj2GiNk+L1VgSfnfQJE1+6ILwiUB82FdvB5E0Use1TZJOwVKkYPDeNSGT2jV9s/89R2iV2XPvTn4TmTIoeyeV/uMXnma7XAOYfNsXYJE/8Bd7liAOMvIv0t5T1SNjxaOGqtnyWIzo4aHbkJNKD7Be66HFoCg=
+	t=1733750240; cv=none; b=FHP/bjEbS4K8nV9dcz3vmA/+Du4w8aBgxv9eQ7m2YFvBRWODYKcmIBiXHCNT1trqC6DW+20JzEe4qIqWQ8UT0OHG5AyMzGoSj5lDgSJQ1/is6xE5dTWl8ErwxTX+I2hNWPiSmWnTQhjcqZNMwTgSf9XRsAqsBBHxHX/pAdR7+cE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733750148; c=relaxed/simple;
-	bh=o57EDAoNco0z5xP4oDUg/FTLA9YTPNTs5M4lwaRDGnM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ym1aGr6SGIPhg+5nbLZR8nAD5lr2YYlGEEDcCTURc49LFSTqZk5ztc1xkLLOyJnlC+//XsYrW/vWXf20JgjQRM8d4pkKRADaeR4cNHUDxstpz7PE8XQ00GB2M6TE17KM9aavj/t7jpYFPWBEBak6zXFnilE1WI1J5IKyjeTzc/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XIZMjCkL; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733750147; x=1765286147;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=o57EDAoNco0z5xP4oDUg/FTLA9YTPNTs5M4lwaRDGnM=;
-  b=XIZMjCkLF5h6cAKewr4eW3MEAiQQj0/s917JmucoqT44gbvkMAMAjFv1
-   AsnHx7RtjXVvsOZtMEeBlS2Y00jdH9FnLi9XoQTLEtAY+CuEhWpwBbrPD
-   buNasruBCMCVIMSvBp0dAu17QaAC9l+YJIz30L0iU7P5TyWaPz32UVURs
-   TS41I2RMpm04JH1QNpI03UPux+YTyA1He58lAnzSR9QcT9ghV0fnj8DQo
-   RcwiC4iwa0edgnLB307VkMVJ6MHnPphPjvctCcq0H2WCbQ56L4xFKj7kN
-   BCVTYvuCjxs76RIhzfz1P/XhvFFfdIvZE/O562SEqEUZg+dlIu0AwUl0T
-   A==;
-X-CSE-ConnectionGUID: UMsXk/NSQTud2Ux1iHvhhw==
-X-CSE-MsgGUID: d0fzCDrFSLKQeddMS1I+7g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="33387398"
-X-IronPort-AV: E=Sophos;i="6.12,219,1728975600"; 
-   d="scan'208";a="33387398"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 05:15:41 -0800
-X-CSE-ConnectionGUID: UKfRcj1bRry421aJgA28cw==
-X-CSE-MsgGUID: IcJA3SvdRdqnR91lDfBr9g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,219,1728975600"; 
-   d="scan'208";a="94934936"
-Received: from enterprise.igk.intel.com ([10.102.20.175])
-  by orviesa009.jf.intel.com with ESMTP; 09 Dec 2024 05:15:38 -0800
-From: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
-To: netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	jiri@resnulli.us,
-	stephen@networkplumber.org
-Cc: anthony.l.nguyen@intel.com,
-	jacob.e.keller@intel.com,
-	przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
-Subject: [RFC 1/1] devlink: add new devlink lock-firmware command
-Date: Mon,  9 Dec 2024 14:14:52 +0100
-Message-ID: <20241209131450.137317-4-martyna.szapar-mudlaw@linux.intel.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241209131450.137317-2-martyna.szapar-mudlaw@linux.intel.com>
-References: <20241209131450.137317-2-martyna.szapar-mudlaw@linux.intel.com>
+	s=arc-20240116; t=1733750240; c=relaxed/simple;
+	bh=GKJhHjDf9U7/zbeK+J4EKmPqyRYVBJdPoU3fNhpiUDw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gjrr/v2+JzOSNx1v8rpHDj/stQFINPVidwEGMhpK/yQJXEjs2vrkowYb+oOv2hDIrFh/9ZUlBE4c1b9XwhpoZGjjDPTgaCELhQ1wYrhmi8WF01TjOT625+pI8rM0d21TEOmW4uihRpMPbM14mIvAdmnobybBmk583U0qBm5ijNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OkT4p3Zm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=a4aNZwKhoEpSgrOUmeaC/mbjjsWaCSSTRiNd1hwQtlU=; b=OkT4p3ZmfazAtxY0zHiUil2mce
+	bVgOGW3Vffzh6CC7+X7tYBmDKZUtgAe+eCURF78RtEdSR7Z8VSthtd0FD8nbpueHZ81igEFvz03nA
+	+EkK5DxQ/dqqboUdOC0U8Hr7PqvIlOm2PrszMDcalcyVHc2j9+OrR+NFqxWopql8xh+E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tKddI-00FfZp-CA; Mon, 09 Dec 2024 14:17:04 +0100
+Date: Mon, 9 Dec 2024 14:17:04 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: dimitri.fedrau@liebherr.com
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Dimitri Fedrau <dima.fedrau@gmail.com>
+Subject: Re: [PATCH net-next 2/2] net: phy: dp83822: Add support for GPIO2
+ clock output
+Message-ID: <bcef90db-ca9d-4c52-9dc5-2f59ae858824@lunn.ch>
+References: <20241209-dp83822-gpio2-clk-out-v1-0-fd3c8af59ff5@liebherr.com>
+ <20241209-dp83822-gpio2-clk-out-v1-2-fd3c8af59ff5@liebherr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241209-dp83822-gpio2-clk-out-v1-2-fd3c8af59ff5@liebherr.com>
 
-Introduce a new lock-firmware command to the devlink API,
-providing a mechanism to enforce secure firmware versions at the user's request.
-The lock-firmware command invokes a driver-implemented callback,
-allowing hardware vendors to implement a mechanism for the specific
-hardware to block undesirable firmware downgrades possibilities.
-This ensures that firmware downgrades, which could expose devices
-to known vulnerabilities, are prevented in security-sensitive deployments.
+>  #define MII_DP83822_RCSR	0x17
+>  #define MII_DP83822_RESET_CTRL	0x1f
+>  #define MII_DP83822_GENCFG	0x465
+> +#define MII_DP83822_IOCTRL2	0x463
+>  #define MII_DP83822_SOR1	0x467
 
-Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+These are sorted, so the MII_DP83822_IOCTRL2 should go before
+MII_DP83822_GENCFG.
+
+> +	if (dp83822->set_gpio2_clk_out)
+> +		phy_modify_mmd(phydev, DP83822_DEVADDR, MII_DP83822_IOCTRL2,
+
+I would of preferred MDIO_MMD_VEND2 rather than DP83822_DEVADDR, but
+having just this one instance correct would look a bit odd.
+
+> +	ret = of_property_read_u32(dev->of_node, "ti,gpio2-clk-out",
+> +				   &dp83822->gpio2_clk_out);
+> +	if (!ret) {
+> +		dp83822->set_gpio2_clk_out = true;
+> +		switch (dp83822->gpio2_clk_out) {
+> +		case DP83822_CLK_SRC_MAC_IF:
+> +			break;
+> +		case DP83822_CLK_SRC_XI:
+> +			break;
+> +		case DP83822_CLK_SRC_INT_REF:
+> +			break;
+> +		case DP83822_CLK_SRC_RMII_MASTER_MODE_REF:
+> +			break;
+> +		case DP83822_CLK_SRC_FREE_RUNNING:
+> +			break;
+> +		case DP83822_CLK_SRC_RECOVERED:
+> +			break;
+
+You can list multiple case statements together, and have one break at
+the end.
+
+I would personally also only have:
+
+> +		dp83822->set_gpio2_clk_out = true;
+
+if validation passes, not that it really matters because:
+
+
+> +		default:
+> +			phydev_err(phydev, "ti,gpio2-clk-out value %u not valid\n",
+> +				   dp83822->gpio2_clk_out);
+> +			return -EINVAL;
+> +		}
+> +	}
+
+
+    Andrew
+
 ---
-Note: This is only RFC draft. As expected, the code that should be
-automatically generated will eventually not be manually entered here.
-Documentation will be added.
----
- include/net/devlink.h        |  2 ++
- include/uapi/linux/devlink.h |  2 ++
- net/devlink/dev.c            | 13 +++++++++++++
- net/devlink/netlink_gen.c    | 18 +++++++++++++++++-
- net/devlink/netlink_gen.h    |  4 +++-
- 5 files changed, 37 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/devlink.h b/include/net/devlink.h
-index d5da362ea321..1b19f7c4550b 100644
---- a/include/net/devlink.h
-+++ b/include/net/devlink.h
-@@ -1354,6 +1354,8 @@ struct devlink_ops {
- 	int (*flash_update)(struct devlink *devlink,
- 			    struct devlink_flash_update_params *params,
- 			    struct netlink_ext_ack *extack);
-+	int (*lock_firmware)(struct devlink *devlink,
-+				   struct netlink_ext_ack *extack);
- 	/**
- 	 * @trap_init: Trap initialization function.
- 	 *
-diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
-index 9401aa343673..8f37cef858e2 100644
---- a/include/uapi/linux/devlink.h
-+++ b/include/uapi/linux/devlink.h
-@@ -141,6 +141,8 @@ enum devlink_command {
- 
- 	DEVLINK_CMD_NOTIFY_FILTER_SET,
- 
-+	DEVLINK_CMD_LOCK_FIRMWARE,
-+
- 	/* add new commands above here */
- 	__DEVLINK_CMD_MAX,
- 	DEVLINK_CMD_MAX = __DEVLINK_CMD_MAX - 1
-diff --git a/net/devlink/dev.c b/net/devlink/dev.c
-index d6e3db300acb..7bb7617a8080 100644
---- a/net/devlink/dev.c
-+++ b/net/devlink/dev.c
-@@ -1440,3 +1440,16 @@ int devlink_nl_selftests_run_doit(struct sk_buff *skb, struct genl_info *info)
- 	nlmsg_free(msg);
- 	return err;
- }
-+
-+int devlink_nl_lock_firmware_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct devlink *devlink = info->user_ptr[0];
-+	int ret;
-+
-+	if (!devlink->ops->lock_firmware)
-+		return -EOPNOTSUPP;
-+
-+	ret = devlink->ops->lock_firmware(devlink, info->extack);
-+
-+	return ret;
-+}
-diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
-index f9786d51f68f..2d12fb09ad48 100644
---- a/net/devlink/netlink_gen.c
-+++ b/net/devlink/netlink_gen.c
-@@ -567,8 +567,14 @@ static const struct nla_policy devlink_notify_filter_set_nl_policy[DEVLINK_ATTR_
- 	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
- };
- 
-+/* DEVLINK_CMD_LOCK_FIRMWARE - do */
-+static const struct nla_policy devlink_lock_firmware_nl_policy[DEVLINK_ATTR_DEV_NAME + 1] = {
-+	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
-+	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
-+};
-+
- /* Ops table for devlink */
--const struct genl_split_ops devlink_nl_ops[74] = {
-+const struct genl_split_ops devlink_nl_ops[75] = {
- 	{
- 		.cmd		= DEVLINK_CMD_GET,
- 		.validate	= GENL_DONT_VALIDATE_STRICT,
-@@ -1247,4 +1253,14 @@ const struct genl_split_ops devlink_nl_ops[74] = {
- 		.maxattr	= DEVLINK_ATTR_PORT_INDEX,
- 		.flags		= GENL_CMD_CAP_DO,
- 	},
-+	{
-+		.cmd		= DEVLINK_CMD_LOCK_FIRMWARE,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.pre_doit	= devlink_nl_pre_doit,
-+		.doit		= devlink_nl_lock_firmware_doit,
-+		.post_doit	= devlink_nl_post_doit,
-+		.policy		= devlink_lock_firmware_nl_policy,
-+		.maxattr	= DEVLINK_ATTR_DEV_NAME,
-+		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-+	},
- };
-diff --git a/net/devlink/netlink_gen.h b/net/devlink/netlink_gen.h
-index 8f2bd50ddf5e..f0129da6a81b 100644
---- a/net/devlink/netlink_gen.h
-+++ b/net/devlink/netlink_gen.h
-@@ -16,7 +16,7 @@ extern const struct nla_policy devlink_dl_port_function_nl_policy[DEVLINK_PORT_F
- extern const struct nla_policy devlink_dl_selftest_id_nl_policy[DEVLINK_ATTR_SELFTEST_ID_FLASH + 1];
- 
- /* Ops table for devlink */
--extern const struct genl_split_ops devlink_nl_ops[74];
-+extern const struct genl_split_ops devlink_nl_ops[75];
- 
- int devlink_nl_pre_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
- 			struct genl_info *info);
-@@ -144,5 +144,7 @@ int devlink_nl_selftests_get_dumpit(struct sk_buff *skb,
- int devlink_nl_selftests_run_doit(struct sk_buff *skb, struct genl_info *info);
- int devlink_nl_notify_filter_set_doit(struct sk_buff *skb,
- 				      struct genl_info *info);
-+int devlink_nl_lock_firmware_doit(struct sk_buff *skb,
-+				  struct genl_info *info);
- 
- #endif /* _LINUX_DEVLINK_GEN_H */
--- 
-2.47.0
-
+pw-bot: cr
 
