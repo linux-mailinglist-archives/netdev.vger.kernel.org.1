@@ -1,185 +1,186 @@
-Return-Path: <netdev+bounces-150329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 022779E9E17
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 19:35:22 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 525E79E9E29
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 19:37:15 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EA8D281745
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:35:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 224CD18883C0
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F3815854F;
-	Mon,  9 Dec 2024 18:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B035172767;
+	Mon,  9 Dec 2024 18:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JUlclw0P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXmykJUJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340AB7080B
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 18:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CDD167DAC
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 18:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733769318; cv=none; b=tsuYWdFdw/3DK46oOTaqJCflgm5O1fiwYgJinRYz1NLK03/2jnwJFduLh404CHQLrkzPlbath7AIshS8QWwLravdd5YhCVv3raBuAbdswJfkWO9OX6tvB8aHRIwi9jL7iFHte0ez2lArbdtvQKuu2ZJGSnedLmeAKhFtbJxj0wQ=
+	t=1733769430; cv=none; b=EHrL9U6JikHVj2f9WIIbZLJ71zmFXVSQjMQxcPlSTGRJ8eGELC0K+ajmVaIka4ZeHpdFAmS2S/MY/cGS+h9RqwbnjmJmJNuV85hf9AuJfiD9HySYNmtDwbn5Bn7NiSxG5z0rbBDy587emiovzCBqFvXSpeF0rvYd3XG0AJoMN2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733769318; c=relaxed/simple;
-	bh=py/FUWNJBVLuNA6AwPU5vM0NehoU8END40d3m0aUxzk=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N9cDa/Z11C42s6VD9EcJNeu84KAh2B4HUNwxLu7UnaSNqKAWbtlQk/71h/hDWS8XvfloPbDfA04dOIBkSrMXZlCnru6/+nLYE8qJgAsC43OEFzYDp6EEojxapvsBkJaJq46bx4v2VQmymiLq1OpEE4ecDZ12YPru43Ep5JNi2kQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JUlclw0P; arc=none smtp.client-ip=209.85.221.51
+	s=arc-20240116; t=1733769430; c=relaxed/simple;
+	bh=ZIK0EewLVrJBA4Uc/hArxadlByCLJJ7W5uA/zEoxoWc=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=o4d+VZUoRSk3WIRQkjHqKejlRc9i4bwB47FWiU1VtkyyffdltaeFk6w9A6SUegOqpZ+UXOcVXkRmXeewbh/e1UmbEJIbc52vItO8IWXDLAtXmMR7bfmezc9H6PkNmAAzAoELb+X967GyH0EQKvvEGAtn5qQ5YgTBVvaXgwxzuFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXmykJUJ; arc=none smtp.client-ip=209.85.222.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-385dece873cso2244657f8f.0
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 10:35:15 -0800 (PST)
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7b676152a86so571945785a.1
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 10:37:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733769314; x=1734374114; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=K6N+dq3hKX8FcRToeisLIdUSzONgBmhzbPqdUM5lEOs=;
-        b=JUlclw0PWow4TqcURXn0Lnh2Ln+fTRECCnFV0KA1oqumGAGHQexcu0lU0DQZ6LJuVM
-         XKT5krHNv29lXaXkOMLTQjZJF4I31gi13ZaPnKVwKzruQsNLvtZZ4I1DMcunvnZHTqku
-         9j0oYMcBYuXa9GkfQhpi97H4GTOjh+dxgfRxSHCzN5yFEaCEY7HrogSx3WObn/cNZPxC
-         HT/J0qDpBNOfV2ZcixqRj3Fs24GdmD0m1pZ1ZQ8DXQhUhSGZFRFxnU42PHEdSThgmvuk
-         4CxkI1CQ+nhxRxNxuDpmN7tRAhhJbEPEQcsm1JcfnoryjFoEILpgIBJEPN44dDcG5s7w
-         0d+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733769314; x=1734374114;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1733769427; x=1734374227; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K6N+dq3hKX8FcRToeisLIdUSzONgBmhzbPqdUM5lEOs=;
-        b=ZkDHO0YLijdbKXyZLt552m7drzlAMVSv2JjnhQ1HmumRtNQrv14BfcRPNa05PEZOBt
-         CJXqIpg0NMvgExVjqRB4Q4Fg4z4DLvtPzCcdAEi++iN2/ySjZwK26ga9xAmlYVmaGBs5
-         xem5ySWm1Db7Y748N7gUhUdZaWyYBJ/fngBikJLhCPP9J7j8X8XfmKF400qLBPCjv2Mv
-         fyWMudMYc5ERnbkg+jdPAqtbGYXVLefVJbffaiNA7E8CuRX7RBb7OenDYyG23WeQripO
-         Z19+2H42/qAbo4Dn7FF/UOyyPApTWxGzQ1bT1ByRmtk4e74BivyPkabSEbO+8JDgAxfV
-         iQnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWsPC8ieLy8WPD9xZqGglan1afGwb3vzFR5NS/w1Hl/+CALTr/O6CTvawYPPvAZJ4o5JnrL5qQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2wtX5Sf77HGeSigFmIl3FsrzRGMN6/OypMOL8rfOCtXKRNgGP
-	6E5X7uGeAJlBVxCIRPzDvq4eEl9XmvHTpzZ0SlGty5lgi3GShqLy
-X-Gm-Gg: ASbGnctiYrsVC7lMgl30BVGASAjz8/HAR2+FnTR5AYlyTeerZnjxo03Xx6LskBvRtb5
-	bBjp3z5zaEy+qMPegBy6zixXvOrR33Z0A9DwKp2g9hVChPDXllr9LrYV/ASsGsRDCgzWDtEZmZF
-	x9usFIcYxVj/cZHbVNhdyeHtXGRY+a1EayVsSG+gQ5nAfHvKlVfPmBj3GdxRaKgIZT+0wl8at84
-	Eeg5FjKRz0X21TKIOIYUIG9/+kxhAqHhm2WMQhX8GAvQgU/1pw5k/Z+EJGTMvzyY2lrT7P2cyJ1
-	xKe/Ng==
-X-Google-Smtp-Source: AGHT+IHTgvXww5OoXd2i5J33KpEIWZPrlxP2cPLcr/9fcDCjaoD4KPfXiQFbVmKRgpFOwWLmzoTB7w==
-X-Received: by 2002:a05:6000:402c:b0:385:fc97:9c71 with SMTP id ffacd0b85a97d-3862b33f007mr8513282f8f.12.1733769314132;
-        Mon, 09 Dec 2024 10:35:14 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434f5506766sm59078995e9.5.2024.12.09.10.35.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2024 10:35:13 -0800 (PST)
-Message-ID: <67573861.050a0220.bef7c.e26e@mx.google.com>
-X-Google-Original-Message-ID: <Z1c4X5_J5CRVhYHa@Ansuel-XPS.>
-Date: Mon, 9 Dec 2024 19:35:11 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next 00/10] net: add phylink managed EEE support
-References: <Z1b9J-FihzJ4A6aQ@shell.armlinux.org.uk>
+        bh=J/YmFDgpUpDSzsmPW5+tzjrqrqfqeFy/GKHYDmvyeOE=;
+        b=KXmykJUJm4ZraINr1+bPbyKLaoxDcKRdFYdnZE7taJ4xVlukbwzCbwR0teKkFezIRj
+         t4A1SEgvoz/41uCifcTUavdQ6dgUnhdGxiJun+mi1Smy4Y0jV8uwnECSdHnsl3Sjwaxx
+         XF7Rg9T2Tjxbw7Tmne+YSMu4uZ6dXfor7eGZDxnOCuS/3FkmZTPh0PzZy5EFHQMUl8y7
+         WSerFE2HPp5m9eteuAhPEDwuR6uxlDmjM+XFTbaDe7lYDZowooTTwlG9SLB0CuXAu00t
+         K/wpw6485GdrqkfFP67k49wDt1T+xxY9DzxD1NgLkxD0fzvGzlwDWSf2RE5KgU9QhJNr
+         jihQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733769427; x=1734374227;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=J/YmFDgpUpDSzsmPW5+tzjrqrqfqeFy/GKHYDmvyeOE=;
+        b=by5ThhEaMsFlalXB+BFxwlEhAfFvdFBtHyEtYodIUFZcKCR/etqnwI0Bv0PYKvOF1N
+         GP6lkzi5gDJ2GMisegDTh6LYm9Mpj8qRqc+o5OohwYhVvHwkXKTWpgvxDWhDQvtij1Q2
+         Oa3xJxp9Citgt87ubUT7AUekBokFSL855dHzVxY2k0kTCOhGTUA660HmIK388nOPy2Y+
+         OMH89QKBBgQ49Y7/GHtGr/YFukenOz3W1b8zg5o5H0ZcZDtu7iFcem3SBrN7N7bI8Baw
+         Zkdiwl9p0OALadBQE6riLEKt5Rt+FXkj1pW9GOyomg8MaTpfrn6aVbkGTai2LeuYcN88
+         g6kA==
+X-Gm-Message-State: AOJu0YyU+pr9FBwP77pRw02hRLxqWDCkRoJDp4WlMd/jEt12hSErNBAR
+	RSt7GZMZBeFkyYtdiJihK36pI+DkWL7as3f8sgPohOkXkcKk7a/SsZkidg==
+X-Gm-Gg: ASbGncurFbvplScwysxkT4kRObYWiS0616HMOboId7IFo4tFHvjGDHn0Qsv5sk708kv
+	zvULIqkOjz5SPT7XgnPUfzE1H5UP+T0ttilKK7J59r5YE43q5sxXC7jVk7UszPWW6kYMio02yGN
+	miPnhpSaKJZdmmNqsT8hLDsBe1ncu9FO5UQPQQJwLeF6R12xI9qVK/41BJeZU8tG7q3TMZ3L4WP
+	ptOHgJANoGsFr6E0k/W4pE762DMQ2E1gfKfUGRB9QsObVZjzC4McMeG+72kri0L
+X-Google-Smtp-Source: AGHT+IFEscSXGykpGsOxgaBS5AmGwPIxbfVmAh1BJMkQaGwAzO4EmqeEjstbL3/MLV/n4r2sAHR4gQ==
+X-Received: by 2002:a05:620a:2a05:b0:7b6:dd89:d86f with SMTP id af79cd13be357-7b6de7616d8mr50365785a.24.1733769426837;
+        Mon, 09 Dec 2024 10:37:06 -0800 (PST)
+Received: from [192.168.128.127] ([142.114.175.98])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b6dbb3b67fsm47068685a.10.2024.12.09.10.37.05
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Dec 2024 10:37:06 -0800 (PST)
+Message-ID: <ef68689e-7e0b-4702-a762-d214c7d76e3b@gmail.com>
+Date: Mon, 9 Dec 2024 13:36:55 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z1b9J-FihzJ4A6aQ@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: netdev@vger.kernel.org
+From: Antonio Pastor <antonio.pastor@gmail.com>
+Subject: [PATCH net] llc: reset transport_header offset as value is inaccurate
+ when buffer is processed by DSA
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 09, 2024 at 02:22:31PM +0000, Russell King (Oracle) wrote:
-> Hi,
-> 
-> Adding managed EEE support to phylink has been on the cards ever since
-> the idea in phylib was mooted. This overly large series attempts to do
-> so. I've included all the patches as it's important to get the driver
-> patches out there.
-> 
-> Patch 1 adds a definition for the clock stop capable bit in the PCS
-> MMD status register.
-> 
-> Patch 2 adds a phylib API to query whether the PHY allows the transmit
-> xMII clock to be stopped while in LPI mode. This capability is for MAC
-> drivers to save power when LPI is active, to allow them to stop their
-> transmit clock.
-> 
-> Patch 3 adds another phylib API to configure whether the receive xMII
-> clock may be disabled by the PHY. We do have an existing API,
-> phy_init_eee(), but... it only allows the control bit to be set which
-> is weird - what if a boot firmware or previous kernel has set this bit
-> and we want it clear?
-> 
-> Patch 4 starts on the phylink parts of this, extracting from
-> phylink_resolve() the detection of link-up. (Yes, okay, I could've
-> dropped this patch, but with 23 patches, it's not going to make that
-> much difference.)
-> 
-> Patch 5 adds phylink managed EEE support. Two new MAC APIs are added,
-> to enable and disable LPI. The enable method is passed the LPI timer
-> setting which it is expected to program into the hardware, and also a
-> flag ehther the transmit clock should be stopped.
-> 
->  *** There are open questions here. Eagle eyed reviewers will notice
->    pl->config->lpi_interfaces. There are MACs out there which only
->    support LPI signalling on a subset of their interface types. Phylib
->    doesn't understand this. I'm handling this at the moment by simply
->    not activating LPI at the MAC, but that leads to ethtool --show-eee
->    suggesting that EEE is active when it isn't.
->  *** Should we pass the phy_interface_t to these functions?
+Hi,
 
-Maybe only to validate?
+While testing 802.2+LLC+SNAP processing of inbound packets in OpenWrt, 
+it was found that network_header offset is 2 bytes short (before 
+sbk->data) when the packet was received through OpenWrt's DSA 
+(Distributed Switch Architecture). This causes SNAP OUI:PID mismatch and 
+packet is silently dropped by snap_rcv().
 
->  *** Should mac_enable_tx_lpi() be allowed to fail if the MAC doesn't
->    support the interface mode?
+Here a trace:
 
-I'm a bit confused by this... Following principle with other OPs
-shouldn't this never happen? Supported interface are validated by
-capabilities hence mac_enable_tx_lpi() should never be reached (if not
-supported). Or I'm missing something by this idea?
+           <idle>-0       [001] ..s..  8744.047176: find_snap_client 
+<-snap_rcv
+           <idle>-0       [001] ..s..  8744.047218: <stack trace>
+  => snap_rcv
+  => llc_rcv
+  => __netif_receive_skb_one_core
+  => netif_receive_skb
+  => br_handle_frame_finish
+  => br_handle_frame
+  => __netif_receive_skb_core.constprop.0
+  => __netif_receive_skb_list_core
+  => netif_receive_skb_list_internal
+  => napi_complete_done
+  => gro_cell_poll
+  => __napi_poll.constprop.0
+  => net_rx_action
+  => handle_softirqs
+  => irq_exit
+  => call_with_stack
+  => __irq_svc
+  => default_idle_call
+  => do_idle
+  => cpu_startup_entry
+  => secondary_start_kernel
+  => 0x42301294
 
-> 
-> The above questions remain unanswered from the RFC posting of this
-> series.
-> 
-> A change that has been included over the RFC version is the addition
-> of the mac_validate_tx_lpi() method, which allows MAC drivers to
-> validate the parameters to the ethtool set_eee() method. Implementations
-> of this are in mvneta and mvpp2.
-> 
-> An example of a MAC that this is the case are the Marvell ones - both
-> NETA and PP2 only support LPI signalling when connected via SGMII,
-> which makes being connected to a PHY which changes its link mode
-> problematical.
-> 
-> The remainder of the patches address the driver sides, which are
-> necessary to actually test phylink managed EEE.
-> 
->  drivers/net/ethernet/marvell/mvneta.c            | 127 +++++++++++--------
->  drivers/net/ethernet/marvell/mvpp2/mvpp2.h       |   5 +
->  drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c  |  98 +++++++++++++++
->  drivers/net/ethernet/microchip/lan743x_ethtool.c |  21 ----
->  drivers/net/ethernet/microchip/lan743x_main.c    |  39 ++++--
->  drivers/net/ethernet/microchip/lan743x_main.h    |   1 -
->  drivers/net/phy/phy.c                            |  47 ++++++-
->  drivers/net/phy/phylink.c                        | 150 +++++++++++++++++++++--
->  include/linux/phy.h                              |   2 +
->  include/linux/phylink.h                          |  59 +++++++++
->  include/uapi/linux/mdio.h                        |   1 +
->  11 files changed, 458 insertions(+), 92 deletions(-)
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+The offsets were detected as incorrect as early as napi_complete_done() 
+and I gave up on tracking where the problem comes from. Running with GRO 
+disabled makes no difference.
 
--- 
-	Ansuel
+Curiously enough, __netif_receive_skb_list_core() resets network_header 
+offset, but leaves transport_header offset alone if it was set, assuming 
+it is correct. On non-DSA OpenWrt images it is, but since images were 
+migrated to use DSA this issue appears. For locally generated packets 
+transport_header offset is not set (0xffff) so 
+__netif_receive_skb_list_core() resets it, which solves the issue. That 
+is why inbound packets received from an external system exhibit the 
+problem but locally generated traffic is processed OK.
+
+I can only assume this has been an issue for a while but since 
+presumably it only impacts 802.2+LLC+SNAP (which I'm aware is not much 
+used today) it has not been flagged before. I wouldn't be surprised if 
+any protocols using Ethernet II frames reset transport_header offset 
+before they have anything to do with it.
+
+The kernel code does not touch transport_header offset until llc_rcv() 
+where it is moved forward based on the length of the LLC header as it is 
+assumed correct, which is the issue.
+
+Patch below proposes modifying llc_rcv() to reset transport_header 
+offset and then push forward by the LLC header length. While a better 
+solution might lurk elsewhere by tackling the root cause of why 
+transport_header offset is off after DSA set it to begin with, that is 
+taking too much effort to identify and risks widespread impact. A patch 
+could be made to __netif_receive_skb_list_core() to always reset 
+transport_header offset, but that would also impact all frames. This is 
+a lower risk patch that will not impact any non 802.2+LLC frames, and 
+presumably only SNAP ones. It follows the approach of 
+__netif_receive_skb_list_core() of not trusting the offset as received 
+and resetting it before snap_rcv() has a need for it.
+
+Patch:
+
+  net/llc/llc_input.c | 2 +-
+  1 file changed, 1 insertions(+), 1 deletions(-)
+
+--- a/net/llc/llc_input.c
++++ b/net/llc/llc_input.c
+@@ -124,7 +124,7 @@ static inline int llc_fixup_skb(struct s
+      if (unlikely(!pskb_may_pull(skb, llc_len)))
+          return 0;
+
+-    skb->transport_header += llc_len;
++    skb_set_transport_header(skb, llc_len);
+      skb_pull(skb, llc_len);
+      if (skb->protocol == htons(ETH_P_802_2)) {
+          __be16 pdulen;
+
+
+Can you share your opinions on this patch and suggest next actions for 
+its adoption (or modification) please?
+
+Regards,
+
+AP
+
 
