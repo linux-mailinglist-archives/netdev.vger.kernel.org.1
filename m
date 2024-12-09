@@ -1,338 +1,286 @@
-Return-Path: <netdev+bounces-150243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 607019E98EE
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:32:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35D0C9E98EF
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:32:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFEFD161688
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:31:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DE2D16730A
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:32:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CDC115575F;
-	Mon,  9 Dec 2024 14:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F921ACEB8;
+	Mon,  9 Dec 2024 14:32:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ktpgUpdm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hiDGek/c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE4C23313D
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 14:31:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733754715; cv=none; b=qMbXbhvAl4fCVxFiNF5RU4aS2e7reKTj+u4v+tdQZGcSveUAyryuw39PwlXxgWrET3Crt604RozD8gAxbtWoVi0qPzHt9psM9qELhGdzLV7GCvXiUpb+9exl77CXbTKKY/QlBo/kqpef2RoCiKwMs/xNvYUUdBjtdtCwb91yAY8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733754715; c=relaxed/simple;
-	bh=MhfealCDqySBLn5juGHahWuXd8EMRr5usCna+BuLTus=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=UGfVvUjj8N1/nN5iBN84QhTe2q/CUE3SMiGPr4UivgAlc2xDQ5wVlk2oD16hIRv+72Gs15euo/MyVGyEN5owzHqtMHrV8s7v2KmQ2sFXEZiXBfaADKBMVURjdIVtfHYwN1H6jDCYP1iaAN8bwfowL2zvCpgCgdkD/Dy6c6lDew8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ktpgUpdm; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6d8918ec243so45389046d6.1
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 06:31:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733754711; x=1734359511; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=140AQ21XBNJ98TnkcQ9rCEV1zMN+f2SiZ+g0BtoRiaA=;
-        b=ktpgUpdmoZd7sf9EzzIja58v9yAQL5++f4+TuCInMZthUlAlO/7g3kaGYQ940FbZhH
-         2gxGDipAZRZbtzbZ+NjXpJ8+XYdRnlMN0IPYejnBH0XuZ+WA6nlJJyGyqcv5DGOa9yGt
-         lEOzXwainRhj6W7AkUM0DV/43LCixrWUZ+WIFOB57Crqm3/Akqjy9C+kBXYq2B98TDjm
-         pqK5ijWRboJ0JOI9xNvjQM0hotM9U0lOR3LH6jFyRvrY3eqAW0uCHjlgKJRopIpyPA7V
-         v/KzlWRc2lwac2sdD+yW/D/oynji8OMju9swTQ2n/Ib9YSq2coBMnw22ayv0+9DbUKv5
-         zVCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733754711; x=1734359511;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=140AQ21XBNJ98TnkcQ9rCEV1zMN+f2SiZ+g0BtoRiaA=;
-        b=MATjn38XnhFWkYpqv1wEBPZ1vjMWHMM9AANDHmx3KLjIiEeneUGru9RDWcpRW0rZKu
-         H/7kTnge4C/dgl8c54+FHRPE2j/1U5U+7bW+6sJ08J7shysnSVBZSyarMlZZAVXcfLlW
-         bR/7IJxiUc0t4HYxd4tgkdCzQCfaDg0tcvAf3bFdRH+F7KSYCCT+DWVUeqzniPav4sD8
-         esArxcl0wTg+DJqHXmD1PUol/ZIj3B2h6TgDdAIiSadoLtVa8mUB2C7vbru6ZBIsFKfg
-         28Es3Oet7uL++TB0dpoifAziWtozEmHEifsV89ABlOOnabNgTPo5l1k8FaYWUIZtSvdi
-         vIvg==
-X-Gm-Message-State: AOJu0YyRe/xi9r/ttWK8+HLYs2EXk9ABxz2BlsYj6upXYo1roEdH9sfC
-	GHGjvnF0kGFlas0Nkr9z4V7T+JWbmjir4O7CrQdXwEs/srgY1lmmsB8Ovg==
-X-Gm-Gg: ASbGncvW6/yp5TLtciHxxlnv858ir1uBxgF4SM/vc/JDxXpDvKTs9bxAiJrlUqQcsXk
-	IGLHOm/rowpMxHPy+jb4ABq9d8Fvgvsv+Wwyu98oxFE3n1iFIMPWB7WrU09f56JcF34q1IJnML+
-	2sObWrxUhhOnI1PqPRyHzmotBGFdJBSw4fRXAjS2OiXgaFs3iFxDzAWLrRrEz1Zoku1wx6o8lvM
-	VIzZxSzoKZ2Hx5898vFCmBh0HUW8bBjM4ONk+NCUZKtAmaX3d4FIJdi9hsytRRxgZlVXjtKaZt2
-	zkPckz/S0uuhBOl88nmv3w==
-X-Google-Smtp-Source: AGHT+IHBLM1SpvZ6ybYs9QOjsiDXHF/aH6fACmLpDGtZ2ALlzXzrpEkXLXj46wYQXgfl2Rexx7lsYQ==
-X-Received: by 2002:a05:6214:d6e:b0:6d8:9a85:5b4d with SMTP id 6a1803df08f44-6d91e2d378cmr13015736d6.5.1733754711491;
-        Mon, 09 Dec 2024 06:31:51 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b6d801632esm76852585a.7.2024.12.09.06.31.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2024 06:31:50 -0800 (PST)
-Date: Mon, 09 Dec 2024 09:31:50 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Anna Nyiri <annaemesenyiri@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- fejes@inf.elte.hu, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- willemb@google.com, 
- idosch@idosch.org
-Message-ID: <6756ff5651ba1_31657c2948a@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAKm6_Rtc8YPFk9QQQZ2p5aiY1zodqy7i484gb=Yq=qrSQaYSoA@mail.gmail.com>
-References: <20241205133112.17903-1-annaemesenyiri@gmail.com>
- <20241205133112.17903-4-annaemesenyiri@gmail.com>
- <6751cb5f3c7d3_119ae629480@willemb.c.googlers.com.notmuch>
- <CAKm6_Rtc8YPFk9QQQZ2p5aiY1zodqy7i484gb=Yq=qrSQaYSoA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 3/4] selftests: net: test SO_PRIORITY
- ancillary data with cmsg_sender
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E15523313D
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 14:32:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733754740; cv=fail; b=cc1d+T1EhdthGj+gSWNkbIRVqjxwod60jGCn2Osz/X5zfQ7cyb2P2tEWB1oNPpUgCGpCdUGmeE4iscCGiXhcCEUg+ueMiuPPQkfI60ZUTqf2iE7ANUPhyak6f2KRVOc74pTcAO5HNm6CAku/2vQJnABVHGbe8mR/UvBb/ZjJ5ek=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733754740; c=relaxed/simple;
+	bh=ZaLim0rJqcX/Cxl7OWGcWyCVvAAFJkkDwx4+/vZj7Qw=;
+	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=a/airjy6+DTx35bn4oc27LZp+Te3a9HIJaVrM1Bgr5Mf9ljO0//UnynTk9ROGnCPz9JeI5AjrcAyE5gQ2JnvW2UcYL1wS2ZF4uGtHNZwLgxzEyk4Tcx36vRfp3+rkKoV2+3Y1fxN/MmiKO0wkQtnOJfbcj4NYgl/Sf1VnnaL5mE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hiDGek/c; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733754738; x=1765290738;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ZaLim0rJqcX/Cxl7OWGcWyCVvAAFJkkDwx4+/vZj7Qw=;
+  b=hiDGek/cS2EyvikWJQViR2W0ewqw2Qxs2wEMn3hdBiLv8As2TGMrKOSb
+   tiwIBKC2iXCn0gicVmM4UbLzq+8XZsoJnp1QJRO6IUXk4VWQkjHv6OjUr
+   mmwdYyGMhjvLtN0ikF/PGeHfxCQREoGRl/3+h+vcrXppQlGE/tMijhauw
+   CcgyZ9fjYDLs+doH5utCO48B0OMRUv0PoX5W2wCwK6HjZnKAptVcVEXIb
+   mnnXDC59a821HBQAd+WX5C7oN1gf0y1+Uy2uoI3D4HcDF3pI2p4/f5Be3
+   jOtG90Q7ZwtghkfLC6F7Jo7kVGWTgVvqGcECpQletkxJlohrVM3E2p5XB
+   A==;
+X-CSE-ConnectionGUID: RxONS5MySAygbsg4q9kU7Q==
+X-CSE-MsgGUID: ey/zZlJfSnGatkTWl0diKQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="34180363"
+X-IronPort-AV: E=Sophos;i="6.12,219,1728975600"; 
+   d="scan'208";a="34180363"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 06:32:17 -0800
+X-CSE-ConnectionGUID: p/p0F5fYRmuGHV/AX0bpUQ==
+X-CSE-MsgGUID: Gm5V/qGAQzSQHNqfI8/COA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,219,1728975600"; 
+   d="scan'208";a="132464486"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Dec 2024 06:32:17 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 9 Dec 2024 06:32:17 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 9 Dec 2024 06:32:17 -0800
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.45) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 9 Dec 2024 06:32:16 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=t27DEQ7FoScJ49LeqZ6/RenZNJMbiPul3J85LzithLawQXumKojIe/U0As2ZowO709Crz+OT3tEdmZPhd+oSW3Z/f3GgRW5wxDrim3LI4udAhzFHvzXwOydgIYMdZiihk1tPVRoiWOweoYzNUbqYP8aiUpIf/9prysSSZbsQIrCt40NQhmmoB3sb9uX9fzW4zqPKK0JCycKd/XAaX8CwHFoSqVZExVTr/Q7ZAuOrAR6XdcVbWJXIXsgKAjrY0E+J5JS6hEq/X+yJ9tkN6bxBFVWvPySLwELrAw4puTk/fchVX+TSfMwD6f+4MrlheZ0xTEGNVRGS+jMuqSGH0Tx0Lg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vDseUQApSViI2IEDRjpHMH9QPokkOsBjP5ZAKQ7JCoQ=;
+ b=XR4mQx9Q9jKegSeJsAFJYHEL4UTgLE2oghMdGbdfDRdaLQBtFnP3yD0TE96SyabVPYmbgNljIDw5KXnX8dC9TsXpgt+PWSHRwuRNCE3VEh8vDtyQICWB+C6e18amww1WOsqQ9riwHK0joajxA5B95eanRZ5DAYaqgrPnHjlL44ZCyoQTLNfoqFDkN828qWK0B9PsXjPs/gRlY+jQmRa/mLlJE5koLaHO1vvbwqwiwwf15+Yvh72HwvxSGe/Xfzk9jIemghzLzy3+JNFEnFTi+vgTP3JSfw03IRWz22/Ydq+DFdgguz9ku9Q0ZmIoErxzzDw3wTKujSWvH9rvp7vGLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL1PR11MB5399.namprd11.prod.outlook.com (2603:10b6:208:318::12)
+ by SA0PR11MB4573.namprd11.prod.outlook.com (2603:10b6:806:98::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.18; Mon, 9 Dec
+ 2024 14:32:13 +0000
+Received: from BL1PR11MB5399.namprd11.prod.outlook.com
+ ([fe80::b8f1:4502:e77d:e2dc]) by BL1PR11MB5399.namprd11.prod.outlook.com
+ ([fe80::b8f1:4502:e77d:e2dc%5]) with mapi id 15.20.8230.016; Mon, 9 Dec 2024
+ 14:32:13 +0000
+Message-ID: <0d8531bc-85b8-46da-a366-1a194fa83584@intel.com>
+Date: Mon, 9 Dec 2024 15:32:09 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] ice: move static_assert to
+ declaration section
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, "Marcin
+ Szycik" <marcin.szycik@linux.intel.com>
+References: <20241204150224.346606-1-mateusz.polchlopek@intel.com>
+ <f684e517-19c5-4dd9-9de6-34aefe289552@molgen.mpg.de>
+ <ee75ce57-bcac-4e23-b35b-bbeff50cf460@intel.com>
+Content-Language: pl
+Organization: Intel
+In-Reply-To: <ee75ce57-bcac-4e23-b35b-bbeff50cf460@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ZRAP278CA0007.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:10::17) To BL1PR11MB5399.namprd11.prod.outlook.com
+ (2603:10b6:208:318::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5399:EE_|SA0PR11MB4573:EE_
+X-MS-Office365-Filtering-Correlation-Id: b0eedfd0-3a26-4097-769a-08dd185e45b6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?TEU5UWZNWElTMnZsbnBWdTlxQnEzemVxL284alQrSnZMZW5LeGFqNlQwTEs2?=
+ =?utf-8?B?Y3Jra1M0NGV6aUFDUGhhMjBNVDMwejg5VHBpYnVEUCtxREEzU2lCZXJ4NE9M?=
+ =?utf-8?B?K2htNnN4NzgwYmlweUJmbjhoREFzOS9jc1VPSHNQM2w4enBFbXpVV1Vkem5R?=
+ =?utf-8?B?dTZ5Z3N6WEFiYkcyRHhNUjZNTVEycWd4d3FYQUJRcThpK0ZMM09FMGhPYWNx?=
+ =?utf-8?B?TzlBSkNTVTZESWxicGM5Wnd4czJWRjZjblJuSlJNZWxkbnZ4OWxoaUhnUHZt?=
+ =?utf-8?B?Ym81ZmU0b1NaK3JaWTFEY2NjUlZXTkVMbk04dzVEVzNMVjFFcnJ1TkV6YUh5?=
+ =?utf-8?B?YU1yTUlLcmJ6WlR2b3N6NTZBYm5VeFdoemtES3ZpbUNhbWNFb0xmMG16S1E5?=
+ =?utf-8?B?Q0VqYlF0bGljWDAvcVIySEdBOUdmNmRxVmlrT2dsRU9Hd2hUVUpiOTlOamU4?=
+ =?utf-8?B?TGcvRzc2enRqYTRWUklvQVdIaDhwRDZNSTdvTElSQTlIeEplbS9CMkQwK3Mv?=
+ =?utf-8?B?ZlFlbEdmV3pHdlM4c245QTFRaGlpU3Q5QkdQb2txeVVTb084dC9MMEl6U25K?=
+ =?utf-8?B?Zm9aTlhmaGJTWFZPU1lqRDVnR21WZEV3Z2phajBZcjlHYXV1U1prVzc3WjNX?=
+ =?utf-8?B?NGNNNTdwbUFBTDJBUE1zMnZJZVJDaTF2QmplL2tFZXk3YlRsaVo5ZnNaMDVT?=
+ =?utf-8?B?cDFaczdhelNiaEMzWmVzTFV4bzJaMlYrM3RtMHF3L05FSHJIWlNYcG9JNEV2?=
+ =?utf-8?B?ODVsU0hyVmI1SDFWZVJMZ3hGajA5cDI4M1NzVEZYRDFkeGJkeTBoRlNMblhX?=
+ =?utf-8?B?Z3JId3lpK2dndzdFck0rMXd1TDlDaWZZdW00TUg5eml5VTRNS1l4VlFleHp1?=
+ =?utf-8?B?RXB2ZmMxTW94b1J2RWl2ZlZGd2hyN1RJS2FOMUVYKzFLYlV2MXVHVlVJNk1t?=
+ =?utf-8?B?R09ZYUlxMXRaNTB1NjgxWHBmcVVUMk01NWI4WDZXUHg5cHRuSFRkcC9uVGE2?=
+ =?utf-8?B?RGxGdTZxU2lKcmtOMkRoY21JS3JvSHVmTGg3dHdhVHQ5MU1QcXJpa2J3bmVO?=
+ =?utf-8?B?bWNsRjVoQjdBZ1NrVUlzQ0kvcWxUVXhMOXRQUzR4TjF0OTF0d3RsdHBYZUxM?=
+ =?utf-8?B?T1dFVzV6bWVhVy9MTytpN0gxMEk3YzZoRGdMRDR5aVZQdkQxZk9hZEZVblZP?=
+ =?utf-8?B?aStQaVFkMGlaZTBwLzhOWkVkY1V6WGZFUXFMOTdhYk1rdkFRN3hKcWNlRzJh?=
+ =?utf-8?B?K2l1ZU9DMXF4cGF0L0V2Ym9SQkRPcWFDZlp4TitSNXllU05POTZIempoWWJl?=
+ =?utf-8?B?aUpud3ljNlY1RU43R01qNmxiRkNYRjBVNEUwYVNiZyt2b2hkajc1Ym96ZzFN?=
+ =?utf-8?B?UWhvYjlSY3JURW92Tk9yV2NTREM2c1BoZkhPczg3bHgrU1hpYnZiNEl2N001?=
+ =?utf-8?B?OTFDNmgyUVJscUFDSjZaMGxxVDhDRUEydG9JaEpUOWRJTWJ3YWo4SklTelgv?=
+ =?utf-8?B?M3FBUGVCN1pzd2ZHekZWT2ZQTGM4QXpYYmU4MjZsOU8yWTd4YUlod2xGTFhk?=
+ =?utf-8?B?c3ZCUEJ6M3JydllLYXZ0YXBwamgrUHRXYytXbmd6VFplNGhRQzIyM3B1Snll?=
+ =?utf-8?B?d3dHTnovK3hwdnljd2I1c1VsREpyb0ZHLzRoS3JWR25lZGN5NWY5bmVkZlJy?=
+ =?utf-8?B?a2pPNnJoYnplNW41Mk1ZWjBCdUJpR2RmSC9IcUlvRkd3NTRxSDg1VEtLZE5N?=
+ =?utf-8?B?WlNFbVZtczM2bHg2Y0xRSDhZSEJqZk9CQXBqUmovNk9jNWZnVG0wNXZIRXJZ?=
+ =?utf-8?B?WUxmd0NteCt0elRxaW9ldz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5399.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NlNwQ0xNRmlTVFRZU0NpTFlENExya0d6TkNZdXFYcE02YnY4alF5ZUx0N0FE?=
+ =?utf-8?B?eHgzdWNDSW0rK21xUVYzMnN0bXRNbDM5b3JaYTBlTS9lVnZsUWVicWtzYXhV?=
+ =?utf-8?B?RFZYK3YxRm41Z0lvTi91RlliRmtxWmdXcEd5M25BUFlZeGF1QWZXMi9KbTA5?=
+ =?utf-8?B?ZnZIb2l0SHYyTUc2bVRtODJVUkFhOHlKVnF5ZzRmWjZHcTc4ZXpmZkE5bXE1?=
+ =?utf-8?B?ekJCc3RBMm90ZU1pZ04vdVdXWUhMV2ZoQUNoeW9SeWdkanU0U2tOU0Z1SXBH?=
+ =?utf-8?B?U2FDY3pmbFRCQkVpV2ptR3hIMVBBY3FJRTYzL3dLeEpJb29INzY0NGdjdUhI?=
+ =?utf-8?B?NGhodnc2cUVnd1puZEpZMUwvTk5XOGdmWVJtNnM2Umx3cDc4eEVIS3dFb0Jt?=
+ =?utf-8?B?SU9pOWVEWVh1RnNJOUNFK0ZSOE1UTHZKbTRxWExWbG9UcFFxeloyd1F1bTB6?=
+ =?utf-8?B?NW1ERFFvRFJ3S0xVb1dyNG9pQnpyWXh5VzhpNTA0T0huMHI5cGVPRUVQUDBs?=
+ =?utf-8?B?a0VFQlNSeVlMU1ZkY3BiOGJycEViNzRpT1ByYVhKUjZVYU5XYVJyZXlqd0V5?=
+ =?utf-8?B?TXV4eXoyTlAyWWNjSU9tc0NqbmZNSUFFSGdWcmlFSC9QZ1gzOXJqQjBhTGlx?=
+ =?utf-8?B?cnRobzZSWVNKclJYRTI3aW15QXpGbjNBRHFaOUh1YUdQbzh1Z2IxODAxZzVh?=
+ =?utf-8?B?VG02KzJTaW9tSVU3ekF0S0wvYlI5R3FJaXFkMy9SNVV1K2RrdjQxMGtybW5q?=
+ =?utf-8?B?Y0xYYXFhaGxIWVV4ZmJ2YTJaZnhCamcwS0M2czVOWGk5dDJEbnVjVDBacXRo?=
+ =?utf-8?B?OFQ1QUVrYy9sZGtvQzVWQ3VNNVJVRzArTkY0WHcxb1dtYjlXL25ZVkRpTnA2?=
+ =?utf-8?B?d0FyMkxPbFBtMS9PaFloVG8zUXFDUU5KNU1LWXdRRjNyd241Tkg5eXJGSStS?=
+ =?utf-8?B?ZlpNekVCQWhwendYU2dDL3o4TStVQnI2eTgrKzFLZUdKc2lZTlRBK1dRakk3?=
+ =?utf-8?B?RXNXS01ucS9nZEV0WXZOVmxCaEhSN0ZlbWpHdm5yL2xBalNxLzJ3VU5kUStr?=
+ =?utf-8?B?Z01tRTFVcUxtdzNKOFJIdWxOaGNrTHFsLzN0VTFjQnlDaFpCL3kyMmRJVEZJ?=
+ =?utf-8?B?SWVCNjlIOXdJZkJOa2ZjRnk1cFBTWnBUWFdjQ2NURm5MUTRqT2xIdTBHcTZQ?=
+ =?utf-8?B?Y0VRNDB3MHhMZ1JuUkUvclFKbUZ4V2JNV2NMS3pqRnJPM3E1c2JDczV1Si8z?=
+ =?utf-8?B?RTNPWmdHQTJJd2tmOWJLVWNtekhnSGw1R0F0TmQvaUFBUzFYRmhOLzdVQ1p3?=
+ =?utf-8?B?S3Q1NUU2N2Z4RDA3cnozay9kbThWWlNzS2hZRDNjNlhsWEZyMjZnTUt1eGo4?=
+ =?utf-8?B?NjloUU1CdFJDZTJjMEhFOGY1TFl5SFFFWkhEc1VvMFMzRy9OVDB1YmxHNXJ4?=
+ =?utf-8?B?MVluZ254YUwySFpuNk5KRkdid1haYVQrdG0vS0M5MDhEOU1XRlpoU255TVNw?=
+ =?utf-8?B?WUh3VmxaSWZvM2cxcUJHaFREWTY1RGZ2UUs3Tkt3ZmowS2ExTW5GZ2xkazNz?=
+ =?utf-8?B?a1dNK1lVT0poU0dsVnBoWGhsTzRPcGlrdlNneHFKVVpqRkhId0NCQnNyeHRr?=
+ =?utf-8?B?SXRNbUhKSzVPS3dOZWlYeVpyN0hWd0NOUnZIdldmZ1FtWFRaN3ZrVUQwUHFa?=
+ =?utf-8?B?Y2d6RE5xeWFTMjJ5U1dTSHpLdmhVcmEvUnphV1BLUFJwRXBENTdIck85R0ov?=
+ =?utf-8?B?MHFydG9NQ2d3RmdzUHRxVlRFU05CYWNQb0ZyZDBRcUVKZVIzcGNid09LQkQ3?=
+ =?utf-8?B?RUx2Q1VhQnRKLzNPL0pObUMxTjdIREhnQXF5RlFLQndWWHhFUGhXNnlSZFAw?=
+ =?utf-8?B?MFExbU5pNGtUYWFTZHRZUWFWV0V5VGgwSkUraVpUYTBiWUZta081SEw4Qnla?=
+ =?utf-8?B?eWU0L091ZUF0U0pwaHo5VFZQRU9YaCtRS1lobTIxQnVuaVBqaGd5WnlPYzF6?=
+ =?utf-8?B?NzEzYnRtY1ZYUXBPRXZ3QjFEMjVRN2tzU3pvd2MwMFFMTWw3QzRrVW1VWFZa?=
+ =?utf-8?B?eGFpSDVPS1JsdHJCRlRqWm43NS9ENWJnWlNOeGJyT3BDTVRTMjVwL0tVWVVw?=
+ =?utf-8?B?NStXWC9xTy9rcmJuS0x2WUltWm5GNkJUQkp1UWR4bDNCVGQyaDI5M08yald1?=
+ =?utf-8?B?RkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b0eedfd0-3a26-4097-769a-08dd185e45b6
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5399.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2024 14:32:13.4487
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6THzug3u9DZLSFpeXzQ8mq3sGg7GTHUeUSHmmd4vSts/USMLd+hUA/lnC9kX7py/Jo6tglGql+ZPq6gYtfgAo8GPIHUFQ2xuIhmTc7F34AI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4573
+X-OriginatorOrg: intel.com
 
-Anna Nyiri wrote:
-> Willem de Bruijn <willemdebruijn.kernel@gmail.com> ezt =C3=ADrta (id=C5=
-=91pont:
-> 2024. dec. 5., Cs, 16:48):
-> >
-> > Anna Emese Nyiri wrote:
-> > > Extend cmsg_sender.c with a new option '-Q' to send SO_PRIORITY
-> > > ancillary data.
-> > >
-> > > cmsg_so_priority.sh script added to validate SO_PRIORITY behavior
-> > > by creating VLAN device with egress QoS mapping and testing packet
-> > > priorities using flower filters. Verify that packets with different=
 
-> > > priorities are correctly matched and counted by filters for multipl=
-e
-> > > protocols and IP versions.
-> > >
-> > > Suggested-by: Ido Schimmel <idosch@idosch.org>
-> > > Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-> > > ---
-> > >  tools/testing/selftests/net/Makefile          |   1 +
-> > >  tools/testing/selftests/net/cmsg_sender.c     |  11 +-
-> > >  .../testing/selftests/net/cmsg_so_priority.sh | 151 ++++++++++++++=
-++++
-> > >  3 files changed, 162 insertions(+), 1 deletion(-)
-> > >  create mode 100755 tools/testing/selftests/net/cmsg_so_priority.sh=
 
-> > >
-> > > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/s=
-elftests/net/Makefile
-> > > index cb2fc601de66..f09bd96cc978 100644
-> > > --- a/tools/testing/selftests/net/Makefile
-> > > +++ b/tools/testing/selftests/net/Makefile
-> > > @@ -32,6 +32,7 @@ TEST_PROGS +=3D ioam6.sh
-> > >  TEST_PROGS +=3D gro.sh
-> > >  TEST_PROGS +=3D gre_gso.sh
-> > >  TEST_PROGS +=3D cmsg_so_mark.sh
-> > > +TEST_PROGS +=3D cmsg_so_priority.sh
-> > >  TEST_PROGS +=3D cmsg_time.sh cmsg_ipv6.sh
-> > >  TEST_PROGS +=3D netns-name.sh
-> > >  TEST_PROGS +=3D nl_netdev.py
-> > > diff --git a/tools/testing/selftests/net/cmsg_sender.c b/tools/test=
-ing/selftests/net/cmsg_sender.c
-> > > index 876c2db02a63..99b0788f6f0c 100644
-> > > --- a/tools/testing/selftests/net/cmsg_sender.c
-> > > +++ b/tools/testing/selftests/net/cmsg_sender.c
-> > > @@ -59,6 +59,7 @@ struct options {
-> > >               unsigned int proto;
-> > >       } sock;
-> > >       struct option_cmsg_u32 mark;
-> > > +     struct option_cmsg_u32 priority;
-> > >       struct {
-> > >               bool ena;
-> > >               unsigned int delay;
-> > > @@ -97,6 +98,8 @@ static void __attribute__((noreturn)) cs_usage(co=
-nst char *bin)
-> > >              "\n"
-> > >              "\t\t-m val  Set SO_MARK with given value\n"
-> > >              "\t\t-M val  Set SO_MARK via setsockopt\n"
-> > > +            "\t\t-P val  Set SO_PRIORITY via setsockopt\n"
-> >
-> > Not in the actual code
-> >
-> > > +            "\t\t-Q val  Set SO_PRIORITY via cmsg\n"
-> > >              "\t\t-d val  Set SO_TXTIME with given delay (usec)\n"
-> > >              "\t\t-t      Enable time stamp reporting\n"
-> > >              "\t\t-f val  Set don't fragment via cmsg\n"
-> > > @@ -115,7 +118,7 @@ static void cs_parse_args(int argc, char *argv[=
-])
-> > >  {
-> > >       int o;
-> > >
-> > > -     while ((o =3D getopt(argc, argv, "46sS:p:P:m:M:n:d:tf:F:c:C:l=
-:L:H:")) !=3D -1) {
-> > > +     while ((o =3D getopt(argc, argv, "46sS:p:P:m:M:n:d:tf:F:c:C:l=
-:L:H:Q:")) !=3D -1) {
-> > >               switch (o) {
-> > >               case 's':
-> > >                       opt.silent_send =3D true;
-> > > @@ -148,6 +151,10 @@ static void cs_parse_args(int argc, char *argv=
-[])
-> > >                       opt.mark.ena =3D true;
-> > >                       opt.mark.val =3D atoi(optarg);
-> > >                       break;
-> > > +             case 'Q':
-> > > +                     opt.priority.ena =3D true;
-> > > +                     opt.priority.val =3D atoi(optarg);
-> > > +                     break;
-> > >               case 'M':
-> > >                       opt.sockopt.mark =3D atoi(optarg);
-> > >                       break;
-> > > @@ -252,6 +259,8 @@ cs_write_cmsg(int fd, struct msghdr *msg, char =
-*cbuf, size_t cbuf_sz)
-> > >
-> > >       ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
-> > >                         SOL_SOCKET, SO_MARK, &opt.mark);
-> > > +     ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
-> > > +                     SOL_SOCKET, SO_PRIORITY, &opt.priority);
-> > >       ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
-> > >                         SOL_IPV6, IPV6_DONTFRAG, &opt.v6.dontfrag);=
+On 12/5/2024 2:18 PM, Mateusz Polchlopek wrote:
+> 
+> 
+> On 12/4/2024 4:05 PM, Paul Menzel wrote:
+>> Dear Mateusz,
+>>
+>>
+>> Thank you for the patch.
+>>
+>> Am 04.12.24 um 16:02 schrieb Mateusz Polchlopek:
+>>> static_assert() needs to be placed in the declaration section,
+>>> so move it there in ice_cfg_tx_topo() function.
+>>>
+>>> Current code causes following warnings on some gcc versions:
+>>
+>> Please list the versions you know of.
+>>
+> 
+> Sure, in next version I will add the info.
+> 
+>>> error: ISO C90 forbids mixed declarations and code
+>>> [-Werror=declaration-after-statement]
+>>
+>> The above could be in one line, as it’s pasted.
+>>
+> 
+> Okay, it will be fixed in v2
+> 
+>>> Fixes: c188afdc3611 ("ice: fix memleak in ice_init_tx_topology()")
+>>> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+>>> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+>>> ---
+>>>   drivers/net/ethernet/intel/ice/ice_ddp.c | 3 ++-
+>>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ 
+>>> ethernet/intel/ice/ice_ddp.c
+>>> index 69d5b1a28491..e885f84520ba 100644
+>>> --- a/drivers/net/ethernet/intel/ice/ice_ddp.c
+>>> +++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
+>>> @@ -2388,6 +2388,8 @@ int ice_cfg_tx_topo(struct ice_hw *hw, const 
+>>> void *buf, u32 len)
+>>>       int status;
+>>>       u8 flags;
+>>> +    static_assert(ICE_PKG_BUF_SIZE == ICE_AQ_MAX_BUF_LEN);
+>>> +
+>>>       if (!buf || !len)
+>>>           return -EINVAL;
+>>> @@ -2482,7 +2484,6 @@ int ice_cfg_tx_topo(struct ice_hw *hw, const 
+>>> void *buf, u32 len)
+>>>       }
+>>>       /* Get the new topology buffer, reuse current topo copy mem */
+>>> -    static_assert(ICE_PKG_BUF_SIZE == ICE_AQ_MAX_BUF_LEN);
+>>>       new_topo = topo;
+>>>       memcpy(new_topo, (u8 *)section + offset, size);
+>>
+>> The diff looks good.
+>>
+>>
+>> Kind regards,
+>>
+>> Paul
+> 
+> Thanks Paul for review!
+> 
+> BR
+> 
+> 
 
-> > >       ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
-> > > diff --git a/tools/testing/selftests/net/cmsg_so_priority.sh b/tool=
-s/testing/selftests/net/cmsg_so_priority.sh
-> > > new file mode 100755
-> > > index 000000000000..016458b219ba
-> > > --- /dev/null
-> > > +++ b/tools/testing/selftests/net/cmsg_so_priority.sh
-> > > @@ -0,0 +1,151 @@
-> > > +#!/bin/bash
-> > > +# SPDX-License-Identifier: GPL-2.0
-> > > +
-> > > +source lib.sh
-> > > +
-> > > +IP4=3D192.0.2.1/24
-> > > +TGT4=3D192.0.2.2
-> > > +TGT4_RAW=3D192.0.2.3
-> > > +IP6=3D2001:db8::1/64
-> > > +TGT6=3D2001:db8::2
-> > > +TGT6_RAW=3D2001:db8::3
-> > > +PORT=3D1234
-> > > +DELAY=3D4000
-> > > +TOTAL_TESTS=3D0
-> > > +FAILED_TESTS=3D0
-> > > +
-> > > +if ! command -v jq &> /dev/null; then
-> > > +    echo "Error: jq is not installed." >&2
-> > > +    exit 1
-> >
-> > use KSFT_ and in these cases skip rather than fail.
-> =
+Ach... It occurred that this is not the problem with compiler version
+but with re-introduction of the -Wdeclaration-after-statement flag in
+my test setup :/
 
-> Did you mean something like this?
-> =
-
-> #!/bin/bash
-> # SPDX-License-Identifier: GPL-2.0
-> =
-
-> source lib.sh
-> =
-
-> DIR=3D"$(dirname $(readlink -f "$0"))"
-> source "${DIR}"/../kselftest/ktap_helpers.sh
-> =
-
-> if ! command -v jq &> /dev/null; then
->     echo "SKIP cmsg_so_priroity.sh test: jq is not installed." >&2
->     exit "$KSFT_SKIP"
-> fi
-
-Yes, similar to ksft_runner.sh
-
-It's helpful to differentiate skip from fail. Especially on external
-system tool dependencies.
-
-> Is a simple echo enough, or should I use ktap_skip_all instead?
-
-The exit code should suffice. Your test does not generate ktap output.
-
-> >
-> > > +fi
-> > > +
-> > > +check_result() {
-> > > +    ((TOTAL_TESTS++))
-> > > +    if [ "$1" -ne 0 ]; then
-> > > +        ((FAILED_TESTS++))
-> > > +    fi
-> > > +}
-> > > +
-> > > +cleanup()
-> > > +{
-> > > +    cleanup_ns $NS
-> > > +}
-> > > +
-> > > +trap cleanup EXIT
-> > > +
-> > > +setup_ns NS
-> > > +
-> > > +create_filter() {
-> > > +    local handle=3D$1
-> > > +    local vlan_prio=3D$2
-> > > +    local ip_type=3D$3
-> > > +    local proto=3D$4
-> > > +    local dst_ip=3D$5
-> > > +    local ip_proto
-> > > +
-> > > +    if [[ "$proto" =3D=3D "u" ]]; then
-> > > +        ip_proto=3D"udp"
-> > > +    elif [[ "$ip_type" =3D=3D "ipv4" && "$proto" =3D=3D "i" ]]; th=
-en
-> > > +        ip_proto=3D"icmp"
-> > > +    elif [[ "$ip_type" =3D=3D "ipv6" && "$proto" =3D=3D "i" ]]; th=
-en
-> > > +        ip_proto=3D"icmpv6"
-> > > +    fi
-> > > +
-> > > +    tc -n $NS filter add dev dummy1 \
-> > > +        egress pref 1 handle "$handle" proto 802.1q \
-> > > +        flower vlan_prio "$vlan_prio" vlan_ethtype "$ip_type" \
-> > > +        dst_ip "$dst_ip" ${ip_proto:+ip_proto $ip_proto} \
-> > > +        action pass
-> > > +}
-> > > +
-> > > +ip -n $NS link set dev lo up
-> > > +ip -n $NS link add name dummy1 up type dummy
-> > > +
-> > > +ip -n $NS link add link dummy1 name dummy1.10 up type vlan id 10 \=
-
-> > > +    egress-qos-map 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
-> > > +
-> > > +ip -n $NS address add $IP4 dev dummy1.10
-> > > +ip -n $NS address add $IP6 dev dummy1.10
-> > > +
-> > > +ip netns exec $NS sysctl -wq net.ipv4.ping_group_range=3D'0 214748=
-3647'
-> > > +
-> > > +ip -n $NS neigh add $TGT4 lladdr 00:11:22:33:44:55 nud permanent \=
-
-> > > +    dev dummy1.10
-> > > +ip -n $NS neigh add $TGT6 lladdr 00:11:22:33:44:55 nud permanent \=
-
-> > > +    dev dummy1.10
-> > > +ip -n $NS neigh add $TGT4_RAW lladdr 00:11:22:33:44:66 nud permane=
-nt \
-> > > +    dev dummy1.10
-> > > +ip -n $NS neigh add $TGT6_RAW lladdr 00:11:22:33:44:66 nud permane=
-nt \
-> > > +    dev dummy1.10
-> > > +
-> > > +tc -n $NS qdisc add dev dummy1 clsact
-> > > +
-> > > +FILTER_COUNTER=3D10
-
-Ack on FILTER_COUNTER btw.
+Nevertheless this move of static_assert is still considered as a good
+practice, so I will send v2 to the net-next with some other polishing
+of code as an improvement (and I will drop Fixes: tag).
 
