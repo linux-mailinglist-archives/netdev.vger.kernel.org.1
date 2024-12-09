@@ -1,125 +1,95 @@
-Return-Path: <netdev+bounces-150035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 214EF9E8B2A
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 06:50:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 435EF9E8B35
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 06:53:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20503164037
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 05:50:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E207E164488
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 05:53:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25BE20FAAE;
-	Mon,  9 Dec 2024 05:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6984211466;
+	Mon,  9 Dec 2024 05:52:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C06ci2Cm"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="XJ0JcE0e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D24120FA99;
-	Mon,  9 Dec 2024 05:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1396820FABD
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 05:52:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733723420; cv=none; b=W/Ve4gWomUtY+uf8sL3pLMPHAaskOXMqK6QRdHAL6bP30zdUxMK1ElmwkJkW4tdUQ+KRAqvk5z3we7KO5AHnIudcOzaUxghWK7bPLOzjbZqyLLZPl/Rx4GzAH/Dfgiy5EBiqGsQ+hBJnJiKZBKB+787WcUSXWOgjJQ/45lVnBGg=
+	t=1733723575; cv=none; b=PfZYATgTrsr6Y2Sb65Skz5gSggCu4YoVGTBJwYWEMFW32g051RDTYy1X+A6ecgFgn+iyRAXNAmStDRHro0GvrjdMteQkYEiZ2qx85xKFlcHDqfGM5QUDga/FZWw+1NsUzK3jgQp9OLsdlM5GyUyUYohc3g+aT3aMvPmhxW4XVhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733723420; c=relaxed/simple;
-	bh=Ex8UPG6CwAQ6xUsLWGEkaQPXLJ0yfO3PEJgWAw2xrZI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=PAaqo6avbo9aUBnbR9UrrCq3qgZ796EDtUbJAe223qnQyjPSklwgPfgzvVRYSrvl/YTi9eBZJnv/P9LmvgjE9YRFg6uMwa4p0miisdod9iYT4LAlHNDgNtX5dZZzKPZGx67IByZKGydjrh2WVtJIRPMotlkvk55S8Q1E4J4x1ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C06ci2Cm; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20cf3e36a76so33964765ad.0;
-        Sun, 08 Dec 2024 21:50:18 -0800 (PST)
+	s=arc-20240116; t=1733723575; c=relaxed/simple;
+	bh=SiO939IOLTrFnhzeaA4scd52E9z7Dt4lbdHfnkEhNpY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L15/Y7Eo28rQHiJCibyAdpihsts8pkUpH2OE5oQJwYBRohMe5zI85fvtp+W2TZ2+3EjbqH7RLVTdxMz4Ihec3gW1N4OT4ACiHKnFmaZ/i1EB6TN0hXLVhQMQaGJA5RH5mfgOde8ZOzNZ6hEZWR5LpOd6OUUeMgTF8xRjRN8Oot4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=XJ0JcE0e; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733723417; x=1734328217; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C9D2sckr5O/tHBe9aJUjYE0OKwXCJIknFnRJ4CB/T3Q=;
-        b=C06ci2Cm6VAHz0h4gR4ht/+2KwTRNz6chRm8NewL3Dju1rPKKhcuuZOqiccBEwHOIy
-         I2XUr9GZO/0wSAeYzT8EUipa2f1yQerl2Xs39BTf7lXNDRvkUAmG5Vn6JuraFZxaE8Ry
-         /ep3UOzV0OKj1548VpQ4DdOUHOM8AHVIS2I4XW+4s8G5aTeISIHQKdOyRzkDHNcWWUDT
-         8HF+fP7y67hbgVPBlhnLRD7TuoDfqtZfLew7JEsbolVkQJpX47kXZ97Bj7NKqKNLyzQ2
-         hkcvl+r1MqIeAkgIukRsBs2SF9xsyIJQ0uBWjv/2srX39z595BHs7e4yXlQdmcQ3yyW2
-         FTsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733723417; x=1734328217;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=C9D2sckr5O/tHBe9aJUjYE0OKwXCJIknFnRJ4CB/T3Q=;
-        b=tycREdb6q/vzu30q74RSokAGMbJoGmBc5GdOhYI5cpcFWsDA4HMdAcRs8wRN8KTOWs
-         uNs0+F8lqOHLwQ+DhdU0NSWL/5NN/HPcnRl317mfY+bp+Bz1KtCQfDlmD5qVWIofocM8
-         5DHQJYxYsWCL1GQaxxHHEZKxAYNLIVQFGWg3ZTdiJndDhwfi2n5isHt3wDJFSWiLzSxY
-         zGoY1+JRXOmFS3BIV/B2fn4MvzuIM0tfL5WsfGRSWwe74vOgc7tS4oT8mDoEByaPfO56
-         zLT4iUzEMYSxypTW1d6Km6MjKikSIxaLrE4rl19jrxjoqA1kzPHiEG8EDqoRxI1dpqu6
-         V5UQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWl7GuilVk/aQJSd0OO3QtStgX6kiJPyXkv74lCTB5EYX7yYiyHrQaX5VHZlxU2Qd38X74oqnD4@vger.kernel.org, AJvYcCXS5YAaVuIaJEKJjZ3007r3sRMzLTNYRCgILoQC8YQaaewlwOJVPSz+TFIXJp6cs+LIbqz610lNbPvmOpGmXQY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzEY3leSTjNq2fCBV8uRB+05Khfm8sn7lmqzCt2wBaPXlE0OdW
-	EmWpsMvHjvr+tE2IWuy/Ba+3MDRgUPUgTv4WKjEz4RmqVgEjPRemi2marw==
-X-Gm-Gg: ASbGncu0hcwTncDgdseFySLO3fszGS/ldmvHVBRrh+BSjfEwnBHy3bNuRWEwi6HQgcN
-	eHVlGy4PsiJQwBGXirqi3jRePvtF4gkq7JK8hozoXEGjCV/KrEQHA3keCuj2Nx0/T/ucEv0kAHE
-	xIXk9zAjTFB+S+SGl8R1dg9lfmH5x3JpsSefnvif1KQx1Lm/4shQo/KMPEYigLO1G0RFVOvtL/t
-	JCFOj8zK+0P8uU6gAf0fuFj+r+0XxVtBaqbxstsu+7AV3PAW1w=
-X-Google-Smtp-Source: AGHT+IFheNWKW2FH8d0p9eycnLA3MBLryQfKMlDkEhW+W4ofgLSZvs8W1weJ6uxWSQycMSDfUc1+fQ==
-X-Received: by 2002:a17:903:138a:b0:20c:9821:69af with SMTP id d9443c01a7336-21614dc5115mr161081525ad.45.1733723417557;
-        Sun, 08 Dec 2024 21:50:17 -0800 (PST)
-Received: from localhost ([98.97.37.114])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2162e519f6bsm30642815ad.30.2024.12.08.21.50.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Dec 2024 21:50:17 -0800 (PST)
-Date: Sun, 08 Dec 2024 21:50:16 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: Michal Luczaj <mhal@rbox.co>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Eduard Zingerman <eddyz87@gmail.com>, 
- Mykola Lysenko <mykolal@fb.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, 
- KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Jakub Sitnicki <jakub@cloudflare.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: bpf@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- netdev@vger.kernel.org, 
- Michal Luczaj <mhal@rbox.co>
-Message-ID: <6756851812aa6_1abf208f@john.notmuch>
-In-Reply-To: <20241202-sockmap-replace-v1-2-1e88579e7bd5@rbox.co>
-References: <20241202-sockmap-replace-v1-0-1e88579e7bd5@rbox.co>
- <20241202-sockmap-replace-v1-2-1e88579e7bd5@rbox.co>
-Subject: RE: [PATCH bpf 2/3] selftest/bpf: Extend test for sockmap update with
- same
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1733723571; x=1765259571;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+QX9sBjtk4HpkK7LXMuzR+eo4Q2BA33e15vbSnjZuu4=;
+  b=XJ0JcE0eaVZPVGr2PfNL9H/0e8sLsdTW8ZFfxfioKw7pEQ++yHekHnCv
+   Q0wYv2jetN/jRbiRO/3ug/l/ZYO8+l6yfvXxa5T6h0fLsguOxa3wxLnmN
+   e9FECY4vhdQwtRcFHUA6vy9xVzlQ7gkUNkX1qyqW6Vw/XjojNwSF8aMgg
+   w=;
+X-IronPort-AV: E=Sophos;i="6.12,218,1728950400"; 
+   d="scan'208";a="701359187"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 05:52:48 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:34804]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.241:2525] with esmtp (Farcaster)
+ id 103733fe-f220-4b75-92a0-2fdc107f3e85; Mon, 9 Dec 2024 05:52:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 103733fe-f220-4b75-92a0-2fdc107f3e85
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 9 Dec 2024 05:52:46 +0000
+Received: from 6c7e67c6786f.amazon.com (10.118.254.92) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Mon, 9 Dec 2024 05:52:43 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <roopa@nvidia.com>
+Subject: Re: [PATCH net-next 2/3] rtnetlink: switch rtnl_fdb_dump() to for_each_netdev_dump()
+Date: Mon, 9 Dec 2024 14:52:39 +0900
+Message-ID: <20241209055239.14578-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241207162248.18536-3-edumazet@google.com>
+References: <20241207162248.18536-3-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC002.ant.amazon.com (10.13.139.242) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Michal Luczaj wrote:
-> Verify that the sockmap link was not severed, and socket's entry is indeed
-> removed from the map when the corresponding descriptor gets closed.
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat,  7 Dec 2024 16:22:47 +0000
+> This is the last netdev iterator still using net->dev_index_head[].
 > 
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> ---
+> Convert to modern for_each_netdev_dump() for better scalability,
+> and use common patterns in our stack.
+> 
+> Following patch in this series removes the pad field
+> in struct ndo_fdb_dump_context.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Reviewed-by: John Fastabend <john.fastabend@gmail.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
