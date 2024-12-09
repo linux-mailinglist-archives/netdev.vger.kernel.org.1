@@ -1,57 +1,70 @@
-Return-Path: <netdev+bounces-150141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A389B9E922C
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:28:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 924A49E9269
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:32:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E325518862C1
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:28:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39F3F16257D
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F45A21B1A8;
-	Mon,  9 Dec 2024 11:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE6D21D005;
+	Mon,  9 Dec 2024 11:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ayIJjFNQ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U5S9Uv8d"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07179216E27;
-	Mon,  9 Dec 2024 11:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C34A21D5B9;
+	Mon,  9 Dec 2024 11:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733743720; cv=none; b=gWN67FNBe3KKIJcLVJfhsSoMhEARAPlbr+eut+gpTHiYKtiYnVpFe7Wdhlj/60bB2OeReIL7ASjT8BdqxEAGze0unL3lnvYXPNV3rlgKBVeXiVUKtay92KcCfC685jGEMMP1SXpZTmexyQp/PmLjZTJ5JU7VOHMHds7EiXtLoMk=
+	t=1733743848; cv=none; b=aaYFCYRGHCcfGSnOnSqWiAcHNkrEd/vMMKR1TYXK8xsMCh5phayUte0jUdOK6nUgkymwuiNZSrJGmBK0M8fMrTB087FQ4h2H3M0q3JFWtt5HaZZ22g118wAKxbI8e9/+qcMR0bfMisbBV3Cuhfgb5twT68vMz5bst0TVnEimcTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733743720; c=relaxed/simple;
-	bh=30vRIwgjK3YRSebTHVWTfJe+cngnCdDLBhdQNmGB8BY=;
+	s=arc-20240116; t=1733743848; c=relaxed/simple;
+	bh=LfcCjeIwv1Rz/2jvlcT6Rbw3bs7AFo4adyeax54DlSw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SHzPtDTMCRstFdWBSKAnx+GUw0qgtkFBvgFlgD4biIabJgBnhmddqzRRrDV5yXwt8FMHXKqbVF5AtxhJqqKoA2GippSvahVU5pvKNiRagP7Uk0w8mKbNSpJf0hvomT0i+vlYJYAWUA4I6LCpyLWB0a5rQUmXreljWXoV1xZTBz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ayIJjFNQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1A62C4CED1;
-	Mon,  9 Dec 2024 11:28:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733743719;
-	bh=30vRIwgjK3YRSebTHVWTfJe+cngnCdDLBhdQNmGB8BY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ayIJjFNQRsHkl1Ln/M7aXXzcC1Rl6IPRhIwnJcUW5nm7Cu0FqsClSgyyUHq5+5mn2
-	 7lokAijq8JNZQt+M89kSIjEQxUzw8vGXrFeiiiUZKzyaaT50KQhOJuavZPA29Rjcgt
-	 pC13ftf5Yv6I11kOEc85dtcdMTz5CV9LtFjJQ3KrgTROKOayd5HMuIuVKFMLniMkWU
-	 dkcmJhpcbTmTgpivarKCMYiYeg/MQTElhJIWfGR8NjGgtez7HGbZK3vpBEPz6uJDQR
-	 CYSF0yvkaUzhMtcq8mQ5hwReA3LKIM7hkPJJSL3S5DkPGexWHsnyKPU8nss8FR4Sd+
-	 fPzzQXkDlX7Ig==
-Date: Mon, 9 Dec 2024 11:28:35 +0000
-From: Simon Horman <horms@kernel.org>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	edumazet@google.com, sgoutham@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com
-Subject: Re: [net v2 PATCH] octeontx2-af: Fix installation of PF multicast
- rule
-Message-ID: <20241209112835.GB2581@kernel.org>
-References: <20241205113435.10601-1-gakula@marvell.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FKsXXIsdghc3h6Mf+V1KG0a6xLB6gCx2o91GoG3ZF9AMXuaezYkIh/DQBeZIUbDa7m2R9UXH12ELu1fQ2GX2QDp5UirZlPQ+mGsFMdie8N+i/1ZfMV/Y53YDHt0lbb+7TZaa07xUqStsEBoerW8MPZMiwc4RtfBJ4gjxj/h6Hus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=U5S9Uv8d; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=qd1akmmoi31Ki/6nXtItmdXPQIscj5PkLzZDSYQld+U=; b=U5S9Uv8dgarrK9YOLdUsT6nkKn
+	a7ku8NIqbNIaINfaEHL88xngO9HFocBZYICcZ8YwvExjocLrI1p/ivxKESGpW2wHLAIQkIF61Jxpy
+	nAwCI+BLQKFB66+42Lhit3VyDUwIQrrdU9iNv58yRL0p2xVbhIFgeG9O4O8Y4mWRQcITkwZ53bAb9
+	oE0ZokyGiChjgQvpGBBzg9RidYhoJhQ/R6Ta5tBGotjdE5SUTB1upXCxIdcEDMVEqVlUnHerDqI8U
+	9hWt4xLEFb4L3hA+8q9475ePfYek+4hErmEifKGBVbyif/ugodaxBoTE/8cvNpi1RofFhk6Rx0CTA
+	+X0eH3QQ==;
+Received: from 77-249-17-89.cable.dynamic.v4.ziggo.nl ([77.249.17.89] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tKbyK-00000001cGR-0mjj;
+	Mon, 09 Dec 2024 11:30:40 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id BF43F3003FF; Mon,  9 Dec 2024 12:30:39 +0100 (CET)
+Date: Mon, 9 Dec 2024 12:30:39 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	linux-bcachefs@vger.kernel.org, linux-arch@vger.kernel.org,
+	netdev@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Christoph Lameter <cl@linux.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>,
+	Brian Gerst <brgerst@gmail.com>,
+	Denys Vlasenko <dvlasenk@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v3 2/6] compiler.h: Introduce TYPEOF_UNQUAL() macro
+Message-ID: <20241209113039.GN21636@noisy.programming.kicks-ass.net>
+References: <20241208204708.3742696-1-ubizjak@gmail.com>
+ <20241208204708.3742696-3-ubizjak@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,16 +73,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241205113435.10601-1-gakula@marvell.com>
+In-Reply-To: <20241208204708.3742696-3-ubizjak@gmail.com>
 
-On Thu, Dec 05, 2024 at 05:04:35PM +0530, Geetha sowjanya wrote:
-> Due to target variable is being reassigned in npc_install_flow()
-> function, PF multicast rules are not getting installed.
-> This patch addresses the issue by fixing the "IF" condition
-> checks when rules are installed by AF.
+On Sun, Dec 08, 2024 at 09:45:17PM +0100, Uros Bizjak wrote:
+> Define TYPEOF_UNQUAL() to use __typeof_unqual__() as typeof operator
+> when available, to return unqualified type of the expression.
 > 
-> Fixes: 6c40ca957fe5 ("octeontx2-pf: Adds TC offload support").
-> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+> Current version of sparse doesn't know anything about __typeof_unqual__()
+> operator. Avoid the usage of __typeof_unqual__() when sparse checking
+> is active to prevent sparse errors with unknowing keyword.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Ooooh, new toys.
+
+I suppose __unqual_scalar_typeof() wants to be using this when
+available?
 
