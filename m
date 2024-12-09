@@ -1,302 +1,127 @@
-Return-Path: <netdev+bounces-150405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 987DD9EA22F
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:56:38 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C89D19EA250
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:01:12 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FD89282994
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 22:56:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4463B163C0E
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7AB819D88F;
-	Mon,  9 Dec 2024 22:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A300719F13F;
+	Mon,  9 Dec 2024 23:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="ICRb2dDs";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EmpgCrFZ"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="wmE8+hxb"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b8-smtp.messagingengine.com (flow-b8-smtp.messagingengine.com [202.12.124.143])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418C12C9A;
-	Mon,  9 Dec 2024 22:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA70919884C
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 23:00:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733784994; cv=none; b=ovm9BIrYnSajwN14pcNQo4NHe182vfpvJgOrtq4PsqhHg8CM3G9XctAaPfaYcNiCMSay/Ci41CW/x5VfNn9zQCQi9xdOtSki1ghuiQcyCQ+71hrThQdubSLOrxfGj2j65f05AljvntPgMT+FyFETz6+bsEnPie0V0+jb5P5GY4Q=
+	t=1733785257; cv=none; b=lZQ0yQvPy3/i1eAkw1xV5Tvn0k6pFN0GWRzucC39m3DtR9VHt6d5K1cXp1mSGfC6GDCD+bodD3ywlIkbBxpD8ufV9gp1KLPSaOmwuTcqm+gKmBgnon6hAXGveJzFUqFkF+l8M2YskfK2A/s6PE2R+8GvgZA17jQp10DMmlomaYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733784994; c=relaxed/simple;
-	bh=FWAPSD3ySfuVCHGAqDOalTu3XFlI4ajnWwxMP7v6+uY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CzhtczQG/DMi2CfoIPp6K1NDnlYWL9oJoTfVb0vTzuiXqOwJIq9wNAR8L9odAMoXkPjwfkD5uPfx7w78E1Dou1fFTywX9mI3ltg3IiVHK6mD5BvbO5cV74VZe6dWi3JB61GGD5TslEUV0xXsOcyFRlVUDJOuWBHXURlsBMaBG9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=ICRb2dDs; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EmpgCrFZ; arc=none smtp.client-ip=202.12.124.143
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
-	by mailflow.stl.internal (Postfix) with ESMTP id B5D071D4067A;
-	Mon,  9 Dec 2024 17:56:30 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-07.internal (MEProxy); Mon, 09 Dec 2024 17:56:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm3; t=1733784990; x=1733792190; bh=75T33NDjZB
-	kRHc5ziCu4Lwwg211OEKZg+3cebXXYZNE=; b=ICRb2dDsHo12hmlK/D+33l6aVq
-	6ph7AZNxpUM4ItJr59Mxozv/gwuN+3oG4sMbq+yDoMLJD5XO0TpoGZR0pmZ9bEbb
-	qqCEcgGZWocP1af6eOiHfdzpfN2gND8mBuCtumtPxp7/FKngqyuJIbGuQrat4Zxm
-	n9EnpqnzDP0hFh5bjLkbRBgjIibEi7iZAusv1qxoko1b7tVXBKTHH4WVMxe+S1Nw
-	m7uWOBRkeHbyTetYxE2Wl7MruhsW+0anWBUjfqSkWI2EvMdDbhnPOWSbt2ybarqZ
-	NJ7jaVsAYauUFKclZNt3JJzytpSq15RqhdDRBHvYIreZZ2cnMkL4xDFvOgEw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1733784990; x=1733792190; bh=75T33NDjZBkRHc5ziCu4Lwwg211OEKZg+3c
-	ebXXYZNE=; b=EmpgCrFZl1dp7QX76IMFPgYNn4M8ANXEhFiNonCoiGOGSBkSHMq
-	bsOD1kZnfwyiqoZtxwdyRK8NASdhPsDrECbrrlc0yhaldCy/fZZ6CHT6Pgaup+hn
-	TeaLBvRjnrMScpBofM0lsR9m3djL0S7hoKeRyT51UVByU73VuQQpEZ5WAaJpP6Yh
-	vDXrRoGbjPbiYYH5M9jglwM5yjXiVoKarhvXKZywF2wC4OZ4m+1wUfqCautoR9SX
-	NHCR276KSPhix0l0vO3vYeEUl02i3f1iQkdzZyhM02/Gxi2yLafjXVfGDeNDU129
-	AHSiVEXUNuaKHg/JjfdLVQWtkNtwWmSad/Q==
-X-ME-Sender: <xms:nXVXZ7kHxRajlucqBJdh_KGv0RtUvdznaiaTHsuEZBezTY1WMd5P8w>
-    <xme:nXVXZ-2bVot-RkbM_EOKooEwkd6TsloRHy0ijYqxlGeOMIFeDKEoCHV2faKeKTbzF
-    cr7bXnVHP7ouiK_Ww>
-X-ME-Received: <xmr:nXVXZxqq01-30N7dBE6OdJaQJHbZb9bvqSlrEE9q5DZAt2OavyRsj0SctZOY4bzgzsNLgdqVsSgTQEW2bcXZiGogmewN1nKzq2AasoZ9H91H_w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrjeejgddtgecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenfghrlhcuvffnffculdefhedmnecujfgurhepfffhvfevuffkfhgg
-    tggujgesthdtsfdttddtvdenucfhrhhomhepffgrnhhivghlucgiuhcuoegugihusegugi
-    huuhhurdighiiiqeenucggtffrrghtthgvrhhnpedtjeekudelieetvdefgedvgeejhefh
-    vdfggfejudeutdegveeivedthfehfeelkeenucffohhmrghinhepghhithhhuhgsrdgtoh
-    hmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepugig
-    uhesugiguhhuuhdrgiihiidpnhgspghrtghpthhtohepvddupdhmohguvgepshhmthhpoh
-    huthdprhgtphhtthhopehqmhhosehkvghrnhgvlhdrohhrghdprhgtphhtthhopehhrgif
-    kheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhhohhhnrdhfrghsthgrsggvnhguse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopegrshhtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurg
-    hvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgsohig
-    rdhnvghtpdhrtghpthhtoheprghnughrihhisehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehmrghrthhinhdrlhgruheslhhinhhugidruggvvh
-X-ME-Proxy: <xmx:nXVXZzk1zpg03J8eB6Hk4hoJz3LLjDubJpZ8vlCe8f2lLFVJudUFwQ>
-    <xmx:nXVXZ52jbQ7whlKEbE2Pak3Pu_dOOCvHJGOcT_7a_RWeEHwaQKrC8g>
-    <xmx:nXVXZytUUCEkf2WekjP_p1zjsUrsLqOxZCLdlNEtUBW7SVUmiLr8FQ>
-    <xmx:nXVXZ9UJFK_4iASHlAuRfgpyUWS89wfqhiG0IgJB5dPyKfaXk5WDCg>
-    <xmx:nnVXZwvj0mr1htwkBsI3L-2XG7xzIfn_PUlRXmZIX778UrvaeU260nVd>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 9 Dec 2024 17:56:27 -0500 (EST)
-Date: Mon, 9 Dec 2024 15:56:26 -0700
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Quentin Monnet <qmo@kernel.org>
-Cc: hawk@kernel.org, john.fastabend@gmail.com, kuba@kernel.org, 
-	ast@kernel.org, davem@davemloft.net, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	antony@phenome.org, toke@kernel.org
-Subject: Re: [PATCH bpf-next v2] bpftool: btf: Support dumping a single type
- from file
-Message-ID: <rphope3vevqgjbq3uh5l3wrtvlcls2dc3abi5caxfbemjgztuy@5qvyeoove3nr>
-References: <c8e6a2dfb64d76e61a20b1e2470fccbddf167499.1733613798.git.dxu@dxuuu.xyz>
- <92b28250-acd8-4ca7-8a0e-09e1338113f0@kernel.org>
+	s=arc-20240116; t=1733785257; c=relaxed/simple;
+	bh=ZT3GdiHB5YddOdoINvPd3JXTw5o0wS6zkw1cRcwR+cI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eopN1UmCXPPL9AngzSNQ1SjiRPOLSBoHc6MLejqvJH0llz/kRSJwhdAPn+FLFMhlr/5UDm/fu7mqr7mnSRPN2EgY7nF+l2sqZFncwx/TXb4GhBLaD1Ws76SWI0QwvNBKnZZoG4NlWORoby/1LhJFXloyGBFFBRnZM/ZCSXwz/l4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=wmE8+hxb; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-725ecc42d43so1154519b3a.3
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 15:00:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1733785255; x=1734390055; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8rdqTpO2uA1Ykp81jesT1emUsHbdy9YgUbLnxTQ984U=;
+        b=wmE8+hxbyMLI2u+SXv/TaLIks5GKBjLtiqxn+G1tuV1o5ba4RkWC8m2MMJGQRmqI1k
+         3RPtaMgGm1qzJOpAm1mDtz8cjGPam1TBmVaIJzxq2JicwPwobf3RcrXYPuNX/3JwP0pO
+         Hv00J744wUToH0jWuQWNOJ7W4CQ9g9W8rKRA6MZeVmyeA0mhoyR9vTpEk7WVbpUJ+0da
+         YpjwwsJSmmVPbIpgeN+3m//MrSk6kT53zek5b92v1SD02S+VhzdOtmITk4bTvawCrRxe
+         bUh5BseFpwKFipQvulzc5hfXrYtt6rWYmpjfLG3Jj4R/b/vyXRNmgQzD9JAf0sdTPrhg
+         KSJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733785255; x=1734390055;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8rdqTpO2uA1Ykp81jesT1emUsHbdy9YgUbLnxTQ984U=;
+        b=s9MQwX8Om+R5jnVkGfh/PCaVV1IDgeoPOgAfOuHkS3te5Oj1Mtd9AyPviMML+DtCzo
+         c8g6ic82jqTDo+9wKprhHeegqygL6Y1bzdkZCXKbJwmzlWAdDFIVk816VjAtsRf9HPxB
+         VBOK+HyohycIoA46V0ybW22LXzz2zgHoXe/WDKXpH8zikYJ+OnlFbViR1KfC3ESaZb5y
+         vEJCkXYfKilKe/EfoQAjfHSpPBJNiiYcvkTnaznWuhcy4ie8e1pvHppbddlVmV8MW5cP
+         okx7cbsWo3b8mC0dLIwRmIfghyw0Z9DLIcmcMgiz99g6mbZ3da3n8rQqcLZrdNhzHUss
+         Sm7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUnO8pHzIKVIW46FJOjND1r4iVMZV9z5PGjda8EFMtyzx7MTzqlb/EAMwdU6mNnzd78WcMPyrE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVMhRZeEZIPSM/F67EhcUlaUs39tkQF04HUUB17aXf31XYg554
+	3TMfc4M5JWNyny3ONg/5DW7alG2kEJFLZaZUZG95z23bUmmhd32TBYaXq72PFQA3UrnJUM9hyQx
+	Dhgb+8TbgXSZtRCMowhs174Ef88+OVtqI9+Vj
+X-Gm-Gg: ASbGncv0XtyNOP/ZwZUQdKjbXiPRZuxDK6uetqzN76V+QOEoyv7AJAuALReU2jdZgSz
+	NS0Xh/yXWyxBorQzCtfB0LA2C/e1VdUxgPg==
+X-Google-Smtp-Source: AGHT+IG6WKU6sgAkakV11JKiqBBUmy5CZr+tK6ahkhudY9xN8p7Xb63u2DWQaS54pYrmBuUuBf0pO1kzC5tBKMzAJx4=
+X-Received: by 2002:a05:6a00:885:b0:726:41e:b32a with SMTP id
+ d2e1a72fcca58-7273c8f1d15mr3403673b3a.4.1733785255122; Mon, 09 Dec 2024
+ 15:00:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <92b28250-acd8-4ca7-8a0e-09e1338113f0@kernel.org>
+References: <20241209-cake-drop-reason-v1-1-19205f6d1f19@redhat.com>
+In-Reply-To: <20241209-cake-drop-reason-v1-1-19205f6d1f19@redhat.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 9 Dec 2024 18:00:44 -0500
+Message-ID: <CAM0EoM=KWpQMcFrHiDPH=FM1raL47McVkCYBMGHBcScXGY_z3Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] net_sched: sch_cake: Add drop reasons
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	cake@lists.bufferbloat.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Quentin,
+On Mon, Dec 9, 2024 at 7:02=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <to=
+ke@redhat.com> wrote:
+>
+> Add three qdisc-specific drop reasons for sch_cake:
+>
+>  1) SKB_DROP_REASON_CAKE_CONGESTED
+>     Whenever a packet is dropped by the CAKE AQM algorithm because
+>     congestion is detected.
+>
+>  2) SKB_DROP_REASON_CAKE_FLOOD
+>     Whenever a packet is dropped by the flood protection part of the
+>     CAKE AQM algorithm (BLUE).
+>
+>  3) SKB_DROP_REASON_CAKE_OVERLIMIT
+>     Whenever the total queue limit for a CAKE instance is exceeded and a
+>     packet is dropped to make room.
+>
+> Also use the existing SKB_DROP_REASON_QUEUE_PURGE in cake_clear_tin().
+>
+> Reasons show up as:
+>
+> perf record -a -e skb:kfree_skb sleep 1; perf script
+>
+>           iperf3     665 [005]   848.656964: skb:kfree_skb: skbaddr=3D0xf=
+fff98168a333500 rx_sk=3D(nil) protocol=3D34525 location=3D__dev_queue_xmit+=
+0x10f0 reason: CAKE_OVERLIMIT
+>          swapper       0 [001]   909.166055: skb:kfree_skb: skbaddr=3D0xf=
+fff98168280cee0 rx_sk=3D(nil) protocol=3D34525 location=3Dcake_dequeue+0x5e=
+f reason: CAKE_CONGESTED
+>
+> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-On Mon, Dec 09, 2024 at 12:26:50PM GMT, Quentin Monnet wrote:
-> On 07/12/2024 23:24, Daniel Xu wrote:
-> > Some projects, for example xdp-tools [0], prefer to check in a minimized
-> > vmlinux.h rather than the complete file which can get rather large.
-> > 
-> > However, when you try to add a minimized version of a complex struct (eg
-> > struct xfrm_state), things can get quite complex if you're trying to
-> > manually untangle and deduplicate the dependencies.
-> > 
-> > This commit teaches bpftool to do a minimized dump of a single type by
-> > providing an optional root_id argument.
-> > 
-> > Example usage:
-> > 
-> >     $ ./bpftool btf dump file ~/dev/linux/vmlinux | rg "STRUCT 'xfrm_state'"
-> >     [12643] STRUCT 'xfrm_state' size=912 vlen=58
-> > 
-> >     $ ./bpftool btf dump file ~/dev/linux/vmlinux root_id 12643 format c
-> >     #ifndef __VMLINUX_H__
-> >     #define __VMLINUX_H__
-> > 
-> >     [..]
-> > 
-> >     struct xfrm_type_offload;
-> > 
-> >     struct xfrm_sec_ctx;
-> > 
-> >     struct xfrm_state {
-> >             possible_net_t xs_net;
-> >             union {
-> >                     struct hlist_node gclist;
-> >                     struct hlist_node bydst;
-> >             };
-> >             union {
-> >                     struct hlist_node dev_gclist;
-> >                     struct hlist_node bysrc;
-> >             };
-> >             struct hlist_node byspi;
-> >     [..]
-> > 
-> > [0]: https://github.com/xdp-project/xdp-tools/blob/master/headers/bpf/vmlinux.h
-> > 
-> > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> > ---
-> > Changes in v2:
-> > * Add early error check for invalid BTF ID
-> > 
-> >  .../bpf/bpftool/Documentation/bpftool-btf.rst |  5 +++--
-> >  tools/bpf/bpftool/btf.c                       | 19 +++++++++++++++++++
-> >  2 files changed, 22 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/tools/bpf/bpftool/Documentation/bpftool-btf.rst b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-> > index 3f6bca03ad2e..5abd0e99022f 100644
-> > --- a/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-> > +++ b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-> > @@ -27,7 +27,7 @@ BTF COMMANDS
-> >  | **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*]
-> >  | **bpftool** **btf help**
-> >  |
-> > -| *BTF_SRC* := { **id** *BTF_ID* | **prog** *PROG* | **map** *MAP* [{**key** | **value** | **kv** | **all**}] | **file** *FILE* }
-> > +| *BTF_SRC* := { **id** *BTF_ID* | **prog** *PROG* | **map** *MAP* [{**key** | **value** | **kv** | **all**}] | **file** *FILE* [**root_id** *ROOT_ID*] }
-> 
-> 
-> Thanks for this!
+Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-No problem!
-
-> 
-> root_id is not part of the BTF_SRC, I think it should be an option on
-> the command line itself (3 lines above), after "format". And the change
-> should also be repeated below in the description (the "format" option is
-> missing, by the way, let's fix it too).
-
-Sure, will do. I was originally thinking it would conflict with `map`
-subcommand, as it also sets the root_type_ids, but we can just error out
-if root_type_cnt > 0 and root_id is pased.
-
-Will send v3 with below suggestions as well.
-
-> 
-> Can you please also update the interactive help message at the end of
-> btf.c?
-> 
-> Can you please also update the bash completion file? I think it should
-> look like this:
-> 
-> 
-> ------
-> diff --git a/tools/bpf/bpftool/bash-completion/bpftool b/tools/bpf/bpftool/bash-completion/bpftool
-> index 0c541498c301..097d406ee21f 100644
-> --- a/tools/bpf/bpftool/bash-completion/bpftool
-> +++ b/tools/bpf/bpftool/bash-completion/bpftool
-> @@ -930,6 +930,9 @@ _bpftool()
->                          format)
->                              COMPREPLY=( $( compgen -W "c raw" -- "$cur" ) )
->                              ;;
-> +                        root_id)
-> +                            return 0;
-> +                            ;;
->                          c)
->                              COMPREPLY=( $( compgen -W "unsorted" -- "$cur" ) )
->                              ;;
-> @@ -937,13 +940,13 @@ _bpftool()
->                              # emit extra options
->                              case ${words[3]} in
->                                  id|file)
-> -                                    _bpftool_once_attr 'format'
-> +                                    _bpftool_once_attr 'format root_id'
->                                      ;;
->                                  map|prog)
->                                      if [[ ${words[3]} == "map" ]] && [[ $cword == 6 ]]; then
->                                          COMPREPLY+=( $( compgen -W "key value kv all" -- "$cur" ) )
->                                      fi
-> -                                    _bpftool_once_attr 'format'
-> +                                    _bpftool_once_attr 'format root_id'
->                                      ;;
->                                  *)
->                                      ;;
-> ------
-> 
-> 
-> >  | *FORMAT* := { **raw** | **c** [**unsorted**] }
-> >  | *MAP* := { **id** *MAP_ID* | **pinned** *FILE* }
-> >  | *PROG* := { **id** *PROG_ID* | **pinned** *FILE* | **tag** *PROG_TAG* | **name** *PROG_NAME* }
-> > @@ -60,7 +60,8 @@ bpftool btf dump *BTF_SRC*
-> >  
-> >      When specifying *FILE*, an ELF file is expected, containing .BTF section
-> >      with well-defined BTF binary format data, typically produced by clang or
-> > -    pahole.
-> > +    pahole. You can choose to dump a single type and all its dependent types
-> > +    by providing an optional *ROOT_ID*.
-> >  
-> >      **format** option can be used to override default (raw) output format. Raw
-> >      (**raw**) or C-syntax (**c**) output formats are supported. With C-style
-> > diff --git a/tools/bpf/bpftool/btf.c b/tools/bpf/bpftool/btf.c
-> > index d005e4fd6128..a75e17efaf5e 100644
-> > --- a/tools/bpf/bpftool/btf.c
-> > +++ b/tools/bpf/bpftool/btf.c
-> > @@ -953,6 +953,8 @@ static int do_dump(int argc, char **argv)
-> >  		NEXT_ARG();
-> >  	} else if (is_prefix(src, "file")) {
-> >  		const char sysfs_prefix[] = "/sys/kernel/btf/";
-> > +		__u32 root_id;
-> > +		char *end;
-> 
-> 
-> I think we could move these declarations to a lower scope, under your
-> "if (argc && is_prefix(...))".
-> 
-> 
-> >  
-> >  		if (!base_btf &&
-> >  		    strncmp(*argv, sysfs_prefix, sizeof(sysfs_prefix) - 1) == 0 &&
-> > @@ -967,6 +969,23 @@ static int do_dump(int argc, char **argv)
-> >  			goto done;
-> >  		}
-> >  		NEXT_ARG();
-> > +
-> > +		if (argc && is_prefix(*argv, "root_id")) {
-> > +			NEXT_ARG();
-> > +			root_id = strtoul(*argv, &end, 0);
-> > +			if (*end) {
-> > +				err = -1;
-> > +				p_err("can't parse %s as root ID", *argv);
-> > +				goto done;
-> > +			}
-> > +			if (root_id >= btf__type_cnt(btf)) {
-> > +				err = -EINVAL;
-> > +				p_err("invalid root ID: %u", root_id);
-> > +				goto done;
-> > +			}
-> > +			root_type_ids[root_type_cnt++] = root_id;
-> > +			NEXT_ARG();
-> > +		}
-> >  	} else {
-> >  		err = -1;
-> >  		p_err("unrecognized BTF source specifier: '%s'", src);
-> 
-> 
-> Same comment as above, it seems to be that the root_id controls the
-> output for the command rather than the source, and I'd rather move this
-> to the "while (argc)" loop where we process the "format" option rather
-> than when parsing the source.
-> 
-> 
-> pw-bot: cr
+cheers,
+jamal
 
