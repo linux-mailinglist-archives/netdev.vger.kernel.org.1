@@ -1,241 +1,291 @@
-Return-Path: <netdev+bounces-150021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84DE29E8927
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 03:20:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1BA69E8954
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 03:45:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37D5628302F
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 02:20:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DEEC28025A
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 02:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534E617741;
-	Mon,  9 Dec 2024 02:20:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E85649652;
+	Mon,  9 Dec 2024 02:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="B8r37hoZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AYu1IrBX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 045F9B66E
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 02:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123B725777
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 02:45:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733710833; cv=none; b=drzNyy7+lelrcmgLqdBNOP4G5HWMHQ2hOMTYocPNdbrm2hrExtNbM6eWow08AyXN3hLgZC/PR0SpZQcZWeMcllIQndPZaU5mywcUw4PGbuCrj/rlmf5BJRmZQfZp2D9/9wNeYo10I7aDYVD2oHiqPqU9uiNtcL++LXWSjY9e7wE=
+	t=1733712346; cv=none; b=dpa6XMJVuYHrz967X/IIZ60n/gjKwBKEq12UVrYooyh2EY1wy0R8inHG+UATdI2kOHikETLbX9EZ5xeDBKEj8S0K+CT1xxRJuJpASjw5FXKdiaZsyIVK0n+4BD6r2woKTaYWEvdUR94eLQce6NW4oq+ai4SOt5sB27eaTnOtVJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733710833; c=relaxed/simple;
-	bh=ab5tQMeE5JGalpqbVUwNFQC3sASHXoQDxbnZx3PceTw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RPzro7JA70RlATOexmVZxvB4CJTKr1D1nv/OVPH2/OY0xpSmiMpCFysDrIiUhh9Y6hvkvebbNuCIxorHvMVpyZoGPmjaxlzcFjziDroAxCCzmlQeYzZFgvRhNtBrIGM+ka1AeSRkNq+UZxwqPmWtq7SK7dTs3p0MOEUlqqbOQ/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au; spf=pass smtp.mailfrom=gandalf.ozlabs.org; dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b=B8r37hoZ; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gandalf.ozlabs.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=gibson.dropbear.id.au; s=202412; t=1733710820;
-	bh=r24AQkVP2WD7kYtnInbRp5c88nw+YFsVknxvi5YGyk8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B8r37hoZKbap4d7hdxxI2iJ2AG8wN0b8Y1yL1MOeFmvCi3D7ifC16OwUumZXU7dti
-	 IHuqEQMfkf1UzYMW03kb5/Pm63vLbU8SzAppaYEV6YLqszOS1odNPaG1aZ94h2GnqU
-	 5YZ8ThalOE0nsOYRsjKVtwuMeNZPNvF4b5KHJvUOJSfhCDoOkvbZz69rWtGuJQaLiy
-	 tounFIoobm0CysLSXN1vsQsZpH8FBYwlvPD+Md5iQ7DBBoV6wj21ehSbvOx6xKkeAd
-	 qmzwH9yRwG7qyMBLuvcqaeWpvchuFE+BJcwh+n9BeLl79zH/R7tX8Ub4ivyGf95UE9
-	 d1HtVlhAIFJLw==
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-	id 4Y65Dh5L9Gz4wcj; Mon,  9 Dec 2024 13:20:20 +1100 (AEDT)
-Date: Mon, 9 Dec 2024 13:20:20 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Stefano Brivio <sbrivio@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Mike Manning <mvrmanning@gmail.com>,
-	Paul Holzinger <pholzing@redhat.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Cambda Zhu <cambda@linux.alibaba.com>,
-	Fred Chen <fred.cc@alibaba-inc.com>,
-	Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
-Subject: Re: [PATCH net-next 2/2] datagram, udp: Set local address and rehash
- socket atomically against lookup
-Message-ID: <Z1ZT5Cwd-VXK1_27@zatzit>
-References: <20241204221254.3537932-1-sbrivio@redhat.com>
- <20241204221254.3537932-3-sbrivio@redhat.com>
- <CANn89i+iULeqTO2GrTCDZEOKPmU_18zwRxG6-P1XoqhP_j1p3A@mail.gmail.com>
- <Z1Ip9Ij8_JpoFu8c@zatzit>
- <CANn89i+PCsOHvd02nvM0oRjAXxPTgX6V1Y1-xfRL_43Ew9=H=w@mail.gmail.com>
- <Z1JeePBN5f1YCmYd@zatzit>
- <CANn89iJqLU6RuHgdbz3iGNL_K8XaPBYr3pWqQmgth2TFf14obg@mail.gmail.com>
+	s=arc-20240116; t=1733712346; c=relaxed/simple;
+	bh=z3vntOns/4hMYw/9IIZvLPuKRPh5l6+lZ8+dfBMsycg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NTnINJRnHPiFBc/EHwcup/qficzuwHWoz7brJZKYmqH12Zhr3RxsjXrzcQCpE4+M4YZVGZ2eg4wGwCYufyQTiWWdDXRt2Sc4DunS49hKTWnj1ehVZU/Sm20yQnszAmd2R0VaS1I1fF1YbkMMGdTzbtZdAw2YcFCk/US7sLZZ5Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AYu1IrBX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733712343;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cd/jYgOUOBv+IhfHBb5vZ7AAPUWg/MyPqH626Q9KOVg=;
+	b=AYu1IrBX9TZHHv7h5bneuUFa6cWwKc4dKv6ZhiNvychAqJqi30tgeD8LaS1frp3wsEg+Y3
+	WHODc4w9p5wx1Pvsj+v02LCJYCJsvfxAzILnV2cDzq7nZIdlSGGLqsZ6Rm4TzqLPF9E2tZ
+	5UWS+Jgj4Kp9rTFBsrNSwKGW7jzfsRU=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-452-n_MDE82aPmK2WMviFE17zg-1; Sun, 08 Dec 2024 21:45:42 -0500
+X-MC-Unique: n_MDE82aPmK2WMviFE17zg-1
+X-Mimecast-MFC-AGG-ID: n_MDE82aPmK2WMviFE17zg
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-7fd305c2027so1189154a12.0
+        for <netdev@vger.kernel.org>; Sun, 08 Dec 2024 18:45:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733712340; x=1734317140;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cd/jYgOUOBv+IhfHBb5vZ7AAPUWg/MyPqH626Q9KOVg=;
+        b=SJZQNwOmx3OY2bSKZszDDaeS6EnULWDovw7qySeXtaUcEK5aHhe4KePOK1EVvrM/+M
+         YJVJD88mLUNvBhGqyOJp4VvJKpAdUTHG3vYv0UEIy2r2RDL7rFR1UELmQVSQ9/52HfWR
+         tLxWgUyBsoZ5tP1FQrFQnCUmVfuB+VDhrgy5klZhzU3r3BLxHLFe6hOlznlMA1uwKAKs
+         bQYRpT5AFvjTAhqy1dgXm2QcKWyYyvR3cowFyQDbc0Ixw9YjJXdQ8+HW8PP6nEtxAJCS
+         AdkNrl7HkcN/nb14/LTsvSI0a7iZK7rd1tMNhaxuIxE+kmkDnxQlQ8YCDkfK91m8lAgp
+         sKOA==
+X-Forwarded-Encrypted: i=1; AJvYcCXqSjRYiGdHUF+eQFu3WEB0a5UF9psWdHwgQhmZEDq/w+PvNm9S+S+HmQjXaQN05zJxeNiGfsU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlSi21phNK+8UmVzqmN/vUGg756n5la5kh+GKD5UFz87LhZZOA
+	f6ApRiWZpUrZ8au1UEFxXinnE6hJmTC99uhhYCOyrgTOTXdb4bqzhSUEBJ0wswt1E/46OfOPGgr
+	DJmaxP7QTjrDk+SD92k+Wpe4tB4u6z0kw5nBbyyE6AOi3wcoc0nkX9cdkcBiQJW4GkuRVy65zy8
+	lqrG0/aC7OQ1g0/XxXHIGMGFrUDWG+uUnx2tJnyF4=
+X-Gm-Gg: ASbGncusrUBCgt/rNPgizLEj9ketBitXXJYlznzK6u6MRKJBuV4O6geLsOB9JrPBWru
+	UPxZozMhCGkJo92xrXUEBbbfgre9O8rSv
+X-Received: by 2002:a05:6a21:6da3:b0:1e1:ac4f:d322 with SMTP id adf61e73a8af0-1e1ac4fd461mr1586004637.14.1733712339774;
+        Sun, 08 Dec 2024 18:45:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFjPLcfBtOmL3j5UniGxxOt3G2kcnYmikXqIAhu/zHQCoHh6AWX+p74HC8lizELHdOesoXE4GEtpeJ5Dt7XmaY=
+X-Received: by 2002:a05:6a21:6da3:b0:1e1:ac4f:d322 with SMTP id
+ adf61e73a8af0-1e1ac4fd461mr1585970637.14.1733712339260; Sun, 08 Dec 2024
+ 18:45:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pjliFRe7kRWNYCIi"
-Content-Disposition: inline
-In-Reply-To: <CANn89iJqLU6RuHgdbz3iGNL_K8XaPBYr3pWqQmgth2TFf14obg@mail.gmail.com>
-
-
---pjliFRe7kRWNYCIi
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20241206011047.923923-1-koichiro.den@canonical.com>
+In-Reply-To: <20241206011047.923923-1-koichiro.den@canonical.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 9 Dec 2024 10:45:27 +0800
+Message-ID: <CACGkMEv2iSfYtOP+ktozN2j39-OUCresD3d2mZfKXCiQur9oig@mail.gmail.com>
+Subject: Re: [PATCH net v4 0/6] virtio_net: correct netdev_tx_reset_queue()
+ invocation points
+To: Koichiro Den <koichiro.den@canonical.com>
+Cc: virtualization@lists.linux.dev, mst@redhat.com, xuanzhuo@linux.alibaba.com, 
+	eperezma@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 06, 2024 at 10:04:33AM +0100, Eric Dumazet wrote:
-> On Fri, Dec 6, 2024 at 3:16=E2=80=AFAM David Gibson <david@gibson.dropbea=
-r.id.au> wrote:
-> >
-> > On Thu, Dec 05, 2024 at 11:52:38PM +0100, Eric Dumazet wrote:
-> > > On Thu, Dec 5, 2024 at 11:32=E2=80=AFPM David Gibson
-> > > <david@gibson.dropbear.id.au> wrote:
-> > > >
-> > > > On Thu, Dec 05, 2024 at 05:35:52PM +0100, Eric Dumazet wrote:
-> > > > > On Wed, Dec 4, 2024 at 11:12=E2=80=AFPM Stefano Brivio <sbrivio@r=
-edhat.com> wrote:
-> > > > [snip]
-> > > > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> > > > > > index 6a01905d379f..8490408f6009 100644
-> > > > > > --- a/net/ipv4/udp.c
-> > > > > > +++ b/net/ipv4/udp.c
-> > > > > > @@ -639,18 +639,21 @@ struct sock *__udp4_lib_lookup(const stru=
-ct net *net, __be32 saddr,
-> > > > > >                 int sdif, struct udp_table *udptable, struct sk=
-_buff *skb)
-> > > > > >  {
-> > > > > >         unsigned short hnum =3D ntohs(dport);
-> > > > > > -       struct udp_hslot *hslot2;
-> > > > > > +       struct udp_hslot *hslot, *hslot2;
-> > > > > >         struct sock *result, *sk;
-> > > > > >         unsigned int hash2;
-> > > > > >
-> > > > > > +       hslot =3D udp_hashslot(udptable, net, hnum);
-> > > > > > +       spin_lock_bh(&hslot->lock);
-> > > > >
-> > > > > This is not acceptable.
-> > > > > UDP is best effort, packets can be dropped.
-> > > > > Please fix user application expectations.
-> > > >
-> > > > The packets aren't merely dropped, they're rejected with an ICMP Po=
-rt
-> > > > Unreachable.
-> > >
-> > > We made UDP stack scalable with RCU, it took years of work.
-> > >
-> > > And this patch is bringing back the UDP stack to horrible performance
-> > > from more than a decade ago.
-> > > Everybody will go back to DPDK.
-> >
-> > It's reasonable to be concerned about the performance impact.  But
-> > this seems like preamture hyperbole given no-one has numbers yet, or
-> > has even suggested a specific benchmark to reveal the impact.
-> >
-> > > I am pretty certain this can be solved without using a spinlock in the
-> > > fast path.
-> >
-> > Quite possibly.  But Stefano has tried, and it certainly wasn't
-> > trivial.
-> >
-> > > Think about UDP DNS/QUIC servers, using SO_REUSEPORT and receiving
-> > > 10,000,000 packets per second....
-> > >
-> > > Changing source address on an UDP socket is highly unusual, we are not
-> > > going to slow down UDP for this case.
-> >
-> > Changing in a general way is very rare, one specific case is not.
-> > Every time you connect() a socket that wasn't previously bound to a
-> > specific address you get an implicit source address change from
-> > 0.0.0.0 or :: to something that depends on the routing table.
-> >
-> > > Application could instead open another socket, and would probably work
-> > > on old linux versions.
-> >
-> > Possibly there's a procedure that would work here, but it's not at all
-> > obvious:
-> >
-> >  * Clearly, you can't close the non-connected socket before opening
-> >    the connected one - that just introduces a new much wider race.  It
-> >    doesn't even get rid of the existing one, because unless you can
-> >    independently predict what the correct bound address will be
-> >    for a given peer address, the second socket will still have an
-> >    address change when you connect().
-> >
->=20
-> The order is kind of obvious.
->=20
-> Kernel does not have to deal with wrong application design.
+On Fri, Dec 6, 2024 at 9:11=E2=80=AFAM Koichiro Den <koichiro.den@canonical=
+.com> wrote:
+>
+> When virtnet_close is followed by virtnet_open, some TX completions can
+> possibly remain unconsumed, until they are finally processed during the
+> first NAPI poll after the netdev_tx_reset_queue(), resulting in a crash
+> [1]. Commit b96ed2c97c79 ("virtio_net: move netdev_tx_reset_queue() call
+> before RX napi enable") was not sufficient to eliminate all BQL crash
+> scenarios for virtio-net.
+>
+> This issue can be reproduced with the latest net-next master by running:
+> `while :; do ip l set DEV down; ip l set DEV up; done` under heavy networ=
+k
+> TX load from inside the machine.
+>
+> This patch series resolves the issue and also addresses similar existing
+> problems:
+>
+> (a). Drop netdev_tx_reset_queue() from open/close path. This eliminates t=
+he
+>      BQL crashes due to the problematic open/close path.
+>
+> (b). As a result of (a), netdev_tx_reset_queue() is now explicitly requir=
+ed
+>      in freeze/restore path. Add netdev_tx_reset_queue() immediately afte=
+r
+>      free_unused_bufs() invocation.
+>
+> (c). Fix missing resetting in virtnet_tx_resize().
+>      virtnet_tx_resize() has lacked proper resetting since commit
+>      c8bd1f7f3e61 ("virtio_net: add support for Byte Queue Limits").
+>
+> (d). Fix missing resetting in the XDP_SETUP_XSK_POOL path.
+>      Similar to (c), this path lacked proper resetting. Call
+>      netdev_tx_reset_queue() when virtqueue_reset() has actually recycled
+>      unused buffers.
+>
+> This patch series consists of six commits:
+>   [1/6]: Resolves (a) and (b).                      # also -stable 6.11.y
+>   [2/6]: Minor fix to make [4/6] streamlined.
+>   [3/6]: Prerequisite for (c).                      # also -stable 6.11.y
+>   [4/6]: Resolves (c) (incl. Prerequisite for (d))  # also -stable 6.11.y
+>   [5/6]: Preresuisite for (d).
+>   [6/6]: Resolves (d).
+>
+> Changes for v4:
+>   - move netdev_tx_reset_queue() out of free_unused_bufs()
+>   - submit to net, not net-next
+> Changes for v3:
+>   - replace 'flushed' argument with 'recycle_done'
+> Changes for v2:
+>   - add tx queue resetting for (b) to (d) above
+>
+> v3: https://lore.kernel.org/all/20241204050724.307544-1-koichiro.den@cano=
+nical.com/
+> v2: https://lore.kernel.org/all/20241203073025.67065-1-koichiro.den@canon=
+ical.com/
+> v1: https://lore.kernel.org/all/20241130181744.3772632-1-koichiro.den@can=
+onical.com/
+>
+> [1]:
+> ------------[ cut here ]------------
+> kernel BUG at lib/dynamic_queue_limits.c:99!
+> Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+> CPU: 7 UID: 0 PID: 1598 Comm: ip Tainted: G    N 6.12.0net-next_main+ #2
+> Tainted: [N]=3DTEST
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), \
+> BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+> RIP: 0010:dql_completed+0x26b/0x290
+> Code: b7 c2 49 89 e9 44 89 da 89 c6 4c 89 d7 e8 ed 17 47 00 58 65 ff 0d
+> 4d 27 90 7e 0f 85 fd fe ff ff e8 ea 53 8d ff e9 f3 fe ff ff <0f> 0b 01
+> d2 44 89 d1 29 d1 ba 00 00 00 00 0f 48 ca e9 28 ff ff ff
+> RSP: 0018:ffffc900002b0d08 EFLAGS: 00010297
+> RAX: 0000000000000000 RBX: ffff888102398c80 RCX: 0000000080190009
+> RDX: 0000000000000000 RSI: 000000000000006a RDI: 0000000000000000
+> RBP: ffff888102398c00 R08: 0000000000000000 R09: 0000000000000000
+> R10: 00000000000000ca R11: 0000000000015681 R12: 0000000000000001
+> R13: ffffc900002b0d68 R14: ffff88811115e000 R15: ffff8881107aca40
+> FS:  00007f41ded69500(0000) GS:ffff888667dc0000(0000)
+> knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000556ccc2dc1a0 CR3: 0000000104fd8003 CR4: 0000000000772ef0
+> PKRU: 55555554
+> Call Trace:
+>  <IRQ>
+>  ? die+0x32/0x80
+>  ? do_trap+0xd9/0x100
+>  ? dql_completed+0x26b/0x290
+>  ? dql_completed+0x26b/0x290
+>  ? do_error_trap+0x6d/0xb0
+>  ? dql_completed+0x26b/0x290
+>  ? exc_invalid_op+0x4c/0x60
+>  ? dql_completed+0x26b/0x290
+>  ? asm_exc_invalid_op+0x16/0x20
+>  ? dql_completed+0x26b/0x290
+>  __free_old_xmit+0xff/0x170 [virtio_net]
+>  free_old_xmit+0x54/0xc0 [virtio_net]
+>  virtnet_poll+0xf4/0xe30 [virtio_net]
+>  ? __update_load_avg_cfs_rq+0x264/0x2d0
+>  ? update_curr+0x35/0x260
+>  ? reweight_entity+0x1be/0x260
+>  __napi_poll.constprop.0+0x28/0x1c0
+>  net_rx_action+0x329/0x420
+>  ? enqueue_hrtimer+0x35/0x90
+>  ? trace_hardirqs_on+0x1d/0x80
+>  ? kvm_sched_clock_read+0xd/0x20
+>  ? sched_clock+0xc/0x30
+>  ? kvm_sched_clock_read+0xd/0x20
+>  ? sched_clock+0xc/0x30
+>  ? sched_clock_cpu+0xd/0x1a0
+>  handle_softirqs+0x138/0x3e0
+>  do_softirq.part.0+0x89/0xc0
+>  </IRQ>
+>  <TASK>
+>  __local_bh_enable_ip+0xa7/0xb0
+>  virtnet_open+0xc8/0x310 [virtio_net]
+>  __dev_open+0xfa/0x1b0
+>  __dev_change_flags+0x1de/0x250
+>  dev_change_flags+0x22/0x60
+>  do_setlink.isra.0+0x2df/0x10b0
+>  ? rtnetlink_rcv_msg+0x34f/0x3f0
+>  ? netlink_rcv_skb+0x54/0x100
+>  ? netlink_unicast+0x23e/0x390
+>  ? netlink_sendmsg+0x21e/0x490
+>  ? ____sys_sendmsg+0x31b/0x350
+>  ? avc_has_perm_noaudit+0x67/0xf0
+>  ? cred_has_capability.isra.0+0x75/0x110
+>  ? __nla_validate_parse+0x5f/0xee0
+>  ? __pfx___probestub_irq_enable+0x3/0x10
+>  ? __create_object+0x5e/0x90
+>  ? security_capable+0x3b/0x7 [I0
+>  rtnl_newlink+0x784/0xaf0
+>  ? avc_has_perm_noaudit+0x67/0xf0
+>  ? cred_has_capability.isra.0+0x75/0x110
+>  ? stack_depot_save_flags+0x24/0x6d0
+>  ? __pfx_rtnl_newlink+0x10/0x10
+>  rtnetlink_rcv_msg+0x34f/0x3f0
+>  ? do_syscall_64+0x6c/0x180
+>  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+>  netlink_rcv_skb+0x54/0x100
+>  netlink_unicast+0x23e/0x390
+>  netlink_sendmsg+0x21e/0x490
+>  ____sys_sendmsg+0x31b/0x350
+>  ? copy_msghdr_from_user+0x6d/0xa0
+>  ___sys_sendmsg+0x86/0xd0
+>  ? __pte_offset_map+0x17/0x160
+>  ? preempt_count_add+0x69/0xa0
+>  ? __call_rcu_common.constprop.0+0x147/0x610
+>  ? preempt_count_add+0x69/0xa0
+>  ? preempt_count_add+0x69/0xa0
+>  ? _raw_spin_trylock+0x13/0x60
+>  ? trace_hardirqs_on+0x1d/0x80
+>  __sys_sendmsg+0x66/0xc0
+>  do_syscall_64+0x6c/0x180
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> RIP: 0033:0x7f41defe5b34
+> Code: 15 e1 12 0f 00 f7 d8 64 89 02 b8 ff ff ff ff eb bf 0f 1f 44 00 00
+> f3 0f 1e fa 80 3d 35 95 0f 00 00 74 13 b8 2e 00 00 00 0f 05 <48> 3d 00
+> f0 ff ff 77 4c c3 0f 1f 00 55 48 89 e5 48 83 ec 20 89 55
+> RSP: 002b:00007ffe5336ecc8 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f41defe5b34
+> RDX: 0000000000000000 RSI: 00007ffe5336ed30 RDI: 0000000000000003
+> RBP: 00007ffe5336eda0 R08: 0000000000000010 R09: 0000000000000001
+> R10: 00007ffe5336f6f9 R11: 0000000000000202 R12: 0000000000000003
+> R13: 0000000067452259 R14: 0000556ccc28b040 R15: 0000000000000000
+>  </TASK>
+> [...]
+> ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+>
+> Koichiro Den (6):
+>   virtio_net: correct netdev_tx_reset_queue() invocation point
+>   virtio_net: replace vq2rxq with vq2txq where appropriate
+>   virtio_ring: add a func argument 'recycle_done' to virtqueue_resize()
+>   virtio_net: ensure netdev_tx_reset_queue is called on tx ring resize
+>   virtio_ring: add a func argument 'recycle_done' to virtqueue_reset()
+>   virtio_net: ensure netdev_tx_reset_queue is called on bind xsk for tx
+>
+>  drivers/net/virtio_net.c     | 31 +++++++++++++++++++++++++------
+>  drivers/virtio/virtio_ring.c | 12 ++++++++++--
+>  include/linux/virtio.h       |  6 ++++--
+>  3 files changed, 39 insertions(+), 10 deletions(-)
+>
+> --
+> 2.43.0
+>
 
-What we're talking about is:
+For the series,
 
-	bind("0.0.0.0:12345");
-	connect("1.2.3.4:54321");
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-Which AFAIK has been a legal sequence since the sockets interface was
-a thing.  I don't think it's reasonable to call expecting that *not*
-to trigger ICMPs around the connect "wrong application design".
+Thanks
 
-> >  * So, you must create the connected socket before closing the
-> >    unconnected one, meaning you have to use SO_REUSEADDR or
-> >    SO_REUSEPORT whether or not you otherwise wanted to.
-> >
-> >  * While both sockets are open, you need to handle the possibility
-> >    that packets could be delivered to either one.  Doable, but a pain
-> >    in the arse.
->=20
-> Given UDP does not have a proper listen() + accept() model, I am
-> afraid this is the only way
->=20
-> You need to keep the generic UDP socket as a catch all, and deal with
-> packets received on it.
->=20
-> >
-> >  * How do you know when the transition is completed and you can close
-> >    the unconnected socket?  The fact that the rehashing has completed
-> >    and all the necessary memory barriers passed isn't something
-> >    userspace can directly discern.
-> >
-> > > If the regression was recent, this would be considered as a normal re=
-gression,
-> > > but apparently nobody noticed for 10 years. This should be saying som=
-ething...
-> >
-> > It does.  But so does the fact that it can be trivially reproduced.
->=20
-> If a kernel fix is doable without making UDP stack a complete nogo for
-> most of us,
-
-The benchmarks Stefano has tried so far don't show an impact, and you
-haven't yet suggested another one.  Again, calling this a "complete
-nogo" seems like huge hyperbole without more data.
-
-> I will be happy to review it.
->=20
-
---=20
-David Gibson (he or they)	| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you, not the other way
-				| around.
-http://www.ozlabs.org/~dgibson
-
---pjliFRe7kRWNYCIi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEO+dNsU4E3yXUXRK2zQJF27ox2GcFAmdWU+AACgkQzQJF27ox
-2Gc7MBAAlKE2MaTMEXVMHAQ8efnVXmSqwlinYohSWZfH9tEV7q2qOZK0CizRP7ZQ
-tc/i9l7FLVMgqGaC9syT2dWTnaQ5F+hJeKuLnoLBAL+IOCSeR+DqlBvfLqAFgsqp
-dUG6YVKteNnRrMnMt3aPBMSufAwfd2gPVOOJYYrNoshYIgvAiP72jj59RajYuYXi
-nIOduFQAbfI9XsQRwqn+758C44z2YsVZttxcU+fCyztCD1ZTnHXP921/aENvyKvQ
-t4Ai70yh2rERlh69cUnNNWX6e034Xu8bX5hjT1jLKCNymsEk4pYAXztW2QaTpx6n
-FeSqeP80nBAUqGDEr97JmGvDNi00QteqWbBcb1Jbt47dUVQqtWrDNe7rFWi9sumx
-7oi7Ul+TlaD9lJvLrcEcK3T+g7H0pXW5w++iAcmdLUM0AgaXnuJbjLNlWevRMySB
-0+mDjuwQQp+Q0Htc+YNjTgjXDWpxLRYCaFNE59xXiOUdBtmS5jY20rptzO09kbGj
-Ai0URnfwFYjkvEjJWMbZnFYvLhjr68NEqQaanEwXuCaXAcO06NGTsyDo7nhtETME
-dwiFsHHAanpiE/3wZ/p0SpSgBGqDdAeGPHmbBT7kTtapgujk/7gTa6Lan8fZkXbD
-6z+tfveuipssKTV3p24hpwDryZATcaQOMMVuzWFV6sDH4vREOvg=
-=90rr
------END PGP SIGNATURE-----
-
---pjliFRe7kRWNYCIi--
 
