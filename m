@@ -1,111 +1,245 @@
-Return-Path: <netdev+bounces-150157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 270669E93B0
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:20:25 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E9659E93DD
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:27:01 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00C7A1655C3
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:20:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 290D1285FA2
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:27:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1090421E085;
-	Mon,  9 Dec 2024 12:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8358E223703;
+	Mon,  9 Dec 2024 12:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hbGEhID+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qfvzxyNh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D152D21B1A7;
-	Mon,  9 Dec 2024 12:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568732236E5;
+	Mon,  9 Dec 2024 12:26:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733746821; cv=none; b=qIzZzeIlWHugap5jQZc5SwRR25/egGYUNPu+955WomBee9uZ0a8Jx9iDUT4pCruoHL3epN0UV3r7Jo2PGAY5j6C0LERCfNirTsxBpgW7o0hJoHoGAWbbO+Wnc2mTtc13sF1Ne+54aktNZRD081gaNC/2PUysqQmpLefRE8imbHg=
+	t=1733747216; cv=none; b=Ahf5qLqzvDuToi9rEbwyD0cDSd9h3ESs0BWfrM18kFoBp7dmnFBmD94j7GxN2igF0AbemTd8tF1Iq3yorplmv8yE3J/BkSEOJPZ1WKjDYM5aNhl7JuTSsCyvl6xuUTVB8mJYy3Q5YI8sReLmSAylEIdPcQ+RAr6/4VQxSIXZO5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733746821; c=relaxed/simple;
-	bh=ORVba51fgn5Y2cMstsQg19evQaiepuNOEBjuFVdtd6Q=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eGnfwlSiunzQqQv2TIh5p8ibIRM4N6Ts5YtxYAo2FE8MrISBpqmooXm4sqn+0VwEorM7qfSOT47aBbNHAG3+zHL5TQuNMpqXxRd1BeKRY8APdwsEJ39dkE+ncB+Xu9qVSRhwYjuRR2DQDDnT0yncSbbwXaaYEAPj7xfixUhH3Eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hbGEhID+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37B86C4CED1;
-	Mon,  9 Dec 2024 12:20:18 +0000 (UTC)
+	s=arc-20240116; t=1733747216; c=relaxed/simple;
+	bh=4JauUlaauwuNUBq73sXeBrsFuFTH+ZeTne9Ec2pQWyo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R8exUGFLLtC7QN0EMWKk9950FltM48eyK5y0eiAG2mClaNkXBgoHCklppOu8bqWjd+j5SEGGQX7OyI+YMN4Zv9KZrHyw4FRGbnrhX6ADBL3U/D3xd05xEzPrr8k90aC9ERN51W00KWJDJBX7+TL1Bp3RxBsEgLzIvoRh06f+1Qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qfvzxyNh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44A5FC4CED1;
+	Mon,  9 Dec 2024 12:26:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733746818;
-	bh=ORVba51fgn5Y2cMstsQg19evQaiepuNOEBjuFVdtd6Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hbGEhID+hZzHkSzqqaBGwT9QK5sAixadT4nGjt8xPEzDk0OOU5LHoe8QWbKUAE93W
-	 a8k5sTLaG9HUkAULxKiiN306zbpA5bOFXnYKrisTmeC6W0qLb5lgMbFlHkxWMK2ptI
-	 KBnGTcFy06l1ygdzOW0JCtXcnvopjEsKMxwIQT0fik56feWGOKDZEO6svBNpQyuDHI
-	 mHLqSg4yn9WlcHLSPqp8CaZKpFuO3CYflTsS+o+aETB6LhZU8EBQCIgoiok5T0xh8n
-	 qaIRzUExwTOXpgPh8EsvUEe8wS0+24QuAVvyUa7FSXrMQJGTTxdd3P+f8yLtv96sTw
-	 O/w1C5ED0nInA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB20C380A95E;
-	Mon,  9 Dec 2024 12:20:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1733747215;
+	bh=4JauUlaauwuNUBq73sXeBrsFuFTH+ZeTne9Ec2pQWyo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qfvzxyNhhMJx0OVwZWoYDm3WmhapNfBdVuE+T3rGNKsfJcFcrrOycdEneT32x/IWz
+	 8d5ik0ZcJuSV7buBdgpCH6rxM9xtKheobH+2uPbJt0X/GHABXptgAjAPiTVwACL9iQ
+	 d4Zi0G9KKy+QtuM4bOLnNQHRUitRjQDaz/TyBKtgqWCPF18bfmi3k0ZVUro1nYn7ze
+	 yCi6xlefH5ImyiR6EMvLjuds7kpRLGaB75odXniY04SiT87bxJaIbaD8iWJplEWUaB
+	 HcEDj2/70fD9zPno9Edx1ngQcfmW0RSIVBc4nYXwmLucFPBjKUg+Sc6FKbqBZQJRXC
+	 Jz3xmpAkdFOTw==
+Message-ID: <92b28250-acd8-4ca7-8a0e-09e1338113f0@kernel.org>
+Date: Mon, 9 Dec 2024 12:26:50 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next PATCH v10 0/8] cn10k-ipsec: Add outbound inline ipsec
- support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173374683375.15657.6178697475771459592.git-patchwork-notify@kernel.org>
-Date: Mon, 09 Dec 2024 12:20:33 +0000
-References: <20241204055659.1700459-1-bbhushan2@marvell.com>
-In-Reply-To: <20241204055659.1700459-1-bbhushan2@marvell.com>
-To: Bharat Bhushan <bbhushan2@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
- hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jerinj@marvell.com, lcherian@marvell.com,
- ndabilpuram@marvell.com, andrew+netdev@lunn.ch, richardcochran@gmail.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v2] bpftool: btf: Support dumping a single type
+ from file
+To: Daniel Xu <dxu@dxuuu.xyz>, hawk@kernel.org, john.fastabend@gmail.com,
+ kuba@kernel.org, ast@kernel.org, davem@davemloft.net, daniel@iogearbox.net,
+ andrii@kernel.org
+Cc: martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, antony@phenome.org,
+ toke@kernel.org
+References: <c8e6a2dfb64d76e61a20b1e2470fccbddf167499.1733613798.git.dxu@dxuuu.xyz>
+From: Quentin Monnet <qmo@kernel.org>
+Content-Language: en-GB
+In-Reply-To: <c8e6a2dfb64d76e61a20b1e2470fccbddf167499.1733613798.git.dxu@dxuuu.xyz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Wed, 4 Dec 2024 11:26:51 +0530 you wrote:
-> This patch series adds outbound inline ipsec support on Marvell
-> cn10k series of platform. One crypto hardware logical function
-> (cpt-lf) per netdev is required for inline ipsec outbound
-> functionality. Software prepare and submit crypto hardware
-> (CPT) instruction for outbound inline ipsec crypto mode offload.
-> The CPT instruction have details for encryption and authentication
-> Crypto hardware encrypt, authenticate and provide the ESP packet
-> to network hardware logic to transmit ipsec packet.
+On 07/12/2024 23:24, Daniel Xu wrote:
+> Some projects, for example xdp-tools [0], prefer to check in a minimized
+> vmlinux.h rather than the complete file which can get rather large.
 > 
-> [...]
+> However, when you try to add a minimized version of a complex struct (eg
+> struct xfrm_state), things can get quite complex if you're trying to
+> manually untangle and deduplicate the dependencies.
+> 
+> This commit teaches bpftool to do a minimized dump of a single type by
+> providing an optional root_id argument.
+> 
+> Example usage:
+> 
+>     $ ./bpftool btf dump file ~/dev/linux/vmlinux | rg "STRUCT 'xfrm_state'"
+>     [12643] STRUCT 'xfrm_state' size=912 vlen=58
+> 
+>     $ ./bpftool btf dump file ~/dev/linux/vmlinux root_id 12643 format c
+>     #ifndef __VMLINUX_H__
+>     #define __VMLINUX_H__
+> 
+>     [..]
+> 
+>     struct xfrm_type_offload;
+> 
+>     struct xfrm_sec_ctx;
+> 
+>     struct xfrm_state {
+>             possible_net_t xs_net;
+>             union {
+>                     struct hlist_node gclist;
+>                     struct hlist_node bydst;
+>             };
+>             union {
+>                     struct hlist_node dev_gclist;
+>                     struct hlist_node bysrc;
+>             };
+>             struct hlist_node byspi;
+>     [..]
+> 
+> [0]: https://github.com/xdp-project/xdp-tools/blob/master/headers/bpf/vmlinux.h
+> 
+> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> ---
+> Changes in v2:
+> * Add early error check for invalid BTF ID
+> 
+>  .../bpf/bpftool/Documentation/bpftool-btf.rst |  5 +++--
+>  tools/bpf/bpftool/btf.c                       | 19 +++++++++++++++++++
+>  2 files changed, 22 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/bpf/bpftool/Documentation/bpftool-btf.rst b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
+> index 3f6bca03ad2e..5abd0e99022f 100644
+> --- a/tools/bpf/bpftool/Documentation/bpftool-btf.rst
+> +++ b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
+> @@ -27,7 +27,7 @@ BTF COMMANDS
+>  | **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*]
+>  | **bpftool** **btf help**
+>  |
+> -| *BTF_SRC* := { **id** *BTF_ID* | **prog** *PROG* | **map** *MAP* [{**key** | **value** | **kv** | **all**}] | **file** *FILE* }
+> +| *BTF_SRC* := { **id** *BTF_ID* | **prog** *PROG* | **map** *MAP* [{**key** | **value** | **kv** | **all**}] | **file** *FILE* [**root_id** *ROOT_ID*] }
 
-Here is the summary with links:
-  - [net-next,v10,1/8] octeontx2-pf: map skb data as device writeable
-    https://git.kernel.org/netdev/net-next/c/195c3d463181
-  - [net-next,v10,2/8] octeontx2-pf: Move skb fragment map/unmap to common code
-    https://git.kernel.org/netdev/net-next/c/c460b7442a6b
-  - [net-next,v10,3/8] octeontx2-af: Disable backpressure between CPT and NIX
-    https://git.kernel.org/netdev/net-next/c/a7ef63dbd588
-  - [net-next,v10,4/8] cn10k-ipsec: Init hardware for outbound ipsec crypto offload
-    https://git.kernel.org/netdev/net-next/c/fe079ab05d49
-  - [net-next,v10,5/8] cn10k-ipsec: Add SA add/del support for outb ipsec crypto offload
-    https://git.kernel.org/netdev/net-next/c/c45211c23697
-  - [net-next,v10,6/8] cn10k-ipsec: Process outbound ipsec crypto offload
-    https://git.kernel.org/netdev/net-next/c/6a77a158848a
-  - [net-next,v10,7/8] cn10k-ipsec: Allow ipsec crypto offload for skb with SA
-    https://git.kernel.org/netdev/net-next/c/32188be805d0
-  - [net-next,v10,8/8] cn10k-ipsec: Enable outbound ipsec crypto offload
-    https://git.kernel.org/netdev/net-next/c/b3ae3dc3a30f
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thanks for this!
+
+root_id is not part of the BTF_SRC, I think it should be an option on
+the command line itself (3 lines above), after "format". And the change
+should also be repeated below in the description (the "format" option is
+missing, by the way, let's fix it too).
+
+Can you please also update the interactive help message at the end of
+btf.c?
+
+Can you please also update the bash completion file? I think it should
+look like this:
 
 
+------
+diff --git a/tools/bpf/bpftool/bash-completion/bpftool b/tools/bpf/bpftool/bash-completion/bpftool
+index 0c541498c301..097d406ee21f 100644
+--- a/tools/bpf/bpftool/bash-completion/bpftool
++++ b/tools/bpf/bpftool/bash-completion/bpftool
+@@ -930,6 +930,9 @@ _bpftool()
+                         format)
+                             COMPREPLY=( $( compgen -W "c raw" -- "$cur" ) )
+                             ;;
++                        root_id)
++                            return 0;
++                            ;;
+                         c)
+                             COMPREPLY=( $( compgen -W "unsorted" -- "$cur" ) )
+                             ;;
+@@ -937,13 +940,13 @@ _bpftool()
+                             # emit extra options
+                             case ${words[3]} in
+                                 id|file)
+-                                    _bpftool_once_attr 'format'
++                                    _bpftool_once_attr 'format root_id'
+                                     ;;
+                                 map|prog)
+                                     if [[ ${words[3]} == "map" ]] && [[ $cword == 6 ]]; then
+                                         COMPREPLY+=( $( compgen -W "key value kv all" -- "$cur" ) )
+                                     fi
+-                                    _bpftool_once_attr 'format'
++                                    _bpftool_once_attr 'format root_id'
+                                     ;;
+                                 *)
+                                     ;;
+------
+
+
+>  | *FORMAT* := { **raw** | **c** [**unsorted**] }
+>  | *MAP* := { **id** *MAP_ID* | **pinned** *FILE* }
+>  | *PROG* := { **id** *PROG_ID* | **pinned** *FILE* | **tag** *PROG_TAG* | **name** *PROG_NAME* }
+> @@ -60,7 +60,8 @@ bpftool btf dump *BTF_SRC*
+>  
+>      When specifying *FILE*, an ELF file is expected, containing .BTF section
+>      with well-defined BTF binary format data, typically produced by clang or
+> -    pahole.
+> +    pahole. You can choose to dump a single type and all its dependent types
+> +    by providing an optional *ROOT_ID*.
+>  
+>      **format** option can be used to override default (raw) output format. Raw
+>      (**raw**) or C-syntax (**c**) output formats are supported. With C-style
+> diff --git a/tools/bpf/bpftool/btf.c b/tools/bpf/bpftool/btf.c
+> index d005e4fd6128..a75e17efaf5e 100644
+> --- a/tools/bpf/bpftool/btf.c
+> +++ b/tools/bpf/bpftool/btf.c
+> @@ -953,6 +953,8 @@ static int do_dump(int argc, char **argv)
+>  		NEXT_ARG();
+>  	} else if (is_prefix(src, "file")) {
+>  		const char sysfs_prefix[] = "/sys/kernel/btf/";
+> +		__u32 root_id;
+> +		char *end;
+
+
+I think we could move these declarations to a lower scope, under your
+"if (argc && is_prefix(...))".
+
+
+>  
+>  		if (!base_btf &&
+>  		    strncmp(*argv, sysfs_prefix, sizeof(sysfs_prefix) - 1) == 0 &&
+> @@ -967,6 +969,23 @@ static int do_dump(int argc, char **argv)
+>  			goto done;
+>  		}
+>  		NEXT_ARG();
+> +
+> +		if (argc && is_prefix(*argv, "root_id")) {
+> +			NEXT_ARG();
+> +			root_id = strtoul(*argv, &end, 0);
+> +			if (*end) {
+> +				err = -1;
+> +				p_err("can't parse %s as root ID", *argv);
+> +				goto done;
+> +			}
+> +			if (root_id >= btf__type_cnt(btf)) {
+> +				err = -EINVAL;
+> +				p_err("invalid root ID: %u", root_id);
+> +				goto done;
+> +			}
+> +			root_type_ids[root_type_cnt++] = root_id;
+> +			NEXT_ARG();
+> +		}
+>  	} else {
+>  		err = -1;
+>  		p_err("unrecognized BTF source specifier: '%s'", src);
+
+
+Same comment as above, it seems to be that the root_id controls the
+output for the command rather than the source, and I'd rather move this
+to the "while (argc)" loop where we process the "format" option rather
+than when parsing the source.
+
+
+pw-bot: cr
 
