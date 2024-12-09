@@ -1,114 +1,261 @@
-Return-Path: <netdev+bounces-150152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CA179E92FF
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:56:04 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45B129E930A
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:57:20 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD390286E0E
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:56:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F00081885B5E
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:57:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B75122069F;
-	Mon,  9 Dec 2024 11:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B821A2248B6;
+	Mon,  9 Dec 2024 11:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="R8KPCw60"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="NDIwfGyn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from AUS01-ME3-obe.outbound.protection.outlook.com (mail-me3aus01olkn2086.outbound.protection.outlook.com [40.92.63.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DE3216E29
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 11:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733745340; cv=none; b=IMZLndwstQAOh0RvDBN60MI8s8Vhh3A7r5hiEYs9wdvrLSwmgTBrLuazc6AgLXA2u7jOfYxgzFNPxnmjO80MurRgSqCT/ZblSpfrIzDEW/2ow571yJ4Mzf0sJMtAT4+NJoamKIoRLOKp6WrE8xl1cterAE2KldpcKYRln8mcKmM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733745340; c=relaxed/simple;
-	bh=sjuo6os0+wYDx3r4euu97sz0/9uEAVk/5zimK0sfg0Y=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JHYAWRhdmRDUKJZvC9WLta+eHdE3OVaD+ywNMWKke6TRXHLaEfXNhNo4jziZQI/yuI0gFBBoWwxkmRKzoAQbZ4WIM8S55NBUPSLJst0lHF66TOWGlOY91cCBQ+upvMNd8tatwbYgmEave8H8dH+rzW6l9JlvWqDLnlLbRpX4WEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=R8KPCw60; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1733745338; x=1765281338;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=R5X9xLuB6kTPsHbnoT9X4/8jxxci3UyNajVfjkL/v7s=;
-  b=R8KPCw60c9inBx7+UEywC4G5hHcY4DQs06yTmOAnlgvrGf+gVuFR3kAJ
-   g50JjULEFugl/BId1sgj+JWWxLQc02X47nj7359ELwcs5Lx+fn+PaTKxo
-   A2DLQZjbl7dK7YqCkZRZ1HchC5kiDaAtmTYGTTb+Gn2HSWZP2tg8GQ7Y8
-   E=;
-X-IronPort-AV: E=Sophos;i="6.12,219,1728950400"; 
-   d="scan'208";a="151432989"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 11:55:36 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:4691]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.26:2525] with esmtp (Farcaster)
- id 5ec23313-d2c7-48a3-afda-4f94a5175b07; Mon, 9 Dec 2024 11:55:36 +0000 (UTC)
-X-Farcaster-Flow-ID: 5ec23313-d2c7-48a3-afda-4f94a5175b07
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 9 Dec 2024 11:55:36 +0000
-Received: from 6c7e67c6786f.amazon.com (10.119.2.114) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 9 Dec 2024 11:55:32 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <wenjia@linux.ibm.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next 03/15] smc: Pass kern to smc_sock_alloc().
-Date: Mon, 9 Dec 2024 20:55:28 +0900
-Message-ID: <20241209115528.54880-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <385f7646-7f87-43ca-9585-5ecdd59a4379@linux.ibm.com>
-References: <385f7646-7f87-43ca-9585-5ecdd59a4379@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD7C221462;
+	Mon,  9 Dec 2024 11:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.63.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733745395; cv=fail; b=EPPOrRKzPwyHtJWwjqs2iLuPF6ra7KD0Q6Z3xKdSLG/3b7bMJCTQ/UkNGOBcANl3GhgzZjZZt0/vk7+apRhRaGFnhQtRfa8ZPt7ioEUHEgpZ1hzb75mBiXw45H1dgU4kX/TClB+frXwZagLGqjxmR2j439erNP6e4NwsWeLXlU0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733745395; c=relaxed/simple;
+	bh=CaqcchIS7vWPuyiRUVvrGCBHAeNftVlN1fMH/Wy3yl8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=uZHHpAGhYKDipLqQ8eOvCcfkOPrGmCnN8mnSr3+pON9L23sO8J8bN3Oi3tXNk4+3x42s6OCO9vOe485tISPp8eCJsKDK2waK9Xq2nKFZuntQaXkQf4MsKtUdjdYEZd/ojDrFqUNIBNuOwcyYaWmpM7ZYGBM7uZw/c2rjYZ8XG+M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=NDIwfGyn; arc=fail smtp.client-ip=40.92.63.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=m5+dlNaxMIFjVLq1B+OXvvHDZJERLBBU+x5fXhlsKFY8qR4AI0PvU1A/xJ5O3Adx32F+bG0CkDHLGva13C+kVl6BM8CtHO5erxRFUyB5+J2oRhlVO8MB8ea84V/+XapJeBFLnt1EawIwbKdlR0fOwAJvIc20K1XML553KOePztxt/iI+Eq6Hc32Myfcq9EfcEXqaiEC1sS4YATVScZlCtXeeD49ha2ryxmwmv0Q4InPmp4AcxsOYhK4izAVdbbW/jO7zJirtRw9cwFIIvzFlxTHzk1eVbSG3bQKjq5/5lCYvMEopsMDUwYdjjlYGUUkrygdO1UGMu4jRuDmLiEsw0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S6/dYAXa14MO+Jo44qkQhIwcjCOUfu8aDJ+75bcKS/w=;
+ b=n1BCnTrAG2FXLNYZH1SnaeeyoTkcGlFFf7BmmxnbaBm65nx3hhhTQwG1ovBD9qvLn66YuPiJsXTC6dssQFXZo5dniHyC0ACNCWlYYc7LvW/tU8ZuEKk4tV2sCuTnMmGqMZY+/gSuq5dcU+tXJMFd4utcwDaklzBjO7Fftsq9Ii8TH1RIuRNGxzQWd9MTlJXJW9SwpEa9ASlfow/EHeFILmOS7HgjXLZJWAKk8vvWV5yMXr/gIClxVgTuBGBO9LI/viwMXdQUjOmyFybL5oGdVC+BV6RdCloNiNYTT08fHzI1YqIOipq3bufkYT5XLYT9l+NV3+FI2xXwWWsOey4iLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S6/dYAXa14MO+Jo44qkQhIwcjCOUfu8aDJ+75bcKS/w=;
+ b=NDIwfGyndftoY7smcVboFzwAocnj0f3NkqTOy+RDo+I2aaSUCWhLmng8WRV6yVQdhonRkFdZJftVnqDZhq4xEgiZt5c1OPdOGBzil/9xtMptIVCPC+FYTNVAaeKNAAhYQHrQOqT6GQMHQsT362kXo1VdlBHurn8C8iJGsET1LfHy2ubtfDPliNXpAEZfz6fcSNj7ris+0u02cypMNvPbfAmyXcYHisea3JPBgqhMt9OWqGrYOxtiq9FeZW8qFifD0tjdaf888jB2eE7i35q22RNJNDZef1RyWaaQ/ZPvdNADRH1L5JJxl8RbrMFpEiwipvFBDrXVKsja8LrvPaA4+Q==
+Received: from MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:ff::9) by
+ SY8P282MB4885.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:25c::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8251.11; Mon, 9 Dec 2024 11:56:28 +0000
+Received: from MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::6174:52de:9210:9165]) by MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::6174:52de:9210:9165%4]) with mapi id 15.20.8251.008; Mon, 9 Dec 2024
+ 11:56:28 +0000
+Message-ID:
+ <MEYP282MB23125E657B3605921535987AC63C2@MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM>
+Date: Mon, 9 Dec 2024 19:56:21 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/2] tcp_bpf: fix copied value in tcp_bpf_sendmsg
+To: John Fastabend <john.fastabend@gmail.com>,
+ Levi Zim via B4 Relay <devnull+rsworktech.outlook.com@kernel.org>,
+ Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241130-tcp-bpf-sendmsg-v1-0-bae583d014f3@outlook.com>
+ <20241130-tcp-bpf-sendmsg-v1-2-bae583d014f3@outlook.com>
+ <675695f1265b2_1abf20862@john.notmuch>
+Content-Language: en-US
+From: Levi Zim <rsworktech@outlook.com>
+In-Reply-To: <675695f1265b2_1abf20862@john.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2P153CA0041.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c6::10)
+ To MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:ff::9)
+X-Microsoft-Original-Message-ID:
+ <d36f35aa-8223-4b82-af72-3ab7ed41a28a@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MEYP282MB2312:EE_|SY8P282MB4885:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8977af11-9ec2-42ff-064b-08dd18488388
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|15080799006|461199028|19110799003|7092599003|6090799003|8060799006|5072599009|3412199025|440099028;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VTNQazcwSktxelNwWjJPMEVaUjU3QmdvWWVBbUVvQW9XcXBUeU9nQlhZOEtM?=
+ =?utf-8?B?d3pCek5HaUZtUWVDSDVZcGUxSXJIRUo3K0Rac2RSYTR4bW01T25TT25pcFM1?=
+ =?utf-8?B?NDI5OURNWFFDTkhiZDI1MFR3ZTJrK2VNRDBqanBIMStkTHRVZStqeGlKMTFN?=
+ =?utf-8?B?eG5Ma2hnMFpoUEtBOXJrTEV6UGJrUmY2R1pJQmVLNWJQcjB1cEYvcmtXVDIw?=
+ =?utf-8?B?bHNBNzBiWmtQNEx4bnRsV2lZK3E3ZEVTYkVSL1UwNHNpbXM3aDBsOGJIVGRp?=
+ =?utf-8?B?eExiMDdZaFprRklFQnlueGlZcjR1L2x2cGRINjN0bjNjSmpucWZsblpmNEUr?=
+ =?utf-8?B?QUt3SU52TTRDTXpWSUh2RFh0KzQ0L1Zyc0N0MUM0ZWxMZW5EY0M1MS81a3Jv?=
+ =?utf-8?B?YVZjNmFMdDZuTjVubzVweVFUYXFRKzJ5bE80T2JyUE1ZSE9IbVlFUEtvZlZa?=
+ =?utf-8?B?MDZ6QXpXLzJhRzExL05GMVUxc3RvVDJWNUx4SUVvN0JpWW1EQm5QVWNobmZa?=
+ =?utf-8?B?VzVUUkpOMVJsV01wMWZZK0lEK3RMYUZ3THhZSjZUaXpSdTc0aGptUUp2OFk2?=
+ =?utf-8?B?U2EyZWpKMmhoTEFFdi92VFhKNkNjbGtTM3AzR2pIZG5oSG5DVnFaVkIwbWFM?=
+ =?utf-8?B?TDRSdEJmSXJSQnpadVU2N2I3YjdWNVNPS3c1RS9memtvL21rOTg1UmI4dE12?=
+ =?utf-8?B?NEtmNzdLTXJMVUNYNXFRZnhENVlRQnZWNGJlc0VrOGF6d0tTbUhFZFRucFVw?=
+ =?utf-8?B?akxNOGV3T2RUbkVxcHFxbENvNFQxUVNJTHV2NEtRTjgyQjBEY3FOTHNIakVN?=
+ =?utf-8?B?aXF3aERRL0ZFQVJSY0dHTWM4YWZacmZoOUkwaU5COVRTOXJ6TGpLOXJ6QXdO?=
+ =?utf-8?B?bUJtRUVzMk1HamtrUGdTc28wdlo5OHVWNEs5UlRiOXh6Vkx6S1dnYkNwNnZ3?=
+ =?utf-8?B?L2Q3WUlFUFN0Z2JxRy9uWlZtZk1NZWtSeHd5ZkNuWWZXUjZsSTM5aiswNWJs?=
+ =?utf-8?B?b2p0NW1OT0VvWTg5ckF2VmgxdFFTQy9yNnRydDNHMzVrcUo3VFFKVXdCT2lX?=
+ =?utf-8?B?WWF1bTJ4elhEenRrc0x1YTVGclZyYlY5TlVWcEs5aFNVUFd5ekxDaDYrdyth?=
+ =?utf-8?B?S0ZYeU45V0JHSWlkQW9PUlIzR1JPNGtjcEdZUWhpdTNieHlXN1daby9JRWx2?=
+ =?utf-8?B?SWN3b0RISGxVcGJXdkpSR1plWnV0ZTJFVFJ6ZExIZzV0enBwdFVUci9QWEJ3?=
+ =?utf-8?B?WVJCQ3JEOFBmdTBwYmgyNkJWTmRHT25uTzB6OFlGL1RXOFFWV0lFQXUrTjZU?=
+ =?utf-8?B?aGJ4T1UvREUraXVIVUFtWVZKVzVHOEhVU3FUNzJTeTRHcFZHemhudmxmNTFp?=
+ =?utf-8?B?T25uNHBQNklBODJFbGFJMVRvb2RhcWdlYkdER1duclpwMkowL0Ura2FSRE5i?=
+ =?utf-8?Q?HzJHfImg?=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?R3JwUThtQ3h4SitaRWNqTXErY3FtejducXp1Ui8rQXpiVC9QTUp4MUV2OHlp?=
+ =?utf-8?B?cFJ1UitLR2VobmxVMEFFLzF4b0NKVWxsbDBoaUZzN3g2RzBTZDhFekhtaXVk?=
+ =?utf-8?B?cTduSFBKMkNoMGo2RDBqcy95MlFRbUVnSlVNTnhyN2xqTkFJamVuR0NsTFoy?=
+ =?utf-8?B?azk3dUZnLzV6SmpiU1VWT2VjM3h0V3ZUWnRaY0VzalFjSEttR1Nkb3d4VDZa?=
+ =?utf-8?B?U01ta2dnNkJMZVJWZkw4N1FBdW03d3p6Y0t4NFZza0kvSzEySG1rSi9RbHVO?=
+ =?utf-8?B?QjBjdWhGRDFLS0d0UzcxK3Q4dksrNTBlUzVFV0NranhOVXY3aHJHMFFuejRo?=
+ =?utf-8?B?Rk9oZ3hUYVJIOWFRSC8wcGltZ0NWeGtqalZiK25EaExEWEdKeGQ4cWhBOG9U?=
+ =?utf-8?B?cHFCMUtkS0JvcWRQV0xudk90SUgrYTlIWURzNDdWdWowdngyQWRWbE15RHFG?=
+ =?utf-8?B?enJSeXJQeVJlSStZWmFOT25NV0lmbkdCc29EVXRQdlNkYi9PZGcxcnpKY0I4?=
+ =?utf-8?B?Y2pxRHJLUTlCWWZlaGd1Z01CWk1nb3hCdDE2dEM5MW5GWTZWMTlRd0ptcVps?=
+ =?utf-8?B?SE1CWittTVhwTWRnYjdDbmRuVXJnNks0Z2QvMmdyMExmK2RyZEFIa1B5amdL?=
+ =?utf-8?B?b3g4Q2F2cFVzeVRsZVNKOGp2b3diMzdmMzhyemEwb25rd09XSkkyWUd1eUMz?=
+ =?utf-8?B?NVZUaWUwalp1bTdHNE50RXpyby8xNmhPanBQRjZGMEJRL2RBV1lnVzE4RDRr?=
+ =?utf-8?B?VS92bVlpbkxxcEVqTmZPelZZQnBZNnFhZkNVMXNaaWphcjFkY29UVVBEL0xF?=
+ =?utf-8?B?cnlmQi8xdDZ0d1owaGtYNXNYQjMrSG1aRGc1RG04VFk3ZFBBdDZoaXZNNi9s?=
+ =?utf-8?B?N0ZIc1lLU2pGVlBOelpaSGZ1eDVDdE9zeDJWV201WU0zV3BSSndtV1o1WUxo?=
+ =?utf-8?B?dUt3RkpRQm85eXlRcVkxTU9GL0Y1WHdWK3J5QUxCdWx1Y29uVE1IL0J2SzdB?=
+ =?utf-8?B?R3FaR3RKdHlha2tlZ3p6K1JXREhoL0MxV2JubzlCVHNrVHQvd3pXNEdjNllO?=
+ =?utf-8?B?MjhsajhOQWtmYkJaK2ZLd1lhK1lCbTdWaWc3MFlTVGxOWTFidWtqRHRodmJH?=
+ =?utf-8?B?bTlQZExPM1ZvR3Fla1NGVkM2TWQyVjhCOWNTUVMvUytqVEc5S29CN1VQMGpP?=
+ =?utf-8?B?cit3TzBHNnVJbUFEbzJXMER2L3pDbzk2ZVJOei9QejdyR2pkUWFTaG9xR01T?=
+ =?utf-8?B?ZWx0MVlGZExyaDN4M0taaURaZE5XREFyaGl6TTVwa1lBK2FFeVVJQVdlTTVy?=
+ =?utf-8?B?K2JxOXVyZTBLWWVkUUdVNWFmakZ3QlFKQndkK3ljY1FzTUlweDREbmtPOGZC?=
+ =?utf-8?B?QnRscmx6Tk9vMVNKbExHcTZwaklaVndzZURESUVCajlDclBBYTVDOEd3bUNr?=
+ =?utf-8?B?L21IdzU4VlY3RFBvTWgvMTJ3OEhyQUVFNkRpbkUxaTh1UWhMSGNuNWNDbzhu?=
+ =?utf-8?B?L1hQdHdFVUtybzUvWjJhS3NMdkdPZFZheGg1SFJtb2ZSLzdlU3FuWkcyaG9r?=
+ =?utf-8?B?dDlNOFdIODRHUi9XTkx2T1hTeDdjREMwVHhoZ2tpZllQeWFEQzhRZ0NFSkRl?=
+ =?utf-8?Q?kU6ZOFIXLF+Is9FWS4ehykPVhBVB92H8h+s/lZut+XXo=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8977af11-9ec2-42ff-064b-08dd18488388
+X-MS-Exchange-CrossTenant-AuthSource: MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2024 11:56:28.4005
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY8P282MB4885
 
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-Date: Mon, 9 Dec 2024 12:05:03 +0100
-> On 06.12.24 08:54, Kuniyuki Iwashima wrote:
-> > Since commit d7cd421da9da ("net/smc: Introduce TCP ULP support"),
-> > smc_ulp_init() calls __smc_create() with kern=1.
-> > 
-> > However, __smc_create() does not pass it to smc_sock_alloc(),
-> > which finally calls sk_alloc() with kern=0.
-> > 
-> > Let's pass kern down to smc_sock_alloc() and sk_alloc().
-> > 
-> > Note that we change kern from 1 to 0 in smc_ulp_init() not to
-> > introduce any functional change.
-> > 
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >   net/smc/af_smc.c | 10 +++++-----
-> >   1 file changed, 5 insertions(+), 5 deletions(-)
-> > 
-> Sorry, I didn't see the need to add the **kern** parameter in 
-> smc_sock_alloc(). Because the **kern** parameter in sk_alloc is not used 
-> others than to decide the value of sk->sk_net_refcnt, which in SMC code 
-> is already set in smc_create_clcsk(). Thus, IMO removing the **kern** 
-> parameter from __smc_create() makes more sense, since this parameter is 
-> not used in the function.
+On 2024-12-09 15:02, John Fastabend wrote:
+> Levi Zim via B4 Relay wrote:
+>> From: Levi Zim <rsworktech@outlook.com>
+>>
+>> bpf kselftest sockhash::test_txmsg_cork_hangs in test_sockmap.c triggers a
+>> kernel NULL pointer dereference:
+> Is it just the cork test that causes issue?
+Yes. More specifically only "sockhash::test_txmsg_cork_hangs" but not 
+"sockmap::test_txmsg_cork_hangs"
+>
+>> BUG: kernel NULL pointer dereference, address: 0000000000000008
+>>   ? __die_body+0x6e/0xb0
+>>   ? __die+0x8b/0xa0
+>>   ? page_fault_oops+0x358/0x3c0
+>>   ? local_clock+0x19/0x30
+>>   ? lock_release+0x11b/0x440
+>>   ? kernelmode_fixup_or_oops+0x54/0x60
+>>   ? __bad_area_nosemaphore+0x4f/0x210
+>>   ? mmap_read_unlock+0x13/0x30
+>>   ? bad_area_nosemaphore+0x16/0x20
+>>   ? do_user_addr_fault+0x6fd/0x740
+>>   ? prb_read_valid+0x1d/0x30
+>>   ? exc_page_fault+0x55/0xd0
+>>   ? asm_exc_page_fault+0x2b/0x30
+>>   ? splice_to_socket+0x52e/0x630
+>>   ? shmem_file_splice_read+0x2b1/0x310
+>>   direct_splice_actor+0x47/0x70
+>>   splice_direct_to_actor+0x133/0x300
+>>   ? do_splice_direct+0x90/0x90
+>>   do_splice_direct+0x64/0x90
+>>   ? __ia32_sys_tee+0x30/0x30
+>>   do_sendfile+0x214/0x300
+>>   __se_sys_sendfile64+0x8e/0xb0
+>>   __x64_sys_sendfile64+0x25/0x30
+>>   x64_sys_call+0xb82/0x2840
+>>   do_syscall_64+0x75/0x110
+>>   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>>
+>> This is caused by tcp_bpf_sendmsg() returning a larger value(12289) than
+>> size (8192), which causes the while loop in splice_to_socket() to release
+>> an uninitialized pipe buf.
+>>
+>> The underlying cause is that this code assumes sk_msg_memcopy_from_iter()
+>> will copy all bytes upon success but it actually might only copy part of
+>> it.
+> The intent was to ensure we allocate a buffer large enough to fit the
+> data. I guess the cork + send here is not allocating enough bytes?
+I am not familiar enough with neither this part of code nor tcp with bpf 
+in general and just
+hit this bug when trying to run the bpf kselftests. Then I decided to 
+debug it.
 
-It would introduce another consufing situation when someone calls
-sock_create_kern(PF_SMC) (sock_create_net() or sock_create_net_noref()),
-which alaways create a userspace socket.
+In my perspective the buffer(8192) is large enough to hold the data(8192),
+but tcp_bpf_sendmsg returns 12289 which is a little surprising for me.
 
-As long as it's part of the kernel socket API, we shouldn't use such a
-hard-coded parameter.
+Could you further elaborate why 8192 bytes are not enough? Thanks!
+
+>> This commit changes it to use the real copied bytes.
+>>
+>> Signed-off-by: Levi Zim <rsworktech@outlook.com>
+>> ---
+>>   net/ipv4/tcp_bpf.c | 8 ++++----
+>>   1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+>> index 370993c03d31363c0f82a003d9e5b0ca3bbed721..8e46c4d618cbbff0d120fe4cd917624e5d5cae15 100644
+>> --- a/net/ipv4/tcp_bpf.c
+>> +++ b/net/ipv4/tcp_bpf.c
+>> @@ -496,7 +496,7 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
+>>   static int tcp_bpf_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+>>   {
+>>   	struct sk_msg tmp, *msg_tx = NULL;
+>> -	int copied = 0, err = 0;
+>> +	int copied = 0, err = 0, ret = 0;
+>>   	struct sk_psock *psock;
+>>   	long timeo;
+>>   	int flags;
+>> @@ -539,14 +539,14 @@ static int tcp_bpf_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+>>   			copy = msg_tx->sg.size - osize;
+>>   		}
+>>   
+>> -		err = sk_msg_memcopy_from_iter(sk, &msg->msg_iter, msg_tx,
+>> +		ret = sk_msg_memcopy_from_iter(sk, &msg->msg_iter, msg_tx,
+>>   					       copy);
+>> -		if (err < 0) {
+>> +		if (ret < 0) {
+>>   			sk_msg_trim(sk, msg_tx, osize);
+>>   			goto out_err;
+>>   		}
+>>   
+>> -		copied += copy;
+>> +		copied += ret;
+>>   		if (psock->cork_bytes) {
+>>   			if (size > psock->cork_bytes)
+>>   				psock->cork_bytes = 0;
+>>
+>> -- 
+>> 2.47.1
+>>
+>>
+>
 
