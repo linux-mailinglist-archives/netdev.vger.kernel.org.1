@@ -1,146 +1,241 @@
-Return-Path: <netdev+bounces-150020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB3F79E8923
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 03:11:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84DE29E8927
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 03:20:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63800281144
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 02:11:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37D5628302F
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 02:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D9A38F83;
-	Mon,  9 Dec 2024 02:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534E617741;
+	Mon,  9 Dec 2024 02:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jnAUi6W4"
+	dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="B8r37hoZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1239474;
-	Mon,  9 Dec 2024 02:11:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 045F9B66E
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 02:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733710298; cv=none; b=e0Y9TVwbArdOAjVpHI9Wl4Qz1OxSSZFab43BSRbCuntavmH+ucUFLlA6Jfgt7FP6r6vqROrHsy+QOR1Y9PcocMa1fdaSifHR8+pPY/1q49apO9oiGFxE4QoRURkL/mg/4cBV8bm5QXxMvyCQ0c0yUO1Ot1K4G2iizMAuxVIK0C0=
+	t=1733710833; cv=none; b=drzNyy7+lelrcmgLqdBNOP4G5HWMHQ2hOMTYocPNdbrm2hrExtNbM6eWow08AyXN3hLgZC/PR0SpZQcZWeMcllIQndPZaU5mywcUw4PGbuCrj/rlmf5BJRmZQfZp2D9/9wNeYo10I7aDYVD2oHiqPqU9uiNtcL++LXWSjY9e7wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733710298; c=relaxed/simple;
-	bh=qNoH6ad1R6gJiGGjyTOv3BRKQVUyf0XZPnOWgEWq0EU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=pwmmLTWric3yCQez7ghHyDDVqZ89x0cjO8jE6DnKoAzc4j5GUyuUOQ+w9hpG65cUXHwlPZUiT5Eo0yVJANeaLbNJSZu7BYkGUTQ+kU+G6FCIGe/mblSSStmikrel8ZwF1hBj0stfedeWtIxtwKo+CmY9ADmbyFLM7C5iNpj8/Hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jnAUi6W4; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B8NHuJN027535;
-	Mon, 9 Dec 2024 02:11:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	LVYLZ7+oGDKpJ6s5sAlwjVecCaWFGCditgawfVlZgSA=; b=jnAUi6W4F4k1GWOa
-	2WeJK4YDSx7BMUkdsf0P46l9LUFrSEIi6T1W0OzwRidihPMIuGnb7n4W8W7xxYwO
-	+90+WlGhvE7EX331fhRPuecdingeUmcUN/K0Jgi6x750TESO7Lu4Fl+c770wS0da
-	dnGyjKHdQohMrhe9NexO6oL+LfYvRGIep+2IHo/oxD1wXMSADWbhTE9tRESjz2wp
-	S6dJB+dqU4pvae+Xyw7+HHsmHg9GskE0QA3s/ZxZKPLWy7rpFLS0p6ytBMiEa0tC
-	BREVg5TrdRNxIuO6J59d0+l735VuNup46a6eUm+j9d6gLUdokL4C4l+acimczi6F
-	SezMyQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43cdxxb1um-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 02:11:30 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B92BTKl028115
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 9 Dec 2024 02:11:29 GMT
-Received: from [10.253.11.153] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 8 Dec 2024
- 18:11:26 -0800
-Message-ID: <441f37f5-3c33-4c62-b3fe-728b43669e29@quicinc.com>
-Date: Mon, 9 Dec 2024 10:11:23 +0800
+	s=arc-20240116; t=1733710833; c=relaxed/simple;
+	bh=ab5tQMeE5JGalpqbVUwNFQC3sASHXoQDxbnZx3PceTw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RPzro7JA70RlATOexmVZxvB4CJTKr1D1nv/OVPH2/OY0xpSmiMpCFysDrIiUhh9Y6hvkvebbNuCIxorHvMVpyZoGPmjaxlzcFjziDroAxCCzmlQeYzZFgvRhNtBrIGM+ka1AeSRkNq+UZxwqPmWtq7SK7dTs3p0MOEUlqqbOQ/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au; spf=pass smtp.mailfrom=gandalf.ozlabs.org; dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b=B8r37hoZ; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gandalf.ozlabs.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=gibson.dropbear.id.au; s=202412; t=1733710820;
+	bh=r24AQkVP2WD7kYtnInbRp5c88nw+YFsVknxvi5YGyk8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B8r37hoZKbap4d7hdxxI2iJ2AG8wN0b8Y1yL1MOeFmvCi3D7ifC16OwUumZXU7dti
+	 IHuqEQMfkf1UzYMW03kb5/Pm63vLbU8SzAppaYEV6YLqszOS1odNPaG1aZ94h2GnqU
+	 5YZ8ThalOE0nsOYRsjKVtwuMeNZPNvF4b5KHJvUOJSfhCDoOkvbZz69rWtGuJQaLiy
+	 tounFIoobm0CysLSXN1vsQsZpH8FBYwlvPD+Md5iQ7DBBoV6wj21ehSbvOx6xKkeAd
+	 qmzwH9yRwG7qyMBLuvcqaeWpvchuFE+BJcwh+n9BeLl79zH/R7tX8Ub4ivyGf95UE9
+	 d1HtVlhAIFJLw==
+Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
+	id 4Y65Dh5L9Gz4wcj; Mon,  9 Dec 2024 13:20:20 +1100 (AEDT)
+Date: Mon, 9 Dec 2024 13:20:20 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Stefano Brivio <sbrivio@redhat.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Mike Manning <mvrmanning@gmail.com>,
+	Paul Holzinger <pholzing@redhat.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Cambda Zhu <cambda@linux.alibaba.com>,
+	Fred Chen <fred.cc@alibaba-inc.com>,
+	Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
+Subject: Re: [PATCH net-next 2/2] datagram, udp: Set local address and rehash
+ socket atomically against lookup
+Message-ID: <Z1ZT5Cwd-VXK1_27@zatzit>
+References: <20241204221254.3537932-1-sbrivio@redhat.com>
+ <20241204221254.3537932-3-sbrivio@redhat.com>
+ <CANn89i+iULeqTO2GrTCDZEOKPmU_18zwRxG6-P1XoqhP_j1p3A@mail.gmail.com>
+ <Z1Ip9Ij8_JpoFu8c@zatzit>
+ <CANn89i+PCsOHvd02nvM0oRjAXxPTgX6V1Y1-xfRL_43Ew9=H=w@mail.gmail.com>
+ <Z1JeePBN5f1YCmYd@zatzit>
+ <CANn89iJqLU6RuHgdbz3iGNL_K8XaPBYr3pWqQmgth2TFf14obg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: qcs615-ride: Enable ethernet
- node
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <20241118-dts_qcs615-v2-0-e62b924a3cbd@quicinc.com>
- <20241118-dts_qcs615-v2-2-e62b924a3cbd@quicinc.com>
- <ececbbe1-07b3-4050-b3a4-3de9451ac7d7@lunn.ch>
- <89a4f120-6cfd-416d-ab55-f0bdf069d9ce@quicinc.com>
- <c2800557-225d-4fbd-83ee-d4b72eb587ce@oss.qualcomm.com>
- <3c69423e-ba80-487f-b585-1e4ffb4137b6@lunn.ch>
- <2556b02c-f884-40c2-a0d4-0c87da6e5332@quicinc.com>
- <75fb42cc-1cc5-4dd3-924c-e6fda4061f03@quicinc.com>
- <4a6a6697-a476-40f4-b700-09ef18e4ba22@lunn.ch>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <4a6a6697-a476-40f4-b700-09ef18e4ba22@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: AyuOOpTBvZOEp_uonKIrjZUxjH_1zHuw
-X-Proofpoint-GUID: AyuOOpTBvZOEp_uonKIrjZUxjH_1zHuw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- phishscore=0 mlxlogscore=705 priorityscore=1501 clxscore=1015
- malwarescore=0 impostorscore=0 bulkscore=0 lowpriorityscore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412090016
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="pjliFRe7kRWNYCIi"
+Content-Disposition: inline
+In-Reply-To: <CANn89iJqLU6RuHgdbz3iGNL_K8XaPBYr3pWqQmgth2TFf14obg@mail.gmail.com>
 
 
+--pjliFRe7kRWNYCIi
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-11-29 23:29, Andrew Lunn wrote:
->> I was mistaken earlier; it is actually the EMAC that will introduce a time
->> skew by shifting the phase of the clock in 'rgmii' mode.
-> 
-> This is fine, but not the normal way we do this. The Linux preference
-> is that the PHY adds the delays. There are a few exceptions, boards
-> which have PHYs which cannot add delays. In that case the MAC adds the
-> delays. But this is pretty unusual.
+On Fri, Dec 06, 2024 at 10:04:33AM +0100, Eric Dumazet wrote:
+> On Fri, Dec 6, 2024 at 3:16=E2=80=AFAM David Gibson <david@gibson.dropbea=
+r.id.au> wrote:
+> >
+> > On Thu, Dec 05, 2024 at 11:52:38PM +0100, Eric Dumazet wrote:
+> > > On Thu, Dec 5, 2024 at 11:32=E2=80=AFPM David Gibson
+> > > <david@gibson.dropbear.id.au> wrote:
+> > > >
+> > > > On Thu, Dec 05, 2024 at 05:35:52PM +0100, Eric Dumazet wrote:
+> > > > > On Wed, Dec 4, 2024 at 11:12=E2=80=AFPM Stefano Brivio <sbrivio@r=
+edhat.com> wrote:
+> > > > [snip]
+> > > > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > > > > index 6a01905d379f..8490408f6009 100644
+> > > > > > --- a/net/ipv4/udp.c
+> > > > > > +++ b/net/ipv4/udp.c
+> > > > > > @@ -639,18 +639,21 @@ struct sock *__udp4_lib_lookup(const stru=
+ct net *net, __be32 saddr,
+> > > > > >                 int sdif, struct udp_table *udptable, struct sk=
+_buff *skb)
+> > > > > >  {
+> > > > > >         unsigned short hnum =3D ntohs(dport);
+> > > > > > -       struct udp_hslot *hslot2;
+> > > > > > +       struct udp_hslot *hslot, *hslot2;
+> > > > > >         struct sock *result, *sk;
+> > > > > >         unsigned int hash2;
+> > > > > >
+> > > > > > +       hslot =3D udp_hashslot(udptable, net, hnum);
+> > > > > > +       spin_lock_bh(&hslot->lock);
+> > > > >
+> > > > > This is not acceptable.
+> > > > > UDP is best effort, packets can be dropped.
+> > > > > Please fix user application expectations.
+> > > >
+> > > > The packets aren't merely dropped, they're rejected with an ICMP Po=
+rt
+> > > > Unreachable.
+> > >
+> > > We made UDP stack scalable with RCU, it took years of work.
+> > >
+> > > And this patch is bringing back the UDP stack to horrible performance
+> > > from more than a decade ago.
+> > > Everybody will go back to DPDK.
+> >
+> > It's reasonable to be concerned about the performance impact.  But
+> > this seems like preamture hyperbole given no-one has numbers yet, or
+> > has even suggested a specific benchmark to reveal the impact.
+> >
+> > > I am pretty certain this can be solved without using a spinlock in the
+> > > fast path.
+> >
+> > Quite possibly.  But Stefano has tried, and it certainly wasn't
+> > trivial.
+> >
+> > > Think about UDP DNS/QUIC servers, using SO_REUSEPORT and receiving
+> > > 10,000,000 packets per second....
+> > >
+> > > Changing source address on an UDP socket is highly unusual, we are not
+> > > going to slow down UDP for this case.
+> >
+> > Changing in a general way is very rare, one specific case is not.
+> > Every time you connect() a socket that wasn't previously bound to a
+> > specific address you get an implicit source address change from
+> > 0.0.0.0 or :: to something that depends on the routing table.
+> >
+> > > Application could instead open another socket, and would probably work
+> > > on old linux versions.
+> >
+> > Possibly there's a procedure that would work here, but it's not at all
+> > obvious:
+> >
+> >  * Clearly, you can't close the non-connected socket before opening
+> >    the connected one - that just introduces a new much wider race.  It
+> >    doesn't even get rid of the existing one, because unless you can
+> >    independently predict what the correct bound address will be
+> >    for a given peer address, the second socket will still have an
+> >    address change when you connect().
+> >
+>=20
+> The order is kind of obvious.
+>=20
+> Kernel does not have to deal with wrong application design.
 
-After testing, it has been observed that modes other than 'rgmii' do not 
-function properly due to the current configuration sequence in the 
-driver code.
+What we're talking about is:
 
-> 
-> If you decided you want to be unusual and have the MAC add the delays,
-> it should not be hard coded. You need to look at phy-mode. Only add
+	bind("0.0.0.0:12345");
+	connect("1.2.3.4:54321");
 
-Are you suggesting that 'rgmii' indicates the delay is introduced by the 
-board rather than the EMAC? But according to the 
-Documentation/devicetree/bindings/net/ethernet-controller.yaml, this 
-mode explicitly states that 'RX and TX delays are added by the MAC when 
-required'. That is indeed my preference.
+Which AFAIK has been a legal sequence since the sockets interface was
+a thing.  I don't think it's reasonable to call expecting that *not*
+to trigger ICMPs around the connect "wrong application design".
 
-> delays for rgmii-id. And you then need to mask the value passed to the
-> PHY, pass PHY_INTERFACE_MODE_RGMII, not PHY_INTERFACE_MODE_RGMII_ID,
-> so the PHY does not add delays as well.
-> 
-> 	Andrew
+> >  * So, you must create the connected socket before closing the
+> >    unconnected one, meaning you have to use SO_REUSEADDR or
+> >    SO_REUSEPORT whether or not you otherwise wanted to.
+> >
+> >  * While both sockets are open, you need to handle the possibility
+> >    that packets could be delivered to either one.  Doable, but a pain
+> >    in the arse.
+>=20
+> Given UDP does not have a proper listen() + accept() model, I am
+> afraid this is the only way
+>=20
+> You need to keep the generic UDP socket as a catch all, and deal with
+> packets received on it.
+>=20
+> >
+> >  * How do you know when the transition is completed and you can close
+> >    the unconnected socket?  The fact that the rehashing has completed
+> >    and all the necessary memory barriers passed isn't something
+> >    userspace can directly discern.
+> >
+> > > If the regression was recent, this would be considered as a normal re=
+gression,
+> > > but apparently nobody noticed for 10 years. This should be saying som=
+ething...
+> >
+> > It does.  But so does the fact that it can be trivially reproduced.
+>=20
+> If a kernel fix is doable without making UDP stack a complete nogo for
+> most of us,
 
--- 
-Best Regards,
-Yijie
+The benchmarks Stefano has tried so far don't show an impact, and you
+haven't yet suggested another one.  Again, calling this a "complete
+nogo" seems like huge hyperbole without more data.
 
+> I will be happy to review it.
+>=20
+
+--=20
+David Gibson (he or they)	| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you, not the other way
+				| around.
+http://www.ozlabs.org/~dgibson
+
+--pjliFRe7kRWNYCIi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEO+dNsU4E3yXUXRK2zQJF27ox2GcFAmdWU+AACgkQzQJF27ox
+2Gc7MBAAlKE2MaTMEXVMHAQ8efnVXmSqwlinYohSWZfH9tEV7q2qOZK0CizRP7ZQ
+tc/i9l7FLVMgqGaC9syT2dWTnaQ5F+hJeKuLnoLBAL+IOCSeR+DqlBvfLqAFgsqp
+dUG6YVKteNnRrMnMt3aPBMSufAwfd2gPVOOJYYrNoshYIgvAiP72jj59RajYuYXi
+nIOduFQAbfI9XsQRwqn+758C44z2YsVZttxcU+fCyztCD1ZTnHXP921/aENvyKvQ
+t4Ai70yh2rERlh69cUnNNWX6e034Xu8bX5hjT1jLKCNymsEk4pYAXztW2QaTpx6n
+FeSqeP80nBAUqGDEr97JmGvDNi00QteqWbBcb1Jbt47dUVQqtWrDNe7rFWi9sumx
+7oi7Ul+TlaD9lJvLrcEcK3T+g7H0pXW5w++iAcmdLUM0AgaXnuJbjLNlWevRMySB
+0+mDjuwQQp+Q0Htc+YNjTgjXDWpxLRYCaFNE59xXiOUdBtmS5jY20rptzO09kbGj
+Ai0URnfwFYjkvEjJWMbZnFYvLhjr68NEqQaanEwXuCaXAcO06NGTsyDo7nhtETME
+dwiFsHHAanpiE/3wZ/p0SpSgBGqDdAeGPHmbBT7kTtapgujk/7gTa6Lan8fZkXbD
+6z+tfveuipssKTV3p24hpwDryZATcaQOMMVuzWFV6sDH4vREOvg=
+=90rr
+-----END PGP SIGNATURE-----
+
+--pjliFRe7kRWNYCIi--
 
