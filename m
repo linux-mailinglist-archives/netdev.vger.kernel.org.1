@@ -1,99 +1,103 @@
-Return-Path: <netdev+bounces-150043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E29879E8B9B
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 07:42:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E68D99E8BA8
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 07:46:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59DB2281615
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 06:42:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A77C12810B3
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 06:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDFC320FA9A;
-	Mon,  9 Dec 2024 06:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA2C18E02D;
+	Mon,  9 Dec 2024 06:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="dVt0Sb4a"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="iFsekXNy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665751E4A4
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 06:42:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4247C1D555;
+	Mon,  9 Dec 2024 06:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733726573; cv=none; b=AY+YIcQTAEPcSQzb10ruK2vLFsds/K0Oz8jrOp7V22PNsSFgqffoSf1OBOI5ftHDyqJofMfEMu5OzKWVBzNeTS0ZS8dPFWM4I5B/GNwU/FFKWT4gdig8qph////LFBqqGmSDGJJxbnR+XJCwXA3ygJ9Q7YsXI6OO2HKZudDDAtc=
+	t=1733726761; cv=none; b=ADKX/8piJ1PShpNa/hptk9xy3p0cisNxRggJ9kGyzDarVZNqwDArM5tfa5Eg7Ae58N/7EJxwtNfFjyIqTGtBZlC/zI2d1zbioS7mZU5dBtQfgMfjtBfh8cAs0K1QajhThLEAixmIVH9bLw8HGX9dWz0LSvanslUh1Xq7opyppnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733726573; c=relaxed/simple;
-	bh=AJZZjliWJW8m4PkR5mjAobUKxgxdwvSe80nUnEdzbDU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pmkv5HTXrnzhafbTGomuXYQ0omkSu9vTTzYxOJzI5xzXABc3uDsUSezs3ylKkevvIWv9ex6ijZ1YeZJzhiEL98EBj8fHlcxHOlA7YlWby5EwS72XzQcBurb4Z2X9YC6It+h1UabjmJy6k8dtsAt7AHs6/IdDEwoaKUMADbetfcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=dVt0Sb4a; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1733726572; x=1765262572;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=zffpAM3VgYaM0O9KhZGJ6IIidR+AehOiZ+CFyd2IZBw=;
-  b=dVt0Sb4aCQyHB0il+OYq5+RhWF7nDOTnavzRr9hwG9nZg+Jbdwv1Sgt/
-   9sv0W6fS3qflORLbFqShbStF4cnyllJx46/RJI2rf+n4DItfcFvFtqOvC
-   jM8DOR7DQie6tFBGIeI/vvLP/t2zYGfR3l8Kohcr3GiSDxcZfD6xcIWSR
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.12,218,1728950400"; 
-   d="scan'208";a="154157690"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 06:42:51 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:51083]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.104:2525] with esmtp (Farcaster)
- id a96e32b4-823a-4fc1-bf6b-80724919ce1c; Mon, 9 Dec 2024 06:42:50 +0000 (UTC)
-X-Farcaster-Flow-ID: a96e32b4-823a-4fc1-bf6b-80724919ce1c
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 9 Dec 2024 06:42:50 +0000
-Received: from 6c7e67c6786f.amazon.com (10.118.254.92) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 9 Dec 2024 06:42:46 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <davem@davemloft.net>, <david.laight@aculab.com>, <edumazet@google.com>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next 00/15] treewide: socket: Clean up sock_create() and friends.
-Date: Mon, 9 Dec 2024 15:42:43 +0900
-Message-ID: <20241209064243.20600-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241209052643.9896-1-kuniyu@amazon.com>
-References: <20241209052643.9896-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1733726761; c=relaxed/simple;
+	bh=2Zgh82YInRNujXxJx28SoaNq1VdkgRl13UEd3cPF0U0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=egOUeT1hoJo88n+ibFsRHNbdKxjEv2dHYwf696nYwO3i36B1kAM8bPP6dvislmfbmR+rLmsj2LYCYQLKGJUOCeLf3SaCkwJzVoEzwSGdVTlofnRqrr6YUpQz6HIj7KzgTREvzX/vn/AlPQgn63kyUoF8I8Jufil/A64rAzK00GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=iFsekXNy; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1733726754; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=lEzZ52adzbYunRpL2ygJuu56f6yoRpwpu4wwmXv/eWw=;
+	b=iFsekXNy2U4sxNpNVBnkemqmOJ4kB8PteF9k+qpH9b8rGNCOH/CpukK4mplpz//zWIRHafHuvZ42n8YpGr+fffj5YfFafsyqAf4TUoAxYKBFFRC6lkiIfduEiqGsSZZtljzEJaxLN1uJt3CktirKtSqFaW3qZpBOY+g/MK5OuOk=
+Received: from 30.39.184.169(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WL3xrGL_1733726752 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 09 Dec 2024 14:45:53 +0800
+Message-ID: <a0358f1e-a63c-4059-adc8-d2f338710e36@linux.alibaba.com>
+Date: Mon, 9 Dec 2024 14:45:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC002.ant.amazon.com (10.13.139.242) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 11/12] net: homa: create homa_plumbing.c
+ homa_utils.c
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org,
+ linux-api@vger.kernel.org
+References: <20241111234006.5942-1-ouster@cs.stanford.edu>
+ <20241111234006.5942-12-ouster@cs.stanford.edu>
+ <f79a70fd-35a4-4d0d-b239-daa4ab652880@linux.alibaba.com>
+ <fd5cf76f-48c3-4d73-9609-c13ccb622382@lunn.ch>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <fd5cf76f-48c3-4d73-9609-c13ccb622382@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Mon, 9 Dec 2024 14:26:43 +0900
-> > >   2) some subsystems use sock_create(), but most of the sockets are
-> > >      not exposed to userspace via file descriptors but are exposed
-> > >      to some BPF hooks (most likely unintentionally)
-> > 
-> > AFAIR the 'kern' flag removes some security/permission checks.
+
+
+On 12/3/24 9:51 AM, Andrew Lunn wrote:
+> On Mon, Dec 02, 2024 at 11:51:48AM +0800, D. Wythe wrote:
+>>> +/**
+>>> + * homa_setsockopt() - Implements the getsockopt system call for Homa sockets.
+>>> + * @sk:      Socket on which the system call was invoked.
+>>> + * @level:   Level at which the operation should be handled; will always
+>>> + *           be IPPROTO_HOMA.
+>>> + * @optname: Identifies a particular setsockopt operation.
+>>> + * @optval:  Address in user space of information about the option.
+>>> + * @optlen:  Number of bytes of data at @optval.
+>>> + * Return:   0 on success, otherwise a negative errno.
+>>> + */
+>>> +int homa_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
+>>> +		    unsigned int optlen)
+>>> +{
+>>> +	struct homa_sock *hsk = homa_sk(sk);
+>>> +	struct homa_set_buf_args args;
+>>> +	int ret;
+>>> +
+>>> +	if (level != IPPROTO_HOMA || optname != SO_HOMA_SET_BUF ||
+>>> +	    optlen != sizeof(struct homa_set_buf_args))
+>>> +		return -EINVAL;
+>>
+>> SO_HOMA_SET_BUF is a bit odd here, maybe HOMA_RCVBUF ? which also can be
+>> implemented in getsockopt.
 > 
-> Right.
+> Please trim the text when replying to just the needed context. With
+> pages and pages of useless quoted text it is easy to overlook your
+> comments.
+> 
+> 	Andrew
 
-This wasn't always true.
+Got it. Thanks for advice.
 
-Currently, SELinux and AppArmor supports the socket_create hook
-and do nothing if kern=0, but Smack supporting socket_post_create
-does not care about kern.
-
-Also, we can enforce security for kernel sockets with BPF LSM.
+D. Wythe
 
