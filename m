@@ -1,99 +1,105 @@
-Return-Path: <netdev+bounces-150012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6758A9E8896
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 00:50:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A06129E88A0
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 01:06:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60CD51884E2E
-	for <lists+netdev@lfdr.de>; Sun,  8 Dec 2024 23:50:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 881991884EE0
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 00:06:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679071917E4;
-	Sun,  8 Dec 2024 23:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0792C9A;
+	Mon,  9 Dec 2024 00:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eleDimTl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DXF9NPn9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A80BB66E;
-	Sun,  8 Dec 2024 23:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAEF819A;
+	Mon,  9 Dec 2024 00:05:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733701803; cv=none; b=ZL5zFhRjCFgjlYaChSdEj0UDs/PoW6mCeh3kfxYYLECU3dKevOcGkdEQYRc/ZxbmwQY4iVGNhpiNVxNV5BaLGW7uWnCKnkUc0FOw/tOmaY+M3uVhVSkXm0Z3rwgD4d0+fooSY5DZ8GXEVTRA3+10I3iEQ3boS+0YNXuYfYW8Yd4=
+	t=1733702759; cv=none; b=kJoSIN6jyKo3rqmpk43AN7pXMXgkUz9ENlC8Q+/QVlLWPnqO6bkQU8NU1UrYwmbo8/wH//uu50vbOkxwzdv2hdrBE9WXh1Ju5qdy2G2w/1nOPfenLEnfUBfC/seKq11IKcgfNvKZYTk6hsSGqxnT5iTc0GEpDq3aRFt26Fa2GgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733701803; c=relaxed/simple;
-	bh=V4HVzsI+XMBJjkzp/89Y6/G2AOKzwT5yoss94xIGubM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a6Xzb4JIuGdOu6YiKUKgbwg0ZF17ME0NVo5lxbvyRurRAi2uiCdPr3HujdsnDeSQBcu0KZI/yI/fGH4/wRArRmjgCJ0r/FH9PRuMeNIaXJR73D6IxL+9W8k4eeXKSYnPvjEFGL3vWrDGzzC8c0w+7A7DjXSEgM7cZswG2hmHgtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eleDimTl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABC12C4CED2;
-	Sun,  8 Dec 2024 23:50:00 +0000 (UTC)
+	s=arc-20240116; t=1733702759; c=relaxed/simple;
+	bh=KOSE2+0IJQr/pu3UWE4qE1sa7hIxtXcxZxP8jtFM2qk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O44FhUi3NBsGKpbYlXx+pMb/lC4bcqmu2NkHl1E1415n925OZKLKz2PTWEa3q1W4hSb2RRPnfv0+V5w//nM+diDtFXIm4aghEC0NJMP5P66+5sd/OP+SRvSLc0cVtLTc/0IwPYroVlXijaJXbNthQEqpSFPDBWVmRxCoN+pgZLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DXF9NPn9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91F2CC4CED2;
+	Mon,  9 Dec 2024 00:05:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733701802;
-	bh=V4HVzsI+XMBJjkzp/89Y6/G2AOKzwT5yoss94xIGubM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=eleDimTlh9CbHWtCzjsE8Jw+BZzCDgMvSwDrAHhW+PH+Biqzb7td6HtPBvGXnRZUr
-	 eDfJZOskHissGyntos7heqy2ARzgXQK5juBrQF0b7Xi3tEODvEX85F3l1fbME+uVff
-	 NcB9MLYCQrb6VjjzpXzRSUwOGUACtg7Rs++lMo65d0gsZ4qGbNlplM6nGP5pHTZ3Cs
-	 wHZgySZVE/JRym2tlLWvYeL59YBs6HXn+6ndb+uMnc8IlH+nDpCIOvE5wmP+lGgoHV
-	 C+leV6Qiny+aZzsfJffBg/SW+JZr4J7BMv28L/buMoleQX0jyXMbN9x6aFD33g4eyb
-	 fiPIjkDV4dnMg==
-From: Frederic Weisbecker <frederic@kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Frederic Weisbecker <frederic@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	netdev@vger.kernel.org
-Subject: [PATCH] net: pktgen: Use kthread_create_on_cpu()
-Date: Mon,  9 Dec 2024 00:49:55 +0100
-Message-ID: <20241208234955.31910-1-frederic@kernel.org>
-X-Mailer: git-send-email 2.46.0
+	s=k20201202; t=1733702758;
+	bh=KOSE2+0IJQr/pu3UWE4qE1sa7hIxtXcxZxP8jtFM2qk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DXF9NPn9POFP50emVFrAtfIHqq4k8Ait3jzAckDzNP4bGmUk6T8lv6B0EIk7fxs1U
+	 u7pjIv1BdHmbkxLaCyDrqJ4fAw2qD+sefOnHMs79XCU1/ccDaVEsY8F86kazyBJr6M
+	 PjJunvWrVykhl/mhPfkYR2UxjUex+regGgNhtDqxdKH+urlUjGi4XqeldagYnbQSxW
+	 lSxM+nTE2m+KYy1gibCaV6aXWA2i8NfGqXbAcVKwqmjgyBrs7oKccYOETeAQKZYlwH
+	 3qilQ0Q/zFmyj3DBqfn5svbmu/EaZbdsza73DiOz60mE4GWluNMmHLT061A3r4GXK8
+	 TI1wK055FK+iQ==
+Date: Mon, 9 Dec 2024 00:05:56 +0000
+From: Wei Liu <wei.liu@kernel.org>
+To: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	iommu@lists.linux.dev, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	virtualization@lists.linux.dev, kys@microsoft.com,
+	haiyangz@microsoft.com, wei.liu@kernel.org, mhklinux@outlook.com,
+	decui@microsoft.com, catalin.marinas@arm.com, will@kernel.org,
+	luto@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+	daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com,
+	robh@kernel.org, bhelgaas@google.com, arnd@arndb.de,
+	sgarzare@redhat.com, jinankjain@linux.microsoft.com,
+	muminulrussell@gmail.com, skinsburskii@linux.microsoft.com,
+	mukeshrathor@microsoft.com, vkuznets@redhat.com,
+	ssengar@linux.microsoft.com, apais@linux.microsoft.com,
+	eahariha@linux.microsoft.com, horms@kernel.org
+Subject: Re: [PATCH v3 0/5] Introduce new headers for Hyper-V
+Message-ID: <Z1Y0ZB0J16oeHBbK@liuwe-devbox-debian-v2>
+References: <1732577084-2122-1-git-send-email-nunodasneves@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1732577084-2122-1-git-send-email-nunodasneves@linux.microsoft.com>
 
-Use the proper API instead of open coding it.
+On Mon, Nov 25, 2024 at 03:24:39PM -0800, Nuno Das Neves wrote:
+> To support Linux as root partition[1] on Hyper-V many new definitions
+> are required.
+> 
+> The plan going forward is to directly import definitions from
+> Hyper-V code without waiting for them to land in the TLFS document.
+> This is a quicker and more maintainable way to import definitions,
+> and is a step toward the eventual goal of exporting the headers
+> directly from Hyper-V for use in Linux.
+> 
+> This patch series introduces new headers (hvhdk.h, hvgdk.h, etc,
+> see patch #3) derived directly from Hyper-V code. hyperv-tlfs.h is
+> replaced with hvhdk.h (which includes the other new headers)
+> everywhere.
+> 
+> No functional change is expected.
+> 
+> Summary:
+> Patch 1-2: Minor cleanup patches
+> Patch 3: Add the new headers (hvhdk.h, etc..) in include/hyperv/
+> Patch 4: Switch to the new headers
+> Patch 5: Delete hyperv-tlfs.h files
+> 
+> Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
 
-Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
----
- net/core/pktgen.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
-
-diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-index 34f68ef74b8f..7fcb4fc7a5d6 100644
---- a/net/core/pktgen.c
-+++ b/net/core/pktgen.c
-@@ -3883,17 +3883,14 @@ static int __net_init pktgen_create_thread(int cpu, struct pktgen_net *pn)
- 	list_add_tail(&t->th_list, &pn->pktgen_threads);
- 	init_completion(&t->start_done);
- 
--	p = kthread_create_on_node(pktgen_thread_worker,
--				   t,
--				   cpu_to_node(cpu),
--				   "kpktgend_%d", cpu);
-+	p = kthread_create_on_cpu(pktgen_thread_worker, t, cpu, "kpktgend_%d");
- 	if (IS_ERR(p)) {
- 		pr_err("kthread_create_on_node() failed for cpu %d\n", t->cpu);
- 		list_del(&t->th_list);
- 		kfree(t);
- 		return PTR_ERR(p);
- 	}
--	kthread_bind(p, cpu);
-+
- 	t->tsk = p;
- 
- 	pe = proc_create_data(t->tsk->comm, 0600, pn->proc_dir,
--- 
-2.46.0
-
+Applied to hyperv-next. Thanks.
 
