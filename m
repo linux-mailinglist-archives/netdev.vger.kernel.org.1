@@ -1,131 +1,154 @@
-Return-Path: <netdev+bounces-150277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E659E9C1A
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:50:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE4FF9E9C27
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:53:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9D0F16755C
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 16:50:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 946211886DE5
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 16:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61D0A153824;
-	Mon,  9 Dec 2024 16:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2038314B959;
+	Mon,  9 Dec 2024 16:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VlM0LuNb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="Nfhkus41"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31EE314F9FB;
-	Mon,  9 Dec 2024 16:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D1214B087
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 16:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733762992; cv=none; b=XQMsrM0kKZR9uVQUD7eoGHRp/nnYRi5A38iiK4AyIhyPmSY9psa7sm97ETJiLYNU1R1yF2WlgxCU+3Wixa9pkA5vgiovBUQ9Jm6cY9oyMPtLlR4zGjq0XbZwCHv+qzfCRKwez/KO9NZ/fUceugaZ8yOAhwvog/uIsPQXJ577XDQ=
+	t=1733763229; cv=none; b=C6D9mt0JO7WDL32XMWXyRPvXOCpzqojQcqSbHaBPiZr3s9zCIbyLNzQX6ZofFQ588NVytBlbpTFKZ1z95na7Viysb7qwXaXup39/qUdt6TrdGN2JbXlc8iUhZL5R9g4HGmIVz4yEl2qNMmOU7nfIyhCmrYjwX19QUKuje94nEEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733762992; c=relaxed/simple;
-	bh=qDOIcIRamvaYbznkBIfCb96yBhJPKCgcT8jFIZBkfHc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oBgtKjEkvCmC6iTvzaCZ9CAMyITeNhabI9ZjnEXEj/jQE4BqdJMAAEa+llKvDA+W63MRmmipaP75chNR/dNxa62k7x4ZVOsgOu32egszPCNIm+NH3N6CmLHU9V3ZMkE15mYB+FOSGSYulubpk2QA7ANYStX7glvIngdptGGjWwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VlM0LuNb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D7DDC4CED1;
-	Mon,  9 Dec 2024 16:49:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733762991;
-	bh=qDOIcIRamvaYbznkBIfCb96yBhJPKCgcT8jFIZBkfHc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VlM0LuNbsoL2znvYf3Gc0UUL41BG38Em8xK8cePbVnc+u7XhLKxlAFMAFmDvEpUL8
-	 QN9hYXxmSZjZuuGQGGUMhaaRaRf9kokykbw9WSsaCNA4cBVQBwqCPAG/aTcGwHoqlq
-	 8tiFQxAY0/i2M8lU0LiuS0w58nbQ0CoWl2RcXYLDS8XNvcamPn5ZCBN9XrHvDCu/sj
-	 G5xDYZwdjo4cGWN2VNUM6Npp5r9w7W4UjV4Sp7prTEY+c7ADPwUPyxzTGKWYT2i6D/
-	 ZZeYFLfFEPM60Y0fwZE9XZG+Jq5LlQmwbOKEH+LNN1VQ8j1miu1lZiKS5IOsMM1rbf
-	 JtwoJ3cjsyFFw==
-Date: Mon, 9 Dec 2024 16:49:46 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, p.zabel@pengutronix.de,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 3/7] net: ftgmac100: Add reset toggling for
- Aspeed SOCs
-Message-ID: <20241209164946.GA2455@kernel.org>
-References: <20241205072048.1397570-1-jacky_chou@aspeedtech.com>
- <20241205072048.1397570-4-jacky_chou@aspeedtech.com>
+	s=arc-20240116; t=1733763229; c=relaxed/simple;
+	bh=nzhs+XhuI85Aboqzx6/Gi5n9/BrZ4n7SkMlLrEDtRtY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PIxWeUoISoXEWDN889baWfJo681CihO0EOsLYVWeE/tBOHXbAkE2fA8Fd/VBUTAGE/L6ujIg2Gz2ezLYwX8ynoyrwx8spS0nbAHOFvQUTmoL/IRod/+Ew33eX75uSdc+4zuE8Md/ZgcCQz/mDTZGTwMv4NnAe250EOsvvTub+tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=Nfhkus41; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ky/6OyEhNZ5sN5gHIVseVpGgBLSCkT+H9/MTo6CbNx4=; t=1733763227; x=1734627227; 
+	b=Nfhkus41+qAehh30eZiOGfZP3GGeIxGzsfL4r9xpPMQYzEbMj1Y6XeUOsso3loDXsuSvtgYzIC+
+	O9CMfxyDHqVsLrO+trgz+EqkAH+ebDjnHDTnb3Vpjas0lQOFxNg8qR30jITo9ox6/9zrDlAUL/BHI
+	k5H9WF4S0Eo8Jzeq4KXwtqjhtat5lHcBIqjWjLWuCBw6QK+hpyL+cytqfhPWq2TXdIWx85BTz1cXk
+	B6aA1pnlnbuHwreC9Ss3lf67sKyWc3wNhCDlCCbHoHiFIwuwJcQ0lgwNNFba0PPN4+5amYK6sQQLk
+	E8Q8qjEFiphf5WjtcERSwO7kAg9mAdx9rPLg==;
+Received: from mail-oa1-f46.google.com ([209.85.160.46]:61669)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tKh0v-0002ML-1K; Mon, 09 Dec 2024 08:53:41 -0800
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-29e998c70f9so2627597fac.2;
+        Mon, 09 Dec 2024 08:53:41 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUVYt8jTMmwxB/35lm1rPgbGVo1B4MNHxb/Dqe84nFt14HHbb/+ZETSCzjfixGXtji8B5dCJK41f40=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRtrufFzKGoGobBwqAqVGoW3xRJxDNxgxxia2lxiJxUPCH2m8z
+	OfheIp6GIH1ZN7ZhNVdCyq/9vQgwo/dkw4rxgv+HvooZMdOKuPAf/k0doE9sdLT8ZnxKMOiHyr7
+	0AALMNfF4RCw25Q2UGtXShEb/eFQ=
+X-Google-Smtp-Source: AGHT+IG+leR1pn8CtV8qGjlpHQjL2OV5d4oL5SoSTkxeAf1pTETfblc8kMj2XZktAeeiT6NhO6GZ7b799B13y2cHypo=
+X-Received: by 2002:a05:6870:c03:b0:29e:4ba5:4ddc with SMTP id
+ 586e51a60fabf-29f73346d6dmr10746250fac.24.1733763220444; Mon, 09 Dec 2024
+ 08:53:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241205072048.1397570-4-jacky_chou@aspeedtech.com>
+References: <20241111234006.5942-1-ouster@cs.stanford.edu> <20241111234006.5942-12-ouster@cs.stanford.edu>
+ <f79a70fd-35a4-4d0d-b239-daa4ab652880@linux.alibaba.com> <CAGXJAmw4tULA02TLXBPa8Lv5cXD1Oe+1ajTWrM2x9=byMTy4jA@mail.gmail.com>
+ <b4bf68f1-189c-4685-8e1a-d8cbf60c1120@linux.alibaba.com>
+In-Reply-To: <b4bf68f1-189c-4685-8e1a-d8cbf60c1120@linux.alibaba.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Mon, 9 Dec 2024 08:53:04 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmxkR7Wgmd2+eUKwOHos2tGbSJ8UFqYKE4nsegg7sr96WQ@mail.gmail.com>
+Message-ID: <CAGXJAmxkR7Wgmd2+eUKwOHos2tGbSJ8UFqYKE4nsegg7sr96WQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 11/12] net: homa: create homa_plumbing.c homa_utils.c
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, linux-api@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: b05cf9a5276a81ca133e41a937654b06
 
-On Thu, Dec 05, 2024 at 03:20:44PM +0800, Jacky Chou wrote:
-> Toggle the SCU reset before hardware initialization.
-> 
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> ---
->  drivers/net/ethernet/faraday/ftgmac100.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-> index 17ec35e75a65..96c1eee547c4 100644
-> --- a/drivers/net/ethernet/faraday/ftgmac100.c
-> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-> @@ -9,6 +9,7 @@
->  #define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
->  
->  #include <linux/clk.h>
-> +#include <linux/reset.h>
->  #include <linux/dma-mapping.h>
->  #include <linux/etherdevice.h>
->  #include <linux/ethtool.h>
-> @@ -98,6 +99,7 @@ struct ftgmac100 {
->  	struct work_struct reset_task;
->  	struct mii_bus *mii_bus;
->  	struct clk *clk;
-> +	struct reset_control *rst;
->  
->  	/* AST2500/AST2600 RMII ref clock gate */
->  	struct clk *rclk;
-> @@ -1979,6 +1981,22 @@ static int ftgmac100_probe(struct platform_device *pdev)
->  				  priv->base + FTGMAC100_OFFSET_TM);
->  	}
->  
-> +	priv->rst = devm_reset_control_get_optional_exclusive(priv->dev, NULL);
-> +	if (IS_ERR(priv->rst))
-> +		goto err_register_netdev;
+Thanks for the additional information; I'll put this on my list of
+things to consider for performance optimization.
 
-Hi Jacky,
+-John-
 
-The goto on the line above will result in this function returning err.
-However, it seems that err is set to 0 here.
-And perhaps it should be set to PTR_ERR(priv->rst).
 
-Flagged by Smatch.
-
-> +
-> +	err = reset_control_assert(priv->rst);
-> +	if (err) {
-> +		dev_err(priv->dev, "Failed to reset mac (%d)\n", err);
-> +		goto err_register_netdev;
-> +	}
-> +	usleep_range(10000, 20000);
-> +	err = reset_control_deassert(priv->rst);
-> +	if (err) {
-> +		dev_err(priv->dev, "Failed to deassert mac reset (%d)\n", err);
-> +		goto err_register_netdev;
-> +	}
-> +
->  	/* Default ring sizes */
->  	priv->rx_q_entries = priv->new_rx_q_entries = DEF_RX_QUEUE_ENTRIES;
->  	priv->tx_q_entries = priv->new_tx_q_entries = DEF_TX_QUEUE_ENTRIES;
-> -- 
-> 2.25.1
-> 
-> 
+On Sun, Dec 8, 2024 at 10:56=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.com=
+> wrote:
+>
+>
+>
+> On 12/6/24 3:49 AM, John Ousterhout wrote:
+> > On Sun, Dec 1, 2024 at 7:51=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.=
+com> wrote:
+> >>> +int homa_setsockopt(struct sock *sk, int level, int optname, sockptr=
+_t optval,
+> >>> +                 unsigned int optlen)
+> >>> +{
+> >>> +     struct homa_sock *hsk =3D homa_sk(sk);
+> >>> +     struct homa_set_buf_args args;
+> >>> +     int ret;
+> >>> +
+> >>> +     if (level !=3D IPPROTO_HOMA || optname !=3D SO_HOMA_SET_BUF ||
+> >>> +         optlen !=3D sizeof(struct homa_set_buf_args))
+> >>> +             return -EINVAL;
+> >>
+> >> SO_HOMA_SET_BUF is a bit odd here, maybe HOMA_RCVBUF ? which also can =
+be
+> >> implemented in getsockopt.
+> >
+> > I have changed it to HOMA_RCVBUF (and renamed struct homa_set_buf_args
+> > to struct homa_rcvbuf_args). I also implemented getsockopt for
+> > HOMA_RCVBUF.
+> >
+> >>> +
+> >>> +     if (copy_from_sockptr(&args, optval, optlen))
+> >>> +             return -EFAULT;
+> >>> +
+> >>> +     /* Do a trivial test to make sure we can at least write the fir=
+st
+> >>> +      * page of the region.
+> >>> +      */
+> >>> +     if (copy_to_user((__force void __user *)args.start, &args, size=
+of(args)))
+> >>> +             return -EFAULT;
+> >>
+> >> To share buffer between kernel and userspace, maybe you should refer t=
+o the implementation of
+> >> io_pin_pbuf_ring()
+> >
+> > I'm not sure what you mean here. Are you suggesting that I look at the
+> > code of io_pin_pbuf_ring to make sure I've done everything needed to
+> > share buffers? I don't believe that Homa needs to do anything special
+> > (e.g. it doesn't need to pin the user's buffers); it just saves the
+> > address and makes copy_to_user calls later when needed (and these
+> > calls are all done at syscall level in the context of the
+> > application). Is there something I'm missing?
+> >
+>
+> I just thought that since the received buffer is shared between kernel an=
+d user-space, if using
+> vmap() to map the very memory, so that we don't need to use such "copy_to=
+_user" to transfer the data
+> from kernel to user-space, we can use memcpy() instead. This shall be mor=
+e faster, but I had no
+> relevant data to prove it..
+>
+> So I'm not going to insist on it, it ups to you.
+>
+> D. Wythe
 
