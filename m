@@ -1,129 +1,175 @@
-Return-Path: <netdev+bounces-150114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 992CB9E8F79
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:56:40 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25821160FF6
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 09:56:26 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A711216E1C;
-	Mon,  9 Dec 2024 09:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="ejwH2zdS"
-X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C2959E8FA4
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:05:44 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6EBF216606
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 09:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D959E280F2C
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:05:42 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944792156FD;
+	Mon,  9 Dec 2024 10:05:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="pyinbY8D";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="LvZ2+XN3"
+X-Original-To: netdev@vger.kernel.org
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48705174EDB;
+	Mon,  9 Dec 2024 10:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733738087; cv=none; b=jsXgZstz8by0hjGNr1L/BD2hwpeue1+T8C9Ym0c+nVcNrwcdxQAqNhq6H8i1UzzpeU3mVxds1C/qlHi9w/GTxuqxHJMG/cXQov1t45EcReS/UTMlMHe0q7Hip9ew0tlFSNIU9L7e/Qo8DD7CnPKUvabVAkPkdTgIjrMzNiOdy8U=
+	t=1733738739; cv=none; b=Iipmg7dMwZfWnzrXKX1a2WlcDcHjUAd9ygktC3SOgOp5TdZo4Dl8kPRTmeHA9nmgfJ9EgHZnuoHI65fUwgvgXukF5qdvGtu5LVVuWvHI2ShdTG8TRaJy2N7y2BRiiq00DAWt863GlTzjyta+mjmCwy2eCKfDaELkKXbWk7XUXRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733738087; c=relaxed/simple;
-	bh=clkDD/hFzOpTf+A8bULiJOQ+kAJSyG2C2ULzsTu2MA0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bhNmIpjOQ7DBr07qVa+/K6ABlC29W0+jzZ2ucG0bq0WpFTAFlKh54UhzdbA/GHC3pbnesJ92vf8gdh6OsJ5i9H3kvTHE487oKl0QyUHLbiXXsKaxiXoVA78OssQSOIJQU2MCXopeVPeauqAL7yBL6zaoqa7N2hVGk3XsTB+gYYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=ejwH2zdS; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tKaT6-00C5hm-A8; Mon, 09 Dec 2024 10:54:20 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=tK3XrgO4rJBXU+NGoXT2L1GQ41DfzfPq/M0ZOmM/Iww=; b=ejwH2zdSIHvMkdk9KzA+Cp4fqP
-	Qd/Hb8hwU52NFWjBiF7pRozGKEyOQxt2FEEqq28K+r2lFYdK0YzJQezePdh5pqzkP6LSo/huGbMnF
-	JDHDA/XrchTB4VtZ7WpGJ5wWHs18u+fH/EJqlN56QUaFVfew8xh6Ao5Gpa/wPAXpjqdTmNE9sCFbd
-	rYhcy+tlUTjZD268Ul14wsCtMXxU9yJA8bCRn8HXZ4tNpKQPLleJ25WEn+s92dqsKf7Rex6wvBf5I
-	GSZSvDKWdJi2wSdek35OOl17/8rF3OlZGwPAOn29derjNboFBF9aHT/FBqN1IshXUo9mFK1pmTL7J
-	PwLZ3CMw==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tKaT5-0000ju-6b; Mon, 09 Dec 2024 10:54:19 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tKaSr-005Bsn-Fk; Mon, 09 Dec 2024 10:54:05 +0100
-Message-ID: <046f2c47-53c7-461e-a5b0-8fe4ae0faacc@rbox.co>
-Date: Mon, 9 Dec 2024 10:54:03 +0100
+	s=arc-20240116; t=1733738739; c=relaxed/simple;
+	bh=sXo5sAmxXW6ZwYuOXa4/hmYfUCh/0aVkqv6kslgjWWo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=PMkK7qMCjWDGD8tAgQMOdw5VkqNzHgNjy+92DPr5r1SZMXw0mtUQyuIuVM5pxJkS07TkOwoRwz+vmf7/OHajPFfczeFefQMrl812sa5wv1aMKK9ZMp7UTnvLXJn79upNQvgz3ho4KY8niDHIUb/t0O4yjc1oDcB2SvEMFEC2+IQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=pyinbY8D; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=LvZ2+XN3 reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1733738736; x=1765274736;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=+NyqZAN0t1dGYImX+TcIzJnbZWbtpRtahPMvnfncONY=;
+  b=pyinbY8DVRYjZ2yAZZAjlN5N7SxAZc+DZhB+uVeKS3iNfNztrEPo79Bc
+   5rSIUmGFDtRs6a7iCDVadh/IYYoZ6Jdlno87beN3BE7iI6JYhlEoGzfGG
+   m1TvtaA7dUB7yll5XJD9U6EuyOj0CAf/kGI1RybcbITR9AMhxbii2JLIe
+   KgFXJ3Twt+Zfg3VJT8bXlbISTD7IzA0IhDOGUiO7vLEpmq0CkGUAcG5gW
+   NQy54qtazjegjP3teW6kg1M6FHr38gEe0lqVaEa62LZEKXhHdqfUeEDCL
+   ppWNdnci/5NYPN2wDCpt7RU6TnEW32jEUDZIRcSh9qzmcYUk7/wQBX/sN
+   Q==;
+X-CSE-ConnectionGUID: nWklzhSzRB+ZfJiZ+kLy6w==
+X-CSE-MsgGUID: 5VGgUcgCQxOkmpA6TO/NCg==
+X-IronPort-AV: E=Sophos;i="6.12,219,1728943200"; 
+   d="scan'208";a="40481917"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 09 Dec 2024 11:05:32 +0100
+X-CheckPoint: {6756C0EC-1B-90CD5875-E0265C0B}
+X-MAIL-CPID: 9AA2BE679C7A784F3A818C4F316453B2_3
+X-Control-Analysis: str=0001.0A682F28.6756C0EC.00E7,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4B0AA161063;
+	Mon,  9 Dec 2024 11:05:24 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1733738728;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+NyqZAN0t1dGYImX+TcIzJnbZWbtpRtahPMvnfncONY=;
+	b=LvZ2+XN3i3aNANKBYSt+2iPKWgtjvLhp12UvcgnsyOyi0sv3MptXB33R77DO0j4GnDiM3p
+	S73bwGYOGzYtqUJ5f1mgwRR1CnvrB881Q6+8ToS/8pyjTX2b5NLPqZc0xWjgRISX7Q+TZ4
+	j7tH5sH/2rSeMbPPE89Equ51bpkccHyJwmciRVBx1035FQ5dxZrOTNfSXNExpPeMrH7YTV
+	SHnY5WHXwj34zu2NLn+UXSmPOkttxmiJSz59SLKaSk1thoNkpRAIMHXGd8DtX1Zw7v/pcc
+	OrpRnFE+zOFhxwZQEd+xkPzcj1wXx1Av/LnGv8q5Eb2HWJ5RRQHtOWtgG4ATgg==
+Message-ID: <b84140959d80439346df949f67882a9136c6977d.camel@ew.tq-group.com>
+Subject: Re: [PATCH v4 1/2] can: m_can: set init flag earlier in probe
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Marc Kleine-Budde
+	 <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Martin =?ISO-8859-1?Q?Hundeb=F8ll?=
+ <martin@geanix.com>, Markus Schneider-Pargmann <msp@baylibre.com>, "Felipe
+ Balbi (Intel)" <balbi@kernel.org>, Raymond Tan <raymond.tan@intel.com>,
+ Jarkko Nikula <jarkko.nikula@linux.intel.com>, linux-can@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux@ew.tq-group.com
+Date: Mon, 09 Dec 2024 11:05:24 +0100
+In-Reply-To: <e247f331cb72829fcbdfda74f31a59cbad1a6006.1728288535.git.matthias.schiffer@ew.tq-group.com>
+References: 
+	<e247f331cb72829fcbdfda74f31a59cbad1a6006.1728288535.git.matthias.schiffer@ew.tq-group.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf 1/3] bpf, sockmap: Fix update element with same
-To: John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20241202-sockmap-replace-v1-0-1e88579e7bd5@rbox.co>
- <20241202-sockmap-replace-v1-1-1e88579e7bd5@rbox.co>
- <675684786d66c_1abf208ea@john.notmuch>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <675684786d66c_1abf208ea@john.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On 12/9/24 06:47, John Fastabend wrote:
-> Michal Luczaj wrote:
->> Consider a sockmap entry being updated with the same socket:
->>
->> 	osk = stab->sks[idx];
->> 	sock_map_add_link(psock, link, map, &stab->sks[idx]);
->> 	stab->sks[idx] = sk;
->> 	if (osk)
->> 		sock_map_unref(osk, &stab->sks[idx]);
->>
->> Due to sock_map_unref(), which invokes sock_map_del_link(), all the psock's
->> links for stab->sks[idx] are torn:
->>
->> 	list_for_each_entry_safe(link, tmp, &psock->link, list) {
->> 		if (link->link_raw == link_raw) {
->> 			...
->> 			list_del(&link->list);
->> 			sk_psock_free_link(link);
->> 		}
->> 	}
->>
->> And that includes the new link sock_map_add_link() added just before the
->> unref.
->>
->> This results in a sockmap holding a socket, but without the respective
->> link. This in turn means that close(sock) won't trigger the cleanup, i.e. a
->> closed socket will not be automatically removed from the sockmap.
->>
->> Stop tearing the links when a matching link_raw is found.
->>
->> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->> ---
-> 
-> Thanks. LGTM.
-> 
-> Reviewed-by: John Fastabend <john.fastabend@gmail.com>
+On Mon, 2024-10-07 at 10:23 +0200, Matthias Schiffer wrote:
+> While an m_can controller usually already has the init flag from a
+> hardware reset, no such reset happens on the integrated m_can_pci of the
+> Intel Elkhart Lake. If the CAN controller is found in an active state,
+> m_can_dev_setup() would fail because m_can_niso_supported() calls
+> m_can_cccr_update_bits(), which refuses to modify any other configuration
+> bits when CCCR_INIT is not set.
+>=20
+> To avoid this issue, set CCCR_INIT before attempting to modify any other
+> configuration flags.
+>=20
+> Fixes: cd5a46ce6fa6 ("can: m_can: don't enable transceiver when probing")
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> Reviewed-by: Markus Schneider-Pargmann <msp@baylibre.com>
+> ---
 
-Thanks, and sorry for a missing tag:
+Hi,
 
-Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
+what's the status of these patches, are there remaining issues/comments? Th=
+ey
+still apply cleanly to linux-next.
 
+Best regards,
+Matthias
+
+
+>=20
+> v2: no changes
+> v3: updated comment to mention Elkhart Lake
+> v4: added Reviewed-by
+>=20
+>  drivers/net/can/m_can/m_can.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.=
+c
+> index 012c3d22b01dd..c85ac1b15f723 100644
+> --- a/drivers/net/can/m_can/m_can.c
+> +++ b/drivers/net/can/m_can/m_can.c
+> @@ -1681,6 +1681,14 @@ static int m_can_dev_setup(struct m_can_classdev *=
+cdev)
+>  		return -EINVAL;
+>  	}
+> =20
+> +	/* Write the INIT bit, in case no hardware reset has happened before
+> +	 * the probe (for example, it was observed that the Intel Elkhart Lake
+> +	 * SoCs do not properly reset the CAN controllers on reboot)
+> +	 */
+> +	err =3D m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
+> +	if (err)
+> +		return err;
+> +
+>  	if (!cdev->is_peripheral)
+>  		netif_napi_add(dev, &cdev->napi, m_can_poll);
+> =20
+> @@ -1732,11 +1740,7 @@ static int m_can_dev_setup(struct m_can_classdev *=
+cdev)
+>  		return -EINVAL;
+>  	}
+> =20
+> -	/* Forcing standby mode should be redundant, as the chip should be in
+> -	 * standby after a reset. Write the INIT bit anyways, should the chip
+> -	 * be configured by previous stage.
+> -	 */
+> -	return m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
+> +	return 0;
+>  }
+> =20
+>  static void m_can_stop(struct net_device *dev)
+
+--=20
+TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
+any
+Amtsgericht M=C3=BCnchen, HRB 105018
+Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
+neider
+https://www.tq-group.com/
 
