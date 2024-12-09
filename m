@@ -1,108 +1,170 @@
-Return-Path: <netdev+bounces-150280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D95119E9C79
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:04:34 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 408D59E9C7B
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:04:41 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68D9B1883E2A
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:03:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAF822813BF
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:04:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0C6154C17;
-	Mon,  9 Dec 2024 17:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F4F49652;
+	Mon,  9 Dec 2024 17:03:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ccoe3Y0k"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="Aj2Pyz7H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BD1154BEC
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 17:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1997B14EC55
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 17:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733763679; cv=none; b=fkPwNHDVZOtP89Y7C6MMg2JDgKxhVpi9dAS7aKoDPlMI0Cr7wRe5qe+51AC+WmRpop+ULpxFXbwovmtnePsiryQO4BhijACCJl8CSb1ZO+lhjt7VkFPtiFkN5UU5kDlGZcSIMhv0RYVez1QfBlXJTsuTEI/2ahYvoRJi8sHTHPY=
+	t=1733763827; cv=none; b=nGoKZCJV5ZH7a2FBibcy7ZWzwpyCz3O+arttFbSpQCu1ztQjrEORinbUULR3Bn7O6VfL4FBja5dYy5lxo9KhPE6SHQ6M7cso2Ix2IcaafvVf1fteIb8EsaGtexyd6KZ2o/WRClOsGHnkp1/H6/PywDPiO8bK8PvaOTXrI3Jyyw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733763679; c=relaxed/simple;
-	bh=pUtcaZ3G9aSBvBL6TFRnCeFW4lRZiE7xlIPP1JC/mOo=;
+	s=arc-20240116; t=1733763827; c=relaxed/simple;
+	bh=TS2dJvRpcbYgPpTKZ5ZMeYuSA6Xg6ig0fMR+eYbQUgQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OXClo89b1yZ6GA8R+MKBnC8bXgr61nQpSg1r9w8smoqy9MZ2k4h4ucVkPR5plBDMMsLUmRyFBkFZhIh2eYI3tw/3dAJjMmQcqoRLVmBhGxednySIcyKHAEU50fJg3pbml4hud1ITRlo1ZpWvX182YSJlO3WimuBcpKmzV5qn2Ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ccoe3Y0k; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4675936f333so304511cf.0
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 09:01:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733763677; x=1734368477; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pUtcaZ3G9aSBvBL6TFRnCeFW4lRZiE7xlIPP1JC/mOo=;
-        b=Ccoe3Y0keWZw7SBZzMwPVBaLZ6KVzJeTh47QAM/u3G/0ATfpHJWsetsJ68ZeJ1hPcP
-         rGUi5gKu02nyS1D9JEC1hsPHooucKENsL01U3aikNr41Sw8CAGb9n/hXvzC7CGcKjuJ2
-         +R7Ogjhz0XdzKfFNwunoWsfu+2nWXtvwutOoohMddwUn5EAhhnvaIAZ82qBq4KwD7XvH
-         bJ1tPzOrD47ic78ufXqI9uKuDeHuyLRjVk3tATgNy8o9dIZmIcrTBA9jk5ATHMWMuAu0
-         o07/yCogtaokc7NmI60WbliVSWaNrOMRnZjknHzYCLBJ7i6ppB/OgepPYyW0k6KPuEQA
-         /saw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733763677; x=1734368477;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pUtcaZ3G9aSBvBL6TFRnCeFW4lRZiE7xlIPP1JC/mOo=;
-        b=gdlAoX0GbsDvmNtj0rYd2OlhBRpFp7gXd6qsSYTOCYIbfN4HyVdpYuSkkRIVHrtv6f
-         vyBJ1pN0VqCzknOK3WFNjhs/m1zBzjljWjKZv8sswBA3CUQezEk8ALdycwsuS0xJw900
-         guGWokT9uJB0FOJlKpn8uL0/QYSpQ/r3wywkda8BQPBoTZX1I5McSVhNaumZqDqgxS4w
-         WgijwffieRUIpUjRbO4wTJ9V5LZ8CNYZJW7nipTwSBLiP6FuSRPg/g1leYcyMIIw+rZR
-         hWGslqNqvIh4YoVSYIAckzVT+RqHY/R2EImu1cKUGTqVm5HjCSjnZUbazMYfZBzvCbf7
-         FUyA==
-X-Forwarded-Encrypted: i=1; AJvYcCVdS5l+JwWnSR4tE8W+egUuWz8kvULconnUCSi+nuEh3xzb0bT8bgSjth+1opn1t0hv36GNv2U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyA0XuTLig1F5OI6YjYSdzwg3kqy1bm3e0ehIfr6lFsq+1eLNNm
-	Wyl3csDXl5IFEC2XcryCdgo8EPEG/GNEOiQJi58eTlyDbibwqEoNUDY61NFbQ5GsQJCHbJ/rtnR
-	oz9ei0ookCz4GI5Ga+/RXh5GUAHfwi9ibQ1AT
-X-Gm-Gg: ASbGncvXQkmBa8kUrtIAWvsnqfQtk0DoXudXLvXpXFmEbKx/sqfdf1hzv7ljedGBK4o
-	Lp6mayddYmJDnoYO7tt9j+eZa1rIElXLUSVt1B7ui2G9S5um44TBbCVMknVfNEA==
-X-Google-Smtp-Source: AGHT+IG7ztvj5oICFMEuNH6nn+JsDFn+n5yiRdsy4jmtRu797XAYVrp2pVczv9CdzMVfXqHzkMpVSL487X7ntrQt7xY=
-X-Received: by 2002:a05:622a:988:b0:466:8f39:fc93 with SMTP id
- d75a77b69052e-4674c5dcda5mr7999271cf.3.1733763676705; Mon, 09 Dec 2024
- 09:01:16 -0800 (PST)
+	 To:Cc:Content-Type; b=aPNf7c/VG1yTvo34TSRa95cquATYcepdLUysjPLtvjfagVKYx6KsUp/wcXMN6NmY4hC3zbj/CeI3KPImAr8BA6/FZJ+/+xLFTbIj0zbNnhOTQffqIrH3HCaFuoxuhD514zzwM6zHA3X/Ou80UYiuzMqVBaJfIJ7tSPfrTGGTT6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=Aj2Pyz7H; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ja54K3Mix1tFT4xLqbj9VGzMOknxqdpdclB1ZrggbhM=; t=1733763826; x=1734627826; 
+	b=Aj2Pyz7HxjsqpB/UoMXNLNl275lmDBCnKSOrmb6eOrZBK3FdxnqPSSl1HrvUp5Mo/1yLHPrxpk/
+	giuplY8xfNTE0awvj83O4huiFlB6M97zd1mnQKJVXaTeehhlHBw2EayzsEvGdBydgv/E2+7zr9DLm
+	LgkOVMbLDr/wbksAI/QHdgPjOps9k+rYn5gqA1ayg8CDENk1KbOfjP88V/MqLQZgmPpJJhBb7mOdC
+	IP2z2xE7G/zt9UeMHzestI5stmqx9yoSaCMjgI8+rjqextEuS98k6NCJvRKpdNisOLYIUcSXTfUib
+	oruzyAK5zjbqUZj7Q5anveKnnuwfK2LSG17Q==;
+Received: from mail-oi1-f177.google.com ([209.85.167.177]:60735)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tKhAe-00031R-WD; Mon, 09 Dec 2024 09:03:45 -0800
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3eb34620af9so958501b6e.1;
+        Mon, 09 Dec 2024 09:03:44 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUUsoMReA/ZPKvqOVuYZ7OuBhiHiHllfDiU3AcfxU0mYygZUocgNKDL1y9C8scYd2xs+yQygL5p414=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw66QH8WtKV2Sc2b7QIiGbTvLo67BdOWVmb/ifAIoLUQ4w4lS+M
+	ySfP/jdB39US0Tg4qW8FrrLCQNjAanVEntQRtC9tpuZXRIFaUbnZre8YlWAla/pzbIVXmUhGkoW
+	KCt0seHOOBk5eMU26ylgJHNQ4BUg=
+X-Google-Smtp-Source: AGHT+IEx49wfEmM9KnGVO24uFYJAhJE6eoNVVDYpalHyD8aUiQ9WMrfjb8X+AwJBVyX8mq+O2ZE0+FcSo/FJ/5TmQNk=
+X-Received: by 2002:a05:6870:a91f:b0:29e:5522:8ee4 with SMTP id
+ 586e51a60fabf-29f733ace51mr11999301fac.25.1733763824396; Mon, 09 Dec 2024
+ 09:03:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241204172204.4180482-1-dw@davidwei.uk> <20241204172204.4180482-3-dw@davidwei.uk>
-In-Reply-To: <20241204172204.4180482-3-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 9 Dec 2024 09:01:04 -0800
-Message-ID: <CAHS8izOR=C=eV91hLu6WubkR1Y9UXdyX0+vyXqiS800gSP3pNg@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 02/17] net: generalise net_iov chunk owners
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
+References: <20241111234006.5942-1-ouster@cs.stanford.edu> <20241111234006.5942-12-ouster@cs.stanford.edu>
+ <f79a70fd-35a4-4d0d-b239-daa4ab652880@linux.alibaba.com> <CAGXJAmw4tULA02TLXBPa8Lv5cXD1Oe+1ajTWrM2x9=byMTy4jA@mail.gmail.com>
+ <b4bf68f1-189c-4685-8e1a-d8cbf60c1120@linux.alibaba.com> <CAGXJAmxkR7Wgmd2+eUKwOHos2tGbSJ8UFqYKE4nsegg7sr96WQ@mail.gmail.com>
+In-Reply-To: <CAGXJAmxkR7Wgmd2+eUKwOHos2tGbSJ8UFqYKE4nsegg7sr96WQ@mail.gmail.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Mon, 9 Dec 2024 09:03:08 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmzzmNrp-7OANK1yQX+xJcGAYjTWDFuyhdD5pvjN28CtXQ@mail.gmail.com>
+Message-ID: <CAGXJAmzzmNrp-7OANK1yQX+xJcGAYjTWDFuyhdD5pvjN28CtXQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 11/12] net: homa: create homa_plumbing.c homa_utils.c
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, linux-api@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 37a9e86f2e4d2511d38563a73d487f50
 
-On Wed, Dec 4, 2024 at 9:22=E2=80=AFAM David Wei <dw@davidwei.uk> wrote:
->
-> From: Pavel Begunkov <asml.silence@gmail.com>
->
-> Currently net_iov stores a pointer to struct dmabuf_genpool_chunk_owner,
-> which serves as a useful abstraction to share data and provide a
-> context. However, it's too devmem specific, and we want to reuse it for
-> other memory providers, and for that we need to decouple net_iov from
-> devmem. Make net_iov to point to a new base structure called
-> net_iov_area, which dmabuf_genpool_chunk_owner extends.
->
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
+A follow-up question on this, if I may. Is it OK to vmap a large
+region of user address space (say, 64 MB) and leave this mapped for an
+extended period of time (say, the life of the application), or would
+this have undesirable consequences? In other words, if I do this,
+would I need to monitor how actively the memory is being used and
+release the vmap for space that is inactive?
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+-John-
+
+
+On Mon, Dec 9, 2024 at 8:53=E2=80=AFAM John Ousterhout <ouster@cs.stanford.=
+edu> wrote:
+>
+> Thanks for the additional information; I'll put this on my list of
+> things to consider for performance optimization.
+>
+> -John-
+>
+>
+> On Sun, Dec 8, 2024 at 10:56=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.c=
+om> wrote:
+> >
+> >
+> >
+> > On 12/6/24 3:49 AM, John Ousterhout wrote:
+> > > On Sun, Dec 1, 2024 at 7:51=E2=80=AFPM D. Wythe <alibuda@linux.alibab=
+a.com> wrote:
+> > >>> +int homa_setsockopt(struct sock *sk, int level, int optname, sockp=
+tr_t optval,
+> > >>> +                 unsigned int optlen)
+> > >>> +{
+> > >>> +     struct homa_sock *hsk =3D homa_sk(sk);
+> > >>> +     struct homa_set_buf_args args;
+> > >>> +     int ret;
+> > >>> +
+> > >>> +     if (level !=3D IPPROTO_HOMA || optname !=3D SO_HOMA_SET_BUF |=
+|
+> > >>> +         optlen !=3D sizeof(struct homa_set_buf_args))
+> > >>> +             return -EINVAL;
+> > >>
+> > >> SO_HOMA_SET_BUF is a bit odd here, maybe HOMA_RCVBUF ? which also ca=
+n be
+> > >> implemented in getsockopt.
+> > >
+> > > I have changed it to HOMA_RCVBUF (and renamed struct homa_set_buf_arg=
+s
+> > > to struct homa_rcvbuf_args). I also implemented getsockopt for
+> > > HOMA_RCVBUF.
+> > >
+> > >>> +
+> > >>> +     if (copy_from_sockptr(&args, optval, optlen))
+> > >>> +             return -EFAULT;
+> > >>> +
+> > >>> +     /* Do a trivial test to make sure we can at least write the f=
+irst
+> > >>> +      * page of the region.
+> > >>> +      */
+> > >>> +     if (copy_to_user((__force void __user *)args.start, &args, si=
+zeof(args)))
+> > >>> +             return -EFAULT;
+> > >>
+> > >> To share buffer between kernel and userspace, maybe you should refer=
+ to the implementation of
+> > >> io_pin_pbuf_ring()
+> > >
+> > > I'm not sure what you mean here. Are you suggesting that I look at th=
+e
+> > > code of io_pin_pbuf_ring to make sure I've done everything needed to
+> > > share buffers? I don't believe that Homa needs to do anything special
+> > > (e.g. it doesn't need to pin the user's buffers); it just saves the
+> > > address and makes copy_to_user calls later when needed (and these
+> > > calls are all done at syscall level in the context of the
+> > > application). Is there something I'm missing?
+> > >
+> >
+> > I just thought that since the received buffer is shared between kernel =
+and user-space, if using
+> > vmap() to map the very memory, so that we don't need to use such "copy_=
+to_user" to transfer the data
+> > from kernel to user-space, we can use memcpy() instead. This shall be m=
+ore faster, but I had no
+> > relevant data to prove it..
+> >
+> > So I'm not going to insist on it, it ups to you.
+> >
+> > D. Wythe
 
