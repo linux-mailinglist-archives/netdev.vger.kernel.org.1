@@ -1,248 +1,191 @@
-Return-Path: <netdev+bounces-150017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 630F89E890A
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 02:49:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD9839E890F
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 02:55:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CE9418832E0
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 01:49:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90D5316524F
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 01:55:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD04128691;
-	Mon,  9 Dec 2024 01:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E64156CA;
+	Mon,  9 Dec 2024 01:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="QqTQFnjJ"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Hrceb4Md"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E5C5695
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 01:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A9D2F3B
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 01:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733708935; cv=none; b=MtOeP7RD/fW7IGE5eKuisJD7jGe95XzfStPyZ5sdnX7Ir+V62F7+weF7hGU//w14Awsh+OM8O105mI9gtHIZ5eJvya0/5M5b2whlICZIV9m+spOBadXLeJxoYhaBm+lVbOkGdsdWTk26sxfWIZSK7NQ6kzWSL0pj7m0+mpdkoOQ=
+	t=1733709326; cv=none; b=Rmz1CWl0C94Xm7CnT3TVCxDHE8agXprh8K7IPe0L6Mdm54cVK3T3qBOVH1rCBi1lhCm0QEh3n2owVlK+1C3Jw+OZdiweYnFQv9geap46DkdP8xDtaJBM8G+kJPnM4CHBP5GkT5E18aS/lkM4JftVZOnXtKbJHUT1Tf0zx6Llows=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733708935; c=relaxed/simple;
-	bh=7I+7ewPdPrhkBFcv5aWbXYivYYXOZEl+zQyNL4b3VXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=VJKvv9QLQiTPTcqB7J6koldQT0c2utuQM+vvgRUDXuTwTowhAZvTkmtnTtwme0VPS2g9g5Y1ooDXGV9zLjz4XdmqlDIbFcUZbc7ozgRXGNqPMP3mWx8m3SZh+ZOi156xpyPyrKtSsx9uNNjJejRw7bBy+e/Z3JSy+asp4Mm3bi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=QqTQFnjJ; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20241209014849epoutp02b153a3d33a767021ce6ee690f6ef0b27~PXxXvUA9w1320313203epoutp02a
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 01:48:49 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20241209014849epoutp02b153a3d33a767021ce6ee690f6ef0b27~PXxXvUA9w1320313203epoutp02a
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1733708929;
-	bh=5q2Gy50CjWY8XzahAef4ozcI3q+afsiLyGYUVA8DltM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QqTQFnjJ3H7I68O5YW1arYzF0I7aoeAw5ib66MlFrbrxpY+dnsKYJ9Bhhcrl7MECC
-	 i1H3kt3rEkDmgnApL12T+QseBvIE7yu9FhwYPS3bR3JCG65ZSX7rTVtKGk7Cup52sX
-	 VRP885yux1dUU5dW8+nAFrg43TSct154mlCd6RTE=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas2p1.samsung.com (KnoxPortal) with ESMTP id
-	20241209014848epcas2p160ab82c51f6cd8a6278ce3e41807009d~PXxXU1pfA3068630686epcas2p1d;
-	Mon,  9 Dec 2024 01:48:48 +0000 (GMT)
-Received: from epsmgec2p1.samsung.com (unknown [182.195.36.90]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4Y64XJ25sMz4x9Q7; Mon,  9 Dec
-	2024 01:48:48 +0000 (GMT)
-Received: from epcas2p2.samsung.com ( [182.195.41.54]) by
-	epsmgec2p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	D6.B8.22938.08C46576; Mon,  9 Dec 2024 10:48:48 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas2p2.samsung.com (KnoxPortal) with ESMTPA id
-	20241209014847epcas2p219955d6e71c91d1f9b2b5dbca5d705d6~PXxWWbxng0909609096epcas2p2c;
-	Mon,  9 Dec 2024 01:48:47 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20241209014847epsmtrp20eb60868368dbdddaa1a0d845ee7f2d0~PXxWUq6xC1489914899epsmtrp2U;
-	Mon,  9 Dec 2024 01:48:47 +0000 (GMT)
-X-AuditID: b6c32a43-0b1e27000000599a-f3-67564c80f037
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	69.B4.18949.F7C46576; Mon,  9 Dec 2024 10:48:47 +0900 (KST)
-Received: from perf (unknown [10.229.95.91]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20241209014847epsmtip2e82778ea439b13f5c32e90b8ff9acd58~PXxWC6tQw0099100991epsmtip23;
-	Mon,  9 Dec 2024 01:48:47 +0000 (GMT)
-Date: Mon, 9 Dec 2024 10:52:12 +0900
-From: Youngmin Nam <youngmin.nam@samsung.com>
-To: Neal Cardwell <ncardwell@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, Youngmin Nam
-	<youngmin.nam@samsung.com>, Jakub Kicinski <kuba@kernel.org>,
-	davem@davemloft.net, dsahern@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, dujeong.lee@samsung.com, guo88.liu@samsung.com,
-	yiwang.cai@samsung.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, joonki.min@samsung.com,
-	hajun.sung@samsung.com, d7271.choe@samsung.com, sw.ju@samsung.com
-Subject: Re: [PATCH] tcp: check socket state before calling WARN_ON
-Message-ID: <Z1ZNTKHmCV9Jg2o8@perf>
+	s=arc-20240116; t=1733709326; c=relaxed/simple;
+	bh=cAvKHDyOy7PuthKQ07j3EXvBEqKRNayG3yrriAIFqhc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R503rAZKbDVoWZknCMyXe5GEwa9h6hkYBSfp+CtoiJQVQlMBqkWTBHT4Kvr8o+mLd708FQ8bvSv+FOxP1k/qkwKaQ1HiQRxLOHmwaFe9HP5pZjn31/3ZWIiF/jSJVeoyxdkSJCTc7J1Ntq7Yq2URSznkJ1ZijmLeFUoZRerabD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Hrceb4Md; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2162c0f6a39so10193465ad.0
+        for <netdev@vger.kernel.org>; Sun, 08 Dec 2024 17:55:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1733709324; x=1734314124; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WuYjkXWcLoHR4Ox4e7f57WhVcZzf2YoyBCCTs7rM5Rk=;
+        b=Hrceb4Md60CAXykhywzQjwsXgJjTqTFxvl0mVlydzMcxLJixzaxxm+zb5hwZV4LGu7
+         BCOW/rFa20BalDIThwoff69Z+/K10rWoVJDJw1s/dzTLW3K4OZlUZivDq029htqDsGNA
+         HGb5aaH+L0YMXKvBxX+jrtHKWdLFHDVp0FOjA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733709324; x=1734314124;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WuYjkXWcLoHR4Ox4e7f57WhVcZzf2YoyBCCTs7rM5Rk=;
+        b=Rq8vjovRzoYlEc5OiPb6/6e3vicKLS7AF/bSE48+64+VfTaTsiVMwGSONzzvKjnbcH
+         IjM9Ah6Ei4yzO9d99Baih+WJyG4w7WcjXCjrf67ajT3Nx4uh/PygegOSj/6AAHFirWRO
+         7KEFEru/SFucW0KM+9eexs0/I7eSkaXSMsNxYzIAA0AmcGMVotMhMJ1UvhcDUS7rrOiw
+         RF0d8uVJ+kwxyi0x5MNbeoq06Vu6nquVaDyLgRQDRK9vV2fzoBlMJXOKB0iOgGt/cC8S
+         S8rKX71DXLAMzP+IwFx6e2EyOLknA2nVyBL8xflZlLTrCMHXYeqKsBcYBGtgDuF6imT7
+         xn0w==
+X-Gm-Message-State: AOJu0Yza8YwHKjkkgMdNJP+NO8RAVvNpkFNETnoAcP4w/b9mj6WgjyvX
+	+16c8b4L+jatTuESiP90aMvFhnOitR+VL6YhOXaqE+nQdAjywWlryXzBR6mtUQ==
+X-Gm-Gg: ASbGncvh8xWslL9XZs7VCmTCYHvoi/S5WzLJjItVklt23EghvWny6zd2SuDr8CotM2s
+	Jnsb+XpMAg9oANqAp6oCLFA1gicWREYxgPIXMyC5jt7r1Edwm8xjc79SQtffYlneV1zN/zJ3s1w
+	sc47x2yC3yuEIox+bCIUy2QYgflG3PXuTVrdKM/Bh+AXgP9FbdCa7GOnytVV/A037nCvvVfqtBZ
+	qM96ajJ5IODUAAMxIhbrk1Q0oQ6wkTaUHgdh6FdRwY0KYcblH00sV0NpxVQ5FNInQw87Sj1pS1n
+	RIg0YTTwB5s9+Y3l/0jEA7rOcA==
+X-Google-Smtp-Source: AGHT+IGKu0PznZ/f/eOIR0ELyv2KbcZlzQ3uk3Af9G9Ec1/IxTkOHNJf3gYhUk5XxWvuJoAueFpRHQ==
+X-Received: by 2002:a17:903:188:b0:215:9ed9:9315 with SMTP id d9443c01a7336-215f3c56b81mr254465895ad.3.1733709324438;
+        Sun, 08 Dec 2024 17:55:24 -0800 (PST)
+Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fd313f0ffbsm3565565a12.82.2024.12.08.17.55.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Dec 2024 17:55:24 -0800 (PST)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com,
+	Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH net] bnxt_en: Fix aggregation ID mask to prevent oops on 5760X chips
+Date: Sun,  8 Dec 2024 17:54:48 -0800
+Message-ID: <20241209015448.1937766-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.43.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CADVnQykZhXO_k5vKpaQBi+9JnuFt1C5E=20mt=mb-bzXrzfXLw@mail.gmail.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrFJsWRmVeSWpSXmKPExsWy7bCmmW6DT1i6wZ8XvBbX9k5kt5hzvoXF
-	Yt2uViaLZwtmsFg8PfaI3WLyFEaLpv2XmC0e9Z9gs7i6+x2zxYVtfawWl3fNYbPouLOXxeLY
-	AjGLb6ffMFq0Pv7MbvHxeBO7xeIDn9gdBD22rLzJ5LFgU6nHplWdbB7v911l8+jbsorR4/Mm
-	uQC2qGybjNTElNQihdS85PyUzLx0WyXv4HjneFMzA0NdQ0sLcyWFvMTcVFslF58AXbfMHKDT
-	lRTKEnNKgUIBicXFSvp2NkX5pSWpChn5xSW2SqkFKTkF5gV6xYm5xaV56Xp5qSVWhgYGRqZA
-	hQnZGf9PNzAWfFKqWPB4PmMD4yupLkYODgkBE4m90yW6GLk4hAR2MEq0n1/ODuF8YpR4dWkh
-	E4TzjVHi6ZG9LF2MnGAdO1/vZ4VI7GWUeHvuHxuE85BR4uL6fUwgc1kEVCRab8mANLAJ6Eps
-	O/GPEcQWEdCQuLvoASNIPbPAEmaJ6yensYLUCws4S/y9YwtSwyugLLHh4Uc2CFtQ4uTMJ2CL
-	OQUCJX7M/QR2kYTAGQ6JXZPXsUJc5CLR/eMHO4QtLPHq+BYoW0ri87u9bBB2sUTD/VvMEM0t
-	jBKnrr9ghkgYS8x61g52HbNAhsTOc93skIBRljhyiwUizCfRcfgvVJhXoqNNCKJTTeLXlA2M
-	ELaMxO7FK6AmekhMXNDEAgmTXywST9e9YZ/AKDcLyT+zkGybBTSWWUBTYv0ufYiwvETz1tnM
-	EGFpieX/OJBULGBkW8UollpQnJuemmxUYAiP6+T83E2M4ESt5byD8cr8f3qHGJk4GA8xSnAw
-	K4nwcniHpgvxpiRWVqUW5ccXleakFh9iNAVG00RmKdHkfGCuyCuJNzSxNDAxMzM0NzI1MFcS
-	573XOjdFSCA9sSQ1OzW1ILUIpo+Jg1OqgWnJ1fSfPu7SAXy/hd9Y5i6PnJu24V1RdfBzvzw1
-	Tr2MusMCpzQlm+RkWfs+lmncCg6xfZit0vFBTIe/NeKKtuLuye8mbQp5Xfjmts+rk1s3WSo6
-	zYxgTK8IWsGSMX3lPIfMk86vFkxV1WdwDb0yyzSvoZtZfJ2Z8XxndiabzonszjIem04dNRT6
-	Y9GUoeNhm8csGrmHnd2h/LXJkzy1/lQX5bPntvctejGne5Oq7r/nM+037vjn+GC+nHX664bs
-	LbPrJovGnn3DlSOqyHj72ItPG1sjtyUvf+UlVnL3X9s1AYfiSXfl3U+cb70ilvvzzN2MlPBD
-	66ptp/QtXHrFOfLVWaegZa3Mko+7WTm6lViKMxINtZiLihMB5vzSd10EAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprLIsWRmVeSWpSXmKPExsWy7bCSvG69T1i6wbFzWhbX9k5kt5hzvoXF
-	Yt2uViaLZwtmsFg8PfaI3WLyFEaLpv2XmC0e9Z9gs7i6+x2zxYVtfawWl3fNYbPouLOXxeLY
-	AjGLb6ffMFq0Pv7MbvHxeBO7xeIDn9gdBD22rLzJ5LFgU6nHplWdbB7v911l8+jbsorR4/Mm
-	uQC2KC6blNSczLLUIn27BK6MfecvshRMUajYdWsPYwPjCokuRk4OCQETiZ2v97N2MXJxCAns
-	ZpToezmBFSIhI3F75WUoW1jifssRqKL7jBLb5h9n7mLk4GARUJFovSUDUsMmoCux7cQ/RhBb
-	REBD4u6iB4wg9cwCy5glFrz4D1YvLOAs8feOLUgNr4CyxIaHH9kgZq5gkZh65TEbREJQ4uTM
-	JywgNrOAusSfeZfAepkFpCWW/+OACMtLNG+dzQxicwoESvyY+4lpAqPgLCTds5B0z0LonoWk
-	ewEjyypGydSC4tz03GLDAqO81HK94sTc4tK8dL3k/NxNjOAY1NLawbhn1Qe9Q4xMHIyHGCU4
-	mJVEeDm8Q9OFeFMSK6tSi/Lji0pzUosPMUpzsCiJ83573ZsiJJCeWJKanZpakFoEk2Xi4JRq
-	YHJ6ousrUuChvY411Uij9c271+rzlbq9Fq5TWbJRfmPGM61JbU+/RP3+pr1v3n4GnaT8S4xm
-	vxkmvDk6b5Ha/+f6tytjN7yUjG764ras0OHqdzXXZxHTdh2Sa42TO1thKKafxfCssmZZRHvb
-	B+Ya06qZ5k0SN0xln2fMvxB02df3obmt6a7P+tNdv8/jPzxd30/W+NKDVPepvhsSJ0mGCKtp
-	J7d+YG94XW7i8GzPbub8rvPtN+QZlteey1CyiagxV5e+kW5+w8c730r+lETSnCUP+qJyD99U
-	TYu2umP9vfaj/Ou8XbwyYTO7/z2JTZ51QkWkwTs6uvXfhmmKF0+cN7xwzy5J9BbnL7vfIpO+
-	KbEUZyQaajEXFScCACHXCUgwAwAA
-X-CMS-MailID: 20241209014847epcas2p219955d6e71c91d1f9b2b5dbca5d705d6
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----Cwu3ZXVVeZAiO6hmdsuERc26j9mSSa5rGzwFtoxKk617clws=_fa1aa_"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20241209014847epcas2p219955d6e71c91d1f9b2b5dbca5d705d6
-References: <CANn89iK+7CKO31=3EvNo6-raUzyibwRRN8HkNXeqzuP9q8k_tA@mail.gmail.com>
-	<CADVnQynUspJL4e3UnZTKps9WmgnE-0ngQnQmn=8gjSmyg4fQ5A@mail.gmail.com>
-	<20241203181839.7d0ed41c@kernel.org> <Z0/O1ivIwiVVNRf0@perf>
-	<CANn89iKms_9EX+wArf1FK7Cy3-Cr_ryX+MJ2YC8yt1xmvpY=Uw@mail.gmail.com>
-	<Z1KRaD78T3FMffuX@perf>
-	<CANn89iKOC9busc9G_akT=H45FvfVjWm97gmCyj=s7_zYJ43T3w@mail.gmail.com>
-	<Z1K9WVykZbo6u7uG@perf>
-	<CANn89i+BuU+1__zSWgjshFzfxFUttDEpn90V+p8+mVGCHidYAA@mail.gmail.com>
-	<CADVnQykZhXO_k5vKpaQBi+9JnuFt1C5E=20mt=mb-bzXrzfXLw@mail.gmail.com>
-	<CGME20241209014847epcas2p219955d6e71c91d1f9b2b5dbca5d705d6@epcas2p2.samsung.com>
-
-------Cwu3ZXVVeZAiO6hmdsuERc26j9mSSa5rGzwFtoxKk617clws=_fa1aa_
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
 
-On Fri, Dec 06, 2024 at 10:34:16AM -0500, Neal Cardwell wrote:
-> On Fri, Dec 6, 2024 at 4:08 AM Eric Dumazet <edumazet@google.com> wrote:
-> >
-> > On Fri, Dec 6, 2024 at 9:58 AM Youngmin Nam <youngmin.nam@samsung.com> wrote:
-> > >
-> > > On Fri, Dec 06, 2024 at 09:35:32AM +0100, Eric Dumazet wrote:
-> > > > On Fri, Dec 6, 2024 at 6:50 AM Youngmin Nam <youngmin.nam@samsung.com> wrote:
-> > > > >
-> > > > > On Wed, Dec 04, 2024 at 08:13:33AM +0100, Eric Dumazet wrote:
-> > > > > > On Wed, Dec 4, 2024 at 4:35 AM Youngmin Nam <youngmin.nam@samsung.com> wrote:
-> > > > > > >
-> > > > > > > On Tue, Dec 03, 2024 at 06:18:39PM -0800, Jakub Kicinski wrote:
-> > > > > > > > On Tue, 3 Dec 2024 10:34:46 -0500 Neal Cardwell wrote:
-> > > > > > > > > > I have not seen these warnings firing. Neal, have you seen this in the past ?
-> > > > > > > > >
-> > > > > > > > > I can't recall seeing these warnings over the past 5 years or so, and
-> > > > > > > > > (from checking our monitoring) they don't seem to be firing in our
-> > > > > > > > > fleet recently.
-> > > > > > > >
-> > > > > > > > FWIW I see this at Meta on 5.12 kernels, but nothing since.
-> > > > > > > > Could be that one of our workloads is pinned to 5.12.
-> > > > > > > > Youngmin, what's the newest kernel you can repro this on?
-> > > > > > > >
-> > > > > > > Hi Jakub.
-> > > > > > > Thank you for taking an interest in this issue.
-> > > > > > >
-> > > > > > > We've seen this issue since 5.15 kernel.
-> > > > > > > Now, we can see this on 6.6 kernel which is the newest kernel we are running.
-> > > > > >
-> > > > > > The fact that we are processing ACK packets after the write queue has
-> > > > > > been purged would be a serious bug.
-> > > > > >
-> > > > > > Thus the WARN() makes sense to us.
-> > > > > >
-> > > > > > It would be easy to build a packetdrill test. Please do so, then we
-> > > > > > can fix the root cause.
-> > > > > >
-> > > > > > Thank you !
-> > > > > >
-> > > > >
-> > > > > Hi Eric.
-> > > > >
-> > > > > Unfortunately, we are not familiar with the Packetdrill test.
-> > > > > Refering to the official website on Github, I tried to install it on my device.
-> > > > >
-> > > > > Here is what I did on my local machine.
-> > > > >
-> > > > > $ mkdir packetdrill
-> > > > > $ cd packetdrill
-> > > > > $ git clone https://protect2.fireeye.com/v1/url?k=746d28f3-15e63dd6-746ca3bc-74fe485cbff6-e405b48a4881ecfc&q=1&e=ca164227-d8ec-4d3c-bd27-af2d38964105&u=https%3A%2F%2Fgithub.com%2Fgoogle%2Fpacketdrill.git .
-> > > > > $ cd gtests/net/packetdrill/
-> > > > > $./configure
-> > > > > $ make CC=/home/youngmin/Downloads/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-gcc
-> > > > >
-> > > > > $ adb root
-> > > > > $ adb push packetdrill /data/
-> > > > > $ adb shell
-> > > > >
-> > > > > And here is what I did on my device
-> > > > >
-> > > > > erd9955:/data/packetdrill/gtests/net # ./packetdrill/run_all.py -S -v -L -l tcp/
-> > > > > /system/bin/sh: ./packetdrill/run_all.py: No such file or directory
-> > > > >
-> > > > > I'm not sure if this procedure is correct.
-> > > > > Could you help us run the Packetdrill on an Android device ?
-> 
-> BTW, Youngmin, do you have a packet trace (e.g., tcpdump .pcap file)
-> of the workload that causes this warning?
-> 
-> If not, in order to construct a packetdrill test to reproduce this
-> issue, you may need to:
-> 
-> (1) add code to the warning to print the local and remote IP address
-> and port number when the warning fires (see DBGUNDO() for an example)
-> 
-> (2) take a tcpdump .pcap trace of the workload
-> 
-> Then you can use the {local_ip:local_port, remote_ip:remote_port} info
-> from (1) to find the packet trace in (2) that can be used to construct
-> a packetdrill test to reproduce this issue.
-> 
-> thanks,
-> neal
-> 
+The 5760X (P7) chip's HW GRO/LRO interface is very similar to that of
+the previous generation (5750X or P5).  However, the aggregation ID
+fields in the completion structures on P7 have been redefined from
+16 bits to 12 bits.  The freed up 4 bits are redefined for part of the
+metadata such as the VLAN ID.  The aggregation ID mask was not modified
+when adding support for P7 chips.  Including the extra 4 bits for the
+aggregation ID can potentially cause the driver to store or fetch the
+packet header of GRO/LRO packets in the wrong TPA buffer.  It may hit
+the BUG() condition in __skb_pull() because the SKB contains no valid
+packet header:
 
-(Neal, please ignore my previous email as I missed adding the CC list.)
+kernel BUG at include/linux/skbuff.h:2766!
+Oops: invalid opcode: 0000 1 PREEMPT SMP NOPTI
+CPU: 4 UID: 0 PID: 0 Comm: swapper/4 Kdump: loaded Tainted: G           OE      6.12.0-rc2+ #7
+Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+Hardware name: Dell Inc. PowerEdge R760/0VRV9X, BIOS 1.0.1 12/27/2022
+RIP: 0010:eth_type_trans+0xda/0x140
+Code: 80 00 00 00 eb c1 8b 47 70 2b 47 74 48 8b 97 d0 00 00 00 83 f8 01 7e 1b 48 85 d2 74 06 66 83 3a ff 74 09 b8 00 04 00 00 eb a5 <0f> 0b b8 00 01 00 00 eb 9c 48 85 ff 74 eb 31 f6 b9 02 00 00 00 48
+RSP: 0018:ff615003803fcc28 EFLAGS: 00010283
+RAX: 00000000000022d2 RBX: 0000000000000003 RCX: ff2e8c25da334040
+RDX: 0000000000000040 RSI: ff2e8c25c1ce8000 RDI: ff2e8c25869f9000
+RBP: ff2e8c258c31c000 R08: ff2e8c25da334000 R09: 0000000000000001
+R10: ff2e8c25da3342c0 R11: ff2e8c25c1ce89c0 R12: ff2e8c258e0990b0
+R13: ff2e8c25bb120000 R14: ff2e8c25c1ce89c0 R15: ff2e8c25869f9000
+FS:  0000000000000000(0000) GS:ff2e8c34be300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055f05317e4c8 CR3: 000000108bac6006 CR4: 0000000000773ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ <IRQ>
+ ? die+0x33/0x90
+ ? do_trap+0xd9/0x100
+ ? eth_type_trans+0xda/0x140
+ ? do_error_trap+0x65/0x80
+ ? eth_type_trans+0xda/0x140
+ ? exc_invalid_op+0x4e/0x70
+ ? eth_type_trans+0xda/0x140
+ ? asm_exc_invalid_op+0x16/0x20
+ ? eth_type_trans+0xda/0x140
+ bnxt_tpa_end+0x10b/0x6b0 [bnxt_en]
+ ? bnxt_tpa_start+0x195/0x320 [bnxt_en]
+ bnxt_rx_pkt+0x902/0xd90 [bnxt_en]
+ ? __bnxt_tx_int.constprop.0+0x89/0x300 [bnxt_en]
+ ? kmem_cache_free+0x343/0x440
+ ? __bnxt_tx_int.constprop.0+0x24f/0x300 [bnxt_en]
+ __bnxt_poll_work+0x193/0x370 [bnxt_en]
+ bnxt_poll_p5+0x9a/0x300 [bnxt_en]
+ ? try_to_wake_up+0x209/0x670
+ __napi_poll+0x29/0x1b0
 
-Thank you for your detailed and considerate information.
+Fix it by redefining the aggregation ID mask for P5_PLUS chips to be
+12 bits.  This will work because the maximum aggregation ID is less
+than 4096 on all P5_PLUS chips.
 
-We are currently trying to reproduce this issue using our stability stress test and
-aiming to capture the tcpdump output.
+Fixes: 13d2d3d381ee ("bnxt_en: Add new P7 hardware interface definitions")
+Reviewed-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Thanks.
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index c9f1cb7e3740..7df7a2233307 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -381,7 +381,7 @@ struct rx_agg_cmp {
+ 	u32 rx_agg_cmp_opaque;
+ 	__le32 rx_agg_cmp_v;
+ 	#define RX_AGG_CMP_V					(1 << 0)
+-	#define RX_AGG_CMP_AGG_ID				(0xffff << 16)
++	#define RX_AGG_CMP_AGG_ID				(0x0fff << 16)
+ 	 #define RX_AGG_CMP_AGG_ID_SHIFT			 16
+ 	__le32 rx_agg_cmp_unused;
+ };
+@@ -419,7 +419,7 @@ struct rx_tpa_start_cmp {
+ 	 #define RX_TPA_START_CMP_V3_RSS_HASH_TYPE_SHIFT	 7
+ 	#define RX_TPA_START_CMP_AGG_ID				(0x7f << 25)
+ 	 #define RX_TPA_START_CMP_AGG_ID_SHIFT			 25
+-	#define RX_TPA_START_CMP_AGG_ID_P5			(0xffff << 16)
++	#define RX_TPA_START_CMP_AGG_ID_P5			(0x0fff << 16)
+ 	 #define RX_TPA_START_CMP_AGG_ID_SHIFT_P5		 16
+ 	#define RX_TPA_START_CMP_METADATA1			(0xf << 28)
+ 	 #define RX_TPA_START_CMP_METADATA1_SHIFT		 28
+@@ -543,7 +543,7 @@ struct rx_tpa_end_cmp {
+ 	 #define RX_TPA_END_CMP_PAYLOAD_OFFSET_SHIFT		 16
+ 	#define RX_TPA_END_CMP_AGG_ID				(0x7f << 25)
+ 	 #define RX_TPA_END_CMP_AGG_ID_SHIFT			 25
+-	#define RX_TPA_END_CMP_AGG_ID_P5			(0xffff << 16)
++	#define RX_TPA_END_CMP_AGG_ID_P5			(0x0fff << 16)
+ 	 #define RX_TPA_END_CMP_AGG_ID_SHIFT_P5			 16
+ 
+ 	__le32 rx_tpa_end_cmp_tsdelta;
+-- 
+2.30.1
 
-------Cwu3ZXVVeZAiO6hmdsuERc26j9mSSa5rGzwFtoxKk617clws=_fa1aa_
-Content-Type: text/plain; charset="utf-8"
-
-
-------Cwu3ZXVVeZAiO6hmdsuERc26j9mSSa5rGzwFtoxKk617clws=_fa1aa_--
 
