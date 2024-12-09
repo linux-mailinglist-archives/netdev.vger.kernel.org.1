@@ -1,261 +1,251 @@
-Return-Path: <netdev+bounces-150153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45B129E930A
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:57:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 90CF49E933F
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:04:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F00081885B5E
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:57:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 643B2188578D
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B821A2248B6;
-	Mon,  9 Dec 2024 11:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1D5321CFF0;
+	Mon,  9 Dec 2024 12:04:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="NDIwfGyn"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="X1DWqvOf"
 X-Original-To: netdev@vger.kernel.org
-Received: from AUS01-ME3-obe.outbound.protection.outlook.com (mail-me3aus01olkn2086.outbound.protection.outlook.com [40.92.63.86])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD7C221462;
-	Mon,  9 Dec 2024 11:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.63.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733745395; cv=fail; b=EPPOrRKzPwyHtJWwjqs2iLuPF6ra7KD0Q6Z3xKdSLG/3b7bMJCTQ/UkNGOBcANl3GhgzZjZZt0/vk7+apRhRaGFnhQtRfa8ZPt7ioEUHEgpZ1hzb75mBiXw45H1dgU4kX/TClB+frXwZagLGqjxmR2j439erNP6e4NwsWeLXlU0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733745395; c=relaxed/simple;
-	bh=CaqcchIS7vWPuyiRUVvrGCBHAeNftVlN1fMH/Wy3yl8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=uZHHpAGhYKDipLqQ8eOvCcfkOPrGmCnN8mnSr3+pON9L23sO8J8bN3Oi3tXNk4+3x42s6OCO9vOe485tISPp8eCJsKDK2waK9Xq2nKFZuntQaXkQf4MsKtUdjdYEZd/ojDrFqUNIBNuOwcyYaWmpM7ZYGBM7uZw/c2rjYZ8XG+M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=NDIwfGyn; arc=fail smtp.client-ip=40.92.63.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=m5+dlNaxMIFjVLq1B+OXvvHDZJERLBBU+x5fXhlsKFY8qR4AI0PvU1A/xJ5O3Adx32F+bG0CkDHLGva13C+kVl6BM8CtHO5erxRFUyB5+J2oRhlVO8MB8ea84V/+XapJeBFLnt1EawIwbKdlR0fOwAJvIc20K1XML553KOePztxt/iI+Eq6Hc32Myfcq9EfcEXqaiEC1sS4YATVScZlCtXeeD49ha2ryxmwmv0Q4InPmp4AcxsOYhK4izAVdbbW/jO7zJirtRw9cwFIIvzFlxTHzk1eVbSG3bQKjq5/5lCYvMEopsMDUwYdjjlYGUUkrygdO1UGMu4jRuDmLiEsw0A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S6/dYAXa14MO+Jo44qkQhIwcjCOUfu8aDJ+75bcKS/w=;
- b=n1BCnTrAG2FXLNYZH1SnaeeyoTkcGlFFf7BmmxnbaBm65nx3hhhTQwG1ovBD9qvLn66YuPiJsXTC6dssQFXZo5dniHyC0ACNCWlYYc7LvW/tU8ZuEKk4tV2sCuTnMmGqMZY+/gSuq5dcU+tXJMFd4utcwDaklzBjO7Fftsq9Ii8TH1RIuRNGxzQWd9MTlJXJW9SwpEa9ASlfow/EHeFILmOS7HgjXLZJWAKk8vvWV5yMXr/gIClxVgTuBGBO9LI/viwMXdQUjOmyFybL5oGdVC+BV6RdCloNiNYTT08fHzI1YqIOipq3bufkYT5XLYT9l+NV3+FI2xXwWWsOey4iLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=S6/dYAXa14MO+Jo44qkQhIwcjCOUfu8aDJ+75bcKS/w=;
- b=NDIwfGyndftoY7smcVboFzwAocnj0f3NkqTOy+RDo+I2aaSUCWhLmng8WRV6yVQdhonRkFdZJftVnqDZhq4xEgiZt5c1OPdOGBzil/9xtMptIVCPC+FYTNVAaeKNAAhYQHrQOqT6GQMHQsT362kXo1VdlBHurn8C8iJGsET1LfHy2ubtfDPliNXpAEZfz6fcSNj7ris+0u02cypMNvPbfAmyXcYHisea3JPBgqhMt9OWqGrYOxtiq9FeZW8qFifD0tjdaf888jB2eE7i35q22RNJNDZef1RyWaaQ/ZPvdNADRH1L5JJxl8RbrMFpEiwipvFBDrXVKsja8LrvPaA4+Q==
-Received: from MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:ff::9) by
- SY8P282MB4885.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:25c::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8251.11; Mon, 9 Dec 2024 11:56:28 +0000
-Received: from MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM
- ([fe80::6174:52de:9210:9165]) by MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM
- ([fe80::6174:52de:9210:9165%4]) with mapi id 15.20.8251.008; Mon, 9 Dec 2024
- 11:56:28 +0000
-Message-ID:
- <MEYP282MB23125E657B3605921535987AC63C2@MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM>
-Date: Mon, 9 Dec 2024 19:56:21 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] tcp_bpf: fix copied value in tcp_bpf_sendmsg
-To: John Fastabend <john.fastabend@gmail.com>,
- Levi Zim via B4 Relay <devnull+rsworktech.outlook.com@kernel.org>,
- Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241130-tcp-bpf-sendmsg-v1-0-bae583d014f3@outlook.com>
- <20241130-tcp-bpf-sendmsg-v1-2-bae583d014f3@outlook.com>
- <675695f1265b2_1abf20862@john.notmuch>
-Content-Language: en-US
-From: Levi Zim <rsworktech@outlook.com>
-In-Reply-To: <675695f1265b2_1abf20862@john.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2P153CA0041.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c6::10)
- To MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:ff::9)
-X-Microsoft-Original-Message-ID:
- <d36f35aa-8223-4b82-af72-3ab7ed41a28a@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E54215182;
+	Mon,  9 Dec 2024 12:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733745856; cv=none; b=AU72ZKJ/om9ZOaE848/pAMDwziStsTIXoXiEu1pBPaO8OQPj5RZ0U0oC8l9kM2eyhkIoBICj5PuhonCHHWHCT8pkR/AuQ71qMEibAEO9AIg2wlbqdrpIx9+KE14LCx5Hy2+SO3gNV8PyOMu53ZQCTBWPE6eZJGkBzdIKtTski3Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733745856; c=relaxed/simple;
+	bh=YhKb8NztGStJO1d7wV5dNFtNiTgrQFruuBmZZdZJe9Q=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=l28cemYA9GN9pwQJX60ppmi+A0PW+M/4dssLI6A5Wx4tNFNtwElAuskjMuc8a+QB1fC+enG7vHc6r0YjldpFB8P2RO9z09o/skBAyxbsp8pxI5CS1XXNnjdpsVG73gCA9O+Atio9K8vNLsoyRMNoA85Y2pE3obAKSACcRjpzKzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=X1DWqvOf; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B96lUVo001478;
+	Mon, 9 Dec 2024 12:00:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=VzoQrl
+	KifGO/+daTs9Y4n2DDkNruouGpa4uTqTdzTNQ=; b=X1DWqvOfPDi5KEyDVB1K5n
+	T8O7pd4B5gqnlkz+UsZbWN3aBuJcObB1i3uF8xI9gwgSVwOFL5Ot0iR+owDVVTWF
+	ZoO53dPyOe3dtPDBEJEvBoCWO35oalMa15+OC+dVTqDgfaQjoZR2Gi8Lw1Pumehy
+	8h7Zm/lBmUip7iT+dYf1WeIqAoK160g7T4pj2r3nf1KVMTbSH0+5751QYpfbCpO+
+	vhFRgw/C5Y5yZXl3dpfkdzllqnPQYDv/qqxu4isXOycDEcw6KxVjLg4bnXyytddv
+	5+NlHQwL1/kjFKaBIHMtsUlmHSGkxBdAZajn5l2gk2W9s/KT7LrNTWBecmqXJrgw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsq0gsu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Dec 2024 12:00:04 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B9BgTJx024304;
+	Mon, 9 Dec 2024 12:00:04 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsq0gsp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Dec 2024 12:00:04 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B99osS7016919;
+	Mon, 9 Dec 2024 12:00:03 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43d12xxmbw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Dec 2024 12:00:03 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B9C02pU30802654
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 9 Dec 2024 12:00:02 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5E6EA58071;
+	Mon,  9 Dec 2024 12:00:02 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9F4D25805D;
+	Mon,  9 Dec 2024 12:00:00 +0000 (GMT)
+Received: from [9.152.212.155] (unknown [9.152.212.155])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  9 Dec 2024 12:00:00 +0000 (GMT)
+Message-ID: <c26c530e124dfe8fa0dcd2cb0189e790a9c5d970.camel@linux.ibm.com>
+Subject: Re: [PATCH] net: ethernet: 8390: Add HAS_IOPORT dependency for
+ mcf8390
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Arnd Bergmann <arnd@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S . Miller"
+	 <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Greg Ungerer
+	 <gerg@uclinux.org>
+Cc: Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+        kernel
+ test robot <lkp@intel.com>
+Date: Mon, 09 Dec 2024 12:59:59 +0100
+In-Reply-To: <3ca55478-a5a9-442b-ae4f-a0a822f786d9@app.fastmail.com>
+References: <20241209-mcf8390_has_ioport-v1-1-f263d573e243@linux.ibm.com>
+	 <3ca55478-a5a9-442b-ae4f-a0a822f786d9@app.fastmail.com>
+Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.2 (3.54.2-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MEYP282MB2312:EE_|SY8P282MB4885:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8977af11-9ec2-42ff-064b-08dd18488388
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|15080799006|461199028|19110799003|7092599003|6090799003|8060799006|5072599009|3412199025|440099028;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VTNQazcwSktxelNwWjJPMEVaUjU3QmdvWWVBbUVvQW9XcXBUeU9nQlhZOEtM?=
- =?utf-8?B?d3pCek5HaUZtUWVDSDVZcGUxSXJIRUo3K0Rac2RSYTR4bW01T25TT25pcFM1?=
- =?utf-8?B?NDI5OURNWFFDTkhiZDI1MFR3ZTJrK2VNRDBqanBIMStkTHRVZStqeGlKMTFN?=
- =?utf-8?B?eG5Ma2hnMFpoUEtBOXJrTEV6UGJrUmY2R1pJQmVLNWJQcjB1cEYvcmtXVDIw?=
- =?utf-8?B?bHNBNzBiWmtQNEx4bnRsV2lZK3E3ZEVTYkVSL1UwNHNpbXM3aDBsOGJIVGRp?=
- =?utf-8?B?eExiMDdZaFprRklFQnlueGlZcjR1L2x2cGRINjN0bjNjSmpucWZsblpmNEUr?=
- =?utf-8?B?QUt3SU52TTRDTXpWSUh2RFh0KzQ0L1Zyc0N0MUM0ZWxMZW5EY0M1MS81a3Jv?=
- =?utf-8?B?YVZjNmFMdDZuTjVubzVweVFUYXFRKzJ5bE80T2JyUE1ZSE9IbVlFUEtvZlZa?=
- =?utf-8?B?MDZ6QXpXLzJhRzExL05GMVUxc3RvVDJWNUx4SUVvN0JpWW1EQm5QVWNobmZa?=
- =?utf-8?B?VzVUUkpOMVJsV01wMWZZK0lEK3RMYUZ3THhZSjZUaXpSdTc0aGptUUp2OFk2?=
- =?utf-8?B?U2EyZWpKMmhoTEFFdi92VFhKNkNjbGtTM3AzR2pIZG5oSG5DVnFaVkIwbWFM?=
- =?utf-8?B?TDRSdEJmSXJSQnpadVU2N2I3YjdWNVNPS3c1RS9memtvL21rOTg1UmI4dE12?=
- =?utf-8?B?NEtmNzdLTXJMVUNYNXFRZnhENVlRQnZWNGJlc0VrOGF6d0tTbUhFZFRucFVw?=
- =?utf-8?B?akxNOGV3T2RUbkVxcHFxbENvNFQxUVNJTHV2NEtRTjgyQjBEY3FOTHNIakVN?=
- =?utf-8?B?aXF3aERRL0ZFQVJSY0dHTWM4YWZacmZoOUkwaU5COVRTOXJ6TGpLOXJ6QXdO?=
- =?utf-8?B?bUJtRUVzMk1HamtrUGdTc28wdlo5OHVWNEs5UlRiOXh6Vkx6S1dnYkNwNnZ3?=
- =?utf-8?B?L2Q3WUlFUFN0Z2JxRy9uWlZtZk1NZWtSeHd5ZkNuWWZXUjZsSTM5aiswNWJs?=
- =?utf-8?B?b2p0NW1OT0VvWTg5ckF2VmgxdFFTQy9yNnRydDNHMzVrcUo3VFFKVXdCT2lX?=
- =?utf-8?B?WWF1bTJ4elhEenRrc0x1YTVGclZyYlY5TlVWcEs5aFNVUFd5ekxDaDYrdyth?=
- =?utf-8?B?S0ZYeU45V0JHSWlkQW9PUlIzR1JPNGtjcEdZUWhpdTNieHlXN1daby9JRWx2?=
- =?utf-8?B?SWN3b0RISGxVcGJXdkpSR1plWnV0ZTJFVFJ6ZExIZzV0enBwdFVUci9QWEJ3?=
- =?utf-8?B?WVJCQ3JEOFBmdTBwYmgyNkJWTmRHT25uTzB6OFlGL1RXOFFWV0lFQXUrTjZU?=
- =?utf-8?B?aGJ4T1UvREUraXVIVUFtWVZKVzVHOEhVU3FUNzJTeTRHcFZHemhudmxmNTFp?=
- =?utf-8?B?T25uNHBQNklBODJFbGFJMVRvb2RhcWdlYkdER1duclpwMkowL0Ura2FSRE5i?=
- =?utf-8?Q?HzJHfImg?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?R3JwUThtQ3h4SitaRWNqTXErY3FtejducXp1Ui8rQXpiVC9QTUp4MUV2OHlp?=
- =?utf-8?B?cFJ1UitLR2VobmxVMEFFLzF4b0NKVWxsbDBoaUZzN3g2RzBTZDhFekhtaXVk?=
- =?utf-8?B?cTduSFBKMkNoMGo2RDBqcy95MlFRbUVnSlVNTnhyN2xqTkFJamVuR0NsTFoy?=
- =?utf-8?B?azk3dUZnLzV6SmpiU1VWT2VjM3h0V3ZUWnRaY0VzalFjSEttR1Nkb3d4VDZa?=
- =?utf-8?B?U01ta2dnNkJMZVJWZkw4N1FBdW03d3p6Y0t4NFZza0kvSzEySG1rSi9RbHVO?=
- =?utf-8?B?QjBjdWhGRDFLS0d0UzcxK3Q4dksrNTBlUzVFV0NranhOVXY3aHJHMFFuejRo?=
- =?utf-8?B?Rk9oZ3hUYVJIOWFRSC8wcGltZ0NWeGtqalZiK25EaExEWEdKeGQ4cWhBOG9U?=
- =?utf-8?B?cHFCMUtkS0JvcWRQV0xudk90SUgrYTlIWURzNDdWdWowdngyQWRWbE15RHFG?=
- =?utf-8?B?enJSeXJQeVJlSStZWmFOT25NV0lmbkdCc29EVXRQdlNkYi9PZGcxcnpKY0I4?=
- =?utf-8?B?Y2pxRHJLUTlCWWZlaGd1Z01CWk1nb3hCdDE2dEM5MW5GWTZWMTlRd0ptcVps?=
- =?utf-8?B?SE1CWittTVhwTWRnYjdDbmRuVXJnNks0Z2QvMmdyMExmK2RyZEFIa1B5amdL?=
- =?utf-8?B?b3g4Q2F2cFVzeVRsZVNKOGp2b3diMzdmMzhyemEwb25rd09XSkkyWUd1eUMz?=
- =?utf-8?B?NVZUaWUwalp1bTdHNE50RXpyby8xNmhPanBQRjZGMEJRL2RBV1lnVzE4RDRr?=
- =?utf-8?B?VS92bVlpbkxxcEVqTmZPelZZQnBZNnFhZkNVMXNaaWphcjFkY29UVVBEL0xF?=
- =?utf-8?B?cnlmQi8xdDZ0d1owaGtYNXNYQjMrSG1aRGc1RG04VFk3ZFBBdDZoaXZNNi9s?=
- =?utf-8?B?N0ZIc1lLU2pGVlBOelpaSGZ1eDVDdE9zeDJWV201WU0zV3BSSndtV1o1WUxo?=
- =?utf-8?B?dUt3RkpRQm85eXlRcVkxTU9GL0Y1WHdWK3J5QUxCdWx1Y29uVE1IL0J2SzdB?=
- =?utf-8?B?R3FaR3RKdHlha2tlZ3p6K1JXREhoL0MxV2JubzlCVHNrVHQvd3pXNEdjNllO?=
- =?utf-8?B?MjhsajhOQWtmYkJaK2ZLd1lhK1lCbTdWaWc3MFlTVGxOWTFidWtqRHRodmJH?=
- =?utf-8?B?bTlQZExPM1ZvR3Fla1NGVkM2TWQyVjhCOWNTUVMvUytqVEc5S29CN1VQMGpP?=
- =?utf-8?B?cit3TzBHNnVJbUFEbzJXMER2L3pDbzk2ZVJOei9QejdyR2pkUWFTaG9xR01T?=
- =?utf-8?B?ZWx0MVlGZExyaDN4M0taaURaZE5XREFyaGl6TTVwa1lBK2FFeVVJQVdlTTVy?=
- =?utf-8?B?K2JxOXVyZTBLWWVkUUdVNWFmakZ3QlFKQndkK3ljY1FzTUlweDREbmtPOGZC?=
- =?utf-8?B?QnRscmx6Tk9vMVNKbExHcTZwaklaVndzZURESUVCajlDclBBYTVDOEd3bUNr?=
- =?utf-8?B?L21IdzU4VlY3RFBvTWgvMTJ3OEhyQUVFNkRpbkUxaTh1UWhMSGNuNWNDbzhu?=
- =?utf-8?B?L1hQdHdFVUtybzUvWjJhS3NMdkdPZFZheGg1SFJtb2ZSLzdlU3FuWkcyaG9r?=
- =?utf-8?B?dDlNOFdIODRHUi9XTkx2T1hTeDdjREMwVHhoZ2tpZllQeWFEQzhRZ0NFSkRl?=
- =?utf-8?Q?kU6ZOFIXLF+Is9FWS4ehykPVhBVB92H8h+s/lZut+XXo=3D?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8977af11-9ec2-42ff-064b-08dd18488388
-X-MS-Exchange-CrossTenant-AuthSource: MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2024 11:56:28.4005
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY8P282MB4885
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: qzuFTvx1pC2sVVwFmJxpHJ90AozDNHy1
+X-Proofpoint-GUID: TIP9S2c7WPMOCNdreaVxcxt4QyxllkCi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=308 adultscore=0
+ lowpriorityscore=0 clxscore=1011 phishscore=0 impostorscore=0
+ suspectscore=0 spamscore=0 mlxscore=0 priorityscore=1501 malwarescore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412090094
 
-On 2024-12-09 15:02, John Fastabend wrote:
-> Levi Zim via B4 Relay wrote:
->> From: Levi Zim <rsworktech@outlook.com>
->>
->> bpf kselftest sockhash::test_txmsg_cork_hangs in test_sockmap.c triggers a
->> kernel NULL pointer dereference:
-> Is it just the cork test that causes issue?
-Yes. More specifically only "sockhash::test_txmsg_cork_hangs" but not 
-"sockmap::test_txmsg_cork_hangs"
->
->> BUG: kernel NULL pointer dereference, address: 0000000000000008
->>   ? __die_body+0x6e/0xb0
->>   ? __die+0x8b/0xa0
->>   ? page_fault_oops+0x358/0x3c0
->>   ? local_clock+0x19/0x30
->>   ? lock_release+0x11b/0x440
->>   ? kernelmode_fixup_or_oops+0x54/0x60
->>   ? __bad_area_nosemaphore+0x4f/0x210
->>   ? mmap_read_unlock+0x13/0x30
->>   ? bad_area_nosemaphore+0x16/0x20
->>   ? do_user_addr_fault+0x6fd/0x740
->>   ? prb_read_valid+0x1d/0x30
->>   ? exc_page_fault+0x55/0xd0
->>   ? asm_exc_page_fault+0x2b/0x30
->>   ? splice_to_socket+0x52e/0x630
->>   ? shmem_file_splice_read+0x2b1/0x310
->>   direct_splice_actor+0x47/0x70
->>   splice_direct_to_actor+0x133/0x300
->>   ? do_splice_direct+0x90/0x90
->>   do_splice_direct+0x64/0x90
->>   ? __ia32_sys_tee+0x30/0x30
->>   do_sendfile+0x214/0x300
->>   __se_sys_sendfile64+0x8e/0xb0
->>   __x64_sys_sendfile64+0x25/0x30
->>   x64_sys_call+0xb82/0x2840
->>   do_syscall_64+0x75/0x110
->>   entry_SYSCALL_64_after_hwframe+0x4b/0x53
->>
->> This is caused by tcp_bpf_sendmsg() returning a larger value(12289) than
->> size (8192), which causes the while loop in splice_to_socket() to release
->> an uninitialized pipe buf.
->>
->> The underlying cause is that this code assumes sk_msg_memcopy_from_iter()
->> will copy all bytes upon success but it actually might only copy part of
->> it.
-> The intent was to ensure we allocate a buffer large enough to fit the
-> data. I guess the cork + send here is not allocating enough bytes?
-I am not familiar enough with neither this part of code nor tcp with bpf 
-in general and just
-hit this bug when trying to run the bpf kselftests. Then I decided to 
-debug it.
+On Mon, 2024-12-09 at 12:49 +0100, Arnd Bergmann wrote:
+> On Mon, Dec 9, 2024, at 11:28, Niklas Schnelle wrote:
+> > Since commit 6f043e757445 ("asm-generic/io.h: Remove I/O port accessors
+> > for HAS_IOPORT=3Dn") the I/O port accessors are compile-time optional. =
+As
+> > m68k may or may not select HAS_IOPORT the COLDFIRE dependency is not
+> > enough to guarantee I/O port access. Add an explicit HAS_IOPORT
+> > dependency for mcf8390 to prevent a build failure as seen by the kernel
+> > test robot.
+> >=20
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Closes:=20
+> > https://lore.kernel.org/oe-kbuild-all/202412080511.ORVinTDs-lkp@intel.c=
+om/
+> > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> > ---
+>=20
+> Hi Niklas,
+>=20
+> I think your patch is correct in the sense that the I/O port
+> handling on m68k coldfire is only defined for the PCI bus
+> the port operations is this driver have nowhere to go when
+> PCI is disabled.
+>=20
+> However, I suspect what you actually found is a different
+> preexisting bug, likely introduced in the addition of PCI
+> support in commits 927c28c252dc ("m68k: setup PCI support
+> code in io_no.h") and d97cf70af097 ("m68k: use asm-generic/io.h
+> for non-MMU io access functions").
+>=20
+> As far as I can tell, the driver predates this patch and
+> presumably relied on inb/outb getting redirected to readb/writeb,
+> using the port number as a pointer (without the=20
+> ((void __iomem *) PCI_IO_PA) offset).
+>=20
+> Note that the dev->base_addr that gets passed into inb()/outb()
+> is a physical address from a IORESOURCE_MEM resource,
+> which is normally different from both 16-bit I/O port numbers
+> and from virtual __iomem pointers, though on coldfire nommu
+> the three traditionally could be used interchangeably.
+>=20
+> Adding Greg Ungerer to Cc, as he maintains the coldfire
+> platform and wrote the driver.
 
-In my perspective the buffer(8192) is large enough to hold the data(8192),
-but tcp_bpf_sendmsg returns 12289 which is a little surprising for me.
+Thanks for taking a closer look. Note that I was a bit hasty in sending
+this and forgot the "PATCH net" suffix so resent[0] with that just
+before your reply and discussing it here might not be seen by all the
+netdev folks. I did get a checkpatch warning that this driver is
+depreated too. But hey, seems like our HAS_IOPORT patches have a talent
+for uncovering old bugs.
 
-Could you further elaborate why 8192 bytes are not enough? Thanks!
+[0]
+https://lore.kernel.org/netdev/3ca55478-a5a9-442b-ae4f-a0a822f786d9@app.fas=
+tmail.com/T/#t
 
->> This commit changes it to use the real copied bytes.
->>
->> Signed-off-by: Levi Zim <rsworktech@outlook.com>
->> ---
->>   net/ipv4/tcp_bpf.c | 8 ++++----
->>   1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
->> index 370993c03d31363c0f82a003d9e5b0ca3bbed721..8e46c4d618cbbff0d120fe4cd917624e5d5cae15 100644
->> --- a/net/ipv4/tcp_bpf.c
->> +++ b/net/ipv4/tcp_bpf.c
->> @@ -496,7 +496,7 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
->>   static int tcp_bpf_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
->>   {
->>   	struct sk_msg tmp, *msg_tx = NULL;
->> -	int copied = 0, err = 0;
->> +	int copied = 0, err = 0, ret = 0;
->>   	struct sk_psock *psock;
->>   	long timeo;
->>   	int flags;
->> @@ -539,14 +539,14 @@ static int tcp_bpf_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
->>   			copy = msg_tx->sg.size - osize;
->>   		}
->>   
->> -		err = sk_msg_memcopy_from_iter(sk, &msg->msg_iter, msg_tx,
->> +		ret = sk_msg_memcopy_from_iter(sk, &msg->msg_iter, msg_tx,
->>   					       copy);
->> -		if (err < 0) {
->> +		if (ret < 0) {
->>   			sk_msg_trim(sk, msg_tx, osize);
->>   			goto out_err;
->>   		}
->>   
->> -		copied += copy;
->> +		copied += ret;
->>   		if (psock->cork_bytes) {
->>   			if (size > psock->cork_bytes)
->>   				psock->cork_bytes = 0;
->>
->> -- 
->> 2.47.1
->>
->>
->
+>=20
+> >  drivers/net/ethernet/8390/Kconfig | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/drivers/net/ethernet/8390/Kconfig=20
+> > b/drivers/net/ethernet/8390/Kconfig
+> > index=20
+> > 345f250781c6d9c3c6cbe5445250dc5987803b1a..f2ee99532187d133fdb02bc4b82c7=
+fc4861f90af=20
+> > 100644
+> > --- a/drivers/net/ethernet/8390/Kconfig
+> > +++ b/drivers/net/ethernet/8390/Kconfig
+> > @@ -87,7 +87,7 @@ config MAC8390
+> >=20
+> >  config MCF8390
+> >  	tristate "ColdFire NS8390 based Ethernet support"
+> > -	depends on COLDFIRE
+> > +	depends on COLDFIRE && HAS_IOPORT
+> >  	select CRC32
+> >  	help
+> >  	  This driver is for Ethernet devices using an NS8390-compatible
+> >=20
+> > ---
+---8<---
 
