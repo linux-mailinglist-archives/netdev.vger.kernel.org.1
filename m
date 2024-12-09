@@ -1,78 +1,79 @@
-Return-Path: <netdev+bounces-150368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8E639E9FC4
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 20:38:31 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B42759E9FC5
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 20:38:37 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9246164C92
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 19:38:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9A93281C14
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 19:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEA75197A7F;
-	Mon,  9 Dec 2024 19:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9222E198E75;
+	Mon,  9 Dec 2024 19:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="YxJDp+PF"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="HMjrd9Az"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CEE13B584
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 19:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912DB17DFE3
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 19:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733773107; cv=none; b=EWNPxIn6h9Y3OemPdP2e8HL++uWvDbs6UIjFX67/SfWi9rDR95Ea5PhjKb81a2qmJRYNwuYlIbWf1yNZNcBmcAikZSvqpsePE/5CHgZWrnVlC2NEpbozW20PONA8Fhvs6RMWen4qqRg2cYyfuFlStrvR3mq6EfUdBC01b4yxmYw=
+	t=1733773109; cv=none; b=VylgUyzPS9eQEjnaN77IiIbfx+2OrIXhIejxqfNwjiQqJWOUgmW+v12fZO8+tmM2Ckfozr50mSqwgzhzpB5n71Py2JrSPjxAYPfRRaAHcpfBj1shPKW14JLabrdFO1FqtFlwaxWi2CyQu2pxc6yTePnBFhcFgKdVNa1iqs/TkqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733773107; c=relaxed/simple;
-	bh=atil/lOdgy/Ws5476Rl28gs3kgqtzKy2LcblqKw5w+A=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=TCKalQLCh62+EDAYFAriWLtUdFtLV55frQloHeRdop2AxF5d6r2sDM85Neuw+pbbW3GnRPKrxTeF+8/shulUXcwwSNz8+pmU9JP1S3P17ugzmC8Y0EphzYeruv0oTzo24Wix6rAhaHVL7RioN+CXBMt3yHIIJ2g2x6aWEveXPs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=YxJDp+PF; arc=none smtp.client-ip=209.85.208.54
+	s=arc-20240116; t=1733773109; c=relaxed/simple;
+	bh=dbssU6TIUfAeyRKxrNJ+PSzIm440bW472avNH7xBfXY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=F+pxPYmchVrlHJs7KLD07Msrvv/WQouT9b3X8dGbEKXFuYgZSrEv7Bg1wJY+vTT51kGpHrGbjViKzL4wkjjCOX0LlHMzZ/JspcZCrTV21EDFuu24MnzIBuGH/AAFN4iCW1CL0Kvy4V7z19uj49XyR0njoWCbWVp/TQGNVGvnlmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=HMjrd9Az; arc=none smtp.client-ip=209.85.218.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5d0ac27b412so6038461a12.1
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 11:38:25 -0800 (PST)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-aa68b513abcso218981266b.0
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 11:38:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1733773104; x=1734377904; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HI/HcMLu7s9szrWTpewc5YaMsQsU7zXZgMTmj+UB35w=;
-        b=YxJDp+PFG5Yh6OxCmgiJmtL3ej2Mjmp3f8P3oYzYKaoW1AJlpudn1B4tDcyQd17bUP
-         d5lB3dwfXXxnpMWqOlmPRlh1vC0obLklZEs0OkBDipJPeI2ebM74L/VeT8rSHe8Sjp4M
-         uoNfoqvO83iFTfuHd4HVt5+sX23ft0PJzYLC48MPT9qdwc1pmuWndZnzwyoLO4TpsmzS
-         Ht1UwZQ3Xp9KG77Iu6NNmO8+PO8SLXKzfBzL2vWSt/Cc5xvIgPy5qiH3PH4W7Gd4ro1h
-         DOmwajRdgSh4HygjNYqJFmc3yNpSRjsyQs1EeiOXosryX2E5wOKylF4bF3VqeL8Ww6z6
-         8Ilw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733773104; x=1734377904;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=cloudflare.com; s=google09082023; t=1733773106; x=1734377906; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HI/HcMLu7s9szrWTpewc5YaMsQsU7zXZgMTmj+UB35w=;
-        b=Ym4ZSk8I6aebiI95n2EPEtKvxdThNSOzGQR1CvUATilMGw1ZwuJqoQnxxRSh1L7SEK
-         RjJxtz3GjZaUKsYtCOiOVIi86DF1xJs8e8Niucjtu8eTjwpUog6X4X/WnsxYIQLH3XCn
-         itfUBECfO9YKtIEOtJebylJnT0GsalrQQT7NeqW1DzCBPZyN6H8plip7H1JF+KvBMWZC
-         4fj7IYgS9rdbo/XpOpknU7VQFTLjtrYimDcNc/cJj1woL/enVdRNY+LkCmB9BuBZexiz
-         5p8qKHiAcFRkt3mjTeJmh50rauhSe1BPCECh+Llbft33uOI//xZgWax68UDWOdLSLywO
-         WLYQ==
-X-Gm-Message-State: AOJu0YzCbxcyWx1GUq82WVnlBP0YtbR5Bl+7q0+rWx8XCI33W86VKrk8
-	h2hdwZCgJEOISYe3SywtVmhOYCO9OlxvnlfGTr4ccPxc7UwyNI2gbdavQmT07tQ=
-X-Gm-Gg: ASbGncvlnVfchn4hboInzz2BRlevPshAPk51afrOqp8ip82UZfHzaN9FwSVPR7EqMeI
-	ZGctll3Uvm8Soke/NDc+EDeu/jjkeNPf1m6ek7yhRsaztDl0jUoH6YTDE35H9hCBDQUBOFIx+m8
-	7rpn/ppIDCtXYw9eKLXyr/jD50jgp4xBMkfp3cMuJ26OAcfIKTrYKHHxkkwDz9435aCLhXFF4E5
-	t6e1qRKd+4Ji1CjGCWMfNTBqdmkK9+LoNtDYsECbzc=
-X-Google-Smtp-Source: AGHT+IEzWPyRpNGDSfcL3JmcPMZRmtURtsSE684idXhjb68/5OGF3wcL8t9mha3LyWf13AwfXlzfQw==
-X-Received: by 2002:a05:6402:518f:b0:5d0:b040:4616 with SMTP id 4fb4d7f45d1cf-5d41863b850mr1934981a12.28.1733773103879;
-        Mon, 09 Dec 2024 11:38:23 -0800 (PST)
+        bh=8pIzCOpcrAx2zhkMIMF6XtATodYKMS1VFygMk/XUcNU=;
+        b=HMjrd9AzgA2gI7wWKhdZYso5MUqD5Nqm7459scToAX6hWHN+meAYaIr6+ug68f+Uhs
+         VaIg/Np/b7qbqxrjTnZiCHrhrFHv64ElKhgXHYXirN5iZRP8L8dcIVG9nkig57SdGDt2
+         qlL2q8OyQx5SkOpxdkRBKmRWYen8Js+wZObWWqZtpIhM11LfvTUrgwGgxJ0iteu6PxDh
+         MW8TP40KY4vQAMgOlbBf1aF9p7fOn0I1wfXPiqLgx1rVtRL0aa8wihn+1xD37hTqG01s
+         ZcjHJfGWVRLcHcrk0w7z+3hrdAGl9JbvQ8Hhq6VVhCROlYyzryNe6uDegA8VOAPBwHPk
+         QRQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733773106; x=1734377906;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8pIzCOpcrAx2zhkMIMF6XtATodYKMS1VFygMk/XUcNU=;
+        b=N07lhDXDpW8EOTtaTla4Nh9FEX5flTPs9zhUQjtw2ZoQNKodfwFnbYSkrc2mBcEG1d
+         v9G4lhNd3YgIOhwirfN7mrjCSlHA9oF3wnQ0uDGGH8YBRKoXaqzwhw2OCVJI4i4/MjDj
+         IUVAmt+qJN80JePDh2A2qMaZ+a1QUWrqGlA77UdHamZqImiHb6e81oM9tFSqfqrt4yID
+         a/GuB9dwJpqfFiYna8aGeHqbi8ls4JMknVnsKdf6dhfBFQmfhqvMG55ZWvnr54VU1Ppp
+         RbKjo5Mda4/rNZdn0BZTQXVNpm4HQn+cVczLN6qMcmycmWUi04Cd3XjJdHX/ad7h8dyz
+         drDQ==
+X-Gm-Message-State: AOJu0YwJL5B6MTfrd1Rhl3/Zgb9nx9mxwYIeyM7njaA3xjD4W8XnhNxj
+	xZVEVaF+3gdsO2rosZhlGhNHs2yAkCj0uNIssh0UYUS2or654AV2BLRA7SUGyA8=
+X-Gm-Gg: ASbGncsJlWpZ9ZUH05T4ncbz+EP2cEah7XWeZa2qMUwmCtZhClQbJQC6cbqMY2+IDO5
+	ZN4SFNbnlgeISUgIHS6hiuCQcqL6nxBophBpWJKBlQSeXzGMIl5OnlFOtj1bEKBLCzQfPo9xPpu
+	CUzJ/9Ato+ZXsQjxY/a6HWLxGFow0CDx9BWNS0vq2VNh8r19NNaCHpRwV9VXeZf1zx5dUrUN7lt
+	V1VRjMk2Y57UIFwNUWnwsFvIIaHGfHNqZOoNelYOY5B9D4=
+X-Google-Smtp-Source: AGHT+IH7EsFF0jO6kFRrvzgVi6/fJ1cO8UV9ebuPrbFODrRUiMTpYWfxH7suvY9+07RSaZ022pdAGg==
+X-Received: by 2002:a17:906:cc57:b0:aa6:993a:25a2 with SMTP id a640c23a62f3a-aa6993a349amr291194366b.10.1733773105866;
+        Mon, 09 Dec 2024 11:38:25 -0800 (PST)
 Received: from cloudflare.com ([2a09:bac5:506b:2387::38a:52])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d14c7aa97asm6439440a12.73.2024.12.09.11.38.20
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa67f4c4ae4sm257163866b.111.2024.12.09.11.38.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2024 11:38:22 -0800 (PST)
+        Mon, 09 Dec 2024 11:38:25 -0800 (PST)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Subject: [PATCH net-next v2 0/2] Make TIME-WAIT reuse delay deterministic
- and configurable
-Date: Mon, 09 Dec 2024 20:38:02 +0100
-Message-Id: <20241209-jakub-krn-909-poc-msec-tw-tstamp-v2-0-66aca0eed03e@cloudflare.com>
+Date: Mon, 09 Dec 2024 20:38:03 +0100
+Subject: [PATCH net-next v2 1/2] tcp: Measure TIME-WAIT reuse delay with
+ millisecond precision
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,12 +82,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIABpHV2cC/43PTU7DMBQE4KtUXvPQ829iVtwDsbAdm5o2dmS7o
- ajK3UkjxAKElOVopG80N1J9ib6Sp8ONFD/HGnNaA3s4EHc06c1DHNZMGDKBPZXwbk4XC6eSQKO
- GKTsYq3fQPqDVZsYJUBozSMWF6QRZman4EK/bxAtJvkHy10Ze1+YYa8vlc9ue6dbvn5kpUDBa6
- t5Rjjq4Z3fOlyGcTfGPLo/36W9N79SUVJ2ViCpY/49GGYpdGkJvpRCqMxi4+K3d38/s5zGllO9
- Q2apaNJxLJjqOf9VlWb4AuNSMmNEBAAA=
-X-Change-ID: 20240815-jakub-krn-909-poc-msec-tw-tstamp-05aad5634a74
+Message-Id: <20241209-jakub-krn-909-poc-msec-tw-tstamp-v2-1-66aca0eed03e@cloudflare.com>
+References: <20241209-jakub-krn-909-poc-msec-tw-tstamp-v2-0-66aca0eed03e@cloudflare.com>
+In-Reply-To: <20241209-jakub-krn-909-poc-msec-tw-tstamp-v2-0-66aca0eed03e@cloudflare.com>
 To: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>
@@ -95,60 +93,131 @@ Cc: Jason Xing <kerneljasonxing@gmail.com>,
  Lee Valentine <lvalentine@cloudflare.com>, kernel-team@cloudflare.com
 X-Mailer: b4 0.15-dev-355e8
 
-This patch set is an effort to enable faster reuse of TIME-WAIT sockets.
-We have recently talked about the motivation and the idea at Plumbers [1].
+Prepare ground for TIME-WAIT socket reuse with subsecond delay.
 
-Experiment in production
-------------------------
+Today the last TS.Recent update timestamp, recorded in seconds and stored
+tp->ts_recent_stamp and tw->tw_ts_recent_stamp fields, has two purposes.
 
-We are restarting our experiment on a small set of production nodes as the
-code has slightly changed since v1 [2], and there are still a few weeks of
-development window to soak the changes. We will report back if we observe
-any regressions.
+Firstly, it is used to track the age of the last recorded TS.Recent value
+to detect when that value becomes outdated due to potential wrap-around of
+the other TCP timestamp clock (RFC 7323, section 5.5).
 
-Packetdrill tests
------------------
+For this purpose a second-based timestamp is completely sufficient as even
+in the worst case scenario of a peer using a high resolution microsecond
+timestamp, the wrap-around interval is ~36 minutes long.
 
-The packetdrill tests for TIME-WAIT reuse [3] did not change since v1.
-Although we are not touching PAWS code any more, I would still like to add
-tests to cover PAWS reject after TW reuse. This, however, requires patching
-packetdrill as I mentioned in the last cover letter [2].
+Secondly, it serves as a threshold value for allowing TIME-WAIT socket
+reuse. A TIME-WAIT socket can be reused only once the virtual 1 Hz clock,
+ktime_get_seconds, is past the TS.Recent update timestamp.
 
-Thanks,
--jkbs
+The purpose behind delaying the TIME-WAIT socket reuse is to wait for the
+other TCP timestamp clock to tick at least once before reusing the
+connection. It is only then that the PAWS mechanism for the reopened
+connection can detect old duplicate segments from the previous connection
+incarnation (RFC 7323, appendix B.2).
 
-[1] https://lpc.events/event/18/contributions/1962/
-[2] https://lore.kernel.org/r/20241113-jakub-krn-909-poc-msec-tw-tstamp-v2-0-b0a335247304@cloudflare.com
-[3] https://github.com/google/packetdrill/pull/90
+In this case using a timestamp with second resolution not only blocks the
+way toward allowing faster TIME-WAIT reuse after shorter subsecond delay,
+but also makes it impossible to reliably delay TW reuse by one second.
+
+As Eric Dumazet has pointed out [1], due to timestamp rounding, the TW
+reuse delay will actually be between (0, 1] seconds, and 0.5 seconds on
+average. We delay TW reuse for one full second only when last TS.Recent
+update coincides with our virtual 1 Hz clock tick.
+
+Considering the above, introduce a dedicated field to store a millisecond
+timestamp of transition into the TIME-WAIT state. Place it in an existing
+4-byte hole inside inet_timewait_sock structure to avoid an additional
+memory cost.
+
+Use the new timestamp to (i) reliably delay TIME-WAIT reuse by one second,
+and (ii) prepare for configurable subsecond reuse delay in the subsequent
+change.
+
+We assume here that a full one second delay was the original intention in
+[2] because it accounts for the worst case scenario of the other TCP using
+the slowest recommended 1 Hz timestamp clock.
+
+A more involved alternative would be to change the resolution of the last
+TS.Recent update timestamp, tw->tw_ts_recent_stamp, to milliseconds.
+
+[1] https://lore.kernel.org/netdev/CANn89iKB4GFd8sVzCbRttqw_96o3i2wDhX-3DraQtsceNGYwug@mail.gmail.com/
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b8439924316d5bcb266d165b93d632a4b4b859af
 
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
-Changes in v2:
-- Pivot to a dedicated msec timestamp for entering TIME-WAIT state (Eric)
-- Link to v1: https://lore.kernel.org/r/20241204-jakub-krn-909-poc-msec-tw-tstamp-v1-0-8b54467a0f34@cloudflare.com
+ include/net/inet_timewait_sock.h | 4 ++++
+ net/ipv4/tcp_ipv4.c              | 5 +++--
+ net/ipv4/tcp_minisocks.c         | 7 ++++++-
+ 3 files changed, 13 insertions(+), 3 deletions(-)
 
-Changes in v1:
-- packetdrill: Adjust TS val for reused connection so value keep increasing
-- Link to RFCv2: https://lore.kernel.org/r/20241113-jakub-krn-909-poc-msec-tw-tstamp-v2-0-b0a335247304@cloudflare.com
+diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_sock.h
+index 62c0a7e65d6bdf4c71a8ea90586b985f9fd30229..67a313575780992a1b55aa26aaa2055111eb7e8d 100644
+--- a/include/net/inet_timewait_sock.h
++++ b/include/net/inet_timewait_sock.h
+@@ -74,6 +74,10 @@ struct inet_timewait_sock {
+ 				tw_tos		: 8;
+ 	u32			tw_txhash;
+ 	u32			tw_priority;
++	/**
++	 * @tw_reuse_stamp: Time of entry into %TCP_TIME_WAIT state in msec.
++	 */
++	u32			tw_entry_stamp;
+ 	struct timer_list	tw_timer;
+ 	struct inet_bind_bucket	*tw_tb;
+ 	struct inet_bind2_bucket	*tw_tb2;
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index a38c8b1f44dbd95fcea08bd81e0ceaa70177ac8a..3b6ba1d16921e079d5ba08c3c0b98dccace8c370 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -120,6 +120,7 @@ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
+ 	const struct tcp_timewait_sock *tcptw = tcp_twsk(sktw);
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 	int ts_recent_stamp;
++	u32 reuse_thresh;
+ 
+ 	if (READ_ONCE(tw->tw_substate) == TCP_FIN_WAIT2)
+ 		reuse = 0;
+@@ -162,9 +163,9 @@ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
+ 	   and use initial timestamp retrieved from peer table.
+ 	 */
+ 	ts_recent_stamp = READ_ONCE(tcptw->tw_ts_recent_stamp);
++	reuse_thresh = READ_ONCE(tw->tw_entry_stamp) + MSEC_PER_SEC;
+ 	if (ts_recent_stamp &&
+-	    (!twp || (reuse && time_after32(ktime_get_seconds(),
+-					    ts_recent_stamp)))) {
++	    (!twp || (reuse && time_after32(tcp_clock_ms(), reuse_thresh)))) {
+ 		/* inet_twsk_hashdance_schedule() sets sk_refcnt after putting twsk
+ 		 * and releasing the bucket lock.
+ 		 */
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index 7121d8573928cbf6840b3361b62f4812d365a30b..b089b08e9617862cd73b47ac06b5ac6c1e843ec6 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -157,8 +157,11 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 				    rcv_nxt);
+ 
+ 		if (tmp_opt.saw_tstamp) {
++			u64 ts = tcp_clock_ms();
++
++			WRITE_ONCE(tw->tw_entry_stamp, ts);
+ 			WRITE_ONCE(tcptw->tw_ts_recent_stamp,
+-				  ktime_get_seconds());
++				   div_u64(ts, MSEC_PER_SEC));
+ 			WRITE_ONCE(tcptw->tw_ts_recent,
+ 				   tmp_opt.rcv_tsval);
+ 		}
+@@ -316,6 +319,8 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
+ 		tw->tw_mark		= sk->sk_mark;
+ 		tw->tw_priority		= READ_ONCE(sk->sk_priority);
+ 		tw->tw_rcv_wscale	= tp->rx_opt.rcv_wscale;
++		/* refreshed when we enter true TIME-WAIT state */
++		tw->tw_entry_stamp	= tcp_time_stamp_ms(tp);
+ 		tcptw->tw_rcv_nxt	= tp->rcv_nxt;
+ 		tcptw->tw_snd_nxt	= tp->snd_nxt;
+ 		tcptw->tw_rcv_wnd	= tcp_receive_window(tp);
 
-Changes in RFCv2:
-- Make TIME-WAIT reuse configurable through a per-netns sysctl.
-- Account for timestamp rounding so delay is not shorter than set value.
-- Use tcp_mstamp when we know it is fresh due to receiving a segment.
-- Link to RFCv1: https://lore.kernel.org/r/20240819-jakub-krn-909-poc-msec-tw-tstamp-v1-1-6567b5006fbe@cloudflare.com
-
----
-Jakub Sitnicki (2):
-      tcp: Measure TIME-WAIT reuse delay with millisecond precision
-      tcp: Add sysctl to configure TIME-WAIT reuse delay
-
- Documentation/networking/ip-sysctl.rst                     | 14 ++++++++++++++
- .../networking/net_cachelines/netns_ipv4_sysctl.rst        |  1 +
- include/net/inet_timewait_sock.h                           |  4 ++++
- include/net/netns/ipv4.h                                   |  1 +
- net/ipv4/sysctl_net_ipv4.c                                 | 10 ++++++++++
- net/ipv4/tcp_ipv4.c                                        |  7 +++++--
- net/ipv4/tcp_minisocks.c                                   |  7 ++++++-
- 7 files changed, 41 insertions(+), 3 deletions(-)
+-- 
+2.43.0
 
 
