@@ -1,129 +1,85 @@
-Return-Path: <netdev+bounces-150284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2CC69E9CA2
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:08:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C1F3E9E9CAF
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:11:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9514281646
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:08:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62455282A76
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:11:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AF911547E9;
-	Mon,  9 Dec 2024 17:08:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A8514AD22;
+	Mon,  9 Dec 2024 17:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PJgEiu3f"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Q8VMzWgb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE43E1531E2
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 17:08:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20822143871;
+	Mon,  9 Dec 2024 17:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733764101; cv=none; b=hTNyoDoyS2eScQ8JjbBxc2ezN08Diqn5RnaWiy3lnf4dLAJThTBeyiDMZ4C1OOV63AibeyxIN7cDK4A76IiOdOWQ1X29q6B8A+/oXpSGdBhw1Qz8yIBXrMWGYd/0D98OxWrZNh11BgRykbS3l6F1EhyQjBCK2UIFnD9p81BZ8yc=
+	t=1733764289; cv=none; b=NA6aoFn8A0BUN79kh2DsXjccg4rdcVgOfxQzfDm3cRK4uDxWxaGhtxxrDwNQKT8OHpugf/y0ifDmIK0d04TmH7tkzHqcFfgjdkheg3y8/V1PbWXyn+V0qAOIBFv9HD6Aw/vYzch1QK0rdssq032f8BqAFsjx8zR6DJ6IftQni0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733764101; c=relaxed/simple;
-	bh=XftrnEfg+GuY0cyTaFtHNYuyzky3F02KxQKZel1SWtE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HnblZVi6usd3jgF1FOLyc6qYEpNqJib33VNT6HlldcjuIk0LQAOrBjy3iJqmNcUuv6RnOrdI1cDpVUJBNmgccxmGKx0g5IEbQo8EDQKDiROxF/u2NLPt+HeQqmlb9tfDr5PTutMUcTovpgjalVd7ahlD3o4AajoyPlWDHOpGHR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PJgEiu3f; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4675936f333so306961cf.0
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 09:08:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733764099; x=1734368899; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XftrnEfg+GuY0cyTaFtHNYuyzky3F02KxQKZel1SWtE=;
-        b=PJgEiu3fs69cvhsqrnjBcGv7VjTFqpkrQvh+sbS2H/8vbfUW/gQ9uy7JHEaqUPrc6a
-         RX9lHKiKFEq1QrVkxtjuafsJExci4v+hm6BzVqASGZCQuFQlQ17SJvwKfdTbOgcVhzbi
-         4StiAPsF8B23IvsAA6zoDRkUV1/XFL8xIkvzhyXUXUfhwGzso8ZkC3XZWJ5C/2S6cMpn
-         sZ2GXd0nB9F53oRo/Y7va3n6/nBC6iuflxPSHNGliVN8gOMnjGeUeN6fs+pAgJmNclvg
-         1Zn2Xip6pSvLo2zpGRsQrJEe/xpXzInfEnotFTsRZ2Nw8NoBjUhYzRCFqaye53qSWNgz
-         FYjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733764099; x=1734368899;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XftrnEfg+GuY0cyTaFtHNYuyzky3F02KxQKZel1SWtE=;
-        b=a7wcq5/Z9mq3RaNj3NQe9OAb3feWIyWACVgVoLkePR0TxEf0ZyXTnnSPpNWIVF40t4
-         WB92UrVC8JC/WxlLSi8kXahytOiCErRwQpipA5BIgci3qgGj1WOfCQN0ZtAKZEF3CrEq
-         KJBMeaWNzfeJgmiMr+8h7CGDXlU4iSQO4aFkCtS1PmSg5FNxVILX494/WHgFXR+ZxX4h
-         eK2OroEI671w3BJyLZRC/fViJrEWdySi29SjVXNpZtNWPs5ie+mfSL6AmvlcTxO+9kHJ
-         VND8N2v+XUD+XyTzELRB0nQfdONPh37/L3ed0VHqeN1cbAOVIF21fJxlP++/YxsEpJaI
-         36WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUkddZlRqIOHV4IazvUv49M24/WOwwT/wIo/CcoLqNOrmS5FbVw2C/Tqj3u/RqTOXYuNsMAtjk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNHatZpIQYd4sCKhwYD7idXhaWuLMZuuAs0BY0TKdZxc9GkwAu
-	WjujpNshqD35p1sWKAfYDI7kI5CLyNDiRuRimjWFhdjYife1M59PfzGqvi8B9Ox4dny6SIAE1GS
-	OJnkSDxGMcNOaG4po5hnbJ3Y1s9wVLfw42i5y
-X-Gm-Gg: ASbGncv5hJ+ywJgrCD4G2QMZOnFGtCKVkTofjAbDGET20g5pi8v+vRnkJ4Bpck16jP7
-	vHw6TqZcbJRpou6k5uJeIwxmcnOxG+tH6fyUU+fP9EnCdtPKWigC4T2GwCqqObg==
-X-Google-Smtp-Source: AGHT+IGeV6Sg1dvO6Ay82bghSQYKpO0qY0K+S5ujSVGXWSjhRfpqCgtwGSRFgftx2kyBpPDMxRyasb5mx4JgD0XGf4Y=
-X-Received: by 2002:a05:622a:58cf:b0:467:462e:a51b with SMTP id
- d75a77b69052e-46746f67fdbmr9222931cf.14.1733764098474; Mon, 09 Dec 2024
- 09:08:18 -0800 (PST)
+	s=arc-20240116; t=1733764289; c=relaxed/simple;
+	bh=ngMmvBElSZG0QFrk2B2dVDCtmQH1Qc2tCmNXX3Dvnss=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DuGxWHPV+aaQdQ+8FQ9gNZpqsk8hWLScFGRh9FrHYjx1csueKM+XJ6qiPO7Y2K1lAJxFJYoBkALrvjAIVi33kNlassxTQIqwKNcGz80z4Y/yisAa39YSXkxlU4BaydKXmaRnaC1Gkppl3uA/VUFOnMSfNVXUth3RE4UGpsibv/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Q8VMzWgb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=B/1VlGu9aZrC/pPeI68fRvjJG+KMxrkY7sSrAbkXbT8=; b=Q8VMzWgbMvHGCD4qrAQ3Qq7DIt
+	mgvx7hG9QGfxtGtJBscvnUOFD1em46UmyECwC7O47ZQ2ksAEsbHSoQIRJ2B1JqsX2P0JOnulMPImL
+	lMAlabWGvjTFieyK2F8gw0iV0qj/ItbAgYVnxErOjA2KGVkCkcKnzThOHd97IMYK8ePc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tKhHz-00FhIO-LJ; Mon, 09 Dec 2024 18:11:19 +0100
+Date: Mon, 9 Dec 2024 18:11:19 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tarun Alle <Tarun.Alle@microchip.com>
+Cc: arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
+	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: phy: microchip_t1: Autonegotiaion
+ support for LAN887x T1 phy
+Message-ID: <1d230d3c-740b-4876-a0f7-e48361b6d238@lunn.ch>
+References: <20241209161427.3580256-1-Tarun.Alle@microchip.com>
+ <20241209161427.3580256-3-Tarun.Alle@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241204172204.4180482-1-dw@davidwei.uk> <20241204172204.4180482-6-dw@davidwei.uk>
-In-Reply-To: <20241204172204.4180482-6-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 9 Dec 2024 09:08:06 -0800
-Message-ID: <CAHS8izPQQwpHTwJqTL+6cvo04sC1WEhcY7WuA_Umquk4oRCGag@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 05/17] net: page_pool: add ->scrub mem
- provider callback
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241209161427.3580256-3-Tarun.Alle@microchip.com>
 
-On Wed, Dec 4, 2024 at 9:22=E2=80=AFAM David Wei <dw@davidwei.uk> wrote:
->
-> From: Pavel Begunkov <asml.silence@gmail.com>
->
-> Some page pool memory providers like io_uring need to catch the point
-> when the page pool is asked to be destroyed. ->destroy is not enough
-> because it relies on the page pool to wait for its buffers first, but
-> for that to happen a provider might need to react, e.g. to collect all
-> buffers that are currently given to the user space.
->
-> Add a new provider's scrub callback serving the purpose and called off
-> the pp's generic (cold) scrubbing path, i.e. page_pool_scrub().
->
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
+> -	/* First patch only supports 100Mbps and 1000Mbps force-mode.
+> -	 * T1 Auto-Negotiation (Clause 98 of IEEE 802.3) will be added later.
+> -	 */
+> -	linkmode_clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, phydev->supported);
+> -
 
-I think after numerous previous discussions on this op, I guess I
-finally see the point.
+What are the backwards compatibility issues here? I would at least
+expect some comments in the commit message. As far as i understand, up
+until this patch, it always required forced configuration. With this
+patch, it suddenly will auto-neg by default? If the link partner is
+not expecting auto-neg, that will fail.
 
-AFAIU on destruction tho io_uring instance will destroy the page_pool,
-but we need to drop the user reference in the memory region. So the
-io_uring instance will destroy the pool, then the scrub callback tells
-io_uring that the pool is being destroyed, which drops the user
-references.
+> +/* LAN887X Errata: 100M master issue. Dual speed in Aneg is not supported. */
 
-I would have preferred if io_uring drops the user references before
-destroying the pool, which I think would have accomplished the same
-thing without adding a memory provider callback that is a bit specific
-to this use case, but I guess it's all the same.
+Please could you expand on this. We are now doing auto-neg by default,
+and auto-neg is somewhat broken?
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-
---=20
-Thanks,
-Mina
+	Andrew
 
