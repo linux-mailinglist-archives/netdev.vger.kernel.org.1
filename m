@@ -1,615 +1,464 @@
-Return-Path: <netdev+bounces-150131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 158699E905B
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:36:08 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FE7B9E9064
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:36:54 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0F5F2824CA
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:36:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98EF81651CB
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:36:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057E0219A92;
-	Mon,  9 Dec 2024 10:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678E5216E39;
+	Mon,  9 Dec 2024 10:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ZIIrI962"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53439217F25
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 10:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5C2216E3B;
+	Mon,  9 Dec 2024 10:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733740497; cv=none; b=P3RYb48eda47EzSq6y/lpVE6VwiyXqRj/A2bssCq5fn6c+r6QI4nxMpuJSkNPZIQvNRtJLddXu3C7DgV+/n3b0iGfoU8sAodOSmQ6hsRQtcdMQ1VKlko72I5gzc2B6S3CgNgLegVk08SD1fUEmWTftY/HMEgXDpfgwwCgyoNyFk=
+	t=1733740522; cv=none; b=aQWn5Hh1A+snRDnwKrjeT9SPIXvKF6IIq91FyaNsKFK32/b+8G+4tljRMbdEmfnUN4wE0/bo3cwwmDiv/cLA6LlZh//xS30dmgl0P21Nq1WMRoqXw0fNxMgSXeaE/ywmev86N5JgD/2qb8dq+0vFPzybulWDmDvHQbpVH3BRxok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733740497; c=relaxed/simple;
-	bh=Pv1y2rUk4D7YIRTWWFsMKM9CRt6p2zuOxY5NCh5B+JA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e6jJSMGg033E+y2t7ilyEf5yGQZIv2SrFbZyeh5NtHwIn9e2dv8aSEiieZPTJqCeUXvREqpjXVHKCOjjJcVa7T3r/3hUgEK7eN4ycKxc3Y9E9ABtxHRrebmgE27BlPXceAsQYdl6V94E+GHKdg2xyRjVdhgemYVD7vKjQ2VN4/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tKb65-00063w-U5; Mon, 09 Dec 2024 11:34:37 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tKb63-002UsM-0n;
-	Mon, 09 Dec 2024 11:34:36 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tKb63-001VY0-30;
-	Mon, 09 Dec 2024 11:34:35 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Roan van Dijk <roan@protonic.nl>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH v2 4/4] arm: dts: stm32: Add Priva E-Measuringbox devicetree
-Date: Mon,  9 Dec 2024 11:34:34 +0100
-Message-Id: <20241209103434.359522-5-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241209103434.359522-1-o.rempel@pengutronix.de>
-References: <20241209103434.359522-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1733740522; c=relaxed/simple;
+	bh=V5LBcTHLhKacE07FccmaYdNmNLE5eTgn9lJ+cRDgDdQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Qz/uuk5lvlArK+Ec1JHkQZ7QgIMKt1ZRVfl+4G9frDkxcUBPE4floanzKGod/zZCQlp0uvk2FZWcOBfpipKvFY41oGG9uIYTdGBtSNpsR5XBwZ7MA5aypba9qBcJ/ALGliFG35pf0w7S2548WMNuj0iTds6+Hf2G8pxBweGzZPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ZIIrI962; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4B9AYknv090518;
+	Mon, 9 Dec 2024 04:34:46 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1733740486;
+	bh=IsPw+LQRUnCnanH7t9Kuob0H3qrAiI/xNlXeOV0nBHI=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=ZIIrI962/DAEdDYaDYgVnnpsNxmI+8K+RXVCE7G589/gPvGKw17eYGqc/B+lVYs07
+	 Lk4QWL1aqvEfRzIZpS5HfKKEV/NEo5wT0mG8cJmYln/1FTMSIuyE6ijTyisN5Ooc5r
+	 JBBzTU2urshLjGVefvakwLO1tW0QUk6jrxpVXzL8=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4B9AYkGF109951
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 9 Dec 2024 04:34:46 -0600
+Received: from DLEE110.ent.ti.com (157.170.170.21) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 9
+ Dec 2024 04:34:46 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 9 Dec 2024 04:34:46 -0600
+Received: from [10.24.69.13] (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4B9AYfC2088003;
+	Mon, 9 Dec 2024 04:34:41 -0600
+Message-ID: <64621290-2488-474d-b2ed-597a1f4ac85f@ti.com>
+Date: Mon, 9 Dec 2024 16:04:40 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 1/2] net: ti: icssg-prueth: Fix firmware load
+ sequence.
+To: Roger Quadros <rogerq@kernel.org>, <vigneshr@ti.com>,
+        <jan.kiszka@siemens.com>, <javier.carrasco.cruz@gmail.com>,
+        <diogo.ivo@siemens.com>, <jacob.e.keller@intel.com>,
+        <horms@kernel.org>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        <danishanwar@ti.com>
+References: <20241205082831.777868-1-m-malladi@ti.com>
+ <20241205082831.777868-2-m-malladi@ti.com>
+ <a86bc0b1-8bb4-477e-b7e1-13921bf47b53@kernel.org>
+Content-Language: en-US
+From: Meghana Malladi <m-malladi@ti.com>
+In-Reply-To: <a86bc0b1-8bb4-477e-b7e1-13921bf47b53@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-From: Roan van Dijk <roan@protonic.nl>
 
-Introduce the devicetree for the Priva E-Measuringbox board
-(stm32mp133c-prihmb), based on the STM32MP133 SoC.
 
-Signed-off-by: Roan van Dijk <roan@protonic.nl>
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- arch/arm/boot/dts/st/Makefile               |   1 +
- arch/arm/boot/dts/st/stm32mp133c-prihmb.dts | 496 ++++++++++++++++++++
- 2 files changed, 497 insertions(+)
- create mode 100644 arch/arm/boot/dts/st/stm32mp133c-prihmb.dts
+On 05/12/24 18:38, Roger Quadros wrote:
+> Hi,
+> 
+> On 05/12/2024 10:28, Meghana Malladi wrote:
+>> From: MD Danish Anwar <danishanwar@ti.com>
+>>
+>> Timesync related operations are ran in PRU0 cores for both ICSSG SLICE0
+>> and SLICE1. Currently whenever any ICSSG interface comes up we load the
+>> respective firmwares to PRU cores and whenever interface goes down, we
+>> stop the resective cores. Due to this, when SLICE0 goes down while
+>> SLICE1 is still active, PRU0 firmwares are unloaded and PRU0 core is
+>> stopped. This results in clock jump for SLICE1 interface as the timesync
+>> related operations are no longer running.
+>>
+>> As there are interdependencies between SLICE0 and SLICE1 firmwares,
+>> fix this by running both PRU0 and PRU1 firmwares as long as at least 1
+>> ICSSG interface is up. Add new flag in prueth struct to check if all
+>> firmwares are running.
+>>
+>> Use emacs_initialized as reference count to load the firmwares for the
+>> first and last interface up/down. Moving init_emac_mode and fw_offload_mode
+>> API outside of icssg_config to icssg_common_start API as they need
+>> to be called only once per firmware boot.
+>>
+>> Fixes: c1e0230eeaab ("net: ti: icss-iep: Add IEP driver")
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+>> ---
+>>
+>> Hi all,
+>>
+>> This patch is based on net-next tagged next-20241128.
+>> v2:https://lore.kernel.org/all/20241128122931.2494446-2-m-malladi@ti.com/
+>>
+>> * Changes since v2 (v3-v2):
+>> - error handling in caller function of prueth_emac_common_start()
+>> - Use prus_running flag check before stopping the firmwares
+>> Both suggested by Roger Quadros <rogerq@kernel.org>
+>>
+>>   drivers/net/ethernet/ti/icssg/icssg_config.c |  45 ++++--
+>>   drivers/net/ethernet/ti/icssg/icssg_config.h |   1 +
+>>   drivers/net/ethernet/ti/icssg/icssg_prueth.c | 157 ++++++++++++-------
+>>   drivers/net/ethernet/ti/icssg/icssg_prueth.h |   5 +
+>>   4 files changed, 140 insertions(+), 68 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
+>> index 5d2491c2943a..342150756cf7 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
+>> @@ -397,7 +397,7 @@ static int prueth_emac_buffer_setup(struct prueth_emac *emac)
+>>   	return 0;
+>>   }
+>>
+[ ... ]
 
-diff --git a/arch/arm/boot/dts/st/Makefile b/arch/arm/boot/dts/st/Makefile
-index eab3a9bd435f..c4c01415fa85 100644
---- a/arch/arm/boot/dts/st/Makefile
-+++ b/arch/arm/boot/dts/st/Makefile
-@@ -29,6 +29,7 @@ dtb-$(CONFIG_ARCH_STM32) += \
- 	stm32h743i-eval.dtb \
- 	stm32h743i-disco.dtb \
- 	stm32h750i-art-pi.dtb \
-+	stm32mp133c-prihmb.dtb \
- 	stm32mp135f-dhcor-dhsbc.dtb \
- 	stm32mp135f-dk.dtb \
- 	stm32mp151a-prtt1a.dtb \
-diff --git a/arch/arm/boot/dts/st/stm32mp133c-prihmb.dts b/arch/arm/boot/dts/st/stm32mp133c-prihmb.dts
-new file mode 100644
-index 000000000000..663b6de1b814
---- /dev/null
-+++ b/arch/arm/boot/dts/st/stm32mp133c-prihmb.dts
-@@ -0,0 +1,496 @@
-+// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
-+/dts-v1/;
-+
-+#include <dt-bindings/gpio/gpio.h>
-+#include <dt-bindings/input/input.h>
-+#include <dt-bindings/leds/common.h>
-+#include <dt-bindings/regulator/st,stm32mp13-regulator.h>
-+#include "stm32mp133.dtsi"
-+#include "stm32mp13xc.dtsi"
-+#include "stm32mp13-pinctrl.dtsi"
-+
-+/ {
-+	model = "Priva E-Measuringbox board";
-+	compatible = "pri,prihmb", "st,stm32mp133";
-+
-+	aliases {
-+		ethernet0 = &ethernet1;
-+		mdio-gpio0 = &mdio0;
-+		mmc0 = &sdmmc1;
-+		mmc1 = &sdmmc2;
-+		serial0 = &uart4;
-+		serial1 = &usart6;
-+		serial2 = &uart7;
-+	};
-+
-+	chosen {
-+		stdout-path = "serial0:115200n8";
-+	};
-+
-+	counter-0 {
-+		compatible = "interrupt-counter";
-+		gpios = <&gpioa 11 GPIO_ACTIVE_HIGH>;
-+	};
-+
-+	gpio-keys {
-+		compatible = "gpio-keys";
-+		autorepeat;
-+
-+		button-reset {
-+			label = "reset-button";
-+			linux,code = <BTN_1>;
-+			gpios = <&gpioi 7 GPIO_ACTIVE_LOW>;
-+		};
-+	};
-+
-+	leds {
-+		compatible = "gpio-leds";
-+
-+		led-blue {
-+			function = LED_FUNCTION_HEARTBEAT;
-+			color = <LED_COLOR_ID_BLUE>;
-+			gpios = <&gpioa 14 GPIO_ACTIVE_LOW>;
-+			linux,default-trigger = "heartbeat";
-+			default-state = "off";
-+		};
-+	};
-+
-+	led-controller-0 {
-+		compatible = "pwm-leds-multicolor";
-+
-+		multi-led {
-+			color = <LED_COLOR_ID_RGB>;
-+			function = LED_FUNCTION_STATUS;
-+			max-brightness = <255>;
-+
-+			led-red {
-+				active-low;
-+				color = <LED_COLOR_ID_RED>;
-+				pwms = <&pwm2 2 1000000 1>;
-+			};
-+
-+			led-green {
-+				active-low;
-+				color = <LED_COLOR_ID_GREEN>;
-+				pwms = <&pwm1 1 1000000 1>;
-+			};
-+
-+			led-blue {
-+				active-low;
-+				color = <LED_COLOR_ID_BLUE>;
-+				pwms = <&pwm1 2 1000000 1>;
-+			};
-+		};
-+	};
-+
-+	led-controller-1 {
-+		compatible = "pwm-leds-multicolor";
-+
-+		multi-led {
-+			color = <LED_COLOR_ID_RGB>;
-+			function = LED_FUNCTION_STATUS;
-+			max-brightness = <255>;
-+
-+			led-red {
-+				active-low;
-+				color = <LED_COLOR_ID_RED>;
-+				pwms = <&pwm1 0 1000000 1>;
-+			};
-+
-+			led-green {
-+				active-low;
-+				color = <LED_COLOR_ID_GREEN>;
-+				pwms = <&pwm2 0 1000000 1>;
-+			};
-+
-+			led-blue {
-+				active-low;
-+				color = <LED_COLOR_ID_BLUE>;
-+				pwms = <&pwm2 1 1000000 1>;
-+			};
-+		};
-+	};
-+
-+	/* DP83TD510E PHYs have max MDC rate of 1.75MHz. Since we can't reduce
-+	 * stmmac MDC clock without reducing system bus rate, we need to use
-+	 * gpio based MDIO bus.
-+	 */
-+	mdio0: mdio {
-+		compatible = "virtual,mdio-gpio";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		gpios = <&gpiog 2 GPIO_ACTIVE_HIGH
-+			 &gpioa 2 GPIO_ACTIVE_HIGH>;
-+
-+		/* TI DP83TD510E */
-+		phy0: ethernet-phy@0 {
-+			compatible = "ethernet-phy-id2000.0181";
-+			reg = <0>;
-+			interrupts-extended = <&gpioa 4 IRQ_TYPE_LEVEL_LOW>;
-+			reset-gpios = <&gpioa 3 GPIO_ACTIVE_LOW>;
-+			reset-assert-us = <10>;
-+			reset-deassert-us = <35>;
-+		};
-+	};
-+
-+	memory@c0000000 {
-+		device_type = "memory";
-+		reg = <0xc0000000 0x10000000>;
-+	};
-+
-+	reg_3v3: regulator-3v3 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "3v3";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+	};
-+
-+	reserved-memory {
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+		ranges;
-+
-+		optee@ce000000 {
-+			reg = <0xce000000 0x02000000>;
-+			no-map;
-+		};
-+	};
-+};
-+
-+&adc_1 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&adc_1_pins_a>;
-+	vdda-supply = <&reg_3v3>;
-+	vref-supply = <&reg_3v3>;
-+	status = "okay";
-+};
-+
-+&adc1 {
-+	status = "okay";
-+
-+	channel@0 { /* Fan current PC0*/
-+		reg = <0>;
-+		st,min-sample-time-ns = <10000>;  /* 10µs sampling time */
-+	};
-+	channel@11 { /* Fan voltage */
-+		reg = <11>;
-+		st,min-sample-time-ns = <10000>;  /* 10µs sampling time */
-+	};
-+	channel@15 { /* Supply voltage */
-+		reg = <15>;
-+		st,min-sample-time-ns = <10000>;  /* 10µs sampling time */
-+	};
-+};
-+
-+&dts {
-+	status = "okay";
-+};
-+
-+&ethernet1 {
-+	status = "okay";
-+	pinctrl-0 = <&ethernet1_rmii_pins_a>;
-+	pinctrl-1 = <&ethernet1_rmii_sleep_pins_a>;
-+	pinctrl-names = "default", "sleep";
-+	phy-mode = "rmii";
-+	phy-handle = <&phy0>;
-+};
-+
-+&i2c1 {
-+	pinctrl-names = "default", "sleep";
-+	pinctrl-0 = <&i2c1_pins_a>;
-+	pinctrl-1 = <&i2c1_sleep_pins_a>;
-+	clock-frequency = <100000>;
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+	status = "okay";
-+
-+	board-sensor@48 {
-+		compatible = "ti,tmp1075";
-+		reg = <0x48>;
-+		vs-supply = <&reg_3v3>;
-+	};
-+};
-+
-+&{i2c1_pins_a/pins} {
-+	pinmux = <STM32_PINMUX('D', 3, AF5)>, /* I2C1_SCL */
-+		 <STM32_PINMUX('B', 8, AF4)>; /* I2C1_SDA */
-+	bias-disable;
-+	drive-open-drain;
-+	slew-rate = <0>;
-+};
-+
-+&{i2c1_sleep_pins_a/pins} {
-+	pinmux = <STM32_PINMUX('D', 3, ANALOG)>, /* I2C1_SCL */
-+		 <STM32_PINMUX('B', 8, ANALOG)>; /* I2C1_SDA */
-+};
-+
-+&iwdg2 {
-+	timeout-sec = <32>;
-+	status = "okay";
-+};
-+
-+/* SD card without Card-detect */
-+&sdmmc1 {
-+	pinctrl-names = "default", "opendrain", "sleep";
-+	pinctrl-0 = <&sdmmc1_b4_pins_a &sdmmc1_clk_pins_a>;
-+	pinctrl-1 = <&sdmmc1_b4_od_pins_a &sdmmc1_clk_pins_a>;
-+	pinctrl-2 = <&sdmmc1_b4_sleep_pins_a>;
-+	broken-cd;
-+	no-sdio;
-+	no-1-8-v;
-+	st,neg-edge;
-+	bus-width = <4>;
-+	vmmc-supply = <&reg_3v3>;
-+	status = "okay";
-+};
-+
-+/* EMMC */
-+&sdmmc2 {
-+	pinctrl-names = "default", "opendrain", "sleep";
-+	pinctrl-0 = <&sdmmc2_b4_pins_a &sdmmc2_d47_pins_a &sdmmc2_clk_pins_a>;
-+	pinctrl-1 = <&sdmmc2_b4_od_pins_a &sdmmc2_d47_pins_a &sdmmc2_clk_pins_a>;
-+	pinctrl-2 = <&sdmmc2_b4_sleep_pins_a &sdmmc2_d47_sleep_pins_a>;
-+	non-removable;
-+	no-sd;
-+	no-sdio;
-+	no-1-8-v;
-+	st,neg-edge;
-+	mmc-ddr-3_3v;
-+	bus-width = <8>;
-+	vmmc-supply = <&reg_3v3>;
-+	status = "okay";
-+};
-+
-+&timers1 {
-+	status = "okay";
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+
-+	pwm1: pwm {
-+		pinctrl-0 = <&pwm1_pins_a>;
-+		pinctrl-1 = <&pwm1_sleep_pins_a>;
-+		pinctrl-names = "default", "sleep";
-+		status = "okay";
-+	};
-+};
-+
-+&timers4 {
-+	status = "okay";
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+
-+	pwm2: pwm {
-+		pinctrl-0 = <&pwm4_pins_a>;
-+		pinctrl-1 = <&pwm4_sleep_pins_a>;
-+		pinctrl-names = "default", "sleep";
-+		status = "okay";
-+	};
-+};
-+
-+/* Fan PWM */
-+&timers5 {
-+	status = "okay";
-+
-+	pwm3: pwm {
-+		pinctrl-0 = <&pwm5_pins_a>;
-+		pinctrl-1 = <&pwm5_sleep_pins_a>;
-+		pinctrl-names = "default", "sleep";
-+		status = "okay";
-+	};
-+};
-+
-+&timers2 {
-+	status = "okay";
-+
-+	timer@1 {
-+		status = "okay";
-+	};
-+};
-+
-+&uart4 {
-+	pinctrl-names = "default", "sleep", "idle";
-+	pinctrl-0 = <&uart4_pins_a>;
-+	pinctrl-1 = <&uart4_sleep_pins_a>;
-+	pinctrl-2 = <&uart4_idle_pins_a>;
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+	status = "okay";
-+};
-+
-+&uart7 {
-+	pinctrl-names = "default", "sleep", "idle";
-+	pinctrl-0 = <&uart7_pins_a>;
-+	pinctrl-1 = <&uart7_sleep_pins_a>;
-+	pinctrl-2 = <&uart7_idle_pins_a>;
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+	status = "okay";
-+};
-+
-+&usart6 {
-+	pinctrl-names = "default", "sleep", "idle";
-+	pinctrl-0 = <&usart6_pins_a>;
-+	pinctrl-1 = <&usart6_sleep_pins_a>;
-+	pinctrl-2 = <&usart6_idle_pins_a>;
-+	linux,rs485-enabled-at-boot-time;
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+	status = "okay";
-+};
-+
-+&pinctrl {
-+	adc_1_pins_a: adc1-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('C', 0, ANALOG)>, /* ADC1 in0 */
-+				 <STM32_PINMUX('C', 2, ANALOG)>, /* ADC1 in15 */
-+				 <STM32_PINMUX('F', 13, ANALOG)>; /* ADC1 in11 */
-+		};
-+	};
-+
-+	ethernet1_rmii_pins_a: rmii-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('G', 13, AF11)>, /* ETH1_RMII_TXD0 */
-+				 <STM32_PINMUX('G', 14, AF11)>, /* ETH1_RMII_TXD1 */
-+				 <STM32_PINMUX('B', 11, AF11)>, /* ETH1_RMII_TX_EN */
-+				 <STM32_PINMUX('A', 1, AF11)>;   /* ETH1_RMII_REF_CLK */
-+			bias-disable;
-+			drive-push-pull;
-+			slew-rate = <2>;
-+		};
-+		pins2 {
-+			pinmux = <STM32_PINMUX('C', 4, AF11)>,  /* ETH1_RMII_RXD0 */
-+				 <STM32_PINMUX('C', 5, AF11)>,  /* ETH1_RMII_RXD1 */
-+				 <STM32_PINMUX('A', 7, AF11)>;  /* ETH1_RMII_CRS_DV */
-+			bias-disable;
-+		};
-+	};
-+
-+	ethernet1_rmii_sleep_pins_a: rmii-sleep-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('G', 13, ANALOG)>, /* ETH1_RMII_TXD0 */
-+				 <STM32_PINMUX('G', 14, ANALOG)>, /* ETH1_RMII_TXD1 */
-+				 <STM32_PINMUX('B', 11, ANALOG)>, /* ETH1_RMII_TX_EN */
-+				 <STM32_PINMUX('C', 4, ANALOG)>,  /* ETH1_RMII_RXD0 */
-+				 <STM32_PINMUX('C', 5, ANALOG)>,  /* ETH1_RMII_RXD1 */
-+				 <STM32_PINMUX('A', 1, ANALOG)>,  /* ETH1_RMII_REF_CLK */
-+				 <STM32_PINMUX('A', 7, ANALOG)>;  /* ETH1_RMII_CRS_DV */
-+		};
-+	};
-+
-+	pwm1_pins_a: pwm1-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('E', 9, AF1)>, /* TIM1_CH1 */
-+				 <STM32_PINMUX('E', 11, AF1)>, /* TIM1_CH2 */
-+				 <STM32_PINMUX('E', 13, AF1)>; /* TIM1_CH3 */
-+			bias-pull-down;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+	};
-+
-+	pwm1_sleep_pins_a: pwm1-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('E', 9, ANALOG)>, /* TIM1_CH1 */
-+				 <STM32_PINMUX('E', 11, ANALOG)>, /* TIM1_CH2 */
-+				 <STM32_PINMUX('E', 13, ANALOG)>; /* TIM1_CH3 */
-+		};
-+	};
-+
-+	pwm4_pins_a: pwm4-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('D', 12, AF2)>, /* TIM4_CH1 */
-+				 <STM32_PINMUX('B', 7, AF2)>, /* TIM4_CH2 */
-+				 <STM32_PINMUX('D', 14, AF2)>; /* TIM4_CH3 */
-+			bias-pull-down;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+	};
-+
-+	pwm4_sleep_pins_a: pwm4-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('D', 12, ANALOG)>, /* TIM4_CH1 */
-+				 <STM32_PINMUX('B', 7, ANALOG)>, /* TIM4_CH2 */
-+				 <STM32_PINMUX('D', 14, ANALOG)>; /* TIM4_CH3 */
-+		};
-+	};
-+	pwm5_pins_a: pwm5-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('A', 0, AF2)>; /* TIM5_CH1 */
-+		};
-+	};
-+
-+	pwm5_sleep_pins_a: pwm5-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('A', 0, ANALOG)>; /* TIM5_CH1 */
-+		};
-+	};
-+
-+	uart7_pins_a: uart7-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('E', 8, AF7)>; /* UART_TX */
-+			bias-disable;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+		pins2 {
-+			pinmux = <STM32_PINMUX('E', 10, AF7)>; /* UART7_RX */
-+			bias-pull-up;
-+		};
-+	};
-+
-+	uart7_idle_pins_a: uart7-idle-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('E', 8, ANALOG)>; /* UART7_TX */
-+		};
-+		pins2 {
-+			pinmux = <STM32_PINMUX('E', 10, AF7)>; /* UART7_RX */
-+			bias-pull-up;
-+		};
-+	};
-+
-+	uart7_sleep_pins_a: uart7-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('E', 8, ANALOG)>, /* UART7_TX */
-+				 <STM32_PINMUX('E', 10, ANALOG)>; /* UART7_RX */
-+		};
-+	};
-+
-+	usart6_pins_a: usart6-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('F', 8, AF7)>, /* USART6_TX */
-+				 <STM32_PINMUX('F', 10, AF7)>; /* USART6_DE */
-+			bias-disable;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+		pins2 {
-+			pinmux = <STM32_PINMUX('H', 11, AF7)>; /* USART6_RX */
-+			bias-disable;
-+		};
-+	};
-+
-+	usart6_idle_pins_a: usart6-idle-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('F', 8, ANALOG)>; /* USART6_TX */
-+		};
-+		pins2 {
-+			pinmux = <STM32_PINMUX('F', 10, AF7)>; /* USART6_DE */
-+			bias-disable;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+		pins3 {
-+			pinmux = <STM32_PINMUX('H', 11, AF7)>; /* USART6_RX */
-+			bias-disable;
-+		};
-+	};
-+
-+	usart6_sleep_pins_a: usart6-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('F', 8, ANALOG)>, /* USART6_TX */
-+				 <STM32_PINMUX('F', 10, ANALOG)>, /* USART6_DE */
-+				 <STM32_PINMUX('H', 11, ANALOG)>; /* USART6_RX */
-+		};
-+	};
-+};
--- 
-2.39.5
+>> +static int prueth_emac_common_start(struct prueth *prueth)
+>> +{
+>> +	struct prueth_emac *emac;
+>> +	int ret = 0;
+>> +	int slice;
+>> +
+>> +	if (!prueth->emac[ICSS_SLICE0] && !prueth->emac[ICSS_SLICE1])
+>> +		return -EINVAL;
+>> +
+>> +	/* clear SMEM and MSMC settings for all slices */
+>> +	memset_io(prueth->msmcram.va, 0, prueth->msmcram.size);
+>> +	memset_io(prueth->shram.va, 0, ICSSG_CONFIG_OFFSET_SLICE1 * PRUETH_NUM_MACS);
+>> +
+>> +	icssg_class_default(prueth->miig_rt, ICSS_SLICE0, 0, false);
+>> +	icssg_class_default(prueth->miig_rt, ICSS_SLICE1, 0, false);
+>> +
+>> +	if (prueth->is_switch_mode || prueth->is_hsr_offload_mode)
+>> +		icssg_init_fw_offload_mode(prueth);
+>> +	else
+>> +		icssg_init_emac_mode(prueth);
+>> +
+>> +	for (slice = 0; slice < PRUETH_NUM_MACS; slice++) {
+>> +		emac = prueth->emac[slice];
+>> +		if (emac) {
+>> +			ret |= icssg_config(prueth, emac, slice);
+>> +			if (ret)
+>> +				return ret;
+>> +		}
+>> +		ret |= prueth_emac_start(prueth, slice);
+>> +	}
+> 
+> need newline?
+> 
 
+Yes I will add it.
+
+>> +	if (!ret)
+>> +		prueth->prus_running = 1;
+>> +	else
+>> +		return ret;
+>> +
+>> +	emac = prueth->emac[ICSS_SLICE0] ? prueth->emac[ICSS_SLICE0] :
+>> +	       prueth->emac[ICSS_SLICE1];
+>> +	ret = icss_iep_init(emac->iep, &prueth_iep_clockops,
+>> +			    emac, IEP_DEFAULT_CYCLE_TIME_NS);
+>> +	if (ret) {
+>> +		dev_err(prueth->dev, "Failed to initialize IEP module\n");
+>> +		return ret;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int prueth_emac_common_stop(struct prueth *prueth)
+>> +{
+>> +	struct prueth_emac *emac;
+>> +	int slice;
+>> +
+>> +	if (!prueth->emac[ICSS_SLICE0] && !prueth->emac[ICSS_SLICE1])
+>> +		return -EINVAL;
+>> +
+>> +	icssg_class_disable(prueth->miig_rt, ICSS_SLICE0);
+>> +	icssg_class_disable(prueth->miig_rt, ICSS_SLICE1);
+>> +
+>> +	for (slice = 0; slice < PRUETH_NUM_MACS; slice++) {
+>> +		if (prueth->prus_running) {
+>> +			rproc_shutdown(prueth->txpru[slice]);
+>> +			rproc_shutdown(prueth->rtu[slice]);
+>> +			rproc_shutdown(prueth->pru[slice]);
+>> +		}
+>> +	}
+>> +	prueth->prus_running = 0;
+>> +
+>> +	emac = prueth->emac[ICSS_SLICE0] ? prueth->emac[ICSS_SLICE0] :
+>> +	       prueth->emac[ICSS_SLICE1];
+>> +	icss_iep_exit(emac->iep);
+> 
+> if icss_iep_init() failed at prueth_emac_common_start(), we should not be
+> calling icss_iep_exit(). Maybe you need another flag for iep_init status?
+> 
+
+Yes I have thought of it as well. In icss_iep_init() does lot of iep 
+register configuration and in the end it enables iep by setting 
+IEP_CNT_ENABLE bit and ptp_clock_register(). Whereas in icss_iep_exit() 
+it checks for ptp_clock and pps/perout. And calls icss_iep_disable() 
+which again clears IEP_CNT_ENABLE.
+
+So I see no harm in calling icss_iep_exit() even if icss_iep_init() as 
+it overwrites the existing configuration only. But if you think this 
+doesn't look good I can definitely add new flag for iep as well. But IMO 
+I think this flag would be redundant, please correct me if I am wrong. 
+So which one sounds better?
+
+> Is it better to call icss_iep_exit() at the top before icssg_class_disable()?
+> 
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>   /* called back by PHY layer if there is change in link state of hw port*/
+>>   static void emac_adjust_link(struct net_device *ndev)
+>>   {
+>> @@ -369,12 +432,13 @@ static void prueth_iep_settime(void *clockops_data, u64 ns)
+>>   {
+>>   	struct icssg_setclock_desc __iomem *sc_descp;
+>>   	struct prueth_emac *emac = clockops_data;
+>> +	struct prueth *prueth = emac->prueth;
+>>   	struct icssg_setclock_desc sc_desc;
+>>   	u64 cyclecount;
+>>   	u32 cycletime;
+>>   	int timeout;
+>>   
+>> -	if (!emac->fw_running)
+>> +	if (!prueth->prus_running)
+>>   		return;
+>>   
+>>   	sc_descp = emac->prueth->shram.va + TIMESYNC_FW_WC_SETCLOCK_DESC_OFFSET;
+>> @@ -543,23 +607,17 @@ static int emac_ndo_open(struct net_device *ndev)
+>>   {
+>>   	struct prueth_emac *emac = netdev_priv(ndev);
+>>   	int ret, i, num_data_chn = emac->tx_ch_num;
+>> +	struct icssg_flow_cfg __iomem *flow_cfg;
+>>   	struct prueth *prueth = emac->prueth;
+>>   	int slice = prueth_emac_slice(emac);
+>>   	struct device *dev = prueth->dev;
+>>   	int max_rx_flows;
+>>   	int rx_flow;
+>>   
+>> -	/* clear SMEM and MSMC settings for all slices */
+>> -	if (!prueth->emacs_initialized) {
+>> -		memset_io(prueth->msmcram.va, 0, prueth->msmcram.size);
+>> -		memset_io(prueth->shram.va, 0, ICSSG_CONFIG_OFFSET_SLICE1 * PRUETH_NUM_MACS);
+>> -	}
+>> -
+>>   	/* set h/w MAC as user might have re-configured */
+>>   	ether_addr_copy(emac->mac_addr, ndev->dev_addr);
+>>   
+>>   	icssg_class_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
+>> -	icssg_class_default(prueth->miig_rt, slice, 0, false);
+>>   	icssg_ft1_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
+>>   
+>>   	/* Notify the stack of the actual queue counts. */
+>> @@ -597,18 +655,23 @@ static int emac_ndo_open(struct net_device *ndev)
+>>   		goto cleanup_napi;
+>>   	}
+>>   
+>> -	/* reset and start PRU firmware */
+>> -	ret = prueth_emac_start(prueth, emac);
+>> -	if (ret)
+>> -		goto free_rx_irq;
+>> +	if (!prueth->emacs_initialized) {
+>> +		ret = prueth_emac_common_start(prueth);
+>> +		if (ret)
+>> +			goto stop;
+>> +	}
+>>   
+>> -	icssg_mii_update_mtu(prueth->mii_rt, slice, ndev->max_mtu);
+>> +	flow_cfg = emac->dram.va + ICSSG_CONFIG_OFFSET + PSI_L_REGULAR_FLOW_ID_BASE_OFFSET;
+>> +	writew(emac->rx_flow_id_base, &flow_cfg->rx_base_flow);
+>> +	ret = emac_fdb_flow_id_updated(emac);
+>>   
+>> -	if (!prueth->emacs_initialized) {
+>> -		ret = icss_iep_init(emac->iep, &prueth_iep_clockops,
+>> -				    emac, IEP_DEFAULT_CYCLE_TIME_NS);
+>> +	if (ret) {
+>> +		netdev_err(ndev, "Failed to update Rx Flow ID %d", ret);
+>> +		goto stop;
+>>   	}
+>>   
+>> +	icssg_mii_update_mtu(prueth->mii_rt, slice, ndev->max_mtu);
+>> +
+>>   	ret = request_threaded_irq(emac->tx_ts_irq, NULL, prueth_tx_ts_irq,
+>>   				   IRQF_ONESHOT, dev_name(dev), emac);
+>>   	if (ret)
+>> @@ -653,8 +716,7 @@ static int emac_ndo_open(struct net_device *ndev)
+>>   free_tx_ts_irq:
+>>   	free_irq(emac->tx_ts_irq, emac);
+>>   stop:
+>> -	prueth_emac_stop(emac);
+>> -free_rx_irq:
+>> +	prueth_emac_common_stop(prueth);
+>>   	free_irq(emac->rx_chns.irq[rx_flow], emac);
+>>   cleanup_napi:
+>>   	prueth_ndev_del_tx_napi(emac, emac->tx_ch_num);
+>> @@ -689,8 +751,6 @@ static int emac_ndo_stop(struct net_device *ndev)
+>>   	if (ndev->phydev)
+>>   		phy_stop(ndev->phydev);
+>>   
+>> -	icssg_class_disable(prueth->miig_rt, prueth_emac_slice(emac));
+>> -
+>>   	if (emac->prueth->is_hsr_offload_mode)
+>>   		__dev_mc_unsync(ndev, icssg_prueth_hsr_del_mcast);
+>>   	else
+>> @@ -728,11 +788,9 @@ static int emac_ndo_stop(struct net_device *ndev)
+>>   	/* Destroying the queued work in ndo_stop() */
+>>   	cancel_delayed_work_sync(&emac->stats_work);
+>>   
+>> -	if (prueth->emacs_initialized == 1)
+>> -		icss_iep_exit(emac->iep);
+>> -
+>>   	/* stop PRUs */
+>> -	prueth_emac_stop(emac);
+>> +	if (prueth->emacs_initialized == 1)
+>> +		prueth_emac_common_stop(prueth);
+>>   
+>>   	free_irq(emac->tx_ts_irq, emac);
+>>   
+>> @@ -1069,16 +1127,10 @@ static void prueth_emac_restart(struct prueth *prueth)
+>>   	icssg_set_port_state(emac1, ICSSG_EMAC_PORT_DISABLE);
+>>   
+>>   	/* Stop both pru cores for both PRUeth ports*/
+>> -	prueth_emac_stop(emac0);
+>> -	prueth->emacs_initialized--;
+>> -	prueth_emac_stop(emac1);
+>> -	prueth->emacs_initialized--;
+>> +	prueth_emac_common_stop(prueth);
+>>   
+>>   	/* Start both pru cores for both PRUeth ports */
+>> -	prueth_emac_start(prueth, emac0);
+>> -	prueth->emacs_initialized++;
+>> -	prueth_emac_start(prueth, emac1);
+>> -	prueth->emacs_initialized++;
+>> +	prueth_emac_common_start(prueth);
+> 
+> But this can fail? You need to deal with failure condition appropriately.
+> 
+
+I haven't added failure conditions for two reasons:
+- Existing code also didn't have any error checks
+- This func simply reloads a new firmware, given everything is already 
+working with the old one.
+
+I can still handle error cases by changing this func to return int 
+(currently it is void) and caller of the functions should print error 
+and immediately return. Thoughts on this?
+
+>>   
+>>   	/* Enable forwarding for both PRUeth ports */
+>>   	icssg_set_port_state(emac0, ICSSG_EMAC_PORT_FORWARD);
+>> @@ -1413,13 +1465,10 @@ static int prueth_probe(struct platform_device *pdev)
+>>   		prueth->pa_stats = NULL;
+>>   	}
+>>   
+>> -	if (eth0_node) {
+>> +	if (eth0_node || eth1_node) {
+>>   		ret = prueth_get_cores(prueth, ICSS_SLICE0, false);
+>>   		if (ret)
+>>   			goto put_cores;
+>> -	}
+>> -
+>> -	if (eth1_node) {
+>>   		ret = prueth_get_cores(prueth, ICSS_SLICE1, false);
+>>   		if (ret)
+>>   			goto put_cores;
+>> @@ -1618,14 +1667,12 @@ static int prueth_probe(struct platform_device *pdev)
+>>   	pruss_put(prueth->pruss);
+>>   
+>>   put_cores:
+>> -	if (eth1_node) {
+>> -		prueth_put_cores(prueth, ICSS_SLICE1);
+>> -		of_node_put(eth1_node);
+>> -	}
+>> -
+>> -	if (eth0_node) {
+>> +	if (eth0_node || eth1_node) {
+>>   		prueth_put_cores(prueth, ICSS_SLICE0);
+>>   		of_node_put(eth0_node);
+>> +
+>> +		prueth_put_cores(prueth, ICSS_SLICE1);
+>> +		of_node_put(eth1_node);
+>>   	}
+>>   
+>>   	return ret;
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> index f5c1d473e9f9..b30f2e9a73d8 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> @@ -257,6 +257,7 @@ struct icssg_firmwares {
+>>    * @is_switchmode_supported: indicates platform support for switch mode
+>>    * @switch_id: ID for mapping switch ports to bridge
+>>    * @default_vlan: Default VLAN for host
+>> + * @prus_running: flag to indicate if all pru cores are running
+>>    */
+>>   struct prueth {
+>>   	struct device *dev;
+>> @@ -298,6 +299,7 @@ struct prueth {
+>>   	int default_vlan;
+>>   	/** @vtbl_lock: Lock for vtbl in shared memory */
+>>   	spinlock_t vtbl_lock;
+>> +	bool prus_running;
+> 
+> I think you don't need fw_running flag anymore. Could you please remove it
+> from struct prueth_emac?
+> 
+
+This flag is still being used by SR1, for which this patch doesn't 
+apply. So I prefer not touching this flag for the sake of SR1.
+
+>>   };
+>>   
+>>   struct emac_tx_ts_response {
+>> @@ -361,6 +363,8 @@ int icssg_set_port_state(struct prueth_emac *emac,
+>>   			 enum icssg_port_state_cmd state);
+>>   void icssg_config_set_speed(struct prueth_emac *emac);
+>>   void icssg_config_half_duplex(struct prueth_emac *emac);
+>> +void icssg_init_emac_mode(struct prueth *prueth);
+>> +void icssg_init_fw_offload_mode(struct prueth *prueth);
+>>   
+>>   /* Buffer queue helpers */
+>>   int icssg_queue_pop(struct prueth *prueth, u8 queue);
+>> @@ -377,6 +381,7 @@ void icssg_vtbl_modify(struct prueth_emac *emac, u8 vid, u8 port_mask,
+>>   		       u8 untag_mask, bool add);
+>>   u16 icssg_get_pvid(struct prueth_emac *emac);
+>>   void icssg_set_pvid(struct prueth *prueth, u8 vid, u8 port);
+>> +int emac_fdb_flow_id_updated(struct prueth_emac *emac);
+>>   #define prueth_napi_to_tx_chn(pnapi) \
+>>   	container_of(pnapi, struct prueth_tx_chn, napi_tx)
+>>   
+> 
 
