@@ -1,89 +1,133 @@
-Return-Path: <netdev+bounces-150398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA0079EA18D
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 22:59:55 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BCAD16650B
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 21:59:52 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DBB719CCEA;
-	Mon,  9 Dec 2024 21:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="HIjMhimM"
-X-Original-To: netdev@vger.kernel.org
-Received: from forward501b.mail.yandex.net (forward501b.mail.yandex.net [178.154.239.145])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 721339EA182
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 22:56:38 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C49E46B8;
-	Mon,  9 Dec 2024 21:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.145
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A624B282ABE
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 21:56:35 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740A619D8A2;
+	Mon,  9 Dec 2024 21:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jSHBlCEN"
+X-Original-To: netdev@vger.kernel.org
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E861119ABD4
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 21:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733781591; cv=none; b=Ddri+Gi9jSp2eeIx0zUCKPItw51KcuB+kjxHYhPXHG7BjDRDKhiV7lNSQxpfUSyKzCE7Ke7elhH2VqHfu9Bynlfu3lk59zdMnUdk1NbpWa0Kr5eP8FzCSI7tHv8C4HRSuRExNcKHd27V7bTX9EXF3e9PxsAfsj9i+mZbqiVy0Ys=
+	t=1733781392; cv=none; b=Qpicg/BV1hHDjORDQ7i/uFQujzwfr2Br+vrjlmONQCK7lxZx+a1MG/r+9mXcMjo7SZOSku4nb53HZsHbXujGLBTJ4IKsyPC+1sfeXhfyxu3W98UcQ7W45TFmkIuz+7x+Iuf6EX2KkL1dg+t6FqGpF/loflqqWEs8EA/qlBW0TTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733781591; c=relaxed/simple;
-	bh=xW7ZmK2B0htEycOpCVgUY8dcJBraRFu06QHIgAgRS74=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y5YhJIkCOQYCzw9Hy1nLnSGYHfwVg41fGNK+6reVW6K7/7Wbevb9wzaZXL5ikbmYcc1MSUQLbzTRU1q6UKSS3mQCILl3odz5L/GBxkQiE/9kaOZm9KyioK8+hf+3qQd9RpC7Cut+nsf7+yBFs++OH/VD4yzQQWZaY8cjX3IBcwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=HIjMhimM; arc=none smtp.client-ip=178.154.239.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-44.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-44.sas.yp-c.yandex.net [IPv6:2a02:6b8:c08:df8e:0:640:17d3:0])
-	by forward501b.mail.yandex.net (Yandex) with ESMTPS id 9042060F09;
-	Tue, 10 Dec 2024 00:54:00 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-44.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id wrtY5C7OkOs0-IdUUzKrN;
-	Tue, 10 Dec 2024 00:53:59 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1733781239; bh=SmV0sEeOxNWdfnUsqBc8E3RnQowYN4KxbN37yd34Omk=;
-	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
-	b=HIjMhimMoBXuxmsVNQoNa25l8d6z1/dm2UK9jcBYoaCseYR34yKIZMYOJi5YKz05/
-	 1nXydnBaccaYP7cuKDh1/8esqYaWwfgpabgLJiBBNTwveMxF3ek/yfSB0c4SpmAYOh
-	 PaqSVCDauoxdPm+ncN0CVIHkD2LmTTdylF+yNMBY=
-Authentication-Results: mail-nwsmtp-smtp-production-main-44.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <2472c4bf-c089-4c80-bb45-31014f4acd9f@yandex.ru>
-Date: Tue, 10 Dec 2024 00:53:58 +0300
+	s=arc-20240116; t=1733781392; c=relaxed/simple;
+	bh=rLikFwWBaSJVkAJl7elSg6TEqIpcLFI+lP4vN60vbY8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=KF2Ik4APr9ASKJQTZN3MAieEejUrILzMlPHHffrcH5nAI9Nu/xD+g5JlFLgLlGVzqnVGRZmjmk/xtCPqLFMT61MJFzOsmz9Vhwe18nhheuhI7cyzcRp5Up67q0m/DlkEfejQEqMWW56sJLAcwH5F6xb3gm3sZADtymkikx/V0ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jSHBlCEN; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <09b0c78a-09be-474d-b080-bdd5e7c76e40@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1733781386;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TOMJNfwreH26POHoZy5xtvsHbwUvB7HFQGPmn4XFhZI=;
+	b=jSHBlCENcCjlMvV4QEHL7fQNkI18KFeKgHb5YtptsmiyeYpaVaqLT9E2O3+o5Gj0caMwLl
+	d7grm7+qCqqqJVKH8Ji6raz+jUveO4CTsD9uG0IGjIjvcOrJo5T+Q8ccBZ1Su6mNWJu/Up
+	EZesVWjK28vBGG2kfkZvEcGJziqQFUk=
+Date: Mon, 9 Dec 2024 13:56:21 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] tun: fix group permission check
+Subject: Re: unregistering tcp_ca struct_ops can cause kernel page fault
+To: rtm@csail.mit.edu
+References: <74665.1733669976@localhost>
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-References: <20241205073614.294773-1-stsp2@yandex.ru>
- <20241207174400.6acdd88f@kernel.org>
- <062ab380-ee73-45ad-9519-e71bb3059c13@yandex.ru>
- <20241209134430.5cdefa09@kernel.org>
-From: stsp <stsp2@yandex.ru>
-In-Reply-To: <20241209134430.5cdefa09@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org
+In-Reply-To: <74665.1733669976@localhost>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-10.12.2024 00:44, Jakub Kicinski пишет:
-> On Sun, 8 Dec 2024 09:53:40 +0300 stsp wrote:
->>> I personally put a --- line between SOB and the CCs.
->>> That way git am discards the CCs when patch is applied.
->>>   
->> I simply used the output of
->> get_maintainer.pl and copy/pasted
->> it directly to commit msg.
->> After doing so, git format-patch
->> would put --- after CCs.
->> How to do that properly?
-> You can have multiple --- markers, you can insert your marker and let
-> git format-patch add another.
+On 12/8/24 6:59 AM, rtm@csail.mit.edu wrote:
+> The attached program, along with the attached bpf_cubic.o eBPF binary,
+> uses bpftool to install a tcp_ca struct ops, creates a tcp connection,
+> and then unregisters the struct ops while the tcp connection is still
+> active. On my 6.13.0 system this causes a kernel fault due to
 
-Thank you.
+I tried the latest bpf-next/master (6.13-r2 + some recent bpf patches). I cannot 
+reproduce. I also don't recall any recent fix related to struct_ops refcnt in 
+the bpf_struct_ops or bpf_tcp_ca.
+
+I don't see how this could happen now because the icsk->icsk_ca_ops is 
+refcnt-ed. e.g. the setsockopt(TCP_CONGESTION) in your attached tcpbpf12a.c. 
+bpf_try_module_get, which then calls bpf_struct_ops_get for the bpf written 
+tcp-cc, should have refcnt-ed the icsk_ca_ops. I traced on the kernel code path 
+triggered by your tcpbpf12a.c and the refcnt looks correct.
+
+If you can reproduce consistently, please help to debug and narrow further why 
+the bpf_struct_ops_map_free() cleanup is finished while a tcp_sock still has a 
+hold of it in icsk->icsk_ca_ops.
+
+> tcp_tso_segs() calling through a de-allocated struct tcp_congestion_ops.
+> 
+> bpf_cubic.o came from
+> 
+>    https://github.com/aroodgar/bpf-tcp-congestion-control-algorithm
+> 
+> Linux ubuntu66 6.13.0-rc1-00337-g7503345ac5f5 #11 SMP Sun Dec  8 08:37:57 EST 2024 x86_64 x86_64 x86_64 GNU/Linux
+> 
+> Oops: general protection fault, probably for non-canonical address 0x6b6b6b6b6b6b6b6b: 0000 [#1] SMP DEBUG_PAGEALLOC PTI
+> CPU: 6 UID: 0 PID: 1594 Comm: a.out Not tainted 6.13.0-rc1-00337-g7503345ac5f5 #11
+> Hardware name: FreeBSD BHYVE/BHYVE, BIOS 14.0 10/17/2021
+> RIP: 0010:__x86_indirect_thunk_array+0xa/0x20
+> Code: 66 0f 1f 00 31 ff e9 15 70 d6 fe cc cc cc cc cc cc cc cc cc cc cc cc cc cc
+>   cc cc cc cc cc cc cc e8 01 00 00 00 cc 48 89 04 24 <c3> cc cc cc cc 90 66 66 2e
+>   0f 1f 84 00 00 00 00 00 0f 1f 44 00 00
+> RSP: 0018:ffffc90002037c60 EFLAGS: 00010202
+> RAX: 6b6b6b6b6b6b6b6b RBX: ffff88810afc0b00 RCX: 0000000000000018
+> RDX: 00000000077b668a RSI: 0000000000008000 RDI: ffff88810afc0b00
+> RBP: 0000000000008000 R08: 0000000000000000 R09: 0000000000008000
+> R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+> R13: 0000000000008000 R14: 0000000000000000 R15: ffffffff842f6140
+> FS:  00007f5457b84740(0000) GS:ffff88842db80000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f5457d8c710 CR3: 000000011b4b8005 CR4: 00000000003706f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>   <TASK>
+>   ? die_addr+0x31/0x80
+>   ? exc_general_protection+0x1b4/0x3c0
+>   ? asm_exc_general_protection+0x26/0x30
+>   ? __x86_indirect_thunk_array+0xa/0x20
+>   ? tcp_tso_segs+0x1c/0x90
+>   ? tcp_write_xmit+0x74/0x1840
+>   ? __mod_memcg_state+0x91/0x190
+>   ? __tcp_push_pending_frames+0x31/0xc0
+>   ? tcp_sendmsg_locked+0xafc/0xd10
+>   ? tcp_sendmsg+0x26/0x40
+>   ? sock_write_iter+0x167/0x1a0
+>   ? vfs_write+0x35d/0x400
+>   ? ksys_write+0xc6/0xe0
+>   ? do_syscall_64+0x3f/0xd0
+>   ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>   </TASK>
+> 
+> Robert Morris
+> rtm@mit.edu
+> 
 
 
