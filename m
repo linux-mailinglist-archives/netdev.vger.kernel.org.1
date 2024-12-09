@@ -1,186 +1,137 @@
-Return-Path: <netdev+bounces-150330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 525E79E9E29
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 19:37:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3785D9E9E45
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 19:45:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 224CD18883C0
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:37:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CF23188390D
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B035172767;
-	Mon,  9 Dec 2024 18:37:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXmykJUJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B24414E2CC;
+	Mon,  9 Dec 2024 18:45:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CDD167DAC
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 18:37:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF14013B59A
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 18:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733769430; cv=none; b=EHrL9U6JikHVj2f9WIIbZLJ71zmFXVSQjMQxcPlSTGRJ8eGELC0K+ajmVaIka4ZeHpdFAmS2S/MY/cGS+h9RqwbnjmJmJNuV85hf9AuJfiD9HySYNmtDwbn5Bn7NiSxG5z0rbBDy587emiovzCBqFvXSpeF0rvYd3XG0AJoMN2Y=
+	t=1733769929; cv=none; b=UCW4Y819UgLBSfljomcdHJ2Im7+je0kSdi/2OuCJfPJyjJcG1O8HX/hOmQylvgmfhn67tHCZZ4WtaKc6J3ZrSmMilDQ8TGMuSCm0Kx2qiZoNL3bL0f2XcUtuQ2XqxsP6dRu9aPBABvSIyNtHhJRQrHCcjHZ3ONpIby3NXGPTlcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733769430; c=relaxed/simple;
-	bh=ZIK0EewLVrJBA4Uc/hArxadlByCLJJ7W5uA/zEoxoWc=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=o4d+VZUoRSk3WIRQkjHqKejlRc9i4bwB47FWiU1VtkyyffdltaeFk6w9A6SUegOqpZ+UXOcVXkRmXeewbh/e1UmbEJIbc52vItO8IWXDLAtXmMR7bfmezc9H6PkNmAAzAoELb+X967GyH0EQKvvEGAtn5qQ5YgTBVvaXgwxzuFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXmykJUJ; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7b676152a86so571945785a.1
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 10:37:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733769427; x=1734374227; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J/YmFDgpUpDSzsmPW5+tzjrqrqfqeFy/GKHYDmvyeOE=;
-        b=KXmykJUJm4ZraINr1+bPbyKLaoxDcKRdFYdnZE7taJ4xVlukbwzCbwR0teKkFezIRj
-         t4A1SEgvoz/41uCifcTUavdQ6dgUnhdGxiJun+mi1Smy4Y0jV8uwnECSdHnsl3Sjwaxx
-         XF7Rg9T2Tjxbw7Tmne+YSMu4uZ6dXfor7eGZDxnOCuS/3FkmZTPh0PzZy5EFHQMUl8y7
-         WSerFE2HPp5m9eteuAhPEDwuR6uxlDmjM+XFTbaDe7lYDZowooTTwlG9SLB0CuXAu00t
-         K/wpw6485GdrqkfFP67k49wDt1T+xxY9DzxD1NgLkxD0fzvGzlwDWSf2RE5KgU9QhJNr
-         jihQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733769427; x=1734374227;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=J/YmFDgpUpDSzsmPW5+tzjrqrqfqeFy/GKHYDmvyeOE=;
-        b=by5ThhEaMsFlalXB+BFxwlEhAfFvdFBtHyEtYodIUFZcKCR/etqnwI0Bv0PYKvOF1N
-         GP6lkzi5gDJ2GMisegDTh6LYm9Mpj8qRqc+o5OohwYhVvHwkXKTWpgvxDWhDQvtij1Q2
-         Oa3xJxp9Citgt87ubUT7AUekBokFSL855dHzVxY2k0kTCOhGTUA660HmIK388nOPy2Y+
-         OMH89QKBBgQ49Y7/GHtGr/YFukenOz3W1b8zg5o5H0ZcZDtu7iFcem3SBrN7N7bI8Baw
-         Zkdiwl9p0OALadBQE6riLEKt5Rt+FXkj1pW9GOyomg8MaTpfrn6aVbkGTai2LeuYcN88
-         g6kA==
-X-Gm-Message-State: AOJu0YyU+pr9FBwP77pRw02hRLxqWDCkRoJDp4WlMd/jEt12hSErNBAR
-	RSt7GZMZBeFkyYtdiJihK36pI+DkWL7as3f8sgPohOkXkcKk7a/SsZkidg==
-X-Gm-Gg: ASbGncurFbvplScwysxkT4kRObYWiS0616HMOboId7IFo4tFHvjGDHn0Qsv5sk708kv
-	zvULIqkOjz5SPT7XgnPUfzE1H5UP+T0ttilKK7J59r5YE43q5sxXC7jVk7UszPWW6kYMio02yGN
-	miPnhpSaKJZdmmNqsT8hLDsBe1ncu9FO5UQPQQJwLeF6R12xI9qVK/41BJeZU8tG7q3TMZ3L4WP
-	ptOHgJANoGsFr6E0k/W4pE762DMQ2E1gfKfUGRB9QsObVZjzC4McMeG+72kri0L
-X-Google-Smtp-Source: AGHT+IFEscSXGykpGsOxgaBS5AmGwPIxbfVmAh1BJMkQaGwAzO4EmqeEjstbL3/MLV/n4r2sAHR4gQ==
-X-Received: by 2002:a05:620a:2a05:b0:7b6:dd89:d86f with SMTP id af79cd13be357-7b6de7616d8mr50365785a.24.1733769426837;
-        Mon, 09 Dec 2024 10:37:06 -0800 (PST)
-Received: from [192.168.128.127] ([142.114.175.98])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b6dbb3b67fsm47068685a.10.2024.12.09.10.37.05
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Dec 2024 10:37:06 -0800 (PST)
-Message-ID: <ef68689e-7e0b-4702-a762-d214c7d76e3b@gmail.com>
-Date: Mon, 9 Dec 2024 13:36:55 -0500
+	s=arc-20240116; t=1733769929; c=relaxed/simple;
+	bh=BVuwvrbSPEmPLGDwReMAzkGJoDptDqqDsx1VPr97Dnk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uPewBDZFEQ/VucxciZA6JoUK0JuIrRi602ijmXf8EVIkCZbEng9J6N+7cAhUl6pzFPLOA8KwvVo73n4LDdnDzakCYMTKNogw17grPxGjvtIYOMXrd7bIsSF79i5gFUFxWv+U3BsRvjjqTD+QmDTZ5dXh9C6p8mC2jR6X83RVBPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
+Received: from mail-relay (helo=jo-so.de)
+	by s1.jo-so.de with local-bsmtp (Exim 4.96)
+	(envelope-from <joerg@jo-so.de>)
+	id 1tKikq-001FPb-0u;
+	Mon, 09 Dec 2024 19:45:12 +0100
+Received: from joerg by zenbook.jo-so.de with local (Exim 4.98)
+	(envelope-from <joerg@jo-so.de>)
+	id 1tKikp-00000000Bs3-2cR3;
+	Mon, 09 Dec 2024 19:45:11 +0100
+Date: Mon, 9 Dec 2024 19:45:11 +0100
+From: =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org
+Subject: Re: KSZ8795 fixes for v5.15
+Message-ID: <kuvnl6z64ldmksnlfdcsfl5unlfdy3sryajjmvrtyenadwktqq@6fhjs3blojkl>
+References: <uz5k4wl4fka3rxoz2tkvpogiwblokbpo72p3sdjdbakwgfbwfi@bzxazuhkhbps>
+ <9e0efd14-ea5c-459f-a70c-b34e61bc47b1@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: netdev@vger.kernel.org
-From: Antonio Pastor <antonio.pastor@gmail.com>
-Subject: [PATCH net] llc: reset transport_header offset as value is inaccurate
- when buffer is processed by DSA
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-
-Hi,
-
-While testing 802.2+LLC+SNAP processing of inbound packets in OpenWrt, 
-it was found that network_header offset is 2 bytes short (before 
-sbk->data) when the packet was received through OpenWrt's DSA 
-(Distributed Switch Architecture). This causes SNAP OUI:PID mismatch and 
-packet is silently dropped by snap_rcv().
-
-Here a trace:
-
-           <idle>-0       [001] ..s..  8744.047176: find_snap_client 
-<-snap_rcv
-           <idle>-0       [001] ..s..  8744.047218: <stack trace>
-  => snap_rcv
-  => llc_rcv
-  => __netif_receive_skb_one_core
-  => netif_receive_skb
-  => br_handle_frame_finish
-  => br_handle_frame
-  => __netif_receive_skb_core.constprop.0
-  => __netif_receive_skb_list_core
-  => netif_receive_skb_list_internal
-  => napi_complete_done
-  => gro_cell_poll
-  => __napi_poll.constprop.0
-  => net_rx_action
-  => handle_softirqs
-  => irq_exit
-  => call_with_stack
-  => __irq_svc
-  => default_idle_call
-  => do_idle
-  => cpu_startup_entry
-  => secondary_start_kernel
-  => 0x42301294
-
-The offsets were detected as incorrect as early as napi_complete_done() 
-and I gave up on tracking where the problem comes from. Running with GRO 
-disabled makes no difference.
-
-Curiously enough, __netif_receive_skb_list_core() resets network_header 
-offset, but leaves transport_header offset alone if it was set, assuming 
-it is correct. On non-DSA OpenWrt images it is, but since images were 
-migrated to use DSA this issue appears. For locally generated packets 
-transport_header offset is not set (0xffff) so 
-__netif_receive_skb_list_core() resets it, which solves the issue. That 
-is why inbound packets received from an external system exhibit the 
-problem but locally generated traffic is processed OK.
-
-I can only assume this has been an issue for a while but since 
-presumably it only impacts 802.2+LLC+SNAP (which I'm aware is not much 
-used today) it has not been flagged before. I wouldn't be surprised if 
-any protocols using Ethernet II frames reset transport_header offset 
-before they have anything to do with it.
-
-The kernel code does not touch transport_header offset until llc_rcv() 
-where it is moved forward based on the length of the LLC header as it is 
-assumed correct, which is the issue.
-
-Patch below proposes modifying llc_rcv() to reset transport_header 
-offset and then push forward by the LLC header length. While a better 
-solution might lurk elsewhere by tackling the root cause of why 
-transport_header offset is off after DSA set it to begin with, that is 
-taking too much effort to identify and risks widespread impact. A patch 
-could be made to __netif_receive_skb_list_core() to always reset 
-transport_header offset, but that would also impact all frames. This is 
-a lower risk patch that will not impact any non 802.2+LLC frames, and 
-presumably only SNAP ones. It follows the approach of 
-__netif_receive_skb_list_core() of not trusting the offset as received 
-and resetting it before snap_rcv() has a need for it.
-
-Patch:
-
-  net/llc/llc_input.c | 2 +-
-  1 file changed, 1 insertions(+), 1 deletions(-)
-
---- a/net/llc/llc_input.c
-+++ b/net/llc/llc_input.c
-@@ -124,7 +124,7 @@ static inline int llc_fixup_skb(struct s
-      if (unlikely(!pskb_may_pull(skb, llc_len)))
-          return 0;
-
--    skb->transport_header += llc_len;
-+    skb_set_transport_header(skb, llc_len);
-      skb_pull(skb, llc_len);
-      if (skb->protocol == htons(ETH_P_802_2)) {
-          __be16 pdulen;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="6tygjn6zac7ih6tg"
+Content-Disposition: inline
+In-Reply-To: <9e0efd14-ea5c-459f-a70c-b34e61bc47b1@lunn.ch>
 
 
-Can you share your opinions on this patch and suggest next actions for 
-its adoption (or modification) please?
+--6tygjn6zac7ih6tg
+Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: KSZ8795 fixes for v5.15
+MIME-Version: 1.0
 
-Regards,
+Andrew Lunn schrieb am Sa 07. Dez, 21:58 (+0100):
+> On Sat, Dec 07, 2024 at 09:44:46AM +0100, J=F6rg Sommer wrote:
+> > Hi,
+> >=20
+> > it's me again with the KSZ8795 connected to TI_DAVINCI_EMAC. It works on
+> > v5.10.227 and now, I try to get this working on v5.15 (and then later
+> > versions). I found this patch [1] in the Microchip forum [2]. Someone p=
+ut it
+> > together to make this chip work with v5.15. I applies fine on v5.15.173=
+ and
+> > gets me to a point where the kernel detects the chip during boot. (It s=
+till
+> > doesn't work, but it's better with this patch than without.)
+> >=20
+> > [1] https://forum.microchip.com/sfc/servlet.shepherd/document/download/=
+0693l00000XiIt9AAF
+> > [2] https://forum.microchip.com/s/topic/a5C3l000000MfQkEAK/t388621
+> >=20
+> > The driver code was restructured in 9f73e1 which contained some mistake=
+s.
+> > These were fixed later with 4bdf79 (which is part of the patch), but wa=
+s not
+> > backported to v5.15 as a grep shows:
+> >=20
+> > $ git grep STATIC_MAC_TABLE_OVERRIDE'.*2[26]' v5.15.173
+> > v5.15.173:drivers/net/dsa/microchip/ksz8795.c:55:       [STATIC_MAC_TAB=
+LE_OVERRIDE]     =3D BIT(26),
+> > $ git grep STATIC_MAC_TABLE_OVERRIDE'.*2[26]' v6.6.62
+> > v6.6.62:drivers/net/dsa/microchip/ksz_common.c:334:     [STATIC_MAC_TAB=
+LE_OVERRIDE]     =3D BIT(22),
+> >=20
+> > Can someone review this patch and apply it to the v5.15 branch?
+>=20
+> Hi J=F6rg
+>=20
+> Please see:
+>=20
+> https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+>=20
+> Option 2.
 
-AP
+I didn't know everyone can request a backport. But, unfortunately, neither
+4bdf79d686b49ac49373b36466acfb93972c7d7c from main, nor
+ce3ec3fc64e0e0f4d148cccba4e31246d50ec910 from v6.1 can be cherry-picked
+without big conflicts.
 
+I think I have to use Option 3 and send a new commit.
+
+
+Kind regards, J=F6rg
+
+--=20
+Au=DFerdem teilt sich die Welt nicht in gute Menschen und b=F6se, wir haben
+alle sowohl eine helle als auch eine dunkle Seite in uns. Es kommt darauf
+an, welche Seite wir f=FCr unser Handeln aussuchen. Das macht uns wirklich
+aus.                             (Harry Potter und der Orden des Ph=F6nix)
+
+--6tygjn6zac7ih6tg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABEIAB0WIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCZ1c6tgAKCRB9LJoj0a6j
+dXtNAQCqFVnWfIsUlL1iP6Rt4gz+UQXgzXUdRSvMGGpWnSbP6QEAr1NIREGUGbSX
+kE4oRV6sMxRyMSj8CDP+6wcyhdbxdPw=
+=fkjp
+-----END PGP SIGNATURE-----
+
+--6tygjn6zac7ih6tg--
 
