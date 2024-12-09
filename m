@@ -1,134 +1,193 @@
-Return-Path: <netdev+bounces-150425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFE529EA31E
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:49:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 15B969EA321
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:50:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BCC818872EE
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:49:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83400188738E
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08DCF19D88F;
-	Mon,  9 Dec 2024 23:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF5A19E980;
+	Mon,  9 Dec 2024 23:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hfBBUUV/"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="DdBdyI+4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4866D1E48A;
-	Mon,  9 Dec 2024 23:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA0519ABD8
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 23:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733788138; cv=none; b=HSrIm6vu5r/t2d+b8RkG3/LckmzRpnY4HVerr3f/jH1VnKrqQbD9Mw7rSThu3CH4PKXfCS0cYSpedMyIaiLB0SX2kK4ootZIT33jVOSDGSB6EppfdM4WL0RN5Uben8LIBWU1vYjFa2bwWqRqwxXXCavKhXlNrJYr1pBOT0Ivn7s=
+	t=1733788234; cv=none; b=OMCmkONYEfT2MFhvbQpKAHOrnqLAc/MIGdUkBpuairqjD9/ij8dHHD80lENBO0ErWKIP8SSSnrTmM7kJ/5ebE0SVeF5CsywEHapxKwU7fCUzRfAuatkZ+Vs7kPBDqe22c3RFi8XlOEuQKT1MZBkfD48B4UVZFTEQiOyZUnPEOw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733788138; c=relaxed/simple;
-	bh=+zGoOp+VflwoGhsgDRcJK53Yg7vYXCoriYkgA8emnjg=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zya6zvBbIzY4cdn0w76rADVdOmE82wxaj/znyqlo/6E/XHfVgp0Gqzl9H9myfgksmcIDK/o4z4mvmPPdL+RpPtWjCKUGuhGlP2gUWLajDEw2k20OU0dQ2FMTo3aRnuCCNJixFRKojG8Omkin0Z+2d8cCdnaWCyk9T1AWdPxDoCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hfBBUUV/; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-434fa6bf744so9028415e9.2;
-        Mon, 09 Dec 2024 15:48:56 -0800 (PST)
+	s=arc-20240116; t=1733788234; c=relaxed/simple;
+	bh=MQ6BGMkiTZAjDeCz1zpPsWTpFJwiXq+uTUSr/QdtR2w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rknYaB80acPiE49PWZKAA7yCD+AF63L8BULoBqvQCb8HD0Og38afN+5SWWHS5b0ojZJKXIyLqng9Yxz//Nki65m28rD2kDz9t0Sz9fetVG0JHxeOppQS0znZS5q1DX0tjJHQB0Gu3apwT5AsVzOTzcqXjSQQbEApkwBwqiZ74oA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=DdBdyI+4; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-7fd17f231a7so3313933a12.0
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 15:50:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733788135; x=1734392935; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=2+opuRzsTQ7K1Ei5kmbovGQpDBWvV453DJpnISWYK7E=;
-        b=hfBBUUV/NRDEkEWhrzFaneDwPd9qOItT34kcO0c9K5h6+258UH8pRfHOen32E7mKuK
-         IkIvCTlNjCr4fkWMEWd/rzO/L8dECt48Er1po09NQmuTfXTLFcLOZwHkYhVZ7oRqvv5X
-         CUvTkVLlrKQmOhDexpxiBzc2LlggrnBejjWIHjsmvIBRFFRPBWeGv0QPEvWTogAFBLk/
-         i1Gpex8eAK/ZZEJySGfxVkaqOmAjLS99zF+V4rCukBAuXGnWJlKM85brFCRjQA6LIutC
-         Bw1OCsp9ivpBjkUAOUgvtHNfp/VHNkxUID7TTQiNXE7Hb2zBx3dciAkhk1sYM28n411e
-         z0pw==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1733788231; x=1734393031; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/d2FdrRp4xEcwuQRCr1uin+p1CVpDEnp1yj0gHgEBek=;
+        b=DdBdyI+4KWHBMuREHH91F/hEbn1X3+hq1EasOjwYg69aP0T8rbt17FM6TxwAeoWuwp
+         KvDxFI4qKeCB4/wKKCEW/TZDH5xuv8inejw5NqpO514qkcSSsGJmdVthOMS0AkojlbzH
+         hbt5dH5T+6o3zgMiKxHNRNZj3AlSllk+6j+U4HhE/NKPPwvFyC5qwRVxDVaJrfd0iFI3
+         Ofv042kL2Rxp0SkVVvT9UKDpandPUXTfbaZzYnO09/rRReySFG65MJED9A02/6KpbCmZ
+         Ajn4Zp1qmiOR0cSEFYfxZ+ckn5gPHHo/RKzozosAHguDMD27MoTU4+BHezgsSe+vhYNX
+         ilbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733788135; x=1734392935;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2+opuRzsTQ7K1Ei5kmbovGQpDBWvV453DJpnISWYK7E=;
-        b=mqaysp5zR1N42SwmYI+wzq5uHVqQre/NSfrCOYDkaYdSONvljbNDBzB+dbQunMaSbW
-         06EpFqneAodKrogMTsp9plBLggFlaBTqueVYmi66kIyKkWPuH/9xuu+2CxnMM0sfM0Fa
-         GTdLoGWvuIthna8IefTTL+SUZT/HTWuUXq+nH5icU3dPJyZSr0xTGIN3ZNlhdF9r2KUc
-         Lg4Q8Sn6mTFH5pxo4HVIJ8rntqSOiDnegyCDfHtAthpIBxEYid19Aq0/G/MYt5tTFEnu
-         s1IVWImgT/6EgUA0L8emHZamWtPq5YHvL6AKt7YGaNCfNRoO9sHyVfltO8oPM5QCUSu7
-         3ENw==
-X-Forwarded-Encrypted: i=1; AJvYcCUhDGr8fGx/bLTJDNiHnncHJVRvOlQUG4tFzUBQFfCWAUufPD61+3AW6CDNE00bnQ382gLqLEyQ@vger.kernel.org, AJvYcCV0nlSHozvG1vfeoHDNN3Z3lT2usps2PJzsgkx3cA8OIIopIPuYn4hg4NLpGA1Be6eUUgYd/siZ2RNJfiD9@vger.kernel.org, AJvYcCVVyRmmnCXxCWDxGLqSX9WDhLcANpvk0xBA7q1B0FAOHfxGSiUr9rR4nYc6TEDsZ1LYnCo7DLOB8T0J@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrfypjnNvCw+rlMaBAFn6z1YxZdtRCX2FyD57njIN3hpD5Iq3n
-	meUJ+hydU2RkKr6F8tZwBuoDxxuyGILMNwVXO8eI4rjDurpXvRFk
-X-Gm-Gg: ASbGncuy2hQOVxpujhlCYCxYc7sTN2WX5QojERDbu8bD1cG6AmMqFz7VOoJex+VFDGQ
-	H/IZQggksVcVImeAFbjWlwMtJ3A94p3ImasBjQWH+AeJO+ttgqqtr+jnc+wiO3MA/VJFLkaPXZI
-	5hR/QUBrAMSHQTl7vEvGkqrAQ6lzRZbXajB4u2KBL3ibbQCWk4cEGmcoYqbkAI0YnJJkZWYOAOF
-	aZ9JmVtyTswMmodVdLlsTJekUihlvX+h+xJZHD+Yplcsfn67FausxCkMfeYC4kPhfR7HheaQr5i
-	DoTzM8r5Ig==
-X-Google-Smtp-Source: AGHT+IH9/KxJN7tPNyH97Gbd1yzXNSTFzl3Ym7oZH/K0A2GTk2oxeudvtllbhttHCkYsV4UVpV6MwQ==
-X-Received: by 2002:a05:600c:45c7:b0:434:f297:8e85 with SMTP id 5b1f17b1804b1-434fff69f57mr25414345e9.10.1733788135304;
-        Mon, 09 Dec 2024 15:48:55 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38621fbbea8sm14345085f8f.97.2024.12.09.15.48.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2024 15:48:54 -0800 (PST)
-Message-ID: <675781e6.df0a0220.3c3d71.7a51@mx.google.com>
-X-Google-Original-Message-ID: <Z1eB4tGzFOvn7ME4@Ansuel-XPS.>
-Date: Tue, 10 Dec 2024 00:48:50 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v11 5/9] mfd: an8855: Add support for Airoha
- AN8855 Switch MFD
-References: <20241209134459.27110-1-ansuelsmth@gmail.com>
- <20241209134459.27110-6-ansuelsmth@gmail.com>
- <20241209151813.106eda03@kernel.org>
- <67577bd7.7b0a0220.1ce6b5.fe93@mx.google.com>
- <20241209154030.0f34d5dd@kernel.org>
+        d=1e100.net; s=20230601; t=1733788231; x=1734393031;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/d2FdrRp4xEcwuQRCr1uin+p1CVpDEnp1yj0gHgEBek=;
+        b=mPgYsC/H/05Ghb250C9jacxqLbXDCLLteJYP6dtz39I5fB+4gGlXoIUfffPMeKtFW/
+         0w+3vtKC1MksiU7CvPdji56NzxSrxvuM6XMzSscJaRdYfCFQFI4YY5B1nBLPp5PgO5jY
+         JczGXzIhBol9e8EO2S6gOD/v5AxV51IQY2ZGQ+P52g54PeQ4M55D3lhbkfensY25u4LD
+         zttz1tY8/vEZaNZ2ObrWzCCdDjpI/XdEBHbWh24lJYkdVndokQ17j9kup32HqQJIO3IM
+         03AgzRwk/ciVmrClw/CTSWiSbr0y41jFcZKn8Pss/KskPrgC/oQ9OmM02FLCaoQMzJ97
+         J5Qg==
+X-Forwarded-Encrypted: i=1; AJvYcCWgnUjD+xkd6SJU/70CuCGe4iSSR7JcIxpH/VOlDMK4+f0UUYFbhhtEZtdSY1FCZ37Y2pCbqAc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcCmHk0LbecWtV3yktZBQbFncyaUy2lzIM1RwIPhfgfwHpXedY
+	Rg1gt5Lic2XSa0kjr5VTRX3N0RhKOK6ksI5uAVDZtokXi0MvPyZxEc6J2fAV562EUttqzJlw/Nv
+	8hG0=
+X-Gm-Gg: ASbGncvnmyuEweTA4oUV74gDGbgvMIIH6lixlZXMPYVqbugMV4CY247xyOMPVtArjwq
+	o5fgWqZXZztNgYjyHhMw0TIbA59UvB8tin8UqE/qYA4PihPD9Zr8TFEreUCf0gqLnuKW7MpOzw2
+	iZlTx3fNkLJjnNmq3hXx/RfteCSiqCDEt1L8vQkA638P1abFWTCQDfSyz/EARnymiBt4R+7z8QD
+	/jNX1pE+WUQxJciUgCOzsnqTQ6rTTNX/VjGZlrhfWTv0QyiE5LYr1fMSuik6ZYa5hUJTKoj5RV2
+	XiiTjyB3r/3FJoM=
+X-Google-Smtp-Source: AGHT+IHvqU5pnkLyZyz2Esg/i0XdEZjhmzi7tZ11Jn/xVvlZMUV7WLcTQnNgJYfzKr2uxDkP6wyRvg==
+X-Received: by 2002:a17:90b:1d52:b0:2ee:c797:e276 with SMTP id 98e67ed59e1d1-2efcef044b1mr3951123a91.0.1733788231391;
+        Mon, 09 Dec 2024 15:50:31 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1256:1:80c:c984:f4f1:951f? ([2620:10d:c090:500::7:8c2b])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ef45ff77b9sm8543784a91.36.2024.12.09.15.50.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Dec 2024 15:50:30 -0800 (PST)
+Message-ID: <5a72c16f-311e-46d9-baed-f0a25d2a3dff@davidwei.uk>
+Date: Mon, 9 Dec 2024 15:50:27 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241209154030.0f34d5dd@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 09/17] io_uring/zcrx: add interface queue and
+ refill queue
+To: Simon Horman <horms@kernel.org>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20241204172204.4180482-1-dw@davidwei.uk>
+ <20241204172204.4180482-10-dw@davidwei.uk> <20241206160511.GY2581@kernel.org>
+Content-Language: en-GB
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20241206160511.GY2581@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 09, 2024 at 03:40:30PM -0800, Jakub Kicinski wrote:
-> On Tue, 10 Dec 2024 00:22:59 +0100 Christian Marangi wrote:
-> > Also hope we won't have to request multiple stable tag for this multi
-> > subsystem patch. Any hint on that?
+On 2024-12-06 08:05, Simon Horman wrote:
+> On Wed, Dec 04, 2024 at 09:21:48AM -0800, David Wei wrote:
+>> From: David Wei <davidhwei@meta.com>
+>>
+>> Add a new object called an interface queue (ifq) that represents a net
+>> rx queue that has been configured for zero copy. Each ifq is registered
+>> using a new registration opcode IORING_REGISTER_ZCRX_IFQ.
+>>
+>> The refill queue is allocated by the kernel and mapped by userspace
+>> using a new offset IORING_OFF_RQ_RING, in a similar fashion to the main
+>> SQ/CQ. It is used by userspace to return buffers that it is done with,
+>> which will then be re-used by the netdev again.
+>>
+>> The main CQ ring is used to notify userspace of received data by using
+>> the upper 16 bytes of a big CQE as a new struct io_uring_zcrx_cqe. Each
+>> entry contains the offset + len to the data.
+>>
+>> For now, each io_uring instance only has a single ifq.
+>>
+>> Signed-off-by: David Wei <dw@davidwei.uk>
 > 
-> Sorry I haven't payed much attention to earlier discussions.
-> Why multiple stable tags? AFAICT all trees will need patches 
-> 4 and 5, so we can put that on a stable tag / branch, the rest 
-> can go directly into respective trees (assuming the table tag
-> has been merged in). No?
+> ...
+> 
+>> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+> 
+> ...
+> 
+>> +int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+>> +			  struct io_uring_zcrx_ifq_reg __user *arg)
+>> +{
+>> +	struct io_uring_zcrx_ifq_reg reg;
+>> +	struct io_uring_region_desc rd;
+>> +	struct io_zcrx_ifq *ifq;
+>> +	size_t ring_sz, rqes_sz;
+>> +	int ret;
+>> +
+>> +	/*
+>> +	 * 1. Interface queue allocation.
+>> +	 * 2. It can observe data destined for sockets of other tasks.
+>> +	 */
+>> +	if (!capable(CAP_NET_ADMIN))
+>> +		return -EPERM;
+>> +
+>> +	/* mandatory io_uring features for zc rx */
+>> +	if (!(ctx->flags & IORING_SETUP_DEFER_TASKRUN &&
+>> +	      ctx->flags & IORING_SETUP_CQE32))
+>> +		return -EINVAL;
+>> +	if (ctx->ifq)
+>> +		return -EBUSY;
+>> +	if (copy_from_user(&reg, arg, sizeof(reg)))
+>> +		return -EFAULT;
+>> +	if (copy_from_user(&rd, u64_to_user_ptr(reg.region_ptr), sizeof(rd)))
+>> +		return -EFAULT;
+>> +	if (memchr_inv(&reg.__resv, 0, sizeof(reg.__resv)))
+>> +		return -EINVAL;
+>> +	if (reg.if_rxq == -1 || !reg.rq_entries || reg.flags)
+>> +		return -EINVAL;
+>> +	if (reg.rq_entries > IO_RQ_MAX_ENTRIES) {
+>> +		if (!(ctx->flags & IORING_SETUP_CLAMP))
+>> +			return -EINVAL;
+>> +		reg.rq_entries = IO_RQ_MAX_ENTRIES;
+>> +	}
+>> +	reg.rq_entries = roundup_pow_of_two(reg.rq_entries);
+>> +
+>> +	if (!reg.area_ptr)
+>> +		return -EFAULT;
+>> +
+>> +	ifq = io_zcrx_ifq_alloc(ctx);
+>> +	if (!ifq)
+>> +		return -ENOMEM;
+>> +
+>> +	ret = io_allocate_rbuf_ring(ifq, &reg, &rd);
+>> +	if (ret)
+>> +		goto err;
+>> +
+>> +	ifq->rq_entries = reg.rq_entries;
+>> +	ifq->if_rxq = reg.if_rxq;
+>> +
+>> +	ring_sz = sizeof(struct io_uring);
+>> +	rqes_sz = sizeof(struct io_uring_zcrx_rqe) * ifq->rq_entries;
+> 
+> Hi David,
+> 
+> A minor nit from my side: rqes_sz is set but otherwise unused in this
+> function. Perhaps it can be removed?
+> 
+> Flagged by W=1 builds.
 
-Yes in theory only MFD is really needed (as it does export the page
-symbol)
-
-- NVMEM can go in his own tree. (no need for stable tag)
-- mdio (require stable tag to correctly compile)
-- dsa/phy (no need for stable tag)
-
-So you are right, only one tag needed.
-
--- 
-	Ansuel
+Hi Simon, thanks for flagging this, I'll remove it in the next version.
 
