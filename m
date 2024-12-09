@@ -1,181 +1,235 @@
-Return-Path: <netdev+bounces-150254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18E139E995C
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:49:43 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B73D18894AC
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:49:07 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6FC1F0E23;
-	Mon,  9 Dec 2024 14:48:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aeE3xiJe"
-X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99DDC9E99CA
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 16:01:00 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E7CD1BEF82
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 14:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733755679; cv=none; b=oCtslhXCKqhjHSTjEexUlgWi34mhvjNktT7S8dEwR5sD5icK9e0/xzS5n9LYd+OKR5B44Cpn7BD7KDZt7igZ694e0ZYxUR2u7dOOonkBDYh6MXaMo+rExZEXRMAQAzNcHyv8EDv6NOoHnfdboU41pHvo/henSLhzAwx7bV9RTjQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733755679; c=relaxed/simple;
-	bh=5L5/QKETaA0ZzUZT5pfI7dgJYc6P10VRFXK70b7x1oQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=q+MW+QssnU6oo2Ay+3D76oWr9RFfIocbXxk1rxw3l0vPuUBWr9/3+dBJC3mqCzyVey7zu3EXbPzzNjDI1Np7xV3hjYa2b1vRVKSTzRia1P0wQOR77zJAKLg8/5lG34RVtw7fxSS9LWq0MHg94k1Hm/M4GtNP7Idu8jYZI88Il+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aeE3xiJe; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733755677;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CDX1t6Lz6Nzmh2lZRUVmXSqrClGnwSF3XrGiwKdpOyU=;
-	b=aeE3xiJerLLFp3MeoY319alQ4ekatyLox9RTldgH+SFO1dUs5DEAfUmTFdUV/1f+1Sw9MT
-	+CBCMlW0PuOTexMtIwCXTgjIcC/zIPmtUJCLW6aMOkXLxoyRMRRPHiwk6D0gySsfl3l21i
-	Wd/LqaaVUto9N97nwE6Fj/KtQ42h8Dw=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-507-t2nFFN6xNvaCMUFdXth6Pg-1; Mon,
- 09 Dec 2024 09:47:54 -0500
-X-MC-Unique: t2nFFN6xNvaCMUFdXth6Pg-1
-X-Mimecast-MFC-AGG-ID: t2nFFN6xNvaCMUFdXth6Pg
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18F9A2826A7
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:00:59 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D509223C79;
+	Mon,  9 Dec 2024 14:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AXEZDTBV"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8FE8D1955D58;
-	Mon,  9 Dec 2024 14:47:52 +0000 (UTC)
-Received: from t14s.redhat.com (unknown [10.45.224.182])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 43350195608A;
-	Mon,  9 Dec 2024 14:47:48 +0000 (UTC)
-From: Jan Stancek <jstancek@redhat.com>
-To: donald.hunter@gmail.com,
-	kuba@kernel.org,
-	stfomichev@gmail.com
-Cc: pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jstancek@redhat.com
-Subject: [PATCH v2 5/5] tools: ynl: add main install target
-Date: Mon,  9 Dec 2024 15:47:17 +0100
-Message-ID: <59e64ba52e7fb7d15248419682433ec5a732650b.1733755068.git.jstancek@redhat.com>
-In-Reply-To: <cover.1733755068.git.jstancek@redhat.com>
-References: <cover.1733755068.git.jstancek@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BC5216E2D;
+	Mon,  9 Dec 2024 14:57:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733756260; cv=none; b=SiOXfKNMagb/LcdPWKCyYoXBout9zaZHERaz5PaTsxccn1z/Xtx0jbPqCRjV7zDE7FK6jxIzpWtrJc1FTJsI2wJNI3MQRksVll19hjDqVzy4jVpFPn1wz/8Zwi9Eh0FqNyyudbIyy8Ox/sh4UBaQTF1FUcDT/Vye4qZr96EXW0g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733756260; c=relaxed/simple;
+	bh=/l0mvBOMk2HfZG67f5AV8KL1eBnmxAnmxVSyCDRMMRg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iFuMeKOcAfuQYeC4pa1jcY7L1cF5k1C3SpUumQ0w3+oxCuC6FJD54+btr2AcK5aD2vTfeAE37+IW5egHre04La8wgAnib8UV1IXPG5o9owxZT0jes+v2dGrGYBaoVOMHKHdxQqfXrTvDV1g2pJlIK3dIk+AAV7sTTnSvb/3dypQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AXEZDTBV; arc=none smtp.client-ip=209.85.166.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-8418ecda199so160004239f.2;
+        Mon, 09 Dec 2024 06:57:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733756257; x=1734361057; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iRZqhFdv7qPXyVhJT3XighvpPtYublPV4yA41Zmvi3g=;
+        b=AXEZDTBVupi7whzYl2+LkwZciMYOj0aHWJv2dy9pUyKjp+rH6tdperXaXcL5gP4uoH
+         itD3WkzljydA0+KfNkw5gKMOB5d+IO2zPWAxg75+jKu+sx87tTiBZ6D1K5ST7KGkePb/
+         Jcp9KGEJ0Ovsu0WWGA9G7OUlvuXeOjbLHO24fZ7FM6PGQYa5Tm4zqQHi7sjTSFAgpjAm
+         SuC0c/ck9IKM/PFAHV133iNiLLd4QYL7SRsZ8kv77LX1UP8IDjq5ka6lkw045y9yQDCq
+         YV5pnwZ0yCId1GTbovzM0MTk7b4Efw5rtDK6fZ6mQwcWXwKPAkLEARKtt2Lc/h3onuuL
+         IeyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733756257; x=1734361057;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iRZqhFdv7qPXyVhJT3XighvpPtYublPV4yA41Zmvi3g=;
+        b=URvUQbBEnRpi3g20djiC0H7e69apw9lcZuMiMixJixTSjhvc0piS1r5QJM3DYeXe7U
+         0Z0xsdtjr3D6fzq4Q4noCU4aBzgauDChHq4W69SddxTbTjZLCoPw8b/IX1U8Y0U5P/me
+         tbNKZ4evaDevfnr+9kS4dOq1adZZMOMBNde7s8P53JmHo3DddKDJVzklw9yddTsjBwtL
+         y2Jkqoc8613o3AydYJRQ3es8zDD5TanxAh09Mstp4Xyv0E3uCnydqmv9kGFFaEkgPvoa
+         belqpOCMUF9UvPKQQifBMwc325wxSGisFVbAeh1ggMVZT41Qc6cwGic2fRCq/VN5l+36
+         Bw9A==
+X-Forwarded-Encrypted: i=1; AJvYcCWWXL97bzGI4iMTFcwm1e58VtgoPCuKu/sGNnFZpozrYs+nCnyjV8jZGDIjer8fyKbyN2w=@vger.kernel.org, AJvYcCXNlKCY0GYFvYAvpjDvv6j4YPgL3DdzSmZLJeRuH6Wsd8tO++Y8UToNviULKvf9nUeWxfmr9df5@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoeXT281x/0IEGlSCYKCkLCrckjKvmYF1lwMXzYQ5MYsGgYqib
+	b3FUokNtpfxl7QFDMAOna9DY71e0bkmJYg1ahr4p2g2FYvPIutlKKragUZrh04XebSt4oUCCLrf
+	F486n1R6L1XTjOXIG6C4HN7CR1tw=
+X-Gm-Gg: ASbGnctAo25QZsnmtPm5RL/cEeTWkQf4B186HczEPgR2VN7vcdnqDmlKV0Q2iHncax8
+	T94GffTX6E+NMYVM6sQZpnPENvyt8nw==
+X-Google-Smtp-Source: AGHT+IHxn5lYeUJYGcIfdEFo/Erk3mLKUZb5EmxoUguQxL1UMUzvpI6LUNtnhBCV1pjoZbdtSYpVlLYU7ehceSbbAV0=
+X-Received: by 2002:a05:6e02:1889:b0:3a7:8720:9deb with SMTP id
+ e9e14a558f8ab-3a811db1a67mr109184645ab.11.1733756257592; Mon, 09 Dec 2024
+ 06:57:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
+ <20241207173803.90744-4-kerneljasonxing@gmail.com> <6757009b87461_31657c294d6@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6757009b87461_31657c294d6@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 9 Dec 2024 22:57:01 +0800
+Message-ID: <CAL+tcoDnRmORP9UKg7k3grB0zaThY7V964pAfY=NuZu33-WkoQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 03/11] net-timestamp: reorganize in skb_tstamp_tx_output()
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This will install C library, specs, rsts and pyynl. The initial
-structure is:
+On Mon, Dec 9, 2024 at 10:37=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > It's a prep for bpf print function later. This patch only puts the
+> > original generating logic into one function, so that we integrate
+> > bpf print easily. No functional changes here.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  include/linux/skbuff.h |  4 ++--
+> >  net/core/dev.c         |  3 +--
+> >  net/core/skbuff.c      | 41 +++++++++++++++++++++++++++++++++++------
+> >  3 files changed, 38 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> > index 58009fa66102..53c6913560e4 100644
+> > --- a/include/linux/skbuff.h
+> > +++ b/include/linux/skbuff.h
+> > @@ -39,6 +39,7 @@
+> >  #include <net/net_debug.h>
+> >  #include <net/dropreason-core.h>
+> >  #include <net/netmem.h>
+> > +#include <uapi/linux/errqueue.h>
+> >
+> >  /**
+> >   * DOC: skb checksums
+> > @@ -4535,8 +4536,7 @@ void skb_tstamp_tx(struct sk_buff *orig_skb,
+> >  static inline void skb_tx_timestamp(struct sk_buff *skb)
+> >  {
+> >       skb_clone_tx_timestamp(skb);
+> > -     if (skb_shinfo(skb)->tx_flags & SKBTX_SW_TSTAMP)
+> > -             skb_tstamp_tx(skb, NULL);
+> > +     __skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_SND);
+> >  }
+> >
+> >  /**
+> > diff --git a/net/core/dev.c b/net/core/dev.c
+> > index 45a8c3dd4a64..5d584950564b 100644
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -4350,8 +4350,7 @@ int __dev_queue_xmit(struct sk_buff *skb, struct =
+net_device *sb_dev)
+> >       skb_reset_mac_header(skb);
+> >       skb_assert_len(skb);
+> >
+> > -     if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_SCHED_TSTAMP))
+> > -             __skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_SCHE=
+D);
+> > +     __skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_SCHED);
+>
+> This adds a function call in the hot path, as __skb_tstamp_tx is
+> defined in a .c file.
+>
+> Currently this is only well predicted branch on a likely cache hot
+> variable.
 
-	$ mkdir /tmp/myroot
-	$ make DESTDIR=/tmp/myroot install
+Oh, right, thanks for reminding me. I will figure out a better solution :)
 
-	/usr
-	/usr/lib64
-	/usr/lib64/libynl.a
-	/usr/lib/python3.XX/site-packages/pyynl/*
-	/usr/lib/python3.XX/site-packages/pyynl-0.0.1.dist-info/*
-	/usr/bin
-	/usr/bin/ynl
-	/usr/bin/ynl-ethtool
-	/usr/bin/ynl-gen-c
-	/usr/bin/ynl-gen-rst
-	/usr/share
-	/usr/share/doc
-	/usr/share/doc/ynl
-	/usr/share/doc/ynl/*.rst
-	/usr/share/ynl
-	/usr/share/ynl/genetlink-c.yaml
-	/usr/share/ynl/genetlink-legacy.yaml
-	/usr/share/ynl/genetlink.yaml
-	/usr/share/ynl/netlink-raw.yaml
-	/usr/share/ynl/specs
-	/usr/share/ynl/specs/devlink.yaml
-	/usr/share/ynl/specs/dpll.yaml
-	/usr/share/ynl/specs/ethtool.yaml
-	/usr/share/ynl/specs/fou.yaml
-	/usr/share/ynl/specs/handshake.yaml
-	/usr/share/ynl/specs/mptcp_pm.yaml
-	/usr/share/ynl/specs/netdev.yaml
-	/usr/share/ynl/specs/net_shaper.yaml
-	/usr/share/ynl/specs/nfsd.yaml
-	/usr/share/ynl/specs/nftables.yaml
-	/usr/share/ynl/specs/nlctrl.yaml
-	/usr/share/ynl/specs/ovs_datapath.yaml
-	/usr/share/ynl/specs/ovs_flow.yaml
-	/usr/share/ynl/specs/ovs_vport.yaml
-	/usr/share/ynl/specs/rt_addr.yaml
-	/usr/share/ynl/specs/rt_link.yaml
-	/usr/share/ynl/specs/rt_neigh.yaml
-	/usr/share/ynl/specs/rt_route.yaml
-	/usr/share/ynl/specs/rt_rule.yaml
-	/usr/share/ynl/specs/tcp_metrics.yaml
-	/usr/share/ynl/specs/tc.yaml
-	/usr/share/ynl/specs/team.yaml
-
-Signed-off-by: Jan Stancek <jstancek@redhat.com>
----
- tools/net/ynl/Makefile | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
-
-diff --git a/tools/net/ynl/Makefile b/tools/net/ynl/Makefile
-index 5268b91bf7ed..116a7fcfc540 100644
---- a/tools/net/ynl/Makefile
-+++ b/tools/net/ynl/Makefile
-@@ -1,5 +1,16 @@
- # SPDX-License-Identifier: GPL-2.0
- 
-+include ../../scripts/Makefile.arch
-+
-+INSTALL	?= install
-+prefix  ?= /usr
-+ifeq ($(LP64), 1)
-+  libdir_relative = lib64
-+else
-+  libdir_relative = lib
-+endif
-+libdir  ?= $(prefix)/$(libdir_relative)
-+
- SUBDIRS = lib generated samples
- 
- all: $(SUBDIRS) libynl.a
-@@ -23,5 +34,15 @@ clean distclean:
- 	rm -f libynl.a
- 	rm -rf pyynl/__pycache__
- 	rm -rf pyynl/lib/__pycache__
-+	rm -rf pyynl.egg-info
-+	rm -rf build
-+
-+install: libynl.a
-+	@echo -e "\tINSTALL libynl.a"
-+	@$(INSTALL) -d $(DESTDIR)$(libdir)
-+	@$(INSTALL) -m 0644 libynl.a $(DESTDIR)$(libdir)/libynl.a
-+	@echo -e "\tINSTALL pyynl"
-+	@pip install --prefix=$(DESTDIR)$(prefix) .
-+	@make -C generated install
- 
--.PHONY: all clean distclean $(SUBDIRS)
-+.PHONY: all clean distclean install $(SUBDIRS)
--- 
-2.43.0
-
+> >
+> >       /* Disable soft irqs for various locks below. Also
+> >        * stops preemption for RCU.
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index 6841e61a6bd0..74b840ffaf94 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -5539,10 +5539,10 @@ void skb_complete_tx_timestamp(struct sk_buff *=
+skb,
+> >  }
+> >  EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
+> >
+> > -void __skb_tstamp_tx(struct sk_buff *orig_skb,
+> > -                  const struct sk_buff *ack_skb,
+> > -                  struct skb_shared_hwtstamps *hwtstamps,
+> > -                  struct sock *sk, int tstype)
+> > +static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
+> > +                              const struct sk_buff *ack_skb,
+> > +                              struct skb_shared_hwtstamps *hwtstamps,
+> > +                              struct sock *sk, int tstype)
+> >  {
+> >       struct sk_buff *skb;
+> >       bool tsonly, opt_stats =3D false;
+> > @@ -5594,13 +5594,42 @@ void __skb_tstamp_tx(struct sk_buff *orig_skb,
+> >
+> >       __skb_complete_tx_timestamp(skb, sk, tstype, opt_stats);
+> >  }
+> > +
+> > +static bool skb_tstamp_is_set(const struct sk_buff *skb, int tstype)
+> > +{
+> > +     switch (tstype) {
+> > +     case SCM_TSTAMP_SCHED:
+> > +             if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_SCHED_TSTA=
+MP))
+> > +                     return true;
+> > +             return false;
+> > +     case SCM_TSTAMP_SND:
+> > +             if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_SW_TSTAMP)=
+)
+> > +                     return true;
+>
+> Also true for SKBTX_HW_TSTAMP
+>
+> > +             return false;
+> > +     case SCM_TSTAMP_ACK:
+> > +             if (TCP_SKB_CB(skb)->txstamp_ack)
+> > +                     return true;
+> > +             return false;
+> > +     }
+> > +
+> > +     return false;
+> > +}
+> > +
+> > +void __skb_tstamp_tx(struct sk_buff *orig_skb,
+> > +                  const struct sk_buff *ack_skb,
+> > +                  struct skb_shared_hwtstamps *hwtstamps,
+> > +                  struct sock *sk, int tstype)
+> > +{
+> > +     if (unlikely(skb_tstamp_is_set(orig_skb, tstype)))
+> > +             skb_tstamp_tx_output(orig_skb, ack_skb, hwtstamps, sk, ts=
+type);
+> > +}
+> >  EXPORT_SYMBOL_GPL(__skb_tstamp_tx);
+> >
+> >  void skb_tstamp_tx(struct sk_buff *orig_skb,
+> >                  struct skb_shared_hwtstamps *hwtstamps)
+> >  {
+> > -     return __skb_tstamp_tx(orig_skb, NULL, hwtstamps, orig_skb->sk,
+> > -                            SCM_TSTAMP_SND);
+> > +     return skb_tstamp_tx_output(orig_skb, NULL, hwtstamps, orig_skb->=
+sk,
+> > +                                 SCM_TSTAMP_SND);
+> >  }
+> >  EXPORT_SYMBOL_GPL(skb_tstamp_tx);
+> >
+> > --
+> > 2.37.3
+> >
+>
+>
 
