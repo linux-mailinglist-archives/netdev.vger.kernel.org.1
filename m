@@ -1,66 +1,65 @@
-Return-Path: <netdev+bounces-150179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCF709E963A
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:16:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BFA7D9E9672
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:20:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59E4B16378B
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:14:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C14F1168EE4
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50FBB1B0403;
-	Mon,  9 Dec 2024 13:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fb82XNWo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 918801BEF68;
+	Mon,  9 Dec 2024 13:08:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB31D234969;
-	Mon,  9 Dec 2024 13:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01441C5CB4
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 13:08:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733749631; cv=none; b=FiCz38p4ddaun4VXDxXPYf0GuKKtqbcpn3LOx9KNMt65WvkDB8keCL8HIHUHynCwNP1wd+Bhq4PfIc7fMydJrIkCxMXVXyP5gP0FylZJ5JzpaCkzFD35bJouovg8AxnmGIJ3PZjQF5OZWy5JucF/OLGNwbvcEd0ZbknHLnqaqWA=
+	t=1733749685; cv=none; b=IWgF1K063P7UAndXKrANoMqJ5jtbm8u5ClJIc4AMDrMog+sz/DUskgW3Ck8JU3MYh47TLPywYf1ifOb6s45zaRfFCws7Y0Px9jYfm6LEhYl80+ciEaS6ZxrT4V4Q5i5IFuK4jip4gVzsxoerHWwjaOOnDPN+kuiCbgBB3u27lME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733749631; c=relaxed/simple;
-	bh=DpHAyUjc3/1GiIvRLKBvS5sUpFpfrxKhPzzv6CSy3DI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mJseVKCNf3duUn16ANRxkB5ZcjYiXeGUhM4J5YM07ltnVEzVXY5Q3lDrnqyYrYYoovnxjUTslqWpLtYKk31CxD8pXbtOCmmPEAEfjgqYLVP0DUQuA988fFmyf3mt5p99d+j4D1kkTl0aKqEs10V2GFpMMH5BrSlUNwTPKqLJ+oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fb82XNWo; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1733749623; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=FfWawy1cHTcYAUYSNosBjfVSaxcWpVzVuXJ5f856eL0=;
-	b=fb82XNWo+oboHgjDnDHKKk5CCec2Nx0410Omhr7mfeVmfvtRSqEOa8tACNWvBoxcakAsZCzaQLlgCgJ84U7hrIrad6+YylmPUM8KuR54reaGRum3VPila9yQ0FafvZ+CzKvRuFBXOBAefVc9ScOGhjw7Nx8Q7PKIjCTd4VZh++w=
-Received: from localhost.localdomain(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WL8eHjH_1733749622 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 09 Dec 2024 21:07:02 +0800
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-To: wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1733749685; c=relaxed/simple;
+	bh=T4r5FGidFDsRUMmlpRvTUjhC9fAyg9vx234rsbBtpLc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=roqz1axqBXLcwpWbFQWfLwBV5fogJkz6z5JdApAga9PNE1eUm3bure+oZ4Zm8eGb8XHOt0dBDIyB5DvfzM2uBFH+ZItcjk8xkgKFKwYQ64JPMC11StAtvkvKkK9dbBJ713JPmMLcrJ0KhOEOzo+mqzaKnwmHMDh8T09wIU9P80w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tKdUP-0004R8-PL; Mon, 09 Dec 2024 14:07:53 +0100
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tKdUN-002W7H-1Q;
+	Mon, 09 Dec 2024 14:07:52 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tKdUO-002wwi-0S;
+	Mon, 09 Dec 2024 14:07:52 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
-	Dust Li <dust.li@linux.alibaba.com>
-Subject: [PATCH net-next v3 2/2] net/smc: support ipv4 mapped ipv6 addr client for smc-r v2
-Date: Mon,  9 Dec 2024 21:06:49 +0800
-Message-Id: <20241209130649.34591-3-guangguan.wang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20241209130649.34591-1-guangguan.wang@linux.alibaba.com>
-References: <20241209130649.34591-1-guangguan.wang@linux.alibaba.com>
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	Phil Elwell <phil@raspberrypi.org>
+Subject: [PATCH net-next v1 00/11] lan78xx: Preparations for PHYlink
+Date: Mon,  9 Dec 2024 14:07:40 +0100
+Message-Id: <20241209130751.703182-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,39 +67,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-AF_INET6 is not supported for smc-r v2 client before, even if the
-ipv6 addr is ipv4 mapped. Thus, when using AF_INET6, smc-r connection
-will fallback to tcp, especially for java applications running smc-r.
-This patch support ipv4 mapped ipv6 addr client for smc-r v2. Clients
-using real global ipv6 addr is still not supported yet.
+This patch set is a second part of the preparatory work for migrating
+the lan78xx USB Ethernet driver to the PHYlink framework. During
+extensive testing, I observed that resetting the USB adapter can lead to
+various read/write errors. While the errors themselves are acceptable,
+they generate excessive log messages, resulting in significant log spam.
+This set improves error handling to reduce logging noise by addressing
+errors directly and returning early when necessary.
 
-Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-Reviewed-by: D. Wythe <alibuda@linux.alibaba.com>
-Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
----
- net/smc/af_smc.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Oleksij Rempel (11):
+  net: usb: lan78xx: Add error handling to lan78xx_setup_irq_domain
+  net: usb: lan78xx: Add error handling to lan78xx_init_mac_address
+  net: usb: lan78xx: Add error handling to lan78xx_set_mac_addr
+  net: usb: lan78xx: Add error handling to lan78xx_get_regs
+  net: usb: lan78xx: Simplify lan78xx_update_reg
+  net: usb: lan78xx: Fix return value handling in lan78xx_set_features
+  net: usb: lan78xx: Use ETIMEDOUT instead of ETIME in lan78xx_stop_hw
+  net: usb: lan78xx: Use function-specific label in lan78xx_mac_reset
+  net: usb: lan78xx: Improve error handling in lan78xx_phy_wait_not_busy
+  net: usb: lan78xx: Rename lan78xx_phy_wait_not_busy to
+    lan78xx_mdiobus_wait_not_busy
+  net: usb: lan78xx: Improve error handling in WoL operations
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 9d76e902fd77..c3f9c0457418 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -1116,7 +1116,10 @@ static int smc_find_proposal_devices(struct smc_sock *smc,
- 	ini->check_smcrv2 = true;
- 	ini->smcrv2.saddr = smc->clcsock->sk->sk_rcv_saddr;
- 	if (!(ini->smcr_version & SMC_V2) ||
--	    smc->clcsock->sk->sk_family != AF_INET ||
-+#if IS_ENABLED(CONFIG_IPV6)
-+	    (smc->clcsock->sk->sk_family == AF_INET6 &&
-+	     !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||
-+#endif
- 	    !smc_clc_ueid_count() ||
- 	    smc_find_rdma_device(smc, ini))
- 		ini->smcr_version &= ~SMC_V2;
--- 
-2.24.3 (Apple Git-128)
+ drivers/net/usb/lan78xx.c | 137 +++++++++++++++++++++++++-------------
+ 1 file changed, 89 insertions(+), 48 deletions(-)
+
+--
+2.39.5
 
 
