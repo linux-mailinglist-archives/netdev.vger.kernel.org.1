@@ -1,101 +1,122 @@
-Return-Path: <netdev+bounces-150423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 982B89EA310
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:45:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C30D39EA317
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:46:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CA1B188716A
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:45:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 429CA1669E7
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFE84226187;
-	Mon,  9 Dec 2024 23:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BEDC227B99;
+	Mon,  9 Dec 2024 23:45:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="HBniydiw";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Hx8+x14t"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="REbop1AF";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EdhC7kKL"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+Received: from flow-b8-smtp.messagingengine.com (flow-b8-smtp.messagingengine.com [202.12.124.143])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DD4226189;
-	Mon,  9 Dec 2024 23:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C177226189;
+	Mon,  9 Dec 2024 23:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.143
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733787908; cv=none; b=j+Kfb9wrEVTelTw2UL9iZfs2cffcpY5XyVipgnnI7JnLCbbk0qxxiitc9eDIUPH92nbav3hzOHkHtyebhGMtThGqpgBsb+OB06ok9xu+/MGfAtEseMGO03U+aGGzrR6YhPU8zB8IY9fS9Lb40XSE/uDRqU72lW9kIQ8/5skDD1I=
+	t=1733787918; cv=none; b=IaiZy5LTcGheNekGtLRDiyfnn8S9v0ZvQsdZIMdZ6UHPvhx7R5APqzDPQP2KCSu6Gqtvnlb+tt4NOrY4A4vToYpCskYZXnXmMzhpWbbDlnwOOJHw6YXAv/wRmQEDgBfgTARaAXuAjO11n79gW3vo2y1mFAX951icbtUPj1fiG3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733787908; c=relaxed/simple;
-	bh=fOnBXHIAuJzE69Hz+Tu/sV6nKrtFajTIcLJ7FIXBo/I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UYBtNNluv3ozxWbyPg0raUJKHI4XQ94tHO4VQQEwz1ZS5RPUXtdCZL6sogHvl62+fhCC4SvjpLa75SZS4x5BLdeFA3sVe5Z/OeWxom4jrIet05aNvTv1okdD0YL0t4cMnS9+iNl/Yn9DulrBLF9IGz5DpW1hSkazh+FQuN0zI/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=HBniydiw; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Hx8+x14t; arc=none smtp.client-ip=202.12.124.155
+	s=arc-20240116; t=1733787918; c=relaxed/simple;
+	bh=t6YWqjuBpOzJUcv0KgUUnzgurGW+EY/nB39y3RsCwOw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=W0qDvc+5ldHH13vSucgSZhiCRa7XMFOOPRfj99ffavbRAmB4JNyP8DWe5XMBsAxhZm+ONuSEZZ7Fzot+pLbagDaYz0J4swqlyX0bNZdduXCYKYoqtyfTe2NWsE++epeLViVJCISzJRFE8emQWB8ZfRYhJp633qim/taB+4tS+CA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=REbop1AF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EdhC7kKL; arc=none smtp.client-ip=202.12.124.143
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 9BA752540143;
-	Mon,  9 Dec 2024 18:45:05 -0500 (EST)
+Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
+	by mailflow.stl.internal (Postfix) with ESMTP id 9E7E21D409B6;
+	Mon,  9 Dec 2024 18:45:14 -0500 (EST)
 Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-09.internal (MEProxy); Mon, 09 Dec 2024 18:45:05 -0500
+  by phl-compute-12.internal (MEProxy); Mon, 09 Dec 2024 18:45:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
 	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1733787905; x=1733874305; bh=cvkcFxFnEzqNudK34KaNb
-	KjEuuWQ+WuBmDyvs2JoXoI=; b=HBniydiwb2yl3TUam+pW5JjwCxko8Um/aknJK
-	30ce7RXqHCYyPL6OvuvNpyF/2UmnsXsATYs1VnKbsr5U2K4BC+eUvxHgX5fNeRGy
-	pjBPX0XpR1Ij64ZWt8rdLrRjipPB5g54mh7Pn+E6vLKOOvC30E8fubnP3XwOwNGN
-	floseDOymAd6JvIML7PkZyZph85nbc7lOZAKicpr7vA2eJEpUDoIfHlAJf7uN/ri
-	Fx1zs0Hr8tSeOFnzB0lAL/Dl5uXIovLwkOZrmTQ3MVSokUFEYv1OWOqMfZdTEWv9
-	e5DQSoSbg/J5MAuvGBYyutn8oB5hI8gujVimAtJe8kczIZggw==
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1733787914; x=
+	1733795114; bh=FNe66ehp1D+ELVvV3anO9UW46My6FNIb3T/hz9ka5zM=; b=R
+	Ebop1AF08yI84fnOa7VIWRotXfPWJLNdvRmwUD48/VG/PtwI5ldOXFZmiyoXeiSR
+	FGaTCngVYwNYeNddogKCmHiY3/u1Jn4otabP/in5DQPSi3jb0adL8PGBVs7pZWDr
+	m0983Wm5zcao7JcA+aJaJ/Zv8pKhfRoN/ClVUD67NesebF+Z+KZqc+cvH4ubnSuO
+	G/QVQny4+iaE1C1D8KUPkB+G7grf9ksmFG72lE9Q9QNiqCrL29Fl4T9aEKXfvMFy
+	9a2OJRB2UJUGHiNmuPkYd/aQcduZEUXC9E8gOezLW+EpG77OmUOuiN66TnqPjHCb
+	DB2TXLM4XNpDkPTrrC44w==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1733787905; x=1733874305; bh=cvkcFxFnEzqNudK34KaNbKjEuuWQ+WuBmDy
-	vs2JoXoI=; b=Hx8+x14tJBg99IVN6qtVcSU3vrJ2M4lN1kYWFsiF+NcvE+8aX7f
-	Zk1kuWwM1XGZIGk58MW9w6Cfk/0a6x/hiZZIh8N7uE9KrRRS5xrLV+GIDwhadWBi
-	1ecT3V/yNyawJuikcOfanQpQIC+FpE4Gdnur3tOShOXcEvIyOIdw1IvpR3nxfPtu
-	p1NOGStwYGHh3iekLhf1nXAkjknuqURWH89rEFZ6aPUdi/KCn4c1inmbC0K/z2OT
-	gcFiJ5GJGfePKDmrkUOLWdGDFuvkxbXCL0hjAbOFmVbl7BWtAwx3hMjKFm8/N9Yg
-	qZ20K+a9HioQNqfZnLNYbZxBTBMJWFUTQYw==
-X-ME-Sender: <xms:AIFXZ9OzkGOJK-LDl3FyeSxOfiL6ITZCXqyiyfJnvyw3_XCd2lqpEA>
-    <xme:AIFXZ_8-pm6lB7vn_H5cgx7usbKft0GaFhfIjw22Te6Vx0VBSAoxZ9FyY_qoCX9NK
-    DPEQWK7tKhPxmRvPw>
-X-ME-Received: <xmr:AIFXZ8RE1qUl7XmxD5c0Q2AFUvxu1zsZyypBerECOacrreF5bbeIgE12U4Fg2i1NLso8vE-RVXo6IIh0Tbnziu-GbU1dVcyJzCtr-LdXzxRuuS7KqHfL>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrjeejgdduhecutefuodetggdotefrodftvf
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm1; t=1733787914; x=1733795114; bh=F
+	Ne66ehp1D+ELVvV3anO9UW46My6FNIb3T/hz9ka5zM=; b=EdhC7kKLxQW/SKzT8
+	oyGkhopL4IrN0ZLbBhHoCDQRNADR1IEv/8UnByMrKql8Xm+QcvOsL2jVKpv0R2us
+	P7PoRjTMusypO2pk4yKMd6LIKf2RBoh9v/E5eirD9nm1CEezlo1f5HU3nJbMJB1S
+	3tvvOxuNRYH3gO3XXu+NoF2pFxdzrrNyVEobxnYQZ6w5yvbBobJI8RAGq0USYw3N
+	aheO4BSrCpguhaTLRvGXmI4+ociaby+K7kiHAs1vY5AtNAK5VTrGDBE2KPaQOFkq
+	P8yp0VrSew+HwFPWFtWq6bw0w/hHwhacrC3I1A2raJcVdjwccoD3KHQ+CSWeREhe
+	crMnQ==
+X-ME-Sender: <xms:CYFXZ2FeGSvzVNRtOWwuNJk4KZuuRwE0l_zVvVXuqgSI1kFYa8qTaQ>
+    <xme:CYFXZ3Vx-ovWo0RY6ZNzRlfq7Q9o1HmAR4TJpycJm-1xZ7_GkHGRzGCDRLBFw3tU6
+    WXQtG6QrHsc9Emm_g>
+X-ME-Received: <xmr:CYFXZwLFzaBt8Ewm82g715ymyvg_-wy-Tb-mCFyS5-PfK5tG1tQl8PlpDFgud2vsXGFOOnDphkLDtWVx4qkLhsWU0PC9uJmQ8YQlbX1043ldUN9malHi>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrjeejgddugecutefuodetggdotefrodftvf
     curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
     tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdefhe
-    dmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepffgrnhhi
-    vghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpeeitd
-    ekgfduveetveevgfeuhfegieekleegheeftdekffefjefgteetfeeukefgkeenucffohhm
-    rghinhepghhithhhuhgsrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghrtghpthhtohep
-    jedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepsghpfhesvhhgvghrrdhkvghr
-    nhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopehqmhhosehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhht
-    ohhnhiesphhhvghnohhmvgdrohhrghdprhgtphhtthhopehtohhkvgeskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtohepmhgrrhhtihhnrdhlrghusehlihhnuhigrdguvghv
-X-ME-Proxy: <xmx:AYFXZ5vLlr_YItdHbLSrgv__s-mVQi_VxiMrLEPwCEHPh5DJQF_xSg>
-    <xmx:AYFXZ1e3SWcCWwOFZmVB1doZLDXu0pXW1cobVC-AKCZmNxmi9jbC2w>
-    <xmx:AYFXZ13WNSx1Nn-Nvk12pnAGZOaULvcZwkZrYptTCnUpwD9CDi2AwA>
-    <xmx:AYFXZx9l3efe3HBI2BiMeSq9MOMW-zNAfGg82cfCnXuf3GFpp4bUYg>
-    <xmx:AYFXZ_uGqYIceT28LYqJT9LsVJWNubKekQojh5MNph6OowzeUOXqaL-F>
+    dmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepffgr
+    nhhivghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpe
+    evtdekjeffkefgfefhvefffeetgfeuueeutdetjeduudehheeiffdvgefhhfevhfenucff
+    ohhmrghinhepghhithhhuhgsrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghrtghpthht
+    ohepvddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehhrgifkheskhgvrhhnvg
+    hlrdhorhhgpdhrtghpthhtohepjhhohhhnrdhfrghsthgrsggvnhgusehgmhgrihhlrdgt
+    ohhmpdhrtghpthhtoheprghstheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepqhhmoh
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
+    nhgvthdprhgtphhtthhopegurghnihgvlhesihhoghgvrghrsghogidrnhgvthdprhgtph
+    htthhopegrnhgurhhiiheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehk
+    vghrnhgvlhdrohhrghdprhgtphhtthhopehmrghrthhinhdrlhgruheslhhinhhugidrug
+    gvvh
+X-ME-Proxy: <xmx:CYFXZwEaWPWhjA8mlb697hiz0cZBPksWNJFuox3nXlI2UE4_vYT11Q>
+    <xmx:CYFXZ8W8D7Fl5MebZmFF4pwzqW6BKai5j_wKH3QFhu4wQj3CfR3l1w>
+    <xmx:CYFXZzP6zuOpDWIfCET--0H3y4BPVN1K1toFMGmtVQNbKYOxieO2qA>
+    <xmx:CYFXZz3ri0e5cTbmzK7lDaeDyZXfNNg3BJsKto3R705s1SXnw9y2SA>
+    <xmx:CoFXZzPTsQF8idrlhRRjkl5pyrL5KdOL7VcjIkI0Jx4sGply-nCSD8NV>
 Feedback-ID: i6a694271:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 9 Dec 2024 18:45:04 -0500 (EST)
+ 9 Dec 2024 18:45:11 -0500 (EST)
 From: Daniel Xu <dxu@dxuuu.xyz>
-To: linux-kernel@vger.kernel.org,
+To: hawk@kernel.org,
+	john.fastabend@gmail.com,
+	ast@kernel.org,
+	qmo@kernel.org,
+	davem@davemloft.net,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	kuba@kernel.org
+Cc: martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
 	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	qmo@kernel.org
-Cc: antony@phenome.org,
-	toke@kernel.org,
-	martin.lau@linux.dev
-Subject: [PATCH bpf-next v3 0/4] bpftool: btf: Support dumping a single type from file
-Date: Mon,  9 Dec 2024 16:44:31 -0700
-Message-ID: <cover.1733787798.git.dxu@dxuuu.xyz>
+	antony@phenome.org,
+	toke@kernel.org
+Subject: [PATCH bpf-next v3 3/4] bpftool: btf: Support dumping a single type from file
+Date: Mon,  9 Dec 2024 16:44:34 -0700
+Message-ID: <3bc17d33161961409dc77a5de29761bf2bed4980.1733787798.git.dxu@dxuuu.xyz>
 X-Mailer: git-send-email 2.46.0
+In-Reply-To: <cover.1733787798.git.dxu@dxuuu.xyz>
+References: <cover.1733787798.git.dxu@dxuuu.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -144,28 +165,83 @@ Example usage:
 
 [0]: https://github.com/xdp-project/xdp-tools/blob/master/headers/bpf/vmlinux.h
 
-=== Changelog ===
+Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+---
+ .../bpf/bpftool/Documentation/bpftool-btf.rst |  7 +++++--
+ tools/bpf/bpftool/btf.c                       | 21 ++++++++++++++++++-
+ 2 files changed, 25 insertions(+), 3 deletions(-)
 
-Changes in v3:
-* Make `root_id` a top level btf-dump argument rather than attached to `file`
-* Update bash completion script
-* Refactor root_type_ids checking to after btf handle creation
-* Update help messages and fix existing man page inconsistency
-
-Changes in v2:
-* Add early error check for invalid BTF ID
-
-Daniel Xu (4):
-  bpftool: man: Add missing format argument to command description
-  bpftool: btf: Validate root_type_ids early
-  bpftool: btf: Support dumping a single type from file
-  bpftool: bash: Add bash completion for root_id argument
-
- .../bpf/bpftool/Documentation/bpftool-btf.rst |  7 ++--
- tools/bpf/bpftool/bash-completion/bpftool     |  7 ++--
- tools/bpf/bpftool/btf.c                       | 33 ++++++++++++++++++-
- 3 files changed, 42 insertions(+), 5 deletions(-)
-
+diff --git a/tools/bpf/bpftool/Documentation/bpftool-btf.rst b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
+index 245569f43035..4899b2c10777 100644
+--- a/tools/bpf/bpftool/Documentation/bpftool-btf.rst
++++ b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
+@@ -24,7 +24,7 @@ BTF COMMANDS
+ =============
+ 
+ | **bpftool** **btf** { **show** | **list** } [**id** *BTF_ID*]
+-| **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*]
++| **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*] [**root_id** *ROOT_ID*]
+ | **bpftool** **btf help**
+ |
+ | *BTF_SRC* := { **id** *BTF_ID* | **prog** *PROG* | **map** *MAP* [{**key** | **value** | **kv** | **all**}] | **file** *FILE* }
+@@ -43,7 +43,7 @@ bpftool btf { show | list } [id *BTF_ID*]
+     that hold open file descriptors (FDs) against BTF objects. On such kernels
+     bpftool will automatically emit this information as well.
+ 
+-bpftool btf dump *BTF_SRC* [format *FORMAT*]
++bpftool btf dump *BTF_SRC* [format *FORMAT*] [root_id *ROOT_ID*]
+     Dump BTF entries from a given *BTF_SRC*.
+ 
+     When **id** is specified, BTF object with that ID will be loaded and all
+@@ -67,6 +67,9 @@ bpftool btf dump *BTF_SRC* [format *FORMAT*]
+     formatting, the output is sorted by default. Use the **unsorted** option
+     to avoid sorting the output.
+ 
++    **root_id** option can be used to filter a dump to a single type and all
++    its dependent types. It cannot be used with any other types of filtering.
++
+ bpftool btf help
+     Print short help message.
+ 
+diff --git a/tools/bpf/bpftool/btf.c b/tools/bpf/bpftool/btf.c
+index 3e995faf9efa..18b037a1414b 100644
+--- a/tools/bpf/bpftool/btf.c
++++ b/tools/bpf/bpftool/btf.c
+@@ -993,6 +993,25 @@ static int do_dump(int argc, char **argv)
+ 				goto done;
+ 			}
+ 			NEXT_ARG();
++		} else if (is_prefix(*argv, "root_id")) {
++			__u32 root_id;
++			char *end;
++
++			if (root_type_cnt) {
++				p_err("cannot use root_id with other type filtering");
++				err = -EINVAL;
++				goto done;
++			}
++
++			NEXT_ARG();
++			root_id = strtoul(*argv, &end, 0);
++			if (*end) {
++				err = -1;
++				p_err("can't parse %s as root ID", *argv);
++				goto done;
++			}
++			root_type_ids[root_type_cnt++] = root_id;
++			NEXT_ARG();
+ 		} else if (is_prefix(*argv, "unsorted")) {
+ 			sort_dump_c = false;
+ 			NEXT_ARG();
+@@ -1403,7 +1422,7 @@ static int do_help(int argc, char **argv)
+ 
+ 	fprintf(stderr,
+ 		"Usage: %1$s %2$s { show | list } [id BTF_ID]\n"
+-		"       %1$s %2$s dump BTF_SRC [format FORMAT]\n"
++		"       %1$s %2$s dump BTF_SRC [format FORMAT] [root_id ROOT_ID]\n"
+ 		"       %1$s %2$s help\n"
+ 		"\n"
+ 		"       BTF_SRC := { id BTF_ID | prog PROG | map MAP [{key | value | kv | all}] | file FILE }\n"
 -- 
 2.46.0
 
