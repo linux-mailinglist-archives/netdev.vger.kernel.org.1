@@ -1,106 +1,141 @@
-Return-Path: <netdev+bounces-150202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B1EA9E9759
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:40:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71B5C9E975C
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:41:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84ACF1881A25
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:40:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DBFE1881D70
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94450233137;
-	Mon,  9 Dec 2024 13:40:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D774233146;
+	Mon,  9 Dec 2024 13:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ehEznMEC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NxrhA0cc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9D335968;
-	Mon,  9 Dec 2024 13:40:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7EB323313C
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 13:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733751615; cv=none; b=qDPJDQc47Im4ZADK1P+IQBctD0vfYYVYPqwIsuUFW11VSj4/lFbuc/vz5zsn6wbvxgsd8pC7PHFZ+tMCKxu1yyrCiXqv0CAJ7gN9X+yoeI5MPRs0wqrbTnV1nhN4QvTky/Uz7Ds+y+lCuPl4C/THlkgiATp8AENbi+6u6l02neM=
+	t=1733751666; cv=none; b=ndaSHPmzZEaLVbaFFMfQXOP3jkfWdPTQurEnp3kn2yZTzdiIKO4ixF/ApTcx6UsWVa7fGwTk+BWYrkkYnTR0Od/UAku2IXx3UjcbbVGZSlsZY+tKR/63FACXaqs63G86LOY3+ibPIImpRtZYFtqj5JPIy6XV/TOrjbEJm7rwTYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733751615; c=relaxed/simple;
-	bh=Y+YCQ+zTvuOJ62iXxPiywsXkNkqk6N2zkZ56nBO2ltU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SKl8199ZF+zHsf/EPp3Su4/AhzHf7jEMnCyF/QcBVomKKQYbpbA+UUClan4N0ZVO4Nui4dY7Qh/9erPrTQLmpI1uELfbIGPXhjqN7l5PBooPqyvijx7gZXxwQI9bSK7eadX88Z0lmLvx8w8rqVm1Qq4NuQufo1zKkv40sabU1s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ehEznMEC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF348C4CED1;
-	Mon,  9 Dec 2024 13:40:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733751615;
-	bh=Y+YCQ+zTvuOJ62iXxPiywsXkNkqk6N2zkZ56nBO2ltU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ehEznMECpBD6HGgVxZwWztdZdJKU5K7+JTfijNV3sfcSAspYUi3QWP6HwsB1dI26A
-	 9LMkM0229KGSKrS3YWRqssUSx/fuwN+X9+UZNeDKKc2wFdW+Zo0L8l1pvXMGYDlpSd
-	 VtIEbrtboKWESmTAvmgp6AjQp/i4+2/K+lMXC5AnwlxNOdOY9e5YRo/nNzTmFl8v83
-	 8teNszDSmS51+nTmRqLoJVV5mTbc5Lzvw25TRBN7WHxtQgTwzEDLo6sMCsjaWolS/b
-	 Fo81tR3ofyv9AxvHNl5djnanW0oQN5b5GGpGCHM6Pwz5u8VHx+70sE2ZyMjc4JSAu5
-	 IuoRWlAaQIsNA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEDD380A95E;
-	Mon,  9 Dec 2024 13:40:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1733751666; c=relaxed/simple;
+	bh=jS1f+tL1BhmQjKQgaN8uoNHbjXF2eXImmnOtunLddcQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e6sBw37JIjtpPb6hu4oIcNUxZIPSOFEXjSuqsxBk5hBlM8Cq534ZpF/GbtUSY5y7c+alveTUVRlnIY7ufA1ryCaNYoPWn9Dd4NPxL8xaqwn0GZKn3HD69+fzxyCU0UXtn5vdrADoiwN8A2pgS/+CayVQVVVq+qqGwN9RmnkM+U4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NxrhA0cc; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=av4IoxwwnMTetRXDEbyvF7gmDWy2jPDeyMe7ve9IPDs=; b=NxrhA0cco9ZaDK9vORgGjm4zhu
+	aKWE5YkFP6r8X5z2HC7NvD3q+ikFT2B7Lb1IyMNl8Mvop9Ll/RI83ZAQBv0c2Uq4jbtWO6qP2I84u
+	9gkdokpiKWHBJUKqHpPQ1Mk8JI+lNl5wsFLIJG15vb3+5qdqAm/Qb+T4wjxQ0rpHH2XQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tKe0N-00Ffnv-Mr; Mon, 09 Dec 2024 14:40:55 +0100
+Date: Mon, 9 Dec 2024 14:40:55 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tian Xin <tianx@yunsilicon.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, weihg@yunsilicon.com
+Subject: Re: [PATCH 08/16] net-next/yunsilicon: Add ethernet interface
+Message-ID: <f4292a69-6956-4028-b5a2-c1b54893718f@lunn.ch>
+References: <20241209071101.3392590-9-tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/5] net: sparx5: misc fixes for sparx5 and lan969x
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173375163050.50212.4642950609895270784.git-patchwork-notify@kernel.org>
-Date: Mon, 09 Dec 2024 13:40:30 +0000
-References: <20241205-sparx5-lan969x-misc-fixes-v1-0-575ff3d0b022@microchip.com>
-In-Reply-To: <20241205-sparx5-lan969x-misc-fixes-v1-0-575ff3d0b022@microchip.com>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, lars.povlsen@microchip.com,
- Steen.Hegelund@microchip.com, UNGLinuxDriver@microchip.com,
- richardcochran@gmail.com, bjarni.jonasson@microchip.com,
- jensemil.schulzostergaard@microchip.com, horatiu.vultur@microchip.com,
- arnd@arndb.de, jacob.e.keller@intel.com, Parthiban.Veerasooran@microchip.com,
- calvin@wbinvd.org, Usama.Anjum@collabora.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241209071101.3392590-9-tianx@yunsilicon.com>
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 5 Dec 2024 14:54:23 +0100 you wrote:
-> This series fixes various issues in the Sparx5 and lan969x drivers. Most
-> of the fixes are for new issues introduced by the recent series adding
-> lan969x switch support in the Sparx5 driver.
+On Mon, Dec 09, 2024 at 03:10:53PM +0800, Tian Xin wrote:
+> From: Xin Tian <tianx@yunsilicon.com>
 > 
-> Most notable is patch 1/5 that moves the lan969x dir into the sparx5
-> dir, in order to address a cyclic dependency issue reported by depmod,
-> when installing modules. Details are in the commit descriptions.
+> Build a basic netdevice driver
 > 
-> [...]
+> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+> ---
+>  drivers/net/ethernet/yunsilicon/Makefile      |   2 +-
+>  .../ethernet/yunsilicon/xsc/common/xsc_core.h |   1 +
+>  .../net/ethernet/yunsilicon/xsc/net/main.c    | 135 ++++++++++++++++++
+>  .../net/ethernet/yunsilicon/xsc/net/xsc_eth.h |  16 +++
+>  .../yunsilicon/xsc/net/xsc_eth_common.h       |  15 ++
+>  5 files changed, 168 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/main.c
+>  create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h
+>  create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_common.h
+> 
+> diff --git a/drivers/net/ethernet/yunsilicon/Makefile b/drivers/net/ethernet/yunsilicon/Makefile
+> index 950fd2663..c1d3e3398 100644
+> --- a/drivers/net/ethernet/yunsilicon/Makefile
+> +++ b/drivers/net/ethernet/yunsilicon/Makefile
+> @@ -4,5 +4,5 @@
+>  # Makefile for the Yunsilicon device drivers.
+>  #
+>  
+> -# obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc/net/
+> +obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc/net/
+>  obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc/pci/
+> \ No newline at end of file
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+> index 88d4c5654..5d2b28e2e 100644
+> --- a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+> @@ -498,6 +498,7 @@ struct xsc_core_device {
+>  	struct pci_dev		*pdev;
+>  	struct device		*device;
+>  	struct xsc_priv		priv;
+> +	void			*netdev;
+>  	void			*eth_priv;
+>  	struct xsc_dev_resource	*dev_res;
+>  
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/main.c b/drivers/net/ethernet/yunsilicon/xsc/net/main.c
+> new file mode 100644
+> index 000000000..243ec7ced
+> --- /dev/null
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/net/main.c
+> @@ -0,0 +1,135 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (C) 2021 - 2023, Shanghai Yunsilicon Technology Co., Ltd.
+> + * All rights reserved.
+> + */
+> +
+> +#include <linux/reboot.h>
 
-Here is the summary with links:
-  - [net,1/5] net: lan969x: fix cyclic dependency reported by depmod
-    https://git.kernel.org/netdev/net/c/1cd7523f4baa
-  - [net,2/5] net: lan969x: fix the use of spin_lock in PTP handler
-    https://git.kernel.org/netdev/net/c/aa5fc889844f
-  - [net,3/5] net: sparx5: fix FDMA performance issue
-    https://git.kernel.org/netdev/net/c/f004f2e535e2
-  - [net,4/5] net: sparx5: fix default value of monitor ports
-    https://git.kernel.org/netdev/net/c/e4d505fda6c8
-  - [net,5/5] net: sparx5: fix the maximum frame length register
-    https://git.kernel.org/netdev/net/c/ddd7ba006078
+reboot.h in an ethernet driver? 
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> +static int xsc_net_reboot_event_handler(struct notifier_block *nb, unsigned long action, void *data)
+> +{
+> +	pr_info("xsc net driver recv %lu event\n", action);
+> +	xsc_remove_eth_driver();
+> +
+> +	return NOTIFY_OK;
+> +}
+> +
+> +struct notifier_block xsc_net_nb = {
+> +	.notifier_call = xsc_net_reboot_event_handler,
+> +	.next = NULL,
+> +	.priority = 1,
+> +};
 
+This needs a comment explanation why this driver needs something
+special during reboot.
 
+    Andrew
+
+---
+pw-bot: cr
 
