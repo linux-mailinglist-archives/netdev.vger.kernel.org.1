@@ -1,157 +1,170 @@
-Return-Path: <netdev+bounces-150125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8053D9E901F
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:28:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A7649E9049
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:34:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C5BB1884FFF
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:28:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 081201634F6
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:34:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD0D2165F5;
-	Mon,  9 Dec 2024 10:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RSvnD6ig"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A8A217F47;
+	Mon,  9 Dec 2024 10:34:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57DAF216380;
-	Mon,  9 Dec 2024 10:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299A6217721;
+	Mon,  9 Dec 2024 10:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733740117; cv=none; b=sctZ/QijBIeNztFTSz7euodqQxgmxBZLXteCzTlflwpdC8vHyS2Sf7wGaDt5wSRjSUaj3aJYeQonkZ1AdqGyZvfYp3SA/gU67r7s9+Zm4BxTzYZh/A4zBe+uxJT3V0TYLF6fOJ3XlBLWSU7uCsLWyVAlFsdNYMax7KNOjxJuNqQ=
+	t=1733740448; cv=none; b=mEoiwFRYLw66O7Aix5gTyhSqiml2fl5WpY759eWu5Tm5maLBB9eFOfrvk/K308rxR3fCvnkic+WjlYQbXL0+DWWCTwlI5P586gmQBlddpQn8PXFjY6EttQBp+5X9h1mC9nEF0xnYAj/EHz9JaVCXeBtiAK8rSbHoXfxoUtmRANI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733740117; c=relaxed/simple;
-	bh=2rwkr8VeDzByDBZGpYZoDTrR1oxX145BEsFkGtK1PH8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=LlUu4WME6wePOyz1574sBp8aLtDwOOFCIHPkKkV5alYNcL11J3sTtvOpTgKV0OuhapMlQNLCC27oNtyhHa1riCltKHl9kArwAUxgI2+b1WVizYyWT1Csv0X7Q+zn+XoEk9xIv0vvWDyxVzz59Ud+NLzNHBo8NnKwSjsaWF0SEpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RSvnD6ig; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B9AHY1i002320;
-	Mon, 9 Dec 2024 10:28:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pp1; bh=vhuftYfkSdQcWlAg8B4/iwLLXDaM
-	P6B4MuhilJfNZgE=; b=RSvnD6iggUfdQS/1yQ/AIrU+/VlDK2IGD8s0JzukDiTj
-	/QVAWnzrnbSW9BLKqPm2sU8UbUaY0+Q8aYOiHiwrRi864jAFbZpIJpWta9G4cew0
-	gZJGVlZJyphVqAy8f2q+yK8Yfxk/4M9Ng2/70XYACXrvDvNu7M3NYXJA336PSCxz
-	zpQxUHO2sT8yzzrD+hU4GH5JM2pTmsGhvxqwVKvP28U9vFWSNOOiTD5jgValM6eY
-	dbJZwSLBkkxhKZIG9tCLhWwPWucwfx1rogf7RYvo1e/HPYPmZrJ6AG8LWEeBrg4p
-	qXyQ4sN96b9HFEUTm9rjCZWnm8oV8FYR7HBVV3ewjg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ce1vgpxh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 10:28:21 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B9ACS3R029316;
-	Mon, 9 Dec 2024 10:28:20 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ce1vgpxe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 10:28:20 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B97mZCr017364;
-	Mon, 9 Dec 2024 10:28:19 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 43d3d1dsey-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 10:28:19 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B9ASJpe29688438
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 9 Dec 2024 10:28:19 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E7EF758053;
-	Mon,  9 Dec 2024 10:28:18 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4AA8458043;
-	Mon,  9 Dec 2024 10:28:17 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  9 Dec 2024 10:28:17 +0000 (GMT)
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-Date: Mon, 09 Dec 2024 11:28:03 +0100
-Subject: [PATCH] net: ethernet: 8390: Add HAS_IOPORT dependency for mcf8390
+	s=arc-20240116; t=1733740448; c=relaxed/simple;
+	bh=rhF6enybLiMYwpi3g6iEZpO8kL4r36agNjh4P74iV4g=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=uS7bLR/SlP/7n/Q+L382nVcVapK26laaaX3h/ChDdFj6/HibAdhOclzsmD0Ta+kxb9jXr1gZ9I9TkA5RvouaJ/5V1PqeWbD+ekaW2ViYdblVOuD/BWJ6OSJhIkGBlBD4M0XnG7diqCOgejnM1/JPhB5IDxPEErPFz8F6ebEVpts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Y6JBY0dbjz20lYq;
+	Mon,  9 Dec 2024 18:34:13 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7E9DF1400F4;
+	Mon,  9 Dec 2024 18:33:56 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 9 Dec 2024 18:33:55 +0800
+Message-ID: <bb464691-06c0-4842-8e4f-27cf368b363f@huawei.com>
+Date: Mon, 9 Dec 2024 18:33:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<horms@kernel.org>, <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
+	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <hkelam@marvell.com>
+Subject: Re: [PATCH V5 net-next 1/8] debugfs: Add debugfs_create_devm_dir()
+ helper
+To: Greg KH <gregkh@linuxfoundation.org>
+References: <20241206111629.3521865-1-shaojijie@huawei.com>
+ <20241206111629.3521865-2-shaojijie@huawei.com>
+ <2024120627-smudge-obsolete-efb6@gregkh>
+ <6274cc5a-375f-4009-bc3e-1b1063f298bb@huawei.com>
+ <2024120925-dreamt-immorally-f9f8@gregkh>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <2024120925-dreamt-immorally-f9f8@gregkh>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241209-mcf8390_has_ioport-v1-1-f263d573e243@linux.ibm.com>
-X-B4-Tracking: v=1; b=H4sIADLGVmcC/x3MQQqAIBBA0avErBPUCq2rRIjZmLMoQyOC6O5Jy
- 7f4/4GMiTDDUD2Q8KJMcS8QdQUu2H1FRksxSC5bIXnPNud103MTbDYUj5hOphY36852QnEHJTw
- Serr/6Ti97wf4qtOTZAAAAA==
-X-Change-ID: 20241209-mcf8390_has_ioport-7dcb85a5170c
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc: Arnd Bergmann <arnd@kernel.org>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1332;
- i=schnelle@linux.ibm.com; h=from:subject:message-id;
- bh=2rwkr8VeDzByDBZGpYZoDTrR1oxX145BEsFkGtK1PH8=;
- b=owGbwMvMwCX2Wz534YHOJ2GMp9WSGNLDjpk/fVr1tsKSNSVdzmnn/2V33B7M5lH9H+Gh5X5r/
- c3OQs1THaUsDGJcDLJiiiyLupz91hVMMd0T1N8BM4eVCWQIAxenAEzEdCnD/5DHoRVrWnZ5dcV4
- 3tfbJsctvCFKyv5QSO7bl+oTGr08Shn+l2RO2uefZXF/Yp+F7NdFiwS77Oa1lgpvmXZlt7sEl9U
- EHgA=
-X-Developer-Key: i=schnelle@linux.ibm.com; a=openpgp;
- fpr=9DB000B2D2752030A5F72DDCAFE43F15E8C26090
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _fSFbHkQVgRDwUpOIitBanAy28Vw7hbx
-X-Proofpoint-ORIG-GUID: -yl5drc7EgQmgyyfmqNxE78OqFiyS1dL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 clxscore=1011 phishscore=0 bulkscore=0 mlxlogscore=574
- impostorscore=0 spamscore=0 malwarescore=0 suspectscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412090078
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-Since commit 6f043e757445 ("asm-generic/io.h: Remove I/O port accessors
-for HAS_IOPORT=n") the I/O port accessors are compile-time optional. As
-m68k may or may not select HAS_IOPORT the COLDFIRE dependency is not
-enough to guarantee I/O port access. Add an explicit HAS_IOPORT
-dependency for mcf8390 to prevent a build failure as seen by the kernel
-test robot.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202412080511.ORVinTDs-lkp@intel.com/
-Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
----
- drivers/net/ethernet/8390/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+on 2024/12/9 14:31, Greg KH wrote:
+> On Mon, Dec 09, 2024 at 09:02:10AM +0800, Jijie Shao wrote:
+>> on 2024/12/6 19:40, Greg KH wrote:
+>>> On Fri, Dec 06, 2024 at 07:16:22PM +0800, Jijie Shao wrote:
+>>>> Add debugfs_create_devm_dir() helper
+>>>>
+>>>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+>>>> ---
+>>>>    fs/debugfs/inode.c      | 36 ++++++++++++++++++++++++++++++++++++
+>>>>    include/linux/debugfs.h | 10 ++++++++++
+>>>>    2 files changed, 46 insertions(+)
+>>>>
+>>>> diff --git a/fs/debugfs/inode.c b/fs/debugfs/inode.c
+>>>> index 38a9c7eb97e6..f682c4952a27 100644
+>>>> --- a/fs/debugfs/inode.c
+>>>> +++ b/fs/debugfs/inode.c
+>>>> @@ -610,6 +610,42 @@ struct dentry *debugfs_create_dir(const char *name, struct dentry *parent)
+>>>>    }
+>>>>    EXPORT_SYMBOL_GPL(debugfs_create_dir);
+>>>> +static void debugfs_remove_devm(void *dentry_rwa)
+>>>> +{
+>>>> +	struct dentry *dentry = dentry_rwa;
+>>>> +
+>>>> +	debugfs_remove(dentry);
+>>>> +}
+>>>> +
+>>>> +/**
+>>>> + * debugfs_create_devm_dir - Managed debugfs_create_dir()
+>>>> + * @dev: Device that owns the action
+>>>> + * @name: a pointer to a string containing the name of the directory to
+>>>> + *        create.
+>>>> + * @parent: a pointer to the parent dentry for this file.  This should be a
+>>>> + *          directory dentry if set.  If this parameter is NULL, then the
+>>>> + *          directory will be created in the root of the debugfs filesystem.
+>>>> + * Managed debugfs_create_dir(). dentry will automatically be remove on
+>>>> + * driver detach.
+>>>> + */
+>>>> +struct dentry *debugfs_create_devm_dir(struct device *dev, const char *name,
+>>>> +				       struct dentry *parent)
+>>>> +{
+>>>> +	struct dentry *dentry;
+>>>> +	int ret;
+>>>> +
+>>>> +	dentry = debugfs_create_dir(name, parent);
+>>>> +	if (IS_ERR(dentry))
+>>>> +		return dentry;
+>>>> +
+>>>> +	ret = devm_add_action_or_reset(dev, debugfs_remove_devm, dentry);
+>>>> +	if (ret)
+>>>> +		ERR_PTR(ret);
+>>> You don't clean up the directory you created if this failed?  Why not?
+>> Don't need to clean up.
+>> in devm_add_action_or_reset(), if failed, will call action: debugfs_remove_devm(),
+>> So, not clean up again.
+>>
+>> #define devm_add_action_or_reset(dev, action, data) \
+>> 	__devm_add_action_or_reset(dev, action, data, #action)
+>>
+>> static inline int __devm_add_action_or_reset(struct device *dev, void (*action)(void *),
+>> 					     void *data, const char *name)
+>> {
+>> 	int ret;
+>>
+>> 	ret = __devm_add_action(dev, action, data, name);
+>> 	if (ret)
+>> 		action(data);
+>>
+>> 	return ret;
+>> }
+>>
+>> But there's a problem with this, I missed return.
+>> I will add return in v6.
+> As this did not even compile, how did you test any of this?
+>
+> I'm now loath to add this at all, please let's just keep this "open
+> coded" in your driver for now until there are multiple users that need
+> this and then convert them all to use the function when you add it.
+>
+> thanks,
+>
+> greg k-h
 
-diff --git a/drivers/net/ethernet/8390/Kconfig b/drivers/net/ethernet/8390/Kconfig
-index 345f250781c6d9c3c6cbe5445250dc5987803b1a..f2ee99532187d133fdb02bc4b82c7fc4861f90af 100644
---- a/drivers/net/ethernet/8390/Kconfig
-+++ b/drivers/net/ethernet/8390/Kconfig
-@@ -87,7 +87,7 @@ config MAC8390
- 
- config MCF8390
- 	tristate "ColdFire NS8390 based Ethernet support"
--	depends on COLDFIRE
-+	depends on COLDFIRE && HAS_IOPORT
- 	select CRC32
- 	help
- 	  This driver is for Ethernet devices using an NS8390-compatible
+I've tested and it's ok,
 
----
-base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
-change-id: 20241209-mcf8390_has_ioport-7dcb85a5170c
+But, there is a warning(warn_unused_result)..
+My test command does not check warning other than the hibmcge driver.
+This was caused by my carelessness. I'm very sorry.
 
-Best regards,
--- 
-Niklas Schnelle
+I've looked at other driver codes, and quite a few others have similar codes.
+As you suggest, this patchset still uses open code in next version.
+In the future, I will try to send a new independent patchset to introduce it.
+
+Thanks,
+Jijie Shao
 
 
