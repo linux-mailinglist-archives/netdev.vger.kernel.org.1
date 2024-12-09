@@ -1,174 +1,142 @@
-Return-Path: <netdev+bounces-150296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C5FB9E9CF8
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:24:30 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C52D89E9CFE
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:25:01 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDC7B280C9B
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:24:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86DE7166C86
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699991F0E34;
-	Mon,  9 Dec 2024 17:23:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5E214B97E;
+	Mon,  9 Dec 2024 17:24:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ek74C0ud"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fj2K67J0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA37D1E9B26
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 17:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EB2153BEE;
+	Mon,  9 Dec 2024 17:23:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733765001; cv=none; b=rrXhNCQfnJ4L1IzJmhMZcERp8APESTtcaQC6SO4xvvnB+Wpy+t8u3pJCGYelmO2D1/GqEvBksUf7mV8ccbVlpxLr3GHcpm9LWTBUesVL87+cHSyuXelCnDyJhKRmrcjkfHwtVOoiUE+6Z5UH+IsX4rrU8y4ZqUuA+v81OZIUff0=
+	t=1733765041; cv=none; b=e9v/8tNCt/seNxo7z1GQSUjq7oPTYTX8s02M1Vojbu0QD6ETZa768tfzXHEe/exU9lSPZShIILUQEx5QUVp9Hu9ELNJDdJW7aGmb7FEApieqHOXmJy/shNboxdW3hhQrnxaIO2zFTRa4Uv3t/1a4DWddMegJO/jt+6ka5e6ClIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733765001; c=relaxed/simple;
-	bh=bFEBgpIHiRCRmFB13zC6eRwjOnKNB5aS9cu/gmZUysw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PpLN61+6Mc4WHpq8UPgfvCFJmBICtMuUtquR5f0rzen2YgQyVbKuHSVpZqRB6NcF7LmQ8rE0VNiKUwPRXLLw1scjsa/yMeEQ+A/aRsDS1B2FNRnrDmPUqWJJL4CbPIdOp9J71+fSphwHKMYPpCdcJzFfuuDvhTkf8yQoXHkU60E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ek74C0ud; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-725f4b412ecso750332b3a.0
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 09:23:19 -0800 (PST)
+	s=arc-20240116; t=1733765041; c=relaxed/simple;
+	bh=Ran93Djr5Ll1LM1y75Npe22RSbCwnFOABEYu3gAJxgY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BL7rRexWWtf6Ex75mmj/C1U0hwo6IzmhhydtIVIoQlLiuQUTxGvxEB6aa1wrtWnLNemX7ejatAL2n2At4NKDVtNHrFFjgDQWmkcn2YYgOwm0v+xfkb5Ng5JnqWaTC0RTMN5kEmDa6Vd6h/Kie8Jd8qEQwlNkdQ0AIbxXSE8Jmc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fj2K67J0; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d3e6f6cf69so3196857a12.1;
+        Mon, 09 Dec 2024 09:23:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733764999; x=1734369799; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZQM2k5Y0cRnDWnUVVFZNmxP5ATTgTt6xLxZwaHOB548=;
-        b=Ek74C0udRt0UTgoKRR9I3IQWjcvoCd0RQhaxTKY/aMxU+mqN6VRcsb9EM1tswTsdlS
-         q5qPIDVj9K7MRqNKw1eVQRtlmpNU2XG+kuwFVu1giljiagxxGpiPAmeo1ovUExb+rA6L
-         b+JD0jAQITs4blc8MTaD0VUELa5iVgnWpEKSZ2SDPnMn4Bf0nat/gwAkEVx9BXMW8Swy
-         /au6ElFrnJ1fRzUBynm5M0j3+Guiqc9ArUc+Hbuaj29GMLv0f10uL8aa5sRYLIO4HJKb
-         jrLEz72M6eenORG4lMJAxZ43iB0uzLeM1u8xPw/6jBKm1Bel+P3+ERmu5XYVrLn9FxxJ
-         xkEQ==
+        d=gmail.com; s=20230601; t=1733765038; x=1734369838; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QRvjM8wWy5ND+Jnmvo7xP/iefj/vWYMFntiDdt24YKU=;
+        b=Fj2K67J0tfqTfToclnFm9T8i42XUmJcNhASPMae40ZQyMCHnpk0faltDAEvJu73jJt
+         WZS+AY2nF9+EpfDR+Q2FEyMsgEAlinNJlf1FeJyK6wYu929Ry+x7Q1oie2J4Cc/f6jAW
+         5HY+lWdb/+PpGqjhRL+UWyuQYJnMKzfNsnBda47srzKEKRekatDHFcTk6PcczjE5pern
+         1geeegyFL0sgFVpap+UMa+opARo+M9jKooQp9LI8WrZDMfJjuCEYjrEZGg6t/CZFZD0S
+         dPumEWedePhW1JsirCkE7DHyFfmKTmBg403F3pJGeyamV1lB+cYrDm6r4/QvbVEvjxFC
+         QCOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733764999; x=1734369799;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZQM2k5Y0cRnDWnUVVFZNmxP5ATTgTt6xLxZwaHOB548=;
-        b=X6FyRdMPenkJzp2+daO5JOZ3GaxUNM1JqWGExvsf42KbmBc1BBobZJqihpEbDxEAC1
-         5jwU3dol+updhlKDPfYWSquXE2JOwxaxmHJTkJ1p6IjL8TzyWOQeIAh645/hIArn6iVK
-         1AGHI94to+X7i77ADWWJN6CglIz/0pMe4qXOwfH0B0frzTiM+DIwr6iBLbmr2aYAm2jp
-         PiwYlmqfrQ/Dh1q5pFVbgMCd1g/72zn/YKQfSOk1khHuhe9rLk6DivLR1T04CF/E8Hwq
-         2l8qxPfrh25kgfvx55RbBFLTRQp6+3WSRr5/3yLzKTRUiAPjBbfiOpYHpSNzZNIhM180
-         AMLA==
-X-Gm-Message-State: AOJu0YyQI4RuIN1xI/wUtoxuKykrUaoxrh2qLdB6zvPdVCyQDhKwTVOs
-	NtswFNJpXyJn1/jZb6ZcHo8WrdjKvJ/vYK19QWwN+ukh5MmxWyqhGxmemo1xvvgJ8YGTlrgcFgS
-	K36Kyp3/hoqX89XZfANWLbwxpzZJ2YFmrIbYOvHDv23k1iLMgRhxXkMKGoY0S/q6jCZ/tvjUoT6
-	0VIUH1xtP7WElgqyfjFfjEyuuUlVcABvfvZQYD3wGUHYTaFq6fJtX8wgyWudI=
-X-Google-Smtp-Source: AGHT+IHhNfJnVxuwnv9R4A+XXQzrx5pGpdsPzg0HIN1/IqhP/Lrmy6fFprFKab30nIaRS6AD+E2szGiPyRTX4XDhXA==
-X-Received: from pfbc2.prod.google.com ([2002:a05:6a00:ad02:b0:725:b17b:24bd])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:22c6:b0:725:9edd:dc30 with SMTP id d2e1a72fcca58-7273cb1af91mr1635221b3a.12.1733764999141;
- Mon, 09 Dec 2024 09:23:19 -0800 (PST)
-Date: Mon,  9 Dec 2024 17:23:08 +0000
-In-Reply-To: <20241209172308.1212819-1-almasrymina@google.com>
+        d=1e100.net; s=20230601; t=1733765038; x=1734369838;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QRvjM8wWy5ND+Jnmvo7xP/iefj/vWYMFntiDdt24YKU=;
+        b=NzUnHxyVzuuMwoOXJt5NEHSxJjycs2YJIzEaEaq5SiOO0i3mKqkHkp98JV4yuHobY3
+         pseVkRBr3aoJ69Ux4FLdP4D5ZVuh/lVbwqYWpXpnSmfhWQ1Adfc9UD5GWRdYEZHv7vi9
+         38TexpN7iKLzDfPMxUGUSwR118sMmqGiN8bIaahr2ySl8GGYlOC9r9L+xjFNAemsjtbW
+         caYjJgvGpJQCb5UektOh2R7uQm5Sv7uqi4C3oKpnGwDzmGi8DvYA0HD0qXrNSPGQ5uf0
+         4O1lh0lNbaMFi3sBH0JdGB+yWtvViGpChvSak3br0wQIiPLfBqcVQUwjvBZvsQ4fNNRl
+         S6Vg==
+X-Forwarded-Encrypted: i=1; AJvYcCX78gTpbumg5BYhsXeM1x83LvEcv7kK4tqdGXwQh/zdDQ3xLmLCXhK3EwxPhQgHLUwr4CDx08s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwL6ofekjeJIwgRKvlfdHAu8G8m9YzJk/FeK3ZGxi5q9dC+jzuK
+	LfzCaamXIz0bEeX1sb3gpUtvnTxCtErnNPBcO+HfZqEVOhqJIQfQ7m/76A==
+X-Gm-Gg: ASbGncs1A8v5Lk4e3pOv44tGjhxZB3a56TgZ5Oy6FYdJ7RiV0cAGihG4DUUJPz+Pwtq
+	R02jatNsceIFlrndNA4nafy0BMPRDCsJx9WuBlmp4ceNzTETwfmxnCCf0guIrgQc7E+tGV2esBs
+	02d3ZSgEAEJwvU270r8/PZMG+laoI/ubK0ZsZnIrRuWodC8vjejYZ4vWaaKot44CaH1JFI2nzEi
+	omzOEVmr8DE3nSL9CHJHV0lB25in2lmQWJwdnlRH47dfYwY8CXD62qQkm6X
+X-Google-Smtp-Source: AGHT+IEAKQYSVmLDkiUbDaGhV99DvpUQ5J4Vgthg8dw/ZKNxyrXjrg4XHBUkXJGXe+ayPXvnY10V5Q==
+X-Received: by 2002:a17:907:7708:b0:aa6:8fed:7c14 with SMTP id a640c23a62f3a-aa68fed7dcfmr323134066b.17.1733765037931;
+        Mon, 09 Dec 2024 09:23:57 -0800 (PST)
+Received: from [192.168.42.75] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa67117df90sm309997666b.170.2024.12.09.09.23.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Dec 2024 09:23:57 -0800 (PST)
+Message-ID: <8a17ffe7-b2ce-4316-8243-512dd40522cc@gmail.com>
+Date: Mon, 9 Dec 2024 17:24:52 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241209172308.1212819-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241209172308.1212819-6-almasrymina@google.com>
-Subject: [PATCH net-next v3 5/5] net: Document memory provider driver support
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Mina Almasry <almasrymina@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 05/17] net: page_pool: add ->scrub mem
+ provider callback
+To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20241204172204.4180482-1-dw@davidwei.uk>
+ <20241204172204.4180482-6-dw@davidwei.uk>
+ <CAHS8izPQQwpHTwJqTL+6cvo04sC1WEhcY7WuA_Umquk4oRCGag@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izPQQwpHTwJqTL+6cvo04sC1WEhcY7WuA_Umquk4oRCGag@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Document expectations from drivers looking to add support for device
-memory tcp or other memory provider based features.
+On 12/9/24 17:08, Mina Almasry wrote:
+> On Wed, Dec 4, 2024 at 9:22 AM David Wei <dw@davidwei.uk> wrote:
+>>
+>> From: Pavel Begunkov <asml.silence@gmail.com>
+>>
+>> Some page pool memory providers like io_uring need to catch the point
+>> when the page pool is asked to be destroyed. ->destroy is not enough
+>> because it relies on the page pool to wait for its buffers first, but
+>> for that to happen a provider might need to react, e.g. to collect all
+>> buffers that are currently given to the user space.
+>>
+>> Add a new provider's scrub callback serving the purpose and called off
+>> the pp's generic (cold) scrubbing path, i.e. page_pool_scrub().
+>>
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>> Signed-off-by: David Wei <dw@davidwei.uk>
+> 
+> I think after numerous previous discussions on this op, I guess I
+> finally see the point.
+> 
+> AFAIU on destruction tho io_uring instance will destroy the page_pool,
+> but we need to drop the user reference in the memory region. So the
+> io_uring instance will destroy the pool, then the scrub callback tells
+> io_uring that the pool is being destroyed, which drops the user
+> references.
+> 
+> I would have preferred if io_uring drops the user references before
+> destroying the pool, which I think would have accomplished the same
+> thing without adding a memory provider callback that is a bit specific
+> to this use case, but I guess it's all the same.
 
-Signed-off-by: Mina Almasry <almasrymina@google.com>
+For unrelated reasons I moved it to a later stage to io_uring code,
+so pool->mp_ops->scrub is no more. v8 is just weird, I think David
+sent an old branch because Jakub asked or so.
 
----
- Documentation/networking/index.rst           |  1 +
- Documentation/networking/memory-provider.rst | 52 ++++++++++++++++++++
- 2 files changed, 53 insertions(+)
- create mode 100644 Documentation/networking/memory-provider.rst
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 46c178e564b3..c184e86a6ce1 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -73,6 +73,7 @@ Contents:
-    l2tp
-    lapb-module
-    mac80211-injection
-+   memory-provider
-    mctp
-    mpls-sysctl
-    mptcp
-diff --git a/Documentation/networking/memory-provider.rst b/Documentation/networking/memory-provider.rst
-new file mode 100644
-index 000000000000..4eee3b01eb18
---- /dev/null
-+++ b/Documentation/networking/memory-provider.rst
-@@ -0,0 +1,52 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+================
-+Memory providers
-+================
-+
-+
-+Intro
-+=====
-+
-+Device memory TCP, and likely more upcoming features, are reliant in memory
-+provider support in the driver.
-+
-+
-+Driver support
-+==============
-+
-+1. The driver must support page_pool. The driver must not do its own recycling
-+   on top of page_pool.
-+
-+2. The driver must support tcp-data-split ethtool option.
-+
-+3. The driver must use the page_pool netmem APIs. The netmem APIs are
-+   currently 1-to-1 mapped with page APIs. Conversion to netmem should be
-+   achievable by switching the page APIs to netmem APIs and tracking memory via
-+   netmem_refs in the driver rather than struct page * :
-+
-+   - page_pool_alloc -> page_pool_alloc_netmem
-+   - page_pool_get_dma_addr -> page_pool_get_dma_addr_netmem
-+   - page_pool_put_page -> page_pool_put_netmem
-+
-+   Not all page APIs have netmem equivalents at the moment. If your driver
-+   relies on a missing netmem API, feel free to add and propose to netdev@ or
-+   reach out to almasrymina@google.com for help adding the netmem API.
-+
-+4. The driver must use the following PP_FLAGS:
-+
-+   - PP_FLAG_DMA_MAP: netmem is not dma mappable by the driver. The driver
-+     must delegate the dma mapping to the page_pool.
-+   - PP_FLAG_DMA_SYNC_DEV: netmem dma addr is not necessarily dma-syncable
-+     by the driver. The driver must delegate the dma syncing to the page_pool.
-+   - PP_FLAG_ALLOW_UNREADABLE_NETMEM. The driver must specify this flag iff
-+     tcp-data-split is enabled. In this case the netmem allocated by the
-+     page_pool may be unreadable, and netmem_address() will return NULL to
-+     indicate that. The driver must not assume that the netmem is readable.
-+
-+5. The driver must use page_pool_dma_sync_netmem_for_cpu() in lieu of
-+   dma_sync_single_range_for_cpu(). For some memory providers, dma_syncing for
-+   CPU will be done by the page_pool, for others (particularly dmabuf memory
-+   provider), dma syncing for CPU is the responsibility of the userspace using
-+   dmabuf APIs. The driver must delegate the entire dma-syncing operation to
-+   the page_pool which will do it correctly.
 -- 
-2.47.0.338.g60cca15819-goog
+Pavel Begunkov
 
 
