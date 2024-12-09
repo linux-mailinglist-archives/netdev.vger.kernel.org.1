@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-150127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B7CE9E9053
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:35:27 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1646F9E9057
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:35:47 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD343281B7C
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:35:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00337163477
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:35:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1001621772E;
-	Mon,  9 Dec 2024 10:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC37A218827;
+	Mon,  9 Dec 2024 10:34:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3AC2163B9
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 10:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB642216E25
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 10:34:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733740494; cv=none; b=bdhe2HqbAgD+gHAQ5wlziGZQy1KAY0ywyOs6DgICxT10OrGBhEi6Diuy5cMJ92mjRZraxMl/RO58BoGaLyeuK3I9dU8o5AJ+bcLd4vhFkCxtAZ2Gmzvkt5d8EESgejnlONyhYjozZQ+doq2Wsn18Hmg9+g8k8nm9sdvjGq7OH+g=
+	t=1733740496; cv=none; b=mkh+h1KrjNMCr623I3Tr9qQRRZ7mCmfZv55iauDV6TC0r+3vejc+nw/gL0B3GkbyB2jTTFYLjl7ytxgko4Vd1l73EcWNv17qegBH5z/ag9MTlekOX2Rof1l54xXGgufxTZ2rG3KM7yZNPnpWzuwGbGivliX5xGQBadA7eIDT5KU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733740494; c=relaxed/simple;
-	bh=+BPTFwca5JOFSDKTpIa5420zANyLrk/KO/GwvFWl0h0=;
+	s=arc-20240116; t=1733740496; c=relaxed/simple;
+	bh=1Mzv+FJcmWcNa0M5L8rwrH0S8bhe5+JsQYtdYZ3G2p8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=a2NjphgHlpOa77BlQw45A4Xk9qV6Nw4eMWZtG0z/6dJB6fvxhqvABk2XNjnEZHKzwER7x2z0HigD31eOHoORPuRJL2AdgjWXhGWwF8XA4B7t3GOwkcnFDyE7RM+iXjpa7WPv/EWJIyeCfc4u1ruh3lAD9IL5/K3PK0+2ykMLDIQ=
+	 MIME-Version; b=MHyeMf46TWTvG/Lj+D1uAZd4qYjTILVqhad50FMFbPLPapGe3UzlM2gaUKCcno9DRF18875YF8qtUDUmh9l7ymKRnFkoHcRO3+3RM3M7NzDUHuCPAL9LIanvOSxE8bXtX6Mj2L9Mp1VbpKZBFV0MtEJhBrGY4QI+1pOEl97UsYE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,16 +33,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tKb65-00063u-RI; Mon, 09 Dec 2024 11:34:37 +0100
+	id 1tKb65-00063v-U4; Mon, 09 Dec 2024 11:34:37 +0100
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tKb63-002UsJ-0b;
+	id 1tKb63-002UsK-0h;
 	Mon, 09 Dec 2024 11:34:35 +0100
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tKb63-001VXg-2r;
+	id 1tKb63-001VXq-2w;
 	Mon, 09 Dec 2024 11:34:35 +0100
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: Rob Herring <robh@kernel.org>,
@@ -56,15 +56,16 @@ To: Rob Herring <robh@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Woojung Huh <woojung.huh@microchip.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+Cc: Roan van Dijk <roan@protonic.nl>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
 	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH v2 2/4] dt-bindings: arm: stm32: Add Priva E-Measuringbox board
-Date: Mon,  9 Dec 2024 11:34:32 +0100
-Message-Id: <20241209103434.359522-3-o.rempel@pengutronix.de>
+Subject: [PATCH v2 3/4] arm: dts: stm32: Add thermal support for STM32MP131
+Date: Mon,  9 Dec 2024 11:34:33 +0100
+Message-Id: <20241209103434.359522-4-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241209103434.359522-1-o.rempel@pengutronix.de>
 References: <20241209103434.359522-1-o.rempel@pengutronix.de>
@@ -80,31 +81,69 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Add support for the Priva E-Measuringbox ('pri,prihmb') board based on
-the ST STM32MP133 SoC to the STM32 devicetree bindings.
+From: Roan van Dijk <roan@protonic.nl>
 
+Add thermal zone configuration and sensor node for STM32MP131 SoC.
+
+Signed-off-by: Roan van Dijk <roan@protonic.nl>
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- Documentation/devicetree/bindings/arm/stm32/stm32.yaml | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm/boot/dts/st/stm32mp131.dtsi | 35 ++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/arm/stm32/stm32.yaml b/Documentation/devicetree/bindings/arm/stm32/stm32.yaml
-index 703d4b574398..1e27b2bd7c6a 100644
---- a/Documentation/devicetree/bindings/arm/stm32/stm32.yaml
-+++ b/Documentation/devicetree/bindings/arm/stm32/stm32.yaml
-@@ -51,6 +51,12 @@ properties:
-               - st,stm32mp135f-dk
-           - const: st,stm32mp135
+diff --git a/arch/arm/boot/dts/st/stm32mp131.dtsi b/arch/arm/boot/dts/st/stm32mp131.dtsi
+index e1a764d269d2..56660e67a2a2 100644
+--- a/arch/arm/boot/dts/st/stm32mp131.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp131.dtsi
+@@ -100,6 +100,31 @@ timer {
+ 		always-on;
+ 	};
  
-+      - description: ST STM32MP133 based Boards
-+        items:
-+          - enum:
-+              - pri,prihmb   # Priva E-Measuringbox board
-+          - const: st,stm32mp133
++	thermal-zones {
++		cpu_thermal: cpu-thermal {
++			polling-delay-passive = <0>;
++			polling-delay = <0>;
++			thermal-sensors = <&dts>;
 +
-       - description: ST STM32MP151 based Boards
-         items:
-           - enum:
++			trips {
++				cpu_alert1: cpu-alert1 {
++					temperature = <85000>;
++					hysteresis = <0>;
++					type = "passive";
++				};
++
++				cpu-crit {
++					temperature = <120000>;
++					hysteresis = <0>;
++					type = "critical";
++				};
++			};
++
++			cooling-maps {
++			};
++		};
++	};
++
+ 	soc {
+ 		compatible = "simple-bus";
+ 		#address-cells = <1>;
+@@ -909,6 +934,16 @@ timer {
+ 			};
+ 		};
+ 
++		dts: thermal@50028000 {
++			compatible = "st,stm32-thermal";
++			reg = <0x50028000 0x100>;
++			interrupts = <GIC_SPI 147 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&rcc DTS>;
++			clock-names = "pclk";
++			#thermal-sensor-cells = <0>;
++			status = "disabled";
++		};
++
+ 		mdma: dma-controller@58000000 {
+ 			compatible = "st,stm32h7-mdma";
+ 			reg = <0x58000000 0x1000>;
 -- 
 2.39.5
 
