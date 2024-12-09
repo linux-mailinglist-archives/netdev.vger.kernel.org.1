@@ -1,146 +1,141 @@
-Return-Path: <netdev+bounces-150147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D534F9E92A9
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:43:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 729B91621DA
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:43:09 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19EAB21D5B7;
-	Mon,  9 Dec 2024 11:42:58 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E68919E92B3
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:46:33 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC9F21B1A8;
-	Mon,  9 Dec 2024 11:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7800281FC2
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:46:32 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315D22163B1;
+	Mon,  9 Dec 2024 11:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="UGQDfeG0"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5293C221D92
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 11:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733744577; cv=none; b=GIGo0XxBcOKJuItalhxDQrA4fVreEQKZOSDi9/y+zp1zUtoWDagsyifTrwWEK4IoRPCI2vcKO7Tr7YgRN39gDR0Hq3ebUyXD0di7KKsN027CDH8j6MBsJ1wF/s7U0Mt0Q0onDUX9K3KSf7sjNYjaSe6IzH7JGsbH6uWjygKuYs4=
+	t=1733744777; cv=none; b=LNimN0gcn7f53r+RvjGI7hKg5Kgcp/4boXzwfvpZpdXolnzRJ/6/kDI31rqQclTDyP3xwnqcAc8/ScXscl7Q1iZs3YfncQjD0+99UrmXgur9VAttaC1yeMiJDmGF71+aUozHhqxrOwrKc+j78cXxWVmz6yN59H856wZJrsp1bI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733744577; c=relaxed/simple;
-	bh=q/xw1l31pm0dg5xbojMuIT0wrI+F13QWnG9PMaA0ITY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=myC13TeHJ5lNWc5cMnvnCUh48VZFqpqXVY0ISmkD7nBzgb30XWqislrhMiZlvcy9/h41TN7TR7fMRC3zGqZdrjfLn7VUbuELdV7R9uBvj2A8B1zZH4GCMqvdHq+ZNokTuhqzqhhNmkhay14TxPBmpEJvLoox02wVneamGLLfhP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Y6Kk45b5Dz21lg5;
-	Mon,  9 Dec 2024 19:43:08 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 36C2B1400F4;
-	Mon,  9 Dec 2024 19:42:52 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 9 Dec 2024 19:42:51 +0800
-Message-ID: <3de1b8a3-ae4f-492f-969d-bc6f2c145d09@huawei.com>
-Date: Mon, 9 Dec 2024 19:42:51 +0800
+	s=arc-20240116; t=1733744777; c=relaxed/simple;
+	bh=YmVW5YtdsyVkEuLgntkxS2vrC8GUTUJo4JdlFsooOEE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lJknvzCnYDyQ/+ws84NmODQcGATs4pkpwNHSCEWfeE4deFR3iQIoXm5chgBTcyezJkCnL7O51guoNGneid1/M7zlw7HoBJgng6HWKJa7uzf2SjwuZuD+UL1aoO5DRv4zX87a6ks7Ra7386dZNZSJwhekUyv2nLs2poOd/s2ABA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=UGQDfeG0; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from katalix.com (unknown [IPv6:2a02:8010:6359:1:25fb:1d7a:7e2b:b2c8])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id 494EA7DCCF;
+	Mon,  9 Dec 2024 11:46:07 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1733744767; bh=YmVW5YtdsyVkEuLgntkxS2vrC8GUTUJo4JdlFsooOEE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:From;
+	z=From:=20James=20Chapman=20<jchapman@katalix.com>|To:=20netdev@vge
+	 r.kernel.org|Cc:=20davem@davemloft.net,=0D=0A=09edumazet@google.co
+	 m,=0D=0A=09kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=0D=0A=09hor
+	 ms@kernel.org,=0D=0A=09tparkin@katalix.com,=0D=0A=09aleksander.lob
+	 akin@intel.com,=0D=0A=09ricardo@marliere.net,=0D=0A=09mail@david-b
+	 auer.net,=0D=0A=09gnault@redhat.com|Subject:=20[PATCH=20net-next]=
+	 20l2tp:=20Handle=20eth=20stats=20using=20NETDEV_PCPU_STAT_DSTATS.|
+	 Date:=20Mon,=20=209=20Dec=202024=2011:46:07=20+0000|Message-Id:=20
+	 <20241209114607.2342405-1-jchapman@katalix.com>|MIME-Version:=201.
+	 0;
+	b=UGQDfeG0BJW+O8hcaIiIShZGjXQRzJ+o900cT/zgbv5xsMAx8jFaNWSdjlYi1yBc1
+	 dJzjKWCyJSYRwQwH9bNbS5ta9+ZiaDMBnsp57zd/NioHfOk5t4ztVk/cBAQHDETn+Q
+	 PaHRDtIr2/3kuFEL2vFKv+o3sezr2pRlis6VNvHxaV9fsFpsB7UnZXK73pzpc8l5He
+	 u75kUu9ndVgNdIF2DlqVGV2Qs6HLko8QIMkI1B4Krp+j7Re5xkU0+xr3cMF0jaZUh6
+	 c5sa1wa90M1rAcp1ullBcOEYMniO6fqkawb67hfPpAzWaz5D/Fpob1JUu7Wc0j3hWa
+	 1srTWVqwyyTBA==
+From: James Chapman <jchapman@katalix.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	tparkin@katalix.com,
+	aleksander.lobakin@intel.com,
+	ricardo@marliere.net,
+	mail@david-bauer.net,
+	gnault@redhat.com
+Subject: [PATCH net-next] l2tp: Handle eth stats using NETDEV_PCPU_STAT_DSTATS.
+Date: Mon,  9 Dec 2024 11:46:07 +0000
+Message-Id: <20241209114607.2342405-1-jchapman@katalix.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 00/10] Replace page_frag with page_frag_cache
- (Part-2)
-To: Alexander Duyck <alexander.duyck@gmail.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Shuah Khan
-	<skhan@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>,
-	Linux-MM <linux-mm@kvack.org>
-References: <20241206122533.3589947-1-linyunsheng@huawei.com>
- <CAKgT0UeXcsB-HOyeA7kYKHmEUM+d_mbTQJRhXfaiFBg_HcWV0w@mail.gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAKgT0UeXcsB-HOyeA7kYKHmEUM+d_mbTQJRhXfaiFBg_HcWV0w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Transfer-Encoding: 8bit
 
-On 2024/12/9 5:34, Alexander Duyck wrote:
+l2tp_eth uses the TSTATS infrastructure (dev_sw_netstats_*()) for RX
+and TX packet counters and DEV_STATS_INC for dropped counters.
 
-...
+Consolidate that using the DSTATS infrastructure, which can
+handle both packet counters and packet drops. Statistics that don't
+fit DSTATS are still updated atomically with DEV_STATS_INC().
 
->>
->> Performance validation for part2:
->> 1. Using micro-benchmark ko added in patch 1 to test aligned and
->>    non-aligned API performance impact for the existing users, there
->>    seems to be about 20% performance degradation for refactoring
->>    page_frag to support the new API, which seems to nullify most of
->>    the performance gain in [3] of part1.
-> 
-> So if I am understanding correctly then this is showing a 20%
-> performance degradation with this patchset. I would argue that it is
-> significant enough that it would be a blocking factor for this patch
-> set. I would suggest bisecting the patch set to identify where the
-> performance degradation has been added and see what we can do to
-> resolve it, and if nothing else document it in that patch so we can
-> identify the root cause for the slowdown.
+This change is inspired by the introduction of DSTATS helpers and
+their use in other udp tunnel drivers:
+Link: https://lore.kernel.org/all/cover.1733313925.git.gnault@redhat.com/
 
-The only patch in this patchset affecting the performance of existing API
-seems to be patch 1, only including patch 1 does show ~20% performance
-degradation as including the whole patchset does:
-mm: page_frag: some minor refactoring before adding new API
+Signed-off-by: James Chapman <jchapman@katalix.com>
+---
+ net/l2tp/l2tp_eth.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-And the cause seems to be about the binary increasing as below, as the
-performance degradation didn't seems to change much when I tried inlining
-the __page_frag_cache_commit_noref() by moving it to the header file:
+diff --git a/net/l2tp/l2tp_eth.c b/net/l2tp/l2tp_eth.c
+index d692b902e120..e83691073496 100644
+--- a/net/l2tp/l2tp_eth.c
++++ b/net/l2tp/l2tp_eth.c
+@@ -73,9 +73,9 @@ static netdev_tx_t l2tp_eth_dev_xmit(struct sk_buff *skb, struct net_device *dev
+ 	int ret = l2tp_xmit_skb(session, skb);
+ 
+ 	if (likely(ret == NET_XMIT_SUCCESS))
+-		dev_sw_netstats_tx_add(dev, 1, len);
++		dev_dstats_tx_add(dev, len);
+ 	else
+-		DEV_STATS_INC(dev, tx_dropped);
++		dev_dstats_tx_dropped(dev);
+ 
+ 	return NETDEV_TX_OK;
+ }
+@@ -84,7 +84,6 @@ static const struct net_device_ops l2tp_eth_netdev_ops = {
+ 	.ndo_init		= l2tp_eth_dev_init,
+ 	.ndo_uninit		= l2tp_eth_dev_uninit,
+ 	.ndo_start_xmit		= l2tp_eth_dev_xmit,
+-	.ndo_get_stats64	= dev_get_tstats64,
+ 	.ndo_set_mac_address	= eth_mac_addr,
+ };
+ 
+@@ -100,7 +99,7 @@ static void l2tp_eth_dev_setup(struct net_device *dev)
+ 	dev->lltx		= true;
+ 	dev->netdev_ops		= &l2tp_eth_netdev_ops;
+ 	dev->needs_free_netdev	= true;
+-	dev->pcpu_stat_type	= NETDEV_PCPU_STAT_TSTATS;
++	dev->pcpu_stat_type	= NETDEV_PCPU_STAT_DSTATS;
+ }
+ 
+ static void l2tp_eth_dev_recv(struct l2tp_session *session, struct sk_buff *skb, int data_len)
+@@ -128,7 +127,7 @@ static void l2tp_eth_dev_recv(struct l2tp_session *session, struct sk_buff *skb,
+ 		goto error_rcu;
+ 
+ 	if (dev_forward_skb(dev, skb) == NET_RX_SUCCESS)
+-		dev_sw_netstats_rx_add(dev, data_len);
++		dev_dstats_rx_add(dev, data_len);
+ 	else
+ 		DEV_STATS_INC(dev, rx_errors);
+ 
+-- 
+2.34.1
 
-./scripts/bloat-o-meter vmlinux_orig vmlinux
-add/remove: 3/2 grow/shrink: 5/0 up/down: 920/-500 (420)
-Function                                     old     new   delta
-__page_frag_cache_prepare                      -     500    +500
-__napi_alloc_frag_align                       68     180    +112
-__netdev_alloc_skb                           488     596    +108
-napi_alloc_skb                               556     624     +68
-__netdev_alloc_frag_align                    196     252     +56
-svc_tcp_sendmsg                              340     376     +36
-__page_frag_cache_commit_noref                 -      32     +32
-e843419@09a6_0000bd47_30                       -       8      +8
-e843419@0369_000044ee_684                      8       -      -8
-__page_frag_alloc_align                      492       -    -492
-Total: Before=34719207, After=34719627, chg +0.00%
-
-./scripts/bloat-o-meter page_frag_test_orig.ko page_frag_test.ko
-add/remove: 0/0 grow/shrink: 2/0 up/down: 78/0 (78)
-Function                                     old     new   delta
-page_frag_push_thread                        508     580     +72
-__UNIQUE_ID_vermagic367                       67      73      +6
-Total: Before=4582, After=4660, chg +1.70%
-
-Patch 1 is about refactoring common codes from __page_frag_alloc_va_align()
-to __page_frag_cache_prepare() and __page_frag_cache_commit(), so that the
-new API can make use of them as much as possible.
-
-Any better idea to reuse common codes as much as possible while avoiding
-the performance degradation as much as possible?
-
-> 
->> 2. Use the below netcat test case, there seems to be some minor
->>    performance gain for replacing 'page_frag' with 'page_frag_cache'
->>    using the new page_frag API after this patchset.
->>    server: taskset -c 32 nc -l -k 1234 > /dev/null
->>    client: perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | taskset -c 1 nc 127.0.0.1 1234
-> 
-> This test would barely touch the page pool. The fact is most of the
-
-I am guessing you meant page_frag here?
-
-> overhead for this would likely be things like TCP latency and data
-> copy much more than the page allocation. As such fluctuations here are
-> likely not related to your changes.
-
-But it does tell us something that the replacing does not seems to
-cause obvious regression, right?
-
-I tried using a smaller MTU to amplify the impact of page allocation,
-it seemed to have a similar result.
 
