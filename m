@@ -1,78 +1,83 @@
-Return-Path: <netdev+bounces-150024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B8429E8A1A
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 05:05:12 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09C26163A13
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 04:05:09 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5CA14AD0E;
-	Mon,  9 Dec 2024 04:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iG+yl8cA"
-X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F01759E8A49
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 05:29:33 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3753042070
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 04:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7055280EAA
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 04:29:32 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A77189F2B;
+	Mon,  9 Dec 2024 04:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U++crwKH"
+X-Original-To: netdev@vger.kernel.org
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F161615958A;
+	Mon,  9 Dec 2024 04:29:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733717108; cv=none; b=EkyrqNmOPw09JSGyoHPNDZZ8LKrv+i88VtVKPhDGcoANWhSjspLio9U12YW+5lK1KB/wpVwOqTXSODMtLNX6QLtbX7N0P+u3MlSzwSFaYbagiXihReBk4LaZqh3L823Ic2q9YggBTbqdpuBCF/CiE6Rtt5macA4caXP/YFui1Dg=
+	t=1733718562; cv=none; b=LcNK4ItNH9dmJlgvdO0RTb2CBmXdp1c4eawCdYlqqTuXa4QxaUkfgTSzw0TR8G7r3Z1sRSFQoz2Ha1ZNM0SjQLiHj5/EzXjbqKlXyrfaS5L9N3NTGoImfw04nzjH3wVUXKCS13LVWAjTUkoKYbNyS7QqgTayT5bNmUBvJkY3xaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733717108; c=relaxed/simple;
-	bh=tnFN3cKLuaolTpd0KOneZQrwC6WFLR7ZhF2p0bYuJwk=;
+	s=arc-20240116; t=1733718562; c=relaxed/simple;
+	bh=p3hzRKd9PlTdOMaycvQjC6I16A5v3NnmxZlH4tjvlXk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qlh0MwqRa6Td6sj962RR9es3coXFXH7AXSI5nM7dleuklnWZueG8+/eGe/AH15UWhcqucuQ9mskixdgZSu47Vk790mOGrpXSeeFR5p/T5C769UPOUhMgAUrUJ+3DxrZaTEb7clvoFRBD6IZ0ixh2bW4m0LY8dLlhDFWu39EFomU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iG+yl8cA; arc=none smtp.client-ip=192.198.163.14
+	 Content-Type:Content-Disposition:In-Reply-To; b=cRGZNH1hx/OrRfAAXUdHX+/rViReBcDsisGNduhRbexabWsi1aAjOhQctjm5uVJ/PmcQ3LU2fdDcItg+PWZ2gC9LaWnSdnKwzk4e+Mo5kIM3ptagdrBvYZNg6XkxQ1BpwPk+nK3GfofwynekSOxb79U2e9gEbVO1WVmbOZqi0SM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U++crwKH; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733717107; x=1765253107;
+  t=1733718561; x=1765254561;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=tnFN3cKLuaolTpd0KOneZQrwC6WFLR7ZhF2p0bYuJwk=;
-  b=iG+yl8cA9nxaF0I3u99FHNgdopaI6y/yIVMFaeKg7tfCpY1PlOSX6El9
-   29A+JNwKQCcYmgPKO5eX7WDVTZDtH7JllRjwLAuT8rAeeL0ZoQaDnbh//
-   4OasZfg/7Xztn1GbISpCo+/jlnTxRIrJPfiUXbBsu5iyQ36Uk0g/8kEBx
-   V13bGEC2+S1cBZoKb3fT3u5YlBG/Ijto3pOSvypDMi1GNf3CnfiGe0369
-   ZL61JZTb4dTY3ptAAOwXXdygwnZu8IN9vIwswCzEelcaPgmi7s/2y/jzK
-   4NkFeAGMtcsRNGM4UNSUz0tFgl0/mL/OAHIb1GBM8PmiUWCGRKxs8t9ra
-   Q==;
-X-CSE-ConnectionGUID: cH+hs5EkQtOC9hbAAnCk9g==
-X-CSE-MsgGUID: 4UzENW6rQ72yyCT4yWI4Hg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11280"; a="34235275"
+  bh=p3hzRKd9PlTdOMaycvQjC6I16A5v3NnmxZlH4tjvlXk=;
+  b=U++crwKHekPdxcT55IWhxe/O2b4hB4buhj5wcoWYnuObuq+yaU/YghXy
+   OL2KkdWRbNat4Z43TIBwfTLxiowObXu2PVHhHHkQeIx4pNeOQR/T8v5mh
+   NadlFCrp7Xztuuyijqk2Fa0e7JsVeHzdZvefXpp0a7K51HnOmMe0lFijy
+   bJbVWt+ItFj9Md9Nfo2PQrZ5KrexpIm6m6RYAJp92bZCMGSmczyHVMe/O
+   vVRfkWxQc/EMHu/ugVyaZhuVDQ/Pe0kVKOLHPP8VPdkKYTgbbUhG1Rzhr
+   qtdMutgovT1LRDiViD3EzDKs4naw4qvnQlY+g2zwQly+76hte5NgWmg9b
+   w==;
+X-CSE-ConnectionGUID: tiuY4oUgQ/az1S4X82eFaw==
+X-CSE-MsgGUID: y2KeVUSOQ1GNY9oBay65jg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11280"; a="34122925"
 X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
-   d="scan'208";a="34235275"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 20:05:07 -0800
-X-CSE-ConnectionGUID: oVNjYBGfRsGlxE8W03ASyA==
-X-CSE-MsgGUID: eL0kmTS8QjeB8IHS+Sx9QQ==
+   d="scan'208";a="34122925"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 20:29:20 -0800
+X-CSE-ConnectionGUID: IaxzBbOlRQ+PKoF7WG+nqQ==
+X-CSE-MsgGUID: o9NcqU3GR6ScBNY6oo6xig==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
-   d="scan'208";a="94822674"
+   d="scan'208";a="99404803"
 Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 08 Dec 2024 20:05:04 -0800
+  by fmviesa005.fm.intel.com with ESMTP; 08 Dec 2024 20:29:15 -0800
 Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1tKV14-0003mh-0Z;
-	Mon, 09 Dec 2024 04:05:02 +0000
-Date: Mon, 9 Dec 2024 12:04:10 +0800
+	id 1tKVOS-0003r7-2t;
+	Mon, 09 Dec 2024 04:29:12 +0000
+Date: Mon, 9 Dec 2024 12:28:33 +0800
 From: kernel test robot <lkp@intel.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: Re: [PATCH v1 net-next 08/15] socket: Pass hold_net to sk_alloc().
-Message-ID: <202412071110.UY8rjRf1-lkp@intel.com>
-References: <20241206075504.24153-9-kuniyu@amazon.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com,
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com,
+	jolsa@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v4 01/11] net-timestamp: add support for
+ bpf_setsockopt()
+Message-ID: <202412080315.koZqiF0Y-lkp@intel.com>
+References: <20241207173803.90744-2-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,87 +86,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241206075504.24153-9-kuniyu@amazon.com>
+In-Reply-To: <20241207173803.90744-2-kerneljasonxing@gmail.com>
 
-Hi Kuniyuki,
+Hi Jason,
 
 kernel test robot noticed the following build errors:
 
 [auto build test ERROR on net-next/main]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/socket-Un-export-__sock_create/20241206-160139
+url:    https://github.com/intel-lab-lkp/linux/commits/Jason-Xing/net-timestamp-add-support-for-bpf_setsockopt/20241208-014111
 base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241206075504.24153-9-kuniyu%40amazon.com
-patch subject: [PATCH v1 net-next 08/15] socket: Pass hold_net to sk_alloc().
-config: s390-allyesconfig (https://download.01.org/0day-ci/archive/20241207/202412071110.UY8rjRf1-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241207/202412071110.UY8rjRf1-lkp@intel.com/reproduce)
+patch link:    https://lore.kernel.org/r/20241207173803.90744-2-kerneljasonxing%40gmail.com
+patch subject: [PATCH net-next v4 01/11] net-timestamp: add support for bpf_setsockopt()
+config: i386-buildonly-randconfig-001-20241208 (https://download.01.org/0day-ci/archive/20241208/202412080315.koZqiF0Y-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241208/202412080315.koZqiF0Y-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412071110.UY8rjRf1-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412080315.koZqiF0Y-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   net/iucv/af_iucv.c: In function 'iucv_sock_alloc':
->> net/iucv/af_iucv.c:455:14: error: too few arguments to function 'sk_alloc'
-     455 |         sk = sk_alloc(&init_net, PF_IUCV, prio, &iucv_proto, kern);
-         |              ^~~~~~~~
-   In file included from net/iucv/af_iucv.c:30:
-   include/net/sock.h:1745:14: note: declared here
-    1745 | struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
-         |              ^~~~~~~~
+   net/core/filter.c: In function 'sk_bpf_set_cb_flags':
+>> net/core/filter.c:5232:11: error: 'struct sock' has no member named 'sk_bpf_cb_flags'
+    5232 |         sk->sk_bpf_cb_flags = sk_bpf_cb_flags;
+         |           ^~
 
 
-vim +/sk_alloc +455 net/iucv/af_iucv.c
+vim +5232 net/core/filter.c
 
-eac3731bd04c713 Jennifer Hunt     2007-02-08  448  
-8424c284851b97e Kuniyuki Iwashima 2024-12-06  449  static struct sock *iucv_sock_alloc(struct socket *sock, int proto, gfp_t prio,
-8424c284851b97e Kuniyuki Iwashima 2024-12-06  450  				    bool kern, bool hold_net)
-eac3731bd04c713 Jennifer Hunt     2007-02-08  451  {
-eac3731bd04c713 Jennifer Hunt     2007-02-08  452  	struct sock *sk;
-493d3971a65c921 Ursula Braun      2011-08-08  453  	struct iucv_sock *iucv;
-eac3731bd04c713 Jennifer Hunt     2007-02-08  454  
-11aa9c28b420924 Eric W. Biederman 2015-05-08 @455  	sk = sk_alloc(&init_net, PF_IUCV, prio, &iucv_proto, kern);
-eac3731bd04c713 Jennifer Hunt     2007-02-08  456  	if (!sk)
-eac3731bd04c713 Jennifer Hunt     2007-02-08  457  		return NULL;
-493d3971a65c921 Ursula Braun      2011-08-08  458  	iucv = iucv_sk(sk);
-eac3731bd04c713 Jennifer Hunt     2007-02-08  459  
-eac3731bd04c713 Jennifer Hunt     2007-02-08  460  	sock_init_data(sock, sk);
-493d3971a65c921 Ursula Braun      2011-08-08  461  	INIT_LIST_HEAD(&iucv->accept_q);
-493d3971a65c921 Ursula Braun      2011-08-08  462  	spin_lock_init(&iucv->accept_q_lock);
-493d3971a65c921 Ursula Braun      2011-08-08  463  	skb_queue_head_init(&iucv->send_skb_q);
-493d3971a65c921 Ursula Braun      2011-08-08  464  	INIT_LIST_HEAD(&iucv->message_q.list);
-493d3971a65c921 Ursula Braun      2011-08-08  465  	spin_lock_init(&iucv->message_q.lock);
-493d3971a65c921 Ursula Braun      2011-08-08  466  	skb_queue_head_init(&iucv->backlog_skb_q);
-493d3971a65c921 Ursula Braun      2011-08-08  467  	iucv->send_tag = 0;
-3881ac441f642d5 Ursula Braun      2011-08-08  468  	atomic_set(&iucv->pendings, 0);
-493d3971a65c921 Ursula Braun      2011-08-08  469  	iucv->flags = 0;
-3881ac441f642d5 Ursula Braun      2011-08-08  470  	iucv->msglimit = 0;
-ef6af7bdb9e6c14 Julian Wiedmann   2021-01-28  471  	atomic_set(&iucv->skbs_in_xmit, 0);
-3881ac441f642d5 Ursula Braun      2011-08-08  472  	atomic_set(&iucv->msg_sent, 0);
-3881ac441f642d5 Ursula Braun      2011-08-08  473  	atomic_set(&iucv->msg_recv, 0);
-493d3971a65c921 Ursula Braun      2011-08-08  474  	iucv->path = NULL;
-3881ac441f642d5 Ursula Braun      2011-08-08  475  	iucv->sk_txnotify = afiucv_hs_callback_txnotify;
-b5d8cf0af167f3a Kees Cook         2021-11-18  476  	memset(&iucv->init, 0, sizeof(iucv->init));
-3881ac441f642d5 Ursula Braun      2011-08-08  477  	if (pr_iucv)
-3881ac441f642d5 Ursula Braun      2011-08-08  478  		iucv->transport = AF_IUCV_TRANS_IUCV;
-3881ac441f642d5 Ursula Braun      2011-08-08  479  	else
-3881ac441f642d5 Ursula Braun      2011-08-08  480  		iucv->transport = AF_IUCV_TRANS_HIPER;
-eac3731bd04c713 Jennifer Hunt     2007-02-08  481  
-eac3731bd04c713 Jennifer Hunt     2007-02-08  482  	sk->sk_destruct = iucv_sock_destruct;
-eac3731bd04c713 Jennifer Hunt     2007-02-08  483  	sk->sk_sndtimeo = IUCV_CONN_TIMEOUT;
-eac3731bd04c713 Jennifer Hunt     2007-02-08  484  
-eac3731bd04c713 Jennifer Hunt     2007-02-08  485  	sock_reset_flag(sk, SOCK_ZAPPED);
-eac3731bd04c713 Jennifer Hunt     2007-02-08  486  
-eac3731bd04c713 Jennifer Hunt     2007-02-08  487  	sk->sk_protocol = proto;
-eac3731bd04c713 Jennifer Hunt     2007-02-08  488  	sk->sk_state	= IUCV_OPEN;
-eac3731bd04c713 Jennifer Hunt     2007-02-08  489  
-eac3731bd04c713 Jennifer Hunt     2007-02-08  490  	iucv_sock_link(&iucv_sk_list, sk);
-eac3731bd04c713 Jennifer Hunt     2007-02-08  491  	return sk;
-eac3731bd04c713 Jennifer Hunt     2007-02-08  492  }
-eac3731bd04c713 Jennifer Hunt     2007-02-08  493  
+  5218	
+  5219	static int sk_bpf_set_cb_flags(struct sock *sk, sockptr_t optval, bool getopt)
+  5220	{
+  5221		int sk_bpf_cb_flags;
+  5222	
+  5223		if (getopt)
+  5224			return -EINVAL;
+  5225	
+  5226		if (copy_from_sockptr(&sk_bpf_cb_flags, optval, sizeof(sk_bpf_cb_flags)))
+  5227			return -EFAULT;
+  5228	
+  5229		if (sk_bpf_cb_flags & ~SK_BPF_CB_MASK)
+  5230			return -EINVAL;
+  5231	
+> 5232		sk->sk_bpf_cb_flags = sk_bpf_cb_flags;
+  5233	
+  5234		return 0;
+  5235	}
+  5236	
 
 -- 
 0-DAY CI Kernel Test Service
