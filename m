@@ -1,209 +1,232 @@
-Return-Path: <netdev+bounces-150226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D16B59E9856
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:07:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A33ED9E9868
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:08:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43DB81889A9B
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:07:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CADFB163C37
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:08:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5262B1BEF6E;
-	Mon,  9 Dec 2024 14:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0B11ACEDB;
+	Mon,  9 Dec 2024 14:07:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UZAZfv+B"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Kn/OSptF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C33B1B4257;
-	Mon,  9 Dec 2024 14:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADF11ACEC1
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 14:07:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733753177; cv=none; b=MiEDnPLrNko2vVqtJaKFYu+7KBRjqrjs1yxoxpx8PYqHoLkL0+7RJr6T174hQKLqUyB5Zkpb0GmywWvZgZvkSRJ7fjxq+5NkAT8l+WVk05wmj5Yw5bZZg/kh7RGcDDIUGaJeuw3K/Fx2oqc2ipT2mWJa94uLn0RNMKWj7+GGAtQ=
+	t=1733753266; cv=none; b=YCeENc7JMpvs1W15JfqE6gvlHxE5dncCcI4/4Tubf/5gs+daFk+QBd4U2NiwrIq/KQ2JDLYlDOP5NzAB9jS+W7BRWNU10ELFrlvZuPLP2uzxnHV5JFACecraH8mDofDOJGLz+XQEnS3I1b3Sdj3iAtJpgfCI4LhtzYMl4e91azA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733753177; c=relaxed/simple;
-	bh=x8YNUdGfzz0Gow2dLZx6X+qGjYOm2eRI9DodjQo7NU8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U7bJ97cbxJpdcfHzt15MBCws/G81NcZZ2u+clZ48iI7A2bAHOn10yHpoEt4dUjkDRfAAdzKS3JB75KWUkMdhrho14GrtvUjhxqoGVU+RspDH7Tyz62zLMNbk/D7rmXoQbu3JN8UnoojQVGT7mpomdsoJvMP0RZggQJYrEgEUu+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UZAZfv+B; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2165448243fso9518935ad.1;
-        Mon, 09 Dec 2024 06:06:15 -0800 (PST)
+	s=arc-20240116; t=1733753266; c=relaxed/simple;
+	bh=Li+9C41OEnoizUBVLjUt4eHwVJbxyfFaCoM/H7D0Upg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BDqdsrKLgV9HMwF5xitG62ptVD6Foo4XZ1PIn41LTUZMMPIBpBOEDxPlAK40/XPUXTaW8HX3YFzFeMglTxnAfeGAytgv8lVwZgm6MrCXt78dpviI6bNJR/DZSSOy53IG3NFf+fv0Xb6VAjplLSkqbgsMK/nR1wQTmrn5IsL1jdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Kn/OSptF; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-434f30ba149so8728805e9.0
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 06:07:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733753174; x=1734357974; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IZacjWdb8RyenSpXv6Caz5kcIhA6mwKRd5G/S3r2hOU=;
-        b=UZAZfv+BRLl/Shtic2L4VBsSRsZmYRwmhJ1j0Xnwb7fJw9/ABUzo79nmLO4z+TGNyS
-         EHxjADxk4lsz30Uy5ZFZtQqfF/bLc/2ROEE/Vbajw/wxhQRy11wDQtjkhUWvq1Q2NyTU
-         eYweIU691CgjovnKYPUe2JnF7D/QFOMeH9Oq3m/l+wWBi874BXrIwLyvcvjQBk9fgMyD
-         +4WLhqA59w4Ka9ryxj/nvYWwldCJ1jqBxRTtISaIujKFAcLsNFu2cvbDr+X0bi5Kg8cK
-         Cv6dDPr3TFCpw33ZL805f9CMCZTMMLT6uUBHI4SmRbenSwWeHHsoG6UwBnTtJPH+1I3X
-         HuMQ==
+        d=openvpn.net; s=google; t=1733753262; x=1734358062; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YAATdBL+Q71uheSTVHloU/f2/2eBkXUbBsjQijIYqTY=;
+        b=Kn/OSptFPoVQIsNrwkEU1kImEm2vjWd/3+ee+zVoRUUnjmmmRV9QRcwR/scLrvk3J+
+         FhsF/Ab1bGCeZedpdOMzJnOFuv3O7O1EJLLzAnObESKiwjateN5gBfTsk6uh4tkqtz26
+         ysRg2CsqIHvQU0hXcjQtUf/mTQIFGhp4rPLHHEQ8oU5tsv5VbvHUkTf1pIEWM8MEcMfr
+         lEF6DVCV7FiK/zQtqf3UQMf2Hl3JY4109ogLoihGAJRrKYuGZGiR5/s9h5TS0q8Vt39r
+         S2wAYFJQr6t9ckpBXGzyPthIXimJqqfECwWPzGTQq0w69XkSJLrjUR5sko+B7CMSNUy5
+         XSrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733753174; x=1734357974;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IZacjWdb8RyenSpXv6Caz5kcIhA6mwKRd5G/S3r2hOU=;
-        b=DHem4pmSO4aCKrwY+1uBxIu4tRkbz5mAhqUShWsozzik4lsXZQwmfr4KNxFUYwRNZA
-         8cCpkgIOX6u7e6t2yZvOswXQDlqxfrXiO/SpSTx2qpZ50T7NjTuBKVZOOFFgM9N+jhby
-         q6zzuGC8ADCYiZj5XVs8uuILuBgfj2duB3dlMV4v1Sn5AkPU5Rouc7sOs/kJZzWtLMLz
-         4+Ib4c0s8SvXFMMnSS5kDm7Jqb6iW5D4lSitp/1DfTHUYcO/osY82EXeZTIwn2qrBhXp
-         1dPr0i93zcN0naDtCtbAtjmtFjUIP7mqtL3jQZBi6RfOO9SHl0zeRZ5bn4yRMc47hgVU
-         /MVA==
-X-Forwarded-Encrypted: i=1; AJvYcCUAx0ZS8vbxLada1xpQ6jvUbYv/WlK5YjswwZWX8LIJTxHpGKQWAPH7vzPACZ8dWwQvjlqzvVhXGQAe@vger.kernel.org, AJvYcCUJ1nDG2k0Xy0ESnsGPeihybrlBHdYwTyxCGAppPGmjLrzd29+YNf1CdpHcLJNM2FlxNNs=@vger.kernel.org, AJvYcCUaDZPMRd/38Zfeh9P3kB//x2o3/7TeK3BD0vYoaAONG+tRhYxmnBGV3XN4dLICNes8MG4nWdYF0KFgvNfn@vger.kernel.org, AJvYcCVF6IOYmj+kpLdp7ctzmCz5egJeCBSbBp54hl7gWE2T5AH2OPdKLsMwySWs3X1Z8M8VG05NlSpdeTIYcQ==@vger.kernel.org, AJvYcCWWLNNPTp8zAr0oVLahBhsnZrdeV/FvIHBldEcNGLztTFSxJxMgwXlADfH9nn3f/UIYoLLeyH7JsEefqQ==@vger.kernel.org, AJvYcCWrKbxHD3826G9bfWdg36KnRWwG9HYQMbMtH0i/VpUWAgBh2Dh94mGgYaIsArkwfihpqICfd7ukMreMQueQWHw=@vger.kernel.org, AJvYcCXbW3jvUGIp5R+w7ZmNCFY8zilMiNBy+tDwVZOwSh4jqL7MHaEc7NfZkyicM/WRQ0ORyuR/8E3A1zFFDlvYcvyP@vger.kernel.org, AJvYcCXlOD3uQoTOoef613wqQBUyQR7Ro0sNd8BXzHos/r7lWQ7gp5WYJYp7EINTSHNcQZXKYl+vjJv1DC68@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRYbiq9KS6tdcBXnKTgURZ5kzyetV5Z0KLyepJ2nTdgbXoZLKu
-	PR4qofKhZT9G2nvhyOmKcgEG48wMM0R11SJbMpjRf/kmNxLCZp8Tlbu4bqtkCQc=
-X-Gm-Gg: ASbGncs8Ratplb/QAj24KurcWvfroPQiRMhrVKLGZml+AZyeEZtgefB0GOSIoRGEBOa
-	9SCufkIf16NHIN31aKP4NYRdzKFtTLCUiG31f/rvPzmmLFi7BMNjzZ1GlNkpJTZFT6Z91szM8K0
-	02uixKuoDlaePQzlxZrqvVrHZbTe0EVan5eYz4yvApF91NkSMQXrfjBebcpFVtPvGqSWqDDpXMi
-	pG7PnI6bful7v8madW/dSrAnsOraGiOvxQUJIoe2YzuX4g=
-X-Google-Smtp-Source: AGHT+IHmgSwYi0f3YPXZUnipKY4/LE+6y74m5MtL3Oj9+h7tdAHjZEgR2L+TFdRwx2htNJ1fIiOnow==
-X-Received: by 2002:a17:902:ce8d:b0:215:a2af:44ca with SMTP id d9443c01a7336-21614dd2374mr177498285ad.37.1733753174431;
-        Mon, 09 Dec 2024 06:06:14 -0800 (PST)
-Received: from nova-ws.. ([103.167.140.11])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-216221db645sm49605645ad.46.2024.12.09.06.06.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2024 06:06:13 -0800 (PST)
-From: Xiao Liang <shaw.leon@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	linux-rdma@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	osmocom-net-gprs@lists.osmocom.org,
-	bpf@vger.kernel.org,
-	linux-ppp@vger.kernel.org,
-	wireguard@lists.zx2c4.com,
-	linux-wireless@vger.kernel.org,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	bridge@lists.linux.dev,
-	linux-wpan@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5 5/5] selftests: net: Add two test cases for link netns
-Date: Mon,  9 Dec 2024 22:01:51 +0800
-Message-ID: <20241209140151.231257-6-shaw.leon@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241209140151.231257-1-shaw.leon@gmail.com>
-References: <20241209140151.231257-1-shaw.leon@gmail.com>
+        d=1e100.net; s=20230601; t=1733753262; x=1734358062;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YAATdBL+Q71uheSTVHloU/f2/2eBkXUbBsjQijIYqTY=;
+        b=JH0NGcbHMcI6u+2+2cVXymIdENXnvM02mDlaj+Q+ZnbfDbcR1R4FyjZ9xxrKmDjvUE
+         7CQCMxLUYICFBJ1jBBGGTuS552l+YY13m9hc8AyScsujkQhr4yI2qevqsajz1HFOEjCl
+         6MSrqINF38Ua4UKX0PBkUhEjMwX7SoHkbjn+lpEpVGhKjg1vkNhgyjEwlCemxUDD7EUN
+         R8Zg2tYJsaZN76bilmScxr9qDgKi4VKvNiGgKw38kR70JTuDDZga/XlU36kii2Twvp/g
+         sKELURSyof7xZEhXBD8dq2OhyIbhlcy1ceRNvy1BNI2nQwlsV+e9bVBUDwpgxbT/QHyG
+         oBoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUqOWB7gr3E18QFruM9DaN926Cte9iTA6XUwtwjGnkAcAVHbk8wba2ZkQPvs39+B/JW7tP9guo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWDhBGpWE6Ds7/wTtGV0UUQTF0n7Vs65qknIfwJAZQauQc3d25
+	nYjWlTrm935sKtTiZe2NEBJkGMCKeBV+ubHcJ/tg9TyUHmYcJXr7SW0AFNDUu3c=
+X-Gm-Gg: ASbGnctEZ6IHHSVNhB/m6Qn24tRAZCwX40x2zlI7IktIQ71UqYtPcz1XBxdNlbR2i84
+	UtUp9NU/jyhg1ektj3ia3gFqWXiQOz7cLTRcdmY7xtJuFsfCRdvNIduHL4C+ZKvWvmMbQX4mzLP
+	pvaTld6EMev0fu++66abfrw5NvZR2QH1VMJok4KzWOJuwsGdTCoD2tpvf4clqYOs7hJMtcuoQYb
+	zEjkM3vF6baPKaJnAIGx+aQOM2t7vcmf84UmmFwtHJwkinuTQi6VEmQqP5yQXx0Mz8sDS0w5o2x
+	+dY/VX/UvQ==
+X-Google-Smtp-Source: AGHT+IHx3KsbV6dFTbqwvBpAQWt4Zvvpiuios/igcBIY6QLOhoXi0AxfFkl8Or4uu4hz8z6QNujtXw==
+X-Received: by 2002:a05:600c:4ec6:b0:434:f270:a4f0 with SMTP id 5b1f17b1804b1-434fffa2a6cmr4817195e9.21.1733753262246;
+        Mon, 09 Dec 2024 06:07:42 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:c60f:6f50:7258:1f7? ([2001:67c:2fbc:1:c60f:6f50:7258:1f7])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-386394dd379sm5544080f8f.24.2024.12.09.06.07.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Dec 2024 06:07:41 -0800 (PST)
+Message-ID: <cb84c0e5-8ee9-4860-a8db-8787c44a703a@openvpn.net>
+Date: Mon, 9 Dec 2024 15:08:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 11/22] ovpn: implement TCP transport
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com,
+ Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20241202-b4-ovpn-v12-0-239ff733bf97@openvpn.net>
+ <20241202-b4-ovpn-v12-11-239ff733bf97@openvpn.net>
+ <784fddc4-336c-4674-8277-c7cebea6b94f@redhat.com>
+ <2a1b614c-c52d-44c7-8cb8-c68a8864508d@openvpn.net>
+ <8714deae-c1f7-42ff-9e76-fabd9ca5188b@openvpn.net>
+ <17e7d4c6-4912-4d5e-8723-45a06a1ad529@openvpn.net>
+ <813d75bf-1d7f-472b-967f-27ab8f9d4759@kernel.org>
+ <e447ef89-e7f1-4c5b-871e-d1cfaa045c6c@openvpn.net>
+ <c34748e0-44ad-4775-abd5-52034c4f5fdc@kernel.org>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <c34748e0-44ad-4775-abd5-52034c4f5fdc@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
- - Add test for creating link in another netns when a link of the same
-   name and ifindex exists in current netns.
- - Add test for link netns atomicity - create link directly in target
-   netns, and no notifications should be generated in current netns.
+On 09/12/2024 12:31, Matthieu Baerts wrote:
+> On 09/12/2024 11:58, Antonio Quartulli wrote:
+>> On 09/12/2024 11:46, Matthieu Baerts wrote:
+>>> Hi Antonio,
+>>>
+>>> Thank you for working on this, and sharing your work here!
+>>>
+>>> On 05/12/2024 00:09, Antonio Quartulli wrote:
+>>>> On 04/12/2024 23:52, Antonio Quartulli wrote:
+>>>>> Paolo,
+>>>>>
+>>>>> On 04/12/2024 12:15, Antonio Quartulli wrote:
+>>>>> [...]
+>>>>>>>> +        mutex_lock(&tcp6_prot_mutex);
+>>>>>>>> +        if (!ovpn_tcp6_prot.recvmsg)
+>>>>>>>> +            ovpn_tcp_build_protos(&ovpn_tcp6_prot, &ovpn_tcp6_ops,
+>>>>>>>> +                          sock->sk->sk_prot,
+>>>>>>>> +                          sock->sk->sk_socket->ops);
+>>>>>>>> +        mutex_unlock(&tcp6_prot_mutex);
+>>>>>>>
+>>>>>>> This looks like an hack to avoid a build dependency on IPV6, I think
+>>>>>>> the
+>>>>>>> explicit
+>>>>>>
+>>>>>> I happily copied this approach from espintcp.c:espintcp_init_sk() :-D
+>>>>>>
+>>>>>>>
+>>>>>>> #if IS_ENABLED(CONFIG_IPV6)
+>>>>>>>
+>>>>>>> at init time should be preferable
+>>>>>
+>>>>> To get this done at init time I need inet6_stream_ops to be
+>>>>> accessible, but it seems there is no EXPORT_SYMBOL() for this object.
+>>>>>
+>>>>> However, I see that mptcp/protocol.c is happily accessing it.
+>>>>> Any clue how this is possible?
+>>>>
+>>>> I answer myself: mptcp is not tristate and it can only be compiled as
+>>>> built-in.
+>>>
+>>> Indeed, that's why.
+>>>
+>>> Talking about MPTCP, by chance, do you plan to support it later on? :)
+>>
+>> Hi Matthieu,
+>>
+>> It is not on our current roadmap (TCP doesn't get much love in the VPN
+>> world), but I agree it could be an interesting option to explore!
+> 
+> I understand, it makes sense not to recommend using TCP for the
+> transport layer for tunnelling solutions.
+> 
+>> I have to admit that I haven't played much with MPTCP myself yet, but I
+>> am more than happy to talk about potential advantages for the ovpn use
+>> case.
+> 
+> Some people told me they were interested in using OpenVPN with MPTCP to
+> use multiple (low-capacity) network links at the same time. I think
+> intercepting and proxying TCP traffic would always be the best in terms
+> of performances, but using OpenVPN with MPTCP seems to be enough for
+> some, especially when they want to "improve" some type of UDP traffic
+> that cannot be intercepted: QUIC, VPN, etc.
+> 
+> I don't have numbers to share, but I can understand this feature can
+> help in some cases.
 
-Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
----
- tools/testing/selftests/net/Makefile        |  1 +
- tools/testing/selftests/net/netns-name.sh   | 10 ++++++
- tools/testing/selftests/net/netns_atomic.py | 39 +++++++++++++++++++++
- 3 files changed, 50 insertions(+)
- create mode 100755 tools/testing/selftests/net/netns_atomic.py
+Yeah, some people may definitely benefit from this feature.
+I'll have a look at MPTCP once ovpn is merged.
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index cb2fc601de66..f9f7a765d645 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -34,6 +34,7 @@ TEST_PROGS += gre_gso.sh
- TEST_PROGS += cmsg_so_mark.sh
- TEST_PROGS += cmsg_time.sh cmsg_ipv6.sh
- TEST_PROGS += netns-name.sh
-+TEST_PROGS += netns_atomic.py
- TEST_PROGS += nl_netdev.py
- TEST_PROGS += srv6_end_dt46_l3vpn_test.sh
- TEST_PROGS += srv6_end_dt4_l3vpn_test.sh
-diff --git a/tools/testing/selftests/net/netns-name.sh b/tools/testing/selftests/net/netns-name.sh
-index 6974474c26f3..0be1905d1f2f 100755
---- a/tools/testing/selftests/net/netns-name.sh
-+++ b/tools/testing/selftests/net/netns-name.sh
-@@ -78,6 +78,16 @@ ip -netns $NS link show dev $ALT_NAME 2> /dev/null &&
-     fail "Can still find alt-name after move"
- ip -netns $test_ns link del $DEV || fail
- 
-+#
-+# Test no conflict of the same name/ifindex in different netns
-+#
-+ip -netns $NS link add name $DEV index 100 type dummy || fail
-+ip -netns $NS link add netns $test_ns name $DEV index 100 type dummy ||
-+    fail "Can create in netns without moving"
-+ip -netns $test_ns link show dev $DEV >> /dev/null || fail "Device not found"
-+ip -netns $NS link del $DEV || fail
-+ip -netns $test_ns link del $DEV || fail
-+
- echo -ne "$(basename $0) \t\t\t\t"
- if [ $RET_CODE -eq 0 ]; then
-     echo "[  OK  ]"
-diff --git a/tools/testing/selftests/net/netns_atomic.py b/tools/testing/selftests/net/netns_atomic.py
-new file mode 100755
-index 000000000000..d350a3fc0a91
---- /dev/null
-+++ b/tools/testing/selftests/net/netns_atomic.py
-@@ -0,0 +1,39 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+import time
-+
-+from lib.py import ksft_run, ksft_exit, ksft_true
-+from lib.py import ip
-+from lib.py import NetNS, NetNSEnter
-+from lib.py import RtnlFamily
-+
-+
-+def test_event(ns1, ns2) -> None:
-+    with NetNSEnter(str(ns1)):
-+        rtnl = RtnlFamily()
-+
-+    rtnl.ntf_subscribe("rtnlgrp-link")
-+
-+    ip(f"netns set {ns1} 0", ns=str(ns2))
-+
-+    ip(f"link add netns {ns2} link-netnsid 0 dummy1 type dummy")
-+    ip(f"link add netns {ns2} dummy2 type dummy", ns=str(ns1))
-+
-+    ip("link del dummy1", ns=str(ns2))
-+    ip("link del dummy2", ns=str(ns2))
-+
-+    time.sleep(1)
-+    rtnl.check_ntf()
-+    ksft_true(rtnl.async_msg_queue.empty(),
-+              "Received unexpected link notification")
-+
-+
-+def main() -> None:
-+    with NetNS() as ns1, NetNS() as ns2:
-+        ksft_run([test_event], args=(ns1, ns2))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
+> 
+> (This reminds me this: https://github.com/OpenVPN/ovpn-dco/issues/60)
+> (and this: https://github.com/arinc9/openvpn/pull/1)
+
+Right, this definitely shows some interest and it means we should easily 
+find people willing to test :-)
+
+
+Regards,
+
+
 -- 
-2.47.1
+Antonio Quartulli
+OpenVPN Inc.
 
 
