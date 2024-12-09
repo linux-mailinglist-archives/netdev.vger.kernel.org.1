@@ -1,43 +1,78 @@
-Return-Path: <netdev+bounces-150145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 925DF9E9287
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:35:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DD139E9295
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:37:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ED1E16413E
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:35:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B099162775
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2248421D017;
-	Mon,  9 Dec 2024 11:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D022206A5;
+	Mon,  9 Dec 2024 11:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QvssUjPr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCBC21B8E7;
-	Mon,  9 Dec 2024 11:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D050021E093;
+	Mon,  9 Dec 2024 11:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733744098; cv=none; b=H80ii8amkT+Yordbyj+v0oaHfQyXw/qdHSvc6No1U7PWprPeyMsEe4z2eB63DlBV6i3UzA01GOs9hWVoMW10yoEsfjPWlBSpS3dHOe+ZX4YNNI6bnRpV4WvgRJakkc3UVpTsfHuMSxl+I45IdKtRYQxGMFv1NEFM9ScWVuD0TIc=
+	t=1733744209; cv=none; b=IH8ATcLKud1/9NcePhAI9rg86zltynVMDjP2I+/vjE8Px4+fHzImr01ab+LT2f+5Y5Y3R9reNGoonKrtLCjIifTaOdc9jgiBdVB+Edp/jyxM7v81TNdgKWGNPyMkoggRXf61LiCZPjpiooEhAhDHMvBj5eJMglq/4xL/MNh/eKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733744098; c=relaxed/simple;
-	bh=7yj+ho3eGntuJsIADyxqGayzAvC2M/QWCJcLVACYVsw=;
+	s=arc-20240116; t=1733744209; c=relaxed/simple;
+	bh=ZlKLqseD77SAZvOORQVUfrSOF8Pn6ADkryyopa+DG9g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z+mvzozKI9ncQwAghnN4QLgBZiSAAcmG+2WxAgqIB7PlqWFE+A0psuwgM7yyskyAi0UOltd4q3RL/q+hAdnzLvARPD624cPxyxx5SaO3m5vMRicVQuxpcTD+gzQ8NoAd5MP386Zy5krMQfqc5AgvhZyAfBJtGH3CsS9esbXurng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.224] (ip5f5aee8e.dynamic.kabel-deutschland.de [95.90.238.142])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 84D0861E6476B;
-	Mon, 09 Dec 2024 12:34:09 +0100 (CET)
-Message-ID: <7c4f3165-df86-47e1-9fc4-7087accf4a68@molgen.mpg.de>
-Date: Mon, 9 Dec 2024 12:34:08 +0100
+	 In-Reply-To:Content-Type; b=hs5kz083tg248jDwuKZtJ5/5gQVE02oXP2J77QXlDLkp9tJAqTYi/oNB39cZ9ISCF1meJBkXjm0kE9oPyys1FrA4DWCrmpxnfDpK6KVWo2Sa8TUACe6ChcCTjWtY2MIe1H23Tt1kRL5TsamlXTHlQFPP6lrzVmwirc76zJc+pUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QvssUjPr; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa689a37dd4so150948766b.3;
+        Mon, 09 Dec 2024 03:36:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733744206; x=1734349006; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zoqe9Whe3yMtlFet31USqO0Fn1cK27Vp8jD/bmMM6cY=;
+        b=QvssUjPrIhX3l8vPHTv2opHGP5yC3SMr9D53qWl1wTbCV7oDGHGyu7jAqUa0K/YSNY
+         sLUH2nUvydd0B+3x0gNvPKNba+F0WYUQbFk3c6VPAO9238SUr7X3tl2bRog5Db16JuG9
+         yJLVjoLXm0e2mTNqifzqV1cPGPZLBTrxcKp4B++7XX/+452MX2CX2C/XKQFTQA8RczWQ
+         152KjjfzncczTFT8lD+j5wSG5peA92XK7m6w6RzSCrHJBNJivTtsEPv1e3c/SRxVck1U
+         H+SQx/cDj+rT08OewbXTSkmTXvsamY69czup0HLz8ARsXrlJhsB+RufBIhEnElzYgxo1
+         yksg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733744206; x=1734349006;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zoqe9Whe3yMtlFet31USqO0Fn1cK27Vp8jD/bmMM6cY=;
+        b=I8Pmzx2a2pJkLDgXqI7pv07oX8L+vmh4Ge2lMFe8LczO9tBXCU9aljCrliqExTOesl
+         DbJVwVLXN0bRYE7O+vFXrTNQtYcun9hZ1wQ6dnrTFO3ktUO9ZlnoSKZ7HD0b2StGVISq
+         yzLsLetl4C0l/2Waf4XCD/jhYczgoWulIRAoTtQWEtpKoMzzdM20+z8hSTGOpiF3u8Wg
+         0IkHuLFtHaoE5rFei5DpfEOp60XfIB5cVhGN1xl06Y5nWGjhCsjNKnQFtITzZLCOXcz+
+         hy4DhjMP7Z3tAVz7Ntt2m7d4Oq64LLdZs3x7R5zOhkGCLXQoavoqSn7gcAQyIymCza9g
+         ZqcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUN89e0MxdxmNe1pCcJfpC0IMgmvJh/rYGiKEUpmkVOp9qdDw9/REF3ddb7igd0cZhB265eB1n5@vger.kernel.org, AJvYcCWjsYcx2FLKRS4WT9Wtz9VEWum3ZUYci4jWExidTxhsEz5n4QmFTTk5wGbZGZ4xbgNbL3vkJxwen2D8@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+w0tdhZZwGDIMvjn1+AbA16Z9+MDSY02SyHu1olcE7zfem6Ej
+	NvFWRx5LS7t7gRTIBho0A9d/JpdjoM4oyT8VeTgcJloOHWNz4DHD
+X-Gm-Gg: ASbGncv6rhhsKpKQR4eYWCTWQcw+FxnXbQ21npGJpJJUr9hTKNyk6uJB/oAw3osOuCc
+	+a0Yuu9tKpjlt1vvbQV/gq3y48VHF3C2n1e9iGfkYAsqUgMZIHbYA5tUWx7ZWVHZeVkN8l+4c9A
+	wk4BmU55llSbrQnAng7EQ5WNAd5N8WkMqALfRXAXK7JXQScf/xGWF5Qr2iu6x82Cquxi4g9ZJhB
+	pesP9F+RzCRrGCn/sjUIDUiHLDJligIdi01UMPT1dBmbm+R5Rsu2h/AL+LUklMRZHg=
+X-Google-Smtp-Source: AGHT+IFKdatPgMfDBN7Xfbk2j+VSacP3ycm6JKmMGa2vsAcwBzl/eTdZm6wsNrpZNUR5VVOsPl1YeA==
+X-Received: by 2002:a17:907:9554:b0:aa6:6c08:dc79 with SMTP id a640c23a62f3a-aa66c08de57mr581772266b.35.1733744205646;
+        Mon, 09 Dec 2024 03:36:45 -0800 (PST)
+Received: from [10.80.1.87] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa6800a99f4sm196237566b.31.2024.12.09.03.36.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Dec 2024 03:36:45 -0800 (PST)
+Message-ID: <6ebe9fdf-ae3f-4e77-a2d4-82427e59f51b@gmail.com>
+Date: Mon, 9 Dec 2024 13:36:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,95 +80,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] e1000e: Fix real-time
- violations on link up
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, Gerhard Engleder <eg@keba.com>,
- Vitaly Lifshits <vitaly.lifshits@intel.com>, linux-pci@vger.kernel.org,
- Bjorn Helgaas <bhelgaas@google.com>
-References: <20241208184950.8281-1-gerhard@engleder-embedded.com>
+Subject: Re: [PATCH net-next] net/mlx5e: Transmit small messages in linear skb
+To: Alexandra Winter <wintera@linux.ibm.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Nils Hoppmann <niho@linux.ibm.com>, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ Thorsten Winkler <twinkler@linux.ibm.com>, Simon Horman <horms@kernel.org>
+References: <20241204140230.23858-1-wintera@linux.ibm.com>
+ <a8e529b2-1454-4c3f-aa49-b3d989e1014a@intel.com>
+ <8e7f3798-c303-44b9-ae3f-5343f7f811e8@linux.ibm.com>
 Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20241208184950.8281-1-gerhard@engleder-embedded.com>
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <8e7f3798-c303-44b9-ae3f-5343f7f811e8@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-[Cc: +PCI folks]
-
-Dear Gerhard,
 
 
-Thank you for your patch.
-
-
-Am 08.12.24 um 19:49 schrieb Gerhard Engleder:
-> From: Gerhard Engleder <eg@keba.com>
+On 06/12/2024 17:20, Alexandra Winter wrote:
 > 
-> From: Gerhard Engleder <eg@keba.com>
-
-The from line is present twice. No idea, if git is going to remove both.
-
-> Link down and up triggers update of MTA table. This update executes many
-> PCIe writes and a final flush. Thus, PCIe will be blocked until all writes
-> are flushed. As a result, DMA transfers of other targets suffer from delay
-> in the range of 50us. This results in timing violations on real-time
-> systems during link down and up of e1000e.
 > 
-> A flush after a low enough number of PCIe writes eliminates the delay
-> but also increases the time needed for MTA table update. The following
-> measurements were done on i3-2310E with e1000e for 128 MTA table entries:
+> On 04.12.24 15:32, Alexander Lobakin wrote:
+>>> @@ -269,6 +270,10 @@ static void mlx5e_sq_xmit_prepare(struct mlx5e_txqsq *sq, struct sk_buff *skb,
+>>>   {
+>>>   	struct mlx5e_sq_stats *stats = sq->stats;
+>>>   
+>>> +	/* Don't require 2 IOMMU TLB entries, if one is sufficient */
+>>> +	if (use_dma_iommu(sq->pdev) && skb->truesize <= PAGE_SIZE)
+>     +		skb_linearize(skb);
+>> 1. What's with the direct DMA? I believe it would benefit, too?
 > 
-> Single flush after all writes: 106us
-> Flush after every write:       429us
-> Flush after every 2nd write:   266us
-> Flush after every 4th write:   180us
-> Flush after every 8th write:   141us
-> Flush after every 16th write:  121us
 > 
-> A flush after every 8th write delays the link up by 35us and the
-> negative impact to DMA transfers of other targets is still tolerable.
+> Removing the use_dma_iommu check is fine with us (s390). It is just a proposal to reduce the impact.
+> Any opinions from the NVidia people?
 > 
-> Execute a flush after every 8th write. This prevents overloading the
-> interconnect with posted writes.
 > 
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> CC: Vitaly Lifshits <vitaly.lifshits@intel.com>
-> Link: https://lore.kernel.org/netdev/f8fe665a-5e6c-4f95-b47a-2f3281aa0e6c@lunn.ch/T/
-> Signed-off-by: Gerhard Engleder <eg@keba.com>
-> ---
-> v2:
-> - remove PREEMPT_RT dependency (Andrew Lunn, Przemek Kitszel)
-> ---
->   drivers/net/ethernet/intel/e1000e/mac.c | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
+>> 2. Why truesize, not something like
+>>
+>> 	if (skb->len <= some_sane_value_maybe_1k)
 > 
-> diff --git a/drivers/net/ethernet/intel/e1000e/mac.c b/drivers/net/ethernet/intel/e1000e/mac.c
-> index d7df2a0ed629..7d1482a9effd 100644
-> --- a/drivers/net/ethernet/intel/e1000e/mac.c
-> +++ b/drivers/net/ethernet/intel/e1000e/mac.c
-> @@ -331,8 +331,13 @@ void e1000e_update_mc_addr_list_generic(struct e1000_hw *hw,
->   	}
->   
->   	/* replace the entire MTA table */
-> -	for (i = hw->mac.mta_reg_count - 1; i >= 0; i--)
-> +	for (i = hw->mac.mta_reg_count - 1; i >= 0; i--) {
->   		E1000_WRITE_REG_ARRAY(hw, E1000_MTA, i, hw->mac.mta_shadow[i]);
-> +
-> +		/* do not queue up too many writes */
+> 
+> With (skb->truesize <= PAGE_SIZE) the whole "head" buffer fits into 1 page.
+> When we set the threshhold at a smaller value, skb->len makes more sense
+> 
+> 
+>>
+>> 3. As Eric mentioned, PAGE_SIZE can be up to 256 Kb, I don't think
+>>     it's a good idea to rely on this.
+>>     Some test-based hardcode would be enough (i.e. threshold on which
+>>     DMA mapping starts performing better).
+> 
+> 
+> A threshhold of 4k is absolutely fine with us (s390).
+> A threshhold of 1k would definitvely improve our situation and bring back the performance for some important scenarios.
+> 
+> 
+> NVidia people do you have any opinion on a good threshhold?
+> 
 
-Maybe make the comment more elaborate?
+Hi,
 
-> +		if ((i % 8) == 0 && i != 0)
-> +			e1e_flush();
-> +	}
->   	e1e_flush();
->   }
+Many approaches in the past few years are going the opposite direction, 
+trying to avoid copies ("zero-copy").
+
+In many cases, copy up to PAGE_SIZE means copy everything.
+For high NIC speeds this is not realistic.
+
+Anyway, based on past experience, threshold should not exceed "max 
+header size" (128/256b).
 
 
-Kind regards,
-
-Paul
 
