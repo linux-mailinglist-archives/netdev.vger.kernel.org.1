@@ -1,351 +1,216 @@
-Return-Path: <netdev+bounces-150303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D34279E9D81
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:51:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CF769E9D84
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:52:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A00A1887043
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:51:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09A19164015
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D612C15749C;
-	Mon,  9 Dec 2024 17:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3667A154BFC;
+	Mon,  9 Dec 2024 17:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UBCCDmwf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="cD9mLwD3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D6A153BFC
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 17:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7132713775E
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 17:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733766679; cv=none; b=fFFI+MdMLCITFfdY1v4lf4eug3aq63R5mw3CWo1W2WA1b/qBBYs37AmGjRSepOfNlcfHMuJRkGNEYMEsHnTx3gBiHSz5EYLjD3dsCo8c/CtOJJbv7WrWses33TNURSoMW8nFSIxqQmUNtF41/gJHJ9QgnkZa+vHWdDCJfqHa9oc=
+	t=1733766736; cv=none; b=Y+sCFEO+Ry7xIiBsXmutijCj70aa4DgC8f+3r04zAN+nVrVcmcviVMxo3a3TSHuTKgudYRjkso8P24J0bQV+XKdztjPYNxItMVIzf42gxB/f/FH/MdjjtbM1dYswabBofyOjzwS3llU2CMSn9PlEXcZZafCVk4ApkgU2FpwDYfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733766679; c=relaxed/simple;
-	bh=I650u4xgoBvZVnpFknCJORT87dGzGprkCetninL2hTY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zg21NllAP7u+uw5DkooBcc0LoA6d6erzPUaF4m02FE6T0a5ZzsqUsCFwG1SSkIAjBETK33OON5DG7v+Y1+YbVJ+2mSPM/ufbkkGeKpEDmYpW0X3/xgczloneZqem4MG+Bta2ZP22Td/MQ0kZoPqPk7Ho3b1JCNknS7/AQieUulA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UBCCDmwf; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4675936f333so321101cf.0
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 09:51:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733766677; x=1734371477; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5mBPvczMWM/n5bKZ9YlmyB0NFq3GEO6dYo6FnSFDkwk=;
-        b=UBCCDmwfheFAdt+1y5HT4OFrP9evdDUof3V/dXcgDney6vBp7ck0CPCCiCaXkhgitK
-         QHFzFUTLbSHpGexFnWJBfKDULPXQ2H0lYK7lfkZI0vCaBndObfFftXtrZP7aef/JYG5/
-         4GVBCkMwKbMlSKDSrNQflSCIvcBSUvrTjD4+THXZprcaGrYEd1Qi8r3Zjb/rQSX/7E7V
-         86iAwVlv2Nb8ECTngsy/JyCrMn5tLDgNaOoMV89i65/enJ8wZKOhzCRLKg/fAgKcODMm
-         o0VNb8gpcvXvR+8ywxEMAnWLRJtmDyQx2b8PlLMnFeAxvEmZpCcOrEvNcGGBp3svheWr
-         Ijug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733766677; x=1734371477;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5mBPvczMWM/n5bKZ9YlmyB0NFq3GEO6dYo6FnSFDkwk=;
-        b=OYW8yTihJxtlWmLsYVR3uCxZ7AoD7apTNYVkc/2DiIQ2LFAIACM+NHaQj4SEZ21Cie
-         fYgI4nIQt5y5yYdKtKMgMhsO+thUWtvX2dfxFpZlyvc5AgYWp8lWmNSF4pQE56CAXm3C
-         GxGswkO/e7MnMUXrkDPw+0Zom2CvrfmyL+Yb/RACWSeD85+baeH48gi2uo9/QHlBbWwE
-         1UgvAdXk8KvQaTkAYFGtEoxXAD7oJaqFyQB/c01wOsGrWVoqBsD7w7dlFPvWwXajWq2i
-         zqmwFMJ0pL9BQDD8XaHWQlJ0opOP5mhHgrmYgMYGnoiBWrnYtze3TpJGYic8SKagLsyt
-         mflg==
-X-Forwarded-Encrypted: i=1; AJvYcCVjM42ndScfSGdM/ndFYmw+qA+qH6DpkGHM4Zs1/NxhLRcIIZN9D223av0dMwGZl4EBiHE+mY4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLvY0+mIk2yRdEC65H/qeoBnwvqkVqdkMYnIDhDf6RuvvCTdCN
-	ZoiHcUeOKr8lPQwCNEBAGinnBUCrw2ATM7c6GtK43tEhYF4C+g/MG4ANRhF3Peqv6bkqwY5LjR3
-	gzQi9276U4VPnQfDUq6NvjXoVTj1XQjj3mlCk
-X-Gm-Gg: ASbGncs1pmorSqPT+hbdclICrC5AXeMem51alVlFztI/mDrq+5I/fy9ptfKVNxH18ae
-	YM++QTtjThgltrHKYyFVarIJRRQxkWghwLWbeNtBkL2GMZomSjJ8PZMHvZQPL0g==
-X-Google-Smtp-Source: AGHT+IE7xvWGaHaycDDuW3FhhbirXibugXj3omDncQUKbGN7PZSoEothwM/hNMib71fL12aAIYzaHzO8ImgEqcQz2zU=
-X-Received: by 2002:a05:622a:5e13:b0:466:975f:b219 with SMTP id
- d75a77b69052e-46746f3433emr10033691cf.8.1733766676670; Mon, 09 Dec 2024
- 09:51:16 -0800 (PST)
+	s=arc-20240116; t=1733766736; c=relaxed/simple;
+	bh=q47wp+7ShOmXP9lThVu5siRWhq5Erpp/RWwWRLpRKOk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OWQr7g/PKQXZdKtxwmIF+I/lExWSsbrhsWuu75+wD7WraXPS7fS+L7zuyEsgq38wLjbr+0hqPyGVphnRcBBGFvL7lUjmFMfW367OtDb68ukvu4C270DcQvu3QSjVBHUneXfXz/4qYfPfr9iNT1yEWzaOnjHJaE8T+KDCmSdfOMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=cD9mLwD3; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+JhDzHtSkTfJYvYO/zyUqfJtGitI0F3X+O3mT98acPs=; t=1733766734; x=1734630734; 
+	b=cD9mLwD3eBIvw7U9cztQTLgmK+shhk5/Mi6l9z8WjkAiAVdGmWcJOpwMrNxUoSm1URaX7djz6/i
+	A4fbmVMFrh/LX1EN3t0zBVwq6S3g8A6CCOojjvHJKunMsW0RX65nw5PmkqjB8xcbWRjphXfCXdHXD
+	iRAvtCivpeW7/QATQ5vJPueY0UUAs9eUBiYBpH1VEkCV7EkzZR8OyDrtL7ffM6cuFz7OpZX1vqWCA
+	ja0kYXhFQ50jHQEFhKsO7FWJ1UzRifeidmXrwZy1narvEI0NqL2UmwVpzith15P03iIPQHwemfkFv
+	S3a4i70FXF6Zkr8LXlQFX7zX5pKEMAv8+4QQ==;
+Received: from 70-228-78-207.lightspeed.sntcca.sbcglobal.net ([70.228.78.207]:53595 helo=localhost.localdomain)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tKhvY-0006KI-QF; Mon, 09 Dec 2024 09:52:13 -0800
+From: John Ousterhout <ouster@cs.stanford.edu>
+To: netdev@vger.kernel.org
+Cc: John Ousterhout <ouster@cs.stanford.edu>
+Subject: [PATCH net-next v3 00/12] Begin upstreaming Homa transport protocol
+Date: Mon,  9 Dec 2024 09:51:17 -0800
+Message-ID: <20241209175131.3839-1-ouster@cs.stanford.edu>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241204172204.4180482-1-dw@davidwei.uk> <20241204172204.4180482-17-dw@davidwei.uk>
-In-Reply-To: <20241204172204.4180482-17-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 9 Dec 2024 09:51:04 -0800
-Message-ID: <CAHS8izP3mo=BYNxKawetg5vNxgRhtUOU2qykJxkWpvua8HQU6g@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 16/17] net: add documentation for io_uring zcrx
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 9c1c2f2bbf77627aba3b3999e7d87b9b
 
-On Wed, Dec 4, 2024 at 9:23=E2=80=AFAM David Wei <dw@davidwei.uk> wrote:
->
-> Add documentation for io_uring zero copy Rx that explains requirements
-> and the user API.
->
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->  Documentation/networking/iou-zcrx.rst | 201 ++++++++++++++++++++++++++
->  1 file changed, 201 insertions(+)
->  create mode 100644 Documentation/networking/iou-zcrx.rst
->
-> diff --git a/Documentation/networking/iou-zcrx.rst b/Documentation/networ=
-king/iou-zcrx.rst
-> new file mode 100644
-> index 000000000000..0a3af8c08c7e
-> --- /dev/null
-> +++ b/Documentation/networking/iou-zcrx.rst
-> @@ -0,0 +1,201 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +io_uring zero copy Rx
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +Introduction
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +io_uring zero copy Rx (ZC Rx) is a feature that removes kernel-to-user c=
-opy on
-> +the network receive path, allowing packet data to be received directly i=
-nto
-> +userspace memory. This feature is different to TCP_ZEROCOPY_RECEIVE in t=
-hat
-> +there are no strict alignment requirements and no need to mmap()/munmap(=
-).
-> +Compared to kernel bypass solutions such as e.g. DPDK, the packet header=
-s are
-> +processed by the kernel TCP stack as normal.
-> +
-> +NIC HW Requirements
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +Several NIC HW features are required for io_uring ZC Rx to work. For now=
- the
-> +kernel API does not configure the NIC and it must be done by the user.
-> +
-> +Header/data split
-> +-----------------
-> +
-> +Required to split packets at the L4 boundary into a header and a payload=
-.
-> +Headers are received into kernel memory as normal and processed by the T=
-CP
-> +stack as normal. Payloads are received into userspace memory directly.
-> +
-> +Flow steering
-> +-------------
-> +
-> +Specific HW Rx queues are configured for this feature, but modern NICs
-> +typically distribute flows across all HW Rx queues. Flow steering is req=
-uired
-> +to ensure that only desired flows are directed towards HW queues that ar=
-e
-> +configured for io_uring ZC Rx.
-> +
-> +RSS
-> +---
-> +
-> +In addition to flow steering above, RSS is required to steer all other n=
-on-zero
-> +copy flows away from queues that are configured for io_uring ZC Rx.
-> +
-> +Usage
-> +=3D=3D=3D=3D=3D
-> +
-> +Setup NIC
-> +---------
-> +
-> +Must be done out of band for now.
+This patch series begins the process of upstreaming the Homa transport
+protocol. Homa is an alternative to TCP for use in datacenter
+environments. It provides 10-100x reductions in tail latency for short
+messages relative to TCP. Its benefits are greatest for mixed workloads
+containing both short and long messages running under high network loads.
+Homa is not API-compatible with TCP: it is connectionless and message-
+oriented (but still reliable and flow-controlled). Homa's new API not
+only contributes to its performance gains, but it also eliminates the
+massive amount of connection state required by TCP for highly connected
+datacenter workloads.
 
-I would remove any 'for now' instances in the docs. Uapis are going to
-be maintained as-is for posterity. Even if you in the future add new
-APIs which auto-configure headersplit/flow steering/rss, I'm guessing
-the current API would live on for backward compatibility reasons.
+For more details on Homa, please consult the Homa Wiki:
+https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
+The Wiki has pointers to two papers on Homa (one of which describes
+this implementation) as well as man pages describing the application
+API and other information.
 
-> +
-> +Ensure there are enough queues::
+There is also a GitHub repo for Homa:
+https://github.com/PlatformLab/HomaModule
+The GitHub repo contains a superset of this patch set, including:
+* Additional source code that will eventually be upstreamed
+* Extensive unit tests (which will also be upstreamed eventually)
+* Application-level library functions (which need to go in glibc?)
+* Man pages (which need to be upstreamed as well)
+* Benchmarking and instrumentation code
 
-Was not clear to me what are enough queues. Technically you only need
-2 queues, right? (one for iozcrx and one for normal traffic).
+For this patch series, Homa has been stripped down to the bare minimum
+functionality capable of actually executing remote procedure calls. (about
+8000 lines of source code, compared to 15000 in the complete Homa). The
+remaining code will be upstreamed in smaller batches once this patch
+series has been accepted. Note: the code in this patch series is
+functional but its performance is not very interesting (about the same
+as TCP).
 
-> +
-> +  ethtool -L eth0 combined 32
-> +
-> +Enable header/data split::
-> +
-> +  ethtool -G eth0 tcp-data-split on
-> +
-> +Carve out half of the HW Rx queues for zero copy using RSS::
-> +
-> +  ethtool -X eth0 equal 16
-> +
-> +Set up flow steering::
-> +
-> +  ethtool -N eth0 flow-type tcp6 ... action 16
-> +
-> +Setup io_uring
-> +--------------
-> +
-> +This section describes the low level io_uring kernel API. Please refer t=
-o
-> +liburing documentation for how to use the higher level API.
-> +
-> +Create an io_uring instance with the following required setup flags::
-> +
-> +  IORING_SETUP_SINGLE_ISSUER
-> +  IORING_SETUP_DEFER_TASKRUN
-> +  IORING_SETUP_CQE32
-> +
-> +Create memory area
-> +------------------
-> +
-> +Allocate userspace memory area for receiving zero copy data::
-> +
-> +  void *area_ptr =3D mmap(NULL, area_size,
-> +                        PROT_READ | PROT_WRITE,
-> +                        MAP_ANONYMOUS | MAP_PRIVATE,
-> +                        0, 0);
-> +
-> +Create refill ring
-> +------------------
-> +
-> +Allocate memory for a shared ringbuf used for returning consumed buffers=
-::
-> +
-> +  void *ring_ptr =3D mmap(NULL, ring_size,
-> +                        PROT_READ | PROT_WRITE,
-> +                        MAP_ANONYMOUS | MAP_PRIVATE,
-> +                        0, 0);
-> +
-> +This refill ring consists of some space for the header, followed by an a=
-rray of
-> +``struct io_uring_zcrx_rqe``::
-> +
-> +  size_t rq_entries =3D 4096;
-> +  size_t ring_size =3D rq_entries * sizeof(struct io_uring_zcrx_rqe) + P=
-AGE_SIZE;
-> +  /* align to page size */
-> +  ring_size =3D (ring_size + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
-> +
-> +Register ZC Rx
-> +--------------
-> +
-> +Fill in registration structs::
-> +
-> +  struct io_uring_zcrx_area_reg area_reg =3D {
-> +    .addr =3D (__u64)(unsigned long)area_ptr,
-> +    .len =3D area_size,
-> +    .flags =3D 0,
-> +  };
-> +
-> +  struct io_uring_region_desc region_reg =3D {
-> +    .user_addr =3D (__u64)(unsigned long)ring_ptr,
-> +    .size =3D ring_size,
-> +    .flags =3D IORING_MEM_REGION_TYPE_USER,
-> +  };
-> +
-> +  struct io_uring_zcrx_ifq_reg reg =3D {
-> +    .if_idx =3D if_nametoindex("eth0"),
-> +    /* this is the HW queue with desired flow steered into it */
-> +    .if_rxq =3D 16,
-> +    .rq_entries =3D rq_entries,
-> +    .area_ptr =3D (__u64)(unsigned long)&area_reg,
-> +    .region_ptr =3D (__u64)(unsigned long)&region_reg,
-> +  };
-> +
-> +Register with kernel::
-> +
-> +  io_uring_register_ifq(ring, &reg);
-> +
-> +Map refill ring
-> +---------------
-> +
-> +The kernel fills in fields for the refill ring in the registration ``str=
-uct
-> +io_uring_zcrx_ifq_reg``. Map it into userspace::
-> +
-> +  struct io_uring_zcrx_rq refill_ring;
-> +
-> +  refill_ring.khead =3D (unsigned *)((char *)ring_ptr + reg.offsets.head=
-);
-> +  refill_ring.khead =3D (unsigned *)((char *)ring_ptr + reg.offsets.tail=
-);
-> +  refill_ring.rqes =3D
-> +    (struct io_uring_zcrx_rqe *)((char *)ring_ptr + reg.offsets.rqes);
-> +  refill_ring.rq_tail =3D 0;
-> +  refill_ring.ring_ptr =3D ring_ptr;
-> +
-> +Receiving data
-> +--------------
-> +
-> +Prepare a zero copy recv request::
-> +
-> +  struct io_uring_sqe *sqe;
-> +
-> +  sqe =3D io_uring_get_sqe(ring);
-> +  io_uring_prep_rw(IORING_OP_RECV_ZC, sqe, fd, NULL, 0, 0);
-> +  sqe->ioprio |=3D IORING_RECV_MULTISHOT;
-> +
-> +Now, submit and wait::
-> +
-> +  io_uring_submit_and_wait(ring, 1);
-> +
-> +Finally, process completions::
-> +
-> +  struct io_uring_cqe *cqe;
-> +  unsigned int count =3D 0;
-> +  unsigned int head;
-> +
-> +  io_uring_for_each_cqe(ring, head, cqe) {
-> +    struct io_uring_zcrx_cqe *rcqe =3D (struct io_uring_zcrx_cqe *)(cqe =
-+ 1);
-> +
-> +    unsigned char *data =3D area_ptr + (rcqe->off & IORING_ZCRX_AREA_MAS=
-K);
-> +    /* do something with the data */
-> +
-> +    count++;
-> +  }
-> +  io_uring_cq_advance(ring, count);
-> +
-> +Recycling buffers
-> +-----------------
-> +
-> +Return buffers back to the kernel to be used again::
-> +
-> +  struct io_uring_zcrx_rqe *rqe;
-> +  unsigned mask =3D refill_ring.ring_entries - 1;
-> +  rqe =3D &refill_ring.rqes[refill_ring.rq_tail & mask];
-> +
-> +  area_offset =3D rcqe->off & IORING_ZCRX_AREA_MASK;
-> +  rqe->off =3D area_offset | area_reg.rq_area_token;
-> +  rqe->len =3D cqe->res;
-> +  IO_URING_WRITE_ONCE(*refill_ring.ktail, ++refill_ring.rq_tail);
-> +
+The patch series is arranged to introduce the major functional components
+of Homa. Until the last patch has been applied, the code is inert (it
+will not be compiled).
 
-Ah, I see why it's difficult for you to napi_pp_put_page() refilled
-pages. In part it's because the refill code in the userspace never
-traps into the kernel. Got it.
+Note: this implementation of Homa supports both IPv4 and IPv6.
 
-I guess I read from the other thread that there are some
-(significant?) changes in the next version to incorporate feedback
-from Jakub, so I guess I'll wait for that before commenting further.
+v3 changes:
+- Fix formatting in Kconfig
+- Set ipv6_pinfo_offset in struct proto
+- Check return value of inet6_register_protosw
+- In homa_load cleanup, don't cleanup things that haven't been
+  initialized
+- Add MODULE_ALIAS_NET_PF_PROTO_TYPE to auto-load module
+- Check return value from kzalloc call in homa_sock_init
+- Change SO_HOMA_SET_BUF to SO_HOMA_RCVBUF
+- Change struct homa_set_buf_args to struct homa_rcvbuf_args
+- Implement getsockopt for SO_HOMA_RCVBUF
+- Return ENOPROTOOPT instead of EINVAL where appropriate in
+  setsockopt and getsockopt
+- Fix crash in homa_pool_check_waiting if pool has no region yet
+- Check for NULL msg->msg_name in homa_sendmsg
+- Change addr->in6.sin6_family to addr->sa.sa_family in homa_sendmsg
+  for clarity
+- For some errors in homa_recvmsg, return directly rather than "goto done"
+- Return error from recvmsg if offsets of returned read buffers are bogus
+- Added comments to clarify lock-unlock pairs for RPCs
+- Renamed homa_try_bucket_lock to homa_try_rpc_lock
+- Fix issues found by test robot and checkpatch.pl
+- Ensure first argument to do_div is 64 bits
+- Remove C++ style comments
+- Removed some code that will only be relevant in future patches that
+  fill in missing Homa functionality
 
+v2 changes:
 
---=20
-Thanks,
-Mina
+- Remove sockaddr_in_union declaration from public API in homa.h
+- Remove kernel wrapper functions (homa_send, etc.) from homa.h
+- Fix many sparse warnings (still more work to do here) and other issues
+  uncovered by test robot
+- Fix checkpatch.pl issues
+- Remove residual code related to unit tests
+- Remove references to tt_record from comments
+- Make it safe to delete sockets during homa_socktab scans
+- Use uintptr_t for portability fo 32-bit platforms
+- Use do_div instead of "/" for portability
+- Remove homa->busy_usecs and homa->gro_busy_usecs (not needed in
+  this stripped down version of Homa)
+- Eliminate usage of cpu_khz, use sched_clock instead of get_cycles
+- Add missing checks of kmalloc return values
+- Remove "inline" qualifier from functions in .c files
+- Document that pad fields must be zero
+- Use more precise type "uint32_t" rather than "int"
+- Remove unneeded #include of linux/version.h
+
+John Ousterhout (12):
+  inet: homa: define user-visible API for Homa
+  net: homa: define Homa packet formats
+  net: homa: create shared Homa header files
+  net: homa: create homa_pool.h and homa_pool.c
+  net: homa: create homa_rpc.h and homa_rpc.c
+  net: homa: create homa_peer.h and homa_peer.c
+  net: homa: create homa_sock.h and homa_sock.c
+  net: homa: create homa_incoming.c
+  net: homa: create homa_outgoing.c
+  net: homa: create homa_timer.c
+  net: homa: create homa_plumbing.c homa_utils.c
+  net: homa: create Makefile and Kconfig
+
+ MAINTAINERS               |    7 +
+ include/uapi/linux/homa.h |  164 ++++++
+ net/Kconfig               |    1 +
+ net/Makefile              |    1 +
+ net/homa/Kconfig          |   19 +
+ net/homa/Makefile         |   14 +
+ net/homa/homa_impl.h      |  696 ++++++++++++++++++++++++
+ net/homa/homa_incoming.c  | 1074 +++++++++++++++++++++++++++++++++++++
+ net/homa/homa_outgoing.c  |  854 +++++++++++++++++++++++++++++
+ net/homa/homa_peer.c      |  367 +++++++++++++
+ net/homa/homa_peer.h      |  232 ++++++++
+ net/homa/homa_plumbing.c  | 1024 +++++++++++++++++++++++++++++++++++
+ net/homa/homa_pool.c      |  446 +++++++++++++++
+ net/homa/homa_pool.h      |  154 ++++++
+ net/homa/homa_rpc.c       |  489 +++++++++++++++++
+ net/homa/homa_rpc.h       |  458 ++++++++++++++++
+ net/homa/homa_sock.c      |  386 +++++++++++++
+ net/homa/homa_sock.h      |  401 ++++++++++++++
+ net/homa/homa_stub.h      |   81 +++
+ net/homa/homa_timer.c     |  157 ++++++
+ net/homa/homa_utils.c     |  177 ++++++
+ net/homa/homa_wire.h      |  365 +++++++++++++
+ 22 files changed, 7567 insertions(+)
+ create mode 100644 include/uapi/linux/homa.h
+ create mode 100644 net/homa/Kconfig
+ create mode 100644 net/homa/Makefile
+ create mode 100644 net/homa/homa_impl.h
+ create mode 100644 net/homa/homa_incoming.c
+ create mode 100644 net/homa/homa_outgoing.c
+ create mode 100644 net/homa/homa_peer.c
+ create mode 100644 net/homa/homa_peer.h
+ create mode 100644 net/homa/homa_plumbing.c
+ create mode 100644 net/homa/homa_pool.c
+ create mode 100644 net/homa/homa_pool.h
+ create mode 100644 net/homa/homa_rpc.c
+ create mode 100644 net/homa/homa_rpc.h
+ create mode 100644 net/homa/homa_sock.c
+ create mode 100644 net/homa/homa_sock.h
+ create mode 100644 net/homa/homa_stub.h
+ create mode 100644 net/homa/homa_timer.c
+ create mode 100644 net/homa/homa_utils.c
+ create mode 100644 net/homa/homa_wire.h
+
+--
+2.34.1
+
 
