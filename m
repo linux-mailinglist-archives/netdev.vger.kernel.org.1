@@ -1,110 +1,87 @@
-Return-Path: <netdev+bounces-150418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBFBF9EA2D9
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:31:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13C019EA2E2
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:36:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CA9428241C
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:31:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6F7D2823BA
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19E85213E9F;
-	Mon,  9 Dec 2024 23:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7142921171C;
+	Mon,  9 Dec 2024 23:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bF8iZKfX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJQvz2io"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A1F213E74;
-	Mon,  9 Dec 2024 23:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C06419B3EE
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 23:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733787110; cv=none; b=I7EHsCZZwwRX9CpbHN8oMGFUEq6u3wuU6yiVrLXp1tWUuU1Y+d0l5NR2alnGwl/UXTM8H1rB+sL/CO3xN1OUbp6iszHEkXh+8yJDBitZfEPJidZwnxf9DNIoJopews/EupggyCI13d54u575A4qmfmlif+leUc9N1f1h8tYCrQA=
+	t=1733787362; cv=none; b=f/HcTJM6//QahXGheQna+E0fjxlOr4Rx9ODrinlaM/p1g2x7uFVjjrZHjWGlTwB/GxtAmD06agsmuDfyadGs+B62qw/RDO7qjFKzXAfglixsdD3ubLHb1e+Yw94H21UUUfdwgiuoolGiYXCVNStkANYPcXboq1iQLIdTObWEoWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733787110; c=relaxed/simple;
-	bh=HRolDNNh5VeZOal5KgaJ9BVFC0x7791FJx9OkRUx2+4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=jht1ngsONJOr3pjPDZ34z2/bt7rJls78UfrvUOMK9c8GtnE+hpQ/ebzk1f25CMQ0z9HY0mltMdR/Mo3HsOUMoFOjh5wEKKMeUjMA3IkrUr/daI2JSjWDdkLrmucv/e/9dFH7xPO1JbYcrqMAn6atxbhk9NkA/4mAOLAT7IFgQkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bF8iZKfX; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-435004228c0so7834175e9.0;
-        Mon, 09 Dec 2024 15:31:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733787107; x=1734391907; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kVLiwDVnZDxng7E3/gp/oj68kLUn9l0CJrsxOcb2dBY=;
-        b=bF8iZKfX9ikeOhYT4sVtxii9DWn7FP/m/ZBBVonLOK36+lGksW9flFhKYWayQCRIrG
-         8rxqJ0J+IJHYMNRvq5ed7AQBFaoHdYuj2ZGlBSZ2N2UnetRVxof+k+OuHQOGZNGHy8+2
-         hnbGBVOZpk0t/O9IVWumMM0bryIKihPrYgfeDUt6U7IOPlutrUSYXZjm9ObfRtpmqeKw
-         VFsjUkL+m6BRsnYVwltiGoOupzhi+B+eXiQTtek8vSfNt5K/zjmkfmX76sgaR5giJZNa
-         spkTdiP3rGoJl+Z15Edx6yCnwDNE1CWwnPimbyHkLeva5Fw0DhsVqsvEAIHywKNUbFtg
-         LbSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733787107; x=1734391907;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kVLiwDVnZDxng7E3/gp/oj68kLUn9l0CJrsxOcb2dBY=;
-        b=dXJrtNvYXif/gvj6PX5hzpSGHrqeM2BRB2O8WdXboBWmAj3+qKGian9zsUf6R7RHgR
-         wGNa6WDVQqgnwhshbLkgr6KXkicPBPnss2crxZlsWEuG1CbERuCqFGeHaoatMnPBr76K
-         jSjlkze58rWFl/lgSGT76doiJ9ikflErJmlM/WGxFuNDbkcgTC7ePCV3EHCvoon2YI0/
-         Z/lb9CjPQLVf1tdrZdZMitoh1BZOXELUU80r1d435HIqKbTQvqMOBoxhdtRKeKKRR8AO
-         lwsyt3JNex0SIgSQq3dNLiEidj7gPA5WQxmGDAx9I8rJ7Nw3ORQAOlW8YPorZ5fMibNw
-         gOGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVU0XkhbN584q2HV8TGtmokYIvlbe9iUPOAWW60g0eCKycx/ywCHcsfCb+bKo1bUN9ghyk9jzSSxJk=@vger.kernel.org, AJvYcCXDmGomKRDnCwJWDOXYpe8Q/ebgT+hCox6oxt1XuuJFaSjjQiVZXatR843bdWtqySrX10dzDDuH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1f5slj982bKJETc5LqiDyZ8F0VkG4aqf22gneuJMTZttRwIaM
-	Lwa98XzyIkfvBlQL+Nl94e2fbJ00fX4Lu6NoQSAei9Zr7da9Na/7
-X-Gm-Gg: ASbGncsNP4PYiVMgcxM6bGQZlmuFZYDl67WQRb04rqwBqnQt9Rh5fn46SRUMYoVJQAU
-	PFBWP+qZl2Vm//oSEisjmydSO6SxZ03oWU+44hB7TQY42BplNefXgSRksxee4N6ZVcaa/p4BuMg
-	BYPUrq6siGU/de5oWqDgf6jnOupyKtBRZTJ+ThrejT8rTYpdekr1IpGXSAPRiuPxPzYns2aOQ4E
-	EaeGuz1LOVUpmgnk38PFUHPvOsMAmwu24TfKUMcpmXv6Skfpe4cihS+558Cgtqi+7Iv5qGwnms/
-	H0XzuvqJ2LaigAXqitRGIisDVT9A6588XJ/n6w9RFw==
-X-Google-Smtp-Source: AGHT+IFzTlH+CAU74XXST/xc814mG6xMdkaj9e8cTpZJnmtljmbAe+ADD3sGW6SFXKjqyU90Nj78bQ==
-X-Received: by 2002:a05:600c:474d:b0:431:542d:2599 with SMTP id 5b1f17b1804b1-434fff9c611mr22258815e9.22.1733787106595;
-        Mon, 09 Dec 2024 15:31:46 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d52c0c9esm209622355e9.31.2024.12.09.15.31.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Dec 2024 15:31:46 -0800 (PST)
-Subject: Re: [PATCH v7 14/28] sfc: create type2 cxl memdev
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-Cc: Alejandro Lucero <alucerop@amd.com>
-References: <20241209185429.54054-1-alejandro.lucero-palau@amd.com>
- <20241209185429.54054-15-alejandro.lucero-palau@amd.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <51a9b9a9-44b3-4185-d746-43b5a054bfcf@gmail.com>
-Date: Mon, 9 Dec 2024 23:31:44 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1733787362; c=relaxed/simple;
+	bh=NdPKOSPU4p+DVGjLP/RnkRHeQoLuuHuopki9InkJ7qE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DbISDfMic22zYrGyJqhqs0/sisJu5hBm9Hhgn6LXYQwG2MT5LpIjwOVK24HecDs7m7N2RwdUwri4EXtDZnszFUt/sp0jptdDBTS1VS91x46JKBUwAZOpjdIY+M87vYaZsknsiqM6VWSMca5pAlpByz2VytkuWu/Ipwz6JdxAJlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YJQvz2io; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63BAEC4CED1;
+	Mon,  9 Dec 2024 23:36:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733787361;
+	bh=NdPKOSPU4p+DVGjLP/RnkRHeQoLuuHuopki9InkJ7qE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YJQvz2ioCqHzoIFaOHTTjvfEWLx6aJ4P5iEqEkBIGoP5W0F+2ekCtELI9egY5b577
+	 EKefEQyM5oa7o6Ls1DVV6hfk7JEWlS57+k7HS8zOiCl32H0Uk6XOUugHXZ9lwxKlBm
+	 VT1xslZ29up9jpmRzs9n5tPkfUQ9Q3gsaba93PzsC+B9M/VsFTNnNH1JXxJ093nNxe
+	 u43DX5mKzTTEIaVDUC1y8USigc+wVjKj0bpVDzTaq0DweeH3w3gzhXQ19A/OyaDuxO
+	 sJ6XSsTB6QuwHI+ev/kWBiJSqFVlliFepG4xA8PZ4wFvjPYzqkogWBcU8rrDGOoVas
+	 i70pwnK0apYqQ==
+Date: Mon, 9 Dec 2024 15:36:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, horms@kernel.org,
+ jiri@resnulli.us, stephen@networkplumber.org, anthony.l.nguyen@intel.com,
+ jacob.e.keller@intel.com, przemyslaw.kitszel@intel.com,
+ intel-wired-lan@lists.osuosl.org
+Subject: Re: [RFC 0/1] Proposal for new devlink command to enforce firmware
+ security
+Message-ID: <20241209153600.27bd07e1@kernel.org>
+In-Reply-To: <20241209131450.137317-2-martyna.szapar-mudlaw@linux.intel.com>
+References: <20241209131450.137317-2-martyna.szapar-mudlaw@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241209185429.54054-15-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 09/12/2024 18:54, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
+On Mon,  9 Dec 2024 14:14:50 +0100 Martyna Szapar-Mudlaw wrote:
+> Proposed design
 > 
-> Use cxl API for creating a cxl memory device using the type2
-> cxl_dev_state struct.
+> New command, `devlink dev lock-firmware` (or `devlink dev guard-firmware`),
+> will be added to devlink API. Implementation in devlink will be simple
+> and generic, with no predefined operations, offering flexibility for drivers
+> to define the firmware locking mechanism appropriate to the hardware's
+> capabilities and security requirements. Running this command will allow
+> ice driver to ensure firmware with lower security value downgrades are
+> prevented.
 > 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
-> Reviewed-by: Fan Ni <fan.ni@samsung.com>
+> Add also changes to Intel ice driver to display security values
+> via devlink dev info command running and set minimum. Also implement
+> lock-firmware devlink op callback in ice driver to update firmware
+> minimum security revision value.
 
-Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+devlink doesn't have a suitable security model. I don't think we should
+be adding hacks since we're not security experts and standards like SPDM
+exist.
+
+I understand that customers ask for this but "security" is not a
+checkbox, the whole certificate and version management is necessary.
 
