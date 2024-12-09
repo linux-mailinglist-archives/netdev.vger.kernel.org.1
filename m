@@ -1,154 +1,114 @@
-Return-Path: <netdev+bounces-150110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F201E9E8F0A
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:47:26 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 093F59E8F09
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:47:16 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B35112822E0
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 09:47:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D87A31883237
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 09:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571CE216380;
-	Mon,  9 Dec 2024 09:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6DEC2165F5;
+	Mon,  9 Dec 2024 09:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eI52RaXC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GwtaXjSX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE631216611;
-	Mon,  9 Dec 2024 09:47:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F86215163
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 09:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733737622; cv=none; b=tvvvqSoGfAwvtunawvQmmnMizh3i+qniGyCQrvuBeQR9kjPz5UPuBFNm1Tjqj2DDFa01jCPP5fAgT7FQGB8J9SK6z8ZVJajUdqYX25gaswDchqFPk2M//caXNMQHkWfVOU1tsE1YafDg/Jhz5/1ehcv0N2HWma5HtqcLbpifULk=
+	t=1733737618; cv=none; b=Gd7w/SuGH729yHyR15Ji6qqsSMrtFCd2gj88H3eV2ks1EyJgBexlHfKgzwQUq5F/aropVo0Es3Asbg0b5FqHxEgaADlD4IG0cKXzsmYfWN0afWfG1INeiSqIN+ZsjoUNN3XWaqZN04QqM/g3G8gaBQ7wBnD7j8yHpE0RrInh6k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733737622; c=relaxed/simple;
-	bh=N60uhZmqgtsTdxA/l+SLwOPWJgwGUdT08XJlCAibg/s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lmIbhD5nVcC9GSP19R1+lLZt9NLxuEf/UHRdBF9xnRk41lFoXYNTfWkqR71WpwAPmBFkRgg2ZUnMPPjlM/kyPblsyHGYj7RvVEMW+bJBg+pZ1X6tDwD9nrJjhvilt0WHryG/9G56hW1GAD+rENXCzN1VUv82TQ+oqxbiKB9fpts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eI52RaXC; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B8MQ3P9010813;
-	Mon, 9 Dec 2024 09:46:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=9bUY/v
-	wlv1lFTgSljFyNrcWCifJ6kjyfjcjGIbQleK0=; b=eI52RaXCPa9HlJ5aCRAZwd
-	05wNVbT4lpJYwv7DdkUezIegFHh1kSev5S3ZtXV+eK6zm7A/XbPlYacAqk2JBTg4
-	34JC9+s94ju81eF7f/VmdrQcakPl7qrNEsBRnEByRdN5uuoIqpMXAOQhRP/n6yBe
-	0lzhEIivGxh8kvgeZuN6h6zkgUSEwmYElJ3xHwrZbCx6JOMxGFpAY5rhhNf5Z1lu
-	th8vjpPpH2r6xdC47YjNuTpWBdA85iFycIDfF0q5sRuTIq4I2Be+Lp8WQEwXvcod
-	dSgfq+Lq6AMe8rVyDg0T9Ir75vuTxpodqvhnE3O/nrUaFbR3KNns8kI21j/NKmVg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ce1vggtf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 09:46:55 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B99imJh002575;
-	Mon, 9 Dec 2024 09:46:54 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ce1vggt9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 09:46:54 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B98B2YJ017397;
-	Mon, 9 Dec 2024 09:46:53 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 43d3d1dmqw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 09:46:53 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B99koAi65274136
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 9 Dec 2024 09:46:50 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4D5AA20040;
-	Mon,  9 Dec 2024 09:46:50 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7500E20043;
-	Mon,  9 Dec 2024 09:46:49 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.179.14.202])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Mon,  9 Dec 2024 09:46:49 +0000 (GMT)
-Date: Mon, 9 Dec 2024 10:46:47 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: Guangguan Wang <guangguan.wang@linux.alibaba.com>, jaka@linux.ibm.com,
-        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dust Li
- <dust.li@linux.alibaba.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH net-next v2 2/2] net/smc: support ipv4 mapped ipv6 addr
- client for smc-r v2
-Message-ID: <20241209104647.5c36c429.pasic@linux.ibm.com>
-In-Reply-To: <868f5d66-ac74-4b0a-a0d0-e44fdea3bb73@linux.ibm.com>
-References: <20241202125203.48821-1-guangguan.wang@linux.alibaba.com>
-	<20241202125203.48821-3-guangguan.wang@linux.alibaba.com>
-	<894d640f-d9f6-4851-adb8-779ff3678440@linux.ibm.com>
-	<20241205135833.0beafd61.pasic@linux.ibm.com>
-	<5ac2c5a7-3f12-48e5-83a9-ecd3867e6125@linux.alibaba.com>
-	<7de81edd-86f2-4cfd-95db-e273c3436eb6@linux.ibm.com>
-	<3710a042-cabe-4b6d-9caa-fd4d864b2fdc@linux.ibm.com>
-	<d2af79e2-adb2-46f0-a7e3-67a9265f3adf@linux.alibaba.com>
-	<868f5d66-ac74-4b0a-a0d0-e44fdea3bb73@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1733737618; c=relaxed/simple;
+	bh=/4yCcmtI9X8BI1PJ3TBHSU8LfIPaaUkVMzOZ5/bpD/E=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=X72+xq7tVaeskwkgd1dzQ4JBTPYz7IcYRPTjICxqgSX5lzuNrilYMUPSzn3GQfGzDMtOA30D+liHPSLDVjkzR2cWPQT5tmrCPc/uwA86nGcx+8B4ac8YPQnbWgyOPTVf8rVWJnmMztStUM9MJ2YYmGOpRQZ70oPNg1VbXorbS0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GwtaXjSX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733737615;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/4yCcmtI9X8BI1PJ3TBHSU8LfIPaaUkVMzOZ5/bpD/E=;
+	b=GwtaXjSXK4uaAQ93UmSUdZGW/clZcH/MiiVTmNUZejondxSnfyLx8VKAMlOjcUMhrh8GoG
+	ecfmmbwuR8RCBvTNBdusHmAoO5Jb9msNbWgn3f6OtDUO1RgSg2QBQxwtvupTiklbTKBKE/
+	uugsJT2j6WK9eyvj0ElPQk8m5QJ4NfU=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-100-gUGl389zOTCf5B0h-YB0lA-1; Mon, 09 Dec 2024 04:46:54 -0500
+X-MC-Unique: gUGl389zOTCf5B0h-YB0lA-1
+X-Mimecast-MFC-AGG-ID: gUGl389zOTCf5B0h-YB0lA
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5d3e4e09ae7so2028894a12.3
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 01:46:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733737612; x=1734342412;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/4yCcmtI9X8BI1PJ3TBHSU8LfIPaaUkVMzOZ5/bpD/E=;
+        b=qtZnCeYNRCthqOj1GhEJxPFj01Pfac25GtcKkRbORudiz7l6C/JQwlJWl8CGFtHwUY
+         tSBFx5QEkYDf+20B8psrjCVDo/IJsa1TFHIWjki4z5oDAicqWs6rGod/D2WV4r8bvC0g
+         Xk8MowR60zGXcMZ5Np3AzbcgxtQI2bs6gVBmFqWC/kkBCwOzuju0Zfw+z8hd5dNA0ZEh
+         LDk6bABqUiaBgisxTFF2QslgEhqApRkFjQc1O2LFINEjpjEDPZq2NkUbzPWT6SyCXyAa
+         BOijb49N8TGFzA10Q4fIC0e7XxMoffBp6mcHOWhNUtX3eE2sa7oVkgqa/1sFA0v03tqf
+         mOsg==
+X-Forwarded-Encrypted: i=1; AJvYcCW3wCFVBEP9v6xFdDkuQQMVNPcNHhZTbsAjLLHUcNPkKUF5FkmtJMlAcLXlX5o4rNu8oujEfnM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyy9YhbW75VDD+rH/ao1m+NmKM+503fVqNX28dWsEyw2DnOZ0jR
+	p0PCCG1lDzThrIN/dbKfUeny46ZNcPjhQJrYmStImR+NTWl73BmVYVjoF9tcZQZSDHLjcA07voo
+	X5Q7gD4jNrdpyzlDdbjmq5k4fQ5xy9sMgFi7vT6zWMIfq5fBl103DiA==
+X-Gm-Gg: ASbGncuS+8DNcClTyF1U/X0vWoysJKRP734m3R6SezO/LNliSVd829i2MzKQurhY3sX
+	iZz209sl8zoLtPj+ynYh1PPRG2Q30INUC6RcfHAQyO0E7ld/chtd9KYYKgK3NYmhXePPNot2u4h
+	HAk7ORD9H/hr4Ml13sdtZni+qMOKZEBLCYIKXACVozbl0VLFdKABdJhfVsvq8rvpNXeSc3p5qGd
+	yOLS1VK1EzI21F9eqsEjIz3eW+iHOrEMwzncMTPi26SeNvCz8irWos3m7cZNI/KhWM/jGVKYxo=
+X-Received: by 2002:a05:6402:1f12:b0:5d0:e560:487f with SMTP id 4fb4d7f45d1cf-5d3be6b51f6mr13070168a12.11.1733737612325;
+        Mon, 09 Dec 2024 01:46:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF+SM0HMMf3rLKQaHWVX8CzFTGrQpKPYgN7rKoWJXvIPMd3Duz+8mjeqy9B/SksYJY5E9rQEQ==
+X-Received: by 2002:a05:6402:1f12:b0:5d0:e560:487f with SMTP id 4fb4d7f45d1cf-5d3be6b51f6mr13070149a12.11.1733737611993;
+        Mon, 09 Dec 2024 01:46:51 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d3db53b828sm3387904a12.74.2024.12.09.01.46.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 01:46:51 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 84C7B16BD8AD; Mon, 09 Dec 2024 10:46:50 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Frederic Weisbecker <frederic@kernel.org>, LKML
+ <linux-kernel@vger.kernel.org>
+Cc: Frederic Weisbecker <frederic@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, netdev@vger.kernel.org
+Subject: Re: [PATCH] net: pktgen: Use kthread_create_on_cpu()
+In-Reply-To: <20241208234955.31910-1-frederic@kernel.org>
+References: <20241208234955.31910-1-frederic@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 09 Dec 2024 10:46:50 +0100
+Message-ID: <87v7vt6ved.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ddy6SNq3VtLuAQsrHnlbwLDhUloAOUYZ
-X-Proofpoint-ORIG-GUID: MWeIVl2jrEaAB-L2GrTVfcn7T6-ALXy0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 clxscore=1011 phishscore=0 bulkscore=0 mlxlogscore=999
- impostorscore=0 spamscore=0 malwarescore=0 suspectscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412090073
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 9 Dec 2024 09:49:23 +0100
-Wenjia Zhang <wenjia@linux.ibm.com> wrote:
+Frederic Weisbecker <frederic@kernel.org> writes:
 
-> > Otherwise, the code below is reasonable.
-> >        if (!(ini->smcr_version & SMC_V2) ||
-> > +#if IS_ENABLED(CONFIG_IPV6)
-> > +        (smc->clcsock->sk->sk_family == AF_INET6 &&
-> > +         !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||
-> > +#endif
-> >            !smc_clc_ueid_count() ||
-> >            smc_find_rdma_device(smc, ini))
-> >            ini->smcr_version &= ~SMC_V2;
-> >   
-> Ok, I got your point, a socket with an address family other than AF_INET 
-> and AF_INET6 is already pre-filtered, so that such extra condition 
-> checking for the smc->clcsock->sk->sk_family != AF_INET is not 
-> necessary, right?
-> 
-> Would you like to send a new version? And feel free to use this in the 
-> new version:
-> 
-> Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+> Use the proper API instead of open coding it.
+>
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-I believe we would like to have a v3 here. Also I'm not sure
-checking on saddr is sufficient, but I didn't do my research on
-that question yet.
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-Regards,
-Halil
 
