@@ -1,92 +1,89 @@
-Return-Path: <netdev+bounces-150400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7D4D9EA1BA
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:18:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCB5A9EA1C2
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:21:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E0531660C4
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 22:18:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E412166114
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 22:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4C2199239;
-	Mon,  9 Dec 2024 22:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="byH5ix7v"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A951619DF4B;
+	Mon,  9 Dec 2024 22:20:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F5346B8
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 22:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E2419CD0B;
+	Mon,  9 Dec 2024 22:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733782720; cv=none; b=tCqMOO6TfrJJ4VNYe6CceZCs8nrHDzL88Fp+wZDFygDdtKQ4A4iZf/NYT0DCLXCmplw6V0vsjV/KX6rmUSPw308rjFEbEfwtRWuiHTpYD7rouvg95ZEzDiYG8HGF7OApbIBlolVgXaTRWVvpqSMXne5MRP+ZDx549wNhNG1owCI=
+	t=1733782859; cv=none; b=K7bBcSlRwGu1sxzKi9/lXlVA41lptiRKOSR9A28OQ0YoOUGb3B3MwOCbmA3qqUVz5DwrlfMCDetYY95Z1BpKXyTC+4p1/yDAtSNznd6iPalrgxMqTKsmOqMW+fil/9e4fCfm5t1jKWPMS6fyCayzcHtGdkJJ69VtKYF9ufUMXs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733782720; c=relaxed/simple;
-	bh=Tm1WaOj8z5Pv519OzW7k9jhUwgHWvOkeot0wUwJ9Z5E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MBGglT67GmNQirC08aGF/Fa8yyax8rrRmkGflGVtYDMqrMKmW2Ae+v63O/YGzDTUMoJzXDR3iusZCY7zALYO58xZxLFTmXlVtfTzuN28In54oN9ZK50u6Dzf8GIjr7RAKpRsYDGEO3u9zTDTQq47pblkh+oQJCGnZcPVhvyuwmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=byH5ix7v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EB62C4CED1;
-	Mon,  9 Dec 2024 22:18:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733782719;
-	bh=Tm1WaOj8z5Pv519OzW7k9jhUwgHWvOkeot0wUwJ9Z5E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=byH5ix7vQ3Zun1u8Bpzx2e6M4Zx3ysralownCaTFZFw93S6DifKHovsxaYy+Gd+9Q
-	 qLk6xo0IgxjMHS1a4QIiDG5bY7FhoqRwIezHwwGYXrkvPW1VK/OENT4Ucw+Qkk7O4W
-	 9+/WtZ/yIMXCfxkbwauZ74zte+oZxXwegrMyP68NGxJj0xuo5fblyBIIerMgbgErr9
-	 4NxvitKG9EfGyknz21xsI5ff0M/4GVbwRRHDj7enk75tCe3nOzyrUV+IIa1dISblQY
-	 pi+qTNTNw1T8veVcN/6hEMh312zeKSq7dAgfkkR6vCtZiCujHOHAQ34zPlvIUvwAd/
-	 Kfp+3VJ56hWZA==
-Date: Mon, 9 Dec 2024 14:18:38 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Andrew Morton
- <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, Masahiro Yamada
- <masahiroy@kernel.org>, netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v9 03/10] lib: packing: add pack_fields() and
- unpack_fields()
-Message-ID: <20241209141838.5470c4a4@kernel.org>
-In-Reply-To: <20241204-packing-pack-fields-and-ice-implementation-v9-3-81c8f2bd7323@intel.com>
-References: <20241204-packing-pack-fields-and-ice-implementation-v9-0-81c8f2bd7323@intel.com>
-	<20241204-packing-pack-fields-and-ice-implementation-v9-3-81c8f2bd7323@intel.com>
+	s=arc-20240116; t=1733782859; c=relaxed/simple;
+	bh=Cs06nYZjCamsC5t3oilkrWOG7mho1lwC6TBmhVBTV+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D8JoWQXfVQEb7DNbTW+rgM3kP0kPT7ohSVVJI6AK/Qwe8MFEjBgBod9Pyj2alo31WcDKARUuy01wImqt5KTwhTLVLoP2nEHSqIGZPWWTl80aeqLUtEVgC0IEwIxq3W1gz08gUUTDdvWUih8iURWrib0I7RfIGWS5iL/l/6cbCd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1tKm7a-0001NZ-1t; Mon, 09 Dec 2024 23:20:54 +0100
+Date: Mon, 9 Dec 2024 23:20:54 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Karol Przybylski <karprzy7@gmail.com>
+Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+	casey@schaufler-ca.com
+Subject: Re: [PATCH] netfilter: nfnetlink_queue: Fix redundant comparison of
+ unsigned value
+Message-ID: <20241209222054.GB4709@breakpoint.cc>
+References: <20241209204918.56943-1-karprzy7@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241209204918.56943-1-karprzy7@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Wed, 04 Dec 2024 17:22:49 -0800 Jacob Keller wrote:
-> +PHONY += scripts_gen_packed_field_checks
-> +scripts_gen_packed_field_checks: scripts_basic
-> +	$(Q)$(MAKE) $(build)=scripts scripts/gen_packed_field_checks
+Karol Przybylski <karprzy7@gmail.com> wrote:
 
-You need to add this binary to .gitignore, one more round :(
-The rest LGTM
+[ CC original patch author and mass-trimming CCs ]
 
-> +/* Small packed field. Use with bit offsets < 256, buffers < 32B and
-> + * unpacked structures < 256B.
-> + */
-> +struct packed_field_s {
-> +	GEN_PACKED_FIELD_MEMBERS(u8);
-> +};
-> +
-> +/* Medium packed field. Use with bit offsets < 65536, buffers < 8KB and
-> + * unpacked structures < 64KB.
-> + */
-> +struct packed_field_m {
-> +	GEN_PACKED_FIELD_MEMBERS(u16);
-> +};
+> The comparison seclen >= 0 in net/netfilter/nfnetlink_queue.c is redundant because seclen is an unsigned value, and such comparisons are always true.
+> 
+> This patch removes the unnecessary comparison replacing it with just 'greater than'
+> 
+> Discovered in coverity, CID 1602243
+> 
+> Signed-off-by: Karol Przybylski <karprzy7@gmail.com>
+> ---
+>  net/netfilter/nfnetlink_queue.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
+> index 5110f29b2..eacb34ffb 100644
+> --- a/net/netfilter/nfnetlink_queue.c
+> +++ b/net/netfilter/nfnetlink_queue.c
+> @@ -643,7 +643,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
+>  
+>  	if ((queue->flags & NFQA_CFG_F_SECCTX) && entskb->sk) {
+>  		seclen = nfqnl_get_sk_secctx(entskb, &ctx);
+> -		if (seclen >= 0)
+> +		if (seclen > 0)
+>  			size += nla_total_size(seclen);
 
-Random thought - would it be more intuitive to use the same size
-suffixes as readX() / writeX()? b = byte, w = u16, l = u32, q = 64? 
-If you're immediate reaction isn't "of course!" -- ignore me.
+Casey, can you please have a look?
+
+AFAICS security_secid_to_secctx() could return -EFOO, so it seems
+nfqnl_get_sk_secctx has a bug and should conceal < 0 retvals
+(the function returns u32), in addition to the always-true >= check
+fixup.
 
