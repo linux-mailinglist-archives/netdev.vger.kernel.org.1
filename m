@@ -1,154 +1,77 @@
-Return-Path: <netdev+bounces-150278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE4FF9E9C27
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:53:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A376A9E9C2C
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:54:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 946211886DE5
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 16:53:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27CE11886E59
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 16:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2038314B959;
-	Mon,  9 Dec 2024 16:53:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBA614BF92;
+	Mon,  9 Dec 2024 16:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="Nfhkus41"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vz68fwh9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D1214B087
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 16:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C3D1465BA;
+	Mon,  9 Dec 2024 16:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733763229; cv=none; b=C6D9mt0JO7WDL32XMWXyRPvXOCpzqojQcqSbHaBPiZr3s9zCIbyLNzQX6ZofFQ588NVytBlbpTFKZ1z95na7Viysb7qwXaXup39/qUdt6TrdGN2JbXlc8iUhZL5R9g4HGmIVz4yEl2qNMmOU7nfIyhCmrYjwX19QUKuje94nEEU=
+	t=1733763263; cv=none; b=sv0m8w5N8+Ie8++U2CBoF3akfM+uPuadtD80cl8/debifIK4n/o5JMRqj+57cst2tPAd5BS7D3E3OfIbwJGgGqO50zUxldvGZXDW/rXCJYond391A6/sroEjKmXrBc7Umf/zTrJLOBsTz/ESP12pGXXTc2dxi88O+EMv/8A0g0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733763229; c=relaxed/simple;
-	bh=nzhs+XhuI85Aboqzx6/Gi5n9/BrZ4n7SkMlLrEDtRtY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PIxWeUoISoXEWDN889baWfJo681CihO0EOsLYVWeE/tBOHXbAkE2fA8Fd/VBUTAGE/L6ujIg2Gz2ezLYwX8ynoyrwx8spS0nbAHOFvQUTmoL/IRod/+Ew33eX75uSdc+4zuE8Md/ZgcCQz/mDTZGTwMv4NnAe250EOsvvTub+tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=Nfhkus41; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ky/6OyEhNZ5sN5gHIVseVpGgBLSCkT+H9/MTo6CbNx4=; t=1733763227; x=1734627227; 
-	b=Nfhkus41+qAehh30eZiOGfZP3GGeIxGzsfL4r9xpPMQYzEbMj1Y6XeUOsso3loDXsuSvtgYzIC+
-	O9CMfxyDHqVsLrO+trgz+EqkAH+ebDjnHDTnb3Vpjas0lQOFxNg8qR30jITo9ox6/9zrDlAUL/BHI
-	k5H9WF4S0Eo8Jzeq4KXwtqjhtat5lHcBIqjWjLWuCBw6QK+hpyL+cytqfhPWq2TXdIWx85BTz1cXk
-	B6aA1pnlnbuHwreC9Ss3lf67sKyWc3wNhCDlCCbHoHiFIwuwJcQ0lgwNNFba0PPN4+5amYK6sQQLk
-	E8Q8qjEFiphf5WjtcERSwO7kAg9mAdx9rPLg==;
-Received: from mail-oa1-f46.google.com ([209.85.160.46]:61669)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tKh0v-0002ML-1K; Mon, 09 Dec 2024 08:53:41 -0800
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-29e998c70f9so2627597fac.2;
-        Mon, 09 Dec 2024 08:53:41 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUVYt8jTMmwxB/35lm1rPgbGVo1B4MNHxb/Dqe84nFt14HHbb/+ZETSCzjfixGXtji8B5dCJK41f40=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRtrufFzKGoGobBwqAqVGoW3xRJxDNxgxxia2lxiJxUPCH2m8z
-	OfheIp6GIH1ZN7ZhNVdCyq/9vQgwo/dkw4rxgv+HvooZMdOKuPAf/k0doE9sdLT8ZnxKMOiHyr7
-	0AALMNfF4RCw25Q2UGtXShEb/eFQ=
-X-Google-Smtp-Source: AGHT+IG+leR1pn8CtV8qGjlpHQjL2OV5d4oL5SoSTkxeAf1pTETfblc8kMj2XZktAeeiT6NhO6GZ7b799B13y2cHypo=
-X-Received: by 2002:a05:6870:c03:b0:29e:4ba5:4ddc with SMTP id
- 586e51a60fabf-29f73346d6dmr10746250fac.24.1733763220444; Mon, 09 Dec 2024
- 08:53:40 -0800 (PST)
+	s=arc-20240116; t=1733763263; c=relaxed/simple;
+	bh=+Um87OK029W18CKSO9ksat2vlJj9Pir9wPRI/6IrrMU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zj3tDoG3Pa44BbzgivpJ6kftpzLjCluDBtogEm689qPhT7aNbrug08qpx60UyNhGWYmvW7XXVvkFdkQuqqfTVvPoVvStxIu/vWFuUUeBxw13yNZVpn/4k1oaAmUZsaWIKiJkHq0n1J6qWELoCse6Til4PzCSEqpfrDKC8Q5Galo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vz68fwh9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=XJ36jjyRlVWT7uD37wfdml35aQJkssXzySfHMBuIM78=; b=vz68fwh9wBi/hPRDdCemsucEPN
+	GhJNjmNewPdTgeoCQ3ktEM9b62pxKhzSkg3CHiuyIkYTWBcBM9JPqyHBz1jsGkBPTO36OyDMU1j6g
+	IGSJBKpvQsJqsPa+8K6yetOzduy/Cqj2E9OQsuK+v6U7O07QNJlzVJydtUhUaihbZebk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tKh1Q-00FhAt-UP; Mon, 09 Dec 2024 17:54:12 +0100
+Date: Mon, 9 Dec 2024 17:54:12 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tarun Alle <Tarun.Alle@microchip.com>
+Cc: arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
+	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net: phy: phy-c45: Auto-negotiaion changes
+ for T1 phy in phy library
+Message-ID: <ad3f19b8-20fc-41c9-bfd0-e5f9996da578@lunn.ch>
+References: <20241209161427.3580256-1-Tarun.Alle@microchip.com>
+ <20241209161427.3580256-2-Tarun.Alle@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241111234006.5942-1-ouster@cs.stanford.edu> <20241111234006.5942-12-ouster@cs.stanford.edu>
- <f79a70fd-35a4-4d0d-b239-daa4ab652880@linux.alibaba.com> <CAGXJAmw4tULA02TLXBPa8Lv5cXD1Oe+1ajTWrM2x9=byMTy4jA@mail.gmail.com>
- <b4bf68f1-189c-4685-8e1a-d8cbf60c1120@linux.alibaba.com>
-In-Reply-To: <b4bf68f1-189c-4685-8e1a-d8cbf60c1120@linux.alibaba.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Mon, 9 Dec 2024 08:53:04 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmxkR7Wgmd2+eUKwOHos2tGbSJ8UFqYKE4nsegg7sr96WQ@mail.gmail.com>
-Message-ID: <CAGXJAmxkR7Wgmd2+eUKwOHos2tGbSJ8UFqYKE4nsegg7sr96WQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 11/12] net: homa: create homa_plumbing.c homa_utils.c
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, linux-api@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: b05cf9a5276a81ca133e41a937654b06
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241209161427.3580256-2-Tarun.Alle@microchip.com>
 
-Thanks for the additional information; I'll put this on my list of
-things to consider for performance optimization.
+On Mon, Dec 09, 2024 at 09:44:26PM +0530, Tarun Alle wrote:
+> Below auto-negotiation library changes required for T1 phys:
+> - Lower byte advertisement register need to read after higher byte as
+>   per 802.3-2022 : Section 45.2.7.22.
 
--John-
+Is this a fix? Does Linux have any T1 PHYs which already support
+auto-neg? Either add a comment this is not a fix because...., or
+please pull this out into a patch for net, with a Fixes: tag.
 
-
-On Sun, Dec 8, 2024 at 10:56=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.com=
-> wrote:
->
->
->
-> On 12/6/24 3:49 AM, John Ousterhout wrote:
-> > On Sun, Dec 1, 2024 at 7:51=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.=
-com> wrote:
-> >>> +int homa_setsockopt(struct sock *sk, int level, int optname, sockptr=
-_t optval,
-> >>> +                 unsigned int optlen)
-> >>> +{
-> >>> +     struct homa_sock *hsk =3D homa_sk(sk);
-> >>> +     struct homa_set_buf_args args;
-> >>> +     int ret;
-> >>> +
-> >>> +     if (level !=3D IPPROTO_HOMA || optname !=3D SO_HOMA_SET_BUF ||
-> >>> +         optlen !=3D sizeof(struct homa_set_buf_args))
-> >>> +             return -EINVAL;
-> >>
-> >> SO_HOMA_SET_BUF is a bit odd here, maybe HOMA_RCVBUF ? which also can =
-be
-> >> implemented in getsockopt.
-> >
-> > I have changed it to HOMA_RCVBUF (and renamed struct homa_set_buf_args
-> > to struct homa_rcvbuf_args). I also implemented getsockopt for
-> > HOMA_RCVBUF.
-> >
-> >>> +
-> >>> +     if (copy_from_sockptr(&args, optval, optlen))
-> >>> +             return -EFAULT;
-> >>> +
-> >>> +     /* Do a trivial test to make sure we can at least write the fir=
-st
-> >>> +      * page of the region.
-> >>> +      */
-> >>> +     if (copy_to_user((__force void __user *)args.start, &args, size=
-of(args)))
-> >>> +             return -EFAULT;
-> >>
-> >> To share buffer between kernel and userspace, maybe you should refer t=
-o the implementation of
-> >> io_pin_pbuf_ring()
-> >
-> > I'm not sure what you mean here. Are you suggesting that I look at the
-> > code of io_pin_pbuf_ring to make sure I've done everything needed to
-> > share buffers? I don't believe that Homa needs to do anything special
-> > (e.g. it doesn't need to pin the user's buffers); it just saves the
-> > address and makes copy_to_user calls later when needed (and these
-> > calls are all done at syscall level in the context of the
-> > application). Is there something I'm missing?
-> >
->
-> I just thought that since the received buffer is shared between kernel an=
-d user-space, if using
-> vmap() to map the very memory, so that we don't need to use such "copy_to=
-_user" to transfer the data
-> from kernel to user-space, we can use memcpy() instead. This shall be mor=
-e faster, but I had no
-> relevant data to prove it..
->
-> So I'm not going to insist on it, it ups to you.
->
-> D. Wythe
+	Andrew
 
