@@ -1,113 +1,148 @@
-Return-Path: <netdev+bounces-150166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5E9A9E95A5
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:06:57 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85EB69E95C2
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:08:35 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89B522821B7
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:06:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7AD21674F9
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:07:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D37A3597B;
-	Mon,  9 Dec 2024 12:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16BF1B4223;
+	Mon,  9 Dec 2024 13:01:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fbOGnd//"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NGWQniFT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E363595B
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 12:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B8427447;
+	Mon,  9 Dec 2024 13:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733749184; cv=none; b=RlFmcjMER50A5ZQGJT284BeZuXooc1+ux5EakChxvSaEpY+Hgs2U6FWtzrwDnVg3HAFl+fzTSlRNfrjsZS9PeNt+QG3QqvNyu5ZTdB/PoKsQHqVeIPpqHocZJimYSF6jmJWtsTKvIe/bJAlx8zL8j5fqYkefjBXoZK2XiKYyytQ=
+	t=1733749285; cv=none; b=GsF9mAGW/o9tleHOeEFCzOoyq4PMmvpTVKMxrCMfIRDXs0uL8qO9FjjQkSQ5t94UHWiCSx85YcLIKpDxjpinn7214Pcinkiw+YtkwRYqy5e3Fg+H2yZ6QzSsQLNO5RHrtZtD4Kyixgia8dH1MMRedPkwsJUjk6dtVoZvZqjwNQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733749184; c=relaxed/simple;
-	bh=/ryV6IzvZ+HqXSJnGC+wom1MiwzaQb78ZbJsm2JS2o8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sHghyDcZF+s3BiDfi8fVjg+75ac6K+47kcN9+w3f4aRFVDnOiXcbsA6XOp5RvLI1Mdt/jKZkFvHnQ+4TSFHP7YNU4hxlJscznDPVA5hDN2ao5mADdOZKSb+4sxDIZbBE5B/jX9Kak/SVWklL5g0W6HmNcmoRvhyptv0Z1MyXhns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fbOGnd//; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733749181;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Dhf/XfzpYsSPb93mu/nTzylFTC6NUpySvcmgI47UhBQ=;
-	b=fbOGnd//OYoYrP8rS3I2gKdWSI/Z3nH4b6G6GR2pJq0obS0mdMkKDCwAr4zXlx2L0M/9VB
-	IiXeuBD5rRTRhpkQ2yllJ2+PJKmCNyQOiRZl+kyZw8QoCt0jL+zlv2Wrk35uffIVe5UzzE
-	E2VnAl5JOJf+SFno9RZslgUmo2NiVYM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-145-7J5m7q_dMWOi4AZx7g12Mg-1; Mon, 09 Dec 2024 07:59:40 -0500
-X-MC-Unique: 7J5m7q_dMWOi4AZx7g12Mg-1
-X-Mimecast-MFC-AGG-ID: 7J5m7q_dMWOi4AZx7g12Mg
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3860bc1d4f1so2415312f8f.2
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 04:59:40 -0800 (PST)
+	s=arc-20240116; t=1733749285; c=relaxed/simple;
+	bh=q4xNiD+1h6n/gmqa9KIJktFHTf/n6lA09xO7+iOB9PY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dPEq2lCmSTaUBHMvgiQX+GnsAqnVswr9lpg6PccOkcyfXUQ7aZwRQ3eTdgdhH0YKaYAt+x8e0/bLl//0hDzgegYljfSD0PNUMR/ZFubXxFF4kRhRw+tcLx2QBiCS/OjJIHe0R8PUlgcjGX+8GPiAihm5I1nQlJOcM9gxTIYJZXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NGWQniFT; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-30229d5b1caso5114281fa.2;
+        Mon, 09 Dec 2024 05:01:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733749282; x=1734354082; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=q4xNiD+1h6n/gmqa9KIJktFHTf/n6lA09xO7+iOB9PY=;
+        b=NGWQniFTDneahKVPWaKS09sj+98L/fOLtk4su397Z59FVyc0lTaOtAqUVyJuRBQieB
+         o0i7axOKnTRr8XmSzwP+ylJqJZA2hQOQRyWndig5z2kecuwcVXKnC7XUR0FdIj3EA/MW
+         dqbC6m89bhnm9RZpqsVcRTmIDjdeTvAm1DtsF5jpJwEjziaVCbWNBcU/eckG4We8xHQ3
+         i7R1fPVOW0ZNXuWtTB7W5oZtoQDghnVZRpyPR1v4XRx/ufpP7qUdKejjzloXdy9ZJfiY
+         ScXCXHxhEPME70lhRtHfBYQw5Y8xQkMbDGJ8AMyVhvtk7XxUWPDRW1rMk8FbL42WFiqx
+         qFtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733749179; x=1734353979;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dhf/XfzpYsSPb93mu/nTzylFTC6NUpySvcmgI47UhBQ=;
-        b=V7lZpYJqOw0HMoDkkENALx6MuNmqHUXuvBBdM7dGr9psaivtZ3vyNM0/RX69+jwajB
-         bZMheqSuRLbm1bSjLg6V0zSVFKLq2Gqjoh9e3esAPrmP/CeFdgGmEBOV+Xaq0ShWFPnq
-         tY9nZGNSwQax+tcxpEC2ENi4Wj1Sni/zlqD1jR7OcChbUWlx0dzajTKUFLJzW5jsvBpb
-         we0KCma6I65tqkJx1YxRpiWiARjsRL+gioOJTKIpo0rTYzZ4DYjl0Ym9d/WBtp8BPC2D
-         vD/mF3DJkr29nffuSlPdt2Vd5qWpm1rRzq+r7s8H5seYsCUbez3tKXbAxAoTlpZwxm+E
-         QkGA==
-X-Gm-Message-State: AOJu0YwO7u5FQnWLuOrqLxpncVLOSTmxUW7kx5UN0Tja1XboMnff2+hS
-	3Wh8MakuAR1gWIcqXmpY61AQnF8GxDOVvkqhqLp6oNY0bjvIaaRxfkH3AAiWAOXDfyqBCvio/oc
-	5spXhMNTzwb97yyO//MwXEJtrcKNVIwMJtcuuwIVUhNqww7NhheAeXA==
-X-Gm-Gg: ASbGnctGTqO9T45RS7cx8DZJidgofJmDS+tJcFYM2k1aW60XFeILy479KPwbbTjBTfs
-	e2agEGj/+ijV/5ufSZVtnjTFcWuL559+e5GjAtxObYzjEaacjEQGqWf59a9eG95xIAOuI+S2ZCJ
-	3r3bjEu8Dqjwkg705O9W9KcRGY1uvFSgFJkZTs29x/QF964DrVS91MV03WVhXxkkfPVK61daCUs
-	aZKX6DvsJ/TCjb3aSMZkLifAU018By6SGft6zlw4Io64gPFjCxkBN30dpdIfjWXI3VCOSLxZ2Kg
-	t51bFRChP9r20iN1rUF5mmZ298Nc
-X-Received: by 2002:a05:6000:1a88:b0:385:e9ba:acda with SMTP id ffacd0b85a97d-386453c5e58mr238192f8f.2.1733749179448;
-        Mon, 09 Dec 2024 04:59:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEhQzfxjFNqHJB6XTPw4CbBK7oqzNkaGMUQBK4V27M6uR4Sq8rd6LkAhzCWUMGuV0TiU2h17Q==
-X-Received: by 2002:a05:6000:1a88:b0:385:e9ba:acda with SMTP id ffacd0b85a97d-386453c5e58mr238169f8f.2.1733749179099;
-        Mon, 09 Dec 2024 04:59:39 -0800 (PST)
-Received: from debian (2a01cb058918ce00016ee0d7ec045c7a.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:16e:e0d7:ec04:5c7a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434f7160599sm44388655e9.23.2024.12.09.04.59.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2024 04:59:38 -0800 (PST)
-Date: Mon, 9 Dec 2024 13:59:36 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: James Chapman <jchapman@katalix.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	tparkin@katalix.com, aleksander.lobakin@intel.com,
-	ricardo@marliere.net, mail@david-bauer.net
-Subject: Re: [PATCH net-next] l2tp: Handle eth stats using
- NETDEV_PCPU_STAT_DSTATS.
-Message-ID: <Z1bpuGs5Y8kmY5hu@debian>
-References: <20241209114607.2342405-1-jchapman@katalix.com>
+        d=1e100.net; s=20230601; t=1733749282; x=1734354082;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q4xNiD+1h6n/gmqa9KIJktFHTf/n6lA09xO7+iOB9PY=;
+        b=L5dQ7fy6Syl5EuKgj2/EghNwd3sJhW6H8XxB1uEtQkTbp9+1/U0cu26e7rSsyK1/sd
+         c88WzVAq6G1iDnSMLdRmN+BI/vmZwqesY6IzjASyoG4k1AEkLA7gpEyUtENCycuvC+8C
+         Jv6Pf+W9b3jVc+7EMe5DMRXJOXmqY5SqnwXsM9Ik0+MJEWpzA20AjGBIB/2DwFVm/nGi
+         e9g+Z8bj8MyrgZKl368wT4KSljPXnnNAhR8Q8HDdliOZvTATUeT5teZrTZC7B4KXm9Ru
+         +vOY0NiO6CO+MdTxzQ9cOi9uUZ3ORngMIr/AV+545c/1uv0eWQwk0qR1MytWxa87Es1t
+         WH1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU/6mYdtJxEqsv5WpVPSGwlVRWIfm6WowchS5ZYJBhC5bawBXfqqhu6b0oZErc2B3atg1PObr+BTEGZIvkK@vger.kernel.org, AJvYcCWBT7u1lC+mapOTw680aYu278xEItglVZSyfqCuImcAXkLwHmg2iB90alXfRroFa+U3KgDdRnD6KjO355D8fZw=@vger.kernel.org, AJvYcCWYYybbzt0sYGSF7X0mfC6ydrUotOnqLbpqj4iCNUZWYHmxY48J0ZP49mGUiwP6KUbX8iW1l30Jjr/s@vger.kernel.org, AJvYcCXvbxF0wp+lHkFYPLkYh6oMhl1MFgOmpiJ/UvGhB0mo6SuCN8+35v2Y5b4cGaPFQ8Zn2s/vceTo@vger.kernel.org
+X-Gm-Message-State: AOJu0YySSirB2UCjNWo0wNsAlI3Cp2+QvwRX2wJuJaQxJLASX47UM4OA
+	9HYbFP23XaaZ1e3sMDrQgZnBwR5O4Ov52h9jpuPSlnyaQPs76TBCKUZSIYOLysTUSWe61gpr18L
+	Cj1H2Dwhbcg1YxQuklaZ+jURpGBaVlb/y0aU=
+X-Gm-Gg: ASbGncvo8voOGJuelyy9zKv/RC5h1NwS/cuHjTILxdMW98iSyb7CPdKEeOb8RJiaXdW
+	6uFY1PGEW11FudUj77l9AVVfEmTmboeE=
+X-Google-Smtp-Source: AGHT+IGe1WstGRWqGSFuoCPDZFOtP3fDmU5Xj4kLOejwoz6WX1eM9hdJD2mx6/c+7+IVgAVWdxA8ME0SNhuOKo7Zq34=
+X-Received: by 2002:a2e:bc05:0:b0:302:2bd8:2687 with SMTP id
+ 38308e7fff4ca-3022bd82cffmr6815311fa.12.1733749281481; Mon, 09 Dec 2024
+ 05:01:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241209114607.2342405-1-jchapman@katalix.com>
+References: <20241208204708.3742696-1-ubizjak@gmail.com> <20241208204708.3742696-3-ubizjak@gmail.com>
+ <20241209113039.GN21636@noisy.programming.kicks-ass.net>
+In-Reply-To: <20241209113039.GN21636@noisy.programming.kicks-ass.net>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Mon, 9 Dec 2024 14:01:09 +0100
+Message-ID: <CAFULd4YHuiyzuzAwuZxsp_kRca-hnR+NqHU8cfk8JDqATMNSMQ@mail.gmail.com>
+Subject: Re: [PATCH v3 2/6] compiler.h: Introduce TYPEOF_UNQUAL() macro
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	linux-bcachefs@vger.kernel.org, linux-arch@vger.kernel.org, 
+	netdev@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
+	Christoph Lameter <cl@linux.com>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, Brian Gerst <brgerst@gmail.com>, 
+	Denys Vlasenko <dvlasenk@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>
+Content-Type: multipart/mixed; boundary="0000000000000dce5f0628d5f635"
 
-On Mon, Dec 09, 2024 at 11:46:07AM +0000, James Chapman wrote:
-> l2tp_eth uses the TSTATS infrastructure (dev_sw_netstats_*()) for RX
-> and TX packet counters and DEV_STATS_INC for dropped counters.
-> 
-> Consolidate that using the DSTATS infrastructure, which can
-> handle both packet counters and packet drops. Statistics that don't
-> fit DSTATS are still updated atomically with DEV_STATS_INC().
+--0000000000000dce5f0628d5f635
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+On Mon, Dec 9, 2024 at 12:30=E2=80=AFPM Peter Zijlstra <peterz@infradead.or=
+g> wrote:
+>
+> On Sun, Dec 08, 2024 at 09:45:17PM +0100, Uros Bizjak wrote:
+> > Define TYPEOF_UNQUAL() to use __typeof_unqual__() as typeof operator
+> > when available, to return unqualified type of the expression.
+> >
+> > Current version of sparse doesn't know anything about __typeof_unqual__=
+()
+> > operator. Avoid the usage of __typeof_unqual__() when sparse checking
+> > is active to prevent sparse errors with unknowing keyword.
+>
+> Ooooh, new toys.
+>
+> I suppose __unqual_scalar_typeof() wants to be using this when
+> available?
 
-Thanks!
+Yes, the attached patch compiles and boots OK.
 
+Uros.
+
+--0000000000000dce5f0628d5f635
+Content-Type: text/plain; charset="US-ASCII"; name="unqual_scalar_typeof.diff.txt"
+Content-Disposition: attachment; filename="unqual_scalar_typeof.diff.txt"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m4h1jn2x0>
+X-Attachment-Id: f_m4h1jn2x0
+
+ZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvY29tcGlsZXJfdHlwZXMuaCBiL2luY2x1ZGUvbGlu
+dXgvY29tcGlsZXJfdHlwZXMuaAppbmRleCA1ZDY1NDQ1NDU2NTguLjg3YTljZTNlYmQxMyAxMDA2
+NDQKLS0tIGEvaW5jbHVkZS9saW51eC9jb21waWxlcl90eXBlcy5oCisrKyBiL2luY2x1ZGUvbGlu
+dXgvY29tcGlsZXJfdHlwZXMuaApAQCAtNDg2LDE1ICs0ODYsMTkgQEAgc3RydWN0IGZ0cmFjZV9s
+aWtlbHlfZGF0YSB7CiAgKiBfX3VucXVhbF9zY2FsYXJfdHlwZW9mKHgpIC0gRGVjbGFyZSBhbiB1
+bnF1YWxpZmllZCBzY2FsYXIgdHlwZSwgbGVhdmluZwogICoJCQkgICAgICAgbm9uLXNjYWxhciB0
+eXBlcyB1bmNoYW5nZWQuCiAgKi8KKworI2lmIGRlZmluZWQoQ09ORklHX0NDX0hBU19UWVBFT0Zf
+VU5RVUFMKSAmJiAhZGVmaW5lZChfX0NIRUNLRVJfXykKKyMgZGVmaW5lIF9fdW5xdWFsX3NjYWxh
+cl90eXBlb2YoeCkgX190eXBlb2ZfdW5xdWFsX18oeCkKKyNlbHNlCiAvKgogICogUHJlZmVyIEMx
+MSBfR2VuZXJpYyBmb3IgYmV0dGVyIGNvbXBpbGUtdGltZXMgYW5kIHNpbXBsZXIgY29kZS4gTm90
+ZTogJ2NoYXInCiAgKiBpcyBub3QgdHlwZS1jb21wYXRpYmxlIHdpdGggJ3NpZ25lZCBjaGFyJywg
+YW5kIHdlIGRlZmluZSBhIHNlcGFyYXRlIGNhc2UuCiAgKi8KLSNkZWZpbmUgX19zY2FsYXJfdHlw
+ZV90b19leHByX2Nhc2VzKHR5cGUpCQkJCVwKKyAjZGVmaW5lIF9fc2NhbGFyX3R5cGVfdG9fZXhw
+cl9jYXNlcyh0eXBlKQkJCQlcCiAJCXVuc2lnbmVkIHR5cGU6CSh1bnNpZ25lZCB0eXBlKTAsCQkJ
+XAogCQlzaWduZWQgdHlwZToJKHNpZ25lZCB0eXBlKTAKIAotI2RlZmluZSBfX3VucXVhbF9zY2Fs
+YXJfdHlwZW9mKHgpIHR5cGVvZigJCQkJXAorICNkZWZpbmUgX191bnF1YWxfc2NhbGFyX3R5cGVv
+Zih4KSB0eXBlb2YoCQkJCVwKIAkJX0dlbmVyaWMoKHgpLAkJCQkJCVwKIAkJCSBjaGFyOgkoY2hh
+cikwLAkJCQlcCiAJCQkgX19zY2FsYXJfdHlwZV90b19leHByX2Nhc2VzKGNoYXIpLAkJXApAQCAt
+NTAzLDYgKzUwNyw3IEBAIHN0cnVjdCBmdHJhY2VfbGlrZWx5X2RhdGEgewogCQkJIF9fc2NhbGFy
+X3R5cGVfdG9fZXhwcl9jYXNlcyhsb25nKSwJCVwKIAkJCSBfX3NjYWxhcl90eXBlX3RvX2V4cHJf
+Y2FzZXMobG9uZyBsb25nKSwJXAogCQkJIGRlZmF1bHQ6ICh4KSkpCisjZW5kaWYKIAogLyogSXMg
+dGhpcyB0eXBlIGEgbmF0aXZlIHdvcmQgc2l6ZSAtLSB1c2VmdWwgZm9yIGF0b21pYyBvcGVyYXRp
+b25zICovCiAjZGVmaW5lIF9fbmF0aXZlX3dvcmQodCkgXAo=
+--0000000000000dce5f0628d5f635--
 
