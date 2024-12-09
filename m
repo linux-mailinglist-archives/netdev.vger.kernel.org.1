@@ -1,153 +1,99 @@
-Return-Path: <netdev+bounces-150042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E4D59E8B87
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 07:32:22 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18B18163CA3
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 06:32:19 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B78115990C;
-	Mon,  9 Dec 2024 06:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ldFqQhef"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E29879E8B9B
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 07:42:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A1414E2CF;
-	Mon,  9 Dec 2024 06:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59DB2281615
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 06:42:56 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDFC320FA9A;
+	Mon,  9 Dec 2024 06:42:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="dVt0Sb4a"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665751E4A4
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 06:42:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733725937; cv=none; b=RRsjfAqEv3SFCyAr6+SGfBsQ8kWnIBWp8N/wHQzoh6tJRBRvQOHrj5hu7r/op//UyDcEndEAr4ifm88/bj/0SXJa9Z7/wuM6/UWfy9ygwxQBz7yKYpUeNLVuE94uSHstYGL5Gx8e5fyUkzwhiOwEWH8jUKIT/vDBW9fmNk2UDZ8=
+	t=1733726573; cv=none; b=AY+YIcQTAEPcSQzb10ruK2vLFsds/K0Oz8jrOp7V22PNsSFgqffoSf1OBOI5ftHDyqJofMfEMu5OzKWVBzNeTS0ZS8dPFWM4I5B/GNwU/FFKWT4gdig8qph////LFBqqGmSDGJJxbnR+XJCwXA3ygJ9Q7YsXI6OO2HKZudDDAtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733725937; c=relaxed/simple;
-	bh=M0gILic1Jcfd4zLwbcEBp09+PdxDNMMYLSq89tSKWWA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qqla8BfEIscoeLXPibTryQ9QBQ4LEnIigg/VUYaIEx1fZMAQqDMPwoiK9sL8Dp0iRc1DMjhJUD2+UUb20QJ5CoVT3+9HaUlazosRa3UUmKif+tXpPhGLvo8WeyYM8W42i3UYlp1yhur2/n2D3Pp3mEX1cOtnKGEYO8YFqbTfSzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ldFqQhef; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 183C3C4CED1;
-	Mon,  9 Dec 2024 06:32:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1733725936;
-	bh=M0gILic1Jcfd4zLwbcEBp09+PdxDNMMYLSq89tSKWWA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ldFqQhefLe+emhGvcfLjNeQsJHWNtve53OFslt17dpszYJ4z2b+fvGaGt3dikXPSO
-	 WXoAAXzQGu0UEBgVRgt+it/jgb10sUUv+reoTNfFuY/m9uy2MSK+iwdfpEvGtmEH5j
-	 nisUWl7bXLrMA/0nJNrB7xueiQClgebtgrVs/yuw=
-Date: Mon, 9 Dec 2024 07:31:40 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	sudongming1@huawei.com, xujunsheng@huawei.com,
-	shiyongbang@huawei.com, libaihan@huawei.com,
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
-	salil.mehta@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, hkelam@marvell.com
-Subject: Re: [PATCH V5 net-next 1/8] debugfs: Add debugfs_create_devm_dir()
- helper
-Message-ID: <2024120925-dreamt-immorally-f9f8@gregkh>
-References: <20241206111629.3521865-1-shaojijie@huawei.com>
- <20241206111629.3521865-2-shaojijie@huawei.com>
- <2024120627-smudge-obsolete-efb6@gregkh>
- <6274cc5a-375f-4009-bc3e-1b1063f298bb@huawei.com>
+	s=arc-20240116; t=1733726573; c=relaxed/simple;
+	bh=AJZZjliWJW8m4PkR5mjAobUKxgxdwvSe80nUnEdzbDU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pmkv5HTXrnzhafbTGomuXYQ0omkSu9vTTzYxOJzI5xzXABc3uDsUSezs3ylKkevvIWv9ex6ijZ1YeZJzhiEL98EBj8fHlcxHOlA7YlWby5EwS72XzQcBurb4Z2X9YC6It+h1UabjmJy6k8dtsAt7AHs6/IdDEwoaKUMADbetfcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=dVt0Sb4a; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1733726572; x=1765262572;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=zffpAM3VgYaM0O9KhZGJ6IIidR+AehOiZ+CFyd2IZBw=;
+  b=dVt0Sb4aCQyHB0il+OYq5+RhWF7nDOTnavzRr9hwG9nZg+Jbdwv1Sgt/
+   9sv0W6fS3qflORLbFqShbStF4cnyllJx46/RJI2rf+n4DItfcFvFtqOvC
+   jM8DOR7DQie6tFBGIeI/vvLP/t2zYGfR3l8Kohcr3GiSDxcZfD6xcIWSR
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.12,218,1728950400"; 
+   d="scan'208";a="154157690"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 06:42:51 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:51083]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.104:2525] with esmtp (Farcaster)
+ id a96e32b4-823a-4fc1-bf6b-80724919ce1c; Mon, 9 Dec 2024 06:42:50 +0000 (UTC)
+X-Farcaster-Flow-ID: a96e32b4-823a-4fc1-bf6b-80724919ce1c
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 9 Dec 2024 06:42:50 +0000
+Received: from 6c7e67c6786f.amazon.com (10.118.254.92) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Mon, 9 Dec 2024 06:42:46 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuniyu@amazon.com>
+CC: <davem@davemloft.net>, <david.laight@aculab.com>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>
+Subject: Re: [PATCH v1 net-next 00/15] treewide: socket: Clean up sock_create() and friends.
+Date: Mon, 9 Dec 2024 15:42:43 +0900
+Message-ID: <20241209064243.20600-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241209052643.9896-1-kuniyu@amazon.com>
+References: <20241209052643.9896-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6274cc5a-375f-4009-bc3e-1b1063f298bb@huawei.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC002.ant.amazon.com (10.13.139.242) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, Dec 09, 2024 at 09:02:10AM +0800, Jijie Shao wrote:
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Mon, 9 Dec 2024 14:26:43 +0900
+> > >   2) some subsystems use sock_create(), but most of the sockets are
+> > >      not exposed to userspace via file descriptors but are exposed
+> > >      to some BPF hooks (most likely unintentionally)
+> > 
+> > AFAIR the 'kern' flag removes some security/permission checks.
 > 
-> on 2024/12/6 19:40, Greg KH wrote:
-> > On Fri, Dec 06, 2024 at 07:16:22PM +0800, Jijie Shao wrote:
-> > > Add debugfs_create_devm_dir() helper
-> > > 
-> > > Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> > > ---
-> > >   fs/debugfs/inode.c      | 36 ++++++++++++++++++++++++++++++++++++
-> > >   include/linux/debugfs.h | 10 ++++++++++
-> > >   2 files changed, 46 insertions(+)
-> > > 
-> > > diff --git a/fs/debugfs/inode.c b/fs/debugfs/inode.c
-> > > index 38a9c7eb97e6..f682c4952a27 100644
-> > > --- a/fs/debugfs/inode.c
-> > > +++ b/fs/debugfs/inode.c
-> > > @@ -610,6 +610,42 @@ struct dentry *debugfs_create_dir(const char *name, struct dentry *parent)
-> > >   }
-> > >   EXPORT_SYMBOL_GPL(debugfs_create_dir);
-> > > +static void debugfs_remove_devm(void *dentry_rwa)
-> > > +{
-> > > +	struct dentry *dentry = dentry_rwa;
-> > > +
-> > > +	debugfs_remove(dentry);
-> > > +}
-> > > +
-> > > +/**
-> > > + * debugfs_create_devm_dir - Managed debugfs_create_dir()
-> > > + * @dev: Device that owns the action
-> > > + * @name: a pointer to a string containing the name of the directory to
-> > > + *        create.
-> > > + * @parent: a pointer to the parent dentry for this file.  This should be a
-> > > + *          directory dentry if set.  If this parameter is NULL, then the
-> > > + *          directory will be created in the root of the debugfs filesystem.
-> > > + * Managed debugfs_create_dir(). dentry will automatically be remove on
-> > > + * driver detach.
-> > > + */
-> > > +struct dentry *debugfs_create_devm_dir(struct device *dev, const char *name,
-> > > +				       struct dentry *parent)
-> > > +{
-> > > +	struct dentry *dentry;
-> > > +	int ret;
-> > > +
-> > > +	dentry = debugfs_create_dir(name, parent);
-> > > +	if (IS_ERR(dentry))
-> > > +		return dentry;
-> > > +
-> > > +	ret = devm_add_action_or_reset(dev, debugfs_remove_devm, dentry);
-> > > +	if (ret)
-> > > +		ERR_PTR(ret);
-> > You don't clean up the directory you created if this failed?  Why not?
-> 
-> Don't need to clean up.
-> in devm_add_action_or_reset(), if failed, will call action: debugfs_remove_devm(),
-> So, not clean up again.
-> 
-> #define devm_add_action_or_reset(dev, action, data) \
-> 	__devm_add_action_or_reset(dev, action, data, #action)
-> 
-> static inline int __devm_add_action_or_reset(struct device *dev, void (*action)(void *),
-> 					     void *data, const char *name)
-> {
-> 	int ret;
-> 
-> 	ret = __devm_add_action(dev, action, data, name);
-> 	if (ret)
-> 		action(data);
-> 
-> 	return ret;
-> }
-> 
-> But there's a problem with this, I missed return.
-> I will add return in v6.
+> Right.
 
-As this did not even compile, how did you test any of this?
+This wasn't always true.
 
-I'm now loath to add this at all, please let's just keep this "open
-coded" in your driver for now until there are multiple users that need
-this and then convert them all to use the function when you add it.
+Currently, SELinux and AppArmor supports the socket_create hook
+and do nothing if kern=0, but Smack supporting socket_post_create
+does not care about kern.
 
-thanks,
-
-greg k-h
+Also, we can enforce security for kernel sockets with BPF LSM.
 
