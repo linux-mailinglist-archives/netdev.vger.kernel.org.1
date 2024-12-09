@@ -1,253 +1,93 @@
-Return-Path: <netdev+bounces-150031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C14D9E8AF7
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 06:27:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF5C09E8B24
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 06:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 893A1280E9B
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 05:26:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEAC0281163
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 05:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C12914D717;
-	Mon,  9 Dec 2024 05:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B371F1C232D;
+	Mon,  9 Dec 2024 05:45:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="j9B4iLnP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OTNFDvzx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD1E54918
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 05:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DD91C4A1B;
+	Mon,  9 Dec 2024 05:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733722017; cv=none; b=FQ990+WMQ0XcDLULJ9KYx4wuj2ohWy5T9jwA033Nkt8df/cRxNcC+hTakAB4ElTaT+4fFDaStxy1WKYUQJhDfBX7qXFSrN4oVvuBUiIPQmqZPH7a8JMfuaHxRctYJ2hrFDPBXk6eT8g1hNipOxABKTpSf+Q80dsY7wQrxPzHs5Y=
+	t=1733723155; cv=none; b=RtgsL5WmahWpWfBpP/f5DQDUkxy+gfaUVYQk7Z3qq1RQYv6LUSoaITx2Vy9bCn3TLxHQBHOkX6L/FRuzH0m8uTVG6TB/hFrHlKMqVAU/7bZCJ8UI+OU676N6dLNljZrrE/2CIJcz/Nu5CdgrRe1JF8npBI9imwB6ff9kWYK/chs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733722017; c=relaxed/simple;
-	bh=rDPs66ls2Ar2HWx8s9z4l6bULwJUOopY1Mg/SJLyxlw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ED+g7t665ibkuSwsgkJHSzv63/bcBuoLXm0v1oBm+1patun8BusJm7PRezdeByKEmkduiqLApUJT98Kitv+TndMwGPXc9dOOy9IEjj6XisEynDyqaBwY6sqDlf+mBkxQ1ElrkCay/8VfIMdAaJ1K1fyExtg/iWBkZkxfwJ+KlSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=j9B4iLnP; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1733722016; x=1765258016;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PrUpfO15SvHBigZbpgC9HlFdlkqgwCXpcBpiu7xM0YE=;
-  b=j9B4iLnPMctLZMmw3CaocXsd6wbGYm4c/S3A6gT0p6JMG9H3cO+w7Ena
-   bgyDVgDxIj92c1oUk3/tU0nKbZH7k7E6Rk+QSLhRhmFkqUeDUc+x6fu8V
-   ENCFSlYdiFGb4/MlTnnlqfwWk5gIpKzf1a5JGZWP6yWRAgi9XZuU9v5jF
-   o=;
-X-IronPort-AV: E=Sophos;i="6.12,218,1728950400"; 
-   d="scan'208";a="454378766"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 05:26:52 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:55345]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.104:2525] with esmtp (Farcaster)
- id 966092e1-e2b7-46e9-aa16-0f29ad0c137f; Mon, 9 Dec 2024 05:26:51 +0000 (UTC)
-X-Farcaster-Flow-ID: 966092e1-e2b7-46e9-aa16-0f29ad0c137f
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 9 Dec 2024 05:26:50 +0000
-Received: from 6c7e67c6786f.amazon.com (10.118.254.92) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 9 Dec 2024 05:26:47 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <david.laight@aculab.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next 00/15] treewide: socket: Clean up sock_create() and friends.
-Date: Mon, 9 Dec 2024 14:26:43 +0900
-Message-ID: <20241209052643.9896-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <85ad278ad61943938a6537f1405f7814@AcuMS.aculab.com>
-References: <85ad278ad61943938a6537f1405f7814@AcuMS.aculab.com>
+	s=arc-20240116; t=1733723155; c=relaxed/simple;
+	bh=3X70tRunR7lYHlKpNIgdPIP119iuLEn/uQ0tKEhyDe0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kk1PVSqheJzwz//VOtHagvxWKDKo1y2Jl+8N+Ojcg2NsM8x4IdLJXf2hbKjl2681wN9O3Pw3Y/8I49z9BZ4Q0DE0zobUBPEOyTx3Z5j8YsdvYl+lhS3TKBkmyTHIefVxlcOMHaSMGCpNOoorWetCdZ9ijLHXz6q0K+MdbMVBNBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OTNFDvzx; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733723154; x=1765259154;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3X70tRunR7lYHlKpNIgdPIP119iuLEn/uQ0tKEhyDe0=;
+  b=OTNFDvzxXKN6lSpN0V6pH2kUaHpC4t9FpQQX4yuxFzC/iK9vTY5LFFrx
+   6qxglRO5wfT1O9PkyNE/yJ/vZg1ntR64fdx63qIPKVnvfRJbCHCY+W2uA
+   mV/zkRLLwunrXLyNdxHEbmlrwIy2DeyRD0LwLU4I7v+QmLtdwjxRshGu7
+   KAS4eAQAQ+06qoLDkul3db8BZhDfmgbIOlQc0Brms33LNHWsS8yHkKmf6
+   4P4sUMHI3E7T5ln4uQp7Yz1POIafzrpHFK5SI8KRm2cPFCu+X9dub43rD
+   +aPm8XrK2nx0+Vz8gTdqNMTG3IpG+nXUDQPkkMCGNS/8AAGzsQr00GGXf
+   Q==;
+X-CSE-ConnectionGUID: M1Z8xtfwSoeKKgoDzpDCWw==
+X-CSE-MsgGUID: xTBJrFfFTJCUjZLx4oQYkg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11280"; a="37934839"
+X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
+   d="scan'208";a="37934839"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 21:45:53 -0800
+X-CSE-ConnectionGUID: Jmfx+m5HTp6cwNLutHY53g==
+X-CSE-MsgGUID: Ojm1sNYFT6mihTvGQ9LVPg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
+   d="scan'208";a="99419996"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 21:45:51 -0800
+Date: Mon, 9 Dec 2024 06:42:49 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Justin Lai <justinlai0215@realtek.com>, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	horms@kernel.org, michal.kubiak@intel.com, pkshih@realtek.com,
+	larry.chiu@realtek.com
+Subject: Re: [PATCH net-next] rtase: Refine the if statement
+Message-ID: <Z1aDWTa2VzXiPpNf@mev-dev.igk.intel.com>
+References: <20241206084851.760475-1-justinlai0215@realtek.com>
+ <Z1LVqssDBEZ7nsWQ@mev-dev.igk.intel.com>
+ <20241206084158.172dd06d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWA003.ant.amazon.com (10.13.139.31) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241206084158.172dd06d@kernel.org>
 
-From: David Laight <David.Laight@ACULAB.COM>
-Date: Sun, 8 Dec 2024 10:54:23 +0000
-> From: Kuniyuki Iwashima
-> > Sent: 06 December 2024 07:55
-> > 
-> > There are a bunch of weird usages of sock_create() and friends due
-> > to poor documentation.
-> > 
-> >   1) some subsystems use __sock_create(), but all of them can be
-> >      replaced with sock_create_kern()
+On Fri, Dec 06, 2024 at 08:41:58AM -0800, Jakub Kicinski wrote:
+> On Fri, 6 Dec 2024 11:44:58 +0100 Michal Swiatkowski wrote:
+> > I am not sure if it is worth to change.
 > 
-> Not currently because sock_create_kern() doesn't increase the ref count
-> on the network namespace.
-> So I have an out of tree driver that end up using __sock_create() in
-> order that the socket holds a reference to the network namespace.
+> True, tho, FWIW, if it's the maintainer of the codebase sending the
+> change it's generally fine. Our "no pointless churn" rule is primarily
+> for randoes.
 
-An out of tree driver is apparently out of scope, and the owner always
-needs to follow the upstream change.
-
-That's one of reasons I changed the arguments and renamed sock_create()
-helpers, letting the out-of-tree drivers notice the change through build
-failure.
-
-
-> 
-> >   2) some subsystems use sock_create(), but most of the sockets are
-> >      not exposed to userspace via file descriptors but are exposed
-> >      to some BPF hooks (most likely unintentionally)
-> 
-> AFAIR the 'kern' flag removes some security/permission checks.
-
-Right.
-
-
-> So a socket that is being created to handle user API requests
-> (user data might be encapsulated and then sent) probably ought
-> to have 'kern == 0' even though the socket is not directly exposed
-> through the fd table.
-
-tun/tap is counterexample, where sk_alloc(kern=0) is directly
-used instead of sock_create(), then no LSM is invoked.
-
-
-> 
-> >   3) some subsystems use sock_create_kern() and convert the sockets
-> >      to hold netns refcnt (cifs, mptcp, rds, smc, and sunrpc)
-> > 
-> >   4) the sockets of 2) and 3) are counted in /proc/net/sockstat even
-> >      though they are untouchable from userspace
-> > 
-> > The primary goal is to sort out such confusion and provide enough
-> > documentation for future developers to choose an appropriate API.
-> > 
-> > Regarding 3), we introduce a new API, sock_create_net(), that holds
-> > a netns refcnt for kernel socket to remove the socket conversion to
-> > avoid use-after-free triggered by TCP kernel socket after commit
-> > 26abe14379f8 ("net: Modify sk_alloc to not reference count the netns
-> > of kernel sockets.").
-> > 
-> > Throughout the series, we follow the definition below:
-> > 
-> >   userspace socket:
-> >     * created by sock_create_user()
-> >     * holds the reference count of the network namespace
-> >     * directly linked to a file descriptor
-> >     * accessed via a file descriptor (and some BPF hooks)
-> >     * counted in the first line of /proc/net/sockstat.
-> > 
-> >   kernel socket
-> >     * created by sock_create_net() or sock_create_net_noref()
-> >       * the former holds the refcnt of netns, but the latter doesn't
-> >     * not directly exposed to userspace via a file descriptor nor BPF
-> 
-> That isn't really right:
-> A 'userspace socket' (kern == 0) is a socket created to support a user's
-> API calls. Typically (but not always) directly linked to a file descriptor.
-> Security/permission checks include those of the current user/process.
-> 
-> A 'kernel socket' (kern == 1) is a socket that isn't related to a user process.
-> These fall into two groups:
-> 1) Normal TCP (etc) sockets used by things like remote filesystems.
->    These need to hold a reference to the network namespace and will stop
->    the namespace being deleted.
-
-You'll see all of the sockets using sock_create() in the patch below
-are of this type.  (infiniband, ISDN, NVMe over TCP, iscsi, Xen PV call,
-ocfs2, smbd)
-https://lore.kernel.org/netdev/20241206075504.24153-14-kuniyu@amazon.com/
-
-Only one valid user of sock_create() is SCTP, and it's "created to support
-users's API call" and actually tied to a file descriptor.
-https://lore.kernel.org/netdev/20241206075504.24153-15-kuniyu@amazon.com/
-
-From this POV, I think tun/tap also should use kern=true && hold_net=true.
-No 'socket' is mentioned in tun/tap doc.  Users need not be aware of the
-underlying sockets.
-
-  $ grep socket Documentation/networking/tuntap.rst
-  $ echo $?
-  1
-
-> 2) Special sockets used internally (perhaps for routing).
->    These don't hold a reference, but require the caller have a callback
->    for the namespace being deleted and must close the socket before
->    the callback returns.
->    The close must be fully synchronous - FIN_WAIT states will break things.
-> 
-> > Note that I didn't CC maintainers for mechanical changes as the CC
-> > list explodes.
-> 
-> This whole change (which is probably worth it) need doing in a different
-> order.
-
-I don't think it's worth it, and you are inconsistent.
-
-This series is a revival of my old patch, where I tried to
-override the kern parameter.
-
-Interestingly, you suggested adding another parameter then,
-that was opposite of what you are suggesting now.
-https://lore.kernel.org/netdev/20240227011041.97375-4-kuniyu@amazon.com/
-
-
-> Start with the actual change to the socket create code and then work
-> back through the callers.
-> That may require adding wrapper functions for the existing calls that
-> can then finally be deleted in the last patch.
-> 
-> Additionally boolean parameters need to be banned, multiple ones
-> are worse - you really can tell from the call site what they mean.
-
-As mentioned above, this is intentional to break out-of-tree drivers
-and give the owners a chance to look at this change.
-
-For example, we provide Lustre service with an out-of-tree driver
-where sock_crete_kern() is used and needs update along future kernel
-update.
-
-Also, changing param let compilers inspect all sock_create_XXX()
-users, and there was a weird path like smc_ulp_init().
-https://lore.kernel.org/netdev/20241206075504.24153-4-kuniyu@amazon.com/
-
-
-> 
-> So change the boolean 'kern' parameter to a flags one.
-> You then want 0 to be the normal case (user socket that holds a ref).
-> Then add (say):
-> 	#define SOCK_CREATE_NO_NS_REF 1
-> 	#define SOCK_CREATE_KERN      2
-> Initially add to the top of sk_alloc():
-> 	if (flags & SOCK_CREATE_NOREF)
-> 		flags |= SOCK_CREATE_KERN;
-> Now all the code compiles and works as before.
-> 
-> Next find all the call sites (especially those that pass 1)
-> and change so they pass the correct flag combination.
-
-Changing param allows us to effectively inspect these callers with
-help of the compiler.
-
-
-> (Some static inlines/#defines might help with long lines.)
-> 
-> Finally change sk_alloc() to return NULL if NO_NS_REF
-> is set without KERN.
-
-This is no-go, no one wants to debug a weird -ENOMEM.
-
-I added DEBUG_NET_WARN_ON_ONCE() for such a case so that
-syzbot will let us know that pattern
-https://lore.kernel.org/netdev/20241206075504.24153-10-kuniyu@amazon.com/
+Sure, thanks for letting me know.
 
