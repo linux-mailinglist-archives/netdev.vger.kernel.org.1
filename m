@@ -1,249 +1,201 @@
-Return-Path: <netdev+bounces-150038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AEB39E8B54
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 07:05:06 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 146619E8B5B
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 07:11:36 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07F4C281658
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 06:05:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0416A163DDC
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 06:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35312147F8;
-	Mon,  9 Dec 2024 06:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 260FB213E8E;
+	Mon,  9 Dec 2024 06:11:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ZlJdK2X5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hr4ihsZ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0932144A9;
-	Mon,  9 Dec 2024 06:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8695616DEB5;
+	Mon,  9 Dec 2024 06:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733724296; cv=none; b=gcfB7JxXJUrkR2rVZvNPFosKqUlEpZwhMLDXgCh0TEME56e/y4Xt4IBtL054Yb0N1YtcWyw89Qj902/hG5qXp2osmqRG0DTnsm7R1J2M3BXNWdr4bWrahz+5fRVZSqxGK8iWe0VWAOBskqNYyW2rYDx3Fshd+tfNipxagdBNNlQ=
+	t=1733724691; cv=none; b=XlKJYIqaSWfyV+r4qE7rUG5m0wXIBGWxrhLTitKn1vmsmqmI8Xlh3ZGwp7mOHA198Fjx0YBI5RycaOTGm68UG8heEpIN10tqqHTY59UsDg+P+diGaOkqjGwziMhDGoLHYPsWXXe31MCVTXzkISL7yuOZlZwhey2fD47udi5Qiv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733724296; c=relaxed/simple;
-	bh=bhTklaj/2PsO5Nv8UhiyX2qItpwg7Uti9kyTx3adxzI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p4mMF9mYqbOA0T0jgXmiGUYMeKIepIrlnA6accTlvGibWhIgVKDc2g+7aTZIO80gL0xaxdPcvXNDCXxN80FrHejNwpvEDjW9gklFAhLD6pijBnAVmVvqJB3TrrzbCROkhbMyCb7lFLm8QKO3UOFap5pqtN5tY+L8ktv9rm4zqpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ZlJdK2X5; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1733724284; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=s/c5AztEBJjv/BTvhC/ba+rQgienYOYyHkd/8hjQ3RM=;
-	b=ZlJdK2X5o9qXUKtk97iWhcq2H2PtlgZ1XNW/llV/mg4PROSba0ELJAup/Xemwzt2xPmZBhKdWk9wuYXIkQkbobDaAiN1hCGdl2dZhSRNQRbM0OaIvJfFe+bBog4Wj34YPS1zTNkA45Bvp7JvjIDJOuYTKpreDzVax/Ys26fDyt8=
-Received: from 30.221.100.140(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WL36AV9_1733724281 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 09 Dec 2024 14:04:43 +0800
-Message-ID: <d2af79e2-adb2-46f0-a7e3-67a9265f3adf@linux.alibaba.com>
-Date: Mon, 9 Dec 2024 14:04:40 +0800
+	s=arc-20240116; t=1733724691; c=relaxed/simple;
+	bh=uWhiM+/cVZ+gZtMPzxGcN6fFIQWwYSzJU8wU6/NrLM4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=XFFxe6NAB+FK6lMBng7MWm9T31K4+wfM8IUDTPt/SH9+AnhnJwz1wl4I6dMJf+P7GWSD8fEnkTv2U4sAQ+yznhD5U9a1ntEdlum9tA1k1SNdJ292yqNQ3GjMu8aaiUvAtFr1QuDBJMoXJbMHvpcrmXoSvnAg7PmS/BGPud00eOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hr4ihsZ2; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-725abf74334so3336778b3a.3;
+        Sun, 08 Dec 2024 22:11:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733724689; x=1734329489; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U0Dr18ok2Bwr1dMchDb8ArapEa4jmdw3PhKJpSV2ky8=;
+        b=Hr4ihsZ24sMHXs4+qJsfYkG1SmnZSSagiHafDeth6ahrleft7MErLw2vwxrNIeDZHf
+         PBDthx8ol4Mgj9cjhvXmDxnN1VcYuwZiWQ/+H5b99okXVD0JI2vHNLzWtXM+pBHlltHN
+         QyuvfUgcwe62H/YbLylEly5rk7zfO6CqFTN9Szw4PusFgvxi35jB9IX+C1TvnNk6x9tE
+         j/yl0jqgnpaw6QLOzyicJE4UrxR3JdG2a4vbwBhvLPcPyt5fd+JUptlntf4N3MTvXP8N
+         wijicivmhD+jPzrOeo4FZf85WRFByjY2tjlM5KjpRO0jKid/E4KFmbrc7jONZjjgaA0S
+         RO+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733724689; x=1734329489;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=U0Dr18ok2Bwr1dMchDb8ArapEa4jmdw3PhKJpSV2ky8=;
+        b=esSc5nKfP+QNeC/lpuzReWIlFiABjOcx0PoCZZcfEIVZT0BnQD1IAmOY0S6RD84qYP
+         Uq3AndS+S8rmuyayqdOf1D7YJuj9I5SNGovU7hPbXpanN6qTebLeIuj9YpKdrO/fZnVY
+         kAXVC0vqCdLPev+VOXTv6UViDPQMI7URUuUuFk0rZ5RCd5ADC3qWA+imYRmp3SPNnhxw
+         iKYDn7Pbq6EnC4zfXtvlPT3H/rGOuGBQVvaL5dhsXmhV1cXnMW/602iMyadSoEipz50T
+         QkBhCOyChahXttsMYqcWkOex/bJIPZ7wFlyNXbLaVYjDLeZkK/bCn7nULrsogb9nsnF1
+         dWBA==
+X-Forwarded-Encrypted: i=1; AJvYcCV9rZaOgHjxNAtN45mMcwohlAaSZw74sns+cLPFd1piEFqFeVMeY7LI+2NdG3rRGI9hoZrl032d@vger.kernel.org, AJvYcCVHWVirEjGhzMrYeZdFNkSXRHACSQYPqE6+jDJ3F6bI874ECD804/VTOnO/A4uBGuVT1G2zjUKAgmbN9xE5fbs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbuWyQXDN4jNY01n3B9aGCybky/MdGOvcnf48+2RS8ZgMVdvqn
+	inlN0nOlDG0iwtm2TOnc8tQaigLNI8m5oLIE4GCugGvCchL0wjNC
+X-Gm-Gg: ASbGncsnUtxOQbnv01o5BIubqhhDUJL4PB26/vmSqCJLSarNXS1fVA9vAyp4jyrn89a
+	YcOtrmKtfdTOw76B9ipBNU6op7NCXEXINdTp98ufW3QYuLM9pK8r/PzPjwPLZ1bsgl258omNU1H
+	7oLnEQexllFTkoRvUHPjLmT8rJOtFlbmvu9Es1vIWNJlEuJtQ1kxWOPg0QQgNZ0HfE02SgcFoMD
+	xkJE4ja6M6rihyUcDS+5qiJUIuCJd6djMJBiackgdQuKvV6s48=
+X-Google-Smtp-Source: AGHT+IFMQfjWG8+hq0DsREnI77EtruDQsGNSS2eOzaYid2+5l3TTbMj5s/XqTwPKfy6itOzuf3pr4w==
+X-Received: by 2002:a05:6a00:a90:b0:725:f153:22d5 with SMTP id d2e1a72fcca58-725f1532457mr1897792b3a.18.1733724688664;
+        Sun, 08 Dec 2024 22:11:28 -0800 (PST)
+Received: from localhost ([98.97.37.114])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-725c9ec7217sm3888129b3a.60.2024.12.08.22.11.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Dec 2024 22:11:27 -0800 (PST)
+Date: Sun, 08 Dec 2024 22:11:26 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Michal Luczaj <mhal@rbox.co>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Eduard Zingerman <eddyz87@gmail.com>, 
+ Mykola Lysenko <mykolal@fb.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Michal Luczaj <mhal@rbox.co>
+Message-ID: <67568a0ed36d3_1abf20818@john.notmuch>
+In-Reply-To: <20241202-sockmap-replace-v1-3-1e88579e7bd5@rbox.co>
+References: <20241202-sockmap-replace-v1-0-1e88579e7bd5@rbox.co>
+ <20241202-sockmap-replace-v1-3-1e88579e7bd5@rbox.co>
+Subject: RE: [PATCH bpf 3/3] bpf, sockmap: Fix race between element replace
+ and close()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/2] net/smc: support ipv4 mapped ipv6 addr
- client for smc-r v2
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>
-Cc: jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Dust Li <dust.li@linux.alibaba.com>
-References: <20241202125203.48821-1-guangguan.wang@linux.alibaba.com>
- <20241202125203.48821-3-guangguan.wang@linux.alibaba.com>
- <894d640f-d9f6-4851-adb8-779ff3678440@linux.ibm.com>
- <20241205135833.0beafd61.pasic@linux.ibm.com>
- <5ac2c5a7-3f12-48e5-83a9-ecd3867e6125@linux.alibaba.com>
- <7de81edd-86f2-4cfd-95db-e273c3436eb6@linux.ibm.com>
- <3710a042-cabe-4b6d-9caa-fd4d864b2fdc@linux.ibm.com>
-Content-Language: en-US
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <3710a042-cabe-4b6d-9caa-fd4d864b2fdc@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 2024/12/7 03:49, Wenjia Zhang wrote:
+Michal Luczaj wrote:
+> Element replace (with a socket different from the one stored) may race with
+> socket's close() link popping & unlinking. __sock_map_delete()
+> unconditionally unrefs the (wrong) element:
 > 
+> // set map[0] = s0
+> map_update_elem(map, 0, s0)
 > 
-> On 06.12.24 11:51, Wenjia Zhang wrote:
->>
->>
->> On 06.12.24 07:06, Guangguan Wang wrote:
->>>
->>>
->>> On 2024/12/5 20:58, Halil Pasic wrote:
->>>> On Thu, 5 Dec 2024 11:16:27 +0100
->>>> Wenjia Zhang <wenjia@linux.ibm.com> wrote:
->>>>
->>>>>> --- a/net/smc/af_smc.c
->>>>>> +++ b/net/smc/af_smc.c
->>>>>> @@ -1116,7 +1116,12 @@ static int smc_find_proposal_devices(struct
->>>>>> smc_sock *smc, ini->check_smcrv2 = true;
->>>>>>        ini->smcrv2.saddr = smc->clcsock->sk->sk_rcv_saddr;
->>>>>>        if (!(ini->smcr_version & SMC_V2) ||
->>>>>> +#if IS_ENABLED(CONFIG_IPV6)
->>>>>> +        (smc->clcsock->sk->sk_family != AF_INET &&
->>>>>> +
->>>>>> !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||
->>>>> I think here you want to say !(smc->clcsock->sk->sk_family == AF_INET
->>>>> && ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)), right? If
->>>>> it is, the negativ form of the logical operation (a&&b) is (!a)||(!b),
->>>>> i.e. here should be:
->>>>> （smc->clcsock->sk->sk_family != AF_INET）||
->>>>> （!ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)）
->>>>
->>>> Wenjia, I think you happen to confuse something here. The condition
->>>> of this if statement is supposed to evaluate as true iff we don't want
->>>> to propose SMCRv2 because the situation is such that SMCRv2 is not
->>>> supported.
->>>>
->>>> We have a bunch of conditions we need to meet for SMCRv2 so
->>>> logically we have (A && B && C && D). Now since the if is
->>>> about when SMCRv2 is not supported we have a super structure
->>>> that looks like !A || !B || !C || !D. With this patch, if
->>>> CONFIG_IPV6 is not enabled, the sub-condition remains the same:
->>>> if smc->clcsock->sk->sk_family is something else that AF_INET
->>>> the we do not do SMCRv2!
->>>>
->>>> But when we do have CONFIG_IPV6 then we want to do SMCRv2 for
->>>> AF_INET6 sockets too if the addresses used are actually
->>>> v4 mapped addresses.
->>>>
->>>> Now this is where the cognitive dissonance starts on my end. I
->>>> think the author assumes sk_family == AF_INET || sk_family == AF_INET6
->>>> is a tautology in this context. That may be a reasonable thing to
->>>> assume. Under that assumption
->>>> sk_family != AF_INET &&    !ipv6_addr_v4mapped(addr) (shortened for
->>>> convenience)
->>>> becomes equivalent to
->>>> sk_family == AF_INET6 && !ipv6_addr_v4mapped(addr)
->>>> which means in words if the socket is an IPv6 sockeet and the addr is not
->>>> a v4 mapped v6 address then we *can not* do SMCRv2. And the condition
->>>> when we can is sk_family != AF_INET6 || ipv6_addr_v4mapped(addr) which
->>>> is equivalen to sk_family == AF_INET || ipv6_addr_v4mapped(addr) under
->>>> the aforementioned assumption.
->>>
->>> Hi, Halil
->>>
->>> Thank you for such a detailed derivation.
->>>
->>> Yes, here assume that sk_family == AF_INET || sk_family == AF_INET6. Indeed,
->>> many codes in SMC have already made this assumption, for example,
->>> static int __smc_create(struct net *net, struct socket *sock, int protocol,
->>>             int kern, struct socket *clcsock)
->>> {
->>>     int family = (protocol == SMCPROTO_SMC6) ? PF_INET6 : PF_INET;
->>>     ...
->>> }
->>> And I also believe it is reasonable.
->>>
->>> Before this patch, for SMCR client, only an IPV4 socket can do SMCRv2. This patch
->>> introduce an IPV6 socket with v4 mapped v6 address for SMCRv2. It is equivalen
->>> to sk_family == AF_INET || ipv6_addr_v4mapped(addr) as you described.
->>>
->>>>
->>>> But if we assume sk_family == AF_INET || sk_family == AF_INET6 then
->>>> the #else does not make any sense, because I guess with IPv6 not
->>>> available AF_INET6 is not available ant thus the else is always
->>>> guaranteed to evaluate to false under the assumption made.
->>>>
->>> You are right. The #else here does not make any sense. It's my mistake.
->>>
->>> The condition is easier to understand and read should be like this:
->>>       if (!(ini->smcr_version & SMC_V2) ||
->>> +#if IS_ENABLED(CONFIG_IPV6)
->>> +        (smc->clcsock->sk->sk_family == AF_INET6 &&
->>> +         !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||
->>> +#endif
->>>           !smc_clc_ueid_count() ||
->>>           smc_find_rdma_device(smc, ini))
->>>           ini->smcr_version &= ~SMC_V2;
->>>
->>
->> sorry, I still don't agree on this version. You removed the condition
->> "
->> smc->clcsock->sk->sk_family != AF_INET ||
->> "
->> completely. What about the socket with neither AF_INET nor AF_INET6 family?
->>
->> Thanks,
->> Wenjia
->>
-> I think the main problem in the original version was that
-> (sk_family != AF_INET) is not equivalent to (sk_family == AF_INET6).
-> Since you already in the new version above used sk_family == AF_INET6,
-> the else condition could stay as it is. My suggestion:
+> // drop fd of s0
+> close(s0)
+>   sock_map_close()
+>     lock_sock(sk)               (s0!)
+>     sock_map_remove_links(sk)
+>       link = sk_psock_link_pop()
+>       sock_map_unlink(sk, link)
+>         sock_map_delete_from_link
+>                                         // replace map[0] with s1
+>                                         map_update_elem(map, 0, s1)
+>                                           sock_map_update_elem
+>                                 (s1!)       lock_sock(sk)
+>                                             sock_map_update_common
+>                                               psock = sk_psock(sk)
+>                                               spin_lock(&stab->lock)
+>                                               osk = stab->sks[idx]
+>                                               sock_map_add_link(..., &stab->sks[idx])
+>                                               sock_map_unref(osk, &stab->sks[idx])
+>                                                 psock = sk_psock(osk)
+>                                                 sk_psock_put(sk, psock)
+>                                                   if (refcount_dec_and_test(&psock))
+>                                                     sk_psock_drop(sk, psock)
+>                                               spin_unlock(&stab->lock)
+>                                             unlock_sock(sk)
+>           __sock_map_delete
+>             spin_lock(&stab->lock)
+>             sk = *psk                        // s1 replaced s0; sk == s1
+>             if (!sk_test || sk_test == sk)   // sk_test (s0) != sk (s1); no branch
+>               sk = xchg(psk, NULL)
+>             if (sk)
+>               sock_map_unref(sk, psk)        // unref s1; sks[idx] will dangle
+>                 psock = sk_psock(sk)
+>                 sk_psock_put(sk, psock)
+>                   if (refcount_dec_and_test())
+>                     sk_psock_drop(sk, psock)
+>             spin_unlock(&stab->lock)
+>     release_sock(sk)
 > 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 8e3093938cd2..5f205a41fc48 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -1116,7 +1116,12 @@ static int smc_find_proposal_devices(struct smc_sock *smc,
->         ini->check_smcrv2 = true;
->         ini->smcrv2.saddr = smc->clcsock->sk->sk_rcv_saddr;
->         if (!(ini->smcr_version & SMC_V2) ||
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +           (smc->clcsock->sk->sk_family == AF_INET6 &&
-> +            !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||
-> +#else
->             smc->clcsock->sk->sk_family != AF_INET ||
-> +#endif
->             !smc_clc_ueid_count() ||
->             smc_find_rdma_device(smc, ini))
->                 ini->smcr_version &= ~SMC_V2;
+> Then close(map) enqueues bpf_map_free_deferred, which finally calls
+> sock_map_free(). This results in some refcount_t warnings along with a
+> KASAN splat[1].
 > 
-> Thanks,
-> Wenjia
 
-The RFC7609 have confined SMC to socket applications using stream (i.e., TCP) sockets over IPv4 or IPv6.
-https://datatracker.ietf.org/doc/html/rfc7609#page-26:~:text=It%20is%20confined%20to%20socket%20applications%20using%20stream%0A%20%20%20(i.e.%2C%20TCP)%20sockets%20over%20IPv4%20or%20IPv6
+[...]
+ 
+> Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
+>  net/core/sock_map.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+> index 20b348b1964a10a1b0bfbe1a90a4a4cd99715b81..f1b9b3958792cd599efcb591742874e9b3f4a76b 100644
+> --- a/net/core/sock_map.c
+> +++ b/net/core/sock_map.c
+> @@ -412,12 +412,11 @@ static void *sock_map_lookup_sys(struct bpf_map *map, void *key)
+>  static int __sock_map_delete(struct bpf_stab *stab, struct sock *sk_test,
+>  			     struct sock **psk)
+>  {
+> -	struct sock *sk;
+> +	struct sock *sk = NULL;
+>  	int err = 0;
+>  
+>  	spin_lock_bh(&stab->lock);
+> -	sk = *psk;
+> -	if (!sk_test || sk_test == sk)
+> +	if (!sk_test || sk_test == *psk)
+>  		sk = xchg(psk, NULL);
+>  
+>  	if (likely(sk))
+> 
+> -- 
+> 2.46.2
+> 
 
-Both in the smc-tools and in smc kernel module, we can see codes that the sk_family is either AF_INET or AF_INET6.
-The codes here:
-https://raw.githubusercontent.com/ibm-s390-linux/smc-tools/refs/heads/main/smc-preload.c#:~:text=if%20((domain%20%3D%3D%20AF_INET%20%7C%7C%20domain%20%3D%3D%20AF_INET6)%20%26%26
-and
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/smc/af_smc.c#:~:text=(sk%2D%3Esk_family%20!%3D%20AF_INET%20%26%26%20sk%2D%3Esk_family%20!%3D%20AF_INET6))
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/smc/af_smc.c#:~:text=int%20family%20%3D%20(protocol%20%3D%3D%20SMCPROTO_SMC6)%20%3F%20PF_INET6%20%3A%20PF_INET%3B 
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/smc/af_smc.c#:~:text=%2D%3Esin_family%20!%3D-,AF_INET,-%26%26%0A%09%20%20%20%20addr%2D%3E
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/smc/af_smc.c#:~:text=%2D%3Esa_family%20!%3D-,AF_INET6,-)%0A%09%09goto%20out_err
-...
-
-I wonder if SMC-R can support other address famliy rather than AF_INET AF_INET6 in design？
-And IBM has any plan to support other address family in future?  Wenjia, can you help explain
-this?
-
-If the answer is positive, the code should be like this:
-        if (!(ini->smcr_version & SMC_V2) ||
-+#if IS_ENABLED(CONFIG_IPV6)
-+           !(smc->clcsock->sk->sk_family == AF_INET || (smc->clcsock->sk->sk_family == AF_INET6 &&
-+            ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr))) ||
-+#else
-             smc->clcsock->sk->sk_family != AF_INET ||
-+#endif
-             !smc_clc_ueid_count() ||
-             smc_find_rdma_device(smc, ini))
-                 ini->smcr_version &= ~SMC_V2;
-
-Otherwise, the code below is reasonable.
-      if (!(ini->smcr_version & SMC_V2) ||
-+#if IS_ENABLED(CONFIG_IPV6)
-+        (smc->clcsock->sk->sk_family == AF_INET6 &&
-+         !ipv6_addr_v4mapped(&smc->clcsock->sk->sk_v6_rcv_saddr)) ||
-+#endif
-          !smc_clc_ueid_count() ||
-          smc_find_rdma_device(smc, ini))
-          ini->smcr_version &= ~SMC_V2;
-
-Thanks,
-Guangguan Wang
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
