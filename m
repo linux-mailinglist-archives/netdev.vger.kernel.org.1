@@ -1,131 +1,189 @@
-Return-Path: <netdev+bounces-150266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D53189E9AE4
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 16:50:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF7A09E9B2D
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:04:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 894951887F8D
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:50:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABF68162551
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 16:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF28384D29;
-	Mon,  9 Dec 2024 15:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D861369B4;
+	Mon,  9 Dec 2024 16:04:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="HGK3zq3j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KQM42HIS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FED78C9C
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 15:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312C2224D4;
+	Mon,  9 Dec 2024 16:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733759424; cv=none; b=BTrsLntkNatZiQhvWKibA/NoXAvGKkET7g95YbNfXn2+qj8uDkNLQDGdsUt6a15iOPWbIxPVk8DwuK4vz+Y4CbTuKhkGH+Ed0f+WQIZAHNh9ovB7eDQ9r/nAv5Da71igcpVSVPjTWZ6Xzunpsg22Jto44p0XG1qZppdfwnq6ASI=
+	t=1733760271; cv=none; b=eYrh5Si8RWFwxHDghFe17MmtLoPPcrwzh948CApIkNV+G81jEUO+PODdDJmJ/Ls33D/jNZ5e0F0LjZu/0TkPm2Cjx1DnqMquDu1rVofgWvoh38qm1p4DwTXxWu6JzyTgMRLUAYW7ULu61QTCpnw/46SWNAOANUsoS0UITmHZBY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733759424; c=relaxed/simple;
-	bh=aytamEz9AGfvqDSyA4tltCUbH2CyU2IuJ0VZeqmezvc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qvkojSQ70T1DqkczR98LUny1fo7VyBKk9SETgOg14r/WFw8pUKPvqYS2jZHDFTK9PJB5j/3+W1QokzDOKSMwl+EjEXbIGmRYjQMHJNcg3QKKXLDyhNTBwPA4P9eKStpgRSP9324kuEQGzNMb+eP0/vWD4WDdLC/D3ZWcPQFknMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=HGK3zq3j; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-434a1582c86so3977495e9.2
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 07:50:21 -0800 (PST)
+	s=arc-20240116; t=1733760271; c=relaxed/simple;
+	bh=HXMJxNxK1a6X0z285aZIc9o9KAuzSJKJ4Q4dpisi/Ao=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bWWyjpRkwR+q0Lfs8g7kvXqd6IArqcenx0lFBlw+jmYpi8yYpt9gz0NBWPlHMQuwVLIqZodhk5EnaS9UIW/36lgRxwy51OE192s5XSDuzdIgPyGe22LSJSMG3Ygk7NcayW7vBLMCa/MK3S9OHFo0GeMUzw+oEZLtEn2Qj20/qvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KQM42HIS; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-385f06d0c8eso2127596f8f.0;
+        Mon, 09 Dec 2024 08:04:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1733759420; x=1734364220; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7kybUbYPpGDewx+f6Wt4KXTxL6OaSZ3M769h/rgbNyc=;
-        b=HGK3zq3jnVYaOKn6KyqxUlfVdKpXBLjFqtd9uVxsXStjHGdX8kB0SLNsaNvcPd65BS
-         rjuxGdrxXnAjxuCpPp/9DTzhicdutiRXX5kHfe6lzwo/vB1o2E/0r2utN4mz3MH5ENQ+
-         C2lcB8/OgVS1gAPV1oh3SSmxziNAJfAufzRRWxas+zvhnnFs1YEJ7e+PGPFb4QLFJ5Mn
-         rv57phjJahT5XaDcBxQgcNhVdReO6VCkewRcPlzwd7VAGHaCUszjrzr1IrkV7lSHiDjC
-         Lt5vO+AD+0vLtCJ0aHNr1VtqZuUa1Sul/4XlLyuLc6XZ521V9qZ+AeTNXgq+A1aQl3gc
-         Fi1Q==
+        d=gmail.com; s=20230601; t=1733760268; x=1734365068; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iLxaRfd7eSIeEGyg5kxtHxj9382euiBv+DNQTz5cePY=;
+        b=KQM42HISgFg2bicYxVpCGmdBn9iyv72/zyWpbuk8XoTt4SCB+DvY9+6TsPtU/u/UrM
+         R0dE6DgTviwo7MzXP+KghAUYGId5vVDBQbLXEpUfwjBH4MqeFadiOM1jQZMAyfEvSRMm
+         zZUv01ZSA1tJ+SiydrodBxvgnQJZuruOWQi3JBCNFXBXSgsn096eMCRywsxKYEzYDuXG
+         P2jAmQdQCbJLAaUtMr0tenBf2JDiHGFtrqXLaZeUmuWfeIpw5vWfLvQsAkw01BBgdWnt
+         NSscpSK8sl31gVUXySwtZK0GaMIilOq1q3TRI4vGSQWK8jMlovSAEq0zBhSNP4BMIe7d
+         7Sfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733759420; x=1734364220;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7kybUbYPpGDewx+f6Wt4KXTxL6OaSZ3M769h/rgbNyc=;
-        b=DT2BgXjRv9EPbeTwzHR2o8vOFc7RTinerhFIwBZnJGTuVB9ZlZsebB+ByDqLkEMUHB
-         vLDyT7aXTABiiteOZF9jzR14Irdj+mA2Ap1bdQZf1bSVJdp0yoUalmQ6MuIFhSHT4mVn
-         Ko6eSWJWSgfrnI1o7z08U//dzXzW3IEvBMxZUefHkJ8E4jqkKWJTpYZ4MTq8euT6Yk5x
-         nZcI/nAiBh566TAN+Z7UUtr1HIJ7rOVCN/tlfV7jYKkOBo46XdWoaMgB4zdqVTwVGuQX
-         LWQJC9TRlxaZIm0mUxEdx4EJkQgnkL+4FmEFKITY92TKITnbmgr5qE/64K21bIsdg+nl
-         h5iA==
-X-Forwarded-Encrypted: i=1; AJvYcCWGIUBmQwk8wtRyi/T655NTpf+zCIRcf8O5GGM74oJ5qMojr1oyFgTx/AjW7RqAt1IigyH1VwQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2X+E+nnb/sJlNcr/zB386gU8ERf33D2MTJ1cY1QBPZgop3EjP
-	lk3ly4iHBRgxvK0SATnWInxTM+2lrnUWPMdvszTCKLiBtulxHvPO1x/mskzPhGE=
-X-Gm-Gg: ASbGncvgQvUP8+wUmCV6PW3zLtCGjxTzXoMR/JXH6Nwt3UkYXJXPA2HQePWpDoDT4kx
-	V26qVLRstzb5vAyVs9H1FbetNxWf4rUcQESZRqM8YLt/xaTxJDePooFrHk24LatFs/SJh+1wkqY
-	IfBct6OwOgYpLbDQ6rnJbYURH6MT02CmhnvxMSNrkH33USaaLMZbyA487TC6Mo8j5ftpgsqF8PT
-	oMt4h1lOgeST9Nfa81V8zyfbWOZVmrUx4sLgwuTi8WV/L49qgTFuZIEbWjgREZ5vNRJRvxLchGA
-	BSbipYWqyZsoooCHER2DAq5yQaI=
-X-Google-Smtp-Source: AGHT+IEjEHk5UnjtFZL9x+jCCCoiU6R/kvd7Y/slVL/tA8motNA5rfasWV97nI0WC4mUl8CjxkTSfw==
-X-Received: by 2002:a05:600c:138c:b0:434:941c:9df2 with SMTP id 5b1f17b1804b1-434dded98a6mr42643155e9.8.1733759420157;
-        Mon, 09 Dec 2024 07:50:20 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:b41:c160:9bc9:8e1d:2458:82b0? ([2a01:e0a:b41:c160:9bc9:8e1d:2458:82b0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4350159f6a4sm2824085e9.21.2024.12.09.07.50.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Dec 2024 07:50:19 -0800 (PST)
-Message-ID: <766da3da-04cb-4131-ba1f-6d821304dfa2@6wind.com>
-Date: Mon, 9 Dec 2024 16:50:18 +0100
+        d=1e100.net; s=20230601; t=1733760268; x=1734365068;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iLxaRfd7eSIeEGyg5kxtHxj9382euiBv+DNQTz5cePY=;
+        b=oj7woviYxoXuaGXsldVD4/bDItYFdFRw0sASoSGDsU/phiA7ceftbg3ZU0bTGkZ0Xl
+         /z5jeGnUYSiM5fkmeAZdaTn8wi9d5/31boYG/szJh+7Hw3BDKYNdnkz3wQdWXFOASRkW
+         LVpclaOrV+Hn5uysTJx82id/PyF9ETxb5tkBSmkBNQfGFjL+Usu+4EIk/DDJSC5y7FOk
+         2g8yVCpJhvXzBFr6lWyZEtsxVJc6qX2ABpUuC7FJme4etg4O4grTyYbNJhjxtEibN8M4
+         ZmEMU9d5xewfTDCw3TDTlqXg63yggMLG2GxIoFWLgTs7F5zvk7JQHtmCyTfRnl7KbUvV
+         +ulA==
+X-Forwarded-Encrypted: i=1; AJvYcCVskHgHi5/m2BwPaFZF89X+eUiJev2IpPUwgkZ5lvZTAYT4Et9y3y5jQe0pqQS7IF6xCeG+K3tlRuezvak=@vger.kernel.org, AJvYcCWIQS86Lutx70lKwxSsnNHVBiATQ5SM2X9s7REmHg2b61dSO5q6HaQ0efeF8N6a4uTK7sHQsE72@vger.kernel.org
+X-Gm-Message-State: AOJu0YzM47sG6mviyRG77SNy1vf4wMoqtprxBZpE7HHosEyFVdNAcrMh
+	spkmM80wEV6+FBVuf2lRqImqwunuTd77XddCcVMHM02Y5K2rdVReGGMGOp8SSsRz+WB+CV6Cie+
+	KAwqOmX0HDaW+nrGnwc0HDejl1TU=
+X-Gm-Gg: ASbGncteKOKUB2Ns+JEj5UyTJ11xSsjCb9TK56iszXqiOVOzXEwdEzuQysU0rxs5X0j
+	5VJ042sifVTctf5O5Gm/dMmbX38OM5RawzNRnv1DwvgGtKtICX7ZAwTiTBddPl3d3
+X-Google-Smtp-Source: AGHT+IE/foTR9XbHPA/D4dvTG6jAXDW+4BspSWdackj4H16YrQChx4tRmqYqiXd2i+id0opxw63az3rqj+njLLJ8+1E=
+X-Received: by 2002:a05:6000:2aa:b0:386:1cd3:8a09 with SMTP id
+ ffacd0b85a97d-386453c5f5dmr881732f8f.1.1733760268007; Mon, 09 Dec 2024
+ 08:04:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH iproute2-next, v5 2/2] iproute2: add 'ip monitor maddress'
- support
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com,
- jiri@resnulli.us, stephen@networkplumber.org, jimictw@google.com,
- prohr@google.com, liuhangbin@gmail.com, andrew@lunn.ch,
- netdev@vger.kernel.org, =?UTF-8?Q?Maciej_=C5=BBenczykowski?=
- <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
-References: <20241207092008.752846-1-yuyanghuang@google.com>
- <20241207092008.752846-2-yuyanghuang@google.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20241207092008.752846-2-yuyanghuang@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20241206122533.3589947-1-linyunsheng@huawei.com>
+ <CAKgT0UeXcsB-HOyeA7kYKHmEUM+d_mbTQJRhXfaiFBg_HcWV0w@mail.gmail.com> <3de1b8a3-ae4f-492f-969d-bc6f2c145d09@huawei.com>
+In-Reply-To: <3de1b8a3-ae4f-492f-969d-bc6f2c145d09@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 9 Dec 2024 08:03:51 -0800
+Message-ID: <CAKgT0Uc5A_mtN_qxR6w5zqDbx87SUdCTFOBxVWCarnryRvhqHA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 00/10] Replace page_frag with page_frag_cache (Part-2)
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Shuah Khan <skhan@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Linux-MM <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Le 07/12/2024 à 10:20, Yuyang Huang a écrit :
-> Enhanced the 'ip monitor' command to track changes in IPv4 and IPv6
-> multicast addresses. This update allows the command to listen for
-> events related to multicast address additions and deletions by
-> registering to the newly introduced RTNLGRP_IPV4_MCADDR and
-> RTNLGRP_IPV6_MCADDR netlink groups.
-> 
-> This patch depends on the kernel patch that adds RTNLGRP_IPV4_MCADDR
-> and RTNLGRP_IPV6_MCADDR being merged first.
-> 
-> Here is an example usage:
-> 
-> root@uml-x86-64:/# ip monitor maddress
-> 8: nettest123    inet6 mcast ff01::1 scope global
-> 8: nettest123    inet6 mcast ff02::1 scope global
-> 8: nettest123    inet mcast 224.0.0.1 scope global
-> 8: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
-> Deleted 8: nettest123    inet mcast 224.0.0.1 scope global
-> Deleted 8: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
-> Deleted 8: nettest123    inet6 mcast ff02::1 scope global
-> 
-> Cc: Maciej Żenczykowski <maze@google.com>
-> Cc: Lorenzo Colitti <lorenzo@google.com>
-> Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
-Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+On Mon, Dec 9, 2024 at 3:42=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
+> wrote:
+>
+> On 2024/12/9 5:34, Alexander Duyck wrote:
+>
+> ...
+>
+> >>
+> >> Performance validation for part2:
+> >> 1. Using micro-benchmark ko added in patch 1 to test aligned and
+> >>    non-aligned API performance impact for the existing users, there
+> >>    seems to be about 20% performance degradation for refactoring
+> >>    page_frag to support the new API, which seems to nullify most of
+> >>    the performance gain in [3] of part1.
+> >
+> > So if I am understanding correctly then this is showing a 20%
+> > performance degradation with this patchset. I would argue that it is
+> > significant enough that it would be a blocking factor for this patch
+> > set. I would suggest bisecting the patch set to identify where the
+> > performance degradation has been added and see what we can do to
+> > resolve it, and if nothing else document it in that patch so we can
+> > identify the root cause for the slowdown.
+>
+> The only patch in this patchset affecting the performance of existing API
+> seems to be patch 1, only including patch 1 does show ~20% performance
+> degradation as including the whole patchset does:
+> mm: page_frag: some minor refactoring before adding new API
+>
+> And the cause seems to be about the binary increasing as below, as the
+> performance degradation didn't seems to change much when I tried inlining
+> the __page_frag_cache_commit_noref() by moving it to the header file:
+>
+> ./scripts/bloat-o-meter vmlinux_orig vmlinux
+> add/remove: 3/2 grow/shrink: 5/0 up/down: 920/-500 (420)
+> Function                                     old     new   delta
+> __page_frag_cache_prepare                      -     500    +500
+> __napi_alloc_frag_align                       68     180    +112
+> __netdev_alloc_skb                           488     596    +108
+> napi_alloc_skb                               556     624     +68
+> __netdev_alloc_frag_align                    196     252     +56
+> svc_tcp_sendmsg                              340     376     +36
+> __page_frag_cache_commit_noref                 -      32     +32
+> e843419@09a6_0000bd47_30                       -       8      +8
+> e843419@0369_000044ee_684                      8       -      -8
+> __page_frag_alloc_align                      492       -    -492
+> Total: Before=3D34719207, After=3D34719627, chg +0.00%
+>
+> ./scripts/bloat-o-meter page_frag_test_orig.ko page_frag_test.ko
+> add/remove: 0/0 grow/shrink: 2/0 up/down: 78/0 (78)
+> Function                                     old     new   delta
+> page_frag_push_thread                        508     580     +72
+> __UNIQUE_ID_vermagic367                       67      73      +6
+> Total: Before=3D4582, After=3D4660, chg +1.70%
+
+Other than code size have you tried using perf to profile the
+benchmark before and after. I suspect that would be telling about
+which code changes are the most likely to be causing the issues.
+Overall I don't think the size has increased all that much. I suspect
+most of this is the fact that you are inlining more of the
+functionality.
+
+> Patch 1 is about refactoring common codes from __page_frag_alloc_va_align=
+()
+> to __page_frag_cache_prepare() and __page_frag_cache_commit(), so that th=
+e
+> new API can make use of them as much as possible.
+>
+> Any better idea to reuse common codes as much as possible while avoiding
+> the performance degradation as much as possible?
+>
+> >
+> >> 2. Use the below netcat test case, there seems to be some minor
+> >>    performance gain for replacing 'page_frag' with 'page_frag_cache'
+> >>    using the new page_frag API after this patchset.
+> >>    server: taskset -c 32 nc -l -k 1234 > /dev/null
+> >>    client: perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | ta=
+skset -c 1 nc 127.0.0.1 1234
+> >
+> > This test would barely touch the page pool. The fact is most of the
+>
+> I am guessing you meant page_frag here?
+>
+> > overhead for this would likely be things like TCP latency and data
+> > copy much more than the page allocation. As such fluctuations here are
+> > likely not related to your changes.
+>
+> But it does tell us something that the replacing does not seems to
+> cause obvious regression, right?
+
+Not really. The fragment allocator is such a small portion of this
+test that we could probably double the cost for it and it would still
+be negligible.
+
+> I tried using a smaller MTU to amplify the impact of page allocation,
+> it seemed to have a similar result.
+
+Not surprising. However the network is likely only a small part of
+this. I suspect if you ran a profile it would likely show the same.
 
