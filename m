@@ -1,87 +1,82 @@
-Return-Path: <netdev+bounces-150107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53CA39E8EC0
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:29:03 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 644959E8E8D
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:18:48 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A317188619B
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 09:18:48 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A1D5215706;
+	Mon,  9 Dec 2024 09:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YFB4aXeq"
+X-Original-To: netdev@vger.kernel.org
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93AA7283EFA
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 09:29:01 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8607721639E;
-	Mon,  9 Dec 2024 09:28:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zviv6cH/"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1081F215702;
-	Mon,  9 Dec 2024 09:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84268158D96
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 09:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733736537; cv=none; b=KTaWh/ahWACYGRKnx1tI09/QlgGcZC9Lku0ndKg1J+1nYb+dwFa0rF/kblUKR+aYURuw4Z3S/Lc/C1AdouE5hCdNG9b/+q03bt15n4mwzToz9ifxTTyqNrlWQV2jAJUtI2EJlDM6sZpv2OelzPSaL+uXpPA/cBoRAjLf8Dfict0=
+	t=1733735924; cv=none; b=XgGmJJ8C7rNB475g9MhFK2uDEhVKuhh0RHr3AJIc213s9d5mcQbYApVe99iL8fxn+yi/R1ciLpFrMmGzcwgQojYZY9OXDKpb/QJdeV9IykH8InhPp9cHc2MgZOl+noG4C5yUnQTMGTksM3t6kP11Sn62ri0oL6i/4ju4DIK+jwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733736537; c=relaxed/simple;
-	bh=LKC34UZI8KC+2m4d7wIuSPyd9Wo8Ea7ETPnYpJbhX3g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e4fI60rzbzo7obXxLSqqDB1mXVtbOGzpwBAJeoSg/brder3l0we5HSeTcK6/GDFmtAEer1IABBKTb34KWjWf5Ezf4NFANZApT785x+bnZ60gDlar2wQaC+d96Wwu5t81L4X3nPeXc7DPPQn3vFpQxtw6n9Z3sG/UbbJM37LPpKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zviv6cH/; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2ee74291415so2927468a91.3;
-        Mon, 09 Dec 2024 01:28:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733736534; x=1734341334; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SWd7sHkqh/MXwWmYIr0V6C3AileMqYQ3P8uNZjOZ7MY=;
-        b=Zviv6cH/em6/flp2vmhDx74kkFjMnVF7NMKx1q0nYdHuFcbi7K1PFZjMoa2Mk+q4OT
-         dSKV1CY7BePEylWRcoLcmrIaSXOK7t+HegoIKlysnXwAP2m1IPMRITgomMfdEX//+W8f
-         AEhKM50zHnoQneCt1ke1l+XSCFhdvSTHdvoAX8T7Z2uMMAT33Drc+8ojDCICD/XUrCdN
-         DYC1+V6Z1k87BwmZegP2cpZAoWWj/ZsuwdkCLVIYYI+jRk1Rp4ivrsCxXpOQMiYxjCRP
-         L9IhbSURbVVLyX/XGl4CZzWOYXundY3S2rUpV2EDTp5Vkm7ne+KHhfwLmoH0/qW3rwnh
-         KMIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733736534; x=1734341334;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SWd7sHkqh/MXwWmYIr0V6C3AileMqYQ3P8uNZjOZ7MY=;
-        b=qOxVveUXobL4zRW8C5v2Gf4PY0Z0QkO5Y6pfrW5rYP79l6vdcHuIbSI5s6jKEUS50i
-         ajs5Bv9kQuLd6ilTJrSDvwPXhxJAohgtPefupuhIXrAtafgMrXh3aXk41Yb6EbL/4YCs
-         LILq9RHdiKQuQ7QxyoRLW9yyuubsKT00H+rm64odesNVBebTIxcKmVE6Sv+cBN9P41R2
-         vDiXQMR5H1BLlCaIitxKu06rv/x1kDA262kVoDQ6buozRhHGZX63Gqq6siuxyF2iiuDF
-         DMhbplNClUSDn85wIy0Umbg64sRq+DC76YMHZ6LvrIpSzn+i3jKYPw0fi8+BnT92OW5f
-         wdeA==
-X-Forwarded-Encrypted: i=1; AJvYcCVEMLVn1Y8CJZVfjqcj56iEoTPwI/nX04lXhAyp+CpbzzVGtdrf6JwC6J7kCP6kD/7x7UHpkCXqY3AKcU0=@vger.kernel.org, AJvYcCX2LKOqCUFtwanMq8JwvSJArIh1jbR7D/XvHNJbMhuToFd2tk8xdFgK8ZB8GJq906PLSSs+lxCs@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeMqfrqU6rEJoeM3GoOYHHnEhyXldmvjZ29RBwZf/mUJnXvWIS
-	NYyEe4jEFwdKHe+xy8pylJY2IibFkJSj3nWEGuPivgRl73T6g5o7Pq6q+ijB
-X-Gm-Gg: ASbGncv6kao/zu0oLd91roJMi1rljpKNGlhmLQU2Xzc7YQIAsSdL+Nr1pXbuX1/32E7
-	rYuObbmOb4ba78Cg1XjyFyn5JApVaRlhT1G22UpMLsJNjZKGvvTR570QixKuVn734G4E8mqlQOE
-	0enJM+js5ind3SjcpieosGaFSWG0C9uKi5YZEUbxUpgtOsKGpZjMqodLLi3HdVvsBiA5+Iu23fr
-	VVg9PHgY7r//JCUdNHHabJ0++mZ5HVuNpt/hGVe2+psSiOU0nZ7Rg==
-X-Google-Smtp-Source: AGHT+IGbjTQ630NT4jIFYIgtaXimrmPQ8VFmMa2eeKgORbiLsvLN/NXZvStgv83yYnO4LeTSGEmGVA==
-X-Received: by 2002:a17:90a:d88e:b0:2ee:b66d:6576 with SMTP id 98e67ed59e1d1-2ef6ab10612mr19038233a91.30.1733736534021;
-        Mon, 09 Dec 2024 01:28:54 -0800 (PST)
-Received: from mythos-cloud.. ([121.185.170.145])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ef45f95bf1sm7487849a91.21.2024.12.09.01.28.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2024 01:28:53 -0800 (PST)
-From: Moon Yeounsu <yyyynoom@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Moon Yeounsu <yyyynoom@gmail.com>,
+	s=arc-20240116; t=1733735924; c=relaxed/simple;
+	bh=5daGjsA21Nks+IOxBLmvYhB6myNIjAd1FXkDPM/SXIc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FPwVQOEcTKJnX+shACOI70ooxShoGU4vhjFFdeYcMq52bPHCEZV4XZ23btyyP8gu1U/NR0WFgtDlBqvyZNS7P572gCZ4B7Ym4+lRAe1mCG6/6zHCoZRBRlRLCQ70GkW3eON1Iq4P2oTOGBjdzgk+9lEU2XPTRTDRYKY/bkxwiVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YFB4aXeq; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733735921; x=1765271921;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=5daGjsA21Nks+IOxBLmvYhB6myNIjAd1FXkDPM/SXIc=;
+  b=YFB4aXeqZHeN2DL8mmtQW0nGRDDEFuSUl1xoGThNIwm/yLkLP++vf/XF
+   W+AwHonDlMRBFC+VkfSXuA3LvCOqRpArhGC5zAZ55fffY8UNu8GFt6PHU
+   Zomdp3cJDmPF3R+vQ149u2+W3ks3UYu9GS7hmeXG1T0hRSGyQYpJqjjWp
+   sM5pkub2VweyXkADmaluD9DNM1+94dj4Hlalzl2KkRubwHZF0yQBqGcZx
+   R46jKWT8PMlULBh0rJfs+0/WEqcvD7tAomM1XeAIgYnrZUUWtgltphtFh
+   P5dj01whTrN9mssTPrUrfz33ts6artD7R7gVShjq/y7lRDiS94UhkTsXC
+   w==;
+X-CSE-ConnectionGUID: EnAlCs8GQsGa4kcYM2mcjg==
+X-CSE-MsgGUID: 85jxwTzxThSGzusYLwroUA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11280"; a="45422538"
+X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
+   d="scan'208";a="45422538"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 01:18:39 -0800
+X-CSE-ConnectionGUID: MNQlIKCvSGujuQlZpMmG1w==
+X-CSE-MsgGUID: J1vu0DwNRDK6Z9vnF1dSjw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
+   d="scan'208";a="95818248"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa008.jf.intel.com with ESMTP; 09 Dec 2024 01:18:35 -0800
+Received: from kord.igk.intel.com (kord.igk.intel.com [10.123.220.9])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 04CF42FC57;
+	Mon,  9 Dec 2024 09:18:32 +0000 (GMT)
+From: Konrad Knitter <konrad.knitter@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5] net: dlink: add support for reporting stats via `ethtool -S` and `ip -s -s link show`
-Date: Mon,  9 Dec 2024 18:28:27 +0900
-Message-ID: <20241209092828.56082-2-yyyynoom@gmail.com>
-X-Mailer: git-send-email 2.47.1
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	brett.creeley@amd.com,
+	marcin.szycik@linux.intel.com,
+	Konrad Knitter <konrad.knitter@intel.com>
+Subject: [PATCH iwl-next v3] ice: add fw and port health reporters
+Date: Mon,  9 Dec 2024 10:32:04 +0100
+Message-Id: <20241209093204.173817-1-konrad.knitter@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,1021 +85,651 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch consolidates previously unused statistics and
-adds support reporting them through `ethtool -S` and `ip -s -s link show`
+Firmware generates events for global events or port specific events.
 
-Before applying the patch:
-$ ethtool -S enp36s0
-> no stats available
+Driver shall subscribe for health status events from firmware on supported
+FW versions >= 1.7.6.
+Driver shall expose those under specific health reporter, two new
+reporters are introduced:
+- FW health reporter shall represent global events (problems with the
+image, recovery mode);
+- Port health reporter shall represent port-specific events (module
+failure).
 
-After applying the patch:
-$ ethtool -S enp36s0
-> NIC statistics:
-     tx_jumbo_frames: 0
-     rx_jumbo_frames: 0
-     tcp_checksum_errors: 0
-     udp_checksum_errors: 0
-     ip_checksum_errors: 0
-     tx_multicast_bytes: 0
-     rx_multicast_bytes: 240
-     rmon_collisions: 0
-     rmon_crc_align_errors: 0
-     rmon_tx_bytes: 0
-     rmon_rx_bytes: 0
-     rmon_tx_packets: 0
-     rmon_rx_packets: 0
+Firmware only reports problems when those are detected, it does not store
+active fault list.
+Driver will hold only last global and last port-specific event.
+Driver will report all events via devlink health report,
+so in case of multiple events of the same source they can be reviewed
+using devlink autodump feature.
 
-$ ethtool -S enp36s0 --all-groups
-> Standard stats for enp36s0:
-eth-mac-FramesTransmittedOK: 0
-eth-mac-SingleCollisionFrames: 0
-eth-mac-MultipleCollisionFrames: 0
-eth-mac-FramesReceivedOK: 22
-eth-mac-FrameCheckSequenceErrors: 0
-eth-mac-OctetsTransmittedOK: 0
-eth-mac-FramesWithDeferredXmissions: 0
-eth-mac-LateCollisions: 0
-eth-mac-FramesAbortedDueToXSColls: 0
-eth-mac-CarrierSenseErrors: 0
-eth-mac-OctetsReceivedOK: 7602
-eth-mac-FramesLostDueToIntMACRcvError: 0
-eth-mac-MulticastFramesXmittedOK: 0
-eth-mac-BroadcastFramesXmittedOK: 0
-eth-mac-FramesWithExcessiveDeferral: 0
-eth-mac-MulticastFramesReceivedOK: 4
-eth-mac-BroadcastFramesReceivedOK: 18
-eth-mac-InRangeLengthErrors: 408
-eth-mac-FrameTooLongErrors: 0
-eth-ctrl-MACControlFramesTransmitted: 0
-eth-ctrl-MACControlFramesReceived: 0
-rmon-etherStatsUndersizePkts: 0
-rmon-etherStatsFragments: 0
-rmon-etherStatsJabbers: 0
-rx-rmon-etherStatsPkts64Octets: 0
-rx-rmon-etherStatsPkts65to127Octets: 0
-rx-rmon-etherStatsPkts128to255Octets: 0
-rx-rmon-etherStatsPkts256to511Octets: 0
-rx-rmon-etherStatsPkts512to1023Octets: 0
-rx-rmon-etherStatsPkts1024to1518Octets: 0
-tx-rmon-etherStatsPkts64Octets: 0
-tx-rmon-etherStatsPkts65to127Octets: 0
-tx-rmon-etherStatsPkts128to255Octets: 0
-tx-rmon-etherStatsPkts256to511Octets: 0
-tx-rmon-etherStatsPkts512to1023Octets: 0
-tx-rmon-etherStatsPkts1024to1518Octets: 0
+$ devlink health
 
-$ ip -s -s link show
-> ...
-> 31: enp36s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 ...
-    link/ether 00:0f:3d:cd:e6:a2 brd ff:ff:ff:ff:ff:ff
-    RX:  bytes packets errors dropped  missed   mcast
-          8420      24      0       0       0       4
-    RX errors:  length    crc   frame    fifo overrun
-                     0      0       0       0       0
-    TX:  bytes packets errors dropped carrier collsns
-             0       0      0       4       0       0
-    TX errors: aborted   fifo  window heartbt transns
-                     0      0       0       0       2
+pci/0000:b1:00.3:
+  reporter fw
+    state healthy error 0 recover 0 auto_dump true
+  reporter port
+    state error error 1 recover 0 last_dump_date 2024-03-17
+	last_dump_time 09:29:29 auto_dump true
 
-Additionally, the previous code did not manage statistics
-in a structured manner, so this patch:
+$ devlink health diagnose pci/0000:b1:00.3 reporter port
 
-1. Added `u64` type stat counters to the `netdev_private` struct.
-2. Defined a `dlink_stats` struct for managing statistics.
-3. Registered standard statistics and driver-specific statistics
-separately.
-4. Compressing repetitive tasks through loops.
+  Syndrome: 262
+  Description: Module is not present.
+  Possible Solution: Check that the module is inserted correctly.
+  Port Number: 0
 
-The code previously blocked by the `#ifdef MEM_MAPPING` preprocessor
-directive has been enabled. This section relates to RMON statistics and
-does not cause issues when activated. Removing unnecessary preprocessor
-directives simplifies the code path and makes it more intuitive.
+Tested on Intel Corporation Ethernet Controller E810-C for SFP
 
-Tested-on: D-Link DGE-550T Rev-A3
-Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
+Co-developed-by: Sharon Haroni <sharon.haroni@intel.com>
+Signed-off-by: Sharon Haroni <sharon.haroni@intel.com>
+Co-developed-by: Nicholas Nunley <nicholas.d.nunley@intel.com>
+Signed-off-by: Nicholas Nunley <nicholas.d.nunley@intel.com>
+Co-developed-by: Brett Creeley <brett.creeley@intel.com>
+Signed-off-by: Brett Creeley <brett.creeley@intel.com>
+Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 ---
-Changelog:
-v1: https://lore.kernel.org/netdev/20241026192651.22169-3-yyyynoom@gmail.com/
-v2: https://lore.kernel.org/netdev/20241107151929.37147-5-yyyynoom@gmail.com/
-- Report standard statistics by specific `ethtool_ops`.
-- A more detailed commit message about the changes.
-v3: https://lore.kernel.org/netdev/20241112100328.134730-1-yyyynoom@gmail.com/
-- Add missing maintainer email.
-- Use `ethtool_puts()`.
-- Remove multiple empty lines.
-- Restrict the use of hard-to-follow macros.
-v4: https://lore.kernel.org/netdev/20241114151949.233170-2-yyyynoom@gmail.com/
-- Fix incorrect maintainer email.
-- Fix the issue where stats are not updating.
-v5:
-- Remove all the macros that make code confusing.
-- Restore code that updates basic stats(`dev->stats`).
-- Add code that updates other `dev->stats` that can be updated.
-- Include comment for `spinlock_t`
-- Fix bug where duplicated stats declaration are not founded in v4 patch.
----
- drivers/net/ethernet/dlink/dl2k.c | 707 +++++++++++++++++++++++++-----
- drivers/net/ethernet/dlink/dl2k.h |  85 ++++
- 2 files changed, 690 insertions(+), 102 deletions(-)
+ .../net/ethernet/intel/ice/devlink/health.c   | 295 +++++++++++++++++-
+ .../net/ethernet/intel/ice/devlink/health.h   |  14 +-
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  87 ++++++
+ drivers/net/ethernet/intel/ice/ice_common.c   |  38 +++
+ drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_main.c     |   3 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   5 +
+ 7 files changed, 436 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-index d0ea92607870..b4a1993b87ed 100644
---- a/drivers/net/ethernet/dlink/dl2k.c
-+++ b/drivers/net/ethernet/dlink/dl2k.c
-@@ -99,6 +99,437 @@ static const struct net_device_ops netdev_ops = {
- 	.ndo_tx_timeout		= rio_tx_timeout,
- };
+diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
+index c7a8b8c9e1ca..0f0f60299d83 100644
+--- a/drivers/net/ethernet/intel/ice/devlink/health.c
++++ b/drivers/net/ethernet/intel/ice/devlink/health.c
+@@ -1,13 +1,271 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /* Copyright (c) 2024, Intel Corporation. */
  
-+static const struct ethtool_rmon_hist_range dlink_rmon_ranges[] = {
-+	{    0,    64 },
-+	{   65,   127 },
-+	{  128,   255 },
-+	{  256,   511 },
-+	{  512,  1023 },
-+	{ 1024,  1518 },
-+	{ }
+-#include "health.h"
+ #include "ice.h"
++#include "ice_adminq_cmd.h" /* for enum ice_aqc_health_status_elem */
++#include "health.h"
+ #include "ice_ethtool_common.h"
+ 
+ #define ICE_DEVLINK_FMSG_PUT_FIELD(fmsg, obj, name) \
+ 	devlink_fmsg_put(fmsg, #name, (obj)->name)
+ 
++#define ICE_HEALTH_STATUS_DATA_SIZE 2
++
++struct ice_health_status {
++	enum ice_aqc_health_status code;
++	const char *description;
++	const char *solution;
++	const char *data_label[ICE_HEALTH_STATUS_DATA_SIZE];
 +};
 +
-+static const struct dlink_stats stats[] = {
-+	{
-+		.string = "tx_jumbo_frames",
-+		.stat_offset = offsetof(struct netdev_private,
-+					tx_jumbo_frames),
-+		.size = sizeof(u16),
-+		.regs = TxJumboFrames
-+	},
-+	{
-+		.string = "rx_jumbo_frames",
-+		.stat_offset = offsetof(struct netdev_private,
-+					rx_jumbo_frames),
-+		.size = sizeof(u16),
-+		.regs = RxJumboFrames
-+	},
-+	{
-+		.string = "tcp_checksum_errors",
-+		.stat_offset = offsetof(struct netdev_private,
-+					tcp_checksum_errors),
-+		.size = sizeof(u16),
-+		.regs = TCPCheckSumErrors
-+	},
-+	{
-+		.string = "udp_checksum_errors",
-+		.stat_offset = offsetof(struct netdev_private,
-+					udp_checksum_errors),
-+		.size = sizeof(u16),
-+		.regs = UDPCheckSumErrors
-+	},
-+	{
-+		.string = "ip_checksum_errors",
-+		.stat_offset = offsetof(struct netdev_private,
-+					ip_checksum_errors),
-+		.size = sizeof(u16),
-+		.regs = IPCheckSumErrors
-+	},
-+	{
-+		.string = "tx_multicast_bytes",
-+		.stat_offset = offsetof(struct netdev_private,
-+					tx_multicast_bytes),
-+		.size = sizeof(u32),
-+		.regs = McstOctetXmtOk
-+	},
-+	{
-+		.string = "rx_multicast_bytes",
-+		.stat_offset = offsetof(struct netdev_private,
-+					rx_multicast_bytes),
-+		.size = sizeof(u32),
-+		.regs = McstOctetRcvOk
-+	},
-+	{
-+		.string = "rmon_collisions",
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_collisions),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsCollisions
-+	},
-+	{
-+		.string = "rmon_crc_align_errors",
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_crc_align_errors),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsCRCAlignErrors
-+	},
-+	{
-+		.string = "rmon_tx_bytes",
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_tx_bytes),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsOctetsTransmit
-+	},
-+	{
-+		.string = "rmon_rx_bytes",
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_rx_bytes),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsOctets
-+	},
-+	{
-+		.string = "rmon_tx_packets",
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_tx_packets),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsPktsTransmit
-+	},
-+	{
-+		.string = "rmon_rx_packets",
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_rx_packets),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsPkts
-+	}
-+}, ctrl_stats[] = {
-+	{
-+		.string = "tx_mac_control_frames",
-+		.data_offset = offsetof(struct ethtool_eth_ctrl_stats,
-+					MACControlFramesTransmitted),
-+		.stat_offset = offsetof(struct netdev_private,
-+					tx_mac_control_frames),
-+		.size = sizeof(u16),
-+		.regs = MacControlFramesXmtd
-+	},
-+	{
-+		.string = "rx_mac_control_frames",
-+		.data_offset = offsetof(struct ethtool_eth_ctrl_stats,
-+					MACControlFramesReceived),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rx_mac_control_frames),
-+		.size = sizeof(u16),
-+		.regs = MacControlFramesRcvd
-+	}
-+}, mac_stats[] = {
-+	{
-+		.string = "tx_packets",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					FramesTransmittedOK),
-+		.stat_offset = offsetof(struct netdev_private,
-+					tx_packets),
-+		.size = sizeof(u32),
-+		.regs = FramesXmtOk,
-+	},
-+	{
-+		.string = "rx_packets",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					FramesReceivedOK),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rx_packets),
-+		.size = sizeof(u32),
-+		.regs = FramesRcvOk,
-+	},
-+	{
-+		.string = "tx_bytes",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					OctetsTransmittedOK),
-+		.stat_offset = offsetof(struct netdev_private,
-+					tx_bytes),
-+		.size = sizeof(u32),
-+		.regs = OctetXmtOk,
-+	},
-+	{
-+		.string = "rx_bytes",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					OctetsReceivedOK),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rx_bytes),
-+		.size = sizeof(u32),
-+		.regs = OctetRcvOk,
-+	},
-+	{
-+		.string = "single_collisions",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					SingleCollisionFrames),
-+		.stat_offset = offsetof(struct netdev_private,
-+					single_collisions),
-+		.size = sizeof(u32),
-+		.regs = SingleColFrames,
-+	},
-+	{
-+		.string = "multi_collisions",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					MultipleCollisionFrames),
-+		.stat_offset = offsetof(struct netdev_private,
-+					multi_collisions),
-+		.size = sizeof(u32),
-+		.regs = MultiColFrames,
-+	},
-+	{
-+		.string = "late_collisions",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					LateCollisions),
-+		.stat_offset = offsetof(struct netdev_private,
-+					late_collisions),
-+		.size = sizeof(u32),
-+		.regs = LateCollisions,
-+	},
-+	{
-+		.string = "rx_frames_too_long_errors",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					FrameTooLongErrors),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rx_frames_too_long_errors),
-+		.size = sizeof(u16),
-+		.regs = FrameTooLongErrors,
-+	},
-+	{
-+		.string = "rx_in_range_length_errors",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					InRangeLengthErrors),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rx_in_range_length_errors),
-+		.size = sizeof(u16),
-+		.regs = InRangeLengthErrors,
-+	},
-+	{
-+		.string = "rx_frames_check_seq_errors",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					FrameCheckSequenceErrors),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rx_frames_check_seq_errors),
-+		.size = sizeof(u16),
-+		.regs = FramesCheckSeqErrors,
-+	},
-+	{
-+		.string = "rx_frames_lost_errors",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					FramesLostDueToIntMACRcvError),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rx_frames_lost_errors),
-+		.size = sizeof(u16),
-+		.regs = FramesLostRxErrors,
-+	},
-+	{
-+		.string = "tx_frames_abort",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					FramesAbortedDueToXSColls),
-+		.stat_offset = offsetof(struct netdev_private,
-+					tx_frames_abort),
-+		.size = sizeof(u16),
-+		.regs = FramesAbortXSColls,
-+	},
-+	{
-+		.string = "tx_carrier_sense_errors",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					CarrierSenseErrors),
-+		.stat_offset = offsetof(struct netdev_private,
-+					tx_carrier_sense_errors),
-+		.size = sizeof(u16),
-+		.regs = CarrierSenseErrors,
-+	},
-+	{
-+		.string = "tx_multicast_frames",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					MulticastFramesXmittedOK),
-+		.stat_offset = offsetof(struct netdev_private,
-+					tx_multicast_frames),
-+		.size = sizeof(u32),
-+		.regs = McstFramesXmtdOk,
-+	},
-+	{
-+		.string = "rx_multicast_frames",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					MulticastFramesReceivedOK),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rx_multicast_frames),
-+		.size = sizeof(u32),
-+		.regs = McstFramesRcvdOk,
-+	},
-+	{
-+		.string = "tx_broadcast_frames",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					BroadcastFramesXmittedOK),
-+		.stat_offset = offsetof(struct netdev_private,
-+					tx_broadcast_frames),
-+		.size = sizeof(u16),
-+		.regs = BcstFramesXmtdOk,
-+	},
-+	{
-+		.string = "rx_broadcast_frames",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					BroadcastFramesReceivedOK),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rx_broadcast_frames),
-+		.size = sizeof(u16),
-+		.regs = BcstFramesRcvdOk,
-+	},
-+	{
-+		.string = "tx_frames_deferred",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					FramesWithDeferredXmissions),
-+		.stat_offset = offsetof(struct netdev_private,
-+					tx_frames_deferred),
-+		.size = sizeof(u32),
-+		.regs = FramesWDeferredXmt,
-+	},
-+	{
-+		.string = "tx_frames_excessive_deferral",
-+		.data_offset = offsetof(struct ethtool_eth_mac_stats,
-+					FramesWithExcessiveDeferral),
-+		.stat_offset = offsetof(struct netdev_private,
-+					tx_frames_excessive_deferral),
-+		.size = sizeof(u16),
-+		.regs = FramesWEXDeferal,
-+	},
-+}, rmon_stats[] = {
-+	{
-+		.string = "rmon_under_size_packets",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					undersize_pkts),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_under_size_packets),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsUndersizePkts
-+	},
-+	{
-+		.string = "rmon_fragments",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					fragments),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_fragments),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsFragments
-+	},
-+	{
-+		.string = "rmon_jabbers",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					jabbers),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_jabbers),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsJabbers
-+	},
-+	{
-+		.string = "rmon_tx_byte_64",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					hist_tx[0]),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_tx_byte_64),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsPkts64OctetTransmit
-+	},
-+	{
-+		.string = "rmon_rx_byte_64",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					hist[0]),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_rx_byte_64),
-+		.size = sizeof(u32),
-+		.regs = EtherStats64Octets
-+	},
-+	{
-+		.string = "rmon_tx_byte_65to127",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					hist_tx[1]),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_tx_byte_65to127),
-+		.size = sizeof(u32),
-+		.regs = EtherStats65to127OctetsTransmit
-+	},
-+	{
-+		.string = "rmon_rx_byte_65to127",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					hist[1]),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_rx_byte_65to127),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsPkts65to127Octets
-+	},
-+	{
-+		.string = "rmon_tx_byte_128to255",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					hist_tx[2]),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_tx_byte_128to255),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsPkts128to255OctetsTransmit
-+	},
-+	{
-+		.string = "rmon_rx_byte_128to255",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					hist[2]),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_rx_byte_128to255),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsPkts128to255Octets
-+	},
-+	{
-+		.string = "rmon_tx_byte_256to511",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					hist_tx[3]),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_tx_byte_256to511),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsPkts256to511OctetsTransmit
-+	},
-+	{
-+		.string = "rmon_rx_byte_256to511",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					hist[3]),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_rx_byte_256to511),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsPkts256to511Octets
-+	},
-+	{
-+		.string = "rmon_tx_byte_512to1023",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					hist_tx[4]),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_tx_byte_512to1023),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsPkts512to1023OctetsTransmit
-+	},
-+	{
-+		.string = "rmon_rx_byte_512to1023",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					hist[4]),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_rx_byte_512to1203),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsPkts512to1023Octets
-+	},
-+	{
-+		.string = "rmon_tx_byte_1024to1518",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					hist_tx[5]),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_tx_byte_1024to1518),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsPkts1024to1518OctetsTransmit
-+	},
-+	{
-+		.string = "rmon_rx_byte_1024to1518",
-+		.data_offset = offsetof(struct ethtool_rmon_stats,
-+					hist[5]),
-+		.stat_offset = offsetof(struct netdev_private,
-+					rmon_rx_byte_1024to1518),
-+		.size = sizeof(u32),
-+		.regs = EtherStatsPkts1024to1518Octets
-+	}
++/*
++ * In addition to the health status codes provided below, the firmware might
++ * generate Health Status Codes that are not pertinent to the end-user.
++ * For instance, Health Code 0x1002 is triggered when the command fails.
++ * Such codes should be disregarded by the end-user.
++ * The below lookup requires to be sorted by code.
++ */
++
++static const char *const ice_common_port_solutions =
++	"Check your cable connection. Change or replace the module or cable. Manually set speed and duplex.";
++static const char *const ice_port_number_label = "Port Number";
++static const char *const ice_update_nvm_solution = "Update to the latest NVM image.";
++
++static const struct ice_health_status ice_health_status_lookup[] = {
++	{ICE_AQC_HEALTH_STATUS_ERR_UNKNOWN_MOD_STRICT, "An unsupported module was detected.",
++		ice_common_port_solutions, {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_MOD_TYPE, "Module type is not supported.",
++		"Change or replace the module or cable.", {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_MOD_QUAL, "Module is not qualified.",
++		ice_common_port_solutions, {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_MOD_COMM,
++		"Device cannot communicate with the module.",
++		"Check your cable connection. Change or replace the module or cable. Manually set speed and duplex.",
++		{ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_MOD_CONFLICT, "Unresolved module conflict.",
++		"Manually set speed/duplex or change the port option. If the problem persists, use a cable/module that is found in the supported modules and cables list for this device.",
++		{ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_MOD_NOT_PRESENT, "Module is not present.",
++		"Check that the module is inserted correctly. If the problem persists, use a cable/module that is found in the supported modules and cables list for this device.",
++		{ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_INFO_MOD_UNDERUTILIZED, "Underutilized module.",
++		"Change or replace the module or cable. Change the port option.",
++		{ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_UNKNOWN_MOD_LENIENT, "An unsupported module was detected.",
++		ice_common_port_solutions, {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_INVALID_LINK_CFG, "Invalid link configuration.",
++		NULL, {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_PORT_ACCESS, "Port hardware access error.",
++		ice_update_nvm_solution, {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_PORT_UNREACHABLE, "A port is unreachable.",
++		"Change the port option. Update to the latest NVM image."},
++	{ICE_AQC_HEALTH_STATUS_INFO_PORT_SPEED_MOD_LIMITED, "Port speed is limited due to module.",
++		"Change the module or configure the port option to match the current module speed. Change the port option.",
++		{ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_PARALLEL_FAULT,
++		"All configured link modes were attempted but failed to establish link. The device will restart the process to establish link.",
++		"Check link partner connection and configuration.",
++		{ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_INFO_PORT_SPEED_PHY_LIMITED,
++		"Port speed is limited by PHY capabilities.",
++		"Change the module to align to port option.", {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_NETLIST_TOPO, "LOM topology netlist is corrupted.",
++		ice_update_nvm_solution, {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_NETLIST, "Unrecoverable netlist error.",
++		ice_update_nvm_solution, {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_TOPO_CONFLICT, "Port topology conflict.",
++		"Change the port option. Update to the latest NVM image."},
++	{ICE_AQC_HEALTH_STATUS_ERR_LINK_HW_ACCESS, "Unrecoverable hardware access error.",
++		ice_update_nvm_solution, {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_LINK_RUNTIME, "Unrecoverable runtime error.",
++		ice_update_nvm_solution, {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_DNL_INIT, "Link management engine failed to initialize.",
++		ice_update_nvm_solution, {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_ERR_PHY_FW_LOAD,
++		"Failed to load the firmware image in the external PHY.",
++		ice_update_nvm_solution, {ice_port_number_label}},
++	{ICE_AQC_HEALTH_STATUS_INFO_RECOVERY, "The device is in firmware recovery mode.",
++		ice_update_nvm_solution, {"Extended Error"}},
++	{ICE_AQC_HEALTH_STATUS_ERR_FLASH_ACCESS, "The flash chip cannot be accessed.",
++		"If issue persists, call customer support.", {"Access Type"}},
++	{ICE_AQC_HEALTH_STATUS_ERR_NVM_AUTH, "NVM authentication failed.",
++		ice_update_nvm_solution},
++	{ICE_AQC_HEALTH_STATUS_ERR_OROM_AUTH, "Option ROM authentication failed.",
++		ice_update_nvm_solution},
++	{ICE_AQC_HEALTH_STATUS_ERR_DDP_AUTH, "DDP package authentication failed.",
++		"Update to latest base driver and DDP package."},
++	{ICE_AQC_HEALTH_STATUS_ERR_NVM_COMPAT, "NVM image is incompatible.",
++		ice_update_nvm_solution},
++	{ICE_AQC_HEALTH_STATUS_ERR_OROM_COMPAT, "Option ROM is incompatible.",
++		ice_update_nvm_solution, {"Expected PCI Device ID", "Expected Module ID"}},
++	{ICE_AQC_HEALTH_STATUS_ERR_DCB_MIB,
++		"Supplied MIB file is invalid. DCB reverted to default configuration.",
++		"Disable FW-LLDP and check DCBx system configuration.",
++		{ice_port_number_label, "MIB ID"}},
 +};
 +
- static int
- rio_probe1 (struct pci_dev *pdev, const struct pci_device_id *ent)
- {
-@@ -137,17 +568,16 @@ rio_probe1 (struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_out_dev;
- 	np->eeprom_addr = ioaddr;
- 
--#ifdef MEM_MAPPING
- 	/* MM registers range. */
- 	ioaddr = pci_iomap(pdev, 1, 0);
- 	if (!ioaddr)
- 		goto err_out_iounmap;
--#endif
- 	np->ioaddr = ioaddr;
- 	np->chip_id = chip_idx;
- 	np->pdev = pdev;
- 	spin_lock_init (&np->tx_lock);
- 	spin_lock_init (&np->rx_lock);
-+	spin_lock_init(&np->stats_lock);
- 
- 	/* Parse manual configuration */
- 	np->an_enable = 1;
-@@ -287,9 +717,7 @@ rio_probe1 (struct pci_dev *pdev, const struct pci_device_id *ent)
- 	dma_free_coherent(&pdev->dev, TX_TOTAL_SIZE, np->tx_ring,
- 			  np->tx_ring_dma);
- err_out_iounmap:
--#ifdef MEM_MAPPING
- 	pci_iounmap(pdev, np->ioaddr);
--#endif
- 	pci_iounmap(pdev, np->eeprom_addr);
- err_out_dev:
- 	free_netdev (dev);
-@@ -1064,65 +1492,98 @@ rio_error (struct net_device *dev, int int_status)
- 	}
- }
- 
-+static void init_stats(struct netdev_private *np,
-+		       const struct dlink_stats *stats, size_t size)
++static int ice_health_status_lookup_compare(const void *a, const void *b)
 +{
-+	void __iomem *ioaddr = np->ioaddr;
-+	u64 *stat;
++	return ((struct ice_health_status *)a)->code - ((struct ice_health_status *)b)->code;
++}
 +
-+	for (size_t i = 0; i < size; i++) {
-+		stat = (void *)np + stats[i].stat_offset;
++static const struct ice_health_status *ice_get_health_status(u16 code)
++{
++	struct ice_health_status key = { .code = code };
 +
-+		if (stats[i].size == sizeof(u32))
-+			(void)dr32(stats[i].regs);
-+		else
-+			(void)dr16(stats[i].regs);
++	return bsearch(&key, ice_health_status_lookup, ARRAY_SIZE(ice_health_status_lookup),
++		       sizeof(struct ice_health_status), ice_health_status_lookup_compare);
++}
 +
-+		*stat = 0;
++static void ice_describe_status_code(struct devlink_fmsg *fmsg,
++				     struct ice_aqc_health_status_elem *hse)
++{
++	static const char *const aux_label[] = { "Aux Data 1", "Aux Data 2" };
++	const struct ice_health_status *health_code;
++	u32 internal_data[2];
++	u16 status_code;
++
++	status_code = le16_to_cpu(hse->health_status_code);
++
++	devlink_fmsg_put(fmsg, "Syndrome", status_code);
++	if (status_code) {
++		internal_data[0] = le32_to_cpu(hse->internal_data1);
++		internal_data[1] = le32_to_cpu(hse->internal_data2);
++
++		health_code = ice_get_health_status(status_code);
++		if (!health_code)
++			return;
++
++		devlink_fmsg_string_pair_put(fmsg, "Description", health_code->description);
++		if (health_code->solution)
++			devlink_fmsg_string_pair_put(fmsg, "Possible Solution",
++						     health_code->solution);
++
++		for (size_t i = 0; i < ICE_HEALTH_STATUS_DATA_SIZE; i++) {
++			if (internal_data[i] != ICE_AQC_HEALTH_STATUS_UNDEFINED_DATA)
++				devlink_fmsg_u32_pair_put(fmsg,
++							  health_code->data_label[i] ?
++							  health_code->data_label[i] :
++							  aux_label[i],
++							  internal_data[i]);
++		}
 +	}
 +}
 +
-+static void update_stats(struct netdev_private *np,
-+			 const struct dlink_stats *stats, size_t size)
++static int
++ice_port_reporter_diagnose(struct devlink_health_reporter *reporter, struct devlink_fmsg *fmsg,
++			   struct netlink_ext_ack *extack)
 +{
-+	void __iomem *ioaddr = np->ioaddr;
-+	u64 *stat;
++	struct ice_pf *pf = devlink_health_reporter_priv(reporter);
 +
-+	for (size_t i = 0; i < size; i++) {
-+		stat = (void *)np + stats[i].stat_offset;
-+
-+		if (stats[i].size == sizeof(u32))
-+			*stat += dr32(stats[i].regs);
-+		else
-+			*stat += dr16(stats[i].regs);
-+	}
-+}
-+
-+static void write_stats(struct netdev_private *np, const void *base,
-+			const struct dlink_stats *stats, size_t size)
-+{
-+	u64 *stat, *data;
-+
-+	for (size_t i = 0; i < size; i++) {
-+		stat = (void *)np + stats[i].stat_offset;
-+		data = (void *)base + stats[i].data_offset;
-+
-+		*data = *stat;
-+	}
-+}
-+
- static struct net_device_stats *
- get_stats (struct net_device *dev)
- {
- 	struct netdev_private *np = netdev_priv(dev);
--	void __iomem *ioaddr = np->ioaddr;
--#ifdef MEM_MAPPING
--	int i;
--#endif
--	unsigned int stat_reg;
-+
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&np->stats_lock, flags);
- 
- 	/* All statistics registers need to be acknowledged,
- 	   else statistic overflow could cause problems */
- 
--	dev->stats.rx_packets += dr32(FramesRcvOk);
--	dev->stats.tx_packets += dr32(FramesXmtOk);
--	dev->stats.rx_bytes += dr32(OctetRcvOk);
--	dev->stats.tx_bytes += dr32(OctetXmtOk);
--
--	dev->stats.multicast = dr32(McstFramesRcvdOk);
--	dev->stats.collisions += dr32(SingleColFrames)
--			     +  dr32(MultiColFrames);
--
--	/* detailed tx errors */
--	stat_reg = dr16(FramesAbortXSColls);
--	dev->stats.tx_aborted_errors += stat_reg;
--	dev->stats.tx_errors += stat_reg;
--
--	stat_reg = dr16(CarrierSenseErrors);
--	dev->stats.tx_carrier_errors += stat_reg;
--	dev->stats.tx_errors += stat_reg;
--
--	/* Clear all other statistic register. */
--	dr32(McstOctetXmtOk);
--	dr16(BcstFramesXmtdOk);
--	dr32(McstFramesXmtdOk);
--	dr16(BcstFramesRcvdOk);
--	dr16(MacControlFramesRcvd);
--	dr16(FrameTooLongErrors);
--	dr16(InRangeLengthErrors);
--	dr16(FramesCheckSeqErrors);
--	dr16(FramesLostRxErrors);
--	dr32(McstOctetXmtOk);
--	dr32(BcstOctetXmtOk);
--	dr32(McstFramesXmtdOk);
--	dr32(FramesWDeferredXmt);
--	dr32(LateCollisions);
--	dr16(BcstFramesXmtdOk);
--	dr16(MacControlFramesXmtd);
--	dr16(FramesWEXDeferal);
--
--#ifdef MEM_MAPPING
--	for (i = 0x100; i <= 0x150; i += 4)
--		dr32(i);
--#endif
--	dr16(TxJumboFrames);
--	dr16(RxJumboFrames);
--	dr16(TCPCheckSumErrors);
--	dr16(UDPCheckSumErrors);
--	dr16(IPCheckSumErrors);
-+	u64 collisions = np->single_collisions + np->multi_collisions;
-+	u64 tx_frames_abort = np->tx_frames_abort;
-+	u64 tx_carrier_errors = np->tx_carrier_sense_errors;
-+
-+	update_stats(np, stats, ARRAY_SIZE(stats));
-+	update_stats(np, rmon_stats, ARRAY_SIZE(rmon_stats));
-+	update_stats(np, ctrl_stats, ARRAY_SIZE(ctrl_stats));
-+	update_stats(np, mac_stats, ARRAY_SIZE(mac_stats));
-+
-+	collisions = np->single_collisions + np->multi_collisions - collisions;
-+	tx_frames_abort = np->tx_frames_abort - tx_frames_abort;
-+	tx_carrier_errors = np->tx_carrier_sense_errors - tx_carrier_errors;
-+
-+	dev->stats.rx_packets = np->rx_packets;
-+	dev->stats.tx_packets = np->tx_packets;
-+
-+	dev->stats.rx_bytes = np->rx_bytes;
-+	dev->stats.tx_bytes = np->tx_bytes;
-+
-+	dev->stats.collisions += collisions;
-+
-+	dev->stats.multicast = np->tx_multicast_frames +
-+			       np->rx_multicast_frames;
-+
-+	dev->stats.rx_over_errors = np->rx_frames_too_long_errors;
-+	dev->stats.tx_aborted_errors = np->tx_frames_abort;
-+	dev->stats.tx_carrier_errors = np->tx_carrier_sense_errors;
-+	dev->stats.tx_window_errors = np->late_collisions;
-+
-+	dev->stats.tx_errors += tx_frames_abort + tx_carrier_errors;
-+
-+	spin_unlock_irqrestore(&np->stats_lock, flags);
-+
- 	return &dev->stats;
- }
- 
-@@ -1130,54 +1591,17 @@ static int
- clear_stats (struct net_device *dev)
- {
- 	struct netdev_private *np = netdev_priv(dev);
--	void __iomem *ioaddr = np->ioaddr;
--#ifdef MEM_MAPPING
--	int i;
--#endif
- 
- 	/* All statistics registers need to be acknowledged,
- 	   else statistic overflow could cause problems */
--	dr32(FramesRcvOk);
--	dr32(FramesXmtOk);
--	dr32(OctetRcvOk);
--	dr32(OctetXmtOk);
--
--	dr32(McstFramesRcvdOk);
--	dr32(SingleColFrames);
--	dr32(MultiColFrames);
--	dr32(LateCollisions);
--	/* detailed rx errors */
--	dr16(FrameTooLongErrors);
--	dr16(InRangeLengthErrors);
--	dr16(FramesCheckSeqErrors);
--	dr16(FramesLostRxErrors);
--
--	/* detailed tx errors */
--	dr16(FramesAbortXSColls);
--	dr16(CarrierSenseErrors);
--
--	/* Clear all other statistic register. */
--	dr32(McstOctetXmtOk);
--	dr16(BcstFramesXmtdOk);
--	dr32(McstFramesXmtdOk);
--	dr16(BcstFramesRcvdOk);
--	dr16(MacControlFramesRcvd);
--	dr32(McstOctetXmtOk);
--	dr32(BcstOctetXmtOk);
--	dr32(McstFramesXmtdOk);
--	dr32(FramesWDeferredXmt);
--	dr16(BcstFramesXmtdOk);
--	dr16(MacControlFramesXmtd);
--	dr16(FramesWEXDeferal);
--#ifdef MEM_MAPPING
--	for (i = 0x100; i <= 0x150; i += 4)
--		dr32(i);
--#endif
--	dr16(TxJumboFrames);
--	dr16(RxJumboFrames);
--	dr16(TCPCheckSumErrors);
--	dr16(UDPCheckSumErrors);
--	dr16(IPCheckSumErrors);
-+
-+	init_stats(np, stats, ARRAY_SIZE(stats));
-+	init_stats(np, rmon_stats, ARRAY_SIZE(rmon_stats));
-+	init_stats(np, ctrl_stats, ARRAY_SIZE(ctrl_stats));
-+	init_stats(np, mac_stats, ARRAY_SIZE(mac_stats));
-+
-+	memset(&dev->stats, 0x00, sizeof(dev->stats));
-+
- 	return 0;
- }
- 
-@@ -1328,11 +1752,92 @@ static u32 rio_get_link(struct net_device *dev)
- 	return np->link_status;
- }
- 
-+static void get_ethtool_stats(struct net_device *dev,
-+			      struct ethtool_stats __always_unused *__,
-+			      u64 *data)
-+{
-+	struct netdev_private *np = netdev_priv(dev);
-+	u64 *stat;
-+
-+	get_stats(dev);
-+
-+	for (size_t i = 0, j = 0; i < ARRAY_SIZE(stats); i++) {
-+		stat = (void *)np + stats[i].stat_offset;
-+		data[j++] = *stat;
-+	}
-+}
-+
-+static void
-+get_ethtool_rmon_stats(struct net_device *dev,
-+		       struct ethtool_rmon_stats *base,
-+		       const struct ethtool_rmon_hist_range **ranges)
-+{
-+	struct netdev_private *np = netdev_priv(dev);
-+
-+	get_stats(dev);
-+
-+	write_stats(np, base, rmon_stats, ARRAY_SIZE(rmon_stats));
-+
-+	*ranges = dlink_rmon_ranges;
-+}
-+
-+static void get_ethtool_ctrl_stats(struct net_device *dev,
-+				   struct ethtool_eth_ctrl_stats *base)
-+{
-+	struct netdev_private *np = netdev_priv(dev);
-+
-+	if (base->src != ETHTOOL_MAC_STATS_SRC_AGGREGATE)
-+		return;
-+
-+	get_stats(dev);
-+
-+	write_stats(np, base, ctrl_stats, ARRAY_SIZE(ctrl_stats));
-+}
-+
-+static void get_ethtool_mac_stats(struct net_device *dev,
-+				  struct ethtool_eth_mac_stats *base)
-+{
-+	struct netdev_private *np = netdev_priv(dev);
-+
-+	if (base->src != ETHTOOL_MAC_STATS_SRC_AGGREGATE)
-+		return;
-+
-+	get_stats(dev);
-+
-+	write_stats(np, base, mac_stats, ARRAY_SIZE(mac_stats));
-+}
-+
-+static void get_strings(struct net_device *dev, u32 stringset, u8 *data)
-+{
-+	switch (stringset) {
-+	case ETH_SS_STATS:
-+		for (size_t i = 0; i < ARRAY_SIZE(stats); i++)
-+			ethtool_puts(&data, stats[i].string);
-+		break;
-+	}
-+}
-+
-+static int get_sset_count(struct net_device *dev, int sset)
-+{
-+	switch (sset) {
-+	case ETH_SS_STATS:
-+		return ARRAY_SIZE(stats);
-+	}
-+
++	ice_describe_status_code(fmsg, &pf->health_reporters.port_status);
 +	return 0;
 +}
 +
- static const struct ethtool_ops ethtool_ops = {
- 	.get_drvinfo = rio_get_drvinfo,
- 	.get_link = rio_get_link,
- 	.get_link_ksettings = rio_get_link_ksettings,
- 	.set_link_ksettings = rio_set_link_ksettings,
-+	.get_ethtool_stats = get_ethtool_stats,
-+	.get_rmon_stats = get_ethtool_rmon_stats,
-+	.get_eth_ctrl_stats = get_ethtool_ctrl_stats,
-+	.get_eth_mac_stats = get_ethtool_mac_stats,
-+	.get_strings = get_strings,
-+	.get_sset_count = get_sset_count
- };
- 
- static int
-@@ -1798,9 +2303,7 @@ rio_remove1 (struct pci_dev *pdev)
- 				  np->rx_ring_dma);
- 		dma_free_coherent(&pdev->dev, TX_TOTAL_SIZE, np->tx_ring,
- 				  np->tx_ring_dma);
--#ifdef MEM_MAPPING
- 		pci_iounmap(pdev, np->ioaddr);
--#endif
- 		pci_iounmap(pdev, np->eeprom_addr);
- 		free_netdev (dev);
- 		pci_release_regions (pdev);
-diff --git a/drivers/net/ethernet/dlink/dl2k.h b/drivers/net/ethernet/dlink/dl2k.h
-index 195dc6cfd895..643c98c4e18a 100644
---- a/drivers/net/ethernet/dlink/dl2k.h
-+++ b/drivers/net/ethernet/dlink/dl2k.h
-@@ -46,6 +46,7 @@
-    In general, only the important configuration values or bits changed
-    multiple times should be defined symbolically.
- */
++static int
++ice_port_reporter_dump(struct devlink_health_reporter *reporter, struct devlink_fmsg *fmsg,
++		       void *priv_ctx, struct netlink_ext_ack __always_unused *extack)
++{
++	struct ice_pf *pf = devlink_health_reporter_priv(reporter);
 +
- enum dl2x_offsets {
- 	/* I/O register offsets */
- 	DMACtrl = 0x00,
-@@ -146,6 +147,14 @@ enum dl2x_offsets {
- 	EtherStatsPkts1024to1518Octets = 0x150,
++	ice_describe_status_code(fmsg, &pf->health_reporters.port_status);
++	return 0;
++}
++
++static int
++ice_fw_reporter_diagnose(struct devlink_health_reporter *reporter, struct devlink_fmsg *fmsg,
++			 struct netlink_ext_ack *extack)
++{
++	struct ice_pf *pf = devlink_health_reporter_priv(reporter);
++
++	ice_describe_status_code(fmsg, &pf->health_reporters.fw_status);
++	return 0;
++}
++
++static int
++ice_fw_reporter_dump(struct devlink_health_reporter *reporter, struct devlink_fmsg *fmsg,
++		     void *priv_ctx, struct netlink_ext_ack *extack)
++{
++	struct ice_pf *pf = devlink_health_reporter_priv(reporter);
++
++	ice_describe_status_code(fmsg, &pf->health_reporters.fw_status);
++	return 0;
++}
++
++static void ice_config_health_events(struct ice_pf *pf, bool enable)
++{
++	u8 enable_bits = 0;
++	int ret;
++
++	if (enable)
++		enable_bits = ICE_AQC_HEALTH_STATUS_SET_PF_SPECIFIC_MASK |
++			      ICE_AQC_HEALTH_STATUS_SET_GLOBAL_MASK;
++
++	ret = ice_aq_set_health_status_cfg(&pf->hw, enable_bits);
++	if (ret)
++		dev_err(ice_pf_to_dev(pf), "Failed to %s firmware health events, err %d aq_err %s\n",
++			str_enable_disable(enable), ret,
++			ice_aq_str(pf->hw.adminq.sq_last_status));
++}
++
++/**
++ * ice_process_health_status_event - Process the health status event from FW
++ * @pf: pointer to the PF structure
++ * @event: event structure containing the Health Status Event opcode
++ *
++ * Decode the Health Status Events and print the associated messages
++ */
++void ice_process_health_status_event(struct ice_pf *pf, struct ice_rq_event_info *event)
++{
++	const struct ice_aqc_health_status_elem *health_info;
++	u16 count;
++
++	health_info = (struct ice_aqc_health_status_elem *)event->msg_buf;
++	count = le16_to_cpu(event->desc.params.get_health_status.health_status_count);
++
++	if (count > (event->buf_len / sizeof(*health_info))) {
++		dev_err(ice_pf_to_dev(pf), "Received a health status event with invalid element count\n");
++		return;
++	}
++
++	for (size_t i = 0; i < count; i++) {
++		const struct ice_health_status *health_code;
++		u16 status_code;
++
++		status_code = le16_to_cpu(health_info->health_status_code);
++		health_code = ice_get_health_status(status_code);
++
++		if (health_code) {
++			switch (health_info->event_source) {
++			case ICE_AQC_HEALTH_STATUS_GLOBAL:
++				pf->health_reporters.fw_status = *health_info;
++				devlink_health_report(pf->health_reporters.fw,
++						      "FW syndrome reported", NULL);
++				break;
++			case ICE_AQC_HEALTH_STATUS_PF:
++			case ICE_AQC_HEALTH_STATUS_PORT:
++				pf->health_reporters.port_status = *health_info;
++				devlink_health_report(pf->health_reporters.port,
++						      "Port syndrome reported", NULL);
++				break;
++			default:
++				dev_err(ice_pf_to_dev(pf), "Health code with unknown source\n");
++			}
++		} else {
++			u32 data1, data2;
++			u16 source;
++
++			source = le16_to_cpu(health_info->event_source);
++			data1 = le32_to_cpu(health_info->internal_data1);
++			data2 = le32_to_cpu(health_info->internal_data2);
++			dev_dbg(ice_pf_to_dev(pf),
++				"Received internal health status code 0x%08x, source: 0x%08x, data1: 0x%08x, data2: 0x%08x",
++				status_code, source, data1, data2);
++		}
++		health_info++;
++	}
++}
++
+ /**
+  * ice_devlink_health_report - boilerplate to call given @reporter
+  *
+@@ -236,14 +494,26 @@ ice_init_devlink_rep(struct ice_pf *pf,
+ 	return rep;
+ }
+ 
+-#define ICE_DEFINE_HEALTH_REPORTER_OPS(_name) \
+-	static const struct devlink_health_reporter_ops ice_ ## _name ## _reporter_ops = { \
++#define ICE_HEALTH_REPORTER_OPS_FIELD(_name, _field) \
++	._field = ice_##_name##_reporter_##_field,
++
++#define ICE_DEFINE_HEALTH_REPORTER_OPS_1(_name, _field1) \
++	static const struct devlink_health_reporter_ops ice_##_name##_reporter_ops = { \
+ 	.name = #_name, \
+-	.dump = ice_ ## _name ## _reporter_dump, \
+-}
++	ICE_HEALTH_REPORTER_OPS_FIELD(_name, _field1) \
++	}
++
++#define ICE_DEFINE_HEALTH_REPORTER_OPS_2(_name, _field1, _field2) \
++	static const struct devlink_health_reporter_ops ice_##_name##_reporter_ops = { \
++	.name = #_name, \
++	ICE_HEALTH_REPORTER_OPS_FIELD(_name, _field1) \
++	ICE_HEALTH_REPORTER_OPS_FIELD(_name, _field2) \
++	}
+ 
+-ICE_DEFINE_HEALTH_REPORTER_OPS(mdd);
+-ICE_DEFINE_HEALTH_REPORTER_OPS(tx_hang);
++ICE_DEFINE_HEALTH_REPORTER_OPS_1(mdd, dump);
++ICE_DEFINE_HEALTH_REPORTER_OPS_1(tx_hang, dump);
++ICE_DEFINE_HEALTH_REPORTER_OPS_2(fw, dump, diagnose);
++ICE_DEFINE_HEALTH_REPORTER_OPS_2(port, dump, diagnose);
+ 
+ /**
+  * ice_health_init - allocate and init all ice devlink health reporters and
+@@ -257,6 +527,12 @@ void ice_health_init(struct ice_pf *pf)
+ 
+ 	reps->mdd = ice_init_devlink_rep(pf, &ice_mdd_reporter_ops);
+ 	reps->tx_hang = ice_init_devlink_rep(pf, &ice_tx_hang_reporter_ops);
++
++	if (ice_is_fw_health_report_supported(&pf->hw)) {
++		reps->fw = ice_init_devlink_rep(pf, &ice_fw_reporter_ops);
++		reps->port = ice_init_devlink_rep(pf, &ice_port_reporter_ops);
++		ice_config_health_events(pf, true);
++	}
+ }
+ 
+ /**
+@@ -279,6 +555,11 @@ void ice_health_deinit(struct ice_pf *pf)
+ {
+ 	ice_deinit_devl_reporter(pf->health_reporters.mdd);
+ 	ice_deinit_devl_reporter(pf->health_reporters.tx_hang);
++	if (ice_is_fw_health_report_supported(&pf->hw)) {
++		ice_deinit_devl_reporter(pf->health_reporters.fw);
++		ice_deinit_devl_reporter(pf->health_reporters.port);
++		ice_config_health_events(pf, false);
++	}
+ }
+ 
+ static
+diff --git a/drivers/net/ethernet/intel/ice/devlink/health.h b/drivers/net/ethernet/intel/ice/devlink/health.h
+index a08c7bd174cf..280c429feec8 100644
+--- a/drivers/net/ethernet/intel/ice/devlink/health.h
++++ b/drivers/net/ethernet/intel/ice/devlink/health.h
+@@ -13,8 +13,10 @@
+  * devlink health mechanism for ice driver.
+  */
+ 
++struct ice_aqc_health_status_elem;
+ struct ice_pf;
+ struct ice_tx_ring;
++struct ice_rq_event_info;
+ 
+ enum ice_mdd_src {
+ 	ICE_MDD_SRC_TX_PQM,
+@@ -25,17 +27,23 @@ enum ice_mdd_src {
+ 
+ /**
+  * struct ice_health - stores ice devlink health reporters and accompanied data
+- * @tx_hang: devlink health reporter for tx_hang event
++ * @fw: devlink health reporter for FW Health Status events
+  * @mdd: devlink health reporter for MDD detection event
++ * @port: devlink health reporter for Port Health Status events
++ * @tx_hang: devlink health reporter for tx_hang event
+  * @tx_hang_buf: pre-allocated place to put info for Tx hang reporter from
+  *               non-sleeping context
+  * @tx_ring: ring that the hang occured on
+  * @head: descriptior head
+  * @intr: interrupt register value
+  * @vsi_num: VSI owning the queue that the hang occured on
++ * @fw_status: buffer for last received FW Status event
++ * @port_status: buffer for last received Port Status event
+  */
+ struct ice_health {
++	struct devlink_health_reporter *fw;
+ 	struct devlink_health_reporter *mdd;
++	struct devlink_health_reporter *port;
+ 	struct devlink_health_reporter *tx_hang;
+ 	struct_group_tagged(ice_health_tx_hang_buf, tx_hang_buf,
+ 		struct ice_tx_ring *tx_ring;
+@@ -43,8 +51,12 @@ struct ice_health {
+ 		u32 intr;
+ 		u16 vsi_num;
+ 	);
++	struct ice_aqc_health_status_elem fw_status;
++	struct ice_aqc_health_status_elem port_status;
  };
  
-+struct dlink_stats {
-+	char string[ETH_GSTRING_LEN];
-+	size_t data_offset;
-+	size_t stat_offset;
-+	size_t size;
-+	enum dl2x_offsets regs;
++void ice_process_health_status_event(struct ice_pf *pf,
++				     struct ice_rq_event_info *event);
+ 
+ void ice_health_init(struct ice_pf *pf);
+ void ice_health_deinit(struct ice_pf *pf);
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index ce590991de38..a151cc18ccd5 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -2511,6 +2511,87 @@ enum ice_aqc_fw_logging_mod {
+ 	ICE_AQC_FW_LOG_ID_MAX,
+ };
+ 
++enum ice_aqc_health_status_mask {
++	ICE_AQC_HEALTH_STATUS_SET_PF_SPECIFIC_MASK = BIT(0),
++	ICE_AQC_HEALTH_STATUS_SET_ALL_PF_MASK      = BIT(1),
++	ICE_AQC_HEALTH_STATUS_SET_GLOBAL_MASK      = BIT(2),
 +};
 +
- /* Bits in the interrupt status/mask registers. */
- enum IntStatus_bits {
- 	InterruptStatus = 0x0001,
-@@ -374,6 +383,82 @@ struct netdev_private {
- 	void __iomem *eeprom_addr;
- 	spinlock_t tx_lock;
- 	spinlock_t rx_lock;
-+	// To ensure synchronization when stats are updated.
-+	spinlock_t stats_lock;
-+	struct {
-+		u64 tx_jumbo_frames;
-+		u64 rx_jumbo_frames;
++/* Set Health Status (direct 0xFF20) */
++struct ice_aqc_set_health_status_cfg {
++	u8 event_source;
++	u8 reserved[15];
++};
 +
-+		u64 tcp_checksum_errors;
-+		u64 udp_checksum_errors;
-+		u64 ip_checksum_errors;
-+		u64 tx_packets;
-+		u64 rx_packets;
++enum ice_aqc_health_status {
++	ICE_AQC_HEALTH_STATUS_ERR_UNKNOWN_MOD_STRICT		= 0x101,
++	ICE_AQC_HEALTH_STATUS_ERR_MOD_TYPE			= 0x102,
++	ICE_AQC_HEALTH_STATUS_ERR_MOD_QUAL			= 0x103,
++	ICE_AQC_HEALTH_STATUS_ERR_MOD_COMM			= 0x104,
++	ICE_AQC_HEALTH_STATUS_ERR_MOD_CONFLICT			= 0x105,
++	ICE_AQC_HEALTH_STATUS_ERR_MOD_NOT_PRESENT		= 0x106,
++	ICE_AQC_HEALTH_STATUS_INFO_MOD_UNDERUTILIZED		= 0x107,
++	ICE_AQC_HEALTH_STATUS_ERR_UNKNOWN_MOD_LENIENT		= 0x108,
++	ICE_AQC_HEALTH_STATUS_ERR_MOD_DIAGNOSTIC_FEATURE	= 0x109,
++	ICE_AQC_HEALTH_STATUS_ERR_INVALID_LINK_CFG		= 0x10B,
++	ICE_AQC_HEALTH_STATUS_ERR_PORT_ACCESS			= 0x10C,
++	ICE_AQC_HEALTH_STATUS_ERR_PORT_UNREACHABLE		= 0x10D,
++	ICE_AQC_HEALTH_STATUS_INFO_PORT_SPEED_MOD_LIMITED	= 0x10F,
++	ICE_AQC_HEALTH_STATUS_ERR_PARALLEL_FAULT		= 0x110,
++	ICE_AQC_HEALTH_STATUS_INFO_PORT_SPEED_PHY_LIMITED	= 0x111,
++	ICE_AQC_HEALTH_STATUS_ERR_NETLIST_TOPO			= 0x112,
++	ICE_AQC_HEALTH_STATUS_ERR_NETLIST			= 0x113,
++	ICE_AQC_HEALTH_STATUS_ERR_TOPO_CONFLICT			= 0x114,
++	ICE_AQC_HEALTH_STATUS_ERR_LINK_HW_ACCESS		= 0x115,
++	ICE_AQC_HEALTH_STATUS_ERR_LINK_RUNTIME			= 0x116,
++	ICE_AQC_HEALTH_STATUS_ERR_DNL_INIT			= 0x117,
++	ICE_AQC_HEALTH_STATUS_ERR_PHY_NVM_PROG			= 0x120,
++	ICE_AQC_HEALTH_STATUS_ERR_PHY_FW_LOAD			= 0x121,
++	ICE_AQC_HEALTH_STATUS_INFO_RECOVERY			= 0x500,
++	ICE_AQC_HEALTH_STATUS_ERR_FLASH_ACCESS			= 0x501,
++	ICE_AQC_HEALTH_STATUS_ERR_NVM_AUTH			= 0x502,
++	ICE_AQC_HEALTH_STATUS_ERR_OROM_AUTH			= 0x503,
++	ICE_AQC_HEALTH_STATUS_ERR_DDP_AUTH			= 0x504,
++	ICE_AQC_HEALTH_STATUS_ERR_NVM_COMPAT			= 0x505,
++	ICE_AQC_HEALTH_STATUS_ERR_OROM_COMPAT			= 0x506,
++	ICE_AQC_HEALTH_STATUS_ERR_NVM_SEC_VIOLATION		= 0x507,
++	ICE_AQC_HEALTH_STATUS_ERR_OROM_SEC_VIOLATION		= 0x508,
++	ICE_AQC_HEALTH_STATUS_ERR_DCB_MIB			= 0x509,
++	ICE_AQC_HEALTH_STATUS_ERR_MNG_TIMEOUT			= 0x50A,
++	ICE_AQC_HEALTH_STATUS_ERR_BMC_RESET			= 0x50B,
++	ICE_AQC_HEALTH_STATUS_ERR_LAST_MNG_FAIL			= 0x50C,
++	ICE_AQC_HEALTH_STATUS_ERR_RESOURCE_ALLOC_FAIL		= 0x50D,
++	ICE_AQC_HEALTH_STATUS_ERR_FW_LOOP			= 0x1000,
++	ICE_AQC_HEALTH_STATUS_ERR_FW_PFR_FAIL			= 0x1001,
++	ICE_AQC_HEALTH_STATUS_ERR_LAST_FAIL_AQ			= 0x1002,
++};
 +
-+		u64 tx_bytes;
-+		u64 rx_bytes;
++/* Get Health Status (indirect 0xFF22) */
++struct ice_aqc_get_health_status {
++	__le16 health_status_count;
++	u8 reserved[6];
++	__le32 addr_high;
++	__le32 addr_low;
++};
 +
-+		u64 single_collisions;
-+		u64 multi_collisions;
-+		u64 late_collisions;
++enum ice_aqc_health_status_scope {
++	ICE_AQC_HEALTH_STATUS_PF	= 0x1,
++	ICE_AQC_HEALTH_STATUS_PORT	= 0x2,
++	ICE_AQC_HEALTH_STATUS_GLOBAL	= 0x3,
++};
 +
-+		u64 rx_frames_too_long_errors;
-+		u64 rx_in_range_length_errors;
-+		u64 rx_frames_check_seq_errors;
-+		u64 rx_frames_lost_errors;
++#define ICE_AQC_HEALTH_STATUS_UNDEFINED_DATA	0xDEADBEEF
 +
-+		u64 tx_frames_abort;
-+		u64 tx_carrier_sense_errors;
++/* Get Health Status event buffer entry (0xFF22),
++ * repeated per reported health status.
++ */
++struct ice_aqc_health_status_elem {
++	__le16 health_status_code;
++	__le16 event_source;
++	__le32 internal_data1;
++	__le32 internal_data2;
++};
 +
-+		u64 tx_multicast_bytes;
-+		u64 rx_multicast_bytes;
+ /* Set FW Logging configuration (indirect 0xFF30)
+  * Register for FW Logging (indirect 0xFF31)
+  * Query FW Logging (indirect 0xFF32)
+@@ -2651,6 +2732,8 @@ struct ice_aq_desc {
+ 		struct ice_aqc_get_link_status get_link_status;
+ 		struct ice_aqc_event_lan_overflow lan_overflow;
+ 		struct ice_aqc_get_link_topo get_link_topo;
++		struct ice_aqc_set_health_status_cfg set_health_status_cfg;
++		struct ice_aqc_get_health_status get_health_status;
+ 		struct ice_aqc_dnl_call_command dnl_call;
+ 		struct ice_aqc_i2c read_write_i2c;
+ 		struct ice_aqc_read_i2c_resp read_i2c_resp;
+@@ -2853,6 +2936,10 @@ enum ice_adminq_opc {
+ 	/* Standalone Commands/Events */
+ 	ice_aqc_opc_event_lan_overflow			= 0x1001,
+ 
++	/* System Diagnostic commands */
++	ice_aqc_opc_set_health_status_cfg		= 0xFF20,
++	ice_aqc_opc_get_health_status			= 0xFF22,
 +
-+		u64 tx_multicast_frames;
-+		u64 rx_multicast_frames;
+ 	/* FW Logging Commands */
+ 	ice_aqc_opc_fw_logs_config			= 0xFF30,
+ 	ice_aqc_opc_fw_logs_register			= 0xFF31,
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index faba09b9d880..9c61318d3027 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -6047,6 +6047,44 @@ bool ice_is_phy_caps_an_enabled(struct ice_aqc_get_phy_caps_data *caps)
+ 	return false;
+ }
+ 
++/**
++ * ice_is_fw_health_report_supported
++ * @hw: pointer to the hardware structure
++ *
++ * Return: true if firmware supports health status reports,
++ * false otherwise
++ */
++bool ice_is_fw_health_report_supported(struct ice_hw *hw)
++{
++	return ice_is_fw_api_min_ver(hw, ICE_FW_API_HEALTH_REPORT_MAJ,
++				     ICE_FW_API_HEALTH_REPORT_MIN,
++				     ICE_FW_API_HEALTH_REPORT_PATCH);
++}
 +
-+		u64 tx_broadcast_frames;
-+		u64 rx_broadcast_frames;
++/**
++ * ice_aq_set_health_status_cfg - Configure FW health events
++ * @hw: pointer to the HW struct
++ * @event_source: type of diagnostic events to enable
++ *
++ * Configure the health status event types that the firmware will send to this
++ * PF. The supported event types are: PF-specific, all PFs, and global.
++ *
++ * Return: 0 on success, negative error code otherwise.
++ */
++int ice_aq_set_health_status_cfg(struct ice_hw *hw, u8 event_source)
++{
++	struct ice_aqc_set_health_status_cfg *cmd;
++	struct ice_aq_desc desc;
 +
-+		u64 tx_broadcast_bytes;
-+		u64 rx_broadcast_bytes;
++	cmd = &desc.params.set_health_status_cfg;
 +
-+		u64 tx_mac_control_frames;
-+		u64 rx_mac_control_frames;
++	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_health_status_cfg);
 +
-+		u64 tx_frames_deferred;
-+		u64 tx_frames_excessive_deferral;
++	cmd->event_source = event_source;
 +
-+		u64 rmon_collisions;
-+		u64 rmon_crc_align_errors;
-+		u64 rmon_under_size_packets;
-+		u64 rmon_fragments;
-+		u64 rmon_jabbers;
++	return ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
++}
 +
-+		u64 rmon_tx_bytes;
-+		u64 rmon_rx_bytes;
+ /**
+  * ice_aq_set_lldp_mib - Set the LLDP MIB
+  * @hw: pointer to the HW struct
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
+index 52a1b72cce26..e132851dc0f0 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.h
++++ b/drivers/net/ethernet/intel/ice/ice_common.h
+@@ -141,6 +141,8 @@ int
+ ice_get_link_default_override(struct ice_link_default_override_tlv *ldo,
+ 			      struct ice_port_info *pi);
+ bool ice_is_phy_caps_an_enabled(struct ice_aqc_get_phy_caps_data *caps);
++bool ice_is_fw_health_report_supported(struct ice_hw *hw);
++int ice_aq_set_health_status_cfg(struct ice_hw *hw, u8 event_source);
+ int ice_aq_get_phy_equalization(struct ice_hw *hw, u16 data_in, u16 op_code,
+ 				u8 serdes_num, int *output);
+ int
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 7b9be612cf33..36cfbe771d1b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -1567,6 +1567,9 @@ static int __ice_clean_ctrlq(struct ice_pf *pf, enum ice_ctl_q q_type)
+ 		case ice_aqc_opc_lldp_set_mib_change:
+ 			ice_dcb_process_lldp_set_mib_change(pf, &event);
+ 			break;
++		case ice_aqc_opc_get_health_status:
++			ice_process_health_status_event(pf, &event);
++			break;
+ 		default:
+ 			dev_dbg(dev, "%s Receive Queue unknown event 0x%04x ignored\n",
+ 				qtype, opcode);
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index e2e6b2119889..42ac5a9f1cf4 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -1207,4 +1207,9 @@ struct ice_aq_get_set_rss_lut_params {
+ #define ICE_FW_API_REPORT_DFLT_CFG_MIN		7
+ #define ICE_FW_API_REPORT_DFLT_CFG_PATCH	3
+ 
++/* AQ API version for Health Status support */
++#define ICE_FW_API_HEALTH_REPORT_MAJ		1
++#define ICE_FW_API_HEALTH_REPORT_MIN		7
++#define ICE_FW_API_HEALTH_REPORT_PATCH		6
 +
-+		u64 rmon_tx_packets;
-+		u64 rmon_rx_packets;
-+
-+		u64 rmon_tx_byte_64;
-+		u64 rmon_rx_byte_64;
-+
-+		u64 rmon_tx_byte_65to127;
-+		u64 rmon_rx_byte_65to127;
-+
-+		u64 rmon_tx_byte_128to255;
-+		u64 rmon_rx_byte_128to255;
-+
-+		u64 rmon_tx_byte_256to511;
-+		u64 rmon_rx_byte_256to511;
-+
-+		u64 rmon_tx_byte_512to1023;
-+		u64 rmon_rx_byte_512to1203;
-+
-+		u64 rmon_tx_byte_1024to1518;
-+		u64 rmon_rx_byte_1024to1518;
-+	};
-+
- 	unsigned int rx_buf_sz;		/* Based on MTU+slack. */
- 	unsigned int speed;		/* Operating speed */
- 	unsigned int vlan;		/* VLAN Id */
+ #endif /* _ICE_TYPE_H_ */
 -- 
-2.47.1
+2.38.1
 
 
