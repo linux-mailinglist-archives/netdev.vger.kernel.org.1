@@ -1,62 +1,60 @@
-Return-Path: <netdev+bounces-150392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BDA69EA156
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 22:41:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CAF6A9EA15A
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 22:44:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AB48282959
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 21:41:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B5E82829D9
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 21:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B7F19CC33;
-	Mon,  9 Dec 2024 21:41:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97ECB19D08A;
+	Mon,  9 Dec 2024 21:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gXexPc3X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uKl21bNS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171AE46B8;
-	Mon,  9 Dec 2024 21:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9D619D06A;
+	Mon,  9 Dec 2024 21:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733780503; cv=none; b=KZc5mJZsKKIE6EgHmr3ZJdYQVcmyO4m0yKJ70rKumKAdaDv+4yf49PT/8sPByX1LFja+pLZhnFPK7B0LkG4vcTMoYeFzKSbfvJYjpODpaSJ/UK304O4p05/yVL6jPdO9EBAunHYV7s9lEAgi//yfagm088ZDf7M9ZfCX+i1SKV8=
+	t=1733780672; cv=none; b=q04Hg3CJpWEctXFZvvh+0CgN2NjvtAYHVMh0CC9RvfluDC/ilUuytIFXRJRWHv9Z9Q65gV6h9Egr/1697nhWI26/MXVeL1O2qgBLaJK6k+k6UnWGDEXpWSOpgMBej0S9fAxynHhl2Why93DdC/ieFIAWniL4zGz+T/F1GtPmjBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733780503; c=relaxed/simple;
-	bh=0l5TuFgRmp+GXL7yja/u+yNnuIVsDN3v47iEWRBBSlM=;
+	s=arc-20240116; t=1733780672; c=relaxed/simple;
+	bh=8Zwmc8+keEBf913N09eZ9odCEXLxK7GQu41YDQemRyY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MEj7Nsj9ukxlfUN5wRkG4jwJEpnjAtODfek/Fz3KU/bNeBC1FvOS/a9iK+Tu52xD/9eNHT9KCgEZ0Ge9cVNeAH6dC60dqrUdh1HtdEIDHoTMwfnTk+OEd8MgF/BY9ZjuQaxDpZtRCIsDW84ZjVErZuwD9TagRwSa+ST5r2rO1b0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gXexPc3X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BB1DC4CEDF;
-	Mon,  9 Dec 2024 21:41:42 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ClLaAOd1mQcX/YC63+jKHtqX6KLs5rxHCIUZGy1r0kRqaBdZCHjLhaKSiHEgkQu1hM6yybw0lWUZYTHFPRtwVOB8042k/WlWeN1D3+qyPzOlxR1wgitvhsTtHDEQBd9KlfK7EOQcmLg6Bt/bzkK4g1z0ehc8Qi8NvKe0gRZRBQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uKl21bNS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97857C4CED1;
+	Mon,  9 Dec 2024 21:44:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733780502;
-	bh=0l5TuFgRmp+GXL7yja/u+yNnuIVsDN3v47iEWRBBSlM=;
+	s=k20201202; t=1733780671;
+	bh=8Zwmc8+keEBf913N09eZ9odCEXLxK7GQu41YDQemRyY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gXexPc3XP1XtZyX1VChkh8sss4pevk74oPygzre2rhYDrVlab1FfSbXYvF7i+g5QA
-	 j7v3YxFGn6eFzzoZjcxJMQ5GXiR3mIjviERt2qT6pH4PFzGhAK5+EmmHEzZ5zvk3lt
-	 TpdnHf4uCh1pTT81kHUVTkO5ufBLkLYS2xbDm/KZ+2AtFDh5imDmana4ybKgl5E9gU
-	 zr+ClLZzGlNmO9dr2AiRdjhDq+qOniFTl1s/kxywduACvEJtF6Mh62QE6L81nePL0Y
-	 K7Ucsm8G4ZIOm/gqkRaySozUiigRA6naTTmtihvPj4N9NyJNioeko+G5wujNBMh+Zv
-	 a9hRFYdn8/Ikw==
-Date: Mon, 9 Dec 2024 13:41:41 -0800
+	b=uKl21bNSMP1/eVEyKuFtjN6dBStUdAl6LKqTZpVcDvRRUA7fSwUOobW3XLc9JTnCw
+	 qfq5HX5tqimJWInXhKTjuHEC6eF8DEs32kG+zbu8Zc159mF/yr+EGP8sYQXmrwQQvK
+	 gjnqc4sm7FgCyY/HON/ZLK2ytIo9DNu5gMeLL/otKs/lUb3UMlQmYK80qhV1b4iNbj
+	 PjvxRfc1FGCqq+QiQGnGKCbNgN/Gw98FuxtKBLyyXFdMAohCDP65BkHsL4dlne9Zlc
+	 /OdVMcOVMVar4qVANlSUytC6PDZ4Xc4mIpvS2ezZPVQlwGszjYcemRVnOGFSO0tIQ2
+	 9ygZTZSjEmyzQ==
+Date: Mon, 9 Dec 2024 13:44:30 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Leon Romanovsky
- <leonro@nvidia.com>, netdev@vger.kernel.org, Saeed Mahameed
- <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
- linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next V5 00/11] net/mlx5: ConnectX-8 SW Steering +
- Rate management on traffic classes
-Message-ID: <20241209134141.508bb5be@kernel.org>
-In-Reply-To: <d4890336-db2d-49f6-9502-6558cbaccefa@gmail.com>
-References: <20241204220931.254964-1-tariqt@nvidia.com>
-	<20241206181345.3eccfca4@kernel.org>
-	<d4890336-db2d-49f6-9502-6558cbaccefa@gmail.com>
+To: stsp <stsp2@yandex.ru>
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] tun: fix group permission check
+Message-ID: <20241209134430.5cdefa09@kernel.org>
+In-Reply-To: <062ab380-ee73-45ad-9519-e71bb3059c13@yandex.ru>
+References: <20241205073614.294773-1-stsp2@yandex.ru>
+	<20241207174400.6acdd88f@kernel.org>
+	<062ab380-ee73-45ad-9519-e71bb3059c13@yandex.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,21 +64,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 9 Dec 2024 21:32:11 +0200 Tariq Toukan wrote:
-> > Do you expect TC bw allocation to work on non-leaf nodes?
->
-> Yes. That's the point. It works.
+On Sun, 8 Dec 2024 09:53:40 +0300 stsp wrote:
+> > I personally put a --- line between SOB and the CCs.
+> > That way git am discards the CCs when patch is applied.
+> >  
+> I simply used the output of
+> get_maintainer.pl and copy/pasted
+> it directly to commit msg.
+> After doing so, git format-patch
+> would put --- after CCs.
+> How to do that properly?
 
-Let's level -- I'm not trying to be difficult, but you're defining
-uAPI with little to no documentation. "It works" is not going to cut it.
-
-> > How does this relate to the rate API which Paolo added? He was asked
-> > to build in a way to integrate with devlink now devlink is growing
-> > extra features again, which presumably the other API will also need.
-> > And the integration may turn out to be challenging.
-> 
-> AFAIU Paolo's work is not for shapers 'above' the network device level, 
-> i.e. groups.
-
-What's the difference between queue group and a VF?
+You can have multiple --- markers, you can insert your marker and let
+git format-patch add another.
 
