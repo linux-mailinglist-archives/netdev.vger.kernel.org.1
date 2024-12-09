@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-150241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4946F9E98AD
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:24:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 263DB9E98AF
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:24:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C34C52858EA
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:24:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66A812858B3
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 626751B0420;
-	Mon,  9 Dec 2024 14:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4FB61B0421;
+	Mon,  9 Dec 2024 14:24:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lRNsK8Hw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XsNtkKDN"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09641B0403
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 14:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1771B0403
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 14:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733754248; cv=none; b=eQmbJrnlL63IJlsFj2KX8UjZhk4rR6N4R/R6W0NFwULZzyIwqMgqq/nYazVH1W1JaEOw467TlNBfWi2S9OIa6Ew0n3MlTk/G+V9EHOLIJLcFjpY0aJaf3M1VowDZG+VZycjHHI8w8Yg6XwElMhTXvbvZdYCR8fpZI0pY2y2SvIU=
+	t=1733754252; cv=none; b=AFzj5RmyvrsASaV/KqSmR7XBq2eUjp+WiUz1fzJTTq3M6g3z2LDXgFA3sqQ8o7Dd1ymHMpVgevWVcmlhvJTZ7FLOwOvJs0cNZnVYtpEg4nqO4rHb0Zn8bW0nbS/4Cm4vr8eWZvqvGuNHW2zA2i9VnVWgBw1rOHI+QE11jAYm4K4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733754248; c=relaxed/simple;
-	bh=HEp7B9GnUR6cNuSHfTUAJBygYSYS2jZhGp2PsZHBn6E=;
+	s=arc-20240116; t=1733754252; c=relaxed/simple;
+	bh=KRAIHUVBwYgyWavcd2jXfBUALyYN6V96AscSgihvkSA=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=sLd5rOlah26vgBYXgSyhlzkIZ5u0OjoXDjMcigt/Gkxz0zcGa7SG7BJ02cYFu/lYBx6Y3mjW0QgYVbi1iGZ5QXT/SgOfTBTR6MKZgfmROxDpn102tDjc/IDE8qMiYXgePlN/J9pudtrGlHkFwJ+j/iS5jtnEcra3C6oND3m++LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lRNsK8Hw; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=awT1Vvnc5Ktm6wyChfl02xtylMhamiSdgaV25sfsQteJy5iLl3RZV0yS4BThideoquswY/oPEyzc4+viqJXWF0/p2NKH1JRLB5TQzKIuegfWK3xHQl1CSMJWJN2jYKGIi1K80S5OPN4PvjAdx1E3jHEVKutwhU3ysGsXr1K1nPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XsNtkKDN; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=tFHx7Hpa/Wx2HX4vYATVmQHXD/1eII6Z1rk5n+BqG/I=; b=lRNsK8HwUGOHUntiFYK5lxZmOj
-	MZuHz1DLvkQmy7WF/hrTwDdkAL4xjdbt3vTY9lys8WpJGJQltwZug1vca4JGuD4LPEAgE0PBXlIgg
-	gtQkXQyFQOr/GnlwVZ6kIEMW9/QcjTd2ZEow9NSkuyMSjcQQg+looG2l4zRzsbSyTrlRUeq2qPPsr
-	+ljvq2aKHxErgp26407PMpg0blWaSI2qAFYsxVvqAlcwZqZ2VLyGJWPaPGyhSI6F7pSl+6OO435wo
-	qv7iC3g7O38cs1kKBOh0uF//v5ryFM0z3PmZ5U4clY8mxXIqwIDF3xFwdh8w9HyjG/OpXKL5d3bh1
-	IScb5f7Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:55044 helo=rmk-PC.armlinux.org.uk)
+	bh=86MjfvWnJQi9fO+/XaHjcVwzFGECVkyvIJk5JlTA9Ng=; b=XsNtkKDNOTvbeJr7G3bPtnIFlU
+	NFjtQ+yAOGGuTM3WpG3Y5kiK5gj0PE0tTbdANpt1vS3gePlxZyOxqZi2r0XXqO9flURylofgm02NA
+	eARRxxRmATzzn7iL4ULOudJ+6YqNFz+DRvms8KOEYEef7kAVBVev/VFvm/1fz9Mg4BAouZGA9RIb1
+	vpXknjM5LpHf5hyASCsInd4v044duH7lH3VsPgdh6qB8Nhk2RkyvAl1uXrmpk26A2o4mc7UnVFdAt
+	1iHqrqvZ4E3KAHkmQQdFPGVRMOPXyqKa2gB30bKdjzKdYglAzNiv6LKOgioekq0SB/BBmN5yjnZoZ
+	V2/Z/LnQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:55058 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tKeg4-0000yE-1a;
-	Mon, 09 Dec 2024 14:24:00 +0000
+	id 1tKeg9-0000yS-1o;
+	Mon, 09 Dec 2024 14:24:06 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tKeg3-006SND-0e; Mon, 09 Dec 2024 14:23:59 +0000
+	id 1tKeg8-006SNJ-4Q; Mon, 09 Dec 2024 14:24:04 +0000
 In-Reply-To: <Z1b9J-FihzJ4A6aQ@shell.armlinux.org.uk>
 References: <Z1b9J-FihzJ4A6aQ@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -66,8 +66,7 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	UNGLinuxDriver@microchip.com
-Subject: [PATCH net-next 09/10] net: lan743x: use netdev in
- lan743x_phylink_mac_link_down()
+Subject: [PATCH net-next 10/10] net: lan743x: convert to phylink managed EEE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,30 +76,168 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tKeg3-006SND-0e@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tKeg8-006SNJ-4Q@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 09 Dec 2024 14:23:59 +0000
+Date: Mon, 09 Dec 2024 14:24:04 +0000
 
-Use the netdev that we already have in lan743x_phylink_mac_link_down().
+Convert lan743x to phylink managed EEE:
+- Set the lpi_capabilties.
+- Move the call to lan743x_mac_eee_enable() into the enable/disable
+  tx_lpi functions.
+- Ensure that EEEEN is clear during probe.
+- Move the setting of the LPI timer into mac_enable_tx_lpi().
+- Move reading of LPI timer to phylink initialisation to set the
+  default timer value.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/microchip/lan743x_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../net/ethernet/microchip/lan743x_ethtool.c  | 21 -----------
+ drivers/net/ethernet/microchip/lan743x_main.c | 37 ++++++++++++++++---
+ drivers/net/ethernet/microchip/lan743x_main.h |  1 -
+ 3 files changed, 31 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index 4dc5adcda6a3..8d7ad021ac70 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -3029,7 +3029,7 @@ static void lan743x_phylink_mac_link_down(struct phylink_config *config,
- 	struct net_device *netdev = to_net_dev(config->dev);
+diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+index 1a1cbd034eda..1459acfb1e61 100644
+--- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
++++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+@@ -1055,9 +1055,6 @@ static int lan743x_ethtool_get_eee(struct net_device *netdev,
+ {
  	struct lan743x_adapter *adapter = netdev_priv(netdev);
  
--	netif_tx_stop_all_queues(to_net_dev(config->dev));
-+	netif_tx_stop_all_queues(netdev);
- 	lan743x_mac_eee_enable(adapter, false);
+-	eee->tx_lpi_timer = lan743x_csr_read(adapter,
+-					     MAC_EEE_TX_LPI_REQ_DLY_CNT);
+-
+ 	return phylink_ethtool_get_eee(adapter->phylink, eee);
  }
  
+@@ -1065,24 +1062,6 @@ static int lan743x_ethtool_set_eee(struct net_device *netdev,
+ 				   struct ethtool_keee *eee)
+ {
+ 	struct lan743x_adapter *adapter = netdev_priv(netdev);
+-	u32 tx_lpi_timer;
+-
+-	tx_lpi_timer = lan743x_csr_read(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT);
+-	if (tx_lpi_timer != eee->tx_lpi_timer) {
+-		u32 mac_cr = lan743x_csr_read(adapter, MAC_CR);
+-
+-		/* Software should only change this field when Energy Efficient
+-		 * Ethernet Enable (EEEEN) is cleared.
+-		 * This function will trigger an autonegotiation restart and
+-		 * eee will be reenabled during link up if eee was negotiated.
+-		 */
+-		lan743x_mac_eee_enable(adapter, false);
+-		lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT,
+-				  eee->tx_lpi_timer);
+-
+-		if (mac_cr & MAC_CR_EEE_EN_)
+-			lan743x_mac_eee_enable(adapter, true);
+-	}
+ 
+ 	return phylink_ethtool_set_eee(adapter->phylink, eee);
+ }
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index 8d7ad021ac70..25d37a2cb4a6 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -2966,7 +2966,7 @@ static int lan743x_phylink_2500basex_config(struct lan743x_adapter *adapter)
+ 	return lan743x_pcs_power_reset(adapter);
+ }
+ 
+-void lan743x_mac_eee_enable(struct lan743x_adapter *adapter, bool enable)
++static void lan743x_mac_eee_enable(struct lan743x_adapter *adapter, bool enable)
+ {
+ 	u32 mac_cr;
+ 
+@@ -3027,10 +3027,8 @@ static void lan743x_phylink_mac_link_down(struct phylink_config *config,
+ 					  phy_interface_t interface)
+ {
+ 	struct net_device *netdev = to_net_dev(config->dev);
+-	struct lan743x_adapter *adapter = netdev_priv(netdev);
+ 
+ 	netif_tx_stop_all_queues(netdev);
+-	lan743x_mac_eee_enable(adapter, false);
+ }
+ 
+ static void lan743x_phylink_mac_link_up(struct phylink_config *config,
+@@ -3072,16 +3070,32 @@ static void lan743x_phylink_mac_link_up(struct phylink_config *config,
+ 					  cap & FLOW_CTRL_TX,
+ 					  cap & FLOW_CTRL_RX);
+ 
+-	if (phydev)
+-		lan743x_mac_eee_enable(adapter, phydev->enable_tx_lpi);
+-
+ 	netif_tx_wake_all_queues(netdev);
+ }
+ 
++static void mac_disable_tx_lpi(struct phylink_config *config)
++{
++	lan743x_mac_eee_enable(adapter, false);
++}
++
++static void mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
++			      bool tx_clk_stop)
++{
++	/* Software should only change this field when Energy Efficient
++	 * Ethernet Enable (EEEEN) is cleared. We ensure that by clearing
++	 * EEEEN during probe, and phylink itself guarantees that
++	 * mac_disable_tx_lpi() will have been previously called.
++	 */
++	lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT, timer);
++	lan743x_mac_eee_enable(adapter, true);
++}
++
+ static const struct phylink_mac_ops lan743x_phylink_mac_ops = {
+ 	.mac_config = lan743x_phylink_mac_config,
+ 	.mac_link_down = lan743x_phylink_mac_link_down,
+ 	.mac_link_up = lan743x_phylink_mac_link_up,
++	.mac_disable_tx_lpi = lan743x_mac_disable_tx_lpi,
++	.mac_enable_tx_lpi = lan743x_mac_enable_tx_lpi,
+ };
+ 
+ static int lan743x_phylink_create(struct lan743x_adapter *adapter)
+@@ -3095,6 +3109,10 @@ static int lan743x_phylink_create(struct lan743x_adapter *adapter)
+ 
+ 	adapter->phylink_config.mac_capabilities = MAC_ASYM_PAUSE |
+ 		MAC_SYM_PAUSE | MAC_10 | MAC_100 | MAC_1000FD;
++	adapter->phylink_config.lpi_capabilities = MAC_100FD | MAC_1000FD;
++	adapter->phylink_config.lpi_timer_max = U32_MAX;
++	adapter->phylink_config.lpi_timer_default =
++		lan743x_csr_read(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT);
+ 
+ 	lan743x_phy_interface_select(adapter);
+ 
+@@ -3120,6 +3138,10 @@ static int lan743x_phylink_create(struct lan743x_adapter *adapter)
+ 		phy_interface_set_rgmii(adapter->phylink_config.supported_interfaces);
+ 	}
+ 
++	memcpy(adapter->phylink_config.lpi_interfaces,
++	       adapter->phylink_config.supported_interfaces,
++	       sizeof(adapter->phylink_config.lpi_interfaces));
++
+ 	pl = phylink_create(&adapter->phylink_config, NULL,
+ 			    adapter->phy_interface, &lan743x_phylink_mac_ops);
+ 
+@@ -3517,6 +3539,9 @@ static int lan743x_hardware_init(struct lan743x_adapter *adapter,
+ 		spin_lock_init(&tx->ring_lock);
+ 	}
+ 
++	/* Ensure EEEEN is clear */
++	lan743x_mac_eee_enable(adapter, false);
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
+index 8ef897c114d3..7f73d66854be 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.h
++++ b/drivers/net/ethernet/microchip/lan743x_main.h
+@@ -1206,6 +1206,5 @@ void lan743x_hs_syslock_release(struct lan743x_adapter *adapter);
+ void lan743x_mac_flow_ctrl_set_enables(struct lan743x_adapter *adapter,
+ 				       bool tx_enable, bool rx_enable);
+ int lan743x_sgmii_read(struct lan743x_adapter *adapter, u8 mmd, u16 addr);
+-void lan743x_mac_eee_enable(struct lan743x_adapter *adapter, bool enable);
+ 
+ #endif /* _LAN743X_H */
 -- 
 2.30.2
 
