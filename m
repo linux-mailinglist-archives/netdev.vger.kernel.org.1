@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-150203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B5C9E975C
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:41:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7FF29E9762
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:42:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DBFE1881D70
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:41:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E7AA1645E9
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D774233146;
-	Mon,  9 Dec 2024 13:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED0E3596F;
+	Mon,  9 Dec 2024 13:41:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NxrhA0cc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LFEdpqk3"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7EB323313C
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 13:41:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C008233152
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 13:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733751666; cv=none; b=ndaSHPmzZEaLVbaFFMfQXOP3jkfWdPTQurEnp3kn2yZTzdiIKO4ixF/ApTcx6UsWVa7fGwTk+BWYrkkYnTR0Od/UAku2IXx3UjcbbVGZSlsZY+tKR/63FACXaqs63G86LOY3+ibPIImpRtZYFtqj5JPIy6XV/TOrjbEJm7rwTYw=
+	t=1733751712; cv=none; b=UolhzswavlRF1rcx04OleEwxQKDurnJ1+qdvE892UXEjE7vBbPvPTehjQhaothllAyMUES1LpI+aklF4YpYOo5cLylApMVW1DuNz0pPmgU6c2T3RsLtz4zC1tuYcf/XzJsD49EaJRhHC9MEPvF2kdjrDxm2vSwPY1WUqx4NcxJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733751666; c=relaxed/simple;
-	bh=jS1f+tL1BhmQjKQgaN8uoNHbjXF2eXImmnOtunLddcQ=;
+	s=arc-20240116; t=1733751712; c=relaxed/simple;
+	bh=bBELRjwXXxVkjJi1rupauKN5d2vHQSBmcRxpcEsfoPQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e6sBw37JIjtpPb6hu4oIcNUxZIPSOFEXjSuqsxBk5hBlM8Cq534ZpF/GbtUSY5y7c+alveTUVRlnIY7ufA1ryCaNYoPWn9Dd4NPxL8xaqwn0GZKn3HD69+fzxyCU0UXtn5vdrADoiwN8A2pgS/+CayVQVVVq+qqGwN9RmnkM+U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NxrhA0cc; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=G8JhhSMCbu/gOAvsPjikdY/Lu7YoiITQ5p/x90zXa6obIc+Ge+CGsRRvzP54sr9dqSLEDQ46j2+/O4pZ5kJfTVZqPoK/Ao60t1hbc7QITLp7/AHM68BeTFm6oniQXccNFXkm2/iRXzR4k0v84pLKJRw0gm4MkjTmVM9u0u73XlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LFEdpqk3; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,18 +36,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=av4IoxwwnMTetRXDEbyvF7gmDWy2jPDeyMe7ve9IPDs=; b=NxrhA0cco9ZaDK9vORgGjm4zhu
-	aKWE5YkFP6r8X5z2HC7NvD3q+ikFT2B7Lb1IyMNl8Mvop9Ll/RI83ZAQBv0c2Uq4jbtWO6qP2I84u
-	9gkdokpiKWHBJUKqHpPQ1Mk8JI+lNl5wsFLIJG15vb3+5qdqAm/Qb+T4wjxQ0rpHH2XQ=;
+	bh=MbRdvqh7mjeyDSPaKW0vbfhpGu4GFVcDzjz5R7/zWFc=; b=LFEdpqk3MCE/DexBBTARceR1vb
+	1DmSjgIKzRhUOUTAJJRUYX9CBs7znZiGpbAnZfIFLXh8QAATFTf+8/irzlHAqOetE+sc5mcwP3uHq
+	U+XyfE35sG2YcHuw0oR/KdN84yD7yz7OPJgKCtoNurluMSz8N6tFfwwMaki4nuakua2w=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tKe0N-00Ffnv-Mr; Mon, 09 Dec 2024 14:40:55 +0100
-Date: Mon, 9 Dec 2024 14:40:55 +0100
+	id 1tKe1E-00Ffon-PT; Mon, 09 Dec 2024 14:41:48 +0100
+Date: Mon, 9 Dec 2024 14:41:48 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Tian Xin <tianx@yunsilicon.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, weihg@yunsilicon.com
 Subject: Re: [PATCH 08/16] net-next/yunsilicon: Add ethernet interface
-Message-ID: <f4292a69-6956-4028-b5a2-c1b54893718f@lunn.ch>
+Message-ID: <3b9ec0a5-35b3-4c23-bbf2-c9e509a54da2@lunn.ch>
 References: <20241209071101.3392590-9-tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,64 +59,12 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20241209071101.3392590-9-tianx@yunsilicon.com>
 
-On Mon, Dec 09, 2024 at 03:10:53PM +0800, Tian Xin wrote:
-> From: Xin Tian <tianx@yunsilicon.com>
-> 
-> Build a basic netdevice driver
-> 
-> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
-> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
-> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
-> ---
->  drivers/net/ethernet/yunsilicon/Makefile      |   2 +-
->  .../ethernet/yunsilicon/xsc/common/xsc_core.h |   1 +
->  .../net/ethernet/yunsilicon/xsc/net/main.c    | 135 ++++++++++++++++++
->  .../net/ethernet/yunsilicon/xsc/net/xsc_eth.h |  16 +++
->  .../yunsilicon/xsc/net/xsc_eth_common.h       |  15 ++
->  5 files changed, 168 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/main.c
->  create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h
->  create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_common.h
-> 
-> diff --git a/drivers/net/ethernet/yunsilicon/Makefile b/drivers/net/ethernet/yunsilicon/Makefile
-> index 950fd2663..c1d3e3398 100644
-> --- a/drivers/net/ethernet/yunsilicon/Makefile
-> +++ b/drivers/net/ethernet/yunsilicon/Makefile
-> @@ -4,5 +4,5 @@
->  # Makefile for the Yunsilicon device drivers.
->  #
->  
-> -# obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc/net/
-> +obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc/net/
->  obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc/pci/
-> \ No newline at end of file
-> diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
-> index 88d4c5654..5d2b28e2e 100644
-> --- a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
-> +++ b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
-> @@ -498,6 +498,7 @@ struct xsc_core_device {
->  	struct pci_dev		*pdev;
->  	struct device		*device;
->  	struct xsc_priv		priv;
-> +	void			*netdev;
->  	void			*eth_priv;
->  	struct xsc_dev_resource	*dev_res;
->  
-> diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/main.c b/drivers/net/ethernet/yunsilicon/xsc/net/main.c
-> new file mode 100644
-> index 000000000..243ec7ced
-> --- /dev/null
-> +++ b/drivers/net/ethernet/yunsilicon/xsc/net/main.c
-> @@ -0,0 +1,135 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (C) 2021 - 2023, Shanghai Yunsilicon Technology Co., Ltd.
-> + * All rights reserved.
-> + */
+> +static void xsc_remove_eth_driver(void)
+> +{
+> +	pr_info("remove ethernet driver\n");
+> +	xsc_unregister_interface(&xsc_interface);
+> +}
 > +
-> +#include <linux/reboot.h>
-
-reboot.h in an ethernet driver? 
-
 > +static int xsc_net_reboot_event_handler(struct notifier_block *nb, unsigned long action, void *data)
 > +{
 > +	pr_info("xsc net driver recv %lu event\n", action);
@@ -130,12 +78,14 @@ reboot.h in an ethernet driver?
 > +	.next = NULL,
 > +	.priority = 1,
 > +};
+> +
+> +static __init int xsc_net_driver_init(void)
+> +{
+> +	int ret;
+> +
+> +	pr_info("add ethernet driver\n");
 
-This needs a comment explanation why this driver needs something
-special during reboot.
+Please don't spam the kernel log with all the pr_info() calls.
 
-    Andrew
-
----
-pw-bot: cr
+	Andrew
 
