@@ -1,141 +1,367 @@
-Return-Path: <netdev+bounces-150148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E68919E92B3
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:46:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60B499E92BC
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:50:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7800281FC2
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:46:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1F1A280C6B
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315D22163B1;
-	Mon,  9 Dec 2024 11:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E03A21B8E7;
+	Mon,  9 Dec 2024 11:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="UGQDfeG0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WNkQh9bl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5293C221D92
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 11:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349CA1F931;
+	Mon,  9 Dec 2024 11:50:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733744777; cv=none; b=LNimN0gcn7f53r+RvjGI7hKg5Kgcp/4boXzwfvpZpdXolnzRJ/6/kDI31rqQclTDyP3xwnqcAc8/ScXscl7Q1iZs3YfncQjD0+99UrmXgur9VAttaC1yeMiJDmGF71+aUozHhqxrOwrKc+j78cXxWVmz6yN59H856wZJrsp1bI0=
+	t=1733745015; cv=none; b=ShoQATTqoPwq5Kwf7PilBmH2ZrT08pOvSltRXJ4HM5fLh1+vowGTxVmIHZGVTZclXwMwI8y0Kuf1YhrRimZ4b0M23FsX6Ulph4iT2ky8QN8bEx/65sQR29JVgJM5TTwm9+oOE07NfmOLBgcNnIg2YfAfnJRt8/Z+VMbCdOALMkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733744777; c=relaxed/simple;
-	bh=YmVW5YtdsyVkEuLgntkxS2vrC8GUTUJo4JdlFsooOEE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lJknvzCnYDyQ/+ws84NmODQcGATs4pkpwNHSCEWfeE4deFR3iQIoXm5chgBTcyezJkCnL7O51guoNGneid1/M7zlw7HoBJgng6HWKJa7uzf2SjwuZuD+UL1aoO5DRv4zX87a6ks7Ra7386dZNZSJwhekUyv2nLs2poOd/s2ABA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=UGQDfeG0; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from katalix.com (unknown [IPv6:2a02:8010:6359:1:25fb:1d7a:7e2b:b2c8])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id 494EA7DCCF;
-	Mon,  9 Dec 2024 11:46:07 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1733744767; bh=YmVW5YtdsyVkEuLgntkxS2vrC8GUTUJo4JdlFsooOEE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:From;
-	z=From:=20James=20Chapman=20<jchapman@katalix.com>|To:=20netdev@vge
-	 r.kernel.org|Cc:=20davem@davemloft.net,=0D=0A=09edumazet@google.co
-	 m,=0D=0A=09kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=0D=0A=09hor
-	 ms@kernel.org,=0D=0A=09tparkin@katalix.com,=0D=0A=09aleksander.lob
-	 akin@intel.com,=0D=0A=09ricardo@marliere.net,=0D=0A=09mail@david-b
-	 auer.net,=0D=0A=09gnault@redhat.com|Subject:=20[PATCH=20net-next]=
-	 20l2tp:=20Handle=20eth=20stats=20using=20NETDEV_PCPU_STAT_DSTATS.|
-	 Date:=20Mon,=20=209=20Dec=202024=2011:46:07=20+0000|Message-Id:=20
-	 <20241209114607.2342405-1-jchapman@katalix.com>|MIME-Version:=201.
-	 0;
-	b=UGQDfeG0BJW+O8hcaIiIShZGjXQRzJ+o900cT/zgbv5xsMAx8jFaNWSdjlYi1yBc1
-	 dJzjKWCyJSYRwQwH9bNbS5ta9+ZiaDMBnsp57zd/NioHfOk5t4ztVk/cBAQHDETn+Q
-	 PaHRDtIr2/3kuFEL2vFKv+o3sezr2pRlis6VNvHxaV9fsFpsB7UnZXK73pzpc8l5He
-	 u75kUu9ndVgNdIF2DlqVGV2Qs6HLko8QIMkI1B4Krp+j7Re5xkU0+xr3cMF0jaZUh6
-	 c5sa1wa90M1rAcp1ullBcOEYMniO6fqkawb67hfPpAzWaz5D/Fpob1JUu7Wc0j3hWa
-	 1srTWVqwyyTBA==
-From: James Chapman <jchapman@katalix.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	tparkin@katalix.com,
-	aleksander.lobakin@intel.com,
-	ricardo@marliere.net,
-	mail@david-bauer.net,
-	gnault@redhat.com
-Subject: [PATCH net-next] l2tp: Handle eth stats using NETDEV_PCPU_STAT_DSTATS.
-Date: Mon,  9 Dec 2024 11:46:07 +0000
-Message-Id: <20241209114607.2342405-1-jchapman@katalix.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1733745015; c=relaxed/simple;
+	bh=14txjGjcIDe5vTITmnV4BciEgZYyRMnSH2sp/HSo8zo=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=blICJvbvMeh9UrgSCS6pCg1IYJMgavugqbJCUyjNsBKlbqZZliF6VsVvs7RibDW2xTX5t9tFmyKjgaQEOkcgFLqWtpHRsAxbJOb09pIUls5SDtwXoS4a3qiSjjRr+s0LweEZb704XFUpnXbidai6BcAzEeX29erye9QmZVEGE8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WNkQh9bl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD45DC4CEDE;
+	Mon,  9 Dec 2024 11:50:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733745014;
+	bh=14txjGjcIDe5vTITmnV4BciEgZYyRMnSH2sp/HSo8zo=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=WNkQh9bl8khGPw4ZIV31iqvj+YfC2TFaL6FY3iL13nzx4OGqkkqwQ264pog41kIpT
+	 RZLwWSwVy9qLDqWyEMhtJHdH63C9o4ltIiuwWpFAKB4QBP4TaCXiVpD/NJUTOSTM57
+	 Df/kAHJRKgFMb7g4vimJKjKMXi4fMnNCv+VTbwZ0nxJ9IVrtqd0wTzSpK2yF1SnUVm
+	 Mx9ZzqO1mvHk46a86jEJi3uObVRXvxmE4BksbmX2g2aMgH5zwElowzWSxMovnxMeUJ
+	 2ZoWdJWv2vakbVW3aw7q7k2OiS9Afqi++bQmZHBoF+Js+KwU9vEvN6+LBSE/oeWTjh
+	 6C4Zj8UyYRSmA==
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id D04581200069;
+	Mon,  9 Dec 2024 06:50:12 -0500 (EST)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-10.internal (MEProxy); Mon, 09 Dec 2024 06:50:12 -0500
+X-ME-Sender: <xms:dNlWZxXbpYRS3pQeF8lm27B2t8YQi_dVACaG4KXYGLriUBa9ng4HPQ>
+    <xme:dNlWZxlCxfLGXYVBk0JZESIdi_K5B7_GZimixRRiKeWwelKMYMNhFWcQaf5tKEInC
+    eVpQNJCTsZqY3CJ67k>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrjeeigddtjecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredttden
+    ucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugeskhgvrhhnvghlrd
+    horhhgqeenucggtffrrghtthgvrhhnpeejteeguefhffevgfehueetudevieeuueffhedv
+    vefhjedthfdutdethefgfeekleenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhguodhm
+    vghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduvdekhedujedtvdegqddvkeejtd
+    dtvdeigedqrghrnhgupeepkhgvrhhnvghlrdhorhhgsegrrhhnuggsrdguvgdpnhgspghr
+    tghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmse
+    gurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
+    vgdrtghomhdprhgtphhtthhopehlkhhpsehinhhtvghlrdgtohhmpdhrtghpthhtohepkh
+    husggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehstghhnhgvlhhlvgeslhhinhhu
+    gidrihgsmhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnh
+    drtghhpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthho
+    pehgvghrghesuhgtlhhinhhugidrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnh
+    gvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:dNlWZ9byyyvr1VREQ3LqbmiipgoRYg42YSi4OFtL77DbjKD6x0hNjw>
+    <xmx:dNlWZ0UVLpjUgyF5WVwZOUEduz02ufnWAziBVj1MdtjOeFuK8D4vbQ>
+    <xmx:dNlWZ7nQmuCGRwwMKjASklN-uGGEN76aervrMk1ESS7-4F-Er1J8Dw>
+    <xmx:dNlWZxex4xI2DcKJy8hNVekAs09L4Xs2qJFHv8mJbAmZSque9Rjfng>
+    <xmx:dNlWZ1Gi3kF-DIncmUSCFn7XjcmyJZLQ-ulc8JzZBaLjzyXPGr2bq76P>
+Feedback-ID: i36794607:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id A586E2220072; Mon,  9 Dec 2024 06:50:12 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Date: Mon, 09 Dec 2024 12:49:51 +0100
+From: "Arnd Bergmann" <arnd@kernel.org>
+To: "Niklas Schnelle" <schnelle@linux.ibm.com>,
+ "Andrew Lunn" <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Greg Ungerer" <gerg@uclinux.org>
+Cc: Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ "kernel test robot" <lkp@intel.com>
+Message-Id: <3ca55478-a5a9-442b-ae4f-a0a822f786d9@app.fastmail.com>
+In-Reply-To: <20241209-mcf8390_has_ioport-v1-1-f263d573e243@linux.ibm.com>
+References: <20241209-mcf8390_has_ioport-v1-1-f263d573e243@linux.ibm.com>
+Subject: Re: [PATCH] net: ethernet: 8390: Add HAS_IOPORT dependency for mcf8390
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-l2tp_eth uses the TSTATS infrastructure (dev_sw_netstats_*()) for RX
-and TX packet counters and DEV_STATS_INC for dropped counters.
+On Mon, Dec 9, 2024, at 11:28, Niklas Schnelle wrote:
+> Since commit 6f043e757445 ("asm-generic/io.h: Remove I/O port accessors
+> for HAS_IOPORT=n") the I/O port accessors are compile-time optional. As
+> m68k may or may not select HAS_IOPORT the COLDFIRE dependency is not
+> enough to guarantee I/O port access. Add an explicit HAS_IOPORT
+> dependency for mcf8390 to prevent a build failure as seen by the kernel
+> test robot.
+>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: 
+> https://lore.kernel.org/oe-kbuild-all/202412080511.ORVinTDs-lkp@intel.com/
+> Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> ---
 
-Consolidate that using the DSTATS infrastructure, which can
-handle both packet counters and packet drops. Statistics that don't
-fit DSTATS are still updated atomically with DEV_STATS_INC().
+Hi Niklas,
 
-This change is inspired by the introduction of DSTATS helpers and
-their use in other udp tunnel drivers:
-Link: https://lore.kernel.org/all/cover.1733313925.git.gnault@redhat.com/
+I think your patch is correct in the sense that the I/O port
+handling on m68k coldfire is only defined for the PCI bus
+the port operations is this driver have nowhere to go when
+PCI is disabled.
 
-Signed-off-by: James Chapman <jchapman@katalix.com>
----
- net/l2tp/l2tp_eth.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+However, I suspect what you actually found is a different
+preexisting bug, likely introduced in the addition of PCI
+support in commits 927c28c252dc ("m68k: setup PCI support
+code in io_no.h") and d97cf70af097 ("m68k: use asm-generic/io.h
+for non-MMU io access functions").
 
-diff --git a/net/l2tp/l2tp_eth.c b/net/l2tp/l2tp_eth.c
-index d692b902e120..e83691073496 100644
---- a/net/l2tp/l2tp_eth.c
-+++ b/net/l2tp/l2tp_eth.c
-@@ -73,9 +73,9 @@ static netdev_tx_t l2tp_eth_dev_xmit(struct sk_buff *skb, struct net_device *dev
- 	int ret = l2tp_xmit_skb(session, skb);
- 
- 	if (likely(ret == NET_XMIT_SUCCESS))
--		dev_sw_netstats_tx_add(dev, 1, len);
-+		dev_dstats_tx_add(dev, len);
- 	else
--		DEV_STATS_INC(dev, tx_dropped);
-+		dev_dstats_tx_dropped(dev);
- 
- 	return NETDEV_TX_OK;
+As far as I can tell, the driver predates this patch and
+presumably relied on inb/outb getting redirected to readb/writeb,
+using the port number as a pointer (without the 
+((void __iomem *) PCI_IO_PA) offset).
+
+Note that the dev->base_addr that gets passed into inb()/outb()
+is a physical address from a IORESOURCE_MEM resource,
+which is normally different from both 16-bit I/O port numbers
+and from virtual __iomem pointers, though on coldfire nommu
+the three traditionally could be used interchangeably.
+
+Adding Greg Ungerer to Cc, as he maintains the coldfire
+platform and wrote the driver.
+
+>  drivers/net/ethernet/8390/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/8390/Kconfig 
+> b/drivers/net/ethernet/8390/Kconfig
+> index 
+> 345f250781c6d9c3c6cbe5445250dc5987803b1a..f2ee99532187d133fdb02bc4b82c7fc4861f90af 
+> 100644
+> --- a/drivers/net/ethernet/8390/Kconfig
+> +++ b/drivers/net/ethernet/8390/Kconfig
+> @@ -87,7 +87,7 @@ config MAC8390
+> 
+>  config MCF8390
+>  	tristate "ColdFire NS8390 based Ethernet support"
+> -	depends on COLDFIRE
+> +	depends on COLDFIRE && HAS_IOPORT
+>  	select CRC32
+>  	help
+>  	  This driver is for Ethernet devices using an NS8390-compatible
+>
+> ---
+
+If I read this right, we would need something like the
+patch below, to actually pass the address through ioremap()
+and use readb/writeb on __iomem pointers.
+
+      Arnd
+
+diff --git a/drivers/net/ethernet/8390/mcf8390.c b/drivers/net/ethernet/8390/mcf8390.c
+index 94ff8364cdf0..0e2a93e9ef59 100644
+--- a/drivers/net/ethernet/8390/mcf8390.c
++++ b/drivers/net/ethernet/8390/mcf8390.c
+@@ -44,19 +44,19 @@ static const char version[] =
+  * Note that the data port accesses are treated a little differently, and
+  * always accessed via the insX/outsX functions.
+  */
+-static inline u32 NE_PTR(u32 addr)
++static inline void __iomem *NE_PTR(void __iomem *addr)
+ {
+-	if (addr & 1)
++	if ((uintptr_t)addr & 1)
+ 		return addr - 1 + NE2000_ODDOFFSET;
+ 	return addr;
  }
-@@ -84,7 +84,6 @@ static const struct net_device_ops l2tp_eth_netdev_ops = {
- 	.ndo_init		= l2tp_eth_dev_init,
- 	.ndo_uninit		= l2tp_eth_dev_uninit,
- 	.ndo_start_xmit		= l2tp_eth_dev_xmit,
--	.ndo_get_stats64	= dev_get_tstats64,
- 	.ndo_set_mac_address	= eth_mac_addr,
- };
  
-@@ -100,7 +99,7 @@ static void l2tp_eth_dev_setup(struct net_device *dev)
- 	dev->lltx		= true;
- 	dev->netdev_ops		= &l2tp_eth_netdev_ops;
- 	dev->needs_free_netdev	= true;
--	dev->pcpu_stat_type	= NETDEV_PCPU_STAT_TSTATS;
-+	dev->pcpu_stat_type	= NETDEV_PCPU_STAT_DSTATS;
+-static inline u32 NE_DATA_PTR(u32 addr)
++static inline void __iomem *NE_DATA_PTR(void __iomem *addr)
+ {
+ 	return addr;
  }
  
- static void l2tp_eth_dev_recv(struct l2tp_session *session, struct sk_buff *skb, int data_len)
-@@ -128,7 +127,7 @@ static void l2tp_eth_dev_recv(struct l2tp_session *session, struct sk_buff *skb,
- 		goto error_rcu;
+-void ei_outb(u32 val, u32 addr)
++void ei_outb(u32 val, void __iomem *addr)
+ {
+ 	NE2000_BYTE *rp;
  
- 	if (dev_forward_skb(dev, skb) == NET_RX_SUCCESS)
--		dev_sw_netstats_rx_add(dev, data_len);
-+		dev_dstats_rx_add(dev, data_len);
- 	else
- 		DEV_STATS_INC(dev, rx_errors);
+@@ -65,7 +65,7 @@ void ei_outb(u32 val, u32 addr)
+ }
  
--- 
-2.34.1
+ #define	ei_inb	ei_inb
+-u8 ei_inb(u32 addr)
++u8 ei_inb(void __iomem *addr)
+ {
+ 	NE2000_BYTE *rp, val;
+ 
+@@ -74,7 +74,7 @@ u8 ei_inb(u32 addr)
+ 	return (u8) (RSWAP(val) & 0xff);
+ }
+ 
+-void ei_insb(u32 addr, void *vbuf, int len)
++void ei_insb(void __iomem *addr, void *vbuf, int len)
+ {
+ 	NE2000_BYTE *rp, val;
+ 	u8 *buf;
+@@ -87,7 +87,7 @@ void ei_insb(u32 addr, void *vbuf, int len)
+ 	}
+ }
+ 
+-void ei_insw(u32 addr, void *vbuf, int len)
++void ei_insw(void __iomem *addr, void *vbuf, int len)
+ {
+ 	volatile u16 *rp;
+ 	u16 w, *buf;
+@@ -100,7 +100,7 @@ void ei_insw(u32 addr, void *vbuf, int len)
+ 	}
+ }
+ 
+-void ei_outsb(u32 addr, const void *vbuf, int len)
++void ei_outsb(void __iomem *addr, const void *vbuf, int len)
+ {
+ 	NE2000_BYTE *rp, val;
+ 	u8 *buf;
+@@ -113,7 +113,7 @@ void ei_outsb(u32 addr, const void *vbuf, int len)
+ 	}
+ }
+ 
+-void ei_outsw(u32 addr, const void *vbuf, int len)
++void ei_outsw(void __iomem *addr, const void *vbuf, int len)
+ {
+ 	volatile u16 *rp;
+ 	u16 w, *buf;
+@@ -128,12 +128,12 @@ void ei_outsw(u32 addr, const void *vbuf, int len)
+ 
+ #else /* !NE2000_ODDOFFSET */
+ 
+-#define	ei_inb		inb
+-#define	ei_outb		outb
+-#define	ei_insb		insb
+-#define	ei_insw		insw
+-#define	ei_outsb	outsb
+-#define	ei_outsw	outsw
++#define	ei_inb		readb
++#define	ei_outb		writeb
++#define	ei_insb		readsb
++#define	ei_insw		readsw
++#define	ei_outsb	writesb
++#define	ei_outsw	writesw
+ 
+ #endif /* !NE2000_ODDOFFSET */
+ 
+@@ -149,7 +149,7 @@ void ei_outsw(u32 addr, const void *vbuf, int len)
+ static void mcf8390_reset_8390(struct net_device *dev)
+ {
+ 	unsigned long reset_start_time = jiffies;
+-	u32 addr = dev->base_addr;
++	void __iomem *addr = ei_local->mem;
+ 	struct ei_device *ei_local = netdev_priv(dev);
+ 
+ 	netif_dbg(ei_local, hw, dev, "resetting the 8390 t=%ld...\n", jiffies);
+@@ -190,7 +190,7 @@ static void mcf8390_get_8390_hdr(struct net_device *dev,
+ 				 struct e8390_pkt_hdr *hdr, int ring_page)
+ {
+ 	struct ei_device *ei_local = netdev_priv(dev);
+-	u32 addr = dev->base_addr;
++	void __iomem *addr = ei_local->mem;
+ 
+ 	if (ei_local->dmaing) {
+ 		mcf8390_dmaing_err(__func__, dev, ei_local);
+@@ -225,7 +225,7 @@ static void mcf8390_block_input(struct net_device *dev, int count,
+ 				struct sk_buff *skb, int ring_offset)
+ {
+ 	struct ei_device *ei_local = netdev_priv(dev);
+-	u32 addr = dev->base_addr;
++	void __iomem *addr = ei_local->mem;
+ 	char *buf = skb->data;
+ 
+ 	if (ei_local->dmaing) {
+@@ -255,7 +255,7 @@ static void mcf8390_block_output(struct net_device *dev, int count,
+ 				 const int start_page)
+ {
+ 	struct ei_device *ei_local = netdev_priv(dev);
+-	u32 addr = dev->base_addr;
++	void __iomem *addr = ei_local->mem;
+ 	unsigned long dma_start;
+ 
+ 	/* Make sure we transfer all bytes if 16bit IO writes */
+@@ -318,7 +318,7 @@ static int mcf8390_init(struct net_device *dev)
+ 	};
+ 	struct ei_device *ei_local = netdev_priv(dev);
+ 	unsigned char SA_prom[32];
+-	u32 addr = dev->base_addr;
++	void __iomem *addr = ei_local->mem;
+ 	int start_page, stop_page;
+ 	int i, ret;
+ 
+@@ -403,7 +403,8 @@ static int mcf8390_init(struct net_device *dev)
+ static int mcf8390_probe(struct platform_device *pdev)
+ {
+ 	struct net_device *dev;
+-	struct resource *mem;
++	struct ei_device *ei_local;
++	void __iomem *mem;
+ 	resource_size_t msize;
+ 	int ret, irq;
+ 
+@@ -411,15 +412,11 @@ static int mcf8390_probe(struct platform_device *pdev)
+ 	if (irq < 0)
+ 		return -ENXIO;
+ 
+-	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (mem == NULL) {
+-		dev_err(&pdev->dev, "no memory address specified?\n");
++	mem = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(mem)) {
++		dev_err(&pdev->dev, "failed to map resource\n");
+ 		return -ENXIO;
+ 	}
+-	msize = resource_size(mem);
+-	if (!request_mem_region(mem->start, msize, pdev->name))
+-		return -EBUSY;
+-
+ 	dev = ____alloc_ei_netdev(0);
+ 	if (dev == NULL) {
+ 		release_mem_region(mem->start, msize);
+@@ -430,25 +427,20 @@ static int mcf8390_probe(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, dev);
+ 
+ 	dev->irq = irq;
+-	dev->base_addr = mem->start;
++	ei_local->mem = mem;
+ 
+ 	ret = mcf8390_init(dev);
+-	if (ret) {
+-		release_mem_region(mem->start, msize);
++	if (ret)
+ 		free_netdev(dev);
+-		return ret;
+-	}
+-	return 0;
++
++	return ret;
+ }
+ 
+ static void mcf8390_remove(struct platform_device *pdev)
+ {
+ 	struct net_device *dev = platform_get_drvdata(pdev);
+-	struct resource *mem;
+ 
+ 	unregister_netdev(dev);
+-	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	release_mem_region(mem->start, resource_size(mem));
+ 	free_netdev(dev);
+ }
+ 
 
 
