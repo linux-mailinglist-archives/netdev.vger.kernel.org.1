@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-150297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C52D89E9CFE
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:25:01 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F33A9E9D11
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:28:07 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86DE7166C86
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:24:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CA77280A6A
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5E214B97E;
-	Mon,  9 Dec 2024 17:24:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4D11547E2;
+	Mon,  9 Dec 2024 17:28:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fj2K67J0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BVqOsbVD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EB2153BEE;
-	Mon,  9 Dec 2024 17:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA101547E9;
+	Mon,  9 Dec 2024 17:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733765041; cv=none; b=e9v/8tNCt/seNxo7z1GQSUjq7oPTYTX8s02M1Vojbu0QD6ETZa768tfzXHEe/exU9lSPZShIILUQEx5QUVp9Hu9ELNJDdJW7aGmb7FEApieqHOXmJy/shNboxdW3hhQrnxaIO2zFTRa4Uv3t/1a4DWddMegJO/jt+6ka5e6ClIU=
+	t=1733765283; cv=none; b=V8Oo9lreD+XZQRsox7kXSJfoPtJn8dlpqFwCZ0HkPauZuCP5Lsfd1w4l7TM5gDEzDXZJQCnHOs3cHLpX7l6jeNIs5euWZfXWl6i47bsppXs23cqdqF0TlZ+FLpnfzJ6A1yayRGV2wG5O47ybKLAA4BiAQ18vtxnWNweyDb+LfIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733765041; c=relaxed/simple;
-	bh=Ran93Djr5Ll1LM1y75Npe22RSbCwnFOABEYu3gAJxgY=;
+	s=arc-20240116; t=1733765283; c=relaxed/simple;
+	bh=rQ+gIg4OnL1XhGumZ32Dc1LUBuYPJkBT3ameSxwhfvg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BL7rRexWWtf6Ex75mmj/C1U0hwo6IzmhhydtIVIoQlLiuQUTxGvxEB6aa1wrtWnLNemX7ejatAL2n2At4NKDVtNHrFFjgDQWmkcn2YYgOwm0v+xfkb5Ng5JnqWaTC0RTMN5kEmDa6Vd6h/Kie8Jd8qEQwlNkdQ0AIbxXSE8Jmc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fj2K67J0; arc=none smtp.client-ip=209.85.208.43
+	 In-Reply-To:Content-Type; b=tcsxWJ8XM5hm76mOmWk9gDhb2y66NPCj+1jivkPppxFHe88pPqn1jga4m6jGWYiioU0MHOBcMwEMNIwa/rIEpBm6CrEqn7V4yjVAHaHmEFJ6d8GSp0zgjLYNLzSHdQAakPVL4ZDUg461Dz89Dc8EfqrnwWfIyQ9jBDA9xUmHKcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BVqOsbVD; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d3e6f6cf69so3196857a12.1;
-        Mon, 09 Dec 2024 09:23:59 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d3ecae02beso2237150a12.0;
+        Mon, 09 Dec 2024 09:28:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733765038; x=1734369838; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1733765280; x=1734370080; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=QRvjM8wWy5ND+Jnmvo7xP/iefj/vWYMFntiDdt24YKU=;
-        b=Fj2K67J0tfqTfToclnFm9T8i42XUmJcNhASPMae40ZQyMCHnpk0faltDAEvJu73jJt
-         WZS+AY2nF9+EpfDR+Q2FEyMsgEAlinNJlf1FeJyK6wYu929Ry+x7Q1oie2J4Cc/f6jAW
-         5HY+lWdb/+PpGqjhRL+UWyuQYJnMKzfNsnBda47srzKEKRekatDHFcTk6PcczjE5pern
-         1geeegyFL0sgFVpap+UMa+opARo+M9jKooQp9LI8WrZDMfJjuCEYjrEZGg6t/CZFZD0S
-         dPumEWedePhW1JsirCkE7DHyFfmKTmBg403F3pJGeyamV1lB+cYrDm6r4/QvbVEvjxFC
-         QCOg==
+        bh=NlgSqwnkTaretACwWz3wRXEVa4cAS47esD0IgePYQOU=;
+        b=BVqOsbVDnqeDqJYNyU2JnUnUViLlfi+/JXZfJlvuaoqZediGE3X6UaKZ3aCHoWySm9
+         avkWPVCwqbOCoLa7WDZ2vxPzyXuNuKD8E2swbJ2TterXiVB+wp0mWgwH5wHpf2MzxiNL
+         DqyAn5n/B6+kj77Fchmmp0IGH3ElvYI3CzyGr188VP33zdw+IY7W7CSnjA7qaXItIO9D
+         0GDJogJBjUvHvuQgIDAZG6vgDUrdYIxU/kr3DwD4dH9JoK1zhdlDbrgbxV2fJQgkc+dn
+         SlNEQZx9qCRIw0XMsKKfJzsuDiGq6RnN665kVPyWLTSvjLxaIJGpfP36UcCUtdMh9yw3
+         Ci2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733765038; x=1734369838;
+        d=1e100.net; s=20230601; t=1733765280; x=1734370080;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QRvjM8wWy5ND+Jnmvo7xP/iefj/vWYMFntiDdt24YKU=;
-        b=NzUnHxyVzuuMwoOXJt5NEHSxJjycs2YJIzEaEaq5SiOO0i3mKqkHkp98JV4yuHobY3
-         pseVkRBr3aoJ69Ux4FLdP4D5ZVuh/lVbwqYWpXpnSmfhWQ1Adfc9UD5GWRdYEZHv7vi9
-         38TexpN7iKLzDfPMxUGUSwR118sMmqGiN8bIaahr2ySl8GGYlOC9r9L+xjFNAemsjtbW
-         caYjJgvGpJQCb5UektOh2R7uQm5Sv7uqi4C3oKpnGwDzmGi8DvYA0HD0qXrNSPGQ5uf0
-         4O1lh0lNbaMFi3sBH0JdGB+yWtvViGpChvSak3br0wQIiPLfBqcVQUwjvBZvsQ4fNNRl
-         S6Vg==
-X-Forwarded-Encrypted: i=1; AJvYcCX78gTpbumg5BYhsXeM1x83LvEcv7kK4tqdGXwQh/zdDQ3xLmLCXhK3EwxPhQgHLUwr4CDx08s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwL6ofekjeJIwgRKvlfdHAu8G8m9YzJk/FeK3ZGxi5q9dC+jzuK
-	LfzCaamXIz0bEeX1sb3gpUtvnTxCtErnNPBcO+HfZqEVOhqJIQfQ7m/76A==
-X-Gm-Gg: ASbGncs1A8v5Lk4e3pOv44tGjhxZB3a56TgZ5Oy6FYdJ7RiV0cAGihG4DUUJPz+Pwtq
-	R02jatNsceIFlrndNA4nafy0BMPRDCsJx9WuBlmp4ceNzTETwfmxnCCf0guIrgQc7E+tGV2esBs
-	02d3ZSgEAEJwvU270r8/PZMG+laoI/ubK0ZsZnIrRuWodC8vjejYZ4vWaaKot44CaH1JFI2nzEi
-	omzOEVmr8DE3nSL9CHJHV0lB25in2lmQWJwdnlRH47dfYwY8CXD62qQkm6X
-X-Google-Smtp-Source: AGHT+IEAKQYSVmLDkiUbDaGhV99DvpUQ5J4Vgthg8dw/ZKNxyrXjrg4XHBUkXJGXe+ayPXvnY10V5Q==
-X-Received: by 2002:a17:907:7708:b0:aa6:8fed:7c14 with SMTP id a640c23a62f3a-aa68fed7dcfmr323134066b.17.1733765037931;
-        Mon, 09 Dec 2024 09:23:57 -0800 (PST)
+        bh=NlgSqwnkTaretACwWz3wRXEVa4cAS47esD0IgePYQOU=;
+        b=kMC/uckNXL4ylui8pFp124nP1iqOIX5tea0EA/m9f9pKqRKarv8hzrlCW+qyR5AJB0
+         +nlHRl8dRo/OxhFWALXN6tQu2K6DROd7fGt2j9VDgMF3Wm4yjlflWHc2ws4QexG/hasK
+         4BSZzDu68AD6Gs+6bvuibHTMEt0VFZseS9kfGPFho36JhMs1tSMXjRvJy65obOmM+q/D
+         5Ybpw9kwiSqGWkGfny2FzxDY+79ujkwrBjNcW6hdfR8R/UR7EjdtH6Gr7tHsqBCmZLS/
+         mgfip4z2hYg92bFVJSlRWpLPEOxJBxLzFuCytn6qP8v/VAGIM2A18ldjXt4H/80K1pX7
+         ATCg==
+X-Forwarded-Encrypted: i=1; AJvYcCWKM1FFuRXY3Eu3vQSkE7Rfr03dKcp9H2woxRCHLq2nwuXZreaCdAItKnY2wEYbiIsVsCo61Sw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWfk1o7bOnFeKAvIpS6a2qC3nBnfK1BeulmUOOjNz0XXa2+UHL
+	wL0MutoxOd5WBXU9RRmM7OXvcwVJQypg9jyMCfyPqrF+92u4cBLd
+X-Gm-Gg: ASbGnct6arA7jPyIpPRveNHndesP9JDKBPg9Y44bLx/JMnWK8rQyOB69NB3Ee5FvrL7
+	GIRfdEHNQqOO6WZl6zACs+YAaAP4g3OxmvrxQdYU7QtPTZ6Y8JbDInvowJBBrieYwPvlYqZ88Sr
+	x0ZXIZDZ2qvAd5Baax61Bn9zClj7SWtMiGxtP2Tyu21Q9ue3t1D5Dp+9gXQgLi1G1dgO2313Mwh
+	HhgMljIRAAYGwEZ+S3ITpm+SHRChbU/FvuLxu4snANi9bYexst3R1MhD/Tk
+X-Google-Smtp-Source: AGHT+IEm1qVfYh8vfMjIA+U3hFJr5O60oJE47O22pw35Wp87fIV7yEGbU/zhZRZQkG8xKdT0nmvGzg==
+X-Received: by 2002:a05:6402:321a:b0:5d2:7456:9812 with SMTP id 4fb4d7f45d1cf-5d3be7f0584mr12958963a12.22.1733765279489;
+        Mon, 09 Dec 2024 09:27:59 -0800 (PST)
 Received: from [192.168.42.75] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa67117df90sm309997666b.170.2024.12.09.09.23.57
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d149a48ab4sm6388519a12.27.2024.12.09.09.27.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Dec 2024 09:23:57 -0800 (PST)
-Message-ID: <8a17ffe7-b2ce-4316-8243-512dd40522cc@gmail.com>
-Date: Mon, 9 Dec 2024 17:24:52 +0000
+        Mon, 09 Dec 2024 09:27:59 -0800 (PST)
+Message-ID: <6fdcd8b4-00d8-4ad7-a9bb-7b208ea54e9d@gmail.com>
+Date: Mon, 9 Dec 2024 17:28:54 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,8 +80,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 05/17] net: page_pool: add ->scrub mem
- provider callback
+Subject: Re: [PATCH net-next v8 07/17] net: page_pool: introduce
+ page_pool_mp_return_in_cache
 To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
 Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
  Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
@@ -91,48 +91,39 @@ Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
  Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
  Pedro Tammela <pctammela@mojatatu.com>
 References: <20241204172204.4180482-1-dw@davidwei.uk>
- <20241204172204.4180482-6-dw@davidwei.uk>
- <CAHS8izPQQwpHTwJqTL+6cvo04sC1WEhcY7WuA_Umquk4oRCGag@mail.gmail.com>
+ <20241204172204.4180482-8-dw@davidwei.uk>
+ <CAHS8izMYOtU-QoCggE+7h9V+Rtxf-m2rBMHHdJtMxSQku-b1Xw@mail.gmail.com>
 Content-Language: en-US
 From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izPQQwpHTwJqTL+6cvo04sC1WEhcY7WuA_Umquk4oRCGag@mail.gmail.com>
+In-Reply-To: <CAHS8izMYOtU-QoCggE+7h9V+Rtxf-m2rBMHHdJtMxSQku-b1Xw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 12/9/24 17:08, Mina Almasry wrote:
+On 12/9/24 17:15, Mina Almasry wrote:
 > On Wed, Dec 4, 2024 at 9:22 AM David Wei <dw@davidwei.uk> wrote:
->>
->> From: Pavel Begunkov <asml.silence@gmail.com>
->>
->> Some page pool memory providers like io_uring need to catch the point
->> when the page pool is asked to be destroyed. ->destroy is not enough
->> because it relies on the page pool to wait for its buffers first, but
->> for that to happen a provider might need to react, e.g. to collect all
->> buffers that are currently given to the user space.
->>
->> Add a new provider's scrub callback serving the purpose and called off
->> the pp's generic (cold) scrubbing path, i.e. page_pool_scrub().
->>
->> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
->> Signed-off-by: David Wei <dw@davidwei.uk>
+...
+>> +/*
+>> + * page_pool_mp_return_in_cache() - return a netmem to the allocation cache.
+>> + * @pool:      pool from which pages were allocated
+>> + * @netmem:    netmem to return
+>> + *
+>> + * Return already allocated and accounted netmem to the page pool's allocation
+>> + * cache. The function doesn't provide synchronisation and must only be called
+>> + * from the napi context.
+>> + */
+>> +void page_pool_mp_return_in_cache(struct page_pool *pool, netmem_ref netmem)
+>> +{
+>> +       if (WARN_ON_ONCE(pool->alloc.count >= PP_ALLOC_CACHE_REFILL))
+>> +               return;
+>> +
 > 
-> I think after numerous previous discussions on this op, I guess I
-> finally see the point.
-> 
-> AFAIU on destruction tho io_uring instance will destroy the page_pool,
-> but we need to drop the user reference in the memory region. So the
-> io_uring instance will destroy the pool, then the scrub callback tells
-> io_uring that the pool is being destroyed, which drops the user
-> references.
-> 
-> I would have preferred if io_uring drops the user references before
-> destroying the pool, which I think would have accomplished the same
-> thing without adding a memory provider callback that is a bit specific
-> to this use case, but I guess it's all the same.
+> Really the caller needs to check this, and if the caller is checking
+> it then this additional check is unnecessarily defensive I would say.
+> But not really a big deal. I think I gave this feedback on the
+> previous iteration.
 
-For unrelated reasons I moved it to a later stage to io_uring code,
-so pool->mp_ops->scrub is no more. v8 is just weird, I think David
-sent an old branch because Jakub asked or so.
+I think I already killed it. Nevertheless, that's true, the caller
+has to check it, which is why it's a warning.
 
 > Reviewed-by: Mina Almasry <almasrymina@google.com>
 
