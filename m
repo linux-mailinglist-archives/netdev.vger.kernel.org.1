@@ -1,69 +1,62 @@
-Return-Path: <netdev+bounces-150420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F3FB9EA2F4
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:40:36 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F5FB9EA2FD
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:43:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FF2A16675D
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:40:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CAB62829E3
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4342224899;
-	Mon,  9 Dec 2024 23:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510BC22489A;
+	Mon,  9 Dec 2024 23:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kztj4lA8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BxdAJsiY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF0119B3EE;
-	Mon,  9 Dec 2024 23:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAE719B3EE;
+	Mon,  9 Dec 2024 23:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733787632; cv=none; b=CJcsU1aJcDOgUmLw3LrYQI0X1a/TIK5UQBlNSkNNjLTlX84FNzaDVCaTfyUyp9r0r5ICrPIVM0a4ZVZRhz1C81/9bo5xZC2rd1+c7z60YqK1vINNFZNsYyX4eAOJv5FNq+iLopBFDklhdEPPnztQD+eufablqNJ30IYsd/rc7+s=
+	t=1733787793; cv=none; b=dco4hVO6SkkURZ+XmSLW/Xoq5YqQ7wJp/NPraGsmyKWGeOuaexvsT+sv9XdU66G4BGrXAYoHOeiOmefJ1B210acm+mnZYZWbmnaB3qp9qDcyM6MWh+nf4MEHJ5MUjjxYO9X+JYRIapDB8QjzKX/K8NqR6/9nN/gwhpiLJZpWEoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733787632; c=relaxed/simple;
-	bh=BA3duGjUYPvGt2f4+K5L5RH1loqbyxLxJMRIpyaILmo=;
+	s=arc-20240116; t=1733787793; c=relaxed/simple;
+	bh=2wzS+Olg+lmZyD9EpYRER7c4q8VA96UI6j8BtIqUWas=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oTMwlQweUMA95E/h/8e7fl2+TcrsfVENAKzmIBpgj+cm7vRrVJhlLV3LhGwKu1DIMugjNKiIsHGqMq5usmmBKGRBfFNLbN4LF1k2WdjxwxkFAK24+WLP3cdZkhgfeX0NVQRbpDiHZtoNBUrLGI+z6r4tNMOZrq3uLP0hQfTmm6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kztj4lA8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37CABC4CED1;
-	Mon,  9 Dec 2024 23:40:31 +0000 (UTC)
+	 MIME-Version:Content-Type; b=dWmxBxbJa7pRoKs7umq9/unH4/Hr4ZEmRTDpBOZ2lhFHrpYXnARP8rZEitITFkbJF0cwEZ2JSRJms8/bwbF9alQ0PGxbolnQEc6HIy5AyEcpY/vERb4fDLymMlhJwvCYMizEmJ4QRs43GCZ2/RYpotVdZ3f/IdIiUhZSbVf6JsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BxdAJsiY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9B60C4CED1;
+	Mon,  9 Dec 2024 23:43:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733787632;
-	bh=BA3duGjUYPvGt2f4+K5L5RH1loqbyxLxJMRIpyaILmo=;
+	s=k20201202; t=1733787792;
+	bh=2wzS+Olg+lmZyD9EpYRER7c4q8VA96UI6j8BtIqUWas=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Kztj4lA8lDAmSnUT5tJAv2cjEFrlBhTk0sI+1anlxEucU7S3ppmCiiWp5j4UokfY5
-	 m2BSlb5gR8sB7vJTcTjbsusvlp3qeZySOwq+xumA8ySDM1kPDzfUE3UC28tuXfdOyu
-	 h9nNK1YCihA7AkI/xYMpeyyJxxf7458SLNL4wVNwRdACYpZ7SqOup4EI6ovshHP8ue
-	 bUE/M59+4CE35vCbPFYegUUYE71neBMWZK/ac0t4DUOfz6rZf1CEdOYHKAGhr1VfCj
-	 6CxapaXrpuDI4Lupv+e3t3V242MpkykZGjpXu5omW31b4jYWhtn/ZVMAlPgZ+UFFBx
-	 bp7H1SQcIDumw==
-Date: Mon, 9 Dec 2024 15:40:30 -0800
+	b=BxdAJsiYuXIxXF1gkwuev2otojh8GZ3JHHplWU1GLyeHnaLnLWyMJQG4pCOhGQg9f
+	 4TdWP2W9hgFQf5W+D44e6op35MtC1tnEeu82ChavQaj/dxCBGK/wAXfWlUtmx47qb0
+	 SKDijhyGIYUkrcznMNJEAN4MSz7BfirwUGER6y4G4U36imEWZNQVJceWzO7BMxxcPM
+	 tV+Z/LuEHB+pGfmEhAUXIZikEoJxXSGkRWVnCaJUd+FXpUbi9MEzuAOrxVlceNd0fJ
+	 r9zHQX0hjWxLuC1LyRViYSbGsOgfxC9WwsfHGpwqrEq1pbVZtSQoTGGDloRoXtJUn9
+	 81PhNQP/Py79A==
+Date: Mon, 9 Dec 2024 15:43:10 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Vladimir
- Oltean <olteanv@gmail.com>, Srinivas Kandagatla
- <srinivas.kandagatla@linaro.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Matthias Brugger
- <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, upstream@airoha.com
-Subject: Re: [net-next PATCH v11 5/9] mfd: an8855: Add support for Airoha
- AN8855 Switch MFD
-Message-ID: <20241209154030.0f34d5dd@kernel.org>
-In-Reply-To: <67577bd7.7b0a0220.1ce6b5.fe93@mx.google.com>
-References: <20241209134459.27110-1-ansuelsmth@gmail.com>
-	<20241209134459.27110-6-ansuelsmth@gmail.com>
-	<20241209151813.106eda03@kernel.org>
-	<67577bd7.7b0a0220.1ce6b5.fe93@mx.google.com>
+To: Wenjia Zhang <wenjia@linux.ibm.com>
+Cc: Guangguan Wang <guangguan.wang@linux.alibaba.com>, pasic@linux.ibm.com,
+ jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, linux-rdma@vger.kernel.org,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Dust Li <dust.li@linux.alibaba.com>
+Subject: Re: [PATCH net-next v3 2/2] net/smc: support ipv4 mapped ipv6 addr
+ client for smc-r v2
+Message-ID: <20241209154310.49a092da@kernel.org>
+In-Reply-To: <1fc33d2e-83c1-4651-b761-27188d22fba0@linux.ibm.com>
+References: <20241209130649.34591-1-guangguan.wang@linux.alibaba.com>
+	<20241209130649.34591-3-guangguan.wang@linux.alibaba.com>
+	<1fc33d2e-83c1-4651-b761-27188d22fba0@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,13 +66,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 10 Dec 2024 00:22:59 +0100 Christian Marangi wrote:
-> Also hope we won't have to request multiple stable tag for this multi
-> subsystem patch. Any hint on that?
+On Mon, 9 Dec 2024 15:10:56 +0100 Wenjia Zhang wrote:
+> @Jakub, could you please give us some more time to verify the issue 
+> mentioned above?
 
-Sorry I haven't payed much attention to earlier discussions.
-Why multiple stable tags? AFAICT all trees will need patches 
-4 and 5, so we can put that on a stable tag / branch, the rest 
-can go directly into respective trees (assuming the table tag
-has been merged in). No?
+No problem. I'll marked it as Awaiting upstream, please repost when
+ready. This is our usual process when maintainers of a subsystem need
+more time or need to do validation before we merge.
+-- 
+pw-bot: au
 
