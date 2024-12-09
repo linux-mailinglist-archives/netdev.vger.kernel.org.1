@@ -1,133 +1,143 @@
-Return-Path: <netdev+bounces-150298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F33A9E9D11
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:28:07 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AB479E9D2E
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:40:04 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CA77280A6A
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:28:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63DAB1886DAC
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4D11547E2;
-	Mon,  9 Dec 2024 17:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A5C14D439;
+	Mon,  9 Dec 2024 17:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BVqOsbVD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dYOa4n3x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA101547E9;
-	Mon,  9 Dec 2024 17:28:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B72A233151;
+	Mon,  9 Dec 2024 17:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733765283; cv=none; b=V8Oo9lreD+XZQRsox7kXSJfoPtJn8dlpqFwCZ0HkPauZuCP5Lsfd1w4l7TM5gDEzDXZJQCnHOs3cHLpX7l6jeNIs5euWZfXWl6i47bsppXs23cqdqF0TlZ+FLpnfzJ6A1yayRGV2wG5O47ybKLAA4BiAQ18vtxnWNweyDb+LfIk=
+	t=1733765996; cv=none; b=alc8Gc3ZmIexJybEwOOUFTl9rYsnhD79FttGxPKqWkZpQbTLh+nLJ1hYO4Pqc6mgp3V/WAlJEHIHeAJxgfCADUeV2DI7jzjqEJ+s7dy/F36kcchg5U85oKDPKcoNQ7PX2/bGDofxcz6ByVh0LyNDqDfLJl4xrbOXLEhmw5nvquY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733765283; c=relaxed/simple;
-	bh=rQ+gIg4OnL1XhGumZ32Dc1LUBuYPJkBT3ameSxwhfvg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tcsxWJ8XM5hm76mOmWk9gDhb2y66NPCj+1jivkPppxFHe88pPqn1jga4m6jGWYiioU0MHOBcMwEMNIwa/rIEpBm6CrEqn7V4yjVAHaHmEFJ6d8GSp0zgjLYNLzSHdQAakPVL4ZDUg461Dz89Dc8EfqrnwWfIyQ9jBDA9xUmHKcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BVqOsbVD; arc=none smtp.client-ip=209.85.208.41
+	s=arc-20240116; t=1733765996; c=relaxed/simple;
+	bh=JUO3i9BiZsfv6aLYbkNAHlyPEoTrCJQmBloQh+fyl7o=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qm/9Oq4svKc2fYfzAdrPrxOO9kqwALhX38nIRrHCyM3NXhjGJ6DvTgWN+S8EnCVz8TCEJvlz331grGl+CNIUkPKWV7z3TwNfvh1lzLeCCMJMjdkGuoymRIu31pyc67IdyGDnOFDpeWIPge2y3XsbsKhDdIeMPMDUvKoinfbuIJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dYOa4n3x; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d3ecae02beso2237150a12.0;
-        Mon, 09 Dec 2024 09:28:01 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2164b662090so12155565ad.1;
+        Mon, 09 Dec 2024 09:39:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733765280; x=1734370080; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NlgSqwnkTaretACwWz3wRXEVa4cAS47esD0IgePYQOU=;
-        b=BVqOsbVDnqeDqJYNyU2JnUnUViLlfi+/JXZfJlvuaoqZediGE3X6UaKZ3aCHoWySm9
-         avkWPVCwqbOCoLa7WDZ2vxPzyXuNuKD8E2swbJ2TterXiVB+wp0mWgwH5wHpf2MzxiNL
-         DqyAn5n/B6+kj77Fchmmp0IGH3ElvYI3CzyGr188VP33zdw+IY7W7CSnjA7qaXItIO9D
-         0GDJogJBjUvHvuQgIDAZG6vgDUrdYIxU/kr3DwD4dH9JoK1zhdlDbrgbxV2fJQgkc+dn
-         SlNEQZx9qCRIw0XMsKKfJzsuDiGq6RnN665kVPyWLTSvjLxaIJGpfP36UcCUtdMh9yw3
-         Ci2w==
+        d=gmail.com; s=20230601; t=1733765995; x=1734370795; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=23+EQ26ggORVwj2Hkygu02oSXs5qJRg7jADqCgmz4uQ=;
+        b=dYOa4n3xTPds2uK+JPyuFIAJdIGW2C+HN5e3ed3u0j8Nk678V8V6+nG/D4wFAwF5gN
+         shYPw6kkPe/ISkabPOhAFbYFFLSsjhcdgvNE/sNLDh43MqsqleFZ6ordEWi1Z7ubGhR/
+         h/Mt2TXETXg7QdOWNDTLi/nEOO1KCRWn/qkDhIdCbl61H/YYwSesYpseBv4foGPYqJuQ
+         /eYW1/SeIvvZJM2JRa4hUdY1DY21C+1vkIfAQDAPwxKWqVgB3faEIusfuWmt89b/cy9c
+         aGSa1HK/6dWb3t6w5TJtzCCXbkqe3+KUe0fNvNQVaKe0A1RqKrsJUeM875dtDJH+RDbr
+         pRsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733765280; x=1734370080;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NlgSqwnkTaretACwWz3wRXEVa4cAS47esD0IgePYQOU=;
-        b=kMC/uckNXL4ylui8pFp124nP1iqOIX5tea0EA/m9f9pKqRKarv8hzrlCW+qyR5AJB0
-         +nlHRl8dRo/OxhFWALXN6tQu2K6DROd7fGt2j9VDgMF3Wm4yjlflWHc2ws4QexG/hasK
-         4BSZzDu68AD6Gs+6bvuibHTMEt0VFZseS9kfGPFho36JhMs1tSMXjRvJy65obOmM+q/D
-         5Ybpw9kwiSqGWkGfny2FzxDY+79ujkwrBjNcW6hdfR8R/UR7EjdtH6Gr7tHsqBCmZLS/
-         mgfip4z2hYg92bFVJSlRWpLPEOxJBxLzFuCytn6qP8v/VAGIM2A18ldjXt4H/80K1pX7
-         ATCg==
-X-Forwarded-Encrypted: i=1; AJvYcCWKM1FFuRXY3Eu3vQSkE7Rfr03dKcp9H2woxRCHLq2nwuXZreaCdAItKnY2wEYbiIsVsCo61Sw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWfk1o7bOnFeKAvIpS6a2qC3nBnfK1BeulmUOOjNz0XXa2+UHL
-	wL0MutoxOd5WBXU9RRmM7OXvcwVJQypg9jyMCfyPqrF+92u4cBLd
-X-Gm-Gg: ASbGnct6arA7jPyIpPRveNHndesP9JDKBPg9Y44bLx/JMnWK8rQyOB69NB3Ee5FvrL7
-	GIRfdEHNQqOO6WZl6zACs+YAaAP4g3OxmvrxQdYU7QtPTZ6Y8JbDInvowJBBrieYwPvlYqZ88Sr
-	x0ZXIZDZ2qvAd5Baax61Bn9zClj7SWtMiGxtP2Tyu21Q9ue3t1D5Dp+9gXQgLi1G1dgO2313Mwh
-	HhgMljIRAAYGwEZ+S3ITpm+SHRChbU/FvuLxu4snANi9bYexst3R1MhD/Tk
-X-Google-Smtp-Source: AGHT+IEm1qVfYh8vfMjIA+U3hFJr5O60oJE47O22pw35Wp87fIV7yEGbU/zhZRZQkG8xKdT0nmvGzg==
-X-Received: by 2002:a05:6402:321a:b0:5d2:7456:9812 with SMTP id 4fb4d7f45d1cf-5d3be7f0584mr12958963a12.22.1733765279489;
-        Mon, 09 Dec 2024 09:27:59 -0800 (PST)
-Received: from [192.168.42.75] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d149a48ab4sm6388519a12.27.2024.12.09.09.27.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Dec 2024 09:27:59 -0800 (PST)
-Message-ID: <6fdcd8b4-00d8-4ad7-a9bb-7b208ea54e9d@gmail.com>
-Date: Mon, 9 Dec 2024 17:28:54 +0000
+        d=1e100.net; s=20230601; t=1733765995; x=1734370795;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=23+EQ26ggORVwj2Hkygu02oSXs5qJRg7jADqCgmz4uQ=;
+        b=lKLN+eXI6zGyAWxx/dsz54LoX4tFKlldzeA4QVKKvUl9xGgaOyZjLZn9dAi+2fIZx0
+         VawqjvgLeBMmAUTIC30c7moWPh/bPK6p7qamO2a2ZTNIgBZ2e+GEzu6AZw2pR5jK3cI3
+         +Mrh0icmlxIdAz64cUJczgyNSwLr28HylYXDDIdCtU/u4I3hPORbswt3T5fkIX02CQ7d
+         zCuBxukH1GGBBZfGQMbx46/SXobJ6RUmIu7iwTUBEP0pZ2NXZ/0jc1KWWzNZVf3tFsFV
+         j9h39hv0zHEKnKBU8KssDIMJlTDDHLtnE8FFqbnH4lOfYgt7fs/dSSdxjN4JV2ROZECg
+         7u9g==
+X-Forwarded-Encrypted: i=1; AJvYcCUhTI/JcAZMsLNrpuxt5Ae60AKOz/5d7LqnUAN8yyVY/6YeY+CBvqPD3oSHRQGREQUu6As5iOA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwddKkarRe6SDay8cbZWvBksRlQLVxPBjcNy5MhNs7p1P66Chq9
+	AqFm0ryJBeZwZo/84NJww6+Azc1CSB6UowoylMnmOqDRN5N1wXMA
+X-Gm-Gg: ASbGncsQsc6TYdWnz3GM7Pp33Fbd47kzFEHn49DJ4AFwDOBKBKQFYCZNOvc5vrDJVlP
+	o7+bCCtm3oE+jKCNlpciZPcWvryD67d/PkOkK7uvYiFf03rfuP0FFhZ7MHBDfE79E4VY3bqHW8c
+	0tgf/sDr/Q0d0b1MaZvnAvGBj1kVEP3fYykL2k6vrca5VZx1kai1CESlJSeOx3TcfHXfVxfehvV
+	WoLRaD5fzt6Z2X++CbJHdV6rcE1H6KRDdauKM2RWaUtv3I5Avuybw==
+X-Google-Smtp-Source: AGHT+IFt0b41XSdONzoY/AFdvkkf7EEMS28wwwvZpp3g70j+q7/jOqblpmwt7KKtlNw5y1yme4fgqw==
+X-Received: by 2002:a17:903:249:b0:215:89a0:416f with SMTP id d9443c01a7336-21614d767b4mr206512185ad.30.1733765994669;
+        Mon, 09 Dec 2024 09:39:54 -0800 (PST)
+Received: from smc-140338-bm01 ([149.97.161.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215f8e6042dsm75149445ad.87.2024.12.09.09.39.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 09:39:54 -0800 (PST)
+From: Fan Ni <nifan.cxl@gmail.com>
+X-Google-Original-From: Fan Ni <fan.ni@samsung.com>
+Date: Mon, 9 Dec 2024 17:39:51 +0000
+To: alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, martin.habets@xilinx.com,
+	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
+	Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v6 18/28] sfc: get endpoint decoder
+Message-ID: <Z1crZ9QLkK1zd0MF@smc-140338-bm01>
+References: <20241202171222.62595-1-alejandro.lucero-palau@amd.com>
+ <20241202171222.62595-19-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 07/17] net: page_pool: introduce
- page_pool_mp_return_in_cache
-To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20241204172204.4180482-1-dw@davidwei.uk>
- <20241204172204.4180482-8-dw@davidwei.uk>
- <CAHS8izMYOtU-QoCggE+7h9V+Rtxf-m2rBMHHdJtMxSQku-b1Xw@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izMYOtU-QoCggE+7h9V+Rtxf-m2rBMHHdJtMxSQku-b1Xw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241202171222.62595-19-alejandro.lucero-palau@amd.com>
 
-On 12/9/24 17:15, Mina Almasry wrote:
-> On Wed, Dec 4, 2024 at 9:22 AM David Wei <dw@davidwei.uk> wrote:
-...
->> +/*
->> + * page_pool_mp_return_in_cache() - return a netmem to the allocation cache.
->> + * @pool:      pool from which pages were allocated
->> + * @netmem:    netmem to return
->> + *
->> + * Return already allocated and accounted netmem to the page pool's allocation
->> + * cache. The function doesn't provide synchronisation and must only be called
->> + * from the napi context.
->> + */
->> +void page_pool_mp_return_in_cache(struct page_pool *pool, netmem_ref netmem)
->> +{
->> +       if (WARN_ON_ONCE(pool->alloc.count >= PP_ALLOC_CACHE_REFILL))
->> +               return;
->> +
+On Mon, Dec 02, 2024 at 05:12:12PM +0000, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Really the caller needs to check this, and if the caller is checking
-> it then this additional check is unnecessarily defensive I would say.
-> But not really a big deal. I think I gave this feedback on the
-> previous iteration.
+> Use cxl api for getting DPA (Device Physical Address) to use through an
+> endpoint decoder.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> ---
 
-I think I already killed it. Nevertheless, that's true, the caller
-has to check it, which is why it's a warning.
+Reviewed-by: Fan Ni <fan.ni@samsung.com>
 
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
+>  drivers/net/ethernet/sfc/efx_cxl.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> index 79b93d92f9c2..6ca23874d0c7 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -120,6 +120,14 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  		goto err3;
+>  	}
+>  
+> +	cxl->cxled = cxl_request_dpa(cxl->cxlmd, true, EFX_CTPIO_BUFFER_SIZE,
+> +				     EFX_CTPIO_BUFFER_SIZE);
+> +	if (IS_ERR_OR_NULL(cxl->cxled)) {
+> +		pci_err(pci_dev, "CXL accel request DPA failed");
+> +		rc = PTR_ERR(cxl->cxlrd);
+> +		goto err3;
+> +	}
+> +
+>  	probe_data->cxl = cxl;
+>  
+>  	return 0;
+> @@ -136,6 +144,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  void efx_cxl_exit(struct efx_probe_data *probe_data)
+>  {
+>  	if (probe_data->cxl) {
+> +		cxl_dpa_free(probe_data->cxl->cxled);
+>  		cxl_release_resource(probe_data->cxl->cxlds, CXL_RES_RAM);
+>  		kfree(probe_data->cxl->cxlds);
+>  		kfree(probe_data->cxl);
+> -- 
+> 2.17.1
+> 
 
 -- 
-Pavel Begunkov
-
+Fan Ni (From gmail)
 
