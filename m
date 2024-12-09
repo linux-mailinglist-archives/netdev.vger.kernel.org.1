@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-150263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C4289E9A46
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 16:19:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91D959E9A3E
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 16:19:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42E27285643
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:19:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E85A285643
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 690B21E9B02;
-	Mon,  9 Dec 2024 15:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566651F0E2E;
+	Mon,  9 Dec 2024 15:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="URx0NsF0"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Cn7xLGtO"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7791C5CBD;
-	Mon,  9 Dec 2024 15:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF75B1C5CBD;
+	Mon,  9 Dec 2024 15:18:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733757524; cv=none; b=iuzIvwQ0SmISX6Gr865KBJIqUK+zAvvdhnUVRvYD3l0Q0I98270wBYHejXWitklLMJJdUfoBYrxpPhXnVCMZ1v700q6kxI+lOTz/J+HREztAStxwaV7/yfBKYd/5840TeSkALgk+F5rKgyUHkcTI9YMSdq0BWBk5tIRUoZ6us9k=
+	t=1733757504; cv=none; b=hDdcVy7biYkSUDb1AUGAPDY/XnR10C/KWSdjlEUlIvyNg2tKdi6uEDu43XczZRtGBR1sUjPk8ss3JOgmjzGAMrFPB2wlDSOgDz8WtHn8lpxM1Rn5JeJZ00dt4UV+0vSnuG0iPu1Z1r4NyM3PPRmesukVhEJAJg4Sq8f9WpgVgpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733757524; c=relaxed/simple;
-	bh=5F2nw2jMwc4D6o7lX7JFabG4RgAbTUZVW7moThkshGQ=;
+	s=arc-20240116; t=1733757504; c=relaxed/simple;
+	bh=3Qskowc5ETaCvhorfTUB8DuLeKvlcyhYS79nxUY7yfg=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fHMFVbaeeSJZNRUENALUjVA5X2xhMnjWitePYEaPR5qVijgn3nhz2wsbSAoyjV6ibQOJOrXaM9taD92JnbY3E125uMYMUCic5JcLQA9h4kRVoD8qmDSQgrh/mcGiKYKxEEEt1akVYXN/P7glh0HAlGrp1qnT49SPTmpvPDOjUcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=URx0NsF0; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=HrA6n/YGeOWsaRTIPYYh76Kyp2k+nYSDGRvf6nRkLu5aE9OQBWW/tRY0eQvMMTZq5RQgMZZ73zgl1eS3SrbPzjwdL8fNvUgYVRWCB48lg1pfVosp1JBC2wybyAw0gwnRc3rp5lvGfIQEUPTfeZgoJ9KvPbiXeUUjHOpIfNygjuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Cn7xLGtO; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1733757522; x=1765293522;
+  t=1733757501; x=1765293501;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version;
-  bh=5F2nw2jMwc4D6o7lX7JFabG4RgAbTUZVW7moThkshGQ=;
-  b=URx0NsF0yI2mvDkpOu8eY00O5QsHjUFehI1DaTmqCsuzYD56Zj9CaIrG
-   rXodqW6vxIV3o3lRXzlRue0EF/1p0HGU7VqAF7Ptpd48qGjcY6swdus3l
-   ckzDkuWy1gwQm2hEnUbWXAXGBol85GDmPomA5nVN1TI6hi/XUs4o8YKIg
-   q9BWYkzQtDYYYaG8wpB4G1TA1eEgp4O7rTy70Mcrnx3EZb3w8cr1fU4t5
-   4Z9o6LZb0mckSgy9yqLK72QR1KZHwpUjA8/X5TiiAdMd3x8Teh/6J/3wU
-   hzfWuAUMWGbGx4XiClhX3oKRWiDi0XRXv9O5QER+E5VXiJ1fRwdsqf6Im
-   A==;
-X-CSE-ConnectionGUID: css/sw7iS6y778PqU3NZ3A==
-X-CSE-MsgGUID: OsHCldszQOi/lBO/T40s6A==
+  bh=3Qskowc5ETaCvhorfTUB8DuLeKvlcyhYS79nxUY7yfg=;
+  b=Cn7xLGtOOVg77A1TLYQnb8MfEQBjxC6LE3JYaniNQ0UUvSFaU4QyMDRd
+   /vv2BpKsD8yC7Vo3BrU7F2fw2oz/xocs/WPRj8P4DO76K+VwdLcJLh/yF
+   A6ytEpaWyt/Se36rhGPbSkfVvNJFCG3Iv51uAH3HMpNE2HYrvD1OWnrmg
+   XFLGzXimPl3e9kkds7zUwNtY+rmnPmiuZGovKpNstpb1LF5fKd0hpIUJA
+   fGqig/hyPGspWfu4ZDJlGGraHwqYfwBnkKSVKv9klghKYWEOMtkdWiQ2K
+   j/2fi3zeXzxB+uCtZh7r7J5In6dbQtRHB/WxVbZG/i2PJa6U5T0qst97R
+   w==;
+X-CSE-ConnectionGUID: fVcj29IcQ9C5yarZFzKSjw==
+X-CSE-MsgGUID: eZfF3k1GT/6Mc/cJCYGFKA==
 X-IronPort-AV: E=Sophos;i="6.12,219,1728975600"; 
-   d="scan'208";a="34995265"
+   d="scan'208";a="35775872"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Dec 2024 08:18:41 -0700
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Dec 2024 08:18:15 -0700
 Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 9 Dec 2024 08:17:39 -0700
+ 15.1.2507.35; Mon, 9 Dec 2024 08:17:44 -0700
 Received: from training-HP-280-G1-MT-PC.microchip.com (10.10.85.11) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 9 Dec 2024 08:17:35 -0700
+ 15.1.2507.35 via Frontend Transport; Mon, 9 Dec 2024 08:17:40 -0700
 From: Divya Koppera <divya.koppera@microchip.com>
 To: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
 	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
@@ -65,9 +65,9 @@ To: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
 	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>,
 	<vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next v6 1/5] net: phy: microchip_rds_ptp: Add header file for Microchip rds ptp library
-Date: Mon, 9 Dec 2024 20:47:38 +0530
-Message-ID: <20241209151742.9128-2-divya.koppera@microchip.com>
+Subject: [PATCH net-next v6 2/5] net: phy: microchip_rds_ptp : Add rds ptp library for Microchip phys
+Date: Mon, 9 Dec 2024 20:47:39 +0530
+Message-ID: <20241209151742.9128-3-divya.koppera@microchip.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20241209151742.9128-1-divya.koppera@microchip.com>
 References: <20241209151742.9128-1-divya.koppera@microchip.com>
@@ -79,258 +79,1052 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-This rds ptp header file will cover ptp macros for future phys in
-Microchip where addresses will be same but base offset and mmd address
-may changes.
+Add rds ptp library for Microchip phys
+1-step and 2-step modes are supported, over Ethernet and UDP(ipv4, ipv6)
 
 Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
 ---
 v5 -> v6
-- Renamed header file name, macros and function names to
-  reflect ptp hardware code name.
+- Renamed file name, macros, function names.
+- Moved initialization of ptp_lock to avoid race condition.
 
 v4 -> v5
-- Reduced scope of config PTP Macro check to APIs
-
-v3 -> v4
-- Re-ordered mchp_ptp_clock structure.
-
-v2 -> v3
 - No changes
 
-v1 -> v2
-- Fixed sparse warnings and compilation errors/warnings reported by kernel
-  test robot
----
- drivers/net/phy/microchip_rds_ptp.h | 218 ++++++++++++++++++++++++++++
- 1 file changed, 218 insertions(+)
- create mode 100644 drivers/net/phy/microchip_rds_ptp.h
+v3 -> v4
+- Fixed coccicheck errors
 
-diff --git a/drivers/net/phy/microchip_rds_ptp.h b/drivers/net/phy/microchip_rds_ptp.h
+v2 -> v3
+- Moved to kmalloc from kzalloc
+- Fixed sparse errors related to cast from restricted __be16
+
+v1 -> v2
+- Removed redundant memsets
+- Moved to standard comparision than memcmp for u16
+- Fixed sparse/smatch warnings reported by kernel test robot
+- Added spinlock to shared code
+- Moved redundant part of code out of spinlock protected area
+---
+ drivers/net/phy/microchip_rds_ptp.c | 1009 +++++++++++++++++++++++++++
+ 1 file changed, 1009 insertions(+)
+ create mode 100644 drivers/net/phy/microchip_rds_ptp.c
+
+diff --git a/drivers/net/phy/microchip_rds_ptp.c b/drivers/net/phy/microchip_rds_ptp.c
 new file mode 100644
-index 000000000000..15e36d6bc975
+index 000000000000..d1c91c0f5e03
 --- /dev/null
-+++ b/drivers/net/phy/microchip_rds_ptp.h
-@@ -0,0 +1,218 @@
-+/* SPDX-License-Identifier: GPL-2.0
-+ * Copyright (C) 2024 Microchip Technology
-+ */
++++ b/drivers/net/phy/microchip_rds_ptp.c
+@@ -0,0 +1,1009 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (C) 2024 Microchip Technology
 +
-+#ifndef _MICROCHIP_RDS_PTP_H
-+#define _MICROCHIP_RDS_PTP_H
++#include "microchip_rds_ptp.h"
 +
-+#include <linux/ptp_clock_kernel.h>
-+#include <linux/ptp_clock.h>
-+#include <linux/ptp_classify.h>
-+#include <linux/net_tstamp.h>
-+#include <linux/mii.h>
-+#include <linux/phy.h>
-+
-+#define MCHP_RDS_PTP_CMD_CTL(b)			((b) + 0x0)
-+#define MCHP_RDS_PTP_CMD_CTL_LTC_STEP_NSEC	BIT(6)
-+#define MCHP_RDS_PTP_CMD_CTL_LTC_STEP_SEC	BIT(5)
-+#define MCHP_RDS_PTP_CMD_CTL_CLOCK_LOAD		BIT(4)
-+#define MCHP_RDS_PTP_CMD_CTL_CLOCK_READ		BIT(3)
-+#define MCHP_RDS_PTP_CMD_CTL_EN			BIT(1)
-+#define MCHP_RDS_PTP_CMD_CTL_DIS		BIT(0)
-+
-+#define MCHP_RDS_PTP_REF_CLK_CFG(b)		((b) + 0x2)
-+#define MCHP_RDS_PTP_REF_CLK_SRC_250MHZ		0x0
-+#define MCHP_RDS_PTP_REF_CLK_PERIOD_OVERRIDE	BIT(9)
-+#define MCHP_RDS_PTP_REF_CLK_PERIOD		4
-+#define MCHP_RDS_PTP_REF_CLK_CFG_SET	(MCHP_RDS_PTP_REF_CLK_SRC_250MHZ |\
-+					 MCHP_RDS_PTP_REF_CLK_PERIOD_OVERRIDE |\
-+					 MCHP_RDS_PTP_REF_CLK_PERIOD)
-+
-+#define MCHP_RDS_PTP_LTC_SEC_HI(b)		((b) + 0x5)
-+#define MCHP_RDS_PTP_LTC_SEC_MID(b)		((b) + 0x6)
-+#define MCHP_RDS_PTP_LTC_SEC_LO(b)		((b) + 0x7)
-+#define MCHP_RDS_PTP_LTC_NS_HI(b)		((b) + 0x8)
-+#define MCHP_RDS_PTP_LTC_NS_LO(b)		((b) + 0x9)
-+#define MCHP_RDS_PTP_LTC_RATE_ADJ_HI(b)		((b) + 0xc)
-+#define MCHP_RDS_PTP_LTC_RATE_ADJ_HI_DIR	BIT(15)
-+#define MCHP_RDS_PTP_LTC_RATE_ADJ_LO(b)		((b) + 0xd)
-+#define MCHP_RDS_PTP_STEP_ADJ_HI(b)		((b) + 0x12)
-+#define MCHP_RDS_PTP_STEP_ADJ_HI_DIR		BIT(15)
-+#define MCHP_RDS_PTP_STEP_ADJ_LO(b)		((b) + 0x13)
-+#define MCHP_RDS_PTP_LTC_READ_SEC_HI(b)		((b) + 0x29)
-+#define MCHP_RDS_PTP_LTC_READ_SEC_MID(b)	((b) + 0x2a)
-+#define MCHP_RDS_PTP_LTC_READ_SEC_LO(b)		((b) + 0x2b)
-+#define MCHP_RDS_PTP_LTC_READ_NS_HI(b)		((b) + 0x2c)
-+#define MCHP_RDS_PTP_LTC_READ_NS_LO(b)		((b) + 0x2d)
-+#define MCHP_RDS_PTP_OP_MODE(b)			((b) + 0x41)
-+#define MCHP_RDS_PTP_OP_MODE_DIS		0
-+#define MCHP_RDS_PTP_OP_MODE_STANDALONE		1
-+#define MCHP_RDS_PTP_LATENCY_CORRECTION_CTL(b)	((b) + 0x44)
-+#define MCHP_RDS_PTP_PREDICTOR_EN		BIT(6)
-+#define MCHP_RDS_PTP_TX_PRED_DIS		BIT(1)
-+#define MCHP_RDS_PTP_RX_PRED_DIS		BIT(0)
-+#define MCHP_RDS_PTP_LATENCY_SETTING		(MCHP_RDS_PTP_PREDICTOR_EN | \
-+						 MCHP_RDS_PTP_TX_PRED_DIS | \
-+						 MCHP_RDS_PTP_RX_PRED_DIS)
-+
-+#define MCHP_RDS_PTP_INT_EN(b)			((b) + 0x0)
-+#define MCHP_RDS_PTP_INT_STS(b)			((b) + 0x01)
-+#define MCHP_RDS_PTP_INT_TX_TS_OVRFL_EN		BIT(3)
-+#define MCHP_RDS_PTP_INT_TX_TS_EN		BIT(2)
-+#define MCHP_RDS_PTP_INT_RX_TS_OVRFL_EN		BIT(1)
-+#define MCHP_RDS_PTP_INT_RX_TS_EN		BIT(0)
-+#define MCHP_RDS_PTP_INT_ALL_MSK	(MCHP_RDS_PTP_INT_TX_TS_OVRFL_EN | \
-+					 MCHP_RDS_PTP_INT_TX_TS_EN | \
-+					 MCHP_RDS_PTP_INT_RX_TS_OVRFL_EN |\
-+					 MCHP_RDS_PTP_INT_RX_TS_EN)
-+
-+#define MCHP_RDS_PTP_CAP_INFO(b)		((b) + 0x2e)
-+#define MCHP_RDS_PTP_TX_TS_CNT(v)		(((v) & GENMASK(11, 8)) >> 8)
-+#define MCHP_RDS_PTP_RX_TS_CNT(v)		((v) & GENMASK(3, 0))
-+
-+#define MCHP_RDS_PTP_RX_PARSE_CONFIG(b)		((b) + 0x42)
-+#define MCHP_RDS_PTP_RX_PARSE_L2_ADDR_EN(b)	((b) + 0x44)
-+#define MCHP_RDS_PTP_RX_PARSE_IPV4_ADDR_EN(b)	((b) + 0x45)
-+
-+#define MCHP_RDS_PTP_RX_TIMESTAMP_CONFIG(b)	((b) + 0x4e)
-+#define MCHP_RDS_PTP_RX_TIMESTAMP_CONFIG_PTP_FCS_DIS BIT(0)
-+
-+#define MCHP_RDS_PTP_RX_VERSION(b)		((b) + 0x48)
-+#define MCHP_RDS_PTP_RX_TIMESTAMP_EN(b)		((b) + 0x4d)
-+
-+#define MCHP_RDS_PTP_RX_INGRESS_NS_HI(b)	((b) + 0x54)
-+#define MCHP_RDS_PTP_RX_INGRESS_NS_HI_TS_VALID	BIT(15)
-+
-+#define MCHP_RDS_PTP_RX_INGRESS_NS_LO(b)	((b) + 0x55)
-+#define MCHP_RDS_PTP_RX_INGRESS_SEC_HI(b)	((b) + 0x56)
-+#define MCHP_RDS_PTP_RX_INGRESS_SEC_LO(b)	((b) + 0x57)
-+#define MCHP_RDS_PTP_RX_MSG_HDR2(b)		((b) + 0x59)
-+
-+#define MCHP_RDS_PTP_TX_PARSE_CONFIG(b)		((b) + 0x82)
-+#define MCHP_RDS_PTP_PARSE_CONFIG_LAYER2_EN	BIT(0)
-+#define MCHP_RDS_PTP_PARSE_CONFIG_IPV4_EN	BIT(1)
-+#define MCHP_RDS_PTP_PARSE_CONFIG_IPV6_EN	BIT(2)
-+
-+#define MCHP_RDS_PTP_TX_PARSE_L2_ADDR_EN(b)	((b) + 0x84)
-+#define MCHP_RDS_PTP_TX_PARSE_IPV4_ADDR_EN(b)	((b) + 0x85)
-+
-+#define MCHP_RDS_PTP_TX_VERSION(b)		((b) + 0x88)
-+#define MCHP_RDS_PTP_MAX_VERSION(x)		(((x) & GENMASK(7, 0)) << 8)
-+#define MCHP_RDS_PTP_MIN_VERSION(x)		((x) & GENMASK(7, 0))
-+
-+#define MCHP_RDS_PTP_TX_TIMESTAMP_EN(b)		((b) + 0x8d)
-+#define MCHP_RDS_PTP_TIMESTAMP_EN_SYNC		BIT(0)
-+#define MCHP_RDS_PTP_TIMESTAMP_EN_DREQ		BIT(1)
-+#define MCHP_RDS_PTP_TIMESTAMP_EN_PDREQ		BIT(2)
-+#define MCHP_RDS_PTP_TIMESTAMP_EN_PDRES		BIT(3)
-+#define MCHP_RDS_PTP_TIMESTAMP_EN_ALL	(MCHP_RDS_PTP_TIMESTAMP_EN_SYNC |\
-+					 MCHP_RDS_PTP_TIMESTAMP_EN_DREQ |\
-+					 MCHP_RDS_PTP_TIMESTAMP_EN_PDREQ |\
-+					 MCHP_RDS_PTP_TIMESTAMP_EN_PDRES)
-+
-+#define MCHP_RDS_PTP_TX_TIMESTAMP_CONFIG(b)	((b) + 0x8e)
-+#define MCHP_RDS_PTP_TX_TIMESTAMP_CONFIG_PTP_FCS_DIS BIT(0)
-+
-+#define MCHP_RDS_PTP_TX_MOD(b)			((b) + 0x8f)
-+#define MCHP_RDS_PTP_TX_MOD_PTP_SYNC_TS_INSERT	BIT(12)
-+#define MCHP_RDS_PTP_TX_MOD_PTP_FU_TS_INSERT	BIT(11)
-+
-+#define MCHP_RDS_PTP_TX_EGRESS_NS_HI(b)		((b) + 0x94)
-+#define MCHP_RDS_PTP_TX_EGRESS_NS_HI_TS_VALID	BIT(15)
-+
-+#define MCHP_RDS_PTP_TX_EGRESS_NS_LO(b)		((b) + 0x95)
-+#define MCHP_RDS_PTP_TX_EGRESS_SEC_HI(b)	((b) + 0x96)
-+#define MCHP_RDS_PTP_TX_EGRESS_SEC_LO(b)	((b) + 0x97)
-+#define MCHP_RDS_PTP_TX_MSG_HDR2(b)		((b) + 0x99)
-+
-+#define MCHP_RDS_PTP_TSU_GEN_CONFIG(b)		((b) + 0xc0)
-+#define MCHP_RDS_PTP_TSU_GEN_CFG_TSU_EN		BIT(0)
-+
-+#define MCHP_RDS_PTP_TSU_HARD_RESET(b)		((b) + 0xc1)
-+#define MCHP_RDS_PTP_TSU_HARDRESET		BIT(0)
-+
-+/* Represents 1ppm adjustment in 2^32 format with
-+ * each nsec contains 4 clock cycles in 250MHz.
-+ * The value is calculated as following: (1/1000000)/((2^-32)/4)
-+ */
-+#define MCHP_RDS_PTP_1PPM_FORMAT		17179
-+#define MCHP_RDS_PTP_FIFO_SIZE			8
-+#define MCHP_RDS_PTP_MAX_ADJ			31249999
-+
-+#define BASE_CLK(p)		((p)->clk_base_addr)
-+#define BASE_PORT(p)		((p)->port_base_addr)
-+#define PTP_MMD(p)		((p)->mmd)
-+
-+enum mchp_rds_ptp_fifo_dir {
-+	MCHP_RDS_PTP_INGRESS_FIFO,
-+	MCHP_RDS_PTP_EGRESS_FIFO
-+};
-+
-+struct mchp_rds_ptp_clock {
-+	struct mii_timestamper mii_ts;
-+	struct phy_device *phydev;
-+	struct ptp_clock *ptp_clock;
-+
-+	struct sk_buff_head tx_queue;
-+	struct sk_buff_head rx_queue;
-+	struct list_head rx_ts_list;
-+
-+	struct ptp_clock_info caps;
-+
-+	/* Lock for Rx ts fifo */
-+	spinlock_t rx_ts_lock;
-+	int hwts_tx_type;
-+
-+	enum hwtstamp_rx_filters rx_filter;
-+	int layer;
-+	int version;
-+	u16 port_base_addr;
-+	u16 clk_base_addr;
-+
-+	/* Lock for phc */
-+	struct mutex ptp_lock;
-+	u8 mmd;
-+};
-+
-+struct mchp_rds_ptp_rx_ts {
-+	struct list_head list;
-+	u32 seconds;
-+	u32 nsec;
-+	u16 seq_id;
-+};
-+
-+#if IS_ENABLED(CONFIG_MICROCHIP_PHY_RDS_PTP)
-+
-+struct mchp_rds_ptp_clock *mchp_rds_ptp_probe(struct phy_device *phydev, u8 mmd,
-+					      u16 clk_base, u16 port_base);
-+
-+int mchp_rds_ptp_top_config_intr(struct mchp_rds_ptp_clock *clock,
-+				 u16 reg, u16 val, bool enable);
-+
-+irqreturn_t mchp_rds_ptp_handle_interrupt(struct mchp_rds_ptp_clock *clock);
-+
-+#else
-+
-+static inline struct mchp_rds_ptp_clock *mchp_rds_ptp_probe(struct phy_device
-+							    *phydev, u8 mmd,
-+							    u16 clk_base,
-+							    u16 port_base)
++static int mchp_rds_ptp_flush_fifo(struct mchp_rds_ptp_clock *clock,
++				   enum mchp_rds_ptp_fifo_dir dir)
 +{
-+	return NULL;
++	struct phy_device *phydev = clock->phydev;
++	int rc;
++
++	for (int i = 0; i < MCHP_RDS_PTP_FIFO_SIZE; ++i) {
++		rc = phy_read_mmd(phydev, PTP_MMD(clock),
++				  dir == MCHP_RDS_PTP_EGRESS_FIFO ?
++				  MCHP_RDS_PTP_TX_MSG_HDR2(BASE_PORT(clock)) :
++				  MCHP_RDS_PTP_RX_MSG_HDR2(BASE_PORT(clock)));
++		if (rc < 0)
++			return rc;
++	}
++	return phy_read_mmd(phydev, PTP_MMD(clock),
++			    MCHP_RDS_PTP_INT_STS(BASE_PORT(clock)));
 +}
 +
-+static inline int mchp_rds_ptp_top_config_intr(struct mchp_rds_ptp_clock *clock,
-+					       u16 reg, u16 val, bool enable)
++static int mchp_rds_ptp_config_intr(struct mchp_rds_ptp_clock *clock,
++				    bool enable)
 +{
++	struct phy_device *phydev = clock->phydev;
++
++	/* Enable  or disable ptp interrupts */
++	return phy_write_mmd(phydev, PTP_MMD(clock),
++			     MCHP_RDS_PTP_INT_EN(BASE_PORT(clock)),
++			     enable ? MCHP_RDS_PTP_INT_ALL_MSK : 0);
++}
++
++static void mchp_rds_ptp_txtstamp(struct mii_timestamper *mii_ts,
++				  struct sk_buff *skb, int type)
++{
++	struct mchp_rds_ptp_clock *clock = container_of(mii_ts,
++						      struct mchp_rds_ptp_clock,
++						      mii_ts);
++
++	switch (clock->hwts_tx_type) {
++	case HWTSTAMP_TX_ONESTEP_SYNC:
++		if (ptp_msg_is_sync(skb, type)) {
++			kfree_skb(skb);
++			return;
++		}
++		fallthrough;
++	case HWTSTAMP_TX_ON:
++		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
++		skb_queue_tail(&clock->tx_queue, skb);
++		break;
++	case HWTSTAMP_TX_OFF:
++	default:
++		kfree_skb(skb);
++		break;
++	}
++}
++
++static bool mchp_rds_ptp_get_sig_rx(struct sk_buff *skb, u16 *sig)
++{
++	struct ptp_header *ptp_header;
++	int type;
++
++	skb_push(skb, ETH_HLEN);
++	type = ptp_classify_raw(skb);
++	if (type == PTP_CLASS_NONE)
++		return false;
++
++	ptp_header = ptp_parse_header(skb, type);
++	if (!ptp_header)
++		return false;
++
++	skb_pull_inline(skb, ETH_HLEN);
++
++	*sig = (__force u16)(ntohs(ptp_header->sequence_id));
++
++	return true;
++}
++
++static bool mchp_rds_ptp_match_skb(struct mchp_rds_ptp_clock *clock,
++				   struct mchp_rds_ptp_rx_ts *rx_ts)
++{
++	struct skb_shared_hwtstamps *shhwtstamps;
++	struct sk_buff *skb, *skb_tmp;
++	unsigned long flags;
++	bool rc = false;
++	u16 skb_sig;
++
++	spin_lock_irqsave(&clock->rx_queue.lock, flags);
++	skb_queue_walk_safe(&clock->rx_queue, skb, skb_tmp) {
++		if (!mchp_rds_ptp_get_sig_rx(skb, &skb_sig))
++			continue;
++
++		if (skb_sig != rx_ts->seq_id)
++			continue;
++
++		__skb_unlink(skb, &clock->rx_queue);
++
++		rc = true;
++		break;
++	}
++	spin_unlock_irqrestore(&clock->rx_queue.lock, flags);
++
++	if (rc) {
++		shhwtstamps = skb_hwtstamps(skb);
++		shhwtstamps->hwtstamp = ktime_set(rx_ts->seconds, rx_ts->nsec);
++		netif_rx(skb);
++	}
++
++	return rc;
++}
++
++static void mchp_rds_ptp_match_rx_ts(struct mchp_rds_ptp_clock *clock,
++				     struct mchp_rds_ptp_rx_ts *rx_ts)
++{
++	unsigned long flags;
++
++	/* If we failed to match the skb add it to the queue for when
++	 * the frame will come
++	 */
++	if (!mchp_rds_ptp_match_skb(clock, rx_ts)) {
++		spin_lock_irqsave(&clock->rx_ts_lock, flags);
++		list_add(&rx_ts->list, &clock->rx_ts_list);
++		spin_unlock_irqrestore(&clock->rx_ts_lock, flags);
++	} else {
++		kfree(rx_ts);
++	}
++}
++
++static void mchp_rds_ptp_match_rx_skb(struct mchp_rds_ptp_clock *clock,
++				      struct sk_buff *skb)
++{
++	struct mchp_rds_ptp_rx_ts *rx_ts, *tmp, *rx_ts_var = NULL;
++	struct skb_shared_hwtstamps *shhwtstamps;
++	unsigned long flags;
++	u16 skb_sig;
++
++	if (!mchp_rds_ptp_get_sig_rx(skb, &skb_sig))
++		return;
++
++	/* Iterate over all RX timestamps and match it with the received skbs */
++	spin_lock_irqsave(&clock->rx_ts_lock, flags);
++	list_for_each_entry_safe(rx_ts, tmp, &clock->rx_ts_list, list) {
++		/* Check if we found the signature we were looking for. */
++		if (skb_sig != rx_ts->seq_id)
++			continue;
++
++		shhwtstamps = skb_hwtstamps(skb);
++		shhwtstamps->hwtstamp = ktime_set(rx_ts->seconds, rx_ts->nsec);
++		netif_rx(skb);
++
++		rx_ts_var = rx_ts;
++
++		break;
++	}
++	spin_unlock_irqrestore(&clock->rx_ts_lock, flags);
++
++	if (rx_ts_var) {
++		list_del(&rx_ts_var->list);
++		kfree(rx_ts_var);
++	} else {
++		skb_queue_tail(&clock->rx_queue, skb);
++	}
++}
++
++static bool mchp_rds_ptp_rxtstamp(struct mii_timestamper *mii_ts,
++				  struct sk_buff *skb, int type)
++{
++	struct mchp_rds_ptp_clock *clock = container_of(mii_ts,
++						      struct mchp_rds_ptp_clock,
++						      mii_ts);
++
++	if (clock->rx_filter == HWTSTAMP_FILTER_NONE ||
++	    type == PTP_CLASS_NONE)
++		return false;
++
++	if ((type & clock->version) == 0 || (type & clock->layer) == 0)
++		return false;
++
++	/* Here if match occurs skb is sent to application, If not skb is added
++	 * to queue and sending skb to application will get handled when
++	 * interrupt occurs i.e., it get handles in interrupt handler. By
++	 * any means skb will reach the application so we should not return
++	 * false here if skb doesn't matches.
++	 */
++	mchp_rds_ptp_match_rx_skb(clock, skb);
++
++	return true;
++}
++
++static int mchp_rds_ptp_hwtstamp(struct mii_timestamper *mii_ts,
++				 struct kernel_hwtstamp_config *config,
++				 struct netlink_ext_ack *extack)
++{
++	struct mchp_rds_ptp_clock *clock =
++				container_of(mii_ts, struct mchp_rds_ptp_clock,
++					     mii_ts);
++	struct phy_device *phydev = clock->phydev;
++	struct mchp_rds_ptp_rx_ts *rx_ts, *tmp;
++	int txcfg = 0, rxcfg = 0;
++	unsigned long flags;
++	int rc;
++
++	clock->hwts_tx_type = config->tx_type;
++	clock->rx_filter = config->rx_filter;
++
++	switch (config->rx_filter) {
++	case HWTSTAMP_FILTER_NONE:
++		clock->layer = 0;
++		clock->version = 0;
++		break;
++	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
++	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
++	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
++		clock->layer = PTP_CLASS_L4;
++		clock->version = PTP_CLASS_V2;
++		break;
++	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
++	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
++	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
++		clock->layer = PTP_CLASS_L2;
++		clock->version = PTP_CLASS_V2;
++		break;
++	case HWTSTAMP_FILTER_PTP_V2_EVENT:
++	case HWTSTAMP_FILTER_PTP_V2_SYNC:
++	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
++		clock->layer = PTP_CLASS_L4 | PTP_CLASS_L2;
++		clock->version = PTP_CLASS_V2;
++		break;
++	default:
++		return -ERANGE;
++	}
++
++	/* Setup parsing of the frames and enable the timestamping for ptp
++	 * frames
++	 */
++	if (clock->layer & PTP_CLASS_L2) {
++		rxcfg = MCHP_RDS_PTP_PARSE_CONFIG_LAYER2_EN;
++		txcfg = MCHP_RDS_PTP_PARSE_CONFIG_LAYER2_EN;
++	}
++	if (clock->layer & PTP_CLASS_L4) {
++		rxcfg |= MCHP_RDS_PTP_PARSE_CONFIG_IPV4_EN |
++			 MCHP_RDS_PTP_PARSE_CONFIG_IPV6_EN;
++		txcfg |= MCHP_RDS_PTP_PARSE_CONFIG_IPV4_EN |
++			 MCHP_RDS_PTP_PARSE_CONFIG_IPV6_EN;
++	}
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_RX_PARSE_CONFIG(BASE_PORT(clock)),
++			   rxcfg);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_TX_PARSE_CONFIG(BASE_PORT(clock)),
++			   txcfg);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_RX_TIMESTAMP_EN(BASE_PORT(clock)),
++			   MCHP_RDS_PTP_TIMESTAMP_EN_ALL);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_TX_TIMESTAMP_EN(BASE_PORT(clock)),
++			   MCHP_RDS_PTP_TIMESTAMP_EN_ALL);
++	if (rc < 0)
++		return rc;
++
++	if (clock->hwts_tx_type == HWTSTAMP_TX_ONESTEP_SYNC)
++		/* Enable / disable of the TX timestamp in the SYNC frames */
++		rc = phy_modify_mmd(phydev, PTP_MMD(clock),
++				    MCHP_RDS_PTP_TX_MOD(BASE_PORT(clock)),
++				    MCHP_RDS_PTP_TX_MOD_PTP_SYNC_TS_INSERT,
++				    MCHP_RDS_PTP_TX_MOD_PTP_SYNC_TS_INSERT);
++	else
++		rc = phy_modify_mmd(phydev, PTP_MMD(clock),
++				    MCHP_RDS_PTP_TX_MOD(BASE_PORT(clock)),
++				    MCHP_RDS_PTP_TX_MOD_PTP_SYNC_TS_INSERT,
++				(u16)~MCHP_RDS_PTP_TX_MOD_PTP_SYNC_TS_INSERT);
++
++	if (rc < 0)
++		return rc;
++
++	/* Now enable the timestamping interrupts */
++	rc = mchp_rds_ptp_config_intr(clock,
++				      config->rx_filter !=
++				      HWTSTAMP_FILTER_NONE);
++	if (rc < 0)
++		return rc;
++
++	/* In case of multiple starts and stops, these needs to be cleared */
++	spin_lock_irqsave(&clock->rx_ts_lock, flags);
++	list_for_each_entry_safe(rx_ts, tmp, &clock->rx_ts_list, list) {
++		list_del(&rx_ts->list);
++		kfree(rx_ts);
++	}
++	spin_unlock_irqrestore(&clock->rx_ts_lock, flags);
++	skb_queue_purge(&clock->rx_queue);
++	skb_queue_purge(&clock->tx_queue);
++
++	rc = mchp_rds_ptp_flush_fifo(clock, MCHP_RDS_PTP_INGRESS_FIFO);
++	if (rc < 0)
++		return rc;
++
++	rc = mchp_rds_ptp_flush_fifo(clock, MCHP_RDS_PTP_EGRESS_FIFO);
++
++	return rc < 0 ? rc : 0;
++}
++
++static int mchp_rds_ptp_ts_info(struct mii_timestamper *mii_ts,
++				struct kernel_ethtool_ts_info *info)
++{
++	struct mchp_rds_ptp_clock *clock = container_of(mii_ts,
++						      struct mchp_rds_ptp_clock,
++						      mii_ts);
++
++	info->phc_index =
++		clock->ptp_clock ? ptp_clock_index(clock->ptp_clock) : -1;
++	if (info->phc_index == -1)
++		return 0;
++
++	info->so_timestamping = SOF_TIMESTAMPING_TX_HARDWARE |
++				SOF_TIMESTAMPING_RX_HARDWARE |
++				SOF_TIMESTAMPING_RAW_HARDWARE;
++
++	info->tx_types = BIT(HWTSTAMP_TX_OFF) | BIT(HWTSTAMP_TX_ON) |
++			 BIT(HWTSTAMP_TX_ONESTEP_SYNC);
++
++	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) |
++			   BIT(HWTSTAMP_FILTER_PTP_V2_L4_EVENT) |
++			   BIT(HWTSTAMP_FILTER_PTP_V2_L2_EVENT) |
++			   BIT(HWTSTAMP_FILTER_PTP_V2_EVENT);
++
 +	return 0;
 +}
 +
-+static inline irqreturn_t mchp_rds_ptp_handle_interrupt(struct
-+							mchp_rds_ptp_clock * clock)
++static int mchp_rds_ptp_ltc_adjtime(struct ptp_clock_info *info, s64 delta)
 +{
-+	return IRQ_NONE;
++	struct mchp_rds_ptp_clock *clock = container_of(info,
++						      struct mchp_rds_ptp_clock,
++						      caps);
++	struct phy_device *phydev = clock->phydev;
++	struct timespec64 ts;
++	bool add = true;
++	int rc = 0;
++	u32 nsec;
++	s32 sec;
++
++	/* The HW allows up to 15 sec to adjust the time, but here we limit to
++	 * 10 sec the adjustment. The reason is, in case the adjustment is 14
++	 * sec and 999999999 nsec, then we add 8ns to compensate the actual
++	 * increment so the value can be bigger than 15 sec. Therefore limit the
++	 * possible adjustments so we will not have these corner cases
++	 */
++	if (delta > 10000000000LL || delta < -10000000000LL) {
++		/* The timeadjustment is too big, so fall back using set time */
++		u64 now;
++
++		info->gettime64(info, &ts);
++
++		now = ktime_to_ns(timespec64_to_ktime(ts));
++		ts = ns_to_timespec64(now + delta);
++
++		info->settime64(info, &ts);
++		return 0;
++	}
++	sec = div_u64_rem(abs(delta), NSEC_PER_SEC, &nsec);
++	if (delta < 0 && nsec != 0) {
++		/* It is not allowed to adjust low the nsec part, therefore
++		 * subtract more from second part and add to nanosecond such
++		 * that would roll over, so the second part will increase
++		 */
++		sec--;
++		nsec = NSEC_PER_SEC - nsec;
++	}
++
++	/* Calculate the adjustments and the direction */
++	if (delta < 0)
++		add = false;
++
++	if (nsec > 0) {
++		/* add 8 ns to cover the likely normal increment */
++		nsec += 8;
++
++		if (nsec >= NSEC_PER_SEC) {
++			/* carry into seconds */
++			sec++;
++			nsec -= NSEC_PER_SEC;
++		}
++	}
++
++	mutex_lock(&clock->ptp_lock);
++	if (sec) {
++		sec = abs(sec);
++
++		rc = phy_write_mmd(phydev, PTP_MMD(clock),
++				   MCHP_RDS_PTP_STEP_ADJ_LO(BASE_CLK(clock)),
++				   sec);
++		if (rc < 0)
++			goto out_unlock;
++
++		rc = phy_set_bits_mmd(phydev, PTP_MMD(clock),
++				      MCHP_RDS_PTP_STEP_ADJ_HI(BASE_CLK(clock)),
++				      ((add ? MCHP_RDS_PTP_STEP_ADJ_HI_DIR :
++					0) | ((sec >> 16) & GENMASK(13, 0))));
++		if (rc < 0)
++			goto out_unlock;
++
++		rc = phy_set_bits_mmd(phydev, PTP_MMD(clock),
++				      MCHP_RDS_PTP_CMD_CTL(BASE_CLK(clock)),
++				      MCHP_RDS_PTP_CMD_CTL_LTC_STEP_SEC);
++		if (rc < 0)
++			goto out_unlock;
++	}
++
++	if (nsec) {
++		rc = phy_write_mmd(phydev, PTP_MMD(clock),
++				   MCHP_RDS_PTP_STEP_ADJ_LO(BASE_CLK(clock)),
++				   nsec & GENMASK(15, 0));
++		if (rc < 0)
++			goto out_unlock;
++
++		rc = phy_write_mmd(phydev, PTP_MMD(clock),
++				   MCHP_RDS_PTP_STEP_ADJ_HI(BASE_CLK(clock)),
++				   (nsec >> 16) & GENMASK(13, 0));
++		if (rc < 0)
++			goto out_unlock;
++
++		rc = phy_set_bits_mmd(phydev, PTP_MMD(clock),
++				      MCHP_RDS_PTP_CMD_CTL(BASE_CLK(clock)),
++				      MCHP_RDS_PTP_CMD_CTL_LTC_STEP_NSEC);
++	}
++
++out_unlock:
++	mutex_unlock(&clock->ptp_lock);
++
++	return rc;
 +}
 +
-+#endif //CONFIG_MICROCHIP_PHY_RDS_PTP
++static int mchp_rds_ptp_ltc_adjfine(struct ptp_clock_info *info,
++				    long scaled_ppm)
++{
++	struct mchp_rds_ptp_clock *clock = container_of(info,
++						      struct mchp_rds_ptp_clock,
++						      caps);
++	struct phy_device *phydev = clock->phydev;
++	u16 rate_lo, rate_hi;
++	bool faster = true;
++	u32 rate;
++	int rc;
 +
-+#endif //_MICROCHIP_RDS_PTP_H
++	if (!scaled_ppm)
++		return 0;
++
++	if (scaled_ppm < 0) {
++		scaled_ppm = -scaled_ppm;
++		faster = false;
++	}
++
++	rate = MCHP_RDS_PTP_1PPM_FORMAT * (upper_16_bits(scaled_ppm));
++	rate += (MCHP_RDS_PTP_1PPM_FORMAT * (lower_16_bits(scaled_ppm))) >> 16;
++
++	rate_lo = rate & GENMASK(15, 0);
++	rate_hi = (rate >> 16) & GENMASK(13, 0);
++
++	if (faster)
++		rate_hi |= MCHP_RDS_PTP_LTC_RATE_ADJ_HI_DIR;
++
++	mutex_lock(&clock->ptp_lock);
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_LTC_RATE_ADJ_HI(BASE_CLK(clock)),
++			   rate_hi);
++	if (rc < 0)
++		goto error;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_LTC_RATE_ADJ_LO(BASE_CLK(clock)),
++			   rate_lo);
++	if (rc > 0)
++		rc = 0;
++error:
++	mutex_unlock(&clock->ptp_lock);
++
++	return rc;
++}
++
++static int mchp_rds_ptp_ltc_gettime64(struct ptp_clock_info *info,
++				      struct timespec64 *ts)
++{
++	struct mchp_rds_ptp_clock *clock = container_of(info,
++						      struct mchp_rds_ptp_clock,
++						      caps);
++	struct phy_device *phydev = clock->phydev;
++	time64_t secs;
++	int rc = 0;
++	s64 nsecs;
++
++	mutex_lock(&clock->ptp_lock);
++	/* Set read bit to 1 to save current values of 1588 local time counter
++	 * into PTP LTC seconds and nanoseconds registers.
++	 */
++	rc = phy_set_bits_mmd(phydev, PTP_MMD(clock),
++			      MCHP_RDS_PTP_CMD_CTL(BASE_CLK(clock)),
++			      MCHP_RDS_PTP_CMD_CTL_CLOCK_READ);
++	if (rc < 0)
++		goto out_unlock;
++
++	/* Get LTC clock values */
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_LTC_READ_SEC_HI(BASE_CLK(clock)));
++	if (rc < 0)
++		goto out_unlock;
++	secs = rc << 16;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_LTC_READ_SEC_MID(BASE_CLK(clock)));
++	if (rc < 0)
++		goto out_unlock;
++	secs |= rc;
++	secs <<= 16;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_LTC_READ_SEC_LO(BASE_CLK(clock)));
++	if (rc < 0)
++		goto out_unlock;
++	secs |= rc;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_LTC_READ_NS_HI(BASE_CLK(clock)));
++	if (rc < 0)
++		goto out_unlock;
++	nsecs = (rc & GENMASK(13, 0));
++	nsecs <<= 16;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_LTC_READ_NS_LO(BASE_CLK(clock)));
++	if (rc < 0)
++		goto out_unlock;
++	nsecs |= rc;
++
++	set_normalized_timespec64(ts, secs, nsecs);
++
++	if (rc > 0)
++		rc = 0;
++out_unlock:
++	mutex_unlock(&clock->ptp_lock);
++
++	return rc;
++}
++
++static int mchp_rds_ptp_ltc_settime64(struct ptp_clock_info *info,
++				      const struct timespec64 *ts)
++{
++	struct mchp_rds_ptp_clock *clock = container_of(info,
++						      struct mchp_rds_ptp_clock,
++						      caps);
++	struct phy_device *phydev = clock->phydev;
++	int rc;
++
++	mutex_lock(&clock->ptp_lock);
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_LTC_SEC_LO(BASE_CLK(clock)),
++			   lower_16_bits(ts->tv_sec));
++	if (rc < 0)
++		goto out_unlock;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_LTC_SEC_MID(BASE_CLK(clock)),
++			   upper_16_bits(ts->tv_sec));
++	if (rc < 0)
++		goto out_unlock;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_LTC_SEC_HI(BASE_CLK(clock)),
++			   upper_32_bits(ts->tv_sec) & GENMASK(15, 0));
++	if (rc < 0)
++		goto out_unlock;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_LTC_NS_LO(BASE_CLK(clock)),
++			   lower_16_bits(ts->tv_nsec));
++	if (rc < 0)
++		goto out_unlock;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_LTC_NS_HI(BASE_CLK(clock)),
++			   upper_16_bits(ts->tv_nsec) & GENMASK(13, 0));
++	if (rc < 0)
++		goto out_unlock;
++
++	/* Set load bit to 1 to write PTP LTC seconds and nanoseconds
++	 * registers to 1588 local time counter.
++	 */
++	rc = phy_set_bits_mmd(phydev, PTP_MMD(clock),
++			      MCHP_RDS_PTP_CMD_CTL(BASE_CLK(clock)),
++			      MCHP_RDS_PTP_CMD_CTL_CLOCK_LOAD);
++	if (rc > 0)
++		rc = 0;
++out_unlock:
++	mutex_unlock(&clock->ptp_lock);
++
++	return rc;
++}
++
++static bool mchp_rds_ptp_get_sig_tx(struct sk_buff *skb, u16 *sig)
++{
++	struct ptp_header *ptp_header;
++	int type;
++
++	type = ptp_classify_raw(skb);
++	if (type == PTP_CLASS_NONE)
++		return false;
++
++	ptp_header = ptp_parse_header(skb, type);
++	if (!ptp_header)
++		return false;
++
++	*sig = (__force u16)(ntohs(ptp_header->sequence_id));
++
++	return true;
++}
++
++static void mchp_rds_ptp_match_tx_skb(struct mchp_rds_ptp_clock *clock,
++				      u32 seconds, u32 nsec, u16 seq_id)
++{
++	struct skb_shared_hwtstamps shhwtstamps;
++	struct sk_buff *skb, *skb_tmp;
++	unsigned long flags;
++	bool rc = false;
++	u16 skb_sig;
++
++	spin_lock_irqsave(&clock->tx_queue.lock, flags);
++	skb_queue_walk_safe(&clock->tx_queue, skb, skb_tmp) {
++		if (!mchp_rds_ptp_get_sig_tx(skb, &skb_sig))
++			continue;
++
++		if (skb_sig != seq_id)
++			continue;
++
++		__skb_unlink(skb, &clock->tx_queue);
++		rc = true;
++		break;
++	}
++	spin_unlock_irqrestore(&clock->tx_queue.lock, flags);
++
++	if (rc) {
++		shhwtstamps.hwtstamp = ktime_set(seconds, nsec);
++		skb_complete_tx_timestamp(skb, &shhwtstamps);
++	}
++}
++
++static struct mchp_rds_ptp_rx_ts
++		       *mchp_rds_ptp_get_rx_ts(struct mchp_rds_ptp_clock *clock)
++{
++	struct phy_device *phydev = clock->phydev;
++	struct mchp_rds_ptp_rx_ts *rx_ts = NULL;
++	u32 sec, nsec;
++	int rc;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_RX_INGRESS_NS_HI(BASE_PORT(clock)));
++	if (rc < 0)
++		goto error;
++	if (!(rc & MCHP_RDS_PTP_RX_INGRESS_NS_HI_TS_VALID)) {
++		phydev_err(phydev, "RX Timestamp is not valid!\n");
++		goto error;
++	}
++	nsec = (rc & GENMASK(13, 0)) << 16;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_RX_INGRESS_NS_LO(BASE_PORT(clock)));
++	if (rc < 0)
++		goto error;
++	nsec |= rc;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_RX_INGRESS_SEC_HI(BASE_PORT(clock)));
++	if (rc < 0)
++		goto error;
++	sec = rc << 16;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_RX_INGRESS_SEC_LO(BASE_PORT(clock)));
++	if (rc < 0)
++		goto error;
++	sec |= rc;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_RX_MSG_HDR2(BASE_PORT(clock)));
++	if (rc < 0)
++		goto error;
++
++	rx_ts = kmalloc(sizeof(*rx_ts), GFP_KERNEL);
++	if (!rx_ts)
++		return NULL;
++
++	rx_ts->seconds = sec;
++	rx_ts->nsec = nsec;
++	rx_ts->seq_id = rc;
++
++error:
++	return rx_ts;
++}
++
++static void mchp_rds_ptp_process_rx_ts(struct mchp_rds_ptp_clock *clock)
++{
++	struct phy_device *phydev = clock->phydev;
++	int caps;
++
++	do {
++		struct mchp_rds_ptp_rx_ts *rx_ts;
++
++		rx_ts = mchp_rds_ptp_get_rx_ts(clock);
++		if (rx_ts)
++			mchp_rds_ptp_match_rx_ts(clock, rx_ts);
++
++		caps = phy_read_mmd(phydev, PTP_MMD(clock),
++				    MCHP_RDS_PTP_CAP_INFO(BASE_PORT(clock)));
++		if (caps < 0)
++			return;
++	} while (MCHP_RDS_PTP_RX_TS_CNT(caps) > 0);
++}
++
++static bool mchp_rds_ptp_get_tx_ts(struct mchp_rds_ptp_clock *clock,
++				   u32 *sec, u32 *nsec, u16 *seq)
++{
++	struct phy_device *phydev = clock->phydev;
++	int rc;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_TX_EGRESS_NS_HI(BASE_PORT(clock)));
++	if (rc < 0)
++		return false;
++	if (!(rc & MCHP_RDS_PTP_TX_EGRESS_NS_HI_TS_VALID))
++		return false;
++	*nsec = (rc & GENMASK(13, 0)) << 16;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_TX_EGRESS_NS_LO(BASE_PORT(clock)));
++	if (rc < 0)
++		return false;
++	*nsec = *nsec | rc;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_TX_EGRESS_SEC_HI(BASE_PORT(clock)));
++	if (rc < 0)
++		return false;
++	*sec = rc << 16;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_TX_EGRESS_SEC_LO(BASE_PORT(clock)));
++	if (rc < 0)
++		return false;
++	*sec = *sec | rc;
++
++	rc = phy_read_mmd(phydev, PTP_MMD(clock),
++			  MCHP_RDS_PTP_TX_MSG_HDR2(BASE_PORT(clock)));
++	if (rc < 0)
++		return false;
++
++	*seq = rc;
++
++	return true;
++}
++
++static void mchp_rds_ptp_process_tx_ts(struct mchp_rds_ptp_clock *clock)
++{
++	struct phy_device *phydev = clock->phydev;
++	int caps;
++
++	do {
++		u32 sec, nsec;
++		u16 seq;
++
++		if (mchp_rds_ptp_get_tx_ts(clock, &sec, &nsec, &seq))
++			mchp_rds_ptp_match_tx_skb(clock, sec, nsec, seq);
++
++		caps = phy_read_mmd(phydev, PTP_MMD(clock),
++				    MCHP_RDS_PTP_CAP_INFO(BASE_PORT(clock)));
++		if (caps < 0)
++			return;
++	} while (MCHP_RDS_PTP_TX_TS_CNT(caps) > 0);
++}
++
++int mchp_rds_ptp_top_config_intr(struct mchp_rds_ptp_clock *clock,
++				 u16 reg, u16 val, bool clear)
++{
++	struct phy_device *phydev = clock->phydev;
++
++	if (clear)
++		return phy_clear_bits_mmd(phydev, PTP_MMD(clock), reg, val);
++	else
++		return phy_set_bits_mmd(phydev, PTP_MMD(clock), reg, val);
++}
++EXPORT_SYMBOL_GPL(mchp_rds_ptp_top_config_intr);
++
++irqreturn_t mchp_rds_ptp_handle_interrupt(struct mchp_rds_ptp_clock *clock)
++{
++	struct phy_device *phydev;
++	int irq_sts;
++
++	/* To handle rogue interrupt scenarios */
++	if (!clock)
++		return IRQ_NONE;
++
++	phydev = clock->phydev;
++	do {
++		irq_sts = phy_read_mmd(phydev, PTP_MMD(clock),
++				       MCHP_RDS_PTP_INT_STS(BASE_PORT(clock)));
++		if (irq_sts < 0)
++			return IRQ_NONE;
++
++		if (irq_sts & MCHP_RDS_PTP_INT_RX_TS_EN)
++			mchp_rds_ptp_process_rx_ts(clock);
++
++		if (irq_sts & MCHP_RDS_PTP_INT_TX_TS_EN)
++			mchp_rds_ptp_process_tx_ts(clock);
++
++		if (irq_sts & MCHP_RDS_PTP_INT_TX_TS_OVRFL_EN) {
++			mchp_rds_ptp_flush_fifo(clock,
++						MCHP_RDS_PTP_EGRESS_FIFO);
++			skb_queue_purge(&clock->tx_queue);
++		}
++
++		if (irq_sts & MCHP_RDS_PTP_INT_RX_TS_OVRFL_EN) {
++			mchp_rds_ptp_flush_fifo(clock,
++						MCHP_RDS_PTP_INGRESS_FIFO);
++			skb_queue_purge(&clock->rx_queue);
++		}
++	} while (irq_sts & (MCHP_RDS_PTP_INT_RX_TS_EN |
++			    MCHP_RDS_PTP_INT_TX_TS_EN |
++			    MCHP_RDS_PTP_INT_TX_TS_OVRFL_EN |
++			    MCHP_RDS_PTP_INT_RX_TS_OVRFL_EN));
++
++	return IRQ_HANDLED;
++}
++EXPORT_SYMBOL_GPL(mchp_rds_ptp_handle_interrupt);
++
++static int mchp_rds_ptp_init(struct mchp_rds_ptp_clock *clock)
++{
++	struct phy_device *phydev = clock->phydev;
++	int rc;
++
++	/* Disable PTP */
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_CMD_CTL(BASE_CLK(clock)),
++			   MCHP_RDS_PTP_CMD_CTL_DIS);
++	if (rc < 0)
++		return rc;
++
++	/* Disable TSU */
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_TSU_GEN_CONFIG(BASE_PORT(clock)), 0);
++	if (rc < 0)
++		return rc;
++
++	/* Clear PTP interrupt status registers */
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_TSU_HARD_RESET(BASE_PORT(clock)),
++			   MCHP_RDS_PTP_TSU_HARDRESET);
++	if (rc < 0)
++		return rc;
++
++	/* Predictor enable */
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_LATENCY_CORRECTION_CTL(BASE_CLK(clock)),
++			   MCHP_RDS_PTP_LATENCY_SETTING);
++	if (rc < 0)
++		return rc;
++
++	/* Configure PTP operational mode */
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_OP_MODE(BASE_CLK(clock)),
++			   MCHP_RDS_PTP_OP_MODE_STANDALONE);
++	if (rc < 0)
++		return rc;
++
++	/* Reference clock configuration */
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_REF_CLK_CFG(BASE_CLK(clock)),
++			   MCHP_RDS_PTP_REF_CLK_CFG_SET);
++	if (rc < 0)
++		return rc;
++
++	/* Classifier configurations */
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_RX_PARSE_CONFIG(BASE_PORT(clock)), 0);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_TX_PARSE_CONFIG(BASE_PORT(clock)), 0);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_TX_PARSE_L2_ADDR_EN(BASE_PORT(clock)),
++			   0);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_RX_PARSE_L2_ADDR_EN(BASE_PORT(clock)),
++			   0);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_RX_PARSE_IPV4_ADDR_EN(BASE_PORT(clock)),
++			   0);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_TX_PARSE_IPV4_ADDR_EN(BASE_PORT(clock)),
++			   0);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_RX_VERSION(BASE_PORT(clock)),
++			   MCHP_RDS_PTP_MAX_VERSION(0xff) |
++			   MCHP_RDS_PTP_MIN_VERSION(0x0));
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_TX_VERSION(BASE_PORT(clock)),
++			   MCHP_RDS_PTP_MAX_VERSION(0xff) |
++			   MCHP_RDS_PTP_MIN_VERSION(0x0));
++	if (rc < 0)
++		return rc;
++
++	/* Enable TSU */
++	rc = phy_write_mmd(phydev, PTP_MMD(clock),
++			   MCHP_RDS_PTP_TSU_GEN_CONFIG(BASE_PORT(clock)),
++			   MCHP_RDS_PTP_TSU_GEN_CFG_TSU_EN);
++	if (rc < 0)
++		return rc;
++
++	/* Enable PTP */
++	return phy_write_mmd(phydev, PTP_MMD(clock),
++			     MCHP_RDS_PTP_CMD_CTL(BASE_CLK(clock)),
++			     MCHP_RDS_PTP_CMD_CTL_EN);
++}
++
++struct mchp_rds_ptp_clock *mchp_rds_ptp_probe(struct phy_device *phydev, u8 mmd,
++					      u16 clk_base_addr,
++					      u16 port_base_addr)
++{
++	struct mchp_rds_ptp_clock *clock;
++	int rc;
++
++	clock = devm_kzalloc(&phydev->mdio.dev, sizeof(*clock), GFP_KERNEL);
++	if (!clock)
++		return ERR_PTR(-ENOMEM);
++
++	clock->port_base_addr	= port_base_addr;
++	clock->clk_base_addr	= clk_base_addr;
++	clock->mmd		= mmd;
++
++	mutex_init(&clock->ptp_lock);
++	/* Register PTP clock */
++	clock->caps.owner          = THIS_MODULE;
++	snprintf(clock->caps.name, 30, "%s", phydev->drv->name);
++	clock->caps.max_adj        = MCHP_RDS_PTP_MAX_ADJ;
++	clock->caps.n_ext_ts       = 0;
++	clock->caps.pps            = 0;
++	clock->caps.adjfine        = mchp_rds_ptp_ltc_adjfine;
++	clock->caps.adjtime        = mchp_rds_ptp_ltc_adjtime;
++	clock->caps.gettime64      = mchp_rds_ptp_ltc_gettime64;
++	clock->caps.settime64      = mchp_rds_ptp_ltc_settime64;
++	clock->ptp_clock = ptp_clock_register(&clock->caps,
++					      &phydev->mdio.dev);
++	if (IS_ERR(clock->ptp_clock))
++		return ERR_PTR(-EINVAL);
++
++	/* Initialize the SW */
++	skb_queue_head_init(&clock->tx_queue);
++	skb_queue_head_init(&clock->rx_queue);
++	INIT_LIST_HEAD(&clock->rx_ts_list);
++	spin_lock_init(&clock->rx_ts_lock);
++
++	clock->mii_ts.rxtstamp = mchp_rds_ptp_rxtstamp;
++	clock->mii_ts.txtstamp = mchp_rds_ptp_txtstamp;
++	clock->mii_ts.hwtstamp = mchp_rds_ptp_hwtstamp;
++	clock->mii_ts.ts_info = mchp_rds_ptp_ts_info;
++
++	phydev->mii_ts = &clock->mii_ts;
++
++	/* Timestamp selected by default to keep legacy API */
++	phydev->default_timestamp = true;
++
++	clock->phydev = phydev;
++
++	rc = mchp_rds_ptp_init(clock);
++	if (rc < 0)
++		return ERR_PTR(rc);
++
++	return clock;
++}
++EXPORT_SYMBOL_GPL(mchp_rds_ptp_probe);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("MICROCHIP PHY RDS PTP driver");
++MODULE_AUTHOR("Divya Koppera");
 -- 
 2.17.1
 
