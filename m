@@ -1,121 +1,105 @@
-Return-Path: <netdev+bounces-150362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E210D9E9F39
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 20:09:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E749E9F4A
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 20:19:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF2EB16A0D3
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 19:09:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5B01883572
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 19:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632D017DFE3;
-	Mon,  9 Dec 2024 19:07:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD82198A08;
+	Mon,  9 Dec 2024 19:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="X79ao65h"
 X-Original-To: netdev@vger.kernel.org
-Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05FCF14E2CC;
-	Mon,  9 Dec 2024 19:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42758198A07;
+	Mon,  9 Dec 2024 19:19:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733771276; cv=none; b=swUebz+xJZhxYayQrbfMzfsIlH63+oCE+285UtFpi/e92j0bFvAKE/1k5rli4SauPbI6zHvWBfF8nbEHAYNBS2LgJJs/NdPFcAJWGqExjwMNyWzYK+Y2MudivIjvao39hw81rMdrEVEnaYtWe1GL/77QORn/M2cqGxbNZqeLdCA=
+	t=1733771967; cv=none; b=Zr/XsA8vC6QbneyJl5VmqL68xya4RL/YR/CnZ+CrpzIt2LPzRAm8VQssV+XWly+o19A9cRQjaUqpUdpPvhyrVpfUMIzrzQddTNTZUgvvoFO5mSQawsP1FQBoG1HmDMLDBduMpgOaCtX/a9f0LaYa/KW2jTgPgcXGr7av6bFbv0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733771276; c=relaxed/simple;
-	bh=GYpB0xHV+GOCcfVnZNdc8CB8Qm2VjIfSsU+NmGkALvQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OepQlP9UKP61QstNiGxR/MzoH8ejK6fmli+dg+EmaRfnDJcPf07qVWook5onwuBP2sHvHltsIJ9jqvyAp8oAr51WvpXuxjfDbRXuAQZVTp8/Biods+5ZkcuyNje2SdGmX3D70PDMb65aws/fk2wL+KLSJClx3G28REJpvxBscXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
-Received: from mail-relay (helo=jo-so.de)
-	by s1.jo-so.de with local-bsmtp (Exim 4.96)
-	(envelope-from <joerg@jo-so.de>)
-	id 1tKj6k-001Fl1-1K;
-	Mon, 09 Dec 2024 20:07:50 +0100
-Received: from joerg by zenbook.jo-so.de with local (Exim 4.98)
-	(envelope-from <joerg@jo-so.de>)
-	id 1tKj6j-00000000CLg-3IVT;
-	Mon, 09 Dec 2024 20:07:49 +0100
-From: =?UTF-8?q?J=C3=B6rg=20Sommer?= <joerg@jo-so.de>
-To: stable@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	Tristram Ha <Tristram.Ha@microchip.com>,
-	Michael Grzeschik <m.grzeschik@pengutronix.de>
-Subject: [PATCH] net: dsa: microchip: correct KSZ8795 static MAC table access
-Date: Mon,  9 Dec 2024 20:07:49 +0100
-Message-ID: <b4a802ae7dfac66efa5175313228f0ba2fc769ef.1733771269.git.joerg@jo-so.de>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1733771967; c=relaxed/simple;
+	bh=IkU30lh01yasDhhYl5DIZiX1actBPTKkOI868W5M7jM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Vs9deMVgYJxxWDIa/0JljpgAlf5mwG0dkgF6z6Z0fhwZLjfXW5qTWDROOFqibZ8m6sD7JvO/BS7gNpghA1SMPblx5YTy6ESiQBokFjiLH8FItg9mT55pjrcjx/cfePutzmzkAVWziiFSTdk8WKmdOq4JoFujQvCuegyxBd1uAKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=X79ao65h; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [10.0.0.115] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
+	by linux.microsoft.com (Postfix) with ESMTPSA id A64AF211F951;
+	Mon,  9 Dec 2024 11:19:23 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A64AF211F951
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1733771964;
+	bh=aNTJR2KnZDmn2B9w7QnkiUuDqNvJl6jmEMliRyXtV4c=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=X79ao65h/u13GLNKxSqyMJ9uUvtBpp3rw2v4gWdlaDngbyQZXN55Xh0ffA4IZXRhV
+	 QT6eYndeymBwoYWDgPYJwOjTDoq9oNVdrDHwkzAldgCCnjvKQkd2EPP2EZ64G6LAZ0
+	 D3aklNFCdRwoxFPP+bj7TYr2I59tP+ffoezRugPw=
+Message-ID: <a76d129c-2956-4bbc-bd14-cb12737b64df@linux.microsoft.com>
+Date: Mon, 9 Dec 2024 11:19:23 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/5] hyperv: Move hv_connection_id to hyperv-tlfs.h
+To: Wei Liu <wei.liu@kernel.org>
+Cc: linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, iommu@lists.linux.dev,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-arch@vger.kernel.org, virtualization@lists.linux.dev,
+ kys@microsoft.com, haiyangz@microsoft.com, mhklinux@outlook.com,
+ decui@microsoft.com, catalin.marinas@arm.com, will@kernel.org,
+ luto@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+ daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com, robh@kernel.org,
+ bhelgaas@google.com, arnd@arndb.de, sgarzare@redhat.com,
+ jinankjain@linux.microsoft.com, muminulrussell@gmail.com,
+ skinsburskii@linux.microsoft.com, mukeshrathor@microsoft.com,
+ vkuznets@redhat.com, ssengar@linux.microsoft.com, apais@linux.microsoft.com,
+ eahariha@linux.microsoft.com, horms@kernel.org
+References: <1732577084-2122-1-git-send-email-nunodasneves@linux.microsoft.com>
+ <1732577084-2122-2-git-send-email-nunodasneves@linux.microsoft.com>
+ <Z1Y0uJlVn-86KHE8@liuwe-devbox-debian-v2>
+Content-Language: en-US
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+In-Reply-To: <Z1Y0uJlVn-86KHE8@liuwe-devbox-debian-v2>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-[Backport of 4bdf79d686b49ac49373b36466acfb93972c7d7c to v5.15]
+On 12/8/2024 4:07 PM, Wei Liu wrote:
+> On Mon, Nov 25, 2024 at 03:24:40PM -0800, Nuno Das Neves wrote:
+>> This definition is in the wrong file; it is part of the TLFS doc.
+>>
+>> Acked-by: Wei Liu <wei.liu@kernel.org>
+>> Reviewed-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+>> Reviewed-by: Michael Kelley <mhklinux@outlook.com>
+>> Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+> 
+> One comment about the ordering of the tags. It is better to organize
+> them in the following order:
+> 
+> Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+> Acked-by: Wei Liu <wei.liu@kernel.org>
+> Reviewed-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+> Reviewed-by: Michael Kelley <mhklinux@outlook.com>
+> 
+> I've made the change for you while applying the patch.
+> 
 
-The rewrite in 9f73e11250fb3948a8599d72318951d5e93b1eaf contained some
-mistakes they where fixed with 4bdf79d686b49ac49373b36466acfb93972c7d7c in
-master. The code in 4bdf to support the bit shift is only required for
-KSZ8795, because support for KSZ8794 and KSZ8765 does not exist in v5.15.
+Thank you, noted for next time.
 
-Signed-off-by: Jörg Sommer <joerg@jo-so.de>
-Cc: Tristram Ha <Tristram.Ha@microchip.com>
-Cc: Michael Grzeschik <m.grzeschik@pengutronix.de>
----
- drivers/net/dsa/microchip/ksz8795.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
-index c5142f86a3c7..ef88e26aedf2 100644
---- a/drivers/net/dsa/microchip/ksz8795.c
-+++ b/drivers/net/dsa/microchip/ksz8795.c
-@@ -25,6 +25,8 @@
- #include "ksz8795_reg.h"
- #include "ksz8.h"
- 
-+#define KSZ8795_CHIP_ID         0x09
-+
- static const u8 ksz8795_regs[] = {
- 	[REG_IND_CTRL_0]		= 0x6E,
- 	[REG_IND_DATA_8]		= 0x70,
-@@ -52,13 +54,13 @@ static const u32 ksz8795_masks[] = {
- 	[STATIC_MAC_TABLE_VALID]	= BIT(21),
- 	[STATIC_MAC_TABLE_USE_FID]	= BIT(23),
- 	[STATIC_MAC_TABLE_FID]		= GENMASK(30, 24),
--	[STATIC_MAC_TABLE_OVERRIDE]	= BIT(26),
--	[STATIC_MAC_TABLE_FWD_PORTS]	= GENMASK(24, 20),
-+	[STATIC_MAC_TABLE_OVERRIDE]	= BIT(22),
-+	[STATIC_MAC_TABLE_FWD_PORTS]	= GENMASK(20, 16),
- 	[DYNAMIC_MAC_TABLE_ENTRIES_H]	= GENMASK(6, 0),
--	[DYNAMIC_MAC_TABLE_MAC_EMPTY]	= BIT(8),
-+	[DYNAMIC_MAC_TABLE_MAC_EMPTY]	= BIT(7),
- 	[DYNAMIC_MAC_TABLE_NOT_READY]	= BIT(7),
- 	[DYNAMIC_MAC_TABLE_ENTRIES]	= GENMASK(31, 29),
--	[DYNAMIC_MAC_TABLE_FID]		= GENMASK(26, 20),
-+	[DYNAMIC_MAC_TABLE_FID]		= GENMASK(22, 16),
- 	[DYNAMIC_MAC_TABLE_SRC_PORT]	= GENMASK(26, 24),
- 	[DYNAMIC_MAC_TABLE_TIMESTAMP]	= GENMASK(28, 27),
- };
-@@ -601,7 +603,13 @@ static int ksz8_r_sta_mac_table(struct ksz_device *dev, u16 addr,
- 				shifts[STATIC_MAC_FWD_PORTS];
- 		alu->is_override =
- 			(data_hi & masks[STATIC_MAC_TABLE_OVERRIDE]) ? 1 : 0;
--		data_hi >>= 1;
-+
-+		/* KSZ8795 family switches have STATIC_MAC_TABLE_USE_FID and
-+		 * STATIC_MAC_TABLE_FID definitions off by 1 when doing read on the
-+		 * static MAC table compared to doing write.
-+		 */
-+		if (dev->chip_id == KSZ8795_CHIP_ID)
-+			data_hi >>= 1;
- 		alu->is_static = true;
- 		alu->is_use_fid =
- 			(data_hi & masks[STATIC_MAC_TABLE_USE_FID]) ? 1 : 0;
--- 
-2.45.2
+> Thanks,
+> Wei.
 
 
