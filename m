@@ -1,244 +1,338 @@
-Return-Path: <netdev+bounces-150242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 263DB9E98AF
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:24:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 607019E98EE
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:32:01 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66A812858B3
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:24:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFEFD161688
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:31:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4FB61B0421;
-	Mon,  9 Dec 2024 14:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CDC115575F;
+	Mon,  9 Dec 2024 14:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XsNtkKDN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ktpgUpdm"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1771B0403
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 14:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE4C23313D
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 14:31:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733754252; cv=none; b=AFzj5RmyvrsASaV/KqSmR7XBq2eUjp+WiUz1fzJTTq3M6g3z2LDXgFA3sqQ8o7Dd1ymHMpVgevWVcmlhvJTZ7FLOwOvJs0cNZnVYtpEg4nqO4rHb0Zn8bW0nbS/4Cm4vr8eWZvqvGuNHW2zA2i9VnVWgBw1rOHI+QE11jAYm4K4=
+	t=1733754715; cv=none; b=qMbXbhvAl4fCVxFiNF5RU4aS2e7reKTj+u4v+tdQZGcSveUAyryuw39PwlXxgWrET3Crt604RozD8gAxbtWoVi0qPzHt9psM9qELhGdzLV7GCvXiUpb+9exl77CXbTKKY/QlBo/kqpef2RoCiKwMs/xNvYUUdBjtdtCwb91yAY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733754252; c=relaxed/simple;
-	bh=KRAIHUVBwYgyWavcd2jXfBUALyYN6V96AscSgihvkSA=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=awT1Vvnc5Ktm6wyChfl02xtylMhamiSdgaV25sfsQteJy5iLl3RZV0yS4BThideoquswY/oPEyzc4+viqJXWF0/p2NKH1JRLB5TQzKIuegfWK3xHQl1CSMJWJN2jYKGIi1K80S5OPN4PvjAdx1E3jHEVKutwhU3ysGsXr1K1nPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XsNtkKDN; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=86MjfvWnJQi9fO+/XaHjcVwzFGECVkyvIJk5JlTA9Ng=; b=XsNtkKDNOTvbeJr7G3bPtnIFlU
-	NFjtQ+yAOGGuTM3WpG3Y5kiK5gj0PE0tTbdANpt1vS3gePlxZyOxqZi2r0XXqO9flURylofgm02NA
-	eARRxxRmATzzn7iL4ULOudJ+6YqNFz+DRvms8KOEYEef7kAVBVev/VFvm/1fz9Mg4BAouZGA9RIb1
-	vpXknjM5LpHf5hyASCsInd4v044duH7lH3VsPgdh6qB8Nhk2RkyvAl1uXrmpk26A2o4mc7UnVFdAt
-	1iHqrqvZ4E3KAHkmQQdFPGVRMOPXyqKa2gB30bKdjzKdYglAzNiv6LKOgioekq0SB/BBmN5yjnZoZ
-	V2/Z/LnQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:55058 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tKeg9-0000yS-1o;
-	Mon, 09 Dec 2024 14:24:06 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tKeg8-006SNJ-4Q; Mon, 09 Dec 2024 14:24:04 +0000
-In-Reply-To: <Z1b9J-FihzJ4A6aQ@shell.armlinux.org.uk>
-References: <Z1b9J-FihzJ4A6aQ@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net-next 10/10] net: lan743x: convert to phylink managed EEE
+	s=arc-20240116; t=1733754715; c=relaxed/simple;
+	bh=MhfealCDqySBLn5juGHahWuXd8EMRr5usCna+BuLTus=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=UGfVvUjj8N1/nN5iBN84QhTe2q/CUE3SMiGPr4UivgAlc2xDQ5wVlk2oD16hIRv+72Gs15euo/MyVGyEN5owzHqtMHrV8s7v2KmQ2sFXEZiXBfaADKBMVURjdIVtfHYwN1H6jDCYP1iaAN8bwfowL2zvCpgCgdkD/Dy6c6lDew8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ktpgUpdm; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6d8918ec243so45389046d6.1
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 06:31:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733754711; x=1734359511; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=140AQ21XBNJ98TnkcQ9rCEV1zMN+f2SiZ+g0BtoRiaA=;
+        b=ktpgUpdmoZd7sf9EzzIja58v9yAQL5++f4+TuCInMZthUlAlO/7g3kaGYQ940FbZhH
+         2gxGDipAZRZbtzbZ+NjXpJ8+XYdRnlMN0IPYejnBH0XuZ+WA6nlJJyGyqcv5DGOa9yGt
+         lEOzXwainRhj6W7AkUM0DV/43LCixrWUZ+WIFOB57Crqm3/Akqjy9C+kBXYq2B98TDjm
+         pqK5ijWRboJ0JOI9xNvjQM0hotM9U0lOR3LH6jFyRvrY3eqAW0uCHjlgKJRopIpyPA7V
+         v/KzlWRc2lwac2sdD+yW/D/oynji8OMju9swTQ2n/Ib9YSq2coBMnw22ayv0+9DbUKv5
+         zVCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733754711; x=1734359511;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=140AQ21XBNJ98TnkcQ9rCEV1zMN+f2SiZ+g0BtoRiaA=;
+        b=MATjn38XnhFWkYpqv1wEBPZ1vjMWHMM9AANDHmx3KLjIiEeneUGru9RDWcpRW0rZKu
+         H/7kTnge4C/dgl8c54+FHRPE2j/1U5U+7bW+6sJ08J7shysnSVBZSyarMlZZAVXcfLlW
+         bR/7IJxiUc0t4HYxd4tgkdCzQCfaDg0tcvAf3bFdRH+F7KSYCCT+DWVUeqzniPav4sD8
+         esArxcl0wTg+DJqHXmD1PUol/ZIj3B2h6TgDdAIiSadoLtVa8mUB2C7vbru6ZBIsFKfg
+         28Es3Oet7uL++TB0dpoifAziWtozEmHEifsV89ABlOOnabNgTPo5l1k8FaYWUIZtSvdi
+         vIvg==
+X-Gm-Message-State: AOJu0YyRe/xi9r/ttWK8+HLYs2EXk9ABxz2BlsYj6upXYo1roEdH9sfC
+	GHGjvnF0kGFlas0Nkr9z4V7T+JWbmjir4O7CrQdXwEs/srgY1lmmsB8Ovg==
+X-Gm-Gg: ASbGncvW6/yp5TLtciHxxlnv858ir1uBxgF4SM/vc/JDxXpDvKTs9bxAiJrlUqQcsXk
+	IGLHOm/rowpMxHPy+jb4ABq9d8Fvgvsv+Wwyu98oxFE3n1iFIMPWB7WrU09f56JcF34q1IJnML+
+	2sObWrxUhhOnI1PqPRyHzmotBGFdJBSw4fRXAjS2OiXgaFs3iFxDzAWLrRrEz1Zoku1wx6o8lvM
+	VIzZxSzoKZ2Hx5898vFCmBh0HUW8bBjM4ONk+NCUZKtAmaX3d4FIJdi9hsytRRxgZlVXjtKaZt2
+	zkPckz/S0uuhBOl88nmv3w==
+X-Google-Smtp-Source: AGHT+IHBLM1SpvZ6ybYs9QOjsiDXHF/aH6fACmLpDGtZ2ALlzXzrpEkXLXj46wYQXgfl2Rexx7lsYQ==
+X-Received: by 2002:a05:6214:d6e:b0:6d8:9a85:5b4d with SMTP id 6a1803df08f44-6d91e2d378cmr13015736d6.5.1733754711491;
+        Mon, 09 Dec 2024 06:31:51 -0800 (PST)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b6d801632esm76852585a.7.2024.12.09.06.31.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 06:31:50 -0800 (PST)
+Date: Mon, 09 Dec 2024 09:31:50 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Anna Nyiri <annaemesenyiri@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ fejes@inf.elte.hu, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ willemb@google.com, 
+ idosch@idosch.org
+Message-ID: <6756ff5651ba1_31657c2948a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAKm6_Rtc8YPFk9QQQZ2p5aiY1zodqy7i484gb=Yq=qrSQaYSoA@mail.gmail.com>
+References: <20241205133112.17903-1-annaemesenyiri@gmail.com>
+ <20241205133112.17903-4-annaemesenyiri@gmail.com>
+ <6751cb5f3c7d3_119ae629480@willemb.c.googlers.com.notmuch>
+ <CAKm6_Rtc8YPFk9QQQZ2p5aiY1zodqy7i484gb=Yq=qrSQaYSoA@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 3/4] selftests: net: test SO_PRIORITY
+ ancillary data with cmsg_sender
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tKeg8-006SNJ-4Q@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 09 Dec 2024 14:24:04 +0000
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Convert lan743x to phylink managed EEE:
-- Set the lpi_capabilties.
-- Move the call to lan743x_mac_eee_enable() into the enable/disable
-  tx_lpi functions.
-- Ensure that EEEEN is clear during probe.
-- Move the setting of the LPI timer into mac_enable_tx_lpi().
-- Move reading of LPI timer to phylink initialisation to set the
-  default timer value.
+Anna Nyiri wrote:
+> Willem de Bruijn <willemdebruijn.kernel@gmail.com> ezt =C3=ADrta (id=C5=
+=91pont:
+> 2024. dec. 5., Cs, 16:48):
+> >
+> > Anna Emese Nyiri wrote:
+> > > Extend cmsg_sender.c with a new option '-Q' to send SO_PRIORITY
+> > > ancillary data.
+> > >
+> > > cmsg_so_priority.sh script added to validate SO_PRIORITY behavior
+> > > by creating VLAN device with egress QoS mapping and testing packet
+> > > priorities using flower filters. Verify that packets with different=
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../net/ethernet/microchip/lan743x_ethtool.c  | 21 -----------
- drivers/net/ethernet/microchip/lan743x_main.c | 37 ++++++++++++++++---
- drivers/net/ethernet/microchip/lan743x_main.h |  1 -
- 3 files changed, 31 insertions(+), 28 deletions(-)
+> > > priorities are correctly matched and counted by filters for multipl=
+e
+> > > protocols and IP versions.
+> > >
+> > > Suggested-by: Ido Schimmel <idosch@idosch.org>
+> > > Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+> > > ---
+> > >  tools/testing/selftests/net/Makefile          |   1 +
+> > >  tools/testing/selftests/net/cmsg_sender.c     |  11 +-
+> > >  .../testing/selftests/net/cmsg_so_priority.sh | 151 ++++++++++++++=
+++++
+> > >  3 files changed, 162 insertions(+), 1 deletion(-)
+> > >  create mode 100755 tools/testing/selftests/net/cmsg_so_priority.sh=
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-index 1a1cbd034eda..1459acfb1e61 100644
---- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
-+++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-@@ -1055,9 +1055,6 @@ static int lan743x_ethtool_get_eee(struct net_device *netdev,
- {
- 	struct lan743x_adapter *adapter = netdev_priv(netdev);
- 
--	eee->tx_lpi_timer = lan743x_csr_read(adapter,
--					     MAC_EEE_TX_LPI_REQ_DLY_CNT);
--
- 	return phylink_ethtool_get_eee(adapter->phylink, eee);
- }
- 
-@@ -1065,24 +1062,6 @@ static int lan743x_ethtool_set_eee(struct net_device *netdev,
- 				   struct ethtool_keee *eee)
- {
- 	struct lan743x_adapter *adapter = netdev_priv(netdev);
--	u32 tx_lpi_timer;
--
--	tx_lpi_timer = lan743x_csr_read(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT);
--	if (tx_lpi_timer != eee->tx_lpi_timer) {
--		u32 mac_cr = lan743x_csr_read(adapter, MAC_CR);
--
--		/* Software should only change this field when Energy Efficient
--		 * Ethernet Enable (EEEEN) is cleared.
--		 * This function will trigger an autonegotiation restart and
--		 * eee will be reenabled during link up if eee was negotiated.
--		 */
--		lan743x_mac_eee_enable(adapter, false);
--		lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT,
--				  eee->tx_lpi_timer);
--
--		if (mac_cr & MAC_CR_EEE_EN_)
--			lan743x_mac_eee_enable(adapter, true);
--	}
- 
- 	return phylink_ethtool_set_eee(adapter->phylink, eee);
- }
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index 8d7ad021ac70..25d37a2cb4a6 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -2966,7 +2966,7 @@ static int lan743x_phylink_2500basex_config(struct lan743x_adapter *adapter)
- 	return lan743x_pcs_power_reset(adapter);
- }
- 
--void lan743x_mac_eee_enable(struct lan743x_adapter *adapter, bool enable)
-+static void lan743x_mac_eee_enable(struct lan743x_adapter *adapter, bool enable)
- {
- 	u32 mac_cr;
- 
-@@ -3027,10 +3027,8 @@ static void lan743x_phylink_mac_link_down(struct phylink_config *config,
- 					  phy_interface_t interface)
- {
- 	struct net_device *netdev = to_net_dev(config->dev);
--	struct lan743x_adapter *adapter = netdev_priv(netdev);
- 
- 	netif_tx_stop_all_queues(netdev);
--	lan743x_mac_eee_enable(adapter, false);
- }
- 
- static void lan743x_phylink_mac_link_up(struct phylink_config *config,
-@@ -3072,16 +3070,32 @@ static void lan743x_phylink_mac_link_up(struct phylink_config *config,
- 					  cap & FLOW_CTRL_TX,
- 					  cap & FLOW_CTRL_RX);
- 
--	if (phydev)
--		lan743x_mac_eee_enable(adapter, phydev->enable_tx_lpi);
--
- 	netif_tx_wake_all_queues(netdev);
- }
- 
-+static void mac_disable_tx_lpi(struct phylink_config *config)
-+{
-+	lan743x_mac_eee_enable(adapter, false);
-+}
-+
-+static void mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
-+			      bool tx_clk_stop)
-+{
-+	/* Software should only change this field when Energy Efficient
-+	 * Ethernet Enable (EEEEN) is cleared. We ensure that by clearing
-+	 * EEEEN during probe, and phylink itself guarantees that
-+	 * mac_disable_tx_lpi() will have been previously called.
-+	 */
-+	lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT, timer);
-+	lan743x_mac_eee_enable(adapter, true);
-+}
-+
- static const struct phylink_mac_ops lan743x_phylink_mac_ops = {
- 	.mac_config = lan743x_phylink_mac_config,
- 	.mac_link_down = lan743x_phylink_mac_link_down,
- 	.mac_link_up = lan743x_phylink_mac_link_up,
-+	.mac_disable_tx_lpi = lan743x_mac_disable_tx_lpi,
-+	.mac_enable_tx_lpi = lan743x_mac_enable_tx_lpi,
- };
- 
- static int lan743x_phylink_create(struct lan743x_adapter *adapter)
-@@ -3095,6 +3109,10 @@ static int lan743x_phylink_create(struct lan743x_adapter *adapter)
- 
- 	adapter->phylink_config.mac_capabilities = MAC_ASYM_PAUSE |
- 		MAC_SYM_PAUSE | MAC_10 | MAC_100 | MAC_1000FD;
-+	adapter->phylink_config.lpi_capabilities = MAC_100FD | MAC_1000FD;
-+	adapter->phylink_config.lpi_timer_max = U32_MAX;
-+	adapter->phylink_config.lpi_timer_default =
-+		lan743x_csr_read(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT);
- 
- 	lan743x_phy_interface_select(adapter);
- 
-@@ -3120,6 +3138,10 @@ static int lan743x_phylink_create(struct lan743x_adapter *adapter)
- 		phy_interface_set_rgmii(adapter->phylink_config.supported_interfaces);
- 	}
- 
-+	memcpy(adapter->phylink_config.lpi_interfaces,
-+	       adapter->phylink_config.supported_interfaces,
-+	       sizeof(adapter->phylink_config.lpi_interfaces));
-+
- 	pl = phylink_create(&adapter->phylink_config, NULL,
- 			    adapter->phy_interface, &lan743x_phylink_mac_ops);
- 
-@@ -3517,6 +3539,9 @@ static int lan743x_hardware_init(struct lan743x_adapter *adapter,
- 		spin_lock_init(&tx->ring_lock);
- 	}
- 
-+	/* Ensure EEEEN is clear */
-+	lan743x_mac_eee_enable(adapter, false);
-+
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-index 8ef897c114d3..7f73d66854be 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.h
-+++ b/drivers/net/ethernet/microchip/lan743x_main.h
-@@ -1206,6 +1206,5 @@ void lan743x_hs_syslock_release(struct lan743x_adapter *adapter);
- void lan743x_mac_flow_ctrl_set_enables(struct lan743x_adapter *adapter,
- 				       bool tx_enable, bool rx_enable);
- int lan743x_sgmii_read(struct lan743x_adapter *adapter, u8 mmd, u16 addr);
--void lan743x_mac_eee_enable(struct lan743x_adapter *adapter, bool enable);
- 
- #endif /* _LAN743X_H */
--- 
-2.30.2
+> > >
+> > > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/s=
+elftests/net/Makefile
+> > > index cb2fc601de66..f09bd96cc978 100644
+> > > --- a/tools/testing/selftests/net/Makefile
+> > > +++ b/tools/testing/selftests/net/Makefile
+> > > @@ -32,6 +32,7 @@ TEST_PROGS +=3D ioam6.sh
+> > >  TEST_PROGS +=3D gro.sh
+> > >  TEST_PROGS +=3D gre_gso.sh
+> > >  TEST_PROGS +=3D cmsg_so_mark.sh
+> > > +TEST_PROGS +=3D cmsg_so_priority.sh
+> > >  TEST_PROGS +=3D cmsg_time.sh cmsg_ipv6.sh
+> > >  TEST_PROGS +=3D netns-name.sh
+> > >  TEST_PROGS +=3D nl_netdev.py
+> > > diff --git a/tools/testing/selftests/net/cmsg_sender.c b/tools/test=
+ing/selftests/net/cmsg_sender.c
+> > > index 876c2db02a63..99b0788f6f0c 100644
+> > > --- a/tools/testing/selftests/net/cmsg_sender.c
+> > > +++ b/tools/testing/selftests/net/cmsg_sender.c
+> > > @@ -59,6 +59,7 @@ struct options {
+> > >               unsigned int proto;
+> > >       } sock;
+> > >       struct option_cmsg_u32 mark;
+> > > +     struct option_cmsg_u32 priority;
+> > >       struct {
+> > >               bool ena;
+> > >               unsigned int delay;
+> > > @@ -97,6 +98,8 @@ static void __attribute__((noreturn)) cs_usage(co=
+nst char *bin)
+> > >              "\n"
+> > >              "\t\t-m val  Set SO_MARK with given value\n"
+> > >              "\t\t-M val  Set SO_MARK via setsockopt\n"
+> > > +            "\t\t-P val  Set SO_PRIORITY via setsockopt\n"
+> >
+> > Not in the actual code
+> >
+> > > +            "\t\t-Q val  Set SO_PRIORITY via cmsg\n"
+> > >              "\t\t-d val  Set SO_TXTIME with given delay (usec)\n"
+> > >              "\t\t-t      Enable time stamp reporting\n"
+> > >              "\t\t-f val  Set don't fragment via cmsg\n"
+> > > @@ -115,7 +118,7 @@ static void cs_parse_args(int argc, char *argv[=
+])
+> > >  {
+> > >       int o;
+> > >
+> > > -     while ((o =3D getopt(argc, argv, "46sS:p:P:m:M:n:d:tf:F:c:C:l=
+:L:H:")) !=3D -1) {
+> > > +     while ((o =3D getopt(argc, argv, "46sS:p:P:m:M:n:d:tf:F:c:C:l=
+:L:H:Q:")) !=3D -1) {
+> > >               switch (o) {
+> > >               case 's':
+> > >                       opt.silent_send =3D true;
+> > > @@ -148,6 +151,10 @@ static void cs_parse_args(int argc, char *argv=
+[])
+> > >                       opt.mark.ena =3D true;
+> > >                       opt.mark.val =3D atoi(optarg);
+> > >                       break;
+> > > +             case 'Q':
+> > > +                     opt.priority.ena =3D true;
+> > > +                     opt.priority.val =3D atoi(optarg);
+> > > +                     break;
+> > >               case 'M':
+> > >                       opt.sockopt.mark =3D atoi(optarg);
+> > >                       break;
+> > > @@ -252,6 +259,8 @@ cs_write_cmsg(int fd, struct msghdr *msg, char =
+*cbuf, size_t cbuf_sz)
+> > >
+> > >       ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
+> > >                         SOL_SOCKET, SO_MARK, &opt.mark);
+> > > +     ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
+> > > +                     SOL_SOCKET, SO_PRIORITY, &opt.priority);
+> > >       ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
+> > >                         SOL_IPV6, IPV6_DONTFRAG, &opt.v6.dontfrag);=
 
+> > >       ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
+> > > diff --git a/tools/testing/selftests/net/cmsg_so_priority.sh b/tool=
+s/testing/selftests/net/cmsg_so_priority.sh
+> > > new file mode 100755
+> > > index 000000000000..016458b219ba
+> > > --- /dev/null
+> > > +++ b/tools/testing/selftests/net/cmsg_so_priority.sh
+> > > @@ -0,0 +1,151 @@
+> > > +#!/bin/bash
+> > > +# SPDX-License-Identifier: GPL-2.0
+> > > +
+> > > +source lib.sh
+> > > +
+> > > +IP4=3D192.0.2.1/24
+> > > +TGT4=3D192.0.2.2
+> > > +TGT4_RAW=3D192.0.2.3
+> > > +IP6=3D2001:db8::1/64
+> > > +TGT6=3D2001:db8::2
+> > > +TGT6_RAW=3D2001:db8::3
+> > > +PORT=3D1234
+> > > +DELAY=3D4000
+> > > +TOTAL_TESTS=3D0
+> > > +FAILED_TESTS=3D0
+> > > +
+> > > +if ! command -v jq &> /dev/null; then
+> > > +    echo "Error: jq is not installed." >&2
+> > > +    exit 1
+> >
+> > use KSFT_ and in these cases skip rather than fail.
+> =
+
+> Did you mean something like this?
+> =
+
+> #!/bin/bash
+> # SPDX-License-Identifier: GPL-2.0
+> =
+
+> source lib.sh
+> =
+
+> DIR=3D"$(dirname $(readlink -f "$0"))"
+> source "${DIR}"/../kselftest/ktap_helpers.sh
+> =
+
+> if ! command -v jq &> /dev/null; then
+>     echo "SKIP cmsg_so_priroity.sh test: jq is not installed." >&2
+>     exit "$KSFT_SKIP"
+> fi
+
+Yes, similar to ksft_runner.sh
+
+It's helpful to differentiate skip from fail. Especially on external
+system tool dependencies.
+
+> Is a simple echo enough, or should I use ktap_skip_all instead?
+
+The exit code should suffice. Your test does not generate ktap output.
+
+> >
+> > > +fi
+> > > +
+> > > +check_result() {
+> > > +    ((TOTAL_TESTS++))
+> > > +    if [ "$1" -ne 0 ]; then
+> > > +        ((FAILED_TESTS++))
+> > > +    fi
+> > > +}
+> > > +
+> > > +cleanup()
+> > > +{
+> > > +    cleanup_ns $NS
+> > > +}
+> > > +
+> > > +trap cleanup EXIT
+> > > +
+> > > +setup_ns NS
+> > > +
+> > > +create_filter() {
+> > > +    local handle=3D$1
+> > > +    local vlan_prio=3D$2
+> > > +    local ip_type=3D$3
+> > > +    local proto=3D$4
+> > > +    local dst_ip=3D$5
+> > > +    local ip_proto
+> > > +
+> > > +    if [[ "$proto" =3D=3D "u" ]]; then
+> > > +        ip_proto=3D"udp"
+> > > +    elif [[ "$ip_type" =3D=3D "ipv4" && "$proto" =3D=3D "i" ]]; th=
+en
+> > > +        ip_proto=3D"icmp"
+> > > +    elif [[ "$ip_type" =3D=3D "ipv6" && "$proto" =3D=3D "i" ]]; th=
+en
+> > > +        ip_proto=3D"icmpv6"
+> > > +    fi
+> > > +
+> > > +    tc -n $NS filter add dev dummy1 \
+> > > +        egress pref 1 handle "$handle" proto 802.1q \
+> > > +        flower vlan_prio "$vlan_prio" vlan_ethtype "$ip_type" \
+> > > +        dst_ip "$dst_ip" ${ip_proto:+ip_proto $ip_proto} \
+> > > +        action pass
+> > > +}
+> > > +
+> > > +ip -n $NS link set dev lo up
+> > > +ip -n $NS link add name dummy1 up type dummy
+> > > +
+> > > +ip -n $NS link add link dummy1 name dummy1.10 up type vlan id 10 \=
+
+> > > +    egress-qos-map 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
+> > > +
+> > > +ip -n $NS address add $IP4 dev dummy1.10
+> > > +ip -n $NS address add $IP6 dev dummy1.10
+> > > +
+> > > +ip netns exec $NS sysctl -wq net.ipv4.ping_group_range=3D'0 214748=
+3647'
+> > > +
+> > > +ip -n $NS neigh add $TGT4 lladdr 00:11:22:33:44:55 nud permanent \=
+
+> > > +    dev dummy1.10
+> > > +ip -n $NS neigh add $TGT6 lladdr 00:11:22:33:44:55 nud permanent \=
+
+> > > +    dev dummy1.10
+> > > +ip -n $NS neigh add $TGT4_RAW lladdr 00:11:22:33:44:66 nud permane=
+nt \
+> > > +    dev dummy1.10
+> > > +ip -n $NS neigh add $TGT6_RAW lladdr 00:11:22:33:44:66 nud permane=
+nt \
+> > > +    dev dummy1.10
+> > > +
+> > > +tc -n $NS qdisc add dev dummy1 clsact
+> > > +
+> > > +FILTER_COUNTER=3D10
+
+Ack on FILTER_COUNTER btw.
 
