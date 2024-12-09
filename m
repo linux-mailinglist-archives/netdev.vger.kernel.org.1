@@ -1,254 +1,291 @@
-Return-Path: <netdev+bounces-150154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F9719E9337
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:02:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA43D9E933A
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:03:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEB59163F54
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:02:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4F8F1886D82
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:03:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB2F2236ED;
-	Mon,  9 Dec 2024 12:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD1C21CFF0;
+	Mon,  9 Dec 2024 12:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iXuX/6bC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F4Muoyrl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052E31922F6;
-	Mon,  9 Dec 2024 12:02:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733745728; cv=fail; b=RTXMeA1aCeMXjHEJZ0dX9nHBPN5GAhekVnQ1ZC5N9rrKIC40cqgDB0sCU5HP4ECmbCtSPnLDuMONf7IY37Zg2OqyICZPADHSA50XD94MsZfxP8yIk9JG9EWXJvB9y5UVKZdlGZ06bWXmL/g5MMEph66d8zR5NWoL8HGuRbf007k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733745728; c=relaxed/simple;
-	bh=UyA0/Mw9n5WUzPQkDFh1rV7dTtFuvIKnJus0jafUjv8=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Gn94/xMUpwcftCpY2BWEKdQ9iErMg390LVUz9DoBQ5clmNuX/KvQaH70bejXSUBmfgybnhGxjQC0tlW48YpA8wO1ujkMRzu09iJaTWafeL3KnAAW/o3sY3wxIsRBPBA+UIebnRVtBOROy8Xh6AfyinaGWswbRaeIOSBs9DSpq1I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iXuX/6bC; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733745726; x=1765281726;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=UyA0/Mw9n5WUzPQkDFh1rV7dTtFuvIKnJus0jafUjv8=;
-  b=iXuX/6bCsiV5DbeJVomYufZyDdk8pNSBz46NXZehgJDniG8qAv7ugJfJ
-   uTnsEFoTi2FZgl2S7RyRvwxMZOKzF2hh/06zfX/Xq3ceL3nIz+KZ4mCVp
-   7BVYiGRY0Q33yByDENC9bbuZJiKfCOOYIKYpAzC0yvW37AxRDo3fyaXuG
-   XyS+NxSJKVZrAI3Uzk3wEeuOKxuPDGIfhCQgifK2lgMXYQW1AKyodQ5K0
-   qX8TSsIhA452xMNLS3KvxNP43DsusAxlN8M8lty3iWejtXHRM+GW1yv0f
-   Lt1LEsKVneKT5hB20FnuAApafxHj+P3yRCHMJB/Pa0oUnU1jUX6E1H9G4
-   Q==;
-X-CSE-ConnectionGUID: q86tbiUhT2aPrKoqTotoVQ==
-X-CSE-MsgGUID: hDRJ8+PoS4iC252FPSPiVw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="33376452"
-X-IronPort-AV: E=Sophos;i="6.12,219,1728975600"; 
-   d="scan'208";a="33376452"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 04:02:04 -0800
-X-CSE-ConnectionGUID: RuB61iplQoa4buHZ6hF5iw==
-X-CSE-MsgGUID: HmL+y8muTr+ymH9yB2HFNg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,219,1728975600"; 
-   d="scan'208";a="118291933"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Dec 2024 04:02:03 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 9 Dec 2024 04:02:01 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 9 Dec 2024 04:02:01 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 9 Dec 2024 04:02:00 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uS+kjXWsgzoZdqSj/eSL5XfkfVfYq2cuSQRl6UEybBLULwbTmEJspFMDdwMArIfetvy4gYcDsuM4cqohT8R4TeOc8bsA48rDaCvAEqTFWn8nkGeUFJ9fVxLIEDzeFbHXhAR5WDHEBHCkJqbgHrphRZz8iNWQyfucmDPSXTq6bFAY7IP9iHDa+agBJFZ7fh4vfN0V8ruZ1jHj9aPaNXNfHPkAC1yW2/F4yT2ChxPpsBsbwc1799X8+RbJOLF3kcBnJRgN7dbK4tlBVJqg7+3pGAb2guhUk/KskQhz+9X/vLe/RosoqV8BvuwBKD1AC1yL/QitAEENUvcrg/5OuZaGmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cWO1vtST2RvN31AcCbA6YitT4GKod8x9EcWhSGYpNW4=;
- b=ANH8q43m/VKi3HisBqbPcLFAbHYlpaCn3rzQRLsHmO3482tc5Rwfwto41iHvFLw68zOiJ7zbZ47XSyoNddedhUlfTnupYAdArYW7cMguiTkY7nP9FfFc3eTKcuI4zYrlp+bVPvzs6G4CGhgvWEZUEgl3FpbBTDGGgMyYa+ItpquHoB/386C37g9Vk9F/pm9y7xBaM2Cr4Y3kfIY4xfaDlpDqYhNnE2FoYS+Bu4wAMeUNjS6Jgpo5K12GldF9o4pesXEwX+9ifVVuKbuGZSP081eJTtc56nD0Hot9bfDCkK/ncyQ/94MbMBgk0yN3e16g1yDNqZp4+Vf348elxgxKJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by SA3PR11MB7416.namprd11.prod.outlook.com (2603:10b6:806:316::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.17; Mon, 9 Dec
- 2024 12:01:50 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%4]) with mapi id 15.20.8230.010; Mon, 9 Dec 2024
- 12:01:50 +0000
-Message-ID: <72c8eb66-eb67-4f8b-b0c0-13f1aa001698@intel.com>
-Date: Mon, 9 Dec 2024 13:01:42 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-CC: <netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <cocci@inria.fr>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-s390@vger.kernel.org>,
-	<dri-devel@lists.freedesktop.org>, <intel-xe@lists.freedesktop.org>,
-	<linux-scsi@vger.kernel.org>, <xen-devel@lists.xenproject.org>,
-	<linux-block@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-	<ath11k@lists.infradead.org>, <linux-mm@kvack.org>,
-	<linux-bluetooth@vger.kernel.org>, <linux-staging@lists.linux.dev>,
-	<linux-rpi-kernel@lists.infradead.org>, <ceph-devel@vger.kernel.org>,
-	<live-patching@vger.kernel.org>, <linux-sound@vger.kernel.org>,
-	<etnaviv@lists.freedesktop.org>, <oss-drivers@corigine.com>,
-	<linuxppc-dev@lists.ozlabs.org>, Anna-Maria Behnsen
-	<anna-maria@linutronix.de>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <b9fcb12a-b7a4-4c33-836e-67109ce07deb@intel.com>
- <dab77729-682f-4182-9fb2-cd522ac29b5f@linux.microsoft.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <dab77729-682f-4182-9fb2-cd522ac29b5f@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR0P278CA0221.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:6a::29) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94206215704
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 12:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733745755; cv=none; b=Tw5haDZgCBHAFVmPmCgC6iBrX0YASpUj4vZnVFFljzAUNtjiJ9UsuFN7vaZSDaWxPBNrHff5iqzqS1qmeKGs7heMMzZzx4mLbygC/qfoBpvTuDLQkzeeJs68uHqP57kmreay0akkSo4aj6ljBZ0AhKZB5V2gig2kiWwOWmyHkog=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733745755; c=relaxed/simple;
+	bh=+Tjthp6EPaPFXc9emXZp2juJ+hOCTF5QeUcjMpXhC2c=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=oSXi1737v86wH6j3WQgdpt0TGJXgQL1+9ZHwE88h5xpqOHfdkJ1rfT++u5PNSJt4jo6iKgu8iFKRBK0NpF1t1nk7jP2oKwdRCnqL/q5qVG0rnEgINw24McsF0fi6igunmCnHmtG8GtZFEHGw13bI8IGuea1Wy5W8S5b25ioVYeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F4Muoyrl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733745752;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=JPu8ZtYEfgI3Se0DLhvDy3kRU1s9r+TbI1u0L6lWYgs=;
+	b=F4Muoyrlj9U6Hz/NAHK9fv9QSb/pOMf+GZBvo4R0tV4m0M1j0/MkUHy8Oy6AzLTsLbc035
+	NjJW3LQb0Pwkr/rHRSJ3AWcwAoxhWtHTTwxzoPLLRW5DyFpPrs9pFFDnSMas+cnvA/cPVo
+	by5Dyy58aquPrF7JtEtAs20b7QcdDVs=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-449-giGYTihCO2aYLWa6-_zoog-1; Mon, 09 Dec 2024 07:02:31 -0500
+X-MC-Unique: giGYTihCO2aYLWa6-_zoog-1
+X-Mimecast-MFC-AGG-ID: giGYTihCO2aYLWa6-_zoog
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-53e1ee761d7so2547264e87.1
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 04:02:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733745749; x=1734350549;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JPu8ZtYEfgI3Se0DLhvDy3kRU1s9r+TbI1u0L6lWYgs=;
+        b=QLsjnvjLCx6HIdMMJkDHwOOjTKEEbnqQxblNvlgJYnZlLEdSORJ76c7p4fgzjWYh12
+         lLZW79Yv3/R793ELUaXsI8AZPzdsV3lQslN832juuoXmM4GNmuN8p/Rci6hMKNou1qBt
+         BUmKsVXguXmzwCKhVNxjpgDt5oIKUCm50ReUFfMewoS6KQ55rta4MUaFfwGAR95Rwc0j
+         Xx+DPf9+BNTJ5o4VWG8JOTek79tJP0/ul/XYc/q5JutV7vIzac1PiheuikM6QnyGyvTH
+         iR234X4x3e5SzVeXUaLt8A2j2lxZRVbH+zoX6Sk3+MLOKnFdIKmyXLuSzLiRAhj2t6Vo
+         fR1g==
+X-Gm-Message-State: AOJu0YxEqOE5DEwObVfmzlnSCV2ja0yfcKngvvB0c1d07XzNeAxaD23v
+	0aMpqKS7cX59ezin8x/dscb0qN5oZ4c5BxTmdcwhAzXrdBYioJPWx8a0HvITVD1UHGjXT9g1kCI
+	MG7m1o/MepTJfIFSsroznCjSV2jMZfyEJwnpcV9WIXKUuJ0aQ/TWVkw==
+X-Gm-Gg: ASbGnctlRM2O7JwGntl5iwGalTAkFYcAvit+OG2/G3KD6K1a2y7zjOz95Fpd6uNbh2u
+	KnneMmrg68d1gm2zrn9LJqFlHk5gkRXx4TlE009ZzgS4R7gnBTB7S4DBxFO2dt0sFjCqk+ETw//
+	IHAZS3fADEXznrzASfPls8oFlDDzI9+T6eic3Yt6LxmaOL2Z22dXGxXCXHYTQ/4hTwgDRgwxg/P
+	9oZKwOOPxw2CtzmCXgWCoTU7vRb57DbrsCUtn7xhUJYiPI=
+X-Received: by 2002:a05:6512:ea0:b0:540:2092:934 with SMTP id 2adb3069b0e04-540240cd264mr78001e87.25.1733745749450;
+        Mon, 09 Dec 2024 04:02:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEd61V5p5PPbm/o4+Q38Yd6j/OzvYQPs0saaosW2vQYet0+4SNgjqO4ZW8KL7C2ceBMqjbHpw==
+X-Received: by 2002:a05:6512:ea0:b0:540:2092:934 with SMTP id 2adb3069b0e04-540240cd264mr77980e87.25.1733745748949;
+        Mon, 09 Dec 2024 04:02:28 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa67cd1e82bsm217712766b.53.2024.12.09.04.02.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 04:02:28 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 2878B16BD8D7; Mon, 09 Dec 2024 13:02:27 +0100 (CET)
+From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Date: Mon, 09 Dec 2024 13:02:18 +0100
+Subject: [PATCH net-next] net_sched: sch_cake: Add drop reasons
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SA3PR11MB7416:EE_
-X-MS-Office365-Filtering-Correlation-Id: fbc1c36e-1946-4347-72cf-08dd18494368
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?YWRaWVBuaVhybkhDN05KMFRwYUpmcjVnbStIR2hkVTg4cTI1T0JpWkNla1dM?=
- =?utf-8?B?Z0kzUy9jY0dENGFSWE1nVTVURmpWcjFGMWtvN2hZaGQzNVFCNDI1YTduM05a?=
- =?utf-8?B?b0JNZHZjZmh3S25PdjdiSDkvUWxYbHJtQVJoK1o1cW5Ic2FUVTN3YW1pZmNC?=
- =?utf-8?B?Sjl1UXpZU2N3ZCtEZkFlRjBQT0pZdHFjVWl4R0hRbDZBQmNBQnk4VHkwbXhC?=
- =?utf-8?B?ZzR3TWV6S1paSGpiemlJTDVKTjMyT1dHZ09zR2xFbE1jZkd1YTJuMUl2RGxp?=
- =?utf-8?B?OUxGY3ZaeWRRSnpqMU5jbWlHVGoybjYxd3NQWTVFZXFBa3JEdWpIbHF6ZDVN?=
- =?utf-8?B?K052M2xlNTZUMDJ4QmNvTEEzUURPNGxJR0VJV1dRNmQveGhCKysrVTRHNjcx?=
- =?utf-8?B?ZnVhUXpoNjJYWGdEMml0endxOTUxRTR0bUxZNVErd2NEZUNBZnhpMyttZlph?=
- =?utf-8?B?djd2bEdVVERYZzVpUFNIaVRmTC9wMzYxaGZSd0tvYkJaYXN0a1FOOGllK1BG?=
- =?utf-8?B?WmhRRWE5bTN2Y3RnUXU0ZFIrMStEYm1ONk1TMWhpR2Fwa1FaMzJXTzVHdUlH?=
- =?utf-8?B?OUMwZDZ0QVlxSjdocmVWWlJucUhsVE9uK01sK3VxWG9uRHQvSTRUanEwQ2NH?=
- =?utf-8?B?K3gwZVlHSWtVK2R0Um1wREZVbUkwTG1wWGVmN3ZCTnk3Sk1sMjYxbnZOVDRz?=
- =?utf-8?B?Y0ZYaE1yRFVaSWxaek1XM3hPOWNRbUtkaFM2Mm4wSnJpbjR3cEdlazNFLzVU?=
- =?utf-8?B?NkZGcU5pYkcyclNFYU1sMW1heXRzK0RjNnFyTlZKbGxqVjJhRW1MSlZXYTF2?=
- =?utf-8?B?bFhjSTJ5SG1TSEE5Uk5tVEN4WmxmeGQ3c3YxYloyZHUzODdEZDdqdnlmQk14?=
- =?utf-8?B?MEVPeXdSNmg5RXZTZVNFdjFmWlNobXJWdEQ3T0dzOXBFTklSL3BWakZhVWdm?=
- =?utf-8?B?ZTEyaDVJbVlNN2EzNUkwb0tyUG5WUjllWC92QjlTdVZrbWZUYTdlZnlSYUNh?=
- =?utf-8?B?NWVZOFo0bVRyd1BJK2Z1ZGZEL2cvRGZkV2ovdTFYaDFyeU80VzFjdDJnZkJJ?=
- =?utf-8?B?anpOcmh5SHZUOUhsbDFuTmR0WVJYSU5TUGVHY0YybEVtakdKT2lmMlErSHVs?=
- =?utf-8?B?VjV3MitiUFU3QitJdUtDMUl1YWxzamxMQldTSkVTVkZRcEt1TDdIOVY2Qzlw?=
- =?utf-8?B?Y21HQXBVZlJMMGlURUdxNHJ5L0MxQkFWVHM3Z3NpT1RUR1A3SGoxRVR2RndP?=
- =?utf-8?B?VVNPRkt1alhwd2dtcTJuQXRCZjZkZzljdjltdVIyV2RydjNwK0lxNE4rby9j?=
- =?utf-8?B?NFZZVWZwYW9uRHpGUElRdXdoNjBEV2t5MU1oaElnWVBiUXdBVnovNVViMy9z?=
- =?utf-8?B?aGtKU0VLcG5Gc04xVVFpZVhkZm1GaUJYNW9rd1FSc1pZNmFnVWFhQ0RBS0Vx?=
- =?utf-8?B?REQ4WFMzN0pNZi9HVEtMQVpJYWxtZXF1L3FZZ0tEdHg2Tk1ET1htMGVxQzA5?=
- =?utf-8?B?aExTblJJVTFyd04xT3dIeFJHV08xOHE2WWlSK3pDL2hhZ1Z5Q2hXRTV1NG5p?=
- =?utf-8?B?S3hSOGRIamdTR2t1ZFNvTGxONHhaYXp1MjQzNEZhM29nbkFIN2ovOWdDSmlp?=
- =?utf-8?B?OEhEbmk3YnR2TUNFNWxNUkliRDE3L2lhOGswOG1helkyVkpiS0FJM3pGNGt0?=
- =?utf-8?B?ODJSYXF4Y2p4YmVFaHpxM0RVNVlzelhEczZYS1BSc240b0R5ZnZDWjdUTllN?=
- =?utf-8?B?Rm5ZZUl2OHk3N1ZnTkVIQUZuRmpPUE1ramNyL0ZwOHBIVGpTTGE0c1NTbXp4?=
- =?utf-8?B?SjJxajJYSWNDR3dMODNkdz09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NTl2cUxMSWdXZWwzUWFBcnM3d2J0cTMxWlVDVldrajRnenBxakp0cDJpK2FB?=
- =?utf-8?B?eCtSeG5sdUFCV3BMY1F4Und2YVloKzlEUzBSWmlGSjNRNkw2amlnVjdkZDZ5?=
- =?utf-8?B?eGVWN1lRMUpjdStZUnZYWGNmb3o4QXozTE5ZaUYxd2UxaHFNS1BwenZicGhn?=
- =?utf-8?B?eTZkTkNLdzVSc3pydW1FK3Y4ZUZGSmFXeW5pS3QwZ1A4RmpiSTVMam9oM25Y?=
- =?utf-8?B?dGpkbVBUNTRMWTVRRXNHUFozUnRFUTA4dVpJcWsxOXZTeHhISW9CeE9mZ1Z4?=
- =?utf-8?B?N0FHV0NabUhYNDB2ZjhISGlEQ2pEZXNWdklzdDNPTUtRUnlsRTBEaWx3eHY2?=
- =?utf-8?B?RG5tZDNRR1I0alJITHA2N3VxN0QzOVBGR2NuNXVrNWtKTlIzMUdIYUNMbkVJ?=
- =?utf-8?B?aUhPaTRKdFQwdm1QZzNIT2YyQXpKL0tyU0d6SXh1RGl6dExmOGFFVE4vUCtt?=
- =?utf-8?B?ZUpEZmJwRis4WVF1bjkrUE5PTTNqWU5NdUV0RUdqaEZTQm81TER3UTJNNVl6?=
- =?utf-8?B?WGpHajF6enM2blFkQVFia1hDdnIvamk2S0txdG1Teld4Qk1IVjVpWENSSjR4?=
- =?utf-8?B?UHZVZzk3TWttVTlFTmxOR0t1R1BLMkZyTGNaZjAvVVRkSk9iZUZYMi9VN0Rq?=
- =?utf-8?B?aHdwZzBMcnNkVzFhVzZ0bys0Szc3TC9xZHBzY2NkS2ZLamhhTmM0Ryt5djVU?=
- =?utf-8?B?YWl2OHc3VGpvL1dJamtRSlFkN1dhSHpuNzBTa1ZPUTVlait4NGxoRkhhWFhC?=
- =?utf-8?B?eG9QTEpSZGJtenUxNVpYRUdicElVM1RHYlJJNTIwSWQ1emtiWkJaSVdoU0Zv?=
- =?utf-8?B?L2JoRUU4allJZXhmL1JBa1lyVTRCbDkzUUE3RDhmL2V2aEZYMnRzZmtwWmFz?=
- =?utf-8?B?SFZOSzB0clNVa0dpcmY5c3V3SkhtaG5TYWVYOHNwT3czUFdPSGw5bUpLa2lX?=
- =?utf-8?B?d0g4ODN6blFMNzFoL1VBWUtSVnIyMXloeFN5dlExWEowa1U2MWJnWDMvaFFU?=
- =?utf-8?B?VWluOCtNNi9oWHpWc29TOEFoekJlQjM0SHNETk5XVlFrcTI5TTNGVk5lRDFO?=
- =?utf-8?B?Y2lFMHBQZ2ZhYzdFNmxGTUhuVEE0eUpzUXkzM2c4WjdBSlU0RjhMNW9VeWl5?=
- =?utf-8?B?ZDNhZU9EUzE2VmdRMldRMUpCVmNQb0VuOGdPZDFLVTdJSnUrL0FMRnB1bm0v?=
- =?utf-8?B?L1NEWjl1MkFDdW1WcXdwZVdRLzZxZElvOVEwNnl4NHNFdUdhcFFQSEZWMEtl?=
- =?utf-8?B?NUxGT25ucDdZUllFbkd6OVduaFJLMm5kNlIySjI1djRTWjY4YmpDS056TXlU?=
- =?utf-8?B?SEVrcEwyV0JVeVpUQmFJZ0E2UmVNMkEyVXBrNThtcm9sWTMyT2s4cm9NNHdn?=
- =?utf-8?B?VkJJdkNFNUpBNkVEdmJkWjZnSlNldW10SVhWNHk3VHkwQSt2Nkk2U1Bvajli?=
- =?utf-8?B?SFVzOEg1VHg1QkEzdlhaYW5WZjhWQlFGVnk3czF5OWhRd3hLZC9qbm5uZ2g0?=
- =?utf-8?B?cVdYOGMxVFVzZ3MrUUxSSXZ1b2JucjRzekNzaHBrclVlbHptRTYveEtrN0Nu?=
- =?utf-8?B?VmZnSGlxQmN2b0RpZ0lKZ01qbEVJTWEyR2lYUWFremtaOGJ6TmF6ZHltZVhn?=
- =?utf-8?B?S0tDQXlMKzVPVU00KzNkOHlrbTZFVGNaWkIwNHRyVHA0WW1BVG1wb0o0c1Az?=
- =?utf-8?B?akRITDhPMUswY2hjTzFlcTNTN2cybnF1OE1Mc3pKNUhOMHp6MXV4R2J0Qnp4?=
- =?utf-8?B?Y1VISFRTUFVOZ3JCdms1d2xENkl6NHc4MGoxVjN4YTlRcVRzSjZpcGVjNTlu?=
- =?utf-8?B?NFFKMXIzSmhRQmI0VFB4dVFMNTgxdHQxVHNDQ3BzSlREeXU5Z0xnWm0wdkZK?=
- =?utf-8?B?WlJHSnpZZ1ZyT1hCaFRwZ0VHZHBlcHA3MnIvR0d1V3BTcGc1Rzd4b01rcGZJ?=
- =?utf-8?B?NVQxemhHclF4M2NJeUQwNXpZdDhXRmlOV3V6SzFtMlJ6a0ZCM091bXNFVUdy?=
- =?utf-8?B?R05iblBITWpVMGZ5U29nQlZNSWc4eTlZYm9pUEpsMzBXcUNFSkFvNlVGcmFH?=
- =?utf-8?B?TkFnN0R5ZklyVEoxQm94NTh6dzVYV1AzOStyUVo0SlA2TG1vZCtnMXA5M21K?=
- =?utf-8?B?blMweFNMRHRTbVQ5UGhjYUVWdWpkZ3NjL2ZmN1d4dGV1NnRZTUp1cjI1R1RW?=
- =?utf-8?B?UHc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: fbc1c36e-1946-4347-72cf-08dd18494368
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2024 12:01:50.0336
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 90RppGftVpk3FnymRpMqElEbYRGNrvoy9BAT6DroNtYjNKooFKLbkYJkbD2fkW+MuR4qzs1oYqLeiuNTTK8T1TE04fQVC07aiB1zb/08NYs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7416
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20241209-cake-drop-reason-v1-1-19205f6d1f19@redhat.com>
+X-B4-Tracking: v=1; b=H4sIAEncVmcC/x3MQQqDQAxG4atI1gYmQ7XgVUoXU/21QchIRkQQ7
+ 96hy2/x3kUFrig0NBc5Di2arULahsZvsgWsUzXFEB8SQ8djWsGT540dqWTjj/S9QPCcQ6KabY5
+ Zz//yRYadDedO7/v+ATTKwslsAAAA
+X-Change-ID: 20241205-cake-drop-reason-b1661e1e7f0a
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>, 
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+ Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, cake@lists.bufferbloat.net, 
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+X-Mailer: b4 0.14.2
 
-On 12/6/24 9:58 PM, Easwar Hariharan wrote:
-> On 11/29/2024 4:57 AM, Przemek Kitszel wrote:
->>
->> [removed most non-list recipients, it's just too much]
->>
->> On 11/15/24 10:26 PM, Easwar Hariharan wrote:
-> <snip>
+Add three qdisc-specific drop reasons for sch_cake:
 
->>
->> Regarding code - you could also convert msecs_to_jiffies(const * HZ),
->> there are 10 that are greppable.
->>
-> 
-> Those seem to be mistakes. const*HZ is a seconds-denominated timeout,
-> being passed to msecs_to_jiffies() which will treat it as a
-> millisecond-denominated timeout resulting in an excessively long
-> timeout. I suppose that's better than a too-short timeout, and
-> apparently it's been working fine all along since hardware responds
-> before the too-long timeout expires. Half of them are in
-> drivers/scsi/arcmsr/arcmsr_hba.c and the pattern has apparently been
-> there since 2010.
+ 1) SKB_DROP_REASON_CAKE_CONGESTED
+    Whenever a packet is dropped by the CAKE AQM algorithm because
+    congestion is detected.
 
-my point was that, the default value of HZ is 1000, and most of the code
-that is just `$value*HZ` was meant as "$value seconds, in ms unit".
+ 2) SKB_DROP_REASON_CAKE_FLOOD
+    Whenever a packet is dropped by the flood protection part of the
+    CAKE AQM algorithm (BLUE).
 
-Same for HZ/const, HZ/2 being 500ms.
+ 3) SKB_DROP_REASON_CAKE_OVERLIMIT
+    Whenever the total queue limit for a CAKE instance is exceeded and a
+    packet is dropped to make room.
 
-HZ is awful in that it is not 1s but 1/s, but it was easy to abuse the
-value in simple context.
+Also use the existing SKB_DROP_REASON_QUEUE_PURGE in cake_clear_tin().
 
-If you happen to touch this, please do in a separate series, to get more
-attention from drivers owners.
+Reasons show up as:
 
-> 
-> Thanks,
-> Easwar
+perf record -a -e skb:kfree_skb sleep 1; perf script
+
+          iperf3     665 [005]   848.656964: skb:kfree_skb: skbaddr=0xffff98168a333500 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x10f0 reason: CAKE_OVERLIMIT
+         swapper       0 [001]   909.166055: skb:kfree_skb: skbaddr=0xffff98168280cee0 rx_sk=(nil) protocol=34525 location=cake_dequeue+0x5ef reason: CAKE_CONGESTED
+
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+---
+ include/net/dropreason-core.h | 18 ++++++++++++++++++
+ net/sched/sch_cake.c          | 43 +++++++++++++++++++++++--------------------
+ 2 files changed, 41 insertions(+), 20 deletions(-)
+
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index c29282fabae6cdf9dd79f698b92b4b8f57156b1e..a9be76be11ad67d6cc7175f1a643314a7dcdf0b8 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -61,6 +61,9 @@
+ 	FN(FQ_BAND_LIMIT)		\
+ 	FN(FQ_HORIZON_LIMIT)		\
+ 	FN(FQ_FLOW_LIMIT)		\
++	FN(CAKE_CONGESTED)		\
++	FN(CAKE_FLOOD)			\
++	FN(CAKE_OVERLIMIT)		\
+ 	FN(CPU_BACKLOG)			\
+ 	FN(XDP)				\
+ 	FN(TC_INGRESS)			\
+@@ -329,6 +332,21 @@ enum skb_drop_reason {
+ 	 * exceeds its limits.
+ 	 */
+ 	SKB_DROP_REASON_FQ_FLOW_LIMIT,
++	/**
++	 * @SKB_DROP_REASON_CAKE_CONGESTED: dropped by the CAKE qdisc AQM
++	 * algorithm due to congestion.
++	 */
++	SKB_DROP_REASON_CAKE_CONGESTED,
++	/**
++	 * @SKB_DROP_REASON_CAKE_FLOOD: dropped by the flood protection part of
++	 * CAKE qdisc AQM algorithm (BLUE).
++	 */
++	SKB_DROP_REASON_CAKE_FLOOD,
++	/**
++	 * @SKB_DROP_REASON_CAKE_OVERLIMIT: dropped by CAKE qdisc when a qdisc
++	 * instance exceeds its total buffer size limit.
++	 */
++	SKB_DROP_REASON_CAKE_OVERLIMIT,
+ 	/**
+ 	 * @SKB_DROP_REASON_CPU_BACKLOG: failed to enqueue the skb to the per CPU
+ 	 * backlog queue. This can be caused by backlog queue full (see
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index 8d8b2db4653c0c9f271f9c1953e8c61175d8f76b..a57bdc771dd14e81fb0cdf54ca7890ac96f1e311 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -484,13 +484,14 @@ static bool cobalt_queue_empty(struct cobalt_vars *vars,
+ /* Call this with a freshly dequeued packet for possible congestion marking.
+  * Returns true as an instruction to drop the packet, false for delivery.
+  */
+-static bool cobalt_should_drop(struct cobalt_vars *vars,
+-			       struct cobalt_params *p,
+-			       ktime_t now,
+-			       struct sk_buff *skb,
+-			       u32 bulk_flows)
++static enum skb_drop_reason cobalt_should_drop(struct cobalt_vars *vars,
++					       struct cobalt_params *p,
++					       ktime_t now,
++					       struct sk_buff *skb,
++					       u32 bulk_flows)
+ {
+-	bool next_due, over_target, drop = false;
++	enum skb_drop_reason reason = SKB_NOT_DROPPED_YET;
++	bool next_due, over_target;
+ 	ktime_t schedule;
+ 	u64 sojourn;
+ 
+@@ -533,7 +534,8 @@ static bool cobalt_should_drop(struct cobalt_vars *vars,
+ 
+ 	if (next_due && vars->dropping) {
+ 		/* Use ECN mark if possible, otherwise drop */
+-		drop = !(vars->ecn_marked = INET_ECN_set_ce(skb));
++		if (!(vars->ecn_marked = INET_ECN_set_ce(skb)))
++			reason = SKB_DROP_REASON_CAKE_CONGESTED;
+ 
+ 		vars->count++;
+ 		if (!vars->count)
+@@ -556,16 +558,17 @@ static bool cobalt_should_drop(struct cobalt_vars *vars,
+ 	}
+ 
+ 	/* Simple BLUE implementation.  Lack of ECN is deliberate. */
+-	if (vars->p_drop)
+-		drop |= (get_random_u32() < vars->p_drop);
++	if (vars->p_drop && reason == SKB_NOT_DROPPED_YET &&
++	    get_random_u32() < vars->p_drop)
++		reason = SKB_DROP_REASON_CAKE_FLOOD;
+ 
+ 	/* Overload the drop_next field as an activity timeout */
+ 	if (!vars->count)
+ 		vars->drop_next = ktime_add_ns(now, p->interval);
+-	else if (ktime_to_ns(schedule) > 0 && !drop)
++	else if (ktime_to_ns(schedule) > 0 && reason == SKB_NOT_DROPPED_YET)
+ 		vars->drop_next = now;
+ 
+-	return drop;
++	return reason;
+ }
+ 
+ static bool cake_update_flowkeys(struct flow_keys *keys,
+@@ -1528,12 +1531,11 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+ 
+ 	flow->dropped++;
+ 	b->tin_dropped++;
+-	sch->qstats.drops++;
+ 
+ 	if (q->rate_flags & CAKE_FLAG_INGRESS)
+ 		cake_advance_shaper(q, b, skb, now, true);
+ 
+-	__qdisc_drop(skb, to_free);
++	qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_CAKE_OVERLIMIT);
+ 	sch->q.qlen--;
+ 	qdisc_tree_reduce_backlog(sch, 1, len);
+ 
+@@ -1926,7 +1928,7 @@ static void cake_clear_tin(struct Qdisc *sch, u16 tin)
+ 	q->cur_tin = tin;
+ 	for (q->cur_flow = 0; q->cur_flow < CAKE_QUEUES; q->cur_flow++)
+ 		while (!!(skb = cake_dequeue_one(sch)))
+-			kfree_skb(skb);
++			kfree_skb_reason(skb, SKB_DROP_REASON_QUEUE_PURGE);
+ }
+ 
+ static struct sk_buff *cake_dequeue(struct Qdisc *sch)
+@@ -1934,6 +1936,7 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch)
+ 	struct cake_sched_data *q = qdisc_priv(sch);
+ 	struct cake_tin_data *b = &q->tins[q->cur_tin];
+ 	struct cake_host *srchost, *dsthost;
++	enum skb_drop_reason reason;
+ 	ktime_t now = ktime_get();
+ 	struct cake_flow *flow;
+ 	struct list_head *head;
+@@ -2143,12 +2146,12 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch)
+ 			goto begin;
+ 		}
+ 
++		reason = cobalt_should_drop(&flow->cvars, &b->cparams, now, skb,
++					    (b->bulk_flow_count *
++					     !!(q->rate_flags &
++						CAKE_FLAG_INGRESS)));
+ 		/* Last packet in queue may be marked, shouldn't be dropped */
+-		if (!cobalt_should_drop(&flow->cvars, &b->cparams, now, skb,
+-					(b->bulk_flow_count *
+-					 !!(q->rate_flags &
+-					    CAKE_FLAG_INGRESS))) ||
+-		    !flow->head)
++		if (reason == SKB_NOT_DROPPED_YET || !flow->head)
+ 			break;
+ 
+ 		/* drop this packet, get another one */
+@@ -2162,7 +2165,7 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch)
+ 		b->tin_dropped++;
+ 		qdisc_tree_reduce_backlog(sch, 1, qdisc_pkt_len(skb));
+ 		qdisc_qstats_drop(sch);
+-		kfree_skb(skb);
++		kfree_skb_reason(skb, reason);
+ 		if (q->rate_flags & CAKE_FLAG_INGRESS)
+ 			goto retry;
+ 	}
+
+---
+base-commit: 7ea2745766d776866cfbc981b21ed3cfdf50124e
+change-id: 20241205-cake-drop-reason-b1661e1e7f0a
 
 
