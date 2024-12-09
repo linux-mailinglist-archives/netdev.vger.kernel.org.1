@@ -1,175 +1,120 @@
-Return-Path: <netdev+bounces-150115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C2959E8FA4
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:05:44 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D1B89E8FB2
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:07:56 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D959E280F2C
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:05:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 701CB1885CB0
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 10:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944792156FD;
-	Mon,  9 Dec 2024 10:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA95E2163A1;
+	Mon,  9 Dec 2024 10:07:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="pyinbY8D";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="LvZ2+XN3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dFAI0al/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48705174EDB;
-	Mon,  9 Dec 2024 10:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498E514658C
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 10:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733738739; cv=none; b=Iipmg7dMwZfWnzrXKX1a2WlcDcHjUAd9ygktC3SOgOp5TdZo4Dl8kPRTmeHA9nmgfJ9EgHZnuoHI65fUwgvgXukF5qdvGtu5LVVuWvHI2ShdTG8TRaJy2N7y2BRiiq00DAWt863GlTzjyta+mjmCwy2eCKfDaELkKXbWk7XUXRE=
+	t=1733738871; cv=none; b=ZM96TCbKOa04FH8es56de8SzzAvwNeQQ9TX3A0Osz8QiUXoF6kojR/SMYrytEU1fds0d0s+Rc0rfbqCLBr859VrgKcyZHXNSPs+NEj4hnHcLo82T9MFiaDLGx5M7rVoo6au0lLAbXGr4n8waqsCS/vqW8ksk0aYMyaBY2Ku4eYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733738739; c=relaxed/simple;
-	bh=sXo5sAmxXW6ZwYuOXa4/hmYfUCh/0aVkqv6kslgjWWo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PMkK7qMCjWDGD8tAgQMOdw5VkqNzHgNjy+92DPr5r1SZMXw0mtUQyuIuVM5pxJkS07TkOwoRwz+vmf7/OHajPFfczeFefQMrl812sa5wv1aMKK9ZMp7UTnvLXJn79upNQvgz3ho4KY8niDHIUb/t0O4yjc1oDcB2SvEMFEC2+IQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=pyinbY8D; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=LvZ2+XN3 reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+	s=arc-20240116; t=1733738871; c=relaxed/simple;
+	bh=7/QFYrIucxIu4JVKWt8Fr/FXGcFt4I6k8ZCkoCQc/0U=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bRsr61A592wX0mFizZcFe7wgrdJ2iCc+iW/PN3cXAsQdz36AY+eFJF6pkPX2rA8PxVyTNn3k8DLZ6J7IoLH9WnNkIfkhUkANdceoRcedJlHl+vpoV9qjaA8gnVSH1UVW0TJX2hAMTPlfQA3BpecUFPtBvD69YuV7aTKVbgc0j8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dFAI0al/; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b6c6429421so282138185a.0
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 02:07:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1733738736; x=1765274736;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=+NyqZAN0t1dGYImX+TcIzJnbZWbtpRtahPMvnfncONY=;
-  b=pyinbY8DVRYjZ2yAZZAjlN5N7SxAZc+DZhB+uVeKS3iNfNztrEPo79Bc
-   5rSIUmGFDtRs6a7iCDVadh/IYYoZ6Jdlno87beN3BE7iI6JYhlEoGzfGG
-   m1TvtaA7dUB7yll5XJD9U6EuyOj0CAf/kGI1RybcbITR9AMhxbii2JLIe
-   KgFXJ3Twt+Zfg3VJT8bXlbISTD7IzA0IhDOGUiO7vLEpmq0CkGUAcG5gW
-   NQy54qtazjegjP3teW6kg1M6FHr38gEe0lqVaEa62LZEKXhHdqfUeEDCL
-   ppWNdnci/5NYPN2wDCpt7RU6TnEW32jEUDZIRcSh9qzmcYUk7/wQBX/sN
-   Q==;
-X-CSE-ConnectionGUID: nWklzhSzRB+ZfJiZ+kLy6w==
-X-CSE-MsgGUID: 5VGgUcgCQxOkmpA6TO/NCg==
-X-IronPort-AV: E=Sophos;i="6.12,219,1728943200"; 
-   d="scan'208";a="40481917"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 09 Dec 2024 11:05:32 +0100
-X-CheckPoint: {6756C0EC-1B-90CD5875-E0265C0B}
-X-MAIL-CPID: 9AA2BE679C7A784F3A818C4F316453B2_3
-X-Control-Analysis: str=0001.0A682F28.6756C0EC.00E7,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4B0AA161063;
-	Mon,  9 Dec 2024 11:05:24 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1733738728;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+NyqZAN0t1dGYImX+TcIzJnbZWbtpRtahPMvnfncONY=;
-	b=LvZ2+XN3i3aNANKBYSt+2iPKWgtjvLhp12UvcgnsyOyi0sv3MptXB33R77DO0j4GnDiM3p
-	S73bwGYOGzYtqUJ5f1mgwRR1CnvrB881Q6+8ToS/8pyjTX2b5NLPqZc0xWjgRISX7Q+TZ4
-	j7tH5sH/2rSeMbPPE89Equ51bpkccHyJwmciRVBx1035FQ5dxZrOTNfSXNExpPeMrH7YTV
-	SHnY5WHXwj34zu2NLn+UXSmPOkttxmiJSz59SLKaSk1thoNkpRAIMHXGd8DtX1Zw7v/pcc
-	OrpRnFE+zOFhxwZQEd+xkPzcj1wXx1Av/LnGv8q5Eb2HWJ5RRQHtOWtgG4ATgg==
-Message-ID: <b84140959d80439346df949f67882a9136c6977d.camel@ew.tq-group.com>
-Subject: Re: [PATCH v4 1/2] can: m_can: set init flag earlier in probe
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Marc Kleine-Budde
-	 <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Martin =?ISO-8859-1?Q?Hundeb=F8ll?=
- <martin@geanix.com>, Markus Schneider-Pargmann <msp@baylibre.com>, "Felipe
- Balbi (Intel)" <balbi@kernel.org>, Raymond Tan <raymond.tan@intel.com>,
- Jarkko Nikula <jarkko.nikula@linux.intel.com>, linux-can@vger.kernel.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux@ew.tq-group.com
-Date: Mon, 09 Dec 2024 11:05:24 +0100
-In-Reply-To: <e247f331cb72829fcbdfda74f31a59cbad1a6006.1728288535.git.matthias.schiffer@ew.tq-group.com>
-References: 
-	<e247f331cb72829fcbdfda74f31a59cbad1a6006.1728288535.git.matthias.schiffer@ew.tq-group.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1 
+        d=google.com; s=20230601; t=1733738869; x=1734343669; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uANFO7U/koncysZn4RWMzdRkXZdHaxrLS1LM/vb954k=;
+        b=dFAI0al/7j+OLws/dAFYREIb5qeW027LpMpoZSfV/vbyYiVKhIX1Tx9piCEoo1PMd8
+         f/MpQ3dAk60BQif3KbBoeZ0h+iABHbqhn3B1jfK+0XZ1EkcPvMtpmycSS4Fs9x9y5dWf
+         ZL3xW6tlweNPdYjLEu2g35EAtS3G4tRpzV5RRItht9jgDB9FdJ9n1ftLWW51GtnlSsN4
+         RUwbZvRQdI+cj2OiW2wFkdVqmmuXqRyruZ4rw1DsWjbDgk5zlPGe8h9pj7kOABJCszq/
+         gAW1DW3oyvvbU+w32bPLT1ObZb7IXiBoWJdmWS/ZsNlFKnVAYsP0lVTECAbM8QYdc9fZ
+         vYOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733738869; x=1734343669;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uANFO7U/koncysZn4RWMzdRkXZdHaxrLS1LM/vb954k=;
+        b=EU8tfC+d+44tl2MfVhTFiheMX8HBUj7MYyscnLv2Uw9CdBKtk6dnRP6wtXSXg49Swe
+         pKJiGGGte3rQZocvo6qku+XaAWtPqlWoMJFKsnxlkpsGZTv8JRU4YlvkxoHhW1hXm5RL
+         O7Mf8+h0zMh3c8+76cDVUI2H8MY0RVRgGjkDvXkyQYKq/i0Stx+sPLtwHyZEyo5ES8XK
+         1eiMr5sNSEkX4KXmwy1YUcT25s8/eLD1H9sZ9qRhYuUf5Zs0504hm2GT73jaLa3sRCu9
+         icXvhhWD74a+6R4L0CCXTqYfn5KTdPwt/VsyjdT520Qkl6zGhut/ubuohfgGoHnYGtPs
+         VyTg==
+X-Gm-Message-State: AOJu0YzVHbFpr5MTPx5qdFuTxdbVeAXAhfFr/HZ1dp7fc507WAda3Wmq
+	SnZODoFLOddthUL5sKVJ/mpOfkreWVgvlT5H/TUu7/tWSOJzr8TmB2i4ri9P0k0g44k8CU6C2Ns
+	U0/jY8H1r/A==
+X-Google-Smtp-Source: AGHT+IGRL8Yrr3ulMwVe2w7GQPI8sUw87ZjYqz8ltSnFKSL6uB74VXGnMUXoyeIy3ADLsA5Hv5jereJm7FA66Q==
+X-Received: from qtcw37.prod.google.com ([2002:a05:622a:1925:b0:466:867e:7235])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:288b:b0:7b3:5858:1286 with SMTP id af79cd13be357-7b6bcb65a41mr2261462085a.47.1733738869264;
+ Mon, 09 Dec 2024 02:07:49 -0800 (PST)
+Date: Mon,  9 Dec 2024 10:07:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Last-TLS-Session-Version: TLSv1.3
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241209100747.2269613-1-edumazet@google.com>
+Subject: [PATCH v2 net-next 0/3] net: prepare for removal of net->dev_index_head
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Roopa Prabhu <roopa@nvidia.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Ido Schimmel <idosch@nvidia.com>, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 2024-10-07 at 10:23 +0200, Matthias Schiffer wrote:
-> While an m_can controller usually already has the init flag from a
-> hardware reset, no such reset happens on the integrated m_can_pci of the
-> Intel Elkhart Lake. If the CAN controller is found in an active state,
-> m_can_dev_setup() would fail because m_can_niso_supported() calls
-> m_can_cccr_update_bits(), which refuses to modify any other configuration
-> bits when CCCR_INIT is not set.
->=20
-> To avoid this issue, set CCCR_INIT before attempting to modify any other
-> configuration flags.
->=20
-> Fixes: cd5a46ce6fa6 ("can: m_can: don't enable transceiver when probing")
-> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> Reviewed-by: Markus Schneider-Pargmann <msp@baylibre.com>
-> ---
+This series changes rtnl_fdb_dump, last iterator using net->dev_index_head[]
 
-Hi,
+First patch creates ndo_fdb_dump_context structure, to no longer
+assume specific layout for the arguments.
 
-what's the status of these patches, are there remaining issues/comments? Th=
-ey
-still apply cleanly to linux-next.
+Second patch adopts for_each_netdev_dump() in rtnl_fdb_dump(),
+while changing two first fields of ndo_fdb_dump_context.
 
-Best regards,
-Matthias
+Third patch removes the padding, thus changing the location
+of ctx->fdb_idx now that all users agree on how to retrive it.
 
+After this series, the only users of net->dev_index_head
+are __dev_get_by_index() and dev_get_by_index_rcu().
 
->=20
-> v2: no changes
-> v3: updated comment to mention Elkhart Lake
-> v4: added Reviewed-by
->=20
->  drivers/net/can/m_can/m_can.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.=
-c
-> index 012c3d22b01dd..c85ac1b15f723 100644
-> --- a/drivers/net/can/m_can/m_can.c
-> +++ b/drivers/net/can/m_can/m_can.c
-> @@ -1681,6 +1681,14 @@ static int m_can_dev_setup(struct m_can_classdev *=
-cdev)
->  		return -EINVAL;
->  	}
-> =20
-> +	/* Write the INIT bit, in case no hardware reset has happened before
-> +	 * the probe (for example, it was observed that the Intel Elkhart Lake
-> +	 * SoCs do not properly reset the CAN controllers on reboot)
-> +	 */
-> +	err =3D m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
-> +	if (err)
-> +		return err;
-> +
->  	if (!cdev->is_peripheral)
->  		netif_napi_add(dev, &cdev->napi, m_can_poll);
-> =20
-> @@ -1732,11 +1740,7 @@ static int m_can_dev_setup(struct m_can_classdev *=
-cdev)
->  		return -EINVAL;
->  	}
-> =20
-> -	/* Forcing standby mode should be redundant, as the chip should be in
-> -	 * standby after a reset. Write the INIT bit anyways, should the chip
-> -	 * be configured by previous stage.
-> -	 */
-> -	return m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
-> +	return 0;
->  }
-> =20
->  static void m_can_stop(struct net_device *dev)
+We have to evaluate if switching them to dev_by_index xarray
+would be sensible.
 
---=20
-TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
-any
-Amtsgericht M=C3=BCnchen, HRB 105018
-Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
-neider
-https://www.tq-group.com/
+v2: addressed Ido feedback
+v1: https://lore.kernel.org/netdev/20241207162248.18536-1-edumazet@google.com/T/#m800755d4b16c7f335927a76d9f52ebd37f7f077c
+
+Eric Dumazet (3):
+  rtnetlink: add ndo_fdb_dump_context
+  rtnetlink: switch rtnl_fdb_dump() to for_each_netdev_dump()
+  rtnetlink: remove pad field in ndo_fdb_dump_context
+
+ .../ethernet/freescale/dpaa2/dpaa2-switch.c   |   3 +-
+ drivers/net/ethernet/mscc/ocelot_net.c 	   |   3 +-
+ drivers/net/vxlan/vxlan_core.c 			   |   5 +-
+ include/linux/rtnetlink.h					   |   6 +
+ net/bridge/br_fdb.c						   |   3 +-
+ net/core/rtnetlink.c						   | 108 +++++++-----------
+ net/dsa/user.c 							   |   3 +-
+ 7 files changed, 61 insertions(+), 70 deletions(-)
+
+--
+2.47.0.338.g60cca15819-goog
+
 
