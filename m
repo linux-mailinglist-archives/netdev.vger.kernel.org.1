@@ -1,72 +1,78 @@
-Return-Path: <netdev+bounces-150023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC8EB9E8974
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 04:13:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B8429E8A1A
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 05:05:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B96218826E0
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 03:13:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09C26163A13
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 04:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A7044360;
-	Mon,  9 Dec 2024 03:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5CA14AD0E;
+	Mon,  9 Dec 2024 04:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="K+jQJJsH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iG+yl8cA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4947A42AA4;
-	Mon,  9 Dec 2024 03:13:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3753042070
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 04:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733713999; cv=none; b=R7Kr6ITey1I+ZOc4z7SYbRMSse27xcymH5IHpgnz/9AsZPEX/BBuv3nH33ZCqaa/zLFtOK1xelIfi+6cXSZMr53doVFlS9asgq6HVY15Y7Esc4RFNOyC1m0QQf3pjX8J9RNN977lDwWuMXQnc3v0XJNl9M1Jd1H9/q/YqlNuy3M=
+	t=1733717108; cv=none; b=EkyrqNmOPw09JSGyoHPNDZZ8LKrv+i88VtVKPhDGcoANWhSjspLio9U12YW+5lK1KB/wpVwOqTXSODMtLNX6QLtbX7N0P+u3MlSzwSFaYbagiXihReBk4LaZqh3L823Ic2q9YggBTbqdpuBCF/CiE6Rtt5macA4caXP/YFui1Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733713999; c=relaxed/simple;
-	bh=mmGrFDAhdv3eTyd/mSMRyL+QMooMk1YbUbR+Efz7JAc=;
+	s=arc-20240116; t=1733717108; c=relaxed/simple;
+	bh=tnFN3cKLuaolTpd0KOneZQrwC6WFLR7ZhF2p0bYuJwk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Oe4HPL7fmQjc4v4Ch+GfO1UVEkoCEKmmx+17Ra9DXArRPu8LbAZlseNL69laHBLOvysEg2MEiBphm9UWsrlCFL/tFK9NU87wLK+h+SsnQ4Y6l0QCBfSsvjItYvM+0S9zTp0hgp0Zwd5U+zSw1bADd8V4wwuBDSB9M0vkftLC6UY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=K+jQJJsH; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=88hQB4j7kUiotkmkgkgByRkhQv0eIn7O2Y7qAPWY/ZU=; b=K+jQJJsHHuF3lBAjvZgqMSa3Bf
-	Zhe9FMBv8V6ad4i7a05BBLuaXo9dgNylVUELZQU5DwjRug4JNe0OG/rAWMlndChKNHvTttLc67DUt
-	9nbrqFbwVCrT8sq5GS/3Lmu2q8mrMqDRNBeyoazSbfqWLA3dyqjedDwLO389D7GFn4oc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tKUCr-00Fbvt-4J; Mon, 09 Dec 2024 04:13:09 +0100
-Date: Mon, 9 Dec 2024 04:13:09 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yijie Yang <quic_yijiyang@quicinc.com>
-Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: qcs615-ride: Enable ethernet
- node
-Message-ID: <4287c838-35b2-45bb-b4a2-e128b55ddbaf@lunn.ch>
-References: <20241118-dts_qcs615-v2-0-e62b924a3cbd@quicinc.com>
- <20241118-dts_qcs615-v2-2-e62b924a3cbd@quicinc.com>
- <ececbbe1-07b3-4050-b3a4-3de9451ac7d7@lunn.ch>
- <89a4f120-6cfd-416d-ab55-f0bdf069d9ce@quicinc.com>
- <c2800557-225d-4fbd-83ee-d4b72eb587ce@oss.qualcomm.com>
- <3c69423e-ba80-487f-b585-1e4ffb4137b6@lunn.ch>
- <2556b02c-f884-40c2-a0d4-0c87da6e5332@quicinc.com>
- <75fb42cc-1cc5-4dd3-924c-e6fda4061f03@quicinc.com>
- <4a6a6697-a476-40f4-b700-09ef18e4ba22@lunn.ch>
- <441f37f5-3c33-4c62-b3fe-728b43669e29@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qlh0MwqRa6Td6sj962RR9es3coXFXH7AXSI5nM7dleuklnWZueG8+/eGe/AH15UWhcqucuQ9mskixdgZSu47Vk790mOGrpXSeeFR5p/T5C769UPOUhMgAUrUJ+3DxrZaTEb7clvoFRBD6IZ0ixh2bW4m0LY8dLlhDFWu39EFomU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iG+yl8cA; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733717107; x=1765253107;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tnFN3cKLuaolTpd0KOneZQrwC6WFLR7ZhF2p0bYuJwk=;
+  b=iG+yl8cA9nxaF0I3u99FHNgdopaI6y/yIVMFaeKg7tfCpY1PlOSX6El9
+   29A+JNwKQCcYmgPKO5eX7WDVTZDtH7JllRjwLAuT8rAeeL0ZoQaDnbh//
+   4OasZfg/7Xztn1GbISpCo+/jlnTxRIrJPfiUXbBsu5iyQ36Uk0g/8kEBx
+   V13bGEC2+S1cBZoKb3fT3u5YlBG/Ijto3pOSvypDMi1GNf3CnfiGe0369
+   ZL61JZTb4dTY3ptAAOwXXdygwnZu8IN9vIwswCzEelcaPgmi7s/2y/jzK
+   4NkFeAGMtcsRNGM4UNSUz0tFgl0/mL/OAHIb1GBM8PmiUWCGRKxs8t9ra
+   Q==;
+X-CSE-ConnectionGUID: cH+hs5EkQtOC9hbAAnCk9g==
+X-CSE-MsgGUID: 4UzENW6rQ72yyCT4yWI4Hg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11280"; a="34235275"
+X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
+   d="scan'208";a="34235275"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 20:05:07 -0800
+X-CSE-ConnectionGUID: oVNjYBGfRsGlxE8W03ASyA==
+X-CSE-MsgGUID: eL0kmTS8QjeB8IHS+Sx9QQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
+   d="scan'208";a="94822674"
+Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 08 Dec 2024 20:05:04 -0800
+Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tKV14-0003mh-0Z;
+	Mon, 09 Dec 2024 04:05:02 +0000
+Date: Mon, 9 Dec 2024 12:04:10 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: Re: [PATCH v1 net-next 08/15] socket: Pass hold_net to sk_alloc().
+Message-ID: <202412071110.UY8rjRf1-lkp@intel.com>
+References: <20241206075504.24153-9-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,53 +81,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <441f37f5-3c33-4c62-b3fe-728b43669e29@quicinc.com>
+In-Reply-To: <20241206075504.24153-9-kuniyu@amazon.com>
 
-On Mon, Dec 09, 2024 at 10:11:23AM +0800, Yijie Yang wrote:
-> 
-> 
-> On 2024-11-29 23:29, Andrew Lunn wrote:
-> > > I was mistaken earlier; it is actually the EMAC that will introduce a time
-> > > skew by shifting the phase of the clock in 'rgmii' mode.
-> > 
-> > This is fine, but not the normal way we do this. The Linux preference
-> > is that the PHY adds the delays. There are a few exceptions, boards
-> > which have PHYs which cannot add delays. In that case the MAC adds the
-> > delays. But this is pretty unusual.
-> 
-> After testing, it has been observed that modes other than 'rgmii' do not
-> function properly due to the current configuration sequence in the driver
-> code.
+Hi Kuniyuki,
 
-O.K, so now you need to find out why.
+kernel test robot noticed the following build errors:
 
-It not working probably suggests you are adding double delays, both in
-the MAC and the PHY. Where the PHY driver add delays is generally easy
-to see in the code. Just search for PHY_INTERFACE_MODE_RGMII_ID. For
-the MAC driver you probably need to read the datasheet and find
-registers which control the delay.
+[auto build test ERROR on net-next/main]
 
-> > If you decided you want to be unusual and have the MAC add the delays,
-> > it should not be hard coded. You need to look at phy-mode. Only add
-> 
-> Are you suggesting that 'rgmii' indicates the delay is introduced by the
-> board rather than the EMAC?
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/socket-Un-export-__sock_create/20241206-160139
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241206075504.24153-9-kuniyu%40amazon.com
+patch subject: [PATCH v1 net-next 08/15] socket: Pass hold_net to sk_alloc().
+config: s390-allyesconfig (https://download.01.org/0day-ci/archive/20241207/202412071110.UY8rjRf1-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241207/202412071110.UY8rjRf1-lkp@intel.com/reproduce)
 
-Yes.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412071110.UY8rjRf1-lkp@intel.com/
 
-> But according to the
-> Documentation/devicetree/bindings/net/ethernet-controller.yaml, this mode
-> explicitly states that 'RX and TX delays are added by the MAC when
-> required'. That is indeed my preference.
+All errors (new ones prefixed by >>):
 
-You need to be careful with context. If the board is not adding
-delays, and you pass PHY_INTERFACE_MODE_RGMII to the PHY, the MAC must
-be adding the delays, otherwise there will not be any delays, and it
-will not work.
+   net/iucv/af_iucv.c: In function 'iucv_sock_alloc':
+>> net/iucv/af_iucv.c:455:14: error: too few arguments to function 'sk_alloc'
+     455 |         sk = sk_alloc(&init_net, PF_IUCV, prio, &iucv_proto, kern);
+         |              ^~~~~~~~
+   In file included from net/iucv/af_iucv.c:30:
+   include/net/sock.h:1745:14: note: declared here
+    1745 | struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
+         |              ^~~~~~~~
 
-> > delays for rgmii-id. And you then need to mask the value passed to the
-> > PHY, pass PHY_INTERFACE_MODE_RGMII, not PHY_INTERFACE_MODE_RGMII_ID,
-> > so the PHY does not add delays as well.
 
-	Andrew
+vim +/sk_alloc +455 net/iucv/af_iucv.c
+
+eac3731bd04c713 Jennifer Hunt     2007-02-08  448  
+8424c284851b97e Kuniyuki Iwashima 2024-12-06  449  static struct sock *iucv_sock_alloc(struct socket *sock, int proto, gfp_t prio,
+8424c284851b97e Kuniyuki Iwashima 2024-12-06  450  				    bool kern, bool hold_net)
+eac3731bd04c713 Jennifer Hunt     2007-02-08  451  {
+eac3731bd04c713 Jennifer Hunt     2007-02-08  452  	struct sock *sk;
+493d3971a65c921 Ursula Braun      2011-08-08  453  	struct iucv_sock *iucv;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  454  
+11aa9c28b420924 Eric W. Biederman 2015-05-08 @455  	sk = sk_alloc(&init_net, PF_IUCV, prio, &iucv_proto, kern);
+eac3731bd04c713 Jennifer Hunt     2007-02-08  456  	if (!sk)
+eac3731bd04c713 Jennifer Hunt     2007-02-08  457  		return NULL;
+493d3971a65c921 Ursula Braun      2011-08-08  458  	iucv = iucv_sk(sk);
+eac3731bd04c713 Jennifer Hunt     2007-02-08  459  
+eac3731bd04c713 Jennifer Hunt     2007-02-08  460  	sock_init_data(sock, sk);
+493d3971a65c921 Ursula Braun      2011-08-08  461  	INIT_LIST_HEAD(&iucv->accept_q);
+493d3971a65c921 Ursula Braun      2011-08-08  462  	spin_lock_init(&iucv->accept_q_lock);
+493d3971a65c921 Ursula Braun      2011-08-08  463  	skb_queue_head_init(&iucv->send_skb_q);
+493d3971a65c921 Ursula Braun      2011-08-08  464  	INIT_LIST_HEAD(&iucv->message_q.list);
+493d3971a65c921 Ursula Braun      2011-08-08  465  	spin_lock_init(&iucv->message_q.lock);
+493d3971a65c921 Ursula Braun      2011-08-08  466  	skb_queue_head_init(&iucv->backlog_skb_q);
+493d3971a65c921 Ursula Braun      2011-08-08  467  	iucv->send_tag = 0;
+3881ac441f642d5 Ursula Braun      2011-08-08  468  	atomic_set(&iucv->pendings, 0);
+493d3971a65c921 Ursula Braun      2011-08-08  469  	iucv->flags = 0;
+3881ac441f642d5 Ursula Braun      2011-08-08  470  	iucv->msglimit = 0;
+ef6af7bdb9e6c14 Julian Wiedmann   2021-01-28  471  	atomic_set(&iucv->skbs_in_xmit, 0);
+3881ac441f642d5 Ursula Braun      2011-08-08  472  	atomic_set(&iucv->msg_sent, 0);
+3881ac441f642d5 Ursula Braun      2011-08-08  473  	atomic_set(&iucv->msg_recv, 0);
+493d3971a65c921 Ursula Braun      2011-08-08  474  	iucv->path = NULL;
+3881ac441f642d5 Ursula Braun      2011-08-08  475  	iucv->sk_txnotify = afiucv_hs_callback_txnotify;
+b5d8cf0af167f3a Kees Cook         2021-11-18  476  	memset(&iucv->init, 0, sizeof(iucv->init));
+3881ac441f642d5 Ursula Braun      2011-08-08  477  	if (pr_iucv)
+3881ac441f642d5 Ursula Braun      2011-08-08  478  		iucv->transport = AF_IUCV_TRANS_IUCV;
+3881ac441f642d5 Ursula Braun      2011-08-08  479  	else
+3881ac441f642d5 Ursula Braun      2011-08-08  480  		iucv->transport = AF_IUCV_TRANS_HIPER;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  481  
+eac3731bd04c713 Jennifer Hunt     2007-02-08  482  	sk->sk_destruct = iucv_sock_destruct;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  483  	sk->sk_sndtimeo = IUCV_CONN_TIMEOUT;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  484  
+eac3731bd04c713 Jennifer Hunt     2007-02-08  485  	sock_reset_flag(sk, SOCK_ZAPPED);
+eac3731bd04c713 Jennifer Hunt     2007-02-08  486  
+eac3731bd04c713 Jennifer Hunt     2007-02-08  487  	sk->sk_protocol = proto;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  488  	sk->sk_state	= IUCV_OPEN;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  489  
+eac3731bd04c713 Jennifer Hunt     2007-02-08  490  	iucv_sock_link(&iucv_sk_list, sk);
+eac3731bd04c713 Jennifer Hunt     2007-02-08  491  	return sk;
+eac3731bd04c713 Jennifer Hunt     2007-02-08  492  }
+eac3731bd04c713 Jennifer Hunt     2007-02-08  493  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
