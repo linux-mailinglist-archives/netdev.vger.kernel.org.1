@@ -1,93 +1,173 @@
-Return-Path: <netdev+bounces-150032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF5C09E8B24
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 06:45:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6AC99E8B26
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 06:47:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEAC0281163
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 05:45:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7656628147A
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 05:47:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B371F1C232D;
-	Mon,  9 Dec 2024 05:45:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17FE82063F0;
+	Mon,  9 Dec 2024 05:47:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OTNFDvzx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LCJYHPuC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DD91C4A1B;
-	Mon,  9 Dec 2024 05:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F712063D7;
+	Mon,  9 Dec 2024 05:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733723155; cv=none; b=RtgsL5WmahWpWfBpP/f5DQDUkxy+gfaUVYQk7Z3qq1RQYv6LUSoaITx2Vy9bCn3TLxHQBHOkX6L/FRuzH0m8uTVG6TB/hFrHlKMqVAU/7bZCJ8UI+OU676N6dLNljZrrE/2CIJcz/Nu5CdgrRe1JF8npBI9imwB6ff9kWYK/chs=
+	t=1733723261; cv=none; b=kGJHR/SsFsr6Dd7nWKS/M3lbfLAHEkpL6XRwevBKkFztIGjg8Z2bxdrKZbOMnv0OR51a8tOrudpvi9m45DQ/pKZpzo4mgl0VBBeCKsKhj6A3u6wV8MFU8hYWGlu0qxvsnuKH1EJiNOP4+aLJyS3FylMFHhMTJ7fetnBw+t8le7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733723155; c=relaxed/simple;
-	bh=3X70tRunR7lYHlKpNIgdPIP119iuLEn/uQ0tKEhyDe0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kk1PVSqheJzwz//VOtHagvxWKDKo1y2Jl+8N+Ojcg2NsM8x4IdLJXf2hbKjl2681wN9O3Pw3Y/8I49z9BZ4Q0DE0zobUBPEOyTx3Z5j8YsdvYl+lhS3TKBkmyTHIefVxlcOMHaSMGCpNOoorWetCdZ9ijLHXz6q0K+MdbMVBNBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OTNFDvzx; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733723154; x=1765259154;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3X70tRunR7lYHlKpNIgdPIP119iuLEn/uQ0tKEhyDe0=;
-  b=OTNFDvzxXKN6lSpN0V6pH2kUaHpC4t9FpQQX4yuxFzC/iK9vTY5LFFrx
-   6qxglRO5wfT1O9PkyNE/yJ/vZg1ntR64fdx63qIPKVnvfRJbCHCY+W2uA
-   mV/zkRLLwunrXLyNdxHEbmlrwIy2DeyRD0LwLU4I7v+QmLtdwjxRshGu7
-   KAS4eAQAQ+06qoLDkul3db8BZhDfmgbIOlQc0Brms33LNHWsS8yHkKmf6
-   4P4sUMHI3E7T5ln4uQp7Yz1POIafzrpHFK5SI8KRm2cPFCu+X9dub43rD
-   +aPm8XrK2nx0+Vz8gTdqNMTG3IpG+nXUDQPkkMCGNS/8AAGzsQr00GGXf
-   Q==;
-X-CSE-ConnectionGUID: M1Z8xtfwSoeKKgoDzpDCWw==
-X-CSE-MsgGUID: xTBJrFfFTJCUjZLx4oQYkg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11280"; a="37934839"
-X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
-   d="scan'208";a="37934839"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 21:45:53 -0800
-X-CSE-ConnectionGUID: Jmfx+m5HTp6cwNLutHY53g==
-X-CSE-MsgGUID: Ojm1sNYFT6mihTvGQ9LVPg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
-   d="scan'208";a="99419996"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 21:45:51 -0800
-Date: Mon, 9 Dec 2024 06:42:49 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Justin Lai <justinlai0215@realtek.com>, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	horms@kernel.org, michal.kubiak@intel.com, pkshih@realtek.com,
-	larry.chiu@realtek.com
-Subject: Re: [PATCH net-next] rtase: Refine the if statement
-Message-ID: <Z1aDWTa2VzXiPpNf@mev-dev.igk.intel.com>
-References: <20241206084851.760475-1-justinlai0215@realtek.com>
- <Z1LVqssDBEZ7nsWQ@mev-dev.igk.intel.com>
- <20241206084158.172dd06d@kernel.org>
+	s=arc-20240116; t=1733723261; c=relaxed/simple;
+	bh=kwjtclmgfmugmEFlH6X5T8hfUwNrUkwmU1L96m3Y5CU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=o4+T6fY/j8m022pjK8/m8jn59dqvzA6644Gkc95BbKvb7iGT/yBu6Z+xOZvMVQzHt8kJpbClXj+Irjly6Vn4g7D9qXDxJnEe6f3hLn6pcvbiqMwh7KJd7hODppo6uoZADYItL6MTCj95fdmJf+wSPS5inIN9EmPLsrPH9xf3/60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LCJYHPuC; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-215770613dbso25278475ad.2;
+        Sun, 08 Dec 2024 21:47:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733723258; x=1734328058; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B+iVONp1bemOOkjT/n7EkSCEGBeAYMzJrereun6Nd8c=;
+        b=LCJYHPuCpPZfA/2KuD4Sm+k9UIWta8vJOHNS2vk1kSpxajlgma8uwENQhqw2LoOayA
+         gILVCnfHEIZugWTrKGrbgppiXtfGLOlG32yYBWDHW+7HyDTE97vVB3TGfuRvUqA3CGAK
+         sNEuQ7CSAQq88UIrDxPtVdXhrDKPGcP3W24tyuTYwdgs4QExYhT4RqdJVkrd0yDgXMac
+         KLk5wclOX9XptZGsQIoyIV5+pEeGgM0bzVYoIonhK4YDSfNS3w/FlVYI06o6s84wOcSV
+         /ZfhoNcH5w/l8Xm2qfMwDqg9JbgKG6gWKD6Wk2Jr9QbdihpGOEOV72DTdbb4jH5P5kBq
+         NXkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733723258; x=1734328058;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=B+iVONp1bemOOkjT/n7EkSCEGBeAYMzJrereun6Nd8c=;
+        b=GzX5t/0Ruajqm+/2X7HIk3LgNKy9qDaO6aE4YIDPORllc2cnlO2vylIxRfGJW6j2TV
+         Pr6To2ayKPJ5I98FjRp/XkluaIR/q6ByBWuSwzkeE2ICQdrf4Vp3sjXvTQQYWorKFmh+
+         MtV3Rju+yIxrnlKN3VytNWDDTgtpF6b/YmIDrNB82BNHCCOmZSUzNkJsOq3St1avx2Vd
+         wBLj13fbDHI3WCO9TkkrjkD2K7rsTqFIHmyr+zkg6RaBhuG6c3r66LalTI2xAh0ySu23
+         fdZPedndMD2w3WBQ9FQur6yZVZd89Fpovyo9f5ugZV70lQkAmpqvMG+c6017j/keBga2
+         jq0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUv6iYoWW6bfbQAIq2OkXUXCVJDeWjUnasWTc7yz5P6tkioAFSezXbaME6q0LAFZzfVasmUOeRiPHxcaC4v1c8=@vger.kernel.org, AJvYcCVgpVsuE+ul0fEKJgq4LAqB1BogMtB5C2Azvim+cvDo8cD5loeocZcmL2iuPBokJJwtNvkjYR12@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEw1IpmHPmvUjtY7gTPr4teekxY3fVAMQDx/ShTvuVGLwl8IDU
+	5szdeRXircw/wbao52PPG1/bdWIndWGPB7yGTDY0WJcnk1a8gGTz
+X-Gm-Gg: ASbGncvM/5n+oOG+0Xlt/JVd8eszVzsmVRcVZuJRB3MUxrjCEXJyPiCjx7WjIr/V0tK
+	9nZDAeDNvwh0oyCTV7/DABZYym6OyxaNlhd5QBtvnleuOHuO0njTuwkLfJ/6jvdwP3cXjQBWcG6
+	mD18lrGyhnDa1O/L4oIDGvmNa1EEFJPPumx/skKR/Ky3TJKrj/FLIO6iws7GVfatpwek2Av8muk
+	ZEG9HmJu3CkcwHKOtAmysS+xF75egVebUjQD9AJz6LsVvJ+Ra8=
+X-Google-Smtp-Source: AGHT+IH3TB1M3EYXQFyQ0vOpAYxhOjsfrL4CUMwiHNTW6xuCQCu0g5lKcbijP8BXnDeb4TrN4r+rYQ==
+X-Received: by 2002:a17:902:ce83:b0:216:50c6:6b42 with SMTP id d9443c01a7336-21650c670ffmr40365835ad.56.1733723258463;
+        Sun, 08 Dec 2024 21:47:38 -0800 (PST)
+Received: from localhost ([98.97.37.114])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2162b13d486sm32392125ad.191.2024.12.08.21.47.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Dec 2024 21:47:37 -0800 (PST)
+Date: Sun, 08 Dec 2024 21:47:36 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Michal Luczaj <mhal@rbox.co>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Eduard Zingerman <eddyz87@gmail.com>, 
+ Mykola Lysenko <mykolal@fb.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Michal Luczaj <mhal@rbox.co>
+Message-ID: <675684786d66c_1abf208ea@john.notmuch>
+In-Reply-To: <20241202-sockmap-replace-v1-1-1e88579e7bd5@rbox.co>
+References: <20241202-sockmap-replace-v1-0-1e88579e7bd5@rbox.co>
+ <20241202-sockmap-replace-v1-1-1e88579e7bd5@rbox.co>
+Subject: RE: [PATCH bpf 1/3] bpf, sockmap: Fix update element with same
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241206084158.172dd06d@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 06, 2024 at 08:41:58AM -0800, Jakub Kicinski wrote:
-> On Fri, 6 Dec 2024 11:44:58 +0100 Michal Swiatkowski wrote:
-> > I am not sure if it is worth to change.
+Michal Luczaj wrote:
+> Consider a sockmap entry being updated with the same socket:
 > 
-> True, tho, FWIW, if it's the maintainer of the codebase sending the
-> change it's generally fine. Our "no pointless churn" rule is primarily
-> for randoes.
+> 	osk = stab->sks[idx];
+> 	sock_map_add_link(psock, link, map, &stab->sks[idx]);
+> 	stab->sks[idx] = sk;
+> 	if (osk)
+> 		sock_map_unref(osk, &stab->sks[idx]);
+> 
+> Due to sock_map_unref(), which invokes sock_map_del_link(), all the psock's
+> links for stab->sks[idx] are torn:
+> 
+> 	list_for_each_entry_safe(link, tmp, &psock->link, list) {
+> 		if (link->link_raw == link_raw) {
+> 			...
+> 			list_del(&link->list);
+> 			sk_psock_free_link(link);
+> 		}
+> 	}
+> 
+> And that includes the new link sock_map_add_link() added just before the
+> unref.
+> 
+> This results in a sockmap holding a socket, but without the respective
+> link. This in turn means that close(sock) won't trigger the cleanup, i.e. a
+> closed socket will not be automatically removed from the sockmap.
+> 
+> Stop tearing the links when a matching link_raw is found.
+> 
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
 
-Sure, thanks for letting me know.
+Thanks. LGTM.
+
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
+
+>  net/core/sock_map.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+> index 78347d7d25ef31525f8ec0a755a18e5793ad92c0..20b348b1964a10a1b0bfbe1a90a4a4cd99715b81 100644
+> --- a/net/core/sock_map.c
+> +++ b/net/core/sock_map.c
+> @@ -159,6 +159,7 @@ static void sock_map_del_link(struct sock *sk,
+>  				verdict_stop = true;
+>  			list_del(&link->list);
+>  			sk_psock_free_link(link);
+> +			break;
+>  		}
+>  	}
+>  	spin_unlock_bh(&psock->link_lock);
+> 
+> -- 
+> 2.46.2
+> 
+
+
 
