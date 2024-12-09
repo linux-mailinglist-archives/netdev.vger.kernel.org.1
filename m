@@ -1,375 +1,216 @@
-Return-Path: <netdev+bounces-150220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C7A19E97F8
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:57:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E27A19E9814
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 15:02:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83880281AA5
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 13:57:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 412272822DB
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 14:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E8335968;
-	Mon,  9 Dec 2024 13:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105BA1ACEBC;
+	Mon,  9 Dec 2024 14:02:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MCDaW0ek"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zo1QlyJu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A541ACEA7
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 13:57:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F62435971;
+	Mon,  9 Dec 2024 14:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733752624; cv=none; b=WQjwOxUDh9uEAvbCmoC9JXwbz6N4mPj+aOF5y/IhEQX73vm3XQ+7AGjrwBT2Cf9C8cUXpPOIfRJdxOiy/JxXqyDLhvHBqiWGx3uhWPcqOZBDnL8S1dG2oMS3HyfWAM29qUf9LowimS+gZQ064Ocs/68OVuOqKxEBvZF9uaBUEbA=
+	t=1733752950; cv=none; b=Lz+3oGG15a7YMNKobOSXtZ0zVd2DWFloBdr31RSN6TLFP/gKqg/jpdJG8dFmZ5HZR9xgm9vd9xmWS5plCh2tGaiSXs8yH4M8ls9L61o2OsUoKSSz0IjMYn7582rkbbtAY5e9ALIMjhmseDgj2EG1V3vpRDljiEcXrqpluD7S0Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733752624; c=relaxed/simple;
-	bh=a9Kb3E2QuwBq8eNG4F9ntmuF2PFK3eEIvtNpbXaSwQg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YQbuCGDC3Su2ynJlk3Ci2u9YhJFR76TEGbqc+BCFNIgR8aPJFPlARWFVUvqPjcquFNNb8CtZYaJPuzOrE9ATVR+JKbOTSIg5RYgRkMtAsLkQe84Xs1zHcBiO5BuQjSbR4NLRzdnv48e534Fl3YMFhYPcOeFVj9ZiYFMjDQZwuac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MCDaW0ek; arc=none smtp.client-ip=209.85.166.52
+	s=arc-20240116; t=1733752950; c=relaxed/simple;
+	bh=03xiu9pYOCrdNfcv/qw+gwiZHTNUJB2+YIld69kTu/Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hYRgf5hx29N50KuLNLiVN89h/etY7Dcf5MY0SZPfjXCiRNzHcC66qbPdOFMVZitH/J1KY/hPl7eVYyfcnFKeO0hHc2G/rrujEi2f2hFUPe/gvHxDdF44M9VJ+eoaycnWquvD55Y/OjdnAq3O7Tfto8b6Ecfte3gHmOF0PRyrzHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zo1QlyJu; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-8418a2f596fso132938639f.1
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 05:57:02 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2165448243fso9431105ad.1;
+        Mon, 09 Dec 2024 06:02:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733752622; x=1734357422; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JGOumAH6/TLIe8lfeAHIiCToUa2S92mxitzu3ILyHTM=;
-        b=MCDaW0ek/lmn3h0jWTaNF96DiT7sJjPvqksbJGrGVsG8+EBhcjeL2zcz10qioTUmGg
-         px62txwOzvELsKC2li2LJoOHz1dqRkKz710tsUSiqUekajpexI3fBQcKBtrw7THPUlCD
-         DXJuk4rQV7cKcPUJ76W93C4oOh2d5dW9dn4Jgop28aQBcP10RI/2rg5jpdUprOp9cR2S
-         9kMwTqhr77k/YpQcq7yx2+O+5EnLIErFSwV/OnH5XseXy8BuCBsSlWyFqLl+llrvOqrG
-         1S+rrGZ6FPxOz69qSIPSw8cGSwnBsiHwDw7ZM+HXzRkdXXTdc1AL3epyIq6Hb4hQX5Jf
-         d8yA==
+        d=gmail.com; s=20230601; t=1733752948; x=1734357748; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OAhPp2pGpsvDTqVI2eQ221kABd4Y8/kh7k1mWyeQzTw=;
+        b=Zo1QlyJu+XBbTOO3w8tdc1A3K2lJwyV/8N78TenKl/WSv6/43Mh7ynbcJQrT7vuJEB
+         VZit3+tvX2NY/mI42fkzQoSLYEW3NT/9F2egqk0KFHPOCbC6N0K6X1e1r586nvaa2Yng
+         Btx9WB9mwHnpmkyoB5eUWqQz1r8gNo4MmlxqhoGWoJapaff6XG/oBURLapB2gsYB/yKZ
+         dE44RyCUSMneeMPQYUhg3wpdx73MVunOvpT+K+ThEnmI1lwrGGZqg3ybUXBJFkSr/h4U
+         Y58cYcTR3OdBAR09eBO3kUrvEIbxNMdIPybE1boYdMKyQEzLCqKzPX43Qe7DNxizHkFz
+         tmOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733752622; x=1734357422;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JGOumAH6/TLIe8lfeAHIiCToUa2S92mxitzu3ILyHTM=;
-        b=WtWP5pVUlgaaNJF+Tj3RJTTpLz59SBOnY7E8h9yiX0fpIK36cGn6HxBWm5R284+q9q
-         WZQ8q93uomkgvgvWogUwc7URex+XGkrpT6zil7C42APrjVCKqYwB1DDIfciBB+d5Ywd6
-         iFkfJE9K+clTecEJoTZ0RZ5ta+Tx/XccK93tPDA1chIwgl1GcuYD2BPvvSWUZmBjsX+t
-         xPRS5MY9DxSXEaEag+u1a8J4cSuM11G2KZrrSk7G8Vhy9MNKfHEX8EHvkHDFoM/D2dO3
-         VA+t9oD5TcnzmKfKCUuogKEEU/j+CNFCDWxHsc/JsPlJTBhvMz1YlYrXfxpyy6tiyDa+
-         kztg==
-X-Gm-Message-State: AOJu0Ywo+cdLvJ71Zyadyji3QSRj+vNbUaHoAkVfdakEUItj5UY0oLSj
-	dk+by5hG4N+toVGqDFsgpUR7bPVxeh+86T9DKtK267dl1d4Q7YGOb9CxY6i9oF/mABeGbm6chvW
-	f2Fe0rU6pPFSGK0a0P2acsbibVRA=
-X-Gm-Gg: ASbGncv1vN0tRGHA1IcdLr89NKN9i3f/CrcEzK5NzbfydYjN/Y4eKN+hNa8dKmP0q91
-	eKnDski06k0lFur2ByRVSTFF2CdD8EZ8rn2j+IP3YVmbbBy//Z9Jey7QKZVTW/Q5q
-X-Google-Smtp-Source: AGHT+IHp6eevl+IdlgI4i4Iwgb09g95HWfE5MBHOhhaNvqgG3IigZQhpAultmXxTDSaMV3u5wc92baOMQayTgZgLTUo=
-X-Received: by 2002:a05:6602:14d2:b0:843:e89d:b62b with SMTP id
- ca18e2360f4ac-844b5239717mr56949539f.11.1733752621719; Mon, 09 Dec 2024
- 05:57:01 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733752948; x=1734357748;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OAhPp2pGpsvDTqVI2eQ221kABd4Y8/kh7k1mWyeQzTw=;
+        b=viUPrGf0LTdi2fKoIcPWM6KEiBrdjAbXkS7TyclAjmP5uaG4ASY5zbYncggROaOgWz
+         AIw17krdv5HlX91kMP1v+AIBVIim3dVPaeaFFcatxTlkOc7xTmJ77ajDjTyKEPiAlppx
+         zmrkbLl+PeVfhrQp+nUKzNfIWgtMfE4mQ6i1JIcNtV2mWpYfgVxtQG1D0lgRmQJVpSqh
+         W0O12xyCmoMV58k/ErBXZrHNaN/Oi2yBDxaqAUDAcmIGfec3xLoHBizX1v5Sn1GXovm9
+         4B39Klvm5eZXO9t7QX8IbcGmpXafpZSFaz5vHWZi4cJC6DoEwm1dnL87dpL8WpRQlDJM
+         1KBA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0lTN3rPXi3GK74dAIoY+HvFm2QvDwqGRWibMh3iUyvuK8z9AtURRUTg1XrQuiJXnjuv8=@vger.kernel.org, AJvYcCU8zqng2OpiE4vF46u6tgfE0IiNPcMXclVlVkGR1a+l2E49IxSxOGK9HnZuHwVBiSrjexlQ5ZQ3yHq65Q==@vger.kernel.org, AJvYcCUut6kck6f7uekoEuNhbB+dMXd4pNcViDq+Xt0z+Q8bXjY7AGzwurKu4Li2rsGWmP6tjSNyIfrzWmq7TQP5@vger.kernel.org, AJvYcCVP5UPLy/lrrB+k231xlOjSzzsrEL0VSPAVimVEzQjKEQ/XekITzjBmddfFmNxRv/TASU7ctTSdh71Y/RzR0L0=@vger.kernel.org, AJvYcCVd87fNDyW6jeItN+eFfXEW3vY78KV05tGRUWfG9kTW6ptS8j/vAaplk4MDQEKUzcDSeX5OC+JV4nTE@vger.kernel.org, AJvYcCWTDJdpCu/thTEae5mrZaHodfTkRkdESIjSKkYYkKoRpfV/+9PCLlK2oEgK3i7dL4jYVNVRZD3V496uhQ==@vger.kernel.org, AJvYcCWeqcqxbgFTCL/2FbBgD0RIawwsIUdaUc2OKMjU+fCcVtNOn9m/DBpyoN0iGN/3OqPuZxVlUKEDKrEXlgFvknQ7@vger.kernel.org, AJvYcCWqr0rJjQoksMWKY1Rbp3RDMyUZRfRqzepzLYxuDUwdOaX9FHMMlL0gQ/5MaK0vHTR23IENwoaeUsqI@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8Y2iJ6sjZX0kqTyUavxQoPxS+LN7DE9T4BpL9iEH9f/ZtlDxe
+	rLO+azhVPQKKYXayWI/Qo+U7nTHa64llceccduYhdUFZpeV1Kak8TIpUMdOfvnY=
+X-Gm-Gg: ASbGncvT4vtOE3nJYWZzhvSf/xsuFhmXbmcOEWuKpbAgae6Dtc/WY1q/zZw8yw65iFq
+	iKlooPPJE1cc+grS0rKaoCVdrpa6+rL3OLTctBwB56koLbRtTofkzdn/tI47k2OzxPdzkYrWssN
+	l1rLpC/5ElH0lmP34DMBWD1BhwE6hOmp+UecQ22yxrj7uuDyI4AMtai07Xx7Gzj0RVTPJLHlzQU
+	PcQbXKemkhmX2sceCS4pjKPmq2SUWmtwOqPqNfYvIfqTQ4=
+X-Google-Smtp-Source: AGHT+IEziqjANISe8V7T1b1Vo9dS8nge43qoErTxjCtNhfTplDp9qnHGPIzO4tjQCtyFccSJFTBRCw==
+X-Received: by 2002:a17:902:e74f:b0:216:4122:925f with SMTP id d9443c01a7336-21641229442mr90363145ad.14.1733752948110;
+        Mon, 09 Dec 2024 06:02:28 -0800 (PST)
+Received: from nova-ws.. ([103.167.140.11])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-216221db645sm49605645ad.46.2024.12.09.06.02.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 06:02:26 -0800 (PST)
+From: Xiao Liang <shaw.leon@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	linux-rdma@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	osmocom-net-gprs@lists.osmocom.org,
+	bpf@vger.kernel.org,
+	linux-ppp@vger.kernel.org,
+	wireguard@lists.zx2c4.com,
+	linux-wireless@vger.kernel.org,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	bridge@lists.linux.dev,
+	linux-wpan@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v5 0/5] net: Improve netns handling in RTNL and ip_tunnel
+Date: Mon,  9 Dec 2024 22:01:46 +0800
+Message-ID: <20241209140151.231257-1-shaw.leon@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241205133112.17903-1-annaemesenyiri@gmail.com>
- <20241205133112.17903-4-annaemesenyiri@gmail.com> <6751cb5f3c7d3_119ae629480@willemb.c.googlers.com.notmuch>
-In-Reply-To: <6751cb5f3c7d3_119ae629480@willemb.c.googlers.com.notmuch>
-From: Anna Nyiri <annaemesenyiri@gmail.com>
-Date: Mon, 9 Dec 2024 14:56:50 +0100
-Message-ID: <CAKm6_Rtc8YPFk9QQQZ2p5aiY1zodqy7i484gb=Yq=qrSQaYSoA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 3/4] selftests: net: test SO_PRIORITY
- ancillary data with cmsg_sender
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, willemb@google.com, idosch@idosch.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Willem de Bruijn <willemdebruijn.kernel@gmail.com> ezt =C3=ADrta (id=C5=91p=
-ont:
-2024. dec. 5., Cs, 16:48):
->
-> Anna Emese Nyiri wrote:
-> > Extend cmsg_sender.c with a new option '-Q' to send SO_PRIORITY
-> > ancillary data.
-> >
-> > cmsg_so_priority.sh script added to validate SO_PRIORITY behavior
-> > by creating VLAN device with egress QoS mapping and testing packet
-> > priorities using flower filters. Verify that packets with different
-> > priorities are correctly matched and counted by filters for multiple
-> > protocols and IP versions.
-> >
-> > Suggested-by: Ido Schimmel <idosch@idosch.org>
-> > Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-> > ---
-> >  tools/testing/selftests/net/Makefile          |   1 +
-> >  tools/testing/selftests/net/cmsg_sender.c     |  11 +-
-> >  .../testing/selftests/net/cmsg_so_priority.sh | 151 ++++++++++++++++++
-> >  3 files changed, 162 insertions(+), 1 deletion(-)
-> >  create mode 100755 tools/testing/selftests/net/cmsg_so_priority.sh
-> >
-> > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selft=
-ests/net/Makefile
-> > index cb2fc601de66..f09bd96cc978 100644
-> > --- a/tools/testing/selftests/net/Makefile
-> > +++ b/tools/testing/selftests/net/Makefile
-> > @@ -32,6 +32,7 @@ TEST_PROGS +=3D ioam6.sh
-> >  TEST_PROGS +=3D gro.sh
-> >  TEST_PROGS +=3D gre_gso.sh
-> >  TEST_PROGS +=3D cmsg_so_mark.sh
-> > +TEST_PROGS +=3D cmsg_so_priority.sh
-> >  TEST_PROGS +=3D cmsg_time.sh cmsg_ipv6.sh
-> >  TEST_PROGS +=3D netns-name.sh
-> >  TEST_PROGS +=3D nl_netdev.py
-> > diff --git a/tools/testing/selftests/net/cmsg_sender.c b/tools/testing/=
-selftests/net/cmsg_sender.c
-> > index 876c2db02a63..99b0788f6f0c 100644
-> > --- a/tools/testing/selftests/net/cmsg_sender.c
-> > +++ b/tools/testing/selftests/net/cmsg_sender.c
-> > @@ -59,6 +59,7 @@ struct options {
-> >               unsigned int proto;
-> >       } sock;
-> >       struct option_cmsg_u32 mark;
-> > +     struct option_cmsg_u32 priority;
-> >       struct {
-> >               bool ena;
-> >               unsigned int delay;
-> > @@ -97,6 +98,8 @@ static void __attribute__((noreturn)) cs_usage(const =
-char *bin)
-> >              "\n"
-> >              "\t\t-m val  Set SO_MARK with given value\n"
-> >              "\t\t-M val  Set SO_MARK via setsockopt\n"
-> > +            "\t\t-P val  Set SO_PRIORITY via setsockopt\n"
->
-> Not in the actual code
->
-> > +            "\t\t-Q val  Set SO_PRIORITY via cmsg\n"
-> >              "\t\t-d val  Set SO_TXTIME with given delay (usec)\n"
-> >              "\t\t-t      Enable time stamp reporting\n"
-> >              "\t\t-f val  Set don't fragment via cmsg\n"
-> > @@ -115,7 +118,7 @@ static void cs_parse_args(int argc, char *argv[])
-> >  {
-> >       int o;
-> >
-> > -     while ((o =3D getopt(argc, argv, "46sS:p:P:m:M:n:d:tf:F:c:C:l:L:H=
-:")) !=3D -1) {
-> > +     while ((o =3D getopt(argc, argv, "46sS:p:P:m:M:n:d:tf:F:c:C:l:L:H=
-:Q:")) !=3D -1) {
-> >               switch (o) {
-> >               case 's':
-> >                       opt.silent_send =3D true;
-> > @@ -148,6 +151,10 @@ static void cs_parse_args(int argc, char *argv[])
-> >                       opt.mark.ena =3D true;
-> >                       opt.mark.val =3D atoi(optarg);
-> >                       break;
-> > +             case 'Q':
-> > +                     opt.priority.ena =3D true;
-> > +                     opt.priority.val =3D atoi(optarg);
-> > +                     break;
-> >               case 'M':
-> >                       opt.sockopt.mark =3D atoi(optarg);
-> >                       break;
-> > @@ -252,6 +259,8 @@ cs_write_cmsg(int fd, struct msghdr *msg, char *cbu=
-f, size_t cbuf_sz)
-> >
-> >       ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
-> >                         SOL_SOCKET, SO_MARK, &opt.mark);
-> > +     ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
-> > +                     SOL_SOCKET, SO_PRIORITY, &opt.priority);
-> >       ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
-> >                         SOL_IPV6, IPV6_DONTFRAG, &opt.v6.dontfrag);
-> >       ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
-> > diff --git a/tools/testing/selftests/net/cmsg_so_priority.sh b/tools/te=
-sting/selftests/net/cmsg_so_priority.sh
-> > new file mode 100755
-> > index 000000000000..016458b219ba
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/net/cmsg_so_priority.sh
-> > @@ -0,0 +1,151 @@
-> > +#!/bin/bash
-> > +# SPDX-License-Identifier: GPL-2.0
-> > +
-> > +source lib.sh
-> > +
-> > +IP4=3D192.0.2.1/24
-> > +TGT4=3D192.0.2.2
-> > +TGT4_RAW=3D192.0.2.3
-> > +IP6=3D2001:db8::1/64
-> > +TGT6=3D2001:db8::2
-> > +TGT6_RAW=3D2001:db8::3
-> > +PORT=3D1234
-> > +DELAY=3D4000
-> > +TOTAL_TESTS=3D0
-> > +FAILED_TESTS=3D0
-> > +
-> > +if ! command -v jq &> /dev/null; then
-> > +    echo "Error: jq is not installed." >&2
-> > +    exit 1
->
-> use KSFT_ and in these cases skip rather than fail.
+This patch series includes some netns-related improvements and fixes for
+RTNL and ip_tunnel, to make link creation more intuitive:
 
-Did you mean something like this?
+ - Creating link in another net namespace doesn't conflict with link names
+   in current one.
+ - Refector rtnetlink link creation. Create link in target namespace
+   directly. Pass both source and link netns to drivers via newlink()
+   callback.
 
-#!/bin/bash
-# SPDX-License-Identifier: GPL-2.0
+So that
 
-source lib.sh
+  # ip link add netns ns1 link-netns ns2 tun0 type gre ...
 
-DIR=3D"$(dirname $(readlink -f "$0"))"
-source "${DIR}"/../kselftest/ktap_helpers.sh
+will create tun0 in ns1, rather than create it in ns2 and move to ns1.
+And don't conflict with another interface named "tun0" in current netns.
 
-if ! command -v jq &> /dev/null; then
-    echo "SKIP cmsg_so_priroity.sh test: jq is not installed." >&2
-    exit "$KSFT_SKIP"
-fi
+---
 
-Is a simple echo enough, or should I use ktap_skip_all instead?
+v5:
+ - Fix function doc in batman-adv.
+ - Include peer_net in rtnl newlink parameters.
+
+v4:
+ link: https://lore.kernel.org/all/20241118143244.1773-1-shaw.leon@gmail.com/
+ - Pack newlink() parameters to a single struct.
+ - Use ynl async_msg_queue.empty() in selftest.
+
+v3:
+ link: https://lore.kernel.org/all/20241113125715.150201-1-shaw.leon@gmail.com/
+ - Drop "netns_atomic" flag and module parameter. Add netns parameter to
+   newlink() instead, and convert drivers accordingly.
+ - Move python NetNSEnter helper to net selftest lib.
+
+v2:
+ link: https://lore.kernel.org/all/20241107133004.7469-1-shaw.leon@gmail.com/
+ - Check NLM_F_EXCL to ensure only link creation is affected.
+ - Add self tests for link name/ifindex conflict and notifications
+   in different netns.
+ - Changes in dummy driver and ynl in order to add the test case.
+
+v1:
+ link: https://lore.kernel.org/all/20241023023146.372653-1-shaw.leon@gmail.com/
 
 
+Xiao Liang (5):
+  net: ip_tunnel: Build flow in underlay net namespace
+  rtnetlink: Lookup device in target netns when creating link
+  rtnetlink: Decouple net namespaces in rtnl_newlink_create()
+  selftests: net: Add python context manager for netns entering
+  selftests: net: Add two test cases for link netns
 
->
-> > +fi
-> > +
-> > +check_result() {
-> > +    ((TOTAL_TESTS++))
-> > +    if [ "$1" -ne 0 ]; then
-> > +        ((FAILED_TESTS++))
-> > +    fi
-> > +}
-> > +
-> > +cleanup()
-> > +{
-> > +    cleanup_ns $NS
-> > +}
-> > +
-> > +trap cleanup EXIT
-> > +
-> > +setup_ns NS
-> > +
-> > +create_filter() {
-> > +    local handle=3D$1
-> > +    local vlan_prio=3D$2
-> > +    local ip_type=3D$3
-> > +    local proto=3D$4
-> > +    local dst_ip=3D$5
-> > +    local ip_proto
-> > +
-> > +    if [[ "$proto" =3D=3D "u" ]]; then
-> > +        ip_proto=3D"udp"
-> > +    elif [[ "$ip_type" =3D=3D "ipv4" && "$proto" =3D=3D "i" ]]; then
-> > +        ip_proto=3D"icmp"
-> > +    elif [[ "$ip_type" =3D=3D "ipv6" && "$proto" =3D=3D "i" ]]; then
-> > +        ip_proto=3D"icmpv6"
-> > +    fi
-> > +
-> > +    tc -n $NS filter add dev dummy1 \
-> > +        egress pref 1 handle "$handle" proto 802.1q \
-> > +        flower vlan_prio "$vlan_prio" vlan_ethtype "$ip_type" \
-> > +        dst_ip "$dst_ip" ${ip_proto:+ip_proto $ip_proto} \
-> > +        action pass
-> > +}
-> > +
-> > +ip -n $NS link set dev lo up
-> > +ip -n $NS link add name dummy1 up type dummy
-> > +
-> > +ip -n $NS link add link dummy1 name dummy1.10 up type vlan id 10 \
-> > +    egress-qos-map 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
-> > +
-> > +ip -n $NS address add $IP4 dev dummy1.10
-> > +ip -n $NS address add $IP6 dev dummy1.10
-> > +
-> > +ip netns exec $NS sysctl -wq net.ipv4.ping_group_range=3D'0 2147483647=
-'
-> > +
-> > +ip -n $NS neigh add $TGT4 lladdr 00:11:22:33:44:55 nud permanent \
-> > +    dev dummy1.10
-> > +ip -n $NS neigh add $TGT6 lladdr 00:11:22:33:44:55 nud permanent \
-> > +    dev dummy1.10
-> > +ip -n $NS neigh add $TGT4_RAW lladdr 00:11:22:33:44:66 nud permanent \
-> > +    dev dummy1.10
-> > +ip -n $NS neigh add $TGT6_RAW lladdr 00:11:22:33:44:66 nud permanent \
-> > +    dev dummy1.10
-> > +
-> > +tc -n $NS qdisc add dev dummy1 clsact
-> > +
-> > +FILTER_COUNTER=3D10
-> > +
-> > +for i in 4 6; do
-> > +    for proto in u i r; do
-> > +        echo "Test IPV$i, prot: $proto"
-> > +        for priority in {0..7}; do
-> > +            if [[ $i =3D=3D 4 && $proto =3D=3D "r" ]]; then
-> > +                TGT=3D$TGT4_RAW
-> > +            elif [[ $i =3D=3D 6 && $proto =3D=3D "r" ]]; then
-> > +                TGT=3D$TGT6_RAW
-> > +            elif [ $i =3D=3D 4 ]; then
-> > +                TGT=3D$TGT4
-> > +            else
-> > +                TGT=3D$TGT6
-> > +            fi
-> > +
-> > +            handle=3D"${FILTER_COUNTER}${priority}"
-> > +
-> > +            create_filter $handle $priority ipv$i $proto $TGT
-> > +
-> > +            pkts=3D$(tc -n $NS -j -s filter show dev dummy1 egress \
-> > +                | jq ".[] | select(.options.handle =3D=3D ${handle}) |=
- \
-> > +                .options.actions[0].stats.packets")
-> > +
-> > +            if [[ $pkts =3D=3D 0 ]]; then
-> > +                check_result 0
-> > +            else
-> > +                echo "prio $priority: expected 0, got $pkts"
-> > +                check_result 1
-> > +            fi
-> > +
-> > +            ip netns exec $NS ./cmsg_sender -$i -Q $priority -d "${DEL=
-AY}" \
-> > +                 -p $proto $TGT $PORT
-> > +
-> > +            pkts=3D$(tc -n $NS -j -s filter show dev dummy1 egress \
-> > +                | jq ".[] | select(.options.handle =3D=3D ${handle}) |=
- \
-> > +                .options.actions[0].stats.packets")
-> > +            if [[ $pkts =3D=3D 1 ]]; then
-> > +                check_result 0
-> > +            else
-> > +                echo "prio $priority -Q: expected 1, got $pkts"
-> > +                check_result 1
-> > +            fi
-> > +
-> > +            ip netns exec $NS ./cmsg_sender -$i -P $priority -d "${DEL=
-AY}" \
-> > +                 -p $proto $TGT $PORT
-> > +
-> > +            pkts=3D$(tc -n $NS -j -s filter show dev dummy1 egress \
-> > +                | jq ".[] | select(.options.handle =3D=3D ${handle}) |=
- \
-> > +                .options.actions[0].stats.packets")
-> > +            if [[ $pkts =3D=3D 2 ]]; then
-> > +                check_result 0
-> > +            else
-> > +                echo "prio $priority -P: expected 2, got $pkts"
-> > +                check_result 1
-> > +            fi
-> > +        done
-> > +        FILTER_COUNTER=3D$((FILTER_COUNTER + 10))
-> > +    done
-> > +done
-> > +
-> > +if [ $FAILED_TESTS -ne 0 ]; then
-> > +    echo "FAIL - $FAILED_TESTS/$TOTAL_TESTS tests failed"
-> > +    exit 1
-> > +else
-> > +    echo "OK - All $TOTAL_TESTS tests passed"
-> > +    exit 0
-> > +fi
-> > +
-> > --
-> > 2.43.0
-> >
->
->
+ drivers/infiniband/ulp/ipoib/ipoib_netlink.c  | 11 +++--
+ drivers/net/amt.c                             | 13 +++---
+ drivers/net/bareudp.c                         | 11 +++--
+ drivers/net/bonding/bond_netlink.c            |  8 ++--
+ drivers/net/can/dev/netlink.c                 |  4 +-
+ drivers/net/can/vxcan.c                       |  9 ++--
+ .../ethernet/qualcomm/rmnet/rmnet_config.c    | 11 +++--
+ drivers/net/geneve.c                          | 11 +++--
+ drivers/net/gtp.c                             |  9 ++--
+ drivers/net/ipvlan/ipvlan.h                   |  4 +-
+ drivers/net/ipvlan/ipvlan_main.c              | 11 +++--
+ drivers/net/ipvlan/ipvtap.c                   |  7 ++-
+ drivers/net/macsec.c                          | 11 +++--
+ drivers/net/macvlan.c                         |  8 ++--
+ drivers/net/macvtap.c                         |  8 ++--
+ drivers/net/netkit.c                          |  9 ++--
+ drivers/net/pfcp.c                            |  8 ++--
+ drivers/net/ppp/ppp_generic.c                 | 10 +++--
+ drivers/net/team/team_core.c                  |  7 +--
+ drivers/net/veth.c                            |  9 ++--
+ drivers/net/vrf.c                             |  7 +--
+ drivers/net/vxlan/vxlan_core.c                | 11 +++--
+ drivers/net/wireguard/device.c                |  8 ++--
+ drivers/net/wireless/virtual/virt_wifi.c      | 10 +++--
+ drivers/net/wwan/wwan_core.c                  | 15 +++++--
+ include/net/ip_tunnels.h                      |  5 ++-
+ include/net/rtnetlink.h                       | 44 ++++++++++++++++---
+ net/8021q/vlan_netlink.c                      | 11 +++--
+ net/batman-adv/soft-interface.c               | 12 ++---
+ net/bridge/br_netlink.c                       |  8 ++--
+ net/caif/chnl_net.c                           |  6 +--
+ net/core/rtnetlink.c                          | 35 ++++++++-------
+ net/hsr/hsr_netlink.c                         | 14 +++---
+ net/ieee802154/6lowpan/core.c                 |  9 ++--
+ net/ipv4/ip_gre.c                             | 27 ++++++++----
+ net/ipv4/ip_tunnel.c                          | 16 ++++---
+ net/ipv4/ip_vti.c                             | 10 +++--
+ net/ipv4/ipip.c                               | 10 +++--
+ net/ipv6/ip6_gre.c                            | 28 +++++++-----
+ net/ipv6/ip6_tunnel.c                         | 16 +++----
+ net/ipv6/ip6_vti.c                            | 15 +++----
+ net/ipv6/sit.c                                | 16 +++----
+ net/xfrm/xfrm_interface_core.c                | 14 +++---
+ tools/testing/selftests/net/Makefile          |  1 +
+ .../testing/selftests/net/lib/py/__init__.py  |  2 +-
+ tools/testing/selftests/net/lib/py/netns.py   | 18 ++++++++
+ tools/testing/selftests/net/netns-name.sh     | 10 +++++
+ tools/testing/selftests/net/netns_atomic.py   | 39 ++++++++++++++++
+ 48 files changed, 385 insertions(+), 211 deletions(-)
+ create mode 100755 tools/testing/selftests/net/netns_atomic.py
+
+-- 
+2.47.1
+
 
