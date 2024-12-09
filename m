@@ -1,147 +1,128 @@
-Return-Path: <netdev+bounces-150394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28D7D9EA166
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 22:50:38 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCDA49EA16E
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 22:53:15 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7E901637AB
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 21:53:09 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296D819D8A0;
+	Mon,  9 Dec 2024 21:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H0CoD4E7"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CDE5282B94
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 21:50:35 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75D6A19D06B;
-	Mon,  9 Dec 2024 21:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AoyAscjn"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D026F137776;
-	Mon,  9 Dec 2024 21:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0152A19D89B
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 21:53:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733781031; cv=none; b=Im2lDUe2ZA5c5Fc7D7XfdmYmSAssFsBN136k9A780IGVZlT/pOfNi8gsKEZ+dJAjX5QsB+BWXtt4fRAH3Kczw8I8bMhOekYndWrMnI8qc9/3WkFIBqRFLSLloQja3ypyRj9UyqzhGSnMAJhLLhDd2VagdScF+llkCP1RYfaF78A=
+	t=1733781187; cv=none; b=V5IyyxxxFjFrsm2jQL3eKT4ZiryHHNqZSU+nDWdssA0RipwaZmICEa2+X47956s66oWZg2Qr6EG0OGZcjbrPFY60Iw1AiMXGbewTlWgz4pJ9Qrpa3yQ5gGKF2hnMBQzxIgWSIIb4IVqEW2o0FABZTtOAacznuZVJaM2EL/lKP/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733781031; c=relaxed/simple;
-	bh=hDQM97Y4jFVlYOaNszFvxzMEgJBaT+HLzVV4nPU4gbU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ckrx0o5MX0VGeJaS7+wmvAlb5pKAOrE8IhFMODygBwjxXBgBdr4+qZPwILO8BbfFI55D7yEccedpSbprSOgMWn1FsWRnimTkyEiAPsU/0IvUlPUPzs+NT/vMPVMV8ipQhyyu6r3K/P6mD4Tewvp9sQ4f/Qg6WBLMFizV1WQmC/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AoyAscjn; arc=none smtp.client-ip=209.85.217.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-4affbc4dc74so538318137.0;
-        Mon, 09 Dec 2024 13:50:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733781028; x=1734385828; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Y0BOvZ3mlVk8nypG+yFwWOupPhYt29InrHyTPoS3Fo=;
-        b=AoyAscjnyjf3kl8ReZWM5qYMZkF+4MKd5gAOiP6GexhfBhY8H4hVA4t4gL18M+NjsS
-         qxomJEHy93Ph6l6bbaCihIomJT+qUta7IJzWOtczhUrjT8pV0WUwKVhGgkI3fdAJJZ61
-         ciUHzYgvnBWJVjS0FRADNGsQTffabY95gkvW5qBjjCbXidfiBCY9T7dUiNxvxKSrhmhJ
-         JftELlJ/7zHh0406zCin+VPtJz8DU6ovNA5kLfJU+UTGbnDc7syuczTxBe+H5lFKHIWv
-         zwH0n6WhA2Zgh/sWII0ecjzLwmQCOAtiamB2xcVzKufMoxBvUmD++lkjKiEhR/grxIWG
-         PaQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733781028; x=1734385828;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8Y0BOvZ3mlVk8nypG+yFwWOupPhYt29InrHyTPoS3Fo=;
-        b=jgcF0LwhGLbrcI67y9MYrc/iVlJ7WasY4oPRi+Omsba8Kk4kTu9LCThzOUE2RR0o9Z
-         ZP2vrmFkkl1W4mtzHmE/v9kpwZhN8mC7DH4qMi152QYNBTDvaqlQFwNJtSznhvfPgQi7
-         XbRgYFZyCwuHlTnkBEXjiQVEqjzUERiTVegl/O0RmW3oaCIST4jYzC3OLAyYV/nCMhzb
-         UHzT7hdMED71dAE7NY0SYnvtNAR+4sZ5CLeTmdH0k6SgU4GRXrTu0qX4S0cdAmOcdT3+
-         SeJrUf0yrvLx23Dxgd1Wkck6DgwT352/0puBeSerDC+WlAWjGo1MBiPoL4+kvWtQTqpk
-         sAIw==
-X-Forwarded-Encrypted: i=1; AJvYcCV8oU4PzxSX/cHl2hm80IPYLrjIjdVyDFMIz2mB0zQdQklEJFWnRUs2oFUrWwguA59ibtSXfVYNcON3q1XHCWum@vger.kernel.org, AJvYcCX1BBNg3o2+6/vp66i2lgDifFwe83heUB53Rn90aHfqHdO5ykh1CuslZUgICBX/xPvlIf/+gRou@vger.kernel.org, AJvYcCXjuxMwPn6TOucCa7+8gExV8+Ks8MMAkminrUV6QwohOcYfh62JDWOyz4dh+kWm2R7iM70CWKfG3FGvJpw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwwFGu1J0VCWfW6D2eINCk+duoHryEiDyCchzGoDyb3+ApuQ2W
-	maKd3Y5EnZyt8xp8WnD1eqT9XmDCRH80/dpdufHffH2TeC/Y4geZDKF+mobQMxJQwBzH/RBqrX5
-	lYGiQL8BvVaWBa52k663bh0Hxdo0=
-X-Gm-Gg: ASbGncusCHVUgLk3SIKO/ogM15OnmNeYY0Wj7hbBry48uKD01w6c7ExbxFxhIAI5qJK
-	DSGUAbX/318sl9a3T0oP90maZVzbyMsB94x8=
-X-Google-Smtp-Source: AGHT+IEJERBBBVubTHmz7RCJslnqiIv1uE9fucalzUR1VqlvDk6jAx5i9Q0rIdhj3HambxdRmGTZS4vnQT4UwyWQwCI=
-X-Received: by 2002:a05:6102:4194:b0:4af:c1b6:c4fd with SMTP id
- ada2fe7eead31-4afcaac78d9mr15519373137.22.1733781028637; Mon, 09 Dec 2024
- 13:50:28 -0800 (PST)
+	s=arc-20240116; t=1733781187; c=relaxed/simple;
+	bh=cI1DgdJ30N5skcwufLsR1wZRUPZiPjGuM1bDPZAW464=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q+jogqGm9OSAOZ6r9ioc6tdLwu0yOrAIavuQzvAfU0We2AOfVNcKQLHwCqkvDwKjvo+K7f/Z+yJCRQF7udit2fg/2c1HXLfd7zJ6rrs1vUMWp9rm4tPE0onsWqdIOA5FRe77GVNZd+yUZK1KrbPDNsjnuFxzHuPf9qEFDnOuCAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H0CoD4E7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1116FC4CEDD;
+	Mon,  9 Dec 2024 21:53:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733781186;
+	bh=cI1DgdJ30N5skcwufLsR1wZRUPZiPjGuM1bDPZAW464=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=H0CoD4E7hKRBFoWobarcGp+9Fw9MWXBw0SYcbH3zMHctnVzJ+i61LCbJomzHPFcIR
+	 DUu69EihbrupyzHsumJJw3RSW11ZOzM9MCGEYuduFj+AdIftAHnbJ2iqBzhvS6tZ78
+	 AHqlHSBShj2eRZ1zLQUWY0w41IMndKeAXDExjeAgVoRwJy/MFMK3zfhnhBgrUzl8H/
+	 9swo19T38xQ+UoUs6tA1vVe1m2T2X4EdbgjhBmksocfDydCmeZdZofoGoJY0+Y3+Y6
+	 4J6ovnKPqTk5yWfxNjhdBXBEq3WgkFAta3/v/9ciK69VFkj9UNDVG0FCY/dGKTOV1j
+	 XwPH827uaMAuA==
+Date: Mon, 9 Dec 2024 23:53:01 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: steffen.klassert@secunet.com
+Cc: Feng Wang <wangfe@google.com>, netdev@vger.kernel.org,
+	antony.antony@secunet.com, pabeni@redhat.com
+Subject: Re: [PATCH v7] xfrm: add SA information to the offloaded packet when
+ if_id is set
+Message-ID: <20241209215301.GC1245331@unreal>
+References: <20241209202811.481441-2-wangfe@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241209204918.56943-1-karprzy7@gmail.com> <Z1diBYlJUIRBIc2L@calendula>
-In-Reply-To: <Z1diBYlJUIRBIc2L@calendula>
-From: Karol P <karprzy7@gmail.com>
-Date: Mon, 9 Dec 2024 22:50:17 +0100
-Message-ID: <CAKwoAfq99AKb=a54=eRSKesFYO2X5R8WR8KSrrXVB_Z4=rkexg@mail.gmail.com>
-Subject: Re: [PATCH] netfilter: nfnetlink_queue: Fix redundant comparison of
- unsigned value
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: kadlec@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	skhan@linuxfoundation.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241209202811.481441-2-wangfe@google.com>
 
-On Mon, 9 Dec 2024 at 22:32, Pablo Neira Ayuso <pablo@netfilter.org> wrote:
->
-> Hi,
->
-> On Mon, Dec 09, 2024 at 09:49:18PM +0100, Karol Przybylski wrote:
-> > The comparison seclen >= 0 in net/netfilter/nfnetlink_queue.c is redundant because seclen is an unsigned value, and such comparisons are always true.
-> >
-> > This patch removes the unnecessary comparison replacing it with just 'greater than'
-> >
-> > Discovered in coverity, CID 1602243
-> >
-> > Signed-off-by: Karol Przybylski <karprzy7@gmail.com>
-> > ---
-> >  net/netfilter/nfnetlink_queue.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
-> > index 5110f29b2..eacb34ffb 100644
-> > --- a/net/netfilter/nfnetlink_queue.c
-> > +++ b/net/netfilter/nfnetlink_queue.c
-> > @@ -643,7 +643,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
-> >
-> >       if ((queue->flags & NFQA_CFG_F_SECCTX) && entskb->sk) {
-> >               seclen = nfqnl_get_sk_secctx(entskb, &ctx);
-> > -             if (seclen >= 0)
-> > +             if (seclen > 0)
->
-> What tree are you using? I don't see this code in net-next.git
+On Mon, Dec 09, 2024 at 08:28:12PM +0000, Feng Wang wrote:
+> In packet offload mode, append Security Association (SA) information
+> to each packet, replicating the crypto offload implementation. This
+> SA info helps HW offload match packets to their correct security
+> policies. The XFRM interface ID is included, which is used in setups
+> with multiple XFRM interfaces where source/destination addresses alone
+> can't pinpoint the right policy.
+> 
+> The XFRM_XMIT flag is set to enable packet to be returned immediately
+> from the validate_xmit_xfrm function, thus aligning with the existing
+> code path for packet offload mode.
+> 
+> Enable packet offload mode on netdevsim and add code to check the XFRM
+> interface ID.
+> 
+> Signed-off-by: wangfe <wangfe@google.com>
+> ---
 
-linux-next, next-20241209
-Link: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/net/netfilter/nfnetlink_queue.c?h=next-20241209#n646
+<...>
 
->
-> >                       size += nla_total_size(seclen);
-> >       }
-> >
-> > @@ -810,7 +810,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
-> >       }
-> >
-> >       nlh->nlmsg_len = skb->len;
-> > -     if (seclen >= 0)
-> > +     if (seclen > 0)
-> >               security_release_secctx(&ctx);
-> >       return skb;
-> >
-> > @@ -819,7 +819,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
-> >       kfree_skb(skb);
-> >       net_err_ratelimited("nf_queue: error creating packet message\n");
-> >  nlmsg_failure:
-> > -     if (seclen >= 0)
-> > +     if (seclen > 0)
-> >               security_release_secctx(&ctx);
-> >       return NULL;
-> >  }
-> > --
-> > 2.34.1
-> >
+> @@ -728,7 +730,27 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
+>  			kfree_skb(skb);
+>  			return -EHOSTUNREACH;
+>  		}
+> +		if (x->if_id) {
+> +			sp = secpath_set(skb);
+> +			if (!sp) {
+> +				XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
+> +				kfree_skb(skb);
+> +				return -ENOMEM;
+> +			}
+> +
+> +			sp->olen++;
+> +			sp->xvec[sp->len++] = x;
+> +			xfrm_state_hold(x);
+>  
+> +			xo = xfrm_offload(skb);
+> +			if (!xo) {
+> +				secpath_reset(skb);
+> +				XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
+> +				kfree_skb(skb);
+> +				return -EINVAL;
+> +			}
+> +			xo->flags |= XFRM_XMIT;
+> +		}
+
+Steffen,
+
+I would like to ask from you to delay this patch till this "if_id"
+support is implemented and tested on real upstreamed device.
+
+I have no confidence that the solution proposed above is the right thing
+to do as it doesn't solve the claim "This SA info helps HW offload match
+packets to their correct security". HW is going to perform lookup anyway
+on the source and destination, so it is unclear how will it "help".
+
+Thanks
+
+>  		return xfrm_output_resume(sk, skb, 0);
+>  	}
+>  
+> -- 
+> 2.47.0.338.g60cca15819-goog
+> 
+> 
 
