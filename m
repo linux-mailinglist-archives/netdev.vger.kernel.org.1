@@ -1,196 +1,167 @@
-Return-Path: <netdev+bounces-150286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B30069E9CBA
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:13:06 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61250188704F
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:13:06 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0C814A60F;
-	Mon,  9 Dec 2024 17:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bKmLGYmb"
-X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A79C9E9CC3
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:16:05 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA4514F9E2;
-	Mon,  9 Dec 2024 17:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34D29282BCE
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:16:00 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81DB312A177;
+	Mon,  9 Dec 2024 17:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jJA2Z3G7"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F934409
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 17:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733764383; cv=none; b=dmjbKSkg67ALrneea1O5u2TnEdAYKWfuWH5+fZjyOs3N1b41yqnUPZue9IXeVM181GgmQzRmSoSL6oGm5Qc6x1hiiHkrdvieswZ6YD7Bplc57s8fjQLTReqMSVClS4/RbaGrZCL+aLm7/ps6PhCQTOBQbSvd13CGQL8P6iN4Sd8=
+	t=1733764548; cv=none; b=SI3t9iaqz4k5kTkP/GbCaCUKlQh5Yx//+1YRZo6fLo4Y0qb8fQxBxk64xkOSE+H08aZCNUFGSbJC7omGEJBiCY08Hhixw+JMbJv0g4gJ8l2thutt7FBCYV7VvEg3GEU8TWVvkMg0piqwWGL+IqqeXE1ROj00zZrGvTLFF9NUeks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733764383; c=relaxed/simple;
-	bh=k06Tt3JpeaIbma1uEZjy4WqffU0RWfcaFFwhVaDcUME=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dcpZJA/kJ+nrRoz9m4kMSjqpQsq1au2cxSIrLZwUERmz/Zp2LKtABiYXxJTNywr509aXF6S16Bhd+0nJ9mAux9h+ejd4Hk+Bf7W0P+ptwvAiRiYhT0tfzBgclV+gk2UA3ReVizx0mVHiFsATvQ0DpPSAT/sEy9Zy60DQwr7Zoa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bKmLGYmb; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B9Cf4cU028854;
-	Mon, 9 Dec 2024 17:12:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=k06Tt3
-	JpeaIbma1uEZjy4WqffU0RWfcaFFwhVaDcUME=; b=bKmLGYmb3QKyzmjLzV5vLE
-	A3/RfJfvDXPydaRQL9KC1YG3oDlfj/QvKgGi75/4X5jefprKwXHh4brRWOxy+UpX
-	KBN0JDGhInV7NtfuLcLGJO8NxTCJGlWNWhS/PUrRB8rCSfV5jFZClG4Afakt2lOs
-	VA9euRgjzb5CSZhazzTcVnK+wb3sazC59Q1q1GqgHmRyY9FxgLjeGl1mVAZZ4g2o
-	lJNvwKpOJs2M60il981y/qN4dU96AoWunYNWmFxhqyCwcaxJ+9j594T55F4YpV2c
-	CEQx5sa9kBDMJfry/uURdSf+0tqoVQqQv5su7S2E0adx+BD0KwUIyARSOeGrLr5A
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsq20em-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 17:12:52 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B9HBvHB025620;
-	Mon, 9 Dec 2024 17:12:52 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsq20eh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 17:12:51 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B9E3Ajd016952;
-	Mon, 9 Dec 2024 17:12:51 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43d12xyspe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 17:12:51 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B9HCoXm21299952
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 9 Dec 2024 17:12:50 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5571E58050;
-	Mon,  9 Dec 2024 17:12:50 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C940158045;
-	Mon,  9 Dec 2024 17:12:46 +0000 (GMT)
-Received: from [9.152.212.155] (unknown [9.152.212.155])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  9 Dec 2024 17:12:46 +0000 (GMT)
-Message-ID: <cd1fb2205d974ee320ddb648c0589940e8646a6c.camel@linux.ibm.com>
-Subject: Re: [PATCH net v2] net: ethernet: 8390: Add HAS_IOPORT dependency
- for mcf8390
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc: Arnd Bergmann <arnd@kernel.org>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>
-Date: Mon, 09 Dec 2024 18:12:44 +0100
-In-Reply-To: <20241209-mcf8390_has_ioport-v2-1-3254267dc35e@linux.ibm.com>
-References: <20241209-mcf8390_has_ioport-v2-1-3254267dc35e@linux.ibm.com>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=mQINBGHm3M8BEAC+MIQkfoPIAKdjjk84OSQ8erd2OICj98+GdhMQpIjHXn/RJdCZLa58k
- /ay5x0xIHkWzx1JJOm4Lki7WEzRbYDexQEJP0xUia0U+4Yg7PJL4Dg/W4Ho28dRBROoJjgJSLSHwc
- 3/1pjpNlSaX/qg3ZM8+/EiSGc7uEPklLYu3gRGxcWV/944HdUyLcnjrZwCn2+gg9ncVJjsimS0ro/
- 2wU2RPE4ju6NMBn5Go26sAj1owdYQQv9t0d71CmZS9Bh+2+cLjC7HvyTHKFxVGOznUL+j1a45VrVS
- XQ+nhTVjvgvXR84z10bOvLiwxJZ/00pwNi7uCdSYnZFLQ4S/JGMs4lhOiCGJhJ/9FR7JVw/1t1G9a
- UlqVp23AXwzbcoV2fxyE/CsVpHcyOWGDahGLcH7QeitN6cjltf9ymw2spBzpRnfFn80nVxgSYVG1d
- w75ksBAuQ/3e+oTQk4GAa2ShoNVsvR9GYn7rnsDN5pVILDhdPO3J2PGIXa5ipQnvwb3EHvPXyzakY
- tK50fBUPKk3XnkRwRYEbbPEB7YT+ccF/HioCryqDPWUivXF8qf6Jw5T1mhwukUV1i+QyJzJxGPh19
- /N2/GK7/yS5wrt0Lwxzevc5g+jX8RyjzywOZGHTVu9KIQiG8Pqx33UxZvykjaqTMjo7kaAdGEkrHZ
- dVHqoPZwhCsgQARAQABtChOaWtsYXMgU2NobmVsbGUgPHNjaG5lbGxlQGxpbnV4LmlibS5jb20+iQ
- JXBBMBCABBAhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAhkBFiEEnbAAstJ1IDCl9y3cr+Q/Fej
- CYJAFAmWVooIFCQWP+TMACgkQr+Q/FejCYJCmLg/+OgZD6wTjooE77/ZHmW6Egb5nUH6DU+2nMHMH
- UupkE3dKuLcuzI4aEf/6wGG2xF/LigMRrbb1iKRVk/VG/swyLh/OBOTh8cJnhdmURnj3jhaefzslA
- 1wTHcxeH4wMGJWVRAhOfDUpMMYV2J5XoroiA1+acSuppelmKAK5voVn9/fNtrVr6mgBXT5RUnmW60
- UUq5z6a1zTMOe8lofwHLVvyG9zMgv6Z9IQJc/oVnjR9PWYDUX4jqFL3yO6DDt5iIQCN8WKaodlNP6
- 1lFKAYujV8JY4Ln+IbMIV2h34cGpIJ7f76OYt2XR4RANbOd41+qvlYgpYSvIBDml/fT2vWEjmncm7
- zzpVyPtCZlijV3npsTVerGbh0Ts/xC6ERQrB+rkUqN/fx+dGnTT9I7FLUQFBhK2pIuD+U1K+A+Egw
- UiTyiGtyRMqz12RdWzerRmWFo5Mmi8N1jhZRTs0yAUn3MSCdRHP1Nu3SMk/0oE+pVeni3ysdJ69Sl
- kCAZoaf1TMRdSlF71oT/fNgSnd90wkCHUK9pUJGRTUxgV9NjafZy7sx1Gz11s4QzJE6JBelClBUiF
- 6QD4a+MzFh9TkUcpG0cPNsFfEGyxtGzuoeE86sL1tk3yO6ThJSLZyqFFLrZBIJvYK2UiD+6E7VWRW
- 9y1OmPyyFBPBosOvmrkLlDtAtyfYInO0KU5pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNjaG5lbGxlQ
- GlibS5jb20+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAAstJ1IDCl9y
- 3cr+Q/FejCYJAFAmWVoosFCQWP+TMACgkQr+Q/FejCYJB7oxAAksHYU+myhSZD0YSuYZl3oLDUEFP
- 3fm9m6N9zgtiOg/GGI0jHc+Tt8qiQaLEtVeP/waWKgQnje/emHJOEDZTb0AdeXZk+T5/ydrKRLmYC
- 6rPge3ue1yQUCiA+T72O3WfjZILI2yOstNwd1f0epQ32YaAvM+QbKDloJSmKhGWZlvdVUDXWkS6/m
- aUtUwZpddFY8InXBxsYCbJsqiKF3kPVD515/6keIZmZh1cTIFQ+Kc+UZaz0MxkhiCyWC4cH6HZGKR
- fiXLhPlmmAyW9FiZK9pwDocTLemfgMR6QXOiB0uisdoFnjhXNfp6OHSy7w7LTIHzCsJoHk+vsyvSp
- +fxkjCXgFzGRQaJkoX33QZwQj1mxeWl594QUfR4DIZ2KERRNI0OMYjJVEtB5jQjnD/04qcTrSCpJ5
- ZPtiQ6Umsb1c9tBRIJnL7gIslo/OXBe/4q5yBCtCZOoD6d683XaMPGhi/F6+fnGvzsi6a9qDBgVvt
- arI8ybayhXDuS6/StR8qZKCyzZ/1CUofxGVIdgkseDhts0dZ4AYwRVCUFQULeRtyoT4dKfEot7hPE
- /4wjm9qZf2mDPRvJOqss6jObTNuw1YzGlpe9OvDYtGeEfHgcZqEmHbiMirwfGLaTG2xKDx4g2jd2z
- Ocf83TCERFKJEhvZxB3tRiUQTd3dZ1TIaisv/o+y0K05pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNj
- aG5lbGxlQGdtYWlsLmNvbT6JAlQEEwEIAD4CGwEFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AWIQSds
- ACy0nUgMKX3Ldyv5D8V6MJgkAUCZZWiiwUJBY/5MwAKCRCv5D8V6MJgkNVuEACo12niyoKhnXLQFt
- NaqxNZ+8p/MGA7g2XcVJ1bYMPoZ2Wh8zwX0sKX/dLlXVHIAeqelL5hIv6GoTykNqQGUN2Kqf0h/z7
- b85o3tHiqMAQV0dAB0y6qdIwdiB69SjpPNK5KKS1+AodLzosdIVKb+LiOyqUFKhLnablni1hiKlqY
- yDeD4k5hePeQdpFixf1YZclGZLFbKlF/A/0Q13USOHuAMYoA/iSgJQDMSUWkuC0mNxdhfVt/gVJnu
- Kq+uKUghcHflhK+yodqezlxmmRxg6HrPVqRG4pZ6YNYO7YXuEWy9JiEH7MmFYcjNdgjn+kxx4IoYU
- O0MJ+DjLpVCV1QP1ZvMy8qQxScyEn7pMpQ0aW6zfJBsvoV3EHCR1emwKYO6rJOfvtu1rElGCTe3sn
- sScV9Z1oXlvo8pVNH5a2SlnsuEBQe0RXNXNJ4RAls8VraGdNSHi4MxcsYEgAVHVaAdTLfJcXZNCIU
- cZejkOE+U2talW2n5sMvx+yURAEVsT/50whYcvomt0y81ImvCgUz4xN1axZ3PCjkgyhNiqLe+vzge
- xq7B2Kx2++hxIBDCKLUTn8JUAtQ1iGBZL9RuDrBy2rR7xbHcU2424iSbP0zmnpav5KUg4F1JVYG12
- vDCi5tq5lORCL28rjOQqE0aLHU1M1D2v51kjkmNuc2pgLDFzpvgLQhTmlrbGFzIFNjaG5lbGxlIDx
- uaWtzQGtlcm5lbC5vcmc+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAA
- stJ1IDCl9y3cr+Q/FejCYJAFAmWVoosFCQWP+TMACgkQr+Q/FejCYJAglRAAihbDxiGLOWhJed5cF
- kOwdTZz6MyYgazbr+2sFrfAhX3hxPFoG4ogY/BzsjkN0cevWpSigb2I8Y1sQD7BFWJ2OjpEpVQd0D
- sk5VbJBXEWIVDBQ4VMoACLUKgfrb0xiwMRg9C2h6KlwrPBlfgctfvrWWLBq7+oqx73CgxqTcGpfFy
- tD87R4ovR9W1doZbh7pjsH5Ae9xX5PnQFHruib3y35zC8+tvSgvYWv3Eg/8H4QWlrjLHHy2AfZDVl
- 9F5t5RfGL8NRsiTdVg9VFYg/GDdck9WPEgdO3L/qoq3Iuk0SZccGl+Nj8vtWYPKNlu2UvgYEbB8cl
- UoWhg+SjjYQka7/p6tc+CCPZ8JUpkgkAdt7yXt6370wP1gct2VztS6SEGcmAE1qxtGhi5Kuln4ZJ/
- UO2yxhPHgoW99OuZw3IRHe0+mNR67JbIpSuFWDFNjZ0nckQcU1taSEUi0euWs7i4MEkm0NsOsVhbs
- 4D2vMiC6kO/FqWOPmWZeAjyJw/KRUG4PaJAr5zJUx57nhKWgeTniW712n4DwCUh77D/PHY0nqBTG/
- B+QQCR/FYGpTFkO4DRVfapT8njDrsWyVpP9o64VNZP42S+DuRGWfUKCMAXsM/wPzRiDEVfnZMcUR9
- vwLSHeoV7MiIFC0xIrp5ES9R00t4UFgqtGc36DV71qjR+66Im0=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.2 (3.54.2-1.fc41) 
+	s=arc-20240116; t=1733764548; c=relaxed/simple;
+	bh=NJxiQUeBq2WFEVAR8RXGCuOrLxf9jxbTqjpMUTNkSRo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YNwePpefEcP+asc0UE6p6A0fv2FxMEocaDohp4MHp/JVR0LG/Hgd+nGy41zXmyZkOBFmfekw1Av2BEJHMU5gefgDbMS2E2ySgGTtP9rN3V/X95JTUXr+aP/+SX6uqNpqnJZrjA8SFhEOQyECITm2ReRPCxYVHAlSSc875S70J/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jJA2Z3G7; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4674c22c4afso638381cf.1
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 09:15:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733764546; x=1734369346; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E/Oc9AAL5s3pNxwTIxiLkmqgw8dYjTavNjAYI8gx6Oo=;
+        b=jJA2Z3G7YsCvnLOkzK3aKTaBTjo6u8riBxEPMjUv1ixRU0rRf2KUiyHdPqALVquSn4
+         oqF6WTTR8nnwfoTpFLECYqDmLQ8hDQ7xm94MSLpsApkSyyQU6/mjlRte10fw8l0D2vz1
+         PPA2Euto23aPZHLU/8mt+FVcFB/qkqXutNns/NrF74hdZpolqGwu2akZUAXR7E2AbB9D
+         s9adLyfyuJ2qLNpst3Lhr72pRb5wer7YNYq8eMqD4/NHR6srh2PXH3Gjc1IqlgosKkel
+         iAS/AZHor9QRi+iFDv/9lLcNK7iNHybnPwWqOmB9h1AqAzXUTN+sBhYOKMTmVCpGd2nC
+         6EKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733764546; x=1734369346;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E/Oc9AAL5s3pNxwTIxiLkmqgw8dYjTavNjAYI8gx6Oo=;
+        b=jyMU0RXl+MQn+zmt0eg8hTLXbr6Ip7KoDwlZC8QF1L8EH4mLQbjxxkGKKbjkzADLW+
+         8v0gcBaL9CJIdPNWpVdcLxnrAvnWxN5snpr7woDosxGuRSvAWPy8nqvxBMew5XFflwWb
+         IP+TTJ/wDr3/hk77ZNMLrzIpnbg5pzXeiUaMUrOP1aTbp8r3kfDLQFe/vUjGBQXvR9ol
+         GRtKUIZw7kSlDYqw49SXTuy0IG6922FwW2Otwkg9mjE5NuUPjbNIbEk37SY6o6w8N6td
+         FeyH8fJRTekTJX1NTZgOQfEwYY4/GyzM9CedTdEYwpW0e08ivnylQu/U4HYPkRRs728j
+         a7vQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX1ZnUZ4XIWqkeeFyc5BrnrrBmRQ2a72SE59CnpOPj2qiKbPdE8ltcY8tlEJqJfNB2qAdorKqw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhQvaqVCHSAYw5YE+AMYS2nrEQaXDqsHBADcbax2V9wKqzxPk6
+	17jy5MuszKMu9z3L1DeFDKwOuCw4XNLlR+Q25CGcQDDui1iRWlUO1+hor/dLeDEqV/sbwcAV1kJ
+	bGNstOVqy6F7G8E1YGSWJh+zy0U012Z42+W7W
+X-Gm-Gg: ASbGnctM5D+H9B8HuQEfqtsUTU0F2SxUWGofX/yhanFZN/UGwPyruvG72CLozjLkIsH
+	vIavOL88m44dT1GEScMZNF0i0Ne0gNTJ67SHBSGN5BBkrklf+VNk7bbc2skJC/A==
+X-Google-Smtp-Source: AGHT+IEfLFjXy136jiaj25OIuPvKpgJgwQwu6lo3Ert4vSwxxcBI0qpz7yA3ZKCRI7TGu2DWBxYzqaMt1FTjjCqcZyk=
+X-Received: by 2002:ac8:6905:0:b0:466:9660:18a2 with SMTP id
+ d75a77b69052e-46746f6859emr9758881cf.16.1733764545557; Mon, 09 Dec 2024
+ 09:15:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: TgvTomgsnspttkkamADjE6fq-6XtXy1u
-X-Proofpoint-GUID: sGDCCyytGLaJoeqmH0B4DIiX4f1jb4Z4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=611 adultscore=0
- lowpriorityscore=0 clxscore=1015 phishscore=0 impostorscore=0
- suspectscore=0 spamscore=0 mlxscore=0 priorityscore=1501 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412090132
+References: <20241204172204.4180482-1-dw@davidwei.uk> <20241204172204.4180482-8-dw@davidwei.uk>
+In-Reply-To: <20241204172204.4180482-8-dw@davidwei.uk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 9 Dec 2024 09:15:33 -0800
+Message-ID: <CAHS8izMYOtU-QoCggE+7h9V+Rtxf-m2rBMHHdJtMxSQku-b1Xw@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 07/17] net: page_pool: introduce page_pool_mp_return_in_cache
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2024-12-09 at 12:26 +0100, Niklas Schnelle wrote:
-> Since commit 6f043e757445 ("asm-generic/io.h: Remove I/O port accessors
-> for HAS_IOPORT=3Dn") the I/O port accessors are compile-time optional. As
-> m68k may or may not select HAS_IOPORT the COLDFIRE dependency is not
-> enough to guarantee I/O port access. Add an explicit HAS_IOPORT
-> dependency for mcf8390 to prevent a build failure as seen by the kernel
-> test robot.
->=20
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202412080511.ORVinTDs-lkp@i=
-ntel.com/
-> Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+On Wed, Dec 4, 2024 at 9:22=E2=80=AFAM David Wei <dw@davidwei.uk> wrote:
+>
+> From: Pavel Begunkov <asml.silence@gmail.com>
+>
+> Add a helper that allows a page pool memory provider to efficiently
+> return a netmem off the allocation callback.
+>
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> Signed-off-by: David Wei <dw@davidwei.uk>
 > ---
-> Changes in v2:
-> - Add missing "net" prefix. Sorry about the noise
-> - Link to v1: https://lore.kernel.org/r/20241209-mcf8390_has_ioport-v1-1-=
-f263d573e243@linux.ibm.com
+>  include/net/page_pool/memory_provider.h |  4 ++++
+>  net/core/page_pool.c                    | 19 +++++++++++++++++++
+>  2 files changed, 23 insertions(+)
+>
+> diff --git a/include/net/page_pool/memory_provider.h b/include/net/page_p=
+ool/memory_provider.h
+> index 83d7eec0058d..352b3a35d31c 100644
+> --- a/include/net/page_pool/memory_provider.h
+> +++ b/include/net/page_pool/memory_provider.h
+> @@ -1,3 +1,5 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +
+>  #ifndef _NET_PAGE_POOL_MEMORY_PROVIDER_H
+>  #define _NET_PAGE_POOL_MEMORY_PROVIDER_H
+>
+> @@ -7,4 +9,6 @@ int page_pool_mp_init_paged_area(struct page_pool *pool,
+>  void page_pool_mp_release_area(struct page_pool *pool,
+>                                 struct net_iov_area *area);
+>
+> +void page_pool_mp_return_in_cache(struct page_pool *pool, netmem_ref net=
+mem);
+> +
+>  #endif
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index d17e536ba8b8..24f29bdd70ab 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -1213,3 +1213,22 @@ void page_pool_mp_release_area(struct page_pool *p=
+ool,
+>                 page_pool_release_page_dma(pool, net_iov_to_netmem(niov))=
+;
+>         }
+>  }
+> +
+> +/*
+> + * page_pool_mp_return_in_cache() - return a netmem to the allocation ca=
+che.
+> + * @pool:      pool from which pages were allocated
+> + * @netmem:    netmem to return
+> + *
+> + * Return already allocated and accounted netmem to the page pool's allo=
+cation
+> + * cache. The function doesn't provide synchronisation and must only be =
+called
+> + * from the napi context.
+> + */
+> +void page_pool_mp_return_in_cache(struct page_pool *pool, netmem_ref net=
+mem)
+> +{
+> +       if (WARN_ON_ONCE(pool->alloc.count >=3D PP_ALLOC_CACHE_REFILL))
+> +               return;
+> +
 
-See Arnd's answer[0] to v1 for why this patch may be fixing the compile
-error but the code may already be broken independently.
+Really the caller needs to check this, and if the caller is checking
+it then this additional check is unnecessarily defensive I would say.
+But not really a big deal. I think I gave this feedback on the
+previous iteration.
 
-[0]
-https://lore.kernel.org/all/3ca55478-a5a9-442b-ae4f-a0a822f786d9@app.fastma=
-il.com/
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 
 
-
+--=20
+Thanks,
+Mina
 
