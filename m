@@ -1,219 +1,163 @@
-Return-Path: <netdev+bounces-150139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 762E19E91E2
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:14:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D37409E9223
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 12:27:15 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54C45280C37
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:14:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4F431885B8D
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 11:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE351217656;
-	Mon,  9 Dec 2024 11:14:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D8BA21A951;
+	Mon,  9 Dec 2024 11:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="meXzZQGJ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZJNyK8U5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89839216E27
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 11:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF57E21A93E;
+	Mon,  9 Dec 2024 11:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733742844; cv=none; b=quZFBRjzIjGAGsRTY4Fj3Go7bXkH+elOAigoX5t+c5E4upYIKJnfHq8dBE0q9Mr6oB6M1NqET9Rq0YAMa84eyn79HUUss40fXIzml9jSa3AjOXCXcf0mCGShej8W9awOuS6BPAyrwR61/vUtrzIpZVtRdALsdkIfSTHj5nCckV4=
+	t=1733743633; cv=none; b=W1gqGNx/Z00NrP0nYGZIGgovJ9BsKjtBSa9eMZm3TEd1hvQUU+NxzwxzGPiDHcGPGG8mCDD4sD2NJNOaWAM4f0vnykyG4VOB+fu2LMo5cYEl9giFQ+ph5iW8lC0P2voxW0DERW2aJpwuVZXGCc4dOz51zX4vv3ziZuiZ34yITV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733742844; c=relaxed/simple;
-	bh=cjhEXeueBX1NeVabk8lXTMVekFREvlG2q8IWFYDSF2Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U4rkwPLbtJNAlInqL+BDs1zfqhiivRue1xOwW5o0Pzp39O7cQ6774cBkYhTTSJQqMFUo0NGZXB37LYhtEuxMg5VN4Urt3XxRluoClJLec9og4Hl5OwYnEBxYYM0mQBR9OzWkZLnkfbq+Scvyx7lrB1Qf9RGepTC90c5Iq47+xu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=meXzZQGJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9759CC4CED1;
-	Mon,  9 Dec 2024 11:14:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733742844;
-	bh=cjhEXeueBX1NeVabk8lXTMVekFREvlG2q8IWFYDSF2Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=meXzZQGJaf3cJW7U3u8ZVQeaKovguZYSnawlGko491TvcQ49zUhnLafyczucFVZYk
-	 R2bvkGhu5+azab62x8OdM/x6J943GoTJblzIlmtRFwlJccEEFlZFbqAnnl3nNZBBmY
-	 iFLM3jyirUhlEU1fqfjvMwyS1nX5MzX0LFPDT9r5eHCF/RVjDq4bgx4Mo1jquBI3eU
-	 4vbu3Ok0vyABNkuXVfB9HJ0GNSubmTx1eSommaoUpv4ecY0Hq+kR6zDZJsQAGIlcMc
-	 NhCz1KsG4iTz8TdDgrdZWW7o5WuGyD/tNGM2NPUhCOs6BNICX40H9MlCPoPIeTANRd
-	 qBZROA6XLU3DQ==
-Date: Mon, 9 Dec 2024 11:13:59 +0000
-From: Simon Horman <horms@kernel.org>
-To: Konrad Knitter <konrad.knitter@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com, netdev@vger.kernel.org,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	davem@davemloft.net, andrew+netdev@lunn.ch,
-	Sharon Haroni <sharon.haroni@intel.com>,
-	Nicholas Nunley <nicholas.d.nunley@intel.com>,
-	Brett Creeley <brett.creeley@intel.com>
-Subject: Re: [PATCH iwl-next v2] ice: fw and port health status
-Message-ID: <20241209111359.GA2581@kernel.org>
-References: <20241204122738.114511-1-konrad.knitter@intel.com>
+	s=arc-20240116; t=1733743633; c=relaxed/simple;
+	bh=5kAsIsrtlfuGTm/bEhkcn9of1LNX7krnEZlj5KO/lfA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=obhqahu2eFgPsvSH8qQTt/en9b6DKuX9pOsKAoDEfa8XOdBD/TUDXMoebK+fUsTrZXfM8ceUqj7jRA6iGyoV1S2Uz0wKCfDUnbADqfUeKVjwf91n2aLympt1kLcrKewS24YDJnMu13al0tn9iFh6MREA7R16X3g2ZySByU0+iag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZJNyK8U5; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B8LtOeR028746;
+	Mon, 9 Dec 2024 11:27:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=6XsX4n18k66gRAYyHoQrPh/Nuqak
+	/pwxNZaaUKLnsZI=; b=ZJNyK8U5WuNT++uqrYsh5IB1w6DRvKIKsM5WksffDDU1
+	KrkaHZ6UOl5SnWz6b1dcWvPwFsvtzBnD4IdrAfgkRLQjnaEWXN8VldUJDP9UuhfC
+	mJ2treqaEgQQyxm5bp/rimBBYishjiRHOuc/LNOpxFe4hGSXHl4pSMHORmTNYCtM
+	i1NWjRlEL/a4n+XHni3a5ES00BU0n3w8JDch6tIDVYUzBEuq5iQ2HWIXYi7LcyB7
+	BEt2XR3sKimZBzBh3kqIu+ARKsyHyben8CI8uPccXw+qplaGawl1rSwUrE04c4nM
+	hWKbYb9RikBS+VQ264w9Pt465F7i2FjYaeZ9wODe4g==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ccsj86m3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Dec 2024 11:27:03 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B9BMPlO011368;
+	Mon, 9 Dec 2024 11:27:02 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ccsj86m0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Dec 2024 11:27:02 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B9AChfE032575;
+	Mon, 9 Dec 2024 11:27:02 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43d1pmxb9h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Dec 2024 11:27:02 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B9BR18j32309912
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 9 Dec 2024 11:27:01 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AF42258055;
+	Mon,  9 Dec 2024 11:27:01 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E07325804E;
+	Mon,  9 Dec 2024 11:26:59 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  9 Dec 2024 11:26:59 +0000 (GMT)
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+Date: Mon, 09 Dec 2024 12:26:50 +0100
+Subject: [PATCH net v2] net: ethernet: 8390: Add HAS_IOPORT dependency for
+ mcf8390
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241204122738.114511-1-konrad.knitter@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241209-mcf8390_has_ioport-v2-1-3254267dc35e@linux.ibm.com>
+X-B4-Tracking: v=1; b=H4sIAPnTVmcC/32NWwqDMBREtyL3u5E8TH18dR9FROO1XqiJJDZYx
+ L03uIB+nhnmzAEBPWGAJjvAY6RAziaQtwzM3NsXMhoTg+SyEJLXbDFTpWrezX3oyK3Ob6wczVD
+ pXouSG0jD1eNE+yV9gsUN2hTOFDbnv9dRFFf1zxkFE2ySdzXqUqEs1ONN9rPnNCy5cQu053n+A
+ CfRRli9AAAA
+X-Change-ID: 20241209-mcf8390_has_ioport-7dcb85a5170c
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Cc: Arnd Bergmann <arnd@kernel.org>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1505;
+ i=schnelle@linux.ibm.com; h=from:subject:message-id;
+ bh=5kAsIsrtlfuGTm/bEhkcn9of1LNX7krnEZlj5KO/lfA=;
+ b=owGbwMvMwCX2Wz534YHOJ2GMp9WSGNLDLv++opB7f+IMB/NYoawu50NbymNlRAS2ptfm5mkdv
+ t1/pFOyo5SFQYyLQVZMkWVRl7PfuoIppnuC+jtg5rAygQxh4OIUgImI32D4X/DEI/Nbv+OCvfvC
+ unYHnZ++M71cUG6/nfYc+ZktHrl/7zIyHAmcXGi12emWQ0pLMWfkT+fX3H4JX37z7DGa/1/9/MY
+ MDgA=
+X-Developer-Key: i=schnelle@linux.ibm.com; a=openpgp;
+ fpr=9DB000B2D2752030A5F72DDCAFE43F15E8C26090
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: aMlxx1DiQJnoOfKBf4D1Y4oMDeGrnLti
+X-Proofpoint-ORIG-GUID: eqK2dz6w1ZX8wWAq40W120ARCdbo-xkm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ impostorscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 mlxlogscore=720
+ mlxscore=0 priorityscore=1501 suspectscore=0 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2412090086
 
-On Wed, Dec 04, 2024 at 01:27:38PM +0100, Konrad Knitter wrote:
-> Firmware generates events for global events or port specific events.
-> 
-> Driver shall subscribe for health status events from firmware on supported
-> FW versions >= 1.7.6.
-> Driver shall expose those under specific health reporter, two new
-> reporters are introduced:
-> - FW health reporter shall represent global events (problems with the
-> image, recovery mode);
-> - Port health reporter shall represent port-specific events (module
-> failure).
-> 
-> Firmware only reports problems when those are detected, it does not store
-> active fault list.
-> Driver will hold only last global and last port-specific event.
-> Driver will report all events via devlink health report,
-> so in case of multiple events of the same source they can be reviewed
-> using devlink autodump feature.
-> 
-> $ devlink health
-> 
-> pci/0000:b1:00.3:
->   reporter fw
->     state healthy error 0 recover 0 auto_dump true
->   reporter port
->     state error error 1 recover 0 last_dump_date 2024-03-17
-> 	last_dump_time 09:29:29 auto_dump true
-> 
-> $ devlink health diagnose pci/0000:b1:00.3 reporter port
-> 
->   Syndrome: 262
->   Description: Module is not present.
->   Possible Solution: Check that the module is inserted correctly.
->   Port Number: 0
-> 
-> Tested on Intel Corporation Ethernet Controller E810-C for SFP
-> 
-> Co-developed-by: Sharon Haroni <sharon.haroni@intel.com>
-> Signed-off-by: Sharon Haroni <sharon.haroni@intel.com>
-> Co-developed-by: Nicholas Nunley <nicholas.d.nunley@intel.com>
-> Signed-off-by: Nicholas Nunley <nicholas.d.nunley@intel.com>
-> Co-developed-by: Brett Creeley <brett.creeley@intel.com>
-> Signed-off-by: Brett Creeley <brett.creeley@intel.com>
-> Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
+Since commit 6f043e757445 ("asm-generic/io.h: Remove I/O port accessors
+for HAS_IOPORT=n") the I/O port accessors are compile-time optional. As
+m68k may or may not select HAS_IOPORT the COLDFIRE dependency is not
+enough to guarantee I/O port access. Add an explicit HAS_IOPORT
+dependency for mcf8390 to prevent a build failure as seen by the kernel
+test robot.
 
-Hi Konrad,
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202412080511.ORVinTDs-lkp@intel.com/
+Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+---
+Changes in v2:
+- Add missing "net" prefix. Sorry about the noise
+- Link to v1: https://lore.kernel.org/r/20241209-mcf8390_has_ioport-v1-1-f263d573e243@linux.ibm.com
+---
+ drivers/net/ethernet/8390/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Some minor feedback from my side.
+diff --git a/drivers/net/ethernet/8390/Kconfig b/drivers/net/ethernet/8390/Kconfig
+index 345f250781c6d9c3c6cbe5445250dc5987803b1a..f2ee99532187d133fdb02bc4b82c7fc4861f90af 100644
+--- a/drivers/net/ethernet/8390/Kconfig
++++ b/drivers/net/ethernet/8390/Kconfig
+@@ -87,7 +87,7 @@ config MAC8390
+ 
+ config MCF8390
+ 	tristate "ColdFire NS8390 based Ethernet support"
+-	depends on COLDFIRE
++	depends on COLDFIRE && HAS_IOPORT
+ 	select CRC32
+ 	help
+ 	  This driver is for Ethernet devices using an NS8390-compatible
 
-> diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
+---
+base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
+change-id: 20241209-mcf8390_has_ioport-7dcb85a5170c
 
-...
+Best regards,
+-- 
+Niklas Schnelle
 
-> +/**
-> + * ice_process_health_status_event - Process the health status event from FW
-> + * @pf: pointer to the PF structure
-> + * @event: event structure containing the Health Status Event opcode
-> + *
-> + * Decode the Health Status Events and print the associated messages
-> + */
-> +void ice_process_health_status_event(struct ice_pf *pf, struct ice_rq_event_info *event)
-> +{
-> +	const struct ice_aqc_health_status_elem *health_info;
-> +	u16 count;
-> +
-> +	health_info = (struct ice_aqc_health_status_elem *)event->msg_buf;
-> +	count = le16_to_cpu(event->desc.params.get_health_status.health_status_count);
-> +
-> +	if (count > (event->buf_len / sizeof(*health_info))) {
-> +		dev_err(ice_pf_to_dev(pf), "Received a health status event with invalid element count\n");
-> +		return;
-> +	}
-> +
-> +	for (int i = 0; i < count; i++) {
-> +		const struct ice_health_status *health_code;
-> +		u16 status_code;
-> +
-> +		status_code = le16_to_cpu(health_info->health_status_code);
-> +		health_code = ice_get_health_status(status_code);
-> +
-> +		if (health_code) {
-> +			switch (health_info->event_source) {
-> +			case ICE_AQC_HEALTH_STATUS_GLOBAL:
-> +				pf->health_reporters.fw_status = *health_info;
-> +				devlink_health_report(pf->health_reporters.fw,
-> +						      "FW syndrome reported", NULL);
-> +				break;
-> +			case ICE_AQC_HEALTH_STATUS_PF:
-> +			case ICE_AQC_HEALTH_STATUS_PORT:
-> +				pf->health_reporters.port_status = *health_info;
-> +				devlink_health_report(pf->health_reporters.port,
-> +						      "Port syndrome reported", NULL);
-> +				break;
-> +			default:
-> +				dev_err(ice_pf_to_dev(pf), "Health code with unknown source\n");
-> +			}
-
-The type of health_info->event_source is __le16.
-But here it is being compared against host byte order values.
-That doesn't seem correct.
-
-Flagged by Sparse.
-
-> +		} else {
-> +			u32 data1, data2;
-> +			u16 source;
-> +
-> +			source = le16_to_cpu(health_info->event_source);
-> +			data1 = le32_to_cpu(health_info->internal_data1);
-> +			data2 = le32_to_cpu(health_info->internal_data2);
-> +			dev_dbg(ice_pf_to_dev(pf),
-> +				"Received internal health status code 0x%08x, source: 0x%08x, data1: 0x%08x, data2: 0x%08x",
-> +				status_code, source, data1, data2);
-> +		}
-> +		health_info++;
-> +	}
-> +}
-> +
->  /**
->   * ice_devlink_health_report - boilerplate to call given @reporter
->   *
-
-...
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-> index faba09b9d880..9c61318d3027 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -6047,6 +6047,44 @@ bool ice_is_phy_caps_an_enabled(struct ice_aqc_get_phy_caps_data *caps)
->  	return false;
->  }
->  
-> +/**
-> + * ice_is_fw_health_report_supported
-
-Please consider including a short description here.
-
-Flagged by ./scripts/kernel-doc -Wall -none
-
-> + * @hw: pointer to the hardware structure
-> + *
-> + * Return: true if firmware supports health status reports,
-> + * false otherwise
-> + */
-> +bool ice_is_fw_health_report_supported(struct ice_hw *hw)
-> +{
-> +	return ice_is_fw_api_min_ver(hw, ICE_FW_API_HEALTH_REPORT_MAJ,
-> +				     ICE_FW_API_HEALTH_REPORT_MIN,
-> +				     ICE_FW_API_HEALTH_REPORT_PATCH);
-> +}
-
-...
 
