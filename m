@@ -1,312 +1,351 @@
-Return-Path: <netdev+bounces-150302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B8509E9D7F
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:51:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D34279E9D81
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 18:51:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58B451886E4E
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:51:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A00A1887043
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 17:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220A0154BFC;
-	Mon,  9 Dec 2024 17:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D612C15749C;
+	Mon,  9 Dec 2024 17:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PSjoyWKg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UBCCDmwf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1E214B077;
-	Mon,  9 Dec 2024 17:50:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D6A153BFC
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 17:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733766657; cv=none; b=jPIsdHSgdY++5ALJfSz6Ka457g0nxaZ8s1me+KY3cLZk0TCzPcMNITCATXCi0TljREkhNuRRgVvWdbx5jEkBAcnJnLVx8i3+W5r95vEmvuIk/Ns/qKXOE8krr+4ybOYvVfd6o5gZuM7yeqcf6KB662ulhfZY2IUqqjUi1UgeUp0=
+	t=1733766679; cv=none; b=fFFI+MdMLCITFfdY1v4lf4eug3aq63R5mw3CWo1W2WA1b/qBBYs37AmGjRSepOfNlcfHMuJRkGNEYMEsHnTx3gBiHSz5EYLjD3dsCo8c/CtOJJbv7WrWses33TNURSoMW8nFSIxqQmUNtF41/gJHJ9QgnkZa+vHWdDCJfqHa9oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733766657; c=relaxed/simple;
-	bh=Y4occCNc6/Ici7P42BSSg7VGntQQoGUD7KDgt5ccTn8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=vGBq8+QvZZbACWyq1Zhb5htd1lulkzOqhLrgFi3d7HEqB7nxV7smI2nFofbDCbZcTjngUFuzqVBUUZKWV1cPJXrCqGOY/5f0v4/IHHn+ZLDxXTuBqKReIS06cNviKLq5Q++i4UtWgySqysk1oxgznb2IzI9c7+pylpNeJ2cOqA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PSjoyWKg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7155FC4CEDF;
-	Mon,  9 Dec 2024 17:50:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733766656;
-	bh=Y4occCNc6/Ici7P42BSSg7VGntQQoGUD7KDgt5ccTn8=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=PSjoyWKgILdPElYmU+CVBdk/szbEogFSjIpw1YK6zDdg8hHMfDWNEHA6TtWv6MQOk
-	 /OqUk/DpElRdkTgz7QKzik2wg/8AxnzXqEiU7ZY3OcGCXiWaJ1w8WPx9ADWdYmg51n
-	 oybMpJemh4RMYnQlw5RWNZ0eI5tCr3hSZjPJluyVJxoLywXfIAnDCnAc8+wiD9uMWH
-	 gHsiUafkuy+2HmVSIT/mSx4KVe0L4fG4xEFoEh1CM68Jm62jPRLUnTFmj2zyfJa2D0
-	 Hz87dA3mJOKPRCcDUtS7U6ymqjl+Q7bqaogk9dZH69TvRNVAmcj6cawRvci6D9TkJu
-	 X4kHjq0bpVe0A==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A0C8E7717D;
-	Mon,  9 Dec 2024 17:50:56 +0000 (UTC)
-From: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
-Date: Mon, 09 Dec 2024 18:50:42 +0100
-Subject: [PATCH net-next] net: phy: dp83822: Replace DP83822_DEVADDR with
- MDIO_MMD_VEND2
+	s=arc-20240116; t=1733766679; c=relaxed/simple;
+	bh=I650u4xgoBvZVnpFknCJORT87dGzGprkCetninL2hTY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zg21NllAP7u+uw5DkooBcc0LoA6d6erzPUaF4m02FE6T0a5ZzsqUsCFwG1SSkIAjBETK33OON5DG7v+Y1+YbVJ+2mSPM/ufbkkGeKpEDmYpW0X3/xgczloneZqem4MG+Bta2ZP22Td/MQ0kZoPqPk7Ho3b1JCNknS7/AQieUulA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UBCCDmwf; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4675936f333so321101cf.0
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 09:51:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733766677; x=1734371477; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5mBPvczMWM/n5bKZ9YlmyB0NFq3GEO6dYo6FnSFDkwk=;
+        b=UBCCDmwfheFAdt+1y5HT4OFrP9evdDUof3V/dXcgDney6vBp7ck0CPCCiCaXkhgitK
+         QHFzFUTLbSHpGexFnWJBfKDULPXQ2H0lYK7lfkZI0vCaBndObfFftXtrZP7aef/JYG5/
+         4GVBCkMwKbMlSKDSrNQflSCIvcBSUvrTjD4+THXZprcaGrYEd1Qi8r3Zjb/rQSX/7E7V
+         86iAwVlv2Nb8ECTngsy/JyCrMn5tLDgNaOoMV89i65/enJ8wZKOhzCRLKg/fAgKcODMm
+         o0VNb8gpcvXvR+8ywxEMAnWLRJtmDyQx2b8PlLMnFeAxvEmZpCcOrEvNcGGBp3svheWr
+         Ijug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733766677; x=1734371477;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5mBPvczMWM/n5bKZ9YlmyB0NFq3GEO6dYo6FnSFDkwk=;
+        b=OYW8yTihJxtlWmLsYVR3uCxZ7AoD7apTNYVkc/2DiIQ2LFAIACM+NHaQj4SEZ21Cie
+         fYgI4nIQt5y5yYdKtKMgMhsO+thUWtvX2dfxFpZlyvc5AgYWp8lWmNSF4pQE56CAXm3C
+         GxGswkO/e7MnMUXrkDPw+0Zom2CvrfmyL+Yb/RACWSeD85+baeH48gi2uo9/QHlBbWwE
+         1UgvAdXk8KvQaTkAYFGtEoxXAD7oJaqFyQB/c01wOsGrWVoqBsD7w7dlFPvWwXajWq2i
+         zqmwFMJ0pL9BQDD8XaHWQlJ0opOP5mhHgrmYgMYGnoiBWrnYtze3TpJGYic8SKagLsyt
+         mflg==
+X-Forwarded-Encrypted: i=1; AJvYcCVjM42ndScfSGdM/ndFYmw+qA+qH6DpkGHM4Zs1/NxhLRcIIZN9D223av0dMwGZl4EBiHE+mY4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLvY0+mIk2yRdEC65H/qeoBnwvqkVqdkMYnIDhDf6RuvvCTdCN
+	ZoiHcUeOKr8lPQwCNEBAGinnBUCrw2ATM7c6GtK43tEhYF4C+g/MG4ANRhF3Peqv6bkqwY5LjR3
+	gzQi9276U4VPnQfDUq6NvjXoVTj1XQjj3mlCk
+X-Gm-Gg: ASbGncs1pmorSqPT+hbdclICrC5AXeMem51alVlFztI/mDrq+5I/fy9ptfKVNxH18ae
+	YM++QTtjThgltrHKYyFVarIJRRQxkWghwLWbeNtBkL2GMZomSjJ8PZMHvZQPL0g==
+X-Google-Smtp-Source: AGHT+IE7xvWGaHaycDDuW3FhhbirXibugXj3omDncQUKbGN7PZSoEothwM/hNMib71fL12aAIYzaHzO8ImgEqcQz2zU=
+X-Received: by 2002:a05:622a:5e13:b0:466:975f:b219 with SMTP id
+ d75a77b69052e-46746f3433emr10033691cf.8.1733766676670; Mon, 09 Dec 2024
+ 09:51:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241209-dp83822-mdio-mmd-vend2-v1-1-4473c7284b94@liebherr.com>
-X-B4-Tracking: v=1; b=H4sIAPEtV2cC/x3MQQqEMAxA0atI1gZqKrR6FXExM4ljFo3Sigji3
- afM8i3+v6FIVikwNjdkObXoZhVd28BnfdlXULkayFHfkRuQ9+gjESbWDVNiPMWYMPoQfHRL798
- BarxnWfT6jycwOdDkOmB+nh8DxbvrcgAAAA==
-X-Change-ID: 20241209-dp83822-mdio-mmd-vend2-8377380f43b7
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Dimitri Fedrau <dima.fedrau@gmail.com>, 
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1733766655; l=9020;
- i=dimitri.fedrau@liebherr.com; s=20241202; h=from:subject:message-id;
- bh=y2zn+L/aWE1Ero8F6H4omU9e4vAI0N/THmMcxqt/cio=;
- b=aplgF5k7dWDI6IDBJarFpSHt9HI3DAtjsQfg4wF+4kPTUgjWolR3JKiP1bVZVQ54EEJ4VMbbk
- YJJj+Wru2anCWf5Msqt1aNjm9yhH9B/W7nal6eeK8r95kS0XYBvRNMs
-X-Developer-Key: i=dimitri.fedrau@liebherr.com; a=ed25519;
- pk=rT653x09JSQvotxIqQl4/XiI4AOiBZrdOGvxDUbb5m8=
-X-Endpoint-Received: by B4 Relay for dimitri.fedrau@liebherr.com/20241202
- with auth_id=290
-X-Original-From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Reply-To: dimitri.fedrau@liebherr.com
+References: <20241204172204.4180482-1-dw@davidwei.uk> <20241204172204.4180482-17-dw@davidwei.uk>
+In-Reply-To: <20241204172204.4180482-17-dw@davidwei.uk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 9 Dec 2024 09:51:04 -0800
+Message-ID: <CAHS8izP3mo=BYNxKawetg5vNxgRhtUOU2qykJxkWpvua8HQU6g@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 16/17] net: add documentation for io_uring zcrx
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+On Wed, Dec 4, 2024 at 9:23=E2=80=AFAM David Wei <dw@davidwei.uk> wrote:
+>
+> Add documentation for io_uring zero copy Rx that explains requirements
+> and the user API.
+>
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>  Documentation/networking/iou-zcrx.rst | 201 ++++++++++++++++++++++++++
+>  1 file changed, 201 insertions(+)
+>  create mode 100644 Documentation/networking/iou-zcrx.rst
+>
+> diff --git a/Documentation/networking/iou-zcrx.rst b/Documentation/networ=
+king/iou-zcrx.rst
+> new file mode 100644
+> index 000000000000..0a3af8c08c7e
+> --- /dev/null
+> +++ b/Documentation/networking/iou-zcrx.rst
+> @@ -0,0 +1,201 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +io_uring zero copy Rx
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +Introduction
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +io_uring zero copy Rx (ZC Rx) is a feature that removes kernel-to-user c=
+opy on
+> +the network receive path, allowing packet data to be received directly i=
+nto
+> +userspace memory. This feature is different to TCP_ZEROCOPY_RECEIVE in t=
+hat
+> +there are no strict alignment requirements and no need to mmap()/munmap(=
+).
+> +Compared to kernel bypass solutions such as e.g. DPDK, the packet header=
+s are
+> +processed by the kernel TCP stack as normal.
+> +
+> +NIC HW Requirements
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +Several NIC HW features are required for io_uring ZC Rx to work. For now=
+ the
+> +kernel API does not configure the NIC and it must be done by the user.
+> +
+> +Header/data split
+> +-----------------
+> +
+> +Required to split packets at the L4 boundary into a header and a payload=
+.
+> +Headers are received into kernel memory as normal and processed by the T=
+CP
+> +stack as normal. Payloads are received into userspace memory directly.
+> +
+> +Flow steering
+> +-------------
+> +
+> +Specific HW Rx queues are configured for this feature, but modern NICs
+> +typically distribute flows across all HW Rx queues. Flow steering is req=
+uired
+> +to ensure that only desired flows are directed towards HW queues that ar=
+e
+> +configured for io_uring ZC Rx.
+> +
+> +RSS
+> +---
+> +
+> +In addition to flow steering above, RSS is required to steer all other n=
+on-zero
+> +copy flows away from queues that are configured for io_uring ZC Rx.
+> +
+> +Usage
+> +=3D=3D=3D=3D=3D
+> +
+> +Setup NIC
+> +---------
+> +
+> +Must be done out of band for now.
 
-Instead of using DP83822_DEVADDR which is locally defined use
-MDIO_MMD_VEND2.
+I would remove any 'for now' instances in the docs. Uapis are going to
+be maintained as-is for posterity. Even if you in the future add new
+APIs which auto-configure headersplit/flow steering/rss, I'm guessing
+the current API would live on for backward compatibility reasons.
 
-Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
----
- drivers/net/phy/dp83822.c | 58 +++++++++++++++++++++++------------------------
- 1 file changed, 28 insertions(+), 30 deletions(-)
+> +
+> +Ensure there are enough queues::
 
-diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-index cf8b6d0bfaa9812eee98c612c0d4259d87da7572..25ee09c48027c86b7d8f4acb5cbe2e157c56a85a 100644
---- a/drivers/net/phy/dp83822.c
-+++ b/drivers/net/phy/dp83822.c
-@@ -22,8 +22,6 @@
- #define DP83826C_PHY_ID		0x2000a130
- #define DP83826NC_PHY_ID	0x2000a110
- 
--#define DP83822_DEVADDR		0x1f
--
- #define MII_DP83822_CTRL_2	0x0a
- #define MII_DP83822_PHYSTS	0x10
- #define MII_DP83822_PHYSCR	0x11
-@@ -159,14 +157,14 @@ static int dp83822_config_wol(struct phy_device *phydev,
- 		/* MAC addresses start with byte 5, but stored in mac[0].
- 		 * 822 PHYs store bytes 4|5, 2|3, 0|1
- 		 */
--		phy_write_mmd(phydev, DP83822_DEVADDR, MII_DP83822_WOL_DA1,
-+		phy_write_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_WOL_DA1,
- 			      (mac[1] << 8) | mac[0]);
--		phy_write_mmd(phydev, DP83822_DEVADDR, MII_DP83822_WOL_DA2,
-+		phy_write_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_WOL_DA2,
- 			      (mac[3] << 8) | mac[2]);
--		phy_write_mmd(phydev, DP83822_DEVADDR, MII_DP83822_WOL_DA3,
-+		phy_write_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_WOL_DA3,
- 			      (mac[5] << 8) | mac[4]);
- 
--		value = phy_read_mmd(phydev, DP83822_DEVADDR,
-+		value = phy_read_mmd(phydev, MDIO_MMD_VEND2,
- 				     MII_DP83822_WOL_CFG);
- 		if (wol->wolopts & WAKE_MAGIC)
- 			value |= DP83822_WOL_MAGIC_EN;
-@@ -174,13 +172,13 @@ static int dp83822_config_wol(struct phy_device *phydev,
- 			value &= ~DP83822_WOL_MAGIC_EN;
- 
- 		if (wol->wolopts & WAKE_MAGICSECURE) {
--			phy_write_mmd(phydev, DP83822_DEVADDR,
-+			phy_write_mmd(phydev, MDIO_MMD_VEND2,
- 				      MII_DP83822_RXSOP1,
- 				      (wol->sopass[1] << 8) | wol->sopass[0]);
--			phy_write_mmd(phydev, DP83822_DEVADDR,
-+			phy_write_mmd(phydev, MDIO_MMD_VEND2,
- 				      MII_DP83822_RXSOP2,
- 				      (wol->sopass[3] << 8) | wol->sopass[2]);
--			phy_write_mmd(phydev, DP83822_DEVADDR,
-+			phy_write_mmd(phydev, MDIO_MMD_VEND2,
- 				      MII_DP83822_RXSOP3,
- 				      (wol->sopass[5] << 8) | wol->sopass[4]);
- 			value |= DP83822_WOL_SECURE_ON;
-@@ -194,10 +192,10 @@ static int dp83822_config_wol(struct phy_device *phydev,
- 		value |= DP83822_WOL_EN | DP83822_WOL_INDICATION_SEL |
- 			 DP83822_WOL_CLR_INDICATION;
- 
--		return phy_write_mmd(phydev, DP83822_DEVADDR,
-+		return phy_write_mmd(phydev, MDIO_MMD_VEND2,
- 				     MII_DP83822_WOL_CFG, value);
- 	} else {
--		return phy_clear_bits_mmd(phydev, DP83822_DEVADDR,
-+		return phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2,
- 					  MII_DP83822_WOL_CFG,
- 					  DP83822_WOL_EN |
- 					  DP83822_WOL_MAGIC_EN |
-@@ -226,23 +224,23 @@ static void dp83822_get_wol(struct phy_device *phydev,
- 	wol->supported = (WAKE_MAGIC | WAKE_MAGICSECURE);
- 	wol->wolopts = 0;
- 
--	value = phy_read_mmd(phydev, DP83822_DEVADDR, MII_DP83822_WOL_CFG);
-+	value = phy_read_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_WOL_CFG);
- 
- 	if (value & DP83822_WOL_MAGIC_EN)
- 		wol->wolopts |= WAKE_MAGIC;
- 
- 	if (value & DP83822_WOL_SECURE_ON) {
--		sopass_val = phy_read_mmd(phydev, DP83822_DEVADDR,
-+		sopass_val = phy_read_mmd(phydev, MDIO_MMD_VEND2,
- 					  MII_DP83822_RXSOP1);
- 		wol->sopass[0] = (sopass_val & 0xff);
- 		wol->sopass[1] = (sopass_val >> 8);
- 
--		sopass_val = phy_read_mmd(phydev, DP83822_DEVADDR,
-+		sopass_val = phy_read_mmd(phydev, MDIO_MMD_VEND2,
- 					  MII_DP83822_RXSOP2);
- 		wol->sopass[2] = (sopass_val & 0xff);
- 		wol->sopass[3] = (sopass_val >> 8);
- 
--		sopass_val = phy_read_mmd(phydev, DP83822_DEVADDR,
-+		sopass_val = phy_read_mmd(phydev, MDIO_MMD_VEND2,
- 					  MII_DP83822_RXSOP3);
- 		wol->sopass[4] = (sopass_val & 0xff);
- 		wol->sopass[5] = (sopass_val >> 8);
-@@ -430,18 +428,18 @@ static int dp83822_config_init(struct phy_device *phydev)
- 		if (tx_int_delay <= 0)
- 			rgmii_delay |= DP83822_TX_CLK_SHIFT;
- 
--		err = phy_modify_mmd(phydev, DP83822_DEVADDR, MII_DP83822_RCSR,
-+		err = phy_modify_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_RCSR,
- 				     DP83822_RX_CLK_SHIFT | DP83822_TX_CLK_SHIFT, rgmii_delay);
- 		if (err)
- 			return err;
- 
--		err = phy_set_bits_mmd(phydev, DP83822_DEVADDR,
-+		err = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2,
- 				       MII_DP83822_RCSR, DP83822_RGMII_MODE_EN);
- 
- 		if (err)
- 			return err;
- 	} else {
--		err = phy_clear_bits_mmd(phydev, DP83822_DEVADDR,
-+		err = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2,
- 					 MII_DP83822_RCSR, DP83822_RGMII_MODE_EN);
- 
- 		if (err)
-@@ -496,7 +494,7 @@ static int dp83822_config_init(struct phy_device *phydev)
- 			return err;
- 
- 		if (dp83822->fx_signal_det_low) {
--			err = phy_set_bits_mmd(phydev, DP83822_DEVADDR,
-+			err = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2,
- 					       MII_DP83822_GENCFG,
- 					       DP83822_SIG_DET_LOW);
- 			if (err)
-@@ -514,10 +512,10 @@ static int dp8382x_config_rmii_mode(struct phy_device *phydev)
- 
- 	if (!device_property_read_string(dev, "ti,rmii-mode", &of_val)) {
- 		if (strcmp(of_val, "master") == 0) {
--			ret = phy_clear_bits_mmd(phydev, DP83822_DEVADDR, MII_DP83822_RCSR,
-+			ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_RCSR,
- 						 DP83822_RMII_MODE_SEL);
- 		} else if (strcmp(of_val, "slave") == 0) {
--			ret = phy_set_bits_mmd(phydev, DP83822_DEVADDR, MII_DP83822_RCSR,
-+			ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_RCSR,
- 					       DP83822_RMII_MODE_SEL);
- 		} else {
- 			phydev_err(phydev, "Invalid value for ti,rmii-mode property (%s)\n",
-@@ -539,7 +537,7 @@ static int dp83826_config_init(struct phy_device *phydev)
- 	int ret;
- 
- 	if (phydev->interface == PHY_INTERFACE_MODE_RMII) {
--		ret = phy_set_bits_mmd(phydev, DP83822_DEVADDR, MII_DP83822_RCSR,
-+		ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_RCSR,
- 				       DP83822_RMII_MODE_EN);
- 		if (ret)
- 			return ret;
-@@ -548,7 +546,7 @@ static int dp83826_config_init(struct phy_device *phydev)
- 		if (ret)
- 			return ret;
- 	} else {
--		ret = phy_clear_bits_mmd(phydev, DP83822_DEVADDR, MII_DP83822_RCSR,
-+		ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_RCSR,
- 					 DP83822_RMII_MODE_EN);
- 		if (ret)
- 			return ret;
-@@ -560,7 +558,7 @@ static int dp83826_config_init(struct phy_device *phydev)
- 				 FIELD_GET(DP83826_CFG_DAC_MINUS_MDIX_5_TO_4,
- 					   dp83822->cfg_dac_minus));
- 		mask = DP83826_VOD_CFG1_MINUS_MDIX_MASK | DP83826_VOD_CFG1_MINUS_MDI_MASK;
--		ret = phy_modify_mmd(phydev, DP83822_DEVADDR, MII_DP83826_VOD_CFG1, mask, val);
-+		ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, MII_DP83826_VOD_CFG1, mask, val);
- 		if (ret)
- 			return ret;
- 
-@@ -568,7 +566,7 @@ static int dp83826_config_init(struct phy_device *phydev)
- 				 FIELD_GET(DP83826_CFG_DAC_MINUS_MDIX_3_TO_0,
- 					   dp83822->cfg_dac_minus));
- 		mask = DP83826_VOD_CFG2_MINUS_MDIX_MASK;
--		ret = phy_modify_mmd(phydev, DP83822_DEVADDR, MII_DP83826_VOD_CFG2, mask, val);
-+		ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, MII_DP83826_VOD_CFG2, mask, val);
- 		if (ret)
- 			return ret;
- 	}
-@@ -577,7 +575,7 @@ static int dp83826_config_init(struct phy_device *phydev)
- 		val = FIELD_PREP(DP83826_VOD_CFG2_PLUS_MDIX_MASK, dp83822->cfg_dac_plus) |
- 		      FIELD_PREP(DP83826_VOD_CFG2_PLUS_MDI_MASK, dp83822->cfg_dac_plus);
- 		mask = DP83826_VOD_CFG2_PLUS_MDIX_MASK | DP83826_VOD_CFG2_PLUS_MDI_MASK;
--		ret = phy_modify_mmd(phydev, DP83822_DEVADDR, MII_DP83826_VOD_CFG2, mask, val);
-+		ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, MII_DP83826_VOD_CFG2, mask, val);
- 		if (ret)
- 			return ret;
- 	}
-@@ -673,7 +671,7 @@ static int dp83822_read_straps(struct phy_device *phydev)
- 	int fx_enabled, fx_sd_enable;
- 	int val;
- 
--	val = phy_read_mmd(phydev, DP83822_DEVADDR, MII_DP83822_SOR1);
-+	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_SOR1);
- 	if (val < 0)
- 		return val;
- 
-@@ -748,7 +746,7 @@ static int dp83822_suspend(struct phy_device *phydev)
- {
- 	int value;
- 
--	value = phy_read_mmd(phydev, DP83822_DEVADDR, MII_DP83822_WOL_CFG);
-+	value = phy_read_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_WOL_CFG);
- 
- 	if (!(value & DP83822_WOL_EN))
- 		genphy_suspend(phydev);
-@@ -762,9 +760,9 @@ static int dp83822_resume(struct phy_device *phydev)
- 
- 	genphy_resume(phydev);
- 
--	value = phy_read_mmd(phydev, DP83822_DEVADDR, MII_DP83822_WOL_CFG);
-+	value = phy_read_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_WOL_CFG);
- 
--	phy_write_mmd(phydev, DP83822_DEVADDR, MII_DP83822_WOL_CFG, value |
-+	phy_write_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_WOL_CFG, value |
- 		      DP83822_WOL_CLR_INDICATION);
- 
- 	return 0;
+Was not clear to me what are enough queues. Technically you only need
+2 queues, right? (one for iozcrx and one for normal traffic).
 
----
-base-commit: 6145fefc1e42c1895c0c1c2c8593de2c085d8c56
-change-id: 20241209-dp83822-mdio-mmd-vend2-8377380f43b7
+> +
+> +  ethtool -L eth0 combined 32
+> +
+> +Enable header/data split::
+> +
+> +  ethtool -G eth0 tcp-data-split on
+> +
+> +Carve out half of the HW Rx queues for zero copy using RSS::
+> +
+> +  ethtool -X eth0 equal 16
+> +
+> +Set up flow steering::
+> +
+> +  ethtool -N eth0 flow-type tcp6 ... action 16
+> +
+> +Setup io_uring
+> +--------------
+> +
+> +This section describes the low level io_uring kernel API. Please refer t=
+o
+> +liburing documentation for how to use the higher level API.
+> +
+> +Create an io_uring instance with the following required setup flags::
+> +
+> +  IORING_SETUP_SINGLE_ISSUER
+> +  IORING_SETUP_DEFER_TASKRUN
+> +  IORING_SETUP_CQE32
+> +
+> +Create memory area
+> +------------------
+> +
+> +Allocate userspace memory area for receiving zero copy data::
+> +
+> +  void *area_ptr =3D mmap(NULL, area_size,
+> +                        PROT_READ | PROT_WRITE,
+> +                        MAP_ANONYMOUS | MAP_PRIVATE,
+> +                        0, 0);
+> +
+> +Create refill ring
+> +------------------
+> +
+> +Allocate memory for a shared ringbuf used for returning consumed buffers=
+::
+> +
+> +  void *ring_ptr =3D mmap(NULL, ring_size,
+> +                        PROT_READ | PROT_WRITE,
+> +                        MAP_ANONYMOUS | MAP_PRIVATE,
+> +                        0, 0);
+> +
+> +This refill ring consists of some space for the header, followed by an a=
+rray of
+> +``struct io_uring_zcrx_rqe``::
+> +
+> +  size_t rq_entries =3D 4096;
+> +  size_t ring_size =3D rq_entries * sizeof(struct io_uring_zcrx_rqe) + P=
+AGE_SIZE;
+> +  /* align to page size */
+> +  ring_size =3D (ring_size + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
+> +
+> +Register ZC Rx
+> +--------------
+> +
+> +Fill in registration structs::
+> +
+> +  struct io_uring_zcrx_area_reg area_reg =3D {
+> +    .addr =3D (__u64)(unsigned long)area_ptr,
+> +    .len =3D area_size,
+> +    .flags =3D 0,
+> +  };
+> +
+> +  struct io_uring_region_desc region_reg =3D {
+> +    .user_addr =3D (__u64)(unsigned long)ring_ptr,
+> +    .size =3D ring_size,
+> +    .flags =3D IORING_MEM_REGION_TYPE_USER,
+> +  };
+> +
+> +  struct io_uring_zcrx_ifq_reg reg =3D {
+> +    .if_idx =3D if_nametoindex("eth0"),
+> +    /* this is the HW queue with desired flow steered into it */
+> +    .if_rxq =3D 16,
+> +    .rq_entries =3D rq_entries,
+> +    .area_ptr =3D (__u64)(unsigned long)&area_reg,
+> +    .region_ptr =3D (__u64)(unsigned long)&region_reg,
+> +  };
+> +
+> +Register with kernel::
+> +
+> +  io_uring_register_ifq(ring, &reg);
+> +
+> +Map refill ring
+> +---------------
+> +
+> +The kernel fills in fields for the refill ring in the registration ``str=
+uct
+> +io_uring_zcrx_ifq_reg``. Map it into userspace::
+> +
+> +  struct io_uring_zcrx_rq refill_ring;
+> +
+> +  refill_ring.khead =3D (unsigned *)((char *)ring_ptr + reg.offsets.head=
+);
+> +  refill_ring.khead =3D (unsigned *)((char *)ring_ptr + reg.offsets.tail=
+);
+> +  refill_ring.rqes =3D
+> +    (struct io_uring_zcrx_rqe *)((char *)ring_ptr + reg.offsets.rqes);
+> +  refill_ring.rq_tail =3D 0;
+> +  refill_ring.ring_ptr =3D ring_ptr;
+> +
+> +Receiving data
+> +--------------
+> +
+> +Prepare a zero copy recv request::
+> +
+> +  struct io_uring_sqe *sqe;
+> +
+> +  sqe =3D io_uring_get_sqe(ring);
+> +  io_uring_prep_rw(IORING_OP_RECV_ZC, sqe, fd, NULL, 0, 0);
+> +  sqe->ioprio |=3D IORING_RECV_MULTISHOT;
+> +
+> +Now, submit and wait::
+> +
+> +  io_uring_submit_and_wait(ring, 1);
+> +
+> +Finally, process completions::
+> +
+> +  struct io_uring_cqe *cqe;
+> +  unsigned int count =3D 0;
+> +  unsigned int head;
+> +
+> +  io_uring_for_each_cqe(ring, head, cqe) {
+> +    struct io_uring_zcrx_cqe *rcqe =3D (struct io_uring_zcrx_cqe *)(cqe =
++ 1);
+> +
+> +    unsigned char *data =3D area_ptr + (rcqe->off & IORING_ZCRX_AREA_MAS=
+K);
+> +    /* do something with the data */
+> +
+> +    count++;
+> +  }
+> +  io_uring_cq_advance(ring, count);
+> +
+> +Recycling buffers
+> +-----------------
+> +
+> +Return buffers back to the kernel to be used again::
+> +
+> +  struct io_uring_zcrx_rqe *rqe;
+> +  unsigned mask =3D refill_ring.ring_entries - 1;
+> +  rqe =3D &refill_ring.rqes[refill_ring.rq_tail & mask];
+> +
+> +  area_offset =3D rcqe->off & IORING_ZCRX_AREA_MASK;
+> +  rqe->off =3D area_offset | area_reg.rq_area_token;
+> +  rqe->len =3D cqe->res;
+> +  IO_URING_WRITE_ONCE(*refill_ring.ktail, ++refill_ring.rq_tail);
+> +
 
-Best regards,
--- 
-Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Ah, I see why it's difficult for you to napi_pp_put_page() refilled
+pages. In part it's because the refill code in the userspace never
+traps into the kernel. Got it.
+
+I guess I read from the other thread that there are some
+(significant?) changes in the next version to incorporate feedback
+from Jakub, so I guess I'll wait for that before commenting further.
 
 
+--=20
+Thanks,
+Mina
 
