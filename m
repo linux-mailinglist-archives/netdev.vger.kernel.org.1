@@ -1,133 +1,131 @@
-Return-Path: <netdev+bounces-150396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 721339EA182
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 22:56:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D40D39EA189
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 22:57:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A624B282ABE
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 21:56:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36A09282D25
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 21:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740A619D8A2;
-	Mon,  9 Dec 2024 21:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jSHBlCEN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2AF619D8B7;
+	Mon,  9 Dec 2024 21:57:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E861119ABD4
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 21:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCA019D092;
+	Mon,  9 Dec 2024 21:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733781392; cv=none; b=Qpicg/BV1hHDjORDQ7i/uFQujzwfr2Br+vrjlmONQCK7lxZx+a1MG/r+9mXcMjo7SZOSku4nb53HZsHbXujGLBTJ4IKsyPC+1sfeXhfyxu3W98UcQ7W45TFmkIuz+7x+Iuf6EX2KkL1dg+t6FqGpF/loflqqWEs8EA/qlBW0TTY=
+	t=1733781447; cv=none; b=RRoOop+/P+UvGw2CLTbSUw9XSQiNUxAEnicn7OSrk3aIAdc1IxJnRnrVBVDrq3h2AOvx5s2p+sJzW2RmjKW7HOQcfeEshi3BYnk4F/7rslNizZYc6yMNv/Mz1inaeuy4W8p0yAYWIZDJf5xBkJDV0B21qwp95X+TigNchn1a/GU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733781392; c=relaxed/simple;
-	bh=rLikFwWBaSJVkAJl7elSg6TEqIpcLFI+lP4vN60vbY8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=KF2Ik4APr9ASKJQTZN3MAieEejUrILzMlPHHffrcH5nAI9Nu/xD+g5JlFLgLlGVzqnVGRZmjmk/xtCPqLFMT61MJFzOsmz9Vhwe18nhheuhI7cyzcRp5Up67q0m/DlkEfejQEqMWW56sJLAcwH5F6xb3gm3sZADtymkikx/V0ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jSHBlCEN; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <09b0c78a-09be-474d-b080-bdd5e7c76e40@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1733781386;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TOMJNfwreH26POHoZy5xtvsHbwUvB7HFQGPmn4XFhZI=;
-	b=jSHBlCENcCjlMvV4QEHL7fQNkI18KFeKgHb5YtptsmiyeYpaVaqLT9E2O3+o5Gj0caMwLl
-	d7grm7+qCqqqJVKH8Ji6raz+jUveO4CTsD9uG0IGjIjvcOrJo5T+Q8ccBZ1Su6mNWJu/Up
-	EZesVWjK28vBGG2kfkZvEcGJziqQFUk=
-Date: Mon, 9 Dec 2024 13:56:21 -0800
+	s=arc-20240116; t=1733781447; c=relaxed/simple;
+	bh=s735wf4mIGy4UockOnCzl0yBJWz9TfD0qhze9f1HsB8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mP07BwcbAkggqdpR6RuuGyQQMOkmP3Y8KZ868FTFoizDRZMAhBijcXdJE5aIyU6iE2c9+Mss5u0xMZZeWGtumxLMqes5ar0flP1X5g48WrSF09kTl3WtVPxpxyBIUFoQ/bgtZtxyFKxtGH/m6hOJ4iSic0SMx2ULLYoACQz1anw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.39.247] (port=46612 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1tKlkk-00GMMr-8S; Mon, 09 Dec 2024 22:57:20 +0100
+Date: Mon, 9 Dec 2024 22:57:17 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Karol P <karprzy7@gmail.com>
+Cc: kadlec@netfilter.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org
+Subject: Re: [PATCH] netfilter: nfnetlink_queue: Fix redundant comparison of
+ unsigned value
+Message-ID: <Z1dnvR1I19Baqjn2@calendula>
+References: <20241209204918.56943-1-karprzy7@gmail.com>
+ <Z1diBYlJUIRBIc2L@calendula>
+ <CAKwoAfq99AKb=a54=eRSKesFYO2X5R8WR8KSrrXVB_Z4=rkexg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: unregistering tcp_ca struct_ops can cause kernel page fault
-To: rtm@csail.mit.edu
-References: <74665.1733669976@localhost>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org
-In-Reply-To: <74665.1733669976@localhost>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAKwoAfq99AKb=a54=eRSKesFYO2X5R8WR8KSrrXVB_Z4=rkexg@mail.gmail.com>
+X-Spam-Score: -1.7 (-)
 
-On 12/8/24 6:59 AM, rtm@csail.mit.edu wrote:
-> The attached program, along with the attached bpf_cubic.o eBPF binary,
-> uses bpftool to install a tcp_ca struct ops, creates a tcp connection,
-> and then unregisters the struct ops while the tcp connection is still
-> active. On my 6.13.0 system this causes a kernel fault due to
+On Mon, Dec 09, 2024 at 10:50:17PM +0100, Karol P wrote:
+> On Mon, 9 Dec 2024 at 22:32, Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> >
+> > Hi,
+> >
+> > On Mon, Dec 09, 2024 at 09:49:18PM +0100, Karol Przybylski wrote:
+> > > The comparison seclen >= 0 in net/netfilter/nfnetlink_queue.c is redundant because seclen is an unsigned value, and such comparisons are always true.
+> > >
+> > > This patch removes the unnecessary comparison replacing it with just 'greater than'
+> > >
+> > > Discovered in coverity, CID 1602243
+> > >
+> > > Signed-off-by: Karol Przybylski <karprzy7@gmail.com>
+> > > ---
+> > >  net/netfilter/nfnetlink_queue.c | 6 +++---
+> > >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
+> > > index 5110f29b2..eacb34ffb 100644
+> > > --- a/net/netfilter/nfnetlink_queue.c
+> > > +++ b/net/netfilter/nfnetlink_queue.c
+> > > @@ -643,7 +643,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
+> > >
+> > >       if ((queue->flags & NFQA_CFG_F_SECCTX) && entskb->sk) {
+> > >               seclen = nfqnl_get_sk_secctx(entskb, &ctx);
+> > > -             if (seclen >= 0)
+> > > +             if (seclen > 0)
+> >
+> > What tree are you using? I don't see this code in net-next.git
+> 
+> linux-next, next-20241209
+> Link: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/net/netfilter/nfnetlink_queue.c?h=next-20241209#n646
 
-I tried the latest bpf-next/master (6.13-r2 + some recent bpf patches). I cannot 
-reproduce. I also don't recall any recent fix related to struct_ops refcnt in 
-the bpf_struct_ops or bpf_tcp_ca.
+Could you trace from what commit ID and what tree this is coming?
 
-I don't see how this could happen now because the icsk->icsk_ca_ops is 
-refcnt-ed. e.g. the setsockopt(TCP_CONGESTION) in your attached tcpbpf12a.c. 
-bpf_try_module_get, which then calls bpf_struct_ops_get for the bpf written 
-tcp-cc, should have refcnt-ed the icsk_ca_ops. I traced on the kernel code path 
-triggered by your tcpbpf12a.c and the refcnt looks correct.
+Then, post the patch to the corresponding tree and add a Fixes: tag?
 
-If you can reproduce consistently, please help to debug and narrow further why 
-the bpf_struct_ops_map_free() cleanup is finished while a tcp_sock still has a 
-hold of it in icsk->icsk_ca_ops.
+Possibly use:
 
-> tcp_tso_segs() calling through a de-allocated struct tcp_congestion_ops.
-> 
-> bpf_cubic.o came from
-> 
->    https://github.com/aroodgar/bpf-tcp-congestion-control-algorithm
-> 
-> Linux ubuntu66 6.13.0-rc1-00337-g7503345ac5f5 #11 SMP Sun Dec  8 08:37:57 EST 2024 x86_64 x86_64 x86_64 GNU/Linux
-> 
-> Oops: general protection fault, probably for non-canonical address 0x6b6b6b6b6b6b6b6b: 0000 [#1] SMP DEBUG_PAGEALLOC PTI
-> CPU: 6 UID: 0 PID: 1594 Comm: a.out Not tainted 6.13.0-rc1-00337-g7503345ac5f5 #11
-> Hardware name: FreeBSD BHYVE/BHYVE, BIOS 14.0 10/17/2021
-> RIP: 0010:__x86_indirect_thunk_array+0xa/0x20
-> Code: 66 0f 1f 00 31 ff e9 15 70 d6 fe cc cc cc cc cc cc cc cc cc cc cc cc cc cc
->   cc cc cc cc cc cc cc e8 01 00 00 00 cc 48 89 04 24 <c3> cc cc cc cc 90 66 66 2e
->   0f 1f 84 00 00 00 00 00 0f 1f 44 00 00
-> RSP: 0018:ffffc90002037c60 EFLAGS: 00010202
-> RAX: 6b6b6b6b6b6b6b6b RBX: ffff88810afc0b00 RCX: 0000000000000018
-> RDX: 00000000077b668a RSI: 0000000000008000 RDI: ffff88810afc0b00
-> RBP: 0000000000008000 R08: 0000000000000000 R09: 0000000000008000
-> R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-> R13: 0000000000008000 R14: 0000000000000000 R15: ffffffff842f6140
-> FS:  00007f5457b84740(0000) GS:ffff88842db80000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007f5457d8c710 CR3: 000000011b4b8005 CR4: 00000000003706f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->   <TASK>
->   ? die_addr+0x31/0x80
->   ? exc_general_protection+0x1b4/0x3c0
->   ? asm_exc_general_protection+0x26/0x30
->   ? __x86_indirect_thunk_array+0xa/0x20
->   ? tcp_tso_segs+0x1c/0x90
->   ? tcp_write_xmit+0x74/0x1840
->   ? __mod_memcg_state+0x91/0x190
->   ? __tcp_push_pending_frames+0x31/0xc0
->   ? tcp_sendmsg_locked+0xafc/0xd10
->   ? tcp_sendmsg+0x26/0x40
->   ? sock_write_iter+0x167/0x1a0
->   ? vfs_write+0x35d/0x400
->   ? ksys_write+0xc6/0xe0
->   ? do_syscall_64+0x3f/0xd0
->   ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
->   </TASK>
-> 
-> Robert Morris
-> rtm@mit.edu
-> 
+        if (seclen)
 
+as this code was before?
+
+Thanks.
+
+> > >                       size += nla_total_size(seclen);
+> > >       }
+> > >
+> > > @@ -810,7 +810,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
+> > >       }
+> > >
+> > >       nlh->nlmsg_len = skb->len;
+> > > -     if (seclen >= 0)
+> > > +     if (seclen > 0)
+> > >               security_release_secctx(&ctx);
+> > >       return skb;
+> > >
+> > > @@ -819,7 +819,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
+> > >       kfree_skb(skb);
+> > >       net_err_ratelimited("nf_queue: error creating packet message\n");
+> > >  nlmsg_failure:
+> > > -     if (seclen >= 0)
+> > > +     if (seclen > 0)
+> > >               security_release_secctx(&ctx);
+> > >       return NULL;
+> > >  }
+> > > --
+> > > 2.34.1
+> > >
 
