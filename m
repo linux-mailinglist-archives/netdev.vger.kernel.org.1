@@ -1,171 +1,134 @@
-Return-Path: <netdev+bounces-150422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69DB39EA30F
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:45:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFE529EA31E
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:49:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58F6618865FC
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:45:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BCC818872EE
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F615226170;
-	Mon,  9 Dec 2024 23:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08DCF19D88F;
+	Mon,  9 Dec 2024 23:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vDB5QPUo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hfBBUUV/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5153422617A
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 23:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4866D1E48A;
+	Mon,  9 Dec 2024 23:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733787906; cv=none; b=CegYEPAk1rVv/UgWR8I4lGhX6mAwE27/YTYxiuYPQIxz0hE6lhBsu42s6BuN4tbyQG8FTmkCh0JSATAPKRrov8aCoYOSaxk9UP1QpltozX9B8mVJqXg6su+p2u22K8O9sdEUdQCOpAPDh7R1JJAzQI4MopyCl2oAXmiBGZ8Q3JE=
+	t=1733788138; cv=none; b=HSrIm6vu5r/t2d+b8RkG3/LckmzRpnY4HVerr3f/jH1VnKrqQbD9Mw7rSThu3CH4PKXfCS0cYSpedMyIaiLB0SX2kK4ootZIT33jVOSDGSB6EppfdM4WL0RN5Uben8LIBWU1vYjFa2bwWqRqwxXXCavKhXlNrJYr1pBOT0Ivn7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733787906; c=relaxed/simple;
-	bh=JufgrUswjYv0bzgkH5yoyfwWJxuth+loL86OiEXEGxM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RKDtv/CsvdjY7hi3lt+0X66hrOe49KnZ/GiC7mOrmxFCxT0zzdTct3uTmb7Egv53SrfonD57VKuoOt9dpUGLApbfCV0IIMnVPjsoXuwZSVawgTkLff87CoCpaNn+3xSJm3P0N9ayuyczSDIYGhVD2yxAlrNTXMfvFawG5L+dSS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vDB5QPUo; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aa642e45241so686862566b.1
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 15:45:04 -0800 (PST)
+	s=arc-20240116; t=1733788138; c=relaxed/simple;
+	bh=+zGoOp+VflwoGhsgDRcJK53Yg7vYXCoriYkgA8emnjg=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zya6zvBbIzY4cdn0w76rADVdOmE82wxaj/znyqlo/6E/XHfVgp0Gqzl9H9myfgksmcIDK/o4z4mvmPPdL+RpPtWjCKUGuhGlP2gUWLajDEw2k20OU0dQ2FMTo3aRnuCCNJixFRKojG8Omkin0Z+2d8cCdnaWCyk9T1AWdPxDoCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hfBBUUV/; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-434fa6bf744so9028415e9.2;
+        Mon, 09 Dec 2024 15:48:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733787903; x=1734392703; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dpfE3tT+UCTl6NxBKbi0GxRreWOybLCZniR1NWm7/Nk=;
-        b=vDB5QPUoWRkuiuNPzntT19hylCU5e8/36ED06Egh0C4wLyeN48uq6ZoPkmHkWqAVDL
-         2XUodI85CFFt2OzxRSSEMxNYbNuAoYOeG0VUMVsR0hj/LvtUpooY9dde8xs6T1lOICsI
-         AEW3SWkpSVOvPPhXMJUSBbHK8JyKbGuwgGRXJpUlIewpKMW/53j4F0XUI4Wuf/EVdovT
-         AO6m1Ot1jHmOJU9ysaUOPufTfrpTxqd9I+LmiA3b1JfV8zu3cXdD072VLow0I2hJmXJO
-         21xx9pwELBPduhi18DZ5b/tq8sRXWSOJ0jZui1nIeGyURLRz5KhsidQz46Ji3GESY+L+
-         scSw==
+        d=gmail.com; s=20230601; t=1733788135; x=1734392935; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2+opuRzsTQ7K1Ei5kmbovGQpDBWvV453DJpnISWYK7E=;
+        b=hfBBUUV/NRDEkEWhrzFaneDwPd9qOItT34kcO0c9K5h6+258UH8pRfHOen32E7mKuK
+         IkIvCTlNjCr4fkWMEWd/rzO/L8dECt48Er1po09NQmuTfXTLFcLOZwHkYhVZ7oRqvv5X
+         CUvTkVLlrKQmOhDexpxiBzc2LlggrnBejjWIHjsmvIBRFFRPBWeGv0QPEvWTogAFBLk/
+         i1Gpex8eAK/ZZEJySGfxVkaqOmAjLS99zF+V4rCukBAuXGnWJlKM85brFCRjQA6LIutC
+         Bw1OCsp9ivpBjkUAOUgvtHNfp/VHNkxUID7TTQiNXE7Hb2zBx3dciAkhk1sYM28n411e
+         z0pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733787903; x=1734392703;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dpfE3tT+UCTl6NxBKbi0GxRreWOybLCZniR1NWm7/Nk=;
-        b=UYynYGbUXkQYtTcr04oOx9d7MnXQ8n+0y69jAaOIqtEOFMAM0IxFAVxRHL4blH3n1s
-         XsBZt+sGEPrxxCfZoUrNJQ8kK0Xa2cgj0Eo8iIlGmDKBHaTX8xJord1um+U+GYzUSv3n
-         xpCS0/Yhah5pGmup/+7NBDLBRjsP9vHUNYeARAsu0QiXjVOeQU6ImqiSIRzQ7XMaf1tN
-         8//g7hoCOSvoLCQFDNZucSkQa1rJeDsHV3+4eS+wZKTXFZ/zgaVDSmnSkUJ0mbgrAncu
-         GfR1yzKNODSQtvs0rioayemdpHxt3YJAtzyb50rmoBwPfgijk50i4So0vSKmoLoZoTjQ
-         Vwhg==
-X-Forwarded-Encrypted: i=1; AJvYcCUhnkOt/OuTOEtKdvTxgEPtTAkUzRNDIEwgkBpka+0/bJMTw8muf2ypX3ViU+fDExOyeO0eZUs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyC6nJyi1IGPJMFRNlBLzS+RXVPgXJ8AMFrOmA6fvAm7s7plZpe
-	/gt360XXHfguzzVazhDHvl24s+CvmdJw4/CK9Yn89hd2/hCr684mbAgtAXvoKrZTHY7lRBJHMR+
-	k0imG/2uAhqDR/98Xuh3KRsHnZf0a7Cvm1TCT
-X-Gm-Gg: ASbGncsjQ8OKEfMpY3lP6f8zdVPVvkuWKXii8oXXEWP/HMrI1/HCBSP6f2JzjZABHvi
-	reUp8GdmmDUzRM+9WFU+btDWZSTRPSr0sz+bayXP/OBz7791nG0o8EGJhNBT4dYO0
-X-Google-Smtp-Source: AGHT+IFVzMugsf0zKCWk1dY8q4BFO/Qb0ORCOxMaSWJ1WAiL3cqrPyQt5cGwwfwWS5pXgHMB5SbrqJN57U1CDMuSuUo=
-X-Received: by 2002:a17:906:2192:b0:aa6:8275:223c with SMTP id
- a640c23a62f3a-aa69ce3762amr221718766b.44.1733787902494; Mon, 09 Dec 2024
- 15:45:02 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733788135; x=1734392935;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2+opuRzsTQ7K1Ei5kmbovGQpDBWvV453DJpnISWYK7E=;
+        b=mqaysp5zR1N42SwmYI+wzq5uHVqQre/NSfrCOYDkaYdSONvljbNDBzB+dbQunMaSbW
+         06EpFqneAodKrogMTsp9plBLggFlaBTqueVYmi66kIyKkWPuH/9xuu+2CxnMM0sfM0Fa
+         GTdLoGWvuIthna8IefTTL+SUZT/HTWuUXq+nH5icU3dPJyZSr0xTGIN3ZNlhdF9r2KUc
+         Lg4Q8Sn6mTFH5pxo4HVIJ8rntqSOiDnegyCDfHtAthpIBxEYid19Aq0/G/MYt5tTFEnu
+         s1IVWImgT/6EgUA0L8emHZamWtPq5YHvL6AKt7YGaNCfNRoO9sHyVfltO8oPM5QCUSu7
+         3ENw==
+X-Forwarded-Encrypted: i=1; AJvYcCUhDGr8fGx/bLTJDNiHnncHJVRvOlQUG4tFzUBQFfCWAUufPD61+3AW6CDNE00bnQ382gLqLEyQ@vger.kernel.org, AJvYcCV0nlSHozvG1vfeoHDNN3Z3lT2usps2PJzsgkx3cA8OIIopIPuYn4hg4NLpGA1Be6eUUgYd/siZ2RNJfiD9@vger.kernel.org, AJvYcCVVyRmmnCXxCWDxGLqSX9WDhLcANpvk0xBA7q1B0FAOHfxGSiUr9rR4nYc6TEDsZ1LYnCo7DLOB8T0J@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrfypjnNvCw+rlMaBAFn6z1YxZdtRCX2FyD57njIN3hpD5Iq3n
+	meUJ+hydU2RkKr6F8tZwBuoDxxuyGILMNwVXO8eI4rjDurpXvRFk
+X-Gm-Gg: ASbGncuy2hQOVxpujhlCYCxYc7sTN2WX5QojERDbu8bD1cG6AmMqFz7VOoJex+VFDGQ
+	H/IZQggksVcVImeAFbjWlwMtJ3A94p3ImasBjQWH+AeJO+ttgqqtr+jnc+wiO3MA/VJFLkaPXZI
+	5hR/QUBrAMSHQTl7vEvGkqrAQ6lzRZbXajB4u2KBL3ibbQCWk4cEGmcoYqbkAI0YnJJkZWYOAOF
+	aZ9JmVtyTswMmodVdLlsTJekUihlvX+h+xJZHD+Yplcsfn67FausxCkMfeYC4kPhfR7HheaQr5i
+	DoTzM8r5Ig==
+X-Google-Smtp-Source: AGHT+IH9/KxJN7tPNyH97Gbd1yzXNSTFzl3Ym7oZH/K0A2GTk2oxeudvtllbhttHCkYsV4UVpV6MwQ==
+X-Received: by 2002:a05:600c:45c7:b0:434:f297:8e85 with SMTP id 5b1f17b1804b1-434fff69f57mr25414345e9.10.1733788135304;
+        Mon, 09 Dec 2024 15:48:55 -0800 (PST)
+Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38621fbbea8sm14345085f8f.97.2024.12.09.15.48.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 15:48:54 -0800 (PST)
+Message-ID: <675781e6.df0a0220.3c3d71.7a51@mx.google.com>
+X-Google-Original-Message-ID: <Z1eB4tGzFOvn7ME4@Ansuel-XPS.>
+Date: Tue, 10 Dec 2024 00:48:50 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH v11 5/9] mfd: an8855: Add support for Airoha
+ AN8855 Switch MFD
+References: <20241209134459.27110-1-ansuelsmth@gmail.com>
+ <20241209134459.27110-6-ansuelsmth@gmail.com>
+ <20241209151813.106eda03@kernel.org>
+ <67577bd7.7b0a0220.1ce6b5.fe93@mx.google.com>
+ <20241209154030.0f34d5dd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241209202811.481441-2-wangfe@google.com> <20241209215301.GC1245331@unreal>
-In-Reply-To: <20241209215301.GC1245331@unreal>
-From: Feng Wang <wangfe@google.com>
-Date: Mon, 9 Dec 2024 15:44:51 -0800
-Message-ID: <CADsK2K_NnizU+oY02PW9ZAiLzyPH=j=LYyjHnzgcMptxr95Oyg@mail.gmail.com>
-Subject: Re: [PATCH v7] xfrm: add SA information to the offloaded packet when
- if_id is set
-To: Leon Romanovsky <leon@kernel.org>
-Cc: steffen.klassert@secunet.com, netdev@vger.kernel.org, 
-	antony.antony@secunet.com, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241209154030.0f34d5dd@kernel.org>
 
-Hi Steffen,
+On Mon, Dec 09, 2024 at 03:40:30PM -0800, Jakub Kicinski wrote:
+> On Tue, 10 Dec 2024 00:22:59 +0100 Christian Marangi wrote:
+> > Also hope we won't have to request multiple stable tag for this multi
+> > subsystem patch. Any hint on that?
+> 
+> Sorry I haven't payed much attention to earlier discussions.
+> Why multiple stable tags? AFAICT all trees will need patches 
+> 4 and 5, so we can put that on a stable tag / branch, the rest 
+> can go directly into respective trees (assuming the table tag
+> has been merged in). No?
 
-This patch was done based on our previous discussion.  I did the
-changes we agreed on.  This SA info includes the matched encryption
-information, so it doesn't need to perform lookup on the source and
-destination anymore in the driver.
+Yes in theory only MFD is really needed (as it does export the page
+symbol)
 
-Thanks,
+- NVMEM can go in his own tree. (no need for stable tag)
+- mdio (require stable tag to correctly compile)
+- dsa/phy (no need for stable tag)
 
-Feng
+So you are right, only one tag needed.
 
-On Mon, Dec 9, 2024 at 1:53=E2=80=AFPM Leon Romanovsky <leon@kernel.org> wr=
-ote:
->
-> On Mon, Dec 09, 2024 at 08:28:12PM +0000, Feng Wang wrote:
-> > In packet offload mode, append Security Association (SA) information
-> > to each packet, replicating the crypto offload implementation. This
-> > SA info helps HW offload match packets to their correct security
-> > policies. The XFRM interface ID is included, which is used in setups
-> > with multiple XFRM interfaces where source/destination addresses alone
-> > can't pinpoint the right policy.
-> >
-> > The XFRM_XMIT flag is set to enable packet to be returned immediately
-> > from the validate_xmit_xfrm function, thus aligning with the existing
-> > code path for packet offload mode.
-> >
-> > Enable packet offload mode on netdevsim and add code to check the XFRM
-> > interface ID.
-> >
-> > Signed-off-by: wangfe <wangfe@google.com>
-> > ---
->
-> <...>
->
-> > @@ -728,7 +730,27 @@ int xfrm_output(struct sock *sk, struct sk_buff *s=
-kb)
-> >                       kfree_skb(skb);
-> >                       return -EHOSTUNREACH;
-> >               }
-> > +             if (x->if_id) {
-> > +                     sp =3D secpath_set(skb);
-> > +                     if (!sp) {
-> > +                             XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERRO=
-R);
-> > +                             kfree_skb(skb);
-> > +                             return -ENOMEM;
-> > +                     }
-> > +
-> > +                     sp->olen++;
-> > +                     sp->xvec[sp->len++] =3D x;
-> > +                     xfrm_state_hold(x);
-> >
-> > +                     xo =3D xfrm_offload(skb);
-> > +                     if (!xo) {
-> > +                             secpath_reset(skb);
-> > +                             XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERRO=
-R);
-> > +                             kfree_skb(skb);
-> > +                             return -EINVAL;
-> > +                     }
-> > +                     xo->flags |=3D XFRM_XMIT;
-> > +             }
->
-> Steffen,
->
-> I would like to ask from you to delay this patch till this "if_id"
-> support is implemented and tested on real upstreamed device.
->
-> I have no confidence that the solution proposed above is the right thing
-> to do as it doesn't solve the claim "This SA info helps HW offload match
-> packets to their correct security". HW is going to perform lookup anyway
-> on the source and destination, so it is unclear how will it "help".
->
-> Thanks
->
-> >               return xfrm_output_resume(sk, skb, 0);
-> >       }
-> >
-> > --
-> > 2.47.0.338.g60cca15819-goog
-> >
-> >
+-- 
+	Ansuel
 
