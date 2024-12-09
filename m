@@ -1,248 +1,171 @@
-Return-Path: <netdev+bounces-150424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C30D39EA317
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:46:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69DB39EA30F
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 00:45:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 429CA1669E7
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:46:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58F6618865FC
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 23:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BEDC227B99;
-	Mon,  9 Dec 2024 23:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F615226170;
+	Mon,  9 Dec 2024 23:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="REbop1AF";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EdhC7kKL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vDB5QPUo"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b8-smtp.messagingengine.com (flow-b8-smtp.messagingengine.com [202.12.124.143])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C177226189;
-	Mon,  9 Dec 2024 23:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5153422617A
+	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 23:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733787918; cv=none; b=IaiZy5LTcGheNekGtLRDiyfnn8S9v0ZvQsdZIMdZ6UHPvhx7R5APqzDPQP2KCSu6Gqtvnlb+tt4NOrY4A4vToYpCskYZXnXmMzhpWbbDlnwOOJHw6YXAv/wRmQEDgBfgTARaAXuAjO11n79gW3vo2y1mFAX951icbtUPj1fiG3o=
+	t=1733787906; cv=none; b=CegYEPAk1rVv/UgWR8I4lGhX6mAwE27/YTYxiuYPQIxz0hE6lhBsu42s6BuN4tbyQG8FTmkCh0JSATAPKRrov8aCoYOSaxk9UP1QpltozX9B8mVJqXg6su+p2u22K8O9sdEUdQCOpAPDh7R1JJAzQI4MopyCl2oAXmiBGZ8Q3JE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733787918; c=relaxed/simple;
-	bh=t6YWqjuBpOzJUcv0KgUUnzgurGW+EY/nB39y3RsCwOw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W0qDvc+5ldHH13vSucgSZhiCRa7XMFOOPRfj99ffavbRAmB4JNyP8DWe5XMBsAxhZm+ONuSEZZ7Fzot+pLbagDaYz0J4swqlyX0bNZdduXCYKYoqtyfTe2NWsE++epeLViVJCISzJRFE8emQWB8ZfRYhJp633qim/taB+4tS+CA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=REbop1AF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EdhC7kKL; arc=none smtp.client-ip=202.12.124.143
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailflow.stl.internal (Postfix) with ESMTP id 9E7E21D409B6;
-	Mon,  9 Dec 2024 18:45:14 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Mon, 09 Dec 2024 18:45:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1733787914; x=
-	1733795114; bh=FNe66ehp1D+ELVvV3anO9UW46My6FNIb3T/hz9ka5zM=; b=R
-	Ebop1AF08yI84fnOa7VIWRotXfPWJLNdvRmwUD48/VG/PtwI5ldOXFZmiyoXeiSR
-	FGaTCngVYwNYeNddogKCmHiY3/u1Jn4otabP/in5DQPSi3jb0adL8PGBVs7pZWDr
-	m0983Wm5zcao7JcA+aJaJ/Zv8pKhfRoN/ClVUD67NesebF+Z+KZqc+cvH4ubnSuO
-	G/QVQny4+iaE1C1D8KUPkB+G7grf9ksmFG72lE9Q9QNiqCrL29Fl4T9aEKXfvMFy
-	9a2OJRB2UJUGHiNmuPkYd/aQcduZEUXC9E8gOezLW+EpG77OmUOuiN66TnqPjHCb
-	DB2TXLM4XNpDkPTrrC44w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1733787914; x=1733795114; bh=F
-	Ne66ehp1D+ELVvV3anO9UW46My6FNIb3T/hz9ka5zM=; b=EdhC7kKLxQW/SKzT8
-	oyGkhopL4IrN0ZLbBhHoCDQRNADR1IEv/8UnByMrKql8Xm+QcvOsL2jVKpv0R2us
-	P7PoRjTMusypO2pk4yKMd6LIKf2RBoh9v/E5eirD9nm1CEezlo1f5HU3nJbMJB1S
-	3tvvOxuNRYH3gO3XXu+NoF2pFxdzrrNyVEobxnYQZ6w5yvbBobJI8RAGq0USYw3N
-	aheO4BSrCpguhaTLRvGXmI4+ociaby+K7kiHAs1vY5AtNAK5VTrGDBE2KPaQOFkq
-	P8yp0VrSew+HwFPWFtWq6bw0w/hHwhacrC3I1A2raJcVdjwccoD3KHQ+CSWeREhe
-	crMnQ==
-X-ME-Sender: <xms:CYFXZ2FeGSvzVNRtOWwuNJk4KZuuRwE0l_zVvVXuqgSI1kFYa8qTaQ>
-    <xme:CYFXZ3Vx-ovWo0RY6ZNzRlfq7Q9o1HmAR4TJpycJm-1xZ7_GkHGRzGCDRLBFw3tU6
-    WXQtG6QrHsc9Emm_g>
-X-ME-Received: <xmr:CYFXZwLFzaBt8Ewm82g715ymyvg_-wy-Tb-mCFyS5-PfK5tG1tQl8PlpDFgud2vsXGFOOnDphkLDtWVx4qkLhsWU0PC9uJmQ8YQlbX1043ldUN9malHi>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrjeejgddugecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdefhe
-    dmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepffgr
-    nhhivghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpe
-    evtdekjeffkefgfefhvefffeetgfeuueeutdetjeduudehheeiffdvgefhhfevhfenucff
-    ohhmrghinhepghhithhhuhgsrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghrtghpthht
-    ohepvddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehhrgifkheskhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtohepjhhohhhnrdhfrghsthgrsggvnhgusehgmhgrihhlrdgt
-    ohhmpdhrtghpthhtoheprghstheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepqhhmoh
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
-    nhgvthdprhgtphhtthhopegurghnihgvlhesihhoghgvrghrsghogidrnhgvthdprhgtph
-    htthhopegrnhgurhhiiheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehk
-    vghrnhgvlhdrohhrghdprhgtphhtthhopehmrghrthhinhdrlhgruheslhhinhhugidrug
-    gvvh
-X-ME-Proxy: <xmx:CYFXZwEaWPWhjA8mlb697hiz0cZBPksWNJFuox3nXlI2UE4_vYT11Q>
-    <xmx:CYFXZ8W8D7Fl5MebZmFF4pwzqW6BKai5j_wKH3QFhu4wQj3CfR3l1w>
-    <xmx:CYFXZzP6zuOpDWIfCET--0H3y4BPVN1K1toFMGmtVQNbKYOxieO2qA>
-    <xmx:CYFXZz3ri0e5cTbmzK7lDaeDyZXfNNg3BJsKto3R705s1SXnw9y2SA>
-    <xmx:CoFXZzPTsQF8idrlhRRjkl5pyrL5KdOL7VcjIkI0Jx4sGply-nCSD8NV>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 9 Dec 2024 18:45:11 -0500 (EST)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: hawk@kernel.org,
-	john.fastabend@gmail.com,
-	ast@kernel.org,
-	qmo@kernel.org,
-	davem@davemloft.net,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	kuba@kernel.org
-Cc: martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	antony@phenome.org,
-	toke@kernel.org
-Subject: [PATCH bpf-next v3 3/4] bpftool: btf: Support dumping a single type from file
-Date: Mon,  9 Dec 2024 16:44:34 -0700
-Message-ID: <3bc17d33161961409dc77a5de29761bf2bed4980.1733787798.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <cover.1733787798.git.dxu@dxuuu.xyz>
-References: <cover.1733787798.git.dxu@dxuuu.xyz>
+	s=arc-20240116; t=1733787906; c=relaxed/simple;
+	bh=JufgrUswjYv0bzgkH5yoyfwWJxuth+loL86OiEXEGxM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RKDtv/CsvdjY7hi3lt+0X66hrOe49KnZ/GiC7mOrmxFCxT0zzdTct3uTmb7Egv53SrfonD57VKuoOt9dpUGLApbfCV0IIMnVPjsoXuwZSVawgTkLff87CoCpaNn+3xSJm3P0N9ayuyczSDIYGhVD2yxAlrNTXMfvFawG5L+dSS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vDB5QPUo; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aa642e45241so686862566b.1
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 15:45:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733787903; x=1734392703; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dpfE3tT+UCTl6NxBKbi0GxRreWOybLCZniR1NWm7/Nk=;
+        b=vDB5QPUoWRkuiuNPzntT19hylCU5e8/36ED06Egh0C4wLyeN48uq6ZoPkmHkWqAVDL
+         2XUodI85CFFt2OzxRSSEMxNYbNuAoYOeG0VUMVsR0hj/LvtUpooY9dde8xs6T1lOICsI
+         AEW3SWkpSVOvPPhXMJUSBbHK8JyKbGuwgGRXJpUlIewpKMW/53j4F0XUI4Wuf/EVdovT
+         AO6m1Ot1jHmOJU9ysaUOPufTfrpTxqd9I+LmiA3b1JfV8zu3cXdD072VLow0I2hJmXJO
+         21xx9pwELBPduhi18DZ5b/tq8sRXWSOJ0jZui1nIeGyURLRz5KhsidQz46Ji3GESY+L+
+         scSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733787903; x=1734392703;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dpfE3tT+UCTl6NxBKbi0GxRreWOybLCZniR1NWm7/Nk=;
+        b=UYynYGbUXkQYtTcr04oOx9d7MnXQ8n+0y69jAaOIqtEOFMAM0IxFAVxRHL4blH3n1s
+         XsBZt+sGEPrxxCfZoUrNJQ8kK0Xa2cgj0Eo8iIlGmDKBHaTX8xJord1um+U+GYzUSv3n
+         xpCS0/Yhah5pGmup/+7NBDLBRjsP9vHUNYeARAsu0QiXjVOeQU6ImqiSIRzQ7XMaf1tN
+         8//g7hoCOSvoLCQFDNZucSkQa1rJeDsHV3+4eS+wZKTXFZ/zgaVDSmnSkUJ0mbgrAncu
+         GfR1yzKNODSQtvs0rioayemdpHxt3YJAtzyb50rmoBwPfgijk50i4So0vSKmoLoZoTjQ
+         Vwhg==
+X-Forwarded-Encrypted: i=1; AJvYcCUhnkOt/OuTOEtKdvTxgEPtTAkUzRNDIEwgkBpka+0/bJMTw8muf2ypX3ViU+fDExOyeO0eZUs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyC6nJyi1IGPJMFRNlBLzS+RXVPgXJ8AMFrOmA6fvAm7s7plZpe
+	/gt360XXHfguzzVazhDHvl24s+CvmdJw4/CK9Yn89hd2/hCr684mbAgtAXvoKrZTHY7lRBJHMR+
+	k0imG/2uAhqDR/98Xuh3KRsHnZf0a7Cvm1TCT
+X-Gm-Gg: ASbGncsjQ8OKEfMpY3lP6f8zdVPVvkuWKXii8oXXEWP/HMrI1/HCBSP6f2JzjZABHvi
+	reUp8GdmmDUzRM+9WFU+btDWZSTRPSr0sz+bayXP/OBz7791nG0o8EGJhNBT4dYO0
+X-Google-Smtp-Source: AGHT+IFVzMugsf0zKCWk1dY8q4BFO/Qb0ORCOxMaSWJ1WAiL3cqrPyQt5cGwwfwWS5pXgHMB5SbrqJN57U1CDMuSuUo=
+X-Received: by 2002:a17:906:2192:b0:aa6:8275:223c with SMTP id
+ a640c23a62f3a-aa69ce3762amr221718766b.44.1733787902494; Mon, 09 Dec 2024
+ 15:45:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241209202811.481441-2-wangfe@google.com> <20241209215301.GC1245331@unreal>
+In-Reply-To: <20241209215301.GC1245331@unreal>
+From: Feng Wang <wangfe@google.com>
+Date: Mon, 9 Dec 2024 15:44:51 -0800
+Message-ID: <CADsK2K_NnizU+oY02PW9ZAiLzyPH=j=LYyjHnzgcMptxr95Oyg@mail.gmail.com>
+Subject: Re: [PATCH v7] xfrm: add SA information to the offloaded packet when
+ if_id is set
+To: Leon Romanovsky <leon@kernel.org>
+Cc: steffen.klassert@secunet.com, netdev@vger.kernel.org, 
+	antony.antony@secunet.com, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Some projects, for example xdp-tools [0], prefer to check in a minimized
-vmlinux.h rather than the complete file which can get rather large.
+Hi Steffen,
 
-However, when you try to add a minimized version of a complex struct (eg
-struct xfrm_state), things can get quite complex if you're trying to
-manually untangle and deduplicate the dependencies.
+This patch was done based on our previous discussion.  I did the
+changes we agreed on.  This SA info includes the matched encryption
+information, so it doesn't need to perform lookup on the source and
+destination anymore in the driver.
 
-This commit teaches bpftool to do a minimized dump of a single type by
-providing an optional root_id argument.
+Thanks,
 
-Example usage:
+Feng
 
-    $ ./bpftool btf dump file ~/dev/linux/vmlinux | rg "STRUCT 'xfrm_state'"
-    [12643] STRUCT 'xfrm_state' size=912 vlen=58
-
-    $ ./bpftool btf dump file ~/dev/linux/vmlinux root_id 12643 format c
-    #ifndef __VMLINUX_H__
-    #define __VMLINUX_H__
-
-    [..]
-
-    struct xfrm_type_offload;
-
-    struct xfrm_sec_ctx;
-
-    struct xfrm_state {
-            possible_net_t xs_net;
-            union {
-                    struct hlist_node gclist;
-                    struct hlist_node bydst;
-            };
-            union {
-                    struct hlist_node dev_gclist;
-                    struct hlist_node bysrc;
-            };
-            struct hlist_node byspi;
-    [..]
-
-[0]: https://github.com/xdp-project/xdp-tools/blob/master/headers/bpf/vmlinux.h
-
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- .../bpf/bpftool/Documentation/bpftool-btf.rst |  7 +++++--
- tools/bpf/bpftool/btf.c                       | 21 ++++++++++++++++++-
- 2 files changed, 25 insertions(+), 3 deletions(-)
-
-diff --git a/tools/bpf/bpftool/Documentation/bpftool-btf.rst b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-index 245569f43035..4899b2c10777 100644
---- a/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-+++ b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-@@ -24,7 +24,7 @@ BTF COMMANDS
- =============
- 
- | **bpftool** **btf** { **show** | **list** } [**id** *BTF_ID*]
--| **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*]
-+| **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*] [**root_id** *ROOT_ID*]
- | **bpftool** **btf help**
- |
- | *BTF_SRC* := { **id** *BTF_ID* | **prog** *PROG* | **map** *MAP* [{**key** | **value** | **kv** | **all**}] | **file** *FILE* }
-@@ -43,7 +43,7 @@ bpftool btf { show | list } [id *BTF_ID*]
-     that hold open file descriptors (FDs) against BTF objects. On such kernels
-     bpftool will automatically emit this information as well.
- 
--bpftool btf dump *BTF_SRC* [format *FORMAT*]
-+bpftool btf dump *BTF_SRC* [format *FORMAT*] [root_id *ROOT_ID*]
-     Dump BTF entries from a given *BTF_SRC*.
- 
-     When **id** is specified, BTF object with that ID will be loaded and all
-@@ -67,6 +67,9 @@ bpftool btf dump *BTF_SRC* [format *FORMAT*]
-     formatting, the output is sorted by default. Use the **unsorted** option
-     to avoid sorting the output.
- 
-+    **root_id** option can be used to filter a dump to a single type and all
-+    its dependent types. It cannot be used with any other types of filtering.
-+
- bpftool btf help
-     Print short help message.
- 
-diff --git a/tools/bpf/bpftool/btf.c b/tools/bpf/bpftool/btf.c
-index 3e995faf9efa..18b037a1414b 100644
---- a/tools/bpf/bpftool/btf.c
-+++ b/tools/bpf/bpftool/btf.c
-@@ -993,6 +993,25 @@ static int do_dump(int argc, char **argv)
- 				goto done;
- 			}
- 			NEXT_ARG();
-+		} else if (is_prefix(*argv, "root_id")) {
-+			__u32 root_id;
-+			char *end;
-+
-+			if (root_type_cnt) {
-+				p_err("cannot use root_id with other type filtering");
-+				err = -EINVAL;
-+				goto done;
-+			}
-+
-+			NEXT_ARG();
-+			root_id = strtoul(*argv, &end, 0);
-+			if (*end) {
-+				err = -1;
-+				p_err("can't parse %s as root ID", *argv);
-+				goto done;
-+			}
-+			root_type_ids[root_type_cnt++] = root_id;
-+			NEXT_ARG();
- 		} else if (is_prefix(*argv, "unsorted")) {
- 			sort_dump_c = false;
- 			NEXT_ARG();
-@@ -1403,7 +1422,7 @@ static int do_help(int argc, char **argv)
- 
- 	fprintf(stderr,
- 		"Usage: %1$s %2$s { show | list } [id BTF_ID]\n"
--		"       %1$s %2$s dump BTF_SRC [format FORMAT]\n"
-+		"       %1$s %2$s dump BTF_SRC [format FORMAT] [root_id ROOT_ID]\n"
- 		"       %1$s %2$s help\n"
- 		"\n"
- 		"       BTF_SRC := { id BTF_ID | prog PROG | map MAP [{key | value | kv | all}] | file FILE }\n"
--- 
-2.46.0
-
+On Mon, Dec 9, 2024 at 1:53=E2=80=AFPM Leon Romanovsky <leon@kernel.org> wr=
+ote:
+>
+> On Mon, Dec 09, 2024 at 08:28:12PM +0000, Feng Wang wrote:
+> > In packet offload mode, append Security Association (SA) information
+> > to each packet, replicating the crypto offload implementation. This
+> > SA info helps HW offload match packets to their correct security
+> > policies. The XFRM interface ID is included, which is used in setups
+> > with multiple XFRM interfaces where source/destination addresses alone
+> > can't pinpoint the right policy.
+> >
+> > The XFRM_XMIT flag is set to enable packet to be returned immediately
+> > from the validate_xmit_xfrm function, thus aligning with the existing
+> > code path for packet offload mode.
+> >
+> > Enable packet offload mode on netdevsim and add code to check the XFRM
+> > interface ID.
+> >
+> > Signed-off-by: wangfe <wangfe@google.com>
+> > ---
+>
+> <...>
+>
+> > @@ -728,7 +730,27 @@ int xfrm_output(struct sock *sk, struct sk_buff *s=
+kb)
+> >                       kfree_skb(skb);
+> >                       return -EHOSTUNREACH;
+> >               }
+> > +             if (x->if_id) {
+> > +                     sp =3D secpath_set(skb);
+> > +                     if (!sp) {
+> > +                             XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERRO=
+R);
+> > +                             kfree_skb(skb);
+> > +                             return -ENOMEM;
+> > +                     }
+> > +
+> > +                     sp->olen++;
+> > +                     sp->xvec[sp->len++] =3D x;
+> > +                     xfrm_state_hold(x);
+> >
+> > +                     xo =3D xfrm_offload(skb);
+> > +                     if (!xo) {
+> > +                             secpath_reset(skb);
+> > +                             XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERRO=
+R);
+> > +                             kfree_skb(skb);
+> > +                             return -EINVAL;
+> > +                     }
+> > +                     xo->flags |=3D XFRM_XMIT;
+> > +             }
+>
+> Steffen,
+>
+> I would like to ask from you to delay this patch till this "if_id"
+> support is implemented and tested on real upstreamed device.
+>
+> I have no confidence that the solution proposed above is the right thing
+> to do as it doesn't solve the claim "This SA info helps HW offload match
+> packets to their correct security". HW is going to perform lookup anyway
+> on the source and destination, so it is unclear how will it "help".
+>
+> Thanks
+>
+> >               return xfrm_output_resume(sk, skb, 0);
+> >       }
+> >
+> > --
+> > 2.47.0.338.g60cca15819-goog
+> >
+> >
 
