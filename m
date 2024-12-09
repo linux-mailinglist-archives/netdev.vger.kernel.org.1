@@ -1,251 +1,144 @@
-Return-Path: <netdev+bounces-150372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51FB79EA045
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 21:29:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BA5C9EA083
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 21:45:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30F0D16651F
-	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 20:29:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EE34165988
+	for <lists+netdev@lfdr.de>; Mon,  9 Dec 2024 20:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C864E198A11;
-	Mon,  9 Dec 2024 20:29:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0432419C54B;
+	Mon,  9 Dec 2024 20:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H634pKOq"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NsEiG5P4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C21C137930
-	for <netdev@vger.kernel.org>; Mon,  9 Dec 2024 20:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778DE19AA63;
+	Mon,  9 Dec 2024 20:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733776165; cv=none; b=Q5KIvDYfwA+CKNRBmCe8SjTh65IglhwvDr8lqQeA0PQ7t4cTBleEfYBsKbNd0KJuJ5yFH+fOvxZU6GC5OLXAwEkpsYCW3RidCtk1iVzenSHqbEuRy1Das+dxid0kPDgaYwv1F0c45FbDuThDtHzSZZSEXpYkOiQJUse5uM/1N9Y=
+	t=1733777103; cv=none; b=Ystwp/me8+yGN/0vjQCmwSfpsttr+zOo75LFXvtzfERD0LQ4s10br63zNnU3Rza5sEjAgE3w6WlfUiAzFi2WBOHrfdw651ieNS8dYKfMpARXWtrq0HIFiE1gDB/qoEGx8PujzCJgOd2DX+SfmamNl9kJI2XkkoKhGMNep7uW1Bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733776165; c=relaxed/simple;
-	bh=v5+B/OQJFpS7sDTSLVLRCbthyGGExUOp2oilaIXWbDg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fulPMLLaifUAX0wb1DfA0Ku+xJKCl6vF+9DelBzmZ/ecA0KKnjLxgAdjFBNCmYWI3NRmVwAHUObAhn//GxFvm1+Tk7MzHtu9xEKX2IgkzqSLoLLc92UTvTiI8d9GuMqggc/ZdwZ6y8T9+W1KdLxWm0uulZuy4IJvDd9CnLndnDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--wangfe.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H634pKOq; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--wangfe.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef6ef9ba3fso3232018a91.2
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 12:29:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733776163; x=1734380963; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=AGhhEAsLZrxVX1am0DE4bMjNtRC/jzKGQ0aztfEBgBE=;
-        b=H634pKOqOO0UFyiBffpPmSIGqnr00bI4oleyk9UGCz0hBYT/tVZiLGnPlGiixq3xnY
-         Ii+o6gvzXNnRwxCmajvkaMJm6YoUkiBjpOjpcFs9es/bbfNggzwdIBczf4o3c0It1Uwq
-         CapnY0hBmA6ozsu6ZMgj3LcE7mpIOONsVusoXjzZ4ZJ8iYVSFdvLEUU5H7Lm8a5ohqLy
-         PiHjBzufyUjcRGbkxn/E00v3/3CVnwYSf4K9cmdl6tC5yeSpnYn1Vv8N/uqMHfOhQrfu
-         J5hS87XD+13zEu6qKqgzPEKLIRDaS7NTxZ1IzeM0vJNTEa+2L3+3yTAGqz1VjIJzqFg2
-         2nMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733776163; x=1734380963;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AGhhEAsLZrxVX1am0DE4bMjNtRC/jzKGQ0aztfEBgBE=;
-        b=pzacrEmXl14KrOuH92JRv45s8q7lSipkKQ3A0OAu5W8K4I050FcTiFdZgnceny4psg
-         h4LJHvlpJ03SWeusc5JmSkMZVRANGpYC/5W12tsV2U61clNHw1lT+NEH7NNzUFRyix2L
-         anVnOVq8R4apW5xwo1aWHtBNPEzSk0VUj/QTnN6VAhy6s3T+0hdLtEH8Qq+4cBzwWj1t
-         EJnSP7TCinOccXOjPP9TSRNXl6O8Hvy5SjtU5PNeMZkp2gtx2Kmu2tSdXsg6F00fhoev
-         2WEYozsttOHXIxECB0i0MZpt+boXtjD7SlX/ymkcyuuOSe4LYdBeKa2Qxl1NK0CHVAm8
-         qIvw==
-X-Gm-Message-State: AOJu0YzdMp20Ooxr9xF/41L0/kfJI8k3HMI3sKU3bcBeQV1qgd++WJOb
-	XdcYbNAA3UZU3GB01yg4t80mFYa5axRDVFHKXVJYnKpd22jrPI8Z004r/v4cgsd8PuEzjDo2uQe
-	yPaK9miZRu+kYCxSgsyoZjNs10gPLbldLDPZWoS78EqrgcCs0246QVBRE8LCw0gYPux0Vjq8gA6
-	Z/JJacQNjYZ8KuxZwpMKwHAYRUtOSD+fQE
-X-Google-Smtp-Source: AGHT+IGpZS63ZPpa5+AL89f86F7lkHQFr2/tuT46CQMeplzPC+Y+k2w0A0FYsOMAF/q4UT1ETbW3Zbutwow=
-X-Received: from pjbqx13.prod.google.com ([2002:a17:90b:3e4d:b0:2ef:d136:17fc])
- (user=wangfe job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d52:b0:2ee:f22a:61dd
- with SMTP id 98e67ed59e1d1-2efcf26e18fmr2549282a91.32.1733776163446; Mon, 09
- Dec 2024 12:29:23 -0800 (PST)
-Date: Mon,  9 Dec 2024 20:28:12 +0000
+	s=arc-20240116; t=1733777103; c=relaxed/simple;
+	bh=jhxh0GPSjK8+EnaM5LvNvrm1hv0enVhcDVUUg6eu/g8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hq9QTy+AYMrMADVRt4Zfwpx/2KUQPPG59icm0nZpEhaouyqowhchOdR0YFlyPHg+/UQLEcHsOZgqAuLNu7w7tm3KpnLSGpxnAG2+YWYJXSy6x5vnSMFEWR66S0I/hL2Or8RRXWrTkOM8qMuooKTtjf/qLQQ7Osrrl2XwRfTiV+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NsEiG5P4; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B9Bm3Vo016757;
+	Mon, 9 Dec 2024 20:44:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=gtTn5W
+	Jb9iF1yBcBK3vMIpLwV6sxqwNJMMcnkzyphvI=; b=NsEiG5P4wtngsKuyZZE7St
+	JV1/RbPKt23DdhV6g2Uonu3G1ZGrqgcrVbv9GnNpGWElAADHwYObklrks96O2Jfr
+	ViLLC4u/NSvPBkQ8km4KhZliXxi1Jc1A7CtV/0UNVyjmGIay2ximJBkbMd8CSOgB
+	PCOmS21VxvI542ThJPGO4OABRS5HzlFoJIvhRbrQEnj97LPC2cLuVbhBCCL7WBGp
+	QudCx+DJObx3nZ4cqPQUAQONjzGsG0ZwYgji7jMikbA0vypPeTDmiZx+L4WgDD80
+	wx2fMuLdk7HElGM7L6rPdU2sqB/e9JW1PFOF97WLKZPKkdjVCpITQiBMMQEe1QIQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ccsjamd2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Dec 2024 20:44:57 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B9Kd0a8025990;
+	Mon, 9 Dec 2024 20:44:56 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ccsjamcx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Dec 2024 20:44:56 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B9KGX0F017428;
+	Mon, 9 Dec 2024 20:44:55 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 43d3d1fyh0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Dec 2024 20:44:55 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B9KiqNu9503012
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 9 Dec 2024 20:44:52 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0BE7920043;
+	Mon,  9 Dec 2024 20:44:52 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 13F8E20040;
+	Mon,  9 Dec 2024 20:44:51 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.179.14.202])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Mon,  9 Dec 2024 20:44:50 +0000 (GMT)
+Date: Mon, 9 Dec 2024 21:44:49 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, jaka@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dust Li
+ <dust.li@linux.alibaba.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH net-next v2 2/2] net/smc: support ipv4 mapped ipv6 addr
+ client for smc-r v2
+Message-ID: <20241209214449.0bb5afce.pasic@linux.ibm.com>
+In-Reply-To: <85d1c6e1-0fe3-4c71-af4e-8015270b90dc@linux.alibaba.com>
+References: <20241202125203.48821-1-guangguan.wang@linux.alibaba.com>
+	<20241202125203.48821-3-guangguan.wang@linux.alibaba.com>
+	<894d640f-d9f6-4851-adb8-779ff3678440@linux.ibm.com>
+	<20241205135833.0beafd61.pasic@linux.ibm.com>
+	<5ac2c5a7-3f12-48e5-83a9-ecd3867e6125@linux.alibaba.com>
+	<7de81edd-86f2-4cfd-95db-e273c3436eb6@linux.ibm.com>
+	<3710a042-cabe-4b6d-9caa-fd4d864b2fdc@linux.ibm.com>
+	<d2af79e2-adb2-46f0-a7e3-67a9265f3adf@linux.alibaba.com>
+	<868f5d66-ac74-4b0a-a0d0-e44fdea3bb73@linux.ibm.com>
+	<20241209104647.5c36c429.pasic@linux.ibm.com>
+	<85d1c6e1-0fe3-4c71-af4e-8015270b90dc@linux.alibaba.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241209202811.481441-2-wangfe@google.com>
-Subject: [PATCH v7] xfrm: add SA information to the offloaded packet when
- if_id is set
-From: Feng Wang <wangfe@google.com>
-To: netdev@vger.kernel.org, steffen.klassert@secunet.com, 
-	antony.antony@secunet.com, leonro@nvidia.com, pabeni@redhat.com
-Cc: wangfe@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: H7xn_dMYCA51XqPbCsgs4_lN0vkABEu2
+X-Proofpoint-ORIG-GUID: uoPbzmDQSfFOTXJu1jL75VzgpE1BkcHu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ impostorscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 mlxlogscore=714
+ mlxscore=0 priorityscore=1501 suspectscore=0 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2412090159
 
-In packet offload mode, append Security Association (SA) information
-to each packet, replicating the crypto offload implementation. This
-SA info helps HW offload match packets to their correct security
-policies. The XFRM interface ID is included, which is used in setups
-with multiple XFRM interfaces where source/destination addresses alone
-can't pinpoint the right policy.
+On Mon, 9 Dec 2024 20:36:45 +0800
+Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
 
-The XFRM_XMIT flag is set to enable packet to be returned immediately
-from the validate_xmit_xfrm function, thus aligning with the existing
-code path for packet offload mode.
+> > I believe we would like to have a v3 here. Also I'm not sure
+> > checking on saddr is sufficient, but I didn't do my research on
+> > that question yet.
+> > 
+> > Regards,
+> > Halil  
+> 
+> Did you mean to research whether the daddr should be checked too?
 
-Enable packet offload mode on netdevsim and add code to check the XFRM
-interface ID.
+Right! Or is it implied that if saddr is a ipv4 mapped ipv6 addr
+then the daddr must be ipv4 mapped ipv6 addr as well?
 
-Signed-off-by: wangfe <wangfe@google.com>
----
-v7: https://lore.kernel.org/all/20241121215257.3879343-2-wangfe@google.com/
-  - Fix the commit message to explain the reason of adding SA.
-v6: https://lore.kernel.org/all/20241119220411.2961121-1-wangfe@google.com/
-  - Fix code style to follow reverse x-mas tree order declaration.
-v5: https://lore.kernel.org/all/20241112192249.341515-1-wangfe@google.com/
-  - Add SA information only when XFRM interface ID is non-zero.
-v4: https://lore.kernel.org/all/20241104233251.3387719-1-wangfe@google.com/
-  - Add offload flag check and only doing check when XFRM interface
-    ID is non-zero.
-v3: https://lore.kernel.org/all/20240822200252.472298-1-wangfe@google.com/
-  - Add XFRM interface ID checking on netdevsim in the packet offload
-    mode.
-v2:
-  - Add why HW offload requires the SA info to the commit message
-v1: https://lore.kernel.org/all/20240812182317.1962756-1-wangfe@google.com/
----
----
- drivers/net/netdevsim/ipsec.c     | 32 ++++++++++++++++++++++++++++++-
- drivers/net/netdevsim/netdevsim.h |  1 +
- net/xfrm/xfrm_output.c            | 22 +++++++++++++++++++++
- 3 files changed, 54 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/netdevsim/ipsec.c b/drivers/net/netdevsim/ipsec.c
-index 88187dd4eb2d..5677b2acf9c0 100644
---- a/drivers/net/netdevsim/ipsec.c
-+++ b/drivers/net/netdevsim/ipsec.c
-@@ -153,7 +153,8 @@ static int nsim_ipsec_add_sa(struct xfrm_state *xs,
- 		return -EINVAL;
- 	}
- 
--	if (xs->xso.type != XFRM_DEV_OFFLOAD_CRYPTO) {
-+	if (xs->xso.type != XFRM_DEV_OFFLOAD_CRYPTO &&
-+	    xs->xso.type != XFRM_DEV_OFFLOAD_PACKET) {
- 		NL_SET_ERR_MSG_MOD(extack, "Unsupported ipsec offload type");
- 		return -EINVAL;
- 	}
-@@ -169,6 +170,7 @@ static int nsim_ipsec_add_sa(struct xfrm_state *xs,
- 	memset(&sa, 0, sizeof(sa));
- 	sa.used = true;
- 	sa.xs = xs;
-+	sa.if_id = xs->if_id;
- 
- 	if (sa.xs->id.proto & IPPROTO_ESP)
- 		sa.crypt = xs->ealg || xs->aead;
-@@ -227,16 +229,31 @@ static bool nsim_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *xs)
- 	return true;
- }
- 
-+static int nsim_ipsec_add_policy(struct xfrm_policy *policy,
-+				 struct netlink_ext_ack *extack)
-+{
-+	return 0;
-+}
-+
-+static void nsim_ipsec_del_policy(struct xfrm_policy *policy)
-+{
-+}
-+
- static const struct xfrmdev_ops nsim_xfrmdev_ops = {
- 	.xdo_dev_state_add	= nsim_ipsec_add_sa,
- 	.xdo_dev_state_delete	= nsim_ipsec_del_sa,
- 	.xdo_dev_offload_ok	= nsim_ipsec_offload_ok,
-+
-+	.xdo_dev_policy_add     = nsim_ipsec_add_policy,
-+	.xdo_dev_policy_delete  = nsim_ipsec_del_policy,
-+
- };
- 
- bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_buff *skb)
- {
- 	struct sec_path *sp = skb_sec_path(skb);
- 	struct nsim_ipsec *ipsec = &ns->ipsec;
-+	struct xfrm_offload *xo;
- 	struct xfrm_state *xs;
- 	struct nsim_sa *tsa;
- 	u32 sa_idx;
-@@ -275,6 +292,19 @@ bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_buff *skb)
- 		return false;
- 	}
- 
-+	if (xs->if_id) {
-+		if (xs->if_id != tsa->if_id) {
-+			netdev_err(ns->netdev, "unmatched if_id %d %d\n",
-+				   xs->if_id, tsa->if_id);
-+			return false;
-+		}
-+		xo = xfrm_offload(skb);
-+		if (!xo || !(xo->flags & XFRM_XMIT)) {
-+			netdev_err(ns->netdev, "offload flag missing or wrong\n");
-+			return false;
-+		}
-+	}
-+
- 	ipsec->tx++;
- 
- 	return true;
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index bf02efa10956..4941b6e46d0a 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -41,6 +41,7 @@ struct nsim_sa {
- 	__be32 ipaddr[4];
- 	u32 key[4];
- 	u32 salt;
-+	u32 if_id;
- 	bool used;
- 	bool crypt;
- 	bool rx;
-diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-index e5722c95b8bb..3e9a1b17f37e 100644
---- a/net/xfrm/xfrm_output.c
-+++ b/net/xfrm/xfrm_output.c
-@@ -704,6 +704,8 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
- {
- 	struct net *net = dev_net(skb_dst(skb)->dev);
- 	struct xfrm_state *x = skb_dst(skb)->xfrm;
-+	struct xfrm_offload *xo;
-+	struct sec_path *sp;
- 	int family;
- 	int err;
- 
-@@ -728,7 +730,27 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
- 			kfree_skb(skb);
- 			return -EHOSTUNREACH;
- 		}
-+		if (x->if_id) {
-+			sp = secpath_set(skb);
-+			if (!sp) {
-+				XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-+				kfree_skb(skb);
-+				return -ENOMEM;
-+			}
-+
-+			sp->olen++;
-+			sp->xvec[sp->len++] = x;
-+			xfrm_state_hold(x);
- 
-+			xo = xfrm_offload(skb);
-+			if (!xo) {
-+				secpath_reset(skb);
-+				XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-+				kfree_skb(skb);
-+				return -EINVAL;
-+			}
-+			xo->flags |= XFRM_XMIT;
-+		}
- 		return xfrm_output_resume(sk, skb, 0);
- 	}
- 
--- 
-2.47.0.338.g60cca15819-goog
-
+Regards,
+Halil
 
