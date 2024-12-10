@@ -1,130 +1,96 @@
-Return-Path: <netdev+bounces-150468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D06319EA518
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 03:27:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11F1E9EA51D
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 03:30:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E9A5283F52
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 02:27:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9833328148C
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 02:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1917019D075;
-	Tue, 10 Dec 2024 02:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0B619C556;
+	Tue, 10 Dec 2024 02:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gFWs0bjR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QbrzU1TN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886B8199949;
-	Tue, 10 Dec 2024 02:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051C619F40B;
+	Tue, 10 Dec 2024 02:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733797634; cv=none; b=HFqx41kDLPGaPYmwQxUoL/vADR7J8yMRs5tihbQZRMaCDBQKAlex1+AY1jG3+Ve/7QJ0lW/Ui9m90tkkmBd4rxq8lnFkJHLa1sc7+wmQTvOv2y6P4HVsLDvzIeDv0CkADJknyGn96nr6Yd9SkSOzRirz2po7v6xE9waybrL/A3A=
+	t=1733797815; cv=none; b=KRcTShzj1jURw1KitbogEW3sUyY/Ghv2uc2JoYTHOaMOzzVs1v39D7mDzCB7g7jDbTbCFXRd/JvSE6droToU+D7xMOhtqaKCYDdVr0+bHCOv/zmTUzd+SZ8Gou98XOiYzDR2lJScmpO9RyNiOhBffqftTpbzMlSCnIC6UoScV2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733797634; c=relaxed/simple;
-	bh=P9K/1F8jUaRy07xqIvk6GRg+ZQ7cdQOWsK9k3jlyN4o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=BTUZC6mxFyY/5RdJBegKHzE/IBU3tbtCYyA8dK9sI3VPqKJQ3HlXMOSzNcRFKl+h8jgKacBgGo7neeaVXwT4Cde0kmviIVASH1qxdNjYjMe7Ve+mq5oqYlVaBA16ZzQ8T1RAuVAQFCteb1JHmK0Kvlg++jDO7sMEggG1KYxFibw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gFWs0bjR; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7250c199602so5119620b3a.1;
-        Mon, 09 Dec 2024 18:27:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733797632; x=1734402432; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=d7Inf/IBagpHI1F16LUrcy4yQaYHpb8yuceNofp6zsc=;
-        b=gFWs0bjRbUwtq6rmfFHqGXi8sUenCbXlEQt8K4NvjgiQRh1sYx7kmBdBsMFsHDGqbc
-         0R2VqFTHuYhcmQ85/FeZrjnoyi0Phfl8Xo44I1sNiGIXUGNBPJ1TcF81b0/B5RRxSjJ6
-         grfqrzvzi1TNLrBjq3MbPP8rCb2FyCEwaqve5ksnNLvCFf/tt3JvKosW54gY+Pe0u4ti
-         QNs9VSOBN3sTeZq9aUU+pqWNh7n7tfeX/XFjkkYjK+VXb0G0u1EudoptBRgwYNeaP50L
-         nMUrcH6oy70EKJQibXs52jZWINFYFnpYGzr6+B1FNiv/65cXBT2yWtamW0ZnsBcSvZHi
-         2WBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733797632; x=1734402432;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=d7Inf/IBagpHI1F16LUrcy4yQaYHpb8yuceNofp6zsc=;
-        b=ryb8uWBaif1BAuy1gIRx13iS+z+ioiPMcEZKkCEjZZ23Pc8dUZR0YHCFmV+3BnU6js
-         XXQC5u9nDnpgREtlDGFxP/Z24YrymNXk7kHZ2wuEHRpiiPdsz7An8j42wKmcF/4EueB/
-         yOC6asM8BzmbxQJsMkQj4i0QmHE1cT1jqXh0/Femb3IxwhDXWxclovscmMp/WzP6Jcc+
-         kPO2LZocfHWk5LL3twAGlGwNWt0rau4NO4LvH+YU5jwvgbcs1YBdS3YuDo45LkLcyj78
-         U1AwWlCimDtmNrYySdPqoB9Vf2lbYlyz3u2tWFh4ScK55V21h/Nz/wjXnz7EWNsBLzo+
-         +aOg==
-X-Forwarded-Encrypted: i=1; AJvYcCV1hGHoqWkientWo3kp539gr3JUcCNC8E9/LA0MBA8jQMx4twITUFkCucI+R/2gXvomZdMo4vVWkKvC@vger.kernel.org
-X-Gm-Message-State: AOJu0YygC2zj2CLlQ9F2nuAL394Q1smro+zYLGGYYQ91jvhWdci3if52
-	yOdrq2W+6wtQLLc1/ceKie3jS3QN8db20nb3nQpmCdy6jEeDdQgt
-X-Gm-Gg: ASbGnctRIebidIRLyQG1lmbjYI62h5BTfumFCj//K4cGskaCJY/8F7JZFe0ioRWWejz
-	UbVNxaHHeEjEyOjk28XJZJh4QltTOrbTOD6802Zxd83gRUCVdTK/DrStbIHk0LD3RvR6JxvxFmb
-	7qULj4n4vIWE0qRC9HgB7ClOCEQYt+oUo3gDPPeL275qQRFHGzg3NokVkHO2GF8os/IZ7/1218w
-	QTi+2FPju0LnSw9PenPaBQobgOLsM24hd270XuiffETOT3/ILHG5L1qHSpNqtJx6KJRQ4GZ6t+t
-	IPGI
-X-Google-Smtp-Source: AGHT+IHOUXtCy2OMg8nQ38PpKzg0l/zWdlxavpLGmx5w6cBBYgdSnzGQMBwjzwxo/1xE9TasQGwnVg==
-X-Received: by 2002:a05:6a20:12c5:b0:1e0:d867:c875 with SMTP id adf61e73a8af0-1e1b1b5c646mr3831785637.36.1733797631650;
-        Mon, 09 Dec 2024 18:27:11 -0800 (PST)
-Received: from localhost.localdomain ([180.159.118.224])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fd4e9d822fsm2396934a12.14.2024.12.09.18.27.09
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 09 Dec 2024 18:27:11 -0800 (PST)
-From: Yafang Shao <laoar.shao@gmail.com>
-To: saeedm@nvidia.com,
-	tariqt@nvidia.com,
-	leon@kernel.org,
-	gal@nvidia.com,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	Yafang Shao <laoar.shao@gmail.com>,
-	Tariq Toukan <ttoukan.linux@gmail.com>
-Subject: [PATCH v4 net-next] net/mlx5e: Report rx_discards_phy via rx_dropped
-Date: Tue, 10 Dec 2024 10:27:06 +0800
-Message-Id: <20241210022706.6665-1-laoar.shao@gmail.com>
-X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
+	s=arc-20240116; t=1733797815; c=relaxed/simple;
+	bh=iUR6wZ+vF94nOVkdKj70CRyZA/xiCM2WcTecmDPBPw0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=h/3Uz9QHlKTQl6UuMnIfllz2PH/AJHPvCzJARFYhxf8eyHCP8bFc39oId9r02IdWy+oVHtZXZYferjeCe2ARe79//Ccj5fcN5nXMe3s7JOoYAaMZ6ZgB1o2z79xknqQPz80wkERICwzcWbuuNb2Y7AD4Qnek51+CV4QaoW/78qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QbrzU1TN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 667BFC4CED1;
+	Tue, 10 Dec 2024 02:30:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733797814;
+	bh=iUR6wZ+vF94nOVkdKj70CRyZA/xiCM2WcTecmDPBPw0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QbrzU1TN9pKGEvh3NVLdTh495QcSSdql8DTCAd96s5Z8LbaQHuMJGSHLRnvcZvkZt
+	 x1phO/oAXtgIF3G50LjlfeoMqwg2iOtiBLsKmR2m2zj3RcAFmmuW4Vf9relr548h/Z
+	 oC8LNLNsWapakfMzkw/aERrC7ZSXUplYYKEXfa0NzG90R1QP4itypVstc6AqkIrTCG
+	 XwLW450UPf8DiuwYZD2x7mDsMKHxqrD0RuVrWdy6CJ1VRFG1DEo+yZHVy8aFqLoXuw
+	 rvSQLT7TLcxRQEcixi8VvGcT+u2F5P600orPZK5zCtCEc4cOJzfHPdSGtEWfu/BWY6
+	 l9m46lHpMsWew==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34A48380A95E;
+	Tue, 10 Dec 2024 02:30:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v4] octeon_ep: add ndo ops for VFs in PF driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173379783002.318197.15810846013570479306.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Dec 2024 02:30:30 +0000
+References: <20241206064135.2331790-1-srasheed@marvell.com>
+In-Reply-To: <20241206064135.2331790-1-srasheed@marvell.com>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com,
+ sedara@marvell.com, vimleshk@marvell.com, thaller@redhat.com,
+ wizhao@redhat.com, kheib@redhat.com, konguyen@redhat.com, horms@kernel.org,
+ einstein.xue@synaxg.com, vburru@marvell.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 
-We noticed a high number of rx_discards_phy events on certain servers while
-running `ethtool -S`. However, this critical counter is not currently
-included in the standard /proc/net/dev statistics file, making it difficult
-to monitor effectively—especially given the diversity of vendors across a
-large fleet of servers.
+Hello:
 
-Let's report it via the standard rx_dropped metric.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-Cc: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>
-Cc: Gal Pressman <gal@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 1 +
- 1 file changed, 1 insertion(+)
+On Thu, 5 Dec 2024 22:41:34 -0800 you wrote:
+> These APIs are needed to support applications that use netlink to get VF
+> information from a PF driver.
+> 
+> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+> ---
+> V4:
+>   - Removed unused vf_info 'trusted' field
+>   - Removed setting of max_tx_rate
+> 
+> [...]
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index e601324a690a..3117fafdabcd 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -3916,6 +3916,7 @@ mlx5e_get_stats(struct net_device *dev, struct rtnl_link_stats64 *stats)
- 	}
- 
- 	stats->rx_missed_errors = priv->stats.qcnt.rx_out_of_buffer;
-+	stats->rx_dropped = PPORT_2863_GET(pstats, if_in_discards);
- 
- 	stats->rx_length_errors =
- 		PPORT_802_3_GET(pstats, a_in_range_length_errors) +
+Here is the summary with links:
+  - [net-next,v4] octeon_ep: add ndo ops for VFs in PF driver
+    https://git.kernel.org/netdev/net-next/c/8a241ef9b9b8
+
+You are awesome, thank you!
 -- 
-2.43.5
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
