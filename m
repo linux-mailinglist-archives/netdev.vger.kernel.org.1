@@ -1,92 +1,94 @@
-Return-Path: <netdev+bounces-150783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1EEE9EB8AE
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 18:52:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8060B9EB8BC
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 18:53:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31F581888D97
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 17:52:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 591C71888ED3
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 17:52:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4BF1AA786;
-	Tue, 10 Dec 2024 17:52:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D092046A4;
+	Tue, 10 Dec 2024 17:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eJaqSrYy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a0tsuu78"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798711AAA1C
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 17:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29ECE1BCA05
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 17:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733853129; cv=none; b=qRqxGBICTmOmS7oaJmFI/JIa5tHqZVTrL4gGNwpBXw1NEVsUyZkjG8y/r6UNqiGjFgbidrNrkdcNGaD8tFrR0f0JYsuUQG7o0rjoANrrqGT3CYN4FhrUYvpBba6Tn7Tayrg3eS8vstuD/Olt8oAH6L6v8vrUD3ALSHfcHL3+3ho=
+	t=1733853156; cv=none; b=ea/+B08WnxLAS8QVWNywxiIn7JcUQ4526isQkFJnSicyUWwqp12RJs0cOwYMcKg05DOBKu0OAGvcDgllCJ+/+2Pk5TlUAWYt4SMzod+cwFu8zDwUU+rHkDYjuYP80fOh8beAHpJuOhZ7qpRscqBVdl0Ws7HNPIH9YjqvFHTAe8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733853129; c=relaxed/simple;
-	bh=q9A16Y6kO4s41vmJMGS854yDLlp9NiUZZ2qJ/TT+EKg=;
+	s=arc-20240116; t=1733853156; c=relaxed/simple;
+	bh=jxM8Oak5FsSIuUdETeAfc41H8506k5MRoOUV/v8nVjg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TM6/AzpeXpJAhHTgcBKPZLT0/KckUjL+ku7ACaVqTTBoE0wPWFeIVvo01/T8XcqfHhupts/w25jrxDgx+YXC+rkz5wC5NnxWCMWupHcuQme4V/MR2TGkehjuI8B2gclGaOpyrJYbbSbsz83vDEAm45bO+fOBJ1hhpA2lWYAzD1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eJaqSrYy; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=lov8nWHJ+tAOZDjEkgOSgjtuaCbghvz0cwFtCHZI5jfsXEOvO8KjQsE3H5CO7LieeX9wSy7gV1RWZyJSHKCCDgDYuWOPSANTgCoO62FeWKGa9RSmMP8FHzMBqJ7CxmNygFhYJJFfPKTYoosWKzmymt5Vew5vE3B0qVTX1twTRbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a0tsuu78; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733853126;
+	s=mimecast20190719; t=1733853154;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5z++hiDZoK6MQKlJqwcak2mnPX1FBIvWTnRgAgxRHwY=;
-	b=eJaqSrYyp2Foq+sTIRsPU1J9YpZbFgWot1Y9m2sy30tRVK0FxffldwK+yeWl/1eSmEKkx7
-	xzpNI00HgPd6EP173ccatIubHLhLoeTii+HY4YGZl9xwoQndZmYCj4KPpZu9okCY/bximg
-	XA128FPPgR7l+WMkBeTBjK/KERVZmYc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=U7wTWXny8CFCbc3FlHKUZFA0j/GNvYUzPKRP1yK4uOU=;
+	b=a0tsuu78D3jUtcmMzQH6U7qRj1h91uZQUfly3LDyZKdM1QeZpiX9B8+dggcQ9wGfhEk9rg
+	h7xIYtRLhtqBFy0y4TJyWbBt+YjDApn1MlE+sM9lx0J/bLMpYtUzVo2rxrE5J+QDKyCMgy
+	Wx8qz7fYaTGPuv1fAI7t6o7sw6cys1A=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-576-9Uh-nT2HNyOB420hO29B0w-1; Tue, 10 Dec 2024 12:52:05 -0500
-X-MC-Unique: 9Uh-nT2HNyOB420hO29B0w-1
-X-Mimecast-MFC-AGG-ID: 9Uh-nT2HNyOB420hO29B0w
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-434f5b7b4a2so22880465e9.0
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 09:52:05 -0800 (PST)
+ us-mta-124-cqXcnCaIOqyh5f7i8MGbhQ-1; Tue, 10 Dec 2024 12:52:32 -0500
+X-MC-Unique: cqXcnCaIOqyh5f7i8MGbhQ-1
+X-Mimecast-MFC-AGG-ID: cqXcnCaIOqyh5f7i8MGbhQ
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-434c214c05aso46174765e9.0
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 09:52:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733853124; x=1734457924;
+        d=1e100.net; s=20230601; t=1733853151; x=1734457951;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5z++hiDZoK6MQKlJqwcak2mnPX1FBIvWTnRgAgxRHwY=;
-        b=eiWrWsJag41jytdwDhp30KP+mqoQ//ZYXTmF3Kj+qwW7Vhx2eKSo6a75DSzvgoItsY
-         ooN1nBqnGIaRi7BQV8PkQ/fmqzQCKRphNg6Mhps3ulua8tWH4p91FCANKX///DBi5UsG
-         +8qyIojvOKU/2L4TWy/4N2hjDmu9oJaC3Eb2VumlN1/wW/vkBAg/J7WJSrr+yKnw3gLG
-         ouX6SDLjby6qO0yPAAIrSKPjR02zml5tCvCmz8jnImZ5pvQsvFLJXqKXhmFi1HDZy9WB
-         0KxuAVXNHcgfFg2smvngrnOsqZ07ST1LJLsA1S9T/oKTJWoRwPmfCJRHj/YmOiOznyjs
-         nm1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWs9xHoyz5QZKIsjlbOpYzNIO7bgyq0JY/VI3sxhTBicCY+z+yubAcWqCWaUMsLUa4k7jbUfVk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRVUHCAUMEX6aURglD8qI2yxHeEhNmll022iitXnTsU/e1DE8V
-	zAOFUAf0T8YEnCaDsHaRH8JO4APpxBhFB7U/fFJkLjjFFJyAh4vmHpcBR7kB3nmZrKi3AyjVcw4
-	N/3U7cIIS5O/a/7WEBOGITeBROzAK/6jaOxSIZnOYOJae9prraNsjJA==
-X-Gm-Gg: ASbGnctRI865VujpD06OdOSJxjrHf+7mefYM8znUbf0G+EvIViw09q51uZqo00K97rP
-	hTtHm/V9dy2cygMeLNBvz+D5InPQRnDCoYKwCJOMSz55KynZdQGCUM1ytwmjaG7nedmx8TKZeXP
-	uttqAnRs/xsH+rIxKzQeR9j/A+THELmkP/khhe2PSZSkt+VBNPuLwcpCbc25sw4DKRKayubvz5S
-	ZxdIbDyLBmws1R/QAkzuTYYvIB1eQPc2yhYnUs16UjCYezTeKyZ6AQwohjEJovAdHbfCodXQ788
-	5CycEAy9BLCR4nSAD4aHr/qjAJfbgA==
-X-Received: by 2002:a05:600c:358a:b0:434:fd77:5436 with SMTP id 5b1f17b1804b1-434fff500a4mr54092205e9.15.1733853123927;
-        Tue, 10 Dec 2024 09:52:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGWlVeLxQceZVqJYPqW9abSwCI92YZV60MOUnZJwqpD1i3FXk0/EecHfd0I1AsDffr0xedD9A==
-X-Received: by 2002:a05:600c:358a:b0:434:fd77:5436 with SMTP id 5b1f17b1804b1-434fff500a4mr54091875e9.15.1733853123291;
-        Tue, 10 Dec 2024 09:52:03 -0800 (PST)
+        bh=U7wTWXny8CFCbc3FlHKUZFA0j/GNvYUzPKRP1yK4uOU=;
+        b=uaRtlkyHahgK6/x2gayOBwo1Jegm1qlikHpKPfo4R1bRc175X9Gxauh2NP8Xy8PIbr
+         8uQPd8scbZUuDDkPVJxXTFTB37CELcLNAQpXgypAs7YthMCcvMnCPoFVErAQ1PgCQYAf
+         F/4jjpVccnWFHcnOlRyu3PhDdcAHURmb8gSk1VriKQcMU5p3vUfRM7iEBcagjJTUeA2S
+         YnFLREplVSuvsq4MGV6Uj8ctyYMNcjZJvbv3rJFsftXnSre9OXR1p3sxFFsZo1fSLCoG
+         S6XZn2bDsUaRGJP2Z1n1TYc4zuRrau3j4nNFpzBAaTMn7bIcPpELrsmAz5vLqz059Lcy
+         9Y8g==
+X-Forwarded-Encrypted: i=1; AJvYcCWvcniZzumzSsXxxoKerE/kiPiHRe9izHr/IolUhYEc3gAbXg9OxpANW4t9rY7NGMqtqbI1dOo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqGiyUMYcp0dA/JLCuKuzbKN+VXXyOTAxzxNJpRPcXa/JsoyKK
+	dtC7IgLchaMo6COx9k8PZLII2Jp3vw19XMkX7Gf3KYjXhpehXg9RbuyuBPuMbt07ukf6byzRwV2
+	Goaq0TDi76Ob9smzNZNOA7JQPGIHk/BZjwHfx5bL0V0v1l0XZPxjzmQ==
+X-Gm-Gg: ASbGncuF8ZJPEIS8p1jRhmJ1FDBX+YCk2RwgSekg7qN/EPcdlilAzohIQZBRvSHQU0y
+	Zi+jKiY3HKrBSVSSA6Mm1p/QREXgUNW0NlaClKrGSjndIWd9lc0SOtiuaTR56nt2oLSyOQC+umj
+	1DSJUcBEBBM8MFAhiTQKNspTMjU6GES2XDE+Gpf5SOuYJVdC3aUf+O+Yef5/ttWFnTd73+ziQ8u
+	wr9N2NxA8GItIkDnmVJ9gY0/oYbKhJqUrtYtuepZae+3y86OUzA+qHP945BQAOq4X/MEbOgbJjt
+	/h4ogKdL9V0Wz6KqFtoFAxyBYDd/pA==
+X-Received: by 2002:a05:600c:1e0c:b0:434:f3a1:b210 with SMTP id 5b1f17b1804b1-434f3a1b4f1mr73407065e9.32.1733853151443;
+        Tue, 10 Dec 2024 09:52:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHT6Om4hYhYhyD9qJSgoZ3Z6qXK38YTr//I5hZ9Q1woRRwaJmZu4m0F7M5ZzfAHvZP1EyN1sw==
+X-Received: by 2002:a05:600c:1e0c:b0:434:f3a1:b210 with SMTP id 5b1f17b1804b1-434f3a1b4f1mr73406865e9.32.1733853150834;
+        Tue, 10 Dec 2024 09:52:30 -0800 (PST)
 Received: from sgarzare-redhat (host-87-12-25-244.business.telecomitalia.it. [87.12.25.244])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436199f6896sm12564785e9.14.2024.12.10.09.52.01
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434f3c96ca2sm99608845e9.24.2024.12.10.09.52.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 09:52:02 -0800 (PST)
-Date: Tue, 10 Dec 2024 18:51:54 +0100
+        Tue, 10 Dec 2024 09:52:30 -0800 (PST)
+Date: Tue, 10 Dec 2024 18:52:27 +0100
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Cindy Lu <lulu@redhat.com>
 Cc: jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com, 
 	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
 	netdev@vger.kernel.org
-Subject: Re: [PATCH v4 0/8] vhost: Add support of kthread API
-Message-ID: <wxfwmdn73heh5k7dnbaqt5iq23qwz4ltlapetvsqlryhz7mhpt@4e3pw5qm7yom>
+Subject: Re: [PATCH v4 1/8] vhost: Add a new parameter in vhost_dev to allow
+ user select kthread
+Message-ID: <urth32zhvjesd7pjgy4rzbkbddtvxbmevfjid5vebfak2bd2ae@izvzeo5mk2s6>
 References: <20241210164456.925060-1-lulu@redhat.com>
+ <20241210164456.925060-2-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,81 +97,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20241210164456.925060-1-lulu@redhat.com>
+In-Reply-To: <20241210164456.925060-2-lulu@redhat.com>
 
-On Wed, Dec 11, 2024 at 12:41:39AM +0800, Cindy Lu wrote:
->In commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads"),
+On Wed, Dec 11, 2024 at 12:41:40AM +0800, Cindy Lu wrote:
+>The vhost now uses vhost_task and workers as a child of the owner thread.
+>While this aligns with containerization principles,it confuses some legacy
 
-missing something here?
+nit: missing space in "principles,it"
 
->
->The vhost now uses vhost_task and operates as a child of the owner thread.
->This aligns with containerization principles, But it has confused some legacy
->userspace applications. Therefore, we are reintroducing support
->for the kthread API.
->
->In commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads"),
->The vhost now use vhost_task and workers working as a child of the owner thread,
->which aligns with containerization principles. However, this change has caused
->confusion for some legacy userspace applications.
->Therefore, we are reintroducing support for the kthread API.
+>userspace app, Therefore, we are reintroducing kthread API support.
 
-This paragraph seems duplicated.
-
-If you have to resend a v5, recheck the cover for a moment because it's 
-not easy to follow.
+nit: "app, therefore" or "app. Therefore"
 
 >
->In this patch,
-
-s/patch/series
-
-> a new User API is implemented to allow userspace applications to
->configure their request mode.
+>Introduce a new parameter to enable users to choose between
+>kthread and task mode.
 >
->Changelog v2:
-> 1. Change the module_param's name to enforce_inherit_owner, and the default value is true.
-> 2. Change the UAPI's name to VHOST_SET_INHERIT_FROM_OWNER.
+>Signed-off-by: Cindy Lu <lulu@redhat.com>
+>---
+> drivers/vhost/vhost.c | 1 +
+> drivers/vhost/vhost.h | 1 +
+> 2 files changed, 2 insertions(+)
 >
->Changelog v3:
-> 1. Change the module_param's name to inherit_owner_default, and the default value is true.
-> 2. Add a structure for task function; the worker will select a different mode based on the value inherit_owner.
-> 3. device will have their own inherit_owner in struct vhost_dev
-> 4. Address other comments
->
->Changelog v4:
-> 1. remove the module_param, only keep the UAPI
-> 2. remove the structure for task function; change to use the function pointer in vhost_worker
-> 3. fix the issue in vhost_worker_create and vhost_dev_ioctl
-> 4. Address other comments
->
->Tested with QEMU with kthread mode/task mode/kthread+task mode
-
-A link to QEMU patches will be nice.
-
->
->Cindy Lu (8):
->  vhost: Add a new parameter in vhost_dev to allow user select kthread
->  vhost: Add the vhost_worker to support kthread
->  vhost: Add the cgroup related function
->  vhost: Add kthread support in function vhost_worker_create
->  vhost: Add kthread support in function vhost_worker_queue()
->  vhost: Add kthread support in function vhost_worker_destroy()
-
-What about merging patches 4, 5, 6 in a single patch?
-
-Thanks,
-Stefano
-
->  vhost: Add new UAPI to support change to task mode
->  vhost_scsi: Add check for inherit_owner status
->
-> drivers/vhost/scsi.c       |   8 ++
-> drivers/vhost/vhost.c      | 185 +++++++++++++++++++++++++++++++++----
-> drivers/vhost/vhost.h      |   4 +
-> include/uapi/linux/vhost.h |  18 ++++
-> 4 files changed, 198 insertions(+), 17 deletions(-)
->
+>diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>index 9ac25d08f473..eaddbd39c29b 100644
+>--- a/drivers/vhost/vhost.c
+>+++ b/drivers/vhost/vhost.c
+>@@ -552,6 +552,7 @@ void vhost_dev_init(struct vhost_dev *dev,
+> 	dev->byte_weight = byte_weight;
+> 	dev->use_worker = use_worker;
+> 	dev->msg_handler = msg_handler;
+>+	dev->inherit_owner = true;
+> 	init_waitqueue_head(&dev->wait);
+> 	INIT_LIST_HEAD(&dev->read_list);
+> 	INIT_LIST_HEAD(&dev->pending_list);
+>diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+>index bb75a292d50c..c650c4506c70 100644
+>--- a/drivers/vhost/vhost.h
+>+++ b/drivers/vhost/vhost.h
+>@@ -176,6 +176,7 @@ struct vhost_dev {
+> 	int byte_weight;
+> 	struct xarray worker_xa;
+> 	bool use_worker;
+>+	bool inherit_owner;
+> 	int (*msg_handler)(struct vhost_dev *dev, u32 asid,
+> 			   struct vhost_iotlb_msg *msg);
+> };
 >-- 
 >2.45.0
 >
