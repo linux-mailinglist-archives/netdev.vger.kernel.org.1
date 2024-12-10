@@ -1,195 +1,114 @@
-Return-Path: <netdev+bounces-150645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 360E79EB103
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:40:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07CDE9EB120
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:47:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83DCF1882013
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:40:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E31FD16A9EA
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:46:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 148AB1A3AB8;
-	Tue, 10 Dec 2024 12:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EDC1A38F9;
+	Tue, 10 Dec 2024 12:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JTG9nZRw"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="N5GTBVsG"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D0D1CD15
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 12:40:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B3E1CA9C
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 12:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733834406; cv=none; b=G/apj3g0WIWInyGJ11QBNGiBX3L+qjljQowkstDok0rNBUKT6TQ5Gon98nXblUmrHNYR624rRU9/ffE2gwNA5VEA/jSqe/RWYv83dWZNjObC167oYyo4+Svertc51Vofv3FPxhfoW9E0JUN8IH1lKilPdKWVnAiadpzECKGl1Yg=
+	t=1733834818; cv=none; b=H7L/ZVd1lOId3qf2QoJOEKOUF8Pbjk1EHv/lZpjqSTqKNx3YUGmzLyjQz5Qd5/um/ee//TO7bRlL26UN2sC7GQE2N57eNnFILeliCmWlFrlaqMmcYFHfuYIh2Xy+T2XH8PQNDDX18NwCw8Qnhy1g7dLcNltDWkqRfl8f8w/PTXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733834406; c=relaxed/simple;
-	bh=jIQM09sWmiKjEqLsCkdUfXqN592AQDPfBsbuuWS8Q2w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KhgcnD76DonDvz+KcKoLGC3vLESfFr/5a/fiWS9x43NkZ8wL1k/u3PUTtdCGPOa0sHEZIPosqNNeWbM9dSYRm8qj+IwUB9jerX86Ysnkvt+SyyZ6PUah4RiUBNJRqIFaJK4K3Irc4wG+FAbUtEJBthUI/ayrkD/zS2jyN2dP+v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JTG9nZRw; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZnkSmeSS0TecoFDCuJYg8c+cB+5A/RYF+qiZ51yXFYw=; b=JTG9nZRw5LFEhbwDO8MdUQCyhp
-	ZX9Ysbu5eIq5tYiLzpS0yEIeWcnnwOstQ0x+lM7+ABzo6U1e0x7KdfrLIHljBZ5yZyAAcsqBfChK9
-	iwk6WkNNzNR/BfGpb6xz3SHCTGnl4hy+2B1wvMCrez+bDVOY9pBfgcLUr88J8dtYYVutvHsgw0keF
-	8z8Bx4m9NKt3Q1qwbR7zj7GSJBba8wMUbFjRqnxiUNYXLuvsvhFDTOqLxx1owzU1TEs4S5Sl6F12R
-	CKS8Uuoq7y6RgWWu50FtAtSzMzXsZd5aWgY3QqwQuRQjFp3bzx3y5Wt0Y8fZ8rDhLAIseknIr22vq
-	yAf/e3MQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38304)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tKzWu-0002JG-0F;
-	Tue, 10 Dec 2024 12:39:56 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tKzWr-0002y8-1l;
-	Tue, 10 Dec 2024 12:39:53 +0000
-Date: Tue, 10 Dec 2024 12:39:53 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	imx@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: fec: use phydev->eee_cfg.tx_lpi_timer
-Message-ID: <Z1g2md_S1kEjOKQH@shell.armlinux.org.uk>
-References: <E1tKzVS-006c67-IJ@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1733834818; c=relaxed/simple;
+	bh=KX4EV3S5tpdSVPVaMW0IgVo/XNFVcw+zGMXFSjwdn4I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EiRvtcvHODWNSN3ONUWlJNdDPuHeXRLFcZSyAETRuHWdOyFJsalmQBqi/iqxGmMK+YXHUrMGhZK2+Zl0KpIKLZPG/UrlpJXZTKebKLUtZ+qW4P3+sAStLy5g1peh9aU37cfthPFF/yuRtsBlBmghZyD5eWTOtnXlvr+czuB7MHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=N5GTBVsG; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-30034ad2ca3so27687691fa.1
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 04:46:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1733834815; x=1734439615; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q2gv17yRT4z0rHDfJ0xNPXvIsRkRnNe0DZfYlBqVB+Y=;
+        b=N5GTBVsG2KMmwjiFXXNZANCiDdkUOMEhZXubJTwofUPnyPJfittosAC9P85mzVRcUH
+         m1f6AVL/CWSwuJ/9xgi2NmpmQVIR9Yb32Nfsd7P6xqViG6WPfpSp5oCB/UsFnQkk9Cnb
+         z1KIfeQUX1c0ob0E8NQmktlYOJTBjZlb+7YKZnCL9qrw3D1LUJuUBLeXxGF9aDR8alkp
+         xmIZDjVBiYMtP6SDIvy559XqDYGBGWVQEscQOUVYL/uuqVKyZqI5U2p0I4dtUbViHixk
+         WraUB39L/Av+uWRqoJfwJ6383htCur/3f9CAi1UskwuBuzUDkZnRB1ZEIlrdZLIJzCQn
+         uBnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733834815; x=1734439615;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q2gv17yRT4z0rHDfJ0xNPXvIsRkRnNe0DZfYlBqVB+Y=;
+        b=H8fUgLb3wdLd2V0smlkn6e7fJYFNL4QRB47xdOaJhpG6jxwyIOWsgGqSclqOFrw9LZ
+         RWt9EVV/fZApB0pUiEvWUpkPzMoSDaSwLt42P2n2+RTdm2iT31F2Biic5BphOMsYzYkP
+         0o9lwPfp3xC65n7NKk0b3GBSjNTrrQO1iI62TrL9YZFEviGpOnPIDsrIpoJFDosF9FS9
+         jhlpFBXqW/pVH2oHs55AGvSNOUN6crzA1fKK15SS3fBC0NjDOidup+yA2i4S6aUXFUKY
+         KkvaWHpBjfyDUncGFZN1lE2XIUTZAUxG7aJHomyCq4TSfZiOm8SpOX6p5X67T0OqLyHK
+         tEDw==
+X-Forwarded-Encrypted: i=1; AJvYcCWJF6Z/aw5glYFrPw4ru6iWHs7Zlul4nH//XUtnf0QumYxCs1hMuYTB/L3snibct9opePXb3tk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3YnS+L7fBsk9Lw/O/IuD5FG1bzlfUvGqmV6BA2XdnYWMajXKK
+	uj3YjWt/I0cdDaUTOlikFgB5+0NysuUoNqaLGuy4N8golDW8GVlG+S6r7A7eXaGhRG3S1WELYT4
+	2/N/5ZQgbqz1oBezwGawSh3TLLRvvlck4noA7sg==
+X-Gm-Gg: ASbGncuOVcLcMGqVKl6/ah9TxkqUSWVgpi7ry3OIqFGXZ1dzpBPr70rI6Xm0L+mouj7
+	s0bFTMWHMpyvr8gUo3h6vLdfdWrZrJCqo3lVLB+AcmOoTvFuKzrfqYD3l3wVs47Tcde0=
+X-Google-Smtp-Source: AGHT+IGlGjnX41lf5nD3xaDqv4/+1zouMo9m8MDdOTdpToJj+sYN673kMGyE3ysEnuS7DFynzHplBUGfucHdrqsCYuk=
+X-Received: by 2002:a2e:a163:0:b0:302:336a:898f with SMTP id
+ 38308e7fff4ca-302336a8a1emr6922311fa.9.1733834815083; Tue, 10 Dec 2024
+ 04:46:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1tKzVS-006c67-IJ@rmk-PC.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20241210104524.2466586-1-tmyu0@nuvoton.com> <20241210104524.2466586-3-tmyu0@nuvoton.com>
+In-Reply-To: <20241210104524.2466586-3-tmyu0@nuvoton.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Tue, 10 Dec 2024 13:46:40 +0100
+Message-ID: <CAMRc=Men4QM3a2rydxDYwLjJLYPB7Uid=y_DJ8YNa-So2H3NQQ@mail.gmail.com>
+Subject: Re: [PATCH v3 2/7] gpio: Add Nuvoton NCT6694 GPIO support
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
+	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 10, 2024 at 12:38:26PM +0000, Russell King (Oracle) wrote:
-> Rather than maintaining a private copy of the LPI timer, make use of
-> the LPI timer maintained by phylib. In any case, phylib overwrites the
-> value of tx_lpi_timer set by the driver in phy_ethtool_get_eee().
-> 
-> Note that feb->eee.tx_lpi_timer is initialised to zero, which is just
-> the same with phylib's copy, so there should be no functional change.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Note that this need testing on compatible hardware - I only have iMX6
-which doesn't have EEE support in FEC.
-
-I'm particularly interested in any change of output from
-
-	# ethtool --show-eee $if
-
-with/without this patch. Also testing that it doesn't cause any
-regression.
-
-Thanks.
-
+On Tue, Dec 10, 2024 at 11:46=E2=80=AFAM Ming Yu <a0282524688@gmail.com> wr=
+ote:
+>
+> This driver supports GPIO and IRQ functionality for NCT6694 MFD
+> device based on USB interface.
+>
+> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
 > ---
->  drivers/net/ethernet/freescale/fec.h      |  2 --
->  drivers/net/ethernet/freescale/fec_main.c | 16 ++++++----------
->  2 files changed, 6 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/freescale/fec.h
-> index 1cca0425d493..c81f2ea588f2 100644
-> --- a/drivers/net/ethernet/freescale/fec.h
-> +++ b/drivers/net/ethernet/freescale/fec.h
-> @@ -671,8 +671,6 @@ struct fec_enet_private {
->  	unsigned int tx_time_itr;
->  	unsigned int itr_clk_rate;
->  
-> -	/* tx lpi eee mode */
-> -	struct ethtool_keee eee;
->  	unsigned int clk_ref_rate;
->  
->  	/* ptp clock period in ns*/
-> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-> index 1b55047c0237..b2daed55bf6c 100644
-> --- a/drivers/net/ethernet/freescale/fec_main.c
-> +++ b/drivers/net/ethernet/freescale/fec_main.c
-> @@ -2045,14 +2045,14 @@ static int fec_enet_us_to_tx_cycle(struct net_device *ndev, int us)
->  	return us * (fep->clk_ref_rate / 1000) / 1000;
->  }
->  
-> -static int fec_enet_eee_mode_set(struct net_device *ndev, bool enable)
-> +static int fec_enet_eee_mode_set(struct net_device *ndev, u32 lpi_timer,
-> +				 bool enable)
->  {
->  	struct fec_enet_private *fep = netdev_priv(ndev);
-> -	struct ethtool_keee *p = &fep->eee;
->  	unsigned int sleep_cycle, wake_cycle;
->  
->  	if (enable) {
-> -		sleep_cycle = fec_enet_us_to_tx_cycle(ndev, p->tx_lpi_timer);
-> +		sleep_cycle = fec_enet_us_to_tx_cycle(ndev, lpi_timer);
->  		wake_cycle = sleep_cycle;
->  	} else {
->  		sleep_cycle = 0;
-> @@ -2105,7 +2105,9 @@ static void fec_enet_adjust_link(struct net_device *ndev)
->  			napi_enable(&fep->napi);
->  		}
->  		if (fep->quirks & FEC_QUIRK_HAS_EEE)
-> -			fec_enet_eee_mode_set(ndev, phy_dev->enable_tx_lpi);
-> +			fec_enet_eee_mode_set(ndev,
-> +					      phy_dev->eee_cfg.tx_lpi_timer,
-> +					      phy_dev->enable_tx_lpi);
->  	} else {
->  		if (fep->link) {
->  			netif_stop_queue(ndev);
-> @@ -3181,7 +3183,6 @@ static int
->  fec_enet_get_eee(struct net_device *ndev, struct ethtool_keee *edata)
->  {
->  	struct fec_enet_private *fep = netdev_priv(ndev);
-> -	struct ethtool_keee *p = &fep->eee;
->  
->  	if (!(fep->quirks & FEC_QUIRK_HAS_EEE))
->  		return -EOPNOTSUPP;
-> @@ -3189,8 +3190,6 @@ fec_enet_get_eee(struct net_device *ndev, struct ethtool_keee *edata)
->  	if (!netif_running(ndev))
->  		return -ENETDOWN;
->  
-> -	edata->tx_lpi_timer = p->tx_lpi_timer;
-> -
->  	return phy_ethtool_get_eee(ndev->phydev, edata);
->  }
->  
-> @@ -3198,7 +3197,6 @@ static int
->  fec_enet_set_eee(struct net_device *ndev, struct ethtool_keee *edata)
->  {
->  	struct fec_enet_private *fep = netdev_priv(ndev);
-> -	struct ethtool_keee *p = &fep->eee;
->  
->  	if (!(fep->quirks & FEC_QUIRK_HAS_EEE))
->  		return -EOPNOTSUPP;
-> @@ -3206,8 +3204,6 @@ fec_enet_set_eee(struct net_device *ndev, struct ethtool_keee *edata)
->  	if (!netif_running(ndev))
->  		return -ENETDOWN;
->  
-> -	p->tx_lpi_timer = edata->tx_lpi_timer;
-> -
->  	return phy_ethtool_set_eee(ndev->phydev, edata);
->  }
->  
-> -- 
-> 2.30.2
-> 
-> 
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Looks much better now. Please address one more issue I just noticed.
+
+> +
+> +       mutex_init(&data->irq_lock);
+
+This is never destroyed. Please use devm_mutex_init() preferably to
+not add remove(). Also, the other mutex doesn't seem to be initialized
+at all.
+
+Bart
 
