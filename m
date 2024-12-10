@@ -1,145 +1,112 @@
-Return-Path: <netdev+bounces-150731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF5B79EB5B5
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 17:10:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A53AB9EB5BD
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 17:12:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F6D5162B5C
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:10:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF9A01883E36
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8441BFE0D;
-	Tue, 10 Dec 2024 16:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 683071BD9DD;
+	Tue, 10 Dec 2024 16:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ODwTq95q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sD1sQ5NL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1453E1BDABE;
-	Tue, 10 Dec 2024 16:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D8C1BBBC6
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 16:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733847028; cv=none; b=qqmMT9W8KN5gFxT9wrwV4vyI/IIjWLBJA+7qO5YlLld43MWyStwr7f8if26ELQxeiKrowGxtoqW14ZxKmwCG/ZBs6PUP8wHjkP6I8FQBBJ07x1uvpdASw0sYoTx5RH3gvUO4D3P9qp1ipb8D6zETyz1EqlxFWruh8Q6Rh1HDiA8=
+	t=1733847172; cv=none; b=RZ+l9G1PlJqL8wh1/C9uDYjUozHHlZ60jYlRKiEafWTIl2h+GQTFdZBdREKy3ylzx6hgzaNEGjfI6cFmVoqlNhRrpYjRGO48Vr+oeDPABuWN7x3EfSdJ6H6yt+PAwSk7+afpctS0/DdZmYk/Hm31F83/hwqeIcWXCMhNxfooUJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733847028; c=relaxed/simple;
-	bh=aAV1ttlGf9XkPkPC37hCTTwpTpgbklabITddkLKpu3M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S1wWfowVcn/ngvR7EjWjPCJFNtpDQnuX9XTitg4JyDFWOydf/3CB6X8XlQruwfoNmtLDwqXcD1Q8YUtO5PAOdq/dGwTJiYP6aVFPp8baFIqOT8QmWU9w8Jm2lOqNYRitdcx6T652SXZ/2xT2I6LQrHiAXZC7hQr5FI3G9/42RlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ODwTq95q; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-728ea1573c0so438796b3a.0;
-        Tue, 10 Dec 2024 08:10:26 -0800 (PST)
+	s=arc-20240116; t=1733847172; c=relaxed/simple;
+	bh=IEEi6Rs914XyJs+OK5nkfUNZ57Kyhb85U4z8bcFbL2o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=svK2VSQMspFxpCXSq8JwkinIi5x/DrY76LOZyzg+qBhJmrjnHsOJfVqXaIcPtn+9jL9hQEm9tGaMx3IIsz2j3QDiQAm5FUqwpEzE072wpXkGxq5mchztPxN10BvyQEo6HKcGMRqxUqFJfXcd/Tu4fKin/iCm8+U4ujAQnjOYvbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sD1sQ5NL; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d122cf8e52so9074684a12.1
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 08:12:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733847026; x=1734451826; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nG2ao3wocTl4ojmZx0A0uC7NWJk+M9hRa4s4yysqSkY=;
-        b=ODwTq95qyGtVgEuqgS0ilHqQINOY3guU34sTYkLvXBkUq3OijK8q4pl+pcp3OOkfMM
-         gYMHAGzo6qXv1CoJsuHdAWvXJsYEA+CV9w7uQWu3ljHOrC8zub4D6bWvxgsyLUQHCyl3
-         jBFlYigcVK9gM9FBAI0u9eQfoEJOL3XwkndWZE90rBkeOYjNjwe7HBUtGq68uRp7cvnt
-         orTNH6GcMFJe7Jr3GoQRWymV6iZ/B8Np7QJABoyrovFMFWLEwSM8UgoGVgrSwgp/aNzs
-         z5juZGBoTgFd8k29z5/n9Wz7xscKplad3oi72fT5ItG7EnJyBsVpS7c4K+QM6FE9tHPE
-         ZKDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733847026; x=1734451826;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1733847169; x=1734451969; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nG2ao3wocTl4ojmZx0A0uC7NWJk+M9hRa4s4yysqSkY=;
-        b=A6q7r6zh0UJidUu4Ls+e5xpSZ0mP2ZDPPV7q4a6Dj+M3jM95uP2EXm5ozVbAUrsu6U
-         wTRCJ1/uT0qOmgnp10qFR8LLqYQfd+ayyN1X4TC3uXofnXdd20ri5a8LNXBszUQm+cgJ
-         /1eshvpa1lv6kNPEQFLLC+Nklbj5w5AxY1By9bc1IWHioB7whL9qJgLj328cDPwia2Gm
-         9cDjQbZQtOmojOiCYZAM8zaqwPm9XAD6cmYQcjqmij4/hseAp1P1MV4r0yx0zP1jogbm
-         TNQEhwlvD23kHsJeoC8A9XtX2UMtcHGvUc86gOjceFYsfs5+A0oPvm22phiz1/BLD2XV
-         9+pg==
-X-Forwarded-Encrypted: i=1; AJvYcCUWDXdA3Toti3I6G/gOHGjahrCI7D0+UGMxcHK/k9qbtg8oIKEzQoNyZP0CZpg0DiD9vZKP+KXV@vger.kernel.org, AJvYcCVsY8b+P/CVrpnFT7WCc3wB1RAetIuwz52JVa6NEEv3twU5y6FfVkxWHg2YG6jbCdScI61RAg0Q@vger.kernel.org, AJvYcCWMcOkSRESzHPaIj3q28lh9Aq6lkOButOhMvCipFhoSANPfhOS9o02Psq4iklndTXn8Ixyjfz7jCn+Webc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8AU4A5CfQaLs6GxoczVDZlN6uX9y5ttgvDd+BT8g1PInR2CPe
-	BEvdl0lQKJRLP6W5HwbZrgaMgeYWSw8IKna0sfYepvJW/yHhoI73
-X-Gm-Gg: ASbGncv6hVl6Ny3mNwT/XDYQZ0lNJnGrVIFhPbBTu7tCwlsr9tEvBBxdHTPfhV0wDwz
-	kJGF7nFC//14fJ24K956cO0fur/bo1d539YtX+cObZY93c6zPzrLVXSGTO3i4K3wBdY/ZCWQgN5
-	NAU37lPG+PHAv2WPwYAXCL+rdpTMTmWOyR9YRQAS46EXbJtmeArycU/YwFtSQAYviW4y/Kxkhox
-	mPOZ3hrEiuQuA586t52vVAKfgR/DDJw7lASHK/CEbzPXKCOFSPOviMifLefSKWSFwjc6xR2dXnI
-	PWNKX0AfFYD9
-X-Google-Smtp-Source: AGHT+IEAkBsbIsMo38CZywg50F4iK7XY9L0JeGmqbkviqzpzFb8HQ1tBYdBVreKjLDfyfZK7ZLEh1w==
-X-Received: by 2002:a05:6a20:244f:b0:1e1:bf3d:a190 with SMTP id adf61e73a8af0-1e1bf3da46bmr964419637.30.1733847026107;
-        Tue, 10 Dec 2024 08:10:26 -0800 (PST)
-Received: from xiberoa (c-76-103-20-67.hsd1.ca.comcast.net. [76.103.20.67])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-725f19a6197sm3432996b3a.198.2024.12.10.08.10.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 08:10:25 -0800 (PST)
-Date: Tue, 10 Dec 2024 08:10:22 -0800
-From: Frederik Deweerdt <deweerdt.lkml@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: David.Laight@ACULAB.COM, davem@davemloft.net, dhowells@redhat.com,
-	edumazet@google.com, horms@kernel.org, jdamato@fastly.com,
-	kuba@kernel.org, linux-kernel@vger.kernel.org, mhal@rbox.co,
-	netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org,
-	xiyou.wangcong@gmail.com
-Subject: Re: [PATCH v2 net] splice: do not checksum AF_UNIX sockets
-Message-ID: <Z1hn7p4T7_NTVbzN@xiberoa>
-References: <Z1fMaHkRf8cfubuE@xiberoa>
- <20241210081721.66479-1-kuniyu@amazon.com>
+        bh=IEEi6Rs914XyJs+OK5nkfUNZ57Kyhb85U4z8bcFbL2o=;
+        b=sD1sQ5NLqBqIHikLU1Jxpgt5cxV/2vSow+crbeVGudUxrSIppwpDDugwUdWm4dAXr2
+         BRmQZgRePiaoPTBwN7lrMMu60aR8Yl/PSPTQJkizhJDQYrMUZaqGlQKWfrgiUHYk96cU
+         yV7Scumy2/jGwUMmQAJDKppYsCXDMSYcKBt+QBfkDgKVJPraF0Jroux0o4McnEEbx8WF
+         hDx+C7UIZndQ009CTGICrxdig1N1XUiudj15HRcovqAuklY8EG+3IGGIyw9bSZFajqj1
+         xV0Tv+cesK3VIW/VKGQBaRVf02UMd2sabcMXlZ2w8aALbx9hBKy52iSZ+BUeZGAnwdcX
+         2niQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733847169; x=1734451969;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IEEi6Rs914XyJs+OK5nkfUNZ57Kyhb85U4z8bcFbL2o=;
+        b=srbaykn5uBjAcRHnEecFfDP/kaj5fW4cHkghZmEV09wa7BkxzJOP+nF5Y59wEEhyG5
+         XQJqZ9bWa/pmEjTo0FIJQMCOvhW/uCkv965wKF4v2R9ee/F1tvIoyHpjZIBnL0+fwGZm
+         WL9E0uW1VIPSj2NGJ2ZHf6JGyD0vvv2NYPJBC5vzaJnfJGQ7SbCTQkJ36bql6QIPZYDn
+         4c3p9Wt/RWohqyBse+zmNVO6Mb65e+UvbsPKXIaG6YR8O6P0Xvx3Tb8V8f67+W3npXJK
+         R3QGfN9fSRYm/DPl8mXl7rPMwPN8VTp6aXOL0hR/7sj31Nd5w4tn8oJdbagOt+FGklPI
+         eS+A==
+X-Gm-Message-State: AOJu0Yyils+TjwhvSQdHKBK8lXJYFn2JfIXOuiT4F9HmNFDaVjzbVPv7
+	q5tpkF0BU5ZWNkYG7ucUAaG+akhfnrZeV51kBItmKCz9MBsRNTJn7w9TkKr5MShUXtLZhv8ioqI
+	Zy/nXzfV5iSkC6ooHBnTcwAHe1tjPq4t8cd7fko9KnECL5tXinWJ1
+X-Gm-Gg: ASbGnctwXK1xBZ/QXHEFFLznLIWg1n7hu9S6Yv4eR2dTTYJigrs7k5QRXYJgiqlAjmI
+	lTkcW8n4ZpXAO+rUhVrrStBVT4VYGpITIgjM=
+X-Google-Smtp-Source: AGHT+IFC/KNyJLyHI2/ye5Ac84Q8Z6BtOd46kGclCv+WlL7f+aQgPRnclsq5M6vaWLh6SgB/Z9DJNBgT1+mVN6Bg9Lc=
+X-Received: by 2002:a05:6402:1e90:b0:5d0:d610:caa2 with SMTP id
+ 4fb4d7f45d1cf-5d4185fe2aamr6068148a12.26.1733847168800; Tue, 10 Dec 2024
+ 08:12:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241210081721.66479-1-kuniyu@amazon.com>
+References: <Z1fMaHkRf8cfubuE@xiberoa>
+In-Reply-To: <Z1fMaHkRf8cfubuE@xiberoa>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 10 Dec 2024 17:12:37 +0100
+Message-ID: <CANn89iLgWc6vZZo0tD0XVg0zY-T-eUjKj4r=O_B3QARjFB755Q@mail.gmail.com>
+Subject: Re: [PATCH v2 net] splice: do not checksum AF_UNIX sockets
+To: Frederik Deweerdt <deweerdt.lkml@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Michal Luczaj <mhal@rbox.co>, David Howells <dhowells@redhat.com>, 
+	linux-kernel@vger.kernel.org, xiyou.wangcong@gmail.com, 
+	David.Laight@aculab.com, jdamato@fastly.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 10, 2024 at 05:17:21PM +0900, Kuniyuki Iwashima wrote:
-> From: Frederik Deweerdt <deweerdt.lkml@gmail.com>
-> Date: Mon, 9 Dec 2024 21:06:48 -0800
-> > When `skb_splice_from_iter` was introduced, it inadvertently added
-> > checksumming for AF_UNIX sockets. This resulted in significant
-> > slowdowns, for example when using sendfile over unix sockets.
-> > 
-> > Using the test code in [1] in my test setup (2G single core qemu),
-> > the client receives a 1000M file in:
-> > - without the patch: 1482ms (+/- 36ms)
-> > - with the patch: 652.5ms (+/- 22.9ms)
-> > 
-> > This commit addresses the issue by marking checksumming as unnecessary in
-> > `unix_stream_sendmsg`
-> > 
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Frederik Deweerdt <deweerdt.lkml@gmail.com>
-> > Fixes: 2e910b95329c ("net: Add a function to splice pages into an skbuff for MSG_SPLICE_PAGES")
-> > ---
-> 
-> For the future submission, it would be nice to explain changes
-> between versions and add the old patch link under '---' here.
-> 
-Will do, thank you.
+On Tue, Dec 10, 2024 at 6:06=E2=80=AFAM Frederik Deweerdt
+<deweerdt.lkml@gmail.com> wrote:
+>
+> When `skb_splice_from_iter` was introduced, it inadvertently added
+> checksumming for AF_UNIX sockets. This resulted in significant
+> slowdowns, for example when using sendfile over unix sockets.
+>
+> Using the test code in [1] in my test setup (2G single core qemu),
+> the client receives a 1000M file in:
+> - without the patch: 1482ms (+/- 36ms)
+> - with the patch: 652.5ms (+/- 22.9ms)
+>
+> This commit addresses the issue by marking checksumming as unnecessary in
+> `unix_stream_sendmsg`
+>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Frederik Deweerdt <deweerdt.lkml@gmail.com>
+> Fixes: 2e910b95329c ("net: Add a function to splice pages into an skbuff =
+for MSG_SPLICE_PAGES")
+> ---
 
-> The patch itself looks good to me.
-> 
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> 
-
-Thanks!
-Frederik
-> >  net/unix/af_unix.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> > index 001ccc55ef0f..6b1762300443 100644
-> > --- a/net/unix/af_unix.c
-> > +++ b/net/unix/af_unix.c
-> > @@ -2313,6 +2313,7 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
-> >  		fds_sent = true;
-> >  
-> >  		if (unlikely(msg->msg_flags & MSG_SPLICE_PAGES)) {
-> > +			skb->ip_summed = CHECKSUM_UNNECESSARY;
-> >  			err = skb_splice_from_iter(skb, &msg->msg_iter, size,
-> >  						   sk->sk_allocation);
-> >  			if (err < 0) {
-> > -- 
-> > 2.44.1
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
