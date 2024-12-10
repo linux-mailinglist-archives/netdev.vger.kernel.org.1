@@ -1,157 +1,303 @@
-Return-Path: <netdev+bounces-150572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D71899EAB7D
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 10:11:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F21619EABC0
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 10:18:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87A01169904
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 09:11:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8EDA1649C0
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 09:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5AD7231C84;
-	Tue, 10 Dec 2024 09:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCEC19A2A2;
+	Tue, 10 Dec 2024 09:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V9njf9N6"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="HaWkhpKj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0924F3594F
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 09:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA202AEE7
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 09:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733821864; cv=none; b=YgpR5bIV7/QTlCmacYniVhj2ZDvfG7Adib7YD2uf2AR4LdSkh3ATrPntgiFrqJioGZf31ZC3mGVqax9c2QyRIWyG51slIY7DJPLHZgOLK2pGiXPjaMJU9XojyAKynaR0Y+s1U9Wg8izlBtH+ieG/TOXTy2pT1/rin9/0wT91eNQ=
+	t=1733822292; cv=none; b=dxswwX03h5emZhdo0RvDqtYIyAa0Jn2jtEifj2FpzMuYlT0tYaRZPgpSYXZKtBNvd34utyJFpihuU+DFHDri/KNV0EA+rYM2PDdpTy7q+SyxlNK5xD4VDUVqLZpl+qpteP1KNwLGk656AjdnOZy4aI29PTT7OfoYkRrxdA+CD4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733821864; c=relaxed/simple;
-	bh=FYZIxQmGdoU5CuxW7RTygdZwcilWga9GvXgO/U4UFRg=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=fXBCXpFrh4//6Q8tnJhdi8ffAIyxirUCAFQ3sOWk+9OmHXr6Svhc+6UOoc+Syc/CRjaknMaGxYVlZByoyuvGB9Qu9ht+Q9aTt6MKulfz7AumqAwa8oI8sPmq1JuEmm9j75Dqzh2HkItTZz4SgOitn4TACJv+jIblO3LQeb+FK0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V9njf9N6; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-30219437e63so21669201fa.1
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 01:11:02 -0800 (PST)
+	s=arc-20240116; t=1733822292; c=relaxed/simple;
+	bh=BHIwuyVRVDTramqPxGogCek36o5nJEkzLna4vKGthYc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JZuMNHbTsQIFa6rqa4kpZbVTjherD3j3REwpX1CGznftL+sMMTXk1a4PSxsnqE1aV/WgczZHWwPdLQaG/FT3DYuCNRdaXK8WAwJkl6S0m/cnRMGSr+nulOoSmeUfhxRGy64ONykTzcGeqVZS9HKvK6r8p9Ly0kitTftkNqkxbiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=HaWkhpKj; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aa679ad4265so393341966b.0
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 01:18:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733821861; x=1734426661; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5r0qQ2ezkJ7/oGwgp8X3sR05EJzkEKlPE/XPTMcBSgI=;
-        b=V9njf9N697gmzGauCHenv1JnxzdsDUMkMAD300t5kmMDN030p099OEMvpVBoFeRPu5
-         SIICHTYitph5nKQIOCT9ppitTgmHN2h2Lu7ptN3O4VodVzUj4JZsFLcD5cMBmEkRCa79
-         sgbK0vunlo7ZZi7um1qUzTGPiG3O69e+y6Q56dwit4QMvzi8LL9yj568niTjjiQcGZ9M
-         9HnxXdRQC1BlupyzaUtWMFSFgR1VroggcioXJYy9tn4g9QG8IkP2LEU/kr5Ps3rfU47k
-         740aj3Es01dtUiuZKk8ardK5Bjy2rehXuB4jPwNnE8TPRT2j8Fql/KQlugODEBQv0Xt1
-         yabA==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1733822288; x=1734427088; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ynIeX8CMo+FB5eBdTlxaT5BUGhWdIHXwoHgPtyiP0u4=;
+        b=HaWkhpKjF5z/3LKheYmCsuL2iMtRk1xfmtw6QpMTeyHpD4LP8t+W+PxGdiITFAyOIe
+         /HDzPftaL69fv/clulnqYCTyZPBO57ZW5pj8nhMEDJf0rXpVSBx4ts2LTwpFYjNQYj86
+         0Yu3EoZLorqal/ASQkRRCSy4G4oG5rRmryMQGbCXrsWD2+PuNvvWe9Cv0xQsh8Aon85g
+         yI7mBHkODC1Jnd7Avd6KU8txTb9LGOtBKtdPwpWASPsxQVgegsCH72k7nW6urGF+RMUB
+         ZnZjd81COYwk2sBK1vpXfY9VHdW1b51lspHovb1Rot2Dr67KHYRb40r/m0NMqK4imEeT
+         zS7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733821861; x=1734426661;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5r0qQ2ezkJ7/oGwgp8X3sR05EJzkEKlPE/XPTMcBSgI=;
-        b=Psajt2WzbuUHcU52vWabDBsNRTgGhZAvWMvAii6pXl7vm/0LJ29vbsqSLWLXRA6jU9
-         u3YNI1V3lZkN2TkgZWd2cRlTb6Dt1PHhC+eLBckozMHoydljPBkkXptSyh4Q+bqAOfSD
-         2sZFwCxjkRUYGh7X2P7PXQIZmkTEv0AW7RezTJtgSORvovSLRQo5v/k66yhEi7a1G/TZ
-         9WbvE75hI4VQZjwq69IgFlfmuqtVv3nIDTPK4WtoFiEQKmsfW3qOXYwoft6IVlgxc/Fx
-         DYMhV9lxJWNXET0CxazU25WFXi21FAbjSsVob2quVVrU9DrVSuCbrQg/GMkLQfH1eNVI
-         i/Jw==
-X-Forwarded-Encrypted: i=1; AJvYcCXYYn2H+R4MsmpuYQlzx4snHdhld93oJ4zJTFqOvpccwPkmVhCTFfpWm1/YKO/oiU5pKNH2Hfc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUbmYwtyTT1Yr5iUZNlrnlPmpuwZzqbx7W4ELZFr/glSS4mpis
-	UsZLhXBFph51dafKNUV65/+AITMVvP26OD6685k1JPJ5nwUfI88t
-X-Gm-Gg: ASbGncs4bzwrFWco7B/MLZqVhPoySmxxpdVeVaD3L4ncmRQI06eypakgjEtp5ayJk6y
-	lhC+0Eo1EylcX4YXvrRRL4j1VrFFbLE6mqODax+DuXL9+YD1JYcuxRTLjf9D+VwGHhGaKUn56Zp
-	qIREMPld4Nqdcw0MuLIo1INIAIxoca1bJSAtaNWb+9mbuUuxLKwyF9xQUVG9YlIMH6S1faPi0LK
-	Zw5j8Fnp69BvARqKQUvEviN6esH79J2mLRvbZJPfSigb+E/kKVEzgQHYLlcEHkS8/yVTxPHjdHx
-	nPAFr4uGQaDWpJN7dBqxMjcc5MpfyNka
-X-Google-Smtp-Source: AGHT+IHKuLaZ67ed/t7U1qFVOtaSXGbhD9n6clTTeNbse3gM19AKEUQxc+NyN16SXnoXpPV07iTXyQ==
-X-Received: by 2002:a05:651c:1141:b0:302:1cdd:73b9 with SMTP id 38308e7fff4ca-30232853420mr7201611fa.11.1733821860753;
-        Tue, 10 Dec 2024 01:11:00 -0800 (PST)
-Received: from smtpclient.apple (188-67-132-152.bb.dnainternet.fi. [188.67.132.152])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-300431a561csm9788831fa.116.2024.12.10.01.10.58
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 10 Dec 2024 01:10:59 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
+        d=1e100.net; s=20230601; t=1733822288; x=1734427088;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ynIeX8CMo+FB5eBdTlxaT5BUGhWdIHXwoHgPtyiP0u4=;
+        b=LWBzoNVzNwSvp90nkWzU/YggcbYpv/mR9d1f1u8wKX8PJf82tcOzjGCGhRmEiq7Qcm
+         JHxhKPxUmeUqS0l7FLOwceRxCN/KrHQ9n0Tc4INE6HZzQAOgUaHOMvxOtJX93NVHWeYG
+         3sNZXgk6g4m1ZaViDpkTBhcPctm+ED5IegShIYiisC9PhqZhPZPRIK/VKE1SI38mj8aF
+         I3DGNCx2WOLw+rU7x+YfByaX/C8C7GO8meGixKzPzJOf/Q/Joj6ia4cteG176WE2KNoT
+         4VaJmUplh5yY14kzH8ud95GYa5K9DfPXIkyewqgfZnrBSe1tm1w9PJoQzZ3ZW6vfi1GK
+         1Akw==
+X-Forwarded-Encrypted: i=1; AJvYcCV9zcKtfD+Ef+5yq80YtM8gL7i4i0W9f1fq6ZV3CAjYieiixvhg3ab0aVvxK+d3XKEAwbM2zV4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXy/c3w6XBNqeTB9uOz6KYNjhKSDalnzumljh0kBNb6O6EReWa
+	1RmvwpONu3SZWArA4KgnmN/IeFclRIEhHM4GGW4/9WIGwI9EL2v/BaD0MZnZaU4=
+X-Gm-Gg: ASbGncvzy1eW44kd0DsKPEkleAK34RERjBUjS2QsASpHk6AUZBkbxMbdoSXsT6bhMbf
+	rRmYtI0bSCCZvyrFA+cJDTXIL82iID1PF2Jp8Vcu4OXPVRYOc3O/Ah4nMX/2NfsoSXbyF58HZS/
+	3OX6pxQa9YFb7J1S5FfU3Pi9ImBqQ/9CkoPDxbd4Npq46OxciShI+KGcu1C4mVAuDuVJK2H5kkg
+	T862jRtjADsDVu1MGYoNVrwrqK49d3o9ZbuPbXjPt7RYaSu78s40Da0
+X-Google-Smtp-Source: AGHT+IHt+ztASsOAIEt43c3x+zcLdVr12T5oX+eMBT4pTUFNWrnSCeXg29EJFBXBd9jNq3Mfw6VbKA==
+X-Received: by 2002:a17:906:3089:b0:aa6:7c36:3428 with SMTP id a640c23a62f3a-aa69fe12147mr278318366b.0.1733822288267;
+        Tue, 10 Dec 2024 01:18:08 -0800 (PST)
+Received: from [192.168.0.123] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa67d6fcd3dsm352670366b.80.2024.12.10.01.18.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2024 01:18:07 -0800 (PST)
+Message-ID: <2283799b-e1fe-42c2-aecc-50c4ae1f9afa@blackwall.org>
+Date: Tue, 10 Dec 2024 11:18:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [Cake] [PATCH net-next] net_sched: sch_cake: Add drop reasons
-From: Jonathan Morton <chromatix99@gmail.com>
-In-Reply-To: <87a5d46i9c.fsf@toke.dk>
-Date: Tue, 10 Dec 2024 11:10:57 +0200
-Cc: Dave Taht <dave.taht@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Jiri Pirko <jiri@resnulli.us>,
- netdev@vger.kernel.org,
- Jamal Hadi Salim <jhs@mojatatu.com>,
- cake@lists.bufferbloat.net,
- Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>,
- Cong Wang <xiyou.wangcong@gmail.com>,
- Paolo Abeni <pabeni@redhat.com>,
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/bridge: Add skb drop reasons to the most
+ common drop points
+To: Radu Rendec <rrendec@redhat.com>, Roopa Prabhu <roopa@nvidia.com>
+Cc: bridge@lists.linux.dev, netdev@vger.kernel.org,
+ Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
  "David S. Miller" <davem@davemloft.net>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <C2055FB9-8EA4-486D-9654-84ED422A4A0C@gmail.com>
-References: <20241209-cake-drop-reason-v1-1-19205f6d1f19@redhat.com>
- <20241209155157.6a817bc5@kernel.org>
- <CAA93jw4chUsQ40LQStvJBeOEENydbv58gOWz8y7fFPJkATa9tA@mail.gmail.com>
- <87a5d46i9c.fsf@toke.dk>
-To: =?utf-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
+References: <20241208221805.1543107-1-rrendec@redhat.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20241208221805.1543107-1-rrendec@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> On 10 Dec, 2024, at 10:42 am, Toke H=C3=B8iland-J=C3=B8rgensen via =
-Cake <cake@lists.bufferbloat.net> wrote:
->=20
->>> On Mon, 09 Dec 2024 13:02:18 +0100 Toke H=C3=B8iland-J=C3=B8rgensen =
-wrote:
->>>> Add three qdisc-specific drop reasons for sch_cake:
->>>>=20
->>>> 1) SKB_DROP_REASON_CAKE_CONGESTED
->>>>    Whenever a packet is dropped by the CAKE AQM algorithm because
->>>>    congestion is detected.
->>>>=20
->>>> 2) SKB_DROP_REASON_CAKE_FLOOD
->>>>    Whenever a packet is dropped by the flood protection part of the
->>>>    CAKE AQM algorithm (BLUE).
->>>>=20
->>>> 3) SKB_DROP_REASON_CAKE_OVERLIMIT
->>>>    Whenever the total queue limit for a CAKE instance is exceeded =
-and a
->>>>    packet is dropped to make room.
->>>=20
->>> Eric's patch was adding fairly FQ-specific reasons, other than flood
->>> this seems like generic AQM stuff, no? =46rom a very quick look the
->>> congestion looks like fairly standard AQM, overlimit is also typical
->>> for qdics?
->>=20
->> While I initially agreed with making this generic, preserving the =
-qdisc from
->> where the drop came lets you safely inspect the cb block (timestamp, =
-etc),
->> format of which varies by qdisc. You also get insight as to which
->> qdisc was dropping.
->>=20
->> Downside is we'll end up with SKB_DROP_REASON_XXX_OVERLIMIT for
->> each of the qdiscs. Etc.
->=20
-> Yeah, I agree that a generic "dropped by AQM" reason will be too =
-generic
-> without knowing which qdisc dropped it. I guess any calls directly to
-> kfree_skb_reason() from the qdisc will provide the calling function, =
-but
-> for qdisc_drop_reason() the drop will be deferred to =
-__dev_queue_xmit(),
-> so no way of knowing where the drop came from, AFAICT?
+On 12/9/24 00:18, Radu Rendec wrote:
+> The bridge input code may drop frames for various reasons and at various
+> points in the ingress handling logic. Currently kfree_skb() is used
+> everywhere, and therefore no drop reason is specified. Add drop reasons
+> to the most common drop points.
+> 
+> The purpose of this patch is to address the most common drop points on
+> the bridge ingress path. It does not exhaustively add drop reasons to
+> the entire bridge code. The intention here is to incrementally add drop
+> reasons to the rest of the bridge code in follow up patches.
+> 
+> Most of the skb drop points that are addressed in this patch can be
+> easily tested by sending crafted packets. The diagram below shows a
+> simple test configuration, and some examples using `packit`(*) are
+> also included. The bridge is set up with STP disabled.
+> (*) https://github.com/resurrecting-open-source-projects/packit
+> 
+> The following changes were *not* tested:
+> * SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT in br_multicast_flood(). I could
+>   not find an easy way to make a crafted packet get there.
+> * SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD in br_handle_frame_finish()
+>   when the port state is BR_STATE_DISABLED, because in that case the
+>   frame is already dropped in the switch/case block at the end of
+>   br_handle_frame().
+> 
+>     +---+---+
+>     |  br0  |
+>     +---+---+
+>         |
+>     +---+---+  veth pair  +-------+
+>     | veth0 +-------------+ xeth0 |
+>     +-------+             +-------+
+> 
+> SKB_DROP_REASON_MAC_INVALID_SOURCE - br_handle_frame()
+> packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+>   -e 01:22:33:44:55:66 -E aa:bb:cc:dd:ee:ff -c 1 \
+>   -p '0x de ad be ef' -i xeth0
+> 
+> SKB_DROP_REASON_MAC_IEEE_MAC_CONTROL - br_handle_frame()
+> packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+>   -e 02:22:33:44:55:66 -E 01:80:c2:00:00:01 -c 1 \
+>   -p '0x de ad be ef' -i xeth0
+> 
+> SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD - br_handle_frame()
+> bridge link set dev veth0 state 0 # disabled
+> packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+>   -e 02:22:33:44:55:66 -E aa:bb:cc:dd:ee:ff -c 1 \
+>   -p '0x de ad be ef' -i xeth0
+> 
+> SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD - br_handle_frame_finish()
+> bridge link set dev veth0 state 2 # learning
+> packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+>   -e 02:22:33:44:55:66 -E aa:bb:cc:dd:ee:ff -c 1 \
+>   -p '0x de ad be ef' -i xeth0
+> 
+> SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT - br_flood()
+> packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+>   -e 02:22:33:44:55:66 -E aa:bb:cc:dd:ee:ff -c 1 \
+>   -p '0x de ad be ef' -i xeth0
+> 
+> Signed-off-by: Radu Rendec <rrendec@redhat.com>
+> ---
+>  include/net/dropreason-core.h | 18 ++++++++++++++++++
+>  net/bridge/br_forward.c       |  4 ++--
+>  net/bridge/br_input.c         | 24 +++++++++++++++---------
+>  3 files changed, 35 insertions(+), 11 deletions(-)
+> 
 
-Would it make sense to be able to extract a "generic" code by applying a =
-bitmask?  Leave code space for "qdisc specific" reasons within that =
-mask.  Then people who don't care about qdisc internals can still =
-reliably interpret the codes, even for future qdiscs.
+Hi,
+Thanks for working on this, a few comments below.
 
- - Jonathan Morton=
+> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+> index c29282fabae6..1f2ae5b387c1 100644
+> --- a/include/net/dropreason-core.h
+> +++ b/include/net/dropreason-core.h
+> @@ -108,6 +108,9 @@
+>  	FN(TUNNEL_TXINFO)		\
+>  	FN(LOCAL_MAC)			\
+>  	FN(ARP_PVLAN_DISABLE)		\
+> +	FN(MAC_IEEE_MAC_CONTROL)	\
+> +	FN(BRIDGE_INGRESS_PORT_NFWD)	\
+> +	FN(BRIDGE_NO_EGRESS_PORT)	\
+>  	FNe(MAX)
+>  
+>  /**
+> @@ -502,6 +505,21 @@ enum skb_drop_reason {
+>  	 * enabled.
+>  	 */
+>  	SKB_DROP_REASON_ARP_PVLAN_DISABLE,
+> +	/**
+> +	 * @SKB_DROP_REASON_MAC_IEEE_MAC_CONTROL: the destination MAC address
+> +	 * is an IEEE MAC Control address.
+> +	 */
+> +	SKB_DROP_REASON_MAC_IEEE_MAC_CONTROL,
+> +	/**
+> +	 * @SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD: the STP state of the
+> +	 * ingress bridge port does not allow frames to be forwarded.
+> +	 */
+> +	SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD,
+
+Since this is used only when the port state causes the packet to drop, why not
+rename it to something that suggests it was the state?
+
+> +	/**
+> +	 * SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT: no eligible egress port was
+> +	 * found while attempting to flood the frame.
+> +	 */
+> +	SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT,
+>  	/**
+>  	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+>  	 * shouldn't be used as a real 'reason' - only for tracing code gen
+> diff --git a/net/bridge/br_forward.c b/net/bridge/br_forward.c
+> index e19b583ff2c6..e33e2f4fc3d9 100644
+> --- a/net/bridge/br_forward.c
+> +++ b/net/bridge/br_forward.c
+> @@ -249,7 +249,7 @@ void br_flood(struct net_bridge *br, struct sk_buff *skb,
+>  
+>  out:
+>  	if (!local_rcv)
+> -		kfree_skb(skb);
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT);
+
+This is not entirely correct, we can get here if we had an error forwarding
+the packet to some port, but it may already have been forwarded to others.
+The reason should distinguish between those two cases.
+
+>  }
+>  
+>  #ifdef CONFIG_BRIDGE_IGMP_SNOOPING
+> @@ -349,6 +349,6 @@ void br_multicast_flood(struct net_bridge_mdb_entry *mdst,
+>  
+>  out:
+>  	if (!local_rcv)
+> -		kfree_skb(skb);
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT);
+
+Same comment as above (br_flood).
+
+>  }
+>  #endif
+> diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
+> index ceaa5a89b947..fc00e172e1e1 100644
+> --- a/net/bridge/br_input.c
+> +++ b/net/bridge/br_input.c
+> @@ -96,8 +96,10 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
+>  	if (br_mst_is_enabled(br)) {
+>  		state = BR_STATE_FORWARDING;
+>  	} else {
+> -		if (p->state == BR_STATE_DISABLED)
+> -			goto drop;
+> +		if (p->state == BR_STATE_DISABLED) {
+> +			kfree_skb_reason(skb, SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD);
+> +			return 0;
+> +		}
+>  
+>  		state = p->state;
+>  	}
+> @@ -155,8 +157,10 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
+>  		}
+>  	}
+>  
+> -	if (state == BR_STATE_LEARNING)
+> -		goto drop;
+> +	if (state == BR_STATE_LEARNING) {
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD);
+> +		return 0;
+> +	}>  
+>  	BR_INPUT_SKB_CB(skb)->brdev = br->dev;
+>  	BR_INPUT_SKB_CB(skb)->src_port_isolated = !!(p->flags & BR_ISOLATED);
+> @@ -331,8 +335,10 @@ static rx_handler_result_t br_handle_frame(struct sk_buff **pskb)
+>  	if (unlikely(skb->pkt_type == PACKET_LOOPBACK))
+>  		return RX_HANDLER_PASS;
+>  
+> -	if (!is_valid_ether_addr(eth_hdr(skb)->h_source))
+> -		goto drop;
+> +	if (!is_valid_ether_addr(eth_hdr(skb)->h_source)) {
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_MAC_INVALID_SOURCE);
+> +		return RX_HANDLER_CONSUMED;
+> +	}
+>  
+>  	skb = skb_share_check(skb, GFP_ATOMIC);
+>  	if (!skb)
+> @@ -374,7 +380,8 @@ static rx_handler_result_t br_handle_frame(struct sk_buff **pskb)
+>  			return RX_HANDLER_PASS;
+>  
+>  		case 0x01:	/* IEEE MAC (Pause) */
+> -			goto drop;
+> +			kfree_skb_reason(skb, SKB_DROP_REASON_MAC_IEEE_MAC_CONTROL);
+> +			return RX_HANDLER_CONSUMED;
+>  
+>  		case 0x0E:	/* 802.1AB LLDP */
+>  			fwd_mask |= p->br->group_fwd_mask;
+> @@ -423,8 +430,7 @@ static rx_handler_result_t br_handle_frame(struct sk_buff **pskb)
+>  
+>  		return nf_hook_bridge_pre(skb, pskb);
+>  	default:
+> -drop:
+> -		kfree_skb(skb);
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD);
+>  	}
+>  	return RX_HANDLER_CONSUMED;
+>  }
+
+Cheers,
+ Nik
+
 
