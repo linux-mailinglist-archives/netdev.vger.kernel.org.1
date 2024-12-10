@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-150520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D86649EA7C2
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:24:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 776829EA7EC
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:36:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E02D1889360
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 05:24:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 823331888E2D
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 05:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA08622616B;
-	Tue, 10 Dec 2024 05:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CE6224AE3;
+	Tue, 10 Dec 2024 05:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SXf6BTqq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BfY3eYyW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492BD1D9A40;
-	Tue, 10 Dec 2024 05:24:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D984279FD;
+	Tue, 10 Dec 2024 05:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733808291; cv=none; b=GrjLwaCSbS4Px0X53OCohhW0e3rL9bpPuPco77jiALvCc3L3fC2hJJ1K7T3T6Lll72s2pOHBCkMdNtXQhYjjXslKEAtTkaqP/ZTml4a8JlTVCPGKWI6LcX5jsD2MyfQj5750i73avyuTNrvLNVE9dZT4dJc7aMEr2q0xig9kU+U=
+	t=1733809009; cv=none; b=upw1kmDJ7gqZZEFowffgoHWM+q7AZ4Hgt4ykR31wuhoxd1gXOW4iFkRVTTvvht+kzujtoahgWaYpRyklziuYufkOZ2rliReP3UWIQQD4Iu4wqmB3HensSNBQyOIWUUeEU7k7o+7u1EceR9EPO7UPANsYIEg8NZ0tw1cwXTzG3Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733808291; c=relaxed/simple;
-	bh=DAxhrU8nYe3wIVwTN/sHDUPcQXoFKKbHmXYU8frJH4s=;
+	s=arc-20240116; t=1733809009; c=relaxed/simple;
+	bh=JrJ8Bm8JAnzs1EDVbuscoVCjq060UBSwKRMNnYePMhU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GTCKoZKvZivP+V4GlMSiLa+JSYMjZlhySwRHLAU2ZsSyr4NX7U+43e1RtuKyEAL8gwJeKtq67Tbculv5P6EUae9jpTaosgNQEQe2Q9T1X75NpNv2xx0wAHR3uujr/Z7z8QjMoLmHVdODDJGXYxl37SA4kuIb6ccPb5PrnojnYCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SXf6BTqq; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733808291; x=1765344291;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=DAxhrU8nYe3wIVwTN/sHDUPcQXoFKKbHmXYU8frJH4s=;
-  b=SXf6BTqqt3Qnx3YmO1u/cfFRn+xCztCQ5xfxwojDjulJxscLVjgAgzx7
-   Gun9e9QGeJ/MA8cJT6TKI9JvUJTRPauaNipUInZoNkEUK0mNnfBjKedZK
-   wwiCSs2rmSyzJtvImtdCV3ulcPhBGQlYsdhR+Gqd+8XC6QsGZiqfCgVwh
-   AKNUF82JswU1SvYJQhCygzDVZ8caoKE2f7/VKQjGNIwJBDbVdtzGAT0Ld
-   GsDndVgB/l6/GtyX4ISQ6kPWtGB4Wd8x/jjgi2O518Mn46vOeIl6RJ+kj
-   iCXpgt43ngpYR7YDdg5PwzDuPV+HkYVCpKTZzNgw8aB1LaMpohVXOe4qL
-   w==;
-X-CSE-ConnectionGUID: B/JfgfNNTOah+X7GUT2+ug==
-X-CSE-MsgGUID: O4zHj/q/TcKCAKB6+A1B0A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11278"; a="45517234"
-X-IronPort-AV: E=Sophos;i="6.12,214,1728975600"; 
-   d="scan'208";a="45517234"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 21:24:50 -0800
-X-CSE-ConnectionGUID: yT3wQW55SUqvh5zoMS2Sng==
-X-CSE-MsgGUID: atNr2jojQd+IxiaOFRtDGw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,221,1728975600"; 
-   d="scan'208";a="95490968"
-Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 09 Dec 2024 21:24:46 -0800
-Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tKsjj-00058n-1q;
-	Tue, 10 Dec 2024 05:24:43 +0000
-Date: Tue, 10 Dec 2024 13:23:47 +0800
-From: kernel test robot <lkp@intel.com>
-To: Inochi Amaoto <inochiama@gmail.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	Inochi Amaoto <inochiama@outlook.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Yixun Lan <dlan@gentoo.org>,
-	Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH 2/2] clk: sophgo: Add clock controller support for SG2044
- SoC
-Message-ID: <202412101358.czZY7XmR-lkp@intel.com>
-References: <20241209082132.752775-3-inochiama@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HRDguUCIrorpjqu54Gml3U1facKl6/zBMfAvfW/dsijcTF6qbsFupqznjp3Hyz40igaH/Y9QSP+mbxnwcGaWDHPhYMqwnwKjrcL8F7s1H3vEL3fE8BxZywh5l68KuPxh05t6X235KMMv8YPEmfnz+he8fdx6YaPPgErx0X4PD2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BfY3eYyW; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7253bc4d25eso3869284b3a.0;
+        Mon, 09 Dec 2024 21:36:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733809007; x=1734413807; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cTgulTHtQgDK3Mg//RjyfQF5xBtvjN618kewj0RHl1g=;
+        b=BfY3eYyWwaqcBFmmsJHqoTjE+AbmmNXz8o7q51BFwyvCoa1oAW/J38Ove54t4oUnjb
+         I2I37Aj9NS1b7H3Po0NqfBcbLDoBSh+fRIDRnQDXWRwrqjtw4AOsyhGcEij1lBhCd852
+         DhznimzHaQkPMm15EO88H+VFmhwzOFZoH6LVAq8doad4t4SS4oGI1z+6/bd5OUz7lPuu
+         cRPiTRaHPYjmw5L0qYEMv9EGqA2N5re+qUBm/ZxRJP0LqdDJR2bIHYLwMtLR+yPr7Yru
+         7eAInku6u1/PgFg5KCrVSQIoIIp/m61gLexw9NiFEilZUH9rgh9DD/Srx8psV0AKRcTs
+         3YuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733809007; x=1734413807;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cTgulTHtQgDK3Mg//RjyfQF5xBtvjN618kewj0RHl1g=;
+        b=GP8rVWizUK/SHNhq08OSIAZF9Ez9AujzTvOQAlodksD7PKjTKt69dd7yoqh2yQCYVQ
+         DeXQBXC8TZp9p4UyMBAFOZnoLbSLW4wnvuGrpbFNB7GxTFEaJks0b7bhEC/lwqcFeHyK
+         yNdi3Yi8/q2lErGwUns/jGlo3bFj6gZCb0QVjUYahxP2Zc1ARXRq0O3K6wpurDiNJD2w
+         d1Aj9WlsuD8lK6zaoY7Wd9ESY3XppwL5oEz0BwI4UUp2WkaraFz7FaxIYVIaNXVfKfYd
+         LzR0N5flC6ZCFGj2GDunZO2zLUOIT18DEm6nnJN40umOCMK0Wi9EYWHbdrQdwtNW7Oyx
+         3C8g==
+X-Forwarded-Encrypted: i=1; AJvYcCUrVibksZY8Z7EA3ZBtkiB0fo1wjD3+mS6RSCo/76QaGxEvWv7XHNxn3YXqwf3p5rj6KRI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVjk99yi4Z1Jl5ACXceCSYzv7XAP3OYHVYvJfMauZk0x8Qqf2m
+	hhV/QmDh3bRwdmv5BD97cQxeWzqc3LY09PrciMPlKwXh9HuD0AHA
+X-Gm-Gg: ASbGncuwetcgrXlVI2Z4WcjmGSZaYPwSxyvBNLbmkAdx4imrLULFmqEL8lN90X7y0st
+	uSn1MmYMbn9ksQsN7K+r1Uy8fWhvhcyovHP6KlnlmDjENYXGU4PTfnmTgzREJSV4Lv/flyD2+to
+	DtLr8G8q62jLmfyxQp9irsvAVgpMn2CZznhrkgcWRHCFbfDFta1ZYXFI5BLjKxb04dxBQP3pn8l
+	nJrHfrb3TOxD4RtNN/lbEElNDRERAyHB4WzHB6X8vHPZW64swjzseD5mAxg
+X-Google-Smtp-Source: AGHT+IGHCqGeWuQm2+dMRoAuMKgYdZfZTJOHBx4K+uZBGL3xSO7lJhwZtv/hOxw2+xYvOwpijgnniw==
+X-Received: by 2002:a05:6a00:4c8c:b0:725:4915:c10 with SMTP id d2e1a72fcca58-72889f31971mr3592224b3a.10.1733809006971;
+        Mon, 09 Dec 2024 21:36:46 -0800 (PST)
+Received: from localhost ([2601:647:6881:9060:5939:82cc:e9ac:c4c3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-725d251137bsm5186974b3a.62.2024.12.09.21.36.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 21:36:46 -0800 (PST)
+Date: Mon, 9 Dec 2024 21:36:45 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+	Cong Wang <cong.wang@bytedance.com>
+Subject: Re: [Patch bpf v2 0/4] bpf: a bug fix and test cases for
+ bpf_skb_change_tail()
+Message-ID: <Z1fTbcRiDRPU9IPQ@pop-os.localdomain>
+References: <20241129012221.739069-1-xiyou.wangcong@gmail.com>
+ <fac7e933-a1cc-4863-9610-f5429da0d849@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,66 +88,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241209082132.752775-3-inochiama@gmail.com>
+In-Reply-To: <fac7e933-a1cc-4863-9610-f5429da0d849@iogearbox.net>
 
-Hi Inochi,
+On Fri, Dec 06, 2024 at 10:35:28PM +0100, Daniel Borkmann wrote:
+> Hi Cong,
+> 
+> On 11/29/24 2:22 AM, Cong Wang wrote:
+> > From: Cong Wang <cong.wang@bytedance.com>
+> > 
+> > This patchset fixes a bug in bpf_skb_change_tail() helper and adds test
+> > cases for it, as requested by Daniel and John.
+> > 
+> > ---
+> > v2: added a test case for TC where offsets are positive
+> >      fixed a typo in 1/4 patch description
+> >      reduced buffer size in the sockmap test case
+> 
+> I ran the selftest several times but it's repeatedly failing whereas
+> without the series bpf tree CI seems fine. The CI fails on tc tests,
+> so potentially patch 4 is causing this.
 
-kernel test robot noticed the following build warnings:
+Ah, thanks for catching it. 
 
-[auto build test WARNING on sophgo/for-next]
-[also build test WARNING on sophgo/fixes clk/clk-next robh/for-next linus/master v6.13-rc2 next-20241209]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Previously, the CI job failed due to flaky tests, which are tests that
+inconsistently pass or fail. However, this time the failure indicates
+a genuine issue.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Inochi-Amaoto/dt-bindings-clock-sophgo-add-clock-controller-for-SG2044/20241209-162418
-base:   https://github.com/sophgo/linux.git for-next
-patch link:    https://lore.kernel.org/r/20241209082132.752775-3-inochiama%40gmail.com
-patch subject: [PATCH 2/2] clk: sophgo: Add clock controller support for SG2044 SoC
-config: parisc-randconfig-r053-20241210 (https://download.01.org/0day-ci/archive/20241210/202412101358.czZY7XmR-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 14.2.0
+> 
+> Switching over to tcx APIs from libbpf might automatically address
+> this given the failures seem to be in 'revision unexpected' which is
+> likely due to legacy libbpf tc APIs detaching but not deleting the
+> underlying qdisc.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412101358.czZY7XmR-lkp@intel.com/
+Sure, thanks for the hint. I will update this patchset.
 
-cocci warnings: (new ones prefixed by >>)
->> drivers/clk/sophgo/clk-sg2044.c:133:1-7: WARNING: do_div() does a 64-by-32 division, please consider using div64_ul instead.
->> drivers/clk/sophgo/clk-sg2044.c:149:1-7: WARNING: do_div() does a 64-by-32 division, please consider using div64_u64 instead.
-
-vim +133 drivers/clk/sophgo/clk-sg2044.c
-
-   126	
-   127	static unsigned long sg2044_pll_calc_vco_rate(unsigned long parent_rate,
-   128						      unsigned long refdiv,
-   129						      unsigned long fbdiv)
-   130	{
-   131		u64 numerator = parent_rate * fbdiv;
-   132	
- > 133		do_div(numerator, refdiv);
-   134	
-   135		return numerator;
-   136	}
-   137	
-   138	static unsigned long sg2044_pll_calc_rate(unsigned long parent_rate,
-   139						  unsigned long refdiv,
-   140						  unsigned long fbdiv,
-   141						  unsigned long postdiv1,
-   142						  unsigned long postdiv2)
-   143	{
-   144		u64 numerator, denominator;
-   145	
-   146		numerator = parent_rate * fbdiv;
-   147		denominator = refdiv * (postdiv1 + 1) * (postdiv2 + 1);
-   148	
- > 149		do_div(numerator, denominator);
-   150	
-   151		return numerator;
-   152	}
-   153	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks.
 
