@@ -1,131 +1,183 @@
-Return-Path: <netdev+bounces-150723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2FBD9EB424
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:59:47 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE4C89EB4AB
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:22:35 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA96C2811FB
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:59:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD16D1882047
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BBBE1B85D3;
-	Tue, 10 Dec 2024 14:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6181D1BAEDC;
+	Tue, 10 Dec 2024 15:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aEeuwa5K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dPlq64R/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079C71B85C2
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 14:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F84B78F23;
+	Tue, 10 Dec 2024 15:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733842775; cv=none; b=av4cNsM2WHY6dD8i9MxnTbwCllP5f+w3Z2u6fCzXlCJ967v8I4B+0nwrGgDVvmc50P8FhnUl8zOLcQcxb/Mxp8Oq79SWfe68DG4+bMwvhlyvLlpXi81mGULzwAwuoxKWmQX0TRbFn3P777nJlfzZlnj7G+LLaWQDtPISStgFB1Y=
+	t=1733844148; cv=none; b=sC4RiQ9b81jIq4ivkfWzPJC7gbgBx0p8kqHIyFnRrCUGWKAQkljzxIvu3KUmI30tbPcnCWwo5jIx4MrJ9kMkskkXd1NYmkykfeuoKjEhGuUMyYMyMVjt3OZL/uLXYeXE8GFbJne81shOUFdq9cQKN9xyXXA7jsLwEwJ05wiZOLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733842775; c=relaxed/simple;
-	bh=ZDw6LCM1u7OLn5QVjJD4sW+N5q2OjqIvp6c9RvNl9vo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TOLQvXD8CYMY3/cYLE4X7vH/bs8GJSpdRGqNTm9t8r2naOjEaXKlou6uzAvKaR0Cxcyr1HlYEaDyCl+7PbaljFI1cu6pGJ+MYVCHO/JePulCSPkJym4QEN5JUeFRGtUP/v1JRoku5xLKDz0WK8m9REBsrLCXpIn38oMrDnd2jF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aEeuwa5K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65329C4CEDE;
-	Tue, 10 Dec 2024 14:59:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733842774;
-	bh=ZDw6LCM1u7OLn5QVjJD4sW+N5q2OjqIvp6c9RvNl9vo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aEeuwa5KZh07b39hZQH33qx3aXB+Hi7OjmhoITc9t29b+xJm9Q2PB/kBf2lEqStO2
-	 TzSS506mQ10vSqBn/wAPgl0XHHCUx9H6CmfrCMvdWopnUHklXdXrGYCwrT6MI3rSsF
-	 0uAzDS3JGo8+j6K6nYW382HQzeJR2uLU3JnuqX7oDC3pBtmqix48nv4aO+Rgd0Hu/a
-	 dmscQRFmw8GLcmCzm0BK0PxAFbBBCjw6NgM/Hk8KrMCh9ZklXPCF6szFmbm0apz1Uo
-	 TgbaU8DIe18op0ltmEiBqzgob1lxhBKRoc1MAlyQ0MO2inIhZ/x1dOOeaNvdkQFBBR
-	 7k5PaaIKzL+iw==
-Date: Tue, 10 Dec 2024 14:59:30 +0000
-From: Simon Horman <horms@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
-	Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: Re: [PATCH net] bnxt_en: Fix aggregation ID mask to prevent oops on
- 5760X chips
-Message-ID: <20241210145930.GF4202@kernel.org>
-References: <20241209015448.1937766-1-michael.chan@broadcom.com>
+	s=arc-20240116; t=1733844148; c=relaxed/simple;
+	bh=HVhiN2OBd6AGD8swy+GfRlzAmnRnYgAGWrQ6OR38Ccg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cD6FYPMNdD7HixjKLLPIYRUd8pAp0NKEXCfznBV+AHacXdLR/N78ZF9xgMDew5iGGG68vNXUYDTBmlvC3O8YYjlicguzOYEalOVrIwjOHxIWeLYCMF8qpii8YRuZrr0k5HPqMjqSI1qpv5/ZZZKIGvf4SRvNiVYo5cxst1mhARw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dPlq64R/; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2ef8c012913so2290129a91.3;
+        Tue, 10 Dec 2024 07:22:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733844146; x=1734448946; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=rVmwqWOa/zEr6Xgq+J3zkDZBkkOC/ONE9vJotzchERc=;
+        b=dPlq64R/VnHWM1bOvw3DqR7NcByzUPGoXCV5GiKn7wex9M8NdMoqm0TeBjgkeU7f8d
+         RCxoKiwECnxQB+CDbZSd+o29flMYgpMghEOLrSKzCQettrEu8mJjEJqwhNy43yYGAbdg
+         VZs2TLHe7G3cWfmjFWm6JgeVl3VylUrVE6dyIe8a+WnYpoFhSadQF9+z7E9pSdQsj/4j
+         S+yo5SiPs8Sx3BoCi0sR7zE7zfA4ZbSCt/XBe8Nl1x34UeAaW3YdCNvhaHzbnhhNrzuN
+         xgEE88o9AwvUeGV3p6Fl6GAnGdaOz5dOa05IsoeWih0oVSg28olirIcNYA2CI8U+JTEF
+         94Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733844146; x=1734448946;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rVmwqWOa/zEr6Xgq+J3zkDZBkkOC/ONE9vJotzchERc=;
+        b=T/nw5f+xL3+eM+sIZSo68XPyMpObrteSkkoVJUyTqu/RfIbqw+xIVx0akFZtKTMXRJ
+         NiwFIYmC14lM3QwPmyeXNPLXAAMAYshfFGv2RY8xJ2PzX0pWwg0KVIoAzj/b8D3xO9si
+         cZA94cWJg4Hm6R1GKr2k1fcoFDghY//nIZc3/xovqXhZnxC7Xn96iPe9ZgSRemif8T/q
+         uypb9bzTR/rhydTQo8uaGU9zSfh9z18BI6odhmaCzQJqUF5d5UKafzK8yTcgE6DAyej0
+         N7wXURIxDtBzMOJv+nVH8LxBEg0iK/ml/8sytF3i4hVoTucTrcMMOQ6kEGZFruJ2raRW
+         sv9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUQweumVCZYoI29Em6efbMwYMjZDLB7LTJXK+a/qNTJj7VHVEVwZuf+JaafnDlxWXIHEVrxAdjcNfM=@vger.kernel.org, AJvYcCUxYtdtbXMpmPNvyAc2h77FyCvHI31O2u+QetYn0BF7ee4B3JjawhMhMA7UchRTKIWOQHvIRM1wJ27X@vger.kernel.org, AJvYcCVLOlHavfAmSgwfZIrLstrV3WAfmCYlski5mX6J/7mzaJR7UJl+/W00BS8VBfLjF7pbYANIyemt@vger.kernel.org, AJvYcCW2Ti3PLfgRU0jJ0CQd0lOoV353z4sz1FjMln5JSPWKw2JMIt1pKys+FjsIiWRtTyYn7pDZlZ1RCMH7oA==@vger.kernel.org, AJvYcCWjr30Qnt+HJh1gm5/xKVeLg+I3lX8j4U/IozXXXQVRvc/WNyhpGoQcj/VGuGrq82SaxczwdsExdRay@vger.kernel.org, AJvYcCXK1zm9lsO0eXMUu4wXRwMoWRtv9wIGTKnlFMiIDRZzEB1c28IgX5De//p+Dkytt8YV6iOdeOspEwmiyZU=@vger.kernel.org, AJvYcCXfjv4dgFszjK5q1cbBbpmcRAzcZzSUN/aNzH3dmkRmpB6fGQ7CY31s3ewJ+t3QxJaiEOAh+Aa0X6VfByN2tnA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxo152wzM+eZGy4rLEpih3aGigxP2TPTkSxmTi3Hk9jA+/+fjbm
+	UOYd7mhtMlZZ23uIF1uhf2HqskHuLkUYWZgKUvV5XBSfIJ1MeIUQ
+X-Gm-Gg: ASbGnct90AnBzCP9SyzE1p4FmF8jDkRIBF7xG/S6b5tSwgVu+eK1WQSDYe7SeHXlZTT
+	DFPFCW5c1/2FNCzViRLfeVnHAaM2fdvS0ksB+dP8cTyXMeET/Mk7BL1AIq15pXs71tvLDOImIOO
+	vYaZthOvVqTobGuDc3U1FsnKMpDa0Cc1lgRnYW2XbxSC2ZKMvhlR/RjuAB74AUrdFdvBn12lCJJ
+	Wc5xaFr6v4dTdrgKkYWlgVi1icCEV2894U2Y120GOmb/Gp9hvqU3pnTMp0xkW43lJVDpxxi+xm/
+	HxxJInOQm+MH0EMQvjH/NL66Q2c=
+X-Google-Smtp-Source: AGHT+IE69d+SUpUCbyXFidBraWIC6ZOeXjpJlhEVcNtxdVDV4xbV+c0aS0/OIIKn6yXac6dM5U2V0A==
+X-Received: by 2002:a17:90b:3d87:b0:2ef:1134:e350 with SMTP id 98e67ed59e1d1-2ef6ab2739dmr25065458a91.35.1733844144217;
+        Tue, 10 Dec 2024 07:22:24 -0800 (PST)
+Received: from ?IPV6:2600:1700:e321:62f0:da43:aeff:fecc:bfd5? ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ef45f95899sm9954572a91.12.2024.12.10.07.22.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2024 07:22:23 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Message-ID: <e8165e99-9770-4287-8a05-709a9a7bb701@roeck-us.net>
+Date: Tue, 10 Dec 2024 07:22:21 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241209015448.1937766-1-michael.chan@broadcom.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 5/7] watchdog: Add Nuvoton NCT6694 WDT support
+To: Ming Yu <a0282524688@gmail.com>, tmyu0@nuvoton.com, lee@kernel.org,
+ linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
+ mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, wim@linux-watchdog.org, jdelvare@suse.com,
+ alexandre.belloni@bootlin.com
+Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org
+References: <20241210104524.2466586-1-tmyu0@nuvoton.com>
+ <20241210104524.2466586-6-tmyu0@nuvoton.com>
+Content-Language: en-US
+From: Guenter Roeck <linux@roeck-us.net>
+Autocrypt: addr=linux@roeck-us.net; keydata=
+ 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
+ mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
+In-Reply-To: <20241210104524.2466586-6-tmyu0@nuvoton.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Dec 08, 2024 at 05:54:48PM -0800, Michael Chan wrote:
-> The 5760X (P7) chip's HW GRO/LRO interface is very similar to that of
-> the previous generation (5750X or P5).  However, the aggregation ID
-> fields in the completion structures on P7 have been redefined from
-> 16 bits to 12 bits.  The freed up 4 bits are redefined for part of the
-> metadata such as the VLAN ID.  The aggregation ID mask was not modified
-> when adding support for P7 chips.  Including the extra 4 bits for the
-> aggregation ID can potentially cause the driver to store or fetch the
-> packet header of GRO/LRO packets in the wrong TPA buffer.  It may hit
-> the BUG() condition in __skb_pull() because the SKB contains no valid
-> packet header:
+On 12/10/24 02:45, Ming Yu wrote:
+> This driver supports Watchdog timer functionality for NCT6694 MFD
+> device based on USB interface.
 > 
-> kernel BUG at include/linux/skbuff.h:2766!
-> Oops: invalid opcode: 0000 1 PREEMPT SMP NOPTI
-> CPU: 4 UID: 0 PID: 0 Comm: swapper/4 Kdump: loaded Tainted: G           OE      6.12.0-rc2+ #7
-> Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
-> Hardware name: Dell Inc. PowerEdge R760/0VRV9X, BIOS 1.0.1 12/27/2022
-> RIP: 0010:eth_type_trans+0xda/0x140
-> Code: 80 00 00 00 eb c1 8b 47 70 2b 47 74 48 8b 97 d0 00 00 00 83 f8 01 7e 1b 48 85 d2 74 06 66 83 3a ff 74 09 b8 00 04 00 00 eb a5 <0f> 0b b8 00 01 00 00 eb 9c 48 85 ff 74 eb 31 f6 b9 02 00 00 00 48
-> RSP: 0018:ff615003803fcc28 EFLAGS: 00010283
-> RAX: 00000000000022d2 RBX: 0000000000000003 RCX: ff2e8c25da334040
-> RDX: 0000000000000040 RSI: ff2e8c25c1ce8000 RDI: ff2e8c25869f9000
-> RBP: ff2e8c258c31c000 R08: ff2e8c25da334000 R09: 0000000000000001
-> R10: ff2e8c25da3342c0 R11: ff2e8c25c1ce89c0 R12: ff2e8c258e0990b0
-> R13: ff2e8c25bb120000 R14: ff2e8c25c1ce89c0 R15: ff2e8c25869f9000
-> FS:  0000000000000000(0000) GS:ff2e8c34be300000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000055f05317e4c8 CR3: 000000108bac6006 CR4: 0000000000773ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
-> PKRU: 55555554
-> Call Trace:
->  <IRQ>
->  ? die+0x33/0x90
->  ? do_trap+0xd9/0x100
->  ? eth_type_trans+0xda/0x140
->  ? do_error_trap+0x65/0x80
->  ? eth_type_trans+0xda/0x140
->  ? exc_invalid_op+0x4e/0x70
->  ? eth_type_trans+0xda/0x140
->  ? asm_exc_invalid_op+0x16/0x20
->  ? eth_type_trans+0xda/0x140
->  bnxt_tpa_end+0x10b/0x6b0 [bnxt_en]
->  ? bnxt_tpa_start+0x195/0x320 [bnxt_en]
->  bnxt_rx_pkt+0x902/0xd90 [bnxt_en]
->  ? __bnxt_tx_int.constprop.0+0x89/0x300 [bnxt_en]
->  ? kmem_cache_free+0x343/0x440
->  ? __bnxt_tx_int.constprop.0+0x24f/0x300 [bnxt_en]
->  __bnxt_poll_work+0x193/0x370 [bnxt_en]
->  bnxt_poll_p5+0x9a/0x300 [bnxt_en]
->  ? try_to_wake_up+0x209/0x670
->  __napi_poll+0x29/0x1b0
-> 
-> Fix it by redefining the aggregation ID mask for P5_PLUS chips to be
-> 12 bits.  This will work because the maximum aggregation ID is less
-> than 4096 on all P5_PLUS chips.
-> 
-> Fixes: 13d2d3d381ee ("bnxt_en: Add new P7 hardware interface definitions")
-> Reviewed-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
-> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
+> ---
+...
+> +static int nct6694_wdt_probe(struct platform_device *pdev)
+> +{
+...
+> +	wdev->timeout = timeout;
+> +	wdev->pretimeout = pretimeout;
+> +	if (timeout < pretimeout) {
+> +		dev_warn(data->dev, "pretimeout < timeout. Setting to zero\n");
+> +		wdev->pretimeout = 0;
+> +	}
+> +
+> +	wdev->min_timeout = 1;
+> +	wdev->max_timeout = 255;
+> +
+> +	mutex_init(&data->lock);
+> +
+> +	platform_set_drvdata(pdev, data);
+> +
+> +	/* Register watchdog timer device to WDT framework */
+> +	watchdog_set_drvdata(&data->wdev, data);
+> +	watchdog_init_timeout(&data->wdev, timeout, dev);
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This is pointless since timeout is pre-initialized with a value != 0.
+That means a value provided through devicetree will never be used
+unless the user sets timeout=0 as module parameter. But then the above
+check for pretimeout is useless.
+
+Guenter
 
 
