@@ -1,143 +1,151 @@
-Return-Path: <netdev+bounces-150725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE9879EB4DE
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:27:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C92CA9EB4EF
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:29:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8909A280E8E
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:27:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8568F168482
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:29:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 716021B982E;
-	Tue, 10 Dec 2024 15:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA4C1BB6A0;
+	Tue, 10 Dec 2024 15:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YazBtt3e"
+	dkim=pass (2048-bit key) header.d=bisdn-de.20230601.gappssmtp.com header.i=@bisdn-de.20230601.gappssmtp.com header.b="lIPzDDdG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0651AA78D
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 15:27:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F6E1B3924
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 15:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733844430; cv=none; b=VSYMyvLRnOpmADGNc/JehwPmP5b5mlBqNqPPZ2XpXvpyfX+1pOZkP9JJVPZm//48IkeclLpXaVp7u17BFAl1KSgiVJ2x09ehWOT3lh10yTyDbg/eTyl/1zz12gRyV7x69ZQtYAQnvtgs8AnIKHdI+e6PM0oUCz4NESiUurv6Axk=
+	t=1733844553; cv=none; b=KkoCEYTD8gdyv+d/vycBdp1zU1rSN0sA0HRYkzNAGCmsVnvHVyQmd7qAg7SBvYlrRAHxEBs45ilTlZFSF8PILomn0BRAo2uiDSZWhec1xwcv8zWn093k6Dy/+AgPouspRJ0sJeTzi+TAV7196N6o3UHaP2ZjifoNQI9iLuqRv6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733844430; c=relaxed/simple;
-	bh=y4LgmUc7RvEv1C+QAjWWd7i3psGBaMi5PzDvn/ejtlM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=sgiSrXAt76uuDnCWxf46b2iinNrOzo+shtFgfaKD1KPKtckjsXsebXHh5zE0H69LeShOZ936bqepO3NHEoT1XI2KCs5Ha9O97kIp9+rfXsXQxhKOyklHas1LbSrs5Di2Cmj0MtZWggk937sRTVTWJFrlQRsdLIGGkJT9nFGT+Sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YazBtt3e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 951F7C4CEE1;
-	Tue, 10 Dec 2024 15:27:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733844429;
-	bh=y4LgmUc7RvEv1C+QAjWWd7i3psGBaMi5PzDvn/ejtlM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=YazBtt3eKTZEioZjvB/7KrOkFFytB879q5nzigXjfa5SVTuNPfHnTydupv0cQ9b+T
-	 bFkyX5aE5FrURxMDx2nJELOie3VE8VB7+eLxMEcAoVPn4juJI7wrAbnkSBjb+7p35G
-	 Rq5yuO1hJAvR/RXXQIgZyuo0k1kFSBMNBzruasXWAPNGJDKtlWPL+vzgKHUWCrFT8j
-	 rn95C+YBIicfGVVCvDB60POEZDKp+rkVcrQOadKqw1wqLdiiGw0bgohuP1HwVfbkZy
-	 zTp28VM7kVh9NJTk4CUZLG5/Ld9guLS6NsQT9JnJnaEIVYxOvBSHpRilmZRqzmIcpJ
-	 uZdaW17OzMP+Q==
-Date: Tue, 10 Dec 2024 09:27:08 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com,
-	Gerhard Engleder <eg@keba.com>,
-	Vitaly Lifshits <vitaly.lifshits@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] e1000e: Fix real-time
- violations on link up
-Message-ID: <20241210152708.GA3241347@bhelgaas>
+	s=arc-20240116; t=1733844553; c=relaxed/simple;
+	bh=cWs/c4TFgM8ytblaB0OKLNZx4QlCxkLj//Xce3vvX44=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tWkrSfiFBuha1Xqc3UwRINyPrcr85W3Yy2G7J01y0t3xgIsNp8Eu+1tg0lVeXT0DrHkPtMr3fr0p90w30cTqwDaznVej+gWru7cr4DhwjiY4l0IZKkqEHlNC24GgzjLrZaDFaF4Wvia7tFJiIi3sB3eWR7K2dZq6YV+55Fwimp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bisdn.de; spf=none smtp.mailfrom=bisdn.de; dkim=pass (2048-bit key) header.d=bisdn-de.20230601.gappssmtp.com header.i=@bisdn-de.20230601.gappssmtp.com header.b=lIPzDDdG; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bisdn.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bisdn.de
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-467666cc5efso1821041cf.3
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 07:29:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bisdn-de.20230601.gappssmtp.com; s=20230601; t=1733844551; x=1734449351; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cWs/c4TFgM8ytblaB0OKLNZx4QlCxkLj//Xce3vvX44=;
+        b=lIPzDDdG+CPFJLeRFEhVcbofmEGtJJK88NVY754OdNlLRd9VKojIBZBv3k8elwwDPp
+         hMCuB+yigMWGnH2XwWpdGaib/CgUdAFdioR4Ni2UULhO/D+UAkHhj0hfCjMQvrADJs2e
+         9yGjrh5Fj0SylFY0c++Xr1R+DatjKJ2zn7dBvubth3oe1AbcWrtU91RUhEX11kBjIwCQ
+         5O/CVXGOp3iMqzkIoepLLJWHse76B+RKRoOP9ohseQzC5eMJssPvulOMfTMWRjJ3/xAh
+         s1ZJsYAoo+rkzZbtTO8bPkM333CZrKIQSAdxDQc9varOQn3VLiBchI+iFTmhIR3ActWV
+         siew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733844551; x=1734449351;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cWs/c4TFgM8ytblaB0OKLNZx4QlCxkLj//Xce3vvX44=;
+        b=u8oMfkRh28pw09E2jehwQIThNzJIz/vr9i5K1IMOLRoXqEOJvedgWLYpRsAMD/QGQd
+         tgiaScfqFuDNayKVbIMrKoNHGAFOtYPAbiI3RYPlo3AcCfvbGXRdxYEkbNxwPwRDjWsl
+         jKtN1XO+gvaAsWL2Qan+rqKpB4Vf78SIXQzwgDf0YCEBVVY/V4DChV95t+QT+vNsfEzl
+         VWVUkEqh9bxazaJr8dvUMGl2M0tI179aX4FAQkgcaeV6UD0ikEe2TNS5nqtPZ5dMx4Mt
+         w8XpWMm1c5NMivdqSXRLLgoxR4mDKAI+WobOTFXJ5VA9BSI6i10hqgSXlrA2MURygG+V
+         rcAw==
+X-Forwarded-Encrypted: i=1; AJvYcCUm9UvSJVFHfGqX5ejzzTyxDjQZYFJBR47VXNeW0TnsT9lXVpukOifDWu58JBgwc4mRAxy7Dro=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNV19d8RHUMvXlK8pPzhhS+heBHx8OKdFuKwFY+6NZDMWHF+pk
+	F4LGkSV1H8VS5eIAuNj24HCqUosGiXpeD6shfK6HAnLn0LOX2pMy24tVgTn47SKeekrAjde3psv
+	8xJBWqMibfP98+7Rkv6jxnKhAvwYtfuYaWpL1OffBfVwrtf2pKjb/gz2zwx7O9TgoX3BNL6lWI+
+	LBlrcjRLLKZ8UHSbAEl2AtkA==
+X-Gm-Gg: ASbGnctO8M8Ib4GhRbYCsaezymav5x3Ym8lbjkYTkbu7s6B5zGCVkj3VsZP4fgPj/bf
+	Rmjj8r0gcsQDrhodOiB+j12AfSNSeTI0wPQ==
+X-Google-Smtp-Source: AGHT+IFYp2J8sA1dyCVQ1vOCeeXRqBIzaSBN+hS+fa8YG0sEE7LCygde5whGIR2rD8IsQqAE7colLdcVHHr8uxRzDYs=
+X-Received: by 2002:a05:622a:307:b0:461:1fc9:61a3 with SMTP id
+ d75a77b69052e-46734ce0dccmr104642071cf.9.1733844551264; Tue, 10 Dec 2024
+ 07:29:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241208184950.8281-1-gerhard@engleder-embedded.com>
+References: <20241210140654.108998-1-jonas.gorski@bisdn.de>
+ <20241210143438.sw4bytcsk46cwqlf@skbuf> <CAJpXRYTGbrM1rK8WVkLERf5B_zdt20Zf+MB67O5M0BT0iJ+piw@mail.gmail.com>
+ <20241210145524.nnj43m23qe5sbski@skbuf>
+In-Reply-To: <20241210145524.nnj43m23qe5sbski@skbuf>
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Tue, 10 Dec 2024 16:28:54 +0100
+Message-ID: <CAJpXRYS3Wbug0CADi_fnaLXdZng1LSicXRTxci3mwQjZmejsdQ@mail.gmail.com>
+Subject: Re: [PATCH RFC] net: bridge: handle ports in locked mode for ll learning
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Ido Schimmel <idosch@nvidia.com>, Hans Schultz <schultz.hans@gmail.com>, 
+	"Hans J. Schultz" <netdev@kapio-technology.com>, bridge@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 08, 2024 at 07:49:50PM +0100, Gerhard Engleder wrote:
-> Link down and up triggers update of MTA table. This update executes many
-> PCIe writes and a final flush. Thus, PCIe will be blocked until all writes
-> are flushed. As a result, DMA transfers of other targets suffer from delay
-> in the range of 50us. This results in timing violations on real-time
-> systems during link down and up of e1000e.
+Am Di., 10. Dez. 2024 um 15:55 Uhr schrieb Vladimir Oltean
+<vladimir.oltean@nxp.com>:
+>
+> On Tue, Dec 10, 2024 at 03:47:11PM +0100, Jonas Gorski wrote:
+> > Huh, indeed. Unexpected decision, didn't think that this was
+> > intentional. I wonder what the use case for that is.
+> >
+> > Ah well, then disregard my patch.
+>
+> The discussion was here, I don't remember the details:
+> https://lore.kernel.org/all/20220630111634.610320-1-hans@kapio-technology=
+.com/
 
-These look like PCIe memory writes (not config or I/O writes), which
-are posted and do not require Completions.  Generally devices should
-not delay acceptance of posted requests for more than 10us (PCIe r6.0,
-sec 2.3.1).
+Thanks for the pointer. Reading the discussion, it seems this was
+before the explicit BR_PORT_MAB option and locked learning support, so
+there was some ambiguity around whether learning on locked ports is
+desired or not, and this was needed(?) for the out-of-tree(?) MAB
+implementation.
 
-Since you mention DMA to/from other targets, maybe there's some kind
-of fairness issue in the interconnect, which would suggest a
-platform-specific issue that could happen with devices other than
-e1000e.
+But now that we do have an explicit flag for MAB, maybe this should be
+revisited? Especially since with BR_PORT_MAB enabled, entries are
+supposed to be learned as locked. But link local learned entries are
+still learned unlocked. So no_linklocal_learn still needs to be
+enabled for +locked, +learning, +mab.
 
-I think it would be useful to get to the root cause of this, or at
-least mention the interconnect design where you saw the problem in
-case somebody trips over this issue with other devices.
+AFACT at least Hans thought that this should be done when there an
+explicit MAB opt in in
+https://lore.kernel.org/all/CAKUejP6wCaOKiafvbxYqQs0-RibC0FMKtvkiG=3DR2Ts0X=
+fa3-tg@mail.gmail.com/
+and https://lore.kernel.org/all/CAKUejP6xR81p1QeSCnDP_3uh9owafdYr1pifeCzekz=
+UvU3_dPw@mail.gmail.com/.
 
-The PCIe spec does have an implementation note that says drivers might
-need to restrict the programming model as you do here for designs that
-can't process posted requests fast enough.  If that's the case for
-e1000e, I would ask Intel whether other related devices might also be
-affected.
+Best Regards,
+Jonas
 
-> A flush after a low enough number of PCIe writes eliminates the delay
-> but also increases the time needed for MTA table update. The following
-> measurements were done on i3-2310E with e1000e for 128 MTA table entries:
-> 
-> Single flush after all writes: 106us
-> Flush after every write:       429us
-> Flush after every 2nd write:   266us
-> Flush after every 4th write:   180us
-> Flush after every 8th write:   141us
-> Flush after every 16th write:  121us
-> 
-> A flush after every 8th write delays the link up by 35us and the
-> negative impact to DMA transfers of other targets is still tolerable.
-> 
-> Execute a flush after every 8th write. This prevents overloading the
-> interconnect with posted writes.
-> 
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> CC: Vitaly Lifshits <vitaly.lifshits@intel.com>
-> Link: https://lore.kernel.org/netdev/f8fe665a-5e6c-4f95-b47a-2f3281aa0e6c@lunn.ch/T/
-> Signed-off-by: Gerhard Engleder <eg@keba.com>
-> ---
-> v2:
-> - remove PREEMPT_RT dependency (Andrew Lunn, Przemek Kitszel)
-> ---
->  drivers/net/ethernet/intel/e1000e/mac.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/e1000e/mac.c b/drivers/net/ethernet/intel/e1000e/mac.c
-> index d7df2a0ed629..7d1482a9effd 100644
-> --- a/drivers/net/ethernet/intel/e1000e/mac.c
-> +++ b/drivers/net/ethernet/intel/e1000e/mac.c
-> @@ -331,8 +331,13 @@ void e1000e_update_mc_addr_list_generic(struct e1000_hw *hw,
->  	}
->  
->  	/* replace the entire MTA table */
-> -	for (i = hw->mac.mta_reg_count - 1; i >= 0; i--)
-> +	for (i = hw->mac.mta_reg_count - 1; i >= 0; i--) {
->  		E1000_WRITE_REG_ARRAY(hw, E1000_MTA, i, hw->mac.mta_shadow[i]);
-> +
-> +		/* do not queue up too many writes */
-> +		if ((i % 8) == 0 && i != 0)
-> +			e1e_flush();
-> +	}
->  	e1e_flush();
->  }
->  
-> -- 
-> 2.39.2
-> 
+--=20
+BISDN GmbH
+K=C3=B6rnerstra=C3=9Fe 7-10
+10785 Berlin
+Germany
+
+
+Phone:=20
++49-30-6108-1-6100
+
+
+Managing Directors:=C2=A0
+Dr.-Ing. Hagen Woesner, Andreas=20
+K=C3=B6psel
+
+
+Commercial register:=C2=A0
+Amtsgericht Berlin-Charlottenburg HRB 141569=20
+B
+VAT ID No:=C2=A0DE283257294
+
 
