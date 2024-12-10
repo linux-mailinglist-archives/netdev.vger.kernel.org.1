@@ -1,235 +1,133 @@
-Return-Path: <netdev+bounces-150848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDFDC9EBC0F
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 22:44:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04E459EBF0E
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 00:11:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B90BC167A19
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 21:44:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B42B2161718
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 23:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14952397A3;
-	Tue, 10 Dec 2024 21:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBB6B1EE7DC;
+	Tue, 10 Dec 2024 23:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="osurqn79"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="prcz+Ngt"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2087.outbound.protection.outlook.com [40.107.92.87])
+Received: from cichlid.cherry.relay.mailchannels.net (cichlid.cherry.relay.mailchannels.net [23.83.223.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454481A9B4C
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 21:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B232451EF
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 23:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.223.36
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733867076; cv=fail; b=l02tqnaAzb+TGh2sjfHnYh0j+d/HFMMZxO+J/AHvPWRQuH9J9juwlImOrgAN5p2TSInCBaZgP/NI9V+E++0nbOjsxXLgB9fKBr5PHsbjWpg3cjoB8MN0DE+sEwXTxbReXguOnf5sqkv8EVZLBhgi5dOwFB9BrCF+ONyjG1n2stg=
+	t=1733872283; cv=pass; b=G5BDxiLeXJWQfez/184IrY6i+uPT0+12D/wDyhfG+8TtVMKi6i1y6jiSl9T0KxvZH6y+n/YPMpEcaCgk+aCI5qkkHq02CRqvEPDclW1yf4q15uNklg7ZTRg6wS3ED42hoB82fe3KFu45y7RX7i4r0UrOKjLsyH5+EaLRjYLUcJ0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733867076; c=relaxed/simple;
-	bh=YOCYLOM11H4lLvI9bDQk+RgLGcVnk6+GTu3hXOk/9JQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=i3+AFzV8F4xk1P2G9vrkWJvWQ4PbiYG6aHmX5SBClR2NWzdlsmJUThTssOGGRq4vxR2UQUXo/Esp6nspNIBWiUHwMqGLs2RgrJbFTM3Nxt/fqNt2W5RIA9YQaPRyYgti4Yj3rlYOeGs3YiICirxhgcDRIdlATnXqjJW+KlvvK+k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=osurqn79; arc=fail smtp.client-ip=40.107.92.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MfMmtBxFbj84L7oliSFGEzd0920VU+COvQilBqKxeYYWu/cO4FfBrj4FGMJ9548ftqJ3qoEJpXlZK3KPK9xgXr5mEbNZrhETiyDwaHV2u8Wm16MW3SJisMiHzAG/e3MING3FSYXMEmB3Ur23Oe938Un9emVgvIKbzdqe9DL69Lru6XyTgNvKrdGim+9isu0RVivmOVxn56Rv+haMbv9XRVuiy48povAJMn9MNIVnXCEbdXAieTdruR03JueLhyvCqjrDKY1DfAL8YHkcokcDVlkh2Q9PCB26Q5hQ9XJYLrNoedVAU3TjqyN8xvY6Qgc49osOfWGxBevfHnUvjlmdcg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I8m0xq/7Fje87xPgyWr9f0sgikkjE5+BsNuWmw27qBY=;
- b=SQRnUsghQCynxg+81z6Q8Dam4whDyKxdbjBWYM8aopgeebajUsT23iw3AOyWRosdv8qkRkplJbJyw1J88zqIcMqDgvkx10m4PxU4vnbXx8ajscE0IqHZabwaynfKXJeEfBV5vW9myRnQg6V4hhkmf4nFARbJcak74RJ2Z1qoQZ/k3oKceW5ELVfTpoADsa9MQJSMQFb+U0iumK+JSqruMY5LzuQteYqg1297vm1bv0c7PqKxmI/EmHl1F5eoIAry+FoMHD6TkHwQscQ+CaMYSoKjlYMaOL+5bHJI8Ve/FPhsEXjwUBfZGdXzM/i/ZA54J+mAs2sV/FpuajcgPEVB0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I8m0xq/7Fje87xPgyWr9f0sgikkjE5+BsNuWmw27qBY=;
- b=osurqn79MnFMPpirXUYCq1IVGzgxvk5ziKFyQLBaToeXbPR4IgtLMSdw+v80aNDnC2WTKoZQ2xe8vKcApeHiI/xX157B5HkZVmXLoFta9kDDzVZeDem42TPy7IEkIDBubecEQA/ErCmDvJ6lxiKh23yDKiUtRVfLlCD8MeEOiiU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- IA1PR12MB7591.namprd12.prod.outlook.com (2603:10b6:208:429::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8230.18; Tue, 10 Dec 2024 21:44:32 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb%4]) with mapi id 15.20.8230.016; Tue, 10 Dec 2024
- 21:44:32 +0000
-Message-ID: <a8faf111-281a-450e-b595-ba35a7ccc66d@amd.com>
-Date: Tue, 10 Dec 2024 13:44:30 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/3] ionic: no double destroy workqueue
-To: Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
- davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch
-Cc: brett.creeley@amd.com
-References: <20241210174828.69525-1-shannon.nelson@amd.com>
- <20241210174828.69525-3-shannon.nelson@amd.com>
- <a4f1acf7-6bdd-4865-a13d-945791917afb@intel.com>
-Content-Language: en-US
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <a4f1acf7-6bdd-4865-a13d-945791917afb@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR05CA0139.namprd05.prod.outlook.com
- (2603:10b6:a03:33d::24) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	s=arc-20240116; t=1733872283; c=relaxed/simple;
+	bh=UQxE7ji1mP5BOJmwh6dh2HbYyWlR+Kk4E6wyTh56mHg=;
+	h=MIME-Version:From:To:Cc:Subject:In-Reply-To:References:Message-ID:
+	 Content-Type:Date; b=Eic4PpRjNRXPxguBTKWZGOwhFP2AKWWd8+X1xKqiMIRPUutx4HBCEoGlxtpaMjXf9W/DzQS52jnUhNHwJWms/Qj4lQd5ZqYleev7dZ8n2OK9/2r2ChllFADGuh53ZkUi/6t0wgas1ZARWykn4pE+s8DP7tpMgtdDBKBUy74pKFw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=prcz+Ngt; arc=pass smtp.client-ip=23.83.223.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|arinc.unal@arinc9.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 81F3124832;
+	Tue, 10 Dec 2024 21:45:20 +0000 (UTC)
+Received: from nl-srv-smtpout7.hostinger.io (trex-5.trex.outbound.svc.cluster.local [100.98.0.247])
+	(Authenticated sender: hostingeremail)
+	by relay.mailchannels.net (Postfix) with ESMTPA id 8AF5A24823;
+	Tue, 10 Dec 2024 21:45:16 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1733867120; a=rsa-sha256;
+	cv=none;
+	b=hFP3QZjCni3Ip+98MFP1SXKWHbM3jP5XOrotbnnYkdE47JEO2yqpYuKMt1LMFHicSvTFc5
+	+carobUQ/Wv063VPCooN79SBt6oRVu5edzaQG6YIhCnNhttSKo0Z47l1zh3NyieycbRx2E
+	dIASUPOWQBl7AKdPMuJj9QvDo2Pu9ryiJ7RBdCAGrsHI845q3kv4JKzK3L65e5ecDzyfS0
+	C7TI2LiyFBK89i6nE57o8UI18UWCddYL5R7Vdc1m1UETHppllY9rWTzu/3kU7HJ4YylTJ0
+	XweUIWINlwQ8PvXeJcXACJbg3pE0Peof2I1C+sV7/KkUH/O0g8f0oVg3PIfNdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1733867120;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=SYdwHkJmBU/pcv/d+DYNr7WpOGo7tnfs2VifDPdDAhg=;
+	b=QrfbnH6L3CMm5LbRWznkqoqMitue4u8NE2ndpjiIs4Iv/dPhPlGvgv0tAeMUfp/OFBQfk8
+	r9YryQB8GS9wfrHTexiw9AYoLEXJcUCcXcPgmDSPtU/4H0sxHHfDOQDJdfxFuPmAU6GOWx
+	8a3GLlwTL5DyhHbxvG0hq1kB/l+XadMSf0lIC2Ex13Yi7KOXuNRwfcAvLA3puavPtz5v8q
+	nOrTj7cX5+fe1cXh9t0yu+2U+HYbwQs6laMOjC2n35quNOeOMiy6YDB45KogRsHXdZSAku
+	soxx0UkocrrBpCqE7K/csxr2eFjRq5rzx2ExEr1gZaHxqXqTKdFKIqKtcXOtxg==
+ARC-Authentication-Results: i=1;
+	rspamd-5d9d86ff64-sqxlh;
+	auth=pass smtp.auth=hostingeremail smtp.mailfrom=arinc.unal@arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|arinc.unal@arinc9.com
+X-MC-Relay: Bad
+X-MailChannels-SenderId: hostingeremail|x-authuser|arinc.unal@arinc9.com
+X-MailChannels-Auth-Id: hostingeremail
+X-Bottle-Coil: 2fbcd1441e3f7124_1733867120287_3536260936
+X-MC-Loop-Signature: 1733867120287:1317792024
+X-MC-Ingress-Time: 1733867120287
+Received: from nl-srv-smtpout7.hostinger.io (nl-srv-smtpout7.hostinger.io
+ [45.87.82.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.98.0.247 (trex/7.0.2);
+	Tue, 10 Dec 2024 21:45:20 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|IA1PR12MB7591:EE_
-X-MS-Office365-Filtering-Correlation-Id: e7ad95c9-18ec-4e39-5c6e-08dd1963d4c5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?MThYMDU3dEZ5OWFvZVV4cjB0YTc3L2U5MmYzTDB6Z1MxbFpqN2I4b2FFWEpT?=
- =?utf-8?B?NjI5UDZWV1VUY1pXL0NKRytTVmh2ejE1ZGtIY1pPNlV1alBhWnFkVzNBOTVF?=
- =?utf-8?B?Zy9KT0lLTzhaMmZjMUwvbzlKK0UydXppUWs3WFpJNWd4aUxwTUsvMkNyeHhi?=
- =?utf-8?B?ME1OZVIyazFzRGU3NEZ5cWJZRy8xeFZNNWFWMmVCUENsWkpXWHRMVjdFM3pF?=
- =?utf-8?B?Z0s0ZXhxU2dGWVd5dzZqRGZTaUZybGZWbG84bmFHL1NGYVNYb2lxVnNrdjFO?=
- =?utf-8?B?K1JqYjhoalp4UTVaaGlCY2VpQitjNU02TXZoZk5PWWhSVlBmZDlnUk8xMUdQ?=
- =?utf-8?B?SUVxUkRNMmIrQUs2REpNY29NT0pkMiszVUI4Yytnam43MGtScytmemxVNU5E?=
- =?utf-8?B?c08wRFgwa1grNXhHNzV0YUYvbjJ2VFJuUlJEbGpwMWxsejN3RFcxb0pnUzVn?=
- =?utf-8?B?Zmt3TFpYUVB1ZXlWZFlRcU1xb054SUFIYUg0MmJZUk9Zd0J5VTY1aUgyRE14?=
- =?utf-8?B?MTlhMlpXcUpiWHlVNDhnWWZQeitKSm9ZWlVWbUJnaTB5eWQ4UFk0Q0l3dW5X?=
- =?utf-8?B?RGJNdFF2TGkzLytLaFlRMXlvOEZ4MjdoazZqZzZtOVJKamo1R056M2NCYnY4?=
- =?utf-8?B?MVU0UnFnQVJnODY4T0FuMTBUcUFnTkdEelc3RlMzRG93ZjBjZEo2TkwwNXRG?=
- =?utf-8?B?Rm1VK3J0ZHF2cXlnbEtQb09KaytlT0FuMm5mdzNZZlpwSGpxVU8waUtUMFhX?=
- =?utf-8?B?a1JaK2E2aFZHVExkWlBCaVhBM1p5YlhsVVladU1sTDRSdkYzWXZSOGJtYy96?=
- =?utf-8?B?dXpaUHlmZ01rVkgzUnN6UjNKQk5QYXpWYmJNRGZBTTYwVHdtU0VPeDQ2YUF6?=
- =?utf-8?B?OTFuWnFQUjFDYktFaXdvVmhFMWs3RWdPRmtMOGRVTDEzdWhjMzAyeHBvSlpZ?=
- =?utf-8?B?Z1IxbU11VEJZdjUvaVh4U0N5aGVrWUFSUVJzVVRuZDJzLytjWlY2dlN1L0Y4?=
- =?utf-8?B?bHdoSEJCaTdqcjYvZDFHcnRPOHJHMEdBSnh1cHhSa0YrYXBSalg5TGlIajE3?=
- =?utf-8?B?UVN6b3dLK0Z5ME1RSkN1NDFGV1JpREdyMXpPZWxEQjR5Wkp1NWxRY2FpVkwy?=
- =?utf-8?B?R0QrWWl6UDRFOE1CQ2E4ZEszeE9CWGsyU3pEbEYzcTVkWlFxOWQzWTNLMFVX?=
- =?utf-8?B?UE0wZEZYeFdKUzhVTXVOZ2hVeERiRDI3dGRwNVpSTDNVSlk1ZUNiK3ZaNlZ5?=
- =?utf-8?B?akYzeTdGMXBkUFprSWdkbUpzaTVkamFLR1JET2NzSzBpQmdNODV5UU9sOGx5?=
- =?utf-8?B?eGt0WnVUWVVUNFkyQXh0d0tkZ1h5NlBjdnl0cmxPNnIxZ043QlBvaEx3ZkZL?=
- =?utf-8?B?QjBSVnFQLy8wR09PajUyZ1YzREZJdmd5SEVCdUFQL0FqcllKcFk2eVhWSmhG?=
- =?utf-8?B?eTUwRk9hRFJkbCs2c0pkQTV2WFpiL01UQzQxWWZMV2cwNUpDdVpEZko5SnJG?=
- =?utf-8?B?Y0g1M0ROSjN5WXBUQUM3QUhDcjlvUUNtK2RPUjJNMDZtbFdkQ2xYSUpzKzVX?=
- =?utf-8?B?clQzc2FRRzNmVjRhUWt0bWxSdCsvRG1nY0NwUW9XWkpROGtLQXYvaWdwN3FR?=
- =?utf-8?B?SjVHZjRRMis1UytXRENKVlNhTTR4T3JrWlVuSklXT3R0YVE5RXJpTHBMclNE?=
- =?utf-8?B?U2phNjNNZlY4bTNNOTAzR2dNR3UrcUFRUjF1dHZ3b1lNSWd4R3ptaW8zZVla?=
- =?utf-8?B?U1htOFJEbTNsR1RDNFgveVJnNTBHODQ5U216MmZTSWV5aXF5a2d4SnU2VHRT?=
- =?utf-8?B?VitMdGVFUzc5QVVzcG5pUT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NDNxWHRCWU1QVThuSnpKZmFSOWpNVGxFakFhSklneGNyMnppNmk1VkJvdjU3?=
- =?utf-8?B?cy9ibCtobTYzVXhYeUVBSC9mSGxJWnkwSmJxS24xQlJ4RmJSLzFXdlE3UnRG?=
- =?utf-8?B?eDhLak1pY2dQdXF6aVV5WWFyRWE5eHNaTHNBbFU5NEkvUnA1aiswK3BjMlRq?=
- =?utf-8?B?NXZVZDhEWHJkQjZRRnREMGtLR1loTHJtd0tLMHZpZGVielMrNGVtYVpTeVln?=
- =?utf-8?B?cXpZSkIwRFkvSWt1ZFF3bkhxQkJqaTVaMTZzYlVKVHRBM0ZLanE3dlg3TVo4?=
- =?utf-8?B?UXpJaU5NcWlFWGI4c1NOTDBNL2VDaUp1Y3ZQQ3lKTFNCOVFCaTE5elJiRFFR?=
- =?utf-8?B?ZmpaVFg2aVJjWnhXK1phd2pocGFlSXdORlB1VkoxMFVqZnpqTVNzc2U4Z0lX?=
- =?utf-8?B?ZFEwT3JBWE5sVE1sSll6UEY4U2lTRXh2N0RJdU9oUXZzQTZmN28vNUVURi9i?=
- =?utf-8?B?WlV2eG9neE0xOTR1cmdKeVdHV1JaamszQ1VzekFJNUlNSkF4Nkx4Q0VUSFE3?=
- =?utf-8?B?Wkt5a2cxSzVSTXVnYnhLMFcyK1l4YThMT0hXRlNJR1VDb2E1SmxtYy9ldVo0?=
- =?utf-8?B?SnJXWHlLcEJIdlpXWFAwVFJxaUpLdVNSMTErc0tMeTNCYzZjQUdwL3grS1Ux?=
- =?utf-8?B?aVdjb2FvQXU4UUtkZE8rOS9ib0kwc2pKYkdKNnI2WmY1djNCVDcyNUEvZnk4?=
- =?utf-8?B?Z0YyYkVlaG9yYTFaWjkzSTdpNlpXTnlvME80MDlmdEJ4K2E2TzR3eXJUVmFP?=
- =?utf-8?B?b2Y4QVUvOEtXNXVOUHU2WGE4ZTlaVGN3QUx2dHo1bXhBOSs3ZzRWL2VhRUpw?=
- =?utf-8?B?OWpxbUJLb3ZMaHNEeTc5VnlPZTl3Y2VPalFrQ3V6WmVKeklEWHREN2R6NnUr?=
- =?utf-8?B?eDJTa3RNbDNZS21mTlNiMWtYdkNUYXJNQVdFKzhXMzhMSnRKOUExczFGVUYy?=
- =?utf-8?B?T0p5RzhFeCtad0NvaTg4UGNBanQ3QVRLTDR3a0RNUnp6TXMrQ1RPSHNkbGw3?=
- =?utf-8?B?a0FWd3NvMWNjMCtWaFlNaEN6WHlUR1NWYmxMWFhGSkdpOGZya1JNSEJpa25y?=
- =?utf-8?B?cDMzRjZCVzZuYkhkeVZ3N2kyMWxobG9QQkk0Q2RtSHI0citudmczamJrZXZr?=
- =?utf-8?B?NjVlbUd5dkVlczJvdHkxcTdLVzEvVUd3c2M0SG93Z3B4aFJLMllNYVhVYmFS?=
- =?utf-8?B?N2paMWlsbHNvRkJZM0ZZYnJSKzNPQmdJTndHd3F3SzlVNnZFRDBqZFZWZzNt?=
- =?utf-8?B?TnZqb1BaVDNNS3h3MXJtakNhdGR3UjZzYjUycExTVVpxdTFPa0JWaVhPY3ZX?=
- =?utf-8?B?MCtuanVxZ2pXbVhFZXJIbjdRUFNPZVNyZnU0ck0xcy9VZ0g4S2ZXSWFVU3I3?=
- =?utf-8?B?bVZnVGhQRmtXNnk5ZHplM21MajFNSVFGMWlJcHlQQjNoam8va1pQemtodTRj?=
- =?utf-8?B?eWZzcE0vR2VCemEyUGVWWTJCUW1NSmdiSG1FYnJ5MXVZOGpLMHNmajl5L0FT?=
- =?utf-8?B?dU96WDFJWVp5UnBXSUpNazcxZk1YSmJwLzZiWDQzdDNMUlRCbFg2MjJaN1lz?=
- =?utf-8?B?RXVhc1JIOGlQRzBpWjF3bktJZGxBZ0hUSkpCS2hnOWJJZXhhdDF5OWxzN1d0?=
- =?utf-8?B?aGEzWUswekVYRXBIT2lVNm5objkvZ1VXalExWXRseDFtL3VzUFdwNEM4UVN1?=
- =?utf-8?B?OFRvRG5ZVEcwUEZwNEp2VUVhZE9iOW9kZEUwUlBWVUEzb1pRcHFSTXorVWk0?=
- =?utf-8?B?ejNyOXJqa0JqdEo0c3VBUGZtTzZ0TjdoZjJ6TnhvQTFmQlpVZnk1NHhYQzl0?=
- =?utf-8?B?d3ZoOVhsalVOQjVYKzNEZFR1Si9UbW1BNmJrdy9pcnVaOHZTYTRrcldGdVFr?=
- =?utf-8?B?aWg4a0sxYXFpbWtjQnR6c0Z4TEk0b3JxRW51emVtdWJoSDhiSU9zbDQvWDZL?=
- =?utf-8?B?TlNIWm9YVFBVNEVjZjM0Q1lIaUo5ZjhjQnZmWlFPTXFERjNqNy9BYXFWVFJU?=
- =?utf-8?B?U0F0SVJQQ3FxQS8rUFZIM3d5M2RGbzZCdmFEdHUxWVNVcXNFem5VQlkzcm4w?=
- =?utf-8?B?bmJGMlRhUnc3b3JlQndZMDlsdzRqZ1o1K1BJRGJDQU5FM2MzN2ZDSmNLY09k?=
- =?utf-8?Q?XZPGid/qFB3ZuSSo2HMz2851r?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e7ad95c9-18ec-4e39-5c6e-08dd1963d4c5
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2024 21:44:31.9987
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mKcsTxv/2L18H9ag5kjY2JHULFMSshTm/9Syvj7rYeWrTnLP51VLu0yWXaxe9mouN0OxGJzY5vM0n5iJBGhCRg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7591
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com;
+	s=hostingermail-a; t=1733867114;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SYdwHkJmBU/pcv/d+DYNr7WpOGo7tnfs2VifDPdDAhg=;
+	b=prcz+Ngt+NRtMI52vtGLN3OQLVWpkPxinr5+LleVEp1gSCl76tsRj8xQ7XMI9r4BWoJ1xM
+	a2LMV9zA8QPElKEHFbxaDsBLNzSFQ+jG0bFKlspi6XSW0rSwZf6/zPwI1miR1+p7Km2IrR
+	dl8X72ZDAiAPAqK8wH3oJNFJMU15lTl5vUV9wniFiOQLW7zyBh097h/yy95tcJHBrk2MW7
+	1jIrQUeXMaObWB1szYeWs3toHC00bBayYWcI+F7VOqw2Gw/veTUxD7Ua9JydTcPNJYRTLh
+	maAd6RhXWFD9cyWuQkDE2eQ0bCgSoJJTk81w+KdzjPr7hbjNz+nacY2KL5q0JQ==
+From: arinc.unal@arinc9.com
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Daniel
+ Golle <daniel@makrotopia.org>, "David S. Miller" <davem@davemloft.net>, DENG
+ Qingfang <dqfext@gmail.com>, Eric Dumazet <edumazet@google.com>, Florian
+ Fainelli <florian.fainelli@broadcom.com>, Jakub Kicinski <kuba@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org, Paolo
+ Abeni <pabeni@redhat.com>, Sean Wang <sean.wang@mediatek.com>, Simon Horman
+ <horms@kernel.org>, UNGLinuxDriver@microchip.com, Vladimir Oltean
+ <olteanv@gmail.com>, Woojung Huh <woojung.huh@microchip.com>
+Subject: Re: [PATCH net-next 5/9] net: dsa: mt753x: implement .support_eee()
+ method
+In-Reply-To: <E1tL14J-006cZa-Rh@rmk-PC.armlinux.org.uk>
+References: <Z1hNkEb13FMuDQiY@shell.armlinux.org.uk>
+ <E1tL14J-006cZa-Rh@rmk-PC.armlinux.org.uk>
+Message-ID: <3b9218282c34a1a0e10c4bc80a588082@arinc9.com>
+X-Sender: arinc.unal@arinc9.com
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date: Tue, 10 Dec 2024 21:45:13 +0000 (UTC)
+X-CM-Envelope: MS4xfJuZft709FxizpinMKGWhJhNuVkZgkBg+qc3Jglod8if95nnLuGy8biWUCFr5kuQapCfrsMBJit/W+EQFp9ExfhFRsMgaChMRyoVpzk96i1nf1hMBm0t rugRkpC2iB2Rhx0oVFDS0z98PC5IEggSkuZi1yGBZZrGG6QaW0lPwJw3+/TPoJBjnPN8FJIiWbFYzpqr6zvZOCZaK2NJ1ice5ZWKcEYuL2dPJP0it+tbzpph RLws0KOZfe7K6l2c0fCG/AmRGk6a8tpWJPX9mYEDRyArrhSB54NgYsmkl358i/wk38tMGVjqZeQIqIVFQhGUPIkP1LC1vfQ7M/zzRUIfPH7eziiUHLPn5kxg esfFq2hvhZp4mvqTHBnZTAf6SIw+4gt46hj2v0GGnhj0rHEMkFeYzDLGTL/Rwn5CKE7w3FYyrLzmTiG7dwJVt+QHVPNrl2e1y0TuKAfxlrSRkvuoT2swX5/R /2NMOPKxL9K11wsaSyml7zlKsITYEAd3AFagiW22SJoHX7sId2VkShlIZ5W+SxrBqDtGcGuVGR15bq3SW5Vm0XSS3s/Z2gYJ8FIOx6c9xZK49JWpGMg4zMS6 sap06jaGyY5vfJ3H4/Z4k2753n/XA0KWv24Fco4jgykckekYj3KbZ11QscrsAjiNCu/2UDmzx+pUxNyh0xxUt9uwTLkT2W7pa5mz/FaW4Z2LObtLEyb5z+/B vbZk8/Bc7qfud57FqoYsdIfA1QPV7fPZ/9KfEynUMNA+qTdmoYEUQp3XuyG6m8SaS4tzzu77sGtlBDcHUx/7/WaodcYWan1mZq2AtoznQ+Lj19n29yHcl6qS wD9NPfzszGRKDim4sx2h1A80/sWxdKlw19iv3smG3G2N42iXzypaYyqZ8qoyVw==
+X-CM-Analysis: v=2.4 cv=K9lwHDWI c=1 sm=1 tr=0 ts=6758b66a a=5MOetqiP25nozuSVG0c2+A==:117 a=5MOetqiP25nozuSVG0c2+A==:17 a=IkcTkHD0fZMA:10 a=PHq6YzTAAAAA:8 a=GvHEsTVZAAAA:8 a=1IKdRoJznwPGE5zMZgQA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=THfFRngN91AA:10 a=ZKzU8r6zoKMcqsNulkmm:22 a=aajZ2D0djhd3YR65f-bR:22
+X-AuthUser: arinc.unal@arinc9.com
 
-On 12/10/2024 1:02 PM, Jacob Keller wrote:
-> On 12/10/2024 9:48 AM, Shannon Nelson wrote:
->> There are some FW error handling paths that can cause us to
->> try to destroy the workqueue more than once, so let's be sure
->> we're checking for that.
->>
->> The case where this popped up was in an AER event where the
->> handlers got called in such a way that ionic_reset_prepare()
->> and thus ionic_dev_teardown() got called twice in a row.
->> The second time through the workqueue was already destroyed,
->> and destroy_workqueue() choked on the bad wq pointer.
->>
->> We didn't hit this in AER handler testing before because at
->> that time we weren't using a private workqueue.  Later we
->> replaced the use of the system workqueue with our own private
->> workqueue but hadn't rerun the AER handler testing since then.
->>
->> Fixes: 9e25450da700 ("ionic: add private workqueue per-device")
->> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
->> ---
->>   drivers/net/ethernet/pensando/ionic/ionic_dev.c | 5 ++++-
->>   1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.c b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
->> index 9e42d599840d..57edcde9e6f8 100644
->> --- a/drivers/net/ethernet/pensando/ionic/ionic_dev.c
->> +++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
->> @@ -277,7 +277,10 @@ void ionic_dev_teardown(struct ionic *ionic)
->>        idev->phy_cmb_pages = 0;
->>        idev->cmb_npages = 0;
->>
->> -     destroy_workqueue(ionic->wq);
->> +     if (ionic->wq) {
->> +             destroy_workqueue(ionic->wq);
->> +             ionic->wq = NULL;
->> +     }
+On 2024-12-10 16:18, Russell King (Oracle) wrote:
+> Implement the .support_eee() method by using the generic helper as all
+> user ports support EEE.
 > 
-> This seems like you still could race if two threads call
-> ionic_dev_teardown twice. Is that not possible due to some other
-> synchronization mechanism?
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Good question.  Thanks for looking at this and the other patches.
+Reviewed-by: Arınç ÜNAL <arinc.unal@arinc9.com>
 
-This is not a race thing so much as an already-been-here thing.  This 
-function is only called by the probe, remove, and reset_prepare threads, 
-all driven as PCI calls.  I'm reasonably sure that they won't be called 
-my simultaneous threads, so we just need to be sure that we don't break 
-if reset_prepare and remove get called one after the other because some 
-PCI bus element got removed by surprise.
+Much love.
 
-sln
-
-
-> 
-> Thanks,
-> Jake
-> 
->>        mutex_destroy(&idev->cmb_inuse_lock);
->>   }
->>
-> 
-
+Arınç
 
