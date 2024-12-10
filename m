@@ -1,167 +1,201 @@
-Return-Path: <netdev+bounces-150633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05FC99EB073
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:06:50 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 710189EB07C
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:08:27 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D91E169A66
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:06:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF009280D9E
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD9A1A2643;
-	Tue, 10 Dec 2024 12:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC091A0BFB;
+	Tue, 10 Dec 2024 12:08:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DFRAl5Cg"
+	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="cKPJu/oA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from TY3P286CU002.outbound.protection.outlook.com (mail-japaneastazon11010024.outbound.protection.outlook.com [52.101.229.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9651A262A;
-	Tue, 10 Dec 2024 12:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733832398; cv=none; b=ID0xf05YfI0fU7SYyJi3UkFe15Cb+2u09yGD881eAZ4hFn1mbPFuvL2OuZeJVt2dsa8XUyjIuFxrgmoTRNq+InkhsyMBGK0B5KWxYfgxGxHynSzwyaEuEcrbJ/dhmsHCmwxPtSc48379ODe7RWWpfC8IYA3CJf3Y6l8KTzsdMSg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733832398; c=relaxed/simple;
-	bh=tac7FU1HS14XQp9BMuUMwuSzdZ33pnoQf7dmpahU5IM=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jhb3mLawgXTcIaSWJ72P1DKF+lnlKwKsauN7Bt9j+4GiGv9y1Dqn/ViayF6dUG0BpL52i17Zb0ZChL9zMkNlP1cMGgUMRNamFbBnXPsvc3e8ZGFxDXr55GrYR8HvJjqSvo4RNooNCX68pdrUfo1DRk8cZEoOs7iFeeUV2bVXC5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DFRAl5Cg; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-434f74e59c7so23979415e9.3;
-        Tue, 10 Dec 2024 04:06:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733832395; x=1734437195; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=46aYL8Qujac4/4V9g8K6BMoI6Lwj7kmEE7LxrwnxQWE=;
-        b=DFRAl5Cgv+dEMJGLYK7Cex7eXQw5NnfMpX4ZOkkf2cAa3vwxw/Hcg0RPhZ4hb4y9YZ
-         Z5yJUtqF52wcPImGfMULE4rL4RfToitKywOZrCeTvXfXnYQl+mo7XJORsDPHyV+J8LZv
-         Q/tAI/QZ3Sf5ttuEo/uQUQ6yfFdsfN2f2vZC/PZ+9YdpCl9w6q3QL5KBkgtF8d0ysuPI
-         8Lk+TouRZmwq1oSkvxUFMynRaKbJfwz91fjE1+G9WT0zVdHsv3q5BCFor9S+4WaJv4jh
-         LZef/pZeoVGrZCDKiI1okC2Sj8wZI9po6dD86dyTH4hRsk0SO+IJj5Hdi6CrIkWCmkst
-         BnmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733832395; x=1734437195;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=46aYL8Qujac4/4V9g8K6BMoI6Lwj7kmEE7LxrwnxQWE=;
-        b=u9e7HIjruaIdjn+IHGqoATTpWqF64Q6sHP3a1hA7eSBIqknMX5eJTONGpcxluZoTeQ
-         oKzqQJI/UH8nak7xBVmTEMUH8k+Tob4WyT1U/lR/m8HFUjr76MFWxXnCjnnpfR96YtjY
-         CMw+vvJ7jgbFAHC5EkunnRFsB1DKXMaXJzAnf4L2o94oOslUmD8JBobqSfSyddhoUGMy
-         ZqKWfZc5E9z4m17aJ+e9h9lQtPihSTiCOy+fuTRfUCyAoBzNwNf5GH2rj92Ir/IDIAKz
-         Wco8v8sjGWiCD1/RCjarEyhyrZPtE0jE6mJSeafYqhWhzI0HHECjBf8YqYVE9JK8eNOl
-         SkMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUdrSjbcAAWI8F+OmwOAvQINC+9Z5u+bFT6SgCxL2niz0QAfZWU/KbLqnO+b/pA3vWH7vl/WWMF@vger.kernel.org, AJvYcCVWhyYzLU5JGBUB+o67uV6wqw1bBWh/oPyol6O8HuTJxbyLaifLetzPJKZ8s2985+bP/4UkQqzsyzCE3zRc@vger.kernel.org, AJvYcCVzCcB+wbFUn+XtZnwDHoXZDLIqzHEUhQgcTuFyQCeGL/f+x9F2keGg8QEhHY1Perv1ZY5zeGdLYrbv@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5CYa56CxiD7G5UbQqVrbAHvwSCR9cOqKZbrbA08eovdlk/6lK
-	bs0gk+UC8xUGWfqB0Qovqt1BlDenLuO5nPtnyNBmwpmwX2Vv8k89
-X-Gm-Gg: ASbGncvy5N9yhdluTy7YOajmw2Xj6AeokHD4Pvt+WIsKaGcLhBOs3CPDc1mcHA/WM90
-	OJOcrWGiVD8+26wOEqZD1UShtoNdOcG3EvIvCf/Se/AZOtkHohpiU+2mhpqtgNKQXJ/QSYHWsJp
-	GCQyOmuRi7IyI2EcRNZAE4S8lliGHRbZ1zreEPIIN3zlonjF9eVrJF/aVVIHLGbwdPn5s4r4bty
-	SY44KdnJx3WtPqpmI/pDPPZMc9myojLxThdwATFJ09iDwrSXJBamTSUoU5ExFO4g2769E3Zg9SI
-	o7PxfLC0PA==
-X-Google-Smtp-Source: AGHT+IGpcC8Z7oXmbBOkKTQCK7YHx0j6xObP8W63hf6oMmuAzbltOfilbIotkhxBgXfUoy6iy3NP7Q==
-X-Received: by 2002:a05:600c:3b04:b0:434:a706:c0fb with SMTP id 5b1f17b1804b1-434fff3dcfbmr51803755e9.10.1733832395127;
-        Tue, 10 Dec 2024 04:06:35 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-386394dd379sm8026747f8f.24.2024.12.10.04.06.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 04:06:34 -0800 (PST)
-Message-ID: <67582eca.050a0220.3b9b85.2de4@mx.google.com>
-X-Google-Original-Message-ID: <Z1guxUhVSGLHUVUh@Ansuel-XPS.>
-Date: Tue, 10 Dec 2024 13:06:29 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v11 6/9] net: mdio: Add Airoha AN8855 Switch
- MDIO Passtrough
-References: <20241209134459.27110-1-ansuelsmth@gmail.com>
- <20241209134459.27110-7-ansuelsmth@gmail.com>
- <5aec4a94-3cea-41a4-8500-71472fae51d4@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638961A00F8;
+	Tue, 10 Dec 2024 12:08:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.229.24
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733832502; cv=fail; b=oaYZudUj6nx56GFsjUY2MCLfu70W7MqqQz78+7wezCFolLpySSnZ29AoYxcWDK9k8F7eMs/pssY5DWRA62f3VsiP266/ty2Tt2MWbXD6IDa0CJjJmAayJtKDJMwncM6MRHaP8uPeR1AOobxapFj0fmy78FicZKHISO9HReC4f74=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733832502; c=relaxed/simple;
+	bh=gYYjRFBSfbLELpoTVbmHz1uJv+6QXWPOUFYM+sucpro=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=rt1nTEAIknQnUuK6rbEX9YNGbM+eGODg7b/aQ4UTFdfVr4NcAzoYBcDrABaHOuhDetZt9SNFydNSzDVqvfmU9IOy5idrMsIjCGINjyyn4Vt39bw43CQjE1rI11P7cThK+ufDuqJwj3UwnekPZR6RaXTiFHHWYl1aKbhFb7YMrnk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=cKPJu/oA; arc=fail smtp.client-ip=52.101.229.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QQptfREVg4eTfr2oT1Mw+P8E3kglffdy/TdsFWQ6h/3sc6sCmmhpcDtRCfILQDCPfFPo7VU5E0hUBwBi24AFvmXHtRgPJNPpPBQXz5+ERs5MPuHLiHChwzDOXqq8Cmrz5DCaMt7viDNC2FS3/RxHvts8EVxa/IkCM5KNUjchorKQlZFqxO5WMlcFwhD2CugyrgJ2t31TinvRR4kwf5rg9kFH3Ex2DvTBYu37lyuPPYr6qV/NEzFsmrongfbZvZcejgsz0P4TRHcchmZEMaxPD6Iwc3IuFhOND9BXWpopQETtvXm1JD1fqN7yytzCO2OSzxsliJj2bd+1hjf+SpCdvQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lrfNTWp+x5Os+aXyH8C8V8gc6UuQ2t+jUqFPxdLPBrY=;
+ b=heUxDWW09gyPc1MvZj6P3/EfcEDXOPjTTCAuGfK4JdjHtA7aRvrqlFN3crDt+jnB2S5ACn8fiZqJWcAuvc+u585b2RCQbDVIcn1ANB1UJrIzVBmP/BFwCLRdsnfL6GNPtLtKm7hi3T+Md4ezT7aZggOGbU/Lxa0yBfERBme+huW+A3FQqFHEIw0aDuYLsJBMg9B2YxzOrKZ78Tb7DJFwKTSnCIYWbq/KiMpRoxf6Z8USUvAEH5VGN4IEAYhmhFOy8VcJuOOkIfDBODWKjIm/AsPJwX/YHE54jAuzaJ8tZsvjiNJ1Kl9ridsGUWw/omb6cAg9prCTghtsUgZQWL2XyQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
+ dkim=pass header.d=renesas.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lrfNTWp+x5Os+aXyH8C8V8gc6UuQ2t+jUqFPxdLPBrY=;
+ b=cKPJu/oAYQmyFn8WfhfU91K99wy/Rpc7pCc+K7F4EpWQofP9WwhNDkCGhUKfPo5C+ReKwpnNbDPu2KdY1CCII8U1QyDVAe5L7sQHT17u3b5vYkkMjYHmfQZ1+lqQ16YeD33jVj7EzVhQfle3R2juS/pezbMr/fD/l9W9zJqz/g4=
+Received: from TYCPR01MB11040.jpnprd01.prod.outlook.com (2603:1096:400:3a7::6)
+ by TYRPR01MB12569.jpnprd01.prod.outlook.com (2603:1096:405:1ad::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.17; Tue, 10 Dec
+ 2024 12:08:16 +0000
+Received: from TYCPR01MB11040.jpnprd01.prod.outlook.com
+ ([fe80::b183:a30f:c95f:a155]) by TYCPR01MB11040.jpnprd01.prod.outlook.com
+ ([fe80::b183:a30f:c95f:a155%4]) with mapi id 15.20.8230.016; Tue, 10 Dec 2024
+ 12:08:16 +0000
+From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To: nikita.yoush <nikita.yoush@cogentembedded.com>, Andrew Lunn
+	<andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Geert Uytterhoeven <geert+renesas@glider.be>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michael Dege
+	<michael.dege@renesas.com>, Christian Mardmoeller
+	<christian.mardmoeller@renesas.com>, Dennis Ostermann
+	<dennis.ostermann@renesas.com>, nikita.yoush
+	<nikita.yoush@cogentembedded.com>
+Subject: RE: [PATCH net-next 0/4] mdio support updates
+Thread-Topic: [PATCH net-next 0/4] mdio support updates
+Thread-Index: AQHbSYk5J1GiFYZP206aVROkSfqyN7LfZJEw
+Date: Tue, 10 Dec 2024 12:08:16 +0000
+Message-ID:
+ <TYCPR01MB1104066D4705868EEA440CE13D83D2@TYCPR01MB11040.jpnprd01.prod.outlook.com>
+References: <20241208155236.108582-1-nikita.yoush@cogentembedded.com>
+In-Reply-To: <20241208155236.108582-1-nikita.yoush@cogentembedded.com>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=renesas.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TYCPR01MB11040:EE_|TYRPR01MB12569:EE_
+x-ms-office365-filtering-correlation-id: 2efe7409-32da-45cb-ff8b-08dd191353fd
+x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?Yg1enIv4getoZR4LTb8SInfKapVD5uTcMR//8TfHAMaAkg5b5Fb4tzenJbMV?=
+ =?us-ascii?Q?N6ipKDmi7dY+MMmkcz8jAqJib4kilxiV7fqcckgSufP5l3D2PlwgF1GA6LZd?=
+ =?us-ascii?Q?ea3ULFiGkTetwsuWtsCRfPWleQ1uHOUJWmR6Ltjhp7d+kfclukouUTxEU5pw?=
+ =?us-ascii?Q?fN+ts+U+NqnKxuOZ6WI9DrmzWPwM4Av6OWRGvgc3tyEGyj+4pCpspraUNzxk?=
+ =?us-ascii?Q?X521UjCZtaz1kK1ZVlvBptaUwD6s2R2J2kmsBnDPDq8ev3wf6dFHtMoCQfY3?=
+ =?us-ascii?Q?OaNCBVwnc0mbOp+7hZOBu6X8Hhwm52j0LDpTVjBysEJY1SSSUZeB2NWx5EDi?=
+ =?us-ascii?Q?vu3ihTu0tA33WGVByFh734X9bbFzvXWjVXCzm47AbQWD39ZhjBopKPq+svtG?=
+ =?us-ascii?Q?ivwCasKv5PNpa+/tM7mRs/GkfS2WbV1nfsZoW6PkYIChfld2EXpoCOgBOAR7?=
+ =?us-ascii?Q?1E2Jpsg04J4pjpvlCXQOO9TgoRlhSJClPvp3rAEOISGwdUGVknONJcYcnQkn?=
+ =?us-ascii?Q?DOoBW66lRq/dTPGKrGaHMMpVA17DI3Mm5w8X3UySEAsu50TkfdfLmJ7kHpuW?=
+ =?us-ascii?Q?UGt6IzDEffmfBGtEU+ubYvO333I+c9qx//XX0qizZl4K/QJ8Q66SaWiqfxsy?=
+ =?us-ascii?Q?LXBFbzdMqaSGTRlVY60y5p1dtGzmsg8ANNCIhwNXpAjpIXksumVoSWoIOA44?=
+ =?us-ascii?Q?Ej30pw/LqiZSdbJujUaEgUI8hCE4d4rE0EA7MsX7FmfazJC0Xbat1RnqHUQS?=
+ =?us-ascii?Q?jhszNtCNrRu76E09Ckvi0gR1MnXwB7NKgULAPHPYd+Yzj1abIYIXGVUwJ5iT?=
+ =?us-ascii?Q?Y84Mk2FjoQb8NGgsyvaQadGlXRCBf8ssJkaqXY1Zij76u6FivHgnjckMHgRm?=
+ =?us-ascii?Q?wnyQZojxZE1u9TR22jz95PuW2LQ0N1nivH6/FJgjHrZi56zmTWdzcGj1nG2c?=
+ =?us-ascii?Q?zo2uB6MW1+0WYexY9756A2gEId0TijtyYY2zsIRulfebZE2Am5Diy/13aohD?=
+ =?us-ascii?Q?pOvtybDJvUY30xoIJThL/YK36KUWh6Y4Mcv2M/EKyQAZvNeKPKO3ICPe9HBb?=
+ =?us-ascii?Q?3MqcyT3kdFyEITA2AWoysrqQfDFLaskDx71QjhAU/v6C5omsoR0l+97ku3j7?=
+ =?us-ascii?Q?etE7cEjUJFaVyrH0OmGb55Z3tR5f35QyHwHirTzscR8qLQoL5VBKgrzS3ks5?=
+ =?us-ascii?Q?IwYblKT3gFeJoSsKI1AO1pSXtqIwoxp183OwJq6BSvNWaWdw7QiZIP+Pt+g9?=
+ =?us-ascii?Q?BmDfH3hX00vHNN9Hynbiid/PjsuVa0t0pn+AJNM0QyMuptRxZfghBiRs3eLL?=
+ =?us-ascii?Q?i4bmZdMA3Hondh3qybm9uEFRxWHLIh9dS/vjWyfMPA389dJLVFB293MEebdw?=
+ =?us-ascii?Q?abVnsRfKG4axLuL1qFJVUAqe7hP4m1hAAVExDgjd9B7//kQfmQ=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYCPR01MB11040.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?QJ8OLJjA9ii9mokIzFFai9qoq52DtdGjrojTMmiorddYO3oas88eNJU/YiL1?=
+ =?us-ascii?Q?A0qTQHYXEeWyH+JxHsYrn1ogihqoRtk+aqfohohB3sKT00dvyiSec8kYO7Wu?=
+ =?us-ascii?Q?OVRUK1liIckSIsuqNvdmAAHT1RHxunodByFbrFvjE8v5WGFLxPtZbNAU4XCI?=
+ =?us-ascii?Q?Dwx7+5huuzwmSfbZTX99IQw4FO0pxiqfnkNRd2zRd6lfePUFM5GiogczJL/j?=
+ =?us-ascii?Q?rl8ftFGfid/2FlsW6pzuYTOx15+slkTP2NoboSgfmpgpTsJv+qNpF+SPkAMw?=
+ =?us-ascii?Q?/MnDjL9AAU8VTC9baWcvo0+VWlQQohOJkVbV9+467Wqs4+GMMiXr6tMuYJTN?=
+ =?us-ascii?Q?w57r8xxj7Uusm+4SN63pMJxU0kIiwOYzLcd36HuieZAJd/R2UW9szmcKitE2?=
+ =?us-ascii?Q?yzZD365ASnaMuBUUxkzrDG9Yiy3VKMGYCbx7gyVIFj68wsWYagWj78aSwyQ8?=
+ =?us-ascii?Q?lCELnyBOorudbhdnowqRjqvgHOgcjGAwX48NYfRd0cZ34EJ+hnO5sSDIykkv?=
+ =?us-ascii?Q?UoZ/zbkcaJUI8gD6bOdzJjf0LfqXWqdZGg0XTr30L+IEgzWQSgUaxUk5NG1A?=
+ =?us-ascii?Q?K7J9F2UqhiFELWbfmY/6xjNisSqgiDmwkpNWMdPm/DBFopskNJibZZhNY+M/?=
+ =?us-ascii?Q?OWPc6E0OVQbN9+Cubc0NiA7/gXK4N9rILgXJK3RImJTdaCpmO5EHreaWh/qC?=
+ =?us-ascii?Q?OAHkfKCrOdRe4VVFU+hpYfSguBcY6KXsRuvi8yNwv2OEcZIdSmIr8KuYM5+T?=
+ =?us-ascii?Q?WU5bqqBbZ20AZJNJGX3D8Fgw0WivCafSB10Pjb+fo1yHNVl1cisChIaqvfwF?=
+ =?us-ascii?Q?h+NEc1xbbSINkiHigvuDkKn08PjGgKh4Qfa7byxt0pP3Xd/bFQ4sQviIBaM/?=
+ =?us-ascii?Q?c5fBBlk2thLg9AaXfOg+RpNGb440jHsKqUCqKTceUVyUeRLTD2gTgHtLophH?=
+ =?us-ascii?Q?emgNmO437cY8cV8tJZSu8k3lPDFKLiPj4u//oYnyBJ6phFmG7c/z6wjl3el3?=
+ =?us-ascii?Q?66j4dzh3yw3eBVOEe8j5/LyNCx4hr0Y0vizIlxnImpTMI9dMuAeL0F1mZEm0?=
+ =?us-ascii?Q?bwU5sIT5oufxg0lYa1HlJnDW1sYOPCX6Cd/08e8PRfU7j7abb0aslfHhcL7i?=
+ =?us-ascii?Q?Pb7bqt5/b76wBY9mLRs4+nyNrJsx4GbT71HAJA4Tk7PcJ0d3vczrEQvhNzm1?=
+ =?us-ascii?Q?i+pih6A6NvKlSQOOuenLo2suXU3bIlJHNDa5pdjjuNkQ/WkD28WumHkmE9kn?=
+ =?us-ascii?Q?/8BIbUaGvK0ehINVxgGbW6sdxvpRokON++7l0SnojSd2fymud3aGM0JEBa06?=
+ =?us-ascii?Q?z3tj2e40zoAjW2UB+EmYgkeD7Bb9nT8mSZraAFCaW5mhQM9tBQTgBYln44CV?=
+ =?us-ascii?Q?y27rLJsHUo2nOY6pq4U0vX0pxRfouKXcAP67jxVADvqKiL9mvArdzQkvZtdF?=
+ =?us-ascii?Q?ts5ox+xKpiUZfE3tQfbGGg6auob7UKGhdsy4T80pMkzgcd/2ihukn+db78F8?=
+ =?us-ascii?Q?HjoesaZGr4DXBQFlCDJ9LZMxjysq9UzwA48fOFKc7DmSZuGi3TBAf6pUOQ7a?=
+ =?us-ascii?Q?5v/blTtnW3FhruRKveo20JMEM6FSrJqxfhJZCfGwlAALD5oTdibvTFmPq5Tn?=
+ =?us-ascii?Q?tQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5aec4a94-3cea-41a4-8500-71472fae51d4@lunn.ch>
+X-OriginatorOrg: renesas.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TYCPR01MB11040.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2efe7409-32da-45cb-ff8b-08dd191353fd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Dec 2024 12:08:16.0411
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6N4u2NliR31JpUaqaS2aJP67cmhoj24yfJhgNvFrP+tsYiRRssJulmQ9ZXZPCzGRZ6BvUqtZMLg4hILvpbBhgF+ZDV/YKTg8+m5ekIJCSE4HQ6e2pPkr2jnIq9/RGF5o
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYRPR01MB12569
 
-On Tue, Dec 10, 2024 at 02:53:34AM +0100, Andrew Lunn wrote:
-> > +static int an855_phy_restore_page(struct an8855_mfd_priv *priv,
-> > +				  int phy) __must_hold(&priv->bus->mdio_lock)
-> > +{
-> > +	/* Check PHY page only for addr shared with switch */
-> > +	if (phy != priv->switch_addr)
-> > +		return 0;
-> > +
-> > +	/* Don't restore page if it's not set to switch page */
-> > +	if (priv->current_page != FIELD_GET(AN8855_PHY_PAGE,
-> > +					    AN8855_PHY_PAGE_EXTENDED_4))
-> > +		return 0;
-> > +
-> > +	/* Restore page to 0, PHY might change page right after but that
-> > +	 * will be ignored as it won't be a switch page.
-> > +	 */
-> > +	return an8855_mii_set_page(priv, phy, AN8855_PHY_PAGE_STANDARD);
-> > +}
-> 
-> I don't really understand what is going on here. Maybe the commit
-> message needs expanding, or the function names changing.
-> 
-> Generally, i would expect a save/restore action. Save the current
-> page, swap to the PHY page, do the PHY access, and then restore to the
-> saved page.
->
+Hello Nikita-san,
 
-Idea is to save on extra read/write on subsequent write on the same
-page.
+> From: Nikita Yushchenko, Sent: Monday, December 9, 2024 12:53 AM
+>=20
+> This series cleans up rswitch mdio support, and adds C22 operations.
+>=20
+> Nikita Yushchenko (4):
+>   net: renesas: rswitch: do not write to MPSM register at init time
+>   net: renesas: rswitch: align mdio C45 operations with datasheet
+>   net: renesas: rswitch: use generic MPSM operation for mdio C45
+>   net: renesas: rswitch: add mdio C22 support
 
-Idea here is that PHY will receive most of the read (for status
-poll) hence in 90% of the time page will be 0.
+Thank you for the patches. They look good to me. So,
 
-And switch will receive read/write only on setup or fdb/vlan access on
-configuration so it will receive subsequent write on the same page.
-(page 4)
+Reviewed-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 
-PHY might also need to write on page 1 on setup but never on page 4 as
-that is reserved for switch.
+And, I tested the patches on my environment (R-Car S4 Spider), and
+it worked without any regression. So,
 
-Making the read/swap/write/restore adds 2 additional operation that can
-really be skipped 90% of the time.
+Tested-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 
-Also curret_page cache is indirectly protected by the mdio lock.
+Best regards,
+Yoshihiro Shimoda
 
-So in short this function makes sure PHY for port 0 is configured on the
-right page based on the prev page set.
 
-An alternative way might be assume PHY is always on page 0 and any
-switch operation save and restore the page.
+>  drivers/net/ethernet/renesas/rswitch.c | 79 ++++++++++++++++----------
+>  drivers/net/ethernet/renesas/rswitch.h | 17 ++++--
+>  2 files changed, 60 insertions(+), 36 deletions(-)
+>=20
+> --
+> 2.39.5
 
-Hope it's clear now why this is needed. Is this ok or you prefer the
-alternative way? 
-
--- 
-	Ansuel
 
