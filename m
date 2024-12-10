@@ -1,165 +1,214 @@
-Return-Path: <netdev+bounces-150597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 138E09EAD76
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 11:02:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 318769EAD92
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 11:05:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6674F16070C
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 10:00:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB0811885B01
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 10:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0E52080ED;
-	Tue, 10 Dec 2024 10:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F57723DEA9;
+	Tue, 10 Dec 2024 10:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Qm9JVpnS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fwr3lptP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5E72080C9;
-	Tue, 10 Dec 2024 09:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2323235942
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 10:04:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733824800; cv=none; b=aPz2muW2iraqNvH9u38U8AcwSPs3G3fBf0pC/wbaPt4+IWkb0kEh0PHIUF/V4Cd4ow2cEf/oSUQvZqKUj7X8m5ju6Lau/mMVr58DH9SaRsIXibtC+BhDi0yzKhisHPpRnM3jLrZEqLlFZVDhY6YSsSV9jRUCwC/MFhf9wZOaGF8=
+	t=1733825093; cv=none; b=t8N79Ym9JtFNJaM4q56U3ViMLlvOnTFypMJrSQQfbVSm52ZICnrSk428GJcB/E2i8y+mblkDcN3p8+NUG5VlRVFwjVzqHhTiVMdmrNZZ0/3DWyhIyV4k7Fm0jKsF5ukMokYh2eJZFMDDnrRGyasYakcYBjEv0wXLrT3R1G8x05A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733824800; c=relaxed/simple;
-	bh=t5EUydVzLEUmqeeWH9AEltt3IDkS6msVBQR7PHoGIfo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o/kmibDbPhfYjNDv1Dfa5UTnsHPmJtFKFlfqvvnn3fEFBxc3Fjjdeq7oOmhnsY5ng57sKPl+MjNviIKFV/YV1Hj0iYTgGksw6CpFSXZWLhYX9MZPs/zGzNS73wYMMELxRa/FMIb4PfmPpkykiqTf928CBJeVl4fGgsfjOQJZm1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Qm9JVpnS; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BA9RiFj019995;
-	Tue, 10 Dec 2024 09:59:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=vkFVlj
-	oYH9tR0VLBFqHDDM+41lBT98TZUnYgw/2vQoA=; b=Qm9JVpnSTodL6Jn+KB49XV
-	f9nDS8IPQZ9xAesoWjK91x5dceFBm3H527xuZJo2J6YoGFLxlZoxPX6/eyaz/EhK
-	nVMEzx9qZKm1WMCtkOdhn1J0wm031Qx7DeCniPryb7Ee0mZyaji41b+gDx+Uwy5t
-	ZfqlMAtBVPhtRQSNRJz4YmyupXUogGb2Eq4VN9RsJDKxpqq/woa08P5lhunpdcVy
-	5f6AWUabbj35aXNyqG5zQsouEInumm7FgqYsL+Z5iTp1yTNZ2d0YPpCaCFBF+Gur
-	9I66aqy6ARe66rdt7NDaq2bqy55RKHdJfScKOnkl31+sPI0oh6VsFWrZYznvtj/A
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ce38pak1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Dec 2024 09:59:54 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BA9tgcM020180;
-	Tue, 10 Dec 2024 09:59:54 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ce38pajy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Dec 2024 09:59:53 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BA8uKK3023018;
-	Tue, 10 Dec 2024 09:59:53 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 43d2wjtrke-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Dec 2024 09:59:52 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BA9xngf59113872
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 10 Dec 2024 09:59:49 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6AD6420043;
-	Tue, 10 Dec 2024 09:59:49 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3714720040;
-	Tue, 10 Dec 2024 09:59:49 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.152.224.212])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 10 Dec 2024 09:59:49 +0000 (GMT)
-Date: Tue, 10 Dec 2024 10:59:47 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, jaka@linux.ibm.com,
-        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dust Li
- <dust.li@linux.alibaba.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH net-next v2 2/2] net/smc: support ipv4 mapped ipv6 addr
- client for smc-r v2
-Message-ID: <20241210105947.466674a4.pasic@linux.ibm.com>
-In-Reply-To: <58075d86-b43a-4d58-bf64-c29418f99143@linux.alibaba.com>
-References: <20241202125203.48821-1-guangguan.wang@linux.alibaba.com>
-	<20241202125203.48821-3-guangguan.wang@linux.alibaba.com>
-	<894d640f-d9f6-4851-adb8-779ff3678440@linux.ibm.com>
-	<20241205135833.0beafd61.pasic@linux.ibm.com>
-	<5ac2c5a7-3f12-48e5-83a9-ecd3867e6125@linux.alibaba.com>
-	<7de81edd-86f2-4cfd-95db-e273c3436eb6@linux.ibm.com>
-	<3710a042-cabe-4b6d-9caa-fd4d864b2fdc@linux.ibm.com>
-	<d2af79e2-adb2-46f0-a7e3-67a9265f3adf@linux.alibaba.com>
-	<868f5d66-ac74-4b0a-a0d0-e44fdea3bb73@linux.ibm.com>
-	<20241209104647.5c36c429.pasic@linux.ibm.com>
-	<85d1c6e1-0fe3-4c71-af4e-8015270b90dc@linux.alibaba.com>
-	<20241209214449.0bb5afce.pasic@linux.ibm.com>
-	<58075d86-b43a-4d58-bf64-c29418f99143@linux.alibaba.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1733825093; c=relaxed/simple;
+	bh=a5KgHKLMnniNQJEqnBxLJOnIy94meK1NEByqFcZ540c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=PRzE/6RWEND0TT+vqvyISJaMBGe0UgkxlyxteUBYE4X8vtTrbAfxDuvXeHKxmIid/UkVu/fRiOwq2UEVbDsXGekbymxqU7kgcGSCWw3oZ0KaO+9UnsYdAigIL7HrU2RQJyPpCkTQpRxCvgIkSngjh2vjTNYE07gGoz1ARY0dnsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fwr3lptP; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733825091;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S3ae6vLLG81Oaz3MLDj9aqdH9v+tZLHlGocELrgXjjk=;
+	b=Fwr3lptPzm6lOXEDKFGBroyAKyg3EhWZecVNgONoeVXG6YBhdvlbgH7uIMUopfCB0BRpDH
+	pXTRkPB4iLNvepvKmmmLEsDZb6u0COCUhLGIVH6Z/Is2+mVbv894ZeExJhpr6al2pDr4Qs
+	T3NMxY8vvQR3JC8Mm6/vzef8RLn4c24=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-359-Jzk868hzNTW54iHPpOpNsg-1; Tue, 10 Dec 2024 05:04:47 -0500
+X-MC-Unique: Jzk868hzNTW54iHPpOpNsg-1
+X-Mimecast-MFC-AGG-ID: Jzk868hzNTW54iHPpOpNsg
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6d8eb5ea994so49128536d6.1
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 02:04:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733825087; x=1734429887;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S3ae6vLLG81Oaz3MLDj9aqdH9v+tZLHlGocELrgXjjk=;
+        b=OaqdyJtV/cZFBZMGBI2dgOmHZ4EP8RN4QjAxVHtMEsFm/MUwbVojgEhoRlXNF/7CZx
+         X8oSsc3f5BcPR99dJ3Mn/ZyglEG3v+q3ufId3a4GxzyGlweJyZPn1hBHqatfEqa0uVhb
+         eFO1nfm754zDi+WKWVUjerrNtbE//VH6/xVUx5kkVQa9+4x1GKAgOkDSdwy/OcVzxodf
+         z1fYbGPvawJKWALbmPCjrMaclJSJ5XtP6cSQDMVS5owgo1e2HzULgO6XPHaQfpQ1C97u
+         6EkeP3FNhLUa699WwCs5XBxBM+iLwXWyJhtw6w8uAbaz3A7z1KEBSfSlGV6W4BtaCO9O
+         IeJg==
+X-Forwarded-Encrypted: i=1; AJvYcCXRDrNG1UFwndUCF9Uzq1D8Uy9tj870hFxtUkiNRCc/GDaegUymuAqb/G3YBWY5pdh1+xQpVIk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGdaGGODVUBF+t6WeoAml0zsejvT0glSEtb+Aaux7ruPoh7qJA
+	kWKipPUZKRJzlrAZThuMqToJQfzABoJCxED87xPuplkqtqpA5azy9Ik0O0luAL1uM/CfXnsCbYF
+	HazGW/+dwRKSkzDkjqjHgYz1/yk3K+xQhV9gjy2UNZSB1e9nGN0JbGA==
+X-Gm-Gg: ASbGncs+IWERYBk5oOaQIETvU+Z8wE3bmokN8T9kHZy9/NvfEkm6fJF3S/Nhf/KJ1yC
+	Ozdvkv+4UwmSpiUvEwV0w3ytieTOPNpoJlZPpQtqfTViDwYVfKkuIAvTiI6rbYZEWS7my8Z8SCD
+	JczIelQR20kI6fYmtOCVmdwhXnVpdrV38LXQswv49kXeUkqkx9g6BdtjJHnIRdqToOunfdlkjSU
+	f/uDEdJp4kZutLyXPsyKv0z4IxdbkPQP94fkC6Hzcgmtuv6ueVSK4CEkg7cT8zDXWzrILjV8vPt
+	1IqgD4ul0VZhk8a3TIy5Pw58AQ==
+X-Received: by 2002:ad4:5ae3:0:b0:6d8:9d28:ff07 with SMTP id 6a1803df08f44-6d8e71e56cbmr314385666d6.45.1733825087276;
+        Tue, 10 Dec 2024 02:04:47 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHrxGRcxXDwUSXmz7uZszQCh1ZzPVfr9/e6EVos7EDDqHcHI7i3fZ5CrTM5Iwp2JEM2PYxVrA==
+X-Received: by 2002:ad4:5ae3:0:b0:6d8:9d28:ff07 with SMTP id 6a1803df08f44-6d8e71e56cbmr314385306d6.45.1733825086975;
+        Tue, 10 Dec 2024 02:04:46 -0800 (PST)
+Received: from [192.168.1.14] (host-82-49-164-239.retail.telecomitalia.it. [82.49.164.239])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d9005f17b7sm31606926d6.5.2024.12.10.02.04.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2024 02:04:46 -0800 (PST)
+Message-ID: <c67e10cf-ae33-4974-93c6-aaa111171635@redhat.com>
+Date: Tue, 10 Dec 2024 11:04:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dHsgy1URY5S9tEcSQkFfxg7h82R871U5
-X-Proofpoint-ORIG-GUID: 2Ce0Tx0GAoXpvCY_w4Jxbxfc-J6aTeY2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- spamscore=0 clxscore=1015 priorityscore=1501 lowpriorityscore=0
- impostorscore=0 bulkscore=0 mlxscore=0 malwarescore=0 mlxlogscore=857
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412100074
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] Do not invoke addrconf_verify_rtnl
+ unnecessarily
+To: Gilad Naaman <gnaaman@drivenets.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+References: <20241205171248.3958156-1-gnaaman@drivenets.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241205171248.3958156-1-gnaaman@drivenets.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 10 Dec 2024 15:07:04 +0800
-Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
-
-> On 2024/12/10 04:44, Halil Pasic wrote:
-> > On Mon, 9 Dec 2024 20:36:45 +0800
-> > Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
-> >   
-> >>> I believe we would like to have a v3 here. Also I'm not sure
-> >>> checking on saddr is sufficient, but I didn't do my research on
-> >>> that question yet.
-> >>>
-> >>> Regards,
-> >>> Halil    
-> >>
-> >> Did you mean to research whether the daddr should be checked too?  
-> > 
-> > Right! Or is it implied that if saddr is a ipv4 mapped ipv6 addr
-> > then the daddr must be ipv4 mapped ipv6 addr as well?
-> > 
-> > Regards,
-> > Halil  
+On 12/5/24 18:12, Gilad Naaman wrote:
+> Do not invoke costly `addrconf_verify_rtnl` if the added address
+> wouldn't need it, or affect the delayed_work timer.
 > 
-> I did a test by iperf3:
-> A server with IPV4 addr 11.213.5.33/24 and real IPV6 addr 2012::1/64.
-> A client with IPV4 addr 11.213.5.5/24 and real IPV6 addr 2012::2/64.
-> iperf3 fails to run when server listen on IPV6 addr and client connect
-> to server using IPV4 mapped IPV6 addr. commands show below:
-> server: smc_run iperf3 -s -6 -B 2012::1
-> client: smc_run iperf3 -t 10 -c 2012::1 -6 -B ::ffff:11.213.5.5
+> For new/modified addresses, call "verify" only if added address has an
+> expiration, or if any temporary address was created.
 > 
-> Failure happened due to the connect() function got the errno -EAFNOSUPPORT,
-> I also located the kernel code where the -EAFNOSUPPORT is returned
-> (https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/ipv6/ip6_output.c#:~:text=err%20%3D%20%2DEAFNOSUPPORT%3B).
+> This is done to account for a case where the new expiration time might
+> be sooner than the current delayed_work's expiration.
+> 
+> For deleted addresses, avoid calling verify at all:
+> 
+> If the address being deleted is not perishable, and thus does not affect
+> the delayed_work expiration, there is not point in going over the entire
+> table.
+> 
+> If the address IS perishable, but is not the soonest-to-be-expired
+> address, calling "verify" would not change the expiration, and would be
+> a very expensive nop.
+> 
+> If the address IS perishable, and IS the soonest-to-be-expired address,
+> calling or not-calling "verify" for a single address deletion is
+> equivalent in cost.
 
-Thanks! That is enough for me!
+This last statement is not obvious to me, could you please expand the
+reasoning?
+
+> 
+> But calling "verify" immediately will result in a performance hit when
+> deleting many addresses.
+
+Since this is about (control plane) performances, please include the
+relevant test details (or even better, please add a small/fast self-test
+covering the use-case).
+
+> 
+> Signed-off-by: Gilad Naaman <gnaaman@drivenets.com>
+> ---
+>  net/ipv6/addrconf.c | 34 +++++++++++++++++++++++-----------
+>  1 file changed, 23 insertions(+), 11 deletions(-)
+> 
+> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> index c489a1e6aec9..893502787554 100644
+> --- a/net/ipv6/addrconf.c
+> +++ b/net/ipv6/addrconf.c
+> @@ -310,6 +310,16 @@ static inline bool addrconf_link_ready(const struct net_device *dev)
+>  	return netif_oper_up(dev) && !qdisc_tx_is_noop(dev);
+>  }
+>  
+> +static inline bool addrconf_perishable(int ifa_flags, u32 prefered_lft)
+
+Please, do not use 'inline' in c files.
+
+> +{
+> +	/* When setting preferred_lft to a value not zero or
+> +	 * infinity, while valid_lft is infinity
+> +	 * IFA_F_PERMANENT has a non-infinity life time.
+> +	 */
+> +	return !((ifa_flags & IFA_F_PERMANENT) &&
+> +		(prefered_lft == INFINITY_LIFE_TIME));
+
+Minor nit: the intentation is wrong should be:
+		
+	return !((ifa_flags & IFA_F_PERMANENT) &&
+		 (prefered_lft == INFINITY_LIFE_TIME));
+> +}
+> +
+>  static void addrconf_del_rs_timer(struct inet6_dev *idev)
+>  {
+>  	if (del_timer(&idev->rs_timer))
+> @@ -3090,8 +3100,7 @@ static int inet6_addr_add(struct net *net, int ifindex,
+>  		 */
+>  		if (!(ifp->flags & (IFA_F_OPTIMISTIC | IFA_F_NODAD)))
+>  			ipv6_ifa_notify(0, ifp);
+> -		/*
+> -		 * Note that section 3.1 of RFC 4429 indicates
+> +		/* Note that section 3.1 of RFC 4429 indicates
+>  		 * that the Optimistic flag should not be set for
+>  		 * manually configured addresses
+>  		 */
+> @@ -3100,7 +3109,14 @@ static int inet6_addr_add(struct net *net, int ifindex,
+>  			manage_tempaddrs(idev, ifp, cfg->valid_lft,
+>  					 cfg->preferred_lft, true, jiffies);
+>  		in6_ifa_put(ifp);
+> -		addrconf_verify_rtnl(net);
+> +
+> +		/* Verify only if it's possible that adding this address
+> +		 * may modify the worker expiration time.
+> +		 */
+> +		if ((cfg->ifa_flags & IFA_F_MANAGETEMPADDR) ||
+> +		    addrconf_perishable(cfg->ifa_flags, cfg->preferred_lft))
+> +			addrconf_verify_rtnl(net);
+> +
+>  		return 0;
+>  	} else if (cfg->ifa_flags & IFA_F_MCAUTOJOIN) {
+>  		ipv6_mc_config(net->ipv6.mc_autojoin_sk, false,
+> @@ -3148,7 +3164,6 @@ static int inet6_addr_del(struct net *net, int ifindex, u32 ifa_flags,
+>  			    (ifp->flags & IFA_F_MANAGETEMPADDR))
+>  				delete_tempaddrs(idev, ifp);
+>  
+> -			addrconf_verify_rtnl(net);
+
+With an additional 'addrconf_perishable' check here protecting the (here
+removed) addrconf_verify_rtnl(), the patch will be IMHO much less prone
+to unintended side-effects.
+
+Thanks,
+
+Paolo
 
 
