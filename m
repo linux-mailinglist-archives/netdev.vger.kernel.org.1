@@ -1,253 +1,98 @@
-Return-Path: <netdev+bounces-150601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39C979EADDA
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 11:20:23 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 567AD9EADEA
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 11:24:09 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D282282854
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 10:20:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AFA11888A8D
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 10:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B1819D8BE;
-	Tue, 10 Dec 2024 10:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CF723DEB5;
+	Tue, 10 Dec 2024 10:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YCStdYEl"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="samgMV8l"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389D623DE8D
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 10:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0F023DE8D;
+	Tue, 10 Dec 2024 10:24:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733826018; cv=none; b=NteHW7Nqh8YEcnlt8XxWczairfflzqJMVhmzBNrN7x+tEhicNAoHbiDu8I6rwh2LbzQIIxBzTkSc8a3L6ZbXn+HS+uGpeAzqAUTSp/riRyEXLlzKo8gKdNqq0R3AG+87g/EA1+FVXZCH1Gwlos934gNXX9jF92zrQyP5l6IEGCg=
+	t=1733826242; cv=none; b=oYMY2RhghoVk0m61/07g5wIunM3jXdKBMvb6ZNwmQD9k7o20Ry0TdOLHmS+TjzzZpRE2P5snIQGNoZehPn/Pn1Om+qyjgr540J9FFbs5MVlWGrEQeEq9onMIRnP5gqX6PLkHbCp2vSvf5k32Nkn/8yyhgkrWR9e6TqfAiuh3FaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733826018; c=relaxed/simple;
-	bh=hCKMGqv40wXMr2vadxbAoiwrAluRIL2zTopknFGintM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lu9v644+HeDT5LpAh65HWOT7NYwgafpnBX6uTvaRXpx691n5xWbVyAZ987bgU1/m6dtd2H8wKsCC7AOw1BmKk3MHsmMiBtuyDN2OJezseWk5DMIKWLmEfcb7FO3VdYwTUymvZgN8Tvib787sQISGOSlyg/jhOeX6yHvW0xuEhLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YCStdYEl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733826015;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OCF2E9mCYdGeADz8ePCZvEf0wcVUvNdfcznRREMbGlI=;
-	b=YCStdYElXzH4PVXgtxfqnPvNoxAObKAW/QmPhYMrSulWviDXvDVitjbxQ509+afGDNUuiS
-	oTETfSQ19s32iimrTU/Oa+HelaaonCy0J+mBdQn7WxSaGl2s/J2SVqrB4FvVssPID8TfZ9
-	0jNvV+sudz/eKLSBfB1YtDnTPFPOwqo=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-682-wHwQ5OjrOd-sjWLxS8Dwkg-1; Tue, 10 Dec 2024 05:20:13 -0500
-X-MC-Unique: wHwQ5OjrOd-sjWLxS8Dwkg-1
-X-Mimecast-MFC-AGG-ID: wHwQ5OjrOd-sjWLxS8Dwkg
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6d8f4a0df93so31308916d6.1
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 02:20:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733826013; x=1734430813;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OCF2E9mCYdGeADz8ePCZvEf0wcVUvNdfcznRREMbGlI=;
-        b=Shmo3x1wFIyBQjcYRNRDqSKTS+K0nexkDNbD/XY0CSIhBKMArqXkPMxPKIuY2lw3s/
-         EjkqizZTheQAkku/2q2S/tfQeScGYt8h5aI+o05X0Nnnz0mxAnI52FsVPorqHFE3J15M
-         ArC6S9MBd+T26YG8zvG6MySNH9iNqwti22zxKD4PqCCk+JNfdletuByC/8UZdK42Ia3o
-         kag4VKK6rvkJ6tSdcjO7A7+7pbOrWsDu8ljgEQ9YLpe9kuY244WcErnpr80wiZ3fPr2V
-         tNhJuAwelHQVA/Y+/bs1rtytLpx2OfNMED6qxG55qzHhz1/uvSs32td6jpBG7XEbG/Ql
-         LJGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUUjut4FtuRh+RhzR4avn/O5oyw6GWFsRpgosf00KaBRqIDzeSLQY3kswrAV5ny6fUcs70KIJw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2TUAt6bKgNJAh4c4B/J/u+dCOfxXiIKTLJ/hHwO7oLT1mIDzp
-	2oaHwnJTxovN301FgWTdqmd2Cu9l4uvBlvt90qwwClzEIDJ9jOd3BMGIkhy694Pxtxm0vL3Ddub
-	sLctaiZMKZphlDxu1vGlolpwHnBL9bDtO8oQZiOuVh60wqyYxdVaOYw==
-X-Gm-Gg: ASbGnctYyaHcMoT0jUVy1hJAImYXZ84UYP1bwVvPg+F7xdOrII5OHdq5vY9Q767I2Li
-	39Iu2yDuR1geo2zCRXlf+PfqAYQKe87b7aXu7ubcYxgsiXCGI9Bn0ZRxWaHHZywsBi4fo7ObF4l
-	8lhHdZGnQ0hTCYd45V833u8vL7axjE/DPqkZambgx95O+bDy0D5N3Z6VNpp0xyH4s2czhw/IYMx
-	MAZzGKBBy/hWLpK5/mTZpzgkvFgLUXhYCt3QvvswcJ4K9gVHx+70Cm74ZdEzrchpHA7SZjINCmy
-	+lEhO3ReboOlZRopL1q5RfiSMA==
-X-Received: by 2002:ad4:5c49:0:b0:6d4:139c:cef0 with SMTP id 6a1803df08f44-6d91e361a58mr71303016d6.22.1733826013337;
-        Tue, 10 Dec 2024 02:20:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGGoxN0wLBCmDWM78sXt5u4pFuGJDHHmRq9wGyq58trvWfia+wMtQwT+LoUjwJpmMgQS6SKSA==
-X-Received: by 2002:ad4:5c49:0:b0:6d4:139c:cef0 with SMTP id 6a1803df08f44-6d91e361a58mr71302706d6.22.1733826012978;
-        Tue, 10 Dec 2024 02:20:12 -0800 (PST)
-Received: from [192.168.1.14] (host-82-49-164-239.retail.telecomitalia.it. [82.49.164.239])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d8da6b651asm58363226d6.69.2024.12.10.02.20.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2024 02:20:12 -0800 (PST)
-Message-ID: <75967109-85e4-46ce-9952-94dcb98f5513@redhat.com>
-Date: Tue, 10 Dec 2024 11:20:08 +0100
+	s=arc-20240116; t=1733826242; c=relaxed/simple;
+	bh=d2qRz96W+zzRUClUbgOOKxJ0mXPbo1fn2u5jwVPZ+Wg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UVyxJ8D2bd5OuVSharr80fwSdeQG21L5jNEkr+gw7Sbic7XPIWALE9U1BdQsHNOgXgCQtqp4fuGZzq70SFzP/vV8lmM1tls9nL2rpYEkPXgQ4b723Ux+SEDPAKqdxXtNPoXhWpCtrpHpgkRQbNe3lZa/UC9Nxi+DPp7lTv2qi2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=samgMV8l; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1127)
+	id C5E572047205; Tue, 10 Dec 2024 02:24:00 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C5E572047205
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1733826240;
+	bh=DPYMgWfskJHty1Ll2/CntEup+SB0EH1CejhaB1TeA+Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=samgMV8lc+4BKtqrY3MdpjbaMFNj5ASxZsRQomk4bc4rRPkZ+gz11yAVOdGw/Cyjj
+	 4n5KRkZhKqZhlUayg6P/hDN6JKhQGNdKxuJEiHxhLjk2GBEGkK7+QNqwlaIqvXHGrv
+	 gPIXB3grguiGxZQOKkVG22RZerDPbyuuSbQ+G0ls=
+Date: Tue, 10 Dec 2024 02:24:00 -0800
+From: Saurabh Singh Sengar <ssengar@linux.microsoft.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
+	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>, Long Li <longli@microsoft.com>,
+	Yury Norov <yury.norov@gmail.com>
+Subject: Re: [PATCH v2 0/2] MANA: Fix few memory leaks in mana_gd_setup_irqs
+Message-ID: <20241210102400.GA2391@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20241209175751.287738-1-mlevitsk@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4 1/6] virtio_net: correct netdev_tx_reset_queue()
- invocation point
-To: Koichiro Den <koichiro.den@canonical.com>, virtualization@lists.linux.dev
-Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
- eperezma@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, jiri@resnulli.us,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20241206011047.923923-1-koichiro.den@canonical.com>
- <20241206011047.923923-2-koichiro.den@canonical.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241206011047.923923-2-koichiro.den@canonical.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241209175751.287738-1-mlevitsk@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On 12/6/24 02:10, Koichiro Den wrote:
-> When virtnet_close is followed by virtnet_open, some TX completions can
-> possibly remain unconsumed, until they are finally processed during the
-> first NAPI poll after the netdev_tx_reset_queue(), resulting in a crash
-> [1]. Commit b96ed2c97c79 ("virtio_net: move netdev_tx_reset_queue() call
-> before RX napi enable") was not sufficient to eliminate all BQL crash
-> cases for virtio-net.
+On Mon, Dec 09, 2024 at 12:57:49PM -0500, Maxim Levitsky wrote:
+> Fix 2 minor memory leaks in the mana driver,
+> introduced by commit
 > 
-> This issue can be reproduced with the latest net-next master by running:
-> `while :; do ip l set DEV down; ip l set DEV up; done` under heavy network
-> TX load from inside the machine.
+> 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
 > 
-> netdev_tx_reset_queue() can actually be dropped from virtnet_open path;
-> the device is not stopped in any case. For BQL core part, it's just like
-> traffic nearly ceases to exist for some period. For stall detector added
-> to BQL, even if virtnet_close could somehow lead to some TX completions
-> delayed for long, followed by virtnet_open, we can just take it as stall
-> as mentioned in commit 6025b9135f7a ("net: dqs: add NIC stall detector
-> based on BQL"). Note also that users can still reset stall_max via sysfs.
+> Best regards,
+> 	Maxim Levitsky
 > 
-> So, drop netdev_tx_reset_queue() from virtnet_enable_queue_pair(). This
-> eliminates the BQL crashes. As a result, netdev_tx_reset_queue() is now
-> explicitly required in freeze/restore path. This patch adds it to
-> immediately after free_unused_bufs(), following the rule of thumb:
-> netdev_tx_reset_queue() should follow any SKB freeing not followed by
-> netdev_tx_completed_queue(). This seems the most consistent and
-> streamlined approach, and now netdev_tx_reset_queue() runs whenever
-> free_unused_bufs() is done.
+> Maxim Levitsky (2):
+>   net: mana: Fix memory leak in mana_gd_setup_irqs
+>   net: mana: Fix irq_contexts memory leak in mana_gd_setup_irqs
 > 
-> [1]:
-> ------------[ cut here ]------------
-> kernel BUG at lib/dynamic_queue_limits.c:99!
-> Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
-> CPU: 7 UID: 0 PID: 1598 Comm: ip Tainted: G    N 6.12.0net-next_main+ #2
-> Tainted: [N]=TEST
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), \
-> BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-> RIP: 0010:dql_completed+0x26b/0x290
-> Code: b7 c2 49 89 e9 44 89 da 89 c6 4c 89 d7 e8 ed 17 47 00 58 65 ff 0d
-> 4d 27 90 7e 0f 85 fd fe ff ff e8 ea 53 8d ff e9 f3 fe ff ff <0f> 0b 01
-> d2 44 89 d1 29 d1 ba 00 00 00 00 0f 48 ca e9 28 ff ff ff
-> RSP: 0018:ffffc900002b0d08 EFLAGS: 00010297
-> RAX: 0000000000000000 RBX: ffff888102398c80 RCX: 0000000080190009
-> RDX: 0000000000000000 RSI: 000000000000006a RDI: 0000000000000000
-> RBP: ffff888102398c00 R08: 0000000000000000 R09: 0000000000000000
-> R10: 00000000000000ca R11: 0000000000015681 R12: 0000000000000001
-> R13: ffffc900002b0d68 R14: ffff88811115e000 R15: ffff8881107aca40
-> FS:  00007f41ded69500(0000) GS:ffff888667dc0000(0000)
-> knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000556ccc2dc1a0 CR3: 0000000104fd8003 CR4: 0000000000772ef0
-> PKRU: 55555554
-> Call Trace:
->  <IRQ>
->  ? die+0x32/0x80
->  ? do_trap+0xd9/0x100
->  ? dql_completed+0x26b/0x290
->  ? dql_completed+0x26b/0x290
->  ? do_error_trap+0x6d/0xb0
->  ? dql_completed+0x26b/0x290
->  ? exc_invalid_op+0x4c/0x60
->  ? dql_completed+0x26b/0x290
->  ? asm_exc_invalid_op+0x16/0x20
->  ? dql_completed+0x26b/0x290
->  __free_old_xmit+0xff/0x170 [virtio_net]
->  free_old_xmit+0x54/0xc0 [virtio_net]
->  virtnet_poll+0xf4/0xe30 [virtio_net]
->  ? __update_load_avg_cfs_rq+0x264/0x2d0
->  ? update_curr+0x35/0x260
->  ? reweight_entity+0x1be/0x260
->  __napi_poll.constprop.0+0x28/0x1c0
->  net_rx_action+0x329/0x420
->  ? enqueue_hrtimer+0x35/0x90
->  ? trace_hardirqs_on+0x1d/0x80
->  ? kvm_sched_clock_read+0xd/0x20
->  ? sched_clock+0xc/0x30
->  ? kvm_sched_clock_read+0xd/0x20
->  ? sched_clock+0xc/0x30
->  ? sched_clock_cpu+0xd/0x1a0
->  handle_softirqs+0x138/0x3e0
->  do_softirq.part.0+0x89/0xc0
->  </IRQ>
->  <TASK>
->  __local_bh_enable_ip+0xa7/0xb0
->  virtnet_open+0xc8/0x310 [virtio_net]
->  __dev_open+0xfa/0x1b0
->  __dev_change_flags+0x1de/0x250
->  dev_change_flags+0x22/0x60
->  do_setlink.isra.0+0x2df/0x10b0
->  ? rtnetlink_rcv_msg+0x34f/0x3f0
->  ? netlink_rcv_skb+0x54/0x100
->  ? netlink_unicast+0x23e/0x390
->  ? netlink_sendmsg+0x21e/0x490
->  ? ____sys_sendmsg+0x31b/0x350
->  ? avc_has_perm_noaudit+0x67/0xf0
->  ? cred_has_capability.isra.0+0x75/0x110
->  ? __nla_validate_parse+0x5f/0xee0
->  ? __pfx___probestub_irq_enable+0x3/0x10
->  ? __create_object+0x5e/0x90
->  ? security_capable+0x3b/0x70
->  rtnl_newlink+0x784/0xaf0
->  ? avc_has_perm_noaudit+0x67/0xf0
->  ? cred_has_capability.isra.0+0x75/0x110
->  ? stack_depot_save_flags+0x24/0x6d0
->  ? __pfx_rtnl_newlink+0x10/0x10
->  rtnetlink_rcv_msg+0x34f/0x3f0
->  ? do_syscall_64+0x6c/0x180
->  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
->  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
->  netlink_rcv_skb+0x54/0x100
->  netlink_unicast+0x23e/0x390
->  netlink_sendmsg+0x21e/0x490
->  ____sys_sendmsg+0x31b/0x350
->  ? copy_msghdr_from_user+0x6d/0xa0
->  ___sys_sendmsg+0x86/0xd0
->  ? __pte_offset_map+0x17/0x160
->  ? preempt_count_add+0x69/0xa0
->  ? __call_rcu_common.constprop.0+0x147/0x610
->  ? preempt_count_add+0x69/0xa0
->  ? preempt_count_add+0x69/0xa0
->  ? _raw_spin_trylock+0x13/0x60
->  ? trace_hardirqs_on+0x1d/0x80
->  __sys_sendmsg+0x66/0xc0
->  do_syscall_64+0x6c/0x180
->  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> RIP: 0033:0x7f41defe5b34
-> Code: 15 e1 12 0f 00 f7 d8 64 89 02 b8 ff ff ff ff eb bf 0f 1f 44 00 00
-> f3 0f 1e fa 80 3d 35 95 0f 00 00 74 13 b8 2e 00 00 00 0f 05 <48> 3d 00
-> f0 ff ff 77 4c c3 0f 1f 00 55 48 89 e5 48 83 ec 20 89 55
-> RSP: 002b:00007ffe5336ecc8 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f41defe5b34
-> RDX: 0000000000000000 RSI: 00007ffe5336ed30 RDI: 0000000000000003
-> RBP: 00007ffe5336eda0 R08: 0000000000000010 R09: 0000000000000001
-> R10: 00007ffe5336f6f9 R11: 0000000000000202 R12: 0000000000000003
-> R13: 0000000067452259 R14: 0000556ccc28b040 R15: 0000000000000000
->  </TASK>
-> [...]
-> ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+>  drivers/net/ethernet/microsoft/mana/gdma_main.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> -- 
+> 2.26.3
+> 
+> 
 
-IIRC, the above separator used to cause some troubles to backport tools
-and to 'next' tree import, trimming the SoB area below. I'm going to
-remove it while applying the series.
+Thanks for fixing this, for the series
+Reviewed-by: Saurabh Sengar <ssengar@linux.microsoft.com>
 
-Cheers,
-
-Paolo
+could have been a single patch, though
 
 
