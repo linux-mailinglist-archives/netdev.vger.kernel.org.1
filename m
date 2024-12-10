@@ -1,188 +1,132 @@
-Return-Path: <netdev+bounces-150750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B84099EB69B
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 17:37:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 245FC9EB6D0
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 17:45:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 475F428336B
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:37:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC392281BE5
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 555271C3040;
-	Tue, 10 Dec 2024 16:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E23233D96;
+	Tue, 10 Dec 2024 16:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lPXQkT5e"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dZaGV9eI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD7F1A3BA1;
-	Tue, 10 Dec 2024 16:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D94F22FE18
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 16:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733848646; cv=none; b=YjO+JnVuzfLdsGfyoe4aa1QQXLkXXB72c1+vumaYu90L9UbIaSkfiEVUPwM5S5J9XRv8fp2cYrW5T4hehj9RgdtRQssUFoOraULfaJCxcaq1Ewiezl3jGG+j1BtRpMk24pL5r+RcBSPSqvvAiwlrqA1TQ7wGJLnhc4pxwBPMZ0Y=
+	t=1733849113; cv=none; b=FErPTrOvdiCCo3NmVVRuD7cYtDDthxgmd9XZpTBFLpLSXPh2Kh4Pv4gNxALdIZRbYrO41yfvpDADTxFdQ4PMgBSgObSIDblIxv4M5xzX8SL/DSZgwBsKKDPamad+r7aT/H1PyqVOjhoJ6BFuq8oHu9fGlpWXnoGhR7XT9tuZEsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733848646; c=relaxed/simple;
-	bh=bMaWMUz5V3ffO6Fby9ugSZR/xOrKRSiA3Zeu/M2/xfM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PfiBnaSSekB7NcoKDR9WAMPOlNDcdANLdzEYfMtw47zOxOQc6fZ0nNZj951p9QwKCJhCRN3gN6U/LvAuJ8H+TjHO+8SB/CZEwpDSm2a0n7ZCZNxbW3EMhGqrD/1zitpUwm0T1Jyrd91W92YRNbfkWNF3UX6Z99g+9Kgz4tQiTnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lPXQkT5e; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-30227ccf803so18584321fa.2;
-        Tue, 10 Dec 2024 08:37:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733848642; x=1734453442; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mMr2qVhA4J2Ksp2znQVcePx2ayh49sbpV9PFu6+5bZw=;
-        b=lPXQkT5eLbSJihPkq8nL0G8RkVzHzRoxK5mOatJadWIYXOxVDxpn+B/NjAsr3sNkyW
-         1cOGWBUM5DRxAknBLIIa5/A6cn7p9apbJyoJY2cMcfyqNdMJmMpKTp3JSDPexsdvavMs
-         5A+p1IsBU7sMkhEMTAjkU9wVpTHamZClnZMpUD+ekJn57j2QdyqlhkalHW1p+PH98SlX
-         NVO4E10KbKrtbbotRq0efHbzE6alEW2Dxj24B3MKZedyTM0yBpAAVZr5zdXKimdq2u7+
-         Zr8TjDW/hNkxGRvO/JDpak679tjOrtPnPQ6QhFNRe+jiirI/iLSsZE5ER/mC8JIZcB4p
-         nEig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733848642; x=1734453442;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mMr2qVhA4J2Ksp2znQVcePx2ayh49sbpV9PFu6+5bZw=;
-        b=t3VqFKAyh/iCq8qnFGWP+G27/0aq73Zt7kpOaAlPc5AtRJmLAruSeGmx1BO7twHDTi
-         tiiwQUrDPTrSHNMhn86hK2i9HGubV7CN0dRLJT/mIpqj5mcNwjNDsLjXpq4hS+4ffOwZ
-         tiszA4Die3jB2y7RkgUPHIhWMDdhB7sPytKysJz3ZAVHnBuyIdnsEJDPaedDsIbNjtQz
-         g1aExzpVYkbROFnqsKwokSe2AGfz8FOavv2bao+MtAv3CxWtJErBuhG/32p9C2VrRYKN
-         7hgyZ9Pm+LXsmYcunJ5b2bKX8BJ7mJHzGNP9HtNZzrPWp1n12jnkJLMIpVM2o6shTEZU
-         nnCw==
-X-Forwarded-Encrypted: i=1; AJvYcCUIA1APIB+1IXaJSTYld/QCmEc+YQtiTxQU+0hiXS1IJ7dl3+SbEoivIoGLL3Rt+dyv1Jvqf5ol@vger.kernel.org, AJvYcCVAtMZwqvBaghoKPvWhxRe+dogpLB5F85HKRwxWfq9wGoSwj2OrY6kSANwIYysufOyMdQ13Op8MIXPA@vger.kernel.org, AJvYcCVS1daRC6bzX4QHacuXx/Axq+TYWzUsmvsvavZ1spW2QHxesWHYfTT/OqrsDUj1guESVbxvG4pzPN+tS23toYk=@vger.kernel.org, AJvYcCWsAMbak7iBv9MOlSQ3bdWPsrNby2V/vIyRjiEZ0fmnrWcAG6PKoxEImYU5NSUfjPgXf6MB+1wcUzlKZM1v@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw80Bl/eCnReMrBbhcMMYZPNkDJoWLNFA3qinKBehRBL/ZpLhU8
-	1ZWrEEvIWJM5/QBsLYrK5aFKqp4HYkloFMc2eWMz6TPz/0ZfiFDLNOIL79b00FI5tPmx/C1Q2i8
-	ZU194xuOhgBdPeZb0trwY2S6tRHQ=
-X-Gm-Gg: ASbGnct6exCBj4xdRBsNdU2qWnitw9JO2TT5yDWfxOvxcBTQYE5uwg4bj8L3Yto0dY/
-	8gAATxVLCoIkAz3+xTa3QA4+lfW3U9aSeoSU=
-X-Google-Smtp-Source: AGHT+IHiGI51RueWOS5PEJQEG+4Gh2nJXRo4OsJkgCK1jqR6c9JsfhkuPRwhfJ6Gu9P1fz4wuUEMdL6zMVunaz4Mo1A=
-X-Received: by 2002:a05:651c:150c:b0:300:41a8:125b with SMTP id
- 38308e7fff4ca-30041a813f7mr47506931fa.37.1733848642191; Tue, 10 Dec 2024
- 08:37:22 -0800 (PST)
+	s=arc-20240116; t=1733849113; c=relaxed/simple;
+	bh=JdLNXbXLVVNZXlqcZZ5mTL4fFReWTKrSXq/RNIRxekk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Y16tYbosKc934jlTbxYHKtZHlQkqLtEadL+czyGqDQrYCXqirQDDT7kLykd8u2k16PxZUkJSVpzzKyVA7q+dbEI0UGCtfv47lc9BBJy0dCiP4hXQG9VOMs6g9XpKVm7M+GSAV8EYiFcrC56uPofLlIrR+Ojdl1S+DtN5t/9TiZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dZaGV9eI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733849110;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7Kp+7Z3nNLIcj1z6tn9P0/hb1TnLvUena0MeRSjLsfA=;
+	b=dZaGV9eItz7KHv2d8AAdqxem1BjmIj9gnOMM2dsNIoGb791NHhX7D6nhDoQoVXQYyzb7yJ
+	nBveaNUv2ELErvDyCSv4FFe0+bd9ZK6tz0nHoSdqOha7nuGMXbf0aNHl5L8PmJ+qrKFplM
+	tmt+mJANL2Btdv6K7CDo6hpBLqhaC38=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-553-uNW6YTPAOPybW7l6F610Jw-1; Tue,
+ 10 Dec 2024 11:45:05 -0500
+X-MC-Unique: uNW6YTPAOPybW7l6F610Jw-1
+X-Mimecast-MFC-AGG-ID: uNW6YTPAOPybW7l6F610Jw
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 964831955F42;
+	Tue, 10 Dec 2024 16:45:04 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.152])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DA98E19560AA;
+	Tue, 10 Dec 2024 16:44:59 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: lulu@redhat.com,
+	jasowang@redhat.com,
+	mst@redhat.com,
+	michael.christie@oracle.com,
+	sgarzare@redhat.com,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v4 0/8] vhost: Add support of kthread API
+Date: Wed, 11 Dec 2024 00:41:39 +0800
+Message-ID: <20241210164456.925060-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241208204708.3742696-1-ubizjak@gmail.com> <20241208204708.3742696-3-ubizjak@gmail.com>
- <20241209113039.GN21636@noisy.programming.kicks-ass.net>
-In-Reply-To: <20241209113039.GN21636@noisy.programming.kicks-ass.net>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Tue, 10 Dec 2024 17:37:10 +0100
-Message-ID: <CAFULd4Y7-_Zax3S-m3H6ok9SvsBgS7DmJjSu=3VZ1hyzT71jjg@mail.gmail.com>
-Subject: Re: [PATCH v3 2/6] compiler.h: Introduce TYPEOF_UNQUAL() macro
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	linux-bcachefs@vger.kernel.org, linux-arch@vger.kernel.org, 
-	netdev@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
-	Christoph Lameter <cl@linux.com>, Linus Torvalds <torvalds@linux-foundation.org>, 
-	Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, Brian Gerst <brgerst@gmail.com>, 
-	Denys Vlasenko <dvlasenk@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Nathan Chancellor <nathan@kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000069a3ca0628ed186b"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
---00000000000069a3ca0628ed186b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads"),
 
-On Mon, Dec 9, 2024 at 12:30=E2=80=AFPM Peter Zijlstra <peterz@infradead.or=
-g> wrote:
->
-> On Sun, Dec 08, 2024 at 09:45:17PM +0100, Uros Bizjak wrote:
-> > Define TYPEOF_UNQUAL() to use __typeof_unqual__() as typeof operator
-> > when available, to return unqualified type of the expression.
-> >
-> > Current version of sparse doesn't know anything about __typeof_unqual__=
-()
-> > operator. Avoid the usage of __typeof_unqual__() when sparse checking
-> > is active to prevent sparse errors with unknowing keyword.
->
-> Ooooh, new toys.
->
-> I suppose __unqual_scalar_typeof() wants to be using this when
-> available?
+The vhost now uses vhost_task and operates as a child of the owner thread.
+This aligns with containerization principles, But it has confused some legacy
+userspace applications. Therefore, we are reintroducing support
+for the kthread API.
 
-Not only that, the new toy enables clang to check kernel's address
-spaces in a generic way using address_space attribute.
+In commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads"),
+The vhost now use vhost_task and workers working as a child of the owner thread,
+which aligns with containerization principles. However, this change has caused
+confusion for some legacy userspace applications. 
+Therefore, we are reintroducing support for the kthread API.
 
-Please find attached a follow-up patch that enables __percpu checks
-for all targets, supported by clang. Clang is a little bit pickier
-than gcc about named address space declarations (it warns for use of
-duplicated address space attribute), so the patch in addition to the
-obvious
+In this patch, a new User API is implemented to allow userspace applications to
+configure their request mode.
 
-+#  define __percpu_qual        __attribute__((address_space(3)))
+Changelog v2: 
+ 1. Change the module_param's name to enforce_inherit_owner, and the default value is true.
+ 2. Change the UAPI's name to VHOST_SET_INHERIT_FROM_OWNER.
+ 
+Changelog v3: 
+ 1. Change the module_param's name to inherit_owner_default, and the default value is true.
+ 2. Add a structure for task function; the worker will select a different mode based on the value inherit_owner.
+ 3. device will have their own inherit_owner in struct vhost_dev
+ 4. Address other comments
+ 
+Changelog v4: 
+ 1. remove the module_param, only keep the UAPI
+ 2. remove the structure for task function; change to use the function pointer in vhost_worker
+ 3. fix the issue in vhost_worker_create and vhost_dev_ioctl
+ 4. Address other comments
+ 
+Tested with QEMU with kthread mode/task mode/kthread+task mode
 
-also fixes a couple of macros that could result in a duplicated
-address space attribute.
+Cindy Lu (8):
+  vhost: Add a new parameter in vhost_dev to allow user select kthread
+  vhost: Add the vhost_worker to support kthread
+  vhost: Add the cgroup related function
+  vhost: Add kthread support in function vhost_worker_create
+  vhost: Add kthread support in function vhost_worker_queue()
+  vhost: Add kthread support in function vhost_worker_destroy()
+  vhost: Add new UAPI to support change to task mode
+  vhost_scsi: Add check for inherit_owner status
 
-The patch, applied as a follow-up to the series, survives allyesconfig
-compilation with clang-19 and produces a bootable kernel. The patch
-was tested only for x86_64 target, for other targets a couple of
-trivial fixes would be necessary (a cast or a substitution of typeof()
-with TYPEOF_UNQUAL()).
+ drivers/vhost/scsi.c       |   8 ++
+ drivers/vhost/vhost.c      | 185 +++++++++++++++++++++++++++++++++----
+ drivers/vhost/vhost.h      |   4 +
+ include/uapi/linux/vhost.h |  18 ++++
+ 4 files changed, 198 insertions(+), 17 deletions(-)
 
-AFAICS, the same approach using clang's address_space attribute can be
-implemented to also check other address spaces: __user, __iommu  and
-__rcu.
+-- 
+2.45.0
 
-Uros.
-
---00000000000069a3ca0628ed186b
-Content-Type: text/plain; charset="US-ASCII"; name="percpu-clang.diff.txt"
-Content-Disposition: attachment; filename="percpu-clang.diff.txt"
-Content-Transfer-Encoding: base64
-Content-ID: <f_m4iomhgl0>
-X-Attachment-Id: f_m4iomhgl0
-
-ZGlmZiAtLWdpdCBhL2luY2x1ZGUvYXNtLWdlbmVyaWMvcGVyY3B1LmggYi9pbmNsdWRlL2FzbS1n
-ZW5lcmljL3BlcmNwdS5oCmluZGV4IDAyYWVjYTIxNDc5YS4uNDEwOWQ4MjhhNTY0IDEwMDY0NAot
-LS0gYS9pbmNsdWRlL2FzbS1nZW5lcmljL3BlcmNwdS5oCisrKyBiL2luY2x1ZGUvYXNtLWdlbmVy
-aWMvcGVyY3B1LmgKQEAgLTE2LDcgKzE2LDEyIEBACiAgKiBzcGFjZSBxdWFsaWZpZXIpLgogICov
-CiAjaWZuZGVmIF9fcGVyY3B1X3F1YWwKLSMgZGVmaW5lIF9fcGVyY3B1X3F1YWwKKyMgaWYgX19o
-YXNfYXR0cmlidXRlKGFkZHJlc3Nfc3BhY2UpICYmIFwKKyAgICAgZGVmaW5lZChDT05GSUdfQ0Nf
-SEFTX1RZUEVPRl9VTlFVQUwpICYmICFkZWZpbmVkKF9fQ0hFQ0tFUl9fKQorIyAgZGVmaW5lIF9f
-cGVyY3B1X3F1YWwJCV9fYXR0cmlidXRlX18oKGFkZHJlc3Nfc3BhY2UoMykpKQorIyBlbHNlCisj
-ICBkZWZpbmUgX19wZXJjcHVfcXVhbAorIyBlbmRpZgogI2VuZGlmCiAKICNpZmRlZiBDT05GSUdf
-U01QCmRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2RldmljZS5oIGIvaW5jbHVkZS9saW51eC9k
-ZXZpY2UuaAppbmRleCA2NjdjYjZkYjkwMTkuLjFkNmE1NWQ1MjUwYSAxMDA2NDQKLS0tIGEvaW5j
-bHVkZS9saW51eC9kZXZpY2UuaAorKysgYi9pbmNsdWRlL2xpbnV4L2RldmljZS5oCkBAIC00MzEs
-OSArNDMxLDkgQEAgc3RhdGljIGlubGluZSBpbnQgX19kZXZtX2FkZF9hY3Rpb25fb3JfcmVzZXQo
-c3RydWN0IGRldmljZSAqZGV2LCB2b2lkICgqYWN0aW9uKSgKICAqIFJFVFVSTlM6CiAgKiBQb2lu
-dGVyIHRvIGFsbG9jYXRlZCBtZW1vcnkgb24gc3VjY2VzcywgTlVMTCBvbiBmYWlsdXJlLgogICov
-Ci0jZGVmaW5lIGRldm1fYWxsb2NfcGVyY3B1KGRldiwgdHlwZSkgICAgICBcCi0JKCh0eXBlb2Yo
-dHlwZSkgX19wZXJjcHUgKilfX2Rldm1fYWxsb2NfcGVyY3B1KChkZXYpLCBzaXplb2YodHlwZSks
-IFwKLQkJCQkJCSAgICAgIF9fYWxpZ25vZl9fKHR5cGUpKSkKKyNkZWZpbmUgZGV2bV9hbGxvY19w
-ZXJjcHUoZGV2LCB0eXBlKQkJCQkgICAgXAorCSgoVFlQRU9GX1VOUVVBTCh0eXBlKSBfX3BlcmNw
-dSAqKV9fZGV2bV9hbGxvY19wZXJjcHUoKGRldiksIFwKKwkJCQlzaXplb2YodHlwZSksIF9fYWxp
-Z25vZl9fKHR5cGUpKSkKIAogdm9pZCBfX3BlcmNwdSAqX19kZXZtX2FsbG9jX3BlcmNwdShzdHJ1
-Y3QgZGV2aWNlICpkZXYsIHNpemVfdCBzaXplLAogCQkJCSAgIHNpemVfdCBhbGlnbik7CmRpZmYg
-LS1naXQgYS9pbmNsdWRlL2xpbnV4L3BlcmNwdS5oIGIvaW5jbHVkZS9saW51eC9wZXJjcHUuaApp
-bmRleCA1MmI1ZWE2NjNiOWYuLmMzYmYwNDBhYmE2NiAxMDA2NDQKLS0tIGEvaW5jbHVkZS9saW51
-eC9wZXJjcHUuaAorKysgYi9pbmNsdWRlL2xpbnV4L3BlcmNwdS5oCkBAIC0xNDgsMTMgKzE0OCwx
-MyBAQCBleHRlcm4gdm9pZCBfX3BlcmNwdSAqcGNwdV9hbGxvY19ub3Byb2Yoc2l6ZV90IHNpemUs
-IHNpemVfdCBhbGlnbiwgYm9vbCByZXNlcnZlZAogCWFsbG9jX2hvb2tzKHBjcHVfYWxsb2Nfbm9w
-cm9mKF9zaXplLCBfYWxpZ24sIHRydWUsIEdGUF9LRVJORUwpKQogCiAjZGVmaW5lIGFsbG9jX3Bl
-cmNwdV9nZnAodHlwZSwgZ2ZwKQkJCQkJXAotCSh0eXBlb2YodHlwZSkgX19wZXJjcHUgKilfX2Fs
-bG9jX3BlcmNwdV9nZnAoc2l6ZW9mKHR5cGUpLAlcCisJKFRZUEVPRl9VTlFVQUwodHlwZSkgX19w
-ZXJjcHUgKilfX2FsbG9jX3BlcmNwdV9nZnAoc2l6ZW9mKHR5cGUpLCBcCiAJCQkJCQlfX2FsaWdu
-b2ZfXyh0eXBlKSwgZ2ZwKQogI2RlZmluZSBhbGxvY19wZXJjcHUodHlwZSkJCQkJCQlcCi0JKHR5
-cGVvZih0eXBlKSBfX3BlcmNwdSAqKV9fYWxsb2NfcGVyY3B1KHNpemVvZih0eXBlKSwJCVwKKwko
-VFlQRU9GX1VOUVVBTCh0eXBlKSBfX3BlcmNwdSAqKV9fYWxsb2NfcGVyY3B1KHNpemVvZih0eXBl
-KSwJXAogCQkJCQkJX19hbGlnbm9mX18odHlwZSkpCiAjZGVmaW5lIGFsbG9jX3BlcmNwdV9ub3By
-b2YodHlwZSkJCQkJCVwKLQkoKHR5cGVvZih0eXBlKSBfX3BlcmNwdSAqKXBjcHVfYWxsb2Nfbm9w
-cm9mKHNpemVvZih0eXBlKSwJXAorCSgoVFlQRU9GX1VOUVVBTCh0eXBlKSBfX3BlcmNwdSAqKXBj
-cHVfYWxsb2Nfbm9wcm9mKHNpemVvZih0eXBlKSwgXAogCQkJCQlfX2FsaWdub2ZfXyh0eXBlKSwg
-ZmFsc2UsIEdGUF9LRVJORUwpKQogCiBleHRlcm4gdm9pZCBmcmVlX3BlcmNwdSh2b2lkIF9fcGVy
-Y3B1ICpfX3BkYXRhKTsK
---00000000000069a3ca0628ed186b--
 
