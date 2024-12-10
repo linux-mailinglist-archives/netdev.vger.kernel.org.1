@@ -1,74 +1,76 @@
-Return-Path: <netdev+bounces-150807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CED49EB9E0
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 20:13:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B80C9EB9E3
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 20:14:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 565A0188238C
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 19:13:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E9351885D50
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 19:13:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944E121421D;
-	Tue, 10 Dec 2024 19:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FFD8214209;
+	Tue, 10 Dec 2024 19:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j00fF4sz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JLejjT72"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911ED1BDAA2
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 19:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB672046AE
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 19:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733858022; cv=none; b=Qg4jWXPkj8A9Mh5BB5cZzewpjSZF5D5Q9xMPFKztHsZyEz7uaFcKl/StcxmQBYPP+OgdhTPBZpMM4VDFCP2CkvVFJBB6q6oQcTzp7aVt6XITq0ITw5dvAIGo4bB4ZZPlfTRsLxZWdqPeB6GQ1pjBa+/FL7ZFLxZlHaK3RbgJ9vY=
+	t=1733858028; cv=none; b=eJN9kS/f4vKKXSz1tyDK878lFOPGvUUI2cH46VNhc6bKM6NilRMb12JBISczs4PtarNV4cXRWsQ+ODcePj0H55HcelyLWQwkYn2iI8vRL3F4xQ3x57o86lGhQFhix/LbIaVcGM1iDU7AA58M0SjGJn+IFyuZG6FipC+H6Sjy8/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733858022; c=relaxed/simple;
-	bh=OoVstYQu6T/zlFaQfWwEFzATEqz/K/PXmqBuACGvh9w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KRdI5mhz5/3ypg8PTH4hvmSav6DIl+9RUUPyoa65e+nu8T4MB+PEyrkSIAXXO0eBNNeSx6OTLOOPyjl00rTbJfF2JpkU7pfCdfXa4C51soLq74KWtsVj+ySrIn5eM0chQRwo8gB8yz3E8ZzKz5Xbe7dD3T+HPE3oWNnMOhxo7O8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j00fF4sz; arc=none smtp.client-ip=209.85.128.51
+	s=arc-20240116; t=1733858028; c=relaxed/simple;
+	bh=QPh03QEa0M8YEQs8GzmP3qJH+OhK905FKbbXXrN+B+8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=W2uzFXAuRO4WjgasOwQI9S5qxD7T3wzHat3nnpYSdeF4J0C0Dgzy4PX/K4qztTPr2pzuG5GocK9Phh8oyrS0IlWHgwczwS2f83mwPVlG0JH2wqrwE38yvZfzNNCuqvDQK8UtO7kC3vz2U7ByCXEC5UIu0crGWjZl1i+9x5n2Q6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JLejjT72; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-434e9716feaso21575025e9.3
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 11:13:40 -0800 (PST)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3862df95f92so3034161f8f.2
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 11:13:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733858019; x=1734462819; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X3dgyedRD1hxfTsP+DaxUndh7xI0JWroSb1zyCKwxS4=;
-        b=j00fF4szwt6RDNMoE6+zfeoJMIUqEuf/9vlYPvBjAqoZvBzX0SQF5UAks46IzLCN3E
-         CevIxle+stAHDJG958qSrqXVciY06hEjKChemRxPgV/UrrANRjSsIKkUhtgHxTOqGKiQ
-         0DerO476rE+5/t+4IWC7/NEvSj+Jj9Xp4r36EoxNoz9GaZGMfxw70XIb7mI9nQfTkUUG
-         Dc+Z/pyn0HIcROTgkum5jXScGMSlD93CuR0NTCvHEZWtO+bGhRzF+3S8TcrXFqjdxou2
-         WKLOM1djzpWb8p9yNdSh50KTkQWf+820PDltfqWjkEUjWvJ1PRod8+QDG6+wutm8ZeE4
-         Citw==
+        d=gmail.com; s=20230601; t=1733858024; x=1734462824; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fNATByMEO9e+OmkVFZzCHZ/xIGul3/7QVkpEK0lUick=;
+        b=JLejjT72hjIOFXkpEwLSBJgN9Qgly3Ao73HqgftOMd7lt4pbREfGXWWNtVOY4MqwvO
+         5TGbWvVsxXIGHqe+/9ZTXwrrp70un9LEMsmLiBMnugFs02CVmv5SmpzSNwtC6O8uq/Vu
+         tZnczs6YNBygC5cQfg9aGChtoWXelMosOJL5I2/isPE+aMTXe71m+ShK8v/CD9pOJpye
+         Zt4Yxw0frPCh8k0GKmbo9aCVVFG6cxvSaZFcc+EXv1+am4zxAM+mpo4qmndbBbxLkeUP
+         PKvlgAfdgTGBvYMmcm2k1db5qzzK8/w0eij73gEKTxf10tJvWyXc4rY6TeIpz81KRmuB
+         w95w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733858019; x=1734462819;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X3dgyedRD1hxfTsP+DaxUndh7xI0JWroSb1zyCKwxS4=;
-        b=aA61ThsPIWT1bB9voYUOxPRugk9swxc021lvLt9PLEYxBnG8djAb5C3U/zvyzu0pN/
-         XTzonEfqTgpT0Er4B8vZIxs+Zvgw2GYJX618OJAVee0IwEQmpSUqNL/OxRdPgitFzHCS
-         UM1E3lVjL4fiIV+NZZc7x691ToGybmdNPmiTd9A9nZmGbzutStSCAPhxbCzZ5jPsTa5w
-         tpzZ0DXwV1mwvOx/mS6B6LMpWr7RQmh66hF22Tfih9eC9goLEQx7lTgx93M2mGorYs1x
-         aflMX92XuNYNdudc5RGy7Q9oOHJdqMKDWcmYFLCly+DZiKpyTQV+icWcHdSG3w78Xrxv
-         Bt7Q==
-X-Gm-Message-State: AOJu0YxF24ny/g5s6z7a3oOoE7HZ7uJIN5TwRIqZggSXUc9MCD9HLboQ
-	z0skY/DjaZSDri9OCfYNWlW9p2zgkpDeV7vtkFzq33R/E7OMuR778hC9KCTU2xI=
-X-Gm-Gg: ASbGncsE8fJ/+kgNKayL7wDM0igKxLY5gxVT757MGI0Ha6cVP6hdCLflxJk5nHqoaMU
-	TFQ8c+tgqrLygvvYvbY20odqQa2fLJfG24QfGIW2LNjCrcvPHewLtK1YeVOLzOOx1f2DxiK2acw
-	i68eLBilbq0/1uBtBhB8N8UdkUR8rnGzWXjr9tCfOmbPf/Zq5EJnH8WwtNBm/KNFkDORq1jiUUa
-	IueUwg3418O+GYoD+Cs+KcF3gajtg1xgBPgvLwyaNoOavEQMN6wDB9twTd9ICHGh5/+msi7k6n0
-	C/OGG+qDR4FUoEFNCmlTgH5R9B8chrD2MkmPWDvFKMLS08OzS0E64wYgqEeLzg==
-X-Google-Smtp-Source: AGHT+IHOkSiF1CR8asnl3lKUjD9+4i6COjCjOo1URqj9o8XWgwpNY5ZD638zrdqu0sv73RqKqilo0A==
-X-Received: by 2002:a5d:5984:0:b0:385:edd1:2245 with SMTP id ffacd0b85a97d-3864cea45bbmr205368f8f.30.1733858018513;
-        Tue, 10 Dec 2024 11:13:38 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733858024; x=1734462824;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fNATByMEO9e+OmkVFZzCHZ/xIGul3/7QVkpEK0lUick=;
+        b=JWZSE2g4z2YmCoITjDZee2K23pv6iOW/eiLc5hpk0qTtCiGvpNVbbn3Djv7qIgHCD6
+         jJUamCCgFXaXxbn9W9irSZ7Wh3NW24YTd8A4U3l3vJ+NC2W0hB62Gp5c/nbGCcUQIfUY
+         Pgc9Im5iGkcw1L6ZFNjnqDbRU8AScIAwsiKD+WVN5UyRLbmqlrykCGpYg1gZx/Y8zYkX
+         UqruzCxYq/QZu4KXUvMsUpaexc5CiSFNDEmIC4hX5Ss7UjPDX7uwowgYufT/wPpjPHV9
+         kO3BJ1g5TJvf5Q5yIb8Z6uBXpEUp5VVk6B5dYV6KVToeLtpfm0tcwGj8LqTAP+Ye4aqQ
+         12kg==
+X-Gm-Message-State: AOJu0YzhGaOTMcJflSWWNEtH5KparwwO/hNU3ZKuIxwilgZKBbKm7yrZ
+	IXLU2Z9MS7855S0w8VU/e1zde0AydGyU5oCqAkrFmb8LKG1qSqIUV/ipPNNPtYQ=
+X-Gm-Gg: ASbGncu7RNTfyGpq94j+Nr190cTeZFqiEYitkI7pKb5iIKW/cN/6op26Iw95GIoxikW
+	jUdNArQ4e7wedPoO9FNpdhr9vh+1HKwdzT6WrlFnmFjHKzGMI9BVXlPDvaXAtxNlNRGKyXKWaOa
+	AbebNezhF14WE0frXpegamp0VKFMXWdTdSkQMY8lg9ViQNDjsEbdF+2jIrTom42h1jxrQoy5PlS
+	w3DoZ2LeOyigidTVD8SB0uFkLQo94wkQEyTKhtwnPo+hqK5bgUtGLHs/jwjZM5hHpxmfyoj9csG
+	sRjbWSgDL0PhVl4fpEcsefrqjB63Q3hylGiQCGl3oC0PYaXmfBQRYOEWMNMsxw==
+X-Google-Smtp-Source: AGHT+IGfksZlNLmG4OiXHSKyN6+5vemY1rdHg/Nk6T9Ijqym/Wncl4Y+X/ri+qPRrLAa3LLOFqdcow==
+X-Received: by 2002:a5d:59ad:0:b0:385:fc32:1ec6 with SMTP id ffacd0b85a97d-3864ceab34amr158271f8f.50.1733858024219;
+        Tue, 10 Dec 2024 11:13:44 -0800 (PST)
 Received: from localhost.localdomain (20014C4E37C0C7006406573B5E53AD5C.dsl.pool.telekom.hu. [2001:4c4e:37c0:c700:6406:573b:5e53:ad5c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3862d3f57a0sm13310345f8f.108.2024.12.10.11.13.36
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3862d3f57a0sm13310345f8f.108.2024.12.10.11.13.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 11:13:37 -0800 (PST)
+        Tue, 10 Dec 2024 11:13:43 -0800 (PST)
 From: Anna Emese Nyiri <annaemesenyiri@gmail.com>
 To: netdev@vger.kernel.org
 Cc: fejes@inf.elte.hu,
@@ -78,10 +80,12 @@ Cc: fejes@inf.elte.hu,
 	willemb@google.com,
 	idosch@idosch.org,
 	Anna Emese Nyiri <annaemesenyiri@gmail.com>
-Subject: [PATCH net-next v6 0/4] Add support for SO_PRIORITY cmsg
-Date: Tue, 10 Dec 2024 20:13:05 +0100
-Message-ID: <20241210191309.8681-1-annaemesenyiri@gmail.com>
+Subject: [PATCH net-next v6 1/4] sock: Introduce sk_set_prio_allowed helper function
+Date: Tue, 10 Dec 2024 20:13:06 +0100
+Message-ID: <20241210191309.8681-2-annaemesenyiri@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241210191309.8681-1-annaemesenyiri@gmail.com>
+References: <20241210191309.8681-1-annaemesenyiri@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,125 +94,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce a new helper function, `sk_set_prio_allowed`,
-to centralize the logic for validating priority settings.
-Add support for the `SO_PRIORITY` control message,
-enabling user-space applications to set socket priority
-via control messages (cmsg).
+Simplify priority setting permissions with the 'sk_set_prio_allowed'
+function, centralizing the validation logic. This change is made in
+anticipation of a second caller in a following patch.
+No functional changes.
 
-Patch Overview:
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-Patch 1/4: Introduce 'sk_set_prio_allowed' helper function.
-Patch 2/4: Add support for setting SO_PRIORITY via control messages
-Patch 3/4: Add test for SO_PRIORITY setting via control messages
-Patch 4/4: Add new socket option, SO_RCVPRIORITY
+Suggested-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+---
+ net/core/sock.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-v6:
-
-- Carry Eric's and Willem's "Reviewed-by" tags from v3 to
-  patch 1/4 since that is resubmitted without changes.
-- Carry Willem's "Reviewed-by" tag from v4 in patch 2/4,
-  as it is resubmitted without changes.
-- Carry Willem's "Reviewed-by" tag from v5 in patch 4/4,
-  as it is resubmitted without changes.
-- Use KSFT_SKIP in jq installation test and
-  add 'nodad' flag for IPv6 address in cmsg_so_priority.sh (patch 3/4).
-- Rebased on net-next.
-
-v5:
-
-https://lore.kernel.org/netdev/20241205133112.17903-1-annaemesenyiri@gmail.com/
-
-- Carry Eric's and Willem's "Reviewed-by" tags from v3 to
-  patch 1/4 since that is resubmitted without changes.
-- Carry Willem's "Reviewed-by" tag from v4 in patch 2/4,
-  as it is resubmitted without changes.
-- Eliminate variable duplication, fix indentation, simplify cleanup,
-  verify dependencies, separate setsockopt and control message 
-  priority testing, and modify namespace setup 
-  in patch 3/4 cmsg_so_priority.sh.
-- Add cmsg_so_priority.sh to tools/testing/selftests/net/Makefile.
-- Remove the unused variable, rename priority_cmsg to priority,
-  and document the -P option in cmsg_sender.c in patch 3/4.
-- New in v5: add new socket option, SO_RCVPRIORITY in patch 4/4.
-- Rebased on net-next.
-
-v4:
-
-https://lore.kernel.org/netdev/20241118145147.56236-1-annaemesenyiri@gmail.com/
-- Carry Eric's and Willem's "Reviewed-by" tags from v3 to 
-  patch 1/3 since that is resubmitted without changes.
-- Updated description in patch 2/3.
-- Missing ipc6.sockc.priority field added in ping_v6_sendmsg()
-  in patch 2/3.
-- Update cmsg_so_priority.sh to test SO_PRIORITY sockopt and cmsg
-  setting with VLAN priority tagging in patch 3/3. (Ido Schimmel) 
-- Rebased on net-next.
-
-v3:
-
-https://lore.kernel.org/netdev/20241107132231.9271-1-annaemesenyiri@gmail.com/
-- Updated cover letter text.
-- Removed priority field from ipcm_cookie.
-- Removed cork->tos value check from ip_setup_cork, so
-  cork->priority will now take its value from ipc->sockc.priority.
-- Replaced ipc->priority with ipc->sockc.priority
-  in ip_cmsg_send().
-- Modified the error handling for the SO_PRIORITY
-  case in __sock_cmsg_send().
-- Added missing initialization for ipc6.sockc.priority.
-- Introduced cmsg_so_priority.sh test script.
-- Modified cmsg_sender.c to set priority via control message (cmsg).
-- Rebased on net-next.
-
-
-v2:
-
-https://lore.kernel.org/netdev/20241102125136.5030-1-annaemesenyiri@gmail.com/
-- Introduced sk_set_prio_allowed helper to check capability
-  for setting priority.
-- Removed new fields and changed sockcm_cookie::priority
-  from char to u32 to align with sk_buff::priority.
-- Moved the cork->tos value check for priority setting
-  from __ip_make_skb() to ip_setup_cork().
-- Rebased on net-next.
-
-v1:
-
-https://lore.kernel.org/all/20241029144142.31382-1-annaemesenyiri@gmail.com/
-
-Anna Emese Nyiri (4):
-  Introduce sk_set_prio_allowed helper function
-  support SO_PRIORITY cmsg
-  test SO_PRIORITY ancillary data with cmsg_sender
-  introduce SO_RCVPRIORITY socket option
-
- arch/alpha/include/uapi/asm/socket.h          |   2 +
- arch/mips/include/uapi/asm/socket.h           |   2 +
- arch/parisc/include/uapi/asm/socket.h         |   2 +
- arch/sparc/include/uapi/asm/socket.h          |   2 +
- include/net/inet_sock.h                       |   2 +-
- include/net/ip.h                              |   2 +-
- include/net/sock.h                            |   8 +-
- include/uapi/asm-generic/socket.h             |   2 +
- net/can/raw.c                                 |   2 +-
- net/core/sock.c                               |  26 ++-
- net/ipv4/ip_output.c                          |   4 +-
- net/ipv4/ip_sockglue.c                        |   2 +-
- net/ipv4/raw.c                                |   2 +-
- net/ipv6/ip6_output.c                         |   3 +-
- net/ipv6/ping.c                               |   1 +
- net/ipv6/raw.c                                |   3 +-
- net/ipv6/udp.c                                |   1 +
- net/packet/af_packet.c                        |   2 +-
- net/socket.c                                  |  11 ++
- tools/include/uapi/asm-generic/socket.h       |   2 +
- tools/testing/selftests/net/Makefile          |   1 +
- tools/testing/selftests/net/cmsg_sender.c     |  11 +-
- .../testing/selftests/net/cmsg_so_priority.sh | 153 ++++++++++++++++++
- 23 files changed, 230 insertions(+), 16 deletions(-)
- create mode 100755 tools/testing/selftests/net/cmsg_so_priority.sh
-
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 74729d20cd00..9016f984d44e 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -454,6 +454,13 @@ static int sock_set_timeout(long *timeo_p, sockptr_t optval, int optlen,
+ 	return 0;
+ }
+ 
++static bool sk_set_prio_allowed(const struct sock *sk, int val)
++{
++	return ((val >= TC_PRIO_BESTEFFORT && val <= TC_PRIO_INTERACTIVE) ||
++		sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
++		sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN));
++}
++
+ static bool sock_needs_netstamp(const struct sock *sk)
+ {
+ 	switch (sk->sk_family) {
+@@ -1193,9 +1200,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 	/* handle options which do not require locking the socket. */
+ 	switch (optname) {
+ 	case SO_PRIORITY:
+-		if ((val >= 0 && val <= 6) ||
+-		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
+-		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
++		if (sk_set_prio_allowed(sk, val)) {
+ 			sock_set_priority(sk, val);
+ 			return 0;
+ 		}
 -- 
 2.43.0
 
