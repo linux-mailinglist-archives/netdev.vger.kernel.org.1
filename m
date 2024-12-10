@@ -1,247 +1,153 @@
-Return-Path: <netdev+bounces-150650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6AC49EB1BA
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:15:03 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6405C9EB1D1
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:25:46 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F8EF283C74
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:15:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F0D41689DB
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD5C11A76DD;
-	Tue, 10 Dec 2024 13:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C3A71A9B5C;
+	Tue, 10 Dec 2024 13:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b="eXE+9zIz"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Zc/Hsxz1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx-rz-3.rrze.uni-erlangen.de (mx-rz-3.rrze.uni-erlangen.de [131.188.11.22])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52B01A0BC0;
-	Tue, 10 Dec 2024 13:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=131.188.11.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E621A0B15;
+	Tue, 10 Dec 2024 13:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733836489; cv=none; b=mVMhEdDaM6roFYdw36L6yqidiAnqDPJm05kwjp6F0pwYIEY4nUJA6rgvoqihsqTxUYC2dV/zbCFGeSrsPs8cTqkQXgfuDgkckoaJTdRpQ/xX68BSaR7rjlEZOjPcUREj0bZDAB0n3ofQs+LK0T4NgAw/AlQw7PILeaBgMoBG9Z0=
+	t=1733837137; cv=none; b=j5sNdL1J2gP2TxcmBNlhM7l8WmGUxiQeoicLcFGAqVLo7kbz1vBh0aqMXVQH2hlU2+JqfoX2+3sT3/qogJLaKJKnwnnlOQ4XQ5kfi3lLiEei+fgxoRmPl/+C1iWrt4okPKahyZYJ7Z9rM6YrHGupG9eS963nGB23ve1ru4Os1UI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733836489; c=relaxed/simple;
-	bh=YsT6EcP18yeiYtzFMO3dO4JbLwI/AMemaxTrUzranP4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OIVOgcHiajolNdyTFKZyuxHedBQVZQcEV/Thq9xm27IB0vBkHShOzsCa8k7ALr95NGTaj5AANvOPVlUGxrtTsOHzyUq5uaUEdb0lMAKy1MP5z506VAgFoWuoDn4NQuam9rlxX06Noxs4v26FbVRQ2Yk1WftTwyTokMk04WUnzhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de; spf=pass smtp.mailfrom=fau.de; dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b=eXE+9zIz; arc=none smtp.client-ip=131.188.11.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fau.de
-Received: from mx-rz-smart.rrze.uni-erlangen.de (mx-rz-smart.rrze.uni-erlangen.de [IPv6:2001:638:a000:1025::1e])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-rz-3.rrze.uni-erlangen.de (Postfix) with ESMTPS id 4Y6zjC265nz1xwX;
-	Tue, 10 Dec 2024 14:14:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fau.de; s=fau-2021;
-	t=1733836479; bh=sG/19ZfeKePzGrlNfwsDwdiV3IXJN2uSxlAjdLrtWQI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From:To:CC:
-	 Subject;
-	b=eXE+9zIzScPz2FUv5JXz+9SaUswPMbQOno7tUqKHlqKmmKE0U+PzmjTr0Tk6dtKtw
-	 0ouwoL/FGgwUn5FhALGsyhY4QPaN2gtGos1AMHV0aIs9JK8g4BqLPnr0H0TvlarL2o
-	 YLG5nX7H4Oz/sEcZC/Q61M2uQCF+vczCc27uVSGUZSJqcMJwDiM6bkCbStNjPArfVX
-	 Pft85fFuhfXGAAL4ufSCzBEBjjiTPLO7vX2/D7AWVdLwGrIHbfMk+YT66KdxyxDGtZ
-	 apwL+j6svk0us3SWtvpmycwec8ZwXEAVuE7OkyfVa/6fz4mHLeZkMHKkiQhHcpFzQx
-	 uHNYIg3NrS8lw==
-X-Virus-Scanned: amavisd-new at boeck5.rrze.uni-erlangen.de (RRZE)
-X-RRZE-Flag: Not-Spam
-X-RRZE-Submit-IP: 131.188.47.107
-Received: from faui76b (faui76b.informatik.uni-erlangen.de [131.188.47.107])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: U2FsdGVkX1+IZSEIeQ8pHHzlT6KmbtTYX2dsz1NRJc0=)
-	by smtp-auth.uni-erlangen.de (Postfix) with ESMTPSA id 4Y6zj83t5Yz1yZZ;
-	Tue, 10 Dec 2024 14:14:36 +0100 (CET)
-From: Martin Ottens <martin.ottens@fau.de>
-To: 
-Cc: Martin Ottens <martin.ottens@fau.de>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3] net/sched: netem: account for backlog updates from child qdisc
-Date: Tue, 10 Dec 2024 14:14:11 +0100
-Message-Id: <20241210131412.1837202-1-martin.ottens@fau.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <AM0EoMm1Qv3_0ak2vtRjSmuW4+zZ7izzBVjDMawfnKm3dLcjyA@mail.gmail.com>
-References: <AM0EoMm1Qv3_0ak2vtRjSmuW4+zZ7izzBVjDMawfnKm3dLcjyA@mail.gmail.com>
+	s=arc-20240116; t=1733837137; c=relaxed/simple;
+	bh=nTFsVJCiG/fGyjcBn/u/RJ4Wm9Xi+qtHH/1Yy6XtMp0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=tWQ4/iGq0GIoeTJLfj5/DrsEGFJxXDBh0yExRstfGobw6nH6vIpv5ao1sa61sz6F9g6wXC7qznkeSJYK31nnxzL22ivWzz4BzISlMWjFQj8bxHn2xMYIAs8puiM6qWAyRhUp4TnAgISw9AQQaT0tAUfQK2H6cB+Fsy6W09d0CLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Zc/Hsxz1; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BACkVqk014059;
+	Tue, 10 Dec 2024 13:25:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	TAy0fqBw+sJaaAGWtwBcjlN1BVcv+m/rtwB2nRnyq/o=; b=Zc/Hsxz1etbRFyzu
+	JMq9zKe+NmITq0QZht5xCA8gPp+VvsQt/Xwn3nU+Or2v3X3yOdCcqLtT183xvX6G
+	pwOF24+1OmIFIHrWcrf0FB1A0ias/PZV0oE6ZyzjecpVlw3rt76FexIkUjO4lFuw
+	CvSh5ABd7ntcR04frcPeKd7oWjAkCDQsXIi83xGPr6fbHVAaGl0LEAqqkRoNFrlh
+	T5Do89YrRFiSL/tTGEHuUw0Mdk4uWCQeZrzsP80bD4yd2ammxO/N572jCXccVD5Z
+	viFWSaNLp7ctgiAH9aZZe69e8ktcRxhE97vNj+FSJFAXUR77ZZHJcMYSvzBNmeaJ
+	yih3PQ==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43dvyamr0j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 10 Dec 2024 13:25:18 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BADPHQ7018156
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 10 Dec 2024 13:25:17 GMT
+Received: from [10.253.8.172] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 10 Dec
+ 2024 05:25:12 -0800
+Message-ID: <2c28f9c2-c555-422d-8d57-6a555f03e6f7@quicinc.com>
+Date: Tue, 10 Dec 2024 21:25:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 4/5] net: pcs: qcom-ipq9574: Add USXGMII
+ interface mode support
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, Andrew Lunn
+	<andrew@lunn.ch>,
+        Heiner Kallweit <hkallweit1@gmail.com>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
+        <quic_pavir@quicinc.com>, <quic_linchen@quicinc.com>,
+        <quic_luoj@quicinc.com>, <srinivas.kandagatla@linaro.org>,
+        <bartosz.golaszewski@linaro.org>, <vsmuthu@qti.qualcomm.com>,
+        <john@phrozen.org>, <linux-arm-msm@vger.kernel.org>
+References: <20241204-ipq_pcs_rc1-v2-0-26155f5364a1@quicinc.com>
+ <20241204-ipq_pcs_rc1-v2-4-26155f5364a1@quicinc.com>
+ <Z1B3W94-8qjn17Sj@shell.armlinux.org.uk>
+ <dc40d847-9a98-4f46-94cb-208257334aed@quicinc.com>
+ <Z1Mm8nBR_sYyzBUh@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Lei Wei <quic_leiwei@quicinc.com>
+In-Reply-To: <Z1Mm8nBR_sYyzBUh@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: bMZB-OSHEUC8Xw4u7C0J4rwqPK9gIfgF
+X-Proofpoint-ORIG-GUID: bMZB-OSHEUC8Xw4u7C0J4rwqPK9gIfgF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
+ mlxlogscore=999 mlxscore=0 priorityscore=1501 suspectscore=0 clxscore=1015
+ malwarescore=0 impostorscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2412100100
 
-In general, 'qlen' of any classful qdisc should keep track of the
-number of packets that the qdisc itself and all of its children holds.
-In case of netem, 'qlen' only accounts for the packets in its internal
-tfifo. When netem is used with a child qdisc, the child qdisc can use
-'qdisc_tree_reduce_backlog' to inform its parent, netem, about created
-or dropped SKBs. This function updates 'qlen' and the backlog statistics
-of netem, but netem does not account for changes made by a child qdisc.
-'qlen' then indicates the wrong number of packets in the tfifo.
-If a child qdisc creates new SKBs during enqueue and informs its parent
-about this, netem's 'qlen' value is increased. When netem dequeues the
-newly created SKBs from the child, the 'qlen' in netem is not updated.
-If 'qlen' reaches the configured sch->limit, the enqueue function stops
-working, even though the tfifo is not full.
 
-Reproduce the bug:
-Ensure that the sender machine has GSO enabled. Configure netem as root
-qdisc and tbf as its child on the outgoing interface of the machine
-as follows:
-$ tc qdisc add dev <oif> root handle 1: netem delay 100ms limit 100
-$ tc qdisc add dev <oif> parent 1:0 tbf rate 50Mbit burst 1542 latency 50ms
 
-Send bulk TCP traffic out via this interface, e.g., by running an iPerf3
-client on the machine. Check the qdisc statistics:
-$ tc -s qdisc show dev <oif>
+On 12/7/2024 12:31 AM, Russell King (Oracle) wrote:
+> On Sat, Dec 07, 2024 at 12:20:57AM +0800, Lei Wei wrote:
+>> On 12/4/2024 11:38 PM, Russell King (Oracle) wrote:
+>>> On Wed, Dec 04, 2024 at 10:43:56PM +0800, Lei Wei wrote:
+>>>> +static int ipq_pcs_link_up_config_usxgmii(struct ipq_pcs *qpcs, int speed)
+>>>> +{
+>>> ...
+>>>> +	/* USXGMII only support full duplex mode */
+>>>> +	val |= XPCS_DUPLEX_FULL;
+>>>
+>>> Again... this restriction needs to be implemented in .pcs_validate() by
+>>> knocking out the half-duplex link modes when using USXGMII mode.
+>>>
+>>> .pcs_validate() needs to be implemented whenever the PCS has
+>>> restrictions beyond what is standard for the PHY interface mode.
+>>>
+>>
+>> Currently, it seems there is no phylink_validate() call in
+>> phylink_resolve(), to validate the resolved duplex/speed which is notified
+>> by phydev when the PHY is linked up. So I am thinking to add this duplex
+>> check in this link_up op, and return an appropriate error in case of
+>> half-duplex. (Kindly correct me if I am wrong).
+> 
+> Doing validation at that point is way too late.
+> 
+> We don't want the PHY e.g. even advertising a half-duplex link mode if
+> the system as a whole can not support half-duplex modes. If the system
+> can't support half-duplex, then trying to trap it out at resolve time
+> would be way too late - the media has already negotiated a half-duplex
+> link, and that's that.
+> 
+> Instead, phylink takes the approach of restricting the media
+> advertisement according to the properties of the system, thereby
+> preventing invalid configurations _way_ before we get to autoneg
+> completion and calling phylink_resolve().
+> 
 
-Statistics after 10s of iPerf3 TCP test before the fix (note that
-netem's backlog > limit, netem stopped accepting packets):
-qdisc netem 1: root refcnt 2 limit 1000 delay 100ms
- Sent 2767766 bytes 1848 pkt (dropped 652, overlimits 0 requeues 0)
- backlog 4294528236b 1155p requeues 0
-qdisc tbf 10: parent 1:1 rate 50Mbit burst 1537b lat 50ms
- Sent 2767766 bytes 1848 pkt (dropped 327, overlimits 7601 requeues 0)
- backlog 0b 0p requeues 0
-
-Statistics after the fix:
-qdisc netem 1: root refcnt 2 limit 1000 delay 100ms
- Sent 37766372 bytes 24974 pkt (dropped 9, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
-qdisc tbf 10: parent 1:1 rate 50Mbit burst 1537b lat 50ms
- Sent 37766372 bytes 24974 pkt (dropped 327, overlimits 96017 requeues 0)
- backlog 0b 0p requeues 0
-
-tbf segments the GSO SKBs (tbf_segment) and updates the netem's 'qlen'.
-The interface fully stops transferring packets and "locks". In this case,
-the child qdisc and tfifo are empty, but 'qlen' indicates the tfifo is at
-its limit and no more packets are accepted.
-
-This patch adds a counter for the entries in the tfifo. Netem's 'qlen' is
-only decreased when a packet is returned by its dequeue function, and not
-during enqueuing into the child qdisc. External updates to 'qlen' are thus
-accounted for and only the behavior of the backlog statistics changes. As
-in other qdiscs, 'qlen' then keeps track of  how many packets are held in
-netem and all of its children. As before, sch->limit remains as the
-maximum number of packets in the tfifo. The same applies to netem's
-backlog statistics.
-
-Fixes: 50612537e9ab ("netem: fix classful handling")
-Signed-off-by: Martin Ottens <martin.ottens@fau.de>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- net/sched/sch_netem.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
-
-diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index fe6fed291a7b..71ec9986ed37 100644
---- a/net/sched/sch_netem.c
-+++ b/net/sched/sch_netem.c
-@@ -79,6 +79,8 @@ struct netem_sched_data {
- 	struct sk_buff	*t_head;
- 	struct sk_buff	*t_tail;
- 
-+	u32 t_len;
-+
- 	/* optional qdisc for classful handling (NULL at netem init) */
- 	struct Qdisc	*qdisc;
- 
-@@ -383,6 +385,7 @@ static void tfifo_reset(struct Qdisc *sch)
- 	rtnl_kfree_skbs(q->t_head, q->t_tail);
- 	q->t_head = NULL;
- 	q->t_tail = NULL;
-+	q->t_len = 0;
- }
- 
- static void tfifo_enqueue(struct sk_buff *nskb, struct Qdisc *sch)
-@@ -412,6 +415,7 @@ static void tfifo_enqueue(struct sk_buff *nskb, struct Qdisc *sch)
- 		rb_link_node(&nskb->rbnode, parent, p);
- 		rb_insert_color(&nskb->rbnode, &q->t_root);
- 	}
-+	q->t_len++;
- 	sch->q.qlen++;
- }
- 
-@@ -518,7 +522,7 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 			1<<get_random_u32_below(8);
- 	}
- 
--	if (unlikely(sch->q.qlen >= sch->limit)) {
-+	if (unlikely(q->t_len >= sch->limit)) {
- 		/* re-link segs, so that qdisc_drop_all() frees them all */
- 		skb->next = segs;
- 		qdisc_drop_all(skb, sch, to_free);
-@@ -702,8 +706,8 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
- tfifo_dequeue:
- 	skb = __qdisc_dequeue_head(&sch->q);
- 	if (skb) {
--		qdisc_qstats_backlog_dec(sch, skb);
- deliver:
-+		qdisc_qstats_backlog_dec(sch, skb);
- 		qdisc_bstats_update(sch, skb);
- 		return skb;
- 	}
-@@ -719,8 +723,7 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
- 
- 		if (time_to_send <= now && q->slot.slot_next <= now) {
- 			netem_erase_head(q, skb);
--			sch->q.qlen--;
--			qdisc_qstats_backlog_dec(sch, skb);
-+			q->t_len--;
- 			skb->next = NULL;
- 			skb->prev = NULL;
- 			/* skb->dev shares skb->rbnode area,
-@@ -747,16 +750,21 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
- 					if (net_xmit_drop_count(err))
- 						qdisc_qstats_drop(sch);
- 					qdisc_tree_reduce_backlog(sch, 1, pkt_len);
-+					sch->qstats.backlog -= pkt_len;
-+					sch->q.qlen--;
- 				}
- 				goto tfifo_dequeue;
- 			}
-+			sch->q.qlen--;
- 			goto deliver;
- 		}
- 
- 		if (q->qdisc) {
- 			skb = q->qdisc->ops->dequeue(q->qdisc);
--			if (skb)
-+			if (skb) {
-+				sch->q.qlen--;
- 				goto deliver;
-+			}
- 		}
- 
- 		qdisc_watchdog_schedule_ns(&q->watchdog,
-@@ -766,8 +774,10 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
- 
- 	if (q->qdisc) {
- 		skb = q->qdisc->ops->dequeue(q->qdisc);
--		if (skb)
-+		if (skb) {
-+			sch->q.qlen--;
- 			goto deliver;
-+		}
- 	}
- 	return NULL;
- }
--- 
-2.39.5
-
+Yes, understand. I will avoid advertising half-duplex in the 
+pcs_validate() method for USXGMII. Thanks for the suggestion.
 
