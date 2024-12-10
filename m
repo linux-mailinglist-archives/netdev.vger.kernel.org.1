@@ -1,152 +1,160 @@
-Return-Path: <netdev+bounces-150595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEE4A9EAD52
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 10:59:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A68B9EAD3A
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 10:58:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF16D188DECE
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 09:57:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6389188EAA8
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 09:56:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3D8223E89;
-	Tue, 10 Dec 2024 09:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B459A78F38;
+	Tue, 10 Dec 2024 09:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Asu0KpH2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VDJZPGwz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB86223E90
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 09:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB73678F30;
+	Tue, 10 Dec 2024 09:51:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733824410; cv=none; b=RerAQMAEuxbfKbknHSYz3cmrFB5TvB2e+sdpnzzAEPRk/0AbRL8T03An6o2l5ZCC45e8i2S+OTv8WvtoyU1jTnhkeRMEQUasod+DhbRncsazQ5Ei4jDrloVMM6Lc4Bw0Jntb/651u/aqVNhGxyiglRGZH5BYAwCGZN+DpnuZ7ig=
+	t=1733824268; cv=none; b=PXxLIURF/w7YxKY8m2g0UZQEpvjANEdAVDa0aSQKmsHF2XAWd6QDNtNvvz535yV9iwbOjHYE5Bc7lbpay0co4NjJ6cKSMZ83es320tdhrYnF4trXVYkPmTTlGcf8vRlliBza/dTma4AgbxxOppYdQnM9nGT700g29Ac2GmxoGCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733824410; c=relaxed/simple;
-	bh=5j4Dk8LXBjZqOyEFGw3cHHkqdvLYPJPuGAYZqOZ1gsg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sjRwcfP9XvDaNLUsqnu9zsJbygyr8kkv0kUoJgfQpUeHZXJZdnDDsSv2SuTDEGbdJ50rVsSNNeqk33kPBURcW0eQWNxRUsVZwgMt2bMOuhvnrQoFKJCglQUyW6i5kmDjReVS3nrkxhb8KzowSI4wnAm0nTvRIUIVa9GBifVnRkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Asu0KpH2; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733824409; x=1765360409;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5j4Dk8LXBjZqOyEFGw3cHHkqdvLYPJPuGAYZqOZ1gsg=;
-  b=Asu0KpH21kPBA93osX+KP8P/+5Fy+dvm+eCn2yyv1/RSw50oSKyTg+ZO
-   r4n53/rhuzGKPPhNtMCOQEIv0ErtZdm5Bio+p7iILASrykdPta2pmzDop
-   e6Ad0kKDcAUF7WUo40VyO1NYQ3ODN91WrJ+1iQxhJvft1HH9LIRkLHzQZ
-   fs3yQwSpXY4QZquYWvelJHEWyUYbL3YuKo4llLHIL2yFG3YzyTuHEo2tx
-   fzxHDsuTA9Z5aCFgpk8am2s+FLGt+hzL3qzX5kLltzgQWlpm49l0G8vzn
-   Lobm8oIxcVYHFKpvATIcI9tFOqM7F3Deb9s936YPEZaXEkPr1mT1RpPop
-   g==;
-X-CSE-ConnectionGUID: BDj2rhfeQ2u+MPCnu/d6dQ==
-X-CSE-MsgGUID: c23XTtgPSL2PF3OYd3rqKg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11278"; a="45541953"
-X-IronPort-AV: E=Sophos;i="6.12,214,1728975600"; 
-   d="scan'208";a="45541953"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 01:53:26 -0800
-X-CSE-ConnectionGUID: 4iYS4OinRDmUfCLTyTXixw==
-X-CSE-MsgGUID: URPu72AYQYWamYBoeRw1cA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,222,1728975600"; 
-   d="scan'208";a="132743742"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 01:53:24 -0800
-Date: Tue, 10 Dec 2024 10:50:21 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	Ido Schimmel <idosch@nvidia.com>, mlxsw@nvidia.com,
-	Vladyslav Mykhaliuk <vmykhaliuk@nvidia.com>,
-	Amit Cohen <amcohen@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next] mlxsw: spectrum_flower: Do not allow mixing
- sample and mirror actions
-Message-ID: <Z1gO3ewMq07er0TN@mev-dev.igk.intel.com>
-References: <d6c979914e8706dbe1dedbaf29ffffb0b8d71166.1733822570.git.petrm@nvidia.com>
+	s=arc-20240116; t=1733824268; c=relaxed/simple;
+	bh=oi7eCnykiiMdiANJBoLlcbfnIekOTSmhDJnHa4TSeJI=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=oQ8kh6scrK4efokesfe9xvCEZbzAnX/o5mBBXMralQIa1bA6H6xhoUcaO/wOxkyjnjpfinw7XI3J9zUL7E9Q+JHG/ipA1DyCIgcKgCngblO5h65B+F2oVrzxpwSoOe/+5/u/AnfeDJkhh5o32TPYbFF0HF8F78EtkAoT9MpMk9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VDJZPGwz; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-434b3e32e9dso58109495e9.2;
+        Tue, 10 Dec 2024 01:51:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733824265; x=1734429065; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eVngt1qTy/xN3Hpa896xeIHRZX1r8nOJq/F7ShWMruQ=;
+        b=VDJZPGwzVxmc/ktT87hfP47PSwsIujM79x+QxT7l2SmMWmCUsM3mQrbzJmKQsozaCm
+         9+GzgKBPSXPg5fxJrEwehKuFCvmKcM5BIZ3y1hUi1Ox46rgA38bAVtyyP/lpEVth4RNe
+         I0rzqr1kF5IK8VOEDGBHC7vq+dTEDXjFBjnJlcNghTIqIdaakY3TPoFM7YItYJuwVWij
+         yN5Aog9D+hEO2PDgFrG27af50eVwbhiiRwV73oocmNdXEQxEib2GKryVWNbSYd+M3G6P
+         YTkE71QfSeghIG7HbHqP5TVPZLr5zzTjzLog/l/kcJV3yDTztx2XmVgg5O4ydR/DsS2G
+         kqAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733824265; x=1734429065;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eVngt1qTy/xN3Hpa896xeIHRZX1r8nOJq/F7ShWMruQ=;
+        b=kcNwvNPtA8mp7Ee2zPYHhIcIP8vaOUc/f8qn90MWvP5md5awiaqItrFR2gMHTzQRNa
+         etfr4nh0MNWXVJjhfk9hKhxaOwdGJeJ8w04tGolkcYoGsLDWEqHbVnMMP+xfRLARZTYe
+         pdh3aXYetxP2WvsyAeiL4mLMTWMZL1aFenPtZS6uXoRUCUA4b/VZH3anU2/V6kS+FQsn
+         Bo+sF60SvH6qP3B8yrTR2YcsBNgs0YkvuFUL+875/iY8iePf1xAdw5I5HSIQyqqXhRDC
+         cka5Vk0i8u6eDJUM3yQIWPHwWV1bDoID7JJjo2Nb6wjLOwDQtcy+MPJ5s57xqDtr10GE
+         6cXw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbFVGtf+uf/VsKUtnm42KUOrHwybQGlZky9h/veF0B7y+NNWoF3ceuKwA/lV2q0ytT1XA9UAT6@vger.kernel.org, AJvYcCVvzSBg21YineMpFMp7PGbKpWe+YDW1aaBCBq11jAej2HJ4okqkIu0Rp2jnNGzOYDN9fq2iAUwyfTw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycQXRRYDWtL8ZyewUwk66kGuropy/8Bm/1guuztD/lIROk+m66
+	0QlBD5Ssmkbaa/I1BKy+nwywGmwSutzzBhnRGNx3r0u2NSHe/k4euoibaw==
+X-Gm-Gg: ASbGncvcmUagtQC0EsMd5UEv2TTYmqB1EaXxk2vmd2l7E0DY+UZN2gD+VC7cqFpe53l
+	fw9VWCjEl0fb7eE17MJNhUUC1TnfLE1vg9UW9XAFhgIoCzf8ye+bOnqOBOwdwiOyFgfAs0KvNf+
+	GT/6QDo/GtLnv7Z37sgo8xwcndPn9tKE/ksBvXEN+5VPHvNeGtSBRIndwA6aSHzcdSF2/gQj18w
+	h4RNvFjulvxUi/e1443LtziTMxk6zNNv7j0j25tjchhwOK/bvo65RUBGlW1Wx6kjHdl5p0CHcAm
+	+QB4JiP3SgzzEkFRwMRy8eAWCirma1L6MNWOWsH+Hg==
+X-Google-Smtp-Source: AGHT+IG1bPkTNmZoa++SRWPW66kFFJI1n5L1bp5c5HzG2uRlnN9E30pff4QzwAt6iLDjZTxSjuFfQw==
+X-Received: by 2002:a05:600c:1e27:b0:434:f804:a992 with SMTP id 5b1f17b1804b1-434f804ac4emr51157525e9.32.1733824265028;
+        Tue, 10 Dec 2024 01:51:05 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434e8ec8072sm115493755e9.18.2024.12.10.01.51.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2024 01:51:04 -0800 (PST)
+Subject: Re: [PATCH v7 16/28] sfc: obtain root decoder with enough HPA free
+ space
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
+Cc: Alejandro Lucero <alucerop@amd.com>
+References: <20241209185429.54054-1-alejandro.lucero-palau@amd.com>
+ <20241209185429.54054-17-alejandro.lucero-palau@amd.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <6c4f75a0-b63b-9591-5ffc-db4bf4bf3a16@gmail.com>
+Date: Tue, 10 Dec 2024 09:51:03 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d6c979914e8706dbe1dedbaf29ffffb0b8d71166.1733822570.git.petrm@nvidia.com>
+In-Reply-To: <20241209185429.54054-17-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 10, 2024 at 10:45:37AM +0100, Petr Machata wrote:
-> From: Ido Schimmel <idosch@nvidia.com>
+On 09/12/2024 18:54, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> The device does not support multiple mirror actions per rule and the
-> driver rejects such configuration:
+> Asking for available HPA space is the previous step to try to obtain
+> an HPA range suitable to accel driver purposes.
 > 
->  # tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw action mirred egress mirror dev swp2 action mirred egress mirror dev swp3
->  Error: mlxsw_spectrum: Multiple mirror actions per rule are not supported.
->  We have an error talking to the kernel
+> Add this call to efx cxl initialization.
 > 
-> Internally, the sample action is implemented by the device by mirroring
-> to the CPU port. Therefore, mixing sample and mirror actions in a single
-> rule does not work correctly and results in the last action effect.
-> 
-> Solve by rejecting such misconfiguration:
-> 
->  # tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw action mirred egress mirror dev swp2 action sample rate 100 group 1
->  Error: mlxsw_spectrum: Sample action after mirror action is not supported.
->  We have an error talking to the kernel
-> 
->  # tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw action sample rate 100 group 1 action mirred egress mirror dev swp2
->  Error: mlxsw_spectrum: Mirror action after sample action is not supported.
->  We have an error talking to the kernel
-> 
-> Reported-by: Vladyslav Mykhaliuk <vmykhaliuk@nvidia.com>
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> Reviewed-by: Amit Cohen <amcohen@nvidia.com>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
 > ---
->  drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  drivers/net/ethernet/sfc/efx_cxl.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c
-> index f07955b5439f..6a4a81c63451 100644
-> --- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c
-> +++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c
-> @@ -192,6 +192,11 @@ static int mlxsw_sp_flower_parse_actions(struct mlxsw_sp *mlxsw_sp,
->  				return -EOPNOTSUPP;
->  			}
->  
-> +			if (sample_act_count) {
-> +				NL_SET_ERR_MSG_MOD(extack, "Mirror action after sample action is not supported");
-> +				return -EOPNOTSUPP;
-> +			}
-> +
->  			err = mlxsw_sp_acl_rulei_act_mirror(mlxsw_sp, rulei,
->  							    block, out_dev,
->  							    extack);
-> @@ -265,6 +270,11 @@ static int mlxsw_sp_flower_parse_actions(struct mlxsw_sp *mlxsw_sp,
->  				return -EOPNOTSUPP;
->  			}
->  
-> +			if (mirror_act_count) {
-> +				NL_SET_ERR_MSG_MOD(extack, "Sample action after mirror action is not supported");
-> +				return -EOPNOTSUPP;
-> +			}
-> +
->  			err = mlxsw_sp_acl_rulei_act_sample(mlxsw_sp, rulei,
->  							    block,
->  							    act->sample.psample_group,
-> -- 
-> 2.47.0
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> index 8db5cf5d9ab0..f2dc025c9fbb 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -26,6 +26,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  	struct pci_dev *pci_dev;
+>  	struct efx_cxl *cxl;
+>  	struct resource res;
+> +	resource_size_t max;
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+While it won't actually match because there's no (), the fact that this
+ is the name of a common function-like macro is not ideal.  Can you
+ rename this variable to something clearer ('max_size' perhaps)?
 
-Thanks
+>  	u16 dvsec;
+>  	int rc;
+>  
+> @@ -102,6 +103,23 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  		goto err3;
+>  	}
+>  
+> +	cxl->cxlrd = cxl_get_hpa_freespace(cxl->cxlmd,
+> +					   CXL_DECODER_F_RAM | CXL_DECODER_F_TYPE2,
+> +					   &max);
+> +
+> +	if (IS_ERR(cxl->cxlrd)) {
+> +		pci_err(pci_dev, "cxl_get_hpa_freespace failed\n");
+> +		rc = PTR_ERR(cxl->cxlrd);
+> +		goto err3;
+> +	}
+> +
+> +	if (max < EFX_CTPIO_BUFFER_SIZE) {
+> +		pci_err(pci_dev, "%s: no enough free HPA space %pap < %u\n",
+
+s/no/not/
+
+> +			__func__, &max, EFX_CTPIO_BUFFER_SIZE);
+> +		rc = -ENOSPC;
+> +		goto err3;
+> +	}
+> +
+>  	probe_data->cxl = cxl;
+>  
+>  	return 0;
+> 
+
 
