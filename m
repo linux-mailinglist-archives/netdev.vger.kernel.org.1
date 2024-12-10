@@ -1,151 +1,164 @@
-Return-Path: <netdev+bounces-150569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BA089EAAE3
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 09:43:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B7AF9EAAF2
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 09:46:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBE3918820DC
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 08:43:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D3E31889D54
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 08:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E598A2309B4;
-	Tue, 10 Dec 2024 08:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8541B230D21;
+	Tue, 10 Dec 2024 08:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eJPui7Lx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BO2Vrb/G"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42BD2309AA
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 08:43:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C23B2309A7
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 08:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733820183; cv=none; b=U+nR60J0qjbsJjd6bPokYTKNphJ3KBpGNxE+WwELiZxMq9FZpTT5AqBCruq+duCP1HdqwIe8yymeMjFG1ikANEC6KEtV8/uxkt4A+Pp+RTO2G8QSQgh2LX9RpLP82Czhk1Gcb2M5oUhkViTNBMiEE/2EhlVOgIlNGy43xzX7WLs=
+	t=1733820402; cv=none; b=XcoUXaRXhJAESbR0OFyC/+dm3FEjMAFV0VSIW97oW5sYauLaAwgDIiLTzStf0+2sT8Kv+jnNSnaOYf9B9qYUhX/OHMsG1ztVQz7p2pc/XSDobqi16V+4SulkBWvT33y0l61gVFVeNAluX54o6poOJHMz4ifpIaBzI419cMBrMrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733820183; c=relaxed/simple;
-	bh=gthI8PZDbtsviiuL24Ic9Kn1i+0akT98OwqMusA9o80=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=f5PV+0nzdYk/0MSLIM9al+9IIizM2BJ0yMfnDZpi0UytqtKTI86VkvRSMf1nJdN7OAuzY3AOqx0ve0nlqooUIsVIUZIs4tyvnay0q+k+4EC6lUD6ztHoBXrEJ2lAo5FmK04KNuUvCTMaHQw+PAIissLqmrbzW0bL9bXaU2hcLa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eJPui7Lx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733820180;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m8pXFWAEjkLhM10kO3M5wqhjCdlxvFoykCNB+vBUV4Q=;
-	b=eJPui7LxKqjcYvBS/hBJ+jlA2sdfNwbSwVJRC+Ttso2+wpFPLoXirW9J6bLcoTOoYGn9zq
-	QCqZfQA5qhItNFfceWPg51dMobKodSHD7tAkHWXmbmop/DOD+hRT5U5e7GeOLAVNMh1GWi
-	6wLfbiv08vfkq8QGaBBbcFWOtdZj2rI=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-400-bi29YppVMQOOxREGVjm93A-1; Tue, 10 Dec 2024 03:42:58 -0500
-X-MC-Unique: bi29YppVMQOOxREGVjm93A-1
-X-Mimecast-MFC-AGG-ID: bi29YppVMQOOxREGVjm93A
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-aa61e72d68dso383261566b.3
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 00:42:58 -0800 (PST)
+	s=arc-20240116; t=1733820402; c=relaxed/simple;
+	bh=Eba7fbqt2ZQeeRKH2zJBxl/+3tg7P1GPjMOSP6Xj+h0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SepNrJ9hIxr5LRsPB/v5IBwsNW0CRnrFc7jpPc6vW4o017kH2CtsrLmMvA+G5jxMCs0EtdeNMWoHgh2XufPFpVOqJ/BEUe6z9EcALeIEsAwDe4RRc3O8nuDnWljDqAXw4yN6Hqjz1T/Ku40f2OHOKRfZYVJcaq8IHFKv/M2ijRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BO2Vrb/G; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d3e9a88793so3917122a12.1
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 00:46:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733820399; x=1734425199; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+qUZ+ytQeipLxCRqR/rU3YK4R6Z+4ZLrxv3Y3omcsV4=;
+        b=BO2Vrb/GrS35cj/cXq+9pb1lzx1wh1xnito75+kTE3cSGbYplrCDS20l176mXnlW8D
+         CRRcRvSMBgM50rSAF06PO+bzd3ROV12dOfov3FxV9OxvHbGGMOwnfx0me8vsclrzErNe
+         EZ2qkMtMGt/JnEcyvus/dWMO2nfG1Fopwin2+KNt69D9hNcJp8DbY7nfmRdVd2EDQJIY
+         6vSKiP1ASl+DXrqkdESz+T8Y+5qTHYhWJRmUQ8B7PNde0N7nu2YStfExwNcMM0rEWne8
+         PnYCKfKgEuuwdttbHBK8OTMrYEoJm5PVZGS0CFvI+Rkp01O0Z9q/60wpxoNw6Hdt6Vul
+         BRlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733820177; x=1734424977;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1733820399; x=1734425199;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=m8pXFWAEjkLhM10kO3M5wqhjCdlxvFoykCNB+vBUV4Q=;
-        b=JLjECV3sc759jfC+0jft3daTlqDdOKdFFoLhPLwHkncCgc+72fCbkzpOXkv3cQosu2
-         ayehPDp85FSAp4EiIoAszrbNyHcOwUe8FqqPbdl5GrttcCbM5+MlOs7Z/TtW09+DPnbe
-         rW2RzxBlj9QcAdA4fQetLdcChIXKYUNsdDLiA1hPXWS2FHSs2DwGmoZ1DDRes5oApMso
-         N4OpkTd108zVnwQ2abBGcMqQq9fBOA+MxHKArowCLyh/4zc2VZtGsgTyIMTZj20jvzO0
-         ZfXSOP8Lr9brPqVHK5XJaIf/Ui9zVabcqZ1au5sOTWxs6QvwltwM6EIzWSmc4fdbBMNk
-         gh3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVDj9rNbDsc3lezwkmnQlJYPp8KQGqTQObTnT5Mh70bFzywH9VqaOvqaq4/dO+uBTst7dhOO+c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyB0sybvl4HSeNHxf8HKOvTXMen6SOmq9MsJTtjfJY+VYEEpS9+
-	e0daifoWm8BhSFeR/97hqEL43AXkvEHVT8sir4BLxKMD2tWbJnqEggqYYnyNhoeDk8S0g4IT/0E
-	ZIqQdXwDKwDnlxBDqkky636KUNxk5cMuf9DRSQv37nB4iXHkgM5aHoQ==
-X-Gm-Gg: ASbGncsMc2e52E2GcbqZJBut5/cl5LfzS3eCc/f0Q4tdn+Mq2b8Y5Ctd+RUFqo5utuR
-	jO4po15GznuLDIY+h4BWAC/iX2h7tR+tBAOhJpGttLob6DnXj7qlk0n/8l2nj41i1dWX+S4jN1t
-	q0Ps0EtNEeI+nLBF4rOeX6Vc5Gwiv+JQlG8k70aVpCRa+suu6zohKyU7ujLo4LgRfdgaWit2Fhq
-	pdkGy6FLhPTW8YUcLjPgj8TwdxZ90qZRyL2bNMRnS34qMDz7Yc=
-X-Received: by 2002:a17:906:cd1:b0:aa6:74a9:ce71 with SMTP id a640c23a62f3a-aa69cd708a1mr286591166b.27.1733820177611;
-        Tue, 10 Dec 2024 00:42:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHzII+NR1Pxx1i/jdu38fmJ+bPWyh8XhuTrskK85VCnAmf8uLJXoopd9TZcS8ONnFb1+kVLvQ==
-X-Received: by 2002:a17:906:cd1:b0:aa6:74a9:ce71 with SMTP id a640c23a62f3a-aa69cd708a1mr286589766b.27.1733820177280;
-        Tue, 10 Dec 2024 00:42:57 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa686bb8cb2sm280815266b.153.2024.12.10.00.42.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 00:42:56 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id A516E16BDA11; Tue, 10 Dec 2024 09:42:55 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Dave Taht <dave.taht@gmail.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, Jamal Hadi Salim
- <jhs@mojatatu.com>, cake@lists.bufferbloat.net, Eric Dumazet
- <edumazet@google.com>, Simon Horman <horms@kernel.org>, Cong Wang
- <xiyou.wangcong@gmail.com>, Paolo Abeni <pabeni@redhat.com>, "David S.
- Miller" <davem@davemloft.net>
-Subject: Re: [Cake] [PATCH net-next] net_sched: sch_cake: Add drop reasons
-In-Reply-To: <CAA93jw4chUsQ40LQStvJBeOEENydbv58gOWz8y7fFPJkATa9tA@mail.gmail.com>
-References: <20241209-cake-drop-reason-v1-1-19205f6d1f19@redhat.com>
- <20241209155157.6a817bc5@kernel.org>
- <CAA93jw4chUsQ40LQStvJBeOEENydbv58gOWz8y7fFPJkATa9tA@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 10 Dec 2024 09:42:55 +0100
-Message-ID: <87a5d46i9c.fsf@toke.dk>
+        bh=+qUZ+ytQeipLxCRqR/rU3YK4R6Z+4ZLrxv3Y3omcsV4=;
+        b=fYtBSLrvjtB7UGIDMQVqAnGHb4PTGH4zid+9x2PPZKNT9znN41zJ8AM6/LRC8nQFn0
+         CfW2dUQhcX+FT2Gd044xgJD7AcNMFTWZ4nv/m78vJ7yOAB7sXddxWjyZucgNl87Ql05a
+         K6p+DWw6QU+fcXn8E2hmNfywzdQl2snYWVkNNo5uESGgFZ7fCE2o3rAv8gOxRWTgAzKH
+         utBAW4m14ukdAO+xyGu0UMUfxixDq2ebzbs104GKf1w1XGeL9VinN01x9B0aCYBWkwoh
+         hr7l5IJmGS33ofQfqqOOAAC2peu4j9VhlcRCM73gJ0P9Hf1IkMry2CluxeBsnQNOGEC5
+         9aNA==
+X-Forwarded-Encrypted: i=1; AJvYcCX7vHswNUiyrLyaeBrPK0Htq3J+ETyp7DpvVqMfF5g6SCb7yLZLXzAE7NInkuKICmogG3ngmJs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdC649IYX/KTH3BGGoRLzORmahCa6EvfbSUuAXU+n4pjEwiuR6
+	7xbbAEPxcxtaD5N9JTBSNv3HridIVGwFnGOJJrRSrqFzGY8t8AlHrouPX4PCF11+6DJVgGPvz3O
+	zomiKHkit/l/gbpgSpEu8F2Dh4WSDO1woBQJRHXri4IYLCaEBajYf
+X-Gm-Gg: ASbGnctnDrJ+tqAb9T8Ey5gOaW5D7yS1GiU8nBTmuO2ZhKbpShoXG+qFIBIVR8zsV29
+	0d7gBWMJqubNRF7JlTbXV7uuyZSckzK5bBg==
+X-Google-Smtp-Source: AGHT+IHKSd7M+cMhyM4R0r1btFzb67y9gtbX3vqaTShlCnIy7i3kCaKghhku6FzXCTycnILsOvhp7umf4cg0YpdcdqI=
+X-Received: by 2002:a05:6402:3587:b0:5d3:d917:dd90 with SMTP id
+ 4fb4d7f45d1cf-5d418502cc8mr4309748a12.6.1733820398800; Tue, 10 Dec 2024
+ 00:46:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20241210073829.62520-1-kuniyu@amazon.com>
+In-Reply-To: <20241210073829.62520-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 10 Dec 2024 09:46:27 +0100
+Message-ID: <CANn89iKHE=ucDztegP5TPHM=6e0JaGApQ7J==4r1Q9nffm+-sQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 00/15] treewide: socket: Clean up
+ sock_create() and friends.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Dave Taht <dave.taht@gmail.com> writes:
-
-> On Mon, Dec 9, 2024 at 3:52=E2=80=AFPM Jakub Kicinski via Cake
-> <cake@lists.bufferbloat.net> wrote:
->>
->> On Mon, 09 Dec 2024 13:02:18 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrot=
-e:
->> > Add three qdisc-specific drop reasons for sch_cake:
->> >
->> >  1) SKB_DROP_REASON_CAKE_CONGESTED
->> >     Whenever a packet is dropped by the CAKE AQM algorithm because
->> >     congestion is detected.
->> >
->> >  2) SKB_DROP_REASON_CAKE_FLOOD
->> >     Whenever a packet is dropped by the flood protection part of the
->> >     CAKE AQM algorithm (BLUE).
->> >
->> >  3) SKB_DROP_REASON_CAKE_OVERLIMIT
->> >     Whenever the total queue limit for a CAKE instance is exceeded and=
- a
->> >     packet is dropped to make room.
->>
->> Eric's patch was adding fairly FQ-specific reasons, other than flood
->> this seems like generic AQM stuff, no? From a very quick look the
->> congestion looks like fairly standard AQM, overlimit is also typical
->> for qdics?
+On Tue, Dec 10, 2024 at 8:38=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
 >
-> While I initially agreed with making this generic, preserving the qdisc f=
-rom
-> where the drop came lets you safely inspect the cb block (timestamp, etc),
-> format of which varies by qdisc. You also get insight as to which
-> qdisc was dropping.
+> There are a bunch of weird usages of sock_create() and friends due
+> to poor documentation.
 >
-> Downside is we'll end up with SKB_DROP_REASON_XXX_OVERLIMIT for
-> each of the qdiscs. Etc.
+>   1) some subsystems use __sock_create(), but all of them can be
+>      replaced with sock_create_kern()
+>
+>   2) some subsystems use sock_create(), but most of the sockets are
+>      not tied to userspace processes nor exposed via file descriptors
+>      but are (most likely unintentionally) exposed to some BPF hooks
+>      (infiniband, ISDN, NVMe over TCP, iscsi, Xen PV call, ocfs2, smbd)
+>
+>   3) some subsystems use sock_create_kern() and convert the sockets
+>      to hold netns refcnt (cifs, mptcp, rds, smc, and sunrpc)
+>
+>   4) the sockets of 2) and 3) are counted in /proc/net/sockstat even
+>      though they are untouchable from userspace
+>
+> The primary goal is to sort out such confusion and provide enough
+> documentation for future developers to choose an appropriate API.
+>
+> Regarding 3), we introduce a new API, sock_create_net(), that holds
+> a netns refcnt for kernel socket to remove the socket conversion to
+> avoid use-after-free triggered by TCP kernel socket after commit
+> 26abe14379f8 ("net: Modify sk_alloc to not reference count the netns
+> of kernel sockets.").
+>
+> Finally, we rename sock_create() and sock_create_kern() to
+> sock_create_user() and sock_create_net_noref(), respectively.
+> This intentionally breaks out-of-tree drivers to give the owners
+> a chance to choose an appropriate API.
+>
+> Throughout the series, we follow the definition below:
+>
+>   userspace socket:
+>     * created by sock_create_user()
+>     * holds the reference count of the network namespace
+>     * directly linked to a file descriptor
+>       * currently all sockets created by sane sock_create() users
+>         are tied to userspace process and exposed via file descriptors
+>     * accessed via a file descriptor (and some BPF hooks except
+>       for BPF LSM)
+>     * counted in the first line of /proc/net/sockstat.
+>
+>   kernel socket
+>     * created by sock_create_net() or sock_create_net_noref()
+>       * the former holds the refcnt of netns, but the latter doesn't
+>     * not directly exposed to userspace via a file descriptor nor BPF
+>       except for BPF LSM
+>
+> Note that __sock_create(kern=3D1) skips some LSMs (SELinux, AppArmor)
+> but not all; BPF LSM can enforce security regardless of the argument.
+>
+> I didn't CC maintainers for mechanical changes as the CC list explodes.
+>
+>
+> Changes:
+>   v2:
+>     * Patch 8
+>       * Fix build error for PF_IUCV
+>     * Patch 12
+>       * Collect Acked-by from MPTCP/RDS maintainers
+>
+>   v1: https://lore.kernel.org/netdev/20241206075504.24153-1-kuniyu@amazon=
+.com/
+>
 
-Yeah, I agree that a generic "dropped by AQM" reason will be too generic
-without knowing which qdisc dropped it. I guess any calls directly to
-kfree_skb_reason() from the qdisc will provide the calling function, but
-for qdisc_drop_reason() the drop will be deferred to __dev_queue_xmit(),
-so no way of knowing where the drop came from, AFAICT?
+My concern with this huge refactoring is the future backports hassle,
+before going to the review part...
 
--Toke
-
+Also the change about counting or not 'kernel sockets' in
+/proc/net/sockstat is orthogonal.
 
