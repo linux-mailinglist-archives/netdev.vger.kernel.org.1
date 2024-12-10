@@ -1,130 +1,136 @@
-Return-Path: <netdev+bounces-150516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6113A9EA78A
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:07:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8EA79EA78E
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:10:28 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EF831888C43
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 05:07:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 179B0283BDE
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 05:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D3A22618B;
-	Tue, 10 Dec 2024 05:06:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1B41E9B17;
+	Tue, 10 Dec 2024 05:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H3bNebKT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5DIW0r/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCF2226182;
-	Tue, 10 Dec 2024 05:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484A1168BE;
+	Tue, 10 Dec 2024 05:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733807214; cv=none; b=aL8htE1BoW6VXYXoQqlw5fG6JlP0eYoKvmtHJSaBXipa88UfUMqWMnq90ViN3FYS/Uc73fPP3P+emlbKpDvDBZuENK93GLQLKXbmbW2nAY46M6kQK9walJu4v3I3SV3W9xw8IMu3DY7Z2tnXezXQamwuo4yEDWj7ptPDrOH07Gw=
+	t=1733807422; cv=none; b=Xafm2nRJHV1uj+Or9iMqKieREUCMEEu92X+04d/d/114qk2izD28P15vz8hcYBgrLoreBQDaYoOuv4MnB73ZqIdWwsB8DCpqMuxFH5itn/wVRqtbib8z3LJ0hT59gt/OUFDS8MTBjTZ7gSabNj1I8ADt2UgHJdpVNzy8kjFBTH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733807214; c=relaxed/simple;
-	bh=bnkUahMoe/2DYRbSBWm5xIriVjrHBkBhabIvxjeBeXA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ucByQEXKB/UKUacak6fwZ1cbzIBBCDmHGEAhzfDIqCibSwOwwz2GdYSrUOu9RneNCiLMSJWaC8+lfY3k74SQ8CPmcvBUU5nqh5FkqlyOpnNQKxqRzHoLH6ZIV3qHyJ7evyGHU6dMQ27nNcCfV9k3r505SdyVQHuJKrP9WsfiioE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H3bNebKT; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2efded08c79so90467a91.0;
-        Mon, 09 Dec 2024 21:06:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733807212; x=1734412012; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dydebYrUiZDY1lQnbppwxvbgV+WzSwhPfcXyLsgRJsI=;
-        b=H3bNebKTu4UJw0mxGKE93DJAMnx5pU9vtdRk+zwzv5gcH7V/UzAlK62YUpiCNUNkNp
-         sb3Uc3fLKQO3GC0qkL+DHsf4+agUtFQZbeh5+HkINIrfXPAIVU0CgURbDaSExltyp6tR
-         U9As3OQdSZ8WZMwx6P2/sHOIwLejQinyoS8jjyLvYBDO7pUAhjiQTqrRLz/+C5fSTgfZ
-         s+pZYEgNwoJ595ujsOXHnbQnMgx8vwcYzSe8WkXivrQPY9Dg+Msikh6neRIdaWsMLjyy
-         pPeo8eUtDjaQrPIFJN6lC6LyV3u1L93iDLNxwsBDAgRS4aZwGziGzTaePEH+ULfQWol7
-         mRjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733807212; x=1734412012;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dydebYrUiZDY1lQnbppwxvbgV+WzSwhPfcXyLsgRJsI=;
-        b=gQQi3q5+5JszzFzA5X9lSf0O0tqQNmWKf1qKSCwxP+Yt0EOrhh1fRiQED9mz2i+dmE
-         lJ59FB6+Lc6W818XuvXkmdeTZfbRJg8N7jQGwEpvucA0U5Vf4ek+bVpa3VcyFZU1Er1w
-         FRCX3DFAsXzYKFmb3ZQxMzHyQUzaSHXKlZ+VUONEWzWHE72BP7oTk3wdDC3yF6eOpUpj
-         oErPcwhIUH4oOadyXAkXxrhxZHu6i2E3ud405oUkpRO82MOTvgDdwDc7WNCzTnjBlZ8S
-         h1/9BPu/kA5G54cPQbMTuSikQ08TcVxk0v02pCER34qLDWlS6jJBvMViumrUyh+sOEmv
-         cm7A==
-X-Forwarded-Encrypted: i=1; AJvYcCUufS8AZ2IDWA0Q0h5vlU1rUVmaooeM7ThUEiAOyBXDDf8Yucwwvsv7Fg8l/y1r8FvE7gMyRBDR@vger.kernel.org, AJvYcCWkCr7YyggkSZV2yx1dQSI7RT/EisETiks+osoBFFk/EyPmkVAqotn7LMEzfMMv1YItXXZvETv3aOiwOJg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzy83uwEs4rxNDhs5t8yNmubVEmjAQoQ91ZCzKhgr1bOzCTNnWc
-	oYh88wfM4JrI3W7GurVXGSKySqr3maNBq4mMp5mToYGHP8eIvfQq9mlY3hka
-X-Gm-Gg: ASbGncsuNBGPzywFxNzKnkED4CbWnGHSZjLz7bQcJ120p3YOI4z/Gf2HyztmG/gIW3z
-	xbP1LYOH+4i6ILE1iRKN+J/zRlFhHBn0sU+eEWhHUj0/6xsODIjJXNvSq9FpZQHeI/7cSe8Aea2
-	GmnEwKnFFyjl9pTvdFWYiu4ux/+VqfhbqTjZRSmQtPQWBTYXhKRdA/cn+yXDgdxepjLMng2sxnw
-	Z6B61IYz8j/Hdb73Wy37KVfKdRUqg3RDn7nYhBsTobkqG+6ihurNaDv/gt/0liu7lWagKcAt0wP
-	tM56TXB0VRp8
-X-Google-Smtp-Source: AGHT+IEAORtju9S5h0kVI3znrOXeKH7w2rA5o0agZXRBE+GxLm5nxeAEr6Xzme+30l7AGcejo40jGQ==
-X-Received: by 2002:a17:90b:46:b0:2ee:df8b:684 with SMTP id 98e67ed59e1d1-2efcef21b5dmr5313424a91.0.1733807212157;
-        Mon, 09 Dec 2024 21:06:52 -0800 (PST)
-Received: from xiberoa (c-76-103-20-67.hsd1.ca.comcast.net. [76.103.20.67])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fd55a9a5edsm1524182a12.55.2024.12.09.21.06.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2024 21:06:51 -0800 (PST)
-Date: Mon, 9 Dec 2024 21:06:48 -0800
-From: Frederik Deweerdt <deweerdt.lkml@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Frederik Deweerdt <deweerdt.lkml@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Michal Luczaj <mhal@rbox.co>,
-	David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org,
-	xiyou.wangcong@gmail.com, David.Laight@ACULAB.COM,
-	jdamato@fastly.com, stable@vger.kernel.org
-Subject: [PATCH v2 net] splice: do not checksum AF_UNIX sockets
-Message-ID: <Z1fMaHkRf8cfubuE@xiberoa>
+	s=arc-20240116; t=1733807422; c=relaxed/simple;
+	bh=3PFxSSpWAf1uej3O7h8d+RzULqKyQZ0CsWOcHahIS8Y=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=HQTyrxVuz9t/j7XyzronW3pVQBFLEMPhWQbfFE3063TxE/q9Zn4nCOKd4YB6KCSc6fr3ZnizGREE0tvUiCNAPvR5DdbflrcMgK7wZStI/xlHFhX+O8WPU91NKAETgODU3yb9SQrJuSzGE+J6KbZ+qj3vFuteNbDY7j9AnFlxzJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r5DIW0r/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CE6FC4CED6;
+	Tue, 10 Dec 2024 05:10:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733807421;
+	bh=3PFxSSpWAf1uej3O7h8d+RzULqKyQZ0CsWOcHahIS8Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=r5DIW0r/VhAd2ECaJf98oP2OK0PH5pluM0LmVmvuXQftBAz3Kvc0GBB1gYNAWofoU
+	 OvWYB4nuOAJP48oZC8JU3OMa89t5wynMF/6vWpKf6mgKoLBg15ElQJcYnPRRIZZQ3g
+	 7BPWUKVGpiTSTo1uzVTiyeFOTVmFlEn/wjsc5dX60ETAFfBFEj4dnZ0w9MnPa5tXy4
+	 YO4s3JkG5/CuHuN3to7O8HnS3i3evzVxJWa7ivs39csiVplv63toxbTbTnwJfRexh0
+	 QCrB7X697iWUdw0gmKR4deBPF9E0U5bVl8MpuuTTkwq7NjjMEoXt057QK6aOP1oc3L
+	 /foaMsTnmJ8Kg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 716FC380A95E;
+	Tue, 10 Dec 2024 05:10:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v8 00/15] Add support for Synopsis DWMAC IP on NXP
+ Automotive SoCs S32G2xx/S32G3xx/S32R45
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173380743727.355055.17303486442146316315.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Dec 2024 05:10:37 +0000
+References: <20241205-upstream_s32cc_gmac-v8-0-ec1d180df815@oss.nxp.com>
+In-Reply-To: <20241205-upstream_s32cc_gmac-v8-0-ec1d180df815@oss.nxp.com>
+To: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
+Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, vkoul@kernel.org,
+ richardcochran@gmail.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, shawnguo@kernel.org, s.hauer@pengutronix.de,
+ kernel@pengutronix.de, festevam@gmail.com, kernel@esmil.dk,
+ minda.chen@starfivetech.com, nicolas.ferre@microchip.com,
+ claudiu.beznea@tuxon.dev, iyappan@os.amperecomputing.com,
+ keyur@os.amperecomputing.com, quan@os.amperecomputing.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, peppe.cavallaro@st.com,
+ andrew+netdev@lunn.ch, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, imx@lists.linux.dev,
+ devicetree@vger.kernel.org, s32@nxp.com, 0x1207@gmail.com,
+ fancer.lancer@gmail.com, jan.petrous@oss.nxp.com, jacob.e.keller@intel.com,
+ rmk+kernel@armlinux.org.uk, emil.renner.berthing@canonical.com
 
-When `skb_splice_from_iter` was introduced, it inadvertently added
-checksumming for AF_UNIX sockets. This resulted in significant
-slowdowns, for example when using sendfile over unix sockets.
+Hello:
 
-Using the test code in [1] in my test setup (2G single core qemu),
-the client receives a 1000M file in:
-- without the patch: 1482ms (+/- 36ms)
-- with the patch: 652.5ms (+/- 22.9ms)
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-This commit addresses the issue by marking checksumming as unnecessary in
-`unix_stream_sendmsg`
+On Thu, 05 Dec 2024 17:42:57 +0100 you wrote:
+> The SoC series S32G2xx and S32G3xx feature one DWMAC instance,
+> the SoC S32R45 has two instances. The devices can use RGMII/RMII/MII
+> interface over Pinctrl device or the output can be routed
+> to the embedded SerDes for SGMII connectivity.
+> 
+> The provided stmmac glue code implements only basic functionality,
+> interface support is restricted to RGMII only. More, including
+> SGMII/SerDes support will come later.
+> 
+> [...]
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Frederik Deweerdt <deweerdt.lkml@gmail.com>
-Fixes: 2e910b95329c ("net: Add a function to splice pages into an skbuff for MSG_SPLICE_PAGES")
----
- net/unix/af_unix.c | 1 +
- 1 file changed, 1 insertion(+)
+Here is the summary with links:
+  - [net-next,v8,01/15] net: stmmac: Fix CSR divider comment
+    https://git.kernel.org/netdev/net-next/c/31cdd8418234
+  - [net-next,v8,02/15] net: stmmac: Extend CSR calc support
+    https://git.kernel.org/netdev/net-next/c/c8fab05d021d
+  - [net-next,v8,03/15] net: stmmac: Fix clock rate variables size
+    https://git.kernel.org/netdev/net-next/c/cb09f61a9ab8
+  - [net-next,v8,04/15] net: phy: Add helper for mapping RGMII link speed to clock rate
+    https://git.kernel.org/netdev/net-next/c/386aa60abdb6
+  - [net-next,v8,05/15] net: dwmac-dwc-qos-eth: Use helper rgmii_clock
+    https://git.kernel.org/netdev/net-next/c/37b66c483e4c
+  - [net-next,v8,06/15] net: dwmac-imx: Use helper rgmii_clock
+    https://git.kernel.org/netdev/net-next/c/839b75ea4d94
+  - [net-next,v8,07/15] net: dwmac-intel-plat: Use helper rgmii_clock
+    https://git.kernel.org/netdev/net-next/c/8470bfc83515
+  - [net-next,v8,08/15] net: dwmac-rk: Use helper rgmii_clock
+    https://git.kernel.org/netdev/net-next/c/30b4a9b5c335
+  - [net-next,v8,09/15] net: dwmac-starfive: Use helper rgmii_clock
+    https://git.kernel.org/netdev/net-next/c/b561d717a799
+  - [net-next,v8,10/15] net: macb: Use helper rgmii_clock
+    https://git.kernel.org/netdev/net-next/c/04207d28f468
+  - [net-next,v8,11/15] net: xgene_enet: Use helper rgmii_clock
+    https://git.kernel.org/netdev/net-next/c/fd59bca4d5ea
+  - [net-next,v8,12/15] net: dwmac-sti: Use helper rgmii_clock
+    https://git.kernel.org/netdev/net-next/c/1ead57775507
+  - [net-next,v8,13/15] dt-bindings: net: Add DT bindings for DWMAC on NXP S32G/R SoCs
+    https://git.kernel.org/netdev/net-next/c/91f10e589520
+  - [net-next,v8,14/15] net: stmmac: dwmac-s32: add basic NXP S32G/S32R glue driver
+    https://git.kernel.org/netdev/net-next/c/cd197ac5d661
+  - [net-next,v8,15/15] MAINTAINERS: Add Jan Petrous as the NXP S32G/R DWMAC driver maintainer
+    https://git.kernel.org/netdev/net-next/c/6bc6234cbd5e
 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 001ccc55ef0f..6b1762300443 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2313,6 +2313,7 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
- 		fds_sent = true;
- 
- 		if (unlikely(msg->msg_flags & MSG_SPLICE_PAGES)) {
-+			skb->ip_summed = CHECKSUM_UNNECESSARY;
- 			err = skb_splice_from_iter(skb, &msg->msg_iter, size,
- 						   sk->sk_allocation);
- 			if (err < 0) {
+You are awesome, thank you!
 -- 
-2.44.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
