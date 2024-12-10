@@ -1,123 +1,171 @@
-Return-Path: <netdev+bounces-150528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBDDE9EA8A2
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 07:17:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AEF19EA897
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 07:14:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CD8C18825C5
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:17:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 654E61882C95
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:14:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE9722B5B2;
-	Tue, 10 Dec 2024 06:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5508228C8F;
+	Tue, 10 Dec 2024 06:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QT//Xhru"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fc0wNKPd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D38B226182;
-	Tue, 10 Dec 2024 06:17:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469191D0E28;
+	Tue, 10 Dec 2024 06:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733811430; cv=none; b=e4GWkSmF/OQXjMGT92u+uVSr4UBYzKujzmoZBx4nqSK6ttbtYprt2k3n0udbHZn35YkMF+l9ZHGdxJeBr0poGPFwyTFwfw2kcj0QEKAiN7kTMo32yhjzKSwdMYbnne3xfu6YU3DmqfDriqePeU21QazoPflUb8s4TrJ97gaf+uE=
+	t=1733811287; cv=none; b=UmCLRmzDiG6vrRjg+KzJ8HmgRms9/fLBLX8xiTkuxK8oVkUmaXQ2sVbUYIu3rtKe4owVmU2d1S/nkKHjVvCGoBUpKBPuOnR8q5RhgPXt9o45eo/cUG215qngvDreIC6eCNmHNQZfwsx4NlCJ0zFY3oWp0zq8qBsZMA7ibPoncyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733811430; c=relaxed/simple;
-	bh=rXuQ1U1NC7bVLF2BcTB7d4Y/ETWhTKJK6BvKDWuC1FQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h6QQ7CcF9cQQuVztJRIDj/QdcPhM0HfXk0xyqQNXRCnn9i/3BJanzJTpJ9Q0vbke6H6HfdYTFPHj1sCHcl8oPDmyfHBxdxoTsG3UlVjrJHVq7eA0MC5Vla/NnGHjlCdDgkV71ub/uSTf9Bk+F4PycMpM4HvdotyJJmG0+XK/8l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QT//Xhru; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733811429; x=1765347429;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rXuQ1U1NC7bVLF2BcTB7d4Y/ETWhTKJK6BvKDWuC1FQ=;
-  b=QT//XhruwqNei2/LN4tTpNyaBC/62RZbYwSCoeEpnbnAguA4yCV80TL9
-   vVxv0j+9Dr4QHswe278wPEvxuKvOItStbByZDSo0Rdn1F2S+Zhg1enVc+
-   9ENyw0EH8lub707A3bDDh4njAt9JDW3NWW7DWsy0a5wyLotN3NaaYkbvr
-   8LnZYpJ3A2Um8orsPnskwqdugIfRMgpwgCKtKV+dbh6UrGnPEV7c8BWZ0
-   YLTc+kqvip+KIEf81Tld7mOg6F5wCPa8CS4sQnxzuXbGDTC1br3+8Z4Py
-   L20DCEGKk8EKw8ICKHaTXgnjCw9qW1ceKbrEfHIs7jROVmjgU2OZHCQ3V
-   A==;
-X-CSE-ConnectionGUID: Xc9Z8U3ZTWyr7B01hWq5MA==
-X-CSE-MsgGUID: Wu1E4WrsRbuip5P5YC7ycw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11281"; a="51549772"
-X-IronPort-AV: E=Sophos;i="6.12,221,1728975600"; 
-   d="scan'208";a="51549772"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 22:17:08 -0800
-X-CSE-ConnectionGUID: FSYz5DUbQKS0MeqUrxuXZg==
-X-CSE-MsgGUID: Jq2ngkAuQSK5xsWRxCqkdA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,221,1728975600"; 
-   d="scan'208";a="95649257"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 22:17:04 -0800
-Date: Tue, 10 Dec 2024 07:13:53 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
-	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>, Long Li <longli@microsoft.com>,
-	Yury Norov <yury.norov@gmail.com>
-Subject: Re: [PATCH v2 1/2] net: mana: Fix memory leak in mana_gd_setup_irqs
-Message-ID: <Z1fcIa7n+hI+v2Nq@mev-dev.igk.intel.com>
-References: <20241209175751.287738-1-mlevitsk@redhat.com>
- <20241209175751.287738-2-mlevitsk@redhat.com>
+	s=arc-20240116; t=1733811287; c=relaxed/simple;
+	bh=AR06kwg4ea8BP6tJ/A64fwSQitfvxzNemx5F1/7aBsg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=fOUmuoGwGN2bg/CjAWj53stScmNlj5rbRfaolShrrHUJmG4UtGyMrqhNKMhul6EkwusGRvlgACsQ8KNTgcM1LlAjnxEntSjIUvaXmwBw1TsRCYoo6ybT/QZJEb7XD8gAP2L5YZ3bLcEE/IT9byIuA7x6UrhOT1HLOD+m3laxYPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fc0wNKPd; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2ef28f07dbaso3792458a91.2;
+        Mon, 09 Dec 2024 22:14:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733811285; x=1734416085; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eWcV6G4iTKswN4OQdoEZk/UPaUce620jWqio98BeEhk=;
+        b=fc0wNKPdT7JuEOk5u838p/kOIg7uzWchAs6nUtT2lDLCGMSfTVQMeB8IXTvYLuWiZ0
+         PxwOV5MkGelIuGX7LcPnxBJywhLWevD2uQFGcLA8Bp941zqHHHpWPaPzgX8xwFUV2ubl
+         slnVxmIc5mCf/9vtp9rVNAHeu+WK1pakhq2okc+Er2sqg0cFrWHvWatH9aKgz764HGhw
+         bUQ9qskL9lAqA0g/vOQ0qKvQ0/0a4HUuv45PoATDaZHme1AU+yTDgqiVLOm4vRcRp4lV
+         /h25zofWIoz5668s/4QZYOOL7GnSL2WheJORz7foq+ns4TNcBfHZQGexdsZcYcfjAQRd
+         8wpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733811285; x=1734416085;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=eWcV6G4iTKswN4OQdoEZk/UPaUce620jWqio98BeEhk=;
+        b=QN6klolZg6GJa+/j91MzVd7xgNuiNzJ2hWYEAuD3OJ9hdfkalbHmEbUEEHtzv2ZzTD
+         CExtvg2JrPyC5z/+BARXqI9295Qiv2b3OUCogIgxKVQH8aKCxZ0lKhuqpUxL8o8sj96I
+         ZhcYUQ7kuR5YAMaFFtieRm0Ruhxwn4/SwJThNEY4JaV4WbcPaYka2H+SINB1WZDHciH2
+         pm98QG6jneMENQxGUvGDSt7cFtq8MJdNpXwPiCMbxTpW4fCDlVZJeQd5nZ4jbDVlvd0N
+         1Fu0gHHAHVKv2HXF5IvU+ZV19dae5+2DY62n/wsLQrvy+CtMrPq8ST62zS5jNpxFay8O
+         xKwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWon0suM1Oysg38Q0rGFqzDJTKbil/PfI1iKxoO5W0MTcMJg3yAYhbK0dLNFJAI3mFyYOY=@vger.kernel.org, AJvYcCXdi8JZye7YvpRXTJu4SztvUJWYsrCrHdkCITHnzyALRdwnE7eEBB5prKO11El/T6O+t5cCxkAlgpq8KO04@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMSvlDBaQWDYJsGuv7Ubjd6rlAZKyQiFajbfdEEqQ/IlvRwd7/
+	F0i8xNbVX6dnuNkp6GhgEEW8zz5Qm41zC8tQFvl34L6uvGpeu2Al
+X-Gm-Gg: ASbGncu0ZgBdfn9xjzy9YLkxzUSpXTBRf2FgYY1oUgpKcL7FL3oQ3ujslwIi2uLlksL
+	zQ6HnjtrzKJnzni31SSrtZNV1Nr+ge3wqoIdG7Spqx6+qf0Ex3PN2v6dpYUNpXZBXOM9AVgsiGP
+	AivnGLDiJrI/t1DQFm3wyuJkSA8RFKNaZduTneVAqQUNt2qfT5kv6Vb1DUYlOeRS2cAhEErIa2z
+	M3SkuTMbMM/mQvWbMecs5Dr6e0cZhvAuA0TP8+1hOnuwnOSM0U4T/o=
+X-Google-Smtp-Source: AGHT+IFgfvh+QHowslIBqZJc21vdMHIl3ls4qtIxXIvIlZiFqGdsq4XAvXi4sA+rcyQiQnHxK7ApEg==
+X-Received: by 2002:a17:90b:3b8c:b0:2ee:b666:d14a with SMTP id 98e67ed59e1d1-2efcf1693a4mr5667249a91.17.1733811285439;
+        Mon, 09 Dec 2024 22:14:45 -0800 (PST)
+Received: from localhost ([98.97.37.114])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ef270790b9sm10859140a91.40.2024.12.09.22.14.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 22:14:44 -0800 (PST)
+Date: Mon, 09 Dec 2024 22:14:42 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Levi Zim <rsworktech@outlook.com>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Levi Zim via B4 Relay <devnull+rsworktech.outlook.com@kernel.org>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <6757dc5255b71_404920841@john.notmuch>
+In-Reply-To: <MEYP282MB23125E657B3605921535987AC63C2@MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM>
+References: <20241130-tcp-bpf-sendmsg-v1-0-bae583d014f3@outlook.com>
+ <20241130-tcp-bpf-sendmsg-v1-2-bae583d014f3@outlook.com>
+ <675695f1265b2_1abf20862@john.notmuch>
+ <MEYP282MB23125E657B3605921535987AC63C2@MEYP282MB2312.AUSP282.PROD.OUTLOOK.COM>
+Subject: Re: [PATCH net 2/2] tcp_bpf: fix copied value in tcp_bpf_sendmsg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241209175751.287738-2-mlevitsk@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 09, 2024 at 12:57:50PM -0500, Maxim Levitsky wrote:
-> Commit 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
-> added memory allocation in mana_gd_setup_irqs of 'irqs' but the code
-> doesn't free this temporary array in the success path.
+Levi Zim wrote:
+> On 2024-12-09 15:02, John Fastabend wrote:
+> > Levi Zim via B4 Relay wrote:
+> >> From: Levi Zim <rsworktech@outlook.com>
+> >>
+> >> bpf kselftest sockhash::test_txmsg_cork_hangs in test_sockmap.c triggers a
+> >> kernel NULL pointer dereference:
+> > Is it just the cork test that causes issue?
+> Yes. More specifically only "sockhash::test_txmsg_cork_hangs" but not 
+> "sockmap::test_txmsg_cork_hangs"
+> >
+> >> BUG: kernel NULL pointer dereference, address: 0000000000000008
+> >>   ? __die_body+0x6e/0xb0
+> >>   ? __die+0x8b/0xa0
+> >>   ? page_fault_oops+0x358/0x3c0
+> >>   ? local_clock+0x19/0x30
+> >>   ? lock_release+0x11b/0x440
+> >>   ? kernelmode_fixup_or_oops+0x54/0x60
+> >>   ? __bad_area_nosemaphore+0x4f/0x210
+> >>   ? mmap_read_unlock+0x13/0x30
+> >>   ? bad_area_nosemaphore+0x16/0x20
+> >>   ? do_user_addr_fault+0x6fd/0x740
+> >>   ? prb_read_valid+0x1d/0x30
+> >>   ? exc_page_fault+0x55/0xd0
+> >>   ? asm_exc_page_fault+0x2b/0x30
+> >>   ? splice_to_socket+0x52e/0x630
+> >>   ? shmem_file_splice_read+0x2b1/0x310
+> >>   direct_splice_actor+0x47/0x70
+> >>   splice_direct_to_actor+0x133/0x300
+> >>   ? do_splice_direct+0x90/0x90
+> >>   do_splice_direct+0x64/0x90
+> >>   ? __ia32_sys_tee+0x30/0x30
+> >>   do_sendfile+0x214/0x300
+> >>   __se_sys_sendfile64+0x8e/0xb0
+> >>   __x64_sys_sendfile64+0x25/0x30
+> >>   x64_sys_call+0xb82/0x2840
+> >>   do_syscall_64+0x75/0x110
+> >>   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+> >>
+> >> This is caused by tcp_bpf_sendmsg() returning a larger value(12289) than
+> >> size (8192), which causes the while loop in splice_to_socket() to release
+> >> an uninitialized pipe buf.
+> >>
+> >> The underlying cause is that this code assumes sk_msg_memcopy_from_iter()
+> >> will copy all bytes upon success but it actually might only copy part of
+> >> it.
+> > The intent was to ensure we allocate a buffer large enough to fit the
+> > data. I guess the cork + send here is not allocating enough bytes?
+> I am not familiar enough with neither this part of code nor tcp with bpf 
+> in general and just
+> hit this bug when trying to run the bpf kselftests. Then I decided to 
+> debug it.
 > 
-> This was caught by kmemleak.
+> In my perspective the buffer(8192) is large enough to hold the data(8192),
+> but tcp_bpf_sendmsg returns 12289 which is a little surprising for me.
 > 
-> Fixes: 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  drivers/net/ethernet/microsoft/mana/gdma_main.c | 1 +
->  1 file changed, 1 insertion(+)
+> Could you further elaborate why 8192 bytes are not enough? Thanks!
 > 
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index e97af7ac2bb2..aba188f9f10f 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -1375,6 +1375,7 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
->  	gc->max_num_msix = nvec;
->  	gc->num_msix_usable = nvec;
->  	cpus_read_unlock();
-> +	kfree(irqs);
 
-Ther is still memleak in case of jumping to free_irq_vector when
-gc->irq_contexts allocation is failing.
+There is some bug in the buffer allocation sizing that is happening
+because of cork'd data. The cork logic is used to hold extra bytes
+in buffer until N bytes have been received.
 
-Thanks
->  	return 0;
->  
->  free_irq:
-> -- 
-> 2.26.3
+I'm not really opposed to the fix here, but would be good to understand
+how it got here. I have some time tommorrow I can look a bit more.
 
