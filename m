@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-150690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B0AD9EB2F9
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:18:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EDF89EB2FA
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:19:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF019285B23
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:18:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6CED283265
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127AB1ABEBA;
-	Tue, 10 Dec 2024 14:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B0A1B2EFB;
+	Tue, 10 Dec 2024 14:18:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="g7O5fXsT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YSAfXk5q"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6481ABEA8
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 14:18:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BF11AB523
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 14:18:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733840310; cv=none; b=o50i25mXm/VKyV5pHe983o+oEGq66NJOgKQOK0BzEBwe4WxJdkSBKe5uPSOlVQ0+xikE5UFbad1B9hZdJ7ru5L+8UIWQNdVt+/PfSZM/GSe+xxtVaxfrwj+F/JScIA4BQkytzSreD14e4B4yEu6+QtksEUjedS786oUY5cyk84E=
+	t=1733840316; cv=none; b=S01e3B0noDJR3J3QaIK8gTfYh7aladEPYwq6yF4Us9bVfdiK5gp0ETBOKI6eUr1ydb77YOi+9sDdEIv+UCdAW3hP29/+/POZ+Hl5apLocwTn5cTsaX/cvPRrDTJggislUwzUykuEiiSgyf0O9GMW8xlvBm4yFb6EeRh9ARIX/vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733840310; c=relaxed/simple;
-	bh=wfckIHVfFQq7caFl7mX5nJMOh4dw9qtUZFjncSeEUpY=;
+	s=arc-20240116; t=1733840316; c=relaxed/simple;
+	bh=UNSKRjfjfRvmg/aq/j8WbqhkI+NkL9e4sjQzMjd8/qI=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=p6nqhMv5kywoyNmRUVE1MLyItXAT5bftkRqTOnlvjp7oOmu5GlEPOjsY5lZBMbvr0VJlY9OY+t/cUNG1XEZxguRxgycE6xsb3EdaPyEopRr2EXBqK1dQw8sMZB2InMBDMjVRJsfcSvLrWBZF8AygBGyPEkYbRElTG2fKqq2c414=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=g7O5fXsT; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=oM3JeRPA3iIdciPRqWsPLQVuECEQA/fQQePteOxUwLvLPVO/h15FUKgOHySS1K10baFr/l3OVFdm5E05jYMhCxDUYWXBackm6Dz4VL72asIMIwS6ijaLc6Ik/VNjFCm0s3gdno+GWyCxcrvok99bnBXaSFxeeoHjaUMKa+2wyqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YSAfXk5q; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gZeUKmjTWrPxI3nhYuZ5sil5KUc6LYRAxvBAbVkyF2w=; b=g7O5fXsTSYslmoYkIrplDjGH9+
-	SoGILQDnbkvlyF/XdP3Cexmqb40R1sGBKHta2hHotDaEM/Ce9b0aW5p0N3LelyAo2BkaT3sx0wB1R
-	nVdG0eew6kyRAtaeREHtXZFwzNeH2oENELF4vnqIwNjOWWdsixmB0FQ5Qmb86xLQCHmNjeLS4w5w1
-	tXykbrISXcMzQb2hIrrmwWp2phccFOQmehVXvaZu6IWNWAfIyD1BXCbFcYpNdPu0pGJLLJimwyxSI
-	1oiGtl9uXB042cceIuC4YdQQAdVo7KmPrhtXiMhjGwxHTZzITXhDfzUjUOhkm3+aOJclRJX7L/uPp
-	bMXJgjLw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38252 helo=rmk-PC.armlinux.org.uk)
+	bh=w4Gug0yZHJ7/4tL9/AB4gLC4PdFqXx2MGKoxDny63/Y=; b=YSAfXk5qKDIfwmAXk12sv+Ppvr
+	5rtupGvOTYtWzTs9JRNmrA1CoMOMsSYB621by2WX3SxJqZAhycCbRFa9kAyePPdZrKcbwCv1FU1l5
+	zKPPc45mA9KghxXGQwNoAwAX+KyLJHfl6700rEG7uNuyI3wsGA0mxzsEO+sxpusgFrmpuAQV+3/Qo
+	FaDRL0QKWpsWGjnXDRSeiFUHv69srKutm2gWbPXCaAxSc5s++dJ1ZYBoTbpcpl/6A/qkOwGxzih7b
+	D1e+Ze8Jex/RQsZPA1gxd9kElFCSyp8PMFBKjIygUgZYTnG6GIwrsaxHVIMTJhNffk64/73QLxR6v
+	HogjcfUQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:39220 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tL145-0002Sq-31;
-	Tue, 10 Dec 2024 14:18:18 +0000
+	id 1tL14B-0002T9-0y;
+	Tue, 10 Dec 2024 14:18:23 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tL144-006cZD-El; Tue, 10 Dec 2024 14:18:16 +0000
+	id 1tL149-006cZJ-JJ; Tue, 10 Dec 2024 14:18:21 +0000
 In-Reply-To: <Z1hNkEb13FMuDQiY@shell.armlinux.org.uk>
 References: <Z1hNkEb13FMuDQiY@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -75,8 +75,8 @@ Cc: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
 	UNGLinuxDriver@microchip.com,
 	Vladimir Oltean <olteanv@gmail.com>,
 	Woojung Huh <woojung.huh@microchip.com>
-Subject: [PATCH net-next 2/9] net: dsa: add hook to determine whether EEE is
- supported
+Subject: [PATCH net-next 3/9] net: dsa: provide implementation of
+ .support_eee()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,59 +86,58 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tL144-006cZD-El@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tL149-006cZJ-JJ@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 10 Dec 2024 14:18:16 +0000
+Date: Tue, 10 Dec 2024 14:18:21 +0000
 
-Add a hook to determine whether the switch supports EEE. This will
-return false if the switch does not, or true if it does. If the
-method is not implemented, we assume (currently) that the switch
-supports EEE.
+Provide a trivial implementation for the .support_eee() method which
+switch drivers can use to simply indicate that they support EEE on
+all their user ports.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- include/net/dsa.h | 1 +
- net/dsa/user.c    | 8 ++++++++
- 2 files changed, 9 insertions(+)
+ include/net/dsa.h |  1 +
+ net/dsa/port.c    | 16 ++++++++++++++++
+ 2 files changed, 17 insertions(+)
 
 diff --git a/include/net/dsa.h b/include/net/dsa.h
-index 72ae65e7246a..aaa75bbaa0ea 100644
+index aaa75bbaa0ea..4aeedb296d67 100644
 --- a/include/net/dsa.h
 +++ b/include/net/dsa.h
-@@ -988,6 +988,7 @@ struct dsa_switch_ops {
- 	/*
- 	 * Port's MAC EEE settings
- 	 */
-+	bool	(*support_eee)(struct dsa_switch *ds, int port);
- 	int	(*set_mac_eee)(struct dsa_switch *ds, int port,
- 			       struct ethtool_keee *e);
- 	int	(*get_mac_eee)(struct dsa_switch *ds, int port,
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index 0640247b8f0a..b54f61605a57 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -1228,6 +1228,10 @@ static int dsa_user_set_eee(struct net_device *dev, struct ethtool_keee *e)
- 	struct dsa_switch *ds = dp->ds;
- 	int ret;
+@@ -1384,5 +1384,6 @@ static inline bool dsa_user_dev_check(const struct net_device *dev)
  
-+	/* Check whether the switch supports EEE */
-+	if (ds->ops->support_eee && !ds->ops->support_eee(ds, dp->index))
-+		return -EOPNOTSUPP;
-+
- 	/* Port's PHY and MAC both need to be EEE capable */
- 	if (!dev->phydev)
- 		return -ENODEV;
-@@ -1248,6 +1252,10 @@ static int dsa_user_get_eee(struct net_device *dev, struct ethtool_keee *e)
- 	struct dsa_switch *ds = dp->ds;
- 	int ret;
+ netdev_tx_t dsa_enqueue_skb(struct sk_buff *skb, struct net_device *dev);
+ void dsa_port_phylink_mac_change(struct dsa_switch *ds, int port, bool up);
++bool dsa_supports_eee(struct dsa_switch *ds, int port);
  
-+	/* Check whether the switch supports EEE */
-+	if (ds->ops->support_eee && !ds->ops->support_eee(ds, dp->index))
-+		return -EOPNOTSUPP;
+ #endif
+diff --git a/net/dsa/port.c b/net/dsa/port.c
+index ee0aaec4c8e0..5c9d1798e830 100644
+--- a/net/dsa/port.c
++++ b/net/dsa/port.c
+@@ -1575,6 +1575,22 @@ void dsa_port_set_tag_protocol(struct dsa_port *cpu_dp,
+ 	cpu_dp->tag_ops = tag_ops;
+ }
+ 
++/* dsa_supports_eee - indicate that EEE is supported
++ * @ds: pointer to &struct dsa_switch
++ * @port: port index
++ *
++ * A default implementation for the .support_eee() DSA operations member,
++ * which drivers can use to indicate that they support EEE on all of their
++ * user ports.
++ *
++ * Returns: true
++ */
++bool dsa_supports_eee(struct dsa_switch *ds, int port)
++{
++	return true;
++}
++EXPORT_SYMBOL_GPL(dsa_supports_eee);
 +
- 	/* Port's PHY and MAC both need to be EEE capable */
- 	if (!dev->phydev)
- 		return -ENODEV;
+ static void dsa_port_phylink_mac_config(struct phylink_config *config,
+ 					unsigned int mode,
+ 					const struct phylink_link_state *state)
 -- 
 2.30.2
 
