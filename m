@@ -1,163 +1,227 @@
-Return-Path: <netdev+bounces-150512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4A1D9EA730
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 05:31:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CAC039EA732
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 05:33:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D84E1888C67
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 04:31:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C606918825CD
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 04:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05EF92AF12;
-	Tue, 10 Dec 2024 04:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89B62248B5;
+	Tue, 10 Dec 2024 04:33:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZCqk2uH+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p60GyNbb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACEE23312A;
-	Tue, 10 Dec 2024 04:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0143A23312A
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 04:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733805064; cv=none; b=CB26ftcXQV1SmQshjFpjpbtb1cSkC+J4PmzJ4jWolRzfyGaqq5oWCmN6n9SdLNHWcVuU3NSlAG/+MxqUwSZyrHbJ/uAZMexS36xAmjGnGQrU6P7d/Yb02gWXITgSmfwyHzGS8JI3hQNc44mjWHL9GT8533SpvKMPosSa5G0uU8M=
+	t=1733805196; cv=none; b=H79EXdp0nkD2WyZOezM+S+widyiVvr4i/teKOHgNPg6B3upVYBf2VmoxzafBxYsPJwdP9f9Mr8gSOkdoAjfryyeTykaeWoBvu3WJaKAalmsN3NaZ5I2ShX1G76eAbS8182Sp5Ak27k+Ms+jbxF4Gb8B98pQMbXO2IyRuuU7xsTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733805064; c=relaxed/simple;
-	bh=ctTwwcQOXwuEeNt5euPI8vBE9ESKk8c9sMIe+dsUHZE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MM7laEbQEBnlp+vL56eYAi4a9QKAWw1BXOEnsXrO3Mef19REJ1B5VWwQZN/1HlwQdWsbyls1Gjab4eXtNQcfd/btM5gUH/ybKcMzOZuP7+bhMRD/8+pY32yd8Uxdka0ji3mdH7wRpWzsQwkF8PebE3TGrOuLfxZYRBuUmq4SM8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZCqk2uH+; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-434a852bb6eso49252225e9.3;
-        Mon, 09 Dec 2024 20:31:02 -0800 (PST)
+	s=arc-20240116; t=1733805196; c=relaxed/simple;
+	bh=SmCmW9BxeAcCl7Ei/BUCMIk2EU8BrEHPt+/MhnKKGc8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h63OrGy2nQAvbtYrtlwXcACPhPrxCYt5dKjluas7YAzf0AfOWmDp0wEwET0umX0YWI9l0lnWU805FnQDkb0BHy1go7QFD/S4ERWwuDEeSG3TUKIxMmz3YFfrx3+bjpg17fRBsGXnhqJTkgSC02Dj/amh5YS25k5MfjZ+aFg4S08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p60GyNbb; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3a818cd5dcbso55ab.0
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 20:33:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733805061; x=1734409861; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WETHc3iF2jDd4buPcVUjs5gPlV9HluEncdO+m92JpMo=;
-        b=ZCqk2uH+8NZe2Syya/PSGWs3EGcjZk6usE2h18pLsZr5XVOwLjD+A18SuOMgb4GGCC
-         Y6OF9Vrty3zZsNdg7OF0AE2QoYqAbSEWY8V2Fb4tr/0rOqy+7l9HIPX9cI9ZR3D/RCJz
-         FU1sfZ6L+CcxGzzXm6oD5a5/yiGE8g3ERSCkKDdjaGIsyQgw+tvgSAK9kMVF5MjH+C92
-         X7IydI6nVd7abJi0zd+q38PIBXaPqpPXasl7XEh4Weu0BRJtPYtjySbEDzk9asAJXdBv
-         TlNiZHyRuDOLV+mhFClrp92G4fkC+vL0zGYpUIYqdsovihgXu84XFgejjH8oJ+njxoH4
-         vinA==
+        d=google.com; s=20230601; t=1733805194; x=1734409994; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZszKNiMm/SV3up1prQQSqqcDrhQmyS1Mq1wrq8XOMJE=;
+        b=p60GyNbbNGsh2xj/gELXPSrb+fWxM8cIIpUV3IeD8WQ9ALFjdfkIzSluY2wTcxxu6p
+         U5guRXa5PNAoDXkEqSMb23GFwJzMLTqyo9iXXK09Se5NHy7dabn3bz8ZdLDay1jx7ylT
+         +opFbik/oauDf9/YKw1nJMEzC4KbFhIxCpiJPvXNM5DC5ZJYmnkThaoFDbT09gEWbw7l
+         zfdi+ugKtdCO9L7iq7x7z80ehkKirruEAXF3KC4Ta7QlFrsO6bn06Qyg6FSW18pQWp0F
+         qzf2UO+JOAlwCidQrg2aXKAmWhQtY6SVEb9S//Zw/kdNEFE3a80UWO0KyZx6dp9HLKq/
+         +L/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733805061; x=1734409861;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WETHc3iF2jDd4buPcVUjs5gPlV9HluEncdO+m92JpMo=;
-        b=kDWwmcYMCrG9Yw96yKMwVc4yXtm4Eg6P7nFwEI5uPfjOSvmMXeFxn+A9qsr+UCHixg
-         4tMwtN7DCD4870nfdH29AiXDz59lPXvx4erE0gv1FwUaZM8ONIGPVRny7fgGvTCNQ5ET
-         +93V2g3Yf1vAXJZCcZ++Q01ePoH3bqA6Hvb7D+CYh99s9j2n6yl+Bu9AUCECO+3vFmca
-         ZrrP3Ml52ji8v0BpOBwFh6SjoY9lt9DQfsufPxCDEeoaFQUOZXRpsa7bTtY8r23OnDoh
-         feQT771OiAMc0GQDQoqRzbhRzWGUJj08weNVh5W9WiehXlDE2s2n9myGzqNsSEkmIVSL
-         SqxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX++b/PpgzIpiV19wxrnRPavh6ojQ5MUzFNfkm3Ip/rajyI03M8q2VYgly0lO3OmnRYmKUBlaI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjZbndg7P2SqavVtANbWmnkhSh5acRMpr2KrvhzuH0PA75Mg/W
-	qdS29MoDoTmi28BXzj11LIvSQCRatbiZZA0FHX9J1P09yJIzWMLZ
-X-Gm-Gg: ASbGncuidtcSxdSWBPWKK2ewYdL3Wm6TZDxDVf3vXKrY+jCGGk3tQcU135gWB3LLyLu
-	nQ2Kav9EXBzbDeixJ652RxfIO9BB0z5nc0m4Z1jV719Ut6pEEnrvGsVw+n0zMEac5Dkvr2YI/g5
-	1QN1XRo+H6pCSRPkSupDahNYde2yi5jF+0fWlb78u3bzC+8F73npl2Q6wZ2ZG0ceKW/ilKzCfgp
-	Y7v+upos700ndesiXnn7O7GR+cHssr7jEgwrecfoOzIek3SSPEgIvahtL2b9qs=
-X-Google-Smtp-Source: AGHT+IH24x1Hypc8JMW8MQrh2Q6Zwi2lIAIWVniZRU6Hh9LeUvahZd0IDtN+R0lgZZ8CVBUvIPaJxg==
-X-Received: by 2002:a05:600c:3b87:b0:434:ff30:a159 with SMTP id 5b1f17b1804b1-434ffe9e71cmr27168475e9.0.1733805061448;
-        Mon, 09 Dec 2024 20:31:01 -0800 (PST)
-Received: from [192.168.42.90] ([85.255.235.153])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434da119a96sm180327165e9.40.2024.12.09.20.31.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Dec 2024 20:31:01 -0800 (PST)
-Message-ID: <fc1715f6-c123-43c6-9562-f84c7aab4ed2@gmail.com>
-Date: Tue, 10 Dec 2024 04:31:53 +0000
+        d=1e100.net; s=20230601; t=1733805194; x=1734409994;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZszKNiMm/SV3up1prQQSqqcDrhQmyS1Mq1wrq8XOMJE=;
+        b=MhYnx2KX4v8r1/x6woWsHQtTS5kVQzidGsrhTuPusBSSjvYuY5dgFc9iSSg7YeWV/N
+         k8kh1FH3eJwNddyHIsxaa4TQkfEMcYkVVJw8rJQfn9XFEFoEK1jjOyTQuXI5m9L0vhPB
+         qLrPwS0MhtN2dkf8muPGXAGXImnA6cIt8XjSbHSR6LNFXYtZmQhF7l8dWbnLpAFwFc6l
+         MV7iAmNf5Cu5HvN0+aNf6n4WykJuBNDUKMNRdjrkBhxeg3kqYmVAQJdcqNj47Uo35hMN
+         iiTPEjxrWdZsHaSkqb+7k9WfbCafJheC2CqMJnPBYjD6hRonttjHWauQe+u2tkyxqY3O
+         kNYA==
+X-Forwarded-Encrypted: i=1; AJvYcCVn27oh7YwQzt4nD5fMclEvoHbQtMPe+jOSJzz4zo/F/4H1P1xHkxOycgbc53jkUXiDfb6VAlc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbZuvjDOFvR4vIXK2f0v40uUVbPpUPGuv2Zujtqq2rT7jUqbv5
+	ItkkKSr69lyIMOpwywoJsZagHiuInqk4XjTmjaN7p6R4OX1rmO5o6Y9+4HKB58ouaXLANHy1Etm
+	DHtCORHA+XHIbtacmgHU5cXkyaJbTvsjo6vzK
+X-Gm-Gg: ASbGncsBeu+jYwt0PH1Ui4+6PaeNPxGqm9KUIKudmKM0IA2gUxkaX5MTDOzn2drMNbk
+	yODIZ27z6OKbFMs5Frp6BNFBm3y9ZwZFcR0iHfnt9MfhoJk+qVTW3TW8MOll3GiV4qg==
+X-Google-Smtp-Source: AGHT+IHWThUEJvPWCRhVMtRWAbCdEPZPRXp2GqM+yw+P+eJM0BqsKbIc3MuoM6Jr5TpBl/1MyTK4iQG5ZZF2GyOIIDU=
+X-Received: by 2002:a05:6e02:1c82:b0:3a7:cde7:1f5f with SMTP id
+ e9e14a558f8ab-3a9e0d53723mr140545ab.2.1733805192887; Mon, 09 Dec 2024
+ 20:33:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 07/17] net: page_pool: introduce
- page_pool_mp_return_in_cache
-To: Jakub Kicinski <kuba@kernel.org>, David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20241204172204.4180482-1-dw@davidwei.uk>
- <20241204172204.4180482-8-dw@davidwei.uk>
- <20241209194057.161e9183@kernel.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20241209194057.161e9183@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241206041025.37231-1-yuyanghuang@google.com>
+ <20241209182549.271ede3a@kernel.org> <CADXeF1FNGMxBHV8_mvU99Xjj-40BcdG44MtbLNywwr1X8CqHkw@mail.gmail.com>
+In-Reply-To: <CADXeF1FNGMxBHV8_mvU99Xjj-40BcdG44MtbLNywwr1X8CqHkw@mail.gmail.com>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Tue, 10 Dec 2024 13:32:35 +0900
+X-Gm-Features: AbW1kvZu_PrJcnsoqZveryWWs3eNIq7ccD43fknvuldbndFUVa-6Slzd3Km15Rc
+Message-ID: <CADXeF1Ekn1cH01GjYmnN64NaGOhY0yLz30HB720u_TFabwm33A@mail.gmail.com>
+Subject: Re: [PATCH net-next, v5] netlink: add IGMP/MLD join/leave notifications
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	roopa@cumulusnetworks.com, jiri@resnulli.us, stephen@networkplumber.org, 
+	jimictw@google.com, prohr@google.com, liuhangbin@gmail.com, 
+	nicolas.dichtel@6wind.com, andrew@lunn.ch, netdev@vger.kernel.org, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Lorenzo Colitti <lorenzo@google.com>, Patrick Ruddy <pruddy@vyatta.att-mail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/10/24 03:40, Jakub Kicinski wrote:
-> On Wed,  4 Dec 2024 09:21:46 -0800 David Wei wrote:
->> +/*
->> + * page_pool_mp_return_in_cache() - return a netmem to the allocation cache.
->> + * @pool:	pool from which pages were allocated
->> + * @netmem:	netmem to return
->> + *
->> + * Return already allocated and accounted netmem to the page pool's allocation
->> + * cache. The function doesn't provide synchronisation and must only be called
->> + * from the napi context.
-> 
-> NAPI is irrelevant, this helper, IIUC, has to be called down the call
-> chain from mp_ops->alloc().
-> 
->> + */
->> +void page_pool_mp_return_in_cache(struct page_pool *pool, netmem_ref netmem)
->> +{
->> +	if (WARN_ON_ONCE(pool->alloc.count >= PP_ALLOC_CACHE_REFILL))
->> +		return;
-> 
-> I'd
-> 
-> 	return false;
-> 
-> without a warning.
-> 
->> +	page_pool_dma_sync_for_device(pool, netmem, -1);
->> +	page_pool_fragment_netmem(netmem, 1);
->> +	pool->alloc.cache[pool->alloc.count++] = netmem;
-> 
-> and here:
-> 
-> 	return true;
-> 
-> this say mps can use return value as a stop condition in a do {} while()
-> loop, without having to duplicate the check.
-> 
-> 	do {
-> 		netmem = alloc...
-> 		... logic;
-> 	} while (page_pool_mp_alloc_refill(pp, netmem));
-> 
-> 	/* last netmem didn't fit in the cache */
-> 	return netmem;
+>In order to reuse the `inet6_fill_ifmcaddr()` logic, we need  move the
+>function and `struct inet6_fill_args` definition into
+>`net/core/rtnetlink.c` and `include/net/rtnetlink.h`. Is this approach
+>acceptable?
 
-That last netmem is a problem. Returning it is not a bad option,
-but it doesn't feel right. Providers should rather converge to
-one way of returning buffers and batching here is needed.
+Instead of touching rtnetlink.{h.c}, I realized it might be more
+suitable to move `inet6_fill_ifmcaddr()` and `struct inet6_fill_args`
+into addrconf.h.
 
-I'd rather prefer this one then
+Thanks,
+Yuyang
 
-while (pp_has_space()) {
-	netmem = alloc();
-	pp_push(netmem);
-}
-
-Any thoughts on that?
-
--- 
-Pavel Begunkov
-
+On Tue, Dec 10, 2024 at 12:19=E2=80=AFPM Yuyang Huang <yuyanghuang@google.c=
+om> wrote:
+>
+> Thanks for the review feedback.
+>
+> >Is there a strong reason you reimplement this instead of trying to reuse
+> >inet6_fill_ifmcaddr() ? Keeping notifications and get responses in sync
+> >used to be a thing in rtnetlink, this code already diverged but maybe
+> >we can bring it back.
+>
+> In order to reuse the `inet6_fill_ifmcaddr()` logic, we need  move the
+> function and `struct inet6_fill_args` definition into
+> `net/core/rtnetlink.c` and `include/net/rtnetlink.h`. Is this approach
+> acceptable?
+>
+> In this patch, we will always set `ifa_scope` to `RT_SCOPE_UNIVERSE`
+> for both IPv4 and IPv6 multicast addresses for consistency. Reusing
+> `inet6_fill_ifmcaddr()` will revert to the following logic:
+>
+> >u8 scope =3D RT_SCOPE_UNIVERSE;
+> >struct nlmsghdr *nlh;
+> >if (ipv6_addr_scope(&ifmca->mca_addr) & IFA_SITE)
+> scope =3D RT_SCOPE_SITE;
+>
+> Is it acceptable, or should I update the old logic to always set
+> =E2=80=98RT_SCOPE_UNIVERSE=E2=80=99?
+>
+> >ENOMEM ? I could be wrong but in atomic context the memory pressure
+> >can well be transient, it's not like the socket queue filled up.
+>
+> Will update in the next patch version.
+>
+> >nit: + goes to the end of previous line
+>
+> Will update in the next patch version.
+>
+> >nit: nlmsg_free(), since it exists
+>
+> Will update in the next patch version.
+>
+> Thanks,
+> Yuyang
+>
+>
+> On Tue, Dec 10, 2024 at 11:25=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
+ wrote:
+> >
+> > On Fri,  6 Dec 2024 13:10:25 +0900 Yuyang Huang wrote:
+> > > +static int inet6_fill_ifmcaddr(struct sk_buff *skb, struct net_devic=
+e *dev,
+> > > +                            const struct in6_addr *addr, int event)
+> > > +{
+> > > +     struct ifaddrmsg *ifm;
+> > > +     struct nlmsghdr *nlh;
+> > > +
+> > > +     nlh =3D nlmsg_put(skb, 0, 0, event, sizeof(struct ifaddrmsg), 0=
+);
+> > > +     if (!nlh)
+> > > +             return -EMSGSIZE;
+> > > +
+> > > +     ifm =3D nlmsg_data(nlh);
+> > > +     ifm->ifa_family =3D AF_INET6;
+> > > +     ifm->ifa_prefixlen =3D 128;
+> > > +     ifm->ifa_flags =3D IFA_F_PERMANENT;
+> > > +     ifm->ifa_scope =3D RT_SCOPE_UNIVERSE;
+> > > +     ifm->ifa_index =3D dev->ifindex;
+> > > +
+> > > +     if (nla_put_in6_addr(skb, IFA_MULTICAST, addr) < 0) {
+> > > +             nlmsg_cancel(skb, nlh);
+> > > +             return -EMSGSIZE;
+> > > +     }
+> > > +
+> > > +     nlmsg_end(skb, nlh);
+> > > +     return 0;
+> > > +}
+> >
+> > Is there a strong reason you reimplement this instead of trying to reus=
+e
+> > inet6_fill_ifmcaddr() ? Keeping notifications and get responses in sync
+> > used to be a thing in rtnetlink, this code already diverged but maybe
+> > we can bring it back.
+> >
+> > > +static void inet6_ifmcaddr_notify(struct net_device *dev,
+> > > +                               const struct in6_addr *addr, int even=
+t)
+> > > +{
+> > > +     struct net *net =3D dev_net(dev);
+> > > +     struct sk_buff *skb;
+> > > +     int err =3D -ENOBUFS;
+> >
+> > ENOMEM ? I could be wrong but in atomic context the memory pressure
+> > can well be transient, it's not like the socket queue filled up.
+> >
+> > > +     skb =3D nlmsg_new(NLMSG_ALIGN(sizeof(struct ifaddrmsg))
+> > > +                     + nla_total_size(16), GFP_ATOMIC);
+> >
+> > nit: + goes to the end of previous line
+> >
+> > > +     if (!skb)
+> > > +             goto error;
+> > > +
+> > > +     err =3D inet6_fill_ifmcaddr(skb, dev, addr, event);
+> > > +     if (err < 0) {
+> > > +             WARN_ON_ONCE(err =3D=3D -EMSGSIZE);
+> > > +             kfree_skb(skb);
+> >
+> > nit: nlmsg_free(), since it exists
+> >
+> > > +             goto error;
+> > > +     }
+> > > +
+> > > +     rtnl_notify(skb, net, 0, RTNLGRP_IPV6_MCADDR, NULL, GFP_ATOMIC)=
+;
+> > > +     return;
+> > > +error:
+> > > +     rtnl_set_sk_err(net, RTNLGRP_IPV6_MCADDR, err);
+> > > +}
+> > > +
+> > --
+> > pw-bot: cr
 
