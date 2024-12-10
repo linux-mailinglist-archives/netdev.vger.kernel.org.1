@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-150872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 037699EBDD0
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 23:26:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F393D9EBDE1
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 23:32:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 648F01693BC
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 22:26:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B556169B08
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 22:32:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CEF51EE7CE;
-	Tue, 10 Dec 2024 22:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6E71EE7DC;
+	Tue, 10 Dec 2024 22:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YaT4HUGZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U5CLeXqF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DDB2451F1;
-	Tue, 10 Dec 2024 22:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE132451EE;
+	Tue, 10 Dec 2024 22:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733869585; cv=none; b=QTEVnNxJHQ5b0vIbKVleOLWZLqYF4+1OSPEL2bYQkEOTwXVhwIsqFFg+jUiafuAAUvcRafgZWGEorofpvbV2Uf/9ICKTv7AOQDB3PjyTcNgtnRiktwQxVit6EzlsGfVYl5cJ1kZIfMtEdz6I4kXY/fwN0L+GjFnbQyNKM9+N3CE=
+	t=1733869945; cv=none; b=oMY3cJwVv7lc78zunZePQufzfpi4PyUKrw3gmi+NmMbOfoQY+VXI4tnrJCDD3GxgBy1cJLnzQH0EXIGLqpPbh1MAebSqH889eXFa+wxzzfz2ATaSdquuCQ19yJNfsXRPAm9l26mWAqIFP80UjmipzBLxpsIVZiSgNIWeyOlcDvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733869585; c=relaxed/simple;
-	bh=7dyBhkgm4N/DLXAeBBU91aVdSrvgFws4aFL8S4LxIyw=;
+	s=arc-20240116; t=1733869945; c=relaxed/simple;
+	bh=hgMJx2VtJ+BbwJuND9+Surw/NGbnfW1t9z8fyk7Lwpw=;
 	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d2U4WgD/+OdjOrkgech9cKdN4crX5R4ZdkuIzdLhIS0+S1X043Bo/6m+u2pi7EEXbraHSQnW7cXCaWUN5fx0XCBpwHIDWnlcc+oMOgfLaI04jgvGhDVcBFK4z8elgSjOucYmcdjXtQoc8SVAEyhwHBNj+xU3HWJFQQsROUOxhwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YaT4HUGZ; arc=none smtp.client-ip=209.85.128.53
+	 Content-Type:Content-Disposition:In-Reply-To; b=WdnC11SuYXaPMeq5OnLpiJoqla9QpZO8TsYvsuK8yUjQWOXsceKqJ1XcN9I8S0auSTnAA+kqICL+OWPsrlha55b8EpTsMBMfnE2WM+e5b40vBRzLroQIrw/adBrpn6WA6sC3j+ZmJ/rGWr0hlRD94t0OavDU/sU8WXHKRXAkdfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U5CLeXqF; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-434f09d18e2so35620055e9.0;
-        Tue, 10 Dec 2024 14:26:23 -0800 (PST)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3862b364538so48322f8f.1;
+        Tue, 10 Dec 2024 14:32:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733869582; x=1734474382; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1733869942; x=1734474742; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:subject:cc
          :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=UAnLPvcXxqQcZMFvRdGiegZqvPuvQ8o1GFTUSOFQNIg=;
-        b=YaT4HUGZ29KbopI4xPnFV5yQ1k3CiVqjDm/2OVTrr8Yfw5Ln2YIw2BhEfnUR/AL10l
-         9hQfs3auWSyaCXaLs+h7OoEB0LzQ6x9l6oNxmNErFwftnxMBleSx6T3z2/DVADz6sETH
-         r5LTskDTQbETsgswj/HaHaT/fwKYI++8jRkP+o4d61vaQ62j6k7b/0IN5gpDeADQfPbB
-         xKNi1S4IiIM1nmWPQ5zgUEDYvGdUv1KDXAKnuarHq/nWVg2/7u2HCDg7KAW3gIGfjJ76
-         k0tMPTnjm+jnIgS2r89rhOWm7AUJ6Ilct0DFaBtQLKxYDOUz138ZJZzzLJbhEny05CGb
-         u5cg==
+        bh=QnO56ocUjPfv+bgOKk5gIkhPUA621URHfVhC+NJz7p4=;
+        b=U5CLeXqFf4tHcprr2O6oChNC4XUwEqBLmSuYDg4pDG664k9T2LCC7lRYkDuSPn8M8k
+         C2Klleznh+7UM8y2d4JM4lrBZNOgUWCjZOo3o2TG+7IKX4VMg0XfP36zxuf3c7NVeWkX
+         nKOslg7BVSeqHQE7t+2xqMPyK3s/rlc27LRN/xNTUfvUeaXhga6taC25izzvm+iQ6EIH
+         QETUJuW1alZjKZQHZ90cjnXXvDW7WfpvyEkg3CklPM9a58cdtpVOUABduePedQu+n6bT
+         IuI/xh1lwkZsK8xQ9ROlICJhv/2FywmfWcy2CZkMaGnU1uhGS8bRYHSxuRPl3KwXe9fe
+         atyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733869582; x=1734474382;
+        d=1e100.net; s=20230601; t=1733869942; x=1734474742;
         h=in-reply-to:content-disposition:mime-version:references:subject:cc
          :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UAnLPvcXxqQcZMFvRdGiegZqvPuvQ8o1GFTUSOFQNIg=;
-        b=CSrpfwLfxRDKePVTXdOaTWTgk5VfPFtIK9rIlhAoXW8AE+Xq/roLQBOkrBV9k9MLyH
-         EdDy+KQDw9i7EI5QC7A1hIZ9QgG1habUlPLOLvU6SBlPzloWWFvu2CeeWXUhsB7PfsP7
-         aTYeAaWjNbkbucDNFV5TSTaeKRt5IW+mPQE8+dtLG8M0AyTo2qNV/7k9cyBGglcm14jV
-         dGoqCD5SOtRJFlPark5QrqQm7KCh17p6mNnG7U5dcSMA3PxjZi/jq2IH/goVMNB22CNV
-         HsUsjl8DGia/v4IGVcNohAdNvkJLi8bbBixnQzdhrVRTabK1lVpQGE8eBv2VRQK+/IE9
-         I88A==
-X-Forwarded-Encrypted: i=1; AJvYcCU7HEu3ja6dGw1PQ2nqJ6aqQday7chUpVIE2Sr8DJT2KYecYeFozmNeDRzj62Q9q9YOekzNtyfs2IvvVoMk@vger.kernel.org, AJvYcCUiQDCvLH5U4CfUqTu6jl1pLXDVSzbeqE9At0a8FGvqKfmCnVPQa+Ts2EbHGRFwSwHgA2wOMMjj@vger.kernel.org, AJvYcCXt203kkPm5aK3kEykN08bea2hNwOvtucB7JfuF4BIxmk7CPF/Ck7U8Jr+z2bZOyr3wSH8CCb10jrln@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLsG+pmb5iELhLTDoawhN00tM9yhMV5DFgia2vuIjFRou8QYWS
-	b9HaQGAmKvXwD/SIVwAjtIOP4HzoHLP6IUJwGYTjg8XRX0DNS4uS03WNXA==
-X-Gm-Gg: ASbGnctTl0747H2s8bSZtF6QmB7ke0NrWsfEh5Z5KQbTZdbYWEOYAKu+XlVeSlp7pRg
-	cb/Nf+Ceyy8RS5RE5U2QV8G6lZAi5/y8CeV9gyst23lrVDCmsqlFSYyQn8L0ZUMr/R7PZGOVjyz
-	Z+WeR55rJv+NJnAyinrZH2IuqXBPTFYzm6P4LNazEN55ZuS6osZkeS2y4DaD0/odglY28eQd/fU
-	yk4vv9RbJLt0zhVf7f026BCSWAyq4BY76S2b4pS9+JF71c8Ax87u2wRRw2TANccxRNNN9JlrJm+
-	FPYhwam5nw==
-X-Google-Smtp-Source: AGHT+IEIx73L8V9Xn20US5TZdCSs05hwB1+pqofuOI4Tftmw7ho7qTCb/DpbVER3GSlQTeepdonLzw==
-X-Received: by 2002:a05:6000:1fae:b0:385:e30a:394e with SMTP id ffacd0b85a97d-3864ce862d2mr561573f8f.3.1733869581438;
-        Tue, 10 Dec 2024 14:26:21 -0800 (PST)
+        bh=QnO56ocUjPfv+bgOKk5gIkhPUA621URHfVhC+NJz7p4=;
+        b=ha9Kqp+tmvIqOFomIx5xSbEUXv5NFCvJXbeaEvjUH42T4kGMawc50FE5wHKusUg3rd
+         FGCNx9FdjpCHngMgsKEQKl6AifyIM+56XJzVj8Ce9PuVl4Zwj5Zj2U1M7GEo+Ei5k3cI
+         PmxUYHwyz88xX4JFBhGwGkpxUcfm6CFifA42mGM4Fd9Uv91vKrNGfJ97+5HgTc4JJQ6v
+         w/QHM9TEQpKcfe6qyo7WC4LkZFeyJaF+83xrOpdEXf4rGMxCTCg3+cT6rDyVYgTMsPuU
+         oynrcCYyuNuEafv9FD+sWpph1YWH7/Ifh+qXKMxDW4ZPn1+jm9ZiMXCg9oP4c9LZlDaC
+         AS9g==
+X-Forwarded-Encrypted: i=1; AJvYcCVFndzAnyrUAN69rZXMOco3OUB81o33Ml162R1+t46oXuROKYNT/QBVpnXN7cGDGhLThjV/LqDnjMte8Hfo@vger.kernel.org, AJvYcCVMBzA6pTnznmTGth2j6SCPfUsAcIkWSOR/kiStwrkFoM4oFhJr7ALj/C+yqK8nTG+h7LrNW168HBF2@vger.kernel.org, AJvYcCWDaEJzrHtK1Y6aKMnh8OgLzeYN3LU/ZZONpTzVwuBmNxTP3yITPJj69qUbvcYUUeEleqBWnTc0@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRsHZR8LRsoT3F1kQgw1sh8N7wbcpnV4ZD1/6OtoiXarFk+GE4
+	RnfLcGWTV+zSGrGgznDZSQQVqLT9FD1zniyXDRuYLu2r8kKs6FKH
+X-Gm-Gg: ASbGncu5c5X+1vCcwDkMfs+0SH/BmOEImOU+yX/gRB4G1CF20EfVsieXOawye2b2WHz
+	h8TzRLmcP5pF1wAkkuzFomgBSzf/4B6ZPZnPnq3x7JZCmzgeq0GNTmyfYxtioPL3wRlsUDA4fi4
+	imA/Xts2SFK3tJqKBjfF17XkDmve5xUptVqZgfOeFgZa8tn6ILrdpIOEivL/xP1i+z3IUMvgfPg
+	nFIoXPdq/zOubtGTKsRXH988RhXwpHDnDZLvwjjAUN6swb4pVl1mDMr0SjUA1uw1Ylgj7/CnVHg
+	OwidhRO2/Q==
+X-Google-Smtp-Source: AGHT+IG1bSXHS0bpB9SrnpgSiy3t2o7skv79APs7LVWlF3TOUod3SzTBdm60dVBBJHjBYfbo6u0icA==
+X-Received: by 2002:a05:6000:1a85:b0:386:3c93:70ff with SMTP id ffacd0b85a97d-3864de9e47emr286354f8f.8.1733869941960;
+        Tue, 10 Dec 2024 14:32:21 -0800 (PST)
 Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434f9da4cd0sm81688025e9.26.2024.12.10.14.26.19
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434f8836dbbsm62231295e9.0.2024.12.10.14.32.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 14:26:20 -0800 (PST)
-Message-ID: <6758c00c.050a0220.1dd14c.63cd@mx.google.com>
-X-Google-Original-Message-ID: <Z1jACflOJaLJmhgy@Ansuel-XPS.>
-Date: Tue, 10 Dec 2024 23:26:17 +0100
+        Tue, 10 Dec 2024 14:32:20 -0800 (PST)
+Message-ID: <6758c174.050a0220.52a35.06bc@mx.google.com>
+X-Google-Original-Message-ID: <Z1jBccAhjYjXTNRV@Ansuel-XPS.>
+Date: Tue, 10 Dec 2024 23:32:17 +0100
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Vladimir Oltean <olteanv@gmail.com>
 Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
@@ -92,13 +92,13 @@ Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
 	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	upstream@airoha.com
-Subject: Re: [net-next PATCH v11 3/9] dt-bindings: net: dsa: Document support
- for Airoha AN8855 DSA Switch
+Subject: Re: [net-next PATCH v11 5/9] mfd: an8855: Add support for Airoha
+ AN8855 Switch MFD
 References: <20241209134459.27110-1-ansuelsmth@gmail.com>
- <20241209134459.27110-4-ansuelsmth@gmail.com>
- <20241210204855.7pgvh74irualyxbn@skbuf>
- <6758ab9b.7b0a0220.3347af.914a@mx.google.com>
- <20241210221602.ohyzlic2x3pflmrg@skbuf>
+ <20241209134459.27110-1-ansuelsmth@gmail.com>
+ <20241209134459.27110-6-ansuelsmth@gmail.com>
+ <20241209134459.27110-6-ansuelsmth@gmail.com>
+ <20241210211529.osgzd54flq646bcr@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,30 +107,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241210221602.ohyzlic2x3pflmrg@skbuf>
+In-Reply-To: <20241210211529.osgzd54flq646bcr@skbuf>
 
-On Wed, Dec 11, 2024 at 12:16:02AM +0200, Vladimir Oltean wrote:
-> On Tue, Dec 10, 2024 at 09:59:04PM +0100, Christian Marangi wrote:
-> > > > +  airoha,ext-surge:
-> > > > +    $ref: /schemas/types.yaml#/definitions/flag
-> > > > +    description:
-> > > > +      Calibrate the internal PHY with the calibration values stored in EFUSE
-> > > > +      for the r50Ohm values.
-> > > 
-> > > Doesn't seem that this pertains to the switch.
-> > 
-> > Do you think this should be placed in each PHY node?
+On Tue, Dec 10, 2024 at 11:15:29PM +0200, Vladimir Oltean wrote:
+> On Mon, Dec 09, 2024 at 02:44:22PM +0100, Christian Marangi wrote:
+> > +int an8855_mii_set_page(struct an8855_mfd_priv *priv, u8 phy_id,
+> > +			u8 page) __must_hold(&priv->bus->mdio_lock)
+> > +{
+> > +	struct mii_bus *bus = priv->bus;
+> > +	int ret;
+> > +
+> > +	ret = __mdiobus_write(bus, phy_id, AN8855_PHY_SELECT_PAGE, page);
+> > +	if (ret < 0)
+> > +		dev_err_ratelimited(&bus->dev,
+> > +				    "failed to set an8855 mii page\n");
+> > +
+> > +	/* Cache current page if next mii read/write is for switch */
+> > +	priv->current_page = page;
+> > +	return ret < 0 ? ret : 0;
+> > +}
+> > +EXPORT_SYMBOL_GPL(an8855_mii_set_page);
 > 
-> Logically speaking, that's where it belongs.
+> You could keep the implementation more contained, and you could avoid
+> exporting an8855_mii_set_page() and an8855_mfd_priv to the MDIO
+> passthrough driver, if you implement a virtual regmap and give it to the
+> MDIO passthrough child MFD device.
 > 
-> > I wanted to prevent having to define a schema also for PHY if possible
-> > given how integrated these are. (originally it was defined in DT node
-> > to follow how it was done in Airoha SDK)
-> 
-> Does compatibility with the Airoha SDK dt-bindings matter in any way?
+> If this bus supports only clause 22 accesses (and it looks like it does),
+> you could expose a 16-bit regmap with a linear address space of 32 MDIO
+> addresses x 65536 registers. The bus->read() of the MDIO bus passthrough
+> just performs regmap_read(), and bus->write() just performs regmap_write().
+> The MFD driver decodes the regmap address into a PHY address and a regnum,
+> and performs the page switching locally, if needed.
 
-No it doesn't, the requirement for nvmem already deviates a lot so changes
-are needed anyway.
+Doesn't regmap add lots of overhead tho? Maybe I should really change
+the switch regmap to apply a save/restore logic?
+
+With an implementation like that current_page is not needed anymore.
+And I feel additional read/write are ok for switch OP.
+
+On mdio I can use the parent-mdio-bus property to get the bus directly
+without using MFD priv.
+
+What do you think?
 
 -- 
 	Ansuel
