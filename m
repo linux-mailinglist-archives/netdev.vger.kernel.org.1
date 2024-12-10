@@ -1,137 +1,167 @@
-Return-Path: <netdev+bounces-150790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95D6F9EB8EE
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 19:01:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCE499EB8FA
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 19:04:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE62D2832BC
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 18:01:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ADFC283318
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 18:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 322851A726B;
-	Tue, 10 Dec 2024 18:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C8B204693;
+	Tue, 10 Dec 2024 18:04:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jTc8Qlsd"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="gVwJWa7N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [83.166.143.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E338633C;
-	Tue, 10 Dec 2024 18:01:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA2A8633C
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 18:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733853713; cv=none; b=N+xzIc2qiBJRZwIFTT1/UjumhKrNCaqQzbxXejFYbsEzWxww2gy4xslnXEFjV+83cxHROrXskD2XKy8y1aCrnRz+yB9y8a7I7WEEJqHq01cWHzajT04+asyL8DJCWZDNkZkxAtxmh9Q7RukRQiJjs4TBY0w9YzXUhr7lCDi+img=
+	t=1733853869; cv=none; b=PE/nFZYVYdtZD/XPdHAQjpxNxdsuER65zKBga7QldKMQVsnmzhHRV0qvn/R8Ty2dDNfHok71G+nCcUYlj+8FmN8q6KGAn8I5zOlQNE7MXaCokCQVVBMbRsrJoy6hTe/nr+0Y3B2gDqztRIaXxN1eItxJi0lhIn7fOp7klrjc/bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733853713; c=relaxed/simple;
-	bh=rsTGxL0HBNmGxWBc2VDCHNPEl3HaF5w17PiOUuj5rUg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pDirsiqEkuBpiM7nPdMbn5/bQh1bs/fGb4r9WoMaOxtz6VpAHHwgFEThCql+Jos15rrPmQCXPtifln0ZsDYe4v8FUvEmzxmiMMWi4Pig1K7FaMWpyeb7jxTDMP+8B1xXIxUAwKUQylb+xUTp1dLrthXZNxqSqebXaDsRTixopV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jTc8Qlsd; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-434e406a547so24842095e9.3;
-        Tue, 10 Dec 2024 10:01:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733853710; x=1734458510; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yBlvItGA4s+sxQEx1hGblMxAfdPEGezlVzN9Y20RcFI=;
-        b=jTc8Qlsd5BvAZtDnpHpvaRDMa8PazbIbOKxPZGYc+o85Cb/wAQZ/XdUZlVhK1AqI7z
-         rfk6ey3voEopJ8oCrIm+ABPBxS/J780ln2G9Lctij2S7lunnFmgwSQiQv6w5APqeYxfH
-         Dh1KbYB4Yw0d0U2OfD71KEEgyBIqhymu/8SnYRcF7tjqLsbnDx2Lvht0ouLzTuZvaWb2
-         OGENhY2l6kHqTNas/9JafTY0G9EsMMmbtxUgZgqvKUbMlgJ3xbLuLL2TPu1w+TtnlJaL
-         WbLKzxirQa1FIswrPxMXepXUang7XSxDSnBVDBjyAxUash4UmwoPs3FYtOugk4RQRbfx
-         +4Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733853710; x=1734458510;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yBlvItGA4s+sxQEx1hGblMxAfdPEGezlVzN9Y20RcFI=;
-        b=GLRd6bRpiRz4+AY6r7rS90UmxQ+LiKw5wNHZNxVI7saKBNPVJODUCUBs+5a9zBWs+M
-         5k3hw70pxVzJze7anOEZ1ssM3QGbU2FQVhKrDtLewCp8uVuVjj4Z2oSr2mWug3inZVyA
-         cc3DX8ya4VyPMHrE7i9jJwPbocW7MXTYpwiezZDsNzKgDLhUnBEQ8aWcBcF8HcUW3giH
-         qsE8ho89uCXk1IuTYCeLC6M6KJZ9qfS9QzvLzcBMyN8dDRo0WZFmZmnEd1q2fV93y5LU
-         fVO3YZ3fIoxQms4pZGLF0iYlXiQo9Js7larQc99++Q6KItE6sR+/uQzxjXud/CpMsDJF
-         IqUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVF0OElDrUog9aIil1n/9IGePbtUxqOIDrylt8nvH+p5B+Ye078TzMoLClLXuoYXnlg7VA=@vger.kernel.org, AJvYcCVXLA2kpzUbClPAKLTlz98G20ZPgT91tNPxkhdGsU/F50zqSnxvMXN+hkOlh5j7u747zgakvLCV@vger.kernel.org, AJvYcCW3XyptrON7JeairzYphSW9uhTyKiRcfpNfVj/nJ4tnbenKbtoL0m+fKUjSthurddyzrYZ+DkBC7yBB/g==@vger.kernel.org, AJvYcCWRQvbeFfbdB6ADtOCM0+lY4GvU9Rrg8ILHuPtl9JNmMEjO8Ad1fSC5aA8N+zuZiWCHpmqu1d12NFRXQA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPqjSKzWkdaDo3gC4elMuqimt9Yorp+6VQjlJJEVoXJzh5bWDI
-	P94arYjMpu0x3psnwjXHSBp01iuZeUSdVDLlCOJM4Fd57Z7E1rstvmki1BekeAZov0K+6PAHlsy
-	PUtWYdBUWbQUZ69aWmr1BHzn9x5U=
-X-Gm-Gg: ASbGncuhqWuhuDrs+d+gFqZBYCzCgIOD6Te25CU3Aiabs5y3zDC4Pwqv3USYgHwfjAy
-	RPmj9EAInXbL8JsNd7i1qYW/jKM1+i6fOHo4HbxXGRyyOIXh/YdM=
-X-Google-Smtp-Source: AGHT+IHhGuEaEWR7fFfHE+4MIKBVmJs6l0dKJ8v3/9GLrqsDK8ii+HMxWZdSOJjxHGu+I796y6DFOO/fpzSIzAcl93Y=
-X-Received: by 2002:a05:600c:458c:b0:434:edcf:7464 with SMTP id
- 5b1f17b1804b1-434fffc0b2bmr54752515e9.30.1733853709387; Tue, 10 Dec 2024
- 10:01:49 -0800 (PST)
+	s=arc-20240116; t=1733853869; c=relaxed/simple;
+	bh=77Qlx27wlKCeqVSBZaB7kO9QJE1s+ZW9CUlb/3SMJ5g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eXRo6djXaBgulho+Ppr5iBw5UBp++CTU5IeP/ox2KfYe69xwQJgKMtjpsnB9eKjCp7V2opi8BlddjY5cf+eR8brijfL+puBjZ3E5K+sCUAR585oqrcdRD31AWOzlNgfW/MjUVQQUzuHgTCfVIMPBl4pj/IuKJujnIvFQ0ScIXzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=gVwJWa7N; arc=none smtp.client-ip=83.166.143.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Y767Q3NTtzX2X;
+	Tue, 10 Dec 2024 19:04:18 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1733853858;
+	bh=EPOh+etsU+dSAyHlZze34E+Js4PynjzVIPhILt/44/I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gVwJWa7NBoxDL8ckAdGmP++bVnwAiY1zsK5bJap6Fbf1Drbc14M/PN8/U9fTOEIlu
+	 rSDeyq+TvL0FVyLS6wntoaU10rBXzrNjuGAokZ23cZqP7y/matiFuF6spZ6x02Ahhl
+	 j+TGvxdswVQ8Vwzb3amwhs1rPPSwuvALieOMOK5Q=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Y767P2ndgzhsx;
+	Tue, 10 Dec 2024 19:04:17 +0100 (CET)
+Date: Tue, 10 Dec 2024 19:04:06 +0100
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: Matthieu Baerts <matttbe@kernel.org>, gnoack@google.com, 
+	willemdebruijn.kernel@gmail.com, matthieu@buffet.re, linux-security-module@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
+	MPTCP Linux <mptcp@lists.linux.dev>, David Laight <David.Laight@aculab.com>
+Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
+Message-ID: <20241210.Eenohkipee9f@digikod.net>
+References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
+ <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
+ <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
+ <20241018.Kahdeik0aaCh@digikod.net>
+ <20241204.fahVio7eicim@digikod.net>
+ <20241204.acho8AiGh6ai@digikod.net>
+ <a24b33c1-57c8-11bb-f3aa-32352b289a5c@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210040404.10606-1-alibuda@linux.alibaba.com> <20241210040404.10606-6-alibuda@linux.alibaba.com>
-In-Reply-To: <20241210040404.10606-6-alibuda@linux.alibaba.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 10 Dec 2024 10:01:38 -0800
-Message-ID: <CAADnVQJisbHFpS2==pw4aOAmKsbo6m6EDvOBntF_ATMrbp0G=w@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 5/5] bpf/selftests: add simple selftest for bpf_smc_ops
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Paolo Abeni <pabeni@redhat.com>, Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@google.com>, 
-	Hao Luo <haoluo@google.com>, Yonghong Song <yhs@fb.com>, Eric Dumazet <edumazet@google.com>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Jiri Olsa <jolsa@kernel.org>, guwen@linux.alibaba.com, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Network Development <netdev@vger.kernel.org>, linux-s390 <linux-s390@vger.kernel.org>, 
-	linux-rdma@vger.kernel.org, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a24b33c1-57c8-11bb-f3aa-32352b289a5c@huawei-partners.com>
+X-Infomaniak-Routing: alpha
 
-On Mon, Dec 9, 2024 at 8:04=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.com>=
- wrote:
->
-> +SEC("struct_ops/bpf_smc_set_tcp_option_cond")
-> +int BPF_PROG(bpf_smc_set_tcp_option_cond, const struct tcp_sock *tp, str=
-uct inet_request_sock *ireq)
-> +{
-> +       return 0;
-> +}
-> +
-> +SEC("struct_ops/bpf_smc_set_tcp_option")
-> +int BPF_PROG(bpf_smc_set_tcp_option, struct tcp_sock *tp)
-> +{
-> +       return 1;
-> +}
-> +
-> +SEC(".struct_ops.link")
-> +struct smc_ops  sample_smc_ops =3D {
-> +       .name                   =3D "sample",
-> +       .set_option             =3D (void *) bpf_smc_set_tcp_option,
-> +       .set_option_cond        =3D (void *) bpf_smc_set_tcp_option_cond,
-> +};
+On Mon, Dec 09, 2024 at 01:19:19PM +0300, Mikhail Ivanov wrote:
+> On 12/4/2024 10:35 PM, Mickaël Salaün wrote:
+> > On Wed, Dec 04, 2024 at 08:27:58PM +0100, Mickaël Salaün wrote:
+> > > On Fri, Oct 18, 2024 at 08:08:12PM +0200, Mickaël Salaün wrote:
+> > > > On Thu, Oct 17, 2024 at 02:59:48PM +0200, Matthieu Baerts wrote:
+> > > > > Hi Mikhail and Landlock maintainers,
+> > > > > 
+> > > > > +cc MPTCP list.
+> > > > 
+> > > > Thanks, we should include this list in the next series.
+> > > > 
+> > > > > 
+> > > > > On 17/10/2024 13:04, Mikhail Ivanov wrote:
+> > > > > > Do not check TCP access right if socket protocol is not IPPROTO_TCP.
+> > > > > > LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
+> > > > > > should not restrict bind(2) and connect(2) for non-TCP protocols
+> > > > > > (SCTP, MPTCP, SMC).
+> > > > > 
+> > > > > Thank you for the patch!
+> > > > > 
+> > > > > I'm part of the MPTCP team, and I'm wondering if MPTCP should not be
+> > > > > treated like TCP here. MPTCP is an extension to TCP: on the wire, we can
+> > > > > see TCP packets with extra TCP options. On Linux, there is indeed a
+> > > > > dedicated MPTCP socket (IPPROTO_MPTCP), but that's just internal,
+> > > > > because we needed such dedicated socket to talk to the userspace.
+> > > > > 
+> > > > > I don't know Landlock well, but I think it is important to know that an
+> > > > > MPTCP socket can be used to discuss with "plain" TCP packets: the kernel
+> > > > > will do a fallback to "plain" TCP if MPTCP is not supported by the other
+> > > > > peer or by a middlebox. It means that with this patch, if TCP is blocked
+> > > > > by Landlock, someone can simply force an application to create an MPTCP
+> > > > > socket -- e.g. via LD_PRELOAD -- and bypass the restrictions. It will
+> > > > > certainly work, even when connecting to a peer not supporting MPTCP.
+> > > > > 
+> > > > > Please note that I'm not against this modification -- especially here
+> > > > > when we remove restrictions around MPTCP sockets :) -- I'm just saying
+> > > > > it might be less confusing for users if MPTCP is considered as being
+> > > > > part of TCP. A bit similar to what someone would do with a firewall: if
+> > > > > TCP is blocked, MPTCP is blocked as well.
+> > > > 
+> > > > Good point!  I don't know well MPTCP but I think you're right.  Given
+> > > > it's close relationship with TCP and the fallback mechanism, it would
+> > > > make sense for users to not make a difference and it would avoid bypass
+> > > > of misleading restrictions.  Moreover the Landlock rules are simple and
+> > > > only control TCP ports, not peer addresses, which seems to be the main
+> > > > evolution of MPTCP.
+> > > 
+> > > Thinking more about this, this makes sense from the point of view of the
+> > > network stack, but looking at external (potentially bogus) firewalls or
+> > > malware detection systems, it is something different.  If we don't
+> > > provide a way for users to differenciate the control of SCTP from TCP,
+> > > malicious use of SCTP could still bypass this kind of bogus security
+> > > appliances.  It would then be safer to stick to the protocol semantic by
+> > > clearly differenciating TCP from MPTCP (or any other protocol).
+> 
+> You mean that these firewals have protocol granularity (e.g. different
+> restrictions for MPTCP and TCP sockets)?
 
-These stubs don't inspire confidence that smc_ops api
-will be sufficient.
-Please implement a real bpf prog that demonstrates the actual use case.
+Yes, and more importantly they can miss the MTCP semantic and then not
+properly filter such packet, which can be use to escape the network
+policy.  See some issues here:
+https://en.wikipedia.org/wiki/Multipath_TCP
 
-See how bpf_cubic was done. On the day one it was implemented
-as a parity to builtin cubic cong control.
-And over years we didn't need to touch tcp_congestion_ops.
-To be fair that api was already solid due to in-kernel cc modules,
-but bpf comes with its own limitations, so it wasn't a guarantee
-that tcp_congestion_ops would be enough.
-Here you're proposing a brand new smc_ops api while bpf progs
-are nothing but stubs. That's not sufficient to prove that api
-is viable long term.
+The point is that we cannot assume anything about other networking
+stacks, and if Landlock can properly differentiate between TCP and MTCP
+(e.g. with new LANDLOCK_ACCESS_NET_CONNECT_MTCP) users of such firewalls
+could still limit the impact of their firewall's bugs.  However, if
+Landlock treats TCP and MTCP the same way, we'll not be able to only
+deny MTCP.  In most use cases, the network policy should treat both TCP
+and MTCP the same way though, but we should let users decide according
+to their context.
 
-In terms of look and feel the smc_ops look ok.
-The change from v1 to v2 was a good step.
+From an implementation point of view, adding MTCP support should be
+simple, mainly tests will grow.
 
-pw-bot: cr
+> 
+> > > 
+> > > Mikhail, could you please send a new patch series containing one patch
+> > > to fix the kernel and another to extend tests?
+> > 
+> > No need to squash them in one, please keep the current split of the test
+> > patches.  However, it would be good to be able to easily backport them,
+> > or at least the most relevant for this fix, which means to avoid
+> > extended refactoring.
+> 
+> No problem, I'll remove the fix of error consistency from this patchset.
+> BTW, what do you think about second and third commits? Should I send the
+> new version of them as well (in separate patch)?
+
+According to the description, patch 2 may be included in this series if
+it can be tested with any other LSM, but I cannot read these patches:
+https://lore.kernel.org/all/20241017110454.265818-3-ivanov.mikhail1@huawei-partners.com/
 
