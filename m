@@ -1,73 +1,93 @@
-Return-Path: <netdev+bounces-150443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8A349EA410
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 02:03:29 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF7E1168426
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 01:03:25 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E3D13B7AE;
-	Tue, 10 Dec 2024 01:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="KOWgrwKb"
-X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3079EA42E
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 02:20:49 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5940C5474C;
-	Tue, 10 Dec 2024 01:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87FFF288AC5
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 01:20:47 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF7C3F9FB;
+	Tue, 10 Dec 2024 01:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="GjNtd6x0"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8193C00
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 01:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733792573; cv=none; b=bGyGzf0s4d4ULiDQd06FJxRRKw+gBRcQlNsY4goA0tO7VDX8x0z96CleGIk794P7dVLdidundvBVRNYWOeW+QOznPyUSG4D5Zls4isnw7hR2VOk58AZ9JZDU22jcIbOCcGPG2uv8+3pXRt+qxx7eamHrwWXWd2MQRMjW8cA/i7w=
+	t=1733793645; cv=none; b=Kg5RxnfpkYEgOFD6nFdgTCSIjqJJVliBt6jGA0HqlVinppMiVSdNjcB1mnCHIxM0XJ+u30aZTZ7KyxZlu0TkquNo73aiEnwz5F0aVdCgBwvZ4HsUqZmsf2LlzVBItEVB/JoH15qcVdlRojwsoedicXtXQdK8P76X8tr0FAGMqvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733792573; c=relaxed/simple;
-	bh=Mi4R10fc6D0UG1ykrzFINIkrlpryLoSgpy/zCpwnInM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QSkHZZvmiBaHiDNA2H1KhoV4zbQ2X2w7tN5eDY30sE2/G4Y7ZRh0YXI4IfzEGmf5iR+jclbDKV2SxwL4pbepp9lDleIGLraoh0Nse+pgZ1MggOT76tYqJTfsmybSr7fxaLoSZzr5F/e0ab0KsL3scUjHDsIAoXUo4jc6TtyBfmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=KOWgrwKb; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=5B4ouTrfxMGgmCIM/C5GmAPRV6HRICqep5cx1w2PwJY=; b=KOWgrwKbB1Ikp21D
-	XzO9tb01IzcShm3/Pl0mvLHmelEwmaWibosoArIgawg1hd6ESuf4PvsJisKh3WBGVRUKRKKu/fEmT
-	gdiROW8Z1r9hu02cTb4o83F4R7/P4ZW/zZ+xarrKEGshimTywwu6LqDF0YODUGZoCvUYCsa8ZdRZu
-	wTVC4eBAA0aVuaCaTx8aqM0G1Ooe7Yi62WwZJyFQm/T+Xn/ja6kL9lypQmiUCZX4RLHWofjh/Ks+s
-	KxxjCU6nrR6a4f6WWNQTwvQOSFBVHrefz3PJo1UXW/fPVsneHXOYXh4Iie3zK/iDRxPbNI9GqThmd
-	CJVwErrZInizD5StGg==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1tKoe1-004Oea-03;
-	Tue, 10 Dec 2024 01:02:33 +0000
-From: linux@treblig.org
-To: trondmy@kernel.org,
-	anna@kernel.org,
-	chuck.lever@oracle.com,
-	jlayton@kernel.org,
-	neilb@suse.de,
-	okorniev@redhat.com,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com
-Cc: linux-nfs@vger.kernel.org,
+	s=arc-20240116; t=1733793645; c=relaxed/simple;
+	bh=riAgWIm4eHOvFvIAD29NmiRmabOQhrVcGI9FcWeW08o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rLEy+Juzwm3MyPyHN8KhVsgsq8DscS4M+Tp5aMKMNL2vBdawN41T93RywWrxRCAISMlHZFI5WRu5lWgjsnuJEmAocsrVTGXrDn9fZncqexxtm1QbUkKUI3ELx+QrL7Bd9Y9QuJWznD/9Vpnl2cIulFnbdUOZRCNMOmEMT+Wax20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=GjNtd6x0; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-467725245a2so6055071cf.3
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 17:20:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1733793642; x=1734398442; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ENRSn1yH7VoQY4e24Ns356ses2mMqgMcB34tq5lxgTQ=;
+        b=GjNtd6x0mKLwqS1vSdvcB5W8QrXnlluViak2EVkclYsIdNeqMFc1s+ZTJSZsdKH06O
+         BWU1X2KKj0blursigxyduLHMdXOAgV3k9oRAWBkRFKBHG/3sCisgq4j+NPUiD2kaZFC/
+         IZAhFc0rDStMBAW1SNUOPZmt+71noUOIgNryQzTj+uYXjPRN+YZz9a+h/L1eBpfZeAMh
+         PFgBhQp+ikzufNE7bre/rDD9JRUSDYvCIiZ+M3f4kh3q0NqJ6ZIykaj431YPI4egOf7R
+         i+M/VeJEzu1t+oiGytkZHV2M8GlOuvgDl+foU5zzrlvn7MBevZVijZrnED/T1nJDwJ2s
+         jwHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733793642; x=1734398442;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ENRSn1yH7VoQY4e24Ns356ses2mMqgMcB34tq5lxgTQ=;
+        b=vqf9cM1sJzoyUxn3RCHX1bP7DB3diAoHa7gALQMDfhXdbmSsd62L9Jg54ptIpOinE+
+         49ILjVzK8H0lMjwqpQUhkv5hJm3jFW32w4DNb48P0rA1Aj3vnfxnfEX53TBW27EUy/7W
+         p927hHYCb3R1hMFe7gVjGE4DsmhdUEXj2wzV0gyOh9T2DZnX2UvXt4nN5em1Ko9+cAVU
+         goA5aXLwNTKkKF86cBcy0eXLrPUHxXpEBn/RlEMG1HzcfG+OkIitxiXZa8xB9SJimSgJ
+         sK0KATZ0j/sD2KWeMqRdgf8CLkTPS24SIo2mG6gKgoXXfg82hCmlyPrsdvHNPlyIea4F
+         4UEw==
+X-Forwarded-Encrypted: i=1; AJvYcCVmgj9XAi9a3zngoex0kqB5TfZ4cFuEWO8qw9MV21BB9HNDr4MsivbmCZcQvK4idn/hEdvfwJ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybQxTUYvWPYTagNgUt2zxnlL7hS150gOBJgndHQWB4RQZ7saF+
+	HEpw2PFVrEx/EWGKIhI/eX/X3jm+P3ZGDKdzIRt1NUue2qXG7JQ7iCR/gH7Fr9Y=
+X-Gm-Gg: ASbGncuzsezDzsnCcAJCO+3S3mwwwOQbxcDA1ZHrXBj2/sigYEkUtHpzxS73VgCgdeV
+	pnQDiuBBdeuJbD/pDIE+2oL09ImORzH8UrSthMKvqqMbV839i1xl8imL7luoxCpY0luO22a/w6A
+	RI6SiT7cpA/GG3p0aJ+ZuEI2j5e0SJd5GVcd52yBys+c9OuHf1ORbBo5y5A1cxmmdlUoxCEMLDI
+	mEr+CeaaXDFe/BUICtPbbuF0JK8TCMycuwaL3My3eMsf5bEIhckM1P9yk09+LZI0+fyD4j6GHSF
+	Ly0=
+X-Google-Smtp-Source: AGHT+IG+jwM1LsV8lCSffGZDdkO+RuMN3wi5qCHTFZ2dq6X/nH2EzdoVMLfykgxlrtEMRzSWCf0kcQ==
+X-Received: by 2002:a05:622a:1454:b0:467:614a:b6d with SMTP id d75a77b69052e-46772028ad5mr44503881cf.45.1733793642465;
+        Mon, 09 Dec 2024 17:20:42 -0800 (PST)
+Received: from n191-036-066.byted.org ([139.177.233.178])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4677006d143sm8116521cf.19.2024.12.09.17.20.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 17:20:41 -0800 (PST)
+From: zijianzhang@bytedance.com
+To: bpf@vger.kernel.org
+Cc: john.fastabend@gmail.com,
+	jakub@cloudflare.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	dsahern@kernel.org,
 	horms@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH 3/3] sunrpc: Remove gss_{de,en}crypt_xdr_buf deadcode
-Date: Tue, 10 Dec 2024 01:02:25 +0000
-Message-ID: <20241210010225.343017-4-linux@treblig.org>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241210010225.343017-1-linux@treblig.org>
-References: <20241210010225.343017-1-linux@treblig.org>
+	Zijian Zhang <zijianzhang@bytedance.com>
+Subject: [PATCH v2 bpf 0/2] tcp_bpf: update the rmem scheduling for 
+Date: Tue, 10 Dec 2024 01:20:37 +0000
+Message-Id: <20241210012039.1669389-1-zijianzhang@bytedance.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,112 +96,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+From: Zijian Zhang <zijianzhang@bytedance.com>
 
-Commit ec596aaf9b48 ("SUNRPC: Remove code behind
-CONFIG_RPCSEC_GSS_KRB5_SIMPLIFIED") was the last user of the
-gss_decrypt_xdr_buf() and gss_encrypt_xdr_buf() functions.
+We should do sk_rmem_schedule instead of sk_wmem_schedule in function
+bpf_tcp_ingress. We also need to update sk_rmem_alloc in bpf_tcp_ingress
+accordingly to account for the rmem.
 
-Remove them.
+v2:
+  - Update the commit message to indicate the reason for msg->skb check
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- net/sunrpc/auth_gss/gss_krb5_crypto.c   | 55 -------------------------
- net/sunrpc/auth_gss/gss_krb5_internal.h |  7 ----
- 2 files changed, 62 deletions(-)
+Cong Wang (1):
+  tcp_bpf: charge receive socket buffer in bpf_tcp_ingress()
 
-diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-index d2b02710ab07..9a27201638e2 100644
---- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
-+++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-@@ -442,35 +442,6 @@ encryptor(struct scatterlist *sg, void *data)
- 	return 0;
- }
- 
--int
--gss_encrypt_xdr_buf(struct crypto_sync_skcipher *tfm, struct xdr_buf *buf,
--		    int offset, struct page **pages)
--{
--	int ret;
--	struct encryptor_desc desc;
--	SYNC_SKCIPHER_REQUEST_ON_STACK(req, tfm);
--
--	BUG_ON((buf->len - offset) % crypto_sync_skcipher_blocksize(tfm) != 0);
--
--	skcipher_request_set_sync_tfm(req, tfm);
--	skcipher_request_set_callback(req, 0, NULL, NULL);
--
--	memset(desc.iv, 0, sizeof(desc.iv));
--	desc.req = req;
--	desc.pos = offset;
--	desc.outbuf = buf;
--	desc.pages = pages;
--	desc.fragno = 0;
--	desc.fraglen = 0;
--
--	sg_init_table(desc.infrags, 4);
--	sg_init_table(desc.outfrags, 4);
--
--	ret = xdr_process_buf(buf, offset, buf->len - offset, encryptor, &desc);
--	skcipher_request_zero(req);
--	return ret;
--}
--
- struct decryptor_desc {
- 	u8 iv[GSS_KRB5_MAX_BLOCKSIZE];
- 	struct skcipher_request *req;
-@@ -525,32 +496,6 @@ decryptor(struct scatterlist *sg, void *data)
- 	return 0;
- }
- 
--int
--gss_decrypt_xdr_buf(struct crypto_sync_skcipher *tfm, struct xdr_buf *buf,
--		    int offset)
--{
--	int ret;
--	struct decryptor_desc desc;
--	SYNC_SKCIPHER_REQUEST_ON_STACK(req, tfm);
--
--	/* XXXJBF: */
--	BUG_ON((buf->len - offset) % crypto_sync_skcipher_blocksize(tfm) != 0);
--
--	skcipher_request_set_sync_tfm(req, tfm);
--	skcipher_request_set_callback(req, 0, NULL, NULL);
--
--	memset(desc.iv, 0, sizeof(desc.iv));
--	desc.req = req;
--	desc.fragno = 0;
--	desc.fraglen = 0;
--
--	sg_init_table(desc.frags, 4);
--
--	ret = xdr_process_buf(buf, offset, buf->len - offset, decryptor, &desc);
--	skcipher_request_zero(req);
--	return ret;
--}
--
- /*
-  * This function makes the assumption that it was ultimately called
-  * from gss_wrap().
-diff --git a/net/sunrpc/auth_gss/gss_krb5_internal.h b/net/sunrpc/auth_gss/gss_krb5_internal.h
-index 3afd4065bf3d..a47e9ec228a5 100644
---- a/net/sunrpc/auth_gss/gss_krb5_internal.h
-+++ b/net/sunrpc/auth_gss/gss_krb5_internal.h
-@@ -172,13 +172,6 @@ u32 krb5_decrypt(struct crypto_sync_skcipher *key, void *iv, void *in,
- int xdr_extend_head(struct xdr_buf *buf, unsigned int base,
- 		    unsigned int shiftlen);
- 
--int gss_encrypt_xdr_buf(struct crypto_sync_skcipher *tfm,
--			struct xdr_buf *outbuf, int offset,
--			struct page **pages);
--
--int gss_decrypt_xdr_buf(struct crypto_sync_skcipher *tfm,
--			struct xdr_buf *inbuf, int offset);
--
- u32 gss_krb5_aes_encrypt(struct krb5_ctx *kctx, u32 offset,
- 			 struct xdr_buf *buf, struct page **pages);
- 
+Zijian Zhang (1):
+  tcp_bpf: add sk_rmem_alloc related logic for tcp_bpf ingress
+    redirection
+
+ include/linux/skmsg.h | 11 ++++++++---
+ include/net/sock.h    | 10 ++++++++--
+ net/core/skmsg.c      |  6 +++++-
+ net/ipv4/tcp_bpf.c    |  6 ++++--
+ 4 files changed, 25 insertions(+), 8 deletions(-)
+
 -- 
-2.47.1
+2.20.1
 
 
