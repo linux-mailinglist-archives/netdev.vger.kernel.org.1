@@ -1,113 +1,118 @@
-Return-Path: <netdev+bounces-150629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 730179EB056
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:00:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CEC539EB05D
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C20171689E9
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:00:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A79D168F12
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A540A19DFA5;
-	Tue, 10 Dec 2024 12:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E81F1A0B0D;
+	Tue, 10 Dec 2024 12:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JZSvx0mu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="keaTljYd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB2623DEBA;
-	Tue, 10 Dec 2024 12:00:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000D31A00F8;
+	Tue, 10 Dec 2024 12:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733832047; cv=none; b=HGtM0Bzn6KYG+6VxOA1m76DH5nh7/iWvujhzK8ZVKoECQJ9DuvjWL7ez7lkpMzmFghMPIIhCJhrdeqkxUaj6XSVzjlXOS9Zmn2HcEKE6HrDQ4WCqrq1+S5uqSsViEBdyesij5sWFHTRZ/7q69r3yKcPCPkLG8w1yuZ7EMdMVx0I=
+	t=1733832265; cv=none; b=nva72U9+MWZzqEycSfuoQE5LkKovqXqO72xqEmqZtuXYPfMXUVQkRQFz6yUpwuuiSCwgCM9V45VKL7Fy9S8OYyoC/6IFhuhDCJ+7SyWXZmL4dboxpiErvBowDjq8gK1C6njkkuhcCaGc1MVSAYLay+aPyK87rb+ytbpMQtuH+n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733832047; c=relaxed/simple;
-	bh=u44ZzZ9eJTAT0sf5MXYiGMa0FE/s7isOKW9Y0ZPiuK8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Va870A+u7w04s+NI4nwcToncA5agbZ9lqAA3VoIDRVgczeEocBxdcL3jHWdsQ5SW6ZNIGvw/0jpA1ivyaBB5UqF0aN1bNPyeno9Vo3L1C8URJEiYrwwULEj8UGasiy75UCoe3rBwpnWaRBukfTf9faB8Tqz5kDv8+RKLqrM7WXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JZSvx0mu; arc=none smtp.client-ip=209.85.160.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-29fe7ff65e6so516104fac.0;
-        Tue, 10 Dec 2024 04:00:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733832045; x=1734436845; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=CeuXANmGOguSDViAcZD5/L/A/tELl/y8XnKm6SR/fLw=;
-        b=JZSvx0muV136GY3sm1j5FkND4oYU8GmwyEgPi92Tq8ElPMxeWZ5uRg+jqIYfritsje
-         sdrFFra5dmrivXzXy0M0izb7iwdGdDjDKjWARoGl4cyh35QX72QiGkHKl5kJzv8ST6Z8
-         5eI3h1HGNqeO2OoNOF53+W+CTaVTh3M7+dHbUQ6ez5+15bx+6NDhfk4eK3BUDL4IpR6r
-         cZnzLr04XdqYu6N5m00m/vg2MDqhNktje1AD6dxaPKzC/SQlX6N/YSd5bBQThUn/LDZ5
-         lwSTF71oajQ3KiMogokaznCWVAo/FFWQGCf77pn+Gn10BWDgUJ9j9fhQ+UQpwNBtrTMt
-         YCiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733832045; x=1734436845;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CeuXANmGOguSDViAcZD5/L/A/tELl/y8XnKm6SR/fLw=;
-        b=trIkVXroRHNLSi0TFo/pGHl4z9B8nSg/7fTBR67HPrWOVd8/Pev36n42aYNMzY7ZIE
-         MEBvmul+Q7ku6Uo1/PFnzQI+Kf/JgEoIk/Ty/pvumPC7klzqcz0ZSyiy4lDEAOWjJRGn
-         9CHGGhkyvimS1paWkqr5h6t/dtqsn7k5JcIfCnTT5aT2zI4Jdqc0957WdHBHSelyXMii
-         88Vrlg+fYxAjZuzIwHX/KBv9MgVUkz1dLLZ1puxVCpMq9fGplJ4rmU+TvxWIZGt5XTpE
-         YzHSk0+lR7/87GBielfPzT/BqRTg2et34SHSZhnZZjh9L0bnN4J3dPwIMPH8X75MxgbC
-         D2PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUQ2WPBclxH7tbNBTT/Jh4uvgvSPp1kw401udw3PK4hocWDehackviqmKFevT7YbTSMP1jMItI6LhR2QY1YSg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzrbjx3+84v0bNwuPpNwhma1ZVrhNNtGxa7XpMrDDs0sCStgWB9
-	7yt8NfxrdcW74CEbLiy/BhWR0jtuQhfwTko9IGe+RQaWwPRrucuvcGoKpuiBrePEJtSLQtMt/zw
-	5hVShHn4JV2QoJmLHvek2jiws4LU=
-X-Gm-Gg: ASbGncswKdUzoQKrqxsnuolaBzYfluMvU2phSVFqlrRQ1HdM4uhB4MhySqHIDH+BDrG
-	iH/9DJzaA8iVJ6u3dmXijotUQRiBzypi7eqz4EE6qAdRa3beSwHbdaphs//6q+GPALA==
-X-Google-Smtp-Source: AGHT+IEGTQ41KcjLQ4BiabwNoGuT16egEOvqFz0KXrZneZuslSGeftUpiWoAQbExXvvxlryZDrqPOZEnnOsfqz+325A=
-X-Received: by 2002:a05:6870:64a7:b0:296:aef8:fe9a with SMTP id
- 586e51a60fabf-29fee50a8cdmr2406739fac.7.1733832044955; Tue, 10 Dec 2024
- 04:00:44 -0800 (PST)
+	s=arc-20240116; t=1733832265; c=relaxed/simple;
+	bh=F2vLOZZmY8igUjUkHX7s++To+8YzE2ks8UcCli1UzT0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gf1mV5LzwRJN9SV/oOPX6D8EU6bvm2ai1OKDSUCtrlazBF5ANL95yeF7mULx8+UszO24bU2CpeaRt8cXdHtG7ZzPv/gAz/8nOyk7a1f7ghzeGkD/icI4DR32YDG9uXWMkTSyYc9JoMgae0eeJDHtau2g3+JtudhQk/fGKekbP6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=keaTljYd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D83B6C4CED6;
+	Tue, 10 Dec 2024 12:04:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733832264;
+	bh=F2vLOZZmY8igUjUkHX7s++To+8YzE2ks8UcCli1UzT0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=keaTljYdtvhbZr6tdyUiFN26lOk46uUerEryfn5Nj11vudpqTRjwbomkNiPqSNvWu
+	 Nc7HYjwzicqThyyeAv1WQfYSkvYoOr2F/EtEmxQexz1jZH09DgnTmdat678kHyokJB
+	 RvObUwSMDBaDfC69SOQ50a1RCGrWGVKB02b9yF/HRrxoM4oYDeXMQ5VeMZJeaUuLDt
+	 efTCYuz1nPf2Zt/Nq9YGvyZO4ydMji3w5eLZcWQm1auuoPOyaOZV1PBNx+wtsjO97d
+	 pagK7r4gje5v06dvugYIdbPROsw3eUxq/BcDFIIOVieufoHkdY+J1aYS68DZuNgWRE
+	 DtL9CG6q6Gbtw==
+Date: Tue, 10 Dec 2024 12:03:19 +0000
+From: Simon Horman <horms@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/7] net: ethtool: plumb PHY stats to PHY
+ drivers
+Message-ID: <20241210120319.GA4202@kernel.org>
+References: <20241203075622.2452169-1-o.rempel@pengutronix.de>
+ <20241203075622.2452169-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241203130655.45293-1-donald.hunter@gmail.com>
- <20241203130655.45293-5-donald.hunter@gmail.com> <20241203180714.45a2af81@kernel.org>
- <CAD4GDZyXDpbEoVFBzU-ExYcd_Gf-hHocPUFWAXBXJOcmMRrnSg@mail.gmail.com>
-In-Reply-To: <CAD4GDZyXDpbEoVFBzU-ExYcd_Gf-hHocPUFWAXBXJOcmMRrnSg@mail.gmail.com>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Tue, 10 Dec 2024 12:00:33 +0000
-Message-ID: <CAD4GDZwwjZvc1YXogJFdmqAA-1W66DdjYpxAKucmVQFDzbyY6w@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 4/7] tools/net/ynl: accept IP string inputs
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Johannes Berg <johannes@sipsolutions.net>, linux-wireless@vger.kernel.org, 
-	donald.hunter@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241203075622.2452169-2-o.rempel@pengutronix.de>
 
-On Wed, 4 Dec 2024 at 13:37, Donald Hunter <donald.hunter@gmail.com> wrote:
->
-> On Wed, 4 Dec 2024 at 02:07, Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > > +        if display_hint in ['ipv4', 'ipv6']:
-> > > +            ip = ipaddress.ip_address(string)
-> > > +            if type == 'binary':
-> > > +                raw = ip.packed
-> > > +            else:
-> > > +                raw = int(ip)
-> > > +        else:
-> >
-> > I wonder if we should raise in this case?
-> > Especially if type is binary passing the string back will just blow up
-> > later, right? We could instead rise with a nice clear error message
-> > here.
->
-> It's actually a bit misleading that the attr is called 'string'
-> because it could be a binary input if it was supplied from python
-> code, i.e. not parsed from JSON on the command-line.
+On Tue, Dec 03, 2024 at 08:56:15AM +0100, Oleksij Rempel wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> 
+> Feed the existing IEEE PHY counter struct (which currently
+> only has one entry) and link stats into the PHY driver.
+> The MAC driver can override the value if it somehow has a better
+> idea of PHY stats. Since the stats are "undefined" at input
+> the drivers can't += the values, so we should be safe from
+> double-counting.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  include/linux/phy.h     | 10 ++++++++++
+>  net/ethtool/linkstate.c | 25 ++++++++++++++++++++++---
+>  net/ethtool/stats.c     | 19 +++++++++++++++++++
+>  3 files changed, 51 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/phy.h b/include/linux/phy.h
+> index 563c46205685..523195c724b5 100644
+> --- a/include/linux/phy.h
+> +++ b/include/linux/phy.h
+> @@ -1090,6 +1090,16 @@ struct phy_driver {
+>  	int (*cable_test_get_status)(struct phy_device *dev, bool *finished);
+>  
+>  	/* Get statistics from the PHY using ethtool */
+> +	/**
+> +	 * @get_phy_stats: Get well known statistics.
+> +	 * @get_link_stats: Get well known link statistics.
+> +	 * The input structure is not zero-initialized and the implementation
+> +	 * must only set statistics which are actually collected by the device.
+> +	 */
+> +	void (*get_phy_stats)(struct phy_device *dev,
+> +			      struct ethtool_eth_phy_stats *eth_stats);
 
-I was wrong, the binary input is handled already by the caller, so
-this should just raise an exception.
+nit: There should be a kernel doc for @get_link_stats here.
+
+     Flagged by ./scripts/kernel-doc -none
+
+> +	void (*get_link_stats)(struct phy_device *dev,
+> +			       struct ethtool_link_ext_stats *link_stats);
+>  	/** @get_sset_count: Number of statistic counters */
+>  	int (*get_sset_count)(struct phy_device *dev);
+>  	/** @get_strings: Names of the statistic counters */
+
+...
 
