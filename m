@@ -1,253 +1,195 @@
-Return-Path: <netdev+bounces-150814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 043689EBA83
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 20:59:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB4E59EBA86
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 21:00:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2279918890F8
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 19:58:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 232D81663CA
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 20:00:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 814AB226873;
-	Tue, 10 Dec 2024 19:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FAD1925AC;
+	Tue, 10 Dec 2024 20:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="QDG8s910"
+	dkim=pass (2048-bit key) header.d=yourpreston.com header.i=@yourpreston.com header.b="KIfD2+ax"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazolkn19010075.outbound.protection.outlook.com [52.103.2.75])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D88623ED48;
-	Tue, 10 Dec 2024 19:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.2.75
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733860724; cv=fail; b=SBipTGu1FGzwG8YOGegavEFpee+v0oksFo3ePLM3insO8y4XoPIIZNuNAOCQJk/WxRRrLX47ArhrY+B8dwBp+79Z83JIuo8Xo2kVye2nJhnLNlWiwtDex3k6JErxNd22giBYOMexPhhvuQx5Cp+wtdOOzw4rW0VJ8SVtlGsp7uI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733860724; c=relaxed/simple;
-	bh=rsir4y9dY0qX6cx/97IfXoJrBveY32kx6i2uH3V3AKg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=jnqTkpwrVu3zKWMC88US5/sH+hhZtn6bEeSsE3nlmrLdF4SvRA6zbBTsMCWRgtCfzMKypghg8vNuIl0jIbAImkQmlzipGDyVZlHZIa7gsHmpobi1tE3hpjGRDl0Kt1rmF8DwnAUqwRUb27WjFzFLXAp88kNoHG3XWnHeCCiQyCc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=QDG8s910; arc=fail smtp.client-ip=52.103.2.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lwF0aiLSRlEwKZkvj0phQPLgZfUNecbeSY/UYOrW17lLBc0aYuV4uMT33KiBM5OGxS0UcEaaDyCEOQ1tDj91Pd6l1NECYvVz+jlaND9u5E+Mc1zYVhvniMa1IllcVuoX9cJvDDkJlVqMucEsYvNzCuDQV7y+skeNbgxTWUUp3nCNiBlGXdR5ELDYDFiCI9E2HIQtYtJuimVkXUNscZ6O6l1qIMXK7jiufgyrut+JaeHr6J4QuWQmsyRI3j3DiG67YLFELA/wmWNpgRWFc8mtbC6nNLcl5TKb9VH5ji7tANpGJN1R1vRVg0LDmLfNKGLS7tsR6YU9Pc2ObLkDgCsLBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rW79KDN71mrQeWuryG5j6P2hFF73Mc+W/MLHW6rtq/U=;
- b=XCZhRxGY+wKdTvf56qfkMTpTLlAS8EoiPAEo3GxfR2npNHnhf2FgruZsWVvgY3g3oRCnmd0LFQDppzYLwFadmcIQmibC2ZXPiYcDtGe05kPdosSvNIA2xTS9HWw3acyc9GeLNs5mNu7bZb62PtoCf7bV23HH11obNbM9WaluPD8QClg+06fvHi20KnvDwiSy4uh9ZBcL757yi6/s2AprPp1G4jheYObl0bAYup4hMgSuHDnC/HkMUW4df3EJzULGyFn0MoXA5ox2Utjq76udAkovh7heAp9t/KbPB0a1dfZCJxk0ILri5CcudJR4cXsI7QBJJW95+Njvym3vLvA0vg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rW79KDN71mrQeWuryG5j6P2hFF73Mc+W/MLHW6rtq/U=;
- b=QDG8s910KxOoxh5oq5Z8nYe4sI7d+0wApWwmQatg1T+KfPH139Yk7yd+QFQA5gkgGuPJtixoF030c/Sp7sbCEx2GwWvd//xG8Gc8UKqCYaBsgB0NG8BgoUBtyo7dhD+d5FS8/CGg9HrISsJaElZeTbE2RlZopB2hBhPFzx1/0fHMrdS+/JLNGHHxgaGagEyNSxDdqq1yaCy77ilzcgJeCCTK2RecaV40kZj6C9Z/p/fS/DrrUxmZD79xPuCKrpITirRia5rvefYHHJyo+tIlhsRuGC7Lz84TrC9NAUf+ujdahMfBQqQaIMAUP3lYWUWDILVPQyAOZdZiLJqjup0wVg==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by DS0PR02MB10251.namprd02.prod.outlook.com (2603:10b6:8:1b4::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.18; Tue, 10 Dec
- 2024 19:58:34 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df%4]) with mapi id 15.20.8207.020; Tue, 10 Dec 2024
- 19:58:34 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: "wei.liu@kernel.org" <wei.liu@kernel.org>
-CC: "iommu@lists.linux.dev" <iommu@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-scsi@vger.kernel.org"
-	<linux-scsi@vger.kernel.org>, Michael Kelley <mhklinux@outlook.com>,
-	"kys@microsoft.com" <kys@microsoft.com>, "haiyangz@microsoft.com"
-	<haiyangz@microsoft.com>, "decui@microsoft.com" <decui@microsoft.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com"
-	<mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
-	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "joro@8bytes.org"
-	<joro@8bytes.org>, "will@kernel.org" <will@kernel.org>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"James.Bottomley@HansenPartnership.com"
-	<James.Bottomley@HansenPartnership.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>
-Subject: RE: [PATCH 0/5] hyper-v: Don't assume cpu_possible_mask is dense
-Thread-Topic: [PATCH 0/5] hyper-v: Don't assume cpu_possible_mask is dense
-Thread-Index: AQHbFUf6M+mdOKKgFUaLQXc7WEQESLLgTs7Q
-Date: Tue, 10 Dec 2024 19:58:34 +0000
-Message-ID:
- <SN6PR02MB415740B41A34B1468BC6AE28D43D2@SN6PR02MB4157.namprd02.prod.outlook.com>
-References: <20241003035333.49261-1-mhklinux@outlook.com>
-In-Reply-To: <20241003035333.49261-1-mhklinux@outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|DS0PR02MB10251:EE_
-x-ms-office365-filtering-correlation-id: df333536-2459-454f-a6f6-08dd195507a0
-x-microsoft-antispam:
- BCL:0;ARA:14566002|8060799006|15080799006|19110799003|8062599003|461199028|102099032|10035399004|440099028|4302099013|1602099012|3412199025|1710799026;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?jBf+DqfS2VsHJe9vrGb8dR2RikHyxnyznSKXWYhuYcoYp16bFh+woV1I4un8?=
- =?us-ascii?Q?DDQ/+xE9n7QaNFl1aQSPTfNOVfMyN7nN4AkdLIrkajjoJLsjw39IVuZoswni?=
- =?us-ascii?Q?v5LFBaTckn6t/ENCMFvixvVjTGDhBxC80Wsy+TfAB3RFbQIjt9R9/d+1UBy8?=
- =?us-ascii?Q?xPzK6NrNxwFleQmJk3zdaPZ85YWOaHUIHWmeMTJI0gxlXiEEGQOYwLMAvEcm?=
- =?us-ascii?Q?bLR/72KFfQ9jYE5hU+xA0iZey6ocQtfIID7AMTHfW50pdfGfRPx6OS5Q9tuU?=
- =?us-ascii?Q?Qt1+oyE9qm6W9sbTliwXfQdve9y0b3q6vyigaJ6evU16w4/DlTh8v6mxwjJ8?=
- =?us-ascii?Q?Zutg8PRXnFH887jGe76NXMhj9nfpBAUBbNLV1R4bKxgZCXu+89f7BOadRXdk?=
- =?us-ascii?Q?bB0XDiqkq2SH1DehCby31j8ys65nxdK/04HlXKor3qgEBA61XIwCT3Yi3muD?=
- =?us-ascii?Q?7BZLsqeCHVRQ26CKFlbl6ph2ks8BfrphQ0gwlxUhC5dcwt0mmDnbnCXbnyQa?=
- =?us-ascii?Q?KCyitrzSVkxlaIk1yOPXGp1341ZtXJrVFvOM8otNW0ygIsefUwzb9LI3Mr4K?=
- =?us-ascii?Q?BKrU75R1JFx9ZblOpIfLK+MIWTUWxAyMxGlP1H0v+NGKt0GJBGQJcb+a+JID?=
- =?us-ascii?Q?1cxSXoP2vZZI584ubEamT/fyKDzNDIp33ZRzXf26Ji8iSNKRoVwP2quKCXSw?=
- =?us-ascii?Q?1UCsAqy27MUQKkTVsLFlFhU0Xff0ouylX+wE9v1uj5bYvnNec6Wk6OAjiah/?=
- =?us-ascii?Q?p90ZtHcafkuQJFs2EbClAsESx6GXlHoxQ6G5bzy6iIM/TYGt/rg+y+6kFeRc?=
- =?us-ascii?Q?PXx/8+x6pyQTE1kO4Hgw8aYqfUaV1KZvnyLqRkJV2LRt1F7XFuivgaF5OPld?=
- =?us-ascii?Q?uYGjxxR5zqWoolCvQLuZTEc/HVTxzCzQGhP4j6nJMOGZAFmAsJdJ/QUwuCol?=
- =?us-ascii?Q?8xUZ9/lXq4GoiyXQ29ALn1Akvg1DabLqExpfe9M1Zkre0JFsDXwnO7r/G/3Q?=
- =?us-ascii?Q?rNr4+O8PoAGhh5eNS3YEDi2GeZ5xd7ij7xCkdyHjNTxTSZAOSsuZqdQ5ucGL?=
- =?us-ascii?Q?JaohJjY2ZFt5Ar+LLaWVixJ85OgIC9czL+L4c+Cq8kZGSor9j5ZB0tL7oYd4?=
- =?us-ascii?Q?O6W8xz6L/Fyv8BxlwrLPxj13wi9QyGbbu6IpxyK8bRWqh9ITVG9L8Bl+Jfos?=
- =?us-ascii?Q?JuFpIs6FHhp29xJGXC0rJjXuyhE2hNnyWhS47Q=3D=3D?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?kys+2F4RNOG5wrfqf5xmmbPsvKAil8AuZQ6zt6ao2bwgMrevA8JADLG+jk6i?=
- =?us-ascii?Q?PJHRGcnYUvmAtOBQMV7u6ZtozTxlJy2gHk1CGt1Fxx7IDlsbMQsou6+jb5bp?=
- =?us-ascii?Q?SiKkxVGZgkwDJZ1A8njn91n6wmC/GBLkcmRrUgUG0C7Qvyk2FjEVP9akWV1e?=
- =?us-ascii?Q?VvAM79owWDcSBCIO10wJpW2FQIHQY7gpnxpIysjwB9Dfj8k8SDwm3K1CMgPG?=
- =?us-ascii?Q?P4K8QpSqZbK4HNP6XoAJqwUZLOlDudlR7Yi1DpUx/h/fMSMW9KriKyqeDH8H?=
- =?us-ascii?Q?0Fphw2xc4y2TksuSgUACzoKZIaK/BnL3JMEKS9htYitIY9psU8SGNPBx4FuF?=
- =?us-ascii?Q?EGZ2XmGVa+q2sOPa/Rk19p7Nh+DRr9K4lzKy2o9+FbKhCRBmbL1Gak0oHq8P?=
- =?us-ascii?Q?kKhPLyjZwPztuTAF+YRPkruQ7dgVrEQLWYW4krimKiiliwBdVjExYLqE5iL/?=
- =?us-ascii?Q?0bH8TQk00oa91WO3EOkzYHiCIJW7nSO/qCjlHS2bJGyBo+hSxFH8/JuPzr5x?=
- =?us-ascii?Q?49SC9Qjm9P3+8G6P9NB1APvGI1Hc9yGEKTx4cDKq46kzAEYLCvi3qsQdCJy9?=
- =?us-ascii?Q?OKQaFNnbnZrTiyZiIqbFmWV8U1ok9i048xMY0kJZo8JX3SvKh45SDfsrhkbm?=
- =?us-ascii?Q?GRyHl00uEaGT41inPE0etZe3FnECuhZCdi61R5FhiJ5wiYSVIrQqux5jWAid?=
- =?us-ascii?Q?G9M7fLIV9mDqyTquniyZ9MB+H/oOMtQS2Y4pPXKW8VZnMRECpe++TmoRyzyd?=
- =?us-ascii?Q?uF1ijsHZnYz7r0PfI5puij1cKYfI50n4OWKuufbzLWrIawpkYbNrgeKYco/0?=
- =?us-ascii?Q?4BXa+stpMb+TZGHFDgwRitddy2hbB20F+/fR38JoEIQODParEG3rlATXVhsk?=
- =?us-ascii?Q?oA0R+1avtzOeyCQdYFfYRtqnLnSEmXSlpNL5k24IAKKxJzhPwl/CDBII8Ykh?=
- =?us-ascii?Q?Nr5MogIEJ4Nq2L/jMgikWzGk+iXnFZzoxhGlUhoYi7uEpYJdT2fecJ/E9fh+?=
- =?us-ascii?Q?I0ehX4alfIMexcZ85d8pA/uuDkuyBF8NUeC4wdRo4NuHeMg9tURADROwf+Yt?=
- =?us-ascii?Q?Tx/LScDExpjVWr1Ew8SjnNQsZPTbMWbBQy2Y7F91jS0Iqe7yKe+R05AOhivW?=
- =?us-ascii?Q?jAUOalmGtoVSse6F7x8A5psPEsnqCVIv2/HE9Dhs3sI8g0Uo70dYdslglXC4?=
- =?us-ascii?Q?jatLNPRdlYFtE/rMUY5aAu2+8j/PQK8KhVeavMUY3JoYZESuSAvRjjD6lsM?=
- =?us-ascii?Q?=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DEE2757FC
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 20:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733860816; cv=none; b=g54IOHQ9lPuQQwr4dmoO6alxrIHbTDiZzJCNQSXiLr8tHMzehVMZk2PbF8ieu25Ngjw2JaVQFdjDSwL+62L9D1gxSxiNxbh0p0KauZgj85sU3G5NrMRZOAVa1MHIZA6iVWwwZKD/Ey8dV9tj66SRc+NZGI8JPfhemhzCR4Msc4A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733860816; c=relaxed/simple;
+	bh=c3fr1wtzS/5jBuSSNHJMgbRfXvwPi88T4XC02rNSLKc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qm6lkvD5y+3h50x8dG2VJh7iLe9YB0el4YmbPBBoDlHQ8PbEXLSV258zmurXZcuof6lNdD2V7wGOoEZ+/XcUU7jNHX9aXzUdSVgvQs+u+g/jIDFhwTTPWN6h1nPBxwQg7rFzVlk6O4CEZBcOUork9jqdypgppaRuiNBI+SZCxNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yourpreston.com; spf=pass smtp.mailfrom=yourpreston.com; dkim=pass (2048-bit key) header.d=yourpreston.com header.i=@yourpreston.com header.b=KIfD2+ax; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yourpreston.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yourpreston.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-6ef9b8b4f13so58966177b3.2
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 12:00:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=yourpreston.com; s=google; t=1733860814; x=1734465614; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pfQp0JlFTl1xmBKV3vJInXnCkVM3op5a/F/0dP17T2s=;
+        b=KIfD2+axHfErkfb6MltoqVZx2ydexzQr8rWETsDgaIrx77v370ZVkwPCkJgXp3QUaV
+         tIUjRFxWZzTr9avT1xyr93W/x0wuCXAfAm8y72NdsjemhVNNL7HBbbX14wYtHEYZ+/te
+         yJi2rYfQ9LV/TjFMe7GAdh5gSfrUJtofYMDeM20oCAl4TtxGRgg7KuEwwDoX8IbF7oMZ
+         ydgQR4882D2t2zr2uYrITCxm0GeiIjSuIwfKaoaTSApg65r2ym+TNbXLGNBaKweFM/Sa
+         H3Pkzd9pzU85AnIYiqkPWd18mUeyI3j+cQADrFcpPi75sGROfiNt4/Kg86J/i5WNZGSk
+         dX6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733860814; x=1734465614;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pfQp0JlFTl1xmBKV3vJInXnCkVM3op5a/F/0dP17T2s=;
+        b=bd/UXWkoTLzKG2j9s5DEJ13Cezdu4VVdgEDkGeyKc5iPnfpBHNhrnhh+so4U+EN4mO
+         1cjs09IPYB1o/tAUdva0HjsxbBcCXSLqZIIqMdMgVnaIx5vkQUPyADRP75N8lroAPY9G
+         Y19G687ZX4CuXkOMbsQkHCj4JHtM6T3wmBVtMWWNHD71haPt9GDRgkIdmR5eF3Qn1rrO
+         l9hNSt86450loytJ7QB3R1WCvosnO1YgVH2t9/JY/yUAqQOF+mG0B4DO27HsCOj92GUt
+         LgPOFIPsqN7MY25zAfvyTgo0lwpkQ0mdOa3N0PUAZgr6Nm4UICV78g8JjGI52edc1rfR
+         snZg==
+X-Gm-Message-State: AOJu0YzoWsqiTLtMvlLaEFeYMS31tLztHprQmM3iy3kF3pC6Arms1bH3
+	cOg+YRaTqIM/UcXzWPpzgk3Hkh1KEMLA0eOe5uxwQH86oByT83HO59KcKxd33lZkshK3uhHXf2L
+	XzXXQAj+ukEm24iKjJa44RzU0TQm/ry0Qo/cY0hqk8OFAsQPz0WM=
+X-Gm-Gg: ASbGncu3YhnXnXE3X2ieizp5loqfBA90r9j10JMplvhcGBnhIdEieRvqPj7Zw/qetKE
+	ZzVfZJTRH6h0jJNUkrKBjpX9Xem60vtQRkXxorspf+qh8dW0SCBNjdzZ+18IeWyuEuA==
+X-Google-Smtp-Source: AGHT+IGTlnRw6KwSWB29tMEmjXSzSCm7lkVWlBZScVgSlKROYYjEXtWXZTe9txtXqe+gHv+rqB1fjLELC+Qld+ePpNw=
+X-Received: by 2002:a05:690c:6c0f:b0:6ef:6fef:4cb6 with SMTP id
+ 00721157ae682-6f147dd350bmr7640637b3.0.1733860813806; Tue, 10 Dec 2024
+ 12:00:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: df333536-2459-454f-a6f6-08dd195507a0
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Dec 2024 19:58:34.7083
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR02MB10251
+References: <CABBfiem067qtdVbMeq2bGrn-5bKZsy_M8N-4GkE0BO6Uh7jX1A@mail.gmail.com>
+ <3e6af55f-3270-604b-c134-456200188f94@katalix.com> <CABBfie=3+NBmjpVHn8Ji7VakEo9-JMKDH3ut5d1nXnDneC0tPw@mail.gmail.com>
+ <ed0ffb72-3848-d1be-6903-d6ab21a0f77f@katalix.com>
+In-Reply-To: <ed0ffb72-3848-d1be-6903-d6ab21a0f77f@katalix.com>
+From: Preston <preston@yourpreston.com>
+Date: Tue, 10 Dec 2024 15:00:03 -0500
+Message-ID: <CABBfienZDG=kFMfGe=Awa4ZhuhGTRRy7uGcPjWaZLiGi+XWBDA@mail.gmail.com>
+Subject: Re: ethernet over l2tp with vlan
+To: James Chapman <jchapman@katalix.com>
+Cc: netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: mhkelley58@gmail.com <mhkelley58@gmail.com> Sent: Wednesday, October =
-2, 2024 8:53 PM
->=20
-> Code specific to Hyper-V guests currently assumes the cpu_possible_mask
-> is "dense" -- i.e., all bit positions 0 thru (nr_cpu_ids - 1) are set,
-> with no "holes". Therefore, num_possible_cpus() is assumed to be equal
-> to nr_cpu_ids.
->=20
-> Per a separate discussion[1], this assumption is not valid in the
-> general case. For example, the function setup_nr_cpu_ids() in
-> kernel/smp.c is coded to assume cpu_possible_mask may be sparse,
-> and other patches have been made in the past to correctly handle
-> the sparseness. See bc75e99983df1efd ("rcu: Correctly handle sparse
-> possible cpu") as noted by Mark Rutland.
->=20
-> The general case notwithstanding, the configurations that Hyper-V
-> provides to guest VMs on x86 and ARM64 hardware, in combination
-> with the algorithms currently used by architecture specific code
-> to assign Linux CPU numbers, *does* always produce a dense
-> cpu_possible_mask. So the invalid assumption is not currently
-> causing failures. But in the interest of correctness, and robustness
-> against future changes in the code that populates cpu_possible_mask,
-> update the Hyper-V code to no longer assume denseness.
->=20
-> The typical code pattern with the invalid assumption is as follows:
->=20
-> 	array =3D kcalloc(num_possible_cpus(), sizeof(<some struct>),
-> 			GFP_KERNEL);
-> 	....
-> 	index into "array" with smp_processor_id()
->=20
-> In such as case, the array might be indexed by a value beyond the size
-> of the array. The correct approach is to allocate the array with size
-> "nr_cpu_ids". While this will probably leave unused any array entries
-> corresponding to holes in cpu_possible_mask, the holes are assumed to
-> be minimal and hence the amount of memory wasted by unused entries is
-> minimal.
->=20
-> Removing the assumption in Hyper-V code is done in several patches
-> because they touch different kernel subsystems:
->=20
-> Patch 1: Hyper-V x86 initialization of hv_vp_assist_page (there's no
-> 	 hv_vp_assist_page on ARM64)
-> Patch 2: Hyper-V common init of hv_vp_index
-> Patch 3: Hyper-V IOMMU driver
-> Patch 4: storvsc driver
-> Patch 5: netvsc driver
+On Thu, Dec 5, 2024 at 3:00=E2=80=AFAM James Chapman <jchapman@katalix.com>=
+ wrote:
+> Please don't top-post.
+Apologies, first timer.
+> Are you configuring an IP address on l2tpeth0.1319 and capturing on
+l2tpeth0?
+I'm running dhclient on  l2tpeth0.1319, the DHCP discover from that is
+the packet you see in the screenshot. The pcap is being taken on the
+physical interface.
 
-Wei --
 
-Could you pick up Patches 1, 2, and 3 in this series for the hyperv-next
-tree? Peter Zijlstra acked the full series [2], and Patches 4 and 5 have
-already been picked by the SCSI and net maintainers respectively [3][4].
+>
+> On 04/12/2024 21:04, Preston wrote:
+> > l2tpeth0 is not attached to anything, it's created by the `ip l2tp`
+> > commands. But since it's encapsulating and setting a new destination
+> > IP address, packets are referred to the route table.
+>
+> Please don't top-post. It makes it much harder for other readers to
+> follow the discussion. I'll repaste your reply below this time.
+>
+> > On Wed, Dec 4, 2024 at 6:48=E2=80=AFAM James Chapman <jchapman@katalix.=
+com> wrote:
+> >>
+> >> On 03/12/2024 16:14, Preston wrote:
+> >>> Hello folks, please let me know if there=E2=80=99s a more appropriate=
+ place to
+> >>> ask this but I believe I=E2=80=99ve found something that isn=E2=80=99=
+t supported in
+> >>> iproute2 and would like to ask your thoughts.
+> >>
+> >> Thanks for reaching out.
+> >>
+> >>> I am trying to encapsulate vlan tagged ethernet traffic inside of an
+> >>> l2tp tunnel.This is something that is actively used in controllerless
+> >>> wifi aggregation in large networks alongside Ethernet over GRE. There
+> >>> are draft RFCs that cover it as well. The iproute2 documentation I=E2=
+=80=99ve
+> >>> found on this makes it seem that it should work but isn=E2=80=99t exp=
+licit.
+> >>>
+> >>> Using a freshly compiled iproute2 (on Rocky 8) I am able to make this
+> >>> work with GRE without issue. L2tp on the other hand seems to quietly
+> >>> drop the vlan header. I=E2=80=99ve tried doing the same with a bridge=
+ type
+> >>> setup and still see the same behavior. I've been unsuccessful in
+> >>> debugging it further, I don=E2=80=99t think the debug flags in iprout=
+e2's
+> >>> ipl2tp.c are functional and I suppose the issue might instead be in
+> >>> the kernel module which isn=E2=80=99t something I=E2=80=99ve tried de=
+bugging before.
+> >>> Is this a bug? Since plain ethernet over l2tp works I assumed vlan
+> >>> support as well.
+> >>>
+> >>>
+> >>> # Not Working L2TP:
+> >>> [root@iperf1 ~]# ip l2tp add tunnel tunnel_id 1 peer_tunnel_id 1 enca=
+p
+> >>> udp local 2.2.2.2 remote 1.1.1.1 udp_sport 1701 udp_dport 1701
+> >>> [root@iperf1 ~]# ip l2tp add session tunnel_id 1 session_id 1 peer_se=
+ssion_id 1
+> >>> [root@iperf1 ~]# ip link add link l2tpeth0 name l2tpeth0.1319 type vl=
+an id 1319
+> >>> [root@iperf1 ~]# ip link set l2tpeth0 up
+> >>> [root@iperf1 ~]# ip link set l2tpeth0.1319 up
+> >>> Results: (captured at physical interface, change wireshark decoding
+> >>> l2tp value 0 if checking yourself)
+> >>> VLAN header dropped
+> >>> Wireshark screenshot: https://i.ibb.co/stMsRG0/l2tpwireshark.png
+> >>
+> >> This should work.
+> >>
+> >> In your test network, how is the virtual interface l2tpeth0 connected =
+to
+> >> the physical interface which you are using to capture packets?
+>  >
+>  > l2tpeth0 is not attached to anything, it's created by the `ip l2tp`
+>  > commands. But since it's encapsulating and setting a new destination
+>  > IP address, packets are referred to the route table.
+>
+> Are you configuring an IP address on l2tpeth0.1319 and capturing on
+> l2tpeth0?
+>
+> >>
+> >>>
+> >>>
+> >>> # Working GRE:
+> >>> [root@iperf1 ~]# ip link add name gre1 type gretap remote 1.1.1.1
+> >>> [root@iperf1 ~]# ip link add name gre1.120 link gre1 type vlan proto
+> >>> 802.1q id 120
+> >>> [root@iperf1 ~]# ip link set gre1 up
+> >>> [root@iperf1 ~]# ip link set gre1.120 up
+> >>> Results:
+> >>> VLAN header present
+> >>> Wireshark screenshot: https://i.ibb.co/6rJWjg9/grewireshark.png
+> >>>
+> >>>
+> >>> -------------------------------------------------------
+> >>> ~Preston Taylor
+> >>>
+> >>
+> >
+>
 
-Let me know if you have any concerns.
 
-Thanks,
-
-Michael
-
-[2] https://lore.kernel.org/linux-hyperv/20241004100742.GO18071@noisy.progr=
-amming.kicks-ass.net/
-[3] https://lore.kernel.org/linux-hyperv/yq15xnsjlc1.fsf@ca-mkp.ca.oracle.c=
-om/
-[4] https://lore.kernel.org/linux-hyperv/172808404024.2772330.2975585273609=
-596688.git-patchwork-notify@kernel.org/
-
->=20
-> I tested the changes by hacking the construction of cpu_possible_mask
-> to include a hole on x86. With a configuration set to demonstrate the
-> problem, a Hyper-V guest kernel eventually crashes due to memory
-> corruption. After the patches in this series, the crash does not occur.
->=20
-> [1] https://lore.kernel.org/lkml/SN6PR02MB4157210CC36B2593F8572E5ED4692@S=
-N6PR02MB4157.namprd02.prod.outlook.com/
->=20
-> Michael Kelley (5):
->   x86/hyperv: Don't assume cpu_possible_mask is dense
->   Drivers: hv: Don't assume cpu_possible_mask is dense
->   iommu/hyper-v: Don't assume cpu_possible_mask is dense
->   scsi: storvsc: Don't assume cpu_possible_mask is dense
->   hv_netvsc: Don't assume cpu_possible_mask is dense
->=20
->  arch/x86/hyperv/hv_init.c       |  2 +-
->  drivers/hv/hv_common.c          |  4 ++--
->  drivers/iommu/hyperv-iommu.c    |  4 ++--
->  drivers/net/hyperv/netvsc_drv.c |  2 +-
->  drivers/scsi/storvsc_drv.c      | 13 ++++++-------
->  5 files changed, 12 insertions(+), 13 deletions(-)
->=20
-> --
-> 2.25.1
->=20
+--
+-------------------------------------------------------
+~Preston Taylor
 
