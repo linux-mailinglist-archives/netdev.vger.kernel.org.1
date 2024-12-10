@@ -1,234 +1,291 @@
-Return-Path: <netdev+bounces-150630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B6A49EB05B
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:04:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28D6A9EB06A
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:05:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 480081889BBE
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:04:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F5DE1889C78
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:05:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37BA1A00F8;
-	Tue, 10 Dec 2024 12:04:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310611A0BC9;
+	Tue, 10 Dec 2024 12:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hi01AtYE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eIYKa7D9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C56323DEBA;
-	Tue, 10 Dec 2024 12:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733832244; cv=fail; b=YnrwXDwnrvggJz4RDEK8POvoOQvIo+bs04y4lt26u593R5Gib3dtT0TRaSHI6fHi/EaC/gV9aQdZlJiLqLKRhkWnhuZam3FULLXg3SVMN4+UfbfwgHSF0FXyng3NhYFy2A7kEbcu7yEIPuWtdTrGCpn8E9SZI5Zsp5ykl6yMh3Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733832244; c=relaxed/simple;
-	bh=nCEA4G/gPVkUtBAfrvRzg2TCSY0Th4WlN304Sh2fkM0=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=L+NNdXVzyTRpwQCTNKDyDigjSeUsheVa3lBoXancisvApSao8x48M+kKSiB26CBK0ASkkx9jU1RlfmmIvsXuKAbOcunFSj0EgXStGUXAvEazhJkU+N+BK3EJ06nWUu0p+K7P/DV3Oj48mgZ6AFlYLti/aV0U689i8ehG7SqTjYw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hi01AtYE; arc=fail smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733832243; x=1765368243;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=nCEA4G/gPVkUtBAfrvRzg2TCSY0Th4WlN304Sh2fkM0=;
-  b=hi01AtYEauXZaPshRqEEwtg5xaDn3YTB/PqRBEn2f/JQQviM7wBiRVPT
-   2gbYC/ks9ybWyjtyZDRriegyo5qahU27rW0YazyvteEfOkGjoK6J/s/w8
-   Vtc20gMWiXWWYN3YDHBIUrHlh0EQgp1PtFznoNwgxp2rUqrfIZwOU3Q3P
-   zlXPXNkjGxEq0hwz1HFdW3ageUlsSUxufkTc1oredktS/5JpcLEiyIci0
-   ydxHQ7t34MRz1JUNi+Vqt5klMIuaz8j9ZOK4f4wWL+DfcILgQdQbvt673
-   O7SKUVORSWG7LlLLL6MEzzn7ImUL5vlR2aUfJbatdUDodtBi37Ld4nhax
-   Q==;
-X-CSE-ConnectionGUID: FHDFuBj9RVGaylELxnG3KA==
-X-CSE-MsgGUID: hCPmtAqVR5GRRNMNKzo3MQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="45182974"
-X-IronPort-AV: E=Sophos;i="6.12,222,1728975600"; 
-   d="scan'208";a="45182974"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 04:04:02 -0800
-X-CSE-ConnectionGUID: RrYH9CarTuG85IJXsvIXeA==
-X-CSE-MsgGUID: fL95YMvyQy+oc2R8vZkxfA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,222,1728975600"; 
-   d="scan'208";a="118637326"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Dec 2024 04:04:02 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 10 Dec 2024 04:04:01 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 10 Dec 2024 04:04:01 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 10 Dec 2024 04:04:01 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=eWk5h0YCj3vaBd5IBqpBMER6gTI2zp+abR/ycw1w+ySMD3tqVM9HFq5Nv56yygAiUpNw1dKJpm+TwXZk5gHRpwbf6qZsTUrLzqsyGzL5kt6OMKZMm+EE06d7XNbqmPVCU+IxcNPHOGBsLiOJVgaaTDFPO0KvXTmbfR5uqDSBrdBIHc8QX/cNPijGiBv89XPDAQZqyiRXPclYk7YIUtQaJyPuJnk8ua315BbvYka9PKCRTBhEiVlfIoHoJzsBxIEXmybTyoQ4Gcj9U5sPLy0dKNaTZfdx/BAts5Sr6zvrWwRvtEqSo4HCcbs46l5FE1JHmqVcvgKXbsar3uh0WDIV4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UnS+6tDsS0/FUwl0ZwegRV2+fOFkvVI89Bcaa2WqxXQ=;
- b=Efdgt3JXCIw73eNJG08aNyp7fLmU8DJGm5mvurpYkGRXPUsSzVAFKMdo7Idkx36WlIfxHgpz25BcfjxE78qAS93DXAOMJFcg+71CLPApC84D/3MR8U+B/GgUg2YxAYukVrTFmRnU6giwOhGn9RE4sWNpZ1g5rqOE0BkV4hwTmijUVhm1aGj9/XPc0R+efE2LjGoVKcCDa8zeNL8/5CAAGJ1Jb6Sk8mvBJt1HNGmU5OXFxLee3kuwDkY8BJTQbNLcmsoSfZLrrcPebA8iDEA+yM+BHEDdoMeZfjl2dkLMcLOJTq14E5sIGCgRufwinTD9k50gAVE231W3nPZpr/dFbQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5399.namprd11.prod.outlook.com (2603:10b6:208:318::12)
- by DM4PR11MB5246.namprd11.prod.outlook.com (2603:10b6:5:389::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Tue, 10 Dec
- 2024 12:03:59 +0000
-Received: from BL1PR11MB5399.namprd11.prod.outlook.com
- ([fe80::b8f1:4502:e77d:e2dc]) by BL1PR11MB5399.namprd11.prod.outlook.com
- ([fe80::b8f1:4502:e77d:e2dc%5]) with mapi id 15.20.8230.016; Tue, 10 Dec 2024
- 12:03:58 +0000
-Message-ID: <7801c223-b45f-4f21-9ba1-bddce2ab0d9e@intel.com>
-Date: Tue, 10 Dec 2024 13:03:44 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1 1/1] net: phy: Move callback comments from
- struct to kernel-doc section
-To: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, "Jonathan
- Corbet" <corbet@lwn.net>
-CC: <kernel@pengutronix.de>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Simon Horman <horms@kernel.org>, Russell King
-	<linux@armlinux.org.uk>, Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	<linux-doc@vger.kernel.org>
-References: <20241206113952.406311-1-o.rempel@pengutronix.de>
-Content-Language: pl
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Organization: Intel
-In-Reply-To: <20241206113952.406311-1-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1PR09CA0131.eurprd09.prod.outlook.com
- (2603:10a6:803:12c::15) To BL1PR11MB5399.namprd11.prod.outlook.com
- (2603:10b6:208:318::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4889019D899;
+	Tue, 10 Dec 2024 12:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733832291; cv=none; b=unknrnsd/W7AVzGXUAt0bJryHN596y1LzdtctAb/pd1x7Q1XICu68CWa/6jrCOkj4UswpSQ9Tn6GBAk8TcbxU5UWyyi8LRfMKtZMC3MmqOfu/NIs14gm9S9ChB+qyY4J/GxfEZwz9xJthSqvkJ32uBpukzdznLFpP0H/wztTv9M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733832291; c=relaxed/simple;
+	bh=4Q6CsvGPnuH0ETC75y3qRAUwZ44hv95JrCnAXeuNh7o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ixuMDaO2wuddGpIF9bgL4XhvxWwyETvQe3zc1EN22UxiAZIDH86u/ZSDy+E9NU8Z7RBRNexXxPqj7wDl3NLeiM9VcvNUiAnA5ukKjdAM2Gz0G7QBbmUTbO4iCPQxmcpY7/T3tHYcH0mBxT7ZblFjsm3AFqDwKrYG8ij7IHv/nmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eIYKa7D9; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-434f74e59c7so23948565e9.3;
+        Tue, 10 Dec 2024 04:04:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733832287; x=1734437087; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QgudF5Nx9tpuAdpAJYzbdPOGbyZ+TN1kZnvYR7ObIaM=;
+        b=eIYKa7D9qgywAuz9eK4LqJlmDHSq3IXlYicxiZbxe6MblbSs2gSeYjI4+EzsoMv6z4
+         +rZ0xoSE+UfPT8Wamv8yr/mqmB6NFB3FRDaL1SuJU4iN7RN4AOxhjLiw4Gn8zcmGT60m
+         xp8mhzPgpF/AYOyDmfPR/PE8rNsWgPGL4cyMQX7zRcb0rvQNW61mkLg+83jK4ukYkrb0
+         /qF9WQN69e6f9Fxk9Zq7BnJBXdYekWDPvlagg9ZKdIPy12D0uTda0+z31U9bzpLRyOeV
+         ygShpQc5fkyBqGUVZVdPlcJxOoL18xeunJhq3F52e7xz0wIY7wOJLkeurV7lXmhmNcEi
+         aiXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733832287; x=1734437087;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QgudF5Nx9tpuAdpAJYzbdPOGbyZ+TN1kZnvYR7ObIaM=;
+        b=OkTXzqZboo9XOjxz7c3dAAUglLFF8TGcnZQ07hzMLoX2HfZB8jaBBOd0MyixORD+b/
+         ouTD5kRlpGW1J0xOetxwra/70/QBsR2oXP+Gdj1RfXFrkhebhX+T0H+EP3r88yrG/+/G
+         UMyIE5Klci1uKnmCbZ5f5yTJKhYdEflp9MhJY+7YfB+rWlegBn6tiT/cYmLg55DyqA+V
+         6x8pvAuYwymACbnUOJgp5RLTRk6QmvwXac0saSnbBk7rzLUCtKkr9u3TAeKmv9XxIVSf
+         4w90+frUjaWtMIt6IdMZtuokC6SuvQT6BvGstxoHKpmfRKvfAuhBkPWIoQzDAGb5+K0L
+         72ag==
+X-Gm-Message-State: AOJu0YzMwUmRuVs7mSojhO2B2ZjcIpCkEBgs8uXFwxF7Mmg7GC8SdJkG
+	t/qx4tX8b7BjmMzXiK4V5FgdWMoFKa0ThvRaJUbxNnqjQ7ZZkf2HUjmRXZJxXfs=
+X-Gm-Gg: ASbGncuZcttpU9Lds2Q0A75ujnHvaZ0aJUlVcjWvV4wPsW3eTVytxJZoVMBID0NTsgQ
+	BOkANlplhic6K2bCzYR4AP+Y9YeT6DqvDN3QXWwjW288bPMK/qyo4elZR4zB0kSL77enYWHPrfx
+	2j5T1ealChnZjGNKVQddGk+QekTh5jbMhM80J/bEpJcBA1Nhw9fGh6s/xgUNMQ1oOCeLpycfGXx
+	70Hv+xmP+EqWobQHFwZu9Bt7qfP4x9N7N5UoalAZKsfD6KP3dWdbQTympCRBxjI+SF91NtlXNIw
+	AEM0Bw==
+X-Google-Smtp-Source: AGHT+IHWwg6YQFgOL9tD0hIZDaWPodDDLRhw7DPHwkp+hTU/M+qtNI2/McfM6WSn2Tr3AiWKBqNBBA==
+X-Received: by 2002:a5d:59ae:0:b0:386:3a8e:64bd with SMTP id ffacd0b85a97d-386453da219mr4093626f8f.22.1733832287115;
+        Tue, 10 Dec 2024 04:04:47 -0800 (PST)
+Received: from KJKCLT3928.esterline.net ([144.178.111.91])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3862a9705dfsm13446132f8f.4.2024.12.10.04.04.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Dec 2024 04:04:46 -0800 (PST)
+From: Jesse Van Gavere <jesseevg@gmail.com>
+X-Google-Original-From: Jesse Van Gavere <jesse.vangavere@scioteq.com>
+To: devicetree@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	Marek Vasut <marex@denx.de>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	UNGLinuxDriver@microchip.com,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Jesse Van Gavere <jesse.vangavere@scioteq.com>
+Subject: [PATCH net-next] dt-bindings: net: dsa: microchip,ksz: Improve example to a working one
+Date: Tue, 10 Dec 2024 13:04:43 +0100
+Message-Id: <20241210120443.1813-1-jesse.vangavere@scioteq.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5399:EE_|DM4PR11MB5246:EE_
-X-MS-Office365-Filtering-Correlation-Id: fe1a6eca-08b2-4163-65e3-08dd1912ba89
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|366016|376014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?SjI3OG9jQVNRM1lmSU04OVhVVVZXVUdKUE1tQUl0cDVVTGpmNEZheU1CRlVy?=
- =?utf-8?B?UzhOV2hjOUtRT3hqN1hSSm1mZFg1MlZTY2ZXSHc4c0R5S3cxOFgxUkRmbWhn?=
- =?utf-8?B?SlovY0JRajlBWnh1VzJ5KzZMUU51M0tVUFZudVA4d3A1YkpWbjQzNlR3WHZR?=
- =?utf-8?B?eWNQZ2hQZVF0ZWx4dE5nYnVQZTFnaExGRk53Wk1vTVpoQktTMFpYakVsQnRN?=
- =?utf-8?B?azhLeFZjUEpnVmpIUEV6ekV1Zy84M3hwRnNvbVhiVmY0STh1VDlCazF1QUpG?=
- =?utf-8?B?L00zT3pLRUM1S1hndklXcEd3QXJINFFtVVF5OTJTczJad3F1WEc3ekZHWUMz?=
- =?utf-8?B?dkZld0FmK3V2TGVrWUNiNVpiUk0xaytrazJ1NmlmRjRXdVNpaHVzYTl3U210?=
- =?utf-8?B?YTlhWFVvOUVWdmhjQWJlTDRWU0ZQaWx2Rlp3Y1AyYktZMEtGOUJ2MUdmSWxJ?=
- =?utf-8?B?RVpobHlDaVluSUVKQTVmSTFOZGM1cXh4R3hKcFhwQ3cvSGpTYnBiR2x0WjZ6?=
- =?utf-8?B?c2diWktCVngyaDVYU0tNS1dYeVppalU5d04rRldzeXViTlBTV1EySkY0RXFD?=
- =?utf-8?B?bXZFZEErTmZPRzlDdWM5VGNzTHR5VVd2d3FqQzlQQWZwbEZ1eUloRTZTWWtG?=
- =?utf-8?B?dnNzcVJDREZrQnl5N285Nm5uUmpuRjFJVk9lZ1p4VFY5L2VabFc0MS9YWnps?=
- =?utf-8?B?UzhhYWsrcDhUM1U2cnlBUnp0Z3BTKzM4djJIc2tKM0hrbjkyUWNUeHg3SCtG?=
- =?utf-8?B?U0o2RitKS0NEbWdoY2w3OWZ0UWRtUzBhY0M5UWNyWVRVT0hMWjhQOU5xNzFq?=
- =?utf-8?B?VWdHRDJEaGZ0Rlo0aXkrbkd0SkFLWTNhN2lBYUJWeVh3NEFjRDBub2NpTjBa?=
- =?utf-8?B?aU1mTjdCRDZaM3FlK2ZQalA2YlVSajFWRHU4NEF6bjBiS3NybE5XeG5FNi9k?=
- =?utf-8?B?VUxkSHNzY3ZUOFB5R0NmSkt1WTBiazZHZjdzbC9tZmxaZ2kzaVBWWDBhL0NI?=
- =?utf-8?B?T2ljVCtMVWhBZDlyT2tqWjJ0NGdkVmlrbmU5YUdIRG5zOUlBcUdMWm0yYzRw?=
- =?utf-8?B?OHhoWFY0bHVLWTg0Q0ozQ3lndGJHT2o5cjE3ZTYyZWRtWHo1Qm04eGppdGJE?=
- =?utf-8?B?QWhwTWVJYURyS2xPZFU3ZHlZWnpXbUZKbCtBQnJ1RkVvRnM1WUtzNC9JejQz?=
- =?utf-8?B?WVFVekVGQzV5dlhydmJaR1ZXRVEyaDJYU1pyVzR4OGNuUnNQRFpuTTdFZmdP?=
- =?utf-8?B?UVVGR0J5WDVKa0VjVitLTmZRZElJOFlyVy9NZmcxeDVhVndoeEZ5UGJja0Fj?=
- =?utf-8?B?Myt6NjMwTUFxM0dGeDVteDBTWUQ5bHpKL2UvZnNnQnQ1R3d4UVZlVVFCL24x?=
- =?utf-8?B?cGhvb2ZDTm83Rk9QVzFTUHh5RWZvazhlWHV1dXR2UmU3aGhlbFJ4eW93UjZs?=
- =?utf-8?B?ODJ2T25WNzhTSTNMb1JqMXJmdUVwWUo3aFB0UTg2Zkk1bUtWK1d3TTlmbzVG?=
- =?utf-8?B?dG5VdGVQakw1TTRaVXFHb2ZLK2U0bjRUMzBrdU9tamY4RThEWVJEdkJLSTBm?=
- =?utf-8?B?Nk5ya0F4czVLdU9hQlVoNER2WDRNVWdZMFE4MEJ6empNZnhOeWg3dmpGUWYw?=
- =?utf-8?B?a0xzZU4rZDdwUVZ3L1lqM2VaMUR3aktaU0hwQmxiNkRvRHZscTNSdFh2SWcz?=
- =?utf-8?B?N2lqcXhiUlpZYWJYcUJwL3FkNDNsb2F3QWFpSnh4YXllZ1dqdDFhbmh0Rngr?=
- =?utf-8?B?M2xUN1lscU0wM1JTWWFROEZkL0QvNUF6V0RUbnpvNHk1a1pLWFJka0ZuUHhW?=
- =?utf-8?B?VmpKZWZ6cTdDYmJrdGZHZz09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5399.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NkF5NHRramREMzUzM3ZWTld3MS90dnk0SnB1RlFyMEhUQit2UzhXTytXV3RM?=
- =?utf-8?B?VjNkTDFyaEkyQ0tZYUNEV0c1a1BpcmFxUGpMa3dxZ3VRUVNPZnMxZXpjZUtj?=
- =?utf-8?B?eU8wd2JNVTNZU2lMTCtaSitXSFh0UjR2bDY3b0k1cVpuUjluOWJscDRGZ0Zk?=
- =?utf-8?B?NTdJV0lMbUpRMjlrTUFyVk1qcHlManVPc3lWaTJ0R2xsYU5PaW1xdnpIZC9J?=
- =?utf-8?B?UUkzUmNrM3U1M3ppNjFBMWQzQlc2NWZXU0VrRndyTksxcVhjVXpiNE9Td005?=
- =?utf-8?B?emJnazFLR3BWa0tUM2U1MGxqRHUyVEZCQVpXK011UGRZNkhHY0dOUGl6TUFs?=
- =?utf-8?B?clVEQXl3N2dYODNubEhvZUlCaVd1QnpJaXIvRWZ4ZlNZWnJCL05CN2xjVmdn?=
- =?utf-8?B?d3p5cjIzTXA3dmhmQTk3TkU4U1BzWGRHTm1HbDZ4SGhTSWYyQkpyMDQ5NW9L?=
- =?utf-8?B?SkpKcHJhcFU1QW4xTElINGNLWERuZ0VoN2d1QXNGREM1VnpJL1cvQnRVTWVL?=
- =?utf-8?B?TVYxZUNYNkJyNFA4VmRWeDdLVlZ6Z042akFqMnh4STQvSlhKaEFYNHRRV0RF?=
- =?utf-8?B?MzNtT255cGRwT25SVXhJQ1QxNHVzdG5URHhHNEFDVVFLS2dYVDdRU3lhODdY?=
- =?utf-8?B?cGhQWnF3Qi9xSC9NelRRSVJIRi8xSk9FRURaQzdrYXJXN0t0SkdkZU9LVytD?=
- =?utf-8?B?Zm1wSndqTXNoSnZpZVlmVHFVdXZhdzBEUENFRkJyOVBuYXZnL0dsR0d2cnV2?=
- =?utf-8?B?ZktIYXdQSnpOeC9IdVFkeThHaWtaM2o3MzVsVzdUY0hjdzA1ME9PM2c5anFl?=
- =?utf-8?B?elVGRENVM2pmZGNqRVhmWmJXMi9HWjNlNTVETW1uY0dhZCtWRnQ4VkV4d21t?=
- =?utf-8?B?T21kWHpkYmFRamk2Kzk4VElmMWczdkhrNFFTb05JRGhhRW9mUUZtd2JDcnhD?=
- =?utf-8?B?NVhaNXBSUHBZb1pWQnVpWnFHamNsTXI2SWdBUFE5WTlKbGtsZzVLQ01XdldC?=
- =?utf-8?B?N0dKS2JyMFBVRTROUW1aNGpXV1V5MDZ6eWJucVI1cUY3UVFrWWRYQnNkdXRl?=
- =?utf-8?B?M3cyZWliOHpNQjNkYTFKYTJ4SEU5ZmlVNFE0RDZndU1mMHJUWWdHZkhPSUx4?=
- =?utf-8?B?dWdNQS9MWVlPejlSTHczT3RudjV3b05WMnJLZzVoWDF3S0dsMHFtdmNTMDgr?=
- =?utf-8?B?OGczWHpheFV5UjFFQkoxR0NTRWkyam9BbWdDQ0pOQXcrNnBqcFZseUNGYU5C?=
- =?utf-8?B?bFhSbUhzdGMyQ3JaNDl2ekg5MndzUzNPRnU4VXVKdEpSY0ZacFNOVGhHL3Mx?=
- =?utf-8?B?TnVwQ0x0ekZtTUZKVGFtdWVzZTMzR0VVL0xTYkxNc0w2MnlCZ2lvZk95R3pY?=
- =?utf-8?B?M0NLTkQ0VmRhVTkrNlBQZlRReXljMWNJTTlabDRlR1UzU3ZqOWFRUnU2VkVw?=
- =?utf-8?B?WE9ldHF0UTFtZENYcE1qMTM3em9FaEtBNGVxYUNpQ0JDdGdzZjkvaitmZ21Q?=
- =?utf-8?B?ekp5RHpuNEcxK3NiV0U0N01VYUpIdU5DNllZNGdiQ094TEhTVElueU1uckh6?=
- =?utf-8?B?cklzcWtWOVgwck1ZV1dWSE5NOG5IQkxUd1FmaFhpb21saDA1YUdtNTRQb0Na?=
- =?utf-8?B?am0vR3RhcEJOeXR5QVZtdlVwT05FRjUwbk9vU01Ma3pkZ1I1WUpIaEtobEFR?=
- =?utf-8?B?bWoxREV6dlFPc1JJSmxqVHo2N211TzJZN0lsZ1J2dDZSL2t3UDZYN2dIU294?=
- =?utf-8?B?YlQ0Rkw5ZHJyQldlRGF5OHQxcVVQREEwc1NLdjZINnlJVlJoSnBCdU1EL1N6?=
- =?utf-8?B?bmRDTE9jRlRWQWpzTkhEV3hMNk1qNTJURFRtRENhVUlWb3k0eVovclB5M0hO?=
- =?utf-8?B?UmsxWWJjU29ocGlGTGVpYWRpOU5JZjhJZWpTWVZoRlpHdmVxR2FhdGZ5bnpx?=
- =?utf-8?B?RXRmWU5hZ2FibjE4MXlaN2RIOFpWaHZDZ2JWVDQ0UEZoQm16WFZiaTR3WGdv?=
- =?utf-8?B?N0V6ZEVyUm1qcUNiejl2YTRyUFlrN0FwQkRIb2ZOVHF2Wkp0UlZPUHNMa2tE?=
- =?utf-8?B?dktJTS9iYXNLaHg0YmFsNXJuQ1NwMmQ0SE1LZmFTQWtuVVhiUU9DWjZlbyts?=
- =?utf-8?B?ZDN1QzVsQ2ljNlQ3Wm5NYlFsTXhQU3V3bHF4N04wcUhpcjk3cDJ6KzJLb3lC?=
- =?utf-8?B?b0E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe1a6eca-08b2-4163-65e3-08dd1912ba89
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5399.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2024 12:03:58.8996
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ukfhmNfcZn5uVCiAgmULdyonFeWvzXA15oGKUrXwVhZadf9Ouxh/bHcPFuSB/bhUWpwKP4OtQ7vr4+jEQa8At7JW0bMYL7aIeW0ctCoZ9iM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5246
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
+Currently the example will not work when implemented as-is as there are
+some properties and nodes missing.
+- Define two eth ports, one for each switch for clarity.
+- Add mandatory dsa,member properties as it's a dual switch setup example.
+- Add the mdio node for each switch and define the PHYs under it.
+- Add a phy-mode and phy-handle to each port otherwise they won't come up.
+- Add a mac-address property, without this the port does not come up, in
+the example all 0 is used so the port replicates MAC from the CPU port
 
+Signed-off-by: Jesse Van Gavere <jesse.vangavere@scioteq.com>
+---
+ .../bindings/net/dsa/microchip,ksz.yaml       | 89 +++++++++++++++++--
+ 1 file changed, 83 insertions(+), 6 deletions(-)
 
-On 12/6/2024 12:39 PM, Oleksij Rempel wrote:
-> Relocate all callback-related comments from the `struct phy_driver`
-> definition to a dedicated `kernel-doc` section. This improves code
-> readability by decluttering the structure definition and consolidating
-> callback documentation in a central place for kernel-doc generation.
-> 
-> No functional changes are introduced by this patch.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
->   include/linux/phy.h | 705 ++++++++++++++++++++++++++++++++------------
->   1 file changed, 522 insertions(+), 183 deletions(-)
+diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+index 62ca63e8a26f..a08ec0fd01fa 100644
+--- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+@@ -145,13 +145,19 @@ examples:
+   - |
+     #include <dt-bindings/gpio/gpio.h>
+ 
+-    // Ethernet switch connected via SPI to the host, CPU port wired to eth0:
++    // Ethernet switches connected via SPI to the host, CPU ports wired to eth0 and eth1:
+     eth0 {
+         fixed-link {
+             speed = <1000>;
+             full-duplex;
+         };
+     };
++    eth1 {
++        fixed-link {
++            speed = <1000>;
++            full-duplex;
++        };
++    };
+ 
+     spi {
+         #address-cells = <1>;
+@@ -167,28 +173,46 @@ examples:
+ 
+             spi-max-frequency = <44000000>;
+ 
++            dsa,member = <0 0>;
++
+             ethernet-ports {
+                 #address-cells = <1>;
+                 #size-cells = <0>;
+                 port@0 {
+                     reg = <0>;
+                     label = "lan1";
++                    phy-mode = "internal";
++                    phy-handle = <&switch0_phy0>;
++                    // The MAC is duplicated from the CPU port when all 0
++                    mac-address = [00 00 00 00 00 00];
+                 };
+                 port@1 {
+                     reg = <1>;
+                     label = "lan2";
++                    phy-mode = "internal";
++                    phy-handle = <&switch0_phy1>;
++                    mac-address = [00 00 00 00 00 00];
+                 };
+                 port@2 {
+                     reg = <2>;
+                     label = "lan3";
++                    phy-mode = "internal";
++                    phy-handle = <&switch0_phy2>;
++                    mac-address = [00 00 00 00 00 00];
+                 };
+                 port@3 {
+                     reg = <3>;
+                     label = "lan4";
++                    phy-mode = "internal";
++                    phy-handle = <&switch0_phy3>;
++                    mac-address = [00 00 00 00 00 00];
+                 };
+                 port@4 {
+                     reg = <4>;
+                     label = "lan5";
++                    phy-mode = "internal";
++                    phy-handle = <&switch0_phy4>;
++                    mac-address = [00 00 00 00 00 00];
+                 };
+                 port@5 {
+                     reg = <5>;
+@@ -201,6 +225,27 @@ examples:
+                     };
+                 };
+             };
++
++            mdio {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                switch0_phy0: ethernet-phy@0 {
++                    reg = <0>;
++                };
++                switch0_phy1: ethernet-phy@1 {
++                  reg = <1>;
++                };
++                switch0_phy2: ethernet-phy@2 {
++                  reg = <2>;
++                };
++                switch0_phy3: ethernet-phy@3 {
++                  reg = <3>;
++                };
++                switch0_phy4: ethernet-phy@4 {
++                  reg = <4>;
++                };
++            };
+         };
+ 
+         ksz8565: switch@1 {
+@@ -209,28 +254,42 @@ examples:
+ 
+             spi-max-frequency = <44000000>;
+ 
++            dsa,member = <1 0>;
++
+             ethernet-ports {
+                 #address-cells = <1>;
+                 #size-cells = <0>;
+                 port@0 {
+                     reg = <0>;
+-                    label = "lan1";
++                    label = "lan6";
++                    phy-mode = "internal";
++                    phy-handle = <&switch1_phy0>;
++                    mac-address = [00 00 00 00 00 00];
+                 };
+                 port@1 {
+                     reg = <1>;
+-                    label = "lan2";
++                    label = "lan7";
++                    phy-mode = "internal";
++                    phy-handle = <&switch1_phy1>;
++                    mac-address = [00 00 00 00 00 00];
+                 };
+                 port@2 {
+                     reg = <2>;
+-                    label = "lan3";
++                    label = "lan8";
++                    phy-mode = "internal";
++                    phy-handle = <&switch1_phy2>;
++                    mac-address = [00 00 00 00 00 00];
+                 };
+                 port@3 {
+                     reg = <3>;
+-                    label = "lan4";
++                    label = "lan9";
++                    phy-mode = "internal";
++                    phy-handle = <&switch1_phy3>;
++                    mac-address = [00 00 00 00 00 00];
+                 };
+                 port@6 {
+                     reg = <6>;
+-                    ethernet = <&eth0>;
++                    ethernet = <&eth1>;
+                     phy-mode = "rgmii";
+ 
+                     fixed-link {
+@@ -239,6 +298,24 @@ examples:
+                     };
+                 };
+             };
++
++            mdio {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                switch1_phy0: ethernet-phy@0 {
++                    reg = <0>;
++                };
++                switch1_phy1: ethernet-phy@1 {
++                  reg = <1>;
++                };
++                switch1_phy2: ethernet-phy@2 {
++                  reg = <2>;
++                };
++                switch1_phy3: ethernet-phy@3 {
++                  reg = <3>;
++                };
++            };
+         };
+     };
+ ...
+-- 
+2.34.1
 
-[...]
-
-Nice cleanup! The only nitpick is about the "Returns" statement in
-functions. According to the kdoc it should be "Return:" . But
-nevertheless it looks good, so:
-
-Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 
