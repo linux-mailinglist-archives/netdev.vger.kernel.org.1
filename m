@@ -1,136 +1,162 @@
-Return-Path: <netdev+bounces-150517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8EA79EA78E
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:10:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 688DB9EA797
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:15:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 179B0283BDE
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 05:10:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26056282F42
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 05:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1B41E9B17;
-	Tue, 10 Dec 2024 05:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA774226171;
+	Tue, 10 Dec 2024 05:15:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5DIW0r/"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="aZlO+0AX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484A1168BE;
-	Tue, 10 Dec 2024 05:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E975C2248A1;
+	Tue, 10 Dec 2024 05:15:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733807422; cv=none; b=Xafm2nRJHV1uj+Or9iMqKieREUCMEEu92X+04d/d/114qk2izD28P15vz8hcYBgrLoreBQDaYoOuv4MnB73ZqIdWwsB8DCpqMuxFH5itn/wVRqtbib8z3LJ0hT59gt/OUFDS8MTBjTZ7gSabNj1I8ADt2UgHJdpVNzy8kjFBTH8=
+	t=1733807707; cv=none; b=SZ1EV6r1U7I0XJ9B7Aag/+H+gOAYRfUpxn0jMUVPr3nAQKyVhpZ5zKvbM4c1UZBZDaoeYU39Dx2hFAzGEy0vVVRu+xJfdb+IhqYI1HD4+kVJI+Xg3tdFmmE79Lr5Z9QToG69bknIdiOH8CY87GOMFXNQmEp1r65LQBLvwdd3wr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733807422; c=relaxed/simple;
-	bh=3PFxSSpWAf1uej3O7h8d+RzULqKyQZ0CsWOcHahIS8Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HQTyrxVuz9t/j7XyzronW3pVQBFLEMPhWQbfFE3063TxE/q9Zn4nCOKd4YB6KCSc6fr3ZnizGREE0tvUiCNAPvR5DdbflrcMgK7wZStI/xlHFhX+O8WPU91NKAETgODU3yb9SQrJuSzGE+J6KbZ+qj3vFuteNbDY7j9AnFlxzJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r5DIW0r/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CE6FC4CED6;
-	Tue, 10 Dec 2024 05:10:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733807421;
-	bh=3PFxSSpWAf1uej3O7h8d+RzULqKyQZ0CsWOcHahIS8Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=r5DIW0r/VhAd2ECaJf98oP2OK0PH5pluM0LmVmvuXQftBAz3Kvc0GBB1gYNAWofoU
-	 OvWYB4nuOAJP48oZC8JU3OMa89t5wynMF/6vWpKf6mgKoLBg15ElQJcYnPRRIZZQ3g
-	 7BPWUKVGpiTSTo1uzVTiyeFOTVmFlEn/wjsc5dX60ETAFfBFEj4dnZ0w9MnPa5tXy4
-	 YO4s3JkG5/CuHuN3to7O8HnS3i3evzVxJWa7ivs39csiVplv63toxbTbTnwJfRexh0
-	 QCrB7X697iWUdw0gmKR4deBPF9E0U5bVl8MpuuTTkwq7NjjMEoXt057QK6aOP1oc3L
-	 /foaMsTnmJ8Kg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 716FC380A95E;
-	Tue, 10 Dec 2024 05:10:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1733807707; c=relaxed/simple;
+	bh=TAS3M9iUKSSJcFvlIA+AyNjSaKPXwEuJbNu3TRAmWGw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qhln8hUHm3xtnnfhLBjAH9OwasQWaUEq8lp5vKRAxetvGbzWS+FW3D0gh7wIX5ATWswxC8m3kQx81PuWmA2lT0E/vTrZdpMT5vII23gWTYGg8Bmom3yHqbtab+HTXjw2ZdhKWzMV//7HcaCjAfQDPj7PLa0mg59SnC8pypA9zhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=aZlO+0AX; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1733807695; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=2ZA9ZIdTj9FS727EqJt3O2PQJRHFWHzqJzoof+IPQO0=;
+	b=aZlO+0AXWvXMpZIxIZnXz9CP90qfcpMa+JKWcHeqvG2sBD/rWD7l/nTg/kspjYxWIj0Osw5kQyvdWBDw4k0mF6fI42K9kaGCNmc4epUetisEr6KtYvXsHcCpkhti0LEMsBT3ElstQFTaPFBDqRVCp0MLEhrw++Ns+zVy5NO2+nw=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WLDmYYh_1733807694 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 10 Dec 2024 13:14:55 +0800
+Date: Tue, 10 Dec 2024 13:14:54 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>, netdev@vger.kernel.org,
+	linux-api@vger.kernel.org
+Subject: Re: [PATCH net-next v2 11/12] net: homa: create homa_plumbing.c
+ homa_utils.c
+Message-ID: <20241210051454.GA83318@j66a10360.sqa.eu95>
+References: <20241111234006.5942-1-ouster@cs.stanford.edu>
+ <20241111234006.5942-12-ouster@cs.stanford.edu>
+ <f79a70fd-35a4-4d0d-b239-daa4ab652880@linux.alibaba.com>
+ <CAGXJAmw4tULA02TLXBPa8Lv5cXD1Oe+1ajTWrM2x9=byMTy4jA@mail.gmail.com>
+ <b4bf68f1-189c-4685-8e1a-d8cbf60c1120@linux.alibaba.com>
+ <CAGXJAmxkR7Wgmd2+eUKwOHos2tGbSJ8UFqYKE4nsegg7sr96WQ@mail.gmail.com>
+ <CAGXJAmzzmNrp-7OANK1yQX+xJcGAYjTWDFuyhdD5pvjN28CtXQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v8 00/15] Add support for Synopsis DWMAC IP on NXP
- Automotive SoCs S32G2xx/S32G3xx/S32R45
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173380743727.355055.17303486442146316315.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Dec 2024 05:10:37 +0000
-References: <20241205-upstream_s32cc_gmac-v8-0-ec1d180df815@oss.nxp.com>
-In-Reply-To: <20241205-upstream_s32cc_gmac-v8-0-ec1d180df815@oss.nxp.com>
-To: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
-Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, vkoul@kernel.org,
- richardcochran@gmail.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, shawnguo@kernel.org, s.hauer@pengutronix.de,
- kernel@pengutronix.de, festevam@gmail.com, kernel@esmil.dk,
- minda.chen@starfivetech.com, nicolas.ferre@microchip.com,
- claudiu.beznea@tuxon.dev, iyappan@os.amperecomputing.com,
- keyur@os.amperecomputing.com, quan@os.amperecomputing.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, peppe.cavallaro@st.com,
- andrew+netdev@lunn.ch, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, imx@lists.linux.dev,
- devicetree@vger.kernel.org, s32@nxp.com, 0x1207@gmail.com,
- fancer.lancer@gmail.com, jan.petrous@oss.nxp.com, jacob.e.keller@intel.com,
- rmk+kernel@armlinux.org.uk, emil.renner.berthing@canonical.com
+In-Reply-To: <CAGXJAmzzmNrp-7OANK1yQX+xJcGAYjTWDFuyhdD5pvjN28CtXQ@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 05 Dec 2024 17:42:57 +0100 you wrote:
-> The SoC series S32G2xx and S32G3xx feature one DWMAC instance,
-> the SoC S32R45 has two instances. The devices can use RGMII/RMII/MII
-> interface over Pinctrl device or the output can be routed
-> to the embedded SerDes for SGMII connectivity.
+On Mon, Dec 09, 2024 at 09:03:08AM -0800, John Ousterhout wrote:
+> A follow-up question on this, if I may. Is it OK to vmap a large
+> region of user address space (say, 64 MB) and leave this mapped for an
+> extended period of time (say, the life of the application), or would
+> this have undesirable consequences? In other words, if I do this,
+> would I need to monitor how actively the memory is being used and
+> release the vmap for space that is inactive?
 > 
-> The provided stmmac glue code implements only basic functionality,
-> interface support is restricted to RGMII only. More, including
-> SGMII/SerDes support will come later.
+> -John-
 > 
-> [...]
+> 
 
-Here is the summary with links:
-  - [net-next,v8,01/15] net: stmmac: Fix CSR divider comment
-    https://git.kernel.org/netdev/net-next/c/31cdd8418234
-  - [net-next,v8,02/15] net: stmmac: Extend CSR calc support
-    https://git.kernel.org/netdev/net-next/c/c8fab05d021d
-  - [net-next,v8,03/15] net: stmmac: Fix clock rate variables size
-    https://git.kernel.org/netdev/net-next/c/cb09f61a9ab8
-  - [net-next,v8,04/15] net: phy: Add helper for mapping RGMII link speed to clock rate
-    https://git.kernel.org/netdev/net-next/c/386aa60abdb6
-  - [net-next,v8,05/15] net: dwmac-dwc-qos-eth: Use helper rgmii_clock
-    https://git.kernel.org/netdev/net-next/c/37b66c483e4c
-  - [net-next,v8,06/15] net: dwmac-imx: Use helper rgmii_clock
-    https://git.kernel.org/netdev/net-next/c/839b75ea4d94
-  - [net-next,v8,07/15] net: dwmac-intel-plat: Use helper rgmii_clock
-    https://git.kernel.org/netdev/net-next/c/8470bfc83515
-  - [net-next,v8,08/15] net: dwmac-rk: Use helper rgmii_clock
-    https://git.kernel.org/netdev/net-next/c/30b4a9b5c335
-  - [net-next,v8,09/15] net: dwmac-starfive: Use helper rgmii_clock
-    https://git.kernel.org/netdev/net-next/c/b561d717a799
-  - [net-next,v8,10/15] net: macb: Use helper rgmii_clock
-    https://git.kernel.org/netdev/net-next/c/04207d28f468
-  - [net-next,v8,11/15] net: xgene_enet: Use helper rgmii_clock
-    https://git.kernel.org/netdev/net-next/c/fd59bca4d5ea
-  - [net-next,v8,12/15] net: dwmac-sti: Use helper rgmii_clock
-    https://git.kernel.org/netdev/net-next/c/1ead57775507
-  - [net-next,v8,13/15] dt-bindings: net: Add DT bindings for DWMAC on NXP S32G/R SoCs
-    https://git.kernel.org/netdev/net-next/c/91f10e589520
-  - [net-next,v8,14/15] net: stmmac: dwmac-s32: add basic NXP S32G/S32R glue driver
-    https://git.kernel.org/netdev/net-next/c/cd197ac5d661
-  - [net-next,v8,15/15] MAINTAINERS: Add Jan Petrous as the NXP S32G/R DWMAC driver maintainer
-    https://git.kernel.org/netdev/net-next/c/6bc6234cbd5e
+I am not an expert in this field, so the following is just my personal
+opinion.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+When users call setsockopt(HOMA_RCV), they should be aware that this
+memory will be occupied by the kernel no matter how large this
+memory is, until the user explicitly notifies the kernel to release this memory
+(HOMA can only do this through close ?).
 
+Therefore, my understanding is that the kernel does not
+need to be responsible for the lifecycle of this memory. For example, if
+the user space forgets that this registered memory has already been
+freed, then a write from the kernel of cause could corrupt the user-space data,
+but the kernel has no need to responsible for that.
 
+If you believe that this could waste memory, perhaps you should provide
+a sparse data structure instead of a fixed memory interface.
+
+D. Wythe
+
+> On Mon, Dec 9, 2024 at 8:53 AM John Ousterhout <ouster@cs.stanford.edu> wrote:
+> >
+> > Thanks for the additional information; I'll put this on my list of
+> > things to consider for performance optimization.
+> >
+> > -John-
+> >
+> >
+> > On Sun, Dec 8, 2024 at 10:56 PM D. Wythe <alibuda@linux.alibaba.com> wrote:
+> > >
+> > >
+> > >
+> > > On 12/6/24 3:49 AM, John Ousterhout wrote:
+> > > > On Sun, Dec 1, 2024 at 7:51 PM D. Wythe <alibuda@linux.alibaba.com> wrote:
+> > > >>> +int homa_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
+> > > >>> +                 unsigned int optlen)
+> > > >>> +{
+> > > >>> +     struct homa_sock *hsk = homa_sk(sk);
+> > > >>> +     struct homa_set_buf_args args;
+> > > >>> +     int ret;
+> > > >>> +
+> > > >>> +     if (level != IPPROTO_HOMA || optname != SO_HOMA_SET_BUF ||
+> > > >>> +         optlen != sizeof(struct homa_set_buf_args))
+> > > >>> +             return -EINVAL;
+> > > >>
+> > > >> SO_HOMA_SET_BUF is a bit odd here, maybe HOMA_RCVBUF ? which also can be
+> > > >> implemented in getsockopt.
+> > > >
+> > > > I have changed it to HOMA_RCVBUF (and renamed struct homa_set_buf_args
+> > > > to struct homa_rcvbuf_args). I also implemented getsockopt for
+> > > > HOMA_RCVBUF.
+> > > >
+> > > >>> +
+> > > >>> +     if (copy_from_sockptr(&args, optval, optlen))
+> > > >>> +             return -EFAULT;
+> > > >>> +
+> > > >>> +     /* Do a trivial test to make sure we can at least write the first
+> > > >>> +      * page of the region.
+> > > >>> +      */
+> > > >>> +     if (copy_to_user((__force void __user *)args.start, &args, sizeof(args)))
+> > > >>> +             return -EFAULT;
+> > > >>
+> > > >> To share buffer between kernel and userspace, maybe you should refer to the implementation of
+> > > >> io_pin_pbuf_ring()
+> > > >
+> > > > I'm not sure what you mean here. Are you suggesting that I look at the
+> > > > code of io_pin_pbuf_ring to make sure I've done everything needed to
+> > > > share buffers? I don't believe that Homa needs to do anything special
+> > > > (e.g. it doesn't need to pin the user's buffers); it just saves the
+> > > > address and makes copy_to_user calls later when needed (and these
+> > > > calls are all done at syscall level in the context of the
+> > > > application). Is there something I'm missing?
+> > > >
+> > >
+> > > I just thought that since the received buffer is shared between kernel and user-space, if using
+> > > vmap() to map the very memory, so that we don't need to use such "copy_to_user" to transfer the data
+> > > from kernel to user-space, we can use memcpy() instead. This shall be more faster, but I had no
+> > > relevant data to prove it..
+> > >
+> > > So I'm not going to insist on it, it ups to you.
+> > >
+> > > D. Wythe
 
