@@ -1,93 +1,127 @@
-Return-Path: <netdev+bounces-150659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28F839EB228
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:47:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 901E79EB255
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:56:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DB14161B37
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:47:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0D1F166362
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:56:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CDA1A9B30;
-	Tue, 10 Dec 2024 13:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CIIioZTx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0565B1AAA1D;
+	Tue, 10 Dec 2024 13:55:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754DB5674D
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 13:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086921A2642;
+	Tue, 10 Dec 2024 13:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733838469; cv=none; b=dd71Jt3q+Vqu40k65gIp6pHZmn8cm5hRkTNiwDLyYcA1PLsj8RsFg11xP531VPMMcu0lplH2SgU+ogsCE8uYAflzKW0UNq0Jm1FjzuvmNy89Vtb4dY/NLqS9qwVhCiCwpd1iMGPpzlF4S89kWcYFht89mFAbWI0pGsnvkt+lMRk=
+	t=1733838954; cv=none; b=PCGhBAbsbM7PmjoTDDvU51d2jiQDBTiOVi9VvoXd2jSarjOkNRb76L1LCSKAiXy0KsMiTWSnUx+LPlqsFrzE6j58PJKLAY+8+RPKex1WujPklRg/Hx7rfJWiXtwS0jX1eQxzjH2d+TyFNhq/XjNC9MRn4Rq+A6VRKn1aDA+WbrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733838469; c=relaxed/simple;
-	bh=rzV8WuFPFKqrbo+gZ85ozOein12RDMOXWWIDdOkg/6A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=N+ItQQbvys3HgLYrEqPeG713+XT3aoegSjrUV3pRBOXsTT+MZTTWNatajITLzIOf4jsS0FWGTsj10pnxyDnrLi+spFrvvoEp9jHvrY6DM5rqz4VIIUvzbrQ0dtS0p1ft82wtl+6w1wJRjBdniF6m+HDiJPbC+TRmsOlJ5DP7PaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CIIioZTx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5B40C4CED6;
-	Tue, 10 Dec 2024 13:47:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733838469;
-	bh=rzV8WuFPFKqrbo+gZ85ozOein12RDMOXWWIDdOkg/6A=;
-	h=From:Date:Subject:To:Cc:From;
-	b=CIIioZTx5m6U7YuzVoF0ADYdS42TgbT1zgJIkVrQ9XD5/Njp2OqmKzPCo5zaUdMPQ
-	 YX0JNTt3Wjm+RlCrrd0MxmQfcbiarVnw04k/7fmTh4rM8vfvw5pozkSqnAA9cNI4VJ
-	 4tuVvL/U+n/wHQWdiMe62q67C+WwPAXsYzqyKN6vifuDIvyHkzKdBRpfD3fnS2paA0
-	 F4P/XHvltUsu034ilBIfsi9lStVp7oP2wKtEO/Y+Qg5Wl7q76rfluxrbgeyxiR3U4g
-	 FfFdRbG9qeQeKYJgFzMtbUjkPryaGCFYNefZMCSQANXwdkdViy4bAH2TkhPbvG+ScX
-	 tAhd5/eQv2DYQ==
-From: Simon Horman <horms@kernel.org>
-Date: Tue, 10 Dec 2024 13:47:44 +0000
-Subject: [PATCH net] MAINTAINERS: Add ethtool.h to NETWORKING [GENERAL]
+	s=arc-20240116; t=1733838954; c=relaxed/simple;
+	bh=BeFbKHFeADyb9Qy2mU8lEHddUCv2AqcJNie1eih9t3Q=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ADvrx3aeMs4o3j+1yg7xkGX+jffj5vKvd+gsa+6YcBp+pMVB+ZcqCYLm+xLsNjZ06qM+nQGsf2KTuQrPebGEV9zXJVcODV1qJt3WNVZzDHv1Hj3cXWbf37kLaGBgn5kJIBvDN1kKRc9TVNpEdiHGl8T8dYmdNvS2RbrCMMQOt9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Y70Zh12sqzRhnl;
+	Tue, 10 Dec 2024 21:54:04 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 489D01800CE;
+	Tue, 10 Dec 2024 21:55:48 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 10 Dec 2024 21:55:47 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<gregkh@linuxfoundation.org>
+CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
+	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>, <hkelam@marvell.com>
+Subject: [PATCH V6 net-next 0/7] Support some features for the HIBMCGE driver
+Date: Tue, 10 Dec 2024 21:48:48 +0800
+Message-ID: <20241210134855.2864577-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241210-mnt-ethtool-h-v1-1-2a40b567939d@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAH9GWGcC/x3MQQqAIBBA0avErBswLayuEi1CpxwoDZUIorsnL
- d/i/wcSRaYEY/VApIsTB1/Q1BUYt/iNkG0xSCHbRooBD5+Rsssh7OhQW9lpsdreKAWlOSOtfP+
- /CTxlmN/3A20zicxkAAAA
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org
-X-Mailer: b4 0.14.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-This is part of an effort to assign a section in MAINTAINERS to header
-files related to Networking. In this case the files named ethool.h.
+In this patch series, The HIBMCGE driver implements some functions
+such as dump register, unicast MAC address filtering, debugfs and reset.
 
-Signed-off-by: Simon Horman <horms@kernel.org>
 ---
- MAINTAINERS | 2 ++
- 1 file changed, 2 insertions(+)
+ChangeLog:
+v5 -> v6:
+  - Drop debugfs_create_devm_dir() helper, suggested by Greg KH.
+  v5: https://lore.kernel.org/all/20241206111629.3521865-1-shaojijie@huawei.com/
+v4 -> v5:
+  - Add debugfs_create_devm_dir() helper, suggested by Jakub.
+  - Simplify reset logic by optimizing release and re-hold rtnl lock, suggested by Jakub.
+  v4: https://lore.kernel.org/all/20241203150131.3139399-1-shaojijie@huawei.com/
+v3 -> v4:
+  - Support auto-neg pause, suggested by Andrew.
+  v3: https://lore.kernel.org/all/20241111145558.1965325-1-shaojijie@huawei.com/
+v2 -> v3:
+  -  Not not dump in ethtool statistics which can be accessed via standard APIs,
+     suggested by Jakub. The relevant patche is removed from this patch series,
+     and the statistically relevant patches will be sent separately.
+  v2: https://lore.kernel.org/all/20241026115740.633503-1-shaojijie@huawei.com/
+v1 -> v2:
+  - Remove debugfs file 'dev_specs' because the dump register
+    does the same thing, suggested by Andrew.
+  - Move 'tx timeout cnt' from debugfs to ethtool -S, suggested by Andrew.
+  - Ignore the error code of the debugfs initialization failure, suggested by Andrew.
+  - Add a new patch for debugfs file 'irq_info', suggested by Andrew.
+  - Add somme comments for filtering, suggested by Andrew.
+  - Not pass back ASCII text in dump register, suggested by Andrew.
+  v1: https://lore.kernel.org/all/20241023134213.3359092-1-shaojijie@huawei.com/
+---
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f84ec3572a5d..16c76ecca3f9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16335,6 +16335,7 @@ F:	Documentation/networking/
- F:	Documentation/networking/net_cachelines/
- F:	Documentation/process/maintainer-netdev.rst
- F:	Documentation/userspace-api/netlink/
-+F:	include/linux/ethtool.h
- F:	include/linux/framer/framer-provider.h
- F:	include/linux/framer/framer.h
- F:	include/linux/in.h
-@@ -16349,6 +16350,7 @@ F:	include/linux/rtnetlink.h
- F:	include/linux/seq_file_net.h
- F:	include/linux/skbuff*
- F:	include/net/
-+F:	include/uapi/linux/ethtool.h
- F:	include/uapi/linux/genetlink.h
- F:	include/uapi/linux/hsr_netlink.h
- F:	include/uapi/linux/in.h
+Jijie Shao (7):
+  net: hibmcge: Add debugfs supported in this module
+  net: hibmcge: Add irq_info file to debugfs
+  net: hibmcge: Add unicast frame filter supported in this module
+  net: hibmcge: Add register dump supported in this module
+  net: hibmcge: Add pauseparam supported in this module
+  net: hibmcge: Add reset supported in this module
+  net: hibmcge: Add nway_reset supported in this module
+
+ .../net/ethernet/hisilicon/hibmcge/Makefile   |   3 +-
+ .../ethernet/hisilicon/hibmcge/hbg_common.h   |  30 +++
+ .../ethernet/hisilicon/hibmcge/hbg_debugfs.c  | 163 ++++++++++++++
+ .../ethernet/hisilicon/hibmcge/hbg_debugfs.h  |  12 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_err.c  | 134 +++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_err.h  |  13 ++
+ .../ethernet/hisilicon/hibmcge/hbg_ethtool.c  | 181 +++++++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   |  48 +++-
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |   6 +-
+ .../net/ethernet/hisilicon/hibmcge/hbg_main.c | 212 ++++++++++++++++--
+ .../net/ethernet/hisilicon/hibmcge/hbg_mdio.c |  15 ++
+ .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  |  39 ++++
+ 12 files changed, 828 insertions(+), 28 deletions(-)
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_err.h
+
+-- 
+2.33.0
 
 
