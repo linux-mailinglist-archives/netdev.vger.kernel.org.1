@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-150683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5490C9EB2DD
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:13:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A261A9EB2D8
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:13:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73ABE167BBF
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:13:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9206C1882978
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17EA1AB523;
-	Tue, 10 Dec 2024 14:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174031AC428;
+	Tue, 10 Dec 2024 14:13:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="ZapmCc7A"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="MhWnoUqI"
 X-Original-To: netdev@vger.kernel.org
 Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913291AAA16;
-	Tue, 10 Dec 2024 14:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBFC11AAA2A;
+	Tue, 10 Dec 2024 14:12:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733839980; cv=none; b=PEjkVgy91hEMn2LR6Pq79TelmyEnlDeDOPWVEqlZQDkJOJBFFyyGOmKmzCt/ezVdBw8RjBkaDLaYgOiT7TDK+ehnOFB2v/fIRaz0g/vQawDxNjbZYXGJK2fCvqdZ3wDi8Ag7qaNoaO/8zCc3cr9Usfb3P5u7IHkaNb7ikbanv3o=
+	t=1733839980; cv=none; b=kKNZZL2b2bryZzw4cFH36H/1rmtz939A5A5yFQOitDJm5QLXZnksYJ1DWcrF2NpBlMAfDi6oI9iLGMrDtqRfiiaaqbAwbCHyqSz5SnTrtIr0GqPuYV9tZCLeUnsGvtLA72psoki6FPDv0o7xLPADKhJE7tUprbT/g9hmWlnzOQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1733839980; c=relaxed/simple;
-	bh=Gqy1cO8kzYjNqYASuqlTqRoNVTgBvuWhGXTo7oU4TSI=;
+	bh=09qaNpq4AJuz9hfCoEjZOuxko+pXD+YneMHD9E479dA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ig7wVT7g1ctUg7iQh7UpXfoXlrnILvaP/FiUWmBQOva1ErTtIHs9grhn61F0/W8GwWUlUYoDKjvOHQEfD9Hp3aM58fIWBjOgxMN6mKeDzetwblow06zorYk4i/vMHa24uIZbqmZkFV3iNPB2A0nnqj+mOlSdTY+KvgjTP4cZE7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=ZapmCc7A; arc=none smtp.client-ip=213.133.104.62
+	 MIME-Version; b=XsrpcFpFhdhXBtxZuCC90jJrrKOiigboX3S/TMAHET+L7sNXmrPuT1JzlrxQ3X5mcqtYyk/lX6jR+BV/98OIciFJAs3dcMWXr0JAnCM3qCFYGxtq86k44cXUfGBSVMKAfEGX82vc7B1sspFHRjHdMjJv2J1tlarCQ8HZ7m5bW+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=MhWnoUqI; arc=none smtp.client-ip=213.133.104.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -36,17 +36,17 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=MMgtaFpnKy53Gq3CYekdZmnl9n6mn/hR4Zipw2JM5yc=; b=ZapmCc7AMibXhx97+LYgD9Bb01
-	POfog218cQoFK/k9+PU+jnSG48ygjuBHvAAHsAPopflBuesmf8gpaUi9EHneaApVmUGOq0gvlIGJJ
-	X7qwLDwM0Y8jKjaQTuJWLiT6vlOgZ81/T+E3qJnvWSW3HisHk9g6rbmqAPFmZrOH5sl94gF5BudFt
-	vwtkeKLug5qYtKcyC/idyslqE9QJ8ucpbkpoyouKc0psq4a/bL5Ew7DV81UV9yYMoAlyTQjr/I4S3
-	d5BB2KisS4d53c1+aPFViLAwhI/4nnZ9AYPqlbUh1L348VfbKnGHgaxemueFWeVw2/X7Httgdxi4W
-	esU96ssg==;
+	bh=Z6pqZZgfaOadgTc8G5zTaPHQbs4UwLMI64dEKXV+Eyo=; b=MhWnoUqId+xj2Mnt9FvpRsD9BM
+	9D3e2pCojMQmY2McntNc3taTo29H6KEljPyogEiSZsPdz6mNbuW/kiJKoMbItrGhGU9jyC6gVor5l
+	rUECBPumh+wqXJcX8pP8IOt52f1vtbBVSAg+Qmbubtm6fM+OmEP48RBQq6xG52J/Qf5H/klv+wDJJ
+	XbV1xvQ8H0OHTVT+G6XS0JVu8S87X2NllADV6LahZXVRdxguuhOPeyfvj5KZ3ApZErhY063jHSYvM
+	879UwNf09PzjP0ic5mfOhqsx35EoVZ/ziX3ci7s4cT1jXsB4ohuZ7MKwfQb+v8Hbe7ElWrUGkIGf2
+	cFwkMOXQ==;
 Received: from 35.248.197.178.dynamic.cust.swisscom.net ([178.197.248.35] helo=localhost)
 	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1tL0yl-000JgP-Cy; Tue, 10 Dec 2024 15:12:47 +0100
+	id 1tL0ym-000JgX-16; Tue, 10 Dec 2024 15:12:48 +0100
 From: Daniel Borkmann <daniel@iogearbox.net>
 To: netdev@vger.kernel.org
 Cc: bpf@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: bpf@vger.kernel.org,
 	Nikolay Aleksandrov <razor@blackwall.org>,
 	Ido Schimmel <idosch@idosch.org>,
 	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net 3/5] bonding: Fix feature propagation of NETIF_F_GSO_ENCAP_ALL
-Date: Tue, 10 Dec 2024 15:12:43 +0100
-Message-ID: <20241210141245.327886-3-daniel@iogearbox.net>
+Subject: [PATCH net 4/5] team: Fix initial vlan_feature set in __team_compute_features
+Date: Tue, 10 Dec 2024 15:12:44 +0100
+Message-ID: <20241210141245.327886-4-daniel@iogearbox.net>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241210141245.327886-1-daniel@iogearbox.net>
 References: <20241210141245.327886-1-daniel@iogearbox.net>
@@ -70,90 +70,41 @@ Content-Transfer-Encoding: 8bit
 X-Authenticated-Sender: daniel@iogearbox.net
 X-Virus-Scanned: Clear (ClamAV 1.0.7/27483/Tue Dec 10 10:38:50 2024)
 
-Drivers like mlx5 expose NIC's vlan_features such as
-NETIF_F_GSO_UDP_TUNNEL & NETIF_F_GSO_UDP_TUNNEL_CSUM which are
-later not propagated when the underlying devices are bonded and
-a vlan device created on top of the bond.
+Similarly as with bonding, fix the calculation of vlan_features to reuse
+netdev_base_features() in order derive the set in the same way as
+ndo_fix_features before iterating through the slave devices to refine the
+feature set.
 
-Right now, the more cumbersome workaround for this is to create
-the vlan on top of the mlx5 and then enslave the vlan devices
-to a bond.
-
-To fix this, add NETIF_F_GSO_ENCAP_ALL to BOND_VLAN_FEATURES
-such that bond_compute_features() can probe and propagate the
-vlan_features from the slave devices up to the vlan device.
-
-Given the following bond:
-
-  # ethtool -i enp2s0f{0,1}np{0,1}
-  driver: mlx5_core
-  [...]
-
-  # ethtool -k enp2s0f0np0 | grep udp
-  tx-udp_tnl-segmentation: on
-  tx-udp_tnl-csum-segmentation: on
-  tx-udp-segmentation: on
-  rx-udp_tunnel-port-offload: on
-  rx-udp-gro-forwarding: off
-
-  # ethtool -k enp2s0f1np1 | grep udp
-  tx-udp_tnl-segmentation: on
-  tx-udp_tnl-csum-segmentation: on
-  tx-udp-segmentation: on
-  rx-udp_tunnel-port-offload: on
-  rx-udp-gro-forwarding: off
-
-  # ethtool -k bond0 | grep udp
-  tx-udp_tnl-segmentation: on
-  tx-udp_tnl-csum-segmentation: on
-  tx-udp-segmentation: on
-  rx-udp_tunnel-port-offload: off [fixed]
-  rx-udp-gro-forwarding: off
-
-Before:
-
-  # ethtool -k bond0.100 | grep udp
-  tx-udp_tnl-segmentation: off [requested on]
-  tx-udp_tnl-csum-segmentation: off [requested on]
-  tx-udp-segmentation: on
-  rx-udp_tunnel-port-offload: off [fixed]
-  rx-udp-gro-forwarding: off
-
-After:
-
-  # ethtool -k bond0.100 | grep udp
-  tx-udp_tnl-segmentation: on
-  tx-udp_tnl-csum-segmentation: on
-  tx-udp-segmentation: on
-  rx-udp_tunnel-port-offload: off [fixed]
-  rx-udp-gro-forwarding: off
-
-Various users have run into this reporting performance issues when
-configuring Cilium in vxlan tunneling mode and having the combination
-of bond & vlan for the core devices connecting the Kubernetes cluster
-to the outside world.
-
-Fixes: a9b3ace44c7d ("bonding: fix vlan_features computing")
+Fixes: 3625920b62c3 ("teaming: fix vlan_features computing")
 Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 Cc: Nikolay Aleksandrov <razor@blackwall.org>
 Cc: Ido Schimmel <idosch@idosch.org>
 Cc: Jiri Pirko <jiri@nvidia.com>
 ---
- drivers/net/bonding/bond_main.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/team/team_core.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 320dd71392ef..7b78c2bada81 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1534,6 +1534,7 @@ static netdev_features_t bond_fix_features(struct net_device *dev,
+diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+index 1df062c67640..306416fc1db0 100644
+--- a/drivers/net/team/team_core.c
++++ b/drivers/net/team/team_core.c
+@@ -991,13 +991,14 @@ static void team_port_disable(struct team *team,
+ static void __team_compute_features(struct team *team)
+ {
+ 	struct team_port *port;
+-	netdev_features_t vlan_features = TEAM_VLAN_FEATURES &
+-					  NETIF_F_ALL_FOR_ALL;
++	netdev_features_t vlan_features = TEAM_VLAN_FEATURES;
+ 	netdev_features_t enc_features  = TEAM_ENC_FEATURES;
+ 	unsigned short max_hard_header_len = ETH_HLEN;
+ 	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE |
+ 					IFF_XMIT_DST_RELEASE_PERM;
  
- #define BOND_VLAN_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
- 				 NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE | \
-+				 NETIF_F_GSO_ENCAP_ALL | \
- 				 NETIF_F_HIGHDMA | NETIF_F_LRO)
- 
- #define BOND_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
++	vlan_features = netdev_base_features(vlan_features);
++
+ 	rcu_read_lock();
+ 	list_for_each_entry_rcu(port, &team->port_list, list) {
+ 		vlan_features = netdev_increment_features(vlan_features,
 -- 
 2.43.0
 
