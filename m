@@ -1,133 +1,114 @@
-Return-Path: <netdev+bounces-150888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B9EC9EBF94
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 00:48:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 611359EBF96
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 00:48:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB5C31673B2
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 23:48:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 540F8167587
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 23:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80DE122C35D;
-	Tue, 10 Dec 2024 23:48:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCDBA22C35E;
+	Tue, 10 Dec 2024 23:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P2m4GfAW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jRIL/FEd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC59A22C352;
-	Tue, 10 Dec 2024 23:48:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FD822C352;
+	Tue, 10 Dec 2024 23:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733874492; cv=none; b=t10wnUMdxAwF5lrweccM28fyaQBYPBi+tg3CmtHnhGiWTGs/XLdzPjF4hemzClQ72U0I9lossHosQcBbgGp2WS+LjMnx6RC9m3PM/h593cYNMas0TKK4bkjzkwtVkrfVyGUAr5fKsgCt4bf3svW+Z7szRorI/9ww6ZLprx4BCJU=
+	t=1733874498; cv=none; b=hE6EVlwyKQuB4OlDFuoSiinv5HvLZNeQ8vclmrRxeH9R8mq+RmgKy8dvoQ61FzKYSBM7l6811R791mCI4E8xmCqyEk3+3oljfbFJF2UGMHqw2Bhr0KAe8t1D6tjytclF4P5hkt4fK9IkwfdwPLRdSykOjo5BFHu4tOgCIliM0dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733874492; c=relaxed/simple;
-	bh=hS77lKS+qrbWJBqTrtJwzE+mtelSylzhjNAlP86Biz4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nRLbzQIR1tPTafX/gc8xWz9pG/5hY5dDkcPUjzi78lP8qxJ2+sLKFM5MQFrZ9SVcJHKJTgv6ufnFH2H7gxsS4gBCzatDCWjDQxCEkGyb6NKqOJRdczlGR9FqZ1mTdACM0La3n69R06tIhQLYlixEQmZ/EO6M0KzOgASq1iC6NPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P2m4GfAW; arc=none smtp.client-ip=209.85.128.53
+	s=arc-20240116; t=1733874498; c=relaxed/simple;
+	bh=Lp09MjOylsSyKIAgxhxl0bO4y+Lm//RliCsSA7mpCW8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FYDag+qvQ1zY8b3tkokRkIBwRF7XBbMnpPicyZeO58i+pNABH5HbjUTlFilTAbh0DkpbpGxoLpdrRucb3zDqvmJRAhLz8knrRzWTi3oHRmtWll5dKp4rWqQctGPya/R0lBL9hefNx02OMyPcxTie/Qb7nW7JqYe0Z1AIzpTmIu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jRIL/FEd; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-434e91ac3d4so2716975e9.0;
-        Tue, 10 Dec 2024 15:48:10 -0800 (PST)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a9a977d6cc7so907856566b.3;
+        Tue, 10 Dec 2024 15:48:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733874489; x=1734479289; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f8UnOGblbQirPOg8RONWJpR4qniXeIU9augpkXN+BVE=;
-        b=P2m4GfAWKfhlGVNXuN101Kn66EhjOSguKFPnE0u4NzHJvCHN+RH4zEtW7S5CxmJU1Z
-         LS9B8A8VrNTREbxWvWf1anZl9DTaFZvtF3nw1CZJrcUsIT96wuN3nuAljfDJlpXaLmmM
-         BLSVNuYNNnVEWXAWBMRPb9+j7JW9p6ts0njwljuWiNztzfHGqdPsNW+MFGBgVqimz76n
-         UHfCSDxXmbrIcAP0wdoqubLuQR3WFqCzUXgE8fFgUo41/jFj1S9payyIJTb8mSVG5JeH
-         EHxMiHnmx4LBTWTuDpCLD+VBmuNwzNiTVh9HCKEfTj6ceSG5Ooz0sj/G6LsR1jSc2goC
-         kEng==
+        d=gmail.com; s=20230601; t=1733874495; x=1734479295; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ukbIms0t1DZTxH1MdXNsTj5uHjkdpiYZBUWkKbFqYeU=;
+        b=jRIL/FEd5Ki4XwYrM80ESceWLeuH1Pwhazcw2E/NikZ+tAesms+bixR+aYOKktl2Ui
+         ZE0Hq8MkS+goSbA9oZYOREJ9uSox70QohobtgGiZ2RJwwWYm4nfmX2inzvX0J/Vuo4sU
+         eJ0QPVwnzHHvHdjgf3Hdw25Kn7Zsm19MQtoWdTAiAP20b1HbVAnDaLut7X8i5R6Os6AO
+         BbydG2EYs/sYbIDUyjbMPNj7ClMOTvgeS+DSCeMZIODUo2tfEKt/tGHlKJykxc9iBdCg
+         eVkZsLRo7G4WK/pr69HDBIv+6oKTGZc6p6S0hrIHLg4oJsJcqFAu/FM9TmHgaemYF8Be
+         azeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733874489; x=1734479289;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f8UnOGblbQirPOg8RONWJpR4qniXeIU9augpkXN+BVE=;
-        b=UukBWDMleNeBYw68b5rleNIBhhuIBi+UideepK2IQhnasjhg8zazo96aVg2XYdY2zG
-         Oal7rC9tj9iDPmjf74agHq3oxQR3MOYhrN0YCHraLPpIj9dK3R+RHp17v5Rj3ROIiilG
-         xGr857LR/DppdT1gz9Lc+i4d850ODfFoyLr5gG1esZfTfx/vxhgT9lrgl+JRCs/vxs02
-         mBpstphlCCQQQLgWDKk8LuGXFnBk+xC9l6zW6806A92CGyI8BlV655gscLug+cIAuwti
-         CLxZLhQOgIcOF843O98dP5YQrHl6i8YxvncrNTToJHZ9/pczoSGfNNIFRd3i3rSLUNvl
-         m1hg==
-X-Forwarded-Encrypted: i=1; AJvYcCU2jNBgfrEaN+xqK4EgqelUlBEWUNOafeOLdiYkpc7y385PYmSaTUomv8pxOd6halHptT/3Ukr5IPL4@vger.kernel.org, AJvYcCUp0Xt+030wzGtTozQXFsSWfa7cGmW1lDdTdbgsIsp+y/Hw/x8R2Xv14d0I0mnlPGU+7lY0x7M+gm5TRd4t@vger.kernel.org, AJvYcCW0HKBmiD2YisjPgqwUMaxOTi46uovBUs6BdU0d5nSPaHTiO7MTCk6PzRtw5wIfoK02t4y6rznH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz615epjPXT3anB0xY6Kioe0njCsN9jsYOxUw5+xiL4gEuplTQg
-	NSivL+9dOViCsjbqtbBYzWExh5RHhOdeII4LPDKXACOE80Xui46Y
-X-Gm-Gg: ASbGncvbCIhZr7VQlMJGAG34UQpPTvd1oGl0Is0pn3KXpOTkgPspDWm3F5vAo9+paVk
-	33kkGc2e5r89aGKeUxpAs4pZCZzB5O1i24M3oB2Cw+/KuOFy1oef4x9+AGX9Vo8AyFZNYqRh0l/
-	xLmw9NyBKhe6bmj/5RX1ZBWVsBrREUO1c3k8aBotcynbfFw0jZA3p6ETr8Z+WkityGfrN+ykG8n
-	+CzoZR6J3V/WVJoED0bqhzodtZDHrg8/AnVuGEEDA==
-X-Google-Smtp-Source: AGHT+IGVFyqOsHq8vJbKENcE96HqDNgEWPNEGfHZbGGsVdmVNjmlG8KgXuPni26CXmKkrEf6w3YBNQ==
-X-Received: by 2002:a05:600c:35c9:b0:436:17f4:9b3d with SMTP id 5b1f17b1804b1-4361c434980mr1530815e9.4.1733874488791;
-        Tue, 10 Dec 2024 15:48:08 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434da0d69dfsm203458605e9.14.2024.12.10.15.48.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 15:48:07 -0800 (PST)
-Date: Wed, 11 Dec 2024 01:48:03 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v11 5/9] mfd: an8855: Add support for Airoha
- AN8855 Switch MFD
-Message-ID: <20241210234803.pzm7fxrve4dastth@skbuf>
-References: <20241209134459.27110-1-ansuelsmth@gmail.com>
- <20241209134459.27110-1-ansuelsmth@gmail.com>
- <20241209134459.27110-6-ansuelsmth@gmail.com>
- <20241209134459.27110-6-ansuelsmth@gmail.com>
- <20241210211529.osgzd54flq646bcr@skbuf>
- <6758c174.050a0220.52a35.06bc@mx.google.com>
+        d=1e100.net; s=20230601; t=1733874495; x=1734479295;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ukbIms0t1DZTxH1MdXNsTj5uHjkdpiYZBUWkKbFqYeU=;
+        b=qFdfBLxDo7HfnIq6A1O58j2D5SE/dHuioEU2wS7ZT/sFIj+2jEYKqG4cjA6NoUEC9J
+         wN0u4BAkbUgMFn6qWrWVOGtsgcSKer1xt/76hxPNLclnmxAGfjcQp8HsQewOn7rLZoov
+         EkcNf7JbP66K1RExxyfKshl3vgoEVIglEIT4P0sRs0l8/6WxMEBnM004PwWt7F7vR3eI
+         7zjtQEkFaODRFKdfTmDmliQq1lwmxElf8lT8M17CYN4VEbeVhaUssHY5UTywouMA3x3p
+         kA0zKx7QmURQcvjhi7bfGpvVX7KU207nutvvIBm9OYhu3Air+9K/IE/pr66LakuFF0eO
+         GWfg==
+X-Forwarded-Encrypted: i=1; AJvYcCWf/5ah2Th8Nd9uaTEUVmOiudBZmls6f1I7JO2nfhepFs+9ZTvkF+US2rmz4n+uUhTYN92e7KuJyMdLaU8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRCy6hcvDwPgSI5aUatrPzkkqU3jpWYtFiSyCFyuM2ODmH9sWp
+	wbEOs9v9GASa/kBInB6nzs6w0aAB1+MDVj+nY/9H/djK+7RFoC/l
+X-Gm-Gg: ASbGncvpwADWvNZNCxkU6tPhDOFjYWPt//15OqTOrcImLqSwyZXYhT/efPymJRu5B8j
+	0KoLnrVPXorixVPx4/Cj8tzbCzT1HNwUzt7D8Kdu/4YNjkV1WdYhVvZS6OttI3cWUckpR2fHHZJ
+	cwAFodu+ifCV12LB7g9rZ6HSs5yHDuRxBn/mvWTh5QUREhooyKcmV5n04f0/R1vNi8jZt7plbqL
+	uqFj0fbIvs4G+awbt7X1/105+sPY+DDGsR2C6kd2BiFHt/q6cS2WYw=
+X-Google-Smtp-Source: AGHT+IG4np9YAocjxEFLm7x39/SQp1jbMm3P4nLtiba8Smoyscql8ySPb2yi/8a3fCNXNrboToIipA==
+X-Received: by 2002:a05:6402:5207:b0:5d4:55e:f99e with SMTP id 4fb4d7f45d1cf-5d4330a5c7cmr1438120a12.18.1733874494920;
+        Tue, 10 Dec 2024 15:48:14 -0800 (PST)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa69964872asm270956366b.103.2024.12.10.15.48.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2024 15:48:13 -0800 (PST)
+Message-ID: <6dc095f8-00ca-4f4d-885e-735ef6c2fa80@gmail.com>
+Date: Wed, 11 Dec 2024 01:48:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6758c174.050a0220.52a35.06bc@mx.google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: wwan: t7xx: Replace deprecated PCI functions
+To: Philipp Stanner <pstanner@redhat.com>,
+ Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+ Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
+ Liu Haijun <haijun.liu@mediatek.com>,
+ Ricardo Martinez <ricardo.martinez@linux.intel.com>,
+ Loic Poulain <loic.poulain@linaro.org>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241206195712.182282-2-pstanner@redhat.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <20241206195712.182282-2-pstanner@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 10, 2024 at 11:32:17PM +0100, Christian Marangi wrote:
-> Doesn't regmap add lots of overhead tho? Maybe I should really change
-> the switch regmap to apply a save/restore logic?
+On 06.12.2024 21:57, Philipp Stanner wrote:
+> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by the
+> PCI subsystem.
 > 
-> With an implementation like that current_page is not needed anymore.
-> And I feel additional read/write are ok for switch OP.
+> Replace them with pcim_iomap_region().
 > 
-> On mdio I can use the parent-mdio-bus property to get the bus directly
-> without using MFD priv.
+> Additionally, pass the actual driver name to that function to improve
+> debug output.
 > 
-> What do you think?
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 
-If performance is a relevant factor at all, it will be hard to measure it, other
-than with synthetic tests (various mixes of switch and PHY register access).
-Though since you mention it, it would be interesting to see a comparison of the
-3 arbitration methods. This could probably be all done from the an8855_mfd_probe()
-calling context: read a switch register and a PHY register 100K times and see how
-long it took, then read 2 switch registers and a PHY register 100K times, then
-3 switch registers.... At some point, we should start seeing the penalty of the
-page restoration in Andrew's proposal, because that will be done after each switch
-register read. Just curious to put it into perspective and see how soon it starts
-to make a difference. And this test will also answer the regmap overhead issue.
+Reviewed-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 
