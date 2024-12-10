@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-150772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C39D89EB841
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 18:30:18 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37BBC9EB845
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 18:30:40 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C40E81883D12
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 17:30:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75A9228553F
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 17:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3AC86347;
-	Tue, 10 Dec 2024 17:30:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE3A01AA7A3;
+	Tue, 10 Dec 2024 17:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VeVL3l1m"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="CRkpwbX6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4658634C
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 17:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D571A0B13
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 17:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733851815; cv=none; b=cMsYK+YUDwzDx+4b7DdcZvU08KJo60SabKG9Uw0KtmMLSTSvy9308LTcd9LJ2oRAi0Efs5a9CZu5HY3KGV/QbNNkLnGRMQaCMAWfm4qoXNklYQIpxssg6jRjR5MMDF0Sf2nfXWMsNdG5D9ybCSzy4HRUAr0hU/SDfsSjBi7dLRo=
+	t=1733851823; cv=none; b=mE/weaDp5dVHH0muTKKzMDRTwAxIOkl8b5tWuCmd/2MZR4CQ112mnIfIkJlFEmRoEiFFJNOz8njUGuhlT9s8i3BDz6hK+05+mG6iu21O1nTaV1cDsOAkmjM9u9nLnPLQjauHSYB8HTq5fTAZHbJnY1BTaAuh10zFcQzAU6maoWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733851815; c=relaxed/simple;
-	bh=BrqQWfU08EOCQ9oPzdhQ+EjNwFysPwfI6ho12lGetd0=;
+	s=arc-20240116; t=1733851823; c=relaxed/simple;
+	bh=hXGF/ZJ6xHQZlI1RktNb/b5Yq1vJZPQmdK1XXtpzN1o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pM0tcUV4KPaMCcj1sA2ZIb0/PZ5db/gYe62ernxmYtqdwyZaxQcugY2P+BRYiq6XSpPtJJcT7r42/+AVyhtCPBn3QvBPrrWzP5y/948Z9bSGvHJMBSLWpwk6cPTnKxM2GUDWSj3ROUuEHTEesYMUT4FZUMTNejmEBebbmQQ0tiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=VeVL3l1m; arc=none smtp.client-ip=209.85.219.48
+	 In-Reply-To:Content-Type; b=jIbJVfxZ3M20VFh0FkVfV9vjuVgl4UqNuyxHq8f211OVoKLUiqqTbgh3/UtXFoZXQaU3xcWbArCtrySL20SwWQzM32uvgsPBxWW11nw4FMLUc7di9hkqybGP6jK6gqKEFm2IF5Cxa+vg7KX7WrG504zJTzuVLNzU0WBI25LOjvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=CRkpwbX6; arc=none smtp.client-ip=209.85.219.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6d884e8341bso41901286d6.0
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 09:30:14 -0800 (PST)
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6d8f916b40bso44888736d6.3
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 09:30:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1733851813; x=1734456613; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1733851821; x=1734456621; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RlM0jpfN/0EIPKkVdkd7aPBaB5Buy5JIg07+r6DSxgQ=;
-        b=VeVL3l1m2Y4Ln3BuC44aKK1UnC94kae0maJTJc9B+2DmbFXmofoSwIdYOVfYJjUxkG
-         AaRqZWm1nmO2yn1cwvn22W0iVPffAhXHDm4owluicXlGfH6aUQpKcqrl75KdVoC6gWkT
-         e+FOzuPVcKki1+d4KIqcJWvUZev41kfIK5+Qo=
+        bh=EJuaBgZKrdv+RWQeMRVkYJY5tTLwVPt/ydvjKnt3MWk=;
+        b=CRkpwbX6oLXmSnkj29R4N4LhSo6CO8L+eaoPclpAztLa0rXOfD3dCpOCA0iNEQ6N/X
+         NnQW2rL6SoUWBbjL7XW8IIH7k0BgjqL0p99bzEdXYpQ1c7IspXmeBOHkgGOM3MMQbWda
+         zexBBSVLZ4Q+wDrn21Ly1lqx86ULyoWx5SO80=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733851813; x=1734456613;
+        d=1e100.net; s=20230601; t=1733851821; x=1734456621;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RlM0jpfN/0EIPKkVdkd7aPBaB5Buy5JIg07+r6DSxgQ=;
-        b=MEWMFH5WBYefYuYrMklphS7kTfHL70dzEb3h++YGiEKPnqm2pMN/gxD49pRHm5SGkC
-         Ee+WhLJ0lhX6keY8cqGNAEPsCHEJbxi5f/P8SsN6ce/l9MhGce366GE5zM/JW0mtwZbj
-         wFMG/AwgUVAbvTq6jP8TcOPsK/AQA8NDj64Azx8Uxa99fIz7+x3xXPuaNaZCCbQCw0u2
-         QfKwxFcheB+kd9VDoXtaZ9D+W/vGUQnOsBRxlRWNNGI69AyV28kkmTdU7RAjlbTlqDmz
-         pi8Irg04qSJVTvpV0O6K2nrOSKQZfMrso78E/uSDGQikwGRsTwY9gTtRI/YYlR5WUDll
-         eu7g==
-X-Forwarded-Encrypted: i=1; AJvYcCUsMCbENqwYjRiXbLDlEKr3qdG9dVprKWdrP4w+aXLHsGN+gpKjNW3+ORDMorPTu4AvuTHP8FA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXUvneO++tvcjXc82pxNRjmeEzvKEEl0TLuZVWOaYq9372u+Ab
-	1BvJZRsQ4MDAiHudUSZ8m/R9pWV3s6JkA1Xfn4yagt8SUzS+qY4qHhnl7CNe2w==
-X-Gm-Gg: ASbGnctQgmr46rYUtZqKLe3J20a7FWPQTL9seFGeCWAJO9aGn0FkEKLQY9XvsbBfD4U
-	RIqL0wUuPQfKC9C7RfDUpcW3a8UMDdDff8mj6Lm6t3nV/ihRHYFVuG5SpqspOU7k5ep0OIF+LSL
-	SBKm7SpYHXX5wO9c+wPLhH1qLaf99VCg5Ca3iCP0UsgRR0nAQEX7bJ84+AVhPWby/tn3FUY4rYw
-	vQhEzakLJiuO+3Tkdg9xHEotFZgrJrWDGXKCMMVCe1S+WA6F/38siuEhmOvYEx/ON9GY1Phf7QN
-	DGumydR2GGhv36/PPg==
-X-Google-Smtp-Source: AGHT+IG1rCPaESNmGeL/pCfwE2PjnYtyp8mw3vbAdlrC5Z0UBjbzp0yHi4eT1rDWVtRv0ChBsv/7Ag==
-X-Received: by 2002:ad4:5ced:0:b0:6d8:d79c:1cb2 with SMTP id 6a1803df08f44-6d8e712254amr258600446d6.21.1733851813313;
-        Tue, 10 Dec 2024 09:30:13 -0800 (PST)
+        bh=EJuaBgZKrdv+RWQeMRVkYJY5tTLwVPt/ydvjKnt3MWk=;
+        b=d3dSp8NS91xS0ana/1zI+8YENE0DUJHahsTTcOu92+7vKYKBuD4d7keMeIT1ZzdtZ3
+         DQUmG9gT2lY+KGwKB/DwMpaQV20bU7zwRNQRGa5C3olutGFQXRD87rmDwpeEbNTCaMco
+         aEOnu4LlFKt0pm3lc3PA4589rIq0lNTEd5ixpQh+Mg1eZJW27eti4lYSsLPeLfn1BbTd
+         rIzOmHmrfwJyhqAfEpqQhj/TV2043RsTKslwrkN9y281lInLz7hPtSAcKYNZ2ThU3EOu
+         YPlTJLdP4hyyvSOVfuRy9kUzgotzLljLREYoNnf2KXj6/n1Ybnl63qdYuaz98+vHBRQn
+         b2XA==
+X-Forwarded-Encrypted: i=1; AJvYcCXURBahLPtPNhY8g1DW7QC8yhlB5wR3U0rUX/ib8fki2E6M5fKSftKjtrjgudHbLKsB/XqSOZM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw++XMh6+wZtlI7/I566FG9o7dIwLYbisoLS0xalcm5ivHHiAZL
+	KCc+CTouQffMN/IERL/IJ/lOO+NkgTmqIddVJhKuznLPHesYPycWN5OlSYBCJw==
+X-Gm-Gg: ASbGncuWyI+AHbj7xnqQKDcY88v/hGGD9fJ6hjIGhNqPF5sbCqjvoqFe86i+X07i/vP
+	g5AihyWgXbehLmr7s9VshlAZoCwVZHbbJLCxbkVbbHfnQ5RGULWaBtB07GWTBMl1xC8t5krvrfq
+	8e81e40LDg3z0REikdwauZGrAr7EebaDruaidijRaM236ZNjvkMQh5PmDD5ZNYxwkpC9cjdcXCW
+	8HoL4K82lRdQLi8wnCjhjCyj+zStLVpA9ynXnIofzfpk1OQ+xMORWDDvvFLpM5KF7Qu3Zy//n1R
+	v0PXC8IBaw25vv8eSw==
+X-Google-Smtp-Source: AGHT+IGSlwLnkhDmztl6nVFIaXK4bCm/Nqbb2pVJVrqEqNuu1yaCRevEfXGCfMJUDd+wIPCUwOQAZQ==
+X-Received: by 2002:a05:6214:2a4f:b0:6d8:981d:529 with SMTP id 6a1803df08f44-6d91e43ea4fmr82139946d6.48.1733851821154;
+        Tue, 10 Dec 2024 09:30:21 -0800 (PST)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d90299bccesm33827546d6.60.2024.12.10.09.30.03
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d90299bccesm33827546d6.60.2024.12.10.09.30.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2024 09:30:10 -0800 (PST)
-Message-ID: <bc03a1e5-b67c-42da-9856-7c77d6858138@broadcom.com>
-Date: Tue, 10 Dec 2024 09:30:00 -0800
+        Tue, 10 Dec 2024 09:30:19 -0800 (PST)
+Message-ID: <ad11506a-3b11-4584-8efb-8075158527b2@broadcom.com>
+Date: Tue, 10 Dec 2024 09:30:11 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,8 +79,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/9] net: dsa: b53/bcm_sf2: implement
- .support_eee() method
+Subject: Re: [PATCH net-next 5/9] net: dsa: mt753x: implement .support_eee()
+ method
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
  Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
 Cc: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
@@ -93,7 +93,7 @@ Cc: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
  Simon Horman <horms@kernel.org>, UNGLinuxDriver@microchip.com,
  Vladimir Oltean <olteanv@gmail.com>, Woojung Huh <woojung.huh@microchip.com>
 References: <Z1hNkEb13FMuDQiY@shell.armlinux.org.uk>
- <E1tL14E-006cZU-Nc@rmk-PC.armlinux.org.uk>
+ <E1tL14J-006cZa-Rh@rmk-PC.armlinux.org.uk>
 Content-Language: en-US
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
@@ -128,14 +128,13 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <E1tL14E-006cZU-Nc@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1tL14J-006cZa-Rh@rmk-PC.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 12/10/24 06:18, Russell King (Oracle) wrote:
-> Implement the .support_eee() method to indicate that EEE is not
-> supported by two switch variants, rather than making these checks in
-> the .set_mac_eee() and .get_mac_eee() methods.
+> Implement the .support_eee() method by using the generic helper as all
+> user ports support EEE.
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
