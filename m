@@ -1,133 +1,118 @@
-Return-Path: <netdev+bounces-150619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289EA9EAF8B
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:15:50 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 487469EAF91
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:16:26 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AA1E28A005
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 11:15:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE36116AE15
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 11:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE2AB197A92;
-	Tue, 10 Dec 2024 11:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB94521577F;
+	Tue, 10 Dec 2024 11:11:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EYnDuM1i"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eLKQoIae"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4743A198823;
-	Tue, 10 Dec 2024 11:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9A522E9EC
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 11:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733829072; cv=none; b=Ltto2eyJ3S0M7V7KIm06yIQqSq4QWIiVhVdcK2q8Wzk3zLoIYPfhGbFCw6bdi2PhEfTz+owEK6RnamwWRZYH6w7UPERxSIJF50C8N1qR6otomNhUBGBwoKktleIwZ7TMQsfs0sFddzz6vR7fmrKLHYtMozB1cYJ1cu04XB6+S/Q=
+	t=1733829085; cv=none; b=nqrxIJdopg47hl+kKGC5AVBjfayyKhM9bjSZQYq0OxUAebuDxM/WG0f+e7CUO2kRgw2+HLoEIzngCf+khkpEaCb3K/m76NB7d6lQdEPi8aZcQAFLAdAciwtBuwkKlMJWXhPJwaS+3zGszJxF7YVaa/BB3ZyUMuMDGpMg9plvnB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733829072; c=relaxed/simple;
-	bh=WmM56rWaA+ibYBICkRPOFNZVIlUsUbLa9mtToOsDnk8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P6AmrLuefqaB5UQ/tT6jV68IVH27f4f5JYmLRBrIlo2CP/yS5pRVeymWuXimcS2Qzwnne8ML13Ju0R6/PmlDYv8TkOUmze6zogIFYXGHtjPttiW6EgquoWWPxiduogIMTweI4A9Jid+vL4p5gyPqFmzjaaHeWAAaehh0nUI6oqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EYnDuM1i; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BA1jC1n026166;
-	Tue, 10 Dec 2024 11:10:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=YRWuaf
-	W8QJmSyZR5XykB7q2JyYMIHBo/0XTJs51UPrA=; b=EYnDuM1iAb93Gi23DWUQaB
-	oFri/azhKA6aF5b2QfGNOVQIJvcwZvu8xlgbi/ChyRbkoZX82Zk8uMj+SP0V8D1a
-	W3G5l8+PwZp7jhueSOOW8QroMbto9UailKaq/sjxwVW+nuS4mmPm6J3Z/Hy01Vj9
-	vJg63zXuo8JqKsjnqa9g/FxOt4A7PApndgPWmJx3SPn/j0DGBbK/NPeecYDRkLLb
-	d4tzCoW0Vs/vlH25qiDC1ukEOlhxdod6WNkPmnLQDYHfVpFJMhONVKFv+74g5fk7
-	2iuzeB5gF4jeAeFBZd70YS6ej+pHz73v6zDVoxGgXXsVoKTPa1oq+hUT1+Gwbolg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cdv8pnh5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Dec 2024 11:10:58 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BAB6eLL004753;
-	Tue, 10 Dec 2024 11:10:58 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cdv8pnh0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Dec 2024 11:10:57 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BA7SM1T032590;
-	Tue, 10 Dec 2024 11:10:56 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43d1pn399h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Dec 2024 11:10:56 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BABAq4L57213196
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 10 Dec 2024 11:10:52 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C673E20049;
-	Tue, 10 Dec 2024 11:10:52 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 729AD20040;
-	Tue, 10 Dec 2024 11:10:52 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.152.224.212])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 10 Dec 2024 11:10:52 +0000 (GMT)
-Date: Tue, 10 Dec 2024 12:10:50 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        horms@kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Dust Li
- <dust.li@linux.alibaba.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH net-next v3 2/2] net/smc: support ipv4 mapped ipv6 addr
- client for smc-r v2
-Message-ID: <20241210121050.760b8693.pasic@linux.ibm.com>
-In-Reply-To: <20241209130649.34591-3-guangguan.wang@linux.alibaba.com>
-References: <20241209130649.34591-1-guangguan.wang@linux.alibaba.com>
-	<20241209130649.34591-3-guangguan.wang@linux.alibaba.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1733829085; c=relaxed/simple;
+	bh=duOg5aZSaMhxVM7GBgcvBVHTwXykQZg9BKZ9NZCkqKU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aVqv6W4LZ9Nzjb1ppBB9n3C9Cu7ORLWpPLnjKtF2QAaYNxZMx4/oUbD1LrlvexcNoEnLoyBHzZwGxohUfCTv60fXRDDzyfm00tbNi8FdeVqygXvffiG86uFCImOPAS3Y9fVryyjKk29wE4u6ExMrFi2O4UVaGkyvR+Qq2UmjUd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eLKQoIae; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733829082;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xqlm4HyfhQR5Y2x/B1nZc065c90eXSUmuJIsBWFFIDA=;
+	b=eLKQoIaeYHchgwB12ctiVinBPPVFteCyrYVOEpH7Yazu9mCqbLIL6PuwodKd2Sq+xOMoil
+	gM3vTrCxAU1iSNNDV4obdMND63zDZGR56a8qCXkZdYFVHvFHSLTxYzO+rqJpNqo2kiMvZi
+	KxIDZZkBKXU8d58NG4xFKGQXgYcbrrM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-164-3lOAbEMsNZeMViCBtWmSvA-1; Tue, 10 Dec 2024 06:11:21 -0500
+X-MC-Unique: 3lOAbEMsNZeMViCBtWmSvA-1
+X-Mimecast-MFC-AGG-ID: 3lOAbEMsNZeMViCBtWmSvA
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-385dcae001fso2012968f8f.1
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 03:11:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733829080; x=1734433880;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xqlm4HyfhQR5Y2x/B1nZc065c90eXSUmuJIsBWFFIDA=;
+        b=Fv6xMohUuunW/LhXEl2c7yhSUf7ucyObwrCzwkzZtKR5cGntaz+9RzIbETZ9yJGdgu
+         bdIx9AOBQJvRJ7cZi6WKK4OqYAtjScefnMQPL9Xm0V+F8aaGIIcUJEEvTINvEETnHkRa
+         OPCE4/kQ2VrRq/c1uwnUwgWSZTSnFE/OEg/svegc3U/Lenpc7gqtBAOUxsKh2LFXD62x
+         AsTXH7ZOewlT/55I7JR4b895MR57KV3G3nsNRXYqYm2SXUnYrlL2/Mrkj+RaL2E71Zc9
+         KRCVgXezSy/Dv3VCbONkW0GBk6sQCT8tprpx+heK44CjXE+5BhkJJpc0nvbUBun5bFQj
+         ObRA==
+X-Forwarded-Encrypted: i=1; AJvYcCWLRXJPxrOLczHVtS6CpGQNWvEbXeYPBsQdet/vcSB3mvSI5pBJ2fLnNryYYX7ogod0fqV0BA8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxklAm68S+KzLSXLXB5hg9KURIX0VsFDCyyoP3HumVrxrvRdMul
+	7z6Izf4paTZI9uDnAZIsfV1xnUPu5OJx5t5nWgBGcyDooKYRDbtnHk6TJX5xVOQk4R4JE4AcCER
+	K6/YhJJQgP7ffNLoUc1egwMXMo5SCobwTCBJNzW/08HyzoJa93ilNlw==
+X-Gm-Gg: ASbGncu0E0kkYpYSWzOVWEvFwCMt6gtJojdyLVrzbTPyfWBP78M469T1qIYkhBLrKq6
+	xLLepuV64KQqALZKgmfaQ3tdCAeirhYfRSRZeaMvp3iGSx4oWC3V/zUrhuagOQt12ex20lXLPiD
+	0e8rh9tjU232jNCf5ZXmGpqvvQ2BQTD4KCXITigpZkzlVR268g//FsqPPcw3Z7g0tGZ2ScJz6Df
+	41LbQE/RKU8aRWTghfG3Z7ti/3/H2m1pNQ/7BcXwLAoPs1T2L+qpS7BkRbta/q/JUND8r75fJTW
+	vLCgC0alrsiV1U9JmreABxhr0Q==
+X-Received: by 2002:a05:6000:1448:b0:385:f892:c8fe with SMTP id ffacd0b85a97d-3862b36af96mr11492599f8f.21.1733829079753;
+        Tue, 10 Dec 2024 03:11:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE2oYABIxVBWc0sRGGU3utHrZFlWLl3V24ghJvcAguYjtvNeao1uCnFtjBoTKC+UvX/ONMpdQ==
+X-Received: by 2002:a05:6000:1448:b0:385:f892:c8fe with SMTP id ffacd0b85a97d-3862b36af96mr11492576f8f.21.1733829079384;
+        Tue, 10 Dec 2024 03:11:19 -0800 (PST)
+Received: from [192.168.1.14] (host-82-49-164-239.retail.telecomitalia.it. [82.49.164.239])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3861ecf3efasm15493726f8f.17.2024.12.10.03.11.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2024 03:11:18 -0800 (PST)
+Message-ID: <ddb27716-f1cc-4b65-9cba-b8f502f747ce@redhat.com>
+Date: Tue, 10 Dec 2024 12:11:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: HzZCdnvSlYq8Pe7LIUi0ijqNtBFtMUaM
-X-Proofpoint-ORIG-GUID: uFmtwOwdKp8UUdBtn5APXoizY2saBQ-B
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015 mlxscore=0
- malwarescore=0 adultscore=0 phishscore=0 suspectscore=0 mlxlogscore=493
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412100082
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net-next 07/15] af_unix: Call unix_autobind() only when
+ msg_namelen is specified in unix_dgram_sendmsg().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+References: <20241206052607.1197-1-kuniyu@amazon.com>
+ <20241206052607.1197-8-kuniyu@amazon.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241206052607.1197-8-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon,  9 Dec 2024 21:06:49 +0800
-Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
-
-> AF_INET6 is not supported for smc-r v2 client before, even if the
-> ipv6 addr is ipv4 mapped. Thus, when using AF_INET6, smc-r connection
-> will fallback to tcp, especially for java applications running smc-r.
-> This patch support ipv4 mapped ipv6 addr client for smc-r v2. Clients
-> using real global ipv6 addr is still not supported yet.
+On 12/6/24 06:25, Kuniyuki Iwashima wrote:
+> If unix_peer_get() returns non-NULL in unix_dgram_sendmsg(), the socket
+> have been already bound in unix_dgram_connect() or unix_bind().
 > 
-> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-> Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
-> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-> Reviewed-by: D. Wythe <alibuda@linux.alibaba.com>
-> Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+> Let's not call unix_autobind() in such a case in unix_dgram_sendmsg().
 
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+AFACS, socketpair() will create unbound sockets with peer != NULL. It
+looks like it break the above assumption?!?
+
+Thanks,
+
+Paolo
+
 
