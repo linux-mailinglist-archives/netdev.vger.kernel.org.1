@@ -1,306 +1,215 @@
-Return-Path: <netdev+bounces-150806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A6459EB99F
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 19:50:30 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CED49EB9E0
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 20:13:50 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93B062815AA
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 18:50:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 565A0188238C
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 19:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9381BEF70;
-	Tue, 10 Dec 2024 18:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944E121421D;
+	Tue, 10 Dec 2024 19:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=finest.io header.i=parker@finest.io header.b="HLsKZhmZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j00fF4sz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.perfora.net (mout.perfora.net [74.208.4.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D406623ED41;
-	Tue, 10 Dec 2024 18:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.208.4.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911ED1BDAA2
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 19:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733856626; cv=none; b=Wxj9BCWr0werohhBxLRumrV2c0AvibYTUrmoOh5/GySZ/qUGuXxN6A/69BT0owo4TLuXpqynGq2Otsc+RBlxQLTgFq7dmMTHxkOdMc1LAF8StUw2Epu9IEelJxWMv4c2R1w/vglzAeHm5qPt0b1jyprHvtIoXb/H0Je0Uczo1O8=
+	t=1733858022; cv=none; b=Qg4jWXPkj8A9Mh5BB5cZzewpjSZF5D5Q9xMPFKztHsZyEz7uaFcKl/StcxmQBYPP+OgdhTPBZpMM4VDFCP2CkvVFJBB6q6oQcTzp7aVt6XITq0ITw5dvAIGo4bB4ZZPlfTRsLxZWdqPeB6GQ1pjBa+/FL7ZFLxZlHaK3RbgJ9vY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733856626; c=relaxed/simple;
-	bh=jeb8RjObl9n/RpjrBee2UUV1rzl2k9GmIRAso3y1rqs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gVynpkFZKBCOzlY3hsNXCzRPrUJgb+MiLWcHVOR+jN6lK+hzOI9MdPQ/fqqNX2R8YqrThF+wb7zQNYMY7oFckN78M0ee0JjSgxygVYTozH9gJ7kVZEsDFz5pLExrav0QSpw3s6ExanwqePLbWGSX6YSuFMOFjhXVn9R2uBNR4Ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=finest.io; spf=pass smtp.mailfrom=finest.io; dkim=pass (2048-bit key) header.d=finest.io header.i=parker@finest.io header.b=HLsKZhmZ; arc=none smtp.client-ip=74.208.4.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=finest.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=finest.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=finest.io;
-	s=s1-ionos; t=1733856574; x=1734461374; i=parker@finest.io;
-	bh=sXGDoDjkGFFSl51u8zxIYJIcqrg3qf0vQUL25ISmdXo=;
-	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=HLsKZhmZn5EV78icqXKZwd+lbxo6+tUK0g14xjb6HGLXz6inIBXEiEShNnb2zk0c
-	 w/JERmS2bidwQuhgYmZ9+uZfwgprFCP3L4K/IQXyLXpH2i9w7GKAJEhXjbmvWgFTg
-	 Rnd02iyDf9oplvzRUA7iwrPA14ex37NLpFQsbGYT5ltovGzh5tUZW0urijPNDlixx
-	 oxdfezbNhYSy4L78sHkb/OS5XZcKsWGSUqpdysK2AnYlmHRoUUgC6EF1DUxTvvNM5
-	 fwtMgdVUUuxwiBQLJdtFuUS7rD8oN7r9+YX3UW8x0hKtcxog6w8pcR7PRmdViNP4i
-	 RRFJ/eDCu2l8ksVxvQ==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from SWDEV2.connecttech.local ([98.159.241.229]) by
- mrelay.perfora.net (mreueus002 [74.208.5.2]) with ESMTPSA (Nemesis) id
- 0MGknn-1tPoFQ2dNJ-009LJs; Tue, 10 Dec 2024 19:49:33 +0100
-Date: Tue, 10 Dec 2024 13:49:30 -0500
-From: Parker Newman <parker@finest.io>
-To: Thierry Reding <thierry.reding@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>, Alexandre
- Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Jonathan
- Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
- linux-kernel@vger.kernel.org, Parker Newman <pnewman@connecttech.com>
-Subject: Re: [PATCH v1 1/1] net: stmmac: dwmac-tegra: Read iommu stream id
- from device tree
-Message-ID: <20241210134930.0f963709.parker@finest.io>
-In-Reply-To: <vyzrfrkvwwbi66zemgjywdzpk75mebr47vxaon5jwnn2vprahl@ndzjlez3ywgv>
-References: <bb52bdc1-df2e-493d-a58f-df3143715150@lunn.ch>
-	<20241118084400.35f4697a.parker@finest.io>
-	<984a8471-7e49-4549-9d8a-48e1a29950f6@lunn.ch>
-	<20241119131336.371af397.parker@finest.io>
-	<f00bccd3-62d5-46a9-b448-051894267c7a@lunn.ch>
-	<20241119144729.72e048a5.parker@finest.io>
-	<mpgilwqb5zg5kb4n7r6zwbhy4uutdh6rq5s2yc6ndhcj6gqgri@qkfr4qwjj3ym>
-	<20241204115317.008f497c.parker@finest.io>
-	<uad6id6omswjm7e4eqwd75c52sy5pddtxru3bcuxlukhecvj4u@klzgrws24r2q>
-	<20241206084203.2502ab95.parker@finest.io>
-	<vyzrfrkvwwbi66zemgjywdzpk75mebr47vxaon5jwnn2vprahl@ndzjlez3ywgv>
-Organization: Connect Tech Inc.
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1733858022; c=relaxed/simple;
+	bh=OoVstYQu6T/zlFaQfWwEFzATEqz/K/PXmqBuACGvh9w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KRdI5mhz5/3ypg8PTH4hvmSav6DIl+9RUUPyoa65e+nu8T4MB+PEyrkSIAXXO0eBNNeSx6OTLOOPyjl00rTbJfF2JpkU7pfCdfXa4C51soLq74KWtsVj+ySrIn5eM0chQRwo8gB8yz3E8ZzKz5Xbe7dD3T+HPE3oWNnMOhxo7O8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j00fF4sz; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-434e9716feaso21575025e9.3
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 11:13:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733858019; x=1734462819; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=X3dgyedRD1hxfTsP+DaxUndh7xI0JWroSb1zyCKwxS4=;
+        b=j00fF4szwt6RDNMoE6+zfeoJMIUqEuf/9vlYPvBjAqoZvBzX0SQF5UAks46IzLCN3E
+         CevIxle+stAHDJG958qSrqXVciY06hEjKChemRxPgV/UrrANRjSsIKkUhtgHxTOqGKiQ
+         0DerO476rE+5/t+4IWC7/NEvSj+Jj9Xp4r36EoxNoz9GaZGMfxw70XIb7mI9nQfTkUUG
+         Dc+Z/pyn0HIcROTgkum5jXScGMSlD93CuR0NTCvHEZWtO+bGhRzF+3S8TcrXFqjdxou2
+         WKLOM1djzpWb8p9yNdSh50KTkQWf+820PDltfqWjkEUjWvJ1PRod8+QDG6+wutm8ZeE4
+         Citw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733858019; x=1734462819;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X3dgyedRD1hxfTsP+DaxUndh7xI0JWroSb1zyCKwxS4=;
+        b=aA61ThsPIWT1bB9voYUOxPRugk9swxc021lvLt9PLEYxBnG8djAb5C3U/zvyzu0pN/
+         XTzonEfqTgpT0Er4B8vZIxs+Zvgw2GYJX618OJAVee0IwEQmpSUqNL/OxRdPgitFzHCS
+         UM1E3lVjL4fiIV+NZZc7x691ToGybmdNPmiTd9A9nZmGbzutStSCAPhxbCzZ5jPsTa5w
+         tpzZ0DXwV1mwvOx/mS6B6LMpWr7RQmh66hF22Tfih9eC9goLEQx7lTgx93M2mGorYs1x
+         aflMX92XuNYNdudc5RGy7Q9oOHJdqMKDWcmYFLCly+DZiKpyTQV+icWcHdSG3w78Xrxv
+         Bt7Q==
+X-Gm-Message-State: AOJu0YxF24ny/g5s6z7a3oOoE7HZ7uJIN5TwRIqZggSXUc9MCD9HLboQ
+	z0skY/DjaZSDri9OCfYNWlW9p2zgkpDeV7vtkFzq33R/E7OMuR778hC9KCTU2xI=
+X-Gm-Gg: ASbGncsE8fJ/+kgNKayL7wDM0igKxLY5gxVT757MGI0Ha6cVP6hdCLflxJk5nHqoaMU
+	TFQ8c+tgqrLygvvYvbY20odqQa2fLJfG24QfGIW2LNjCrcvPHewLtK1YeVOLzOOx1f2DxiK2acw
+	i68eLBilbq0/1uBtBhB8N8UdkUR8rnGzWXjr9tCfOmbPf/Zq5EJnH8WwtNBm/KNFkDORq1jiUUa
+	IueUwg3418O+GYoD+Cs+KcF3gajtg1xgBPgvLwyaNoOavEQMN6wDB9twTd9ICHGh5/+msi7k6n0
+	C/OGG+qDR4FUoEFNCmlTgH5R9B8chrD2MkmPWDvFKMLS08OzS0E64wYgqEeLzg==
+X-Google-Smtp-Source: AGHT+IHOkSiF1CR8asnl3lKUjD9+4i6COjCjOo1URqj9o8XWgwpNY5ZD638zrdqu0sv73RqKqilo0A==
+X-Received: by 2002:a5d:5984:0:b0:385:edd1:2245 with SMTP id ffacd0b85a97d-3864cea45bbmr205368f8f.30.1733858018513;
+        Tue, 10 Dec 2024 11:13:38 -0800 (PST)
+Received: from localhost.localdomain (20014C4E37C0C7006406573B5E53AD5C.dsl.pool.telekom.hu. [2001:4c4e:37c0:c700:6406:573b:5e53:ad5c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3862d3f57a0sm13310345f8f.108.2024.12.10.11.13.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Dec 2024 11:13:37 -0800 (PST)
+From: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+To: netdev@vger.kernel.org
+Cc: fejes@inf.elte.hu,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	idosch@idosch.org,
+	Anna Emese Nyiri <annaemesenyiri@gmail.com>
+Subject: [PATCH net-next v6 0/4] Add support for SO_PRIORITY cmsg
+Date: Tue, 10 Dec 2024 20:13:05 +0100
+Message-ID: <20241210191309.8681-1-annaemesenyiri@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:YH2jGO95AdX7oPzjLch72mMQO5TSMAiGw1gFaJeEQ8bYIyNDqgc
- 6uSgtqvI9N/SkrLZTX1E6RaIcOyizSttMBzs8K0GBkymI7PI0gVKjgBjRbWt3v15dHMwrUB
- TDTfMznV2ZtimFGzzYvWbxC4eUDek+mUYN1VTrm0ECvtnu7DTYIgGlzGfwNRmcwPHn31lYI
- dWAAq4hReSBo5+Qe1ui9A==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:f1o3tPPtBnU=;vSmAOKOkEElLwW6kf2XQdeBsfMF
- YUVRGvNG7ndwxxTCRvVKx/FNa2Uk71AGWTIFfjo2LzpPv1+BZAx9WkTiVS6J4RYSrkz4eU51c
- 32Auwoj6FUbodmHP2jKZltaXeYzefZ19oTIeJJfXZP8axMGz9Kh0ILZrbrVDt0P6zlRWOCy/u
- w9w2nH7t6KYUXoEeoR45iZ2Wsb6rhPSGUatO3xlpW6OnLEG2r+r8CLQDftt4rSnvi55j3gOmg
- kNltiO1AvMAIxWzl+92m0AdEUACxRGwDRT98o7U3tL/tB0fs7m3eLF70xIu6j8Ft8ryZMfOIe
- NKNVI9zqI3qo0GEHpJ2XG221RutkKlLT7mb3QgPL5NgYrI1W8o049e4f5hsoQ483zsGGD6vI9
- qtzuh89Ie9ldy52m9IMnhCJfDuaWMLvFPwV1QATZWTxWLAKnJ2TS5kjl2Tg9YgWjX3PugEr7H
- RTth/KNa805ChPXzsOYpvVrsKfAQtbsV1LytI36zIHmNTBihX9yKrQpXxF4EwGfXNtYbG5tap
- 1FBFVfjrsNKknJ4l4UhP8qKRdgZ52RM+jXNNNzJ0E0WWcTiDD6Yipt6yyK9oH9qG8bE6YjQBL
- qXVD1fYaEQS7Limq/9B+YNvE2v7DqWjyIOF/FTuA3PBC22mRsapTYi3pw3+NKeGbrDmmsYkER
- 3ewSj/2jNeLfHQS0r24wbE0kHrKlX/QiY6kJIk8poIps92+CbpKrG6oc350RsFIwIu1TS++Yi
- Mx71vH8hU7D984VM1K+gsU8pRwOFGzXz/wpjL32kRWqWfB4/71683mP0Lu4rXOet7Bk6TxmWP
- F7ObvdQTAjCtg89IsysBes7aCmCspujilY1QnZGcNL6c0yUCuQEXMA5Esdh3amv22/fuOf9X7
- zZ7D3j0HNfpYWUZ+PKxBa+ihw4MiE1pG9cK1tJGQxGoqdCNGWwVsfzNcrS+VRMyL33K3vkxei
- tD/wv+p87Khm+pmE+ALTWWPcm+14b43Ago1aY6YRD+4KpoJfoJen0EaguY8Da9n3bqgGws3vk
- /zah2f1Zk6OoHdiiRB4iCWz42O9QGDscsOrbzr+
+Content-Transfer-Encoding: 8bit
 
-On Fri, 6 Dec 2024 17:01:01 +0100
-Thierry Reding <thierry.reding@gmail.com> wrote:
+Introduce a new helper function, `sk_set_prio_allowed`,
+to centralize the logic for validating priority settings.
+Add support for the `SO_PRIORITY` control message,
+enabling user-space applications to set socket priority
+via control messages (cmsg).
 
-> On Fri, Dec 06, 2024 at 08:42:03AM -0500, Parker Newman wrote:
-> > On Wed, 4 Dec 2024 19:06:30 +0100
-> > Thierry Reding <thierry.reding@gmail.com> wrote:
-> >
-> > > On Wed, Dec 04, 2024 at 11:53:17AM -0500, Parker Newman wrote:
-> > > > On Wed, 4 Dec 2024 17:23:53 +0100
-> > > > Thierry Reding <thierry.reding@gmail.com> wrote:
-> > > >
-> > > > > On Tue, Nov 19, 2024 at 02:47:29PM -0500, Parker Newman wrote:
-> > > > > > On Tue, 19 Nov 2024 20:18:00 +0100
-> > > > > > Andrew Lunn <andrew@lunn.ch> wrote:
-> > > > > >
-> > > > > > > > I think there is some confusion here. I will try to summar=
-ize:
-> > > > > > > > - Ihe iommu is supported by the Tegra SOC.
-> > > > > > > > - The way the mgbe driver is written the iommu DT property=
- is REQUIRED.
-> > > > > > >
-> > > > > > > If it is required, please also include a patch to
-> > > > > > > nvidia,tegra234-mgbe.yaml and make iommus required.
-> > > > > > >
-> > > > > >
-> > > > > > I will add this when I submit a v2 of the patch.
-> > > > > >
-> > > > > > > > - "iommus" is a SOC DT property and is defined in tegra234=
-.dtsi.
-> > > > > > > > - The mgbe device tree nodes in tegra234.dtsi DO have the =
-iommus property.
-> > > > > > > > - There are no device tree changes required to to make thi=
-s patch work.
-> > > > > > > > - This patch works fine with existing device trees.
-> > > > > > > >
-> > > > > > > > I will add the fallback however in case there is changes m=
-ade to the iommu
-> > > > > > > > subsystem in the future.
-> > > > > > >
-> > > > > > > I would suggest you make iommus a required property and run =
-the tests
-> > > > > > > over the existing .dts files.
-> > > > > > >
-> > > > > > > I looked at the history of tegra234.dtsi. The ethernet nodes=
- were
-> > > > > > > added in:
-> > > > > > >
-> > > > > > > 610cdf3186bc604961bf04851e300deefd318038
-> > > > > > > Author: Thierry Reding <treding@nvidia.com>
-> > > > > > > Date:   Thu Jul 7 09:48:15 2022 +0200
-> > > > > > >
-> > > > > > >     arm64: tegra: Add MGBE nodes on Tegra234
-> > > > > > >
-> > > > > > > and the iommus property is present. So the requires is safe.
-> > > > > > >
-> > > > > > > Please expand the commit message. It is clear from all the q=
-uestions
-> > > > > > > and backwards and forwards, it does not provide enough detai=
-ls.
-> > > > > > >
-> > > > > >
-> > > > > > I will add more details when I submit V2.
-> > > > > >
-> > > > > > > I just have one open issue. The code has been like this for =
-over 2
-> > > > > > > years. Why has it only now started crashing?
-> > > > > > >
-> > > > > >
-> > > > > > It is rare for Nvidia Jetson users to use the mainline kernel.=
- Nvidia
-> > > > > > provides a custom kernel package with many out of tree drivers=
- including a
-> > > > > > driver for the mgbe controllers.
-> > > > > >
-> > > > > > Also, while the Orin AGX SOC (tegra234) has 4 instances of the=
- mgbe controller,
-> > > > > > the Nvidia Orin AGX devkit only uses mgbe0. Connect Tech has c=
-arrier boards
-> > > > > > that use 2 or more of the mgbe controllers which is why we fou=
-nd the bug.
-> > > > >
-> > > > > Correct. Also, this was a really stupid thing that I overlooked.=
- I don't
-> > > > > recall the exact circumstances, but I vaguely recall there had b=
-een
-> > > > > discussions about adding the tegra_dev_iommu_get_stream_id() hel=
-per
-> > > > > (that this patch uses) around the time that this driver was crea=
-ted. In
-> > > > > the midst of all of this I likely forgot to update the driver af=
-ter the
-> > > > > discussions had settled.
-> > > > >
-> > > > > Anyway, I agree with the conclusion that we don't need a compati=
-bility
-> > > > > fallback for this, both because it would be actively wrong to do=
- it and
-> > > > > we've had the required IOMMU properties in device tree since the=
- start,
-> > > > > so there can't be any regressions caused by this.
-> > > > >
-> > > > > I don't think it's necessary to make the iommus property require=
-d,
-> > > > > though, because there's technically no requirement for these dev=
-ices to
-> > > > > be attached to an IOMMU. They usually are, and it's better if th=
-ey are,
-> > > > > but they should be able to work correctly without an IOMMU.
-> > > > >
-> > > > Thanks for confirming from the Nvidia side! I wasn't sure if they =
-would
-> > > > work without the iommu. That said, if you did NOT want to use the =
-iommu
-> > > > and removed the iommu DT property then the probe will fail after m=
-y patch.
-> > > > Would we not need a guard around the writes to MGBE_WRAP_AXI_ASID0=
-_CTRL as well?
-> > >
-> > > Well... frankly, I don't know. There's an override in the memory
-> > > controller which we set when a device is attached to an IOMMU. That'=
-s
-> > > usually how the stream ID is programmed. If we don't do that it will
-> > > typically default to a special passthrough stream ID (technically th=
-e
-> > > firmware can lock down those register and force them to a specific
-> > > stream ID all the time). I'm not sure what exactly the impact is of
-> > > these ASID registers (there's a few other instances where those are
-> > > needed). They are required if you want to use the IOMMU, but I don't
-> > > know what their meaning is if the IOMMU is not enabled.
-> > >
-> > > There's also different cases: the IOMMU can be disabled altogether, =
-in
-> > > which case no page tables and such exist for any device and no
-> > > translation should happen whatsoever. But there's also the case wher=
-e an
-> > > IOMMU is enabled, but certain devices shouldn't attach to them. I sh=
-ould
-> > > make it very clear that both of these are not recommended setups and=
- I
-> > > don't know if they'll work. And they are mostly untested. I've been
-> > > meaning, but haven't found the time, to test some of these cases.
-> > >
-> >
-> > Yes I agree, all of those situations are very niche and not recommende=
-d for
-> > a Tegra platform that should always have the iommu enabled anyways. Ad=
-ding an
-> > iommu bypass would probably be outside of the scope of this patch.
-> >
-> > I will not add a patch marking the iommu as required in the device tre=
-e
-> > bindings when I submit v2 unless anyone else feels different.
->
-> I was able to find a bit more information on this. Starting with
-> Tegra234 it's usually no longer possible to even enable bypass. It can
-> still be done, but it needs to be carefully coordinated between the
-> secure bootloader/firmware and the OS. Basically the secure firmware
-> can lock down the ability to bypass the IOMMU. If the firmware was
-> configured to allow bypass, the driver can then do so by writing the
-> special stream ID 0x7f into the stream ID register.
->
-> On these newer chips the memory controller override no longer has any
-> effect and writing the per-device stream ID registers is the only way to
-> attach to the IOMMU.
->
-> There's still the case where you can disable the IOMMU altogether, in
-> which case the IOMMU will still be bypassed, no matter what the firmware
-> did. My understanding is that it doesn't matter in those cases whether
-> we write the stream ID registers or not, they will simply get ignored.
-> With one exception perhaps being the bypass SID. If you write that, then
-> there's a protection mechanism that kicks in.
->
-> Well, after all this this still isn't entirely clear to me, but I think
-> what it means in a nutshell is that a) we'll want to keep the IOMMU
-> always on for security and because the firmware is by default configured
-> to not allow bypassing, b) IOMMU isn't strictly required because the
-> IOMMU might be completely disabled and c) we shouldn't need to
-> conditionalize the stream ID register writes.
->
-> That said, the tegra_dev_iommu_get_stream_id() function returns a bool
-> specifically to support the latter case. So the intention with the
-> design was that drivers would call that function and only need to write
-> the stream ID register if it returns true. That's not always great
-> because you may want (or need) to rewrite the register after suspend/
-> resume, in which case you probably want to resort to a cached value
-> rather than call that API. On the other hand the API is quite simple, so
-> it could serve as a cache as well.
->
+Patch Overview:
 
-I guess I could add an IS_ENABLED(CONFIG_IOMMU_API) check if
-tegra_dev_iommu_get_stream_id() returns false in probe?
+Patch 1/4: Introduce 'sk_set_prio_allowed' helper function.
+Patch 2/4: Add support for setting SO_PRIORITY via control messages
+Patch 3/4: Add test for SO_PRIORITY setting via control messages
+Patch 4/4: Add new socket option, SO_RCVPRIORITY
 
-That would cover if the IOMMU_API is not enabled but not if the Tegra's
-iommu is disabled in other ways.
+v6:
 
--Parker
+- Carry Eric's and Willem's "Reviewed-by" tags from v3 to
+  patch 1/4 since that is resubmitted without changes.
+- Carry Willem's "Reviewed-by" tag from v4 in patch 2/4,
+  as it is resubmitted without changes.
+- Carry Willem's "Reviewed-by" tag from v5 in patch 4/4,
+  as it is resubmitted without changes.
+- Use KSFT_SKIP in jq installation test and
+  add 'nodad' flag for IPv6 address in cmsg_so_priority.sh (patch 3/4).
+- Rebased on net-next.
+
+v5:
+
+https://lore.kernel.org/netdev/20241205133112.17903-1-annaemesenyiri@gmail.com/
+
+- Carry Eric's and Willem's "Reviewed-by" tags from v3 to
+  patch 1/4 since that is resubmitted without changes.
+- Carry Willem's "Reviewed-by" tag from v4 in patch 2/4,
+  as it is resubmitted without changes.
+- Eliminate variable duplication, fix indentation, simplify cleanup,
+  verify dependencies, separate setsockopt and control message 
+  priority testing, and modify namespace setup 
+  in patch 3/4 cmsg_so_priority.sh.
+- Add cmsg_so_priority.sh to tools/testing/selftests/net/Makefile.
+- Remove the unused variable, rename priority_cmsg to priority,
+  and document the -P option in cmsg_sender.c in patch 3/4.
+- New in v5: add new socket option, SO_RCVPRIORITY in patch 4/4.
+- Rebased on net-next.
+
+v4:
+
+https://lore.kernel.org/netdev/20241118145147.56236-1-annaemesenyiri@gmail.com/
+- Carry Eric's and Willem's "Reviewed-by" tags from v3 to 
+  patch 1/3 since that is resubmitted without changes.
+- Updated description in patch 2/3.
+- Missing ipc6.sockc.priority field added in ping_v6_sendmsg()
+  in patch 2/3.
+- Update cmsg_so_priority.sh to test SO_PRIORITY sockopt and cmsg
+  setting with VLAN priority tagging in patch 3/3. (Ido Schimmel) 
+- Rebased on net-next.
+
+v3:
+
+https://lore.kernel.org/netdev/20241107132231.9271-1-annaemesenyiri@gmail.com/
+- Updated cover letter text.
+- Removed priority field from ipcm_cookie.
+- Removed cork->tos value check from ip_setup_cork, so
+  cork->priority will now take its value from ipc->sockc.priority.
+- Replaced ipc->priority with ipc->sockc.priority
+  in ip_cmsg_send().
+- Modified the error handling for the SO_PRIORITY
+  case in __sock_cmsg_send().
+- Added missing initialization for ipc6.sockc.priority.
+- Introduced cmsg_so_priority.sh test script.
+- Modified cmsg_sender.c to set priority via control message (cmsg).
+- Rebased on net-next.
+
+
+v2:
+
+https://lore.kernel.org/netdev/20241102125136.5030-1-annaemesenyiri@gmail.com/
+- Introduced sk_set_prio_allowed helper to check capability
+  for setting priority.
+- Removed new fields and changed sockcm_cookie::priority
+  from char to u32 to align with sk_buff::priority.
+- Moved the cork->tos value check for priority setting
+  from __ip_make_skb() to ip_setup_cork().
+- Rebased on net-next.
+
+v1:
+
+https://lore.kernel.org/all/20241029144142.31382-1-annaemesenyiri@gmail.com/
+
+Anna Emese Nyiri (4):
+  Introduce sk_set_prio_allowed helper function
+  support SO_PRIORITY cmsg
+  test SO_PRIORITY ancillary data with cmsg_sender
+  introduce SO_RCVPRIORITY socket option
+
+ arch/alpha/include/uapi/asm/socket.h          |   2 +
+ arch/mips/include/uapi/asm/socket.h           |   2 +
+ arch/parisc/include/uapi/asm/socket.h         |   2 +
+ arch/sparc/include/uapi/asm/socket.h          |   2 +
+ include/net/inet_sock.h                       |   2 +-
+ include/net/ip.h                              |   2 +-
+ include/net/sock.h                            |   8 +-
+ include/uapi/asm-generic/socket.h             |   2 +
+ net/can/raw.c                                 |   2 +-
+ net/core/sock.c                               |  26 ++-
+ net/ipv4/ip_output.c                          |   4 +-
+ net/ipv4/ip_sockglue.c                        |   2 +-
+ net/ipv4/raw.c                                |   2 +-
+ net/ipv6/ip6_output.c                         |   3 +-
+ net/ipv6/ping.c                               |   1 +
+ net/ipv6/raw.c                                |   3 +-
+ net/ipv6/udp.c                                |   1 +
+ net/packet/af_packet.c                        |   2 +-
+ net/socket.c                                  |  11 ++
+ tools/include/uapi/asm-generic/socket.h       |   2 +
+ tools/testing/selftests/net/Makefile          |   1 +
+ tools/testing/selftests/net/cmsg_sender.c     |  11 +-
+ .../testing/selftests/net/cmsg_so_priority.sh | 153 ++++++++++++++++++
+ 23 files changed, 230 insertions(+), 16 deletions(-)
+ create mode 100755 tools/testing/selftests/net/cmsg_so_priority.sh
+
+-- 
+2.43.0
+
 
