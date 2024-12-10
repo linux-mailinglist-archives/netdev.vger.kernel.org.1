@@ -1,132 +1,130 @@
-Return-Path: <netdev+bounces-150845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 597239EBBBF
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 22:21:25 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56389163B36
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 21:21:22 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A383023024D;
-	Tue, 10 Dec 2024 21:21:22 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E3FC9EBBFA
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 22:42:08 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF13623ED4A
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 21:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95055284716
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 21:42:06 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DF2D23979F;
+	Tue, 10 Dec 2024 21:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CGUlodse"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9F5237A57;
+	Tue, 10 Dec 2024 21:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733865682; cv=none; b=ffVPWg7DbMYmyN4vxSJbDBF92rw6hbRz1y2/YIeOhE8S9iVPFptV7j71Ap8Qd5szzj3K4NBxkEl8ImR/iUM4Gi/4NAcZHQ9bC7ObVeFZAyPxzjqhpE7Zp/j1kUDTKWbkX1C5VEVEsadqFtPFV8IyU1gdoxjpdNLkDe5xmtrWr48=
+	t=1733866923; cv=none; b=k5M8NpeTaBTCcqHXzGdfze4n3yxzICRl2OlB0ygCcD7EE71kZCn0CnF+xm+SWqsLXaVxbM8PyPJ1G2GhfH6RxhnHl8L0SIHzUFiaW91CqwB0VUE8SZxLg+YBuhLw3nkqv5cU4hXTK9Ek/ZkX/Cwj/SEyH920HVmFqWbQ+D3tXPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733865682; c=relaxed/simple;
-	bh=03QxPv6zHZFNMcD5lh91H1q2l5BIdvYZmqXGPIXUEWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n2Iop3NJwewhgrddQb+W8oAlOyASmKK987RtXZ1yzgs6lvziA+lztnE0OPr3APYTFjsIcedUacQDGhT/4qIuagxRVANr6W/5yzoUcr38zEYrr4wQV3Eg93q2fXYCNm5aRydDxSG/Y95WHIzQNsuT8h+cpMccp7UXlxgbIOZtwaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
-Received: from mail-relay (helo=jo-so.de)
-	by s1.jo-so.de with local-bsmtp (Exim 4.96)
-	(envelope-from <joerg@jo-so.de>)
-	id 1tL7fI-001fAJ-03;
-	Tue, 10 Dec 2024 22:21:08 +0100
-Received: from joerg by zenbook.jo-so.de with local (Exim 4.98)
-	(envelope-from <joerg@jo-so.de>)
-	id 1tL7fH-00000000Qis-1e4Y;
-	Tue, 10 Dec 2024 22:21:07 +0100
-Date: Tue, 10 Dec 2024 22:21:07 +0100
-From: =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Christian Eggers <ceggers@arri.de>, netdev@vger.kernel.org
-Subject: Re: KSZ8795 not detected at start to boot from NFS
-Message-ID: <vuslt6lyxgfyswtpymtu5yklflzqs5f2l2yqtzlypnyqe6llkk@yz3eakhmctsq>
-OpenPGP: id=7D2C9A23D1AEA375; url=https://jo-so.de/pgp-key.txt;
- preference=signencrypt
-References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
- <a578b29f-53f0-4e33-91a4-3932fa759cd1@lunn.ch>
- <phab74r5xxbufhe6llruqa3tgkxzalytgzqrko4o2bg2xzizjv@apha3we342xn>
- <7080052.9J7NaK4W3v@n9w6sw14>
- <zhuujdhxrquhi4u6n25rryx3yw3lm2ceuijcwjmnrr4awt4ys4@53wh2fqxnd6w>
- <njdcvcha6n3chy2ldrf2ghnj5brgqxqujrk4trp5wyo6jvpo6c@b3qdubsvg6ko>
- <f52b2e7d-e4dc-4afd-8a7f-eaa2d4586fb9@lunn.ch>
+	s=arc-20240116; t=1733866923; c=relaxed/simple;
+	bh=eMB4BERgg0UcMa0SMSP2cNR/GwixDiZtVw4VPXs5cTE=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=OH8l0t0ryxpinTh+cAoVaFoTzzmbZIeGE6nj1y9XPMd7oCkH+lQjB6SVtg2JCiVEgceuEoL8H446mK8JO4OgvidI24egHDUn6Svv6EOBYLwpTAkDW8UsWfmwt/pI+ABYi5HDPuo78rCmSHx/jKGUvClGwRoD7geB6b+Ok8EZ+CI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CGUlodse; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4C22C4CED6;
+	Tue, 10 Dec 2024 21:42:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733866922;
+	bh=eMB4BERgg0UcMa0SMSP2cNR/GwixDiZtVw4VPXs5cTE=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=CGUlodseObfVPj3hiYJxhiXbZsEPZpsH23S+zoCmMvLMQnnbIU0JLOP9hWJzmuRDx
+	 RtC8q/UxA4NHet4EyYjfivZBBJB99SuL6jPhTnXBe7jy0S+5xx82g/g0IaHcKeQqG9
+	 aUc6/dnLbUJxN8ek959LpitRRFEIWtwZ5RrZU37JPTxei3C6AZchUr0OoudUu11py9
+	 ygJzjUdIhPClcWfe5OjpuItqxWMmLEdR/mfHFnPWsJBTBJsb6RAxqDePbe9Bk80MBR
+	 GglhVj4D71ZQpTgCUAGsrEPAxLn5Z5bpu8irWqswMkC+z5arwkewHO9fIqL8vI5i2N
+	 Yo4OuTxOOuOYg==
+Date: Tue, 10 Dec 2024 15:42:00 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gdvp7ysucchvqtbi"
-Content-Disposition: inline
-In-Reply-To: <f52b2e7d-e4dc-4afd-8a7f-eaa2d4586fb9@lunn.ch>
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+ Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ Woojung Huh <woojung.huh@microchip.com>, Conor Dooley <conor+dt@kernel.org>, 
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Eric Dumazet <edumazet@google.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+In-Reply-To: <20241209103434.359522-1-o.rempel@pengutronix.de>
+References: <20241209103434.359522-1-o.rempel@pengutronix.de>
+Message-Id: <173386568446.497546.553726469163110460.robh@kernel.org>
+Subject: Re: [PATCH v2 0/4] Add support for Priva E-Measuringbox board
 
 
---gdvp7ysucchvqtbi
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: KSZ8795 not detected at start to boot from NFS
-MIME-Version: 1.0
-
-Andrew Lunn schrieb am Di 10. Dez, 18:41 (+0100):
-> > So I think it's a timing problem: the ksz8795 isn't ready after the SPI
-> > reset, when the chip ID gets read, and this causes the probing to stop.
->=20
-> Is there anything in the datasheet about reset timing?=20
-
-Not exactly. On page 127 is a diagram about resetting the chip.
-
-https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocum=
-ents/DataSheets/KSZ8795CLX-Data-Sheet-DS00002112.pdf
-
-Here's a commit that contains a calculation and determines 100ms.
-
-commit 1aa4ee0ec7fe929bd46ae20d9457f0a242115643
-Author: Marek Vasut <marex@denx.de>
-Date:   Wed Jan 20 04:05:02 2021 +0100
-
-    net: dsa: microchip: Adjust reset release timing to match reference res=
-et circuit
-
-    commit 1c45ba93d34cd6af75228f34d0675200c81738b5 upstream.
-
-    KSZ8794CNX datasheet section 8.0 RESET CIRCUIT describes recommended
-    circuit for interfacing with CPU/FPGA reset consisting of 10k pullup
-    resistor and 10uF capacitor to ground. This circuit takes ~100 ms to
-    rise enough to release the reset.
-
-    For maximum supply voltage VDDIO=3D3.3V VIH=3D2.0V R=3D10kR C=3D10uF th=
-at is
-                        VDDIO - VIH
-      t =3D R * C * -ln( ------------- ) =3D 10000*0.00001*-(-0.93)=3D0.093=
- s
-                           VDDIO
-    so we need ~95 ms for the reset to really de-assert, and then the
-    original 100us for the switch itself to come out of reset. Simply
-    msleep() for 100 ms which fits the constraint with a bit of extra
-    space.
+On Mon, 09 Dec 2024 11:34:30 +0100, Oleksij Rempel wrote:
+> This patch series introduces support for the Priva E-Measuringbox board
+> based on the ST STM32MP133 SoC. The set includes all the necessary
+> changes for device tree bindings, vendor prefixes, thermal support, and
+> board-specific devicetree to pass devicetree validation and checkpatch
+> tests.
+> 
+> changes v2:
+> - drop: dt-bindings: net: Add TI DP83TD510 10BaseT1L PHY
+> 
+> Oleksij Rempel (2):
+>   dt-bindings: vendor-prefixes: Add prefix for Priva
+>   dt-bindings: arm: stm32: Add Priva E-Measuringbox board
+> 
+> Roan van Dijk (2):
+>   arm: dts: stm32: Add thermal support for STM32MP131
+>   arm: dts: stm32: Add Priva E-Measuringbox devicetree
+> 
+>  .../devicetree/bindings/arm/stm32/stm32.yaml  |   6 +
+>  .../devicetree/bindings/vendor-prefixes.yaml  |   2 +
+>  arch/arm/boot/dts/st/Makefile                 |   1 +
+>  arch/arm/boot/dts/st/stm32mp131.dtsi          |  35 ++
+>  arch/arm/boot/dts/st/stm32mp133c-prihmb.dts   | 496 ++++++++++++++++++
+>  5 files changed, 540 insertions(+)
+>  create mode 100644 arch/arm/boot/dts/st/stm32mp133c-prihmb.dts
+> 
+> --
+> 2.39.5
+> 
+> 
+> 
 
 
-J=C3=B6rg
+My bot found new DTB warnings on the .dts files added or changed in this
+series.
 
---=20
-=E2=80=9EDass man etwas durchdringen kann, wenn man es durchschaut
- hat, ist der Irrtum der Fliege an der Fensterscheibe.=E2=80=9C (Nietzsche)
+Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
+are fixed by another series. Ultimately, it is up to the platform
+maintainer whether these warnings are acceptable or not. No need to reply
+unless the platform maintainer has comments.
 
---gdvp7ysucchvqtbi
-Content-Type: application/pgp-signature; name="signature.asc"
+If you already ran DT checks and didn't see these error(s), then
+make sure dt-schema is up to date:
 
------BEGIN PGP SIGNATURE-----
+  pip3 install dtschema --upgrade
 
-iHUEABEIAB0WIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCZ1iwwgAKCRB9LJoj0a6j
-dW6fAP0UkspqH6PurY94sxxPW3jr3q4vNAXKvbj6wgx9WA1rNgEAjOYVZcsYQrlV
-QgnB8mLua2VyMM22+JeFfPPky+1hr+Q=
-=PcLh
------END PGP SIGNATURE-----
 
---gdvp7ysucchvqtbi--
+New warnings running 'make CHECK_DTBS=y st/stm32mp133c-prihmb.dtb' for 20241209103434.359522-1-o.rempel@pengutronix.de:
+
+arch/arm/boot/dts/st/stm32mp133c-prihmb.dtb: adc@48004000: adc@0:interrupts: 0 was expected
+	from schema $id: http://devicetree.org/schemas/iio/adc/st,stm32-adc.yaml#
+arch/arm/boot/dts/st/stm32mp133c-prihmb.dtb: adc@48003000: adc@0:interrupts: 0 was expected
+	from schema $id: http://devicetree.org/schemas/iio/adc/st,stm32-adc.yaml#
+
+
+
+
+
 
