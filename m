@@ -1,88 +1,158 @@
-Return-Path: <netdev+bounces-150478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E02069EA636
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 04:11:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B3319EA65B
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 04:15:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97AD3188C1E8
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 03:11:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7ADB216A136
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 03:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E777E13B58C;
-	Tue, 10 Dec 2024 03:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD05111A8;
+	Tue, 10 Dec 2024 03:15:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rDNf+FL7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qm5s8u1m"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B112AEFE
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 03:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A9AB644;
+	Tue, 10 Dec 2024 03:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733800276; cv=none; b=gA7xa+cD/tqrqtgZpZV0b7MNBZoDngfoik5kBKSFR6PAPRXazEyBp6YE/u/M/WEIuJ1r66M5DImQHpOJS5bUK9LsJe12IsBL1QS9mKb7gY1Uk0dTKaNSI2gQmzl03CTukPwKvYF4YQFNjiLttuKT1SBblmPv4CnVhkmUX1yfc6Y=
+	t=1733800529; cv=none; b=P46haohjsB50DI1JAzvzKDFrQ26SDxyuU32IrYkKEwTqxqDSeYrCFdrt69mIWej+JDjOtXaVdn0TH3n9bfC2mULmkmxsfP6mG6/fDc7PEl4QE1LtE22lZTtzj5tSAEBwb8l9YUU6BZv1Fu18CHKBJvjv7lt7hJSiWf9kyadwEbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733800276; c=relaxed/simple;
-	bh=VCQZrQ4vJp+zEAdVACTwxZ5FTkarvjAoSzsIY1SELJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K1ZjR47LHR9y3FJs0bZE6OJvFhDlV9tTeKBrGAXb+3QqsO85K5lKkujBTyetqZgGrY8t+/124yvUStRh7rqIwUaAz79EPreL6OgIhFXLf+ITH5v3Uab7CE+kWVsb402lU2ZKvIJ8VLvtpQCRm+ZdYRNuMUqKiBs0MOuuC50qtYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rDNf+FL7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=jMFetFruFka8IIRNhoyfsmF5SWd5uoAOs7rMiPBCrrM=; b=rDNf+FL7eV10CGfd7e9d83HpL6
-	ocba9KPDZjVQ6L6v6YhAYzFPw9QbuX2rmKgKcvouN/Bnewh/0SRdFY2MikLWlLEGOL2qp0cBcxeOX
-	8aoQbJslQHbQzY3Li/s1mUL50qtoQPgj0/H4u69wi5ZOgKnyWoTg6QR9ctH3870FevCE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tKqeT-00FkUG-T3; Tue, 10 Dec 2024 04:11:09 +0100
-Date: Tue, 10 Dec 2024 04:11:09 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next 03/10] net: phy: add configuration of rx clock
- stop mode
-Message-ID: <fdf1b674-8e47-43ab-9608-e25dde9f3f20@lunn.ch>
-References: <Z1b9J-FihzJ4A6aQ@shell.armlinux.org.uk>
- <E1tKefY-006SMd-Af@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1733800529; c=relaxed/simple;
+	bh=hikp0XhoCm1dqCyO4dn4t0X6ZV8oady+HW0iZKvlZ28=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iTPT3/0nlwOOLlKpOW11gTf61tOAub5RggYdKyxFZWNM4j1ipGlS1yYnKFULYepg0DBfjAbmM+NjmGKVOWyWKEKldq6/MqhwUTDYvT8SRh29/TwcjkYpog+uaIfE0jE+pT0JZxU8p+bVqtbcAyH3PzffobeCBIkVlgD7+9rJUGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qm5s8u1m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F187C4CED1;
+	Tue, 10 Dec 2024 03:15:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733800527;
+	bh=hikp0XhoCm1dqCyO4dn4t0X6ZV8oady+HW0iZKvlZ28=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qm5s8u1mfYHldehN7GyYGGsAsD8ratla3taWqKpnZq4eMohuyS8Y9gulIWLxZjZa1
+	 pK77vESvXXp1QYWZe6Cdzb1atPilWImxnpTqci85Q8GUm49rDNPm+Vhhwn46AloQ07
+	 3Sivzq55/A3ia+kdpEuau4Crmx4oOz5W1tscyQ/+ue6rPeOw1M30GNKPCB1ljcbsYx
+	 TDyfK5FbXpVV6Dq6EZEMRB5Asa/kSIxMyk4NrI4ztElwsGoRaAtMCF6VsuZHDqNHYm
+	 CyM13GVqdAfd3gbnP4AVmU3NEZhfl9G6LpzSQH5bnphGPZBly3rc7Je6fskHQjlWRp
+	 VayBWFAIwj97Q==
+Date: Mon, 9 Dec 2024 19:15:26 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, Jens Axboe
+ <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, Paolo Abeni
+ <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David
+ Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+Subject: Re: [PATCH net-next v8 04/17] net: prepare for non devmem TCP
+ memory providers
+Message-ID: <20241209191526.063d6797@kernel.org>
+In-Reply-To: <20241204172204.4180482-5-dw@davidwei.uk>
+References: <20241204172204.4180482-1-dw@davidwei.uk>
+	<20241204172204.4180482-5-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1tKefY-006SMd-Af@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> @@ -2073,6 +2073,7 @@ int phy_unregister_fixup_for_id(const char *bus_id);
->  int phy_unregister_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask);
+On Wed,  4 Dec 2024 09:21:43 -0800 David Wei wrote:
+> +EXPORT_SYMBOL_GPL(net_is_devmem_page_pool_ops);
+
+Export doesn't seem necessary, no module should need this right?
+
+> @@ -316,10 +322,10 @@ void dev_dmabuf_uninstall(struct net_device *dev)
+>  	unsigned int i;
 >  
->  int phy_eee_tx_clock_stop_capable(struct phy_device *phydev);
-> +int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable);
+>  	for (i = 0; i < dev->real_num_rx_queues; i++) {
+> -		binding = dev->_rx[i].mp_params.mp_priv;
+> -		if (!binding)
+> +		if (dev->_rx[i].mp_params.mp_ops != &dmabuf_devmem_ops)
+>  			continue;
+>  
+> +		binding = dev->_rx[i].mp_params.mp_priv;
+>  		xa_for_each(&binding->bound_rxqs, xa_idx, rxq)
+>  			if (rxq == &dev->_rx[i]) {
+>  				xa_erase(&binding->bound_rxqs, xa_idx);
 
-Hi Russell
+Maybe add an op to mp_ops for queue unbinding?
+Having an op struct and yet running code under if (ops == X) seems odd.
 
-Do you have patches to MAC drivers using phylib, not phylink, using
-these two new calls?
+> -	if (binding && nla_put_u32(rsp, NETDEV_A_PAGE_POOL_DMABUF, binding->id))
+> -		goto err_cancel;
+> +	if (net_is_devmem_page_pool_ops(pool->mp_ops)) {
+> +		binding = pool->mp_priv;
+> +		if (nla_put_u32(rsp, NETDEV_A_PAGE_POOL_DMABUF, binding->id))
+> +			goto err_cancel;
 
-We see phylib users get EEE wrong. I'm worried phylib users are going
-to try to use these new API methods and make an even bigger mess. If
-we think these should only be used by phylink, maybe they should be
-put into a header in drivers/net/phy to stop MAC drivers using them?
+ditto, all mps should show up in page pool info. Even if it's just 
+an empty nest for now, waiting for attributes to be added later.
 
-	Andrew
+> +	}
+>  
+>  	genlmsg_end(rsp, hdr);
+>  
+> @@ -353,16 +356,16 @@ void page_pool_unlist(struct page_pool *pool)
+>  int page_pool_check_memory_provider(struct net_device *dev,
+>  				    struct netdev_rx_queue *rxq)
+>  {
+> -	struct net_devmem_dmabuf_binding *binding = rxq->mp_params.mp_priv;
+> +	void *mp_priv = rxq->mp_params.mp_priv;
+>  	struct page_pool *pool;
+>  	struct hlist_node *n;
+>  
+> -	if (!binding)
+> +	if (!mp_priv)
+>  		return 0;
+>  
+>  	mutex_lock(&page_pools_lock);
+>  	hlist_for_each_entry_safe(pool, n, &dev->page_pools, user.list) {
+> -		if (pool->mp_priv != binding)
+> +		if (pool->mp_priv != mp_priv)
+>  			continue;
+>  
+>  		if (pool->slow.queue_idx == get_netdev_rx_queue_index(rxq)) {
+
+appears to be unrelated
+
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index b872de9a8271..f22005c70fd3 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -277,6 +277,7 @@
+>  #include <net/ip.h>
+>  #include <net/sock.h>
+>  #include <net/rstreason.h>
+> +#include <net/page_pool/types.h>
+
+types.h being needed to call a helper is unusual
+
+>  #include <linux/uaccess.h>
+>  #include <asm/ioctls.h>
+> @@ -2476,6 +2477,11 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+>  			}
+>  
+>  			niov = skb_frag_net_iov(frag);
+> +			if (net_is_devmem_page_pool_ops(niov->pp->mp_ops)) {
+
+This one seems legit to me, FWIW, checking if its devmem in devmem
+specific code is fine. 
+
+> +				err = -ENODEV;
+> +				goto out;
+> +			}
+> +
+>  			end = start + skb_frag_size(frag);
+>  			copy = end - offset;
+>  
 
