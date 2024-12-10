@@ -1,150 +1,131 @@
-Return-Path: <netdev+bounces-150721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F4809EB418
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:57:48 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D070C18816CD
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:57:47 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E5B1A9B25;
-	Tue, 10 Dec 2024 14:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U8IkJ6Ep"
-X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2FBD9EB424
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:59:47 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39BF11A0B15
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 14:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA96C2811FB
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:59:45 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BBBE1B85D3;
+	Tue, 10 Dec 2024 14:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aEeuwa5K"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079C71B85C2
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 14:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733842663; cv=none; b=C1OaBiQhTVCdc1EXKxe2lTsWFerIquP1Co8wqu3xN/mYCf5mm76nQsnzgUepNobYqMEQP3bzclq/NIQ7HgmVuHkkfd352ocdzoXfESytOje7jyhtua7lCT39xXvorCS4qZszccgDigOspkrVSEC5OLV+BIPsNdw2ZVATMANWNu8=
+	t=1733842775; cv=none; b=av4cNsM2WHY6dD8i9MxnTbwCllP5f+w3Z2u6fCzXlCJ967v8I4B+0nwrGgDVvmc50P8FhnUl8zOLcQcxb/Mxp8Oq79SWfe68DG4+bMwvhlyvLlpXi81mGULzwAwuoxKWmQX0TRbFn3P777nJlfzZlnj7G+LLaWQDtPISStgFB1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733842663; c=relaxed/simple;
-	bh=fDX5RNoVRjU4BcnqQdRaApxIr9nCwL29OAJ3hLNdKCY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j+g0J7Xktzo5O38VSEV0yJ14f5WbkaQ5PHjUHbXlTZP9hj2voNQke2YwR2VQ8ZsngOdoX3vmP34eCA3AkE8p2j52Jt1kpceXrVHppDvuqnWVmc4E5/xyjh1DS7eBjkFP3z8+n1j/wE9BKkPR/Uq5s3VqC3ntHU63xEJks+Ckqsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U8IkJ6Ep; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733842661;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ay8NfcUY0T/d/3vklaeP1VfwpDuNBfY2af1Jw8w5ZUI=;
-	b=U8IkJ6Ep8wpY0Oe7hBRf2+TGAXpsTCXNJT7kYktntctU7+BPYFk4PJfbCAhJfHl403cM2a
-	BxJMBrdgZzlNkEn3wxyc7agnWIookMTFyldVvlAO7NTg+SmbP4imb5iCgNqDNBBeOs91Et
-	HLqRzIAat+V0gWU06mFYk9krL/z0Hjk=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-358-6RnjeSj8NxSQCSKFShjHYQ-1; Tue, 10 Dec 2024 09:57:39 -0500
-X-MC-Unique: 6RnjeSj8NxSQCSKFShjHYQ-1
-X-Mimecast-MFC-AGG-ID: 6RnjeSj8NxSQCSKFShjHYQ
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-46686a1565bso107356191cf.0
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 06:57:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733842659; x=1734447459;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ay8NfcUY0T/d/3vklaeP1VfwpDuNBfY2af1Jw8w5ZUI=;
-        b=RChUcyhNFnE42rJBvgQLjerMezRe4rIajJ+yaEjAP0x0FN4LpRJlF5JsG02OyMrF4/
-         U0RozlP6GDIoBxBdzAim6/5FC56sTtvlHZY/zoo/y7V6ACknneuCFk/+nkbBPwVls3Wr
-         W5/k12KPeLJBsiRicKbEeeh9DIn83ilmEZpSMktwUYCN7Ua8+dGA/nBZGFUYdf7PdJkY
-         uNIKZ9gdGkbp0zsRjQxehgyi+fSqC3CPrwoMfMZp7CPoNqDhvq9UJiUv/4TTbsL6Gdw9
-         IWqvXghXnoJQncCNXTtX4QbqIqgzzehcoKmlZa4ffGMl6T7f3oNN9iehpz47r4zNHs8s
-         j1rA==
-X-Forwarded-Encrypted: i=1; AJvYcCUtrWbtzaCz2vBYNfXqS6rmVBfVe82zfSYbtUXDcKj80z6FX68dSx6tzt4A0ZstiJBCT5258SE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyx948I0OJa9umYVkNas1prQ3iLWhVlDVe3+t6TsgXBlebJRrvh
-	ucV8qDeYwQFwz6a0PX5Mor/fsZYyxj8lnvDh2ykCRlkN5RI93/yjSVVVWnHMOH9ipF/WivRMY1e
-	EBkTEB+COGvDq3NHiyUL7W4NpDRUWRVU3912dAdlZ1nUY5Ixnzxobqg==
-X-Gm-Gg: ASbGnctsh0PAfMAIYoeJd8VJLGdkQkpVd3fgLmcon3FuI7TOItZ8AFB2OL3jELdNow0
-	oC8lprkPsWn63uWP5oBLRmZpRl8Rj0j3K3dMoFJW3pCHGzC7DA20/nHadBRPsiOmiQ8GIveaCUB
-	k04Cu9F/sjpkb1Z6dLVj1tiBhzmBjQylh4FonI2ZrsGNU2PLB2P4NTpgkCsUqZ+6esqtkQ9aHHf
-	vN8xOTblOhs/akCxk5Ia6iv9u5Y22/oEd/4fznZhxYd3yLm9iTdWqyUZusPT39FVxtJ38dqkZ1n
-	QL+d+rGVsq2Z6tyHdxVWTMLbVQ==
-X-Received: by 2002:a05:622a:5588:b0:467:54f4:737b with SMTP id d75a77b69052e-46754f47fcfmr184716961cf.25.1733842659426;
-        Tue, 10 Dec 2024 06:57:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFG7cnNqoBiMvJLT/w4nsM1TFhqWSEwBKOd94h1uXgd+rgELynEhjwIX13vVuBdHIAhy0EDIg==
-X-Received: by 2002:a05:622a:5588:b0:467:54f4:737b with SMTP id d75a77b69052e-46754f47fcfmr184716511cf.25.1733842659102;
-        Tue, 10 Dec 2024 06:57:39 -0800 (PST)
-Received: from [192.168.1.14] (host-82-49-164-239.retail.telecomitalia.it. [82.49.164.239])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4677006d143sm14016401cf.19.2024.12.10.06.57.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2024 06:57:38 -0800 (PST)
-Message-ID: <6f5b5241-2b08-4332-9268-fde890f0ae52@redhat.com>
-Date: Tue, 10 Dec 2024 15:57:34 +0100
+	s=arc-20240116; t=1733842775; c=relaxed/simple;
+	bh=ZDw6LCM1u7OLn5QVjJD4sW+N5q2OjqIvp6c9RvNl9vo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TOLQvXD8CYMY3/cYLE4X7vH/bs8GJSpdRGqNTm9t8r2naOjEaXKlou6uzAvKaR0Cxcyr1HlYEaDyCl+7PbaljFI1cu6pGJ+MYVCHO/JePulCSPkJym4QEN5JUeFRGtUP/v1JRoku5xLKDz0WK8m9REBsrLCXpIn38oMrDnd2jF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aEeuwa5K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65329C4CEDE;
+	Tue, 10 Dec 2024 14:59:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733842774;
+	bh=ZDw6LCM1u7OLn5QVjJD4sW+N5q2OjqIvp6c9RvNl9vo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aEeuwa5KZh07b39hZQH33qx3aXB+Hi7OjmhoITc9t29b+xJm9Q2PB/kBf2lEqStO2
+	 TzSS506mQ10vSqBn/wAPgl0XHHCUx9H6CmfrCMvdWopnUHklXdXrGYCwrT6MI3rSsF
+	 0uAzDS3JGo8+j6K6nYW382HQzeJR2uLU3JnuqX7oDC3pBtmqix48nv4aO+Rgd0Hu/a
+	 dmscQRFmw8GLcmCzm0BK0PxAFbBBCjw6NgM/Hk8KrMCh9ZklXPCF6szFmbm0apz1Uo
+	 TgbaU8DIe18op0ltmEiBqzgob1lxhBKRoc1MAlyQ0MO2inIhZ/x1dOOeaNvdkQFBBR
+	 7k5PaaIKzL+iw==
+Date: Tue, 10 Dec 2024 14:59:30 +0000
+From: Simon Horman <horms@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
+	Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [PATCH net] bnxt_en: Fix aggregation ID mask to prevent oops on
+ 5760X chips
+Message-ID: <20241210145930.GF4202@kernel.org>
+References: <20241209015448.1937766-1-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/4] ice: Fix quad registers read on E825
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
- kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
- netdev@vger.kernel.org
-Cc: Karol Kolacinski <karol.kolacinski@intel.com>, richardcochran@gmail.com,
- przemyslaw.kitszel@intel.com, horms@kernel.org,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Grzegorz Nitka <grzegorz.nitka@intel.com>,
- Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-References: <20241206193542.4121545-1-anthony.l.nguyen@intel.com>
- <20241206193542.4121545-3-anthony.l.nguyen@intel.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241206193542.4121545-3-anthony.l.nguyen@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241209015448.1937766-1-michael.chan@broadcom.com>
 
-On 12/6/24 20:35, Tony Nguyen wrote:
-> @@ -1988,50 +2045,48 @@ static int ice_phy_cfg_parpcs_eth56g(struct ice_hw *hw, u8 port)
->   */
->  int ice_phy_cfg_ptp_1step_eth56g(struct ice_hw *hw, u8 port)
->  {
-> -	u8 port_blk = port & ~(ICE_PORTS_PER_QUAD - 1);
-> -	u8 blk_port = port & (ICE_PORTS_PER_QUAD - 1);
-> +	u8 quad_lane = port % ICE_PORTS_PER_QUAD;
-> +	u32 addr, val, peer_delay;
->  	bool enable, sfd_ena;
-> -	u32 val, peer_delay;
->  	int err;
->  
->  	enable = hw->ptp.phy.eth56g.onestep_ena;
->  	peer_delay = hw->ptp.phy.eth56g.peer_delay;
->  	sfd_ena = hw->ptp.phy.eth56g.sfd_ena;
->  
-> -	/* PHY_PTP_1STEP_CONFIG */
-> -	err = ice_read_ptp_reg_eth56g(hw, port_blk, PHY_PTP_1STEP_CONFIG, &val);
-> +	addr = PHY_PTP_1STEP_CONFIG;
-> +	err = ice_read_quad_ptp_reg_eth56g(hw, port, addr, &val);
->  	if (err)
->  		return err;
->  
->  	if (enable)
-> -		val |= blk_port;
-> +		val |= BIT(quad_lane);
->  	else
-> -		val &= ~blk_port;
-> +		val &= ~BIT(quad_lane);
->  
-> -	val &= ~(PHY_PTP_1STEP_T1S_UP64_M | PHY_PTP_1STEP_T1S_DELTA_M);
-> +	val &= ~PHY_PTP_1STEP_T1S_UP64_M;
-> +	val &= ~PHY_PTP_1STEP_T1S_DELTA_M;
+On Sun, Dec 08, 2024 at 05:54:48PM -0800, Michael Chan wrote:
+> The 5760X (P7) chip's HW GRO/LRO interface is very similar to that of
+> the previous generation (5750X or P5).  However, the aggregation ID
+> fields in the completion structures on P7 have been redefined from
+> 16 bits to 12 bits.  The freed up 4 bits are redefined for part of the
+> metadata such as the VLAN ID.  The aggregation ID mask was not modified
+> when adding support for P7 chips.  Including the extra 4 bits for the
+> aggregation ID can potentially cause the driver to store or fetch the
+> packet header of GRO/LRO packets in the wrong TPA buffer.  It may hit
+> the BUG() condition in __skb_pull() because the SKB contains no valid
+> packet header:
+> 
+> kernel BUG at include/linux/skbuff.h:2766!
+> Oops: invalid opcode: 0000 1 PREEMPT SMP NOPTI
+> CPU: 4 UID: 0 PID: 0 Comm: swapper/4 Kdump: loaded Tainted: G           OE      6.12.0-rc2+ #7
+> Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+> Hardware name: Dell Inc. PowerEdge R760/0VRV9X, BIOS 1.0.1 12/27/2022
+> RIP: 0010:eth_type_trans+0xda/0x140
+> Code: 80 00 00 00 eb c1 8b 47 70 2b 47 74 48 8b 97 d0 00 00 00 83 f8 01 7e 1b 48 85 d2 74 06 66 83 3a ff 74 09 b8 00 04 00 00 eb a5 <0f> 0b b8 00 01 00 00 eb 9c 48 85 ff 74 eb 31 f6 b9 02 00 00 00 48
+> RSP: 0018:ff615003803fcc28 EFLAGS: 00010283
+> RAX: 00000000000022d2 RBX: 0000000000000003 RCX: ff2e8c25da334040
+> RDX: 0000000000000040 RSI: ff2e8c25c1ce8000 RDI: ff2e8c25869f9000
+> RBP: ff2e8c258c31c000 R08: ff2e8c25da334000 R09: 0000000000000001
+> R10: ff2e8c25da3342c0 R11: ff2e8c25c1ce89c0 R12: ff2e8c258e0990b0
+> R13: ff2e8c25bb120000 R14: ff2e8c25c1ce89c0 R15: ff2e8c25869f9000
+> FS:  0000000000000000(0000) GS:ff2e8c34be300000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 000055f05317e4c8 CR3: 000000108bac6006 CR4: 0000000000773ef0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
+> PKRU: 55555554
+> Call Trace:
+>  <IRQ>
+>  ? die+0x33/0x90
+>  ? do_trap+0xd9/0x100
+>  ? eth_type_trans+0xda/0x140
+>  ? do_error_trap+0x65/0x80
+>  ? eth_type_trans+0xda/0x140
+>  ? exc_invalid_op+0x4e/0x70
+>  ? eth_type_trans+0xda/0x140
+>  ? asm_exc_invalid_op+0x16/0x20
+>  ? eth_type_trans+0xda/0x140
+>  bnxt_tpa_end+0x10b/0x6b0 [bnxt_en]
+>  ? bnxt_tpa_start+0x195/0x320 [bnxt_en]
+>  bnxt_rx_pkt+0x902/0xd90 [bnxt_en]
+>  ? __bnxt_tx_int.constprop.0+0x89/0x300 [bnxt_en]
+>  ? kmem_cache_free+0x343/0x440
+>  ? __bnxt_tx_int.constprop.0+0x24f/0x300 [bnxt_en]
+>  __bnxt_poll_work+0x193/0x370 [bnxt_en]
+>  bnxt_poll_p5+0x9a/0x300 [bnxt_en]
+>  ? try_to_wake_up+0x209/0x670
+>  __napi_poll+0x29/0x1b0
+> 
+> Fix it by redefining the aggregation ID mask for P5_PLUS chips to be
+> 12 bits.  This will work because the maximum aggregation ID is less
+> than 4096 on all P5_PLUS chips.
+> 
+> Fixes: 13d2d3d381ee ("bnxt_en: Add new P7 hardware interface definitions")
+> Reviewed-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
+> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 
-Minor nit: please don't mix 'cosmetic' changes like the above one in a
-fix, that makes the patch harder to read.
-
-Thanks,
-
-Paolo
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
