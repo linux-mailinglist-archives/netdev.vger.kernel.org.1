@@ -1,151 +1,130 @@
-Return-Path: <netdev+bounces-150515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B928E9EA753
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 05:49:56 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6113A9EA78A
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:07:13 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7326C288C06
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 04:49:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EF831888C43
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 05:07:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C3C82890;
-	Tue, 10 Dec 2024 04:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D3A22618B;
+	Tue, 10 Dec 2024 05:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TsfFXL4n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H3bNebKT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B2579FD;
-	Tue, 10 Dec 2024 04:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCF2226182;
+	Tue, 10 Dec 2024 05:06:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733806192; cv=none; b=Sdf510ReYEXjwvDBbjE+WgnnFxlpaIO4JQ6qM6e9Zj7QlOuCdiqGszcMUcW3K+L574diUU9/rpsSfHN9pVlqv+voR/e9sKDHBdNcABRSP7X0B0pSSe1E2JwtjBbfx7nUepps+CxYXMQgsZjARC21qKkqrNAcbyIXBtyqgB+xCQE=
+	t=1733807214; cv=none; b=aL8htE1BoW6VXYXoQqlw5fG6JlP0eYoKvmtHJSaBXipa88UfUMqWMnq90ViN3FYS/Uc73fPP3P+emlbKpDvDBZuENK93GLQLKXbmbW2nAY46M6kQK9walJu4v3I3SV3W9xw8IMu3DY7Z2tnXezXQamwuo4yEDWj7ptPDrOH07Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733806192; c=relaxed/simple;
-	bh=6nEWeQAeyMiZD24G516Y/lc+ymSXSnZHEG/uO2/zZeg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=WnOTgA/qGMIfOpZERsJXXHYiJG48Faf3vcIVdBr+YzM6CMqSNOgp/w8ikOX7sOehKKX3AId8xoDAT0DCgKjEzq4tIOzIUqAd7iXT0RjwrKSbGXyRhq+92Va7zUFdtg45FCinvA3X45jbn4muvof9RJar+J836uxVfVgymQkopTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TsfFXL4n; arc=none smtp.client-ip=209.85.221.50
+	s=arc-20240116; t=1733807214; c=relaxed/simple;
+	bh=bnkUahMoe/2DYRbSBWm5xIriVjrHBkBhabIvxjeBeXA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ucByQEXKB/UKUacak6fwZ1cbzIBBCDmHGEAhzfDIqCibSwOwwz2GdYSrUOu9RneNCiLMSJWaC8+lfY3k74SQ8CPmcvBUU5nqh5FkqlyOpnNQKxqRzHoLH6ZIV3qHyJ7evyGHU6dMQ27nNcCfV9k3r505SdyVQHuJKrP9WsfiioE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H3bNebKT; arc=none smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3863494591bso1349412f8f.1;
-        Mon, 09 Dec 2024 20:49:50 -0800 (PST)
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2efded08c79so90467a91.0;
+        Mon, 09 Dec 2024 21:06:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733806189; x=1734410989; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=hu+E1d6FVD8TmkXkZ+JdeZuo4py52+CscSEktFlyu6Q=;
-        b=TsfFXL4nNHQG5uzIT2Lr92HQRbujciOjmT50jRO6BsXCKTOWg7efJNMSlwLWqtSDyV
-         qIlBbQS1Z8KUdhPaRfAoX6f8cfthHfCyiZELDFYF//n2gEciinjlO6vnAwvsNMLswV3f
-         UD6aTr+kXV3rsuZSeV42Nb9mYxsZ3VaSOJIubj4DWQhbkU3JZp1ZGozaVfCsWbpRMCs1
-         AyE9mMHq2+rPUcuUa8zptUbosd7c2YrRGEMGdMF+TWwW/lj2kE3zYhin61xe68C3gioW
-         AYWxy8OWCrAVukFqUB0C4FyMEsEkLhzhrqCDZ/3Q9r6MudBMfq6isHDeIIhVVUe0pnNJ
-         sk8A==
+        d=gmail.com; s=20230601; t=1733807212; x=1734412012; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dydebYrUiZDY1lQnbppwxvbgV+WzSwhPfcXyLsgRJsI=;
+        b=H3bNebKTu4UJw0mxGKE93DJAMnx5pU9vtdRk+zwzv5gcH7V/UzAlK62YUpiCNUNkNp
+         sb3Uc3fLKQO3GC0qkL+DHsf4+agUtFQZbeh5+HkINIrfXPAIVU0CgURbDaSExltyp6tR
+         U9As3OQdSZ8WZMwx6P2/sHOIwLejQinyoS8jjyLvYBDO7pUAhjiQTqrRLz/+C5fSTgfZ
+         s+pZYEgNwoJ595ujsOXHnbQnMgx8vwcYzSe8WkXivrQPY9Dg+Msikh6neRIdaWsMLjyy
+         pPeo8eUtDjaQrPIFJN6lC6LyV3u1L93iDLNxwsBDAgRS4aZwGziGzTaePEH+ULfQWol7
+         mRjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733806189; x=1734410989;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1733807212; x=1734412012;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hu+E1d6FVD8TmkXkZ+JdeZuo4py52+CscSEktFlyu6Q=;
-        b=O70oPQn1dxNA5tKv9tgbDZcr4g7rHhUGR4ABXBKZVtIpq25YVKcpIRGnMPI2wjrZyC
-         0t/17ggXehjV7r9faPateDBNsnlMyVQ/YBEc5dg2yrXnFnJgvclCzoBfLnSWT0mIm3zX
-         +DgQRcpE2SxUqsy/2C8koBYpaTxWMNcVJME+3m/AAPopVhN3m8RLmyKUTlgaSg9UMOtW
-         mU72vw/SqzUE8OG0FOwFUiYo5WekMnUMO+IaaiBnLDJlD/u4v+M34nc9DuY06OPojvPW
-         nmozxYDI3Dr0gG1ydkacQur2Ag1sxsirYdoS1uEjdjYURZvZJ8eTaoztWxiqC+YV09pz
-         W8oQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUq733kbS3nebB+zE2CjPiA375fN5AocCk6PkjJxln7copXDyqZKfMXALc2Va8QYz4flD8t2hU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaUlF3bvxoJTv7tzOTbmQFZIGAOCMyrWReDyh6iQ3ZluXcnuFy
-	5UHfXliDqAL/4DYZ6yTKCORTnfD1OoG+8Glpk/Lp1L3ICyKqOuUm
-X-Gm-Gg: ASbGncsOIQc9ZQPrPDVGALn5xzwC0dnBauV8PH3+LzH3mbZIh0+aCVMZCoPTvALsqom
-	aszPKQc3hCZwFnfdM96xXjdyJ6WS2Y6ImaDXbXqVmYGjOhOEcjcbG78fEmfHnY2erq1j5Zygy07
-	8kXozJE0hSk2RfmB4rVz3axIomKkhh9jkeR2ymQN07wVY6F+CP1CFz71LxV6LLTFHj2LmijWgNk
-	kHvHHG0eZnML1QkMx0OSr1hV9N6FNG/BLdGy5vFefSiV7IAwinNDkl8btkoD/k=
-X-Google-Smtp-Source: AGHT+IFIw2w0JFuGvd1xfKCVx4eU3Kt9sjdDpvZP4uintKlNPZOnwH7y58Pn+4B/jZwUa0qMRBN3RA==
-X-Received: by 2002:a05:6000:4604:b0:385:e17a:ce6f with SMTP id ffacd0b85a97d-386453dbd0cmr2525862f8f.24.1733806189176;
-        Mon, 09 Dec 2024 20:49:49 -0800 (PST)
-Received: from [192.168.42.90] ([85.255.235.153])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3861ecf3cd1sm14715389f8f.11.2024.12.09.20.49.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Dec 2024 20:49:48 -0800 (PST)
-Message-ID: <3572bf15-333c-4db2-a714-edef2ce09f26@gmail.com>
-Date: Tue, 10 Dec 2024 04:50:40 +0000
+        bh=dydebYrUiZDY1lQnbppwxvbgV+WzSwhPfcXyLsgRJsI=;
+        b=gQQi3q5+5JszzFzA5X9lSf0O0tqQNmWKf1qKSCwxP+Yt0EOrhh1fRiQED9mz2i+dmE
+         lJ59FB6+Lc6W818XuvXkmdeTZfbRJg8N7jQGwEpvucA0U5Vf4ek+bVpa3VcyFZU1Er1w
+         FRCX3DFAsXzYKFmb3ZQxMzHyQUzaSHXKlZ+VUONEWzWHE72BP7oTk3wdDC3yF6eOpUpj
+         oErPcwhIUH4oOadyXAkXxrhxZHu6i2E3ud405oUkpRO82MOTvgDdwDc7WNCzTnjBlZ8S
+         h1/9BPu/kA5G54cPQbMTuSikQ08TcVxk0v02pCER34qLDWlS6jJBvMViumrUyh+sOEmv
+         cm7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUufS8AZ2IDWA0Q0h5vlU1rUVmaooeM7ThUEiAOyBXDDf8Yucwwvsv7Fg8l/y1r8FvE7gMyRBDR@vger.kernel.org, AJvYcCWkCr7YyggkSZV2yx1dQSI7RT/EisETiks+osoBFFk/EyPmkVAqotn7LMEzfMMv1YItXXZvETv3aOiwOJg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzy83uwEs4rxNDhs5t8yNmubVEmjAQoQ91ZCzKhgr1bOzCTNnWc
+	oYh88wfM4JrI3W7GurVXGSKySqr3maNBq4mMp5mToYGHP8eIvfQq9mlY3hka
+X-Gm-Gg: ASbGncsuNBGPzywFxNzKnkED4CbWnGHSZjLz7bQcJ120p3YOI4z/Gf2HyztmG/gIW3z
+	xbP1LYOH+4i6ILE1iRKN+J/zRlFhHBn0sU+eEWhHUj0/6xsODIjJXNvSq9FpZQHeI/7cSe8Aea2
+	GmnEwKnFFyjl9pTvdFWYiu4ux/+VqfhbqTjZRSmQtPQWBTYXhKRdA/cn+yXDgdxepjLMng2sxnw
+	Z6B61IYz8j/Hdb73Wy37KVfKdRUqg3RDn7nYhBsTobkqG+6ihurNaDv/gt/0liu7lWagKcAt0wP
+	tM56TXB0VRp8
+X-Google-Smtp-Source: AGHT+IEAORtju9S5h0kVI3znrOXeKH7w2rA5o0agZXRBE+GxLm5nxeAEr6Xzme+30l7AGcejo40jGQ==
+X-Received: by 2002:a17:90b:46:b0:2ee:df8b:684 with SMTP id 98e67ed59e1d1-2efcef21b5dmr5313424a91.0.1733807212157;
+        Mon, 09 Dec 2024 21:06:52 -0800 (PST)
+Received: from xiberoa (c-76-103-20-67.hsd1.ca.comcast.net. [76.103.20.67])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fd55a9a5edsm1524182a12.55.2024.12.09.21.06.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 21:06:51 -0800 (PST)
+Date: Mon, 9 Dec 2024 21:06:48 -0800
+From: Frederik Deweerdt <deweerdt.lkml@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Frederik Deweerdt <deweerdt.lkml@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Michal Luczaj <mhal@rbox.co>,
+	David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org,
+	xiyou.wangcong@gmail.com, David.Laight@ACULAB.COM,
+	jdamato@fastly.com, stable@vger.kernel.org
+Subject: [PATCH v2 net] splice: do not checksum AF_UNIX sockets
+Message-ID: <Z1fMaHkRf8cfubuE@xiberoa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 11/17] io_uring/zcrx: implement zerocopy
- receive pp memory provider
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20241204172204.4180482-1-dw@davidwei.uk>
- <20241204172204.4180482-12-dw@davidwei.uk>
- <20241209200156.3aaa5e24@kernel.org>
- <aa20a0fd-75fb-4859-bd0e-74d0098daae8@gmail.com>
-Content-Language: en-US
-In-Reply-To: <aa20a0fd-75fb-4859-bd0e-74d0098daae8@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 12/10/24 04:45, Pavel Begunkov wrote:
-> On 12/10/24 04:01, Jakub Kicinski wrote:
->> On Wed,  4 Dec 2024 09:21:50 -0800 David Wei wrote:
->>> Then, either the buffer is dropped and returns back to the page pool
->>> into the ->freelist via io_pp_zc_release_netmem, in which case the page
->>> pool will match hold_cnt for us with ->pages_state_release_cnt. Or more
->>> likely the buffer will go through the network/protocol stacks and end up
->>> in the corresponding socket's receive queue. From there the user can get
->>> it via an new io_uring request implemented in following patches. As
->>> mentioned above, before giving a buffer to the user we bump the refcount
->>> by IO_ZC_RX_UREF.
->>>
->>> Once the user is done with the buffer processing, it must return it back
->>> via the refill queue, from where our ->alloc_netmems implementation can
->>> grab it, check references, put IO_ZC_RX_UREF, and recycle the buffer if
->>> there are no more users left. As we place such buffers right back into
->>> the page pools fast cache and they didn't go through the normal pp
->>> release path, they are still considered "allocated" and no pp hold_cnt
->>> is required. For the same reason we dma sync buffers for the device
->>> in io_zc_add_pp_cache().
->>
->> Can you say more about the IO_ZC_RX_UREF bias? net_iov is not the page
->> struct, we can add more fields. In fact we have 8B of padding in it
->> that can be allocated without growing the struct. So why play with
-> 
-> I guess we can, though it's growing it for everyone not just
-> io_uring considering how indexing works, i.e. no embedding into
-> a larger struct.
-> 
->> biases? You can add a 32b atomic counter for how many refs have been
->> handed out to the user.
-> 
-> This set does it in a stupid way, but the bias allows to coalesce
-> operations with it into a single atomic. Regardless, it can be
-> placed separately, though we still need a good way to optimise
-> counting. Take a look at my reply with questions in the v7 thread,
-> I outlined what can work quite well in terms of performance but
-> needs a clear api for that from net/
+When `skb_splice_from_iter` was introduced, it inadvertently added
+checksumming for AF_UNIX sockets. This resulted in significant
+slowdowns, for example when using sendfile over unix sockets.
 
-FWIW, I tried it and placed user refs into a separate array.
-Without optimisations it'll be additional atomics + cache
-bouncing, which is not great, but if we can somehow reuse the
-frag ref as in replies to v7, that might work even better than
-with the bias. Devmem might reuse that as well.
+Using the test code in [1] in my test setup (2G single core qemu),
+the client receives a 1000M file in:
+- without the patch: 1482ms (+/- 36ms)
+- with the patch: 652.5ms (+/- 22.9ms)
 
+This commit addresses the issue by marking checksumming as unnecessary in
+`unix_stream_sendmsg`
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Frederik Deweerdt <deweerdt.lkml@gmail.com>
+Fixes: 2e910b95329c ("net: Add a function to splice pages into an skbuff for MSG_SPLICE_PAGES")
+---
+ net/unix/af_unix.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 001ccc55ef0f..6b1762300443 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2313,6 +2313,7 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		fds_sent = true;
+ 
+ 		if (unlikely(msg->msg_flags & MSG_SPLICE_PAGES)) {
++			skb->ip_summed = CHECKSUM_UNNECESSARY;
+ 			err = skb_splice_from_iter(skb, &msg->msg_iter, size,
+ 						   sk->sk_allocation);
+ 			if (err < 0) {
 -- 
-Pavel Begunkov
+2.44.1
 
 
