@@ -1,146 +1,79 @@
-Return-Path: <netdev+bounces-150812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 150F79EBA27
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 20:35:09 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9C339EBA51
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 20:49:17 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA2D31888DC5
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 19:49:15 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55759153BF6;
+	Tue, 10 Dec 2024 19:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eV+S7oiA"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE4552817FE
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 19:35:03 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A44120468A;
-	Tue, 10 Dec 2024 19:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DJ9KOo/n"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9826586342
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 19:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D5823ED7F;
+	Tue, 10 Dec 2024 19:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733859302; cv=none; b=V4B0kyrMetmRSxq+3qA26ZZlz8rCxfqmqVpw7br2gsMAgof5LjsJ8u+LFfPXlIPWwZokT2ulw8K3Loiz79uvXiyGmNAtzxXvlzqseOEx0z49D0yr2fx2PDlW9ddFVG01S+KI3qipOjr4OE4Zt8mUvGh9oOEhTYBWS7fnkIL5ZhI=
+	t=1733860152; cv=none; b=YTii1n07lolIyZLkrYIayGmf3UukC9eRFmFk1kS7jlsLr+0/yWI0Vkaoyaly8UtHiyPvXHoYzxCFyCH3HmouGeqdvzXwUjJDCs4ijdAyAMrpwBuYmTABczcX2+goniIQhIJAH1T7Hn1tDLXYm/n7anu2AH4t0ovbu1HE1FOG7pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733859302; c=relaxed/simple;
-	bh=dhQZ5hdiZRs+Gcc4d03j2TXHZ8gU+WCfRWPtUNcNCP4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=smoGKiotcmWKL0tE9We4ZI7ylszxZUINJc5GMOfsap0OqYivsnACtmuC68l0FJYPQ3yvfy949G3c3T2H4V1nocC/id9MVLZUiq+BAOvxarEcv5qD8riNrVrQt+85p+ph/BXMgqxL2AV28tZ9MJb8JYrC57vBiFTTyp6g+vcGxBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DJ9KOo/n; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2efded08c79so695595a91.0
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 11:35:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1733859300; x=1734464100; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=OwV717DZF6jBbGmMqY4Lay6suGsxDvolISQzDQbt+mE=;
-        b=DJ9KOo/n3r7y9NtTWy+5WLYADoJcZbCp7+30oQncWZZ7P1cLJmcSNDDcUadqr4hDm/
-         nEjICcCdAPpAAQTdYfECJCW2kC47/JL0jcJghRKCEPJZVoqmKqHm1vQD8t1M0yJ4R0/j
-         N/bN+QdAItcRjcjFnnwg7yAQSym755VRmiV5A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733859300; x=1734464100;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OwV717DZF6jBbGmMqY4Lay6suGsxDvolISQzDQbt+mE=;
-        b=ryP6E3KK4aOgDzAGu+CcJggyP7UjhqbNs+f3d2rFODifx+6SrEcAgC2lwNIDZ2AIP/
-         U4jPFwQBPIQqsRIZqTQEOz03qyvgnqgMJ+B78lDwf1tBMMlMZ49sB1rA7tnjiYflXxbE
-         FU8jgvRGWwkEtk9oKsA0PhL4L9uYmxyabvZT6den93Y/avFi2f1eDt6zLzrp/oFBSQUr
-         uh86aFMg8xVJ42Fqv8UJ6b4nXNZ+pSOkuYCKupnrZMxmQjkvFUcO32Y+VzqBJCsggSYt
-         4/nqcLLWY9ifMfKTVYAPij25tjNs3rjIQ5Kvhx+CDNtLoeSkHh8ciEDqU7q8pz9eGIyy
-         G0eg==
-X-Forwarded-Encrypted: i=1; AJvYcCUf4t2nEcruunjnvTdiY/yZCWzXwrRCADoLiWW6TUZdKP1RBZ6fHBjKdWMuvDCXcrHMdDALwwg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxw2RpESSaVWkeQFkBquTVIwMueagZrpuLHE4QNZt4XmY6NjkgK
-	lP2HSUVh3jIssnl0vLW1zM0fnlEUj+RcKhRODqXRD+ACWTmDPgrFencdut3zeA==
-X-Gm-Gg: ASbGncuxtwFKexXCoNq6tAN9c4LNV4dNJUa7vtwzIsqBnPl+wS4iN0jTi12C1anC3q0
-	wVKwt2fAknG9P3bef9qKLQKUF168/WNtMCKW279bvsQo+fTfsDWEvgAcfDwZ2jYJWwqQ5HtdldZ
-	wT+hzPTd7RDXWYVKBOmCsqna1ITwi6KjevfUK+drHWXT8iz6JIHMBufXYA1qWH5Q8FQVFgbCpCD
-	e3IbcPWw8sPw/jShncsKJZosB1sb6VxQk5sj/wY3cWpls+VvibDCl2VgShBn55rrorNDD7rhs7A
-	S17AgssFShSH2xU7sA==
-X-Google-Smtp-Source: AGHT+IFBOs/F/U4/hLKU6kyWf8O6LlmYbxeJeYss/dK1iAbYGZxIT+jEyZtSoRHQ4kvolIcl2McsnQ==
-X-Received: by 2002:a17:90b:3a83:b0:2ee:e518:c1d8 with SMTP id 98e67ed59e1d1-2f12808c035mr266194a91.30.1733859299825;
-        Tue, 10 Dec 2024 11:34:59 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ef45f958d6sm10127971a91.17.2024.12.10.11.34.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2024 11:34:58 -0800 (PST)
-Message-ID: <8a7bd584-d4e7-4a68-a562-08f2603ff49c@broadcom.com>
-Date: Tue, 10 Dec 2024 11:34:51 -0800
+	s=arc-20240116; t=1733860152; c=relaxed/simple;
+	bh=ccp/xH4bLy0ckAAyRaIH+PYOoXHwMQ8m+iqCNhb/8jI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VyCbC7nKr/UT7a7EEoXDEMUGjv3vzieXrW303leK8Z76XnCc0Perzn5qvr4vgjhIy9AtjWcrx+v7Nh4rDJHNqVipxmAyQ1wmEiUcdlVA5c+21QU4Vsx1O5BcoSUDpALw0/IxcuzfUep9XCqoEl/jNDCxJkAvRxJop3pPbZ9zZMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eV+S7oiA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8FFFC4CED6;
+	Tue, 10 Dec 2024 19:49:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733860151;
+	bh=ccp/xH4bLy0ckAAyRaIH+PYOoXHwMQ8m+iqCNhb/8jI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eV+S7oiAKYmVWA8+KJu85nOlnXrH3Mz624CAK6LuJMd9xHH29/iC1zKzfVJn3BrzS
+	 uxs0/AkGHTUNuAZz7tVVjJfJdazXgVObV1i6IDNjyE8HavW+rkCqyKAtuCrI6GJ2Ou
+	 QP4rcic2r/EOz+ja0DQfcyGD9PjIHxJuhhWuGiIw3OCaetDEWSZTUPBWR5bQ2kMIlM
+	 9uiASTrBNaV1dFM+UHEJjBifsMISWURtIhLer+S7e2LjgI8N2kW/BhE93KtjPbnfPr
+	 fTp8mAWcBOSECZbKT739PhTWIV4dTGbzLoy6uG3dJGLHDbUxeLZMC1Cu1emsmnofUO
+	 L3R8bb3KGyq6Q==
+Date: Tue, 10 Dec 2024 19:49:07 +0000
+From: Simon Horman <horms@kernel.org>
+To: Yafang Shao <laoar.shao@gmail.com>
+Cc: saeedm@nvidia.com, tariqt@nvidia.com, leon@kernel.org, gal@nvidia.com,
+	kuba@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	Tariq Toukan <ttoukan.linux@gmail.com>
+Subject: Re: [PATCH v4 net-next] net/mlx5e: Report rx_discards_phy via
+ rx_dropped
+Message-ID: <20241210194907.GA2806@kernel.org>
+References: <20241210022706.6665-1-laoar.shao@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/9] net: dsa: add hook to determine whether EEE
- is supported
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Ar__n__ __NAL <arinc.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>,
- "David S. Miller" <davem@davemloft.net>, DENG Qingfang <dqfext@gmail.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, Sean Wang <sean.wang@mediatek.com>,
- Simon Horman <horms@kernel.org>, UNGLinuxDriver@microchip.com,
- Vladimir Oltean <olteanv@gmail.com>, Woojung Huh <woojung.huh@microchip.com>
-References: <Z1hNkEb13FMuDQiY@shell.armlinux.org.uk>
- <E1tL144-006cZD-El@rmk-PC.armlinux.org.uk>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <E1tL144-006cZD-El@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241210022706.6665-1-laoar.shao@gmail.com>
 
-On 12/10/24 06:18, Russell King (Oracle) wrote:
-> Add a hook to determine whether the switch supports EEE. This will
-> return false if the switch does not, or true if it does. If the
-> method is not implemented, we assume (currently) that the switch
-> supports EEE.
+On Tue, Dec 10, 2024 at 10:27:06AM +0800, Yafang Shao wrote:
+> We noticed a high number of rx_discards_phy events on certain servers while
+> running `ethtool -S`. However, this critical counter is not currently
+> included in the standard /proc/net/dev statistics file, making it difficult
+> to monitor effectively—especially given the diversity of vendors across a
+> large fleet of servers.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Let's report it via the standard rx_dropped metric.
+> 
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
