@@ -1,103 +1,247 @@
-Return-Path: <netdev+bounces-150707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B591E9EB346
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:29:06 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB3059EB36D
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:34:50 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9909D188305C
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:34:49 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F28B1B5ED1;
+	Tue, 10 Dec 2024 14:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dtkanh4/"
+X-Original-To: netdev@vger.kernel.org
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C312281D3F
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:29:05 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314FA1B394F;
-	Tue, 10 Dec 2024 14:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IYGKP4R9"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493551B042B
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 14:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15C21B415C;
+	Tue, 10 Dec 2024 14:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733840936; cv=none; b=Cjcs7Ehq8EpHgh3U+c1ytX704ciqxpdeLFYB2Vf7CIcv2yoXTXG0Nan/x4O4Y2FCfoiIM1mmVe1ojVGoIClvILdP2JkZEkdbaGh3TPTM9RSHuDD04rz+k1q7geg6MNG2IooU+5XTCK6QxntOE/uf0L0US0/3Rosg4THXWyiJCrc=
+	t=1733841267; cv=none; b=Ig4Kuowm7XSJxRbrdtzlrUBvqmM2CRWd2WjWBvm+L+znUNsHi0egQXmBbNdcc7Br+8H1ni8kprgKRC76XMTre7/juoGVNFCPK+3aLKPmDuKNGEcbEqxxb8eIR4aWieqb1XFSRuzcLHxE50HLu0gVVo6NcN2bJi6cGNvrVClkl8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733840936; c=relaxed/simple;
-	bh=uyPvZ41Etvmfq1tE8uJDaPMtfSj8eWiFsAuISEuHcDs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G1Bq3Te4IC2JlSrVtCbw5XyM6fgbKcU0S2SrdcQqgDthSgInXBq+zOEBvRmSUGwwW/PHF8fFrY8laiu+VkiQaH8iUCOuu6kpxahwIaVkvKtpVDYoy1iESN2UryCKrsOcO17cQSaMXTJuZP8/rhoVVjSIa0RQRmyBuCHKokFkxEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IYGKP4R9; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3862b364538so2401722f8f.1
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 06:28:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733840932; x=1734445732; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uyPvZ41Etvmfq1tE8uJDaPMtfSj8eWiFsAuISEuHcDs=;
-        b=IYGKP4R9dw5iWaPFEmwVX8DDVja7habrufmvSiOY/LXSYP40wS67FYvGeHtWgwmJKV
-         9GlFGX4abENxWHo2zxYpw/hHQd4DELo/JTQQzoFii92pcTUS2cEwfO3gN/Z6WaFpPgo1
-         g2iuJ/TuxsFTcXqaO4EzJoiMnTH5GVt1nat65V8UoVum6ZA71IRY1IH5qKdhKPUrw9iQ
-         KpiYtoDa50WlK4FTWtCLYXgqIFml2G+dw/kK1XFFMdTu0KeB2gzBo6i14t1q2TRdganI
-         6b3CWzYlAfSBdfao1eGADqf+E9lQWDmHp7dez2Y8ztvX/t7UehdSeN+5w698pvG3QADQ
-         YmfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733840932; x=1734445732;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uyPvZ41Etvmfq1tE8uJDaPMtfSj8eWiFsAuISEuHcDs=;
-        b=wCdAI/TJGLeubeEIfkm+q6lPtTQvvjs9lfuMVkXy6Zb/xNjkR5d7WduByiJ2Qj1Tcq
-         F8m1bFjaXm403SY76IJd6XVXMwd4ilFlPuXdHKWyiob/Ds/I5hkk20k3IVw0qYZ7eR/9
-         4mMuKvWyXOP3/9nD+P8oLP4yukkqFCtNE7fjqOooVYLNTlIZ7/lhbs8j7AtGtjauwhOR
-         /p0mE4EUQ0L7Z0A/e6dM+87l7mlSxSvuRDVc4FfOyNwsagXyxc3RPZR0PfeRH3o7Z3a5
-         FHexJpnCw017PmYxR2YnzyiccemZZN1ALrfyAHdUdRjvH5etzbV4Rdj9wfouv04hz+/4
-         +O5g==
-X-Gm-Message-State: AOJu0Yx82S2ggW6oGQpvvsVNmovBu43128hoQrSa+kSXoS55OSmAfUCG
-	edwa7IcJlKZTKsbp5K/f8cVGLTIXgDr+2JdKsbHtMX7CAjdRXfVK2S3lyP1PdMoZCEarpg7Ez1f
-	2u6XW9xVI3gNn9Y+8gp7y351lV5M=
-X-Gm-Gg: ASbGncuvHFRLuRmeADUvyTY8y0Jlqd/rOjrHvPThbX2o0te6MWNESz4QQLn29ofAnXD
-	GnJvymqgHq/kO7yE/FTIjcfnznUqEGNpnI6vf
-X-Google-Smtp-Source: AGHT+IGrLfMK34OcxPeuwxi3HpqKLZOZhRJfLKjyABLf3Bi02q/7zAbHaINTEcr9SBtO5yt2jfiO1/g3dVOP91sAC6c=
-X-Received: by 2002:a5d:47cd:0:b0:385:e10a:4d97 with SMTP id
- ffacd0b85a97d-386469bf8a4mr2520322f8f.21.1733840932217; Tue, 10 Dec 2024
- 06:28:52 -0800 (PST)
+	s=arc-20240116; t=1733841267; c=relaxed/simple;
+	bh=ku8Tr3vO4h1PCsHD6TJ0Op/SiB/vy8EBsbOZHcdX7I8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JSSv52ffPYq66eNvtiu3cEy8MOy9v2T4Pzn8U6BspCLH6w4dayYQpWDPiKlEzdr1H2bdGGM/6S3XGntM7oAYoaFqXZkoTwBmrtVB9x5YQs/nU9Xqxt4VVmfS1tZkYmZAGC4x5Fq+wsyvx2TSkxe9xWZt4Jo9bzeIVLBXu0wnfbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dtkanh4/; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <23536ee9-742d-4867-825c-290d6778c4a6@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1733841252;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LuTO/DqCv1DN+rgrhzj9hJhz/lVP64ZbBRgPZiZms58=;
+	b=dtkanh4/xntToCKu29lrgUvUupEhAA2xt9rGx4hlewrR2OTDepARCuSTYoPvVOILT/4ZW1
+	Bhflniy/AOjQU8foB8hRxCETQ0dV9W5e5gxSorrVgaeZT8CQe6vCTfP7+IDKHTWCSF+8OT
+	fA2dXscaFj1TcabV4rpFfiZYagEPSc0=
+Date: Tue, 10 Dec 2024 15:34:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241207225906.1047985-1-jesse.vangavere@scioteq.com> <20241210141308.GE4202@kernel.org>
-In-Reply-To: <20241210141308.GE4202@kernel.org>
-From: Jesse Van Gavere <jesseevg@gmail.com>
-Date: Tue, 10 Dec 2024 15:28:41 +0100
-Message-ID: <CAMdwsN_P27r3dPmUFM4JwzjL-0Y-nv1a9eBCt_5CrHunrD6wrg@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: dsa: microchip: KSZ9896 register regmap
- alignment to 32 bit boundaries
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, woojung.huh@microchip.com, 
-	UNGLinuxDriver@microchip.com, andrew@lunn.ch, olteanv@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	Jesse Van Gavere <jesse.vangavere@scioteq.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH] RDMA/siw: Remove direct link to net_device
+To: Bernard Metzler <bmt@zurich.ibm.com>, linux-rdma@vger.kernel.org
+Cc: jgg@ziepe.ca, leon@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+ zyjzyj2000@gmail.com, syzbot+4b87489410b4efd181bf@syzkaller.appspotmail.com
+References: <20241210130351.406603-1-bmt@zurich.ibm.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20241210130351.406603-1-bmt@zurich.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello Simon,
+On 10.12.24 14:03, Bernard Metzler wrote:
+> Maintain needed network interface information locally, but
+> remove a direct link to net_device which can become stale.
+> Accessing a stale net_device link was causing a 'KASAN:
+> slab-use-after-free' exception during siw_query_port()
+> call.
+> 
+> Fixes: bdcf26bf9b3a ("rdma/siw: network and RDMA core interface")
+> Reported-by: syzbot+4b87489410b4efd181bf@syzkaller.appspotmail.com
+> Link: https://syzkaller.appspot.com/bug?extid=4b87489410b4efd181bf
 
-Op di 10 dec 2024 om 15:13 schreef Simon Horman <horms@kernel.org>:
-> Hi Jesse,
->
-> Sorry to nit-pick but the Fixes tag should be placed along with other tags
-> at the bottom of the commit description. In this case exactly
-> above your Signed-off-by line - no blank line in between.
+Thanks, Bernard.
+The similar problem also exists in rxe.
+The link is https://syzkaller.appspot.com/bug?extid=4b87489410b4efd181bf
 
-No problem, that's a valid remark, it was something I already wondered
-about as checkpatch didn't mention it, I will fix that and send a v3
-later.
+And I delved into this problem, it seems that the wq event was queued in 
+ib_wq for a long time. Then before the event was executed, the netdev 
+was freed. Then this problem occured.
 
-Best regards,
-Jesse
+I hope that this commit can fix this problem.^_^
+
+Best Regards,
+Zhu Yanjun
+
+> Signed-off-by: Bernard Metzler <bmt@zurich.ibm.com>
+> ---
+>   drivers/infiniband/sw/siw/siw.h       | 11 +++++++----
+>   drivers/infiniband/sw/siw/siw_cm.c    |  4 ++--
+>   drivers/infiniband/sw/siw/siw_main.c  | 18 ++++++++++++------
+>   drivers/infiniband/sw/siw/siw_verbs.c | 11 ++++++-----
+>   4 files changed, 27 insertions(+), 17 deletions(-)
+> 
+> diff --git a/drivers/infiniband/sw/siw/siw.h b/drivers/infiniband/sw/siw/siw.h
+> index 86d4d6a2170e..c8f75527b513 100644
+> --- a/drivers/infiniband/sw/siw/siw.h
+> +++ b/drivers/infiniband/sw/siw/siw.h
+> @@ -69,16 +69,19 @@ struct siw_pd {
+>   
+>   struct siw_device {
+>   	struct ib_device base_dev;
+> -	struct net_device *netdev;
+>   	struct siw_dev_cap attrs;
+>   
+>   	u32 vendor_part_id;
+> +	struct {
+> +		int ifindex;
+> +		enum ib_port_state state;
+> +		enum ib_mtu mtu;
+> +		enum ib_mtu max_mtu;
+> +	} ifinfo;
+> +
+>   	int numa_node;
+>   	char raw_gid[ETH_ALEN];
+>   
+> -	/* physical port state (only one port per device) */
+> -	enum ib_port_state state;
+> -
+>   	spinlock_t lock;
+>   
+>   	struct xarray qp_xa;
+> diff --git a/drivers/infiniband/sw/siw/siw_cm.c b/drivers/infiniband/sw/siw/siw_cm.c
+> index 86323918a570..451b50d92f7f 100644
+> --- a/drivers/infiniband/sw/siw/siw_cm.c
+> +++ b/drivers/infiniband/sw/siw/siw_cm.c
+> @@ -1780,7 +1780,7 @@ int siw_create_listen(struct iw_cm_id *id, int backlog)
+>   
+>   		/* For wildcard addr, limit binding to current device only */
+>   		if (ipv4_is_zeronet(laddr->sin_addr.s_addr))
+> -			s->sk->sk_bound_dev_if = sdev->netdev->ifindex;
+> +			s->sk->sk_bound_dev_if = sdev->ifinfo.ifindex;
+>   
+>   		rv = s->ops->bind(s, (struct sockaddr *)laddr,
+>   				  sizeof(struct sockaddr_in));
+> @@ -1798,7 +1798,7 @@ int siw_create_listen(struct iw_cm_id *id, int backlog)
+>   
+>   		/* For wildcard addr, limit binding to current device only */
+>   		if (ipv6_addr_any(&laddr->sin6_addr))
+> -			s->sk->sk_bound_dev_if = sdev->netdev->ifindex;
+> +			s->sk->sk_bound_dev_if = sdev->ifinfo.ifindex;
+>   
+>   		rv = s->ops->bind(s, (struct sockaddr *)laddr,
+>   				  sizeof(struct sockaddr_in6));
+> diff --git a/drivers/infiniband/sw/siw/siw_main.c b/drivers/infiniband/sw/siw/siw_main.c
+> index 17abef48abcd..4db10bdfb515 100644
+> --- a/drivers/infiniband/sw/siw/siw_main.c
+> +++ b/drivers/infiniband/sw/siw/siw_main.c
+> @@ -287,7 +287,6 @@ static struct siw_device *siw_device_create(struct net_device *netdev)
+>   		return NULL;
+>   
+>   	base_dev = &sdev->base_dev;
+> -	sdev->netdev = netdev;
+>   
+>   	if (netdev->addr_len) {
+>   		memcpy(sdev->raw_gid, netdev->dev_addr,
+> @@ -354,6 +353,10 @@ static struct siw_device *siw_device_create(struct net_device *netdev)
+>   	atomic_set(&sdev->num_mr, 0);
+>   	atomic_set(&sdev->num_pd, 0);
+>   
+> +	sdev->ifinfo.max_mtu = ib_mtu_int_to_enum(netdev->max_mtu);
+> +	sdev->ifinfo.mtu = ib_mtu_int_to_enum(READ_ONCE(netdev->mtu));
+> +	sdev->ifinfo.ifindex = netdev->ifindex;
+> +
+>   	sdev->numa_node = dev_to_node(&netdev->dev);
+>   	spin_lock_init(&sdev->lock);
+>   
+> @@ -381,12 +384,12 @@ static int siw_netdev_event(struct notifier_block *nb, unsigned long event,
+>   
+>   	switch (event) {
+>   	case NETDEV_UP:
+> -		sdev->state = IB_PORT_ACTIVE;
+> +		sdev->ifinfo.state = IB_PORT_ACTIVE;
+>   		siw_port_event(sdev, 1, IB_EVENT_PORT_ACTIVE);
+>   		break;
+>   
+>   	case NETDEV_DOWN:
+> -		sdev->state = IB_PORT_DOWN;
+> +		sdev->ifinfo.state = IB_PORT_DOWN;
+>   		siw_port_event(sdev, 1, IB_EVENT_PORT_ERR);
+>   		break;
+>   
+> @@ -406,10 +409,13 @@ static int siw_netdev_event(struct notifier_block *nb, unsigned long event,
+>   	case NETDEV_CHANGEADDR:
+>   		siw_port_event(sdev, 1, IB_EVENT_LID_CHANGE);
+>   		break;
+> +
+> +	case NETDEV_CHANGEMTU:
+> +		sdev->ifinfo.mtu = ib_mtu_int_to_enum(READ_ONCE(netdev->mtu));
+> +		break;
+>   	/*
+>   	 * Todo: Below netdev events are currently not handled.
+>   	 */
+> -	case NETDEV_CHANGEMTU:
+>   	case NETDEV_CHANGE:
+>   		break;
+>   
+> @@ -444,9 +450,9 @@ static int siw_newlink(const char *basedev_name, struct net_device *netdev)
+>   		dev_dbg(&netdev->dev, "siw: new device\n");
+>   
+>   		if (netif_running(netdev) && netif_carrier_ok(netdev))
+> -			sdev->state = IB_PORT_ACTIVE;
+> +			sdev->ifinfo.state = IB_PORT_ACTIVE;
+>   		else
+> -			sdev->state = IB_PORT_DOWN;
+> +			sdev->ifinfo.state = IB_PORT_DOWN;
+>   
+>   		ib_mark_name_assigned_by_user(&sdev->base_dev);
+>   		rv = siw_device_register(sdev, basedev_name);
+> diff --git a/drivers/infiniband/sw/siw/siw_verbs.c b/drivers/infiniband/sw/siw/siw_verbs.c
+> index 986666c19378..3ab9c5170637 100644
+> --- a/drivers/infiniband/sw/siw/siw_verbs.c
+> +++ b/drivers/infiniband/sw/siw/siw_verbs.c
+> @@ -178,14 +178,15 @@ int siw_query_port(struct ib_device *base_dev, u32 port,
+>   
+>   	rv = ib_get_eth_speed(base_dev, port, &attr->active_speed,
+>   			 &attr->active_width);
+> +
+>   	attr->gid_tbl_len = 1;
+>   	attr->max_msg_sz = -1;
+> -	attr->max_mtu = ib_mtu_int_to_enum(sdev->netdev->mtu);
+> -	attr->active_mtu = ib_mtu_int_to_enum(sdev->netdev->mtu);
+> -	attr->phys_state = sdev->state == IB_PORT_ACTIVE ?
+> +	attr->max_mtu = sdev->ifinfo.max_mtu;
+> +	attr->active_mtu = sdev->ifinfo.mtu;
+> +	attr->phys_state = sdev->ifinfo.state == IB_PORT_ACTIVE ?
+>   		IB_PORT_PHYS_STATE_LINK_UP : IB_PORT_PHYS_STATE_DISABLED;
+>   	attr->port_cap_flags = IB_PORT_CM_SUP | IB_PORT_DEVICE_MGMT_SUP;
+> -	attr->state = sdev->state;
+> +	attr->state = sdev->ifinfo.state;
+>   	/*
+>   	 * All zero
+>   	 *
+> @@ -519,7 +520,7 @@ int siw_query_qp(struct ib_qp *base_qp, struct ib_qp_attr *qp_attr,
+>   	qp_attr->cap.max_send_sge = qp->attrs.sq_max_sges;
+>   	qp_attr->cap.max_recv_wr = qp->attrs.rq_size;
+>   	qp_attr->cap.max_recv_sge = qp->attrs.rq_max_sges;
+> -	qp_attr->path_mtu = ib_mtu_int_to_enum(sdev->netdev->mtu);
+> +	qp_attr->path_mtu = sdev->ifinfo.mtu;
+>   	qp_attr->max_rd_atomic = qp->attrs.irq_size;
+>   	qp_attr->max_dest_rd_atomic = qp->attrs.orq_size;
+>   
+
 
