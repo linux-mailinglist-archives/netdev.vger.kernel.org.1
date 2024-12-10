@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-150543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 737A69EA9C7
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 08:40:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 457669EA9C8
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 08:40:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EF3218863E6
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 07:40:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F23A1684CC
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 07:40:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62AD1FCCE6;
-	Tue, 10 Dec 2024 07:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9FA1228389;
+	Tue, 10 Dec 2024 07:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pZSgbvuL"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BO5Vigbl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD77B172BD5
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 07:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBA5227560
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 07:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733816430; cv=none; b=sIpcdkwpQqlDFIqnCKHMlBLwEwJWkHLgcO0GNyFi78bdJQ2nepwCQ8Ga3RJWOv/16O3joM6+ItW2v+UN2eIgj1hPw15bXLX2DppmpAhP1GXjjgIlbLzF86eqNFSUqxYOfr1rF/b4dsExSLBdT2LQRG/HbNtMQqu2onmz56MHitE=
+	t=1733816452; cv=none; b=N1GeHMSb7axbMRZ0KAkIBRIcym+fgD/XaTYmZZ2KdIVdtRgXN0i0YBu7EL2KVd1ufGUEaQSP8LhCaDhqSQwIbIsfgcJtM+Ieu1wZoUjAJG990G0tM3Bfdt05BhjTKQoUENTVXilGm5h88XSbT2JVU4z3nbGf/3uU3n5ebUsptG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733816430; c=relaxed/simple;
-	bh=eaVkSfu8BwMoKQRK4a1hxZvFoNn0xIZUfhNVGQqXHsA=;
+	s=arc-20240116; t=1733816452; c=relaxed/simple;
+	bh=phPe+Cc8+QpKHb57YzMkHVCN/O1UawmnwQqW2Xj1OsM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hRYnosLgyY8gIf0I7YBbxcQwhXSIVG2rs7JJ5mgdYDeDRucNbympP8nCgvUiHtmvocgSgi4+h7AikXpji/+K2L0biWId1RcZbhATUnRs3R5QHZw/0ir4aS7ifZNaO4OvrvRCrLDoYwChVZAm31OPv43+1QHHKSdCsmf4oIBdZKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pZSgbvuL; arc=none smtp.client-ip=52.95.48.154
+	 MIME-Version:Content-Type; b=k0fr1Nt+j5ZXEhiuiso3GepFaKN/pZGnbQwecbwaB/gnYy6lr1D1zxBoUMeP7K85V8Oj9SFoznShuyW0AbIrcVxwi+W3lqCsdDd3w77p4ZR2xZ7QZVqN2cfwlUIK21I+MZqFYoBSLCBkdW/mh/rfFVs8aYSazyMKJ6zGZk7lVwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BO5Vigbl; arc=none smtp.client-ip=52.95.49.90
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1733816429; x=1765352429;
+  t=1733816452; x=1765352452;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=IgYP1pSzO0yPRRAorTmY+8uA5xekeY2AQAu14aHQEAc=;
-  b=pZSgbvuLnj3huErRHi/yxXKGFDUDv9F4efLYVny3koIxjpiwnQelOk8T
-   qaT9v9pHVhGq1NKLhzS2gOgXUk7nGVkrJ3ea3e1G7U0UOTr9wv3kKmc1o
-   w884coK1U9GMfYDgVc9cIos+dfAo+ZE5je0vNVGnWhsyLXnSb75+J1E0t
-   I=;
+  bh=4TKbqshIPKl/2Y+gyyNXv1gN0Rd9DpYuNeCS2Zhejz8=;
+  b=BO5VigblUQ05M8TsczQievhyftAeio/cJzFMDBDGIvO9GQYLiNlIBK3x
+   Yn4csRqS1L/eyKbEW8OnvznmpRRI/EHXDqf0uEfqpYYrXwEc5T4It/Yk9
+   sS1MlhM/fee/8Jzp9oCyNNX73hPr/rQe81VBbyC7nfcqRi5wmUmf/aNdj
+   M=;
 X-IronPort-AV: E=Sophos;i="6.12,221,1728950400"; 
-   d="scan'208";a="444429341"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 07:40:26 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:31403]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.26:2525] with esmtp (Farcaster)
- id 3dfff1e9-22f9-4cf7-9f82-1bba7bf81daa; Tue, 10 Dec 2024 07:40:25 +0000 (UTC)
-X-Farcaster-Flow-ID: 3dfff1e9-22f9-4cf7-9f82-1bba7bf81daa
+   d="scan'208";a="454699294"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 07:40:48 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:6700]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.104:2525] with esmtp (Farcaster)
+ id 764804c4-6648-4660-9fc2-8cf39d01a4b2; Tue, 10 Dec 2024 07:40:46 +0000 (UTC)
+X-Farcaster-Flow-ID: 764804c4-6648-4660-9fc2-8cf39d01a4b2
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 10 Dec 2024 07:40:25 +0000
+ Tue, 10 Dec 2024 07:40:46 +0000
 Received: from 6c7e67c6786f.amazon.com (10.143.88.19) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 10 Dec 2024 07:40:22 +0000
+ Tue, 10 Dec 2024 07:40:42 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next 05/15] ppp: Pass hold_net to struct pppox_proto.create().
-Date: Tue, 10 Dec 2024 16:38:19 +0900
-Message-ID: <20241210073829.62520-6-kuniyu@amazon.com>
+Subject: [PATCH v2 net-next 06/15] nfc: Pass hold_net to struct nfc_protocol.create().
+Date: Tue, 10 Dec 2024 16:38:20 +0900
+Message-ID: <20241210073829.62520-7-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241210073829.62520-1-kuniyu@amazon.com>
 References: <20241210073829.62520-1-kuniyu@amazon.com>
@@ -77,94 +77,130 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA001.ant.amazon.com (10.13.139.92) To
+X-ClientProxiedBy: EX19D038UWB004.ant.amazon.com (10.13.139.177) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
 We will introduce a new API to create a kernel socket with netns refcnt
-held.  Then, sk_alloc() need the hold_net flag passed to pppox_create().
+held.  Then, sk_alloc() need the hold_net flag passed to nfc_sock_create().
 
-Let's pass it down to struct pppox_proto.create().
+Let's pass it down to struct nfc_protocol.create() and functions that call
+sk_alloc().
 
 While at it, we convert the kern flag to boolean.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- drivers/net/ppp/pppoe.c  | 3 ++-
- drivers/net/ppp/pppox.c  | 2 +-
- drivers/net/ppp/pptp.c   | 3 ++-
- include/linux/if_pppox.h | 3 ++-
- net/l2tp/l2tp_ppp.c      | 3 ++-
- 5 files changed, 9 insertions(+), 5 deletions(-)
+ net/nfc/af_nfc.c    | 3 ++-
+ net/nfc/llcp.h      | 3 ++-
+ net/nfc/llcp_core.c | 3 ++-
+ net/nfc/llcp_sock.c | 8 +++++---
+ net/nfc/nfc.h       | 3 ++-
+ net/nfc/rawsock.c   | 3 ++-
+ 6 files changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-index 2ea4f4890d23..90995f8a08a3 100644
---- a/drivers/net/ppp/pppoe.c
-+++ b/drivers/net/ppp/pppoe.c
-@@ -533,7 +533,8 @@ static struct proto pppoe_sk_proto __read_mostly = {
-  * Initialize a new struct sock.
-  *
-  **********************************************************************/
--static int pppoe_create(struct net *net, struct socket *sock, int kern)
-+static int pppoe_create(struct net *net, struct socket *sock,
-+			bool kern, bool hold_net)
- {
- 	struct sock *sk;
+diff --git a/net/nfc/af_nfc.c b/net/nfc/af_nfc.c
+index 4fb1c86fcc81..6cdeeccd15bc 100644
+--- a/net/nfc/af_nfc.c
++++ b/net/nfc/af_nfc.c
+@@ -28,7 +28,8 @@ static int nfc_sock_create(struct net *net, struct socket *sock, int proto,
  
-diff --git a/drivers/net/ppp/pppox.c b/drivers/net/ppp/pppox.c
-index 53b3f790d1f5..823b1facac6f 100644
---- a/drivers/net/ppp/pppox.c
-+++ b/drivers/net/ppp/pppox.c
-@@ -126,7 +126,7 @@ static int pppox_create(struct net *net, struct socket *sock, int protocol,
- 	    !try_module_get(pppox_protos[protocol]->owner))
- 		goto out;
+ 	read_lock(&proto_tab_lock);
+ 	if (proto_tab[proto] &&	try_module_get(proto_tab[proto]->owner)) {
+-		rc = proto_tab[proto]->create(net, sock, proto_tab[proto], kern);
++		rc = proto_tab[proto]->create(net, sock, proto_tab[proto],
++					      kern, hold_net);
+ 		module_put(proto_tab[proto]->owner);
+ 	}
+ 	read_unlock(&proto_tab_lock);
+diff --git a/net/nfc/llcp.h b/net/nfc/llcp.h
+index d8345ed57c95..b9d539358e65 100644
+--- a/net/nfc/llcp.h
++++ b/net/nfc/llcp.h
+@@ -211,7 +211,8 @@ void nfc_llcp_send_to_raw_sock(struct nfc_llcp_local *local,
+ 			       struct sk_buff *skb, u8 direction);
  
--	rc = pppox_protos[protocol]->create(net, sock, kern);
-+	rc = pppox_protos[protocol]->create(net, sock, kern, hold_net);
+ /* Sock API */
+-struct sock *nfc_llcp_sock_alloc(struct socket *sock, int type, gfp_t gfp, int kern);
++struct sock *nfc_llcp_sock_alloc(struct socket *sock, int type, gfp_t gfp,
++				 bool kern, bool hold_net);
+ void nfc_llcp_sock_free(struct nfc_llcp_sock *sock);
+ void nfc_llcp_accept_unlink(struct sock *sk);
+ void nfc_llcp_accept_enqueue(struct sock *parent, struct sock *sk);
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index 18be13fb9b75..96d8df013bda 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -965,7 +965,8 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
+ 		sock->ssap = ssap;
+ 	}
  
- 	module_put(pppox_protos[protocol]->owner);
- out:
-diff --git a/drivers/net/ppp/pptp.c b/drivers/net/ppp/pptp.c
-index 689687bd2574..7bfb5c227c40 100644
---- a/drivers/net/ppp/pptp.c
-+++ b/drivers/net/ppp/pptp.c
-@@ -538,7 +538,8 @@ static void pptp_sock_destruct(struct sock *sk)
- 	dst_release(rcu_dereference_protected(sk->sk_dst_cache, 1));
+-	new_sk = nfc_llcp_sock_alloc(NULL, parent->sk_type, GFP_ATOMIC, 0);
++	new_sk = nfc_llcp_sock_alloc(NULL, parent->sk_type, GFP_ATOMIC,
++				     false, true);
+ 	if (new_sk == NULL) {
+ 		reason = LLCP_DM_REJ;
+ 		release_sock(&sock->sk);
+diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
+index 57a2f97004e1..14f592becce0 100644
+--- a/net/nfc/llcp_sock.c
++++ b/net/nfc/llcp_sock.c
+@@ -971,7 +971,8 @@ static void llcp_sock_destruct(struct sock *sk)
+ 	}
  }
  
--static int pptp_create(struct net *net, struct socket *sock, int kern)
-+static int pptp_create(struct net *net, struct socket *sock,
-+		       bool kern, bool hold_net)
+-struct sock *nfc_llcp_sock_alloc(struct socket *sock, int type, gfp_t gfp, int kern)
++struct sock *nfc_llcp_sock_alloc(struct socket *sock, int type, gfp_t gfp,
++				 bool kern, bool hold_net)
  {
- 	int error = -ENOMEM;
  	struct sock *sk;
-diff --git a/include/linux/if_pppox.h b/include/linux/if_pppox.h
-index ff3beda1312c..a38047e308fd 100644
---- a/include/linux/if_pppox.h
-+++ b/include/linux/if_pppox.h
-@@ -68,7 +68,8 @@ static inline struct sock *sk_pppox(struct pppox_sock *po)
- struct module;
+ 	struct nfc_llcp_sock *llcp_sock;
+@@ -1022,7 +1023,8 @@ void nfc_llcp_sock_free(struct nfc_llcp_sock *sock)
+ }
  
- struct pppox_proto {
--	int		(*create)(struct net *net, struct socket *sock, int kern);
-+	int		(*create)(struct net *net, struct socket *sock,
-+				  bool kern, bool hold_net);
- 	int		(*ioctl)(struct socket *sock, unsigned int cmd,
- 				 unsigned long arg);
- 	struct module	*owner;
-diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
-index 53baf2dd5d5d..bab3c7b943db 100644
---- a/net/l2tp/l2tp_ppp.c
-+++ b/net/l2tp/l2tp_ppp.c
-@@ -477,7 +477,8 @@ static int pppol2tp_backlog_recv(struct sock *sk, struct sk_buff *skb)
- 
- /* socket() handler. Initialize a new struct sock.
-  */
--static int pppol2tp_create(struct net *net, struct socket *sock, int kern)
-+static int pppol2tp_create(struct net *net, struct socket *sock,
-+			   bool kern, bool hold_net)
+ static int llcp_sock_create(struct net *net, struct socket *sock,
+-			    const struct nfc_protocol *nfc_proto, int kern)
++			    const struct nfc_protocol *nfc_proto,
++			    bool kern, bool hold_net)
  {
- 	int error = -ENOMEM;
  	struct sock *sk;
+ 
+@@ -1041,7 +1043,7 @@ static int llcp_sock_create(struct net *net, struct socket *sock,
+ 		sock->ops = &llcp_sock_ops;
+ 	}
+ 
+-	sk = nfc_llcp_sock_alloc(sock, sock->type, GFP_ATOMIC, kern);
++	sk = nfc_llcp_sock_alloc(sock, sock->type, GFP_ATOMIC, kern, hold_net);
+ 	if (sk == NULL)
+ 		return -ENOMEM;
+ 
+diff --git a/net/nfc/nfc.h b/net/nfc/nfc.h
+index 0b1e6466f4fb..6dac305a32d3 100644
+--- a/net/nfc/nfc.h
++++ b/net/nfc/nfc.h
+@@ -21,7 +21,8 @@ struct nfc_protocol {
+ 	struct proto *proto;
+ 	struct module *owner;
+ 	int (*create)(struct net *net, struct socket *sock,
+-		      const struct nfc_protocol *nfc_proto, int kern);
++		      const struct nfc_protocol *nfc_proto,
++		      bool kern, bool hold_net);
+ };
+ 
+ struct nfc_rawsock {
+diff --git a/net/nfc/rawsock.c b/net/nfc/rawsock.c
+index 5125392bb68e..4485b1ccb1c7 100644
+--- a/net/nfc/rawsock.c
++++ b/net/nfc/rawsock.c
+@@ -321,7 +321,8 @@ static void rawsock_destruct(struct sock *sk)
+ }
+ 
+ static int rawsock_create(struct net *net, struct socket *sock,
+-			  const struct nfc_protocol *nfc_proto, int kern)
++			  const struct nfc_protocol *nfc_proto,
++			  bool kern, bool hold_net)
+ {
+ 	struct sock *sk;
+ 
 -- 
 2.39.5 (Apple Git-154)
 
