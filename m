@@ -1,87 +1,93 @@
-Return-Path: <netdev+bounces-150658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 719749EB220
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:45:03 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28F839EB228
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:47:53 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFF4A2844F7
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:45:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DB14161B37
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2EB1AA1C9;
-	Tue, 10 Dec 2024 13:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CDA1A9B30;
+	Tue, 10 Dec 2024 13:47:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zc+A3xnM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CIIioZTx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A28123DE8D;
-	Tue, 10 Dec 2024 13:44:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754DB5674D
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 13:47:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733838298; cv=none; b=ZyCfltQsJmOe99vCxwV4M2BpEsQhvU3o6X4QPg/G96Kh8B1Tiw4ivif6ZT2J7ksx7EKbLfVAF8FJ9216pCDSAb3SZEH+QSn08iGb3ws1uqxCvMELHhlqPyeKegbF9QdoEni/zjRJrkOjYEZe61e2uaC7XQ6+E2TPF9lBzbsB69o=
+	t=1733838469; cv=none; b=dd71Jt3q+Vqu40k65gIp6pHZmn8cm5hRkTNiwDLyYcA1PLsj8RsFg11xP531VPMMcu0lplH2SgU+ogsCE8uYAflzKW0UNq0Jm1FjzuvmNy89Vtb4dY/NLqS9qwVhCiCwpd1iMGPpzlF4S89kWcYFht89mFAbWI0pGsnvkt+lMRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733838298; c=relaxed/simple;
-	bh=fmtAwz9r7mdCnu6Pbec9pEFR3UL2H2XM9OAzzlbAAKo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ob9hAOhIPYHZyNzcWjAJ691KQ6+R4ehXHxStXNPvl24AO1OBM6kFiggJj6Sq8DdfZ2qZPdzvomW4H3HFoWM1Xj8z3lIpCR5p2JQtbZpRi3Q8eh770Du1gOfAdsmvCWwPXFpm1BZkrFmIKM45kMtVlqaZI17hmSD/UUcPGdt3Cag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zc+A3xnM; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=HlnfhHdfjevXdjQVYFmiX94WQ1u9RlobiSXLEyJd84I=; b=zc+A3xnM3QJ/QkIQSdFTQ6kjXb
-	GAUlBaviwPU7VJNt1qDCmdzvvFQSQufg2HAAMfYAArt9aZL92r6TuBpsl4/+/qE2ysWy7EulYylWS
-	zRyOP67PSLb1zD7L2NXalQKhtiWUQyCyQneWi/LZ2UAhPfQqbO2q0XGM8UHNTadftJA0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tL0XZ-00Fo03-VK; Tue, 10 Dec 2024 14:44:41 +0100
-Date: Tue, 10 Dec 2024 14:44:41 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	imx@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: fec: use phydev->eee_cfg.tx_lpi_timer
-Message-ID: <649e70e2-5690-4f6c-95d2-3e74c9636d2c@lunn.ch>
-References: <E1tKzVS-006c67-IJ@rmk-PC.armlinux.org.uk>
- <Z1g2md_S1kEjOKQH@shell.armlinux.org.uk>
+	s=arc-20240116; t=1733838469; c=relaxed/simple;
+	bh=rzV8WuFPFKqrbo+gZ85ozOein12RDMOXWWIDdOkg/6A=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=N+ItQQbvys3HgLYrEqPeG713+XT3aoegSjrUV3pRBOXsTT+MZTTWNatajITLzIOf4jsS0FWGTsj10pnxyDnrLi+spFrvvoEp9jHvrY6DM5rqz4VIIUvzbrQ0dtS0p1ft82wtl+6w1wJRjBdniF6m+HDiJPbC+TRmsOlJ5DP7PaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CIIioZTx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5B40C4CED6;
+	Tue, 10 Dec 2024 13:47:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733838469;
+	bh=rzV8WuFPFKqrbo+gZ85ozOein12RDMOXWWIDdOkg/6A=;
+	h=From:Date:Subject:To:Cc:From;
+	b=CIIioZTx5m6U7YuzVoF0ADYdS42TgbT1zgJIkVrQ9XD5/Njp2OqmKzPCo5zaUdMPQ
+	 YX0JNTt3Wjm+RlCrrd0MxmQfcbiarVnw04k/7fmTh4rM8vfvw5pozkSqnAA9cNI4VJ
+	 4tuVvL/U+n/wHQWdiMe62q67C+WwPAXsYzqyKN6vifuDIvyHkzKdBRpfD3fnS2paA0
+	 F4P/XHvltUsu034ilBIfsi9lStVp7oP2wKtEO/Y+Qg5Wl7q76rfluxrbgeyxiR3U4g
+	 FfFdRbG9qeQeKYJgFzMtbUjkPryaGCFYNefZMCSQANXwdkdViy4bAH2TkhPbvG+ScX
+	 tAhd5/eQv2DYQ==
+From: Simon Horman <horms@kernel.org>
+Date: Tue, 10 Dec 2024 13:47:44 +0000
+Subject: [PATCH net] MAINTAINERS: Add ethtool.h to NETWORKING [GENERAL]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z1g2md_S1kEjOKQH@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241210-mnt-ethtool-h-v1-1-2a40b567939d@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAH9GWGcC/x3MQQqAIBBA0avErBswLayuEi1CpxwoDZUIorsnL
+ d/i/wcSRaYEY/VApIsTB1/Q1BUYt/iNkG0xSCHbRooBD5+Rsssh7OhQW9lpsdreKAWlOSOtfP+
+ /CTxlmN/3A20zicxkAAAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-On Tue, Dec 10, 2024 at 12:39:53PM +0000, Russell King (Oracle) wrote:
-> On Tue, Dec 10, 2024 at 12:38:26PM +0000, Russell King (Oracle) wrote:
-> > Rather than maintaining a private copy of the LPI timer, make use of
-> > the LPI timer maintained by phylib. In any case, phylib overwrites the
-> > value of tx_lpi_timer set by the driver in phy_ethtool_get_eee().
-> > 
-> > Note that feb->eee.tx_lpi_timer is initialised to zero, which is just
-> > the same with phylib's copy, so there should be no functional change.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> Note that this need testing on compatible hardware - I only have iMX6
-> which doesn't have EEE support in FEC.
+This is part of an effort to assign a section in MAINTAINERS to header
+files related to Networking. In this case the files named ethool.h.
 
-The FEC hardware i have does not have EEE either. Sorry.
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
-	Andrew
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f84ec3572a5d..16c76ecca3f9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -16335,6 +16335,7 @@ F:	Documentation/networking/
+ F:	Documentation/networking/net_cachelines/
+ F:	Documentation/process/maintainer-netdev.rst
+ F:	Documentation/userspace-api/netlink/
++F:	include/linux/ethtool.h
+ F:	include/linux/framer/framer-provider.h
+ F:	include/linux/framer/framer.h
+ F:	include/linux/in.h
+@@ -16349,6 +16350,7 @@ F:	include/linux/rtnetlink.h
+ F:	include/linux/seq_file_net.h
+ F:	include/linux/skbuff*
+ F:	include/net/
++F:	include/uapi/linux/ethtool.h
+ F:	include/uapi/linux/genetlink.h
+ F:	include/uapi/linux/hsr_netlink.h
+ F:	include/uapi/linux/in.h
+
 
