@@ -1,157 +1,144 @@
-Return-Path: <netdev+bounces-150566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 882FC9EAA9E
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 09:27:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB00B9EAAC1
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 09:32:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 789C4188A42A
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 08:27:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD70E188A652
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 08:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A31230990;
-	Tue, 10 Dec 2024 08:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C4F2309A1;
+	Tue, 10 Dec 2024 08:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ipRpvBeo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCDC230981
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 08:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F200230982
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 08:32:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733819243; cv=none; b=WUYxirc9QDRg7ZtNfzTI5DSkuvq7JyE2X0BZME1eat6/w4N105IRvyk4n6Hws9SGakf6wEC6Yfb1WHMvpESUL/OkWlY4vwb2kmF1wdKUYvTL6WjjHOGs1xFcT0HMdovkJrfahgKpycdTBauVVSE0f9fXGULY4Ao7jFkXLyizgHc=
+	t=1733819570; cv=none; b=dA80Pq4isgx4Cy/SKBhnat0d4nPmlJbLjQ8o6kbCV2xelVQsXo0EiI5Ijk9Ovj87WLdsLseB3Yteq1mar4+BDfzZc2XdQfaXmFLcQeGkg5/ler7Vhjj2GINonR/72vxUzF7ygBNCcQnRMiE0zcc1qpKjgBgDkeNHYB5zmKlIs9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733819243; c=relaxed/simple;
-	bh=RGEqFTsyLAWytI7W+/2L934Qp3FUaqeSB9bSIm03mQI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=nSTfhcdJJVlUkfiHLtTXOun8KdfqZ84QC/ExHpVp8PlHvLV4gGwEFGzCna3wRXoVaG0B88mIUjwZA+5Bko7S3Y89f/28woOA57Tergs0jgeolpdlyLMBdtX1xAGhSzeJwiE4O+j0XzeJrzncP5mWG4nNjWUYngZ5YagYVNBmolk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a7de3ab182so116339665ab.1
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 00:27:21 -0800 (PST)
+	s=arc-20240116; t=1733819570; c=relaxed/simple;
+	bh=C95Yp+TtH7hbaEHcFYsumRyKem0CNEcNHNuqx20MW78=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z28DkcjX6g2vTrsYj5glT9rxgCe0eVGd3FCYYAiQ2zHhsQjetefgZRwh/TYieV1jNtkgUjIj4ch9Hcz8vgI3z97dyjw1y01/lqnmeWyIZSc3CH8DvBsfXYMWhHlf7DgwaTuZYo+g/m4YnFqUDvIzCYrn/V0eCUycvhb/IziHtHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ipRpvBeo; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733819568;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P/P6lJeDrLZb+NYbzC1Fl4Z0gargyMkctdIvfmI6zLs=;
+	b=ipRpvBeoCWUXl8nIEqdscdR4x9jkyj7182FXKXDqcUN5vGZyw7mNMmOUht61bxQxmoo27Y
+	apJjbZP4w4vf1Qsp7HJf3GbQj6OuYjXsVkrN8nrDljsq6vNf7IQgWcbzaKjIrCtbsXEopl
+	Lq7Yd2GNQltH7cj8OhkqEY9syPl22z4=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-652-C0Lf8bDuPwKb3NddnTAaew-1; Tue, 10 Dec 2024 03:32:46 -0500
+X-MC-Unique: C0Lf8bDuPwKb3NddnTAaew-1
+X-Mimecast-MFC-AGG-ID: C0Lf8bDuPwKb3NddnTAaew
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4667e12c945so79226201cf.3
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 00:32:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733819241; x=1734424041;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gEszRSbd8tWerIRnCbggzUfqai9KrhAu9qVrRUgthsE=;
-        b=fXYHdJ6YpTwHQfyWgVdG6f2zOOKylktgIJahjLfSRFuG3QiqKftEGsWbMi8H79JbNC
-         HZXtyl4qRJZu6FSml2hYME4HJoCEfIKR72mFwaXisc1AykcIkHLayxT4NVxt4nHyzwTy
-         Q6dl85FOXJv7mVx2V8iPJu6rfs+do4DSwnTERBNMzqE2Tpcm8sJdMSJn6Ux+sd7eFLH5
-         s9CJPOcHM+hlvy8jYVYT38N5PuEbl18lpvQLCqmACeiunssuMU+XSJAr8I3lYZfpNTEg
-         YQlcdF72V+bpllSekA6r0rqmAwtaN7mf5FDXsz5kvqPZw8dznN7DXmbnzA9h+ppziBY5
-         sBlg==
-X-Forwarded-Encrypted: i=1; AJvYcCV7k3riuqYIm/uEnaWBVh6EGdWEDImcN6aD01CRKfr7XU7d3+Ztmn5YSY5EXpKoNPYwAKuZwx8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCTXTFCNShB2VjQh3JnYkJqgkoTS/y4x/Dvgy7Fab1UqoARJGp
-	DJfdCHZ4mTG7hbre+WvaX5bBXzr9I5RwakoykmOVCD8EjdbQK8yL63Dbw+D47uL8LlckveIlas9
-	DACukslXpFzuliFgREYeyNvNqWNCfimS3MGH10Rsd1WQL3mtULTJfQ9g=
-X-Google-Smtp-Source: AGHT+IHBX2YwuKKiF3YlIjH872Jb10T1FN7R/2rd1aFm4MD74rYJnO0r7c1yeHL8132Q4SDwuC4tN2wH79oeFO1GSSZ1vhk07TcQ
+        d=1e100.net; s=20230601; t=1733819566; x=1734424366;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P/P6lJeDrLZb+NYbzC1Fl4Z0gargyMkctdIvfmI6zLs=;
+        b=dF3XJlSVA2uhZ8icq2HYQwVgy2BLZHNJgljuNwa5WeyyF+wABkBnQ1nw0X8WmFvDiB
+         bjTC0A+THIDjL7xosV1mzOXYwmLj4pjI7XetZdOVja+Yi3RjrpLIPolgeh+Ux2Uj8M7K
+         6QG9TefnAfqy/F8KIfppkrVKp59npl9MYELkmvN4gnr6AKKB2/76oeXY9CZpvnzWU07P
+         MnbDyfZ5U0QBHHe5hMgLlgZ3OPEbuI+YZ+o5asaPrL/Q0gIJcHtgF39Y6WUEBt613llD
+         KcH/4wmWehWJL6ugv+80hrsjHHGNW87iGBKfCMn4hMbxd5WkpwWIe3PWhBsb9/knlCp2
+         jQ7Q==
+X-Gm-Message-State: AOJu0YzhIc8bZon8gFifVJ5tdM3dUFTTJBc1n2mrrvWZ3A1L4jj49bpg
+	tN+UAXKg3vux8Ohwc8XB30wzsxv45vjDqVw1vSFw2tsFZSZ397yFQ/zsm50yNytm0X4JmTI36tD
+	vQn04QUx8m86Rp6oY290X1TsP5Ef634veMwBx/l+p5q+dVS8RExzN0g==
+X-Gm-Gg: ASbGncuX3APpoXOUquyQxFpFFV80Fwpj4SNkAt56Fw3sM7VrMeeN3OyuHFHPXNZjvaH
+	du5Gin7QXYISGUdRsiSXeCYdS0GcwZ088N1s04I98/XxESaeZxWiOQcuNlotFNtgFm+ku8drG+S
+	/kHi/tYV77zZ/pHoDK73U59eSISi88gkaqoyjQV6C2z1BMo164DxV6VpOnSuqEPAZyOYaemi6Qf
+	2I8bRxM663ElscRx6svd/NrwkTAax8uZC2wLJnGgRr9B2Z0ILxGHJCEUwm8x75WjTNWxMz+/4wn
+	HKUissSLRNTspaKiUW6niSMhhg==
+X-Received: by 2002:a05:6214:2507:b0:6d8:a822:2ee2 with SMTP id 6a1803df08f44-6d8e711808cmr320000226d6.16.1733819566454;
+        Tue, 10 Dec 2024 00:32:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGUT9a2JCpBxHLshOy1bi4Da9CvF3PHqUbdLxCpftdB6kAzNsOS8f7tP8acPEVY4uW+O1teyg==
+X-Received: by 2002:a05:6214:2507:b0:6d8:a822:2ee2 with SMTP id 6a1803df08f44-6d8e711808cmr319999896d6.16.1733819566050;
+        Tue, 10 Dec 2024 00:32:46 -0800 (PST)
+Received: from [192.168.1.14] (host-82-49-164-239.retail.telecomitalia.it. [82.49.164.239])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d8da69591fsm58638106d6.31.2024.12.10.00.32.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2024 00:32:45 -0800 (PST)
+Message-ID: <63b0f262-066a-4f7b-b55a-a7f0ed4aa7f4@redhat.com>
+Date: Tue, 10 Dec 2024 09:32:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1568:b0:3a7:e800:7d37 with SMTP id
- e9e14a558f8ab-3a9dbac588cmr37719775ab.10.1733819240944; Tue, 10 Dec 2024
- 00:27:20 -0800 (PST)
-Date: Tue, 10 Dec 2024 00:27:20 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6757fb68.050a0220.2477f.005f.GAE@google.com>
-Subject: [syzbot] [net?] [afs?] WARNING in rxrpc_send_data
-From: syzbot <syzbot+ff11be94dfcd7a5af8da@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dhowells@redhat.com, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-afs@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, marc.dionne@auristor.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] udp: fix l4 hash after reconnect
+To: Philo Lu <lulie@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Fred Chen <fred.cc@alibaba-inc.com>,
+ Cambda Zhu <cambda@linux.alibaba.com>, Willem de Bruijn
+ <willemb@google.com>, Stefano Brivio <sbrivio@redhat.com>
+References: <4761e466ab9f7542c68cdc95f248987d127044d2.1733499715.git.pabeni@redhat.com>
+ <CANn89i+aKNhzYKo3H3gx5Uhy4iPQ4p=6WDDF-0brGyR=PzJqjQ@mail.gmail.com>
+ <CANn89i+k11E9XeJZwvgZ7VO0yr1nWge8+U-ESw2GLYDq7-sdBw@mail.gmail.com>
+ <b46a7757-f311-4656-a114-68381d9856e3@redhat.com>
+ <a4085013-daaf-4141-af56-cd438bf8b4c9@linux.alibaba.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <a4085013-daaf-4141-af56-cd438bf8b4c9@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 12/7/24 03:34, Philo Lu wrote:
+> On 2024/12/7 00:23, Paolo Abeni wrote:
+>> On 12/6/24 17:01, Eric Dumazet wrote:
+>>> BTW, it seems that udp_lib_rehash() does the udp_rehash4()
+>>> only if the hash2 has changed.
+>>
+>> Oh, you are right, that requires a separate fix.
+>>
+>> @Philo: could you please have a look at that? basically you need to
+>> check separately for hash2 and hash4 changes.
+> 
+> This is a good question. IIUC, the only affected case is when trying to 
+> re-connect another remote address with the same local address 
 
-syzbot found the following issue on:
+AFAICS, there is also another case: when re-connection using a different
+local addresses with the same l2 hash...
 
-HEAD commit:    e58b4771af2b Merge branch 'vxlan-support-user-defined-rese..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=16b9a8f8580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1362a5aee630ff34
-dashboard link: https://syzkaller.appspot.com/bug?extid=ff11be94dfcd7a5af8da
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14cb93e8580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15a3d4df980000
+> (i.e., 
+> hash2 unchanged). And this will be handled by udp_lib_hash4(). So in 
+> udp_lib_rehash() I put rehash4() inside hash2 checking, which means a 
+> passive rehash4 following rehash2.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/b527c0c7acd8/disk-e58b4771.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/41720c9a36cc/vmlinux-e58b4771.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8888d773b743/bzImage-e58b4771.xz
+... but even the latter case should be covered from the above.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ff11be94dfcd7a5af8da@syzkaller.appspotmail.com
+> So I think it's more about the convention for rehash. We can choose the 
+> better one.
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5822 at net/rxrpc/sendmsg.c:296 rxrpc_alloc_txqueue net/rxrpc/sendmsg.c:296 [inline]
-WARNING: CPU: 0 PID: 5822 at net/rxrpc/sendmsg.c:296 rxrpc_send_data+0x2969/0x2b30 net/rxrpc/sendmsg.c:390
-Modules linked in:
-CPU: 0 UID: 0 PID: 5822 Comm: syz-executor280 Not tainted 6.13.0-rc1-syzkaller-00332-ge58b4771af2b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:rxrpc_alloc_txqueue net/rxrpc/sendmsg.c:296 [inline]
-RIP: 0010:rxrpc_send_data+0x2969/0x2b30 net/rxrpc/sendmsg.c:390
-Code: 24 48 48 89 de e8 37 38 ab f6 4c 39 f3 b8 00 fe ff ff 41 bf fc ff ff ff 44 0f 44 f8 45 31 f6 e9 71 fd ff ff e8 38 33 ab f6 90 <0f> 0b 90 48 8b 7c 24 28 e8 4a d3 09 f7 e9 46 fd ff ff 89 d9 80 e1
-RSP: 0018:ffffc90003d9f620 EFLAGS: 00010293
-RAX: ffffffff8af43ee8 RBX: ffff88814e6b4e80 RCX: ffff88802b741e00
-RDX: 0000000000000000 RSI: 00000000000000ff RDI: ffff88807d0ea440
-RBP: ffffc90003d9f8d0 R08: ffff88807d0ea43f R09: 0000000000000000
-R10: ffff88807d0ea340 R11: ffffed100fa1d488 R12: ffff88814e6b4e48
-R13: 1ffff11029cd69cf R14: ffff88807d0ea000 R15: 0000000000000000
-FS:  0000555559fc7380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f831d7fb0d0 CR3: 000000007f1c2000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- rxrpc_do_sendmsg+0x1569/0x1910 net/rxrpc/sendmsg.c:763
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2583
- ___sys_sendmsg net/socket.c:2637 [inline]
- __sys_sendmsg+0x269/0x350 net/socket.c:2669
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f831d783ab9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fffd37defc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f831d783ab9
-RDX: 0000000000008880 RSI: 0000000020000000 RDI: 0000000000000003
-RBP: 00007f831d7cd0fd R08: 0000000000000000 R09: 0000000000000006
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f831d7d213c
-R13: 00007f831d7cd082 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+IIRC a related question raised during code review for the udp L4 hash
+patches. Perhaps refactoring the code slightly to let udp_rehash()
+really doing the re-hashing and udp_hash really doing only the hashing
+could be worth.
 
+Cheers,
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Paolo
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
