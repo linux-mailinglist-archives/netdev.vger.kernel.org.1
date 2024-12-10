@@ -1,130 +1,236 @@
-Return-Path: <netdev+bounces-150663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B70C19EB235
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:50:57 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFB619EB232
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:50:41 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10DE628323E
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:50:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E40871889624
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:50:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EDBA1AAA11;
-	Tue, 10 Dec 2024 13:50:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6875E1A2642;
+	Tue, 10 Dec 2024 13:50:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YEcoBYha"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1061A9B5C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415F21A08A0
 	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 13:50:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733838640; cv=none; b=VNV033tWUAp7H+tTLE0o5xzydGRAAvFq0TrTbs16ZJvQeUJbnCcgpKbAvQ3SrHKfJBqlXJ60p8o53ogLxQ3Od/eYPCzmVisvNWEE7vjsoQc69Zq0bXOXacluvStQILCRU4kJjR9CdF9BhB6pSNIeR1eZUu5J15H9PG8ltfh2Mkk=
+	t=1733838638; cv=none; b=HB4vEOSWGGMM8C7/0Sp4K9EUd7DpuByA+D/Socn3qyO7h8IKq1MKIofOmnYmy6vIhFd89lv1ZIzKFilJ0hsYv8B77BPxfwwKDK1OYik9yz6Nnym7M6GFqaf6Hb0SktArwX+vzpQTjNI9acjB5m3008ZNR20Rt8NluznbkSiXN0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733838640; c=relaxed/simple;
-	bh=hp+6qhS324G6AM9ywgVH5MwonZcR8ZzvpIgKABrFalk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=i1742CBa+71MkC0Otr9k55JgkWszruENBhxYgRdQ/T1LT0+Lz3SyaAH9wT+jVmaSv1g/7WNSdTYWy9atnuWp+Km47vavtNPkajFqOkb6e6YfOqZLmiyooMYbO4mIJ7Gq1n7LSBL1dwbBprr25t1y1yT9HUIMJI+M///3PBbbqz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; arc=none smtp.client-ip=23.88.38.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
-Received: from kero.packetmixer.de (p200300c5971B44D83038c7ecb8e2ed5C.dip0.t-ipconnect.de [IPv6:2003:c5:971b:44d8:3038:c7ec:b8e2:ed5c])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.simonwunderlich.de (Postfix) with ESMTPSA id 484E4FA184;
-	Tue, 10 Dec 2024 14:50:30 +0100 (CET)
-From: Simon Wunderlich <sw@simonwunderlich.de>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	Remi Pommarel <repk@triplefau.lt>,
-	Antonio Quartulli <Antonio@mandelbit.com>,
-	Sven Eckelmann <sven@narfation.org>,
-	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH 3/3] batman-adv: Do not let TT changes list grows indefinitely
-Date: Tue, 10 Dec 2024 14:50:24 +0100
-Message-Id: <20241210135024.39068-4-sw@simonwunderlich.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241210135024.39068-1-sw@simonwunderlich.de>
-References: <20241210135024.39068-1-sw@simonwunderlich.de>
+	s=arc-20240116; t=1733838638; c=relaxed/simple;
+	bh=7EU67tCvOJazyKo8mGVkzs9Ka41GIQn66ofZREF/QMA=;
+	h=Content-Type:Date:Message-Id:Cc:From:To:Subject:References:
+	 In-Reply-To; b=EKVrK6EOfAHMAkAXgqf0zKp1Q8iFxq5XE/aRz24DL7VtzoqrjT814z0lXGOs/WF5gzndXiqPY5Bv2EKjSYWHctc6zF3ZDJZGX7gLdGY1h2upMAmAMvb86biE3vL7FPncqvgZjPNHdAdOIQOgA52NknVKGrZwaPdJW8YHZ/yf+iE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YEcoBYha; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F8C8C4CED6;
+	Tue, 10 Dec 2024 13:50:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733838638;
+	bh=7EU67tCvOJazyKo8mGVkzs9Ka41GIQn66ofZREF/QMA=;
+	h=Date:Cc:From:To:Subject:References:In-Reply-To:From;
+	b=YEcoBYharrzNhJ68SwGoj8xr3SH/FzTgdz/1fpVH/19E7eFuA1/cv9qkbCxCP1/6C
+	 sQYmulgIkKeuewmO8oVIAwyqQq4xsVm0Yu7CJBfwyUj0K/nqoh9dTbPxcgh+ofTCv/
+	 e6w2Sv5gRdsOboU57ITQTrAF0Cn5uabiAiM+FhpgKsoR/qdWWCdkZVCjYotzeGbE5k
+	 ex2znWo5sMMgeJW/OyvuFk4Ti75tgBDRNdH8jbFMIaWf0m/BpXbJIbVb9hiM6YKAkD
+	 K2LkR9bw0U2KOG+3chUeKVWQQuLHign6qClBLDpo345EnxmVQrNZtsABAoG/uCMSdU
+	 J1MTRc+hf1LiA==
+Content-Type: multipart/signed;
+ boundary=ec7f30d4b36eb363bb3626bfabdd704cec6c3d3467c105c63b08970e9d26;
+ micalg=pgp-sha384; protocol="application/pgp-signature"
+Date: Tue, 10 Dec 2024 14:50:33 +0100
+Message-Id: <D682I0FBTZYR.RBPXND1NUZFR@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, "Eric Dumazet"
+ <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
+ <pabeni@redhat.com>, "Andrew Lunn" <andrew@lunn.ch>, "Claudiu Manoil"
+ <claudiu.manoil@nxp.com>, "Alexandre Belloni"
+ <alexandre.belloni@bootlin.com>, <UNGLinuxDriver@microchip.com>, "Xiaoliang
+ Yang" <xiaoliang.yang_1@nxp.com>, "Yangbo Lu" <yangbo.lu@nxp.com>, "Radu
+ Bulie" <radu-andrei.bulie@nxp.com>
+From: "Michael Walle" <mwalle@kernel.org>
+To: "Vladimir Oltean" <vladimir.oltean@nxp.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH net] net: dsa: felix: fix stuck CPU-injected packets
+ with short taprio windows
+X-Mailer: aerc 0.16.0
+References: <20241210132640.3426788-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20241210132640.3426788-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Remi Pommarel <repk@triplefau.lt>
+--ec7f30d4b36eb363bb3626bfabdd704cec6c3d3467c105c63b08970e9d26
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-When TT changes list is too big to fit in packet due to MTU size, an
-empty OGM is sent expected other node to send TT request to get the
-changes. The issue is that tt.last_changeset was not built thus the
-originator was responding with previous changes to those TT requests
-(see batadv_send_my_tt_response). Also the changes list was never
-cleaned up effectively never ending growing from this point onwards,
-repeatedly sending the same TT response changes over and over, and
-creating a new empty OGM every OGM interval expecting for the local
-changes to be purged.
+On Tue Dec 10, 2024 at 2:26 PM CET, Vladimir Oltean wrote:
+> With this port schedule:
+>
+> tc qdisc replace dev $send_if parent root handle 100 taprio \
+> 	num_tc 8 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 \
+> 	map 0 1 2 3 4 5 6 7 \
+> 	base-time 0 cycle-time 10000 \
+> 	sched-entry S 01 1250 \
+> 	sched-entry S 02 1250 \
+> 	sched-entry S 04 1250 \
+> 	sched-entry S 08 1250 \
+> 	sched-entry S 10 1250 \
+> 	sched-entry S 20 1250 \
+> 	sched-entry S 40 1250 \
+> 	sched-entry S 80 1250 \
+> 	flags 2
+>
+> ptp4l would fail to take TX timestamps of Pdelay_Resp messages like this:
+>
+> increasing tx_timestamp_timeout may correct this issue, but it is likely =
+caused by a driver bug
+> ptp4l[4134.168]: port 2: send peer delay response failed
+>
+> It turns out that the driver can't take their TX timestamps because it
+> can't transmit them in the first place. And there's nothing special
+> about the Pdelay_Resp packets - they're just regular 68 byte packets.
+> But with this taprio configuration, the switch would refuse to send even
+> the ETH_ZLEN minimum packet size.
+>
+> This should have definitely not been the case. When applying the taprio
+> config, the driver prints:
+>
+> mscc_felix 0000:00:00.5: port 0 tc 0 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 132 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 1 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 132 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 2 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 132 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 3 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 132 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 4 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 132 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 5 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 132 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 6 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 132 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 7 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 132 octets includ=
+ing FCS
+>
+> and thus, everything under 132 bytes - ETH_FCS_LEN should have been sent
+> without problems. Yet it's not.
+>
+> For the forwarding path, the configuration is fine, yet packets injected
+> from Linux get stuck with this schedule no matter what.
+>
+> The first hint that the static guard bands are the cause of the problem
+> is that reverting Michael Walle's commit 297c4de6f780 ("net: dsa: felix:
+> re-enable TAS guard band mode") made things work. It must be that the
+> guard bands are calculated incorrectly.
+>
+> I remembered that there is a magic constant in the driver, set to 33 ns
+> for no logical reason other than experimentation, which says "never let
+> the static guard bands get so large as to leave less than this amount of
+> remaining space in the time slot, because the queue system will refuse
+> to schedule packets otherwise, and they will get stuck". I had a hunch
+> that my previous experimentally-determined value was only good for
+> packets coming from the forwarding path, and that the CPU injection path
+> needed more.
+>
+> I came to the new value of 35 ns through binary search, after seeing
+> that with 544 ns (the bit time required to send the Pdelay_Resp packet
+> at gigabit) it works. Again, this is purely experimental, there's no
+> logic and the manual doesn't say anything.
+>
+> The new driver prints for this schedule look like this:
+>
+> mscc_felix 0000:00:00.5: port 0 tc 0 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 131 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 1 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 131 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 2 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 131 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 3 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 131 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 4 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 131 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 5 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 131 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 6 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 131 octets includ=
+ing FCS
+> mscc_felix 0000:00:00.5: port 0 tc 7 min gate length 1250 ns not enough f=
+or max frame size 1526 at 1000 Mbps, dropping frames over 131 octets includ=
+ing FCS
+>
+> So yes, the maximum MTU is now even smaller by 1 byte than before.
+> This is maybe counter-intuitive, but makes more sense with a diagram of
+> one time slot.
+>
+> Before:
+>
+>  Gate open                                   Gate close
+>  |                                                    |
+>  v           1250 ns total time slot duration         v
+>  <---------------------------------------------------->
+>  <----><---------------------------------------------->
+>   33 ns            1217 ns static guard band
+>   useful
+>
+>  Gate open                                   Gate close
+>  |                                                    |
+>  v           1250 ns total time slot duration         v
+>  <---------------------------------------------------->
+>  <-----><--------------------------------------------->
+>   35 ns            1215 ns static guard band
+>   useful
+>
+> The static guard band implemented by this switch hardware directly
+> determines the maximum allowable MTU for that traffic class. The larger
+> it is, the earlier the switch will stop scheduling frames for
+> transmission, because otherwise they might overrun the gate close time
+> (and avoiding that is the entire purpose of Michael's patch).
+> So, we now have guard bands smaller by 2 ns, thus, in this particular
+> case, we lose a byte of the maximum MTU.
+>
+> Fixes: 11afdc6526de ("net: dsa: felix: tc-taprio intervals smaller than M=
+TU should send at least one packet")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-When there is more TT changes that can fit in packet, drop all changes,
-send empty OGM and wait for TT request so we can respond with a full
-table instead.
+Makes sense:
 
-Fixes: e1bf0c14096f ("batman-adv: tvlv - convert tt data sent within OGMs")
-Signed-off-by: Remi Pommarel <repk@triplefau.lt>
-Acked-by: Antonio Quartulli <Antonio@mandelbit.com>
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
----
- net/batman-adv/translation-table.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+Reviewed-by: Michael Walle <mwalle@kernel.org>
 
-diff --git a/net/batman-adv/translation-table.c b/net/batman-adv/translation-table.c
-index f5201738628c..760d51fdbdf6 100644
---- a/net/batman-adv/translation-table.c
-+++ b/net/batman-adv/translation-table.c
-@@ -948,6 +948,7 @@ static void batadv_tt_tvlv_container_update(struct batadv_priv *bat_priv)
- 	int tt_diff_len, tt_change_len = 0;
- 	int tt_diff_entries_num = 0;
- 	int tt_diff_entries_count = 0;
-+	bool drop_changes = false;
- 	size_t tt_extra_len = 0;
- 	u16 tvlv_len;
- 
-@@ -955,10 +956,17 @@ static void batadv_tt_tvlv_container_update(struct batadv_priv *bat_priv)
- 	tt_diff_len = batadv_tt_len(tt_diff_entries_num);
- 
- 	/* if we have too many changes for one packet don't send any
--	 * and wait for the tt table request which will be fragmented
-+	 * and wait for the tt table request so we can reply with the full
-+	 * (fragmented) table.
-+	 *
-+	 * The local change history should still be cleaned up so the next
-+	 * TT round can start again with a clean state.
- 	 */
--	if (tt_diff_len > bat_priv->soft_iface->mtu)
-+	if (tt_diff_len > bat_priv->soft_iface->mtu) {
- 		tt_diff_len = 0;
-+		tt_diff_entries_num = 0;
-+		drop_changes = true;
-+	}
- 
- 	tvlv_len = batadv_tt_prepare_tvlv_local_data(bat_priv, &tt_data,
- 						     &tt_change, &tt_diff_len);
-@@ -967,7 +975,7 @@ static void batadv_tt_tvlv_container_update(struct batadv_priv *bat_priv)
- 
- 	tt_data->flags = BATADV_TT_OGM_DIFF;
- 
--	if (tt_diff_len == 0)
-+	if (!drop_changes && tt_diff_len == 0)
- 		goto container_register;
- 
- 	spin_lock_bh(&bat_priv->tt.changes_list_lock);
--- 
-2.39.5
+-michael
 
+--ec7f30d4b36eb363bb3626bfabdd704cec6c3d3467c105c63b08970e9d26
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iKgEABMJADAWIQTIVZIcOo5wfU/AngkSJzzuPgIf+AUCZ1hHKhIcbXdhbGxlQGtl
+cm5lbC5vcmcACgkQEic87j4CH/i2awF/UG4PPPL+YyYoEZbfOUzb41LwgJXzq8h9
+xfIIOxF7bDGfRn3iDHxLko0kVbX9CxKaAX9kA69VVmgSYBO5zIR05qXHsWZ30vIj
+9rLqJ9HSxefgN0YobYv5fd6VjIXZrCXCWcE=
+=r2Gp
+-----END PGP SIGNATURE-----
+
+--ec7f30d4b36eb363bb3626bfabdd704cec6c3d3467c105c63b08970e9d26--
 
