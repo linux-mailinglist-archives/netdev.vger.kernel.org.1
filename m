@@ -1,81 +1,85 @@
-Return-Path: <netdev+bounces-150519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 503B79EA7A0
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:17:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D86649EA7C2
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:24:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 797601888F41
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 05:17:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E02D1889360
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 05:24:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14731D6DBF;
-	Tue, 10 Dec 2024 05:17:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA08622616B;
+	Tue, 10 Dec 2024 05:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cs7p2cJt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SXf6BTqq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4C81A01C6
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 05:17:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492BD1D9A40;
+	Tue, 10 Dec 2024 05:24:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733807829; cv=none; b=ELegyO3EgrlUrWqsOa3RCB1OXqoeSO2uH9mZdfqAy1h9FXw4qRiGEuri4rIEdQaBZgG/ZUobQwOcJLKkZKm/dVGOJlTDw4pFTEk0Fve/qBlnpvkqW+ps3gxniubKp8BZWLI5wfV4IOR5akz0kTT8n9CVlzQ9l1NIfUcbd1ek/ng=
+	t=1733808291; cv=none; b=GrjLwaCSbS4Px0X53OCohhW0e3rL9bpPuPco77jiALvCc3L3fC2hJJ1K7T3T6Lll72s2pOHBCkMdNtXQhYjjXslKEAtTkaqP/ZTml4a8JlTVCPGKWI6LcX5jsD2MyfQj5750i73avyuTNrvLNVE9dZT4dJc7aMEr2q0xig9kU+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733807829; c=relaxed/simple;
-	bh=omcPm/+iNfFwqpUHoZgS7GWCcQ6rktq1lykFQYpiOBo=;
+	s=arc-20240116; t=1733808291; c=relaxed/simple;
+	bh=DAxhrU8nYe3wIVwTN/sHDUPcQXoFKKbHmXYU8frJH4s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K24rhmUfve8DXYcvNwJ0jWXYzO9sQTNTTnHwWZhK8C4/3vsdMcQ2PiqsmvstBN+5TmRbaw6YJeHfaWvXnOr1SZ/haVXO1nBtncE0MEAXxEb6q5DguaZ1EHRLmEoZpuO+G5iDkXHDhly1sNRbJu/Bd5lUPSNZ95b4AhIUgScSBoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cs7p2cJt; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2166360285dso12778995ad.1
-        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 21:17:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733807828; x=1734412628; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9OJ01TgOq0G7xYxgCKirKmr+56LQpsASz1uNA/kq4V4=;
-        b=cs7p2cJt7JcxAwhJ/UtfrWzVYABoOAMRGdsk2SJeHUOs0VkbedEwi0ZNx3lFJBrxWx
-         OgO2i67ajcIVZX1hge7mymfHwtm++wMLiG5Pf02ZMsXiiO+ylITniOsOe95OqhLjY5xW
-         xfcccTaEKTCua6Tay8TKutC3vZpWBLUhXe/DecPbMFMOhYE+LalKXZJWA1TLN28o2ZE9
-         6H4aVEJy/BqqkFhINIuBD97dJotNMTepRjxVHVXcDUNrNGnGEZI3FNCrbj7UVn6P89VS
-         fZwJlg1OwlkSQq2F9QNd88Ye8YvuEzNuDCWiVTivsfHLZIA9fw98mCe8eGEzZhKt7bNh
-         Bxig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733807828; x=1734412628;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9OJ01TgOq0G7xYxgCKirKmr+56LQpsASz1uNA/kq4V4=;
-        b=Umy5zjHIv/OWa+Om8uIrNUi9uro4y1Cmc11FdwFK8Kc24m3yWLJdk1+zvsXYQZpkcb
-         QV0cMqEzuYqc7wgAzKxfzx1d+RQUW7MWg3hM3MPfgoowAvSq07lUFYsAMiStjdrqKpT/
-         GlW5aSNgnVzrYTZLUMv3nzj1VcOXBEY81e7GG6eyV5IfQKNKTY0mZsgrNv/Tdg4KF3vo
-         toHLkHShDhx7S6RCTVf+HwJpvM5nofoBPTw8rlQZLdNdWuKQ1hI1vGvG+g5v0X38z0qG
-         B8qbsWs7/GnLYuBev/j7YkDya1FX1f5TDzQnzuZIBtAOuE3bMjLopa6V6seXDtymsZvl
-         zKRg==
-X-Gm-Message-State: AOJu0YwfDMKpyLxnH0yPTiUWINKBALnU9UqIiskcWzx5Hek/5RiOhQtH
-	hqg+eTZ/UFf6CFyYLmWVgmFpcnxJ8wSmAB0+iQ8dGZ+g62u2+wZU
-X-Gm-Gg: ASbGncs4MjPZ6MdUcXIy8q+qjZMdSxIE74k9w556qJnfFkZT0Iw6eqwjFj6Q0g0rbhA
-	7pPDDWBhsS8tkkTYN/N+Bd89dfhTkteCgPdxL1sBBNOrgU4annREw1cmK1MprD65isK7+heKEUo
-	ii1DTmCiQHSr1DofyFaRucJx4WAz5w6ML9JW51E0XkH5kXmcUjC+SEFVMvZE+7fgI26l4+V1IrA
-	nkTfjqoi8Z8lOxJu52b3+wgZtfkhG09jZoHUItY7mMogvFSGWm8EXSAHMYV
-X-Google-Smtp-Source: AGHT+IE+wd397gqslluIxEX6iuq/JgEqnmIUF2ByZwQx4gsIWpqdOukdm4gQTQH73QJGV4kZftfJIg==
-X-Received: by 2002:a17:902:f7cf:b0:215:781a:9183 with SMTP id d9443c01a7336-21614da30c6mr178596605ad.38.1733807827681;
-        Mon, 09 Dec 2024 21:17:07 -0800 (PST)
-Received: from localhost ([2601:647:6881:9060:5939:82cc:e9ac:c4c3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215f8f63772sm79184085ad.281.2024.12.09.21.17.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2024 21:17:07 -0800 (PST)
-Date: Mon, 9 Dec 2024 21:17:06 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: dave seddon <dave.seddon.ca@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: tcp_diag for all network namespaces?
-Message-ID: <Z1fO0rT9MZs5D61z@pop-os.localdomain>
-References: <CANypexQX+MW_00xAo-sxO19jR1yCLVKNU3pCZvmFPuphk=cRFw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GTCKoZKvZivP+V4GlMSiLa+JSYMjZlhySwRHLAU2ZsSyr4NX7U+43e1RtuKyEAL8gwJeKtq67Tbculv5P6EUae9jpTaosgNQEQe2Q9T1X75NpNv2xx0wAHR3uujr/Z7z8QjMoLmHVdODDJGXYxl37SA4kuIb6ccPb5PrnojnYCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SXf6BTqq; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733808291; x=1765344291;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=DAxhrU8nYe3wIVwTN/sHDUPcQXoFKKbHmXYU8frJH4s=;
+  b=SXf6BTqqt3Qnx3YmO1u/cfFRn+xCztCQ5xfxwojDjulJxscLVjgAgzx7
+   Gun9e9QGeJ/MA8cJT6TKI9JvUJTRPauaNipUInZoNkEUK0mNnfBjKedZK
+   wwiCSs2rmSyzJtvImtdCV3ulcPhBGQlYsdhR+Gqd+8XC6QsGZiqfCgVwh
+   AKNUF82JswU1SvYJQhCygzDVZ8caoKE2f7/VKQjGNIwJBDbVdtzGAT0Ld
+   GsDndVgB/l6/GtyX4ISQ6kPWtGB4Wd8x/jjgi2O518Mn46vOeIl6RJ+kj
+   iCXpgt43ngpYR7YDdg5PwzDuPV+HkYVCpKTZzNgw8aB1LaMpohVXOe4qL
+   w==;
+X-CSE-ConnectionGUID: B/JfgfNNTOah+X7GUT2+ug==
+X-CSE-MsgGUID: O4zHj/q/TcKCAKB6+A1B0A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11278"; a="45517234"
+X-IronPort-AV: E=Sophos;i="6.12,214,1728975600"; 
+   d="scan'208";a="45517234"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2024 21:24:50 -0800
+X-CSE-ConnectionGUID: yT3wQW55SUqvh5zoMS2Sng==
+X-CSE-MsgGUID: atNr2jojQd+IxiaOFRtDGw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,221,1728975600"; 
+   d="scan'208";a="95490968"
+Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 09 Dec 2024 21:24:46 -0800
+Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tKsjj-00058n-1q;
+	Tue, 10 Dec 2024 05:24:43 +0000
+Date: Tue, 10 Dec 2024 13:23:47 +0800
+From: kernel test robot <lkp@intel.com>
+To: Inochi Amaoto <inochiama@gmail.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Inochi Amaoto <inochiama@outlook.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH 2/2] clk: sophgo: Add clock controller support for SG2044
+ SoC
+Message-ID: <202412101358.czZY7XmR-lkp@intel.com>
+References: <20241209082132.752775-3-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,37 +88,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANypexQX+MW_00xAo-sxO19jR1yCLVKNU3pCZvmFPuphk=cRFw@mail.gmail.com>
+In-Reply-To: <20241209082132.752775-3-inochiama@gmail.com>
 
-On Mon, Dec 09, 2024 at 11:24:18AM -0800, dave seddon wrote:
-> G'day,
-> 
-> Short
-> Is there a way to extract tcp_diag socket data for all sockets from
-> all network name spaces please?
-> 
-> Background
-> I've been using tcp_diag to dump out TCP socket performance every
-> minute and then stream the data via Kafka and then into a Clickhouse
-> database.  This is awesome for socket performance monitoring.
-> 
-> Kubernetes
-> I'd like to adapt this solution to <somehow> allow monitoring of
-> kubernetes clusters, so that it would be possible to monitor the
-> socket performance of all pods.  Ideally, a single process could open
-> a netlink socket into each network namespace, but currently that isn't
-> possible.
-> 
-> Would it be crazy to add a new feature to the kernel to allow dumping
-> all sockets from all name spaces?
+Hi Inochi,
 
-You are already able to do so in user-space, something like:
+kernel test robot noticed the following build warnings:
 
-for ns in $(ip netns list | cut -d' ' -f1); do
-    ip netns exec $ns ss -tapn
-done
+[auto build test WARNING on sophgo/for-next]
+[also build test WARNING on sophgo/fixes clk/clk-next robh/for-next linus/master v6.13-rc2 next-20241209]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-(If you use API, you can find equivalent API's)
+url:    https://github.com/intel-lab-lkp/linux/commits/Inochi-Amaoto/dt-bindings-clock-sophgo-add-clock-controller-for-SG2044/20241209-162418
+base:   https://github.com/sophgo/linux.git for-next
+patch link:    https://lore.kernel.org/r/20241209082132.752775-3-inochiama%40gmail.com
+patch subject: [PATCH 2/2] clk: sophgo: Add clock controller support for SG2044 SoC
+config: parisc-randconfig-r053-20241210 (https://download.01.org/0day-ci/archive/20241210/202412101358.czZY7XmR-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 14.2.0
 
-Thanks.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412101358.czZY7XmR-lkp@intel.com/
+
+cocci warnings: (new ones prefixed by >>)
+>> drivers/clk/sophgo/clk-sg2044.c:133:1-7: WARNING: do_div() does a 64-by-32 division, please consider using div64_ul instead.
+>> drivers/clk/sophgo/clk-sg2044.c:149:1-7: WARNING: do_div() does a 64-by-32 division, please consider using div64_u64 instead.
+
+vim +133 drivers/clk/sophgo/clk-sg2044.c
+
+   126	
+   127	static unsigned long sg2044_pll_calc_vco_rate(unsigned long parent_rate,
+   128						      unsigned long refdiv,
+   129						      unsigned long fbdiv)
+   130	{
+   131		u64 numerator = parent_rate * fbdiv;
+   132	
+ > 133		do_div(numerator, refdiv);
+   134	
+   135		return numerator;
+   136	}
+   137	
+   138	static unsigned long sg2044_pll_calc_rate(unsigned long parent_rate,
+   139						  unsigned long refdiv,
+   140						  unsigned long fbdiv,
+   141						  unsigned long postdiv1,
+   142						  unsigned long postdiv2)
+   143	{
+   144		u64 numerator, denominator;
+   145	
+   146		numerator = parent_rate * fbdiv;
+   147		denominator = refdiv * (postdiv1 + 1) * (postdiv2 + 1);
+   148	
+ > 149		do_div(numerator, denominator);
+   150	
+   151		return numerator;
+   152	}
+   153	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
