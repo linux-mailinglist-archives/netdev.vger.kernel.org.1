@@ -1,309 +1,156 @@
-Return-Path: <netdev+bounces-150535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17E6C9EA8E7
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 07:46:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6DA29EA866
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 07:02:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1FDC2833D5
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:46:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A83F28A10F
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 06:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488082248A1;
-	Tue, 10 Dec 2024 06:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="HxWsGGMz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A06228394;
+	Tue, 10 Dec 2024 05:58:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from OS0P286CU010.outbound.protection.outlook.com (mail-japanwestazon11011035.outbound.protection.outlook.com [40.107.74.35])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C523594F;
-	Tue, 10 Dec 2024 06:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.74.35
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733813171; cv=fail; b=QExedORmcpNMxnpfezxtaK2IMaXYtzjPEMjMBR3//cj5PaZgvoyw5xIBiltug59GKlo85YOX2wkIvoL/WfjvZcf6e2z7pnbgGj6B+fzxjyRZdvHwa7zhZWSXMC28LB9bQNBJshTSGpe404nS2Ji6BVGkUk37blVi5qrt/HfD1OY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733813171; c=relaxed/simple;
-	bh=uTHB9lyk0UqVu9XilkSYKsaEgmoMw1GXxoLvFZRHRqc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=HHB7tuEx70vNuf/mx3am9neB4aGxeeTMxMW1NjPK/TgPfR6qK9EWeUWDJqa89Dvw62x9Cfk/PpfBrILDOrFuNSr2NaDZwbiIu681PknE6zYuc0OipSp7X7qx2twa+Ds4S7kC/rk8l8DKTrnuPSI3PGFqBOyfIdo4h7BddvdKst0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=HxWsGGMz; arc=fail smtp.client-ip=40.107.74.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cFAfX1O6JTPJkmOgQfWvRiakjROXiupY0+IyD7KElnDrKE0dYhy+WACQFeAz/Ug4q7t+SbKel9aCxXlksIzIIoqflHtgEsNNd3wpq3+ZcoGq2XiXD3MmRlYgeVXjmHDZx/TZfaymhNAtaUB/us1AZ1/VrdSgRXGTBg5e8mVCV9yvB39SjeVLbTAX7pqS2u93HdgC4yh1+1zLHYQxzASnv9hK3qUsg9M4U3raZkulWV4tJYADfSt79JTzvNBFBF92VYGvkCUgidpyIeI0n20rqekuWWFup3iO6oESFrqKosdpmo/oSK4IThzNK/vE5GT4ivAun+AW+23E7gHA6Qfxbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1BBSsPz//9QtxspfjErmjJvfFc0CKkrmm+QuEGlzpI4=;
- b=SvAAxyf+B/mqL6HtWU2h7vrp0qzoqG7muGxDqh4gYRf9j3evfnGFQvrK5xp7GuZj5q8abT4XsfhiK0dPvx5I4XVSCnyHwv6iN0j03PXU15nbVZByhpLSN+63sFHPcQy7H5+brOmxxHEdxbu06XH2lPb8hXIwUiYM9fDXpvZqdmSjL3iPfYKgeOGuCJj1drSOKmIplK0gRaxI3MyjerAMAt3e2lN6lG5oeOQcFWjoH3QL+BDBvCiyGHq4bsKEbllA0F0JpT9H+GF9f8h2kShg1IT+7Frsq8pNTdWtHb0Xfw0UmxKxyZt+n+zG7ppu1ix6uquB4RyTex7s09mof3VRqw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1BBSsPz//9QtxspfjErmjJvfFc0CKkrmm+QuEGlzpI4=;
- b=HxWsGGMzQhdzL6yAzWk48mp9giR7/DzjysboJUuKlCDKVpo5Xt8PXypI1C9lGXmh6Gf3dy+WiUQMEd+lGkJGCp4VBd99XEUSSZXOJJrNv6vexRkWZRi7QWg2upWPLuJ2u0ChOmNMp49inbZHKtz/5A7Fcp+u9q7HoWIaqccwqiM=
-Received: from TYWPR01MB11030.jpnprd01.prod.outlook.com
- (2603:1096:400:390::11) by TY3PR01MB10061.jpnprd01.prod.outlook.com
- (2603:1096:400:1de::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.10; Tue, 10 Dec
- 2024 06:46:04 +0000
-Received: from TYWPR01MB11030.jpnprd01.prod.outlook.com
- ([fe80::a78e:aecb:953:b562]) by TYWPR01MB11030.jpnprd01.prod.outlook.com
- ([fe80::a78e:aecb:953:b562%4]) with mapi id 15.20.8230.016; Tue, 10 Dec 2024
- 06:46:04 +0000
-From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To: nikita.yoush <nikita.yoush@cogentembedded.com>, Andrew Lunn
-	<andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Geert Uytterhoeven <geert+renesas@glider.be>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michael Dege
-	<michael.dege@renesas.com>, Christian Mardmoeller
-	<christian.mardmoeller@renesas.com>, Dennis Ostermann
-	<dennis.ostermann@renesas.com>, nikita.yoush
-	<nikita.yoush@cogentembedded.com>
-Subject: RE: [PATCH net] net: renesas: rswitch: handle stop vs interrupt race
-Thread-Topic: [PATCH net] net: renesas: rswitch: handle stop vs interrupt race
-Thread-Index: AQHbSi4BGb0KrsT/rk2BwvNszCBRyrLfBb6w
-Date: Tue, 10 Dec 2024 06:46:04 +0000
-Message-ID:
- <TYWPR01MB11030FA7F8B6B30B8A7759847D83D2@TYWPR01MB11030.jpnprd01.prod.outlook.com>
-References: <20241209113204.175015-1-nikita.yoush@cogentembedded.com>
-In-Reply-To: <20241209113204.175015-1-nikita.yoush@cogentembedded.com>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYWPR01MB11030:EE_|TY3PR01MB10061:EE_
-x-ms-office365-filtering-correlation-id: 280f3f53-043e-4a8d-d507-08dd18e6513c
-x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|10070799003|376014|366016|1800799024|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?a38UVkUqxhdSaVjOTQ2Tvelid42qzV+toX8gsmoIcDL40GG5nIs5lemfT+V3?=
- =?us-ascii?Q?yKZsd+1DX44TAPw9wSAc64j1PpI3JyxXQhp1m/bdWtRyjcQrnpBI+Tbz5u5H?=
- =?us-ascii?Q?nSRr6B1pRJalMyzGzvWpACV0kBd6CW8Ond9NYe9C65YJMuM92T/GLc7PUpD5?=
- =?us-ascii?Q?MLYfxY/QJYHb+xrc/a5xiS+U5xoDyn5Tsi0HXykl1/nitHAGh8d4WjxHIcCs?=
- =?us-ascii?Q?J/cZDyETHlinzwipcjfLt+pIeahOq841YUWCUVBWl3KIFKMD+urXhNs198F7?=
- =?us-ascii?Q?4VDUUsAbopypoS467aSP+c8uTcPVes+eeRC84EPGyjavRVw9sJplhDqSvcpS?=
- =?us-ascii?Q?Z5jyweu/uLrdFvG6aDtcv05z+NqmEKz53UzaRGxik8TqDhbuZUMflSG+4CI+?=
- =?us-ascii?Q?4OZnLO7LRd16UCmFTcMpYR1wNbmA3pi2ZmrHAZhP06CjVjF2z2JfieO68XQb?=
- =?us-ascii?Q?5ucGhKsI0p0dgLhYj33hbxzD4IGZPTE1ILMKvuTgO1n3JNRqu5ITsjMFNja5?=
- =?us-ascii?Q?eAlVbHIkC+sKkmhl7BV6V/Pll/J7K5FldcjUrVoRjNVs5ispHUaoNEYeKVFI?=
- =?us-ascii?Q?iNEMdKo+MEb6aCOICIZur0gwjYdzKoky+YZnVLfuf48u0v6/UwbhTSOoTUpv?=
- =?us-ascii?Q?91GCyhExzC7Xxp0WqUcbOBNjMR1r+xwZT4uPEvm01FI1hcVQ5Q9tdNC9SG8y?=
- =?us-ascii?Q?lQi/GXWpR5yZJtHth1bm3pM6zZjFLgjHSpbjya1OGdry767+y59BP41VUpPY?=
- =?us-ascii?Q?qUik25Rcfn0t23vLm9jkAqbfuuKPKNwm/3GoUpEUDO+nr5x/sBBVNBBij1ae?=
- =?us-ascii?Q?xI65PZuOhKRwy1vzxK/2UEsCTU32nKYL9MSqbZz0rNeTTIeLvk0xSmNVt4f2?=
- =?us-ascii?Q?7OMZsQoqwCgE1iSAkudwC6GBiMeCLQ4kt0HN+WGQ/TwkKV1KaIQS9klh+YaF?=
- =?us-ascii?Q?puobo1lY9BNBTLeDitmE8sHX2S+wu/niW/8OC/qr5EsbOTJ+bR4POPbkp4Ez?=
- =?us-ascii?Q?ciGUFhVZ9QFgrD2LAEfcdJatwnnBvYt4HlzezplKoVVge3uTEOtW4NkS7DM+?=
- =?us-ascii?Q?gaW1wqR3/IwZIQfA2cqrHZy+Pz0kQKhlUpvaXhV1m8J7iCpENRGczlIVLfgQ?=
- =?us-ascii?Q?4UkRYpAFEHqHrMztZaIEcnrlGW5NnBU7SkXGXxqmLtxU3bElHjV1iyHdJt4U?=
- =?us-ascii?Q?izBTZOHZETfadDOn4SoaI22rLPrlTgF+1w0S75c/mMZSzdb+sI8y+OtSVHO/?=
- =?us-ascii?Q?lJXt8g8nsgcWzLO3QNbfhA3oDoDq9zTQjLG0a5Ihdwg9v36LarjQybqOuiv5?=
- =?us-ascii?Q?EV4DE83Um+AECC3TuzgX50qCckQptXCUK0ZwCBQBBVKhiTHs53Z+ZpL06Pvn?=
- =?us-ascii?Q?Kkafq+GRnWVgtKxv28qw+WepTz6Ko8Fm5xY0q+zbigl4wBBP6g=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYWPR01MB11030.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(376014)(366016)(1800799024)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?b7eC03ZUrcd2yIU+qNNwDldHEz0tKLZeuoMszANiKJ4D0r8bnSM8l2HzGsM0?=
- =?us-ascii?Q?z7WwNwLLP3mzk91NnQllFWfVQkEmVv8YukGCBnzbz51rovRO40WpUStwmdTq?=
- =?us-ascii?Q?apV8l/eqqRy8abtC/1Rstll7D/ChuFs4izPszmfTkroe7v8uTmrLudecYi9o?=
- =?us-ascii?Q?16j5MgLs1d5aOYyUFGFcSFyaBeUnZsd6UbVRU5UUPWNuXu/+/z1lkr3CY1Jb?=
- =?us-ascii?Q?llDiykvxnnBancwehP1xFPI3vSebL/aVK5yZkjxfhRB37aTmWTjYtjhEACuM?=
- =?us-ascii?Q?z1JzPtxUOAf9EOpjpLOfRiWsTRW3nZNxmAdpNTwKplIvWMsnnXyV202Fe/bl?=
- =?us-ascii?Q?j27G8dlNeM2pzDsDQbbhpwphMDS/z8/lYwOe1clKw4Ttg/anxE9a3AIAOJ91?=
- =?us-ascii?Q?NsTesqeVBHg01GoIDQC3BB7SnWsNUC25yVl2N8Wy0+biM4oKON6G/wSg0Lcf?=
- =?us-ascii?Q?Wyb59pabn/7AGVBSMcWaz60qEyXnnFUsfpvEQQqeJN71dbZQgHe3V1HXv8YP?=
- =?us-ascii?Q?qT88ekeRgpxSP8bd+1JkRi6xezjSe9TDjRSkkvirKuCMIECtS9TDyE4dg42d?=
- =?us-ascii?Q?A15Mb5GQvQ24ABhSH+QVWBko/J2mMhQSbaE7BaAAcXB1oArZUXdqOKlxJAKY?=
- =?us-ascii?Q?zBz2t0TaCLj0Xi+CSuZhn5omTCRXpuhOqEXCIU7IoexkxDkMcCYTgoa9VOjM?=
- =?us-ascii?Q?ohlYTtZuH39l0SxFN9oW/Oejvvh5Ucn5fNwhQBSfaEetwiAFWjI71oZZbzZa?=
- =?us-ascii?Q?8ZBqNynBjP6j7L3/CnU1QmaTA6f8SvxS2DQqZOHFyCLsS1koj3gm1t4VKauW?=
- =?us-ascii?Q?LvxuEICflDmtKzh+DBL9zPoZicEC4cK8k16DDuiTff2CrfAKFXJ9htAyMry/?=
- =?us-ascii?Q?F4e4yYWp4hyiJQ4gJ0kaSJRyan9QmntpDi5Rb93dHmU2mLWkj3mAMq19Qf0D?=
- =?us-ascii?Q?P9YAQyfSCcCVe5UjM1/ZFD8LQaSCDPLWSv1oNSOpiBWnJpoCt2MlDsnrMfSk?=
- =?us-ascii?Q?aPQGDZQdVdDu8DA5hYxcU8RXzTZ+6W/es2y+/Y1R/T1AdEpKQNpOUJpjPivM?=
- =?us-ascii?Q?N/U4fYpcZRIye7yGyr1ssd+vmqPcX1S6Vifunsauw/gQFIL0DQugpIgPk21o?=
- =?us-ascii?Q?ZfkYZPMc5it+xCI+QEF+1+VRreOGDu5iyHLoIgo9xLu74UY7YGtldWH99hcI?=
- =?us-ascii?Q?0rUKK7MJzidRZtu74NChSc0wReJq7i7Y3HSukA7JYT8yPFPxrW+Tnb1uCEuK?=
- =?us-ascii?Q?uDBXWsnsbtp5aHB39GSA1FSuP5PHxQFWhNanbRpxc8EN1+T0T9moVME1yK41?=
- =?us-ascii?Q?EIYmeqMrt5EOzNJ/t5h9grpht7DjiXkTmeNXD7cerhS/4KrkAm/UCaauf1rr?=
- =?us-ascii?Q?Plg+R41a3edjeIzzGORbc/cMn9gEPKIHsWSP6xopWEzboFItz6j9JiyzrxGj?=
- =?us-ascii?Q?GqEbB9GAwi9QDo4H7zjyzoYWv1OEF3GShHBQhVZlDqIGLUyCsg1n3s6WhMYi?=
- =?us-ascii?Q?Mlzm+tKK6ga31armg0+1nK4NBn3vgP/RRfLODPShT7VuxsItGupGjsrKWiOD?=
- =?us-ascii?Q?GOj2GU/pLXm8sQ41KzBpA/hhQ1cFtqdRmfXrmXhORskZAmnJzkgF9F7xRyHU?=
- =?us-ascii?Q?X/v/4ba5arOAFctt69GwZ3kKpE2XynyDbLO6oxpDV6Pv1BgB+2kxpumfNZRL?=
- =?us-ascii?Q?WxtLVQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E498C22619A;
+	Tue, 10 Dec 2024 05:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733810312; cv=none; b=XfA7RheSpUXeOk5uoSS2Dfx0XoDv+Clh7+oXcRPLn3s/drw2HBChpDpTDLJ4hspYkNy4wsxKU4Bkk8hVRvKkQF76BUYiPwMEWkUkpQXNmyqMCLKcuxoJuiGG5bNlik3Eh+7O7qL94O31nJ5VAyFkq3/H8nOaJbLYnEcN0Kezrnk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733810312; c=relaxed/simple;
+	bh=Knj5TIsDQgyLg8p5+cY2aWCAJDz82Z4lK2SWfH0yCD8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h/heFuVo8V6khk0nfkKULcdN5BpokEKT3MeKkCBLBIti1+gGdcfi10obWJcQ/ikDaYGaC8WX2Kj0b9vT3LYWp2tfQEPUEFXKxWS6stdorhYUDaHP6Ks98jQaSd3wGjf78QUMgHPX5F7U0j6OCnotfoWXnpuzhY2UC5KutzpIUAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BA4esB5008405;
+	Tue, 10 Dec 2024 05:58:07 GMT
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 43cx4xaapx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 10 Dec 2024 05:58:06 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Mon, 9 Dec 2024 21:58:05 -0800
+Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Mon, 9 Dec 2024 21:58:02 -0800
+From: <jianqi.ren.cn@windriver.com>
+To: <cratiu@nvidia.com>, <gregkh@linuxfoundation.org>
+CC: <stable@vger.kernel.org>, <saeedm@nvidia.com>, <leon@kernel.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <roid@nvidia.com>, <netdev@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH 6.1.y] net/mlx5e: Don't call cleanup on profile rollback failure
+Date: Tue, 10 Dec 2024 14:55:55 +0800
+Message-ID: <20241210065555.3784562-1-jianqi.ren.cn@windriver.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYWPR01MB11030.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 280f3f53-043e-4a8d-d507-08dd18e6513c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Dec 2024 06:46:04.0914
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XHiPiJwlWXC7IOiAu3ht/Q/ZaquVJr4vIxpE1tkAj++ahMA6cYgjsBtyEVsUcsDWOsb5u5M1ISc6m4eJTxpwzo9uUZ7/qCvR3gMFTKvJvLFvsELTIgI0LIQswwfJ6PZc
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY3PR01MB10061
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: L2Zj0lm3aKl1qEJa1TRRppk6recvEa5q
+X-Proofpoint-ORIG-GUID: L2Zj0lm3aKl1qEJa1TRRppk6recvEa5q
+X-Authority-Analysis: v=2.4 cv=Y/UCsgeN c=1 sm=1 tr=0 ts=6757d86e cx=c_pps a=/ZJR302f846pc/tyiSlYyQ==:117 a=/ZJR302f846pc/tyiSlYyQ==:17 a=RZcAm9yDv7YA:10 a=Ikd4Dj_1AAAA:8 a=20KFwNOVAAAA:8 a=t7CeM3EgAAAA:8 a=O6WMtLnDkRuORcTRUxwA:9 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-10_02,2024-12-09_05,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 mlxscore=0 clxscore=1011 malwarescore=0 priorityscore=1501
+ phishscore=0 suspectscore=0 adultscore=0 mlxlogscore=999 spamscore=0
+ impostorscore=0 classifier=spam authscore=0 adjust=0 reason=mlx
+ scancount=1 engine=8.21.0-2411120000 definitions=main-2412100043
 
-Hello Nikita-san,
+From: Cosmin Ratiu <cratiu@nvidia.com>
 
-Thank you for your patch!
+[ Upstream commit 4dbc1d1a9f39c3711ad2a40addca04d07d9ab5d0 ]
 
-> From: Nikita Yushchenko, Sent: Monday, December 9, 2024 8:32 PM
->=20
-> Currently the stop routine of rswitch driver does not immediately
-> prevent hardware from continuing to update descriptors and requesting
-> interrupts.
->=20
-> It can happen that when rswitch_stop() executes the masking of
-> interrupts from the queues of the port being closed, napi poll for
-> that port is already scheduled or running on a different CPU. When
-> execution of this napi poll completes, it will unmask the interrupts.
-> And unmasked interrupt can fire after rswitch_stop() returns from
-> napi_disable() call. Then, the handler won't mask it, because
-> napi_schedule_prep() will return false, and interrupt storm will
-> happen.
->=20
-> This can't be fixed by making rswitch_stop() call napi_disable() before
-> masking interrupts. In this case, the interrupt storm will happen if
-> interrupt fires between napi_disable() and masking.
->=20
-> Fix this by checking for priv->opened_ports bit when unmasking
-> interrupts after napi poll. For that to be consistent, move
-> priv->opened_ports changes into spinlock-protected areas, and reorder
-> other operations in rswitch_open() and rswitch_stop() accordingly.
+When profile rollback fails in mlx5e_netdev_change_profile, the netdev
+profile var is left set to NULL. Avoid a crash when unloading the driver
+by not calling profile->cleanup in such a case.
 
-We should add a Fixes tag for net.git here. I think the following tag is be=
-tter because
-the first commit had this issue. Although this fixing patch cannot be appli=
-ed on
-the first commit, I believe this is no matter about the Fixes tag [1].
+This was encountered while testing, with the original trigger that
+the wq rescuer thread creation got interrupted (presumably due to
+Ctrl+C-ing modprobe), which gets converted to ENOMEM (-12) by
+mlx5e_priv_init, the profile rollback also fails for the same reason
+(signal still active) so the profile is left as NULL, leading to a crash
+later in _mlx5e_remove.
 
-Fixes: 3590918b5d07 ("net: ethernet: renesas: Add support for "Ethernet Swi=
-tch"")
+ [  732.473932] mlx5_core 0000:08:00.1: E-Switch: Unload vfs: mode(OFFLOADS), nvfs(2), necvfs(0), active vports(2)
+ [  734.525513] workqueue: Failed to create a rescuer kthread for wq "mlx5e": -EINTR
+ [  734.557372] mlx5_core 0000:08:00.1: mlx5e_netdev_init_profile:6235:(pid 6086): mlx5e_priv_init failed, err=-12
+ [  734.559187] mlx5_core 0000:08:00.1 eth3: mlx5e_netdev_change_profile: new profile init failed, -12
+ [  734.560153] workqueue: Failed to create a rescuer kthread for wq "mlx5e": -EINTR
+ [  734.589378] mlx5_core 0000:08:00.1: mlx5e_netdev_init_profile:6235:(pid 6086): mlx5e_priv_init failed, err=-12
+ [  734.591136] mlx5_core 0000:08:00.1 eth3: mlx5e_netdev_change_profile: failed to rollback to orig profile, -12
+ [  745.537492] BUG: kernel NULL pointer dereference, address: 0000000000000008
+ [  745.538222] #PF: supervisor read access in kernel mode
+<snipped>
+ [  745.551290] Call Trace:
+ [  745.551590]  <TASK>
+ [  745.551866]  ? __die+0x20/0x60
+ [  745.552218]  ? page_fault_oops+0x150/0x400
+ [  745.555307]  ? exc_page_fault+0x79/0x240
+ [  745.555729]  ? asm_exc_page_fault+0x22/0x30
+ [  745.556166]  ? mlx5e_remove+0x6b/0xb0 [mlx5_core]
+ [  745.556698]  auxiliary_bus_remove+0x18/0x30
+ [  745.557134]  device_release_driver_internal+0x1df/0x240
+ [  745.557654]  bus_remove_device+0xd7/0x140
+ [  745.558075]  device_del+0x15b/0x3c0
+ [  745.558456]  mlx5_rescan_drivers_locked.part.0+0xb1/0x2f0 [mlx5_core]
+ [  745.559112]  mlx5_unregister_device+0x34/0x50 [mlx5_core]
+ [  745.559686]  mlx5_uninit_one+0x46/0xf0 [mlx5_core]
+ [  745.560203]  remove_one+0x4e/0xd0 [mlx5_core]
+ [  745.560694]  pci_device_remove+0x39/0xa0
+ [  745.561112]  device_release_driver_internal+0x1df/0x240
+ [  745.561631]  driver_detach+0x47/0x90
+ [  745.562022]  bus_remove_driver+0x84/0x100
+ [  745.562444]  pci_unregister_driver+0x3b/0x90
+ [  745.562890]  mlx5_cleanup+0xc/0x1b [mlx5_core]
+ [  745.563415]  __x64_sys_delete_module+0x14d/0x2f0
+ [  745.563886]  ? kmem_cache_free+0x1b0/0x460
+ [  745.564313]  ? lockdep_hardirqs_on_prepare+0xe2/0x190
+ [  745.564825]  do_syscall_64+0x6d/0x140
+ [  745.565223]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+ [  745.565725] RIP: 0033:0x7f1579b1288b
 
-> Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Fixes: 3ef14e463f6e ("net/mlx5e: Separate between netdev objects and mlx5e profiles initialization")
+Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-I could not apply this patch on net.git / main branch and the branch + your=
- patches [2]
-though, the fixed code looks good. So,
-
-Reviewed-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-
-[1]
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Doc=
-umentation/process/5.Posting.rst?h=3Dv6.12#n204
-
-[2]
-https://patchwork.kernel.org/project/netdevbpf/list/?series=3D915669
-
-Best regards,
-Yoshihiro Shimoda
-
-> ---
->  drivers/net/ethernet/renesas/rswitch.c | 33 ++++++++++++++------------
->  1 file changed, 18 insertions(+), 15 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/etherne=
-t/renesas/rswitch.c
-> index 6ca5f72193eb..a33f74e1c447 100644
-> --- a/drivers/net/ethernet/renesas/rswitch.c
-> +++ b/drivers/net/ethernet/renesas/rswitch.c
-> @@ -918,8 +918,10 @@ static int rswitch_poll(struct napi_struct *napi, in=
-t budget)
->=20
->  	if (napi_complete_done(napi, budget - quota)) {
->  		spin_lock_irqsave(&priv->lock, flags);
-> -		rswitch_enadis_data_irq(priv, rdev->tx_queue->index, true);
-> -		rswitch_enadis_data_irq(priv, rdev->rx_queue->index, true);
-> +		if (test_bit(rdev->port, priv->opened_ports)) {
-> +			rswitch_enadis_data_irq(priv, rdev->tx_queue->index, true);
-> +			rswitch_enadis_data_irq(priv, rdev->rx_queue->index, true);
-> +		}
->  		spin_unlock_irqrestore(&priv->lock, flags);
->  	}
->=20
-> @@ -1582,20 +1584,20 @@ static int rswitch_open(struct net_device *ndev)
->  	struct rswitch_device *rdev =3D netdev_priv(ndev);
->  	unsigned long flags;
->=20
-> -	phy_start(ndev->phydev);
-> +	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
-> +		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDIE);
->=20
->  	napi_enable(&rdev->napi);
-> -	netif_start_queue(ndev);
->=20
->  	spin_lock_irqsave(&rdev->priv->lock, flags);
-> +	bitmap_set(rdev->priv->opened_ports, rdev->port, 1);
->  	rswitch_enadis_data_irq(rdev->priv, rdev->tx_queue->index, true);
->  	rswitch_enadis_data_irq(rdev->priv, rdev->rx_queue->index, true);
->  	spin_unlock_irqrestore(&rdev->priv->lock, flags);
->=20
-> -	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
-> -		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDIE);
-> +	phy_start(ndev->phydev);
->=20
-> -	bitmap_set(rdev->priv->opened_ports, rdev->port, 1);
-> +	netif_start_queue(ndev);
->=20
->  	return 0;
->  };
-> @@ -1607,7 +1609,16 @@ static int rswitch_stop(struct net_device *ndev)
->  	unsigned long flags;
->=20
->  	netif_tx_stop_all_queues(ndev);
-> +
-> +	phy_stop(ndev->phydev);
-> +
-> +	spin_lock_irqsave(&rdev->priv->lock, flags);
-> +	rswitch_enadis_data_irq(rdev->priv, rdev->tx_queue->index, false);
-> +	rswitch_enadis_data_irq(rdev->priv, rdev->rx_queue->index, false);
->  	bitmap_clear(rdev->priv->opened_ports, rdev->port, 1);
-> +	spin_unlock_irqrestore(&rdev->priv->lock, flags);
-> +
-> +	napi_disable(&rdev->napi);
->=20
->  	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
->  		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDID);
-> @@ -1620,14 +1631,6 @@ static int rswitch_stop(struct net_device *ndev)
->  		kfree(ts_info);
->  	}
->=20
-> -	spin_lock_irqsave(&rdev->priv->lock, flags);
-> -	rswitch_enadis_data_irq(rdev->priv, rdev->tx_queue->index, false);
-> -	rswitch_enadis_data_irq(rdev->priv, rdev->rx_queue->index, false);
-> -	spin_unlock_irqrestore(&rdev->priv->lock, flags);
-> -
-> -	phy_stop(ndev->phydev);
-> -	napi_disable(&rdev->napi);
-> -
->  	return 0;
->  };
->=20
-> --
-> 2.39.5
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 385904502a6b..8ee6a81b42b4 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -5980,7 +5980,9 @@ static void mlx5e_remove(struct auxiliary_device *adev)
+ 	mlx5e_dcbnl_delete_app(priv);
+ 	unregister_netdev(priv->netdev);
+ 	mlx5e_suspend(adev, state);
+-	priv->profile->cleanup(priv);
++	/* Avoid cleanup if profile rollback failed. */
++	if (priv->profile)
++		priv->profile->cleanup(priv);
+ 	mlx5e_devlink_port_unregister(priv);
+ 	mlx5e_destroy_netdev(priv);
+ }
+-- 
+2.25.1
 
 
