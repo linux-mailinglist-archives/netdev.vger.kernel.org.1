@@ -1,151 +1,241 @@
-Return-Path: <netdev+bounces-150726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C92CA9EB4EF
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:29:18 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A7E79EB524
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:36:42 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8568F168482
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:29:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 068FF2830F2
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA4C1BB6A0;
-	Tue, 10 Dec 2024 15:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637E61B0433;
+	Tue, 10 Dec 2024 15:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bisdn-de.20230601.gappssmtp.com header.i=@bisdn-de.20230601.gappssmtp.com header.b="lIPzDDdG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PlzobWxV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F6E1B3924
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 15:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6231AAE30
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 15:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733844553; cv=none; b=KkoCEYTD8gdyv+d/vycBdp1zU1rSN0sA0HRYkzNAGCmsVnvHVyQmd7qAg7SBvYlrRAHxEBs45ilTlZFSF8PILomn0BRAo2uiDSZWhec1xwcv8zWn093k6Dy/+AgPouspRJ0sJeTzi+TAV7196N6o3UHaP2ZjifoNQI9iLuqRv6s=
+	t=1733844997; cv=none; b=ghAOhGb6Y1cZN1W0ZwxY47OmlW/jj6kv51LWtOHfTDjn0mOZVZTJ9ltL+9jKapyzmW6qSDfdULl0T6yt+fVGnsQzoBulRlKwQWLc5f9P7AvRewLKKSwpzlinwch8J9LbkxPwaPvB6McQARAXpAGqbfPVjGmjg6ASksxx60qYtbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733844553; c=relaxed/simple;
-	bh=cWs/c4TFgM8ytblaB0OKLNZx4QlCxkLj//Xce3vvX44=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tWkrSfiFBuha1Xqc3UwRINyPrcr85W3Yy2G7J01y0t3xgIsNp8Eu+1tg0lVeXT0DrHkPtMr3fr0p90w30cTqwDaznVej+gWru7cr4DhwjiY4l0IZKkqEHlNC24GgzjLrZaDFaF4Wvia7tFJiIi3sB3eWR7K2dZq6YV+55Fwimp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bisdn.de; spf=none smtp.mailfrom=bisdn.de; dkim=pass (2048-bit key) header.d=bisdn-de.20230601.gappssmtp.com header.i=@bisdn-de.20230601.gappssmtp.com header.b=lIPzDDdG; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bisdn.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bisdn.de
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-467666cc5efso1821041cf.3
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 07:29:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bisdn-de.20230601.gappssmtp.com; s=20230601; t=1733844551; x=1734449351; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cWs/c4TFgM8ytblaB0OKLNZx4QlCxkLj//Xce3vvX44=;
-        b=lIPzDDdG+CPFJLeRFEhVcbofmEGtJJK88NVY754OdNlLRd9VKojIBZBv3k8elwwDPp
-         hMCuB+yigMWGnH2XwWpdGaib/CgUdAFdioR4Ni2UULhO/D+UAkHhj0hfCjMQvrADJs2e
-         9yGjrh5Fj0SylFY0c++Xr1R+DatjKJ2zn7dBvubth3oe1AbcWrtU91RUhEX11kBjIwCQ
-         5O/CVXGOp3iMqzkIoepLLJWHse76B+RKRoOP9ohseQzC5eMJssPvulOMfTMWRjJ3/xAh
-         s1ZJsYAoo+rkzZbtTO8bPkM333CZrKIQSAdxDQc9varOQn3VLiBchI+iFTmhIR3ActWV
-         siew==
+	s=arc-20240116; t=1733844997; c=relaxed/simple;
+	bh=SwOAAPuu7/dVwWLxTmAG5aAZ1CditX8krZwjJJ/NlD4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LWG+fDEmOef06Ius6rjc5fhf6QjTaNGAai2WhOOyZnppFwibPkwVZAqh89a4DJiWYbDafUtHaN1L6ZVyBCK8Tc0KUXTBTqiagb5WTn3pTBmJzkGH6jxHPsIKPUp1w1TSy5tanD1vdLzxDp4uxh0RFPB9Xsbl3WoAkszdUUMp3LU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PlzobWxV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733844994;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3p4JHVIupJYhcnCPgn0RJ5p+5L5Q4CoL+DBFWHZcfu8=;
+	b=PlzobWxVBXjNqBke3ccm+d9YvjTgBxQiUV0sX0whY2Pzj1WQGZmOcw4uyNpfblTOpywUz2
+	MI7hOcVFd0IRS5sugrik/BMnQ1Ac5ZVKNUn2Oc2z9GyfEnT1ZhEk0lmyXEHHBm0oYs3k9v
+	QEOKTMjmfGb2apNfGaH/ObBPOdCnybA=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-322-ArUZ0XlEOeuDQYjb4gIypQ-1; Tue, 10 Dec 2024 10:36:32 -0500
+X-MC-Unique: ArUZ0XlEOeuDQYjb4gIypQ-1
+X-Mimecast-MFC-AGG-ID: ArUZ0XlEOeuDQYjb4gIypQ
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7b6e1b037d5so96238385a.0
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 07:36:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733844551; x=1734449351;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cWs/c4TFgM8ytblaB0OKLNZx4QlCxkLj//Xce3vvX44=;
-        b=u8oMfkRh28pw09E2jehwQIThNzJIz/vr9i5K1IMOLRoXqEOJvedgWLYpRsAMD/QGQd
-         tgiaScfqFuDNayKVbIMrKoNHGAFOtYPAbiI3RYPlo3AcCfvbGXRdxYEkbNxwPwRDjWsl
-         jKtN1XO+gvaAsWL2Qan+rqKpB4Vf78SIXQzwgDf0YCEBVVY/V4DChV95t+QT+vNsfEzl
-         VWVUkEqh9bxazaJr8dvUMGl2M0tI179aX4FAQkgcaeV6UD0ikEe2TNS5nqtPZ5dMx4Mt
-         w8XpWMm1c5NMivdqSXRLLgoxR4mDKAI+WobOTFXJ5VA9BSI6i10hqgSXlrA2MURygG+V
-         rcAw==
-X-Forwarded-Encrypted: i=1; AJvYcCUm9UvSJVFHfGqX5ejzzTyxDjQZYFJBR47VXNeW0TnsT9lXVpukOifDWu58JBgwc4mRAxy7Dro=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNV19d8RHUMvXlK8pPzhhS+heBHx8OKdFuKwFY+6NZDMWHF+pk
-	F4LGkSV1H8VS5eIAuNj24HCqUosGiXpeD6shfK6HAnLn0LOX2pMy24tVgTn47SKeekrAjde3psv
-	8xJBWqMibfP98+7Rkv6jxnKhAvwYtfuYaWpL1OffBfVwrtf2pKjb/gz2zwx7O9TgoX3BNL6lWI+
-	LBlrcjRLLKZ8UHSbAEl2AtkA==
-X-Gm-Gg: ASbGnctO8M8Ib4GhRbYCsaezymav5x3Ym8lbjkYTkbu7s6B5zGCVkj3VsZP4fgPj/bf
-	Rmjj8r0gcsQDrhodOiB+j12AfSNSeTI0wPQ==
-X-Google-Smtp-Source: AGHT+IFYp2J8sA1dyCVQ1vOCeeXRqBIzaSBN+hS+fa8YG0sEE7LCygde5whGIR2rD8IsQqAE7colLdcVHHr8uxRzDYs=
-X-Received: by 2002:a05:622a:307:b0:461:1fc9:61a3 with SMTP id
- d75a77b69052e-46734ce0dccmr104642071cf.9.1733844551264; Tue, 10 Dec 2024
- 07:29:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733844991; x=1734449791;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3p4JHVIupJYhcnCPgn0RJ5p+5L5Q4CoL+DBFWHZcfu8=;
+        b=Yk69Z7+w5oH4F9bbR8gtFJwpno/uU0OaeQl6qw6x8GvhXlgDZVlcOX1sMNjZB2SHmr
+         150nyWLWE9AMQ0R6kvIUrxAvMszaX5fAoiOzMztcGeye3TbzQ308VpFecBqukX5P/HsG
+         OiHIz1LuPken85yve6Kg55sNdHKqbGZPnsLdnWhBhs4WaOeZlOdfI5s4LyXidonyfFZB
+         o7lGcRG1J5muSmLACMlOdBMg4f2CkvqormhcK3dTi4sg71Jc0BXGgEZO8xosYKhfhmUJ
+         r+GSgcWCYtvAdgE1BJme4bru3UXxBQa2TVkg6ZG4FbUNE7o89DRufgBXFjtSOPR5rdSO
+         XjFA==
+X-Gm-Message-State: AOJu0YwTt+2XCpx9IN6ioaSSyiaakm3MdhYxRbFpjp0TpekRzR3fY3hU
+	wSPd9yYsTDlLmkzhV1xo9xc1biKqELDhyBXppvMPNUYgLY9NgbeKAzb8LZjuhyjvJdQ/x6n1BUG
+	L2Ngvv7mq7tVgI9WTGJ9Z2HYF+veNteERqR6v3Oxx4erGaO5X8I8OUtQSpM5VqQ==
+X-Gm-Gg: ASbGncs8cgIx5sLHQvlqGRM7KX/uQhfKLg/yp7WjbWdgB7+NBlketXfJZYU6Fuiu711
+	Y790FlBH6WkaAxGHNiY9u+C95p2XgphDGnT3iDPW6kY7FWbclqAfeaa/dgSgdW5LJMjSTwah8Ug
+	qHRSfIGYMJiDoTl8PdhaacA8VLsdnA+gfAvCXC5YCSAmF79eDTGTb0DFapVLPlLsdAkZqJ5kX/W
+	wmoFYAVeYPvJ766Rr5ijWQo/XmkEDhiASP4KnBdaC1iOqqPH1+6Rn3gusRd4ggFuvl3Io0O5SRS
+	qWwcDJAhGd73nV2ZVgLcN8WF6LUz9g==
+X-Received: by 2002:a05:620a:2a06:b0:7b6:d3b3:575e with SMTP id af79cd13be357-7b6dce8e024mr803317785a.47.1733844991431;
+        Tue, 10 Dec 2024 07:36:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFbBJsJhmFAft+bVx4jXuSjSqYu0mf0/m3n3EkBk1M9RjemuMFWHyE9ZQ7GjCDbu/zaUbNKzQ==
+X-Received: by 2002:a05:620a:2a06:b0:7b6:d3b3:575e with SMTP id af79cd13be357-7b6dce8e024mr803314585a.47.1733844991056;
+        Tue, 10 Dec 2024 07:36:31 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-25-244.business.telecomitalia.it. [87.12.25.244])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b6cdecc0b8sm292911685a.80.2024.12.10.07.36.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Dec 2024 07:36:30 -0800 (PST)
+Date: Tue, 10 Dec 2024 16:36:23 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 4/4] vsock/test: Add test for MSG_ZEROCOPY
+ completion memory leak
+Message-ID: <oipmjpvmvbksopq6ugfmad2bd6k6mkj34q3jef5fvz72f3xfow@ve7lrp5gx37c>
+References: <20241206-test-vsock-leaks-v1-0-c31e8c875797@rbox.co>
+ <20241206-test-vsock-leaks-v1-4-c31e8c875797@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210140654.108998-1-jonas.gorski@bisdn.de>
- <20241210143438.sw4bytcsk46cwqlf@skbuf> <CAJpXRYTGbrM1rK8WVkLERf5B_zdt20Zf+MB67O5M0BT0iJ+piw@mail.gmail.com>
- <20241210145524.nnj43m23qe5sbski@skbuf>
-In-Reply-To: <20241210145524.nnj43m23qe5sbski@skbuf>
-From: Jonas Gorski <jonas.gorski@bisdn.de>
-Date: Tue, 10 Dec 2024 16:28:54 +0100
-Message-ID: <CAJpXRYS3Wbug0CADi_fnaLXdZng1LSicXRTxci3mwQjZmejsdQ@mail.gmail.com>
-Subject: Re: [PATCH RFC] net: bridge: handle ports in locked mode for ll learning
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Ido Schimmel <idosch@nvidia.com>, Hans Schultz <schultz.hans@gmail.com>, 
-	"Hans J. Schultz" <netdev@kapio-technology.com>, bridge@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20241206-test-vsock-leaks-v1-4-c31e8c875797@rbox.co>
 
-Am Di., 10. Dez. 2024 um 15:55 Uhr schrieb Vladimir Oltean
-<vladimir.oltean@nxp.com>:
+On Fri, Dec 06, 2024 at 07:34:54PM +0100, Michal Luczaj wrote:
+>Exercise the ENOMEM error path by attempting to hit net.core.optmem_max
+>limit on send().
 >
-> On Tue, Dec 10, 2024 at 03:47:11PM +0100, Jonas Gorski wrote:
-> > Huh, indeed. Unexpected decision, didn't think that this was
-> > intentional. I wonder what the use case for that is.
-> >
-> > Ah well, then disregard my patch.
+>Fixed by commit 60cf6206a1f5 ("virtio/vsock: Improve MSG_ZEROCOPY error
+>handling").
 >
-> The discussion was here, I don't remember the details:
-> https://lore.kernel.org/all/20220630111634.610320-1-hans@kapio-technology=
-.com/
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> tools/testing/vsock/vsock_test.c | 66 ++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 66 insertions(+)
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index f92c62b25a25d35ae63a77a0122a194051719169..6973e681490b363e3b9cedcf195844ba56da6f1d 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -1552,6 +1552,67 @@ static void test_stream_msgzcopy_leak_errq_server(const struct test_opts *opts)
+> 	close(fd);
+> }
+>
+>+static void test_stream_msgzcopy_leak_zcskb_client(const struct test_opts *opts)
+>+{
+>+	char buf[1024] = { 0 };
+>+	ssize_t optmem_max;
+>+	int fd, res;
+>+	FILE *f;
+>+
+>+	f = fopen("/proc/sys/net/core/optmem_max", "r");
+>+	if (!f) {
+>+		perror("fopen(optmem_max)");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (fscanf(f, "%zd", &optmem_max) != 1 || optmem_max > ~0U / 2) {
+>+		fprintf(stderr, "fscanf(optmem_max) failed\n");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	fclose(f);
+>+
+>+	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	enable_so_zerocopy_check(fd);
+>+
+>+	/* The idea is to fail virtio_transport_init_zcopy_skb() by hitting
+>+	 * core.sysctl_optmem_max (sysctl net.core.optmem_max) limit check in
+>+	 * sock_omalloc().
+>+	 */
+>+	optmem_max *= 2;
+>+	errno = 0;
+>+	do {
+>+		res = send(fd, buf, sizeof(buf), MSG_ZEROCOPY);
+>+		optmem_max -= res;
+>+	} while (res > 0 && optmem_max > 0);
+>+
+>+	if (errno != ENOMEM) {
+>+		fprintf(stderr, "expected ENOMEM on send()\n");
 
-Thanks for the pointer. Reading the discussion, it seems this was
-before the explicit BR_PORT_MAB option and locked learning support, so
-there was some ambiguity around whether learning on locked ports is
-desired or not, and this was needed(?) for the out-of-tree(?) MAB
-implementation.
+This test is failing in my suite with this message (I added errno
+in the message that maybe we can add to understand better what we
+expect, and what we saw):
 
-But now that we do have an explicit flag for MAB, maybe this should be
-revisited? Especially since with BR_PORT_MAB enabled, entries are
-supposed to be learned as locked. But link local learned entries are
-still learned unlocked. So no_linklocal_learn still needs to be
-enabled for +locked, +learning, +mab.
+28 - SOCK_STREAM MSG_ZEROCOPY leak completion skb...expected ENOMEM on send() - errno 0
 
-AFACT at least Hans thought that this should be done when there an
-explicit MAB opt in in
-https://lore.kernel.org/all/CAKUejP6wCaOKiafvbxYqQs0-RibC0FMKtvkiG=3DR2Ts0X=
-fa3-tg@mail.gmail.com/
-and https://lore.kernel.org/all/CAKUejP6xR81p1QeSCnDP_3uh9owafdYr1pifeCzekz=
-UvU3_dPw@mail.gmail.com/.
+my env:
 
-Best Regards,
-Jonas
+host (L0) -> vsockvm0 (L1) -> vsockvm1 (L2)
 
---=20
-BISDN GmbH
-K=C3=B6rnerstra=C3=9Fe 7-10
-10785 Berlin
-Germany
+L2 is a nested guest run by L1.
+L1 and L2 runs v6.13-rc2 plus some commits
+(7cb1b466315004af98f6ba6c2546bb713ca3c237)
 
+vsockvm0$ cat /proc/sys/net/core/optmem_max
+81920
 
-Phone:=20
-+49-30-6108-1-6100
+vsockvm1$ cat /proc/sys/net/core/optmem_max
+81920
 
+If the server is running on vsockvm0 (host for the test POV, using
+vhost-vsock transport), the test passes, but if the server is running on
+vsockvm1 (guest, virtio-vsock transport) the test fails:
 
-Managing Directors:=C2=A0
-Dr.-Ing. Hagen Woesner, Andreas=20
-K=C3=B6psel
+vsockvm1$ vsock_test --mode=server --control-port=12345 --peer-cid=2
 
+vsockvm0$ vsock_test --mode=client --control-host=192.168.133.3 \
+     --control-port=12345 --peer-cid=4
+...
+26 - SOCK_STREAM leak accept queue...ok
+27 - SOCK_STREAM MSG_ZEROCOPY leak MSG_ERRQUEUE...ok
+28 - SOCK_STREAM MSG_ZEROCOPY leak completion skb...expected ENOMEM on send() - errno 0
 
-Commercial register:=C2=A0
-Amtsgericht Berlin-Charlottenburg HRB 141569=20
-B
-VAT ID No:=C2=A0DE283257294
+Maybe because virtio_transport_init_zcopy_skb() in the vhost-vsock case
+is called in the context of vhost kernel task created by
+vhost_task_create()?
+
+Thanks,
+Stefano
+
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	close(fd);
+>+}
+>+
+>+static void test_stream_msgzcopy_leak_zcskb_server(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	vsock_wait_remote_close(fd);
+>+	close(fd);
+>+}
+>+
+> static struct test_case test_cases[] = {
+> 	{
+> 		.name = "SOCK_STREAM connection reset",
+>@@ -1692,6 +1753,11 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_stream_msgzcopy_leak_errq_client,
+> 		.run_server = test_stream_msgzcopy_leak_errq_server,
+> 	},
+>+	{
+>+		.name = "SOCK_STREAM MSG_ZEROCOPY leak completion skb",
+>+		.run_client = test_stream_msgzcopy_leak_zcskb_client,
+>+		.run_server = test_stream_msgzcopy_leak_zcskb_server,
+>+	},
+> 	{},
+> };
+>
+>
+>-- 
+>2.47.1
+>
 
 
