@@ -1,114 +1,91 @@
-Return-Path: <netdev+bounces-150590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F4089EAD25
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 10:56:16 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 109FF9EAD19
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 10:54:54 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABE7B188AFEC
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 09:54:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08B7B28C65D
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 09:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B236C23D43D;
-	Tue, 10 Dec 2024 09:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F773215764;
+	Tue, 10 Dec 2024 09:47:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NPtf2hJm"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nghzPLE5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2058.outbound.protection.outlook.com [40.107.243.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9199123D408;
-	Tue, 10 Dec 2024 09:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733823998; cv=none; b=c17xqyggpKBwt84CdrT7LCrSPNh7Q9OTUmzn2LrT8+jUJ/GL2JoPeQJ2QhOo82suUWBkkZLMA03S1dAMSA5QNGWSTE/WxN9q7s1SEtcB8bgvzYMo/aCzRW0xFZ7yPi5hpZp9LtFRGerya2d3AIT8wsUzEo5b3aLMwpIFSexcTR4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733823998; c=relaxed/simple;
-	bh=53JGUH2pR8oX8Xp8+Xw+36LGxxviOGdtjx+fvNsDyms=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lTkSpQSUa81Ik1hvKTYZIVfL0NWCuiFCjVEXfEApQWGLT6SikIm09+QuBnReg+E9AYpnVc9CcKZPk2LDPPumuLjDT/ok/cvGZ4ABWJE+d6broIjk6ndRJ972Buvi6QR913C0yRznkN2bkKMCz7c0CS7OyYOnIUedDxfpPhsIISs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NPtf2hJm; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5d3ecae02beso3176556a12.0;
-        Tue, 10 Dec 2024 01:46:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733823995; x=1734428795; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kjMfgZPTOt1wzklPxYQo1KoCry3saUouaCrKRGjXlrM=;
-        b=NPtf2hJm33sdfs5FhNapzTmBIbeEEb0oiZ2inIGbcIAvwrSnraPcGPKz5wLKNC0kcj
-         KexCCL3ElbhaUyotMWiwXSu+F5EWWjldhio2I3JirkTyDpJf3KfGvQqcmz2hU/BVldaE
-         jpJsBhRJ8oxFJg2WYBSp7BTpGvKXzl+fqrWTtN1E+NHdwvCbx7o8xUjGYQB/alAMj1ee
-         MDNK/j36gl7Xsv4SUKckIRPqK8x3NmxhP9ZveN50Ji20KPzStwjFuBbMPqLb2/36gj54
-         J0ESHKwPtm3rZ13QOlEoZFElWsJ0RVNgNb8izbhGt+m+rDud5UR/6A2qXQgw+r4ieiij
-         fcfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733823995; x=1734428795;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kjMfgZPTOt1wzklPxYQo1KoCry3saUouaCrKRGjXlrM=;
-        b=wLjGNGwKqZZ0c1SQXvZlXTQ1zuFAOVGW4DC4pWLG8NwgCFFUVyfOS4LOWOZ1a0La64
-         AZBajMFtBMK/SqdleCy+QYQ1yJqyTNFlGUHi44B0hFhRNS/Q8+Ug4isQB9iXOMm5TTQt
-         z1cnY7rh1ITilvIQYGEGScyrG4ClgsldkF3qVj2qPCXq3abzuqRtVDbsLmcON03BV7Ma
-         4MjmbA3AfpJSqbzk3VyaioUZAwtq9z5AVkp6jaOBa9jVZl4J5JF10GuYLfWFN61C2ioR
-         MFyXDhAaFNmBNgkVPIox1P3cujcwTcZTP2C5OfezS+DoSKIqO3iSHao91gGvfe5SOLRa
-         4zgA==
-X-Forwarded-Encrypted: i=1; AJvYcCUm1MP5J4EAI+KmbVVBFot3trR6MjZ75w+fxiyUg8u9tUHcC/ECdUkyRm4JNOA+nmKOrzk22EY+ZrdhgYsaRsHr@vger.kernel.org, AJvYcCVhON/99rrvaYbv2qr1eiP+x2JJOQBk/azccuVH3f4bIWM539C8DXs7R/B9DmwlabR74sStAQM5SwZzOh0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+c+uvWF5B0FyaIBANkuvpZ5dQ94q1FlXb4HOVOyJOZSTkrI5r
-	HWqi7Lsqqns0DtRo4hiifyv6NOEDMLTOs3IU6+4lTC518yFZoFxe
-X-Gm-Gg: ASbGncvU35zOb+wABbCiJfBO+SPONFhJbwSf1KuxqUYZqulwATmFOputD/baOxRO/0R
-	FsYY9J43jHSunXsbGTZ0bqHqmH+11hGPhGrccumV4wgAqLhX0eLJYNx3CYYCvgIf4foewLBR5I0
-	CelYqTLbExghluMhdYHF4FGvOnBY3AFFSvZu23b+hyEDzoR1jHkRkLXBQsvC7xegdPXfpVu7yx8
-	5jWwzshMMROb7lb6pSGBTmv1rEXR4w0mYMebYkdKfePFCPIebdETTGQ6O4y4IljWrdq+GjRTUIB
-	T35vuo7lRAP59fYeKxk23/RGqxNzDT2XjOMFwmaLr/gJ11w2/MS3nHdHveMlbeOdv3ECKOA=
-X-Google-Smtp-Source: AGHT+IFAu59kegmItDpMGH7TM0Tzld+Gwydm4Aw22u8I6s2WTgEkJzLS/k6ir2kKhoX3eegXigdJOA==
-X-Received: by 2002:a05:6402:51cb:b0:5d2:7346:3ecb with SMTP id 4fb4d7f45d1cf-5d3be69d3admr15117186a12.12.1733823994692;
-        Tue, 10 Dec 2024 01:46:34 -0800 (PST)
-Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d14b609e56sm7313936a12.40.2024.12.10.01.46.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 01:46:33 -0800 (PST)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Ivan Vecera <ivecera@redhat.com>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Ahern <dsahern@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Joe Damato <jdamato@fastly.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"Frank Wunderlich" <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	bridge@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH RFC v3 net-next 13/13] netfilter: nft_flow_offload: Add bridgeflow to nft_flow_offload_eval()
-Date: Tue, 10 Dec 2024 10:45:01 +0100
-Message-ID: <20241210094501.3069-14-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241210094501.3069-1-ericwouds@gmail.com>
-References: <20241210094501.3069-1-ericwouds@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC85123DE9D
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 09:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733824029; cv=fail; b=bKcjdIR1uZFh4qtYj5Deh0AWwTGk+Dq1WmbQJBUQAFgd4YK+tUdRr7I1EhUig1WocNutQ/pPpX9LheXlynlzAYmUeQiPBmQEAQEKV0dy+ShfMBCkTq8JGbw8aQTlYbi3rzFmlTdCkRBaETg1CdUuGdhAVtVT2wpO78+av7VqDd0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733824029; c=relaxed/simple;
+	bh=ZLj0Idj/MXHM3WjyffYFBrn4FNM8Hf3elbcg/ZwXweQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YAX54xn1fRzrIb9lbFmCXX5CMpq4tIhIvU7+ZvjOLibxQlMbp73iW2+9tz2cnwqLFTJXQH1H/u3bUuNt/NBM2dA4sB53M1q+Zky/UobQZqtRm3ISt2bruWlp6FX8a0YSQgzLdV7PO4nDInjX7AE+E97k5bK/qItCAk4C0PSIGmA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nghzPLE5; arc=fail smtp.client-ip=40.107.243.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ud2CViYBjtpO85jN0Tv7Udb3ZXgY356L+ItccximwkRSqXbh5g8Rd1i8aspf1PT8S9YuEDJfengMxUs6lAUyIWYxErZ3AW4Jfzvc59C9jMx2wHkLirDn1GOqPz9JBoV5lz6TDkNn7rt64NJx7BlzLOET41xK5iCdZwFAqosbHFI1HRlFGgUdOCIF7GZvZtRrDh5uQCPkF5arsiC3JsskUhSlY17XpJwYw+0r1tHH5PrQSfWfSn+nVfpBYK3gxvxj94gqO/crZl0oktwRuCtmdsC/W+0aeEOtDMXn8BR36vFzYQkJVrjkgFOGmFOvChaQzunLPQ2krgfoZFk3u9obWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eBgNKWYQVAsZUe/8159aTQXIED5YPMHSMgDBOdhTsT8=;
+ b=rG5GbhKmkUuEGkgdVt0igCmBbQZJPbqCFdrosPkQwwNKabLkevEcYho/vV5SH/rHwtSXOPi303SvSFbmiAod38ZCVZBwcu9il8tkR4trXokxeC99e8Vy/msKpLoWqt5jFFoSDMLkFjodAtXHE1ahUr8mQgTTktV2D7PODS1PZg0xlKQBDAgd4R6vPbLe2RBIwfDuBhG2mXwyfE9vrAv3QD3HFySCkEKYTGsdE7bzTYC0BaAOO770O5RPXtgBAZ0qNzIX5wV9QmbP0rlNhgx/m4MNQxD61eB93ISO1oYBsR+zr64rAQ5eRyG1nnamfrGfxZEU3s+nI3GyyjsAM/Wueg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eBgNKWYQVAsZUe/8159aTQXIED5YPMHSMgDBOdhTsT8=;
+ b=nghzPLE5JYsTKtZ+h3TtnrwqC9F2X8LC1dJFrQF/mOlvEFifM5Cth7qmTAXsjLfPTRzUWdZ7Hg3SgMOS3AHAH8C4BkTDvLD5rKxGS3fx2mkB13WdEvymzeaYhvayCPq3v/WFHn0NzkiE4zHDiBWVukyK79mrgEXhbEjno4B+wZCVnUQTds67kf0Ogss8mVJylYMh4+lY6DJRunERV94kKCFnu4Mmhbyck/bsNbBwzFT7OBDAxsvTWgVUH3qUeB9RI7cgcwbyCRmp26AMKzWR5fgWNhnNZLyH5IxSAkUHJtFtNhnySoa+bjDh8yM2iz/RYp8Fsy/n1OqheBqDqqY3zA==
+Received: from DS7PR03CA0030.namprd03.prod.outlook.com (2603:10b6:5:3b8::35)
+ by SN7PR12MB8060.namprd12.prod.outlook.com (2603:10b6:806:343::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.18; Tue, 10 Dec
+ 2024 09:47:02 +0000
+Received: from CY4PEPF0000E9D9.namprd05.prod.outlook.com
+ (2603:10b6:5:3b8:cafe::5a) by DS7PR03CA0030.outlook.office365.com
+ (2603:10b6:5:3b8::35) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8230.12 via Frontend Transport; Tue,
+ 10 Dec 2024 09:47:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000E9D9.mail.protection.outlook.com (10.167.241.72) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8230.7 via Frontend Transport; Tue, 10 Dec 2024 09:47:02 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 10 Dec
+ 2024 01:46:48 -0800
+Received: from fedora.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 10 Dec
+ 2024 01:46:43 -0800
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<netdev@vger.kernel.org>
+CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	<mlxsw@nvidia.com>, Vladyslav Mykhaliuk <vmykhaliuk@nvidia.com>, Amit Cohen
+	<amcohen@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: [PATCH net-next] mlxsw: spectrum_flower: Do not allow mixing sample and mirror actions
+Date: Tue, 10 Dec 2024 10:45:37 +0100
+Message-ID: <d6c979914e8706dbe1dedbaf29ffffb0b8d71166.1733822570.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -116,200 +93,118 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D9:EE_|SN7PR12MB8060:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0b6474f0-266c-49cd-fc16-08dd18ff9922
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?bkf1i3kse8PyUkuECNqUfN/C6xAfuMxpCLzJX4Yy3153EjvBxQyJc/ekLNzd?=
+ =?us-ascii?Q?PDKdQ2ysCJswBtlNhmcCvCo495lyw4gVzOw4LjgVMxTZVgP+NdXvTxCD2q27?=
+ =?us-ascii?Q?YPF0crEmKPbnnbr9W0g5TLb6LVsYcZrsEEXXfq3+BYomW3llOd4pfoMhcn6D?=
+ =?us-ascii?Q?UqWFXAtXYek/ZL+b2aLDvJXnJ3lhgB5RQ1hy9hZX9ovTV6nGrbcEahJea2E4?=
+ =?us-ascii?Q?3LhPkfk9GYF/Ss3sS6C/Og7KKeC4pjrdPtsVcqSIOz9vKbu7ZTh4aEii0Ddc?=
+ =?us-ascii?Q?XDiSdE0R5TJ2P0Tfb542tx8gSH8i9NLLK9sX4zux0Axo4U1N6H+1ns9N9U0C?=
+ =?us-ascii?Q?gV+9LCxwyuSQjAxARFz3XKoJWj14PLmyZC+oJV1z09N/sbosLtTL7VJggYzc?=
+ =?us-ascii?Q?SIl9mL1Dsxia+o5dRiutXAA9BGcNHRMsSBt6ME3P9mRdTYTXDQg1sPzdq9EA?=
+ =?us-ascii?Q?37Cdjtq2zaGnuG6nTzOfX1boV/05W66cByK+0A4zAPaj6tvaq6JV7acnzrx5?=
+ =?us-ascii?Q?DpU/bHUftPc2kKPJd2LFxCG9YNWfU2K0xbc5fDZ4yQ9CWj7jPqcxHAzaS+Bg?=
+ =?us-ascii?Q?q9lfNFyux9tTrIfoC+j+5/mHCZ3dA3YpNc+796zT2pXMctwe5KMgZzj67IaR?=
+ =?us-ascii?Q?OuiL5MJX/P2S6pz8jifJGscPzS259/HXMJcOt7lu2S8th7kc+gJ2vk2FgXS/?=
+ =?us-ascii?Q?PjOiN+cPBZwKa84HsRQ5YNPamnmNU2cEi35j+oC+kc6ns8wueec2vc6EnK1C?=
+ =?us-ascii?Q?Ris50HsbZ7waAeP2EQsrF4U+391kFXX3tXPQQKri7edSjnrgz5BUKni0iSrB?=
+ =?us-ascii?Q?ZkHmuEE6fwRTp+lJMx3ZgL+IpksvQ8ZY0klyFAzfyDbhXJU19ienlMMs48BY?=
+ =?us-ascii?Q?IpHlgwHdQl18X3IN7cd88P2LxMt0YpjfWm77a7BpPTevv+KepjcSaydgilN5?=
+ =?us-ascii?Q?EeKqJ0DPTrz8gE70o8a9433IF2ZG4Czya/yXU84C/jllbPSCqZ7ZpY9GzEny?=
+ =?us-ascii?Q?M5Kf/NI7jEG9SQnmprY6iSADApvhRpxzhF67N24GFD9wBZm6Ozx4C8B3qHJw?=
+ =?us-ascii?Q?PccYMwihSxwTPSdhaksZM7HtJX2+igEvpX6Lc2hU2rhn0bTVYrE2Rz68Awd3?=
+ =?us-ascii?Q?JWpmCxhgcVud6+uucaiKG9q/Ipek8ypjN8kDBrWMpOTFf+r830LUI7hSHQv4?=
+ =?us-ascii?Q?P13lXJFIpddwfuA/bfazsy/tlqH8eXkl7bL4cnfsH3Pu3PTRsFESMNUNDk9r?=
+ =?us-ascii?Q?eeUrVJ13b2xZjALxFqbTB1bFQ24DhSA1hbNzjDzRnORczvYMNVIDfWp449Xo?=
+ =?us-ascii?Q?GtGhjpVnC/Zy57edZeXz8A9W99yFY/vIqCEXP0gfAgp6xb+b72B62RwrGSTh?=
+ =?us-ascii?Q?PDwPYmORDnDZgoHUh0RnmbyNt4b0CvJg1hVhLqWo0EV4B0bjI5zUa9Bz1pEe?=
+ =?us-ascii?Q?YNzmxAhB/xSvfb5naXTrPWVOaI+kozXA?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2024 09:47:02.0006
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b6474f0-266c-49cd-fc16-08dd18ff9922
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9D9.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8060
 
-Edit nft_flow_offload_eval() to make it possible to handle a flowtable of
-the nft bridge family.
+From: Ido Schimmel <idosch@nvidia.com>
 
-Use nft_flow_offload_bridge_init() to fill the flow tuples. It uses
-nft_dev_fill_bridge_path() in each direction.
+The device does not support multiple mirror actions per rule and the
+driver rejects such configuration:
 
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+ # tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw action mirred egress mirror dev swp2 action mirred egress mirror dev swp3
+ Error: mlxsw_spectrum: Multiple mirror actions per rule are not supported.
+ We have an error talking to the kernel
+
+Internally, the sample action is implemented by the device by mirroring
+to the CPU port. Therefore, mixing sample and mirror actions in a single
+rule does not work correctly and results in the last action effect.
+
+Solve by rejecting such misconfiguration:
+
+ # tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw action mirred egress mirror dev swp2 action sample rate 100 group 1
+ Error: mlxsw_spectrum: Sample action after mirror action is not supported.
+ We have an error talking to the kernel
+
+ # tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw action sample rate 100 group 1 action mirred egress mirror dev swp2
+ Error: mlxsw_spectrum: Mirror action after sample action is not supported.
+ We have an error talking to the kernel
+
+Reported-by: Vladyslav Mykhaliuk <vmykhaliuk@nvidia.com>
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Amit Cohen <amcohen@nvidia.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
- net/netfilter/nft_flow_offload.c | 144 +++++++++++++++++++++++++++++--
- 1 file changed, 139 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/net/netfilter/nft_flow_offload.c b/net/netfilter/nft_flow_offload.c
-index ed0e9b499971..b17a3ef79852 100644
---- a/net/netfilter/nft_flow_offload.c
-+++ b/net/netfilter/nft_flow_offload.c
-@@ -196,6 +196,131 @@ static bool nft_flowtable_find_dev(const struct net_device *dev,
- 	return found;
- }
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c
+index f07955b5439f..6a4a81c63451 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c
+@@ -192,6 +192,11 @@ static int mlxsw_sp_flower_parse_actions(struct mlxsw_sp *mlxsw_sp,
+ 				return -EOPNOTSUPP;
+ 			}
  
-+static int nft_dev_fill_bridge_path(struct flow_offload *flow,
-+				    struct nft_flowtable *ft,
-+				    const struct nft_pktinfo *pkt,
-+				    enum ip_conntrack_dir dir,
-+				    const struct net_device *src_dev,
-+				    const struct net_device *dst_dev,
-+				    unsigned char *src_ha,
-+				    unsigned char *dst_ha)
-+{
-+	struct flow_offload_tuple_rhash *th = flow->tuplehash;
-+	struct net_device_path_stack stack;
-+	struct net_device_path_ctx ctx = {};
-+	struct nft_forward_info info = {};
-+	int i, j = 0;
++			if (sample_act_count) {
++				NL_SET_ERR_MSG_MOD(extack, "Mirror action after sample action is not supported");
++				return -EOPNOTSUPP;
++			}
 +
-+	for (i = th[dir].tuple.encap_num - 1; i >= 0 ; i--) {
-+		if (info.num_encaps >= NF_FLOW_TABLE_ENCAP_MAX)
-+			return -1;
-+
-+		if (th[dir].tuple.in_vlan_ingress & BIT(i))
-+			continue;
-+
-+		info.encap[info.num_encaps].id = th[dir].tuple.encap[i].id;
-+		info.encap[info.num_encaps].proto = th[dir].tuple.encap[i].proto;
-+		info.num_encaps++;
-+
-+		if (th[dir].tuple.encap[i].proto == htons(ETH_P_PPP_SES))
-+			continue;
-+
-+		if (ctx.num_vlans >= NET_DEVICE_PATH_VLAN_MAX)
-+			return -1;
-+		ctx.vlan[ctx.num_vlans].id = th[dir].tuple.encap[i].id;
-+		ctx.vlan[ctx.num_vlans].proto = th[dir].tuple.encap[i].proto;
-+		ctx.num_vlans++;
-+	}
-+	ctx.dev = src_dev;
-+	ether_addr_copy(ctx.daddr, dst_ha);
-+
-+	if (dev_fill_bridge_path(&ctx, &stack) < 0)
-+		return -1;
-+
-+	nft_dev_path_info(&stack, &info, dst_ha, &ft->data);
-+
-+	if (!info.indev || info.indev != dst_dev)
-+		return -1;
-+
-+	th[!dir].tuple.iifidx = info.indev->ifindex;
-+	for (i = info.num_encaps - 1; i >= 0; i--) {
-+		th[!dir].tuple.encap[j].id = info.encap[i].id;
-+		th[!dir].tuple.encap[j].proto = info.encap[i].proto;
-+		if (info.ingress_vlans & BIT(i))
-+			th[!dir].tuple.in_vlan_ingress |= BIT(j);
-+		j++;
-+	}
-+	th[!dir].tuple.encap_num = info.num_encaps;
-+
-+	th[dir].tuple.mtu = dst_dev->mtu;
-+	ether_addr_copy(th[dir].tuple.out.h_source, src_ha);
-+	ether_addr_copy(th[dir].tuple.out.h_dest, dst_ha);
-+	th[dir].tuple.out.ifidx = info.outdev->ifindex;
-+	th[dir].tuple.out.hw_ifidx = info.hw_outdev->ifindex;
-+	th[dir].tuple.xmit_type = FLOW_OFFLOAD_XMIT_DIRECT;
-+
-+	return 0;
-+}
-+
-+static int nft_flow_offload_bridge_init(struct flow_offload *flow,
-+					const struct nft_pktinfo *pkt,
-+					enum ip_conntrack_dir dir,
-+					struct nft_flowtable *ft)
-+{
-+	struct ethhdr *eth = eth_hdr(pkt->skb);
-+	struct flow_offload_tuple *tuple;
-+	const struct net_device *out_dev;
-+	const struct net_device *in_dev;
-+	struct pppoe_hdr *phdr;
-+	struct vlan_hdr *vhdr;
-+	int err, i = 0;
-+
-+	in_dev = nft_in(pkt);
-+	if (!in_dev || !nft_flowtable_find_dev(in_dev, ft))
-+		return -1;
-+
-+	out_dev = nft_out(pkt);
-+	if (!out_dev || !nft_flowtable_find_dev(out_dev, ft))
-+		return -1;
-+
-+	tuple =  &flow->tuplehash[!dir].tuple;
-+
-+	if (skb_vlan_tag_present(pkt->skb)) {
-+		tuple->encap[i].id = skb_vlan_tag_get(pkt->skb);
-+		tuple->encap[i].proto = pkt->skb->vlan_proto;
-+		i++;
-+	}
-+	switch (pkt->skb->protocol) {
-+	case htons(ETH_P_8021Q):
-+		vhdr = (struct vlan_hdr *)skb_network_header(pkt->skb);
-+		tuple->encap[i].id = ntohs(vhdr->h_vlan_TCI);
-+		tuple->encap[i].proto = pkt->skb->protocol;
-+		i++;
-+		break;
-+	case htons(ETH_P_PPP_SES):
-+		phdr = (struct pppoe_hdr *)skb_network_header(pkt->skb);
-+		tuple->encap[i].id = ntohs(phdr->sid);
-+		tuple->encap[i].proto = pkt->skb->protocol;
-+		i++;
-+		break;
-+	}
-+	tuple->encap_num = i;
-+
-+	err = nft_dev_fill_bridge_path(flow, ft, pkt, !dir, out_dev, in_dev,
-+				       eth->h_dest, eth->h_source);
-+	if (err < 0)
-+		return err;
-+
-+	memset(tuple->encap, 0, sizeof(tuple->encap));
-+
-+	err = nft_dev_fill_bridge_path(flow, ft, pkt, dir, in_dev, out_dev,
-+				       eth->h_source, eth->h_dest);
-+	if (err < 0)
-+		return err;
-+
-+	return 0;
-+}
-+
- static void nft_dev_forward_path(struct nf_flow_route *route,
- 				 const struct nf_conn *ct,
- 				 enum ip_conntrack_dir dir,
-@@ -306,6 +431,7 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
- {
- 	struct nft_flow_offload *priv = nft_expr_priv(expr);
- 	struct nf_flowtable *flowtable = &priv->flowtable->data;
-+	bool routing = (flowtable->type->family != NFPROTO_BRIDGE);
- 	struct tcphdr _tcph, *tcph = NULL;
- 	struct nf_flow_route route = {};
- 	enum ip_conntrack_info ctinfo;
-@@ -359,14 +485,20 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
- 		goto out;
+ 			err = mlxsw_sp_acl_rulei_act_mirror(mlxsw_sp, rulei,
+ 							    block, out_dev,
+ 							    extack);
+@@ -265,6 +270,11 @@ static int mlxsw_sp_flower_parse_actions(struct mlxsw_sp *mlxsw_sp,
+ 				return -EOPNOTSUPP;
+ 			}
  
- 	dir = CTINFO2DIR(ctinfo);
--	if (nft_flow_route(pkt, ct, &route, dir, priv->flowtable) < 0)
--		goto err_flow_route;
-+	if (routing) {
-+		if (nft_flow_route(pkt, ct, &route, dir, priv->flowtable) < 0)
-+			goto err_flow_route;
-+	}
- 
- 	flow = flow_offload_alloc(ct);
- 	if (!flow)
- 		goto err_flow_alloc;
- 
--	flow_offload_route_init(flow, &route);
-+	if (routing)
-+		flow_offload_route_init(flow, &route);
-+	else
-+		if (nft_flow_offload_bridge_init(flow, pkt, dir, priv->flowtable) < 0)
-+			goto err_flow_route;
- 
- 	if (tcph) {
- 		ct->proto.tcp.seen[0].flags |= IP_CT_TCP_FLAG_BE_LIBERAL;
-@@ -419,8 +551,10 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
- err_flow_add:
- 	flow_offload_free(flow);
- err_flow_alloc:
--	dst_release(route.tuple[dir].dst);
--	dst_release(route.tuple[!dir].dst);
-+	if (routing) {
-+		dst_release(route.tuple[dir].dst);
-+		dst_release(route.tuple[!dir].dst);
-+	}
- err_flow_route:
- 	clear_bit(IPS_OFFLOAD_BIT, &ct->status);
- out:
++			if (mirror_act_count) {
++				NL_SET_ERR_MSG_MOD(extack, "Sample action after mirror action is not supported");
++				return -EOPNOTSUPP;
++			}
++
+ 			err = mlxsw_sp_acl_rulei_act_sample(mlxsw_sp, rulei,
+ 							    block,
+ 							    act->sample.psample_group,
 -- 
-2.47.1
+2.47.0
 
 
