@@ -1,165 +1,132 @@
-Return-Path: <netdev+bounces-150487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB0B29EA6A4
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 04:30:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 578ED9EA6AC
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 04:31:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FB6F188763B
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 03:30:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 740BC1887E5D
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 03:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FA21D5CD6;
-	Tue, 10 Dec 2024 03:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 686F31ACECB;
+	Tue, 10 Dec 2024 03:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M/MQun+s"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yonfa6r2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6101BEF8B;
-	Tue, 10 Dec 2024 03:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3D4198A37
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 03:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733801401; cv=none; b=l+3F3U/vq4Sry9jPQRq00TJ6KySGl2KKDNpry1ukR0qvxSi/9xgfgpDtoeobo4D6TAHRuy5GHWceYK/nIhqXlx6orgNAGJYeOe//9Kxig6vra5rqJCgWre+joB6w6eDKwsNkxBYqn6KHzVNFCJ/SFNaNp0bmsrcretnMAjh1DQ0=
+	t=1733801510; cv=none; b=dzd6R4CJ5DmdFVBy2Hmt9oPp8bG4GjO/RC0N6kSeIG2Qpnmm0l29/nMMtSeYUVuzFEeXW3cGQyeOgWx63HX2sc8IfetxU/sKyNoYqJfWHqF0Y7QJ1mBYh+9qiS5+oazdraiQXOcElf/rudFjWpjSyql5TqAlh9fWF9ggx6abbU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733801401; c=relaxed/simple;
-	bh=HcWoaK439QTaY/DOc4afGwl8pFNb+PCJ7dAnkLL7e4k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MM9TpTSuCcCbmkIWRyve8I0KQcbpOva0RP9NFom5MeipLXQO91Tj9Vq+ctwOVY0uJfwpnv4IFS0vV4i3Qi+dScnUnp/+GOjd9SlWJyB6cKa/bw2te2i3AcA3OPykdQm08OC+pb59aZULckkRsR8gHZ7B3ki2YBnheVKxZUZghOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M/MQun+s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6167CC4CED6;
-	Tue, 10 Dec 2024 03:30:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733801400;
-	bh=HcWoaK439QTaY/DOc4afGwl8pFNb+PCJ7dAnkLL7e4k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=M/MQun+sIrYfdZCh9CNqjL7ftXtStBD9UtTfmzKgfTEoWm6YPFYtptK1seAQQFr5m
-	 Wlzt9VJaLP7W1lvI2HQ04K4rT3Fzj+p6+CLkeT7Jo7WXGJqSdImcfDg5T3J7AgRHKo
-	 hBn0SiuWi/kPyhBYSiwjE2AYjp1MN0otY5m/xqddsmU3zUkBn/y3+YsIlmlX/ulhV2
-	 iuNwkm32uNM86pMwyUqAP8aL+pRl5pAEomKAkAnwm6kMCNbijT6Hc1MHQZLSpexD2y
-	 yx39x/6fBzRtGaX5qcsvvGhElCdQmDEJGCZAZe7CGGRqp7BmG8G5r677ZzVuCjsKDk
-	 tPoY1vzxjjt+g==
-Date: Mon, 9 Dec 2024 19:29:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, Jens Axboe
- <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David
- Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-Subject: Re: [PATCH net-next v8 06/17] net: page pool: add helper creating
- area from pages
-Message-ID: <20241209192959.42425232@kernel.org>
-In-Reply-To: <20241204172204.4180482-7-dw@davidwei.uk>
-References: <20241204172204.4180482-1-dw@davidwei.uk>
-	<20241204172204.4180482-7-dw@davidwei.uk>
+	s=arc-20240116; t=1733801510; c=relaxed/simple;
+	bh=FNzKszCuHp8YBw4zUen9q+/Su0cHKgEr5TQylNKG7Rg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VjK/4CcA17nKstnTiRDiqnAdPEF2h7lKQ4U3uc71NVpwlTqiCUvWAZP6Z8aP7ujoOp0kfez3UdfxzAgq2+VGbKkcoKqMLyjNUiZuHz9fVItB3h53JAE0DF5U6rFv63U7IwVlDqYnnECy1ydr6LBDpGy0Vt3H5vhgmmldyumuwac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yonfa6r2; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21625b4f978so29775ad.0
+        for <netdev@vger.kernel.org>; Mon, 09 Dec 2024 19:31:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733801508; x=1734406308; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vv0YJOP4wsTr0yQs0O9EirzGuPC4EYUuQmTwZ8ZwYDs=;
+        b=Yonfa6r2aTAA7K2Q3rzZ31HLSWfK+rUQeeWpm5Y+rsanQPK5pVWu78frOs/uaV7M1d
+         0O9Sgmz/0HR5j7o0Dm+3vbiMldwpiOVHfRtF9W7NKKT2JPCKK6XJ6lgmKDuQ57mVNx0P
+         ZL+BCVsNYZHT0Z7ruIl27v7c5wGEZiDnrTo1nGP0THLUH9sROLxgAr1ZwMXTt+TutR2g
+         cF2o+NFblT7TutVJnLzY60BV7J+51pm3zH3B0h0kEpDXEBdyG+d6t4w+qv8Z8wcygVAX
+         tjnLt0X/9TopjsP+gYdPGRbgyYri6+nSafDkWbsr8jUkspLwPalUsUYevUqvFdjtfFV8
+         AaiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733801508; x=1734406308;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vv0YJOP4wsTr0yQs0O9EirzGuPC4EYUuQmTwZ8ZwYDs=;
+        b=aCWNtUqPOo4Ng1QTR8nCsjWKQVjR8V1zxPe1A19fYIpFQy9mJ5c4DHBGjT0mrlp0Hb
+         hJZHkbqyHsJN50nslreIOsKm6mbxjFCxsHA1AJrpfZ5pkmJu5xw3ZK5vpae7EH/aAvhE
+         fKY0Uq+0x2Bpq2x/wgEA09VhR1Sk/NO9a/MFOGC1ynOpXrzxR3eiSNqAdPP7IDdjOwGB
+         IzVR4/71Erhc8N/USgWXSPlR72BW9MhoLgg/EPI+UNfn3EKgOGpL0JS7qZ0vzRjRDOKA
+         NfIU39X8XjidXLiyZVSXWAKvJylBaY4cjwJU0ZlTWdkh8Fnd89bYqV8wZs2jsXFfNyT5
+         n0eA==
+X-Forwarded-Encrypted: i=1; AJvYcCVUGYWp0fZnvN90zlDLtdpmTKKOcDDEgZy04LYGDXeFQVWg+LlRbg65Zop+fXdCs7ON5QZhUuM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYiJ4Z7MTi7rrxD01IUXjrk2GNO48ea3h1hJ7cI27VdqceXNZb
+	b9m/hBQ6NgMk52ybHVZuHkrL/9T9bmHq49syVZs5ZfYrPcpigr71gFJVjSshug==
+X-Gm-Gg: ASbGncumzAp5Fb1hvHA03wnwC7KvIzIWVSbDMzgOWHtcAQ3Yyp068SLpVNJ8fo3Olk2
+	BalEfeMPQcOWd2FBNZMcTgfKsjl5usvnEYKbCTAiVnRBNrOAJ9rQVHRiqLCth4oK/2HN10yfXqA
+	jcaH1GEip2qrYOZmVdu0A+pNba4zjYCIRZuubMWJ2JyckP3WHoyesfXZMLN+sBy1pBhzScupD9D
+	H2F1SE0LsVXmD7QgdCDK25zOzQxXDiiMSSi1HMFsbxPp1hVHUKGmYYS/z9oDjShpIEi0I5jV18X
+	X8Oug5B4DUjsVmfq
+X-Google-Smtp-Source: AGHT+IH+pvo4/VQN7viU5wtrvbWZV7k0OuEnVi1lVzkq1rjMfGLod9qaEdLeCxJfDRPWaSCkHHj1EQ==
+X-Received: by 2002:a17:903:2391:b0:215:44af:313b with SMTP id d9443c01a7336-216718a490bmr1533575ad.0.1733801506645;
+        Mon, 09 Dec 2024 19:31:46 -0800 (PST)
+Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215f8ef9ef1sm79715295ad.159.2024.12.09.19.31.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 19:31:46 -0800 (PST)
+Date: Tue, 10 Dec 2024 03:31:42 +0000
+From: Carlos Llamas <cmllamas@google.com>
+To: Li Li <dualli@chromium.org>
+Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	donald.hunter@gmail.com, gregkh@linuxfoundation.org,
+	arve@android.com, tkjos@android.com, maco@android.com,
+	joel@joelfernandes.org, brauner@kernel.org, surenb@google.com,
+	arnd@arndb.de, masahiroy@kernel.org, bagasdotme@gmail.com,
+	horms@kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	hridya@google.com, smoreland@google.com, kernel-team@android.com
+Subject: Re: [PATCH net-next v9 1/1] binder: report txn errors via generic
+ netlink
+Message-ID: <Z1e2Hn1ChSXCprwo@google.com>
+References: <20241209192247.3371436-1-dualli@chromium.org>
+ <20241209192247.3371436-2-dualli@chromium.org>
+ <Z1eO-Nu0aowZnv6t@google.com>
+ <CANBPYPgU9uL9jdxqsri=NwLTJcFpzdB313QsYjSQAuopRppTDw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANBPYPgU9uL9jdxqsri=NwLTJcFpzdB313QsYjSQAuopRppTDw@mail.gmail.com>
 
-On Wed,  4 Dec 2024 09:21:45 -0800 David Wei wrote:
-> From: Pavel Begunkov <asml.silence@gmail.com>
+On Mon, Dec 09, 2024 at 05:26:14PM -0800, Li Li wrote:
+> On Mon, Dec 9, 2024 at 4:44 PM Carlos Llamas <cmllamas@google.com> wrote:
+> > > +
+> > > +Usage example (user space pseudo code):
+> > > +
+> > > +::
+> > > +
+> > > +    // open netlink socket
+> > > +    int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+> > > +
+> > > +    // bind netlink socket
+> > > +    bind(fd, struct socketaddr);
+> > > +
+> > > +    // get the family id of the binder genl
+> > > +    send(fd, CTRL_CMD_GETFAMILY, CTRL_ATTR_FAMILY_NAME,
+> > > +            BINDER_GENL_FAMILY_NAME);
+> >
+> > ok, what is happening here? this is not a regular send(). Is this
+> > somehow an overloaded send()? If so, I had a really hard time trying to
+> > figuring that out so might be best to rename this.
+> >
 > 
-> Add a helper that takes an array of pages and initialises passed in
-> memory provider's area with them, where each net_iov takes one page.
-> It's also responsible for setting up dma mappings.
-> 
-> We keep it in page_pool.c not to leak netmem details to outside
-> providers like io_uring, which don't have access to netmem_priv.h
-> and other private helpers.
+> This pseudo code means a few attributes are sent by a single send().
 
-User space will likely give us hugepages. Feels a bit wasteful to map
-and manage them 4k at a time. But okay, we can optimize this later.
-
-> diff --git a/include/net/page_pool/memory_provider.h b/include/net/page_pool/memory_provider.h
-> new file mode 100644
-> index 000000000000..83d7eec0058d
-> --- /dev/null
-> +++ b/include/net/page_pool/memory_provider.h
-> @@ -0,0 +1,10 @@
-
-nit: missing SPDX
-
-> +#ifndef _NET_PAGE_POOL_MEMORY_PROVIDER_H
-> +#define _NET_PAGE_POOL_MEMORY_PROVIDER_H
-> +
-> +int page_pool_mp_init_paged_area(struct page_pool *pool,
-> +				struct net_iov_area *area,
-> +				struct page **pages);
-> +void page_pool_mp_release_area(struct page_pool *pool,
-> +				struct net_iov_area *area);
-> +
-> +#endif
-
-> +static void page_pool_release_page_dma(struct page_pool *pool,
-> +				       netmem_ref netmem)
-> +{
-> +	__page_pool_release_page_dma(pool, netmem);
-
-I'm guessing this is to save text? Because
-__page_pool_release_page_dma() is always_inline? 
-Maybe add a comment?
-
-> +}
-> +
-> +int page_pool_mp_init_paged_area(struct page_pool *pool,
-> +				 struct net_iov_area *area,
-> +				 struct page **pages)
-> +{
-> +	struct net_iov *niov;
-> +	netmem_ref netmem;
-> +	int i, ret = 0;
-> +
-> +	if (!pool->dma_map)
-> +		return -EOPNOTSUPP;
-> +
-> +	for (i = 0; i < area->num_niovs; i++) {
-> +		niov = &area->niovs[i];
-> +		netmem = net_iov_to_netmem(niov);
-> +
-> +		page_pool_set_pp_info(pool, netmem);
-
-Maybe move setting pp down, after we successfully mapped. Technically
-it's not a bug to leave it set on netmem, but it would be on a page
-struct.
-
-> +		if (!page_pool_dma_map_page(pool, netmem, pages[i])) {
-> +			ret = -EINVAL;
-> +			goto err_unmap_dma;
-> +		}
-> +	}
-> +	return 0;
-> +
-> +err_unmap_dma:
-> +	while (i--) {
-> +		netmem = net_iov_to_netmem(&area->niovs[i]);
-> +		page_pool_release_page_dma(pool, netmem);
-> +	}
-> +	return ret;
-> +}
-> +
-> +void page_pool_mp_release_area(struct page_pool *pool,
-> +			       struct net_iov_area *area)
-> +{
-> +	int i;
-> +
-> +	if (!pool->dma_map)
-> +		return;
-> +
-> +	for (i = 0; i < area->num_niovs; i++) {
-> +		struct net_iov *niov = &area->niovs[i];
-> +
-> +		page_pool_release_page_dma(pool, net_iov_to_netmem(niov));
-> +	}
-> +}
-
+Ok, sorry this broke my brain trying to make sense of the arguments to
+send(). You imply that the nlmsghdr, genlmsghdr and so on need to be
+populated accordingly with these arguments.
 
