@@ -1,108 +1,103 @@
-Return-Path: <netdev+bounces-150706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2AA59EB338
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:27:42 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7B9F162312
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:27:15 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A44201B2190;
-	Tue, 10 Dec 2024 14:26:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="clLNwCGf"
-X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B591E9EB346
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 15:29:06 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E401AA1FD
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 14:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C312281D3F
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 14:29:05 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314FA1B394F;
+	Tue, 10 Dec 2024 14:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IYGKP4R9"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493551B042B
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 14:28:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733840812; cv=none; b=WLP9ZWhXE6SbJM9OXRJGdUk0T9yWxB6KDpLsyVWqnS8OER0SSpKFXaT2MFioqZmwrRsFRYglFnEuHDMbyiS+7xj+hdGvd6neu4FZaI3gOx5lKAwd52AMjNg0TmbN+7RfTfQTqbD21QwvfVNNG0ty+fjaJO7uZAXIbMVtimN3JDc=
+	t=1733840936; cv=none; b=Cjcs7Ehq8EpHgh3U+c1ytX704ciqxpdeLFYB2Vf7CIcv2yoXTXG0Nan/x4O4Y2FCfoiIM1mmVe1ojVGoIClvILdP2JkZEkdbaGh3TPTM9RSHuDD04rz+k1q7geg6MNG2IooU+5XTCK6QxntOE/uf0L0US0/3Rosg4THXWyiJCrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733840812; c=relaxed/simple;
-	bh=kSiA94ParQtd16g2J/Kqqgn323ohU2UmPfI21Z+U53g=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=Ig/TVSUVUUSqkVzO4U+DN31oa4/S78kAUvAV3sd++nV4kS4DNUQtYM8mByNDLPW65ER3bd8pTudPGC5P+hkHnZxL0bRQkD3tWwYfHvbYwOYH7RAECYQynxVyWfCxNCJvcXlo8U9GgMS4eSzwRe4Q57NGIxbUoTV4Oky39PVVUvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=clLNwCGf; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=G8t1xaI1/GugJIK8OBprVbaU/A8jM/gJsPmAeiSAzxc=; b=clLNwCGfyp0oG0TR9gNUeWxtyk
-	O/sqKL9Nnwn2JsaJYTOVv5Yi4rQFnRjbCtmhmqV3H81dEzXZ+98JQOq/qhYPsUz0bF2esFejz50Kh
-	ofsUKa13GTz84FEsBZMo8XaPRlcR2Ujh2ikHIHsfccfIpMqAdT5f3CawMAxTvMoQrq5XXooasDBki
-	zw/2An9fRPKKn8ZJliJ3JEc01rqy7AmnIhwMcXKCIMWKAHTRaz4yte7Z+PBrn/jRMgjBCQGVxtvh6
-	dHZMojHN9cDWx3X4VXNph+cuIjANb3hdxSUTBgssE6ucCd/G2r2egpJ2TjmdueEc4fLEgvDli2qrD
-	atJzBSYw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:57170 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tL1CI-0002ZH-2C;
-	Tue, 10 Dec 2024 14:26:47 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tL1CH-006cne-6W; Tue, 10 Dec 2024 14:26:45 +0000
-In-Reply-To: <Z1hPaLFlR4TW_YCr@shell.armlinux.org.uk>
-References: <Z1hPaLFlR4TW_YCr@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	UNGLinuxDriver@microchip.com,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>
-Subject: [PATCH RFC net-next 7/7] net: dsa: remove get_mac_eee() method
+	s=arc-20240116; t=1733840936; c=relaxed/simple;
+	bh=uyPvZ41Etvmfq1tE8uJDaPMtfSj8eWiFsAuISEuHcDs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G1Bq3Te4IC2JlSrVtCbw5XyM6fgbKcU0S2SrdcQqgDthSgInXBq+zOEBvRmSUGwwW/PHF8fFrY8laiu+VkiQaH8iUCOuu6kpxahwIaVkvKtpVDYoy1iESN2UryCKrsOcO17cQSaMXTJuZP8/rhoVVjSIa0RQRmyBuCHKokFkxEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IYGKP4R9; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3862b364538so2401722f8f.1
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 06:28:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733840932; x=1734445732; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=uyPvZ41Etvmfq1tE8uJDaPMtfSj8eWiFsAuISEuHcDs=;
+        b=IYGKP4R9dw5iWaPFEmwVX8DDVja7habrufmvSiOY/LXSYP40wS67FYvGeHtWgwmJKV
+         9GlFGX4abENxWHo2zxYpw/hHQd4DELo/JTQQzoFii92pcTUS2cEwfO3gN/Z6WaFpPgo1
+         g2iuJ/TuxsFTcXqaO4EzJoiMnTH5GVt1nat65V8UoVum6ZA71IRY1IH5qKdhKPUrw9iQ
+         KpiYtoDa50WlK4FTWtCLYXgqIFml2G+dw/kK1XFFMdTu0KeB2gzBo6i14t1q2TRdganI
+         6b3CWzYlAfSBdfao1eGADqf+E9lQWDmHp7dez2Y8ztvX/t7UehdSeN+5w698pvG3QADQ
+         YmfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733840932; x=1734445732;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uyPvZ41Etvmfq1tE8uJDaPMtfSj8eWiFsAuISEuHcDs=;
+        b=wCdAI/TJGLeubeEIfkm+q6lPtTQvvjs9lfuMVkXy6Zb/xNjkR5d7WduByiJ2Qj1Tcq
+         F8m1bFjaXm403SY76IJd6XVXMwd4ilFlPuXdHKWyiob/Ds/I5hkk20k3IVw0qYZ7eR/9
+         4mMuKvWyXOP3/9nD+P8oLP4yukkqFCtNE7fjqOooVYLNTlIZ7/lhbs8j7AtGtjauwhOR
+         /p0mE4EUQ0L7Z0A/e6dM+87l7mlSxSvuRDVc4FfOyNwsagXyxc3RPZR0PfeRH3o7Z3a5
+         FHexJpnCw017PmYxR2YnzyiccemZZN1ALrfyAHdUdRjvH5etzbV4Rdj9wfouv04hz+/4
+         +O5g==
+X-Gm-Message-State: AOJu0Yx82S2ggW6oGQpvvsVNmovBu43128hoQrSa+kSXoS55OSmAfUCG
+	edwa7IcJlKZTKsbp5K/f8cVGLTIXgDr+2JdKsbHtMX7CAjdRXfVK2S3lyP1PdMoZCEarpg7Ez1f
+	2u6XW9xVI3gNn9Y+8gp7y351lV5M=
+X-Gm-Gg: ASbGncuvHFRLuRmeADUvyTY8y0Jlqd/rOjrHvPThbX2o0te6MWNESz4QQLn29ofAnXD
+	GnJvymqgHq/kO7yE/FTIjcfnznUqEGNpnI6vf
+X-Google-Smtp-Source: AGHT+IGrLfMK34OcxPeuwxi3HpqKLZOZhRJfLKjyABLf3Bi02q/7zAbHaINTEcr9SBtO5yt2jfiO1/g3dVOP91sAC6c=
+X-Received: by 2002:a5d:47cd:0:b0:385:e10a:4d97 with SMTP id
+ ffacd0b85a97d-386469bf8a4mr2520322f8f.21.1733840932217; Tue, 10 Dec 2024
+ 06:28:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tL1CH-006cne-6W@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 10 Dec 2024 14:26:45 +0000
+References: <20241207225906.1047985-1-jesse.vangavere@scioteq.com> <20241210141308.GE4202@kernel.org>
+In-Reply-To: <20241210141308.GE4202@kernel.org>
+From: Jesse Van Gavere <jesseevg@gmail.com>
+Date: Tue, 10 Dec 2024 15:28:41 +0100
+Message-ID: <CAMdwsN_P27r3dPmUFM4JwzjL-0Y-nv1a9eBCt_5CrHunrD6wrg@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: dsa: microchip: KSZ9896 register regmap
+ alignment to 32 bit boundaries
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, woojung.huh@microchip.com, 
+	UNGLinuxDriver@microchip.com, andrew@lunn.ch, olteanv@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	Jesse Van Gavere <jesse.vangavere@scioteq.com>
+Content-Type: text/plain; charset="UTF-8"
 
-The get_mac_eee() is no longer called by the core DSA code, nor are
-there any implementations of this method. Remove it.
+Hello Simon,
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- include/net/dsa.h | 2 --
- 1 file changed, 2 deletions(-)
+Op di 10 dec 2024 om 15:13 schreef Simon Horman <horms@kernel.org>:
+> Hi Jesse,
+>
+> Sorry to nit-pick but the Fixes tag should be placed along with other tags
+> at the bottom of the commit description. In this case exactly
+> above your Signed-off-by line - no blank line in between.
 
-diff --git a/include/net/dsa.h b/include/net/dsa.h
-index 4aeedb296d67..9640d5c67f56 100644
---- a/include/net/dsa.h
-+++ b/include/net/dsa.h
-@@ -991,8 +991,6 @@ struct dsa_switch_ops {
- 	bool	(*support_eee)(struct dsa_switch *ds, int port);
- 	int	(*set_mac_eee)(struct dsa_switch *ds, int port,
- 			       struct ethtool_keee *e);
--	int	(*get_mac_eee)(struct dsa_switch *ds, int port,
--			       struct ethtool_keee *e);
- 
- 	/* EEPROM access */
- 	int	(*get_eeprom_len)(struct dsa_switch *ds);
--- 
-2.30.2
+No problem, that's a valid remark, it was something I already wondered
+about as checkpatch didn't mention it, I will fix that and send a v3
+later.
 
+Best regards,
+Jesse
 
