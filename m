@@ -1,195 +1,293 @@
-Return-Path: <netdev+bounces-150838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42E6B9EBB54
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 21:59:15 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B46E89EBB65
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 22:00:35 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2ED35167C19
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 20:59:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4976E284320
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 21:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B01022B8AE;
-	Tue, 10 Dec 2024 20:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED352236E7;
+	Tue, 10 Dec 2024 21:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fZbM39lr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MZi8SCcr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C9822687F;
-	Tue, 10 Dec 2024 20:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733864352; cv=none; b=FC70E4xtlALQHKhUWalbJ9uPkZHuiufBHOml6KFDl0/ttQbNx0aw20O8pMZO4/xh10hASX4QgxAAIT7fWWbA/kO6dVMLRfFCLTMCv1r82laUGXb9MC8JbxBz4uYPHgf9zmBzMPHJx4X9obWzjv5uzKqzZP8D81vHPzsdV1F18Yk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733864352; c=relaxed/simple;
-	bh=8ay72ah4zoiprvTWL2Yp+qkOORhqO1uhwF6m23dIdoA=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=enDY/M8q5alkr3isWLiYKutEUJpucTUBVAHFsQRd77pWswZNlkUk1ecRjG9TJF7/HmX76nV0Sck6i5jMX+6B6qmnFFL4GL1KJ6SuJ8jPxEMEtl7qPgAeiQBW/KX6D4Z3MJWVL8KRmaa4+tkCcPGM3bmqb6ZO7ngf7Xg4+4HMTn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fZbM39lr; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-434a742481aso53485045e9.3;
-        Tue, 10 Dec 2024 12:59:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733864349; x=1734469149; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aZoRyVnubsCTXnGDN0W6JhwZ/Q5YmmQyUD3hy10ebHg=;
-        b=fZbM39lr9XFHcKMyCnBpdVjroQGIVyMU7ry7DijQ/jvDmlwDC8PuvGAX8B358V4dsW
-         1iZTviK1FAChTYs6IBD0DLKFDMiNP0K1LulSKqiIzybcFebpm+aP2e409iCBQzpok1Vs
-         Ty/H/MOOOkuzLUuzBbdYLzK/FKDKxzM/qUy5k/zJOz2ps7+FRRkVgv3LSIt84xvgv7rc
-         QzUK+e7JIK80OlJnk1E4vEZCKqKzryJ2DVjxgPIow+t7Rx9pspZEJIsoAdiOPErfS9+s
-         6Ji5afM6158ppi8Ig56H19hH9t7oG86ARgPgwOioeTi3vr+Yfs6oXOZNYIR+FSbvZ9G7
-         Ey7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733864349; x=1734469149;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aZoRyVnubsCTXnGDN0W6JhwZ/Q5YmmQyUD3hy10ebHg=;
-        b=ruRb9ZsM7vEgkX6rPIfT+EbU4m7+WUKw522gi6+WvAPm/wlqLVd9Qyo+5JhVTuU9+a
-         kk75G8OE+Rkrzum9/dSUwnuIKeeEnDm6ty4+SU6grkduWoWycq+qyaH1G6ita83zUwll
-         txTwf1tbFdvpYUf3vKbO6rmr//ez38h8RbaN1aeEhpaPV2rwqlonIt8uOe10MVi/NsCX
-         MBy12qsysKutV+f8Rn/1ODPX9Z4wgd72bGBsXRfg/nBf3PB086sp7ae1VkXFlRAhduk1
-         Sb8m2yvZApNghXwQ/f/BXCgXoobnBN/++MktsqxioXrPKkNI62sMVGKXFjUvYV0ZXJLk
-         FeFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUg9MzNVR5muITXHrVt82AwOUHjqWSrDJ41EqzsHD5iW8vm7PoF1YB4HlGOcG5xHt8SDYuFoSzZaQUS@vger.kernel.org, AJvYcCUgXJwibc/XJNF0j7APD/kpRGcPNCps6H5EgYZHYYFsMappOdoOSlsoxzYHDfMoBSvvir+p0dNziQ80XgQn@vger.kernel.org, AJvYcCVJ5WuQ1OY9lvmmPFi4ZRHQVtlnYPVXOW2VmE2qeLIh5+EbN3b9i+EBgna1SoRK4EPPQ+wkGIs4@vger.kernel.org
-X-Gm-Message-State: AOJu0YwM7dezV8sI/rttOTihqcZhHYNmLPFGWETZXDq7YOs8G1NxJQ/H
-	r3XmEzLxNwQyGHulOyTNQEe2ANcQU41PLaif6gFRJydbBLxjjXTt
-X-Gm-Gg: ASbGncso1voA5/Hh9wrfsUXFLhrPLn27DQzl0yyFfZTmIup20Is4WtrCuUAKx+F8anu
-	uKyuhJ3vvnk2bU/wzdq+Uf5+TrQQ9gfL75k5eliJ7yQYv4brlNzBKxbKUtNefC84NEJskcv1Z8a
-	bmk2cSzFfOYS6zAgttk6OeDAdFdtgol6bmRynKjfQ0X4Sp9WfdrvVIHakMjRktzMgAX/HJzFmAo
-	UTEuKl/OMEgUO6JtYjHLo2mavVVQqcxHmzg1aYXfLkD2+HaGdm6HcP8kQStM4yZvLtTDNqdc4Zz
-	Vao6BmZ2rQ==
-X-Google-Smtp-Source: AGHT+IE2p4zS0d4ssJx5pitNO8yM+2jWAE85KmDwhz76rWPYidu8fzQPEOifjDJac/byApIZwC84jg==
-X-Received: by 2002:a05:6000:1843:b0:386:3b93:6cc6 with SMTP id ffacd0b85a97d-3864ce54e5fmr442280f8f.15.1733864348810;
-        Tue, 10 Dec 2024 12:59:08 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434f5774454sm94941465e9.13.2024.12.10.12.59.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 12:59:07 -0800 (PST)
-Message-ID: <6758ab9b.7b0a0220.3347af.914a@mx.google.com>
-X-Google-Original-Message-ID: <Z1irmE4BWBl1jIz7@Ansuel-XPS.>
-Date: Tue, 10 Dec 2024 21:59:04 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v11 3/9] dt-bindings: net: dsa: Document support
- for Airoha AN8855 DSA Switch
-References: <20241209134459.27110-1-ansuelsmth@gmail.com>
- <20241209134459.27110-4-ansuelsmth@gmail.com>
- <20241210204855.7pgvh74irualyxbn@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B8622FACF
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 21:00:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733864413; cv=fail; b=Wwi1Jypn7Uw6g79LA1zGsRgg6Y2rzUQJaiFkV//Ub6sKHPZ7T/vd/YR+YLIZIN0YxKLMacpK36ZZvVFf2yGpVwfdVByFuUb6fKQoB2ghMwQNI1tLHletJ72Uxfc7Ao7GY0AHdnezEVH10cOPz44GUzF3FN1BqH+Y/qIhea7cEaM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733864413; c=relaxed/simple;
+	bh=KtrZAuzPKc/TLWM7bAJr3mjxLo3Uz58XfGwAA/QhisI=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=s0kB7CpNHIJjneBOFRtiy9NqEwW7vH0fSAohd2uCPFOgdKMv58XQVibhhL3KnrUE5VVtqzYzEKuotpYMOFoXwjOTBvxpI7ophc9p7B+NJYI0qXVflhSpr+Raafp+JWMv9mWXycE7AuA8r4l16TrcifWlLkzqH0M6SwHsIjrMpuE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MZi8SCcr; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733864411; x=1765400411;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=KtrZAuzPKc/TLWM7bAJr3mjxLo3Uz58XfGwAA/QhisI=;
+  b=MZi8SCcrB53VS4uBwcaLlZGfKG5DrZswkGLIsBx1Mh9iWgmCE1pc508S
+   9t8O2bEMRM2nAkn3Yj+WTvO7Th7n5OaMO2gMWRQlI1BbLQvVzY4rkVPSB
+   zxLHZgEPeZNyx3BXIbh6cK+NnoSgSYmofe7NU/byaPecdcCOuKg1TgvDn
+   bJMXDZyDxH9d3AnMviyAalO1ZHZNEBuMyBDUegn8Cafi3SYcACS8AUg1G
+   PZ9ZNAcwGv329vfkxOFmj7BMnM8uwpn6BdzfI/B20VDzm8/LgSLVyHc3v
+   cDnUq8vhy7MI1RCOmVzEzM1tBp6+NDOYNcbYX1iZjaOBcNdPRIFBVmI7G
+   w==;
+X-CSE-ConnectionGUID: 4AabBbzESUGW+CU0md1jJg==
+X-CSE-MsgGUID: 1N7KaEAjS26eB7z6BjLEcQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="38010464"
+X-IronPort-AV: E=Sophos;i="6.12,223,1728975600"; 
+   d="scan'208";a="38010464"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 13:00:08 -0800
+X-CSE-ConnectionGUID: PnKOWSJnRkKYz5RbwbVxlw==
+X-CSE-MsgGUID: iS2Jy2sqQ6myvtPn9dgwDg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,223,1728975600"; 
+   d="scan'208";a="132933766"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Dec 2024 13:00:05 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 10 Dec 2024 13:00:04 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 10 Dec 2024 13:00:04 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 10 Dec 2024 13:00:03 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bLJHT6tijESTmdBbkCKcYi1YOU/NB3ykpYUyweW1NL5iMCOuG4CCtimYX2/Ek5gLpGPjzpR+sD35Q1qRbdT0KX1K4aOcP+iKkOCjalAc/6Xt/oq83E9k2Ng/EXOA44zLxudCcIvBaJ6S/ZBgmDI1j3My19Pgfu8CPHIzJnRxLkqU/+Osbz+Elq5Hr8IgAPUwOBygaGEmn856GrGmwxCWIal549DZdWD2G0VRBMbKGCO4r+NJyy85ZAtSWGGG1uTb6ZiILzUK+pvltJU/lqR/dnlsCwizAgcBa31wzgeLJn6N11r1o/3xhgnCMnRQQ1969tYJBYkf7I1A0uSLyQt3VA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gMxlK7dvqcD3wUJ1zKGLn9kp+DE6/MqmxfkVegYzsuQ=;
+ b=Qj8bRgx02gn0D98kCE3vb6OyBwFW3KygaBvhMgrQDgrvlRn50cC5gAr+dx6qqrObJpr5KMiEz1UTYiKzGoXSnYG/g6ud7gazDWIuWsfGw0CDaFE5+U/PMVVPNuZG1cDnnmhD7EEZaJ4uZq58ihVQ145Uc3MhtVx7a3DHGdKUi/JZWNCLkhs/7Hl4+AGdmIYcsH4LM4Ji3XcGMgaRgfdu12u2UL7EcXhK5LW6IXuiYX5Bx4RU3aMcCRsfuW/IrFqk03iP+RyIJWFojM0W1KYH91WfwC5opV8ujw3L6wyFVcVOoXUr22Z93N/FNCBT0TkCtWbiDKHIkq3A9cHt0FzqrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5095.namprd11.prod.outlook.com (2603:10b6:510:3b::14)
+ by DS0PR11MB7407.namprd11.prod.outlook.com (2603:10b6:8:135::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.12; Tue, 10 Dec
+ 2024 20:59:33 +0000
+Received: from PH0PR11MB5095.namprd11.prod.outlook.com
+ ([fe80::215b:e85e:1973:8189]) by PH0PR11MB5095.namprd11.prod.outlook.com
+ ([fe80::215b:e85e:1973:8189%3]) with mapi id 15.20.8230.016; Tue, 10 Dec 2024
+ 20:59:33 +0000
+Message-ID: <564b9d98-4d64-40ab-a523-4487712430dd@intel.com>
+Date: Tue, 10 Dec 2024 12:59:31 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/3] ionic: Fix netdev notifier unregister on failure
+To: Shannon Nelson <shannon.nelson@amd.com>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>
+CC: <brett.creeley@amd.com>
+References: <20241210174828.69525-1-shannon.nelson@amd.com>
+ <20241210174828.69525-2-shannon.nelson@amd.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20241210174828.69525-2-shannon.nelson@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0213.namprd03.prod.outlook.com
+ (2603:10b6:303:b9::8) To PH0PR11MB5095.namprd11.prod.outlook.com
+ (2603:10b6:510:3b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241210204855.7pgvh74irualyxbn@skbuf>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5095:EE_|DS0PR11MB7407:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9f4a72ab-f6e5-4d7b-afce-08dd195d8c63
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?RFM5Vm1mamFUNHkxQkhQcHFudlpDSHVtRFBJVFc3S212dGR2MzJ4YzM4cTdx?=
+ =?utf-8?B?YjJSb0d2SGlSekt2emtxRDVvMDB4dGpDZWpXYXR6c1pKWXE3bkJpdG1mRWgr?=
+ =?utf-8?B?eXNyK1FDeDFWZkh4dFhkeUZoRytwZG1hU0ozYXA5WWM2WlpIcFNzSVdNdytR?=
+ =?utf-8?B?Uy9PUzhVSFZUOGtKMElWVVhVWVo1K0U1bUhZZDNMK1Mvc2N3Q1VVNTlLY1JP?=
+ =?utf-8?B?SzhQalNBMWJ3VlBKRS8xZHRUV3FydTFjRlZLSW5FVDJ1U3hlaHlxNXorK3lp?=
+ =?utf-8?B?Y3YyS2tYVUFncG5QalNWZzlRTUs4Zmt0RHE0MlVSVkNIUzlTUHlJSlljbVo3?=
+ =?utf-8?B?YkZzcUdyZkZPcGFZVG1kenFpRU5tSGgxWEthZ01oMFpWNFJRMk15QjZybzk2?=
+ =?utf-8?B?UCtLd1VOVUNuUlJkOExTYnh5Q2FBVUQzV0ZTWXM4clV0ODJNN00zakJWMkhF?=
+ =?utf-8?B?YzZES2VNa2o0M2NOWnlzb09rOHRHaXdldDJuejI2MjlMS0xhMmRGSExocTNT?=
+ =?utf-8?B?bm1LM2thc0FESTRiV1E3MmoybE1vZG51SlJhaVlqdWRLcE95Y2M0RW5wN3kz?=
+ =?utf-8?B?dTNBRUp1RXYvOW5FTUd1Mm5QZm54QUVQTE9Od2FHQ245b01XSGJteGo4bVRF?=
+ =?utf-8?B?c0d6Wk84c3pzcnhCZUlXY1k0ekd6TTh1RUdBWEJ3R09jdU9OYTVuNEVLZnFC?=
+ =?utf-8?B?Uk82OWpkbkdHMXNvRjQ3Ry9nUjFLUUVnZTJNMS9MM2N1SnBWanV1STFmemI2?=
+ =?utf-8?B?REVWNnc2amdBQWRSZExPQW9Fa0xka3kxTWxvcDRaczJtN3dWK29KUDIyenNF?=
+ =?utf-8?B?eklvOW50OEJZQVdWa2g2K0hUdWFpS1F3VWtyRDA5R216OVFNWTlTSzhIU2xo?=
+ =?utf-8?B?U1B0WWxGVVp5MmV1UGFzS1hXZVIrb3lBNjh4bXR6MFhqOWgzdjh6MW8rMVIw?=
+ =?utf-8?B?MWErTk9PakNmS2lmTzRuMXZNb0ZmYUdqRHVOcjRPRFZQdU1PTm9CMjl0bEtR?=
+ =?utf-8?B?dlUyYUF2VXd6aGk5ZG5PUjdzYnByNzhGcFgzUHdoOUtPeGlYMXpIZ3dwOWpx?=
+ =?utf-8?B?OWEwSmRVaDFQWmVDblhWeld0MmpNQjVBRkkrNGhlNVVkVU0reEJSakRXb0Nh?=
+ =?utf-8?B?MWhvdW5rQ1I4V2tCbWVwNitydmwzQjU5MjNCMUNnSnpBNVZvZThIU01PNjVs?=
+ =?utf-8?B?WUZPN0UyaVd5WnozZEo4UkFuWlptT1daSVU1NDl5cE14NzBBdmxrYStINjcr?=
+ =?utf-8?B?N0VlNlJmTXBiajA0OFNLK3FlaHNkdENhNzZuakFyVlBTaE9XS2NWdjhaeVIy?=
+ =?utf-8?B?RmJiVFZqQ1ZoTU9XTWJPYkU2aklqT1l0OHlKSVd5OG9xNFFpeWNQcFJoRXN4?=
+ =?utf-8?B?SGY4TEJtaW9BNUZQbENrKzVuMldDTDVQWlpKOEtlMWdIOHVFdDN0cVZrTGd3?=
+ =?utf-8?B?a2xQYkRvV0hUbm5VTU56Njd6SVNLc0NwTDE5RDhCM3Q5b0dtRnd5UEc5QmVW?=
+ =?utf-8?B?M1JRRitDcDBHUVlBbjhFc1J1NEFqYkpyRmRpZWg5RFpFWEl0YzgwMnRPVjdV?=
+ =?utf-8?B?Wk54OGxIbUV3TnhERmwySGFBcUlOQ09aTzZFNGRlZ2ZIUHcrT2EvQUM4bWpk?=
+ =?utf-8?B?Ly96UEV3dnFCcDlxK1kwQlNPVDZMS0dOZElSaWZObDVDU1FhaU5IdW80bUd0?=
+ =?utf-8?B?UEMxenVMbTFYRzdHVWlrL0k0VVJvRFE3SjRiekZYWXRzOE9tdldGTXUvMXRV?=
+ =?utf-8?B?UHNZMjFRczRsNFdOTmlTQ0VFSGsrSE5PTWI0MTV3aCsvT2ZoWWpLcm51QWFy?=
+ =?utf-8?B?a1QvcHRTQ09ZSkNyL0s5dz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5095.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aDdzK0tnTkNCK001UzZkelQvRGpwUzk2K0JyTStUNFdhbGFBajZGTGQ5d1da?=
+ =?utf-8?B?aGlCZXJJTkdtNU5wSWFNSm5lRUdyUUlwOW1HRUd3QjFGSmZhcmVxOFlkbFhW?=
+ =?utf-8?B?MU94UEhUSzZYQzhxUnk1RHdoU2RCWnpEbThFY2dvUUNidWtjYkQ5eGViNHJn?=
+ =?utf-8?B?S0lOMlRWQ01XeUdCUnV6b0MzcWtnK1FaVU0vSU56c2s0SGtlMFRGb20xdVlN?=
+ =?utf-8?B?TnYzb0RobVY1RjV1cGNLL2tmWFhpOXhZNDhicGdxaHJmQXJWN0l2WSt3OFU0?=
+ =?utf-8?B?M0VnemY1bWc3K1FxdkIwVVpPdENmK2tqUFNpZmVQNktud2hpeVlHK1dybTU4?=
+ =?utf-8?B?eG5nL0Njc3h6bmd4ZVZyTTJ0RWp5NXFqNDFSZTZjRnQ3bFZnbTN2UnZ3VDcv?=
+ =?utf-8?B?TUxqb1NrcVl4cHJaQ3VyeG9EYjI0VkM3SlhZZEczWiszZmVWRThDSjgvUlVi?=
+ =?utf-8?B?T3hxTkhac2pvM0JRVW9lSFhqYitTbTFpOUYwL3lCVW53ZmdldFhxTE5Mc0Ju?=
+ =?utf-8?B?aXp5NVJxVkgwaHMxbnBqWnVMVVltdCtuL045YWRtYWJqOURvTHlkWDBnd2Ri?=
+ =?utf-8?B?MlNUK203a2hRaXNlcURkYlNPZ1NGVzR5UEc4V1pkSTJuNFRTU3ZOY21aZUFJ?=
+ =?utf-8?B?dlE2UlpMNi83RXFjNCtnMHltcXlSZ1lubStrUWswYWlpTkhGVGxNK0FEVGtT?=
+ =?utf-8?B?L1o4c2VvMXJBY25hY2JIQkpzYmNmK2xhTVJoVTFYQXhkWlYwUUVDUGNpSits?=
+ =?utf-8?B?clJDU1dQcldqek9td2NxMnBHeTBFT3JiMVhyZkRRaFYyOEZETkw0OTR2Y3VH?=
+ =?utf-8?B?MHBXTDQvLzQ3YzQrcFZROHo3RlFZTjRlc2hxWWZYdGRxc1Q2M1V5MS9pcDNh?=
+ =?utf-8?B?U3o3TzFYRnhNYkJhWW9sck45QVUxaU9CNG9JTkR5MHZSblpEamV5WEIyYjZW?=
+ =?utf-8?B?Wk5raURvZ2ZVcVdvT2F0Yzc3VVlHczk4MkQva01wcU9yVWxQN3RONTI1eHUz?=
+ =?utf-8?B?LzZ6NTAwVkFOekhGOGFBeGtRNXRzMEU3b1Vhc3NmOFpYQjBxdUhnR3dJc2I5?=
+ =?utf-8?B?d3RLWkoxRHM3bzl2QlpoMlhGVEpiMUlQUm9NeE5BZFR1R28yMHJiZ1E1b1J0?=
+ =?utf-8?B?aEtMRzhNWVhvd1Q1RnNlYVBWOGRFVGFRWnlWbDFkanF6N1Bxakk2TFA4MytQ?=
+ =?utf-8?B?SjVhWnBHYnNCZ2ZUUGdFTHhkazNKdThrb0JEQWo1UmJIL3RlZ2V2VW5FbUhw?=
+ =?utf-8?B?S2Y0YysrMU9EcHFoeFRIcjQ2S3VTcFFRYmZLM3RQcXAzVjcxdkhKWGUwRWk5?=
+ =?utf-8?B?R2ZUUHcwcDlyK2kxeGphV04rQXkwdGpVOEpaY0c2WTM3QzBmVExNSzU2bXNU?=
+ =?utf-8?B?eWNHaTV3RU5LOXlvbXJsYkJ6UUFHTzBaM2VlbkJPRTdmUFJTUUJMNGp1S2dG?=
+ =?utf-8?B?QmZWL3JhSCtjd3YxNVZZUHZZbDFyeWxsTloya2RZK1JwTzJxT1F2UmJuSzVO?=
+ =?utf-8?B?MXd6STlPdzZlcnJxSTVydVpwVjFSMFc1K1d1Q0ZrakN4R1pLNWtoWEtQUTBw?=
+ =?utf-8?B?UFROc0kvVU9jOVVGd1VKQmtabUp5STFOKzFrelF5WnJnaFRhSDBXVUcxRndo?=
+ =?utf-8?B?VnBhUWtmODZFeDYzNk5XbHlLM1lKYjZrYXhKOWlXT3pqUC9sMFRrZFlZMGI4?=
+ =?utf-8?B?MXdoamF5aittNnd6Nll4OEh2YlpNd29GUXZhWGRDRE45dThMRkFQa3BwcmlO?=
+ =?utf-8?B?WUhmVHZUSG5JU0hlVlM5RTY5WGl3a05Ma3Y3OGpuRmp6cE5seVluVGRUbkFO?=
+ =?utf-8?B?VTZ4dEJzeXMxOXN6N285VkJENjRFQnE5ZGhaNndVMnhNbnpRQ3NFLzBoTGli?=
+ =?utf-8?B?ZjhnbFNyQmtnYlhhUzN6SUZ5bWhxcGNzWnFmQTN5TytVaGRaeW1nVFY3VXNZ?=
+ =?utf-8?B?RWhLQUZZSW1JZGh4cWc0c0lmY25HMWpsL1hGMWJMSEYzczNtYmZDOGtSMzF6?=
+ =?utf-8?B?a2NRMDRTeTRBMjduWTlVWHV1L3RtdEFCL1NibnZPMzhYT1F4UkRyVnZoZkxY?=
+ =?utf-8?B?SmpaQlZobWY4WWY3bEloTCt2alo1c2JoQmV6bmd4ZlM5VWlXQmpEamlNMXRs?=
+ =?utf-8?B?cnpEUEx1RGRFaE1LOG5MeUhaazZkTTYza0I4aWVtUlhyMnFQNDNQZmNOU3JX?=
+ =?utf-8?B?NEE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f4a72ab-f6e5-4d7b-afce-08dd195d8c63
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5095.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2024 20:59:33.6094
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3RozhpW7BAhyiXlOM4HhB8VoNn5A6M5gVe9f3R4eBxWs87XHfYyzjzZXnv/Orn7v30iR+GoprjOZV+HbycrXXhnkelzOvsbGRZjEC7mJlxI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7407
+X-OriginatorOrg: intel.com
 
-On Tue, Dec 10, 2024 at 10:48:55PM +0200, Vladimir Oltean wrote:
-> On Mon, Dec 09, 2024 at 02:44:20PM +0100, Christian Marangi wrote:
-> > Document support for Airoha AN8855 5-port Gigabit Switch.
-> > 
-> > It does expose the 5 Internal PHYs on the MDIO bus and each port
-> > can access the Switch register space by configurting the PHY page.
-> 
-> typo: configuring
-> Also below.
-> 
-> > 
-> > Each internal PHY might require calibration with the fused EFUSE on
-> > the switch exposed by the Airoha AN8855 SoC NVMEM.
-> 
-> This paragraph should be irrelevant to the switch binding.
-> 
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > ---
-> >  .../net/dsa/airoha,an8855-switch.yaml         | 105 ++++++++++++++++++
-> >  MAINTAINERS                                   |   1 +
-> >  2 files changed, 106 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/net/dsa/airoha,an8855-switch.yaml
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/dsa/airoha,an8855-switch.yaml b/Documentation/devicetree/bindings/net/dsa/airoha,an8855-switch.yaml
-> > new file mode 100644
-> > index 000000000000..63bcbebd6a29
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/dsa/airoha,an8855-switch.yaml
-> > @@ -0,0 +1,105 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/dsa/airoha,an8855-switch.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Airoha AN8855 Gigabit Switch
-> > +
-> > +maintainers:
-> > +  - Christian Marangi <ansuelsmth@gmail.com>
-> > +
-> > +description: >
-> > +  Airoha AN8855 is a 5-port Gigabit Switch.
-> > +
-> > +  It does expose the 5 Internal PHYs on the MDIO bus and each port
-> > +  can access the Switch register space by configurting the PHY page.
-> > +
-> > +  Each internal PHY might require calibration with the fused EFUSE on
-> > +  the switch exposed by the Airoha AN8855 SoC NVMEM.
-> > +
-> > +$ref: dsa.yaml#
-> > +
-> > +properties:
-> > +  compatible:
-> > +    const: airoha,an8855-switch
-> > +
-> > +  reset-gpios:
-> > +    description:
-> > +      GPIO to be used to reset the whole device
-> > +    maxItems: 1
-> 
-> Since this affects the whole device, the SoC node (handled by the
-> MFD driver) should handle it. Otherwise you expose the code to weird
-> race conditions where one child MFD device resets the whole chip after
-> the other MFD children have probed, and this undoes their settings.
->
 
-OK.
 
-> > +
-> > +  airoha,ext-surge:
-> > +    $ref: /schemas/types.yaml#/definitions/flag
-> > +    description:
-> > +      Calibrate the internal PHY with the calibration values stored in EFUSE
-> > +      for the r50Ohm values.
+On 12/10/2024 9:48 AM, Shannon Nelson wrote:
+> From: Brett Creeley <brett.creeley@amd.com>
 > 
-> Doesn't seem that this pertains to the switch.
+> If register_netdev() fails, then the driver leaks the netdev notifier.
+> Fix this by calling ionic_lif_unregister() on register_netdev()
+> failure. This will also call ionic_lif_unregister_phc() if it has
+> already been registered.
+> 
+> While at it, remove the empty and unused nb_work and associated
+> ionic_lif_notify_work() function.
+> 
+> Fixes: 30b87ab4c0b3 ("ionic: remove lif list concept")
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+> ---
 
-Do you think this should be placed in each PHY node? I wanted to prevent
-having to define a schema also for PHY if possible given how integrated
-these are. (originally it was defined in DT node to follow how it was
-done in Airoha SDK)
+I'm not certain about the inclusion of cleanup to drop unused code in
+the same commit as an obvious fix. However, the changes as a whole seem
+ok to me:
 
--- 
-	Ansuel
+With or without splitting:
+
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+
+>  drivers/net/ethernet/pensando/ionic/ionic.h     |  1 -
+>  drivers/net/ethernet/pensando/ionic/ionic_lif.c | 11 ++---------
+>  2 files changed, 2 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic.h b/drivers/net/ethernet/pensando/ionic/ionic.h
+> index 1c61390677f7..faaf96af506d 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic.h
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic.h
+> @@ -59,7 +59,6 @@ struct ionic {
+>  	DECLARE_BITMAP(intrs, IONIC_INTR_CTRL_REGS_MAX);
+>  	cpumask_var_t *affinity_masks;
+>  	struct delayed_work doorbell_check_dwork;
+> -	struct work_struct nb_work;
+>  	struct notifier_block nb;
+>  	struct rw_semaphore vf_op_lock;	/* lock for VF operations */
+>  	struct ionic_vf *vfs;
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+> index 40496587b2b3..bfa24c659d84 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+> @@ -3804,10 +3804,6 @@ int ionic_lif_init(struct ionic_lif *lif)
+>  	return err;
+>  }
+>  
+> -static void ionic_lif_notify_work(struct work_struct *ws)
+> -{
+> -}
+> -
+>  static void ionic_lif_set_netdev_info(struct ionic_lif *lif)
+>  {
+>  	struct ionic_admin_ctx ctx = {
+> @@ -3858,8 +3854,6 @@ int ionic_lif_register(struct ionic_lif *lif)
+>  
+>  	ionic_lif_register_phc(lif);
+>  
+> -	INIT_WORK(&lif->ionic->nb_work, ionic_lif_notify_work);
+> -
+>  	lif->ionic->nb.notifier_call = ionic_lif_notify;
+>  
+>  	err = register_netdevice_notifier(&lif->ionic->nb);
+> @@ -3869,8 +3863,8 @@ int ionic_lif_register(struct ionic_lif *lif)
+>  	/* only register LIF0 for now */
+>  	err = register_netdev(lif->netdev);
+>  	if (err) {
+> -		dev_err(lif->ionic->dev, "Cannot register net device, aborting\n");
+> -		ionic_lif_unregister_phc(lif);
+> +		dev_err(lif->ionic->dev, "Cannot register net device: %d, aborting\n", err);
+> +		ionic_lif_unregister(lif);
+>  		return err;
+>  	}
+>  
+> @@ -3885,7 +3879,6 @@ void ionic_lif_unregister(struct ionic_lif *lif)
+>  {
+>  	if (lif->ionic->nb.notifier_call) {
+>  		unregister_netdevice_notifier(&lif->ionic->nb);
+> -		cancel_work_sync(&lif->ionic->nb_work);
+>  		lif->ionic->nb.notifier_call = NULL;
+>  	}
+>  
+
 
