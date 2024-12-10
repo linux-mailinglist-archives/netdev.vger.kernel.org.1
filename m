@@ -1,144 +1,134 @@
-Return-Path: <netdev+bounces-150635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6159B9EB084
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:10:57 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13C789EB086
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:11:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4C4B168F17
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:10:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C6B6283D5B
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 696F41A0BFB;
-	Tue, 10 Dec 2024 12:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D121A2630;
+	Tue, 10 Dec 2024 12:11:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fWzv0jrW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OzZ1jsnG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A541A254E;
-	Tue, 10 Dec 2024 12:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE9C1A2564
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 12:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733832654; cv=none; b=qFfs5mCXqnYhn4AHJwxhMmPsvU7ArMOU9Thjy5QR6IdFiD8fnqSROyxUc3BKxnX4m4EBGv8hjXycMJNsUQMAIhvkvGKp2LMlfn9dsQfvtSOEbnx/ufyem4tliDgHL0KEudItfplPAc5WyZ6eJJwpwDQySNlhYQD5Bd4MwEkCykY=
+	t=1733832667; cv=none; b=mKgdN/35qJac7FAQPNme2LiecvkLLqcY/LN1AT4vzlEmtP0vDTRV7zUfAfZObpp3bPoA48epH/eVQtfjm+NtBDBVo9FqptzupnE4zmsd4QHHV+bZW1eRwNdXYbDo2UiMGVdGS2oykAR4m2SfumBsmAi8gHUqUyc5NunJGBbiMh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733832654; c=relaxed/simple;
-	bh=7iaiJHcabJsZWGYUOvU3ry+AH7YdXrI8KxaJ2hWVsz8=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A92xaEc7jbFZj5q9FG9bHbOBNUkF7jGebqRZi4oo5z377Vj0pHly9C/C0GmQHEIYDD7foab60SSsvmd2+sQdhdkfNYFgx8CRJ8jVTNgVAI4MzcuewSDKdehXsIHjUmUApk8YY5G+bJi0/ztgKq8ceH28CRid8BOK6UhPf7dgp5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fWzv0jrW; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-434a1fe2b43so55801215e9.2;
-        Tue, 10 Dec 2024 04:10:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733832651; x=1734437451; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=f/tm/wcnr6fTaffyLAXSgHwJaQbGmdxPhc9rTLVd32w=;
-        b=fWzv0jrWhUzwOrGsPYVZb1znOSti+xkY1cJlU1Ce0WNf30yjl0ttoZ3oCgOTOIyjIO
-         1GVxBR1qAIFS2ZUGrQWyXAm0w7WKESOZCtIFF7VPOsmPwDtVZOCz1YZr6cNbMP4tQjZg
-         fZ5G/0EXEdHGUkq6IZtPEQ0XrMt46AOQXWrUbEPc58egiHZB6lEUU7bflnNXoNtS2t9U
-         Sg3IKfNt+ibSe0ebjjWVCaRGT3/uKLHu7lsQnU6gV+CEngd91WH0vigxWanUFWkbBwDd
-         ATFHPYY9OnJ/qX+xXAWEtU22URnGaCcQ778iMmqGMnISF6pwiIv3zB18zhr+z5ICFq/n
-         V7sw==
+	s=arc-20240116; t=1733832667; c=relaxed/simple;
+	bh=WpFJws+1AAKwCgFgJgNhVVsNE/Ttl/8nbJ5O1lIMyT0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f85nA39cpEbp/cgUlKfP/enrhOM4YSIeaSOB1xmBwrjgergyTDWVmyVl+reYdETqTjmExvqMM9W0Qt5uFGzuY97KJpiPVlJWOIXC4WVIA98Eg4pMExKstb0FCfCr67dJ4nV9iGdUYs/wpzRibI4bNugdyV8Wwnn3jF+GvteMFeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OzZ1jsnG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733832662;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RhM7wkaVMM+fe9bz3ACeYFwdz9wUUgUciwQHUf9mljs=;
+	b=OzZ1jsnGOJO+LeUmBHoAPWiU4Og3D5GFb3bfSUrX1kLlI3GPHA9mDsfMJ5sj+SKA/y3Fc1
+	cZZVJNkw2vvaXMEYpAeTh26jPoC4cLvjh6vpsA1gEhUutrN/EkEV0PjLR7br0MyrHKdJOG
+	AInR+zqvTLDjiLvoPyHQkP1JKCXZAfQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-102-xkTtjp4jPMKzEEqCtLnIrA-1; Tue, 10 Dec 2024 07:11:01 -0500
+X-MC-Unique: xkTtjp4jPMKzEEqCtLnIrA-1
+X-Mimecast-MFC-AGG-ID: xkTtjp4jPMKzEEqCtLnIrA
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3862a49fbdaso1886948f8f.1
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 04:11:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733832651; x=1734437451;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f/tm/wcnr6fTaffyLAXSgHwJaQbGmdxPhc9rTLVd32w=;
-        b=BqUHOP4Cnguq9INBPbpLf6aHM2Fs3xbzWfcGFZgNw7pQyOW3bj3BvgEqYyQ13zih4u
-         nII+FPKPv1xFEZqk4/kN/MDBPIUx0QuIqxXDv94d1sCzMrY0D+LyUVLM4Vv22irFbOkr
-         +ubYaGS4LZ8PevcrHY1T4HuRpiHYiqemBZ+hRSLlhm194LlHX7rjyC9oyfMBYyCwpJna
-         /dmp76gfl410tDgY7GLBrzt5DV2dAPfAAtgI65qt/Gec7C3a99PF3JIPNYiTCcbnZ2bu
-         9BTW4oT2WqXKyzImYII15Ub6RIUzuY3MJIb/w6VXV0iPTHEvJMfBVlKR09XGUGfUt+jK
-         6SLg==
-X-Forwarded-Encrypted: i=1; AJvYcCVwpS5N7V8GbrdxqFB0angriICaGozTNTfKwGDKYwb/PWEZ4WL6V+JYqaBo0XPecL9WR7klzYO+@vger.kernel.org, AJvYcCXMLkoDWRxDmJRS/kgp15SzKXC3KhmIM6rqDAC+aMh23+iD/A1/cWvXXpese5lhJwDaFeKCe9XUf1H5@vger.kernel.org, AJvYcCXxoIOFPxG0cbrXTBN7RWv9QRpFofjXN0+O6tt0bmHGFWplJvBCv7J2EGb2ROXJvg7J5RwOQpK7yF18UzoD@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV0urprrfk0MRU9o7BZfKTV6HH9S2EdpAqYP6OGjE76YUefxik
-	Zj0IHXlcVslDGLclyatGR/FcO2MVSGrrG7nY+W4PcmenygG0Tv4f
-X-Gm-Gg: ASbGncscRmLWbXLmADntmPQ06z6FGchR6r9S0eKjwHkmCVV19v5nh9got7yWhG4pKLX
-	CLEw1hV+u5UNJ0fz5gUKADJJUZ9oeOCSEgXdWmfCl/AyhyyZh6TQwPZ3w0HGI+o9LCRuDtu9au7
-	9wm1+RZbB3CtQnpplxDdrwYVrq9ElCSVViN/Fa3b0Ks3Np2MWcWY7WYl6NF8hOx+Vx2V8xbT40b
-	Jwxmq5rJvh+AE9QzL4opNQP4BfZgOyOv6+Q1z0kbhABKr7IjVyQWXyqlrL9mbjpq31JB2Cxmu1z
-	IrtFvTV+CQ==
-X-Google-Smtp-Source: AGHT+IELqnqj7Lv40ZEePpA0AiZtjlj0HSeZm+v8CN5Y+7SYlmGGorQ4+fRTjI1MBtElPDrqJtCp+A==
-X-Received: by 2002:a05:600c:3b03:b0:435:14d:f61a with SMTP id 5b1f17b1804b1-435014dfa8emr28638915e9.25.1733832650610;
-        Tue, 10 Dec 2024 04:10:50 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434f1125e69sm107925285e9.32.2024.12.10.04.10.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 04:10:50 -0800 (PST)
-Message-ID: <67582fca.050a0220.2d187a.9e01@mx.google.com>
-X-Google-Original-Message-ID: <Z1gvxWn-xvCByaUb@Ansuel-XPS.>
-Date: Tue, 10 Dec 2024 13:10:45 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v11 9/9] net: phy: Add Airoha AN8855 Internal
- Switch Gigabit PHY
-References: <20241209134459.27110-1-ansuelsmth@gmail.com>
- <20241209134459.27110-10-ansuelsmth@gmail.com>
- <b3b79c80-ac7c-456b-a3b5-eee61f671694@lunn.ch>
+        d=1e100.net; s=20230601; t=1733832660; x=1734437460;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RhM7wkaVMM+fe9bz3ACeYFwdz9wUUgUciwQHUf9mljs=;
+        b=IN+JyQt3SjFE8n2PdCanARaCJsEI5Kri2AHHUmflhmLaGoYg7sHZa752KgWbcSgtZ9
+         F5tWs2ioUkWg3SFiWWtKSoXiwjAuDnDsdDx+hTzOb240VE3Tjjo4KY5uppWbNiWnO79b
+         mIDpIQe9z/JHKvEM4l+bQ7TqmSRSip1H4+ZG/eWdw+PwKQFQ7x/GZm+i4Oyek8V/F09t
+         kkl7UJy4lEkCY58md+JOeZ8wZlliTXEUQCXbIvWHgtjHVCnNnUKwx86gsjnvw3B88F+B
+         ge44ssQTom9QkOcDMXWWXoShR02IXv8NbTIajquzwYvY09y+agu+MqgKN8kmQ7VyDrDj
+         rikg==
+X-Forwarded-Encrypted: i=1; AJvYcCW5vfNR2iHKoDK7XIWj5NzxC3oKic0dYGpd8CIk+BYxHMngqD9vPIVewfHFWURfsnRkmgqIyfs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzlpi/ozfdMHeZSrM4fz1kxGmsFU2ctejC1W1lyEVgqiYU4tCvx
+	BS8ij6YiPUfxAZLRacPUvndpOg9coa/rlIoJB7eW5Rm5NyyQRq049KmIr/3Ygjn4LkgN3v6PaFn
+	t9TjOSircXCMWRfBTaAXaSUVikxcd7qICCX6J9DjoqXP527WL7H1Enw==
+X-Gm-Gg: ASbGncuJ/se11TBXrZ8ZL7MY8EqKigbVXr+1P79rLVqk5hl4RdlrswzVxCmZr7Vo3F+
+	ddmUefGMHZcxNVVVBDWiee7KF7IOh4YQMHkMLHhOmTdl5zzc7itcFsW72qArD3lXzxQGVqD4aJ0
+	+2W0+7RA1LCdD70ez4xnkap4E3iEO+QeA6w6CHPWtmWi6o+//NfuS5xd6/udgstlMFGBuMZ98DZ
+	3RWT2WpunURgWu/jqYWKdwEujyswmyVgs4DYwaxid+CxtiitoUzVPVjm+Tpad9d4nJDEJgXFGfX
+	ZSI5pM1YIU2mIudvi/vPQ6wVPg==
+X-Received: by 2002:a05:6000:1868:b0:385:e38f:8dd with SMTP id ffacd0b85a97d-386453f9d18mr3275302f8f.46.1733832660016;
+        Tue, 10 Dec 2024 04:11:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHKwb7Q/AAsAZiRE1WgBOMhwvv1eQWNMA/tdwYlA97mx+0mxSgPemTKmBfH3OvniCb4fAfxHw==
+X-Received: by 2002:a05:6000:1868:b0:385:e38f:8dd with SMTP id ffacd0b85a97d-386453f9d18mr3275283f8f.46.1733832659637;
+        Tue, 10 Dec 2024 04:10:59 -0800 (PST)
+Received: from [192.168.1.14] (host-82-49-164-239.retail.telecomitalia.it. [82.49.164.239])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d52cbefasm226004575e9.43.2024.12.10.04.10.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2024 04:10:59 -0800 (PST)
+Message-ID: <a9c93b21-71e4-431d-9ab2-e73d47d12dd8@redhat.com>
+Date: Tue, 10 Dec 2024 13:10:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b3b79c80-ac7c-456b-a3b5-eee61f671694@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/4] net: dsa: mv88e6xxx: Give chips more time to
+ activate their PPUs
+To: Tobias Waldekranz <tobias@waldekranz.com>, Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, kuba@kernel.org, f.fainelli@gmail.com,
+ olteanv@gmail.com, netdev@vger.kernel.org, linux@armlinux.org.uk,
+ chris.packham@alliedtelesis.co.nz
+References: <20241206130824.3784213-1-tobias@waldekranz.com>
+ <20241206130824.3784213-3-tobias@waldekranz.com>
+ <518b8e8c-aa84-4e8e-9780-a672915443e7@lunn.ch>
+ <87ldwt7wxe.fsf@waldekranz.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <87ldwt7wxe.fsf@waldekranz.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 10, 2024 at 02:36:29AM +0100, Andrew Lunn wrote:
-> > +config AIR_AN8855_PHY
-> > +	tristate "Airoha AN8855 Internal Gigabit PHY"
-> > +	help
-> > +	  Currently supports the internal Airoha AN8855 Switch PHY.
-> > +
-> >  config AIR_EN8811H_PHY
-> >  	tristate "Airoha EN8811H 2.5 Gigabit PHY"
-> >  	help
+On 12/6/24 14:39, Tobias Waldekranz wrote:
+> On fre, dec 06, 2024 at 14:18, Andrew Lunn <andrew@lunn.ch> wrote:
+>> On Fri, Dec 06, 2024 at 02:07:34PM +0100, Tobias Waldekranz wrote:
+>>> +
+>>> +	if (err) {
+>>> +		dev_err(chip->dev, "PPU did not come online: %d\n", err);
+>>> +		return err;
+>>> +	}
+>>> +
+>>> +	if (i)
+>>> +		dev_warn(chip->dev,
+>>> +			 "PPU was slow to come online, retried %d times\n", i);
+>>
+>> dev_dbg()? Does the user care if it took longer than one loop
+>> iteration?
 > 
-> Do you have any idea why the new one is AN, and previous one is EN?  I
-> just like consistent naming, or an explanation why it is not
-> consistent.
->
+> My resoning was: While it does seem fine that the device takes this long
+> to initialize, if it turns out that this is an indication of some bigger
+> issue, it might be good to have it recorded in the log.
 
-EN EcoNet that was then absorbed by Airoha (AN). Hence it's the same
-thing. Airoha is suggesting to use AN for new submission. So it's just
-about timing.
+What about dev_info()? Warn in the log message tend to be interpreted in
+pretty drastic ways.
 
-> > +#define AN8855_PHY_ID				0xc0ff0410
-> > +static struct phy_driver an8855_driver[] = {
-> > +{
-> > +	PHY_ID_MATCH_EXACT(AN8855_PHY_ID),
-> 
-> Is there any documentation about the ID, and the lower nibble. Given
-> it is 0, i'm wondering if PHY_ID_MATCH_EXACT() is correct.
->
+Thanks,
 
-I will check this but I doubt there is any explaination. These are internal
-to the switch so my theory is that no exact logic was applied.
+Paolo
 
--- 
-	Ansuel
 
