@@ -1,134 +1,152 @@
-Return-Path: <netdev+bounces-150745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BE0B9EB63B
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 17:25:18 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E4DA9EB647
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 17:26:14 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F23D165866
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:26:09 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DBB207DE4;
+	Tue, 10 Dec 2024 16:25:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iRSQy/EM"
+X-Original-To: netdev@vger.kernel.org
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31A0628136E
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:25:14 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9471BD9DD;
-	Tue, 10 Dec 2024 16:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="m+c/A2iq"
-X-Original-To: netdev@vger.kernel.org
-Received: from sonic307-15.consmr.mail.ne1.yahoo.com (sonic307-15.consmr.mail.ne1.yahoo.com [66.163.190.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54201A08C5
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 16:25:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.190.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF5D1F2385
+	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 16:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733847910; cv=none; b=pGsrqPrBYsWzCXT4m59JEcBMoCpJT6wCBIaTiY0k2cj49Q7vGcgvODKR4mIqgrsq5NMBPShOstwpm/mLJUefqY+1RmCM8HmF716h3y1urSrzs6Fn+uGALDyaIJ6ulcCOWX8Dtm3byo0kGj4fZWesbnX+3Lu5oKbcH+B6ybaM9/I=
+	t=1733847959; cv=none; b=APcCp24V4ZSn9AUYVLzY2AvRdcbe/yRSoSw4OTIvTT7Jw7W58EPjmwB+COP2kFTc0hriPbBfKZXlGkI13HhZCHINJKoyPM1QUu8DRZxEwXZMI83xP7DI9CaVfGadlC/Fvw7J4VHShShLa7UX+feKWJDCcDOy6tcOhe7v+HlQ8Mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733847910; c=relaxed/simple;
-	bh=dtdQbFhmnVnI7ygtZ76xo9nld9J+WNLb2rNHplFbi6M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rMRnVavRWm83/+e5jSLQQt7Hh32D0U3NSFIoSNaMJSP57ldkd8p2pGiLAyL/R5ZJLaMklxkEOb5l3e7IYddEsXOtQfgvV2U9zivfN3PHVR1P+6qNdPcmRlrfrgK3M7Rcyc0Bos8VDozamwVaOiK1B2p5Gye40/XLWNGksemjvJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=m+c/A2iq; arc=none smtp.client-ip=66.163.190.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1733847901; bh=0CrZJ7aKEZ3Vs5CFfuBg7/KfL3yW3adz05gAk40JQAA=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=m+c/A2iqAKzgVLEsjcJqgW2wj3lCHBSDui7j62RSIRaXqYaVdaVPnHpr6rUCXK/jOguxn9i6aB0A0bDMwmZUbktX5lJImC+3JOB1DgtbyDdB54MPZZ9AvOla1lvbjftd2mqC+/4+Wev5O+Fvc6BFrpMtiUWpTJDhrpciQdJBQqIr11lilB/XHKfqVZpgNmusn1FuUxfyLGvVQNR5/1MteNUe85q05T0WRonLwrKtz84I8MDYQu1QfxEw+MOQycpvbk05PHhuGRsHOu478FqMu6ow6HBQ9rw+gDZynbPkxTZsJewsV/yarqNF2A2KhQZp4F5v/4lLE319aG3xluFOAw==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1733847901; bh=DKJWSq/rbspl04F6Vdrse8y2cHwEElotBz35vEQhben=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=L4XLMJSQRfVjtQXygDKHPKY4iLlxisJq5SOEs1NnDZn14nbbiu7Z0U6z1nEbmean6BMbUBilaUSE5ZdaxZzHOfzQDF2ETDOoITEU/q33eQysNtXe2E56CSIaB4qTzFM6MBsFu9S2J2ZY2uEhpQMQJxsCEg4GKk7OfquG4YmVsO6AMn2ltRG6ZjK1QQVjUM8n2zDGqAgSTAhi9Q5+V2g+VfzDbjLntF6IJcwjx2v1OuAOIiX5elRMWNmeAe2O9QzNQRoG4rspwBqJ0Dm6T0LRaWBtLy9UJB+oQ4fMBQZqc391FgOKOsRAKYN9ZcuA1sQEpVoy1PJ+AQIX6F0d3X5A6w==
-X-YMail-OSG: ifYj2fMVM1kW9nanvmOlDRgdBouDroIPl431ZTGfMPjE7mN1r0XD26_EiHTgRWZ
- 5LIVM9ou6XDx.mtlhHP.fh4pE_.yZv2nCB4pW3Ug_h7i6VKoTUf0PYTHpWAbscXnPRGAGmJt3OgJ
- i1pFDGyVpWShxkyGu2C6iBI7bgBgjLnYkl8sWB_mVDf__8HpbbF_L0F7YZ7o5p0_nwMQqmB61R.2
- zACRDKjSPWs0aZD4ewRvjE7yIvHsqae2XAovDDE0FKEcKF5eguD5TWIO7B5bXGbl6Q69S1ozIO2o
- Me6PMgt3rPUWfXHaRNqN9IOy.idirlslBgxhyt.yVjix7Hunfo27ihJU_3GNQ1Y3GOUyLgdxR4pJ
- JUhq8DTLy3R_BiZosfdyd2g2yXlH0QQjHE5pUbzKVu3pKhQV.2kkk5Mk7HRIMxEcV1bVdMXzKoCB
- NA0x8zxg4Ojs1M2pf_D0GK1OeeKAPoAbxwog4WsDT_zXRrM1Lbcv0uCdPB_ApP37RvqS4.h8Y8j0
- vj39LdubGoHCbcGfK11A2UEPNiidEiNNPo_geEyPtbF3c98Jz5xxVr9YTbEeXg6hwKrC7rFDpdtt
- .hpo4SMyA_WQJzY7OcAUnMd6wmYrjTJmz5jCsOWlWJ99JJ5QKRDm.ayoif9Qw8mFFsPJUK0LjE3i
- EglAGcWp_XZ6QA0fKEp6_QVdwG4.LAO4J_XXlUrOpVPUn_k9fD7lxLYH.a8QSSjZvPaUfT8yOr_R
- mjCbB5iA.9kegw62AcEic2C4F.p8vG6CF6GWWmX1STg2wCHtxtBiR2wyJWjPwPcKvbYvDPTeGZ_V
- yqNinRI.ZVLFRxQlis2DAHuDPnAZj_rJKY1QGCmUrH5D4JPQYp8dFSzmr1fIvFuw8ujTKSmkg3I1
- 8XPeHA6sAb6foN5wOvLgDqkAJ6qsI7w7SQvElVZG5d2zPma7HBYPopGO2_0oK7iTx1D7kwyr_FZn
- 5ah5A7BAEMRQdL5hN77gGqVCmFr.jS6m1YfIZ0mHwwqtsRXQH.4Lj4xV9BcshI9h6jFhpQTp7sMe
- cRZJMYGcIiqoom7ND4RvGCGo8VMSn3dJb42n.mWMjNSxxZzgE4eQ2bMRHNOAl54KtKGTMZ27Om3Z
- jokdHyyW8oJzkgaGS29g7st9fR0ibjVbLQ4ew.61M9hnuzfiRh6AeYmq2SqOFO6hOXfUMeorSi_c
- vHvInCwobhI0uGM5W_jRQ1KtINhC1OrhvTIFXkJF_3d1ikBD263AgwzLuB_wp1iC9BthrD3Ct6sW
- 5Wtl.IPH55q7vxl_5lZu5E2znp_O3e0q9ZyeE_PvYWS1SmnWbEp1xaCsauZuaqT8AkMJVYzB3P2_
- 3LHcSfSJL4ExEek.H3aF8wARHo1m9.139Lnw4I8a2SSUs2YNbic2dvEpOEm.4rkWMY6igDUpI1xW
- TRAvgB51sIZS0LXx9N4Fy3rmRiDxN1iwShDXvj4BMUoV15SGRhu9GxHtjTkJekWmF0XjBvdRNnfE
- 7OOsaYiKE_vr9FKPGWY5lKBL1REvZAwQjn7bhzSkrbKOcegsx33N4IEjuiuRSymlMZy0DIz_rIjd
- 102GGzYjSskr39oQCr4_zXtEMVESb3OqSdOtH7hwOLpxVPHvsMYq54WcKv8g2lGd9PUl5hTw5kls
- 1JSUQGK9buExMYjlWQbJZyjLmTItfd21FVHQkV6VzRldjUIYzBXO08vxckRrJ9NN0sQB6M8w1SMv
- 3ClaL2Kq_U8IgTyM5BYPSxsghDsdmEE8MNLL3VA7OskkFsB8wteIjYBzj0tK70QVsfSfBsQuQ9pT
- k8ege5MOcRmdwXvQ86p0IbZQadW8hqBZpOngnw2Cw_awXhFEmwJ6al0_bL5Yk4s8isBuEWYzfhto
- j5AXDKYVpy0LfZFDhoZ62Efgp8QfNczbsT.8b4qDsvTZuj0mdEZUCLl5cAFA4D0mpp.UXMT.JvRO
- zzyG8hedwFqynm5UFgdZYItnKg1aoahQ3NcHvTsTkHTMSdwUANfFBqUpgnVmOKGkrFEn8sKmhin3
- n6.mY9HWzLQ7eYn0R5Y92kHmkMvYLelG8UqewJ5WVFta.4Hy1HAkmDw3sCmsMsZzwcsxUBAuNmd2
- 10y.5TatEu5.6uSzpVC4Pxw0wzAqIsrIn88ydhSRYhl5M895pYkUW3Cc3A1H1dbMYH8v319AqXlb
- XHUO2H88SWvvfU1SiKbsQpk0JByRecDLgwhN4qKHvnYLFQXI_PSIVK_B6gsYC5iGHehcUagNeftm
- A2a5Mq8J_T1wk2Yr_8g5xd0mObzUmYhXDI_x8L5Bh_95h3B4QVzqVcL4EQFJvOdYbXHy5ENt1yCw
- A5JpdKpe4YEM-
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: cb97717a-cc82-4c3d-9c52-aff220deed0c
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic307.consmr.mail.ne1.yahoo.com with HTTP; Tue, 10 Dec 2024 16:25:01 +0000
-Received: by hermes--production-gq1-5dd4b47f46-xx4tp (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID ab3978b6ad48dc7e6bf0c5fe9355704c;
-          Tue, 10 Dec 2024 16:24:58 +0000 (UTC)
-Message-ID: <7fb4dd7f-6e89-4587-98d6-fc1a99bbeb88@schaufler-ca.com>
-Date: Tue, 10 Dec 2024 08:24:56 -0800
+	s=arc-20240116; t=1733847959; c=relaxed/simple;
+	bh=rsGi+233XdfkbvdLRb982obVXZtqHqHcvkwQlMBGCog=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O0IupC9BYf+vUdQ3cqIxJiQa9YTd0e7lvlvDbtDzhNdrq56hz6vpt0WqhOGftSlAAi5iSn7ZKRn0JnSD2mIlk+yJL3YvbOzTlJdmd8k5+kxu0xSrc37mLE4oDju3mhuHzKzC0l6LLOFpnW86eUHEcRW/9hIScHzKBiHPWc95LeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iRSQy/EM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733847956;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FNgpTci+3ySJROriztVOC/ztCjjdpwqE655ZgwtCI0c=;
+	b=iRSQy/EM4eL7D8ruFWH4q7ATbRx7EETIhqpPxyrzGK7GqqGcbjW3juchEnZbbZ+e9FMj00
+	B3d9QuZL5f72Cn8yQk0QtA8Y9nZ4IUz3o349+EJRLYgUYKUHt9UCdihKMLl90zrfdu/+oz
+	7gR5jmZXAZWlDZXr2eL/BSLlxseUiE0=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-453-vk6ujlkjMdGzlxCGe1mKXA-1; Tue, 10 Dec 2024 11:25:55 -0500
+X-MC-Unique: vk6ujlkjMdGzlxCGe1mKXA-1
+X-Mimecast-MFC-AGG-ID: vk6ujlkjMdGzlxCGe1mKXA
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7b6e6cf6742so129754185a.3
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 08:25:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733847954; x=1734452754;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FNgpTci+3ySJROriztVOC/ztCjjdpwqE655ZgwtCI0c=;
+        b=ioS5R0WTF44FwkPErGrNfwVDe68KU4k58Jir7kJ32XGUedd9IJkLB2LNubJGAY0r7c
+         SOvy7ItwTAWctpEjNqnzsjbwgQh1/chsyQ6DsimxSumOzxJwX44sXpA79R8dYStxjpmM
+         kCkTIQsIJFAaw+/BjCj0Gczfp4nRmFVelYINIy4c6oMtMiu9zf2GfMSE6+X5n1DEmSt8
+         UXkD3WUaV6S2ekTRNB1Ki7pek6izupEfHe5CszO+3sPJY8E6GccJrCbLB+SqhLXQzGro
+         zYCs8or1g49G1d3ihhrxfSIj0kBtkmC6HMgltepq5H5th4oOW6HDAzeNqgtNxf9lbiVS
+         cRQA==
+X-Gm-Message-State: AOJu0YyprgPcWjfKbqNv5sVvTSUFPX9LudRVc7noXcLnbRhni9o/bY4k
+	8aVH1hlNf+KwzWby6i8Z+/3ZPAk0eomJa/seenJ/BcggoHIqHrDeiYrjAOXUHqDT2NyaYxq/7BC
+	+bYCLaRmkerkxnJTpeVlE14W66AY702Wiad4DxjPccV8yGTiXDZjRuFw0j/CENg==
+X-Gm-Gg: ASbGncu5lPx+kwq5H2NT0mj7rtqYB+y2tx1Eg7/xjvzQxBCzFxlh6ilk7Aqby84lgCr
+	iUKJhcTCx3e/qOnSCNaKHge5VFc1YGWDhr1M++17S9OA4/EDFqHClrHorVRRdIjRltZJscSEXKc
+	Iu7m01e4BjV2a7EgQ6AdkxYPPS7cV2qzc71JOfQc8a3z21SqIniPHnBgSTw3Vpc7M0RcIB7FKq2
+	UhVH+zaPIajxBURFd0pVTmgiSSkkqrfQTxpeTRCI6/wz7rdaYhitqt8mcC7D8VgRjt64zQtkHlu
+	97CJQ+hcZEc2Rw0yljR7/lo6qS9QHg==
+X-Received: by 2002:a05:620a:8904:b0:7b1:4e01:547c with SMTP id af79cd13be357-7b6dce5d359mr782492285a.27.1733847954237;
+        Tue, 10 Dec 2024 08:25:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF8CnWvwfI+O1UBFZtL6u75uiM4VJh/vchjZqPfz9mgw6se83Ieke20R1DwxVI5HeTn8M4qpQ==
+X-Received: by 2002:a05:620a:8904:b0:7b1:4e01:547c with SMTP id af79cd13be357-7b6dce5d359mr782488885a.27.1733847953903;
+        Tue, 10 Dec 2024 08:25:53 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-25-244.business.telecomitalia.it. [87.12.25.244])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b6deb2eb18sm91692085a.39.2024.12.10.08.25.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Dec 2024 08:25:53 -0800 (PST)
+Date: Tue, 10 Dec 2024 17:25:46 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 0/4] vsock/test: Tests for memory leaks
+Message-ID: <gm7qmwewqroqjyengpluw5xdr2mkv5u4fgjrwvly24pc5k2fl7@qelrw3hzq33h>
+References: <20241206-test-vsock-leaks-v1-0-c31e8c875797@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] netfilter: nfnetlink_queue: Fix redundant comparison of
- unsigned value
-To: Florian Westphal <fw@strlen.de>, Karol Przybylski <karprzy7@gmail.com>
-Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
- Casey Schaufler <casey@schaufler-ca.com>
-References: <20241209204918.56943-1-karprzy7@gmail.com>
- <20241209222054.GB4709@breakpoint.cc>
-Content-Language: en-US
-From: Casey Schaufler <casey@schaufler-ca.com>
-In-Reply-To: <20241209222054.GB4709@breakpoint.cc>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.23040 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20241206-test-vsock-leaks-v1-0-c31e8c875797@rbox.co>
 
-On 12/9/2024 2:20 PM, Florian Westphal wrote:
-> Karol Przybylski <karprzy7@gmail.com> wrote:
->
-> [ CC original patch author and mass-trimming CCs ]
->
->> The comparison seclen >= 0 in net/netfilter/nfnetlink_queue.c is redundant because seclen is an unsigned value, and such comparisons are always true.
->>
->> This patch removes the unnecessary comparison replacing it with just 'greater than'
->>
->> Discovered in coverity, CID 1602243
->>
->> Signed-off-by: Karol Przybylski <karprzy7@gmail.com>
->> ---
->>  net/netfilter/nfnetlink_queue.c | 6 +++---
->>  1 file changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
->> index 5110f29b2..eacb34ffb 100644
->> --- a/net/netfilter/nfnetlink_queue.c
->> +++ b/net/netfilter/nfnetlink_queue.c
->> @@ -643,7 +643,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
->>  
->>  	if ((queue->flags & NFQA_CFG_F_SECCTX) && entskb->sk) {
->>  		seclen = nfqnl_get_sk_secctx(entskb, &ctx);
->> -		if (seclen >= 0)
->> +		if (seclen > 0)
->>  			size += nla_total_size(seclen);
-> Casey, can you please have a look?
+Hi Michal,
 
-Yes, there is indeed an issue here. I will look into the correct change today.
-Thank you.
+On Fri, Dec 06, 2024 at 07:34:50PM +0100, Michal Luczaj wrote:
+>Series adds tests for recently fixed memory leaks[1]:
+>
+>d7b0ff5a8667 ("virtio/vsock: Fix accept_queue memory leak")
+>fbf7085b3ad1 ("vsock: Fix sk_error_queue memory leak")
+>60cf6206a1f5 ("virtio/vsock: Improve MSG_ZEROCOPY error handling")
+
+Great! Thanks for these new tests!
 
 >
-> AFAICS security_secid_to_secctx() could return -EFOO, so it seems
-> nfqnl_get_sk_secctx has a bug and should conceal < 0 retvals
-> (the function returns u32), in addition to the always-true >= check
-> fixup.
+>First patch is a non-functional preparatory cleanup.
+>
+>I initially considered triggering (and parsing) a kmemleak scan after each
+>test, but ultimately concluded that the slowdown and the required
+>privileges would be too much.
+
+Yeah, what about adding something in the README to suggest using
+kmemleak and how to check that everything is okay after a run?
+
+I'd suggest also to add something about that in each patch that
+introduce tests where we expects the user to check kmemleak,
+at least with a comment on top of the test functions, and maybe
+also in the commit description.
+
+WDYT?
+
+I left some comments and reported an issue with the last tests.
+
+Thanks,
+Stefano
+
+>
+>[1]: https://lore.kernel.org/netdev/20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co/
+>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+>Michal Luczaj (4):
+>      vsock/test: Use NSEC_PER_SEC
+>      vsock/test: Add test for accept_queue memory leak
+>      vsock/test: Add test for sk_error_queue memory leak
+>      vsock/test: Add test for MSG_ZEROCOPY completion memory leak
+>
+> tools/testing/vsock/vsock_test.c | 159 ++++++++++++++++++++++++++++++++++++++-
+> 1 file changed, 157 insertions(+), 2 deletions(-)
+>---
+>base-commit: 51db5c8943001186be0b5b02456e7d03b3be1f12
+>change-id: 20241203-test-vsock-leaks-38f9559f5636
+>
+>Best regards,
+>-- 
+>Michal Luczaj <mhal@rbox.co>
+>
+
 
