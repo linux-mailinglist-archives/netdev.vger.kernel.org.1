@@ -1,124 +1,113 @@
-Return-Path: <netdev+bounces-150628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 270A99EB047
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:57:11 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 730179EB056
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 13:00:55 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 068EA282E75
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 11:57:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C20171689E9
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 12:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BED019EED6;
-	Tue, 10 Dec 2024 11:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A540A19DFA5;
+	Tue, 10 Dec 2024 12:00:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FG5MXQKe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JZSvx0mu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3170719E99E;
-	Tue, 10 Dec 2024 11:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB2623DEBA;
+	Tue, 10 Dec 2024 12:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733831824; cv=none; b=KtTaVnwuJC7xapV/H7HNSyD5roWXTDRMWcuY7qR7fNL0yE1FksBCVEYciWE7F5i9ub08OOuIety06ySuIdpWjLNQbTa7qF2vzPqYupdkIRWIYIo71kbjnJowli3Lug3TWwkh41HHraRc1F7k4pwSn3VOjluoaO+7xF/A9/H3wRk=
+	t=1733832047; cv=none; b=HGtM0Bzn6KYG+6VxOA1m76DH5nh7/iWvujhzK8ZVKoECQJ9DuvjWL7ez7lkpMzmFghMPIIhCJhrdeqkxUaj6XSVzjlXOS9Zmn2HcEKE6HrDQ4WCqrq1+S5uqSsViEBdyesij5sWFHTRZ/7q69r3yKcPCPkLG8w1yuZ7EMdMVx0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733831824; c=relaxed/simple;
-	bh=+PGdy1a0YaWtqkwxhanaUKLDKgb00Z5XGEDcswMcHeQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iT3V218gx8IHn6NvsPKceZ1Ime2xQ3Pzr3uQo4gZSVkIwYgC1q1N5Lq5KQldUYLE/HRt63VHpRahdL9K2nbVlzbGYdINfWex7CYkokXkYxCyxaYQUvKKyveYHBHOUO87gnRRIrIXHKY4JCG9Zp5Y8ehrhyQW8/ZV6W/pt1BHaNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FG5MXQKe; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733831823; x=1765367823;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+PGdy1a0YaWtqkwxhanaUKLDKgb00Z5XGEDcswMcHeQ=;
-  b=FG5MXQKedHjQ54UiooZmmXs4mpyQwNthB8HVHYwH+wh93wx6rYGgTdnU
-   Y+kufD86Fm2JOA9rKH1rv7yP6tf9Rk3aU0stLbt8wqWZDA7twbIi/q9tg
-   CRigYtAqoKWkpvuKECsLQ/uxhHMd+OMMHHqRS1rs4yC07Xdl8ssh58yCl
-   Q416dTvcS29BPnUecdb3UWQimsQ5WNT16GC6A3QXfKRV1Lw0lNT+JnD+I
-   BPj/jO24ib86M7uZTo3NM53/tKpGYtTs9QB7yyzoYj4+fUV3Yiqx+gztK
-   oYKPy0T+LiW5wb2QRRovccaEoC5Ksfj3GhR/hmld0R7i3AEAo8631tHbM
-   g==;
-X-CSE-ConnectionGUID: HwbFKjI0RN6pAbd3H2TlUA==
-X-CSE-MsgGUID: 4ozj2VfRSjKubIdR2sXw/Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="37954873"
-X-IronPort-AV: E=Sophos;i="6.12,222,1728975600"; 
-   d="scan'208";a="37954873"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 03:57:02 -0800
-X-CSE-ConnectionGUID: 4O8P+dp1SIKQONr/Asa4MQ==
-X-CSE-MsgGUID: qVlaJWULQuicI7j0PYSbjQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,222,1728975600"; 
-   d="scan'208";a="100341171"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa005.jf.intel.com with ESMTP; 10 Dec 2024 03:56:58 -0800
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id EF9852FC51;
-	Tue, 10 Dec 2024 11:56:56 +0000 (GMT)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com
-Cc: apw@canonical.com,
-	joe@perches.com,
-	dwaipayanray1@gmail.com,
-	lukas.bulwahn@gmail.com,
-	akpm@linux-foundation.org,
-	willemb@google.com,
-	edumazet@google.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH iwl-next] fixup! devlink: add devlink_fmsg_dump_skb() function
-Date: Tue, 10 Dec 2024 12:56:20 +0100
-Message-Id: <20241210115620.3141094-1-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1733832047; c=relaxed/simple;
+	bh=u44ZzZ9eJTAT0sf5MXYiGMa0FE/s7isOKW9Y0ZPiuK8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Va870A+u7w04s+NI4nwcToncA5agbZ9lqAA3VoIDRVgczeEocBxdcL3jHWdsQ5SW6ZNIGvw/0jpA1ivyaBB5UqF0aN1bNPyeno9Vo3L1C8URJEiYrwwULEj8UGasiy75UCoe3rBwpnWaRBukfTf9faB8Tqz5kDv8+RKLqrM7WXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JZSvx0mu; arc=none smtp.client-ip=209.85.160.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-29fe7ff65e6so516104fac.0;
+        Tue, 10 Dec 2024 04:00:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733832045; x=1734436845; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=CeuXANmGOguSDViAcZD5/L/A/tELl/y8XnKm6SR/fLw=;
+        b=JZSvx0muV136GY3sm1j5FkND4oYU8GmwyEgPi92Tq8ElPMxeWZ5uRg+jqIYfritsje
+         sdrFFra5dmrivXzXy0M0izb7iwdGdDjDKjWARoGl4cyh35QX72QiGkHKl5kJzv8ST6Z8
+         5eI3h1HGNqeO2OoNOF53+W+CTaVTh3M7+dHbUQ6ez5+15bx+6NDhfk4eK3BUDL4IpR6r
+         cZnzLr04XdqYu6N5m00m/vg2MDqhNktje1AD6dxaPKzC/SQlX6N/YSd5bBQThUn/LDZ5
+         lwSTF71oajQ3KiMogokaznCWVAo/FFWQGCf77pn+Gn10BWDgUJ9j9fhQ+UQpwNBtrTMt
+         YCiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733832045; x=1734436845;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CeuXANmGOguSDViAcZD5/L/A/tELl/y8XnKm6SR/fLw=;
+        b=trIkVXroRHNLSi0TFo/pGHl4z9B8nSg/7fTBR67HPrWOVd8/Pev36n42aYNMzY7ZIE
+         MEBvmul+Q7ku6Uo1/PFnzQI+Kf/JgEoIk/Ty/pvumPC7klzqcz0ZSyiy4lDEAOWjJRGn
+         9CHGGhkyvimS1paWkqr5h6t/dtqsn7k5JcIfCnTT5aT2zI4Jdqc0957WdHBHSelyXMii
+         88Vrlg+fYxAjZuzIwHX/KBv9MgVUkz1dLLZ1puxVCpMq9fGplJ4rmU+TvxWIZGt5XTpE
+         YzHSk0+lR7/87GBielfPzT/BqRTg2et34SHSZhnZZjh9L0bnN4J3dPwIMPH8X75MxgbC
+         D2PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUQ2WPBclxH7tbNBTT/Jh4uvgvSPp1kw401udw3PK4hocWDehackviqmKFevT7YbTSMP1jMItI6LhR2QY1YSg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzrbjx3+84v0bNwuPpNwhma1ZVrhNNtGxa7XpMrDDs0sCStgWB9
+	7yt8NfxrdcW74CEbLiy/BhWR0jtuQhfwTko9IGe+RQaWwPRrucuvcGoKpuiBrePEJtSLQtMt/zw
+	5hVShHn4JV2QoJmLHvek2jiws4LU=
+X-Gm-Gg: ASbGncswKdUzoQKrqxsnuolaBzYfluMvU2phSVFqlrRQ1HdM4uhB4MhySqHIDH+BDrG
+	iH/9DJzaA8iVJ6u3dmXijotUQRiBzypi7eqz4EE6qAdRa3beSwHbdaphs//6q+GPALA==
+X-Google-Smtp-Source: AGHT+IEGTQ41KcjLQ4BiabwNoGuT16egEOvqFz0KXrZneZuslSGeftUpiWoAQbExXvvxlryZDrqPOZEnnOsfqz+325A=
+X-Received: by 2002:a05:6870:64a7:b0:296:aef8:fe9a with SMTP id
+ 586e51a60fabf-29fee50a8cdmr2406739fac.7.1733832044955; Tue, 10 Dec 2024
+ 04:00:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241203130655.45293-1-donald.hunter@gmail.com>
+ <20241203130655.45293-5-donald.hunter@gmail.com> <20241203180714.45a2af81@kernel.org>
+ <CAD4GDZyXDpbEoVFBzU-ExYcd_Gf-hHocPUFWAXBXJOcmMRrnSg@mail.gmail.com>
+In-Reply-To: <CAD4GDZyXDpbEoVFBzU-ExYcd_Gf-hHocPUFWAXBXJOcmMRrnSg@mail.gmail.com>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Tue, 10 Dec 2024 12:00:33 +0000
+Message-ID: <CAD4GDZwwjZvc1YXogJFdmqAA-1W66DdjYpxAKucmVQFDzbyY6w@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 4/7] tools/net/ynl: accept IP string inputs
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Johannes Berg <johannes@sipsolutions.net>, linux-wireless@vger.kernel.org, 
+	donald.hunter@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Tony!
+On Wed, 4 Dec 2024 at 13:37, Donald Hunter <donald.hunter@gmail.com> wrote:
+>
+> On Wed, 4 Dec 2024 at 02:07, Jakub Kicinski <kuba@kernel.org> wrote:
+> >
+> > > +        if display_hint in ['ipv4', 'ipv6']:
+> > > +            ip = ipaddress.ip_address(string)
+> > > +            if type == 'binary':
+> > > +                raw = ip.packed
+> > > +            else:
+> > > +                raw = int(ip)
+> > > +        else:
+> >
+> > I wonder if we should raise in this case?
+> > Especially if type is binary passing the string back will just blow up
+> > later, right? We could instead rise with a nice clear error message
+> > here.
+>
+> It's actually a bit misleading that the attr is called 'string'
+> because it could be a binary input if it was supplied from python
+> code, i.e. not parsed from JSON on the command-line.
 
-In the commit related to "devlink-health dump" the sparse reports new issue.
-It has been also reported some time ago by Simon:
-https://lore.kernel.org/netdev/20240822104007.GL2164@kernel.org/
-
-Please squash this change into to devlink-health series, the link for the
-last sent version is here:
-https://lore.kernel.org/netdev/20240821133714.61417-1-przemyslaw.kitszel@intel.com/
-
-Thanks in advance
-Mateusz
-
-CC: Simon Horman <horms@kernel.org>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
----
- net/devlink/health.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/devlink/health.c b/net/devlink/health.c
-index 3f6241d51007..57db6799722a 100644
---- a/net/devlink/health.c
-+++ b/net/devlink/health.c
-@@ -1270,7 +1270,7 @@ void devlink_fmsg_dump_skb(struct devlink_fmsg *fmsg, const struct sk_buff *skb)
- 			 has_trans ? skb_network_header_len(skb) : -1);
- 	devlink_fmsg_put(fmsg, "transport hdr",
- 			 has_trans ? skb->transport_header : -1);
--	devlink_fmsg_put(fmsg, "csum", skb->csum);
-+	devlink_fmsg_put(fmsg, "csum", (__force u32)skb->csum);
- 	devlink_fmsg_put(fmsg, "csum_ip_summed", (u8)skb->ip_summed);
- 	devlink_fmsg_put(fmsg, "csum_complete_sw", !!skb->csum_complete_sw);
- 	devlink_fmsg_put(fmsg, "csum_valid", !!skb->csum_valid);
--- 
-2.38.1
-
+I was wrong, the binary input is handled already by the caller, so
+this should just raise an exception.
 
