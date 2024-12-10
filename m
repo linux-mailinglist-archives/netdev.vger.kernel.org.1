@@ -1,126 +1,218 @@
-Return-Path: <netdev+bounces-150733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 134979EB5C7
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 17:15:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF989EB5E2
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 17:17:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 806A518826BC
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:15:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B485188BFAE
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 16:16:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF8331BD004;
-	Tue, 10 Dec 2024 16:15:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D501BD004;
+	Tue, 10 Dec 2024 16:16:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hPZf5H1B"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="aUXQVVkR";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="JUXK9X3L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED8E1AAA15;
-	Tue, 10 Dec 2024 16:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFEC1B423F;
+	Tue, 10 Dec 2024 16:16:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733847300; cv=none; b=EKFy394M0FhezenoHT9le7XriXn37zAMlJeDCZ4UtO1n9l94EGd2Fu8twTfty+zOn2k/CnrxeGCR+DkVEyA+cuq8xp87cuiX9qfIvEIc/+k3ipGaOYvfWnO9f4lyn7a1sLVvC2dITIJEHmUZWEUMgWWEWjn72wAMGuN7/rgQeLk=
+	t=1733847379; cv=none; b=cUcVHG+TY95M6JqAC9qyCg6P421ZSiEPphUxMXzcVVQ5Gm9SJlL6DbyBM0rKnvcmy17Ol0M7/TEC9B/neMWe1mUmlX3IM0y06oZkVgMWuQyLQc383Q85FOQc5Fu4nmppgKhUnQ//KgnpCxA7zu8b92XmtBy1Cqv93BRs5hrI748=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733847300; c=relaxed/simple;
-	bh=31VPjuhtUqs5XTJZjLWo1bnT/4FHbU4/2zRNq1awM5E=;
+	s=arc-20240116; t=1733847379; c=relaxed/simple;
+	bh=viUmSs0HvGY4X79TSdydr20WipmovPOTq5y6AzuszwU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oEvSJu85E7sacZDilXxPKKeQFQrgw1SP/y3wwi9uYiNv+YlHQoqGJfxPUYN9mNm4oNmSyCEGJW3J4X7v3fGygxAG30P/0nHUGDGCXXZa+/6KnVzH6XvRg0LHcFt0riE11CfxJfH2UXPGJ8WgjYt1Vgu9ocVlnBalqAb+UZwnrLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hPZf5H1B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE5F7C4CEDE;
-	Tue, 10 Dec 2024 16:14:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733847300;
-	bh=31VPjuhtUqs5XTJZjLWo1bnT/4FHbU4/2zRNq1awM5E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hPZf5H1BVBX/7HcnkYtV2DylIp1rLFxLRcczmtRuCwwQ2Fov8LtGizL9CXhSrQ6EQ
-	 nfebIG+lJ8optZmTp/AFpDHHlZvHutvEUOtQWE8qTTsZp7qmhsFKnf5dVNugXqLaIK
-	 IRpNPpTBEEIevy7tDYZNRQi6FAfxcPzF0OWoPxfZJxfyiPgKcPZO6aVWQFMWl6mTzp
-	 ybDC/yirdvVia+jlDVS1pzPAKeJ/NHk05mUuKRZXieyAclX5H97oQNV7KUBQVhM9A0
-	 wYs8BPZSzWrsel9pQIywsnafcIRsbqzYuzJ1z0ZPrktZcWKiCmwD3Npl4tFTXs6KGd
-	 I/hWgMZfLyPag==
-Date: Tue, 10 Dec 2024 11:14:58 -0500
-From: Sasha Levin <sashal@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH AUTOSEL 5.4 20/28] net: enetc: add i.MX95 EMDIO support
-Message-ID: <Z1hpArZhTewykeE4@sashalap>
-References: <20241124135549.3350700-1-sashal@kernel.org>
- <20241124135549.3350700-20-sashal@kernel.org>
- <PAXPR04MB8510442A46C2F25FF783E899882E2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QF+oNcq9j7rh/OWKefNY3yszhp0oQJK4st7+B92JzId41mK/zG190FWpHLHHKSrqbhhoaOMD8/fmHpSFcUPQD4q5/03rhSyn1In47JrPC16ODLEkVNNVl4giUfdo03lizBdxIH7Q5ITqGFixjH0xCzOQsageMq6QzdGH4pddgdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=aUXQVVkR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=JUXK9X3L; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 1A287254015A;
+	Tue, 10 Dec 2024 11:16:14 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Tue, 10 Dec 2024 11:16:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1733847373; x=
+	1733933773; bh=oD7elXkrVIabNJ1sH7sT/UFc6vHA8qZV5oZsH/wBIvE=; b=a
+	UXQVVkRq+nlYoAXiUrOeOo0UWA5CvuErTkd4LN2ZPiC4LRwanfFurVCLq9LDSAu5
+	PvucFTL65Mvv1SbGC42rQ1qxAb4iZV6stTHyI+g/sI2NS8qK9DtoDogPvSHuGMO2
+	gd5bDxWFmQVewtEeeDGWLYcQcyNKVew4HFLu6YbnEt9iKzxwEMAoSa3rZf/22cuj
+	ZtrW+wHPbCjeWn9k3VbUCo7vl8Wis+JWamKbxyfO0+l2z6ahdQswgDt1qfnoDmMx
+	fcN7LI0WJwv2JVe5TaPuIGR3Qztxo5P2XJDAbNPtx3PsgXqkzPrBcg5c7IOezQvj
+	u3Vn/6foOAoW0M1nYt+vw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1733847373; x=1733933773; bh=oD7elXkrVIabNJ1sH7sT/UFc6vHA8qZV5oZ
+	sH/wBIvE=; b=JUXK9X3LJfPR/oMAUCJOsq5BhRYTMa1vl9WOcEGW2fTQ99FKGlw
+	UeoiZbGJK0Dz7EVc2OHkpMbkAKOtr8LbVXuWjlJEKOeAJXZntgwar1dmPpFr3xIM
+	0GMECvj2enumHG9TCUAAYvEEssY1wt2/YLLy9bdNh4A0906ky/Mu4pKMjDIvlM3O
+	myjdipGeWp0355AOA6dRBqgr0zqhxph++Ok4y2P3rTJAv8oGEgK3U8MWaFNoPsKM
+	UaHxqCuUN1VqkI1LU7YkRS0Q987CJMeXBsgNVcbz5NWUkvi8Oj0TsU7Jevtrh57p
+	uqTZ+IIVKzqGVTciyE4ve1bzDY22a/Qrp0w==
+X-ME-Sender: <xms:TGlYZ2BLF02PdMzLCDBLw4ArpIbECMkrRc9-CtaAi9X5eUwHRyOHOA>
+    <xme:TGlYZwh0GcWHyJiDcgrHxrxLmfJ4h-qjzm7C9dm3wIoTUbubmNVxAYPuBwhffXzBc
+    5gptUcpYDGnW4LEvOo>
+X-ME-Received: <xmr:TGlYZ5nv1ajhV3oXbvU5HjxzZqebIRuUhPo9zN910mGCSSLtHWd3CFaOsXnZ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrjeekgdekhecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
+    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
+    hlrdhnvghtqeenucggtffrrghtthgvrhhnpedukeeiieejvdefudfgieeiudejieehiefh
+    keeiffehgfehleduieefgfeujeekjeenucffohhmrghinhepihgvthhfrdhorhhgnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepshgusehquhgv
+    rghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedufedpmhhouggvpehsmhhtph
+    houhhtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehn
+    vghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehvfhgvughorh
+    gvnhhkohesnhhovhgvkhdrrhhupdhrtghpthhtohepfhhkrhgvnhiivghlsehrvgguhhgr
+    thdrtghomhdprhgtphhtthhopehkuhhnihihuhesrghmrgiiohhnrdgtohhmpdhrtghpth
+    htoheprghpohhorhhvkhhosegrmhgriihonhdrtghomhdprhgtphhtthhopegsohhrihhs
+    phesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhohhhnrdhfrghsthgrsggvnhguse
+    hgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:TGlYZ0zmSeyabU5v0U-V7-mbGJ8wL6F9prV4Gbag6AlN1o0WTEMJ7A>
+    <xmx:TGlYZ7Qas3JGPQMgMaYUIw-5-UWGBk8RbrxqcQIrqQy-Mszj66kG0w>
+    <xmx:TGlYZ_ayFvdbyOAa5GPxR-0eYsV5QxtX9HjbHCHYqT8oXZ8M_m3_uw>
+    <xmx:TGlYZ0TI2Fr83HEssJhWt7pH49vV2h9pg3pmyozIG7wm_QagHwTbbg>
+    <xmx:TWlYZ5CZZXtUDzoER9w2UytJm_ZFG72sfcelgWM1TWGTcBvw5aMPhj3q>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 10 Dec 2024 11:16:11 -0500 (EST)
+Date: Tue, 10 Dec 2024 17:16:09 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vfedorenko@novek.ru>,
+	Frantisek Krenzelok <fkrenzel@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Apoorv Kothari <apoorvko@amazon.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v4 1/6] tls: block decryption when a rekey is
+ pending
+Message-ID: <Z1hpSbYKgytCFiPG@hog>
+References: <cover.1731597571.git.sd@queasysnail.net>
+ <327cb575d15fa5c5379f9c38a5132d78953fb648.1731597571.git.sd@queasysnail.net>
+ <20241203194701.48e74c8e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <PAXPR04MB8510442A46C2F25FF783E899882E2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+In-Reply-To: <20241203194701.48e74c8e@kernel.org>
 
-On Mon, Nov 25, 2024 at 01:54:14AM +0000, Wei Fang wrote:
->> From: Wei Fang <wei.fang@nxp.com>
->>
->> [ Upstream commit a52201fb9caa9b33b4d881725d1ec733438b07f2 ]
->>
->> The verdor ID and device ID of i.MX95 EMDIO are different from LS1028A
->> EMDIO, so add new vendor ID and device ID to pci_device_id table to support
->> i.MX95 EMDIO.
->>
->> Signed-off-by: Wei Fang <wei.fang@nxp.com>
->> Signed-off-by: David S. Miller <davem@davemloft.net>
->> Signed-off-by: Sasha Levin <sashal@kernel.org>
->> ---
->>  drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
->> b/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
->> index fbd41ce01f068..aeffc3bd00afe 100644
->> --- a/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
->> +++ b/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
->> @@ -3,6 +3,8 @@
->>  #include <linux/of_mdio.h>
->>  #include "enetc_mdio.h"
->>
->> +#define NETC_EMDIO_VEN_ID	0x1131
->> +#define NETC_EMDIO_DEV_ID	0xee00
->>  #define ENETC_MDIO_DEV_ID	0xee01
->>  #define ENETC_MDIO_DEV_NAME	"FSL PCIe IE Central MDIO"
->>  #define ENETC_MDIO_BUS_NAME	ENETC_MDIO_DEV_NAME " Bus"
->> @@ -85,6 +87,7 @@ static void enetc_pci_mdio_remove(struct pci_dev *pdev)
->>
->>  static const struct pci_device_id enetc_pci_mdio_id_table[] = {
->>  	{ PCI_DEVICE(PCI_VENDOR_ID_FREESCALE, ENETC_MDIO_DEV_ID) },
->> +	{ PCI_DEVICE(NETC_EMDIO_VEN_ID, NETC_EMDIO_DEV_ID) },
->>  	{ 0, } /* End of table. */
->>  };
->>  MODULE_DEVICE_TABLE(pci, enetc_pci_mdio_id_table);
->> --
->> 2.43.0
->
->Hi Sasha,
->
->This patch does not need to be backported, because this is a new
->feature which adds the EMDIO support for i.MX95 NETC. And i.MX95
->NETC is supported in the latest kernel (should be 6.13, Linus tree).
+2024-12-03, 19:47:01 -0800, Jakub Kicinski wrote:
+> On Thu, 14 Nov 2024 16:50:48 +0100 Sabrina Dubroca wrote:
+> > +static int tls_check_pending_rekey(struct tls_context *ctx, struct sk_buff *skb)
+> > +{
+> > +	const struct tls_msg *tlm = tls_msg(skb);
+> > +	const struct strp_msg *rxm = strp_msg(skb);
+> > +	char hs_type;
+> > +	int err;
+> > +
+> > +	if (likely(tlm->control != TLS_RECORD_TYPE_HANDSHAKE))
+> > +		return 0;
+> > +
+> > +	if (rxm->full_len < 1)
+> > +		return -EINVAL;
+> > +
+> > +	err = skb_copy_bits(skb, rxm->offset, &hs_type, 1);
+> > +	if (err < 0)
+> > +		return err;
+> > +
+> > +	if (hs_type == TLS_HANDSHAKE_KEYUPDATE) {
+> > +		struct tls_sw_context_rx *rx_ctx = ctx->priv_ctx_rx;
+> > +
+> > +		WRITE_ONCE(rx_ctx->key_update_pending, true);
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  static int tls_rx_one_record(struct sock *sk, struct msghdr *msg,
+> >  			     struct tls_decrypt_arg *darg)
+> >  {
+> > @@ -1739,6 +1769,10 @@ static int tls_rx_one_record(struct sock *sk, struct msghdr *msg,
+> >  	rxm->full_len -= prot->overhead_size;
+> >  	tls_advance_record_sn(sk, prot, &tls_ctx->rx);
+> >  
+> > +	err = tls_check_pending_rekey(tls_ctx, darg->skb);
+> > +	if (err < 0)
+> > +		return err;
+> 
+> Sorry if I already asked this, is this 100% safe to error out from here
+> after we decrypted the record? Normally once we successfully decrypted
+> and pulled the message header / trailer we always call tls_rx_rec_done()
 
-I'll drop it, thanks!
+This is the same thing tls_rx_one_record does when tls_decrypt_sw
+fails. Return <0 immediately, let the caller deal with the fallout. In
+the case where tls_padding_length fails, tls_decrypt_sw has an extra
+consume_skb though.
+
+Returning an error here will make tls_rx_one_record() also return an
+error, and when that happens we always call tls_err_abort(). It's a
+big hammer, but it should be safe.
+
+> The only reason the check_pending_rekey() can fail is if the message is
+> mis-formatted, I wonder if we are better off ignoring mis-formatted
+> rekeys? User space will see them and break the connection, anyway.
+> Alternatively - we could add a selftest for this.
+
+
+Going back to tls_check_pending_rekey():
+
+> > +	if (rxm->full_len < 1)
+> > +		return -EINVAL;
+
+There's no real reason to fail here, we should probably just ignore
+it. It's not a rekey, and it's not a valid handshake message, but one
+could say that's not the kernel's problem. I'll make that return 0
+unless you want to keep -EINVAL.
+
+Hard to write a selftest for because we'd have to do a sendmsg with
+len=0, or do the crypto in the selftest.
+
+> > +	err = skb_copy_bits(skb, rxm->offset, &hs_type, 1);
+> > +	if (err < 0)
+> > +		return err;
+
+This probably means that the skb we got from the parser was broken. If
+we can't read 1B with full_len >= 1, something's wrong. Maybe worth a
+DEBUG_NET_WARN_ON_ONCE?
+
+> > +	if (hs_type == TLS_HANDSHAKE_KEYUPDATE) {
+
+Here I don't actually check if it's a correct KeyUpdate message [1],
+we pause decryption and let userspace decide what to do (probably
+break the connection as you said).
+
+[1] https://datatracker.ietf.org/doc/html/rfc8446#page-25
+    https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3
+
+> > +		struct tls_sw_context_rx *rx_ctx = ctx->priv_ctx_rx;
+> > +
+> > +		WRITE_ONCE(rx_ctx->key_update_pending, true);
+> > +	}
+> > +
+> > +	return 0;
+> > +}
 
 -- 
-Thanks,
-Sasha
+Sabrina
 
