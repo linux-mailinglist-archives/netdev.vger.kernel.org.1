@@ -1,706 +1,305 @@
-Return-Path: <netdev+bounces-150553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83D299EA9FE
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 08:46:49 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAC2F1644E9
-	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 07:46:40 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 511D222D4DC;
-	Tue, 10 Dec 2024 07:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="EpTiGHy2"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A899E9EAA05
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 08:49:31 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01DF622D4C6
-	for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 07:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733816640; cv=none; b=YP+Xan2/nNucGui6soZ4dO9ovPKn20h//47sVRIGiOtoURiXNsgbTzhSh6tleaCUuNau1aKL6h3LRHPziM8f2CWnF/Fi+9lat0x4d4nf6b//I0BCljzYqTSeL6dNj+CEJo9MKMJkb3NCgT5OjM+NC0uwqnpHt7lXEw3yYEcSlJg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733816640; c=relaxed/simple;
-	bh=GXhEEupLz9NHFgqbUtR+AF0dpYu9UlUPS00nqy4FlfU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VuDIQx6qLK49lZgo2eofa9vTp+ATUxlL76wPyZKfnyQ/nV1TGZXzoYEGvKXh6WpGHw06RU+j0fUvKfkicBGVBexPataw/UAb2iy+2Kc+ZHr+z3h3OalwqleunqXMRGY7Lbi1bxaBurgZTnEP6gOnz6bYMo7R47Q6Dg120qZYnBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=EpTiGHy2; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1733816571; x=1765352571;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=iWuuyFKxXDQyuhxUrgxHMl1arVcV93vrAWfmKAePXdE=;
-  b=EpTiGHy2d3vIbNv4wquu9qWLnfmQ+IyXrWY90DXMQGOShjv+ptCdVwm/
-   2eGftkg96najiCXO5627cEFHfxWoJ5L+Wx7hCzeC4Dk/lVIai8V4evG4B
-   XaoHk9Gvx925dMzRIbzbxtRFGZahzL9UGXa+rlwdIV+HlZa/1165x4Bxa
-   c=;
-X-IronPort-AV: E=Sophos;i="6.12,221,1728950400"; 
-   d="scan'208";a="4585323"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 07:42:49 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:7606]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.73:2525] with esmtp (Farcaster)
- id 337a6b50-6e81-4e17-8f48-e15ce38862e7; Tue, 10 Dec 2024 07:43:55 +0000 (UTC)
-X-Farcaster-Flow-ID: 337a6b50-6e81-4e17-8f48-e15ce38862e7
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 10 Dec 2024 07:43:55 +0000
-Received: from 6c7e67c6786f.amazon.com (10.143.88.19) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 10 Dec 2024 07:43:51 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next 15/15] socket: Rename sock_create_kern() to sock_create_net_noref().
-Date: Tue, 10 Dec 2024 16:38:29 +0900
-Message-ID: <20241210073829.62520-16-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241210073829.62520-1-kuniyu@amazon.com>
-References: <20241210073829.62520-1-kuniyu@amazon.com>
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59BB1280575
+	for <lists+netdev@lfdr.de>; Tue, 10 Dec 2024 07:49:30 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CA217BB2E;
+	Tue, 10 Dec 2024 07:49:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="E31XszqS"
+X-Original-To: netdev@vger.kernel.org
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2057.outbound.protection.outlook.com [40.107.20.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698B94C81;
+	Tue, 10 Dec 2024 07:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733816967; cv=fail; b=lc7LQLghbuwGVu0/7u3OF/AWoPI0aLxPV5p9/5wacjRA05101k3ACdGdymGhn/0smLzWyi8Z9d18NmhzFiQ10JTo6ReUAjcrxqxmycIQ7BXrhSoxu+DorxaP+sLDVAwi+rkwm47N0Nat+kuLF4Bcc0pvDcxAwKDZDjdQYr2MD1g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733816967; c=relaxed/simple;
+	bh=Abv3Q/mEO0p4kgy3TJADAz8M/mZ8TuRcTWVVL38DmW8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=KS0ve6KtMtWx77mzjv7t6tCvxRJLDn31tzroe2lAetmFlKSVeZ1WXER9QdHOcABU5cnz15wGWQi1AhA7j5VX/l67E8YTmvwuG4iQcKNFcIcS6Xjv1xYb+Fm6Wcu9WgHreWh8QvLiXnJNT4WPKvXAXOPQfHkx+0JeYkQlt9l87p4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=E31XszqS; arc=fail smtp.client-ip=40.107.20.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=a55Kua38V3qHFJiTKJ4H0n22jbqW+EmpKM6KJQI6Bl1JE1CZlqVEySMDq3re9byd6B2vA/nxIxWGZr0CY6KQX+uNytZsOM4esnEcgLU5+N5m96g0E3Hlpm89RFoyVVjhtA6JCj01s7kkv9sX53CuamF9iTOmUOUrRFSTLhNELt0UJcVEwZZw3+qlxzisBXv/AdcLIV/X0zy9qkfkesCN12AH39r5tVSgdY1OgSPM3oSOobhIjnMqNbLDpqle7ibDxaBz5TaK07A/onWqmnTIO3/bKNlybhEcaj2JxbCOEnJFjs6fgKyeQ5XUPEnLyNuoaPyp4QIsqCsbb2BI3Grn/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Abv3Q/mEO0p4kgy3TJADAz8M/mZ8TuRcTWVVL38DmW8=;
+ b=xhQ/TehPmiRNhzzyCYFvK869yMCRl93n2igGK5FltyGtAW72Xu7YG8bxc1HVR20aoHT5SWV5znUmfaB1ok2zlxwV7ufrw6ctoQgQw3rz0JdxXPWYratD7tmgqgO5hjbKkntpHumEHclhHOZg/r7auVt6Q5AJp0eZIrCQrC5gaQVGWsosPRixXaUpod9c0ZlHaIScmDF5oC0HPfNRsXeEWv4toGmm9KyPjnccWrC0ndjKMx/mvHlyNm4DeSlb1DoDtmToliUNng0moQxYpEBZ30eEcK7L54YvdYR79B2SyIPDmm3apY8gAyF9h19l6nB85SN/wT6DzygFGUbPvYFWlQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Abv3Q/mEO0p4kgy3TJADAz8M/mZ8TuRcTWVVL38DmW8=;
+ b=E31XszqS1mt0KdoUIS4MdUEOHoc0+MJN48SPL2yPoV7I5EXn5Ami8DbvRVwpB61r7A5bTnJevraJFLah7QdLoj3a6B8uBZPhYmsVpfNz9iBq3WUoki9b7Q1uIA8pFGj8NFiq48Zul0AF2dbvujLhT1ft/Hiy4ETo2YmupxkuwkSc1ut6QqLMboADjtl6P8NDim2/qxZ/OeOcxPCHkMhcwyyt41c3yqJ0ClJdX5IIMFFZRL/fXjp6mU/PmIMpQEqx1Mjp25nqsvN/xFw/wKpHzuhHWi3O0quDWM1K828dulxa1JmmFysQHl7xOSJdDOjhpeqV1Ot8ituq4djiIXxCCQ==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by PAXPR04MB9254.eurprd04.prod.outlook.com (2603:10a6:102:2bc::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.11; Tue, 10 Dec
+ 2024 07:49:20 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8230.016; Tue, 10 Dec 2024
+ 07:49:18 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Ido Schimmel <idosch@idosch.org>, "tom@herbertland.com"
+	<tom@herbertland.com>
+CC: Simon Horman <horms@kernel.org>, Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, Frank Li <frank.li@nxp.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>
+Subject: RE: [PATCH v6 RESEND net-next 1/5] net: enetc: add Rx checksum
+ offload for i.MX95 ENETC
+Thread-Topic: [PATCH v6 RESEND net-next 1/5] net: enetc: add Rx checksum
+ offload for i.MX95 ENETC
+Thread-Index:
+ AQHbRg+5C4mdptfiA06bM4c11AC4ErLY9OWAgAAMdbCAACfMAIAAAliggANZW4CAAp3McA==
+Date: Tue, 10 Dec 2024 07:49:18 +0000
+Message-ID:
+ <PAXPR04MB85101F4E12086B8E0A471580883D2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20241204052932.112446-1-wei.fang@nxp.com>
+ <20241204052932.112446-2-wei.fang@nxp.com> <20241206092329.GH2581@kernel.org>
+ <PAXPR04MB85101D0EE82ED8EEF48A588988312@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20241206123030.GM2581@kernel.org>
+ <PAXPR04MB85107FD857F1AB33BBE4F70988312@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <Z1W_kSMUp3lsLPr_@shredder>
+In-Reply-To: <Z1W_kSMUp3lsLPr_@shredder>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|PAXPR04MB9254:EE_
+x-ms-office365-filtering-correlation-id: 7f8b2df3-8307-44a2-a223-08dd18ef271c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?gb2312?B?cDEzSkw5bmFvOUc5QzhXKzBlUmVIa2JmWVB4TmtjTEVRbnJEalVMRVl5TXd3?=
+ =?gb2312?B?M00wU1JRWThKMGk3c29yL00yR25kaStmT3MzYXVET3ovS25VMFF6bkxtSEU2?=
+ =?gb2312?B?a2xqYlM3RW1ZVmQrek9ZajVsR0hzYzUwYUlXZ3NMSE4zeTFPMVg4QkR6dGxN?=
+ =?gb2312?B?ZHM0UnJXNzRpR3ROZ2tnajN0T2tRZGZSVnZvYVRLd282cUlMRVhIeG5ERnVp?=
+ =?gb2312?B?K2RZK2ZFUXZORG8ycWlyM0l2bmFRVVVxL3h2aVp5T0Uwd1U5M2pPMWM3dWZa?=
+ =?gb2312?B?SlNoWDlxTm43ZmozSjJnckhZVDlkK2tPOGwvNldFWDhCZ1NNYWtrV0hWOFVn?=
+ =?gb2312?B?STc2Q2dDQjl1MGhMbU5EUFRWL2N6THN0QmdZb3hYdWpsZ24rR1JpNnNjNVg0?=
+ =?gb2312?B?OHBvZENvcFo3VEwydnQ4amQ1Zm9QT2pDRk0rbFhlZGJmeHRJVStrajhhdGlt?=
+ =?gb2312?B?a3V4MXVKNXl0TFo5RGNlZWFkT0dyM1hiUEJWVzBQS01mRGhEOTk0aGpmZTdD?=
+ =?gb2312?B?aXRMSjRubEFrdlh4RHpLRWNXbUNKMXlmR0luQVRtQmwxamx3c1B6ZWpzbGU1?=
+ =?gb2312?B?T3JKQThmRGlhM0lIVzVGRXF2b3hNVncrVHNaYW1PRUV4Q3Y1cmF2RkhQSzAy?=
+ =?gb2312?B?QjE3ekZ4R0NtNGZwNDd3T0YrdWcveUpLUG1VLzk3VDBiMEtnSE5BMDNmVy9l?=
+ =?gb2312?B?VW11RmVyODZiMmNRSlNkem5wVzMyZS9qREk3L01ZNlJxOE9wKzg5TTM3WWJE?=
+ =?gb2312?B?czhxc0NIaHhGK2RwbFNHV1krL2RmZnlncUdUZk0yb1RtU3QvZ1lEcitSQXRk?=
+ =?gb2312?B?dCs5TWZEbHVqdVJFaldHVjREZW5Lci83RTFPcGo4QmVNUjUwMDZtWHRLZnM1?=
+ =?gb2312?B?UzJzTTJEaWh0RU9XVG5IeGMwVUVXRjQyREtFWUhVM3RIMExEV1MwemYrYUhx?=
+ =?gb2312?B?RTBkdCtHUkhyaXNUSkNoSzIxTG1VS3ZCVG9WKytwa1pZNGFUaVJtRHA4NFFp?=
+ =?gb2312?B?dXRnWnNqQXU5VzV6aktFc2ZnZkJWcVFWWW40YTI4WGtYd1NreSs0cTZWZUxY?=
+ =?gb2312?B?eTJ2L1JsRXFXMWZ2amRROFZIQzlQUjJTQlhJUkdBUXBZK0dscWJJVUVjOU9H?=
+ =?gb2312?B?RmQ1TzFzTjJJRnJiaGFtK29XQkQ2Skg0QzJ2dUVaSk0vU1FUeWxFUFZUSEcy?=
+ =?gb2312?B?Q0pIaDh4UHNaVVNaTW5QcmpqWnFjdVdWWVlGRWViR1Vha2paRG5pTlhlY094?=
+ =?gb2312?B?WUNLM2xQcW9CczJ6eW1vaFFROHV1NWtnRC9LeGhxQ1FWMmVTc3ZwSk9EWGpK?=
+ =?gb2312?B?ZUppZHRlRHl5cEpDZ21tcStyUFJEQnJNemkvK05FeDVIbXlQR1pra29Xamw0?=
+ =?gb2312?B?emdsa2NWWUU3Nm9FSTRGRFh6TjVHUGFwNWlVR3NWODBTMWM5ZytqdTRyYU1p?=
+ =?gb2312?B?NjlxM2JDRE43VFpUUEVmUWhueFo5Vlc3Z1ozdGJuRlgzY2VXTTlLdThlMVBN?=
+ =?gb2312?B?d1NmSTl4N3FxWDlQdTJ3MEdCcWx4ajNHQXVtTmxLemRBRGNnMzI1VnFvNXZq?=
+ =?gb2312?B?bXBQSExmeWMrV3RxN3dVOHhDREh3RFpMdHI4TkUxYUhvL1VnR0lSdi9qbXNV?=
+ =?gb2312?B?MUxTL3RkZEM2YzAveUdnWW45RFM1UWZOT0NOemVqRTViMHFXZFVVTGJWc3Vi?=
+ =?gb2312?B?SGIwSnVPN2pzY2VNMDVXYTdCVFN0c056T2g5WklQYjNzRXV0M3hCbS9nYUw4?=
+ =?gb2312?B?QlVkN3c4ejFMRWlpd2tDcXR0ZkpkY3RmQTF0Z3J0eUZMeHpqb254NlVYWEFs?=
+ =?gb2312?B?YW9mQStMZ3FoSVVleUxraVlDVTAyOTNTbEErcnJPNW9NUW5aT2ZuWVdyQjRl?=
+ =?gb2312?B?NjIxUnE5b2gzeHRrVkhuVkxkemVCVW8vSnl4Y21mRWR1ZkE9PQ==?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:zh-cn;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?gb2312?B?TDUxZ0N5azFpQ0JhazA0VnhBQjcxRmY3MElITFo4VXlqUjEyQjVFMjVpcGRm?=
+ =?gb2312?B?SVowNXRlVy9hcmdXaGFraTkzbW1xaXpEYmVzbzFVd2xKSzloZjBvbGtpcWky?=
+ =?gb2312?B?ZUxLcTBrV2VWK2J0ay9zM1Y5MzBHNzc5N0t4VjNGUUFGUnJTdFA5SXNqcWNH?=
+ =?gb2312?B?SUQzU3NYbXNSOWJwbDlycnVBNWFOQ29hemxWL0Q2aEdkdW5pM2pnVHUyVGRn?=
+ =?gb2312?B?RGNlL05uT1RVZ3BFZzF1ZlJNOCtCOENjWUltb0JNNk93eWhBdzZhMUg2eGJi?=
+ =?gb2312?B?elJmQUJJWFJwSHNTakFzOFI4Rnp4K2JHc3djWUpkU29Kclp4ZmdUYjlEbXNu?=
+ =?gb2312?B?ckJ2QmlrMXJUK1hxOEp5K2MzcnJjbHdDNnBuZWVqRXF4YWxraHhXckp3TWRZ?=
+ =?gb2312?B?eUQ1d2pmelRJdU9mejFZM3J2Y2hLUGV1OE1VbU9PVnZndjhnWFlrVWVQRnY5?=
+ =?gb2312?B?VE1tRWRLeHphVFh5QkhEQ3VzWmlkejIwSWkzWmt2cDRUQ29CUHFtaC9RNm5p?=
+ =?gb2312?B?d0JETXRCaVZBTjJOQXpFN2NNeE5pVEJTMW80cFNzTG9FVGEyVnZ0MG4zV0Ir?=
+ =?gb2312?B?Z01kM1k4ZUFUaEtRYS9DYUVsQnN6c2JGd1l3VnpHNjl0R3AvQjFoV0x1TVJq?=
+ =?gb2312?B?MEJxdGdIV3VvUDB6SUNla1d0a25QN21yS29VS0cvT3B4UElySmVkblEwd3Az?=
+ =?gb2312?B?QkEzR2lBaVdmOGZpcXpNWGVpeXNDbmYyYTB3TGltejlCVW94NVJSSjhiSWtH?=
+ =?gb2312?B?SVl2L1E2QytGTFBhY0RSRUVsQ3NqamxPM2w4eXFyM3l3WFlXOCtrZFdKTHBz?=
+ =?gb2312?B?TWw5dGttZFYreUhUVmptdDNhUWdIZ3FEM1Z0YWVrQmM3eG03VDZSa3pwbDlz?=
+ =?gb2312?B?YndhWGhFVFdBUUFVaHRXMFFZSTI4cUhTOTV0Vk9DMy9SVEZLRUJkelJiTEVQ?=
+ =?gb2312?B?NjhMVUp6Y1B4R0JLUmFGdkxuZmdaZXVBSVdTTnV0ZWhpeGZwUzJ4YlZGd1E1?=
+ =?gb2312?B?aU1WclFkS2JjVm8zVGNDbHJWL3I5NWlhMldCUEgyQzdvamdGcmdMdmlxZW4w?=
+ =?gb2312?B?WUMvdHdraVJpMmhmWG8zWFh5em1zVTlDWUoxc1pta3FhN3pBUG9yT00ySjI3?=
+ =?gb2312?B?eTEwbEFMZFJ3Z3lvK3pJOTM5T29abnVsUW9HVmtvUmRuSVFJRnpvQitFK2Yv?=
+ =?gb2312?B?QzdJUmdxWnlUZDQyYWU2VVoxa25aNzBTb0ZMR0ZzVTN4MnhRK1gxYjMwSFMv?=
+ =?gb2312?B?Z2lXSEtwQ0VmOVNXa2hndHI2d3VRUnFrUlZmUnFHckppR1U1VWhHYXhnZ0o1?=
+ =?gb2312?B?ZytMeFlsOVpxRTFTbzdjVWQyUytiTU1DMnhhMWhRSHNUaUlMN1c4S291Nmk2?=
+ =?gb2312?B?Q1BNNW9obFllN3NsZEdsdTFlQlpxS0dqaEJ3TlpSanFIZVZ2RW90VlRtRTlE?=
+ =?gb2312?B?N2FCNm9lbDIzbWdIdXZoYVU3YXdtQkU0Q0I5dkFPWFZkd1ZqTVVFOTBMNXk2?=
+ =?gb2312?B?d0R2M1JBU1p6LzdmUkc0Q00zbVA5VytyU1lYWXZXcVY3QVFtR2E4ZEJKWXlt?=
+ =?gb2312?B?UnJCMlhkai9MbitMRWZCdXdjTjNycHVXRVl4R2pmS2lFSGFCajV1MWIxVk9s?=
+ =?gb2312?B?Z2lOZmpNZWRPZm1aMStrZnJKRngzNnl1SlhZbHN2MVpWZlFOQzVYWS9lM3dz?=
+ =?gb2312?B?YXloMnZqTDJMNUVIRW0xQ2xSc2pVWkpXdEZ5UmxESGF0QUpiblBVcnhOZWxG?=
+ =?gb2312?B?UmlJejdIaHhRc0lheXdMWDgyT1BSZW0wOFlIaUV4anZPU0ZmaFlUSGdKMmM5?=
+ =?gb2312?B?Vm1Xd1lVdVZ5YkYzaDZVaDUvZzVoa0xGTkIyL2xBZ0oxbXQwMVExYjNlaWF3?=
+ =?gb2312?B?cHYwN3B1andRRExiNW1vMG5Xb3JUMmt1cnNSaXpZcW5VU0pSTkFaMUVJeU9P?=
+ =?gb2312?B?SDJDOUFCTmdoQm5nSmFKMXhOWldtWk4yREVSbGMrWkVuY09DN0NCRzBnamtl?=
+ =?gb2312?B?N1BJL2VIbVJDanZGdGlrejVZQ2NQeTQyWmJoWmo1VlowWC8rd1ZxUTFCUXlK?=
+ =?gb2312?B?U2ZaRGc0TnZ4dUhWQXlNYUpWeEJ5TFZ5b1RpczE1eCt4STYzY2ZPcytJZnA0?=
+ =?gb2312?Q?sH5g=3D?=
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWA001.ant.amazon.com (10.13.139.103) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f8b2df3-8307-44a2-a223-08dd18ef271c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Dec 2024 07:49:18.8445
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +l5iw7Nmi2dOr+G3g5EHXefLdBjq5h7U2GUUNI59mLx1Z/JOPnq4IGrnEdEJFxvLuvIhdRQ2p7gQGiQH/gtSaQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9254
 
-sock_create_kern() is quite a bad name, and the non-netdev folks tend
-to use it without taking care of the netns lifetime.
-
-Since commit 26abe14379f8 ("net: Modify sk_alloc to not reference count
-the netns of kernel sockets."), TCP sockets created by sock_create_kern()
-have caused many use-after-free.
-
-Let's rename sock_create_kern() to sock_create_net_noref() and add fat
-documentation so that we no longer introduce the same issue in the future.
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- drivers/block/drbd/drbd_receiver.c            | 12 +++----
- drivers/infiniband/sw/rxe/rxe_qp.c            |  2 +-
- drivers/soc/qcom/qmi_interface.c              |  4 +--
- fs/afs/rxrpc.c                                |  3 +-
- fs/dlm/lowcomms.c                             |  8 ++---
- include/linux/net.h                           |  3 +-
- net/9p/trans_fd.c                             |  8 ++---
- net/bluetooth/rfcomm/core.c                   |  3 +-
- net/ceph/messenger.c                          |  6 ++--
- net/handshake/handshake-test.c                |  3 +-
- net/ipv4/af_inet.c                            |  3 +-
- net/ipv4/udp_tunnel_core.c                    |  2 +-
- net/ipv6/ip6_udp_tunnel.c                     |  4 +--
- net/l2tp/l2tp_core.c                          |  8 ++---
- net/mctp/test/route-test.c                    |  6 ++--
- net/mptcp/pm_netlink.c                        |  4 +--
- net/mptcp/subflow.c                           |  2 +-
- net/netfilter/ipvs/ip_vs_sync.c               |  8 ++---
- net/qrtr/ns.c                                 |  6 ++--
- net/rds/tcp_listen.c                          |  4 +--
- net/rxrpc/rxperf.c                            |  4 +--
- net/sctp/socket.c                             |  2 +-
- net/smc/smc_inet.c                            |  2 +-
- net/socket.c                                  | 35 +++++++++++++------
- net/sunrpc/clnt.c                             |  4 +--
- net/sunrpc/svcsock.c                          |  2 +-
- net/sunrpc/xprtsock.c                         |  6 ++--
- net/tipc/topsrv.c                             |  4 +--
- net/wireless/nl80211.c                        |  4 +--
- .../selftests/bpf/bpf_testmod/bpf_testmod.c   |  4 +--
- 30 files changed, 92 insertions(+), 74 deletions(-)
-
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 0c9f54197768..39be44e5db8a 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -618,9 +618,9 @@ static struct socket *drbd_try_connect(struct drbd_connection *connection)
- 	peer_addr_len = min_t(int, connection->peer_addr_len, sizeof(src_in6));
- 	memcpy(&peer_in6, &connection->peer_addr, peer_addr_len);
- 
--	what = "sock_create_kern";
--	err = sock_create_kern(&init_net, ((struct sockaddr *)&src_in6)->sa_family,
--			       SOCK_STREAM, IPPROTO_TCP, &sock);
-+	what = "sock_create_net_noref";
-+	err = sock_create_net_noref(&init_net, ((struct sockaddr *)&src_in6)->sa_family,
-+				    SOCK_STREAM, IPPROTO_TCP, &sock);
- 	if (err < 0) {
- 		sock = NULL;
- 		goto out;
-@@ -713,9 +713,9 @@ static int prepare_listen_socket(struct drbd_connection *connection, struct acce
- 	my_addr_len = min_t(int, connection->my_addr_len, sizeof(struct sockaddr_in6));
- 	memcpy(&my_addr, &connection->my_addr, my_addr_len);
- 
--	what = "sock_create_kern";
--	err = sock_create_kern(&init_net, ((struct sockaddr *)&my_addr)->sa_family,
--			       SOCK_STREAM, IPPROTO_TCP, &s_listen);
-+	what = "sock_create_net_noref";
-+	err = sock_create_net_noref(&init_net, ((struct sockaddr *)&my_addr)->sa_family,
-+				    SOCK_STREAM, IPPROTO_TCP, &s_listen);
- 	if (err) {
- 		s_listen = NULL;
- 		goto out;
-diff --git a/drivers/infiniband/sw/rxe/rxe_qp.c b/drivers/infiniband/sw/rxe/rxe_qp.c
-index 91d329e90308..250673cf6cbf 100644
---- a/drivers/infiniband/sw/rxe/rxe_qp.c
-+++ b/drivers/infiniband/sw/rxe/rxe_qp.c
-@@ -241,7 +241,7 @@ static int rxe_qp_init_req(struct rxe_dev *rxe, struct rxe_qp *qp,
- 	/* if we don't finish qp create make sure queue is valid */
- 	skb_queue_head_init(&qp->req_pkts);
- 
--	err = sock_create_kern(&init_net, AF_INET, SOCK_DGRAM, 0, &qp->sk);
-+	err = sock_create_net_noref(&init_net, AF_INET, SOCK_DGRAM, 0, &qp->sk);
- 	if (err < 0)
- 		return err;
- 	qp->sk->sk->sk_user_data = (void *)(uintptr_t)qp->elem.index;
-diff --git a/drivers/soc/qcom/qmi_interface.c b/drivers/soc/qcom/qmi_interface.c
-index bc6d6379d8b1..eb5a64f6fd6f 100644
---- a/drivers/soc/qcom/qmi_interface.c
-+++ b/drivers/soc/qcom/qmi_interface.c
-@@ -588,8 +588,8 @@ static struct socket *qmi_sock_create(struct qmi_handle *qmi,
- 	struct socket *sock;
- 	int ret;
- 
--	ret = sock_create_kern(&init_net, AF_QIPCRTR, SOCK_DGRAM,
--			       PF_QIPCRTR, &sock);
-+	ret = sock_create_net_noref(&init_net, AF_QIPCRTR, SOCK_DGRAM,
-+				    PF_QIPCRTR, &sock);
- 	if (ret < 0)
- 		return ERR_PTR(ret);
- 
-diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
-index 9f2a3bb56ec6..7443fe801894 100644
---- a/fs/afs/rxrpc.c
-+++ b/fs/afs/rxrpc.c
-@@ -44,7 +44,8 @@ int afs_open_socket(struct afs_net *net)
- 
- 	_enter("");
- 
--	ret = sock_create_kern(net->net, AF_RXRPC, SOCK_DGRAM, PF_INET6, &socket);
-+	ret = sock_create_net_noref(net->net, AF_RXRPC, SOCK_DGRAM, PF_INET6,
-+				    &socket);
- 	if (ret < 0)
- 		goto error_1;
- 
-diff --git a/fs/dlm/lowcomms.c b/fs/dlm/lowcomms.c
-index df40c3fd1070..b0450aff4cd4 100644
---- a/fs/dlm/lowcomms.c
-+++ b/fs/dlm/lowcomms.c
-@@ -1579,8 +1579,8 @@ static int dlm_connect(struct connection *con)
- 	}
- 
- 	/* Create a socket to communicate with */
--	result = sock_create_kern(&init_net, dlm_local_addr[0].ss_family,
--				  SOCK_STREAM, dlm_proto_ops->proto, &sock);
-+	result = sock_create_net_noref(&init_net, dlm_local_addr[0].ss_family,
-+				       SOCK_STREAM, dlm_proto_ops->proto, &sock);
- 	if (result < 0)
- 		return result;
- 
-@@ -1760,8 +1760,8 @@ static int dlm_listen_for_all(void)
- 	if (result < 0)
- 		return result;
- 
--	result = sock_create_kern(&init_net, dlm_local_addr[0].ss_family,
--				  SOCK_STREAM, dlm_proto_ops->proto, &sock);
-+	result = sock_create_net_noref(&init_net, dlm_local_addr[0].ss_family,
-+				       SOCK_STREAM, dlm_proto_ops->proto, &sock);
- 	if (result < 0) {
- 		log_print("Can't create comms socket: %d", result);
- 		return result;
-diff --git a/include/linux/net.h b/include/linux/net.h
-index 1ba4abb18863..582faf2fdd08 100644
---- a/include/linux/net.h
-+++ b/include/linux/net.h
-@@ -254,7 +254,8 @@ bool sock_is_registered(int family);
- int sock_create_user(int family, int type, int proto, struct socket **res);
- int sock_create_net(struct net *net, int family, int type, int proto,
- 		    struct socket **res);
--int sock_create_kern(struct net *net, int family, int type, int proto, struct socket **res);
-+int sock_create_net_noref(struct net *net, int family, int type, int proto,
-+			  struct socket **res);
- int sock_create_lite(int family, int type, int proto, struct socket **res);
- struct socket *sock_alloc(void);
- void sock_release(struct socket *sock);
-diff --git a/net/9p/trans_fd.c b/net/9p/trans_fd.c
-index 83f81da24727..ae014999040f 100644
---- a/net/9p/trans_fd.c
-+++ b/net/9p/trans_fd.c
-@@ -1011,8 +1011,8 @@ p9_fd_create_tcp(struct p9_client *client, const char *addr, char *args)
- 	sin_server.sin_family = AF_INET;
- 	sin_server.sin_addr.s_addr = in_aton(addr);
- 	sin_server.sin_port = htons(opts.port);
--	err = sock_create_kern(current->nsproxy->net_ns, PF_INET,
--			       SOCK_STREAM, IPPROTO_TCP, &csocket);
-+	err = sock_create_net_noref(current->nsproxy->net_ns, PF_INET,
-+				    SOCK_STREAM, IPPROTO_TCP, &csocket);
- 	if (err) {
- 		pr_err("%s (%d): problem creating socket\n",
- 		       __func__, task_pid_nr(current));
-@@ -1062,8 +1062,8 @@ p9_fd_create_unix(struct p9_client *client, const char *addr, char *args)
- 
- 	sun_server.sun_family = PF_UNIX;
- 	strcpy(sun_server.sun_path, addr);
--	err = sock_create_kern(current->nsproxy->net_ns, PF_UNIX,
--			       SOCK_STREAM, 0, &csocket);
-+	err = sock_create_net_noref(current->nsproxy->net_ns, PF_UNIX,
-+				    SOCK_STREAM, 0, &csocket);
- 	if (err < 0) {
- 		pr_err("%s (%d): problem creating socket\n",
- 		       __func__, task_pid_nr(current));
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index ad5177e3a69b..d641b12468f4 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -200,7 +200,8 @@ static int rfcomm_l2sock_create(struct socket **sock)
- 
- 	BT_DBG("");
- 
--	err = sock_create_kern(&init_net, PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP, sock);
-+	err = sock_create_net_noref(&init_net, PF_BLUETOOTH, SOCK_SEQPACKET,
-+				    BTPROTO_L2CAP, sock);
- 	if (!err) {
- 		struct sock *sk = (*sock)->sk;
- 		sk->sk_data_ready   = rfcomm_l2data_ready;
-diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
-index d1b5705dc0c6..cb6a1532ff9f 100644
---- a/net/ceph/messenger.c
-+++ b/net/ceph/messenger.c
-@@ -442,10 +442,10 @@ int ceph_tcp_connect(struct ceph_connection *con)
- 	     ceph_pr_addr(&con->peer_addr));
- 	BUG_ON(con->sock);
- 
--	/* sock_create_kern() allocates with GFP_KERNEL */
-+	/* sock_create_net_noref() allocates with GFP_KERNEL */
- 	noio_flag = memalloc_noio_save();
--	ret = sock_create_kern(read_pnet(&con->msgr->net), ss.ss_family,
--			       SOCK_STREAM, IPPROTO_TCP, &sock);
-+	ret = sock_create_net_noref(read_pnet(&con->msgr->net), ss.ss_family,
-+				    SOCK_STREAM, IPPROTO_TCP, &sock);
- 	memalloc_noio_restore(noio_flag);
- 	if (ret)
- 		return ret;
-diff --git a/net/handshake/handshake-test.c b/net/handshake/handshake-test.c
-index 4f300504f3e5..54793f9e4d30 100644
---- a/net/handshake/handshake-test.c
-+++ b/net/handshake/handshake-test.c
-@@ -145,7 +145,8 @@ static void handshake_req_alloc_case(struct kunit *test)
- 
- static int handshake_sock_create(struct socket **sock)
- {
--	return sock_create_kern(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP, sock);
-+	return sock_create_net_noref(&init_net, PF_INET, SOCK_STREAM,
-+				     IPPROTO_TCP, sock);
- }
- 
- static void handshake_req_submit_test1(struct kunit *test)
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index d22bb0d3ddc1..03c3854f382a 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -1644,8 +1644,9 @@ int inet_ctl_sock_create(struct sock **sk, unsigned short family,
- 			 struct net *net)
- {
- 	struct socket *sock;
--	int rc = sock_create_kern(net, family, type, protocol, &sock);
-+	int rc;
- 
-+	rc = sock_create_net_noref(net, family, type, protocol, &sock);
- 	if (rc == 0) {
- 		*sk = sock->sk;
- 		(*sk)->sk_allocation = GFP_ATOMIC;
-diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
-index 619a53eb672d..e8e079ebca36 100644
---- a/net/ipv4/udp_tunnel_core.c
-+++ b/net/ipv4/udp_tunnel_core.c
-@@ -15,7 +15,7 @@ int udp_sock_create4(struct net *net, struct udp_port_cfg *cfg,
- 	struct socket *sock = NULL;
- 	struct sockaddr_in udp_addr;
- 
--	err = sock_create_kern(net, AF_INET, SOCK_DGRAM, 0, &sock);
-+	err = sock_create_net_noref(net, AF_INET, SOCK_DGRAM, 0, &sock);
- 	if (err < 0)
- 		goto error;
- 
-diff --git a/net/ipv6/ip6_udp_tunnel.c b/net/ipv6/ip6_udp_tunnel.c
-index c99053189ea8..65d859c7d9c4 100644
---- a/net/ipv6/ip6_udp_tunnel.c
-+++ b/net/ipv6/ip6_udp_tunnel.c
-@@ -18,10 +18,10 @@ int udp_sock_create6(struct net *net, struct udp_port_cfg *cfg,
- 		     struct socket **sockp)
- {
- 	struct sockaddr_in6 udp6_addr = {};
--	int err;
- 	struct socket *sock = NULL;
-+	int err;
- 
--	err = sock_create_kern(net, AF_INET6, SOCK_DGRAM, 0, &sock);
-+	err = sock_create_net_noref(net, AF_INET6, SOCK_DGRAM, 0, &sock);
- 	if (err < 0)
- 		goto error;
- 
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index 369a2f2e459c..e43534185f45 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -1494,8 +1494,8 @@ static int l2tp_tunnel_sock_create(struct net *net,
- 		if (cfg->local_ip6 && cfg->peer_ip6) {
- 			struct sockaddr_l2tpip6 ip6_addr = {0};
- 
--			err = sock_create_kern(net, AF_INET6, SOCK_DGRAM,
--					       IPPROTO_L2TP, &sock);
-+			err = sock_create_net_noref(net, AF_INET6, SOCK_DGRAM,
-+						    IPPROTO_L2TP, &sock);
- 			if (err < 0)
- 				goto out;
- 
-@@ -1522,8 +1522,8 @@ static int l2tp_tunnel_sock_create(struct net *net,
- 		{
- 			struct sockaddr_l2tpip ip_addr = {0};
- 
--			err = sock_create_kern(net, AF_INET, SOCK_DGRAM,
--					       IPPROTO_L2TP, &sock);
-+			err = sock_create_net_noref(net, AF_INET, SOCK_DGRAM,
-+						    IPPROTO_L2TP, &sock);
- 			if (err < 0)
- 				goto out;
- 
-diff --git a/net/mctp/test/route-test.c b/net/mctp/test/route-test.c
-index 8551dab1d1e6..f1b2cf0c8b48 100644
---- a/net/mctp/test/route-test.c
-+++ b/net/mctp/test/route-test.c
-@@ -310,7 +310,7 @@ static void __mctp_route_test_init(struct kunit *test,
- 	rt = mctp_test_create_route(&init_net, dev->mdev, 8, 68);
- 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, rt);
- 
--	rc = sock_create_kern(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
-+	rc = sock_create_net_noref(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
- 	KUNIT_ASSERT_EQ(test, rc, 0);
- 
- 	addr.smctp_family = AF_MCTP;
-@@ -568,7 +568,7 @@ static void mctp_test_route_input_sk_keys(struct kunit *test)
- 	rt = mctp_test_create_route(&init_net, dev->mdev, 8, 68);
- 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, rt);
- 
--	rc = sock_create_kern(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
-+	rc = sock_create_net_noref(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
- 	KUNIT_ASSERT_EQ(test, rc, 0);
- 
- 	msk = container_of(sock->sk, struct mctp_sock, sk);
-@@ -994,7 +994,7 @@ static void mctp_test_route_output_key_create(struct kunit *test)
- 	rt = mctp_test_create_route(&init_net, dev->mdev, dst, 68);
- 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, rt);
- 
--	rc = sock_create_kern(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
-+	rc = sock_create_net_noref(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
- 	KUNIT_ASSERT_EQ(test, rc, 0);
- 
- 	dev->mdev->addrs = kmalloc(sizeof(u8), GFP_KERNEL);
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index 7a0f7998376a..3dc40a364fb2 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -1083,8 +1083,8 @@ static int mptcp_pm_nl_create_listen_socket(struct sock *sk,
- 	int backlog = 1024;
- 	int err;
- 
--	err = sock_create_kern(sock_net(sk), entry->addr.family,
--			       SOCK_STREAM, IPPROTO_MPTCP, &entry->lsk);
-+	err = sock_create_net_noref(sock_net(sk), entry->addr.family,
-+				    SOCK_STREAM, IPPROTO_MPTCP, &entry->lsk);
- 	if (err)
- 		return err;
- 
-diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-index e7e8972bdfca..7162873a232a 100644
---- a/net/mptcp/subflow.c
-+++ b/net/mptcp/subflow.c
-@@ -1953,7 +1953,7 @@ static int subflow_ulp_init(struct sock *sk)
- 	int err = 0;
- 
- 	/* disallow attaching ULP to a socket unless it has been
--	 * created with sock_create_kern()
-+	 * created with sock_create_net()
- 	 */
- 	if (!sk->sk_kern_sock) {
- 		err = -EOPNOTSUPP;
-diff --git a/net/netfilter/ipvs/ip_vs_sync.c b/net/netfilter/ipvs/ip_vs_sync.c
-index 3402675bf521..e97cd30f196a 100644
---- a/net/netfilter/ipvs/ip_vs_sync.c
-+++ b/net/netfilter/ipvs/ip_vs_sync.c
-@@ -1470,8 +1470,8 @@ static int make_send_sock(struct netns_ipvs *ipvs, int id,
- 	int result, salen;
- 
- 	/* First create a socket */
--	result = sock_create_kern(ipvs->net, ipvs->mcfg.mcast_af, SOCK_DGRAM,
--				  IPPROTO_UDP, &sock);
-+	result = sock_create_net_noref(ipvs->net, ipvs->mcfg.mcast_af, SOCK_DGRAM,
-+				       IPPROTO_UDP, &sock);
- 	if (result < 0) {
- 		pr_err("Error during creation of socket; terminating\n");
- 		goto error;
-@@ -1527,8 +1527,8 @@ static int make_receive_sock(struct netns_ipvs *ipvs, int id,
- 	int result, salen;
- 
- 	/* First create a socket */
--	result = sock_create_kern(ipvs->net, ipvs->bcfg.mcast_af, SOCK_DGRAM,
--				  IPPROTO_UDP, &sock);
-+	result = sock_create_net_noref(ipvs->net, ipvs->bcfg.mcast_af, SOCK_DGRAM,
-+				       IPPROTO_UDP, &sock);
- 	if (result < 0) {
- 		pr_err("Error during creation of socket; terminating\n");
- 		goto error;
-diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
-index 3de9350cbf30..2f8f347150c0 100644
---- a/net/qrtr/ns.c
-+++ b/net/qrtr/ns.c
-@@ -692,8 +692,8 @@ int qrtr_ns_init(void)
- 	INIT_LIST_HEAD(&qrtr_ns.lookups);
- 	INIT_WORK(&qrtr_ns.work, qrtr_ns_worker);
- 
--	ret = sock_create_kern(&init_net, AF_QIPCRTR, SOCK_DGRAM,
--			       PF_QIPCRTR, &qrtr_ns.sock);
-+	ret = sock_create_net_noref(&init_net, AF_QIPCRTR, SOCK_DGRAM,
-+				    PF_QIPCRTR, &qrtr_ns.sock);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -735,7 +735,7 @@ int qrtr_ns_init(void)
- 	 *  qrtr module is inserted successfully.
- 	 *
- 	 * However, the reference count is increased twice in
--	 * sock_create_kern(): one is to increase the reference count of owner
-+	 * sock_create_net_noref(): one is to increase the reference count of owner
- 	 * of qrtr socket's proto_ops struct; another is to increment the
- 	 * reference count of owner of qrtr proto struct. Therefore, we must
- 	 * decrement the module reference count twice to ensure that it keeps
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index 440ac9057148..202afd77b532 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -289,8 +289,8 @@ struct socket *rds_tcp_listen_init(struct net *net, bool isv6)
- 	int addr_len;
- 	int ret;
- 
--	ret = sock_create_kern(net, isv6 ? PF_INET6 : PF_INET, SOCK_STREAM,
--			       IPPROTO_TCP, &sock);
-+	ret = sock_create_net_noref(net, isv6 ? PF_INET6 : PF_INET, SOCK_STREAM,
-+				    IPPROTO_TCP, &sock);
- 	if (ret < 0) {
- 		rdsdebug("could not create %s listener socket: %d\n",
- 			 isv6 ? "IPv6" : "IPv4", ret);
-diff --git a/net/rxrpc/rxperf.c b/net/rxrpc/rxperf.c
-index 7ef93407be83..1c784d449a6b 100644
---- a/net/rxrpc/rxperf.c
-+++ b/net/rxrpc/rxperf.c
-@@ -182,8 +182,8 @@ static int rxperf_open_socket(void)
- 	struct socket *socket;
- 	int ret;
- 
--	ret = sock_create_kern(&init_net, AF_RXRPC, SOCK_DGRAM, PF_INET6,
--			       &socket);
-+	ret = sock_create_net_noref(&init_net, AF_RXRPC, SOCK_DGRAM, PF_INET6,
-+				    &socket);
- 	if (ret < 0)
- 		goto error_1;
- 
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index e49904f08559..fb8ed0290a4a 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -1328,7 +1328,7 @@ static int __sctp_setsockopt_connectx(struct sock *sk, struct sockaddr *kaddrs,
- 		return err;
- 
- 	/* in-kernel sockets don't generally have a file allocated to them
--	 * if all they do is call sock_create_kern().
-+	 * if all they do is call sock_create_net_noref().
- 	 */
- 	if (sk->sk_socket->file)
- 		flags = sk->sk_socket->file->f_flags;
-diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
-index a944e7dcb8b9..dbd76070e05e 100644
---- a/net/smc/smc_inet.c
-+++ b/net/smc/smc_inet.c
-@@ -111,7 +111,7 @@ static struct inet_protosw smc_inet6_protosw = {
- static unsigned int smc_sync_mss(struct sock *sk, u32 pmtu)
- {
- 	/* No need pass it through to clcsock, mss can always be set by
--	 * sock_create_kern or smc_setsockopt.
-+	 * sock_create_net or smc_setsockopt.
- 	 */
- 	return 0;
- }
-diff --git a/net/socket.c b/net/socket.c
-index 992de3dd94b8..8f45d17e52c3 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -1665,23 +1665,36 @@ int sock_create_net(struct net *net, int family, int type, int protocol,
- EXPORT_SYMBOL(sock_create_net);
- 
- /**
-- *	sock_create_kern - creates a socket (kernel space)
-- *	@net: net namespace
-- *	@family: protocol family (AF_INET, ...)
-- *	@type: communication type (SOCK_STREAM, ...)
-- *	@protocol: protocol (0, ...)
-- *	@res: new socket
-+ * sock_create_net_noref - creates a socket for kernel space
-+ *
-+ * @net: net namespace
-+ * @family: protocol family (AF_INET, ...)
-+ * @type: communication type (SOCK_STREAM, ...)
-+ * @protocol: protocol (0, ...)
-+ * @res: new socket
-  *
-- *	A wrapper around __sock_create().
-- *	Returns 0 or an error. This function internally uses GFP_KERNEL.
-+ * Creates a new socket and assigns it to @res, passing through LSM.
-+ *
-+ * The socket is for kernel space and should not be exposed to
-+ * userspace via a file descriptor nor BPF hooks except for LSM
-+ * (see inet_create(), inet_release(), etc).
-+ *
-+ * The socket DOES NOT hold a reference count of @net to allow it to
-+ * be removed; the caller MUST ensure that the socket is always freed
-+ * before @net.
-+ *
-+ * @net MUST be alive as of calling sock_create_net_noref().
-+ *
-+ * Context: Process context. This function internally uses GFP_KERNEL.
-+ * Return: 0 or an error.
-  */
- 
--int sock_create_kern(struct net *net, int family, int type, int protocol,
--		     struct socket **res)
-+int sock_create_net_noref(struct net *net, int family, int type, int protocol,
-+			  struct socket **res)
- {
- 	return __sock_create(net, family, type, protocol, res, true, false);
- }
--EXPORT_SYMBOL(sock_create_kern);
-+EXPORT_SYMBOL(sock_create_net_noref);
- 
- static struct socket *__sys_socket_create(int family, int type, int protocol)
- {
-diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
-index 37935082d799..4e8723403e07 100644
---- a/net/sunrpc/clnt.c
-+++ b/net/sunrpc/clnt.c
-@@ -1450,8 +1450,8 @@ static int rpc_sockname(struct net *net, struct sockaddr *sap, size_t salen,
- 	struct socket *sock;
- 	int err;
- 
--	err = sock_create_kern(net, sap->sa_family,
--			       SOCK_DGRAM, IPPROTO_UDP, &sock);
-+	err = sock_create_net_noref(net, sap->sa_family,
-+				    SOCK_DGRAM, IPPROTO_UDP, &sock);
- 	if (err < 0) {
- 		dprintk("RPC:       can't create UDP socket (%d)\n", err);
- 		goto out;
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index cde5765f6f81..e20465c20b16 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1529,7 +1529,7 @@ static struct svc_xprt *svc_create_socket(struct svc_serv *serv,
- 	if (protocol == IPPROTO_TCP)
- 		error = sock_create_net(net, family, type, protocol, &sock);
- 	else
--		error = sock_create_kern(net, family, type, protocol, &sock);
-+		error = sock_create_net_noref(net, family, type, protocol, &sock);
- 	if (error < 0)
- 		return ERR_PTR(error);
- 
-diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-index f3e139c30442..e793914d48f6 100644
---- a/net/sunrpc/xprtsock.c
-+++ b/net/sunrpc/xprtsock.c
-@@ -1927,7 +1927,7 @@ static struct socket *xs_create_sock(struct rpc_xprt *xprt,
- 	if (protocol == IPPROTO_TCP)
- 		err = sock_create_net(xprt->xprt_net, family, type, protocol, &sock);
- 	else
--		err = sock_create_kern(xprt->xprt_net, family, type, protocol, &sock);
-+		err = sock_create_net_noref(xprt->xprt_net, family, type, protocol, &sock);
- 	if (err < 0) {
- 		dprintk("RPC:       can't create %d transport socket (%d).\n",
- 				protocol, -err);
-@@ -1999,8 +1999,8 @@ static int xs_local_setup_socket(struct sock_xprt *transport)
- 	struct socket *sock;
- 	int status;
- 
--	status = sock_create_kern(xprt->xprt_net, AF_LOCAL,
--				  SOCK_STREAM, 0, &sock);
-+	status = sock_create_net_noref(xprt->xprt_net, AF_LOCAL,
-+				       SOCK_STREAM, 0, &sock);
- 	if (status < 0) {
- 		dprintk("RPC:       can't create AF_LOCAL "
- 			"transport socket (%d).\n", -status);
-diff --git a/net/tipc/topsrv.c b/net/tipc/topsrv.c
-index 8ee0c07d00e9..2e03391c1bd1 100644
---- a/net/tipc/topsrv.c
-+++ b/net/tipc/topsrv.c
-@@ -515,7 +515,7 @@ static int tipc_topsrv_create_listener(struct tipc_topsrv *srv)
- 	struct sock *sk;
- 	int rc;
- 
--	rc = sock_create_kern(srv->net, AF_TIPC, SOCK_SEQPACKET, 0, &lsock);
-+	rc = sock_create_net_noref(srv->net, AF_TIPC, SOCK_SEQPACKET, 0, &lsock);
- 	if (rc < 0)
- 		return rc;
- 
-@@ -553,7 +553,7 @@ static int tipc_topsrv_create_listener(struct tipc_topsrv *srv)
- 	 * after TIPC module is inserted successfully.
- 	 *
- 	 * However, the reference count is ever increased twice in
--	 * sock_create_kern(): one is to increase the reference count of owner
-+	 * sock_create_net_noref(): one is to increase the reference count of owner
- 	 * of TIPC socket's proto_ops struct; another is to increment the
- 	 * reference count of owner of TIPC proto struct. Therefore, we must
- 	 * decrement the module reference count twice to ensure that it keeps
-diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-index 6df6eb5d4a74..1ebe40e61d93 100644
---- a/net/wireless/nl80211.c
-+++ b/net/wireless/nl80211.c
-@@ -13689,8 +13689,8 @@ static int nl80211_parse_wowlan_tcp(struct cfg80211_registered_device *rdev,
- 	port = nla_get_u16_default(tb[NL80211_WOWLAN_TCP_SRC_PORT], 0);
- #ifdef CONFIG_INET
- 	/* allocate a socket and port for it and use it */
--	err = sock_create_kern(wiphy_net(&rdev->wiphy), PF_INET, SOCK_STREAM,
--			       IPPROTO_TCP, &cfg->sock);
-+	err = sock_create_net_noref(wiphy_net(&rdev->wiphy), PF_INET, SOCK_STREAM,
-+				    IPPROTO_TCP, &cfg->sock);
- 	if (err) {
- 		kfree(cfg);
- 		return err;
-diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-index cc9dde507aba..b6e78e9d3280 100644
---- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-+++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-@@ -804,8 +804,8 @@ __bpf_kfunc int bpf_kfunc_init_sock(struct init_sock_args *args)
- 		goto out;
- 	}
- 
--	err = sock_create_kern(current->nsproxy->net_ns, args->af, args->type,
--			       proto, &sock);
-+	err = sock_create_net_noref(current->nsproxy->net_ns, args->af, args->type,
-+				    proto, &sock);
- 
- 	if (!err)
- 		/* Set timeout for call to kernel_connect() to prevent it from hanging,
--- 
-2.39.5 (Apple Git-154)
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBJZG8gU2NoaW1tZWwgPGlkb3Nj
+aEBpZG9zY2gub3JnPg0KPiBTZW50OiAyMDI0xOoxMtTCOMjVIDIzOjQ3DQo+IFRvOiBXZWkgRmFu
+ZyA8d2VpLmZhbmdAbnhwLmNvbT47IHRvbUBoZXJiZXJ0bGFuZC5jb20NCj4gQ2M6IFNpbW9uIEhv
+cm1hbiA8aG9ybXNAa2VybmVsLm9yZz47IENsYXVkaXUgTWFub2lsDQo+IDxjbGF1ZGl1Lm1hbm9p
+bEBueHAuY29tPjsgVmxhZGltaXIgT2x0ZWFuIDx2bGFkaW1pci5vbHRlYW5AbnhwLmNvbT47IENs
+YXJrDQo+IFdhbmcgPHhpYW9uaW5nLndhbmdAbnhwLmNvbT47IGFuZHJldytuZXRkZXZAbHVubi5j
+aDsNCj4gZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgZWR1bWF6ZXRAZ29vZ2xlLmNvbTsga3ViYUBrZXJu
+ZWwub3JnOw0KPiBwYWJlbmlAcmVkaGF0LmNvbTsgRnJhbmsgTGkgPGZyYW5rLmxpQG54cC5jb20+
+OyBuZXRkZXZAdmdlci5rZXJuZWwub3JnOw0KPiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3Jn
+OyBpbXhAbGlzdHMubGludXguZGV2DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjYgUkVTRU5EIG5l
+dC1uZXh0IDEvNV0gbmV0OiBlbmV0YzogYWRkIFJ4IGNoZWNrc3VtDQo+IG9mZmxvYWQgZm9yIGku
+TVg5NSBFTkVUQw0KPiANCj4gT24gRnJpLCBEZWMgMDYsIDIwMjQgYXQgMTI6NDU6MDJQTSArMDAw
+MCwgV2VpIEZhbmcgd3JvdGU6DQo+ID4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+
+ID4gRnJvbTogU2ltb24gSG9ybWFuIDxob3Jtc0BrZXJuZWwub3JnPg0KPiA+ID4gU2VudDogMjAy
+NMTqMTLUwjbI1SAyMDozMQ0KPiA+ID4gVG86IFdlaSBGYW5nIDx3ZWkuZmFuZ0BueHAuY29tPg0K
+PiA+ID4gQ2M6IENsYXVkaXUgTWFub2lsIDxjbGF1ZGl1Lm1hbm9pbEBueHAuY29tPjsgVmxhZGlt
+aXIgT2x0ZWFuDQo+ID4gPiA8dmxhZGltaXIub2x0ZWFuQG54cC5jb20+OyBDbGFyayBXYW5nIDx4
+aWFvbmluZy53YW5nQG54cC5jb20+Ow0KPiA+ID4gYW5kcmV3K25ldGRldkBsdW5uLmNoOyBkYXZl
+bUBkYXZlbWxvZnQubmV0OyBlZHVtYXpldEBnb29nbGUuY29tOw0KPiA+ID4ga3ViYUBrZXJuZWwu
+b3JnOyBwYWJlbmlAcmVkaGF0LmNvbTsgRnJhbmsgTGkgPGZyYW5rLmxpQG54cC5jb20+Ow0KPiA+
+ID4gbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsg
+aW14QGxpc3RzLmxpbnV4LmRldg0KPiA+ID4gU3ViamVjdDogUmU6IFtQQVRDSCB2NiBSRVNFTkQg
+bmV0LW5leHQgMS81XSBuZXQ6IGVuZXRjOiBhZGQgUnggY2hlY2tzdW0NCj4gPiA+IG9mZmxvYWQg
+Zm9yIGkuTVg5NSBFTkVUQw0KPiA+ID4NCj4gPiA+IE9uIEZyaSwgRGVjIDA2LCAyMDI0IGF0IDEw
+OjMzOjE1QU0gKzAwMDAsIFdlaSBGYW5nIHdyb3RlOg0KPiA+ID4gPiA+IC0tLS0tT3JpZ2luYWwg
+TWVzc2FnZS0tLS0tDQo+ID4gPiA+ID4gRnJvbTogU2ltb24gSG9ybWFuIDxob3Jtc0BrZXJuZWwu
+b3JnPg0KPiA+ID4gPiA+IFNlbnQ6IDIwMjTE6jEy1MI2yNUgMTc6MjMNCj4gPiA+ID4gPiBUbzog
+V2VpIEZhbmcgPHdlaS5mYW5nQG54cC5jb20+DQo+ID4gPiA+ID4gQ2M6IENsYXVkaXUgTWFub2ls
+IDxjbGF1ZGl1Lm1hbm9pbEBueHAuY29tPjsgVmxhZGltaXIgT2x0ZWFuDQo+ID4gPiA+ID4gPHZs
+YWRpbWlyLm9sdGVhbkBueHAuY29tPjsgQ2xhcmsgV2FuZyA8eGlhb25pbmcud2FuZ0BueHAuY29t
+PjsNCj4gPiA+ID4gPiBhbmRyZXcrbmV0ZGV2QGx1bm4uY2g7IGRhdmVtQGRhdmVtbG9mdC5uZXQ7
+DQo+IGVkdW1hemV0QGdvb2dsZS5jb207DQo+ID4gPiA+ID4ga3ViYUBrZXJuZWwub3JnOyBwYWJl
+bmlAcmVkaGF0LmNvbTsgRnJhbmsgTGkgPGZyYW5rLmxpQG54cC5jb20+Ow0KPiA+ID4gPiA+IG5l
+dGRldkB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+IGlt
+eEBsaXN0cy5saW51eC5kZXYNCj4gPiA+ID4gPiBTdWJqZWN0OiBSZTogW1BBVENIIHY2IFJFU0VO
+RCBuZXQtbmV4dCAxLzVdIG5ldDogZW5ldGM6IGFkZCBSeA0KPiBjaGVja3N1bQ0KPiA+ID4gPiA+
+IG9mZmxvYWQgZm9yIGkuTVg5NSBFTkVUQw0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gT24gV2VkLCBE
+ZWMgMDQsIDIwMjQgYXQgMDE6Mjk6MjhQTSArMDgwMCwgV2VpIEZhbmcgd3JvdGU6DQo+ID4gPiA+
+ID4gPiBFTkVUQyByZXYgNC4xIHN1cHBvcnRzIFRDUCBhbmQgVURQIGNoZWNrc3VtIG9mZmxvYWQg
+Zm9yIHJlY2VpdmUsIHRoZQ0KPiBiaXQNCj4gPiA+ID4gPiA+IDEwOCBvZiB0aGUgUnggQkQgd2ls
+bCBiZSBzZXQgaWYgdGhlIFRDUC9VRFAgY2hlY2tzdW0gaXMgY29ycmVjdC4gU2luY2UNCj4gPiA+
+ID4gPiA+IHRoaXMgY2FwYWJpbGl0eSBpcyBub3QgZGVmaW5lZCBpbiByZWdpc3RlciwgdGhlIHJ4
+X2NzdW0gYml0IGlzIGFkZGVkIHRvDQo+ID4gPiA+ID4gPiBzdHJ1Y3QgZW5ldGNfZHJ2ZGF0YSB0
+byBpbmRpY2F0ZSB3aGV0aGVyIHRoZSBkZXZpY2Ugc3VwcG9ydHMgUngNCj4gPiA+IGNoZWNrc3Vt
+DQo+ID4gPiA+ID4gPiBvZmZsb2FkLg0KPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+IFNpZ25lZC1v
+ZmYtYnk6IFdlaSBGYW5nIDx3ZWkuZmFuZ0BueHAuY29tPg0KPiA+ID4gPiA+ID4gUmV2aWV3ZWQt
+Ynk6IEZyYW5rIExpIDxGcmFuay5MaUBueHAuY29tPg0KPiA+ID4gPiA+ID4gUmV2aWV3ZWQtYnk6
+IENsYXVkaXUgTWFub2lsIDxjbGF1ZGl1Lm1hbm9pbEBueHAuY29tPg0KPiA+ID4gPiA+ID4gLS0t
+DQo+ID4gPiA+ID4gPiB2Mjogbm8gY2hhbmdlcw0KPiA+ID4gPiA+ID4gdjM6IG5vIGNoYW5nZXMN
+Cj4gPiA+ID4gPiA+IHY0OiBubyBjaGFuZ2VzDQo+ID4gPiA+ID4gPiB2NTogbm8gY2hhbmdlcw0K
+PiA+ID4gPiA+ID4gdjY6IG5vIGNoYW5nZXMNCj4gPiA+ID4gPiA+IC0tLQ0KPiA+ID4gPiA+ID4g
+IGRyaXZlcnMvbmV0L2V0aGVybmV0L2ZyZWVzY2FsZS9lbmV0Yy9lbmV0Yy5jICAgICAgIHwgMTQN
+Cj4gPiA+ICsrKysrKysrKystLS0tDQo+ID4gPiA+ID4gPiAgZHJpdmVycy9uZXQvZXRoZXJuZXQv
+ZnJlZXNjYWxlL2VuZXRjL2VuZXRjLmggICAgICAgfCAgMiArKw0KPiA+ID4gPiA+ID4gIGRyaXZl
+cnMvbmV0L2V0aGVybmV0L2ZyZWVzY2FsZS9lbmV0Yy9lbmV0Y19ody5oICAgIHwgIDIgKysNCj4g
+PiA+ID4gPiA+ICAuLi4vbmV0L2V0aGVybmV0L2ZyZWVzY2FsZS9lbmV0Yy9lbmV0Y19wZl9jb21t
+b24uYyB8ICAzICsrKw0KPiA+ID4gPiA+ID4gIDQgZmlsZXMgY2hhbmdlZCwgMTcgaW5zZXJ0aW9u
+cygrKSwgNCBkZWxldGlvbnMoLSkNCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiBkaWZmIC0tZ2l0
+IGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvZnJlZXNjYWxlL2VuZXRjL2VuZXRjLmMNCj4gPiA+ID4g
+PiBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ZyZWVzY2FsZS9lbmV0Yy9lbmV0Yy5jDQo+ID4gPiA+
+ID4gPiBpbmRleCAzNTYzNGM1MTZlMjYuLjMxMzdiNmVlNjJkMyAxMDA2NDQNCj4gPiA+ID4gPiA+
+IC0tLSBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ZyZWVzY2FsZS9lbmV0Yy9lbmV0Yy5jDQo+ID4g
+PiA+ID4gPiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9mcmVlc2NhbGUvZW5ldGMvZW5ldGMu
+Yw0KPiA+ID4gPiA+ID4gQEAgLTEwMTEsMTAgKzEwMTEsMTUgQEAgc3RhdGljIHZvaWQgZW5ldGNf
+Z2V0X29mZmxvYWRzKHN0cnVjdA0KPiA+ID4gZW5ldGNfYmRyDQo+ID4gPiA+ID4gKnJ4X3Jpbmcs
+DQo+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gIAkvKiBUT0RPOiBoYXNoaW5nICovDQo+ID4gPiA+
+ID4gPiAgCWlmIChyeF9yaW5nLT5uZGV2LT5mZWF0dXJlcyAmIE5FVElGX0ZfUlhDU1VNKSB7DQo+
+ID4gPiA+ID4gPiAtCQl1MTYgaW5ldF9jc3VtID0gbGUxNl90b19jcHUocnhiZC0+ci5pbmV0X2Nz
+dW0pOw0KPiA+ID4gPiA+ID4gLQ0KPiA+ID4gPiA+ID4gLQkJc2tiLT5jc3VtID0gY3N1bV91bmZv
+bGQoKF9fZm9yY2UNCj4gPiA+IF9fc3VtMTYpfmh0b25zKGluZXRfY3N1bSkpOw0KPiA+ID4gPiA+
+ID4gLQkJc2tiLT5pcF9zdW1tZWQgPSBDSEVDS1NVTV9DT01QTEVURTsNCj4gPiA+ID4gPiA+ICsJ
+CWlmIChwcml2LT5hY3RpdmVfb2ZmbG9hZHMgJiBFTkVUQ19GX1JYQ1NVTSAmJg0KPiA+ID4gPiA+
+ID4gKwkJICAgIGxlMTZfdG9fY3B1KHJ4YmQtPnIuZmxhZ3MpICYNCj4gPiA+IEVORVRDX1JYQkRf
+RkxBR19MNF9DU1VNX09LKQ0KPiA+ID4gPiA+IHsNCj4gPiA+ID4gPiA+ICsJCQlza2ItPmlwX3N1
+bW1lZCA9IENIRUNLU1VNX1VOTkVDRVNTQVJZOw0KPiA+ID4gPiA+ID4gKwkJfSBlbHNlIHsNCj4g
+PiA+ID4gPiA+ICsJCQl1MTYgaW5ldF9jc3VtID0gbGUxNl90b19jcHUocnhiZC0+ci5pbmV0X2Nz
+dW0pOw0KPiA+ID4gPiA+ID4gKw0KPiA+ID4gPiA+ID4gKwkJCXNrYi0+Y3N1bSA9IGNzdW1fdW5m
+b2xkKChfX2ZvcmNlDQo+ID4gPiBfX3N1bTE2KX5odG9ucyhpbmV0X2NzdW0pKTsNCj4gPiA+ID4g
+PiA+ICsJCQlza2ItPmlwX3N1bW1lZCA9IENIRUNLU1VNX0NPTVBMRVRFOw0KPiA+ID4gPiA+ID4g
+KwkJfQ0KPiA+ID4gPiA+ID4gIAl9DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBIaSBXZWksDQo+ID4g
+PiA+ID4NCj4gPiA+ID4gPiBJIGFtIHdvbmRlcmluZyBhYm91dCB0aGUgcmVsYXRpb25zaGlwIGJl
+dHdlZW4gdGhlIGFib3ZlIGFuZA0KPiA+ID4gPiA+IGhhcmR3YXJlIHN1cHBvcnQgZm9yIENIRUNL
+U1VNX0NPTVBMRVRFLg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gUHJpb3IgdG8gdGhpcyBwYXRjaCBD
+SEVDS1NVTV9DT01QTEVURSB3YXMgYWx3YXlzIHVzZWQsIHdoaWNoIHNlZW1zDQo+ID4gPiA+ID4g
+ZGVzaXJhYmxlLiBCdXQgd2l0aCB0aGlzIHBhdGNoLCBDSEVDS1NVTV9VTk5FQ0VTU0FSWSBpcyBj
+b25kaXRpb25hbGx5DQo+ID4gPiB1c2VkLg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gSWYgdGhvc2Ug
+Y2FzZXMgZG9uJ3Qgd29yayB3aXRoIENIRUNLU1VNX0NPTVBMRVRFIHRoZW4gaXMgdGhpcyBhDQo+
+ID4gPiBidWctZml4Pw0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gT3IsIGFsdGVybmF0aXZlbHksIGlm
+IHRob3NlIGNhc2VzIGRvIHdvcmsgd2l0aCBDSEVDS1NVTV9DT01QTEVURSwNCj4gdGhlbg0KPiA+
+ID4gPiA+IEknbSB1bnN1cmUgd2h5IHRoaXMgY2hhbmdlIGlzIG5lY2Vzc2FyeSBvciBkZXNpcmFi
+bGUuIEl0J3MgbXkNCj4gdW5kZXJzdGFuZGluZw0KPiA+ID4gPiA+IHRoYXQgZnJvbSB0aGUgS2Vy
+bmVsJ3MgcGVyc3BlY3RpdmUgQ0hFQ0tTVU1fQ09NUExFVEUgaXMgcHJlZmVyYWJsZQ0KPiB0bw0K
+PiA+ID4gPiA+IENIRUNLU1VNX1VOTkVDRVNTQVJZLg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gLi4u
+DQo+ID4gPiA+DQo+ID4gPiA+IFJ4IGNoZWNrc3VtIG9mZmxvYWQgaXMgYSBuZXcgZmVhdHVyZSBv
+ZiBFTkVUQyB2NC4gV2Ugd291bGQgbGlrZSB0byBleHBsb2l0DQo+ID4gPiB0aGlzDQo+ID4gPiA+
+IGNhcGFiaWxpdHkgb2YgdGhlIGhhcmR3YXJlIHRvIHNhdmUgQ1BVIGN5Y2xlcyBpbiBjYWxjdWxh
+dGluZyBhbmQgdmVyaWZ5aW5nDQo+ID4gPiBjaGVja3N1bS4NCj4gPiA+ID4NCj4gPiA+DQo+ID4g
+PiBVbmRlcnN0b29kLCBidXQgQ0hFQ0tTVU1fVU5ORUNFU1NBUlkgaXMgdXN1YWxseSB0aGUgcHJl
+ZmVycmVkIG9wdGlvbg0KPiBhcw0KPiA+ID4gaXQNCj4gPiA+IGlzIG1vcmUgZmxleGlibGUsIGUu
+Zy4gYWxsb3dpbmcgbG93LWNvc3QgY2FsY3VsYXRpb24gb2YgaW5uZXIgY2hlY2tzdW1zDQo+ID4g
+PiBpbiB0aGUgcHJlc2VuY2Ugb2YgZW5jYXBzdWxhdGlvbi4NCj4gPg0KPiA+IEkgdGhpbmsgeW91
+IG1lYW4gJ0NIRUNLU1VNX0NPTVBMRVRFJyBpcyB0aGUgcHJlZmVycmVkIG9wdGlvbi4gQnV0IHRo
+ZXJlIGlzDQo+IG5vDQo+ID4gc3Ryb25nIHJlYXNvbiBhZ2FpbnN0IHVzaW5nIENIRUNLU1VNX1VO
+TkVDRVNTQVJZLiBTbyBJIGhvcGUgdG8ga2VlcCB0aGlzDQo+IHBhdGNoLg0KPiANCj4gSSB3YXMg
+YWxzbyB1bmRlciB0aGUgaW1wcmVzc2lvbiB0aGF0IENIRUNLU1VNX0NPTVBMRVRFIGlzIG1vcmUg
+ZGVzaXJhYmxlDQo+IHRoYW4gQ0hFQ0tTVU1fVU5ORUNFU1NBUlkuIE1heWJlIFRvbSBjYW4gaGVs
+cC4NCg0KRnJvbSB0aGUga2VybmVsIGRvYyBbMV0gaXQgc2hvdWxkIGJlIG5lY2Vzc2FyeSB0byB1
+c2UgQ0hFQ0tTVU1fQ09NUExFVEUgaW4NCmVuZXRjIGRyaXZlciwgYmVjYXVzZSBFTkVUQ3Y0IG9u
+bHkgc3VwcG9ydHMgVURQL1RDUCBjaGVja3N1bSBvZmZsb2FkLiBTbyBJIHdpbGwNCmRyb3AgdGhp
+cyBwYXRjaCBmcm9tIHRoZSBwYXRjaCBzZXQuIHRoYW5rcy4NCg0KWzFdIGh0dHBzOi8vZG9jcy5r
+ZXJuZWwub3JnL25ldHdvcmtpbmcvc2tidWZmLmh0bWwjOn46dGV4dD1FdmVuJTIwaWYlMjBkZXZp
+Y2UlMjBzdXBwb3J0cyUyMG9ubHklMjBzb21lJTIwcHJvdG9jb2xzJTJDJTIwYnV0JTIwaXMlMjBh
+YmxlJTIwdG8lMjBwcm9kdWNlJTIwc2tiJTJEJTNFY3N1bSUyQyUyMGl0JTIwTVVTVCUyMHVzZSUy
+MENIRUNLU1VNX0NPTVBMRVRFJTJDJTIwbm90JTIwQ0hFQ0tTVU1fVU5ORUNFU1NBUlkuDQo=
 
