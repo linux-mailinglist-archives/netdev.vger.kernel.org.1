@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-151193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B53D9ED57A
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 20:01:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C1499ED5BE
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 20:06:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E43A7169551
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 19:01:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDD1C188874E
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 19:05:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62194249D69;
-	Wed, 11 Dec 2024 18:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FDC2510BA;
+	Wed, 11 Dec 2024 18:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jZZHubEa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lqnoNAVC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36EC3249D63;
-	Wed, 11 Dec 2024 18:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2C023A193;
+	Wed, 11 Dec 2024 18:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733943166; cv=none; b=sDkiVZt1SIueN7zuLxxNLqzQxgaRe6YvDmxFdEEH+0tlKamPDm/UYmVCESo7W2A31/1be1QN5n+o5Wyz7RU6xqlc/sLwP+jYp0qqPDVLZp7vhJ9sSm3c3uRlZcVmpjXWuXIJRyPK2or5ZnAON/vzkhdOmYHshmkkfgLkiP+8pNI=
+	t=1733943215; cv=none; b=KbBpFRUP/W/8o72FKUHiqzX6soEPhCVTM1SCUlW4IfjJQ8P1D6+eYJChayOLnPiJqFrgcOhoS2eC+HDYMtXvsqrTf0jFRY8uK/vBYHOwd/iBmgPGzwi1C6vGzQvb+DaYCF8Ogji00hAbVaz+lK2hHNv/bmSYQ7JkkqDuCOZxSoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733943166; c=relaxed/simple;
-	bh=/GqXsUvp7leke0Ic7oUS0GoQj5+Xi/xodGN1FrUodGU=;
+	s=arc-20240116; t=1733943215; c=relaxed/simple;
+	bh=j2wMNToJjGdHIBwnzb8JzZ+mgkI1yv35iQ/gPJEuKM0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fnXE90AnncV2Ti03nmeW+iC+rE5s5/72UFQahKYHMPbqvFl1bqsjDnZuQ8zXkQNcJVyrXjU8nIRLvXD5u8XKNATPQFGvHoO8dmkqnUdwRuQU0mGBNJtxfDfI4OHrKbX4ApZigSHIrMskR4RNPWPf1MCJyoUbEKWulOGbaPoKyqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jZZHubEa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C873C4CED4;
-	Wed, 11 Dec 2024 18:52:44 +0000 (UTC)
+	 MIME-Version:Content-Type; b=W/hGHKv/CgqqGqjgKDqaTQHQSgPJSbLlKS02E/i877h2pDivHlTiJ01+LvKByjfpne1tMw7KepeAse0MtzjoVvYsEAqKENeKHBd8iFIAnsKHisi+Xj+QQBhyWsGdY3yXIN0Bn7JbwjWiad1oW2d51xQrSpk0kn9KD+JdVnhSuDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lqnoNAVC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 016F9C4CED2;
+	Wed, 11 Dec 2024 18:53:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733943166;
-	bh=/GqXsUvp7leke0Ic7oUS0GoQj5+Xi/xodGN1FrUodGU=;
+	s=k20201202; t=1733943215;
+	bh=j2wMNToJjGdHIBwnzb8JzZ+mgkI1yv35iQ/gPJEuKM0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jZZHubEa9lQ2rZ9e17XZBC87yTHue1QXvOgeVP3Z2c3dAteH5EP4bcYPZ8Cqk+Eeq
-	 VqYeX9gmVqvODsNzgiigw23h8yniMLNGy/KRdrAgIOjXnEIiC8IAkt8uqn1iH+qRv8
-	 ZjcHO4Gy7Wydxvy9OY3uy5rv3a0TO0mhyjnGz4J3317GuJ5rx0dJ0jjcgFxoHA97YH
-	 rnscE+j3YvncMGbxCIAezuIDJ9gCLUGvBHU4HOM8tysRhzSq7QkaemHOhyAm5f3vvj
-	 mrIDdShGvNMLQxN5jTGA8o/Qt5W3HRhx0ZU8IAN6k5HOKANaoeQ7Jj9o6tUbZkZhHr
-	 USbfpDWPCgdTg==
+	b=lqnoNAVCLkc0F6AxPB2DXwiLtjZ2GvCQQoStVMhdDXy3Xu6KA5/5BU9AFZbhj9pIf
+	 7sOgnWr912Uft7WMe0sMnrInYCuWbs+Icr2p/v+oyam4NW5LXndEcJE5Jjfs4Wod5F
+	 oKrvn3bNtYtwhvWMC/Oquxbuzt6gUcIuBQ00mwK1fmrSeaAwGyy+z2QFKuMxUZ+Pzh
+	 T5vwDBc8c6Eph3vN8csMjaXulNcAL7G3CTK36fMx4OGoe3N1s/kEKi7KFdSNtehZh1
+	 SMUr0RIG6WZKjyxehB7cjfR5aYDqpmzM7U053OU6iNtmeoA04JLApOakNH7D2L4a1a
+	 2qBylK/Zkx9JQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -56,12 +56,12 @@ Cc: Lion Ackermann <nnamrec@gmail.com>,
 	pabeni@redhat.com,
 	cake@lists.bufferbloat.net,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 14/23] net: sched: fix ordering of qlen adjustment
-Date: Wed, 11 Dec 2024 13:51:51 -0500
-Message-ID: <20241211185214.3841978-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 09/15] net: sched: fix ordering of qlen adjustment
+Date: Wed, 11 Dec 2024 13:53:01 -0500
+Message-ID: <20241211185316.3842543-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241211185214.3841978-1-sashal@kernel.org>
-References: <20241211185214.3841978-1-sashal@kernel.org>
+In-Reply-To: <20241211185316.3842543-1-sashal@kernel.org>
+References: <20241211185316.3842543-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,7 +71,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.65
+X-stable-base: Linux 6.1.119
 Content-Transfer-Encoding: 8bit
 
 From: Lion Ackermann <nnamrec@gmail.com>
@@ -92,10 +92,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index 30955dd45779e..a65fad45d5568 100644
+index 73e8caeffd47e..eee9ebad35a5c 100644
 --- a/net/sched/sch_cake.c
 +++ b/net/sched/sch_cake.c
-@@ -1542,7 +1542,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+@@ -1541,7 +1541,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
  	b->backlogs[idx]    -= len;
  	b->tin_backlog      -= len;
  	sch->qstats.backlog -= len;
@@ -103,7 +103,7 @@ index 30955dd45779e..a65fad45d5568 100644
  
  	flow->dropped++;
  	b->tin_dropped++;
-@@ -1553,6 +1552,7 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+@@ -1552,6 +1551,7 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
  
  	__qdisc_drop(skb, to_free);
  	sch->q.qlen--;
@@ -112,7 +112,7 @@ index 30955dd45779e..a65fad45d5568 100644
  	cake_heapify(q, 0);
  
 diff --git a/net/sched/sch_choke.c b/net/sched/sch_choke.c
-index 19c851125901f..a919591422085 100644
+index 3ac3e5c80b6ff..e38cf34287018 100644
 --- a/net/sched/sch_choke.c
 +++ b/net/sched/sch_choke.c
 @@ -123,10 +123,10 @@ static void choke_drop_by_idx(struct Qdisc *sch, unsigned int idx,
