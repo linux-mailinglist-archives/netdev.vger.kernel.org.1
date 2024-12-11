@@ -1,124 +1,136 @@
-Return-Path: <netdev+bounces-151033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B82729EC8A4
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:15:48 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97BB99EC87B
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:09:50 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B7A92813ED
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 09:15:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9A3C1885AC4
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 09:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B439A205E06;
-	Wed, 11 Dec 2024 09:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809032210F7;
+	Wed, 11 Dec 2024 09:09:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="DT11vbxL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JZo3c9wo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3812040B2
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 09:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62AA2210C6;
+	Wed, 11 Dec 2024 09:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733908544; cv=none; b=X1IDNUy2k1pmb4KnahaFXNSm087s4sFC8pZtBPNA0QdqvdkmPfZMcMYgHgZevkfK/FrIGwKmoZecmifqXEqsFrnFbkbgiszuhvEyy2EbKiJXyYYa8cY/BC2LpqKLpUzqlvOlgqoDfg+USQcCI19K8O4BCUtTriqAa7clKuDV1Z8=
+	t=1733908172; cv=none; b=n+1lDzZ1SUQygIgXRXuh8Y9bcmOAEvEP4KcYSpCeMLJx9bK1bEsTsiONlWMgqBgHOM07R5Rw8Z+2LLH7vlSmEUvf4PybNzWE3xfnU12hD7tRjmEHgqc0dVMlq8al74gSGFiV2hXfGrnIgOLDSbqB0pNgxf6FwyLKUkhPnNm+zfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733908544; c=relaxed/simple;
-	bh=GTn8h1cILJZxRD/WPjB/UJpuuiM1eVhQlkQeJgDh5NM=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=GUvEUID4qHJhM3q0aJtJpoP8f1NLU0DAjBWYIZUNWsVOL05ieqqtnCTC2aa51YBB6dgKM7yGx2wQYwwVUqQKlyziyP94QePzhA5S9HODmkn4S/lTe3Jc7W1NDx3DdbYxy6ybWRRbIkD/wFVDA5GnEA5pXy3Cl0CDcGdLL85jzgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=DT11vbxL; arc=none smtp.client-ip=162.62.57.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1733908231;
-	bh=cqjMnbVmK1LhKXPepmKCsyi8lbW9EtlYn+9I8xwf1ms=;
-	h=From:To:Cc:Subject:Date;
-	b=DT11vbxLmQNpOd8UdLbru5oeVdXR4VvHUpXyY9PjI+yuNZ1OjN8LRg3kpO9wIjCRw
-	 6N7D3/T+rkz1JKgJT7ckKrMdxddCkY+u59oTeMVwuo39EnK4oJKwUELgY1pHJYZa+x
-	 ctZDsqEE4OkmWvFpHTn2uKLCVnyJdZpHqz/hhkU8=
-Received: from yangang-TM1701.. ([223.70.159.239])
-	by newxmesmtplogicsvrszc25-0.qq.com (NewEsmtp) with SMTP
-	id 1011BCCC; Wed, 11 Dec 2024 17:04:01 +0800
-X-QQ-mid: xmsmtpt1733907841tzs7a4spc
-Message-ID: <tencent_0FE3ED0442E69C9D86C0AEEE338A49F90305@qq.com>
-X-QQ-XMAILINFO: Ni8Yhdca2hoVflPFEakEGBA6MZIsGTtyedeHR6Bjr8xZsS8Ftp/KmRfYPTocQY
-	 dAjPEpChLf3eygMKsdRHTNa0mzWUI3OhiqBBod/+j4YIA0RHYhftZwzlj7KAeQDhNZyZcRXu4nfe
-	 4ASDtftpblDf9yDGmlvX/6FKHe8SlQZOp+UU6eqoUDpbH/OAUix9i57OXrJgFdXoMUFh/2lZkQ9y
-	 8VdHPLbF3S9fOMhOptuF3zGHP/m2Uz1tD1a/eGJ02+jY8tMqJ7AOx7GU85KPUiF/3+oJx9HXCmCT
-	 LUM4ckSmOwMSY06xK7Cn+puH27Mb45yH0O9X7mInLMUsByP9TN6wIQrg3gG7N/eMq0F6NPp2U9Iw
-	 oQtk/De7aQweLL0lrdU4A73Y5YED5mhV9KlKtam+DuqAzs3N7sClRuVD6f2gVymjoWBzmvhIp8hM
-	 Wv2JfINXg1Ynf7/61ZW9GxgyZUvv1hbL0VJzqVv97/m7y50SUrymPRCToCei2cgqwIUu39QvIXoI
-	 vkMhp+7dVKWTqK8gi9guo32FSEM/jF1HIVUOyQKV/B4eplxThvIm8e6xIXIykZbwqoOhZwiwqfG8
-	 3Ye268FLWtygR39u3NwFzWodk88in9sGFDeaLtheuC6URKLhivRDiivAsFFN+JUfT0SXD4MlXkNG
-	 u6QPt388m0N60YzpDJ9OOC3v8fI0C6aPr6Lt/PNYOMsh8ztTcQRYemNemI8dxfCu7K4fA2fYQz2R
-	 YqGYqp8dzKzIuFnji5Img0JAuuTGoFSPRyQf0+Nhu6on8pBr0Zfqn1o3dRcVWNTOQOyvURAWYW/C
-	 +YNdWAFv/NuTFISRGJpCeZDujOqZte6FQy8tffkYvB9cfJbI0msicBqzVoTnuaSkwFYYBrSxG3d3
-	 NmmudrE/Oi9Ea6iB/rlpePhVSlF9eHQU/LLCwBBwoUFIjtMO/zWrl/yHwHTpq4tsKK0+wZC8lyXB
-	 p64OirwF4=
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-From: Gang Yan <gang_yan@foxmail.com>
-To: Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Gang Yan <yangang@kylinos.cn>,
-	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [mptcp-next] mptcp: fix invalid addr occupy 'add_addr_accepted'
-Date: Wed, 11 Dec 2024 17:03:58 +0800
-X-OQ-MSGID: <20241211090400.4646-1-gang_yan@foxmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1733908172; c=relaxed/simple;
+	bh=xIaQXFskKCgp5A/NEx71Hx314rVTXuATxS4qKYmDeLI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UIZUsmEvRoutquXUJ1rbPY5ps1eKHvrH5CEqjww90r87yhIcZxqDVSdIY/A3ycA2WHBJttFBG2tTvq1IHPLNfJjtonui2BI5mcTnfZT5BZ/FmIiBS5BmO+8hv2Y80YtX083H8OokRJf6TUQPARebqMiyncDqd4/yLhFuopV9vB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JZo3c9wo; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-725e71a11f7so365134b3a.1;
+        Wed, 11 Dec 2024 01:09:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733908170; x=1734512970; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1RMe/+7kIy4SbIRyalwwTZ03nL2wZipPR7y509ZPy4c=;
+        b=JZo3c9wonO2bgSwY4c6GlK7Uq9T/5g0MisNZsqMbp93b244QwHIXnt6HYmfwh2qQMJ
+         dkmOesRgp5DaCQK79vWDOqZVpBGCsH/5WiATiGafwJQiGvlThM3qM/ZSH6NQmrEgiPAY
+         1yEV1R1WkNUeTCG7gurDbBIz/SCNvT+Lde9cv5IhYMoS+WL+ELbpOlsPQat80fvM4Cmd
+         fccQlGPoYX8jmGdut7OkSGGsKTHq/cvra6611+wxzS0wD0kFbxbDO879P37hdMl/aR75
+         PhP3Ua4Y41bRN/adfKMK+/beTITuKDqG5UE42Y775T/BOoL4glx6rFSTKguzfccLaB/j
+         2Row==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733908170; x=1734512970;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1RMe/+7kIy4SbIRyalwwTZ03nL2wZipPR7y509ZPy4c=;
+        b=haFvFTX4V8Rjjy/vrD2tnVIy0pXRqJyPGIEUNxG36jJj8sj4g+u0N0D4d6NwCcdsA1
+         LjNC8zEbWa+/vBbzL795lXvgsEVCL5ke6ijeUaI+omCLxQVJTDe6praajcH/aOYy5DEK
+         Kvr8SSAaRnhFOcZgMywAYpa37zIjzuJkisJK4o2umdEudX4apUL2DX8+eu9GCXqPwWvB
+         i0EqQW/tNAhOPX7o+HfaTaotXeRvCUqIx8ULzs380t4h+J3V0h2BW+3A3JatNM4vRoyG
+         bpeEm2/UGPq7rkXco6pAhfJ7+2ugiLD/QMwtGhr3Yg0V+Ec/GA6X5XlUMNskhjwLkVma
+         VlEg==
+X-Forwarded-Encrypted: i=1; AJvYcCVPzR6A3OTb2886XpDc0aBqghuXz4A5ltx9Cko4/izidA2tlCTErsYrBmmFxWGG5/76aCE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySTMl17Cc7BDiYpctNQyy0SWMu2JuaEKSwA4ty7zyE7FcsysuO
+	3mX5gfhZ6fjHqeUuk+6HYwtua5svLXg4kTNSHEM1xPRbGLUzguTV
+X-Gm-Gg: ASbGncsiaL1FaAcLO5im/MgCkNeHUoW7ai2CiiaRwfJ/jLgVlnf6zZlh2D/ublklqXv
+	5+8lSDb6Xo0VnotUt/4isHA6y+aV+fkl6LDpOUP0Rsc3yxxOKhiXh+yldzbbkRZl8niDB1fPYCG
+	xGlj65Prmfi7tr49Lgzs1LnThJIcZUiQzQIukBODwTMZTkzYH1OPFqgGJBZ4rO4NaNtpDLoPQy5
+	wgKmehKV6nzj0RAUjkNvko8AqbZE/B7mQ9oD9/q/QTBT2h5zgJmRsLNsRw=
+X-Google-Smtp-Source: AGHT+IHbBIG2jkSmgeOa0zNVx6HrbC60xE8IDHv2oBq3+JdwoA6FDnuCXUx8LX4D4UbLraJUB7ulLQ==
+X-Received: by 2002:a05:6a00:1817:b0:725:e386:3c5b with SMTP id d2e1a72fcca58-728edb790bfmr3134095b3a.5.1733908170117;
+        Wed, 11 Dec 2024 01:09:30 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-727ba09a13bsm3185774b3a.46.2024.12.11.01.09.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Dec 2024 01:09:29 -0800 (PST)
+Date: Wed, 11 Dec 2024 09:09:23 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, mkubecek@suse.cz,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@idosch.org>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net 2/5] bonding: Fix initial {vlan,mpls}_feature set in
+ bond_compute_features
+Message-ID: <Z1lWw5qM-AGPCjuZ@fedora>
+References: <20241210141245.327886-1-daniel@iogearbox.net>
+ <20241210141245.327886-2-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241210141245.327886-2-daniel@iogearbox.net>
 
-From: Gang Yan <yangang@kylinos.cn>
+On Tue, Dec 10, 2024 at 03:12:42PM +0100, Daniel Borkmann wrote:
+> If a bonding device has slave devices, then the current logic to derive
+> the feature set for the master bond device is limited in that flags which
+> are fully supported by the underlying slave devices cannot be propagated
+> up to vlan devices which sit on top of bond devices. Instead, these get
+> blindly masked out via current NETIF_F_ALL_FOR_ALL logic.
+> 
+> vlan_features and mpls_features should reuse netdev_base_features() in
+> order derive the set in the same way as ndo_fix_features before iterating
+> through the slave devices to refine the feature set.
+> 
+> Fixes: a9b3ace44c7d ("bonding: fix vlan_features computing")
+> Fixes: 2e770b507ccd ("net: bonding: Inherit MPLS features from slave devices")
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+> Cc: Ido Schimmel <idosch@idosch.org>
+> Cc: Jiri Pirko <jiri@nvidia.com>
+> ---
+>  drivers/net/bonding/bond_main.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index 42c835c60cd8..320dd71392ef 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -1563,8 +1563,9 @@ static void bond_compute_features(struct bonding *bond)
+>  
+>  	if (!bond_has_slaves(bond))
+>  		goto done;
+> -	vlan_features &= NETIF_F_ALL_FOR_ALL;
+> -	mpls_features &= NETIF_F_ALL_FOR_ALL;
+> +
+> +	vlan_features = netdev_base_features(vlan_features);
+> +	mpls_features = netdev_base_features(mpls_features);
+>  
+>  	bond_for_each_slave(bond, slave, iter) {
+>  		vlan_features = netdev_increment_features(vlan_features,
+> -- 
+> 2.43.0
+> 
 
-This patch fixes an issue where an invalid address is announce as a
-signal, the 'add_addr_accepted' is incorrectly added several times
-when 'retransmit ADD_ADDR'. So we need to update this variable
-when the connection is removed from conn_list by mptcp_worker. So that
-the available address can be added in time.
-
-In fact, the 'add_addr_accepted' is only declined when 'RM_ADDR'
-by now, so when subflows are getting closed from the other peer,
-the new signal is not accepted as well.
-
-We noticed there have exist some problems related to this.I think
-this patch effectively resolves them.
-
-Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/498
-Signed-off-by: Gang Yan <yangang@kylinos.cn>
----
- net/mptcp/protocol.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 21bc3586c33e..f99dddca859d 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -2569,6 +2569,10 @@ static void __mptcp_close_subflow(struct sock *sk)
- 			continue;
- 
- 		mptcp_close_ssk(sk, ssk, subflow);
-+
-+		if (READ_ONCE(subflow->remote_id) &&
-+		    --msk->pm.add_addr_accepted < mptcp_pm_get_add_addr_accept_max(msk))
-+			WRITE_ONCE(msk->pm.accept_addr, true);
- 	}
- 
- }
--- 
-2.25.1
-
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
