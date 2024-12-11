@@ -1,107 +1,102 @@
-Return-Path: <netdev+bounces-151255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4622A9EDAB6
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 00:02:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59D8A9EDAAF
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 00:01:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9343168D63
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 23:02:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1216B168735
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 23:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D0DE1F236E;
-	Wed, 11 Dec 2024 23:01:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="R60Bc3wz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5C31EC4F3;
+	Wed, 11 Dec 2024 23:01:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0871EC4FF
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 23:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151F21C07D8;
+	Wed, 11 Dec 2024 23:01:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733958111; cv=none; b=XWNGbZnixuV/ZvqunuDUXmUTWXIWTVVmbsgH2XMo5AowxQcdJGB0f/JKzAuBaBK0B2J7qtjIU6HzyQwpUJGhSXe+s1u1iFlbiCW1WuakqQk1QxcpMBKCT4Dk98bpNF3ujPLsVd1UrjriYNiZiSh/+xTnG2Gar/FIjdFerRFKtYA=
+	t=1733958103; cv=none; b=stuUsO1PQVRGpl+4ZaJHYRFs2Ec2m5rXiBKGtnDRCl5dcK2tyEbuop/mGEeeFiNvR6ybLzjdpYw2pnI8qRMcUuGcOCOVF8/qI+Ra0XKdvpAt0YBLqWeZZ3k/c0fAnrLbXRDXm6mlMSUDk6Uc5q0YQXrsCL3VYNfg9K0fUA+haxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733958111; c=relaxed/simple;
-	bh=7702vU6deKDG7UUlM9f7IXMlbtnn4sBDdbyNvy1bzAM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r5OqmsyFL5C571aMuV1H600vmMxzGPBTCX07eEc5D5uhQyjMEuhV/WN5R1CM+P+etckEK7vUOBPcNfVPHv94xsLQhP+V/n91AlWrao+Lvr43OeJY8sOyXlo2YoVQnSOze9KAGoqhD+x8iFMc3cEaMPwhqTbP2Xkxp4iyGo/1HHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=R60Bc3wz; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=aqpj2NOEIC4he92SdwRDRx1lfkZ6BBPNo45E39NFDBI=; t=1733958109; x=1734822109; 
-	b=R60Bc3wzcFkvD7zN8dJZHMXEmvWul6xIRhvr+ylllBohFWilFtOfpecLUcXST3ATphCt6QTcFxz
-	h4naZocDQa+TyVQoCvtmvfhC0jseO122fu2uJQR7SO0I6yQ0EqRX4SZgIm/sbspOCv+DZkB2kO7cP
-	rX8YBF5ZEnhnAtXmLisJW6bzeX4vzBuvdN/g+b7uZUzeI9hvByvXCLTpcQgicSRP9xg5FI2zAQ8vP
-	uOfQqpX08vlyNmm9UfOtLR75kfmBvjnBNOK1974t/0jH43xMXPhsAWpVmCgxfmLqOuxVaa95pO7Jm
-	Nr5GnZC+hOQjxBBCdOdooZizCNZXyCdbTDwQ==;
-Received: from mail-oa1-f53.google.com ([209.85.160.53]:45144)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tLViG-000088-Sl
-	for netdev@vger.kernel.org; Wed, 11 Dec 2024 15:01:49 -0800
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-2967af48248so3624303fac.2
-        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 15:01:48 -0800 (PST)
-X-Gm-Message-State: AOJu0YyCJzql56mIlJUyriWdq5OZy1RazKWBnN7x8S5WDwSJLdgqKWrW
-	IuUSDEYR+HIH1bvAjsORQdLOrIVuE2Ewr8/zTL6+jEGMeKzBpto7G9fxEX0IsRJDikI3Nb/BZ10
-	QL7DtZ+xsajqllfC9AJUS+bcgb1g=
-X-Google-Smtp-Source: AGHT+IHMmJbu1mq16kwWiBPDWWfFkW/tJrzU574SuWj5+4lizRoWNVYoOrYlESwnGJnpQZgzr5rD82aQgwvkgXGoS3A=
-X-Received: by 2002:a05:6870:2102:b0:295:eb96:9fd4 with SMTP id
- 586e51a60fabf-2a012c0f7b3mr2942903fac.11.1733958108304; Wed, 11 Dec 2024
- 15:01:48 -0800 (PST)
+	s=arc-20240116; t=1733958103; c=relaxed/simple;
+	bh=42T/xrKErMOh83l9sTZL+EWwQ1rbLEDjNUpsmsm/yNY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lCOupSJ7/z7bSgQbLpBNw6Y9ixSfnlb3ywThPJDclmHZ4lVobOGFzKQnpW2qWs/r0tPgkLjUXw68cAsGrtE5VPQgeH327SyZV8oKuCjHyhQWw/Iltzu01hMFrZqEbq5oqxNmFWjx5VmGwi5MARZfobfw2+6lRl/u8ac1oL2+OwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	phil@netfilter.org
+Subject: [PATCH net 0/3] Netfilter fixes for net
+Date: Thu, 12 Dec 2024 00:01:27 +0100
+Message-Id: <20241211230130.176937-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241209175131.3839-1-ouster@cs.stanford.edu> <20241209175131.3839-13-ouster@cs.stanford.edu>
- <20241211063914.GA34839@j66a10360.sqa.eu95>
-In-Reply-To: <20241211063914.GA34839@j66a10360.sqa.eu95>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Wed, 11 Dec 2024 15:01:13 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmxC5PkcbXyRuAxa6_uYDPoEE-_RfcE4NmyAHwg_rf9ChQ@mail.gmail.com>
-Message-ID: <CAGXJAmxC5PkcbXyRuAxa6_uYDPoEE-_RfcE4NmyAHwg_rf9ChQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 11/12] net: homa: create homa_plumbing.c homa_utils.c
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: 0.8
-X-Spam-Level: 
-X-Scan-Signature: a11a15d02c0ec4233875b3872b0caebb
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 10, 2024 at 10:39=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.co=
-m> wrote:
-> > +
-> > +     /* Using a static buffer can produce garbled text under concurren=
-cy,
-> > +      * but (a) it's unlikely (this code only executes if the opcode i=
-s
-> > +      * bogus), (b) this is mostly for testing and debugging, and (c) =
-the
-> > +      * code below ensures that the string cannot run past the end of =
-the
-> > +      * buffer, so the code is safe.
-> > +      */
->
-> IMMO, Regardless of the scenario you expect to use it in, writing code th=
-at
-> is clearly buggy is always perplexing.
+Hi,
 
-Fair enough; you have shamed me (appropriately) into changing the code
-to use only static strings. This reduces the amount of information
-provided if a bogus type is provided, but I don't think that will
-matter in practice.
+The following patchset contains Netfilter fixes for net:
 
--John-
+1) Fix bogus test reports in rpath.sh selftest by adding permanent
+   neighbor entries, from Phil Sutter.
+
+2) Lockdep reports possible ABBA deadlock in xt_IDLETIMER, fix it by
+   removing sysfs out of the mutex section, also from Phil Sutter.
+
+3) It is illegal to release basechain via RCU callback, for several
+   reasons. Keep it simple and safe by calling synchronize_rcu() instead.
+   This is a partially reverting a botched recent attempt of me to fix
+   this basechain release path on netdevice removal.
+   From Florian Westphal.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-12-11
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 31f1b55d5d7e531cd827419e5d71c19f24de161c:
+
+  net :mana :Request a V2 response version for MANA_QUERY_GF_STAT (2024-12-05 12:02:15 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-12-11
+
+for you to fetch changes up to b04df3da1b5c6f6dc7cdccc37941740c078c4043:
+
+  netfilter: nf_tables: do not defer rule destruction via call_rcu (2024-12-11 23:27:50 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 24-12-11
+
+----------------------------------------------------------------
+Florian Westphal (1):
+      netfilter: nf_tables: do not defer rule destruction via call_rcu
+
+Phil Sutter (2):
+      selftests: netfilter: Stabilize rpath.sh
+      netfilter: IDLETIMER: Fix for possible ABBA deadlock
+
+ include/net/netfilter/nf_tables.h              |  4 --
+ net/netfilter/nf_tables_api.c                  | 32 ++++++++--------
+ net/netfilter/xt_IDLETIMER.c                   | 52 ++++++++++++++------------
+ tools/testing/selftests/net/netfilter/rpath.sh | 18 ++++++++-
+ 4 files changed, 59 insertions(+), 47 deletions(-)
 
