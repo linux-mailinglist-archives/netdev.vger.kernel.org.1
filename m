@@ -1,98 +1,118 @@
-Return-Path: <netdev+bounces-150907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 225E69EC0A8
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 01:24:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAEDF9EC0A9
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 01:26:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6489F18877A0
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 00:24:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4C201652F3
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 00:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24480748A;
-	Wed, 11 Dec 2024 00:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D58F23BE;
+	Wed, 11 Dec 2024 00:25:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IYTNCngH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A2jo4Q7P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5625672;
-	Wed, 11 Dec 2024 00:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF3CECC;
+	Wed, 11 Dec 2024 00:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733876655; cv=none; b=lc7L1qwEKmjYY7KYeB1hvz0GXyA/v5jDSGzHxXqe2VqvpNfximdVbJIdlwsyvg5yaLDdpwndhZrSCsbUqxSjeY7Cv7frFU5jqqzwGQ8XceG6Na1c93SND2XoRZ10W9zwUnHnYZzmbv41VQC39Ftobz3oPA9o+3aHMD2j+oexZKc=
+	t=1733876758; cv=none; b=RBqQ8D6FtxQEGgFyhvxGwltKtsYb86VpP+KRTc/vlNEswRyRNcsrXiNTEbEKYqA4WOXX1Av/SFlmlf04ZFjod4FDBAIr2NRjGE5BO3F/Rs3uQ6SpxMgbJtKr4+7UlLDmugFddye3Jp0jtqnfmLEx4oGuRwkkZHKjP62nDtFhTUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733876655; c=relaxed/simple;
-	bh=RbOrXry18u7MTCeRA/ZHJ8KYwndASIayO+JAAnydo6k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BsB1HiweBNOumw6LGsr9uydCt3BBLvIId9sOOJWHVM1PVBX+hyi39Eu8j/Zume+PoH2Vhkjxf40zw9aVd1qxmWdmopDoY+qMq2qKzhScz4mI/46YTu59KETymocf0E+RxsMBRU2u+XXFIzHLM5gdIspIc31sx0U+uP0LUBe2GSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IYTNCngH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1FE6C4CEDE;
-	Wed, 11 Dec 2024 00:24:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733876654;
-	bh=RbOrXry18u7MTCeRA/ZHJ8KYwndASIayO+JAAnydo6k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IYTNCngHaoNSPe+ai6ExtR4jlNKw8bc6azWE/ldlPH/7vP01bCbdpr7Tgn7/QD100
-	 5UGGpsvV6WvISQTHYPMrZn3S4kZ3VdO0866lFNWnLZiDasZn8YQwiws4bi00/T9JSY
-	 ppAI65WUHMR0KnHzsJGzd5joWFSFmow3aABUISd/eyB9GZEguSJQA2hUmv285WiYJo
-	 +sqd3Hmv0Pe9ia/JzjvOVuivtdQvgJ1NQdWcfzCigVV4wYEln1k6lysrWK0duhBNEI
-	 B8cowDNvW7L2JWOz6ANhgaVok1y0pLI671z8K6IZ3/PsQ16yzoSV/yyrGmucg22MBa
-	 /+SESyQ1RR1Ug==
-Date: Tue, 10 Dec 2024 16:24:12 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Paolo Abeni
- <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David
- Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-Subject: Re: [PATCH net-next v8 11/17] io_uring/zcrx: implement zerocopy
- receive pp memory provider
-Message-ID: <20241210162412.6f04a505@kernel.org>
-In-Reply-To: <aa20a0fd-75fb-4859-bd0e-74d0098daae8@gmail.com>
-References: <20241204172204.4180482-1-dw@davidwei.uk>
-	<20241204172204.4180482-12-dw@davidwei.uk>
-	<20241209200156.3aaa5e24@kernel.org>
-	<aa20a0fd-75fb-4859-bd0e-74d0098daae8@gmail.com>
+	s=arc-20240116; t=1733876758; c=relaxed/simple;
+	bh=wM0095OKMvKklc/EiHoH/Dogbj+M7ycnYTry719vZrA=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=kLVZHUSCN8RC2GK3HzbqVZLWFo/GLBfh0sdHuCzI6T6MDtzhj1bCRZvcP0Pm15PAgn3I9T3JHWCjm3sWbdX7RDaG7KOlLs5sBALYF7dO4bjZKWjgsqbGTfML/khDAB5XB1Hqb4VRUUsXyGd0+gWd3oLDECwj5hzs0Gr+8DjteBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A2jo4Q7P; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-434b3e32e9dso65615535e9.2;
+        Tue, 10 Dec 2024 16:25:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733876755; x=1734481555; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b8/cayzOhsqU4AsjHcoYJNNhPp9zDbVhe0OrNQHtSEU=;
+        b=A2jo4Q7PD1Xxn/qKxNMyI0b6RsCIVfb/seySW6avOtFXVd+3TlKSlNPWzBd59veHPT
+         fKbDwJTZSc1ZJNM6jxC/aH+2n/RNQSXUJ1ZvI2kM3Fl3+e2w5AuAnRWKz5T7B79lSUb3
+         zyqZ7DOVk09j/5r1Ww6mj6u8YNGzvlxmHTrY3yrK51Z1zLEL0KWe56tGlP9hB8s5gfb4
+         xnmx6A9lYgWFe/VCAZC8gG7VLkTg4kv4MgbPNIBNhXrxn/ybms8wPWhGJjnuIGIf1gsv
+         nQeJGkoGW9A7g8jshCIlmj8KXPJ5R/Tatp+dxxiy5mRsJSe6JjmGALukjPhaXyV2ZGzN
+         2QKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733876755; x=1734481555;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b8/cayzOhsqU4AsjHcoYJNNhPp9zDbVhe0OrNQHtSEU=;
+        b=GTeZEg61qHEQZFv9O5x78I9CE3BZPLZ+FRKao6kVwOjtGv4UijNOYmMv5TD/K113VW
+         L9YRqwKHJxrFHb74794cZXqrMf0aTeGoySGjMtc1kcpi4HyrDjUO154Xh3sCrAVET+NF
+         e9DMi2LtVIiQhuL3XRJoOzm/ydA8IqShNZJWZwCXl2rQNY5wPdojLls/XiZ9ZADLkH/4
+         5KXS4yTDDlcV7vRYpxJAWbnOMTRTeAgh3e92QgaCGotA8fNZVFMpgUSP1rvNikz4dTwB
+         Hurb098HJHfilQwL0L0d7lpY9SpqABi5dfipNYmsTHluFsKLJOkpqZAMzsedUo6MTrTd
+         9++w==
+X-Forwarded-Encrypted: i=1; AJvYcCVveNr51Nq/9TWJzv9LM7/9oZeIx8K+FUyiztKxkjoL5OjzDgn6km05s6nXxVR5RTcgGPh5Kv7h4IQ=@vger.kernel.org, AJvYcCXOLINFNMVqr2ZoKZ7KOWjG3PAldxHODFJjB2Xfq0dtIloVwR2IwsmLuXj8gaz4pnMRyZO/ozl+@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiwKyoO7mifpuHEIXe7Mavdz1POlMmsbi+8yn6GWovuQGxh3I+
+	v5Oh1zTS1TVg0vr4UcQyJFmP2F5sW/YYIuY2nCWOCFYDDaNxU68y
+X-Gm-Gg: ASbGncsrrLgNMj1iXUR3ko+WdMckHMJ+5gAt2coxiBUoEJ35UV9sfJemHyVd+aPHSKm
+	Uua7NCxEx6Em+A9SkzraPf0rGpm4aVmeL66v2Noihq34mYJ+5e1ii6PPTKLbh/RWPyKYWIa1czI
+	eljpe/wft0zau712ZcuxutTvEw9giiZsf7MM5uluaXHJ2Y2Ef/iiD3crGK+2M7ZkbISefDsfVRR
+	NcZ1KmCIioB6or0541c+zjYhDcKJdogP06guWR50IK6G2vRvmQQQD2DGTChVlsrXB60Cx7KdoMz
+	AqMgML149mG39xw+jcSsh61YtL99WR/GjZ/kJWsGTA==
+X-Google-Smtp-Source: AGHT+IEbklDrWieZb/9EH2a3HH/nUivEqGeY6jHRu3CMCKacFrbHJNqmZGkjSYN3YcEO5JWySX+qNw==
+X-Received: by 2002:a5d:64e8:0:b0:385:fc8c:24b6 with SMTP id ffacd0b85a97d-3864cea22d3mr572955f8f.27.1733876754762;
+        Tue, 10 Dec 2024 16:25:54 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434eba653a0sm132327145e9.22.2024.12.10.16.25.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2024 16:25:54 -0800 (PST)
+Subject: Re: [PATCH v7 18/28] sfc: get endpoint decoder
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
+Cc: Alejandro Lucero <alucerop@amd.com>
+References: <20241209185429.54054-1-alejandro.lucero-palau@amd.com>
+ <20241209185429.54054-19-alejandro.lucero-palau@amd.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <d3646edc-281a-1e43-4db3-dd4b29e4ef3f@gmail.com>
+Date: Wed, 11 Dec 2024 00:25:52 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20241209185429.54054-19-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 
-On Tue, 10 Dec 2024 04:45:23 +0000 Pavel Begunkov wrote:
-> > Can you say more about the IO_ZC_RX_UREF bias? net_iov is not the page
-> > struct, we can add more fields. In fact we have 8B of padding in it
-> > that can be allocated without growing the struct. So why play with  
+On 09/12/2024 18:54, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> I guess we can, though it's growing it for everyone not just
-> io_uring considering how indexing works, i.e. no embedding into
-> a larger struct.
-
-Right but we literally have 8B of "padding". We only need 32b counter
-here, so there will still be 4B of unused space. Not to mention that
-net_iov is not cacheline aligned today. Space is not a concern.
-
-> > biases? You can add a 32b atomic counter for how many refs have been
-> > handed out to the user.  
+> Use cxl api for getting DPA (Device Physical Address) to use through an
+> endpoint decoder.
 > 
-> This set does it in a stupid way, but the bias allows to coalesce
-> operations with it into a single atomic. Regardless, it can be
-> placed separately, though we still need a good way to optimise
-> counting. Take a look at my reply with questions in the v7 thread,
-> I outlined what can work quite well in terms of performance but
-> needs a clear api for that from net/
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
 
-I was thinking along the lines of transferring the ownership of
-the frags. But let's work on that as a follow up. Atomic add on 
-an exclusively owned cacheline is 2 cycles on AMD if I'm looking
-correctly.
+Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+
+> +	cxl->cxled = cxl_request_dpa(cxl->cxlmd, true, EFX_CTPIO_BUFFER_SIZE,
+> +				     EFX_CTPIO_BUFFER_SIZE);
+
+Just for my education, could you explain what's the difference between
+ cxl_dpa_alloc(..., size) and cxl_request_dpa(..., size, size)?  Since
+ you're not really making use of the min/max flexibility here, I assume
+ there's some other reason for using the latter.  Is it just that it's
+ a convenience wrapper that saves open-coding some of the boilerplate?
 
