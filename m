@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-151141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B837B9ECFC2
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 16:32:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22FFA9ECFC4
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 16:32:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 369C418887CC
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:32:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C908167A93
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B0D13B5AE;
-	Wed, 11 Dec 2024 15:32:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 687C71ABEA1;
+	Wed, 11 Dec 2024 15:32:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OaXWFTDW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EuhlBhi2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CDF8134AC
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 15:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43EE0134AC
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 15:32:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733931128; cv=none; b=WD9LDbnXD+M11iCfNA2qVGs1sTagfweTYkaFNJhUxSfTyUtUic5igLtjJsTrpm6waUk0xAvmamiUSXBfwDKoxvQcUhVvYKyk9MBmGJnL1f22avQIxSsdZVXNa9kdNU0iZ2nkNJ5oALZu1tMISSQWinoOE8ckfsIRmmnPFj2bjrA=
+	t=1733931131; cv=none; b=WzfRUWUKZuOVz+h6JrW0LGjHAUV7LsYwgb1AMUBkywa1VxihRo9WT3XsL63z0eifU1Ni0Rh3+wQxN9r4PV4Zl3JVR28Hs3vjkMKtKrtLdeHDBUx+RyJj1eFdBD+BBDpR5v7Rol7JHYNLnzcpZGjLHWvUO/0K907iLgqprUqR63E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733931128; c=relaxed/simple;
-	bh=nfkSVveSOQFK0fyG49zgemzYr5p+ZQr0aSixQs/hcLI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AgZdyb8Y1cTsENKdPpc8yoRdFhASIUn5Nr1MZwlwCer7JrU8ISDzZkP+YCa36vegpJICZb75QSCcgSpTfYnS3XkNHqKLBZW6U5DtbJnFnoiJn7iiCimr06uPWrWxQlT48w0eJ/rLragIW7MnFVjg08eQifl5vxmeoiYspQH+yCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OaXWFTDW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CE56C4CED2;
-	Wed, 11 Dec 2024 15:32:07 +0000 (UTC)
+	s=arc-20240116; t=1733931131; c=relaxed/simple;
+	bh=ROV6gAJ72HepSe7VqiKDMySMiiQ8/V+aYPKFzp3BNs4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NvZsP4FSTFi5iWAE4aI0WdRvK2SLK7rGrPowNbf/hJ4tC2nLK2sboXSaTLfCFM+o7QHNLyiQ+gigRryzm1/R/XmZM6cdVew2HQF4yaxXHrpMWh9HpwO6+4LURc/F7i5jfc+DIo4if55kgA2A2msoBm0WEMxb3kGoz0uY5c03ml8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EuhlBhi2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78A64C4CED2;
+	Wed, 11 Dec 2024 15:32:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733931127;
-	bh=nfkSVveSOQFK0fyG49zgemzYr5p+ZQr0aSixQs/hcLI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=OaXWFTDW0A+dsXvel28tzlEVS/63WQnjWOwZkYho1Vqs1w5aYFfCTgKS0hZ/ZYjcz
-	 UlJ/eCwrnnT3YekinGRGmeSmW7TGmxpZ6CY5ykX6l/5zXFwGvXZAkdVePHb1FSiU9/
-	 f4kvVR/5ha6mmrWmXpGuFxMHA9oUnkuV6XOsH16gZQosFTPKQf1SKmxJY6EpJ/3KGy
-	 UBerLPhI8Lr2phDepVgiayYzsEGoKKUZ5cXEdNvpdsEr/5hDQ8ekzaeKnHEHMb6fnT
-	 kltgPjaO/MWxkoaiP2q+C9IDjWT5qLc3A0FGbD5rzQelXUaK3FW5RYjQ23aBCzqSdT
-	 FsXGzetAtRRTQ==
+	s=k20201202; t=1733931130;
+	bh=ROV6gAJ72HepSe7VqiKDMySMiiQ8/V+aYPKFzp3BNs4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=EuhlBhi21LY7LlvP50LO4JRKHRzggagoRnf2Pppfij12bi5yjPbQeBybXTyuq7Ksb
+	 051D+Zm9I+sc82lD7KhQP6HgnIpNB4eTNvSBg3Du/IZVm7ORiOiARtPuHtj4rWECaS
+	 fipGJYnkA4sw4t7pXTTjMGBK1n7mrKxlZkfHeWR57C5XbaJDBVB1RobmmUwXMpgMiN
+	 39oQmXROaH+6ofVvc4vVie8FITrgo6EBk2p3lmbGNsDQJuJ3SJZaqYxURUs03XEP47
+	 DdfTPLii4GY3tw46HtO3xVKil1O5tNDMzTEBsWSjdm2asPttXzfynaMO/jKaNrUQmD
+	 ZcbU7EifXIoTQ==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -53,10 +54,12 @@ Cc: andrew@lunn.ch,
 	sean.wang@mediatek.com,
 	Mark-MC.Lee@mediatek.com,
 	lorenzo.bianconi83@gmail.com
-Subject: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha EN7581 SoC
-Date: Wed, 11 Dec 2024 16:31:48 +0100
-Message-ID: <cover.1733930558.git.lorenzo@kernel.org>
+Subject: [RFC net-next 1/5] net: airoha: Enable Tx drop capability for each Tx DMA ring
+Date: Wed, 11 Dec 2024 16:31:49 +0100
+Message-ID: <7447d3ae100352962c6a0c967bfeed73df9068b0.1733930558.git.lorenzo@kernel.org>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <cover.1733930558.git.lorenzo@kernel.org>
+References: <cover.1733930558.git.lorenzo@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,28 +68,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce support for ETS and TBF qdisc offload available in the Airoha
-EN7581 ethernet controller.
-Some DSA hw switches do not support Qdisc offloading or the mac chip
-has more fine grained QoS capabilities with respect to the hw switch
-(e.g. Airoha EN7581 mac chip has more hw QoS and buffering capabilities
-with respect to the mt7530 switch). 
-Introduce ndo_setup_tc_conduit callback in order to allow tc to offload
-Qdisc policies for the specified DSA user port configuring the hw switch
-cpu port (mac chip).
+This is a preliminary patch in order to enable hw Qdisc offloading.
 
-Lorenzo Bianconi (5):
-  net: airoha: Enable Tx drop capability for each Tx DMA ring
-  net: airoha: Introduce ndo_select_queue callback
-  net: dsa: Introduce ndo_setup_tc_conduit callback
-  net: airoha: Add sched ETS offload support
-  net: airoha: Add sched TBF offload support
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/mediatek/airoha_eth.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
- drivers/net/ethernet/mediatek/airoha_eth.c | 372 ++++++++++++++++++++-
- include/linux/netdevice.h                  |  12 +
- net/dsa/user.c                             |  47 ++-
- 3 files changed, 422 insertions(+), 9 deletions(-)
-
+diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
+index 6c683a12d5aa..dd8d65a7e255 100644
+--- a/drivers/net/ethernet/mediatek/airoha_eth.c
++++ b/drivers/net/ethernet/mediatek/airoha_eth.c
+@@ -1789,6 +1789,10 @@ static int airoha_qdma_init_tx_queue(struct airoha_queue *q,
+ 		WRITE_ONCE(q->desc[i].ctrl, cpu_to_le32(val));
+ 	}
+ 
++	/* xmit ring drop default setting */
++	airoha_qdma_set(qdma, REG_TX_RING_BLOCKING(qid),
++			TX_RING_IRQ_BLOCKING_TX_DROP_EN_MASK);
++
+ 	airoha_qdma_wr(qdma, REG_TX_RING_BASE(qid), dma_addr);
+ 	airoha_qdma_rmw(qdma, REG_TX_CPU_IDX(qid), TX_RING_CPU_IDX_MASK,
+ 			FIELD_PREP(TX_RING_CPU_IDX_MASK, q->head));
 -- 
 2.47.1
 
