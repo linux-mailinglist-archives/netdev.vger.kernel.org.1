@@ -1,284 +1,134 @@
-Return-Path: <netdev+bounces-150994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5219F9EC4C7
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 07:30:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A38579EC4CA
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 07:32:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D84D8168A3E
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 06:30:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FBD8163A67
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 06:32:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA6A1C4A36;
-	Wed, 11 Dec 2024 06:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B4AC1C32E4;
+	Wed, 11 Dec 2024 06:32:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="ZEecOv7O"
+	dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b="Ki9h0kSp"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636CF1B85F8;
-	Wed, 11 Dec 2024 06:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3791B0F01
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 06:31:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733898618; cv=none; b=Ke8xg7RVVlXZ8zLvyk6cxZ1LgHWY6VtHjX6+YsXL+zVSbbSoHL5oq/a54VO0AKD+NhCRxcs0qkPona1gBQeMioBkXZNcw/ZhHRzYwTE/dJ/51VirQoA1HrhNj2/A9pKKn7LQ1fa2xtmsFxyTPT5lDajF4hpwjJVqB7FQLiSCdo8=
+	t=1733898721; cv=none; b=l5gXhcH6g5lDV+9rkiPjI0lS7LuGwapoOepdgv/iSYAg3VbTAwRi4V3VIbjET2hArK8beR4rpEX8N+oCuEC54VXViNZWs7MucNPlgDOUHICiR+genrGDTEvhr60nHsnxLNXNiFEn/JEkL1Vnnd2j1MmX9BmCwEFukVz1jNJh2HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733898618; c=relaxed/simple;
-	bh=k1BxJHbleykfubxbLq3WM1bUxZIXi+Nircdv7l1clW4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZWyyGiM6Nz81F48/UtGI/1zflZhyPHdKCSAr9KFGAiY2gN66kG7IWIZs913FDi/+Edxaph9GtP8qUxp0tqJRsg/4+LX6vco5tZ8qg3Papg57fFlHSw49rTlsHCBsLT0jG97A1ieSvyjITqSLkX6NWfomede+XA4e9mP0WtEHrao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=ZEecOv7O; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4BB6TmbqE3341241, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1733898589; bh=k1BxJHbleykfubxbLq3WM1bUxZIXi+Nircdv7l1clW4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=ZEecOv7OvWYb/gof0sCamLmUnxAkJ9V91nhZpqu/DAm6I6CVrLy4WN46cpWEMXti8
-	 r5+mlpwrETW316o7zShI0HE1aCOMpfJ50GwT1Gzvxdp3vg/9odr7LuSxCU5ppj48Mq
-	 QvKLULQ2vw+KvYJzTklokfZxTpH2LrCr55I8mIK4Wnteu14WpIrvHRiWyoDmFRC6dJ
-	 UjKu84fbe55GC0rKrhOk7Y57xZrILqlHo9GmnRjgRTLGpcXY7MrXJqF/kxiW6tb0CV
-	 yajiSnevNeVUXpCpVggNNvvLYEEgCECxCHpAXIIZrcH8OZz0idY0+E6ewiX+5ez4/5
-	 RP2+z8Z9t6ZKw==
-Received: from RSEXH36502.realsil.com.cn (msx.realsil.com.cn[172.29.17.3])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4BB6TmbqE3341241
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
-	Wed, 11 Dec 2024 14:29:49 +0800
-Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
- RSEXH36502.realsil.com.cn (172.29.17.3) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 11 Dec 2024 14:29:48 +0800
-Received: from RSEXH36502.realsil.com.cn (172.29.17.3) by
- RS-EX-MBS3.realsil.com.cn (172.29.17.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Wed, 11 Dec 2024 14:29:48 +0800
-Received: from 172.29.32.27 (172.29.32.27) by RSEXH36502.realsil.com.cn
- (172.29.17.3) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 11 Dec 2024 14:29:48 +0800
-From: ChunHao Lin <hau@realtek.com>
-To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        ChunHao Lin
-	<hau@realtek.com>
-Subject: [PATCH net-next] r8169: add support for RTL8125D rev.b
-Date: Wed, 11 Dec 2024 14:29:46 +0800
-Message-ID: <20241211062946.3716-1-hau@realtek.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1733898721; c=relaxed/simple;
+	bh=tjNGwI3JyN0lTO3lWL7gsHveByFhzhe+vTxNwm4q5pY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tfCIFOf0gx4+Yw5Vz7cIspcJecetoVg6UH5ikdNOZnAHgHNc2CtZe4ZrFm+MZuRgZDyiRyGuX4hwotYOkJCSe4hc/zGF6jiMtqIDmOt03YhX6x9NBC7LiKkKuQgGDGVa0dYwnYbfbntcHzKu0WpGN1hsSocPm1B/seVya2uRz5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com; spf=none smtp.mailfrom=andrewstrohman.com; dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b=Ki9h0kSp; arc=none smtp.client-ip=209.85.219.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=andrewstrohman.com
+Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e398484b60bso5225938276.1
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 22:31:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=andrewstrohman-com.20230601.gappssmtp.com; s=20230601; t=1733898719; x=1734503519; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tjNGwI3JyN0lTO3lWL7gsHveByFhzhe+vTxNwm4q5pY=;
+        b=Ki9h0kSpjYYCAq9xspFL+RGLWwE2l4FMb+j35XA/Q/L5rYbQHER/D9ztM9Oq91ipBo
+         Oymh7NDmiq2ehh9xO6smgy85hdgrCiU0z6z0Eawiyac5DXd743hvdQbKCHLTgapn1iyz
+         h0/w9buxmPw5vkLiV4qxXWbM2JoFwQEX/MiyeN4UmeguyNMSCCT2J8Od71Jtw6AZlOdt
+         yFySawq3YPok5GAMVCrXMTBBBYyMj0ARlKJC8w3bN6Cj+8BrRiYXMutohsYL/Hd6fVpv
+         or9XwoEmQNVAyxAAAAGSmURqP1j00rcunRd1ZgRfL1sxtXIP+1jRQUKs/cXDa1SryvnY
+         bDIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733898719; x=1734503519;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tjNGwI3JyN0lTO3lWL7gsHveByFhzhe+vTxNwm4q5pY=;
+        b=vV2l07xBlzLzdzIjbk5juN2v4VIsjsK1ZGjHHu/h3dkinkHM5ZqmyFfdPhPB6O+QiA
+         grm1YUPe2uEvB3GsfIv3LAK9fiI+Bz+7J2m1P/Chk6COK6TEJ6PpW6SIwRLA6V3UBQ/y
+         WUTQC4L4idWdvt6AWFA94YnbisaVUDj9/BeMsFqxlDrl13dI+YRGtXKPRl1RRG0VlhA8
+         4OHNAhIlT/BFCxGNvuvLJokVOV6I3W9GIU3WNfsjJy69keNxHdlqFG4vX+qUsS8zUP7t
+         CquGR4dhaEemA7fU/qhpB6w3xY3T2VAC3SixxYquAoc7LItBEBqcK6VQFIIWLWfo/DRA
+         +AyA==
+X-Forwarded-Encrypted: i=1; AJvYcCXkuqFY5LF0i/mi08Zmszz8WtY4yKood5KOIC310qIiAaLG1tIjvjz0J0LpFvQ2UWaJ8pNxlbk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvrgBejj3jHE/p/f7x8ecQHKO5bboLSsJb8Tc7b7txfYLjefLV
+	GCFfQiFkAUCdJtQTK+W/TMXuzH/d25+1yrNKDYiSm/iYIB7GbJ//IRdPaKgrMRxIs2UP5o5ZqIS
+	50pRQxa0N4GXvT7D6lUVn1/b4jf89qytBhiAfoN9ChGirk1BOiBU=
+X-Gm-Gg: ASbGncvh2oZPybem05uEb7AFFfpAtbhDS9EjH01eIwg7NSSerQA3SQxbaEZYPTs4WNJ
+	5Jm5SrwJwlL214m4ow4V7zDfzWO6Y0l6hJiI=
+X-Google-Smtp-Source: AGHT+IFpqB8++GwCPCoca2FkFUGl5QNG6byYHcL1Hv+rwtzJe7wqU8sOxBY+fjbLZRtRpSmjfnai+zERa+ZGtA5fiBE=
+X-Received: by 2002:a05:6902:2b88:b0:e38:91e2:5173 with SMTP id
+ 3f1490d57ef6-e3c8e42e955mr1788501276.8.1733898718868; Tue, 10 Dec 2024
+ 22:31:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+References: <20241201074212.2833277-1-andrew@andrewstrohman.com>
+ <Z019fbECX6R4HHpm@nanopsycho.orion> <20241202094508.4tpbed2b4amyvbsi@skbuf>
+In-Reply-To: <20241202094508.4tpbed2b4amyvbsi@skbuf>
+From: Andrew Strohman <andrew@andrewstrohman.com>
+Date: Tue, 10 Dec 2024 22:31:48 -0800
+Message-ID: <CAA8ajJn63xVmU7vd8UWT3eYtsMpVmd_njeGZRVs2DFE9MK0Eww@mail.gmail.com>
+Subject: Re: [PATCH net-next] dsa: Make offloading optional on per port basis
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add support for RTL8125D rev.b. Its XID is 0x689. It is basically
-based on the one with XID 0x688, but with different firmware file.
+Hi Vladimir,
 
-Signed-off-by: ChunHao Lin <hau@realtek.com>
----
- drivers/net/ethernet/realtek/r8169.h          |  1 +
- drivers/net/ethernet/realtek/r8169_main.c     | 32 +++++++++++--------
- .../net/ethernet/realtek/r8169_phy_config.c   |  1 +
- 3 files changed, 21 insertions(+), 13 deletions(-)
+Thanks for the review. I've responded back to Jiri,
+about making this more generic. I'm happy
+to make this more generic, but I'd appreciate
+some guidance on the best way forward.
 
-diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
-index 8904aae41aca..5b87c89363b3 100644
---- a/drivers/net/ethernet/realtek/r8169.h
-+++ b/drivers/net/ethernet/realtek/r8169.h
-@@ -71,6 +71,7 @@ enum mac_version {
- 	RTL_GIGA_MAC_VER_64,
- 	RTL_GIGA_MAC_VER_65,
- 	RTL_GIGA_MAC_VER_66,
-+	RTL_GIGA_MAC_VER_67,
- 	RTL_GIGA_MAC_NONE
- };
- 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 6934bdee2a91..c97cfbf876af 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -57,6 +57,7 @@
- #define FIRMWARE_8125A_3	"rtl_nic/rtl8125a-3.fw"
- #define FIRMWARE_8125B_2	"rtl_nic/rtl8125b-2.fw"
- #define FIRMWARE_8125D_1	"rtl_nic/rtl8125d-1.fw"
-+#define FIRMWARE_8125D_2	"rtl_nic/rtl8125d-2.fw"
- #define FIRMWARE_8126A_2	"rtl_nic/rtl8126a-2.fw"
- #define FIRMWARE_8126A_3	"rtl_nic/rtl8126a-3.fw"
- 
-@@ -142,6 +143,7 @@ static const struct {
- 	[RTL_GIGA_MAC_VER_64] = {"RTL8125D",		FIRMWARE_8125D_1},
- 	[RTL_GIGA_MAC_VER_65] = {"RTL8126A",		FIRMWARE_8126A_2},
- 	[RTL_GIGA_MAC_VER_66] = {"RTL8126A",		FIRMWARE_8126A_3},
-+	[RTL_GIGA_MAC_VER_67] = {"RTL8125D",		FIRMWARE_8125D_2},
- };
- 
- static const struct pci_device_id rtl8169_pci_tbl[] = {
-@@ -706,6 +708,7 @@ MODULE_FIRMWARE(FIRMWARE_8107E_2);
- MODULE_FIRMWARE(FIRMWARE_8125A_3);
- MODULE_FIRMWARE(FIRMWARE_8125B_2);
- MODULE_FIRMWARE(FIRMWARE_8125D_1);
-+MODULE_FIRMWARE(FIRMWARE_8125D_2);
- MODULE_FIRMWARE(FIRMWARE_8126A_2);
- MODULE_FIRMWARE(FIRMWARE_8126A_3);
- 
-@@ -1228,7 +1231,7 @@ static void rtl_writephy(struct rtl8169_private *tp, int location, int val)
- 	case RTL_GIGA_MAC_VER_31:
- 		r8168dp_2_mdio_write(tp, location, val);
- 		break;
--	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_67:
- 		r8168g_mdio_write(tp, location, val);
- 		break;
- 	default:
-@@ -1243,7 +1246,7 @@ static int rtl_readphy(struct rtl8169_private *tp, int location)
- 	case RTL_GIGA_MAC_VER_28:
- 	case RTL_GIGA_MAC_VER_31:
- 		return r8168dp_2_mdio_read(tp, location);
--	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_67:
- 		return r8168g_mdio_read(tp, location);
- 	default:
- 		return r8169_mdio_read(tp, location);
-@@ -1574,7 +1577,7 @@ static void __rtl8169_set_wol(struct rtl8169_private *tp, u32 wolopts)
- 		break;
- 	case RTL_GIGA_MAC_VER_34:
- 	case RTL_GIGA_MAC_VER_37:
--	case RTL_GIGA_MAC_VER_39 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_39 ... RTL_GIGA_MAC_VER_67:
- 		r8169_mod_reg8_cond(tp, Config2, PME_SIGNAL, wolopts);
- 		break;
- 	default:
-@@ -2047,7 +2050,7 @@ static void rtl_set_eee_txidle_timer(struct rtl8169_private *tp)
- 		tp->tx_lpi_timer = timer_val;
- 		r8168_mac_ocp_write(tp, 0xe048, timer_val);
- 		break;
--	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_67:
- 		tp->tx_lpi_timer = timer_val;
- 		RTL_W16(tp, EEE_TXIDLE_TIMER_8125, timer_val);
- 		break;
-@@ -2259,6 +2262,7 @@ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
- 		{ 0x7cf, 0x649,	RTL_GIGA_MAC_VER_65 },
- 
- 		/* 8125D family. */
-+		{ 0x7cf, 0x689,	RTL_GIGA_MAC_VER_67 },
- 		{ 0x7cf, 0x688,	RTL_GIGA_MAC_VER_64 },
- 
- 		/* 8125B family. */
-@@ -2526,7 +2530,7 @@ static void rtl_init_rxcfg(struct rtl8169_private *tp)
- 	case RTL_GIGA_MAC_VER_61:
- 		RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST);
- 		break;
--	case RTL_GIGA_MAC_VER_63 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_63 ... RTL_GIGA_MAC_VER_67:
- 		RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST |
- 			RX_PAUSE_SLOT_ON);
- 		break;
-@@ -2658,7 +2662,7 @@ static void rtl_wait_txrx_fifo_empty(struct rtl8169_private *tp)
- 	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_61:
- 		rtl_loop_wait_high(tp, &rtl_rxtx_empty_cond, 100, 42);
- 		break;
--	case RTL_GIGA_MAC_VER_63 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_63 ... RTL_GIGA_MAC_VER_67:
- 		RTL_W8(tp, ChipCmd, RTL_R8(tp, ChipCmd) | StopReq);
- 		rtl_loop_wait_high(tp, &rtl_rxtx_empty_cond, 100, 42);
- 		rtl_loop_wait_high(tp, &rtl_rxtx_empty_cond_2, 100, 42);
-@@ -2901,7 +2905,7 @@ static void rtl_enable_exit_l1(struct rtl8169_private *tp)
- 	case RTL_GIGA_MAC_VER_37 ... RTL_GIGA_MAC_VER_38:
- 		rtl_eri_set_bits(tp, 0xd4, 0x0c00);
- 		break;
--	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_67:
- 		r8168_mac_ocp_modify(tp, 0xc0ac, 0, 0x1f80);
- 		break;
- 	default:
-@@ -2915,7 +2919,7 @@ static void rtl_disable_exit_l1(struct rtl8169_private *tp)
- 	case RTL_GIGA_MAC_VER_34 ... RTL_GIGA_MAC_VER_38:
- 		rtl_eri_clear_bits(tp, 0xd4, 0x1f00);
- 		break;
--	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_67:
- 		r8168_mac_ocp_modify(tp, 0xc0ac, 0x1f80, 0);
- 		break;
- 	default:
-@@ -2953,7 +2957,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
- 
- 		switch (tp->mac_version) {
- 		case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
--		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
-+		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_67:
- 			/* reset ephy tx/rx disable timer */
- 			r8168_mac_ocp_modify(tp, 0xe094, 0xff00, 0);
- 			/* chip can trigger L1.2 */
-@@ -2965,7 +2969,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
- 	} else {
- 		switch (tp->mac_version) {
- 		case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
--		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
-+		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_67:
- 			r8168_mac_ocp_modify(tp, 0xe092, 0x00ff, 0);
- 			break;
- 		default:
-@@ -3839,6 +3843,7 @@ static void rtl_hw_config(struct rtl8169_private *tp)
- 		[RTL_GIGA_MAC_VER_64] = rtl_hw_start_8125d,
- 		[RTL_GIGA_MAC_VER_65] = rtl_hw_start_8126a,
- 		[RTL_GIGA_MAC_VER_66] = rtl_hw_start_8126a,
-+		[RTL_GIGA_MAC_VER_67] = rtl_hw_start_8125d,
- 	};
- 
- 	if (hw_configs[tp->mac_version])
-@@ -3855,6 +3860,7 @@ static void rtl_hw_start_8125(struct rtl8169_private *tp)
- 	switch (tp->mac_version) {
- 	case RTL_GIGA_MAC_VER_61:
- 	case RTL_GIGA_MAC_VER_64:
-+	case RTL_GIGA_MAC_VER_67:
- 		for (i = 0xa00; i < 0xb00; i += 4)
- 			RTL_W32(tp, i, 0);
- 		break;
-@@ -4092,7 +4098,7 @@ static void rtl8169_cleanup(struct rtl8169_private *tp)
- 		RTL_W8(tp, ChipCmd, RTL_R8(tp, ChipCmd) | StopReq);
- 		rtl_loop_wait_high(tp, &rtl_txcfg_empty_cond, 100, 666);
- 		break;
--	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_67:
- 		rtl_enable_rxdvgate(tp);
- 		fsleep(2000);
- 		break;
-@@ -4249,7 +4255,7 @@ static unsigned int rtl_quirk_packet_padto(struct rtl8169_private *tp,
- 
- 	switch (tp->mac_version) {
- 	case RTL_GIGA_MAC_VER_34:
--	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_67:
- 		padto = max_t(unsigned int, padto, ETH_ZLEN);
- 		break;
- 	default:
-@@ -5267,7 +5273,7 @@ static void rtl_hw_initialize(struct rtl8169_private *tp)
- 	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_48:
- 		rtl_hw_init_8168g(tp);
- 		break;
--	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_67:
- 		rtl_hw_init_8125(tp);
- 		break;
- 	default:
-diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
-index b28b30390e84..bfdcadebe486 100644
---- a/drivers/net/ethernet/realtek/r8169_phy_config.c
-+++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
-@@ -1164,6 +1164,7 @@ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
- 		[RTL_GIGA_MAC_VER_64] = rtl8125d_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_65] = rtl8126a_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_66] = rtl8126a_hw_phy_config,
-+		[RTL_GIGA_MAC_VER_67] = rtl8125d_hw_phy_config,
- 	};
- 
- 	if (phy_configs[ver])
--- 
-2.43.0
+So, if you have a suggestion about how to store
+the configuration that signals that the port should
+not be offloaded, I'd love to hear it.
 
+As I described in my response to Jiri, it looks like
+adding the next netdev feature will be painful.
+Do you thinking adding a new netdev feature
+is the best way forward here?
+
+
+Thanks,
+
+Andy
+
+
+
+
+
+On Mon, Dec 2, 2024 at 1:45=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com> =
+wrote:
+>
+> On Mon, Dec 02, 2024 at 10:27:25AM +0100, Jiri Pirko wrote:
+> > Why is this DSA specific? Plus, you say you want to disable offloading
+> > in general (DSA_FLAG_OFFLOADING_DISABLED), but you check the flag only
+> > when joining bridge. I mean, shouldn't this be rather something exposed
+> > by some common UAPI?
+>
+> I agree with this. The proposed functionality isn't DSA specific, and
+> thus, the UAPI to configure it shouldn't be made so.
+>
+> > Btw, isn't NETIF_F_HW_L2FW_DOFFLOAD what you are looking for?
+>
+> Is it? macvlan uses NETIF_F_HW_L2FW_DOFFLOAD to detect presence of
+> netdev_ops->ndo_dfwd_add_station(). Having to even consider macvlan
+> offload and its implications just because somebody decided to monopolize
+> the "l2-fwd-offload" name seems at least bizarre in my opinion.
 
