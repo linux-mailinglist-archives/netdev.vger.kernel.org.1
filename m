@@ -1,78 +1,94 @@
-Return-Path: <netdev+bounces-151118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E92909ECDDA
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:01:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 814339ECDD7
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:00:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A03616733E
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:00:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 127CE188CA52
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F89A23694A;
-	Wed, 11 Dec 2024 14:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63543236913;
+	Wed, 11 Dec 2024 14:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iVaSzB3D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o+FajsLX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0702E236942;
-	Wed, 11 Dec 2024 14:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8E023692D
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 14:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733925621; cv=none; b=CRhhPl/NrXCMLJCUwignE9UeRKJVzlrlu5GFA43lHFIRJi0+2MWfnReitgflKSQudZSnDgLeO9E9IEB1EuWDPV9xGdIkz7rNnhH5U/W0+vxuQCVyksdepsfx9w7patdhdr2gOurnB35cMcyG/AmgV9ycv28wEfck3apgCjkl3wM=
+	t=1733925620; cv=none; b=XwU0ksVRg+RAB2svRwg/cMjAHMwjtX1WM/XFBJ2jS7tITvxrUwFf6+wqNV20xbg382Taor/2f1KqIViX1rzBeV2kJUeUJRV1Cq9fAEzVKuBE9u7nQ2vrGU0VdXL8SwZ1Wj1KadcOe4ndJm8A8tAVzi3rC7yGbhFk70ry6lVD5xM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733925621; c=relaxed/simple;
-	bh=nIlzAcfl9O6eXzIAlla0bKYL1nk3/WO3361TA6pxwh0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b/6zR9bip0t9qP1xN0I0XadE0yNQxhjpv6+dyDFjyhh0Fzn1K3ODuB2VxBdB4Z+3jgIB0ATsmgOyTnSGjhKXB9b7GjOnPsSlbg5z9TftyriKWG2XkKh74odFbwgMJfP3s+Q+23exP1K31+qU4flzOuHr7Wl6rrhmUV5oofcwTfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iVaSzB3D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBB11C4CED7;
-	Wed, 11 Dec 2024 14:00:19 +0000 (UTC)
+	s=arc-20240116; t=1733925620; c=relaxed/simple;
+	bh=5KI0t3Srr1i4GA/+pE4ZnRH7Ha9ZRUjNl/KzyXi0bzo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hZUysQrkaqVtj5AtVrNtXhEeIAsTSNCDE4P/i5Ij9nOjThdxS4jFBCDNbyzQEq9+JiT4YQqWLm27vJMjud1OyMn+7OfInoq/EY5QORLOw00j3yBLYlvmAj9gGQFQPSw94KfdN1Lko906jERpHnUUEBa5ApmP4apo16sE/tM8xCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o+FajsLX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7E09C4CED2;
+	Wed, 11 Dec 2024 14:00:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733925620;
-	bh=nIlzAcfl9O6eXzIAlla0bKYL1nk3/WO3361TA6pxwh0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iVaSzB3DeyJn/Hhm3UR/vVi85MAoBHQShaTEkGDH2fWlLYw1Esxiqg85/uIoXgqDW
-	 uENolEfgmR/rX/v0KsyYc1iAYCGTy2xiB848uFqcKznKXwhdqgZaSFPgB3y5icN6c4
-	 gDjwVHt7MrDBLEMKVRDGmIfcFD+Y5O54iM1bTk8VLuXo49z63owHLzsWciGPzB71zx
-	 B9ATjVFXO7UbPaQqoTtctNBdA+PWPLnKv+4g8rKWATd/ZWdxfzrvuzd6HtWAQt4Qng
-	 34JHWftD6lSoW4gs9L/jzrddCmnXLcUvDhUUiCZ9oIi0CEx2cKFiVkmA7z4sM6oPh/
-	 FMruKcoRyLYxA==
-Date: Wed, 11 Dec 2024 06:00:18 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <andrew+netdev@lunn.ch>, <horms@kernel.org>, <gregkh@linuxfoundation.org>,
- <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
- <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
- <sudongming1@huawei.com>, <xujunsheng@huawei.com>,
- <shiyongbang@huawei.com>, <libaihan@huawei.com>,
- <jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
- <salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <hkelam@marvell.com>
-Subject: Re: [PATCH V6 net-next 1/7] net: hibmcge: Add debugfs supported in
- this module
-Message-ID: <20241211060018.14f56635@kernel.org>
-In-Reply-To: <20241210134855.2864577-2-shaojijie@huawei.com>
-References: <20241210134855.2864577-1-shaojijie@huawei.com>
-	<20241210134855.2864577-2-shaojijie@huawei.com>
+	s=k20201202; t=1733925617;
+	bh=5KI0t3Srr1i4GA/+pE4ZnRH7Ha9ZRUjNl/KzyXi0bzo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=o+FajsLXFQlDJZESfFJpPPV6i9cUnOYhSznkjh0yfHq6MKFS4GHcOl6bb0I4k9s7v
+	 ZR0UP+qQ2n8Z8XHc4EdYcQiZZ0dtfElXHKiukJ5UA611lP0s/U3kCBz6TiDzg4cuWh
+	 FXCtZwLZzQ50qzEhJopvnJ9L2QIZS9CmeeHxUmoW4wDqoLvHJmTblJYrm8iiuR15Fl
+	 Iq6AS83bLSky5N2dFCcFWmQ4WO2oXcTUPqrT708eSiR5bRgLlS6zN9O+jyabbgXNLf
+	 WqcCgVJfxN7d8OQCPjBy++ut0XHYbB882Nvsx9YSrmRmhsHc1zyN4VOApdbFvEwOQ1
+	 vGDcsEB/4WSqw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EBA08380A962;
+	Wed, 11 Dec 2024 14:00:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] l2tp: Handle eth stats using
+ NETDEV_PCPU_STAT_DSTATS.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173392563378.1585286.17233800331525317529.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Dec 2024 14:00:33 +0000
+References: <20241209114607.2342405-1-jchapman@katalix.com>
+In-Reply-To: <20241209114607.2342405-1-jchapman@katalix.com>
+To: James Chapman <jchapman@katalix.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, tparkin@katalix.com,
+ aleksander.lobakin@intel.com, ricardo@marliere.net, mail@david-bauer.net,
+ gnault@redhat.com
 
-On Tue, 10 Dec 2024 21:48:49 +0800 Jijie Shao wrote:
-> +		debugfs_create_devm_seqfile(dev, hbg_dbg_infos[i].name,
-> +					    root, hbg_dbg_infos[i].read);
+Hello:
 
-Like I said last time, if you devm_ the entire folder you don't have to
-devm_ each individual file. debugfs_remove_recursive() removes all files
-under specified directory.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Mon,  9 Dec 2024 11:46:07 +0000 you wrote:
+> l2tp_eth uses the TSTATS infrastructure (dev_sw_netstats_*()) for RX
+> and TX packet counters and DEV_STATS_INC for dropped counters.
+> 
+> Consolidate that using the DSTATS infrastructure, which can
+> handle both packet counters and packet drops. Statistics that don't
+> fit DSTATS are still updated atomically with DEV_STATS_INC().
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] l2tp: Handle eth stats using NETDEV_PCPU_STAT_DSTATS.
+    https://git.kernel.org/netdev/net-next/c/c0b8980e6041
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
