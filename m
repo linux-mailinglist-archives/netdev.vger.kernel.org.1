@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-150974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C84B9EC3AE
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 04:48:09 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20D089EC3B9
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 04:49:16 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0325C286263
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:48:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99DF3188B6C0
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B85BB22915F;
-	Wed, 11 Dec 2024 03:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED48B23236B;
+	Wed, 11 Dec 2024 03:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="De8yOqZt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fbIsJENH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89B7E22914B;
-	Wed, 11 Dec 2024 03:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB2A217F40;
+	Wed, 11 Dec 2024 03:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733888653; cv=none; b=O5xRB7NeylmGxuXEl1aH6F+tKvYx3bFp9/jXcHurd4KhmYzfegML6Nza0O5zpG1KyUYqYfM8P+De1kg464s7eL5tM/i81OIlb+RLrZN8NJ8io77jIltxJDw9YFllF7lzgHWZnL6aUYZWbaZc65cSTWOHAzZVYaxOO+ra1emKeLw=
+	t=1733888867; cv=none; b=HGs4WpMCzduSHah8iVT05S8yXAee76fII++yj9Wti/mvB8BISIcAKGjQj+66+mVpiMm1chftLj4w4hC5qJh+qf4toxMEvATaEl+eUWMpDPQGkhgshWTMBx5JftiGaNryk/6x8VtpVa/YAIqrz23SbHKguFhMzoDkSPQXOntU/M0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733888653; c=relaxed/simple;
-	bh=97Q9KZPqtfr3u6MHwjc600BHQ9UHmgQQX4d8wB3oYIg=;
+	s=arc-20240116; t=1733888867; c=relaxed/simple;
+	bh=4VXvFe7m050VpSVNBvTDwFfGuKPuf2l5vzRdP3v5/38=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qja8Kjspmu1XRpzm26RsuC0epTToRcn8PMEk5M+2RctVfxWFeDlJm01TtdjFStWfLBn+u1U9QtCRRw1NKlCf4j7w7miuyoFC8tRrX2a8siAfScn6OmRFcDtGU5L/n2wu+vR9a2mQLhCZox2UMNGwgphnIemfz1gepFGoKKpIBSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=De8yOqZt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 649BAC4CED2;
-	Wed, 11 Dec 2024 03:44:12 +0000 (UTC)
+	 MIME-Version:Content-Type; b=WSzoxaOSqAsrOjy3RsAZ5Lsb7JKrtJ5EOarpiQyLqCR//YZyusiYmRDiIsPov61AtVPe/ORbdv8BmraNoBGPpa4SkpF4ANgdjiPUK+iEhb9fECp3zR/8UGIINnXK+Szu13HQsn/aMwm+sX1rP0AyrZtMeYPt4OYdcDX0DX0shUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fbIsJENH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86041C4CED2;
+	Wed, 11 Dec 2024 03:47:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733888653;
-	bh=97Q9KZPqtfr3u6MHwjc600BHQ9UHmgQQX4d8wB3oYIg=;
+	s=k20201202; t=1733888867;
+	bh=4VXvFe7m050VpSVNBvTDwFfGuKPuf2l5vzRdP3v5/38=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=De8yOqZtNLM3PkoX8NYyt4N7fB7i8wlpXEVCXyLQRz2ebgIYLHrw8h28y81u8jeGB
-	 mNOCiOHhnA5lf41SzQI+gc4QJR4HcGW+lFYMOouJa37pyMiELGNlhh2LViR3ocSqZU
-	 rYQM3dsOaJT0ujNTiGC7tLftA59RlzrmBnIvUaM8Nd/sHMsi66AB3kEH+ZYbPgc3G2
-	 XKPfc7SvB8RDUhPXENs3QpkcXbvosEXJsZOcnf/Vd41TygTrJGEaeIfX5CqE9ANx1R
-	 XSZCVSp3LZrl0BnzKOPS+dy5cCBh8MW5U0iyF7+FJ9kCx0rcKbQu/oZxOmx2zp7qPA
-	 ROnaA/l4YifRw==
-Date: Tue, 10 Dec 2024 19:44:11 -0800
+	b=fbIsJENHb8B/oO7g0wQh/evbS6I87BuukPBtB+x9SvC74OEqDcRqtobK9rzX1bewj
+	 CCYKFmGmRcHlbX18y+CMzs25nqfW7lvg7XSaDAjTISRDUNstRxvgTserXRCfdn1rZX
+	 wqfSWP+u7FfNZR2qbA1FtPKtF8ro3KGEsVto0s3ckulJgE09n4eI8LUNxut5SiKwgq
+	 BPiXWKrZYWUj5YaExjUrnXHwATFtCBXtgb8Pgzoiim+MKV9Ea/RIx8Nz5rm5dZ1CAf
+	 gxsfiszwIbWz6rOWyXa9/JlZ2lzp/7nQEU+mF+zVCod1WZxeQC9qmlL+q/v63JNcmk
+	 FbJWus52JkPlw==
+Date: Tue, 10 Dec 2024 19:47:45 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Mina Almasry <almasrymina@google.com>
 Cc: netdev@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>, Kaiyuan
@@ -52,12 +52,12 @@ Cc: netdev@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>, Kaiyuan
  Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Jesper
  Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
  <ilias.apalodimas@linaro.org>
-Subject: Re: [PATCH net-next v3 3/5] page_pool: Set `dma_sync` to false for
- devmem memory provider
-Message-ID: <20241210194411.5c0a98ad@kernel.org>
-In-Reply-To: <20241209172308.1212819-4-almasrymina@google.com>
+Subject: Re: [PATCH net-next v3 4/5] page_pool: disable sync for cpu for
+ dmabuf memory provider
+Message-ID: <20241210194745.7a0a319e@kernel.org>
+In-Reply-To: <20241209172308.1212819-5-almasrymina@google.com>
 References: <20241209172308.1212819-1-almasrymina@google.com>
-	<20241209172308.1212819-4-almasrymina@google.com>
+	<20241209172308.1212819-5-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,12 +67,38 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon,  9 Dec 2024 17:23:06 +0000 Mina Almasry wrote:
-> +	/* dma-buf dma addresses should not be used with
+On Mon,  9 Dec 2024 17:23:07 +0000 Mina Almasry wrote:
+> -static inline void page_pool_dma_sync_for_cpu(const struct page_pool *pool,
+> -					      const struct page *page,
+> -					      u32 offset, u32 dma_sync_size)
+> +static inline void
+> +page_pool_dma_sync_netmem_for_cpu(const struct page_pool *pool,
+> +				  const netmem_ref netmem, u32 offset,
+> +				  u32 dma_sync_size)
+>  {
+> +	if (pool->mp_priv)
 
-Sounds a bit scary, maybe let's say:
-                                 vvvvvvvvvvvvvvv
-	/* dma-buf DMA addresses do not need and should not be used with
+Let's add a dedicated bit to skip sync. The io-uring support feels
+quite close. Let's not force those guys to have to rejig this.
 
-? up to you.
+> +		return;
+> +
+>  	dma_sync_single_range_for_cpu(pool->p.dev,
+> -				      page_pool_get_dma_addr(page),
+> +				      page_pool_get_dma_addr_netmem(netmem),
+>  				      offset + pool->p.offset, dma_sync_size,
+>  				      page_pool_get_dma_dir(pool));
+>  }
+>  
+> +static inline void page_pool_dma_sync_for_cpu(const struct page_pool *pool,
+> +					      struct page *page, u32 offset,
+> +					      u32 dma_sync_size)
+> +{
+> +	page_pool_dma_sync_netmem_for_cpu(pool, page_to_netmem(page), offset,
+> +					  dma_sync_size);
+
+I have the feeling Olek won't thank us for this extra condition and
+bit clearing. If driver calls page_pool_dma_sync_for_cpu() we don't
+have to check the new bit / mp_priv. Let's copy & paste the
+dma_sync_single_range_for_cpu() call directly here.
 
