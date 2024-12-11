@@ -1,108 +1,93 @@
-Return-Path: <netdev+bounces-151140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1C089ECFBF
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 16:31:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B837B9ECFC2
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 16:32:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2160D1888BF1
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:31:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 369C418887CC
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24A018BC3F;
-	Wed, 11 Dec 2024 15:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B0D13B5AE;
+	Wed, 11 Dec 2024 15:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OaXWFTDW"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1949013B5AE;
-	Wed, 11 Dec 2024 15:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CDF8134AC
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 15:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733931065; cv=none; b=MtmCecBGLb2Kzk3jpLxQ6uoxReepFxY1hJO/UebtBs40qOvf0IBHSNW/p3KNB0kUchCNM7LZYcRvJgCoxQhYQ8YR9QYSS0hoQLU4BkmUDS0mP0UbncqlSguedzoYpR2b5Q/ff8vLPPsl2FYjT+7gyISSUox6C84s5CEgF7xubv8=
+	t=1733931128; cv=none; b=WD9LDbnXD+M11iCfNA2qVGs1sTagfweTYkaFNJhUxSfTyUtUic5igLtjJsTrpm6waUk0xAvmamiUSXBfwDKoxvQcUhVvYKyk9MBmGJnL1f22avQIxSsdZVXNa9kdNU0iZ2nkNJ5oALZu1tMISSQWinoOE8ckfsIRmmnPFj2bjrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733931065; c=relaxed/simple;
-	bh=AsVg+gx9nWV4PRZYQ0dbhVzBEv13OVRQm9qm5jKbOuA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=dGBpH1CgzQOOdpzlDwMxkYKDK9OO2tkNTgAZ7KIVP1BDioZ/MsTLbLX9kAyMUQzMK4LRzblreFyi8sSTrFB9Q4o9fg+bDnHD6QdSSwTI3IBOSumMRITglKwEpXCbT0bnyoEGtu+OjIwglQROMDzVeH4jbZWs+msfu+tDjs4bubg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Y7fcK0WDNz6D8Xm;
-	Wed, 11 Dec 2024 23:27:45 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id A59331400DB;
-	Wed, 11 Dec 2024 23:31:01 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Wed, 11 Dec 2024 18:30:59 +0300
-Message-ID: <c508ead6-67c3-6e84-367b-e266d49306f7@huawei-partners.com>
-Date: Wed, 11 Dec 2024 18:30:59 +0300
+	s=arc-20240116; t=1733931128; c=relaxed/simple;
+	bh=nfkSVveSOQFK0fyG49zgemzYr5p+ZQr0aSixQs/hcLI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AgZdyb8Y1cTsENKdPpc8yoRdFhASIUn5Nr1MZwlwCer7JrU8ISDzZkP+YCa36vegpJICZb75QSCcgSpTfYnS3XkNHqKLBZW6U5DtbJnFnoiJn7iiCimr06uPWrWxQlT48w0eJ/rLragIW7MnFVjg08eQifl5vxmeoiYspQH+yCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OaXWFTDW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CE56C4CED2;
+	Wed, 11 Dec 2024 15:32:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733931127;
+	bh=nfkSVveSOQFK0fyG49zgemzYr5p+ZQr0aSixQs/hcLI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OaXWFTDW0A+dsXvel28tzlEVS/63WQnjWOwZkYho1Vqs1w5aYFfCTgKS0hZ/ZYjcz
+	 UlJ/eCwrnnT3YekinGRGmeSmW7TGmxpZ6CY5ykX6l/5zXFwGvXZAkdVePHb1FSiU9/
+	 f4kvVR/5ha6mmrWmXpGuFxMHA9oUnkuV6XOsH16gZQosFTPKQf1SKmxJY6EpJ/3KGy
+	 UBerLPhI8Lr2phDepVgiayYzsEGoKKUZ5cXEdNvpdsEr/5hDQ8ekzaeKnHEHMb6fnT
+	 kltgPjaO/MWxkoaiP2q+C9IDjWT5qLc3A0FGbD5rzQelXUaK3FW5RYjQ23aBCzqSdT
+	 FsXGzetAtRRTQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	nbd@nbd.name,
+	sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com,
+	lorenzo.bianconi83@gmail.com
+Subject: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha EN7581 SoC
+Date: Wed, 11 Dec 2024 16:31:48 +0100
+Message-ID: <cover.1733930558.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 7/8] landlock: Add note about errors consistency in
- documentation
-Content-Language: ru
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, Paul Moore
-	<paul@paul-moore.com>
-CC: <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
-	<matthieu@buffet.re>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
- <20241017110454.265818-8-ivanov.mikhail1@huawei-partners.com>
- <20241210.kohGhez4osha@digikod.net>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20241210.kohGhez4osha@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
- mscpeml500004.china.huawei.com (7.188.26.250)
 
-On 12/10/2024 9:08 PM, Mickaël Salaün wrote:
-> On Thu, Oct 17, 2024 at 07:04:53PM +0800, Mikhail Ivanov wrote:
->> Add recommendation to specify Landlock first in CONFIG_LSM list, so user
->> can have better LSM errors consistency provided by Landlock.
->>
->> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->> ---
->>   Documentation/userspace-api/landlock.rst | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/Documentation/userspace-api/landlock.rst b/Documentation/userspace-api/landlock.rst
->> index bb7480a05e2c..0db5eee9bffa 100644
->> --- a/Documentation/userspace-api/landlock.rst
->> +++ b/Documentation/userspace-api/landlock.rst
->> @@ -610,7 +610,8 @@ time as the other security modules.  The list of security modules enabled by
->>   default is set with ``CONFIG_LSM``.  The kernel configuration should then
->>   contains ``CONFIG_LSM=landlock,[...]`` with ``[...]``  as the list of other
->>   potentially useful security modules for the running system (see the
->> -``CONFIG_LSM`` help).
->> +``CONFIG_LSM`` help). It is recommended to specify Landlock first of all other
->> +modules in CONFIG_LSM list since it provides better errors consistency.
-> 
-> This is partially correct because Landlock may not block anything
-> whereas another LSM could deny a network action, with potentially a
-> wrong error code.  I don't think this patch is worth it, especially
-> because other LSMs have bugs that should be fixed.
+Introduce support for ETS and TBF qdisc offload available in the Airoha
+EN7581 ethernet controller.
+Some DSA hw switches do not support Qdisc offloading or the mac chip
+has more fine grained QoS capabilities with respect to the hw switch
+(e.g. Airoha EN7581 mac chip has more hw QoS and buffering capabilities
+with respect to the mt7530 switch). 
+Introduce ndo_setup_tc_conduit callback in order to allow tc to offload
+Qdisc policies for the specified DSA user port configuring the hw switch
+cpu port (mac chip).
 
-Ok, agreed
+Lorenzo Bianconi (5):
+  net: airoha: Enable Tx drop capability for each Tx DMA ring
+  net: airoha: Introduce ndo_select_queue callback
+  net: dsa: Introduce ndo_setup_tc_conduit callback
+  net: airoha: Add sched ETS offload support
+  net: airoha: Add sched TBF offload support
 
-> 
->>   
->>   Boot time configuration
->>   -----------------------
->> -- 
->> 2.34.1
->>
->>
+ drivers/net/ethernet/mediatek/airoha_eth.c | 372 ++++++++++++++++++++-
+ include/linux/netdevice.h                  |  12 +
+ net/dsa/user.c                             |  47 ++-
+ 3 files changed, 422 insertions(+), 9 deletions(-)
+
+-- 
+2.47.1
+
 
