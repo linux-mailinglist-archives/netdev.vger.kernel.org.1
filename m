@@ -1,221 +1,174 @@
-Return-Path: <netdev+bounces-151185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C9129ED3E1
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 18:44:25 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0FAB18823D0
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 17:44:21 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E29971D6DA4;
-	Wed, 11 Dec 2024 17:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="H6Gb+RKl"
-X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2041.outbound.protection.outlook.com [40.107.93.41])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC5489ED3FD
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 18:47:11 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3316424632C;
-	Wed, 11 Dec 2024 17:44:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733939057; cv=fail; b=fhpi/bznf9lymLLOKuaXfhvysWEVJOXTGDUOC4PB/R6Q8usiidJ7qtR6nNLaHx3DmU0l71MHcL9lbZArmHaOtI08kVt2mhviRywTPXbMDKbSYvcQRl3yTRqvb9b5G6sIiObDqQIcPJMPWXAZYNNXugm06U3JeBRYmJoFIX+nIq0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733939057; c=relaxed/simple;
-	bh=md0pVAk5GrsAXtX/xNDRRpl2KXHqMt9De8xJsB8VmfM=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J+Wz399SJRt9C2UFrEU4CUiMQJ6mU++usNmTIOoKbh1NZxBthCGwmqx0I507UQ6rMXkrz/osoY/iXe62vSSSlRxmqZLKiEC7e8kTFIk7gwav1RluORs/V9ecyL9NowGh4gPFemICBn/uzFxEte3gql3UQc0uLPufqPetLr6ngWg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=H6Gb+RKl; arc=fail smtp.client-ip=40.107.93.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bpRtsGQZa3zwVatzr2A9lNXWfQ+Y+WT334DaVEG8sP6PTAzFOw1fh0rmWQKboC4zemkWBtzUjVCmoIQW/yxfhg1SuapkU2hWsuYXZC+0FBhLtnZR50fwB2xFXPl4FoELckC08ykILW6WKXAnisI0YMf3VA8YVP9vJWGWp4PUeRBnc5Us6PFEhZVO8X2TJWYnMjotmTQZinzTLhFYNk5MSmdfN6vSfLTHxbYeTPnJmj1+UYhYSbh4mfTrcnm+p+ji2aUrCxddQcfs9kafO/jWPimc0bFTNI96DV94n3NjbI5xF/vQ2XkoSweO6yfy0FA9QVY0iE86qtlAUkyK99Lnaw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Vtv9e/uY9K7ZlnR1iYnPML4tWgyQ44RtySK15gz+erg=;
- b=DrjTH66bpHRZ3mrrZIz5OjBU0TEGosFw1XuccCRVgPvuLs42VKorM7X2VWe4hm+Bo64TjBP5xPriBwdzeGjZ+ajqxEwNMDZWnonjRLKGs+35IXMRizR0/40YhceAPItESFM0ZfpHKVepjf+oLRaqLwyUohjKTkfd+s/gCIgHGCQW6cxHysEdrf9cVWCJPGw+DZKE8rt9yr/l4Q/TscL98TyC4+y8vABcyKoV5SgTb0icuvIq0qZzWNrQr3+rQDhIUg9UYqrXwIBxf/uMYyH5wCGjfholLTjJBVdszVtjxmpJnrumfZZ6FP3ljWDxF3KVUZPOoafhNWkCYDKb4Q4Liw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=amd.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vtv9e/uY9K7ZlnR1iYnPML4tWgyQ44RtySK15gz+erg=;
- b=H6Gb+RKlSDPCTzcSF+Q48qrSe75/BxoysIykn/SPeZyvXZBH02zWniBNrSrwzL0tjS6pQRaPJAzjTPgX0njKCwF2k1Fc/mHYsvmoNlvNzP3WuM2hyNSMxqe7nuVwY+EqJKpoy7GqZK8oZrQVzGHB6RL0VbCx2itfDKgnGiXnu7cNxPB8KVUv97d/R9ZfrjGtSmxxwllSc7wuN1duAPX4WJ+x4s//vGKuYcu5I8bSdMfnBK1hF1RKJUQB1Rlou54KBdi0do/qPpAk3MfbbTn3uzGGY5fSlw0rRJaAEyMHFxnZ6ph1953WYAYuCNhsxT8VXQzcXvJThw+/Pj+TuVXS/A==
-Received: from BY3PR10CA0010.namprd10.prod.outlook.com (2603:10b6:a03:255::15)
- by CH3PR12MB8910.namprd12.prod.outlook.com (2603:10b6:610:179::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.20; Wed, 11 Dec
- 2024 17:44:12 +0000
-Received: from SJ1PEPF000023D7.namprd21.prod.outlook.com
- (2603:10b6:a03:255:cafe::8b) by BY3PR10CA0010.outlook.office365.com
- (2603:10b6:a03:255::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8251.15 via Frontend Transport; Wed,
- 11 Dec 2024 17:44:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ1PEPF000023D7.mail.protection.outlook.com (10.167.244.72) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8272.0 via Frontend Transport; Wed, 11 Dec 2024 17:44:12 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 11 Dec
- 2024 09:44:00 -0800
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 11 Dec
- 2024 09:44:00 -0800
-Received: from localhost (10.127.8.13) by mail.nvidia.com (10.129.68.9) with
- Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Wed, 11 Dec 2024
- 09:43:57 -0800
-Date: Wed, 11 Dec 2024 19:43:56 +0200
-From: Zhi Wang <zhiw@nvidia.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <martin.habets@xilinx.com>,
-	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <edumazet@google.com>, <dave.jiang@intel.com>,
-	"Alejandro Lucero" <alucerop@amd.com>
-Subject: Re: [PATCH v7 26/28] cxl: add function for obtaining region range
-Message-ID: <20241211194356.00002976@nvidia.com>
-In-Reply-To: <20241209185429.54054-27-alejandro.lucero-palau@amd.com>
-References: <20241209185429.54054-1-alejandro.lucero-palau@amd.com>
-	<20241209185429.54054-27-alejandro.lucero-palau@amd.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-w64-mingw32)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F28962830A0
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 17:47:06 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F7B20110F;
+	Wed, 11 Dec 2024 17:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=raspberrypi.com header.i=@raspberrypi.com header.b="iJ1Rv1gP"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4951FF1CB
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 17:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733939215; cv=none; b=t1PSfA6o7L7O8kb2/ayU15dNJAKmEW5bIxln0XdYPO+x+ORRcvWRPIXWGMrrkvVlGdYQTf4dD7pcNAL8Bg8oMsxtSBUvoaoNUeDZsS6n0ikNFAkVjHS7drE4qv5cq90j4a1MvU+0t/WhZ04Bj5ID8J5EXA6NgL2W9jazfUWl7gw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733939215; c=relaxed/simple;
+	bh=xKfttj73jG1uTZpJNN82RMi2jpdXNIkxOf7nv7eMMZ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=asXImXpAh4hbDg5LKYJvOji8Zygo6Pzom81j85Sc3G8dwcgAPaPhEb/ed3ZOwgIUggaszx34QSl/NjNVU4XUuBOYhaAxwbp+oF7cnOlnPAJ98b4EfvSeocVhWHXq7mvXtBIuAhvMNAwzSuzYmSc8t3s6hB0OmrG80RLypfJUPSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raspberrypi.com; spf=pass smtp.mailfrom=raspberrypi.com; dkim=pass (2048-bit key) header.d=raspberrypi.com header.i=@raspberrypi.com header.b=iJ1Rv1gP; arc=none smtp.client-ip=209.85.219.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raspberrypi.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raspberrypi.com
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e398484b60bso5665559276.1
+        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 09:46:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=raspberrypi.com; s=google; t=1733939211; x=1734544011; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XX4yF9JMGXX3II/VI0ICz4h+LN+8Yz44eu6TfJ04Ugk=;
+        b=iJ1Rv1gPyVXZinfE2j1hskrQVtwOTmifZx892vfPVXmW+A4luks2PdH2B2Tl4HOqN6
+         U9LqS7pYhhesWy/EGPUEEaXNixUTWci5GU5iiVALQSIcaGNrrwa3KRwiY7NIu2Xm5M9O
+         b3bR1JInOlALvNN3xwW/FiAhOLXRWEdfW4VOahL/Xlyp3XRxMh8RsYIj5yDvN6DZJ7Ul
+         iOh4z0HBbsY9FYf1yBBSENjuPtqUFQzg036S66WXVQnVehFi4bWC3djajWjWbKhxsi1b
+         JZ7nHrGpMISaEuXqGNuZ52zlgMmrRhLWgeS7Sg8Hjg+/P5uGHHslF0Tnhj90FCLu3x1z
+         uF0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733939211; x=1734544011;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XX4yF9JMGXX3II/VI0ICz4h+LN+8Yz44eu6TfJ04Ugk=;
+        b=nKU9wxBuDbXqE8t0qwzsVnfGwzFejc/R7ANqV6uZMQ4acZO3ICY4fijjGmrxf62+hz
+         nwpJLVnUKUC661od6WCiuDhLlgI1jYBxoIyhkq9f9PnkPygw+nzCyuvOvskCabQLPC1O
+         mQibSrJRVtiV5qCGDW/QuEFiKOeLEMbGaqvtFh3/qf/ZCNMSxbgqqg/AZCjyhe1nm7FY
+         AAC9OZ6UlpxKD8JDKcwBPAidNCEkrZSngpUZOaHLaYCUx4EKmdDlVvBjezyXCTSrLUqB
+         eEpUVMFqG8CCiA9jYOb2EitUW2uyLX9NBzRxlBPpxzS2oHxgYZspPcF/VsWpIuRD/TQf
+         5oig==
+X-Forwarded-Encrypted: i=1; AJvYcCVILcwGKCoA1orn4zNXz1ZT6JeJhmdqP+G5SktruDCqrPuJnuPoE/n1SrdDcg2P/xlBm7DaAXE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZbMNGZmjtKoJzCr9z33NU6N4pq6j1h7zmo2f7xdoha+X8izzc
+	dBs/ACQA2Ae46Z6RYx5C6Po1jtecyuxedmSCqrinucaLvz2XCpLZRvWiZ0GV+LEw+VpzKR4Jxo1
+	sW7igL+bBZCQaXm/5W03273v3nroSFlhgV8XvLQ==
+X-Gm-Gg: ASbGncuc4+N/th20PZ49xZISVXmUwi7bceVsoMsHkg2R5TQr9hDnRSq2BTd0w5nM0oo
+	0Or9dCRMmJti7SYkwxrNpMzPIU3d0yMgbJ74=
+X-Google-Smtp-Source: AGHT+IG3lDp6pcc8WpN9DOxtNpymp29steFnShZFR78LeXrDU2v7lqz7zSz8oGrhbnT8m3jrCYcj2LxsZTVFVNmSQds=
+X-Received: by 2002:a05:6902:230d:b0:e39:8a36:5771 with SMTP id
+ 3f1490d57ef6-e3da3158089mr228005276.34.1733939211006; Wed, 11 Dec 2024
+ 09:46:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000023D7:EE_|CH3PR12MB8910:EE_
-X-MS-Office365-Filtering-Correlation-Id: a5963e0f-65aa-4d4c-b9a4-08dd1a0b6c60
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|1800799024|376014|36860700013|82310400026|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ET1Tkooog7eTg7suMTyD9enKjMdrZ8iULpwafajqp2Yf9auPN5JYFGLdL3Tv?=
- =?us-ascii?Q?GWIbXuq31euFeYMTPIaq2pVqN07joP7M5o0jWaEqNAFfrQAdzoZQfam2IbsP?=
- =?us-ascii?Q?L7mbXc/qOfZNXhHzhmgqbKmYbWlDvEpDiZFLLN6QjQJpRWTa9ukAsx0Bnc9C?=
- =?us-ascii?Q?w+/DzXRkU8VuwG+PLQ7Gkj8PhwUn2iUtxq3HEzsOpGaIpgO1A0dk8uCByPtp?=
- =?us-ascii?Q?nyM2uKTg5UxkOx+mYs8cF8EIoQ9pt79/4C2m0n/k+E2krxSUN7n/93CZbra/?=
- =?us-ascii?Q?MzTECTvecBGQPH6YICGWuKBi0Fe/T8ZUNtYqwygzA/yaQJR6IXwISPo2eQ3i?=
- =?us-ascii?Q?og6Ls/SdzHkZw8DBzNb53FEiYD/bCztmZsVs76SF1qHJ3PYT6zwEY+3fl3J/?=
- =?us-ascii?Q?7Jfw+65bkKXBFR7LsMpTyz+e3jYb2vDnkujsBfIqFYQN2UK4i2SSjB7WQfCT?=
- =?us-ascii?Q?s0XgAR0Mr0o6Qqq23wCxcTn1lgEmixfgrLpdwHLV+ThvpRB3V2pIwdCet5B+?=
- =?us-ascii?Q?F+tB4FxJkdUo6pjcVx2Z9rdM1UyWLZzMCsQjKerCctB14R6oqDA0xZc83YGZ?=
- =?us-ascii?Q?tpwyogPYcPtgiHEWBEhQo/gcOwN9WzeIUC87zPCkLC8T042At3X6X6cX4e6u?=
- =?us-ascii?Q?pQ7yLG1calPtMuM9x8SU9hbaDK9f/2kScOpbtmFgd7yTkIwHKYg+mm4T5iOu?=
- =?us-ascii?Q?jclQpXkmw/VKU1P2Rjs8hQryVKHwYL0K0/sNggHDt/YGRK9O4jWQ7v6+BLwf?=
- =?us-ascii?Q?7ewzQi+rIDNphxK/Lzgo0+R60faW7P1/kCDAseS86nJzdzaePH05VGIFvrxm?=
- =?us-ascii?Q?Nst4MhOePmwjdq1Ko0M48HZIFqk0k/utdNacZdXsT4M/CD02YM88RGkEdwP3?=
- =?us-ascii?Q?u80bnzzs3jeJ7V6CSsOj41VUuPYa2yruexULELZbneZkQxIxhMJu1Wiqr7Sz?=
- =?us-ascii?Q?lVFwuSczHn72VC2VONAl7Fnk5ZLeCYQMbGBcYn0e5q2D6fpEpOoKTVNgAKSB?=
- =?us-ascii?Q?AGvi84hWKH7lQCki2xfeaUkwwEOFMXCC2F37CXZL3TyciXaxT/XgeD5hWRZB?=
- =?us-ascii?Q?QtzclzKLSpSX/zioPPYhgErlZkk0mCWuZQufT05FV2cVyHfx7z/LxL7DCxeQ?=
- =?us-ascii?Q?KWKCSjdBag32gus2AcIljuBhdbxWg0wGXYXWBw73CS9pPy8bxG6kh5eL9jcv?=
- =?us-ascii?Q?jlVQBynke72iRJOwTal6xWQMss127qk5+89QTd+Gu7h6YTy0TIBr5DeQkf27?=
- =?us-ascii?Q?FWDWSK2D7b20XQtvKMlGOyjuHeYNP+w1DUD3Wg6lKF/F9q/hAnmKWNN3BHKs?=
- =?us-ascii?Q?LBOfkMXAvyhzX6QhDpnJyNaoZHHtpBIIHvJdz+YNmRhYMbCeJPepnG/cpGmy?=
- =?us-ascii?Q?2mxPKAqbGz70KfBmFLNDXMeYx0TTL+FgSpxk2YpeWFtf+KFgTzDylBfNzefb?=
- =?us-ascii?Q?3zb1jkcuWhRyWafh4jRmpWX7Y+9FaVvq?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(36860700013)(82310400026)(7053199007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2024 17:44:12.1250
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5963e0f-65aa-4d4c-b9a4-08dd1a0b6c60
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000023D7.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8910
+References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
+ <20241210-converge-secs-to-jiffies-v3-16-ddfefd7e9f2a@linux.microsoft.com>
+In-Reply-To: <20241210-converge-secs-to-jiffies-v3-16-ddfefd7e9f2a@linux.microsoft.com>
+From: Dave Stevenson <dave.stevenson@raspberrypi.com>
+Date: Wed, 11 Dec 2024 17:46:32 +0000
+Message-ID: <CAPY8ntDHcGpsaNytY2up_54e03twqZ2fj1=JTnb8x7LLo3uGDQ@mail.gmail.com>
+Subject: Re: [PATCH v3 16/19] staging: vc04_services: Convert timeouts to secs_to_jiffies()
+To: Easwar Hariharan <eahariha@linux.microsoft.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Julia Lawall <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, 
+	Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, 
+	Robert Jarzmik <robert.jarzmik@free.fr>, Russell King <linux@armlinux.org.uk>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>, 
+	Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi <lucas.demarchi@intel.com>, 
+	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	James Smart <james.smart@broadcom.com>, Dick Kennedy <dick.kennedy@broadcom.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>, 
+	Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui <rjui@broadcom.com>, 
+	Scott Branden <sbranden@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>, 
+	Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
+	Miroslav Benes <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, 
+	Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Louis Peens <louis.peens@corigine.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
+	Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	cocci@inria.fr, linux-arm-kernel@lists.infradead.org, 
+	linux-s390@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	intel-xe@lists.freedesktop.org, linux-scsi@vger.kernel.org, 
+	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org, 
+	linux-mm@kvack.org, linux-bluetooth@vger.kernel.org, 
+	linux-staging@lists.linux.dev, linux-rpi-kernel@lists.infradead.org, 
+	ceph-devel@vger.kernel.org, live-patching@vger.kernel.org, 
+	linux-sound@vger.kernel.org, oss-drivers@corigine.com, 
+	linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 9 Dec 2024 18:54:27 +0000
-<alejandro.lucero-palau@amd.com> wrote:
+On Tue, 10 Dec 2024 at 22:02, Easwar Hariharan
+<eahariha@linux.microsoft.com> wrote:
+>
+> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
+> secs_to_jiffies(). As the value here is a multiple of 1000, use
+> secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication.
+>
+> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
+> the following Coccinelle rules:
+>
+> @@ constant C; @@
+>
+> - msecs_to_jiffies(C * 1000)
+> + secs_to_jiffies(C)
+>
+> @@ constant C; @@
+>
+> - msecs_to_jiffies(C * MSEC_PER_SEC)
+> + secs_to_jiffies(C)
+>
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
+Reviewed-by: Dave Stevenson <dave.stevenson@raspberrypi.com>
 
-Reviewed-by: Zhi Wang <zhiw@nvidia.com>
-
-> A CXL region struct contains the physical address to work with.
-> 
-> Add a function for getting the cxl region range to be used for mapping
-> such memory range.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 > ---
->  drivers/cxl/core/region.c | 15 +++++++++++++++
->  drivers/cxl/cxl.h         |  1 +
->  include/cxl/cxl.h         |  1 +
->  3 files changed, 17 insertions(+)
-> 
-> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> index b39086356d74..910037546a06 100644
-> --- a/drivers/cxl/core/region.c
-> +++ b/drivers/cxl/core/region.c
-> @@ -2676,6 +2676,21 @@ static struct cxl_region *devm_cxl_add_region(struct cxl_root_decoder *cxlrd,
->  	return ERR_PTR(rc);
->  }
->  
-> +int cxl_get_region_range(struct cxl_region *region, struct range *range)
-> +{
-> +	if (WARN_ON_ONCE(!region))
-> +		return -ENODEV;
-> +
-> +	if (!region->params.res)
-> +		return -ENOSPC;
-> +
-> +	range->start = region->params.res->start;
-> +	range->end = region->params.res->end;
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_NS_GPL(cxl_get_region_range, "CXL");
-> +
->  static ssize_t __create_region_show(struct cxl_root_decoder *cxlrd, char *buf)
->  {
->  	return sysfs_emit(buf, "region%u\n", atomic_read(&cxlrd->region_id));
-> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
-> index cc9e3d859fa6..32d2bd0520d4 100644
-> --- a/drivers/cxl/cxl.h
-> +++ b/drivers/cxl/cxl.h
-> @@ -920,6 +920,7 @@ void cxl_coordinates_combine(struct access_coordinate *out,
->  
->  bool cxl_endpoint_decoder_reset_detected(struct cxl_port *port);
->  
-> +int cxl_get_region_range(struct cxl_region *region, struct range *range);
->  /*
->   * Unit test builds overrides this to __weak, find the 'strong' version
->   * of these symbols in tools/testing/cxl/.
-> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
-> index 14be26358f9c..0ed9e32f25dd 100644
-> --- a/include/cxl/cxl.h
-> +++ b/include/cxl/cxl.h
-> @@ -65,4 +65,5 @@ struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
->  				     bool no_dax);
->  
->  int cxl_accel_region_detach(struct cxl_endpoint_decoder *cxled);
-> +int cxl_get_region_range(struct cxl_region *region, struct range *range);
->  #endif
-
+>  drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c b/drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c
+> index dc0d715ed97078ad0f0a41db78428db4f4135a76..0dbe76ee557032d7861acfc002cc203ff2e6971d 100644
+> --- a/drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c
+> +++ b/drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c
+> @@ -59,7 +59,7 @@ static int bcm2835_audio_send_msg_locked(struct bcm2835_audio_instance *instance
+>
+>         if (wait) {
+>                 if (!wait_for_completion_timeout(&instance->msg_avail_comp,
+> -                                                msecs_to_jiffies(10 * 1000))) {
+> +                                                secs_to_jiffies(10))) {
+>                         dev_err(instance->dev,
+>                                 "vchi message timeout, msg=%d\n", m->type);
+>                         return -ETIMEDOUT;
+>
+> --
+> 2.43.0
+>
 
