@@ -1,213 +1,129 @@
-Return-Path: <netdev+bounces-151123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C47439ECE71
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:22:07 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E41941681F1
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:21:59 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE363246322;
-	Wed, 11 Dec 2024 14:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=digi.com header.i=@digi.com header.b="G7QF5fBJ"
-X-Original-To: netdev@vger.kernel.org
-Received: from outbound-ip8a.ess.barracuda.com (outbound-ip8a.ess.barracuda.com [209.222.82.175])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F4A49ECCF7
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:16:41 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9FD246330
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 14:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=209.222.82.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733926919; cv=fail; b=GdjLRWt4dksB3gVKynTd7WC8J7NlZ8ZjD+4PzGsrPycftyWqcU/Z6o+lQdpE3CPYybuCaHqcRzJgYxVtVzU0h+zrH1RcC7J5vYLKjgIEsYZzZvxw5PInAN9IDDJS1BlDVHK8VomxTNXT2Lsmtan+PnSx5KEmYDHnc2387Q2dWBo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733926919; c=relaxed/simple;
-	bh=yJmuBfIP7XIEeBT9bCbraAbd2zVfG7IRH+BSUMHanAM=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=H6kd0QprTad4dG06B1C3aXrV/EH185PIGWM5Q9GBfarUO12ixio7k8pnu81xOch8VutxIDFS0wUJf90QLPGH1nyctG7tW1uFsE7nQMlKfgd2pGBv9xuMNt6lheTerZEcTlrk9I7nSvvI+zig5nUXUJKS1/TCnnRlE9RW8jU+DDM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digi.com; spf=pass smtp.mailfrom=digi.com; dkim=pass (2048-bit key) header.d=digi.com header.i=@digi.com header.b=G7QF5fBJ; arc=fail smtp.client-ip=209.222.82.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digi.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digi.com
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2045.outbound.protection.outlook.com [104.47.55.45]) by mx-outbound14-65.us-east-2a.ess.aws.cudaops.com (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Wed, 11 Dec 2024 14:21:51 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Jxe/zQovNM/vxLoRxhyBQbCYQXgtGj33gQuxBDdbBbPmBo8ftGFTTu6N5t0+O1HYpkEi4Mkp+QQR5E8CytBWjq3g6b3wckR1gecIEksLYQ+OyDiVSVMwHRuI2NAINt2BuUXbHpCk+1aC48j7PXbHCzjNWGT2JSYBX3R6MmWL6+giQh493bBAkX8LD5X77gEhNRWUEZdTiC5z1apF6CU37vPPHUZ4k9PJIAMnMT7On3MEovtJ0LSQX63Mfx49wgnEnGR+eI4smTFMYvAq8pcpE+bgxslfQXo4szttiau77Gee7h53u3tB3w2DOUNrTzKjQwrLXhpnzPL2vUDuetlL9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UbMR5Dxr2kYyVzgT3KyFsVJH7edTo38pJVwm6TVX6g0=;
- b=stR7ouKOVGEUKAaVy7LFG4H89F8tPOvCFuXiilsqlClLCtMvc2tv/x66A+XDqLzIn15Ipw3BpLNMF+bhUBeV+N2dACHynV2scxWrTfyWBUjRXabYz5O0xWA7+caygCpMiMvJ+p/i2DoCUxFWpP2QhMUQS1m6YlPf2BwStU2ZOnViKQozTR1Z0Pxz3EiP7mdMnI+eDidv2HeFGz6AbgiGDrWMctgdvXn2nC/XQxe2GWm84ZgeVy0YkdtLXu5CEBpbmzVmUb0kdusYhJp7JoyTqqabXDc8JbLYmcS8pd2Axej3BufewmUP92i9kQnwHRJyUPQQs2NC24498qujpyGRlA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=digi.com; dmarc=pass action=none header.from=digi.com;
- dkim=pass header.d=digi.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digi.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UbMR5Dxr2kYyVzgT3KyFsVJH7edTo38pJVwm6TVX6g0=;
- b=G7QF5fBJwZlKA5M83m8F7snURrTFpCLNaQYRJkPHBd+ZQGewNDB3seXFTIghUsLieSGPsjNKoqAz3wENnagsd2GmteMkoWh8o7TtIW3XRSooaVDANI6rCuHcl4WZnXsI9JtukXojugIe6NAEUvGT7rXhi4Hhar5hpXk5B3OHE9BD30hmGt16E/q6H2ukf3RQjbpjvphYkjnyeZ/qtQZ2TYhyrlj0yq7yFAfJIU0uf45NGWR5SRKrzdPYiXoXvh7oZkDqFU28bgD5NbpEwFRDRWUztnuqWoE+Rw1uspkq2aVA3SHusgI+XHbsGoKbyNg0i0sByXLLZnNvPmBpCElhMw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=digi.com;
-Received: from CO1PR10MB4561.namprd10.prod.outlook.com (2603:10b6:303:9d::15)
- by SN7PR10MB6570.namprd10.prod.outlook.com (2603:10b6:806:2a9::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.14; Wed, 11 Dec
- 2024 12:48:31 +0000
-Received: from CO1PR10MB4561.namprd10.prod.outlook.com
- ([fe80::ecc0:e020:de02:c448]) by CO1PR10MB4561.namprd10.prod.outlook.com
- ([fe80::ecc0:e020:de02:c448%4]) with mapi id 15.20.8251.008; Wed, 11 Dec 2024
- 12:48:30 +0000
-From: Robert Hodaszi <robert.hodaszi@digi.com>
-To: netdev@vger.kernel.org,
-	vladimir.oltean@nxp.com,
-	claudiu.manoil@nxp.com,
-	alexandre.belloni@bootlin.com,
-	UNGLinuxDriver@microchip.com,
-	andrew@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Robert Hodaszi <robert.hodaszi@digi.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] net: dsa: tag_ocelot_8021q: fix broken reception
-Date: Wed, 11 Dec 2024 13:46:56 +0100
-Message-ID: <20241211124657.1357330-1-robert.hodaszi@digi.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-ClientProxiedBy: MI2P293CA0002.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:45::17) To CO1PR10MB4561.namprd10.prod.outlook.com
- (2603:10b6:303:9d::15)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C6F2280C49
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:16:40 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14CB9229126;
+	Wed, 11 Dec 2024 13:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M3C0fLXs"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D560211A26
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 13:16:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733922998; cv=none; b=Ueo1gjYSp5F7/9eF6bCqg+n2in96BhUhHLdBM0Add3kfC4k0fG1nnHIQBIanpBHiDNwUQVw8ncVUJ/GZUdJLdZ5UPtRM18Rp9c/Hmoo+KPLYPJeFskUVxUxvgNCW3kj+ewQpFGjju7L4TA2JcUbBCiuTR40Mr007O0OjO8dH0Yg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733922998; c=relaxed/simple;
+	bh=vHnOqrE9U3DzgtMQ2aewHIsU1Cqb1sBnG7bs/0nghbw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=S+MeWwacsGU0Zxds1uuQSI19LazF7I8MRoxZ14BFTabf3do6qm4k+EtVI3v9uGsMmttn93sURdJ5VbvCiIMrwbwl2yLnvT9hsQ5irsgNVlq7RaYKlQR0FutrYQBq/E69gi3gbzGxHaqpqJTuiGLoqi2bdlPUOOeAhhnRw89mI3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=M3C0fLXs; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-434a7ee3d60so3874595e9.1
+        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 05:16:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1733922995; x=1734527795; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=U0uQFK6fLtwRvjcx8HTnxkyo0H7NF49q4SiozMOoHr0=;
+        b=M3C0fLXsAXtW9jjA7Dw43HxhJb/ma2hwbeaSImzzX7Wu7RYcE42u9NHmp+NsU0LxVR
+         udhLSSw6LSOGvUhrV0RjqVPLYf7nmiof1q/OnqAqWOxYdhUlA3OiI6gcPW9UPqUIVx+B
+         XeB3l1tY3OAa76qITBRVjT/LsZKCc1Oyf7qj5tLDzDw4KdFRJAui6XPZBA6BtPDCv+QL
+         aH6S4yeBmVOaaxDEHVJ6uk72umhFvGCRwdRvTf/AnokJ90+ZLpqQWusrWyp9I+OYSKJo
+         qMFq4jihLNTzIn+KtRcb9w8X5QY3hdoRuQHdWvdW4IaBXzhVbyRu48X3+j5L7neRv2C1
+         nFjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733922995; x=1734527795;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U0uQFK6fLtwRvjcx8HTnxkyo0H7NF49q4SiozMOoHr0=;
+        b=pBaqMd8A8Sk/VGVL1UUCB+S4DInmpEIUd5xdfdDR4b45EeQkTZBCa5Da5+Pli37V7/
+         rwaKZZ5oEM7881PTuc9GQqWn2n18FkfQsG3rJe8Dm2GJCVVuuhhICkRWdPaJ9HqJSE0F
+         ckKSxU67QCsKMlrJCt6w7VasAZPcezeO68gMtVc3Hr4LrOEr7C/QHQpd3lR/311rLGFr
+         pa8kGPkUmhIpz8tk0I8ok8Ld5jWIpuOl+zW5j7fJ9jAPFOSDibSKl2iSYA29tgCxGp9b
+         lZoeHITg/IqAmZiNf5xU5sjVOhWAwXMM27UbaEz1P9QnKtAhUWXb+a3yvVe7Vd6t98KJ
+         5MrA==
+X-Forwarded-Encrypted: i=1; AJvYcCV/TtJMjdD+3cMkQRb4IDvuZSl4YSWR8sU2wKoTRBQYWP44h3B6SxkjEuOKMClohCyJ3+ZCnJU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxC8b9TL2ArAPzGcIjoPnzE0FQx9HB/fjGIciJ18nXOhAWtI7WC
+	Koiij0c4ferFQTFaS97kHuo3nfJIyFNT10m8Xj+4b3zpQSmdGwtWHekXdNcJ+yg=
+X-Gm-Gg: ASbGncvid7yLQ265rD5da978HBLY9ery+2VVVS8SVMgXZoOFnff624/QVJ/YJcmRXm+
+	bjP8AOD/254MME4IAfHOUh4wvj17sRuMDpc1ciig5dtjT1UBoxEpq5WMiSdLHBBliKe43PbtE/r
+	WpPBRkesYtU9KjvDMcX2bzZ0pnwVWbS2kcH3VEifK8ZXg5kLB9xzXr/zPFsfHyC9ru0Rp+NfEqs
+	61zanCq1uNwnv6cunrl68A0JnOPPgB8TmJ6axpIvZMkyAbqq3YQrTUSTJk=
+X-Google-Smtp-Source: AGHT+IE+WdWttoicHGnSAYRa/Js50ySh4oFF39e3AO71tMfwm775Hmc486swefhbNY2eUNQZK3siyw==
+X-Received: by 2002:a05:600c:1c1c:b0:434:f1bd:1e40 with SMTP id 5b1f17b1804b1-4361c5d9386mr19966765e9.6.1733922994659;
+        Wed, 11 Dec 2024 05:16:34 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434f1125e69sm142392845e9.32.2024.12.11.05.16.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Dec 2024 05:16:34 -0800 (PST)
+Date: Wed, 11 Dec 2024 16:16:30 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Julian Anastasov <ja@ssi.bg>
+Cc: Simon Horman <horms@verge.net.au>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>,
+	David Laight <David.Laight@aculab.com>
+Subject: [PATCH net] ipvs: Fix clamp() order in ip_vs_conn_init()
+Message-ID: <1e0cf09d-406f-4b66-8ff5-25ddc2345e54@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR10MB4561:EE_|SN7PR10MB6570:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0c5dbbae-8cd9-4a90-ac9e-08dd19e21d9b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
- BCL:0;ARA:13230040|52116014|376014|7416014|1800799024|366016|921020|38350700014;
-X-Microsoft-Antispam-Message-Info:
- =?us-ascii?Q?GmkZEQlE+PeE/YQ2W6RDcj1skmQwui1kun3EU4bYxJt+ZvqQrCHCuCEQkyWc?=
- =?us-ascii?Q?mIJiV/LGKm1oFj4pAwufiL8aqBp+OPe43VpTx/fLXBkTxdI6e3UiYJ9gPtqw?=
- =?us-ascii?Q?IOqiuDg+eXqHiVTNQ8o5JQmF5aqUqGxqkfI0G/DDbbCgSBVcIWL81EVhhxUN?=
- =?us-ascii?Q?P0XN0hSgQVrbvwkzDJbEEphL3Ew0KEwSbnb+/rvtb8SS0A0ueoxDA08xQLkx?=
- =?us-ascii?Q?wNiZiO7mQfldCNGL/sBEeoBd7Dc+CLK0+d81CYdDXYvr+vuZ9TapapForqPJ?=
- =?us-ascii?Q?aF7pgY3osxJ7kj6rhPHxyCr/KvSP7z0FR+T4iiPzl8Rw1oJVsA5MjerQt3T6?=
- =?us-ascii?Q?Eono6/U0JwDRc93cPQOi8PSERFiHkHY/RRlzCdwtWgh8Hh4led8K8BTM58L8?=
- =?us-ascii?Q?M46GRBB0ofePMwQJqkiUzuiUD8FAKPZhfzInYbHoulm4JJonfjR4SGpBOxiP?=
- =?us-ascii?Q?EihF5Zkdd4dNeV9IIt15aQrfkuVe0gKfbtaPPCgjFK0s7nM33fokn7dpTPIE?=
- =?us-ascii?Q?Rw+dTlkr+6ifbDZ7zRmyHok5kEyBz7GSZkgU0pGeW840npX+aLDJ2GypY3Ur?=
- =?us-ascii?Q?P2ROCKnMaEmOLSvw2luR5NwO5ixAcD9uBZ4yjWGPr9Pwx/Eq6SKvhyrkfecn?=
- =?us-ascii?Q?Us7ZoG+63Ot0dJTtVABvEFGS0QI1gPuWtrPs9L2AlefYMeEZRV0O25NsrxX6?=
- =?us-ascii?Q?ondYfddcaDN/EsOBKqfHDrJIwuP/8Oz9idUlCEVHAk9azOIatxsBCjy0a9XG?=
- =?us-ascii?Q?ejpDvzYr8YPtnN0WkFdOPaeCUeryXHdjaRmVOrw0qaJ5xMqEGpodcbA/ijIg?=
- =?us-ascii?Q?JN9kD2JrPHpilu6ZWuqX5UKavZgMz/nyha+PmUoTDsL/s2xABz7jdkQN7caD?=
- =?us-ascii?Q?ySNFhE1dNdvuAk0xlig73UPMwZwMnxEpaFPhr8bgv9hc1puDyfeIBf/g/3rg?=
- =?us-ascii?Q?1sCs3WM23Hum4xUvFmnWh6kO2JOJ4AplSDm/m97EguYJV70hNiPXPZkngUU5?=
- =?us-ascii?Q?PxnEhcgaLjLh+PJy5NAa5nXoS1LfqoG8/2zVI77A/pCeP3LJnYFUMWqBbFrg?=
- =?us-ascii?Q?68xKJVqR4p8m9en4U5e3qjKqfKosgFxn53YuJckdzxg7JDfVqvjtxa5troI7?=
- =?us-ascii?Q?4VtjAHJO5cHjfscDaIpqZxcPA8WjRb4v39OqyfwVWi/3fvrWAPe1AucztfL5?=
- =?us-ascii?Q?gm/hzXQTeXAVKe75zHBfGimODjA7o+hiIxUVKUuuAVs4oYIfRTjam1V58rc/?=
- =?us-ascii?Q?VrRIjtkWVrMGeqLf2gmu+tE2FDMIl4YAAZKSzVGkvCQ/rKtxuPZVIMIJ1wmY?=
- =?us-ascii?Q?+MbYVUTr0agVbEZOcnQYnaxI6JywaLW3TI4LhiLEbnVBXut3a+5CXlAyXj36?=
- =?us-ascii?Q?TdGBupgAmId7iAhzpRG6eEmDlmggoIUN30D7UgDlzB7pLHCyvEFPrXZ1KTRo?=
- =?us-ascii?Q?Zqr1oMdlZiU=3D?=
-X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR10MB4561.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(7416014)(1800799024)(366016)(921020)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
- =?us-ascii?Q?6aJQmmwGLfZNPs3Qpm74DE1G4uZVYw0Rr3Y28bYfBHXL2Rb3/QTrf1aV2EFt?=
- =?us-ascii?Q?EQDyijXNMrEUQxKZILo+ALy4j3MCOnXC8VK2Xzd2Gyd1LZXC6aNztLGuz6pP?=
- =?us-ascii?Q?Srtd2QJFJB8FmdHRzZD+sAlJgbAH48B+Lnm1I7nbsO3TSHauCSu8cuwz01Gx?=
- =?us-ascii?Q?qvK/vZQHFjlxP0CdzR5aRL8SV6S3B+BGS/JJK6F9roxra/+VXfXR39f/dIND?=
- =?us-ascii?Q?abmHzZaTzrfkbZlWRiJNubnbqzj5nTntL/jtDrLjLVjzceqScTtrpg3s4TbW?=
- =?us-ascii?Q?MTfOVGo2Op0ygEZy8aRqAikJ6VNklMsp5I+pP5f8sy1BlhwooUC81HeicKIq?=
- =?us-ascii?Q?ZbFHDtDydaX9lOIsJSzotv+VIUTry9e0zWMbU17cOJT1sZdpcKhplo3t7npO?=
- =?us-ascii?Q?2AsS4ahZpyP/Xh9yQjPfKt3Gmgq1IQ3Nkzi1kdzrwr2P/pRdJ3CsxiSdgC8a?=
- =?us-ascii?Q?YwOE/CmjsEQzHfOpgdZDWGBdcEqRKwCFYCcKFtbWsj/974gKetzhAcaYrMzX?=
- =?us-ascii?Q?qTju/T9pKFhKNzYm44VJPrdtcO7pE+hhveSsv1x3HWse2pWjDNoSLHpXz93j?=
- =?us-ascii?Q?H/stH1kVAsxBlUa5eqqkjwFqTF7pAuR70YL22VGi/lXfuFNo4zlvkpeGu3lH?=
- =?us-ascii?Q?twnGhIBHv1p862/Vrb+J2EYbl4Sa/T3CRwiofyGdlP42VuDZW4XxqyBK0gO3?=
- =?us-ascii?Q?pA8Hca61gxuPFINh4kKDdSi3+/+m7f7MC9JpucrYHtcusrj+mnzSkbqyFFoX?=
- =?us-ascii?Q?MvuAnToQZPsfPO8F3VYbOKpj/9o8D23iIJgeXMsKk5j0P0djublcSeBcWDym?=
- =?us-ascii?Q?cV8D7L/kIgB6FoFBVwRV5FQ/4EXtASwXF89YEeAgAwbvBfAsjdVqy/f+HoHS?=
- =?us-ascii?Q?LgvHljkfpQnWiPxJXD0LPmc/8K46xzSHD8xyZkhUgI/qohB8ArO7TxMpoDMN?=
- =?us-ascii?Q?LmWYGkqiQHqWNd4LGLpyYichPItTFSW1EyUHsMOUyw4CMbLHALy79ha7W8xi?=
- =?us-ascii?Q?TAkJunMEmREnuv8sEujD7femyscALmuhsAPCSEOtno4I1NJzyCX+rlsS6se/?=
- =?us-ascii?Q?/OdylKHc0AyrsGU/rJmNQiBv2wYTQzjVxG3OpY+Ji+goIftm6cn08M6+3gJH?=
- =?us-ascii?Q?C8MYJuQ5jeUvUhnSjljZLBZp5Vn0ZtLFTyk5CiQUyJsX39ZQU8JbsB0aRo9m?=
- =?us-ascii?Q?W0BLz3Y9xR7iO9HdUFgAFq4P2bbgMbKVifCH1Q6AMziCT3Hw56z+7qkVw/yq?=
- =?us-ascii?Q?sNgqq0OJH2E/6EuSvP3hLS0d/xDooQOxWWP6S3e3DFnoCXHa0YjYSH25xWeU?=
- =?us-ascii?Q?VmdX2l+cEYl4TIJCGVYWF90loeljrXlk2/dfUtcK1wyNQuf95viB8Otb/Isi?=
- =?us-ascii?Q?2RtUG6XHbvM/7ZrUSTdn03NCQBLwOjVTVgzOVuva/zMSJBtH/HGykrNNRwij?=
- =?us-ascii?Q?6d5AqF7vxkyXKOhJHU8CBg8/I6yOJKJvEh4ToTZlmcgqDQAOmR0nfKz9YQ2Y?=
- =?us-ascii?Q?zwDJex02MuUXptqbQOoWjJQ3aOL1VXuayfCRWcjqpnEo8Q4ySnNRgWi83blS?=
- =?us-ascii?Q?y0Jbt4JVcd0Vb7iP1aIYmKyTGPnmtj9z2eh7NoE1?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0c5dbbae-8cd9-4a90-ac9e-08dd19e21d9b
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR10MB4561.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2024 12:48:30.9302
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: abb4cdb7-1b7e-483e-a143-7ebfd1184b9e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aiRjscpAB8+QNPoTaCXVTFeYD03L3yK5Gddq0owrosvTVy1hvkbBdV0pdfQLEvU2n6Y/9+Wk8Uj188BgRTjSQQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR10MB6570
-X-OriginatorOrg: digi.com
-X-BESS-ID: 1733926911-103649-13361-10798-1
-X-BESS-VER: 2019.1_20241205.2350
-X-BESS-Apparent-Source-IP: 104.47.55.45
-X-BESS-Parts: H4sIAAAAAAACA4uuVkqtKFGyUioBkjpK+cVKVoZGpiZAVgZQ0MLMOMks1cDYPN
-	XA0MLEIjnRwtzUNDkxJTEtOS3RxMxIqTYWAPmWzgdBAAAA
-X-BESS-Outbound-Spam-Score: 0.00
-X-BESS-Outbound-Spam-Report: Code version 3.2, rules version 3.2.2.261038 [from 
-	cloudscan14-131.us-east-2a.ess.aws.cudaops.com]
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------
-	0.00 BSF_BESS_OUTBOUND      META: BESS Outbound 
-X-BESS-Outbound-Spam-Status: SCORE=0.00 using account:ESS112744 scores of KILL_LEVEL=7.0 tests=BSF_BESS_OUTBOUND
-X-BESS-BRTS-Status:1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-Commit dcfe7673787b4bfea2c213df443d312aa754757b ("net: dsa: tag_sja1105:
-absorb logic for not overwriting precise info into dsa_8021q_rcv()")
-added support to let the DSA switch driver set source_port and
-switch_id. tag_8021q's logic overrides the previously set source_port
-and switch_id only if they are marked as "invalid" (-1). sja1105 and
-vsc73xx drivers are doing that properly, but ocelot_8021q driver doesn't
-initialize those variables. That causes dsa_8021q_rcv() doesn't set
-them, and they remain unassigned.
+We recently added some build time asserts to detect incorrect calls to
+clamp and it detected this bug which breaks the build.  The variable
+in this clamp is "max_avail" and it should be the first argument.  The
+code currently is the equivalent to max = max(max_avail, max).
 
-Initialize them as invalid to so dsa_8021q_rcv() can return with the
-proper values.
-
-Signed-off-by: Robert Hodaszi <robert.hodaszi@digi.com>
-Cc: stable@vger.kernel.org
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Closes: https://lore.kernel.org/all/CA+G9fYsT34UkGFKxus63H6UVpYi5GRZkezT9MRLfAbM3f6ke0g@mail.gmail.com/
+Fixes: 4f325e26277b ("ipvs: dynamically limit the connection hash table")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
- net/dsa/tag_ocelot_8021q.c | 2 +-
+I've been trying to add stable CC's to my commits but I'm not sure the
+netdev policy on this.  Do you prefer to add them yourself?
+
+ net/netfilter/ipvs/ip_vs_conn.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/dsa/tag_ocelot_8021q.c b/net/dsa/tag_ocelot_8021q.c
-index 8e8b1bef6af6..11ea8cfd6266 100644
---- a/net/dsa/tag_ocelot_8021q.c
-+++ b/net/dsa/tag_ocelot_8021q.c
-@@ -79,7 +79,7 @@ static struct sk_buff *ocelot_xmit(struct sk_buff *skb,
- static struct sk_buff *ocelot_rcv(struct sk_buff *skb,
- 				  struct net_device *netdev)
- {
--	int src_port, switch_id;
-+	int src_port = -1, switch_id = -1;
- 
- 	dsa_8021q_rcv(skb, &src_port, &switch_id, NULL, NULL);
- 
+diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
+index 98d7dbe3d787..9f75ac801301 100644
+--- a/net/netfilter/ipvs/ip_vs_conn.c
++++ b/net/netfilter/ipvs/ip_vs_conn.c
+@@ -1495,7 +1495,7 @@ int __init ip_vs_conn_init(void)
+ 	max_avail -= 2;		/* ~4 in hash row */
+ 	max_avail -= 1;		/* IPVS up to 1/2 of mem */
+ 	max_avail -= order_base_2(sizeof(struct ip_vs_conn));
+-	max = clamp(max, min, max_avail);
++	max = clamp(max_avail, min, max);
+ 	ip_vs_conn_tab_bits = clamp_val(ip_vs_conn_tab_bits, min, max);
+ 	ip_vs_conn_tab_size = 1 << ip_vs_conn_tab_bits;
+ 	ip_vs_conn_tab_mask = ip_vs_conn_tab_size - 1;
 -- 
-2.43.0
+2.45.2
 
 
