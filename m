@@ -1,127 +1,123 @@
-Return-Path: <netdev+bounces-151017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 843899EC5E8
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 08:48:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D9209EC681
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 09:05:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C2601881E96
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 07:48:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38BC71886C88
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 08:05:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC701C5F3A;
-	Wed, 11 Dec 2024 07:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FFB1CCEE2;
+	Wed, 11 Dec 2024 08:04:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="DH2Qoqug"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s9urXzK1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3FF1BD9DE
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 07:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7BF81C5F03;
+	Wed, 11 Dec 2024 08:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733903276; cv=none; b=RQnmUvIEutvjyUjTJllw80DhrUv055ZCbjnRrlfVJseuFY6YgE8CqC8AH8GA4jcbrUiyRPVQONNnFtSq+Jwsln8doRjhsiGsmTRSMYpA85Bhp+tDOFyfnYCCp7Xm/m8GcPw1yyXAEcFKP7BIZJpa49H+cNFgwLMZl/yT6qKKKMs=
+	t=1733904293; cv=none; b=hq8f8HBHwPoJhS7QpXB81BDqlb/boZF+F9H98fKpa2aWTiDaAVm04svZvnPXpAEiQp1JYLHnLsmBR0YLF4lRDeYUS9zLBy37G7zLPFm2zei1mZdruXQrDxhjtpKpbupIi6UJyFUMyQ1KokXyF05czFxFHo6DIZ2YkuWD2hvgPDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733903276; c=relaxed/simple;
-	bh=TUVGTdzfcQP43eRAMRjYFmi1MnK/rZDxy5/4b8C8Hdk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MdScSrrUDihTWLJ+pZSBUmhEMTV+RoWeZppBRM3fGTLiblSO24pkC1KaDqzC4D4XDtTAUAbJ3KQEJTyAzFeoNGV53M0XNImShLE/VkfWQAqwrhXjfmq5xuV7sAnxyKYCmpEi3vtFQXHr+dTxcQuBNr7CEiLxWdfebCoqBUPRYHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=DH2Qoqug; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5d122cf8dd1so10423062a12.2
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 23:47:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1733903273; x=1734508073; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C9avSO34dj2cbK4oT3GkDrDvFb5SBzVZgXvDYfCmnG0=;
-        b=DH2QoqugnssSYahAnVgFMVATuo6hRXTAVBYxqS4srDTKcel6+dOoFU4bkAq6ky5fMd
-         i70oTXJaAH73UB1j+gXa+1FrMwvNCNBZjsFRA7Uw35WrUV+Yere/5rxV7TAKlQitu7Mn
-         cESFSEP/IuaxFI+owBHEvDQnQcHRK1ioftYNxL369bw51+AoYSYvt/hKALZpzSsq+JzC
-         9Wc13OT6825GkNZqTvMK3bYiVWzOY0vCjLLr55579fBJ4A0PtHJF8Uhxs8BnWIJ7oYY7
-         99ZFiChJGbtcGbd8vb29sL9R+gLP8/EZjDERpeNtuU/Oq4Yk93i8ksX4gr53gp0fwtnM
-         qmXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733903273; x=1734508073;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C9avSO34dj2cbK4oT3GkDrDvFb5SBzVZgXvDYfCmnG0=;
-        b=EYcRp2PVcduN9slmrXibNjGA+nCwBg4CzHY9KzvysXsGeVKWgXQ+tk4fFF+7knClTO
-         sUcgeGI2vt0lNWBayic+6cRN1d5WpUGUzfS2JrPLZ84wD53s8cVaEUsuyRfQcYbUbdwi
-         R4bCN1soVhanlfpJY0UXGfcgZNKG6SiiGo61JB7un2IokK5plUyA/RtQoTCDXHXyrhdW
-         R7JJpOCLeGhqdS+nbKvMd6UpJJOQxdh/O3il0if1S8vcOAR/vrFjl0yPbYxDS9bFys8g
-         I1Oh2S8wqw3FVQkaf9XmmI1A64XRlfAbFED3AaFlqjnsW7tHh0SxqzHgdiDkHev2Srk5
-         IMnw==
-X-Forwarded-Encrypted: i=1; AJvYcCUuSWH0F1vNPlweUXWIXO0Iii1Uuv+liJCSaSxqDVvzNihmzOu7kh5edOhfFhiVyf7/WhQ6pA8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQmJcwT0THErTkVSKZAQxIaf175ZqguVJIgqBWalvHsTbfbWaQ
-	k2nbZxLnhiQDDQmC66Dop1m7lqkC7Z3H+Va81JWX5MYKvDeFcz5ZtkOsOUt01to=
-X-Gm-Gg: ASbGncsKnZSQwSu6kjCFpPY3TrcEMPXYRHTI9pYDC8pICKAZ+uiO9O7vit24/AaqB5P
-	wRwdaCCOSz088BfykfXsor/zgLNgEP74QaDZhKGP4nQ05/LA/UNIu6TUvwARL2qVHNVj8EzCzXT
-	tvuWp+aoK5EdjTIdpx7WHJPz4UiAnV/mHPkJGb3Ws+NgeYbnYcDhHppoNZTMnszjop9rQRgtoq2
-	xsZ1/GB78898F2hNPn2tL+ZDARDZtE+iZmAAKsfcsGbfOEVKTCVL9pQ
-X-Google-Smtp-Source: AGHT+IHaFCpxYn1qWnjVigLj6jX1jU0ewLVQF5KgPoDKZ0fPJqOBncskDQmBZX1lbuSMbjqhPVLTyg==
-X-Received: by 2002:a17:906:2192:b0:aa6:6a52:962 with SMTP id a640c23a62f3a-aa6b11a05b6mr141367666b.18.1733903272842;
-        Tue, 10 Dec 2024 23:47:52 -0800 (PST)
-Received: from [192.168.0.123] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa673474d96sm540475266b.96.2024.12.10.23.47.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2024 23:47:52 -0800 (PST)
-Message-ID: <9c4f8153-7eb9-47a4-89a8-dd0f875b8b1a@blackwall.org>
-Date: Wed, 11 Dec 2024 09:47:51 +0200
+	s=arc-20240116; t=1733904293; c=relaxed/simple;
+	bh=ZzbxjgecJ8fa0v+feo6S6Xx4k2fRvoVfmSCJajpyxHQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=BjCiOUTVcKvOglL9WAGDspNurOAQF96mtG35enH5wG6YTOec3OQBEo4eTL8qNcFYFKzDEWk3MuTwZaiAH2TlguElSn5Cf2oLwgekYrLopv5c4urt4lxOvXAEcJQdhPcjwLyRpuP3IXzx/+pzFkcWDXKV1P/XaaNC3TzYjL5kta0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s9urXzK1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 35F9AC4CED2;
+	Wed, 11 Dec 2024 08:04:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733904293;
+	bh=ZzbxjgecJ8fa0v+feo6S6Xx4k2fRvoVfmSCJajpyxHQ=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=s9urXzK18UZQl3ofNAqQNQRgp8K5Z1nZcmAdq7v6AT8DUKGlQj/d6rUp48BHdNNUP
+	 Eou/xv68miRLQYxeIR4p1bRKGltEGvqOxVW5lNUBe/neoYNQOtrLsn+7yKU7CXNV3S
+	 W+/xPyCwI9Syqgm4UADksGPAHCPh4fjhzAENw0ECysujRJ+R2Xk329h+JjTekSOUE1
+	 AZo0z8WNpsXR5pUngx/00Qa8i7aOJQ+rV+DKDff9Nf69pnBGT8tQqk/VFOVSKA8mPh
+	 0q7p9POpQc9U/aeJf580wke65W+6exQk9+vZKJstxkghLbwPd8pm1/swp4YMlbD46h
+	 VaB15h2WHEDsA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A487E7717D;
+	Wed, 11 Dec 2024 08:04:53 +0000 (UTC)
+From: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
+Subject: [PATCH net-next v2 0/2] net: phy: dp83822: Add support for GPIO2
+ clock output
+Date: Wed, 11 Dec 2024 09:04:38 +0100
+Message-Id: <20241211-dp83822-gpio2-clk-out-v2-0-614a54f6acab@liebherr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 5/5] team: Fix feature propagation of
- NETIF_F_GSO_ENCAP_ALL
-To: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, mkubecek@suse.cz, Ido Schimmel <idosch@idosch.org>,
- Jiri Pirko <jiri@nvidia.com>
-References: <20241210141245.327886-1-daniel@iogearbox.net>
- <20241210141245.327886-5-daniel@iogearbox.net>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20241210141245.327886-5-daniel@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJZHWWcC/3WNQQ6CMBBFr0Jm7RhoBYGV9zAssJ3CRGxJWwmGc
+ Hcb4tbly8t/f4NAnilAm23gaeHAziYQpwzU2NuBkHViELm4FCKvUM+1rIXAYWYnUE1PdO+ISjf
+ KVJLkVRtI29mT4fXo3sFSREtrhC6ZkUN0/nMcLsXhf+3mT3spMEejpap7UzbGlLeJ6TGS92flX
+ tDt+/4FEX7aKMcAAAA=
+X-Change-ID: 20241206-dp83822-gpio2-clk-out-cd9cf63e37df
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Dimitri Fedrau <dimitri.fedrau@liebherr.com>, 
+ Dimitri Fedrau <dima.fedrau@gmail.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1733904292; l=1344;
+ i=dimitri.fedrau@liebherr.com; s=20241202; h=from:subject:message-id;
+ bh=ZzbxjgecJ8fa0v+feo6S6Xx4k2fRvoVfmSCJajpyxHQ=;
+ b=sNlY2EfgzLwGNb75JNVptc++ZJf3vlOpn5gLzzjBlNAnNB4zy2Al0D50jxbE8q+7pR6VXf+3W
+ T/iOfzIr1arBmYAzRZpt/FjSEXBERck4PI0DR0BuQAOLyIMTPfACQMB
+X-Developer-Key: i=dimitri.fedrau@liebherr.com; a=ed25519;
+ pk=rT653x09JSQvotxIqQl4/XiI4AOiBZrdOGvxDUbb5m8=
+X-Endpoint-Received: by B4 Relay for dimitri.fedrau@liebherr.com/20241202
+ with auth_id=290
+X-Original-From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Reply-To: dimitri.fedrau@liebherr.com
 
-On 12/10/24 16:12, Daniel Borkmann wrote:
-> Similar to bonding driver, add NETIF_F_GSO_ENCAP_ALL to TEAM_VLAN_FEATURES
-> in order to support slave devices which propagate NETIF_F_GSO_UDP_TUNNEL &
-> NETIF_F_GSO_UDP_TUNNEL_CSUM as vlan_features.
-> 
-> Fixes: 3625920b62c3 ("teaming: fix vlan_features computing")
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> Cc: Nikolay Aleksandrov <razor@blackwall.org>
-> Cc: Ido Schimmel <idosch@idosch.org>
-> Cc: Jiri Pirko <jiri@nvidia.com>
-> ---
->  drivers/net/team/team_core.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-> index 306416fc1db0..69ea2c3c76bf 100644
-> --- a/drivers/net/team/team_core.c
-> +++ b/drivers/net/team/team_core.c
-> @@ -983,7 +983,8 @@ static void team_port_disable(struct team *team,
->  
->  #define TEAM_VLAN_FEATURES (NETIF_F_HW_CSUM | NETIF_F_SG | \
->  			    NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE | \
-> -			    NETIF_F_HIGHDMA | NETIF_F_LRO)
-> +			    NETIF_F_HIGHDMA | NETIF_F_LRO | \
-> +			    NETIF_F_GSO_ENCAP_ALL)
->  
->  #define TEAM_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
->  				 NETIF_F_RXCSUM | NETIF_F_GSO_SOFTWARE)
+The DP83822 has several clock configuration options for pins GPIO1, GPIO2
+and GPIO3. Clock options include:
+  - MAC IF clock
+  - XI clock
+  - Free-Running clock
+  - Recovered clock
+This patch adds support for GPIO2, the support for GPIO1 and GPIO3 can be
+easily added if needed. Code and device tree bindings are derived from
+dp83867 which has a similar feature.
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+---
+Changes in v2:
+- Move MII_DP83822_IOCTRL2 before MII_DP83822_GENCFG
+- List case statements together, and have one break at the end.
+- Move dp83822->set_gpio2_clk_out = true at the end of the validation
+- Link to v1: https://lore.kernel.org/r/20241209-dp83822-gpio2-clk-out-v1-0-fd3c8af59ff5@liebherr.com
+
+---
+Dimitri Fedrau (2):
+      dt-bindings: net: dp83822: Add support for GPIO2 clock output
+      net: phy: dp83822: Add support for GPIO2 clock output
+
+ .../devicetree/bindings/net/ti,dp83822.yaml        |  7 ++++
+ drivers/net/phy/dp83822.c                          | 40 ++++++++++++++++++++++
+ include/dt-bindings/net/ti-dp83822.h               | 21 ++++++++++++
+ 3 files changed, 68 insertions(+)
+---
+base-commit: 65fb414c93f486cef5408951350f20552113abd0
+change-id: 20241206-dp83822-gpio2-clk-out-cd9cf63e37df
+
+Best regards,
+-- 
+Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+
 
 
