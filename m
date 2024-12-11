@@ -1,124 +1,135 @@
-Return-Path: <netdev+bounces-150920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33A6A9EC19A
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:36:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A79609EC1B1
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:44:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68B972857A7
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 01:36:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCE18284F80
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 01:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957F213A3F7;
-	Wed, 11 Dec 2024 01:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F276B3A8F7;
+	Wed, 11 Dec 2024 01:44:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lWXuqS/O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S0EQjfAB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287064A08;
-	Wed, 11 Dec 2024 01:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FD72451E2
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 01:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733880954; cv=none; b=FRcd2FclOOHssh8S81vY6ScnctC+Sj9GHGzbv7/qFrIg3/boaCioaST2QRvHb2UGX88x7P8Bb6LqmTejf2cqCGZaO5kVpzbV8oK6lGEZgPvIQC90WkZ67tvUE1lS2KpMFsO7bTzdFjgY97Q1fY66dERyk3k6if25Btksww3EFvE=
+	t=1733881478; cv=none; b=NSESfzo9u35UIr9r4mwyTK4WPRL0EQL01rp59bvlHfjrTFDND3NIlGllrHnpL7II5DczDdEf9Y4QK47gKqE/0vH7u3t0Y1qWjFa82ttvweCgV301anlgfR8mUcKh2e4tdIbLAQ+/jJu4xWCw0WIFmFsubDwWYCuUxTdpJsJB/eU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733880954; c=relaxed/simple;
-	bh=Dz1h0dkmrv6Ze1cxU8t5rn465fyVUykxbTsS0X2OpsA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SbYGXO1EW8Nx/B0Ix2UEJEZF4xQdyly1BAin6X+UDXC7JThmXoJ3s6QSvSNLRzE5isfLIM4Ra45XyDap9bQL1tq7gTZoxceNGQupJ9eBvM8ed5ariMK1X4rJS0v7spUsyqAUQd37W2XhLOoJPSoVUBKkcqGGD8P+LNM+ftBVz1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lWXuqS/O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 199D6C4CED6;
-	Wed, 11 Dec 2024 01:35:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733880952;
-	bh=Dz1h0dkmrv6Ze1cxU8t5rn465fyVUykxbTsS0X2OpsA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lWXuqS/OGpuLDDn3e6rd0Ny3W9lOBqxl6ouihxGY5DI5BnIAz9k8OvBxV/WkkoGKL
-	 hvX4IUIFhNQrpaU/cm1/wigfic0JSqIb6VAvnSxeGoBEhxQ8j23ePZ7Up9KKZysBId
-	 uO/7yQ7qC/+pZb6ESDTBeZAbwesJTCLTy1XLYAF4mlcKRBKyoFjzB5pZOEDAYCVUSK
-	 PtvZkQ2HN8nf8vIhBE/HaUtHV2aj4U1eGeFDoHxYziwThc1ReVtXl39rfXh3mERvJ2
-	 23iH30lOevYf8TCz5YvtH3bGmPPNofPB05oCl1pJa3BU8K8c+a39qY+xcVUgGWrb0g
-	 vGjoGdbfKJTPg==
-Date: Tue, 10 Dec 2024 17:35:48 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, Easwar Hariharan
- <eahariha@linux.microsoft.com>
-Cc: Jeff Johnson <jeff.johnson@oss.qualcomm.com>, Pablo Neira Ayuso
- <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Julia Lawall
- <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack
- <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, Robert
- Jarzmik <robert.jarzmik@free.fr>, Russell King <linux@armlinux.org.uk>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Ofir
- Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>, Lucas De
- Marchi <lucas.demarchi@intel.com>, Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?=
- <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
- <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
- <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>, Dick Kennedy
- <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Roger Pau =?UTF-8?B?TW9ubsOp?=
- <roger.pau@citrix.com>, Jens Axboe <axboe@kernel.dk>, Kalle Valo
- <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel
- Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Ray Jui <rjui@broadcom.com>, Scott Branden
- <sbranden@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>, Ilya
- Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Jiri
- Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>, Petr Mladek
- <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Louis Peens
- <louis.peens@corigine.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
- Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan
- <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
- <anna-maria@linutronix.de>
-Subject: Re: [PATCH v3 00/19] Converge on using secs_to_jiffies()
-Message-ID: <20241210173548.5d32efe0@kernel.org>
-In-Reply-To: <20241210153604.cf99699f264f12740ffce5c7@linux-foundation.org>
-References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
-	<315e9178-5b10-4de0-bdcf-7243e0e355bb@oss.qualcomm.com>
-	<20241210153604.cf99699f264f12740ffce5c7@linux-foundation.org>
+	s=arc-20240116; t=1733881478; c=relaxed/simple;
+	bh=2rCReVUMGJ0g2/GRoyymGEfrwqH2WPfzgitFkta5nbg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c9abhGgjrzbWBIDAIvofP7qprA8mKGr6YgeqVcXyq4Wld6EH3iKikpTiO7JUptniDKAL+aEZRSZE9fyqujqDijkp9ZMLMVbPBaJVZp0tgiJmkR5Uep/JYmhCZGUkykHgJBcNxO/4hxJk67E+XZtUQSpu59KLacSRFlJS3PAsPqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S0EQjfAB; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3a9d5a7ecc3so145ab.1
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 17:44:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733881476; x=1734486276; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2rCReVUMGJ0g2/GRoyymGEfrwqH2WPfzgitFkta5nbg=;
+        b=S0EQjfABV/RZ/f0RddHhESyVxRn1YI33f5nrNGc7dE4MOa++TJo7oqmUERQHbLaHXE
+         4/Wu7MUb78cP7EJcGhbubxGZQ9uNB3Y4rFzQI/ZzYXIh6idC9hISu4fA5Z0vJWEW+atn
+         izq7Unuqo3hj9BkWbQ9tN78PkreFFM0M/hLE/qIe8euR+Hrbs10pULChjMUGTGNCff5U
+         /MhRXgHVEByeH7P2OpD53j6p/5/MBCjZQnsxwYl5yCpeIccksxzx4iy1GCS9idMex7wY
+         dEhobGrK71F9daKwIHmXdIPq+rbs9NasrjrSR/4opaPOBj58ertf1cOhCx8uEB0p+wBW
+         Z58Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733881476; x=1734486276;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2rCReVUMGJ0g2/GRoyymGEfrwqH2WPfzgitFkta5nbg=;
+        b=JXrGsMc6mBBuCsUuGvfbgof3oELFWANzf0ixp99/BCxHo+AXJSxFwVuxhxsdypgbZc
+         DNq1SgIEE7E1+KBZNXmHpP/s13dY7qIi0/7e1Na18pWt8woi/d/EjPRxD7jPP1S/Ck9W
+         OU2crUOgwfKJsC+K0Js2e8fVSsQI4wEw+HP849jNyj5fgKxfeidtOqL0jYUzDxIunIgH
+         NXfrRevEUZyEp28Flvu4+/KlKAsL2E1Zwwc9g07bhekvMgdHxYuB1L3y0PPufo8iCRSs
+         u7H6h+WWt9pGQqe4fv8alqDHtQLtv023jWlrxwd6QhjtwucdbZGz44ebIhHft/Wl24ZH
+         998Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXIFJGWd0mqlCN/xOTd5b1Pba87u4ESNUD7tIFug5xfK2Eg5CB6LEy6b+IR0C/X2a6SQcDeyDk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNlYFU85F9p1UrNROZsIRZ1eH3BhHKEEYkF44NI6/wLNCWD0hW
+	jItsGrHHb3CiOxueEJ1vLsFsZnmXvnwSp1O/+7I42SpA05nCB0uXwk6GjUkyloyfoRJ47goAO3D
+	ZjGw7lPWCvSS9W+pA6MwDYdxqJFC1Q+6SPmRB
+X-Gm-Gg: ASbGncttB3Djx0oiEWPyUDSzn6Wf/UpGRywnbwobzCB33Ec+yKAolWGviB8GHmK3OqM
+	sqNkWSB16j+5zS4x8XDzyD1QKwqy9PMOPrB7KLjCkEtnRJOrI44bTuSoMe6i+y8B9PAoT
+X-Google-Smtp-Source: AGHT+IHgIUlCaSckRytllOw1VFbpzaTh+/80yziR7q/Xmb+k9VGDi2X9upi+F9cSMbDIb5/8fLtXjq1G7w0wnZABZuw=
+X-Received: by 2002:a05:6e02:1093:b0:3a7:d682:36f6 with SMTP id
+ e9e14a558f8ab-3aa3bdd73d2mr394565ab.0.1733881475762; Tue, 10 Dec 2024
+ 17:44:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241206041025.37231-1-yuyanghuang@google.com>
+ <20241209182549.271ede3a@kernel.org> <CADXeF1FNGMxBHV8_mvU99Xjj-40BcdG44MtbLNywwr1X8CqHkw@mail.gmail.com>
+ <20241210165024.07baa835@kernel.org>
+In-Reply-To: <20241210165024.07baa835@kernel.org>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Wed, 11 Dec 2024 10:43:58 +0900
+X-Gm-Features: AbW1kvZGxNtmoat3xNO5M6L28CiAjfyABhacfn8s5McTBq1vnYGf9zGTXWlu_G8
+Message-ID: <CADXeF1GoaVbobrTe99R0FVUuxcWxxaH=XCOusCq=+vS1QvEc9g@mail.gmail.com>
+Subject: Re: [PATCH net-next, v5] netlink: add IGMP/MLD join/leave notifications
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	roopa@cumulusnetworks.com, jiri@resnulli.us, stephen@networkplumber.org, 
+	jimictw@google.com, prohr@google.com, liuhangbin@gmail.com, 
+	nicolas.dichtel@6wind.com, andrew@lunn.ch, netdev@vger.kernel.org, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Lorenzo Colitti <lorenzo@google.com>, Patrick Ruddy <pruddy@vyatta.att-mail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 10 Dec 2024 15:36:04 -0800 Andrew Morton wrote:
-> > I have the same question as before: How do you expect these to land?
-> > Do you now have a maintainer who will take all of them?
-> > Or do you want individual maintainers to take the ones applicable to them?  
-> 
-> I'll just grab everything and see if anyone complains ;)
+>TBH I'm not an expert on IPv6 address scopes, why do we want to ignore
+>it now? Some commit or RFC we can refer to?
 
-I may, if this leads to a conflict :(
+For IPv6, I think rfc3484 and rfc4193 talk about address scope
+selection. However, I am not aware if we have any clear definition for
+IPv4 addresses.
 
-Easwar, please break this up per subsystem.
+Based on previous suggestions from Paolo, we should make IPv4 and IPv6
+rtm_scope consistent. RT_SCOPE_UNIVERSE could be a good fit.
+
+Link: https://lore.kernel.org/all/1a4af543-d217-4bc4-b411-a0ab84a31dda@redh=
+at.com/
+
+>Perhaps you could add a new member to inet6_fill_args to force the
+>scope to always be set to universe?
+
+Thanks, I think this will avoid me affecting existing usage. I will
+apply this in the next patch.
+
+Thanks,
+Yuyang
+
+On Wed, Dec 11, 2024 at 9:50=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 10 Dec 2024 12:19:11 +0900 Yuyang Huang wrote:
+> > >u8 scope =3D RT_SCOPE_UNIVERSE;
+> > >struct nlmsghdr *nlh;
+> > >if (ipv6_addr_scope(&ifmca->mca_addr) & IFA_SITE)
+> > scope =3D RT_SCOPE_SITE;
+> >
+> > Is it acceptable, or should I update the old logic to always set
+> > =E2=80=98RT_SCOPE_UNIVERSE=E2=80=99?
+>
+> TBH I'm not an expert on IPv6 address scopes, why do we want to ignore
+> it now? Some commit or RFC we can refer to?
+>
+> Perhaps you could add a new member to inet6_fill_args to force the
+> scope to always be set to universe?
 
