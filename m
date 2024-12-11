@@ -1,191 +1,137 @@
-Return-Path: <netdev+bounces-151215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C4BA9ED86F
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 22:22:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEE379ED999
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 23:25:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 453B71888D6C
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 21:21:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9E911885F02
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 22:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340691F2C40;
-	Wed, 11 Dec 2024 21:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93381F0E50;
+	Wed, 11 Dec 2024 22:24:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CmqoNzRw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DxJT5G3B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E2F1EC4C0
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 21:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399CC1EC4CD
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 22:24:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733952045; cv=none; b=dLDonbvsRlsuOYL7iz4/UqEjCC8bS6Ny7U7rdlY0jLAG+GwKPdIGApwfPsAHjggPqsZ1vRgdzPZnN+TDgjj0JbiORDHmbNqnccghZoADEf5DiRvPIMnM4r0eWxpDuCHPjKcx/UT3db81exzuMp6WRpFwqdlQML5dm8wambpoZkY=
+	t=1733955893; cv=none; b=X+o+CkaIoUv/UURi/G5KS0rNZL9bZP7wEZZx+E6J87ERBXpzJwByPykGLXKSbGkl8sPDCZNdIDtGgfu3TL4YT+JGHa2PKRskLvdmRgrZ0GDTe0wdqEyLJkyqZa2fY2tw7mGtX/ATUQR0ic2CYScSH0gS7f3kXYT5ooYFCNHTT6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733952045; c=relaxed/simple;
-	bh=9BNoKvvCDKbyXYRvGcmAgiOTx+VjuHH2W8Or3dRTMpc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mVg7M4zQl0kIbmSBapaHyYwrd9bJvXiUBXaOZIhaZ8O5EeqLdt1wVz4WCh4LZH2pxEMPr9jV1umazzMmDNJ8dUxbO+8g+E/JJPVoR8xaLfxq+k+zU+ypqDjf7OVCTH7CBuuiKlRYyD2aBPUP6njOHtpV7mjVWahl3Dz8Hdm3uU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CmqoNzRw; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2efa0eb9dacso3853015a91.1
-        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 13:20:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733952043; x=1734556843; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=745mn/S2xe1Z43WeSOTvQvgzJ70pexQD0FqzrefhnYc=;
-        b=CmqoNzRwnz58z4wKlWaK9VJkxia4k9usxdlLwfnj89aTSmvyfW6pbOXhjN6AgsT8dZ
-         UDeNxuHPP5ykljoCbTmFcRC+aCWsVJYaQH/RHJZuqVPKgw7J0GmbJ1sZc37COOMZf5r2
-         Q0ZrmcBDCgmXdjd7SU+N2yG1DFtowAH6IkwD20Gs+Wuiuky+8kKBXB7awyhDVqGSfwJo
-         BjcOUoR2zVqCXEgJaDDw8a+cfTLgraLyMTqsSJfBtSEFcq2Rwb2JqlFCBSJZbjsw9Ejr
-         jZ8bSQu0rYTqgKQVM7S0t0DjhmGJrsycFOTHpHOq4/DUKJnhjaInb28ywKZO8nTPpo+x
-         VHyg==
+	s=arc-20240116; t=1733955893; c=relaxed/simple;
+	bh=RV/W/MroeiS9i7sZw8kk7loBgZRFz63mwAfHWQtoXlE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UtIZeXyqNOq/IMSFG74NbilrnXRH+SLeWN4mSQRivZPNm3s9KbA24vVtyWULuVApGhylpq8QrpcOEKSBEiti9q7EpqV8vhoBl4tGA2N1PA678DWlQJ3lwb0Yp2t1O067bXGoV22m6b70mhBVUx9QgXnNs/AKnJAhiEz9G4d+2mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DxJT5G3B; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733955890;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4L62xxnOjfKCwQHQtFYxaSuIGZjtEixLHzI3Spv7u9I=;
+	b=DxJT5G3Bm88gTE25/B/XJpT4WqEks49r6GDDl+WxkvIvhr0fPDrovpW5F72RjJQ655K8AB
+	TguYPHMbqmMEobuNGYfRkFKy+hyF6XbRMCcCGFNK7QNBN6cTfQXsC1lEvvXpsah7PRbbzF
+	NLuZjhuYJzKfVg+vfgEkCAwWnrMp+gY=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-259-a_N0ztx9P92O0Sj8VNLW4g-1; Wed, 11 Dec 2024 17:24:49 -0500
+X-MC-Unique: a_N0ztx9P92O0Sj8VNLW4g-1
+X-Mimecast-MFC-AGG-ID: a_N0ztx9P92O0Sj8VNLW4g
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-6ef88388aaaso85077197b3.0
+        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 14:24:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733952043; x=1734556843;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=745mn/S2xe1Z43WeSOTvQvgzJ70pexQD0FqzrefhnYc=;
-        b=cR1HXS9B8PZJrfPmJ5vWpdv2XvCKRNn5SIngbLy4tM63/L+LIcplyytXq2i7GLlIgu
-         TF/W/CVb5+AkIDuHh96RS3t2YvzHILQr3hoC7qeKrez03MnLFOK5RGC0EWA/qbR9686H
-         5HBRLtM+aVpY32hwo4MiOzKHdJHPPFdt5mTqgE5ziphciNo1UnuVIDXC9SSxQXR8Itfj
-         +olzdtSmxYuf4LG6O0UU+FcQChkUTyYcoZtetDigFfyzOAXvL2OFVbHE9F0ToMoolKsd
-         aQYaRRwxXEoBBR69kywzH+eD3FEeDHGMKiumk/HmsR/fdXVRGcRg/pzVHZrJML1Mfh07
-         /+6g==
-X-Gm-Message-State: AOJu0YxvD20KzfrEuNSMGBXOtvjXEby1vLjbQCKu70+uhsOQ6ewfVs6F
-	6zZJy2BaVtUGdA31pPd+KGfbYSKQRMMTUM+p8NSiG16mXX+Bn9H54Vm/sfrjEnzCetW1+Z01jz4
-	hKOv/7kOw+ckWYTAiA83McDUinrBecyilTpP6gsZsYNwlwOjyn8JdhBv53zhDg2XeZCMrH9GZXe
-	HjRjhunCcxpPeq/Zfm8J+0VNSWr6BEWWIxejkQAMeKq3oOVAUX4fIGp+QRtFs=
-X-Google-Smtp-Source: AGHT+IF2uRXFUQriUo4tvi6x2FYHwsywKL7Zw3vDn+zO9RvFZ2JyJoMpQxG3APMIfW/ed/zYgqVVYVaPi7Sv7tAlhg==
-X-Received: from pjbsp5.prod.google.com ([2002:a17:90b:52c5:b0:2ea:6b84:3849])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:17ce:b0:2ee:b26c:10a3 with SMTP id 98e67ed59e1d1-2f139329035mr1977597a91.36.1733952042875;
- Wed, 11 Dec 2024 13:20:42 -0800 (PST)
-Date: Wed, 11 Dec 2024 21:20:32 +0000
-In-Reply-To: <20241211212033.1684197-1-almasrymina@google.com>
+        d=1e100.net; s=20230601; t=1733955888; x=1734560688;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4L62xxnOjfKCwQHQtFYxaSuIGZjtEixLHzI3Spv7u9I=;
+        b=a1JqomuTZrY3yxfzmmrO/6VtANTnRZLlR83niTrLOoeRi+LLhZ20rn9waArmjk8ffO
+         jAfImz1zAbXoV0bJhyzAYfP9471LHMNocxPKz+d6cttTqIKsc9LKkInf/2J+C1aSvfZ5
+         UC7ax8zxH8vEXW1XJbXcEHQQPfAmIBbmd8giIrMx9LUhYP6BfhJjCLgSlR7jaeM+QIPL
+         6iS1sAzJ5eNhkvIpWcD/2Bbr+kLh8y4Oc2DdEdDzEqcr1oBYrSRNFGQHEo8K2LHNPIYU
+         BBi/DuAD0ZbsNVl0dLKa93tErWFjiYim9blH2yIviV8hlsmH+WAILcs3g8yBcbxJFEs9
+         ymDw==
+X-Forwarded-Encrypted: i=1; AJvYcCX1rGlqtpE0bJbv8SyjxeFSWJzOJ7LTu64Uh9tcjntvaPnDPQwKEObP4YVZ3yY+cSqlG33Tn28=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywbpx4hvVy4FZAwuj5a6qlfLGrNg2PLR3oWXCJj/Q7OtxIx/8AM
+	WGOgqpY5tHONIdtJ02HzNRSPsjI1cwO2QF6ecxvHgYZjKBITBRf+QlnFsAymv368iZH1tsUnhJJ
+	wrqAZpFLLZbVuQMOansz8456l8jB2KyoPAUXJSdmTFBF11YXqRkZrT1GCIgylbKL1ZaH+PJgX4n
+	5woMwRRTJA4owOkiu/XYWLeaF5ZDPb
+X-Gm-Gg: ASbGncs7p+fNJvHEE6mQ38R6NHXqt7d8LdPZbpdfRbFOCBCM1vcR6clFDHC6bPK3Elb
+	Er62AngeQolsU8kZLlu3HN1ZSgM7dAm9p+jf7gTpthxi+jabt/C5+vYEKPg9cQVHVMg==
+X-Received: by 2002:a05:690c:4485:b0:6e2:2600:ed50 with SMTP id 00721157ae682-6f19e5071a2mr10985187b3.21.1733955888567;
+        Wed, 11 Dec 2024 14:24:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGh7oBAib1eBpyek7a5WPWh4QHh7h9VICuRKeigaC7/liBhCsHFKK7GpYF1R309LJITTPHEPKoaTwkJLcRC/qY=
+X-Received: by 2002:a05:690c:4485:b0:6e2:2600:ed50 with SMTP id
+ 00721157ae682-6f19e5071a2mr10985027b3.21.1733955888311; Wed, 11 Dec 2024
+ 14:24:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241211212033.1684197-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241211212033.1684197-6-almasrymina@google.com>
-Subject: [PATCH net-next v4 5/5] net: Document netmem driver support
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Mina Almasry <almasrymina@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>
+MIME-Version: 1.0
+References: <20241210161448.76799-1-donald.hunter@gmail.com>
+ <20241210161448.76799-8-donald.hunter@gmail.com> <20241211210713.GE2806@kernel.org>
+In-Reply-To: <20241211210713.GE2806@kernel.org>
+From: Donald Hunter <donald.hunter@redhat.com>
+Date: Wed, 11 Dec 2024 22:24:37 +0000
+Message-ID: <CAAf2ycnfaZ9z4+skH9cUFxgx8Dk60ct-WsZXq9YS6gUtY1dQFw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 7/7] netlink: specs: wireless: add a spec for nl80211
+To: Simon Horman <horms@kernel.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, linux-wireless@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Document expectations from drivers looking to add support for device
-memory tcp or other netmem based features.
+On Wed, 11 Dec 2024 at 21:13, Simon Horman <horms@kernel.org> wrote:
+>
+> On Tue, Dec 10, 2024 at 04:14:48PM +0000, Donald Hunter wrote:
+> > Add a rudimentary YNL spec for nl80211 that covers get-wiphy,
+> > get-interface and get-protocol-features.
+> >
+> > ./tools/net/ynl/cli.py \
+> >     --spec Documentation/netlink/specs/nl80211.yaml \
+> >     --do get-protocol-features
+> > {'protocol-features': {'split-wiphy-dump'}}
+> >
+> > ./tools/net/ynl/cli.py \
+> >     --spec Documentation/netlink/specs/nl80211.yaml \
+> >     --dump get-wiphy --json '{ "split-wiphy-dump": true }'
+> >
+> > ./tools/net/ynl/cli.py \
+> >     --spec Documentation/netlink/specs/nl80211.yaml \
+> >     --dump get-interface
+> >
+> > Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+>
+> Hi Donald,
+>
+> Perhaps I'm doing something silly here, or my environment is somehow
+> broken. But with this patch applied I see:
+>
+> make -C tools/net/ynl/ distclean && make -C tools/net/ynl/
+> ...
+> Exception: new_attr: unsupported sub-type u32
+> make[1]: *** [Makefile:37: nl80211-user.c] Error 1
 
-Signed-off-by: Mina Almasry <almasrymina@google.com>
+Hi Simon,
 
----
+Thanks for reporting. It was also flagged up on patchwork. My bad. I
+had a blind spot for checking the C build because the last few specs I
+have worked on have been netlink-raw which don't have codegen. I'll
+look at fixing this and any subsequent issues.
 
-v4:
-- Address comments from Randy.
-- Change docs to netmem focus (Jakub).
-- Address comments from Jakub.
-
----
- Documentation/networking/index.rst  |  1 +
- Documentation/networking/netmem.rst | 62 +++++++++++++++++++++++++++++
- 2 files changed, 63 insertions(+)
- create mode 100644 Documentation/networking/netmem.rst
-
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 46c178e564b3..058193ed2eeb 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -86,6 +86,7 @@ Contents:
-    netdevices
-    netfilter-sysctl
-    netif-msg
-+   netmem
-    nexthop-group-resilient
-    nf_conntrack-sysctl
-    nf_flowtable
-diff --git a/Documentation/networking/netmem.rst b/Documentation/networking/netmem.rst
-new file mode 100644
-index 000000000000..f9f03189c53c
---- /dev/null
-+++ b/Documentation/networking/netmem.rst
-@@ -0,0 +1,62 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+================
-+Netmem
-+================
-+
-+
-+Introduction
-+============
-+
-+Device memory TCP, and likely more upcoming features, are reliant on netmem
-+support in the driver. This outlines what drivers need to do to support netmem.
-+
-+
-+Driver support
-+==============
-+
-+1. The driver must support page_pool. The driver must not do its own recycling
-+   on top of page_pool.
-+
-+2. The driver must support the tcp-data-split ethtool option.
-+
-+3. The driver must use the page_pool netmem APIs. The netmem APIs are
-+   currently 1-to-1 correspond with page APIs. Conversion to netmem should be
-+   achievable by switching the page APIs to netmem APIs and tracking memory via
-+   netmem_refs in the driver rather than struct page * :
-+
-+   - page_pool_alloc -> page_pool_alloc_netmem
-+   - page_pool_get_dma_addr -> page_pool_get_dma_addr_netmem
-+   - page_pool_put_page -> page_pool_put_netmem
-+
-+   Not all page APIs have netmem equivalents at the moment. If your driver
-+   relies on a missing netmem API, feel free to add and propose to netdev@ or
-+   reach out to almasrymina@google.com for help adding the netmem API.
-+
-+4. The driver must use the following PP_FLAGS:
-+
-+   - PP_FLAG_DMA_MAP: netmem is not dma-mappable by the driver. The driver
-+     must delegate the dma mapping to the page_pool.
-+   - PP_FLAG_DMA_SYNC_DEV: netmem dma addr is not necessarily dma-syncable
-+     by the driver. The driver must delegate the dma syncing to the page_pool.
-+   - PP_FLAG_ALLOW_UNREADABLE_NETMEM. The driver must specify this flag iff
-+     tcp-data-split is enabled.
-+
-+5. The driver must not assume the netmem is readable and/or backed by pages.
-+   The netmem returned by the page_pool may be unreadable, in which case
-+   netmem_address() will return NULL. The driver must correctly handle
-+   unreadable netmem, i.e. don't attempt to handle its contents when
-+   netmem_address() is NULL.
-+
-+   Ideally, drivers should not have to check the underlying netmem type via
-+   helpers like netmem_is_net_iov() or convert the netmem to any of its
-+   underlying types via netmem_to_page() or netmem_to_net_iov(). In most cases,
-+   netmem or page_pool helpers that abstract this complexity are provided
-+   (and more can be added).
-+
-+6. The driver must use page_pool_dma_sync_netmem_for_cpu() in lieu of
-+   dma_sync_single_range_for_cpu(). For some memory providers, dma_syncing for
-+   CPU will be done by the page_pool, for others (particularly dmabuf memory
-+   provider), dma syncing for CPU is the responsibility of the userspace using
-+   dmabuf APIs. The driver must delegate the entire dma-syncing operation to
-+   the page_pool which will do it correctly.
--- 
-2.47.0.338.g60cca15819-goog
+Thanks,
+Donald.
 
 
