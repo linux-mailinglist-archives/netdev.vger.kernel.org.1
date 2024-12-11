@@ -1,155 +1,105 @@
-Return-Path: <netdev+bounces-150961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584DB9EC2E2
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 04:09:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CC0A9EC2EF
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 04:10:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFD6B18816DC
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:09:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EADA165D67
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9492204F64;
-	Wed, 11 Dec 2024 03:09:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C81A20C013;
+	Wed, 11 Dec 2024 03:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h7ajyQOf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qXcW5Mij"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7516F30C;
-	Wed, 11 Dec 2024 03:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317BF20B81C;
+	Wed, 11 Dec 2024 03:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733886579; cv=none; b=OAHawm4ST1p8D9ee60ClwzsugoytZ4OWIXcDiKT9kkQ8GT/w1tpUHUj80CvU83vlloMmNmCD5tUg/EZXLFhVW+l8MRn9hTCF5MbcC6IOIGQAqKWOn34xyrNEYjR8eLG+UfrnjzJP87k92qYDPqa2GWBBABABtlNGTttImzPIlk4=
+	t=1733886616; cv=none; b=sXL5MArukrN2mG6d8RhO5uNXn1kuJxMQKxmpSS9gqleSRHP3DoAXTVIKSJH5x06TRKPFAfz1LOVRGi0GQyKO6Ht+aV7bhKMSx+bFWl+WHcPSrHLcBxEWt+Wek2gh1Wls8jRB07S/tk2N7ZbzaOUKUOnozI9w0/1AasS6oExyX9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733886579; c=relaxed/simple;
-	bh=WmrUd5Nu2a7eyR1oMIbgS0v2IvziIaAtqv+1/FXypfU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GccejTh0JJJPDMQTKZAOHW6aNovRMMdTpOpFuVeQP6dRQr2PeopOhNrqcH5EwE7bOFLHOAKSW9XYLRO+xMIIEstCvHGKC/7cQPkT88u0XnENyBibgNIORsMnm4vbJvcM0Fha/4sb4wxTfVThsbQv0G/PIgcu6/R2olZFNRwm1/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h7ajyQOf; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-38637614567so1787361f8f.3;
-        Tue, 10 Dec 2024 19:09:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733886576; x=1734491376; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jrvqNyhKC4J4j6+ceUZ/ULpbNEbVa+Y8QtWcj7x+I1k=;
-        b=h7ajyQOffZmh9ww0ivtWKKy8vMYNHeHAMJFaXVLLu4r5L9kn42BHVvZJwaKsXM6dWP
-         y6bjtg5jSEv6Vuj3oXrs+IQo+uUaC1tI51o2jePhJlmDKlj/a8Dp6UH22ImXXRKnVzI3
-         qXPxLEEeexnsI+R/ENqR58CC6LGR9MBWpTKYdlYs9Pj5OtzQZlFgF9fPjXc+Pd48xov4
-         C+KlTN+jcfI/XYs3tjySIzXZ4sa1RlxR0RSQ+rsYHAXJGCzCwcNsgIr48+SYRCFdyXzQ
-         e2NZAls04TEMisZo0L5IN6krzssGkfFOM8S9wLwgX43MlH4kYjwnP7afWRM1uFjcwQGm
-         Oqlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733886576; x=1734491376;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jrvqNyhKC4J4j6+ceUZ/ULpbNEbVa+Y8QtWcj7x+I1k=;
-        b=HYkdxNF3TZYxq0dH0839rQDUrwcEVhb3x3nfBM4oouXgMC1R5DZnSkIdYz5bpGGXy6
-         83pdpTq+fzPmtjQHOlb02gEBcOnre0hNfiVzvoyl0Gw7jsI05BcTizReFMx0x2ddMaOi
-         vhEX4INvBDbvY5kxRKy84dFddq+KOQrIywV9BUb7dDRas6l5CB2JppO/j6cMPMpF2mDC
-         Xovw4rG6dsOBgtS78unQLGtBN1rblkNx7lLJKg0KY/DE/+yBHSuHVyDOLgXkqxKCN/od
-         yH3UF4dBWjKZevOoOCJnl4RL/t10Pae+0OSGv/nxL51ZWy+CNH5BiUIDIlfLuYSsLp9W
-         g1ig==
-X-Forwarded-Encrypted: i=1; AJvYcCViJ7kOcp0Sqg3CMbEff0FyT4mlM9zrGjtJ/BLGqunhau2T0KRJia3SwMNaqhW3aYI4YEah5L36faslkleGgP8f@vger.kernel.org, AJvYcCXrzr6IZzuPc1aSzTTZdfnLO5g6UJeYfeVBSDhjsF+k1S4nwE/uP49jY5Af5CBOzgFPmhL4atSOaFkdFIo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzxjiy/urAIuH1OdV+Dy793RhHSQa8akR6VnyVNq0FGPZBqqHQU
-	v2NZ9cbu3I9n+bmZKpB4k7gKuWdxoJPDjgvMdaH5cXvqDtDfAkeQKUgKjwl/miRAbDGBQCIYd41
-	Hm/HkopWyG86wdA10NSq+lGtHBQ8=
-X-Gm-Gg: ASbGnct5NouLhSwZ949Ckm0einvuMzfRPEgUYY6js4mmkYlCHUciebNN7y7Q9kfb+JP
-	0y4+b7wLAg+7NopZoB3qvC5Jx8RCHRPIqNA==
-X-Google-Smtp-Source: AGHT+IHtYGYEAAmYOf8dXiFVQC5xP/l+aAUTsx/Mqvp+fp0NoPDfS4GQ9TBCXwwLk8+JKMb0nNq5SQgzCMv7a2Qk7lk=
-X-Received: by 2002:a5d:6486:0:b0:386:4a60:6650 with SMTP id
- ffacd0b85a97d-3864cec5bd0mr853962f8f.42.1733886576197; Tue, 10 Dec 2024
- 19:09:36 -0800 (PST)
+	s=arc-20240116; t=1733886616; c=relaxed/simple;
+	bh=79qZmJ+TQ8cZcD/WuIhRJ5qYo8fst9V7HyNBmkyL0ek=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Ojyk8MKGuAipow7svhcNUTafa6p9cl+IpMbY8JI0TyX5aq13+M+6ZEa9phsu4T0xAGNaRccjYDMGnV0PHSAY7m+CDxg55SME51xbxACBc3zawudsH0ZD2ji6MZ903nyIKN3qjL0ifH1YDJ/vXgKnXpPD18hks2ik/qM8YPc5YUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qXcW5Mij; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A02E7C4CEDF;
+	Wed, 11 Dec 2024 03:10:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733886615;
+	bh=79qZmJ+TQ8cZcD/WuIhRJ5qYo8fst9V7HyNBmkyL0ek=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qXcW5MijN2d01JSQRvIlzeKSA3KJPFbeFhxHdjkyG+vEHp3bQEbXPlu4WwLjraV88
+	 1IetF0GsywOOczWH0Hp2VxZN2jxPwk3Z35Mh6DgcJOwpTiz6HEgWSlSk/7zgzgSGy8
+	 7ejAWW4FjXFbC9PGcx/UPrxHuNwjtNtLe2HF8bzEk9vNFMQnLx6C7Nuud7t9Z06+7i
+	 jKYM+UeKelYletkG1JhrCR2G9S/sHj78msiDYDZUH4s7nasHUbMnj7jdvlUX7NNLyf
+	 K/K5Somw075FZlf9cgIB6hI8QSPiFsikBgTD2Nfqem3hGZBnqHTasNE/Zo4sw3/Rk2
+	 a92ouFfGAz+fA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE2BD380A954;
+	Wed, 11 Dec 2024 03:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241209-b4-ovpn-v14-0-ea243cf16417@openvpn.net> <20241209-b4-ovpn-v14-17-ea243cf16417@openvpn.net>
-In-Reply-To: <20241209-b4-ovpn-v14-17-ea243cf16417@openvpn.net>
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Wed, 11 Dec 2024 11:08:59 +0800
-Message-ID: <CABAhCOSJCoZFuevjcwvdJ+==TpGEJZPmvvHfT=U3Kf_-Ob+BnA@mail.gmail.com>
-Subject: Re: [PATCH net-next v14 17/22] ovpn: implement peer
- add/get/dump/delete via netlink
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>, sd@queasysnail.net, 
-	ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 resend 0/4] net: renesas: rswitch: several fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173388663152.1102804.7757113228741600120.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Dec 2024 03:10:31 +0000
+References: <20241208095004.69468-1-nikita.yoush@cogentembedded.com>
+In-Reply-To: <20241208095004.69468-1-nikita.yoush@cogentembedded.com>
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Cc: yoshihiro.shimoda.uh@renesas.com, andrew@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ geert+renesas@glider.be, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ michael.dege@renesas.com, christian.mardmoeller@renesas.com,
+ dennis.ostermann@renesas.com
 
-On Mon, Dec 9, 2024 at 6:48=E2=80=AFPM Antonio Quartulli <antonio@openvpn.n=
-et> wrote:
-[...]
-> +/**
-> + * ovpn_nl_peer_modify - modify the peer attributes according to the inc=
-oming msg
-> + * @peer: the peer to modify
-> + * @info: generic netlink info from the user request
-> + * @attrs: the attributes from the user request
-> + *
-> + * Return: a negative error code in case of failure, 0 on success or 1 o=
-n
-> + *        success and the VPN IPs have been modified (requires rehashing=
- in MP
-> + *        mode)
-> + */
-> +static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info =
-*info,
-> +                              struct nlattr **attrs)
-> +{
-> +       struct sockaddr_storage ss =3D {};
-> +       struct ovpn_socket *ovpn_sock;
-> +       u32 sockfd, interv, timeout;
-> +       struct socket *sock =3D NULL;
-> +       u8 *local_ip =3D NULL;
-> +       bool rehash =3D false;
-> +       int ret;
-> +
-> +       if (attrs[OVPN_A_PEER_SOCKET]) {
+Hello:
 
-Similar to link attributes in other tunnel drivers (e.g. IFLA_GRE_LINK,
-IFLA_GRE_FWMARK), user-supplied sockets could have sockopts
-(e.g. oif, fwmark, TOS). Since some of them may affect encapsulation
-and routing decision, which are supported in datapath? And do we need
-some validation here?
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-[...]
-> +static int ovpn_nl_send_peer(struct sk_buff *skb, const struct genl_info=
- *info,
-> +                            const struct ovpn_peer *peer, u32 portid, u3=
-2 seq,
-> +                            int flags)
-> +{
-> +       const struct ovpn_bind *bind;
-> +       struct nlattr *attr;
-> +       void *hdr;
-> +
-> +       hdr =3D genlmsg_put(skb, portid, seq, &ovpn_nl_family, flags,
-> +                         OVPN_CMD_PEER_GET);
-> +       if (!hdr)
-> +               return -ENOBUFS;
-> +
-> +       attr =3D nla_nest_start(skb, OVPN_A_PEER);
-> +       if (!attr)
-> +               goto err;
-> +
-> +       if (nla_put_u32(skb, OVPN_A_PEER_ID, peer->id))
-> +               goto err;
-> +
+On Sun,  8 Dec 2024 14:50:00 +0500 you wrote:
+> This series fixes several glitches found in the rswitch driver.
+> 
+> This repost fixes a mistake in the previous post at
+> https://lore.kernel.org/netdev/20241206190015.4194153-1-nikita.yoush@cogentembedded.com/
+> 
+> Nikita Yushchenko (4):
+>   net: renesas: rswitch: fix possible early skb release
+>   net: renesas: rswitch: fix race window between tx start and complete
+>   net: renesas: rswitch: fix leaked pointer on error path
+>   net: renesas: rswitch: avoid use-after-put for a device tree node
+> 
+> [...]
 
-I think it would be helpful to include the netns ID and supported sockopts
-of the peer socket in peer info message.
+Here is the summary with links:
+  - [net,v2,resend,1/4] net: renesas: rswitch: fix possible early skb release
+    https://git.kernel.org/netdev/net/c/5cb099902b6b
+  - [net,v2,resend,2/4] net: renesas: rswitch: fix race window between tx start and complete
+    https://git.kernel.org/netdev/net/c/0c9547e6ccf4
+  - [net,v2,resend,3/4] net: renesas: rswitch: fix leaked pointer on error path
+    https://git.kernel.org/netdev/net/c/bb617328bafa
+  - [net,v2,resend,4/4] net: renesas: rswitch: avoid use-after-put for a device tree node
+    https://git.kernel.org/netdev/net/c/66b7e9f85b84
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
