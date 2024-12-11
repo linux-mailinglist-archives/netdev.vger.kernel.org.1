@@ -1,266 +1,155 @@
-Return-Path: <netdev+bounces-151126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B4099ECEC6
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:38:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 786A59ECED0
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:42:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B119165B2C
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:38:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58D7B1882813
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95BB6185B4C;
-	Wed, 11 Dec 2024 14:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3333E18A6B8;
+	Wed, 11 Dec 2024 14:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PMjz4VGo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jTNESz1q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29D4183CBB;
-	Wed, 11 Dec 2024 14:38:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B72183CBB;
+	Wed, 11 Dec 2024 14:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733927895; cv=none; b=TTYyS0o+AiqnxNNwNzWsYFXIISsWQCIvBF/zZq1vrZdJNnkbEDL3EzWDKHQuEmY44kKvxfVqvpjoVAFx/XoWNML+ME/uSPZnLgKdIln3Ub4HTS7WN/KTLqQPiBY/EqBBS8Y7ieuYFM7suMaQMta00ZhHmxZYhQCFMwzIsw+49/w=
+	t=1733928118; cv=none; b=R0iTQpdbHkuiDX8NwwqqG2nIk7fa1kitIsVAyxxUDqzHRNxQcJFYJPqpYisBH4KjP147ydtnW1OtkwKgdwcDDTqPznkMB4d8P5nyKyrBQGKgP3wGLW49x7ufl0d8QJ8LozWIpasEVgMCbIzpsPpKKLd+wgeK6IzcgY9hv2cRw0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733927895; c=relaxed/simple;
-	bh=eDn/KEEuWg9ykTMqAFi7uDaqkbW37rB44oyXqF55IWw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kefpj0CzaocnDTM4yJPmdWmtMQ7k6G9cw5N54scJP8dsOS0q6/ty7EEpfy29QCuCmj4bxS6pAQ1TxI4Fgsc55dz89DH9oYOwlV0HUycu5U4AhurEW6AA1gtk8CnIiPX71ZcUCZAWoqYBbhwP0wIKqDxq4R39tmqackTyIzBN9Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PMjz4VGo; arc=none smtp.client-ip=209.85.128.51
+	s=arc-20240116; t=1733928118; c=relaxed/simple;
+	bh=2zCr7zTEDvwh0hxmt8kosvt5S4x9iQ1y8ZMqi/6QkiY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F1F68wBTuA7C60RMNf48csat8xX2sIGQHS/Vx2Wo9jm0J4QUlnxMG/DXBdPDk+oWzHf6vNUpElVxLJTrCh8Z8KUmx3zzzDAFBRqSR+5OgDulFTzRJHlIrg09fKYeq4VOsVyvR/M2732pCvvekSDax4kASPXKMk+z8GSDFQ0PK28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jTNESz1q; arc=none smtp.client-ip=209.85.218.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-434e3953b65so31492175e9.1;
-        Wed, 11 Dec 2024 06:38:13 -0800 (PST)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a9a0ec0a94fso1051730666b.1;
+        Wed, 11 Dec 2024 06:41:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733927892; x=1734532692; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YQuPW53YSaLNHqZEn69qaiJmpFeJpkI4ahVvWi4pfW4=;
-        b=PMjz4VGo2vZ9wBRId7nnyDP3M9MpITPk9KPt5TCwDyInysIQTbEDcVKbLjUdEnJpOh
-         wokbIAOKVLSEIsD17f4hpKpAZhp66An2ZvASp2oMjSO9m4sy/0oxKOC58TKlQOytjfbN
-         U3MmIapKD7I53lMbYnNwRQtbJBeorFHZq2dg/jS8tYdOaeiBDr5oTR1uLhpkVcjPNJN6
-         k3eAQFpn4aHFvIcS5+rTjepcmcytKEmuFK+pbF4PtLnnipKMB8Ct+qK9cvAzO6+4eWGr
-         ZEestMefVEPd2iaV3enlg/fq+sp0d1U4uGGC3+NoU277XS8avgA6EA5ZUj9l4UQcGef4
-         WRjQ==
+        d=gmail.com; s=20230601; t=1733928114; x=1734532914; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hkbOevxvo+2AHuPTmTX9U9nsm+MQ6tjjMsdfgSE7Tcc=;
+        b=jTNESz1qH5DQjCVmZbClCAxRR9xx05vTm6MhIgqKXWitDo8lFsdhbatqEUtRuZ8rso
+         leYl8Uui6+RIh3ixmKb5jOJH/F4TcLR9qO/G4IhhWnOh+zg+1ReU5+iStrbYlBwng6yN
+         jlp7g4rOs6oLfZAaPVm7S03z2AZpP7KKVNjJOcj6I312tNoH2ZXLHERcwzrWrSTpOuOA
+         4t9E/X77bsS4CBkxRddZMZ5kdttmrUY1mK88snIHLIs2hsZ03oZjvEUfcUR3e0T8gCR9
+         DdfN+ZNnKaLH4CzH5wy2Spm/YLpFQM4gwn7vBjD9UokK5CSOq2WRGymyvrom+nuN5dde
+         OdKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733927892; x=1734532692;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YQuPW53YSaLNHqZEn69qaiJmpFeJpkI4ahVvWi4pfW4=;
-        b=hr87bxoJsQcSwIsbb9TSjqxeB2/007hgmrTyibJxWED/PxFnQV9TAHVxGnozDrHhiU
-         CHa7WkdhB5ppBUe6Bg/D8s7wVkct0C/s9HmZpn2BV1KpK6i4aU35F/Wq+IyfnpAWBsGK
-         xaooZjoW8Ys/+D/OAyR2EZWImBtnVqm2TyAjmUYC6WfRJcSRN7tapEbi+Ekq9omr8yqY
-         /+QHFFwFo64FaFJJg4vYztH0xsifvnHJi3bsggpiBx7/eAif9VqyPv1DO3XuVcXvXcS2
-         s07OFX7c9alLbtUCHXMVsXlt8zVQcQE3ZSY+JS4674KwJg/SJzoPt6bIE8VBFHX0iyCT
-         qw0A==
-X-Forwarded-Encrypted: i=1; AJvYcCVYJ92Q7/Oog3Oxg/wrLkfkuTVdeJAhjoIR+StzHa5l6PrXXYhGCXYAWIe++hBa5F2fywjtaSrMDnK9w+c=@vger.kernel.org, AJvYcCX20cghMooYaQJ8TJJiHUv0AmxG8qScJ5/ewIllHs0myBnEUjtukHPig8C6PvBe0I+4oUlICIuat7nSidILdV9S@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdoqY5lYph80c4JxgkOVqfFk8Mip0AU4ZgUWMniQ8ej9arR+Cp
-	e+TN6YLEjJO0OdeFw4+1kObGgYUinjt2SuhlKBJzyqruHaXQOVhn7JW9RAHgegOdsFf+pOmpi8e
-	vRuYYMte9JGDPoZpSDVIiOlsT11ka6C+rQ4saYjw7
-X-Gm-Gg: ASbGncvnaVbPJ3JhZ71KOzYJ4CwLufoXDkeyyqfT6cXBtd/4VehOXPLwMGE609mSvr7
-	2rUlZ7/YJGzMNo0BBp5nh7l96AxA2fMHxTg==
-X-Google-Smtp-Source: AGHT+IEyDUgLjsh47qA+3KzQCjlYxJ7r0aym9yvvdF+I9bFcJhBWyOtYgyrHdwfNn+9MVP1MFQLIy/+GxNFq6HkmIEY=
-X-Received: by 2002:a5d:5886:0:b0:385:faad:bfb9 with SMTP id
- ffacd0b85a97d-3864ce8644emr2517003f8f.8.1733927891701; Wed, 11 Dec 2024
- 06:38:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733928114; x=1734532914;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hkbOevxvo+2AHuPTmTX9U9nsm+MQ6tjjMsdfgSE7Tcc=;
+        b=AeLiDcPg8T9cdKP2ukSdoDZoz/d3J8n3IBspE1n7MPXnvU08GOZdmIIKf8ix18VCze
+         pvA67E8pm3emj6ysGXonF8iCV7cEDzCPqeFaro+rAhdOHtbaZqe+pinikcXEwScAB9TZ
+         sx8NibjtZ7PS0eoZ+x82sEQJE4vU3LuPSqpX/sECpsEX7A+GFfUf4LjRzF5ZVXqSRoCu
+         FzVU4GVIln3dkGZaCH3TksnPHmeU9thzCjBB4/o4ADEcGFjjXs5dmpQskXmwVhdV0RMc
+         /8cACBvbR4VBYCScO7uZle0TWQg6Zu6L81tCSEEVd5EIz1GWInPB5a4SyF+IccWM9xJ6
+         z5Qw==
+X-Forwarded-Encrypted: i=1; AJvYcCWo6AevjN/fuOxD2wFGGg03GVtNNFh6Uq1aoxsPkban2iVv7mCC4fTeSe4CEZuDVq6zYkQK9LPU@vger.kernel.org, AJvYcCXTUlDNQRWBdce2IIYzSlnB0RlKFfz9vA2pj/dz20TOfr1vECwqiU8GNnGnQ4LIHzA8dxc4s378tA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsO0A9CG9bDVdmn4qFYfmKW0+grz+uVW5GcTGWDElNzOc79tT9
+	q7WGHplk54/LG54jmRgopipe9iFtFbWQfDcWm6zR9FD3VwXlh18y
+X-Gm-Gg: ASbGnctznvwYl9t9xFqLNF+cYq7o/Kzpgl8b5T0ABewiJgV5lWjGAARpbdlhfL+J2PQ
+	6CEyJwzZGPx90KJYVj2p3Tb8KXI66HYJr7OypJAOgWgSrO39q9lmUWa+f+A8Wjz3DdhZ2bSpQdy
+	Mg8Np/4zpZf+U9Xn9/XtDbXJg0CMM44V0/Nm6relS2RV4xZnIsZtFKJSVjK6e9wCBdv6jc1zv1q
+	tvA4krmKXNZ2hxz6JrV1AJIRz7OZ6x9wcrx50VBZbnvTiOjruwEEFZ/JUJXTN4wIw==
+X-Google-Smtp-Source: AGHT+IHzXL2ZE64atw/hBytgozJvn8AbubwyvuvtiJ1aQmZ4Fu5JuRqeu0RKShCtfuMflGASIzdrkw==
+X-Received: by 2002:a17:906:2931:b0:aa6:29dc:11b with SMTP id a640c23a62f3a-aa6c1ae6a06mr6880966b.16.1733928113524;
+        Wed, 11 Dec 2024 06:41:53 -0800 (PST)
+Received: from [192.168.42.162] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa69964872asm365208866b.103.2024.12.11.06.41.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Dec 2024 06:41:53 -0800 (PST)
+Message-ID: <95e02ca4-4f0d-4f74-a882-6c975b345daa@gmail.com>
+Date: Wed, 11 Dec 2024 14:42:43 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241209-b4-ovpn-v14-0-ea243cf16417@openvpn.net>
- <20241209-b4-ovpn-v14-17-ea243cf16417@openvpn.net> <CABAhCOSJCoZFuevjcwvdJ+==TpGEJZPmvvHfT=U3Kf_-Ob+BnA@mail.gmail.com>
- <5a3d1c9b-f000-45c1-afd3-c7a10d2a50e8@openvpn.net> <CABAhCOSNRu1QfVr_0Las+dSMsbrVE=HLT6pzqQHODkUTxBi0-Q@mail.gmail.com>
- <4471b912-d8df-41ba-9c3b-a46906ca797d@openvpn.net> <CABAhCOT-waHW4HJ30a6qLoRBTQN67Y4PmFD0djCoP4iRYnQ5Kg@mail.gmail.com>
- <42e268a6-e0d1-4892-b76a-68ba937e29bf@openvpn.net>
-In-Reply-To: <42e268a6-e0d1-4892-b76a-68ba937e29bf@openvpn.net>
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Wed, 11 Dec 2024 22:37:34 +0800
-Message-ID: <CABAhCOQ=9NVXGUF7kc0pjtvcw9S__OHhDJ-YEeY2HDr9eoeSyQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v14 17/22] ovpn: implement peer
- add/get/dump/delete via netlink
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>, sd@queasysnail.net, 
-	ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 11/17] io_uring/zcrx: implement zerocopy
+ receive pp memory provider
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20241204172204.4180482-1-dw@davidwei.uk>
+ <20241204172204.4180482-12-dw@davidwei.uk>
+ <20241209200156.3aaa5e24@kernel.org>
+ <aa20a0fd-75fb-4859-bd0e-74d0098daae8@gmail.com>
+ <20241210162412.6f04a505@kernel.org>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20241210162412.6f04a505@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Dec 11, 2024 at 10:07=E2=80=AFPM Antonio Quartulli <antonio@openvpn=
-.net> wrote:
->
-> On 11/12/2024 14:53, Xiao Liang wrote:
-> > On Wed, Dec 11, 2024 at 8:51=E2=80=AFPM Antonio Quartulli <antonio@open=
-vpn.net> wrote:
-> >>
-> >> On 11/12/2024 13:35, Xiao Liang wrote:
-> >>> On Wed, Dec 11, 2024 at 7:30=E2=80=AFPM Antonio Quartulli <antonio@op=
-envpn.net> wrote:
-> >>>>
-> >>>> Hi Xiao and thanks for chiming in,
-> >>>>
-> >>>> On 11/12/2024 04:08, Xiao Liang wrote:
-> >>>>> On Mon, Dec 9, 2024 at 6:48=E2=80=AFPM Antonio Quartulli <antonio@o=
-penvpn.net> wrote:
-> >>>>> [...]
-> >>>>>> +/**
-> >>>>>> + * ovpn_nl_peer_modify - modify the peer attributes according to =
-the incoming msg
-> >>>>>> + * @peer: the peer to modify
-> >>>>>> + * @info: generic netlink info from the user request
-> >>>>>> + * @attrs: the attributes from the user request
-> >>>>>> + *
-> >>>>>> + * Return: a negative error code in case of failure, 0 on success=
- or 1 on
-> >>>>>> + *        success and the VPN IPs have been modified (requires re=
-hashing in MP
-> >>>>>> + *        mode)
-> >>>>>> + */
-> >>>>>> +static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct gen=
-l_info *info,
-> >>>>>> +                              struct nlattr **attrs)
-> >>>>>> +{
-> >>>>>> +       struct sockaddr_storage ss =3D {};
-> >>>>>> +       struct ovpn_socket *ovpn_sock;
-> >>>>>> +       u32 sockfd, interv, timeout;
-> >>>>>> +       struct socket *sock =3D NULL;
-> >>>>>> +       u8 *local_ip =3D NULL;
-> >>>>>> +       bool rehash =3D false;
-> >>>>>> +       int ret;
-> >>>>>> +
-> >>>>>> +       if (attrs[OVPN_A_PEER_SOCKET]) {
-> >>>>>
-> >>>>> Similar to link attributes in other tunnel drivers (e.g. IFLA_GRE_L=
-INK,
-> >>>>> IFLA_GRE_FWMARK), user-supplied sockets could have sockopts
-> >>>>> (e.g. oif, fwmark, TOS). Since some of them may affect encapsulatio=
-n
-> >>>>> and routing decision, which are supported in datapath? And do we ne=
-ed
-> >>>>> some validation here?
-> >>>>
-> >>>> Thanks for pointing this out.
-> >>>> At the moment ovpn doesn't expect any specific socket option.
-> >>>> I haven't investigated how they could be used and what effect they w=
-ould
-> >>>> have on the packet processing.
-> >>>> This is something we may consider later.
-> >>>>
-> >>>> At this point, do you still think I should add a check here of some =
-sort?
-> >>>>
-> >>>
-> >>> I think some sockopts are important. Especially when oif is a VRF,
-> >>> the destination can be totally different than using the default routi=
-ng
-> >>> table. If we don't support them now, it would be good to deny sockets
-> >>> with non-default values.
-> >>
-> >> I see - openvpn in userspace doesn't set any specific oif for the
-> >> socket, but I understand ovpn should at least claim that those options
-> >> are not supported.
-> >>
-> >> I am a bit lost regarding this aspect. Do you have a pointer for me
-> >> where I can see how other modules are doing similar checks?
-> >>
-> >
-> > The closest thing I can find is L2TP, which has some checks in
-> > l2tp_validate_socket(). However, it uses ip_queue_xmit() /
-> > inet6_csk_xmit() to send packets, where many sockopts are handled.
->
-> mhh l2tp_sk_to_tunnel() doesn't have more checks than what we already hav=
-e.
->
-> > Maybe someone else can give a more suitable example. I guess we
-> > can start with sockopts relevant to fields in struct flowi{4,6} and enc=
-ap
-> > headers?
->
-> Since I have little experience with sockopts in general, and this is not
-> truly mission critical, how would you feel about sending a patch for
-> this once ovpn has been merged?
-> I'd truly appreciate it.
+On 12/11/24 00:24, Jakub Kicinski wrote:
+> On Tue, 10 Dec 2024 04:45:23 +0000 Pavel Begunkov wrote:
+>>> Can you say more about the IO_ZC_RX_UREF bias? net_iov is not the page
+>>> struct, we can add more fields. In fact we have 8B of padding in it
+>>> that can be allocated without growing the struct. So why play with
+>>
+>> I guess we can, though it's growing it for everyone not just
+>> io_uring considering how indexing works, i.e. no embedding into
+>> a larger struct.
+> 
+> Right but we literally have 8B of "padding". We only need 32b counter
+> here, so there will still be 4B of unused space. Not to mention that
+> net_iov is not cacheline aligned today. Space is not a concern.
+> 
+>>> biases? You can add a 32b atomic counter for how many refs have been
+>>> handed out to the user.
+>>
+>> This set does it in a stupid way, but the bias allows to coalesce
+>> operations with it into a single atomic. Regardless, it can be
+>> placed separately, though we still need a good way to optimise
+>> counting. Take a look at my reply with questions in the v7 thread,
+>> I outlined what can work quite well in terms of performance but
+>> needs a clear api for that from net/
+> 
+> I was thinking along the lines of transferring the ownership of
+> the frags. But let's work on that as a follow up. Atomic add on
 
-Honestly I'm not an expert on this. Will see if I can.
+That's fine to leave it out for now and deal later, but what's
+important for me when going through preliminary shittification of
+the project is to have a way to optimise it after and a clear
+understanding that it can't be left w/o it, and that there are
+no strong opinions that would block it.
 
->
-> >
-> >>>
-> >>>>>
-> >>>>> [...]
-> >>>>>> +static int ovpn_nl_send_peer(struct sk_buff *skb, const struct ge=
-nl_info *info,
-> >>>>>> +                            const struct ovpn_peer *peer, u32 por=
-tid, u32 seq,
-> >>>>>> +                            int flags)
-> >>>>>> +{
-> >>>>>> +       const struct ovpn_bind *bind;
-> >>>>>> +       struct nlattr *attr;
-> >>>>>> +       void *hdr;
-> >>>>>> +
-> >>>>>> +       hdr =3D genlmsg_put(skb, portid, seq, &ovpn_nl_family, fla=
-gs,
-> >>>>>> +                         OVPN_CMD_PEER_GET);
-> >>>>>> +       if (!hdr)
-> >>>>>> +               return -ENOBUFS;
-> >>>>>> +
-> >>>>>> +       attr =3D nla_nest_start(skb, OVPN_A_PEER);
-> >>>>>> +       if (!attr)
-> >>>>>> +               goto err;
-> >>>>>> +
-> >>>>>> +       if (nla_put_u32(skb, OVPN_A_PEER_ID, peer->id))
-> >>>>>> +               goto err;
-> >>>>>> +
-> >>>>>
-> >>>>> I think it would be helpful to include the netns ID and supported s=
-ockopts
-> >>>>> of the peer socket in peer info message.
-> >>>>
-> >>>> Technically the netns is the same as where the openvpn process in
-> >>>> userspace is running, because it'll be it to open the socket and pas=
-s it
-> >>>> down to ovpn.
-> >>>
-> >>> A userspace process could open UDP sockets in one namespace
-> >>> and the netlink socket in another. And the ovpn link could also be
-> >>> moved around. At this moment, we can remember the initial netns,
-> >>> or perhaps link-netns, of the ovpn link, and validate if the socket
-> >>> is in the same one.
-> >>>
-> >>
-> >> You are correct, but we don't want to force sockets and link to be in
-> >> the same netns.
-> >>
-> >> Openvpn in userspace may have been started in the global netns, where
-> >> all sockets are expected to live (transport layer), but then the
-> >> link/device is moved - or maybe created - somewhere else (tunnel layer=
-).
-> >> This is not an issue.
-> >>
-> >> Does it clarify?
-> >
-> > If netns id is not included, then when the link has been moved,
-> > we can't infer which netns the socket is in from peer info message,
-> > thus can not figure out how packets are routed. Other tunnel drivers
-> > usually use IFLA_LINK_NETNSID for this. Probably have a look at
-> > rtnl_fill_link_netnsid()?
-> >
->
-> Ok, I see what you mean.
-> I was assuming this was not needed, because we'd always have a running
-> openvpn process and it would live in the socket netns.
-> But it still makes sense to report it with the peer info.
->
-> I'll add this new attribute and fill it on PEER_GET.
->
+The current cache situation is too unfortunate, understandably so
+with it being aliased to struct page. pp_ref_count is in the
+same line with ->pp and others. Here an iov usually gets modified
+by napi, then refcounted from syscall, after deferred skb put will
+put it down back at napi context, and in some time after it gets
+washed out from the cache, the user will finally return it back
+to page pool.
 
-That would be nice. Thanks!
+> an exclusively owned cacheline is 2 cycles on AMD if I'm looking
+> correctly.
+
+Sounds too good to be true considering x86 implies a full barrier
+for atomics. I wonder where the data comes from?
+
+-- 
+Pavel Begunkov
+
 
