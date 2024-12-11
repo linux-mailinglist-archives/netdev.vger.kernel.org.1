@@ -1,123 +1,133 @@
-Return-Path: <netdev+bounces-151191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B24099ED4BF
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 19:34:23 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7DAA9ED523
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 19:55:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFEBE188A86F
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 18:54:53 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177F6231A54;
+	Wed, 11 Dec 2024 18:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="btMMI284"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD6A1283E5D
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 18:34:21 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4D320103C;
-	Wed, 11 Dec 2024 18:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UYAAUtxX"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACDEC24632F;
-	Wed, 11 Dec 2024 18:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF683231A52;
+	Wed, 11 Dec 2024 18:51:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733942058; cv=none; b=slIpMx71e2YjjpixnRWw2NMQZ0bOHv3jeWBbjVSGe/rpBuDnFBS1zWjj6V4KlOW8gWC2YdPxcjUMpQI7w6doEr9sWFPqNf0ytRM3B+VIwqLYIDH7oLkcHtu4rkEaohlGUiRa8pmRHL+1EQNNjKFUnCz8JoJcLwWHt4HLZRzKcE4=
+	t=1733943089; cv=none; b=ntHZQtpnu+mBOmGeBI1IdeQXw15X+oKhu5+KSua/Li2CCJMwxOL9NVy7Yk3GMtXRvOLCTA44IzoX9F7NOAB4i7xqeWiElk9oeRvuFEeuqRTY7Ro1ML3u3m6QC3N1zRDofAfRAPgLNE3Hc2F5Xy/aGzb30mSqiVqMILTluObtShM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733942058; c=relaxed/simple;
-	bh=/TaoJdfvFhwTAQjfbYZdIm0Vywdm28jJi5S46WIRpCA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YdBrxbxx7kHkid/jfVZWUA6WnhUAuWuN6Wzwfk7oXwA3uxD+059YyNoOzW8X4+HY3F24zjRoU6G4Avn0A0zGipanMR6dTbewYOV+RGXKffgVj1M4BYt09u9sNC4YeBLAIBoCsnwcfC8itgtjqoDL7nKYUpNk9+/KldxnDeIE0Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UYAAUtxX; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-725f2f79ed9so2925137b3a.2;
-        Wed, 11 Dec 2024 10:34:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733942056; x=1734546856; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rk/fxlEH9BCZY0Alvd/M1BO7urypX5QFhl3cqisfidI=;
-        b=UYAAUtxXcQIA3XfteDCn+FUYIjx/Q5GTcAlrceQRoq9VjS1JQYn5HAyO8MTKqi2VWt
-         Vo2Yx6ZV6K5kBspnrOYXc8RjnkBUqYss+u3rvf3vTPyt0oaEQLsU7DENk+eOsS+mSKWA
-         CKFn1aYdZ+T6LSLz8EEau+vP+kwOOM3Y5COVQxyZF3z2IX/OlOTdVLwFhb4UcOMIUCN9
-         utp+JS/DuVrO11u0Y8S9xvJ4W1EgxItCQ492UjfAz/qZrUYp62Ca4LSqNa3tdC/VQyWa
-         befx4FhWp3hhLnDBrBcGAVDu5qJj3re7X1/27tI+ZI9Q31D8iZTjTv+9N/EHUIFJeUmE
-         zHBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733942056; x=1734546856;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rk/fxlEH9BCZY0Alvd/M1BO7urypX5QFhl3cqisfidI=;
-        b=dgQVhgNP4T4epY4rqz3CZQOaOVkxkkZVVPkbRtytuvEkuhaGL+Xz2EVNyzrM11cKxv
-         9Sy7dFichP5yfSf4cbbtmjXiq2Mn9IXGc6h9DBo/vdq5QUVbidmhl+LJW4WiIF8qfvsK
-         9zzkArNJUvgR5elH51AWyjBNGLTeKivgPXeYWRDylRyva3dM6Ur0ynAgO2yqfo4UVfft
-         wNoUTUmVNXfuLzmzgUJ0DS9ayq6GkXX8g5ZAeDujmsydITNNZPIlnotIhzUHwAldZsZR
-         dLb17Asj9HctHjBZboIfqPUepezsv3LJP/fAd9S7nWQ3lBRrfh9AXlLKtH59YQZq/bYz
-         MXJg==
-X-Forwarded-Encrypted: i=1; AJvYcCVfpVfa4lbo5/8YSNdQk+L7jr4YiJoqSLLCeb+m4byXl42ha0jMQtdfzO0/IVzCaPUaF4/II3eQ/br3XsU=@vger.kernel.org, AJvYcCVlVZNVTn2aJyX7pf5EsK6aRxEiUogIibQrfVEqsyhDGfJoLFEldMFE/BVnFfyljwbQ7Zbd+7WHNtGWRDRO@vger.kernel.org, AJvYcCWK7qRKcx93SMrVRwNdUDyIOxV0zFHwV+5Z8sOKbOPnX3iqLjvfvwES/cUSsvVJ04PQkmZAkTAT@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzb1W0GORmoBwwhnU/OKrGuzk9rNbY1q1HKBEayVlZf8Y25ogWD
-	n7FwbxUkz/pvmUs/F1wvOEpZTDMwnOdV4t4czRZ+MyTSpF8un798
-X-Gm-Gg: ASbGnctaoTdtgix9HQIeDKeTduSs+Kp17T/XjMYrjC0D+0kh6ndF7//cIX2O+j066XU
-	U/jw8sZPvL6j2SDEbjMGoPsxM7CqE5h4qGDBrcgYoips1QYIEYzJISiNUdtHhzLyoy1qOwZGITd
-	GpMSDoxa/Vk3F3TafyLjsK8ayByEyCvzcZOx6fETXuJKq6wAbi9TtyBWEaTF0+RX3s/eWyvCxaW
-	cx8UQNowsfXkBwAApCA474+0Te9baLtWm62y0mYSS8dIGzo//uaFQ==
-X-Google-Smtp-Source: AGHT+IEH5l/T2i1ylcugW4ACfynX26ff/6uP1bdDxE3xa15KOwnDbL1Kdr+JCiIfZIOEb7i2xD8vWA==
-X-Received: by 2002:a05:6a00:1256:b0:71d:f2e3:a878 with SMTP id d2e1a72fcca58-728fa9b762bmr556129b3a.5.1733942055956;
-        Wed, 11 Dec 2024 10:34:15 -0800 (PST)
-Received: from localhost ([216.228.125.129])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7282c0f5bb0sm3752892b3a.59.2024.12.11.10.34.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 10:34:15 -0800 (PST)
-Date: Wed, 11 Dec 2024 10:34:12 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
-	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>, Long Li <longli@microsoft.com>
-Subject: Re: [PATCH v2 0/2] MANA: Fix few memory leaks in mana_gd_setup_irqs
-Message-ID: <Z1nbJFNwFGwE3xbN@yury-ThinkPad>
-References: <20241209175751.287738-1-mlevitsk@redhat.com>
+	s=arc-20240116; t=1733943089; c=relaxed/simple;
+	bh=96r5ccacfmXcLQnwik2jHbpoWaiE2MrtcAfUX3pATWM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lAx/YFV2xhvDaPZeAV++XWihSzlZ0eOxLMz2Io/CqBkAXpsGyI/0Wq+LMo3G61ActLiccw9LdslqpQG3lgPTWkn+73JMuV5MW4q4NNo/D8V6NAg3/NxOzEkk4IW+TZh6yJkNV4IKfzjYjbno0PtOlKPJidGNvrHm1OK5VdB5ArI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=btMMI284; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28714C4CEE6;
+	Wed, 11 Dec 2024 18:51:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733943088;
+	bh=96r5ccacfmXcLQnwik2jHbpoWaiE2MrtcAfUX3pATWM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=btMMI2844CHpivRupse72R7RZI6KL35EzZIDsrvPxtJBl0vWQW7+r4IBqEBWQOCTB
+	 qnMNlKWMP0h7ZswAF3lkQYXBtGfw/pAhX0mt2dJt1YNdpd9Poow05gg73qYMn6Lzld
+	 yEucXr5zae84/MCneCqZx2lJC4ylQJOXcoGgSMN2ihmaswwoKeAAFl6YGdxzHl+Cvf
+	 2FWFM6DHZ5vG8nAg3imynt2lKBcbjyZgFEsl/G0wxSu1quK3gwcV8o8Az3LN1AbQXq
+	 7b4GKZyoecqejWJTzNcLGTtCAhObCBmKfz9ZMrAZCe1gAW632oyGtSc0pWMDufaEng
+	 TKSp/9zrEEzHA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Lion Ackermann <nnamrec@gmail.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	cake@lists.bufferbloat.net,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.12 22/36] net: sched: fix ordering of qlen adjustment
+Date: Wed, 11 Dec 2024 13:49:38 -0500
+Message-ID: <20241211185028.3841047-22-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241211185028.3841047-1-sashal@kernel.org>
+References: <20241211185028.3841047-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241209175751.287738-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.12.4
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 09, 2024 at 12:57:49PM -0500, Maxim Levitsky wrote:
-> Fix 2 minor memory leaks in the mana driver,
-> introduced by commit
-> 
-> 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
+From: Lion Ackermann <nnamrec@gmail.com>
 
-Reviewed-by: Yury Norov <yury.norov@gmail.com>
+[ Upstream commit 5eb7de8cd58e73851cd37ff8d0666517d9926948 ]
 
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> Maxim Levitsky (2):
->   net: mana: Fix memory leak in mana_gd_setup_irqs
->   net: mana: Fix irq_contexts memory leak in mana_gd_setup_irqs
-> 
->  drivers/net/ethernet/microsoft/mana/gdma_main.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> -- 
-> 2.26.3
-> 
+Changes to sch->q.qlen around qdisc_tree_reduce_backlog() need to happen
+_before_ a call to said function because otherwise it may fail to notify
+parent qdiscs when the child is about to become empty.
+
+Signed-off-by: Lion Ackermann <nnamrec@gmail.com>
+Acked-by: Toke Høiland-Jørgensen <toke@toke.dk>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/sched/sch_cake.c  | 2 +-
+ net/sched/sch_choke.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index f2f9b75008bb0..8d8b2db4653c0 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -1525,7 +1525,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+ 	b->backlogs[idx]    -= len;
+ 	b->tin_backlog      -= len;
+ 	sch->qstats.backlog -= len;
+-	qdisc_tree_reduce_backlog(sch, 1, len);
+ 
+ 	flow->dropped++;
+ 	b->tin_dropped++;
+@@ -1536,6 +1535,7 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+ 
+ 	__qdisc_drop(skb, to_free);
+ 	sch->q.qlen--;
++	qdisc_tree_reduce_backlog(sch, 1, len);
+ 
+ 	cake_heapify(q, 0);
+ 
+diff --git a/net/sched/sch_choke.c b/net/sched/sch_choke.c
+index 91072010923d1..757b89292e7e6 100644
+--- a/net/sched/sch_choke.c
++++ b/net/sched/sch_choke.c
+@@ -123,10 +123,10 @@ static void choke_drop_by_idx(struct Qdisc *sch, unsigned int idx,
+ 	if (idx == q->tail)
+ 		choke_zap_tail_holes(q);
+ 
++	--sch->q.qlen;
+ 	qdisc_qstats_backlog_dec(sch, skb);
+ 	qdisc_tree_reduce_backlog(sch, 1, qdisc_pkt_len(skb));
+ 	qdisc_drop(skb, sch, to_free);
+-	--sch->q.qlen;
+ }
+ 
+ struct choke_skb_cb {
+-- 
+2.43.0
+
 
