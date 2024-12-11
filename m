@@ -1,58 +1,65 @@
-Return-Path: <netdev+bounces-150923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 305B49EC1BE
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:52:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8279C9EC1C4
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:56:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FB79284F43
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 01:52:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A4462850BA
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 01:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FEA01DF248;
-	Wed, 11 Dec 2024 01:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 060411DF26E;
+	Wed, 11 Dec 2024 01:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOBzB53I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eRHcntU6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5196744384;
-	Wed, 11 Dec 2024 01:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98D01422A8;
+	Wed, 11 Dec 2024 01:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733881959; cv=none; b=ds40uEP+4JX8oQbIBHwExwT9x8rfy8TFqgGf5MSxQhhQlaV7eMytVrvI8txSDZcK8BvIBql15M9NwdWyDLWHrYYBTv2IYw5nxmW4Jy7y9/JJSroHcLJt3r/puab8NGc6JNgYeoqmZdeZnl/vDsW31RCSmo3WZL+bBwSv/2bGhik=
+	t=1733882185; cv=none; b=MgGLFIFw9/6NnyOoA+44Kc+5eL1pYlhGqMdlP+Yo9iR0CaJKqT7I4qLLX8hFYE5lMNHJdeiXNjtql863dJ02ERC1cW1gFarfRtXFx1GNlu24hlJIDmgOQWjXBb8MMtQFzNSJccY7lfkOgP9uIpYoiZcFrD6paS3m5SGk4CRPy8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733881959; c=relaxed/simple;
-	bh=V0eXPilT/Fmh3RWixb5MQCJ4Ns2P6B8ChPIvbx9WZOo=;
+	s=arc-20240116; t=1733882185; c=relaxed/simple;
+	bh=L9hpu8B4bEbv4BWzFDWIU58mS0NmeBwiwVL18jWxcmk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YVXNW1sroy9H2zsZ/7hT+ZsyAVRwKTVxNvqiBeH5p+IjXMbpU/aTvobd30Q3I4NG6nn/F4jj9NbyBPOsDHh73ibkLdoEFWs7H9K29Q6OYO5TSOXdK5lgaO8sZf9kNX+NAEs1zuxuEXb+gpXjG1AF8kmHcroQbd6oyOuGisRORkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOBzB53I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CEC3C4CED6;
-	Wed, 11 Dec 2024 01:52:38 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Ym8DKZ14/g6ux4T4o3nMApf9CA+yG7xcWoYb01dGuDWM+XPP3kRFtUbbmHwuCDouAT5BR/FnfMom9NXdoVSuYtRqWqF13JkFUzC9CFtLkSsrnX3s+IJBLwsnnx9WpFN5xONkuJ1ruGpsOqcyJRgI/PsZgj0v/tdcapa7bBLyfdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eRHcntU6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21A8BC4CED6;
+	Wed, 11 Dec 2024 01:56:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733881958;
-	bh=V0eXPilT/Fmh3RWixb5MQCJ4Ns2P6B8ChPIvbx9WZOo=;
+	s=k20201202; t=1733882185;
+	bh=L9hpu8B4bEbv4BWzFDWIU58mS0NmeBwiwVL18jWxcmk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oOBzB53IUc9Wg6MGvdWoc2zZGOsL3KveCFivZxJnG2F2eNBXXSNIYsvNURP0lmB8B
-	 ENeR32e3v3dJSMwgkizb5h4ABIx9G/09f7PNwK/FGel8EvRe9XAPWTdx6DlrhHkohN
-	 L22O/MO25yMPuB8MdkIEoHQBy1oqzgj+UUZTeSDJ3mMm5vb3VR4CTB7Q+tDWBF4MgT
-	 8CYhoWZeMfvT34hq86oDmvUh7XFxqJ5lLEckXI0l08l8w95FJOIs9XmsX3piyn89NO
-	 qvewEiDMuroahGsocWyFbwTtK+3U5J6QxQDXrd3nlq4b40tpqArKfkveVmrkmWwKoz
-	 9qnaoj1ZVBBxw==
-Date: Tue, 10 Dec 2024 17:52:37 -0800
+	b=eRHcntU6PUTaQAoAcl1WW2JDRXgUKIXE7WBD7o897zJVjdXb+uAiSlKSMQNPpDzh/
+	 CBJkfx8GA0/BK7W2DxurNJNOHL0weszqvRbEy8rzexSz9ta3UBrxKwe2UcGKEtu/0I
+	 Vm0SIlF3cQ25hub1vkMJbn8v7uxSo1NusbEq1EBA8lIsJbnMPbSr+/OFukp161Alfv
+	 Mf9skIEs60bLDHpHFv5HQGSDlxF2cGKr2azC27J4VbIb8skxdprs/As1YbPvmXa3Qf
+	 s6APl4ww4KZXiib2CpXNuzIpWorqL83QDNashcBW2pkabbAF4S0zvLXVHk1hxvBwDW
+	 P/hlfzaglAtKA==
+Date: Tue, 10 Dec 2024 17:56:23 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Bernard Metzler <bmt@zurich.ibm.com>, linux-rdma@vger.kernel.org,
- leon@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, zyjzyj2000@gmail.com,
- syzbot+4b87489410b4efd181bf@syzkaller.appspotmail.com
-Subject: Re: [PATCH] RDMA/siw: Remove direct link to net_device
-Message-ID: <20241210175237.3342a9eb@kernel.org>
-In-Reply-To: <20241210145627.GH1888283@ziepe.ca>
-References: <20241210130351.406603-1-bmt@zurich.ibm.com>
-	<20241210145627.GH1888283@ziepe.ca>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: Ming Yu <a0282524688@gmail.com>, <tmyu0@nuvoton.com>, <lee@kernel.org>,
+ <linus.walleij@linaro.org>, <brgl@bgdev.pl>, <andi.shyti@kernel.org>,
+ <mkl@pengutronix.de>, <mailhol.vincent@wanadoo.fr>,
+ <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <wim@linux-watchdog.org>, <linux@roeck-us.net>,
+ <jdelvare@suse.com>, <alexandre.belloni@bootlin.com>,
+ <linux-kernel@vger.kernel.org>, <linux-gpio@vger.kernel.org>,
+ <linux-i2c@vger.kernel.org>, <linux-can@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-watchdog@vger.kernel.org>,
+ <linux-hwmon@vger.kernel.org>, <linux-rtc@vger.kernel.org>
+Subject: Re: [PATCH v3 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20241210175623.748da1b8@kernel.org>
+In-Reply-To: <2d6e82ff-9f68-427e-a8a6-8dd31b3c94e4@intel.com>
+References: <20241210104524.2466586-1-tmyu0@nuvoton.com>
+	<20241210104524.2466586-2-tmyu0@nuvoton.com>
+	<2d6e82ff-9f68-427e-a8a6-8dd31b3c94e4@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,18 +69,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 10 Dec 2024 10:56:27 -0400 Jason Gunthorpe wrote:
-> >  struct siw_device {
-> >  	struct ib_device base_dev;
-> > -	struct net_device *netdev;
-> >  	struct siw_dev_cap attrs;
-> >  
-> >  	u32 vendor_part_id;
-> > +	struct {
-> > +		int ifindex;  
+On Tue, 10 Dec 2024 11:57:41 +0100 Mateusz Polchlopek wrote:
+> > +int nct6694_read_msg(struct nct6694 *nct6694, u8 mod, u16 offset,
+> > +		     u16 length, void *buf)
+> > +{
+> > +	struct nct6694_cmd_header *cmd_header = nct6694->cmd_header;
+> > +	struct nct6694_response_header *response_header = nct6694->response_header;  
 > 
-> ifindex is only stable so long as you are holding a reference on the
-> netdev..
+> RCT violation
 
-Does not compute. Can you elaborate what you mean, Jason?
+This code is not under net not drivers/net
+As a general rule please focus on functional review, formatting and
+process issues are harder to judge unless you read all of the mailing
+list traffic.
 
