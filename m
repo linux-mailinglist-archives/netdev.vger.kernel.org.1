@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-151054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F5219EC963
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:43:49 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72B289EC994
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:46:03 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7CB9285CDD
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 09:43:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 271461889FE3
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 09:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0ED1C1F22;
-	Wed, 11 Dec 2024 09:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CBB41C5CAC;
+	Wed, 11 Dec 2024 09:45:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V7X6lHEO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QvAEbMI2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2B3236FB6;
-	Wed, 11 Dec 2024 09:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710CF236F9D;
+	Wed, 11 Dec 2024 09:45:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733910224; cv=none; b=KMTLZZ8RS6MLz1kogXCaomzLYx5js7zwG4y9B2j3U2SmTXJcVieMLpnpfZbOgV7xpyHpRgIb75PaTUQVwhLLXm13YQI49j7p19d7BGwQ/PHAigxvEzeHVxV4pLomXWS7JEpmGT3WdA7dmfIeupdIE2jJDxQwJ+XUPpZG6baG9NY=
+	t=1733910357; cv=none; b=FqzHRO7TKVaWdgyTJ8n788L0oeyQUcPj3bWLjoUq+oIhvvJ/xdSmKhje60YAmREhiwWkTWw0PzRJnOsVPC1D0skMDfxGCAqdHDLw9catj2k62UQituppQtxjbcCzvRHDspbVeDAW0u20/n7QLaBkRQUQrGui5EK6JYdHAkvM/rA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733910224; c=relaxed/simple;
-	bh=tjOJhShJ66gPvdzusOXZm8nsP45GFF+Q7mTgg0svbak=;
+	s=arc-20240116; t=1733910357; c=relaxed/simple;
+	bh=TLG1JXv+ExtIVMQQwLMu9xMOfDG7DssWntfH4Ei9uJI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tIK1925PMIatI66bEY7kHVN9NzHcIB37AGDEubkdT+VZoysCHPWtvbLrIfIZ26i13bysYxW5iTSsWcxsaFztSzVEUWS9l8ilrhx4jJCBHM7szGwyCbd0dJEFhW+KsdU71wqMx1w7aTe03T2M7eor+zZCZdOoM/V9Vb2cyjpoF7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V7X6lHEO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 915C7C4CED2;
-	Wed, 11 Dec 2024 09:43:43 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=IwrKXSmW/BfEJAvJOH+3II0vztu/pVt4T0i/jgel/Rj3jO0kwQ8h5MTl66WqF1sHCMqn3Y05/rP4Kx40fa9R9IfG4sXGxSZTHahH+Hl75Ne9kOUzE5a8haq9XjrnBxnK98Hrh8nHJirDtiQsjqhchnwlS5fPiUDYAvFNxlcGMio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QvAEbMI2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1AEBC4CED2;
+	Wed, 11 Dec 2024 09:45:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733910224;
-	bh=tjOJhShJ66gPvdzusOXZm8nsP45GFF+Q7mTgg0svbak=;
+	s=k20201202; t=1733910357;
+	bh=TLG1JXv+ExtIVMQQwLMu9xMOfDG7DssWntfH4Ei9uJI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V7X6lHEODmO/+HZAoQtCyAxhDgtNeqTn7aVWcCO42WLt6djAqz+m0CduwfC923irq
-	 7abPownTqOz4DwomBvxUclphJr4TKJzqv0d1U7GZZ9FWv/YLmK7wN+Cld4v6Rxyllu
-	 xnZxACkvIu5qip1AOLVCLKPDc9pdeOSJqKZPPQyShJ5+A45c7jUfqfWkwew2MfKcCJ
-	 TVkm+qFQ54CSsbAC7Q+1aMzyMCV03H1gZd2qiENDko9bOXW0fg5Bc7XcLVs5t7HnwY
-	 j9SPDHUvNMM91Rkxoc609AAJuDv+csAe/3IGJ32IP9ZHo7oUXQ0rZNQrswzBrrhYno
-	 WZv8ftKoBu0yg==
-Date: Wed, 11 Dec 2024 10:43:40 +0100
+	b=QvAEbMI21N1cZkZRNj/LxwRtEhQiFpDv9rvb0qfZhdTj157y59fr+RTpciHtZLk5B
+	 d4Ayh7QqfqVFHq5TdnneEKpMX/E+qJ6t2/ePhqjy8qWtlHrStnnhvE5WT5/LfkHqwy
+	 CqLQpUpDfl/Gc6cAE+vsLc26wuITVURc3jptJIZZiogFhR6fXuyKibd4uExZBxK+mD
+	 1vVVoHkY6uooE5z6sbLNC+EujORlpprS+yfzyqlPqGGHGJVuhmVua7vUlyL2PKSY4F
+	 Gj3waoS3uzt39bU5JapGMa7i3W8paBQbeUrP+0HoB2DnK9qTF43btgZyFn6TS/87Vy
+	 m2b3NY6Czbg9g==
+Date: Wed, 11 Dec 2024 10:45:53 +0100
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -51,11 +51,11 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
 	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, Dimitri Fedrau <dima.fedrau@gmail.com>
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: dp83822: Add support
- for GPIO2 clock output
-Message-ID: <hayqmsohcpdg43yh5obmkbxpw3stckxpmm3myhqfsf62jdpquh@ndwfhr3gqm3b>
+Subject: Re: [PATCH net-next v2 2/2] net: phy: dp83822: Add support for GPIO2
+ clock output
+Message-ID: <qqqwdzmcnkuga6qvvszgg7o2myb26sld5i37e4konhln2n4cgc@mwtropwj3ywv>
 References: <20241211-dp83822-gpio2-clk-out-v2-0-614a54f6acab@liebherr.com>
- <20241211-dp83822-gpio2-clk-out-v2-1-614a54f6acab@liebherr.com>
+ <20241211-dp83822-gpio2-clk-out-v2-2-614a54f6acab@liebherr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,71 +64,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241211-dp83822-gpio2-clk-out-v2-1-614a54f6acab@liebherr.com>
+In-Reply-To: <20241211-dp83822-gpio2-clk-out-v2-2-614a54f6acab@liebherr.com>
 
-On Wed, Dec 11, 2024 at 09:04:39AM +0100, Dimitri Fedrau wrote:
-> The GPIO2 pin on the DP83822 can be configured as clock output. Add
-> binding to support this feature.
+On Wed, Dec 11, 2024 at 09:04:40AM +0100, Dimitri Fedrau wrote:
+> The GPIO2 pin on the DP83822 can be configured as clock output. Add support
+> for configuration via DT.
 > 
 > Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
 > ---
->  .../devicetree/bindings/net/ti,dp83822.yaml         |  7 +++++++
->  include/dt-bindings/net/ti-dp83822.h                | 21 +++++++++++++++++++++
->  2 files changed, 28 insertions(+)
+>  drivers/net/phy/dp83822.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-> index 784866ea392b2083e93d8dc9aaea93b70dc80934..4a4dc794f21162c6a61c3daeeffa08e666034679 100644
-> --- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-> +++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-> @@ -96,6 +96,13 @@ properties:
->        - master
->        - slave
+> diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
+> index 25ee09c48027c86b7d8f4acb5cbe2e157c56a85a..dc5595eae6cc74e5c77914d53772c5fad64c3e70 100644
+> --- a/drivers/net/phy/dp83822.c
+> +++ b/drivers/net/phy/dp83822.c
+> @@ -14,6 +14,8 @@
+>  #include <linux/netdevice.h>
+>  #include <linux/bitfield.h>
 >  
-> +  ti,gpio2-clk-out:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description: |
-> +       DP83822 PHY only.
-> +       Muxing option for GPIO2 pin. See dt-bindings/net/ti-dp83822.h for
-> +       applicable values. When omitted, the PHY's default will be left as is.
-
-1. Missing constraints, this looks like enum.
-2. Missing explanation of values.
-3. This should be most likely a string.
-4. Extend your example with this. 
-
+> +#include <dt-bindings/net/ti-dp83822.h>
 > +
->  required:
->    - reg
+>  #define DP83822_PHY_ID	        0x2000a240
+>  #define DP83825S_PHY_ID		0x2000a140
+>  #define DP83825I_PHY_ID		0x2000a150
+> @@ -30,6 +32,7 @@
+>  #define MII_DP83822_FCSCR	0x14
+>  #define MII_DP83822_RCSR	0x17
+>  #define MII_DP83822_RESET_CTRL	0x1f
+> +#define MII_DP83822_IOCTRL2	0x463
+>  #define MII_DP83822_GENCFG	0x465
+>  #define MII_DP83822_SOR1	0x467
 >  
-> diff --git a/include/dt-bindings/net/ti-dp83822.h b/include/dt-bindings/net/ti-dp83822.h
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..d569c90618b7bcae9ffe44eb041f7dae2e74e5d1
-> --- /dev/null
-> +++ b/include/dt-bindings/net/ti-dp83822.h
-> @@ -0,0 +1,21 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
-> +/*
-> + * Device Tree constants for the Texas Instruments DP83822 PHY
-> + *
-> + * Copyright (C) 2024 Liebherr-Electronics and Drives GmbH
-> + *
-> + * Author: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-> + */
+> @@ -104,6 +107,11 @@
+>  #define DP83822_RX_CLK_SHIFT	BIT(12)
+>  #define DP83822_TX_CLK_SHIFT	BIT(11)
+>  
+> +/* IOCTRL2 bits */
+> +#define DP83822_IOCTRL2_GPIO2_CLK_SRC		GENMASK(6, 4)
+> +#define DP83822_IOCTRL2_GPIO2_CTRL		GENMASK(2, 0)
+> +#define DP83822_IOCTRL2_GPIO2_CTRL_CLK_REF	GENMASK(1, 0)
 > +
-> +#ifndef _DT_BINDINGS_TI_DP83822_H
-> +#define _DT_BINDINGS_TI_DP83822_H
-> +
-> +/* IO_MUX_GPIO_CTRL - Clock source selection */
-> +#define DP83822_CLK_SRC_MAC_IF			0x0
-> +#define DP83822_CLK_SRC_XI			0x1
-> +#define DP83822_CLK_SRC_INT_REF			0x2
-> +#define DP83822_CLK_SRC_RMII_MASTER_MODE_REF	0x4
-> +#define DP83822_CLK_SRC_FREE_RUNNING		0x6
-> +#define DP83822_CLK_SRC_RECOVERED		0x7
+>  /* SOR1 mode */
+>  #define DP83822_STRAP_MODE1	0
+>  #define DP83822_STRAP_MODE2	BIT(0)
+> @@ -139,6 +147,8 @@ struct dp83822_private {
+>  	u8 cfg_dac_minus;
+>  	u8 cfg_dac_plus;
+>  	struct ethtool_wolinfo wol;
+> +	bool set_gpio2_clk_out;
+> +	u32 gpio2_clk_out;
+>  };
+>  
+>  static int dp83822_config_wol(struct phy_device *phydev,
+> @@ -413,6 +423,15 @@ static int dp83822_config_init(struct phy_device *phydev)
+>  	int err = 0;
+>  	int bmcr;
+>  
+> +	if (dp83822->set_gpio2_clk_out)
+> +		phy_modify_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_IOCTRL2,
+> +			       DP83822_IOCTRL2_GPIO2_CTRL |
+> +			       DP83822_IOCTRL2_GPIO2_CLK_SRC,
+> +			       FIELD_PREP(DP83822_IOCTRL2_GPIO2_CTRL,
+> +					  DP83822_IOCTRL2_GPIO2_CTRL_CLK_REF) |
+> +			       FIELD_PREP(DP83822_IOCTRL2_GPIO2_CLK_SRC,
+> +					  dp83822->gpio2_clk_out));
 
-These are not really bindings but some register values. Hex numbers
-indicate that. Don't store register values as bindings, because this
-is neither necessary nor helping.
+You include the header but you do not use the defines, so it's a proof
+these are register values. Register values are not bindings, they do not
+bind anything. Bindings are imaginary numbers starting from 0 or 1 which
+are used between drivers and DTS, serving as abstraction layer (or
+abstraction values) between these two.
+
+You do not have here abstraction. Drop the bindings header entirely.
 
 Best regards,
 Krzysztof
