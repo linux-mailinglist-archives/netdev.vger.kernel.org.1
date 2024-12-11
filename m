@@ -1,266 +1,213 @@
-Return-Path: <netdev+bounces-151087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 621FC9ECCD3
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:05:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C47439ECE71
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:22:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61B76167F88
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:05:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E41941681F1
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:21:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D809522914A;
-	Wed, 11 Dec 2024 13:04:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE363246322;
+	Wed, 11 Dec 2024 14:21:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="ld0bCr/k"
+	dkim=pass (2048-bit key) header.d=digi.com header.i=@digi.com header.b="G7QF5fBJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2058.outbound.protection.outlook.com [40.107.21.58])
+Received: from outbound-ip8a.ess.barracuda.com (outbound-ip8a.ess.barracuda.com [209.222.82.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F58D226186
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 13:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9FD246330
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 14:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=209.222.82.175
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733922289; cv=fail; b=JUfR8MMxoIC0Zpf32B5sY2YUfNfZ4IAt2qxPn/JljizGNCshylPXgXqZjVjdTiOya5t4stO9S2vCmhkVdIIg8YLW5a0JEvISZgKUl6FJxLO8qy3KOPubBtNxMXTtYSaCa+RfBUeGKTItZuvPg58JU/c72SqhB5he8kuXqiI57V0=
+	t=1733926919; cv=fail; b=GdjLRWt4dksB3gVKynTd7WC8J7NlZ8ZjD+4PzGsrPycftyWqcU/Z6o+lQdpE3CPYybuCaHqcRzJgYxVtVzU0h+zrH1RcC7J5vYLKjgIEsYZzZvxw5PInAN9IDDJS1BlDVHK8VomxTNXT2Lsmtan+PnSx5KEmYDHnc2387Q2dWBo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733922289; c=relaxed/simple;
-	bh=//0CVQc+R9U9Bo4Nez3RqO4u89We/Xk9P+rRNzEfRW8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CfYMYgtxEkY282Mvlw5DNibiGgVuujaZ66bY5YgeePOtXl5Ael4hncNGN9BOr/tVHy5g5wOsep8HN6SSmbC2cIbZpsEWQRtMtomE/zbpWTjLYEFZiAswiu2k7SiABzS6BTNObjmZp/WbEssMU4MOQEpR/86GCzoDv8bGaZT9Qt8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=ld0bCr/k; arc=fail smtp.client-ip=40.107.21.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+	s=arc-20240116; t=1733926919; c=relaxed/simple;
+	bh=yJmuBfIP7XIEeBT9bCbraAbd2zVfG7IRH+BSUMHanAM=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=H6kd0QprTad4dG06B1C3aXrV/EH185PIGWM5Q9GBfarUO12ixio7k8pnu81xOch8VutxIDFS0wUJf90QLPGH1nyctG7tW1uFsE7nQMlKfgd2pGBv9xuMNt6lheTerZEcTlrk9I7nSvvI+zig5nUXUJKS1/TCnnRlE9RW8jU+DDM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digi.com; spf=pass smtp.mailfrom=digi.com; dkim=pass (2048-bit key) header.d=digi.com header.i=@digi.com header.b=G7QF5fBJ; arc=fail smtp.client-ip=209.222.82.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digi.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digi.com
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2045.outbound.protection.outlook.com [104.47.55.45]) by mx-outbound14-65.us-east-2a.ess.aws.cudaops.com (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Wed, 11 Dec 2024 14:21:51 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=voMosCCkyLiFYDDZTypnafR6+uJTjJYL/lJfCF4Qv2ru28qFIlGwJ8+DRm/N8sS8Ht29brPQOexYO/JdgzWEOfVGDIe6sPk2mkrLlLfHhS7fNPwluXIp9b//AMS+DiiJpxMN+neJSqZau9t6VD5prG3e9WBNUnakXMYAyuhxRgzfvqp359DRnAwBvedWR6MeCz+a8f94t4F3K5chQer0E2/Xoha8HMKKklLb+M0KxOascX9Xn//vJuzdkLlv8htSo5pbEu04O0PoYMWluj2q4Qpe4crwXBf/v45e3s6MOP4HeTfW5QjMsHzPhpOz6grz1Lefvu1d/6sCSKsBr4mxgg==
+ b=Jxe/zQovNM/vxLoRxhyBQbCYQXgtGj33gQuxBDdbBbPmBo8ftGFTTu6N5t0+O1HYpkEi4Mkp+QQR5E8CytBWjq3g6b3wckR1gecIEksLYQ+OyDiVSVMwHRuI2NAINt2BuUXbHpCk+1aC48j7PXbHCzjNWGT2JSYBX3R6MmWL6+giQh493bBAkX8LD5X77gEhNRWUEZdTiC5z1apF6CU37vPPHUZ4k9PJIAMnMT7On3MEovtJ0LSQX63Mfx49wgnEnGR+eI4smTFMYvAq8pcpE+bgxslfQXo4szttiau77Gee7h53u3tB3w2DOUNrTzKjQwrLXhpnzPL2vUDuetlL9w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rXU+LzkObK7XGONLjeXShC+uaDDFRIurscnvhWR1wG0=;
- b=yb4elkZ0V72pRk5XAScsh+RfNpp06SAqGozj032MAa6+qvs6ZF8BYhfrcxvv/SU9ECsnd0xsdKVt2GxPIOvxnd7Kd+Sl1+MFDffTH/HEaVsZuTMlrQQp1/FxpSaLo4ssc322tRUA2387XaMcS5bRkKt0jNFI/qB2wdf7T+y8adMqJpUsRdsJ+XHlga4InBflZz9DrRtCsPWduF2fdn0aFKAeHKbg00+/hyTUBqryaC2Xc2EEeYgTEHu4v1yJGx/NEi5NC1JG1iqjmYXLmUDkBBQfDwf72naIiXnzpJZCpqHkxcvNPZkdlIH6ldI4xpxuIRCXaYGRds8MDA2QAAdSvA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 217.111.95.7) smtp.rcpttodomain=jo-so.de smtp.mailfrom=arri.de; dmarc=fail
- (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
- not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ bh=UbMR5Dxr2kYyVzgT3KyFsVJH7edTo38pJVwm6TVX6g0=;
+ b=stR7ouKOVGEUKAaVy7LFG4H89F8tPOvCFuXiilsqlClLCtMvc2tv/x66A+XDqLzIn15Ipw3BpLNMF+bhUBeV+N2dACHynV2scxWrTfyWBUjRXabYz5O0xWA7+caygCpMiMvJ+p/i2DoCUxFWpP2QhMUQS1m6YlPf2BwStU2ZOnViKQozTR1Z0Pxz3EiP7mdMnI+eDidv2HeFGz6AbgiGDrWMctgdvXn2nC/XQxe2GWm84ZgeVy0YkdtLXu5CEBpbmzVmUb0kdusYhJp7JoyTqqabXDc8JbLYmcS8pd2Axej3BufewmUP92i9kQnwHRJyUPQQs2NC24498qujpyGRlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=digi.com; dmarc=pass action=none header.from=digi.com;
+ dkim=pass header.d=digi.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digi.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rXU+LzkObK7XGONLjeXShC+uaDDFRIurscnvhWR1wG0=;
- b=ld0bCr/kQjqru2Qlj1TrPyjIsXhuY2h8sp+Iylz47rs/YSHo7qWb6Ywg7ZTi6DyrD2UXp90gDxCE/juQj7LsXRDDK91z5gKvptySAN37oODwbA3stErpPc+U6MpZaBsDfFZeo1JhR2XBZI1275VimazaZXRaEULz6owV3wiPkIU=
-Received: from DU7P194CA0007.EURP194.PROD.OUTLOOK.COM (2603:10a6:10:553::30)
- by AS8PR07MB8072.eurprd07.prod.outlook.com (2603:10a6:20b:35b::5) with
+ bh=UbMR5Dxr2kYyVzgT3KyFsVJH7edTo38pJVwm6TVX6g0=;
+ b=G7QF5fBJwZlKA5M83m8F7snURrTFpCLNaQYRJkPHBd+ZQGewNDB3seXFTIghUsLieSGPsjNKoqAz3wENnagsd2GmteMkoWh8o7TtIW3XRSooaVDANI6rCuHcl4WZnXsI9JtukXojugIe6NAEUvGT7rXhi4Hhar5hpXk5B3OHE9BD30hmGt16E/q6H2ukf3RQjbpjvphYkjnyeZ/qtQZ2TYhyrlj0yq7yFAfJIU0uf45NGWR5SRKrzdPYiXoXvh7oZkDqFU28bgD5NbpEwFRDRWUztnuqWoE+Rw1uspkq2aVA3SHusgI+XHbsGoKbyNg0i0sByXLLZnNvPmBpCElhMw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=digi.com;
+Received: from CO1PR10MB4561.namprd10.prod.outlook.com (2603:10b6:303:9d::15)
+ by SN7PR10MB6570.namprd10.prod.outlook.com (2603:10b6:806:2a9::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Wed, 11 Dec
- 2024 13:04:38 +0000
-Received: from DB1PEPF000509FE.eurprd03.prod.outlook.com
- (2603:10a6:10:553:cafe::18) by DU7P194CA0007.outlook.office365.com
- (2603:10a6:10:553::30) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8251.15 via Frontend Transport; Wed,
- 11 Dec 2024 13:04:38 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
- smtp.mailfrom=arri.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=arri.de;
-Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
- designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
- client-ip=217.111.95.7; helo=mta.arri.de;
-Received: from mta.arri.de (217.111.95.7) by
- DB1PEPF000509FE.mail.protection.outlook.com (10.167.242.40) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8251.15 via Frontend Transport; Wed, 11 Dec 2024 13:04:38 +0000
-Received: from n9w6sw14.localnet (10.30.4.231) by mta.arri.de (10.10.18.5)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Wed, 11 Dec
- 2024 14:04:37 +0100
-From: Christian Eggers <ceggers@arri.de>
-To: =?ISO-8859-1?Q?J=F6rg?= Sommer <joerg@jo-so.de>
-CC: Andrew Lunn <andrew@lunn.ch>, <netdev@vger.kernel.org>
-Subject: Re: KSZ8795 not detected at start to boot from NFS
-Date: Wed, 11 Dec 2024 14:04:37 +0100
-Message-ID: <2675613.fDdHjke4Dd@n9w6sw14>
-Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
-In-Reply-To: <cxe42bethnzs7f46xxyvj6ok6ve7itssdxyh2vuftnfws4aa3z@2o4njdkw3r5i>
-References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
- <5708326.ZASKD2KPVS@n9w6sw14>
- <cxe42bethnzs7f46xxyvj6ok6ve7itssdxyh2vuftnfws4aa3z@2o4njdkw3r5i>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.14; Wed, 11 Dec
+ 2024 12:48:31 +0000
+Received: from CO1PR10MB4561.namprd10.prod.outlook.com
+ ([fe80::ecc0:e020:de02:c448]) by CO1PR10MB4561.namprd10.prod.outlook.com
+ ([fe80::ecc0:e020:de02:c448%4]) with mapi id 15.20.8251.008; Wed, 11 Dec 2024
+ 12:48:30 +0000
+From: Robert Hodaszi <robert.hodaszi@digi.com>
+To: netdev@vger.kernel.org,
+	vladimir.oltean@nxp.com,
+	claudiu.manoil@nxp.com,
+	alexandre.belloni@bootlin.com,
+	UNGLinuxDriver@microchip.com,
+	andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Robert Hodaszi <robert.hodaszi@digi.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: dsa: tag_ocelot_8021q: fix broken reception
+Date: Wed, 11 Dec 2024 13:46:56 +0100
+Message-ID: <20241211124657.1357330-1-robert.hodaszi@digi.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-ClientProxiedBy: MI2P293CA0002.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:45::17) To CO1PR10MB4561.namprd10.prod.outlook.com
+ (2603:10b6:303:9d::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB1PEPF000509FE:EE_|AS8PR07MB8072:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8cd49a5e-a168-4381-83c5-08dd19e45e4c
+X-MS-TrafficTypeDiagnostic: CO1PR10MB4561:EE_|SN7PR10MB6570:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0c5dbbae-8cd9-4a90-ac9e-08dd19e21d9b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
+ BCL:0;ARA:13230040|52116014|376014|7416014|1800799024|366016|921020|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NVpzcUtKK3Y1S3BLTjVaOGxtM0lKNGpwUmptRksvblNJcjZVT04vREx1N3ZC?=
- =?utf-8?B?NGNlby8xZEtlek8rUGJlRER4aUxBcXFkWnVjOWFkY0k0YW9rVXRsOEIwR3JC?=
- =?utf-8?B?YWIzRXppN2paRUJVWjBnNGU5M0lPZ0pFKzhRQi94dXg1VFFJckdnZlNiN2lS?=
- =?utf-8?B?czFJWldyaHpSdk9Zb1NrTmVNQkkwM2hiVTltenI5UEJuMnVDYUg0UGd2d0NQ?=
- =?utf-8?B?c2F3NUVtV0hEMHVwSkZhWU9EZkxBWkprM0oycG9FRDVmMmMySEhqQTVodGxU?=
- =?utf-8?B?cmRaZ3ZBY3FRVnczQngrcVB2NDhkeWZVeHdQSGVxZTZzQXd4VTJDeTBQbzEz?=
- =?utf-8?B?OHJSNUx2aElZcmVzUmdTZkwyOVE4RXZEZWx6bU1qT2dIVEhJNld3WHNtV3F0?=
- =?utf-8?B?ZW5XTVRxY2dHWVRWU2JjcVNzNFFsV0N5MEd0clcwNWNac1licDlvaG0yeDFH?=
- =?utf-8?B?Zm5OS3p0SHRCTkk0bnZ1elB1N1c5YkVpSUd5QzZQRENyTm9TNEFwK0tGSDZt?=
- =?utf-8?B?ZFd6RU5GaHBNTWRHVHczRzVzN0ZJamExSUFtM3B6eGpDMkZwZGIyVXprQ0pE?=
- =?utf-8?B?V1lBdVZmUkJ1SDNCRkdGY2R4bTBCSUp1bzBNVlV6eGxURXJBUXZvRnNURDF0?=
- =?utf-8?B?TVA2VGwvb1NPdmo1TjZSSTVPTFBia2o1WjgrOXQyamRRUTlkQWZvMEVPT05w?=
- =?utf-8?B?N3B6anBHY3c3ZUpRRFBRcFNvdS9ISkphWkFlSjlHZlJMSkkvaXBQVlJmWnZP?=
- =?utf-8?B?TjF0VUY1U0hWZFQ0aGFOakFQbTk2b0VXcG14UitpeW1kT3Y5SWxaVnQyWDZs?=
- =?utf-8?B?SEhwNlJTTkNpV3psUEtaZ09IWnFJeGlJMVVkKzRST3l1M1hibGp6cmxSNXBW?=
- =?utf-8?B?QlVLRmZCcWVKeXFCb2FienhwS3liN0d1aU5YYXVIanUzZjFDam1iS3RpZWkv?=
- =?utf-8?B?bUR6K1U4TFZXcUhmUkt0UmtSUFYvWVE0SzVaV21jVll2WW5pRWxzS2tvSHUr?=
- =?utf-8?B?UnBWSkNLcWM0QnVKYTBJUHRSdDltQU5CSXZLRHJNelZwMFdoU3VMOWtlRkNl?=
- =?utf-8?B?NzhscHJyQkpIc1VqdC9ISXBiRlFzNURHS0JMTmxKOGVIbTZYSGc5em5hdHJz?=
- =?utf-8?B?SjYzZVA0US9YL0lWZXlCQzZBMjhSemlKc20rRjJ0YUppbyt0aEVUYUFxNDBH?=
- =?utf-8?B?RG53UnVXUlFyNXJDdWg2aGw5MEtUNVYvQWxnNFlCNDB4bUhNS29BTzFOWi84?=
- =?utf-8?B?dGlWcEJUUHhYWVJKVll5VWJaVDVGOFJqUGlzV1ZpVUJYaG51eTg5YVMvKytk?=
- =?utf-8?B?OE93c0hPWEtXNERDdWRsMkF0Z255Mm1FOFA5VG5SYUQyTXl1R2RtblIyMFE3?=
- =?utf-8?B?eEI3Q1RsVHRteXZFbXF2blYxbTRHaGZCQ1dzNW83U1QxSndDdWNERTIvbDhs?=
- =?utf-8?B?TnFnWjR6R0JmVVZ4RXBVOHIrdklQUmhqR3NTOUR5R2x3YmtJNVkzRFB3WkJN?=
- =?utf-8?B?dE1EN1BGMVM0Zm5uL0ZDbUMrVGFGcmZaelpEWTErYzYxcER3RDVLRi90bzcy?=
- =?utf-8?B?Wno2bnZXd05FWjBjRWNod250ZSt5WTVCYWV0WDhQZUI1bG5pMmppbnFJQWd6?=
- =?utf-8?B?cXZjemJ5aklqaDVLemtBWkNuSGNFODJRWHpaZnRTdWFZbE00Kzl3R2FENmlm?=
- =?utf-8?B?QzhNUmp4MEtqbWNpMnVPWFkxai93M0JSMWlYZmN1L1dUTFhDUkM3QmUybVVa?=
- =?utf-8?B?RThtYmR0K1kycDVrM3cvY3dhbWlQTElpVWNLUWZoRzdVMCtyZ1E2QVRWbFdy?=
- =?utf-8?B?c1NUSXNzaktSTUVqaElnbElPbi9WV2VhRytuYTN3VmpZVEVHYkdNRWlrYXA1?=
- =?utf-8?B?bHNzVUJvdkFkMFVZbnZnY3pMS25vcXJuMll4UEJjcVJUZnZzWW1YV2NuVjJB?=
- =?utf-8?Q?Cz1cNUzVMvE=3D?=
+ =?us-ascii?Q?GmkZEQlE+PeE/YQ2W6RDcj1skmQwui1kun3EU4bYxJt+ZvqQrCHCuCEQkyWc?=
+ =?us-ascii?Q?mIJiV/LGKm1oFj4pAwufiL8aqBp+OPe43VpTx/fLXBkTxdI6e3UiYJ9gPtqw?=
+ =?us-ascii?Q?IOqiuDg+eXqHiVTNQ8o5JQmF5aqUqGxqkfI0G/DDbbCgSBVcIWL81EVhhxUN?=
+ =?us-ascii?Q?P0XN0hSgQVrbvwkzDJbEEphL3Ew0KEwSbnb+/rvtb8SS0A0ueoxDA08xQLkx?=
+ =?us-ascii?Q?wNiZiO7mQfldCNGL/sBEeoBd7Dc+CLK0+d81CYdDXYvr+vuZ9TapapForqPJ?=
+ =?us-ascii?Q?aF7pgY3osxJ7kj6rhPHxyCr/KvSP7z0FR+T4iiPzl8Rw1oJVsA5MjerQt3T6?=
+ =?us-ascii?Q?Eono6/U0JwDRc93cPQOi8PSERFiHkHY/RRlzCdwtWgh8Hh4led8K8BTM58L8?=
+ =?us-ascii?Q?M46GRBB0ofePMwQJqkiUzuiUD8FAKPZhfzInYbHoulm4JJonfjR4SGpBOxiP?=
+ =?us-ascii?Q?EihF5Zkdd4dNeV9IIt15aQrfkuVe0gKfbtaPPCgjFK0s7nM33fokn7dpTPIE?=
+ =?us-ascii?Q?Rw+dTlkr+6ifbDZ7zRmyHok5kEyBz7GSZkgU0pGeW840npX+aLDJ2GypY3Ur?=
+ =?us-ascii?Q?P2ROCKnMaEmOLSvw2luR5NwO5ixAcD9uBZ4yjWGPr9Pwx/Eq6SKvhyrkfecn?=
+ =?us-ascii?Q?Us7ZoG+63Ot0dJTtVABvEFGS0QI1gPuWtrPs9L2AlefYMeEZRV0O25NsrxX6?=
+ =?us-ascii?Q?ondYfddcaDN/EsOBKqfHDrJIwuP/8Oz9idUlCEVHAk9azOIatxsBCjy0a9XG?=
+ =?us-ascii?Q?ejpDvzYr8YPtnN0WkFdOPaeCUeryXHdjaRmVOrw0qaJ5xMqEGpodcbA/ijIg?=
+ =?us-ascii?Q?JN9kD2JrPHpilu6ZWuqX5UKavZgMz/nyha+PmUoTDsL/s2xABz7jdkQN7caD?=
+ =?us-ascii?Q?ySNFhE1dNdvuAk0xlig73UPMwZwMnxEpaFPhr8bgv9hc1puDyfeIBf/g/3rg?=
+ =?us-ascii?Q?1sCs3WM23Hum4xUvFmnWh6kO2JOJ4AplSDm/m97EguYJV70hNiPXPZkngUU5?=
+ =?us-ascii?Q?PxnEhcgaLjLh+PJy5NAa5nXoS1LfqoG8/2zVI77A/pCeP3LJnYFUMWqBbFrg?=
+ =?us-ascii?Q?68xKJVqR4p8m9en4U5e3qjKqfKosgFxn53YuJckdzxg7JDfVqvjtxa5troI7?=
+ =?us-ascii?Q?4VtjAHJO5cHjfscDaIpqZxcPA8WjRb4v39OqyfwVWi/3fvrWAPe1AucztfL5?=
+ =?us-ascii?Q?gm/hzXQTeXAVKe75zHBfGimODjA7o+hiIxUVKUuuAVs4oYIfRTjam1V58rc/?=
+ =?us-ascii?Q?VrRIjtkWVrMGeqLf2gmu+tE2FDMIl4YAAZKSzVGkvCQ/rKtxuPZVIMIJ1wmY?=
+ =?us-ascii?Q?+MbYVUTr0agVbEZOcnQYnaxI6JywaLW3TI4LhiLEbnVBXut3a+5CXlAyXj36?=
+ =?us-ascii?Q?TdGBupgAmId7iAhzpRG6eEmDlmggoIUN30D7UgDlzB7pLHCyvEFPrXZ1KTRo?=
+ =?us-ascii?Q?Zqr1oMdlZiU=3D?=
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2024 13:04:38.0695
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR10MB4561.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(7416014)(1800799024)(366016)(921020)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?us-ascii?Q?6aJQmmwGLfZNPs3Qpm74DE1G4uZVYw0Rr3Y28bYfBHXL2Rb3/QTrf1aV2EFt?=
+ =?us-ascii?Q?EQDyijXNMrEUQxKZILo+ALy4j3MCOnXC8VK2Xzd2Gyd1LZXC6aNztLGuz6pP?=
+ =?us-ascii?Q?Srtd2QJFJB8FmdHRzZD+sAlJgbAH48B+Lnm1I7nbsO3TSHauCSu8cuwz01Gx?=
+ =?us-ascii?Q?qvK/vZQHFjlxP0CdzR5aRL8SV6S3B+BGS/JJK6F9roxra/+VXfXR39f/dIND?=
+ =?us-ascii?Q?abmHzZaTzrfkbZlWRiJNubnbqzj5nTntL/jtDrLjLVjzceqScTtrpg3s4TbW?=
+ =?us-ascii?Q?MTfOVGo2Op0ygEZy8aRqAikJ6VNklMsp5I+pP5f8sy1BlhwooUC81HeicKIq?=
+ =?us-ascii?Q?ZbFHDtDydaX9lOIsJSzotv+VIUTry9e0zWMbU17cOJT1sZdpcKhplo3t7npO?=
+ =?us-ascii?Q?2AsS4ahZpyP/Xh9yQjPfKt3Gmgq1IQ3Nkzi1kdzrwr2P/pRdJ3CsxiSdgC8a?=
+ =?us-ascii?Q?YwOE/CmjsEQzHfOpgdZDWGBdcEqRKwCFYCcKFtbWsj/974gKetzhAcaYrMzX?=
+ =?us-ascii?Q?qTju/T9pKFhKNzYm44VJPrdtcO7pE+hhveSsv1x3HWse2pWjDNoSLHpXz93j?=
+ =?us-ascii?Q?H/stH1kVAsxBlUa5eqqkjwFqTF7pAuR70YL22VGi/lXfuFNo4zlvkpeGu3lH?=
+ =?us-ascii?Q?twnGhIBHv1p862/Vrb+J2EYbl4Sa/T3CRwiofyGdlP42VuDZW4XxqyBK0gO3?=
+ =?us-ascii?Q?pA8Hca61gxuPFINh4kKDdSi3+/+m7f7MC9JpucrYHtcusrj+mnzSkbqyFFoX?=
+ =?us-ascii?Q?MvuAnToQZPsfPO8F3VYbOKpj/9o8D23iIJgeXMsKk5j0P0djublcSeBcWDym?=
+ =?us-ascii?Q?cV8D7L/kIgB6FoFBVwRV5FQ/4EXtASwXF89YEeAgAwbvBfAsjdVqy/f+HoHS?=
+ =?us-ascii?Q?LgvHljkfpQnWiPxJXD0LPmc/8K46xzSHD8xyZkhUgI/qohB8ArO7TxMpoDMN?=
+ =?us-ascii?Q?LmWYGkqiQHqWNd4LGLpyYichPItTFSW1EyUHsMOUyw4CMbLHALy79ha7W8xi?=
+ =?us-ascii?Q?TAkJunMEmREnuv8sEujD7femyscALmuhsAPCSEOtno4I1NJzyCX+rlsS6se/?=
+ =?us-ascii?Q?/OdylKHc0AyrsGU/rJmNQiBv2wYTQzjVxG3OpY+Ji+goIftm6cn08M6+3gJH?=
+ =?us-ascii?Q?C8MYJuQ5jeUvUhnSjljZLBZp5Vn0ZtLFTyk5CiQUyJsX39ZQU8JbsB0aRo9m?=
+ =?us-ascii?Q?W0BLz3Y9xR7iO9HdUFgAFq4P2bbgMbKVifCH1Q6AMziCT3Hw56z+7qkVw/yq?=
+ =?us-ascii?Q?sNgqq0OJH2E/6EuSvP3hLS0d/xDooQOxWWP6S3e3DFnoCXHa0YjYSH25xWeU?=
+ =?us-ascii?Q?VmdX2l+cEYl4TIJCGVYWF90loeljrXlk2/dfUtcK1wyNQuf95viB8Otb/Isi?=
+ =?us-ascii?Q?2RtUG6XHbvM/7ZrUSTdn03NCQBLwOjVTVgzOVuva/zMSJBtH/HGykrNNRwij?=
+ =?us-ascii?Q?6d5AqF7vxkyXKOhJHU8CBg8/I6yOJKJvEh4ToTZlmcgqDQAOmR0nfKz9YQ2Y?=
+ =?us-ascii?Q?zwDJex02MuUXptqbQOoWjJQ3aOL1VXuayfCRWcjqpnEo8Q4ySnNRgWi83blS?=
+ =?us-ascii?Q?y0Jbt4JVcd0Vb7iP1aIYmKyTGPnmtj9z2eh7NoE1?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0c5dbbae-8cd9-4a90-ac9e-08dd19e21d9b
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR10MB4561.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2024 12:48:30.9302
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8cd49a5e-a168-4381-83c5-08dd19e45e4c
-X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
-X-MS-Exchange-CrossTenant-AuthSource: DB1PEPF000509FE.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR07MB8072
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: abb4cdb7-1b7e-483e-a143-7ebfd1184b9e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aiRjscpAB8+QNPoTaCXVTFeYD03L3yK5Gddq0owrosvTVy1hvkbBdV0pdfQLEvU2n6Y/9+Wk8Uj188BgRTjSQQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR10MB6570
+X-OriginatorOrg: digi.com
+X-BESS-ID: 1733926911-103649-13361-10798-1
+X-BESS-VER: 2019.1_20241205.2350
+X-BESS-Apparent-Source-IP: 104.47.55.45
+X-BESS-Parts: H4sIAAAAAAACA4uuVkqtKFGyUioBkjpK+cVKVoZGpiZAVgZQ0MLMOMks1cDYPN
+	XA0MLEIjnRwtzUNDkxJTEtOS3RxMxIqTYWAPmWzgdBAAAA
+X-BESS-Outbound-Spam-Score: 0.00
+X-BESS-Outbound-Spam-Report: Code version 3.2, rules version 3.2.2.261038 [from 
+	cloudscan14-131.us-east-2a.ess.aws.cudaops.com]
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------
+	0.00 BSF_BESS_OUTBOUND      META: BESS Outbound 
+X-BESS-Outbound-Spam-Status: SCORE=0.00 using account:ESS112744 scores of KILL_LEVEL=7.0 tests=BSF_BESS_OUTBOUND
+X-BESS-BRTS-Status:1
 
-Hi J=C3=B6rg,
+Commit dcfe7673787b4bfea2c213df443d312aa754757b ("net: dsa: tag_sja1105:
+absorb logic for not overwriting precise info into dsa_8021q_rcv()")
+added support to let the DSA switch driver set source_port and
+switch_id. tag_8021q's logic overrides the previously set source_port
+and switch_id only if they are marked as "invalid" (-1). sja1105 and
+vsc73xx drivers are doing that properly, but ocelot_8021q driver doesn't
+initialize those variables. That causes dsa_8021q_rcv() doesn't set
+them, and they remain unassigned.
 
-On Wednesday, 11 December 2024, 13:23:38 CET, J=C3=B6rg Sommer wrote:
-> Christian Eggers schrieb am Mi 11. Dez, 11:18 (+0100):
+Initialize them as invalid to so dsa_8021q_rcv() can return with the
+proper values.
 
-> I think for 8795 these are optional. At me, it works with 0 and 3.
-Hmm, I understood that setting SPI mode to 3 (by my patch) is the
-root of your problem? If you revert my patch and set spi-cpol + spi-cpha
-in you device tree, the result should be more or less the same.
+Signed-off-by: Robert Hodaszi <robert.hodaszi@digi.com>
+Cc: stable@vger.kernel.org
+---
+ net/dsa/tag_ocelot_8021q.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If you think that your problem is related to the reset timing, feel
-free to increase the sleep time after asserting/deasserting the reset
-line. Beside the hardware reset there's usually also a software reset.
-But this type of reset normally doesn't affect consecutive register
-accesses.
-
-> I'm not an expert. So, please, double check this: the spec [1] says on
-> page 53, table 4-3, register 11, bit 0 =E2=80=9CTrigger on the rising edg=
-e of SPI
-> clock (for higher speed SPI)=E2=80=9D. According to [2] the rising edge i=
-s cpol=3D0
-> and mode 0. So, =E2=80=9Chigher speed SPI=E2=80=9D (I think this is the 2=
-5MHz) should use
-> mode 0.
->
-> [1] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Produc=
-tDocuments/DataSheets/KSZ8795CLX-Data-Sheet-DS00002112.pdf
-> [2] https://electronics.stackexchange.com/a/455564
-
-I hate SPI because of its poorly written specifications! When I read the
-corresponding sections of the KSZ9563 DS [3], I come to the conclusion that
-the register bit you mentioned above affects the SPI *output* signal=20
-(SPIQ a.k.a MISO). This would also make more sense, as you usually
-cannot change the behavior of the SPI input lines.
-
-[3] https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-DS=
-00002419D.pdf
-
-Page 68, on the bottom:
-> *SPI Data Out Edge Select*
-> 0 =3D SDO data is clocked by the falling edge of SCL
-> 1 =3D SDO data is clocked by the rising edge of SCL
-
-So the bit 0 is intended to adjust the phase of the SPIQ/SDO/MOSI output
-signal, in order to avoid that this signal is switched at the same clock ed=
-ge
-where your uC samples the MISO input.
-
-Also for the KSZ8795CLX there seems to be a mismatch regarding the SPI clock
-polarity in the datasheet. Page 28 (functional description) implies CPOL=3D1
-whilst page 123 (timing diagram) shows CPOL=3D0. I would trust the latter
-in this case.
-
->=20
->=20
-> > On Thursday, 19 November 2020 07:48:01 -0600, Rob Hering wrote:
-> > > On Wed, Nov 18, 2020 at 09:30:02PM +0100, Christian Eggers wrote:
-> > ...
-> > > > +        ksz9477: switch@0 {
-> > > > +            compatible =3D "microchip,ksz9477";
-> > > > +            reg =3D <0>;
-> > > > +            reset-gpios =3D <&gpio5 0 GPIO_ACTIVE_LOW>;
-> > > > +
-> > > > +            spi-max-frequency =3D <44000000>;
-> > > > +            spi-cpha;
-> > > > +            spi-cpol;
-> > >=20
-> > > Are these 2 optional or required? Being optional is rare as most
-> > > devices support 1 mode, but not unheard of. In general, you shouldn't
-> > > need them as the driver should know how to configure the mode if the =
-h/w
-> > > is fixed.
-> > ...
-> >=20
-> > It seems that I considered the h/w as "fixed". The pre-existing device =
-tree
-> > bindings and the diagrams on page 53 suggested that SPI mode 3 is the o=
-nly
-> > valid option. Particularly the idle state of the "SCL" signal is high h=
-ere:
-> >=20
-> > https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-DS=
-00002419D.pdf
-> >=20
-> > But the text description on page 52 says something different:
-> > > SCL is expected to stay low when SPI operation is idle.=20
-> >=20
-> > Especially the timing diagrams on page 206 look more like SPI mode 0.
-> >=20
-> > So it is possible that my patch was wrong (due to inconsistent descript=
-ion
-> > on the data sheet / pre existing device tree binding). As I already men=
-tioned,
-> > I did this only due to the DT conversion, I actually don't use SPI on s=
-uch
-> > devices myself.
-> >=20
-> > N.B. Which KSZ device do you actually use (I didn't find this in you pr=
-evious
-> > mails)?
->=20
-> I'm using KSZ8795.
-
-I should better read the subject line ...
-
-Summary:
-=2D The timing diagrams of KSZ8795CLX and KSZ9563 implies that SPI mode 0 i=
-s correct
-=2D The functional descriptions in the datasheets look more like SPI mode 3=
-, but this
-  is not authoritative.
-=2D Maybe that the KSZ devices can work with both modes.
-
-
-regards,
-Christian
-
-
+diff --git a/net/dsa/tag_ocelot_8021q.c b/net/dsa/tag_ocelot_8021q.c
+index 8e8b1bef6af6..11ea8cfd6266 100644
+--- a/net/dsa/tag_ocelot_8021q.c
++++ b/net/dsa/tag_ocelot_8021q.c
+@@ -79,7 +79,7 @@ static struct sk_buff *ocelot_xmit(struct sk_buff *skb,
+ static struct sk_buff *ocelot_rcv(struct sk_buff *skb,
+ 				  struct net_device *netdev)
+ {
+-	int src_port, switch_id;
++	int src_port = -1, switch_id = -1;
+ 
+ 	dsa_8021q_rcv(skb, &src_port, &switch_id, NULL, NULL);
+ 
+-- 
+2.43.0
 
 
