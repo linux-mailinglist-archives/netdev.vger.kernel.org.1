@@ -1,300 +1,210 @@
-Return-Path: <netdev+bounces-151064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A1EC9ECA26
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 11:17:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7FF39ECA2C
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 11:19:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78AF5188B925
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:17:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8912A1613CE
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4663386330;
-	Wed, 11 Dec 2024 10:17:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD2BD1ACECC;
+	Wed, 11 Dec 2024 10:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LXj0r6Em"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="jzwVbHdA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2045.outbound.protection.outlook.com [40.107.103.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3D6236FBE
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 10:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733912252; cv=none; b=haCB0Rza0sd5zuiBydh1QeMNvC6G54mru6PqCc4bKhkVRvjaaN91fgYQaCl2G624yZpyLNVPx/Ffi6unX92df9hLrVxxCEb5sTbtjub/axUSKZIbzaFPXWnUIrWM1fy12s5Lhv6j/oD/+kJTSwIzWtTzHRLSKUTu9WeZ8CK0i5c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733912252; c=relaxed/simple;
-	bh=0alu2WejjJ2ScrEhTbxdb4hcYBA/+OFvJTA00lRStGk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pyi2u3wdymOpfjUOYBcPgcwUJesG3CE8L9BofJMDFpP3TqsEYKDA1oYnMC/b7rpVq9XBkOmXdgPSR9noCfjD1ctq+y8IMjzWtZR48GoOcVy4p2dZMMPQ3+gypEvRkXERuOS+QHr5c8zucUot3tzHCPQHY+wNJzgm9q3jPHB1NfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LXj0r6Em; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733912249;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=M9zJVggtTmdu3KzfuhyLWooNUtfdXK1FNoWWOWUupHk=;
-	b=LXj0r6EmuJcsFfSYNI8OYDt7Y6VyGy1ZgSZFr1rKxg2sEtI1VYmqo+TVIuL07M7UauCA/4
-	Ns/otW68l/VWtRm7RojD6TadlJoNiNO3Nyi5FRDXIFDxwO0eIHVrpWDpg/Y/iIrk5X9wNU
-	V3o2ctUZ2bovkjOglAH4Whh7qhqdWv4=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-640-hZXFLNzHNW2gYgwaRu8s1Q-1; Wed, 11 Dec 2024 05:17:27 -0500
-X-MC-Unique: hZXFLNzHNW2gYgwaRu8s1Q-1
-X-Mimecast-MFC-AGG-ID: hZXFLNzHNW2gYgwaRu8s1Q
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-aa68fd5393cso77055566b.0
-        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 02:17:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733912246; x=1734517046;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M9zJVggtTmdu3KzfuhyLWooNUtfdXK1FNoWWOWUupHk=;
-        b=AUuoUIh49F1mm8qTatt8jADAbkna7AARx2XtgQUBS9GiJ25ugbQIOZnWB31BEsWr3f
-         chANH239OtbiN6aPQrpSKHaRImcDgVeSo/9FTfkM4+RKI00Lzw3Ok7q9uVKbMt0KK11V
-         3bEStsd8urIvJVxJ/17XGrfKdSx/HxEF/fMGJh660BYOI8+0FaolQnLcgrIwC7ZJaGKy
-         eXBDiY/GmtaRVPz5pJOpmjImvA9Z3yPqWIQF/hiRt9TBDreZz3MPkcFEocBTic7QHg3i
-         RqS4eUJ32opngX7NsK0lQhCYEtMK2+kztWUEQw0wlO54WPBtiNxYIPlCTUo8/EN+N7GX
-         40UA==
-X-Gm-Message-State: AOJu0YycIgobqLf/35JDk16v0iRz2TvMTCrzr7qugv8tw3+GgGc59pSp
-	evzcdfZKH3/AeI1Ew554RuRHPX19WavvhnN5eHFgnQdBQNJHScuZqhMJmOPX3bJ4OlfEz/vRxXs
-	sfTnFIe9M6WuvEHSFV5ECuXq78/2kAkka+CUPUIlllmmXeWyM24ql2A==
-X-Gm-Gg: ASbGncuSmyCUe/+uCBgU/BvNub2zVYbpac6WFxTRMN0LPei2OTgWQS3yDtPgEkSFMRj
-	Nm8nI6Mz/4dR6YZXc0ofypu40wQ4ZSptDfVZdRqmN36n3X9VJ5mqTKhaLar7jkYJpll8QxstiDH
-	52eU/Fme7n1fnAnurgWCxPmETFLTv4kGI6ZzpAWwPUCiFOALN/+g6CvJvgSwnRe8gbkaDxW6si3
-	jh249+qD1hx9siNO9znCxRTdg2m8k/2co/b8MVl59mlTpbSYtk=
-X-Received: by 2002:a17:906:23e1:b0:aa6:9eac:4b83 with SMTP id a640c23a62f3a-aa6b159dce6mr185098366b.12.1733912246469;
-        Wed, 11 Dec 2024 02:17:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGSg4lxIpRE0Pgirq1L/Eznuw06rdzIT7ddhWqydGde+0G1kjM0e3Aqvnq5MF6nND5n3qyxEA==
-X-Received: by 2002:a17:906:23e1:b0:aa6:9eac:4b83 with SMTP id a640c23a62f3a-aa6b159dce6mr185094966b.12.1733912245974;
-        Wed, 11 Dec 2024 02:17:25 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa678f34c68sm528413666b.38.2024.12.11.02.17.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 02:17:25 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 78DA716BDC4D; Wed, 11 Dec 2024 11:17:24 +0100 (CET)
-From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Date: Wed, 11 Dec 2024 11:17:09 +0100
-Subject: [PATCH net-next v2] net_sched: sch_cake: Add drop reasons
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1871EC4F4
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 10:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733912345; cv=fail; b=URNPDleqUQTw3JTU4FChQNFirlrqGV4gnnkgQjEP0W+LuA1eg8nDv1xybkSl0UgvQ5Ar6GBI7Wic/IZKKCgs21lb+/+0qEE95uHmNq3iCZQTvv9n2PUrMrKRstXVfvTj1ZxZ0DiwPTVcAubXlXhD/GgMBAKd4GfkJ05rPoH/NAo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733912345; c=relaxed/simple;
+	bh=ad/M4YEHJFtLOHpzQhFM2oPDLlxJzeN10+SB8z0IVQQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PgWU3vjSNyhJqz5NeDMgGb//UU3Lfam89ItgOvYogTBerHjSAch4V8V9uhtFM9OmJAfP8XkQWe/pbsOyf+LSR0AzD5C4LXtcHN5iAXrbtE+gLy+/h6Dkfl3SYDRIbQ5ogo+rrm+kYyYDlVp/ryTg3PS5Tbn7/RUd3K7e/hiSA2w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=jzwVbHdA; arc=fail smtp.client-ip=40.107.103.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bFiqTJISqsVrEzhUsVQ4BFDEDQT3IDYLxyDZiQYUS8VDFqfPr7q8dKVjBAWzmu2i9qtI/OVrGpWh7cQ7zwo2pL3FLD4TUyEGeO0jIuZ6kG3eQiV4/ugK4BJ7sTcx7CDqpqMyRMQfpo4NDag70QjhYD5UZkuuuPeTlO3w5NJjaImag9xpGC7O4P9KA9/We4e8JOQcsCviJxuXOSbWBwjVw8JnOXaH58EK4l5kvu4wJDIP5PLZIiKCtJI8Ue/mxzRQwZjEZ3HDwC+7szDfKvAQ80T0vq8pVr4dWaPb2oijgZ3OvEFVCgm9WPp5DTFzt7bwMBM34x2YEXkmKDyq0KnGEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lS07DEkij0siyBFgtqV+onP5vPnua80KVNIVtxpdqyA=;
+ b=ZdovlQCeh4qISufMN1KPYW4pruA67o4/HABwQovXtVA/cOJmPUhIxEXQTcfYX1GBTt53MfW09h7/vZ05DJNpve7Vy1nOOT/pwBZnKsaN8aWpwkSUpX6vsbQG2WNqydgAUADapUoHojuV3Aavrpu7yezWWrH2NPPCf47GLUPZ5rMro+XHI+HgDxov9yd1um9taG8BqOxixEMaY/cRt2NWM0zWYLlycuPTccBBrSJZxK8qFjgc0PWVRYGuWN8V5wzH6NVaX5Yq7gnHD0RtiTSS8jd77j3yuM24GPsjzt82AOb/jniHjZmho9tn5FyxuREl7Tau6+iRD22agYRJ57cEFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=jo-so.de smtp.mailfrom=arri.de; dmarc=fail
+ (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
+ not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lS07DEkij0siyBFgtqV+onP5vPnua80KVNIVtxpdqyA=;
+ b=jzwVbHdAQhMXXZgMttJLdu/T2hG36F+/XPeUPITaYHK+LHxURmnBxYSGPeJz4B6mzAFmSg4g/8yvOzm92pLNvYUGV/wxYYMHiBFmTmnPkIo0n2UWXKhONYfYk7FveRsCHHzvicSyRYhrzOB7bsSEzCCsQCLumWabtE0E0FXXJJ8=
+Received: from DB7PR03CA0078.eurprd03.prod.outlook.com (2603:10a6:10:72::19)
+ by DU2PR07MB8346.eurprd07.prod.outlook.com (2603:10a6:10:2e5::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Wed, 11 Dec
+ 2024 10:18:59 +0000
+Received: from DB5PEPF00014B8D.eurprd02.prod.outlook.com
+ (2603:10a6:10:72:cafe::33) by DB7PR03CA0078.outlook.office365.com
+ (2603:10a6:10:72::19) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8230.14 via Frontend Transport; Wed,
+ 11 Dec 2024 10:18:59 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ DB5PEPF00014B8D.mail.protection.outlook.com (10.167.8.201) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8251.15 via Frontend Transport; Wed, 11 Dec 2024 10:18:58 +0000
+Received: from n9w6sw14.localnet (10.30.4.231) by mta.arri.de (10.10.18.5)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Wed, 11 Dec
+ 2024 11:18:58 +0100
+From: Christian Eggers <ceggers@arri.de>
+To: =?ISO-8859-1?Q?J=F6rg?= Sommer <joerg@jo-so.de>
+CC: Andrew Lunn <andrew@lunn.ch>, <netdev@vger.kernel.org>
+Subject: Re: KSZ8795 not detected at start to boot from NFS
+Date: Wed, 11 Dec 2024 11:18:58 +0100
+Message-ID: <5708326.ZASKD2KPVS@n9w6sw14>
+Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
+In-Reply-To: <njdcvcha6n3chy2ldrf2ghnj5brgqxqujrk4trp5wyo6jvpo6c@b3qdubsvg6ko>
+References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
+ <zhuujdhxrquhi4u6n25rryx3yw3lm2ceuijcwjmnrr4awt4ys4@53wh2fqxnd6w>
+ <njdcvcha6n3chy2ldrf2ghnj5brgqxqujrk4trp5wyo6jvpo6c@b3qdubsvg6ko>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20241211-cake-drop-reason-v2-1-920afadf4d1b@redhat.com>
-X-B4-Tracking: v=1; b=H4sIAKRmWWcC/2WNwQrCMBBEf6Xs2ZVu0Eg9+R/SQ0w2NohJ2YRQK
- f13Q/Emc3oM82aFzBI4w7VbQbiGHFJsoA4d2MnEJ2NwjUH16kSqP6M1L0YnaUZhk1PEB2lNTHz
- xvYE2m4V9WHblHSIXjLwUGFszhVySfPavSnv/0w7/2krYMrRLrx15Gm7CbjLlaNMbxm3bvnkYl
- qm7AAAA
-X-Change-ID: 20241205-cake-drop-reason-b1661e1e7f0a
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>, 
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
- Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, cake@lists.bufferbloat.net, 
- Dave Taht <dave.taht@gmail.com>, 
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB5PEPF00014B8D:EE_|DU2PR07MB8346:EE_
+X-MS-Office365-Filtering-Correlation-Id: e0ae2107-5526-45af-f461-08dd19cd3a11
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?iso-8859-1?Q?kz1wBk1bmDE5wIZOd0j/DLVfx+yp68io0qw/lV4xq2rv7z6W9KDM4+tQgf?=
+ =?iso-8859-1?Q?cspUb5PRHpJsFYzRsn9c3k2bKPi3ZA0b5nNB/2TmzSPAtgec27FtjotM5V?=
+ =?iso-8859-1?Q?t3wdPUXrXF64M+uwarCFQDcmAZ1ZspBZNe3X0FFrbQTCYLYX59Cl01fWoc?=
+ =?iso-8859-1?Q?WBeTfA2OLFtih9OHVDZCiVGvrFuaf+MQNneHB1bLc+AE832n9CPtgf9zYO?=
+ =?iso-8859-1?Q?D2Gi2PrBBrCpfIcp7BNExzIpmweHqqXo3rGHEf5uqngjTaavgMVYXG+DsO?=
+ =?iso-8859-1?Q?TZLbRULqhyD7GxKCg5TyEIIg+sPpkiojA1AcsI7iwbHgb6jiSqa8evIN2w?=
+ =?iso-8859-1?Q?GzFJsFglya0g2i6gKh1FTRYO7FFCyc3+PBp+OM3hcgEHPY7xzS4/dbd+RQ?=
+ =?iso-8859-1?Q?2XVlvR+yXuewlIb430nEKdBHbVI2kYMC2H8hLWKDwzMrzdrxaB2QBSSiLb?=
+ =?iso-8859-1?Q?39g7SDsRoYzFtub93nXdtedOP/BDfXRXankoi5sdJ33h8ept1eM5Pgztxf?=
+ =?iso-8859-1?Q?o04ySqL6brGIBiZJjCbibjFjC0drExaxqSZd3JiLsCTrHPExr7Y5Vm2mzw?=
+ =?iso-8859-1?Q?44hmD/O7qRNaHhWVp9mMYU0/+qXZFdUyNuGwde0hoyaKfvlvPxIRFndTNk?=
+ =?iso-8859-1?Q?H7MtiiLfAGgLOmZ1bniFNmtv4G7QUPaLEIr5fSniS612Wpx4EZ7yIcdFSx?=
+ =?iso-8859-1?Q?PKD7laI8rJC0sDskcwkvDVqTzbAL5GoVaNXYkf8g7d7smFqR22MMIESzNx?=
+ =?iso-8859-1?Q?3pdutDW8UjDGwN4B2aeLi7woZdpJTl55FaIKK2wdZG+vnCRf2bdTNZt5q5?=
+ =?iso-8859-1?Q?TWw55QT/o+NeCJGz1RIQAR+tGAuNJQC8Z5mpm1OLXLhS3U9DlqezT+4NtP?=
+ =?iso-8859-1?Q?MmdzE98MDOmf63tAVbuTG+3MFMczo9AFF9CNwlQ4+rOkaD2QD3RCzEHS7Y?=
+ =?iso-8859-1?Q?uOTscoHWvYtdBt/eMmxycwpOBwmKvasoEWY8OPosz6nAADC39GCoNPA6Dd?=
+ =?iso-8859-1?Q?dMmxbOHYwLtP/4ZXJiRqzejKRg949/ou0wCtzEij3QvvPbKVlSZOZODaJL?=
+ =?iso-8859-1?Q?06vqijrulywMpJO3IR+3bSnjcBkxLco3SUx2TIADo8QhiKTAxL0Vmgg3fz?=
+ =?iso-8859-1?Q?PeQhErqNeOy41sMysqbHXkh9n6MUjeFjhsEe8eWP3LBbuTAofVQmKj7oGI?=
+ =?iso-8859-1?Q?F0W12kLIRS4t0+agUYdwqfVcfL5zoBZkWdQcRDeC3uYpLChMJCwu64nXuE?=
+ =?iso-8859-1?Q?p9zLBOXpzS9dSpGclzHtvrsUMF8XUgqdSMvbKulMQwTPWpa6imdVVqNGgm?=
+ =?iso-8859-1?Q?7AqWxqQufO2QDpSPXBEynI9uNd/r712fYF3M7KkMfOv3+0gdbLwsWtE0Zo?=
+ =?iso-8859-1?Q?m4TgIUBjuQ2mG6YKIwAQNh1Tnt9ZyncN82pxIQ6/IvxKnre/m3G5mR73NH?=
+ =?iso-8859-1?Q?hgXJT8HbfEYL6p7EfjqX3jAdLBkcXntkc78a+VSix/BOEJowR79dVXc8NG?=
+ =?iso-8859-1?Q?WCX24okb0d9IoqfnDF5jGlchYvndObhj9MLQ6NCzBvhjQ4l+EKUoFqz95O?=
+ =?iso-8859-1?Q?Vm2Ls2Y=3D?=
+X-Forefront-Antispam-Report:
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2024 10:18:58.8942
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e0ae2107-5526-45af-f461-08dd19cd3a11
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource: DB5PEPF00014B8D.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR07MB8346
 
-Add three qdisc-specific drop reasons and use them in sch_cake:
+Hi J=F6rg,
 
- 1) SKB_DROP_REASON_QDISC_OVERLIMIT
-    Whenever the total queue limit for a qdisc instance is exceeded
-    and a packet is dropped to make room.
+On Tuesday, 10 December 2024, 17:43:01 CET, J=F6rg Sommer wrote:
+>=20
+> So I think it's a timing problem: the ksz8795 isn't ready after the SPI
+> reset, when the chip ID gets read, and this causes the probing to stop.
+>=20
+> Why is SPI_MODE_3 required? At me, the chip works fine with SPI_MODE_0.
 
- 2) SKB_DROP_REASON_QDISC_CONGESTED
-    Whenever a packet is dropped by the qdisc AQM algorithm because
-    congestion is detected.
+I tried to reconstruct why I actually did this change (sorry, I am over 40):
 
- 3) SKB_DROP_REASON_CAKE_FLOOD
-    Whenever a packet is dropped by the flood protection part of the
-    CAKE AQM algorithm (BLUE).
+1. I was working on the PTP patches for KSZ956x.
+2. It was necessary to convert the devicetree bindings to Yaml.
+3. There where objections against keeping "spi-cpha" and "spi-cpol"
+   in the example code:
+   https://lore.kernel.org/netdev/20201119134801.GB3149565@bogus/
 
-Also use the existing SKB_DROP_REASON_QUEUE_PURGE in cake_clear_tin().
+On Thursday, 19 November 2020 07:48:01 -0600, Rob Hering wrote:
+> On Wed, Nov 18, 2020 at 09:30:02PM +0100, Christian Eggers wrote:
+=2E..
+> > +        ksz9477: switch@0 {
+> > +            compatible =3D "microchip,ksz9477";
+> > +            reg =3D <0>;
+> > +            reset-gpios =3D <&gpio5 0 GPIO_ACTIVE_LOW>;
+> > +
+> > +            spi-max-frequency =3D <44000000>;
+> > +            spi-cpha;
+> > +            spi-cpol;
+>=20
+> Are these 2 optional or required? Being optional is rare as most
+> devices support 1 mode, but not unheard of. In general, you shouldn't
+> need them as the driver should know how to configure the mode if the h/w
+> is fixed.
+=2E..
 
-Reasons show up as:
+It seems that I considered the h/w as "fixed". The pre-existing device tree
+bindings and the diagrams on page 53 suggested that SPI mode 3 is the only
+valid option. Particularly the idle state of the "SCL" signal is high here:
 
-perf record -a -e skb:kfree_skb sleep 1; perf script
+https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-DS0000=
+2419D.pdf
 
-          iperf3     665 [005]   848.656964: skb:kfree_skb: skbaddr=0xffff98168a333500 rx_sk=(nil) protocol=34525 location=__dev_queue_xmit+0x10f0 reason: QDISC_OVERLIMIT
-         swapper       0 [001]   909.166055: skb:kfree_skb: skbaddr=0xffff98168280cee0 rx_sk=(nil) protocol=34525 location=cake_dequeue+0x5ef reason: QDISC_CONGESTED
+But the text description on page 52 says something different:
+> SCL is expected to stay low when SPI operation is idle.=20
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Acked-by: Dave Taht <dave.taht@gmail.com>
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
----
-Changes in v2:
-- Make CONGESTED and OVERLIMIT qdisc-generic instead of specific to CAKE (Jakub)
-- Link to v1: https://lore.kernel.org/r/20241209-cake-drop-reason-v1-1-19205f6d1f19@redhat.com
----
- include/net/dropreason-core.h | 18 ++++++++++++++++++
- net/sched/sch_cake.c          | 43 +++++++++++++++++++++++--------------------
- 2 files changed, 41 insertions(+), 20 deletions(-)
+Especially the timing diagrams on page 206 look more like SPI mode 0.
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index c29282fabae6cdf9dd79f698b92b4b8f57156b1e..ead4170a1d0a9d3198876fabf453130bf11953be 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -58,6 +58,9 @@
- 	FN(TC_EGRESS)			\
- 	FN(SECURITY_HOOK)		\
- 	FN(QDISC_DROP)			\
-+	FN(QDISC_OVERLIMIT)		\
-+	FN(QDISC_CONGESTED)		\
-+	FN(CAKE_FLOOD)			\
- 	FN(FQ_BAND_LIMIT)		\
- 	FN(FQ_HORIZON_LIMIT)		\
- 	FN(FQ_FLOW_LIMIT)		\
-@@ -314,6 +317,21 @@ enum skb_drop_reason {
- 	 * failed to enqueue to current qdisc)
- 	 */
- 	SKB_DROP_REASON_QDISC_DROP,
-+	/**
-+	 * @SKB_DROP_REASON_QDISC_OVERLIMIT: dropped by qdisc when a qdisc
-+	 * instance exceeds its total buffer size limit.
-+	 */
-+	SKB_DROP_REASON_QDISC_OVERLIMIT,
-+	/**
-+	 * @SKB_DROP_REASON_QDISC_CONGESTED: dropped by a qdisc AQM algorithm
-+	 * due to congestion.
-+	 */
-+	SKB_DROP_REASON_QDISC_CONGESTED,
-+	/**
-+	 * @SKB_DROP_REASON_CAKE_FLOOD: dropped by the flood protection part of
-+	 * CAKE qdisc AQM algorithm (BLUE).
-+	 */
-+	SKB_DROP_REASON_CAKE_FLOOD,
- 	/**
- 	 * @SKB_DROP_REASON_FQ_BAND_LIMIT: dropped by fq qdisc when per band
- 	 * limit is reached.
-diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index 8d8b2db4653c0c9f271f9c1953e8c61175d8f76b..deb0925f536dda69469738e45e1dbf8ed59a6820 100644
---- a/net/sched/sch_cake.c
-+++ b/net/sched/sch_cake.c
-@@ -484,13 +484,14 @@ static bool cobalt_queue_empty(struct cobalt_vars *vars,
- /* Call this with a freshly dequeued packet for possible congestion marking.
-  * Returns true as an instruction to drop the packet, false for delivery.
-  */
--static bool cobalt_should_drop(struct cobalt_vars *vars,
--			       struct cobalt_params *p,
--			       ktime_t now,
--			       struct sk_buff *skb,
--			       u32 bulk_flows)
-+static enum skb_drop_reason cobalt_should_drop(struct cobalt_vars *vars,
-+					       struct cobalt_params *p,
-+					       ktime_t now,
-+					       struct sk_buff *skb,
-+					       u32 bulk_flows)
- {
--	bool next_due, over_target, drop = false;
-+	enum skb_drop_reason reason = SKB_NOT_DROPPED_YET;
-+	bool next_due, over_target;
- 	ktime_t schedule;
- 	u64 sojourn;
- 
-@@ -533,7 +534,8 @@ static bool cobalt_should_drop(struct cobalt_vars *vars,
- 
- 	if (next_due && vars->dropping) {
- 		/* Use ECN mark if possible, otherwise drop */
--		drop = !(vars->ecn_marked = INET_ECN_set_ce(skb));
-+		if (!(vars->ecn_marked = INET_ECN_set_ce(skb)))
-+			reason = SKB_DROP_REASON_QDISC_CONGESTED;
- 
- 		vars->count++;
- 		if (!vars->count)
-@@ -556,16 +558,17 @@ static bool cobalt_should_drop(struct cobalt_vars *vars,
- 	}
- 
- 	/* Simple BLUE implementation.  Lack of ECN is deliberate. */
--	if (vars->p_drop)
--		drop |= (get_random_u32() < vars->p_drop);
-+	if (vars->p_drop && reason == SKB_NOT_DROPPED_YET &&
-+	    get_random_u32() < vars->p_drop)
-+		reason = SKB_DROP_REASON_CAKE_FLOOD;
- 
- 	/* Overload the drop_next field as an activity timeout */
- 	if (!vars->count)
- 		vars->drop_next = ktime_add_ns(now, p->interval);
--	else if (ktime_to_ns(schedule) > 0 && !drop)
-+	else if (ktime_to_ns(schedule) > 0 && reason == SKB_NOT_DROPPED_YET)
- 		vars->drop_next = now;
- 
--	return drop;
-+	return reason;
- }
- 
- static bool cake_update_flowkeys(struct flow_keys *keys,
-@@ -1528,12 +1531,11 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
- 
- 	flow->dropped++;
- 	b->tin_dropped++;
--	sch->qstats.drops++;
- 
- 	if (q->rate_flags & CAKE_FLAG_INGRESS)
- 		cake_advance_shaper(q, b, skb, now, true);
- 
--	__qdisc_drop(skb, to_free);
-+	qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
- 	sch->q.qlen--;
- 	qdisc_tree_reduce_backlog(sch, 1, len);
- 
-@@ -1926,7 +1928,7 @@ static void cake_clear_tin(struct Qdisc *sch, u16 tin)
- 	q->cur_tin = tin;
- 	for (q->cur_flow = 0; q->cur_flow < CAKE_QUEUES; q->cur_flow++)
- 		while (!!(skb = cake_dequeue_one(sch)))
--			kfree_skb(skb);
-+			kfree_skb_reason(skb, SKB_DROP_REASON_QUEUE_PURGE);
- }
- 
- static struct sk_buff *cake_dequeue(struct Qdisc *sch)
-@@ -1934,6 +1936,7 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch)
- 	struct cake_sched_data *q = qdisc_priv(sch);
- 	struct cake_tin_data *b = &q->tins[q->cur_tin];
- 	struct cake_host *srchost, *dsthost;
-+	enum skb_drop_reason reason;
- 	ktime_t now = ktime_get();
- 	struct cake_flow *flow;
- 	struct list_head *head;
-@@ -2143,12 +2146,12 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch)
- 			goto begin;
- 		}
- 
-+		reason = cobalt_should_drop(&flow->cvars, &b->cparams, now, skb,
-+					    (b->bulk_flow_count *
-+					     !!(q->rate_flags &
-+						CAKE_FLAG_INGRESS)));
- 		/* Last packet in queue may be marked, shouldn't be dropped */
--		if (!cobalt_should_drop(&flow->cvars, &b->cparams, now, skb,
--					(b->bulk_flow_count *
--					 !!(q->rate_flags &
--					    CAKE_FLAG_INGRESS))) ||
--		    !flow->head)
-+		if (reason == SKB_NOT_DROPPED_YET || !flow->head)
- 			break;
- 
- 		/* drop this packet, get another one */
-@@ -2162,7 +2165,7 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch)
- 		b->tin_dropped++;
- 		qdisc_tree_reduce_backlog(sch, 1, qdisc_pkt_len(skb));
- 		qdisc_qstats_drop(sch);
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, reason);
- 		if (q->rate_flags & CAKE_FLAG_INGRESS)
- 			goto retry;
- 	}
+So it is possible that my patch was wrong (due to inconsistent description
+on the data sheet / pre existing device tree binding). As I already mention=
+ed,
+I did this only due to the DT conversion, I actually don't use SPI on such
+devices myself.
 
----
-base-commit: 7ea2745766d776866cfbc981b21ed3cfdf50124e
-change-id: 20241205-cake-drop-reason-b1661e1e7f0a
+N.B. Which KSZ device do you actually use (I didn't find this in you previo=
+us
+mails)?
+
+
+On Sunday, 8 December 2024, 17:44:49 CET, J=F6rg Sommer wrote:
+> Or am I missing something in my devicetree to set the SPI to mode 3?
+
+The idea was that for "fixed" hardware the SPI mode should be setup in
+the drivers probe() routine rather than in the device tree.
+
+regards,
+Christian
+
+
 
 
