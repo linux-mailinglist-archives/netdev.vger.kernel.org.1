@@ -1,232 +1,151 @@
-Return-Path: <netdev+bounces-151160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8A679ED278
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 17:45:18 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 582229ED282
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 17:47:05 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9738E1889BE3
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 16:45:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C29FB289C9D
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 16:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 848371DE3AB;
-	Wed, 11 Dec 2024 16:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A601DC054;
+	Wed, 11 Dec 2024 16:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="PPUMdDom"
+	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="kmc6W85V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-18.smtpout.orange.fr [80.12.242.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B137748A;
-	Wed, 11 Dec 2024 16:44:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46BA61F949;
+	Wed, 11 Dec 2024 16:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733935502; cv=none; b=dMtLBq8MmJdCXGN8jdJazFjtv3JcsxoQPSBNTIB1tuEOJuuA9vknfnuj2aLygZqb3Ga8Xu9XcZvXruJKtZAK0kjZDh1lv4WK2LxMhEbObrc3Bptj+pMrUXKFgdM2fz7e9uFQV9JSZsjscBbXHic+a4jqRF4RVVZWbkjieMu9dPY=
+	t=1733935617; cv=none; b=IYJT3+My8eEwUKu6YzoWt+P8XiDkqPPEq56iNDngfOt6ifY/NKqsOPWT+OBwHZpbdpcIp8ow+beAoPkKntBAaXmrEK2je4mr0pgfIpJjxni2bsdDTKiznL6y5pEN0rfuu/XuMitpWLak/uUz7fCl20fL0XRCM4TMoZZAJ5SLrMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733935502; c=relaxed/simple;
-	bh=sAP+tRgUhnql6R7R3db5IeDRYeDczl/yF1C3ExMaCgo=;
-	h=Message-ID:Date:MIME-Version:Subject:References:From:To:Cc:
-	 In-Reply-To:Content-Type; b=W4IeUBTY161sOdil/mKA1TplFeRTG9YMn52GVOLTjn+HuUMkfWn1gD0p4bP+mMkFuvps9t9Rr2I6twRom3zt8GgvhebxwKtX9xDYLyxJlNEM68HjKloUep2WPKbtu3wM7t+vvNuFhO+pMMFqWPid8IGwul3ZeHt6J17NEFmGHu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=PPUMdDom; arc=none smtp.client-ip=80.12.242.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id LPpQth5h4Q2aZLPpRtbPgg; Wed, 11 Dec 2024 17:44:55 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1733935495;
-	bh=SVQEOuIW0eCozjA9frw8qm4f/i4aTd4kf39LBuuYa5M=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To;
-	b=PPUMdDomNKLrzttqf/svHMgQjR+ic9Q4Ke8v4qJ8yx6CY73kKOm+Zl+mmQI7I323t
-	 5kgRkaExDDAXYCv1CBX9cSjpb3A1BoCbk+4ORMSP7XAksYZ+s9yVHnUKcgTJfptZmO
-	 gXRJI3qXgAJvvC7YFRPYn12+Xyyn1AuJj2xiOiroxwoli11iKs4Ujg1q/hr2AtMnD0
-	 Hd6sjCRAQBAlcdJ+aEKdirs6A3xlcuoUAR06okRqUVgQsscXVOSdxxrqoNWNtKA7zh
-	 cH5GiyDFROkKXRYq9AA/Ekfx+H9FeI4gDHcC+1QpOnCo0i4Wxf455VgKzWh+7/KwdQ
-	 m4INFOLUkmOkw==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Wed, 11 Dec 2024 17:44:55 +0100
-X-ME-IP: 90.11.132.44
-Message-ID: <47f720f8-90d7-4444-bfde-fb76ec2a2f0f@wanadoo.fr>
-Date: Wed, 11 Dec 2024 17:44:48 +0100
+	s=arc-20240116; t=1733935617; c=relaxed/simple;
+	bh=96Cayvso728TmhS6qmHKdvsuIfX5z5hnZTLixJoAqcM=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=jmbtEZ/YPqWP1I7DClVyB0z8s2Bt0jd3A7DvIKTlDobNJTcwMbEydOAfa8js6WoK6hzuddEvMWhhx3vGK54yLIzAqTZyMY5enewCDREboVl/eOAqolTnZWCO6O0ERBxv0SqYBk4lHJMFxABNGkoytiJpqxjkH5vLJoLK+4ya+Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=kmc6W85V; arc=none smtp.client-ip=193.238.174.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id CBACC23557;
+	Wed, 11 Dec 2024 18:46:45 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=2FvUHXc/TMwGrU7X3V1Wpacmv3StILxOEravI0TKj2E=; b=kmc6W85V+Hog
+	L5grwQ6YCMdmMw+56yrRz0b297gPiKDi6cKLeEeEaMq1zYhjDvES2Tcbe52mKpzU
+	1tAt2EpWy9TrDpsZVeB9qwJrF9TsH4P7ZErLh3NnpDjs/TwyIhDChoZSXuPVtKha
+	0+paW9WzxsmGbjgYfV2iU7b0pJ0dOBc+O0LB8p6ZWqgMuAxSikEmXQbOb/BnJ5Uv
+	xZcZBjK2g9uoTUp08xBdZpTfkoQ5xuIWzYga4fl6Hrse2crOqej6YJf0fcF7/TP2
+	U2lR3BJ/RILAsVqD9yRqo5gDrBGO8s24ygt0ln3oQPDw31IE6BllsoT2NISwG4Wz
+	yAJFFWLp0uY8n2lkLp1Y9oN+BOad4Cky19XMRh0LjGwZ2nWBJLp0duwywh1gvzh3
+	q6xnQnh3SbiUvUAeJBgpX+gW9uu3dJsWXCJYTUH93HNyKQqUUnxjBPb1wyEJleBf
+	w2DCUTXxrmbCC0Lz7YDFsQ1AlTXpWq/LsdPYdwRirhQdhgkTkvfVn3mCaM1Ca133
+	iHiSe2zoqqN8vKhFePBuCCiEUMVVnqYx1ABbzLFluKVA/mnxHN6rk+PcTGE1t2NO
+	Gm+Q0DokXHYGuOhBL9g0ERIZv5ogUbdufURKQdwkVGvCIQsxZWx2yOV34/V9iOuF
+	lLfSOZviyk8DYDtBNrcHcG72//7XPcw=
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Wed, 11 Dec 2024 18:46:44 +0200 (EET)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id A842015D48;
+	Wed, 11 Dec 2024 18:46:36 +0200 (EET)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 4BBGkRAC056570;
+	Wed, 11 Dec 2024 18:46:28 +0200
+Date: Wed, 11 Dec 2024 18:46:27 +0200 (EET)
+From: Julian Anastasov <ja@ssi.bg>
+To: David Laight <David.Laight@ACULAB.COM>
+cc: "'Dan Carpenter'" <dan.carpenter@linaro.org>,
+        Simon Horman <horms@verge.net.au>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "lvs-devel@vger.kernel.org" <lvs-devel@vger.kernel.org>,
+        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+        "coreteam@netfilter.org" <coreteam@netfilter.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>
+Subject: RE: [PATCH net] ipvs: Fix clamp() order in ip_vs_conn_init()
+In-Reply-To: <7e01a62a5cb4435198f13be27c19de26@AcuMS.aculab.com>
+Message-ID: <af5b4872-4645-2bf3-19c1-72a45fda18b1@ssi.bg>
+References: <1e0cf09d-406f-4b66-8ff5-25ddc2345e54@stanley.mountain> <7e01a62a5cb4435198f13be27c19de26@AcuMS.aculab.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/7] mfd: Add core driver for Nuvoton NCT6694
-References: <20241210104524.2466586-1-tmyu0@nuvoton.com>
- <20241210104524.2466586-2-tmyu0@nuvoton.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, tmyu0@nuvoton.com,
- lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl,
- andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
- linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com
-In-Reply-To: <20241210104524.2466586-2-tmyu0@nuvoton.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 
-Le 10/12/2024 à 11:45, Ming Yu a écrit :
-> The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
-> 6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
-> PWM, and RTC.
+
+	Hello,
+
+On Wed, 11 Dec 2024, David Laight wrote:
+
+> From: Dan Carpenter
+> > Sent: 11 December 2024 13:17
+> > 
+> > We recently added some build time asserts to detect incorrect calls to
+> > clamp and it detected this bug which breaks the build.  The variable
+> > in this clamp is "max_avail" and it should be the first argument.  The
+> > code currently is the equivalent to max = max(max_avail, max).
 > 
-> This driver implements USB device functionality and shares the
-> chip's peripherals as a child device.
+> The fix is correct but the description above is wrong.
+> When run max_avail is always larger than min so the result is correct.
+> But the compiler does some constant propagation (for something that
+> can't happen) and wants to calculate the constant 'clamp(max, min, 0)'
+> Both max and min are known values so the build assert trips.
 > 
-> Each child device can use the USB functions nct6694_read_msg()
-> and nct6694_write_msg() to issue a command. They can also request
-> interrupt that will be called when the USB device receives its
-> interrupt pipe.
+> I posted the same patch (with a different message) last week.
 
-...
+	I was still waiting for v2 from David Laight as
+he can put more specific explanation for the bad 3rd arg
+to clamp() and to add the Fixes header.
 
-> +int nct6694_read_msg(struct nct6694 *nct6694, u8 mod, u16 offset,
-> +		     u16 length, void *buf)
-> +{
-> +	struct nct6694_cmd_header *cmd_header = nct6694->cmd_header;
-> +	struct nct6694_response_header *response_header = nct6694->response_header;
-> +	struct usb_device *udev = nct6694->udev;
-> +	int tx_len, rx_len, ret;
-> +
-> +	guard(mutex)(&nct6694->access_lock);
+	David, let me know what should we do, I prefer
+to see v2 from you but if you prefer we can go with the
+latest version from Dan...
 
-Nitpick: This could be moved a few lines below, should it still comply 
-with your coding style.
+> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > Closes:
+> > https://lore.kernel.org/all/CA+G9fYsT34UkGFKxus63H6UVpYi5GRZkezT9MRLfAbM3f6ke0g@mail.gmail.com/
+> > Fixes: 4f325e26277b ("ipvs: dynamically limit the connection hash table")
+> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> > ---
+> > I've been trying to add stable CC's to my commits but I'm not sure the
+> > netdev policy on this.  Do you prefer to add them yourself?
+> > 
+> >  net/netfilter/ipvs/ip_vs_conn.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
+> > index 98d7dbe3d787..9f75ac801301 100644
+> > --- a/net/netfilter/ipvs/ip_vs_conn.c
+> > +++ b/net/netfilter/ipvs/ip_vs_conn.c
+> > @@ -1495,7 +1495,7 @@ int __init ip_vs_conn_init(void)
+> >  	max_avail -= 2;		/* ~4 in hash row */
+> >  	max_avail -= 1;		/* IPVS up to 1/2 of mem */
+> >  	max_avail -= order_base_2(sizeof(struct ip_vs_conn));
+> > -	max = clamp(max, min, max_avail);
+> > +	max = clamp(max_avail, min, max);
+> >  	ip_vs_conn_tab_bits = clamp_val(ip_vs_conn_tab_bits, min, max);
+> >  	ip_vs_conn_tab_size = 1 << ip_vs_conn_tab_bits;
+> >  	ip_vs_conn_tab_mask = ip_vs_conn_tab_size - 1;
+> > --
+> > 2.45.2
 
-> +
-> +	/* Send command packet to USB device */
-> +	cmd_header->mod = mod;
-> +	cmd_header->cmd = offset & 0xFF;
-> +	cmd_header->sel = (offset >> 8) & 0xFF;
-> +	cmd_header->hctrl = NCT6694_HCTRL_GET;
-> +	cmd_header->len = length;
-> +
-> +	ret = usb_bulk_msg(udev, usb_sndbulkpipe(udev, NCT6694_BULK_OUT_EP),
-> +			   cmd_header, NCT6694_CMD_PACKET_SZ, &tx_len,
-> +			   nct6694->timeout);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Receive response packet from USB device */
-> +	ret = usb_bulk_msg(udev, usb_rcvbulkpipe(udev, NCT6694_BULK_IN_EP),
-> +			   response_header, NCT6694_CMD_PACKET_SZ, &rx_len,
-> +			   nct6694->timeout);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = usb_bulk_msg(udev, usb_rcvbulkpipe(udev, NCT6694_BULK_IN_EP),
-> +			   buf, NCT6694_MAX_PACKET_SZ, &rx_len, nct6694->timeout);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return nct6694_response_err_handling(nct6694, response_header->sts);
-> +}
-> +EXPORT_SYMBOL(nct6694_read_msg);
-> +
-> +int nct6694_write_msg(struct nct6694 *nct6694, u8 mod, u16 offset,
-> +		      u16 length, void *buf)
-> +{
-> +	struct nct6694_cmd_header *cmd_header = nct6694->cmd_header;
-> +	struct nct6694_response_header *response_header = nct6694->response_header;
-> +	struct usb_device *udev = nct6694->udev;
-> +	int tx_len, rx_len, ret;
-> +
-> +	guard(mutex)(&nct6694->access_lock);
+Regards
 
-Nitpick: This could be moved a few lines below, should it still comply 
-with your coding style.
-
-> +
-> +	/* Send command packet to USB device  */
-
-Nitpick: double space before */
-
-> +	cmd_header->mod = mod;
-> +	cmd_header->cmd = offset & 0xFF;
-> +	cmd_header->sel = (offset >> 8) & 0xFF;
-> +	cmd_header->hctrl = NCT6694_HCTRL_SET;
-> +	cmd_header->len = length;
-
-...
-
-> +static struct irq_chip nct6694_irq_chip = {
-
-const?
-
-> +	.name = "nct6694-irq",
-> +	.flags = IRQCHIP_SKIP_SET_WAKE,
-> +	.irq_bus_lock = nct6694_irq_lock,
-> +	.irq_bus_sync_unlock = nct6694_irq_sync_unlock,
-> +	.irq_enable = nct6694_irq_enable,
-> +	.irq_disable = nct6694_irq_disable,
-> +};
-
-...
-
-> +static int nct6694_usb_probe(struct usb_interface *iface,
-> +			     const struct usb_device_id *id)
-> +{
-> +	struct usb_device *udev = interface_to_usbdev(iface);
-> +	struct device *dev = &udev->dev;
-> +	struct usb_host_interface *interface;
-> +	struct usb_endpoint_descriptor *int_endpoint;
-> +	struct nct6694 *nct6694;
-> +	struct nct6694_cmd_header *cmd_header;
-> +	struct nct6694_response_header *response_header;
-> +	int pipe, maxp;
-> +	int ret;
-> +
-> +	interface = iface->cur_altsetting;
-> +
-> +	int_endpoint = &interface->endpoint[0].desc;
-> +	if (!usb_endpoint_is_int_in(int_endpoint))
-> +		return -ENODEV;
-> +
-> +	nct6694 = devm_kzalloc(dev, sizeof(*nct6694), GFP_KERNEL);
-> +	if (!nct6694)
-> +		return -ENOMEM;
-> +
-> +	pipe = usb_rcvintpipe(udev, NCT6694_INT_IN_EP);
-> +	maxp = usb_maxpacket(udev, pipe);
-> +
-> +	cmd_header = devm_kzalloc(dev, sizeof(*cmd_header),
-> +				  GFP_KERNEL);
-> +	if (!cmd_header)
-> +		return -ENOMEM;
-> +
-> +	response_header = devm_kzalloc(dev, sizeof(*response_header),
-> +				       GFP_KERNEL);
-> +	if (!response_header)
-> +		return -ENOMEM;
-> +
-> +	nct6694->int_buffer = devm_kcalloc(dev, NCT6694_MAX_PACKET_SZ,
-> +					   sizeof(unsigned char), GFP_KERNEL);
-
-Why for cmd_header and response_header we use a temp variable, while 
-here we update directly nct6694->int_buffer?
-
-It would save a few LoC do remove this temp var.
-
-> +	if (!nct6694->int_buffer)
-> +		return -ENOMEM;
-> +
-> +	nct6694->int_in_urb = usb_alloc_urb(0, GFP_KERNEL);
-> +	if (!nct6694->int_in_urb)
-> +		return -ENOMEM;
-
-...
-
-CJ
+--
+Julian Anastasov <ja@ssi.bg>
 
 
