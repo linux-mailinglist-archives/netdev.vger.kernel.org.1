@@ -1,232 +1,126 @@
-Return-Path: <netdev+bounces-151094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4B7C9ECD5E
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:37:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 476D19ECD76
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:42:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFCC5162E32
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:37:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FFD91636DA
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:42:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7566236922;
-	Wed, 11 Dec 2024 13:36:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E49C22ACCA;
+	Wed, 11 Dec 2024 13:42:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Uuy6mqcM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YXghnRdb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD70233687;
-	Wed, 11 Dec 2024 13:36:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D076023FD00;
+	Wed, 11 Dec 2024 13:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733924167; cv=none; b=aySCjTonL0Px+limW/cOG75N3IDhFOMKuBUu80n1KL9QMnZKvK11jLml5IyudenOdKhwdxClLeVi6Sq2xoxvhhu5vxcI7JHbNJrhfR1GTJH3uv7imBa7iOlSgtl8++Ail4G32oFY9baK//7dPNkjprkXEfC9BzPofQcFWpoz3rE=
+	t=1733924557; cv=none; b=nB3wL2ARv71GAsM8y6QZVxNOYOZxFQcGa2gVEFhsMoFL41EDOcO53LezpbrMJkZgHn0U/vAqwQmYPF6uuYXAtQicEnarICi8Gxy9flmoxvRb9I4NnT+KGq3NCTYMAwBcL1NrvzyUtROcTI1725hLS7AFi0C6Pbu06A/yz72m7/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733924167; c=relaxed/simple;
-	bh=Nx2OtLznPMrYylAFzfby0Fi4vm/scTkyO7y2Bx9GMp0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dy5+JT6np6cZ+HK7/Oyvye3KZCQ2kd/AXL3FZEBoTXwOfl6SHLQkqnmDWn2XkbKQHKB3eqs3kJbl6mdFbJTfL/W7x/jHJE1o/RMxM4ictDKxLCcUAqKUh0FTYIjLH6lMAE6sQWJkJjlo0TMAaw9b3nguQrq/56sB+TbaTfq2rm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Uuy6mqcM; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BBAbVJ8026694;
-	Wed, 11 Dec 2024 13:35:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=83Mm14
-	vPTCxgTAsRML9zi54L/sMJzjl1PVd6kBYPl0g=; b=Uuy6mqcMmlKkni9mu9IkIT
-	pZubqxO+NamKv/6XTMFzT418bh3/K17nb7Wjha7yo7gsRjHfldogRx4eVszsIr97
-	qnsXbAevt5B0yV48Nut+9JmXftiRLL5ISH+ZOREl0qNgcZ7FxnmS3EKfSPqSmro5
-	WkOOECI8ZqPwymdt7Kmkd5NwYybb4ZhBDG50tboXZIBP49ZnRtC8C9WakCO7ggx4
-	GoTAY1Pk0ankqcCTVCI+BciyrRYZtFr8ybuQtnJni3V1OjW69Cm33yalh8aQSvNn
-	hA8tInjSMHgW0N7CX9/tj2S2kUhBeLr/RC+MMDiNbEnBdEsVkH4Vl9PuLu6O90Xg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsqcpup-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Dec 2024 13:35:53 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BBDX6fC029033;
-	Wed, 11 Dec 2024 13:35:52 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsqcpug-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Dec 2024 13:35:52 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BBD6rIY000572;
-	Wed, 11 Dec 2024 13:35:52 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43d1pn9n7y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Dec 2024 13:35:51 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BBDZmMR48103920
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Dec 2024 13:35:48 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3BD662004B;
-	Wed, 11 Dec 2024 13:35:48 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EEDEC20040;
-	Wed, 11 Dec 2024 13:35:47 +0000 (GMT)
-Received: from [9.152.224.44] (unknown [9.152.224.44])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 11 Dec 2024 13:35:47 +0000 (GMT)
-Message-ID: <54738182-3438-4a58-8c33-27dc20a4b3fe@linux.ibm.com>
-Date: Wed, 11 Dec 2024 14:35:47 +0100
+	s=arc-20240116; t=1733924557; c=relaxed/simple;
+	bh=//aM2lAG9xBSYdK0Zd1rktWcH+zQpqdgJLKcA6MaQgM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KPfASEJFRYRy8a64EgICkHeHiMF/ZpqatsmIN3LXnTQV+NNMuKHT4xiVMgwbVzlzvn1Xm1drsKsa91eNJ3hAkGqP9BBC/TSobmug1HTnJ45SVd80P4MefYPIvmUHXfB5q6C41iwS7N66KN4dfMe6j50RzndT4fuQgSHa7ljDKwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YXghnRdb; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3863494591bso2110889f8f.1;
+        Wed, 11 Dec 2024 05:42:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733924554; x=1734529354; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0+Jj+YhZdReS15WwCWMzdZsF/agoNR+Ju4FNBhDdYtY=;
+        b=YXghnRdbmbCjkwBjPkVdBJ6v1yB0tEhAon1dDUfhw7+Ef5cn16yj6luL6s3O+WHBT6
+         GAYqwFtHzUxPRMeSm3IK/JcyKzrn1Cy0T/TZsiNz6izs62AyzObcJEewGmGh+g5xuccw
+         6jrdjBihWRCTV+ZDinRIRJpqvFx9IgC0tpOyN6+Rxpf64+0YWXab9SG5/9Gvi6ZMF9NK
+         w4sgeCWZYzwUvTAFAhUlzU4KXhRg4Ps/CIL36i59wGTNC4/DLTS232n1PerJ6P1Vtb49
+         TxkMttYbNuWbaF7NnVDBYnehcGILniIG0XSRv6x6mzabo9qbGzmd6cog27ItavIBs0+Z
+         +PUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733924554; x=1734529354;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0+Jj+YhZdReS15WwCWMzdZsF/agoNR+Ju4FNBhDdYtY=;
+        b=jF/PT4rc7aicgjY4noUh6w5qFJTeEkiI2eLQw7U5kf0tDgfPZhwS2ht8VhcfbCKKRE
+         NwxAQRrF8dajv2fLOLNA4OYRL/UOv5W4IiSqHRkEGGIvcVGm6MqjjchVVWy+QwH4CPF0
+         WL1v25kahH6N/vyXBOcvP23A4Zz7KZw+YAMJjt87TfQyuEMWri+eUcj7OFTE47R3UYmL
+         IWXvhXdcVn/6ZuaQDdzBA1guR+pjdek2/66GO2Naqc+bASIOdF00cYzwVepXvmvMmlxY
+         zuJeltoYcJOvqHw4tsMgNwegnW2HBOn5QC+4u8Q+pH2LmDF9a0bEoTiZTLlQUlkuZKbX
+         N74w==
+X-Forwarded-Encrypted: i=1; AJvYcCUfmJccrw7w6hqpGa87I0tW1De9x5fBKZP/AHZtRM7URQWcxqfc6wMRpTwE+EOqZ9Vdw7vrwSLFvonBBkk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweHnPQor7GkT08fq0RE2kzKlo0lgADu9onZhLB5LeiE5nJLAdq
+	7eGH53HB0Kb2YWjWRXvvWx1mfNHJ0XR/wO55FDz/5m/+qc3FPSe5
+X-Gm-Gg: ASbGncu3egMLBc4QnifdrXEMyTPgIwMqbGD6JKHT80evZbaEz0pWO8x57Nv+yvbIVUr
+	t6cHQXXaDS+9+gshtPwhb+zgGqfc2eFZmqtrUeDQ7AHzGVyFCzWjz8TNNv2COURYKyKWLYdC4yx
+	E2AqGkvsfUZI8qMZQDLqIV+CBHxLvi5Ny5IP/biZsxEHOQKMjCy35oZYNyZ0o+2twwuInglACNX
+	KCraUpu+JJtWIfhi5DuY91Cd2cdZGuV9tA9G74e2F4xvVB0GhlIXM67BDw6lw5x
+X-Google-Smtp-Source: AGHT+IG+2YYZETv1errh5l2XpjzbOI5e6j5nECnS+lXKoM4bG3C6YBGKE9JMjwpLNUmwg1jMjpVtyw==
+X-Received: by 2002:a05:6000:2ae:b0:386:4a16:dad7 with SMTP id ffacd0b85a97d-3864ce495c9mr2975553f8f.10.1733924553898;
+        Wed, 11 Dec 2024 05:42:33 -0800 (PST)
+Received: from gi4n-KLVL-WXX9.. ([2a01:e11:5400:7400:3efb:ead2:f2a7:dd86])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38782514e6asm1326818f8f.79.2024.12.11.05.42.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Dec 2024 05:42:33 -0800 (PST)
+From: Gianfranco Trad <gianf.trad@gmail.com>
+To: manishc@marvell.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	Gianfranco Trad <gianf.trad@gmail.com>
+Subject: [PATCH] qed: fix uninit pointer read in qed_mcp_nvm_info_populate()
+Date: Wed, 11 Dec 2024 14:40:42 +0100
+Message-ID: <20241211134041.65860-2-gianf.trad@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/mlx5e: Transmit small messages in linear skb
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
-        Dragos Tatulea <dtatulea@nvidia.com>
-Cc: Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-        Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>, David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Nils Hoppmann <niho@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Simon Horman <horms@kernel.org>,
-        Niklas Schnelle <schnelle@linux.ibm.com>
-References: <20241204140230.23858-1-wintera@linux.ibm.com>
- <a8e529b2-1454-4c3f-aa49-b3d989e1014a@intel.com>
- <8e7f3798-c303-44b9-ae3f-5343f7f811e8@linux.ibm.com>
- <554a3061-5f3b-4a7e-a9bd-574f2469f96e@nvidia.com>
- <bc9459f0-62b0-407f-9caf-d80ee37eb581@intel.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <bc9459f0-62b0-407f-9caf-d80ee37eb581@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 2w-Kl8r3XbVrtkmVuh3bDXP2BaosYrL1
-X-Proofpoint-GUID: -Ph2-HwnIgstGyLMG9Mj4OlSGqU9Shto
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
- lowpriorityscore=0 clxscore=1011 phishscore=0 impostorscore=0
- suspectscore=0 spamscore=0 mlxscore=0 priorityscore=1501 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412110099
+Content-Transfer-Encoding: 8bit
 
+Coverity reports an uninit pointer read in qed_mcp_nvm_info_populate().
+If qed_mcp_bist_nvm_get_num_images() returns -EOPNOTSUPP, this leads to
+jump to label out with nvm_info.image_att being uninit while assigning it
+to p_hwfn->nvm_info.image_att.
+Add check on rc against -EOPNOTSUPP to avoid such uninit pointer read.
 
+Closes: https://scan5.scan.coverity.com/#/project-view/63204/10063?selectedIssue=1636666
+Signed-off-by: Gianfranco Trad <gianf.trad@gmail.com>
+---
+Note:
+- Fixes: tag should be "7a0ea70da56e net/qed: allow old cards not supporting "num_images" to work" ?
+  
+ drivers/net/ethernet/qlogic/qed/qed_mcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 10.12.24 14:54, Alexander Lobakin wrote:
-> From: Dragos Tatulea <dtatulea@nvidia.com>
-> Date: Tue, 10 Dec 2024 12:44:04 +0100
-> 
->>
->>
->> On 06.12.24 16:20, Alexandra Winter wrote:
->>>
->>>
->>> On 04.12.24 15:32, Alexander Lobakin wrote:
->>>>> @@ -269,6 +270,10 @@ static void mlx5e_sq_xmit_prepare(struct mlx5e_txqsq *sq, struct sk_buff *skb,
->>>>>  {
->>>>>  	struct mlx5e_sq_stats *stats = sq->stats;
->>>>>  
->>>>> +	/* Don't require 2 IOMMU TLB entries, if one is sufficient */
->>>>> +	if (use_dma_iommu(sq->pdev) && skb->truesize <= PAGE_SIZE)
->>>    +		skb_linearize(skb);
->>>> 1. What's with the direct DMA? I believe it would benefit, too?
->>>
->>>
->>> Removing the use_dma_iommu check is fine with us (s390). It is just a proposal to reduce the impact.
->>> Any opinions from the NVidia people?
->>>
->> Agreed.
->>
->>>
->>>> 2. Why truesize, not something like
->>>>
->>>> 	if (skb->len <= some_sane_value_maybe_1k)
->>>
->>>
->>> With (skb->truesize <= PAGE_SIZE) the whole "head" buffer fits into 1 page.
->>> When we set the threshhold at a smaller value, skb->len makes more sense
->>>
->>>
->>>>
->>>> 3. As Eric mentioned, PAGE_SIZE can be up to 256 Kb, I don't think
->>>>    it's a good idea to rely on this.
->>>>    Some test-based hardcode would be enough (i.e. threshold on which
->>>>    DMA mapping starts performing better).
->>>
->>>
->>> A threshhold of 4k is absolutely fine with us (s390). 
->>> A threshhold of 1k would definitvely improve our situation and bring back the performance for some important scenarios.
->>>
->>>
->>> NVidia people do you have any opinion on a good threshhold?
->>>
-
-On 09.12.24 12:36, Tariq Toukan wrote:
-> Hi,
-> 
-> Many approaches in the past few years are going the opposite direction, trying to avoid copies ("zero-copy").
-> 
-> In many cases, copy up to PAGE_SIZE means copy everything.
-> For high NIC speeds this is not realistic.
-> 
-> Anyway, based on past experience, threshold should not exceed "max header size" (128/256b).
-
->> 1KB is still to large. As Tariq mentioned, the threshold should not
->> exceed 128/256B. I am currently testing this with 256B on x86. So far no
->> regressions but I need to play with it more.
-> 
-> On different setups, usually the copybreak of 192 or 256 bytes was the
-> most efficient as well.
-> 
->>
-
-
-Thank you very much, everybody for looking into this.
-
-Unfortunately we are seeing these performance regressions with ConnectX-6 cards on s390
-and with this patch we get up to 12% more transactions/sec even for 1k messages.
-
-As we're always using an IOMMU and are operating with large multi socket systems,
-DMA costs far outweigh the costs of small to medium memcpy()s on our system.
-We realize that the recommendation is to just run without IOMMU when performance is important,
-but this is not an option in our environment.
-
-I understand that the simple patch of calling skb_linearize() in mlx5 for small messages is not a
-strategic direction, it is more a simple mitigation of our problem.
-
-Whether it should be restricted to use_dma_iommu() or not is up to you and your measurements.
-We could even restrict it to S390 arch, if you want.
-
-A threshold of 256b would cover some amount of our typical request-response workloads
-(think database queries/updates), but we would prefer a higher number (e.g. 1k or 2k).
-Could we maybe define an architecture dependent threshold?
-
-My preferred scenario for the next steps would be the following:
-1) It would be great if we could get a simple mitigation patch upstream, that the distros could
-easily backport. This would avoid our customers experiencing performance regression when they
-upgrade their distro versions. (e.g. from RHEL8 to RHEL9 or RHEL10 just as an example)
-
-2) Then we could work on a more invasive solution. (see proposals by Eric, Dragos/Saeed).
-This would then replace the simple mitigation patch upstream, and future releases would contain 
-that solution. If somebody else wants to work on this improved version, fine with me, otherwise
-I could give it a try.
-
-What do you think of this approach?
-
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_mcp.c b/drivers/net/ethernet/qlogic/qed/qed_mcp.c
+index b45efc272fdb..127943b39f61 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_mcp.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_mcp.c
+@@ -3387,7 +3387,7 @@ int qed_mcp_nvm_info_populate(struct qed_hwfn *p_hwfn)
+ 	}
+ out:
+ 	/* Update hwfn's nvm_info */
+-	if (nvm_info.num_images) {
++	if (nvm_info.num_images && rc != -EOPNOTSUPP) {
+ 		p_hwfn->nvm_info.num_images = nvm_info.num_images;
+ 		kfree(p_hwfn->nvm_info.image_att);
+ 		p_hwfn->nvm_info.image_att = nvm_info.image_att;
+-- 
+2.43.0
 
 
