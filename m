@@ -1,101 +1,103 @@
-Return-Path: <netdev+bounces-150964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A1E9EC315
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 04:20:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4032D9EC31A
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 04:20:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0859918877F9
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:20:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4659B166770
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D14220B210;
-	Wed, 11 Dec 2024 03:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF4E20C000;
+	Wed, 11 Dec 2024 03:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nkzZ/oVr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H0Ada3Xt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213AAF9E6;
-	Wed, 11 Dec 2024 03:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAD6209F40
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 03:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733887217; cv=none; b=dTfXsDCJxidAmiHepKTi2hk46a9NwNShS+O82uJ7+P9+UjfSDV2mYx2O40GdKGdcJPco/P65+TA2VQ0jhquSZSbeT9VRTA0adKi/RdThu7bNCAwNO6QANHrylwXTI8Xk0/0UdZU6HZmURwn4DkvkV/5hhHfcbaSkM1Q2Qs5pfmA=
+	t=1733887250; cv=none; b=tzAxsfi5ncCA3csMAlYHJDzzuZB9bBcKkM108WyC8S16IQN5CaA4imyhVHn64Njxt9u9mNVXKTR5dehv9Pim6Efb3lOcgJ22at5UFLvk1lbG626zIho8M23lvRJT1341k9k+gylI1r05EMojBeecJ/Pj1YRPaGM3IXPMTo2lA48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733887217; c=relaxed/simple;
-	bh=17Duc3CAKDXdm8/1QwlEBB9jroPiU4zGXbLKeH6fjBI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ga4z3twJJRobAzPdBaN7fziBVB1JLRbg51q7QI29jHbgYFnDvm9bI/pK95QG3lZ5jirZq8ArTNLW59h1S7nTokCWuM8H6bFwu2JHfIPgBZ/dP54E9k/UY7ksS564SkiK46scgfSvTVNrchgzGTfTW9N29sUu3/42Gxt/dC2fVG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nkzZ/oVr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A87C4CED6;
-	Wed, 11 Dec 2024 03:20:16 +0000 (UTC)
+	s=arc-20240116; t=1733887250; c=relaxed/simple;
+	bh=XCY0pXlzNw/8pmnbv7v2GtOBQPku5J4SBwfsoz/32Lw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kaGYH4ofLJj/tiVT/N1spCachr2yDBj6jNESqE4tYtuX5aQMGkXXVOQ0j9bZ8SsVAbjhzeMyItPPu1aI1WFizXk/jdFB+QoWEWm3VrF1Tos+U+RE7qWXvm8OzinXA3GDyxyuBdHMyoEMFOO0rzWBxA2+JLNVz6TYlRgLo9cjiYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H0Ada3Xt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91741C4CED6;
+	Wed, 11 Dec 2024 03:20:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733887216;
-	bh=17Duc3CAKDXdm8/1QwlEBB9jroPiU4zGXbLKeH6fjBI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nkzZ/oVrlrHs/HrSESs/cs+T+hUiaoqnQ6zUsozfdEWuAO71obWuCvN8aBlZbh55N
-	 Md3qL/ZK7vlN2M5ni3USt7wwMdkYOB8dJ6Zq2MDjr40tmoJFRXceXr5+cJ0ClRT3G+
-	 xneFI1s0Yyw85tGFXHRDVUY/2l+L8BJAWGdjuCb8SEeGa1vqssM+44Ku7hfa0hoaDu
-	 +JuASJ63qYeGEIsn93W9NL8hy/SzcFQPdNRYF8t70u+qpf/TUcnIOSiV1tZrH8E3C8
-	 xCd1hM9jP7aSOsfhAAhLz/fuKMFqwMskrUAZ9mIuRSBa8wP7XPf0RNea72tuGcFscn
-	 HfvLkGu8Fan6A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF40380A954;
-	Wed, 11 Dec 2024 03:20:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1733887249;
+	bh=XCY0pXlzNw/8pmnbv7v2GtOBQPku5J4SBwfsoz/32Lw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=H0Ada3XtIYw+muYZwXqVd2BeTW+xOaGovOKzGVtoEggJ0dRXTSDy0yC3eWN1ZLZ5/
+	 Y/IWFcBE/jDUPkS/YI/OmjiN2BTsULHac25Y+VsmGXi+3VRmsXhH9rKDqsJsxZ4ajx
+	 c+p9PxXuSV8H557uj5xu3Jfde0QZkxO4uX6SLYNQH2bdE+jrz8N/QNvo+NizFxWrBR
+	 oe8XIsrSaZbquTfgooD8QfzeeZwKd2qR5WsA44m/YrdQES1/B2iheX0X7tmkPhNS/5
+	 Oa9WifiBzbHHjAXHfockimIiloFXtwifSnLhVJhT8qDb46l+SLGbmotosJDVM2R+5X
+	 u8u9JparMZwjQ==
+Date: Tue, 10 Dec 2024 19:20:48 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>, Feng Wang
+ <wangfe@google.com>
+Cc: Leon Romanovsky <leon@kernel.org>, <netdev@vger.kernel.org>,
+ <antony.antony@secunet.com>, <pabeni@redhat.com>
+Subject: Re: [PATCH v7] xfrm: add SA information to the offloaded packet
+ when if_id is set
+Message-ID: <20241210192048.386d518a@kernel.org>
+In-Reply-To: <Z1gMGlYPCywoqJK5@gauss3.secunet.de>
+References: <20241209202811.481441-2-wangfe@google.com>
+	<20241209215301.GC1245331@unreal>
+	<CADsK2K_NnizU+oY02PW9ZAiLzyPH=j=LYyjHnzgcMptxr95Oyg@mail.gmail.com>
+	<Z1gMGlYPCywoqJK5@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: renesas: rswitch: handle stop vs interrupt race
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173388723251.1105799.6013882460430110390.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Dec 2024 03:20:32 +0000
-References: <20241209113204.175015-1-nikita.yoush@cogentembedded.com>
-In-Reply-To: <20241209113204.175015-1-nikita.yoush@cogentembedded.com>
-To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Cc: yoshihiro.shimoda.uh@renesas.com, andrew@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- geert+renesas@glider.be, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
- michael.dege@renesas.com, christian.mardmoeller@renesas.com,
- dennis.ostermann@renesas.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon,  9 Dec 2024 16:32:04 +0500 you wrote:
-> Currently the stop routine of rswitch driver does not immediately
-> prevent hardware from continuing to update descriptors and requesting
-> interrupts.
+On Tue, 10 Dec 2024 10:38:34 +0100 Steffen Klassert wrote:
+> > This patch was done based on our previous discussion.  I did the
+> > changes we agreed on.  
 > 
-> It can happen that when rswitch_stop() executes the masking of
-> interrupts from the queues of the port being closed, napi poll for
-> that port is already scheduled or running on a different CPU. When
-> execution of this napi poll completes, it will unmask the interrupts.
-> And unmasked interrupt can fire after rswitch_stop() returns from
-> napi_disable() call. Then, the handler won't mask it, because
-> napi_schedule_prep() will return false, and interrupt storm will
-> happen.
+> there is still no real packet offload support for netdev sim.
+> And as said, this is at most the second best option.
 > 
-> [...]
+> You need to prove that this works. I want a complete API,
+> but I also want a working one.
+> 
+> The easiest way to prove that this is implemented correctly
+> is to upstream your driver. Everyting else is controversial
+> and complicated.
 
-Here is the summary with links:
-  - [net] net: renesas: rswitch: handle stop vs interrupt race
-    https://git.kernel.org/netdev/net/c/3dd002f20098
+Yes, I don't have full context but FWIW offload changes accompanied 
+by just netdevsim modifications raise a red flag:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Quoting documentation:
 
-
+  netdevsim
+  ~~~~~~~~~
+  
+  ``netdevsim`` is a test driver which can be used to exercise driver
+  configuration APIs without requiring capable hardware.
+  Mock-ups and tests based on ``netdevsim`` are strongly encouraged when
+  adding new APIs, but ``netdevsim`` in itself is **not** considered
+  a use case/user. You must also implement the new APIs in a real driver.
+  
+  We give no guarantees that ``netdevsim`` won't change in the future
+  in a way which would break what would normally be considered uAPI.
+  
+  ``netdevsim`` is reserved for use by upstream tests only, so any
+  new ``netdevsim`` features must be accompanied by selftests under
+  ``tools/testing/selftests/``.
+  
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#netdevsim
 
