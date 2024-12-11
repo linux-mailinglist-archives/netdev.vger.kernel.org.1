@@ -1,195 +1,153 @@
-Return-Path: <netdev+bounces-150984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E20869EC455
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 06:30:29 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A7049EC472
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 06:50:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 695771669C8
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 05:50:14 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83681C07CF;
+	Wed, 11 Dec 2024 05:50:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YAAb+HOn"
+X-Original-To: netdev@vger.kernel.org
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 560B8280E01
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 05:30:28 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD0261C1F0C;
-	Wed, 11 Dec 2024 05:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="tv93OZCW"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AC34C85
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 05:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF7E286331
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 05:50:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733895023; cv=none; b=AaQ2AFBzTuQbUfpPAl0QrVUV0saUF1gpbvgomkAEjpMAEU/dwZipZtuWqmDhWAVI9m8fQeLew0JHNA5YgOjnOL82+W4FXlicqeu0h1kMMJbrkhyJHjsvcrmDfcsZelBWlMbfndxApIY34UEBX4+OELLeVUTFk85G28aJli1ZWIc=
+	t=1733896212; cv=none; b=NDJKVC4T8fYZjqfGTcu5TNhYeOltBtilgcxombJ/vCCuk8LKaiAVcqkejs7Tdv2pA+7bnaNH0DUzBQgBj6brGGxZCFYeuhshaD1+KuP/IekfMeMXYBRgTJnzIvV4T8lk1NcW9aLQ11KbNBnuKXtCCvv0peOKCVFwzkU5znGxKZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733895023; c=relaxed/simple;
-	bh=WjStt6KCmPyjA0UUxxptllAJ1zIxzLzoXkXCuU8sFB4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dyvGPG4t0+N83ss8LX+2RE6GwZcRy91LlIjKTR69d25hwTltFrgi9MCcneD1lq8vrWcXozV38eWMw/71lP0GvGYOJ48OKr4Anjpyt6Q3AvYoHly8DzfvbPBdhXnfY92+sW5CmH7eBBn1VW/BIRvGwFtN9wCuBLC6w9JqTRwDhqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=tv93OZCW; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-54025432becso1752990e87.1
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 21:30:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1733895019; x=1734499819; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JohBzc6SIbwiwfBt8MJ3uGvt7oRvwtZBP0CDs+EpYnY=;
-        b=tv93OZCW/YwbXOQaLqYjTWAqH1mAdjeVIzAhBA18FekKyURnyFtWKbXZJ29k1ipS0x
-         0GOqutadFyUj1avm8kPLEGn0FEWtQk62rw0F+VqWK/mP6nMERZehmXRvSwRLloCJ6fL1
-         D4a4p5mdl/tJfPA7sXLYNgzFwheEE/v1XcmOLb0ciaevN4nVWDWaAErXkPpyY1zfPPHP
-         468jZpqLQ/orCS4BHjBuYmbvXf32l9/Rce/ASEYlSN5AlccQ+UWZbYXW+qIy+vAPr5xJ
-         PWpHH+Md5D8pLqGSQuSAuPzkr0r1NsnprvcdiYcUIXPj51Ci9eqtCM91JMg1+UMRpTS8
-         GfHg==
+	s=arc-20240116; t=1733896212; c=relaxed/simple;
+	bh=pTw6+HXewQVV4V8HC5eH2eUX2bdmmcmJFKzFd4Ir55k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rESuWhLdptfmQpVNFbYo9O+8hv+fLKBL/8hEO5Ow1zRTJ4NY1z7VU+MuXy/872/TRd72JcWDJ/RsIKDyfYJDNt6QcrAFRKwABa4vychoa+GTvdNJ4bivzhvIeGgjcMK5YvqWm6YU0Cm4KIUhvbH3gZwGWPQpTYPlTr7IIZaumjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YAAb+HOn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733896209;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LZKzAJOTVUI2+3jv44AVXBEr1V6z3Mv6Ud2xQd2hF/E=;
+	b=YAAb+HOn9W98+sMigt5SEtA41c9cdmix21RyPLMpWpTVkcBkZZGjrABbYrWbMG5KmdPtPB
+	N7v1jF97/xW2UT5MZX0WNAHTRrMmfZw2+ZGaCHw5kdQr0KyYrYhuZT6ItoGuiAbN9D6n7C
+	FV7PPj6MJoul4RnwI03P0JHv3x2FKKY=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-602-d2v6GU5SMsGvXowDUr9qdA-1; Wed, 11 Dec 2024 00:50:07 -0500
+X-MC-Unique: d2v6GU5SMsGvXowDUr9qdA-1
+X-Mimecast-MFC-AGG-ID: d2v6GU5SMsGvXowDUr9qdA
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-aa6732a1af5so13835666b.3
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 21:50:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733895019; x=1734499819;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JohBzc6SIbwiwfBt8MJ3uGvt7oRvwtZBP0CDs+EpYnY=;
-        b=APDvLxVFfj/L0tWLINlvsNHsinQV3tedAxY2lThMqd5WBjU4T0nDl/XJMUqOrSI6H0
-         EW5oIoWMrfIZETqf8Bhsf2TIDWozBOlY7l/q4/ZiY/DF5QOpOsv/c2kGRUPFC7+ojoSX
-         KnND4BkBH8XnYOCa2Ci3nsP0DqnrWPz4wMCiG5cyJ4oDb/2pf2LE8M/Mm8+AtxZFG1gC
-         wGT+RMK3SeEhGsrViqp0sTpdaxUVXg8EHe77n1Yx65/Q4fUa9Z2dMi5/g2lJjIqNIoc+
-         ni2gpC8lNZjK/m9QHgVFuURqpCqrNFIX6V+mBcfxax3lpeYnZf+JqSRrA455nO8bcyYL
-         OiIw==
-X-Gm-Message-State: AOJu0YyJwGZJTt8xPBl0vh/lFL+HVXgnWNPsGrzTBGdsqm5R0L1wbW9G
-	9nKpcEHANTwveRUrw2ITJ4lykbmFOMgJyMt3PNOUgAaIKdkQQln3RGM305tY1/LlgWcVMJ3t7+B
-	YPnc=
-X-Gm-Gg: ASbGnctRrFg1QDw59WIw8t3/fvAhYvMNosYCBYagMjq+uVo8+K6R7AGj8iXt8AS+LmQ
-	sQdup/KFDV7sCwi43deVK/k428Mtsa65J8fWVomDI94csffLl/Gc3Ip8yyCeQIt4hQyWHulX5OF
-	sm6laccRxp+7cWbxoTEu3xvf18NUmy+NU+FrmnbVAzhjMASmqqBAp05UpK7Bo2VyB1//HXjkV3A
-	4iUy1V1soQfpKO1bXgK3PeXJsS166QnsRxAtaYi0HqsWDpzTp4tO72qUMS0+Nxa7q1F
-X-Google-Smtp-Source: AGHT+IF/6paNyWnK5s7sNDNe+xdCVS9id0CRa3T10BRNgQZGzD3tcn5rO5sJvrkylZtSPBA99NeIFw==
-X-Received: by 2002:a05:6512:1049:b0:540:2188:763c with SMTP id 2adb3069b0e04-5402a602133mr321217e87.37.1733895018632;
-        Tue, 10 Dec 2024 21:30:18 -0800 (PST)
-Received: from cobook.home ([91.198.101.25])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5401bd77e6asm1022025e87.283.2024.12.10.21.30.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 21:30:18 -0800 (PST)
-From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michael Dege <michael.dege@renesas.com>,
-	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
-	Dennis Ostermann <dennis.ostermann@renesas.com>,
-	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Subject: [PATCH net v2] net: renesas: rswitch: fix initial MPIC register setting
-Date: Wed, 11 Dec 2024 10:30:12 +0500
-Message-Id: <20241211053012.368914-1-nikita.yoush@cogentembedded.com>
-X-Mailer: git-send-email 2.39.5
+        d=1e100.net; s=20230601; t=1733896206; x=1734501006;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LZKzAJOTVUI2+3jv44AVXBEr1V6z3Mv6Ud2xQd2hF/E=;
+        b=E2VPzPACHxleSAUMgUdblme5SmnnxvPxPDn+3yA1HWl3FEHu2VH5oLo8Bs1cVeXpDk
+         3BkRS630agj4aWQ/rascK9mVaJ+sDWYOR9h6Ko7LwJg89W/KGS5HNQGFTEmbx/eUBTmw
+         9uXBXeXZyKNa+M9+KUNBrq2zBmzdqs5xuLQ2KDbbakB2SPZzZBRObmoMf4fQF4bbLZQp
+         Ac/W+J/bmG1aE/uIaRHynqq4+C2HyRqY/1YBkkZo5gOiDHHPDi37jfaH00957KLsQ9TC
+         VRJUPrjVFk1n9emPgD1l5bhAtWpSdXV/i/WBTR2DfHjntMQiWLZBfQ0lHG2kmohPFjqD
+         QShA==
+X-Forwarded-Encrypted: i=1; AJvYcCXnI1RrZK4xYPDagsURxtdIDNHXaAEoBu1dqPHU7QH1eK3IvCgUwoE/BB2ZH6yXjeIB0KGyE+c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCUR5VDuPU3F8sc+62hX3cEe/0xUJJdbZcZ7hi8Q8G1eOxAu5b
+	PuOHVm6+JyiQKRurT1E2wgx8vgTlKeGwLqt3vVsflMoRZcqi3XrTh0NkFIzuI/9m2avM5uy1Ucy
+	2w6/dzM7/IVxK51sQfa2euAjsp3A2JF15wbryOW40LVJgUlj53XnVG9AUJ6j7rDa+ars3bHXASk
+	+kZLmDt31kN/UZQzbkmYhXd5STpd4M
+X-Gm-Gg: ASbGncvl1uyPH4IZBn95u26XRirIXacNMS3czjYirTE4TYzezyS8LdYVhRWZYLvsfXA
+	uOvAWzxU33oDHhPHPR5AUDBWxVFY+T2MuNO1v
+X-Received: by 2002:a17:907:7702:b0:aa6:acd6:b30d with SMTP id a640c23a62f3a-aa6b1396eabmr113659066b.48.1733896206572;
+        Tue, 10 Dec 2024 21:50:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEpDct7ZNNOFQqgGk4S0pzIyNtjEkcahpRAQ25cSBOXT+i/S1uQlOHn7d+0GcNwBJsWFR2bkTyTMTH2AqxqVS8=
+X-Received: by 2002:a17:907:7702:b0:aa6:acd6:b30d with SMTP id
+ a640c23a62f3a-aa6b1396eabmr113657466b.48.1733896206265; Tue, 10 Dec 2024
+ 21:50:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241206011047.923923-1-koichiro.den@canonical.com> <173382722925.756341.2427257382387957687.git-patchwork-notify@kernel.org>
+In-Reply-To: <173382722925.756341.2427257382387957687.git-patchwork-notify@kernel.org>
+From: Lei Yang <leiyang@redhat.com>
+Date: Wed, 11 Dec 2024 13:49:29 +0800
+Message-ID: <CAPpAL=xJ9_-TU=9rhtdR78g-SVSn9vOMBr0vaA8VbP+eLykvFQ@mail.gmail.com>
+Subject: Re: [PATCH net v4 0/6] virtio_net: correct netdev_tx_reset_queue()
+ invocation points
+To: Koichiro Den <koichiro.den@canonical.com>
+Cc: virtualization@lists.linux.dev, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	jiri@resnulli.us, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	patchwork-bot+netdevbpf@kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-MPIC.PIS must be set per phy interface type.
-MPIC.LSC must be set per speed.
+I tested this series v4 patches with virtio-net regression tests, all
+cases test pass. But I hit a bug
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219588, only judging from
+call trace info it should be a CPU issue, and not related to the
+current patch.
 
-Do that strictly per datasheet, instead of hardcoding MPIC.PIS to GMII.
+Tested-by: Lei Yang <leiyang@redhat.com>
 
-Fixes: 3590918b5d07 ("net: ethernet: renesas: Add support for "Ethernet Switch"")
-Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
----
-v1: https://lore.kernel.org/netdev/20241209075951.163924-1-nikita.yoush@cogentembedded.com/
-changes: regenerate against top of net tree (commit 3dd002f20098 "net:
-         renesas: rswitch: handle stop vs interrupt race") to ensure it
-         applies cleanly
----
- drivers/net/ethernet/renesas/rswitch.c | 27 ++++++++++++++++++++------
- drivers/net/ethernet/renesas/rswitch.h | 14 ++++++-------
- 2 files changed, 28 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index 6ec714789573..dbbbf024e7ab 100644
---- a/drivers/net/ethernet/renesas/rswitch.c
-+++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -1116,25 +1116,40 @@ static int rswitch_etha_wait_link_verification(struct rswitch_etha *etha)
- 
- static void rswitch_rmac_setting(struct rswitch_etha *etha, const u8 *mac)
- {
--	u32 val;
-+	u32 pis, lsc;
- 
- 	rswitch_etha_write_mac_address(etha, mac);
- 
-+	switch (etha->phy_interface) {
-+	case PHY_INTERFACE_MODE_SGMII:
-+		pis = MPIC_PIS_GMII;
-+		break;
-+	case PHY_INTERFACE_MODE_USXGMII:
-+	case PHY_INTERFACE_MODE_5GBASER:
-+		pis = MPIC_PIS_XGMII;
-+		break;
-+	default:
-+		pis = FIELD_GET(MPIC_PIS, ioread32(etha->addr + MPIC));
-+		break;
-+	}
-+
- 	switch (etha->speed) {
- 	case 100:
--		val = MPIC_LSC_100M;
-+		lsc = MPIC_LSC_100M;
- 		break;
- 	case 1000:
--		val = MPIC_LSC_1G;
-+		lsc = MPIC_LSC_1G;
- 		break;
- 	case 2500:
--		val = MPIC_LSC_2_5G;
-+		lsc = MPIC_LSC_2_5G;
- 		break;
- 	default:
--		return;
-+		lsc = FIELD_GET(MPIC_LSC, ioread32(etha->addr + MPIC));
-+		break;
- 	}
- 
--	iowrite32(MPIC_PIS_GMII | val, etha->addr + MPIC);
-+	rswitch_modify(etha->addr, MPIC, MPIC_PIS | MPIC_LSC,
-+		       FIELD_PREP(MPIC_PIS, pis) | FIELD_PREP(MPIC_LSC, lsc));
- }
- 
- static void rswitch_etha_enable_mii(struct rswitch_etha *etha)
-diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
-index 72e3ff596d31..e020800dcc57 100644
---- a/drivers/net/ethernet/renesas/rswitch.h
-+++ b/drivers/net/ethernet/renesas/rswitch.h
-@@ -724,13 +724,13 @@ enum rswitch_etha_mode {
- 
- #define EAVCC_VEM_SC_TAG	(0x3 << 16)
- 
--#define MPIC_PIS_MII		0x00
--#define MPIC_PIS_GMII		0x02
--#define MPIC_PIS_XGMII		0x04
--#define MPIC_LSC_SHIFT		3
--#define MPIC_LSC_100M		(1 << MPIC_LSC_SHIFT)
--#define MPIC_LSC_1G		(2 << MPIC_LSC_SHIFT)
--#define MPIC_LSC_2_5G		(3 << MPIC_LSC_SHIFT)
-+#define MPIC_PIS		GENMASK(2, 0)
-+#define MPIC_PIS_GMII		2
-+#define MPIC_PIS_XGMII		4
-+#define MPIC_LSC		GENMASK(5, 3)
-+#define MPIC_LSC_100M		1
-+#define MPIC_LSC_1G		2
-+#define MPIC_LSC_2_5G		3
- 
- #define MDIO_READ_C45		0x03
- #define MDIO_WRITE_C45		0x01
--- 
-2.39.5
+On Tue, Dec 10, 2024 at 6:40=E2=80=AFPM <patchwork-bot+netdevbpf@kernel.org=
+> wrote:
+>
+> Hello:
+>
+> This series was applied to netdev/net.git (main)
+> by Paolo Abeni <pabeni@redhat.com>:
+>
+> On Fri,  6 Dec 2024 10:10:41 +0900 you wrote:
+> > When virtnet_close is followed by virtnet_open, some TX completions can
+> > possibly remain unconsumed, until they are finally processed during the
+> > first NAPI poll after the netdev_tx_reset_queue(), resulting in a crash
+> > [1]. Commit b96ed2c97c79 ("virtio_net: move netdev_tx_reset_queue() cal=
+l
+> > before RX napi enable") was not sufficient to eliminate all BQL crash
+> > scenarios for virtio-net.
+> >
+> > [...]
+>
+> Here is the summary with links:
+>   - [net,v4,1/6] virtio_net: correct netdev_tx_reset_queue() invocation p=
+oint
+>     https://git.kernel.org/netdev/net/c/3ddccbefebdb
+>   - [net,v4,2/6] virtio_net: replace vq2rxq with vq2txq where appropriate
+>     https://git.kernel.org/netdev/net/c/4571dc7272b2
+>   - [net,v4,3/6] virtio_ring: add a func argument 'recycle_done' to virtq=
+ueue_resize()
+>     https://git.kernel.org/netdev/net/c/8d6712c89201
+>   - [net,v4,4/6] virtio_net: ensure netdev_tx_reset_queue is called on tx=
+ ring resize
+>     https://git.kernel.org/netdev/net/c/1480f0f61b67
+>   - [net,v4,5/6] virtio_ring: add a func argument 'recycle_done' to virtq=
+ueue_reset()
+>     https://git.kernel.org/netdev/net/c/8d2da07c813a
+>   - [net,v4,6/6] virtio_net: ensure netdev_tx_reset_queue is called on bi=
+nd xsk for tx
+>     https://git.kernel.org/netdev/net/c/76a771ec4c9a
+>
+> You are awesome, thank you!
+> --
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
+>
+>
+>
 
 
