@@ -1,144 +1,158 @@
-Return-Path: <netdev+bounces-151061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91EB79EC9E4
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 11:02:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C6109EC88C
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:12:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F6E21882787
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:02:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FCFA18846A4
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 09:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D31C8489;
-	Wed, 11 Dec 2024 10:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="uQEbUnaz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C34E72210D4;
+	Wed, 11 Dec 2024 09:12:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BECB236FAA
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 10:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D872210C6;
+	Wed, 11 Dec 2024 09:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733911332; cv=none; b=MZ9LykIp1JSS6S4l5V/W2KZELGTtiguDkskzW3EgHQccRnGJb8CsLMi1oegZJnEDlBMEnAxR3nj8Gzyhz0Cr7ReBsXaeOF78oPGDJiLiUYHL7wzT9cpwQwZY3wrC61KBDYKnSj2SvHAcLQ8p3eKlvgJSeAzQuOXN+pjXF4JjjfM=
+	t=1733908338; cv=none; b=kwup7nAafQy7lABhNw+HzkR3smHV2LUhLKbA2XB2f0sHbPIEj7ELstSxP2dwh82+OYDb3Y5zZe/uQy6Wk/wLGejuQoP4XiwtXsfA/IyYgrcVeynRQiBaVHqukFU6KUhy/Q7DI+t+H6Mn3uj55N2SM0ffdvgT5XLv3yG8SIOvx8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733911332; c=relaxed/simple;
-	bh=Dut1NhVxVHSy/Ur7XDadQQlvvZTNCqRf9cylHsZK7ss=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pXM4O3fifTz8v1X3E0gPRgtJRa6509IW+toxVdW7R26ReXt8nFbUidclD0QSihlA0vUSqNMvaqGTO028+MlqdqfvHsuAHyZOnFw79XFUyjHjHPXmSOcYz1j9lMcU8OD25TeKQ6Q78QGGlHwyBaLd10Z1kdvVfvwuOS1tEZcxBSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=uQEbUnaz; arc=none smtp.client-ip=202.12.124.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 081C72540224;
-	Wed, 11 Dec 2024 05:02:09 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Wed, 11 Dec 2024 05:02:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1733911328; x=1733997728; bh=csUAyW/GabKpNjwNH03rm+A8M4jUj03HMJL
-	U/3eUnOU=; b=uQEbUnazMVaMM9JRXjtIQ8aBm9oILTaOra8lh8p+U9w1eccbZf8
-	EN9sw6oH3+YQzS5eyQBvGaPx4EOIvzY7Und1cQz4TwddRJ0aZ90w7sMpI4qSZTH2
-	W9dFH5i+Axjlg/aiQ1LyZFJ/M31R/Uzd+ZNBB+Xc0IK2IEym25bATcJpx26mPAEF
-	ZmuUi7EGwhy0JPFfmsF/ObC2dh1JgYS5leqnLowqnv+SGuIQnvggZfsYeS5iR+Q6
-	oc9Fm7rSFiy8CvEnBwEV43PrtEGZLiIBpD1d2CA3CrzW936BDjw0K2IR5vtVQPXY
-	6jq1SbXrXT8YasP2JH0Iz37g2m4Bq4onWTQ==
-X-ME-Sender: <xms:H2NZZ47X6z6ZxIn4X-WuzNLCf270MIW4qOegGwQDozTaZBUyT9Shaw>
-    <xme:H2NZZ5538tA4hdtGMudolehalope1vSDxl2Yn0jf-kA-VelNuEklt3pq5cmw0nu4u
-    suTa8WbpFROU1o>
-X-ME-Received: <xmr:H2NZZ3c6vQ80i3hxTUZyb-m_XKFzBHyJ_z0t4gUs2ARQtTF4YMeULR33MeTFA_qP6h433pkI5Vcfia0sDcst5NPmV-E>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkedtgdduudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecu
-    hfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorh
-    hgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefg
-    leekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthho
-    peejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhnrggvmhgvshgvnhihih
-    hrihesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghr
-    nhgvlhdrohhrghdprhgtphhtthhopehfvghjvghssehinhhfrdgvlhhtvgdrhhhupdhrtg
-    hpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgs
-    rgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtg
-    homhdprhgtphhtthhopeifihhllhgvmhgssehgohhoghhlvgdrtghomh
-X-ME-Proxy: <xmx:H2NZZ9I6sBIZ-2iqfjfTVt7GfwCCwaBDBaLiDYPe8-37_60OSRmmvw>
-    <xmx:H2NZZ8J7vdt8Yzbkgmyhp8BDWDqPKXrK3dRzGQQasZPjnqUSr5ZxkA>
-    <xmx:H2NZZ-yZnKACAnuXXnA2F99lNXY0ozvNxsWLO7hElZJk4JR_RLfMZw>
-    <xmx:H2NZZwIjJRVP1lB2dA9B9ndq8e-2aeMlemW6ED5LBguHVawgxPl2Bw>
-    <xmx:IGNZZ088VmnxBEuix03XN5xImhHQpI78olybXhmcc8Oz8ZO8yua9ztOE>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 11 Dec 2024 05:02:01 -0500 (EST)
-Date: Wed, 11 Dec 2024 12:01:58 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, willemb@google.com
-Subject: Re: [PATCH net-next v6 3/4] selftests: net: test SO_PRIORITY
- ancillary data with cmsg_sender
-Message-ID: <Z1ljFkEk3jZHRGl3@shredder>
-References: <20241210191309.8681-1-annaemesenyiri@gmail.com>
- <20241210191309.8681-4-annaemesenyiri@gmail.com>
+	s=arc-20240116; t=1733908338; c=relaxed/simple;
+	bh=Knj5TIsDQgyLg8p5+cY2aWCAJDz82Z4lK2SWfH0yCD8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=heaIi3xNiS74qT0/6CN5ry05rRPFcP0IpBE1wctF7C6zRx2PRkyKRD0YSqNA01fQmawPP2pjVYqPLUxC/2D+q1TBaNj+YOAegmkWPxClpYg3aeMbvCtdXPdl7DOwvuo+SuiBdzo/au9NtZ56UVqw7Ql/4a84vX1vZ5mSxnNS//Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BB7fYB5012824;
+	Wed, 11 Dec 2024 09:12:05 GMT
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 43cx4xbybu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 11 Dec 2024 09:12:04 +0000 (GMT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Wed, 11 Dec 2024 01:12:03 -0800
+Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Wed, 11 Dec 2024 01:11:59 -0800
+From: <jianqi.ren.cn@windriver.com>
+To: <cratiu@nvidia.com>, <gregkh@linuxfoundation.org>
+CC: <dtatulea@nvidia.com>, <tariqt@nvidia.com>, <pabeni@redhat.com>,
+        <patches@lists.linux.dev>, <stable@vger.kernel.org>,
+        <saeedm@nvidia.com>, <leon@kernel.org>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <roid@nvidia.com>,
+        <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH 6.1.y] net/mlx5e: Don't call cleanup on profile rollback failure
+Date: Wed, 11 Dec 2024 18:09:53 +0800
+Message-ID: <20241211100953.2069964-1-jianqi.ren.cn@windriver.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241210191309.8681-4-annaemesenyiri@gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: QoGXlSgbYD0qKXE6BvwAKD0aea_IgHQn
+X-Proofpoint-ORIG-GUID: QoGXlSgbYD0qKXE6BvwAKD0aea_IgHQn
+X-Authority-Analysis: v=2.4 cv=Y/UCsgeN c=1 sm=1 tr=0 ts=67595764 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=RZcAm9yDv7YA:10 a=Ikd4Dj_1AAAA:8 a=20KFwNOVAAAA:8 a=t7CeM3EgAAAA:8 a=O6WMtLnDkRuORcTRUxwA:9 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-11_08,2024-12-10_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 mlxscore=0 clxscore=1011 malwarescore=0 priorityscore=1501
+ phishscore=0 suspectscore=0 adultscore=0 mlxlogscore=999 spamscore=0
+ impostorscore=0 classifier=spam authscore=0 adjust=0 reason=mlx
+ scancount=1 engine=8.21.0-2411120000 definitions=main-2412110068
 
-On Tue, Dec 10, 2024 at 08:13:08PM +0100, Anna Emese Nyiri wrote:
-> Extend cmsg_sender.c with a new option '-Q' to send SO_PRIORITY
-> ancillary data.
-> 
-> cmsg_so_priority.sh script added to validate SO_PRIORITY behavior 
-> by creating VLAN device with egress QoS mapping and testing packet
-> priorities using flower filters. Verify that packets with different
-> priorities are correctly matched and counted by filters for multiple
-> protocols and IP versions.
-> 
-> Suggested-by: Ido Schimmel <idosch@idosch.org>
-> Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+From: Cosmin Ratiu <cratiu@nvidia.com>
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Tested-by: Ido Schimmel <idosch@nvidia.com>
+[ Upstream commit 4dbc1d1a9f39c3711ad2a40addca04d07d9ab5d0 ]
 
-Few nits that you can address in a follow up
+When profile rollback fails in mlx5e_netdev_change_profile, the netdev
+profile var is left set to NULL. Avoid a crash when unloading the driver
+by not calling profile->cleanup in such a case.
 
-> @@ -252,6 +259,8 @@ cs_write_cmsg(int fd, struct msghdr *msg, char *cbuf, size_t cbuf_sz)
->  
->  	ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
->  			  SOL_SOCKET, SO_MARK, &opt.mark);
-> +	ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
-> +			SOL_SOCKET, SO_PRIORITY, &opt.priority);
+This was encountered while testing, with the original trigger that
+the wq rescuer thread creation got interrupted (presumably due to
+Ctrl+C-ing modprobe), which gets converted to ENOMEM (-12) by
+mlx5e_priv_init, the profile rollback also fails for the same reason
+(signal still active) so the profile is left as NULL, leading to a crash
+later in _mlx5e_remove.
 
-Need to align to the open parenthesis
+ [  732.473932] mlx5_core 0000:08:00.1: E-Switch: Unload vfs: mode(OFFLOADS), nvfs(2), necvfs(0), active vports(2)
+ [  734.525513] workqueue: Failed to create a rescuer kthread for wq "mlx5e": -EINTR
+ [  734.557372] mlx5_core 0000:08:00.1: mlx5e_netdev_init_profile:6235:(pid 6086): mlx5e_priv_init failed, err=-12
+ [  734.559187] mlx5_core 0000:08:00.1 eth3: mlx5e_netdev_change_profile: new profile init failed, -12
+ [  734.560153] workqueue: Failed to create a rescuer kthread for wq "mlx5e": -EINTR
+ [  734.589378] mlx5_core 0000:08:00.1: mlx5e_netdev_init_profile:6235:(pid 6086): mlx5e_priv_init failed, err=-12
+ [  734.591136] mlx5_core 0000:08:00.1 eth3: mlx5e_netdev_change_profile: failed to rollback to orig profile, -12
+ [  745.537492] BUG: kernel NULL pointer dereference, address: 0000000000000008
+ [  745.538222] #PF: supervisor read access in kernel mode
+<snipped>
+ [  745.551290] Call Trace:
+ [  745.551590]  <TASK>
+ [  745.551866]  ? __die+0x20/0x60
+ [  745.552218]  ? page_fault_oops+0x150/0x400
+ [  745.555307]  ? exc_page_fault+0x79/0x240
+ [  745.555729]  ? asm_exc_page_fault+0x22/0x30
+ [  745.556166]  ? mlx5e_remove+0x6b/0xb0 [mlx5_core]
+ [  745.556698]  auxiliary_bus_remove+0x18/0x30
+ [  745.557134]  device_release_driver_internal+0x1df/0x240
+ [  745.557654]  bus_remove_device+0xd7/0x140
+ [  745.558075]  device_del+0x15b/0x3c0
+ [  745.558456]  mlx5_rescan_drivers_locked.part.0+0xb1/0x2f0 [mlx5_core]
+ [  745.559112]  mlx5_unregister_device+0x34/0x50 [mlx5_core]
+ [  745.559686]  mlx5_uninit_one+0x46/0xf0 [mlx5_core]
+ [  745.560203]  remove_one+0x4e/0xd0 [mlx5_core]
+ [  745.560694]  pci_device_remove+0x39/0xa0
+ [  745.561112]  device_release_driver_internal+0x1df/0x240
+ [  745.561631]  driver_detach+0x47/0x90
+ [  745.562022]  bus_remove_driver+0x84/0x100
+ [  745.562444]  pci_unregister_driver+0x3b/0x90
+ [  745.562890]  mlx5_cleanup+0xc/0x1b [mlx5_core]
+ [  745.563415]  __x64_sys_delete_module+0x14d/0x2f0
+ [  745.563886]  ? kmem_cache_free+0x1b0/0x460
+ [  745.564313]  ? lockdep_hardirqs_on_prepare+0xe2/0x190
+ [  745.564825]  do_syscall_64+0x6d/0x140
+ [  745.565223]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+ [  745.565725] RIP: 0033:0x7f1579b1288b
 
->  	ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
->  			  SOL_IPV6, IPV6_DONTFRAG, &opt.v6.dontfrag);
->  	ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
-> diff --git a/tools/testing/selftests/net/cmsg_so_priority.sh b/tools/testing/selftests/net/cmsg_so_priority.sh
-> new file mode 100755
-> index 000000000000..1fdfe6939a97
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/cmsg_so_priority.sh
+Fixes: 3ef14e463f6e ("net/mlx5e: Separate between netdev objects and mlx5e profiles initialization")
+Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-[...]
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 385904502a6b..8ee6a81b42b4 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -5980,7 +5980,9 @@ static void mlx5e_remove(struct auxiliary_device *adev)
+ 	mlx5e_dcbnl_delete_app(priv);
+ 	unregister_netdev(priv->netdev);
+ 	mlx5e_suspend(adev, state);
+-	priv->profile->cleanup(priv);
++	/* Avoid cleanup if profile rollback failed. */
++	if (priv->profile)
++		priv->profile->cleanup(priv);
+ 	mlx5e_devlink_port_unregister(priv);
+ 	mlx5e_destroy_netdev(priv);
+ }
+-- 
+2.25.1
 
-> +fi
-> +
-
-Unnecessary blank line:
-
-Applying: selftests: net: test SO_PRIORITY ancillary data with cmsg_sender
-.git/rebase-apply/patch:228: new blank line at EOF.
-+
-warning: 1 line adds whitespace errors.
 
