@@ -1,99 +1,137 @@
-Return-Path: <netdev+bounces-150989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F9AC9EC47E
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 06:57:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 824AD9EC4A2
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 07:13:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10AAF188B485
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 05:57:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 269CE188AC81
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 06:13:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21341C463F;
-	Wed, 11 Dec 2024 05:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53AD51C4A20;
+	Wed, 11 Dec 2024 06:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="hsp1NV8M"
+	dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b="PrvgVu7w"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098431C2457
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 05:56:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09B01C4A02
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 06:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733896609; cv=none; b=o9gI0GYOqt8XDWSLO1FVgvvsbRLVt7S1MfvghalPR2HrIdHca6rWKISbvKh4bJ6S+jvn0IIoeKgJrD8MTIe1EKgOuGtEnAxcht9/QIx35ZXjC4KLBqzBpk64dUIRLSQo0lUnt/aSMdGkyfdeOVXhZPYzkP695M+wxLmwR+ssZl8=
+	t=1733897570; cv=none; b=nbtpiunI5Rvfn0FQGSyWOvZP6Iic6d+KLkv/UDgbqmXk3/Mg1Jk2UhZ9WV4JQeIaqLSDIVtBne9Qb4hfnhCznL4Z6aFytLznesTOU2CQ/jGIoDz30RZQlkigXI+qfxDuyDXu/X0mo8UyAZFPhUqGIYR5loNAjGKJ+ykFSzN5bf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733896609; c=relaxed/simple;
-	bh=1VxNeLDw1DXamTowiJZ0+vvsnHBWT4Ig+73wMlUgEZI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Rl40Fut9bML0MxMdiB1pdV/Gw9E5SRVu5NCl5MKYjLCBpXZ7/VQ7MWnVu8tNhTAaBKlnOOoRrliFYVlGZjzEhRQXCto1B9GIcvI2wXCZaLHSgiUspVLARseJU5Cz3275zYwRUlIZG0FYUfLnsfz0LN1csOztluNtHXbRVEsbkfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=hsp1NV8M; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+	s=arc-20240116; t=1733897570; c=relaxed/simple;
+	bh=tV4UQ+BiBM0LFw+r6S1cE2/jM0gxNLnQ+tmkcQGE0Y8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jEBIHoZkJmNJdkOsbIDHk9v0JY2LPbZqJNld6qDxHtWmYidQ5CbQULxdIUgJ977jdUTbVx7DkZHIXMzNDAzju4RwBPd4NDPd8QC815Fwupwg3sR32CnaUd7b2rwCKs+2hn07+t663koie6gdHemtNuiXibTvnm56BLQzyU7mi6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com; spf=none smtp.mailfrom=andrewstrohman.com; dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b=PrvgVu7w; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=andrewstrohman.com
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e3985aabf43so4845749276.3
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 22:12:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1733896599;
-	bh=0gIyjngxpjh8dKRgWiQ7JmKdEaRZMJpel9SGDyPSS2o=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=hsp1NV8Mc/Sb2zmEVtZphYThox7nc54heIpSV/8154KsVbPJADmFGfTEX+jOCsChM
-	 RHemeKMUPz/R10MmGTVDqzaW2U/VFkTb7ab1DgWRY3kuXw3NHeCxXUidHcKa1TtBRI
-	 0w7BPiaQyXPwB5kWaVRt7kPb3zyriUMUFVgSunIGTcvRc3lTiQKCLmc7q+e5o+nfap
-	 edeyaPBJI/8illQeo67vgp9rGDgDkl8YxzJXGsLvoobPeaGlT8y8991YqeiKMuiS7c
-	 Mw1xT89LBetPpLCAyGPBF6t8koplnIMeg5+UItGQEFqdOMwa5MsOzfPHsDl0tqFnR7
-	 VAYy4GpqdWHAQ==
-Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id B0D556E7A9; Wed, 11 Dec 2024 13:56:39 +0800 (AWST)
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Wed, 11 Dec 2024 13:56:18 +0800
-Subject: [PATCH net-next 3/3] net: mctp: Allow MCTP_NET_ANY for v2 tag
- control ioctls
+        d=andrewstrohman-com.20230601.gappssmtp.com; s=20230601; t=1733897568; x=1734502368; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=tV4UQ+BiBM0LFw+r6S1cE2/jM0gxNLnQ+tmkcQGE0Y8=;
+        b=PrvgVu7wsI1loz/dG3lnzHdrm1DtWCDMfnrK6lZFlAUphoeyoufOxyNG5BLQTXu0kO
+         /nvX7I3Ndni+05QL3bzVbw0FRrzWHJHP8x0MfTYaJX3OehF0Ek2F/P0N6joFjytyXMq3
+         GXDdfdisx+tfFE0uyFy2rkEyYBzKtZ6vqps/1CL/i1G587YZjE2oZdOQnacdosWVp1YE
+         O2fXV+5sMJv252UspI/82U+efCtCbJI/wzQe2Htt0/ZotKmhTex1f57mrZwc2xzUk/0C
+         sY2BpyJuoyED6Mquyg8zZqYd+T2vOmXiC5ArdwC8B5lAHD0Xx0M6ZMxu68lJi2htMG4+
+         c2Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733897568; x=1734502368;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tV4UQ+BiBM0LFw+r6S1cE2/jM0gxNLnQ+tmkcQGE0Y8=;
+        b=s2NzmQ9BIziSiyh+h4YNQP3OD1DUKZXtnxfx70FTNA8wBYnH1V6ZiMA3uhfzRkkafL
+         xlNYquNVF2vu1EfBoGxZxv3Bk3PNL3DV9wOe0/vxp9aN/G7wuS42wm+t4zx8GVD94eej
+         uftYfz5t+t/yJaZLrYBMVUM4xkLTsBcm0hDt9aC4FPUWm9lgfOThI8/hUeNKNJpHdBdO
+         v1CUDe0OOQg2mYYFVM0M9jWvGiConnmbKDP7ZbZQZwrf0fVposhgTv3Phj5cXc/OlWhr
+         6OkEJutUYx0WbWIavBy0IJy96Qejnxl3WpH2SZ3nshok1SraD2BW8HRAT7TBo8HOK2VE
+         tuEA==
+X-Forwarded-Encrypted: i=1; AJvYcCX3zEHHqk0nakE/YRtK2XyHjiMsaqTe2wF/c0x9Nwf38sTtdpDC2uyQKKsQyCEgtUNGEmqJ7Vg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlUYgKgvSIJNFrgZ402VdjckzAB1W31swHJ43Fum1i+9o+Y4t1
+	dR9cnInDPprFke++vakSTRWLqSLvKidBVryx7TcjSs8tCTyXnX4hdWL4dqQrkJ3hER1KS+BoiSp
+	+oX+NdsFkR1rm0YUS+/dO5y5dQJz9nAXgomTVNA==
+X-Gm-Gg: ASbGncv/jwQ1SZSBtwSOUM9Oq1VHHaqTfeznRP3420wu7NxCnQ/1uTE92KRNNxhTbBE
+	xJlwxknOvS9g4Nl/mt91y86BzCaSOW87ZWeo=
+X-Google-Smtp-Source: AGHT+IHtV2VjryMZleS2mRSEmzy29u4HImGox+Xi3owB9rCNEZ8dtJvHQ7OnZGiommLp2qXb62xl05JUYnr18r9opE8=
+X-Received: by 2002:a05:6902:70b:b0:e3a:398f:6720 with SMTP id
+ 3f1490d57ef6-e3c8e67c3cbmr1977245276.38.1733897567797; Tue, 10 Dec 2024
+ 22:12:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241211-mctp-next-v1-3-e392f3d6d154@codeconstruct.com.au>
-References: <20241211-mctp-next-v1-0-e392f3d6d154@codeconstruct.com.au>
-In-Reply-To: <20241211-mctp-next-v1-0-e392f3d6d154@codeconstruct.com.au>
-To: Matt Johnston <matt@codeconstruct.com.au>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-X-Mailer: b4 0.14.2
+References: <20241201074212.2833277-1-andrew@andrewstrohman.com> <Z019fbECX6R4HHpm@nanopsycho.orion>
+In-Reply-To: <Z019fbECX6R4HHpm@nanopsycho.orion>
+From: Andrew Strohman <andrew@andrewstrohman.com>
+Date: Tue, 10 Dec 2024 22:12:36 -0800
+Message-ID: <CAA8ajJ=UYjqVkvxKDTQNpSWpz7+p0+0Ckavpotkh5qUzd1qc0w@mail.gmail.com>
+Subject: Re: [PATCH net-next] dsa: Make offloading optional on per port basis
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-With ALLOCTAG2/DROPTAG2, we added a net field, to allow allocating tags
-outside of the default network. However, we may still want to use the
-same ioctl for a default net, so implement the same NET_ANY logic which
-falls back to the default net.
+Hi Jiri,
 
-This makes it a little more ergonomic to use the ALLOCTAG2/DROPTAG2
-interfaces on simpler MCTP network setups.
+ Thanks for the review.
 
-Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
----
- net/mctp/af_mctp.c | 3 +++
- 1 file changed, 3 insertions(+)
+> Why is this DSA specific?
 
-diff --git a/net/mctp/af_mctp.c b/net/mctp/af_mctp.c
-index 87adb4b81ca3ee7d240c80a8a40c4a2e8a876075..1086bff475c1c475df24aedf09737186f87e196f 100644
---- a/net/mctp/af_mctp.c
-+++ b/net/mctp/af_mctp.c
-@@ -383,6 +383,9 @@ static int mctp_ioctl_tag_copy_from_user(struct net *net, unsigned long arg,
- 		ctl->tag = ctl_compat.tag;
- 	}
- 
-+	if (ctl->net == MCTP_NET_ANY)
-+		ctl->net = mctp_default_net(net);
-+
- 	if (ctl->flags)
- 		return -EINVAL;
- 
+I can make this more general. I'm not aware of potential
+users outside of switchdev and dsa. Are you anticipating
+additional users outside of switchdev?
 
--- 
-2.39.2
+I could make this more general, and just implement
+for dsa for now. Then later, if someone else wants
+this functionality for switchdev, or something else,
+they could implement that part.
 
+
+> Plus, you say you want to disable offloading
+> in general (DSA_FLAG_OFFLOADING_DISABLED), but you check the flag only
+> when joining bridge.
+
+I think it's only required for joining a bridge because
+that's where dp->bridge gets assigned. All the other
+offloading related code paths check dp->bridge
+either directly or indirectly, to determine if the port
+is offloaded or not before continuing. If you see
+an offloading related code path that does not
+consider dp->bridge before moving forward,
+please let me know.
+
+
+> I mean, shouldn't this be rather something exposed
+> by some common UAPI?
+>
+> Btw, isn't NETIF_F_HW_L2FW_DOFFLOAD what you are looking for?
+
+It sounds like Vladimir doesn't like this suggestion. So,
+I considered introducing another netdev feature for this, but
+I noticed that we are currently maxed out since
+netdev_features_t is u64 and NETDEV_FEATURE_COUNT
+is 64.
+
+I considered changing netdev_features_t to a bitmap,
+so that we can keep adding additional features, but
+there are users doing bitwise operations directly on
+instances of netdev_features_t, so that seems difficult
+to untangle.
+
+Do you have a suggestion about how to proceed?
+How should I signal that offloading should be disabled?
 
