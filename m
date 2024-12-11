@@ -1,132 +1,195 @@
-Return-Path: <netdev+bounces-150983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31B929EC42E
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 06:17:42 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E164B188ABE4
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 05:17:40 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E981C07D9;
-	Wed, 11 Dec 2024 05:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="D8LakECd"
-X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E20869EC455
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 06:30:29 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8E81514F8;
-	Wed, 11 Dec 2024 05:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 560B8280E01
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 05:30:28 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD0261C1F0C;
+	Wed, 11 Dec 2024 05:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="tv93OZCW"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AC34C85
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 05:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733894255; cv=none; b=fwvhpZN8By7ophuyPLdkaJxXsnllnv5VAUrM7JWRB2h9tGt3Dom6GHJcK8pMrg1+aRMKxqfR+GT/JCVmKwjFaZ25yj+DcWFPZlQhc5kWxsoi8d6IFupIRNl6/Ml6TtKLNO9SHLDYvMAdhTYpS0amFPFsxuLli4XW7nEi0BN32Mw=
+	t=1733895023; cv=none; b=AaQ2AFBzTuQbUfpPAl0QrVUV0saUF1gpbvgomkAEjpMAEU/dwZipZtuWqmDhWAVI9m8fQeLew0JHNA5YgOjnOL82+W4FXlicqeu0h1kMMJbrkhyJHjsvcrmDfcsZelBWlMbfndxApIY34UEBX4+OELLeVUTFk85G28aJli1ZWIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733894255; c=relaxed/simple;
-	bh=RPWCoG4RhG6ryjnD0ys4kpDDuDXeC7eMtJBFDhrGKLo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RVMp0odaEvkrtqfZdTABe84Mv0KQl/7RF0BwBC+OIWgzzm0hd66Py8Cp9JbV8z+OsacILVA2iY+VatycdIjx7D40j+yolrsP4C195Y1KaSOxiZHssFWmeFY8gTmMQhYVamPb3iBGoqI5Ayc6uSZTPDGboJdi439A+CS31wSM3Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=D8LakECd; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1733894248; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=nQcLfV2xZwKTL2O3SG540LsNxNtq3k+Lv38jppzlJyg=;
-	b=D8LakECdV6PtHFpA4aH2HxB7yZRpxlFj5nHsy5nsCH4VFPiPgSBCb5IQq9lGQqoYk28AEKwslYMaETNTDqPCltk3syqkJM97KVGQAo9utHBOd5v327lEJ3Kftprb8p5Cx/7BM5AGHLIMZcmW+jZAKwGjphWfKyw/l/T9PLkYCro=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WLH6tub_1733894245 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 11 Dec 2024 13:17:26 +0800
-Date: Wed, 11 Dec 2024 13:17:25 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
-	Yonghong Song <yhs@fb.com>, Eric Dumazet <edumazet@google.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
-	guwen@linux.alibaba.com, Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1733895023; c=relaxed/simple;
+	bh=WjStt6KCmPyjA0UUxxptllAJ1zIxzLzoXkXCuU8sFB4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dyvGPG4t0+N83ss8LX+2RE6GwZcRy91LlIjKTR69d25hwTltFrgi9MCcneD1lq8vrWcXozV38eWMw/71lP0GvGYOJ48OKr4Anjpyt6Q3AvYoHly8DzfvbPBdhXnfY92+sW5CmH7eBBn1VW/BIRvGwFtN9wCuBLC6w9JqTRwDhqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=tv93OZCW; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-54025432becso1752990e87.1
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 21:30:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1733895019; x=1734499819; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JohBzc6SIbwiwfBt8MJ3uGvt7oRvwtZBP0CDs+EpYnY=;
+        b=tv93OZCW/YwbXOQaLqYjTWAqH1mAdjeVIzAhBA18FekKyURnyFtWKbXZJ29k1ipS0x
+         0GOqutadFyUj1avm8kPLEGn0FEWtQk62rw0F+VqWK/mP6nMERZehmXRvSwRLloCJ6fL1
+         D4a4p5mdl/tJfPA7sXLYNgzFwheEE/v1XcmOLb0ciaevN4nVWDWaAErXkPpyY1zfPPHP
+         468jZpqLQ/orCS4BHjBuYmbvXf32l9/Rce/ASEYlSN5AlccQ+UWZbYXW+qIy+vAPr5xJ
+         PWpHH+Md5D8pLqGSQuSAuPzkr0r1NsnprvcdiYcUIXPj51Ci9eqtCM91JMg1+UMRpTS8
+         GfHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733895019; x=1734499819;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JohBzc6SIbwiwfBt8MJ3uGvt7oRvwtZBP0CDs+EpYnY=;
+        b=APDvLxVFfj/L0tWLINlvsNHsinQV3tedAxY2lThMqd5WBjU4T0nDl/XJMUqOrSI6H0
+         EW5oIoWMrfIZETqf8Bhsf2TIDWozBOlY7l/q4/ZiY/DF5QOpOsv/c2kGRUPFC7+ojoSX
+         KnND4BkBH8XnYOCa2Ci3nsP0DqnrWPz4wMCiG5cyJ4oDb/2pf2LE8M/Mm8+AtxZFG1gC
+         wGT+RMK3SeEhGsrViqp0sTpdaxUVXg8EHe77n1Yx65/Q4fUa9Z2dMi5/g2lJjIqNIoc+
+         ni2gpC8lNZjK/m9QHgVFuURqpCqrNFIX6V+mBcfxax3lpeYnZf+JqSRrA455nO8bcyYL
+         OiIw==
+X-Gm-Message-State: AOJu0YyJwGZJTt8xPBl0vh/lFL+HVXgnWNPsGrzTBGdsqm5R0L1wbW9G
+	9nKpcEHANTwveRUrw2ITJ4lykbmFOMgJyMt3PNOUgAaIKdkQQln3RGM305tY1/LlgWcVMJ3t7+B
+	YPnc=
+X-Gm-Gg: ASbGnctRrFg1QDw59WIw8t3/fvAhYvMNosYCBYagMjq+uVo8+K6R7AGj8iXt8AS+LmQ
+	sQdup/KFDV7sCwi43deVK/k428Mtsa65J8fWVomDI94csffLl/Gc3Ip8yyCeQIt4hQyWHulX5OF
+	sm6laccRxp+7cWbxoTEu3xvf18NUmy+NU+FrmnbVAzhjMASmqqBAp05UpK7Bo2VyB1//HXjkV3A
+	4iUy1V1soQfpKO1bXgK3PeXJsS166QnsRxAtaYi0HqsWDpzTp4tO72qUMS0+Nxa7q1F
+X-Google-Smtp-Source: AGHT+IF/6paNyWnK5s7sNDNe+xdCVS9id0CRa3T10BRNgQZGzD3tcn5rO5sJvrkylZtSPBA99NeIFw==
+X-Received: by 2002:a05:6512:1049:b0:540:2188:763c with SMTP id 2adb3069b0e04-5402a602133mr321217e87.37.1733895018632;
+        Tue, 10 Dec 2024 21:30:18 -0800 (PST)
+Received: from cobook.home ([91.198.101.25])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5401bd77e6asm1022025e87.283.2024.12.10.21.30.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Dec 2024 21:30:18 -0800 (PST)
+From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Andrew Lunn <andrew@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Network Development <netdev@vger.kernel.org>,
-	linux-s390 <linux-s390@vger.kernel.org>, linux-rdma@vger.kernel.org,
-	bpf <bpf@vger.kernel.org>
-Subject: Re: [PATCH bpf-next v2 5/5] bpf/selftests: add simple selftest for
- bpf_smc_ops
-Message-ID: <20241211051725.GA97570@j66a10360.sqa.eu95>
-References: <20241210040404.10606-1-alibuda@linux.alibaba.com>
- <20241210040404.10606-6-alibuda@linux.alibaba.com>
- <CAADnVQJisbHFpS2==pw4aOAmKsbo6m6EDvOBntF_ATMrbp0G=w@mail.gmail.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michael Dege <michael.dege@renesas.com>,
+	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+	Dennis Ostermann <dennis.ostermann@renesas.com>,
+	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Subject: [PATCH net v2] net: renesas: rswitch: fix initial MPIC register setting
+Date: Wed, 11 Dec 2024 10:30:12 +0500
+Message-Id: <20241211053012.368914-1-nikita.yoush@cogentembedded.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQJisbHFpS2==pw4aOAmKsbo6m6EDvOBntF_ATMrbp0G=w@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Tue, Dec 10, 2024 at 10:01:38AM -0800, Alexei Starovoitov wrote:
-> On Mon, Dec 9, 2024 at 8:04 PM D. Wythe <alibuda@linux.alibaba.com> wrote:
-> >
-> > +SEC("struct_ops/bpf_smc_set_tcp_option_cond")
-> > +int BPF_PROG(bpf_smc_set_tcp_option_cond, const struct tcp_sock *tp, struct inet_request_sock *ireq)
-> > +{
-> > +       return 0;
-> > +}
-> > +
-> > +SEC("struct_ops/bpf_smc_set_tcp_option")
-> > +int BPF_PROG(bpf_smc_set_tcp_option, struct tcp_sock *tp)
-> > +{
-> > +       return 1;
-> > +}
-> > +
-> > +SEC(".struct_ops.link")
-> > +struct smc_ops  sample_smc_ops = {
-> > +       .name                   = "sample",
-> > +       .set_option             = (void *) bpf_smc_set_tcp_option,
-> > +       .set_option_cond        = (void *) bpf_smc_set_tcp_option_cond,
-> > +};
-> 
-> These stubs don't inspire confidence that smc_ops api
-> will be sufficient.
-> Please implement a real bpf prog that demonstrates the actual use case.
-> 
-> See how bpf_cubic was done. On the day one it was implemented
-> as a parity to builtin cubic cong control.
-> And over years we didn't need to touch tcp_congestion_ops.
-> To be fair that api was already solid due to in-kernel cc modules,
-> but bpf comes with its own limitations, so it wasn't a guarantee
-> that tcp_congestion_ops would be enough.
-> Here you're proposing a brand new smc_ops api while bpf progs
-> are nothing but stubs. That's not sufficient to prove that api
-> is viable long term.
+MPIC.PIS must be set per phy interface type.
+MPIC.LSC must be set per speed.
 
-Hi Alexei,
+Do that strictly per datasheet, instead of hardcoding MPIC.PIS to GMII.
 
-Thanks a lot for your advices. I will add actual cases in the
-next version to prove why we need it.
+Fixes: 3590918b5d07 ("net: ethernet: renesas: Add support for "Ethernet Switch"")
+Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+---
+v1: https://lore.kernel.org/netdev/20241209075951.163924-1-nikita.yoush@cogentembedded.com/
+changes: regenerate against top of net tree (commit 3dd002f20098 "net:
+         renesas: rswitch: handle stop vs interrupt race") to ensure it
+         applies cleanly
+---
+ drivers/net/ethernet/renesas/rswitch.c | 27 ++++++++++++++++++++------
+ drivers/net/ethernet/renesas/rswitch.h | 14 ++++++-------
+ 2 files changed, 28 insertions(+), 13 deletions(-)
 
-> 
-> In terms of look and feel the smc_ops look ok.
-> The change from v1 to v2 was a good step.
+diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
+index 6ec714789573..dbbbf024e7ab 100644
+--- a/drivers/net/ethernet/renesas/rswitch.c
++++ b/drivers/net/ethernet/renesas/rswitch.c
+@@ -1116,25 +1116,40 @@ static int rswitch_etha_wait_link_verification(struct rswitch_etha *etha)
+ 
+ static void rswitch_rmac_setting(struct rswitch_etha *etha, const u8 *mac)
+ {
+-	u32 val;
++	u32 pis, lsc;
+ 
+ 	rswitch_etha_write_mac_address(etha, mac);
+ 
++	switch (etha->phy_interface) {
++	case PHY_INTERFACE_MODE_SGMII:
++		pis = MPIC_PIS_GMII;
++		break;
++	case PHY_INTERFACE_MODE_USXGMII:
++	case PHY_INTERFACE_MODE_5GBASER:
++		pis = MPIC_PIS_XGMII;
++		break;
++	default:
++		pis = FIELD_GET(MPIC_PIS, ioread32(etha->addr + MPIC));
++		break;
++	}
++
+ 	switch (etha->speed) {
+ 	case 100:
+-		val = MPIC_LSC_100M;
++		lsc = MPIC_LSC_100M;
+ 		break;
+ 	case 1000:
+-		val = MPIC_LSC_1G;
++		lsc = MPIC_LSC_1G;
+ 		break;
+ 	case 2500:
+-		val = MPIC_LSC_2_5G;
++		lsc = MPIC_LSC_2_5G;
+ 		break;
+ 	default:
+-		return;
++		lsc = FIELD_GET(MPIC_LSC, ioread32(etha->addr + MPIC));
++		break;
+ 	}
+ 
+-	iowrite32(MPIC_PIS_GMII | val, etha->addr + MPIC);
++	rswitch_modify(etha->addr, MPIC, MPIC_PIS | MPIC_LSC,
++		       FIELD_PREP(MPIC_PIS, pis) | FIELD_PREP(MPIC_LSC, lsc));
+ }
+ 
+ static void rswitch_etha_enable_mii(struct rswitch_etha *etha)
+diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
+index 72e3ff596d31..e020800dcc57 100644
+--- a/drivers/net/ethernet/renesas/rswitch.h
++++ b/drivers/net/ethernet/renesas/rswitch.h
+@@ -724,13 +724,13 @@ enum rswitch_etha_mode {
+ 
+ #define EAVCC_VEM_SC_TAG	(0x3 << 16)
+ 
+-#define MPIC_PIS_MII		0x00
+-#define MPIC_PIS_GMII		0x02
+-#define MPIC_PIS_XGMII		0x04
+-#define MPIC_LSC_SHIFT		3
+-#define MPIC_LSC_100M		(1 << MPIC_LSC_SHIFT)
+-#define MPIC_LSC_1G		(2 << MPIC_LSC_SHIFT)
+-#define MPIC_LSC_2_5G		(3 << MPIC_LSC_SHIFT)
++#define MPIC_PIS		GENMASK(2, 0)
++#define MPIC_PIS_GMII		2
++#define MPIC_PIS_XGMII		4
++#define MPIC_LSC		GENMASK(5, 3)
++#define MPIC_LSC_100M		1
++#define MPIC_LSC_1G		2
++#define MPIC_LSC_2_5G		3
+ 
+ #define MDIO_READ_C45		0x03
+ #define MDIO_WRITE_C45		0x01
+-- 
+2.39.5
 
-I'm glad that you feel it looks okay. If you have any questions,
-please let me know.
-
-Thanks,
-D. Wythe
-
-> 
-> pw-bot: cr
 
