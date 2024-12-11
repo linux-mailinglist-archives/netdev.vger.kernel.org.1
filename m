@@ -1,135 +1,117 @@
-Return-Path: <netdev+bounces-150891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A102D9EBFCC
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 01:08:25 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B325A9EBFC9
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 01:06:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2DDD1688D7
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 00:06:54 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43BAA800;
+	Wed, 11 Dec 2024 00:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LV3pbIfJ"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B7C5283E4A
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 00:08:24 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ECA0195;
-	Wed, 11 Dec 2024 00:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HeBH/1BA"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B8BAD5E;
-	Wed, 11 Dec 2024 00:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10E9BEC4;
+	Wed, 11 Dec 2024 00:06:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733875702; cv=none; b=PWYA7XG5cuflZVZ+JVILOuMtZ7GtNfu2yhOGCCIrqSdpycVjc/z6J8Q1/dQRVvY3PktMR+oxuyq4y99WHmohwmPD5MnIrZc13cuTkTzxq7gG0Ki6bXV/8Tw7q5gplwd9tTD7CINxSg/nu/7qq65W/DLBcGGsQNUdc4TtgOQYn7Y=
+	t=1733875614; cv=none; b=N/WP4uWeLZd6pn19BJM4Mq1PeSFliUc6awfObvcXRHCoRc/HSyN9KHeAV0+EIK05FW5FuEu33BKgEqCI7/vr8ylhKzlgXizn8OsAotw1WNpV8rRwdtSc9YB8mDBg2HdQW7AL5yma0YrtlR8rJ4IGAPLbCsvUcySdGZVhpp7GhqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733875702; c=relaxed/simple;
-	bh=sbIOuSJN32vC8RlW8xOT+xvwoQXmS3mK36l8ACMYi90=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iW8p1Na+tfVdr7KbuBunb2kwnUuamZOlpP/yom/Ttwvl4s0pHfrIpolPDWy/AlL1N0mUVhdu60IoRVYEI6Rsek735DHpH1TeK9GCzTu5Aa4WVNeanPDT1E+rT6pdeAmjTHo6mdom+Eb+eSFWOoITo+czfWMmlZ1NEyArlNispl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HeBH/1BA; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2ef28f07dbaso4509872a91.2;
-        Tue, 10 Dec 2024 16:08:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733875698; x=1734480498; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CWfDJ8uLreZc4qiFdS7zDvZDBlkopaB7TbBYNKsvddk=;
-        b=HeBH/1BAVZAc5o1oW6+OdDqD0Z6RxlGyZLp6/FPlAmVf5RGAFKliscJ6X5+b47i6JF
-         fGYGB79qpEtIGx6YoYSphWhiEa5dlg8GUcI+TJUUad2FHdJD20xZ/lzkH1gTRp31f3Lk
-         G3ExwHxS6ZT0yYBW9VtwmMcqYp7ujUotAwPSWo4z2pJTmWmjxuGCythYeKbOp73varVd
-         qZ3XBHNFTghcBPwl1xID0BJ06T37NC65CylSgsuuh+0KOxZT/CBe8InRxNvNgNSgzIRK
-         2ZNg4n+Ems6M9Au8X9gBLyzB333cAxLmlStIrGpVup/c7QTYppci/5a1G2uDP6lgWCdu
-         nkfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733875698; x=1734480498;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CWfDJ8uLreZc4qiFdS7zDvZDBlkopaB7TbBYNKsvddk=;
-        b=wzgcQ92kcdrt7Slrub5Bdj/QsqLYTod12JVcBeEXElJLLkg+Eq7r66oINMUij2flft
-         fJiY8kfvRfiha5crXrc2vdQgRj4SHDiohF6R0FIB0yjFK1V7iLK5abiUMeNInizu09pl
-         mbYkPs9ZALtdh5E2eaDZwtYYtQQpb/Fhhbufcyia/e2x6vf21aqpXpdAvTw7xprvIATT
-         sO7i3TZI5wC0iHGZrkpq9QqZkYiVTCXtyKVw6aRkjZ69u5FeY0mgtVDuxos14p/aSj35
-         +2X9TMCnhBWucyfp1yO24z7Jv1g4HdhF/y1KILCb/6XNAzOt5oD8OvauHviK4MJqswyz
-         htYw==
-X-Gm-Message-State: AOJu0Yxd2BR5OaI8wFEfSYS+geQF7nDqpXn/RGZZIARs8JAnKMRRQSCK
-	+2LNUsyXi8vg8p4uLWS1KFNCDgAatJh7tKUSgTbKnMIb4r3lIYXmuZbn7pKj
-X-Gm-Gg: ASbGncu98+3rIP6MxwhjwjN3/DuBs8qewiPWw4jCmKABjBFnBpcxunedYbAMLr6D738
-	J98tNSJ/uEcNa5yXAXLl+Qr9Yk408JpxNj/cVERUAP2ineZ4Pwgr0PhH3K/ltztFqsWIO9Or4vn
-	mLK2XR2e/9z3u0rU3cWQ7BMt6UyVC2nK7ji40fjaEMgZ5QVhEdnUTym3pXo9XPOi8FLmKTDHtcq
-	mzQihJTdOBSfXATCzDqzR8b1XrumD3fgA06y2XZ9qFZdC73cnyGK5kO/qny961NUuXjm4D+vzZS
-	p5tqks273qeyMz7GTeYVuDsX6xg0
-X-Google-Smtp-Source: AGHT+IEKiMYo90UOYfycM73IYnNC37gA6gxbmTDxHtP0+pJWRqjobiaAKk0IaoocnjfD+Zr/fYZ5cQ==
-X-Received: by 2002:a17:90b:48cc:b0:2ee:f076:20fa with SMTP id 98e67ed59e1d1-2f12808cac8mr1305085a91.25.1733875697685;
-        Tue, 10 Dec 2024 16:08:17 -0800 (PST)
-Received: from mew.. (p4007189-ipxg22601hodogaya.kanagawa.ocn.ne.jp. [180.53.81.189])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2efa267857esm4998580a91.19.2024.12.10.16.08.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 16:08:17 -0800 (PST)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: netdev@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	tmgross@umich.edu,
-	aliceryhl@google.com,
-	boqun.feng@gmail.com,
-	gary@garyguo.net,
-	bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me,
-	a.hindborg@kernel.org,
-	ojeda@kernel.org,
-	alex.gaynor@gmail.com
-Subject: [PATCH net v1] rust: net::phy fix module autoloading
-Date: Wed, 11 Dec 2024 09:06:16 +0900
-Message-ID: <20241211000616.232482-1-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1733875614; c=relaxed/simple;
+	bh=Q0xDJhoumS6SK4KZTkewFgu5ZjY6X4lL0E/F4WlCvP0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mFHDCi1MlfDMeJjDZ3uHh6uW8va8/jBfy5XtIiMRYcJFRXEvqrZFWiPYmfyCOrik9hTuAUdAYkVXfWKW1MGEF7LvqGyGGFZ1KF8Je6tnpAPY2NDe8fHedOIUNhFoFlU/QNqniV9nUs/JTQb86p8dny89tHDgrbm7YrZVXkzPYy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LV3pbIfJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB5ACC4CED6;
+	Wed, 11 Dec 2024 00:06:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733875613;
+	bh=Q0xDJhoumS6SK4KZTkewFgu5ZjY6X4lL0E/F4WlCvP0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LV3pbIfJ9XYGTBYZA4wWCfSnbR8UKWkGdey3/DgCAZjVV511CY2CRFoeARwjN/D9V
+	 EWHX9W+TUpzzGh5ml8qo0dnX3ufKGNppjjaIDsgKr5ntUTEuDzp20KIHuNw3owC9x5
+	 Sg+IiUNJZTWFmSMZFllDKyVIw1BnpYRh8aS59oIjqhU2XIxxQEISXbH+eoN0vxNtOY
+	 X5FQMcYpOp1n2JBdSxE8cLf16IuGzdZ04ET5BB3jKzYEwfPJl53bv70S415Ovv26bA
+	 9ArpS6cNj/mjt+sDHkp+SjEp+TB1JdJ6cZfrdJvf5OSGm+Wg9IuwasBt7gFfV2LpHr
+	 tNqohNEQmqEhg==
+Date: Tue, 10 Dec 2024 16:06:51 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Paolo Abeni
+ <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David
+ Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+Subject: Re: [PATCH net-next v8 07/17] net: page_pool: introduce
+ page_pool_mp_return_in_cache
+Message-ID: <20241210160651.32b5e8f8@kernel.org>
+In-Reply-To: <fc1715f6-c123-43c6-9562-f84c7aab4ed2@gmail.com>
+References: <20241204172204.4180482-1-dw@davidwei.uk>
+	<20241204172204.4180482-8-dw@davidwei.uk>
+	<20241209194057.161e9183@kernel.org>
+	<fc1715f6-c123-43c6-9562-f84c7aab4ed2@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The alias symbol name was renamed by the commit 054a9cd395a7("modpost:
-rename alias symbol for MODULE_DEVICE_TABLE()").
+On Tue, 10 Dec 2024 04:31:53 +0000 Pavel Begunkov wrote:
+> >> +	page_pool_dma_sync_for_device(pool, netmem, -1);
+> >> +	page_pool_fragment_netmem(netmem, 1);
+> >> +	pool->alloc.cache[pool->alloc.count++] = netmem;  
+> > 
+> > and here:
+> > 
+> > 	return true;
+> > 
+> > this say mps can use return value as a stop condition in a do {} while()
+> > loop, without having to duplicate the check.
+> > 
+> > 	do {
+> > 		netmem = alloc...
+> > 		... logic;
+> > 	} while (page_pool_mp_alloc_refill(pp, netmem));
+> > 
+> > 	/* last netmem didn't fit in the cache */
+> > 	return netmem;  
+> 
+> That last netmem is a problem. Returning it is not a bad option,
+> but it doesn't feel right. Providers should rather converge to
+> one way of returning buffers and batching here is needed.
+> 
+> I'd rather prefer this one then
+> 
+> while (pp_has_space()) {
+> 	netmem = alloc();
+> 	pp_push(netmem);
+> }
+> 
+> Any thoughts on that?
 
-Adjust module_phy_driver macro to create the proper symbol name.
+No strong preference. If I was the one who placed the ->alloc() call
+the way it is placed it's probably because it saves us a conditional,
+it saves us checking if the cache is empty. 
 
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
----
- rust/kernel/net/phy.rs | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+If we want to have the page pool pick the last object out of the cache
+I'd lean towards avoiding all the helpers. Make the callback:
 
-diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index b89c681d97c0..2fbfb6a94c11 100644
---- a/rust/kernel/net/phy.rs
-+++ b/rust/kernel/net/phy.rs
-@@ -860,7 +860,7 @@ const fn as_int(&self) -> u32 {
- /// ];
- /// #[cfg(MODULE)]
- /// #[no_mangle]
--/// static __mod_mdio__phydev_device_table: [::kernel::bindings::mdio_device_id; 2] = _DEVICE_TABLE;
-+/// static __mod_device_table__mdio__phydev: [::kernel::bindings::mdio_device_id; 2] = _DEVICE_TABLE;
- /// ```
- #[macro_export]
- macro_rules! module_phy_driver {
-@@ -883,7 +883,7 @@ macro_rules! module_phy_driver {
- 
-         #[cfg(MODULE)]
-         #[no_mangle]
--        static __mod_mdio__phydev_device_table: [$crate::bindings::mdio_device_id;
-+        static __mod_device_table__mdio__phydev: [$crate::bindings::mdio_device_id;
-             $crate::module_phy_driver!(@count_devices $($dev),+) + 1] = _DEVICE_TABLE;
-     };
- 
+ void alloc_netmem(struct page_pool *pool, gfp_t gfp,
+                   size_t cnt, netmem_ref *arr);
 
-base-commit: 51a00be6a0994da2ba6b4ace3b7a0d9373b4b25e
--- 
-2.43.0
-
+you get an @arr(ay) to fill up with up to @cnt elements. Mirroring
+alloc_pages_bulk_array_node() (down to its, to me at least, unusual
+ordering of arguments).
 
