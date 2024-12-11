@@ -1,120 +1,100 @@
-Return-Path: <netdev+bounces-150910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ACC89EC0F4
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 01:35:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA439EC107
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 01:43:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1C7C16400A
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 00:35:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 399EF188A91F
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 00:43:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BECA22A1CF;
-	Wed, 11 Dec 2024 00:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516C6364BA;
+	Wed, 11 Dec 2024 00:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="SAfmO1AX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pG+BKg9J"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D5E8494;
-	Wed, 11 Dec 2024 00:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D772A1CF;
+	Wed, 11 Dec 2024 00:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733877324; cv=none; b=WVxh8le4kH8lQPnLDoGA0fKoupFYe9qdBlH6+a0Ngnzt7k9NIDqvaFY76D9RTr81hWhg/pcmm3NJdIKKmSASShzOlQ4xT8JMZNZ8PsvZTCtMzkiKuWyHjNSWLRAidYk1UBRJ2OIszobsfELqhvpe/9d2Frk3Vy54boNL5k4mmRU=
+	t=1733877790; cv=none; b=Z2z9L7+z4Tirq9F5UDJKFU3Do2pktxGpFBFHWiOY59KLnxvKi5HVpDSuOxMvynuMta7EBengXEzT/1ACogON5tDZjP1jttrh8iv8+ac72+gW1z+wTiIi3VXIzsjBjlD+rBRppJUvZ5dxd4EqoQJBYzSTbxvFH0IJp2HXAU9GHk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733877324; c=relaxed/simple;
-	bh=JacV5V+VE+iRUgZxF+CyNriRT0L3gGNH3mNPIEp8PtQ=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=DzGpPqagcKSmTnh0C9Y6/Vsf/7TQtN12agXxQS32Vd2BV0iLYa8mwwbP39u0nC9afGr6gE8botArRyOdwKHTZ0PQ0xkq2eku/zOTBLFiEfJi/tNobpOHereypxW5lkz/sI5/NOw0IyA27nttip4mfkyePzgrIJPnMZr7qVXS8Sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=SAfmO1AX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08A68C4CED6;
-	Wed, 11 Dec 2024 00:35:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1733877323;
-	bh=JacV5V+VE+iRUgZxF+CyNriRT0L3gGNH3mNPIEp8PtQ=;
+	s=arc-20240116; t=1733877790; c=relaxed/simple;
+	bh=NgVez8nReWQlSrD2wR+9xnrrekmBUArkj9umbfrXTF0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GCpL/AXunVBJ+9+fjEKxV8YhIesuXQdXSP6UrUeqJ9vIaJGL2oAMimJXME2ERZBzSkPz2qsJfJ4/G4f9AIfEAdYuHQTWEiEM4YlxsUBImZreyr1s0fbjblSAMUx7Q9v/9DN2ulwZn0Q1E0qFqrqq5Ed3lem11KXOYKQgL6FJQ4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pG+BKg9J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A9EAC4CED6;
+	Wed, 11 Dec 2024 00:43:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733877789;
+	bh=NgVez8nReWQlSrD2wR+9xnrrekmBUArkj9umbfrXTF0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SAfmO1AXcxfNbXeA1lt2ARS5JA4aoca5GZCiMS3IsanyDv7yL62uuNcWrh+aSXiVP
-	 AePvXROpCDcKvBJXxbvGsZk9klohSs7XOvzlFRp1o6jpcriieZaxAhKmQ+7F8mdfh1
-	 fRbKx1TTHL0AKtGcnVGrRVHy0Uy+i6x4JaMqirKE=
-Date: Tue, 10 Dec 2024 16:35:20 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
- <kadlec@netfilter.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Julia Lawall
- <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack
- <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, Robert
- Jarzmik <robert.jarzmik@free.fr>, Russell King <linux@armlinux.org.uk>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Ofir
- Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>, Lucas De
- Marchi <lucas.demarchi@intel.com>, Thomas =?ISO-8859-1?Q?Hellstr=F6m?=
- <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
- <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
- <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>, Dick Kennedy
- <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Roger Pau =?ISO-8859-1?Q?Monn=E9?=
- <roger.pau@citrix.com>, Jens Axboe <axboe@kernel.dk>, Kalle Valo
- <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel
- Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Ray Jui <rjui@broadcom.com>, Scott Branden
- <sbranden@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>, Ilya
- Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Jiri
- Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>, Petr Mladek
- <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Louis Peens
- <louis.peens@corigine.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
- Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan
- <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Jeff Johnson <quic_jjohnson@quicinc.com>
-Subject: Re: [PATCH v3 00/19] Converge on using secs_to_jiffies()
-Message-Id: <20241210163520.95fa1c8aa83e1915004ed884@linux-foundation.org>
-In-Reply-To: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
-References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	b=pG+BKg9JU+q5lYb8UWPUOfOa2unJCPTPaYl4i003XvIpDyMqQD4KQHnTwV1i+wPaP
+	 6pZ1/sCNgnaWmkRz7Nn+Q4GNJoSNX0RxxBbd67snXEjcytav4+Hy+NqbYRfHcGizN4
+	 zVT870Sde5f5u8aAE2irXkONA6NBdDRea+KwsBQWfWCchBpgbxxhWjLdZWtHoVMuA7
+	 F5TUoQR+xBE4RZvmo3XJpI/+EC46Sx/7XIgasuXot1fFyk5BaXnNLT/+8n3g6qbGlt
+	 yfBsiWf5wNWxbvUzUnzGlqsMvh61B+KfGUqtORJsJG5K4k1VsNO1Qcxh7V5MuonkZ5
+	 KQCDRO97PcF/g==
+Date: Tue, 10 Dec 2024 16:43:08 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: "andrew@lunn.ch" <andrew@lunn.ch>, "hkallweit1@gmail.com"
+ <hkallweit1@gmail.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+ "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "florian.fainelli@broadcom.com" <florian.fainelli@broadcom.com>,
+ "heiko.stuebner@cherry.de" <heiko.stuebner@cherry.de>, "fank.li@nxp.com"
+ <fank.li@nxp.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "imx@lists.linux.dev" <imx@lists.linux.dev>
+Subject: Re: [PATCH v3 net] net: phy: micrel: Dynamically control external
+ clock of KSZ PHY
+Message-ID: <20241210164308.6af97d00@kernel.org>
+In-Reply-To: <PAXPR04MB85104EC1BFE4075DF1A27B93883D2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20241206012113.437029-1-wei.fang@nxp.com>
+	<20241209181451.56790483@kernel.org>
+	<PAXPR04MB85104EC1BFE4075DF1A27B93883D2@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 10 Dec 2024 22:02:31 +0000 Easwar Hariharan <eahariha@linux.microsoft.com> wrote:
+On Tue, 10 Dec 2024 02:45:57 +0000 Wei Fang wrote:
+> The simple fix could only fix the commit 985329462723 ("net: phy: micrel: use
+> devm_clk_get_optional_enabled for the rmii-ref clock"), because as the commit
+> message said some clock suppliers need to be enabled so that the driver can get
+> the correct clock rate.
+> 
+> But the problem is that the simple fix cannot fix the 99ac4cbcc2a5 ("net: phy:
+> micrel: allow usage of generic ethernet-phy clock"). The change is as follows,
+> this change just enables the clock when the PHY driver probes. There are no
+> other operations on the clock, such as obtaining the clock rate. So you still think
+> a simple fix is good enough for net tree?
 
-> This is a series that follows up on my previous series to introduce
-> secs_to_jiffies() and convert a few initial users.
+I may be missing something but if you don't need to disable the generic
+clock you can put the disable into the if () block for rmii-ref ?
 
-Thanks, I added this to mm.git.  I suppressed the usual added-to-mm
-emails because soooo many cc's!
-
-I'd ask relevant maintainers to send in any acks and I'll paste them
-into the relevant changelogs.
-
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 3ef508840674..8bbd2018f2a6 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -2214,6 +2214,8 @@ static int kszphy_probe(struct phy_device *phydev)
+                                   rate);
+                        return -EINVAL;
+                }
++
++               clk_disable_unprepare(clk);
+        } else if (!clk) {
+                /* unnamed clock from the generic ethernet-phy binding */
+                clk = devm_clk_get_optional_enabled(&phydev->mdio.dev, NULL);
 
