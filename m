@@ -1,97 +1,84 @@
-Return-Path: <netdev+bounces-151110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A10C9ECD9B
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:46:21 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 555231888AC7
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:45:51 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D99522336A2;
-	Wed, 11 Dec 2024 13:44:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cNeICnUs"
-X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2048.outbound.protection.outlook.com [40.107.93.48])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB01C9ECD9C
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:46:31 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4003A2336A9;
-	Wed, 11 Dec 2024 13:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733924684; cv=fail; b=ZghrUZfFam73glKMirjbLFj4Pny45nzyBUL4AXbE7bXHG0AtPcAZ9Cn+O7zIqITEFvnawUUyIx0MgdoCmX7fCWcgdnicqgeZMI1fM7OI1T3dcTVX6OxWnib0CgTDNzlULR3JR3jNXkgftvIFzIpO2l/YHLNrEudZ1GZvzLI5GHk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733924684; c=relaxed/simple;
-	bh=6ZVzd45VKwaVqvqtE2yC1dZepgb84hEbcv7tRF6SLUI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SDkjMUzhNVp/kPDBCQzfcwfKhG8ya8ILkAC59uFrl2jxgx7uxDqzOK5yJjqISeeAGC3hcJMNpP95aktRbB1S2rTzZP3CNaUDX+WD0P9uo29RtCDV5ynK45mnqtbXxM9s1x926Im72Xqahizn7lH5yqbZKe7B8dIFPSU8GpmCAuo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cNeICnUs; arc=fail smtp.client-ip=40.107.93.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JYqhQ6ExhXYk5BZnIxcHNfoI5j4jQLKzOJJpR3Yr7TUTfniPDhs/Qbec1AXGzstKqCPi9uDzx1eIMbmw5Z38Z4Ns9LewNxxdeUOqqljrcfwjvOKtC+6rSpqvWCHfGCPVMVMIJs5NiNAWnDfzi46rZaGsD8BeYYGbTAY3z9j/0SynoJbRjlC/tCO2TL+EzP0r9dsZqN/38I+rZ3GJ5K9DPFlkMUoVk5WNf4HhvxQ5OMKVKHl3XhzyxgjqvN8mBm0VN7oxlcjDxkfORUXvJwL27tDM9s8fCPlUj7gkscZ9Qt5VczCFI3yYrVq1mRJBc2cTRnt1RYR3hRVbva3rykOv4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Rfv3elRwyUydOqmqS8DCP8iIxtevsE045EXbXJHdEGU=;
- b=o7WDm3h8iG3N4GFW7xd0KTJjDtGLPTNb1E9wu28eF75Jmh5ybg3fnotLJ9TVMIT4XCWpC3zDUPV56iVCAkJRySPu0d95O1907HYRlcA5FgVKLtEiI3d22AX5l48+2C8W4agGKXTOG0BL+CH/TXEM0uzH24lsnYenwgik0iweVohpw1xPWMQrAmQTbku0wU0d0UhWSR9zpMFzo7Uj8Fj3+3pCJA/wVA+4vo5VviWjsXyr1SgQsRKqu2mI2YvgouXCbam4t/w2afitXrpowwBHvbcrNQDRcKJ7i2md7gSIqjXEtyZ+CFdthVa6ehWsotMntyErpnuOlKOz1ntO+ZRKyg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Rfv3elRwyUydOqmqS8DCP8iIxtevsE045EXbXJHdEGU=;
- b=cNeICnUsWJb0si8xT/+MP4yGi0UHn0vmn6qO1CukEM9iKNPm6mcDdmRmm4PXQmXWT63JiQ/mqzczI+1XMdHg/Vl1F+6FO16Fsdt+zTSMXDdwarDn+zxkjhmfyWrsD6dC40XzjvAoVOmCsOLZhjScj2i13QUxIP9rZ2m6BDWpzHj3G0XFiz4irVMiSrmYZJH3YIUvXrapBnWAsbnVolzSVPhDehwdO3sn0k+Jl+eTz/UQ5mQ9TkGD2wqrcyJA04KoJaYtFr7TYvaPx0de7kK0axQ/TU/8U1GE692f9qjG0J+l8JANrlM+Tib3yVvYTeqTISvKAv4eashYUOSsmdp2Jg==
-Received: from CY5P221CA0036.NAMP221.PROD.OUTLOOK.COM (2603:10b6:930:b::40) by
- SJ2PR12MB8847.namprd12.prod.outlook.com (2603:10b6:a03:546::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Wed, 11 Dec
- 2024 13:44:37 +0000
-Received: from CY4PEPF0000EE3C.namprd03.prod.outlook.com
- (2603:10b6:930:b:cafe::cd) by CY5P221CA0036.outlook.office365.com
- (2603:10b6:930:b::40) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8251.15 via Frontend Transport; Wed,
- 11 Dec 2024 13:44:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000EE3C.mail.protection.outlook.com (10.167.242.13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8251.15 via Frontend Transport; Wed, 11 Dec 2024 13:44:37 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 11 Dec
- 2024 05:44:22 -0800
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 11 Dec
- 2024 05:44:21 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
- with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Wed, 11 Dec
- 2024 05:44:18 -0800
-From: Tariq Toukan <tariqt@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>, Leon Romanovsky <leonro@nvidia.com>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, <linux-rdma@vger.kernel.org>, Patrisious Haddad
-	<phaddad@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Tariq Toukan
-	<tariqt@nvidia.com>
-Subject: [PATCH net-next 12/12] net/mlx5: fs, Add support for RDMA RX steering over IB link layer
-Date: Wed, 11 Dec 2024 15:42:23 +0200
-Message-ID: <20241211134223.389616-13-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20241211134223.389616-1-tariqt@nvidia.com>
-References: <20241211134223.389616-1-tariqt@nvidia.com>
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2EB4281DD7
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:46:25 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760182368E1;
+	Wed, 11 Dec 2024 13:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y/LKFdFE"
+X-Original-To: netdev@vger.kernel.org
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6A2233687;
+	Wed, 11 Dec 2024 13:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733924772; cv=none; b=aSFg+sJd5Q9axB3M0XCPOOcBrBpLdSAPOIavRk1tG0Zp+y6ibLWcaeXhkyXiYfAMd/j/3ORJJ2EZ7O7eRlXjzShwnNrxlTUoF22kEEBkbu1UDDGRQOn335XTN34MxozCoGBgHr6epK9sF8DjAncRC35H2bTFavg1/DcaHPgedfE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733924772; c=relaxed/simple;
+	bh=P2PQ2vFtUndMC7zzOBl61FW7HLiReXx8jF9TSzVoLxE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UPUylM+gSXF3JY7IbRWnVwM/BMNllakuUetncdvRXNfjt20RXgE1SQAlY2085GaiP9rTOZW73xZ93+P69U4yHyybRutnl6MjoZiwe7tH6lWliBK8O2uNd058R7hGDlh9pOFpKoNfewgffOrAkBSf3XJN6HY0I/PRC4Lm4HoZdk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y/LKFdFE; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733924770; x=1765460770;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=P2PQ2vFtUndMC7zzOBl61FW7HLiReXx8jF9TSzVoLxE=;
+  b=Y/LKFdFEfM5RH9tbLPmctoazcmK+0A3/UZDIJaQWGTN8rd3873W66i6N
+   iKAcOFQFvRyC4ZVerc85HUIuTnLK5cXyFTC00jJqs+/ijwUKIGDTM5hVh
+   +JtGs/Y4w+Wr+haoboT+6m64/pLHmcjlx6a80Ob3xS+fR0x7xEQj+AQwF
+   AJNou4Hsi4nFk3DGo4448AjRMyDDLLodv2Ozb2DV4CfwiS/qsCgcuq5gs
+   otoPJPAOZ3S3yrsF4Mj+kttiCTjZs7woj7Mc3TFFxWt8qnz7ZvG3+T54U
+   69T3qwyndAXoszVTst4Oq8MxsOfoG9ulg9uw8+soyj2ffAuU39LJDMu10
+   A==;
+X-CSE-ConnectionGUID: kpOPQ+n9RGKpg0k8Ll5qkg==
+X-CSE-MsgGUID: DzNerxBsTWm4x4LCOgEEdA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="44912752"
+X-IronPort-AV: E=Sophos;i="6.12,225,1728975600"; 
+   d="scan'208";a="44912752"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2024 05:46:03 -0800
+X-CSE-ConnectionGUID: OLxoQH+DRBqZwHS+Zy/tYA==
+X-CSE-MsgGUID: FewiAaAbTiGaI8FZj+15Ag==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,225,1728975600"; 
+   d="scan'208";a="95634672"
+Received: from p12ill20yoongsia.png.intel.com ([10.88.227.28])
+  by fmviesa007.fm.intel.com with ESMTP; 11 Dec 2024 05:45:59 -0800
+From: Song Yoong Siang <yoong.siang.song@intel.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH iwl-next v2 1/1] igc: Improve XDP_SETUP_PROG process
+Date: Wed, 11 Dec 2024 21:45:32 +0800
+Message-Id: <20241211134532.3489335-1-yoong.siang.song@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,104 +86,124 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3C:EE_|SJ2PR12MB8847:EE_
-X-MS-Office365-Filtering-Correlation-Id: f66bae45-7bf1-4b01-1f1e-08dd19e9f46c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?zGCCi8zOI7hruE46o9YugIXDBWAOhEELaX8LcmOS+41XS7fTqWVxuybdOiD9?=
- =?us-ascii?Q?5lPIl6GwZDlw5fRHvP4Nk2GKNG7UD0PpU+SvLoQHjSnjdOJJmfHEYZeHXhpG?=
- =?us-ascii?Q?ui7clXLycDYhq4BieBdVPnPJ117uLnVb3z5McU7okA5bY0UtR/J84Hp5jzTM?=
- =?us-ascii?Q?J3WzWMj7dUcbSVx/epAm50vZlmem+SyK2QYkrkRq+R5xjMpAVZPzy5xcwfl4?=
- =?us-ascii?Q?gIM/8+7Qlgv1QwGnVLAqcX489FVgWE9IJB7o02MbjsPvUJVSWH+5qdGC/wtK?=
- =?us-ascii?Q?y6k+3bTQlDP5vj229cZLhwIt0e8iNJ6w57djUxG5Tcpon3xh9mAdNTPJ2Z34?=
- =?us-ascii?Q?/AEp9+eYkogAGayj5dz7CtpogcfzWGRRZJmbcNqTwemQqwm0DEQH19/NuIJs?=
- =?us-ascii?Q?gkSi2ta3lpw+3wu9z4Qpi/oMrKO1ByUEGyRo2pWEd92gsm01C3Pftc2+w+fU?=
- =?us-ascii?Q?AGWdZps9Vfxz6iYnL1+iOnKdpoAwSz8mwaj+wszmV7Mm1kMrItdXriqkNiwA?=
- =?us-ascii?Q?6ZMobg095czk6uMlX1/YeGAWh4n3El+cBbURpfvR5JaS422AQn2YBynXwFiw?=
- =?us-ascii?Q?T/uUZPMCNaeJs7k2cwjLqi1D2fD9f/AIyMEpXSRiWw3RGtW3Yu44/ttB3a2e?=
- =?us-ascii?Q?tg59PoWlJQCuGmzw4MM1L1iHaun2Sfk0r6b7w+DGOYX6aER4Ozq6NxjYtgLq?=
- =?us-ascii?Q?WAH1MHWaVTcLzHtdYBLnruk0cC5PMtg4+dtoczIcCw4IB7wizL84FOYtZOt3?=
- =?us-ascii?Q?jilq7DenKVcSP/meQY5ZrghGE1Rq2d8ZPXEvMCSwsR36ok8X+NjBa+POqcku?=
- =?us-ascii?Q?7OVchtaa28SSLW5UOXuYbZ5QM5Nw/7lEJfAMU/wHrE30kS11cHSg2wlqpQEo?=
- =?us-ascii?Q?mqHZvAmgHXqPsuUCJSSacFwXscCMmZLR3XhxvMDGmr7N0yLU4Ocz6BYFuJz1?=
- =?us-ascii?Q?4Kwl++3E2hqmTNbPkjftyFTs0kjKtWgJAf/N/Y+qNrrg1HuxBwGEbvz0cxEq?=
- =?us-ascii?Q?iPMn57AFSfLXlMplMzcnQRVt2tOTWXLuqiFgRIY+duBJ7qnJszIwVQDJgpIr?=
- =?us-ascii?Q?qTbXl/TxzUMCxO24MZPPfeRauTNEduVwKRjxbvQM8ensGtjqQZsR6tK8dtSW?=
- =?us-ascii?Q?jJ8qc5igMSXHveVjQ8aBIlqCrq6HYwdCz2kMePxHcnsnTrdqI+0LK5fsra0i?=
- =?us-ascii?Q?ms2tg4lvpdv6Vjpt1D/9E38jXwgqPByD7xC+WdSLtMj99XSumbLlVHgV2yub?=
- =?us-ascii?Q?1H7kyweyGQWp1XV82SpRz56CDvLavTh338od9eui1fvx2H/bzgU/3qfxStfL?=
- =?us-ascii?Q?T2QsNUbalRflwi0yrCle5v0NO3kS1MDpIb5Ffr4+TiHoi5tMMheihNfkkqRA?=
- =?us-ascii?Q?StF+nx3UCfoFuXdzCE4TC3taDsEea4y86fiiAiigeGYzHhbRjwF0i1u5T9Mo?=
- =?us-ascii?Q?JWlwBqWGNTYDFvM2CP+fc0WNcGNtpKTm?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2024 13:44:37.3873
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f66bae45-7bf1-4b01-1f1e-08dd19e9f46c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3C.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8847
 
-From: Patrisious Haddad <phaddad@nvidia.com>
+Improve XDP_SETUP_PROG process by avoiding unnecessary link down event.
 
-Relax the capability check for creating the RDMA RX steering domain
-by considering only the capabilities reported by the firmware
-as necessary for its creation, which in turn allows RDMA RX creation
-over devices with IB link layer as well.
+This patch is tested by using ip link set xdpdrv command to attach a simple
+XDP program which always return XDP_PASS.
 
-The table_miss_action_domain capability is required only for a specific
-priority, which is handled in mlx5_rdma_enable_roce_steering().
-The additional capability check for this case is already in place.
+Before this patch, attaching xdp program will cause ptp4l to lost sync for
+few seconds, as shown in ptp4l log below:
+  ptp4l[198.082]: rms    4 max    8 freq   +906 +/-   2 delay    12 +/-   0
+  ptp4l[199.082]: rms    3 max    4 freq   +906 +/-   3 delay    12 +/-   0
+  ptp4l[199.536]: port 1 (enp2s0): link down
+  ptp4l[199.536]: port 1 (enp2s0): SLAVE to FAULTY on FAULT_DETECTED (FT_UNSPECIFIED)
+  ptp4l[199.600]: selected local clock 22abbc.fffe.bb1234 as best master
+  ptp4l[199.600]: port 1 (enp2s0): assuming the grand master role
+  ptp4l[199.600]: port 1 (enp2s0): master state recommended in slave only mode
+  ptp4l[199.600]: port 1 (enp2s0): defaultDS.priority1 probably misconfigured
+  ptp4l[202.266]: port 1 (enp2s0): link up
+  ptp4l[202.300]: port 1 (enp2s0): FAULTY to LISTENING on INIT_COMPLETE
+  ptp4l[205.558]: port 1 (enp2s0): new foreign master 44abbc.fffe.bb2144-1
+  ptp4l[207.558]: selected best master clock 44abbc.fffe.bb2144
+  ptp4l[207.559]: port 1 (enp2s0): LISTENING to UNCALIBRATED on RS_SLAVE
+  ptp4l[208.308]: port 1 (enp2s0): UNCALIBRATED to SLAVE on MASTER_CLOCK_SELECTED
+  ptp4l[208.933]: rms  742 max 1303 freq   -195 +/- 682 delay    12 +/-   0
+  ptp4l[209.933]: rms  178 max  274 freq   +387 +/- 243 delay    12 +/-   0
 
-Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
-Reviewed-by: Mark Bloch <mbloch@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+After this patch, attaching xdp program no longer cause ptp4l to lost sync,
+as shown on ptp4l log below:
+  ptp4l[201.183]: rms    1 max    3 freq   +959 +/-   1 delay     8 +/-   0
+  ptp4l[202.183]: rms    1 max    3 freq   +961 +/-   2 delay     8 +/-   0
+  ptp4l[203.183]: rms    2 max    3 freq   +958 +/-   2 delay     8 +/-   0
+  ptp4l[204.183]: rms    3 max    5 freq   +961 +/-   3 delay     8 +/-   0
+  ptp4l[205.183]: rms    2 max    4 freq   +964 +/-   3 delay     8 +/-   0
+
+Besides, before this patch, attaching xdp program will cause flood ping to
+loss 10 packets, as shown in ping statistics below:
+  --- 169.254.1.2 ping statistics ---
+  100000 packets transmitted, 99990 received, +6 errors, 0.01% packet loss, time 34001ms
+  rtt min/avg/max/mdev = 0.028/0.301/3104.360/13.838 ms, pipe 10, ipg/ewma 0.340/0.243 ms
+
+After this patch, attaching xdp program no longer cause flood ping to loss
+any packets, as shown in ping statistics below:
+  --- 169.254.1.2 ping statistics ---
+  100000 packets transmitted, 100000 received, 0% packet loss, time 32326ms
+  rtt min/avg/max/mdev = 0.027/0.231/19.589/0.155 ms, pipe 2, ipg/ewma 0.323/0.322 ms
+
+On the other hand, this patch is also tested with tools/testing/selftests/
+bpf/xdp_hw_metadata app to make sure XDP zero-copy is working fine with
+XDP Tx and Rx metadata. Below is the result of last packet after received
+10000 UDP packets with interval 1 ms:
+  poll: 1 (0) skip=0 fail=0 redir=10000
+  xsk_ring_cons__peek: 1
+  0x55881c7ef7a8: rx_desc[9999]->addr=8f110 addr=8f110 comp_addr=8f110 EoP
+  rx_hash: 0xFB9BB6A3 with RSS type:0x1
+  HW RX-time:   1733923136269470866 (sec:1733923136.2695) delta to User RX-time sec:0.0000 (43.280 usec)
+  XDP RX-time:   1733923136269482482 (sec:1733923136.2695) delta to User RX-time sec:0.0000 (31.664 usec)
+  No rx_vlan_tci or rx_vlan_proto, err=-95
+  0x55881c7ef7a8: ping-pong with csum=ab19 (want 315b) csum_start=34 csum_offset=6
+  0x55881c7ef7a8: complete tx idx=9999 addr=f010
+  HW TX-complete-time:   1733923136269591637 (sec:1733923136.2696) delta to User TX-complete-time sec:0.0001 (108.571 usec)
+  XDP RX-time:   1733923136269482482 (sec:1733923136.2695) delta to User TX-complete-time sec:0.0002 (217.726 usec)
+  HW RX-time:   1733923136269470866 (sec:1733923136.2695) delta to HW TX-complete-time sec:0.0001 (120.771 usec)
+  0x55881c7ef7a8: complete rx idx=10127 addr=8f110
+
+Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c  | 3 ++-
- drivers/net/ethernet/mellanox/mlx5/core/fs_core.c | 3 +--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+V2 changelog:
+ - show some examples of problem in commit msg. (Vinicius)
+ - igc_close()/igc_open() are too big a hammer for installing a new XDP
+   program. Only do we we really need. (Vinicius)
+---
+ drivers/net/ethernet/intel/igc/igc_xdp.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-index 6bf0aade69d7..ae20c061e0fb 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-@@ -217,7 +217,8 @@ static int mlx5_cmd_update_root_ft(struct mlx5_flow_root_namespace *ns,
- 	int err;
+diff --git a/drivers/net/ethernet/intel/igc/igc_xdp.c b/drivers/net/ethernet/intel/igc/igc_xdp.c
+index 869815f48ac1..64b04aad614c 100644
+--- a/drivers/net/ethernet/intel/igc/igc_xdp.c
++++ b/drivers/net/ethernet/intel/igc/igc_xdp.c
+@@ -14,6 +14,7 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
+ 	bool if_running = netif_running(dev);
+ 	struct bpf_prog *old_prog;
+ 	bool need_update;
++	int i;
  
- 	if ((MLX5_CAP_GEN(dev, port_type) == MLX5_CAP_PORT_TYPE_IB) &&
--	    underlay_qpn == 0)
-+	    underlay_qpn == 0 &&
-+	    (ft->type != FS_FT_RDMA_RX && ft->type != FS_FT_RDMA_TX))
- 		return 0;
- 
- 	if (ft->type == FS_FT_FDB &&
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-index ae1a5705b26d..41b5e98a0495 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-@@ -3665,8 +3665,7 @@ int mlx5_fs_core_init(struct mlx5_core_dev *dev)
- 			goto err;
+ 	if (dev->mtu > ETH_DATA_LEN) {
+ 		/* For now, the driver doesn't support XDP functionality with
+@@ -24,8 +25,13 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
  	}
  
--	if (MLX5_CAP_FLOWTABLE_RDMA_RX(dev, ft_support) &&
--	    MLX5_CAP_FLOWTABLE_RDMA_RX(dev, table_miss_action_domain)) {
-+	if (MLX5_CAP_FLOWTABLE_RDMA_RX(dev, ft_support)) {
- 		err = init_rdma_rx_root_ns(steering);
- 		if (err)
- 			goto err;
+ 	need_update = !!adapter->xdp_prog != !!prog;
+-	if (if_running && need_update)
+-		igc_close(dev);
++	if (if_running && need_update) {
++		for (i = 0; i < adapter->num_rx_queues; i++) {
++			igc_disable_rx_ring(adapter->rx_ring[i]);
++			igc_disable_tx_ring(adapter->tx_ring[i]);
++			napi_disable(&adapter->rx_ring[i]->q_vector->napi);
++		}
++	}
+ 
+ 	old_prog = xchg(&adapter->xdp_prog, prog);
+ 	if (old_prog)
+@@ -36,8 +42,13 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
+ 	else
+ 		xdp_features_clear_redirect_target(dev);
+ 
+-	if (if_running && need_update)
+-		igc_open(dev);
++	if (if_running && need_update) {
++		for (i = 0; i < adapter->num_rx_queues; i++) {
++			napi_enable(&adapter->rx_ring[i]->q_vector->napi);
++			igc_enable_tx_ring(adapter->tx_ring[i]);
++			igc_enable_rx_ring(adapter->rx_ring[i]);
++		}
++	}
+ 
+ 	return 0;
+ }
 -- 
-2.44.0
+2.34.1
 
 
