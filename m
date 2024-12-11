@@ -1,81 +1,85 @@
-Return-Path: <netdev+bounces-150991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 056219EC4A6
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 07:18:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 216649EC4AE
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 07:23:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A15D188B277
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 06:18:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21A5C16867C
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 06:23:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5397C1BD9DE;
-	Wed, 11 Dec 2024 06:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D916E1BD9DE;
+	Wed, 11 Dec 2024 06:23:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M6zlZtk3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LV3D6XlL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5619C2451C0;
-	Wed, 11 Dec 2024 06:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7042B2451C0;
+	Wed, 11 Dec 2024 06:23:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733897921; cv=none; b=F4wrqGP3xX/GMU+9PX3Av6N02dSRReXHp+OPH+7bDTR2JuluTcF7WQMTFsl+4UhVoeAjdyaTRqafh2o/SKZYpEqqM34eE/PrXRpJJYr9UpzYutipcypjzvOcebsvYtSA5C3X0LaYptMRjClz4+BPjgGR2T++dKsCgV7oafgtiRw=
+	t=1733898199; cv=none; b=pbdGfzMLBf4Z/A/0/vXr4q7HXaaPeedpfOKVCjmYTT93/VA0FeKZpBdOn0ymKnVHujm3/x0NYOAUMp+UkIoydd1cTLmR38iCfK1MzFGzbKDGS3IJNDmtAPqgZf+cOTz7Rdv7Y2FOPyr3z6SGGkfZOeJVKZ8B6hJTjYNeArdzQiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733897921; c=relaxed/simple;
-	bh=cur8CuoAH+H4jF33FgCR6R1uA3IllajSA0KvS9KrMQc=;
+	s=arc-20240116; t=1733898199; c=relaxed/simple;
+	bh=cmiD+UcTXJNkpZUqRbUnI7Qr3wBGV+y0BOrRVfqeupE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GhTYzVWWtasYvEXCQLyimPMK0A5brG3Z6GXP82ssZGx/9fYylbn04xst6GRAfhLv29ngnUkFVd4sL0nbxpH6Jw+cPoAiQYCQ+zCNTBgWgj+acD6Fhlt6jLCJKVJCCk/ajHzmdk8zN6gRAqOkdyHp30ZEbfPZiojhSYt6GCXvo70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M6zlZtk3; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733897920; x=1765433920;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cur8CuoAH+H4jF33FgCR6R1uA3IllajSA0KvS9KrMQc=;
-  b=M6zlZtk3ysMGJIE6+/kjxEOHr0+dHXTVvp6ql318iO7eP6Nw/xmJBNby
-   Ls5NOVnGMBT/0JyRIxfGovTjQoFZVMZjsyS28/qSuMrs/86TzDy0bNdHW
-   rmgrQaRRlu712iZFajINyF9WNOJWhQ1DoLIbo9XhUJRwesvRzbKWvTCgD
-   jl28RZ88MI2yKbTMjeFo3yVj52RWx3QjGiZStBlgNyLRFuWjHKsgpEqZZ
-   86G0R/bjduzMEzC/7BtlgYGH6FsRB0Q8VC4HZ0+pg1j9O0CYus7QHsM+v
-   /AVy0TQ489I9WiH4+h2GOYXNAadTeziGiz4Q0ODfi7i00lQe5Lz3xI7k8
-   Q==;
-X-CSE-ConnectionGUID: 52NFVWRTQQ+8F2GMj6AJuw==
-X-CSE-MsgGUID: LylsMFkcSZyoq4q9JJVP5g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="34390458"
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="34390458"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 22:18:39 -0800
-X-CSE-ConnectionGUID: PCFnWO9wRvKGcb6vNOSpXQ==
-X-CSE-MsgGUID: hJqPX/ImR/G57QTjcGJIQQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="118921327"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 22:18:35 -0800
-Date: Wed, 11 Dec 2024 07:15:35 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michael Dege <michael.dege@renesas.com>,
-	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
-	Dennis Ostermann <dennis.ostermann@renesas.com>
-Subject: Re: [PATCH net v2] net: renesas: rswitch: fix initial MPIC register
- setting
-Message-ID: <Z1kuB1Ac225G8HkY@mev-dev.igk.intel.com>
-References: <20241211053012.368914-1-nikita.yoush@cogentembedded.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=exTG5xT8lcX+DEr0CwHvu9+XiDFQbEn4w/Ie50RJ1vKKZfFJ4ngaqQUiGNYHOQxNMJCOmArCppwe3SMIi7DIVKAx2/fa2VtVZ1GWj0wmUiuNqQprNZk4CYN/yco7K3ihncH+kkIw0B/aC6BFs3BP6VcVkfhvoXTDI3cKGudIayY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LV3D6XlL; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7fd35b301bdso2921825a12.2;
+        Tue, 10 Dec 2024 22:23:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733898197; x=1734502997; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5qkxY1avkOoWW07234aWtJOqYEByF+/tTPC72emPdi4=;
+        b=LV3D6XlL0Fr6hTWXvGYixwyx15uoIS4YNuJ+BLge01/Pbilc+th4ow5unRVH0n5Xna
+         B4CgQmqdThk0fTtncKH7sG3jHaX4nZz60IW1bIf3ts0eIg6hmCsvE8FKn7NqAZlrjz6f
+         Ln0PJyVh3RX1a6eS+Q6kPEGkijr2+ptlgtho9B3hs/DUylvEub7/gJB22m0gUlnHJSGB
+         DTXpXF4/Z/97HE5cGQ7owiC19YaR3jX/5c4GHHfGXy2XsMPldKfv9lp2XRR09cFh5/ya
+         50N4kNalATutDKOsXmAwpCQPXQ8Tq4aqEhaMQmRRvaPanFqyrd++I4jRdx0vIXCfve8k
+         htsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733898197; x=1734502997;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5qkxY1avkOoWW07234aWtJOqYEByF+/tTPC72emPdi4=;
+        b=SoXYiIwQsMQczEa3oPFHfkNr4a/yoL1EoTeUHISsz6wU4gbJ190Gt1Kgq3EEYenIHb
+         ZswolTqeePIl8qg2pHc/RUc06siodU9p4PEWP1Ahw04Txgs4ttVBscYFvutM093NRtmZ
+         BzJhlSt9plifcBGcC90ijRUeGaycY5JHraG3uZ0LvCB3Vunj32ZIH9IpKVgADbM3osSE
+         WQF2A+sPQJSTl8jn4EFujNCqB3R5OtnhW0wlKQHdIMexgEhyPOYWWJYdZIXQthripFCP
+         7eI3mebsVNgb0q/KBMsCA0+neVvpBw4zYsElfg9kOrU4zyBxHE9XBzHioSu6Swb9xipS
+         g7rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVXR7HjtiMpsqS0U31X5L2hh6ZqViiyfQTWUxi2LxCn3hZtp+dcGngtZBcFywpV24IzGE0k3Ylu@vger.kernel.org, AJvYcCX4zve4RUG2di7pIkcqNwj8i2V+aN76sqVUp1LTVZWpxFAX/PwyDeC7JoIygTwdXW1mBucNmnokF1h0g3s=@vger.kernel.org, AJvYcCXEBIuQnlFAP1buDh1CDOBvRtRUVuB2POo9gmUBwglgF/iyvS3qNP48zWw4e7wNgO2CkQDD3b6r@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyg4Z9p2O/9bM9wLQykGZSqtRWNi1qtN2hVlZz54Gt5MWMTJkcD
+	5G+oPsk7FDGTlJXFS/qi9NGYG5u30x0BuTz1x3vUxvRaYCth2s1d7x/jMA==
+X-Gm-Gg: ASbGnctyjmVvwKbreOl9nrzzSXBfPm11vS9DwOGAuxFR9j6qsIWxhCZaw9IxoE7P91J
+	cY56Yhr5Hm2RqoMwNTPcoZEkTIQA024k+uSzNHCr6bh6k/8vFULlHKa8SBdj0pHaRaJooqAwlh/
+	T3/d06DLLGq8YIAhUcv8/lDMTvIfWdJzVdTXqpjkTpXs4dRaeWexjj107Cy2oG9Xz04Kark/fK5
+	GBwfBvy7ryjozzlzad/IPck4AuAeUI3r1t8JnsV1A1I9EFPgOJJV/HmivoGpx8v982l66vwrQ==
+X-Google-Smtp-Source: AGHT+IHQONMvanKaDDQaiCx8CuJlxl2HMa++W4IWg8efjNmZtTfNbCOt3sA5XKXviX45mNEy1oQgtg==
+X-Received: by 2002:a17:90b:49:b0:2ee:a127:ba8b with SMTP id 98e67ed59e1d1-2f128048ea9mr2495853a91.36.1733898196697;
+        Tue, 10 Dec 2024 22:23:16 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ef26ff86d9sm12731692a91.1.2024.12.10.22.23.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Dec 2024 22:23:16 -0800 (PST)
+Date: Tue, 10 Dec 2024 22:23:14 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Ma Ke <make_ruc2021@163.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, vdronov@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] ptp: Check dev_set_name() return value
+Message-ID: <Z1kv0tJHtoGVGmxO@hoboy.vegasvil.org>
+References: <20241211022612.2159956-1-make_ruc2021@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,105 +88,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241211053012.368914-1-nikita.yoush@cogentembedded.com>
+In-Reply-To: <20241211022612.2159956-1-make_ruc2021@163.com>
 
-On Wed, Dec 11, 2024 at 10:30:12AM +0500, Nikita Yushchenko wrote:
-> MPIC.PIS must be set per phy interface type.
-> MPIC.LSC must be set per speed.
-> 
-> Do that strictly per datasheet, instead of hardcoding MPIC.PIS to GMII.
-> 
-> Fixes: 3590918b5d07 ("net: ethernet: renesas: Add support for "Ethernet Switch"")
-> Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-> ---
-> v1: https://lore.kernel.org/netdev/20241209075951.163924-1-nikita.yoush@cogentembedded.com/
-> changes: regenerate against top of net tree (commit 3dd002f20098 "net:
->          renesas: rswitch: handle stop vs interrupt race") to ensure it
->          applies cleanly
-> ---
->  drivers/net/ethernet/renesas/rswitch.c | 27 ++++++++++++++++++++------
->  drivers/net/ethernet/renesas/rswitch.h | 14 ++++++-------
->  2 files changed, 28 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-> index 6ec714789573..dbbbf024e7ab 100644
-> --- a/drivers/net/ethernet/renesas/rswitch.c
-> +++ b/drivers/net/ethernet/renesas/rswitch.c
-> @@ -1116,25 +1116,40 @@ static int rswitch_etha_wait_link_verification(struct rswitch_etha *etha)
->  
->  static void rswitch_rmac_setting(struct rswitch_etha *etha, const u8 *mac)
->  {
-> -	u32 val;
-> +	u32 pis, lsc;
->  
->  	rswitch_etha_write_mac_address(etha, mac);
->  
-> +	switch (etha->phy_interface) {
-> +	case PHY_INTERFACE_MODE_SGMII:
-> +		pis = MPIC_PIS_GMII;
-> +		break;
-> +	case PHY_INTERFACE_MODE_USXGMII:
-> +	case PHY_INTERFACE_MODE_5GBASER:
-> +		pis = MPIC_PIS_XGMII;
-> +		break;
-> +	default:
-> +		pis = FIELD_GET(MPIC_PIS, ioread32(etha->addr + MPIC));
-> +		break;
-> +	}
-> +
->  	switch (etha->speed) {
->  	case 100:
-> -		val = MPIC_LSC_100M;
-> +		lsc = MPIC_LSC_100M;
->  		break;
->  	case 1000:
-> -		val = MPIC_LSC_1G;
-> +		lsc = MPIC_LSC_1G;
->  		break;
->  	case 2500:
-> -		val = MPIC_LSC_2_5G;
-> +		lsc = MPIC_LSC_2_5G;
->  		break;
->  	default:
-> -		return;
-> +		lsc = FIELD_GET(MPIC_LSC, ioread32(etha->addr + MPIC));
-> +		break;
->  	}
->  
-> -	iowrite32(MPIC_PIS_GMII | val, etha->addr + MPIC);
-> +	rswitch_modify(etha->addr, MPIC, MPIC_PIS | MPIC_LSC,
-> +		       FIELD_PREP(MPIC_PIS, pis) | FIELD_PREP(MPIC_LSC, lsc));
->  }
->  
->  static void rswitch_etha_enable_mii(struct rswitch_etha *etha)
-> diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
-> index 72e3ff596d31..e020800dcc57 100644
-> --- a/drivers/net/ethernet/renesas/rswitch.h
-> +++ b/drivers/net/ethernet/renesas/rswitch.h
-> @@ -724,13 +724,13 @@ enum rswitch_etha_mode {
->  
->  #define EAVCC_VEM_SC_TAG	(0x3 << 16)
->  
-> -#define MPIC_PIS_MII		0x00
-> -#define MPIC_PIS_GMII		0x02
-> -#define MPIC_PIS_XGMII		0x04
-> -#define MPIC_LSC_SHIFT		3
-> -#define MPIC_LSC_100M		(1 << MPIC_LSC_SHIFT)
-> -#define MPIC_LSC_1G		(2 << MPIC_LSC_SHIFT)
-> -#define MPIC_LSC_2_5G		(3 << MPIC_LSC_SHIFT)
-> +#define MPIC_PIS		GENMASK(2, 0)
-> +#define MPIC_PIS_GMII		2
-> +#define MPIC_PIS_XGMII		4
-> +#define MPIC_LSC		GENMASK(5, 3)
-> +#define MPIC_LSC_100M		1
-> +#define MPIC_LSC_1G		2
-> +#define MPIC_LSC_2_5G		3
->  
->  #define MDIO_READ_C45		0x03
->  #define MDIO_WRITE_C45		0x01
-> -- 
-> 2.39.5
+On Wed, Dec 11, 2024 at 10:26:12AM +0800, Ma Ke wrote:
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+> index 77a36e7bddd5..82405c07be3e 100644
+> --- a/drivers/ptp/ptp_clock.c
+> +++ b/drivers/ptp/ptp_clock.c
+> @@ -348,7 +348,9 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+>  	ptp->dev.groups = ptp->pin_attr_groups;
+>  	ptp->dev.release = ptp_clock_release;
+>  	dev_set_drvdata(&ptp->dev, ptp);
+> -	dev_set_name(&ptp->dev, "ptp%d", ptp->index);
+> +	err = dev_set_name(&ptp->dev, "ptp%d", ptp->index);
+> +	if (err)
+> +		goto no_pps;
 
+NAK
+
+This fails to clean up by calling pps_unregister_source() on the error path.
+
+Thanks,
+Richard
 
