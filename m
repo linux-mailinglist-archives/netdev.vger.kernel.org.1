@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-151194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C1499ED5BE
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 20:06:47 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86A1D9ED5CF
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 20:08:14 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDD1C188874E
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 19:05:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 450A8281BCB
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 19:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FDC2510BA;
-	Wed, 11 Dec 2024 18:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3406A23E6D9;
+	Wed, 11 Dec 2024 18:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lqnoNAVC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MRjwyDSx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2C023A193;
-	Wed, 11 Dec 2024 18:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08AA5254E9C;
+	Wed, 11 Dec 2024 18:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733943215; cv=none; b=KbBpFRUP/W/8o72FKUHiqzX6soEPhCVTM1SCUlW4IfjJQ8P1D6+eYJChayOLnPiJqFrgcOhoS2eC+HDYMtXvsqrTf0jFRY8uK/vBYHOwd/iBmgPGzwi1C6vGzQvb+DaYCF8Ogji00hAbVaz+lK2hHNv/bmSYQ7JkkqDuCOZxSoA=
+	t=1733943250; cv=none; b=egFYLEvNSFAO4vTInziheaaAOdUwlXq5UmpDRAwLI25a/l+1DBW4RTobKnvO3udwKNhj4AyndXWNH3nUSfCYYRi9E/38MrUmh+o9tIsz6h81yXKetNO6KqZfnjilHqzbLg+fUg7XoNF6WXkuYhAXM/ixktpng49vml4BrcaKQyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733943215; c=relaxed/simple;
-	bh=j2wMNToJjGdHIBwnzb8JzZ+mgkI1yv35iQ/gPJEuKM0=;
+	s=arc-20240116; t=1733943250; c=relaxed/simple;
+	bh=DVq9/0UC8vOHkJXORLyGEhtGTjAtJDQ/nabgP13wMvk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W/hGHKv/CgqqGqjgKDqaTQHQSgPJSbLlKS02E/i877h2pDivHlTiJ01+LvKByjfpne1tMw7KepeAse0MtzjoVvYsEAqKENeKHBd8iFIAnsKHisi+Xj+QQBhyWsGdY3yXIN0Bn7JbwjWiad1oW2d51xQrSpk0kn9KD+JdVnhSuDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lqnoNAVC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 016F9C4CED2;
-	Wed, 11 Dec 2024 18:53:33 +0000 (UTC)
+	 MIME-Version:Content-Type; b=N8K9FhRzn4LEGA6PitAhpT+Q74RmqHQJrL6BZtJc8JQVKgi3zQODGWUCTOP8GDrwm4PaFiPmvtuA29SSTNpLypwH8+4fr2+ZcROGLGT6OgUTPdKgnoEtYqek5NpaI6fmLZh8zaPl+//EhcchwiPjgLu+faKQgZxji+PTeT+T2A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MRjwyDSx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4F09C4CED4;
+	Wed, 11 Dec 2024 18:54:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733943215;
-	bh=j2wMNToJjGdHIBwnzb8JzZ+mgkI1yv35iQ/gPJEuKM0=;
+	s=k20201202; t=1733943249;
+	bh=DVq9/0UC8vOHkJXORLyGEhtGTjAtJDQ/nabgP13wMvk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lqnoNAVCLkc0F6AxPB2DXwiLtjZ2GvCQQoStVMhdDXy3Xu6KA5/5BU9AFZbhj9pIf
-	 7sOgnWr912Uft7WMe0sMnrInYCuWbs+Icr2p/v+oyam4NW5LXndEcJE5Jjfs4Wod5F
-	 oKrvn3bNtYtwhvWMC/Oquxbuzt6gUcIuBQ00mwK1fmrSeaAwGyy+z2QFKuMxUZ+Pzh
-	 T5vwDBc8c6Eph3vN8csMjaXulNcAL7G3CTK36fMx4OGoe3N1s/kEKi7KFdSNtehZh1
-	 SMUr0RIG6WZKjyxehB7cjfR5aYDqpmzM7U053OU6iNtmeoA04JLApOakNH7D2L4a1a
-	 2qBylK/Zkx9JQ==
+	b=MRjwyDSxbuynJqvPCqb3OFkH9/1dWiSeYxFflnfVIPw6gsAEbXDh4YkrExKXKsAQw
+	 2KtUVHnxb75R7S8zlPmX21Z6GuAn/Ih2lNtBV86rE+55LeqdQ8oh/q/6E+qZ9yzrWT
+	 K2JrdIzbA02LQwnCuvdq78G5uZxllDew/nG4foyXIcDr+h4KYWnWa0INLe1DeOW1lv
+	 gleT7jAqmGc7qvOnxZP5QNEEfpffBOpryAvT/SvmTqPQ1cOYsyToyfIzHLHu5jxH1b
+	 hzbdckdi/L3/ibL/fF7OCeRvGdAtUxeZ2pEDl85rBjLuWx/mZnX9U6fdvvLka7UNC+
+	 pSKXfa9i4KFKg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -56,12 +56,12 @@ Cc: Lion Ackermann <nnamrec@gmail.com>,
 	pabeni@redhat.com,
 	cake@lists.bufferbloat.net,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 09/15] net: sched: fix ordering of qlen adjustment
-Date: Wed, 11 Dec 2024 13:53:01 -0500
-Message-ID: <20241211185316.3842543-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 07/10] net: sched: fix ordering of qlen adjustment
+Date: Wed, 11 Dec 2024 13:53:48 -0500
+Message-ID: <20241211185355.3842902-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241211185316.3842543-1-sashal@kernel.org>
-References: <20241211185316.3842543-1-sashal@kernel.org>
+In-Reply-To: <20241211185355.3842902-1-sashal@kernel.org>
+References: <20241211185355.3842902-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,7 +71,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.119
+X-stable-base: Linux 5.15.173
 Content-Transfer-Encoding: 8bit
 
 From: Lion Ackermann <nnamrec@gmail.com>
@@ -92,7 +92,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index 73e8caeffd47e..eee9ebad35a5c 100644
+index c952e50d3f4f8..eeb418165755e 100644
 --- a/net/sched/sch_cake.c
 +++ b/net/sched/sch_cake.c
 @@ -1541,7 +1541,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
@@ -112,10 +112,10 @@ index 73e8caeffd47e..eee9ebad35a5c 100644
  	cake_heapify(q, 0);
  
 diff --git a/net/sched/sch_choke.c b/net/sched/sch_choke.c
-index 3ac3e5c80b6ff..e38cf34287018 100644
+index 25d2daaa81227..f3805bee995bb 100644
 --- a/net/sched/sch_choke.c
 +++ b/net/sched/sch_choke.c
-@@ -123,10 +123,10 @@ static void choke_drop_by_idx(struct Qdisc *sch, unsigned int idx,
+@@ -124,10 +124,10 @@ static void choke_drop_by_idx(struct Qdisc *sch, unsigned int idx,
  	if (idx == q->tail)
  		choke_zap_tail_holes(q);
  
