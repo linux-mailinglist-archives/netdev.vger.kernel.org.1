@@ -1,94 +1,135 @@
-Return-Path: <netdev+bounces-150947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80B599EC25C
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:40:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66EC49EC262
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:41:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6AD0168BCC
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:40:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AA0E166E7A
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651A71FDE1E;
-	Wed, 11 Dec 2024 02:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21211FCCF5;
+	Wed, 11 Dec 2024 02:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="svMowYqC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Da4qREKh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE7A1FCF78;
-	Wed, 11 Dec 2024 02:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A09983CDA;
+	Wed, 11 Dec 2024 02:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733884822; cv=none; b=fwhNOhhrcuhRfz5L7G/yeYY299HrfCxr9P7GpNVgbSFEH/R5aK5eSIjzZS/kUCxXhO0od4sBB2NxNHXC4Xd8psbJuVSqavqYATD3sWIgGGgLyypGMHzfC2DFXd92Fi450APDZPje5h6fYg9iYOZ+GzCERojfAwsBQ9E7eIJb910=
+	t=1733884894; cv=none; b=fZFatDuVXf7d6kXB4yxWc4HVIhq6CtOhNBxH3xhGH6RuGoHGppSlyi93Y5hd/AsI5Cu2KdhOSL66R4TMYalYpJgUIG9ixrzXPAavVEL/EKZvpmmPJfhUUah1TYcVJ8TgW1nWhYIs7Wk06o7AIR1DWNtZSfDc/FE49oKEnBb1HsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733884822; c=relaxed/simple;
-	bh=8cIQXMiCby+3yuGNOfE5BSFWLVI70HuzLn9UPvD2Hdg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hCl7oD/QXMWYjqNdVRKiHezqwgYi4Qa/eqSKCISGu6ZRjLaMXtTLVfqo5Zb/fDv+cooez2VnhRS9xocug7a6gfTT521/zmEG85odZxHzhM+BT0b1QP2jeun0pfcx088ER9Vls8Bm+BhW2YkdQ684O6Ek/Q9tfCb7gKkty0qgWUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=svMowYqC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD386C4CED6;
-	Wed, 11 Dec 2024 02:40:21 +0000 (UTC)
+	s=arc-20240116; t=1733884894; c=relaxed/simple;
+	bh=00K8MMiI4zi+Ut/RW/eta+vMQomu0Giei3szpffQQOQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bwavUJfhfGhWBRICXK/JkbZwip66AWOJahROKVbqj+ETuMByvPMjjxfsvTCC5p8LgEAOdS00QMeqI2L7C+2Snaqpaxg92buweCLokfwCu5bqxypDqeDHRlgyK5Wpz2g8H+5v3NETUQelJyuh/6pxtXI/5Wi0ONmFDsh4JSfz4q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Da4qREKh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2728C4CED6;
+	Wed, 11 Dec 2024 02:41:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733884821;
-	bh=8cIQXMiCby+3yuGNOfE5BSFWLVI70HuzLn9UPvD2Hdg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=svMowYqC0ePX6rl1zvfxXUVeVllEGcQCv6NyKN40gsgCpIkxd/XKocgQR+Al6d7hG
-	 xggt7ajn5R2pcWfEd7PqmZnSOyZQHNeK8uADxIYLIh2ikAD5NSMJV8DE0LVlctTToE
-	 psGusYWoLF4/PM+lBpwRo5ygu7SLDZo8BU+L3x8SCdX33RM/BdoeKWLLf3bhzzpUFJ
-	 DydOoImLxLldSUBNLxiowhpmDkHTKk/TKjlsu+G34G4M3K2z5GxNha2lT9JGEdW8gM
-	 mMYNbNnxV054zl5WTYG8K6wgFHa3eHrBRCA8gYcmAHx8bYn/erBxNywaGil9GohT5N
-	 sL+hqlecL4Ouw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD7A380A954;
-	Wed, 11 Dec 2024 02:40:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1733884894;
+	bh=00K8MMiI4zi+Ut/RW/eta+vMQomu0Giei3szpffQQOQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Da4qREKhLmCm8yz23HYMcnYhvUPIhwEMSq3e2xy5eHqmd+lk3xFCqCL8gMV2d1qZM
+	 OX/nYhIL+8FVEAH5j2G8jreOCn4t5aDyk2A67ZSa2Mkyc9Pdlwt9HWePiQrPKYupQD
+	 HqnoKIQmX31F4DdpsyABbQ15F6Ui5dY/VyDtBpBstL8y1jhriA+kdAfBMPTAXFbWnS
+	 63C0vjQwg5Lmz+BJiiuG775DcGC4erU4pOGbFjbFCfGrajmvqQlFUpggTSjU+aLgVs
+	 HKqzofl4MBLxzwaLLU/QjjetYigVK4WMW1awwyb5uskvci+1KuE5L5PLpPOgzSWNQz
+	 YP2aWNyh8AjbA==
+Date: Tue, 10 Dec 2024 18:41:29 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Easwar Hariharan <eahariha@linux.microsoft.com>, Jeff Johnson
+ <jeff.johnson@oss.qualcomm.com>, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Julia Lawall
+ <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack
+ <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, Robert
+ Jarzmik <robert.jarzmik@free.fr>, Russell King <linux@armlinux.org.uk>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Ofir
+ Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>, Lucas De
+ Marchi <lucas.demarchi@intel.com>, Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?=
+ <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
+ <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
+ <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>, Dick Kennedy
+ <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Roger Pau =?UTF-8?B?TW9ubsOp?=
+ <roger.pau@citrix.com>, Jens Axboe <axboe@kernel.dk>, Kalle Valo
+ <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel
+ Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Ray Jui <rjui@broadcom.com>, Scott Branden
+ <sbranden@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>, Ilya
+ Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Jiri
+ Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>, Petr Mladek
+ <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Louis Peens
+ <louis.peens@corigine.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
+ Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan
+ <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>
+Subject: Re: [PATCH v3 00/19] Converge on using secs_to_jiffies()
+Message-ID: <20241210184129.41aaf371@kernel.org>
+In-Reply-To: <20241210183130.81111d05148c41278a299aad@linux-foundation.org>
+References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
+	<315e9178-5b10-4de0-bdcf-7243e0e355bb@oss.qualcomm.com>
+	<20241210153604.cf99699f264f12740ffce5c7@linux-foundation.org>
+	<20241210173548.5d32efe0@kernel.org>
+	<20241210183130.81111d05148c41278a299aad@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: dp83822: Replace DP83822_DEVADDR with
- MDIO_MMD_VEND2
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173388483774.1093253.9609358542133634563.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Dec 2024 02:40:37 +0000
-References: <20241209-dp83822-mdio-mmd-vend2-v1-1-4473c7284b94@liebherr.com>
-In-Reply-To: <20241209-dp83822-mdio-mmd-vend2-v1-1-4473c7284b94@liebherr.com>
-To: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, dima.fedrau@gmail.com,
- dimitri.fedrau@liebherr.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 09 Dec 2024 18:50:42 +0100 you wrote:
-> From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+On Tue, 10 Dec 2024 18:31:30 -0800 Andrew Morton wrote:
+> > > I'll just grab everything and see if anyone complains ;)  
+> > 
+> > I may, if this leads to a conflict :(  
 > 
-> Instead of using DP83822_DEVADDR which is locally defined use
-> MDIO_MMD_VEND2.
+> Very unlikely, and any such conflict will be trivial.
+
+Agreed, mainly I don't understand why we'd make an exception
+and take the patchset via a special tree.
+
+> > Easwar, please break this up per subsystem.  
 > 
-> Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-> 
-> [...]
+> The series is already one-patch-per-changed-file.
 
-Here is the summary with links:
-  - [net-next] net: phy: dp83822: Replace DP83822_DEVADDR with MDIO_MMD_VEND2
-    https://git.kernel.org/netdev/net-next/c/4eb0308d78d3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+More confusingly still, they did send one standalone patch for 
+an Ethernet driver:
+https://lore.kernel.org/all/20241210-converge-secs-to-jiffies-v3-20-59479891e658@linux.microsoft.com/
+And yet another Ethernet driver (drivers/net/ethernet/google/gve/) 
+is converted in this series.
 
