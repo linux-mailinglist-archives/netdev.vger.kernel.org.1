@@ -1,221 +1,209 @@
-Return-Path: <netdev+bounces-151052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72FB19EC950
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:39:34 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BB379EC962
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:43:31 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FDF1281220
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 09:39:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAF8A18825D8
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 09:43:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4549A1DFD89;
-	Wed, 11 Dec 2024 09:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3827E1A83FE;
+	Wed, 11 Dec 2024 09:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="qFe8kOe+"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="lwA3jy5j"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2095.outbound.protection.outlook.com [40.107.92.95])
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE391C5CD3;
-	Wed, 11 Dec 2024 09:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.95
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733909959; cv=fail; b=Ce2ch/OySBRVOcQAFlei5AbDRPuy6o6ks7MNBWAuI+U1bmH3s6oBiycjcawLUW577M3jUQFssTFGtzpzXR7W5lj3kn28r1GTkDDlQdgk3YBDfu0ye53e80CuOxz7uPAHcxduH7zAFQXWUCvY8bVlh8Xy8vKMNUQP9U7JkEDvuSU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733909959; c=relaxed/simple;
-	bh=c3+P3Q4Yg9Wb68Au6pvKO//3E4MzF37lKOM64VXeV0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=P8esiQq7cNDYxpW6i2r4MtSE7tRXoUN599+h/PHmYVrSPE6AGTLlX/e/Cy8qrcDNvRMBrRIEuXkOzR/3itWqTejfbN2xNoX1gJHfFel/Q0k0shsGp7+aNeW3B2R0CrMv9UXcW/d1e8zMlvqWxyUXb96WtuLOMBy6umxb6XNmcyE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=qFe8kOe+; arc=fail smtp.client-ip=40.107.92.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corigine.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=A5lhWr7OSvzz332UcvGGLWKuIMz9q02Q3BPE/auHKZ90J1EvKG0G1YsyqdWAytBlMHTSEMd7o5hcGsPthtreVr4y38Rd1n5GBnIBpN2P6K/QgsO1We60SBNLeI1ZvRVrRg1JBKFRmOmKVoE+Y1KPwAEpAJm4VJHBiJHRqHcLET4dKuvabnB4fbkfzgsYN5IW7+oBSjdF6U8KNxSHhs+5DJ9BCAwi83J+PCPkZJk+i14LdhQri49PJEHHp3152d6TxYhUZSjZq9eB4eo+SxsxG5eSgHTQG8a2NM9Pv7xU7+UOj/PRKg0lXwV7tAXuJpbY2aKSmdlrZGlVm4aSkVKZ5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=t5iJmYsyQqxrw6dzt8uZoEzhtrjHSj+Vrl392CBq+Gs=;
- b=PTnpoCbSIApm4PROjGxY8aygmhardft0DfMgBvbulYfQpNuFtMsPXB5wIGJClxk3Or5gXb7TRyCfnaq4qldxaZx+4eARF1FzFA/dOzlQqKF72YmssiCS/JSYXTYhDayfwSpP1nAi4NCLPWQgn6POcBua7BQh8BCMYBwEf2Gm4mU14INCYMXHll1rW1WpC0/eAooPm4WS6jpEVTvwLIU4ThcbbgrhOxNy2to/h5KN38+yOxQL8/uIYKKXl2HnqG8hEKZpUJCg8SLEBrkFEj5DGE5vuJgbmwp2yqaHLoRrsfLl4H3tkphzaQTbC/jE9ZvAHX/8NVt0eC7M7OutY4K5+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t5iJmYsyQqxrw6dzt8uZoEzhtrjHSj+Vrl392CBq+Gs=;
- b=qFe8kOe+v1XfkD22i9/e7TCvxnm+E3gReiVC5BQjD9o0QCmNB/xr1pSCdF9SWSOdUZzZ9Xyylf/rz6dL/m+vI91VXuLNtDHebSSpgVXYxvf6B4wxSYi7Rlom4OdRz1jqBN116sJl1vJw6nNrKxQDGw1WDx7gahVU7ae3pBdYZIM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
- by BL3PR13MB5225.namprd13.prod.outlook.com (2603:10b6:208:344::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.14; Wed, 11 Dec
- 2024 09:39:14 +0000
-Received: from BL0PR13MB4403.namprd13.prod.outlook.com
- ([fe80::bbcb:1c13:7639:bdc0]) by BL0PR13MB4403.namprd13.prod.outlook.com
- ([fe80::bbcb:1c13:7639:bdc0%7]) with mapi id 15.20.8251.008; Wed, 11 Dec 2024
- 09:39:14 +0000
-Date: Wed, 11 Dec 2024 11:39:02 +0200
-From: Louis Peens <louis.peens@corigine.com>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jinjie Ruan <ruanjinjie@huawei.com>,
-	James Hershaw <james.hershaw@corigine.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Mohammad Heib <mheib@redhat.com>, Fei Qin <fei.qin@corigine.com>,
-	"open list:NETRONOME ETHERNET DRIVERS" <oss-drivers@corigine.com>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3] nfp: Convert timeouts to secs_to_jiffies()
-Message-ID: <Z1ldtgYpXCIIN5uQ@LouisNoVo>
-References: <20241210-converge-secs-to-jiffies-v3-20-59479891e658@linux.microsoft.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241210-converge-secs-to-jiffies-v3-20-59479891e658@linux.microsoft.com>
-X-ClientProxiedBy: JNAP275CA0037.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4e::7)
- To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25664236FB6
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 09:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733910206; cv=none; b=svi1jF08yqzqCRaYC2sjr90rOlivGygpXOG4w8QwDkEjhJ+DvdUNAQUSXa3aWWyjXqGPuB6OmY/y5jyx8Ad+kFvGuIR2pulNcBo1yVV/3WeTxIZ3yjsqG/rWafi+5jR0Bn6bhkUtoaT4mttLizqxIDaFmKZwQuUZgkCbTvYMabg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733910206; c=relaxed/simple;
+	bh=fjay/P8NW6O9+UbSe7xhuqU3lBYGjE2l8y6uvwci7VY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=EvnPAbkWRbX3eGWF0Lh5jG+L5PTozZlusMjSvSI8cmtDLq0dtIhYRp4e/9JvXtRir2I1z7rHnhIKjjQsfAB32aCaf6UiPJ+1sJ6LRXU3T0qTeEFrGgBkr96YI8Q8ZEQW2BQNL+31ApivZq8m7LDZp/z7Tj0Sa/b/7pN8rERiYhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=lwA3jy5j; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from [IPV6:2a02:8010:6359:2:9c63:293c:9db9:bde3] (unknown [IPv6:2a02:8010:6359:2:9c63:293c:9db9:bde3])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id C855B7DCB8;
+	Wed, 11 Dec 2024 09:43:16 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1733910196; bh=fjay/P8NW6O9+UbSe7xhuqU3lBYGjE2l8y6uvwci7VY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:From;
+	z=Message-ID:=20<682346f6-5a19-1b09-c201-9ab210643ca0@katalix.com>|
+	 Date:=20Wed,=2011=20Dec=202024=2009:43:16=20+0000|MIME-Version:=20
+	 1.0|To:=20Preston=20<preston@yourpreston.com>|Cc:=20netdev=20<netd
+	 ev@vger.kernel.org>|References:=20<CABBfiem067qtdVbMeq2bGrn-5bKZsy
+	 _M8N-4GkE0BO6Uh7jX1A@mail.gmail.com>=0D=0A=20<3e6af55f-3270-604b-c
+	 134-456200188f94@katalix.com>=0D=0A=20<CABBfie=3D3+NBmjpVHn8Ji7Vak
+	 Eo9-JMKDH3ut5d1nXnDneC0tPw@mail.gmail.com>=0D=0A=20<ed0ffb72-3848-
+	 d1be-6903-d6ab21a0f77f@katalix.com>=0D=0A=20<CABBfienZDG=3DkFMfGe=
+	 3DAwa4ZhuhGTRRy7uGcPjWaZLiGi+XWBDA@mail.gmail.com>|From:=20James=2
+	 0Chapman=20<jchapman@katalix.com>|Subject:=20Re:=20ethernet=20over
+	 =20l2tp=20with=20vlan|In-Reply-To:=20<CABBfienZDG=3DkFMfGe=3DAwa4Z
+	 huhGTRRy7uGcPjWaZLiGi+XWBDA@mail.gmail.com>;
+	b=lwA3jy5jaFvJsySx2mEWkRWEODqw134GfwKaQ6RRsXkADKAme0IgxrAVpyTJDjp7i
+	 0QVFQAsbWBKJ/9s4iVsHdkrue37wiqxBzkv7EzwzRR8fYF0MPZMjR0OQysVbUbE3Nx
+	 FNABkVFiMunVFKCrfVpl2O+2ioOcPLLe1iIlQE6I0vVHQISpqEi+KBuWB5Pb9zX8Py
+	 X88uWhZ8Ll1h1I5DDwk1hjvw7Yu33SH7iahPNxsBTCc9JnHOCm4ArJQnEnCfKDRsQV
+	 kKI4ro4g9EtWbS3EkV+debluk+uM3BQ90oTZs2+RlWsCOYmxxysbnSHPyesfPCaqmG
+	 sdU/7PXRrzOMA==
+Message-ID: <682346f6-5a19-1b09-c201-9ab210643ca0@katalix.com>
+Date: Wed, 11 Dec 2024 09:43:16 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|BL3PR13MB5225:EE_
-X-MS-Office365-Filtering-Correlation-Id: 10f23d8b-724a-4a83-4369-08dd19c7ac82
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?QIe7hdGFTYw0MjEwLPiNCS8DLBX1MofVoLZi1uFNV86U8sbpvuXrL5e/PANh?=
- =?us-ascii?Q?N2FmmoC5to2ZfnkiwOQLNlOrhTbLW8FrefwiWwj/8IKuVTVK6msTuzMJuQlJ?=
- =?us-ascii?Q?oKB4+UgV23qGiHu1glRCML4S2gngnlO8HSeiDUkxO7TIQmm1UIU5x9DdTozO?=
- =?us-ascii?Q?AbBnx9GQKpMZG+CiEEV1s8bX8qIMLz/ZiBXErVuIRxNBVq4wXZxwe084d1Rw?=
- =?us-ascii?Q?wZYjS1HgaASkVutck0wXsniYslnIhj/7T4/Em03Gwu+Rw7YS4KVGyGfzR8BT?=
- =?us-ascii?Q?C6bIoBp8gBEjsi/KsrBUpe8NzyliiHLftqSRg3An4EpK7r/ZTE3fiR7gWzoS?=
- =?us-ascii?Q?Ipqby9k3DZ2YDZHOGsyULsSK7PKTibXRov0lfeD/bVamRWdwP26FdFGMB3aM?=
- =?us-ascii?Q?NZ0xuDIuxS+q3aeC5GlkmY+QQUsCjO8H9I2opBpr9s+uJLDRPK9twpk0rls4?=
- =?us-ascii?Q?NvCmnPZDtatGdYJyx0y+rZluSGhLD80cMC3d2/b7WUprEjfJaPF15JQWVq68?=
- =?us-ascii?Q?MchQrzUJaB0KAMUNRzxBHd/1uD94QoTVB9xPFdcWkkXfGwxtYo7mCu0VJWJl?=
- =?us-ascii?Q?fE7DX/9hFbjPh2Z2DzkNX5uFbUCyn7jzvwUQ4wCNIrINca8HcjGTTU0gezey?=
- =?us-ascii?Q?2c0Ja31Cgd6ssV5OIrwh8AZSSSXWWJ46UjjTza+6T/HZ48JtSsVIrZPm/Nqq?=
- =?us-ascii?Q?nGIQ94dtBF8fcDNz4KW6r6vZiRkcvDzi4faTlyOA8Y2WxSamqHYFoIt9lYRf?=
- =?us-ascii?Q?4FGdIdExCvMqApKSzmGXEcGk4Sj6HH074dOp+YwiQ/Y1nM6G17dYGGu0/4VS?=
- =?us-ascii?Q?vDXfEsjd1VZkRlUJo3tCeEnSOlEI7bXBzNVNp240/PYwe5dyjwtAEGpuyQLS?=
- =?us-ascii?Q?HypdWrLQrRZZVIFn/7F0WeIxudaEPbHneuEBQk2QrpbkcizZcTgxHNFsM9tj?=
- =?us-ascii?Q?vcCucNj/uTYFUNP9/dF/0uKO2vlQ+3XnX2wMFBfJv/NKs6l1t6xHo5qJK/TR?=
- =?us-ascii?Q?a2BwJnE/PtKxuraHlVQELJL5P5Pc81VezcgAiLhOt7ymfqA2erunCVG5CwIn?=
- =?us-ascii?Q?Nwi6ITUN2o3FU+qrcNR4xNiJWsPiApzuxlLr8PMD6L9T0Kv0dshV60PAfFlY?=
- =?us-ascii?Q?R2uRMdaV8+ZlHzZ1DSx5rpcLFGW4zy45THLTsOMXiXJI2yikXBeOy7lq8AFT?=
- =?us-ascii?Q?E/X6mh28nQeiGK5lXXZmJj5IpP/6Qb503eiQOW7pxc7GXQtClmxrfkw8DnTN?=
- =?us-ascii?Q?m2QzyviUVhJ+G+bnRZaIGV+Vj+lZ3tMqWYGzsMyhlZSgkX3CNOK/PFMuTTNw?=
- =?us-ascii?Q?CpDe2GvByiK4N1QPl+jIDXg92ljtc1KboxS6CiHQJtGhQv6Aoy42FuqVv54x?=
- =?us-ascii?Q?YhXLhFQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ECE0n+Y+irn0AuYD5RFHvMmLvQmyQ00rwBE9fmkHWWgwEFM4j7fRhxU8n8XU?=
- =?us-ascii?Q?ZuMyG6PJ1P1YIgSjRzfsNNa3EJXDXEMi0xpOCk46ynhytUT2T8bbh2cEFutu?=
- =?us-ascii?Q?qA4RpgAi74Mz68NzqhsQ8+b0JKdmNXoVvCFiF8ILw6gMW7dML0F5asjOMov6?=
- =?us-ascii?Q?gk/F8ljzIH0x2BcbudwK+ZnzmW8q2FoOiNR6pQ00GvbNQn/nes9MEQ+fZQMd?=
- =?us-ascii?Q?ODcKO9vIZFabmStg13T+YrDKKRd5vlsutwNKHpvDwWBXTlKk3xT8oQgYGXWP?=
- =?us-ascii?Q?rJJcKufoID9PoKimm9/cCg+ZWBZ1Q5ZmwcMvC3kR/ulxowtFQjtwqbY9CV3+?=
- =?us-ascii?Q?yooj/BjN/ktcY5RSzkRL+/2B6QGBf5KOmajeh8gH+5Xn0InPMCrDxQ1RnCpV?=
- =?us-ascii?Q?LTKLI9VvHU1pGhuz3xYT0v3eNu/AL5kbdnGQSSnQUn/S0b8xmzhO6FNGPXCf?=
- =?us-ascii?Q?4dbBkjegV72nSQcdJLleSA6UY1AFhHuu6F7jSYhU516F52zWj9yYD8hHDnHG?=
- =?us-ascii?Q?iDlOjfUTdM0l7fSn7Ns8jf/GkkE/2BaTFblN2B90UC+FGWQyFBIiMi7sLqtv?=
- =?us-ascii?Q?9pge8kY/jSswCNBjpO6UCk6QHFxsQmkjYMWK0fmJFBZ8JJQjRG/+7c27YnT5?=
- =?us-ascii?Q?noXG7SyBBIPRWj6qJyXF8vBJOKOmPZ1f9ClkduJAzfQmrwmbBoJvfBTJ0vMY?=
- =?us-ascii?Q?mUME5MLMMPN/4QaaSgRNw8o/YhzrwpQVzEz50MGl1hk00wv+ObSOjUx1PB1h?=
- =?us-ascii?Q?G8vYnJ9mJ3+6xFmWVevFuly/I8wWErlyTkKxWHTWqvY/K3yDsaBSdne2i6yX?=
- =?us-ascii?Q?aM9jvy4i51Bdu1lt3usQkN0KPLLVUVAK+w3JcMFyVQkxeheE/ZAWXSIjd7Zx?=
- =?us-ascii?Q?YzDriI6AHq1PrIG/xrIFn5NXGssK+MUm5l2lkFwIkc/Sm2rbNfoE4t2ON/dT?=
- =?us-ascii?Q?EJJg2fv4i7m5yuUiU89WPUU7fYeMXMneHNqp9XX4YiWln5Yc7MSPrbRgxEuQ?=
- =?us-ascii?Q?QodA5oYiXHtz3zqDH+hcpnmnhWaqsNlBWHPXBH2s7Nz1A8NQKWmAs5eEEVnb?=
- =?us-ascii?Q?plJUZdt2JGT6Ip9WN0+Ej7nszFKk+5AL/clI0Afw2YirjxLu5HxlTcs5vDPa?=
- =?us-ascii?Q?c8VpCHe1OsJSZbcNyy+kijzqCLmcWYDRPbKybrNyHGoCo9oxL4uaiDjCdmV7?=
- =?us-ascii?Q?bWJongoXclrnyX0+Twy4fgGYzl8s0/XNLeepiERQ7mj4MSKytduZGnMQ59Nz?=
- =?us-ascii?Q?pQx4VLxorzbkVZezc497KM8Vh6QAqakoxkeS+C12NZ6i+TnCbctSK8jl3nwL?=
- =?us-ascii?Q?L+i7zg11RUVQmomK4RPtyriVJf52qSYbKmEb2GOEMbDetij3sO68YVKW8+vl?=
- =?us-ascii?Q?kGxUjp/xlEePi9lPiFvq1MUcwiWQccc+uvkKcIsAWfdfDzbwzvbVQ3gGaR7u?=
- =?us-ascii?Q?h7tpJqN0oETI0yg2VdZvGsrZVP6EdWYpRoHm680q+DvI5PUWhYEVjd+HE7Rf?=
- =?us-ascii?Q?GCrWwIqbz6wXVTswimGKYbQspeYBvUeGP8qMpZiHN76tvzMFpuunpuImHaJd?=
- =?us-ascii?Q?6wapChI9dDTjt1f1VMP3uoCupeaG8AvfzT3vXdFXXX/va9WHDqyS7WnqTAEu?=
- =?us-ascii?Q?MA=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 10f23d8b-724a-4a83-4369-08dd19c7ac82
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2024 09:39:14.3768
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8ZFRb7yIZGnao0VWQ+hGTAN51BmwoHKagLUEhX+NrwY6bPXBjgk8giBbUOV9lxoUzFpSC661eQBGFJ/dUnTTUs4vSEHSaREH1gsZB3q04zI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR13MB5225
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Content-Language: en-US
+To: Preston <preston@yourpreston.com>
+Cc: netdev <netdev@vger.kernel.org>
+References: <CABBfiem067qtdVbMeq2bGrn-5bKZsy_M8N-4GkE0BO6Uh7jX1A@mail.gmail.com>
+ <3e6af55f-3270-604b-c134-456200188f94@katalix.com>
+ <CABBfie=3+NBmjpVHn8Ji7VakEo9-JMKDH3ut5d1nXnDneC0tPw@mail.gmail.com>
+ <ed0ffb72-3848-d1be-6903-d6ab21a0f77f@katalix.com>
+ <CABBfienZDG=kFMfGe=Awa4ZhuhGTRRy7uGcPjWaZLiGi+XWBDA@mail.gmail.com>
+From: James Chapman <jchapman@katalix.com>
+Organization: Katalix Systems Ltd
+Subject: Re: ethernet over l2tp with vlan
+In-Reply-To: <CABBfienZDG=kFMfGe=Awa4ZhuhGTRRy7uGcPjWaZLiGi+XWBDA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 10, 2024 at 10:56:53PM +0000, Easwar Hariharan wrote:
-> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
-> secs_to_jiffies(). As the value here is a multiple of 1000, use
-> secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication.
-> 
-> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
-> the following Coccinelle rules:
-> 
-> @@ constant C; @@
-> 
-> - msecs_to_jiffies(C * 1000)
-> + secs_to_jiffies(C)
-> 
-> @@ constant C; @@
-> 
-> - msecs_to_jiffies(C * MSEC_PER_SEC)
-> + secs_to_jiffies(C)
-> 
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-> ---
-> This patch is pulled out from v2 [1] of my series to convert users of
-> msecs_to_jiffies() that need seconds-denominated timeouts to the new
-> secs_to_jiffies() API in include/linux/jiffies.h to send with the
-> net-next prefix as suggested by Christophe Leroy.
-> 
-> It may be possible to use prefixes for some patches but not others with b4
-> (that I'm using to manage the series as a whole) but I didn't find such
-> in the help. v3 of the series addressing other review comments is here:
-> https://lore.kernel.org/r/20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com
-> 
-> [1]: https://lore.kernel.org/r/20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com
-> ---
->  drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-> index 98e098c09c03..abba165738a3 100644
-> --- a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-> +++ b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-> @@ -2779,7 +2779,7 @@ static void nfp_net_netdev_init(struct nfp_net *nn)
->  		break;
->  	}
->  
-> -	netdev->watchdog_timeo = msecs_to_jiffies(5 * 1000);
-> +	netdev->watchdog_timeo = secs_to_jiffies(5);
->  
->  	/* MTU range: 68 - hw-specific max */
->  	netdev->min_mtu = ETH_MIN_MTU;
-> -- 
-> 2.43.0
-> 
-It's not super clear to me which patch is handled where and through which tree
-at the moment, but looks like this is a network driver change scoped to the
-netdev tree, so makes sense to me to add sign-off here. Thanks for applying
-this to the nfp driver.
+On 10/12/2024 20:00, Preston wrote:
+> On Thu, Dec 5, 2024 at 3:00 AM James Chapman <jchapman@katalix.com> wrote:
+>> Please don't top-post.
+> Apologies, first timer.
+>> Are you configuring an IP address on l2tpeth0.1319 and capturing on
+> l2tpeth0?
+> I'm running dhclient on  l2tpeth0.1319, the DHCP discover from that is
+> the packet you see in the screenshot. The pcap is being taken on the
+> physical interface.
 
-Reviewed-by: Louis Peens <louis.peens@corigine.com>
+You've top-posted again! Don't c&p parts of text to the top of emails 
+when replying. Please see https://subspace.kernel.org/etiquette.html
+
+I'll add your reply text below and answer there, in the interest of 
+making progress.
+> 
+> 
+>>
+>> On 04/12/2024 21:04, Preston wrote:
+>>> l2tpeth0 is not attached to anything, it's created by the `ip l2tp`
+>>> commands. But since it's encapsulating and setting a new destination
+>>> IP address, packets are referred to the route table.
+>>
+>> Please don't top-post. It makes it much harder for other readers to
+>> follow the discussion. I'll repaste your reply below this time.
+>>
+>>> On Wed, Dec 4, 2024 at 6:48 AM James Chapman <jchapman@katalix.com> wrote:
+>>>>
+>>>> On 03/12/2024 16:14, Preston wrote:
+>>>>> Hello folks, please let me know if there’s a more appropriate place to
+>>>>> ask this but I believe I’ve found something that isn’t supported in
+>>>>> iproute2 and would like to ask your thoughts.
+>>>>
+>>>> Thanks for reaching out.
+>>>>
+>>>>> I am trying to encapsulate vlan tagged ethernet traffic inside of an
+>>>>> l2tp tunnel.This is something that is actively used in controllerless
+>>>>> wifi aggregation in large networks alongside Ethernet over GRE. There
+>>>>> are draft RFCs that cover it as well. The iproute2 documentation I’ve
+>>>>> found on this makes it seem that it should work but isn’t explicit.
+>>>>>
+>>>>> Using a freshly compiled iproute2 (on Rocky 8) I am able to make this
+>>>>> work with GRE without issue. L2tp on the other hand seems to quietly
+>>>>> drop the vlan header. I’ve tried doing the same with a bridge type
+>>>>> setup and still see the same behavior. I've been unsuccessful in
+>>>>> debugging it further, I don’t think the debug flags in iproute2's
+>>>>> ipl2tp.c are functional and I suppose the issue might instead be in
+>>>>> the kernel module which isn’t something I’ve tried debugging before.
+>>>>> Is this a bug? Since plain ethernet over l2tp works I assumed vlan
+>>>>> support as well.
+>>>>>
+>>>>>
+>>>>> # Not Working L2TP:
+>>>>> [root@iperf1 ~]# ip l2tp add tunnel tunnel_id 1 peer_tunnel_id 1 encap
+>>>>> udp local 2.2.2.2 remote 1.1.1.1 udp_sport 1701 udp_dport 1701
+>>>>> [root@iperf1 ~]# ip l2tp add session tunnel_id 1 session_id 1 peer_session_id 1
+>>>>> [root@iperf1 ~]# ip link add link l2tpeth0 name l2tpeth0.1319 type vlan id 1319
+>>>>> [root@iperf1 ~]# ip link set l2tpeth0 up
+>>>>> [root@iperf1 ~]# ip link set l2tpeth0.1319 up
+>>>>> Results: (captured at physical interface, change wireshark decoding
+>>>>> l2tp value 0 if checking yourself)
+>>>>> VLAN header dropped
+>>>>> Wireshark screenshot: https://i.ibb.co/stMsRG0/l2tpwireshark.png
+>>>>
+>>>> This should work.
+>>>>
+>>>> In your test network, how is the virtual interface l2tpeth0 connected to
+>>>> the physical interface which you are using to capture packets?
+>>   >
+>>   > l2tpeth0 is not attached to anything, it's created by the `ip l2tp`
+>>   > commands. But since it's encapsulating and setting a new destination
+>>   > IP address, packets are referred to the route table.
+>>
+>> Are you configuring an IP address on l2tpeth0.1319 and capturing on
+>> l2tpeth0?
+
+> l2tpeth0?
+
+Yes.
+
+> I'm running dhclient on  l2tpeth0.1319, the DHCP discover from that is
+> the packet you see in the screenshot. The pcap is being taken on the
+> physical interface.
+
+Which physical interface? Please share your tcpdump/wireshark/other 
+command line to show which interface you are capturing packets on.
+
+If you capture on l2tpeth0.1319, you will see untagged packets carried 
+over l2tpeth0 on VLAN 1319.
+
+If you capture on l2tpeth0, you will see all packets carried over 
+l2tpeth0, with VLAN tags, if any. In your case, you should see tagged 
+packets of VLAN 1319.
+
+If you capture on the network interface used by the L2TP tunnel, you 
+will see the L2TP packets with their tunnel IP header.
+
+>>
+>>>>
+>>>>>
+>>>>>
+>>>>> # Working GRE:
+>>>>> [root@iperf1 ~]# ip link add name gre1 type gretap remote 1.1.1.1
+>>>>> [root@iperf1 ~]# ip link add name gre1.120 link gre1 type vlan proto
+>>>>> 802.1q id 120
+>>>>> [root@iperf1 ~]# ip link set gre1 up
+>>>>> [root@iperf1 ~]# ip link set gre1.120 up
+>>>>> Results:
+>>>>> VLAN header present
+>>>>> Wireshark screenshot: https://i.ibb.co/6rJWjg9/grewireshark.png
+>>>>>
+>>>>>
+>>>>> -------------------------------------------------------
+>>>>> ~Preston Taylor
+>>>>>
+>>>>
+>>>
+>>
+> 
+> 
+> --
+> -------------------------------------------------------
+> ~Preston Taylor
+
 
