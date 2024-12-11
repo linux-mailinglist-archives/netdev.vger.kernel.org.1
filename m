@@ -1,210 +1,221 @@
-Return-Path: <netdev+bounces-151065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7FF39ECA2C
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 11:19:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8912A1613CE
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:19:05 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD2BD1ACECC;
-	Wed, 11 Dec 2024 10:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="jzwVbHdA"
-X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2045.outbound.protection.outlook.com [40.107.103.45])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C989ECA49
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 11:26:11 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1871EC4F4
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 10:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.45
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DD0E28279E
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:26:06 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ACC01EC4E8;
+	Wed, 11 Dec 2024 10:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="avgdzTMx"
+X-Original-To: netdev@vger.kernel.org
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2040.outbound.protection.outlook.com [40.107.237.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42C8236FB2;
+	Wed, 11 Dec 2024 10:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.40
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733912345; cv=fail; b=URNPDleqUQTw3JTU4FChQNFirlrqGV4gnnkgQjEP0W+LuA1eg8nDv1xybkSl0UgvQ5Ar6GBI7Wic/IZKKCgs21lb+/+0qEE95uHmNq3iCZQTvv9n2PUrMrKRstXVfvTj1ZxZ0DiwPTVcAubXlXhD/GgMBAKd4GfkJ05rPoH/NAo=
+	t=1733912763; cv=fail; b=OiLlbdHmdrAdT0j7QPCVxcMSPD2Heo01TlSnGpTtHLIIhoedXeBt+6RC+3tBjrqetyOFV1XBWrh0+EemxOttL6xAgYk0pet5epWpZFzcTXaWn02FGdN7YPu9baZOLjA/h6SDn6QMbkm2ZWP5O5Kadk8GGZgjr/DlRvzJ0cOh5nA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733912345; c=relaxed/simple;
-	bh=ad/M4YEHJFtLOHpzQhFM2oPDLlxJzeN10+SB8z0IVQQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PgWU3vjSNyhJqz5NeDMgGb//UU3Lfam89ItgOvYogTBerHjSAch4V8V9uhtFM9OmJAfP8XkQWe/pbsOyf+LSR0AzD5C4LXtcHN5iAXrbtE+gLy+/h6Dkfl3SYDRIbQ5ogo+rrm+kYyYDlVp/ryTg3PS5Tbn7/RUd3K7e/hiSA2w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=jzwVbHdA; arc=fail smtp.client-ip=40.107.103.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+	s=arc-20240116; t=1733912763; c=relaxed/simple;
+	bh=mQPmQkLnoOA5PZtitAGPgEqnEI89DN2UylLuMKcmJL4=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=SLWkcdR+3Rn35GrNzs1slM/cZvuXGoiC4mWzOWUdem2Pf5FZuW5Am6oS+/gskcKtg1O2hTsaEaDbUfSdbjNBL+OaA6xbTqSmZ7j8LmDG1rCqVYOYPh2H6l3u2hi687UckFNzG/Ve6V/oA26/SU9alnWTtXicZKrkPbRVRhn/JO8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=avgdzTMx; arc=fail smtp.client-ip=40.107.237.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bFiqTJISqsVrEzhUsVQ4BFDEDQT3IDYLxyDZiQYUS8VDFqfPr7q8dKVjBAWzmu2i9qtI/OVrGpWh7cQ7zwo2pL3FLD4TUyEGeO0jIuZ6kG3eQiV4/ugK4BJ7sTcx7CDqpqMyRMQfpo4NDag70QjhYD5UZkuuuPeTlO3w5NJjaImag9xpGC7O4P9KA9/We4e8JOQcsCviJxuXOSbWBwjVw8JnOXaH58EK4l5kvu4wJDIP5PLZIiKCtJI8Ue/mxzRQwZjEZ3HDwC+7szDfKvAQ80T0vq8pVr4dWaPb2oijgZ3OvEFVCgm9WPp5DTFzt7bwMBM34x2YEXkmKDyq0KnGEQ==
+ b=xy8GkuFFoZIW8Y1El1kINDJShNSsT4RsTJP1Mywm1NILqfOZ+cuNnTIxa31HNv+JgYYtKcS6G+2L/F3nYn0GX+9hdxQmT4G1UrM+8fKS1u5pBlnsLxk9nxV1D8lGBOe4torvKGEalGmYmZ92YoLe63LWYaYzKJkZoMUojGIbLJoQvdEcebwBXXCLOx30ff4VgzJsx3DlasEAnFsBh3kFwCCeYuyK8WK/Z0AbPHWVEyreyt+gdnk05Aym583x0gfJv+f5eKkhPgG3U3nWre+SGq21MmLlXjmHIBOTLK/Q1ONuvldl3u3rQJ6974iJweXA0CC2ztqBAKNguYMyTbDYhA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lS07DEkij0siyBFgtqV+onP5vPnua80KVNIVtxpdqyA=;
- b=ZdovlQCeh4qISufMN1KPYW4pruA67o4/HABwQovXtVA/cOJmPUhIxEXQTcfYX1GBTt53MfW09h7/vZ05DJNpve7Vy1nOOT/pwBZnKsaN8aWpwkSUpX6vsbQG2WNqydgAUADapUoHojuV3Aavrpu7yezWWrH2NPPCf47GLUPZ5rMro+XHI+HgDxov9yd1um9taG8BqOxixEMaY/cRt2NWM0zWYLlycuPTccBBrSJZxK8qFjgc0PWVRYGuWN8V5wzH6NVaX5Yq7gnHD0RtiTSS8jd77j3yuM24GPsjzt82AOb/jniHjZmho9tn5FyxuREl7Tau6+iRD22agYRJ57cEFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 217.111.95.7) smtp.rcpttodomain=jo-so.de smtp.mailfrom=arri.de; dmarc=fail
- (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
- not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ bh=6iTf546zlyXOnYZToIU/VJfMVVM6aiSiuLCkiALUYYM=;
+ b=vgIR6ewG976H2D0vsOsJcrT5yk6Hv44TDoibmVZXRuHeMOsab96vBoWmIMJ0ersKlEkzo1g/d/SXRi3fucEnEdozRm5m/pJBw7jV0orOKzQRR+080XaHQPwuGs3CDxcnX8aU/teBa4HduJ/Ly2o32X338m1qyJeiF86VPYDpVR2TgVUQRxkZ5yr/Ey/juq+NfdYt1JuO1M/cjTMxiQSlVVaylm3VP3wmoV1mUPUdOdNffKo/aGG/X7AX+E96JUYLPIYu4/6nSz78vEUeA2BnPlOZQ7ZGaK1d2hA3On3sicVZLahXbfDQpxyuNm5pBshPIgJ3I2/PRo1SHkiApFF6Iw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lS07DEkij0siyBFgtqV+onP5vPnua80KVNIVtxpdqyA=;
- b=jzwVbHdAQhMXXZgMttJLdu/T2hG36F+/XPeUPITaYHK+LHxURmnBxYSGPeJz4B6mzAFmSg4g/8yvOzm92pLNvYUGV/wxYYMHiBFmTmnPkIo0n2UWXKhONYfYk7FveRsCHHzvicSyRYhrzOB7bsSEzCCsQCLumWabtE0E0FXXJJ8=
-Received: from DB7PR03CA0078.eurprd03.prod.outlook.com (2603:10a6:10:72::19)
- by DU2PR07MB8346.eurprd07.prod.outlook.com (2603:10a6:10:2e5::21) with
+ bh=6iTf546zlyXOnYZToIU/VJfMVVM6aiSiuLCkiALUYYM=;
+ b=avgdzTMxv3Jmih859Or57uMNaIBvIilgIr1k4J3MwlyiGt3i1WG++1KOgEYWiVjNZA1yGxaVr7x4ROZ2YD/MJ52WZU3nhRtgqHxrR0iOBF8D/iv565Ih3LXWeTiVfaWuC/eMdzgnFdw904FfLVjcMwo3dNxs4EVTkuUBH0yqYwY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by DM6PR12MB4329.namprd12.prod.outlook.com (2603:10b6:5:211::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Wed, 11 Dec
- 2024 10:18:59 +0000
-Received: from DB5PEPF00014B8D.eurprd02.prod.outlook.com
- (2603:10a6:10:72:cafe::33) by DB7PR03CA0078.outlook.office365.com
- (2603:10a6:10:72::19) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8230.14 via Frontend Transport; Wed,
- 11 Dec 2024 10:18:59 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
- smtp.mailfrom=arri.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=arri.de;
-Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
- designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
- client-ip=217.111.95.7; helo=mta.arri.de;
-Received: from mta.arri.de (217.111.95.7) by
- DB5PEPF00014B8D.mail.protection.outlook.com (10.167.8.201) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8251.15 via Frontend Transport; Wed, 11 Dec 2024 10:18:58 +0000
-Received: from n9w6sw14.localnet (10.30.4.231) by mta.arri.de (10.10.18.5)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Wed, 11 Dec
- 2024 11:18:58 +0100
-From: Christian Eggers <ceggers@arri.de>
-To: =?ISO-8859-1?Q?J=F6rg?= Sommer <joerg@jo-so.de>
-CC: Andrew Lunn <andrew@lunn.ch>, <netdev@vger.kernel.org>
-Subject: Re: KSZ8795 not detected at start to boot from NFS
-Date: Wed, 11 Dec 2024 11:18:58 +0100
-Message-ID: <5708326.ZASKD2KPVS@n9w6sw14>
-Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
-In-Reply-To: <njdcvcha6n3chy2ldrf2ghnj5brgqxqujrk4trp5wyo6jvpo6c@b3qdubsvg6ko>
-References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
- <zhuujdhxrquhi4u6n25rryx3yw3lm2ceuijcwjmnrr4awt4ys4@53wh2fqxnd6w>
- <njdcvcha6n3chy2ldrf2ghnj5brgqxqujrk4trp5wyo6jvpo6c@b3qdubsvg6ko>
+ 2024 10:25:59 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.8230.016; Wed, 11 Dec 2024
+ 10:25:58 +0000
+Message-ID: <d2bfe3af-c3ef-b6fd-6e0e-6765fbed2954@amd.com>
+Date: Wed, 11 Dec 2024 10:25:52 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v7 28/28] sfc: support pio mapping based on cxl
+Content-Language: en-US
+To: Edward Cree <ecree.xilinx@gmail.com>, alejandro.lucero-palau@amd.com,
+ linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
+ martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
+References: <20241209185429.54054-1-alejandro.lucero-palau@amd.com>
+ <20241209185429.54054-29-alejandro.lucero-palau@amd.com>
+ <0f2c6c09-f3cd-4a27-4d07-6f9b5c805724@gmail.com>
+ <bffb1a61-bc47-cc60-6d1c-70f57e749e36@amd.com>
+ <25df5f6d-096e-593c-9b6b-710658415a2f@gmail.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <25df5f6d-096e-593c-9b6b-710658415a2f@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PR3P191CA0056.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:102:55::31) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB5PEPF00014B8D:EE_|DU2PR07MB8346:EE_
-X-MS-Office365-Filtering-Correlation-Id: e0ae2107-5526-45af-f461-08dd19cd3a11
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|DM6PR12MB4329:EE_
+X-MS-Office365-Filtering-Correlation-Id: 910bb743-dc9c-4cd3-281a-08dd19ce33f3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
+	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?iso-8859-1?Q?kz1wBk1bmDE5wIZOd0j/DLVfx+yp68io0qw/lV4xq2rv7z6W9KDM4+tQgf?=
- =?iso-8859-1?Q?cspUb5PRHpJsFYzRsn9c3k2bKPi3ZA0b5nNB/2TmzSPAtgec27FtjotM5V?=
- =?iso-8859-1?Q?t3wdPUXrXF64M+uwarCFQDcmAZ1ZspBZNe3X0FFrbQTCYLYX59Cl01fWoc?=
- =?iso-8859-1?Q?WBeTfA2OLFtih9OHVDZCiVGvrFuaf+MQNneHB1bLc+AE832n9CPtgf9zYO?=
- =?iso-8859-1?Q?D2Gi2PrBBrCpfIcp7BNExzIpmweHqqXo3rGHEf5uqngjTaavgMVYXG+DsO?=
- =?iso-8859-1?Q?TZLbRULqhyD7GxKCg5TyEIIg+sPpkiojA1AcsI7iwbHgb6jiSqa8evIN2w?=
- =?iso-8859-1?Q?GzFJsFglya0g2i6gKh1FTRYO7FFCyc3+PBp+OM3hcgEHPY7xzS4/dbd+RQ?=
- =?iso-8859-1?Q?2XVlvR+yXuewlIb430nEKdBHbVI2kYMC2H8hLWKDwzMrzdrxaB2QBSSiLb?=
- =?iso-8859-1?Q?39g7SDsRoYzFtub93nXdtedOP/BDfXRXankoi5sdJ33h8ept1eM5Pgztxf?=
- =?iso-8859-1?Q?o04ySqL6brGIBiZJjCbibjFjC0drExaxqSZd3JiLsCTrHPExr7Y5Vm2mzw?=
- =?iso-8859-1?Q?44hmD/O7qRNaHhWVp9mMYU0/+qXZFdUyNuGwde0hoyaKfvlvPxIRFndTNk?=
- =?iso-8859-1?Q?H7MtiiLfAGgLOmZ1bniFNmtv4G7QUPaLEIr5fSniS612Wpx4EZ7yIcdFSx?=
- =?iso-8859-1?Q?PKD7laI8rJC0sDskcwkvDVqTzbAL5GoVaNXYkf8g7d7smFqR22MMIESzNx?=
- =?iso-8859-1?Q?3pdutDW8UjDGwN4B2aeLi7woZdpJTl55FaIKK2wdZG+vnCRf2bdTNZt5q5?=
- =?iso-8859-1?Q?TWw55QT/o+NeCJGz1RIQAR+tGAuNJQC8Z5mpm1OLXLhS3U9DlqezT+4NtP?=
- =?iso-8859-1?Q?MmdzE98MDOmf63tAVbuTG+3MFMczo9AFF9CNwlQ4+rOkaD2QD3RCzEHS7Y?=
- =?iso-8859-1?Q?uOTscoHWvYtdBt/eMmxycwpOBwmKvasoEWY8OPosz6nAADC39GCoNPA6Dd?=
- =?iso-8859-1?Q?dMmxbOHYwLtP/4ZXJiRqzejKRg949/ou0wCtzEij3QvvPbKVlSZOZODaJL?=
- =?iso-8859-1?Q?06vqijrulywMpJO3IR+3bSnjcBkxLco3SUx2TIADo8QhiKTAxL0Vmgg3fz?=
- =?iso-8859-1?Q?PeQhErqNeOy41sMysqbHXkh9n6MUjeFjhsEe8eWP3LBbuTAofVQmKj7oGI?=
- =?iso-8859-1?Q?F0W12kLIRS4t0+agUYdwqfVcfL5zoBZkWdQcRDeC3uYpLChMJCwu64nXuE?=
- =?iso-8859-1?Q?p9zLBOXpzS9dSpGclzHtvrsUMF8XUgqdSMvbKulMQwTPWpa6imdVVqNGgm?=
- =?iso-8859-1?Q?7AqWxqQufO2QDpSPXBEynI9uNd/r712fYF3M7KkMfOv3+0gdbLwsWtE0Zo?=
- =?iso-8859-1?Q?m4TgIUBjuQ2mG6YKIwAQNh1Tnt9ZyncN82pxIQ6/IvxKnre/m3G5mR73NH?=
- =?iso-8859-1?Q?hgXJT8HbfEYL6p7EfjqX3jAdLBkcXntkc78a+VSix/BOEJowR79dVXc8NG?=
- =?iso-8859-1?Q?WCX24okb0d9IoqfnDF5jGlchYvndObhj9MLQ6NCzBvhjQ4l+EKUoFqz95O?=
- =?iso-8859-1?Q?Vm2Ls2Y=3D?=
+	=?utf-8?B?T3dnZ3Jzd1V1cEt6OHBpMEUwOEJmcXdqbW8ybGNrZEk4MnVDS3F0czFDZUJI?=
+ =?utf-8?B?VGZBaVNMTEFEdjE5L0NHeGZLcnN2WWJEOCttY2E5cEgwM2d5Y0tpdEFkZXc3?=
+ =?utf-8?B?WmdrWFVVOGx5bWhVaVM3Mmp1S09Sc2VpY3pZRWVYdS9ZMXh3c2JnMHVDMFNv?=
+ =?utf-8?B?clZhUDJMcW9xYXEydG16NVBlVkhtVkJvUG1ucDJ5a2ZYNFJURWd5WlpQb1VS?=
+ =?utf-8?B?eUtEUFpmQi9ZTVpPbWUyT3huZnFUV0NuVmVCRjhmVlVnM3ptYUxRY1dqaW1x?=
+ =?utf-8?B?alFNTVBBK2d0YnVqV2FZV3VEQWRxYmI5Y24wZ3UrWXFhRTExZThOM3U5aytu?=
+ =?utf-8?B?N3RpWm5LTE1WbXY0VWFmMmdmWEYzTTBFcXkweWFMdUw3aW5hekVHTDdZaXBV?=
+ =?utf-8?B?MkNjVlRIamhrRFZOUzMrL1c2ck90Z092ajQyNEVjMSt3SmZkNWJBVDFwTGs1?=
+ =?utf-8?B?NlhLbzdqczI5VnNTMU96Rm5HWUxGZGNtbVlNY1JLY3A5dGdwWUtadUlxeldu?=
+ =?utf-8?B?ZjF3Z09GWS81MDFtSUVrWHB6YWFDMVkwYVhjTytIZkRRWXdsZmZ3Qk1lSy9h?=
+ =?utf-8?B?SVhFTzBVSTJHdGR1KzFXTGQvNUdIMWF6dUNpL3ZhVTNMRVhGREdVdVo5WHdL?=
+ =?utf-8?B?Q2ZRaFVoUWtxVndBOGswaXkvTlhSSGR2cXV5eDVQWENJQ01VZUhJYXZiTHcy?=
+ =?utf-8?B?aGhqZ2FlWVJDQ1MzN29jZEZXeUV5OUdkNzdiVU5PS3krOHlTOU9aZUptYUdI?=
+ =?utf-8?B?S252RlRlS0p3VnhRWkVVbUYyS1R4cEVHeDZGbHhVekpNcm9BQzVsYjBlSkVN?=
+ =?utf-8?B?bmNRWHZkUEd6MXcrNTRrSi9rUDA4N1JId2w5VmtRUSs4VUZHRlNCTVJ2Y2RM?=
+ =?utf-8?B?VGhDMGxrNXFoVEtBOW1ZRWlkUm5mWWN3S1MwenFwVlVSbU0rajROSlpjQktp?=
+ =?utf-8?B?bnVnQmxHckIranpPdGkxVmVlcTA0VTd6ZURGd2NtZDNHMHlNY1UyUEFYZFZS?=
+ =?utf-8?B?bXJuYTE1WEJCaU5pZzhub0hiYjA0UDRHc2pGYUIvZ2RobWxLQnlrVEYyNm1L?=
+ =?utf-8?B?NXY1RERKeVdQUEVONXZaQ2NoTU5lR2N4Q3lNa3FhV3FSV2poR0ZwVCtRbFlG?=
+ =?utf-8?B?NVlJdTNMNnoyTXF5eHhwSXBYS3g5TEJ4Q09JWDdSOTA4VmhuRlZXcDlTZEZk?=
+ =?utf-8?B?ekswbENpYk5RQzlXS3NZdkZGVDk4Y0N6U0FJczZ5c3VPNmp2RUIzZURib3pR?=
+ =?utf-8?B?VTRMR29zemdvZGlIV3pUMzJHa1RxU0hyeUloWkdvTjNQeDhtQmtwOEJuNWVX?=
+ =?utf-8?B?QXA0YkVvblUwTENGMVo1alNrT1RuY2U5ZzFpVmtsbndIZ2hUejc3VnNoNElk?=
+ =?utf-8?B?QTNwSGxQdU5oZjdacG1YNHlOTnRGVlExa2hwUk9HZmtIU0VjZ0x3M2szU2JX?=
+ =?utf-8?B?MkVjMlZ6TWo0QmFUNzEwbUM2WGhFYklycDFLOGNURjNpMlVXbk1hZjB5ZE5r?=
+ =?utf-8?B?NUdCd0pjbUM1SUNSTU9WMXp6a0g3OXlYM0JMWDA0SFc5ZGNPZUlEK1RzSXp1?=
+ =?utf-8?B?MTJ1QVd6V0tWOXRlTzRUL09QY29wNTdUMENmOFZncjNBVDZ5VE5XZTRUSU5S?=
+ =?utf-8?B?V0tUb0szZHhSOVltQWhPVS91SGxoVGd5cFF4Zk13a0Jmait4ZHpvUE9tY1dj?=
+ =?utf-8?B?aGNGeEpweGUwZmJrdExucmc0aTMxZXEyY3Rwb0ZJUVUyV2VVc25TYkUyM212?=
+ =?utf-8?B?ZXliZFhwNml4ZzdZZ0QyS2pLLzFEVVpZRDhCa2I5TEFHM0o3U1gwMktORXha?=
+ =?utf-8?B?RVAxTHJPeVV1K0Z4bnowdEdEUWZsN3hZNEhkYWhCTVJKT0lLQjVvKzJMNlNq?=
+ =?utf-8?Q?kPs4+Hv8+NWG0?=
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2024 10:18:58.8942
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MjBOYUtoTUhUZ2lvR2VBRWNESVc5Q2U3cXFrZWN6UUhtZU1RMzhzajd4OSti?=
+ =?utf-8?B?S2dMbE4zZ01qK0NibzdXRC9ITGdidWx5TDJhR0JTQ1hOazRtYnFKaHhoM2lI?=
+ =?utf-8?B?b3ZEZS9oZHgvVmdvemJDb3pRd3dxTXJJb3ZJNnhXQVNmUjRWOVZ5cXhNRXdT?=
+ =?utf-8?B?SEZTZVJTaUJiUTFQbDdEd0IrY1F1VUtqM1IwMXpMUmZ0WWtZVHl0L1JFUk5w?=
+ =?utf-8?B?UkJKOXdIRkZBU01XMVpZOWRsS3U1bmk0b3l1YlZqQ0ljS01DUDFSNUIvbU5D?=
+ =?utf-8?B?NzlKb25TQ0JNcXlrUXRLbGQzU1A5QzFWUkdyaVdmR21wUWFJWlFXSTRQR0Qw?=
+ =?utf-8?B?MFdGTVNTSExBM3Q1MzcyUEtQQzdiSllPallKSzN6OUt0VDhQbmU2VVJLaXIw?=
+ =?utf-8?B?eitLczVvOGdpQVZCcjhqZlZURW9ra3loSzVORTBpL0JNdlNQdk5Pa3ZNNDBM?=
+ =?utf-8?B?S2ZIdERkdUpjRUdwYkR3OUVITms5bmt2WWJkUlQxTG1nbU1GSWVoU1BzTFZE?=
+ =?utf-8?B?eS9JQmVpYjdHWnI1UXBKN2ZVZ0gxVG13a1NzdHZPNkIyOWptekxhK1ZVeHBt?=
+ =?utf-8?B?MEZycElsZXpONXpuZm9NaWxUdkt4bmpmN3Q2L3ArRUkvV1VvV3NzSFVPUFBS?=
+ =?utf-8?B?bkYvcE1ncGlURHp1M1FGeDZlVzE5bjhnQis4Zll5eVZRdjFWNGRrTGFBdTRO?=
+ =?utf-8?B?c045b1EyVEZ3cndsYmJMeWMvTm9KdjlQRmNjT3ZQdDlLREVBVGZNZllxZjhx?=
+ =?utf-8?B?UDh5OFJkaEV5Mm1tR1k1SnhXZDhBZGsyem5nNndpaklONUlmMmMxU1BMWitV?=
+ =?utf-8?B?SFNYbzR4RXVFS2x4SzBYMXE2cDRUMWF3dkFWeDlqNGlWVXdZbjBJcGw1NFRH?=
+ =?utf-8?B?cXVSTWFZTC9CZ2RWUXlLMjFOUmhrSDhvUU5SbHFIS2g2SmwvbGR2T1Y3Z2x6?=
+ =?utf-8?B?MWcxa0tRYTM4SWFWa0FvRXVxdlJON1ZvREZGbWVhYkpyRnJBS2NZUjNGUUVZ?=
+ =?utf-8?B?K1kxd09XcklhUTQ5OHZ0NGNiT2dJQkVaclBiU0JBN0wwUmxZUzM5TG92MVJU?=
+ =?utf-8?B?aE5kazhmSFpmOTd0ZkE4K3R5VnZFTUd1Nlp3UEt5ZHpoMytFakFZOStzNk1m?=
+ =?utf-8?B?OVVneVpoTUNBTG1iZTlUcTF5Mk9HZEUwWjFuWTZtZzloTDY1NmFRdE5wYnZn?=
+ =?utf-8?B?VjJoRzlPaFZTSDBvc1ZiMGFzR1huRVh5dWtCNjJWb2FvSUIrR0xJSEY0R2lx?=
+ =?utf-8?B?Skd2NCtCNEpuOEkvZ3pQZlQyM3RJbCt0RC9IQkdhRmR0RmVaM3JTWHpCUGdB?=
+ =?utf-8?B?WUMzQXBtSDhybzJvWmNNUy81a2lFemNrTHRwdVI5dFN5d3lZVUxSR05CaUJ2?=
+ =?utf-8?B?VU1KTXNuZ1FRUWc5THBoYmtzTGRNbVBnQklkQWlzVDJLS0hKNjljcnAzUnpU?=
+ =?utf-8?B?dzVmSTRKSkVwRnVBbWRIYjZtdktqd2NHZEljaVptQzN6UjJQdEwvT0piTWM4?=
+ =?utf-8?B?cCthYlNXeUkrdmFCVnFqTm9UN3lsNHR2NSswNXMzVldlZkxuZXFrcTVzMVRh?=
+ =?utf-8?B?SGhXb0hnL3NFMUZ6QlhDSXZlWUZSTWhKdmF3c3BYWEhSWGV5QlVUUXBPZXRt?=
+ =?utf-8?B?WjdBRi9qV3R1My9CcFFIRzFsZmVKMll5UWoxajVNbDg4RjZuK3BwNEt6TlZC?=
+ =?utf-8?B?WXA3ZWZxYUlpZmlya0E3Q0VYSitUKzdqUm5MUlEvZk9XdXAyd05PcTFoNVZw?=
+ =?utf-8?B?NlljM1pDejY4N2tnclFnVWd6UlV3MFhPdEJnRWMyakVKMWorcW1DUUVvSDJp?=
+ =?utf-8?B?MS9ac0JiRldINUR4M2FwVFQ3UHgxdDArdzBtdUM1RXk3c0czZm9LWEZ5dmVv?=
+ =?utf-8?B?UGx3Q3IrVUtrbEtyaUQ4bWY4aC9McGpqWlZzY1J3VmpPaThBbFBabDNITGFr?=
+ =?utf-8?B?aWI1dTd6ZXpRS0hRZG94TEdDTDlZSFVLOHhTd0JvUDVLOUJTM3lFU1ErL3Zi?=
+ =?utf-8?B?WWZmTkg4cG95VzdLR2Q4bjNCWHI4Yk1HQmd3Z2pINnQwRGRTTjhoYktzVlJO?=
+ =?utf-8?B?dkVsK3ZLRzNwd2RyMDFWNHdPVE4zTW5NdU5GTWtTTmU5T3FPaEZQQjBGRm5v?=
+ =?utf-8?Q?DiKvBN2dng4TVEXKaLUF30Njn?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 910bb743-dc9c-4cd3-281a-08dd19ce33f3
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2024 10:25:58.4546
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e0ae2107-5526-45af-f461-08dd19cd3a11
-X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
-X-MS-Exchange-CrossTenant-AuthSource: DB5PEPF00014B8D.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR07MB8346
-
-Hi J=F6rg,
-
-On Tuesday, 10 December 2024, 17:43:01 CET, J=F6rg Sommer wrote:
->=20
-> So I think it's a timing problem: the ksz8795 isn't ready after the SPI
-> reset, when the chip ID gets read, and this causes the probing to stop.
->=20
-> Why is SPI_MODE_3 required? At me, the chip works fine with SPI_MODE_0.
-
-I tried to reconstruct why I actually did this change (sorry, I am over 40):
-
-1. I was working on the PTP patches for KSZ956x.
-2. It was necessary to convert the devicetree bindings to Yaml.
-3. There where objections against keeping "spi-cpha" and "spi-cpol"
-   in the example code:
-   https://lore.kernel.org/netdev/20201119134801.GB3149565@bogus/
-
-On Thursday, 19 November 2020 07:48:01 -0600, Rob Hering wrote:
-> On Wed, Nov 18, 2020 at 09:30:02PM +0100, Christian Eggers wrote:
-=2E..
-> > +        ksz9477: switch@0 {
-> > +            compatible =3D "microchip,ksz9477";
-> > +            reg =3D <0>;
-> > +            reset-gpios =3D <&gpio5 0 GPIO_ACTIVE_LOW>;
-> > +
-> > +            spi-max-frequency =3D <44000000>;
-> > +            spi-cpha;
-> > +            spi-cpol;
->=20
-> Are these 2 optional or required? Being optional is rare as most
-> devices support 1 mode, but not unheard of. In general, you shouldn't
-> need them as the driver should know how to configure the mode if the h/w
-> is fixed.
-=2E..
-
-It seems that I considered the h/w as "fixed". The pre-existing device tree
-bindings and the diagrams on page 53 suggested that SPI mode 3 is the only
-valid option. Particularly the idle state of the "SCL" signal is high here:
-
-https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-DS0000=
-2419D.pdf
-
-But the text description on page 52 says something different:
-> SCL is expected to stay low when SPI operation is idle.=20
-
-Especially the timing diagrams on page 206 look more like SPI mode 0.
-
-So it is possible that my patch was wrong (due to inconsistent description
-on the data sheet / pre existing device tree binding). As I already mention=
-ed,
-I did this only due to the DT conversion, I actually don't use SPI on such
-devices myself.
-
-N.B. Which KSZ device do you actually use (I didn't find this in you previo=
-us
-mails)?
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Dv2mTAQ3Z75qXIf9RSMJ6INuX2aXwgqq/zNRtErxOs5jQDHBfXdsFRa61vN8DKiuoaF+cZoTQBnyJmhXdT34kg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4329
 
 
-On Sunday, 8 December 2024, 17:44:49 CET, J=F6rg Sommer wrote:
-> Or am I missing something in my devicetree to set the SPI to mode 3?
+On 12/11/24 10:11, Edward Cree wrote:
+> On 11/12/2024 09:38, Alejandro Lucero Palau wrote:
+>> On 12/11/24 02:39, Edward Cree wrote:
+>>> On 09/12/2024 18:54, alejandro.lucero-palau@amd.com wrote:
+>>>> @@ -1263,8 +1281,25 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
+>>>>        iounmap(efx->membase);
+>>>>        efx->membase = membase;
+>>>>    -    /* Set up the WC mapping if needed */
+>>>> -    if (wc_mem_map_size) {
+>>>> +    if (!wc_mem_map_size)
+>>>> +        goto out;
+>>> Maybe this label ought to be called something else; it's not really an
+>>>    'early exit', it's a 'skip over mapping and linking PIO', which just
+>>>    _happens_ to be almost the last thing in the function.
+>>
+>> I do not know if I follow your point here. This was added following Martin's previous review for keeping the debugging when PIO is not needed.
+>>
+>> It is formally skipping now because the change what I think is good for keeping indentation simpler with the additional conditional added.
+> Yeah, I agree that additional indentation is undesirable here.
+> (Although that does suggest that the *ideal* approach would be
+>   some refactoring into smaller functions, but I'm not going to
+>   ask you to take on that extra work just to get your change in.)
 
-The idea was that for "fixed" hardware the SPI mode should be setup in
-the drivers probe() routine rather than in the device tree.
 
-regards,
-Christian
+I appreciate it. :-)
+
+>> Anyway, I can change the label to something like "out_through_debug "which adds, IMO, unnecessary name complexity. Just using "debug" could give the wrong idea ...
+>>
+>> Any naming suggestion?
+> I was thinking something like "skip_pio:" or "no_piobufs:".
+> That way if someone later adds another bit of code to this function
+>   (to do something not PIO-related) it'll be obvious it should go
+>   after the label (& hence not be skipped), whereas with an "out:"
+>   label normally that means "something went wrong, we're exiting
+>   early" and thus additional functionality gets added before it.
 
 
+I like skip_pio. I'll use it.
+
+Thanks!
 
 
