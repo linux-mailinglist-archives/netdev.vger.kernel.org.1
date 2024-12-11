@@ -1,133 +1,139 @@
-Return-Path: <netdev+bounces-151197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB69C9ED61B
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 20:14:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 519879ED627
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 20:15:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2F55188411C
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 19:12:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04103188B8AC
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 19:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6195A235C49;
-	Wed, 11 Dec 2024 18:54:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA624259484;
+	Wed, 11 Dec 2024 18:54:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gCnVLuhv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LdjFUTiu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D00235C46;
-	Wed, 11 Dec 2024 18:54:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1913B23FD2E;
+	Wed, 11 Dec 2024 18:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733943292; cv=none; b=jyPyY5w2IlFmb3dwT+kSFq+WEADuH7noKQQhHS7/f5gx2EeQBh8VxIDUFALGeD0ZmeWCCx9Du7Q3qrBSnhMHAUkwg73AVj8kUs9mWwzEycE0vJNlmH8Y0cEz6888NG1Dihtmi6JreINTAC8DR5LteUPUpVFDRknvCiuH+YhDuYE=
+	t=1733943299; cv=none; b=u2pV4sS6kGCSC2LRdUilvUYurekHJII9AB8Iq0/yTzdutGVtOT84YkCngbdxjEsmzf2bAnUT7AnqfgFuWoskZsdZ35XOOOs32CIBLtxu6rjEIosPdUkG4nJJOFRrg87buNpJSMTfQ7xnrSLCVSqEy2nTL05InhHIWWeV5o779yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733943292; c=relaxed/simple;
-	bh=3VYmXnMI4su6R0mhdY7vsuCOVCVssqNMN6WEYch34QE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VcOrYJY2Wtji8yS4oq/a7jAMKRN+vxDQwV4AUHTIe+W3GHxbeQ4QfRnewe3TJghrE0IVuM9JDRxE8lSh1nQ08KBbb+zKW/xE8YroIMhUDqjzjDjuFdKJIP4TgoFVZ4+17XetIJzi1nwt7tXjhoIz3fnwKSxQEMsIxQ2ftYtpo3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gCnVLuhv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25F34C4CED4;
-	Wed, 11 Dec 2024 18:54:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733943291;
-	bh=3VYmXnMI4su6R0mhdY7vsuCOVCVssqNMN6WEYch34QE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gCnVLuhveQjxh+uFtEF2FjfHjMlIRh3SrCyC+DZ5D2mwBWmgwE9kT3WiLRNERsl84
-	 VX/thGEW6FxgYdPVVguMTKPTiO420xhAByc8l2C9nS5ivJ4ELVcDWMYrwq3i93YDiN
-	 4/+XJ29BNPHWVRpi+z9DjJGkq/xogJ6zQcr+fm5/AFqsZ7qH/5K0mjx6oUKobYpLky
-	 jDw8BSnNIpZzLSyqvh35dxsa3bdOdvn0kLkyD89DrMJKDq3102gwDD7L9/PzylM58H
-	 wPHKSXUzTq9RsWVCgSbG8jI97CBi5KotZJAz7tidnM63dDyqz9Z14Zs3mf79shvlPO
-	 6m/5Nad7emUAw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Lion Ackermann <nnamrec@gmail.com>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Sasha Levin <sashal@kernel.org>,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	cake@lists.bufferbloat.net,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 5/7] net: sched: fix ordering of qlen adjustment
-Date: Wed, 11 Dec 2024 13:54:38 -0500
-Message-ID: <20241211185442.3843374-5-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241211185442.3843374-1-sashal@kernel.org>
-References: <20241211185442.3843374-1-sashal@kernel.org>
+	s=arc-20240116; t=1733943299; c=relaxed/simple;
+	bh=VsLFDWRcpPe3Dn5zdglydGPNIzRwNv5JSeTvfZ/Qy2M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ssXZkk9aB4BD0zEVRqrCx8iih1KNcP1uuyt0i5yzrtVasaohs6Iy7M1Q4w2dJtBXh/6a844fbKLwnKeMUQzR5HN1JBgezpI0ENR9t7xjiEBCa/VVK5x+3DgpT+RVw3a6ku2mnZ1qXOHSKlvLF5/l4jmDISsri+6HYSKpy9nvIsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LdjFUTiu; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BBBvEqW025841;
+	Wed, 11 Dec 2024 18:54:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=tbLHFR
+	PDkwEfVtwHNEpSw/kwG8L4VWUBxBNMVuE96VA=; b=LdjFUTiuXWUKZ6mM4O9XLG
+	gmwtrZbGjjVytZHNRMRohvR+Zfz8GsPFggEzvHP/gTlainJ2H1QGiXNv2u/JS1+3
+	iWO64eJk1mc4ja/LBD2oaNu7RX6lRoqxzD4rUgpVPpm1OQCKWfr1Dh4+fp8AJ2gb
+	TbOcZaXlMhBN9A43H8/KusFR9nkye2v+/QMSEwqvTbLdwxxYWl1eWqQ2pl181gUJ
+	H/zkbXgsbDS9UfREoXocjOQxsEIYLIiFlln04LZTjt96WYA2dOoJYwzJYiY9Kdop
+	2261Lu8US03fyDY0VRbbDK5kAktE75WFB1wDiZsC2FDZi7bnnvC6/ytMx/BsdZ/A
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsqej7p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Dec 2024 18:54:51 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BBIspac005666;
+	Wed, 11 Dec 2024 18:54:51 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsqej7k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Dec 2024 18:54:51 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BBHIF9B017421;
+	Wed, 11 Dec 2024 18:54:50 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 43d3d1u0qf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Dec 2024 18:54:50 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BBIskpJ62456262
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 11 Dec 2024 18:54:47 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D37E220043;
+	Wed, 11 Dec 2024 18:54:46 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CC09520040;
+	Wed, 11 Dec 2024 18:54:45 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.81.50])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Wed, 11 Dec 2024 18:54:45 +0000 (GMT)
+Date: Wed, 11 Dec 2024 19:54:40 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Dust Li
+ <dust.li@linux.alibaba.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH net-next RESEND v3 2/2] net/smc: support ipv4 mapped
+ ipv6 addr client for smc-r v2
+Message-ID: <20241211195440.54b37a79.pasic@linux.ibm.com>
+In-Reply-To: <20241211023055.89610-3-guangguan.wang@linux.alibaba.com>
+References: <20241211023055.89610-1-guangguan.wang@linux.alibaba.com>
+	<20241211023055.89610-3-guangguan.wang@linux.alibaba.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.286
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ojddAGxzXGN6xT6MqxVDlPPu-LDffvjO
+X-Proofpoint-GUID: bIA3QC9xMxVzuWVB8X2EzXkTV9ipzQ-Q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=639 adultscore=0
+ lowpriorityscore=0 clxscore=1015 phishscore=0 impostorscore=0
+ suspectscore=0 spamscore=0 mlxscore=0 priorityscore=1501 malwarescore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412110133
 
-From: Lion Ackermann <nnamrec@gmail.com>
+On Wed, 11 Dec 2024 10:30:55 +0800
+Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
 
-[ Upstream commit 5eb7de8cd58e73851cd37ff8d0666517d9926948 ]
+> AF_INET6 is not supported for smc-r v2 client before, even if the
+> ipv6 addr is ipv4 mapped. Thus, when using AF_INET6, smc-r connection
+> will fallback to tcp, especially for java applications running smc-r.
+> This patch support ipv4 mapped ipv6 addr client for smc-r v2. Clients
+> using real global ipv6 addr is still not supported yet.
+> 
+> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+> Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
+> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+> Reviewed-by: D. Wythe <alibuda@linux.alibaba.com>
+> Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
 
-Changes to sch->q.qlen around qdisc_tree_reduce_backlog() need to happen
-_before_ a call to said function because otherwise it may fail to notify
-parent qdiscs when the child is about to become empty.
+Sorry for the late remark, but does this need a Fixes tag? I mean
+my gut feeling is that this is a bugfix -- i.e. should have been
+working from the get go -- and not a mere enhancement. No strong
+opinions here.
 
-Signed-off-by: Lion Ackermann <nnamrec@gmail.com>
-Acked-by: Toke Høiland-Jørgensen <toke@toke.dk>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/sched/sch_cake.c  | 2 +-
- net/sched/sch_choke.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index 9b4a9bdbeafd9..f2a49bccb5ef5 100644
---- a/net/sched/sch_cake.c
-+++ b/net/sched/sch_cake.c
-@@ -1505,7 +1505,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
- 	b->backlogs[idx]    -= len;
- 	b->tin_backlog      -= len;
- 	sch->qstats.backlog -= len;
--	qdisc_tree_reduce_backlog(sch, 1, len);
- 
- 	flow->dropped++;
- 	b->tin_dropped++;
-@@ -1516,6 +1515,7 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
- 
- 	__qdisc_drop(skb, to_free);
- 	sch->q.qlen--;
-+	qdisc_tree_reduce_backlog(sch, 1, len);
- 
- 	cake_heapify(q, 0);
- 
-diff --git a/net/sched/sch_choke.c b/net/sched/sch_choke.c
-index e54f6eabfa0c0..2007bc4f96709 100644
---- a/net/sched/sch_choke.c
-+++ b/net/sched/sch_choke.c
-@@ -124,10 +124,10 @@ static void choke_drop_by_idx(struct Qdisc *sch, unsigned int idx,
- 	if (idx == q->tail)
- 		choke_zap_tail_holes(q);
- 
-+	--sch->q.qlen;
- 	qdisc_qstats_backlog_dec(sch, skb);
- 	qdisc_tree_reduce_backlog(sch, 1, qdisc_pkt_len(skb));
- 	qdisc_drop(skb, sch, to_free);
--	--sch->q.qlen;
- }
- 
- struct choke_skb_cb {
--- 
-2.43.0
-
+Halil
 
