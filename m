@@ -1,80 +1,136 @@
-Return-Path: <netdev+bounces-150915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 032349EC125
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 01:59:35 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FC18168217
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 00:59:31 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CAEC4D8A3;
-	Wed, 11 Dec 2024 00:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q5ccgsJV"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E4B79EC12F
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:00:37 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67ABD1F949
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 00:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B85E2850C3
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 01:00:31 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F75C7E792;
+	Wed, 11 Dec 2024 01:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="oU8Wxq8f"
+X-Original-To: netdev@vger.kernel.org
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 749342451D8;
+	Wed, 11 Dec 2024 01:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733878770; cv=none; b=ruS7yebuoLV3ar/tqmmrE1ON67aa8iabkx++Iq6P3dCwFrx4KoF2khpfQsi6EwnzWq0ykrZihCucUSagu7j+5GQq2dB71n6MRdNf20knLHDFB/C3HS7NhEkaJAChmXDJzNkhil1XjOuXnRZbZkZt6lUb4MF2uv9BweO/fdltrpU=
+	t=1733878828; cv=none; b=MUB8H9RteLOJDiSbI8EU3ZbMqAEHnDTdKIDmOnjMFxPwyr2P6AGqND61iXDVHhgSV/0P2fTmdv6IQ1Vk/n/2x2kl7L+fsxQyRjCgs9WvRP5Tvf005rZySEopuzbcNUYYAxutXizlWimZXyo3T1iRcJ5l/Pu59OACzbH+xXIWUDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733878770; c=relaxed/simple;
-	bh=2eEwHT72/u4XxyGBevbiQqT4zc0BhDMAqZv6w9GeNxc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GuEMqwSRORKnDkjk9KiRj/nnMgRDWrmASRD07ZveS4pEuxtVZuYtJA2kY/TdRVViwowyuCkUFDHtY5R1gSwX8WYYW46EmYnaIup9pmAY69wDJP+dXPvGjLFOtSiORbViWeteSiKkAaakqh/eMVbXNHxIj+2iNTI0oJz6rKfiPwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q5ccgsJV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83829C4CED6;
-	Wed, 11 Dec 2024 00:59:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733878770;
-	bh=2eEwHT72/u4XxyGBevbiQqT4zc0BhDMAqZv6w9GeNxc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q5ccgsJVP4uzUtdP/wi7mstKvjRSlpZwCIgc7/1+oxxGMep8lcyn1ULURso0+jIYH
-	 9gQCQ9kDNhqg/mIJxNqVgQGWMoSG+f+zRrmSl7LZO51JNvED2c5eM3l7DZle3t7pai
-	 67+BbWKNgMafdjsir+NESfQSBG7d/PCw8FVb09y7k5Ghn/ihxDFlVMYmkdKfTLxbzd
-	 1PUFpTf1YsGD9FLEBXA3yT92B57ZRSn0Qr8HY7TkH+ccs89dgXRkd6Xt47dsHQSc4h
-	 qUPjZXaj+hJOMTl4WwsNmNJkOMcbFUjpbB79mQAZeXa+hT6pD50V17QtqxQFcsClgV
-	 DFyATQBbfPp4Q==
-Date: Tue, 10 Dec 2024 16:59:28 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, David
- Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Simon
- Horman <horms@kernel.org>, Fred Chen <fred.cc@alibaba-inc.com>, Cambda Zhu
- <cambda@linux.alibaba.com>, Willem de Bruijn <willemb@google.com>, Philo Lu
- <lulie@linux.alibaba.com>, Stefano Brivio <sbrivio@redhat.com>
-Subject: Re: [PATCH net] udp: fix l4 hash after reconnect
-Message-ID: <20241210165928.6934188e@kernel.org>
-In-Reply-To: <4761e466ab9f7542c68cdc95f248987d127044d2.1733499715.git.pabeni@redhat.com>
-References: <4761e466ab9f7542c68cdc95f248987d127044d2.1733499715.git.pabeni@redhat.com>
+	s=arc-20240116; t=1733878828; c=relaxed/simple;
+	bh=0BvstVVeKRVCLoTLCxrmHus0YKemmAtOgNTEx7/Hua4=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=C1nJGUkRWkf3xUtiBP9NVXqLlVsTzdBBvy5sE8AB01Sr8H5g4bV92vyArKaSmvDg+JOp5vycxXGmNyLNdd1RvLdhnB6VKlGT/0JI5kKJvaf1RWFnEx5RJI9wNHINIX+nhkY/2MUcImKXpRPPjoP2CKoox3dND1N+AlzTYiNJFI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=oU8Wxq8f; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [100.65.224.195] (unknown [20.236.10.66])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 3DB3C204722A;
+	Tue, 10 Dec 2024 17:00:23 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3DB3C204722A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1733878825;
+	bh=QUGnAohdjtquVH/2okVPvYsuli7DzTd7KNzArXZ6FX8=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=oU8Wxq8f38kSwtMyloVNW6CTihWbqiihpmp0Kmbf9489s89C/Z1o5JZmtxg0WiGWP
+	 5xvVb1XhicfPH1o/xdUSq84/qeX5nOMyN7dJOgbbvoyqRelv8RbAXLy4i6uQ7bi++o
+	 Gm59sZekWoiwe5TvchRr+7Gxo8CyNIMiE5EA50Kw=
+Message-ID: <422470cd-84f0-469e-93c2-493c5091391d@linux.microsoft.com>
+Date: Tue, 10 Dec 2024 17:00:21 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Cc: eahariha@linux.microsoft.com, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
+ Haojian Zhuang <haojian.zhuang@gmail.com>,
+ Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
+ <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
+ Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
+ <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>,
+ Dick Kennedy <dick.kennedy@broadcom.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Jack Wang <jinpu.wang@cloud.ionos.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
+ <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
+ Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
+ Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Louis Peens <louis.peens@corigine.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Jeff Johnson <quic_jjohnson@quicinc.com>
+Subject: Re: [PATCH v3 00/19] Converge on using secs_to_jiffies()
+To: Andrew Morton <akpm@linux-foundation.org>
+References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
+ <20241210163520.95fa1c8aa83e1915004ed884@linux-foundation.org>
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+Content-Language: en-US
+In-Reply-To: <20241210163520.95fa1c8aa83e1915004ed884@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Fri,  6 Dec 2024 16:49:14 +0100 Paolo Abeni wrote:
-> After the blamed commit below, udp_rehash() is supposed to be called
-> with both local and remote addresses set.
+On 12/10/2024 4:35 PM, Andrew Morton wrote:
+> On Tue, 10 Dec 2024 22:02:31 +0000 Easwar Hariharan <eahariha@linux.microsoft.com> wrote:
 > 
-> Currently that is already the case for IPv6 sockets, but for IPv4 the
-> destination address is updated after rehashing.
+>> This is a series that follows up on my previous series to introduce
+>> secs_to_jiffies() and convert a few initial users.
 > 
-> Address the issue moving the destination address and port initialization
-> before rehashing.
+> Thanks, I added this to mm.git.  I suppressed the usual added-to-mm
+> emails because soooo many cc's!
 > 
-> Fixes: 1b29a730ef8b ("ipv6/udp: Add 4-tuple hash for connected socket")
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> I'd ask relevant maintainers to send in any acks and I'll paste them
+> into the relevant changelogs.
 
-I feel obliged to point out a lack of selftest both here and the series
-under Fixes :(
+Thank you, Andrew!
+
+- Easwar
 
