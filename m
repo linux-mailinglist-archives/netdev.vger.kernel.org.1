@@ -1,100 +1,101 @@
-Return-Path: <netdev+bounces-150971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D72959EC35C
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 04:32:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3111F9EC35F
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 04:37:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E96A4188A2C1
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:32:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C90A18897FA
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1457209F23;
-	Wed, 11 Dec 2024 03:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6329A20C493;
+	Wed, 11 Dec 2024 03:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XrHCPeL/"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DQSGBr/1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365066F073
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 03:32:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833536F073
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 03:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733887961; cv=none; b=edjaCEgdz/Zywg/EVsHdKuQUVIdGtc+5SSXMPjNUBKOGZHJARAzIRHGHTngjZ9vQXnAwZgdSeiF25PPB595SIKGyhWj2coFq1ZFlhmg+KToJ9rHoYInwEHjVjiTSs/6XOcHDLhfTspI3ZjkWD4S/xenWeFF0AG3mWbLavR2qlVc=
+	t=1733888220; cv=none; b=olMQXvxX0O8rKtxKSF+uXXm1qqfY4su3tboFFQnkzJlCQnKkyuqLiwZdrXeGl81I1vmJkpuRZPRjsUP9YWFLEOQ8i4108SGsZ6W4kCORlPqxMnoEtrKnGFzIhjUXs8UuzXCUcrCJRT7Xml3dfiPqcrE20m2aVKR4KUElOIQSPEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733887961; c=relaxed/simple;
-	bh=eG4pQkr0aZ08nGyH+RzDanLEKokpoMWHHON+nXp5vXA=;
+	s=arc-20240116; t=1733888220; c=relaxed/simple;
+	bh=W4bSoBdH/IcP03Ompp+b5ciExzsDFgrgZHSnBI5ZRhs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WIJUsSQfjWF/p842DPJnZ39Z1UY6DPGVBbpcF7YZNS9+0WPqRSCsFS65xBr/UpAwL5E9gxJC9r1WE3kHuK8Df5ZWvNXsHqrhaLT16PtE0AFKf9hN0cqdVFTOEtu2rYpwAFMcfd08rijoVK48KdesK3x8ZjtA93Xy2mn/XW7/Amg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XrHCPeL/; arc=none smtp.client-ip=209.85.167.50
+	 To:Cc:Content-Type; b=bHFfejJDptccZz8eDY6ehf9uyTAR8HwS6oM0qmPgkATa76vW2VbGQR09FI7p/LCGLaQ3YFedfj7m0P7pyjptYIsD30Yc3pY3T1lj9+yOaX4oen8uZ4RfOuArZwZUQdaZD8qOR7Ie28mp4VF5a72U6Sgb1g4lDb1F0Msf+SPfK/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DQSGBr/1; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-53df80eeeedso5965373e87.2
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 19:32:39 -0800 (PST)
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5401c52000dso3056266e87.3
+        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 19:36:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1733887958; x=1734492758; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1733888216; x=1734493016; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=eG4pQkr0aZ08nGyH+RzDanLEKokpoMWHHON+nXp5vXA=;
-        b=XrHCPeL/i2tSsiNwjmP24vW4nv7zjCpByj1GfeAtuHJc54lQKJMUP5eKoFk8S49eTv
-         jR4iI0cBpEGCMylvl6IvJ0zqRUGExxOs63RBKHUirE/j/V2XVLt05JvY2pZr1y0gukk7
-         zDM9sy+c/Nbc0OOmasjUY6HxUJa3/XO2zp/0M=
+        bh=UNkTbs7XOXF21ZGOhnsjrizgdbo6CCSJS2ejBB/ACks=;
+        b=DQSGBr/1q5jL4EgyxNq4Hr/JZjV6fl0AJbwNAQOQr1LrtkNouhsSDTMj0gj6h8Pgy1
+         RQG102VXOxZTXuNF622Ixcd+0niKeXCFVKk8mpw9yssYoF3DFcq9c7ptph0mA6Wa+DaK
+         oZAzmQX0qi7eGmZxCrVLswrWrxA1RvUF7Pr3I=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733887958; x=1734492758;
+        d=1e100.net; s=20230601; t=1733888216; x=1734493016;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=eG4pQkr0aZ08nGyH+RzDanLEKokpoMWHHON+nXp5vXA=;
-        b=Ar+qLN71vP/cM/a1cslyJOZFoQ98Vrh33RgTy3RBhE7fyirykqb57Q1yjv1s3Xu/H2
-         DM8pBi8+RQ+CK7Z0FVsWPCophaSVH4HU3h674qRa4JBm8k+LXL4DhhJXYr/hT3OGiwcE
-         Bn7ehjGsuINJ0WridTVXO0TUFRzBQZrWYSIkmOIuc600V9tZprYkGo7uiTL/EHeHNfBj
-         NZbgutvgkLJApka9+weqMBJhl9HX0nqS5lE8G16EJr72k7tHbkelrWFamvnjC6tgVDFW
-         hdhkAm72AHbzgce6GxoAgm0kt8Z+K7+2Q+Kyy02Z4q6FXKcNeHRbBruAUaexyNZju7sH
-         9s4Q==
-X-Gm-Message-State: AOJu0YxjCqIaZcJdz5joybf2qjkqsm+fMOTZzm97u7BtDy/Od5vrNToE
-	V//X5a4N+UQAYvZH9q6Jh+Yj3Th0H7tD3JgGgx0ok1NmzaOdRwDFgI62E9kYKCkxDbouUZmoRfp
-	UFT3bpPFpsXJ09lYyjvQ20q73sn/ruhdS+2sG
-X-Gm-Gg: ASbGncsMhKuCpRXIUPx6/pgnsJ4GAZpvFrAAgDYjF0aI1WIW5Ywgu/IFialsxZumjcl
-	jnUyG7vOZWT2Ng4hMirDR4fZpj2eKU+tcYzA/
-X-Google-Smtp-Source: AGHT+IHwJYAEbtbh8kY7khQWIhDTUoCLWhnpZe2RXxkUdbB5Fjb6g6WJrnUhOml2QgmL9kiN5DZAGBFg/0Q3JrmcSdw=
-X-Received: by 2002:a05:6512:3d11:b0:53e:350a:729e with SMTP id
- 2adb3069b0e04-5402a5fec67mr298276e87.35.1733887958231; Tue, 10 Dec 2024
- 19:32:38 -0800 (PST)
+        bh=UNkTbs7XOXF21ZGOhnsjrizgdbo6CCSJS2ejBB/ACks=;
+        b=WgxS6c7cLzWldEwcE4+4P8ZMirEYv1Xuqn/QrS51k+dBTHFQetqIQzkZP4RDqvN6t5
+         9UEQKjK4YokvxB4cSp2GoedjT3p25BZHwv5IAd7e4LtxJuAQqbB89BXjb1zK963vOd4S
+         uqyt+cLwfEqrAbg9/8phdWyOWgsa1BW11q5cjUbgi9bjD/jn/IEuwDqk5A2JtrI5hTJ/
+         tL/UHa+bvMYxzOxG2uXdh3ZV4k6A9mjXaqKYngnKGkkUaZ8d9XUlJuIC4MFPVDyOyRLE
+         pWTxxeXtcxYl2Zq5E51tuIQOt64JoCHxpSvnOhc3HeElnSlPs8oSh6WOMEAiLTo6c2Sp
+         Fv8A==
+X-Gm-Message-State: AOJu0YznvteRuE7Ba/hl/zvUmMU2DnYUOTFLAYwnmSk+F02awUiXXLyV
+	oosNC8R/pzQwCBP1HvHi5lG4BxJ/PhU4qBCPRbuOO+YPDP5QJ1DwWryh0bu9cAOoBm/popZ52X7
+	xfs9VEyk1MvZL4sIBM/pvD7Y0tTUeTqFYLZ6/
+X-Gm-Gg: ASbGncuyU1eWQu0xVM8d1K05uePWJmmMOXskUjEvY42o598WqidgIIehLSBnY7taEUT
+	Kt7q8laPf+NMphaKlG8AwasVydB6tuGsIpYrE
+X-Google-Smtp-Source: AGHT+IE7W7ZOLlcLY3aFSN9i7YPI0rCQPzLEv1uIMPsbU0rSIt8cR6sCKwvTCvj6f27ubjGVyYVqf05Dhi2LsBfAGO8=
+X-Received: by 2002:a05:6512:308c:b0:540:228d:b8d3 with SMTP id
+ 2adb3069b0e04-5402a5d6f83mr318652e87.1.1733888216615; Tue, 10 Dec 2024
+ 19:36:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210183045.67878-1-shannon.nelson@amd.com> <20241210183045.67878-3-shannon.nelson@amd.com>
-In-Reply-To: <20241210183045.67878-3-shannon.nelson@amd.com>
+References: <20241210183045.67878-1-shannon.nelson@amd.com> <20241210183045.67878-2-shannon.nelson@amd.com>
+In-Reply-To: <20241210183045.67878-2-shannon.nelson@amd.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Wed, 11 Dec 2024 09:02:27 +0530
-Message-ID: <CAH-L+nMm99569_UbyFV7TBpXaeCs39m-xf_0jnT02rNnPiuV3Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/5] ionic: Use VLAN_ETH_HLEN when possible
+Date: Wed, 11 Dec 2024 09:06:46 +0530
+Message-ID: <CAH-L+nNEsi3zc8A38b20FK3hnCkZdHEdTXptbq1d2CXba4U19g@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/5] ionic: add asic codes to firmware interface file
 To: Shannon Nelson <shannon.nelson@amd.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
 	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch, 
 	jacob.e.keller@intel.com, brett.creeley@amd.com
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000da43eb0628f63f5c"
+	boundary="0000000000004087050628f64f82"
 
---000000000000da43eb0628f63f5c
+--0000000000004087050628f64f82
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Wed, Dec 11, 2024 at 12:01=E2=80=AFAM Shannon Nelson <shannon.nelson@amd=
 .com> wrote:
 >
-> From: Brett Creeley <brett.creeley@amd.com>
+> Now that the firmware has learned how to properly report
+> the asic type id, add the values to our interface file.
 >
-> Replace when ETH_HLEN and VLAN_HLEN are used together with
-> VLAN_ETH_HLEN since it's the same value and uses 1 define
-> instead of 2.
+> The sharp-eyed reviewers will catch that the CAPRI value
+> changed here from 0 to 1.  This comes with the FW actually
+> defining it correctly.  This is safe for us to change as
+> nothing actually uses that value yet.
 >
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
 > Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
@@ -104,7 +105,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh AP
 
---000000000000da43eb0628f63f5c
+--0000000000004087050628f64f82
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -176,14 +177,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIMQZAK4FzeqF4/6eMI2Snp74aoL8Z7bkAkGENFYbE+MMMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTIxMTAzMzIzOFowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEILy+3EjDoBmAPKWoFgfnYXbiyVs14O5hEqINYVQ/EptYMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTIxMTAzMzY1NlowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBXw66rtWqs
-A1Jlx+OztJzS5/dlnd01NZHCB9T/46sySu3O2MkGNmEidkGHn1EpFWU0902L/sgd8wNou1dkUju9
-Kme09anl8xlcOaRqH5dvqCqAqWvE3ysikWcUf04kjTM35dTZtDi0IOAViFvSIe4bKRjUzxzQhUxE
-G3GiY167V67CDduuoZzlXGqBUho1xptVxpNtnUmj9YLuTHgQ8nEAmEXtjVWGznBPt+Ogbw30PbIY
-unZk/VVOI+Vi+j63yo/+yGwQppHrUPLMiYDaORob2E9mB848gE1tuCjyyfUPeGioHPyCjF5mBs5r
-uoq4DunFK3rqdA0HBgUk5K3c1+A+
---000000000000da43eb0628f63f5c--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB+x0S3lkNM
+zUN95bLRCAjnOfcOedcAlhXqjgrxHUV58WSclRfuvoDflmJdzGoyFAULRR4GG3xYpeFn7xfvQGZa
+FwzTO16kzM1zJ3g5aLP4Q/Pref8ZzDAVs8o1QwWmtUycYnYl2mKr/Upr3WcoNmKToWG9i1NuDhM9
+ZyfxkF+JmbLH3Y2w2dH1sfqAQ7sTGN8bLz4zS9rYfqvGKmsNSpwBefZcs8KXh3+HHVV0n3k3G28H
+cG6vpfWJCHs1leOyZND7/aw6wms8tOn5mBkDjdD/pvvffXrZC/9TI09vxFPyglkmBJ8h3/Ag+RKl
+Rf56ihVb7wrgxGioxACcBKL4Sdql
+--0000000000004087050628f64f82--
 
