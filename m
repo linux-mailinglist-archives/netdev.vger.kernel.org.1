@@ -1,46 +1,79 @@
-Return-Path: <netdev+bounces-151086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C49839ECC9C
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:52:35 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 073C81888C6B
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 12:52:33 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5E623FD04;
-	Wed, 11 Dec 2024 12:52:28 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17BA29ECC99
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:51:46 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9630A23FD00;
-	Wed, 11 Dec 2024 12:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEAB32814D5
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 12:51:40 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A288E23FD17;
+	Wed, 11 Dec 2024 12:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="X9SRhYUO"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CDC1E50B
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 12:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733921548; cv=none; b=Ne9De027iXuwO02CCpXNhPT/IM/HRaXd1mhHCriGXVIri7NGQ7+ETGwR6Oa4vT791YwQN3ncgWRe7ch7dF9m/hoia9WUYxAMUExaiCyLa9NY15a2iGyLO+3aB9JZsvTFH3HjWaqMw4JuZNBeQKNPV4Qd0ndkk7saindN2X7ddvU=
+	t=1733921498; cv=none; b=eXOutC5xg/VM1qOOBN30X72qjvJCVG4S2dAZuYjw2sWWwMxDsZmoBUffjg89EBOa1bFVnzYFdd48nySjkIOaRZK5Q2OFgs8QIMK5oPeZixMx3N7J0dc4XBzcGaChh/aHdZ0A0rAeUiQLjdgdYQzEkE6RR3XHHXlFFIw+2Ta7ULk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733921548; c=relaxed/simple;
-	bh=1607GGABTEokozmx5ur7ARJ/8i0OR0tZHAUiMLWMWZs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=IcR12d98+jWYljYS8DDIJedYXZFX9JCHLVZ3hO4oJnFqjT+VY1e1MIwkPKlaUKTlAmpRrEB41kkGudus7fTTAxLyrSV6gbJ8zB2f9peoo6ZJ6WCoH8wLLxkWsCEFrzEO1kreccqf0xxMRwO3Fl8ng5ZvFeCo1LM2a4O0BlFbkvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Y7b9F2b2nz20ldZ;
-	Wed, 11 Dec 2024 20:52:33 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5F780140120;
-	Wed, 11 Dec 2024 20:52:16 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 11 Dec 2024 20:52:16 +0800
-Message-ID: <389876b8-e565-4dc9-bc87-d97a639ff585@huawei.com>
-Date: Wed, 11 Dec 2024 20:52:15 +0800
+	s=arc-20240116; t=1733921498; c=relaxed/simple;
+	bh=0OUWphyTbf6xBZM1dUwTwW/QFrk4VopnS/m0vm8v1vI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jJyrq1lpFsVbl6aQXrmZUTojnKHsgB+NbFgJabaveEF9yBsM39eJZQqCoZ643KLQgS0Iq1YOaVQ8G5BRv3YfQXj1ZsNzPFBfZRTsHZAcbtF5B8a5gTY7W0lJBo3S2yYpEN3zdN1Uk3VB3Sakn42OfbadPXj0A1EHYRWY/3rfNso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=X9SRhYUO; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-436202dd730so2715105e9.2
+        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 04:51:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1733921495; x=1734526295; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nd4cR7VNkiPh4DainW3uYEi6+FSg1iou6ceeUwexMCU=;
+        b=X9SRhYUOJaS8NI3ZiDbv1Ma9afDl9N1WQvLeabFxRxdrL0V7oreMdcEg2kZaXVVxMp
+         /F1TwX0qB0E7JFUwjQQpAWVI9toRCXSE2O9LNpfXhXwc/dfXnlksvjK3GJJU/+0Tqw07
+         xrmq2yCdp1M0pWFLxl6gLmPWEhS0Nyk2Njqks1qjwr7oEa20+zUsPwvBgDxo6s3tVmaW
+         VwARXTvaD422lsoCe9maNU0RSHaA5ipO3cLew6eoGip/7glFUENf+ltfLzuyyPc2yYmo
+         7TLY1VYzHCMP5i3P5Pc5J8yfs1aV++FB+lTdLgrMETrVY2b0nCSLFLTOqjqXuJ0qKyn0
+         rAag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733921495; x=1734526295;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nd4cR7VNkiPh4DainW3uYEi6+FSg1iou6ceeUwexMCU=;
+        b=Czg+s8xC2OANUbOgX/m0Lv1rVj8CqdkwfbjeeYLIp/iYm+OIf5u/pZLFbJrTvR7RFe
+         jRqSTeN1vA6tIKmuXmttSw5HPP6We5h8QadQSHZZCen8K0duRVmK7Qkl3Hs5DJBNhGZc
+         THeM/au6EsLNS738gHRkNhSQCsVaTYxi4gY39jPLm1319v/BR31GvgxvCNeczKGKkwAJ
+         2qDAt3D7XvlU/iObhVQjOqz/8mXrDqmGMtWysaSPPfJQp9I67M2cBIqlLAuLb3uLgeL6
+         l3cGxrx+8lmWV+dOQOqEWmLcPUGW2ChJ8XW5+xIDpDwi8hK38uY0Y14HXHj0qJLZMyVJ
+         5F5Q==
+X-Gm-Message-State: AOJu0YwZU/j3cchPB7oIMJw5VCVs1k6iweT0l7OR47kQ7FgpLxtVE0Dc
+	HSs6ic7gbL0IG/EkCuKFpc5gWINzZ2d7VVBCpRifXk8i21mH7BHNJRs0gNiWkZQ=
+X-Gm-Gg: ASbGncsgLXeYJ2X8Z76Qp+WIdpqaHxo2fEOVe8cd25X3D1SxGgOpFzSZhBlZcQXjooW
+	Gwve+smUSrBOVQrk5AvnGGdzIJxPPrdjmTazzeMCD5QsOexbJ9gnR9Ne1+nOsk5+8H/y/9Mh+3f
+	f/b9JIQfKTvSjrew7DZMZ4QJSYaZAtlKIdFZ33PX1iAMRE2huIqNVfUCGPJai72U7urBp532SOT
+	BrxG1FF5FU4n1lZkVa+lZ5KvgGAVp7PZ3GP2Xh2IpImHv15SBG53KxqG9yigxob89KlGOyBPmlf
+	/T+RYy21QnhD0A==
+X-Google-Smtp-Source: AGHT+IEAhSjKj7WdnSQujhKoCbXsLtfE3ig+PhAU836+YP/N5IG6Z7pZ3cnPntdYmIp9qR/MmIzbzw==
+X-Received: by 2002:a05:600c:4e4b:b0:435:306:e5dd with SMTP id 5b1f17b1804b1-4361c42c70bmr17359425e9.22.1733921494713;
+        Wed, 11 Dec 2024 04:51:34 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:f6e8:f722:d96d:abb? ([2001:67c:2fbc:1:f6e8:f722:d96d:abb])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-387824a5005sm1229367f8f.41.2024.12.11.04.51.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Dec 2024 04:51:34 -0800 (PST)
+Message-ID: <4471b912-d8df-41ba-9c3b-a46906ca797d@openvpn.net>
+Date: Wed, 11 Dec 2024 13:52:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,141 +81,176 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 00/10] Replace page_frag with page_frag_cache
- (Part-2)
-To: Alexander Duyck <alexander.duyck@gmail.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Shuah Khan
-	<skhan@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>,
-	Linux-MM <linux-mm@kvack.org>
-References: <20241206122533.3589947-1-linyunsheng@huawei.com>
- <CAKgT0UeXcsB-HOyeA7kYKHmEUM+d_mbTQJRhXfaiFBg_HcWV0w@mail.gmail.com>
- <3de1b8a3-ae4f-492f-969d-bc6f2c145d09@huawei.com>
- <CAKgT0Uc5A_mtN_qxR6w5zqDbx87SUdCTFOBxVWCarnryRvhqHA@mail.gmail.com>
- <15723762-7800-4498-845e-7383a88f147b@huawei.com>
- <CAKgT0Uf7V+wMa7zz+9j9gwHC+hia3OwL_bo_O-yhn4=Xh0WadA@mail.gmail.com>
+Subject: Re: [PATCH net-next v14 17/22] ovpn: implement peer
+ add/get/dump/delete via netlink
+To: Xiao Liang <shaw.leon@gmail.com>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ sd@queasysnail.net, ryazanov.s.a@gmail.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20241209-b4-ovpn-v14-0-ea243cf16417@openvpn.net>
+ <20241209-b4-ovpn-v14-17-ea243cf16417@openvpn.net>
+ <CABAhCOSJCoZFuevjcwvdJ+==TpGEJZPmvvHfT=U3Kf_-Ob+BnA@mail.gmail.com>
+ <5a3d1c9b-f000-45c1-afd3-c7a10d2a50e8@openvpn.net>
+ <CABAhCOSNRu1QfVr_0Las+dSMsbrVE=HLT6pzqQHODkUTxBi0-Q@mail.gmail.com>
 Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAKgT0Uf7V+wMa7zz+9j9gwHC+hia3OwL_bo_O-yhn4=Xh0WadA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <CABAhCOSNRu1QfVr_0Las+dSMsbrVE=HLT6pzqQHODkUTxBi0-Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2024/12/10 23:58, Alexander Duyck wrote:
+On 11/12/2024 13:35, Xiao Liang wrote:
+> On Wed, Dec 11, 2024 at 7:30 PM Antonio Quartulli <antonio@openvpn.net> wrote:
+>>
+>> Hi Xiao and thanks for chiming in,
+>>
+>> On 11/12/2024 04:08, Xiao Liang wrote:
+>>> On Mon, Dec 9, 2024 at 6:48 PM Antonio Quartulli <antonio@openvpn.net> wrote:
+>>> [...]
+>>>> +/**
+>>>> + * ovpn_nl_peer_modify - modify the peer attributes according to the incoming msg
+>>>> + * @peer: the peer to modify
+>>>> + * @info: generic netlink info from the user request
+>>>> + * @attrs: the attributes from the user request
+>>>> + *
+>>>> + * Return: a negative error code in case of failure, 0 on success or 1 on
+>>>> + *        success and the VPN IPs have been modified (requires rehashing in MP
+>>>> + *        mode)
+>>>> + */
+>>>> +static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info *info,
+>>>> +                              struct nlattr **attrs)
+>>>> +{
+>>>> +       struct sockaddr_storage ss = {};
+>>>> +       struct ovpn_socket *ovpn_sock;
+>>>> +       u32 sockfd, interv, timeout;
+>>>> +       struct socket *sock = NULL;
+>>>> +       u8 *local_ip = NULL;
+>>>> +       bool rehash = false;
+>>>> +       int ret;
+>>>> +
+>>>> +       if (attrs[OVPN_A_PEER_SOCKET]) {
+>>>
+>>> Similar to link attributes in other tunnel drivers (e.g. IFLA_GRE_LINK,
+>>> IFLA_GRE_FWMARK), user-supplied sockets could have sockopts
+>>> (e.g. oif, fwmark, TOS). Since some of them may affect encapsulation
+>>> and routing decision, which are supported in datapath? And do we need
+>>> some validation here?
+>>
+>> Thanks for pointing this out.
+>> At the moment ovpn doesn't expect any specific socket option.
+>> I haven't investigated how they could be used and what effect they would
+>> have on the packet processing.
+>> This is something we may consider later.
+>>
+>> At this point, do you still think I should add a check here of some sort?
+>>
+> 
+> I think some sockopts are important. Especially when oif is a VRF,
+> the destination can be totally different than using the default routing
+> table. If we don't support them now, it would be good to deny sockets
+> with non-default values.
+
+I see - openvpn in userspace doesn't set any specific oif for the 
+socket, but I understand ovpn should at least claim that those options 
+are not supported.
+
+I am a bit lost regarding this aspect. Do you have a pointer for me 
+where I can see how other modules are doing similar checks?
 
 > 
-> I'm not sure perf stat will tell us much as it is really too high
-> level to give us much in the way of details. I would be more
-> interested in the output from perf record -g followed by a perf
-> report, or maybe even just a snapshot from perf top while the test is
-> running. That should show us where the CPU is spending most of its
-> time and what areas are hot in the before and after graphs.
+>>>
+>>> [...]
+>>>> +static int ovpn_nl_send_peer(struct sk_buff *skb, const struct genl_info *info,
+>>>> +                            const struct ovpn_peer *peer, u32 portid, u32 seq,
+>>>> +                            int flags)
+>>>> +{
+>>>> +       const struct ovpn_bind *bind;
+>>>> +       struct nlattr *attr;
+>>>> +       void *hdr;
+>>>> +
+>>>> +       hdr = genlmsg_put(skb, portid, seq, &ovpn_nl_family, flags,
+>>>> +                         OVPN_CMD_PEER_GET);
+>>>> +       if (!hdr)
+>>>> +               return -ENOBUFS;
+>>>> +
+>>>> +       attr = nla_nest_start(skb, OVPN_A_PEER);
+>>>> +       if (!attr)
+>>>> +               goto err;
+>>>> +
+>>>> +       if (nla_put_u32(skb, OVPN_A_PEER_ID, peer->id))
+>>>> +               goto err;
+>>>> +
+>>>
+>>> I think it would be helpful to include the netns ID and supported sockopts
+>>> of the peer socket in peer info message.
+>>
+>> Technically the netns is the same as where the openvpn process in
+>> userspace is running, because it'll be it to open the socket and pass it
+>> down to ovpn.
+> 
+> A userspace process could open UDP sockets in one namespace
+> and the netlink socket in another. And the ovpn link could also be
+> moved around. At this moment, we can remember the initial netns,
+> or perhaps link-netns, of the ovpn link, and validate if the socket
+> is in the same one.
+> 
 
-It seems the bottleneck is in the freeing side that page_frag_free()
-function took up to about 50% cpu for non-aligned API and 16% cpu
-for aligned API in the push CPU using 'perf top'.
+You are correct, but we don't want to force sockets and link to be in 
+the same netns.
 
-Using the below patch cause the page_frag_free() to disappear in the
-push CPU  of 'perf top', new performance data is below:
-Without patch 1:
- Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=0 test_pop_cpu=1 test_alloc_len=12 nr_test=51200000' (20 runs):
+Openvpn in userspace may have been started in the global netns, where 
+all sockets are expected to live (transport layer), but then the 
+link/device is moved - or maybe created - somewhere else (tunnel layer).
+This is not an issue.
 
-         21.084113      task-clock (msec)         #    0.008 CPUs utilized            ( +-  1.59% )
-                 7      context-switches          #    0.334 K/sec                    ( +-  1.25% )
-                 1      cpu-migrations            #    0.031 K/sec                    ( +- 20.20% )
-                78      page-faults               #    0.004 M/sec                    ( +-  0.26% )
-          54748233      cycles                    #    2.597 GHz                      ( +-  1.59% )
-          61637051      instructions              #    1.13  insn per cycle           ( +-  0.13% )
-          14727268      branches                  #  698.501 M/sec                    ( +-  0.11% )
-             20178      branch-misses             #    0.14% of all branches          ( +-  0.94% )
+Does it clarify?
 
-       2.637345524 seconds time elapsed                                          ( +-  0.19% )
+Thanks
 
- Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=0 test_pop_cpu=1 test_alloc_len=12 nr_test=51200000 test_align=1' (20 runs):
-
-         19.669259      task-clock (msec)         #    0.009 CPUs utilized            ( +-  2.91% )
-                 7      context-switches          #    0.356 K/sec                    ( +-  1.04% )
-                 0      cpu-migrations            #    0.005 K/sec                    ( +- 68.82% )
-                77      page-faults               #    0.004 M/sec                    ( +-  0.27% )
-          51077447      cycles                    #    2.597 GHz                      ( +-  2.91% )
-          58875368      instructions              #    1.15  insn per cycle           ( +-  4.47% )
-          14040015      branches                  #  713.805 M/sec                    ( +-  4.68% )
-             20150      branch-misses             #    0.14% of all branches          ( +-  0.64% )
-
-       2.226539190 seconds time elapsed                                          ( +-  0.12% )
-
-With patch 1:
- Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=0 test_pop_cpu=1 test_alloc_len=12 nr_test=51200000' (20 runs):
-
-         20.782788      task-clock (msec)         #    0.008 CPUs utilized            ( +-  0.09% )
-                 7      context-switches          #    0.342 K/sec                    ( +-  0.97% )
-                 1      cpu-migrations            #    0.031 K/sec                    ( +- 16.83% )
-                78      page-faults               #    0.004 M/sec                    ( +-  0.31% )
-          53967333      cycles                    #    2.597 GHz                      ( +-  0.08% )
-          61577257      instructions              #    1.14  insn per cycle           ( +-  0.02% )
-          14712140      branches                  #  707.900 M/sec                    ( +-  0.02% )
-             20234      branch-misses             #    0.14% of all branches          ( +-  0.55% )
-
-       2.677974457 seconds time elapsed                                          ( +-  0.15% )
-
-root@(none):/home# perf stat -r 20 insmod ./page_frag_test.ko test_push_cpu=0 test_pop_cpu=1 test_alloc_len=12 nr_test=51200000 test_align=1
-
-insmod: can't insert './page_frag_test.ko': Resource temporarily unavailable
-
- Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=0 test_pop_cpu=1 test_alloc_len=12 nr_test=51200000 test_align=1' (20 runs):
-
-         20.420537      task-clock (msec)         #    0.009 CPUs utilized            ( +-  0.05% )
-                 7      context-switches          #    0.345 K/sec                    ( +-  0.71% )
-                 0      cpu-migrations            #    0.005 K/sec                    ( +-100.00% )
-                77      page-faults               #    0.004 M/sec                    ( +-  0.23% )
-          53038942      cycles                    #    2.597 GHz                      ( +-  0.05% )
-          59965712      instructions              #    1.13  insn per cycle           ( +-  0.03% )
-          14372507      branches                  #  703.826 M/sec                    ( +-  0.03% )
-             20580      branch-misses             #    0.14% of all branches          ( +-  0.56% )
-
-       2.287783171 seconds time elapsed                                          ( +-  0.12% )
-
-It seems that bottleneck is still the freeing side that the above
-result might not be as meaningful as it should be.
-
-As we can't use more than one cpu for the free side without some
-lock using a single ptr_ring, it seems something more complicated
-might need to be done in order to support more than one CPU for the
-freeing side?
-
-Before patch 1, __page_frag_alloc_align took up to 3.62% percent of
-CPU using 'perf top'.
-After patch 1, __page_frag_cache_prepare() and __page_frag_cache_commit_noref()
-took up to 4.67% + 1.01% = 5.68%.
-Having a similar result, I am not sure if the CPU usages is able tell us
-the performance degradation here as it seems to be quite large?
-
-@@ -100,13 +100,20 @@ static int page_frag_push_thread(void *arg)
-                if (!va)
-                        continue;
-
--               ret = __ptr_ring_produce(ring, va);
--               if (ret) {
-+               do {
-+                       ret = __ptr_ring_produce(ring, va);
-+                       if (!ret) {
-+                               va = NULL;
-+                               break;
-+                       } else {
-+                               cond_resched();
-+                       }
-+               } while (!force_exit);
-+
-+               if (va)
-                        page_frag_free(va);
--                       cond_resched();
--               } else {
-+               else
-                        test_pushed++;
--               }
-        }
-
-        pr_info("page_frag push test thread exits on cpu %d\n",
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
 
