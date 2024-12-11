@@ -1,217 +1,213 @@
-Return-Path: <netdev+bounces-151130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 066AC9ECEEF
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:46:34 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A4951882A80
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:46:30 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF88246342;
-	Wed, 11 Dec 2024 14:46:24 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0A289ECEF5
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:48:38 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EEC24635E;
-	Wed, 11 Dec 2024 14:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733928384; cv=none; b=ot8/qXguAx7gqm1BHd1ZsA8fsR6hzDY7UDnocDkd0TGmceJUiAy7NZtENBh/0FR6i/TQYVEbV8C0cTzP28dDa2n3FsEn/+LpyeZHNaCRXJzLHZ8OStVPQaEtM4LycSnlBtG8fsFOuZ1BiqL9gtqDE4YVPgs7Mi5jErgasEi4qXs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733928384; c=relaxed/simple;
-	bh=4432CzuyDb6GCvPf5YdoDyqv6F9aCZqCiwvjkQV3948=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TQ7c3aZaricSVQMvoon20WP8UWjelgD1yEqmwGJG2xlLUgp2nBQfdYRdLa0Injaq4GBvK8ntBf7IxSsoZ4X3beut02HQNG7c4EBKABRTVQsg55l4Ub3dFYk3K2A6sOm6dzda4iTSiWJrCTDI4IsnG2pPzo3ffqk0h9LnDYxa+y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
-Received: from mail-relay (helo=jo-so.de)
-	by s1.jo-so.de with local-bsmtp (Exim 4.96)
-	(envelope-from <joerg@jo-so.de>)
-	id 1tLNyf-001umu-2P;
-	Wed, 11 Dec 2024 15:46:13 +0100
-Received: from joerg by zenbook.jo-so.de with local (Exim 4.98)
-	(envelope-from <joerg@jo-so.de>)
-	id 1tLNyf-00000000e7P-0cFt;
-	Wed, 11 Dec 2024 15:46:13 +0100
-Date: Wed, 11 Dec 2024 15:46:13 +0100
-From: =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
-To: Christian Eggers <ceggers@arri.de>, linux-spi@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
-Subject: Re: KSZ8795 not detected at start to boot from NFS
-Message-ID: <sqsslcr7fsgqi7fvjpy5xnarhlm76atvatczkzwpn37e7gnsu6@tuy7an7t4gdg>
-OpenPGP: id=7D2C9A23D1AEA375; url=https://jo-so.de/pgp-key.txt;
- preference=signencrypt
-References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
- <5708326.ZASKD2KPVS@n9w6sw14>
- <cxe42bethnzs7f46xxyvj6ok6ve7itssdxyh2vuftnfws4aa3z@2o4njdkw3r5i>
- <2675613.fDdHjke4Dd@n9w6sw14>
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D30482835EE
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:48:35 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD27D17C7CE;
+	Wed, 11 Dec 2024 14:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=digi.com header.i=@digi.com header.b="dKndCu5P"
+X-Original-To: netdev@vger.kernel.org
+Received: from outbound-ip8a.ess.barracuda.com (outbound-ip8a.ess.barracuda.com [209.222.82.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D3C246342;
+	Wed, 11 Dec 2024 14:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=209.222.82.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733928513; cv=fail; b=efW2v6vXk9osdqak9MkD3+plyoJdDaNgdPIgd9v4E8JgIz52aa6ZvF2Txxf3uJv0XHB9kpFIG4eEzlNuOzy0JejCNSqdqbFVqpH6IHjy38RL8TgL9yeaQJ1SftDGR35gKvG+wUhn76V2Na1Ngb6w4xfUzGRM3wKIZFEPzHlIBhA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733928513; c=relaxed/simple;
+	bh=kOWQIYJKHf01kIWdB1KE07+7p/UHyCTLGXfqWBJXkl0=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=uea2RrCCWT+60s/PAdDOcVTQ/1qn8X02kJSuojLrHK23wly6HF6a4La/pUWjgIKRwra8atjhBD4How1KqycU6D7qyUs8t3O/nHL+p0VTZ1jzsl6HDXTqkRyMs3ecaGz0VFQtdErp0Pyu36UDZdjxcfElum8cxf3/55eRyv+3WT8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digi.com; spf=pass smtp.mailfrom=digi.com; dkim=pass (2048-bit key) header.d=digi.com header.i=@digi.com header.b=dKndCu5P; arc=fail smtp.client-ip=209.222.82.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digi.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digi.com
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2040.outbound.protection.outlook.com [104.47.55.40]) by mx-outbound12-219.us-east-2a.ess.aws.cudaops.com (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Wed, 11 Dec 2024 14:48:14 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=u3dYJ7ZKqwlhHer2dcOZHMwkZfhPT4ELHWHatgFOke8F/APo+RopScdrexQcUZyFLOA5pFYyoswWygONQ1QFEOQMCN/Mbs2LzSqiq+W6JBdj83Zd8WmIHl/pkCjcx5zugO5zyeHPsTSF7fb+0O3/ETZiTbEARyaXfGPU6KQKAq6fkvVpgmveZPIixviMTaJ7lej6429VG5z0HsbnpwgKB0GbPd4BvRKUO/7VzCGZ32f5CYJ59zmjNNMe6fmdfZza1MRQ41KrX+54TaP/rIlUUa5IuntwjUXxHEZ4bid4a6uGl0KYZ1lloiR3CgOxi59vlNX6urC3KRJqhoBWA9+6Pg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/dS3WOnmLOszx5DbYaxjrsIwX9m9SbHOM1RE9ftZ2wA=;
+ b=I6qpdLQjFlN0T93EOI7beWpBUkkcKQ7ZmJMmSXyhcBnXOWT0duDyn+mAaBTKPBByOAIEG8U4xYJHcNrKwcFNVmCibWnwQxU5eslytwalaew7xSUY8dFxerVKfWOKy7IT301544wDGWNbW5EkDNBS4I9SK+qOwtOWBEl8DfzpZfsR9XUYhaTBSzcXvBlzPGsnyCBWHNKYske1b9d5JfQ2I20DinDJzCIVdFpVaHpFforJXF3uP5fcwSxaWYz8hzw8cporISFyzoskjmrxcZF3LNTzPv/Ljt70k8NbmI/G7jRiL9FLs4M2fqluw753JO/sxjIkjwNm2rkqVQ7Vc5O6Lw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=digi.com; dmarc=pass action=none header.from=digi.com;
+ dkim=pass header.d=digi.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digi.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/dS3WOnmLOszx5DbYaxjrsIwX9m9SbHOM1RE9ftZ2wA=;
+ b=dKndCu5PQ97a0DOFaA6hZVTCaTyZ3YvV9iyTsE4cZLzkeajnKtHeuHlq3OcYUqix/dufmPtD+5fMlwXwLNUBAPlyPNXpBekSDljYWGulrjBCLkU3aF/oGeh2gfQqsPez7l2vGglq82LkCknz/psBDz1sm+aCalNOnqx8UPtq7dVjcKh7P3UhyHffrwlijEvH6rasPDwEVBR9LTEjDYeHm1Ol4tAo43TFm3enKkjW7PK7+/UJOsYesHkhrKEqUMXchvZgznINT7tl6GZzmDcffdsyK3P5+keCDR4P3GfRG3efox8Oa00RsN1MvURz5bAodetrj4GLT3sNdlEpx4c6ww==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=digi.com;
+Received: from CO1PR10MB4561.namprd10.prod.outlook.com (2603:10b6:303:9d::15)
+ by CH3PR10MB6835.namprd10.prod.outlook.com (2603:10b6:610:152::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Wed, 11 Dec
+ 2024 14:48:09 +0000
+Received: from CO1PR10MB4561.namprd10.prod.outlook.com
+ ([fe80::ecc0:e020:de02:c448]) by CO1PR10MB4561.namprd10.prod.outlook.com
+ ([fe80::ecc0:e020:de02:c448%4]) with mapi id 15.20.8251.008; Wed, 11 Dec 2024
+ 14:48:09 +0000
+From: Robert Hodaszi <robert.hodaszi@digi.com>
+To: netdev@vger.kernel.org,
+	vladimir.oltean@nxp.com,
+	claudiu.manoil@nxp.com,
+	alexandre.belloni@bootlin.com,
+	UNGLinuxDriver@microchip.com,
+	andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Robert Hodaszi <robert.hodaszi@digi.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] net: dsa: tag_ocelot_8021q: fix broken reception
+Date: Wed, 11 Dec 2024 15:47:41 +0100
+Message-ID: <20241211144741.1415758-1-robert.hodaszi@digi.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-ClientProxiedBy: MI1P293CA0021.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:3::14) To CO1PR10MB4561.namprd10.prod.outlook.com
+ (2603:10b6:303:9d::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rtocwkfoomwx67gv"
-Content-Disposition: inline
-In-Reply-To: <2675613.fDdHjke4Dd@n9w6sw14>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR10MB4561:EE_|CH3PR10MB6835:EE_
+X-MS-Office365-Filtering-Correlation-Id: 03c3c6ea-93cc-498e-b181-08dd19f2d46f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|52116014|921020|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?KGCZh7j+KIHF9om6IkHPjQ8NyO5x8XbDr3CumgE4sh6FsHTL40c2PH8I8Zdt?=
+ =?us-ascii?Q?qezWWsMkLteMNNbetWfi5XlMmaJxPKtIgKCgqsGdJiaUo+l8IsAru8cidMbT?=
+ =?us-ascii?Q?bjIpa8eCJSw6f01CHE5ElJQDKn+LJm/c2LVT1Z/SxXTFg5e5oQkLaT6X1SxT?=
+ =?us-ascii?Q?eARuB5a7ou+aFkFODJDBcify5hEmtvep/fmGjB+yW+YxbXK91+MSZrr/p3HJ?=
+ =?us-ascii?Q?G2tnA36chD+4YBHvrOHMSd4RGqWzIgH663mCGIipH5k73+j1SAwuIPq39/BW?=
+ =?us-ascii?Q?psEVS/9ajqnke1qsDQINazxrt0wV4lHXJvtXL1NYXx0p2ECt+uRwXH8KnnMU?=
+ =?us-ascii?Q?7MNQ3USVOsJCOI8dKQQ/W2UWMBBdmAwjJIArbHIPn14eDW2oEAz7DFQZM5aN?=
+ =?us-ascii?Q?SR0kRprUxdBdJmYyrlUlUul/dhsd1Gc7dvjcN81SDeH+AvFOYOaZWWdCKW7H?=
+ =?us-ascii?Q?gavRiLxEuEwocEgah0Q1MWpTJxZcRDq3dt3ZBsXwCTRuGLxWC5+N/xD0wE/U?=
+ =?us-ascii?Q?XthJg9XIYXLtwOH9rxUDJGnAN4czCsqe7fU9fDpLwPChvRmYUODnWAuIsfcn?=
+ =?us-ascii?Q?dHzOat2Zlu8J9OcoPZu1W2vBMenw5M6Emx2iL9p0X3b1O3GufBxXYvQArO9h?=
+ =?us-ascii?Q?ojoG8IQX/tpD13AINqIuHVXGlLb0BkML2VM1BoycDLjAEdSRX3xYbDzlhIgd?=
+ =?us-ascii?Q?jX6BN+xb6osHOQnHATUkAE0fdVu7b/QS/TJCH4vCACDdEEI1WWOShCTsQ3kS?=
+ =?us-ascii?Q?T8thfBp0OApfFAZxM2TQJLcwqXrGSJhR92dcWbmete6ZfiH3BUjymTANM/Qc?=
+ =?us-ascii?Q?/CbOfbPcQZhHnomrQBmrsAHSj3k1QvslOxcLWPHkHkQgevYAH28cnsAlYuat?=
+ =?us-ascii?Q?KAiHJsuzP06APwW+PbWDnPZ8/oB+54f843ttCDO/W5KWd+lLSJZ82PgqJ4U2?=
+ =?us-ascii?Q?ZjvNDIyZbADIu2gHlK5x3VtVxGoKJObd2qQGMb2/SqGtBsvXeOSY7SJtEStl?=
+ =?us-ascii?Q?qLAA7ESpYSYA7XlBi+WnE+MmuZ8/nZZZFR51UrXF3dEUUKJYz1yUJPMvcEwM?=
+ =?us-ascii?Q?HdG1dBNZzYEfPzMojy2Cky+Ust3Y+wcdAnu1cNiI4zh9rDVdaRSh6hihiMvG?=
+ =?us-ascii?Q?ptIjO9vq6oA5JEtfsy1jViZE0DAriRTA4MOOaReFglJXAQ6xfEOFtrqSpEsp?=
+ =?us-ascii?Q?gYUK6aW7XJ6K/WuVDIVo+4ykHcI4h2/0MBJbD1TnfNdHfN88zoUe6zUJWimL?=
+ =?us-ascii?Q?+wfY3TRFtHKLWRTlc49MWX+RrcxltmcM41uxwuSlrZu+eBXyNnFfET6A7TbX?=
+ =?us-ascii?Q?vipBDpgwrmDmygHwyzOahQSzV3+xk5gN+u0pABtGueKUshCnY2g2pJXPfyU9?=
+ =?us-ascii?Q?GCGTZnhJy+maR/JZAQlw8DGKLZWhH6PhyXOm9z6znGbMuto7GkbbB4sZ9D+Z?=
+ =?us-ascii?Q?ho+Undv5ACY=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR10MB4561.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(52116014)(921020)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?sUmR3SePA5rgq+JS4gXh5xT6iRri4RhWjkmtVa+npfclaxZ7OCI4IIbVJ7Qv?=
+ =?us-ascii?Q?kBV0RxpJsePKyEI1rn2tQhiHs34UFKtusfooRII/ZL6OPOUcvr7bPvePkyDh?=
+ =?us-ascii?Q?b7N+jXDM+Cr9X4uc2Qx3R7NAlq74s6pBAIrvJ4E1YKXcJx91qHGj0E0Q6NCJ?=
+ =?us-ascii?Q?6DaPaww2Mzt3nzZgang02qjD6rC5b/lS/cJD9noYzFFdnAMTfGSa4vEvBhEL?=
+ =?us-ascii?Q?8bNxUQgmgVKYuzFtzMdyXT88JETyQRnu0OIchSrsSRYdHTf6rMC3J1QO5s3Z?=
+ =?us-ascii?Q?3vh7vM72M0RcnDZQ5Dm8JYtcbQ3N8cq2r73pNvqhIMw0/NbBXBbtM90qK9Ki?=
+ =?us-ascii?Q?hU/w7pc8esnUO16ugl5XaDNO1+/xhOm2Tz/3qD1IukCsqzmuVyN/MyKSygcU?=
+ =?us-ascii?Q?AbBXK+TNG7W9y35HBawZ4n8xotRvgBWi8BLCSs9pkaFVlX8vRVOrf5aRucSR?=
+ =?us-ascii?Q?L/u9KfxLCa4lS1IZ8aHC98jgw1x74ge0+15Upk8n9zHTPdOWA+C5sHIiT95y?=
+ =?us-ascii?Q?cMh1RTez8n/8kkZWd/SDrmhi43+D7wpn9C/hH6gzqDj+YMXyZIlX+HVbq8+3?=
+ =?us-ascii?Q?RoaNjSJjUBgv2HBZGGqfY9LNXjEfgeEzTlu5uiHpu72/ONJF3EluEvF7cN30?=
+ =?us-ascii?Q?+xiN2SEUgqf6VyyYGctcQix/3S4q6ddmvvLl0TTfIadE5kjuHSuVwyuMS1FM?=
+ =?us-ascii?Q?OPQYx4Oq8WbmmWA/bsLwQfDq2AKohcxfNscSyGfOBcEASMwxBytPK43JqGiN?=
+ =?us-ascii?Q?9MA+YLNAokfIuBEvhfvGlX1iP9mQmYf62EfSJbXV72th61tjuBMRztO1VrWJ?=
+ =?us-ascii?Q?AkL1sVHrN34oebRHkACSMEz3XxkAh5mMCGHmBuLtC5maGJS80jYZC/tXGXNi?=
+ =?us-ascii?Q?wlAXjICYwRxUcqASw8uLHoq0XO5RzOiEl4edRvN2z4qMpuorgmzCX2xTNHLm?=
+ =?us-ascii?Q?fxPFY0zF1kSsSdrKrZm0t/6eWsYDwo+QMeHV0IDgZPelDnbdZ6SMiK82UKtB?=
+ =?us-ascii?Q?SVvaux8t8wPf/cLx1spTuxiOA3pCB0ExQi0OxGNTqjfLSIqMYMi75BS5UB9Q?=
+ =?us-ascii?Q?5X1a7TjyJoSQpH/hLdWslR7yHbpAhaNeOtZCXgj0ZYbbIAiqNrHyvBiKXZQ2?=
+ =?us-ascii?Q?bw1seR4nuwhvbjcbnwMVrDirZZZgX0dIgwkyTEK5YtFdHIyx17sPE+2e9ShR?=
+ =?us-ascii?Q?S7ChbHBUWnHyA6xlVtbQ30oS2WRUvYN0LiSKh5Qo+N2UgKCgClEA2hc+Qxlz?=
+ =?us-ascii?Q?Dt2ITl0rGZjweJcF2W2DvvUbjyyJINUteyI2pJg9nN7JbLM2uNnawX7jjY4X?=
+ =?us-ascii?Q?0S7MRkVxZR0f9zh7QigwDjoGzW7sHM2J2N5VKltiaVVzVmybkSQ1t6jqv/xD?=
+ =?us-ascii?Q?2rUvRKUNlCSFPSBm+Nc0BNKCDKXtXTugEiwITwxvur3TICFN4YgByLJguwGA?=
+ =?us-ascii?Q?7297yuKleBqTrRUpwrpnPYezGT1/0oyrWX9oW780/SykMB1xnSPhPCjO3kCQ?=
+ =?us-ascii?Q?2iy2e4yoeGdW166k85z8hq8dKdo6sWpBAnQ+fg3UTOfhOU1wS8Ty75eBZtJE?=
+ =?us-ascii?Q?gzb/vYx2lYZP1YkchB373LyxZvrQsLw5di49pZvf?=
+X-OriginatorOrg: digi.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 03c3c6ea-93cc-498e-b181-08dd19f2d46f
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR10MB4561.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2024 14:48:09.6315
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: abb4cdb7-1b7e-483e-a143-7ebfd1184b9e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BikEa1w2DCpCo87KVqYfUcBfzdgwHiy0mebQwmnG7DSLl4FH1x/BHuCmKfLhP0GlJO5hUa7MKH3ZedAW9ro2EQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR10MB6835
+X-BESS-ID: 1733928494-103291-13513-6992-1
+X-BESS-VER: 2019.1_20241205.2350
+X-BESS-Apparent-Source-IP: 104.47.55.40
+X-BESS-Parts: H4sIAAAAAAACA4uuVkqtKFGyUioBkjpK+cVKVoZGpkZAVgZQ0CI10djI1NzUJN
+	UwLckk0TjRwMgkKdXQPNXC2MTAzMxcqTYWABllJuBBAAAA
+X-BESS-Outbound-Spam-Score: 0.00
+X-BESS-Outbound-Spam-Report: Code version 3.2, rules version 3.2.2.261038 [from 
+	cloudscan21-129.us-east-2b.ess.aws.cudaops.com]
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------
+	0.00 BSF_BESS_OUTBOUND      META: BESS Outbound 
+X-BESS-Outbound-Spam-Status: SCORE=0.00 using account:ESS112744 scores of KILL_LEVEL=7.0 tests=BSF_BESS_OUTBOUND
+X-BESS-BRTS-Status:1
 
+The blamed commit changed the dsa_8021q_rcv() calling convention to
+accept pre-populated source_port and switch_id arguments. If those are
+not available, as in the case of tag_ocelot_8021q, the arguments must be
+pre-initialized with -1.
 
---rtocwkfoomwx67gv
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: KSZ8795 not detected at start to boot from NFS
-MIME-Version: 1.0
+Due to the bug of passing uninitialized arguments in tag_ocelot_8021q,
+dsa_8021q_rcv() does not detect that it needs to populate the
+source_port and switch_id, and this makes dsa_conduit_find_user() fail,
+which leads to packet loss on reception.
 
-Hi Christian, hi SPI people,
+Fixes: dcfe7673787b ("net: dsa: tag_sja1105: absorb logic for not overwriting precise info into dsa_8021q_rcv()")
+Signed-off-by: Robert Hodaszi <robert.hodaszi@digi.com>
+---
+Cc: stable@vger.kernel.org
+---
+ net/dsa/tag_ocelot_8021q.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-we are debating the SPI mode setting for the microchip ksz8795 and ksz9477
-and possibly others. Since the commit
-8c4599f49841dd663402ec52325dc2233add1d32 the SPI mode gets fixed to mode=C2=
-=A03
-in the code. But at least my ksz8795 works also with mode=C2=A00 and shows =
-better
-initialization behaviour with mode=C2=A00.
+diff --git a/net/dsa/tag_ocelot_8021q.c b/net/dsa/tag_ocelot_8021q.c
+index 8e8b1bef6af6..11ea8cfd6266 100644
+--- a/net/dsa/tag_ocelot_8021q.c
++++ b/net/dsa/tag_ocelot_8021q.c
+@@ -79,7 +79,7 @@ static struct sk_buff *ocelot_xmit(struct sk_buff *skb,
+ static struct sk_buff *ocelot_rcv(struct sk_buff *skb,
+ 				  struct net_device *netdev)
+ {
+-	int src_port, switch_id;
++	int src_port = -1, switch_id = -1;
+ 
+ 	dsa_8021q_rcv(skb, &src_port, &switch_id, NULL, NULL);
+ 
+-- 
+2.43.0
 
-The big question is: can both chips work with both modes? Should this
-setting stay in code or moved to the device tree?
-
-https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-DS0000=
-2419D.pdf
-https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocum=
-ents/DataSheets/KSZ8795CLX-Data-Sheet-DS00002112.pdf
-
-Christian Eggers schrieb am Mi 11. Dez, 14:04 (+0100):
-> On Wednesday, 11 December 2024, 13:23:38 CET, J=C3=B6rg Sommer wrote:
-> > Christian Eggers schrieb am Mi 11. Dez, 11:18 (+0100):
->=20
-> > I think for 8795 these are optional. At me, it works with 0 and 3.
-> Hmm, I understood that setting SPI mode to 3 (by my patch) is the
-> root of your problem? If you revert my patch and set spi-cpol + spi-cpha
-> in you device tree, the result should be more or less the same.
-
-Yes, that's right. When I set spi-cpol + spi-cpha in the DT (or with your
-patch) I get the message =E2=80=9Cksz8795-switch spi0.1: invalid family id:=
- 0=E2=80=9D.
-Without it, I don't get this message and the switch works fine.
-
-> If you think that your problem is related to the reset timing,
-
-Not really. My impression is more that =E2=80=9Cthe first read after mode s=
-witch
-always fails.=E2=80=9D
-
-=46rom my other mail:
-
-[    1.712545] ksz8795-switch spi0.1: Switching SPI mode from 0 to spi-cpha=
-,spi-cpol
-[    1.851109] ksz8795-switch spi0.1: invalid family id: 0
-
-a gap of 140ms.
-
-With two reads immediately after the spi_setup:
-
-[    1.569835] ksz8795-switch spi0.1: Switching SPI mode from 0 to spi-cpha=
-,spi-cpol
-[    1.570641] ksz8795-switch spi0.1: ksz8795_spi_probe:84: ksz_read16(REG_=
-CHIP_ID0, 0) =3D 0
-[    1.571420] ksz8795-switch spi0.1: ksz8795_spi_probe:90: ksz_read16(REG_=
-CHIP_ID0, 34705) =3D 0
-[    1.701375] ksz8795-switch spi0.1: Switching SPI mode from 3 to spi-cpha=
-,spi-cpol
-[    1.702191] ksz8795-switch spi0.1: ksz8795_spi_probe:84: ksz_read16(REG_=
-CHIP_ID0, 34705) =3D 0
-[    1.702928] ksz8795-switch spi0.1: ksz8795_spi_probe:90: ksz_read16(REG_=
-CHIP_ID0, 34705) =3D 0
-
-Maybe the chip needs this read to detect the SPI mode. And if this first
-read is the chip detection the initialization fails.
-
-> > > On Thursday, 19 November 2020 07:48:01 -0600, Rob Hering wrote:
-> > > > On Wed, Nov 18, 2020 at 09:30:02PM +0100, Christian Eggers wrote:
-> > > ...
-> > > > > +        ksz9477: switch@0 {
-> > > > > +            compatible =3D "microchip,ksz9477";
-> > > > > +            reg =3D <0>;
-> > > > > +            reset-gpios =3D <&gpio5 0 GPIO_ACTIVE_LOW>;
-> > > > > +
-> > > > > +            spi-max-frequency =3D <44000000>;
-> > > > > +            spi-cpha;
-> > > > > +            spi-cpol;
-> > > >=20
-> > > > Are these 2 optional or required? Being optional is rare as most
-> > > > devices support 1 mode, but not unheard of. In general, you shouldn=
-'t
-> > > > need them as the driver should know how to configure the mode if th=
-e h/w
-> > > > is fixed.
-> > > ...
-> > >=20
-> > > It seems that I considered the h/w as "fixed". The pre-existing devic=
-e tree
-> > > bindings and the diagrams on page 53 suggested that SPI mode 3 is the=
- only
-> > > valid option. Particularly the idle state of the "SCL" signal is high=
- here:
-> > >=20
-> > > https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-=
-DS00002419D.pdf
-> > >=20
-> > > But the text description on page 52 says something different:
-> > > > SCL is expected to stay low when SPI operation is idle.=20
-> > >=20
-> > > Especially the timing diagrams on page 206 look more like SPI mode 0.
-> > >=20
-> > > So it is possible that my patch was wrong (due to inconsistent descri=
-ption
-> > > on the data sheet / pre existing device tree binding). As I already m=
-entioned,
-> > > I did this only due to the DT conversion, I actually don't use SPI on=
- such
-> > > devices myself.
-> > >=20
-> > > N.B. Which KSZ device do you actually use (I didn't find this in you =
-previous
-> > > mails)?
-> >=20
-> > I'm using KSZ8795.
->=20
-> I should better read the subject line ...
->=20
-> Summary:
-> - The timing diagrams of KSZ8795CLX and KSZ9563 implies that SPI mode 0 i=
-s correct
-> - The functional descriptions in the datasheets look more like SPI mode 3=
-, but this
->   is not authoritative.
-> - Maybe that the KSZ devices can work with both modes.
-
-Or maybe not all ksz8 behave the same? Should we revert the behaviour and
-leave it up to the device tree to decide?
-
-
-J=C3=B6rg
-
---=20
-Prof. in der Mathematikvorlesung zu einem vergessenen =CF=86 in der
-Gleichung: =E2=80=9EKlein=E2=80=90=CF=86 macht auch Mist.=E2=80=9C
-
---rtocwkfoomwx67gv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABEIAB0WIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCZ1mlswAKCRB9LJoj0a6j
-dbD1AP9Wq46TEqExVUJnS1+2ZP6WTDTbj0Vieya7xYaFUd7llgEApGgcuJ0i41K9
-zlKzN9/JfyuIs6D6KNI0W9SO4S+lTsg=
-=Y+Hv
------END PGP SIGNATURE-----
-
---rtocwkfoomwx67gv--
 
