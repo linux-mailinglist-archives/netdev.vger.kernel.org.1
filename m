@@ -1,145 +1,217 @@
-Return-Path: <netdev+bounces-151129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF0279ECEE1
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:43:47 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 066AC9ECEEF
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 15:46:34 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A4951882A80
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:46:30 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF88246342;
+	Wed, 11 Dec 2024 14:46:24 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4522283968
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:43:39 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D9719D06A;
-	Wed, 11 Dec 2024 14:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rTPmN5Y4"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF3818B464
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 14:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EEC24635E;
+	Wed, 11 Dec 2024 14:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733928214; cv=none; b=f1BIPditKMJcgggiygxYHxvHqFG6IU5go0k0koGki9aXmGXYZhPDB2XbAhHiicINgDz2hwrgaOTSVaryDhquASjguwDskITBxmH8XNGjilJwTFbkF8p7djgr/klny4tfdZm5EZHfKHZP2d95/QvKuvi9yQ2hlwu+3Xo0b+DJxJ8=
+	t=1733928384; cv=none; b=ot8/qXguAx7gqm1BHd1ZsA8fsR6hzDY7UDnocDkd0TGmceJUiAy7NZtENBh/0FR6i/TQYVEbV8C0cTzP28dDa2n3FsEn/+LpyeZHNaCRXJzLHZ8OStVPQaEtM4LycSnlBtG8fsFOuZ1BiqL9gtqDE4YVPgs7Mi5jErgasEi4qXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733928214; c=relaxed/simple;
-	bh=LNfbBS4JcW3bqltyDScedOWIg/0KtssJKmos97a7344=;
+	s=arc-20240116; t=1733928384; c=relaxed/simple;
+	bh=4432CzuyDb6GCvPf5YdoDyqv6F9aCZqCiwvjkQV3948=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VCxAATIJ6h9v8qCwc7uPfDY//CLgWuWewNpBY2hQIXwMRzU8cG7AYdSWhrLG4LwykrEms3gzZ80ddrH6miona96YfthWv3AvAV8RMHY1y4KGi0MRNxxIXzO8CbHQmsFSsqQq8/k9hZM/QGZvc9ch1UXrKkyhuyDtFoQl59ADjbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rTPmN5Y4; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3863c36a731so2652032f8f.1
-        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 06:43:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1733928210; x=1734533010; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8tZ3oScaXADgh2YYICTmnLAOe1Prw/82LWnlm+aUpE8=;
-        b=rTPmN5Y4dy9SAYYuHRVGTKnEpWbOm2QEtjvE6ijxP9p/6VNdLqenvTStNruMR5jcfJ
-         xh/HiaFtEy8RmM2nu013svLyRn80YJ8H2shZBQf98PZEpQ4+nSgJDayRubAUgk9L5EZm
-         Jbz7SHEDP3MjhMkWxJ5A+Fqkgtym8l1/LKJDpk/uFIJZhHUFG19qf3O9aMl/XBOZ5S30
-         BlzI5kwnjUuZIGVlgngfNHM7y5Pu8mt1wNiGJQY1ugw72U2h3SN99M3A6JhsYerG8A2F
-         y6OXQo3/rH5X3VmAkALE1UoK6uKIVzxNZSel9ZGWYZyJSZY5BePqjBIpWheFMDoax4Lh
-         SuqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733928210; x=1734533010;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8tZ3oScaXADgh2YYICTmnLAOe1Prw/82LWnlm+aUpE8=;
-        b=ooBN/eLODuYULSfZwQlthlveibYlx7F7bOd+DRAmnXPebgS62RMcxVEV5AZ3Fy/lOo
-         g3qdTt/kVesD5Wo98y5w1RBSKa/CDm2rCPImLmEewTgYS9yxpHwzV58P7Pc4HRd5uKb/
-         CZOkKGveiOthDHLvdegxTlQJEwWEBTXH5QZ/qtgUh4Zr2MCTOAdKSS4rYqu9p3r3x2rI
-         Pdt0zG/klF3HttwRbZQC984rlw6o8kdNXW5vs80BCOG8Mi8tF0QiG6y30g8r7OxHPR/7
-         oK5fTJ5Mt3jmbTubhWN+SXXL9RI/rqTHW5CmpdjxW+tC/YOxpORVInbSJaBoJ1lUzcG9
-         oiug==
-X-Forwarded-Encrypted: i=1; AJvYcCU7VD/ff6GHcjBEqsR8rhK8pZUXVTtGZWBngzHz7uckEwmqpmz+/6ltjq6lkZ+UISivpIPK4mE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzow85fz0slH4PSHeBt5JQQBux2D+Ib9RZVQdrFPn5TkgJOuNBB
-	Ug5eltyHz2DlU1iH0dxCI2X7DVcQlAtkoUnAog9xwUgQLdoIASTUq4xUzBrhmP4=
-X-Gm-Gg: ASbGncsmYtjTeaW8ys9Coby1FqINCKlSXDZB9jF2wzLv8CcAlbyFO03/P/12jzi1/8J
-	M1r0kcDO56Cpa4LIxcsns83aHez4kfXMe5GPJNtVG6BWEzq6RMGmpnbs5fd+F8o0pqkil9aefSV
-	JAMnkz6hkxoa7JtOLozq4+zeDL4SgAV6BGJBwNUmvCFf9o7Vrgy6Fg6/g/GTlRqEp1u6BsHKROa
-	Vhxy2rYPFptVsNf6iySHX2bMEYU/ixY7E/DP9U/jafBnwlhpM5/o3jJTDM=
-X-Google-Smtp-Source: AGHT+IGhBl9kYyiFJWrrIA36GwLyBYxcBdJzLqLa3LCOZD0jb1flkcZBqM18kbs7vv5xS6DGb2Iuqw==
-X-Received: by 2002:a05:6000:2b0e:b0:386:8ff:d20b with SMTP id ffacd0b85a97d-3864ce9f344mr1998729f8f.27.1733928210457;
-        Wed, 11 Dec 2024 06:43:30 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4362039a474sm11589855e9.24.2024.12.11.06.43.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 06:43:29 -0800 (PST)
-Date: Wed, 11 Dec 2024 17:43:26 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: vigneshr@ti.com, matthias.schiffer@ew.tq-group.com, robh@kernel.org,
-	u.kleine-koenig@baylibre.com, javier.carrasco.cruz@gmail.com,
-	diogo.ivo@siemens.com, horms@kernel.org, pabeni@redhat.com,
-	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
-	andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	srk@ti.com, Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
-Subject: Re: [PATCH net v4 2/2] net: ti: icssg-prueth: Fix clearing of
- IEP_CMP_CFG registers during iep_init
-Message-ID: <3b0b84f9-d51b-4075-9d1a-5c2042ee6c4e@stanley.mountain>
-References: <20241211135941.1800240-1-m-malladi@ti.com>
- <20241211135941.1800240-3-m-malladi@ti.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TQ7c3aZaricSVQMvoon20WP8UWjelgD1yEqmwGJG2xlLUgp2nBQfdYRdLa0Injaq4GBvK8ntBf7IxSsoZ4X3beut02HQNG7c4EBKABRTVQsg55l4Ub3dFYk3K2A6sOm6dzda4iTSiWJrCTDI4IsnG2pPzo3ffqk0h9LnDYxa+y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
+Received: from mail-relay (helo=jo-so.de)
+	by s1.jo-so.de with local-bsmtp (Exim 4.96)
+	(envelope-from <joerg@jo-so.de>)
+	id 1tLNyf-001umu-2P;
+	Wed, 11 Dec 2024 15:46:13 +0100
+Received: from joerg by zenbook.jo-so.de with local (Exim 4.98)
+	(envelope-from <joerg@jo-so.de>)
+	id 1tLNyf-00000000e7P-0cFt;
+	Wed, 11 Dec 2024 15:46:13 +0100
+Date: Wed, 11 Dec 2024 15:46:13 +0100
+From: =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
+To: Christian Eggers <ceggers@arri.de>, linux-spi@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
+Subject: Re: KSZ8795 not detected at start to boot from NFS
+Message-ID: <sqsslcr7fsgqi7fvjpy5xnarhlm76atvatczkzwpn37e7gnsu6@tuy7an7t4gdg>
+OpenPGP: id=7D2C9A23D1AEA375; url=https://jo-so.de/pgp-key.txt;
+ preference=signencrypt
+References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
+ <5708326.ZASKD2KPVS@n9w6sw14>
+ <cxe42bethnzs7f46xxyvj6ok6ve7itssdxyh2vuftnfws4aa3z@2o4njdkw3r5i>
+ <2675613.fDdHjke4Dd@n9w6sw14>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="rtocwkfoomwx67gv"
 Content-Disposition: inline
-In-Reply-To: <20241211135941.1800240-3-m-malladi@ti.com>
-
-On Wed, Dec 11, 2024 at 07:29:41PM +0530, Meghana Malladi wrote:
->  drivers/net/ethernet/ti/icssg/icss_iep.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-> index 5d6d1cf78e93..a96861debbe3 100644
-> --- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-> +++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-> @@ -215,6 +215,10 @@ static void icss_iep_enable_shadow_mode(struct icss_iep *iep)
->  	for (cmp = IEP_MIN_CMP; cmp < IEP_MAX_CMP; cmp++) {
->  		regmap_update_bits(iep->map, ICSS_IEP_CMP_STAT_REG,
->  				   IEP_CMP_STATUS(cmp), IEP_CMP_STATUS(cmp));
-> +
-> +		regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
-> +				   IEP_CMP_CFG_CMP_EN(cmp), 0);
-> +
-
-Don't add this blank line.
-
-You won't detect this by running checkpatch on the patch, but if you
-apply the patch and re-run checkpatch on the file then it will complain
-about this.
-
->  	}
->  
->  	/* enable reset counter on CMP0 event */
-> @@ -780,6 +784,11 @@ int icss_iep_exit(struct icss_iep *iep)
->  	}
->  	icss_iep_disable(iep);
->  
-> +	if (iep->pps_enabled)
-> +		icss_iep_pps_enable(iep, false);
-> +	else if (iep->perout_enabled)
-> +		icss_iep_perout_enable(iep, NULL, false);
+In-Reply-To: <2675613.fDdHjke4Dd@n9w6sw14>
 
 
-Do we need the else?  Could be written as:
+--rtocwkfoomwx67gv
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: KSZ8795 not detected at start to boot from NFS
+MIME-Version: 1.0
 
-	if (iep->pps_enabled)
-		icss_iep_pps_enable(iep, false);
-	if (iep->perout_enabled)
-		icss_iep_perout_enable(iep, NULL, false);
+Hi Christian, hi SPI people,
 
-regards,
-dan carpenter
+we are debating the SPI mode setting for the microchip ksz8795 and ksz9477
+and possibly others. Since the commit
+8c4599f49841dd663402ec52325dc2233add1d32 the SPI mode gets fixed to mode=C2=
+=A03
+in the code. But at least my ksz8795 works also with mode=C2=A00 and shows =
+better
+initialization behaviour with mode=C2=A00.
+
+The big question is: can both chips work with both modes? Should this
+setting stay in code or moved to the device tree?
+
+https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-DS0000=
+2419D.pdf
+https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocum=
+ents/DataSheets/KSZ8795CLX-Data-Sheet-DS00002112.pdf
+
+Christian Eggers schrieb am Mi 11. Dez, 14:04 (+0100):
+> On Wednesday, 11 December 2024, 13:23:38 CET, J=C3=B6rg Sommer wrote:
+> > Christian Eggers schrieb am Mi 11. Dez, 11:18 (+0100):
+>=20
+> > I think for 8795 these are optional. At me, it works with 0 and 3.
+> Hmm, I understood that setting SPI mode to 3 (by my patch) is the
+> root of your problem? If you revert my patch and set spi-cpol + spi-cpha
+> in you device tree, the result should be more or less the same.
+
+Yes, that's right. When I set spi-cpol + spi-cpha in the DT (or with your
+patch) I get the message =E2=80=9Cksz8795-switch spi0.1: invalid family id:=
+ 0=E2=80=9D.
+Without it, I don't get this message and the switch works fine.
+
+> If you think that your problem is related to the reset timing,
+
+Not really. My impression is more that =E2=80=9Cthe first read after mode s=
+witch
+always fails.=E2=80=9D
+
+=46rom my other mail:
+
+[    1.712545] ksz8795-switch spi0.1: Switching SPI mode from 0 to spi-cpha=
+,spi-cpol
+[    1.851109] ksz8795-switch spi0.1: invalid family id: 0
+
+a gap of 140ms.
+
+With two reads immediately after the spi_setup:
+
+[    1.569835] ksz8795-switch spi0.1: Switching SPI mode from 0 to spi-cpha=
+,spi-cpol
+[    1.570641] ksz8795-switch spi0.1: ksz8795_spi_probe:84: ksz_read16(REG_=
+CHIP_ID0, 0) =3D 0
+[    1.571420] ksz8795-switch spi0.1: ksz8795_spi_probe:90: ksz_read16(REG_=
+CHIP_ID0, 34705) =3D 0
+[    1.701375] ksz8795-switch spi0.1: Switching SPI mode from 3 to spi-cpha=
+,spi-cpol
+[    1.702191] ksz8795-switch spi0.1: ksz8795_spi_probe:84: ksz_read16(REG_=
+CHIP_ID0, 34705) =3D 0
+[    1.702928] ksz8795-switch spi0.1: ksz8795_spi_probe:90: ksz_read16(REG_=
+CHIP_ID0, 34705) =3D 0
+
+Maybe the chip needs this read to detect the SPI mode. And if this first
+read is the chip detection the initialization fails.
+
+> > > On Thursday, 19 November 2020 07:48:01 -0600, Rob Hering wrote:
+> > > > On Wed, Nov 18, 2020 at 09:30:02PM +0100, Christian Eggers wrote:
+> > > ...
+> > > > > +        ksz9477: switch@0 {
+> > > > > +            compatible =3D "microchip,ksz9477";
+> > > > > +            reg =3D <0>;
+> > > > > +            reset-gpios =3D <&gpio5 0 GPIO_ACTIVE_LOW>;
+> > > > > +
+> > > > > +            spi-max-frequency =3D <44000000>;
+> > > > > +            spi-cpha;
+> > > > > +            spi-cpol;
+> > > >=20
+> > > > Are these 2 optional or required? Being optional is rare as most
+> > > > devices support 1 mode, but not unheard of. In general, you shouldn=
+'t
+> > > > need them as the driver should know how to configure the mode if th=
+e h/w
+> > > > is fixed.
+> > > ...
+> > >=20
+> > > It seems that I considered the h/w as "fixed". The pre-existing devic=
+e tree
+> > > bindings and the diagrams on page 53 suggested that SPI mode 3 is the=
+ only
+> > > valid option. Particularly the idle state of the "SCL" signal is high=
+ here:
+> > >=20
+> > > https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-=
+DS00002419D.pdf
+> > >=20
+> > > But the text description on page 52 says something different:
+> > > > SCL is expected to stay low when SPI operation is idle.=20
+> > >=20
+> > > Especially the timing diagrams on page 206 look more like SPI mode 0.
+> > >=20
+> > > So it is possible that my patch was wrong (due to inconsistent descri=
+ption
+> > > on the data sheet / pre existing device tree binding). As I already m=
+entioned,
+> > > I did this only due to the DT conversion, I actually don't use SPI on=
+ such
+> > > devices myself.
+> > >=20
+> > > N.B. Which KSZ device do you actually use (I didn't find this in you =
+previous
+> > > mails)?
+> >=20
+> > I'm using KSZ8795.
+>=20
+> I should better read the subject line ...
+>=20
+> Summary:
+> - The timing diagrams of KSZ8795CLX and KSZ9563 implies that SPI mode 0 i=
+s correct
+> - The functional descriptions in the datasheets look more like SPI mode 3=
+, but this
+>   is not authoritative.
+> - Maybe that the KSZ devices can work with both modes.
+
+Or maybe not all ksz8 behave the same? Should we revert the behaviour and
+leave it up to the device tree to decide?
 
 
+J=C3=B6rg
+
+--=20
+Prof. in der Mathematikvorlesung zu einem vergessenen =CF=86 in der
+Gleichung: =E2=80=9EKlein=E2=80=90=CF=86 macht auch Mist.=E2=80=9C
+
+--rtocwkfoomwx67gv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABEIAB0WIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCZ1mlswAKCRB9LJoj0a6j
+dbD1AP9Wq46TEqExVUJnS1+2ZP6WTDTbj0Vieya7xYaFUd7llgEApGgcuJ0i41K9
+zlKzN9/JfyuIs6D6KNI0W9SO4S+lTsg=
+=Y+Hv
+-----END PGP SIGNATURE-----
+
+--rtocwkfoomwx67gv--
 
