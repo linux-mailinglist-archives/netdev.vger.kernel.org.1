@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-150936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2BAE9EC221
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:30:48 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A30759EC223
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:31:04 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 142A628398A
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:30:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9B29163B66
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7A41FCFF3;
-	Wed, 11 Dec 2024 02:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33B41FE44A;
+	Wed, 11 Dec 2024 02:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S9BzzJJe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ob7gNB92"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C53E1FCFE6;
-	Wed, 11 Dec 2024 02:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FA61FDE38;
+	Wed, 11 Dec 2024 02:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733884224; cv=none; b=IPkasvXwPu3xz7SwH0miv2Nu5ukR2Yp8d8rcjj8GSuvsFMkx8F+0ZAHP4Dc5d6IHeoEnD0Hzezcp1KSZiAXOgv+bgXz8vR9vKv5WxLvJ0j6fqdwbVLaoD/uSrLpq2/aIB3vNXQobDphmcg9oikPioSdfcK/VQaeyy1kPz5F5ytc=
+	t=1733884225; cv=none; b=Qo+NHZ3ROkTHjMUbPGFnXroIzdmtcIbnDO2wUd2rnoBcWL5Ph/7ve69xvDsKi4p8VdP0JNJszYjnozvYWiH9Nhe4f8g1WP1iJJHVQ9K0caCbkDgmT3YUB5xUze5P+rp62b3AxBCR3QIqEcttHU1HEBjM4h5OBVzdHoZ0T5BFmLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733884224; c=relaxed/simple;
-	bh=IZC6m5zf9hXxF6klKhoyzxvWGC7O8TTUhbr90rq5VqU=;
+	s=arc-20240116; t=1733884225; c=relaxed/simple;
+	bh=pc2MQPbAvIERSWwlHw2ybqImM0rR2QI5xFBUQeZKNKc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gSVl8cmAugf6XiQq4p/7jRtxg2CqaKQnphgYFv85E/kXisqNS6pQZ4oMGAWJ5Z6bLZKFSuCb3Hbfz3aeZjU1qLaDqBYdN4OXSAq0Vz4lbEmUgQ/PU4dsAVXVTiRlmsgAM96GH0KcpWLGRLClisl7lRXzlo66RKDWXQ4sLZ/ytDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S9BzzJJe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF8BAC4CEE0;
-	Wed, 11 Dec 2024 02:30:23 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=DHId/6dme6m+i/UF8dxZCkskX5WPEz6WTB7eRG9RE02uJGzG8LMYnCVvtcudFgxJ0MzvckWqG5+M31+c38WIZ0jc6s2+1DkUWgUNcBL0maC7zjxwz80QUUcfLq3ZSwmVq/9KJKbmhKIcET9bjJjPHuYfSk1P5qYLz07KTiB6nCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ob7gNB92; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 584D0C4CED6;
+	Wed, 11 Dec 2024 02:30:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733884223;
-	bh=IZC6m5zf9hXxF6klKhoyzxvWGC7O8TTUhbr90rq5VqU=;
+	s=k20201202; t=1733884225;
+	bh=pc2MQPbAvIERSWwlHw2ybqImM0rR2QI5xFBUQeZKNKc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=S9BzzJJe4wWNrOiBlGIo9TF2Av9Khm2FfAZrjKnXxLrksrG8a+t2/YxOw9jT2PB9u
-	 dynYeSAlu26rFx2zkk8nmYK5yEzqR2L0Lzqb8ltxDTlHm1laR620jNYksXqDaSmh9x
-	 Ec1hrUzofpItVrJNJJ1PHfTyTCwLLynL2EtzaKTQmw4OVWHj+NjUgwOWK3ZWK74/5x
-	 AHunlVQME3hJqH+L6l0vqVzw1U0TAxjQ+P9ARJruy26ygDH3fXTpDe7og4fa2uVJhW
-	 bBUPs3fghlmixoCij5niBLs5C6MLmrQo81ktganh6b6SoQgk+s+aPOVIlderjzQoAO
-	 disvcIiet58EA==
+	b=ob7gNB92DRcxXT1bEF1Q5UPS6fX5MLJD8xbS/O9p4/VsRKRHoTc43jmilra82EmxI
+	 Ex/ir95bwZVb4pYhmpPRsiGVs9DuMTM9w+M4iVIP1kCYjwJF/VkQmEvx66ICnxn1cx
+	 9fdQuv+Ji0NBak1/dBMNqRU67gOl86DLsucK47C0qYHdmB/vSZQvcIuMo93xwHfvSt
+	 WPdqtVLSq7fgsovOhJ3kZocgbXIr4CcBzVW3gyMa7hOERGRhcZqVzvYfZVluQtSQIx
+	 QrB1ZTx6x+Lp7lJOInJMlmX+9fSgKcQMWDiBIHrxObS1JdoSZrLKyIq9L9vtoRa/wZ
+	 xdg1O/Iz6rJfw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB242380A954;
-	Wed, 11 Dec 2024 02:30:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 715D4380A954;
+	Wed, 11 Dec 2024 02:30:42 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,35 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: pktgen: Use kthread_create_on_cpu()
+Subject: Re: [PATCH net-next] net: hinic: Fix typo in dev_err message
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173388423950.1090195.11688101236904327584.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Dec 2024 02:30:39 +0000
-References: <20241208234955.31910-1-frederic@kernel.org>
-In-Reply-To: <20241208234955.31910-1-frederic@kernel.org>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
- netdev@vger.kernel.org
+ <173388424100.1090195.1669181628771165715.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Dec 2024 02:30:41 +0000
+References: <20241209124804.9789-1-algonell@gmail.com>
+In-Reply-To: <20241209124804.9789-1-algonell@gmail.com>
+To: Andrew Kreimer <algonell@gmail.com>
+Cc: cai.huoqing@linux.dev, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  9 Dec 2024 00:49:55 +0100 you wrote:
-> Use the proper API instead of open coding it.
+On Mon,  9 Dec 2024 14:47:30 +0200 you wrote:
+> There is a typo in dev_err message: fliter -> filter.
+> Fix it via codespell.
 > 
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Andrew Kreimer <algonell@gmail.com>
 > ---
->  net/core/pktgen.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
+>  drivers/net/ethernet/huawei/hinic/hinic_port.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - net: pktgen: Use kthread_create_on_cpu()
-    https://git.kernel.org/netdev/net-next/c/33035977b464
+  - [net-next] net: hinic: Fix typo in dev_err message
+    https://git.kernel.org/netdev/net-next/c/6bb6ab852c19
 
 You are awesome, thank you!
 -- 
