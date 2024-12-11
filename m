@@ -1,129 +1,152 @@
-Return-Path: <netdev+bounces-151088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F4A49ECCF7
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:16:41 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB23B9ECD14
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:20:41 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3273167B54
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:20:32 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F019F229151;
+	Wed, 11 Dec 2024 13:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YJBp+A2S"
+X-Original-To: netdev@vger.kernel.org
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C6F2280C49
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:16:40 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14CB9229126;
-	Wed, 11 Dec 2024 13:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M3C0fLXs"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D560211A26
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 13:16:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3321323FD18
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 13:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733922998; cv=none; b=Ueo1gjYSp5F7/9eF6bCqg+n2in96BhUhHLdBM0Add3kfC4k0fG1nnHIQBIanpBHiDNwUQVw8ncVUJ/GZUdJLdZ5UPtRM18Rp9c/Hmoo+KPLYPJeFskUVxUxvgNCW3kj+ewQpFGjju7L4TA2JcUbBCiuTR40Mr007O0OjO8dH0Yg=
+	t=1733923231; cv=none; b=Wd0vEXSIx2D1JlanFBA04w2CJr16r4X53BG6zHK5/34umXr4uKrZ1crUPMGmGnEuuQ40IDf+J2w53U6qTIuhA+7ZEQ+P5J/Ty0QTF98VpFT1qzzxQ/cW9vpFoIiqfAqQQePfHqnP56rMYx9tCDWkvwB8FIkXDXjYX+xHAsoFXqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733922998; c=relaxed/simple;
-	bh=vHnOqrE9U3DzgtMQ2aewHIsU1Cqb1sBnG7bs/0nghbw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=S+MeWwacsGU0Zxds1uuQSI19LazF7I8MRoxZ14BFTabf3do6qm4k+EtVI3v9uGsMmttn93sURdJ5VbvCiIMrwbwl2yLnvT9hsQ5irsgNVlq7RaYKlQR0FutrYQBq/E69gi3gbzGxHaqpqJTuiGLoqi2bdlPUOOeAhhnRw89mI3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=M3C0fLXs; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-434a7ee3d60so3874595e9.1
-        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 05:16:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1733922995; x=1734527795; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=U0uQFK6fLtwRvjcx8HTnxkyo0H7NF49q4SiozMOoHr0=;
-        b=M3C0fLXsAXtW9jjA7Dw43HxhJb/ma2hwbeaSImzzX7Wu7RYcE42u9NHmp+NsU0LxVR
-         udhLSSw6LSOGvUhrV0RjqVPLYf7nmiof1q/OnqAqWOxYdhUlA3OiI6gcPW9UPqUIVx+B
-         XeB3l1tY3OAa76qITBRVjT/LsZKCc1Oyf7qj5tLDzDw4KdFRJAui6XPZBA6BtPDCv+QL
-         aH6S4yeBmVOaaxDEHVJ6uk72umhFvGCRwdRvTf/AnokJ90+ZLpqQWusrWyp9I+OYSKJo
-         qMFq4jihLNTzIn+KtRcb9w8X5QY3hdoRuQHdWvdW4IaBXzhVbyRu48X3+j5L7neRv2C1
-         nFjQ==
+	s=arc-20240116; t=1733923231; c=relaxed/simple;
+	bh=czuEY77JCZPstMaLM63oJZzbj6XrhHUBcn36oBhySws=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n7/FpLzEBROKarTKL3ClHipvB8EPQq9IRHp/1EKZd/VgpEIAYDK2wfRIyvP+AsDqhwm6LRYa3/FzIqs36x96ex2EZJCONuoKvMk+WyQjqf8Odk4qkjRHD9bru+Ig62Rk1ldhkYjJcxYhRtN8+RO7YtwdZ9BEPH/BBsGpaD/IVXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YJBp+A2S; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733923229;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=czuEY77JCZPstMaLM63oJZzbj6XrhHUBcn36oBhySws=;
+	b=YJBp+A2SAUSZwiciD1tXWKljLXay2B6Glra0sKk4lULEQN/fVtUMtIS/DcR4CqQIi6Kxmm
+	u+jsAY4wWOS5qe/EvF2FmzO1Hb+K+FmfGzmD2sYApEz1efQUdKBKJ7yWuw7akWiWdrzJ3x
+	m2nEeTDNwH6vwW166F56lj3HgB/ShEU=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-422-flcavVW3PAaIjMR4Evm7oA-1; Wed, 11 Dec 2024 08:20:26 -0500
+X-MC-Unique: flcavVW3PAaIjMR4Evm7oA-1
+X-Mimecast-MFC-AGG-ID: flcavVW3PAaIjMR4Evm7oA
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6d87d6c09baso119200136d6.3
+        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 05:20:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733922995; x=1734527795;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U0uQFK6fLtwRvjcx8HTnxkyo0H7NF49q4SiozMOoHr0=;
-        b=pBaqMd8A8Sk/VGVL1UUCB+S4DInmpEIUd5xdfdDR4b45EeQkTZBCa5Da5+Pli37V7/
-         rwaKZZ5oEM7881PTuc9GQqWn2n18FkfQsG3rJe8Dm2GJCVVuuhhICkRWdPaJ9HqJSE0F
-         ckKSxU67QCsKMlrJCt6w7VasAZPcezeO68gMtVc3Hr4LrOEr7C/QHQpd3lR/311rLGFr
-         pa8kGPkUmhIpz8tk0I8ok8Ld5jWIpuOl+zW5j7fJ9jAPFOSDibSKl2iSYA29tgCxGp9b
-         lZoeHITg/IqAmZiNf5xU5sjVOhWAwXMM27UbaEz1P9QnKtAhUWXb+a3yvVe7Vd6t98KJ
-         5MrA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/TtJMjdD+3cMkQRb4IDvuZSl4YSWR8sU2wKoTRBQYWP44h3B6SxkjEuOKMClohCyJ3+ZCnJU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxC8b9TL2ArAPzGcIjoPnzE0FQx9HB/fjGIciJ18nXOhAWtI7WC
-	Koiij0c4ferFQTFaS97kHuo3nfJIyFNT10m8Xj+4b3zpQSmdGwtWHekXdNcJ+yg=
-X-Gm-Gg: ASbGncvid7yLQ265rD5da978HBLY9ery+2VVVS8SVMgXZoOFnff624/QVJ/YJcmRXm+
-	bjP8AOD/254MME4IAfHOUh4wvj17sRuMDpc1ciig5dtjT1UBoxEpq5WMiSdLHBBliKe43PbtE/r
-	WpPBRkesYtU9KjvDMcX2bzZ0pnwVWbS2kcH3VEifK8ZXg5kLB9xzXr/zPFsfHyC9ru0Rp+NfEqs
-	61zanCq1uNwnv6cunrl68A0JnOPPgB8TmJ6axpIvZMkyAbqq3YQrTUSTJk=
-X-Google-Smtp-Source: AGHT+IE+WdWttoicHGnSAYRa/Js50ySh4oFF39e3AO71tMfwm775Hmc486swefhbNY2eUNQZK3siyw==
-X-Received: by 2002:a05:600c:1c1c:b0:434:f1bd:1e40 with SMTP id 5b1f17b1804b1-4361c5d9386mr19966765e9.6.1733922994659;
-        Wed, 11 Dec 2024 05:16:34 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434f1125e69sm142392845e9.32.2024.12.11.05.16.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 05:16:34 -0800 (PST)
-Date: Wed, 11 Dec 2024 16:16:30 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Julian Anastasov <ja@ssi.bg>
-Cc: Simon Horman <horms@verge.net.au>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>,
-	David Laight <David.Laight@aculab.com>
-Subject: [PATCH net] ipvs: Fix clamp() order in ip_vs_conn_init()
-Message-ID: <1e0cf09d-406f-4b66-8ff5-25ddc2345e54@stanley.mountain>
+        d=1e100.net; s=20230601; t=1733923225; x=1734528025;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=czuEY77JCZPstMaLM63oJZzbj6XrhHUBcn36oBhySws=;
+        b=Gbo/CRYkE/qa5yRqwmdBqQZlyrUwqqWTcJn9Qo0sMadg7c1PuBqR+YZn8rNlOKdkzi
+         xW7RZPG/Hg9J2L89du3i+Rlz3umZ0G2im4bHS6nMxnsMIrgTfCLSBqK5Pr4jDDl7Sl3/
+         UiU7Scasno/QyZ9rsjc9InqWcE5feZ7MNnoTb8kT3X67Gst4kTtQ/Lnvf0xRsuqPPlSO
+         Bgsuqj9ClqgsJGXIziHsmoLou7DpuoQoAujdg3mqd//vI3ZRe3mhIb/j2LyEreK1700z
+         dh7wcwLFIU2+PhDJFWLuGkdFT1wJUQ0jDOxIbqKQSbQ2DbaiOptw3GRHy9FcqUVyPWC2
+         MzcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW4546jlUpFvLG9/XPv2DMG1bbuzJfP+l/yRTdUlLaXI1OrDcdLnV7+ZTbdIEtqRUIccVF/tCM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNZQbiAdLiql4D9rF7bKdLcnKV6JKSzIwaiVlBe29ExrGOAbcD
+	U6/OV3uXMo8GdYgLqNgjnrlbmmquvNBAJ+h5BzMEaokuqVecrWGbTWNaBDW3GexalP7iP7tSCX2
+	Qc55RfYa1bPyr8H+O8qlAXp/7/HE+3fkRgAuj/9xBHZ4oLv4r546Ogd0ZvUW+lCOGcYAkD7ixnT
+	yKF90jaYFEnIYtFAO4UeIjLP9Iwytk
+X-Gm-Gg: ASbGnctKvZjMa9COiip2wX3us5swB0CyiLX/Kdqv5wpWDOOFTeOJZygpMrgMHz7rgZp
+	rTm0ekxrXQv7ikZq0NtPVDSXsu02jAgVGg54WSDcNOtrMu/JXVAD8ulWEoIlfERo1OUGemQ==
+X-Received: by 2002:a05:6214:ca5:b0:6d8:aa04:9a5d with SMTP id 6a1803df08f44-6d9348d2142mr46799306d6.4.1733923225598;
+        Wed, 11 Dec 2024 05:20:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG883jmPVlNDMql0MfElEuVFNmIdnEfS+mjFs8E85duJCJ5UK2bNaU7F3/+T5MmFm/rBUpyG4I3beqd4Jy2Wno=
+X-Received: by 2002:a05:6214:ca5:b0:6d8:aa04:9a5d with SMTP id
+ 6a1803df08f44-6d9348d2142mr46798926d6.4.1733923225372; Wed, 11 Dec 2024
+ 05:20:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+References: <CAMENy5pb8ea+piKLg5q5yRTMZacQqYWAoVLE1FE9WhQPq92E0g@mail.gmail.com>
+ <5b64c89f-4127-4e8f-b795-3cec8e7350b4@kernel.org> <87wmmkn3mq.fsf@toke.dk>
+ <ff571dcf-0375-6684-b188-5c1278cd50ce@iogearbox.net> <CA+h3auMq5vnoyRLvJainG-AFA6f=ivRmu6RjKU4cBv_go975tw@mail.gmail.com>
+ <c97e0085-be67-415c-ae06-7ef38992fab1@nvidia.com> <2f8dfd0a25279f18f8f86867233f6d3ba0921f47.camel@nvidia.com>
+ <b1148fab-ecf3-46c1-9039-597cc80f3d28@nvidia.com> <03c24731-e56f-44b2-b0a3-6afd7f14f77b@redhat.com>
+In-Reply-To: <03c24731-e56f-44b2-b0a3-6afd7f14f77b@redhat.com>
+From: Samuel Dobron <sdobron@redhat.com>
+Date: Wed, 11 Dec 2024 14:20:14 +0100
+Message-ID: <CA+h3auPydMVmWRKPKQJ75Gg5c8uhttVik4seCtmPXduQxQSjMQ@mail.gmail.com>
+Subject: Re: XDP Performance Regression in recent kernel versions
+To: Carolina Jubran <cjubran@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, 
+	Tariq Toukan <tariqt@nvidia.com>, "daniel@iogearbox.net" <daniel@iogearbox.net>, 
+	"hawk@kernel.org" <hawk@kernel.org>, "mianosebastiano@gmail.com" <mianosebastiano@gmail.com>
+Cc: "toke@redhat.com" <toke@redhat.com>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"kuba@kernel.org" <kuba@kernel.org>, Benjamin Poirier <bpoirier@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We recently added some build time asserts to detect incorrect calls to
-clamp and it detected this bug which breaks the build.  The variable
-in this clamp is "max_avail" and it should be the first argument.  The
-code currently is the equivalent to max = max(max_avail, max).
+Hey all,
 
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-Closes: https://lore.kernel.org/all/CA+G9fYsT34UkGFKxus63H6UVpYi5GRZkezT9MRLfAbM3f6ke0g@mail.gmail.com/
-Fixes: 4f325e26277b ("ipvs: dynamically limit the connection hash table")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
-I've been trying to add stable CC's to my commits but I'm not sure the
-netdev policy on this.  Do you prefer to add them yourself?
+We recently enabled tests for XDP TX, so I was able to test
+xdp tx as well.
 
- net/netfilter/ipvs/ip_vs_conn.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+XDP_DROP performance regression is the same as I reported
+a while ago. There is about 20% regression in
+kernel-6.4.0-0.rc6.20230616git40f71e7cd3c6.50.eln126 (baseline)
+compared to previous kernel
+kernel-6.4.0-0.rc6.20230614gitb6dad5178cea.49.eln126 (broken).
+We don't see such regression for other drivers.
 
-diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
-index 98d7dbe3d787..9f75ac801301 100644
---- a/net/netfilter/ipvs/ip_vs_conn.c
-+++ b/net/netfilter/ipvs/ip_vs_conn.c
-@@ -1495,7 +1495,7 @@ int __init ip_vs_conn_init(void)
- 	max_avail -= 2;		/* ~4 in hash row */
- 	max_avail -= 1;		/* IPVS up to 1/2 of mem */
- 	max_avail -= order_base_2(sizeof(struct ip_vs_conn));
--	max = clamp(max, min, max_avail);
-+	max = clamp(max_avail, min, max);
- 	ip_vs_conn_tab_bits = clamp_val(ip_vs_conn_tab_bits, min, max);
- 	ip_vs_conn_tab_size = 1 << ip_vs_conn_tab_bits;
- 	ip_vs_conn_tab_mask = ip_vs_conn_tab_size - 1;
--- 
-2.45.2
+The regression was partially fixed somewhere between eln126 and
+kernel-6.10.0-0.rc2.20240606git2df0193e62cf.27.eln137 (partially
+fixed) and the performance since then is -7 to -15% compared to
+baseline. So, nothing new.
+
+XDP_TX is however, more interesting.
+When comparing baseline with broken kernel there is 20 - 25%
+performance drop (cpu utilizations remains the same) on mlx driver.
+There is also 10% drop on other drivers as well. HOWEVER, it got
+fixed somewhere between broken and partially fixed kernel. On most
+recent kernels, we don't see that regressions on other drivers. But
+2-10% (depends if using dpa/load-bytes) regression remains on mlx5.
+
+The numbers look a bit similar to regression with enabled spectre/meltdown
+mitigations but based on my experiments, there is no difference with
+enabled/disabled mitigations.
+
+Hope this will help,
+Sam.
+
+On Tue, Jul 30, 2024 at 1:04=E2=80=AFPM Samuel Dobron <sdobron@redhat.com> =
+wrote:
+>
+> > Could you try adding the mentioned parameters to your kernel arguments
+> > and check if you still see the degradation?
+>
+> Hey,
+> So i tried multiple kernels around v5.15 as well as couple of previous
+> v6.xx and there is no difference with spectre v2 mitigations enabled
+> or disabled.
+>
+> No difference on other drivers as well.
+>
+>
+> Sam.
+>
 
 
