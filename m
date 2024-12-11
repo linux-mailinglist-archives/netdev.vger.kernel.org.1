@@ -1,148 +1,164 @@
-Return-Path: <netdev+bounces-151188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB2E9ED419
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 18:53:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42C3E9ED45A
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 19:03:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED0841888DE8
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 17:53:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B856C1889D2C
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 18:03:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182871FF1DF;
-	Wed, 11 Dec 2024 17:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37861DE2DF;
+	Wed, 11 Dec 2024 18:03:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YggdufoW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Uv8eUPJd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630FD1FF1AC
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 17:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0C4246344
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 18:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733939633; cv=none; b=V98Y11IyRdFTl0Mwi2T4fTkwah0iLKlBto2QJ9TXIfv1LmGOMi2PmIUKzk3H6TEbDF9K85txB92FXqJzoWRyW+g4GGRtHyhNaJlMvPkpqTYnD4dSPyCGBEpqz6VrIot7cgRXPp9nevCPZTYg7nBZ5uRzQ9YjXBFyY256oOCtTEA=
+	t=1733940227; cv=none; b=s/svSI6MOLFBez5ONKPKAt5ybwabeVSHhHpla8nNj1D+PKH+CSR1oSKrJfkioUHKc1DevjWPX9c7ZI2f09/fdipJrIMcuj3pxc7qoZlZcU5me0uLiQryWyLB0D6ddrbQqXSVHrcnaZABzoF0oigrdA2n5pNTzDa1DvRLN1cI+zY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733939633; c=relaxed/simple;
-	bh=C8j9naSGtmANXLxB6gTQA/l/WydQAfl5PDcPUGnaCfc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OqjJeBTE8CHA0gQRJNz8k0MsUWJFqXXg5aiJdRayF6XtJnYYi3E8J9ZOLjEZWFcX1HeDfGDS6ZFWYCsPbQLPLPf1phuNQf718y5eZViou4+b6vXHgRHRkE5T1GnWlsRtHp2+zzSPDwepb92P58RdXHrnCXfFc/O+4VmJGW7k6+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YggdufoW; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4674c22c4afso2991cf.1
-        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 09:53:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733939630; x=1734544430; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A63aMunO9nsMaAYz7w2GO3I55GNNyAuGNNFIOi4q+as=;
-        b=YggdufoWx3nmKDo849Xjgr088T+2j50F00EMTYmeju6l2giDErdLiXmCG61M2gmFyK
-         PP3xawPmxYCzOxTYhKILZs77v2pM2K0H/aT1KPYF7BY2e/J8PmrY9EZxBiWEY0VQwQAJ
-         5oLkQ8CJ40X2GxPYPtNFP3FYwuH8LDNmSoA4xBnop9gxNP+JUTdwPrhMnPEX+b49E+7c
-         YtgmdxVMpntUSsh42nOvEhGeKvvAFtK/iusPlQS7+Bt8NeuCYVxAerhYQ2eC6PXPkApO
-         IfDtOjo/kad1rxmGsgkDG3WLKaPxQ7ztzMk1NdYko4/4JejfF3pCQp6AHIOVaQUj+pkM
-         171g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733939630; x=1734544430;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A63aMunO9nsMaAYz7w2GO3I55GNNyAuGNNFIOi4q+as=;
-        b=BYLsmX5PJjasAYf/89A5kmI+QiMH2o6WNGasy6yPmNN7uD/ionr61yIOFDZxaNILmY
-         Ajk8YBUtQZ94FKx0X6jhIvFqnUSAmWwX86lXbzVw5NnOsQUOxyt+ttylpAAmOd8fV1fr
-         nig+7VycGGnxV1hPZYndzuC3JQQxLDrdDGSnK7DgcE8rvVadCpaxoBqyojNyaasaQb8x
-         Ag47nGVuU225c/MxlrGEARh9vDvuepLbSAcy/9vUa3taii/HT1USwzH6NfwmGjNEJ57T
-         98ly3k+qDdgzti7qld+JOf7V7HtwUc0VGyBJQve/Ins4HaN8ZRbS2w2G6etyXkw9S2HN
-         uVtA==
-X-Gm-Message-State: AOJu0YzIObv9ijs1p+jJyJBkRjznPJAB4bphUdEl3+30snS8erbFsbHp
-	6ZaY39dn4RRlcEStr9Sy4m/Wmj4MPDQiEB7Kn0JZtY04halc0ku5zS//y6pwUYqxu6PwAhZjNny
-	5aClfc4W5KhO2UzbtHfMbHDTqAFkWXNU0r2yW052SABhBhiL0zW3R
-X-Gm-Gg: ASbGncu0aV+OAFDqQfXWUqJDGFVZQcuuphuQYz4kgCPhZWCUz5Kl6OoUUvU/T8bQO4o
-	PgTkEC7syXRh66IL+Xbvf51wEn3sWHB7yoj0=
-X-Google-Smtp-Source: AGHT+IGBmAiSVzIqqNUuw+Enc5v64pgEhWaYhT/F/17Ts5J82I57JPNQTfvnFZoXyG+FMm9QZemzOrYEl15oPcAFmio=
-X-Received: by 2002:a05:622a:4acd:b0:466:8a29:9de7 with SMTP id
- d75a77b69052e-46795cc07a5mr547161cf.12.1733939628703; Wed, 11 Dec 2024
- 09:53:48 -0800 (PST)
+	s=arc-20240116; t=1733940227; c=relaxed/simple;
+	bh=Urrx3fIHjgVDBub/W5ZfGb7hZp1qtolno2vy7Bvct2o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JJHRvcNnhXpjw7YCuf7TalnaI1cZbM+WCa3Ag1WEoO1ZHnfWtVyXXpFqkNBRxwgu/FqbpgKrmRQCGENvpP+S8dUyaHADmAx4o1tJ4vgWDcP7uqsPd+FMiRdwdJ60D6/Ngn3YfZ7dEcvSQKB1c9zXlUzqvR/yaVH9aehmgVjAQ9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Uv8eUPJd; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=z1PpeSS2xeXJOyJX8mjBNS26bdbLj0jfa4E8290Z9O8=; b=Uv8eUPJdCK/xesNPcjx7g5dqwv
+	bWv6elMTdFRMiLIwFx8JCbqrW22XqDqukLVxD09tLjTMqYLc9EVBKY12gw48hRbZjWRFHnxGrpAXu
+	CqGG8L9R4odhu0eA9grY0wpHa2lZA+bkll98Z62qF0vZU8Hj21G7fefvuGn5ZlWUL4vRvquGPD6DP
+	rnpr6vFD8j51d3121cASqm03XWYzj8HeYTvXePQfZj3FnWUJ/jhU6x4ahCcB/qiWFkt78m07dDMlT
+	4N21JipUYQSJjP0AYD9uAMxfyVxoetcczA4M4+Lcv+ppsrGEQzHcVt/jHsJ3puoyGwEA4koumltft
+	cmz510Cg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39676)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tLR3k-0004Gg-0D;
+	Wed, 11 Dec 2024 18:03:40 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tLR3g-0004W2-2g;
+	Wed, 11 Dec 2024 18:03:36 +0000
+Date: Wed, 11 Dec 2024 18:03:36 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH v2 net-next] net: phylink: improve
+ phylink_sfp_config_phy() error message with empty supported
+Message-ID: <Z1nT-GlW24hgHkfx@shell.armlinux.org.uk>
+References: <20241211172537.1245216-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241209172308.1212819-1-almasrymina@google.com>
- <20241209172308.1212819-6-almasrymina@google.com> <20241210195513.116337b9@kernel.org>
-In-Reply-To: <20241210195513.116337b9@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 11 Dec 2024 09:53:36 -0800
-Message-ID: <CAHS8izOHfWPGaAF0Ri6sN5SVbvD9k_u2-_WmHJHcwu4HDEXj-Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 5/5] net: Document memory provider driver support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241211172537.1245216-1-vladimir.oltean@nxp.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Dec 10, 2024 at 7:55=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon,  9 Dec 2024 17:23:08 +0000 Mina Almasry wrote:
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +Memory providers
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +
-> > +
-> > +Intro
-> > +=3D=3D=3D=3D=3D
-> > +
-> > +Device memory TCP, and likely more upcoming features, are reliant in m=
-emory
-> > +provider support in the driver.
->
-> Are "memory providers" something driver authors care about?
-> I'd go with netmem naming in all driver facing APIs.
-> Or perhaps say placing data into unreable buffers?
->
+On Wed, Dec 11, 2024 at 07:25:36PM +0200, Vladimir Oltean wrote:
+> It seems that phylink does not support driving PHYs in SFP modules using
+> the Generic PHY or Generic Clause 45 PHY driver. I've come to this
+> conclusion after analyzing these facts:
+> 
+> - sfp_sm_probe_phy(), who is our caller here, first calls
+>   phy_device_register() and then sfp_add_phy() -> ... ->
+>   phylink_sfp_connect_phy().
+> 
+> - phydev->supported is populated by phy_probe()
+> 
+> - phy_probe() is usually called synchronously from phy_device_register()
+>   via phy_bus_match(), if a precise device driver is found for the PHY.
+>   In that case, phydev->supported has a good chance of being set to a
+>   non-zero mask.
+> 
+> - There is an exceptional case for the PHYs for which phy_bus_match()
+>   didn't find a driver. Those devices sit for a while without a driver,
+>   then phy_attach_direct() force-binds the genphy_c45_driver or
+>   genphy_driver to them. Again, this triggers phy_probe() and renders
+>   a good chance of phydev->supported being populated, assuming
+>   compatibility with genphy_read_abilities() or
+>   genphy_c45_pma_read_abilities().
+> 
+> - phylink_sfp_config_phy() does not support the exceptional case of
+>   retrieving phydev->supported from the Generic PHY driver, due to its
+>   code flow. It expects the phydev->supported mask to already be
+>   non-empty, because it first calls phylink_validate() on it, and only
+>   calls phylink_attach_phy() if that succeeds. Thus, phylink_attach_phy()
+>   -> phy_attach_direct() has no chance of running.
+> 
+> It is not my wish to change the state of affairs by altering the code
+> flow, but merely to document the limitation rather than have the current
+> unspecific error:
+> 
+> [   61.800079] mv88e6085 d0032004.mdio-mii:12 sfp: validation with support 00,00000000,00000000,00000000 failed: -EINVAL
+> [   61.820743] sfp sfp: sfp_add_phy failed: -EINVAL
+> 
+> On the premise that an empty phydev->supported is going to make
+> phylink_validate() fail anyway, it would be more informative to single
+> out that case, undercut the phylink_validate() call, and print a more
+> specific message:
+> 
+> [   33.468000] mv88e6085 d0032004.mdio-mii:12 sfp: PHY i2c:sfp:16 (id 0x01410cc2) supports no link modes. Maybe its specific PHY driver not loaded?
+> [   33.488187] mv88e6085 d0032004.mdio-mii:12 sfp: Common drivers for PHYs on SFP modules are CONFIG_BCM84881_PHY and CONFIG_MARVELL_PHY.
+> [   33.518621] sfp sfp: sfp_add_phy failed: -EINVAL
+> 
+> Of course, there may be other reasons due to which phydev->supported is
+> empty, thus the use of the word "maybe", but I think the lack of a
+> driver would be the most common.
+> 
+> Link: https://lore.kernel.org/netdev/20241113144229.3ff4bgsalvj7spb7@skbuf/
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+> v1->v2: add one more informational line containing common Kconfig
+> options, as per review feedback.
+> 
+> Link to v1:
+> https://lore.kernel.org/netdev/20241114165348.2445021-1-vladimir.oltean@nxp.com/
+> 
+>  drivers/net/phy/phylink.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index 95fbc363f9a6..b9dee09f4cfc 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -3436,6 +3436,12 @@ static int phylink_sfp_config_phy(struct phylink *pl, struct phy_device *phy)
+>  	int ret;
+>  
+>  	linkmode_copy(support, phy->supported);
+> +	if (linkmode_empty(support)) {
+> +		phylink_err(pl, "PHY %s (id 0x%.8lx) supports no link modes. Maybe its specific PHY driver not loaded?\n",
+> +			    phydev_name(phy), (unsigned long)phy->phy_id);
+> +		phylink_err(pl, "Common drivers for PHYs on SFP modules are CONFIG_BCM84881_PHY and CONFIG_MARVELL_PHY.\n");
+> +		return -EINVAL;
+> +	}
 
-Sure, I can center the docs around netmem rather than 'memory providers'.
+Wouldn't checking phy->drv == NULL be a better to detect that there is
+no PHY driver bound (and thus indicating that the specific driver is
+not loaded?)
 
-> > +Driver support
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +
-> > +1. The driver must support page_pool. The driver must not do its own r=
-ecycling
-> > +   on top of page_pool.
->
-> I like the rule, but is there a specific reason driver can't do its own
-> recycling?
->
-
-Drivers doing their own recycling is not currently supported, AFAICT.
-Adding support for it in the future and maintaining it is doable, but
-a headache. I also noticed with IDPF you're nacking drivers doing
-their own recycling anyway, so I thought why not just declare all such
-use cases as not supported to make the whole thing much simpler.
-Drivers can deprecate their recycling while adding support for netmem
-which brings them in line with what you're enforcing for new drivers
-anyway.
-
-The specific reason: currently drivers will get_page pp pages to hold
-on to them to do their own recycling, right? We don't even have a
-get_netmem equivalent. We could add one (and for the TX path, which is
-coming along, I do add one), but even then, the pp needs to detect
-elevated references on net_iovs to exclude them from pp recycling. The
-mp also needs to understand/keep track of elevated refcounts and make
-sure the page is returned to it when the elevated refcounts from the
-driver are dropped.
-
---=20
-Thanks,
-Mina
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
