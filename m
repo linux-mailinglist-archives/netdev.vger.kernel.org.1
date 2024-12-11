@@ -1,136 +1,129 @@
-Return-Path: <netdev+bounces-150938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 068DB9EC22D
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:31:53 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3AAF9EC23C
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:32:50 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEACD188A016
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:32:49 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96CAE1FCCE2;
+	Wed, 11 Dec 2024 02:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="LFzIAbje"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D6D8285AF3
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:31:51 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1201FDE08;
-	Wed, 11 Dec 2024 02:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SMOIxaXL"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE9E1AAA1D;
-	Wed, 11 Dec 2024 02:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA2BC148;
+	Wed, 11 Dec 2024 02:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733884267; cv=none; b=Rtf9d/1IXeG7YPd8IpJXcW+U0pBqD9T58uNgZQMEv0MMH6vt/jblUFjhxxgjlxCSl8x+7oSqGisWDzqjQeVoPa4WG/YL8JeeWuaalpNn5u8Je1gkyLTnyONjepuT5+XB5tGdBzDv6aQxEtg+Fm0H4G1SnW6JeaNFGIVZoXqSHm4=
+	t=1733884295; cv=none; b=s4wcAaULzzWZ00h1h/tt6qi16QhniJZ5YHz2fNLZcN4Aa7gAjg7K9ZmXTrgWxnE0KInZtSWBNEqxXxYBY3QGXzGKdHyX14NaNo/Ryk2atCifwflf0/N4x6hJPOGA1QMG0+skpqELiShnR6ceFM4bNT0I0AABh69VgQd7CpVWQ6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733884267; c=relaxed/simple;
-	bh=9/RMUndcExKfIjoAYXiSrUcS/uugTHcL3EUWICRqRuY=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=iJ4yGKHEa+fK16pXrsXcbijEtPcDeHmZkD1iHHmkYDOhveHqLMLYd07aerfT9lC05Mewuq2/forOHEywnvHBfn+keqew7PzPwmf657qW8xviO5EMmoxTpxT2OIwc1RiF7UIiKPJOtx0l6vVYyyfFbjLtekgnQczLAVhI8/dFuNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SMOIxaXL; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3863703258fso106743f8f.1;
-        Tue, 10 Dec 2024 18:31:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733884264; x=1734489064; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gtkADtFaW5vFNsFzmyNYgIm6XeqYy3yV6Xm55WGlKSo=;
-        b=SMOIxaXL5at4fjJW5Idz1MNJBkwDW7pFirDt7hntYRaT1M/8OwpOtnyHCWnmMyW/RW
-         R8UqoXKTmYEXOvcdj2GXwfClrdQB4CO5VvkNKfPd8coFxsoh7yIPx9shE5fNgW1Ugssi
-         ISrCHiy4O+fcFv5ACT9lPHCFr6iosJpzhCfL1sNI6NQRZHIH9lzR6M1nC3g4FlzkVYF8
-         B9oFcSPW4pxFEV311yVbprEm30gaSUj4MH+SE+gteTruVEwdTrwqBOfTHYZ+9yeVXvzu
-         SlqK1uUjqe05Ub7NptmIJcwRRZRYZliIuii8WW3UXn8Jp4VNyVzxWNfUYzCHVHCbzp57
-         6QRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733884264; x=1734489064;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gtkADtFaW5vFNsFzmyNYgIm6XeqYy3yV6Xm55WGlKSo=;
-        b=aalItLM1LqqZnFQXHr285KV5FpipBrLiwcUhpM3rXQyC/viWHs3HLpimaRueAdO8P1
-         w3wiTwbeLVHvxLUXBGGjKpqBCZ0AHmnE3um/oJ39Jib5Uxix9i4XgCeaINUHXZM9ETmD
-         Rw7ciZdzRNNp8tk2km4WnuZhpXUDh+3+uT2pRemmhVRzT3FlHnGJ097CIZ5UPjL/rkG7
-         Y70a6Ji0nEJQUU80GhaZ3HmOpI9n/uY/nddQxHfVe/eF/t8Fp+54r75GBffBpQBeOlnc
-         mZYNgfRvBQyX6Y3H+eJKIZafMewKAPy3kjlc4/PNEhSj6V7wAfLLs8o8DGYkc9sv5Kdb
-         3B1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVwm0afzPtgiDx6VE20BF+V9BIOimFydc3uELMV4QVinZCrH3QHSid5Y95MFJgR7YVjp9K77t13pHI=@vger.kernel.org, AJvYcCXpRuABWk5WiCJ5Vg8MhmZIJEkRjPRZB+pjU0KKqDX/NkNEoFqhv0Nl/YqUXtOyH3CWXkCynQfW@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvdoTfT8wqxYlp8cvkjr7IwGpLnoW+4yDtKoESQ2H+p2nDOEqz
-	bGX81qWH80orT6dXkzQm7YxZbmKAB/WANSYy62NDMXxxcF0NL79g
-X-Gm-Gg: ASbGnctv45S/jCEgctmw1S3I5MnD7jZIf2JPTenb6nqklWtuDLbeNkfMmQoJh7QFJo+
-	J9coX+ecfx7D+1p71BzWkQlIaOEjAxg7KDALgOacbOyBROLXt7rwFqAgTXkZ6goIfJNgkPf4M+g
-	osvI2vaPH6N8fT6teMDaCgZL6Vx+3zx+WRhHSoRK92j9QmXaXfAxG/tdOabat0GaJMyCvPragY5
-	XxbHcMmROwFoug1kCPWtmArGgD4ZiJIM6Ger+AeIv65N98MaYLjd4ELsQXFRjRSOBsqiwftouUq
-	VLzUYTSEXFVIWmAzY0vvswdTkBlSLe78LqZyWYE/dQ==
-X-Google-Smtp-Source: AGHT+IHLe4oFOwCG1X40I8qdseDXMMpZXgckwUjW58XF1YFf4gxQ3VpvIkheqIOqqd82tcCFO74cOQ==
-X-Received: by 2002:a05:6000:1869:b0:385:fcaf:841 with SMTP id ffacd0b85a97d-3864dee4258mr495319f8f.23.1733884263825;
-        Tue, 10 Dec 2024 18:31:03 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3878248f8e1sm141794f8f.18.2024.12.10.18.31.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2024 18:31:02 -0800 (PST)
-Subject: Re: [PATCH v7 24/28] cxl: add region flag for precluding a device
- memory to be used for dax
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-Cc: Alejandro Lucero <alucerop@amd.com>
-References: <20241209185429.54054-1-alejandro.lucero-palau@amd.com>
- <20241209185429.54054-25-alejandro.lucero-palau@amd.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <455f8e81-fa7b-f416-db0d-4ad9ac158865@gmail.com>
-Date: Wed, 11 Dec 2024 02:31:01 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1733884295; c=relaxed/simple;
+	bh=sLhMhQmowIvyDOZaQSUrMhLsPhwddTfrbVNYlnBcDH4=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=uefrOuJeVPpLTfC8VG6bYss8t07pU7qrDi7zY6nKHt4oolFmeNWPnL+IssELiYZ/WMqYxnLwp9W8HlGJhLDrLGjn9r8pzMRtrtBgMxS7ll7xkvQth/NlutdyUTdMw5bMqy35vdZnLoDin5nvdp+eKjdlccAXhJjWe9pXx9uJKNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=LFzIAbje; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88D37C4CED6;
+	Wed, 11 Dec 2024 02:31:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1733884294;
+	bh=sLhMhQmowIvyDOZaQSUrMhLsPhwddTfrbVNYlnBcDH4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LFzIAbjeVxr5ODQPOZZgTBsZ9VPv2qRYsjzufXTmy2VjrkolY7we/T3El5L3bI4tv
+	 ZwBBxonZW6D/7UDB8GmpeizZX1si0/2Sixxb/Y/AoqhAb098fytUnRjDBW3AgAqPQ/
+	 xwSsay0w7F9KyDeJ3A+YhVB7Vf6NOdXZjnEFoERY=
+Date: Tue, 10 Dec 2024 18:31:30 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Easwar Hariharan <eahariha@linux.microsoft.com>, Jeff Johnson
+ <jeff.johnson@oss.qualcomm.com>, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Julia Lawall
+ <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack
+ <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, Robert
+ Jarzmik <robert.jarzmik@free.fr>, Russell King <linux@armlinux.org.uk>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Ofir
+ Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>, Lucas De
+ Marchi <lucas.demarchi@intel.com>, Thomas =?ISO-8859-1?Q?Hellstr=F6m?=
+ <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
+ <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
+ <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>, Dick Kennedy
+ <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Roger Pau =?ISO-8859-1?Q?Monn=E9?=
+ <roger.pau@citrix.com>, Jens Axboe <axboe@kernel.dk>, Kalle Valo
+ <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel
+ Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Ray Jui <rjui@broadcom.com>, Scott Branden
+ <sbranden@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>, Ilya
+ Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Jiri
+ Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>, Petr Mladek
+ <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Louis Peens
+ <louis.peens@corigine.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
+ Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan
+ <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>
+Subject: Re: [PATCH v3 00/19] Converge on using secs_to_jiffies()
+Message-Id: <20241210183130.81111d05148c41278a299aad@linux-foundation.org>
+In-Reply-To: <20241210173548.5d32efe0@kernel.org>
+References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
+	<315e9178-5b10-4de0-bdcf-7243e0e355bb@oss.qualcomm.com>
+	<20241210153604.cf99699f264f12740ffce5c7@linux-foundation.org>
+	<20241210173548.5d32efe0@kernel.org>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20241209185429.54054-25-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 09/12/2024 18:54, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> By definition a type2 cxl device will use the host managed memory for
-> specific functionality, therefore it should not be available to other
-> uses. However, a dax interface could be just good enough in some cases.
-> 
-> Add a flag to a cxl region for specifically state to not create a dax
-> device. Allow a Type2 driver to set that flag at region creation time.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Zhi Wang <zhiw@nvidia.com>
-> ---
->  drivers/cxl/core/region.c | 10 +++++++++-
->  drivers/cxl/cxl.h         |  3 +++
->  drivers/cxl/cxlmem.h      |  3 ++-
->  include/cxl/cxl.h         |  3 ++-
->  4 files changed, 16 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> index b014f2fab789..b39086356d74 100644
-> --- a/drivers/cxl/core/region.c
-> +++ b/drivers/cxl/core/region.c
-> @@ -3562,7 +3562,8 @@ __construct_new_region(struct cxl_root_decoder *cxlrd,
->   * cxl_region driver.
->   */
->  struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
-> -				     struct cxl_endpoint_decoder *cxled)
-> +				     struct cxl_endpoint_decoder *cxled,
-> +				     bool no_dax)
+On Tue, 10 Dec 2024 17:35:48 -0800 Jakub Kicinski <kuba@kernel.org> wrote:
 
-Won't this break bisectability?  sfc won't build as of this commit
- because it tries to call cxl_create_region with the old signature.
-You could do the whole dance of having an interim API during the
- conversion, but seems simpler just to reorder the patches so that
- the no_dax parameter is added first before the caller is introduced.
+> On Tue, 10 Dec 2024 15:36:04 -0800 Andrew Morton wrote:
+> > > I have the same question as before: How do you expect these to land?
+> > > Do you now have a maintainer who will take all of them?
+> > > Or do you want individual maintainers to take the ones applicable to them?  
+> > 
+> > I'll just grab everything and see if anyone complains ;)
+> 
+> I may, if this leads to a conflict :(
+
+Very unlikely, and any such conflict will be trivial.
+
+> Easwar, please break this up per subsystem.
+
+The series is already one-patch-per-changed-file.
 
