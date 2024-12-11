@@ -1,209 +1,136 @@
-Return-Path: <netdev+bounces-151053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BB379EC962
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:43:31 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAF8A18825D8
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 09:43:29 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3827E1A83FE;
-	Wed, 11 Dec 2024 09:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="lwA3jy5j"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F5219EC963
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 10:43:49 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25664236FB6
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 09:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7CB9285CDD
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 09:43:47 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0ED1C1F22;
+	Wed, 11 Dec 2024 09:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V7X6lHEO"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2B3236FB6;
+	Wed, 11 Dec 2024 09:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733910206; cv=none; b=svi1jF08yqzqCRaYC2sjr90rOlivGygpXOG4w8QwDkEjhJ+DvdUNAQUSXa3aWWyjXqGPuB6OmY/y5jyx8Ad+kFvGuIR2pulNcBo1yVV/3WeTxIZ3yjsqG/rWafi+5jR0Bn6bhkUtoaT4mttLizqxIDaFmKZwQuUZgkCbTvYMabg=
+	t=1733910224; cv=none; b=KMTLZZ8RS6MLz1kogXCaomzLYx5js7zwG4y9B2j3U2SmTXJcVieMLpnpfZbOgV7xpyHpRgIb75PaTUQVwhLLXm13YQI49j7p19d7BGwQ/PHAigxvEzeHVxV4pLomXWS7JEpmGT3WdA7dmfIeupdIE2jJDxQwJ+XUPpZG6baG9NY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733910206; c=relaxed/simple;
-	bh=fjay/P8NW6O9+UbSe7xhuqU3lBYGjE2l8y6uvwci7VY=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=EvnPAbkWRbX3eGWF0Lh5jG+L5PTozZlusMjSvSI8cmtDLq0dtIhYRp4e/9JvXtRir2I1z7rHnhIKjjQsfAB32aCaf6UiPJ+1sJ6LRXU3T0qTeEFrGgBkr96YI8Q8ZEQW2BQNL+31ApivZq8m7LDZp/z7Tj0Sa/b/7pN8rERiYhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=lwA3jy5j; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from [IPV6:2a02:8010:6359:2:9c63:293c:9db9:bde3] (unknown [IPv6:2a02:8010:6359:2:9c63:293c:9db9:bde3])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id C855B7DCB8;
-	Wed, 11 Dec 2024 09:43:16 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1733910196; bh=fjay/P8NW6O9+UbSe7xhuqU3lBYGjE2l8y6uvwci7VY=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:From;
-	z=Message-ID:=20<682346f6-5a19-1b09-c201-9ab210643ca0@katalix.com>|
-	 Date:=20Wed,=2011=20Dec=202024=2009:43:16=20+0000|MIME-Version:=20
-	 1.0|To:=20Preston=20<preston@yourpreston.com>|Cc:=20netdev=20<netd
-	 ev@vger.kernel.org>|References:=20<CABBfiem067qtdVbMeq2bGrn-5bKZsy
-	 _M8N-4GkE0BO6Uh7jX1A@mail.gmail.com>=0D=0A=20<3e6af55f-3270-604b-c
-	 134-456200188f94@katalix.com>=0D=0A=20<CABBfie=3D3+NBmjpVHn8Ji7Vak
-	 Eo9-JMKDH3ut5d1nXnDneC0tPw@mail.gmail.com>=0D=0A=20<ed0ffb72-3848-
-	 d1be-6903-d6ab21a0f77f@katalix.com>=0D=0A=20<CABBfienZDG=3DkFMfGe=
-	 3DAwa4ZhuhGTRRy7uGcPjWaZLiGi+XWBDA@mail.gmail.com>|From:=20James=2
-	 0Chapman=20<jchapman@katalix.com>|Subject:=20Re:=20ethernet=20over
-	 =20l2tp=20with=20vlan|In-Reply-To:=20<CABBfienZDG=3DkFMfGe=3DAwa4Z
-	 huhGTRRy7uGcPjWaZLiGi+XWBDA@mail.gmail.com>;
-	b=lwA3jy5jaFvJsySx2mEWkRWEODqw134GfwKaQ6RRsXkADKAme0IgxrAVpyTJDjp7i
-	 0QVFQAsbWBKJ/9s4iVsHdkrue37wiqxBzkv7EzwzRR8fYF0MPZMjR0OQysVbUbE3Nx
-	 FNABkVFiMunVFKCrfVpl2O+2ioOcPLLe1iIlQE6I0vVHQISpqEi+KBuWB5Pb9zX8Py
-	 X88uWhZ8Ll1h1I5DDwk1hjvw7Yu33SH7iahPNxsBTCc9JnHOCm4ArJQnEnCfKDRsQV
-	 kKI4ro4g9EtWbS3EkV+debluk+uM3BQ90oTZs2+RlWsCOYmxxysbnSHPyesfPCaqmG
-	 sdU/7PXRrzOMA==
-Message-ID: <682346f6-5a19-1b09-c201-9ab210643ca0@katalix.com>
-Date: Wed, 11 Dec 2024 09:43:16 +0000
+	s=arc-20240116; t=1733910224; c=relaxed/simple;
+	bh=tjOJhShJ66gPvdzusOXZm8nsP45GFF+Q7mTgg0svbak=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tIK1925PMIatI66bEY7kHVN9NzHcIB37AGDEubkdT+VZoysCHPWtvbLrIfIZ26i13bysYxW5iTSsWcxsaFztSzVEUWS9l8ilrhx4jJCBHM7szGwyCbd0dJEFhW+KsdU71wqMx1w7aTe03T2M7eor+zZCZdOoM/V9Vb2cyjpoF7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V7X6lHEO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 915C7C4CED2;
+	Wed, 11 Dec 2024 09:43:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733910224;
+	bh=tjOJhShJ66gPvdzusOXZm8nsP45GFF+Q7mTgg0svbak=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=V7X6lHEODmO/+HZAoQtCyAxhDgtNeqTn7aVWcCO42WLt6djAqz+m0CduwfC923irq
+	 7abPownTqOz4DwomBvxUclphJr4TKJzqv0d1U7GZZ9FWv/YLmK7wN+Cld4v6Rxyllu
+	 xnZxACkvIu5qip1AOLVCLKPDc9pdeOSJqKZPPQyShJ5+A45c7jUfqfWkwew2MfKcCJ
+	 TVkm+qFQ54CSsbAC7Q+1aMzyMCV03H1gZd2qiENDko9bOXW0fg5Bc7XcLVs5t7HnwY
+	 j9SPDHUvNMM91Rkxoc609AAJuDv+csAe/3IGJ32IP9ZHo7oUXQ0rZNQrswzBrrhYno
+	 WZv8ftKoBu0yg==
+Date: Wed, 11 Dec 2024 10:43:40 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Dimitri Fedrau <dima.fedrau@gmail.com>
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: dp83822: Add support
+ for GPIO2 clock output
+Message-ID: <hayqmsohcpdg43yh5obmkbxpw3stckxpmm3myhqfsf62jdpquh@ndwfhr3gqm3b>
+References: <20241211-dp83822-gpio2-clk-out-v2-0-614a54f6acab@liebherr.com>
+ <20241211-dp83822-gpio2-clk-out-v2-1-614a54f6acab@liebherr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Content-Language: en-US
-To: Preston <preston@yourpreston.com>
-Cc: netdev <netdev@vger.kernel.org>
-References: <CABBfiem067qtdVbMeq2bGrn-5bKZsy_M8N-4GkE0BO6Uh7jX1A@mail.gmail.com>
- <3e6af55f-3270-604b-c134-456200188f94@katalix.com>
- <CABBfie=3+NBmjpVHn8Ji7VakEo9-JMKDH3ut5d1nXnDneC0tPw@mail.gmail.com>
- <ed0ffb72-3848-d1be-6903-d6ab21a0f77f@katalix.com>
- <CABBfienZDG=kFMfGe=Awa4ZhuhGTRRy7uGcPjWaZLiGi+XWBDA@mail.gmail.com>
-From: James Chapman <jchapman@katalix.com>
-Organization: Katalix Systems Ltd
-Subject: Re: ethernet over l2tp with vlan
-In-Reply-To: <CABBfienZDG=kFMfGe=Awa4ZhuhGTRRy7uGcPjWaZLiGi+XWBDA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241211-dp83822-gpio2-clk-out-v2-1-614a54f6acab@liebherr.com>
 
-On 10/12/2024 20:00, Preston wrote:
-> On Thu, Dec 5, 2024 at 3:00 AM James Chapman <jchapman@katalix.com> wrote:
->> Please don't top-post.
-> Apologies, first timer.
->> Are you configuring an IP address on l2tpeth0.1319 and capturing on
-> l2tpeth0?
-> I'm running dhclient on  l2tpeth0.1319, the DHCP discover from that is
-> the packet you see in the screenshot. The pcap is being taken on the
-> physical interface.
-
-You've top-posted again! Don't c&p parts of text to the top of emails 
-when replying. Please see https://subspace.kernel.org/etiquette.html
-
-I'll add your reply text below and answer there, in the interest of 
-making progress.
+On Wed, Dec 11, 2024 at 09:04:39AM +0100, Dimitri Fedrau wrote:
+> The GPIO2 pin on the DP83822 can be configured as clock output. Add
+> binding to support this feature.
 > 
+> Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+> ---
+>  .../devicetree/bindings/net/ti,dp83822.yaml         |  7 +++++++
+>  include/dt-bindings/net/ti-dp83822.h                | 21 +++++++++++++++++++++
+>  2 files changed, 28 insertions(+)
 > 
->>
->> On 04/12/2024 21:04, Preston wrote:
->>> l2tpeth0 is not attached to anything, it's created by the `ip l2tp`
->>> commands. But since it's encapsulating and setting a new destination
->>> IP address, packets are referred to the route table.
->>
->> Please don't top-post. It makes it much harder for other readers to
->> follow the discussion. I'll repaste your reply below this time.
->>
->>> On Wed, Dec 4, 2024 at 6:48 AM James Chapman <jchapman@katalix.com> wrote:
->>>>
->>>> On 03/12/2024 16:14, Preston wrote:
->>>>> Hello folks, please let me know if there’s a more appropriate place to
->>>>> ask this but I believe I’ve found something that isn’t supported in
->>>>> iproute2 and would like to ask your thoughts.
->>>>
->>>> Thanks for reaching out.
->>>>
->>>>> I am trying to encapsulate vlan tagged ethernet traffic inside of an
->>>>> l2tp tunnel.This is something that is actively used in controllerless
->>>>> wifi aggregation in large networks alongside Ethernet over GRE. There
->>>>> are draft RFCs that cover it as well. The iproute2 documentation I’ve
->>>>> found on this makes it seem that it should work but isn’t explicit.
->>>>>
->>>>> Using a freshly compiled iproute2 (on Rocky 8) I am able to make this
->>>>> work with GRE without issue. L2tp on the other hand seems to quietly
->>>>> drop the vlan header. I’ve tried doing the same with a bridge type
->>>>> setup and still see the same behavior. I've been unsuccessful in
->>>>> debugging it further, I don’t think the debug flags in iproute2's
->>>>> ipl2tp.c are functional and I suppose the issue might instead be in
->>>>> the kernel module which isn’t something I’ve tried debugging before.
->>>>> Is this a bug? Since plain ethernet over l2tp works I assumed vlan
->>>>> support as well.
->>>>>
->>>>>
->>>>> # Not Working L2TP:
->>>>> [root@iperf1 ~]# ip l2tp add tunnel tunnel_id 1 peer_tunnel_id 1 encap
->>>>> udp local 2.2.2.2 remote 1.1.1.1 udp_sport 1701 udp_dport 1701
->>>>> [root@iperf1 ~]# ip l2tp add session tunnel_id 1 session_id 1 peer_session_id 1
->>>>> [root@iperf1 ~]# ip link add link l2tpeth0 name l2tpeth0.1319 type vlan id 1319
->>>>> [root@iperf1 ~]# ip link set l2tpeth0 up
->>>>> [root@iperf1 ~]# ip link set l2tpeth0.1319 up
->>>>> Results: (captured at physical interface, change wireshark decoding
->>>>> l2tp value 0 if checking yourself)
->>>>> VLAN header dropped
->>>>> Wireshark screenshot: https://i.ibb.co/stMsRG0/l2tpwireshark.png
->>>>
->>>> This should work.
->>>>
->>>> In your test network, how is the virtual interface l2tpeth0 connected to
->>>> the physical interface which you are using to capture packets?
->>   >
->>   > l2tpeth0 is not attached to anything, it's created by the `ip l2tp`
->>   > commands. But since it's encapsulating and setting a new destination
->>   > IP address, packets are referred to the route table.
->>
->> Are you configuring an IP address on l2tpeth0.1319 and capturing on
->> l2tpeth0?
+> diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+> index 784866ea392b2083e93d8dc9aaea93b70dc80934..4a4dc794f21162c6a61c3daeeffa08e666034679 100644
+> --- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+> +++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+> @@ -96,6 +96,13 @@ properties:
+>        - master
+>        - slave
+>  
+> +  ti,gpio2-clk-out:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: |
+> +       DP83822 PHY only.
+> +       Muxing option for GPIO2 pin. See dt-bindings/net/ti-dp83822.h for
+> +       applicable values. When omitted, the PHY's default will be left as is.
 
-> l2tpeth0?
+1. Missing constraints, this looks like enum.
+2. Missing explanation of values.
+3. This should be most likely a string.
+4. Extend your example with this. 
 
-Yes.
+> +
+>  required:
+>    - reg
+>  
+> diff --git a/include/dt-bindings/net/ti-dp83822.h b/include/dt-bindings/net/ti-dp83822.h
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..d569c90618b7bcae9ffe44eb041f7dae2e74e5d1
+> --- /dev/null
+> +++ b/include/dt-bindings/net/ti-dp83822.h
+> @@ -0,0 +1,21 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
+> +/*
+> + * Device Tree constants for the Texas Instruments DP83822 PHY
+> + *
+> + * Copyright (C) 2024 Liebherr-Electronics and Drives GmbH
+> + *
+> + * Author: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+> + */
+> +
+> +#ifndef _DT_BINDINGS_TI_DP83822_H
+> +#define _DT_BINDINGS_TI_DP83822_H
+> +
+> +/* IO_MUX_GPIO_CTRL - Clock source selection */
+> +#define DP83822_CLK_SRC_MAC_IF			0x0
+> +#define DP83822_CLK_SRC_XI			0x1
+> +#define DP83822_CLK_SRC_INT_REF			0x2
+> +#define DP83822_CLK_SRC_RMII_MASTER_MODE_REF	0x4
+> +#define DP83822_CLK_SRC_FREE_RUNNING		0x6
+> +#define DP83822_CLK_SRC_RECOVERED		0x7
 
-> I'm running dhclient on  l2tpeth0.1319, the DHCP discover from that is
-> the packet you see in the screenshot. The pcap is being taken on the
-> physical interface.
+These are not really bindings but some register values. Hex numbers
+indicate that. Don't store register values as bindings, because this
+is neither necessary nor helping.
 
-Which physical interface? Please share your tcpdump/wireshark/other 
-command line to show which interface you are capturing packets on.
-
-If you capture on l2tpeth0.1319, you will see untagged packets carried 
-over l2tpeth0 on VLAN 1319.
-
-If you capture on l2tpeth0, you will see all packets carried over 
-l2tpeth0, with VLAN tags, if any. In your case, you should see tagged 
-packets of VLAN 1319.
-
-If you capture on the network interface used by the L2TP tunnel, you 
-will see the L2TP packets with their tunnel IP header.
-
->>
->>>>
->>>>>
->>>>>
->>>>> # Working GRE:
->>>>> [root@iperf1 ~]# ip link add name gre1 type gretap remote 1.1.1.1
->>>>> [root@iperf1 ~]# ip link add name gre1.120 link gre1 type vlan proto
->>>>> 802.1q id 120
->>>>> [root@iperf1 ~]# ip link set gre1 up
->>>>> [root@iperf1 ~]# ip link set gre1.120 up
->>>>> Results:
->>>>> VLAN header present
->>>>> Wireshark screenshot: https://i.ibb.co/6rJWjg9/grewireshark.png
->>>>>
->>>>>
->>>>> -------------------------------------------------------
->>>>> ~Preston Taylor
->>>>>
->>>>
->>>
->>
-> 
-> 
-> --
-> -------------------------------------------------------
-> ~Preston Taylor
+Best regards,
+Krzysztof
 
 
