@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-151247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C625C9EDA0C
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 23:37:25 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A10529EDA0B
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 23:37:24 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F76A161FA3
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 22:37:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 542F8280AB1
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 22:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D42204C33;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54578204C38;
 	Wed, 11 Dec 2024 22:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A76p09v3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jw0sBUcY"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DEB1204696
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2894B2046A6
 	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 22:32:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733956366; cv=none; b=PVf3/U9uYCT80JTby8l42LCD5HdxKKdUZM3pQ60L8xnnXKe5NhtybXIRdied6OhFYodLyNyGEQHLY2nPGk+Qr2fu/K8S1k0SWlWeZi0GlDeVqVoPhUffpvxlmahcOMx/VNs6yNST+MiH8WkSBsBkquvT8WVCQ26Bp1U02dn/cG4=
+	t=1733956366; cv=none; b=B84FYue8OTtCvqSvrx4o8YHS0w0ME3/eYjTzXnjTwydx13tmJ2GYpeIpDvu1UWMNiagHOeH+DOh8P5kUT6uMgtuQQH85hyzmO3kqVLoS2tVbFScwF8bazoj2Y/GgsWIFr6XiQEIvLjqhqM9h3BBE/6M4GmeaJ08dCq2UvsjCIrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1733956366; c=relaxed/simple;
-	bh=NAS07V7tLD1XfiI4DKCY3VyAD0Y/heRVWRFjSiwpAnA=;
+	bh=Btbce94nYPEGod4BC7F/cbhBgqtefqG66pIe6Ym/Sqo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C1skGLY6EAYkAR0//AB1xvOPnZ0IKWFvfpYjBxTkh5LfKLm417e94AitriVlC9SDEqwMiKpzPDDeCxJyf7qzggI9THPf4TGjvcLJlRvQeHHw+QLOIVk0ozfa697NgO8Le0dWAZn4RZjEBuw9tnFOMUR28WBwS8LogssdfnjU02U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A76p09v3; arc=none smtp.client-ip=192.198.163.14
+	 MIME-Version; b=OX6HRwCR0vfChRZwW4LPmjwDHMhwOaes9oDmqXQ0FyZ6RMS0x5vTzRA2Zh8XtgHFjPSatR3mTRPCHDX1gtw7W8zAEiwem7Rg+ZA+8w2zrei9CPi9CsQ1AXbWftdHvfGOtr46RrL/F8T+PGNS8S2H8OFz6pMKGl/PdOvvXhXOIvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Jw0sBUcY; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,28 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1733956364; x=1765492364;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NAS07V7tLD1XfiI4DKCY3VyAD0Y/heRVWRFjSiwpAnA=;
-  b=A76p09v3qFlMeWeI9Fna3Jz44kPFDDf9iYjPjKhJGy9EqQGuL46ryyGA
-   +VHDuSyDTBuFmPBarbOoOB/HIqlpWPmBCP0RVaWoOSb7u/M1jv9I2dl6e
-   4hL2EHlybaHnoSTBTlHmzWV5PAp0hgKcj+0Ej1ae4pXUklJXd/nXv6van
-   6O6+oo5EDBzRrgNLwfWM33Wu5yaTTnaQjv56yVv+3E3n3bQZ78Q0N1OnC
-   DB+wfOvI9YCWZaQNb36wRBKAWKAV4AbQd7RR+r1QGRPKAuSFjxsQAMH+3
-   6DjbxIAcPe3pcqOvwKpj4u3QXJr5jdWCl5OYJqHdZtWfa2CppGpstYEzg
-   g==;
-X-CSE-ConnectionGUID: CVBkTPOqT6+d67ZM1aI0VA==
-X-CSE-MsgGUID: Mfbif+sHS3+YkyMbHnPIkQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11283"; a="34599652"
+  bh=Btbce94nYPEGod4BC7F/cbhBgqtefqG66pIe6Ym/Sqo=;
+  b=Jw0sBUcYKwXzd5IdWdvJEhTOyXG4eyuopzExCc4JgrP+f7pZudv5x/zH
+   gpO5+6cIfszshgOuWlEjuGw06AisUYv5ywND95wnm3NexI7VY6MvWKQCm
+   SYyX6BqS/ALxRb1H8+SB6sesvz+d4W2eiCUUMVvkDAJPPqXE7k4Epbq4T
+   zpU4g3ZNSB57OY+QHyc+R5vMcyQC5O2DLpS8+0mY+6uzVFSBCyNfL7wkc
+   nLcuQ+l1G4Q3hjkRqEGO4M+5BzynpTOZx2HhpRlOAJj9zS+tt6AN4OoFa
+   +4w1lAckErzQQaEqeeIahwsqHgkTgcHoA3jIm/q2lrYQIBx/wGmm28peZ
+   w==;
+X-CSE-ConnectionGUID: VsM1WWa8R4ysXMc16Xoy1A==
+X-CSE-MsgGUID: CsloYDMKQxCKYR7ogiMJSQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11283"; a="34599663"
 X-IronPort-AV: E=Sophos;i="6.12,226,1728975600"; 
-   d="scan'208";a="34599652"
+   d="scan'208";a="34599663"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
   by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2024 14:32:41 -0800
-X-CSE-ConnectionGUID: xA9VdtGNTd+KwaceDJSNLQ==
-X-CSE-MsgGUID: 8k2c/X5xRLKkfuX/wqcECQ==
+X-CSE-ConnectionGUID: +R/ALqBNQX2vc8S1xv6kdQ==
+X-CSE-MsgGUID: Ix+EB42YTZmylwhr/NgloQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,226,1728975600"; 
-   d="scan'208";a="96192944"
+   d="scan'208";a="96192952"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa008.fm.intel.com with ESMTP; 11 Dec 2024 14:32:40 -0800
+  by fmviesa008.fm.intel.com with ESMTP; 11 Dec 2024 14:32:41 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -65,8 +65,9 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+Cc: Ben Shelton <benjamin.h.shelton@intel.com>,
 	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
 	wojciech.drewek@intel.com,
 	mateusz.polchlopek@intel.com,
 	joe@perches.com,
@@ -77,9 +78,9 @@ Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	dwaipayanray1@gmail.com,
 	Igor Bagnucki <igor.bagnucki@intel.com>,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 6/7] ice: dump ethtool stats and skb by Tx hang devlink health reporter
-Date: Wed, 11 Dec 2024 14:32:14 -0800
-Message-ID: <20241211223231.397203-7-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 7/7] ice: Add MDD logging via devlink health
+Date: Wed, 11 Dec 2024 14:32:15 -0800
+Message-ID: <20241211223231.397203-8-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20241211223231.397203-1-anthony.l.nguyen@intel.com>
 References: <20241211223231.397203-1-anthony.l.nguyen@intel.com>
@@ -91,179 +92,212 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+From: Ben Shelton <benjamin.h.shelton@intel.com>
 
-Print the ethtool stats and skb diagnostic information as part of Tx hang
-devlink health dump.
+Add a devlink health reporter for MDD events. The 'dump' handler will
+return the information captured in each call to ice_handle_mdd_event().
+A device reset (CORER/PFR) will put the reporter back in healthy state.
 
-Move the declarations of ethtool functions that devlink health uses out
-to a new file: ice_ethtool_common.h
-
-To utilize our existing ethtool code in this context, convert it to
-non-static.
-
+Signed-off-by: Ben Shelton <benjamin.h.shelton@intel.com>
 Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
 Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
+Co-developed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- .../net/ethernet/intel/ice/devlink/health.c   | 36 +++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_ethtool.c  | 10 +++---
- drivers/net/ethernet/intel/ice/ice_ethtool.h  |  2 ++
- .../ethernet/intel/ice/ice_ethtool_common.h   | 19 ++++++++++
- 4 files changed, 62 insertions(+), 5 deletions(-)
- create mode 100644 drivers/net/ethernet/intel/ice/ice_ethtool_common.h
+ .../net/ethernet/intel/ice/devlink/health.c   | 77 +++++++++++++++++++
+ .../net/ethernet/intel/ice/devlink/health.h   | 11 +++
+ drivers/net/ethernet/intel/ice/ice_main.c     |  6 ++
+ 3 files changed, 94 insertions(+)
 
 diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
-index b8c5a1c372dc..b0abb6d4e3e4 100644
+index b0abb6d4e3e4..d9b852ccf99e 100644
 --- a/drivers/net/ethernet/intel/ice/devlink/health.c
 +++ b/drivers/net/ethernet/intel/ice/devlink/health.c
-@@ -3,6 +3,7 @@
- 
- #include "health.h"
- #include "ice.h"
-+#include "ice_ethtool_common.h"
- 
- #define ICE_DEVLINK_FMSG_PUT_FIELD(fmsg, obj, name) \
- 	devlink_fmsg_put(fmsg, #name, (obj)->name)
-@@ -26,6 +27,36 @@ static void ice_devlink_health_report(struct devlink_health_reporter *reporter,
+@@ -27,6 +27,79 @@ static void ice_devlink_health_report(struct devlink_health_reporter *reporter,
  	devlink_health_report(reporter, msg, priv_ctx);
  }
  
-+static void ice_dump_ethtool_stats_to_fmsg(struct devlink_fmsg *fmsg,
-+					   struct net_device *netdev)
++struct ice_mdd_event {
++	enum ice_mdd_src src;
++	u16 vf_num;
++	u16 queue;
++	u8 pf_num;
++	u8 event;
++};
++
++static const char *ice_mdd_src_to_str(enum ice_mdd_src src)
 +{
-+	const u32 string_set = ETH_SS_STATS;
-+	u64 *stats;
-+	u8 *names;
-+	int scnt;
-+
-+	scnt = ice_get_sset_count(netdev, string_set);
-+	devlink_fmsg_put(fmsg, "stats-cnt", (u32)scnt);
-+	if (scnt <= 0)
-+		return;
-+
-+	names = kcalloc(scnt, ETH_GSTRING_LEN, GFP_KERNEL);
-+	stats = kcalloc(scnt, sizeof(*stats), GFP_KERNEL);
-+	if (!names || !stats)
-+		goto out;
-+
-+	ice_get_strings(netdev, string_set, names);
-+	ice_get_ethtool_stats(netdev, NULL, stats);
-+
-+	devlink_fmsg_obj_nest_start(fmsg);
-+	for (int i = 0; i < scnt; ++i)
-+		devlink_fmsg_put(fmsg, &names[i * ETH_GSTRING_LEN], stats[i]);
-+	devlink_fmsg_obj_nest_end(fmsg);
-+out:
-+	kfree(names);
-+	kfree(stats);
++	switch (src) {
++	case ICE_MDD_SRC_TX_PQM:
++		return "tx_pqm";
++	case ICE_MDD_SRC_TX_TCLAN:
++		return "tx_tclan";
++	case ICE_MDD_SRC_TX_TDPU:
++		return "tx_tdpu";
++	case ICE_MDD_SRC_RX:
++		return "rx";
++	default:
++		return "invalid";
++	}
 +}
 +
- /**
-  * ice_fmsg_put_ptr - put hex value of pointer into fmsg
-  *
-@@ -57,10 +88,12 @@ static int ice_tx_hang_reporter_dump(struct devlink_health_reporter *reporter,
- 				     struct netlink_ext_ack *extack)
- {
- 	struct ice_tx_hang_event *event = priv_ctx;
-+	struct sk_buff *skb;
- 
- 	if (!event)
- 		return 0;
- 
-+	skb = event->tx_ring->tx_buf->skb;
- 	devlink_fmsg_obj_nest_start(fmsg);
- 	ICE_DEVLINK_FMSG_PUT_FIELD(fmsg, event, head);
- 	ICE_DEVLINK_FMSG_PUT_FIELD(fmsg, event, intr);
-@@ -71,8 +104,11 @@ static int ice_tx_hang_reporter_dump(struct devlink_health_reporter *reporter,
- 	devlink_fmsg_put(fmsg, "irq-mapping", event->tx_ring->q_vector->name);
- 	ice_fmsg_put_ptr(fmsg, "desc-ptr", event->tx_ring->desc);
- 	ice_fmsg_put_ptr(fmsg, "dma-ptr", (void *)(long)event->tx_ring->dma);
-+	ice_fmsg_put_ptr(fmsg, "skb-ptr", skb);
- 	devlink_fmsg_binary_pair_put(fmsg, "desc", event->tx_ring->desc,
- 				     event->tx_ring->count * sizeof(struct ice_tx_desc));
-+	devlink_fmsg_dump_skb(fmsg, skb);
-+	ice_dump_ethtool_stats_to_fmsg(fmsg, event->tx_ring->vsi->netdev);
- 	devlink_fmsg_obj_nest_end(fmsg);
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 3072634bf049..b552439fc1f9 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -1507,7 +1507,7 @@ __ice_get_strings(struct net_device *netdev, u32 stringset, u8 *data,
- 	}
- }
- 
--static void ice_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
-+void ice_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
- {
- 	struct ice_netdev_priv *np = netdev_priv(netdev);
- 
-@@ -1887,7 +1887,7 @@ static int ice_set_priv_flags(struct net_device *netdev, u32 flags)
- 	return ret;
- }
- 
--static int ice_get_sset_count(struct net_device *netdev, int sset)
-+int ice_get_sset_count(struct net_device *netdev, int sset)
- {
- 	switch (sset) {
- 	case ETH_SS_STATS:
-@@ -1990,9 +1990,9 @@ __ice_get_ethtool_stats(struct net_device *netdev,
- 	}
- }
- 
--static void
--ice_get_ethtool_stats(struct net_device *netdev,
--		      struct ethtool_stats __always_unused *stats, u64 *data)
-+void ice_get_ethtool_stats(struct net_device *netdev,
-+			   struct ethtool_stats __always_unused *stats,
-+			   u64 *data)
- {
- 	struct ice_netdev_priv *np = netdev_priv(netdev);
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.h b/drivers/net/ethernet/intel/ice/ice_ethtool.h
-index 8f2ad1c172c0..a1a34440557d 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.h
-@@ -4,6 +4,8 @@
- #ifndef _ICE_ETHTOOL_H_
- #define _ICE_ETHTOOL_H_
- 
-+#include "ice_ethtool_common.h"
++static int
++ice_mdd_reporter_dump(struct devlink_health_reporter *reporter,
++		      struct devlink_fmsg *fmsg, void *priv_ctx,
++		      struct netlink_ext_ack *extack)
++{
++	struct ice_mdd_event *mdd_event = priv_ctx;
++	const char *src;
 +
- struct ice_phy_type_to_ethtool {
- 	u64 aq_link_speed;
- 	u8 link_mode;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_common.h b/drivers/net/ethernet/intel/ice/ice_ethtool_common.h
-new file mode 100644
-index 000000000000..0c772056f006
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool_common.h
-@@ -0,0 +1,19 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) 2024, Intel Corporation. */
++	if (!mdd_event)
++		return 0;
 +
-+#ifndef _ICE_ETHTOOL_COMMON_H_
-+#define _ICE_ETHTOOL_COMMON_H_
++	src = ice_mdd_src_to_str(mdd_event->src);
++
++	devlink_fmsg_obj_nest_start(fmsg);
++	devlink_fmsg_put(fmsg, "src", src);
++	ICE_DEVLINK_FMSG_PUT_FIELD(fmsg, mdd_event, pf_num);
++	ICE_DEVLINK_FMSG_PUT_FIELD(fmsg, mdd_event, vf_num);
++	ICE_DEVLINK_FMSG_PUT_FIELD(fmsg, mdd_event, event);
++	ICE_DEVLINK_FMSG_PUT_FIELD(fmsg, mdd_event, queue);
++	devlink_fmsg_obj_nest_end(fmsg);
++
++	return 0;
++}
 +
 +/**
-+ * DOC: ice_ethtool_common.h
++ * ice_report_mdd_event - Report an MDD event through devlink health
++ * @pf: the PF device structure
++ * @src: the HW block that was the source of this MDD event
++ * @pf_num: the pf_num on which the MDD event occurred
++ * @vf_num: the vf_num on which the MDD event occurred
++ * @event: the event type of the MDD event
++ * @queue: the queue on which the MDD event occurred
 + *
-+ * This header is for ethtool related code that is reused in other places.
++ * Report an MDD event that has occurred on this PF.
 + */
++void ice_report_mdd_event(struct ice_pf *pf, enum ice_mdd_src src, u8 pf_num,
++			  u16 vf_num, u8 event, u16 queue)
++{
++	struct ice_mdd_event ev = {
++		.src = src,
++		.pf_num = pf_num,
++		.vf_num = vf_num,
++		.event = event,
++		.queue = queue,
++	};
 +
-+void ice_get_strings(struct net_device *netdev, u32 stringset, u8 *data);
-+int ice_get_sset_count(struct net_device *netdev, int sset);
-+void ice_get_ethtool_stats(struct net_device *netdev,
-+			   struct ethtool_stats __always_unused *stats,
-+			   u64 *data);
++	ice_devlink_health_report(pf->health_reporters.mdd, "MDD event", &ev);
++}
 +
-+#endif /* _ICE_ETHTOOL_COMMON_H_ */
+ static void ice_dump_ethtool_stats_to_fmsg(struct devlink_fmsg *fmsg,
+ 					   struct net_device *netdev)
+ {
+@@ -168,6 +241,7 @@ ice_init_devlink_rep(struct ice_pf *pf,
+ 	.dump = ice_ ## _name ## _reporter_dump, \
+ }
+ 
++ICE_DEFINE_HEALTH_REPORTER_OPS(mdd);
+ ICE_DEFINE_HEALTH_REPORTER_OPS(tx_hang);
+ 
+ /**
+@@ -180,6 +254,7 @@ void ice_health_init(struct ice_pf *pf)
+ {
+ 	struct ice_health *reps = &pf->health_reporters;
+ 
++	reps->mdd = ice_init_devlink_rep(pf, &ice_mdd_reporter_ops);
+ 	reps->tx_hang = ice_init_devlink_rep(pf, &ice_tx_hang_reporter_ops);
+ }
+ 
+@@ -201,6 +276,7 @@ static void ice_deinit_devl_reporter(struct devlink_health_reporter *reporter)
+  */
+ void ice_health_deinit(struct ice_pf *pf)
+ {
++	ice_deinit_devl_reporter(pf->health_reporters.mdd);
+ 	ice_deinit_devl_reporter(pf->health_reporters.tx_hang);
+ }
+ 
+@@ -220,5 +296,6 @@ void ice_health_assign_healthy_state(struct devlink_health_reporter *reporter)
+  */
+ void ice_health_clear(struct ice_pf *pf)
+ {
++	ice_health_assign_healthy_state(pf->health_reporters.mdd);
+ 	ice_health_assign_healthy_state(pf->health_reporters.tx_hang);
+ }
+diff --git a/drivers/net/ethernet/intel/ice/devlink/health.h b/drivers/net/ethernet/intel/ice/devlink/health.h
+index 92e40d790e72..a08c7bd174cf 100644
+--- a/drivers/net/ethernet/intel/ice/devlink/health.h
++++ b/drivers/net/ethernet/intel/ice/devlink/health.h
+@@ -16,9 +16,17 @@
+ struct ice_pf;
+ struct ice_tx_ring;
+ 
++enum ice_mdd_src {
++	ICE_MDD_SRC_TX_PQM,
++	ICE_MDD_SRC_TX_TCLAN,
++	ICE_MDD_SRC_TX_TDPU,
++	ICE_MDD_SRC_RX,
++};
++
+ /**
+  * struct ice_health - stores ice devlink health reporters and accompanied data
+  * @tx_hang: devlink health reporter for tx_hang event
++ * @mdd: devlink health reporter for MDD detection event
+  * @tx_hang_buf: pre-allocated place to put info for Tx hang reporter from
+  *               non-sleeping context
+  * @tx_ring: ring that the hang occured on
+@@ -27,6 +35,7 @@ struct ice_tx_ring;
+  * @vsi_num: VSI owning the queue that the hang occured on
+  */
+ struct ice_health {
++	struct devlink_health_reporter *mdd;
+ 	struct devlink_health_reporter *tx_hang;
+ 	struct_group_tagged(ice_health_tx_hang_buf, tx_hang_buf,
+ 		struct ice_tx_ring *tx_ring;
+@@ -43,6 +52,8 @@ void ice_health_clear(struct ice_pf *pf);
+ 
+ void ice_prep_tx_hang_report(struct ice_pf *pf, struct ice_tx_ring *tx_ring,
+ 			     u16 vsi_num, u32 head, u32 intr);
++void ice_report_mdd_event(struct ice_pf *pf, enum ice_mdd_src src, u8 pf_num,
++			  u16 vf_num, u8 event, u16 queue);
+ void ice_report_tx_hang(struct ice_pf *pf);
+ 
+ #endif /* _HEALTH_H_ */
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 316f5109bd3f..1701f7143f24 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -1816,6 +1816,8 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+ 		if (netif_msg_tx_err(pf))
+ 			dev_info(dev, "Malicious Driver Detection event %d on TX queue %d PF# %d VF# %d\n",
+ 				 event, queue, pf_num, vf_num);
++		ice_report_mdd_event(pf, ICE_MDD_SRC_TX_PQM, pf_num, vf_num,
++				     event, queue);
+ 		wr32(hw, GL_MDET_TX_PQM, 0xffffffff);
+ 	}
+ 
+@@ -1829,6 +1831,8 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+ 		if (netif_msg_tx_err(pf))
+ 			dev_info(dev, "Malicious Driver Detection event %d on TX queue %d PF# %d VF# %d\n",
+ 				 event, queue, pf_num, vf_num);
++		ice_report_mdd_event(pf, ICE_MDD_SRC_TX_TCLAN, pf_num, vf_num,
++				     event, queue);
+ 		wr32(hw, GL_MDET_TX_TCLAN_BY_MAC(hw), U32_MAX);
+ 	}
+ 
+@@ -1842,6 +1846,8 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+ 		if (netif_msg_rx_err(pf))
+ 			dev_info(dev, "Malicious Driver Detection event %d on RX queue %d PF# %d VF# %d\n",
+ 				 event, queue, pf_num, vf_num);
++		ice_report_mdd_event(pf, ICE_MDD_SRC_RX, pf_num, vf_num, event,
++				     queue);
+ 		wr32(hw, GL_MDET_RX, 0xffffffff);
+ 	}
+ 
 -- 
 2.42.0
 
