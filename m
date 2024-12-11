@@ -1,137 +1,188 @@
-Return-Path: <netdev+bounces-150990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 824AD9EC4A2
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 07:13:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 056219EC4A6
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 07:18:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 269CE188AC81
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 06:13:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A15D188B277
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 06:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53AD51C4A20;
-	Wed, 11 Dec 2024 06:12:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5397C1BD9DE;
+	Wed, 11 Dec 2024 06:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b="PrvgVu7w"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M6zlZtk3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09B01C4A02
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 06:12:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5619C2451C0;
+	Wed, 11 Dec 2024 06:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733897570; cv=none; b=nbtpiunI5Rvfn0FQGSyWOvZP6Iic6d+KLkv/UDgbqmXk3/Mg1Jk2UhZ9WV4JQeIaqLSDIVtBne9Qb4hfnhCznL4Z6aFytLznesTOU2CQ/jGIoDz30RZQlkigXI+qfxDuyDXu/X0mo8UyAZFPhUqGIYR5loNAjGKJ+ykFSzN5bf0=
+	t=1733897921; cv=none; b=F4wrqGP3xX/GMU+9PX3Av6N02dSRReXHp+OPH+7bDTR2JuluTcF7WQMTFsl+4UhVoeAjdyaTRqafh2o/SKZYpEqqM34eE/PrXRpJJYr9UpzYutipcypjzvOcebsvYtSA5C3X0LaYptMRjClz4+BPjgGR2T++dKsCgV7oafgtiRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733897570; c=relaxed/simple;
-	bh=tV4UQ+BiBM0LFw+r6S1cE2/jM0gxNLnQ+tmkcQGE0Y8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jEBIHoZkJmNJdkOsbIDHk9v0JY2LPbZqJNld6qDxHtWmYidQ5CbQULxdIUgJ977jdUTbVx7DkZHIXMzNDAzju4RwBPd4NDPd8QC815Fwupwg3sR32CnaUd7b2rwCKs+2hn07+t663koie6gdHemtNuiXibTvnm56BLQzyU7mi6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com; spf=none smtp.mailfrom=andrewstrohman.com; dkim=pass (2048-bit key) header.d=andrewstrohman-com.20230601.gappssmtp.com header.i=@andrewstrohman-com.20230601.gappssmtp.com header.b=PrvgVu7w; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=andrewstrohman.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=andrewstrohman.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e3985aabf43so4845749276.3
-        for <netdev@vger.kernel.org>; Tue, 10 Dec 2024 22:12:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=andrewstrohman-com.20230601.gappssmtp.com; s=20230601; t=1733897568; x=1734502368; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=tV4UQ+BiBM0LFw+r6S1cE2/jM0gxNLnQ+tmkcQGE0Y8=;
-        b=PrvgVu7wsI1loz/dG3lnzHdrm1DtWCDMfnrK6lZFlAUphoeyoufOxyNG5BLQTXu0kO
-         /nvX7I3Ndni+05QL3bzVbw0FRrzWHJHP8x0MfTYaJX3OehF0Ek2F/P0N6joFjytyXMq3
-         GXDdfdisx+tfFE0uyFy2rkEyYBzKtZ6vqps/1CL/i1G587YZjE2oZdOQnacdosWVp1YE
-         O2fXV+5sMJv252UspI/82U+efCtCbJI/wzQe2Htt0/ZotKmhTex1f57mrZwc2xzUk/0C
-         sY2BpyJuoyED6Mquyg8zZqYd+T2vOmXiC5ArdwC8B5lAHD0Xx0M6ZMxu68lJi2htMG4+
-         c2Iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733897568; x=1734502368;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tV4UQ+BiBM0LFw+r6S1cE2/jM0gxNLnQ+tmkcQGE0Y8=;
-        b=s2NzmQ9BIziSiyh+h4YNQP3OD1DUKZXtnxfx70FTNA8wBYnH1V6ZiMA3uhfzRkkafL
-         xlNYquNVF2vu1EfBoGxZxv3Bk3PNL3DV9wOe0/vxp9aN/G7wuS42wm+t4zx8GVD94eej
-         uftYfz5t+t/yJaZLrYBMVUM4xkLTsBcm0hDt9aC4FPUWm9lgfOThI8/hUeNKNJpHdBdO
-         v1CUDe0OOQg2mYYFVM0M9jWvGiConnmbKDP7ZbZQZwrf0fVposhgTv3Phj5cXc/OlWhr
-         6OkEJutUYx0WbWIavBy0IJy96Qejnxl3WpH2SZ3nshok1SraD2BW8HRAT7TBo8HOK2VE
-         tuEA==
-X-Forwarded-Encrypted: i=1; AJvYcCX3zEHHqk0nakE/YRtK2XyHjiMsaqTe2wF/c0x9Nwf38sTtdpDC2uyQKKsQyCEgtUNGEmqJ7Vg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlUYgKgvSIJNFrgZ402VdjckzAB1W31swHJ43Fum1i+9o+Y4t1
-	dR9cnInDPprFke++vakSTRWLqSLvKidBVryx7TcjSs8tCTyXnX4hdWL4dqQrkJ3hER1KS+BoiSp
-	+oX+NdsFkR1rm0YUS+/dO5y5dQJz9nAXgomTVNA==
-X-Gm-Gg: ASbGncv/jwQ1SZSBtwSOUM9Oq1VHHaqTfeznRP3420wu7NxCnQ/1uTE92KRNNxhTbBE
-	xJlwxknOvS9g4Nl/mt91y86BzCaSOW87ZWeo=
-X-Google-Smtp-Source: AGHT+IHtV2VjryMZleS2mRSEmzy29u4HImGox+Xi3owB9rCNEZ8dtJvHQ7OnZGiommLp2qXb62xl05JUYnr18r9opE8=
-X-Received: by 2002:a05:6902:70b:b0:e3a:398f:6720 with SMTP id
- 3f1490d57ef6-e3c8e67c3cbmr1977245276.38.1733897567797; Tue, 10 Dec 2024
- 22:12:47 -0800 (PST)
+	s=arc-20240116; t=1733897921; c=relaxed/simple;
+	bh=cur8CuoAH+H4jF33FgCR6R1uA3IllajSA0KvS9KrMQc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GhTYzVWWtasYvEXCQLyimPMK0A5brG3Z6GXP82ssZGx/9fYylbn04xst6GRAfhLv29ngnUkFVd4sL0nbxpH6Jw+cPoAiQYCQ+zCNTBgWgj+acD6Fhlt6jLCJKVJCCk/ajHzmdk8zN6gRAqOkdyHp30ZEbfPZiojhSYt6GCXvo70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M6zlZtk3; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733897920; x=1765433920;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cur8CuoAH+H4jF33FgCR6R1uA3IllajSA0KvS9KrMQc=;
+  b=M6zlZtk3ysMGJIE6+/kjxEOHr0+dHXTVvp6ql318iO7eP6Nw/xmJBNby
+   Ls5NOVnGMBT/0JyRIxfGovTjQoFZVMZjsyS28/qSuMrs/86TzDy0bNdHW
+   rmgrQaRRlu712iZFajINyF9WNOJWhQ1DoLIbo9XhUJRwesvRzbKWvTCgD
+   jl28RZ88MI2yKbTMjeFo3yVj52RWx3QjGiZStBlgNyLRFuWjHKsgpEqZZ
+   86G0R/bjduzMEzC/7BtlgYGH6FsRB0Q8VC4HZ0+pg1j9O0CYus7QHsM+v
+   /AVy0TQ489I9WiH4+h2GOYXNAadTeziGiz4Q0ODfi7i00lQe5Lz3xI7k8
+   Q==;
+X-CSE-ConnectionGUID: 52NFVWRTQQ+8F2GMj6AJuw==
+X-CSE-MsgGUID: LylsMFkcSZyoq4q9JJVP5g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="34390458"
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="34390458"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 22:18:39 -0800
+X-CSE-ConnectionGUID: PCFnWO9wRvKGcb6vNOSpXQ==
+X-CSE-MsgGUID: hJqPX/ImR/G57QTjcGJIQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="118921327"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2024 22:18:35 -0800
+Date: Wed, 11 Dec 2024 07:15:35 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michael Dege <michael.dege@renesas.com>,
+	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+	Dennis Ostermann <dennis.ostermann@renesas.com>
+Subject: Re: [PATCH net v2] net: renesas: rswitch: fix initial MPIC register
+ setting
+Message-ID: <Z1kuB1Ac225G8HkY@mev-dev.igk.intel.com>
+References: <20241211053012.368914-1-nikita.yoush@cogentembedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241201074212.2833277-1-andrew@andrewstrohman.com> <Z019fbECX6R4HHpm@nanopsycho.orion>
-In-Reply-To: <Z019fbECX6R4HHpm@nanopsycho.orion>
-From: Andrew Strohman <andrew@andrewstrohman.com>
-Date: Tue, 10 Dec 2024 22:12:36 -0800
-Message-ID: <CAA8ajJ=UYjqVkvxKDTQNpSWpz7+p0+0Ckavpotkh5qUzd1qc0w@mail.gmail.com>
-Subject: Re: [PATCH net-next] dsa: Make offloading optional on per port basis
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241211053012.368914-1-nikita.yoush@cogentembedded.com>
 
-Hi Jiri,
+On Wed, Dec 11, 2024 at 10:30:12AM +0500, Nikita Yushchenko wrote:
+> MPIC.PIS must be set per phy interface type.
+> MPIC.LSC must be set per speed.
+> 
+> Do that strictly per datasheet, instead of hardcoding MPIC.PIS to GMII.
+> 
+> Fixes: 3590918b5d07 ("net: ethernet: renesas: Add support for "Ethernet Switch"")
+> Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+> ---
+> v1: https://lore.kernel.org/netdev/20241209075951.163924-1-nikita.yoush@cogentembedded.com/
+> changes: regenerate against top of net tree (commit 3dd002f20098 "net:
+>          renesas: rswitch: handle stop vs interrupt race") to ensure it
+>          applies cleanly
+> ---
+>  drivers/net/ethernet/renesas/rswitch.c | 27 ++++++++++++++++++++------
+>  drivers/net/ethernet/renesas/rswitch.h | 14 ++++++-------
+>  2 files changed, 28 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
+> index 6ec714789573..dbbbf024e7ab 100644
+> --- a/drivers/net/ethernet/renesas/rswitch.c
+> +++ b/drivers/net/ethernet/renesas/rswitch.c
+> @@ -1116,25 +1116,40 @@ static int rswitch_etha_wait_link_verification(struct rswitch_etha *etha)
+>  
+>  static void rswitch_rmac_setting(struct rswitch_etha *etha, const u8 *mac)
+>  {
+> -	u32 val;
+> +	u32 pis, lsc;
+>  
+>  	rswitch_etha_write_mac_address(etha, mac);
+>  
+> +	switch (etha->phy_interface) {
+> +	case PHY_INTERFACE_MODE_SGMII:
+> +		pis = MPIC_PIS_GMII;
+> +		break;
+> +	case PHY_INTERFACE_MODE_USXGMII:
+> +	case PHY_INTERFACE_MODE_5GBASER:
+> +		pis = MPIC_PIS_XGMII;
+> +		break;
+> +	default:
+> +		pis = FIELD_GET(MPIC_PIS, ioread32(etha->addr + MPIC));
+> +		break;
+> +	}
+> +
+>  	switch (etha->speed) {
+>  	case 100:
+> -		val = MPIC_LSC_100M;
+> +		lsc = MPIC_LSC_100M;
+>  		break;
+>  	case 1000:
+> -		val = MPIC_LSC_1G;
+> +		lsc = MPIC_LSC_1G;
+>  		break;
+>  	case 2500:
+> -		val = MPIC_LSC_2_5G;
+> +		lsc = MPIC_LSC_2_5G;
+>  		break;
+>  	default:
+> -		return;
+> +		lsc = FIELD_GET(MPIC_LSC, ioread32(etha->addr + MPIC));
+> +		break;
+>  	}
+>  
+> -	iowrite32(MPIC_PIS_GMII | val, etha->addr + MPIC);
+> +	rswitch_modify(etha->addr, MPIC, MPIC_PIS | MPIC_LSC,
+> +		       FIELD_PREP(MPIC_PIS, pis) | FIELD_PREP(MPIC_LSC, lsc));
+>  }
+>  
+>  static void rswitch_etha_enable_mii(struct rswitch_etha *etha)
+> diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
+> index 72e3ff596d31..e020800dcc57 100644
+> --- a/drivers/net/ethernet/renesas/rswitch.h
+> +++ b/drivers/net/ethernet/renesas/rswitch.h
+> @@ -724,13 +724,13 @@ enum rswitch_etha_mode {
+>  
+>  #define EAVCC_VEM_SC_TAG	(0x3 << 16)
+>  
+> -#define MPIC_PIS_MII		0x00
+> -#define MPIC_PIS_GMII		0x02
+> -#define MPIC_PIS_XGMII		0x04
+> -#define MPIC_LSC_SHIFT		3
+> -#define MPIC_LSC_100M		(1 << MPIC_LSC_SHIFT)
+> -#define MPIC_LSC_1G		(2 << MPIC_LSC_SHIFT)
+> -#define MPIC_LSC_2_5G		(3 << MPIC_LSC_SHIFT)
+> +#define MPIC_PIS		GENMASK(2, 0)
+> +#define MPIC_PIS_GMII		2
+> +#define MPIC_PIS_XGMII		4
+> +#define MPIC_LSC		GENMASK(5, 3)
+> +#define MPIC_LSC_100M		1
+> +#define MPIC_LSC_1G		2
+> +#define MPIC_LSC_2_5G		3
+>  
+>  #define MDIO_READ_C45		0x03
+>  #define MDIO_WRITE_C45		0x01
+> -- 
+> 2.39.5
 
- Thanks for the review.
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-> Why is this DSA specific?
-
-I can make this more general. I'm not aware of potential
-users outside of switchdev and dsa. Are you anticipating
-additional users outside of switchdev?
-
-I could make this more general, and just implement
-for dsa for now. Then later, if someone else wants
-this functionality for switchdev, or something else,
-they could implement that part.
-
-
-> Plus, you say you want to disable offloading
-> in general (DSA_FLAG_OFFLOADING_DISABLED), but you check the flag only
-> when joining bridge.
-
-I think it's only required for joining a bridge because
-that's where dp->bridge gets assigned. All the other
-offloading related code paths check dp->bridge
-either directly or indirectly, to determine if the port
-is offloaded or not before continuing. If you see
-an offloading related code path that does not
-consider dp->bridge before moving forward,
-please let me know.
-
-
-> I mean, shouldn't this be rather something exposed
-> by some common UAPI?
->
-> Btw, isn't NETIF_F_HW_L2FW_DOFFLOAD what you are looking for?
-
-It sounds like Vladimir doesn't like this suggestion. So,
-I considered introducing another netdev feature for this, but
-I noticed that we are currently maxed out since
-netdev_features_t is u64 and NETDEV_FEATURE_COUNT
-is 64.
-
-I considered changing netdev_features_t to a bitmap,
-so that we can keep adding additional features, but
-there are users doing bitwise operations directly on
-instances of netdev_features_t, so that seems difficult
-to untangle.
-
-Do you have a suggestion about how to proceed?
-How should I signal that offloading should be disabled?
 
