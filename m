@@ -1,256 +1,266 @@
-Return-Path: <netdev+bounces-151085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17BA29ECC99
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:51:46 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 621FC9ECCD3
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 14:05:55 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61B76167F88
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:05:42 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D809522914A;
+	Wed, 11 Dec 2024 13:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="ld0bCr/k"
+X-Original-To: netdev@vger.kernel.org
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2058.outbound.protection.outlook.com [40.107.21.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEAB32814D5
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 12:51:40 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A288E23FD17;
-	Wed, 11 Dec 2024 12:51:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="X9SRhYUO"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CDC1E50B
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 12:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733921498; cv=none; b=eXOutC5xg/VM1qOOBN30X72qjvJCVG4S2dAZuYjw2sWWwMxDsZmoBUffjg89EBOa1bFVnzYFdd48nySjkIOaRZK5Q2OFgs8QIMK5oPeZixMx3N7J0dc4XBzcGaChh/aHdZ0A0rAeUiQLjdgdYQzEkE6RR3XHHXlFFIw+2Ta7ULk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733921498; c=relaxed/simple;
-	bh=0OUWphyTbf6xBZM1dUwTwW/QFrk4VopnS/m0vm8v1vI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jJyrq1lpFsVbl6aQXrmZUTojnKHsgB+NbFgJabaveEF9yBsM39eJZQqCoZ643KLQgS0Iq1YOaVQ8G5BRv3YfQXj1ZsNzPFBfZRTsHZAcbtF5B8a5gTY7W0lJBo3S2yYpEN3zdN1Uk3VB3Sakn42OfbadPXj0A1EHYRWY/3rfNso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=X9SRhYUO; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-436202dd730so2715105e9.2
-        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 04:51:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1733921495; x=1734526295; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nd4cR7VNkiPh4DainW3uYEi6+FSg1iou6ceeUwexMCU=;
-        b=X9SRhYUOJaS8NI3ZiDbv1Ma9afDl9N1WQvLeabFxRxdrL0V7oreMdcEg2kZaXVVxMp
-         /F1TwX0qB0E7JFUwjQQpAWVI9toRCXSE2O9LNpfXhXwc/dfXnlksvjK3GJJU/+0Tqw07
-         xrmq2yCdp1M0pWFLxl6gLmPWEhS0Nyk2Njqks1qjwr7oEa20+zUsPwvBgDxo6s3tVmaW
-         VwARXTvaD422lsoCe9maNU0RSHaA5ipO3cLew6eoGip/7glFUENf+ltfLzuyyPc2yYmo
-         7TLY1VYzHCMP5i3P5Pc5J8yfs1aV++FB+lTdLgrMETrVY2b0nCSLFLTOqjqXuJ0qKyn0
-         rAag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733921495; x=1734526295;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Nd4cR7VNkiPh4DainW3uYEi6+FSg1iou6ceeUwexMCU=;
-        b=Czg+s8xC2OANUbOgX/m0Lv1rVj8CqdkwfbjeeYLIp/iYm+OIf5u/pZLFbJrTvR7RFe
-         jRqSTeN1vA6tIKmuXmttSw5HPP6We5h8QadQSHZZCen8K0duRVmK7Qkl3Hs5DJBNhGZc
-         THeM/au6EsLNS738gHRkNhSQCsVaTYxi4gY39jPLm1319v/BR31GvgxvCNeczKGKkwAJ
-         2qDAt3D7XvlU/iObhVQjOqz/8mXrDqmGMtWysaSPPfJQp9I67M2cBIqlLAuLb3uLgeL6
-         l3cGxrx+8lmWV+dOQOqEWmLcPUGW2ChJ8XW5+xIDpDwi8hK38uY0Y14HXHj0qJLZMyVJ
-         5F5Q==
-X-Gm-Message-State: AOJu0YwZU/j3cchPB7oIMJw5VCVs1k6iweT0l7OR47kQ7FgpLxtVE0Dc
-	HSs6ic7gbL0IG/EkCuKFpc5gWINzZ2d7VVBCpRifXk8i21mH7BHNJRs0gNiWkZQ=
-X-Gm-Gg: ASbGncsgLXeYJ2X8Z76Qp+WIdpqaHxo2fEOVe8cd25X3D1SxGgOpFzSZhBlZcQXjooW
-	Gwve+smUSrBOVQrk5AvnGGdzIJxPPrdjmTazzeMCD5QsOexbJ9gnR9Ne1+nOsk5+8H/y/9Mh+3f
-	f/b9JIQfKTvSjrew7DZMZ4QJSYaZAtlKIdFZ33PX1iAMRE2huIqNVfUCGPJai72U7urBp532SOT
-	BrxG1FF5FU4n1lZkVa+lZ5KvgGAVp7PZ3GP2Xh2IpImHv15SBG53KxqG9yigxob89KlGOyBPmlf
-	/T+RYy21QnhD0A==
-X-Google-Smtp-Source: AGHT+IEAhSjKj7WdnSQujhKoCbXsLtfE3ig+PhAU836+YP/N5IG6Z7pZ3cnPntdYmIp9qR/MmIzbzw==
-X-Received: by 2002:a05:600c:4e4b:b0:435:306:e5dd with SMTP id 5b1f17b1804b1-4361c42c70bmr17359425e9.22.1733921494713;
-        Wed, 11 Dec 2024 04:51:34 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:f6e8:f722:d96d:abb? ([2001:67c:2fbc:1:f6e8:f722:d96d:abb])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-387824a5005sm1229367f8f.41.2024.12.11.04.51.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Dec 2024 04:51:34 -0800 (PST)
-Message-ID: <4471b912-d8df-41ba-9c3b-a46906ca797d@openvpn.net>
-Date: Wed, 11 Dec 2024 13:52:18 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F58D226186
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 13:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733922289; cv=fail; b=JUfR8MMxoIC0Zpf32B5sY2YUfNfZ4IAt2qxPn/JljizGNCshylPXgXqZjVjdTiOya5t4stO9S2vCmhkVdIIg8YLW5a0JEvISZgKUl6FJxLO8qy3KOPubBtNxMXTtYSaCa+RfBUeGKTItZuvPg58JU/c72SqhB5he8kuXqiI57V0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733922289; c=relaxed/simple;
+	bh=//0CVQc+R9U9Bo4Nez3RqO4u89We/Xk9P+rRNzEfRW8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CfYMYgtxEkY282Mvlw5DNibiGgVuujaZ66bY5YgeePOtXl5Ael4hncNGN9BOr/tVHy5g5wOsep8HN6SSmbC2cIbZpsEWQRtMtomE/zbpWTjLYEFZiAswiu2k7SiABzS6BTNObjmZp/WbEssMU4MOQEpR/86GCzoDv8bGaZT9Qt8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=ld0bCr/k; arc=fail smtp.client-ip=40.107.21.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=voMosCCkyLiFYDDZTypnafR6+uJTjJYL/lJfCF4Qv2ru28qFIlGwJ8+DRm/N8sS8Ht29brPQOexYO/JdgzWEOfVGDIe6sPk2mkrLlLfHhS7fNPwluXIp9b//AMS+DiiJpxMN+neJSqZau9t6VD5prG3e9WBNUnakXMYAyuhxRgzfvqp359DRnAwBvedWR6MeCz+a8f94t4F3K5chQer0E2/Xoha8HMKKklLb+M0KxOascX9Xn//vJuzdkLlv8htSo5pbEu04O0PoYMWluj2q4Qpe4crwXBf/v45e3s6MOP4HeTfW5QjMsHzPhpOz6grz1Lefvu1d/6sCSKsBr4mxgg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rXU+LzkObK7XGONLjeXShC+uaDDFRIurscnvhWR1wG0=;
+ b=yb4elkZ0V72pRk5XAScsh+RfNpp06SAqGozj032MAa6+qvs6ZF8BYhfrcxvv/SU9ECsnd0xsdKVt2GxPIOvxnd7Kd+Sl1+MFDffTH/HEaVsZuTMlrQQp1/FxpSaLo4ssc322tRUA2387XaMcS5bRkKt0jNFI/qB2wdf7T+y8adMqJpUsRdsJ+XHlga4InBflZz9DrRtCsPWduF2fdn0aFKAeHKbg00+/hyTUBqryaC2Xc2EEeYgTEHu4v1yJGx/NEi5NC1JG1iqjmYXLmUDkBBQfDwf72naIiXnzpJZCpqHkxcvNPZkdlIH6ldI4xpxuIRCXaYGRds8MDA2QAAdSvA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=jo-so.de smtp.mailfrom=arri.de; dmarc=fail
+ (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
+ not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rXU+LzkObK7XGONLjeXShC+uaDDFRIurscnvhWR1wG0=;
+ b=ld0bCr/kQjqru2Qlj1TrPyjIsXhuY2h8sp+Iylz47rs/YSHo7qWb6Ywg7ZTi6DyrD2UXp90gDxCE/juQj7LsXRDDK91z5gKvptySAN37oODwbA3stErpPc+U6MpZaBsDfFZeo1JhR2XBZI1275VimazaZXRaEULz6owV3wiPkIU=
+Received: from DU7P194CA0007.EURP194.PROD.OUTLOOK.COM (2603:10a6:10:553::30)
+ by AS8PR07MB8072.eurprd07.prod.outlook.com (2603:10a6:20b:35b::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Wed, 11 Dec
+ 2024 13:04:38 +0000
+Received: from DB1PEPF000509FE.eurprd03.prod.outlook.com
+ (2603:10a6:10:553:cafe::18) by DU7P194CA0007.outlook.office365.com
+ (2603:10a6:10:553::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8251.15 via Frontend Transport; Wed,
+ 11 Dec 2024 13:04:38 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ DB1PEPF000509FE.mail.protection.outlook.com (10.167.242.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8251.15 via Frontend Transport; Wed, 11 Dec 2024 13:04:38 +0000
+Received: from n9w6sw14.localnet (10.30.4.231) by mta.arri.de (10.10.18.5)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Wed, 11 Dec
+ 2024 14:04:37 +0100
+From: Christian Eggers <ceggers@arri.de>
+To: =?ISO-8859-1?Q?J=F6rg?= Sommer <joerg@jo-so.de>
+CC: Andrew Lunn <andrew@lunn.ch>, <netdev@vger.kernel.org>
+Subject: Re: KSZ8795 not detected at start to boot from NFS
+Date: Wed, 11 Dec 2024 14:04:37 +0100
+Message-ID: <2675613.fDdHjke4Dd@n9w6sw14>
+Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
+In-Reply-To: <cxe42bethnzs7f46xxyvj6ok6ve7itssdxyh2vuftnfws4aa3z@2o4njdkw3r5i>
+References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
+ <5708326.ZASKD2KPVS@n9w6sw14>
+ <cxe42bethnzs7f46xxyvj6ok6ve7itssdxyh2vuftnfws4aa3z@2o4njdkw3r5i>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v14 17/22] ovpn: implement peer
- add/get/dump/delete via netlink
-To: Xiao Liang <shaw.leon@gmail.com>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- sd@queasysnail.net, ryazanov.s.a@gmail.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241209-b4-ovpn-v14-0-ea243cf16417@openvpn.net>
- <20241209-b4-ovpn-v14-17-ea243cf16417@openvpn.net>
- <CABAhCOSJCoZFuevjcwvdJ+==TpGEJZPmvvHfT=U3Kf_-Ob+BnA@mail.gmail.com>
- <5a3d1c9b-f000-45c1-afd3-c7a10d2a50e8@openvpn.net>
- <CABAhCOSNRu1QfVr_0Las+dSMsbrVE=HLT6pzqQHODkUTxBi0-Q@mail.gmail.com>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <CABAhCOSNRu1QfVr_0Las+dSMsbrVE=HLT6pzqQHODkUTxBi0-Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB1PEPF000509FE:EE_|AS8PR07MB8072:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8cd49a5e-a168-4381-83c5-08dd19e45e4c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?NVpzcUtKK3Y1S3BLTjVaOGxtM0lKNGpwUmptRksvblNJcjZVT04vREx1N3ZC?=
+ =?utf-8?B?NGNlby8xZEtlek8rUGJlRER4aUxBcXFkWnVjOWFkY0k0YW9rVXRsOEIwR3JC?=
+ =?utf-8?B?YWIzRXppN2paRUJVWjBnNGU5M0lPZ0pFKzhRQi94dXg1VFFJckdnZlNiN2lS?=
+ =?utf-8?B?czFJWldyaHpSdk9Zb1NrTmVNQkkwM2hiVTltenI5UEJuMnVDYUg0UGd2d0NQ?=
+ =?utf-8?B?c2F3NUVtV0hEMHVwSkZhWU9EZkxBWkprM0oycG9FRDVmMmMySEhqQTVodGxU?=
+ =?utf-8?B?cmRaZ3ZBY3FRVnczQngrcVB2NDhkeWZVeHdQSGVxZTZzQXd4VTJDeTBQbzEz?=
+ =?utf-8?B?OHJSNUx2aElZcmVzUmdTZkwyOVE4RXZEZWx6bU1qT2dIVEhJNld3WHNtV3F0?=
+ =?utf-8?B?ZW5XTVRxY2dHWVRWU2JjcVNzNFFsV0N5MEd0clcwNWNac1licDlvaG0yeDFH?=
+ =?utf-8?B?Zm5OS3p0SHRCTkk0bnZ1elB1N1c5YkVpSUd5QzZQRENyTm9TNEFwK0tGSDZt?=
+ =?utf-8?B?ZFd6RU5GaHBNTWRHVHczRzVzN0ZJamExSUFtM3B6eGpDMkZwZGIyVXprQ0pE?=
+ =?utf-8?B?V1lBdVZmUkJ1SDNCRkdGY2R4bTBCSUp1bzBNVlV6eGxURXJBUXZvRnNURDF0?=
+ =?utf-8?B?TVA2VGwvb1NPdmo1TjZSSTVPTFBia2o1WjgrOXQyamRRUTlkQWZvMEVPT05w?=
+ =?utf-8?B?N3B6anBHY3c3ZUpRRFBRcFNvdS9ISkphWkFlSjlHZlJMSkkvaXBQVlJmWnZP?=
+ =?utf-8?B?TjF0VUY1U0hWZFQ0aGFOakFQbTk2b0VXcG14UitpeW1kT3Y5SWxaVnQyWDZs?=
+ =?utf-8?B?SEhwNlJTTkNpV3psUEtaZ09IWnFJeGlJMVVkKzRST3l1M1hibGp6cmxSNXBW?=
+ =?utf-8?B?QlVLRmZCcWVKeXFCb2FienhwS3liN0d1aU5YYXVIanUzZjFDam1iS3RpZWkv?=
+ =?utf-8?B?bUR6K1U4TFZXcUhmUkt0UmtSUFYvWVE0SzVaV21jVll2WW5pRWxzS2tvSHUr?=
+ =?utf-8?B?UnBWSkNLcWM0QnVKYTBJUHRSdDltQU5CSXZLRHJNelZwMFdoU3VMOWtlRkNl?=
+ =?utf-8?B?NzhscHJyQkpIc1VqdC9ISXBiRlFzNURHS0JMTmxKOGVIbTZYSGc5em5hdHJz?=
+ =?utf-8?B?SjYzZVA0US9YL0lWZXlCQzZBMjhSemlKc20rRjJ0YUppbyt0aEVUYUFxNDBH?=
+ =?utf-8?B?RG53UnVXUlFyNXJDdWg2aGw5MEtUNVYvQWxnNFlCNDB4bUhNS29BTzFOWi84?=
+ =?utf-8?B?dGlWcEJUUHhYWVJKVll5VWJaVDVGOFJqUGlzV1ZpVUJYaG51eTg5YVMvKytk?=
+ =?utf-8?B?OE93c0hPWEtXNERDdWRsMkF0Z255Mm1FOFA5VG5SYUQyTXl1R2RtblIyMFE3?=
+ =?utf-8?B?eEI3Q1RsVHRteXZFbXF2blYxbTRHaGZCQ1dzNW83U1QxSndDdWNERTIvbDhs?=
+ =?utf-8?B?TnFnWjR6R0JmVVZ4RXBVOHIrdklQUmhqR3NTOUR5R2x3YmtJNVkzRFB3WkJN?=
+ =?utf-8?B?dE1EN1BGMVM0Zm5uL0ZDbUMrVGFGcmZaelpEWTErYzYxcER3RDVLRi90bzcy?=
+ =?utf-8?B?Wno2bnZXd05FWjBjRWNod250ZSt5WTVCYWV0WDhQZUI1bG5pMmppbnFJQWd6?=
+ =?utf-8?B?cXZjemJ5aklqaDVLemtBWkNuSGNFODJRWHpaZnRTdWFZbE00Kzl3R2FENmlm?=
+ =?utf-8?B?QzhNUmp4MEtqbWNpMnVPWFkxai93M0JSMWlYZmN1L1dUTFhDUkM3QmUybVVa?=
+ =?utf-8?B?RThtYmR0K1kycDVrM3cvY3dhbWlQTElpVWNLUWZoRzdVMCtyZ1E2QVRWbFdy?=
+ =?utf-8?B?c1NUSXNzaktSTUVqaElnbElPbi9WV2VhRytuYTN3VmpZVEVHYkdNRWlrYXA1?=
+ =?utf-8?B?bHNzVUJvdkFkMFVZbnZnY3pMS25vcXJuMll4UEJjcVJUZnZzWW1YV2NuVjJB?=
+ =?utf-8?Q?Cz1cNUzVMvE=3D?=
+X-Forefront-Antispam-Report:
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2024 13:04:38.0695
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8cd49a5e-a168-4381-83c5-08dd19e45e4c
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource: DB1PEPF000509FE.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR07MB8072
 
-On 11/12/2024 13:35, Xiao Liang wrote:
-> On Wed, Dec 11, 2024 at 7:30 PM Antonio Quartulli <antonio@openvpn.net> wrote:
->>
->> Hi Xiao and thanks for chiming in,
->>
->> On 11/12/2024 04:08, Xiao Liang wrote:
->>> On Mon, Dec 9, 2024 at 6:48 PM Antonio Quartulli <antonio@openvpn.net> wrote:
->>> [...]
->>>> +/**
->>>> + * ovpn_nl_peer_modify - modify the peer attributes according to the incoming msg
->>>> + * @peer: the peer to modify
->>>> + * @info: generic netlink info from the user request
->>>> + * @attrs: the attributes from the user request
->>>> + *
->>>> + * Return: a negative error code in case of failure, 0 on success or 1 on
->>>> + *        success and the VPN IPs have been modified (requires rehashing in MP
->>>> + *        mode)
->>>> + */
->>>> +static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info *info,
->>>> +                              struct nlattr **attrs)
->>>> +{
->>>> +       struct sockaddr_storage ss = {};
->>>> +       struct ovpn_socket *ovpn_sock;
->>>> +       u32 sockfd, interv, timeout;
->>>> +       struct socket *sock = NULL;
->>>> +       u8 *local_ip = NULL;
->>>> +       bool rehash = false;
->>>> +       int ret;
->>>> +
->>>> +       if (attrs[OVPN_A_PEER_SOCKET]) {
->>>
->>> Similar to link attributes in other tunnel drivers (e.g. IFLA_GRE_LINK,
->>> IFLA_GRE_FWMARK), user-supplied sockets could have sockopts
->>> (e.g. oif, fwmark, TOS). Since some of them may affect encapsulation
->>> and routing decision, which are supported in datapath? And do we need
->>> some validation here?
->>
->> Thanks for pointing this out.
->> At the moment ovpn doesn't expect any specific socket option.
->> I haven't investigated how they could be used and what effect they would
->> have on the packet processing.
->> This is something we may consider later.
->>
->> At this point, do you still think I should add a check here of some sort?
->>
-> 
-> I think some sockopts are important. Especially when oif is a VRF,
-> the destination can be totally different than using the default routing
-> table. If we don't support them now, it would be good to deny sockets
-> with non-default values.
+Hi J=C3=B6rg,
 
-I see - openvpn in userspace doesn't set any specific oif for the 
-socket, but I understand ovpn should at least claim that those options 
-are not supported.
+On Wednesday, 11 December 2024, 13:23:38 CET, J=C3=B6rg Sommer wrote:
+> Christian Eggers schrieb am Mi 11. Dez, 11:18 (+0100):
 
-I am a bit lost regarding this aspect. Do you have a pointer for me 
-where I can see how other modules are doing similar checks?
+> I think for 8795 these are optional. At me, it works with 0 and 3.
+Hmm, I understood that setting SPI mode to 3 (by my patch) is the
+root of your problem? If you revert my patch and set spi-cpol + spi-cpha
+in you device tree, the result should be more or less the same.
 
-> 
->>>
->>> [...]
->>>> +static int ovpn_nl_send_peer(struct sk_buff *skb, const struct genl_info *info,
->>>> +                            const struct ovpn_peer *peer, u32 portid, u32 seq,
->>>> +                            int flags)
->>>> +{
->>>> +       const struct ovpn_bind *bind;
->>>> +       struct nlattr *attr;
->>>> +       void *hdr;
->>>> +
->>>> +       hdr = genlmsg_put(skb, portid, seq, &ovpn_nl_family, flags,
->>>> +                         OVPN_CMD_PEER_GET);
->>>> +       if (!hdr)
->>>> +               return -ENOBUFS;
->>>> +
->>>> +       attr = nla_nest_start(skb, OVPN_A_PEER);
->>>> +       if (!attr)
->>>> +               goto err;
->>>> +
->>>> +       if (nla_put_u32(skb, OVPN_A_PEER_ID, peer->id))
->>>> +               goto err;
->>>> +
->>>
->>> I think it would be helpful to include the netns ID and supported sockopts
->>> of the peer socket in peer info message.
->>
->> Technically the netns is the same as where the openvpn process in
->> userspace is running, because it'll be it to open the socket and pass it
->> down to ovpn.
-> 
-> A userspace process could open UDP sockets in one namespace
-> and the netlink socket in another. And the ovpn link could also be
-> moved around. At this moment, we can remember the initial netns,
-> or perhaps link-netns, of the ovpn link, and validate if the socket
-> is in the same one.
-> 
+If you think that your problem is related to the reset timing, feel
+free to increase the sleep time after asserting/deasserting the reset
+line. Beside the hardware reset there's usually also a software reset.
+But this type of reset normally doesn't affect consecutive register
+accesses.
 
-You are correct, but we don't want to force sockets and link to be in 
-the same netns.
+> I'm not an expert. So, please, double check this: the spec [1] says on
+> page 53, table 4-3, register 11, bit 0 =E2=80=9CTrigger on the rising edg=
+e of SPI
+> clock (for higher speed SPI)=E2=80=9D. According to [2] the rising edge i=
+s cpol=3D0
+> and mode 0. So, =E2=80=9Chigher speed SPI=E2=80=9D (I think this is the 2=
+5MHz) should use
+> mode 0.
+>
+> [1] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Produc=
+tDocuments/DataSheets/KSZ8795CLX-Data-Sheet-DS00002112.pdf
+> [2] https://electronics.stackexchange.com/a/455564
 
-Openvpn in userspace may have been started in the global netns, where 
-all sockets are expected to live (transport layer), but then the 
-link/device is moved - or maybe created - somewhere else (tunnel layer).
-This is not an issue.
+I hate SPI because of its poorly written specifications! When I read the
+corresponding sections of the KSZ9563 DS [3], I come to the conclusion that
+the register bit you mentioned above affects the SPI *output* signal=20
+(SPIQ a.k.a MISO). This would also make more sense, as you usually
+cannot change the behavior of the SPI input lines.
 
-Does it clarify?
+[3] https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-DS=
+00002419D.pdf
 
-Thanks
+Page 68, on the bottom:
+> *SPI Data Out Edge Select*
+> 0 =3D SDO data is clocked by the falling edge of SCL
+> 1 =3D SDO data is clocked by the rising edge of SCL
 
--- 
-Antonio Quartulli
-OpenVPN Inc.
+So the bit 0 is intended to adjust the phase of the SPIQ/SDO/MOSI output
+signal, in order to avoid that this signal is switched at the same clock ed=
+ge
+where your uC samples the MISO input.
+
+Also for the KSZ8795CLX there seems to be a mismatch regarding the SPI clock
+polarity in the datasheet. Page 28 (functional description) implies CPOL=3D1
+whilst page 123 (timing diagram) shows CPOL=3D0. I would trust the latter
+in this case.
+
+>=20
+>=20
+> > On Thursday, 19 November 2020 07:48:01 -0600, Rob Hering wrote:
+> > > On Wed, Nov 18, 2020 at 09:30:02PM +0100, Christian Eggers wrote:
+> > ...
+> > > > +        ksz9477: switch@0 {
+> > > > +            compatible =3D "microchip,ksz9477";
+> > > > +            reg =3D <0>;
+> > > > +            reset-gpios =3D <&gpio5 0 GPIO_ACTIVE_LOW>;
+> > > > +
+> > > > +            spi-max-frequency =3D <44000000>;
+> > > > +            spi-cpha;
+> > > > +            spi-cpol;
+> > >=20
+> > > Are these 2 optional or required? Being optional is rare as most
+> > > devices support 1 mode, but not unheard of. In general, you shouldn't
+> > > need them as the driver should know how to configure the mode if the =
+h/w
+> > > is fixed.
+> > ...
+> >=20
+> > It seems that I considered the h/w as "fixed". The pre-existing device =
+tree
+> > bindings and the diagrams on page 53 suggested that SPI mode 3 is the o=
+nly
+> > valid option. Particularly the idle state of the "SCL" signal is high h=
+ere:
+> >=20
+> > https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-DS=
+00002419D.pdf
+> >=20
+> > But the text description on page 52 says something different:
+> > > SCL is expected to stay low when SPI operation is idle.=20
+> >=20
+> > Especially the timing diagrams on page 206 look more like SPI mode 0.
+> >=20
+> > So it is possible that my patch was wrong (due to inconsistent descript=
+ion
+> > on the data sheet / pre existing device tree binding). As I already men=
+tioned,
+> > I did this only due to the DT conversion, I actually don't use SPI on s=
+uch
+> > devices myself.
+> >=20
+> > N.B. Which KSZ device do you actually use (I didn't find this in you pr=
+evious
+> > mails)?
+>=20
+> I'm using KSZ8795.
+
+I should better read the subject line ...
+
+Summary:
+=2D The timing diagrams of KSZ8795CLX and KSZ9563 implies that SPI mode 0 i=
+s correct
+=2D The functional descriptions in the datasheets look more like SPI mode 3=
+, but this
+  is not authoritative.
+=2D Maybe that the KSZ devices can work with both modes.
+
+
+regards,
+Christian
+
+
 
 
