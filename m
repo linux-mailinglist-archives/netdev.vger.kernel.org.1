@@ -1,114 +1,152 @@
-Return-Path: <netdev+bounces-150980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8831D9EC3F1
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 05:21:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E30B9168387
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 04:21:14 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3237F1BD9CA;
-	Wed, 11 Dec 2024 04:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s8ESym3d"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AFFD9EC408
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 05:34:57 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7A52AE90
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 04:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1BE628428E
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 04:34:54 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31F61C07C6;
+	Wed, 11 Dec 2024 04:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="IJPud503"
+X-Original-To: netdev@vger.kernel.org
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F1D2451C1;
+	Wed, 11 Dec 2024 04:34:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733890874; cv=none; b=STih0pPLZaU9V0Z5NKauU8hROCdP1Yf0dkxcorlGm4TkO9AMJNzAf7TeT90B92DY26jaBdS9HE8GFGqjFj9R577uxjBTefOJQJNrUYWhTUx32SknjR79qYU676v/PNF3X2XaQ7tl3q26d6PaeI4+u7aCaiM0TciLlGPg2FCysFk=
+	t=1733891688; cv=none; b=C/RT1NeRrsxI8j+7E82VjPWVfZzrZSZFLHa0IgU56Bo8P3SZ1ovI3qWiIdbV65+sQ+BpyyDE0vQTIp7O+aS4iomNcXVYjl2t1OFnT/VcRt1EQUsZjQtinBeE01DmOLyUiWQFgM6JmTilsXNB3FYBPvHFWYDGWAXfw/TFBnZRVeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733890874; c=relaxed/simple;
-	bh=00Xr4iiIPcrxg8sF6uscKsYeAVXQPkoHYFPv+z1hHhQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CE6LyhPPnwu5Us6sTJqoyHiw/m7ESYEEDqjUtYXHP3iUr8ts3z5U/K9sBNR34SPX8GpwVyrx2MdGQeYXVS23Y2r8Hf2UXVkaFmPeWHWeowpD0jAunqvy6MN650aeA3bDezrpob69pZRvOkAHcYL4dntnwgysuGaKPbMYoVmDZps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s8ESym3d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E338CC4CED2;
-	Wed, 11 Dec 2024 04:21:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733890873;
-	bh=00Xr4iiIPcrxg8sF6uscKsYeAVXQPkoHYFPv+z1hHhQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s8ESym3dEZqHWhAxasFMSDQMWKT8bUdo4BGeqJYrHiYsgHklnE+3cWNZe0vHK14ir
-	 fdf7+wliWyrkEnp8oPENX+BWfSHQ7cxJicZ/pG/qItyEbRQnbBtEZ1npIdQqqBzxt6
-	 LennZzmTpI/2/xI5RxFDVsDLp7rpeKG8BQcRoeznLdnf9k7ljrDip9NsmKTbXPb4d2
-	 CgSq0YFk+NJ5fPrhhiBfyots77Fz7xREzRsfxA5zjCNAZQjDUTSbVYB/Tvz39BSqnU
-	 JbSRe54n0HnztuJTYFhO0W08cOFyWJv7rIQzYLyuA75Q1Kl1s5qYgqFsRtU6xYFInw
-	 loK8M2Q8jL9Jg==
-Date: Tue, 10 Dec 2024 20:21:11 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, andrew+netdev@lunn.ch,
- edumazet@google.com, pabeni@redhat.com, davem@davemloft.net,
- michael.chan@broadcom.com, tariqt@nvidia.com, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH v1 net-next 2/6] net: napi: add CPU affinity to
- napi->config
-Message-ID: <20241210202111.7d3a2dc8@kernel.org>
-In-Reply-To: <Z1eZXKe58ncARD2N@LQ3V64L9R2>
-References: <20241210002626.366878-1-ahmed.zaki@intel.com>
-	<20241210002626.366878-3-ahmed.zaki@intel.com>
-	<Z1eZXKe58ncARD2N@LQ3V64L9R2>
+	s=arc-20240116; t=1733891688; c=relaxed/simple;
+	bh=+6iom3xS2EcNM1rvfQkOHsuFsgIrc5Jo/yPosMOw+8I=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=OtnXlDmr7igFEUBRJuCxlaqmgfdxzQ578452dcmzngwKGPo7O9rVrs3nJveZIXhWD7Ccgn+2QdMy1GLtpi+swbYr9kqQ8W8notJT5v5pTpgc+wKNsKJcMFK5KiXS+PqUZ1oSJZar8/HNt8U8Rep4y3noWnG0rzNZrctz6OKbHPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=IJPud503; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [100.65.208.14] (unknown [20.236.11.185])
+	by linux.microsoft.com (Postfix) with ESMTPSA id C44BD204722B;
+	Tue, 10 Dec 2024 20:34:43 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C44BD204722B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1733891686;
+	bh=SKADluaoUiTETH1UwG/V5DVCwgNdNCuMvx/YiXR3rAc=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=IJPud503TZQ7qC+nAh33r29ZAguv/DZaDYDmYDAbJHqsXv7vFEisx4C+2Bx4/X0Ny
+	 QNmGT6WWiLLDSDyIxMX24BlKcPvLa2DRjFmS0GhpoB9JmvKOYeEniEHPcKfYI5Rx3Y
+	 UFvay1FmNXEMmTdeKu7+xEJKV27TsW4+ndYHIugA=
+Message-ID: <d93e388c-ed18-400c-b6cf-ec00a5979457@linux.microsoft.com>
+Date: Tue, 10 Dec 2024 20:34:43 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Cc: Andrew Morton <akpm@linux-foundation.org>, eahariha@linux.microsoft.com,
+ Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Julia Lawall <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>,
+ Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>,
+ Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
+ <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
+ Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
+ <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>,
+ Dick Kennedy <dick.kennedy@broadcom.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Jack Wang <jinpu.wang@cloud.ionos.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
+ <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
+ Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
+ Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Louis Peens <louis.peens@corigine.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>
+Subject: Re: [PATCH v3 00/19] Converge on using secs_to_jiffies()
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
+ <315e9178-5b10-4de0-bdcf-7243e0e355bb@oss.qualcomm.com>
+ <20241210153604.cf99699f264f12740ffce5c7@linux-foundation.org>
+ <20241210173548.5d32efe0@kernel.org>
+ <20241210183130.81111d05148c41278a299aad@linux-foundation.org>
+ <20241210184129.41aaf371@kernel.org>
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+Content-Language: en-US
+In-Reply-To: <20241210184129.41aaf371@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Mon, 9 Dec 2024 17:29:00 -0800 Joe Damato wrote:
-> My understanding when I attempted this was that using generic IRQ
-> notifiers breaks ARFS [1], because IRQ notifiers only support a
-> single notifier and so drivers with ARFS can't _also_ set their own
-> notifiers for that.
-
-Ah, you are so right, I forgot the details and was grepping for
-notifier registration :S
-
-> Two ideas were proposed in the thread I mentioned:
->   1. Have multiple notifiers per IRQ so that having a generic core
->      based notifier wouldn't break ARFS.
->   2. Jakub mentioned calling cpu_rmap_update from the core so that a
->      generic solution wouldn't be blocked.
+On 12/10/2024 6:41 PM, Jakub Kicinski wrote:
+> On Tue, 10 Dec 2024 18:31:30 -0800 Andrew Morton wrote:
+>>>> I'll just grab everything and see if anyone complains ;)  
+>>>
+>>> I may, if this leads to a conflict :(  
+>>
+>> Very unlikely, and any such conflict will be trivial.
 > 
-> I don't know anything about option 1, so I looked at option 2.
+> Agreed, mainly I don't understand why we'd make an exception
+> and take the patchset via a special tree.
 > 
-> At the time when I read the code, it seemed that cpu_rmap_update
-> required some state be passed in (struct irq_glue), so in that case,
-> the only way to call cpu_rmap_update from the core would be to
-> maintain some state about ARFS in the core, too, so that drivers
-> which support ARFS won't be broken by this change.
+>>> Easwar, please break this up per subsystem.  
+>>
+>> The series is already one-patch-per-changed-file.
 > 
-> At that time there was no persistent per-NAPI config, but since
-> there is now, there might be a way to solve this.
-> 
-> Just guessing here, but maybe one way to solve this would be to move
-> ARFS into the core by:
->   - Adding a new bit in addition to NAPIF_F_IRQ_AFFINITY... I don't
->     know NAPIF_F_ARFS_AFFINITY or something? so that drivers
->     could express that they support ARFS.
->   - Remove the driver calls to irq_cpu_rmap_add and make sure to
->     pass the new bit in for drivers that support ARFS (in your
->     changeset, I believe that would be at least ice, mlx4, and
->     bnxt... possibly more?).
->   - In the generic core code, if the ARFS bit is set then you pass
->     in the state needed for ARFS to work, otherwise do what the
->     proposed code is doing now.
+> More confusingly still, they did send one standalone patch for 
+> an Ethernet driver:
+> https://lore.kernel.org/all/20241210-converge-secs-to-jiffies-v3-20-59479891e658@linux.microsoft.com/
+> And yet another Ethernet driver (drivers/net/ethernet/google/gve/) 
+> is converted in this series.
 
-SG, maybe I'd put the flag(s) in struct net_device, so that we are sure 
-the whole device either wants the new behavior or not.
+Sorry about the confusion, I missed pulling the gve patch from this
+series. I'll send that (and ath11k) separately as well. I'll pull all
+these together into a series so you can merge them together if you prefer.
 
-I say flag(s) because idpf probably wants just to opt in for affinity
-mask management, without ARFS. So pretty close to Ahmed's existing code.
-ARFS support will require another flag to ask for rmap management in
-the core as you describe.
+Thanks,
+Easwar
 
