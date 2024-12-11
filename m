@@ -1,173 +1,115 @@
-Return-Path: <netdev+bounces-151080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E48A09ECBFB
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:24:15 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5090A9ECC18
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 13:32:59 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69A86283FCA
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 12:24:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EA181888853
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 12:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5454A225A2A;
-	Wed, 11 Dec 2024 12:24:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D6E5238E35;
+	Wed, 11 Dec 2024 12:32:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from s1.jo-so.de (s1.jo-so.de [37.221.195.157])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115611C173F
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 12:24:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.221.195.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8B4238E23
+	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 12:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733919847; cv=none; b=fPmxOvIkJVxhbKJ6WODWfop2U+UOSVJpNrQV/9mMvAy8YtHh8ijk+2kRykFQyVy4ZIR95FXswR58xk5xn/nCYnw/5i/l5ERRswfeIevtV0B9/76ltnne16iFqd1xyDJQpVsO3E46520ziJX7GWCEzlpWg41MgWQrNyxIypbzAvw=
+	t=1733920375; cv=none; b=IVMvxbB/IkYTuTuGIqSUXIC61GVUTZWSC6oAeEw5xDlfMbDX/DFryFX7KY7Zk4E+BFXc8WzZYnq0V93so90VZPI07qsFa16OgYZ4MP2ssI7+MTBGBQmrVtmMGSjz/LAxwthqVsGFoMnm7SJLpfjwzPTJCcma1tRwT76wuEZvMQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733919847; c=relaxed/simple;
-	bh=uzuxhtwvN1xpG/I342ummGF9fxqwn1ceIrIpKJyXxPM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Eil+jfSHx1xtspxaKXG1/mF+oihOPf7bKvUjmaR9ZDbBsBSbIMcWr+vllKvnqnvoLxfLmEqIfB75u/+246kgzhiLyVI1wmO20QB7Vr8Hb/q5rC6xZjQvVrp3Y+zYJtg/Llpobe/E8mrXbEFlbmfDrCN23OXv0DI7czJW+5wcBOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de; spf=pass smtp.mailfrom=jo-so.de; arc=none smtp.client-ip=37.221.195.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jo-so.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jo-so.de
-Received: from mail-relay (helo=jo-so.de)
-	by s1.jo-so.de with local-bsmtp (Exim 4.96)
-	(envelope-from <joerg@jo-so.de>)
-	id 1tLLkh-001rhL-1R;
-	Wed, 11 Dec 2024 13:23:39 +0100
-Received: from joerg by zenbook.jo-so.de with local (Exim 4.98)
-	(envelope-from <joerg@jo-so.de>)
-	id 1tLLkg-00000000bZs-3SDB;
-	Wed, 11 Dec 2024 13:23:38 +0100
-Date: Wed, 11 Dec 2024 13:23:38 +0100
-From: =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
-To: Christian Eggers <ceggers@arri.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
-Subject: Re: KSZ8795 not detected at start to boot from NFS
-Message-ID: <cxe42bethnzs7f46xxyvj6ok6ve7itssdxyh2vuftnfws4aa3z@2o4njdkw3r5i>
-References: <ojegz5rmcjavsi7rnpkhunyu2mgikibugaffvj24vomvan3jqx@5v6fyz32wqoz>
- <zhuujdhxrquhi4u6n25rryx3yw3lm2ceuijcwjmnrr4awt4ys4@53wh2fqxnd6w>
- <njdcvcha6n3chy2ldrf2ghnj5brgqxqujrk4trp5wyo6jvpo6c@b3qdubsvg6ko>
- <5708326.ZASKD2KPVS@n9w6sw14>
+	s=arc-20240116; t=1733920375; c=relaxed/simple;
+	bh=hunXydSSJnWtI/fE50MBwYEaKPGu+a5vN/yej7F4uY4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=qqBmJGJd83ag4PLsDgMYkunYOzopZJyQqyuC6GtTu12/iz67Jfq621PAd7ujI+4yHn5j1Im9CrPfTpLcnEjjjkgdi8/A0tltU7/tnjiaFbzWk9y+7xDkhYbV67BVIwFEtWNvtqI79UrZruCGCRE/z3qZ5YNV+USKHSnL0zs1twA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Y7ZhL4Yj0z21n1Y;
+	Wed, 11 Dec 2024 20:30:58 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9698A1A0188;
+	Wed, 11 Dec 2024 20:32:43 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 11 Dec 2024 20:32:43 +0800
+Message-ID: <a1d5ffda-1e6c-4730-8b36-6ba644bb0118@huawei.com>
+Date: Wed, 11 Dec 2024 20:32:42 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ruj6lnrinrx7yj4z"
-Content-Disposition: inline
-In-Reply-To: <5708326.ZASKD2KPVS@n9w6sw14>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 3/3] bnxt_en: handle tpa_info in queue API
+ implementation
+To: David Wei <dw@davidwei.uk>, <netdev@vger.kernel.org>, Michael Chan
+	<michael.chan@broadcom.com>, Andy Gospodarek
+	<andrew.gospodarek@broadcom.com>, Somnath Kotur <somnath.kotur@broadcom.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20241204041022.56512-1-dw@davidwei.uk>
+ <20241204041022.56512-4-dw@davidwei.uk>
+ <9ca8506d-c42d-40a0-9532-7a95c06fed39@huawei.com>
+ <0bc60b9d-fbf7-4421-ab6a-5854355d68f4@davidwei.uk>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <0bc60b9d-fbf7-4421-ab6a-5854355d68f4@davidwei.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
+On 2024/12/11 2:14, David Wei wrote:
+> On 2024-12-10 04:25, Yunsheng Lin wrote:
+>> On 2024/12/4 12:10, David Wei wrote:
+>>
+>>>  	bnxt_copy_rx_ring(bp, rxr, clone);
+>>> @@ -15563,6 +15580,8 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
+>>>  	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+>>>  	rxr->rx_next_cons = 0;
+>>>  	page_pool_disable_direct_recycling(rxr->page_pool);
+>>> +	if (bnxt_separate_head_pool())
+>>> +		page_pool_disable_direct_recycling(rxr->head_pool);
+>>
+>> Hi, David
+>> As mentioned in [1], is the above page_pool_disable_direct_recycling()
+>> really needed?
+>>
+>> Is there any NAPI API called in the implementation of netdev_queue_mgmt_ops?
+>> It doesn't seem obvious there is any NAPI API like napi_enable() &
+>> ____napi_schedule() that is called in bnxt_queue_start()/bnxt_queue_stop()/
+>> bnxt_queue_mem_alloc()/bnxt_queue_mem_free() through code reading.
+>>
+>> 1. https://lore.kernel.org/all/c2b306af-4817-4169-814b-adbf25803919@huawei.com/
+> 
+> Hi Yunsheng, there are explicitly no napi_enable/disable() calls in the
+> bnxt implementation of netdev_queue_mgmt_ops due to ... let's say HW/FW
+> quirks. I looked back at my discussions w/ Broadcom, and IIU/RC
+> bnxt_hwrm_vnic_update() will prevent any work from coming into the rxq
+> that I'm trying to stop. Calling napi_disable() has unintended side
+> effects on the Tx side.
 
---ruj6lnrinrx7yj4z
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: KSZ8795 not detected at start to boot from NFS
-MIME-Version: 1.0
+It seems that bnxt_hwrm_vnic_update() sends a VNIC_UPDATE cmd to disable
+a VNIC? and a napi_disable() is not needed? Is it possible that there may
+be some pending NAPI work is still being processed after bnxt_hwrm_vnic_update()
+is called?
 
-Christian Eggers schrieb am Mi 11. Dez, 11:18 (+0100):
-> Hi J=C3=B6rg,
->=20
-> On Tuesday, 10 December 2024, 17:43:01 CET, J=C3=B6rg Sommer wrote:
-> >=20
-> > So I think it's a timing problem: the ksz8795 isn't ready after the SPI
-> > reset, when the chip ID gets read, and this causes the probing to stop.
-> >=20
-> > Why is SPI_MODE_3 required? At me, the chip works fine with SPI_MODE_0.
->=20
-> I tried to reconstruct why I actually did this change (sorry, I am over 4=
-0):
+> 
+> The intent of the call to page_pool_disable_direct_recycling() is to
+> prevent pages from the old page pool from being returned into the fast
+> cache. These pages must be returned via page_pool_return_page() so that
+> the it can eventually be freed in page_pool_release_retry().
+> 
+> I'm going to take a look at your discussions in [1] and respond there.
 
-Don't worry. Me, too. :)
-
-> 1. I was working on the PTP patches for KSZ956x.
-> 2. It was necessary to convert the devicetree bindings to Yaml.
-> 3. There where objections against keeping "spi-cpha" and "spi-cpol"
->    in the example code:
->    https://lore.kernel.org/netdev/20201119134801.GB3149565@bogus/
-
-I think for 8795 these are optional. At me, it works with 0 and 3.
-
-I'm not an expert. So, please, double check this: the spec [1] says on
-page=C2=A053, table=C2=A04-3, register=C2=A011, bit=C2=A00 =E2=80=9CTrigger=
- on the rising edge of SPI
-clock (for higher speed SPI)=E2=80=9D. According to [2] the rising edge is =
-cpol=3D0
-and mode=C2=A00. So, =E2=80=9Chigher speed SPI=E2=80=9D (I think this is th=
-e 25MHz) should use
-mode=C2=A00.
-
-[1] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductD=
-ocuments/DataSheets/KSZ8795CLX-Data-Sheet-DS00002112.pdf
-[2] https://electronics.stackexchange.com/a/455564
-
-> On Thursday, 19 November 2020 07:48:01 -0600, Rob Hering wrote:
-> > On Wed, Nov 18, 2020 at 09:30:02PM +0100, Christian Eggers wrote:
-> ...
-> > > +        ksz9477: switch@0 {
-> > > +            compatible =3D "microchip,ksz9477";
-> > > +            reg =3D <0>;
-> > > +            reset-gpios =3D <&gpio5 0 GPIO_ACTIVE_LOW>;
-> > > +
-> > > +            spi-max-frequency =3D <44000000>;
-> > > +            spi-cpha;
-> > > +            spi-cpol;
-> >=20
-> > Are these 2 optional or required? Being optional is rare as most
-> > devices support 1 mode, but not unheard of. In general, you shouldn't
-> > need them as the driver should know how to configure the mode if the h/w
-> > is fixed.
-> ...
->=20
-> It seems that I considered the h/w as "fixed". The pre-existing device tr=
-ee
-> bindings and the diagrams on page 53 suggested that SPI mode 3 is the only
-> valid option. Particularly the idle state of the "SCL" signal is high her=
-e:
->=20
-> https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-DS00=
-002419D.pdf
->=20
-> But the text description on page 52 says something different:
-> > SCL is expected to stay low when SPI operation is idle.=20
->=20
-> Especially the timing diagrams on page 206 look more like SPI mode 0.
->=20
-> So it is possible that my patch was wrong (due to inconsistent description
-> on the data sheet / pre existing device tree binding). As I already menti=
-oned,
-> I did this only due to the DT conversion, I actually don't use SPI on such
-> devices myself.
->=20
-> N.B. Which KSZ device do you actually use (I didn't find this in you prev=
-ious
-> mails)?
-
-I'm using KSZ8795.
-
-
-J=C3=B6rg.
-
---=20
->> Kann man da auch ausrutschen?
-> Das ist ja das fatale: Im Bett passieren sogar Unf=C3=A4lle, *ohne* da=C3=
-=9F man
-> ausrutscht.
-Du meinst, Safer Sex ist, wenn man die Freundin an der Wand festkettet?
-   <news:072bda371fa28679a7c0818a1157fd7e@fitug.de>
-
---ruj6lnrinrx7yj4z
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABEIAB0WIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCZ1mESQAKCRB9LJoj0a6j
-dWjTAQCzWAdKH95Xo0iGAIPaHorkFo4mvPTu4uKWrdYmmbSeGQD/egiqLQ5Z7gbu
-onI4zl2Ub51CVXcOhInsrGtcfeKRNzE=
-=K4Nf
------END PGP SIGNATURE-----
-
---ruj6lnrinrx7yj4z--
+Thanks.
 
