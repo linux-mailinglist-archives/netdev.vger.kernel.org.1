@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-150965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4032D9EC31A
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 04:20:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5414E9EC34A
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 04:26:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4659B166770
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:20:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDD5716775C
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:26:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF4E20C000;
-	Wed, 11 Dec 2024 03:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D118320C493;
+	Wed, 11 Dec 2024 03:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H0Ada3Xt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rpl2i1vO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAD6209F40
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 03:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7177F9E6;
+	Wed, 11 Dec 2024 03:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733887250; cv=none; b=tzAxsfi5ncCA3csMAlYHJDzzuZB9bBcKkM108WyC8S16IQN5CaA4imyhVHn64Njxt9u9mNVXKTR5dehv9Pim6Efb3lOcgJ22at5UFLvk1lbG626zIho8M23lvRJT1341k9k+gylI1r05EMojBeecJ/Pj1YRPaGM3IXPMTo2lA48=
+	t=1733887612; cv=none; b=Y0yfo5D1HXqi/0aXTItlHg624oXgf7i0/UNntg8azh7H3qmQI7UvM2F2Q/RzMCnMASnZ9FzBh+RTFLNfsUaHlG5lV+wFms1ia/OtAC2mkGFR1hzswAfQejCDTrG/6oWpXa+Zrd/kHibexoboe28sCKLlBlP7gDVTirZzGEHiisw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733887250; c=relaxed/simple;
-	bh=XCY0pXlzNw/8pmnbv7v2GtOBQPku5J4SBwfsoz/32Lw=;
+	s=arc-20240116; t=1733887612; c=relaxed/simple;
+	bh=Q1kVpqhvGvq7h0HQfZsX/GFYg3+eN9/ciKegJkNWrLg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kaGYH4ofLJj/tiVT/N1spCachr2yDBj6jNESqE4tYtuX5aQMGkXXVOQ0j9bZ8SsVAbjhzeMyItPPu1aI1WFizXk/jdFB+QoWEWm3VrF1Tos+U+RE7qWXvm8OzinXA3GDyxyuBdHMyoEMFOO0rzWBxA2+JLNVz6TYlRgLo9cjiYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H0Ada3Xt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91741C4CED6;
-	Wed, 11 Dec 2024 03:20:49 +0000 (UTC)
+	 MIME-Version:Content-Type; b=MvOy2Ou1KNvaCSVK/wu8RvXBuu5FR1E/kKNi+69jPH5GlcllAkw1HtMvFeaOAnFqm+5r2uVheStal6UYjOtDpS2FfVqbQdRK43B9LD6NVx6OUwu1RzCRdqurzzjqpcfkJ2YwqSkFAC9aiG3uAN9xepRhruUtYbLO0oc2wajAP/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rpl2i1vO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C90ADC4CEDD;
+	Wed, 11 Dec 2024 03:26:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733887249;
-	bh=XCY0pXlzNw/8pmnbv7v2GtOBQPku5J4SBwfsoz/32Lw=;
+	s=k20201202; t=1733887612;
+	bh=Q1kVpqhvGvq7h0HQfZsX/GFYg3+eN9/ciKegJkNWrLg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H0Ada3XtIYw+muYZwXqVd2BeTW+xOaGovOKzGVtoEggJ0dRXTSDy0yC3eWN1ZLZ5/
-	 Y/IWFcBE/jDUPkS/YI/OmjiN2BTsULHac25Y+VsmGXi+3VRmsXhH9rKDqsJsxZ4ajx
-	 c+p9PxXuSV8H557uj5xu3Jfde0QZkxO4uX6SLYNQH2bdE+jrz8N/QNvo+NizFxWrBR
-	 oe8XIsrSaZbquTfgooD8QfzeeZwKd2qR5WsA44m/YrdQES1/B2iheX0X7tmkPhNS/5
-	 Oa9WifiBzbHHjAXHfockimIiloFXtwifSnLhVJhT8qDb46l+SLGbmotosJDVM2R+5X
-	 u8u9JparMZwjQ==
-Date: Tue, 10 Dec 2024 19:20:48 -0800
+	b=Rpl2i1vOFzg/iMnL1B3BKxSAVVEF8Cb6Sdr1zK0jbNbstML3OQcIM0MWUnGiElZLw
+	 0SMFS0ygf7nZIAH5ifPh8e8fMZOO62LJDmxSp4I6dO7rAZyvt4c3SOtpvjNpO7q2bI
+	 yWb4FwbFLNzEfcDBZdnvCnPkVvMFW/e8KN4VieHAQioLE6dl5djmfix7gI+L6ArCfU
+	 7bBOHebfQgrYpClEJ7DbDcggyLhQ1cxQvbdgggT3stPSIAinbuq1b5FHHfw79Uc+gx
+	 6j/cw5cVD4ZYa7Pga+llW7Y8SgHl/sPTZEoBGdSPqEkGTLRgknYqVB62qoELbJ2OfN
+	 hFY0eaJNSTGsw==
+Date: Tue, 10 Dec 2024 19:26:50 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Feng Wang
- <wangfe@google.com>
-Cc: Leon Romanovsky <leon@kernel.org>, <netdev@vger.kernel.org>,
- <antony.antony@secunet.com>, <pabeni@redhat.com>
-Subject: Re: [PATCH v7] xfrm: add SA information to the offloaded packet
- when if_id is set
-Message-ID: <20241210192048.386d518a@kernel.org>
-In-Reply-To: <Z1gMGlYPCywoqJK5@gauss3.secunet.de>
-References: <20241209202811.481441-2-wangfe@google.com>
-	<20241209215301.GC1245331@unreal>
-	<CADsK2K_NnizU+oY02PW9ZAiLzyPH=j=LYyjHnzgcMptxr95Oyg@mail.gmail.com>
-	<Z1gMGlYPCywoqJK5@gauss3.secunet.de>
+To: Jan Stancek <jstancek@redhat.com>
+Cc: donald.hunter@gmail.com, stfomichev@gmail.com, pabeni@redhat.com,
+ davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] tools: ynl: provide symlinks to user-facing
+ scripts for compatibility
+Message-ID: <20241210192650.552d51d7@kernel.org>
+In-Reply-To: <ce653225895177ab5b861d5348b1c610919f4779.1733755068.git.jstancek@redhat.com>
+References: <cover.1733755068.git.jstancek@redhat.com>
+	<ce653225895177ab5b861d5348b1c610919f4779.1733755068.git.jstancek@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,40 +62,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 10 Dec 2024 10:38:34 +0100 Steffen Klassert wrote:
-> > This patch was done based on our previous discussion.  I did the
-> > changes we agreed on.  
-> 
-> there is still no real packet offload support for netdev sim.
-> And as said, this is at most the second best option.
-> 
-> You need to prove that this works. I want a complete API,
-> but I also want a working one.
-> 
-> The easiest way to prove that this is implemented correctly
-> is to upstream your driver. Everyting else is controversial
-> and complicated.
+On Mon,  9 Dec 2024 15:47:14 +0100 Jan Stancek wrote:
+> For backwards compatibility provide also symlinks from original location
+> of user facing scripts.
 
-Yes, I don't have full context but FWIW offload changes accompanied 
-by just netdevsim modifications raise a red flag:
-
-Quoting documentation:
-
-  netdevsim
-  ~~~~~~~~~
-  
-  ``netdevsim`` is a test driver which can be used to exercise driver
-  configuration APIs without requiring capable hardware.
-  Mock-ups and tests based on ``netdevsim`` are strongly encouraged when
-  adding new APIs, but ``netdevsim`` in itself is **not** considered
-  a use case/user. You must also implement the new APIs in a real driver.
-  
-  We give no guarantees that ``netdevsim`` won't change in the future
-  in a way which would break what would normally be considered uAPI.
-  
-  ``netdevsim`` is reserved for use by upstream tests only, so any
-  new ``netdevsim`` features must be accompanied by selftests under
-  ``tools/testing/selftests/``.
-  
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#netdevsim
+Did someone ask for this? Does everything work without the symlinks?
+If the answers are "no", "yes" then let's try without this patch.
+In tree users should be able to adjust.
 
