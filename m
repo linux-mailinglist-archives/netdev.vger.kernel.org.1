@@ -1,84 +1,98 @@
-Return-Path: <netdev+bounces-150930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-150932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96EF49EC209
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:20:11 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB79D9EC214
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 03:27:06 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF8C8284894
-	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:20:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38E60188B786
+	for <lists+netdev@lfdr.de>; Wed, 11 Dec 2024 02:27:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77E01422A8;
-	Wed, 11 Dec 2024 02:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB77A1BDAAA;
+	Wed, 11 Dec 2024 02:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bjR596X2"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="CcqNjutO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B215713B58D
-	for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 02:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB9C1BD9E6;
+	Wed, 11 Dec 2024 02:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733883606; cv=none; b=iD62gWQYT+2Fh0broxnAMbolqP60NOdj3QBKFfgx2rOMZ9ijyRtCWi3NoMdKzrepVXdNcz9J22Dr12BWvsL+SDLucWkGM73kQyLMByQHrgEVllKLuJ06ttFQnbtKj0S3yYn/lEUTTguOgvwPqritZPhEIqnfR625dpCvyWXr3g8=
+	t=1733884021; cv=none; b=RaM/Oktmwo4d0+FdQWWLiyfwCwrAik8OTCfr3xCnqcyIq8kaF+FudpUbMK+QCET36yuVtqQDSYMNXqx11gP5DSgcsN/1nzy7SSHIXEWyYKDIpwFtsQGtLLQdqgj+Z/ZlaAIRGD7wQyrEymBKECTHxISmGF2XUzrayk/UFKWDwFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733883606; c=relaxed/simple;
-	bh=HM5aLR3IBVerkpjsM1hqBPvGb9Y8YY27zoqzzNYFnmU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jhG/hjfdQyclgJ/JAQezvvNLKzEZ9bu642VKN2P21oIcXzU5kmm7RHjOQbfX+vqhk79rZFLJUniDbGhlZU3VScZS8S3PdRLldAOTIEA0nhXdBsb4RjyN1kMvI4RYg8JCro0EW/6Hykjm3YeMqusq2buRl+XD3ZGau7yzuadJzxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bjR596X2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BF8FC4CED6;
-	Wed, 11 Dec 2024 02:20:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733883606;
-	bh=HM5aLR3IBVerkpjsM1hqBPvGb9Y8YY27zoqzzNYFnmU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bjR596X2AECHmNFoGfq6NaFV5g4brrf8b1G/EnnjtPMDxH2AN285b5jdItre9Ugbd
-	 jziwkYLLjYr7aEVMijOJfGOaPsfOP9YDNL/xyLbtTE+ZkfgEZJi9emHYPVWTqj04jY
-	 lEt+c1/MR9VjVx85lWDT5HQefEo2LzxIZSTal+4BUtU21wArhCPXIbBoEOPyGHtWiZ
-	 /VIHw3UVBp31IwZJ4igoO7m32ffDzCO79CWFSIBRUOFfST3QEcF7dspEOD7ea3WeZE
-	 86bzvsyUZ+cc3SwNfNDWLvyGUmo5CCqhVYBgHP3ZpnM8Q6WnK5obT27EHqYMMulWf0
-	 cNX4ge2lx6vTQ==
-Date: Tue, 10 Dec 2024 18:20:04 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- <netdev@vger.kernel.org>, Matthieu Baerts <matttbe@kernel.org>, Allison
- Henderson <allison.henderson@oracle.com>, "Steve French"
- <sfrench@samba.org>, Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher
- <jaka@linux.ibm.com>, Chuck Lever <chuck.lever@oracle.com>, Jeff Layton
- <jlayton@kernel.org>
-Subject: Re: [PATCH v2 net-next 12/15] socket: Remove kernel socket
- conversion.
-Message-ID: <20241210182004.16ce5df7@kernel.org>
-In-Reply-To: <20241210073829.62520-13-kuniyu@amazon.com>
-References: <20241210073829.62520-1-kuniyu@amazon.com>
-	<20241210073829.62520-13-kuniyu@amazon.com>
+	s=arc-20240116; t=1733884021; c=relaxed/simple;
+	bh=Q7gT5UPh646tXmWXFz8AQJe47Gh1rfWWFi5jofs2n6s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aE94nHqa2meoUydQktmB2XIxv4PtTN45KT00tsX3I8xIR4RCtcKGxmurLhb0iaodTn/mv6RSswmajQexovZvfkAIgqJQr10PrNOrSr0Fu+XAviPpA3zJ0KBaIsBI3OTC1rjE6DAPBKMc75QOEnHmWyjmEdc1UyjJl69gHVCG8p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=CcqNjutO; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=KKNPe
+	pEhel2YrTC/NHwwhpdzTF8i+bHDK6KR7Fq9aa4=; b=CcqNjutOWOzWTrb/2frK8
+	APw1osJLyOM15gArSpP37iccdK4joP9uOQ8J6uWqZNMNjii1I70diIHrOTGPVhFm
+	8EmuZPj9jvbyJk2/afSs4urM92hnJY7F+WumivwBcRv2Q66fqXqA099zxOSXRUcz
+	jv1jd7Hs9/+2NBVVBV8Muk=
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [])
+	by gzsmtp4 (Coremail) with SMTP id PygvCgBXjH9F+FhnTh6jAw--.23094S4;
+	Wed, 11 Dec 2024 10:26:21 +0800 (CST)
+From: Ma Ke <make_ruc2021@163.com>
+To: richardcochran@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	vdronov@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ma Ke <make_ruc2021@163.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] ptp: Check dev_set_name() return value
+Date: Wed, 11 Dec 2024 10:26:12 +0800
+Message-Id: <20241211022612.2159956-1-make_ruc2021@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PygvCgBXjH9F+FhnTh6jAw--.23094S4
+X-Coremail-Antispam: 1Uf129KBjvdXoWruFyrGFy3uw48Cw15uryUJrb_yoWDCFXE9r
+	W2vr9rJr1kWan3tF1vkrsIv3yIyrWDtF4xGFs2q393GFWrur1rCrWkZFyqgw4DXa1fGr15
+	AFZrJry3Zr47tjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRRApnDUUUUU==
+X-CM-SenderInfo: 5pdnvshuxfjiisr6il2tof0z/xtbBXxayC2dY8AxofgABsk
 
-On Tue, 10 Dec 2024 16:38:26 +0900 Kuniyuki Iwashima wrote:
-> +	net = rds_conn_net(conn);
-> +
->  	if (rds_conn_path_up(cp)) {
->  		mutex_unlock(&tc->t_conn_path_lock);
->  		return 0;
->  	}
-> +
-> +	if (!maybe_get_net(net))
-> +		return -EINVAL;
+It's possible that dev_set_name() returns -ENOMEM. We could catch and
+handle it by adding dev_set_name() return value check.
 
-FWIW missing unlock here.
+Cc: stable@vger.kernel.org
+Fixes: a33121e5487b ("ptp: fix the race between the release of ptp_clock and cdev")
+Signed-off-by: Ma Ke <make_ruc2021@163.com>
+---
+ drivers/ptp/ptp_clock.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 77a36e7bddd5..82405c07be3e 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -348,7 +348,9 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	ptp->dev.groups = ptp->pin_attr_groups;
+ 	ptp->dev.release = ptp_clock_release;
+ 	dev_set_drvdata(&ptp->dev, ptp);
+-	dev_set_name(&ptp->dev, "ptp%d", ptp->index);
++	err = dev_set_name(&ptp->dev, "ptp%d", ptp->index);
++	if (err)
++		goto no_pps;
+ 
+ 	/* Create a posix clock and link it to the device. */
+ 	err = posix_clock_register(&ptp->clock, &ptp->dev);
 -- 
-pw-bot: cr
+2.25.1
+
 
