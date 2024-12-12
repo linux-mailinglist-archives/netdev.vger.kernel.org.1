@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-151424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 462D99EEC02
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 16:30:24 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 597B49EEC33
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 16:32:16 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00118283D80
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 15:30:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFCAF1887819
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 15:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD47F21CA0C;
-	Thu, 12 Dec 2024 15:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B03372210CD;
+	Thu, 12 Dec 2024 15:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g1G4jnCJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nUhKd6vX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83BB921C166;
-	Thu, 12 Dec 2024 15:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB5D22069F;
+	Thu, 12 Dec 2024 15:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734017417; cv=none; b=SLD5QI6nRBZYyTrbZtnGFLcjJrGNv4EtMO1w+tUhFqiwxdChX26kEa5m0rkMLiI8xG0kprWclhTiIiBKVFapbq5gKsreeL6qqrFJRRB44Dk2P0jbwBgJctvThi0njpFvGfuc2CQ5ZaQ0uHfaAeTqm2tvHmX3aDpMLEgvius1xE0=
+	t=1734017418; cv=none; b=Qg+qPaV47lT5/hTUR/h4U8pLN4oBiIi5InUiC2KK8+V8iMAZpjcTboCQJmmTculu3r0ZCvAXphn7elUHNwAKAg3yoLh/sCdnqrKIbK167kLOiviji1MgAhYFptl02iHFI0Q3zxj5hZxTx64K0OumxhW0DFg2Rsf+YWOp0TC2Jhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734017417; c=relaxed/simple;
-	bh=NGwT/sP6fdeGKQ6iR9Uw1CJTnYeHzQsJrSFdTagVG44=;
+	s=arc-20240116; t=1734017418; c=relaxed/simple;
+	bh=fRo28MlPeN080sVHAgv+Xk8U7MBZ4lUVusodbTjE80w=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=igXoQpXNdM9+DaigJbuSQfhJmEd/VMB6ZfBSFjWmsxwWquzgwkqln9JC0opnKe0L6TN44J8xRNUJO2bmbiRvaGmkjlDlJhEKxuyAfk6Y0Tcg7OEPEA/ivtnWMOc28FmYj1F8T+DlyTBmSP17BL9UgOI3+fTCuxGaIcp7uriX4eA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g1G4jnCJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1231AC4CECE;
-	Thu, 12 Dec 2024 15:30:17 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=lB64S+Y6ry4X9WZn1Vi6jtxcYlJTaeSEeQo8p3iFn2pgL/kvxG99TqKTnlQXLif3IuOPb+/00LjYThHJhi0oJ4bRvHQB7Y4OaMgsGPgtvUCL+oWg0ftjTPLvuxMFlmHUKiiDyS71H6NOuFv9WB29VmKt9DMafDBEt2VbUJ/m2vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nUhKd6vX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AD27C4CECE;
+	Thu, 12 Dec 2024 15:30:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734017417;
-	bh=NGwT/sP6fdeGKQ6iR9Uw1CJTnYeHzQsJrSFdTagVG44=;
+	s=k20201202; t=1734017418;
+	bh=fRo28MlPeN080sVHAgv+Xk8U7MBZ4lUVusodbTjE80w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=g1G4jnCJ8aVRftXS8THsL/gbpoht3H8LJeSz3Usi15hdpYC0NLN7TrUSUIAQuYyIF
-	 hB+mNv5mg87n6xP0V6DLmwbU9e0IYVw3C0egBT0/idMJjng4K8dMjAaW7nqZFROnfQ
-	 ys7fEdPdgxICWsaEUmlz6z9n4X6QcBosEE6JsJBucE8IgjH9ZwAqV8LLwiP+SrgloV
-	 /eWPyKHGmhvZT8K8+2O+sOr/reFb51/KKYjFVpm37Vvm3T3U0KnewOj4pkKhpRmLKS
-	 cB+hDXLk2COpzvyw+eYmuh/fuslmefSu8Jaq3L/J3M2ijvHCtZZMssNYWYeR99fG8L
-	 3w3uxufAEGNCg==
+	b=nUhKd6vXhTRRV1mEAaYPgbgz+fTSDQUcQiQT0Ixvc4mZjTU03sfQP5plE4CQoPaM9
+	 3DgkydEoABMF7ysVVL5z6FsRMZ/rA0r/AIIoiiagVsjAXhTm7PUCOodlX1cNsqBXII
+	 eMg9szOtARBdR2jIyIhOUJUC0pasYNdMA5gcLeecGI6BPm7FLlTHjHH0NEcPXNfanE
+	 S9JcHy1UhViTVZ9WH1ODtbwNS/7URtcJ+fTNf/N4BrbKTCpvP+aGRD/3Bgl6vLfNM2
+	 F8G2l2P9AWM1D2IzX7Raam+7j8WL6n9utly3MKQriAuyBCrUNpkfjS40Ta/tX3WokK
+	 ppRIpCXECVxDw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7109E380A959;
-	Thu, 12 Dec 2024 15:30:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE943380A959;
+	Thu, 12 Dec 2024 15:30:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-12-12
+Subject: Re: [PATCH net v2] net: dsa: tag_ocelot_8021q: fix broken reception
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173401743299.2337313.1332143889147091604.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Dec 2024 15:30:32 +0000
-References: <20241212142806.2046274-1-luiz.dentz@gmail.com>
-In-Reply-To: <20241212142806.2046274-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+ <173401743449.2337313.7538670718873866823.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Dec 2024 15:30:34 +0000
+References: <20241211144741.1415758-1-robert.hodaszi@digi.com>
+In-Reply-To: <20241211144741.1415758-1-robert.hodaszi@digi.com>
+To: Robert Hodaszi <robert.hodaszi@digi.com>
+Cc: netdev@vger.kernel.org, vladimir.oltean@nxp.com, claudiu.manoil@nxp.com,
+ alexandre.belloni@bootlin.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 12 Dec 2024 09:28:05 -0500 you wrote:
-> The following changes since commit 3dd002f20098b9569f8fd7f8703f364571e2e975:
+On Wed, 11 Dec 2024 15:47:41 +0100 you wrote:
+> The blamed commit changed the dsa_8021q_rcv() calling convention to
+> accept pre-populated source_port and switch_id arguments. If those are
+> not available, as in the case of tag_ocelot_8021q, the arguments must be
+> pre-initialized with -1.
 > 
->   net: renesas: rswitch: handle stop vs interrupt race (2024-12-10 19:08:00 -0800)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-12-12
+> Due to the bug of passing uninitialized arguments in tag_ocelot_8021q,
+> dsa_8021q_rcv() does not detect that it needs to populate the
+> source_port and switch_id, and this makes dsa_conduit_find_user() fail,
+> which leads to packet loss on reception.
 > 
 > [...]
 
 Here is the summary with links:
-  - pull request: bluetooth 2024-12-12
-    https://git.kernel.org/netdev/net/c/ad913dfd8bfa
+  - [net,v2] net: dsa: tag_ocelot_8021q: fix broken reception
+    https://git.kernel.org/netdev/net/c/36ff681d2283
 
 You are awesome, thank you!
 -- 
