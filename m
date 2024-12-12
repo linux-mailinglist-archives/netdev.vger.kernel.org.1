@@ -1,169 +1,231 @@
-Return-Path: <netdev+bounces-151512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 592119EFDCE
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 22:04:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE0629EFE01
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 22:11:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26FDA160E6A
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 21:04:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD287167CD3
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 21:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3DD51AB51F;
-	Thu, 12 Dec 2024 21:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B971BC9F4;
+	Thu, 12 Dec 2024 21:11:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z/G3DwgQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DqvIe4se"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D637E13FD72
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 21:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734037472; cv=none; b=DYWMcp/2zJ9wfBvqYQPQ6GF1i9RPa1he41L2ehZi285t37XglHFHEePVxwn6rXq+4tG8k5K+YAjXdt3TTDrEFFwU9+OrdmDIq+MEp5r7u5rDqw37ltqJoWT+NHnv1QriFxWU/CzmR40LCy1gQTDVUkX6ScHu5G1yj+iB02uWXkY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734037472; c=relaxed/simple;
-	bh=aJpqbvI4STgzb2cQr1nzOQxdJ7I4Sxmsit523/V0kCw=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=WX9c5sjf64FWa0JJ4NBfnMTgueoeo0Mi9uZx5bYwKU9RvfId7Tb/ap2qdaKtWON1C4BckFXQXo4l6grrQg475JcMUPZbCWz3YGxks8uztAlKtUfEe931Q9frXSbx2/HOBf/aEZtNMrEP/1zxWQzcinG3VNMr8KjOXHun0p/0UJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z/G3DwgQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734037470;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=UJ061P1Dr12VwDcDgqIvm5UI7xtypEyUk8M1AhY3aQo=;
-	b=Z/G3DwgQ0n3gzmDruCWPiiFZ1RymucBeKOTuHyfcXlaxI1gftKFCeCOd7KV25/MBE5CFm2
-	f0JbpEyJF0ihZ7zRT1bK+gPEMZ8sSuf6fNlf7C6ZRfZFW3xWG4RSgoFX9hLup36K+ufVC/
-	NgRKotfWNV9bUn0LogCALhQILx0gP7E=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-213-czDF83xzOtO6XfRDMqo_9Q-1; Thu,
- 12 Dec 2024 16:04:26 -0500
-X-MC-Unique: czDF83xzOtO6XfRDMqo_9Q-1
-X-Mimecast-MFC-AGG-ID: czDF83xzOtO6XfRDMqo_9Q
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5DD1419560A5;
-	Thu, 12 Dec 2024 21:04:25 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.48])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 663B91956052;
-	Thu, 12 Dec 2024 21:04:23 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-cc: dhowells@redhat.com, Marc Dionne <marc.dionne@auristor.com>,
-    Jakub Kicinski <kuba@kernel.org>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-    linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] rxrpc: Fix ability to add more data to a call once MSG_MORE deasserted 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68ABB1AF0B0
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 21:11:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734037892; cv=fail; b=OdQAxPyJTHCNbNRsBGNTRk42fGnS9AXkMOnbL44Oc6tbQrIrO6eh0ElL2fvEdB2WUUneb1N57xc4jtTkZjAC/DXhfTHg3ppuw2kOzBZnTKmUz5jsGeL7xMHuQOkTF3+DQe0bhGRU8LDDRlO1+bA9YK/B9GEH3rkxYcYUSDgI2yE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734037892; c=relaxed/simple;
+	bh=cHhd4gEqrrxTbthVldmUjiFpSE8WIG3liiSHIwI+mDo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gEf9+ijOyX2iZfckJvFEa202q3mB6A4eZKpW+P91IX6qeNFPbZ7aRdX8UYtl1T/NfKlN+CHwhytW3xzHo1RGpMHe5JgSzMKVK1le6QOU6qA05gqd5cPrNZVUfAlpSEjhGnmK4upryyUhIOZddd6pflpTLvTKNkVKLyJDp9a4cK8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DqvIe4se; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734037889; x=1765573889;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=cHhd4gEqrrxTbthVldmUjiFpSE8WIG3liiSHIwI+mDo=;
+  b=DqvIe4seeF2LYtpEMTDoa9QEOAj6eFhJnqVupIKj5SLNkaUK/44ctllB
+   Yy7HMIBEYHQ23ckUJJZFm03AxtawAG/4v47m/EHu1qLgMy8FYNI+FBSlc
+   ImwrHxxOGS82spE4A4773pGQOAW66v5cRFPW4asWsJ+m9PIWcn+2UVIhP
+   1A3gx3+1HuwA//+448xj4mbrM3I5jcyNn9Kx/61lOd6wwGnKPGh/9nxk1
+   odCoreymV+oANd+tYjL9N+9nCsxOy5M5kiqlP1KIzgz981g21wysXw34x
+   aIZ/g5Itok63bn/R8wnqBHbO8byR34NlPv7R4cKIaDtaeEek4ZC5MqV6L
+   Q==;
+X-CSE-ConnectionGUID: AkRH3yqgQiu7PXD43JxWnw==
+X-CSE-MsgGUID: ixI48jD9TZK1OdFinpkGHA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11282"; a="45490963"
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="45490963"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 13:11:19 -0800
+X-CSE-ConnectionGUID: 21XVNgXQTh2KB0PLKBpZeA==
+X-CSE-MsgGUID: WyejJlKSR3u5IvnzgSDrrg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="100505657"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Dec 2024 13:11:19 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 12 Dec 2024 13:11:12 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Thu, 12 Dec 2024 13:11:12 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.40) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 12 Dec 2024 13:11:11 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Qk0fbbdZ8PctzNuv7JbypA0VMJ9CyxQtj4960ilNnWlnF2h+b75EA6svwmRog2Ce9bm5Sa3ZMOd42rCWvLJMIXLpIhttxafWI+WIiCpQyCYA0BUJMWDJSFj+Qn4Si+T20LD8UnMAbK3B0bW3H0lUYIw4rXP5rneUT9JxG+X7Z9B5C/KdCM6o1sFCIMFS3napH/A1NDdxcE1iHSLQoJ9b4myeszitWKpwkJM2r1NtzEQmkX8DYvgGW+f0KhbV9+pCuf2gqfIAnnFTGyEtX00J95r1v0JALD6v9xCemidgUrN+Up0IGjqn3OmPJNPKpv4r1xPC3a/sQvlZtsFRNt+Mpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d1xamrCsaYGjuRuWFhS1p+zx0/yBZ0nrK6UBPxmklhc=;
+ b=CpfoKB3vG0fwBADt35ltyZTrCuObvAgDzv71WH/+mhzWt5VtQP8XwO8TaOa+poxh593HsPjSJb+rhplHDrOc6F4IZ+QfdKzwjyne/4y5M4ioKAAKOyTSHvMYd6w09pbi7d+aurM3XizLVmvINThocrhKtKQBLK6RF4v1XIesCg9c06KVQ5ZKTQBKpNo+m5khIAnuNXCUnC6L26H7D650yzHWZRccjw02U68RUziTXqNvDS+O0TFUESTn7BVI1U1t/YuFcv/MeCNGEYdp4SUWzn2Ukl5qABbgNJ80VzFREn1Xz/JFcDNHOGm/hALtdInWtRX/k9H7D+2l6R4xTt+ulQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5911.namprd11.prod.outlook.com (2603:10b6:303:16b::16)
+ by SJ0PR11MB5866.namprd11.prod.outlook.com (2603:10b6:a03:429::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.18; Thu, 12 Dec
+ 2024 21:11:08 +0000
+Received: from MW4PR11MB5911.namprd11.prod.outlook.com
+ ([fe80::1d00:286c:1800:c2f2]) by MW4PR11MB5911.namprd11.prod.outlook.com
+ ([fe80::1d00:286c:1800:c2f2%6]) with mapi id 15.20.8251.015; Thu, 12 Dec 2024
+ 21:11:08 +0000
+From: "Singh, Krishneil K" <krishneil.k.singh@intel.com>
+To: "Hay, Joshua A" <joshua.a.hay@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Kubiak, Michal"
+	<michal.kubiak@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, "Chittim, Madhu" <madhu.chittim@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Hay, Joshua A"
+	<joshua.a.hay@intel.com>
+Subject: RE: [Intel-wired-lan][PATCH iwl-net 1/2] idpf: add support for SW
+ triggered interrupts
+Thread-Topic: [Intel-wired-lan][PATCH iwl-net 1/2] idpf: add support for SW
+ triggered interrupts
+Thread-Index: AQHbP5URyAE2kBIoB02PYltefykSt7LjM0tA
+Date: Thu, 12 Dec 2024 21:11:08 +0000
+Message-ID: <MW4PR11MB59119B127978DF2D89145996BA3F2@MW4PR11MB5911.namprd11.prod.outlook.com>
+References: <20241125235855.64850-1-joshua.a.hay@intel.com>
+ <20241125235855.64850-2-joshua.a.hay@intel.com>
+In-Reply-To: <20241125235855.64850-2-joshua.a.hay@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW4PR11MB5911:EE_|SJ0PR11MB5866:EE_
+x-ms-office365-filtering-correlation-id: 1419515a-005a-47bd-c6a4-08dd1af17f87
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?hKOLkoXyaPQz7mXgde00RKHzywnbuVsdVhEFDpEsEXYlLIYZ2bTAWKgMdLM1?=
+ =?us-ascii?Q?yZtDaMKQRefSmtGjd+SJ4jFFwkWFBxH82HLpuOdiCZpFEt75JjOJ8M4NXuoB?=
+ =?us-ascii?Q?Qg/G5LrS+IXgI6rquTEuDE04tu6n7AXxkjFA3xcH18Iiuz2q0zETZHJOmTl8?=
+ =?us-ascii?Q?ojBMU9uOzw6hPrjcA3G/3UYksB5fZvmHvgGYA0KyUkVOqbzD3Z3c2rQIeFBr?=
+ =?us-ascii?Q?TUHWF+dqGluoyO0EF2E5zK9rCuxpYRQ05WmMeHM4qWrX5EKqciJtUOMbV4Zk?=
+ =?us-ascii?Q?QJX/reEvrj5U4GFbcBMNmcY1TVMZlALPuschx/8mJUrdq3fksj6g49nWCPce?=
+ =?us-ascii?Q?tg6BIUHTDaRVw5+Byqss/Hd5R6Y5+EY7exhwgeneAuH/4On+/k18JBWdZKuk?=
+ =?us-ascii?Q?o0+K3wn0URhFL8/LtmdQa+lVj0ZozsdDf/o19B18yzPdKR5YHhfFB4qp7Ms9?=
+ =?us-ascii?Q?W7iH7696zPXmq1zEw2gMCJjOgCRFojPqRhoqaH0rkF/9RtizsWNoTah2XOOI?=
+ =?us-ascii?Q?pqRv+Off1jSxH8HN7N7q6Zb51UeAXEax0MUxzM91yHTsk3bF/ls/KCbrFEQt?=
+ =?us-ascii?Q?OETb5oGHsB8Em6MzGmWlkkbzcrkY7GGGWGjQ4cpsNh/R/iwmqtf1bX/aRrdo?=
+ =?us-ascii?Q?VG9G6jh470a9wCT3+aW1vc6GmQ4TvwxTBFkGfYQy58lhU0HQQF1K8k+qqH2M?=
+ =?us-ascii?Q?x4m3/2xSMlkuPrtc9DvPS3Y2XeS10Fc0pGdBziAAvyJEzMEabyl5FPuDDJsG?=
+ =?us-ascii?Q?RzOspKXshexbK7XU4QaauV5yqa47oMZTZ2FjZ7t0Vw3KrLye3OVxpuymWI9q?=
+ =?us-ascii?Q?k6/TaihDv+qvo769MCbaYlBZj27dTw2CKEXFY18DVxv+/Kg3/qwVzb4bv9ay?=
+ =?us-ascii?Q?6PmMLDLOtdRzfHxy0ys4x9SVZVnc6cz+ZuvTk6AQ5kkdTZnBBHKdc3Ka+dX0?=
+ =?us-ascii?Q?IKiHAthdEgpicKMYOvjlTEblAJ2gnbWHBsXrEwMQ5F2o6rpJH3ADfdXjk/Cm?=
+ =?us-ascii?Q?1vNIQoFiCYwpomtEqD6hZ4Az/vBssG0cQcj/VVbkTMoA226QMNQYMUYuqj5i?=
+ =?us-ascii?Q?pXLU2ER8S9zxqkl4dHaUvoZAJMlYMXeiIEnGKE9KGX6ggeKtC1VjZaLt0e0M?=
+ =?us-ascii?Q?vZO7DBBjPKuLiVRCcTO7OaqvokPrEjsn+aXsiWg1rIzVrwrGHa5TFOL8YJ98?=
+ =?us-ascii?Q?1ETqjYeTS+C3f4iHKB6xhS1pvg5g9wzcqGL5e0Ddn7eS1lM8K7oixZGB3gQH?=
+ =?us-ascii?Q?tbmtwPWk6DoPqNGZoc9pDbyLbhIeg0xJHUj6V2tIsHcclVizqGnu9wqkDgLR?=
+ =?us-ascii?Q?bqzRJzzVZMTx/kriJZI9LuBE0XHc3+7wdx7mJQxVjZh5Ak9chqFZzz56jOVM?=
+ =?us-ascii?Q?/zmu48F7NNYOleENghcx/7v7W3nI/RG/RBNVHEDcbivTymJCPw=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5911.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?zsTRA5No4RhbSDoJfIt2uhOSul0SkMsLWoXo7ju//HU9s8Y45KJ2F2erIBRa?=
+ =?us-ascii?Q?iiBK4OJbKHbjrdci7urNRnNv1SjALYOiVERApWiYit+Voex1tWc3oo5MuxLw?=
+ =?us-ascii?Q?aO6KaqZPZMNrzC6Wi9aKNAu5Nns40HxyXwQi9FoCi9cGty/EFJTJGqJK7P3O?=
+ =?us-ascii?Q?lKrs/frT2InVeWK3OXUbwI7cUf54RHmaKvb3ae1uFuQQ5y0d1lSSf149i9St?=
+ =?us-ascii?Q?6yRGOrAnhfyqVGD4q1ULSyFFB+GFz7qlXiAyhkfbPRaA+7bCEC0ul5odB3JW?=
+ =?us-ascii?Q?QaZilCwznUY+3wiV9J2XF4IneYqV1bkwvTYiOIEHvAYxqu0ppoSsIa+ULqA2?=
+ =?us-ascii?Q?0rhI2SDaLOwFXCNUhC787xLI2kxPbcdqSU4nfhvpwGE0FMeW2eRahY8wqQeT?=
+ =?us-ascii?Q?Jssa9A1Vi3vWC7lrNpdPx3s0eu6pAKyxiBv/LOqeuq9x00Pzj5cL7K4vw72N?=
+ =?us-ascii?Q?QD2YXK0bNrSf+SZ/Kn5h20HZHNIU3OSuscLru2lTY0yP5flbl1x6r5czYF15?=
+ =?us-ascii?Q?uOkmrwjWXN1GBbPl+MAknSV2bfJP+gnoNaRzuD9qdoxDX98J8kx74VZwiW+9?=
+ =?us-ascii?Q?e/wTt5IqTnYhpr7awLBS29JcRzA2XiFIxcfOnaf6TsTA3cmWU85Cm2UACAtS?=
+ =?us-ascii?Q?BrVhp1MXtQypJ0SHMwu5eFv/S1S0WGQKkRGo0oHfuUP3GE0YqqPyJ1C4vKa0?=
+ =?us-ascii?Q?+cjjhpd+9gQVVyMVCRTVdtJ0JiXv3WHvExxP06iE/7aQa/qrY1BxFi2BYvjD?=
+ =?us-ascii?Q?ZuPXltm4F6ZRcUQ6hVBH8mVjyJ42iFXUrvKf6Hcl/r1GGUE+v98SuLQHra1a?=
+ =?us-ascii?Q?h2ww3uCeCrhKTxQLqz8FOIx8Sbyy0zyiavg/uScjCQbhu08cJGX/G42ZgkZT?=
+ =?us-ascii?Q?qRuidOECAnV3uP1EH2NwgMAWP9Dw55+OrYNbxCBcE6WAs8ad+hFdqyykMe01?=
+ =?us-ascii?Q?Wm+pdJ32rddrwOYSEEgpp7kPXPfrx1CxUFVBQ2wfHV+24yflPCs1s0Evve1X?=
+ =?us-ascii?Q?E1w6XpRx9GVCViFCXiUS7Ez9Lch6NQAK1Fku3BznZnoTa1IqvNpluhWlLtBh?=
+ =?us-ascii?Q?dJzQrhAX0FUXnhYYY+DtU5to28Qsnyec4mRS3FLKHT2mFB5qxHO3wg1XZ39d?=
+ =?us-ascii?Q?B1B9HsiwYRfpe/NeJO/fBCxq3F3mLl/Sh6Qp9bgM/QYy2w9fU3jUU72iU1rs?=
+ =?us-ascii?Q?gONrkRIIFZF0ebpupyF7K96N0sgvMX3qIvQUfxtRYkH4+LLY6mc5F1gSToEG?=
+ =?us-ascii?Q?KHUojKowjr78gwaGcl8DR9udfSu5BaZnZwmRBXC4tfoMQrGd0yc3NVz7yZn+?=
+ =?us-ascii?Q?IYKzZicPT//T/FZdSP1Izv3p4dDzdEZWKn7w0xgblKwdo+dJX8vwOJlmYO7H?=
+ =?us-ascii?Q?M7y1JUnk6sAUSBT0n9Oc/n91lcqx+PX+pufwtQu41ewhfc5uMIDGboxwiYr0?=
+ =?us-ascii?Q?95HZpkEDS0gQytvmZNTB55s/qA4wvVg7JmQg7sLtZAaYpAdmacTXZ6NZw1jU?=
+ =?us-ascii?Q?4+r0M0iLzP0RAJpfWtfHU+vgRsiQXBMOeQ+OzoTizqd+vwFApZ29EkyZrKCA?=
+ =?us-ascii?Q?32jtAmwBUdq8e0oStaMKDMMgakLZ5ON5M8PVUHii?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2870479.1734037462.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Dec 2024 21:04:22 +0000
-Message-ID: <2870480.1734037462@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5911.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1419515a-005a-47bd-c6a4-08dd1af17f87
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Dec 2024 21:11:08.5176
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nfx70iQlrdIq7rKIozw0bzvujB874MBBMkXxznJjVrMC+uhsTeXcnxtQdlx/lqGVXqWSzhDjUerG7u+vFrNfuiZDBVmFyNPL4fbadmSIxtA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5866
+X-OriginatorOrg: intel.com
 
-When userspace is adding data to an RPC call for transmission, it must pas=
-s
-MSG_MORE to sendmsg() if it intends to add more data in future calls to
-sendmsg().  Calling sendmsg() without MSG_MORE being asserted closes the
-transmission phase of the call (assuming sendmsg() adds all the data
-presented) and further attempts to add more data should be rejected.
 
-However, this is no longer the case.  The change of call state that was
-previously the guard got bumped over to the I/O thread, which leaves a
-window for a repeat sendmsg() to insert more data.  This previously went
-unnoticed, but the more recent patch that changed the structures behind th=
-e
-Tx queue added a warning:
+> -----Original Message-----
+> From: Joshua Hay <joshua.a.hay@intel.com>
+> Sent: Monday, November 25, 2024 3:59 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; Kubiak, Michal
+> <michal.kubiak@intel.com>; Lobakin, Aleksander
+> <aleksander.lobakin@intel.com>; Chittim, Madhu
+> <madhu.chittim@intel.com>; netdev@vger.kernel.org; Hay, Joshua A
+> <joshua.a.hay@intel.com>
+> Subject: [Intel-wired-lan][PATCH iwl-net 1/2] idpf: add support for SW
+> triggered interrupts
+>=20
+> SW triggered interrupts are guaranteed to fire after their timer
+> expires, unlike Tx and Rx interrupts which will only fire after the
+> timer expires _and_ a descriptor write back is available to be processed
+> by the driver.
+>=20
+> Add the necessary fields, defines, and initializations to enable a SW
+> triggered interrupt in the vector's dyn_ctl register.
+>=20
+> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+> ---
+>  drivers/net/ethernet/intel/idpf/idpf_dev.c    | 3 +++
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.h   | 8 +++++++-
+>  drivers/net/ethernet/intel/idpf/idpf_vf_dev.c | 3 +++
+>  3 files changed, 13 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_dev.c
+> b/drivers/net/ethernet/intel/idpf/idpf_dev.c
+> index 6c913a703df6..41e4bd49402a 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_dev.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_dev.c
 
-        WARNING: CPU: 3 PID: 6639 at net/rxrpc/sendmsg.c:296 rxrpc_send_da=
-ta+0x3f2/0x860
-
-and rejected the additional data, returning error EPROTO.
-
-Fix this by adding a guard flag to the call, setting the flag when we queu=
-e
-the final packet and then rejecting further attempts to add data with
-EPROTO.
-
-Fixes: 2d689424b618 ("rxrpc: Move call state changes from sendmsg to I/O t=
-hread")
-Reported-by: syzbot+ff11be94dfcd7a5af8da@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/r/6757fb68.050a0220.2477f.005f.GAE@google.=
-com/
-Signed-off-by: David Howells <dhowells@redhat.com>
-Tested-by: syzbot+ff11be94dfcd7a5af8da@syzkaller.appspotmail.com
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
----
- net/rxrpc/ar-internal.h |    1 +
- net/rxrpc/sendmsg.c     |    8 ++++++++
- 2 files changed, 9 insertions(+)
-
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index 0c0a3c89dba3..718193df9d2e 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -571,6 +571,7 @@ enum rxrpc_call_flag {
- 	RXRPC_CALL_RX_LAST,		/* Received the last packet (at rxtx_top) */
- 	RXRPC_CALL_TX_LAST,		/* Last packet in Tx buffer (at rxtx_top) */
- 	RXRPC_CALL_TX_ALL_ACKED,	/* Last packet has been hard-acked */
-+	RXRPC_CALL_TX_NO_MORE,		/* No more data to transmit (MSG_MORE deasserted=
-) */
- 	RXRPC_CALL_SEND_PING,		/* A ping will need to be sent */
- 	RXRPC_CALL_RETRANS_TIMEOUT,	/* Retransmission due to timeout occurred */
- 	RXRPC_CALL_BEGAN_RX_TIMER,	/* We began the expect_rx_by timer */
-diff --git a/net/rxrpc/sendmsg.c b/net/rxrpc/sendmsg.c
-index c4c8b718cafa..0e8da909d4f2 100644
---- a/net/rxrpc/sendmsg.c
-+++ b/net/rxrpc/sendmsg.c
-@@ -266,6 +266,7 @@ static void rxrpc_queue_packet(struct rxrpc_sock *rx, =
-struct rxrpc_call *call,
- 	/* Order send_top after the queue->next pointer and txb content. */
- 	smp_store_release(&call->send_top, seq);
- 	if (last) {
-+		set_bit(RXRPC_CALL_TX_NO_MORE, &call->flags);
- 		rxrpc_notify_end_tx(rx, call, notify_end_tx);
- 		call->send_queue =3D NULL;
- 	}
-@@ -329,6 +330,13 @@ static int rxrpc_send_data(struct rxrpc_sock *rx,
- 	bool more =3D msg->msg_flags & MSG_MORE;
- 	int ret, copied =3D 0;
- =
-
-+	if (test_bit(RXRPC_CALL_TX_NO_MORE, &call->flags)) {
-+		trace_rxrpc_abort(call->debug_id, rxrpc_sendmsg_late_send,
-+				  call->cid, call->call_id, call->rx_consumed,
-+				  0, -EPROTO);
-+		return -EPROTO;
-+	}
-+
- 	timeo =3D sock_sndtimeo(sk, msg->msg_flags & MSG_DONTWAIT);
- =
-
- 	ret =3D rxrpc_wait_to_be_connected(call, &timeo);
-
+Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
 
