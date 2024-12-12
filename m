@@ -1,75 +1,72 @@
-Return-Path: <netdev+bounces-151336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D8CE9EE381
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:57:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 819979EE38F
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 11:00:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A93D6283DEE
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:57:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAC77286794
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2BE20E715;
-	Thu, 12 Dec 2024 09:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EED52101A0;
+	Thu, 12 Dec 2024 10:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V+b7AyzM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VdKfS77S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4F5204C3D;
-	Thu, 12 Dec 2024 09:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60946210198;
+	Thu, 12 Dec 2024 10:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733997427; cv=none; b=GmA8MWMXGQdEyk75MuCvByv4UuFzPygxaQlEK6bJFkuo9f19o8GhOJyZp99ZUJAhSZMEBcOyEA8M5ROz4pveqmJQuS5vHX5YZqYr0FFgvPJ2i1twO8Bj33otytdKMt6vCodA5Fx9u+qWAPxrGfxfuEhoxqRa26Wfi+puTY8HpYo=
+	t=1733997610; cv=none; b=P84PTuZ6nYOwETN/ZMbEV+DVSBEbjekIjUYbIF5QJoLN+g79Vw+DU/DPLeoy6XS9NGbbL4xQ0hym9F1fS22j1LfU7J+WyAPcUYFy+eXL9IrE3/HCu/gd5chmq22J02MZDpTOk+9zUBpcXymZoGGIGH27Y+ITgTkpRaB8fEnNzTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733997427; c=relaxed/simple;
-	bh=nppU8uMDTN+7Tp4+rDmbcKivr8wiymzwB3BPU5fBWtA=;
+	s=arc-20240116; t=1733997610; c=relaxed/simple;
+	bh=qDAv2Xv6N2kuxJQLsjfm1axhvIqwPsan4GylkV4QvzY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qMTNooAngV138nLaeYN7n6NS0e3dHjfRgUlWmPNs4sjGcILhw/hBNrS0O1MF5qlLunhM94J8D6kejmK1w8AB4gA90oaSL0KtkgOebm8lheqVyAyKIhxLzQT5OvhIjl3tVEi5xXUv1pFLF6Ic86lQE5i9H3ZkuouE0Aad4Fz/ij8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V+b7AyzM; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733997426; x=1765533426;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nppU8uMDTN+7Tp4+rDmbcKivr8wiymzwB3BPU5fBWtA=;
-  b=V+b7AyzM9s4vgRikwKpAw4h5852+lkc7bsorT3B6syUUDGPa6aFSOmAB
-   dw3hGUXDN9oqElxlBnhCSOxkRBDt/eWqpQIrVkdZLOzPo4kNdURULP/bK
-   Y/Bybyy2gHbqvBfCR15b16fMVvsC/MhHJzDewhHMqu7E224uKhUAmKsCT
-   h4/icnLvzaZXprgzPcxVYCgOw6HShCBNh5W+YzN9KQAIbtUz9Wq9EKDo/
-   s9H277fexGsziVsHUZDrbQ1DKWyw9vQabSmH+gQMaG+Bi2CDFdpuWN+B/
-   WlJsGrdQXjfWHhvfR0QEkRYUjsorRKrWeB98/b1qtyVOkUCy+KSSirDvC
-   A==;
-X-CSE-ConnectionGUID: vmdsgPWGT4io1WzA0cf6ag==
-X-CSE-MsgGUID: 4AshdFvtRUGbC6PzVH1d+Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11283"; a="34133618"
-X-IronPort-AV: E=Sophos;i="6.12,228,1728975600"; 
-   d="scan'208";a="34133618"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 01:57:06 -0800
-X-CSE-ConnectionGUID: 43UYJOO/SG2GYPoQsceDyw==
-X-CSE-MsgGUID: Hvwmu08KTpu2+6lxDwrGWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="96979763"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 01:57:03 -0800
-Date: Thu, 12 Dec 2024 10:54:02 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Lorenz Brun <lorenz@brun.one>
-Cc: Igor Russkikh <irusskikh@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Manuel Ullmann <labre@posteo.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: atlantic: keep rings across suspend/resume
-Message-ID: <Z1qyuioi7N1WYEW4@mev-dev.igk.intel.com>
-References: <20241212023946.3979643-1-lorenz@brun.one>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z0sfh8mVcSVFQtw7HPyI6pTih7ABhfzmpgb7h9cP8OhYaXWvf8amxXNV28x+n7WdLiP7pPxbaO7MFjLcrWgPGlLCnwBTt2naH5jkUaSzqRBfQpWV1Kc5smEe1CNWUVZh9P0yWe3Qk+m70o+MM+0UpPRTX5QP4IvhbCOqP1kyEEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VdKfS77S; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=wA41zs323CaxwCsbLDOAz6jafr2ZMVwJEresqJ562hE=; b=VdKfS77SJboOdDhtPNF3vqvb86
+	UPC1q2HKZ90KAVOWlP7iooe6gv7dhK7+e0dKXQNRtNU0UEjRv4cTsIh9QYbDiXZ1h4jWgPCwdHZ0g
+	NHYAxxMY67JEcM+LPoOtH694kdgAb9lPWqDXjk/HUCumQgB+XwoKFFvwAHE8VtNmHdo2E74rVLUn+
+	mmDgYejw0tNQzdGErxsB0jWiR9kW7JpDhsAHn+KvBM232HWoEAF0jMejSGjSebb5HTZ1ffRTt8btF
+	Vv5vIZILY/TKJT22kt9DMVyjBckS/8dlYIB1+KdG6lp50lUHPLUw41/J2o7jxMiQUnddP66KqAbQC
+	Yt7MMrbQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45064)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tLfyz-00054Z-1C;
+	Thu, 12 Dec 2024 09:59:45 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tLfys-0005FA-2P;
+	Thu, 12 Dec 2024 09:59:38 +0000
+Date: Thu, 12 Dec 2024 09:59:38 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Chris Packham <chris.packham@alliedtelesis.co.nz>
+Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	tsbogend@alpha.franken.de, hkallweit1@gmail.com,
+	markus.stockhausen@gmx.de, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-mips@vger.kernel.org
+Subject: Re: [PATCH 4/4] net: mdio: Add RTL9300 MDIO driver
+Message-ID: <Z1q0CuDXe8VFuBfZ@shell.armlinux.org.uk>
+References: <20241211235342.1573926-1-chris.packham@alliedtelesis.co.nz>
+ <20241211235342.1573926-5-chris.packham@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,159 +75,190 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241212023946.3979643-1-lorenz@brun.one>
+In-Reply-To: <20241211235342.1573926-5-chris.packham@alliedtelesis.co.nz>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Dec 12, 2024 at 03:39:24AM +0100, Lorenz Brun wrote:
-> The rings are order-6 allocations which tend to fail on suspend due to
-> fragmentation. As memory is kept during suspend/resume, we don't need to
-> reallocate them.
-> 
-> This does not touch the PTP rings which, if enabled, still reallocate.
-> Fixing these is harder as the whole structure is reinitialized.
-> 
-> Fixes: cbe6c3a8f8f4 ("net: atlantic: invert deep par in pm functions, preventing null derefs")
-> Signed-off-by: Lorenz Brun <lorenz@brun.one>
-> ---
->  drivers/net/ethernet/aquantia/atlantic/aq_main.c     |  4 ++--
->  drivers/net/ethernet/aquantia/atlantic/aq_nic.c      |  7 ++++---
->  drivers/net/ethernet/aquantia/atlantic/aq_nic.h      |  2 +-
->  drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c |  4 ++--
->  drivers/net/ethernet/aquantia/atlantic/aq_vec.c      | 10 ++++++++++
->  5 files changed, 19 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_main.c b/drivers/net/ethernet/aquantia/atlantic/aq_main.c
-> index c1d1673c5749..cd3709ba7229 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/aq_main.c
-> +++ b/drivers/net/ethernet/aquantia/atlantic/aq_main.c
-> @@ -84,7 +84,7 @@ int aq_ndev_open(struct net_device *ndev)
->  
->  err_exit:
->  	if (err < 0)
-> -		aq_nic_deinit(aq_nic, true);
-> +		aq_nic_deinit(aq_nic, true, false);
-Only my suggestion:
-Instead of passing another boolean to the function you can have:
-aq_nic_deinit(...)
-{
-	always without free
-}
+On Thu, Dec 12, 2024 at 12:53:42PM +1300, Chris Packham wrote:
+> +#define SMI_GLB_CTRL			0x000
+> +#define   GLB_CTRL_INTF_SEL(intf)	BIT(16 + (intf))
+> +#define SMI_PORT0_15_POLLING_SEL	0x008
+> +#define SMI_ACCESS_PHY_CTRL_0		0x170
+> +#define SMI_ACCESS_PHY_CTRL_1		0x174
+> +#define   PHY_CTRL_RWOP			BIT(2)
 
-aq_nic_deinit_and_free(...)
-{
-	aq_nic_deinit(...);
-	free
-}
+Presumably, reading the code, this bit is set when writing?
 
-It may be easier to read.
+> +#define   PHY_CTRL_TYPE			BIT(1)
 
->  
->  	return err;
->  }
-> @@ -95,7 +95,7 @@ int aq_ndev_close(struct net_device *ndev)
->  	int err = 0;
->  
->  	err = aq_nic_stop(aq_nic);
-> -	aq_nic_deinit(aq_nic, true);
-> +	aq_nic_deinit(aq_nic, true, false);
->  
->  	return err;
->  }
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-> index fe0e3e2a8117..a6324ae88acf 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-> +++ b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-> @@ -1422,7 +1422,7 @@ void aq_nic_set_power(struct aq_nic_s *self)
->  		}
->  }
->  
-> -void aq_nic_deinit(struct aq_nic_s *self, bool link_down)
-Will be nice to have a kernel-doc.
+Presumably, reading the code, this bit indicates we want to use clause
+45?
 
-> +void aq_nic_deinit(struct aq_nic_s *self, bool link_down, bool keep_rings)
->  {
->  	struct aq_vec_s *aq_vec = NULL;
->  	unsigned int i = 0U;
-> @@ -1433,7 +1433,8 @@ void aq_nic_deinit(struct aq_nic_s *self, bool link_down)
->  	for (i = 0U; i < self->aq_vecs; i++) {
->  		aq_vec = self->aq_vec[i];
->  		aq_vec_deinit(aq_vec);
-> -		aq_vec_ring_free(aq_vec);
-> +		if (!keep_rings)
-> +			aq_vec_ring_free(aq_vec);
->  	}
->  
->  	aq_ptp_unregister(self);
-> @@ -1499,7 +1500,7 @@ void aq_nic_shutdown(struct aq_nic_s *self)
->  		if (err < 0)
->  			goto err_exit;
->  	}
-> -	aq_nic_deinit(self, !self->aq_hw->aq_nic_cfg->wol);
-> +	aq_nic_deinit(self, !self->aq_hw->aq_nic_cfg->wol, false);
->  	aq_nic_set_power(self);
->  
->  err_exit:
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_nic.h b/drivers/net/ethernet/aquantia/atlantic/aq_nic.h
-> index ad33f8586532..f0543a5cc087 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/aq_nic.h
-> +++ b/drivers/net/ethernet/aquantia/atlantic/aq_nic.h
-> @@ -189,7 +189,7 @@ int aq_nic_get_regs(struct aq_nic_s *self, struct ethtool_regs *regs, void *p);
->  int aq_nic_get_regs_count(struct aq_nic_s *self);
->  u64 *aq_nic_get_stats(struct aq_nic_s *self, u64 *data);
->  int aq_nic_stop(struct aq_nic_s *self);
-> -void aq_nic_deinit(struct aq_nic_s *self, bool link_down);
-> +void aq_nic_deinit(struct aq_nic_s *self, bool link_down, bool keep_rings);
->  void aq_nic_set_power(struct aq_nic_s *self);
->  void aq_nic_free_hot_resources(struct aq_nic_s *self);
->  void aq_nic_free_vectors(struct aq_nic_s *self);
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c b/drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c
-> index 43c71f6b314f..1015eab5ee50 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c
-> +++ b/drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c
-> @@ -390,7 +390,7 @@ static int aq_suspend_common(struct device *dev)
->  	if (netif_running(nic->ndev))
->  		aq_nic_stop(nic);
->  
-> -	aq_nic_deinit(nic, !nic->aq_hw->aq_nic_cfg->wol);
-> +	aq_nic_deinit(nic, !nic->aq_hw->aq_nic_cfg->wol, true);
->  	aq_nic_set_power(nic);
->  
->  	rtnl_unlock();
-> @@ -426,7 +426,7 @@ static int atl_resume_common(struct device *dev)
->  
->  err_exit:
->  	if (ret < 0)
-> -		aq_nic_deinit(nic, true);
-> +		aq_nic_deinit(nic, true, false);
->  
->  	rtnl_unlock();
->  
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_vec.c b/drivers/net/ethernet/aquantia/atlantic/aq_vec.c
-> index 9769ab4f9bef..3b51d6ee0812 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/aq_vec.c
-> +++ b/drivers/net/ethernet/aquantia/atlantic/aq_vec.c
-> @@ -132,6 +132,16 @@ int aq_vec_ring_alloc(struct aq_vec_s *self, struct aq_nic_s *aq_nic,
->  	unsigned int i = 0U;
->  	int err = 0;
->  
-> +	if (self && self->tx_rings == aq_nic_cfg->tcs && self->rx_rings == aq_nic_cfg->tcs) {
-> +		/* Correct rings already allocated, nothing to do here */
-> +		return 0;
-Is the same number of Tx/Rx always enough to say that the vector is the
-same? It has more additinal data in the structure.
+> +#define   PHY_CTRL_CMD			BIT(0)
+> +#define   PHY_CTRL_FAIL			BIT(25)
+> +#define SMI_ACCESS_PHY_CTRL_2		0x178
+> +#define SMI_ACCESS_PHY_CTRL_3		0x17c
+> +#define SMI_PORT0_5_ADDR_CTRL		0x180
+> +
+> +#define MAX_PORTS       32
+> +#define MAX_SMI_BUSSES  4
+> +
+> +struct realtek_mdio_priv {
+> +	struct regmap *regmap;
+> +	u8 smi_bus[MAX_PORTS];
+> +	u8 smi_addr[MAX_PORTS];
+> +	bool smi_bus_isc45[MAX_SMI_BUSSES];
 
-> +	} else if (self && (self->tx_rings > 0 || self->rx_rings > 0)) {
-> +		/* Allocated rings are different, free rings and reallocate */
-> +		pr_notice("%s: cannot reuse rings, have %d, need %d, reallocating", __func__,
-> +			  self->tx_rings, aq_nic_cfg->tcs);
-> +		aq_vec_ring_free(self);
+Not sure about the support for !C45 - you appear to set this if you
+find a PHY as a child of this device which has the PHY C45 compatible,
+but as you don't populate the C22 MDIO bus operations, I'm not sure
+how a C22 PHY can work.
+
+> +	u32 reg_base;
+> +};
+> +
+> +static int realtek_mdio_wait_ready(struct realtek_mdio_priv *priv)
+> +{
+> +	u32 val;
+> +
+> +	return regmap_read_poll_timeout(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_1,
+> +					val, !(val & PHY_CTRL_CMD), 10, 500);
+> +}
+> +
+> +static int realtek_mdio_read_c45(struct mii_bus *bus, int phy_id, int dev_addr, int regnum)
+> +{
+> +	struct realtek_mdio_priv *priv = bus->priv;
+> +	u32 val;
+> +	int err;
+> +
+> +	err = realtek_mdio_wait_ready(priv);
+> +	if (err)
+> +		return err;
+> +
+> +	err = regmap_write(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_2, phy_id << 16);
+> +	if (err)
+> +		return err;
+> +
+> +	err = regmap_write(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_3,
+> +			   dev_addr << 16 | (regnum & 0xffff));
+> +	if (err)
+> +		return err;
+> +
+> +	err = regmap_write(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_1,
+> +			   PHY_CTRL_TYPE | PHY_CTRL_CMD);
+> +	if (err)
+> +		return err;
+
+Maybe consider using a local variable for "regmap" and "reg_base" to
+reduce the line length/wrapping?
+
+> +static int realtek_mdiobus_init(struct realtek_mdio_priv *priv)
+> +{
+> +	u32 port_addr[5] = { };
+> +	u32 poll_sel[2] = { 0, 0 };
+> +	u32 glb_ctrl_mask = 0, glb_ctrl_val = 0;
+
+Please use reverse Christmas tree order.
+
+> +	int i, err;
+> +
+> +	for (i = 0; i < MAX_PORTS; i++) {
+> +		int pos;
+> +
+> +		if (priv->smi_bus[i] > 3)
+> +			continue;
+> +
+> +		pos = (i % 6) * 5;
+> +		port_addr[i / 6] |=  priv->smi_addr[i] << pos;
+
+s/  / /
+
+> +
+> +		pos = (i % 16) * 2;
+> +		poll_sel[i / 16] |= priv->smi_bus[i] << pos;
 > +	}
 > +
->  	for (i = 0; i < aq_nic_cfg->tcs; ++i) {
->  		const unsigned int idx_ring = AQ_NIC_CFG_TCVEC2RING(aq_nic_cfg,
->  								    i, idx);
+> +	for (i = 0; i < MAX_SMI_BUSSES; i++) {
+> +		if (priv->smi_bus_isc45[i]) {
+> +			glb_ctrl_mask |= GLB_CTRL_INTF_SEL(i);
+> +			glb_ctrl_val |= GLB_CTRL_INTF_SEL(i);
+> +		}
+> +	}
+> +
+> +	err = regmap_bulk_write(priv->regmap, priv->reg_base + SMI_PORT0_5_ADDR_CTRL,
+> +				port_addr, 5);
+> +	if (err)
+> +		return err;
+> +
+> +	err = regmap_bulk_write(priv->regmap, priv->reg_base + SMI_PORT0_15_POLLING_SEL,
+> +				poll_sel, 2);
+> +	if (err)
+> +		return err;
+> +
+> +	err = regmap_update_bits(priv->regmap, priv->reg_base + SMI_GLB_CTRL,
+> +				 glb_ctrl_mask, glb_ctrl_val);
+> +	if (err)
+> +		return err;
+> +
+> +	return 0;
+> +}
+> +
+> +static int realtek_mdiobus_probe(struct platform_device *pdev)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct realtek_mdio_priv *priv;
+> +	struct fwnode_handle *child;
+> +	struct mii_bus *bus;
+> +	int err;
+> +
+> +	bus = devm_mdiobus_alloc_size(dev, sizeof(*priv));
+> +	if (!bus)
+> +		return -ENOMEM;
+> +
+> +	bus->name = "Reaktek Switch MDIO Bus";
+> +	bus->read_c45 = realtek_mdio_read_c45;
+> +	bus->write_c45 =  realtek_mdio_write_c45;
+> +	bus->parent = dev;
+> +	priv = bus->priv;
+> +
+> +	priv->regmap = syscon_node_to_regmap(dev->parent->of_node);
+> +	if (IS_ERR(priv->regmap))
+> +		return PTR_ERR(priv->regmap);
+> +
+> +	err = device_property_read_u32(dev, "reg", &priv->reg_base);
+> +	if (err)
+> +		return err;
+> +
+> +	snprintf(bus->id, MII_BUS_ID_SIZE, "%s", dev_name(dev));
+> +
+> +	device_for_each_child_node(dev, child) {
+> +		u32 pn, smi_addr[2];
+> +
+> +		err = fwnode_property_read_u32(child, "reg", &pn);
+> +		if (err)
+> +			return err;
+> +
+> +		if (pn > MAX_PORTS)
+> +			return dev_err_probe(dev, -EINVAL, "illegal port number %d\n", pn);
 
-Thanks,
-Michal
-> -- 
-> 2.44.1
+You validate the port number.
+
+> +
+> +		err = fwnode_property_read_u32_array(child, "realtek,smi-address", smi_addr, 2);
+> +		if (err) {
+> +			smi_addr[0] = 0;
+> +			smi_addr[1] = pn;
+> +		}
+
+You don't validate the "smi_addr", so:
+
+	realtek,smi-address = <4, ...>;
+
+would silently overflow priv->smi_bus_isc45. However, I haven't checked
+whether the binding would warn about this.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
