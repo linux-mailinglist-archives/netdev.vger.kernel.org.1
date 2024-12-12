@@ -1,172 +1,203 @@
-Return-Path: <netdev+bounces-151330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B30E59EE281
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:20:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2B7D9EE309
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:28:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6B76188B284
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:19:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C62F01624EC
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968E720E707;
-	Thu, 12 Dec 2024 09:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175B920E71E;
+	Thu, 12 Dec 2024 09:27:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOXrkPE5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nhqx6W4k"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724D720CCE7
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 09:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A88B20E315
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 09:27:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733995184; cv=none; b=fkglmHwexsPYihzGmCF40RoCmiyB3Gv4oetAOZ4FtmJgmyGvoUgyKMEZnOCeOGInmSLWdxlK5/95TLIO0MoVv3Er+aca0joqwpBk65uX49zmvtk+/q21Wi0LQQdIM6HMou1Q6aHSk7TdZdwXxc4vIkonPMWybQTCchauMavXw6s=
+	t=1733995677; cv=none; b=S1GqdBg6tp8qpfdxtfXkgtL/ReEeMBeoYK65EAqElFXGzdlM/uZkV8B4wbe1bven6DdkLz/Rd48/mseIyr8uSd46MsTODnpm+ilnwDyXNlRar1HcA/9QX2dHbPAqYRL8w1c1pUfE/sglNa0qcte3zgX56SYGzLrBgHQ/upXCiig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733995184; c=relaxed/simple;
-	bh=iUGVAU4e5lFNJ0P2lalKqxBBvplL/cziTTZ9ZcjocIg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b8YZeqq9T9/5m2MXG3fD5HJOtqNa/skU8zpLEELQlGLMBrt3Pliz7NPdGCDh5xDvC5p51GRgQBzd5dbhFsFhsM/LGfcnjn+4NZ7ytSVv/zs33MyPl2i/Uh9TNuzhSWkCoqRahAH7/mAxb+y8gLjMymPVE7LHpfZC1kGGoGrZAss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOXrkPE5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AE96C4CED4;
-	Thu, 12 Dec 2024 09:19:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733995184;
-	bh=iUGVAU4e5lFNJ0P2lalKqxBBvplL/cziTTZ9ZcjocIg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jOXrkPE5GpckYdd+nCyk30R2BNFND6ldzp2hDAO7OPw+6ZZ6U4P25RunWFdDr3faQ
-	 1KUeVcQ2jaexd1/ghnbsoPOWgUApVhbisiG8J0Nrt+lJ68yIejDud99kg9u3nBK3HG
-	 8FeociRqH4HnI2Tv7/J4pjqsRJ8yvEsvfAuodgM0i1MrQxqeXeZV7ETmK+AaDcjJjw
-	 syuObn5Pc/rE5f1m6UR6tcOQ3trWsHo09CkLucH0yUA7+lkk23YRAi6shkEeB4L9ZL
-	 ThOoNJ1HLP3E72DJpw5BiCaGn3GHbf83LLE86HzBkSSgEPX0wS7dsOdi+TbzJYT5jA
-	 gzaIkA1u6vBVA==
-Date: Thu, 12 Dec 2024 10:19:41 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, nbd@nbd.name, sean.wang@mediatek.com,
-	Mark-MC.Lee@mediatek.com, lorenzo.bianconi83@gmail.com
-Subject: Re: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha
- EN7581 SoC
-Message-ID: <Z1qqrVWV84DBZuCn@lore-desk>
-References: <cover.1733930558.git.lorenzo@kernel.org>
- <20241211154109.dvkihluzdouhtamr@skbuf>
+	s=arc-20240116; t=1733995677; c=relaxed/simple;
+	bh=b9cdBCl6i8/Pg9BidsE6MaRf0sy/S53LsQhJ0yDDCcE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=To8fdnsfkSbSQB5V74i7SMdt7hjeJqWCXeukneDtt+wAA5GzXIABXZ6jlyixgZNwHY265Xn2Qpr3AzlXWyXP8Te47FsHmVHg55PWtR1mXsFTCm7bcLpfYIb8+v1wQSc12iV7Y3aNCzmItIo0Q7SH6JOm/q+Y1jxeLjw8EPqcY2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nhqx6W4k; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733995674;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YQDLEldT18Fc0IWLf1h2y9YzeGe3KbZy7EnSjmgH5Ac=;
+	b=Nhqx6W4kJE3Wle9BHJlqTvkDnRjXESdDQ4Epx9gNr43wKyu62KRgktilyqs8a+20w/MU+K
+	y4TyK6Molb+XCdxIJKsMg8PCtNocCdYwpQDCWDnl6nXp2YzyKYunLunrs0OeRWPLa67Ui0
+	pbyPkxU7QU0xSAKtH11T983ezr3G5/M=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-590-Lqav0oUxNwOe0kKpApKosA-1; Thu, 12 Dec 2024 04:27:52 -0500
+X-MC-Unique: Lqav0oUxNwOe0kKpApKosA-1
+X-Mimecast-MFC-AGG-ID: Lqav0oUxNwOe0kKpApKosA
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43625ceae52so1979275e9.0
+        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 01:27:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733995671; x=1734600471;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YQDLEldT18Fc0IWLf1h2y9YzeGe3KbZy7EnSjmgH5Ac=;
+        b=CYIl8rQxjYtDPKfYpBIUZ2ZyOBGGkYPMBcbfgdbD+RCyLuPOE6k+5Oxe1wMJa7b6bK
+         rgBnoqV4jwOA1S4iZYtDsK9tOOBUOiA6Ly6MzQWLtARknogVY7U20b+p7pahV3toqazO
+         WHFacJQ9hHbMyUWQNeAJPJaacZdMhrOsjsZKUG87khCpqpZJ/noVA43dD2aJ7TNQJSW6
+         IN2R6uVbVKsXpV/9/xN9hFiyKzZGU/KwaIiKOcvxX7IAL489UOMMQF+UwvLtjyRdSisB
+         /4u+D6dT944y42jC538sdW5t5PGGYFaER1kg9LymSvxKBeDIAt6RAyMtX7IrIjxT6Rde
+         vaiA==
+X-Forwarded-Encrypted: i=1; AJvYcCVeLkxmYQ8Z3k3ftwD3dSaKPAEV+IFBYoI+sNpwaCjR0aq1TLQOMEBUbpq8Jz7qPn4Q541QfrM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywm/Z9Nl04KW9CkXyD7yqgvsMg3UoEtD4biH0USjWRe4OOgCxzG
+	XiqfXy+jD82nuZPXP8gw4bFANZptizqdNa9sRkAx/QxhCORG+EF+9WR7B6qvgodDTVUVsLrCmI6
+	l7wUYR2+Hi5MWiQj5UUM9SE4OvJ4QwLhVypax9EtfOCjDYO+nfndIqICi3OwXqSYO
+X-Gm-Gg: ASbGncsDPay44D3+SI6YvTW7Vr0VvY4UWdUKLWkk2IfKwQXAJ0QrhdIxqeqPLoYz6/q
+	Moure7LE2TZAAIDQUfWPVlKM8xuu3xEf0N7v/B48DCdAH8ldFZRk/pqgc9gYCHk2rPlIxvcrnci
+	5eAKxcc5Xq/6b4tjhq+/Q7hPnUoG9ydlrDQe3V8cc2uCNsBSlwjsUEPvM6orv+ct8VpiWLDuPAD
+	MtCvF+dvNTr6lxFBLo7tzsc4r3fBaWaPXqIupyJle2gWyBFGbtVQiiBjTRzl7/GdBJ2dMUCDUI1
+	RTWm8H4=
+X-Received: by 2002:a05:600c:548a:b0:434:f609:1afa with SMTP id 5b1f17b1804b1-43622823a9bmr23141935e9.4.1733995671073;
+        Thu, 12 Dec 2024 01:27:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGfecq/fvmxWbZmLr9mwKSJq21xM6RVRZ1wSoCEsNQjvNePz0TX5CuMdaiXcW+mTqnLDcuA8w==
+X-Received: by 2002:a05:600c:548a:b0:434:f609:1afa with SMTP id 5b1f17b1804b1-43622823a9bmr23141765e9.4.1733995670687;
+        Thu, 12 Dec 2024 01:27:50 -0800 (PST)
+Received: from [192.168.88.24] (146-241-48-67.dyn.eolo.it. [146.241.48.67])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436256b42a3sm10746345e9.28.2024.12.12.01.27.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2024 01:27:50 -0800 (PST)
+Message-ID: <2b89667d-ccd6-40b7-b355-1c71e159d14f@redhat.com>
+Date: Thu, 12 Dec 2024 10:27:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Tv/j4zy2xt/BHBs/"
-Content-Disposition: inline
-In-Reply-To: <20241211154109.dvkihluzdouhtamr@skbuf>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 3/5] rtnetlink: Decouple net namespaces in
+ rtnl_newlink_create()
+To: Xiao Liang <shaw.leon@gmail.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Jakub Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Jiri Pirko <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
+ linux-rdma@vger.kernel.org, linux-can@vger.kernel.org,
+ osmocom-net-gprs@lists.osmocom.org, bpf@vger.kernel.org,
+ linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+ linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
+ bridge@lists.linux.dev, linux-wpan@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241209140151.231257-1-shaw.leon@gmail.com>
+ <20241209140151.231257-4-shaw.leon@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241209140151.231257-4-shaw.leon@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 12/9/24 15:01, Xiao Liang wrote:
+> There are 4 net namespaces involved when creating links:
+> 
+>  - source netns - where the netlink socket resides,
+>  - target netns - where to put the device being created,
+>  - link netns - netns associated with the device (backend),
+>  - peer netns - netns of peer device.
+> 
+> Currently, two nets are passed to newlink() callback - "src_net"
+> parameter and "dev_net" (implicitly in net_device). They are set as
+> follows, depending on netlink attributes.
+> 
+>  +------------+-------------------+---------+---------+
+>  | peer netns | IFLA_LINK_NETNSID | src_net | dev_net |
+>  +------------+-------------------+---------+---------+
+>  |            | absent            | source  | target  |
+>  | absent     +-------------------+---------+---------+
+>  |            | present           | link    | link    |
+>  +------------+-------------------+---------+---------+
+>  |            | absent            | peer    | target  |
+>  | present    +-------------------+---------+---------+
+>  |            | present           | peer    | link    |
+>  +------------+-------------------+---------+---------+
+> 
+> When IFLA_LINK_NETNSID is present, the device is created in link netns
+> first. This has some side effects, including extra ifindex allocation,
+> ifname validation and link notifications. There's also an extra step to
+> move the device to target netns. These could be avoided if we create it
+> in target netns at the beginning.
+> 
+> On the other hand, the meaning of src_net is ambiguous. It varies
+> depending on how parameters are passed. It is the effective link or peer
+> netns by design, but some drivers ignore it and use dev_net instead.
+> 
+> This patch refactors netns handling by packing newlink() parameters into
+> a struct, and passing source, link and peer netns as is through this
+> struct. Fallback logic is implemented in helper functions -
+> rtnl_newlink_link_net() and rtnl_newlink_peer_net(). If is not set, peer
+> netns falls back to link netns, and link netns falls back to source netns.
+> rtnl_newlink_create() now creates devices in target netns directly,
+> so dev_net is always target netns.
+> 
+> For drivers that use dev_net as fallback of link_netns, current behavior
+> is kept for compatibility.
+> 
+> Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
 
---Tv/j4zy2xt/BHBs/
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I must admit this patch is way too huge for me to allow any reasonable
+review except that this has the potential of breaking a lot of things.
 
-> Hi Lorenzo,
+I think you should be splitted to make it more palatable; i.e.
+- a patch just add the params struct with no semantic changes.
+- a patch making the dev_change_net_namespace() conditional on net !=
+tge_net[1]
+- many per-device patches creating directly the device in the target
+namespace.
+- a patch reverting [1]
 
-Hi Vladimir,
+Other may have different opinions, I'd love to hear them.
 
->=20
-> On Wed, Dec 11, 2024 at 04:31:48PM +0100, Lorenzo Bianconi wrote:
-> > Introduce support for ETS and TBF qdisc offload available in the Airoha
-> > EN7581 ethernet controller.
-> > Some DSA hw switches do not support Qdisc offloading or the mac chip
-> > has more fine grained QoS capabilities with respect to the hw switch
-> > (e.g. Airoha EN7581 mac chip has more hw QoS and buffering capabilities
-> > with respect to the mt7530 switch).=20
-> > Introduce ndo_setup_tc_conduit callback in order to allow tc to offload
-> > Qdisc policies for the specified DSA user port configuring the hw switch
-> > cpu port (mac chip).
->=20
-> Can you please make a detailed diagram explaining how is the conduit
-> involved in the packet data path for QoS? Offloaded tc on a DSA user
-> port is supposed to affect autonomously forwarded traffic too (like the
-> Linux bridge).
+> diff --git a/drivers/net/amt.c b/drivers/net/amt.c
+> index 98c6205ed19f..2f7bf50e05d2 100644
+> --- a/drivers/net/amt.c
+> +++ b/drivers/net/amt.c
+> @@ -3161,14 +3161,17 @@ static int amt_validate(struct nlattr *tb[], struct nlattr *data[],
+>  	return 0;
+>  }
+>  
+> -static int amt_newlink(struct net *net, struct net_device *dev,
+> -		       struct nlattr *tb[], struct nlattr *data[],
+> -		       struct netlink_ext_ack *extack)
+> +static int amt_newlink(struct rtnl_newlink_params *params)
+>  {
+> +	struct net_device *dev = params->dev;
+> +	struct nlattr **tb = params->tb;
+> +	struct nlattr **data = params->data;
+> +	struct netlink_ext_ack *extack = params->extack;
+> +	struct net *link_net = rtnl_newlink_link_net(params);
+>  	struct amt_dev *amt = netdev_priv(dev);
+>  	int err = -EINVAL;
 
-I guess a typical use case would be the one below where the traffic from the
-WAN port is forwarded to a DSA LAN one (e.g. lan0) via netfilter flowtable
-offload.
+Minor nit: here and and many other places, please respect the reverse
+xmas tree order.
 
-            =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=90            =20
-            =E2=94=82               BR0               =E2=94=82            =
-=20
-            =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=AC=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=AC=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=AC=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=AC=
-=E2=94=80=E2=94=80=E2=94=98            =20
-=E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=90           =20
-=E2=94=82DSA            =E2=94=82        =E2=94=82        =E2=94=82        =
-=E2=94=82   =E2=94=82           =20
-=E2=94=82               =E2=94=82        =E2=94=82        =E2=94=82        =
-=E2=94=82   =E2=94=82           =20
-=E2=94=82 =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=90      =E2=94=8C=E2=
-=94=80=E2=94=80=E2=96=BC=E2=94=80=E2=94=90   =E2=94=8C=E2=94=80=E2=94=80=E2=
-=96=BC=E2=94=80=E2=94=90   =E2=94=8C=E2=94=80=E2=94=80=E2=96=BC=E2=94=80=E2=
-=94=90   =E2=94=8C=E2=94=80=E2=94=80=E2=96=BC=E2=94=80=E2=94=90 =E2=94=82  =
-     =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=90
-=E2=94=82 =E2=94=82CPU=E2=94=82      =E2=94=82LAN0=E2=94=82   =E2=94=82LAN1=
-=E2=94=82   =E2=94=82LAN2=E2=94=82   =E2=94=82LAN3=E2=94=82 =E2=94=82      =
- =E2=94=82WAN=E2=94=82
-=E2=94=82 =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=98      =E2=94=94=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98   =E2=94=94=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=98   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=98   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98 =E2=94=82  =
-     =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=98
-=E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98           =20
+Thanks,
 
-In this case the mac chip forwards (in hw) the WAN traffic to the DSA switch
-via the CPU port. In [0] we have the EN7581 mac chip architecture where we
-can assume GDM1 is the CPU port and GDM2 is the WAN port.
-The goal of this RFC series is to offload a Qdisc rule (e.g. ETS) on a given
-LAN port using the mac chip QoS capabilities instead of creating the QoS
-discipline directly in the DSA hw switch:
+Paolo
 
-$tc qdisc replace dev lan0 root handle 1: ets bands 8 strict 2 quanta 1514 =
-1514 1514 3528 1514 1514
-
-As described above the reason for this approach would be to rely on the more
-fine grained QoS capabilities available on the mac chip with respect to the
-hw switch or because the DSA switch does not support QoS offloading.
-
-Regards,
-Lorenzo
-
-[0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it/?id=3D23020f04932701d5c8363e60756f12b43b8ed752
-
---Tv/j4zy2xt/BHBs/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ1qqrQAKCRA6cBh0uS2t
-rMQiAP9CQXoTGBbDoUzsoN2crcTuqAUZdey81BsKhZ6SLYsnMgD8D9bjqcSSy/mi
-Q6siFo9ni1K0GzQ0awTDoQoXVZRBMQ8=
-=WNB4
------END PGP SIGNATURE-----
-
---Tv/j4zy2xt/BHBs/--
 
