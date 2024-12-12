@@ -1,187 +1,191 @@
-Return-Path: <netdev+bounces-151555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 424B09EFFB9
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 00:00:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E219F0001
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 00:23:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A93316880F
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 23:00:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D44F162F64
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 23:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAED71DE8AA;
-	Thu, 12 Dec 2024 23:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C71621DE899;
+	Thu, 12 Dec 2024 23:23:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="Pbpk/0fs"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="cC0mYaWP";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UxsvW09y"
 X-Original-To: netdev@vger.kernel.org
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5DF1D8DFB;
-	Thu, 12 Dec 2024 23:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB0F1D88C7;
+	Thu, 12 Dec 2024 23:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734044441; cv=none; b=jbnXmLzZ1lLsOboWLvmty4545Y6hnFpG7rHC9x1kdm2Roxny7fWtclrLRtHVezpiLcDfmuW69LMTvolV6qub1GhPS30GKvjiyMX2aSVBKG2taACro2ubYMxytvLuctInhBNk88oBs7vzyGu7cFQygZXt2FG/8df/rvsyOEfsMqg=
+	t=1734045805; cv=none; b=tQrfx0+kazMFFja2WMGhFHGNfS/dDsV7sIKV/6vymDyKMzL/qAyRMiTEB2HabZgR2W0umvTcRsbEMuZMtebyjF9CSLYm379jR+TPPlN/btMyY02HZuRBhDkwZqjED8iNb9FX5QFR9tNH6oRZvFonL8TjmHhP1HrJU4QsjaofUc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734044441; c=relaxed/simple;
-	bh=7QLwXxqiXHK9GxQGN/b7k3jlhS5iyReQ14GxQy93dNU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Df+AfC5z7ObOqLDqhnGlz2Qiazlis7znHt+xeAB6hNPoOus/2kIFqaiMcaVV1SoqxzoUTGw+snq3n/V5jUXJbSC3dmAYfPT0dPgTTgKnEkqx3k5kMyHqv/+8CD8cJufw+o4BtY+SflCSvRFhgHM71ne9c2YCM4jVHkt3cIryves=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=Pbpk/0fs; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1734044433;
-	bh=7QLwXxqiXHK9GxQGN/b7k3jlhS5iyReQ14GxQy93dNU=;
-	h=From:Date:Subject:To:Cc:From;
-	b=Pbpk/0fsso5FSs5n/+B28RE7/sErOBu8T/HW8+y+LEoSVyvkUWbP3vFl/clLfVwml
-	 M2P8hJDMKvyRc5xGVVAR8/0UnZk8O1kB2Y4icOVBgcrLnpWEXKluVvIa4FgcbZoxI6
-	 ui9FonpkzzJK9eqVmY1ia5twoQq7/N9Oj+1tN5Oc=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Fri, 13 Dec 2024 00:00:30 +0100
-Subject: [PATCH bpf] bpf: fix configuration-dependent BTF function
- references
+	s=arc-20240116; t=1734045805; c=relaxed/simple;
+	bh=/WdJlbdFKhBhBaI8pNkou1RvtXH2M6zc853zjdaiOt0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=us+K+pO1zr4ZHlV8aPi5sa6KOoHHl8p1nQodmFRBZ4O+lXG0NVE4lO3MXxfjYaicwS8Hpb5CjUm2NGOhWrc7ODYNt+5vfEXK7ToOGNvET5Mg5KvUz90jL6YzjXy1rmxCzFt2s4QRx8Xh8B7ukw8fL9M+or/Gh9QPjfI+tx1lxxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=cC0mYaWP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UxsvW09y; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfout.phl.internal (Postfix) with ESMTP id A4E36138370B;
+	Thu, 12 Dec 2024 18:23:21 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Thu, 12 Dec 2024 18:23:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1734045801; x=1734132201; bh=u6hB1h+d6p4EJ8BejXkpl
+	SVJZjGQRemDsGbKPqKBy50=; b=cC0mYaWPNkX/W9qzk9bEbNTc9jYgvgUUXLDTb
+	D4vYUO2rCiX1bHh9QG8NbEuA1S2gSuqv09d8bULm/BOFVsM1AYlmnk2gtlxuUT+b
+	Pmp7CKprRw8nUNn0n7Ua9caobdeTl8N8EXJfh4n56+AAzSNSzdmSNA0mG609WXKm
+	SZ6empDjtqgIKHFQ9ZTMHCjnE2Ae0xZ10l48DafHFcffZkyRrs6P8UwofymOoybQ
+	d/Vo3tOxzRGhMR8hK/wo4V5iJH8asTp/HBbMI0VUAEq7ixWGDHlyjh6MfOAGNUzu
+	l4I17jmu7DWGowwQBT6XNoLoWdEuJd8OIv7UbjdUeQyHAYiDw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:content-transfer-encoding:content-type
+	:date:date:feedback-id:feedback-id:from:from:in-reply-to
+	:message-id:mime-version:reply-to:subject:subject:to:to
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1734045801; x=1734132201; bh=u6hB1h+d6p4EJ8BejXkplSVJZjGQRemDsGb
+	KPqKBy50=; b=UxsvW09ySFdttUyMHc7M7Qjtwdpr0KkfbGsuNO8QqXske8A7duG
+	UoxlYTv2YCHbImL3LUlOCYFFHczU2uXbvhohtsv55mmpXzYrM6KQsvvRXy7GiU61
+	/xjWBoFOBbF2XUl8L88omjhXRruTXfvSW2FYrvuZLu5FaxSiKBddmm8glYyugsM+
+	74CZdTLU6gkzvENG0w/V0Ge9h79pz1rHDNiT4jfuZ4EYqOAKoIP/q78+NcvNvfNK
+	Gu347qcVDLE1MTH0no1JIhuGLtZNy3zT4XKmQ13m/DynPmqIC7cZnJsSY/xnOan2
+	FcqplC/RDMOgQuACz5JAu0//2DiNNlVgTPQ==
+X-ME-Sender: <xms:aXBbZ5a5Io5bvcqF5c293mLqiAK2awPMk-UdQKHEir3RXZFekdtbJQ>
+    <xme:aXBbZwblwylEjZWNQc3xBSD1t41ROoEnvtLoLtGft5NofQY547dw2agiFCzxcW3Z9
+    fD5bBUkluTe2991sA>
+X-ME-Received: <xmr:aXBbZ78_FBXmPqQ-T1sCv1sjMarsfbLUbInu8LDhWQfixHbaTHFRi5VxfRQCNMe4TEj3Qnlw43FUucutSmfSclQ3W98Sg6o8HqgKkP74lxWSa0G_lXWt>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkeeigddtlecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdejtd
+    dmnecujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghnihgv
+    lhcuighuuceougiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepieffgf
+    elvdffiedtleejvdetfeefiedvfeehieevveejudeiiefgteeiveeiffffnecuvehluhhs
+    thgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuh
+    drgiihiidpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthht
+    oheprghstheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvg
+    hlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgv
+    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhhsvghlfhhtvghsth
+    esvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehmvghmgihorhesghhmrghi
+    lhdrtghomhdprhgtphhtthhopegsphhfsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtohepuggrnhhivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtghpthhtohepvggu
+    ugihiiekjeesghhmrghilhdrtghomh
+X-ME-Proxy: <xmx:aXBbZ3oq3NX2Bm6kzA9ov_JgTysi5sijZsFsBasJ8rElVcaCzKRpfw>
+    <xmx:aXBbZ0p2ow3VKV3CHgg0lyA6I7bZJYEbRL0-8IrZ3wFFkIxYxiB6yw>
+    <xmx:aXBbZ9R1_mPgiPYy6BJk1EBZBisilRGjixiL7lMRFE62T6_3BGGS4w>
+    <xmx:aXBbZ8o0QhsB1F5Tcf2FK5rTgUEVQWSbpzwmncUUtcjR5pbiGYBDtQ>
+    <xmx:aXBbZweW3jzOKAn-kgX-1mAjTrt8NhLFuY7rJy54TXv1heuGctl21qPI>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 12 Dec 2024 18:23:19 -0500 (EST)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: ast@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	memxor@gmail.com,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	eddyz87@gmail.com
+Subject: [PATCH bpf-next v5 0/5] Support eliding map lookup nullness
+Date: Thu, 12 Dec 2024 16:22:04 -0700
+Message-ID: <cover.1734045451.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20241213-bpf-cond-ids-v1-1-881849997219@weissschuh.net>
-X-B4-Tracking: v=1; b=H4sIAA5rW2cC/x2MQQqAIBBFryKzTkiRpK4SLVLHmo2KQgTi3Rtav
- s/7r0PDSthgEx0qPtQoJwY1CfD3mS6UFJhBz9oorbR0JUqfU+C9ydVF5xcTgrUO+FIqRnr/3A5
- swjHGB1slDRhjAAAA
-X-Change-ID: 20241212-bpf-cond-ids-9bfbc64dd77b
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1734044433; l=3913;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=7QLwXxqiXHK9GxQGN/b7k3jlhS5iyReQ14GxQy93dNU=;
- b=iFMRFxFRZhLYX6ZjIvxGwu4AbMkFGFKKTsmUqyawE6GMp3A9SGg131hRovYSSJzvbQ+RcGmJ9
- 42hc61fmHVSCYKFSQTncIRcShBgc5QCCVV6/ZO+dltldHVKJJ1iH41K
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-These BTF functions are not available unconditionally,
-only reference them when they are available.
+This patch allows progs to elide a null check on statically known map
+lookup keys. In other words, if the verifier can statically prove that
+the lookup will be in-bounds, allow the prog to drop the null check.
 
-Avoid the following build warnings:
+This is useful for two reasons:
 
-  BTF     .tmp_vmlinux1.btf.o
-btf_encoder__tag_kfunc: failed to find kfunc 'bpf_send_signal_task' in BTF
-btf_encoder__tag_kfuncs: failed to tag kfunc 'bpf_send_signal_task'
-  NM      .tmp_vmlinux1.syms
-  KSYMS   .tmp_vmlinux1.kallsyms.S
-  AS      .tmp_vmlinux1.kallsyms.o
-  LD      .tmp_vmlinux2
-  NM      .tmp_vmlinux2.syms
-  KSYMS   .tmp_vmlinux2.kallsyms.S
-  AS      .tmp_vmlinux2.kallsyms.o
-  LD      vmlinux
-  BTFIDS  vmlinux
-WARN: resolve_btfids: unresolved symbol prog_test_ref_kfunc
-WARN: resolve_btfids: unresolved symbol bpf_crypto_ctx
-WARN: resolve_btfids: unresolved symbol bpf_send_signal_task
-WARN: resolve_btfids: unresolved symbol bpf_modify_return_test_tp
-WARN: resolve_btfids: unresolved symbol bpf_dynptr_from_xdp
-WARN: resolve_btfids: unresolved symbol bpf_dynptr_from_skb
+1. Large numbers of nullness checks (especially when they cannot fail)
+   unnecessarily pushes prog towards BPF_COMPLEXITY_LIMIT_JMP_SEQ.
+2. It forms a tighter contract between programmer and verifier.
 
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
- kernel/bpf/helpers.c  | 4 ++++
- kernel/bpf/verifier.c | 8 ++++++++
- 2 files changed, 12 insertions(+)
+For (1), bpftrace is starting to make heavier use of percpu scratch
+maps. As a result, for user scripts with large number of unrolled loops,
+we are starting to hit jump complexity verification errors.  These
+percpu lookups cannot fail anyways, as we only use static key values.
+Eliding nullness probably results in less work for verifier as well.
 
-diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-index 751c150f9e1cd7f56e6a2b68a7ebb4ae89a30d2d..5edf5436a7804816b7dcf1bbef2624d71a985f20 100644
---- a/kernel/bpf/helpers.c
-+++ b/kernel/bpf/helpers.c
-@@ -3089,7 +3089,9 @@ BTF_ID_FLAGS(func, bpf_task_get_cgroup1, KF_ACQUIRE | KF_RCU | KF_RET_NULL)
- BTF_ID_FLAGS(func, bpf_task_from_pid, KF_ACQUIRE | KF_RET_NULL)
- BTF_ID_FLAGS(func, bpf_task_from_vpid, KF_ACQUIRE | KF_RET_NULL)
- BTF_ID_FLAGS(func, bpf_throw)
-+#ifdef CONFIG_BPF_EVENTS
- BTF_ID_FLAGS(func, bpf_send_signal_task, KF_TRUSTED_ARGS)
-+#endif
- BTF_KFUNCS_END(generic_btf_ids)
- 
- static const struct btf_kfunc_id_set generic_kfunc_set = {
-@@ -3135,7 +3137,9 @@ BTF_ID_FLAGS(func, bpf_dynptr_is_null)
- BTF_ID_FLAGS(func, bpf_dynptr_is_rdonly)
- BTF_ID_FLAGS(func, bpf_dynptr_size)
- BTF_ID_FLAGS(func, bpf_dynptr_clone)
-+#ifdef CONFIG_NET
- BTF_ID_FLAGS(func, bpf_modify_return_test_tp)
-+#endif
- BTF_ID_FLAGS(func, bpf_wq_init)
- BTF_ID_FLAGS(func, bpf_wq_set_callback_impl)
- BTF_ID_FLAGS(func, bpf_wq_start)
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index 5e541339b2f6d1870561033fd55cca7144db14bc..77bbf58418fee7533bce539c8e005d2342ee1a48 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -5526,7 +5526,9 @@ static bool in_rcu_cs(struct bpf_verifier_env *env)
- 
- /* Once GCC supports btf_type_tag the following mechanism will be replaced with tag check */
- BTF_SET_START(rcu_protected_types)
-+#ifdef CONFIG_NET
- BTF_ID(struct, prog_test_ref_kfunc)
-+#endif
- #ifdef CONFIG_CGROUPS
- BTF_ID(struct, cgroup)
- #endif
-@@ -5534,7 +5536,9 @@ BTF_ID(struct, cgroup)
- BTF_ID(struct, bpf_cpumask)
- #endif
- BTF_ID(struct, task_struct)
-+#ifdef CONFIG_CRYPTO
- BTF_ID(struct, bpf_crypto_ctx)
-+#endif
- BTF_SET_END(rcu_protected_types)
- 
- static bool rcu_protected_object(const struct btf *btf, u32 btf_id)
-@@ -11529,8 +11533,10 @@ BTF_ID(func, bpf_rdonly_cast)
- BTF_ID(func, bpf_rbtree_remove)
- BTF_ID(func, bpf_rbtree_add_impl)
- BTF_ID(func, bpf_rbtree_first)
-+#ifdef CONFIG_NET
- BTF_ID(func, bpf_dynptr_from_skb)
- BTF_ID(func, bpf_dynptr_from_xdp)
-+#endif
- BTF_ID(func, bpf_dynptr_slice)
- BTF_ID(func, bpf_dynptr_slice_rdwr)
- BTF_ID(func, bpf_dynptr_clone)
-@@ -11558,8 +11564,10 @@ BTF_ID(func, bpf_rcu_read_unlock)
- BTF_ID(func, bpf_rbtree_remove)
- BTF_ID(func, bpf_rbtree_add_impl)
- BTF_ID(func, bpf_rbtree_first)
-+#ifdef CONFIG_NET
- BTF_ID(func, bpf_dynptr_from_skb)
- BTF_ID(func, bpf_dynptr_from_xdp)
-+#endif
- BTF_ID(func, bpf_dynptr_slice)
- BTF_ID(func, bpf_dynptr_slice_rdwr)
- BTF_ID(func, bpf_dynptr_clone)
+For (2), percpu scratch maps are often used as a larger stack, as the
+currrent stack is limited to 512 bytes. In these situations, it is
+desirable for the programmer to express: "this lookup should never fail,
+and if it does, it means I messed up the code". By omitting the null
+check, the programmer can "ask" the verifier to double check the logic.
 
----
-base-commit: 5d287a7de3c95b78946e71d17d15ec9c87fffe7f
-change-id: 20241212-bpf-cond-ids-9bfbc64dd77b
+Changes in v5:
+* Dropped all acks
+* Use s64 instead of long for const_map_key
+* Ensure stack slot contains spilled reg before accessing spilled_ptr
+* Ensure spilled reg is a scalar before accessing tnum const value
+* Fix verifier selftest for 32-bit write to write at 8 byte alignment
+  to ensure spill is tracked
+* Introduce more precise tracking of helper stack accesses
+* Do constant map key extraction as part of helper argument processing
+  and then remove duplicated stack checks
+* Use ret_flag instead of regs[BPF_REG_0].type
+* Handle STACK_ZERO
+* Fix bug in bpf_load_hdr_opt() arg annotation
 
-Best regards,
+Changes in v4:
+* Only allow for CAP_BPF
+* Add test for stack growing upwards
+* Improve comment about stack growing upwards
+
+Changes in v3:
+* Check if stack is (erroneously) growing upwards
+* Mention in commit message why existing tests needed change
+
+Changes in v2:
+* Added a check for when R2 is not a ptr to stack
+* Added a check for when stack is uninitialized (no stack slot yet)
+* Updated existing tests to account for null elision
+* Added test case for when R2 can be both const and non-const
+
+Daniel Xu (5):
+  bpf: verifier: Add missing newline on verbose() call
+  bpf: tcp: Mark bpf_load_hdr_opt() arg2 as read-write
+  bpf: verifier: Refactor helper access type tracking
+  bpf: verifier: Support eliding map lookup nullness
+  bpf: selftests: verifier: Add nullness elision tests
+
+ kernel/bpf/verifier.c                         | 127 ++++++++---
+ net/core/filter.c                             |   2 +-
+ .../testing/selftests/bpf/progs/dynptr_fail.c |   6 +-
+ tools/testing/selftests/bpf/progs/iters.c     |  14 +-
+ .../selftests/bpf/progs/map_kptr_fail.c       |   2 +-
+ .../selftests/bpf/progs/test_global_func10.c  |   2 +-
+ .../selftests/bpf/progs/uninit_stack.c        |  29 ---
+ .../bpf/progs/verifier_array_access.c         | 214 ++++++++++++++++++
+ .../bpf/progs/verifier_basic_stack.c          |   2 +-
+ .../selftests/bpf/progs/verifier_const_or.c   |   4 +-
+ .../progs/verifier_helper_access_var_len.c    |  12 +-
+ .../selftests/bpf/progs/verifier_int_ptr.c    |   2 +-
+ .../selftests/bpf/progs/verifier_map_in_map.c |   2 +-
+ .../selftests/bpf/progs/verifier_mtu.c        |   2 +-
+ .../selftests/bpf/progs/verifier_raw_stack.c  |   4 +-
+ .../selftests/bpf/progs/verifier_unpriv.c     |   2 +-
+ .../selftests/bpf/progs/verifier_var_off.c    |   8 +-
+ tools/testing/selftests/bpf/verifier/calls.c  |   2 +-
+ .../testing/selftests/bpf/verifier/map_kptr.c |   2 +-
+ 19 files changed, 342 insertions(+), 96 deletions(-)
+
 -- 
-Thomas Weißschuh <linux@weissschuh.net>
+2.46.0
 
 
