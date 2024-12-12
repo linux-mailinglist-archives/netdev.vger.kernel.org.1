@@ -1,204 +1,182 @@
-Return-Path: <netdev+bounces-151376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA659EE75E
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 14:06:52 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E38F99EE786
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 14:12:19 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5909188741F
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 13:06:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24766282B5D
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 13:12:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A84213E91;
-	Thu, 12 Dec 2024 13:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440532144BA;
+	Thu, 12 Dec 2024 13:12:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZktGluM3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M162+d9s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720F21EEE6;
-	Thu, 12 Dec 2024 13:06:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF68213E9C
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 13:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734008803; cv=none; b=BegvWGSBuKYl9AfaZ2nJyWuCpEArFrwjeD6VU0UN8NrAKWF+nlLg1iL8E5RH+adKmfXZMotW9+NkKqKYqpr3r+Ux8syFaksKq64tVeyph+WdHWIr+qBh+hZ2Lfy0f+tA6Rgr/yF8AvQJufces29J1PZY22+gIlrvEX8WTYhVbgk=
+	t=1734009129; cv=none; b=U/7TKZY0nLeL1MvWTtii5i55/mLSOoj+yx3p+79EeMhbKzjQNym8bR9DSSpdwSnJjSvT0CTfVg1deyF/mszLuPqsYW3nk6ScZOJoavwKfAK5hA81JcI7exr8h3G9XVbSESuIflYuQTZ8ZgoV3GULgaBT2ihZUC/tFmYbi1WD8xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734008803; c=relaxed/simple;
-	bh=QtnJQVvfbhujzCBbhdoVTuAqzhIPgOKP0r086zlDy7E=;
+	s=arc-20240116; t=1734009129; c=relaxed/simple;
+	bh=xNH0trxtTOW4rvdL0I4jlBRk+iwSpfBrPX6q3+p6KJQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r/Apqum03kGBI+CNFfZGWhkzLEQmxNYF0KuZVnuHx+YcgGwq44qEy3hC4R8j2eZWka8LGPclmJEdvFq+Yxb5Ev8Ce4IuTWQVkb9VRVgHAnNwW6KwKrBeph5RV6HU0GLD3rvLXGaXzcQ4hCIKniWZDSqm2vZItpfc6t0c4l4j7r8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZktGluM3; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4361fe642ddso5928795e9.2;
-        Thu, 12 Dec 2024 05:06:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734008800; x=1734613600; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HqYxTqAiECe9wyyAXaPuVyEXlxRKQjZazVAEQa5Qpbg=;
-        b=ZktGluM3dlR/NF+iXXPLFABaWgcjKCjnNLgrvwDNFhu8xp1OFZ5GHABrDQ1Yv/nH8b
-         ZFXbXUYcE7TfhLWarn4g6UQBwoOfQM6mD23j1LXBSTY3/EzSP355LtykvKZV/wGip79k
-         TwehLk2kIdBMiw3GEOoD4ks6CaoxyvsNl5qtpvYDKf4++YhlJwbcFibtA18/DLzUqKcz
-         oc+ZHNejW+ROMyxslfKFhLGSJf1lDQyNIYjhy1+bpgd2Qs1cNaVCbG8P6SRQTTfSur80
-         5S6/kJ4Mt9DAa3Sk5fDa/LqseIyKcI4vJAWboLA5o74/7Br09Gv1LAawbXz5Bh7i7Yit
-         nI2g==
+	 To:Cc:Content-Type; b=usWaGpKSgy1pnPmYlmKfFTQizUErjLGYHPM73I2JOpUwWvhiVkQ3QATNMXnswCxbmvaPl6OjgrwmTe/es2J/qJU7RcSqnFk4/QEZ1p0qjglhJQ9f7Aivu1AofCKOIAc68b9O71oyzLfIFrQ1k2lTJGaecDnxuxBVR29lKzORdtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M162+d9s; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734009125;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cg1nYxP6XG2A44Y9yGhgtQIdlrwL6BM0kKg96k/uz4g=;
+	b=M162+d9scuqvE/W6geF+/E5Q83aTeotaCzwb1VPHTAWtg0c1shcGr9Ox+3UBhzLjOXaWF3
+	CkG9gId0PW8cPBF9CBzKPXWII3qiKijMN9z3VgvSgTy95H5SpjnPeoU7zEK0t5pg3sNOsZ
+	a1Wg7JqruS9u286xlY4hyua/yTFwtZc=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-664-VyDzj2K0Pkqfjdgj8R5j3g-1; Thu, 12 Dec 2024 08:12:02 -0500
+X-MC-Unique: VyDzj2K0Pkqfjdgj8R5j3g-1
+X-Mimecast-MFC-AGG-ID: VyDzj2K0Pkqfjdgj8R5j3g
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-71d893a4082so233277a34.0
+        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 05:12:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734008800; x=1734613600;
+        d=1e100.net; s=20230601; t=1734009122; x=1734613922;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HqYxTqAiECe9wyyAXaPuVyEXlxRKQjZazVAEQa5Qpbg=;
-        b=DkuoP9tmR4LAp4upucPVi/gANCEW/N9EYXgvaJN+Sa1kGSLtvaM5b3DnSHUGvw+JOh
-         hT3F/y6l6CpiSg9fJJZkUlcbfV/Go4aNCe8wnzO8RnRIyG98sbVK2AdqDYnEmJ7G7Kxb
-         RTejDUH10bjxmJUtrIo3Kk+nlKBRcZJ3vn8VqRnurZcfJHRcjbXn4uCWg85hpwB9ao0g
-         u+vpyNsGYdAggSUKN0sG5gr86i9nqPuXwBWI5g046ZP+hmjY6ZXYrvpJCxtPsHS3Tv6x
-         fRyg4MkAOSxLeiolhik3mCz7az/GLV8fxoBFBZcM5IEHSW3SJmhxqYEyYREfS2AUEKfj
-         1/qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0co2m8kQ87soIcfJKzwNxclsUvo2uyTa37dRPsdaKIFLLr0DEj64pZZ+gAc01qnWFRz27o7rS/Uow@vger.kernel.org, AJvYcCU85PbXeNqOaEBYeGeklIoQ/U3dkw5DVFdTjeOatDS59ghUfie5tO8s4KMbic5xOQ0UTKE=@vger.kernel.org, AJvYcCV5coQ0VWJ42/b1iKHA+SrdRhnkIEv5bG7KP6gkK/EJ7W378Mch/w9K27iMt/BVMLgtKo0BXE6zQBidag==@vger.kernel.org, AJvYcCVFOaHkDV658AHNOOnh3KwwhLhnS9Nm/im/vz2w8QDYDUOmcNToQsMaTwTq/6TwXmkiMMpcsI4pH0q3y5Ts@vger.kernel.org, AJvYcCWb6PWROPDhghXhjuSkH505RNcJFBdDDQLGHnluyGj+Ur1uevI44UmWgh1KolYyezPIl2R/LcfcQxEsAp38j+M=@vger.kernel.org, AJvYcCWhRiDf8Bq+lD7dudbo59mwdKqtcx94TlsWgGz6lhXcmZk2dSU4x8qMWxs/hKuv9WyurK8oiV/JZVRT@vger.kernel.org, AJvYcCWulte37j3DZ41CT1brK37eLXzTMB9e9T5M4DIB1RhdjL52u7C+vipG82iTHvtB+sHVSCY1Mm9J7aKYUw==@vger.kernel.org, AJvYcCXzv9fWxhYf2YBUwR5tw+p4GN9J+gL1fLQBMWskLubscEUPubjsrhqhTk17Xzz8TfmJ1cvCoJX502wAs4b4p9Lc@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9oKm1OleroqTcHb1AE+VsCqnDLoCfA6AuoOVrTYbtLJU/QaLg
-	OVsyi3XZId07Fq/1ER1JRz0kCELEY8wQoQ2e3HEyx4+x1cNisdQSaTEp3S0OiNZNOCL+43bx+FW
-	DP+Y9HkwYB2wADHhiSkSL5GI0MyI=
-X-Gm-Gg: ASbGncu5/2LogKtPmifCLgyTBTx8/o5yaXHqveru4ofL6zY9BrBwuliTgRbCM8j48zr
-	w+cT/AzuxNrmCty1TiyoRa8ry15UvK1DiV7Kk
-X-Google-Smtp-Source: AGHT+IEgToBDxS7Y2rJTQaW+KRxkcbBuEM1S3SQpzBBgB7EfM9NZPQ+SlbrHysoSI6mEreAZ9kYV8K51n0HSyiFVXHg=
-X-Received: by 2002:a05:600c:3acf:b0:434:f8a0:9dd8 with SMTP id
- 5b1f17b1804b1-4361c345006mr53002405e9.1.1734008799513; Thu, 12 Dec 2024
- 05:06:39 -0800 (PST)
+        bh=cg1nYxP6XG2A44Y9yGhgtQIdlrwL6BM0kKg96k/uz4g=;
+        b=cLRD3cGWuYONWuLq1GzriSoev2n59O0X8PSyj2ZE+ldSvjP0ydMI00G2OTLgr3fK9T
+         fPEkC49cpZRdHgcpZXTPakbjF4WR/xC1jtKQcL0DkYqmu5hgn3FM23k2lSihQkXztn+n
+         QDMeXli8tjS46jJMSGcOhnKcRb7YM6AO7+zTK6PZhZHceNrxnQ9WaclVX40MApLMAga1
+         ljsm1gLvN0oNyvst1Y1Zbmo5CiRcVPzj6ztUwcGSSKV5SmZaKBYuQTadMzYBtE6hQu2x
+         yikBb+XndqXG0wDdmvVJVMV5ASVPQlbKv7f9SVN5+kVwP+HXKKlqt+8txPomVP3g6jdt
+         EjUA==
+X-Forwarded-Encrypted: i=1; AJvYcCXH/Vm4ALqe01j3PpC2+fLUCKkufT5SYO+p5Ip5O/08ZbB/X87sSPDCweLb8TUnDpUJinTVrk0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKs5uH1vNBdmX4Ql5h9IYBgrOLk35SIv58I1M7VlAsHrn3H9Ah
+	F9EswA7iIj3qF9xaVT4D6CqPrCdCQwVzSnFG55ZeJk8tMcrSls2rI3Nj3TxTaUu2YbTPqmAo8jM
+	XfE6qvTb3JU5Y62lkXh0OwurvnSkQsxvATLXNe/R7jzdSuV+V9wTR+TwkohyR3Rzh9Dwy3Sk40G
+	ubCGpL8OMBINSu4CmTSz7LftWX7IWL
+X-Gm-Gg: ASbGncusQKQ9CYrYAilaAf7IGLCIxlFLZFSZYUgdbtMAwzqYMxdRW+pRtI5THs1HeRt
+	920lEVrHFE26yTAncJALiYnrLN4jzPSljOBAoQQ==
+X-Received: by 2002:a05:6870:7b46:b0:29f:de73:b4e3 with SMTP id 586e51a60fabf-2a0128a2e5fmr1284619fac.0.1734009122007;
+        Thu, 12 Dec 2024 05:12:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF2aoz+nmqiiFuP0zfvq8eSkrlXCTfYsTtSQ0bCvkAzA+SqW9fUzx/j08IR/MBPt9jjTuI1kyLvvaeqR0mCtR0=
+X-Received: by 2002:a05:6870:7b46:b0:29f:de73:b4e3 with SMTP id
+ 586e51a60fabf-2a0128a2e5fmr1284607fac.0.1734009121717; Thu, 12 Dec 2024
+ 05:12:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241209140151.231257-1-shaw.leon@gmail.com> <20241209140151.231257-6-shaw.leon@gmail.com>
- <4a2fe99a-772d-4df1-a8ef-14338682b69e@redhat.com>
-In-Reply-To: <4a2fe99a-772d-4df1-a8ef-14338682b69e@redhat.com>
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Thu, 12 Dec 2024 21:06:01 +0800
-Message-ID: <CABAhCOQnMGm8y5bVj_fg5veJqim1PEEa02oZHqFt7ZPEQMpFzw@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 5/5] selftests: net: Add two test cases for
- link netns
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
-	Hangbin Liu <liuhangbin@gmail.com>, linux-rdma@vger.kernel.org, 
-	linux-can@vger.kernel.org, osmocom-net-gprs@lists.osmocom.org, 
-	bpf@vger.kernel.org, linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com, 
-	linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org, 
-	bridge@lists.linux.dev, linux-wpan@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20241115194216.2718660-1-aleksandr.loktionov@intel.com> <SJ0PR11MB586584A7DD6C2BF831B358418F312@SJ0PR11MB5865.namprd11.prod.outlook.com>
+In-Reply-To: <SJ0PR11MB586584A7DD6C2BF831B358418F312@SJ0PR11MB5865.namprd11.prod.outlook.com>
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Thu, 12 Dec 2024 14:11:50 +0100
+Message-ID: <CADEbmW1otJrU3HgcJ2mx22r50Xjmcb15LxJ=h8R8Cs+L0QBGSg@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v5] i40e: add ability to reset
+ VF for Tx and Rx MDD events
+To: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
+Cc: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, 
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Sokolowski, Jan" <jan.sokolowski@intel.com>, 
+	"Connolly, Padraig J" <padraig.j.connolly@intel.com>, 
+	"Romanowski, Rafal" <rafal.romanowski@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 12, 2024 at 5:40=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Fri, Dec 6, 2024 at 4:41=E2=80=AFPM Romanowski, Rafal
+<rafal.romanowski@intel.com> wrote:
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> on behalf of A=
+leksandr Loktionov <aleksandr.loktionov@intel.com>
+> Sent: Friday, November 15, 2024 8:42 PM
+> To: intel-wired-lan@lists.osuosl.org <intel-wired-lan@lists.osuosl.org>; =
+Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Loktionov, Aleksandr <aleks=
+andr.loktionov@intel.com>
+> Cc: netdev@vger.kernel.org <netdev@vger.kernel.org>; Sokolowski, Jan <jan=
+.sokolowski@intel.com>; Connolly, Padraig J <padraig.j.connolly@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v5] i40e: add ability to reset=
+ VF for Tx and Rx MDD events
 >
-> On 12/9/24 15:01, Xiao Liang wrote:
-> >  - Add test for creating link in another netns when a link of the same
-> >    name and ifindex exists in current netns.
-> >  - Add test for link netns atomicity - create link directly in target
-> >    netns, and no notifications should be generated in current netns.
-> >
-> > Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
-> > ---
-> >  tools/testing/selftests/net/Makefile        |  1 +
-> >  tools/testing/selftests/net/netns-name.sh   | 10 ++++++
-> >  tools/testing/selftests/net/netns_atomic.py | 39 +++++++++++++++++++++
-> >  3 files changed, 50 insertions(+)
-> >  create mode 100755 tools/testing/selftests/net/netns_atomic.py
-> >
-> > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selft=
-ests/net/Makefile
-> > index cb2fc601de66..f9f7a765d645 100644
-> > --- a/tools/testing/selftests/net/Makefile
-> > +++ b/tools/testing/selftests/net/Makefile
-> > @@ -34,6 +34,7 @@ TEST_PROGS +=3D gre_gso.sh
-> >  TEST_PROGS +=3D cmsg_so_mark.sh
-> >  TEST_PROGS +=3D cmsg_time.sh cmsg_ipv6.sh
-> >  TEST_PROGS +=3D netns-name.sh
-> > +TEST_PROGS +=3D netns_atomic.py
-> >  TEST_PROGS +=3D nl_netdev.py
-> >  TEST_PROGS +=3D srv6_end_dt46_l3vpn_test.sh
-> >  TEST_PROGS +=3D srv6_end_dt4_l3vpn_test.sh
-> > diff --git a/tools/testing/selftests/net/netns-name.sh b/tools/testing/=
-selftests/net/netns-name.sh
-> > index 6974474c26f3..0be1905d1f2f 100755
-> > --- a/tools/testing/selftests/net/netns-name.sh
-> > +++ b/tools/testing/selftests/net/netns-name.sh
-> > @@ -78,6 +78,16 @@ ip -netns $NS link show dev $ALT_NAME 2> /dev/null &=
-&
-> >      fail "Can still find alt-name after move"
-> >  ip -netns $test_ns link del $DEV || fail
-> >
-> > +#
-> > +# Test no conflict of the same name/ifindex in different netns
-> > +#
-> > +ip -netns $NS link add name $DEV index 100 type dummy || fail
-> > +ip -netns $NS link add netns $test_ns name $DEV index 100 type dummy |=
-|
-> > +    fail "Can create in netns without moving"
-> > +ip -netns $test_ns link show dev $DEV >> /dev/null || fail "Device not=
- found"
-> > +ip -netns $NS link del $DEV || fail
-> > +ip -netns $test_ns link del $DEV || fail
-> > +
-> >  echo -ne "$(basename $0) \t\t\t\t"
-> >  if [ $RET_CODE -eq 0 ]; then
-> >      echo "[  OK  ]"
-> > diff --git a/tools/testing/selftests/net/netns_atomic.py b/tools/testin=
-g/selftests/net/netns_atomic.py
-> > new file mode 100755
-> > index 000000000000..d350a3fc0a91
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/net/netns_atomic.py
-> > @@ -0,0 +1,39 @@
-> > +#!/usr/bin/env python3
-> > +# SPDX-License-Identifier: GPL-2.0
-> > +
-> > +import time
-> > +
-> > +from lib.py import ksft_run, ksft_exit, ksft_true
-> > +from lib.py import ip
-> > +from lib.py import NetNS, NetNSEnter
-> > +from lib.py import RtnlFamily
-> > +
-> > +
-> > +def test_event(ns1, ns2) -> None:
-> > +    with NetNSEnter(str(ns1)):
-> > +        rtnl =3D RtnlFamily()
-> > +
-> > +    rtnl.ntf_subscribe("rtnlgrp-link")
-> > +
-> > +    ip(f"netns set {ns1} 0", ns=3Dstr(ns2))
-> > +
-> > +    ip(f"link add netns {ns2} link-netnsid 0 dummy1 type dummy")
-> > +    ip(f"link add netns {ns2} dummy2 type dummy", ns=3Dstr(ns1))
-> > +
-> > +    ip("link del dummy1", ns=3Dstr(ns2))
-> > +    ip("link del dummy2", ns=3Dstr(ns2))
-> > +
-> > +    time.sleep(1)
-> > +    rtnl.check_ntf()
-> > +    ksft_true(rtnl.async_msg_queue.empty(),
-> > +              "Received unexpected link notification")
+> Implement "mdd-auto-reset-vf" priv-flag to handle Tx and Rx MDD events fo=
+r VFs.
+> This flag is also used in other network adapters like ICE.
 >
-> I think we need a much larger coverage here, possibly testing all the
-> update drivers and more 'netns', 'link-netnsid', 'peer netns'
-> permutations for the devices that allow them.
+> Usage:
+> - "on"  - The problematic VF will be automatically reset
+>           if a malformed descriptor is detected.
+> - "off" - The problematic VF will be disabled.
+>
+> In cases where a VF sends malformed packets classified as malicious, it c=
+an
+> cause the Tx queue to freeze, rendering it unusable for several minutes. =
+When
+> an MDD event occurs, this new implementation allows for a graceful VF res=
+et to
+> quickly restore operational state.
+>
+> Currently, VF queues are disabled if an MDD event occurs. This patch adds=
+ the
+> ability to reset the VF if a Tx or Rx MDD event occurs. It also includes =
+MDD
+> event logging throttling to avoid dmesg pollution and unifies the format =
+of
+> Tx and Rx MDD messages.
+>
+> Note: Standard message rate limiting functions like dev_info_ratelimited(=
+)
+> do not meet our requirements. Custom rate limiting is implemented,
+> please see the code for details.
+>
+> Co-developed-by: Jan Sokolowski <jan.sokolowski@intel.com>
+> Signed-off-by: Jan Sokolowski <jan.sokolowski@intel.com>
+> Co-developed-by: Padraig J Connolly <padraig.j.connolly@intel.com>
+> Signed-off-by: Padraig J Connolly <padraig.j.connolly@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> v4->v5 + documentation - 2nd clear_bit(__I40E_MDD_EVENT_PENDING) * rate l=
+imit
+> v3->v4 refactor two helper functions into one
+> v2->v3 fix compilation issue
+> v1->v2 fix compilation issue
+> ---
+>  .../device_drivers/ethernet/intel/i40e.rst    |  12 ++
+>  drivers/net/ethernet/intel/i40e/i40e.h        |   4 +-
+>  .../net/ethernet/intel/i40e/i40e_debugfs.c    |   2 +-
+>  .../net/ethernet/intel/i40e/i40e_ethtool.c    |   2 +
+>  drivers/net/ethernet/intel/i40e/i40e_main.c   | 107 +++++++++++++++---
+>  .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |   2 +-
+>  .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  11 +-
+>  7 files changed, 123 insertions(+), 17 deletions(-)
+>
+> diff --git a/Documentation/networking/device_drivers/ethernet/intel/i40e.=
+rst b/Documentation/networking/device_drivers/ethernet/intel/i40e.rst
+> index 4fbaa1a..53d9d58 100644
+> --- a/Documentation/networking/device_drivers/ethernet/intel/i40e.rst
+> +++ b/Documentation/networking/device_drivers/ethernet/intel/i40e.rst
+> @@ -299,6 +299,18 @@ Use ethtool to view and set link-down-on-close, as f=
+ollows::
+>
+>
+> Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 
-OK, I will add more cases. But I'm afraid I don't know how to build
-valid parameters for all of them, and some seem to require hardware.
+Hi Tony,
 
->
-> Thanks,
->
-> Paolo
->
+Did your tools miss this "Tested-by" from Rafal? Maybe because of the
+weird quoting in Rafal's email?
+I see you refreshed dev-queue yesterday, but the Tested-by is not there.
+
+Michal
+
 
