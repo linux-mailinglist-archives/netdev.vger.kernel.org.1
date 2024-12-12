@@ -1,115 +1,78 @@
-Return-Path: <netdev+bounces-151408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4D659EE953
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 15:47:52 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEFB7162757
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 14:47:09 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A81642153E4;
-	Thu, 12 Dec 2024 14:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vYU0r/Nz"
-X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E8719EE95B
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 15:50:51 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6CA204C1D
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 14:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEEE02841D3
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 14:50:49 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893F821571B;
+	Thu, 12 Dec 2024 14:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BSdXoiju"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1E22153C3;
+	Thu, 12 Dec 2024 14:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734014830; cv=none; b=R/+PSJQbGUpVGA7mSXb1sVKhQXqfQhW3vXGzDvfdCptO6vPyGjP7Q1EvSdSTenqyFu19d5x/gwNz5nQXfpeaGsAQb4gjzFQQe3cq8MSHIPrP04kheqxmCbcIEzH+qskfOvVonr4jw99OHDBOdFtu1nOsuTL1RjUk3yBb5H50uaA=
+	t=1734015046; cv=none; b=A5xOGBXhz+Wtl2f3UMZjYa2y9mIK5I89Q4ZQ3UJ0bip7VibdvqaD2isVInsEiEXYWoJ2xWgZjq0BQcij9/M4cqlSLZRQyZcKSfv1eMd8Y1r9SPYqUJPM8izByJXPBeGPujZGaPd7UKWTna4NqsN28CxN5tu269cRyyp6hop+kQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734014830; c=relaxed/simple;
-	bh=wT57xc2BWCiErk5gP4jxdavb8KrwbxRpevb52qNgwDY=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=jDNY2lgepE8AcJZso7PywGfOsKqNtD8O9rSyRzhxz4gVwN+PWcdk88c39R9USkyWUDacFUF5wicIacvCeTdaF2jFjZOU2YfPHSMazo6BAzrW3WWrbaXyTLwSqJt0cJ89vEH1uS7t7rP85DI20EYPlyRMHTTmda7kG1jJAhYV/zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vYU0r/Nz; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=pqHaoSTE46zO1P4LewDTS4T3/Qa3Tnr13CNJMKSL5mw=; b=vYU0r/Nz+JwSWr7t18JyKDG9ui
-	6cIqPC3a4vrL77jX0J+L6gkln7vOgTTVTv0HTU67wL/Fvi5yoCM4VTJuf5U+KG35lvXkdvAOaYgWw
-	9kY14HVSwmJGpzH9k0KlFiQHxhowiQZoIooDDyk3wsempA87q7OLFyFVtN5xbEecHL9ysoORmXiEO
-	g7EWKk4/wxaygfWyFV3rCTqhKAmOOsUlcD5abJ9SZY1Ecu4nKo86DA1oOC58t6dCk35vUEIjO7bKd
-	WRZSaVI3BQJlgCgkg1nhIWrj/voP86cpUQnXthg380qqit+f70FwcBRa7ic2rb+edbMIrD5WWR0uV
-	MtzXowmg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:39516 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tLkSz-0005M1-1R;
-	Thu, 12 Dec 2024 14:47:01 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tLkSx-006qfx-Fk; Thu, 12 Dec 2024 14:46:59 +0000
-In-Reply-To: <Z1r3MWZOt36SgGxf@shell.armlinux.org.uk>
-References: <Z1r3MWZOt36SgGxf@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 7/7] net: stmmac: convert to use
- phy_eee_rx_clock_stop()
+	s=arc-20240116; t=1734015046; c=relaxed/simple;
+	bh=V/D333GEnAXR6TKatHVFatYZi2rCIDF/Ea/kA02M6pM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gSz2XfizcFL0JlnyR+Kw5QVeZwqsT4E4lnvFKmRpmR2/OzGJokJIZe8yPOGtnhPktFFytAg5YI5iK9zflBrGK/bCHu/O34SKWEh30h0+TRuagLY99f3H4M9WAR58N+SVFOW/qwuOWXUeSE8OKSEbSbRfR1CVt9MRjmOc0RTS/WA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BSdXoiju; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78602C4CECE;
+	Thu, 12 Dec 2024 14:50:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734015046;
+	bh=V/D333GEnAXR6TKatHVFatYZi2rCIDF/Ea/kA02M6pM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BSdXoijuwcRCkFR3ocvCl1oONKTr80TQeHpVRLgIGf6kx6vvk2yO/yl2ooWPMgEFp
+	 bR5UXF50RJgyOBDVvfht7UBXLHDRnxuvCMzSfJWLfs+QOKUe/o3OEWsuZV3l5U7EEW
+	 PouE/wL9vOUt5O7cQhPK2SQH6ROojebRmUsl85sLfTcUsSCqjfkJf83k4g6zK9S1si
+	 7IpncSShyUR24QXDWsY8zpveuY/x+Si6paDlU1sd9TVmQ9aXW9CMi5LnA+KbdRMoBr
+	 TPfzjVA9MLWaX40gFgCevVwapf2r/LfhN0tkykt5NYSYSrneLyoEutRS56KrDigj37
+	 vc6uRtDwCAWDQ==
+Date: Thu, 12 Dec 2024 06:50:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Greg KH <gregkh@linuxfoundation.org>, cve@kernel.org
+Cc: jianqi.ren.cn@windriver.com, stable@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ sashal@kernel.org, jamie.bainbridge@gmail.com, jdamato@fastly.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6.1.y] net: napi: Prevent overflow of
+ napi_defer_hard_irqs
+Message-ID: <20241212065044.09d7b377@kernel.org>
+In-Reply-To: <2024121250-preschool-napping-502e@gregkh>
+References: <20241211040304.3212711-1-jianqi.ren.cn@windriver.com>
+	<2024121250-preschool-napping-502e@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tLkSx-006qfx-Fk@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 12 Dec 2024 14:46:59 +0000
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Convert stmmac to use phy_eee_rx_clock_stop() to set the PHY receive
-clock stop in LPI setting, rather than calling the legacy
-phy_init_eee() function.
+On Thu, 12 Dec 2024 12:41:08 +0100 Greg KH wrote:
+> On Wed, Dec 11, 2024 at 12:03:04PM +0800, jianqi.ren.cn@windriver.com wrote:
+> > From: Joe Damato <jdamato@fastly.com>
+> > 
+> > [ Upstream commit 08062af0a52107a243f7608fd972edb54ca5b7f8 ]  
+> 
+> You can't ignore the 6.6.y tree :(
+> 
+> Dropping from my review queue now.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 3acc6f6e2190..d5516ef0f098 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1087,9 +1087,9 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 
- 	stmmac_mac_set(priv, priv->ioaddr, true);
- 	if (phy && priv->dma_cap.eee) {
--		priv->eee_active = phy->enable_tx_lpi &&
--			phy_init_eee(phy, !(priv->plat->flags &
--				STMMAC_FLAG_RX_CLK_RUNS_IN_LPI)) >= 0;
-+		phy_eee_rx_clock_stop(phy, !(priv->plat->flags &
-+					     STMMAC_FLAG_RX_CLK_RUNS_IN_LPI));
-+		priv->eee_active = phy->enable_tx_lpi;
- 		priv->eee_enabled = stmmac_eee_init(priv);
- 		priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
- 		stmmac_set_eee_pls(priv, priv->hw, true);
--- 
-2.30.2
-
+Is it possible to instead mark CVE-2024-50018 as invalid, please?
+The change is cosmetic.
 
