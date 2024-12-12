@@ -1,165 +1,79 @@
-Return-Path: <netdev+bounces-151277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BDB19EDDEF
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:34:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 317C49EDDF5
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:39:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 612DB1887A29
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 03:34:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3A021888C1A
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 03:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCC75BAF0;
-	Thu, 12 Dec 2024 03:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356B713D539;
+	Thu, 12 Dec 2024 03:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i1ktdYGP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wa5922Bi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19FF33FE;
-	Thu, 12 Dec 2024 03:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092147346D;
+	Thu, 12 Dec 2024 03:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733974440; cv=none; b=baQDE3TnMbM6okGBMdNTwAOdUCBXC3NV6pOtZLvGmVKidfFAj6SnHB+N8N1+E5Xfr/nAO1INT7XPlqjc5t7mhr+16gFpOhvCiWJN4UTwHuVHEjQmuMrMfPAErverBrAx/zImJUM1XE1yX2JaxX6y1aY7V1TQZ6MDSQqzLGfl+qg=
+	t=1733974735; cv=none; b=DT7EPziN/L3TYWHD/MgK+HRNuMPDyp2jOqY1qat8bC63GpfH70uRybs7BeQ1y3RhINKpn0oTY8cDELUjUvXbH0Hcp/4iX6KPPEaTgcEOTMpp+TqJh0nkj1kcym5d199gR7wDkC5jxpBm4YkhiNCpgwMdws3493+yfubgIOsAqas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733974440; c=relaxed/simple;
-	bh=rmaljj3CVMsjgDpn8DnNrL7kt+LtW4QxuED6cOgCiLQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WEDEgi3VCSrplvt5+T1WaOqXfIu/K81C8XRwgyOjTnJoq5GEB5qE9i1tIp9yEJiQFHOLYaRwQUmtnw1zQEnbxr3EKr69auz7TblGTfijiGyX4nZvlbehkWbi7SXOaizLO2QN9ciSEPE/uqAK6iWGUpd1V58rlKH1w1SAqM5MSPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i1ktdYGP; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-725ce7b82cbso189231b3a.0;
-        Wed, 11 Dec 2024 19:33:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733974437; x=1734579237; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7pzYjRDOZjwQLGfG7tztY2fF9MD2eQ633kRSm3R85gQ=;
-        b=i1ktdYGPONA3Jq1vGh9UdkTKXqBRmkWjMyhibZQTJxo4T1MqNavrXeICbVtPfZ9Io4
-         Bti628zuRfapm3NW27yY8gm2N4ci3d7wkIGpieQWp5UUKyy6e3q66euJ5XyDX7tccSjS
-         NR73qQQAT7ARjfoeG5FEMCmQH1k8v+pL3KyTT4/Zt5HyLIUaD2aw6/L9CedJC7EfffxU
-         IlH+NY1E7zEVWfUDcIWMhOng7FtbVdcH7TvO/Roxq4GxqcAt3e3AzIkncV4XdU98H3uS
-         lrAattCErgYmiQMrkeq2NNX8HTCo0LOaMHgSqGSIVJ9B+ad71YVE7hCYB/rp97+R0y0V
-         y+Xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733974437; x=1734579237;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7pzYjRDOZjwQLGfG7tztY2fF9MD2eQ633kRSm3R85gQ=;
-        b=CZ4AxT/t0Ie109516GcDoStzf0uZ/ngoT9qVmrMk30oHJIS+qRgjxLhlX/gshdGHX4
-         0SqyvwR4tNtuOQxlUW8MwiEyr6WJsGRlepUKbk+0KQ2kwEbdAC7U8oppMT52nzatz4ck
-         CB7MGBMEPPtGq+Bz/9nTQMVJw1NYfYs/RBhddM85tyFn8uvKzPRYRfaguGLIh/EE/ERO
-         KkeeZt1ABgR/9LXCDBxuBBdzWNMPR1Y4DRayX1gcke581o2UzR39Kgs2KSbc4oLqFBnV
-         xYUiCx77jq18f3FT2AWqRP6qU8l3jn+F6xqxlKwEnsdfj/bmd3ztmQoab+7BfwgT0Yol
-         7f3w==
-X-Forwarded-Encrypted: i=1; AJvYcCXrb/17VOXAmDrWWUKh/Sg2v7P2aGD4GH6Z0y4zMSi4aqx682r8OyuLViGRP7bHkZIVj5oVoydgfl8Vwx0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywjt/IK0x3w6pA/ZosxeRSUdfkSUA66JwjPujJwf+4hgi3vzovQ
-	TlVguN7W7eMtuZ5BNcY39tfKZjWSE4gReFxaUas8Cs8tcELy55yk6bCHUA==
-X-Gm-Gg: ASbGncs23/YgHznPqM+QcHR5d9PFy2jwvSMzZIluA/i20r1RLdRnUOeFrzm5CwmcfPZ
-	L6cslr9bUMszOkh3gG22UdFdKbZFgohuia1YPgshMMwlqtO1pCX+wwNc/ptjbJRpbHKpASKbnvV
-	tPlcQcF1+2XUbRn1VtSxumtbEIVaVBP8eOMVJOXAsXOKKN6UXANEbAyuhDuwu0W7VdhCasNz3gE
-	nYRBHitOJAwSRI587Nh+9fnxO7sBDcppA20gmeIgP0eZhjZlY60AVlZU2B0L0fKy3iKsQ==
-X-Google-Smtp-Source: AGHT+IF2HUGVgJTHXHp2yZPxjGH98+Grs5GenuoQqTTyxoTeHaymmzl37DBT8/NhlfehPqg/7Ou6EQ==
-X-Received: by 2002:a05:6a00:17a7:b0:725:df1a:27c with SMTP id d2e1a72fcca58-728faa2e5a2mr2417893b3a.14.1733974437292;
-        Wed, 11 Dec 2024 19:33:57 -0800 (PST)
-Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-725f03a0ca4sm5879236b3a.113.2024.12.11.19.33.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 19:33:56 -0800 (PST)
-From: Furong Xu <0x1207@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	xfr@outlook.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next v1] net: stmmac: Drop redundant dwxgmac_tc_ops variable
-Date: Thu, 12 Dec 2024 11:33:25 +0800
-Message-Id: <20241212033325.282817-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1733974735; c=relaxed/simple;
+	bh=xXIwQz+7Oo+XuICxcdAgCUZpGj0zV01YwKG/RaioLLE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TziDxdlP14iISIb8w+lQLCogOQ9Fh3makrCcm5ICBzvjS3mDXR3HSUjCcooJdL61k8aqzPIlEPJZjj9Bo2CMeBESo42aARKCT6ACdApYIecEEsI7Fntlo4Hu2zvo90uC9uTMtagAkabSNlXBoYMp/FYcP56VwGX47VcCO8qlGZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wa5922Bi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAB5DC4CED1;
+	Thu, 12 Dec 2024 03:38:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733974734;
+	bh=xXIwQz+7Oo+XuICxcdAgCUZpGj0zV01YwKG/RaioLLE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Wa5922BiQrE+b1XPh2agtoyvpfKyJY0mN8Sq6lqj0DK68Ad7GlWcII/hkeNKmbEUG
+	 WPFel+z7HRTDO/UeZ6+LhkDWDT1mDJqPiLePn9j8sTSGFDdM9802AGuegFeLBNpA31
+	 0Wa3qBYAqibN/Yxj8CLl1DdOb8VSns5USnVJ+vE6b4ZNDOThnJ71++p9han8gnSfyw
+	 zFdPKMJGCbffh2K57Actpz5SzOqeIOLaYHhZAxk7p3Z0V2nSosSpdQoP9uLdmoA/2O
+	 wys3cR53Snfi1ONoRKs6Nq+MNr+wlm2kmu24rZjgdyd+JOoodinrmBPZkJgv4qrUv9
+	 Yf59/SLEw9lFA==
+Date: Wed, 11 Dec 2024 19:38:52 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <andrew+netdev@lunn.ch>, <horms@kernel.org>, <gregkh@linuxfoundation.org>,
+ <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+ <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+ <sudongming1@huawei.com>, <xujunsheng@huawei.com>,
+ <shiyongbang@huawei.com>, <libaihan@huawei.com>,
+ <jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+ <salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <hkelam@marvell.com>
+Subject: Re: [PATCH V6 net-next 1/7] net: hibmcge: Add debugfs supported in
+ this module
+Message-ID: <20241211193852.262f11da@kernel.org>
+In-Reply-To: <c36b6423-720f-4bb0-ac7e-8e69a5c2a81b@huawei.com>
+References: <20241210134855.2864577-1-shaojijie@huawei.com>
+	<20241210134855.2864577-2-shaojijie@huawei.com>
+	<20241211060018.14f56635@kernel.org>
+	<c36b6423-720f-4bb0-ac7e-8e69a5c2a81b@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-dwmac510_tc_ops and dwxgmac_tc_ops are completely identical,
-keep dwmac510_tc_ops to provide better backward compatibility.
+On Thu, 12 Dec 2024 09:35:02 +0800 Jijie Shao wrote:
+> I think debugfs_create_devm_seqfile() is a better choice,
+> if not use it, I might need to code like so=EF=BC=9A
 
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/hwif.c      |  4 ++--
- drivers/net/ethernet/stmicro/stmmac/hwif.h      |  1 -
- drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c | 11 -----------
- 3 files changed, 2 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-index 4bd79de2e222..31bdbab9a46c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-@@ -267,7 +267,7 @@ static const struct stmmac_hwif_entry {
- 		.hwtimestamp = &stmmac_ptp,
- 		.ptp = &stmmac_ptp_clock_ops,
- 		.mode = NULL,
--		.tc = &dwxgmac_tc_ops,
-+		.tc = &dwmac510_tc_ops,
- 		.mmc = &dwxgmac_mmc_ops,
- 		.est = &dwmac510_est_ops,
- 		.setup = dwxgmac2_setup,
-@@ -290,7 +290,7 @@ static const struct stmmac_hwif_entry {
- 		.hwtimestamp = &stmmac_ptp,
- 		.ptp = &stmmac_ptp_clock_ops,
- 		.mode = NULL,
--		.tc = &dwxgmac_tc_ops,
-+		.tc = &dwmac510_tc_ops,
- 		.mmc = &dwxgmac_mmc_ops,
- 		.est = &dwmac510_est_ops,
- 		.setup = dwxlgmac2_setup,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-index e428c82b7d31..2f7295b6c1c5 100644
---- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-@@ -685,7 +685,6 @@ extern const struct stmmac_dma_ops dwmac410_dma_ops;
- extern const struct stmmac_ops dwmac510_ops;
- extern const struct stmmac_tc_ops dwmac4_tc_ops;
- extern const struct stmmac_tc_ops dwmac510_tc_ops;
--extern const struct stmmac_tc_ops dwxgmac_tc_ops;
- 
- #define GMAC_VERSION		0x00000020	/* GMAC CORE Version */
- #define GMAC4_VERSION		0x00000110	/* GMAC4+ CORE Version */
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-index 6a79e6a111ed..694d6ee14381 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-@@ -1284,14 +1284,3 @@ const struct stmmac_tc_ops dwmac510_tc_ops = {
- 	.query_caps = tc_query_caps,
- 	.setup_mqprio = tc_setup_dwmac510_mqprio,
- };
--
--const struct stmmac_tc_ops dwxgmac_tc_ops = {
--	.init = tc_init,
--	.setup_cls_u32 = tc_setup_cls_u32,
--	.setup_cbs = tc_setup_cbs,
--	.setup_cls = tc_setup_cls,
--	.setup_taprio = tc_setup_taprio,
--	.setup_etf = tc_setup_etf,
--	.query_caps = tc_query_caps,
--	.setup_mqprio = tc_setup_dwmac510_mqprio,
--};
--- 
-2.34.1
-
+Oh, sorry, I thought there is a non-devm version of create_seqfile().
+Let me review the rest.
 
