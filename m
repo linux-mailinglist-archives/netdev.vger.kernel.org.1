@@ -1,79 +1,200 @@
-Return-Path: <netdev+bounces-151275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1866B9EDDB3
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 03:37:09 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EC5B167CDC
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 02:37:04 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AAFD13D52B;
-	Thu, 12 Dec 2024 02:37:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNni2L3k"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36A559EDDDD
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:13:13 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACF518643;
-	Thu, 12 Dec 2024 02:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53F9B282C26
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 03:13:10 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B0913FD72;
+	Thu, 12 Dec 2024 03:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=brun.one header.i=@brun.one header.b="L8IMwkqN"
+X-Original-To: netdev@vger.kernel.org
+Received: from mx.dolansoft.org (s2.dolansoft.org [212.51.146.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEBB14387B;
+	Thu, 12 Dec 2024 03:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.51.146.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733971022; cv=none; b=KDhGIJVSgvjwkUJP7GAjQ01PSgF/G6t9EVnmijBqWIjkZJY4y9A18pkW8LpjIh7LQr79LQnCEpBF9DM6xfSH88tVpuJovaWMYRGt+pw84jHUrVSNJqyV5JpV+S/u6M9wDw1UWSfN0y9qjuV0allHwHvMphKyMJ9Nja15dSHzWes=
+	t=1733973188; cv=none; b=mojbC0uceWx7dfj++wZKWJu8khQrUmRXBXh5U0C1YewytiHnhtG4WH3lkXPf+qOU+AQv3hFEXmzV7rfctb3lgvRZO2f+zWmjIi/ndKO7Ysje2QLP45jTQX7J0ye/HefNLvuqUot+bu2Pznib3hbxl+Vz5OvjZbc/AnHg0akb6uI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733971022; c=relaxed/simple;
-	bh=DRclRfHEitaK10C0WBuLlWgcfYHfKPNDcjpntNVUWCQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a6O2nPjnf2CMTn+bEWAoOq9M+z6/zqacsqfuluFMe/tSSHIjajo9COIqNVfGIqAl24umH/UXbK7QpMID8oYaGBNz7pIRDS4WK4rEC+0AgTOwYoidAXPQOCsHNbWG2GGGAI4Sf5VwL+6uQKQeoO6uFBmICU1wYQeQq4j2k1QeF5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNni2L3k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68498C4CED2;
-	Thu, 12 Dec 2024 02:37:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733971021;
-	bh=DRclRfHEitaK10C0WBuLlWgcfYHfKPNDcjpntNVUWCQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SNni2L3kqNkeHb4Q2KanH+1K7uRMb2m3dNsaK363SMWE5GU768G4IR2FKnmi2kjQg
-	 KCU6T08m/vjKoLp8SxKK1VKGmjP8tAjDJRezPR4zPqKBUSk7KQaA4Y0hVjH2aCiGY2
-	 wVm+HSlUZ9hRPLfwZnTjs93u1uEStIh90k8icclt4axuU9nfwlnI1EO5cedpZ9QJUi
-	 JzD82c39pmujhoVE+A7JG8oR+XgtAx3gelhcYY/L9q8WKfZ+u0l29Qw02Fvn+DRC79
-	 CIke2ZQGvTRpbxV3+a3idJYktB2CTHYHuY/z6zALXRLg7GEtKzfeOOmTTDOV2dCdQr
-	 F2TBh0J+xcVTw==
-Date: Wed, 11 Dec 2024 18:37:00 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Bernard Metzler <bmt@zurich.ibm.com>, linux-rdma@vger.kernel.org,
- leon@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, zyjzyj2000@gmail.com,
- syzbot+4b87489410b4efd181bf@syzkaller.appspotmail.com
-Subject: Re: [PATCH] RDMA/siw: Remove direct link to net_device
-Message-ID: <20241211183700.1dff156f@kernel.org>
-In-Reply-To: <20241211160055.GM1888283@ziepe.ca>
-References: <20241210130351.406603-1-bmt@zurich.ibm.com>
-	<20241210145627.GH1888283@ziepe.ca>
-	<20241210175237.3342a9eb@kernel.org>
-	<20241211160055.GM1888283@ziepe.ca>
+	s=arc-20240116; t=1733973188; c=relaxed/simple;
+	bh=rKbsxGB3AFxIQm5RPyK7MJFL+KHlfLn3sdTudJwPrsM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mrCJPoEQj8jOL2LJt75XDenTOV8Em0cm5IKLONm9ZZl4fTkpR7mCplkoYDe9Fill+Dzhx5HRqyTFxOCjIohyRwR8M3PeKyNjpg+NZi/AeB3vQwxNb0LBDmVc0AELn9zF8DK97Ge6unQ27S5Dn2LlFdN/a6wgqAi9NdgTE3UNltc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=brun.one; spf=pass smtp.mailfrom=brun.one; dkim=pass (2048-bit key) header.d=brun.one header.i=@brun.one header.b=L8IMwkqN; arc=none smtp.client-ip=212.51.146.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=brun.one
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=brun.one
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=brun.one;
+	s=s1; h=MIME-Version:Message-ID:Date:Subject:Cc:To:From:In-Reply-To:
+	References:From:To:Subject:Date:Message-ID:Reply-To;
+	bh=2PrfMK9ue+KBe11eTA9nTUKl/IRBkVyrnaOSt1abAZU=; b=L8IMwkqNTWOKdPqZPhr4WmegPH
+	Cmvvw1e7zOtGRSemcRKiS0I0z5TwlMqLCrSYW2vD+UVPK4OqtqAQu+6syhVATHiVsQ1Z14K6zzquH
+	l6u8Xp6+cOEtBJiBnc4zsic/t+UnmWiaOVbItBFzl48JLpBU5d8zxmsw/zTSUa1zIeZpAPXQKXgj6
+	8X+OwYnQll3O8gaxYm84PsTVm+DfvJ9ES/3J1qlPW1wfFN7hzbnx5tCjIJW5BZsMQyC+hwakqWU3Q
+	YpLqqzuWsqWqtQgqE5nfgEo/DZ4qSmBOPsJ7ZNxVoEf2y9pNF0qOLFZ2u4t8wUfeWCFdAmJRlpM3+
+	E1tSqG/A==;
+Received: from [212.51.153.89] (helo=localhost.localdomain)
+	by mx.dolansoft.org with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98)
+	(envelope-from <lorenz@dolansoft.org>)
+	id 1tLZ7V-00000001RTO-2Vep;
+	Thu, 12 Dec 2024 02:40:05 +0000
+From: Lorenz Brun <lorenz@brun.one>
+To: Igor Russkikh <irusskikh@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Manuel Ullmann <labre@posteo.de>
+Cc: Lorenz Brun <lorenz@brun.one>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: atlantic: keep rings across suspend/resume
+Date: Thu, 12 Dec 2024 03:39:24 +0100
+Message-ID: <20241212023946.3979643-1-lorenz@brun.one>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Sender: lorenz@dolansoft.org
 
-On Wed, 11 Dec 2024 12:00:55 -0400 Jason Gunthorpe wrote:
-> > > ifindex is only stable so long as you are holding a reference on the
-> > > netdev..  
-> > 
-> > Does not compute. Can you elaborate what you mean, Jason?  
-> 
-> I mean you can't replace a netdev pointer with an ifindex, you can't
-> reliably get back to the same netdev from ifindex alone.
+The rings are order-6 allocations which tend to fail on suspend due to
+fragmentation. As memory is kept during suspend/resume, we don't need to
+reallocate them.
 
-With the right use of locking and the netdev notifier the ifindex
-is as good as a pointer. I just wanted to point out that taking 
-a reference makes no difference here.
+This does not touch the PTP rings which, if enabled, still reallocate.
+Fixing these is harder as the whole structure is reinitialized.
+
+Fixes: cbe6c3a8f8f4 ("net: atlantic: invert deep par in pm functions, preventing null derefs")
+Signed-off-by: Lorenz Brun <lorenz@brun.one>
+---
+ drivers/net/ethernet/aquantia/atlantic/aq_main.c     |  4 ++--
+ drivers/net/ethernet/aquantia/atlantic/aq_nic.c      |  7 ++++---
+ drivers/net/ethernet/aquantia/atlantic/aq_nic.h      |  2 +-
+ drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c |  4 ++--
+ drivers/net/ethernet/aquantia/atlantic/aq_vec.c      | 10 ++++++++++
+ 5 files changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_main.c b/drivers/net/ethernet/aquantia/atlantic/aq_main.c
+index c1d1673c5749..cd3709ba7229 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_main.c
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_main.c
+@@ -84,7 +84,7 @@ int aq_ndev_open(struct net_device *ndev)
+ 
+ err_exit:
+ 	if (err < 0)
+-		aq_nic_deinit(aq_nic, true);
++		aq_nic_deinit(aq_nic, true, false);
+ 
+ 	return err;
+ }
+@@ -95,7 +95,7 @@ int aq_ndev_close(struct net_device *ndev)
+ 	int err = 0;
+ 
+ 	err = aq_nic_stop(aq_nic);
+-	aq_nic_deinit(aq_nic, true);
++	aq_nic_deinit(aq_nic, true, false);
+ 
+ 	return err;
+ }
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
+index fe0e3e2a8117..a6324ae88acf 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
+@@ -1422,7 +1422,7 @@ void aq_nic_set_power(struct aq_nic_s *self)
+ 		}
+ }
+ 
+-void aq_nic_deinit(struct aq_nic_s *self, bool link_down)
++void aq_nic_deinit(struct aq_nic_s *self, bool link_down, bool keep_rings)
+ {
+ 	struct aq_vec_s *aq_vec = NULL;
+ 	unsigned int i = 0U;
+@@ -1433,7 +1433,8 @@ void aq_nic_deinit(struct aq_nic_s *self, bool link_down)
+ 	for (i = 0U; i < self->aq_vecs; i++) {
+ 		aq_vec = self->aq_vec[i];
+ 		aq_vec_deinit(aq_vec);
+-		aq_vec_ring_free(aq_vec);
++		if (!keep_rings)
++			aq_vec_ring_free(aq_vec);
+ 	}
+ 
+ 	aq_ptp_unregister(self);
+@@ -1499,7 +1500,7 @@ void aq_nic_shutdown(struct aq_nic_s *self)
+ 		if (err < 0)
+ 			goto err_exit;
+ 	}
+-	aq_nic_deinit(self, !self->aq_hw->aq_nic_cfg->wol);
++	aq_nic_deinit(self, !self->aq_hw->aq_nic_cfg->wol, false);
+ 	aq_nic_set_power(self);
+ 
+ err_exit:
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_nic.h b/drivers/net/ethernet/aquantia/atlantic/aq_nic.h
+index ad33f8586532..f0543a5cc087 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_nic.h
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_nic.h
+@@ -189,7 +189,7 @@ int aq_nic_get_regs(struct aq_nic_s *self, struct ethtool_regs *regs, void *p);
+ int aq_nic_get_regs_count(struct aq_nic_s *self);
+ u64 *aq_nic_get_stats(struct aq_nic_s *self, u64 *data);
+ int aq_nic_stop(struct aq_nic_s *self);
+-void aq_nic_deinit(struct aq_nic_s *self, bool link_down);
++void aq_nic_deinit(struct aq_nic_s *self, bool link_down, bool keep_rings);
+ void aq_nic_set_power(struct aq_nic_s *self);
+ void aq_nic_free_hot_resources(struct aq_nic_s *self);
+ void aq_nic_free_vectors(struct aq_nic_s *self);
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c b/drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c
+index 43c71f6b314f..1015eab5ee50 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c
+@@ -390,7 +390,7 @@ static int aq_suspend_common(struct device *dev)
+ 	if (netif_running(nic->ndev))
+ 		aq_nic_stop(nic);
+ 
+-	aq_nic_deinit(nic, !nic->aq_hw->aq_nic_cfg->wol);
++	aq_nic_deinit(nic, !nic->aq_hw->aq_nic_cfg->wol, true);
+ 	aq_nic_set_power(nic);
+ 
+ 	rtnl_unlock();
+@@ -426,7 +426,7 @@ static int atl_resume_common(struct device *dev)
+ 
+ err_exit:
+ 	if (ret < 0)
+-		aq_nic_deinit(nic, true);
++		aq_nic_deinit(nic, true, false);
+ 
+ 	rtnl_unlock();
+ 
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_vec.c b/drivers/net/ethernet/aquantia/atlantic/aq_vec.c
+index 9769ab4f9bef..3b51d6ee0812 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_vec.c
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_vec.c
+@@ -132,6 +132,16 @@ int aq_vec_ring_alloc(struct aq_vec_s *self, struct aq_nic_s *aq_nic,
+ 	unsigned int i = 0U;
+ 	int err = 0;
+ 
++	if (self && self->tx_rings == aq_nic_cfg->tcs && self->rx_rings == aq_nic_cfg->tcs) {
++		/* Correct rings already allocated, nothing to do here */
++		return 0;
++	} else if (self && (self->tx_rings > 0 || self->rx_rings > 0)) {
++		/* Allocated rings are different, free rings and reallocate */
++		pr_notice("%s: cannot reuse rings, have %d, need %d, reallocating", __func__,
++			  self->tx_rings, aq_nic_cfg->tcs);
++		aq_vec_ring_free(self);
++	}
++
+ 	for (i = 0; i < aq_nic_cfg->tcs; ++i) {
+ 		const unsigned int idx_ring = AQ_NIC_CFG_TCVEC2RING(aq_nic_cfg,
+ 								    i, idx);
+-- 
+2.44.1
+
 
