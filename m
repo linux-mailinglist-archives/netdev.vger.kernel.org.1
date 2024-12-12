@@ -1,271 +1,292 @@
-Return-Path: <netdev+bounces-151309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E51559EDFCA
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 08:02:17 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9BCE9EDFEA
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 08:06:45 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9E6216562D
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 07:02:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 237B2285DA7
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 07:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E388D204C39;
-	Thu, 12 Dec 2024 07:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A7D205517;
+	Thu, 12 Dec 2024 07:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WolaB3IN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JtvLNLgh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DDF3288DA;
-	Thu, 12 Dec 2024 07:02:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DE72054EB
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 07:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733986926; cv=none; b=gwVxsc9vPw2TOpjMq+CBX+Rw/0B+qf4H6YSkhm3AmUx9cPNyzLAvJN9iyZxyqmKbUg6j8fWj2Vxff/DEw/3//QwbK1D7YNcihtOCgVyP9uxqbvWsFjC+wJUww069AG4fbAv/M9Jmzp5rxN6pBVDyKmec3q7iZx5d9pNW6gDygvI=
+	t=1733987158; cv=none; b=MeguCBd0X6QF2F5gEPdPBqRrObJ3W2B/UA2e81gOvTXHQvEztKqLnswqybdy/aGwhmKYKGFWUUJn1PInFmgO9HgPvMvQ0G+iy7dSuTfiWncBKN4CrzdRgXwqTDNOelXWy4WUL8OqCZ0MzfnirKDt/H3FJx3DiDn4ZaJK4iF8e0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733986926; c=relaxed/simple;
-	bh=wbTqd8TPPjxYXP1zKGXFI2x00mOdOXssSkhfYc/0fgs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YUSSFqoNXOhEGW8r2QoLyESCF7grZfhBKqUIUETlBUTMjRYVKunUmkmLBIFxeKQUCf+yl9uZD2XRkc+zRznknowWm13bh94zs+E/l1BVdgQBv45WSDD/zNcsFK0Gx0yM9demcH8zND89HaoBG1BUG9dsaSrj5ahoXILfsnYR8OA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WolaB3IN; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-6eff5f99de4so3223987b3.1;
-        Wed, 11 Dec 2024 23:02:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733986924; x=1734591724; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aKrPssl5ptxpuCfiwGMsPZMTvrn0Pjz0iVG975wfYS4=;
-        b=WolaB3INgbL7Da+sXx4uDyH6IIA2r59PmatBOc2DcDuwGxP9f2mq1A7FLeEnXOEPmj
-         1EcEnUG1L3rNI43MEV2ldTTPj1mpAx7RgFygakiQtFZNBLUcNYrRxx0jK5XkASAEruKZ
-         xnwK/fHlajrHBjyI2HLZ0xGFb1P7QgvvMlurTM9nut1aT6pMuS3Tab5akEXvaRBtKuMI
-         gOXepV5crYoiQFQbH819IHfAeqtfQe1f9yY6odyCRz4V8j9lTEn2UtGu/+q33S3Ahgx4
-         mlS+ydNGEXN81AgsPVbUcs/9cEr61/pC+HD5K/8JIjib99xDpUX5OHGgfvtSx/xKXyaI
-         JHWQ==
+	s=arc-20240116; t=1733987158; c=relaxed/simple;
+	bh=8F6m4ATudDTuB4heWGJ8+L4tcXicno7Gqda8mYKbC10=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ebjqoB0x4I6yaXACRZuugljnSZPZ8V9Eu0MkznlCCZsCZ5NdApvEo8/9ZLRAivOYx+Q44TWqIA6G7i8PgweXLY0p1pTrfTPjuHe/lIEQSkCHmPMSvkfP6fX2Fe3FYI33z4AOi3I8jqXUMt3VzFoDBR2mlVB8r3/rpqsVm1YWAFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JtvLNLgh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733987155;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rti03MdrVXI/elGajytboAaA+i7ZN4OIWBTI355So04=;
+	b=JtvLNLgh1TZwy19fckbMnt+RR+rJ8+jXC5FVDcKAycDemWN+a+c7qfjpEBnvhxwbYGIKRc
+	nZPYgxvxsRRjFdYuCku1vVgbkKav8oNQ+BuQeXaygcA3hc4vmWVnuFx7Yq0h5W5LEBG1yy
+	0mc9QzMycKFKixGpxdOmwRQrl4COdU8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-363-woGjqvz3NTyGuJHrHTKGnA-1; Thu, 12 Dec 2024 02:05:49 -0500
+X-MC-Unique: woGjqvz3NTyGuJHrHTKGnA-1
+X-Mimecast-MFC-AGG-ID: woGjqvz3NTyGuJHrHTKGnA
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43619b135bcso1414485e9.1
+        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 23:05:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733986924; x=1734591724;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aKrPssl5ptxpuCfiwGMsPZMTvrn0Pjz0iVG975wfYS4=;
-        b=W/LSsQMTKzYPH9MUiw3dRufmcVyQ1tHDKRLolIF5A2kHiZzx/K0iV5PPRQtAHu0x3z
-         +Jutb92+JrBod3AsTT/Lr0QzvoqzgEqZkL9ECJugPWM74ZnckBNDCFHeJGRLoRJm4kOk
-         Jh7r974bMgNrl7IQ78KthsDm/B9P4IHyvS9qe1ZOPwblfndr9JCHLh/IQlXKqV0/cf0i
-         s6Z5suxa4B7Ve++5ex1GZm58dgS/eJC4hXrVCo0u3snT5cYm3aWuv8ijckv9Awra+WMP
-         w6wS0gk4/94vVm7mplzDJQFq11UlIexvVOWQdJJBLP/mo8XqmHEypnX3B8kvvw8rRzZl
-         UaHw==
-X-Forwarded-Encrypted: i=1; AJvYcCU6VyTAW/5UuNCcOf2Hf0rsGs89Csq5thdPXxXQJWNR0HeGI1490NnSnzHsymVYUAdntKevz8/e@vger.kernel.org, AJvYcCV/Zx6W8XO6m3CiXWKKpUlyAy7RAaTBtse/6iKruF/BIjtiHvJe6iFIAFmI5pn6uQgErcTYgnqexH02@vger.kernel.org, AJvYcCV2OLZ1b2Y1c9oHx5e8Sy4zoxkLO9oNlnwEocEI7w80wlmKAOK0fLGEli34D0Qv5pNDwL64Shixfo3huCA=@vger.kernel.org, AJvYcCVvFA6CTF+dzAwXgU7rqHVLVNI2P8q/XZJSvAlfSxDq2RK+02jl5mlfPLBqqgBclZK3IWBX+mKUXPY=@vger.kernel.org, AJvYcCWBzwcJZF18YkVkLDa2gZOyaucL++/624pkLczBZ7TnhoBLvFT9Kgm/XAMSiZQVCWXsWb2TCAnnZLTG@vger.kernel.org, AJvYcCXSaUcvDk9SfaWOmB2Re8cZP0eWzz0JHIozyzLbJOEf+ceMTW2GnF8G2KArMbqjQLT/ztj85aPDgNjbJdxSHkw=@vger.kernel.org, AJvYcCXxNJUNOublxZW0+fku9cobwQGiYYEYAibCLWwsKvk0YxbvIpkZVDblF+hGb2N3CD6Ky0OjZi7b1xo6bA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzz8P0hxAK0vLbWPzhJa/IVwskoVvdbxMSQZw+0sXJ34aoHWfxe
-	0XjePH6JkbfkXjH4pvaj47F/eILIiC//TFshGalPKcnG0p8DZEEEDciB5+qhQ1Tv9CawCgM8lgK
-	4b9MigUAa4lhaE1nHv31mEh8z68E=
-X-Gm-Gg: ASbGnct7hMz3F1NHjMFYCa5AyEmBzzSljNAsWBY2b4H9JHIMIOLnlECaEfu65LSnzaV
-	LtVLavGypU7s2TX2G+p4OW4BE3BHSi+qkRjDIQS7gUUiKCFcPeaXOKPFBS5mWh+aPwbh/dc0=
-X-Google-Smtp-Source: AGHT+IFhv4QyHcNAajVgFrqbIVUujoYsNm1PsFdg3x7M+LbdO2uCN7G0YuFwTVKJ2c8fgexcq19wksQCuFGSHyGv1xQ=
-X-Received: by 2002:a05:690c:6e03:b0:6ef:8122:282f with SMTP id
- 00721157ae682-6f1a508837dmr20566937b3.24.1733986924068; Wed, 11 Dec 2024
- 23:02:04 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733987148; x=1734591948;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rti03MdrVXI/elGajytboAaA+i7ZN4OIWBTI355So04=;
+        b=Ys4upepGv9q0jAryqI2hJLPE+P35Xheq61kDdBJ+/aKFskaLfoJ6CO5Fp6zxYCMgGo
+         OEmNdkoXC2jAU5aJeK0VTQ7puyuvIrTo5ipD0AX8OeVnnlNbSasUDnGQkID2/X9biaGd
+         bQSNdvVbdsJlunlIPFXVk12QGjd2PQnpo7iqaGR6wMegrVLvpsLsWneoRFUIGpymwXuO
+         c1hx4LP1h4NP9rS9q+QQm3m2p6JBVeDUb+ZQntBNy+AWSVdwOf3bR/vZ7CMibUUlC04n
+         t40aKWhbxE0F0fD01Xfe2FxR80mTYpyBIg0ODat5aBXcfxodpmwOXXdojGwI9hpNNZon
+         Dqcw==
+X-Forwarded-Encrypted: i=1; AJvYcCVHZihDFI8sy+ZXfbctOur6t5JP9U9+8UZc+34B0tJTGwRixGCn3ots6DJjTWF5VjHX9R8+y2g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycQC1BywOwfCOP2ARCh5Hev7goIhfdwgQCZ9XpgyDEDff9Ajn8
+	zFZfJcmcz4rBD7eHHfe0hpVLlZ9C5M+tccQdtXkM7vK+Jg6L0OOobFDhGPSYIpDCRm246TEZchp
+	E0a9Kt6FroSluykA0qo5lBog1300aetQ52SL/7uc6MYVMhc6GUrNAXQ==
+X-Gm-Gg: ASbGncs6fmkFAjrni1RGCKH2Dprdm38J3uMniCLwwGbmZcdIoz2BdHc1vGg20SZNAfr
+	4f9CQaJfqxH1QOSJXVhKZVsBEwtbExrjMzlPrPqYbPNiYAuwB02efMvLXRMldnw4qr5P48UnJHV
+	Nis6QsFjTokMXByLgbBl9bdRkB9194dwMJfBMkeowybRiVK79cgOrx0ejnQ1Er/La2xYkg87vH3
+	kq/d5IXnv68/tEQ/obzc7YiorFwpdx3vZ9bfy+7V4G15bq+Ew==
+X-Received: by 2002:a05:600c:1c85:b0:434:fdbc:5cf7 with SMTP id 5b1f17b1804b1-4361c416003mr39047665e9.27.1733987148526;
+        Wed, 11 Dec 2024 23:05:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHM80JCEN7MZoecTSwl2bXnHH1Ct9tE9wGDfZGHrSJBXJKgu6o9wF6yCI7CnMl4kLTpHYS1ew==
+X-Received: by 2002:a05:600c:1c85:b0:434:fdbc:5cf7 with SMTP id 5b1f17b1804b1-4361c416003mr39047425e9.27.1733987148104;
+        Wed, 11 Dec 2024 23:05:48 -0800 (PST)
+Received: from redhat.com ([2a02:14f:179:603a:6ff0:d430:c1c2:5bc9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43625553208sm7354775e9.9.2024.12.11.23.05.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Dec 2024 23:05:47 -0800 (PST)
+Date: Thu, 12 Dec 2024 02:05:42 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Koichiro Den <koichiro.den@canonical.com>
+Cc: virtualization@lists.linux.dev, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v4 0/6] virtio_net: correct netdev_tx_reset_queue()
+ invocation points
+Message-ID: <20241212020531-mutt-send-email-mst@kernel.org>
+References: <20241206011047.923923-1-koichiro.den@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210104524.2466586-1-tmyu0@nuvoton.com> <20241210104524.2466586-2-tmyu0@nuvoton.com>
- <47f720f8-90d7-4444-bfde-fb76ec2a2f0f@wanadoo.fr>
-In-Reply-To: <47f720f8-90d7-4444-bfde-fb76ec2a2f0f@wanadoo.fr>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Thu, 12 Dec 2024 15:01:53 +0800
-Message-ID: <CAOoeyxXC5zj5R1qV-WSakJmh_q8vK0oh_sjg1VZK=dvhaZdYCw@mail.gmail.com>
-Subject: Re: [PATCH v3 1/7] mfd: Add core driver for Nuvoton NCT6694
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, tmyu0@nuvoton.com, lee@kernel.org, 
-	linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
-	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20241206011047.923923-1-koichiro.den@canonical.com>
 
-Dear Christophe,
+On Fri, Dec 06, 2024 at 10:10:41AM +0900, Koichiro Den wrote:
+> When virtnet_close is followed by virtnet_open, some TX completions can
+> possibly remain unconsumed, until they are finally processed during the
+> first NAPI poll after the netdev_tx_reset_queue(), resulting in a crash
+> [1]. Commit b96ed2c97c79 ("virtio_net: move netdev_tx_reset_queue() call
+> before RX napi enable") was not sufficient to eliminate all BQL crash
+> scenarios for virtio-net.
+>=20
+> This issue can be reproduced with the latest net-next master by running:
+> `while :; do ip l set DEV down; ip l set DEV up; done` under heavy network
+> TX load from inside the machine.
+>=20
+> This patch series resolves the issue and also addresses similar existing
+> problems:
+>=20
+> (a). Drop netdev_tx_reset_queue() from open/close path. This eliminates t=
+he
+>      BQL crashes due to the problematic open/close path.
+>=20
+> (b). As a result of (a), netdev_tx_reset_queue() is now explicitly requir=
+ed
+>      in freeze/restore path. Add netdev_tx_reset_queue() immediately after
+>      free_unused_bufs() invocation.
+>=20
+> (c). Fix missing resetting in virtnet_tx_resize().
+>      virtnet_tx_resize() has lacked proper resetting since commit
+>      c8bd1f7f3e61 ("virtio_net: add support for Byte Queue Limits").
+>=20
+> (d). Fix missing resetting in the XDP_SETUP_XSK_POOL path.
+>      Similar to (c), this path lacked proper resetting. Call
+>      netdev_tx_reset_queue() when virtqueue_reset() has actually recycled
+>      unused buffers.
 
-Thank you for your comments,
 
-Christophe JAILLET <christophe.jaillet@wanadoo.fr> =E6=96=BC 2024=E5=B9=B41=
-2=E6=9C=8812=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8A=E5=8D=8812:44=E5=AF=AB=
-=E9=81=93=EF=BC=9A
->
-> > +int nct6694_read_msg(struct nct6694 *nct6694, u8 mod, u16 offset,
-> > +                  u16 length, void *buf)
-> > +{
-> > +     struct nct6694_cmd_header *cmd_header =3D nct6694->cmd_header;
-> > +     struct nct6694_response_header *response_header =3D nct6694->resp=
-onse_header;
-> > +     struct usb_device *udev =3D nct6694->udev;
-> > +     int tx_len, rx_len, ret;
-> > +
-> > +     guard(mutex)(&nct6694->access_lock);
->
-> Nitpick: This could be moved a few lines below, should it still comply
-> with your coding style.
->
+thanks
 
-I think the lock should be placed here to prevent the cmd_header from
-being overwritten by another caller.
-Could you share your perspective on this?
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-> > +
-> > +     /* Send command packet to USB device */
-> > +     cmd_header->mod =3D mod;
-> > +     cmd_header->cmd =3D offset & 0xFF;
-> > +     cmd_header->sel =3D (offset >> 8) & 0xFF;
-> > +     cmd_header->hctrl =3D NCT6694_HCTRL_GET;
-> > +     cmd_header->len =3D length;
-> > +
-> > +     ret =3D usb_bulk_msg(udev, usb_sndbulkpipe(udev, NCT6694_BULK_OUT=
-_EP),
-> > +                        cmd_header, NCT6694_CMD_PACKET_SZ, &tx_len,
-> > +                        nct6694->timeout);
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     /* Receive response packet from USB device */
-> > +     ret =3D usb_bulk_msg(udev, usb_rcvbulkpipe(udev, NCT6694_BULK_IN_=
-EP),
-> > +                        response_header, NCT6694_CMD_PACKET_SZ, &rx_le=
-n,
-> > +                        nct6694->timeout);
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     ret =3D usb_bulk_msg(udev, usb_rcvbulkpipe(udev, NCT6694_BULK_IN_=
-EP),
-> > +                        buf, NCT6694_MAX_PACKET_SZ, &rx_len, nct6694->=
-timeout);
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     return nct6694_response_err_handling(nct6694, response_header->st=
-s);
-> > +}
-> > +EXPORT_SYMBOL(nct6694_read_msg);
-> > +
-> > +int nct6694_write_msg(struct nct6694 *nct6694, u8 mod, u16 offset,
-> > +                   u16 length, void *buf)
-> > +{
-> > +     struct nct6694_cmd_header *cmd_header =3D nct6694->cmd_header;
-> > +     struct nct6694_response_header *response_header =3D nct6694->resp=
-onse_header;
-> > +     struct usb_device *udev =3D nct6694->udev;
-> > +     int tx_len, rx_len, ret;
-> > +
-> > +     guard(mutex)(&nct6694->access_lock);
->
-> Nitpick: This could be moved a few lines below, should it still comply
-> with your coding style.
->
+> This patch series consists of six commits:
+>   [1/6]: Resolves (a) and (b).                      # also -stable 6.11.y
+>   [2/6]: Minor fix to make [4/6] streamlined.
+>   [3/6]: Prerequisite for (c).                      # also -stable 6.11.y
+>   [4/6]: Resolves (c) (incl. Prerequisite for (d))  # also -stable 6.11.y
+>   [5/6]: Preresuisite for (d).
+>   [6/6]: Resolves (d).
+>=20
+> Changes for v4:
+>   - move netdev_tx_reset_queue() out of free_unused_bufs()
+>   - submit to net, not net-next
+> Changes for v3:
+>   - replace 'flushed' argument with 'recycle_done'
+> Changes for v2:
+>   - add tx queue resetting for (b) to (d) above
+>=20
+> v3: https://lore.kernel.org/all/20241204050724.307544-1-koichiro.den@cano=
+nical.com/
+> v2: https://lore.kernel.org/all/20241203073025.67065-1-koichiro.den@canon=
+ical.com/
+> v1: https://lore.kernel.org/all/20241130181744.3772632-1-koichiro.den@can=
+onical.com/
+>=20
+> [1]:
+> ------------[ cut here ]------------
+> kernel BUG at lib/dynamic_queue_limits.c:99!
+> Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+> CPU: 7 UID: 0 PID: 1598 Comm: ip Tainted: G    N 6.12.0net-next_main+ #2
+> Tainted: [N]=3DTEST
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), \
+> BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+> RIP: 0010:dql_completed+0x26b/0x290
+> Code: b7 c2 49 89 e9 44 89 da 89 c6 4c 89 d7 e8 ed 17 47 00 58 65 ff 0d
+> 4d 27 90 7e 0f 85 fd fe ff ff e8 ea 53 8d ff e9 f3 fe ff ff <0f> 0b 01
+> d2 44 89 d1 29 d1 ba 00 00 00 00 0f 48 ca e9 28 ff ff ff
+> RSP: 0018:ffffc900002b0d08 EFLAGS: 00010297
+> RAX: 0000000000000000 RBX: ffff888102398c80 RCX: 0000000080190009
+> RDX: 0000000000000000 RSI: 000000000000006a RDI: 0000000000000000
+> RBP: ffff888102398c00 R08: 0000000000000000 R09: 0000000000000000
+> R10: 00000000000000ca R11: 0000000000015681 R12: 0000000000000001
+> R13: ffffc900002b0d68 R14: ffff88811115e000 R15: ffff8881107aca40
+> FS:  00007f41ded69500(0000) GS:ffff888667dc0000(0000)
+> knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000556ccc2dc1a0 CR3: 0000000104fd8003 CR4: 0000000000772ef0
+> PKRU: 55555554
+> Call Trace:
+>  <IRQ>
+>  ? die+0x32/0x80
+>  ? do_trap+0xd9/0x100
+>  ? dql_completed+0x26b/0x290
+>  ? dql_completed+0x26b/0x290
+>  ? do_error_trap+0x6d/0xb0
+>  ? dql_completed+0x26b/0x290
+>  ? exc_invalid_op+0x4c/0x60
+>  ? dql_completed+0x26b/0x290
+>  ? asm_exc_invalid_op+0x16/0x20
+>  ? dql_completed+0x26b/0x290
+>  __free_old_xmit+0xff/0x170 [virtio_net]
+>  free_old_xmit+0x54/0xc0 [virtio_net]
+>  virtnet_poll+0xf4/0xe30 [virtio_net]
+>  ? __update_load_avg_cfs_rq+0x264/0x2d0
+>  ? update_curr+0x35/0x260
+>  ? reweight_entity+0x1be/0x260
+>  __napi_poll.constprop.0+0x28/0x1c0
+>  net_rx_action+0x329/0x420
+>  ? enqueue_hrtimer+0x35/0x90
+>  ? trace_hardirqs_on+0x1d/0x80
+>  ? kvm_sched_clock_read+0xd/0x20
+>  ? sched_clock+0xc/0x30
+>  ? kvm_sched_clock_read+0xd/0x20
+>  ? sched_clock+0xc/0x30
+>  ? sched_clock_cpu+0xd/0x1a0
+>  handle_softirqs+0x138/0x3e0
+>  do_softirq.part.0+0x89/0xc0
+>  </IRQ>
+>  <TASK>
+>  __local_bh_enable_ip+0xa7/0xb0
+>  virtnet_open+0xc8/0x310 [virtio_net]
+>  __dev_open+0xfa/0x1b0
+>  __dev_change_flags+0x1de/0x250
+>  dev_change_flags+0x22/0x60
+>  do_setlink.isra.0+0x2df/0x10b0
+>  ? rtnetlink_rcv_msg+0x34f/0x3f0
+>  ? netlink_rcv_skb+0x54/0x100
+>  ? netlink_unicast+0x23e/0x390
+>  ? netlink_sendmsg+0x21e/0x490
+>  ? ____sys_sendmsg+0x31b/0x350
+>  ? avc_has_perm_noaudit+0x67/0xf0
+>  ? cred_has_capability.isra.0+0x75/0x110
+>  ? __nla_validate_parse+0x5f/0xee0
+>  ? __pfx___probestub_irq_enable+0x3/0x10
+>  ? __create_object+0x5e/0x90
+>  ? security_capable+0x3b/0x7=1B[I0
+>  rtnl_newlink+0x784/0xaf0
+>  ? avc_has_perm_noaudit+0x67/0xf0
+>  ? cred_has_capability.isra.0+0x75/0x110
+>  ? stack_depot_save_flags+0x24/0x6d0
+>  ? __pfx_rtnl_newlink+0x10/0x10
+>  rtnetlink_rcv_msg+0x34f/0x3f0
+>  ? do_syscall_64+0x6c/0x180
+>  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+>  netlink_rcv_skb+0x54/0x100
+>  netlink_unicast+0x23e/0x390
+>  netlink_sendmsg+0x21e/0x490
+>  ____sys_sendmsg+0x31b/0x350
+>  ? copy_msghdr_from_user+0x6d/0xa0
+>  ___sys_sendmsg+0x86/0xd0
+>  ? __pte_offset_map+0x17/0x160
+>  ? preempt_count_add+0x69/0xa0
+>  ? __call_rcu_common.constprop.0+0x147/0x610
+>  ? preempt_count_add+0x69/0xa0
+>  ? preempt_count_add+0x69/0xa0
+>  ? _raw_spin_trylock+0x13/0x60
+>  ? trace_hardirqs_on+0x1d/0x80
+>  __sys_sendmsg+0x66/0xc0
+>  do_syscall_64+0x6c/0x180
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> RIP: 0033:0x7f41defe5b34
+> Code: 15 e1 12 0f 00 f7 d8 64 89 02 b8 ff ff ff ff eb bf 0f 1f 44 00 00
+> f3 0f 1e fa 80 3d 35 95 0f 00 00 74 13 b8 2e 00 00 00 0f 05 <48> 3d 00
+> f0 ff ff 77 4c c3 0f 1f 00 55 48 89 e5 48 83 ec 20 89 55
+> RSP: 002b:00007ffe5336ecc8 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f41defe5b34
+> RDX: 0000000000000000 RSI: 00007ffe5336ed30 RDI: 0000000000000003
+> RBP: 00007ffe5336eda0 R08: 0000000000000010 R09: 0000000000000001
+> R10: 00007ffe5336f6f9 R11: 0000000000000202 R12: 0000000000000003
+> R13: 0000000067452259 R14: 0000556ccc28b040 R15: 0000000000000000
+>  </TASK>
+> [...]
+> ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+>=20
+> Koichiro Den (6):
+>   virtio_net: correct netdev_tx_reset_queue() invocation point
+>   virtio_net: replace vq2rxq with vq2txq where appropriate
+>   virtio_ring: add a func argument 'recycle_done' to virtqueue_resize()
+>   virtio_net: ensure netdev_tx_reset_queue is called on tx ring resize
+>   virtio_ring: add a func argument 'recycle_done' to virtqueue_reset()
+>   virtio_net: ensure netdev_tx_reset_queue is called on bind xsk for tx
+>=20
+>  drivers/net/virtio_net.c     | 31 +++++++++++++++++++++++++------
+>  drivers/virtio/virtio_ring.c | 12 ++++++++++--
+>  include/linux/virtio.h       |  6 ++++--
+>  3 files changed, 39 insertions(+), 10 deletions(-)
+>=20
+> --=20
+> 2.43.0
 
-I think the lock should be placed here to prevent the cmd_header from
-being overwritten by another caller.
-Could you share your perspective on this?
-
-> > +
-> > +     /* Send command packet to USB device  */
->
-> Nitpick: double space before */
->
-
-Fix it in v4.
-
-> > +     cmd_header->mod =3D mod;
-> > +     cmd_header->cmd =3D offset & 0xFF;
-> > +     cmd_header->sel =3D (offset >> 8) & 0xFF;
-> > +     cmd_header->hctrl =3D NCT6694_HCTRL_SET;
-> > +     cmd_header->len =3D length;
->
-> ...
->
-> > +static struct irq_chip nct6694_irq_chip =3D {
->
-> const?
->
-
-Fix it in v4.
-
-> > +     .name =3D "nct6694-irq",
-> > +     .flags =3D IRQCHIP_SKIP_SET_WAKE,
-> > +     .irq_bus_lock =3D nct6694_irq_lock,
-> > +     .irq_bus_sync_unlock =3D nct6694_irq_sync_unlock,
-> > +     .irq_enable =3D nct6694_irq_enable,
-> > +     .irq_disable =3D nct6694_irq_disable,
-> > +};
->
-> ...
->
-> > +static int nct6694_usb_probe(struct usb_interface *iface,
-> > +                          const struct usb_device_id *id)
-> > +{
-> > +     struct usb_device *udev =3D interface_to_usbdev(iface);
-> > +     struct device *dev =3D &udev->dev;
-> > +     struct usb_host_interface *interface;
-> > +     struct usb_endpoint_descriptor *int_endpoint;
-> > +     struct nct6694 *nct6694;
-> > +     struct nct6694_cmd_header *cmd_header;
-> > +     struct nct6694_response_header *response_header;
-> > +     int pipe, maxp;
-> > +     int ret;
-> > +
-> > +     interface =3D iface->cur_altsetting;
-> > +
-> > +     int_endpoint =3D &interface->endpoint[0].desc;
-> > +     if (!usb_endpoint_is_int_in(int_endpoint))
-> > +             return -ENODEV;
-> > +
-> > +     nct6694 =3D devm_kzalloc(dev, sizeof(*nct6694), GFP_KERNEL);
-> > +     if (!nct6694)
-> > +             return -ENOMEM;
-> > +
-> > +     pipe =3D usb_rcvintpipe(udev, NCT6694_INT_IN_EP);
-> > +     maxp =3D usb_maxpacket(udev, pipe);
-> > +
-> > +     cmd_header =3D devm_kzalloc(dev, sizeof(*cmd_header),
-> > +                               GFP_KERNEL);
-> > +     if (!cmd_header)
-> > +             return -ENOMEM;
-> > +
-> > +     response_header =3D devm_kzalloc(dev, sizeof(*response_header),
-> > +                                    GFP_KERNEL);
-> > +     if (!response_header)
-> > +             return -ENOMEM;
-> > +
-> > +     nct6694->int_buffer =3D devm_kcalloc(dev, NCT6694_MAX_PACKET_SZ,
-> > +                                        sizeof(unsigned char), GFP_KER=
-NEL);
->
-> Why for cmd_header and response_header we use a temp variable, while
-> here we update directly nct6694->int_buffer?
->
-> It would save a few LoC do remove this temp var.
->
-
-Fix it in v4.
-
-> > +     if (!nct6694->int_buffer)
-> > +             return -ENOMEM;
-> > +
-> > +     nct6694->int_in_urb =3D usb_alloc_urb(0, GFP_KERNEL);
-> > +     if (!nct6694->int_in_urb)
-> > +             return -ENOMEM;
->
-> ...
->
-
-Best regards,
-Ming
 
