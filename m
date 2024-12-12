@@ -1,301 +1,187 @@
-Return-Path: <netdev+bounces-151554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B335B9EFF81
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 23:45:33 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 424B09EFFB9
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 00:00:51 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A93316880F
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 23:00:48 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAED71DE8AA;
+	Thu, 12 Dec 2024 23:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="Pbpk/0fs"
+X-Original-To: netdev@vger.kernel.org
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DC7F2863EB
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 22:45:32 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003621D7E5F;
-	Thu, 12 Dec 2024 22:45:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="W98m/OmJ"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03251ADFF8
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 22:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5DF1D8DFB;
+	Thu, 12 Dec 2024 23:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734043529; cv=none; b=gO0IxV08g1F6NWZCrfC75nS8gdBMi94DlcRMNeU2j5UVLoQ/IxyiJBZOZ3LmyOZQ9/N9Aa4CslGcRFeIXvMcb9BwS2+7CVglxnDoUwPoajCffA75dbCUFAwW0QYCi71Ns3q/ieXtELaFeKMHdcduztBoXF17FqBD8v/K+svV1Wo=
+	t=1734044441; cv=none; b=jbnXmLzZ1lLsOboWLvmty4545Y6hnFpG7rHC9x1kdm2Roxny7fWtclrLRtHVezpiLcDfmuW69LMTvolV6qub1GhPS30GKvjiyMX2aSVBKG2taACro2ubYMxytvLuctInhBNk88oBs7vzyGu7cFQygZXt2FG/8df/rvsyOEfsMqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734043529; c=relaxed/simple;
-	bh=XpEtdsrgb4tWlq/LargblSbGeI9jhQhkhPTRrqvon8M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HHin0NDQV89pEqRTv5z335fJk7mq+PyIzhF7/NX0NVEnUHrnDQUxRh/QFHSY5e7/XbPC4gq1RfATi2Am/1p8nc3MLK3EH+T4CgV5H0c7P536vKacONKXoxELbi5X+7lcukIZQbyv3k2f7isDzHUC4FBhLPAEPrC8L2Xfm95pP4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=W98m/OmJ; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aa67f31a858so196937066b.2
-        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 14:45:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1734043526; x=1734648326; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XUsJkf4J+j/xiECkG4sE5rLGWyn8q8xGGB06NtynjQE=;
-        b=W98m/OmJUPXrjeok+jriss0vDObb0KKDK/COOVBg9Ggzm/RTpblnYppu8hHFJgX/SM
-         r2k3g2hCkXCos/bViZJn+8kiqxtPBPeWRBE+2vf3PwOAefxR0VHeGJiGLjDn2B05f2mn
-         DgmjcMYBA3M3acIzUajJga2+n7gRkkB1rwFZ1r+BSarF7+8aELX+8JqochSfAqWTmchT
-         r2WC2cMX7O4PvIouPYgKOMxnhXiTRDoMxtPi7SUwm6FZIpY1hSieD38WrP7dCfW+6Mcl
-         qPLfcT7SZcqNmVmlnrXfHX/WWcaGTH7LqgYhD7NM6rhUG0Cl+6krRQ9voehXXMj0HO7n
-         xGFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734043526; x=1734648326;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XUsJkf4J+j/xiECkG4sE5rLGWyn8q8xGGB06NtynjQE=;
-        b=sqkC9pU37ukVjp8fE587+N8ssd9A5MbUl3nQxDTACWYg3fiNER2E3v6OGniwuSb6wY
-         J/7/XjOMu3U5JJ0jsFCy8TZXJ2VAc2RWovXnqkSc8MWgZy4RjrLf4+sQHfY7vYnh+WST
-         mjj7wqxDjd/xNUImjkTehWZge8L2IH/3iW9lPIr8hR/U3sQQiosaaFF8ndaE1XuAcj8h
-         j+Vg8gRiGV/LncucJlCf55fNGiT/hvs1zVf3s33xcnKf2U2d0fIU0UyKgSjfrZklXTQB
-         R0VEpmVE/NI3Z7Wl30lUuTKwhH4ozVT1I6XltgFkjmIbNTkV1QJJ2TDb21iZ/CQFXgrb
-         CSYQ==
-X-Gm-Message-State: AOJu0YzgHIi1AjnJ9JDQvQ2KFvWV4zRXCm6645vu4XHAb5r+yVZjVBTd
-	HOOWda9QxUGMF+BXISTh1sXi6+1EcidhNQcwYlVxqTZ8T03MADhqQq7IspcmSWA=
-X-Gm-Gg: ASbGncsX7PwFmdNVfDWhYbBuVxiTJbqxh9BNFyI65vAwycHuyaYT9BE4nMRrE1Sj87K
-	QjY8bxt6I0S0ieSo1Er5ygcnPAMwouznVJu33we9+bz9v/Op+sXQmVhMCvNtU5lEbJrDVhq5UyH
-	vXYXoNuTyRbjeYm1Vv2bxc8I1RML1AsySG77fnc5YnyRphOFwbVPpoJgUw+DsG844meUQjFY0E9
-	2I0yw4m79pR87lnA27Pl4bZ1VQDFAGc8+q03rDwXSSYq8J4BgusOsePs3oTT/DlLUsO2f7iDmJR
-	gUGYfHYb+Yj+pBcHeYM=
-X-Google-Smtp-Source: AGHT+IEnd+D7X8TzYQBVe2H+wexdsZa1tb6lj6B+PXBw/DjlnuLHbieso5Q07N5vS1ESwsrUnIOZ3A==
-X-Received: by 2002:a17:907:1ca3:b0:aab:7588:f411 with SMTP id a640c23a62f3a-aab779c8bcamr43821666b.25.1734043526035;
-        Thu, 12 Dec 2024 14:45:26 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:a1c0:e394:b652:4ab3? ([2001:67c:2fbc:1:a1c0:e394:b652:4ab3])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa6260e6c67sm1164937766b.187.2024.12.12.14.45.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2024 14:45:25 -0800 (PST)
-Message-ID: <fa19f3a8-c273-4d2c-a10e-e9bda2375365@openvpn.net>
-Date: Thu, 12 Dec 2024 23:46:11 +0100
+	s=arc-20240116; t=1734044441; c=relaxed/simple;
+	bh=7QLwXxqiXHK9GxQGN/b7k3jlhS5iyReQ14GxQy93dNU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Df+AfC5z7ObOqLDqhnGlz2Qiazlis7znHt+xeAB6hNPoOus/2kIFqaiMcaVV1SoqxzoUTGw+snq3n/V5jUXJbSC3dmAYfPT0dPgTTgKnEkqx3k5kMyHqv/+8CD8cJufw+o4BtY+SflCSvRFhgHM71ne9c2YCM4jVHkt3cIryves=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=Pbpk/0fs; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1734044433;
+	bh=7QLwXxqiXHK9GxQGN/b7k3jlhS5iyReQ14GxQy93dNU=;
+	h=From:Date:Subject:To:Cc:From;
+	b=Pbpk/0fsso5FSs5n/+B28RE7/sErOBu8T/HW8+y+LEoSVyvkUWbP3vFl/clLfVwml
+	 M2P8hJDMKvyRc5xGVVAR8/0UnZk8O1kB2Y4icOVBgcrLnpWEXKluVvIa4FgcbZoxI6
+	 ui9FonpkzzJK9eqVmY1ia5twoQq7/N9Oj+1tN5Oc=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Fri, 13 Dec 2024 00:00:30 +0100
+Subject: [PATCH bpf] bpf: fix configuration-dependent BTF function
+ references
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v15 06/22] ovpn: introduce the ovpn_socket object
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
- willemdebruijn.kernel@gmail.com
-References: <20241211-b4-ovpn-v15-0-314e2cad0618@openvpn.net>
- <20241211-b4-ovpn-v15-6-314e2cad0618@openvpn.net> <Z1sNEgQLMzZua3mS@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <Z1sNEgQLMzZua3mS@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20241213-bpf-cond-ids-v1-1-881849997219@weissschuh.net>
+X-B4-Tracking: v=1; b=H4sIAA5rW2cC/x2MQQqAIBBFryKzTkiRpK4SLVLHmo2KQgTi3Rtav
+ s/7r0PDSthgEx0qPtQoJwY1CfD3mS6UFJhBz9oorbR0JUqfU+C9ydVF5xcTgrUO+FIqRnr/3A5
+ swjHGB1slDRhjAAAA
+X-Change-ID: 20241212-bpf-cond-ids-9bfbc64dd77b
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1734044433; l=3913;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=7QLwXxqiXHK9GxQGN/b7k3jlhS5iyReQ14GxQy93dNU=;
+ b=iFMRFxFRZhLYX6ZjIvxGwu4AbMkFGFKKTsmUqyawE6GMp3A9SGg131hRovYSSJzvbQ+RcGmJ9
+ 42hc61fmHVSCYKFSQTncIRcShBgc5QCCVV6/ZO+dltldHVKJJ1iH41K
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-On 12/12/2024 17:19, Sabrina Dubroca wrote:
-> 2024-12-11, 22:15:10 +0100, Antonio Quartulli wrote:
->> +static struct ovpn_socket *ovpn_socket_get(struct socket *sock)
->> +{
->> +	struct ovpn_socket *ovpn_sock;
->> +
->> +	rcu_read_lock();
->> +	ovpn_sock = rcu_dereference_sk_user_data(sock->sk);
->> +	if (WARN_ON(!ovpn_socket_hold(ovpn_sock)))
-> 
-> Could we hit this situation when we're removing the last peer (so
-> detaching its socket) just as we're adding a new one? ovpn_socket_new
-> finds the socket already attached and goes through the EALREADY path,
-> but the refcount has already dropped to 0?
-> 
+These BTF functions are not available unconditionally,
+only reference them when they are available.
 
-hm good point.
+Avoid the following build warnings:
 
-> Then we'd also return NULL from ovpn_socket_new [1], which I don't
-> think is handled well by the caller (at least the netdev_dbg call at
-> the end of ovpn_nl_peer_modify, maybe other spots too).
-> 
-> (I guess it's not an issue you would see with the existing userspace
-> if it's single-threaded)
+  BTF     .tmp_vmlinux1.btf.o
+btf_encoder__tag_kfunc: failed to find kfunc 'bpf_send_signal_task' in BTF
+btf_encoder__tag_kfuncs: failed to tag kfunc 'bpf_send_signal_task'
+  NM      .tmp_vmlinux1.syms
+  KSYMS   .tmp_vmlinux1.kallsyms.S
+  AS      .tmp_vmlinux1.kallsyms.o
+  LD      .tmp_vmlinux2
+  NM      .tmp_vmlinux2.syms
+  KSYMS   .tmp_vmlinux2.kallsyms.S
+  AS      .tmp_vmlinux2.kallsyms.o
+  LD      vmlinux
+  BTFIDS  vmlinux
+WARN: resolve_btfids: unresolved symbol prog_test_ref_kfunc
+WARN: resolve_btfids: unresolved symbol bpf_crypto_ctx
+WARN: resolve_btfids: unresolved symbol bpf_send_signal_task
+WARN: resolve_btfids: unresolved symbol bpf_modify_return_test_tp
+WARN: resolve_btfids: unresolved symbol bpf_dynptr_from_xdp
+WARN: resolve_btfids: unresolved symbol bpf_dynptr_from_skb
 
-The TCP patch 11/22 will convert the socket release routine to a 
-scheduled worker.
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+---
+ kernel/bpf/helpers.c  | 4 ++++
+ kernel/bpf/verifier.c | 8 ++++++++
+ 2 files changed, 12 insertions(+)
 
-This means we can have the following flow:
-1) userspace deletes a peer -> peer drops its reference to the ovpn_socket
-2) ovpn_socket refcnt may hit 0 -> cleanup/detach work is scheduled, but 
-not yet executed
-3) userspace adds a new peer -> attach returns -EALREADY but refcnt is 0
+diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+index 751c150f9e1cd7f56e6a2b68a7ebb4ae89a30d2d..5edf5436a7804816b7dcf1bbef2624d71a985f20 100644
+--- a/kernel/bpf/helpers.c
++++ b/kernel/bpf/helpers.c
+@@ -3089,7 +3089,9 @@ BTF_ID_FLAGS(func, bpf_task_get_cgroup1, KF_ACQUIRE | KF_RCU | KF_RET_NULL)
+ BTF_ID_FLAGS(func, bpf_task_from_pid, KF_ACQUIRE | KF_RET_NULL)
+ BTF_ID_FLAGS(func, bpf_task_from_vpid, KF_ACQUIRE | KF_RET_NULL)
+ BTF_ID_FLAGS(func, bpf_throw)
++#ifdef CONFIG_BPF_EVENTS
+ BTF_ID_FLAGS(func, bpf_send_signal_task, KF_TRUSTED_ARGS)
++#endif
+ BTF_KFUNCS_END(generic_btf_ids)
+ 
+ static const struct btf_kfunc_id_set generic_kfunc_set = {
+@@ -3135,7 +3137,9 @@ BTF_ID_FLAGS(func, bpf_dynptr_is_null)
+ BTF_ID_FLAGS(func, bpf_dynptr_is_rdonly)
+ BTF_ID_FLAGS(func, bpf_dynptr_size)
+ BTF_ID_FLAGS(func, bpf_dynptr_clone)
++#ifdef CONFIG_NET
+ BTF_ID_FLAGS(func, bpf_modify_return_test_tp)
++#endif
+ BTF_ID_FLAGS(func, bpf_wq_init)
+ BTF_ID_FLAGS(func, bpf_wq_set_callback_impl)
+ BTF_ID_FLAGS(func, bpf_wq_start)
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 5e541339b2f6d1870561033fd55cca7144db14bc..77bbf58418fee7533bce539c8e005d2342ee1a48 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -5526,7 +5526,9 @@ static bool in_rcu_cs(struct bpf_verifier_env *env)
+ 
+ /* Once GCC supports btf_type_tag the following mechanism will be replaced with tag check */
+ BTF_SET_START(rcu_protected_types)
++#ifdef CONFIG_NET
+ BTF_ID(struct, prog_test_ref_kfunc)
++#endif
+ #ifdef CONFIG_CGROUPS
+ BTF_ID(struct, cgroup)
+ #endif
+@@ -5534,7 +5536,9 @@ BTF_ID(struct, cgroup)
+ BTF_ID(struct, bpf_cpumask)
+ #endif
+ BTF_ID(struct, task_struct)
++#ifdef CONFIG_CRYPTO
+ BTF_ID(struct, bpf_crypto_ctx)
++#endif
+ BTF_SET_END(rcu_protected_types)
+ 
+ static bool rcu_protected_object(const struct btf *btf, u32 btf_id)
+@@ -11529,8 +11533,10 @@ BTF_ID(func, bpf_rdonly_cast)
+ BTF_ID(func, bpf_rbtree_remove)
+ BTF_ID(func, bpf_rbtree_add_impl)
+ BTF_ID(func, bpf_rbtree_first)
++#ifdef CONFIG_NET
+ BTF_ID(func, bpf_dynptr_from_skb)
+ BTF_ID(func, bpf_dynptr_from_xdp)
++#endif
+ BTF_ID(func, bpf_dynptr_slice)
+ BTF_ID(func, bpf_dynptr_slice_rdwr)
+ BTF_ID(func, bpf_dynptr_clone)
+@@ -11558,8 +11564,10 @@ BTF_ID(func, bpf_rcu_read_unlock)
+ BTF_ID(func, bpf_rbtree_remove)
+ BTF_ID(func, bpf_rbtree_add_impl)
+ BTF_ID(func, bpf_rbtree_first)
++#ifdef CONFIG_NET
+ BTF_ID(func, bpf_dynptr_from_skb)
+ BTF_ID(func, bpf_dynptr_from_xdp)
++#endif
+ BTF_ID(func, bpf_dynptr_slice)
+ BTF_ID(func, bpf_dynptr_slice_rdwr)
+ BTF_ID(func, bpf_dynptr_clone)
 
-So not so impossible, even with a single-threaded userspace software.
+---
+base-commit: 5d287a7de3c95b78946e71d17d15ec9c87fffe7f
+change-id: 20241212-bpf-cond-ids-9bfbc64dd77b
 
-> 
-> [...]
->> +struct ovpn_socket *ovpn_socket_new(struct socket *sock, struct ovpn_peer *peer)
->> +{
->> +	struct ovpn_socket *ovpn_sock;
->> +	int ret;
->> +
->> +	ret = ovpn_socket_attach(sock, peer);
->> +	if (ret < 0 && ret != -EALREADY)
->> +		return ERR_PTR(ret);
->> +
->> +	/* if this socket is already owned by this interface, just increase the
->> +	 * refcounter and use it as expected.
->> +	 *
->> +	 * Since UDP sockets can be used to talk to multiple remote endpoints,
->> +	 * openvpn normally instantiates only one socket and shares it among all
->> +	 * its peers. For this reason, when we find out that a socket is already
->> +	 * used for some other peer in *this* instance, we can happily increase
->> +	 * its refcounter and use it normally.
->> +	 */
->> +	if (ret == -EALREADY) {
->> +		/* caller is expected to increase the sock refcounter before
->> +		 * passing it to this function. For this reason we drop it if
->> +		 * not needed, like when this socket is already owned.
->> +		 */
->> +		ovpn_sock = ovpn_socket_get(sock);
->> +		sockfd_put(sock);
-> 
-> [1] so we would need to add
-> 
->      if (!ovpn_sock)
->          return -EAGAIN;
-
-I am not sure returning -EAGAIN is the right move at this point.
-We don't know when the scheduled worker will execute, so we don't know 
-when to try again.
-
-Maybe we should call cancel_sync_work(&ovpn_sock->work) inside 
-ovpn_socket_get()?
-So the latter will return NULL only when it is sure that the socket has 
-been detached.
-
-At that point we can skip the following return and continue along the 
-"new socket" path.
-
-What do you think?
-
-However, this makes we wonder: what happens if we have two racing 
-PEER_NEW with the same non-yet-attached UDP socket?
-
-Maybe we should lock the socket in ovpn_udp_socket_attach() when 
-checking its user-data and setting it (in order to make the test-and-set 
-atomic)?
-
-I am specifically talking about this in udp.c:
-
-345         /* make sure no pre-existing encapsulation handler exists */
-346         rcu_read_lock();
-347         old_data = rcu_dereference_sk_user_data(sock->sk);
-348         if (!old_data) {
-349                 /* socket is currently unused - we can take it */
-350                 rcu_read_unlock();
-351                 setup_udp_tunnel_sock(sock_net(sock->sk), sock, &cfg);
-352                 return 0;
-353         }
-
-We will end up returning 0 in both contexts and thus allocate two 
-ovpn_sockets instead of re-using the first one we allocated.
-
-Does it make sense?
-
-> 
->> +		return ovpn_sock;
->> +	}
->> +
-> 
-> [...]
->> +int ovpn_udp_socket_attach(struct socket *sock, struct ovpn_priv *ovpn)
->> +{
->> +	struct ovpn_socket *old_data;
->> +	int ret = 0;
->> +
->> +	/* make sure no pre-existing encapsulation handler exists */
->> +	rcu_read_lock();
->> +	old_data = rcu_dereference_sk_user_data(sock->sk);
->> +	if (!old_data) {
->> +		/* socket is currently unused - we can take it */
->> +		rcu_read_unlock();
->> +		return 0;
->> +	}
->> +
->> +	/* socket is in use. We need to understand if it's owned by this ovpn
->> +	 * instance or by something else.
->> +	 * In the former case, we can increase the refcounter and happily
->> +	 * use it, because the same UDP socket is expected to be shared among
->> +	 * different peers.
->> +	 *
->> +	 * Unlikely TCP, a single UDP socket can be used to talk to many remote
-> 
-> (since I'm commenting on this patch:)
-> 
-> s/Unlikely/Unlike/
-
-ACK
-
-> 
-> [I have some more nits/typos here and there but I worry the
-> maintainers will get "slightly" annoyed if I make you repost 22
-> patches once again :) -- if that's all I find in the next few days,
-> everyone might be happier if I stash them and we get them fixed after
-> merging?]
-
-If we have to rework this socket attaching part, it may be worth 
-throwing in those typ0 fixes too :)
-
-Thanks a lot.
-
-Regards,
-
-
+Best regards,
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+Thomas Weißschuh <linux@weissschuh.net>
 
 
