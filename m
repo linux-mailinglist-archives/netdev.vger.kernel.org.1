@@ -1,85 +1,156 @@
-Return-Path: <netdev+bounces-151262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FA759EDCD3
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 01:51:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BBE19EDCE2
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 02:01:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E6021889096
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 00:51:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DE741888E37
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 01:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D177C15E8B;
-	Thu, 12 Dec 2024 00:48:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE8BFC02;
+	Thu, 12 Dec 2024 01:01:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aZpoze4i"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XI9Jtogc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA9A3BB24
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 00:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F5E4A29
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 01:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733964523; cv=none; b=Up7mNhZZ418g2Si/kArzasMAicpED28yH1OPhyy5Zllct/7cIJdCtgKiaYIP3W+k8c3pCOA8+UxORPGUSvpbam6DlOjR1uF8vR66lp3OoejJ74PirM/hl34sSpZj6YQ4SDDhNk/DFdTOqA/8VJFMChuHSSINvdpdDiV+Z54Yi18=
+	t=1733965268; cv=none; b=YhAmvDQWXA5W9WLi2BkCkGl0wohG/e/iIgNVhCEc2HoKd/S8jbEKfs8T1ypLt8EFKWHteDi8oN8IKMbxzOxSQHtABaKC4lXWrB8sGhj5/chUy5V4PrjyaAgDZZ+1N8hkXVYyc+MBra+erHywXYYxvpB15uMe5SGGHiWHVLv+RC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733964523; c=relaxed/simple;
-	bh=Op/xrUFMq7xJCV6WqNKzSaIcz+vzYF0vnclFUAlvzJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cl9DTVYs/Cdj3nLaaRcR2OT5udkjpU7r5Y7yrjNGWOnh4FSSRVXDJfEF9P4HW/GXM3I72ytZ8N+Pk4/IoH7sSdj45EbgppPukgAUUiAQjT/Y4k96TXwixQwHytXGvq34EsFNrNF3dikuCjVfrBCB0VNAb6tmYh850uxpygHJBm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aZpoze4i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD9C6C4CED2;
-	Thu, 12 Dec 2024 00:48:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733964523;
-	bh=Op/xrUFMq7xJCV6WqNKzSaIcz+vzYF0vnclFUAlvzJA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aZpoze4iStlTwICIMGG4OWzMi0UQG9QdgYNx3As2raDfTJZVDvVAhYSEMdb0f7jDo
-	 Kj0YWuMil2Sg4xT0ZK0RNa/ne2flzLh7ROyMG87xctu5kq7y2WrcWtltZvwarMlzeb
-	 xymRTk6HMZaSHSUmIzPO2+LJ2p1EPeQgJuWoTMnNXTA17yVoiplrOdri8kOXKfKeqM
-	 tEwUa8RpgrFlTV9ClCm00pyKFRkFC05+CoVn0s6Oy3R5XZ0WLsovSBIf6zQwcc2Kcs
-	 DdjqekfUHpb0C3NV0rVOkHHXF0UYUr8SM54fBVmdSs6RSgnS9qczlXCn0dk6vwTVVk
-	 tI4fssATCn06Q==
-Date: Wed, 11 Dec 2024 16:48:41 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: David Wei <dw@davidwei.uk>, Yunsheng Lin <linyunsheng@huawei.com>,
- netdev@vger.kernel.org, Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Somnath Kotur <somnath.kotur@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net v3 3/3] bnxt_en: handle tpa_info in queue API
- implementation
-Message-ID: <20241211164841.44cba0ad@kernel.org>
-In-Reply-To: <CACKFLik1-rQB2QHY1pZ3eF0GYGUCgXFHvhh50DNboXV+A7MCuA@mail.gmail.com>
-References: <20241204041022.56512-1-dw@davidwei.uk>
-	<20241204041022.56512-4-dw@davidwei.uk>
-	<9ca8506d-c42d-40a0-9532-7a95c06fed39@huawei.com>
-	<0bc60b9d-fbf7-4421-ab6a-5854355d68f4@davidwei.uk>
-	<a1d5ffda-1e6c-4730-8b36-6ba644bb0118@huawei.com>
-	<fedc8606-b3bc-4fb1-8803-a004cb24216e@davidwei.uk>
-	<CACKFLik1-rQB2QHY1pZ3eF0GYGUCgXFHvhh50DNboXV+A7MCuA@mail.gmail.com>
+	s=arc-20240116; t=1733965268; c=relaxed/simple;
+	bh=M3g1B7AOnncBaEqpzP4s29l77Dc0sy57EtqDKKlKagw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MUcljG+7J2SKrTuG55XH87PKGHczlnFnDt48OWNDQpta0s6HzKUlGrrVonfemZ2+Mya+rDPNDKE1dwvM8U6pun0MuFY/pUR7arKazL3Qvlh6fRXDD2od5nVkOjoIcZPzithPDBEayeqScdBm1wABjgkcxE2Khkpof4fA/yrOCPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XI9Jtogc; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-844c6b3e989so3972439f.0
+        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 17:01:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733965266; x=1734570066; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M3g1B7AOnncBaEqpzP4s29l77Dc0sy57EtqDKKlKagw=;
+        b=XI9JtogcVy/jfjKWiUHaArKA5JYNbIztI9CzVJgQN15IE4ni/8jeC2s1ojeX2EUp5I
+         cFMYbfGQNzlKpsZ6mAj/UFzJmS+unX3KXEs2IJutjeZSiu17YBApkxIJIdTP/OG2Atrf
+         PiExtlpA5DK5pdLRD3bgfvQAVwD9J2dnlSxQCwJ4Sl65Dd+N1P1cHfsAwg2IvnERY/Ta
+         baxSzNHP/OVU0E7fY4KfbKnFIKcZNfrgBYwwcGNZq9lfITxomfOShwIhTzas6Wr2N+Np
+         kwycMPw2Ls3EMB02U7+H1uySemkubo6GN40WrdJM/BxrPlMH5pOY44Ov2+pwFy/KusIb
+         US9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733965266; x=1734570066;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M3g1B7AOnncBaEqpzP4s29l77Dc0sy57EtqDKKlKagw=;
+        b=ONJDrYasHopaitRNxRAYt2Il5vXr21vFLK2PY7ClXG49pg0rWd2mWiOQKYJanBLrIz
+         gUX03w69/lvsVeRt+mB1Ej96bE6Niq6yt2eXI8+vr8EFUPnDWMSlvkno34SPEdNndPJI
+         n5Y+PLhf55LymNv6ClG15xo/4Zxp1k5mlswa/ud6duhUPVaKLVXb9r+IQ7j/YgIx6pAg
+         ZB6E8AmanDLtgovo4IzPYDvMTkBw1T821RThawPX9Eh39gxYlEhttjBzWuYq7sYdUtS3
+         1L/gCpa7+mAHiKXz12sycaeZJYpEuza9WwMWozppXpvg3xMjfMkotm947PCDw2L5VlgB
+         FcHw==
+X-Gm-Message-State: AOJu0YyFxAF5SYeRqw1LzaST5sAIbqwEqS6T1fu5GX1Tdh7Lp1+TzILo
+	jkTqcEDe3o6QifMLXakSAILmQxqy4xGTWeAI4sol6WtgtWzJW/luYyJx6lqaRyQgrLarXPlc53D
+	yJ5JnLbR4aoYLopOeCmNQYPxWKGM=
+X-Gm-Gg: ASbGnctzu+aDAK6/XU01RfPuNfBwfqcoLe1DXoEVuCH1yMYQVm6e6gA4oNIEYE3wSxE
+	x+VzuvEfkUPItk4Hn12FrV17t60l7Icn/j4LF
+X-Google-Smtp-Source: AGHT+IHgO2i4FHG1d0lZEoVh6UgtxQ4hJPRuFTd3SLheVnzoIsTlJ1UgQ0OA3MqJ4J5NdlamD+DwKcAPcZu/QaVZp1Y=
+X-Received: by 2002:a05:6e02:1c41:b0:3a7:7ee3:10a2 with SMTP id
+ e9e14a558f8ab-3ac4b909086mr15788425ab.19.1733965266223; Wed, 11 Dec 2024
+ 17:01:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241209-jakub-krn-909-poc-msec-tw-tstamp-v2-0-66aca0eed03e@cloudflare.com>
+ <20241209-jakub-krn-909-poc-msec-tw-tstamp-v2-1-66aca0eed03e@cloudflare.com>
+In-Reply-To: <20241209-jakub-krn-909-poc-msec-tw-tstamp-v2-1-66aca0eed03e@cloudflare.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 12 Dec 2024 09:00:30 +0800
+Message-ID: <CAL+tcoBC1Zr+u30Aoq-UqJB2xc06SjuLzqeWBSySrUBMhs8=MQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/2] tcp: Measure TIME-WAIT reuse delay with
+ millisecond precision
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Adrien Vasseur <avasseur@cloudflare.com>, Lee Valentine <lvalentine@cloudflare.com>, 
+	kernel-team@cloudflare.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 11 Dec 2024 09:11:55 -0800 Michael Chan wrote:
-> > At the time I just wanted something to work, and not having
-> > napi_enable/disable() made it work. :) Looking back though it does seem
-> > odd, so I'll try putting it back.  
-> 
-> Yeah, I think it makes sense to add napi_disable().
+On Tue, Dec 10, 2024 at 3:38=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.co=
+m> wrote:
+>
+> Prepare ground for TIME-WAIT socket reuse with subsecond delay.
+>
+> Today the last TS.Recent update timestamp, recorded in seconds and stored
+> tp->ts_recent_stamp and tw->tw_ts_recent_stamp fields, has two purposes.
+>
+> Firstly, it is used to track the age of the last recorded TS.Recent value
+> to detect when that value becomes outdated due to potential wrap-around o=
+f
+> the other TCP timestamp clock (RFC 7323, section 5.5).
+>
+> For this purpose a second-based timestamp is completely sufficient as eve=
+n
+> in the worst case scenario of a peer using a high resolution microsecond
+> timestamp, the wrap-around interval is ~36 minutes long.
+>
+> Secondly, it serves as a threshold value for allowing TIME-WAIT socket
+> reuse. A TIME-WAIT socket can be reused only once the virtual 1 Hz clock,
+> ktime_get_seconds, is past the TS.Recent update timestamp.
+>
+> The purpose behind delaying the TIME-WAIT socket reuse is to wait for the
+> other TCP timestamp clock to tick at least once before reusing the
+> connection. It is only then that the PAWS mechanism for the reopened
+> connection can detect old duplicate segments from the previous connection
+> incarnation (RFC 7323, appendix B.2).
+>
+> In this case using a timestamp with second resolution not only blocks the
+> way toward allowing faster TIME-WAIT reuse after shorter subsecond delay,
+> but also makes it impossible to reliably delay TW reuse by one second.
+>
+> As Eric Dumazet has pointed out [1], due to timestamp rounding, the TW
+> reuse delay will actually be between (0, 1] seconds, and 0.5 seconds on
+> average. We delay TW reuse for one full second only when last TS.Recent
+> update coincides with our virtual 1 Hz clock tick.
+>
+> Considering the above, introduce a dedicated field to store a millisecond
+> timestamp of transition into the TIME-WAIT state. Place it in an existing
+> 4-byte hole inside inet_timewait_sock structure to avoid an additional
+> memory cost.
+>
+> Use the new timestamp to (i) reliably delay TIME-WAIT reuse by one second=
+,
+> and (ii) prepare for configurable subsecond reuse delay in the subsequent
+> change.
+>
+> We assume here that a full one second delay was the original intention in
+> [2] because it accounts for the worst case scenario of the other TCP usin=
+g
+> the slowest recommended 1 Hz timestamp clock.
+>
+> A more involved alternative would be to change the resolution of the last
+> TS.Recent update timestamp, tw->tw_ts_recent_stamp, to milliseconds.
+>
+> [1] https://lore.kernel.org/netdev/CANn89iKB4GFd8sVzCbRttqw_96o3i2wDhX-3D=
+raQtsceNGYwug@mail.gmail.com/
+> [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/co=
+mmit/?id=3Db8439924316d5bcb266d165b93d632a4b4b859af
+>
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 
-+1, TBH I'm not sure how we avoid hitting the warning which checks
-if NAPI is "scheduled" in page_pool_disable_direct_recycling().
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
-But, Yunsheng, I hope it is clear that the sync RCU is needed even 
-if driver disables NAPI for the reconfiguration. Unless you see a
-RCU sync in napi_disable() / napi_enable()..
+Thanks for your effort!
 
