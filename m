@@ -1,85 +1,55 @@
-Return-Path: <netdev+bounces-151315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A04AD9EE0DE
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:08:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD18F9EE109
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:18:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 175422812B8
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 08:08:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 330D528129A
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 08:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA3720C01D;
-	Thu, 12 Dec 2024 08:08:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC9B20C011;
+	Thu, 12 Dec 2024 08:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eRKccMB9"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="lxhE+TWe"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-16.smtpout.orange.fr [80.12.242.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D0D20C004
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 08:08:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890F6126C01;
+	Thu, 12 Dec 2024 08:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733990901; cv=none; b=UvyhekOSzqAJ67uUzct7nWY6UhJZly5YFzkqKtv3x4R13gf8LU4rwK1XpwyJCkzmAz2/9CUa6+XLb9WJfM8jWDLhHWUDxL/UC3TKXJBPdsEojsKhsLwauFEIBuYKBjiew9CUh6zYvEd4BG6Xxq9db8Qm4YiVnlJwIaAUOdRxFn0=
+	t=1733991502; cv=none; b=SLF5jRg/tLub1ibBaMfM8sUuEpR8myNBY2N1JKAsax/cgMbjHg3eGHwhOGC0MVqisTe5hziOzsxVbct2K8+HH/7KSEwctqVgc6b25wZ/JU0uEScEk0hHvysUHDhhaPDyWEa3sAR/kjs2+6+BSiidfRwdgS9HSah8lR/ILjETVVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733990901; c=relaxed/simple;
-	bh=4zY98UHHGfgFUFQXkyrd6VkTOS0moSnEAon1VWvcJWI=;
+	s=arc-20240116; t=1733991502; c=relaxed/simple;
+	bh=9u0EssyiR9jPCJXXENhMiwaH0C7px6oEo+PfyB7UW9k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JLr860WOBotS1VUrlbh2qzv1ERAusrxXZ15EsKq2ZnlpxUk70Mp1TPLC5B+SP4iVS/MXmhwImb3S1wFCScl6fULD4SzUJCbfVcWtettLg4D/9MCiKavmvt96GoAtg08jA3R4S9LCE5gcJcBJ1c+Vmis6gKqnq9wPwd0mGtAUbZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eRKccMB9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733990899;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bjf1nmOaVLrku/wXD9lDjECZxn/Olb8fTnRITGTTN/E=;
-	b=eRKccMB9S/K/gLAn/D4QJP+UX3uFs2y71HpcCjFpzFEI/21EEpjNeBlbfrBxR956U25OZY
-	7KYm0CNYHglB5E1BHmjSfL5JmVi6908tt//juAIsmwhGzI+kt6t9t5mYrrWoBfTkidjjK2
-	Pp/S1vrEc8sfmdjAgfo8vlL0r+BXu2Q=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-480-wJz1nytsMUiXG3bmpsAkHw-1; Thu, 12 Dec 2024 03:08:17 -0500
-X-MC-Unique: wJz1nytsMUiXG3bmpsAkHw-1
-X-Mimecast-MFC-AGG-ID: wJz1nytsMUiXG3bmpsAkHw
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4359eb032c9so2449175e9.2
-        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 00:08:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733990896; x=1734595696;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bjf1nmOaVLrku/wXD9lDjECZxn/Olb8fTnRITGTTN/E=;
-        b=Wxip1PAV27fM9JGbF8mzY757Jty+2kFFiavDSWPQmrDvFvhkO7nYAa7saQpXxUY12M
-         daq1+OjOAUQsWscNnSSxNez5VJ4yXSFH41A6K+l31e2lWy4BggdpFE3z4AeXEdokdQud
-         BNzQ0M93Gn08k6H8oJBCMG9DuQ5rcs1cROjWhSiOSO3mkQHk9J2RjFO2l6RYTOIQlO0e
-         2Wh+2BevBdpzhVcfcI+xtJyzlVWnHT/9x6w8sCoDvbloT6JuYNASrYGMzu/yMRHshwIF
-         fgubQ/pbYa2MbCRUQkvninoch3kmJ3Z5Q4aIQn/EvOkLo6GqbaCTtmJt6Df/xw21HeRN
-         mrXg==
-X-Gm-Message-State: AOJu0Yz6EdGGyAg/EHzmYp3dBHwemdk8hE1cJsouKTEpJd10jAeQmfxI
-	XR+uZkTz14EN0zZZ2Wx2Ag2YI6qBtuI/w0ZfKQ4nIpCgq3l3ElSBLQLkNHPhxUPPc68mW+AdtKv
-	NaITNnmiZFt6/LjP5z+S1avIWSKUQD3TePRfzjBl31jIDlCMVIwePPA==
-X-Gm-Gg: ASbGncuvQwvZz+uyE+4Lx6zfYGqio0e2zhk6YvUML3KNxl0K3zz+P4IfO8tWGskKHH6
-	oKmz+4r37fhxUygkBw7bMQIvB7ox3MgI5M1FQVBmgBObXZs7jR6ebEmhJaH0WGPq+LVzlu4lYN0
-	gNrqZz5FmExiw4M+BOVY3AC3fjma9SyDlHtmRkHQhN1H46UdJYXI3/16+XQBWgLyfGCnPf1/nWS
-	2elyjCorLoArza127P/OGJ3GDzLr92gaOUeGnJbaCCW4szSQilIXMlfVQuiUAFAq2TViC0RLDwW
-	0MkKtbU=
-X-Received: by 2002:adf:e18e:0:b0:386:4571:9a22 with SMTP id ffacd0b85a97d-38787695702mr1905600f8f.31.1733990896399;
-        Thu, 12 Dec 2024 00:08:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHTBQqIZP4mAbmNDkq+BdMt3lJ9rORZUl6zp6FVSlb2GdXN4hAbWa7GzDXPUGiEy3/sL0XluQ==
-X-Received: by 2002:adf:e18e:0:b0:386:4571:9a22 with SMTP id ffacd0b85a97d-38787695702mr1905577f8f.31.1733990896075;
-        Thu, 12 Dec 2024 00:08:16 -0800 (PST)
-Received: from [192.168.88.24] (146-241-48-67.dyn.eolo.it. [146.241.48.67])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3878251dcdesm3227619f8f.104.2024.12.12.00.08.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2024 00:08:15 -0800 (PST)
-Message-ID: <ee865add-5f30-4c7d-b14d-fbc693dba265@redhat.com>
-Date: Thu, 12 Dec 2024 09:08:13 +0100
+	 In-Reply-To:Content-Type; b=fwfHc4aqINDzhDLnJI2v8VHk+ZWP/xDOI4Ic5yldAiKtDZV+W166T+CO61BF7zvEbOekp807up1nm7VZWHOWQ1l+1qi/JgHWIVA1e0S9rGpqOq8EnvyPWXKoO7fI9N3OSdgc9zzF78PMHWpYh5l4skNs2mRq2toB3C1NDkO+PyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=lxhE+TWe; arc=none smtp.client-ip=80.12.242.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.37] ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id LeOatTTIgshnBLeObtEztn; Thu, 12 Dec 2024 09:18:09 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1733991489;
+	bh=00Te5LkHVNFFflrQpCPuLSqGbddJ7mVyn5/l4cEM7RM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=lxhE+TWej8depxWvfP6sIBSAshiRXQiOXDFWjYfE9kuLSQQfff1Cs/8R1tcmPfFEC
+	 O6FkK6gtt5zr9de2K6DZ+xwkeOms6NfisLex3Ytcc7/2Wbw5C+UAFmAHtUbukAliW+
+	 mNPuyYcLY8zvtM4YFweUzbhS0uUIrUZhpd5XWKbvybwilv26KasVgwUFwASTAzkT5V
+	 GCDnU/E7C4dXbBVrdroSijReZQBG45fpD3waUIqdfSv4Yoixvs7wrmw1jVaR3eAQ0E
+	 tYiQXSfLT/H6uo3yJ5SQ2VfQyh3qrpQ0XORLmFOZDgsOBrUbxdZ4Fiu0SvfLKZB094
+	 ZXfkUTi77H3mA==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Thu, 12 Dec 2024 09:18:09 +0100
+X-ME-IP: 90.11.132.44
+Message-ID: <a50f9f86-b0f4-484a-85ef-9dd1e5737d83@wanadoo.fr>
+Date: Thu, 12 Dec 2024 09:18:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,40 +57,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/4] mdio support updates
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org, Michael Dege <michael.dege@renesas.com>,
- Christian Mardmoeller <christian.mardmoeller@renesas.com>,
- Dennis Ostermann <dennis.ostermann@renesas.com>,
- Nikita Yushchenko <nikita.yoush@cogentembedded.com>,
- Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Geert Uytterhoeven <geert+renesas@glider.be>
-References: <20241208155236.108582-1-nikita.yoush@cogentembedded.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241208155236.108582-1-nikita.yoush@cogentembedded.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 4/4] net: mdio: Add RTL9300 MDIO driver
+To: Chris Packham <chris.packham@alliedtelesis.co.nz>, lee@kernel.org,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, tsbogend@alpha.franken.de,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, markus.stockhausen@gmx.de
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-mips@vger.kernel.org
+References: <20241211235342.1573926-1-chris.packham@alliedtelesis.co.nz>
+ <20241211235342.1573926-5-chris.packham@alliedtelesis.co.nz>
+Content-Language: en-US, fr-FR
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20241211235342.1573926-5-chris.packham@alliedtelesis.co.nz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 12/8/24 16:52, Nikita Yushchenko wrote:
-> This series cleans up rswitch mdio support, and adds C22 operations.
+Le 12/12/2024 à 00:53, Chris Packham a écrit :
+> Add a driver for the MDIO controller on the RTL9300 family of Ethernet
+> switches with integrated SoC. There are 4 physical SMI interfaces on the
+> RTL9300 but access is done using the switch ports so a single MDIO bus
+> is presented to the rest of the system.
 > 
-> Nikita Yushchenko (4):
->   net: renesas: rswitch: do not write to MPSM register at init time
->   net: renesas: rswitch: align mdio C45 operations with datasheet
->   net: renesas: rswitch: use generic MPSM operation for mdio C45
->   net: renesas: rswitch: add mdio C22 support
-> 
->  drivers/net/ethernet/renesas/rswitch.c | 79 ++++++++++++++++----------
->  drivers/net/ethernet/renesas/rswitch.h | 17 ++++--
->  2 files changed, 60 insertions(+), 36 deletions(-)
+> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
 
-@Yoshihiro, could you please have a look here?
+...
 
-Thanks,
+> +	err = regmap_write(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_1,
+> +			   PHY_CTRL_RWOP | PHY_CTRL_TYPE | PHY_CTRL_CMD);
+> +	if (err)
+> +		return err;
+> +
+> +	err = regmap_read_poll_timeout(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_1,
+> +				       val, !(val & PHY_CTRL_CMD), 10, 100);
+> +	if (err)
+> +		return err;
+> +
+> +	if (val & PHY_CTRL_FAIL) {
+> +		err = -ENXIO;
+> +		return err;
 
-Paolo
+Nitpick: return -ENXIO; and remove the { }
+
+> +	}
+> +
+> +	return err;
+
+Nitpick: return 0;
+
+> +}
+> +
+> +static int realtek_mdiobus_init(struct realtek_mdio_priv *priv)
+> +{
+> +	u32 port_addr[5] = { };
+> +	u32 poll_sel[2] = { 0, 0 };
+
+Nitpick: Why {} in on case and {0,0} in the other one?
+
+> +	u32 glb_ctrl_mask = 0, glb_ctrl_val = 0;
+> +	int i, err;
+> +
+> +	for (i = 0; i < MAX_PORTS; i++) {
+> +		int pos;
+> +
+> +		if (priv->smi_bus[i] > 3)
+> +			continue;
+> +
+> +		pos = (i % 6) * 5;
+> +		port_addr[i / 6] |=  priv->smi_addr[i] << pos;
+> +
+> +		pos = (i % 16) * 2;
+> +		poll_sel[i / 16] |= priv->smi_bus[i] << pos;
+> +	}
+
+...
+
+CJ
 
 
