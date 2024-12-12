@@ -1,82 +1,86 @@
-Return-Path: <netdev+bounces-151341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B7B79EE43F
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 11:36:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC9CD9EE46B
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 11:45:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4357616718B
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:36:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6488B1886A97
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FB8204C28;
-	Thu, 12 Dec 2024 10:36:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5597D210F60;
+	Thu, 12 Dec 2024 10:44:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="B2zeNUaC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IwKgbQft"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD841E89C;
-	Thu, 12 Dec 2024 10:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A6F10F2
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 10:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733999811; cv=none; b=lVhx2Zql1XTvFL+oJznrrIb1lTm7RXhVWEZTUgoRXWXViz807jS3WQWvyA0tJCDlTG6JqrNsvNfo616nZSIOSUCQssXQJNcguUXd1pr2qdSqLj4TwezFeb2NCmLryYvoUTUq/85PHVTRQmpCnYXMCfWnXcFfhhU3W1JJgQmPDDE=
+	t=1734000296; cv=none; b=XQ/xYW/UaWD0VNPQWKtcwJUO1Y1FSbeUzbwW5zozwoi5fVrVGz6hVrG++0iXN5NL7/GMinH0AbJnNitpV+dHc1rqcPaqyRgRT2LY2h5w+clr9JJ9ARRSmjwaH1vaZXGzBqiSfkbzF3sz6MaK3wl8xHIJNUtklsPegvnArv1CfQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733999811; c=relaxed/simple;
-	bh=Op5yf32g9TOumU+/rU3vOMZ4PAryy+8pHaPZSN+FjOU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n6diAW0REIZXQAXJ8+Z+Z6HTSoK6wsMHV6fHzr11xHs++SHa8dKLfGNAeJZNKgtafUfaY8ZMccWjnleBN63MyfIhsDQc8ZwOC1aIq3uYLT5vBRgNZTNMvLZjBHff+usFZm4dtkXK0BaScRHZ3UPjAP6dWyyJO/FQEAVjFEhyPZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=B2zeNUaC; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BC69ACx030550;
-	Thu, 12 Dec 2024 10:36:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Op5yf3
-	2g9TOumU+/rU3vOMZ4PAryy+8pHaPZSN+FjOU=; b=B2zeNUaCGCI/7NznPSvMx2
-	AQ/9U83PTERNreHFL7kuHJ0n7bRMWsUH9nG0YARxRwpn+UJOCiyiQZe3PuFUTOum
-	UuIzjDobg5H5pntL+MChhxKGjJ+5cjuCrS6mh9k62w8hc19OuDgQ74VeaAoi5iQv
-	pBaPSVCJUrsD/bA3uQJTsfv01pFtdCVAKWgURQjlcDw3isgJeBrr/WWe7rMjw+GT
-	QhpelPj3XCPsxotPGtTuraIR2qr25oYteW+vTWEVBaNYaIV2AseBen5TeR6lyxd6
-	+wATNHXgdgT+NK1qcMMADoAiUl8NC3yK+RpnNEO+Us6FELP/RrqhZ7IhwxdH7qaw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ce1w3per-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Dec 2024 10:36:40 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BCAXHI0024097;
-	Thu, 12 Dec 2024 10:36:40 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ce1w3pek-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Dec 2024 10:36:40 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BC9bO1f032739;
-	Thu, 12 Dec 2024 10:36:39 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43d0psr1jm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Dec 2024 10:36:38 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BCAaZOb55837086
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 12 Dec 2024 10:36:35 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 71E7D2004B;
-	Thu, 12 Dec 2024 10:36:35 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 32BC620040;
-	Thu, 12 Dec 2024 10:36:35 +0000 (GMT)
-Received: from [9.152.224.86] (unknown [9.152.224.86])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 12 Dec 2024 10:36:35 +0000 (GMT)
-Message-ID: <f10497b1-e27f-43b6-81e6-bedfc8bc93e9@linux.ibm.com>
-Date: Thu, 12 Dec 2024 11:36:35 +0100
+	s=arc-20240116; t=1734000296; c=relaxed/simple;
+	bh=5b/d8AyG2N/kZgsV83xq0eB7TQYSMiYh65wkLwvvA/M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=JhXLrO2CwXSyhKlNA5uH8QqUL/bD4YVF9ScczixC0dfMWz/H2OIcUV9h/EyPleVPSIg8DoCZj5fryWmbpH3nMeOaaXOcL8vXSDStDlbN1ni9cFc6ejGpTCyStn0uNSrojX2euGUZktI9j/kwz2BmlqD17/nzcgmF7+Q+I8JD4Q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IwKgbQft; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734000292;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1cwnE6aZS9G1n0HYjfMg9NdtQL50LplyHybCt++p+aI=;
+	b=IwKgbQftTJPHq848H2yJYpe4g2Oa+W+1BYu8/taCvZVjXnH1qiemgawSNYc1/s13VdOhc3
+	DChYzuVQ+hjyC0Dll5rvnIlVv6InhNE7su7GCokHCL0x+3S9NdyLbSGH51wyvBdKASrtH+
+	ZsTlmPtWo2ucx8JMWPxkiBY4Av5qeG4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-516-xe1Y__sFP2K_AHmTaVzASA-1; Thu, 12 Dec 2024 05:44:50 -0500
+X-MC-Unique: xe1Y__sFP2K_AHmTaVzASA-1
+X-Mimecast-MFC-AGG-ID: xe1Y__sFP2K_AHmTaVzASA
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-385d80576abso310589f8f.3
+        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 02:44:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734000289; x=1734605089;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1cwnE6aZS9G1n0HYjfMg9NdtQL50LplyHybCt++p+aI=;
+        b=CnFSeCrEBT7OdBZI5j3Xsm5g/8w/wtJahKOzZE2HHf8d9Sk6zdVEqwhy7A+ZiiRy+Z
+         wC+lyYHDz1jHMeoTy3OpNgN3UPhXJqN79xbwBfnb2gRndzEnvJrKgt8RlurQyN3gt8gw
+         9Ou+bCEMwdxzV9pKN2xRflCr5iQqT2kjWwXXiDlABkY/xhwRaZ1pwjN0oMHyjksBln05
+         /VnBfl2rXxxi6Y0tuSFuV43O/ZKLtzm3WV2r3iVPHz0HzNUg5tu4GSws/A7TUuQ2WXta
+         hUVOf1wcuqoYqXxrd3JBK3MUuuOZXQlAlcZq2a/7xAwcgz6sSWYHSuuW7v2lHMFeZ3cX
+         Aweg==
+X-Forwarded-Encrypted: i=1; AJvYcCV2Mty3I+EuVD67Lws0omPtmVxuIOrR4dcIavlF6Yggx+q98S680ylSSWAJXFYoOp6WaFHqbrk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+7EapbnDg05vQ5Syrmho2SpwGsg9fDheDXW3n38hDzpbU9JtD
+	2HKk0lCUnszMywUx3YBtWxN1AnKyZY1Hxp+ixMa6OIqUMVUbNHfTgdXu8yMbwYUtFX3a30kFxUc
+	jdR35f7JXq07sMuuGzsOewO7fHqE6fv2zeF/JkC9VmLYsLwrMh1f6OA==
+X-Gm-Gg: ASbGncs/JqiSrMTg0zEE9pp70WlnX7blt4bGYjpLYqhjn+hhFXTyU0qKHMmqWtYAQKB
+	fLRJ3z3CrzOkX+HGp3Xe/I1w44TW2Si15xLrJgAkzxoZPbePHDXmFhjuNAOUQMTj88omhiB85BT
+	KiFyFviETsl++SgllqrnQ8FZV/MuJiiOdiRA7PK7ynDRvmql6EshL6eVQ2nxxe0658ihMH/Hrtv
+	qAYfjU1FLBXl7XU+OmXbOOeRITTINL9g9fQH+wUw2kgHB+WlZ4R/U3SwDoe8+DvCdwiecEspMQn
+	Fxkl/Rc=
+X-Received: by 2002:a05:6000:21c5:b0:385:ef8e:a652 with SMTP id ffacd0b85a97d-3864ced4a75mr4060345f8f.56.1734000289514;
+        Thu, 12 Dec 2024 02:44:49 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGoGUBQoyq6hw31iEBG4OwN016yKVTlUbicI6drvmMl3LuyRpLo48NHbMKwz3SgwhJtjNO7AA==
+X-Received: by 2002:a05:6000:21c5:b0:385:ef8e:a652 with SMTP id ffacd0b85a97d-3864ced4a75mr4060329f8f.56.1734000289130;
+        Thu, 12 Dec 2024 02:44:49 -0800 (PST)
+Received: from [192.168.88.24] (146-241-48-67.dyn.eolo.it. [146.241.48.67])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3878251dba9sm3618778f8f.98.2024.12.12.02.44.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2024 02:44:48 -0800 (PST)
+Message-ID: <1fae5ceb-e15a-479a-b876-0239a4cdfc27@redhat.com>
+Date: Thu, 12 Dec 2024 11:44:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,69 +88,119 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/mlx5e: Transmit small messages in linear skb
-To: Dragos Tatulea <dtatulea@nvidia.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-        Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>, David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Nils Hoppmann <niho@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Simon Horman <horms@kernel.org>,
-        Niklas Schnelle <schnelle@linux.ibm.com>
-References: <20241204140230.23858-1-wintera@linux.ibm.com>
- <a8e529b2-1454-4c3f-aa49-b3d989e1014a@intel.com>
- <8e7f3798-c303-44b9-ae3f-5343f7f811e8@linux.ibm.com>
- <554a3061-5f3b-4a7e-a9bd-574f2469f96e@nvidia.com>
- <bc9459f0-62b0-407f-9caf-d80ee37eb581@intel.com>
- <54738182-3438-4a58-8c33-27dc20a4b3fe@linux.ibm.com>
- <89c67aa3-4b84-45c1-9e7f-a608957d5aeb@nvidia.com>
+Subject: Re: [PATCH net] llc: reset transport_header offset as value is
+ inaccurate when buffer is processed by DSA
+To: Antonio Pastor <antonio.pastor@gmail.com>, netdev@vger.kernel.org
+References: <ef68689e-7e0b-4702-a762-d214c7d76e3b@gmail.com>
 Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <89c67aa3-4b84-45c1-9e7f-a608957d5aeb@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7L9s-Ny2rPyhePN9q9L9qpbZDemvRdKy
-X-Proofpoint-ORIG-GUID: 8Q-We0TaB2HNx-Xa6qoACCUbGOyn5mTT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 clxscore=1011 phishscore=0 bulkscore=0 mlxlogscore=727
- impostorscore=0 spamscore=0 malwarescore=0 suspectscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412120074
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <ef68689e-7e0b-4702-a762-d214c7d76e3b@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+On 12/9/24 19:36, Antonio Pastor wrote:
+> While testing 802.2+LLC+SNAP processing of inbound packets in OpenWrt, 
+> it was found that network_header offset is 2 bytes short (before 
+> sbk->data) when the packet was received through OpenWrt's DSA 
+> (Distributed Switch Architecture). This causes SNAP OUI:PID mismatch and 
+> packet is silently dropped by snap_rcv().
+> 
+> Here a trace:
+> 
+>            <idle>-0       [001] ..s..  8744.047176: find_snap_client 
+> <-snap_rcv
+>            <idle>-0       [001] ..s..  8744.047218: <stack trace>
+>   => snap_rcv
+>   => llc_rcv
+>   => __netif_receive_skb_one_core
+>   => netif_receive_skb
+>   => br_handle_frame_finish
+>   => br_handle_frame
+>   => __netif_receive_skb_core.constprop.0
+>   => __netif_receive_skb_list_core
+>   => netif_receive_skb_list_internal
+>   => napi_complete_done
+>   => gro_cell_poll
+>   => __napi_poll.constprop.0
+>   => net_rx_action
+>   => handle_softirqs
+>   => irq_exit
+>   => call_with_stack
+>   => __irq_svc
+>   => default_idle_call
+>   => do_idle
+>   => cpu_startup_entry
+>   => secondary_start_kernel
+>   => 0x42301294
+> 
+> The offsets were detected as incorrect as early as napi_complete_done() 
+> and I gave up on tracking where the problem comes from. Running with GRO 
+> disabled makes no difference.
+> 
+> Curiously enough, __netif_receive_skb_list_core() resets network_header 
+> offset, but leaves transport_header offset alone if it was set, assuming 
+> it is correct. On non-DSA OpenWrt images it is, but since images were 
+> migrated to use DSA this issue appears. For locally generated packets 
+> transport_header offset is not set (0xffff) so 
+> __netif_receive_skb_list_core() resets it, which solves the issue. That 
+> is why inbound packets received from an external system exhibit the 
+> problem but locally generated traffic is processed OK.
+> 
+> I can only assume this has been an issue for a while but since 
+> presumably it only impacts 802.2+LLC+SNAP (which I'm aware is not much 
+> used today) it has not been flagged before. I wouldn't be surprised if 
+> any protocols using Ethernet II frames reset transport_header offset 
+> before they have anything to do with it.
+> 
+> The kernel code does not touch transport_header offset until llc_rcv() 
+> where it is moved forward based on the length of the LLC header as it is 
+> assumed correct, which is the issue.
+> 
+> Patch below proposes modifying llc_rcv() to reset transport_header 
+> offset and then push forward by the LLC header length. While a better 
+> solution might lurk elsewhere by tackling the root cause of why 
+> transport_header offset is off after DSA set it to begin with, that is 
+> taking too much effort to identify and risks widespread impact. A patch 
+> could be made to __netif_receive_skb_list_core() to always reset 
+> transport_header offset, but that would also impact all frames. This is 
+> a lower risk patch that will not impact any non 802.2+LLC frames, and 
+> presumably only SNAP ones. It follows the approach of 
+> __netif_receive_skb_list_core() of not trusting the offset as received 
+> and resetting it before snap_rcv() has a need for it.
+> 
+> Patch:
+> 
+>   net/llc/llc_input.c | 2 +-
+>   1 file changed, 1 insertions(+), 1 deletions(-)
+> 
+> --- a/net/llc/llc_input.c
+> +++ b/net/llc/llc_input.c
+> @@ -124,7 +124,7 @@ static inline int llc_fixup_skb(struct s
+>       if (unlikely(!pskb_may_pull(skb, llc_len)))
+>           return 0;
+> 
+> -    skb->transport_header += llc_len;
+> +    skb_set_transport_header(skb, llc_len);
+>       skb_pull(skb, llc_len);
+>       if (skb->protocol == htons(ETH_P_802_2)) {
+>           __be16 pdulen;
+> 
+> 
+> Can you share your opinions on this patch and suggest next actions for 
+> its adoption (or modification) please?
 
+IMHO llc should avoid entirely using the transport_header field as
+AFAICS the relevant information do not belong to such layer. Anyhow such
+change looks like way too invasive as a fix.
 
-Am 11.12.24 um 18:28 schrieb Dragos Tatulea:
+Your approach is IMHO correct, but the patch itself is white-space
+damage - be sure to generate it on top of current net tree and double
+your client is not corrupting it. Additionally, as a fix the patch must
+include a suitable Fixes tag. Have an accurate read to the process
+documentation before formally submitting the fix.
 
->> My preferred scenario for the next steps would be the following:
->> 1) It would be great if we could get a simple mitigation patch upstream, that the distros could
->> easily backport. This would avoid our customers experiencing performance regression when they
->> upgrade their distro versions. (e.g. from RHEL8 to RHEL9 or RHEL10 just as an example)
->>
-> Stupid question on my behalf: why can't this patch be taken as a distro
-> patch for s390 and carried over over releases? This way the kernel
-> upgrade pain would be avoided.
+Thanks,
 
-This is not how distros work today. All code/patches must come from upstream
-and all code/patches must be cross-architecture. There are exceptions, but
-only for very critical things.
-
-Furthermore, the right answer to avoid upgrade pain is to fix things upstream.
-So lets try to find a solution that we can integrate.
-
-Christian
+Paolo
 
 
