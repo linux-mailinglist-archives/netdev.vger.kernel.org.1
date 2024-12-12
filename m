@@ -1,72 +1,58 @@
-Return-Path: <netdev+bounces-151337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 819979EE38F
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 11:00:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60E529EE3D0
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 11:12:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAC77286794
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:00:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9986B28795F
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EED52101A0;
-	Thu, 12 Dec 2024 10:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0F1C2101A0;
+	Thu, 12 Dec 2024 10:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VdKfS77S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ODxq46j9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60946210198;
-	Thu, 12 Dec 2024 10:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD7220FA8A
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 10:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733997610; cv=none; b=P84PTuZ6nYOwETN/ZMbEV+DVSBEbjekIjUYbIF5QJoLN+g79Vw+DU/DPLeoy6XS9NGbbL4xQ0hym9F1fS22j1LfU7J+WyAPcUYFy+eXL9IrE3/HCu/gd5chmq22J02MZDpTOk+9zUBpcXymZoGGIGH27Y+ITgTkpRaB8fEnNzTI=
+	t=1733998320; cv=none; b=F7/WOHt5hQ8P3IiDnyYYgqROlkGbMPQF2500+491moANE1o+HvmGnH++FcFDqWB5ZBsup9zhYTHSHW9vKnneLG9t3+MFaZiUcV86Wre2UfO6uUKHDzWmCjnbfMJ+0oLLIky32LP5xOLjBAQ1aUjt6k+3g8A+HiiLiqZeluZzGBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733997610; c=relaxed/simple;
-	bh=qDAv2Xv6N2kuxJQLsjfm1axhvIqwPsan4GylkV4QvzY=;
+	s=arc-20240116; t=1733998320; c=relaxed/simple;
+	bh=tz/PR/oOH4PSpF2A5K68wm2YyiXmiwOjbScvrXg19Ac=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z0sfh8mVcSVFQtw7HPyI6pTih7ABhfzmpgb7h9cP8OhYaXWvf8amxXNV28x+n7WdLiP7pPxbaO7MFjLcrWgPGlLCnwBTt2naH5jkUaSzqRBfQpWV1Kc5smEe1CNWUVZh9P0yWe3Qk+m70o+MM+0UpPRTX5QP4IvhbCOqP1kyEEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VdKfS77S; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wA41zs323CaxwCsbLDOAz6jafr2ZMVwJEresqJ562hE=; b=VdKfS77SJboOdDhtPNF3vqvb86
-	UPC1q2HKZ90KAVOWlP7iooe6gv7dhK7+e0dKXQNRtNU0UEjRv4cTsIh9QYbDiXZ1h4jWgPCwdHZ0g
-	NHYAxxMY67JEcM+LPoOtH694kdgAb9lPWqDXjk/HUCumQgB+XwoKFFvwAHE8VtNmHdo2E74rVLUn+
-	mmDgYejw0tNQzdGErxsB0jWiR9kW7JpDhsAHn+KvBM232HWoEAF0jMejSGjSebb5HTZ1ffRTt8btF
-	Vv5vIZILY/TKJT22kt9DMVyjBckS/8dlYIB1+KdG6lp50lUHPLUw41/J2o7jxMiQUnddP66KqAbQC
-	Yt7MMrbQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45064)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tLfyz-00054Z-1C;
-	Thu, 12 Dec 2024 09:59:45 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tLfys-0005FA-2P;
-	Thu, 12 Dec 2024 09:59:38 +0000
-Date: Thu, 12 Dec 2024 09:59:38 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	tsbogend@alpha.franken.de, hkallweit1@gmail.com,
-	markus.stockhausen@gmx.de, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-mips@vger.kernel.org
-Subject: Re: [PATCH 4/4] net: mdio: Add RTL9300 MDIO driver
-Message-ID: <Z1q0CuDXe8VFuBfZ@shell.armlinux.org.uk>
-References: <20241211235342.1573926-1-chris.packham@alliedtelesis.co.nz>
- <20241211235342.1573926-5-chris.packham@alliedtelesis.co.nz>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bLzqkPEtJ4i2oVnuNjSWAcwpG6fFvohsbMGCitNhoT59SSyPLS4zLXfW3b9iejUQddmqgEkGST8Lok9HldLAgcty+gFsqJMLvTSqwdvRgdO07N67yDwtxg03wJnCHzKqZ8EB7wkfTcgl77mocMiQYykdXr4G1z0fUx68SESFB2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ODxq46j9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7138C4CED1;
+	Thu, 12 Dec 2024 10:11:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733998320;
+	bh=tz/PR/oOH4PSpF2A5K68wm2YyiXmiwOjbScvrXg19Ac=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ODxq46j9ufJi/H9YVf+0luqzNbqdCBzfx5s4eeu1D1nRGeyxdVx03WGWz0rRw468H
+	 x4PHeq6Q0T4jA8WVR0/nw8P/OkXBMKPGKvhB4zXEgTrfWtwq3OgTofEytsea3KqOA9
+	 7sHk9k6cULpTs4JxJF6oqGekJ5mrkZ0JPVNpRdN7yL2dQkfSlDUhgsm+tr+DwKVg4f
+	 RNm1pdhdfHOmBOzwZTfuY28yvvmkzuj4IjjwDCcOTIubjRsJGscZLjIyqoFq0Bq1xG
+	 WkDemzeuRumWTvbCuQcRrYKlOYjfU4HhYd44L7wdF8lK1L/HItc/RoKmjVRA6FT+rX
+	 nCdkHkf4vFJBQ==
+Date: Thu, 12 Dec 2024 10:11:56 +0000
+From: Simon Horman <horms@kernel.org>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Breno Leitao <leitao@debian.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] netconsole: allow selection of egress interface via MAC
+ address
+Message-ID: <20241212101156.GF2806@kernel.org>
+References: <20241211021851.1442842-1-ushankar@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,190 +61,159 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241211235342.1573926-5-chris.packham@alliedtelesis.co.nz>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20241211021851.1442842-1-ushankar@purestorage.com>
 
-On Thu, Dec 12, 2024 at 12:53:42PM +1300, Chris Packham wrote:
-> +#define SMI_GLB_CTRL			0x000
-> +#define   GLB_CTRL_INTF_SEL(intf)	BIT(16 + (intf))
-> +#define SMI_PORT0_15_POLLING_SEL	0x008
-> +#define SMI_ACCESS_PHY_CTRL_0		0x170
-> +#define SMI_ACCESS_PHY_CTRL_1		0x174
-> +#define   PHY_CTRL_RWOP			BIT(2)
+On Tue, Dec 10, 2024 at 07:18:52PM -0700, Uday Shankar wrote:
+> Currently, netconsole has two methods of configuration - kernel command
+> line parameter and configfs. The former interface allows for netconsole
+> activation earlier during boot, so it is preferred for debugging issues
+> which arise before userspace is up/the configfs interface can be used.
+> The kernel command line parameter syntax requires specifying the egress
+> interface name. This requirement makes it hard to use for a couple
+> reasons:
+> - The egress interface name can be hard or impossible to predict. For
+>   example, installing a new network card in a system can change the
+>   interface names assigned by the kernel.
+> - When constructing the kernel parameter, one may have trouble
+>   determining the original (kernel-assigned) name of the interface
+>   (which is the name that should be given to netconsole) if some stable
+>   interface naming scheme is in effect. A human can usually look at
+>   kernel logs to determine the original name, but this is very painful
+>   if automation is constructing the parameter.
+> 
+> For these reasons, allow selection of the egress interface via MAC
+> address. To maintain parity between interfaces, the local_mac entry in
+> configfs is also made read-write and can be used to select the local
+> interface, though this use case is less interesting than the one
+> highlighted above.
+> 
+> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 
-Presumably, reading the code, this bit is set when writing?
+Hi Uday,
 
-> +#define   PHY_CTRL_TYPE			BIT(1)
+Overall this looks good to me. But I have some minor feedback.
 
-Presumably, reading the code, this bit indicates we want to use clause
-45?
+Firstly, this patch doesn't apply to net-next.
+Which means that the Netdev CI doesn't run.
+So, please rebase and post a v2.
+But please first wait for review from others.
 
-> +#define   PHY_CTRL_CMD			BIT(0)
-> +#define   PHY_CTRL_FAIL			BIT(25)
-> +#define SMI_ACCESS_PHY_CTRL_2		0x178
-> +#define SMI_ACCESS_PHY_CTRL_3		0x17c
-> +#define SMI_PORT0_5_ADDR_CTRL		0x180
+Also, as this is a new feature, I wonder if a selftest should be added.
+Perhaps some variant of netcons_basic.sh as has been done here:
+
+* [PATCH net-next 0/4] netconsole: selftest for userdata overflow
+  https://lore.kernel.org/netdev/20241204-netcons_overflow_test-v1-0-a85a8d0ace21@debian.org/
+
+...
+
+> diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+> index 2e459b9d88eb..485093387b9f 100644
+> --- a/net/core/netpoll.c
+> +++ b/net/core/netpoll.c
+
+...
+
+> @@ -570,11 +571,20 @@ int netpoll_parse_options(struct netpoll *np, char *opt)
+>  	cur++;
+>  
+>  	if (*cur != ',') {
+> -		/* parse out dev name */
+> +		/* parse out dev_name or local_mac */
+>  		if ((delim = strchr(cur, ',')) == NULL)
+>  			goto parse_failed;
+>  		*delim = 0;
+> -		strscpy(np->dev_name, cur, sizeof(np->dev_name));
+> +		if (!strchr(cur, ':')) {
+> +			strscpy(np->dev_name, cur, sizeof(np->dev_name));
+> +			eth_broadcast_addr(np->local_mac);
+> +		} else {
+> +			if (!mac_pton(cur, np->local_mac)) {
+> +				goto parse_failed;
+> +			}
+
+nit: No need for braces in the conditional above:
+
+			if (!mac_pton(cur, np->local_mac))
+				goto parse_failed;
+
+> +			/* force use of local_mac for device lookup */
+> +			np->dev_name[0] = '\0';
+> +		}
+>  		cur = delim;
+>  	}
+>  	cur++;
+
+...
+
+> @@ -674,29 +685,46 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
+>  }
+>  EXPORT_SYMBOL_GPL(__netpoll_setup);
+>  
+> +/* upper bound on length of %pM output */
+> +#define MAX_MAC_ADDR_LEN (4 * ETH_ALEN)
+
+I think 3 * ETH_ALEN is enough for the hex digits, colons (':') and
+trailing NUL character ('\0').
+
+And I think that defining it as such would allow it to be reused in
+local_mac_store.
+
+Also, this seems to occur a few times throughout the tree.
+Perhaps adding it somewhere more global would make sense.
+
 > +
-> +#define MAX_PORTS       32
-> +#define MAX_SMI_BUSSES  4
-> +
-> +struct realtek_mdio_priv {
-> +	struct regmap *regmap;
-> +	u8 smi_bus[MAX_PORTS];
-> +	u8 smi_addr[MAX_PORTS];
-> +	bool smi_bus_isc45[MAX_SMI_BUSSES];
-
-Not sure about the support for !C45 - you appear to set this if you
-find a PHY as a child of this device which has the PHY C45 compatible,
-but as you don't populate the C22 MDIO bus operations, I'm not sure
-how a C22 PHY can work.
-
-> +	u32 reg_base;
-> +};
-> +
-> +static int realtek_mdio_wait_ready(struct realtek_mdio_priv *priv)
+> +static char *local_dev(struct netpoll *np, char *buf)
 > +{
-> +	u32 val;
+> +	if (np->dev_name[0]) {
+> +		return np->dev_name;
+> +	}
+
+nit: No need for braces in the conditional above.
+
 > +
-> +	return regmap_read_poll_timeout(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_1,
-> +					val, !(val & PHY_CTRL_CMD), 10, 500);
+> +	snprintf(buf, MAX_MAC_ADDR_LEN, "%pM", np->local_mac);
+> +	return buf;
 > +}
 > +
-> +static int realtek_mdio_read_c45(struct mii_bus *bus, int phy_id, int dev_addr, int regnum)
-> +{
-> +	struct realtek_mdio_priv *priv = bus->priv;
-> +	u32 val;
-> +	int err;
-> +
-> +	err = realtek_mdio_wait_ready(priv);
-> +	if (err)
-> +		return err;
-> +
-> +	err = regmap_write(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_2, phy_id << 16);
-> +	if (err)
-> +		return err;
-> +
-> +	err = regmap_write(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_3,
-> +			   dev_addr << 16 | (regnum & 0xffff));
-> +	if (err)
-> +		return err;
-> +
-> +	err = regmap_write(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_1,
-> +			   PHY_CTRL_TYPE | PHY_CTRL_CMD);
-> +	if (err)
-> +		return err;
+>  int netpoll_setup(struct netpoll *np)
+>  {
+>  	struct net_device *ndev = NULL;
+>  	bool ip_overwritten = false;
+>  	struct in_device *in_dev;
+>  	int err;
+> +	char buf[MAX_MAC_ADDR_LEN];
 
-Maybe consider using a local variable for "regmap" and "reg_base" to
-reduce the line length/wrapping?
+nit: Please maintain reverse xmas tree order - longest line to shortest -
+     for local variable declarations.
+>  
+>  	skb_queue_head_init(&np->skb_pool);
+>  
+>  	rtnl_lock();
+> +	struct net *net = current->nsproxy->net_ns;
 
-> +static int realtek_mdiobus_init(struct realtek_mdio_priv *priv)
-> +{
-> +	u32 port_addr[5] = { };
-> +	u32 poll_sel[2] = { 0, 0 };
-> +	u32 glb_ctrl_mask = 0, glb_ctrl_val = 0;
+Please declare local variables at the top of the function.
 
-Please use reverse Christmas tree order.
+>  	if (np->dev_name[0]) {
+> -		struct net *net = current->nsproxy->net_ns;
+>  		ndev = __dev_get_by_name(net, np->dev_name);
+> +	} else if (is_valid_ether_addr(np->local_mac)) {
+> +		ndev = dev_getbyhwaddr_rcu(net, ARPHRD_ETHER, np->local_mac);
+>  	}
+>  	if (!ndev) {
+> -		np_err(np, "%s doesn't exist, aborting\n", np->dev_name);
+> +		np_err(np, "%s doesn't exist, aborting\n", local_dev(np, buf));
+>  		err = -ENODEV;
+>  		goto unlock;
+>  	}
+>  	netdev_hold(ndev, &np->dev_tracker, GFP_KERNEL);
+>  
+>  	if (netdev_master_upper_dev_get(ndev)) {
+> -		np_err(np, "%s is a slave device, aborting\n", np->dev_name);
+> +		np_err(np, "%s is a slave device, aborting\n",
+> +		       local_dev(np, buf));
+>  		err = -EBUSY;
+>  		goto put;
+>  	}
 
-> +	int i, err;
-> +
-> +	for (i = 0; i < MAX_PORTS; i++) {
-> +		int pos;
-> +
-> +		if (priv->smi_bus[i] > 3)
-> +			continue;
-> +
-> +		pos = (i % 6) * 5;
-> +		port_addr[i / 6] |=  priv->smi_addr[i] << pos;
-
-s/  / /
-
-> +
-> +		pos = (i % 16) * 2;
-> +		poll_sel[i / 16] |= priv->smi_bus[i] << pos;
-> +	}
-> +
-> +	for (i = 0; i < MAX_SMI_BUSSES; i++) {
-> +		if (priv->smi_bus_isc45[i]) {
-> +			glb_ctrl_mask |= GLB_CTRL_INTF_SEL(i);
-> +			glb_ctrl_val |= GLB_CTRL_INTF_SEL(i);
-> +		}
-> +	}
-> +
-> +	err = regmap_bulk_write(priv->regmap, priv->reg_base + SMI_PORT0_5_ADDR_CTRL,
-> +				port_addr, 5);
-> +	if (err)
-> +		return err;
-> +
-> +	err = regmap_bulk_write(priv->regmap, priv->reg_base + SMI_PORT0_15_POLLING_SEL,
-> +				poll_sel, 2);
-> +	if (err)
-> +		return err;
-> +
-> +	err = regmap_update_bits(priv->regmap, priv->reg_base + SMI_GLB_CTRL,
-> +				 glb_ctrl_mask, glb_ctrl_val);
-> +	if (err)
-> +		return err;
-> +
-> +	return 0;
-> +}
-> +
-> +static int realtek_mdiobus_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct realtek_mdio_priv *priv;
-> +	struct fwnode_handle *child;
-> +	struct mii_bus *bus;
-> +	int err;
-> +
-> +	bus = devm_mdiobus_alloc_size(dev, sizeof(*priv));
-> +	if (!bus)
-> +		return -ENOMEM;
-> +
-> +	bus->name = "Reaktek Switch MDIO Bus";
-> +	bus->read_c45 = realtek_mdio_read_c45;
-> +	bus->write_c45 =  realtek_mdio_write_c45;
-> +	bus->parent = dev;
-> +	priv = bus->priv;
-> +
-> +	priv->regmap = syscon_node_to_regmap(dev->parent->of_node);
-> +	if (IS_ERR(priv->regmap))
-> +		return PTR_ERR(priv->regmap);
-> +
-> +	err = device_property_read_u32(dev, "reg", &priv->reg_base);
-> +	if (err)
-> +		return err;
-> +
-> +	snprintf(bus->id, MII_BUS_ID_SIZE, "%s", dev_name(dev));
-> +
-> +	device_for_each_child_node(dev, child) {
-> +		u32 pn, smi_addr[2];
-> +
-> +		err = fwnode_property_read_u32(child, "reg", &pn);
-> +		if (err)
-> +			return err;
-> +
-> +		if (pn > MAX_PORTS)
-> +			return dev_err_probe(dev, -EINVAL, "illegal port number %d\n", pn);
-
-You validate the port number.
-
-> +
-> +		err = fwnode_property_read_u32_array(child, "realtek,smi-address", smi_addr, 2);
-> +		if (err) {
-> +			smi_addr[0] = 0;
-> +			smi_addr[1] = pn;
-> +		}
-
-You don't validate the "smi_addr", so:
-
-	realtek,smi-address = <4, ...>;
-
-would silently overflow priv->smi_bus_isc45. However, I haven't checked
-whether the binding would warn about this.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+...
 
