@@ -1,78 +1,117 @@
-Return-Path: <netdev+bounces-151383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B31B69EE86C
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 15:09:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D139EE876
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 15:10:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E8BC1889188
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 14:09:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 921B0188A0BA
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 14:09:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92EE921576C;
-	Thu, 12 Dec 2024 14:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D6B21B90F;
+	Thu, 12 Dec 2024 14:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="m1ZKK3gH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YDkCbds1"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013044.outbound.protection.outlook.com [40.107.159.44])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED79C2144A2
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 14:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D341E217F48;
+	Thu, 12 Dec 2024 14:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734012529; cv=fail; b=RaGkj87A1l0szyed1nfjPdJoRZVEH8+wWgHpWHKxDRkpIlr3NovNCbexYCfcJQr1F3JmSB2f+IjNkQapZJu8XLlFK3JmfFmVa2b7NXv1fPdbBdCCXMnD+UgJmYjOaPu0itfhcCx7sVQggUGXfqtPNsseB2EaBQTHWnSYW4SpRNM=
+	t=1734012538; cv=fail; b=mtiC4qP5Km9Z3pLBhFppxFBr0lVE3N3f+Z0bXsVp9D9T7M/3Sk6JYBbacmFuwlE59bfeCTdfPs4w0wSp2VAOU9BjiBYoo1Rh7tBnKi6IvaY25Zh5Z/9GvpcA6MNjfAUpLW1/Di7xAAPXQUg6RRGEPi990S6a3m+Ylj874xGAiIQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734012529; c=relaxed/simple;
-	bh=gLidDEWrzwqnOGkhb25NmD+f/+CLhZy90e3Olq1XapM=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=bGNcJnrcKhjZc5pI9D9BoJLAaDxwMdg4+VwYB64LZBdPygG/SOZxLiU+A2EztpRMYWH8/IHNmpHfYttXoJwhaMIvBFGbEA6JZR7RQdCrJkACKKld1WTgVA8o+8LEvXzJKdVrUgVedvzfeLaw7YwQM4oe0JKaVUvbhTI5bdozjvk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=m1ZKK3gH; arc=fail smtp.client-ip=40.107.159.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1734012538; c=relaxed/simple;
+	bh=AE/4HVNl+pmWhTijMB1BeD8ojhxrVB9jZuoiTWVre60=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=rg9HUA3ZT+i3caNuFxQQqMTbgEN9/D33qBVJXSJFXSiQjlhO3VtbB/TSJ9D0dkOnUz+U5NKuZAvdIPDXn+omyybnHFpw9g7KgumNVmnZC7GnAS6PNWuZXA8pIXyFMs6A7RHQlqZ9m6cxZGjzUQmAbZZv2ZBQBzJGA/wHolSo6uo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YDkCbds1; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734012537; x=1765548537;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=AE/4HVNl+pmWhTijMB1BeD8ojhxrVB9jZuoiTWVre60=;
+  b=YDkCbds1iSNsFtSwF9SNylac8kb3ZgVfuQd7YCMpt0A1HeHvoaRda6b6
+   Qmz0w1wv/IVYxr5qfs/R1AQTTFVLhagvEIPd6zmh4IlRMTH4vd8zvvP9P
+   zE7Xv/B5EazcSVtAGiYGGfxTGyoi5qGo0LPXCmfgqAEmdTnQABP6siKkl
+   J0IaAe6FMLe4PXqN3P35cgImyjTdYacG1dGMTDGYgIyysbHY81RWMBf9p
+   ZmwH10mOAQDJBpvtjBJL0Dvf47p7ypaxXEv0giClfmrt71mbS7eJNgKNP
+   ga5qsBhXkqbFz2P4Bz5lv47dHYF3DOwvEw9sqthWCpHbkOhPvyu4RynbK
+   A==;
+X-CSE-ConnectionGUID: tGt39XwGQ9GmWlUhhwGFqQ==
+X-CSE-MsgGUID: pw+QMkW4TSqTtQoUk5KIcw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11284"; a="51957837"
+X-IronPort-AV: E=Sophos;i="6.12,228,1728975600"; 
+   d="scan'208";a="51957837"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 06:08:56 -0800
+X-CSE-ConnectionGUID: Odb60tQKSH6zQNQHJYqzrA==
+X-CSE-MsgGUID: Yk2R49wqQM2HP26bhb6dRg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="133613015"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Dec 2024 06:08:55 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 12 Dec 2024 06:08:55 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Thu, 12 Dec 2024 06:08:55 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.170)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 12 Dec 2024 06:08:55 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Lz8FklMOLmXJ6TsGJ0M4FwdsGt0X9v+/GM2bLalM4Bivw3nFQJP9TcrETw4s89P2A+FCAmzfXqJvfCDZ0HHUDNh910mC0ObQGJ2KHId/gUVktifQIIMwxJiBRlEWN3XX+jO0NeylhOz1zmUizRfaRQ/7focA2eLLhx3TJS7j4B+Rk1bXuwZAqCI+4EoBWrSf5Ckt8qdAN3KJAb9XUt2aKPsEkWqTEugsbBDshNPml5EpfLf6+M4cGpzcxNXzlixJq+2+WN7IpmmhZn/K7F3j3AP53telCeEGooWfKJ2yAL6/kAVSJV/a6NoT98CehTQKWjFSIPraj9zf2kyTTyYEcQ==
+ b=iCQOlvToMyQhUDOJgRFwpaJrGJHhD9LOJs6jEiZOfmyRiubspLwuJZyZFeaFTSQB2ZCl4M2YFFRwysfIiO4Rq+WYFYC5sfDOVvBKbIt81YAy/ugBE7qg/08ASjQsuuvyFhf8342TSJwo55hB7WLKQZfvuipie3Zyg0hkb5FIYxpZ8IjtwUulzcv0syw4ZvcUBDSHpC3XciID+R5tqMTDSZgaqZnMYUPcTmTVtx+C3S8HAzQWlTVc7YMn7d22rZMc6NL/4dOmKe/lG+xSUFRCVzk6N3bzqh0uQB/D+v+4v7AcNLXN5p2AHdss1X4SVVAUHIR+2XSY0RUNTeTmxd79aA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jyDAAskNd+4MLJafa+eSg0txv8UkZ5iWuf5N7IQLXBg=;
- b=khM5POZZwAY5Z1oI/xnoD3uttF2VHXxlnI9c+GeDavVQY+VBdrgUxqd/bL4dhbQBhla7RvADK0fWhKswmKcZB1RErLVCpancbGT/8b597P1zM0otglnWSdL94huUZcvXtanGGFD8B+N1E2FsGEuGkvTcqyRTvQGezulB6oE9mMJL4IKFWQX/dPl/3sw/nqunab48ZWTYtZ0/s5hfIVnxAeMaVQcGgZ/I3G0XFTmW8Wu7ZP0hxAoF0QCuYASjQPjj6Bw86wKPeNhPFyk+/5TNTVX8i8lZT+htChhckyvAfP1uaxva4EikzP0we7/E6rMmaY3N/Z/h1znsibNf4i7mRg==
+ bh=a1L+cu789uAutBaQOBLR3pKdi2w/JdXMcty9FsmheKg=;
+ b=Gps8ZvLzewuawJwohfRsUrPwRLCcYnnbszrJeTn5LUg9OV7cpfNSNLtL4z8m0Mq5mNq41ZJRgHC/pNfqZoktkEpBdAyHZtD1Q57QfeCVdRjT/6B1crGLa/4Cf6+RXAr20FMzj0Gt4CObCADIh8BhVKglVktlSa3p/Yj+L9r+OrMCULgs90oxD+1q3o66EwOQLxQLGXtgartlM6GSeoPo/i67bX0gRfKIqMs/gFHeHoR+VyrXf2Fuq1pNqMwdxyKMIr9T+XJao2/aX84fYAs0CknBYg+K2Hsih7IW+vQR0u2ZpfXql+DXgHyKBwjVCbIMVETDwFFgVkF/0Z7BR8K3yA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jyDAAskNd+4MLJafa+eSg0txv8UkZ5iWuf5N7IQLXBg=;
- b=m1ZKK3gHnxcuGVVDjklVlmLyqFMEuzQzRNUgU5o/nsFDEFsMg5O5cljHbGJgvC8GTebw2lRPUIdkLrxRUWEEGSB+ko3Fstb1EjB69J0rPDfhffS9B9QuuDef2jbbA5rB82if8y7qt2adRo9J7kAAPI9kx1dymglpSmJJww2cq76YmyX+NnTPP93tTQTeI4KJMIVjD6y28AgZz14AIC5rV+vrlhQj5IZ6k66SM+GC9RfBNGhpgfME8IbX29DSVWpYQpjVgRXh/xuJ6ZxL0B2mZWT35S3GsXH4rf6k0FexRNaLuqIrEd0hoBWGFedSlk/9uUdG7YPGn6hpAxyI7Uj8/Q==
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by AS8PR04MB7655.eurprd04.prod.outlook.com (2603:10a6:20b:292::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.16; Thu, 12 Dec
- 2024 14:08:43 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8251.015; Thu, 12 Dec 2024
- 14:08:43 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: Russell King <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH v3 net-next] net: phylink: improve phylink_sfp_config_phy() error message with missing PHY driver
-Date: Thu, 12 Dec 2024 16:08:34 +0200
-Message-ID: <20241212140834.278894-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BE1P281CA0041.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:22::19) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ CY5PR11MB6485.namprd11.prod.outlook.com (2603:10b6:930:33::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8251.15; Thu, 12 Dec 2024 14:08:52 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.8251.015; Thu, 12 Dec 2024
+ 14:08:52 +0000
+Date: Thu, 12 Dec 2024 15:08:39 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Song Yoong Siang <yoong.siang.song@intel.com>
+CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, "David S . Miller" <davem@davemloft.net>, "Jakub
+ Kicinski" <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, "John
+ Fastabend" <john.fastabend@gmail.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Vinicius Costa Gomes
+	<vinicius.gomes@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bpf@vger.kernel.org>
+Subject: Re: [PATCH iwl-next v2 1/1] igc: Improve XDP_SETUP_PROG process
+Message-ID: <Z1ruZwiTmph3iX9F@boxer>
+References: <20241211134532.3489335-1-yoong.siang.song@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241211134532.3489335-1-yoong.siang.song@intel.com>
+X-ClientProxiedBy: MI1P293CA0015.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:2::14) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,164 +119,198 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AS8PR04MB7655:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1ea4abb1-afe4-4665-e46d-08dd1ab67c87
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CY5PR11MB6485:EE_
+X-MS-Office365-Filtering-Correlation-Id: e90208dc-ee1b-4136-9894-08dd1ab681f7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|52116014|1800799024|376014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?5qQtlba3JrkYUBhafbITU6B2YwaK8gGaIt3pM/PGTfsUpr2fzBlinf/H/3Rb?=
- =?us-ascii?Q?W9ViglS06bXozoTFJJlhgCPiJ3PsjnhkiOVwVuJuCleV2Jwy7X2xPwoMrnQw?=
- =?us-ascii?Q?ENBa7bYwSTzj/xusAkXAmaYUonnPAF1GuFeerX3NXc/WtmW6mmcmlzlWtq6i?=
- =?us-ascii?Q?QNCEGfoUJheLoVSlOb9w88Fw/gCsb/FW40crh0e9Z1KF7s5X5RijQ7pyBWPR?=
- =?us-ascii?Q?1Nrtdw+s8sjnNa1vg96hmrTiTZtn4dCNIzEcDwQBrdJQJdiZJai5KVJd5AgC?=
- =?us-ascii?Q?+Wq2xmECjWvBSTV5bQ94e2To5zG2MpjBdicvHgzKDhZXhhRH5v91n2w4LnS/?=
- =?us-ascii?Q?n32MYT3jiu3/nLvKPRMYB6CCf0jijbTIFtZ5sQ9EFaArX+yODcJLs6JbAbep?=
- =?us-ascii?Q?9glxqxQb/9sQOzox6wuRVQDZVfQP1NqUqm7V5L27gOCmVFqej7ebXrErmdY7?=
- =?us-ascii?Q?rgybxsV0HBf3aSzYOZ+u7KkqBVuDv2OjCx8+q4b7hGbL4PANxnGNhBJ94vkI?=
- =?us-ascii?Q?fnEKXMyS2R5c941uYe7TstQ5CjPawi8lrY414Pde6FiubG2+qBhOMYxOl/uu?=
- =?us-ascii?Q?58I5R/FOByi/ExtvhfUQHS/3RWCY92L9sR9Pi6KfBpXV2DkZcUp6CuUASt+i?=
- =?us-ascii?Q?IBfFVStfHZD/+/q41guPQZVXvwTi2dgI5NohDbS8hL/S6QM2G8CuCpCV804n?=
- =?us-ascii?Q?O6P56/mrDj6pCuGTWlUT1f5p8c7Gp3519+ZtS+JY8zca6Q8TzXWK4+zmhvW5?=
- =?us-ascii?Q?YXKtgwUDuKk3wQIK6InklZf/WH1fRZI3hYZ90TUzr3xH/zWlD3QFCgZ5EKNk?=
- =?us-ascii?Q?FUU1UlmXJD+EyjwfwaOCu3j0SVst+BVQzkX68bU8GSPAJSHGWfMNR645Alp7?=
- =?us-ascii?Q?h/Cx+b0MIq8R4gv7btlwKVO9v5fEfgoea/eJgCHB778XP0brTsVgqw7YMvje?=
- =?us-ascii?Q?BdS8b9PG89jvVrRza3rDPmHF6qY7ufaPAEcM6ui6IEaVYboKtHtk0Lm7TLGr?=
- =?us-ascii?Q?17mtlBb+1hCLhMAjkGCGCa/GIjujYAFErLAojy2x9LjwC9L/PvEwB8bJ4dc8?=
- =?us-ascii?Q?xXU8Mai3PbFN0u4mgZr5ZRYoiZCLXSSlDt7TFfolY0uMy7eo6muu+SHJWkmG?=
- =?us-ascii?Q?BNfU3arMi5QthIm1orBtQauMpgRfYhF/QQcSBs2jFndgnKH2TlHV6mjqCt2i?=
- =?us-ascii?Q?4XIP6guWaaZcG4TcGAanD4eSViHR4zhKRMaVwMFZ/tUUvJSuUIDSdZsyvEsx?=
- =?us-ascii?Q?Or24F7SaaBDEFPl2i6cLTEYoaAbneaO7ulB7Aj+HEOH+ottBO3ILqKifkIGD?=
- =?us-ascii?Q?mdx/Pz62Y2qWc3+86cMmODxzYPLgySTl1VJWBdWNMmzlQZ1xsU9+GRNpUlzq?=
- =?us-ascii?Q?BUC9aGwoVQ0CbVDZJs78RfQmad1kzxR5SFOlTohwT9CO70d+jA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(52116014)(1800799024)(376014)(38350700014);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?6hFn86dIprdolSkvYJjEO7TaLYj8C3EMr3W+Tr91YglwsqhhPNjpPf2iV9B9?=
+ =?us-ascii?Q?3eqlr4QioinCL9bZRoLhzykoTs3vRXJzBFGkY3ublLhnE1hv34vSuYQVrxx9?=
+ =?us-ascii?Q?aDzXG/EFwjxWegXsT68YwcPgUf3MQe1xhgu1iXu5HR8pgrD73Wy8T2GcOtYF?=
+ =?us-ascii?Q?hRb7BTTjODwvvE+tZOjx2sQp3aO0/YCY4gCzFv41yhx6Xk/o9WI14CblxxnO?=
+ =?us-ascii?Q?ahojcgHtPCUtwlRLa6kdnd5vKVfHrgSleCtj2k0HlTGgaogq67KnbSAfNZ6s?=
+ =?us-ascii?Q?w+xYXoOttfjI+Mvwd+BULKLqeHP+UqEWd50bKRIO+NscmV1bhPg30Lovmzi/?=
+ =?us-ascii?Q?0OffpcoFuB+m8p6Ppmg/58KZ4UXDFY3ls+2ICj0eXi7s/8SmfMADUSB7164a?=
+ =?us-ascii?Q?qmMTP3OUpo6LunXGktpN87ciCDokdje1rDAGZtHaCNTGLQhai4e3C1ReouUh?=
+ =?us-ascii?Q?ySHsK6bGlny5UraVdxPo6QyXxxzmnCnIHkohiY7DPBTmcj4cy0Ycda5cqXIm?=
+ =?us-ascii?Q?CBjGFyUCOiMHnAwktxM5BsSkitJOuteOP8sNjOePX9z1CIEHSlpHSjPMi5TL?=
+ =?us-ascii?Q?KhmCO+FuzL6sUwJGEz16+iyG/t0nZvpoGlleuVfWNA6WDkcI+RQxkggZWjwG?=
+ =?us-ascii?Q?uXBJJdm8S4fOGYYAGnn9Vd25P28UNb9V7ezH/zB+RZauJyo4dKBXs0wkYvzH?=
+ =?us-ascii?Q?vt3e7tsUPBfVBAo/F82Yz5e+gq0I0tZH69bUP1CzIjwp2QqjvYbNiB2C0xzr?=
+ =?us-ascii?Q?NhwC1V/r4Qm5p1IBHfKS9bzBx5iq5UfKIw2sKjwG5NwgoApZSxKNTe0oO4Ey?=
+ =?us-ascii?Q?+LQAdZvEtTGq3g9zkXeUn+7KYNOJx/INIW9pTpSeqhxfCetrj9QuRxEw76xT?=
+ =?us-ascii?Q?TxJVRB8G3FtKIuhJTrBpBIPT1ySZ042nm7HOtiqPMoj9uw2154tFq0bmSl7e?=
+ =?us-ascii?Q?lFIght37u+YHh9vLyGa5tOFvTZGIQLzfcQaf2ta0CbWcfFP8GiV6zQZZc2/L?=
+ =?us-ascii?Q?RVpz8NQYUZKDc8Y/X7ONT8lqbBx7AHzOuhyp9Jrprp/BmrvZCOu5lIgFlhKc?=
+ =?us-ascii?Q?GBiA+GjJAnpm2EURtaTKZbuqs+NqtwOf3qrmWMLX5IVpyKMaRa2NlBPLwsNB?=
+ =?us-ascii?Q?bMqtLty6GxkfR2AuxzDMu0JXNW3gFh7kzJktUsZg76hhGF9V2gk6js49LRpI?=
+ =?us-ascii?Q?yVGallcTcUF4PoBohqr9qNRb3cuva57lKMTRL2gBm+hULb3JZQ+BSJAcpuu8?=
+ =?us-ascii?Q?SQcwWEXnZK2GUVJ8qL9FM0gN8oKqrFhbrmw0q/CMnjEx8Pxd3hIM5+S0FwyW?=
+ =?us-ascii?Q?J0khB6QZsNRIxGkTeFoA/EasdpfvKSsdNYv6Uo58n6v7Cw=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?3HECfLDBjBLvtltYJH4+8G5vTGYIarwcxPWdJF4s8IKnv1eCVh93vMDGTMH4?=
- =?us-ascii?Q?4M8dEDsKFBn4ISFE4nEOWl+JFhppXzmodjr/8cBKlRUYPEu5TZ3U2+7Ycdkj?=
- =?us-ascii?Q?r2HSdEAZxZz4ScRIMz9EgpCfo5JXHiN+5nAQFhUD+TYXA+4flx7B5fJbLUak?=
- =?us-ascii?Q?+T/6KwrmeNNZ5TwcNPH1lsSouObjun8192wpMAkfPQzBWvM4GhWm72FeQrRk?=
- =?us-ascii?Q?ciQQ3n1M0+xHoV8cSz4CUxKIu6k+l1N0Rh4Ao6JkR2Hka8QM85ECqsokMEFB?=
- =?us-ascii?Q?qL0yoiEM8vXRrS3NPo+wW2x2VTk1FJeUmGAi2HVetYU36umqdn5FbluhI4ti?=
- =?us-ascii?Q?n82YpwUHo/Px2h9h6agNRK8rW4xwkPXV1GUdyo6izKZStK9QBtdbCTWqx5ZM?=
- =?us-ascii?Q?Jwigw4h78RgLGavpdC8JZBewjndJ7FtIfI/rBtPHzb74d/SfduSCpdYNbgN0?=
- =?us-ascii?Q?Ojv2wpanxQOQD8pQKL/kCBJdnNd4KQtTC+SVpXbwn9c3Fd/XRfRmwteqylbN?=
- =?us-ascii?Q?TMwHZD4h9iq7rUxVdFqdpN38w7PmE8c+C2pqJqDNjPh3W5ldQpIbv1I6KyjG?=
- =?us-ascii?Q?p5/lU2b87gkRLsDW/zYd0uCwDAbNF7VGDY37P9P6S61Agqow8D+LDajJhKbI?=
- =?us-ascii?Q?G+pP+KHRvQaBG6/7d+UH9nmUE7pIC0ouRB8U3EaU3VElNcAShxHGAUtRo3ei?=
- =?us-ascii?Q?1xx6ZrAfN23kCjLgUSogq2fHoqi2lrtofEV0tHg9iv7nDpnBh/W8ZI0CXqhx?=
- =?us-ascii?Q?WB69IH9D2Xw5V1PzENe2oa/wKbzgbvrbNk9zqbFcJO+xE3Nn8ZFLGUFoGIz+?=
- =?us-ascii?Q?sNoWlcBmN78DV/y5LUTd2CsKIjMFb2dXTHMTlXVpVt+mhPl8i6RvpzYpPM2H?=
- =?us-ascii?Q?Uq4B+YAUJOhAdBtz8sZPmaEELaFWrKb8P2H4LIdKVjusGLxgxI61SST0MQnP?=
- =?us-ascii?Q?0Mt1Ab52EGnLyOdUypioasm4UXlhZLuFyNgjDVp5m44y6wGBtzMV0LkqVrih?=
- =?us-ascii?Q?7CgDJGK1I4nhJjXEED/dfPLl0jwgDemeFIvOSSQ2nU4gabzbDFp3HLg4dplq?=
- =?us-ascii?Q?slj07f2eLhwD2Tpk2ZGl11Pg/yzZpxuFha2rUNzaHVKeyB48wrW3EtbvZDdm?=
- =?us-ascii?Q?Wf3KEJdfhT863oDzcsoLfyC0d9pab2zShuq5mM2JXCd0n/zH5H7CPhYWj777?=
- =?us-ascii?Q?5bZc5bmTQ8LZDNqkbnok0Lt3gsfYOTmQSgylO2AgQNBOMqmT25YjtZlxGWl5?=
- =?us-ascii?Q?HOtKtqTzjoXzIsWWz9JzY43tkpUCPlrJ0I4WOL6ea9XTHngUM3f6YTGIoFcj?=
- =?us-ascii?Q?YqcKHdJQFmMjKGtLrTE0M/rC3GQ0FssL279y/9B6kiTAFb4E9wResHLL3YR7?=
- =?us-ascii?Q?D0vzs+1lE5yT5x3f0YPnJniRUGQwfVKdzETvp6Zs8eMHwN/0Ffa0xKBF0eER?=
- =?us-ascii?Q?PgVqvrVVrudemLt13zx0RxlEXFENjDORmcXi+N3dyWSfhHVDZTpMF1Ue0MhY?=
- =?us-ascii?Q?T12DKE8755U8h2URJAbIpqlgakzqP/bxY1vQxoJCZqtORaluVt2JGbRlxWbV?=
- =?us-ascii?Q?KCb/yRFstnpUy7i0kaaqrE1nji14nbhwLwU4D/rDpvKBAHkldCMBqk0t1Ecs?=
- =?us-ascii?Q?Vg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1ea4abb1-afe4-4665-e46d-08dd1ab67c87
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Dslm4YhZNrel4DFSiE20eV+Pl83LtHqnp17kZnQI3J2v4AdI03228BAHBo82?=
+ =?us-ascii?Q?cNc2AG49tP09BA+FEIGCTpFECqJBCVdFv6WeFG5Zuw6SSw69OhK/qRlgY0Eu?=
+ =?us-ascii?Q?z8DMJ2VDFGop15KyH49kMLkMSnJ2qK/cQFawJArXbfKUp9G/lSuUT75vYLVT?=
+ =?us-ascii?Q?YYKZVtpBCEJhooK5FNg52UEoaYQqaj0ujkE9jhdH6din5tVw8z7KMOciVvc/?=
+ =?us-ascii?Q?NHkUkf2VYGfXZRwOC4gy8QWWsjd76sLZiF0/CpbkgZDR0eK7bhc89y9tw7sc?=
+ =?us-ascii?Q?v0IkUSyRaBZ2ZkeZ2uWvgaacr5ecHzVELiThnGKUSSGiijGLHJ5bOkBxfiP2?=
+ =?us-ascii?Q?7HyvEF98VQmddHl67kvsBr0n8YZOJv6wbonJ3xF+Tx9TrTsEi470ya1qk/mA?=
+ =?us-ascii?Q?WsdpyeV7UQFAC5nr2L2jEExzUMpFSzb/SQAC3xFsG8bh1+0PntXzPgTbVEvU?=
+ =?us-ascii?Q?Cxpvm84nrRLHyLiLWlqK7tDl91kFgOKA+/pKbU362Zm0XURxXqZkEnWQ9pl6?=
+ =?us-ascii?Q?2KT0AR4kpLozIHg3/9WLDKSE/cV+Y0bNm+EUEsaXV8/PYeMV1skltxwgQxj3?=
+ =?us-ascii?Q?MfdvuZ0tAZLwGixjZC/33oKeJ84OW2dZw+n2Kn8gRmC4TXtwYBFLiwgv5gGf?=
+ =?us-ascii?Q?Gaa5BiJe2cajqtAYF8pbiKDW2D74vF1WVPgnU+PbniosP/PEZup1hoLW34Jy?=
+ =?us-ascii?Q?fM355Vkyeso87IwjKS/MOX6tx9VeSMkr71j7j5T9mwMOA4442QdyBTWivo7C?=
+ =?us-ascii?Q?iC8UXIYl+URkUTposAzSIthL8QGkkOkJeXEPZasyr1B8R/MSupyv46LADkq4?=
+ =?us-ascii?Q?BrMJ6Cr1F4IWqiqCMrET8+sNyPyy9neQ18v1FCG4/ButkzfyNkwTesYZQp0i?=
+ =?us-ascii?Q?+wyQdP7hWagjcApRt2vWzqCoZACyW7PVtw9QGTYhCwEdDLIwdDf44vvG7tMb?=
+ =?us-ascii?Q?u1cxPDS2uLerSN0hQtIjeLEPIhUai4OeC/q18GVMATEWBaXBzBzZRJxU+miW?=
+ =?us-ascii?Q?K5N8J6luD0ciKSSczVKkODHFB9bcrfJ4q6VYvLD+xNIXbok8dOEF1MYvQZNI?=
+ =?us-ascii?Q?iYdeapnSdMHjP6WAYBxXwNiwfr6Nmd+1wFxeybTi2GJSh2dA47gCSk3Achm6?=
+ =?us-ascii?Q?yL4/yIdF6qDHH5XkIPXHVw179UkLW6+SgJR0786kFAOi86xmAen3RxVG7IIW?=
+ =?us-ascii?Q?pc4ALE4G1GLmGl61a4cZzY7xvILBsdsQrKdiltoNF97pGnMWZUneYEuGwaTX?=
+ =?us-ascii?Q?fOgXCYpG9X/nqdeKaOpaJbxS8JJPFaVpzZXJkqeH6INnb6Pa7Clj/+xuDG8Y?=
+ =?us-ascii?Q?oKIDZ0QhIjlv/2jePuz+NLqj0JRiNJ0VmJlgMVo583WibpN4QTarVmNQkGba?=
+ =?us-ascii?Q?9Hd78qN13dJ0rsa+URK3QeqF1p3TbH4lnYF3eY+FOmuJusOJnDIxJBzKGi17?=
+ =?us-ascii?Q?ZN5gSln5nKmJ5WwmUQ17GOfHDBjDKHFRiyOb7KTYF8GxnuA9decyG/+gmEE9?=
+ =?us-ascii?Q?VjgU3PiUObCBnV7PNeu8MDm06m3rfhVpn+Y1/WyRiSFKA8RM6vRw+rkpmYp0?=
+ =?us-ascii?Q?oGbncBbGmHjuvxVLP9Q914F1yI4XHqIieQJbod4u6h5WevKxxrkeV5o1PNbQ?=
+ =?us-ascii?Q?Yg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e90208dc-ee1b-4136-9894-08dd1ab681f7
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2024 14:08:43.3833
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2024 14:08:52.4834
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1yT7k2Sq54oUgCqkyITKrpSYaInBsHbY2ymTEq1rodUyvbdYlD6ZKQDng3uAPKUCFyvDBmhnTTLAngWafLAN4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7655
+X-MS-Exchange-CrossTenant-UserPrincipalName: ztXk8CVZWZXVSi/ml1OSEzPltgKH/9lBYXrUfy+TQZIT+eCmpUVHBVH5Qaii+Vc8TXTANmINA+an0Di2kA4quByO/gIBltIW0IE3e9QY3Ew=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6485
+X-OriginatorOrg: intel.com
 
-It seems that phylink does not support driving PHYs in SFP modules using
-the Generic PHY or Generic Clause 45 PHY driver. I've come to this
-conclusion after analyzing these facts:
+On Wed, Dec 11, 2024 at 09:45:32PM +0800, Song Yoong Siang wrote:
+> Improve XDP_SETUP_PROG process by avoiding unnecessary link down event.
+> 
+> This patch is tested by using ip link set xdpdrv command to attach a simple
+> XDP program which always return XDP_PASS.
+> 
+> Before this patch, attaching xdp program will cause ptp4l to lost sync for
+> few seconds, as shown in ptp4l log below:
+>   ptp4l[198.082]: rms    4 max    8 freq   +906 +/-   2 delay    12 +/-   0
+>   ptp4l[199.082]: rms    3 max    4 freq   +906 +/-   3 delay    12 +/-   0
+>   ptp4l[199.536]: port 1 (enp2s0): link down
+>   ptp4l[199.536]: port 1 (enp2s0): SLAVE to FAULTY on FAULT_DETECTED (FT_UNSPECIFIED)
+>   ptp4l[199.600]: selected local clock 22abbc.fffe.bb1234 as best master
+>   ptp4l[199.600]: port 1 (enp2s0): assuming the grand master role
+>   ptp4l[199.600]: port 1 (enp2s0): master state recommended in slave only mode
+>   ptp4l[199.600]: port 1 (enp2s0): defaultDS.priority1 probably misconfigured
+>   ptp4l[202.266]: port 1 (enp2s0): link up
+>   ptp4l[202.300]: port 1 (enp2s0): FAULTY to LISTENING on INIT_COMPLETE
+>   ptp4l[205.558]: port 1 (enp2s0): new foreign master 44abbc.fffe.bb2144-1
+>   ptp4l[207.558]: selected best master clock 44abbc.fffe.bb2144
+>   ptp4l[207.559]: port 1 (enp2s0): LISTENING to UNCALIBRATED on RS_SLAVE
+>   ptp4l[208.308]: port 1 (enp2s0): UNCALIBRATED to SLAVE on MASTER_CLOCK_SELECTED
+>   ptp4l[208.933]: rms  742 max 1303 freq   -195 +/- 682 delay    12 +/-   0
+>   ptp4l[209.933]: rms  178 max  274 freq   +387 +/- 243 delay    12 +/-   0
+> 
+> After this patch, attaching xdp program no longer cause ptp4l to lost sync,
+> as shown on ptp4l log below:
+>   ptp4l[201.183]: rms    1 max    3 freq   +959 +/-   1 delay     8 +/-   0
+>   ptp4l[202.183]: rms    1 max    3 freq   +961 +/-   2 delay     8 +/-   0
+>   ptp4l[203.183]: rms    2 max    3 freq   +958 +/-   2 delay     8 +/-   0
+>   ptp4l[204.183]: rms    3 max    5 freq   +961 +/-   3 delay     8 +/-   0
+>   ptp4l[205.183]: rms    2 max    4 freq   +964 +/-   3 delay     8 +/-   0
+> 
+> Besides, before this patch, attaching xdp program will cause flood ping to
+> loss 10 packets, as shown in ping statistics below:
+>   --- 169.254.1.2 ping statistics ---
+>   100000 packets transmitted, 99990 received, +6 errors, 0.01% packet loss, time 34001ms
+>   rtt min/avg/max/mdev = 0.028/0.301/3104.360/13.838 ms, pipe 10, ipg/ewma 0.340/0.243 ms
+> 
+> After this patch, attaching xdp program no longer cause flood ping to loss
+> any packets, as shown in ping statistics below:
+>   --- 169.254.1.2 ping statistics ---
+>   100000 packets transmitted, 100000 received, 0% packet loss, time 32326ms
+>   rtt min/avg/max/mdev = 0.027/0.231/19.589/0.155 ms, pipe 2, ipg/ewma 0.323/0.322 ms
+> 
+> On the other hand, this patch is also tested with tools/testing/selftests/
+> bpf/xdp_hw_metadata app to make sure XDP zero-copy is working fine with
+> XDP Tx and Rx metadata. Below is the result of last packet after received
+> 10000 UDP packets with interval 1 ms:
+>   poll: 1 (0) skip=0 fail=0 redir=10000
+>   xsk_ring_cons__peek: 1
+>   0x55881c7ef7a8: rx_desc[9999]->addr=8f110 addr=8f110 comp_addr=8f110 EoP
+>   rx_hash: 0xFB9BB6A3 with RSS type:0x1
+>   HW RX-time:   1733923136269470866 (sec:1733923136.2695) delta to User RX-time sec:0.0000 (43.280 usec)
+>   XDP RX-time:   1733923136269482482 (sec:1733923136.2695) delta to User RX-time sec:0.0000 (31.664 usec)
+>   No rx_vlan_tci or rx_vlan_proto, err=-95
+>   0x55881c7ef7a8: ping-pong with csum=ab19 (want 315b) csum_start=34 csum_offset=6
+>   0x55881c7ef7a8: complete tx idx=9999 addr=f010
+>   HW TX-complete-time:   1733923136269591637 (sec:1733923136.2696) delta to User TX-complete-time sec:0.0001 (108.571 usec)
+>   XDP RX-time:   1733923136269482482 (sec:1733923136.2695) delta to User TX-complete-time sec:0.0002 (217.726 usec)
+>   HW RX-time:   1733923136269470866 (sec:1733923136.2695) delta to HW TX-complete-time sec:0.0001 (120.771 usec)
+>   0x55881c7ef7a8: complete rx idx=10127 addr=8f110
+> 
+> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
+> ---
+> V2 changelog:
+>  - show some examples of problem in commit msg. (Vinicius)
+>  - igc_close()/igc_open() are too big a hammer for installing a new XDP
+>    program. Only do we we really need. (Vinicius)
+> ---
+>  drivers/net/ethernet/intel/igc/igc_xdp.c | 19 +++++++++++++++----
+>  1 file changed, 15 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/igc/igc_xdp.c b/drivers/net/ethernet/intel/igc/igc_xdp.c
+> index 869815f48ac1..64b04aad614c 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_xdp.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_xdp.c
+> @@ -14,6 +14,7 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
+>  	bool if_running = netif_running(dev);
+>  	struct bpf_prog *old_prog;
+>  	bool need_update;
+> +	int i;
+>  
+>  	if (dev->mtu > ETH_DATA_LEN) {
+>  		/* For now, the driver doesn't support XDP functionality with
+> @@ -24,8 +25,13 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
+>  	}
+>  
+>  	need_update = !!adapter->xdp_prog != !!prog;
+> -	if (if_running && need_update)
+> -		igc_close(dev);
+> +	if (if_running && need_update) {
+> +		for (i = 0; i < adapter->num_rx_queues; i++) {
+> +			igc_disable_rx_ring(adapter->rx_ring[i]);
+> +			igc_disable_tx_ring(adapter->tx_ring[i]);
+> +			napi_disable(&adapter->rx_ring[i]->q_vector->napi);
+> +		}
+> +	}
+>  
+>  	old_prog = xchg(&adapter->xdp_prog, prog);
+>  	if (old_prog)
+> @@ -36,8 +42,13 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
+>  	else
+>  		xdp_features_clear_redirect_target(dev);
+>  
+> -	if (if_running && need_update)
+> -		igc_open(dev);
+> +	if (if_running && need_update) {
+> +		for (i = 0; i < adapter->num_rx_queues; i++) {
+> +			napi_enable(&adapter->rx_ring[i]->q_vector->napi);
+> +			igc_enable_tx_ring(adapter->tx_ring[i]);
+> +			igc_enable_rx_ring(adapter->rx_ring[i]);
 
-- sfp_sm_probe_phy(), who is our caller here, first calls
-  phy_device_register() and then sfp_add_phy() -> ... ->
-  phylink_sfp_connect_phy().
+I agree we could do better than igc_close/igc_open pair, but have you
+tried igc_down/igc_open instead?
 
-- phydev->supported is populated by phy_probe()
-
-- phy_probe() is usually called synchronously from phy_device_register()
-  via phy_bus_match(), if a precise device driver is found for the PHY.
-  In that case, phydev->supported has a good chance of being set to a
-  non-zero mask.
-
-- There is an exceptional case for the PHYs for which phy_bus_match()
-  didn't find a driver. Those devices sit for a while without a driver,
-  then phy_attach_direct() force-binds the genphy_c45_driver or
-  genphy_driver to them. Again, this triggers phy_probe() and renders
-  a good chance of phydev->supported being populated, assuming
-  compatibility with genphy_read_abilities() or
-  genphy_c45_pma_read_abilities().
-
-- phylink_sfp_config_phy() does not support the exceptional case of
-  retrieving phydev->supported from the Generic PHY driver, due to its
-  code flow. It expects the phydev->supported mask to already be
-  non-empty, because it first calls phylink_validate() on it, and only
-  calls phylink_attach_phy() if that succeeds. Thus, phylink_attach_phy()
-  -> phy_attach_direct() has no chance of running.
-
-It is not my wish to change the state of affairs by altering the code
-flow, but merely to document the limitation rather than have the current
-unspecific error:
-
-[   61.800079] mv88e6085 d0032004.mdio-mii:12 sfp: validation with support 00,00000000,00000000,00000000 failed: -EINVAL
-[   61.820743] sfp sfp: sfp_add_phy failed: -EINVAL
-
-On the premise that an empty phydev->supported is going to make
-phylink_validate() fail anyway, and that this is caused by a missing PHY
-driver, it would be more informative to single out that case, undercut
-the entire phylink_sfp_config_phy() call, including phylink_validate(),
-and print a more specific message for this common gotcha:
-
-[   37.076403] mv88e6085 d0032004.mdio-mii:12 sfp: PHY i2c:sfp:16 (id 0x01410cc2) has no driver loaded
-[   37.089157] mv88e6085 d0032004.mdio-mii:12 sfp: Drivers which handle known common cases: CONFIG_BCM84881_PHY, CONFIG_MARVELL_PHY
-[   37.108047] sfp sfp: sfp_add_phy failed: -EINVAL
-
-Link: https://lore.kernel.org/netdev/20241113144229.3ff4bgsalvj7spb7@skbuf/
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
-v2->v3: test specifically for the NULL quality of phy->drv, to avoid the
-"maybe" in the error message.
-
-v1->v2: add one more informational line containing common Kconfig
-options, as per review feedback.
-
-Link to v2:
-https://lore.kernel.org/netdev/20241211172537.1245216-1-vladimir.oltean@nxp.com/
-Link to v1:
-https://lore.kernel.org/netdev/20241114165348.2445021-1-vladimir.oltean@nxp.com/
-
- drivers/net/phy/phylink.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 95fbc363f9a6..6d50c2fdb190 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -3623,6 +3623,13 @@ static int phylink_sfp_connect_phy(void *upstream, struct phy_device *phy)
- {
- 	struct phylink *pl = upstream;
- 
-+	if (!phy->drv) {
-+		phylink_err(pl, "PHY %s (id 0x%.8lx) has no driver loaded\n",
-+			    phydev_name(phy), (unsigned long)phy->phy_id);
-+		phylink_err(pl, "Drivers which handle known common cases: CONFIG_BCM84881_PHY, CONFIG_MARVELL_PHY\n");
-+		return -EINVAL;
-+	}
-+
- 	/*
- 	 * This is the new way of dealing with flow control for PHYs,
- 	 * as described by Timur Tabi in commit 529ed1275263 ("net: phy:
--- 
-2.43.0
-
+> +		}
+> +	}
+>  
+>  	return 0;
+>  }
+> -- 
+> 2.34.1
+> 
 
