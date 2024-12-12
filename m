@@ -1,281 +1,109 @@
-Return-Path: <netdev+bounces-151490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 323B09EFB54
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 19:43:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 239EA9EFB55
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 19:44:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A826C188E2E7
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 18:43:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C3D518852E5
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 18:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53FD6223E69;
-	Thu, 12 Dec 2024 18:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEB4F223338;
+	Thu, 12 Dec 2024 18:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="m24QQ47l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="raFr9Xfy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-42aa.mail.infomaniak.ch (smtp-42aa.mail.infomaniak.ch [84.16.66.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7CB223C7A
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 18:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861A72101A0;
+	Thu, 12 Dec 2024 18:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734029009; cv=none; b=LMsPxJuzg40g/v+JGPPDjkureKzAwV7ocvZQ4BhK/c8UnploZIF2FFS8FOtgcuNhjvZOprReQ8xtraLvpS07MmgSUA7BLk4leRMv9MthGQxnyjWbU9JZlDs5e7fqvoqUu+uPYH+XWm6GoYGENSoHm2BADdO8fTEoi+5grdNWp30=
+	t=1734029049; cv=none; b=OhnLhGMFZGyRELjsSf2OCIrgfs58pYB4RM/2y4Q6LiDU0jA1YPW1fcRmfNTCY/irMi5brlu/QCfONTOWZHUQSs//cl3Hx/kxWwARfqzBSvObeeAJK7+Rkpk7tB68fv91VxGp0BHkt6z0+F4FbS9PRL1aGTp4ly/13nIdZfUuqKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734029009; c=relaxed/simple;
-	bh=WPeW8EtRRjSbM3Gqryl/zTV+zOBFy8rVXNkNkq6vbaU=;
+	s=arc-20240116; t=1734029049; c=relaxed/simple;
+	bh=fp/dUTY0EcFc0/TB9PU8rwyfZcOy8D1EROhkZy2QS2Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=riElSlA3/3K4w0ysd8vsCeR4agMHJ1ZXSBPfavuQ7yhC6lH8XJgRmYaaFI53A/bAvoNk+qBQ0Kh72UbNN9jclhXL8Nbz7GMhsR3F+O3grHYwlrUHnpizLeuzGv80jDtm+becz1HWdja8XfJ3jEfsyReal9B8tIdQgwcT2A3ctfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=m24QQ47l; arc=none smtp.client-ip=84.16.66.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246b])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Y8LvZ4XyDzP0L;
-	Thu, 12 Dec 2024 19:43:22 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1734029002;
-	bh=gi+0AwcCOHahZNLJJenN1xCfRyjgS8Yj9+bAEXIwqeA=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tn/7vqkaT6jGOYEar/oE3OU3MDOJsuGahjPf7mKXKf2P9mSC1eDt+fZy/fo/eUWUgIHagKWxcSte8JnA30IdsJDozfHzJi7n6iMLwcvdXW9qQ5ntYLuvLlLd2NF8huavOuFQ5nUE2LFTUaYH1ltKnSzt0H6vR4fo42oruLo7ryY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=raFr9Xfy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C897DC4CED1;
+	Thu, 12 Dec 2024 18:44:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734029049;
+	bh=fp/dUTY0EcFc0/TB9PU8rwyfZcOy8D1EROhkZy2QS2Q=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=m24QQ47lA21IyeVRO1g4qdx+y3lpapylGxWZ9whxVxCsyAIGPNwY6mrnhqxfOMqly
-	 qBGFHKXIlBrDPDJVf0N05D8184Foax0zykYxSAuIHXRcIXsc4h96gTHjCSSKAv+1Sj
-	 WYBVqGuNPuJ+yxA04OrrbkR9+PEk4PElNJE9eRzY=
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4Y8LvZ0GqRzQyh;
-	Thu, 12 Dec 2024 19:43:22 +0100 (CET)
-Date: Thu, 12 Dec 2024 19:43:18 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: Matthieu Baerts <matttbe@kernel.org>, gnoack@google.com, 
-	willemdebruijn.kernel@gmail.com, matthieu@buffet.re, linux-security-module@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
-	MPTCP Linux <mptcp@lists.linux.dev>, linux-nfs@vger.kernel.org
-Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
-Message-ID: <20241212.qua0Os3sheev@digikod.net>
-References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
- <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
- <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
- <20241018.Kahdeik0aaCh@digikod.net>
- <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
+	b=raFr9XfyXLHHLPVJkdfuDZuHApZ8i0u92YoHfIAi/RA+bOWd0gHPU1VIRWFbxHw5N
+	 IVuvNN394G0z8F4a9J5OUpbxQjlf0ZoWEo4yZ7V34Y+LQ1WH5OXpKfs83bd/NNDupO
+	 U0tDxLfpVBGrsCnWKN2mFPi8EJG8e/ASPSDMxsRFcrrCAHfqyDv/f9e9CUpItkFYXn
+	 NvUbZTET151q72CFbZ8qoU1iH2JOLXXtY31n2Depeje1caiX8MWKwAtEBWoKMc9pUN
+	 C5LiieIx9+ATw1IhXe6k5wxti9ZfmofGsoKTCack1BcJ4wPYXR+a5pFzNVw1uFUI/l
+	 ZT6fYR7jBGe0A==
+Date: Thu, 12 Dec 2024 18:44:04 +0000
+From: Simon Horman <horms@kernel.org>
+To: alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, martin.habets@xilinx.com,
+	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
+	Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v7 24/28] cxl: add region flag for precluding a device
+ memory to be used for dax
+Message-ID: <20241212184404.GC2110@kernel.org>
+References: <20241209185429.54054-1-alejandro.lucero-palau@amd.com>
+ <20241209185429.54054-25-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
-X-Infomaniak-Routing: alpha
+In-Reply-To: <20241209185429.54054-25-alejandro.lucero-palau@amd.com>
 
-On Thu, Oct 31, 2024 at 07:21:44PM +0300, Mikhail Ivanov wrote:
-> On 10/18/2024 9:08 PM, Mickaël Salaün wrote:
-> > On Thu, Oct 17, 2024 at 02:59:48PM +0200, Matthieu Baerts wrote:
-> > > Hi Mikhail and Landlock maintainers,
-> > > 
-> > > +cc MPTCP list.
-> > 
-> > Thanks, we should include this list in the next series.
-> > 
-> > > 
-> > > On 17/10/2024 13:04, Mikhail Ivanov wrote:
-> > > > Do not check TCP access right if socket protocol is not IPPROTO_TCP.
-> > > > LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
-> > > > should not restrict bind(2) and connect(2) for non-TCP protocols
-> > > > (SCTP, MPTCP, SMC).
-> > > 
-> > > Thank you for the patch!
-> > > 
-> > > I'm part of the MPTCP team, and I'm wondering if MPTCP should not be
-> > > treated like TCP here. MPTCP is an extension to TCP: on the wire, we can
-> > > see TCP packets with extra TCP options. On Linux, there is indeed a
-> > > dedicated MPTCP socket (IPPROTO_MPTCP), but that's just internal,
-> > > because we needed such dedicated socket to talk to the userspace.
-> > > 
-> > > I don't know Landlock well, but I think it is important to know that an
-> > > MPTCP socket can be used to discuss with "plain" TCP packets: the kernel
-> > > will do a fallback to "plain" TCP if MPTCP is not supported by the other
-> > > peer or by a middlebox. It means that with this patch, if TCP is blocked
-> > > by Landlock, someone can simply force an application to create an MPTCP
-> > > socket -- e.g. via LD_PRELOAD -- and bypass the restrictions. It will
-> > > certainly work, even when connecting to a peer not supporting MPTCP.
-> > > 
-> > > Please note that I'm not against this modification -- especially here
-> > > when we remove restrictions around MPTCP sockets :) -- I'm just saying
-> > > it might be less confusing for users if MPTCP is considered as being
-> > > part of TCP. A bit similar to what someone would do with a firewall: if
-> > > TCP is blocked, MPTCP is blocked as well.
-> > 
-> > Good point!  I don't know well MPTCP but I think you're right.  Given
-> > it's close relationship with TCP and the fallback mechanism, it would
-> > make sense for users to not make a difference and it would avoid bypass
-> > of misleading restrictions.  Moreover the Landlock rules are simple and
-> > only control TCP ports, not peer addresses, which seems to be the main
-> > evolution of MPTCP. >
-> > > 
-> > > I understand that a future goal might probably be to have dedicated
-> > > restrictions for MPTCP and the other stream protocols (and/or for all
-> > > stream protocols like it was before this patch), but in the meantime, it
-> > > might be less confusing considering MPTCP as being part of TCP (I'm not
-> > > sure about the other stream protocols).
-> > 
-> > We need to take a closer look at the other stream protocols indeed.
-> Hello! Sorry for the late reply, I was on a small business trip.
+On Mon, Dec 09, 2024 at 06:54:25PM +0000, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Thanks a lot for this catch, without doubt MPTCP should be controlled
-> with TCP access rights.
+> By definition a type2 cxl device will use the host managed memory for
+> specific functionality, therefore it should not be available to other
+> uses. However, a dax interface could be just good enough in some cases.
 > 
-> In that case, we should reconsider current semantics of TCP control.
+> Add a flag to a cxl region for specifically state to not create a dax
+> device. Allow a Type2 driver to set that flag at region creation time.
 > 
-> Currently, it looks like this:
-> * LANDLOCK_ACCESS_NET_BIND_TCP: Bind a TCP socket to a local port.
-> * LANDLOCK_ACCESS_NET_CONNECT_TCP: Connect an active TCP socket to a
->   remote port.
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Zhi Wang <zhiw@nvidia.com>
+> ---
+>  drivers/cxl/core/region.c | 10 +++++++++-
+>  drivers/cxl/cxl.h         |  3 +++
+>  drivers/cxl/cxlmem.h      |  3 ++-
+>  include/cxl/cxl.h         |  3 ++-
+>  4 files changed, 16 insertions(+), 3 deletions(-)
 > 
-> According to these definitions only TCP sockets should be restricted and
-> this is already provided by Landlock (considering observing commit)
-> (assuming that "TCP socket" := user space socket of IPPROTO_TCP
-> protocol).
-> 
-> AFAICS the two objectives of TCP access rights are to control
-> (1) which ports can be used for sending or receiving TCP packets
->     (including SYN, ACK or other service packets).
-> (2) which ports can be used to establish TCP connection (performed by
->     kernel network stack on server or client side).
-> 
-> In most cases denying (2) cause denying (1). Sending or receiving TCP
-> packets without initial 3-way handshake is only possible on RAW [1] or
-> PACKET [2] sockets. Usage of such sockets requires root privilligies, so
-> there is no point to control them with Landlock.
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index b014f2fab789..b39086356d74 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -3562,7 +3562,8 @@ __construct_new_region(struct cxl_root_decoder *cxlrd,
+>   * cxl_region driver.
+>   */
+>  struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
+> -				     struct cxl_endpoint_decoder *cxled)
+> +				     struct cxl_endpoint_decoder *cxled,
+> +				     bool no_dax)
 
-I agree.
+nit: no_dax should be added to the Kernel doc for this function.
 
-> 
-> Therefore Landlock should only take care about case (2). For now
-> (please correct me if I'm wrong), we only considered control of
-> connection performed on user space plain TCP sockets (created with
-> IPPROTO_TCP).
+Also, I think you need to squash the following patch, which updates
+the caller to use pass the extra argument, into this patch. Or otherwise
+rework things slightly to avoid breaking bisection.
 
-Correct. Landlock is dedicated to sandbox user space processes and the
-related access rights should focus on restricting what is possible
-through syscalls (mainly).
+>  {
+>  	struct cxl_region *cxlr;
+>  
 
-> 
-> TCP kernel sockets are generally used in the following ways:
-> * in a couple of other user space protocols (MPTCP, SMC, RDS)
-> * in a few network filesystems (e.g. NFS communication over TCP)
-> 
-> For the second case TCP connection is currently not restricted by
-> Landlock. This approach is may be correct, since NFS should not have
-> access to a plain TCP communication and TCP restriction of NFS may
-> be too implicit. Nevertheless, I think that restriction via current
-> access rights should be considered.
-
-I'm not sure what you mean here.  I'm not familiar with NFS in the
-kernel.  AFAIK there is no socket type for NFS.
-
-> 
-> For the first case, each protocol use TCP differently, so they should
-> be considered separately.
-
-Yes, for user-accessible protocols.
-
-> 
-> In the case of MPTCP TCP internal sockets are used to establish
-> connection and exchange data between two network interfaces. MPTCP
-> allows to have multiple TCP connections between two MPTCP sockets by
-> connecting different network interfaces (e.g. WIFI and 3G).
-> 
-> Shared Memory Communication is a protocol that allows TCP applications
-> transparently use RDMA for communication [3]. TCP internal socket is
-> used to exchange service CLC messages when establishing SMC connection
-> (which seems harmless for sandboxing) and for communication in the case
-> of fallback. Fallback happens only if RDMA communication became
-> impossible (e.g. if RDMA capable RNIC card went down on host or peer
-> side). So, preventing TCP communication may be achieved by controlling
-> fallback mechanism.
-> 
-> Reliable Datagram Socket is connectionless protocol implemented by
-> Oracle [4]. It uses TCP stack or Infiniband to reliably deliever
-> datagrams. For every sendmsg(2), recvmsg(2) it establishes TCP
-> connection and use it to deliever splitted message.
-> 
-> In comparison with previous protocols, RDS sockets cannot be binded or
-> connected to special TCP ports (e.g. with bind(2), connect(2)). 16385
-> port is assigned to receiving side and sending side is binded to the
-> port allocated by the kernel (by using zero as port number).
-> 
-> It may be useful to restrict RDS-over-TCP with current access rights,
-> since it allows to perform TCP communication from user-space. But it
-> would be only possible to fully allow or deny sending/receiving
-> (since used ports are not controlled from user space).
-
-Thanks for these explanations.  The ability to fine-control specific
-protocol operations (e.g. connect, bind) can be useful for widely used
-protocol such as TCP and UDP (or if someone wants to implement it for
-another protocol), but this approach would not scale with all protocols
-because of their own semantic and the development efforts.  The Landlock
-access rights should be explicit, and we should also be able to deny
-access to a whole set of protocols.  This should be partially possible
-with your socket creation patch series.  I guess the remaining cases
-would be to cover transformation of one socket type to another.  I think
-we could control such transformation by building on top of the socket
-creation control foundation: instead of controlling socket creation, add
-a new access right to control socket transformation.  What do you think?
-
-> 
-> Restricting any TCP connection in the kernel is probably simplest
-> design, but we should consider above cases to provide the most useful
-> one.
-> 
-> [1] https://man7.org/linux/man-pages/man7/raw.7.html
-> [2] https://man7.org/linux/man-pages/man7/packet.7.html
-> [3] https://datatracker.ietf.org/doc/html/rfc7609
-> [4] https://oss.oracle.com/projects/rds/dist/documentation/rds-3.1-spec.html
-> 
-> > 
-> > > 
-> > > 
-> > > > sk_is_tcp() is used for this to check address family of the socket
-> > > > before doing INET-specific address length validation. This is required
-> > > > for error consistency.
-> > > > 
-> > > > Closes: https://github.com/landlock-lsm/linux/issues/40
-> > > > Fixes: fff69fb03dde ("landlock: Support network rules with TCP bind and connect")
-> > > 
-> > > I don't know how fixes are considered in Landlock, but should this patch
-> > > be considered as a fix? It might be surprising for someone who thought
-> > > all "stream" connections were blocked to have them unblocked when
-> > > updating to a minor kernel version, no?
-> > 
-> > Indeed.  The main issue was with the semantic/definition of
-> > LANDLOCK_ACCESS_FS_NET_{CONNECT,BIND}_TCP.  We need to synchronize the
-> > code with the documentation, one way or the other, preferably following
-> > the principle of least astonishment.
-> > 
-> > > 
-> > > (Personally, I would understand such behaviour change when upgrading to
-> > > a major version, and still, maybe only if there were alternatives to
-> > 
-> > This "fix" needs to be backported, but we're not clear yet on what it
-> > should be. :)
-> > 
-> > > continue having the same behaviour, e.g. a way to restrict all stream
-> > > sockets the same way, or something per stream socket. But that's just me
-> > > :) )
-> > 
-> > The documentation and the initial idea was to control TCP bind and
-> > connect.  The kernel implementation does more than that, so we need to
-> > synthronize somehow.
-> > 
-> > > 
-> > > Cheers,
-> > > Matt
-> > > -- 
-> > > Sponsored by the NGI0 Core fund.
-> > > 
-> > > 
-> 
+...
 
