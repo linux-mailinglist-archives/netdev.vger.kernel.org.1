@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-151544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 973139EFF49
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 23:26:49 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 288AC9EFF47
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 23:26:43 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4909163929
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 22:26:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3B8A286F6F
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 22:26:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10FA71DED59;
-	Thu, 12 Dec 2024 22:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC37C1DE3BA;
+	Thu, 12 Dec 2024 22:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="IzJQtv2C"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="E1Vzf4Ik"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A341DE2A9
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 22:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98C01DE2B8
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 22:26:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734042366; cv=none; b=apvtCwot+R9x7zXWCyReNPlQl05yrtydM21aB/Boess0o0PGw2GeQ+D/tgNTCNH/3M1ZzPdwWudO/pGNVZ1PowvohqDC4JHNGmwOsZdFcm/3PQDlDKwRRE6X+YwqFOsPJvt4TYnPI2OoX1SIVH/i7r0G/rZuYN9NS3QbNnCXDC8=
+	t=1734042369; cv=none; b=r9EpuPPZgyo+nCEGAIy6/PPKrRxIhi8W3MwCM6Mtv+k+HdO/+Zuwyxg6DjvmZWDBqkfkiIYC46z+DzKVjStocU12MurLcLcOoaJvF97LT/QSA/REMSsDHwuLc+l/oMXoa5UB0LFrjnDC1uzl8jFIHF0odfT/0Z6XDPvnTpFUgBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734042366; c=relaxed/simple;
-	bh=UCschTUXG8B+cffoozbV5wQmPqrnBlI/jfwv4zqZ4r0=;
+	s=arc-20240116; t=1734042369; c=relaxed/simple;
+	bh=4pB5oOG/al/+veIVNf3erQM8CjNyPQ/J63c0AhLtShg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cgr1+7NFtFd12kY7gJrJwvQvn3wCw1vG4N9gXvq9yacU/Hf5D1r1LJRmAN34vgenIQbins//b2VfR7HVOuNxbiVtzDmwNVWMod+KLKHv7/kr/KBY4rXMG7h35iFztGyOGzKyesjDp19eKvhnmQvMEx8As6fVp/fgJRN0l/BByRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=IzJQtv2C; arc=none smtp.client-ip=209.85.216.45
+	 MIME-Version; b=Ke92qnTdFhIdmNgdQXBm/D7E7VGih+yzFxH9cIirmqPQR/IsIpapbAVfYg0Kl2BLELaerhAu/mFni4ydpZLF1kdWX0Bvk3Zj8672NLRDZ6MDt1YD8JcHREaH0TNihmdBW40GUVXbIxp5ePHcN8hyULMJyEbGJCqwtSCQGYoDFTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=E1Vzf4Ik; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2ee397a82f6so948217a91.2
-        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 14:26:03 -0800 (PST)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7fc88476a02so932253a12.2
+        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 14:26:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1734042363; x=1734647163; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1734042364; x=1734647164; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LnT7YTCnab/Y0VtR9F2A3nXG/fKpdDUTqgBlIhVljlQ=;
-        b=IzJQtv2CVLD4RYsLNhLbrYUfBc4XiMTRv3UCml17HSiafiuklbhyNYJASXAc8R1Cc9
-         z4awu6llXYkpDbDKuBidwkYomhCYAr/pJiKzKBaq8rZiMe+OM+vqawFNN0uzWqbBrWlQ
-         clMdGVlwDD1bD08W3C+KKz8xYz0CEyVEiWBe5i4ugopX2Yh/Uot+6UryYTo6mIbPSDK/
-         0KY0iw+7w9s3X/IThtk/NMhzfphioPXxHKBdYC33UxgusHyXVlioK6UqOJLO8bu/llYv
-         AXzRHprwdclHTok0rBfn1Oua/HI7hhudX0244RiaOHZ01dk49NMWF9XKXxbdUnJ4cl2U
-         283g==
+        bh=HkdI0v71YIIMW/h2nJtvCUZS2CV2DbhWrwQdxX337ug=;
+        b=E1Vzf4IkkujA4EiT2lgDXvzK0hygmm5GlcIiKgCH/eTxnUmO7U1RnI4r4rntCABH5F
+         7JHRjkSlTzFchQZcNGsRMnixgqz1qAPvNNdkeE7ACgR9afZmir6gBClxBhhoAQ4EY8T3
+         t2/ju6U1z0T2zJH7J03m4QmfJ0HcrsKb7DQlDMnRvZbcqknSNkXoBWK600lZ5m7nspmY
+         WW1oU7vo6HgeFcRaPqYkxwF3swDpAF4qvfka5GsSkT6zQTcEO90uWBsNHACYmgq1rXAq
+         k12n2aHhwBClNmA2zGTrivRZvq4jHesnrv/Obz7NICFhxDqcrhTpeAik/xjs1bM6e+8z
+         X2MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734042363; x=1734647163;
+        d=1e100.net; s=20230601; t=1734042364; x=1734647164;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LnT7YTCnab/Y0VtR9F2A3nXG/fKpdDUTqgBlIhVljlQ=;
-        b=qgqs6E+NdTBB2uADYbFjsCHd+MkMRw8O7dsVrveuCalhkg/xJ6xoDT0eZqentXovaa
-         +ZPgEFJ/NaJ2SLWbb3pPB6Wv4DM4wnzR8TH+4/t6IaL6yuyNqalDXQ0fMcftW8Bm6bT/
-         hMZqCkltFf/BgD6IX3pwCis3XKGoOE3jGU2BZjdGcDtF2Cxei6zZToEWH1/5I5hheTzC
-         d9mTSYaAHJnwJikvUj6y2Oy6XHecQgkDk2Sn+5JLB+5r+3lyV6t29ALozgBTkSv5BL4b
-         nwNDj5W9bjlKs3mXhK2nuFJNP3pjhNtbucv/z9qVgECoRNiFIcZyQnG8Agw7q0I2AXMf
-         Gfng==
-X-Gm-Message-State: AOJu0YzS9hC2BTEr0gls7MBSI3vzq5BwJ5CBg9KNViS1JvNikPeFC7Gf
-	7RKMCU1TQms/PqVUAR0U7y+G1EM9f/rSdlBF2V4KexkMDtyzYAbSCwLbdMLkm/nKnYtbpgX954W
-	2
-X-Gm-Gg: ASbGnctS+zLUSSWP+2l2ScFkhOoEJPAwQ+Gg23KC8rhSzzsRkUhW+prKc+9145HXLGt
-	AkVjWATFsD04LuNxsJqVAl3Pc1IFixq334SE7uzDBtBf1eg8l3qYTUoLdn2poXshtVJsL1US2Yi
-	lWJr+dTtwkg5miExH1vT+rxVjwFVZDsWsQveTfigKyLgVlgKJa8a2KE9Q5VX45EoftOfU187G9o
-	hymsVIPGyKqV3wA9mocFWFne9rdL4zsIiFyHAJb8V25dXlZKzDtok5n7zrPO/ODakCpL/nKvry6
-	hXo67kLwsCUn0JPGa/zVQclHo7EdsDSrvw==
-X-Google-Smtp-Source: AGHT+IHRbJGsVtXmnxR2DbD51zEp7URifrcEXlohQ+Vo3lu7hbhAvYp9nPL/6WF4VIyEcs3fR4y7xw==
-X-Received: by 2002:a17:90b:1fc8:b0:2ee:d63f:d77 with SMTP id 98e67ed59e1d1-2f28fb71d6bmr632537a91.9.1734042363308;
-        Thu, 12 Dec 2024 14:26:03 -0800 (PST)
+        bh=HkdI0v71YIIMW/h2nJtvCUZS2CV2DbhWrwQdxX337ug=;
+        b=wujHEgidb9EYwMUTo1TW4VyJj0iL6kf2bHQtR7ykdsTQYRC9OsyjJW8qf2RmGQAcgT
+         1Eps9BIVVZTU4L5UXfUVxMq1c4QM+a0J3HWE53YzRUXwcQmK187s4MB3Y3Y7O6B8DF5z
+         MItfbDUzOEhUeamf+q9z8WDvQQSkwDAOvw3+EH7U+PF99iF/+qY1Xdoj4wWa5nuShp/J
+         6veBghwcXtNkWY5iul+IuHYOOO4h+ei/Ltm4z7/SbkCuLpszs+0VL7KnCoeEh3O2rxmu
+         6TWHvun6NOJ3LwbS7wXT/dwCh1VQXWvu/IoNi8leiSkyTK5C5UMM1pORVA+AHow0nTu8
+         P04Q==
+X-Gm-Message-State: AOJu0Yy5ez1CEZByyGMC0L5PPMcQ+w8XVwXhK1wPN/E8PDdX0w4aHsR8
+	iqreIfGtkZRotdIOjXuGuYPn8+y0h+usWqhxLdxOGhfB9DCSlEq16pmE3GouVAlDTzBtpAPl7Kw
+	c
+X-Gm-Gg: ASbGncvMFzyiivahA9DJgYQfvK8+dVxzelne68lDPzg3LDYnJPEwtCbT7D2E+wfnylj
+	DbOSSe/d5zTxZs5GUbjXFt1paD7jxDf+/y4iUb3WHxg2OGatpRJpfYCkaY6DKh9NSpk9ecYdBfb
+	Q0psNvfni3BezpPfxwIFruDfK1xw5RLZ8zyhtbRwH7ZVLHvr5REY0mU6o+WrzX/+XtxYSPmWdzK
+	3cSc/LhJb6RtDvok/y1VorJrgqAmmeZ1aHmKqwNgOGHBre/J0lVVJA4WCYe+c2Ikac1ETjBYv5V
+	nchYJMC4/S1rpWE0mIg2tIkzxvZw7iWjMA==
+X-Google-Smtp-Source: AGHT+IEF3cK9/mIS3qglYbNQSOh3TM7BWal9zt9c9o68Dmlh/D2NlA7ggmvmIwkqbcNKtI0SOFHeAw==
+X-Received: by 2002:a17:90b:4a0a:b0:2ee:bc1d:f98b with SMTP id 98e67ed59e1d1-2f2901b7dbfmr528459a91.31.1734042364017;
+        Thu, 12 Dec 2024 14:26:04 -0800 (PST)
 Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f142daeb5asm1830071a91.12.2024.12.12.14.26.02
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f142daeb5asm1830071a91.12.2024.12.12.14.26.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2024 14:26:02 -0800 (PST)
+        Thu, 12 Dec 2024 14:26:03 -0800 (PST)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2 5/6] flower: replace XATTR_SIZE_MAX
-Date: Thu, 12 Dec 2024 14:24:30 -0800
-Message-ID: <20241212222549.43749-6-stephen@networkplumber.org>
+Subject: [PATCH iproute2 6/6] uapi: remove no longer used linux/limits.h
+Date: Thu, 12 Dec 2024 14:24:31 -0800
+Message-ID: <20241212222549.43749-7-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20241212222549.43749-1-stephen@networkplumber.org>
 References: <20241212222549.43749-1-stephen@networkplumber.org>
@@ -89,181 +89,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The flower tc parser was using XATTR_SIZE_MAX from linux/limits.h,
-but this constant is intended to before extended filesystem attributes
-not for TC.  Replace it with a local define.
-
-This fixes issue on systems with musl and XATTR_SIZE_MAX is not
-defined in limits.h there.
+Code is now using limits.h instead.
 
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- tc/f_flower.c | 37 ++++++++++++++++++++-----------------
- 1 file changed, 20 insertions(+), 17 deletions(-)
+ include/uapi/linux/limits.h | 21 ---------------------
+ 1 file changed, 21 deletions(-)
+ delete mode 100644 include/uapi/linux/limits.h
 
-diff --git a/tc/f_flower.c b/tc/f_flower.c
-index 3b61c219..6fc2c6a1 100644
---- a/tc/f_flower.c
-+++ b/tc/f_flower.c
-@@ -10,7 +10,7 @@
- #include <unistd.h>
- #include <string.h>
- #include <net/if.h>
--#include <linux/limits.h>
-+
- #include <linux/if_arp.h>
- #include <linux/if_ether.h>
- #include <linux/ip.h>
-@@ -22,6 +22,9 @@
- #include "tc_util.h"
- #include "rt_names.h"
- 
-+/* maximum length of options string */
-+#define FLOWER_OPTS_MAX	4096
-+
- #ifndef IPPROTO_L2TP
- #define IPPROTO_L2TP 115
- #endif
-@@ -1252,7 +1255,7 @@ static int flower_check_enc_opt_key(char *key)
- 
- static int flower_parse_enc_opts_geneve(char *str, struct nlmsghdr *n)
- {
--	char key[XATTR_SIZE_MAX], mask[XATTR_SIZE_MAX];
-+	char key[FLOWER_OPTS_MAX], mask[FLOWER_OPTS_MAX];
- 	int data_len, key_len, mask_len, err;
- 	char *token, *slash;
- 	struct rtattr *nest;
-@@ -1265,7 +1268,7 @@ static int flower_parse_enc_opts_geneve(char *str, struct nlmsghdr *n)
- 		if (slash)
- 			*slash = '\0';
- 
--		if ((key_len + strlen(token) > XATTR_SIZE_MAX) ||
-+		if ((key_len + strlen(token) > FLOWER_OPTS_MAX) ||
- 		    flower_check_enc_opt_key(token))
- 			return -1;
- 
-@@ -1275,7 +1278,7 @@ static int flower_parse_enc_opts_geneve(char *str, struct nlmsghdr *n)
- 
- 		if (!slash) {
- 			/* Pad out mask when not provided */
--			if (mask_len + strlen(token) > XATTR_SIZE_MAX)
-+			if (mask_len + strlen(token) > FLOWER_OPTS_MAX)
- 				return -1;
- 
- 			data_len = strlen(rindex(token, ':'));
-@@ -1288,7 +1291,7 @@ static int flower_parse_enc_opts_geneve(char *str, struct nlmsghdr *n)
- 			continue;
- 		}
- 
--		if (mask_len + strlen(slash + 1) > XATTR_SIZE_MAX)
-+		if (mask_len + strlen(slash + 1) > FLOWER_OPTS_MAX)
- 			return -1;
- 
- 		strcpy(&mask[mask_len], slash + 1);
-@@ -1318,7 +1321,7 @@ static int flower_parse_enc_opts_geneve(char *str, struct nlmsghdr *n)
- 
- static int flower_parse_enc_opts_vxlan(char *str, struct nlmsghdr *n)
- {
--	char key[XATTR_SIZE_MAX], mask[XATTR_SIZE_MAX];
-+	char key[FLOWER_OPTS_MAX], mask[FLOWER_OPTS_MAX];
- 	struct rtattr *nest;
- 	char *slash;
- 	int err;
-@@ -1326,14 +1329,14 @@ static int flower_parse_enc_opts_vxlan(char *str, struct nlmsghdr *n)
- 	slash = strchr(str, '/');
- 	if (slash) {
- 		*slash++ = '\0';
--		if (strlen(slash) > XATTR_SIZE_MAX)
-+		if (strlen(slash) > FLOWER_OPTS_MAX)
- 			return -1;
- 		strcpy(mask, slash);
- 	} else {
- 		strcpy(mask, "0xffffffff");
- 	}
- 
--	if (strlen(str) > XATTR_SIZE_MAX)
-+	if (strlen(str) > FLOWER_OPTS_MAX)
- 		return -1;
- 	strcpy(key, str);
- 
-@@ -1355,7 +1358,7 @@ static int flower_parse_enc_opts_vxlan(char *str, struct nlmsghdr *n)
- 
- static int flower_parse_enc_opts_erspan(char *str, struct nlmsghdr *n)
- {
--	char key[XATTR_SIZE_MAX], mask[XATTR_SIZE_MAX];
-+	char key[FLOWER_OPTS_MAX], mask[FLOWER_OPTS_MAX];
- 	struct rtattr *nest;
- 	char *slash;
- 	int err;
-@@ -1364,7 +1367,7 @@ static int flower_parse_enc_opts_erspan(char *str, struct nlmsghdr *n)
- 	slash = strchr(str, '/');
- 	if (slash) {
- 		*slash++ = '\0';
--		if (strlen(slash) > XATTR_SIZE_MAX)
-+		if (strlen(slash) > FLOWER_OPTS_MAX)
- 			return -1;
- 		strcpy(mask, slash);
- 	} else {
-@@ -1376,7 +1379,7 @@ static int flower_parse_enc_opts_erspan(char *str, struct nlmsghdr *n)
- 		strcpy(mask + index, ":0xffffffff:0xff:0xff");
- 	}
- 
--	if (strlen(str) > XATTR_SIZE_MAX)
-+	if (strlen(str) > FLOWER_OPTS_MAX)
- 		return -1;
- 	strcpy(key, str);
- 
-@@ -1398,7 +1401,7 @@ static int flower_parse_enc_opts_erspan(char *str, struct nlmsghdr *n)
- 
- static int flower_parse_enc_opts_gtp(char *str, struct nlmsghdr *n)
- {
--	char key[XATTR_SIZE_MAX], mask[XATTR_SIZE_MAX];
-+	char key[FLOWER_OPTS_MAX], mask[FLOWER_OPTS_MAX];
- 	struct rtattr *nest;
- 	char *slash;
- 	int err;
-@@ -1406,13 +1409,13 @@ static int flower_parse_enc_opts_gtp(char *str, struct nlmsghdr *n)
- 	slash = strchr(str, '/');
- 	if (slash) {
- 		*slash++ = '\0';
--		if (strlen(slash) > XATTR_SIZE_MAX)
-+		if (strlen(slash) > FLOWER_OPTS_MAX)
- 			return -1;
- 		strcpy(mask, slash);
- 	} else
- 		strcpy(mask, "ff:ff");
- 
--	if (strlen(str) > XATTR_SIZE_MAX)
-+	if (strlen(str) > FLOWER_OPTS_MAX)
- 		return -1;
- 	strcpy(key, str);
- 
-@@ -1433,7 +1436,7 @@ static int flower_parse_enc_opts_gtp(char *str, struct nlmsghdr *n)
- 
- static int flower_parse_enc_opts_pfcp(char *str, struct nlmsghdr *n)
- {
--	char key[XATTR_SIZE_MAX], mask[XATTR_SIZE_MAX];
-+	char key[FLOWER_OPTS_MAX], mask[FLOWER_OPTS_MAX];
- 	struct rtattr *nest;
- 	char *slash;
- 	int err;
-@@ -1442,14 +1445,14 @@ static int flower_parse_enc_opts_pfcp(char *str, struct nlmsghdr *n)
- 	slash = strchr(str, '/');
- 	if (slash) {
- 		*slash++ = '\0';
--		if (strlen(slash) > XATTR_SIZE_MAX)
-+		if (strlen(slash) > FLOWER_OPTS_MAX)
- 			return -1;
- 		strcpy(mask, slash);
- 	} else {
- 		strcpy(mask, "ff:ffffffffffffffff");
- 	}
- 
--	if (strlen(str) > XATTR_SIZE_MAX)
-+	if (strlen(str) > FLOWER_OPTS_MAX)
- 		return -1;
- 	strcpy(key, str);
- 
+diff --git a/include/uapi/linux/limits.h b/include/uapi/linux/limits.h
+deleted file mode 100644
+index c3547f07..00000000
+--- a/include/uapi/linux/limits.h
++++ /dev/null
+@@ -1,21 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+-#ifndef _LINUX_LIMITS_H
+-#define _LINUX_LIMITS_H
+-
+-#define NR_OPEN	        1024
+-
+-#define NGROUPS_MAX    65536	/* supplemental group IDs are available */
+-#define ARG_MAX       131072	/* # bytes of args + environ for exec() */
+-#define LINK_MAX         127	/* # links a file may have */
+-#define MAX_CANON        255	/* size of the canonical input queue */
+-#define MAX_INPUT        255	/* size of the type-ahead buffer */
+-#define NAME_MAX         255	/* # chars in a file name */
+-#define PATH_MAX        4096	/* # chars in a path name including nul */
+-#define PIPE_BUF        4096	/* # bytes in atomic write to a pipe */
+-#define XATTR_NAME_MAX   255	/* # chars in an extended attribute name */
+-#define XATTR_SIZE_MAX 65536	/* size of an extended attribute value (64k) */
+-#define XATTR_LIST_MAX 65536	/* size of extended attribute namelist (64k) */
+-
+-#define RTSIG_MAX	  32
+-
+-#endif
 -- 
 2.45.2
 
