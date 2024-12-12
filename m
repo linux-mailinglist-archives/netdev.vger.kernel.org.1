@@ -1,140 +1,131 @@
-Return-Path: <netdev+bounces-151500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB309EFC85
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 20:29:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 737A69EFC90
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 20:35:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C97128C47D
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 19:29:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33F92289E9B
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 19:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54572199FD3;
-	Thu, 12 Dec 2024 19:29:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B96A41A0AFB;
+	Thu, 12 Dec 2024 19:35:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d8Cw2aVs"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YiIbmGbv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C33168497;
-	Thu, 12 Dec 2024 19:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F96D19D089
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 19:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734031777; cv=none; b=RHacACiAxDDOeOrHpCkFzFB+lyxA6+ti1Ftqu5cCsKt0XFUTrO9PwChkHyVdILQADqGb+IULsJY+5gEhTJfjmjfj1ywSUlMFRky51tbcNn+CpQVyv1mPi0wpoqUrukRJ1JYXlhFpB352lpfsrjLeYSyM99oqgya4QA+rHliZlJ0=
+	t=1734032108; cv=none; b=OI3xAifMhflTuBi5eDfgMss5RiymIn9Jj372j8O8hAX3SxZjSBEPNrPmPCscvWU+o0KsOgNKQqyRNpqjDpvzfH/tDZVtO+C3HXZKYAawUM4iwlEDZm58ijkYP3/YROEL+vhfElUfmoFyQxfgYNpwr9DCV3IWrAOXhGDz+UnAuPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734031777; c=relaxed/simple;
-	bh=WYoQMRv5P87I4hjtnXW8jZn4JiuWP9wJLhfOJzWWED8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=Lb3jUZVJyNcHkpqYeVOQPNfL+449gsR1gZ7RltnfYyebupl25hBlolCKGEKysLQtvbyewlV5M9IYqTFXWqO4dEp270mIlxYBIWhH/SZnfwpun5YuFDwQWtqdz9hOjSUCEu5vWYftBWodLxXBmYpK+HlLE5zM1GD1CmSqZG18vJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d8Cw2aVs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CF19C4CECE;
-	Thu, 12 Dec 2024 19:29:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734031776;
-	bh=WYoQMRv5P87I4hjtnXW8jZn4JiuWP9wJLhfOJzWWED8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=d8Cw2aVsk35SPPPau+WmwKHftXtxOtBGxzABqjUp3VewkjoIOKo8B2KXqKje+JVSP
-	 djTBvJiul67mWCuDNPW4/7UmW1JpZA0Oe5fd7eFxyNc9E3jTYVs++scwAbEKvN2iio
-	 ASWerK5IzlxQVYyY4PM1IgFrHu0PGaU7uXur0la91TTLygMlSjhi0SElqDcrayVRMc
-	 0tYs1Hf43YjllDIP7BU4vZCfLJYJF9u51IjbOaLqSBjARf2gjtT5Lvj9TK90DQ5pmV
-	 rzwfJOkKAeZX8PAqSxmH3Y12S6t6PJiSyxTumghytGk8wMXEJrBvzc6gMccg5kHs/2
-	 saRXMHh0KSqZQ==
-Date: Thu, 12 Dec 2024 13:29:35 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Philipp Stanner <pstanner@redhat.com>,
-	Igor Mitsyanko <imitsyanko@quantenna.com>
-Cc: amien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
-	Basavaraj Natikar <basavaraj.natikar@amd.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Sergey Matyukevich <geomatsi@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Alex Dubov <oakad@yahoo.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Kalle Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>,
-	Allen Hubbe <allenbh@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Chen Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Mostafa Saleh <smostafa@google.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Yi Liu <yi.l.liu@intel.com>, Kunwu Chan <chentao@kylinos.cn>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
-	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-input@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v3 09/11] wifi: qtnfmac: use always-managed version of
- pcim_intx()
-Message-ID: <20241212192935.GA3360239@bhelgaas>
+	s=arc-20240116; t=1734032108; c=relaxed/simple;
+	bh=tnUSTCUCV3YbtAqd+dXe3qV/gXDB7PsdGL/K5e4W2pA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HB7WIQdjyM6t8sANEzuQXyc2CZHwQyIfU8VSxzmjMAJEuhTf5kEecQEwPg1g2mvbVxvouCi73d0EK4AxNlavivEaL2fP52AbVZvaV8qddal2mE0xE/B5mGJ7U2Kf2dr6jm4ZMA3u9hIgCMSs7Krl5do2k0exOjMs1xFs6zaWLhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YiIbmGbv; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8a464155-3115-468b-88f3-5ee81d9e3b84@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734032103;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ojw80EIqrCZctLiiIevFYV0ImOn3GkYm7ZZRe2ml6qY=;
+	b=YiIbmGbvq02j4tFQW/iYxkkovrKCH6HNQAP9clas4o/4rEvI607CAaze9xjfgx+n5ZfJ4R
+	hyjmyDw6JbFegQNF636k+P2RPHbR/Xrf29CQGCwWdaDbxnX2qx2U48ZnNMIEXZMYkeAiGK
+	f8OydmSoHljcnii6UeUMLHm07Bio6Ik=
+Date: Thu, 12 Dec 2024 11:34:52 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241209130632.132074-11-pstanner@redhat.com>
+Subject: Re: [PATCH net-next v4 01/11] net-timestamp: add support for
+ bpf_setsockopt()
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
+ <20241207173803.90744-2-kerneljasonxing@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241207173803.90744-2-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-[cc->to: Igor]
+On 12/7/24 9:37 AM, Jason Xing wrote:
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 6625b3f563a4..f7e9f88e09b1 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -5214,6 +5214,24 @@ static const struct bpf_func_proto bpf_get_socket_uid_proto = {
+>   	.arg1_type      = ARG_PTR_TO_CTX,
+>   };
+>   
+> +static int sk_bpf_set_cb_flags(struct sock *sk, sockptr_t optval, bool getopt)
 
-On Mon, Dec 09, 2024 at 02:06:31PM +0100, Philipp Stanner wrote:
-> pci_intx() is a hybrid function which can sometimes be managed through
-> devres. To remove this hybrid nature from pci_intx(), it is necessary to
-> port users to either an always-managed or a never-managed version.
-> 
-> qtnfmac enables its PCI-Device with pcim_enable_device(). Thus, it needs
-> the always-managed version.
-> 
-> Replace pci_intx() with pcim_intx().
-> 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> Acked-by: Kalle Valo <kvalo@kernel.org>
+It is confusing to take a sockptr_t argument. It is called by the kernel bpf 
+prog only. It must be from the kernel memory. Directly pass the "int 
+sk_bpf_cb_flags" as the argument.
 
-Hoping for an ack from Igor, too.
+> +{
+> +	int sk_bpf_cb_flags;
+> +
+> +	if (getopt)
+> +		return -EINVAL;
+> +
+> +	if (copy_from_sockptr(&sk_bpf_cb_flags, optval, sizeof(sk_bpf_cb_flags)))
 
-> ---
->  drivers/net/wireless/quantenna/qtnfmac/pcie/pcie.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/wireless/quantenna/qtnfmac/pcie/pcie.c b/drivers/net/wireless/quantenna/qtnfmac/pcie/pcie.c
-> index f66eb43094d4..3adcfac2886f 100644
-> --- a/drivers/net/wireless/quantenna/qtnfmac/pcie/pcie.c
-> +++ b/drivers/net/wireless/quantenna/qtnfmac/pcie/pcie.c
-> @@ -204,7 +204,7 @@ static void qtnf_pcie_init_irq(struct qtnf_pcie_bus_priv *priv, bool use_msi)
->  
->  	if (!priv->msi_enabled) {
->  		pr_warn("legacy PCIE interrupts enabled\n");
-> -		pci_intx(pdev, 1);
-> +		pcim_intx(pdev, 1);
->  	}
->  }
->  
-> -- 
-> 2.47.1
-> 
+It is an unnecessary copy. Directly use the "int sk_bpf_cb_flags" arg instead.
+
+> +		return -EFAULT;
+
+This should never happen.
+
+> +
+> +	if (sk_bpf_cb_flags & ~SK_BPF_CB_MASK)
+> +		return -EINVAL;
+> +
+> +	sk->sk_bpf_cb_flags = sk_bpf_cb_flags;
+> +
+> +	return 0;
+> +}
+> +
+>   static int sol_socket_sockopt(struct sock *sk, int optname,
+>   			      char *optval, int *optlen,
+>   			      bool getopt)
+> @@ -5230,6 +5248,7 @@ static int sol_socket_sockopt(struct sock *sk, int optname,
+>   	case SO_MAX_PACING_RATE:
+>   	case SO_BINDTOIFINDEX:
+>   	case SO_TXREHASH:
+> +	case SK_BPF_CB_FLAGS:
+>   		if (*optlen != sizeof(int))
+>   			return -EINVAL;
+>   		break;
+> @@ -5239,6 +5258,9 @@ static int sol_socket_sockopt(struct sock *sk, int optname,
+>   		return -EINVAL;
+>   	}
+>   
+> +	if (optname == SK_BPF_CB_FLAGS)
+> +		return sk_bpf_set_cb_flags(sk, KERNEL_SOCKPTR(optval), getopt);
+> +
+>   	if (getopt) {
+>   		if (optname == SO_BINDTODEVICE)
+>   			return -EINVAL;
 
