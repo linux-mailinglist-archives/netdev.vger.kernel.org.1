@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-151271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9E6F9EDD6D
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 03:11:58 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECC889EDD76
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 03:13:52 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7CF52826A8
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 02:11:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 043FD1887004
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 02:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2303613B791;
-	Thu, 12 Dec 2024 02:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EDB13B29B;
+	Thu, 12 Dec 2024 02:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gq7lkd7j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aSILkdTa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFDE139D1B
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 02:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF7513AD38;
+	Thu, 12 Dec 2024 02:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733969510; cv=none; b=bIb5lCzIcq8af5rYFKLxklU00uBg2dwxvkSVx9v8wD0IF4Fhyf/FltbbgIWCJozITdjnPiHO6Ti7EvPdZNbYRx2ny6bv51J6G21/a7mqhm1nTe0ax5x42KR8wQl5MOLBwj0AWyqb445FPqL+J7tjSEtUQh6Wxs5dHfmKRhPzM4Y=
+	t=1733969624; cv=none; b=bCR/xZ4Rn62o+76xsm6TZHTLPLs/HxKJlOnP+LovUIMTlCN+yK0CiA4pDThtsbpCTQgaAvLMc2XbGkBr4u+cw8Fyf3EwRqjdk5S/tDAyOnbNVU/EWITV0/b9rYOaaBueken18Ea4i59aUEPl6TAX1uasLanrddSx0gpvCluEE24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733969510; c=relaxed/simple;
-	bh=u4Ab/RrhNENWre9NH1ASUMwA1i2WxPNZzyYljqFy7zU=;
+	s=arc-20240116; t=1733969624; c=relaxed/simple;
+	bh=WOJIxkXJBdrspcO3VMmxK/S//FZEKVoFBrjn6HEY44s=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sPjylq9EvQcVw3fA1/TZ933BiDrDAEZm6Fo+qJTPQ+4miXtUaiCZSlyyTG0iRzZMWhmo9Ri8KmAwwWVg3sNVLNHTKkHTT5UXqSBH1+Np+IbJPm2/qZJhUX0SfnJ5Dutj3SChCi4IQY19C4uh8nCDf8p0dAHvxl0bl7fONH+ymTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gq7lkd7j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17CFEC4CEDD;
-	Thu, 12 Dec 2024 02:11:49 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cwTAKMgAsprMHuNeDoPfudij8srh6OSOjlmQPUWUuRuOJdeROE78gPUJRVVMxsidcrCtOUYSbBl958n64Ug5C7OieWcAs2DkmGE5eNjlIJ0x5PRqr2/MPVq05hfk8dWIHXXJ8vBJCbZwgJTslBVsUtL4DkEp9IR3r1j9T7+En0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aSILkdTa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E6D6C4CED7;
+	Thu, 12 Dec 2024 02:13:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733969509;
-	bh=u4Ab/RrhNENWre9NH1ASUMwA1i2WxPNZzyYljqFy7zU=;
+	s=k20201202; t=1733969623;
+	bh=WOJIxkXJBdrspcO3VMmxK/S//FZEKVoFBrjn6HEY44s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Gq7lkd7jPGIBym0vqjBJiH0mvdOTP7DSLDCUrdIql9yYLAk32kzuz18q6xCIkJda5
-	 fdcDyi8Se8xk84BktYyvSYt6/8Xqf/Ai965mzhwUEOeb1oyj1N41cc14UbFCq0eGLx
-	 LRbL9YSnJMzHSjpHKh4g2TpUtM6U8qdF8M1RCPYMMOiKFQUYmkd0QQIhlSYGh6Hct5
-	 6BpAzIcltwqDlauibhGFOWgqtgeoNeciSroGCWIIaMJ1YYFW4FWGsVCNZ9Kv112bCx
-	 7KDeMmwcZEkLfYGNeQyPszWk5TDsGUz1+S2pnRsgGG1QZ0lKcCx0yyYsbrwXhNoHB+
-	 yVGF0+CSZpjtg==
-Date: Wed, 11 Dec 2024 18:11:47 -0800
+	b=aSILkdTaynAPT4X3BKGT5TM4VbpS7yk9SKMYOpPHZB4gVjqm3BSCeaIJynG6Dfo25
+	 6zWR77afNbN7y6yxs6CNCOPwi8oz/3MkBvprKhOo2isSAJ7XE0cmCEFaENmmphrYTS
+	 xlDarbTq8zC9qoo/zfvmtQycFpWf3Kqj84AnaO3Qb8Q4hxFrUkQyB1Ud0+geY74OId
+	 j84w1/A7WAsJ4jPNXhodTPqdQTkirq1U4qjCDMLBis8LPpq3BgcFnMgr+0UM1JiiE1
+	 1hFDTaYPfwaX3kD4ueM83sahQer3tGm7k5D6CVdB4E2vJ3X8rN4Oh4edzIry8VrN/l
+	 tGxGRvN5oYpnw==
+Date: Wed, 11 Dec 2024 18:13:42 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Szapar-Mudlaw, Martyna" <martyna.szapar-mudlaw@linux.intel.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, horms@kernel.org,
- jiri@resnulli.us, stephen@networkplumber.org, anthony.l.nguyen@intel.com,
- jacob.e.keller@intel.com, przemyslaw.kitszel@intel.com,
- intel-wired-lan@lists.osuosl.org
-Subject: Re: [RFC 0/1] Proposal for new devlink command to enforce firmware
- security
-Message-ID: <20241211181147.09b4f8f3@kernel.org>
-In-Reply-To: <b3b23f47-96d0-4cdc-a6fd-f7dd58a5d3c6@linux.intel.com>
-References: <20241209131450.137317-2-martyna.szapar-mudlaw@linux.intel.com>
-	<20241209153600.27bd07e1@kernel.org>
-	<b3b23f47-96d0-4cdc-a6fd-f7dd58a5d3c6@linux.intel.com>
+To: Jan Stancek <jstancek@redhat.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>, stfomichev@gmail.com,
+ pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
+ horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] tools: ynl: provide symlinks to user-facing
+ scripts for compatibility
+Message-ID: <20241211181342.31676ec4@kernel.org>
+In-Reply-To: <CAASaF6wcW54MwR-CdR_bfXRJS+ar0y87g7FN1_T6qLVJX0Ti6A@mail.gmail.com>
+References: <cover.1733755068.git.jstancek@redhat.com>
+	<ce653225895177ab5b861d5348b1c610919f4779.1733755068.git.jstancek@redhat.com>
+	<20241210192650.552d51d7@kernel.org>
+	<CAD4GDZzwVhiJjJ=dqXMSqN39EeVBrUbO3QYB=ZhrExC86yybNg@mail.gmail.com>
+	<CAASaF6wcW54MwR-CdR_bfXRJS+ar0y87g7FN1_T6qLVJX0Ti6A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,38 +65,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 11 Dec 2024 13:15:06 +0100 Szapar-Mudlaw, Martyna wrote:
-> This patch does not aim to introduce a new security mechanism, rather, 
+On Wed, 11 Dec 2024 13:42:28 +0100 Jan Stancek wrote:
+> > > Did someone ask for this? Does everything work without the symlinks?
+> > > If the answers are "no", "yes" then let's try without this patch.
+> > > In tree users should be able to adjust.  
+> >
+> > I asked for the symlinks for cli.py and ethtool.py to avoid surprising
+> > people when they move. The ynl-gen- scripts are primarily used in-tree
+> > via Makefiles so I didn't think they should be symlinked. Happy to go
+> > with your suggestion to drop this if you'd prefer not to have any
+> > symlinks.  
+> 
+> I'll drop them, we can always add them later in case someone
+> _really_ needs original script locations.
 
-What I was referring to when I said "devlink doesn't have a suitable
-security model" is that we have no definition of what security guarantees
-we provide. Nothing in devlink is authenticated at all. 
-
-Anti-rollback is fundamentally about preventing FW compromise.
-How do you know that the FW is not compromised with devlink?
-
-> it enables users to utilize the controller's existing functionality. 
-> This feature is to provide users with a devlink interface to inform the 
-> device that the currently loaded firmware can become the new minimal 
-> version for the card. Users have specifically requested the ability to 
-> make this step an independent part of their firmware update process.
-
-I know, I've heard it for my internal users too. Vendors put some
-"device is secure" checkbox and some SREs without security training
-think that this is enough and should be supported by devlink.
-
-> Leaving in-tree users without this capability exposes them to the risk 
-> of downgrades to older, released by Intel, but potentially compromised 
-> fw versions, and prevents the intended security protections of the 
-> device from being utilized.
-> On the other hand always enforcing this mechanism during firmware 
-> update, could lead to poor customer experiences due to unintended 
-> firmware behavior in specific workflows and is not accepted by Intel 
-> customers.
-
-Please point me to relevant standard that supports locking in security
-revision as an action separate from FW update, and over an insecure
-channel.
-
-If you can't find one, please let's not revisit this conversation.
+FWIW that's my thinking, too.
 
