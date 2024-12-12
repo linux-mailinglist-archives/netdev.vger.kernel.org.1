@@ -1,73 +1,96 @@
-Return-Path: <netdev+bounces-151287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 127099EDE74
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 05:28:47 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E849EDE76
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 05:30:19 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3718167E5D
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:28:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CDF5281183
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AC414A627;
-	Thu, 12 Dec 2024 04:28:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 531A6153800;
+	Thu, 12 Dec 2024 04:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vCzq9tZ5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ahauCRda"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0C07DA88
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 04:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271DD126BEE;
+	Thu, 12 Dec 2024 04:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733977723; cv=none; b=RiBu0TCyia+yvckMvMyk3pXjzTk7D8tt/LAqk81Zex4midZncNK+GyPzGw13Wd7zfm1BTrRy2+07gebp2a/tC/WMAhUxF6vTs/h5T4icwMtGDRs0snLnaMKBFNwQHl6wgmNYyGLAX6n1qjvTXNz7x2dcgay6PN7C8aeAa7loZ+I=
+	t=1733977815; cv=none; b=gw9zDboyYr5RbtrNCQ9/12JoKjoD+/FHdtvVabls/M44vU8t5XSEJnGSP8J8sLiTau5/hN85KQgjM1NSM83cXujKPpEWL92BDx+PSzNy9IvoY5fraXLzWzIIIjHHe03LX+7X/6+JOXWS27U4b9X1sRWk1D7YLhq3pv+fVlf0cAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733977723; c=relaxed/simple;
-	bh=0yDzkkBU5zyRc7jKfO2KTV2GfwFLne4mqvqyS0+ZMLA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B4rVzU/tLtn03DiSuIQPERAZoI58O9Se64eu1MOTriVJ2iSNMxZCQkAEbz7lZOwoCimQsENorCoY21xcu8G+VerJDH7csZT13OH+KigxxxsM15mBxsKhFr8i4RFwQ6dVaXmrmsrn3qwv0Pv1MCCY5GzJzZbrU1vLOaHIKBz8TuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vCzq9tZ5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B994C4CECE;
-	Thu, 12 Dec 2024 04:28:41 +0000 (UTC)
+	s=arc-20240116; t=1733977815; c=relaxed/simple;
+	bh=VyVWym0UcOZvSvQWz5iVZz6QF6qf+TE74PpOyTlvUSc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Dt7yLPuLYimGhHdw7nq1wQmSnqPZjL4i5i5+hkV9MB8walKOF6c+Cbeep/5Hb7EeBZwE8zpx8BgkvnKvH2vi+3b3srTUfKKF4b7KkYZwFvvd0CHRF3LzQhShRIz7dJdYG4zWaLTDv2jdCfJVDwJtd22pAJ4YO8gaqVmwPhulHzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ahauCRda; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A264FC4CECE;
+	Thu, 12 Dec 2024 04:30:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733977721;
-	bh=0yDzkkBU5zyRc7jKfO2KTV2GfwFLne4mqvqyS0+ZMLA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vCzq9tZ5/oxGknMZ5NsjHelgn373rDrWm39LGizIvEa6z6jrjbctsWQBRBv8MLQQi
-	 6wLnj2vFoe5QfbyKrQDgIkD8mt1nMLQyfKu1T2C58VK54JPhd1rmXf3ZK/iRfX2EQ1
-	 TVpZ2rLDdGcOHSsQF//SPyr0iNY78Xo9BIAMR5m+REOnH3z2idwa0i/7EuMxMkRuVG
-	 G728iRWyyjOYKPGVd/S2em5EfRSqPUKZQwjaLnylwVQQWRgJbK6lIxFHfwMuLoLdQv
-	 XVF5HlOr61W6R6YhNbugh1/DggdM3XwbTlKDZbZLiGruUYHHT2Ssu2n6wLAMUrhUv5
-	 84FIqlyLpUfkg==
-Date: Wed, 11 Dec 2024 20:28:40 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Shannon Nelson <shannon.nelson@amd.com>, <netdev@vger.kernel.org>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <andrew+netdev@lunn.ch>, <brett.creeley@amd.com>
-Subject: Re: [PATCH net 1/3] ionic: Fix netdev notifier unregister on
- failure
-Message-ID: <20241211202840.05c0a461@kernel.org>
-In-Reply-To: <564b9d98-4d64-40ab-a523-4487712430dd@intel.com>
-References: <20241210174828.69525-1-shannon.nelson@amd.com>
-	<20241210174828.69525-2-shannon.nelson@amd.com>
-	<564b9d98-4d64-40ab-a523-4487712430dd@intel.com>
+	s=k20201202; t=1733977814;
+	bh=VyVWym0UcOZvSvQWz5iVZz6QF6qf+TE74PpOyTlvUSc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ahauCRdaB+w25fxR4VV7wEmkW+2DLbHexQzySGhhoLHMgb9wK9gFpz256YU7/HqT/
+	 MvpapZqiN7EVkT8fsmPD1I8EtsjJMZWjMJSugBBSUit41XlIMN3RxXV4zqgOMCYsQ9
+	 rgAR9guLRsDlUGxXNamLI16HW1seicKtyHcYPOFM8XekgtJZH+stqXNN76B9l+58oR
+	 voCEyB+2oUsGV7IohaB0znu/QcQiACeLv476x1Kc1SHK8vFcWI3WyB2UOCFUr2bHms
+	 xLS8udATRtlcVHcGSoYkqXw3pq78JGLFbWFBh5khJWs7yVwKu+TG7Rhde09b9xJ392
+	 u1nwcNIm6Ym5g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB29F380A959;
+	Thu, 12 Dec 2024 04:30:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] splice: do not checksum AF_UNIX sockets
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173397783066.1847197.14863491347323512309.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Dec 2024 04:30:30 +0000
+References: <Z1fMaHkRf8cfubuE@xiberoa>
+In-Reply-To: <Z1fMaHkRf8cfubuE@xiberoa>
+To: Frederik Deweerdt <deweerdt.lkml@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuniyu@amazon.com,
+ mhal@rbox.co, dhowells@redhat.com, linux-kernel@vger.kernel.org,
+ xiyou.wangcong@gmail.com, David.Laight@ACULAB.COM, jdamato@fastly.com,
+ stable@vger.kernel.org
 
-On Tue, 10 Dec 2024 12:59:31 -0800 Jacob Keller wrote:
-> I'm not certain about the inclusion of cleanup to drop unused code in
-> the same commit as an obvious fix. 
+Hello:
 
-+1, please separate the nb_work removal to a net-next commit
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 9 Dec 2024 21:06:48 -0800 you wrote:
+> When `skb_splice_from_iter` was introduced, it inadvertently added
+> checksumming for AF_UNIX sockets. This resulted in significant
+> slowdowns, for example when using sendfile over unix sockets.
+> 
+> Using the test code in [1] in my test setup (2G single core qemu),
+> the client receives a 1000M file in:
+> - without the patch: 1482ms (+/- 36ms)
+> - with the patch: 652.5ms (+/- 22.9ms)
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net] splice: do not checksum AF_UNIX sockets
+    https://git.kernel.org/netdev/net/c/6bd8614fc2d0
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
