@@ -1,134 +1,105 @@
-Return-Path: <netdev+bounces-151265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 943449EDCEE
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 02:09:01 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53EC39EDD04
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 02:21:36 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7D0318892FC
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 01:21:35 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621C342AA9;
+	Thu, 12 Dec 2024 01:21:31 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDBCE282E22
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 01:08:59 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF7517C68;
-	Thu, 12 Dec 2024 01:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AvhNcRpL"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186631E53A
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 01:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E27225A8;
+	Thu, 12 Dec 2024 01:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733965737; cv=none; b=WW1ToGu5Q7xAsJzvG9sY6rkb28YUBEnwcNfN9PG40I+ycAgh21V6U2OoJf+Xt1RuKTerAGH2HH00zDYj0JEhO2E/E/mmzNXitcyq0ANnD7zkS6rJ8zAOqaL5QzCBBFvUVIdwpGPXLj71Cz5xUj93YnKsDjNYMJ6znVm2Babl69Q=
+	t=1733966491; cv=none; b=OM4yeEvXoANQuNrwLGbCmIgxOkspnDdecBk/XZDj3OnnMpSP9ltx/BO5LcDpxrGbgd07AZzeIeLMsykaDnR3ocolMxDRg7f4nk3aRt3yFI6MnNnxp8XCsYwMPtUjhKITIat6N9MYn7UGCcIzgLTqruL4zWhECjojwGOLh/ZcRuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733965737; c=relaxed/simple;
-	bh=EoyweFmVj+YjPrtVOIm7w87frPQQrBdb2qTM1lLqKjA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m6T3VJiCNxXHCdbqC2Bp1x1wU59IsPVIQVQrjGf0wUaKt1YYT5l6czVfddk+xMhw99ZEvibJ7H997KM7/97oS1kGOvQ7/vWH5hcRBbuz6K2uSAntPUTL+ObR+eq2VAcFN9C9fTg+gY8tfZmnuvJ0mkQVHyEIkJ8FPLevK+zIZXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AvhNcRpL; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3a9caa3726fso270885ab.1
-        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 17:08:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733965735; x=1734570535; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EoyweFmVj+YjPrtVOIm7w87frPQQrBdb2qTM1lLqKjA=;
-        b=AvhNcRpLuDSR1W0IPBcUaantK+P8nYAxlh4SmLYEZtyuje2fagRfJ00r8n7wlr+zEF
-         xifXNjMeGK3hWDg4U2XNX5YJUT63EPUFTxwo5VobEcj2sHItHUKuSwqblOG+J8mBuKvm
-         dWHmAkToeLNMYWeKOfB66B/jIRC7MMn8qdalqOI62it6u5DPU04adYZT1g9zPrSNEA15
-         QKdwFWQ4N4vUP1PzKkp47A3e3K5nXidCrE6EDwV0Qsgb8DVmB8vo/M/vQwbczgEwN9FE
-         eayV+eMt0LLeicQA+XDCX3CejNZGtWxyhm3qpY+M3J8bW2jO3318tIVDsWy3xNIj9FZv
-         FZnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733965735; x=1734570535;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EoyweFmVj+YjPrtVOIm7w87frPQQrBdb2qTM1lLqKjA=;
-        b=u0RKe23RG57ORa/roIfr5NzTLSFxjDtSkH2ys9r7g/w+Y2dUsTn9LUnYuBQu0/pbRQ
-         /j6PPYPaWUYCHLFHNSaENkazterUNNEEzZYNesPSNUoUreoT+7oXNlIEJ+xTQljeAkb5
-         sbK/RjG/EXj/ZpVi4PMNC+SD+5zRSCItDb2KsvhtO1O419qoteecggxhS3TQ0yhKlsDC
-         zCl1SwwoIlk7XZIM0UEb+/BWNyGiVihtghukfD7kkMx4e5Vpt4QSdFOZuUlDnhSmt5s7
-         XPRFIDWQHugBbc+mzKuhI0ZTCGXCR4nxn+fNg/qdoIAulaFla35WDa99BrNWt3Jo5iKn
-         zzkA==
-X-Gm-Message-State: AOJu0YxTjjnS7zCttzrylwjeURQD6WDUoTk4S4G43muQEvm0vxaDjpca
-	Byf1dhammVX1vVattWy+0K0Xo898U9dnEY3lIAsYFzG1ItlN6veJKiIShul3josJXavLJhwdLW2
-	GbRMj5jrHgGROz74VnggS0x9PqgQZnZJ93S4=
-X-Gm-Gg: ASbGncvA4ShCj+mzW4dIhqhOpbPZcjfaM5aN/iYZ1i72OKKZVpYW2i+f8Up6F1fVbbH
-	CTtB2oJDVixB9AWaXzTothEvZFCSZ74UhpDB/
-X-Google-Smtp-Source: AGHT+IHI2/dVrgOJHj9ymgA+6BKxRHJGFHi2veXDYIZcERHkMy84hN7uCFisty6rsEHmgtH6IpOuADO/Xwt3nZN/tYA=
-X-Received: by 2002:a92:d409:0:b0:3a8:16c2:3772 with SMTP id
- e9e14a558f8ab-3ac5e6390b8mr13873325ab.0.1733965735158; Wed, 11 Dec 2024
- 17:08:55 -0800 (PST)
+	s=arc-20240116; t=1733966491; c=relaxed/simple;
+	bh=TMW033nVrGyiTEV4a/l0sGFVH3R2oR6fu0kElFUfkVo=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ETgbr6d16erRC8qeq9zaeds5s4KJy0byKh0AFAMs2NpWQqjg+v7yDwYX0Netls4MAnOqrs+nat8y7QbVebNWFpGCziZp/zKIXyf/q+KIh9FvvXKHKvZvg8O8OIj5Te1sKhxsquGj7R6QMV/aGr3yCWM3mY1k9lHcuUQHRFdvN2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Y7vkN3cYBz1kvcv;
+	Thu, 12 Dec 2024 09:18:52 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id DA441140156;
+	Thu, 12 Dec 2024 09:21:18 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 12 Dec 2024 09:21:17 +0800
+Message-ID: <74eae7ad-151c-4dd4-a14d-44da0d000e54@huawei.com>
+Date: Thu, 12 Dec 2024 09:21:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241209-jakub-krn-909-poc-msec-tw-tstamp-v2-0-66aca0eed03e@cloudflare.com>
- <20241209-jakub-krn-909-poc-msec-tw-tstamp-v2-2-66aca0eed03e@cloudflare.com>
-In-Reply-To: <20241209-jakub-krn-909-poc-msec-tw-tstamp-v2-2-66aca0eed03e@cloudflare.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 12 Dec 2024 09:08:19 +0800
-Message-ID: <CAL+tcoAX2zMStiEkOkvJDr-PLCM3fC8JwHZyxnOToQCPfMq43w@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/2] tcp: Add sysctl to configure TIME-WAIT
- reuse delay
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Adrien Vasseur <avasseur@cloudflare.com>, Lee Valentine <lvalentine@cloudflare.com>, 
-	kernel-team@cloudflare.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<gregkh@linuxfoundation.org>, <shenjian15@huawei.com>,
+	<wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
+	<libaihan@huawei.com>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<hkelam@marvell.com>
+Subject: Re: [PATCH V6 net-next 1/7] net: hibmcge: Add debugfs supported in
+ this module
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20241210134855.2864577-1-shaojijie@huawei.com>
+ <20241210134855.2864577-2-shaojijie@huawei.com>
+ <20241211060018.14f56635@kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20241211060018.14f56635@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On Tue, Dec 10, 2024 at 3:38=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.co=
-m> wrote:
->
-> Today we have a hardcoded delay of 1 sec before a TIME-WAIT socket can be
-> reused by reopening a connection. This is a safe choice based on an
-> assumption that the other TCP timestamp clock frequency, which is unknown
-> to us, may be as low as 1 Hz (RFC 7323, section 5.4).
->
-> However, this means that in the presence of short lived connections with =
-an
-> RTT of couple of milliseconds, the time during which a 4-tuple is blocked
-> from reuse can be orders of magnitude longer that the connection lifetime=
-.
-> Combined with a reduced pool of ephemeral ports, when using
-> IP_LOCAL_PORT_RANGE to share an egress IP address between hosts [1], the
-> long TIME-WAIT reuse delay can lead to port exhaustion, where all availab=
-le
-> 4-tuples are tied up in TIME-WAIT state.
->
-> Turn the reuse delay into a per-netns setting so that sysadmins can make
-> more aggressive assumptions about remote TCP timestamp clock frequency an=
-d
-> shorten the delay in order to allow connections to reincarnate faster.
->
-> Note that applications can completely bypass the TIME-WAIT delay protecti=
-on
-> already today by locking the local port with bind() before connecting. Su=
-ch
-> immediate connection reuse may result in PAWS failing to detect old
-> duplicate segments, leaving us with just the sequence number check as a
-> safety net.
->
-> This new configurable offers a trade off where the sysadmin can balance
-> between the risk of PAWS detection failing to act versus exhausting ports
-> by having sockets tied up in TIME-WAIT state for too long.
->
-> [1] https://lpc.events/event/16/contributions/1349/
->
-> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+on 2024/12/11 22:00, Jakub Kicinski wrote:
+> On Tue, 10 Dec 2024 21:48:49 +0800 Jijie Shao wrote:
+>> +		debugfs_create_devm_seqfile(dev, hbg_dbg_infos[i].name,
+>> +					    root, hbg_dbg_infos[i].read);
+> Like I said last time, if you devm_ the entire folder you don't have to
+> devm_ each individual file. debugfs_remove_recursive() removes all files
+> under specified directory.
 
-Thanks. I feel this will benefit a certain group of people soon :)
+I think debugfs_create_devm_seqfile()is a better choice, if not use it.  and I might need to code like so： static const struct file_operations 
+hbg_dbg_fops = { .owner = THIS_MODULE, ... }; static int 
+hbg_dbg_file_init(struct hbg_priv *priv, u32 cmd, const char *name) { 
+struct hbg_dbg_pri_data *data; data = devm_kzalloc(&priv->pdev->dev, 
+sizeof(*data), GFP_KERNEL); if (!data) return -ENOMEM; data->priv = 
+priv; data->cmd = cmd; debugfs_create_file(name, HBG_DBG_FILE_MODE, 
+priv->debugfs.root, data, &hbg_dbg_fops); return 0; } int 
+hbg_debugfs_init(struct hbg_priv *priv) { ... for (i = 0; i < ARRAY_SIZE(hbg_dbg_infos); i++) { ret = hbg_dbg_file_init(priv, i, hbg_dbg_infos[i].name); ... } But use debugfs_create_devm_seqfile(), I only need：void hbg_debugfs_init(struct hbg_priv *priv)
+{
+...
+	for (i = 0; i < ARRAY_SIZE(hbg_dbg_infos); i++)
+		debugfs_create_devm_seqfile(dev, hbg_dbg_infos[i].name,
+					    root, hbg_dbg_infos[i].read);
+
+
+Actually i think debugfs_create_devm_seqfile() is actually similar to hbg_dbg_file_init().
+And in debugfs_create_devm_seqfile(), debugfs_create_file() is also called, and the code is simplified.
+
+Thanks,
+Jijie Shao
+
+
+
 
