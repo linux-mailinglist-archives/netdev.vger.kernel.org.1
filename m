@@ -1,61 +1,63 @@
-Return-Path: <netdev+bounces-151461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 662819EF6EC
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 18:30:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F3AE9EF755
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 18:33:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32931188EBA9
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:14:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BB10189823D
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01CB122333B;
-	Thu, 12 Dec 2024 17:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 391F52153DD;
+	Thu, 12 Dec 2024 17:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RwKKIrNB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k0yGXDF3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6349E2210DB;
-	Thu, 12 Dec 2024 17:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119542144C4;
+	Thu, 12 Dec 2024 17:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734023623; cv=none; b=ARr9juBGdT2+BZ2vnesZe7+gowmcsfGAGFafz2t3Hrt10YsX6MwlL3//9PJNh6GJFSqkFRFfL3b03Oqc20W0NsrNSlZ0vOVfMN3AadkzD4/ezmXi2I0GOr8Z/92kQE3qGYx/qkLKuPfo3yNzHQBi5SX2W2DiyBfIziQRKxlnqzQ=
+	t=1734024029; cv=none; b=lQ53af0zsRymuRgLWYG3Rf5vFOxr/mi+TTlSwNBoudlCdkPoO6JC4bwOKJo0conIGQZ3ZxfsEe08ZJU1QqGh9gNFVwndvnuRuGYlbnhyE0JFGsUGumPstOnn3jh0iV1GgSOF+rlW5bmHlMazT056YDAPHi08AQr9MShbSC2r72U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734023623; c=relaxed/simple;
-	bh=TU4Atp3xw3sNd3X+Ksrq/CI/MSf/mtoPSGERKj4eB0Q=;
+	s=arc-20240116; t=1734024029; c=relaxed/simple;
+	bh=Zmi6Nqj5VlEtvbHsIMFgxSwXD4Xweuc8qDZ0pWDc0W0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eOnme9heEzic4lC8K4hWlSDim+RuhPl3H+HwPm7lfLiDxOnO5WHiZjvsQRHMKczSSKkc2rPtC6ctCrLUHoP6FByJKYd4y/XRJZ0DG5Ysh0CSt4wnZAfl+kmlAe9PAGI5nSWxysCbPgyDPr68AGjvpq7DrT30Bh1WaQnGtFUlBco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RwKKIrNB; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=X8q2rrm1SuS3vpSan9xVzw55JIuApZMl/xTXFlxS3L0=; b=RwKKIrNB9/Trt2hKXqhBi2StpC
-	iO1Zp9U5KD7eeRCHkEnCdLnQLE0YKTiwBCJtiVa/kop133DWouBD4xmRXs2tjUHIoThPqDX1smuu7
-	4LyBvuYU83VWKpX1Sn0tFkjoBFOpHUhtmPQCyoe8tGsu0CkezR8CjqTCIzpkbHzNDRyU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tLmkZ-000EYk-86; Thu, 12 Dec 2024 18:13:19 +0100
-Date: Thu, 12 Dec 2024 18:13:19 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	tsbogend@alpha.franken.de, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, markus.stockhausen@gmx.de,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-mips@vger.kernel.org
-Subject: Re: [PATCH 1/4] dt-bindings: net: Add Realtek MDIO controller
-Message-ID: <77817fd0-cf79-4c4f-b09f-8ee9b3b136f9@lunn.ch>
-References: <20241211235342.1573926-1-chris.packham@alliedtelesis.co.nz>
- <20241211235342.1573926-2-chris.packham@alliedtelesis.co.nz>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZoNLYrefh45L8o8ExGGn7TdthjI8UPH8ExEOPz1Sju/B54SMaIg7vv7S+1mrXd89JEwbqcrSJVU1vtTAOosu2zS1zIYZc9LHSGMZMkHrGRMk+gcBgWomlu/Vjj35DbUoDw1eaT7GMwiF7gbgm5YSgts/NPKNUsL8fOjCQG+BEZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k0yGXDF3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D940C4CECE;
+	Thu, 12 Dec 2024 17:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734024028;
+	bh=Zmi6Nqj5VlEtvbHsIMFgxSwXD4Xweuc8qDZ0pWDc0W0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k0yGXDF37bZfqsK7XsQJqVJWkuxpw0QXp6FyFtnebf9Xk5hO+P8yL5dtx8p4SVxVH
+	 XwoBfH8R+1HNwt8oNp1fXXQbTx9mefYVLFDXbeejXT99ZBS93wJFQOsc40+RbUMHsQ
+	 Jr4odxJI41x7DQW0Tj/aHBNiJa0zhD4pgdXpLq2J0zkgbPENea8oVSxDJrVgqpQhbm
+	 opDIYlH1DZIXL5YbrAQzmLfIp5ep76ixkt/QdJmJJUMHh+jGLTrPMtpF3e4W7ilHf1
+	 9TwQ8Fl9jG1/6gDSvHMOTRWZNRNr7+7zjueLDSw6GAEMw04FkWZ6cewaWVCsMLU/z3
+	 LVGMnQRCcEpYA==
+Date: Thu, 12 Dec 2024 17:20:24 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Leon Romanovsky <leonro@nvidia.com>, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	linux-rdma@vger.kernel.org, Moshe Shemesh <moshe@nvidia.com>,
+	Yevgeny Kliteynik <kliteyn@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>
+Subject: Re: [PATCH net-next 04/12] net/mlx5: fs, add counter object to flow
+ destination
+Message-ID: <20241212172024.GD73795@kernel.org>
+References: <20241211134223.389616-1-tariqt@nvidia.com>
+ <20241211134223.389616-5-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,19 +66,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241211235342.1573926-2-chris.packham@alliedtelesis.co.nz>
+In-Reply-To: <20241211134223.389616-5-tariqt@nvidia.com>
 
-> +      realtek,smi-address:
-> +        $ref: /schemas/types.yaml#/definitions/uint32-array
-> +        description: SMI interface and address for the connected PHY
-> +        items:
-> +          - description: SMI interface number associated with the port.
-> +          - description: SMI address of the PHY for the port.
+On Wed, Dec 11, 2024 at 03:42:15PM +0200, Tariq Toukan wrote:
+> From: Moshe Shemesh <moshe@nvidia.com>
+> 
+> Currently mlx5_flow_destination includes counter_id which is assigned in
+> case we use flow counter on the flow steering rule. However, counter_id
+> is not enough data in case of using HW Steering. Thus, have mlx5_fc
+> object as part of mlx5_flow_destination instead of counter_id and assign
+> it where needed.
+> 
+> In case counter_id is received from user space, create a local counter
+> object to represent it.
+> 
+> Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
+> Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+> Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-Is the hardware really random here with its mapping of PHYs?
-Generally, hardware is pretty predictable, logical. I'm just wondering
-if this property is really required, or if it can be replaced with
-some logic, avoiding typ0s.
+Unfortunately, I think that this misses two counter_id instances
+in mlx5_vnet.c and the following is needed:
 
-	Andrew
+diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+index 5f581e71e201..36099047560d 100644
+--- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
++++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+@@ -1952,7 +1952,7 @@ static int mlx5_vdpa_add_mac_vlan_rules(struct mlx5_vdpa_net *ndev, u8 *mac,
+ 		goto out_free;
+ 
+ #if defined(CONFIG_MLX5_VDPA_STEERING_DEBUG)
+-	dests[1].counter_id = mlx5_fc_id(node->ucast_counter.counter);
++	dests[1].counter = node->ucast_counter.counter;
+ #endif
+ 	node->ucast_rule = mlx5_add_flow_rules(ndev->rxft, spec, &flow_act, dests, NUM_DESTS);
+ 	if (IS_ERR(node->ucast_rule)) {
+@@ -1961,7 +1961,7 @@ static int mlx5_vdpa_add_mac_vlan_rules(struct mlx5_vdpa_net *ndev, u8 *mac,
+ 	}
+ 
+ #if defined(CONFIG_MLX5_VDPA_STEERING_DEBUG)
+-	dests[1].counter_id = mlx5_fc_id(node->mcast_counter.counter);
++	dests[1].counter = node->mcast_counter.counter;
+ #endif
+ 
+ 	memset(dmac_c, 0, ETH_ALEN);
+
+You can observe this with an allmodconfig build.
+
+
+Also, please consider including a "Returns:" section in
+the Kernel doc of mlx5_fc_local_create().
+
+-- 
+pw-bot: changes-requested
 
