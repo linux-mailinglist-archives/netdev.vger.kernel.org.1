@@ -1,86 +1,77 @@
-Return-Path: <netdev+bounces-151333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE74D9EE340
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:41:08 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AEF91627FC
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:41:05 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC12120E6ED;
-	Thu, 12 Dec 2024 09:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UwlDR4wP"
-X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F3D89EE353
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:43:30 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31ED520E6E1
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 09:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0FD728278E
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:43:26 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C977920FAB1;
+	Thu, 12 Dec 2024 09:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="r4EAFHGO"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0534420E011
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 09:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733996461; cv=none; b=G7K7HFUYdJqqBzaSnOawXOiqr5oM+QHKAChABtn1A0U3TEDKsS2jsmL3RLhxFICZHZ6HcD2TCxO2o6i6QxWQTcne46HaiaAY6mCGsbRu60ko6iMX2hGjcJyFzsQOpwpN7WSy5Bi3RHJpiZTsSz/QegmbNBN8YaemiRMadqsvvXE=
+	t=1733996601; cv=none; b=RZiHNuPx3AKZCkuJ/Ho1YDML3uIZiqKo3t1LreIGF/Dm7VtbZa380Zqjr8fGcOrGCS/bU1lqA2mMiHbfghiomRtCzfhc0ItbQJgjwURdE5Ov2SomRwCSl7zVS+vZPVH7uT/SZuZEuGu6doGx7AZjRrozPTLVHUUfRCyTIbfKgvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733996461; c=relaxed/simple;
-	bh=vS3YMZ8TTS+sy79u9btJFf1HSWBg0QXdTjZNCNiaehM=;
+	s=arc-20240116; t=1733996601; c=relaxed/simple;
+	bh=wlI6Vx9AQIzBF2jM0KW8GGqD5QzMTunPSWLwPFJk11I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=USha68i2/5r//EKLgUJ/xP1B3PRMP/FSZA/eRJJ6/W9XKN6N36sxyf33mRn7KmQNtMSfewIh9NHfrnOIPPM7vVip/XPMrVUlLvEz6QoWqFZ7Omt7Jt/dWRMqOITPwdRLOAeZ29h9JRrd8h9MYThFxBWz+rihGBzjpTN2qP1zgM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UwlDR4wP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733996458;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vO5x2q/Sa0e5fTHlXfwREEvSvA3RWPrUa1t93Ro/NiA=;
-	b=UwlDR4wPRD6Eb4DFKgZ9fdxy8jAxr4kXYjZjFN/zmkEFJ9w3k/zX/cLiYvBzK/alfpc/Hb
-	rAbdn+t+LjOQXYLJspmbchLoDiRJY7zo3f8HOOTgiYiOc542STFiuYx+glNIYF+rQeeWW0
-	vV7y+ITjtmpKvXxrKp2DyZ68bPmzkM0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-413-9CoIN0nbN7KxPE-96ck6qg-1; Thu, 12 Dec 2024 04:40:57 -0500
-X-MC-Unique: 9CoIN0nbN7KxPE-96ck6qg-1
-X-Mimecast-MFC-AGG-ID: 9CoIN0nbN7KxPE-96ck6qg
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-385f0829430so284045f8f.1
-        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 01:40:56 -0800 (PST)
+	 In-Reply-To:Content-Type; b=Yo7qc1bqjq97q/5CcvB5rC9eQd++Paipm+gi5KQaoqTNRAM3/fxaDE8xAIabWjCA9VAw/sTsF4rEHa6NrrWAwsCNzrzpkk3SeK/V13DKMVKuJ0pRXtUMC+z2fH0y/kvI6ILs7PwJjGEbYFPAnS0nyxRJ/sgvfL18fL6GtYDX2/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=r4EAFHGO; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aa67333f7d2so54338066b.0
+        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 01:43:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1733996597; x=1734601397; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iyR2MXiFEoU2H13Rzo6SI2LM94SiVSjauzhtJPn93dI=;
+        b=r4EAFHGOWIqHWNWF2CNx59wjBRx3cDKe0Qf1EXCQqnaFZGWdnFp7iISWFlcOXHJnfs
+         R5MGHzA8/MxRSJEEASfmx+1aiwCUSwNxhW+zJIRmuQtojOlpF70zqTYjkzED6i6xJUkD
+         sqflOHv5Ays4K4PsrVBfQWBKNtGROaSMyJqPy3fUMXAx3q8OhMcIfXjXg+PTVX4vW9Aa
+         zem5lxdlaRJJp3/nDfe4wmRe6PDY1IGU0b1TQmQpeMyY8XHDNCcBWjtTmrrWyTuQVAJq
+         /wEBTSOvUyjIjxejf9xONNxvNFTt7LR1m+UQV2KD7itl0qJssw83L/J+9Oadk2hTKjgQ
+         tnmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733996456; x=1734601256;
+        d=1e100.net; s=20230601; t=1733996597; x=1734601397;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vO5x2q/Sa0e5fTHlXfwREEvSvA3RWPrUa1t93Ro/NiA=;
-        b=kqHGl1JL+wZU3c5JDGa3u21wlKVplpTY2wSrT1+iaDTaV3D0iyRkq1RZ67WRSFJLK1
-         iwEgMENGGv+JWukmIPutt9hlhIWZR9ns+PO3UaBuaqlia8plLGMV3sR6efcoImUKJqsI
-         u80EXfyTSqFGaKw2a9GdH30YbpCdl1IBzIYPhwvT7S/YEOjr/XKr+ECfqoeUiUEzFNIf
-         m/RF0P6KHFkdsv+KmnXY75cg/ArEIOo9mWlNk84RZ7rsCC/lj6AshSuU6Iv4zciQgU/9
-         Z3LnXKmgyyn8ym8aGuKZeDPh4sZTDaAIb78T0GrDo/OfAnGfJ0bUo07U2j0EKDrSSDrx
-         i8BQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXynRpQp87j8cWZ57dh6Mu5q3FiJSfs5xpNDTG1UT+rAjzQmZkRdqGBT8JMnoeo61PURt/j65o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7Jzmon4LGTwtJo8eianlovCdafuLHCMOmgqVybZ/E9Tte3Iuv
-	aER5ci7xsVW5Dz1lla6AHvr8VBfY8BBI6yH1lZ0pvyFknZuFuwaPUtebQpWVUEVh/3s6tGsg86r
-	aTb2DU5RIjgVgV/yKSg41+l0hdhHK9O1jrrxmBZwXjFJHG0GQc1ZmSg==
-X-Gm-Gg: ASbGnctxcH8LfJXlT59AVzmgcu/De+pgXBLT47KKb/v47dXxZdRHT30kc8kMZdYAnx4
-	fBzTEzNyscVkpFQMy4tuYxfEyFxhXgQb2pbNCCvMLLobBRcuvHFCx/rgWTaeVMOxGDzD4LqTrNt
-	QaUADa8g6VujEMHBd/OQQS4VAM2rKUSL+3uFhF271CkouAPSAoF3KvrxXTAqJzpDdbCe2JudVOh
-	GbjpPqSREvl65AcpgQ9H4eSGZ1HFP9hMQoDVL4odv1uAL3P6DaEQ8xjNeMm/ZI487S8PiHAo8ib
-	gxjHAN0=
-X-Received: by 2002:a05:6000:1fa9:b0:385:f23a:2fec with SMTP id ffacd0b85a97d-3864ce88e29mr6040199f8f.11.1733996455829;
-        Thu, 12 Dec 2024 01:40:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFPT0KYgGEFCZGrqybSALsE3Qqj+pmWswO0HlvX3IBSNS8HmdA5fJvJjIK2Fq1iEV0Tr46sRQ==
-X-Received: by 2002:a05:6000:1fa9:b0:385:f23a:2fec with SMTP id ffacd0b85a97d-3864ce88e29mr6040187f8f.11.1733996455462;
-        Thu, 12 Dec 2024 01:40:55 -0800 (PST)
-Received: from [192.168.88.24] (146-241-48-67.dyn.eolo.it. [146.241.48.67])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4362557c462sm11164015e9.14.2024.12.12.01.40.53
+        bh=iyR2MXiFEoU2H13Rzo6SI2LM94SiVSjauzhtJPn93dI=;
+        b=QB4CcOzZ1Mg66CD7wETmnLZnmtG+sp6qvMtATzJBnQoJzyDAjEZ5TxTRQDX5HZETo2
+         Pvi1G+WAR4n9hEVk1K66SvZ4I/WIwSpFdjxnOlTzAZXnPbAIXtKjcVBceN126O02lGjx
+         0kNDchLeMweQwzUT1IS3ptxIZ9lu+GwJzgQ6cRKzASPd3pKLQJ8kR4uhjfiY3rzDm9xy
+         7lvbdIwPEhG0+5HQZRxaSY6Ur/XXPCtoMvHvkpQ94YNgrgjAmzrFQD4KuuA56UeG6BBv
+         DG9sW5Ybtjnlo7opRLYVLusd52xbbNy4doJTCfL8hfGnYum0ZEZk2AMSTOUXyqDQ4NjA
+         WxQA==
+X-Gm-Message-State: AOJu0YxWwjKjY9p3KFBXMVXoJZiD40BzW1fNUyt/fzQzkSNn4+0PtsF0
+	68XOcsks0NFLq2C3R3bRASFJk+SYSFlKmWRhdrLJkqZwIbwGVCfmWWFkVLO4eXw=
+X-Gm-Gg: ASbGncvtRskv8Nj0BGCbnj63BEFyXFDhiHQblbCe/I7XJdjq+cIkSOBWrGGX5nzW6Vc
+	pXeU9sImDLqXVI4AFubQpHBraGWbrC1UXZgHslji7D66VKlhHLE+sV70hg9EBCCXECFPOXPR4Ez
+	rPd4HNhulHjk+DTyM8KIfd4yaWOOuhBissNIdg+Ba+InbePJBnTsO/o/EOxDSuJ7l/cwh4E6gds
+	FIypd8CQB8xUSkn/N8elWqQEQN8/LTB6TA+bHjE28la6LW0891ibAl8UBc=
+X-Google-Smtp-Source: AGHT+IH4QMf5pvin6wVJSMpuuwVLXt6LuvTJ0Y3P9wBPqNEQoBBct151LQDukhxHB9I5tAqRnBsVXw==
+X-Received: by 2002:a17:906:32d9:b0:aa6:19c9:ad08 with SMTP id a640c23a62f3a-aa6b13977bcmr641736766b.48.1733996597171;
+        Thu, 12 Dec 2024 01:43:17 -0800 (PST)
+Received: from [192.168.0.123] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa6a394d380sm358006366b.77.2024.12.12.01.43.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2024 01:40:55 -0800 (PST)
-Message-ID: <4a2fe99a-772d-4df1-a8ef-14338682b69e@redhat.com>
-Date: Thu, 12 Dec 2024 10:40:53 +0100
+        Thu, 12 Dec 2024 01:43:16 -0800 (PST)
+Message-ID: <d5606430-16cf-4a2b-ac29-88b73b4ef284@blackwall.org>
+Date: Thu, 12 Dec 2024 11:43:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,119 +79,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 5/5] selftests: net: Add two test cases for
- link netns
-To: Xiao Liang <shaw.leon@gmail.com>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Jakub Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Jiri Pirko <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
- linux-rdma@vger.kernel.org, linux-can@vger.kernel.org,
- osmocom-net-gprs@lists.osmocom.org, bpf@vger.kernel.org,
- linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
- linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
- bridge@lists.linux.dev, linux-wpan@vger.kernel.org,
+Subject: Re: [PATCH net 1/2] bonding: fix xfrm offload feature setup on
+ active-backup mode
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+ Andy Gospodarek <andy@greyhouse.net>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
  linux-kernel@vger.kernel.org
-References: <20241209140151.231257-1-shaw.leon@gmail.com>
- <20241209140151.231257-6-shaw.leon@gmail.com>
+References: <20241211071127.38452-1-liuhangbin@gmail.com>
+ <20241211071127.38452-2-liuhangbin@gmail.com>
+ <032ea83b-0df0-4c88-b0d1-153d9c1bf865@blackwall.org>
+ <Z1qvb7Nz7zAv0L1w@fedora>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241209140151.231257-6-shaw.leon@gmail.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <Z1qvb7Nz7zAv0L1w@fedora>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/9/24 15:01, Xiao Liang wrote:
->  - Add test for creating link in another netns when a link of the same
->    name and ifindex exists in current netns.
->  - Add test for link netns atomicity - create link directly in target
->    netns, and no notifications should be generated in current netns.
+On 12/12/24 11:39, Hangbin Liu wrote:
+> On Thu, Dec 12, 2024 at 11:19:33AM +0200, Nikolay Aleksandrov wrote:
+>>> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+>>> index 49dd4fe195e5..7daeab67e7b5 100644
+>>> --- a/drivers/net/bonding/bond_main.c
+>>> +++ b/drivers/net/bonding/bond_main.c
+>>> @@ -4389,7 +4389,7 @@ void bond_work_init_all(struct bonding *bond)
+>>>  	INIT_DELAYED_WORK(&bond->slave_arr_work, bond_slave_arr_handler);
+>>>  }
+>>>  
+>>> -static void bond_work_cancel_all(struct bonding *bond)
+>>> +void bond_work_cancel_all(struct bonding *bond)
+>>>  {
+>>>  	cancel_delayed_work_sync(&bond->mii_work);
+>>>  	cancel_delayed_work_sync(&bond->arp_work);
+>>> diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
+>>> index 2a6a424806aa..7fe8c62366eb 100644
+>>> --- a/drivers/net/bonding/bond_netlink.c
+>>> +++ b/drivers/net/bonding/bond_netlink.c
+>>> @@ -568,18 +568,21 @@ static int bond_newlink(struct net *src_net, struct net_device *bond_dev,
+>>>  			struct nlattr *tb[], struct nlattr *data[],
+>>>  			struct netlink_ext_ack *extack)
+>>>  {
+>>> +	struct bonding *bond = netdev_priv(bond_dev);
+>>>  	int err;
+>>>  
+>>> -	err = bond_changelink(bond_dev, tb, data, extack);
+>>> -	if (err < 0)
+>>> +	err = register_netdevice(bond_dev);
+>>> +	if (err)
+>>>  		return err;
+>>>  
+>>> -	err = register_netdevice(bond_dev);
+>>> -	if (!err) {
+>>> -		struct bonding *bond = netdev_priv(bond_dev);
+>>> +	netif_carrier_off(bond_dev);
+>>> +	bond_work_init_all(bond);
+>>>  
+>>> -		netif_carrier_off(bond_dev);
+>>> -		bond_work_init_all(bond);
+>>> +	err = bond_changelink(bond_dev, tb, data, extack);
+>>> +	if (err) {
+>>> +		bond_work_cancel_all(bond);
+>>> +		netif_carrier_on(bond_dev);
+>>
+>> The patch looks good, but I'm curious why the carrier on here?
 > 
-> Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
-> ---
->  tools/testing/selftests/net/Makefile        |  1 +
->  tools/testing/selftests/net/netns-name.sh   | 10 ++++++
->  tools/testing/selftests/net/netns_atomic.py | 39 +++++++++++++++++++++
->  3 files changed, 50 insertions(+)
->  create mode 100755 tools/testing/selftests/net/netns_atomic.py
+> The current code set netif_carrier_off(bond_dev) after register_netdevice()
+> success, So I make it on if register failed.
 > 
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-> index cb2fc601de66..f9f7a765d645 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -34,6 +34,7 @@ TEST_PROGS += gre_gso.sh
->  TEST_PROGS += cmsg_so_mark.sh
->  TEST_PROGS += cmsg_time.sh cmsg_ipv6.sh
->  TEST_PROGS += netns-name.sh
-> +TEST_PROGS += netns_atomic.py
->  TEST_PROGS += nl_netdev.py
->  TEST_PROGS += srv6_end_dt46_l3vpn_test.sh
->  TEST_PROGS += srv6_end_dt4_l3vpn_test.sh
-> diff --git a/tools/testing/selftests/net/netns-name.sh b/tools/testing/selftests/net/netns-name.sh
-> index 6974474c26f3..0be1905d1f2f 100755
-> --- a/tools/testing/selftests/net/netns-name.sh
-> +++ b/tools/testing/selftests/net/netns-name.sh
-> @@ -78,6 +78,16 @@ ip -netns $NS link show dev $ALT_NAME 2> /dev/null &&
->      fail "Can still find alt-name after move"
->  ip -netns $test_ns link del $DEV || fail
->  
-> +#
-> +# Test no conflict of the same name/ifindex in different netns
-> +#
-> +ip -netns $NS link add name $DEV index 100 type dummy || fail
-> +ip -netns $NS link add netns $test_ns name $DEV index 100 type dummy ||
-> +    fail "Can create in netns without moving"
-> +ip -netns $test_ns link show dev $DEV >> /dev/null || fail "Device not found"
-> +ip -netns $NS link del $DEV || fail
-> +ip -netns $test_ns link del $DEV || fail
-> +
->  echo -ne "$(basename $0) \t\t\t\t"
->  if [ $RET_CODE -eq 0 ]; then
->      echo "[  OK  ]"
-> diff --git a/tools/testing/selftests/net/netns_atomic.py b/tools/testing/selftests/net/netns_atomic.py
-> new file mode 100755
-> index 000000000000..d350a3fc0a91
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/netns_atomic.py
-> @@ -0,0 +1,39 @@
-> +#!/usr/bin/env python3
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +import time
-> +
-> +from lib.py import ksft_run, ksft_exit, ksft_true
-> +from lib.py import ip
-> +from lib.py import NetNS, NetNSEnter
-> +from lib.py import RtnlFamily
-> +
-> +
-> +def test_event(ns1, ns2) -> None:
-> +    with NetNSEnter(str(ns1)):
-> +        rtnl = RtnlFamily()
-> +
-> +    rtnl.ntf_subscribe("rtnlgrp-link")
-> +
-> +    ip(f"netns set {ns1} 0", ns=str(ns2))
-> +
-> +    ip(f"link add netns {ns2} link-netnsid 0 dummy1 type dummy")
-> +    ip(f"link add netns {ns2} dummy2 type dummy", ns=str(ns1))
-> +
-> +    ip("link del dummy1", ns=str(ns2))
-> +    ip("link del dummy2", ns=str(ns2))
-> +
-> +    time.sleep(1)
-> +    rtnl.check_ntf()
-> +    ksft_true(rtnl.async_msg_queue.empty(),
-> +              "Received unexpected link notification")
+> Thanks
+> hangbin
 
-I think we need a much larger coverage here, possibly testing all the
-update drivers and more 'netns', 'link-netnsid', 'peer netns'
-permutations for the devices that allow them.
+I don't like adding code just for symmetry alone, I think you should drop it
+unless there is an actual reason to turn carrier on.
 
-Thanks,
-
-Paolo
+>>
+>>> +		unregister_netdevice(bond_dev);
+>>>  	}
+>>>  
+>>>  	return err;
 
 
