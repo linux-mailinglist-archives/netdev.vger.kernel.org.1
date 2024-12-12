@@ -1,131 +1,107 @@
-Return-Path: <netdev+bounces-151501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 737A69EFC90
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 20:35:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5BE29EFC99
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 20:38:54 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33F92289E9B
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 19:35:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F408F168F6B
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 19:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B96A41A0AFB;
-	Thu, 12 Dec 2024 19:35:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A8A192B9A;
+	Thu, 12 Dec 2024 19:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YiIbmGbv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DT7Whrlc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F96D19D089
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 19:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C501B18FDB9
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 19:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734032108; cv=none; b=OI3xAifMhflTuBi5eDfgMss5RiymIn9Jj372j8O8hAX3SxZjSBEPNrPmPCscvWU+o0KsOgNKQqyRNpqjDpvzfH/tDZVtO+C3HXZKYAawUM4iwlEDZm58ijkYP3/YROEL+vhfElUfmoFyQxfgYNpwr9DCV3IWrAOXhGDz+UnAuPk=
+	t=1734032333; cv=none; b=aorNcGOEReCJfj+Dfdw0F8bL8ZlbBwDpvNyoBGGlkA058cuJQ8llvXtKie64wedqMpo5UWZu5Y3Znh+9lrQ402VsobzTvarl1ow5vr3+D/HA+OA0PvGaeVIgJRTrfilWKvWp/JSQkevkJSPPIwZjs7lHjksln5xW4lZ3b11MxSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734032108; c=relaxed/simple;
-	bh=tnUSTCUCV3YbtAqd+dXe3qV/gXDB7PsdGL/K5e4W2pA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HB7WIQdjyM6t8sANEzuQXyc2CZHwQyIfU8VSxzmjMAJEuhTf5kEecQEwPg1g2mvbVxvouCi73d0EK4AxNlavivEaL2fP52AbVZvaV8qddal2mE0xE/B5mGJ7U2Kf2dr6jm4ZMA3u9hIgCMSs7Krl5do2k0exOjMs1xFs6zaWLhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YiIbmGbv; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8a464155-3115-468b-88f3-5ee81d9e3b84@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734032103;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ojw80EIqrCZctLiiIevFYV0ImOn3GkYm7ZZRe2ml6qY=;
-	b=YiIbmGbvq02j4tFQW/iYxkkovrKCH6HNQAP9clas4o/4rEvI607CAaze9xjfgx+n5ZfJ4R
-	hyjmyDw6JbFegQNF636k+P2RPHbR/Xrf29CQGCwWdaDbxnX2qx2U48ZnNMIEXZMYkeAiGK
-	f8OydmSoHljcnii6UeUMLHm07Bio6Ik=
-Date: Thu, 12 Dec 2024 11:34:52 -0800
+	s=arc-20240116; t=1734032333; c=relaxed/simple;
+	bh=B069AJ99yMLbiaxEMFlwsbpViIKqiXF2IyBppmS/V1g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JGqQBUqixdCn98goptyZfoHomsIXAZoraEIbv9s0Hmw7apwP6G9r7BPMpfYpoNV8EIwJbL+9HWQNQzc6STp88jtZ51eO5AplIb197Djw/jVgOCbCyL+VJZJXso2B7g6pcGguw1jKTIeASb9hrPFyz01V6R1Cy10E4Vw+EI7UgO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DT7Whrlc; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3862de51d38so55389f8f.1
+        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 11:38:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734032330; x=1734637130; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=B069AJ99yMLbiaxEMFlwsbpViIKqiXF2IyBppmS/V1g=;
+        b=DT7Whrlc+tNVptwCMYPcUQ7Xzq8djlSRr9HDBcTW6piEtxlPDjAmYck4i+XXsGLSdE
+         PgTRRQB7w24K1vvVHnqHyOQ04fTq7kMPF9FhBIQQrbAR6wPW3g+e4EzXaxOvNQ1qgPAk
+         j+alLDbtsp1UPQ090+Y5DY8StRLI6lCYTXC8MY6yaigDQXAXZjXmHSYT7dXLjn6qDrkR
+         Kcx4kVqogvKsrvzKgm7sPWBq+s6K1buYXq6jPhWZPdiHvhzSECf7rxuIJopvRRPDFJkw
+         zzlofFk7iaVA2YVfZBrtD50quUFEESw7f1WCm99m/mXHEvVXwqIM8Ksc/SRu+vSgzeJ3
+         4X6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734032330; x=1734637130;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B069AJ99yMLbiaxEMFlwsbpViIKqiXF2IyBppmS/V1g=;
+        b=t41nmVOqagE0mdk2yKJa9+OKGBkkZwdYPMDNWxiXE9RhXet+Y4iAR4h64Y7belKUPU
+         1UEGmgSzbXTKexqmmZtZu3fIeFJkx9tmgqCPqlBgrkMelbUC2HYHYRWBfyzGuOTsOiy7
+         1T2DXOhX9RIWZxqxdAEaECVQeNra1jvm0b7hsp7e6bldFnEVoQplP8Pbu/mOG+K0I776
+         A2JZWNA1jU/4uJbGNXrKRmOuyKWsVBok3OBuR0JzArrqabr670rQP7GCi5vzVu6RbZJc
+         ozoMhLps0oIgFo9iTa6rveOhvpa37Nmkzy94JTOaoRPIiuMrbOZF9cdGD2NAgbdhxUW9
+         C4fw==
+X-Forwarded-Encrypted: i=1; AJvYcCWh68tRrr5wZ0PjihHBvlW4CwDH1v3mCWvqmgrDNGKb/gZ4OfElVPUGU99QTJz0FZ9CWm29xyA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzxHBCaEnqD9N5krfeu24Gb5Ee1KMQL+t6uev0UDXHKCKhGxCy
+	hFIO8ELRkGfU/XrDMtDmHxWMipCcpauPvEfI85EjwopCh6TCY18X
+X-Gm-Gg: ASbGncugWBgBvpkfUjB3WslrQoRDMT8t1dPokZJKnZKd01a8h1+W6KyxyLzvJAHucDh
+	aCaETHmEU4FUuy/S6gF1blI1sxXiv4bMPkzx8lpiwIHrql6gKDLDwGsQSQnGTATSayPwBrGWRSI
+	d28kqaFiYuY5CIrlQDFv3LaN1c38+b2h2/dQJPDLney0cfKktfrBNvOV0L6Tovv4iNRMsGX2OyD
+	EktRZp62bqiJb2g77+QIBrJXk8zwzqTWIdngLrs6IAw
+X-Google-Smtp-Source: AGHT+IE4G1PjDDwENlz2Lyv74KagRT5Yifxh/lMIeV3kJcj+rAK9HcqLLiw82iZvaVorQTc5hOGSzw==
+X-Received: by 2002:a5d:5f8d:0:b0:382:41ad:d8e1 with SMTP id ffacd0b85a97d-3864cea57b2mr2521448f8f.14.1734032329830;
+        Thu, 12 Dec 2024 11:38:49 -0800 (PST)
+Received: from skbuf ([86.127.124.81])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3878251dbbfsm4798063f8f.97.2024.12.12.11.38.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Dec 2024 11:38:49 -0800 (PST)
+Date: Thu, 12 Dec 2024 21:38:46 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	UNGLinuxDriver@microchip.com,
+	Woojung Huh <woojung.huh@microchip.com>
+Subject: Re: [PATCH RFC net-next 1/7] net: dsa: ksz: remove setting of tx_lpi
+ parameters
+Message-ID: <20241212193846.33qouvlhxspzqnbl@skbuf>
+References: <Z1hPaLFlR4TW_YCr@shell.armlinux.org.uk>
+ <E1tL1Bm-006cn4-Gr@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4 01/11] net-timestamp: add support for
- bpf_setsockopt()
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
- <20241207173803.90744-2-kerneljasonxing@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20241207173803.90744-2-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1tL1Bm-006cn4-Gr@rmk-PC.armlinux.org.uk>
 
-On 12/7/24 9:37 AM, Jason Xing wrote:
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 6625b3f563a4..f7e9f88e09b1 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -5214,6 +5214,24 @@ static const struct bpf_func_proto bpf_get_socket_uid_proto = {
->   	.arg1_type      = ARG_PTR_TO_CTX,
->   };
->   
-> +static int sk_bpf_set_cb_flags(struct sock *sk, sockptr_t optval, bool getopt)
+On Tue, Dec 10, 2024 at 02:26:14PM +0000, Russell King (Oracle) wrote:
+> dsa_user_get_eee() calls the DSA switch get_mac_eee() method followed
+> by phylink_ethtool_get_eee(), which goes on to call
+> phy_ethtool_get_eee(). This overwrites all members of the passed
+> ethtool_keee, which means anything written by the DSA switch
+> get_mac_eee() method will discarded.
 
-It is confusing to take a sockptr_t argument. It is called by the kernel bpf 
-prog only. It must be from the kernel memory. Directly pass the "int 
-sk_bpf_cb_flags" as the argument.
-
-> +{
-> +	int sk_bpf_cb_flags;
-> +
-> +	if (getopt)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_sockptr(&sk_bpf_cb_flags, optval, sizeof(sk_bpf_cb_flags)))
-
-It is an unnecessary copy. Directly use the "int sk_bpf_cb_flags" arg instead.
-
-> +		return -EFAULT;
-
-This should never happen.
-
-> +
-> +	if (sk_bpf_cb_flags & ~SK_BPF_CB_MASK)
-> +		return -EINVAL;
-> +
-> +	sk->sk_bpf_cb_flags = sk_bpf_cb_flags;
-> +
-> +	return 0;
-> +}
-> +
->   static int sol_socket_sockopt(struct sock *sk, int optname,
->   			      char *optval, int *optlen,
->   			      bool getopt)
-> @@ -5230,6 +5248,7 @@ static int sol_socket_sockopt(struct sock *sk, int optname,
->   	case SO_MAX_PACING_RATE:
->   	case SO_BINDTOIFINDEX:
->   	case SO_TXREHASH:
-> +	case SK_BPF_CB_FLAGS:
->   		if (*optlen != sizeof(int))
->   			return -EINVAL;
->   		break;
-> @@ -5239,6 +5258,9 @@ static int sol_socket_sockopt(struct sock *sk, int optname,
->   		return -EINVAL;
->   	}
->   
-> +	if (optname == SK_BPF_CB_FLAGS)
-> +		return sk_bpf_set_cb_flags(sk, KERNEL_SOCKPTR(optval), getopt);
-> +
->   	if (getopt) {
->   		if (optname == SO_BINDTODEVICE)
->   			return -EINVAL;
+nitpick: will _be_ discarded.
 
