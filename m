@@ -1,99 +1,125 @@
-Return-Path: <netdev+bounces-151273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A7739EDDA3
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 03:28:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A66839EDDB2
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 03:33:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9044F188369D
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 02:28:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F39D18848CC
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 02:33:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D569E13C67C;
-	Thu, 12 Dec 2024 02:28:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4178245027;
+	Thu, 12 Dec 2024 02:33:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N1lN/NV/"
+	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="bU7wRfH1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8096257D;
-	Thu, 12 Dec 2024 02:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F01518643
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 02:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733970495; cv=none; b=KeD7zFnBJL7vNXG5i7j2yLETzGipzjkqfFZ3G3XhAKqIYt5r1tB9WGm9ndEKxlo+l8DyG2isxEq+xg4lNIFLSrjlXwiPlw68nyc0kZYSMCxXmL+B7oCJEmwh3oq8BMVgmoXnWgo0GjPqGqNiBjXLklz6d6S4CvtsekVvMk2SmH0=
+	t=1733970788; cv=none; b=G7FsMw/+l+BjpJeCS5HnTF6iX0JFesQSHHw4mnogmfGaXSRwiQ7grkyEZ2RRLEpp0VWzWOG6X0T4PC0GGGeW2yrVQ7itTGFTDbtXO4AnIf5zcOpjJZxWVAFRWp9PwYj4J7JHvnzJ0Jcnkh2JK4xhozy2YzDOGdz0H6yc9kSA2Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733970495; c=relaxed/simple;
-	bh=XsiEYnxh+hvzn/XFOkHqruCHasjAtgFcOsO/3Lg/otk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UnX6ISpnUqVPrnM5C5S916cKZrRz1YkITRCeZX6T8ARX6b1gHRVtJm/HkYFrpxBtF+Su/fzkJLwi82fzbSLSnSewBofyBxeGvQPy6tlD31ldSdrfC5iZOOk3o34IpHx6NDp2C354RFtcabCi1e2TYdg3ud3u4okP3ANuUgMQIIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N1lN/NV/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBD2EC4CED2;
-	Thu, 12 Dec 2024 02:28:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733970495;
-	bh=XsiEYnxh+hvzn/XFOkHqruCHasjAtgFcOsO/3Lg/otk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=N1lN/NV/HzLYJ59eTU2CTXKk1IRG0uF9xQPIBL9qPWPt4qbQk3Z+mAHN1HtR/goYO
-	 30UGr57Ge4SWphzeROlqd4KrN2ZWf7hOImC8FUHdgI/mOEhghjORThfo8tLc8Gy+Je
-	 Jij0LBX/iQM3yMOW3ueXouAFoMIkL3O9JKNfz0bEMlzQdbVv7bsO2/ePA1Y0UDJoDN
-	 VW7FgR2vXXNYJaIgu/qmkurJSbwqnjj+bRlS5fnu90suQmqX03FJH2+nl5Ed7aWRdn
-	 +PhvBooPZI5q9Wo7oZAk4YbL5LMgghxPypt7ZKZHyG0mTZnfFqzX2vudSxa9yjeEJX
-	 JAHnXyV8zPBoQ==
-Date: Wed, 11 Dec 2024 18:28:13 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>, Kaiyuan
- Zhang <kaiyuanz@google.com>, Willem de Bruijn <willemb@google.com>,
- Samiullah Khawaja <skhawaja@google.com>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>
-Subject: Re: [PATCH net-next v3 5/5] net: Document memory provider driver
- support
-Message-ID: <20241211182813.789616ce@kernel.org>
-In-Reply-To: <CAHS8izOHfWPGaAF0Ri6sN5SVbvD9k_u2-_WmHJHcwu4HDEXj-Q@mail.gmail.com>
-References: <20241209172308.1212819-1-almasrymina@google.com>
-	<20241209172308.1212819-6-almasrymina@google.com>
-	<20241210195513.116337b9@kernel.org>
-	<CAHS8izOHfWPGaAF0Ri6sN5SVbvD9k_u2-_WmHJHcwu4HDEXj-Q@mail.gmail.com>
+	s=arc-20240116; t=1733970788; c=relaxed/simple;
+	bh=D4GKQEcZ0/I2A+Qs62rc+bBhXvDD2Oj8V8CFi+LmAs8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NbGswPtMGhUeSsyPEXu+D+vZ3cj15CF3Cll424ZYgi85OemgAa3o9nsO1amVeeY5xCeMW4F5YRmdDbrHLKgT/axptElbKYzFWLBFKhXBH24ibne6Cnd3E0WWQGm0AUE0c3gRIEon/r1eM+bSA8DEgd4qhtxpC5h5FN+mLeHm+zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=bU7wRfH1; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-725f4025e25so92048b3a.1
+        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 18:33:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1733970786; x=1734575586; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=culLUjXgQf1PCKdDSJG3rk51jdWiWQDjWoRpzLsnb3Q=;
+        b=bU7wRfH1vJbHMd4GnUJqAm65ozIo0ID/AcVY+gvEyQjUmlfxvnZ3vCp6r4ZxtdihbZ
+         hwRYeLPBh6S142KUJyXWukfeZglkhQ1cWiAhu7M2ygMXyBZ7rxSORTAuwsoeiCpx9/lW
+         ++muV95eSxrgj/d7L2CjTZeNshcMO6FQuXmFKKT8CIj7HWJHU5aCNOdMJKF1VoAwWTgK
+         t3R9TPXegkZZmAbLYH4WFTRnYR1rg2AYu90hxl68tfhEQNHOn0CuO+MO6KhKS6CL5m33
+         kNSgpJd4gkvTQgdvYULumKD4Yy7trr7yYf2MbBHaGcS2LlLahX3nLgC1/KRXwTcQsIvE
+         N/Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733970786; x=1734575586;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=culLUjXgQf1PCKdDSJG3rk51jdWiWQDjWoRpzLsnb3Q=;
+        b=RYXJah83u5emQs70geQpCRaVVK2BP9EMYwqzGZibGuZMr03eHrmK2BDZFALVLm05TN
+         pXW/2VLrubf9dDWddomgTheAm62II4ANaVgfuWfwYaKZAXamZuxSFDSFCwV0xG5AWnI7
+         YqXOD527jS2szV5qNI0kW0S7fmoUwjsCHk/3s4HhhPfZznL47UMAmbjTpA783xa6lpjX
+         rH/lEBJPJhu4ji4lXzRsodtAT9J3bdS3NKY2sK4z8Y5Vdv5zbS/OHmQEiIZZNn0Mln0L
+         FavFo9848Wx+mohwCjwoV3UXNYDVS9N2R8d5Fy7/LpDYntjKTdhzwE7cXGyaGskx5Cxv
+         MrmA==
+X-Gm-Message-State: AOJu0Yz2RDaArfSPaVki4DeG9oat5D04qHueAlXOt1nyylponIxNm6Zo
+	FmBic6RQZ/IanaBEkCBbhMARi8mticiFVJIWxd5EQlpjC/SQbLLBpN2QC1rnfHM=
+X-Gm-Gg: ASbGnctTo1HWRREVRgFDUncF5MUS9WVy+d93zKBUNpdhtwSXCuC1Ja8/oy5US0fgOfo
+	d3nhs+qPYoAed3saEx3+3SBGAYlmw0DdWRe3deDIJBck0ytX9apD8D7WAapT6h7dmT+EFcbWVd8
+	RpxbThT15jw6OFow3mGXKhGACmKHBk0opoc6vAJzmVIOLklB9aCDjOrRqUbvSA+szHtmpNobZRG
+	BDJMf4uPHAUMLvKiHBm5zQJ5wFO10NazAceP3QoOIVj62MJi44jcBGeYuRQDqunIIZnCq1fSMfh
+	7uK4VaVzVukQvG1cFvlKoDJubpazU9NItJMzdgfXgWw=
+X-Google-Smtp-Source: AGHT+IF3v9FE2nfnShP56v8x0zeB1I4jIbscDq/zAC08Jjg5QCd0BhxXfFJ+AVySwy1L/xe2E0H4/Q==
+X-Received: by 2002:a05:6a21:3985:b0:1e1:a6a6:848 with SMTP id adf61e73a8af0-1e1ceb0a07dmr2786451637.25.1733970785959;
+        Wed, 11 Dec 2024 18:33:05 -0800 (PST)
+Received: from localhost.localdomain (133-32-227-190.east.xps.vectant.ne.jp. [133.32.227.190])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fd50fe6a58sm4598360a12.11.2024.12.11.18.33.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Dec 2024 18:33:05 -0800 (PST)
+From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+To: rafal@milecki.pl,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bcm-kernel-feedback-list@broadcom.com
+Cc: netdev@vger.kernel.org,
+	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Subject: [PATCH] net: ethernet: bgmac-platform: fix an OF node reference leak
+Date: Thu, 12 Dec 2024 11:32:56 +0900
+Message-Id: <20241212023256.3453396-1-joe@pf.is.s.u-tokyo.ac.jp>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 11 Dec 2024 09:53:36 -0800 Mina Almasry wrote:
-> Drivers doing their own recycling is not currently supported, AFAICT.
-> Adding support for it in the future and maintaining it is doable, but
-> a headache. I also noticed with IDPF you're nacking drivers doing
-> their own recycling anyway, so I thought why not just declare all such
-> use cases as not supported to make the whole thing much simpler.
-> Drivers can deprecate their recycling while adding support for netmem
-> which brings them in line with what you're enforcing for new drivers
-> anyway.
+The OF node obtained by of_parse_phandle() is not freed. Define a
+device node with __free(device_node) to fix the leak.
 
-IIRC IDPF was doing recycling based on the old page ref tricks,
-without any use of page pool at all. But without using page pool
-the driver will never acquire a netmem_ref in the first place.
+This bug was found by an experimental static analysis tool that I am
+developing.
 
-> The specific reason: currently drivers will get_page pp pages to hold
-> on to them to do their own recycling, right? We don't even have a
-> get_netmem equivalent. We could add one (and for the TX path, which is
-> coming along, I do add one), but even then, the pp needs to detect
-> elevated references on net_iovs to exclude them from pp recycling. The
-> mp also needs to understand/keep track of elevated refcounts and make
-> sure the page is returned to it when the elevated refcounts from the
-> driver are dropped.
+Fixes: 1676aba5ef7e ("net: ethernet: bgmac: device tree phy enablement")
+Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+---
+ drivers/net/ethernet/broadcom/bgmac-platform.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-No? It should all just work. The page may get split / fragmented by 
-the driver or page_pool_alloc_netmem() which you're adding in this
-series. A fragmented net_iov will have an elevated refcount in exactly
-the same way as if the driver was stashing one ref to release later.
+diff --git a/drivers/net/ethernet/broadcom/bgmac-platform.c b/drivers/net/ethernet/broadcom/bgmac-platform.c
+index ecce23cecbea..ca07a6d26590 100644
+--- a/drivers/net/ethernet/broadcom/bgmac-platform.c
++++ b/drivers/net/ethernet/broadcom/bgmac-platform.c
+@@ -236,7 +236,10 @@ static int bgmac_probe(struct platform_device *pdev)
+ 	bgmac->cco_ctl_maskset = platform_bgmac_cco_ctl_maskset;
+ 	bgmac->get_bus_clock = platform_bgmac_get_bus_clock;
+ 	bgmac->cmn_maskset32 = platform_bgmac_cmn_maskset32;
+-	if (of_parse_phandle(np, "phy-handle", 0)) {
++
++	struct device_node *phy_node __free(device_node) =
++		of_parse_phandle(np, "phy-handle", 0);
++	if (phy_node) {
+ 		bgmac->phy_connect = platform_phy_connect;
+ 	} else {
+ 		bgmac->phy_connect = bgmac_phy_connect_direct;
+-- 
+2.34.1
+
 
