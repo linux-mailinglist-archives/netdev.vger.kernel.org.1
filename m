@@ -1,315 +1,136 @@
-Return-Path: <netdev+bounces-151305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59C219EDF63
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 07:26:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 612489EDF6F
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 07:27:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18345163467
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 06:26:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 018851889A29
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 06:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCAD0192D98;
-	Thu, 12 Dec 2024 06:26:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48BE51DEFE1;
+	Thu, 12 Dec 2024 06:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="aRMmI9/9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NEhY8J/4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2BC18C03A
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 06:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A58176AB7;
+	Thu, 12 Dec 2024 06:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733984780; cv=none; b=JQyWRuEHPo0EUKnQnUizaNU8BFgRpbFy0P8J3xS3UzSYuTcQzPyu07RsRbxDx/WYdyknLSPGxOBxauzq9fJHcRApXL/CEc9oONb4jhOGdR37nzlkyYarLcjGKOhwUh1jUzT6y8p3TPs8Z5EepH/2GDixUcOjicBIXkj94DdLyAs=
+	t=1733984816; cv=none; b=cwgcn8TsSfnQes/IF+mhaRu4AqT/5LOrIEs7ENY4L5QFDSZZPeKYExyy+wAdrIlDbXDwQn2iw6YXWaIG/eWvQoU7dGF6oyL2ofAqJqOstj0xNSCz1qBF620oe6UNhu40AAdOlRXzp0saNUM/KRGkG52+DeQcysxdf4PAE6MvtXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733984780; c=relaxed/simple;
-	bh=Lw+ze2Co0gj+5K3wkHR1YRQPmlFOF/oD7NcnYt1tECY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lIZC1zdFhCsD2vXV4W3tMnZNte32FI9xqJeywzZffLDyHosgKWToQte1vLkrdId3vfvVhwsPan55O6T2+kbTzxCEjUCfaKHB8eZZVChB/NX8vRCmA/1HTJTQAAQ7Bk2dSgssLUh5/CqU4QTFWcLHcWGUCYuKZj4R1wcS8Vgjvms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=aRMmI9/9; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ff976ab0edso1554221fa.1
-        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 22:26:18 -0800 (PST)
+	s=arc-20240116; t=1733984816; c=relaxed/simple;
+	bh=fsAhW7uXSwTVCHbkk7P6nCdfV+5oyEPDJvHbIi1IALg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ag6HM0CB2ESkzyGVhRaUIqlT5BKcxSrozlDvyUG9SNeuiieIrEpNgrqhdqgGRbda9GXqZvw/vQeWLnHPRuyTDaQUyktCW+4wu3ygxeHMtm9L0z8QxD2I780E42dkxm0uXPBjk51uNncznS5HGrV9R3yNx2fsuz+UJUAv9C1FBGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NEhY8J/4; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6ef7640e484so2519257b3.3;
+        Wed, 11 Dec 2024 22:26:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1733984777; x=1734589577; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kuRjAdbDbTEkU+Ho9EYzXIrZiSQv0hABO5CTMWmsx+w=;
-        b=aRMmI9/9iVJwzJMubQpRjVDyVvcEcRUtM80JiNDdtcJ/04ICHReprOLVWjAZ/lUvcd
-         YCT1BR/pEiNAPifyDSiL6TAcGGZqhOaKiidslfxozIx0sAnOJMqN87VjPY3uBmkXM0Zi
-         888J6Cs6dwUzpPXn5a+UyFDcvV7ZP8pvz4jZb5m/spR787JC1PNLnlqiuh8t+8lUnIuM
-         WBkaSLa0oQM8vMb+Tbyo4mFy7Fqw7mhcIys4s96PXV4cztECieIOdyJseyyG0AiROLuS
-         qQr6uxv9gwINf2PIGuyPAaPpJ9DE25SfkwaBW6oaJmXpUqbbTzNFGGd/FUqcyyQdkjd5
-         ji8A==
+        d=gmail.com; s=20230601; t=1733984813; x=1734589613; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B2zbvxVhnIA1/tYrT/GzUNHWzm0AQCITVV3oMXXfgf4=;
+        b=NEhY8J/459Dh+htAk9JUoQfWTCj54W/rp5ssLxkzIoOIpMNVpOxqf0P4vUbkh94dlF
+         DKKyk4ZBcqM0dE6jTTQ90UUVP42ddss1dntEuSFzIOz/Ym3pkFiBys09ICKTbkx1Uk+y
+         5wFGDpNKJx49ttxDclPZgKfiAr7tPHN6+fzMj0HdxTeGHyMRjczwAHuozUgCgd/7yuqb
+         OEjOjFTyPAILar49TsicLMX/t+K9jERyrkTEDJgVOFlkEddl+yo52CmYpVMUoQVTLPmg
+         FmWZr6JJY1lAP1C7/yCySzZ6a3HpMExU4WTE07lVulfbKpl7EENARQj5yKkSrXFHjAA6
+         2ZBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733984777; x=1734589577;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kuRjAdbDbTEkU+Ho9EYzXIrZiSQv0hABO5CTMWmsx+w=;
-        b=Cp03BtrvjiBkSONpiwqmlBFuLdSNC/iuYxwlwce1w9sQsv+Qin1rlxR6UBqyvKAtrP
-         y09YsJzOT8qDeVVjdIMHIKkDFSnPFFRCCSXbkyR5zMBoRs8pVM2vBVY6Fc6tRBQvQS/H
-         2678MBcWdkk2Fi+Sdt6Ayid2U2JFDAAsk37jrRAYU16OVRgvO7qedzfCSY7SHxnfxeaL
-         enEnhRnQ2TNdzEVY+ci4p7HuCk1SWIOMGLPU4NRaVQPjVcT2jmIgRrrup+B8b2311adr
-         +UvD3QRJsdvL/xhynwe5YgleVybI6pMCv01pu2TWqkHQOrgAMzh5i4NuJfo9IUYnY0n/
-         Chcg==
-X-Gm-Message-State: AOJu0YxRmC1mgR/1ldQlYeYCdQNNKR8w41coHMtUJVRsa3vPk0ogm1GW
-	EOJ/tjSx2xxQdPhwNdN7fUsuYKmOSpNbWZ4AAp6dTlvWH70yCqNCU703VMElQ00=
-X-Gm-Gg: ASbGncsrdZrM5Aaur+tOkZaXZVmZncrkpy5uUADPfk32o4p62XbOaKKB41pbMtsyqrZ
-	ZljAIDffF9r5mEotQvtXqAJZeYlnQsDVKvBzTyVnUheEYhgjNoAv+T08R+C6EiBunBQpHBhGXgF
-	9XGykrf3bSal6EficaeDNx1aU7wwSH68RnHezKd6YOVvhR18ohQRlH3i6KUbNlcxuzbX1I4MNyD
-	PCJ94BL3IKTlevX77pSdE2aLuTWR6E1Pyz0aozKVBQ4MG2HJB3awFq2/am5T0G5tK9DJu4=
-X-Google-Smtp-Source: AGHT+IEDTXGBo2HWzXx2i6Hv1sGpcVA3TggdLOBM18vE43jz6irncBSC3Gba5PIz1VR7slTQ7L8ovQ==
-X-Received: by 2002:a05:651c:2220:b0:302:3de5:b039 with SMTP id 38308e7fff4ca-3024a1d4bd1mr6264891fa.8.1733984776497;
-        Wed, 11 Dec 2024 22:26:16 -0800 (PST)
-Received: from cobook.home ([91.198.101.25])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30223be9b15sm11209191fa.106.2024.12.11.22.26.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 22:26:16 -0800 (PST)
-From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michael Dege <michael.dege@renesas.com>,
-	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
-	Dennis Ostermann <dennis.ostermann@renesas.com>,
-	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Subject: [PATCH net] net: renesas: rswitch: rework ts tags management
-Date: Thu, 12 Dec 2024 11:25:58 +0500
-Message-Id: <20241212062558.436455-1-nikita.yoush@cogentembedded.com>
-X-Mailer: git-send-email 2.39.5
+        d=1e100.net; s=20230601; t=1733984813; x=1734589613;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B2zbvxVhnIA1/tYrT/GzUNHWzm0AQCITVV3oMXXfgf4=;
+        b=wk1IKL/Zi29o8svsywT9RueNqZBLmflqW/ryRP34MopB39gtDsF+NuxWUtKE2ahh3R
+         WNqRZib1VERFCZqb0qVvLkccd6AInv5CGuZXZgT+FBLedFzKHEYAgGw4F28beySbvIQr
+         vTDWTzwC6k1cQ3o97Ms+toNwEpd71ezAljoabOwuT4I/X/q9BPr8Vb4a7JyuuWriV/+f
+         XRrH397AMUN4lNWmQeEFCp3UUCbHBOUBNFOw9eXn42ndlMpA5idss0IVHOWGLft5P1B1
+         1JtXju2AIia2g6BR6XyCDp6hUj57lkSNblGWIGcKtK2mvnKwXWbO1bh0I2OX/zGZ7awj
+         SVdw==
+X-Forwarded-Encrypted: i=1; AJvYcCU6PfiPUNXW4BddUuRWNI5XeESQxpBn81eruR+fVW/ImEwP1UgQPudSuQg/1ZCHRrz+Dct2NYkPq1tzsZY=@vger.kernel.org, AJvYcCU9YZKPTE3VGGh+hMp4vYj2Uy+bT1Mgv4x/sla36VswR7/IhPFJwsZe1Ex1ic8pozGMMl25xY2e@vger.kernel.org, AJvYcCVtDrvomi2oRUzlrEFFniW547Nn88cau4hzzwMFScW6s4xQRB3vzufzjOolkvarf8PZv+LiRy9teZ8=@vger.kernel.org, AJvYcCVy1KSrPC/6k4gTuIzdZt/XMa23bJnsocwN5V03wFtql0GrSQdlSysweMshFDGGXxQcSDu7uAnTEviD@vger.kernel.org, AJvYcCW2SSpcsUQ2s3/QyetvfrZetABWCYfMxAMyqzrPruyrkvyz9hVFlPEtFCMLwGwjFgo+JIL6neGv/c60WD52@vger.kernel.org, AJvYcCWLoilqqATFSzN9Op2V88z0NVpVNbMRgaHEgDpZJNv5VjBnx2k9m2OBA+ArUD8OqXIsEm6k6IhEjslJCA==@vger.kernel.org, AJvYcCXFtlYZ4iWVy70Zgm6CWgMOcFZn1GGQ16bm14Z3GbFgwGXsW8wY5FRVrlxMh5QuDTWv+PrWzRaL2n29EwrLBV4=@vger.kernel.org, AJvYcCXPZDs+hpWazzLJ9ntR5uNsmdbKQauLmvkqOeCw8lAmIkF80HmxcV6Tag/TMQKGI5beUaVMJbkavh4u@vger.kernel.org
+X-Gm-Message-State: AOJu0YySH9emI4uhh8WNacnLGBUiyPhnolEc/wWr5lSnWHBDl1bvNvCF
+	p2p6D16BRnhEHzV7grTA7cxvdWwMQnb9kAHxdsX5Nv9Y79REyQPhiiUgFmS/BVK/4edGW8nsfhg
+	PUnxQFd9y7Fp0K6VM3AMLBrxAQ0o=
+X-Gm-Gg: ASbGnctwsPeFoxEoZU798/fz2fnfAyVt0wT/KCkFbEo8g0FQr3ds/geRBhbMcgING0r
+	KR7PO4FNweusFCcLw3igbmucqxhIs53Xi+uRGzBvCqlEQbh5b7PyB4PmbEQmG3EJgWp/9QEg=
+X-Google-Smtp-Source: AGHT+IGqdigMfVFnbLLNn+yyp2sMBMAH7e5o6CU1jXSYMqjxj+WKGacedXvEKBN+row0zV7EnrkLe5Rj2bZFUaNxIqk=
+X-Received: by 2002:a05:690c:6ac5:b0:6b3:a6ff:7676 with SMTP id
+ 00721157ae682-6f198a3b52dmr23213857b3.3.1733984813469; Wed, 11 Dec 2024
+ 22:26:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241210104524.2466586-1-tmyu0@nuvoton.com> <20241210104524.2466586-6-tmyu0@nuvoton.com>
+ <e8165e99-9770-4287-8a05-709a9a7bb701@roeck-us.net>
+In-Reply-To: <e8165e99-9770-4287-8a05-709a9a7bb701@roeck-us.net>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Thu, 12 Dec 2024 14:26:42 +0800
+Message-ID: <CAOoeyxUXcMn=prW6gSebmCBM0Wb0Z+SvBw9oSrViRvZtqT2gZg@mail.gmail.com>
+Subject: Re: [PATCH v3 5/7] watchdog: Add Nuvoton NCT6694 WDT support
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The existing linked list based implementation of how ts tags are
-assigned and managed is unsafe against concurrency and corner cases:
-- element addition in tx processing can race against element removal
-  in ts queue completion,
-- element removal in ts queue completion can race against element
-  removal in device close,
-- if a large number of frames gets added to tx queue without ts queue
-  completions in between, elements with duplicate tag values can get
-  added.
+Dear Guenter,
 
-Use a different implementation, based on per-port used tags bitmaps and
-saved skb arrays.
+Thank you for your comments,
 
-Safety for addition in tx processing vs removal in ts completion is
-provided by:
+Guenter Roeck <linux@roeck-us.net> =E6=96=BC 2024=E5=B9=B412=E6=9C=8810=E6=
+=97=A5 =E9=80=B1=E4=BA=8C =E4=B8=8B=E5=8D=8811:22=E5=AF=AB=E9=81=93=EF=BC=
+=9A
+>
+> > +static int nct6694_wdt_probe(struct platform_device *pdev)
+> > +{
+> ...
+> > +     wdev->timeout =3D timeout;
+> > +     wdev->pretimeout =3D pretimeout;
+> > +     if (timeout < pretimeout) {
+> > +             dev_warn(data->dev, "pretimeout < timeout. Setting to zer=
+o\n");
+> > +             wdev->pretimeout =3D 0;
+> > +     }
+> > +
+> > +     wdev->min_timeout =3D 1;
+> > +     wdev->max_timeout =3D 255;
+> > +
+> > +     mutex_init(&data->lock);
+> > +
+> > +     platform_set_drvdata(pdev, data);
+> > +
+> > +     /* Register watchdog timer device to WDT framework */
+> > +     watchdog_set_drvdata(&data->wdev, data);
+> > +     watchdog_init_timeout(&data->wdev, timeout, dev);
+>
+> This is pointless since timeout is pre-initialized with a value !=3D 0.
+> That means a value provided through devicetree will never be used
+> unless the user sets timeout=3D0 as module parameter. But then the above
+> check for pretimeout is useless.
+>
 
-    tag = find_first_zero_bit(...);
-    smp_mb();
-    <write rdev->ts_skb[tag]>
-    set_bit(...);
+Understood! I will drop it in v4.
 
-  vs
-
-    <read rdev->ts_skb[tag]>
-    smp_mb();
-    clear_bit(...);
-
-Safety for removal in ts completion vs removal in device close is
-provided by using atomic read-and-clear for rdev->ts_skb[tag]:
-
-    ts_skb = xchg(&rdev->ts_skb[tag], NULL);
-    if (ts_skb)
-        <handle it>
-
-Fixes: 33f5d733b589 ("net: renesas: rswitch: Improve TX timestamp accuracy")
-Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
----
- drivers/net/ethernet/renesas/rswitch.c | 74 ++++++++++++++------------
- drivers/net/ethernet/renesas/rswitch.h | 13 ++---
- 2 files changed, 42 insertions(+), 45 deletions(-)
-
-diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index dbbbf024e7ab..9ac6e2aad18f 100644
---- a/drivers/net/ethernet/renesas/rswitch.c
-+++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -547,7 +547,6 @@ static int rswitch_gwca_ts_queue_alloc(struct rswitch_private *priv)
- 	desc = &gq->ts_ring[gq->ring_size];
- 	desc->desc.die_dt = DT_LINKFIX;
- 	rswitch_desc_set_dptr(&desc->desc, gq->ring_dma);
--	INIT_LIST_HEAD(&priv->gwca.ts_info_list);
- 
- 	return 0;
- }
-@@ -1003,9 +1002,10 @@ static int rswitch_gwca_request_irqs(struct rswitch_private *priv)
- static void rswitch_ts(struct rswitch_private *priv)
- {
- 	struct rswitch_gwca_queue *gq = &priv->gwca.ts_queue;
--	struct rswitch_gwca_ts_info *ts_info, *ts_info2;
- 	struct skb_shared_hwtstamps shhwtstamps;
- 	struct rswitch_ts_desc *desc;
-+	struct rswitch_device *rdev;
-+	struct sk_buff *ts_skb;
- 	struct timespec64 ts;
- 	unsigned int num;
- 	u32 tag, port;
-@@ -1015,23 +1015,28 @@ static void rswitch_ts(struct rswitch_private *priv)
- 		dma_rmb();
- 
- 		port = TS_DESC_DPN(__le32_to_cpu(desc->desc.dptrl));
--		tag = TS_DESC_TSUN(__le32_to_cpu(desc->desc.dptrl));
--
--		list_for_each_entry_safe(ts_info, ts_info2, &priv->gwca.ts_info_list, list) {
--			if (!(ts_info->port == port && ts_info->tag == tag))
--				continue;
--
--			memset(&shhwtstamps, 0, sizeof(shhwtstamps));
--			ts.tv_sec = __le32_to_cpu(desc->ts_sec);
--			ts.tv_nsec = __le32_to_cpu(desc->ts_nsec & cpu_to_le32(0x3fffffff));
--			shhwtstamps.hwtstamp = timespec64_to_ktime(ts);
--			skb_tstamp_tx(ts_info->skb, &shhwtstamps);
--			dev_consume_skb_irq(ts_info->skb);
--			list_del(&ts_info->list);
--			kfree(ts_info);
--			break;
--		}
-+		if (unlikely(port >= RSWITCH_NUM_PORTS))
-+			goto next;
-+		rdev = priv->rdev[port];
- 
-+		tag = TS_DESC_TSUN(__le32_to_cpu(desc->desc.dptrl));
-+		if (unlikely(tag >= TS_TAGS_PER_PORT))
-+			goto next;
-+		ts_skb = xchg(&rdev->ts_skb[tag], NULL);
-+		smp_mb(); /* order rdev->ts_skb[] read before bitmap update */
-+		clear_bit(tag, rdev->ts_skb_used);
-+
-+		if (unlikely(!ts_skb))
-+			goto next;
-+
-+		memset(&shhwtstamps, 0, sizeof(shhwtstamps));
-+		ts.tv_sec = __le32_to_cpu(desc->ts_sec);
-+		ts.tv_nsec = __le32_to_cpu(desc->ts_nsec & cpu_to_le32(0x3fffffff));
-+		shhwtstamps.hwtstamp = timespec64_to_ktime(ts);
-+		skb_tstamp_tx(ts_skb, &shhwtstamps);
-+		dev_consume_skb_irq(ts_skb);
-+
-+next:
- 		gq->cur = rswitch_next_queue_index(gq, true, 1);
- 		desc = &gq->ts_ring[gq->cur];
- 	}
-@@ -1576,8 +1581,9 @@ static int rswitch_open(struct net_device *ndev)
- static int rswitch_stop(struct net_device *ndev)
- {
- 	struct rswitch_device *rdev = netdev_priv(ndev);
--	struct rswitch_gwca_ts_info *ts_info, *ts_info2;
-+	struct sk_buff *ts_skb;
- 	unsigned long flags;
-+	unsigned int tag;
- 
- 	netif_tx_stop_all_queues(ndev);
- 
-@@ -1594,12 +1600,13 @@ static int rswitch_stop(struct net_device *ndev)
- 	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
- 		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDID);
- 
--	list_for_each_entry_safe(ts_info, ts_info2, &rdev->priv->gwca.ts_info_list, list) {
--		if (ts_info->port != rdev->port)
--			continue;
--		dev_kfree_skb_irq(ts_info->skb);
--		list_del(&ts_info->list);
--		kfree(ts_info);
-+	for (tag = find_first_bit(rdev->ts_skb_used, TS_TAGS_PER_PORT);
-+	     tag < TS_TAGS_PER_PORT;
-+	     tag = find_next_bit(rdev->ts_skb_used, TS_TAGS_PER_PORT, tag + 1)) {
-+		ts_skb = xchg(&rdev->ts_skb[tag], NULL);
-+		clear_bit(tag, rdev->ts_skb_used);
-+		if (ts_skb)
-+			dev_kfree_skb(ts_skb);
- 	}
- 
- 	return 0;
-@@ -1612,20 +1619,17 @@ static bool rswitch_ext_desc_set_info1(struct rswitch_device *rdev,
- 	desc->info1 = cpu_to_le64(INFO1_DV(BIT(rdev->etha->index)) |
- 				  INFO1_IPV(GWCA_IPV_NUM) | INFO1_FMT);
- 	if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) {
--		struct rswitch_gwca_ts_info *ts_info;
-+		unsigned int tag;
- 
--		ts_info = kzalloc(sizeof(*ts_info), GFP_ATOMIC);
--		if (!ts_info)
-+		tag = find_first_zero_bit(rdev->ts_skb_used, TS_TAGS_PER_PORT);
-+		if (tag == TS_TAGS_PER_PORT)
- 			return false;
-+		smp_mb(); /* order bitmap read before rdev->ts_skb[] write */
-+		rdev->ts_skb[tag] = skb_get(skb);
-+		set_bit(tag, rdev->ts_skb_used);
- 
- 		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
--		rdev->ts_tag++;
--		desc->info1 |= cpu_to_le64(INFO1_TSUN(rdev->ts_tag) | INFO1_TXC);
--
--		ts_info->skb = skb_get(skb);
--		ts_info->port = rdev->port;
--		ts_info->tag = rdev->ts_tag;
--		list_add_tail(&ts_info->list, &rdev->priv->gwca.ts_info_list);
-+		desc->info1 |= cpu_to_le64(INFO1_TSUN(tag) | INFO1_TXC);
- 
- 		skb_tx_timestamp(skb);
- 	}
-diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
-index e020800dcc57..d8d4ed7d7f8b 100644
---- a/drivers/net/ethernet/renesas/rswitch.h
-+++ b/drivers/net/ethernet/renesas/rswitch.h
-@@ -972,14 +972,6 @@ struct rswitch_gwca_queue {
- 	};
- };
- 
--struct rswitch_gwca_ts_info {
--	struct sk_buff *skb;
--	struct list_head list;
--
--	int port;
--	u8 tag;
--};
--
- #define RSWITCH_NUM_IRQ_REGS	(RSWITCH_MAX_NUM_QUEUES / BITS_PER_TYPE(u32))
- struct rswitch_gwca {
- 	unsigned int index;
-@@ -989,7 +981,6 @@ struct rswitch_gwca {
- 	struct rswitch_gwca_queue *queues;
- 	int num_queues;
- 	struct rswitch_gwca_queue ts_queue;
--	struct list_head ts_info_list;
- 	DECLARE_BITMAP(used, RSWITCH_MAX_NUM_QUEUES);
- 	u32 tx_irq_bits[RSWITCH_NUM_IRQ_REGS];
- 	u32 rx_irq_bits[RSWITCH_NUM_IRQ_REGS];
-@@ -997,6 +988,7 @@ struct rswitch_gwca {
- };
- 
- #define NUM_QUEUES_PER_NDEV	2
-+#define TS_TAGS_PER_PORT	256
- struct rswitch_device {
- 	struct rswitch_private *priv;
- 	struct net_device *ndev;
-@@ -1004,7 +996,8 @@ struct rswitch_device {
- 	void __iomem *addr;
- 	struct rswitch_gwca_queue *tx_queue;
- 	struct rswitch_gwca_queue *rx_queue;
--	u8 ts_tag;
-+	struct sk_buff *ts_skb[TS_TAGS_PER_PORT];
-+	DECLARE_BITMAP(ts_skb_used, TS_TAGS_PER_PORT);
- 	bool disabled;
- 
- 	int port;
--- 
-2.39.5
-
+Best regards,
+Ming
 
