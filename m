@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-151350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A38BB9EE4E0
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 12:20:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C1979EE4E1
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 12:20:26 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBAE82808BC
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 11:20:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB5151887021
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 11:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0180D20E028;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4DDB211701;
 	Thu, 12 Dec 2024 11:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZD7IDtEb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RU3kVr6V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13BE1C5497
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 11:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDF12116EE
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 11:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734002415; cv=none; b=BWNmGbrsy0LpQIdpHgUwc9HU0/ePvlZaZvEylnKJ8UeRG6YlkgMstF1+V4NGlapmJblqR6dyLGMod3Tyyog77TfMThQCmRb7WrPsPISOlhOg5e42zu3IULTxFBHGrqF3+1YZcXQzxzIyaLffVbT3FQ5cuISMZjrZ4o+5mA2B5PQ=
+	t=1734002416; cv=none; b=p998kUB0JOpjdr8uFwA9Y3XTmiRvW3ia/tLR2at4D8j2ojAfuWtIFd1gNxJQH3X3PhA3Rd5+YQn1uJpH0dqiSkPhiad/1rN0dS4TLQMfp/RJEbImXB9HGAwCGnSaLmj/Xvj/5dc+7A08r0VazpS+LoqIg9Xwz0tX5dWmLyQdlVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734002415; c=relaxed/simple;
-	bh=pBNjYNLG87wfF5ZBAgZCbrsjcrlSTwN3kMC9/pb6JAM=;
+	s=arc-20240116; t=1734002416; c=relaxed/simple;
+	bh=WmOPlyEe9pWgc+IqFYekDzdjZztmTDeHIXjp0b2nK0E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LYcC7PfeVJEsxjJw/KgilVhr2V0a+U19mDAaGnYw+c9kK8LNfc0PZ5t+ffaIebWSFrH1p/5hLF8KqY1GGG5GwtNxDVc13doj+ov6wzpFuww64fR2fa7/bk4FcdVDT1vXTtFLKpxdc+FOm5wE/eX+uPCQ/L+pW6RdjX1m7YAeXZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZD7IDtEb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50C14C4CECE;
-	Thu, 12 Dec 2024 11:20:15 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=NnXOT4OXYCDi6+BEUbvL+HKeSgZZx4gi6+EXC1VmV8FqCPwtiWYBjMJM0VABQfk3oEoj6kY9xXL2EFS3VclCxLVnwZA7rVbEF9jNSyDhWoYTFwCLbWP+rC/LdVsrqnwN4vNJfA+Azv+Xpn1SvB1PAP5YhEwuH1ofcbMiVqc2x5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RU3kVr6V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88616C4CED1;
+	Thu, 12 Dec 2024 11:20:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734002415;
-	bh=pBNjYNLG87wfF5ZBAgZCbrsjcrlSTwN3kMC9/pb6JAM=;
+	s=k20201202; t=1734002416;
+	bh=WmOPlyEe9pWgc+IqFYekDzdjZztmTDeHIXjp0b2nK0E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZD7IDtEbQX95sP5mXKjCpWDJzKaAIlniBkq69DOBPv85242hQe9ff+OYZcA6O7otq
-	 evoTpLLxYEuVO6SePF5Kq/o7DxA5A3dwLQSrbfOWvM85b3auwrYI8LIfVZ2dGpBrEf
-	 m9hZ90USMKWS98YQ0RymhG31bDbS52ChG9dNwbBmbx3JncsFfz+drr4CKWxoayiNZ8
-	 ZWQpPWPfGjJS36MXIw6Q6Vlhk18wYNz1QijL7HxSCH48cJaZ9eJnkpu9JLSX4+BylU
-	 kQwY7dQbjwXkLvi7pEqmYQDjw3lb8aE+7yorqC5vA+UCuxqRvBkPjufG6sl55DQ2sg
-	 LHU2di2CvcxdQ==
+	b=RU3kVr6VCkSBkXYeNHzZUbttRL71VDnWDYgqREQI44wzcRCqOY8lI1ycY9zCB9+bA
+	 Z40ODX3mJmv5laTOdVQ1VQXEN4fct2qYFGUiP258iQmccFkW69AVaOxQHkdU0CKI/j
+	 O0gdAhDr5AdxkI2JE4XYng+TNFTDmBr5N2QO6EEmwPwaa5MmnfKvlYojQz99bfCUfw
+	 QIgRu3a/Nk2y30zIik+AVlhKMWb+rOs7R5HdcQHjTK+QAY41Xec/7cVjLYWGlLaU9A
+	 e5uIebW3LohEHNtSF5Phtgp9Lton4/BpWneaBR1yJhhjcLqy88ogOgx0Obn+AvtN1k
+	 6uLD8Wrauiy9Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0FC380A959;
-	Thu, 12 Dec 2024 11:20:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEC5380A959;
+	Thu, 12 Dec 2024 11:20:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] ionic: minor code updates
+Subject: Re: [PATCH net-next] selftests: forwarding: add a pvid_change test to
+ bridge_vlan_unaware
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173400243150.2263704.13209593856094716019.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Dec 2024 11:20:31 +0000
-References: <20241210183045.67878-1-shannon.nelson@amd.com>
-In-Reply-To: <20241210183045.67878-1-shannon.nelson@amd.com>
-To: Nelson@codeaurora.org, Shannon <shannon.nelson@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
- jacob.e.keller@intel.com, brett.creeley@amd.com
+ <173400243274.2263704.7641246846550604885.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Dec 2024 11:20:32 +0000
+References: <20241210233541.1401837-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20241210233541.1401837-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, shuah@kernel.org,
+ petrm@nvidia.com, idosch@nvidia.com, ansuelsmth@gmail.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Tue, 10 Dec 2024 10:30:40 -0800 you wrote:
-> These are a few updates to the ionic driver, mostly for handling
-> newer/faster QSFP connectors.
+On Wed, 11 Dec 2024 01:35:40 +0200 you wrote:
+> Historically, DSA drivers have seen problems with the model in which
+> bridge VLANs work, particularly with them being offloaded to switchdev
+> asynchronously relative to when they become active (vlan_filtering=1).
 > 
-> Brett Creeley (2):
->   ionic: Use VLAN_ETH_HLEN when possible
->   ionic: Translate IONIC_RC_ENOSUPP to EOPNOTSUPP
+> This switchdev API peculiarity was papered over by commit 2ea7a679ca2a
+> ("net: dsa: Don't add vlans when vlan filtering is disabled"), which
+> introduced other problems, fixed by commit 54a0ed0df496 ("net: dsa:
+> provide an option for drivers to always receive bridge VLANs") through
+> an opt-in ds->configure_vlan_while_not_filtering bool (which later
+> became an opt-out).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/5] ionic: add asic codes to firmware interface file
-    https://git.kernel.org/netdev/net-next/c/4aa567b1df8b
-  - [net-next,2/5] ionic: Use VLAN_ETH_HLEN when possible
-    https://git.kernel.org/netdev/net-next/c/33ce1d41c133
-  - [net-next,3/5] ionic: Translate IONIC_RC_ENOSUPP to EOPNOTSUPP
-    https://git.kernel.org/netdev/net-next/c/7c372bac12b2
-  - [net-next,4/5] ionic: add speed defines for 200G and 400G
-    https://git.kernel.org/netdev/net-next/c/a8b05dd3389f
-  - [net-next,5/5] ionic: add support for QSFP_PLUS_CMIS
-    https://git.kernel.org/netdev/net-next/c/a857c841e7ea
+  - [net-next] selftests: forwarding: add a pvid_change test to bridge_vlan_unaware
+    https://git.kernel.org/netdev/net-next/c/a3b16198d3df
 
 You are awesome, thank you!
 -- 
