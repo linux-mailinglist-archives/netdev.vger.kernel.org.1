@@ -1,611 +1,208 @@
-Return-Path: <netdev+bounces-151437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BEFD9EECF5
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 16:40:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A064D9EEEEE
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:05:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB243188D3BA
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 15:37:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DADB166BAF
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 15:57:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA840222D4B;
-	Thu, 12 Dec 2024 15:37:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807AF22333A;
+	Thu, 12 Dec 2024 15:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Gy7ZkuaT";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WYsENeiU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jdG5GLlq"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB03222D42;
-	Thu, 12 Dec 2024 15:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C225223C49;
+	Thu, 12 Dec 2024 15:56:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734017829; cv=none; b=SwEkLrPeF9t+l9xg/E14sJJpWa6AIcp1YCejkuK1Pndj4OB+ylPEcr31Qgbjpc2N1lD1SG3r6NihOtwOsrMIYImgGk7MrVRCC9ENfELJRVL10FHGEIbjVmdNklW7k1VrA/um2SL6JjKNlEtx8HbF2PL+lj1bEC1cYShd3b1Hq68=
+	t=1734019008; cv=none; b=Uyxir5MpmNAgP0lqQ7omCmrNUx0zz2bprd/xIx5II8CE1iVcxyGNAjDsHssOXKfwJm/1W453LKvT9FsmXSEJsWEwidmzYZVD7rgXhG14GH6leBTclJ4aDlwvrenhF35H1ETFw/IC0fjorEbtnh5+FaaqjfE1vKwp2KKH78vgwXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734017829; c=relaxed/simple;
-	bh=+fHsghrdf4sZIJkIEvtW+cAvGMkasB03DjPu0Q1nkzY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CY8EpqHoQQREcG+gNhuucgAi9toFglLNl/ky/uNoexbAqXpd6WDqrLhX+IxPecbMkutnN5LJMsQStIXaZRsSCjDcUbVD55yyuYulnmbCECg5wMAD+tVvkoV4oGRuJERL0YL3zfme58Zg8aq1IvX96OILWdzEFe1cz25S7QQv30E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Gy7ZkuaT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WYsENeiU; arc=none smtp.client-ip=202.12.124.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 354F62540266;
-	Thu, 12 Dec 2024 10:37:06 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Thu, 12 Dec 2024 10:37:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1734017826; x=
-	1734104226; bh=lTaJeILgzHwkCB6op29bPStqrGY9/sWSdlLECTkVDu0=; b=G
-	y7ZkuaThpvFIwC/VLhlsfyansnIpyMhpd1pHELX1bv4XuHGSOEzJsV61Y7/Hvmji
-	un+749zU+m5DJMel8l5RM3/ZIFfit4gzA+Knl/iYfaw5nUJ+WDzjODuZDgsuHJj0
-	1ca3JqB0YeHuY72iJM6NPaAAIhhe98olKWlHA+5FRJ3SxjpfWmqVxx975rJ7+WG2
-	qJRvUyuWSMCDnMys9CKD9kFDEGyfAunD91LsyZOqkokoOz852F2E4PCqEBZpNUTp
-	OO92pUUd7OYsdEILb8v56Z7Y0CDtEtcbwLxjVtiPBii4QqTKJY4BtzMRJbmcQH0Z
-	ry3TIr9GN6p+i+3MUHPMQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1734017826; x=1734104226; bh=l
-	TaJeILgzHwkCB6op29bPStqrGY9/sWSdlLECTkVDu0=; b=WYsENeiUttpxC3jen
-	y7hHwdcFfn7tjlE/RZWFq5JSVLY8aMif5UvLss2m/tM8DnR+7TskqXCT2d4PgbzI
-	ohGzFBQgc8N25gxdrGmcwO5+WKY5M6FrhPufadiOFr50hSrH9rhnLSlQ1xq/L7Ak
-	qrTVeO5bCjbRgQmkWSxB89gonWBEpJB51VYYcgQBrzrufnrjW8mDQ+B4dvkxII66
-	4JhzYQWbi9uqYCv0SBRuE7AEEC5v1s/RHqQQmChpvqxbGuu6KZzS6elIBAGawVpo
-	n+xPdJdoKW46d4ENp9EGPlTs5IDZ0C6jSWsU6b2regEKH88W1/RTaaMjyOt8JBjF
-	pNP+w==
-X-ME-Sender: <xms:IQNbZ-F5aVO7uNCIRErQnZBQfipChQoJjJ3Tu07sjgcVPgSdLqVoLw>
-    <xme:IQNbZ_Umywje_7GaNucg6j6Y01bflp-NWG5BTIrMyRuCXfvY7TfwNocFzph5gut8f
-    HWm-LyNMIheHITgjns>
-X-ME-Received: <xmr:IQNbZ4IMvJr3YO3TUsk29_l6t8bc45e1yR0f4wYWinOXeYcUxiIIyGMGMaJo>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkeehgdejjecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeiieeuieethedtfeehkefhhfegveeuhfet
-    veeuleejieejieevhefghedugfehgfenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepudehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehnvghtuggvvh
-    esvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehsugesqhhuvggrshihshhn
-    rghilhdrnhgvthdprhgtphhtthhopehvfhgvughorhgvnhhkohesnhhovhgvkhdrrhhupd
-    hrtghpthhtohepfhhkrhgvnhiivghlsehrvgguhhgrthdrtghomhdprhgtphhtthhopehk
-    uhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhunhhihihusegrmhgriihonh
-    drtghomhdprhgtphhtthhopegrphhoohhrvhhkohesrghmrgiiohhnrdgtohhmpdhrtghp
-    thhtohepsghorhhishhpsehnvhhiughirgdrtghomhdprhgtphhtthhopehjohhhnhdrfh
-    grshhtrggsvghnugesghhmrghilhdrtghomh
-X-ME-Proxy: <xmx:IQNbZ4GLCV6L-uSnA7vZLYJBEH11iHak__Xood1u7U8rTQkOSOHAFQ>
-    <xmx:IQNbZ0UQllLaG6yGI8zBlheaEeaxixIJK5wuoV9Y5yDYQ2377wSJbQ>
-    <xmx:IQNbZ7OHBVOLTANwFFwLXtNBkJnNYQHqk3pyVJnktwLlKQ2KEIgukw>
-    <xmx:IQNbZ70q5xbOA2sx0WWtedaXrBulXNfylBCCzT25EoCR2JdZGJALQw>
-    <xmx:IgNbZ5WhfJuuBjONA4SlXE-wSPJAaLdEpMJp2G1QMK0MxDrjTx215tvL>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 12 Dec 2024 10:37:05 -0500 (EST)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Vadim Fedorenko <vfedorenko@novek.ru>,
-	Frantisek Krenzelok <fkrenzel@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Apoorv Kothari <apoorvko@amazon.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Simon Horman <horms@kernel.org>,
-	Parthiban.Veerasooran@microchip.com
-Subject: [PATCH net-next v5 6/6] selftests: tls: add rekey tests
-Date: Thu, 12 Dec 2024 16:36:09 +0100
-Message-ID: <1c242d046cb78b37f16f45a7ea046af024acb8d9.1734013874.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <cover.1734013874.git.sd@queasysnail.net>
-References: <cover.1734013874.git.sd@queasysnail.net>
+	s=arc-20240116; t=1734019008; c=relaxed/simple;
+	bh=viU2z5ww8SGpckEb5uDkQ/hhkagL4yv7HyEWdggMAYk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B1F/n7xolBNarlbGEPCBEEZKVVwTqltGNO25cWAsV3x136NCpiztZR2hwDVkoYhtaG4jSoH6iKDw3wU2CmnJRO9upazRUz92HCGVG+jZfsu8sF8LeZiOQlhpVzICeoW+RInYzR17VU8ZQCTa4GJaTqHMbXLq5oFVH6TDIkyN9VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jdG5GLlq; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=YFoc339tueLvMa87D9wphRrOL+Jf750+sCI4ejb2O2w=; b=jdG5GLlqv715NSU8j27fuWpLHW
+	kigi2RfcQvZ4u/uRVVfbY51jyao9dxnDsZj9o9m6Q7FDMQlxGaAuov2VQ+Ocx9QRKFXWyJU2h0Jej
+	MXEE7SoYtYUY4ehVa2o34aNo9sO7xCL7YMAeaigzSwQMYQIx4YGR32l0BQ4ltouwiDZlcsZ0dxk6d
+	XTOH0AOfcJZWkIqFIBTdo48ENeghKuw2m2euy1a4hdbD9b1YIC/knJzidbDcqDVQMMt/8g7yLY8MO
+	wWvDOyTCsXwV3EWJ4nVKXrVkxeRsPv9uIK94Kqe+VrVNwseCgg5sEMuc2XnSulQxO3GT/EEuaiLSE
+	w/dXEV9Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46612)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tLlYP-0005Rx-0u;
+	Thu, 12 Dec 2024 15:56:41 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tLlYM-0005RO-0B;
+	Thu, 12 Dec 2024 15:56:38 +0000
+Date: Thu, 12 Dec 2024 15:56:37 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net-next] net: dsa: sja1105: let phylink help with
+ the replay of link callbacks
+Message-ID: <Z1sHtZXuOvJe3Ruu@shell.armlinux.org.uk>
+References: <20241003140754.1229076-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241003140754.1229076-1-vladimir.oltean@nxp.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Test the kernel's ability to:
- - update the key (but not the version or cipher), only for TLS1.3
- - pause decryption after receiving a KeyUpdate message, until a new
-   RX key has been provided
- - reflect the pause/non-readable socket in poll()
+On Thu, Oct 03, 2024 at 05:07:53PM +0300, Vladimir Oltean wrote:
+> sja1105_static_config_reload() changes major settings in the switch and
+> it requires a reset. A use case is to change things like Qdiscs (but see
+> sja1105_reset_reasons[] for full list) while PTP synchronization is
+> running, and the servo loop must not exit the locked state (s2).
+> Therefore, stopping and restarting the phylink instances of all ports is
+> not desirable, because that also stops the phylib state machine, and
+> retriggers a seconds-long auto-negotiation process that breaks PTP.
 
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
----
-v2: add rekey_fail test (reject changing the version/cipher)
-v3: add rekey_peek_splice following Jakub's comment
-    add rekey+poll tests
-v4: rebase, new selftests were added
-    check that rekey isn't supported on TLS1.2
+However:
 
- tools/testing/selftests/net/tls.c | 458 ++++++++++++++++++++++++++++++
- 1 file changed, 458 insertions(+)
+> ptp4l[54.552]: master offset          5 s2 freq    -931 path delay       764
+> ptp4l[55.551]: master offset         22 s2 freq    -913 path delay       764
+> ptp4l[56.551]: master offset         13 s2 freq    -915 path delay       765
+> ptp4l[57.552]: master offset          5 s2 freq    -919 path delay       765
+> ptp4l[58.553]: master offset         13 s2 freq    -910 path delay       765
+> ptp4l[59.553]: master offset         13 s2 freq    -906 path delay       765
+> ptp4l[60.553]: master offset          6 s2 freq    -909 path delay       765
+> ptp4l[61.553]: master offset          6 s2 freq    -907 path delay       765
+> ptp4l[62.553]: master offset          6 s2 freq    -906 path delay       765
+> ptp4l[63.553]: master offset         14 s2 freq    -896 path delay       765
+> $ ip link set br0 type bridge vlan_filtering 1
+> [   63.983283] sja1105 spi2.0 sw0p0: Link is Down
+> [   63.991913] sja1105 spi2.0: Link is Down
+> [   64.009784] sja1105 spi2.0: Reset switch and programmed static config. Reason: VLAN filtering
+> [   64.020217] sja1105 spi2.0 sw0p0: Link is Up - 1Gbps/Full - flow control off
+> [   64.030683] sja1105 spi2.0: Link is Up - 1Gbps/Full - flow control off
+> ptp4l[64.554]: master offset       7397 s2 freq   +6491 path delay       765
+> ptp4l[65.554]: master offset         38 s2 freq   +1352 path delay       765
+> ptp4l[66.554]: master offset      -2225 s2 freq    -900 path delay       764
+> ptp4l[67.555]: master offset      -2226 s2 freq   -1569 path delay       765
+> ptp4l[68.555]: master offset      -1553 s2 freq   -1563 path delay       765
+> ptp4l[69.555]: master offset       -865 s2 freq   -1341 path delay       765
+> ptp4l[70.555]: master offset       -401 s2 freq   -1137 path delay       765
+> ptp4l[71.556]: master offset       -145 s2 freq   -1001 path delay       765
 
-diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
-index b1f52d2bb096..9a85f93c33d8 100644
---- a/tools/testing/selftests/net/tls.c
-+++ b/tools/testing/selftests/net/tls.c
-@@ -1670,6 +1670,464 @@ TEST_F(tls, recv_efault)
- 		EXPECT_EQ(memcmp(rec2, recv_mem + 9, ret - 9), 0);
- }
- 
-+#define TLS_RECORD_TYPE_HANDSHAKE      0x16
-+/* key_update, length 1, update_not_requested */
-+static const char key_update_msg[] = "\x18\x00\x00\x01\x00";
-+static void tls_send_keyupdate(struct __test_metadata *_metadata, int fd)
-+{
-+	size_t len = sizeof(key_update_msg);
-+
-+	EXPECT_EQ(tls_send_cmsg(fd, TLS_RECORD_TYPE_HANDSHAKE,
-+				(char *)key_update_msg, len, 0),
-+		  len);
-+}
-+
-+static void tls_recv_keyupdate(struct __test_metadata *_metadata, int fd, int flags)
-+{
-+	char buf[100];
-+
-+	EXPECT_EQ(tls_recv_cmsg(_metadata, fd, TLS_RECORD_TYPE_HANDSHAKE, buf, sizeof(buf), flags),
-+		  sizeof(key_update_msg));
-+	EXPECT_EQ(memcmp(buf, key_update_msg, sizeof(key_update_msg)), 0);
-+}
-+
-+/* set the key to 0 then 1 for RX, immediately to 1 for TX */
-+TEST_F(tls_basic, rekey_rx)
-+{
-+	struct tls_crypto_info_keys tls12_0, tls12_1;
-+	char const *test_str = "test_message";
-+	int send_len = strlen(test_str) + 1;
-+	char buf[20];
-+	int ret;
-+
-+	if (self->notls)
-+		return;
-+
-+	tls_crypto_info_init(TLS_1_3_VERSION, TLS_CIPHER_AES_GCM_128,
-+			     &tls12_0, 0);
-+	tls_crypto_info_init(TLS_1_3_VERSION, TLS_CIPHER_AES_GCM_128,
-+			     &tls12_1, 1);
-+
-+	ret = setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12_1, tls12_1.len);
-+	ASSERT_EQ(ret, 0);
-+
-+	ret = setsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12_0, tls12_0.len);
-+	ASSERT_EQ(ret, 0);
-+
-+	ret = setsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12_1, tls12_1.len);
-+	EXPECT_EQ(ret, 0);
-+
-+	EXPECT_EQ(send(self->fd, test_str, send_len, 0), send_len);
-+	EXPECT_EQ(recv(self->cfd, buf, send_len, 0), send_len);
-+	EXPECT_EQ(memcmp(buf, test_str, send_len), 0);
-+}
-+
-+/* set the key to 0 then 1 for TX, immediately to 1 for RX */
-+TEST_F(tls_basic, rekey_tx)
-+{
-+	struct tls_crypto_info_keys tls12_0, tls12_1;
-+	char const *test_str = "test_message";
-+	int send_len = strlen(test_str) + 1;
-+	char buf[20];
-+	int ret;
-+
-+	if (self->notls)
-+		return;
-+
-+	tls_crypto_info_init(TLS_1_3_VERSION, TLS_CIPHER_AES_GCM_128,
-+			     &tls12_0, 0);
-+	tls_crypto_info_init(TLS_1_3_VERSION, TLS_CIPHER_AES_GCM_128,
-+			     &tls12_1, 1);
-+
-+	ret = setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12_0, tls12_0.len);
-+	ASSERT_EQ(ret, 0);
-+
-+	ret = setsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12_1, tls12_1.len);
-+	ASSERT_EQ(ret, 0);
-+
-+	ret = setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12_1, tls12_1.len);
-+	EXPECT_EQ(ret, 0);
-+
-+	EXPECT_EQ(send(self->fd, test_str, send_len, 0), send_len);
-+	EXPECT_EQ(recv(self->cfd, buf, send_len, 0), send_len);
-+	EXPECT_EQ(memcmp(buf, test_str, send_len), 0);
-+}
-+
-+TEST_F(tls, rekey)
-+{
-+	char const *test_str_1 = "test_message_before_rekey";
-+	char const *test_str_2 = "test_message_after_rekey";
-+	struct tls_crypto_info_keys tls12;
-+	int send_len;
-+	char buf[100];
-+
-+	if (variant->tls_version != TLS_1_3_VERSION)
-+		return;
-+
-+	/* initial send/recv */
-+	send_len = strlen(test_str_1) + 1;
-+	EXPECT_EQ(send(self->fd, test_str_1, send_len, 0), send_len);
-+	EXPECT_EQ(recv(self->cfd, buf, send_len, 0), send_len);
-+	EXPECT_EQ(memcmp(buf, test_str_1, send_len), 0);
-+
-+	/* update TX key */
-+	tls_send_keyupdate(_metadata, self->fd);
-+	tls_crypto_info_init(variant->tls_version, variant->cipher_type, &tls12, 1);
-+	EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), 0);
-+
-+	/* send after rekey */
-+	send_len = strlen(test_str_2) + 1;
-+	EXPECT_EQ(send(self->fd, test_str_2, send_len, 0), send_len);
-+
-+	/* can't receive the KeyUpdate without a control message */
-+	EXPECT_EQ(recv(self->cfd, buf, send_len, 0), -1);
-+
-+	/* get KeyUpdate */
-+	tls_recv_keyupdate(_metadata, self->cfd, 0);
-+
-+	/* recv blocking -> -EKEYEXPIRED */
-+	EXPECT_EQ(recv(self->cfd, buf, sizeof(buf), 0), -1);
-+	EXPECT_EQ(errno, EKEYEXPIRED);
-+
-+	/* recv non-blocking -> -EKEYEXPIRED */
-+	EXPECT_EQ(recv(self->cfd, buf, sizeof(buf), MSG_DONTWAIT), -1);
-+	EXPECT_EQ(errno, EKEYEXPIRED);
-+
-+	/* update RX key */
-+	EXPECT_EQ(setsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12, tls12.len), 0);
-+
-+	/* recv after rekey */
-+	EXPECT_NE(recv(self->cfd, buf, send_len, 0), -1);
-+	EXPECT_EQ(memcmp(buf, test_str_2, send_len), 0);
-+}
-+
-+TEST_F(tls, rekey_fail)
-+{
-+	char const *test_str_1 = "test_message_before_rekey";
-+	char const *test_str_2 = "test_message_after_rekey";
-+	struct tls_crypto_info_keys tls12;
-+	int send_len;
-+	char buf[100];
-+
-+	/* initial send/recv */
-+	send_len = strlen(test_str_1) + 1;
-+	EXPECT_EQ(send(self->fd, test_str_1, send_len, 0), send_len);
-+	EXPECT_EQ(recv(self->cfd, buf, send_len, 0), send_len);
-+	EXPECT_EQ(memcmp(buf, test_str_1, send_len), 0);
-+
-+	/* update TX key */
-+	tls_send_keyupdate(_metadata, self->fd);
-+
-+	if (variant->tls_version != TLS_1_3_VERSION) {
-+		/* just check that rekey is not supported and return */
-+		tls_crypto_info_init(variant->tls_version, variant->cipher_type, &tls12, 1);
-+		EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), -1);
-+		EXPECT_EQ(errno, EBUSY);
-+		return;
-+	}
-+
-+	/* successful update */
-+	tls_crypto_info_init(variant->tls_version, variant->cipher_type, &tls12, 1);
-+	EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), 0);
-+
-+	/* invalid update: change of version */
-+	tls_crypto_info_init(TLS_1_2_VERSION, variant->cipher_type, &tls12, 1);
-+	EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), -1);
-+	EXPECT_EQ(errno, EINVAL);
-+
-+	/* invalid update (RX socket): change of version */
-+	tls_crypto_info_init(TLS_1_2_VERSION, variant->cipher_type, &tls12, 1);
-+	EXPECT_EQ(setsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12, tls12.len), -1);
-+	EXPECT_EQ(errno, EINVAL);
-+
-+	/* invalid update: change of cipher */
-+	if (variant->cipher_type == TLS_CIPHER_AES_GCM_256)
-+		tls_crypto_info_init(variant->tls_version, TLS_CIPHER_CHACHA20_POLY1305, &tls12, 1);
-+	else
-+		tls_crypto_info_init(variant->tls_version, TLS_CIPHER_AES_GCM_256, &tls12, 1);
-+	EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), -1);
-+	EXPECT_EQ(errno, EINVAL);
-+
-+	/* send after rekey, the invalid updates shouldn't have an effect */
-+	send_len = strlen(test_str_2) + 1;
-+	EXPECT_EQ(send(self->fd, test_str_2, send_len, 0), send_len);
-+
-+	/* can't receive the KeyUpdate without a control message */
-+	EXPECT_EQ(recv(self->cfd, buf, send_len, 0), -1);
-+
-+	/* get KeyUpdate */
-+	tls_recv_keyupdate(_metadata, self->cfd, 0);
-+
-+	/* recv blocking -> -EKEYEXPIRED */
-+	EXPECT_EQ(recv(self->cfd, buf, sizeof(buf), 0), -1);
-+	EXPECT_EQ(errno, EKEYEXPIRED);
-+
-+	/* recv non-blocking -> -EKEYEXPIRED */
-+	EXPECT_EQ(recv(self->cfd, buf, sizeof(buf), MSG_DONTWAIT), -1);
-+	EXPECT_EQ(errno, EKEYEXPIRED);
-+
-+	/* update RX key */
-+	tls_crypto_info_init(variant->tls_version, variant->cipher_type, &tls12, 1);
-+	EXPECT_EQ(setsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12, tls12.len), 0);
-+
-+	/* recv after rekey */
-+	EXPECT_NE(recv(self->cfd, buf, send_len, 0), -1);
-+	EXPECT_EQ(memcmp(buf, test_str_2, send_len), 0);
-+}
-+
-+TEST_F(tls, rekey_peek)
-+{
-+	char const *test_str_1 = "test_message_before_rekey";
-+	struct tls_crypto_info_keys tls12;
-+	int send_len;
-+	char buf[100];
-+
-+	if (variant->tls_version != TLS_1_3_VERSION)
-+		return;
-+
-+	send_len = strlen(test_str_1) + 1;
-+	EXPECT_EQ(send(self->fd, test_str_1, send_len, 0), send_len);
-+
-+	/* update TX key */
-+	tls_send_keyupdate(_metadata, self->fd);
-+	tls_crypto_info_init(variant->tls_version, variant->cipher_type, &tls12, 1);
-+	EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), 0);
-+
-+	EXPECT_EQ(recv(self->cfd, buf, sizeof(buf), MSG_PEEK), send_len);
-+	EXPECT_EQ(memcmp(buf, test_str_1, send_len), 0);
-+
-+	EXPECT_EQ(recv(self->cfd, buf, send_len, 0), send_len);
-+	EXPECT_EQ(memcmp(buf, test_str_1, send_len), 0);
-+
-+	/* can't receive the KeyUpdate without a control message */
-+	EXPECT_EQ(recv(self->cfd, buf, send_len, MSG_PEEK), -1);
-+
-+	/* peek KeyUpdate */
-+	tls_recv_keyupdate(_metadata, self->cfd, MSG_PEEK);
-+
-+	/* get KeyUpdate */
-+	tls_recv_keyupdate(_metadata, self->cfd, 0);
-+
-+	/* update RX key */
-+	EXPECT_EQ(setsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12, tls12.len), 0);
-+}
-+
-+TEST_F(tls, splice_rekey)
-+{
-+	int send_len = TLS_PAYLOAD_MAX_LEN / 2;
-+	char mem_send[TLS_PAYLOAD_MAX_LEN];
-+	char mem_recv[TLS_PAYLOAD_MAX_LEN];
-+	struct tls_crypto_info_keys tls12;
-+	int p[2];
-+
-+	if (variant->tls_version != TLS_1_3_VERSION)
-+		return;
-+
-+	memrnd(mem_send, sizeof(mem_send));
-+
-+	ASSERT_GE(pipe(p), 0);
-+	EXPECT_EQ(send(self->fd, mem_send, send_len, 0), send_len);
-+
-+	/* update TX key */
-+	tls_send_keyupdate(_metadata, self->fd);
-+	tls_crypto_info_init(variant->tls_version, variant->cipher_type, &tls12, 1);
-+	EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), 0);
-+
-+	EXPECT_EQ(send(self->fd, mem_send, send_len, 0), send_len);
-+
-+	EXPECT_EQ(splice(self->cfd, NULL, p[1], NULL, TLS_PAYLOAD_MAX_LEN, 0), send_len);
-+	EXPECT_EQ(read(p[0], mem_recv, send_len), send_len);
-+	EXPECT_EQ(memcmp(mem_send, mem_recv, send_len), 0);
-+
-+	/* can't splice the KeyUpdate */
-+	EXPECT_EQ(splice(self->cfd, NULL, p[1], NULL, TLS_PAYLOAD_MAX_LEN, 0), -1);
-+	EXPECT_EQ(errno, EINVAL);
-+
-+	/* peek KeyUpdate */
-+	tls_recv_keyupdate(_metadata, self->cfd, MSG_PEEK);
-+
-+	/* get KeyUpdate */
-+	tls_recv_keyupdate(_metadata, self->cfd, 0);
-+
-+	/* can't splice before updating the key */
-+	EXPECT_EQ(splice(self->cfd, NULL, p[1], NULL, TLS_PAYLOAD_MAX_LEN, 0), -1);
-+	EXPECT_EQ(errno, EKEYEXPIRED);
-+
-+	/* update RX key */
-+	EXPECT_EQ(setsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12, tls12.len), 0);
-+
-+	EXPECT_EQ(splice(self->cfd, NULL, p[1], NULL, TLS_PAYLOAD_MAX_LEN, 0), send_len);
-+	EXPECT_EQ(read(p[0], mem_recv, send_len), send_len);
-+	EXPECT_EQ(memcmp(mem_send, mem_recv, send_len), 0);
-+}
-+
-+TEST_F(tls, rekey_peek_splice)
-+{
-+	char const *test_str_1 = "test_message_before_rekey";
-+	struct tls_crypto_info_keys tls12;
-+	int send_len;
-+	char buf[100];
-+	char mem_recv[TLS_PAYLOAD_MAX_LEN];
-+	int p[2];
-+
-+	if (variant->tls_version != TLS_1_3_VERSION)
-+		return;
-+
-+	ASSERT_GE(pipe(p), 0);
-+
-+	send_len = strlen(test_str_1) + 1;
-+	EXPECT_EQ(send(self->fd, test_str_1, send_len, 0), send_len);
-+
-+	/* update TX key */
-+	tls_send_keyupdate(_metadata, self->fd);
-+	tls_crypto_info_init(variant->tls_version, variant->cipher_type, &tls12, 1);
-+	EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), 0);
-+
-+	EXPECT_EQ(recv(self->cfd, buf, sizeof(buf), MSG_PEEK), send_len);
-+	EXPECT_EQ(memcmp(buf, test_str_1, send_len), 0);
-+
-+	EXPECT_EQ(splice(self->cfd, NULL, p[1], NULL, TLS_PAYLOAD_MAX_LEN, 0), send_len);
-+	EXPECT_EQ(read(p[0], mem_recv, send_len), send_len);
-+	EXPECT_EQ(memcmp(mem_recv, test_str_1, send_len), 0);
-+}
-+
-+TEST_F(tls, rekey_getsockopt)
-+{
-+	struct tls_crypto_info_keys tls12;
-+	struct tls_crypto_info_keys tls12_get;
-+	socklen_t len;
-+
-+	tls_crypto_info_init(variant->tls_version, variant->cipher_type, &tls12, 0);
-+
-+	len = tls12.len;
-+	EXPECT_EQ(getsockopt(self->fd, SOL_TLS, TLS_TX, &tls12_get, &len), 0);
-+	EXPECT_EQ(len, tls12.len);
-+	EXPECT_EQ(memcmp(&tls12_get, &tls12, tls12.len), 0);
-+
-+	len = tls12.len;
-+	EXPECT_EQ(getsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12_get, &len), 0);
-+	EXPECT_EQ(len, tls12.len);
-+	EXPECT_EQ(memcmp(&tls12_get, &tls12, tls12.len), 0);
-+
-+	if (variant->tls_version != TLS_1_3_VERSION)
-+		return;
-+
-+	tls_send_keyupdate(_metadata, self->fd);
-+	tls_crypto_info_init(variant->tls_version, variant->cipher_type, &tls12, 1);
-+	EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), 0);
-+
-+	tls_recv_keyupdate(_metadata, self->cfd, 0);
-+	EXPECT_EQ(setsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12, tls12.len), 0);
-+
-+	len = tls12.len;
-+	EXPECT_EQ(getsockopt(self->fd, SOL_TLS, TLS_TX, &tls12_get, &len), 0);
-+	EXPECT_EQ(len, tls12.len);
-+	EXPECT_EQ(memcmp(&tls12_get, &tls12, tls12.len), 0);
-+
-+	len = tls12.len;
-+	EXPECT_EQ(getsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12_get, &len), 0);
-+	EXPECT_EQ(len, tls12.len);
-+	EXPECT_EQ(memcmp(&tls12_get, &tls12, tls12.len), 0);
-+}
-+
-+TEST_F(tls, rekey_poll_pending)
-+{
-+	char const *test_str = "test_message_after_rekey";
-+	struct tls_crypto_info_keys tls12;
-+	struct pollfd pfd = { };
-+	int send_len;
-+	int ret;
-+
-+	if (variant->tls_version != TLS_1_3_VERSION)
-+		return;
-+
-+	/* update TX key */
-+	tls_send_keyupdate(_metadata, self->fd);
-+	tls_crypto_info_init(variant->tls_version, variant->cipher_type, &tls12, 1);
-+	EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), 0);
-+
-+	/* get KeyUpdate */
-+	tls_recv_keyupdate(_metadata, self->cfd, 0);
-+
-+	/* send immediately after rekey */
-+	send_len = strlen(test_str) + 1;
-+	EXPECT_EQ(send(self->fd, test_str, send_len, 0), send_len);
-+
-+	/* key hasn't been updated, expect cfd to be non-readable */
-+	pfd.fd = self->cfd;
-+	pfd.events = POLLIN;
-+	EXPECT_EQ(poll(&pfd, 1, 0), 0);
-+
-+	ret = fork();
-+	ASSERT_GE(ret, 0);
-+
-+	if (ret) {
-+		int pid2, status;
-+
-+		/* wait before installing the new key */
-+		sleep(1);
-+
-+		/* update RX key while poll() is sleeping */
-+		EXPECT_EQ(setsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12, tls12.len), 0);
-+
-+		pid2 = wait(&status);
-+		EXPECT_EQ(pid2, ret);
-+		EXPECT_EQ(status, 0);
-+	} else {
-+		pfd.fd = self->cfd;
-+		pfd.events = POLLIN;
-+		EXPECT_EQ(poll(&pfd, 1, 5000), 1);
-+
-+		exit(!__test_passed(_metadata));
-+	}
-+}
-+
-+TEST_F(tls, rekey_poll_delay)
-+{
-+	char const *test_str = "test_message_after_rekey";
-+	struct tls_crypto_info_keys tls12;
-+	struct pollfd pfd = { };
-+	int send_len;
-+	int ret;
-+
-+	if (variant->tls_version != TLS_1_3_VERSION)
-+		return;
-+
-+	/* update TX key */
-+	tls_send_keyupdate(_metadata, self->fd);
-+	tls_crypto_info_init(variant->tls_version, variant->cipher_type, &tls12, 1);
-+	EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), 0);
-+
-+	/* get KeyUpdate */
-+	tls_recv_keyupdate(_metadata, self->cfd, 0);
-+
-+	ret = fork();
-+	ASSERT_GE(ret, 0);
-+
-+	if (ret) {
-+		int pid2, status;
-+
-+		/* wait before installing the new key */
-+		sleep(1);
-+
-+		/* update RX key while poll() is sleeping */
-+		EXPECT_EQ(setsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12, tls12.len), 0);
-+
-+		sleep(1);
-+		send_len = strlen(test_str) + 1;
-+		EXPECT_EQ(send(self->fd, test_str, send_len, 0), send_len);
-+
-+		pid2 = wait(&status);
-+		EXPECT_EQ(pid2, ret);
-+		EXPECT_EQ(status, 0);
-+	} else {
-+		pfd.fd = self->cfd;
-+		pfd.events = POLLIN;
-+		EXPECT_EQ(poll(&pfd, 1, 5000), 1);
-+		exit(!__test_passed(_metadata));
-+	}
-+}
-+
- FIXTURE(tls_err)
- {
- 	int fd, cfd;
+doesn't this change in offset and frequency indicate that the PTP clock
+was still disrupted, and needed to be re-synchronised? If it was
+unaffected, then I would have expected the offset and frequency to
+remain similar to before the reset happened.
+
+Nevertheless...
+
+> @@ -1551,7 +1552,8 @@ static void phylink_resolve(struct work_struct *w)
+>  	}
+>  
+>  	if (mac_config) {
+> -		if (link_state.interface != pl->link_config.interface) {
+> +		if (link_state.interface != pl->link_config.interface ||
+> +		    pl->force_major_config) {
+>  			/* The interface has changed, force the link down and
+>  			 * then reconfigure.
+>  			 */
+> @@ -1561,6 +1563,7 @@ static void phylink_resolve(struct work_struct *w)
+>  			}
+>  			phylink_major_config(pl, false, &link_state);
+>  			pl->link_config.interface = link_state.interface;
+> +			pl->force_major_config = false;
+>  		}
+>  	}
+
+This will delay the major config until the link comes up, as mac_config
+only gets set true for fixed-link and PHY when the link is up. For
+inband mode, things get less certain, because mac_config will only be
+true if there is a PHY present and the PHY link was up. Otherwise,
+inband leaves mac_config false, and thus if force_major_config was
+true, that would persist indefinitely.
+
+> +/**
+> + * phylink_replay_link_begin() - begin replay of link callbacks for driver
+> + *				 which loses state
+> + * @pl: a pointer to a &struct phylink returned from phylink_create()
+> + *
+> + * Helper for MAC drivers which may perform a destructive reset at runtime.
+> + * Both the own driver's mac_link_down() method is called, as well as the
+> + * pcs_link_down() method of the split PCS (if any).
+> + *
+> + * This is similar to phylink_stop(), except it does not alter the state of
+> + * the phylib PHY (it is assumed that it is not affected by the MAC destructive
+> + * reset).
+> + */
+> +void phylink_replay_link_begin(struct phylink *pl)
+> +{
+> +	ASSERT_RTNL();
+> +
+> +	phylink_run_resolve_and_disable(pl, PHYLINK_DISABLE_STOPPED);
+
+I would prefer this used a different disable flag, so that...
+
+> +}
+> +EXPORT_SYMBOL_GPL(phylink_replay_link_begin);
+> +
+> +/**
+> + * phylink_replay_link_end() - end replay of link callbacks for driver
+> + *			       which lost state
+> + * @pl: a pointer to a &struct phylink returned from phylink_create()
+> + *
+> + * Helper for MAC drivers which may perform a destructive reset at runtime.
+> + * Both the own driver's mac_config() and mac_link_up() methods, as well as the
+> + * pcs_config() and pcs_link_up() method of the split PCS (if any), are called.
+> + *
+> + * This is similar to phylink_start(), except it does not alter the state of
+> + * the phylib PHY.
+> + *
+> + * One must call this method only within the same rtnl_lock() critical section
+> + * as a previous phylink_replay_link_start().
+> + */
+> +void phylink_replay_link_end(struct phylink *pl)
+> +{
+> +	ASSERT_RTNL();
+> +
+> +	pl->force_major_config = true;
+> +	phylink_enable_and_run_resolve(pl, PHYLINK_DISABLE_STOPPED);
+
+this can check that phylink_replay_link_begin() was previously called
+to catch programming errors. There shouldn't be any conflict with
+phylink_start()/phylink_stop() since the RTNL is held, but I think
+its still worth checking that phylink_replay_link_begin() was
+indeed called previously.
+
+Other than those points, I think for sja1105 this is a better approach,
+and as it's lightweight in phylink, I don't think having this will add
+much maintenance burden, so I'm happy with the approach.
+
 -- 
-2.47.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
