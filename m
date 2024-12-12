@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-151520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C7689EFE4F
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 22:32:46 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A74518891BF
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 21:32:43 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE3A1D89FA;
-	Thu, 12 Dec 2024 21:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="hXQ5dR5D"
-X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2055.outbound.protection.outlook.com [40.107.223.55])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 119949EFE4D
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 22:32:38 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93BB1DACB8
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 21:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.55
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C12EE28771D
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 21:32:36 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73A61DA100;
+	Thu, 12 Dec 2024 21:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QBUMz+aX"
+X-Original-To: netdev@vger.kernel.org
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2078.outbound.protection.outlook.com [40.107.96.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1139A1B21AA
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 21:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.78
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734039151; cv=fail; b=gb2H+p6/qx9rbJpMapBPSRWII7kQo1ixXRqF9WcwKvt7+FsKm8mi030JPQ/ytsvqcoKNzICVFE7eT7+/Sx4wgSI5hRadG6gVIy8tKiLCqprA/Tfjia8SKPLmcDJ8x6xDyiXlaUfGVBzd24/9PvxOxQv/KbhwkbeosRDd01W/fWg=
+	t=1734039147; cv=fail; b=sCx8n/LmVJkHBj1iBZvaykUCtEuLRWzkbehua/oDF0PAvgHkZG4HDg7IjqX+S6T6xwZcv4NyZqRJiBuBFfBe9nKWnHBZAI3qIF264+5acQCnoABuhSgKVxVyzblch3YdIFvavi8odRiC79Qol7Plt7/EfvMl2f+StPXo5o4sRo4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734039151; c=relaxed/simple;
-	bh=DPNIGcAc+3LhRDqfYIZUcTgC2YHkvIDjg21iJQ72TPc=;
+	s=arc-20240116; t=1734039147; c=relaxed/simple;
+	bh=wsnuJA5O4s62G60RQvmi5CXZ1UBveF3b7fp2NO7sbzM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HMuGkR7LMzsKcpAcoB/nG/zv+mcQSGtJeo9v+YijaK/2/4wgqIvn4ffnL/EjkhtqtBGNdblk4af2NOzlmQJCU6eYsXk2Js6thIGS6itEOe+q5+B7xRCNkrOoAkjgUDHtbedUNPUgKD/VYtNZC1l5HDHSiJNNd2uCI1XkQ6XRdW0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=hXQ5dR5D; arc=fail smtp.client-ip=40.107.223.55
+	 MIME-Version:Content-Type; b=oX6S3keD1gMrqsxznGoAxFu1x96NyFwBCxRBV2kbtoABA3xOw1L5OeaC+nhwbq1B3G14gb4WxQCq3tEkHhzamm5zRozyXzayQSqQqVryyXYbvq9WeqdPPCggyD78X4gyLrMZXMqBEYidAG6mIW3TAy1xImLgXdBzsQuaZk0H15I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QBUMz+aX; arc=fail smtp.client-ip=40.107.96.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DqzVhDjqJGg1jOyccFfJk5NxBQe31pFAY1u/X6WUhXpb3puzJGrdQePSzZensc5cg2cJOlUHLFyLhiDUZqc+XzL2rPcph3J14RNSYn9sEzHR8szSGIH1ZgerXpN3fjeZkH+kivdXiLLkjRcjQJdg7xgBKEp0d/EfiJ7hlq5YKNFuuM30WUS9eKEgLnA/rvrtzebdH7O7DD+8YWK1MONslwo6TbjnyaHhmkANUPimj1g7xZ5XIUAadfXJ9OwoFMuwUM6rdRWLlbO/JKtHE3GdpmMsUpISNxEsSSidZ+3icM1SKiqDDEwPf3S8YgAM/Ye+T3m3l/3z5RNEHC9tALFP8A==
+ b=NAJ0XAKIwj92wY3XegvOzuBOhe/5sTslVRvOFckvdpDV9lRwOnmgwRwsJWHuedxfK/5dAtslS0sd3rGklJN4K/dqDwUrlbyWSe3tjwsWK28wmm0wmb0/slq8K4AbSdDgIk8lYKTlNuT4NJTADpzK0dDMI/TFIDUkgoY65myPHkzIRHV02/NbIFIzuuZjaK3MmCtUjAk3fGrUOUnjgf/5P1uuTyGWZLwpXdTfo+jsXHnzDmaPM9xhg8EwvU0cX4UM2oq22o8S3QhbYEjVafnkTMSNC3sOJgv1O2ntbfm6GXhjX2fCC2+NezkECi5q7IrFXnh0oCAknijin8Ei820hbw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X3RMp/Vwl9TWyV0qH2rvA43NfPkKob0EAqsDD3EzHsI=;
- b=mRkwvTrD6micYP4xvs5dmEqSiYh7ZvC0PgUWT3xSSsU7qz/sCX6QUEaYDCaopeSdKUj9RB0sFdo3lF/qn3l5uZE/D3KbINCXZqmeFOxZkEXLPyu1FWcivIhgjXxTMRHi9N8CGW5G/qa4Tvu+EdxPpMRaKMGpEyeQKmIjgivHdQMZrbizdlyB/ZTMYeYLM+quAyG9VBCKnq8aqTHjlvDiqCokiy4nV9M4p1fxz6SpdGywYKY3jj+DODv1qr3QlNnlR3uFOghClKihg1y5DNs0DyIJk+IugIEp8x4NdzMIW2eT9c04qveWuMV0KrGnbofwlsg1IhnJm1z7bNU5oNZVoQ==
+ bh=8tnmOvRBipRO86D2hN7Zrwe3H1wQlpdNSx7ldcKH7/s=;
+ b=X9bvRCqzBUV7oeXGUFjoMEm5jZ034P9h/fuTVcgPGWZw5bnjdjzBPLaWGecS+bORm7tfMW61nnFQHJuvPHvALo0JTEqvCKno1fSWJQbTucc+uGR67YqhDDaIbZRguupF2Dz43zStnNULj6pTfmrXiR4REFTvhtq4NNEh95w5/eH99vKupWBKBDgulanHTSoyZYFim3pbklYk/vGD64t02PzgvwkUw4jnM1uv7TmMEKX9p4gOlBCSy/iKfazm9Tdx3wa0uzsaAOip2QezVF8NJGLDdTiVT0cFc7ehDfx+hvdhhJG1bTZ2L1iCKJuWWL2OgRdT10b4Y8wttpV9aWqhsQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X3RMp/Vwl9TWyV0qH2rvA43NfPkKob0EAqsDD3EzHsI=;
- b=hXQ5dR5DTFVlpgeoFaQpndEhDQa0/zZiWFc9//wEjPWPgbkJiht2YkJBKg5viaKassxr+YSsORGYG4MBxxa08caebARbehYIR3fCCNJ6t2UKlrPF8osf4q+NYZ/NDgF5CNGxewQVlRoNd+jAX0vuY/sO17eDPVjNegeksjHS7ik=
-Received: from MW2PR2101CA0025.namprd21.prod.outlook.com (2603:10b6:302:1::38)
- by PH0PR12MB7010.namprd12.prod.outlook.com (2603:10b6:510:21c::11) with
+ bh=8tnmOvRBipRO86D2hN7Zrwe3H1wQlpdNSx7ldcKH7/s=;
+ b=QBUMz+aXXkJZhwfeiqZ4QtzV3LePblt9eXN429CTH60KkXsHSRQcmRn8oW4Qtgb687ph5ekEnE6gejqz7PS5STQkZF+1i7qsFdmcc6kxr4ylY9akJ5oODGXMCcZwiREzn3yi4J39wZDC19KbtjAoi8uD+q+YwlbztszvoA5Q2cA=
+Received: from MW2PR2101CA0010.namprd21.prod.outlook.com (2603:10b6:302:1::23)
+ by DM4PR12MB7576.namprd12.prod.outlook.com (2603:10b6:8:10c::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.18; Thu, 12 Dec
- 2024 21:32:21 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Thu, 12 Dec
+ 2024 21:32:22 +0000
 Received: from MWH0EPF000971E8.namprd02.prod.outlook.com
- (2603:10b6:302:1:cafe::15) by MW2PR2101CA0025.outlook.office365.com
- (2603:10b6:302:1::38) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8272.6 via Frontend Transport; Thu,
- 12 Dec 2024 21:32:20 +0000
+ (2603:10b6:302:1:cafe::e) by MW2PR2101CA0010.outlook.office365.com
+ (2603:10b6:302:1::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8272.4 via Frontend Transport; Thu,
+ 12 Dec 2024 21:32:21 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,19 +65,19 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  MWH0EPF000971E8.mail.protection.outlook.com (10.167.243.68) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8251.15 via Frontend Transport; Thu, 12 Dec 2024 21:32:20 +0000
+ 15.20.8251.15 via Frontend Transport; Thu, 12 Dec 2024 21:32:21 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 12 Dec
- 2024 15:32:18 -0600
+ 2024 15:32:19 -0600
 From: Shannon Nelson <shannon.nelson@amd.com>
 To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
 	<jacob.e.keller@intel.com>
 CC: <brett.creeley@amd.com>, Shannon Nelson <shannon.nelson@amd.com>
-Subject: [PATCH v2 net 2/3] ionic: no double destroy workqueue
-Date: Thu, 12 Dec 2024 13:31:56 -0800
-Message-ID: <20241212213157.12212-3-shannon.nelson@amd.com>
+Subject: [PATCH v2 net 3/3] ionic: use ee->offset when returning sprom data
+Date: Thu, 12 Dec 2024 13:31:57 -0800
+Message-ID: <20241212213157.12212-4-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20241212213157.12212-1-shannon.nelson@amd.com>
 References: <20241212213157.12212-1-shannon.nelson@amd.com>
@@ -92,90 +92,79 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E8:EE_|PH0PR12MB7010:EE_
-X-MS-Office365-Filtering-Correlation-Id: 615c7c59-68a3-4e89-20a7-08dd1af475db
+X-MS-TrafficTypeDiagnostic: MWH0EPF000971E8:EE_|DM4PR12MB7576:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32da3325-5534-4242-ddfd-08dd1af4767a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026;
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?o+d3U+8vStd/xMbvjp1qmci8pxjJPQ2KthE2m+MlXjrgTqyCK+ssM6DA6LFg?=
- =?us-ascii?Q?5qSEjp3EsWs3eEKeA6nQ50cZebTOA3evTHJiAVF9oHVghdR2Mz1E4uCPQ7sR?=
- =?us-ascii?Q?fWaA5zP7BRrJE2ml6VliOQB5k3yk9JxMzLURw/X5s23bVxxJe2zbovJSvxoC?=
- =?us-ascii?Q?Z8d3NJlKudvux7mN1Rwn7qcc+bRGhhlX8K5+8DeD9kHciEK5bXnS9K7vMTlt?=
- =?us-ascii?Q?OMq7BQNQEJg1t69qbqGtONRcnUZRgs98gfRhKcWh7Xbm3Ypq1x4G3qjSFrdy?=
- =?us-ascii?Q?euIMnhAXvVWbPY5NiORqndCPVMgQv4F/wf0w/8k6CPTcJm3pDlMEcI+Mv6jy?=
- =?us-ascii?Q?MsqbT6ifBKUwpRB9snSPsQJwDj4tdJ6DYjugcEURdJ0y1Q1AYkRclEXRG/KY?=
- =?us-ascii?Q?A0RzkERnoNmfysuCfNWIrOnC7WVwLZTRknqKI1UicNpJUU0lBiWjs/ZzOxNz?=
- =?us-ascii?Q?NL3mPbjFUJkqgrpxHlZiui7jFRUf0a/uV3F/e0CuqX2wKms89TAx3jnZlHwV?=
- =?us-ascii?Q?2YGN44RHiauXpauIndSR3EyJ+KNV4erSLkeH2JNesmQakfTo4VusopQ/jIG8?=
- =?us-ascii?Q?A7l8+i070C/VQ8koE8j0U0a3N/R7+x3KcCiJd37asLg9Qer/Zb5A8pIQFs0n?=
- =?us-ascii?Q?2sMx+pppr6aba7ME3GZLC3nNKL+Ad+OITA+gisW8I8I/2EGGggI4Ud3+jewv?=
- =?us-ascii?Q?bOgjSNcuyxVJ2HMxXHxmzTYaCLYHoa7zPP/nKDqQJ2wdz0citUsBBXvIaw91?=
- =?us-ascii?Q?KVR242mDEutMXyaV1i7DmXt5y/ac6aeQpQl2pHLSWvVuqjIQV7w+5+LXjdhn?=
- =?us-ascii?Q?9iOAAspNkqpImsp9ZGaDtpJokw32WvTpL6wnHgdpTm3BBdnGAgH2lT7h04UQ?=
- =?us-ascii?Q?IynZoL3javc4Cvo2kTFuCGQN3AC/zW9rTL+laCxtU8feIW0cw8NySMipfxZ6?=
- =?us-ascii?Q?CpqjhDxD74mgVYVe5G8lnavL4ABM+S52ON4c69gWX00KbWyeRh+FAV6EqfuL?=
- =?us-ascii?Q?52qNuxJJMkm9HZbWXKin9PvKoC+VzWgV+Q+guK2E4nwPGwv8VQ3c6qUsCeid?=
- =?us-ascii?Q?t1Y6HBQCo/KEkG15IvF1VgJqtaTMeThDMm5ROLfDnwBYesYu7bQ9bJ/loDdg?=
- =?us-ascii?Q?XLL/tyhMt49WzMnyqUP2xkFFRdma2KhTtKmfhwiTv8CMb56jIsMvOvRq1EvA?=
- =?us-ascii?Q?psk+pF+BVUhzRRMPeh+NEc5aQhn12Q/fKmeDyS/BevM9m8h8uznBiHqQmDeZ?=
- =?us-ascii?Q?0qJc4TcIW+m1SJYdLk0Ja9GoAPEgFliSHpkmhmQZIcRz5QOPOljVyIxGagfN?=
- =?us-ascii?Q?IEdnQhan3wAFz7ny+beT6Kwkdixk158OfzAcIWjZninhZ0Cj4WZsG5Rx1tEd?=
- =?us-ascii?Q?wxuEaS/lF/ohh240UQymh7ix7/9QRDltLbK0blyKwROeiaNHuJLyB8LaxYUt?=
- =?us-ascii?Q?Cjz2ahEooyfzk7wa5ThZAnHeljwxpN5N?=
+	=?us-ascii?Q?/gnL23aYDCj+AiLvL/vf7XvxfjQiLaMBX8MYIV1yPtj0uUqP/lTvABEA8h2H?=
+ =?us-ascii?Q?jtNhZJgm+eDVOGu92v4qomdX+RANkMWiqI5fbQ0XyMnEn/drGejhhc81w/SH?=
+ =?us-ascii?Q?AM2RAf8LcVGHxwQEKYt8N96uU3fNLEqKzwOgrbS2lWAVa1RkXOj6qKFmxVV8?=
+ =?us-ascii?Q?RJU2pZjY78bchz/yZudOLA1MncSLkC7pRK26yFFWw3wJzaww0kJ9+COP5pNJ?=
+ =?us-ascii?Q?mwWGrClGfdf5YLTNLyALcVKQJJPk7xbz2kbLd8xrUBFWMmNvCiX0RPH6mJw/?=
+ =?us-ascii?Q?MujdLC9scwRbqxjYHnvEviNV8TsxR5rkfjCcE3Er3o0TevTbvPCWN2ImZC5f?=
+ =?us-ascii?Q?SpTRpkudm59egjjZYyZrUuBp0wfRxC2e/6M+iyNsiOnGabggFabAHpwZyRcT?=
+ =?us-ascii?Q?1GbRdHZ1zStuoskSUFvUnKzXPS8wC7juINZGgwEtBIyQ5r1lI+TS6ghqMG3g?=
+ =?us-ascii?Q?1pSBqOEzW12yj4gAt/PHPdc+EmWQKluK9p8N4XEY1REjtB1Dc4eGMTlCS3OJ?=
+ =?us-ascii?Q?u+7FJqy6JKTGtlu88Rg5hMimyLTHBip4WTiqU3j0IpLznFxs/cQmMui1s7Z6?=
+ =?us-ascii?Q?8e2TKZczC97jBXsgcl8eD9mHIqlE/cK14HjSenvy/pdlKFheKaVLSlRQyLTL?=
+ =?us-ascii?Q?7DmbDwyIiPoHLg/i17NIzBDahWUNAhxFPmwRiSnHghNrebthkNTZk8zLqHUs?=
+ =?us-ascii?Q?YDm/JqAOXwWQlqOdVsNtxTjRKd1u77oIuw7pB/0DG/YipWYIMiy+3ZmTWas5?=
+ =?us-ascii?Q?O6ljDZJ3s81DZnvTqZ94qEAE3Rwryr5pz+Iu0b0L020r6Y1RtI3uZTtBuUYs?=
+ =?us-ascii?Q?jFs5KZO93za38epE2oTr5iGmVxE6RNVqcUfJ7pNNEI/hzEl75NFgnBulnH8w?=
+ =?us-ascii?Q?PYgz00zOiSH+WcAzXFcKZdI9iplJdNZwEBQAcpKO0ilCIedn+wivCwGtNLTv?=
+ =?us-ascii?Q?jb+10bXuGG6ob91+xgGmiV5Eao8p6AFvwZpk64eDGBA7fn/2pMgiIOHj+uzV?=
+ =?us-ascii?Q?XZKg+9xVbguqwk+CXqJEc8N3dTcpGHf38R1ojeu9IfgAJVB+ANg32MIaT8Uq?=
+ =?us-ascii?Q?8tKZdLnN2fx3veBhGMDEnxgxlprK10XJmWmcgi52nkWvO0m35JIYgQDYUm88?=
+ =?us-ascii?Q?4uRjdFonM6dD52cHkvjcsWmVO5Sd0Cn+j+aBHrJu7aafeIliyoDnWsORj/Md?=
+ =?us-ascii?Q?BE4hDPyCJN+rsw2t7R5I6Neibe+f0MoM3FSIojFATnCau4687h4NPOrWbxCV?=
+ =?us-ascii?Q?gXLoSoGU3Jve74mmUfOvJvWiWHqYK4F1hLaOhqqbzGBo/RutAjHilJB9nAWz?=
+ =?us-ascii?Q?OflLGahUjhuKTvlVsUu4Y9do8TcHMtT+OQGLFfO+/XP1PVUTZ25Xrm1nsCy5?=
+ =?us-ascii?Q?2hCYA5Jp/rcH/xGPsuSw9+bT2inC0s/yZVGt1CuGH9Sd7Pikd51KtA0cnybp?=
+ =?us-ascii?Q?PFb2i7/57S+L3MYRbA8j0BG4RVDH64Cx?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2024 21:32:20.6397
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2024 21:32:21.7022
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 615c7c59-68a3-4e89-20a7-08dd1af475db
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32da3325-5534-4242-ddfd-08dd1af4767a
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	MWH0EPF000971E8.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7010
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7576
 
-There are some FW error handling paths that can cause us to
-try to destroy the workqueue more than once, so let's be sure
-we're checking for that.
+Some calls into ionic_get_module_eeprom() don't use a single
+full buffer size, but instead multiple calls with an offset.
+Teach our driver to use the offset correctly so we can
+respond appropriately to the caller.
 
-The case where this popped up was in an AER event where the
-handlers got called in such a way that ionic_reset_prepare()
-and thus ionic_dev_teardown() got called twice in a row.
-The second time through the workqueue was already destroyed,
-and destroy_workqueue() choked on the bad wq pointer.
-
-We didn't hit this in AER handler testing before because at
-that time we weren't using a private workqueue.  Later we
-replaced the use of the system workqueue with our own private
-workqueue but hadn't rerun the AER handler testing since then.
-
-Fixes: 9e25450da700 ("ionic: add private workqueue per-device")
+Fixes: 4d03e00a2140 ("ionic: Add initial ethtool support")
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/pensando/ionic/ionic_dev.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/pensando/ionic/ionic_ethtool.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.c b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-index 9e42d599840d..57edcde9e6f8 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-@@ -277,7 +277,10 @@ void ionic_dev_teardown(struct ionic *ionic)
- 	idev->phy_cmb_pages = 0;
- 	idev->cmb_npages = 0;
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
+index dda22fa4448c..9b7f78b6cdb1 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
+@@ -961,8 +961,8 @@ static int ionic_get_module_eeprom(struct net_device *netdev,
+ 	len = min_t(u32, sizeof(xcvr->sprom), ee->len);
  
--	destroy_workqueue(ionic->wq);
-+	if (ionic->wq) {
-+		destroy_workqueue(ionic->wq);
-+		ionic->wq = NULL;
-+	}
- 	mutex_destroy(&idev->cmb_inuse_lock);
- }
+ 	do {
+-		memcpy(data, xcvr->sprom, len);
+-		memcpy(tbuf, xcvr->sprom, len);
++		memcpy(data, &xcvr->sprom[ee->offset], len);
++		memcpy(tbuf, &xcvr->sprom[ee->offset], len);
  
+ 		/* Let's make sure we got a consistent copy */
+ 		if (!memcmp(data, tbuf, len))
 -- 
 2.17.1
 
