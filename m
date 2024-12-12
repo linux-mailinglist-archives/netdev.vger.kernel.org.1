@@ -1,81 +1,92 @@
-Return-Path: <netdev+bounces-151441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08A239EF046
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:26:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00FED9EF0C9
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:31:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1023F28FF17
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 16:26:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A934A29C4C7
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 16:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 514B523F9EB;
-	Thu, 12 Dec 2024 16:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E846242EF7;
+	Thu, 12 Dec 2024 16:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bo3M0O7N"
+	dkim=pass (1024-bit key) header.d=mguentner.de header.i=@mguentner.de header.b="vH0yHTTT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.transformierende.org (mail.transformierende.org [116.203.43.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F7053365;
-	Thu, 12 Dec 2024 16:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31BAD235C44
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 16:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.43.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734020126; cv=none; b=O1ymiXAkGPwNYiTvIpKyIVhMElNWPN5y3jVXT8JAjSsuKu3/7hkWkQrXNEpL7/iE2Iadnuqaj9h03NFuNrlqSeJiiJsCU08nklBdUngFTXayz3Ae9BGSWUxGfdqiFEomiR29l6EHkaerN6rdgyPlv4KU5vY5dyNJySTKzMOjSWM=
+	t=1734020382; cv=none; b=ua5cuFbUnX0KBkcUOU2+ake7p5+Zrow9mcAAUqtoMxG9DwUx+oQu/Xb3ruzw36YAwRf6/nwRBSOayr/g0mXlzz97GR8jaxdKAcNTBBfqossu8TLAD43ng18MWvRy8XlkiyplLrqgsJ7GgZcp2lIt+5kjK4N+JAiGAz0B7u8Xx8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734020126; c=relaxed/simple;
-	bh=US0sNSA9+vWU77C0dKGx5HEPtf3IqHGi45uXTp6uT90=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=bqvVlwUcPTvCFeERVbICXImnGxOcfvb9MssNRG6j4jjzqc0Jb5DrPWQG27Ek2C0PChz1X3SNvtc+wcwpArYMbHED6TFJv5pZQfDOl/OretOe5roKMyt5unVr/N2UvgS/UiJUcfgPhO9Ew+6yFnqYLWNbyyOiempG6eIOg9eft3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bo3M0O7N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C380AC4CECE;
-	Thu, 12 Dec 2024 16:15:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734020126;
-	bh=US0sNSA9+vWU77C0dKGx5HEPtf3IqHGi45uXTp6uT90=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=bo3M0O7NEW5DrPsa+237O22XtQJZW9dTotn6RtDp6LWegudmtbYElUOb0y9R041UG
-	 643Kb6M1zNYDFRdRKdUfVg65klYDRBVhNHuRQBulAPSSSwnJYZp+8mG6in53Cc7DxX
-	 iVxeLqwMJpXwgHVj/Fu8fne8LxtofEKK/PkuDCMi45i7rvue7UO56qehqi1o0lem2K
-	 RAtPmxHOLbgbqf8kt4YvRl/BDPvCg2P3VO6H/olO99JX7VoBVk272msh9SzXNxDjKA
-	 cgb3anQh+slDUqL1MTZZ32GhUEDqp6mmu+72Sq4lBcuZpetk7sn6O1cnoOYZOEtWop
-	 wVhHYLRvHkxGQ==
-Date: Thu, 12 Dec 2024 10:15:24 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Jinjian Song <jinjian.song@fibocom.com>
-Cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
-	haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com,
-	ricardo.martinez@linux.intel.com, loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com, johannes@sipsolutions.net,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	angelogioacchino.delregno@collabora.com,
-	linux-arm-kernel@lists.infradead.org, matthias.bgg@gmail.com,
-	corbet@lwn.net, linux-mediatek@lists.infradead.org,
-	danielwinkler@google.com, korneld@google.com, andrew+netdev@lunn.ch,
-	horms@kernel.org
-Subject: Re: [net-next v1] net: wwan: t7xx: Fix FSM command timeout issue
-Message-ID: <20241212161524.GA3345429@bhelgaas>
+	s=arc-20240116; t=1734020382; c=relaxed/simple;
+	bh=SSZNEqgCyQaxVi5bgdt8h6NjIKfN3mwKR2Wp89D139s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fEHJT4CdNGeRtZ7/fWBbCXSbf+unUBTgPcxDbIc1aAguPmHA15dHTD7mTxWo3qLy/UuG9K8Klv6aiwOx/qZ96B+e3xdFQBY2DkfKbDurZee1cIYDBsRY1tYoXSmX5LxlWNdxxUibB7o7NDBztX/3d2bPWNN7zg/VsHd+S8DmDL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mguentner.de; spf=pass smtp.mailfrom=mguentner.de; dkim=pass (1024-bit key) header.d=mguentner.de header.i=@mguentner.de header.b=vH0yHTTT; arc=none smtp.client-ip=116.203.43.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mguentner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mguentner.de
+From: =?UTF-8?q?Maximilian=20G=C3=BCntner?= <code@mguentner.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mguentner.de;
+	s=mail; t=1734020375;
+	bh=lQE+4+q1H0866N2a/bMZsIdgNZ1b7euphOxbX9tBYDw=;
+	h=From:To:Cc:Subject:Date;
+	b=vH0yHTTTBaIV00EwAcPQlBLI7uOe7jzgb8hPj1OONU8WDE6Ij2zZSBagFDj8dj2fa
+	 isThzWEzAnh3WMLBynV3VVriQtuiGxG7Vg6lEK0Z6yVMT0Hu5+/rHe5uiq95LTIsEY
+	 GSaHviv+kqKISLaNZTaa+oFsXLk0UgGB+DUnUiNA=
+To: netdev@vger.kernel.org
+Cc: David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	=?UTF-8?q?Maximilian=20G=C3=BCntner?= <code@mguentner.de>
+Subject: [PATCH] ipv4: output metric as unsigned int
+Date: Thu, 12 Dec 2024 17:19:11 +0100
+Message-ID: <20241212161911.51598-1-code@mguentner.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241212105555.10364-1-jinjian.song@fibocom.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 12, 2024 at 06:55:55PM +0800, Jinjian Song wrote:
-> When driver processes the internal state change command, it use
-> asynchronous thread to process the command operation. If the main
-> thread detects that the task has timed out, the asynchronous thread
-> will panic when executing te completion notification because the
-> main thread completion object is released.
+adding a route metric greater than 0x7fff_ffff leads to an
+unintended wrap when printing the underlying u32 as an
+unsigned int (`%d`) thus incorrectly rendering the metric
+as negative.  Formatting using `%u` corrects the issue.
 
-s/it use/it uses an/
-s/te/the/
-s/is released/has been released/
+Signed-off-by: Maximilian Güntner <code@mguentner.de>
+---
+ net/ipv4/fib_trie.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
+index 161f5526b86c..d6411ac81096 100644
+--- a/net/ipv4/fib_trie.c
++++ b/net/ipv4/fib_trie.c
+@@ -2999,7 +2999,7 @@ static int fib_route_seq_show(struct seq_file *seq, void *v)
+ 
+ 			seq_printf(seq,
+ 				   "%s\t%08X\t%08X\t%04X\t%d\t%u\t"
+-				   "%d\t%08X\t%d\t%u\t%u",
++				   "%u\t%08X\t%d\t%u\t%u",
+ 				   nhc->nhc_dev ? nhc->nhc_dev->name : "*",
+ 				   prefix, gw, flags, 0, 0,
+ 				   fi->fib_priority,
+@@ -3011,7 +3011,7 @@ static int fib_route_seq_show(struct seq_file *seq, void *v)
+ 		} else {
+ 			seq_printf(seq,
+ 				   "*\t%08X\t%08X\t%04X\t%d\t%u\t"
+-				   "%d\t%08X\t%d\t%u\t%u",
++				   "%u\t%08X\t%d\t%u\t%u",
+ 				   prefix, 0, flags, 0, 0, 0,
+ 				   mask, 0, 0, 0);
+ 		}
+-- 
+2.47.0
+
 
