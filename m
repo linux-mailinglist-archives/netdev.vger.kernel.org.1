@@ -1,946 +1,301 @@
-Return-Path: <netdev+bounces-151553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1646D9EFF7F
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 23:42:59 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B335B9EFF81
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 23:45:33 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A17DB16BE3B
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 22:42:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DC7F2863EB
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 22:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19491DEFD9;
-	Thu, 12 Dec 2024 22:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003621D7E5F;
+	Thu, 12 Dec 2024 22:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Ifd4uRFz"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="W98m/OmJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357F31DED59
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 22:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03251ADFF8
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 22:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734043290; cv=none; b=M//ELRx3627qOKgRsNziDM7lqrd6Vg4rwRuUgb9DRuJk0nItTo3RIOqL3SYp8O3uQuBVDb2FOPrBrjLM7sss7APGbD++mq+EBqw/zzN9Xe/0Fj6bmlRY9ZzieYynTDBag15O9lc4YanrEAzhcZMYhchYFhy5A/kRS5FIFR/4ovQ=
+	t=1734043529; cv=none; b=gO0IxV08g1F6NWZCrfC75nS8gdBMi94DlcRMNeU2j5UVLoQ/IxyiJBZOZ3LmyOZQ9/N9Aa4CslGcRFeIXvMcb9BwS2+7CVglxnDoUwPoajCffA75dbCUFAwW0QYCi71Ns3q/ieXtELaFeKMHdcduztBoXF17FqBD8v/K+svV1Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734043290; c=relaxed/simple;
-	bh=DnuqRQ2ao0SSp7ydGhGUtb0kXzmR2XDZlEZ5pdIbxC0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mfIGd1ZovVV/VbowTclQfQf/nKpxFTdzQyOK6jjJKGb6KsTFTrqEodAb00i8uRGgpwaEwMP8gIWBqOEWeR0igy18OjPp0Z5P+EIUmLZ+YS9+irK1cgyHlJIFtiiSkw5BWek4xEuWACYXBr7ajyMm0Ai+nL6XDyvcOx2kvDyA3k0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Ifd4uRFz; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21675fd60feso13385655ad.2
-        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 14:41:25 -0800 (PST)
+	s=arc-20240116; t=1734043529; c=relaxed/simple;
+	bh=XpEtdsrgb4tWlq/LargblSbGeI9jhQhkhPTRrqvon8M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HHin0NDQV89pEqRTv5z335fJk7mq+PyIzhF7/NX0NVEnUHrnDQUxRh/QFHSY5e7/XbPC4gq1RfATi2Am/1p8nc3MLK3EH+T4CgV5H0c7P536vKacONKXoxELbi5X+7lcukIZQbyv3k2f7isDzHUC4FBhLPAEPrC8L2Xfm95pP4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=W98m/OmJ; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aa67f31a858so196937066b.2
+        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 14:45:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1734043285; x=1734648085; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v1Tzhy9gJOgwX4hYFCKR+1bmO4u8v5t2gaKspYX31cc=;
-        b=Ifd4uRFzyrptr6UNupIUhNpFp7tESkku7K0DUFkXwmM8N1EUlGMYCo6Yaz9az8t6YS
-         zOtfXNjEDu3pg5EWjkjPK7lGpZcyFqZRuVLjuCWWnHjOeljEYfYlnYU0G6+BxhzM7uOq
-         npCUWZ/KZtFOpDBU6Di1fch2yqVelIm9EjaxI=
+        d=openvpn.net; s=google; t=1734043526; x=1734648326; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=XUsJkf4J+j/xiECkG4sE5rLGWyn8q8xGGB06NtynjQE=;
+        b=W98m/OmJUPXrjeok+jriss0vDObb0KKDK/COOVBg9Ggzm/RTpblnYppu8hHFJgX/SM
+         r2k3g2hCkXCos/bViZJn+8kiqxtPBPeWRBE+2vf3PwOAefxR0VHeGJiGLjDn2B05f2mn
+         DgmjcMYBA3M3acIzUajJga2+n7gRkkB1rwFZ1r+BSarF7+8aELX+8JqochSfAqWTmchT
+         r2WC2cMX7O4PvIouPYgKOMxnhXiTRDoMxtPi7SUwm6FZIpY1hSieD38WrP7dCfW+6Mcl
+         qPLfcT7SZcqNmVmlnrXfHX/WWcaGTH7LqgYhD7NM6rhUG0Cl+6krRQ9voehXXMj0HO7n
+         xGFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734043285; x=1734648085;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v1Tzhy9gJOgwX4hYFCKR+1bmO4u8v5t2gaKspYX31cc=;
-        b=mOjA4VVkqnRrW3TRh6Dy9GUwp0p+T3FZBQXbzqgU5NJD9Yr8lGl1uBrdmXSCLPUeob
-         Mvu7bGPitAHdYPYKui1ZZEGBdiI2TXPGwI/aZNMf0tjVTjxJyOQlbqrnSMyiU+PIqzac
-         VVOjst7ESqY3cWrzq7apQwnUHLuNgjkSVkHS5GO+1j17NPHZvvApIV7UW6itP7c0tsN+
-         elXnBv+tGQ+QS8iZdYBNGQ+Fn5OX/n3gqWe5ZMmOKMXpVO8qXEMl69Jcez0StNY0kbJE
-         m3vdF0vvPxF+f1XPqwWbSILKr9j7EyyamSb8j4hQI67Az2BPHINgh51qA3VuftRCvLAT
-         ii9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWylQUN/g+C4ZsjtSxW/dpWwCYzpNrizs0XUjpK1GaAvOtozmaFkChHMQSmoyHgxSV5bVSMXs4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTAcL//qtcNc1KDa8fNitCkhvF6Cb0POjw15gdz/nfmDnkOOwM
-	5XZ9m81ex51iMslRFNrQVl4nWyb01cR2uya9nx523udZg3SifD3yUAOq4LUYbw==
-X-Gm-Gg: ASbGncvxJJi1AnsBux0K5iRByO2yc/Nz8JPi3CXI5F+/+GcK+YwCBUEre4tO1dN3PD7
-	E2xSjwCMyA9fbmwa3GsOItm3YxoboV7+FqowMV1uP3xxZ7IXje8NOdxFCLYU5HimyjWtbTj25Ms
-	vc+IiYDrQpiweX/yNsdiCETg8VXGTusjA/5crCTqt50/OIgNFdeWYZ2m7rFwxogf7O4zh+ewHN7
-	Rq5SzOxxBKQW2yf0T87uha9v3v/ijtsqIwYT6hebgKcRbgvwNrueuZWAYp/Xve6zf2F9EzFQupd
-	bFYNyrOAZ4A8n4rqgEq3I9B82YNunUVk9rzgiJZ91D2f7A==
-X-Google-Smtp-Source: AGHT+IHDkloNL47qyhWcGmgVRmx3Y9Fvt8uPXQQjfbKOtdxXwCv4qofLm9bIHoz9zYhgFKdDZAcAfA==
-X-Received: by 2002:a17:902:da87:b0:216:25a2:2ebe with SMTP id d9443c01a7336-218929bfc2amr6919165ad.19.1734043285168;
-        Thu, 12 Dec 2024 14:41:25 -0800 (PST)
-Received: from li-cloudtop.c.googlers.com.com (200.23.125.34.bc.googleusercontent.com. [34.125.23.200])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-216281f45a2sm98579785ad.250.2024.12.12.14.41.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2024 14:41:24 -0800 (PST)
-From: Li Li <dualli@chromium.org>
-To: dualli@google.com,
-	corbet@lwn.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	donald.hunter@gmail.com,
-	gregkh@linuxfoundation.org,
-	arve@android.com,
-	tkjos@android.com,
-	maco@android.com,
-	joel@joelfernandes.org,
-	brauner@kernel.org,
-	cmllamas@google.com,
-	surenb@google.com,
-	arnd@arndb.de,
-	masahiroy@kernel.org,
-	bagasdotme@gmail.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	hridya@google.com,
-	smoreland@google.com
-Cc: kernel-team@android.com
-Subject: [PATCH net-next v10 2/2] binder: report txn errors via generic netlink
-Date: Thu, 12 Dec 2024 14:41:14 -0800
-Message-ID: <20241212224114.888373-3-dualli@chromium.org>
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-In-Reply-To: <20241212224114.888373-1-dualli@chromium.org>
-References: <20241212224114.888373-1-dualli@chromium.org>
+        d=1e100.net; s=20230601; t=1734043526; x=1734648326;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XUsJkf4J+j/xiECkG4sE5rLGWyn8q8xGGB06NtynjQE=;
+        b=sqkC9pU37ukVjp8fE587+N8ssd9A5MbUl3nQxDTACWYg3fiNER2E3v6OGniwuSb6wY
+         J/7/XjOMu3U5JJ0jsFCy8TZXJ2VAc2RWovXnqkSc8MWgZy4RjrLf4+sQHfY7vYnh+WST
+         mjj7wqxDjd/xNUImjkTehWZge8L2IH/3iW9lPIr8hR/U3sQQiosaaFF8ndaE1XuAcj8h
+         j+Vg8gRiGV/LncucJlCf55fNGiT/hvs1zVf3s33xcnKf2U2d0fIU0UyKgSjfrZklXTQB
+         R0VEpmVE/NI3Z7Wl30lUuTKwhH4ozVT1I6XltgFkjmIbNTkV1QJJ2TDb21iZ/CQFXgrb
+         CSYQ==
+X-Gm-Message-State: AOJu0YzgHIi1AjnJ9JDQvQ2KFvWV4zRXCm6645vu4XHAb5r+yVZjVBTd
+	HOOWda9QxUGMF+BXISTh1sXi6+1EcidhNQcwYlVxqTZ8T03MADhqQq7IspcmSWA=
+X-Gm-Gg: ASbGncsX7PwFmdNVfDWhYbBuVxiTJbqxh9BNFyI65vAwycHuyaYT9BE4nMRrE1Sj87K
+	QjY8bxt6I0S0ieSo1Er5ygcnPAMwouznVJu33we9+bz9v/Op+sXQmVhMCvNtU5lEbJrDVhq5UyH
+	vXYXoNuTyRbjeYm1Vv2bxc8I1RML1AsySG77fnc5YnyRphOFwbVPpoJgUw+DsG844meUQjFY0E9
+	2I0yw4m79pR87lnA27Pl4bZ1VQDFAGc8+q03rDwXSSYq8J4BgusOsePs3oTT/DlLUsO2f7iDmJR
+	gUGYfHYb+Yj+pBcHeYM=
+X-Google-Smtp-Source: AGHT+IEnd+D7X8TzYQBVe2H+wexdsZa1tb6lj6B+PXBw/DjlnuLHbieso5Q07N5vS1ESwsrUnIOZ3A==
+X-Received: by 2002:a17:907:1ca3:b0:aab:7588:f411 with SMTP id a640c23a62f3a-aab779c8bcamr43821666b.25.1734043526035;
+        Thu, 12 Dec 2024 14:45:26 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:a1c0:e394:b652:4ab3? ([2001:67c:2fbc:1:a1c0:e394:b652:4ab3])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa6260e6c67sm1164937766b.187.2024.12.12.14.45.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2024 14:45:25 -0800 (PST)
+Message-ID: <fa19f3a8-c273-4d2c-a10e-e9bda2375365@openvpn.net>
+Date: Thu, 12 Dec 2024 23:46:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v15 06/22] ovpn: introduce the ovpn_socket object
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
+ willemdebruijn.kernel@gmail.com
+References: <20241211-b4-ovpn-v15-0-314e2cad0618@openvpn.net>
+ <20241211-b4-ovpn-v15-6-314e2cad0618@openvpn.net> <Z1sNEgQLMzZua3mS@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z1sNEgQLMzZua3mS@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Li Li <dualli@google.com>
+On 12/12/2024 17:19, Sabrina Dubroca wrote:
+> 2024-12-11, 22:15:10 +0100, Antonio Quartulli wrote:
+>> +static struct ovpn_socket *ovpn_socket_get(struct socket *sock)
+>> +{
+>> +	struct ovpn_socket *ovpn_sock;
+>> +
+>> +	rcu_read_lock();
+>> +	ovpn_sock = rcu_dereference_sk_user_data(sock->sk);
+>> +	if (WARN_ON(!ovpn_socket_hold(ovpn_sock)))
+> 
+> Could we hit this situation when we're removing the last peer (so
+> detaching its socket) just as we're adding a new one? ovpn_socket_new
+> finds the socket already attached and goes through the EALREADY path,
+> but the refcount has already dropped to 0?
+> 
 
-Introduce generic netlink messages into the binder driver so that the
-Linux/Android system administration process can listen to important
-events and take corresponding actions, like stopping a broken app from
-attacking the OS by sending huge amount of spamming binder transactions.
+hm good point.
 
-The binder netlink sources and headers are automatically generated from
-the corresponding binder_netlink YAML spec. Don't modify them directly.
+> Then we'd also return NULL from ovpn_socket_new [1], which I don't
+> think is handled well by the caller (at least the netdev_dbg call at
+> the end of ovpn_nl_peer_modify, maybe other spots too).
+> 
+> (I guess it's not an issue you would see with the existing userspace
+> if it's single-threaded)
 
-Signed-off-by: Li Li <dualli@google.com>
----
- Documentation/admin-guide/binder_genl.rst     | 110 ++++++++
- Documentation/admin-guide/index.rst           |   1 +
- .../netlink/specs/binder_netlink.yaml         | 108 ++++++++
- drivers/android/Kconfig                       |   1 +
- drivers/android/Makefile                      |   2 +-
- drivers/android/binder.c                      | 237 +++++++++++++++++-
- drivers/android/binder_internal.h             |  21 +-
- drivers/android/binder_netlink.c              |  39 +++
- drivers/android/binder_netlink.h              |  19 ++
- drivers/android/binder_trace.h                |  35 +++
- include/uapi/linux/android/binder_netlink.h   |  55 ++++
- 11 files changed, 622 insertions(+), 6 deletions(-)
- create mode 100644 Documentation/admin-guide/binder_genl.rst
- create mode 100644 Documentation/netlink/specs/binder_netlink.yaml
- create mode 100644 drivers/android/binder_netlink.c
- create mode 100644 drivers/android/binder_netlink.h
- create mode 100644 include/uapi/linux/android/binder_netlink.h
+The TCP patch 11/22 will convert the socket release routine to a 
+scheduled worker.
 
-diff --git a/Documentation/admin-guide/binder_genl.rst b/Documentation/admin-guide/binder_genl.rst
-new file mode 100644
-index 000000000000..71b4c6596c5b
---- /dev/null
-+++ b/Documentation/admin-guide/binder_genl.rst
-@@ -0,0 +1,110 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+==============================================================
-+Generic Netlink for the Android Binder Driver (Binder Netlink)
-+==============================================================
-+
-+The Generic Netlink subsystem in the Linux kernel provides a generic way for
-+the Linux kernel to communicate with the user space applications via binder
-+driver. It is used to report binder transaction errors and warnings to user
-+space administration process. The driver allows multiple binder devices and
-+their corresponding binder contexts. Each context has an independent Generic
-+Netlink for security reason. To prevent untrusted user applications from
-+accessing the netlink data, the kernel driver uses unicast mode instead of
-+multicast.
-+
-+Basically, the user space code uses the BINDER_NETLINK_CMD_REPORT_SETUP
-+command to request what kind of binder transactions should be reported by
-+the driver. The driver then echoes the attributes in a reply message to
-+acknowledge the request. The BINDER_NETLINK_CMD_REPORT_SETUP command also
-+registers the current user space process to receive the reports. When the
-+user space process exits, the previous request will be reset automatically.
-+
-+Currently the driver reports these binder transaction errors and warnings.
-+1. "FAILED" transactions that fail to reach the target process;
-+2. "ASYNC_FROZEN" transactions that are delayed due to the target process
-+being frozen by cgroup freezer; or
-+3. "SPAM" transactions that are considered spamming according to existing
-+logic in binder_alloc.c.
-+
-+When the specified binder transactions happen, the driver uses the
-+BINDER_NETLINK_CMD_REPORT command to send a generic netlink message to the
-+registered process, containing the payload defined in binder_netlink.yaml.
-+
-+More details about the flags, attributes and operations can be found at the
-+the doc sections in Documentations/netlink/specs/binder_netlink.yaml and the
-+kernel-doc comments of the new source code in binder.{h|c}.
-+
-+Using Binder Netlink
-+--------------------
-+
-+The Binder Netlink can be used in the same way as any other generic netlink
-+drivers. Userspace application uses a raw netlink socket to send commands
-+to and receive packets from the kernel driver.
-+
-+.. note::
-+    If the userspace application that talks to the driver exits, the kernel
-+    driver will automatically reset the configuration to the default and
-+    stop sending more reports, which would otherwise fail.
-+
-+Usage example (user space pseudo code):
-+
-+::
-+    /*
-+     * send() below is overloaded to pack netlink commands and attributes
-+     * to nlattr/genlmsghdr/nlmsghdr and then send to the netlink socket.
-+     *
-+     * recv() below is overloaded to receive the raw netlink message from
-+     * the netlink socket, parse nlmsghdr/genlmsghdr to find the netlink
-+     * command and then return the nlattr payload.
-+     */
-+
-+    // open netlink socket
-+    int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
-+
-+    // bind netlink socket
-+    bind(fd, struct socketaddr);
-+
-+    // get the family id of the binder netlink
-+    send(fd, CTRL_CMD_GETFAMILY, CTRL_ATTR_FAMILY_NAME,
-+            BINDER_NETLINK_FAMILY_NAME);
-+    void *data = recv(CTRL_CMD_NEWFAMILY);
-+    if (!has_nla_type(data, CTRL_ATTR_FAMILY_ID)) {
-+        // Binder Netlink isn't available on this version of Linux kernel
-+        return;
-+    }
-+    __u16 id = nla(data)[CTRL_ATTR_FAMILY_ID];
-+
-+    // enable per-context binder report
-+    send(fd, id, BINDER_NETLINK_CMD_REPORT_SETUP, "binder", 0,
-+            BINDER_NETLINK_FLAG_FAILED | BINDER_NETLINK_FLAG_DELAYED);
-+
-+    // confirm the per-context configuration
-+    data = recv(fd, BINDER_NETLINK_CMD_REPLY);
-+    char *context = nla(data)[BINDER_NETLINK_A_CMD_CONTEXT];
-+    __u32 pid =  nla(data)[BINDER_NETLINK_A_CMD_PID];
-+    __u32 flags = nla(data)[BINDER_NETLINK_A_CMD_FLAGS];
-+
-+    // set optional per-process report, overriding the per-context one
-+    send(fd, id, BINDER_NETLINK_CMD_REPORT_SETUP, "binder", getpid(),
-+            BINDER_NETLINK_FLAG_SPAM | BINDER_REPORT_OVERRIDE);
-+
-+    // confirm the optional per-process configuration
-+    data = recv(fd, BINDER_NETLINK_CMD_REPLY);
-+    context = nla(data)[BINDER_NETLINK_A_CMD_CONTEXT];
-+    pid =  nla(data)[BINDER_NETLINK_A_CMD_PID];
-+    flags = nla(data)[BINDER_NETLINK_A_CMD_FLAGS];
-+
-+    // wait and read all binder reports
-+    while (running) {
-+            data = recv(fd, BINDER_NETLINK_CMD_REPORT);
-+            auto *attr = nla(data)[BINDER_NETLINK_A_REPORT_XXX];
-+
-+            // process binder report
-+            do_something(*attr);
-+    }
-+
-+    // clean up
-+    send(fd, id, BINDER_NETLINK_CMD_REPORT_SETUP, 0, 0);
-+    send(fd, id, BINDER_NETLINK_CMD_REPORT_SETUP, getpid(), 0);
-+    close(fd);
-diff --git a/Documentation/admin-guide/index.rst b/Documentation/admin-guide/index.rst
-index e85b1adf5908..b3b5cfadffe5 100644
---- a/Documentation/admin-guide/index.rst
-+++ b/Documentation/admin-guide/index.rst
-@@ -79,6 +79,7 @@ configure specific aspects of kernel behavior to your liking.
-    aoe/index
-    auxdisplay/index
-    bcache
-+   binder_genl
-    binderfs
-    binfmt-misc
-    blockdev/index
-diff --git a/Documentation/netlink/specs/binder_netlink.yaml b/Documentation/netlink/specs/binder_netlink.yaml
-new file mode 100644
-index 000000000000..7eef013e6f07
---- /dev/null
-+++ b/Documentation/netlink/specs/binder_netlink.yaml
-@@ -0,0 +1,108 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: binder_netlink
-+protocol: genetlink
-+uapi-header: linux/android/binder_netlink.h
-+doc: Netlink protocol to report binder transaction errors and warnings.
-+
-+definitions:
-+  -
-+    type: flags
-+    name: flag
-+    doc: Define what kind of binder transactions should be reported.
-+    entries: [ failed, async-frozen, spam, override ]
-+
-+attribute-sets:
-+  -
-+    name: cmd
-+    doc: The supported attributes of "report-setup" command.
-+    attributes:
-+      -
-+        name: context
-+        type: string
-+        doc: The binder context to enable binder netlink report.
-+      -
-+        name: pid
-+        type: u32
-+        doc: The binder proc to enable binder netlink report.
-+      -
-+        name: flags
-+        type: u32
-+        enum: flag
-+        doc: What kind of binder transactions should be reported.
-+  -
-+    name: report
-+    doc: The supported attributes of "report" command
-+    attributes:
-+      -
-+        name: context
-+        type: string
-+        doc: The binder context where the binder netlink report happens.
-+      -
-+        name: err
-+        type: u32
-+        doc: Copy of binder_driver_return_protocol returned to the sender.
-+      -
-+        name: from_pid
-+        type: u32
-+        doc: Sender pid of the corresponding binder transaction.
-+      -
-+        name: from_tid
-+        type: u32
-+        doc: Sender tid of the corresponding binder transaction.
-+      -
-+        name: to_pid
-+        type: u32
-+        doc: Target pid of the corresponding binder transaction.
-+      -
-+        name: to_tid
-+        type: u32
-+        doc: Target tid of the corresponding binder transaction.
-+      -
-+        name: reply
-+        type: u32
-+        doc: 1 means the transaction is a reply, 0 otherwise.
-+      -
-+        name: flags
-+        type: u32
-+        doc: Copy of binder_transaction_data->flags.
-+      -
-+        name: code
-+        type: u32
-+        doc: Copy of binder_transaction_data->code.
-+      -
-+        name: data_size
-+        type: u32
-+        doc: Copy of binder_transaction_data->data_size.
-+
-+operations:
-+  list:
-+    -
-+      name: report-setup
-+      doc: Set flags from user space.
-+      attribute-set: cmd
-+
-+      do:
-+        request: &params
-+          attributes:
-+            - context
-+            - pid
-+            - flags
-+        reply: *params
-+    -
-+      name: report
-+      doc: Send the requested reports to user space.
-+      attribute-set: report
-+
-+      event:
-+        attributes:
-+          - context
-+          - err
-+          - from_pid
-+          - from_tid
-+          - to_pid
-+          - to_tid
-+          - reply
-+          - flags
-+          - code
-+          - data_size
-diff --git a/drivers/android/Kconfig b/drivers/android/Kconfig
-index 07aa8ae0a058..e2fa620934e2 100644
---- a/drivers/android/Kconfig
-+++ b/drivers/android/Kconfig
-@@ -4,6 +4,7 @@ menu "Android"
- config ANDROID_BINDER_IPC
- 	bool "Android Binder IPC Driver"
- 	depends on MMU
-+	depends on NET
- 	default n
- 	help
- 	  Binder is used in Android for both communication between processes,
-diff --git a/drivers/android/Makefile b/drivers/android/Makefile
-index c9d3d0c99c25..b8874dba884e 100644
---- a/drivers/android/Makefile
-+++ b/drivers/android/Makefile
-@@ -2,5 +2,5 @@
- ccflags-y += -I$(src)			# needed for trace events
- 
- obj-$(CONFIG_ANDROID_BINDERFS)		+= binderfs.o
--obj-$(CONFIG_ANDROID_BINDER_IPC)	+= binder.o binder_alloc.o
-+obj-$(CONFIG_ANDROID_BINDER_IPC)	+= binder.o binder_alloc.o binder_netlink.o
- obj-$(CONFIG_ANDROID_BINDER_IPC_SELFTEST) += binder_alloc_selftest.o
-diff --git a/drivers/android/binder.c b/drivers/android/binder.c
-index 0a16acd29653..44932659051c 100644
---- a/drivers/android/binder.c
-+++ b/drivers/android/binder.c
-@@ -72,6 +72,7 @@
- 
- #include <linux/cacheflush.h>
- 
-+#include "binder_netlink.h"
- #include "binder_internal.h"
- #include "binder_trace.h"
- 
-@@ -2990,6 +2991,111 @@ static void binder_set_txn_from_error(struct binder_transaction *t, int id,
- 	binder_thread_dec_tmpref(from);
- }
- 
-+/**
-+ * binder_find_proc() - set binder report flags
-+ * @pid:	the target process
-+ */
-+static struct binder_proc *binder_find_proc(int pid)
-+{
-+	struct binder_proc *proc;
-+
-+	mutex_lock(&binder_procs_lock);
-+	hlist_for_each_entry(proc, &binder_procs, proc_node) {
-+		if (proc->pid == pid) {
-+			mutex_unlock(&binder_procs_lock);
-+			return proc;
-+		}
-+	}
-+	mutex_unlock(&binder_procs_lock);
-+
-+	return NULL;
-+}
-+
-+/**
-+ * binder_netlink_enabled() - check if binder netlink reports are enabled
-+ * @proc:	the binder_proc to check
-+ * @mask:	the categories of binder netlink reports
-+ *
-+ * Returns true if certain binder netlink reports are enabled for this binder
-+ * proc (when per-process overriding takes effect) or context.
-+ */
-+static bool binder_netlink_enabled(struct binder_proc *proc, u32 mask)
-+{
-+	struct binder_context *context = proc->context;
-+
-+	if (!context->report_portid)
-+		return false;
-+
-+	if (proc->report_flags & BINDER_NETLINK_FLAG_OVERRIDE)
-+		return (proc->report_flags & mask) != 0;
-+	else
-+		return (context->report_flags & mask) != 0;
-+}
-+
-+/**
-+ * binder_netlink_report() - report one binder netlink event
-+ * @context:	the binder context
-+ * @err:	copy of binder_driver_return_protocol returned to the sender
-+ * @pid:	sender process
-+ * @tid:	sender thread
-+ * @to_pid:	target process
-+ * @to_tid:	target thread
-+ * @reply:	whether the binder transaction is a reply
-+ * @tr:		the binder transaction data
-+ *
-+ * Packs the report data into a binder netlink message and send it.
-+ */
-+static void binder_netlink_report(struct binder_context *context, u32 err,
-+				  u32 pid, u32 tid, u32 to_pid, u32 to_tid,
-+				  u32 reply,
-+				  struct binder_transaction_data *tr)
-+{
-+	int ret;
-+	struct sk_buff *skb;
-+	void *hdr;
-+
-+	trace_binder_netlink_report(context->name, err, pid, tid, to_pid,
-+				    to_tid, reply, tr);
-+
-+	skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!skb) {
-+		pr_err("Failed to alloc binder netlink message\n");
-+		return;
-+	}
-+
-+	hdr = genlmsg_put(skb, 0, atomic_inc_return(&context->report_seq),
-+			  &binder_netlink_nl_family, 0, BINDER_NETLINK_CMD_REPORT);
-+	if (!hdr)
-+		goto free_skb;
-+
-+	if (nla_put_string(skb, BINDER_NETLINK_A_REPORT_CONTEXT, context->name) ||
-+	    nla_put_u32(skb, BINDER_NETLINK_A_REPORT_ERR, err) ||
-+	    nla_put_u32(skb, BINDER_NETLINK_A_REPORT_FROM_PID, pid) ||
-+	    nla_put_u32(skb, BINDER_NETLINK_A_REPORT_FROM_TID, tid) ||
-+	    nla_put_u32(skb, BINDER_NETLINK_A_REPORT_TO_PID, to_pid) ||
-+	    nla_put_u32(skb, BINDER_NETLINK_A_REPORT_TO_TID, to_tid) ||
-+	    nla_put_u32(skb, BINDER_NETLINK_A_REPORT_REPLY, reply) ||
-+	    nla_put_u32(skb, BINDER_NETLINK_A_REPORT_FLAGS, tr->flags) ||
-+	    nla_put_u32(skb, BINDER_NETLINK_A_REPORT_CODE, tr->code) ||
-+	    nla_put_u32(skb, BINDER_NETLINK_A_REPORT_DATA_SIZE, tr->data_size))
-+		goto cancel_skb;
-+
-+	genlmsg_end(skb, hdr);
-+
-+	ret = genlmsg_unicast(&init_net, skb, context->report_portid);
-+	if (ret < 0)
-+		pr_err("Failed to send binder netlink message to %d: %d\n",
-+		       context->report_portid, ret);
-+	return;
-+
-+cancel_skb:
-+	pr_err("Failed to add attributes to binder netlink message\n");
-+	genlmsg_cancel(skb, hdr);
-+free_skb:
-+	pr_err("Free binder netlink report message on error\n");
-+	nlmsg_free(skb);
-+}
-+
- static void binder_transaction(struct binder_proc *proc,
- 			       struct binder_thread *thread,
- 			       struct binder_transaction_data *tr, int reply,
-@@ -3684,10 +3790,17 @@ static void binder_transaction(struct binder_proc *proc,
- 		return_error_line = __LINE__;
- 		goto err_copy_data_failed;
- 	}
--	if (t->buffer->oneway_spam_suspect)
-+	if (t->buffer->oneway_spam_suspect) {
- 		tcomplete->type = BINDER_WORK_TRANSACTION_ONEWAY_SPAM_SUSPECT;
--	else
-+		if (binder_netlink_enabled(proc, BINDER_NETLINK_FLAG_SPAM))
-+			binder_netlink_report(context, BR_ONEWAY_SPAM_SUSPECT,
-+					      proc->pid, thread->pid,
-+					      target_proc ? target_proc->pid : 0,
-+					      target_thread ? target_thread->pid : 0,
-+					      reply, tr);
-+	} else {
- 		tcomplete->type = BINDER_WORK_TRANSACTION_COMPLETE;
-+	}
- 	t->work.type = BINDER_WORK_TRANSACTION;
- 
- 	if (reply) {
-@@ -3737,8 +3850,15 @@ static void binder_transaction(struct binder_proc *proc,
- 		 * process and is put in a pending queue, waiting for the target
- 		 * process to be unfrozen.
- 		 */
--		if (return_error == BR_TRANSACTION_PENDING_FROZEN)
-+		if (return_error == BR_TRANSACTION_PENDING_FROZEN) {
- 			tcomplete->type = BINDER_WORK_TRANSACTION_PENDING;
-+			if (binder_netlink_enabled(proc, BINDER_NETLINK_FLAG_ASYNC_FROZEN))
-+				binder_netlink_report(context, return_error,
-+						      proc->pid, thread->pid,
-+						      target_proc ? target_proc->pid : 0,
-+						      target_thread ? target_thread->pid : 0,
-+						      reply, tr);
-+		}
- 		binder_enqueue_thread_work(thread, tcomplete);
- 		if (return_error &&
- 		    return_error != BR_TRANSACTION_PENDING_FROZEN)
-@@ -3800,6 +3920,13 @@ static void binder_transaction(struct binder_proc *proc,
- 		binder_dec_node_tmpref(target_node);
- 	}
- 
-+	if (binder_netlink_enabled(proc, BINDER_NETLINK_FLAG_FAILED))
-+		binder_netlink_report(context, return_error,
-+				      proc->pid, thread->pid,
-+				      target_proc ? target_proc->pid : 0,
-+				      target_thread ? target_thread->pid : 0,
-+				      reply, tr);
-+
- 	binder_debug(BINDER_DEBUG_FAILED_TRANSACTION,
- 		     "%d:%d transaction %s to %d:%d failed %d/%d/%d, size %lld-%lld line %d\n",
- 		     proc->pid, thread->pid, reply ? "reply" :
-@@ -6137,6 +6264,11 @@ static int binder_release(struct inode *nodp, struct file *filp)
- 
- 	binder_defer_work(proc, BINDER_DEFERRED_RELEASE);
- 
-+	if (proc->pid == proc->context->report_portid) {
-+		proc->context->report_portid = 0;
-+		proc->context->report_flags = 0;
-+	}
-+
- 	return 0;
- }
- 
-@@ -6335,6 +6467,99 @@ binder_defer_work(struct binder_proc *proc, enum binder_deferred_state defer)
- 	mutex_unlock(&binder_deferred_lock);
- }
- 
-+/**
-+ * binder_netlink_nl_report_setup_doit() - netlink .doit handler
-+ * @skb:	the metadata struct passed from netlink driver
-+ * @info:	the generic netlink struct passed from netlink driver
-+ *
-+ * Implements the .doit function to process binder netlink commands.
-+ */
-+int binder_netlink_nl_report_setup_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	int portid;
-+	u32 pid;
-+	u32 flags;
-+	void *hdr;
-+	struct binder_proc *proc;
-+	struct binder_device *device;
-+	struct binder_context *context = NULL;
-+
-+	hlist_for_each_entry(device, &binder_devices, hlist) {
-+		if (!nla_strcmp(info->attrs[BINDER_NETLINK_A_CMD_CONTEXT],
-+				device->context.name)) {
-+			context = &device->context;
-+			break;
-+		}
-+	}
-+
-+	if (!context) {
-+		NL_SET_ERR_MSG(info->extack, "Unknown binder context");
-+		return -EINVAL;
-+	}
-+
-+	portid = nlmsg_hdr(skb)->nlmsg_pid;
-+	pid = nla_get_u32(info->attrs[BINDER_NETLINK_A_CMD_PID]);
-+	flags = nla_get_u32(info->attrs[BINDER_NETLINK_A_CMD_FLAGS]);
-+
-+	if (context->report_portid && context->report_portid != portid) {
-+		NL_SET_ERR_MSG_FMT(info->extack,
-+				   "No permission to set flags from %d",
-+				   portid);
-+		return -EPERM;
-+	}
-+
-+	if (!pid) {
-+		/* Set the global flags for the whole binder context */
-+		context->report_flags = flags;
-+	} else {
-+		/* Set the per-process flags */
-+		proc = binder_find_proc(pid);
-+		if (!proc) {
-+			NL_SET_ERR_MSG_FMT(info->extack,
-+					   "Invalid binder report pid %u",
-+					   pid);
-+			return -EINVAL;
-+		}
-+
-+		proc->report_flags = flags;
-+	}
-+
-+	skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!skb) {
-+		pr_err("Failed to alloc binder netlink reply message\n");
-+		return -ENOMEM;
-+	}
-+
-+	hdr = genlmsg_iput(skb, info);
-+	if (!hdr)
-+		goto free_skb;
-+
-+	if (nla_put_string(skb, BINDER_NETLINK_A_CMD_CONTEXT, context->name) ||
-+	    nla_put_u32(skb, BINDER_NETLINK_A_CMD_PID, pid) ||
-+	    nla_put_u32(skb, BINDER_NETLINK_A_CMD_FLAGS, flags))
-+		goto cancel_skb;
-+
-+	genlmsg_end(skb, hdr);
-+
-+	if (genlmsg_reply(skb, info)) {
-+		pr_err("Failed to send binder netlink reply message\n");
-+		return -EFAULT;
-+	}
-+
-+	if (!context->report_portid)
-+		context->report_portid = portid;
-+
-+	return 0;
-+
-+cancel_skb:
-+	pr_err("Failed to add reply attributes to binder netlink message\n");
-+	genlmsg_cancel(skb, hdr);
-+free_skb:
-+	pr_err("Free binder netlink reply message on error\n");
-+	nlmsg_free(skb);
-+	return -EMSGSIZE;
-+}
-+
- static void print_binder_transaction_ilocked(struct seq_file *m,
- 					     struct binder_proc *proc,
- 					     const char *prefix,
-@@ -7014,6 +7239,12 @@ static int __init binder_init(void)
- 	if (ret)
- 		goto err_init_binder_device_failed;
- 
-+	ret = genl_register_family(&binder_netlink_nl_family);
-+	if (ret) {
-+		pr_err("Failed to register binder netlink family\n");
-+		goto err_init_binder_device_failed;
-+	}
-+
- 	return ret;
- 
- err_init_binder_device_failed:
-diff --git a/drivers/android/binder_internal.h b/drivers/android/binder_internal.h
-index 1f21ad3963b1..c67eba88f89a 100644
---- a/drivers/android/binder_internal.h
-+++ b/drivers/android/binder_internal.h
-@@ -12,21 +12,35 @@
- #include <linux/stddef.h>
- #include <linux/types.h>
- #include <linux/uidgid.h>
-+#include <net/genetlink.h>
- #include <uapi/linux/android/binderfs.h>
- #include "binder_alloc.h"
- #include "dbitmap.h"
- 
-+/**
-+ * struct binder_context - information about a binder domain
-+ * @binder_context_mgr_node: the context manager
-+ * @context_mgr_node_lock:   the lock protecting the above context manager node
-+ * @binder_context_mgr_uid:  the uid of the above context manager
-+ * @name:                    the name of the binder device
-+ * @report_portid:           the netlink socket to receive binder reports
-+ * @report_flags:            the categories of binder transactions that would
-+ *                           be reported (see enum binder_report_flag).
-+ * @report_seq:              the seq number of the generic netlink report
-+ */
- struct binder_context {
- 	struct binder_node *binder_context_mgr_node;
- 	struct mutex context_mgr_node_lock;
- 	kuid_t binder_context_mgr_uid;
- 	const char *name;
-+	u32 report_portid;
-+	u32 report_flags;
-+	atomic_t report_seq;
- };
- 
- /**
-  * struct binder_device - information about a binder device node
-- * @hlist:          list of binder devices (only used for devices requested via
-- *                  CONFIG_ANDROID_BINDER_DEVICES)
-+ * @hlist:          list of binder devices
-  * @miscdev:        information about a binder character device node
-  * @context:        binder context information
-  * @binderfs_inode: This is the inode of the root dentry of the super block
-@@ -415,6 +429,8 @@ struct binder_ref {
-  * @binderfs_entry:       process-specific binderfs log file
-  * @oneway_spam_detection_enabled: process enabled oneway spam detection
-  *                        or not
-+ * @report_flags:         the categories of binder transactions that would
-+ *                        be reported (see enum binder_genl_flag).
-  *
-  * Bookkeeping structure for binder processes
-  */
-@@ -453,6 +469,7 @@ struct binder_proc {
- 	spinlock_t outer_lock;
- 	struct dentry *binderfs_entry;
- 	bool oneway_spam_detection_enabled;
-+	u32 report_flags;
- };
- 
- /**
-diff --git a/drivers/android/binder_netlink.c b/drivers/android/binder_netlink.c
-new file mode 100644
-index 000000000000..2081b4319268
---- /dev/null
-+++ b/drivers/android/binder_netlink.c
-@@ -0,0 +1,39 @@
-+// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/binder_netlink.yaml */
-+/* YNL-GEN kernel source */
-+
-+#include <net/netlink.h>
-+#include <net/genetlink.h>
-+
-+#include "binder_netlink.h"
-+
-+#include <uapi/linux/android/binder_netlink.h>
-+
-+/* BINDER_NETLINK_CMD_REPORT_SETUP - do */
-+static const struct nla_policy binder_netlink_report_setup_nl_policy[BINDER_NETLINK_A_CMD_FLAGS + 1] = {
-+	[BINDER_NETLINK_A_CMD_CONTEXT] = { .type = NLA_NUL_STRING, },
-+	[BINDER_NETLINK_A_CMD_PID] = { .type = NLA_U32, },
-+	[BINDER_NETLINK_A_CMD_FLAGS] = NLA_POLICY_MASK(NLA_U32, 0xf),
-+};
-+
-+/* Ops table for binder_netlink */
-+static const struct genl_split_ops binder_netlink_nl_ops[] = {
-+	{
-+		.cmd		= BINDER_NETLINK_CMD_REPORT_SETUP,
-+		.doit		= binder_netlink_nl_report_setup_doit,
-+		.policy		= binder_netlink_report_setup_nl_policy,
-+		.maxattr	= BINDER_NETLINK_A_CMD_FLAGS,
-+		.flags		= GENL_CMD_CAP_DO,
-+	},
-+};
-+
-+struct genl_family binder_netlink_nl_family __ro_after_init = {
-+	.name		= BINDER_NETLINK_FAMILY_NAME,
-+	.version	= BINDER_NETLINK_FAMILY_VERSION,
-+	.netnsok	= true,
-+	.parallel_ops	= true,
-+	.module		= THIS_MODULE,
-+	.split_ops	= binder_netlink_nl_ops,
-+	.n_split_ops	= ARRAY_SIZE(binder_netlink_nl_ops),
-+};
-diff --git a/drivers/android/binder_netlink.h b/drivers/android/binder_netlink.h
-new file mode 100644
-index 000000000000..022cff5f7c38
---- /dev/null
-+++ b/drivers/android/binder_netlink.h
-@@ -0,0 +1,19 @@
-+/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/binder_netlink.yaml */
-+/* YNL-GEN kernel header */
-+
-+#ifndef _LINUX_BINDER_NETLINK_GEN_H
-+#define _LINUX_BINDER_NETLINK_GEN_H
-+
-+#include <net/netlink.h>
-+#include <net/genetlink.h>
-+
-+#include <uapi/linux/android/binder_netlink.h>
-+
-+int binder_netlink_nl_report_setup_doit(struct sk_buff *skb,
-+					struct genl_info *info);
-+
-+extern struct genl_family binder_netlink_nl_family;
-+
-+#endif /* _LINUX_BINDER_NETLINK_GEN_H */
-diff --git a/drivers/android/binder_trace.h b/drivers/android/binder_trace.h
-index fe38c6fc65d0..8976fb5ee2db 100644
---- a/drivers/android/binder_trace.h
-+++ b/drivers/android/binder_trace.h
-@@ -423,6 +423,41 @@ TRACE_EVENT(binder_return,
- 			  "unknown")
- );
- 
-+TRACE_EVENT(binder_netlink_report,
-+	TP_PROTO(const char *name, u32 err, u32 pid, u32 tid, u32 to_pid,
-+		 u32 to_tid, u32 reply, struct binder_transaction_data *tr),
-+	TP_ARGS(name, err, pid, tid, to_pid, to_tid, reply, tr),
-+	TP_STRUCT__entry(
-+		__field(const char *, name)
-+		__field(u32, err)
-+		__field(u32, pid)
-+		__field(u32, tid)
-+		__field(u32, to_pid)
-+		__field(u32, to_tid)
-+		__field(u32, reply)
-+		__field(u32, flags)
-+		__field(u32, code)
-+		__field(binder_size_t, data_size)
-+	),
-+	TP_fast_assign(
-+		__entry->name = name;
-+		__entry->err = err;
-+		__entry->pid = pid;
-+		__entry->tid = tid;
-+		__entry->to_pid = to_pid;
-+		__entry->to_tid = to_tid;
-+		__entry->reply = reply;
-+		__entry->flags = tr->flags;
-+		__entry->code = tr->code;
-+		__entry->data_size = tr->data_size;
-+	),
-+	TP_printk("%s: %d %d:%d -> %d:%d %s flags=0x08%x code=%d %llu",
-+		  __entry->name, __entry->err, __entry->pid, __entry->tid,
-+		  __entry->to_pid, __entry->to_tid,
-+		  __entry->reply ? "reply" : "",
-+		  __entry->flags, __entry->code, __entry->data_size)
-+);
-+
- #endif /* _BINDER_TRACE_H */
- 
- #undef TRACE_INCLUDE_PATH
-diff --git a/include/uapi/linux/android/binder_netlink.h b/include/uapi/linux/android/binder_netlink.h
-new file mode 100644
-index 000000000000..2b1460387597
---- /dev/null
-+++ b/include/uapi/linux/android/binder_netlink.h
-@@ -0,0 +1,55 @@
-+/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/binder_netlink.yaml */
-+/* YNL-GEN uapi header */
-+
-+#ifndef _UAPI_LINUX_ANDROID_BINDER_NETLINK_H
-+#define _UAPI_LINUX_ANDROID_BINDER_NETLINK_H
-+
-+#define BINDER_NETLINK_FAMILY_NAME	"binder_netlink"
-+#define BINDER_NETLINK_FAMILY_VERSION	1
-+
-+/*
-+ * Define what kind of binder transactions should be reported.
-+ */
-+enum binder_netlink_flag {
-+	BINDER_NETLINK_FLAG_FAILED = 1,
-+	BINDER_NETLINK_FLAG_ASYNC_FROZEN = 2,
-+	BINDER_NETLINK_FLAG_SPAM = 4,
-+	BINDER_NETLINK_FLAG_OVERRIDE = 8,
-+};
-+
-+enum {
-+	BINDER_NETLINK_A_CMD_CONTEXT = 1,
-+	BINDER_NETLINK_A_CMD_PID,
-+	BINDER_NETLINK_A_CMD_FLAGS,
-+
-+	__BINDER_NETLINK_A_CMD_MAX,
-+	BINDER_NETLINK_A_CMD_MAX = (__BINDER_NETLINK_A_CMD_MAX - 1)
-+};
-+
-+enum {
-+	BINDER_NETLINK_A_REPORT_CONTEXT = 1,
-+	BINDER_NETLINK_A_REPORT_ERR,
-+	BINDER_NETLINK_A_REPORT_FROM_PID,
-+	BINDER_NETLINK_A_REPORT_FROM_TID,
-+	BINDER_NETLINK_A_REPORT_TO_PID,
-+	BINDER_NETLINK_A_REPORT_TO_TID,
-+	BINDER_NETLINK_A_REPORT_REPLY,
-+	BINDER_NETLINK_A_REPORT_FLAGS,
-+	BINDER_NETLINK_A_REPORT_CODE,
-+	BINDER_NETLINK_A_REPORT_DATA_SIZE,
-+
-+	__BINDER_NETLINK_A_REPORT_MAX,
-+	BINDER_NETLINK_A_REPORT_MAX = (__BINDER_NETLINK_A_REPORT_MAX - 1)
-+};
-+
-+enum {
-+	BINDER_NETLINK_CMD_REPORT_SETUP = 1,
-+	BINDER_NETLINK_CMD_REPORT,
-+
-+	__BINDER_NETLINK_CMD_MAX,
-+	BINDER_NETLINK_CMD_MAX = (__BINDER_NETLINK_CMD_MAX - 1)
-+};
-+
-+#endif /* _UAPI_LINUX_ANDROID_BINDER_NETLINK_H */
+This means we can have the following flow:
+1) userspace deletes a peer -> peer drops its reference to the ovpn_socket
+2) ovpn_socket refcnt may hit 0 -> cleanup/detach work is scheduled, but 
+not yet executed
+3) userspace adds a new peer -> attach returns -EALREADY but refcnt is 0
+
+So not so impossible, even with a single-threaded userspace software.
+
+> 
+> [...]
+>> +struct ovpn_socket *ovpn_socket_new(struct socket *sock, struct ovpn_peer *peer)
+>> +{
+>> +	struct ovpn_socket *ovpn_sock;
+>> +	int ret;
+>> +
+>> +	ret = ovpn_socket_attach(sock, peer);
+>> +	if (ret < 0 && ret != -EALREADY)
+>> +		return ERR_PTR(ret);
+>> +
+>> +	/* if this socket is already owned by this interface, just increase the
+>> +	 * refcounter and use it as expected.
+>> +	 *
+>> +	 * Since UDP sockets can be used to talk to multiple remote endpoints,
+>> +	 * openvpn normally instantiates only one socket and shares it among all
+>> +	 * its peers. For this reason, when we find out that a socket is already
+>> +	 * used for some other peer in *this* instance, we can happily increase
+>> +	 * its refcounter and use it normally.
+>> +	 */
+>> +	if (ret == -EALREADY) {
+>> +		/* caller is expected to increase the sock refcounter before
+>> +		 * passing it to this function. For this reason we drop it if
+>> +		 * not needed, like when this socket is already owned.
+>> +		 */
+>> +		ovpn_sock = ovpn_socket_get(sock);
+>> +		sockfd_put(sock);
+> 
+> [1] so we would need to add
+> 
+>      if (!ovpn_sock)
+>          return -EAGAIN;
+
+I am not sure returning -EAGAIN is the right move at this point.
+We don't know when the scheduled worker will execute, so we don't know 
+when to try again.
+
+Maybe we should call cancel_sync_work(&ovpn_sock->work) inside 
+ovpn_socket_get()?
+So the latter will return NULL only when it is sure that the socket has 
+been detached.
+
+At that point we can skip the following return and continue along the 
+"new socket" path.
+
+What do you think?
+
+However, this makes we wonder: what happens if we have two racing 
+PEER_NEW with the same non-yet-attached UDP socket?
+
+Maybe we should lock the socket in ovpn_udp_socket_attach() when 
+checking its user-data and setting it (in order to make the test-and-set 
+atomic)?
+
+I am specifically talking about this in udp.c:
+
+345         /* make sure no pre-existing encapsulation handler exists */
+346         rcu_read_lock();
+347         old_data = rcu_dereference_sk_user_data(sock->sk);
+348         if (!old_data) {
+349                 /* socket is currently unused - we can take it */
+350                 rcu_read_unlock();
+351                 setup_udp_tunnel_sock(sock_net(sock->sk), sock, &cfg);
+352                 return 0;
+353         }
+
+We will end up returning 0 in both contexts and thus allocate two 
+ovpn_sockets instead of re-using the first one we allocated.
+
+Does it make sense?
+
+> 
+>> +		return ovpn_sock;
+>> +	}
+>> +
+> 
+> [...]
+>> +int ovpn_udp_socket_attach(struct socket *sock, struct ovpn_priv *ovpn)
+>> +{
+>> +	struct ovpn_socket *old_data;
+>> +	int ret = 0;
+>> +
+>> +	/* make sure no pre-existing encapsulation handler exists */
+>> +	rcu_read_lock();
+>> +	old_data = rcu_dereference_sk_user_data(sock->sk);
+>> +	if (!old_data) {
+>> +		/* socket is currently unused - we can take it */
+>> +		rcu_read_unlock();
+>> +		return 0;
+>> +	}
+>> +
+>> +	/* socket is in use. We need to understand if it's owned by this ovpn
+>> +	 * instance or by something else.
+>> +	 * In the former case, we can increase the refcounter and happily
+>> +	 * use it, because the same UDP socket is expected to be shared among
+>> +	 * different peers.
+>> +	 *
+>> +	 * Unlikely TCP, a single UDP socket can be used to talk to many remote
+> 
+> (since I'm commenting on this patch:)
+> 
+> s/Unlikely/Unlike/
+
+ACK
+
+> 
+> [I have some more nits/typos here and there but I worry the
+> maintainers will get "slightly" annoyed if I make you repost 22
+> patches once again :) -- if that's all I find in the next few days,
+> everyone might be happier if I stash them and we get them fixed after
+> merging?]
+
+If we have to rework this socket attaching part, it may be worth 
+throwing in those typ0 fixes too :)
+
+Thanks a lot.
+
+Regards,
+
+
 -- 
-2.47.1.613.gc27f4b7a9f-goog
+Antonio Quartulli
+OpenVPN Inc.
 
 
