@@ -1,124 +1,184 @@
-Return-Path: <netdev+bounces-151328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AF9D9EE25C
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:14:07 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C958B9EE27F
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:19:46 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 334A218874C7
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:14:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F200284109
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCFD20E00A;
-	Thu, 12 Dec 2024 09:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0CE320E307;
+	Thu, 12 Dec 2024 09:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="eQJU7Rev"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ABD720B808;
-	Thu, 12 Dec 2024 09:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6A520C495
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 09:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733994842; cv=none; b=J4e2plWq4+DQRj10+5Ebz9wluh4zv/9NBk3WUPcD1X953ebGx0M2WgQ8YIw0FAcs4f8HNS/n49mD/4gSzssFVDrqXsi6PE5VxrbNfMfygiMBoCFK38M5iu5A8fG3LUdMZDCPBRGo0lr5Ulecc8gI36xEYsmP8saVGedkcOVW50s=
+	t=1733995178; cv=none; b=NSfXTQcGzFJXevjw9maMJcR1ybIJIDrMFonKtGN9xY7nHlygAeG/oVVhNPSaz7xccRhRXOaEkK5Oo4KklDMc+gSXzpF3typW4gtv6DjlXvmB9UDu9PvaCyjbWk7A/NaGEXtmUJw2lRrbN2ZyPgduo996vTyiL16GjYhmKshLcwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733994842; c=relaxed/simple;
-	bh=jMe5DMsQaVgJD30Fuf7T2bz+p7iJLMSRi7QyfuCSVkU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UZ3B2PkQWhWMqQs/bE6KvhXg+tgvT4WJ+Gl6f3zLIaLftZo9zMlP4nXa4yzeryCiOQqxgCOGdO6zD4zJK6ozN+/DMktF/iIBaHmlOJFVVEmghPrNCZMu4TqzQRFmWcG7F9dzcjb7tgnSGuA6Qhs6cASx+bqcsxJVC6TJ8tei+Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-4afe70b41a8so89789137.3;
-        Thu, 12 Dec 2024 01:14:00 -0800 (PST)
+	s=arc-20240116; t=1733995178; c=relaxed/simple;
+	bh=+XYxslf9807ANkkmItLTVtW58UAN7h4Ov1PT5JQxV70=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=epsVNMTVH0QW9oRBHkLSyyHh2k3JiYE/LfrHsvggEpjq5THM4i8wB+8ln2+oOtHtTX7KxtY9PSAI+Dy/u+PmtJ9Yd3vXnNmTjaAIscMqe/KpX2cvH4nKj89UhJFzFVcVOpF0HsfLJy6jN9B1GcO1lGpaEgvemRoo2yR2l69ELlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=eQJU7Rev; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa66ead88b3so64843366b.0
+        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 01:19:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1733995175; x=1734599975; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dOT7SbPJ2rQiYOFe9U/+XO94gsWo7iytdYj0QsI0vmU=;
+        b=eQJU7RevsYAVcLLIoCNFBv3ISO7JlYYN5+OMTpYNix7MJu9lFgAuVE5JEGLH8XXRSN
+         Fk4Vms6DVsLepRkjnoliht7pgkH1AC7uF26j0noIHvcrueH4LsrVQcqSF1seo8f5UM60
+         lSqEYF9VL3jdk5DC0N0eY0RCzPRY1ZFTskkmGZka8qXp1uDLD2CgG5flSS+pgeu4ViU4
+         LtQmlSSKu6AvgSpWUc4um6mYCGSrReKABR2pnh22c2WoYQnYdvmKYS4t8VuGIBpFH76u
+         nwjDw98Hf0disync16tRgohk01Nr28h33V6EApR/GogAJfVUqJP89mOpiILiIvHwI2G9
+         BnpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733994839; x=1734599639;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p3vOvdd3INn7kkIYe2riOUyRlnXmK2D+iAwEfkSB57Y=;
-        b=ZfNMsdDRMZ4ij4wq41fpv9WqKbQEks/pPlebRWDszY5MkgDpc99Oq7Pp3nHM3Atfi7
-         QFNNZEAOkf/W/K/d7oRz2GC88jn3beLaLX1MFtjsqUaEfSleDC7Q0+opcKLsYUmlQtS2
-         0Tb1yyEQgx1zTImgEtKuw91IYz3l6YF/scjXam3U/PbJWjYoTWT3JYKyyTdfOtueKGoK
-         Ad3d2KpoxRUNNGkPShDUPMje3gVO+f22djhZ1tsc4lPyhNHPizMNGryROysX8Oo/u/sQ
-         /iBJIWAtX2qyomGJXwHWndcDFgu8wMx48NN4L8aWr+T2ORQ09TBs4mVSjh2IIEoHlEVV
-         qzjA==
-X-Forwarded-Encrypted: i=1; AJvYcCX4zSMOdKT96tIRZinoAX5cQZj/467fjfjmReDL2O+AeDo9ZuEdPKTrL8hh+1SdUqwwmvGzJNxh+qBzNXQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrP0Y+d0JeiqmMzLsAC6mZJcXEZnnWRyBnS8HZCtbScTPnjq/t
-	DHbvLCua2oxqCRCNtONs6VTnJ+d7Nd9+v+x87oNTyo17I/dT0lWDtDnHcZ1slyU=
-X-Gm-Gg: ASbGncswwa/XwZZa5oc7iNDMgzoCdUD5Ru+9YI+AnOVvJvzCrJ6Iddst4EzwGPXFfxr
-	PaWtIDpocUdN0Hhw/phyIV/Z7HIpbG++aX+Fb9o/zRvmN8NYOsRe1Wh+UU9kE4HfM+RsEkq0Rfg
-	wJXlAnrpePdtDl1+Tm2XgOceX6xL/iZM3nEpvfIebDfyZ4CXdTE0Uh/+SlUDwLtKSvyU2yppFHz
-	088vVuCC6x+wg7x6gg09aQOaB9q9OvP4BjxkvgaTg2r51WxDeqEvFsJmu1crI2reY8iUWFAfboF
-	66YThkW5mU7e0nxGzy0=
-X-Google-Smtp-Source: AGHT+IHxwhXBD7QtV57GPX18QEqwlJN0xLGrvpFbUNScduT1oj9dMI5+RAQghbnaMwCwSxyGWQpHcA==
-X-Received: by 2002:a05:6102:f13:b0:4af:f275:e747 with SMTP id ada2fe7eead31-4b2478aea7amr2352016137.22.1733994838889;
-        Thu, 12 Dec 2024 01:13:58 -0800 (PST)
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com. [209.85.222.50])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-85c5569f71csm1557353241.7.2024.12.12.01.13.58
+        d=1e100.net; s=20230601; t=1733995175; x=1734599975;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dOT7SbPJ2rQiYOFe9U/+XO94gsWo7iytdYj0QsI0vmU=;
+        b=lqq3fzLyhBnemrqt6GFdHe1uBpArtwLhLG8pB3CquizM/peznAnEM6lGfOdeEKdyG7
+         nZsrPMCgGe6A83I1eAbzhSDRQbr0iWD39Abx1E2BQf2FHXK/3rmwzsLXItwW72dlftvF
+         V/6HiuPTfdzoc/hESDxy7R19IcvGFhR+ww+C2iRzJFxlzaPNblAOd9Lq6yNEisynEwoZ
+         xQPv98f2Pkn/+uzp3q7HgA6J0zCd+Qqcq1ea3ebliwRXqpCx2f4tFJho6nYJBBiQW4z3
+         T9BvHurQWTAuZBFV/l6+GaEhtFIWpnDCe5K89xrNnCv/RJ7aIS43hOlQozqyp/VDMM7E
+         svvw==
+X-Forwarded-Encrypted: i=1; AJvYcCX6F+HKjBaqZ9U71ClM9bn1Uozw5GX87j0lOz+0UTXLClHlt+HKdQCBYy9izNNMOYYVTCtLSHE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaukemFHcGe4rTUaMyy2Wt1Lcip9/MCTwr4uv8HhbNOsMDfOU5
+	blxvzNhQeuygx2jTp/DP/AvbkfJwgQHEXLUxlIlzH/TpG9QmrW/ywVhTd94O1+w=
+X-Gm-Gg: ASbGnct9KgGi1STwhI9oiH+U2S8zz7YFsH+F+IsmXEdkNioB+Rr4j8nzB9/N6iOKP80
+	0teLOhhEJ/7s0PkOG2dh5gb/SjiQDf8fYxQZFXWD+ncRAlmNeiEeq4vOPWKvxwcCPNkav2S1Y7m
+	2f2L9E2XBlv26mZhM7rrFAbOQRZOX1gKDgLgYKWeqiA9L/xzLSvAO+a+LZ3JaCmJTf2fJEXKuK6
+	BMwQkrwomtcN2t9CPOOLQhoWzQ5bHHjLHBt5DaJFYc7VNyRv5EoZUTNw+o=
+X-Google-Smtp-Source: AGHT+IH1til71TqzpTAVwmRAgwAL54yooaxzeUzZ97FhI40WlFkHR2qJBaFdJHFiR4OgflPRhkitrA==
+X-Received: by 2002:a17:906:4d2:b0:aa6:b4b3:5925 with SMTP id a640c23a62f3a-aa6b4b36060mr462442666b.14.1733995175079;
+        Thu, 12 Dec 2024 01:19:35 -0800 (PST)
+Received: from [192.168.0.123] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa689a0a6fcsm549704566b.30.2024.12.12.01.19.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2024 01:13:58 -0800 (PST)
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-85bc5d0509bso96347241.1;
-        Thu, 12 Dec 2024 01:13:58 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVg1jq58Z4uR+RvP9oYmFxFSe2DPQ25qUeZab0FKgdzJEGcEdRYPQn2YQGAgdlmcM0hx2P/M5Ly0zpYuls=@vger.kernel.org
-X-Received: by 2002:a05:6102:419e:b0:4b1:3b91:a697 with SMTP id
- ada2fe7eead31-4b24780ccb2mr2758608137.15.1733994838008; Thu, 12 Dec 2024
- 01:13:58 -0800 (PST)
+        Thu, 12 Dec 2024 01:19:34 -0800 (PST)
+Message-ID: <032ea83b-0df0-4c88-b0d1-153d9c1bf865@blackwall.org>
+Date: Thu, 12 Dec 2024 11:19:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241212091100.3154773-1-geert+renesas@glider.be>
-In-Reply-To: <20241212091100.3154773-1-geert+renesas@glider.be>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 12 Dec 2024 10:13:46 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdXg5b21OmYfKfmgj433U+1dR5wriN8Q2cgFtq6S2wq_dg@mail.gmail.com>
-Message-ID: <CAMuHMdXg5b21OmYfKfmgj433U+1dR5wriN8Q2cgFtq6S2wq_dg@mail.gmail.com>
-Subject: Re: [PATCH] drm/rockchip: avoid 64-bit division
-To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Arnd Bergmann <arnd@arndb.de>, Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
-	Nathan Chancellor <nathan@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] bonding: fix xfrm offload feature setup on
+ active-backup mode
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek <andy@greyhouse.net>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241211071127.38452-1-liuhangbin@gmail.com>
+ <20241211071127.38452-2-liuhangbin@gmail.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20241211071127.38452-2-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 12, 2024 at 10:11=E2=80=AFAM Geert Uytterhoeven
-<geert+renesas@glider.be> wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> Dividing a 64-bit integer prevents building this for 32-bit targets:
->
-> ERROR: modpost: "__aeabi_uldivmod" [drivers/gpu/drm/rockchip/rockchipdrm.=
-ko] undefined!
->
-> As this function is not performance criticial, just Use the div_u64() hel=
-per.
->
-> Fixes: 128a9bf8ace2 ("drm/rockchip: Add basic RK3588 HDMI output support"=
-)
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+On 12/11/24 09:11, Hangbin Liu wrote:
+> The active-backup bonding mode supports XFRM ESP offload. However, when
+> a bond is added using command like `ip link add bond0 type bond mode 1
+> miimon 100`, the `ethtool -k` command shows that the XFRM ESP offload is
+> disabled. This occurs because, in bond_newlink(), we change bond link
+> first and register bond device later. So the XFRM feature update in
+> bond_option_mode_set() is not called as the bond device is not yet
+> registered, leading to the offload feature not being set successfully.
+> 
+> To resolve this issue, we can modify the code order in bond_newlink() to
+> ensure that the bond device is registered first before changing the bond
+> link parameters. This change will allow the XFRM ESP offload feature to be
+> correctly enabled.
+> 
+> Fixes: 007ab5345545 ("bonding: fix feature flag setting at init time")
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>  drivers/net/bonding/bond_main.c    |  2 +-
+>  drivers/net/bonding/bond_netlink.c | 17 ++++++++++-------
+>  include/net/bonding.h              |  1 +
+>  3 files changed, 12 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index 49dd4fe195e5..7daeab67e7b5 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -4389,7 +4389,7 @@ void bond_work_init_all(struct bonding *bond)
+>  	INIT_DELAYED_WORK(&bond->slave_arr_work, bond_slave_arr_handler);
+>  }
+>  
+> -static void bond_work_cancel_all(struct bonding *bond)
+> +void bond_work_cancel_all(struct bonding *bond)
+>  {
+>  	cancel_delayed_work_sync(&bond->mii_work);
+>  	cancel_delayed_work_sync(&bond->arp_work);
+> diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
+> index 2a6a424806aa..7fe8c62366eb 100644
+> --- a/drivers/net/bonding/bond_netlink.c
+> +++ b/drivers/net/bonding/bond_netlink.c
+> @@ -568,18 +568,21 @@ static int bond_newlink(struct net *src_net, struct net_device *bond_dev,
+>  			struct nlattr *tb[], struct nlattr *data[],
+>  			struct netlink_ext_ack *extack)
+>  {
+> +	struct bonding *bond = netdev_priv(bond_dev);
+>  	int err;
+>  
+> -	err = bond_changelink(bond_dev, tb, data, extack);
+> -	if (err < 0)
+> +	err = register_netdevice(bond_dev);
+> +	if (err)
+>  		return err;
+>  
+> -	err = register_netdevice(bond_dev);
+> -	if (!err) {
+> -		struct bonding *bond = netdev_priv(bond_dev);
+> +	netif_carrier_off(bond_dev);
+> +	bond_work_init_all(bond);
+>  
+> -		netif_carrier_off(bond_dev);
+> -		bond_work_init_all(bond);
+> +	err = bond_changelink(bond_dev, tb, data, extack);
+> +	if (err) {
+> +		bond_work_cancel_all(bond);
+> +		netif_carrier_on(bond_dev);
 
-Please ignore this patch. Something went wrong with my scripting.
-Sorry for the inconvenience.
+The patch looks good, but I'm curious why the carrier on here?
 
-Gr{oetje,eeting}s,
+> +		unregister_netdevice(bond_dev);
+>  	}
+>  
+>  	return err;
+> diff --git a/include/net/bonding.h b/include/net/bonding.h
+> index 8bb5f016969f..e5e005cd2e17 100644
+> --- a/include/net/bonding.h
+> +++ b/include/net/bonding.h
+> @@ -707,6 +707,7 @@ struct bond_vlan_tag *bond_verify_device_path(struct net_device *start_dev,
+>  int bond_update_slave_arr(struct bonding *bond, struct slave *skipslave);
+>  void bond_slave_arr_work_rearm(struct bonding *bond, unsigned long delay);
+>  void bond_work_init_all(struct bonding *bond);
+> +void bond_work_cancel_all(struct bonding *bond);
+>  
+>  #ifdef CONFIG_PROC_FS
+>  void bond_create_proc_entry(struct bonding *bond);
 
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
