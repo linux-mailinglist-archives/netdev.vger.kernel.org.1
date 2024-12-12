@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-151294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3D5D9EDE82
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 05:31:11 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D7309EDE83
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 05:31:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 631BD168299
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:31:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7206280F94
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C65E152196;
-	Thu, 12 Dec 2024 04:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E2D189B8D;
+	Thu, 12 Dec 2024 04:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LfMt71Ds"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SfKpjCTB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48DB8170A1B
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 04:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F816189B8B;
+	Thu, 12 Dec 2024 04:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733977829; cv=none; b=aOWGRTUCnVC5BWCsvN/+g2Mpu74+iYEwMLraU5KPr+0W3kfGRKhfxJoIwK3j5fRLE9/G2L95GqsTK1jZehNHCaxv8wM2QH14zX6xOzxqiZ6u/0rUGjjKt7I4xVK8P0Jkwg4nFgQXaCXhxgwmwaqfafkv15CEXKz74ojs66pEqfU=
+	t=1733977830; cv=none; b=e+rqBFfvRmIGBDEoiIqj58ghRiGBZ0gaEHWfz4hYj/O6oqF533nTuGBYgM0tFlVWlfoh70EOMDikYh6MSo9qRAps4Hpgf32ybQYQV9glE6rlC5Sc0BojKWKqG+PnKeJqpG5jmshjEKrSkbqY5vW35CyKea/RbTigcUXMcyAmFw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733977829; c=relaxed/simple;
-	bh=ycZqFgnqB8ywwKc3Mk6FBM7KoKKtZ8aYIO0SaiKvwyE=;
+	s=arc-20240116; t=1733977830; c=relaxed/simple;
+	bh=0Vj80Ta0OW9QfO74TR+rFZIcL08hS399Iy88X8eLzYk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=b2F/rIohLgGYXqIZOgXVdpYFg4beyI2MT9M/2iqmRa3aCRLuCYle+x4d6oDpL7+DFHkM5XuqtaDRujrwFQ0hQ08Oqs7f5TCrLI85E8dd/+TtRZqla8ecPzNCsMXBQf1AxyP4ZQRi2X0nIsbktLAehpQNWRM6N+6qfA9ATuaYPPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LfMt71Ds; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25D61C4CECE;
-	Thu, 12 Dec 2024 04:30:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=iSupZ+QKsVKdWzghV5xlpHjJB9JpFXxhYyoATwJmc5A6py3M1IxEVxdgI+i41xQ4j7HFOZXLDHFauhK0ja4OYqNA382Tq0Vc40ReIxS3f9VBhhQtsZtoKRYwLA1nE4RZsdpEYPiKeo9yDs04rm6spbB6leRSzNjaTgvQ2Dl3dhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SfKpjCTB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74734C4CECE;
+	Thu, 12 Dec 2024 04:30:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733977829;
-	bh=ycZqFgnqB8ywwKc3Mk6FBM7KoKKtZ8aYIO0SaiKvwyE=;
+	s=k20201202; t=1733977830;
+	bh=0Vj80Ta0OW9QfO74TR+rFZIcL08hS399Iy88X8eLzYk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LfMt71Ds7GSXVFqN7UeCF/omMWzwTif1PrnY05RvNHlnanxrbKSWUPQrS6fIzAXMf
-	 LWi306ISmoLnm/cCvcDKqE+4wbDfrffwfVDSxUyemiEMQz5tCZ/KFbPVoOf9fZcaDI
-	 VTbL86z0AJjUJ16Yi+9v1UXCCkIXs67VXjRDxnG2tAKwWWEIVKybsNJmlDfrfAxdZo
-	 EjwfHRlvCqdRr0zyIhaNIMatzIyjQ9sFjUClrA9Yy0Zs0U9gg3q7jwo6JcG2W7ADls
-	 SdkP8ePHaa6nCYFjSxf1i/8eeqLwB2XY7vxC1+i+cua+W0bhqTTzgS1xlK5GB197zl
-	 8cm/0sve6s0CA==
+	b=SfKpjCTBHkdF2wxAjn/oQA+DT5eJWNYFHOikz3ifqdSrOI3UQtG9noDgjZTV6hRjQ
+	 23FR8iOiKZwEfAu2bX6IheCAI0UbvxWMNreo0YOr1mu2Dyd8DevGF9ZBhhlevk2H1E
+	 Q5n6wNdl8hG1ZLl0SiPJOqFxMHA/BBTLrA/cszYvoZORMIBN0SqnKgbFR75I5O1tdi
+	 dgvMeunyEJtEVZgJgpPuYBy57Q2ZebxnrlTLm2QGKCkGU1wib0i6aZLByjDhoMEvm1
+	 bgcdf3yxNzSxM1vxajmNyV7XNbIt7qGbzHhYi9iRed6TKNcwyuH5xu25UGuHiATpyi
+	 CR/3CyVIpV9eQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713B1380A959;
-	Thu, 12 Dec 2024 04:30:46 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B0A79380A959;
+	Thu, 12 Dec 2024 04:30:47 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] mlxsw: spectrum_flower: Do not allow mixing sample
- and mirror actions
+Subject: Re: [PATCH net-next] net: fec: use phydev->eee_cfg.tx_lpi_timer
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173397784500.1847197.12759000313918649518.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Dec 2024 04:30:45 +0000
-References: <d6c979914e8706dbe1dedbaf29ffffb0b8d71166.1733822570.git.petrm@nvidia.com>
-In-Reply-To: <d6c979914e8706dbe1dedbaf29ffffb0b8d71166.1733822570.git.petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- idosch@nvidia.com, mlxsw@nvidia.com, vmykhaliuk@nvidia.com,
- amcohen@nvidia.com, jiri@nvidia.com
+ <173397784649.1847197.3581070398078320436.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Dec 2024 04:30:46 +0000
+References: <E1tKzVS-006c67-IJ@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1tKzVS-006c67-IJ@rmk-PC.armlinux.org.uk>
+To: Russell King <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, wei.fang@nxp.com,
+ shenwei.wang@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ imx@lists.linux.dev, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 10 Dec 2024 10:45:37 +0100 you wrote:
-> From: Ido Schimmel <idosch@nvidia.com>
+On Tue, 10 Dec 2024 12:38:26 +0000 you wrote:
+> Rather than maintaining a private copy of the LPI timer, make use of
+> the LPI timer maintained by phylib. In any case, phylib overwrites the
+> value of tx_lpi_timer set by the driver in phy_ethtool_get_eee().
 > 
-> The device does not support multiple mirror actions per rule and the
-> driver rejects such configuration:
-> 
->  # tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw action mirred egress mirror dev swp2 action mirred egress mirror dev swp3
->  Error: mlxsw_spectrum: Multiple mirror actions per rule are not supported.
->  We have an error talking to the kernel
+> Note that feb->eee.tx_lpi_timer is initialised to zero, which is just
+> the same with phylib's copy, so there should be no functional change.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] mlxsw: spectrum_flower: Do not allow mixing sample and mirror actions
-    https://git.kernel.org/netdev/net-next/c/175dd9079ecb
+  - [net-next] net: fec: use phydev->eee_cfg.tx_lpi_timer
+    https://git.kernel.org/netdev/net-next/c/3fa2540d93d8
 
 You are awesome, thank you!
 -- 
