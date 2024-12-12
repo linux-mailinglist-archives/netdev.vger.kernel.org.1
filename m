@@ -1,132 +1,129 @@
-Return-Path: <netdev+bounces-151319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C5C99EE16E
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:37:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 406439EE1A5
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:44:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E58C2834D0
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 08:37:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDE1E283221
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 08:44:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704EF20ADFC;
-	Thu, 12 Dec 2024 08:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 405FC20E00A;
+	Thu, 12 Dec 2024 08:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="OKyAkVcX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UY+lLJN8"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC92259496;
-	Thu, 12 Dec 2024 08:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8A120DD77;
+	Thu, 12 Dec 2024 08:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733992621; cv=none; b=pEUn3IlYG7q9QK7+RECtucw3vHIpO8PFgVqxdwbraf2+nrCK7CNhemnjMji5WRcgpAXEWvW+9xX1RR+dcFPxQ0mQrucpMcOhkS4ft63uO3G733yeOS+4kDaOZlXGNgHDShJm2YiyCyJc/apQ43aAzLVknf8/dHN/u7ldYcl/UgY=
+	t=1733993057; cv=none; b=kR0iiY8t6pJEvHslwkRKjrd8IQEm4/uNdnsxrI8JxZ4KzkOantmvh09HmYwfFYS+fxiOpGL+4DAMuvUrdEbB2MJZaYbVK+Ekd0WJdy8KUsfvnyc4rakHgC61X8MuCLktOFrGo86pD36wty5BEWGlzFHshNz32BS9KP7tIFRNVvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733992621; c=relaxed/simple;
-	bh=PXyVToHgBZ/irKQmsyPqluV5a2VOI0+6VtqRCyOuRFM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EgCAzJh8q9iUIipZ5QUjhqunHhMGISX3mnHJWpnV5dAD4XScB+RDhnNjz7/Wu68JUj2aJFXv5VfYQKPayET6CFY2EQCiJa/iDBIdrHwycitgdQzrLVe4zmqUnEcTrI8CWsMzNnlQBgRfaiHVq3MNLFjdVtDM7e6BZuYczC7dg8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=OKyAkVcX; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=7KbY6Zm7XQ1HcYK2xy67X3utVVHXapQSwU7xM6Ao3ts=;
-	t=1733992619; x=1735202219; b=OKyAkVcXuTfq+ll47hOf6g+oNu1uGjFmZeRtWj40pG9gBco
-	sQ1ODSppw98u9+B05zDqFyNbfj4MBGIWIXPqLzY3sizBdQCdLhjyjhESyP1lSZl4OoQO4tJ/bsCM2
-	w7ESiel9ijvp0mdbOF1urNQgA0kUzZScl+tNWFmz5RAfSj7X1XUC6KLWTKrahTh+KsCQ8hzARzVWk
-	QWpGBqnlJ1R7pXY76rYqV+AndrFB8mxUa4vtf2oj7lfAnuQoyDUSO2wUwvfYUWlkdgSMzqcR6z2s1
-	9NOVIdKGYl7oclw41eSrfdfDMUAJQ1w5ZOe99lMZNDwSh7USowBcdBel9Y9M3NJg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1tLegp-0000000EMJI-0P4Z;
-	Thu, 12 Dec 2024 09:36:55 +0100
-Message-ID: <9c0fcee07cb7b93308a5d0185c4e74fb3cbbef1c.camel@sipsolutions.net>
-Subject: Re: [PATCH net-next v2 7/7] netlink: specs: wireless: add a spec
- for nl80211
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org, Jakub
- Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet	 <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman	 <horms@kernel.org>, linux-wireless@vger.kernel.org
-Cc: donald.hunter@redhat.com
-Date: Thu, 12 Dec 2024 09:36:54 +0100
-In-Reply-To: <20241210161448.76799-8-donald.hunter@gmail.com>
-References: <20241210161448.76799-1-donald.hunter@gmail.com>
-	 <20241210161448.76799-8-donald.hunter@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.2 (3.54.2-1.fc41) 
+	s=arc-20240116; t=1733993057; c=relaxed/simple;
+	bh=BsCgYFZcnDgVtF99wPIkB0aPEfMbStFx+F00Xk/qQfg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EWcMQue95Y8QmARuUppZ1Smm5Ukj6T9Z+bJqV27WN/gd6EEDf5N+AdIOG0gLzBOkKiFZ3ONowESz/FuVqMsPuusALHCHnRCfn+rQzxdXLgKznGMnDXBshj3LNYxTJjqFmofujIy3oGNQIgbWN7ubdPA/cxaFkKz4Cf7BUV8V9b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UY+lLJN8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BADD3C4CED1;
+	Thu, 12 Dec 2024 08:44:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733993056;
+	bh=BsCgYFZcnDgVtF99wPIkB0aPEfMbStFx+F00Xk/qQfg=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=UY+lLJN8wjdd28yefr6xtu7mrW1prG6HvqLDD5jVqU4X+SZW3luhIKOSpIh7nE1P6
+	 VBGe2lYUJZC3zHpR+eOGBx9kIcRtXZxqQtMQxwvwkJ3LKy1/DSCYnID+wzJUGz4rl8
+	 5ES9Ki0L4ZW3+orfdcWrlTctcI3SLGt5X89qxANAE52M/Laab7bDoywMGP9on7M1po
+	 X7xQ1baIpMYkQUbRAOuxRI1yAkTtPWFjXe3rsRSX5O1wu58MXEGttCnaWHbE4A9wu7
+	 E369NtGVMe/TGAY3VtuaBWdAjKbfGs+iwQqf5dCnLoP8l8u1F7nTjUmUSArIszWiG0
+	 nlCQ6ZxN28lYQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A874EE7717F;
+	Thu, 12 Dec 2024 08:44:16 +0000 (UTC)
+From: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
+Subject: [PATCH net-next v3 0/2] net: phy: dp83822: Add support for GPIO2
+ clock output
+Date: Thu, 12 Dec 2024 09:44:05 +0100
+Message-Id: <20241212-dp83822-gpio2-clk-out-v3-0-e4af23490f44@liebherr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFWiWmcC/3XN0Q6CIBgF4FdxXPc3ASXtqvdoXSD8KKvEgTGb8
+ 91jrIvW5uXZ2fnOSgJ6i4Gci5V4jDZYN6bADwVRgxx7BKtTJqxkFWWlAD01vGEM+sk6BupxB/e
+ aQelWGcGRn7QhaTt5NHbJ7pWMOMOIy0xuqRlsmJ1/58NIc/+12x07UijBaK4aaerWmPrysNgN6
+ P1RuWdGI/uBKN2DWIIErWRdGSGV7P6gbds+04fsRBABAAA=
+X-Change-ID: 20241206-dp83822-gpio2-clk-out-cd9cf63e37df
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Dimitri Fedrau <dimitri.fedrau@liebherr.com>, 
+ Dimitri Fedrau <dima.fedrau@gmail.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1733993055; l=1627;
+ i=dimitri.fedrau@liebherr.com; s=20241202; h=from:subject:message-id;
+ bh=BsCgYFZcnDgVtF99wPIkB0aPEfMbStFx+F00Xk/qQfg=;
+ b=arNm8HpkQ/hNROhZaSL+MMtw3sgiZkb8Qqo0ATyNiD2tTdFWk+9DFb2cOnueh7L75oYQ+pWx4
+ tyQZYnbO/b5B5xUD1aEn9N27qvWhFxGoOo32jX6r1QBw4n0oGsINntf
+X-Developer-Key: i=dimitri.fedrau@liebherr.com; a=ed25519;
+ pk=rT653x09JSQvotxIqQl4/XiI4AOiBZrdOGvxDUbb5m8=
+X-Endpoint-Received: by B4 Relay for dimitri.fedrau@liebherr.com/20241202
+ with auth_id=290
+X-Original-From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Reply-To: dimitri.fedrau@liebherr.com
 
-On Tue, 2024-12-10 at 16:14 +0000, Donald Hunter wrote:
->=20
-> +  -
-> +    name: wlan-cipher-suites
-> +    type: enum
+The DP83822 has several clock configuration options for pins GPIO1, GPIO2
+and GPIO3. Clock options include:
+  - MAC IF clock
+  - XI clock
+  - Free-Running clock
+  - Recovered clock
+This patch adds support for GPIO2, the support for GPIO1 and GPIO3 can be
+easily added if needed. Code and device tree bindings are derived from
+dp83867 which has a similar feature.
 
-I'm not sure exactly what this does, but I'm not sure 'enum' is the
-right way to think about it. Pretty much every number (OUI + subvalue)
-could be valid here, if the driver advertises support for it and you
-have a supplicant that understands it.
+Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+---
+Changes in v3:
+- Dropped <dt-bindings/net/ti-dp83822.h>
+- Moved defines from <dt-bindings/net/ti-dp83822.h> to dp83822.c
+- Switched to enum of type string for property ti,gpio2-clk-out and added
+  explanation for values, added example.
+- Link to v2: https://lore.kernel.org/r/20241211-dp83822-gpio2-clk-out-v2-0-614a54f6acab@liebherr.com
 
-> +  -
-> +    name: wiphy-bands
-> +    attributes:
-> +      -
-> +        name: 2ghz
-> +        doc: 2.4 GHz ISM band
-> +        value: 0
-> +        type: nest
-> +        nested-attributes: band-attrs
-> +      -
-> +        name: 5ghz
-> +        doc: around 5 GHz band (4.9 - 5.7 GHz)
-> +        type: nest
-> +        nested-attributes: band-attrs
-> +      -
-> +        name: 60ghz
-> +        doc: around 60 GHz band (58.32 - 69.12 GHz)
-> +        type: binary
+Changes in v2:
+- Move MII_DP83822_IOCTRL2 before MII_DP83822_GENCFG
+- List case statements together, and have one break at the end.
+- Move dp83822->set_gpio2_clk_out = true at the end of the validation
+- Link to v1: https://lore.kernel.org/r/20241209-dp83822-gpio2-clk-out-v1-0-fd3c8af59ff5@liebherr.com
 
-This (and s1g/lc) should also nest, with the same attributes? There
-should be no structural difference between the bands, even if most of
-the values are only used/valid for some of the bands.
+---
+Dimitri Fedrau (2):
+      dt-bindings: net: dp83822: Add support for GPIO2 clock output
+      net: phy: dp83822: Add support for GPIO2 clock output
 
-> +operations:
-> +  enum-model: directional
-> +  list:
-> +    -
-> +      name: get-wiphy
-> +      doc: |
-> +        Get information about a wiphy or dump a list of all wiphys. Requ=
-ests to dump get-wiphy
-> +        should unconditionally include the split-wiphy-dump flag in the =
-request.
-> +      attribute-set: nl80211-attrs
-> +      do:
-> +        request:
-> +          value: 1
-> +          attributes:
-> +            - wiphy
-> +            - wdev
-> +            - ifindex
-> +        reply:
-> +          value: 3
+ .../devicetree/bindings/net/ti,dp83822.yaml        | 27 ++++++++++++
+ drivers/net/phy/dp83822.c                          | 48 ++++++++++++++++++++++
+ 2 files changed, 75 insertions(+)
+---
+base-commit: 65fb414c93f486cef5408951350f20552113abd0
+change-id: 20241206-dp83822-gpio2-clk-out-cd9cf63e37df
 
-could the value not reference "get-wiphy" and "new-wiphy" from the
-command list? That might be easier to understand?
+Best regards,
+-- 
+Dimitri Fedrau <dimitri.fedrau@liebherr.com>
 
-johannes
+
 
