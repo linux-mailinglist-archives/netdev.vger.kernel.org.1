@@ -1,184 +1,172 @@
-Return-Path: <netdev+bounces-151329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C958B9EE27F
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:19:46 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B30E59EE281
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 10:20:01 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6B76188B284
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:19:58 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968E720E707;
+	Thu, 12 Dec 2024 09:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOXrkPE5"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F200284109
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:19:41 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0CE320E307;
-	Thu, 12 Dec 2024 09:19:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="eQJU7Rev"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6A520C495
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 09:19:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724D720CCE7
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 09:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733995178; cv=none; b=NSfXTQcGzFJXevjw9maMJcR1ybIJIDrMFonKtGN9xY7nHlygAeG/oVVhNPSaz7xccRhRXOaEkK5Oo4KklDMc+gSXzpF3typW4gtv6DjlXvmB9UDu9PvaCyjbWk7A/NaGEXtmUJw2lRrbN2ZyPgduo996vTyiL16GjYhmKshLcwA=
+	t=1733995184; cv=none; b=fkglmHwexsPYihzGmCF40RoCmiyB3Gv4oetAOZ4FtmJgmyGvoUgyKMEZnOCeOGInmSLWdxlK5/95TLIO0MoVv3Er+aca0joqwpBk65uX49zmvtk+/q21Wi0LQQdIM6HMou1Q6aHSk7TdZdwXxc4vIkonPMWybQTCchauMavXw6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733995178; c=relaxed/simple;
-	bh=+XYxslf9807ANkkmItLTVtW58UAN7h4Ov1PT5JQxV70=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=epsVNMTVH0QW9oRBHkLSyyHh2k3JiYE/LfrHsvggEpjq5THM4i8wB+8ln2+oOtHtTX7KxtY9PSAI+Dy/u+PmtJ9Yd3vXnNmTjaAIscMqe/KpX2cvH4nKj89UhJFzFVcVOpF0HsfLJy6jN9B1GcO1lGpaEgvemRoo2yR2l69ELlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=eQJU7Rev; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa66ead88b3so64843366b.0
-        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 01:19:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1733995175; x=1734599975; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dOT7SbPJ2rQiYOFe9U/+XO94gsWo7iytdYj0QsI0vmU=;
-        b=eQJU7RevsYAVcLLIoCNFBv3ISO7JlYYN5+OMTpYNix7MJu9lFgAuVE5JEGLH8XXRSN
-         Fk4Vms6DVsLepRkjnoliht7pgkH1AC7uF26j0noIHvcrueH4LsrVQcqSF1seo8f5UM60
-         lSqEYF9VL3jdk5DC0N0eY0RCzPRY1ZFTskkmGZka8qXp1uDLD2CgG5flSS+pgeu4ViU4
-         LtQmlSSKu6AvgSpWUc4um6mYCGSrReKABR2pnh22c2WoYQnYdvmKYS4t8VuGIBpFH76u
-         nwjDw98Hf0disync16tRgohk01Nr28h33V6EApR/GogAJfVUqJP89mOpiILiIvHwI2G9
-         BnpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733995175; x=1734599975;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dOT7SbPJ2rQiYOFe9U/+XO94gsWo7iytdYj0QsI0vmU=;
-        b=lqq3fzLyhBnemrqt6GFdHe1uBpArtwLhLG8pB3CquizM/peznAnEM6lGfOdeEKdyG7
-         nZsrPMCgGe6A83I1eAbzhSDRQbr0iWD39Abx1E2BQf2FHXK/3rmwzsLXItwW72dlftvF
-         V/6HiuPTfdzoc/hESDxy7R19IcvGFhR+ww+C2iRzJFxlzaPNblAOd9Lq6yNEisynEwoZ
-         xQPv98f2Pkn/+uzp3q7HgA6J0zCd+Qqcq1ea3ebliwRXqpCx2f4tFJho6nYJBBiQW4z3
-         T9BvHurQWTAuZBFV/l6+GaEhtFIWpnDCe5K89xrNnCv/RJ7aIS43hOlQozqyp/VDMM7E
-         svvw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6F+HKjBaqZ9U71ClM9bn1Uozw5GX87j0lOz+0UTXLClHlt+HKdQCBYy9izNNMOYYVTCtLSHE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaukemFHcGe4rTUaMyy2Wt1Lcip9/MCTwr4uv8HhbNOsMDfOU5
-	blxvzNhQeuygx2jTp/DP/AvbkfJwgQHEXLUxlIlzH/TpG9QmrW/ywVhTd94O1+w=
-X-Gm-Gg: ASbGnct9KgGi1STwhI9oiH+U2S8zz7YFsH+F+IsmXEdkNioB+Rr4j8nzB9/N6iOKP80
-	0teLOhhEJ/7s0PkOG2dh5gb/SjiQDf8fYxQZFXWD+ncRAlmNeiEeq4vOPWKvxwcCPNkav2S1Y7m
-	2f2L9E2XBlv26mZhM7rrFAbOQRZOX1gKDgLgYKWeqiA9L/xzLSvAO+a+LZ3JaCmJTf2fJEXKuK6
-	BMwQkrwomtcN2t9CPOOLQhoWzQ5bHHjLHBt5DaJFYc7VNyRv5EoZUTNw+o=
-X-Google-Smtp-Source: AGHT+IH1til71TqzpTAVwmRAgwAL54yooaxzeUzZ97FhI40WlFkHR2qJBaFdJHFiR4OgflPRhkitrA==
-X-Received: by 2002:a17:906:4d2:b0:aa6:b4b3:5925 with SMTP id a640c23a62f3a-aa6b4b36060mr462442666b.14.1733995175079;
-        Thu, 12 Dec 2024 01:19:35 -0800 (PST)
-Received: from [192.168.0.123] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa689a0a6fcsm549704566b.30.2024.12.12.01.19.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2024 01:19:34 -0800 (PST)
-Message-ID: <032ea83b-0df0-4c88-b0d1-153d9c1bf865@blackwall.org>
-Date: Thu, 12 Dec 2024 11:19:33 +0200
+	s=arc-20240116; t=1733995184; c=relaxed/simple;
+	bh=iUGVAU4e5lFNJ0P2lalKqxBBvplL/cziTTZ9ZcjocIg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b8YZeqq9T9/5m2MXG3fD5HJOtqNa/skU8zpLEELQlGLMBrt3Pliz7NPdGCDh5xDvC5p51GRgQBzd5dbhFsFhsM/LGfcnjn+4NZ7ytSVv/zs33MyPl2i/Uh9TNuzhSWkCoqRahAH7/mAxb+y8gLjMymPVE7LHpfZC1kGGoGrZAss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOXrkPE5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AE96C4CED4;
+	Thu, 12 Dec 2024 09:19:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733995184;
+	bh=iUGVAU4e5lFNJ0P2lalKqxBBvplL/cziTTZ9ZcjocIg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jOXrkPE5GpckYdd+nCyk30R2BNFND6ldzp2hDAO7OPw+6ZZ6U4P25RunWFdDr3faQ
+	 1KUeVcQ2jaexd1/ghnbsoPOWgUApVhbisiG8J0Nrt+lJ68yIejDud99kg9u3nBK3HG
+	 8FeociRqH4HnI2Tv7/J4pjqsRJ8yvEsvfAuodgM0i1MrQxqeXeZV7ETmK+AaDcjJjw
+	 syuObn5Pc/rE5f1m6UR6tcOQ3trWsHo09CkLucH0yUA7+lkk23YRAi6shkEeB4L9ZL
+	 ThOoNJ1HLP3E72DJpw5BiCaGn3GHbf83LLE86HzBkSSgEPX0wS7dsOdi+TbzJYT5jA
+	 gzaIkA1u6vBVA==
+Date: Thu, 12 Dec 2024 10:19:41 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, nbd@nbd.name, sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com, lorenzo.bianconi83@gmail.com
+Subject: Re: [RFC net-next 0/5] Add ETS and TBF Qdisc offload for Airoha
+ EN7581 SoC
+Message-ID: <Z1qqrVWV84DBZuCn@lore-desk>
+References: <cover.1733930558.git.lorenzo@kernel.org>
+ <20241211154109.dvkihluzdouhtamr@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] bonding: fix xfrm offload feature setup on
- active-backup mode
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek <andy@greyhouse.net>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20241211071127.38452-1-liuhangbin@gmail.com>
- <20241211071127.38452-2-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20241211071127.38452-2-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Tv/j4zy2xt/BHBs/"
+Content-Disposition: inline
+In-Reply-To: <20241211154109.dvkihluzdouhtamr@skbuf>
 
-On 12/11/24 09:11, Hangbin Liu wrote:
-> The active-backup bonding mode supports XFRM ESP offload. However, when
-> a bond is added using command like `ip link add bond0 type bond mode 1
-> miimon 100`, the `ethtool -k` command shows that the XFRM ESP offload is
-> disabled. This occurs because, in bond_newlink(), we change bond link
-> first and register bond device later. So the XFRM feature update in
-> bond_option_mode_set() is not called as the bond device is not yet
-> registered, leading to the offload feature not being set successfully.
-> 
-> To resolve this issue, we can modify the code order in bond_newlink() to
-> ensure that the bond device is registered first before changing the bond
-> link parameters. This change will allow the XFRM ESP offload feature to be
-> correctly enabled.
-> 
-> Fixes: 007ab5345545 ("bonding: fix feature flag setting at init time")
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  drivers/net/bonding/bond_main.c    |  2 +-
->  drivers/net/bonding/bond_netlink.c | 17 ++++++++++-------
->  include/net/bonding.h              |  1 +
->  3 files changed, 12 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index 49dd4fe195e5..7daeab67e7b5 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -4389,7 +4389,7 @@ void bond_work_init_all(struct bonding *bond)
->  	INIT_DELAYED_WORK(&bond->slave_arr_work, bond_slave_arr_handler);
->  }
->  
-> -static void bond_work_cancel_all(struct bonding *bond)
-> +void bond_work_cancel_all(struct bonding *bond)
->  {
->  	cancel_delayed_work_sync(&bond->mii_work);
->  	cancel_delayed_work_sync(&bond->arp_work);
-> diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
-> index 2a6a424806aa..7fe8c62366eb 100644
-> --- a/drivers/net/bonding/bond_netlink.c
-> +++ b/drivers/net/bonding/bond_netlink.c
-> @@ -568,18 +568,21 @@ static int bond_newlink(struct net *src_net, struct net_device *bond_dev,
->  			struct nlattr *tb[], struct nlattr *data[],
->  			struct netlink_ext_ack *extack)
->  {
-> +	struct bonding *bond = netdev_priv(bond_dev);
->  	int err;
->  
-> -	err = bond_changelink(bond_dev, tb, data, extack);
-> -	if (err < 0)
-> +	err = register_netdevice(bond_dev);
-> +	if (err)
->  		return err;
->  
-> -	err = register_netdevice(bond_dev);
-> -	if (!err) {
-> -		struct bonding *bond = netdev_priv(bond_dev);
-> +	netif_carrier_off(bond_dev);
-> +	bond_work_init_all(bond);
->  
-> -		netif_carrier_off(bond_dev);
-> -		bond_work_init_all(bond);
-> +	err = bond_changelink(bond_dev, tb, data, extack);
-> +	if (err) {
-> +		bond_work_cancel_all(bond);
-> +		netif_carrier_on(bond_dev);
 
-The patch looks good, but I'm curious why the carrier on here?
+--Tv/j4zy2xt/BHBs/
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> +		unregister_netdevice(bond_dev);
->  	}
->  
->  	return err;
-> diff --git a/include/net/bonding.h b/include/net/bonding.h
-> index 8bb5f016969f..e5e005cd2e17 100644
-> --- a/include/net/bonding.h
-> +++ b/include/net/bonding.h
-> @@ -707,6 +707,7 @@ struct bond_vlan_tag *bond_verify_device_path(struct net_device *start_dev,
->  int bond_update_slave_arr(struct bonding *bond, struct slave *skipslave);
->  void bond_slave_arr_work_rearm(struct bonding *bond, unsigned long delay);
->  void bond_work_init_all(struct bonding *bond);
-> +void bond_work_cancel_all(struct bonding *bond);
->  
->  #ifdef CONFIG_PROC_FS
->  void bond_create_proc_entry(struct bonding *bond);
+> Hi Lorenzo,
 
+Hi Vladimir,
+
+>=20
+> On Wed, Dec 11, 2024 at 04:31:48PM +0100, Lorenzo Bianconi wrote:
+> > Introduce support for ETS and TBF qdisc offload available in the Airoha
+> > EN7581 ethernet controller.
+> > Some DSA hw switches do not support Qdisc offloading or the mac chip
+> > has more fine grained QoS capabilities with respect to the hw switch
+> > (e.g. Airoha EN7581 mac chip has more hw QoS and buffering capabilities
+> > with respect to the mt7530 switch).=20
+> > Introduce ndo_setup_tc_conduit callback in order to allow tc to offload
+> > Qdisc policies for the specified DSA user port configuring the hw switch
+> > cpu port (mac chip).
+>=20
+> Can you please make a detailed diagram explaining how is the conduit
+> involved in the packet data path for QoS? Offloaded tc on a DSA user
+> port is supposed to affect autonomously forwarded traffic too (like the
+> Linux bridge).
+
+I guess a typical use case would be the one below where the traffic from the
+WAN port is forwarded to a DSA LAN one (e.g. lan0) via netfilter flowtable
+offload.
+
+            =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=90            =20
+            =E2=94=82               BR0               =E2=94=82            =
+=20
+            =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=AC=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=AC=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=AC=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=AC=
+=E2=94=80=E2=94=80=E2=94=98            =20
+=E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=90           =20
+=E2=94=82DSA            =E2=94=82        =E2=94=82        =E2=94=82        =
+=E2=94=82   =E2=94=82           =20
+=E2=94=82               =E2=94=82        =E2=94=82        =E2=94=82        =
+=E2=94=82   =E2=94=82           =20
+=E2=94=82 =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=90      =E2=94=8C=E2=
+=94=80=E2=94=80=E2=96=BC=E2=94=80=E2=94=90   =E2=94=8C=E2=94=80=E2=94=80=E2=
+=96=BC=E2=94=80=E2=94=90   =E2=94=8C=E2=94=80=E2=94=80=E2=96=BC=E2=94=80=E2=
+=94=90   =E2=94=8C=E2=94=80=E2=94=80=E2=96=BC=E2=94=80=E2=94=90 =E2=94=82  =
+     =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=90
+=E2=94=82 =E2=94=82CPU=E2=94=82      =E2=94=82LAN0=E2=94=82   =E2=94=82LAN1=
+=E2=94=82   =E2=94=82LAN2=E2=94=82   =E2=94=82LAN3=E2=94=82 =E2=94=82      =
+ =E2=94=82WAN=E2=94=82
+=E2=94=82 =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=98      =E2=94=94=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98   =E2=94=94=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=98   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=98   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98 =E2=94=82  =
+     =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=98
+=E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98           =20
+
+In this case the mac chip forwards (in hw) the WAN traffic to the DSA switch
+via the CPU port. In [0] we have the EN7581 mac chip architecture where we
+can assume GDM1 is the CPU port and GDM2 is the WAN port.
+The goal of this RFC series is to offload a Qdisc rule (e.g. ETS) on a given
+LAN port using the mac chip QoS capabilities instead of creating the QoS
+discipline directly in the DSA hw switch:
+
+$tc qdisc replace dev lan0 root handle 1: ets bands 8 strict 2 quanta 1514 =
+1514 1514 3528 1514 1514
+
+As described above the reason for this approach would be to rely on the more
+fine grained QoS capabilities available on the mac chip with respect to the
+hw switch or because the DSA switch does not support QoS offloading.
+
+Regards,
+Lorenzo
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3D23020f04932701d5c8363e60756f12b43b8ed752
+
+--Tv/j4zy2xt/BHBs/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ1qqrQAKCRA6cBh0uS2t
+rMQiAP9CQXoTGBbDoUzsoN2crcTuqAUZdey81BsKhZ6SLYsnMgD8D9bjqcSSy/mi
+Q6siFo9ni1K0GzQ0awTDoQoXVZRBMQ8=
+=WNB4
+-----END PGP SIGNATURE-----
+
+--Tv/j4zy2xt/BHBs/--
 
