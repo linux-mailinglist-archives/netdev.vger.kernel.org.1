@@ -1,117 +1,155 @@
-Return-Path: <netdev+bounces-151472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0FBF9EF8CC
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 18:45:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF2459EF91F
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 18:48:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B21E189D308
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:38:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6213177B75
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4654F2210F1;
-	Thu, 12 Dec 2024 17:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E1C221D93;
+	Thu, 12 Dec 2024 17:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4rgW3kF9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="StmJIb3w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752C9222D6A
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 17:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8606F2FE;
+	Thu, 12 Dec 2024 17:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734025099; cv=none; b=U+4O1LMsjui9hiinZQNMPfvCHUHrJ2rIKh9DblRfXJK6Rm+Y9Gjf7w33mczC4eZ42DzUdeDqosjUjpouWtOLQ3Rhu+T0t7BMtfHfPXVK9ffrggQ8xedEMEWOp3emjuEMSLAka7jlJmYrcT1Nr0vwpBCLW2cl96glgVZDJnWKfDA=
+	t=1734025314; cv=none; b=TF/OdLqR3OA3S6vBrWqCJDtgJtlrrlvicR7Ub8ZI1OUB7ZkDkCNcJWm4cqJA+j696Nckv5oiVtZRtt235aJeDarzn9Lc+sJuOgdq1IfPDWKEuQ1O0A84fpJS15vnkNuczO/lkcTFG33mlTh4HZ0/P+Lf29CYOHb3jMA+ZKJH5s0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734025099; c=relaxed/simple;
-	bh=aWTVrxmG5W3tIhT6neWuRFNEJ1LBgRdw+hgIKFCMjK8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lOfR3Ddd+o0aUkyB81vSOHdtjwFaqYPPR6iMuNAINwWBMAWGYtSYuq/+bT/WT9XbV2YQorGFLGK4IDw4SDw+nYGCOj1duUUOOIZ0mzVF5s1sX+SFIg6mea0eYys5spSV4y+ms0VhersFhe05mN4T3Au+EK1WamPpn5UK/kc6ZNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4rgW3kF9; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-53e3a90336eso959242e87.3
-        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 09:38:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734025095; x=1734629895; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aWTVrxmG5W3tIhT6neWuRFNEJ1LBgRdw+hgIKFCMjK8=;
-        b=4rgW3kF9468wmzu5vD3JP2gqmc4PdmJAWEx2DVd80dOtBAnwJwaaxmm/DAHJO3bYIY
-         dQWCVSDktLwQ7VY7erI49aRt1NVP9Nb8iMD1j9Crza7t+fvbyyFizPyhloGYOoiVmJ3c
-         ovIboTYbmYkTrK0uh2L3wuTGWqPvaAuGUf+d4VhxkefASUIIvl6HFQ8lLUc5zj8c+UOQ
-         ZQA9obp/zn2gqu7MkONKg9YGFMOCf9MGc75qK5wYbjo2pRCPS6QRmRYbxzz4/OdM7Ybo
-         W417cELTTjvLWTl56/QqSTvb3EVIQ4+Pmk1q76lMX+90km/kwUu0PzVhXFoNnPRk/QNb
-         43vA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734025095; x=1734629895;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aWTVrxmG5W3tIhT6neWuRFNEJ1LBgRdw+hgIKFCMjK8=;
-        b=P1AdFG8sBmcg+rDpqUqQ8PgRsZsXW5G9UL314030lHLVqpPlj7EVfQeHI7IEGI7odM
-         Fu8vO75mCV/CAZ5d9i/d5TXTO8RW8k8nCwG8K2evE014hMZhuX9P9Ka6VfAJM0Ad5aZY
-         ldS0LZAQFcxY+Dtazw8Kx5cwC9M+HOtEln6D2HilkRAxXMn6/yUMG9E1KtURnCP9XbA2
-         F2DT2CXgznps0lmYLp7vypumHkvkoiTy8t/JhKJkuS0A/SkeCh+G8JWCEI9nIv7xiN3C
-         Eh0J816Ucohb5yRPInJJIiuTepXKpUHndkma0Iqqm0d4zIPwuL9go+SQGmzwd6L+EHQ4
-         Q1qA==
-X-Forwarded-Encrypted: i=1; AJvYcCVuFwvtCRaokvDQ5QKmsX0J1pxPc9ehU4ab3MW4cjOegaccPy2H3x2E9rMVmVCKhjj0wwxsnzQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhfvDRyilhQS8x79A0jf+Yzflo6IM1LzYnLYkgBLw/EsRjM8n+
-	KMQGJNW3qeUUft3Epm5LBexsAs4ZOA8zrMChu9328EQjdWi+Fk0HHA/gtnPshampo9daTL7SwFB
-	BJg/PRbs9vf/+14FxjQHnxStEHxceWND4gNa9
-X-Gm-Gg: ASbGnctWZPtGbUoD30DxG3Yp37EmZEvI2mridpqOHceCP0Uvw0eE2nStZy1rqcZHjOX
-	jOZmHOGK58DIcaFu1CKBVmJ/OLaCHybTGhx3yMA==
-X-Google-Smtp-Source: AGHT+IH015phUurBpWFmQa3s3RBwJ8PNrtRSaF1ujp3Q451/4hYQAF7Ccw77Ht0ZKlUC+7RE7PoqmmdadfJXIZMtLLU=
-X-Received: by 2002:a05:6512:124f:b0:540:1e51:b919 with SMTP id
- 2adb3069b0e04-54034112534mr504071e87.31.1734025095447; Thu, 12 Dec 2024
- 09:38:15 -0800 (PST)
+	s=arc-20240116; t=1734025314; c=relaxed/simple;
+	bh=h1OgHvZrV/r+9yeGz1pyu/H5WwMytyQAVZq7j7iYJiw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CN87d7WrbxAqzsK2LfPZEm9S32THvsk+qSTV1ZLgAS4ZpJE95TXrFn+76Jh1UKu0eu6GLs0GmwmcOKodRjeHg8vDwp4BaLpvC1QlbA93pNnb44oXY3+tWoudq1iRyOxuwaefC5nYEjYzcUjL5dkXFjSR3EI5P5EWHeO238tVHSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=StmJIb3w; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HzG8qPVDVt5NNcEUAYVGyZ32xnNQpVWDejnTHHrGg4E=; b=StmJIb3wJ/muDoGQcTNreEnU1y
+	Ke910i7+CRU848GU0FmG06BjnyMVKmt+wBv8O3kTK+bB/aUhvz57K7HB1TVL2KnG7z7YRrSufRQJ+
+	qT7yFGddfgKMkCamBuNDgMTZcc3vASZz52oE+oEKcWINr2bOQyjIG/VZ/7JiYXrRugF0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tLnC4-000ErC-8d; Thu, 12 Dec 2024 18:41:44 +0100
+Date: Thu, 12 Dec 2024 18:41:44 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Gur Stavi <gur.stavi@huawei.com>
+Cc: gongfan <gongfan1@huawei.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	Cai Huoqing <cai.huoqing@linux.dev>, Xin Guo <guoxin09@huawei.com>,
+	Shen Chenyang <shenchenyang1@hisilicon.com>,
+	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+	Shi Jing <shijing34@huawei.com>,
+	Meny Yossefi <meny.yossefi@huawei.com>
+Subject: Re: [RFC net-next v02 1/3] net: hinic3: module initialization and
+ tx/rx logic
+Message-ID: <b794027a-ef3b-4262-a952-db249a840e89@lunn.ch>
+References: <cover.1733990727.git.gur.stavi@huawei.com>
+ <7d62ca11c809ac646c2fd8613fd48729061c22b3.1733990727.git.gur.stavi@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241212-netdev-converge-secs-to-jiffies-v4-0-6dac97a6d6ab@linux.microsoft.com>
- <20241212-netdev-converge-secs-to-jiffies-v4-1-6dac97a6d6ab@linux.microsoft.com>
-In-Reply-To: <20241212-netdev-converge-secs-to-jiffies-v4-1-6dac97a6d6ab@linux.microsoft.com>
-From: Praveen Kaligineedi <pkaligineedi@google.com>
-Date: Thu, 12 Dec 2024 09:38:03 -0800
-Message-ID: <CA+f9V1OK39b5hNoVZqu6AfPJqGsB4_5iyAK24Oit-tjmxrk7jA@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/2] gve: Convert timeouts to secs_to_jiffies()
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Jeroen de Borst <jeroendb@google.com>, Shailend Chand <shailend@google.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kalle Valo <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath11k@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7d62ca11c809ac646c2fd8613fd48729061c22b3.1733990727.git.gur.stavi@huawei.com>
 
-On Thu, Dec 12, 2024 at 9:33=E2=80=AFAM Easwar Hariharan
-<eahariha@linux.microsoft.com> wrote:
->
-> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
-> secs_to_jiffies(). As the value here is a multiple of 1000, use
-> secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication=
-.
->
-> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci wit=
-h
-> the following Coccinelle rules:
->
-> @@ constant C; @@
->
-> - msecs_to_jiffies(C * 1000)
-> + secs_to_jiffies(C)
->
-> @@ constant C; @@
->
-> - msecs_to_jiffies(C * MSEC_PER_SEC)
-> + secs_to_jiffies(C)
->
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+> +static void hinic3_del_one_adev(struct hinic3_hwdev *hwdev,
+> +				enum hinic3_service_type svc_type)
+> +{
+> +	struct hinic3_pcidev *pci_adapter = hwdev->adapter;
+> +	struct hinic3_adev *hadev;
+> +	bool timeout = true;
+> +	unsigned long end;
+> +
+> +	end = jiffies + msecs_to_jiffies(HINIC3_EVENT_PROCESS_TIMEOUT);
+> +	do {
+> +		if (!test_and_set_bit(svc_type, &pci_adapter->state)) {
+> +			timeout = false;
+> +			break;
+> +		}
+> +		usleep_range(900, 1000);
+> +	} while (time_before(jiffies, end));
+> +
+> +	if (timeout && !test_and_set_bit(svc_type, &pci_adapter->state))
+> +		timeout = false;
+
+Please look at using iopoll.h
+
+> +static int hinic3_sw_init(struct net_device *netdev)
+> +{
+> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> +	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
+> +	int err;
+> +
+> +	nic_dev->q_params.sq_depth = HINIC3_SQ_DEPTH;
+> +	nic_dev->q_params.rq_depth = HINIC3_RQ_DEPTH;
+> +
+> +	hinic3_try_to_enable_rss(netdev);
+> +
+> +	eth_hw_addr_random(netdev);
+
+Is using a random MAC just a temporary thing until more code is added
+to access an OTP?
+
+> +	err = register_netdev(netdev);
+> +	if (err) {
+> +		err = -ENOMEM;
+> +		goto err_netdev;
+> +	}
+> +
+> +	netif_carrier_off(netdev);
+> +
+> +	dev_set_drvdata(&adev->dev, nic_dev);
+
+Is this used anywhere in the driver? Calling register_netdev() makes
+the interface live, even before it returns. If you have NFS root for
+example, it could be sending packets, etc, before drvdata is set.
+
+> +int hinic3_set_port_mtu(struct net_device *netdev, u16 new_mtu)
+> +{
+> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> +	struct hinic3_func_tbl_cfg func_tbl_cfg = {};
+> +	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
+> +
+> +	if (new_mtu < HINIC3_MIN_MTU_SIZE) {
+> +		dev_err(hwdev->dev,
+> +			"Invalid mtu size: %ubytes, mtu size < %ubytes\n",
+> +			new_mtu, HINIC3_MIN_MTU_SIZE);
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (new_mtu > HINIC3_MAX_JUMBO_FRAME_SIZE) {
+> +		dev_err(hwdev->dev, "Invalid mtu size: %ubytes, mtu size > %ubytes\n",
+> +			new_mtu, HINIC3_MAX_JUMBO_FRAME_SIZE);
+> +		return -EINVAL;
+> +	}
+
+The core can do this validation for you, if you set ndev->max_mtu,
+ndev->min_mtu.
+
+
+    Andrew
+
+---
+pw-bot: cr
 
