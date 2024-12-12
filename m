@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-151321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1280A9EE1A7
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:44:23 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E6D9EE1AA
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:44:26 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77924165DE8
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 08:44:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DF622834F3
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 08:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C77820E014;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6800020E02C;
 	Thu, 12 Dec 2024 08:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WcwzrMhV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DXx7OBxc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3016420DD48;
-	Thu, 12 Dec 2024 08:44:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301D820DD79;
+	Thu, 12 Dec 2024 08:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733993057; cv=none; b=LpzJ9FkHOmc8Di0TiopcJ7t/+wrSRHMZoD/434RKqS4JlprVhTQ7G+PbH7wxX+H3KpPK++f8AEi8WlfYN2aUGzJ1x6LU+mW+ekhYBTkBSwrjAeRx4ZrpUViQNjzFIfbbkiwsDJBggQ3yj43aCieGcPRW3RPUjDQBRs5iBT/5HD4=
+	t=1733993057; cv=none; b=VTllN4GYB5VbePtHA810tPIweHyHHEgYfml30z5dosQ/t6DjS8pKna2QIFx5yY3D8kWure5YJGI0XX+ABtS/l/+NfniswBI9sySjOL5dWjLoJpETSiTbxW2BKcprj/xj0esDtkf3rlpHlKrgO5XBlkCiWks78Evk4dO1BEkwC7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1733993057; c=relaxed/simple;
-	bh=mzxUkpl/VW8zg/qcxT23Jk37zVt32M5rjm1tUX0zNjg=;
+	bh=QA5JVwPUGPpNQHXJ2rFyBx16z4DecAsSGIJ5SdiPhIU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=C/t4kjWqDGfugGDrJATryeLZWGW9VWV/nA0RRlvPz2Cj8jCge94F9NoWSWFcor28Y8boW4qe0M2AH+AUwPDgWdBXq9d1Hz6dkL+9JtGJcseUgdJg05GeofNgg6u+/sw0Kz8VV5q5ddC/7ZXNDTzBDw5KiiOZwIsWqMpGEvwoh/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WcwzrMhV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CDD91C4CED3;
+	 In-Reply-To:To:Cc; b=jPZRoIg5tyH81G3MRwBE9c8ifGDU0BhJNs+TRb3QOUxhjlVm3kL7UDd/PTOBk+NZT1ynvIs/F8/8gyVGZ/D/0eFkIcAXEiOAQHnnIuY7sQWl19xl8dzZWKF/1PeP4QTOH7Yt1H6njSwkchKpg8Z27gUXkGse8nZ/jEQ5+8BLPx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DXx7OBxc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D6F34C4CED4;
 	Thu, 12 Dec 2024 08:44:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1733993056;
-	bh=mzxUkpl/VW8zg/qcxT23Jk37zVt32M5rjm1tUX0zNjg=;
+	bh=QA5JVwPUGPpNQHXJ2rFyBx16z4DecAsSGIJ5SdiPhIU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=WcwzrMhVpwxVqdhTN46+bnd+8lwcXJZU/BsmclenF7xY80us7X4ohLdT3bgiJkCM1
-	 TUVhayXLwbdo3X9BzavvGkh2hdQJsdC6E9BDk4tZwhG8isKvKM/Ht1Ams8wWSm5RSi
-	 LO/mN4zV7vZIT20K2CN93USfE2iLgxZfNX3YheXHU45K9eU4HmwEJSI7DZPRM+rQBF
-	 5y3s2qEMiakDHRYLGLmmuZ4ftZmvRowLNz9n8l8HAMWaMu+vNk70hWmYJVXx2WYfBH
-	 byIxlcmyRc51dfeuOB+teT16bQ6fp4DSfEsO6j1ZQyPvmMy1ssDjLTYB6ZjDvnUodq
-	 RSXeJSEy4Il3A==
+	b=DXx7OBxcFAyGwAyRhLgo/2WPVggJV+blEmpGZqLDnaxKLLDkfWp1hM6b3CRCwWAE6
+	 KTyjyUAOV8YiDOLstlQkhyPkEqZdmq+rpqs5eENokxoT4uZC/8jpjfjDTyRT88axyw
+	 +mso+XWEeTa/8QTbRBKFuCIKRnl+3rLok93bI92CJSVzCDBm5/PNX2V5skMg2be/Z2
+	 XEaiLmRXH/+zoCuQxZx28tOwC3OCCWrsJa5AgH+IuUzdxz1xE7T3hZbgpFh6iiZhm9
+	 XnfRuilNHW9IBenrmZAanudr6nz6B5sFHI01WDuIoovPHCPAbAFiAdoun+yHfJnBMx
+	 8OJDKD6UoUEVA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7494E77182;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6902E77183;
 	Thu, 12 Dec 2024 08:44:16 +0000 (UTC)
 From: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
-Date: Thu, 12 Dec 2024 09:44:06 +0100
-Subject: [PATCH net-next v3 1/2] dt-bindings: net: dp83822: Add support for
- GPIO2 clock output
+Date: Thu, 12 Dec 2024 09:44:07 +0100
+Subject: [PATCH net-next v3 2/2] net: phy: dp83822: Add support for GPIO2
+ clock output
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241212-dp83822-gpio2-clk-out-v3-1-e4af23490f44@liebherr.com>
+Message-Id: <20241212-dp83822-gpio2-clk-out-v3-2-e4af23490f44@liebherr.com>
 References: <20241212-dp83822-gpio2-clk-out-v3-0-e4af23490f44@liebherr.com>
 In-Reply-To: <20241212-dp83822-gpio2-clk-out-v3-0-e4af23490f44@liebherr.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -70,11 +70,11 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, Dimitri Fedrau <dimitri.fedrau@liebherr.com>, 
  Dimitri Fedrau <dima.fedrau@gmail.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1733993055; l=1961;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1733993055; l=3688;
  i=dimitri.fedrau@liebherr.com; s=20241202; h=from:subject:message-id;
- bh=oEDI75kHA2vxmaYUN5E6SgqscD6FI8Q9e8nx/xXgh34=;
- b=n8XOiO/Ng/08odC8bibzCb9PWP/hxxT+MhDB/24CxH2F0ml4yUwf2kM8V0Ti3L/ixt+OfqtVa
- rMZxq77zOA3Dth/DIULnOVnDtycq69eSwOMNL8VD/PXkBxFexZ9/kwP
+ bh=8vNC532plUP4IGqLwiYlEq3xWmFx4qwBlb44h2NCtjU=;
+ b=H0BtmX5BYZhsh3jBWob2FmLYnNpPWjJQvO+YL2bnCAL1YocLdEAo65UsDEOoEK5ZYYQJMtK85
+ tKih3uXcaMyDOW0PikNMliMYKI17ldxDc/YXBPMvnJTe8l21dso5Mvy
 X-Developer-Key: i=dimitri.fedrau@liebherr.com; a=ed25519;
  pk=rT653x09JSQvotxIqQl4/XiI4AOiBZrdOGvxDUbb5m8=
 X-Endpoint-Received: by B4 Relay for dimitri.fedrau@liebherr.com/20241202
@@ -84,58 +84,107 @@ Reply-To: dimitri.fedrau@liebherr.com
 
 From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
 
-The GPIO2 pin on the DP83822 can be configured as clock output. Add
-binding to support this feature.
+The GPIO2 pin on the DP83822 can be configured as clock output. Add support
+for configuration via DT.
 
 Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
 ---
- .../devicetree/bindings/net/ti,dp83822.yaml        | 27 ++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ drivers/net/phy/dp83822.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-index 784866ea392b2083e93d8dc9aaea93b70dc80934..50c24248df266f1950371b950cd9c4d417835f97 100644
---- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-+++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-@@ -96,6 +96,32 @@ properties:
-       - master
-       - slave
+diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
+index 25ee09c48027c86b7d8f4acb5cbe2e157c56a85a..334c17a68edd7c2a0f707b3ccafaa7a870818fbe 100644
+--- a/drivers/net/phy/dp83822.c
++++ b/drivers/net/phy/dp83822.c
+@@ -30,6 +30,7 @@
+ #define MII_DP83822_FCSCR	0x14
+ #define MII_DP83822_RCSR	0x17
+ #define MII_DP83822_RESET_CTRL	0x1f
++#define MII_DP83822_IOCTRL2	0x463
+ #define MII_DP83822_GENCFG	0x465
+ #define MII_DP83822_SOR1	0x467
  
-+  ti,gpio2-clk-out:
-+    description: |
-+       DP83822 PHY only.
-+       The GPIO2 pin on the DP83822 can be configured as clock output. When
-+       omitted, the PHY's default will be left as is.
-+
-+       - 'mac-if': In MII mode the clock frequency is 25-MHz, in RMII Mode the
-+         clock frequency is 50-MHz and in RGMII Mode the clock frequency is
-+         25-MHz.
-+       - 'xi': XI clock(pass-through clock from XI pin).
-+       - 'int-ref': Internal reference clock 25-MHz.
-+       - 'rmii-master-mode-ref': RMII master mode reference clock 50-MHz. RMII
-+         master mode reference clock is identical to MAC IF clock in RMII master
-+         mode.
-+       - 'free-running': Free running clock 125-MHz.
-+       - 'recovered': Recovered clock is a 125-MHz recovered clock from a
-+         connected link partner.
-+    $ref: /schemas/types.yaml#/definitions/string
-+    enum:
-+      - mac-if
-+      - xi
-+      - int-ref
-+      - rmii-master-mode-ref
-+      - free-running
-+      - recovered
-+
- required:
-   - reg
+@@ -104,6 +105,18 @@
+ #define DP83822_RX_CLK_SHIFT	BIT(12)
+ #define DP83822_TX_CLK_SHIFT	BIT(11)
  
-@@ -110,6 +136,7 @@ examples:
-         reg = <0>;
-         rx-internal-delay-ps = <1>;
-         tx-internal-delay-ps = <1>;
-+        ti,gpio2-clk-out = "xi";
-       };
-     };
++/* IOCTRL2 bits */
++#define DP83822_IOCTRL2_GPIO2_CLK_SRC		GENMASK(6, 4)
++#define DP83822_IOCTRL2_GPIO2_CTRL		GENMASK(2, 0)
++#define DP83822_IOCTRL2_GPIO2_CTRL_CLK_REF	GENMASK(1, 0)
++
++#define DP83822_CLK_SRC_MAC_IF			0x0
++#define DP83822_CLK_SRC_XI			0x1
++#define DP83822_CLK_SRC_INT_REF			0x2
++#define DP83822_CLK_SRC_RMII_MASTER_MODE_REF	0x4
++#define DP83822_CLK_SRC_FREE_RUNNING		0x6
++#define DP83822_CLK_SRC_RECOVERED		0x7
++
+ /* SOR1 mode */
+ #define DP83822_STRAP_MODE1	0
+ #define DP83822_STRAP_MODE2	BIT(0)
+@@ -139,6 +152,8 @@ struct dp83822_private {
+ 	u8 cfg_dac_minus;
+ 	u8 cfg_dac_plus;
+ 	struct ethtool_wolinfo wol;
++	bool set_gpio2_clk_out;
++	u32 gpio2_clk_out;
+ };
+ 
+ static int dp83822_config_wol(struct phy_device *phydev,
+@@ -413,6 +428,15 @@ static int dp83822_config_init(struct phy_device *phydev)
+ 	int err = 0;
+ 	int bmcr;
+ 
++	if (dp83822->set_gpio2_clk_out)
++		phy_modify_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_IOCTRL2,
++			       DP83822_IOCTRL2_GPIO2_CTRL |
++			       DP83822_IOCTRL2_GPIO2_CLK_SRC,
++			       FIELD_PREP(DP83822_IOCTRL2_GPIO2_CTRL,
++					  DP83822_IOCTRL2_GPIO2_CTRL_CLK_REF) |
++			       FIELD_PREP(DP83822_IOCTRL2_GPIO2_CLK_SRC,
++					  dp83822->gpio2_clk_out));
++
+ 	if (phy_interface_is_rgmii(phydev)) {
+ 		rx_int_delay = phy_get_internal_delay(phydev, dev, NULL, 0,
+ 						      true);
+@@ -611,6 +635,7 @@ static int dp83822_of_init(struct phy_device *phydev)
+ {
+ 	struct dp83822_private *dp83822 = phydev->priv;
+ 	struct device *dev = &phydev->mdio.dev;
++	const char *of_val;
+ 
+ 	/* Signal detection for the PHY is only enabled if the FX_EN and the
+ 	 * SD_EN pins are strapped. Signal detection can only enabled if FX_EN
+@@ -623,6 +648,29 @@ static int dp83822_of_init(struct phy_device *phydev)
+ 		dp83822->fx_enabled = device_property_present(dev,
+ 							      "ti,fiber-mode");
+ 
++	if (!device_property_read_string(dev, "ti,gpio2-clk-out", &of_val)) {
++		if (strcmp(of_val, "mac-if") == 0) {
++			dp83822->gpio2_clk_out = DP83822_CLK_SRC_MAC_IF;
++		} else if (strcmp(of_val, "xi") == 0) {
++			dp83822->gpio2_clk_out = DP83822_CLK_SRC_XI;
++		} else if (strcmp(of_val, "int-ref") == 0) {
++			dp83822->gpio2_clk_out = DP83822_CLK_SRC_INT_REF;
++		} else if (strcmp(of_val, "rmii-master-mode-ref") == 0) {
++			dp83822->gpio2_clk_out = DP83822_CLK_SRC_RMII_MASTER_MODE_REF;
++		} else if (strcmp(of_val, "free-running") == 0) {
++			dp83822->gpio2_clk_out = DP83822_CLK_SRC_FREE_RUNNING;
++		} else if (strcmp(of_val, "recovered") == 0) {
++			dp83822->gpio2_clk_out = DP83822_CLK_SRC_RECOVERED;
++		} else {
++			phydev_err(phydev,
++				   "Invalid value for ti,gpio2-clk-out property (%s)\n",
++				   of_val);
++			return -EINVAL;
++		}
++
++		dp83822->set_gpio2_clk_out = true;
++	}
++
+ 	return 0;
+ }
  
 
 -- 
