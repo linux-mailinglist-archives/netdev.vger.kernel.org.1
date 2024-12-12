@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-151288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34E849EDE76
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 05:30:19 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ACD29EDE7A
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 05:30:30 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CDF5281183
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:30:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DF0C18874C3
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 531A6153800;
-	Thu, 12 Dec 2024 04:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910F0174EF0;
+	Thu, 12 Dec 2024 04:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ahauCRda"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mH88PfDO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271DD126BEE;
-	Thu, 12 Dec 2024 04:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F17A170A1B;
+	Thu, 12 Dec 2024 04:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733977815; cv=none; b=gw9zDboyYr5RbtrNCQ9/12JoKjoD+/FHdtvVabls/M44vU8t5XSEJnGSP8J8sLiTau5/hN85KQgjM1NSM83cXujKPpEWL92BDx+PSzNy9IvoY5fraXLzWzIIIjHHe03LX+7X/6+JOXWS27U4b9X1sRWk1D7YLhq3pv+fVlf0cAE=
+	t=1733977816; cv=none; b=qLvQplXxqQBHQ8LEYHdxQy2FKfb4pPZfqymavBwdberhqK2uYgc0LeK4ItkQdDGCJngD/K+BzcM3qgGaelgEwYSeuGDH+BNMxVUyrzj7iXR+SuAzC+Cz4DgkvWawJsMi2TjsnZIZw7l+KkY0mlG+XllIC5ohaQvMcmwUdjkQ8aM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733977815; c=relaxed/simple;
-	bh=VyVWym0UcOZvSvQWz5iVZz6QF6qf+TE74PpOyTlvUSc=;
+	s=arc-20240116; t=1733977816; c=relaxed/simple;
+	bh=w0GaN2svvAl//6VXkTZuXQXE+ogd0LPmILmAZXFMlxM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Dt7yLPuLYimGhHdw7nq1wQmSnqPZjL4i5i5+hkV9MB8walKOF6c+Cbeep/5Hb7EeBZwE8zpx8BgkvnKvH2vi+3b3srTUfKKF4b7KkYZwFvvd0CHRF3LzQhShRIz7dJdYG4zWaLTDv2jdCfJVDwJtd22pAJ4YO8gaqVmwPhulHzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ahauCRda; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A264FC4CECE;
-	Thu, 12 Dec 2024 04:30:14 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=MX9Frq4E403K6mDlF4Yblj8IW7xhrmaIw4o/uFUBvuWQTJVAV7elK5XcqcR4Vg2PougBXsUq34a5oTtDzVNHFe+uHOMoMDyCYoX5qGOI4WLLCPhNXfPtSwxQEONfwJV7J3eiVA1Twc5Bx9p0NFGr06hP0fhamQ4tysG+4sG/om0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mH88PfDO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5071C4CED0;
+	Thu, 12 Dec 2024 04:30:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733977814;
-	bh=VyVWym0UcOZvSvQWz5iVZz6QF6qf+TE74PpOyTlvUSc=;
+	s=k20201202; t=1733977815;
+	bh=w0GaN2svvAl//6VXkTZuXQXE+ogd0LPmILmAZXFMlxM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ahauCRdaB+w25fxR4VV7wEmkW+2DLbHexQzySGhhoLHMgb9wK9gFpz256YU7/HqT/
-	 MvpapZqiN7EVkT8fsmPD1I8EtsjJMZWjMJSugBBSUit41XlIMN3RxXV4zqgOMCYsQ9
-	 rgAR9guLRsDlUGxXNamLI16HW1seicKtyHcYPOFM8XekgtJZH+stqXNN76B9l+58oR
-	 voCEyB+2oUsGV7IohaB0znu/QcQiACeLv476x1Kc1SHK8vFcWI3WyB2UOCFUr2bHms
-	 xLS8udATRtlcVHcGSoYkqXw3pq78JGLFbWFBh5khJWs7yVwKu+TG7Rhde09b9xJ392
-	 u1nwcNIm6Ym5g==
+	b=mH88PfDOqyp6h2xinfzwPU3ZRwO4xhmM+/l/vWYDoyz1dDjpjFXLCW14d7to7h0Ho
+	 Ki9MLSz8zFsey+48X9CWlm2hFhBtyGt3Q8qNyyHoK68a1vgvgPJXWKM08dgKKFGjPY
+	 eU9rpzeFXLbu20YZlrTcslXpgPJSI0pvkx4QrJUyn6/GuCbHAb70LXYQIcpEWDkDKY
+	 K+RggOwr2hO8fgEnwx10FtZVUsDzIGTkHU1c4xI2n5OJcO35oSqxh+ziN1UH5gbtTH
+	 ctafaFDlYsiinQPQgs808dQTvEghkfnMaj7UYaxOayOr+z0uL/zAstMXXX+mYUGPkM
+	 8IPaRv1MNt99A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB29F380A959;
-	Thu, 12 Dec 2024 04:30:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 345F3380A959;
+	Thu, 12 Dec 2024 04:30:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] splice: do not checksum AF_UNIX sockets
+Subject: Re: [PATCH v2 0/2] MANA: Fix few memory leaks in mana_gd_setup_irqs
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173397783066.1847197.14863491347323512309.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Dec 2024 04:30:30 +0000
-References: <Z1fMaHkRf8cfubuE@xiberoa>
-In-Reply-To: <Z1fMaHkRf8cfubuE@xiberoa>
-To: Frederik Deweerdt <deweerdt.lkml@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuniyu@amazon.com,
- mhal@rbox.co, dhowells@redhat.com, linux-kernel@vger.kernel.org,
- xiyou.wangcong@gmail.com, David.Laight@ACULAB.COM, jdamato@fastly.com,
- stable@vger.kernel.org
+ <173397783199.1847197.16469133820148942308.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Dec 2024 04:30:31 +0000
+References: <20241209175751.287738-1-mlevitsk@redhat.com>
+In-Reply-To: <20241209175751.287738-1-mlevitsk@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, kuba@kernel.org, haiyangz@microsoft.com,
+ schakrabarti@linux.microsoft.com, linux-hyperv@vger.kernel.org,
+ decui@microsoft.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ kotaranov@microsoft.com, leon@kernel.org, kys@microsoft.com,
+ wei.liu@kernel.org, andrew+netdev@lunn.ch, shradhagupta@linux.microsoft.com,
+ davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ longli@microsoft.com, yury.norov@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 9 Dec 2024 21:06:48 -0800 you wrote:
-> When `skb_splice_from_iter` was introduced, it inadvertently added
-> checksumming for AF_UNIX sockets. This resulted in significant
-> slowdowns, for example when using sendfile over unix sockets.
+On Mon,  9 Dec 2024 12:57:49 -0500 you wrote:
+> Fix 2 minor memory leaks in the mana driver,
+> introduced by commit
 > 
-> Using the test code in [1] in my test setup (2G single core qemu),
-> the client receives a 1000M file in:
-> - without the patch: 1482ms (+/- 36ms)
-> - with the patch: 652.5ms (+/- 22.9ms)
+> 8afefc361209 ("net: mana: Assigning IRQ affinity on HT cores")
+> 
+> Best regards,
+> 	Maxim Levitsky
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net] splice: do not checksum AF_UNIX sockets
-    https://git.kernel.org/netdev/net/c/6bd8614fc2d0
+  - [v2,1/2] net: mana: Fix memory leak in mana_gd_setup_irqs
+    https://git.kernel.org/netdev/net/c/bb1e3eb57d2c
+  - [v2,2/2] net: mana: Fix irq_contexts memory leak in mana_gd_setup_irqs
+    https://git.kernel.org/netdev/net/c/9a5beb6ca630
 
 You are awesome, thank you!
 -- 
