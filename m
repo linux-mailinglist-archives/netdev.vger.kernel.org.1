@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-151480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D101D9EFA9A
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 19:17:51 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D8299EFAB8
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 19:21:27 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91F9228E5AA
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 18:17:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D360F16F29B
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 18:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4124422C370;
-	Thu, 12 Dec 2024 18:09:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F05C231A39;
+	Thu, 12 Dec 2024 18:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u/qjrtOi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fH3sqYJu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 116282253FE;
-	Thu, 12 Dec 2024 18:09:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C2D22370C;
+	Thu, 12 Dec 2024 18:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734026973; cv=none; b=NjemwZZki0Bhw5miOjeHtjbCrlQHSvwwgdinWnURAVb7TgeWz9qdV1qWkMJ+J+5NAfGVFcict1FTfdl8CwITSVmBLzn1bm8wtpw89oEuehOzbxmIzocx28iZq+/pYn+fKcESeSKGtNzmbxCDQ3v6dj2HUV9q7F9TtmP8X9M0dPQ=
+	t=1734027128; cv=none; b=AwGsCfCzhuXp4dUFBMdPBiqRqnXtCRSjpTSlpe9LaPs1XIyxhOPnScD+K+RBV2GdJdJHC/ZBQ6VIHM1YrQ/4mjJL/RCPXta6LnbzZPoeQE/qPvHvjlQ3TeXI5zheStNYEA6ao1oMI1rYLNtzUFpmQolkNXbqKweVP+007emIUfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734026973; c=relaxed/simple;
-	bh=1TjkRWZBU28axmJe4vNYPqBY7I/9EiBSXXV3wfGhTXY=;
+	s=arc-20240116; t=1734027128; c=relaxed/simple;
+	bh=OY1y+5vY1bOZPYadIV8H9gvceIlcFBAJIacX4Qcgho0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e9h/dm+UjrjuBFuZ1rwJFN9JuFXf+ZvafM386uHnUeoDMGEo+YHyIeNnASc7h1F2Ass66pGVwzQxd0AZpXruZwLFRzWZG5/Cz7I5Li0ZnVi3P0CXsYYCeqmLbIujlXt7/oXmcIT5T2lWkAhY6d+DDVFY4Gm+QHD87AKazNNqVjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u/qjrtOi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4583AC4CED1;
-	Thu, 12 Dec 2024 18:09:30 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=DZqBkYfISn4SXCFKDBU3VHhr4FbDHpHZhrli9/oKLKr7U6G+AS5oh+iNH9nVG5D76XOiKHKIDd0rnD3pegbHoxEMuMHgUiIF6kaFjPJOx5307ik5aqWAKcG6w7K4zRoh99ZPZWj8cKf7I312PvFPSBAqlhGyyA4SpwRVNccGSWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fH3sqYJu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80EE2C4CED0;
+	Thu, 12 Dec 2024 18:12:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734026972;
-	bh=1TjkRWZBU28axmJe4vNYPqBY7I/9EiBSXXV3wfGhTXY=;
+	s=k20201202; t=1734027127;
+	bh=OY1y+5vY1bOZPYadIV8H9gvceIlcFBAJIacX4Qcgho0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=u/qjrtOikj5SxtqdT61PFTX3lipRF4ofWG/3e6VfNRHa3XIW5KgBP21VOCXmaWItx
-	 oMS+b3ncXFA2wE+mH8z8N1bsiyiWdPR+G23MuLBJlyofMr9/YwKXVBE08m30ugrnkN
-	 rBr7TQG2K7NlzbCvExf6JTiFFeDcwJ3pxMUiZ+9jD6Fn4MhJE7TvEK/VWVPrp5giaR
-	 Ce9CzROU1BGcv05hDb5dlaFumqRei9U0YTlCiL4DCQ+sd0HFbtEFkFj9U3C2HhWsfM
-	 z6zcxrVGD8sxCAKffYtj/Fc+mitN6n9K4c3Oa5mhnhTD7y1wKIcezhTOqYZhXuHEEi
-	 SvV1SSNi3leBw==
-Date: Thu, 12 Dec 2024 18:09:28 +0000
+	b=fH3sqYJu2nuhuKXv2eF2Wv7A4Bidw9g48lwKLJHgvcYJEHkxZVosEknSDpF7MtqQC
+	 4vLjhdxUYnJyQLCyLcmS+Tl2mKOlDqTDiDORu9lqOvOXOtSeEW2rfsDvlqn8mG3oJA
+	 /6hwAW1duvgTLvbw9XKwWyWc6fWRXxzdfw6KqYb6zwAeM54H05m3KO1Y0QjGWCzUum
+	 y8AJwqzKAER2mk+BIdOT1WXi/pHoZ3OOW82AyEusorWX4FUrGo6ZOFMuHD9qInvX++
+	 vM0mjuZL1KVKyE+Iss/0w4gphB5Wjo7UXFznLCtnKYg+80WM961DXM6wLiTgHpmzJP
+	 5c+SBKSMq+15w==
+Date: Thu, 12 Dec 2024 18:12:03 +0000
 From: Simon Horman <horms@kernel.org>
 To: alejandro.lucero-palau@amd.com
 Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
@@ -49,11 +49,11 @@ Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
 	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
 	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
 	Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v7 15/28] cxl: define a driver interface for HPA free
- space enumeration
-Message-ID: <20241212180928.GH73795@kernel.org>
+Subject: Re: [PATCH v7 17/28] cxl: define a driver interface for DPA
+ allocation
+Message-ID: <20241212181203.GI73795@kernel.org>
 References: <20241209185429.54054-1-alejandro.lucero-palau@amd.com>
- <20241209185429.54054-16-alejandro.lucero-palau@amd.com>
+ <20241209185429.54054-18-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,150 +62,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241209185429.54054-16-alejandro.lucero-palau@amd.com>
+In-Reply-To: <20241209185429.54054-18-alejandro.lucero-palau@amd.com>
 
-On Mon, Dec 09, 2024 at 06:54:16PM +0000, alejandro.lucero-palau@amd.com wrote:
+On Mon, Dec 09, 2024 at 06:54:18PM +0000, alejandro.lucero-palau@amd.com wrote:
 > From: Alejandro Lucero <alucerop@amd.com>
 > 
-> CXL region creation involves allocating capacity from device DPA
-> (device-physical-address space) and assigning it to decode a given HPA
-> (host-physical-address space). Before determining how much DPA to
-> allocate the amount of available HPA must be determined. Also, not all
-> HPA is create equal, some specifically targets RAM, some target PMEM,
-> some is prepared for device-memory flows like HDM-D and HDM-DB, and some
-> is host-only (HDM-H).
+> Region creation involves finding available DPA (device-physical-address)
+> capacity to map into HPA (host-physical-address) space. Given the HPA
+> capacity constraint, define an API, cxl_request_dpa(), that has the
+> flexibility to  map the minimum amount of memory the driver needs to
+> operate vs the total possible that can be mapped given HPA availability.
 > 
-> Wrap all of those concerns into an API that retrieves a root decoder
-> (platform CXL window) that fits the specified constraints and the
-> capacity available for a new region.
+> Factor out the core of cxl_dpa_alloc, that does free space scanning,
+> into a cxl_dpa_freespace() helper, and use that to balance the capacity
+> available to map vs the @min and @max arguments to cxl_request_dpa.
 > 
-> Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
+> Based on https://lore.kernel.org/linux-cxl/168592158743.1948938.7622563891193802610.stgit@dwillia2-xfh.jf.intel.com/
 > 
 > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 > Co-developed-by: Dan Williams <dan.j.williams@intel.com>
 > ---
->  drivers/cxl/core/region.c | 154 ++++++++++++++++++++++++++++++++++++++
->  drivers/cxl/cxl.h         |   3 +
->  include/cxl/cxl.h         |   8 ++
->  3 files changed, 165 insertions(+)
+>  drivers/cxl/core/hdm.c | 154 +++++++++++++++++++++++++++++++++++------
+>  include/cxl/cxl.h      |   5 ++
+>  2 files changed, 138 insertions(+), 21 deletions(-)
 > 
-> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> index 967132b49832..77af6a59f4b5 100644
-> --- a/drivers/cxl/core/region.c
-> +++ b/drivers/cxl/core/region.c
-> @@ -687,6 +687,160 @@ static int free_hpa(struct cxl_region *cxlr)
->  	return 0;
+> diff --git a/drivers/cxl/core/hdm.c b/drivers/cxl/core/hdm.c
+
+...
+
+> @@ -538,6 +557,99 @@ int cxl_dpa_alloc(struct cxl_endpoint_decoder *cxled, unsigned long long size)
+>  	return devm_add_action_or_reset(&port->dev, cxl_dpa_release, cxled);
 >  }
 >  
-> +struct cxlrd_max_context {
-> +	struct device *host_bridge;
-> +	unsigned long flags;
-> +	resource_size_t max_hpa;
-> +	struct cxl_root_decoder *cxlrd;
-> +};
-> +
-> +static int find_max_hpa(struct device *dev, void *data)
+> +static int find_free_decoder(struct device *dev, void *data)
 > +{
-> +	struct cxlrd_max_context *ctx = data;
-> +	struct cxl_switch_decoder *cxlsd;
-> +	struct cxl_root_decoder *cxlrd;
-> +	struct resource *res, *prev;
-> +	struct cxl_decoder *cxld;
-> +	resource_size_t max;
+> +	struct cxl_endpoint_decoder *cxled;
+> +	struct cxl_port *port;
 > +
-> +	if (!is_root_decoder(dev))
+> +	if (!is_endpoint_decoder(dev))
 > +		return 0;
 > +
-> +	cxlrd = to_cxl_root_decoder(dev);
-> +	cxlsd = &cxlrd->cxlsd;
-> +	cxld = &cxlsd->cxld;
-> +	if ((cxld->flags & ctx->flags) != ctx->flags) {
-> +		dev_dbg(dev, "%s, flags not matching: %08lx vs %08lx\n",
-> +			__func__, cxld->flags, ctx->flags);
+> +	cxled = to_cxl_endpoint_decoder(dev);
+> +	port = cxled_to_port(cxled);
+> +
+> +	if (cxled->cxld.id != port->hdm_end + 1)
 > +		return 0;
-> +	}
 > +
-> +	/*
-> +	 * The CXL specs do not forbid an accelerator being part of an
-> +	 * interleaved HPA range, but it is unlikely and because it helps
-> +	 * simplifying the code, we assume this being the case by now.
-> +	 */
-> +	if (cxld->interleave_ways != 1) {
-> +		dev_dbg(dev, "%s, interleave_ways not matching\n", __func__);
-> +		return 0;
-> +	}
-> +
-> +	guard(rwsem_read)(&cxl_region_rwsem);
-> +	if (ctx->host_bridge != cxlsd->target[0]->dport_dev) {
-> +		dev_dbg(dev, "%s, host bridge does not match\n", __func__);
-> +		return 0;
-> +	}
-> +
-> +	/*
-> +	 * Walk the root decoder resource range relying on cxl_region_rwsem to
-> +	 * preclude sibling arrival/departure and find the largest free space
-> +	 * gap.
-> +	 */
-> +	lockdep_assert_held_read(&cxl_region_rwsem);
-> +	max = 0;
-> +	res = cxlrd->res->child;
-> +	if (!res)
-> +		max = resource_size(cxlrd->res);
-> +	else
-> +		max = 0;
-> +
-> +	for (prev = NULL; res; prev = res, res = res->sibling) {
-> +		struct resource *next = res->sibling;
-> +		resource_size_t free = 0;
-> +
-> +		/*
-> +		 * Sanity check for preventing arithmetic problems below as a
-> +		 * resource with size 0 could imply using the end field below
-> +		 * when set to unsigned zero - 1 or all f in hex.
-> +		 */
-> +		if (!resource_size(prev))
-> +			continue;
-
-Hi Alejandro and Dan,
-
-Below it is assumed that prev may be null.
-But above resource_size will dereference it unconditionally.
-That doesn't seem right.
-
-Flagged by Smatch.
-
-> +
-> +		if (!prev && res->start > cxlrd->res->start) {
-> +			free = res->start - cxlrd->res->start;
-> +			max = max(free, max);
-> +		}
-> +		if (prev && res->start > prev->end + 1) {
-> +			free = res->start - prev->end + 1;
-> +			max = max(free, max);
-> +		}
-> +		if (next && res->end + 1 < next->start) {
-> +			free = next->start - res->end + 1;
-> +			max = max(free, max);
-> +		}
-> +		if (!next && res->end + 1 < cxlrd->res->end + 1) {
-> +			free = cxlrd->res->end + 1 - res->end + 1;
-> +			max = max(free, max);
-> +		}
-> +	}
-> +
-> +	dev_dbg(CXLRD_DEV(cxlrd), "%s, found %pa bytes of free space\n",
-> +		__func__, &max);
-> +	if (max > ctx->max_hpa) {
-> +		if (ctx->cxlrd)
-> +			put_device(CXLRD_DEV(ctx->cxlrd));
-> +		get_device(CXLRD_DEV(cxlrd));
-> +		ctx->cxlrd = cxlrd;
-> +		ctx->max_hpa = max;
-> +		dev_dbg(CXLRD_DEV(cxlrd), "%s, found %pa bytes of free space\n",
-> +			__func__, &max);
-> +	}
-> +	return 0;
+> +	return 1;
 > +}
+> +
+> +/**
+> + * cxl_request_dpa - search and reserve DPA given input constraints
+> + * @endpoint: an endpoint port with available decoders
+
+nit: @cxlmd should be described here rather than @endpoint
+
+> + * @is_ram: DPA operation mode (ram vs pmem)
+> + * @min: the minimum amount of capacity the call needs
+> + * @max: extra capacity to allocate after min is satisfied
+> + *
+> + * Given that a region needs to allocate from limited HPA capacity it
+> + * may be the case that a device has more mappable DPA capacity than
+> + * available HPA. So, the expectation is that @min is a driver known
+> + * value for how much capacity is needed, and @max is based the limit of
+> + * how much HPA space is available for a new region.
+> + *
+> + * Returns a pinned cxl_decoder with at least @min bytes of capacity
+> + * reserved, or an error pointer. The caller is also expected to own the
+> + * lifetime of the memdev registration associated with the endpoint to
+> + * pin the decoder registered as well.
+> + */
+> +struct cxl_endpoint_decoder *cxl_request_dpa(struct cxl_memdev *cxlmd,
+> +					     bool is_ram,
+> +					     resource_size_t min,
+> +					     resource_size_t max)
 
 ...
 
