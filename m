@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-151279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 147709EDDF7
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:41:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E2329EDE09
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:54:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 728BD167645
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 03:41:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4F6D1676AA
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 03:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F07014389F;
-	Thu, 12 Dec 2024 03:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B7013B59B;
+	Thu, 12 Dec 2024 03:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G2zLSggm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JVe4jA88"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6443338DDB;
-	Thu, 12 Dec 2024 03:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3797957CBE;
+	Thu, 12 Dec 2024 03:54:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733974884; cv=none; b=BQZlJutOdbxtdxMtD/Yej2K8S4scP216OIYFTqhQ54UEjb1eLgFnwNv7CDs+pdb2JciyizLA8AAGJnA54UStmJXs2soR8AZF5vzrPOP71OynTn7UuXLQlc8dbwej0eZEuqKkdkiWHYDG9Nv/vtruRcyp2g5HL9orAbE7fDYQ+MU=
+	t=1733975682; cv=none; b=ZQ77sVlB5NcjVcAxzgNOoHgSEZm8f2jSWwRZod3ToPIBcthyRmFCyDIIzCCs0fzmDA6O9zpI9mBmWZMDDKKMcDUmOIS/ok12XKksjBAlSy3+TmLA48ovQXXNOdXnrggeod5XGtu+lnxRBrMJtzQxUk+5wgAXl2j4/N+aVN7Sxbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733974884; c=relaxed/simple;
-	bh=7Vi1Sc9kCGtKQksRtAfKyk/bPxwvFdGJDdkUvncYg8I=;
+	s=arc-20240116; t=1733975682; c=relaxed/simple;
+	bh=TJo/10K8D4UMkp+crhwMMswgVgBjjdYqS0iUXkzYFtQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WZ8esqsbFRjU+oxsp2loedvBmZoz5VEa1gFtMQAlW2iaUbr4Cs8WnCNpv6XLPW0B33GPP6/0y0CIL8imDhsQhct9rb7edTbW7Yr6VGYFfZHxN9O6WkRaMnwaN+DWdiXLnxBGdUopxXduSH9GWczFg/LLAY1mF1+6IZeY2nRYKQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G2zLSggm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 317F8C4CED1;
-	Thu, 12 Dec 2024 03:41:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jevmRnRH8F+OrY7xzM2ja/wlN09M/rbk7Dkr5vkxxMCz05DhG4g85lhCQr6RgGz7HD9Lyf1yzgSNZfG570izuBI/p0+T2dxKs4Yv/yI4z3nt53iOptL+SeQvKHQIEMfe6AO2o1CiBzkIgNnrxneN6yJqkFe56cij4M7V9Yx2Pog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JVe4jA88; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F29E5C4CED1;
+	Thu, 12 Dec 2024 03:54:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733974884;
-	bh=7Vi1Sc9kCGtKQksRtAfKyk/bPxwvFdGJDdkUvncYg8I=;
+	s=k20201202; t=1733975681;
+	bh=TJo/10K8D4UMkp+crhwMMswgVgBjjdYqS0iUXkzYFtQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G2zLSggmzEFyOKFADq5n4DbpgYATKEExUnAmufeBGTR+tzG4vbtSeyFnCJspU0Jpj
-	 K800gGsDkIIPxuIplISk0VilwFQ/0arl4iMo2pwv1umZrOkG7W2wsBlVtVf/UxVkIz
-	 2fjXR+PgMSSLaCxFclTIELDLofVk1lF/TGsV71dmjxctSS80kKnWxKHSJQgPb1R/ac
-	 SZi7gAW1wKDMmgMEZBHUv0/fTavxxLJGGEAtv8wd7M+uFElqnuLRYefTVPXzZIFJRi
-	 aVRnP7hVH30jdNvH4p2HojZA20EQ89V60HTPyDdE74xeLbI4/XezD42bTrhKGS3DP/
-	 V0nHNHoBqN7PA==
-Date: Wed, 11 Dec 2024 19:41:22 -0800
+	b=JVe4jA88U6k4cWRe8Yds8rFSljhX9QvFL4ygOlA21TzB/IEUDKm00TuBikQdBT5Ev
+	 9vdWxgPhBPHO165Cus2xcq+pfyrCtCFzemFe8gpDPfLuhMWJMkXqwi0TqzVUg24u/z
+	 UwY8HXztTIthrwexSjar+oUYZwfqWI62/86aepH2b3pAmFaM+XVcwKIPV0Mki445Dj
+	 HckYiS477rk8WCKVdCeMSPeW4A+rp9iAsspJbE2iCtWukknR3Jip1igGjpYtIPbF9T
+	 XYLnoXRRDJr4N69uoDw6ZqvwchUJ2WkHLs301t3qTv9IQsr+TzE3QmuMUhhprPAQ1b
+	 QOvHccfdiUfCg==
+Date: Wed, 11 Dec 2024 19:54:40 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Jijie Shao <shaojijie@huawei.com>
 Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
@@ -53,12 +53,12 @@ Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
  <jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
  <salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
  <linux-kernel@vger.kernel.org>, <hkelam@marvell.com>
-Subject: Re: [PATCH V6 net-next 1/7] net: hibmcge: Add debugfs supported in
- this module
-Message-ID: <20241211194122.26d6b38b@kernel.org>
-In-Reply-To: <20241210134855.2864577-2-shaojijie@huawei.com>
+Subject: Re: [PATCH V6 net-next 3/7] net: hibmcge: Add unicast frame filter
+ supported in this module
+Message-ID: <20241211195440.4b861d51@kernel.org>
+In-Reply-To: <20241210134855.2864577-4-shaojijie@huawei.com>
 References: <20241210134855.2864577-1-shaojijie@huawei.com>
-	<20241210134855.2864577-2-shaojijie@huawei.com>
+	<20241210134855.2864577-4-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,9 +68,63 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 10 Dec 2024 21:48:49 +0800 Jijie Shao wrote:
-> +#define hbg_get_bool_str(state) ((state) ? "true" : "false")
+On Tue, 10 Dec 2024 21:48:51 +0800 Jijie Shao wrote:
+> +static void hbg_del_mac_from_filter(struct hbg_priv *priv, const u8 *addr)
+> +{
+> +	u32 index;
+> +
+> +	/* not exists */
+> +	if (hbg_get_index_from_mac_table(priv, addr, &index))
+> +		return;
+> +
+> +	hbg_set_mac_to_mac_table(priv, index, NULL);
+> +
+> +	if (priv->filter.table_overflow) {
 
-If you're defining a wrapper for this you're better off using
-str_true_false()
+why are you tracking the overflow (see below)
+
+> +		priv->filter.table_overflow = false;
+> +		hbg_update_promisc_mode(priv->netdev);
+> +		dev_info(&priv->pdev->dev, "mac table is not full\n");
+> +	}
+> +}
+> +
+> +static int hbg_uc_sync(struct net_device *netdev, const unsigned char *addr)
+> +{
+> +	struct hbg_priv *priv = netdev_priv(netdev);
+> +
+> +	return hbg_add_mac_to_filter(priv, addr);
+> +}
+> +
+> +static int hbg_uc_unsync(struct net_device *netdev, const unsigned char *addr)
+> +{
+> +	struct hbg_priv *priv = netdev_priv(netdev);
+> +
+> +	if (ether_addr_equal(netdev->dev_addr, (u8 *)addr))
+> +		return 0;
+> +
+> +	hbg_del_mac_from_filter(priv, addr);
+> +	return 0;
+> +}
+> +
+> +static void hbg_net_set_rx_mode(struct net_device *netdev)
+> +{
+> +	hbg_update_promisc_mode(netdev);
+> +	__dev_uc_sync(netdev, hbg_uc_sync, hbg_uc_unsync);
+
+__dev_uc_sync() will only fail if it failed to add an entry
+you can pass the status it returned (cast to bool) to
+hbg_update_promisc_mode(), no need to save the "table_overflow" bool
+
+> +}
+> +
+>  static int hbg_net_set_mac_address(struct net_device *netdev, void *addr)
+>  {
+>  	struct hbg_priv *priv = netdev_priv(netdev);
+>  	u8 *mac_addr;
+> +	bool is_exists;
+
+just "exists", without the is_
+
+> +	u32 index;
 
