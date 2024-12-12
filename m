@@ -1,208 +1,145 @@
-Return-Path: <netdev+bounces-151442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5F979EF15A
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:37:44 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25D8917917C
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 16:31:30 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E622253E3;
-	Thu, 12 Dec 2024 16:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="MjnYmpAC";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AHBFjBgS"
-X-Original-To: netdev@vger.kernel.org
-Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C6A39EF1AB
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:40:12 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC18223E98;
-	Thu, 12 Dec 2024 16:19:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D11D6290FC0
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 16:40:10 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03CF6231A3D;
+	Thu, 12 Dec 2024 16:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LjutuD17"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3A70231A3A
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 16:30:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734020378; cv=none; b=YlP6hhF6sXY6p1keVBu5eYgjqABN871hf3OQWH2WwnuTucxYwUuigU2tLIMUFBVlhybcvrVYKX40uLnDKSMBbWArK6BzixLD/cUO276JDdqSFwcMAehwaoAZI3AbjI6KmhiW38vGfkljqK1AFPrkaMXFhdM6h6//UT/o8FwKccA=
+	t=1734021051; cv=none; b=ZwQUsHIAOyuO8Obv6ZERpNHZyOPknBwBfiOnNjMeL76CDd9lQHjEg2i4ULzFfbAnXfXLDdyawPk+o/0EWEZsO+dqVD1lp+lrYee5FKON4gJOKXqxCaB60me/UT0xxr95yX62YQ9Apnd7fmPx4+Kz7/+TmtHiMztJ2mrgKNjafFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734020378; c=relaxed/simple;
-	bh=w216NyfW1oxIY2+Gq63plKSQ6r+1ySMwciBz7cCBkQM=;
+	s=arc-20240116; t=1734021051; c=relaxed/simple;
+	bh=Bgd7dC+8VkZkhmHsUWGvAPgGMT1s5CIo9KCWBJ3WLgg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FUc8iUklxXT2MLv58xZMfyW320LV6mRnuComZDYV6DDZ5Rp5Oqj6/X7LF2j0kQEJv5tKO2o8SoteoEpyU/VvlArqRv9AQ2qmfm+x55kD0MugSQMMUOWnpEaKDV5cO25x6gzqtgAnMNrX+VU/DtbtbCMyzNJYOINg1ySGZ1M3NLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=MjnYmpAC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AHBFjBgS; arc=none smtp.client-ip=202.12.124.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id EE2F01140126;
-	Thu, 12 Dec 2024 11:19:33 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Thu, 12 Dec 2024 11:19:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1734020373; x=
-	1734106773; bh=C0k2bwpb7K+Z89BBfh8KWMaxfFFAR3kLSH99DukfYyQ=; b=M
-	jnYmpAClQxmo43CaCkbnBWOLUEFqAzX7qM0GO5z3jOyvDBkWo+2udaXPtoV9W/k9
-	kQh6CKOjJahlYzVjf5GeawyfrtNjYO/xb46HEyaYTmSFWUFC7LcXE0ieq/Ea1/0+
-	mCnAt/wzPW2TG4flVVPlqdxjr3lBMPQB7Z4bOtTSNvY51vjgFknrPgXYPdeaextM
-	jCouM/EbFLrBu9f6mO1MmE8V8M13BkjonVTRVW3CIrlVRnlgLmtiFnUaSeoeMyGr
-	mJm0SahcJXHA72C4mrHGjPzKqL5V3M4T8LCO73UQila3s3U3BrjAvCW3ctO2WZJ6
-	i6XVLM30Lg8jsVtIaJIjA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1734020373; x=1734106773; bh=C0k2bwpb7K+Z89BBfh8KWMaxfFFAR3kLSH9
-	9DukfYyQ=; b=AHBFjBgSA/j15YHY4n9YD+jZIeHsHoxDCs5bmTJQGD1Yfs4gp39
-	lYOx/ZzuSTO1MOuKwQNXti/FfX/DCKmFNvTdonHHU30xg8Jk6wtZxN2Xm3Y929sN
-	KgM/t3KpPNo15TJS4ZO5UvlNpgvcpvHArkXksPR9u2JewMOEQHms8R33OUPjQ1tR
-	2hDS0ZwTu7I+QKAN13aZqbetWGNFmAwIc7yj7+PUnHY9Ofy8AtWz8p6Q79n32heI
-	+3g8EAjxDzejKcsSDS/0Gp/THbP3l4eBvwl8TGNzBEeapEt5+z+31ic+kaDeFsQO
-	DXfXk5oqCCX2c+JDWZuWXVRv+69bnEPrt2A==
-X-ME-Sender: <xms:FQ1bZwVys6JLznzzXhZvUeclxp79V4EVllFTddM9NLgwOVci7GmsWg>
-    <xme:FQ1bZ0kmajk4W9ARk4ajmAvz7p8DsB1E6fOzlb_9MU7EkUn95wrjGxRo3QQWZOGP6
-    HTJHn8kIUps92uDTaU>
-X-ME-Received: <xmr:FQ1bZ0Y7RGGRzjxfRe4LnI1u5l8rfr-MsjrDioenRynvQe2KKzw1gn5EHF2Q>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkeehgdekiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepudegpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnih
-    hosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggv
-    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhr
-    tghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhrtghpthhtoh
-    eprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
-X-ME-Proxy: <xmx:FQ1bZ_WMuVRfMZien5stnUO5tjvCmn9a2H1k3FfcUH-jhPYqN6sMCQ>
-    <xmx:FQ1bZ6nmxGu8B5zthDTf8zLtTDY8mEIrDUsWnPKRzwF7ZmsxPfQIPw>
-    <xmx:FQ1bZ0eoxHwHfy8jDHis-ZVdy91-AX1tzz227tznKo2iBreZMj1JAg>
-    <xmx:FQ1bZ8EB_fRkce0SbjQqQ8Yh5X6dj85M8Skttb2Qy0pcJLdeAxJ7Mw>
-    <xmx:FQ1bZ__UU06aWK2NwfUpayGfFNCus7CSZH7BsmNgcWxTC7Hu7KusKkMn>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 12 Dec 2024 11:19:32 -0500 (EST)
-Date: Thu, 12 Dec 2024 17:19:30 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
-	willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next v15 06/22] ovpn: introduce the ovpn_socket object
-Message-ID: <Z1sNEgQLMzZua3mS@hog>
-References: <20241211-b4-ovpn-v15-0-314e2cad0618@openvpn.net>
- <20241211-b4-ovpn-v15-6-314e2cad0618@openvpn.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=A6XS+9uUJPOQ/YBqptdOyopk5U+odvp1THslvmlIbljyp2Wvqz0gn4j4uJKD1E6/YSJ2hrJEzLB49dqMAb7mb23QvdTPnX7BuQ6dsOo3koB1JaPYjLgHGYuASjnLtZYeVhY9iOrXtAJGOoi4mD8EvcXuuwp6L4qGSJnu9Cz6y6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LjutuD17; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C8B7C4CECE;
+	Thu, 12 Dec 2024 16:30:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734021051;
+	bh=Bgd7dC+8VkZkhmHsUWGvAPgGMT1s5CIo9KCWBJ3WLgg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LjutuD17SdC3oU1eNsby40al2J7o8SErj+ov30fqtQQK085BsF1HSVdJEouvFEq9c
+	 mEf84+jqHBLX26q+mzSywIgC/n0L0CYkcwobTOarz2jYIu94DBq6WrXEya4E6SwIys
+	 y9yGXOiJIK3YDTIs21EymA8wC+qJRV1tVEpTDe8qeYcOn2IR3WBY/SM/zJhdquZO/Y
+	 cOMmk70J33AyhsfQSnrBUvmwsQOkzsbgtpdeUCH85DXLLQTvrqkPLt4aVWqZSAWjDs
+	 mS4DCi0Pi8exOKtbRTgd4Obh+QIDo2XM5+kgOQIcwcTU+N/zPXFyQtWf0t2jIPpg6k
+	 C/hHoZCSgBLAg==
+Date: Thu, 12 Dec 2024 16:30:47 +0000
+From: Simon Horman <horms@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>
+Subject: Re: [PATCH iwl-net] ice: fix ice_parser_rt::bst_key array size
+Message-ID: <20241212163047.GA73795@kernel.org>
+References: <20241211132745.112536-2-przemyslaw.kitszel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241211-b4-ovpn-v15-6-314e2cad0618@openvpn.net>
+In-Reply-To: <20241211132745.112536-2-przemyslaw.kitszel@intel.com>
 
-2024-12-11, 22:15:10 +0100, Antonio Quartulli wrote:
-> +static struct ovpn_socket *ovpn_socket_get(struct socket *sock)
-> +{
-> +	struct ovpn_socket *ovpn_sock;
-> +
-> +	rcu_read_lock();
-> +	ovpn_sock = rcu_dereference_sk_user_data(sock->sk);
-> +	if (WARN_ON(!ovpn_socket_hold(ovpn_sock)))
+On Wed, Dec 11, 2024 at 02:26:36PM +0100, Przemek Kitszel wrote:
+> Fix &ice_parser_rt::bst_key size. It was wrongly set to 10 instead of 20
+> in the initial impl commit (see Fixes tag). All usage code assumed it was
+> of size 20. That was also the initial size present up to v2 of the intro
+> series [2], but halved by v3 [3] refactor described as "Replace magic
+> hardcoded values with macros." The introducing series was so big that
+> some ugliness was unnoticed, same for bugs :/
+> 
+> ICE_BST_KEY_TCAM_SIZE and ICE_BST_TCAM_KEY_SIZE were differing by one.
+> There was tmp variable @j in the scope of edited function, but was not
+> used in all places. This ugliness is now gone.
+> I'm moving ice_parser_rt::pg_prio a few positions up, to fill up one of
+> the holes in order to compensate for the added 10 bytes to the ::bst_key,
+> resulting in the same size of the whole as prior to the fix, and miminal
+> changes in the offsets of the fields.
+> 
+> This fix obsoletes Ahmed's attempt at [1].
+> 
+> [1] https://lore.kernel.org/intel-wired-lan/20240823230847.172295-1-ahmed.zaki@intel.com
+> [2] https://lore.kernel.org/intel-wired-lan/20230605054641.2865142-13-junfeng.guo@intel.com
+> [3] https://lore.kernel.org/intel-wired-lan/20230817093442.2576997-13-junfeng.guo@intel.com
+> 
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/intel-wired-lan/b1fb6ff9-b69e-4026-9988-3c783d86c2e0@stanley.mountain
+> Fixes: 9a4c07aaa0f5 ("ice: add parser execution main loop")
+> CC: Ahmed Zaki <ahmed.zaki@intel.com>
+> Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-Could we hit this situation when we're removing the last peer (so
-detaching its socket) just as we're adding a new one? ovpn_socket_new
-finds the socket already attached and goes through the EALREADY path,
-but the refcount has already dropped to 0?
+Hi Przemek,
 
-Then we'd also return NULL from ovpn_socket_new [1], which I don't
-think is handled well by the caller (at least the netdev_dbg call at
-the end of ovpn_nl_peer_modify, maybe other spots too).
+I agree that these changes are good.  But I wonder if it would be best to
+only treat the update size of bst_key as a fix.
 
-(I guess it's not an issue you would see with the existing userspace
-if it's single-threaded)
+...
 
-[...]
-> +struct ovpn_socket *ovpn_socket_new(struct socket *sock, struct ovpn_peer *peer)
-> +{
-> +	struct ovpn_socket *ovpn_sock;
-> +	int ret;
-> +
-> +	ret = ovpn_socket_attach(sock, peer);
-> +	if (ret < 0 && ret != -EALREADY)
-> +		return ERR_PTR(ret);
-> +
-> +	/* if this socket is already owned by this interface, just increase the
-> +	 * refcounter and use it as expected.
-> +	 *
-> +	 * Since UDP sockets can be used to talk to multiple remote endpoints,
-> +	 * openvpn normally instantiates only one socket and shares it among all
-> +	 * its peers. For this reason, when we find out that a socket is already
-> +	 * used for some other peer in *this* instance, we can happily increase
-> +	 * its refcounter and use it normally.
-> +	 */
-> +	if (ret == -EALREADY) {
-> +		/* caller is expected to increase the sock refcounter before
-> +		 * passing it to this function. For this reason we drop it if
-> +		 * not needed, like when this socket is already owned.
-> +		 */
-> +		ovpn_sock = ovpn_socket_get(sock);
-> +		sockfd_put(sock);
+> diff --git a/drivers/net/ethernet/intel/ice/ice_parser_rt.c b/drivers/net/ethernet/intel/ice/ice_parser_rt.c
+> index dedf5e854e4b..d9c38ce27e4f 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_parser_rt.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_parser_rt.c
+> @@ -125,22 +125,20 @@ static void ice_bst_key_init(struct ice_parser_rt *rt,
+>  	else
+>  		key[idd] = imem->b_kb.prio;
+>  
+> -	idd = ICE_BST_KEY_TCAM_SIZE - 1;
+> +	idd = ICE_BST_TCAM_KEY_SIZE - 2;
+>  	for (i = idd; i >= 0; i--) {
+>  		int j;
+>  
+>  		j = ho + idd - i;
+>  		if (j < ICE_PARSER_MAX_PKT_LEN)
+> -			key[i] = rt->pkt_buf[ho + idd - i];
+> +			key[i] = rt->pkt_buf[j];
+>  		else
+>  			key[i] = 0;
+>  	}
+>  
+> -	ice_debug(rt->psr->hw, ICE_DBG_PARSER, "Generated Boost TCAM Key:\n");
+> -	ice_debug(rt->psr->hw, ICE_DBG_PARSER, "%02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n",
+> -		  key[0], key[1], key[2], key[3], key[4],
+> -		  key[5], key[6], key[7], key[8], key[9]);
+> -	ice_debug(rt->psr->hw, ICE_DBG_PARSER, "\n");
+> +	ice_debug_array_w_prefix(rt->psr->hw, ICE_DBG_PARSER,
+> +				 KBUILD_MODNAME "Generated Boost TCAM Key",
 
-[1] so we would need to add
+Should there be a delimeter between KBUILD_MODNAME and "Generated ..." ?
+e.g.:
 
-    if (!ovpn_sock)
-        return -EAGAIN;
+				 KBUILD_MODNAME ": Generated Boost TCAM Key",
 
-> +		return ovpn_sock;
-> +	}
-> +
-
-[...]
-> +int ovpn_udp_socket_attach(struct socket *sock, struct ovpn_priv *ovpn)
-> +{
-> +	struct ovpn_socket *old_data;
-> +	int ret = 0;
-> +
-> +	/* make sure no pre-existing encapsulation handler exists */
-> +	rcu_read_lock();
-> +	old_data = rcu_dereference_sk_user_data(sock->sk);
-> +	if (!old_data) {
-> +		/* socket is currently unused - we can take it */
-> +		rcu_read_unlock();
-> +		return 0;
-> +	}
-> +
-> +	/* socket is in use. We need to understand if it's owned by this ovpn
-> +	 * instance or by something else.
-> +	 * In the former case, we can increase the refcounter and happily
-> +	 * use it, because the same UDP socket is expected to be shared among
-> +	 * different peers.
-> +	 *
-> +	 * Unlikely TCP, a single UDP socket can be used to talk to many remote
-
-(since I'm commenting on this patch:)
-
-s/Unlikely/Unlike/
-
-[I have some more nits/typos here and there but I worry the
-maintainers will get "slightly" annoyed if I make you repost 22
-patches once again :) -- if that's all I find in the next few days,
-everyone might be happier if I stash them and we get them fixed after
-merging?]
-
--- 
-Sabrina
+> +				 key, ICE_BST_TCAM_KEY_SIZE);
+>  }
+>  
+>  static u16 ice_bit_rev_u16(u16 v, int len)
+> 
+> base-commit: 51a00be6a0994da2ba6b4ace3b7a0d9373b4b25e
+> -- 
+> 2.46.0
+> 
+> 
 
