@@ -1,136 +1,113 @@
-Return-Path: <netdev+bounces-151546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5A849EFF59
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 23:29:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EF199EFF67
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 23:32:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75E6C284A3F
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 22:29:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBAF62864FC
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 22:32:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3800E1DE2B8;
-	Thu, 12 Dec 2024 22:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302BA1DD0FF;
+	Thu, 12 Dec 2024 22:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="h/NH4cj/"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dk4nXoEm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f99.google.com (mail-qv1-f99.google.com [209.85.219.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5372F2F;
-	Thu, 12 Dec 2024 22:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7D819CC0F
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 22:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734042566; cv=none; b=NGxIQ7j1Fzo0WuiurIEB+hWDRYaTHM55CShrz2z9jIP7QhXcObrLSwxQIogFzvPl8ueO9emJFC8ghkg86bR6XO1EhDNbT3iV3/2J28wLSsc4ael5arffr/YAAggPRFPV6f0VVt/iZWPuv9Rd1bLEBRoItDc4EkFupGcAb9pfppc=
+	t=1734042718; cv=none; b=IxJ/nkf/+mbaL/e+HIkDcIZGa/Vi825qYOCZq4qiZmPZ6qX0+XYwIU5jYSCnAWleAl1aMI7D2mnNiuEthp9jtFDDypQttqfCLqmHwHJ7/qr0R0cEjYHO/OKDthPVJvBd33zv6TqJDbgaol2xfESFcx+y4GUnb1lXIjXwoLm+xsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734042566; c=relaxed/simple;
-	bh=hgLL+j7viOzNdukkTMbjWUP+M01pNEnqmEe4gbYyxUw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ldEdFliAYtEX6s0BA0/TnEtlZ8zF6D4spYxy57eU8lqf1ReCHQMs8wxE+jJ0Krr+G9Y381l6itQhRlWvi1GcrAuhC2s2yyCfmdDHjQGdkR0qff709Kpx6z4nOIR4MtSTCjV/iA5J/UqSs9zuPFicLI577CHbKj3fKcMgsOJrUaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=h/NH4cj/; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BCEvO6O029697;
-	Thu, 12 Dec 2024 22:29:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=um4mQb
-	9dLa/+1MlyiZ6x7Q5vlgiEUQiPyor2NdHS6Mw=; b=h/NH4cj/HBj4VNSbeHFobY
-	Tn8NL49lwgz91hCADluFQU0ipc1mbzvNjCccBGRuSbSlPpo87xcB8E+N3tWrBVPp
-	5XF6on22eKMFk6EbD1ZQfRjrq5p8JjRNL3noirXYm4urw61DcawVMRdpEZ9JmH91
-	9plouJYD42oCm82zOREWpopyOoICNUp1ZFq/9wgLQ8Apwz/YbBBXtcgLx6ZTna8n
-	+flXwdyKuWoymDiFqGj2nqtyx4Iss8Z588/YEV8ZTgT+Xf5Aq/4TXkUCPr3fpAUz
-	KkV0rglyyDmfEZIxqqNTCoZv+InI1bxo/HJfGruyTeWQf8BO4XnMOrRFbK44++Ag
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ccsjwsxp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Dec 2024 22:29:18 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BCMQegO023311;
-	Thu, 12 Dec 2024 22:29:18 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ccsjwsxd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Dec 2024 22:29:18 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BCIdYHk007776;
-	Thu, 12 Dec 2024 22:29:17 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43ft11vake-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Dec 2024 22:29:17 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BCMTDbi34668920
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 12 Dec 2024 22:29:13 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 611B12004D;
-	Thu, 12 Dec 2024 22:29:13 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 769DA20040;
-	Thu, 12 Dec 2024 22:29:12 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.23.191])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu, 12 Dec 2024 22:29:12 +0000 (GMT)
-Date: Thu, 12 Dec 2024 23:29:10 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Guangguan Wang <guangguan.wang@linux.alibaba.com>, wenjia@linux.ibm.com,
-        jaka@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, horms@kernel.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dust Li <dust.li@linux.alibaba.com>,
-        Halil
- Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH net-next RESEND v3 2/2] net/smc: support ipv4 mapped
- ipv6 addr client for smc-r v2
-Message-ID: <20241212232910.65825906.pasic@linux.ibm.com>
-In-Reply-To: <c67f6f4d-2291-41c8-8a89-aa0ae8f2ecd9@redhat.com>
-References: <20241211023055.89610-1-guangguan.wang@linux.alibaba.com>
-	<20241211023055.89610-3-guangguan.wang@linux.alibaba.com>
-	<20241211195440.54b37a79.pasic@linux.ibm.com>
-	<c67f6f4d-2291-41c8-8a89-aa0ae8f2ecd9@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1734042718; c=relaxed/simple;
+	bh=pA+8zqupfBFDmt4qMmv07ENz1H7Uu6iKpzyR6Qsp5w4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HkIaZh65PS86tbEnNzToMQ1rlRvHe7JyK7XopK7O0vhivC/2ZVryyU11l9SIrMJcC7wL2F910qfFttdhHbXQbvRSX3aWd1eUFsbpEwzGGSvgCWcTRSetyjua7Bd4hkLUQTpCuN+NtOPkFHOmQBn9bDJFxpemTULTUGb82mCgFBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dk4nXoEm; arc=none smtp.client-ip=209.85.219.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-qv1-f99.google.com with SMTP id 6a1803df08f44-6d87ceb58a0so9570056d6.0
+        for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 14:31:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1734042715; x=1734647515; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vSoAXlJ6Zprog6XxVRiaV+HV0cPvdNUNPJcmRmBytG0=;
+        b=dk4nXoEmFQA9PkRm2rmpyUzudW9MOJDcIjuaYr+LcJh6Cy2ClvqvwZFGLREHYSd8sS
+         nwlM6WEEwPTv3UmLISIpBK+fcViCJfEdBvmf1kcgL6K6hKEQXyGOB8JXF201/fZ27REq
+         jzFUz1p/09ilUCko+0bD2ItDpPEpZaXZk2QUxPEHPl7SWbh5zFQrXHiGa06bLo6H1T8V
+         9EF4yS08FZwYUjPyGpnobjNMlg4R3ZbHRzA13J7edC5RojmlbaWipo2AuXg8hdWUpVbi
+         V8QB3r0NU/yN58LiMhA2jKRrEBa40ViKR4E8fNuCu0nGP3DNvf12gBlYjUdo/NILjDDC
+         F+mQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734042715; x=1734647515;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vSoAXlJ6Zprog6XxVRiaV+HV0cPvdNUNPJcmRmBytG0=;
+        b=YDDzzpYtnBLM9urcww9kTvA6yWissucORFnlQJScgcDK01SZ0r47tiNhitBrrUbsbX
+         DBUjQAqFuF8BWziYbltLRIgGFhAQNBF1QoC5QjdgEM2UhxEW2UCxvGxmRfKzXckN2SIT
+         y1ZswXNqknw8yx5w5DbLufwcX23UHgylo+ruZ3kDzGRFCrBBzY00tIE1gt/sfAOLh+/b
+         BjPmT/nQai8bGi/BRBNtGyB1U4HneH3jFGgHG2aAG/o8iJhz2yJh/LR74Cz+Sf7k3b2N
+         g9sOk0C4TznWbu7Uk4Fv5GegRfeTgZTS8lev2OkaS2VAxHPVHLB4yjTUatBvMb20YKcK
+         9qvA==
+X-Forwarded-Encrypted: i=1; AJvYcCWikzKUymkg0rVPKIPUXzuOOJuac1ySZnx0kLDbuK2MOsVJTRJOln6JVNdagtI3dcI+zmjymL0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxGTyU2pXgH665zcqiSz1xnsRwhqTUCWTdoq1L7PIKK/AIdeeo
+	L40pKaiuLpF8cO4oKY7e3CSpGc3SFsKlhBkPs8t5LzXdwA+F8oA7X0BL+tQvC31f97BZVhGeeAS
+	Gog15tjMRZYwKoYQbfJRi+ZuIuWS6uoJcRV3nOrn7Ljq+JhTG
+X-Gm-Gg: ASbGncupBxOsunPfc1KfUbmSKU+vxZfSlJmiTo+zDhD8Aqz8vLCg/sBQdCCEfiayAn7
+	OGl2D/Gb2YrP4Pn3LjluCnHKgsso00uxajuFWrjDzC0JIsWjeulq07+1WlsIHxmCXa/1Gnks/s4
+	RUD3WEb2AL2rGrcGQF/mihNxkA1NxFWaMfv8Lca16amBNYgSY7GJK0sQrcb4pnZ8Id73cjfIgF/
+	CzcSrWwP+GdNj5lYyxFt3rFZge0RbI6OHiOpkFbqC9KbunRTQCnLlyRHCdNffFxyUYsGxAlM6uA
+X-Google-Smtp-Source: AGHT+IH56sOCE6AkMB1NOqGAghBKxtUHjKlgsak4gHXU9LCsz1gAmmoQahmcgKqrKFvFM+c2/vTxN1mhlThe
+X-Received: by 2002:a05:6214:c4d:b0:6d4:211c:dff0 with SMTP id 6a1803df08f44-6dc8caad1aemr4676616d6.29.1734042715018;
+        Thu, 12 Dec 2024 14:31:55 -0800 (PST)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-6d8e5f4bd31sm7915456d6.34.2024.12.12.14.31.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Dec 2024 14:31:55 -0800 (PST)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 290F03401BC;
+	Thu, 12 Dec 2024 15:31:54 -0700 (MST)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 1BDEDE55E56; Thu, 12 Dec 2024 15:31:54 -0700 (MST)
+Date: Thu, 12 Dec 2024 15:31:54 -0700
+From: Uday Shankar <ushankar@purestorage.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] netconsole: allow selection of egress interface via MAC
+ address
+Message-ID: <Z1tkWqxwF+3JpGcv@dev-ushankar.dev.purestorage.com>
+References: <20241211021851.1442842-1-ushankar@purestorage.com>
+ <20241212101156.GF2806@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: P6yKMqRStoWD_On5XprJpk05iFBG6s_1
-X-Proofpoint-ORIG-GUID: hfe_P7LkdbcQXYWPJZoa96yFH1LLMWcU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- impostorscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 mlxlogscore=726
- mlxscore=0 priorityscore=1501 suspectscore=0 malwarescore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2412120162
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241212101156.GF2806@kernel.org>
 
-On Thu, 12 Dec 2024 13:49:29 +0100
-Paolo Abeni <pabeni@redhat.com> wrote:
-
-> > Sorry for the late remark, but does this need a Fixes tag? I mean
-> > my gut feeling is that this is a bugfix -- i.e. should have been
-> > working from the get go -- and not a mere enhancement. No strong
-> > opinions here.  
+On Thu, Dec 12, 2024 at 10:11:56AM +0000, Simon Horman wrote:
+> Also, as this is a new feature, I wonder if a selftest should be added.
+> Perhaps some variant of netcons_basic.sh as has been done here:
 > 
-> FTR: my take is this is really a new feature, as the ipv6 support for
-> missing from the smc-r v2 introduction and sub-system maintainers
-> already implicitly agreed on that via RB tags.
+> * [PATCH net-next 0/4] netconsole: selftest for userdata overflow
+>   https://lore.kernel.org/netdev/20241204-netcons_overflow_test-v1-0-a85a8d0ace21@debian.org/
 
-Works with me! Thanks!
+Sure, I can add a test. That patchset does some refactoring that I'd
+like to use though. Can it be merged? It looks like it's ready.
 
-Regards,
-Halil
 
