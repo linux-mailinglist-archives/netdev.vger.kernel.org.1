@@ -1,261 +1,305 @@
-Return-Path: <netdev+bounces-151444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 213F89EF0D7
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:32:37 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AB1B9EF117
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:34:42 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01E2717781E
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 16:25:02 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8F8B2288E1;
+	Thu, 12 Dec 2024 16:14:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="pRcmFPlO"
+X-Original-To: netdev@vger.kernel.org
+Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1B1329D213
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 16:32:35 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F6D236917;
-	Thu, 12 Dec 2024 16:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="hrBykZb6"
-X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-67.smtpout.orange.fr [193.252.22.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D651C222D67;
-	Thu, 12 Dec 2024 16:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473F4218592
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 16:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734020408; cv=none; b=heFrXqkO46TScbFRGnujpdTAxRMl1Wtxp5i/J1iQ25dGIjumJvffAIEUYAeABaShDGE5G2p6g3oq6lgmSXVUhG+Sn6rbBBvDSVDS/WzWWhU55yf3Gzp92FmIz6t/1hue8MliKi2vJD8kSCqv6UItKPYywstS+2pu6SCy7EQxLlc=
+	t=1734020051; cv=none; b=bupjDaFltuqMFmvv7CY+oE3nhQK0JLbJQz8osWSXmeM+lkLqxh/GdDySLY7vZW7Q9IyT78vHo1re4Q2yjkpa1PacyiYhukKy54WtKr1FnDmOZ+T3VUwKm+vnCCdrpG9D+WgdflN7oksR9YBM7SOykTywm+JTG9JHfYMYp6ZSTqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734020408; c=relaxed/simple;
-	bh=1WTawLpM22VVsO7MCnmppbiRvTxqh0PjOroEF1c+9og=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PzNj4DgqKFSqnx/gt2OzpHPUKamD8rtQw+gfHBPbjVIH865X17/aCerEE9v2qbJiTBfFh5HK9CNoxXvNCplauxorN7RNtUN8sAJeN6DSg3hloWmv7xxXO8N1HzWFCaZK1jdTXvr9XCJmcPGuq6nGIaRxZT+NBcRYpvAYJAVp/mQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=hrBykZb6; arc=none smtp.client-ip=193.252.22.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from mail-ej1-f45.google.com ([209.85.218.45])
-	by smtp.orange.fr with ESMTPSA
-	id LllstKMYjwPxvLllstdUPZ; Thu, 12 Dec 2024 17:10:36 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1734019836;
-	bh=BHm2u6jBHZpNa6IIRdcDt5V+yEj/eHfBKedn+I+Dfbk=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To;
-	b=hrBykZb69u10gI+mbJc/HgFUoRt6LyqPBI7JddcZaTv4Y868d7nbJAofXVrGwVK+c
-	 C3N4RA6lO1Od4XYAem2a7cm9liIsNp4WR9U2TZCupxIZBbASScvfujhqcWrf8gzfhT
-	 oAkx/h5VnZ1xkHbXtyeDR6kgY8beBNxyuUrUrOhLWdewZTGJIOwEHigYXO1ME4505+
-	 MGybw937qi9Liii6qzv91W63x5LTzOT9fsZ7T/oTraulrhsuhwNioFDo5nUX3fGUZY
-	 Ieg2v3g4ScnttDfqNygU6X8wk9Bct0ug3jfspd5DU9bn4vOcxG/Vlv1Eeu1dLS1sHZ
-	 aMzTksBdxMiHw==
-X-ME-Helo: mail-ej1-f45.google.com
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 12 Dec 2024 17:10:36 +0100
-X-ME-IP: 209.85.218.45
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aa6997f33e4so112756566b.3;
-        Thu, 12 Dec 2024 08:10:36 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUeKhSFGBP/u3aVDV786tkBDWSU0/P+c7UoqUQRFcPVcX/CulW2DzitTXrwymb/UyFSnZPR0e8BCpQvzQ==@vger.kernel.org, AJvYcCVSUQCp/PsqJ7mgCHVnqNg049G8g6WnBSDn9aXeknHg/Lr/YOABrS9gjPa+BhcUHdpvG/h5EDlCsAhg43Sh@vger.kernel.org, AJvYcCVtMeqjZ3UamKQzV9qi4W9+C9Ogfc98j4nj9SgbTHoeWnRGqlJ1jKpEjNv6Qf467l2rSrMt0eLToFhLpO8=@vger.kernel.org, AJvYcCWoKPAQW3u23LdDut8TUO/N+nLiyuf6wFxj/R1rk7QOmTNQaX2lwFanHFxy06hgmnIT5aiw1Ae4c37U3Ji/peI=@vger.kernel.org, AJvYcCXOQzBUmS/NzWWETPUYCjTLnwQK4fbW5sneG3I5evDSL0ucGO3wqX2jXZjzty77nW5L1cwjxJR5@vger.kernel.org, AJvYcCXX0CZrxqgHvyq3R2QLCWd4XFMtV7hc+RSGe8agje7DKhBBkc9C7UO2b2yKpHuFXBNHmJRGzR6W/ms=@vger.kernel.org, AJvYcCXoOYX88jvb51fu6evM0kfRJ8tWWHKeTdjML7mY8gaJXjaBcpU4z9LSF+FzcqjiIX8xAm1Xjql6Vr/+@vger.kernel.org, AJvYcCXuOF0Fc2h3+Jckbo3vQMSiZZ3Aq1ww+OHrNUKSZV4bAdyHzHDrnDf0jYHQcNUhNjoyTLNF5xQ33fUK@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywf24S4MyE/XxIy97HBaKjt1Fy3VRzWOuTwrA8cpKRJLlfQ9FxP
-	qonzHl04PsCgLYXFstI6x9z81YHj8TtP0+N2ksoRepqITPGAQLJZ+k+dofMo603h7sLDMJ4UwII
-	z7mdFbLheC9A3DaFTUQ9xh2FVigk=
-X-Google-Smtp-Source: AGHT+IFvGS39Q624IKF07GqeqUCByzjY7zIhUSAblRV0CFMPxwMOrCpGqL4TwDw9irsDnBXj1+ssKbSOGJ7elO9bzQ0=
-X-Received: by 2002:a17:906:3ca9:b0:aa6:423c:8502 with SMTP id
- a640c23a62f3a-aa6b15007ccmr663042066b.60.1734019832762; Thu, 12 Dec 2024
- 08:10:32 -0800 (PST)
+	s=arc-20240116; t=1734020051; c=relaxed/simple;
+	bh=eR0ZbRH6HLHvoah/9oCZXptW0VitzX95uvgWjSzU06w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tj0PkLlH09O4CWBq2WxwZMtGpktxI/zyY/Eurl+ZPilXxXPX5jPd9v2JXg6zY76lspIYVBFfaIZ4EHZirz084kxSsn5VLcqefjqwIsZ65eq+3JE+R9uISiE3VZFpjUB7TasMksOk2Ed6321MDOYQ6GZ6yK/h3WTz5DHoHxdJF4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=pRcmFPlO; arc=none smtp.client-ip=103.168.172.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfout.phl.internal (Postfix) with ESMTP id 6018013802EA;
+	Thu, 12 Dec 2024 11:14:07 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Thu, 12 Dec 2024 11:14:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1734020047; x=1734106447; bh=WeclAqIy9sf4mR+Xqw9pFD+R2mGlqRZf/7c
+	rEsdQr7o=; b=pRcmFPlOI8gSCYtNlYFkUlXDwtD9Qn+q7AKlXIotsyuI9CU41F+
+	yrobB5mDj5OZmbd01WFmottOsHTBY5rNpxy2IbFoIs8HA34ROBEAbLFD/LbeGpUg
+	P+cIIwIV48YtWCLzo8zm64mP6u9U+J8ttkTagUkVnQZtUM3UzAlmBSMJ0pgtiiF6
+	oFAdkRtiRZ7HyRYXjCTNw1CmGx6f9zwVVyUrk30P2zINdAsPIGe/HoprGSVXyhap
+	lNRM0a0QUkfS9q/bFbXC5Zp/Er8wBJBHMNGloiRMGSmnSRXG4vfP9h4JJIOrVJH2
+	3FGPqeYCP8U6kkCdFobd/E7Cz/YHQ0MJVVA==
+X-ME-Sender: <xms:zgtbZzj7pxHbcTY_8qJXuRbBEQrF5OB17M8HuMe4r84Ia-R6ps17Zg>
+    <xme:zgtbZwBj0N-GG4weQ-Qno-JvMy3XU_e5349Qwr3Jjx-rqj5xr6fJC6wesTrdzd13O
+    GVvulOiFvOOVlk>
+X-ME-Received: <xmr:zgtbZzF_DMCpH2PWSNNy9WlsA8SUTQ2vAUNpTfQJaQ3iwhmQG069GXQSrkIrt95ZepA0xc6CsQhVIG3lEYA8BMwjT9A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkeehgdekhecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecu
+    hfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorh
+    hgqeenucggtffrrghtthgvrhhnpefhffejgefhjeehjeevheevhfetveevfefgueduueei
+    vdeijeeihfegheeljefgueenucffohhmrghinhepghhithhhuhgsrdgtohhmnecuvehluh
+    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehi
+    ughoshgthhdrohhrghdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuth
+    dprhgtphhtthhopehrrhgvnhguvggtsehrvgguhhgrthdrtghomhdprhgtphhtthhopehr
+    rgiiohhrsegslhgrtghkfigrlhhlrdhorhhgpdhrtghpthhtoheprhhoohhprgesnhhvih
+    guihgrrdgtohhmpdhrtghpthhtohepsghrihgughgvsehlihhsthhsrdhlihhnuhigrdgu
+    vghvpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhi
+    sehrvgguhhgrthdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
+X-ME-Proxy: <xmx:zgtbZwSapwMLePUOQR2dMfggzSVFw1uM90_q9WjyORUqJ0_bx15Meg>
+    <xmx:zgtbZwzwr9ILgIpllFtM8bYiuvpjDgW_j8DcTQNOSEgLgNeRVA-w2A>
+    <xmx:zgtbZ26Zivoj0GzAWpFs5GTMCYUPmgutHbQgGrlNR-f6KygdhRwHlg>
+    <xmx:zgtbZ1y54XoL5gEqZR17ATEivbvtjSSM1idpWej6IakylyfIon9HVQ>
+    <xmx:zwtbZ8dDp6OTbIx-MhDwo4PRSEkhCJiWvyRQmabzUFyVjo-T6kcGNMm5>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 12 Dec 2024 11:14:05 -0500 (EST)
+Date: Thu, 12 Dec 2024 18:14:02 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Radu Rendec <rrendec@redhat.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>,
+	Roopa Prabhu <roopa@nvidia.com>, bridge@lists.linux.dev,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net-next] net/bridge: Add skb drop reasons to the most
+ common drop points
+Message-ID: <Z1sLyqZQCjbcCOde@shredder>
+References: <20241208221805.1543107-1-rrendec@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210104524.2466586-1-tmyu0@nuvoton.com> <20241210104524.2466586-7-tmyu0@nuvoton.com>
-In-Reply-To: <20241210104524.2466586-7-tmyu0@nuvoton.com>
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Date: Fri, 13 Dec 2024 01:10:21 +0900
-X-Gmail-Original-Message-ID: <CAMZ6RqK+B3nc9bLWR49vwDJX3=pbjOKKoa=e=Pnc7wJNQx7JPQ@mail.gmail.com>
-Message-ID: <CAMZ6RqK+B3nc9bLWR49vwDJX3=pbjOKKoa=e=Pnc7wJNQx7JPQ@mail.gmail.com>
-Subject: Re: [PATCH v3 6/7] hwmon: Add Nuvoton NCT6694 HWMON support
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241208221805.1543107-1-rrendec@redhat.com>
 
-On 10/12/2024 at 19:45, Ming Yu wrote:
-> This driver supports Hardware monitor functionality for NCT6694 MFD
-> device based on USB interface.
->
-> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
+On Sun, Dec 08, 2024 at 05:18:05PM -0500, Radu Rendec wrote:
+> The bridge input code may drop frames for various reasons and at various
+> points in the ingress handling logic. Currently kfree_skb() is used
+> everywhere, and therefore no drop reason is specified. Add drop reasons
+> to the most common drop points.
+> 
+> The purpose of this patch is to address the most common drop points on
+> the bridge ingress path. It does not exhaustively add drop reasons to
+> the entire bridge code. The intention here is to incrementally add drop
+> reasons to the rest of the bridge code in follow up patches.
+> 
+> Most of the skb drop points that are addressed in this patch can be
+> easily tested by sending crafted packets. The diagram below shows a
+> simple test configuration, and some examples using `packit`(*) are
+> also included. The bridge is set up with STP disabled.
+> (*) https://github.com/resurrecting-open-source-projects/packit
+> 
+> The following changes were *not* tested:
+> * SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT in br_multicast_flood(). I could
+>   not find an easy way to make a crafted packet get there.
+> * SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD in br_handle_frame_finish()
+>   when the port state is BR_STATE_DISABLED, because in that case the
+>   frame is already dropped in the switch/case block at the end of
+>   br_handle_frame().
+> 
+>     +---+---+
+>     |  br0  |
+>     +---+---+
+>         |
+>     +---+---+  veth pair  +-------+
+>     | veth0 +-------------+ xeth0 |
+>     +-------+             +-------+
+> 
+> SKB_DROP_REASON_MAC_INVALID_SOURCE - br_handle_frame()
+> packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+>   -e 01:22:33:44:55:66 -E aa:bb:cc:dd:ee:ff -c 1 \
+>   -p '0x de ad be ef' -i xeth0
+> 
+> SKB_DROP_REASON_MAC_IEEE_MAC_CONTROL - br_handle_frame()
+> packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+>   -e 02:22:33:44:55:66 -E 01:80:c2:00:00:01 -c 1 \
+>   -p '0x de ad be ef' -i xeth0
+> 
+> SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD - br_handle_frame()
+> bridge link set dev veth0 state 0 # disabled
+> packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+>   -e 02:22:33:44:55:66 -E aa:bb:cc:dd:ee:ff -c 1 \
+>   -p '0x de ad be ef' -i xeth0
+> 
+> SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD - br_handle_frame_finish()
+> bridge link set dev veth0 state 2 # learning
+> packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+>   -e 02:22:33:44:55:66 -E aa:bb:cc:dd:ee:ff -c 1 \
+>   -p '0x de ad be ef' -i xeth0
+> 
+> SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT - br_flood()
+> packit -t UDP -s 192.168.0.1 -d 192.168.0.2 -S 8000 -D 8000 \
+>   -e 02:22:33:44:55:66 -E aa:bb:cc:dd:ee:ff -c 1 \
+>   -p '0x de ad be ef' -i xeth0
+> 
+> Signed-off-by: Radu Rendec <rrendec@redhat.com>
 > ---
->  MAINTAINERS                   |   1 +
->  drivers/hwmon/Kconfig         |  10 +
->  drivers/hwmon/Makefile        |   1 +
->  drivers/hwmon/nct6694-hwmon.c | 768 ++++++++++++++++++++++++++++++++++
->  4 files changed, 780 insertions(+)
->  create mode 100644 drivers/hwmon/nct6694-hwmon.c
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 496fe7d5a23f..d6414eea0463 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -16546,6 +16546,7 @@ M:      Ming Yu <tmyu0@nuvoton.com>
->  L:     linux-kernel@vger.kernel.org
->  S:     Supported
->  F:     drivers/gpio/gpio-nct6694.c
-> +F:     drivers/hwmon/nct6694-hwmon.c
->  F:     drivers/i2c/busses/i2c-nct6694.c
->  F:     drivers/mfd/nct6694.c
->  F:     drivers/net/can/nct6694_canfd.c
-> diff --git a/drivers/hwmon/Kconfig b/drivers/hwmon/Kconfig
-> index dd376602f3f1..df40986424bd 100644
-> --- a/drivers/hwmon/Kconfig
-> +++ b/drivers/hwmon/Kconfig
-> @@ -1636,6 +1636,16 @@ config SENSORS_NCT6683
->           This driver can also be built as a module. If so, the module
->           will be called nct6683.
->
-> +config SENSORS_NCT6694
-> +       tristate "Nuvoton NCT6694 Hardware Monitor support"
-> +       depends on MFD_NCT6694
-> +       help
-> +         Say Y here to support Nuvoton NCT6694 hardware monitoring
-> +         functionality.
-> +
-> +         This driver can also be built as a module. If so, the module
-> +         will be called nct6694-hwmon.
-> +
->  config SENSORS_NCT6775_CORE
->         tristate
->         select REGMAP
-> diff --git a/drivers/hwmon/Makefile b/drivers/hwmon/Makefile
-> index b827b92f2a78..27a43e67cdb7 100644
-> --- a/drivers/hwmon/Makefile
-> +++ b/drivers/hwmon/Makefile
-> @@ -168,6 +168,7 @@ obj-$(CONFIG_SENSORS_MLXREG_FAN) += mlxreg-fan.o
->  obj-$(CONFIG_SENSORS_MENF21BMC_HWMON) += menf21bmc_hwmon.o
->  obj-$(CONFIG_SENSORS_MR75203)  += mr75203.o
->  obj-$(CONFIG_SENSORS_NCT6683)  += nct6683.o
-> +obj-$(CONFIG_SENSORS_NCT6694)  += nct6694-hwmon.o
->  obj-$(CONFIG_SENSORS_NCT6775_CORE) += nct6775-core.o
->  nct6775-objs                   := nct6775-platform.o
->  obj-$(CONFIG_SENSORS_NCT6775)  += nct6775.o
-> diff --git a/drivers/hwmon/nct6694-hwmon.c b/drivers/hwmon/nct6694-hwmon.c
-> new file mode 100644
-> index 000000000000..b2320d64090b
-> --- /dev/null
-> +++ b/drivers/hwmon/nct6694-hwmon.c
-> @@ -0,0 +1,768 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Nuvoton NCT6694 HWMON driver based on USB interface.
-> + *
-> + * Copyright (C) 2024 Nuvoton Technology Corp.
-> + */
-> +
-> +#include <linux/bitfield.h>
-> +#include <linux/hwmon.h>
-> +#include <linux/kernel.h>
-> +#include <linux/mfd/core.h>
-> +#include <linux/mfd/nct6694.h>
-> +#include <linux/module.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/slab.h>
-> +
-> +/* Host interface */
-> +#define NCT6694_RPT_MOD                        0xFF
-> +#define NCT6694_HWMON_MOD              0x00
-> +#define NCT6694_PWM_MOD                        0x01
-> +
-> +/* Report Channel */
-> +#define NCT6694_VIN_IDX(x)             (0x00 + (x))
-> +#define NCT6694_TIN_IDX(x)                     \
-> +       ({ typeof(x) (_x) = (x);                \
-> +        ((_x) < 10) ? (0x10 + ((_x) * 2)) :    \
-> +        (0x30 + (((_x) - 10) * 2)); })
-> +#define NCT6694_FIN_IDX(x)             (0x50 + ((x) * 2))
-> +#define NCT6694_PWM_IDX(x)             (0x70 + (x))
-> +#define NCT6694_VIN_STS(x)             (0x68 + (x))
-> +#define NCT6694_TIN_STS(x)             (0x6A + (x))
-> +#define NCT6694_FIN_STS(x)             (0x6E + (x))
-> +
-> +/* Message Channel*/
-> +/* HWMON Command */
-> +/* Command 00h */
-> +#define NCT6694_HWMON_CMD0_LEN         0x40
-> +#define NCT6694_HWMON_CMD0_OFFSET      0x0000  /* OFFSET = SEL|CMD */
-> +#define NCT6694_VIN_EN(x)              (0x00 + (x))
-> +#define NCT6694_TIN_EN(x)              (0x02 + (x))
-> +#define NCT6694_FIN_EN(x)              (0x04 + (x))
-> +#define NCT6694_PWM_EN(x)              (0x06 + (x))
-> +#define NCT6694_PWM_FREQ_IDX(x)                (0x30 + (x))
-> +/* Command 02h */
-> +#define NCT6694_HWMON_CMD2_LEN         0x90
-> +#define NCT6694_HWMON_CMD2_OFFSET      0x0002  /* OFFSET = SEL|CMD */
-> +#define NCT6694_SMI_CTRL_IDX           0x00
-> +#define NCT6694_VIN_HL(x)              (0x10 + ((x) * 2))
-> +#define NCT6694_VIN_LL(x)              (0x11 + ((x) * 2))
-> +#define NCT6694_TIN_HYST(x)            (0x30 + ((x) * 2))
-> +#define NCT6694_TIN_HL(x)              (0x31 + ((x) * 2))
-> +#define NCT6694_FIN_HL(x)              (0x70 + ((x) * 2))
-> +#define NCT6694_FIN_LL(x)              (0x71 + ((x) * 2))
-> +/* PWM Command */
-> +#define NCT6694_PWM_CMD1_LEN           0x18
-> +#define NCT6694_PWM_CMD1_OFFSET                0x0001
-> +#define NCT6694_MAL_VAL(x)             (0x02 + (x))
-> +
-> +#define NCT6694_FREQ_FROM_REG(reg)     ((reg) * 25000 / 255)
-> +#define NCT6694_FREQ_TO_REG(val)       \
-> +       (DIV_ROUND_CLOSEST(clamp_val((val), 100, 25000) * 255, 25000))
-> +
-> +#define NCT6694_LSB_REG_MASK           GENMASK(7, 5)
-> +#define NCT6694_TIN_HYST_MASK          GENMASK(7, 5)
-> +
-> +static inline long in_from_reg(u8 reg)
-> +{
-> +       return reg * 16;
-> +}
-> +
-> +static inline u8 in_to_reg(long val)
-> +{
-> +       if (val <= 0)
-> +               return 0;
-> +       return val / 16;
-> +}
-> +
-> +static inline long temp_from_reg(u8 reg)
-> +{
-> +       return reg * 1000;
-> +}
-> +
-> +static inline u8 temp_to_reg(long val)
-> +{
-> +       return val / 1000;
-> +}
-> +
-> +struct nct6694_hwmon_data {
-> +       struct nct6694 *nct6694;
-> +       struct mutex lock;
-> +       unsigned char *xmit_buf;
-> +       unsigned char hwmon_en[NCT6694_HWMON_CMD0_LEN];
-> +};
+>  include/net/dropreason-core.h | 18 ++++++++++++++++++
+>  net/bridge/br_forward.c       |  4 ++--
+>  net/bridge/br_input.c         | 24 +++++++++++++++---------
+>  3 files changed, 35 insertions(+), 11 deletions(-)
+> 
+> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+> index c29282fabae6..1f2ae5b387c1 100644
+> --- a/include/net/dropreason-core.h
+> +++ b/include/net/dropreason-core.h
+> @@ -108,6 +108,9 @@
+>  	FN(TUNNEL_TXINFO)		\
+>  	FN(LOCAL_MAC)			\
+>  	FN(ARP_PVLAN_DISABLE)		\
+> +	FN(MAC_IEEE_MAC_CONTROL)	\
+> +	FN(BRIDGE_INGRESS_PORT_NFWD)	\
+> +	FN(BRIDGE_NO_EGRESS_PORT)	\
+>  	FNe(MAX)
+>  
+>  /**
+> @@ -502,6 +505,21 @@ enum skb_drop_reason {
+>  	 * enabled.
+>  	 */
+>  	SKB_DROP_REASON_ARP_PVLAN_DISABLE,
+> +	/**
+> +	 * @SKB_DROP_REASON_MAC_IEEE_MAC_CONTROL: the destination MAC address
+> +	 * is an IEEE MAC Control address.
+> +	 */
 
-A global comment on this series: do not declare your buffers as some
-opaque unsigned char arrays. Instead, make it a structure (or an array
-of structures if needed) using the little endian types for the
-different fields.
+IMO, dropping pause frames is not among "the most common drop points".
+Are you planning on reusing this reason in other modules? If not, then I
+prefer removing it. My understanding is that we should not try to
+document every obscure drop with these reasons.
 
-You already applied this change to the CAN driver after I made a
-comment, please do the same throughout the series.
+> +	SKB_DROP_REASON_MAC_IEEE_MAC_CONTROL,
+> +	/**
+> +	 * @SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD: the STP state of the
+> +	 * ingress bridge port does not allow frames to be forwarded.
+> +	 */
+> +	SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD,
 
-The same applies with any other comments made by anyone else: do not
-only apply to the patch where the comment is made, but apply it
-broadly to the series.
+Are you intending on reusing this for other ingress drops (e.g., VLAN,
+locked port) or is this specific to ingress STP filtering? I think it
+will be useful to distinguish between the different cases, so I suggest
+renaming this reason to make it clear it is about ingress STP.
 
-Thank you.
-
-
-Yours sincerely,
-Vincent Mailhol
+> +	/**
+> +	 * SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT: no eligible egress port was
+> +	 * found while attempting to flood the frame.
+> +	 */
+> +	SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT,
+>  	/**
+>  	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+>  	 * shouldn't be used as a real 'reason' - only for tracing code gen
+> diff --git a/net/bridge/br_forward.c b/net/bridge/br_forward.c
+> index e19b583ff2c6..e33e2f4fc3d9 100644
+> --- a/net/bridge/br_forward.c
+> +++ b/net/bridge/br_forward.c
+> @@ -249,7 +249,7 @@ void br_flood(struct net_bridge *br, struct sk_buff *skb,
+>  
+>  out:
+>  	if (!local_rcv)
+> -		kfree_skb(skb);
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT);
+>  }
+>  
+>  #ifdef CONFIG_BRIDGE_IGMP_SNOOPING
+> @@ -349,6 +349,6 @@ void br_multicast_flood(struct net_bridge_mdb_entry *mdst,
+>  
+>  out:
+>  	if (!local_rcv)
+> -		kfree_skb(skb);
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_BRIDGE_NO_EGRESS_PORT);
+>  }
+>  #endif
+> diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
+> index ceaa5a89b947..fc00e172e1e1 100644
+> --- a/net/bridge/br_input.c
+> +++ b/net/bridge/br_input.c
+> @@ -96,8 +96,10 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
+>  	if (br_mst_is_enabled(br)) {
+>  		state = BR_STATE_FORWARDING;
+>  	} else {
+> -		if (p->state == BR_STATE_DISABLED)
+> -			goto drop;
+> +		if (p->state == BR_STATE_DISABLED) {
+> +			kfree_skb_reason(skb, SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD);
+> +			return 0;
+> +		}
+>  
+>  		state = p->state;
+>  	}
+> @@ -155,8 +157,10 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
+>  		}
+>  	}
+>  
+> -	if (state == BR_STATE_LEARNING)
+> -		goto drop;
+> +	if (state == BR_STATE_LEARNING) {
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD);
+> +		return 0;
+> +	}
+>  
+>  	BR_INPUT_SKB_CB(skb)->brdev = br->dev;
+>  	BR_INPUT_SKB_CB(skb)->src_port_isolated = !!(p->flags & BR_ISOLATED);
+> @@ -331,8 +335,10 @@ static rx_handler_result_t br_handle_frame(struct sk_buff **pskb)
+>  	if (unlikely(skb->pkt_type == PACKET_LOOPBACK))
+>  		return RX_HANDLER_PASS;
+>  
+> -	if (!is_valid_ether_addr(eth_hdr(skb)->h_source))
+> -		goto drop;
+> +	if (!is_valid_ether_addr(eth_hdr(skb)->h_source)) {
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_MAC_INVALID_SOURCE);
+> +		return RX_HANDLER_CONSUMED;
+> +	}
+>  
+>  	skb = skb_share_check(skb, GFP_ATOMIC);
+>  	if (!skb)
+> @@ -374,7 +380,8 @@ static rx_handler_result_t br_handle_frame(struct sk_buff **pskb)
+>  			return RX_HANDLER_PASS;
+>  
+>  		case 0x01:	/* IEEE MAC (Pause) */
+> -			goto drop;
+> +			kfree_skb_reason(skb, SKB_DROP_REASON_MAC_IEEE_MAC_CONTROL);
+> +			return RX_HANDLER_CONSUMED;
+>  
+>  		case 0x0E:	/* 802.1AB LLDP */
+>  			fwd_mask |= p->br->group_fwd_mask;
+> @@ -423,8 +430,7 @@ static rx_handler_result_t br_handle_frame(struct sk_buff **pskb)
+>  
+>  		return nf_hook_bridge_pre(skb, pskb);
+>  	default:
+> -drop:
+> -		kfree_skb(skb);
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_BRIDGE_INGRESS_PORT_NFWD);
+>  	}
+>  	return RX_HANDLER_CONSUMED;
+>  }
+> -- 
+> 2.47.1
+> 
+> 
 
