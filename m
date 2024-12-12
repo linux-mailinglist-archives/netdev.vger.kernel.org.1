@@ -1,137 +1,110 @@
-Return-Path: <netdev+bounces-151316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD18F9EE109
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:18:27 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45AF69EE123
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 09:21:19 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01161188742B
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 08:20:46 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13FD620C483;
+	Thu, 12 Dec 2024 08:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="OYT1lsYW"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 330D528129A
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 08:18:26 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC9B20C011;
-	Thu, 12 Dec 2024 08:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="lxhE+TWe"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-16.smtpout.orange.fr [80.12.242.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890F6126C01;
-	Thu, 12 Dec 2024 08:18:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D758C20C03D;
+	Thu, 12 Dec 2024 08:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733991502; cv=none; b=SLF5jRg/tLub1ibBaMfM8sUuEpR8myNBY2N1JKAsax/cgMbjHg3eGHwhOGC0MVqisTe5hziOzsxVbct2K8+HH/7KSEwctqVgc6b25wZ/JU0uEScEk0hHvysUHDhhaPDyWEa3sAR/kjs2+6+BSiidfRwdgS9HSah8lR/ILjETVVs=
+	t=1733991606; cv=none; b=WKXsUemJp3okokKpLxrah2UI52pNQGBbP/ldRm8oi0sE+hCDXTlFZWNYcCAPCzwOpXGIGl9HaN3mxEnKzr+iuNDdYJrguJwVHJLT6yGpH5Cq3OqqJaAFqweA3/mWn1NBDYVOL5zYVC3NlKItezxV7zFiSM6q4CKWNEYFy5ZhyP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733991502; c=relaxed/simple;
-	bh=9u0EssyiR9jPCJXXENhMiwaH0C7px6oEo+PfyB7UW9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fwfHc4aqINDzhDLnJI2v8VHk+ZWP/xDOI4Ic5yldAiKtDZV+W166T+CO61BF7zvEbOekp807up1nm7VZWHOWQ1l+1qi/JgHWIVA1e0S9rGpqOq8EnvyPWXKoO7fI9N3OSdgc9zzF78PMHWpYh5l4skNs2mRq2toB3C1NDkO+PyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=lxhE+TWe; arc=none smtp.client-ip=80.12.242.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id LeOatTTIgshnBLeObtEztn; Thu, 12 Dec 2024 09:18:09 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1733991489;
-	bh=00Te5LkHVNFFflrQpCPuLSqGbddJ7mVyn5/l4cEM7RM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=lxhE+TWej8depxWvfP6sIBSAshiRXQiOXDFWjYfE9kuLSQQfff1Cs/8R1tcmPfFEC
-	 O6FkK6gtt5zr9de2K6DZ+xwkeOms6NfisLex3Ytcc7/2Wbw5C+UAFmAHtUbukAliW+
-	 mNPuyYcLY8zvtM4YFweUzbhS0uUIrUZhpd5XWKbvybwilv26KasVgwUFwASTAzkT5V
-	 GCDnU/E7C4dXbBVrdroSijReZQBG45fpD3waUIqdfSv4Yoixvs7wrmw1jVaR3eAQ0E
-	 tYiQXSfLT/H6uo3yJ5SQ2VfQyh3qrpQ0XORLmFOZDgsOBrUbxdZ4Fiu0SvfLKZB094
-	 ZXfkUTi77H3mA==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Thu, 12 Dec 2024 09:18:09 +0100
-X-ME-IP: 90.11.132.44
-Message-ID: <a50f9f86-b0f4-484a-85ef-9dd1e5737d83@wanadoo.fr>
-Date: Thu, 12 Dec 2024 09:18:04 +0100
+	s=arc-20240116; t=1733991606; c=relaxed/simple;
+	bh=8BzNrdXpRYK3J5Zj0vYLHTDTPwgoL6DooDD/zG7Is4A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e1iVePo7rlACcjVWMUpsC+HfMhEzRP9/41ssncNU11KxLLM/Rpg1idOdYRr0C0GPYSAIlzL0KgPcoy1zwIngsHO9+5/4mGXDL/GkzKd9u0casZq9WhAG+6AMAw5O++CgcaGk75cxvfeS/Q6prX2SkpAjoU3NT8w345rZR3tx0io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=OYT1lsYW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D38D7C4CECE;
+	Thu, 12 Dec 2024 08:20:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1733991605;
+	bh=8BzNrdXpRYK3J5Zj0vYLHTDTPwgoL6DooDD/zG7Is4A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OYT1lsYWI2OxomAdKDSYqD0kthQ1HdQzJFN+ix+HycMDP7h7nfI0mRddKps7TmU3c
+	 Qu3f4fcCfahwwnFGAsm6xd0RFXtN9MKHd7N7qNu4YItLzgyPm07H6M9tRaMcihCQcn
+	 9qFlgrMjeVPwzH7RVk0sE2QqDdGAt+H16Xk5dsfs=
+Date: Thu, 12 Dec 2024 09:20:02 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Hardik Gohil <hgohil@mvista.com>
+Cc: stable@vger.kernel.org, netdev@vger.kernel.org,
+	Kenton Groombridge <concord@gentoo.org>,
+	Kees Cook <kees@kernel.org>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Xiangyu Chen <xiangyu.chen@windriver.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: Re: [PATCH v5.10.y v5.4.y] wifi: mac80211: Avoid address
+ calculations via out of bounds array indexing
+Message-ID: <2024121233-washing-sputter-11f4@gregkh>
+References: <1729316200-15234-1-git-send-email-hgohil@mvista.com>
+ <2024102147-paralyses-roast-0cec@gregkh>
+ <CAH+zgeGXXQOqg5aZnvCXfBhd4ONG25oGoukYJL5-uHYJAo11gQ@mail.gmail.com>
+ <2024110634-reformed-frightful-990d@gregkh>
+ <CAH+zgeGs7Tk+3sP=Bn4=11i5pH3xjZquy-x1ykTXMBE8HcOtew@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] net: mdio: Add RTL9300 MDIO driver
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>, lee@kernel.org,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, tsbogend@alpha.franken.de,
- hkallweit1@gmail.com, linux@armlinux.org.uk, markus.stockhausen@gmx.de
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-mips@vger.kernel.org
-References: <20241211235342.1573926-1-chris.packham@alliedtelesis.co.nz>
- <20241211235342.1573926-5-chris.packham@alliedtelesis.co.nz>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20241211235342.1573926-5-chris.packham@alliedtelesis.co.nz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAH+zgeGs7Tk+3sP=Bn4=11i5pH3xjZquy-x1ykTXMBE8HcOtew@mail.gmail.com>
 
-Le 12/12/2024 à 00:53, Chris Packham a écrit :
-> Add a driver for the MDIO controller on the RTL9300 family of Ethernet
-> switches with integrated SoC. There are 4 physical SMI interfaces on the
-> RTL9300 but access is done using the switch ports so a single MDIO bus
-> is presented to the rest of the system.
+On Thu, Dec 05, 2024 at 11:41:45AM +0530, Hardik Gohil wrote:
+> From: Kenton Groombridge <concord@gentoo.org>
 > 
-> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+> [ Upstream commit 2663d0462eb32ae7c9b035300ab6b1523886c718 ]
+> 
+> req->n_channels must be set before req->channels[] can be used.
+> 
+> This patch fixes one of the issues encountered in [1].
+> 
+> [   83.964255] UBSAN: array-index-out-of-bounds in net/mac80211/scan.c:364:4
+> [   83.964258] index 0 is out of range for type 'struct ieee80211_channel *[]'
+> [...]
+> [   83.964264] Call Trace:
+> [   83.964267]  <TASK>
+> [   83.964269]  dump_stack_lvl+0x3f/0xc0
+> [   83.964274]  __ubsan_handle_out_of_bounds+0xec/0x110
+> [   83.964278]  ieee80211_prep_hw_scan+0x2db/0x4b0
+> [   83.964281]  __ieee80211_start_scan+0x601/0x990
+> [   83.964291]  nl80211_trigger_scan+0x874/0x980
+> [   83.964295]  genl_family_rcv_msg_doit+0xe8/0x160
+> [   83.964298]  genl_rcv_msg+0x240/0x270
+> [...]
+> 
+> [1] https://bugzilla.kernel.org/show_bug.cgi?id=218810
+> 
+> Co-authored-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Kees Cook <kees@kernel.org>
+> Signed-off-by: Kenton Groombridge <concord@gentoo.org>
+> Link: https://msgid.link/20240605152218.236061-1-concord@gentoo.org
+> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> [Xiangyu: Modified to apply on 6.1.y and 6.6.y]
+> Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> Signed-off-by: Hardik Gohil <hgohil@mvista.com>
 
-...
+What did you do to change this patch?
 
-> +	err = regmap_write(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_1,
-> +			   PHY_CTRL_RWOP | PHY_CTRL_TYPE | PHY_CTRL_CMD);
-> +	if (err)
-> +		return err;
-> +
-> +	err = regmap_read_poll_timeout(priv->regmap, priv->reg_base + SMI_ACCESS_PHY_CTRL_1,
-> +				       val, !(val & PHY_CTRL_CMD), 10, 100);
-> +	if (err)
-> +		return err;
-> +
-> +	if (val & PHY_CTRL_FAIL) {
-> +		err = -ENXIO;
-> +		return err;
+Also, what about 5.15.y, you can't "skip" a stable tree :(
 
-Nitpick: return -ENXIO; and remove the { }
+thanks,
 
-> +	}
-> +
-> +	return err;
-
-Nitpick: return 0;
-
-> +}
-> +
-> +static int realtek_mdiobus_init(struct realtek_mdio_priv *priv)
-> +{
-> +	u32 port_addr[5] = { };
-> +	u32 poll_sel[2] = { 0, 0 };
-
-Nitpick: Why {} in on case and {0,0} in the other one?
-
-> +	u32 glb_ctrl_mask = 0, glb_ctrl_val = 0;
-> +	int i, err;
-> +
-> +	for (i = 0; i < MAX_PORTS; i++) {
-> +		int pos;
-> +
-> +		if (priv->smi_bus[i] > 3)
-> +			continue;
-> +
-> +		pos = (i % 6) * 5;
-> +		port_addr[i / 6] |=  priv->smi_addr[i] << pos;
-> +
-> +		pos = (i % 16) * 2;
-> +		poll_sel[i / 16] |= priv->smi_bus[i] << pos;
-> +	}
-
-...
-
-CJ
-
+greg k-h
 
