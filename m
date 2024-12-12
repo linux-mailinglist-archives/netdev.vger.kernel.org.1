@@ -1,79 +1,95 @@
-Return-Path: <netdev+bounces-151283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 352E19EDE19
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 05:07:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA369EDE59
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 05:20:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E95F1888DDC
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:07:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A6361884465
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 04:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D694614F136;
-	Thu, 12 Dec 2024 04:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F046314A627;
+	Thu, 12 Dec 2024 04:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lUse4SRn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nqDUFiJw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DE3257D;
-	Thu, 12 Dec 2024 04:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDF613B288;
+	Thu, 12 Dec 2024 04:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733976460; cv=none; b=f7+Ur8pLjdbJZuGBEflM1IXBtWjcz5Seby+N6MA8OnGQ0y2dZTPxGTCeYJU439an2/L7gfGbwdMFl8Ou44IfGV0V312sgQuZCrb/6uE0rndrzToZCEvsHWMThi9rh2KpRvhGtOUx/IVF5/jwD5ae3l6M563o4rETNqtyCPvLTqg=
+	t=1733977214; cv=none; b=YyVyfNfxqXbSFWoJr9rNHtRmjpI9OyKlEV9iHpHt9jY81E5D6Ga6+urRq+pe4aqtyqFtdotRtAoVW5l3FXHKdyKZn4esOCH0XsQpjU561nMVNhVfy14rP6AEr26/cP/uU2AD7iR8xorvS9UhbIbPUiGTzCirXzj1Yujgu/7q4HM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733976460; c=relaxed/simple;
-	bh=eLXYWlzIVT2anxBWKTIb4bivf4yqr+3CWaVmL+hTVNY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W2F2zadCZpKATewTSoA/qgWWNJWsw6Th963ntMAmT0splDUGt8trxtj4rhW+iUaP5AChsVyCxbSMBVjltPi6x6Qpx2s1+PV9Gr7qQRQaZvEaFw685ODF9eOLvMZlwJ2VOlHqoQXOxPh77OfB51Ze6sjdsNM2ffh/N+F7ZjxX9jI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lUse4SRn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07D0CC4CED1;
-	Thu, 12 Dec 2024 04:07:39 +0000 (UTC)
+	s=arc-20240116; t=1733977214; c=relaxed/simple;
+	bh=WYupl2GeukecHHDy7KU4ArYkTIXK8OJyOiIvH99hasw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=aPkKB5oqkl5X1OWDmeUFULVV1zHUJblwDkk1xcorSVlXWNbcmuntdXiPIQTefbpUYOTvfJqoP04TxIwUiEtjAtFZNwTtIsuYsQJol4LF6DOFylyINQfkJ0jyhCh3sCwCWJcXQkAZipsC+995yPPCohNjscyQM4chu4pVNKNAC80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nqDUFiJw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 290F5C4CED0;
+	Thu, 12 Dec 2024 04:20:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733976460;
-	bh=eLXYWlzIVT2anxBWKTIb4bivf4yqr+3CWaVmL+hTVNY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lUse4SRnceK8WBPBSCbJVt35nCR65jlwBzpZjbTlGfQ+Oc2Vb6j0MAAsfsojoy/rh
-	 mamjSBuK06+paCs1gz8tPFR+mN9l9OkoHN8AsDVCLDQ6SWafxmqAiopPyXLboEQ0cM
-	 TXWs/q2Pc51FMrmRCp8CjJ7wfw6u/DR/YEm601pWs2qBsy/YMzEP3Me/Il5V3nx7Dt
-	 Drjd3Pbl8jsC6N7GFra0ZkHLx50FDYwDiXYVAcOYBSyH2hvtRxGu53I+NCyMGZt7lG
-	 /VYgj6jFah6mNA+un5WxH+EggeVTvDC1THGf5703rezi9Uvo1f4TTUikVeHt7vuVvp
-	 V10j+4XOOVypQ==
-Date: Wed, 11 Dec 2024 20:07:39 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: <jianqi.ren.cn@windriver.com>
-Cc: <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <sashal@kernel.org>, <jamie.bainbridge@gmail.com>, <jdamato@fastly.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 6.1.y] net: napi: Prevent overflow of
- napi_defer_hard_irqs
-Message-ID: <20241211200739.47686258@kernel.org>
-In-Reply-To: <20241211040304.3212711-1-jianqi.ren.cn@windriver.com>
-References: <20241211040304.3212711-1-jianqi.ren.cn@windriver.com>
+	s=k20201202; t=1733977214;
+	bh=WYupl2GeukecHHDy7KU4ArYkTIXK8OJyOiIvH99hasw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nqDUFiJwCyFW2pbMwwvOvKzABq/bJoCG01It0t5wSJa0rMs2d2pL+MHHZvq7w//oE
+	 v+eMI67s9fH/+kg4g474giLicvYqmb7LmelQyHPVQ669ALxz4t5e7g39Ar2bn+XQWW
+	 6vNRLS1c4StybURZVuYHVcjjgZYJxXpTgbuo2zy1SqqCxNjOv9dm7kMJ2Ix+/LAY6n
+	 QfkfQaMOtP3ICCpRN0MVq5roMy6ZW1QH9Y7QcHThsACXrgBfvFZ2h5nncyUrQ826RO
+	 LiMNQ27Wf3oGD4Tbp8m8VC1l96kgvSv6q12vaboSRXjVE1P4yAN9cL2NFC5cB34E+f
+	 dDAvwxLWyXA2Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F7F380A959;
+	Thu, 12 Dec 2024 04:20:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next PATCH] cn10k-ipsec: Fix compilation error when
+ CONFIG_XFRM_OFFLOAD disabled
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173397723031.1845437.10790419708591220845.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Dec 2024 04:20:30 +0000
+References: <20241211062419.2587111-1-bbhushan2@marvell.com>
+In-Reply-To: <20241211062419.2587111-1-bbhushan2@marvell.com>
+To: Bharat Bhushan <bbhushan2@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+ hkelam@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, lkp@intel.com
 
-On Wed, 11 Dec 2024 12:03:04 +0800 jianqi.ren.cn@windriver.com wrote:
-> From: Joe Damato <jdamato@fastly.com>
-> 
-> [ Upstream commit 08062af0a52107a243f7608fd972edb54ca5b7f8 ]
-> 
-> In commit 6f8b12d661d0 ("net: napi: add hard irqs deferral feature")
-> napi_defer_irqs was added to net_device and napi_defer_irqs_count was
-> added to napi_struct, both as type int.
-> 
-> This value never goes below zero, so there is not reason for it to be a
-> signed int. Change the type for both from int to u32, and add an
-> overflow check to sysfs to limit the value to S32_MAX.
+Hello:
 
-Could you explain why you want to backport this change to stable?
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 11 Dec 2024 11:54:19 +0530 you wrote:
+> Define static branch variable "cn10k_ipsec_sa_enabled"
+> in "otx2_txrx.c". This fixes below compilation error
+> when CONFIG_XFRM_OFFLOAD is disabled.
+> 
+>  drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.o:(__jump_table+0x8): undefined reference to `cn10k_ipsec_sa_enabled'
+>  drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.o:(__jump_table+0x18): undefined reference to `cn10k_ipsec_sa_enabled'
+>  drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.o:(__jump_table+0x28): undefined reference to `cn10k_ipsec_sa_enabled'
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] cn10k-ipsec: Fix compilation error when CONFIG_XFRM_OFFLOAD disabled
+    https://git.kernel.org/netdev/net-next/c/b82ca90d5512
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
