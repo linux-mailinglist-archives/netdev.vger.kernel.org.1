@@ -1,123 +1,103 @@
-Return-Path: <netdev+bounces-151467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB6559EF824
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 18:39:59 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE69D189AD3B
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:31:21 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B9D222D62;
-	Thu, 12 Dec 2024 17:31:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JTRHXaZZ"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FCA99EF746
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 18:33:15 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7851211493;
-	Thu, 12 Dec 2024 17:31:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 475AC28A096
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:33:14 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF33222D6A;
+	Thu, 12 Dec 2024 17:33:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="gJT8tylM"
+X-Original-To: netdev@vger.kernel.org
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446D62153DD;
+	Thu, 12 Dec 2024 17:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734024678; cv=none; b=o1+mt4qmfLq6nwxRkY4N0TF2oGGLdpGQ4UhB5Zogfx4KsfBAbi/i1xzOIkbcalyrXIOup/WkW5jIkm5Gc/AkD5OWNhl0k9kTU56evnegTORcu2cgAtK9kFCB55wctcR7ROaJVhBGniUvvJnY75sR74JVIihx/aNJFgcDCCbiZok=
+	t=1734024792; cv=none; b=uTSElMe1otI2btMMQSGI9WNvCsSfAvyGwFPUEh7efJNmzlftoU3dZ2ZhK4QeYoKpgDbj75NqgHGAVnE2skodnBzvD06Y6hmmZK97oe5K4VvU7nLzqlOHCSplcrcCZ7rQ4O+GYStl5NsGHvj3PHfv2D15VXsvEjPcHOhnUj+Bf4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734024678; c=relaxed/simple;
-	bh=cqSaXGVyqwsHkzoR1ON5E5Xa1cU6TA0Om7XLkH/MaSs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o3xa9caLYIwOefP/udYjuxwDCEeuxS4c9HVPQLutKzhbjCxd9ezPXFGh4t0kQ3dF8ujCrWz5dT4zACVasDt1TrC19yagj9cKH+z2qDZBvGmBwIG4EuuDZ735zG/vMz138XE3D33/dkORLIXz5KMrAjWW5sFmFgXZqSv+aM2/j94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JTRHXaZZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 302CEC4CECE;
-	Thu, 12 Dec 2024 17:31:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734024678;
-	bh=cqSaXGVyqwsHkzoR1ON5E5Xa1cU6TA0Om7XLkH/MaSs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JTRHXaZZTwodoVmnWEQ3l8k985OFcuw4VlIUKXTf5iq08b4hyfNbuofpZgDv0MQGp
-	 G4AtkpX/AO/8WBp/Rctis/dGuGPfSgwM1U6BhrgtpsaDbuFsWnkUMQCC6IjWsHTMhq
-	 mAV9hzP9kYvSwsEJ7L7dS2+pUfDr7SQSsxk0ys12EhRmPJ2++W3r8wmgCb75QeBPB7
-	 FbaY0iaHvYFamSiJkViY6YzTz5rCwvZ3/gg6MmrCsCfVr4Sea6tNSQaqEc/ZCyapzD
-	 cuUQOTv4bHywH4g2jTE35Iv7Y8pSuLDrZyLJhzooM7dla8InkK5fcAmosbFuEFnLRP
-	 r6za3Ozrr9iyg==
-Date: Thu, 12 Dec 2024 17:31:13 +0000
-From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1734024792; c=relaxed/simple;
+	bh=R5JFd69wz+34MsBBdxu3c/nOib3KiRU/jllGTF4pL8U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Re9HW3okDV8KWAe4uSYn2+e57b1AYZuV6zjC0BL3C0ei7N206Izw1UjKq8YwrF/+Z4Ih5NzbpoO7DvkUMvPY2wPx74tXqXhYxJ4LU0G4W18gqU7h3kf6It7XNwb6qFZSd59na38LbjAPrGsxjskzVMt8n1otDgoPL/dRBxYGkvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=gJT8tylM; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from eahariha-devbox.5bhznamrcrmeznzvghz2s0u2eh.xx.internal.cloudapp.net (unknown [40.91.112.99])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 9FC7F20ACD6C;
+	Thu, 12 Dec 2024 09:33:10 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9FC7F20ACD6C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1734024790;
+	bh=j8AmzIEjYIQS6zN/bjVcHRxb12g3/9cjkDw7Uf+bRaw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gJT8tylMA9p8ykATh8M7TBp8bG7wrLTBVChrEcO+8CYjky2IreuL7Ww1JIgrqe0TJ
+	 HmgK0Wa2KtnbepWHfjoD7K4cLnpv39lVLmv1GQD37mLACLyU2fd6TS/gCPPalZTK9Z
+	 iCLN3g+6to3teWWxrd32CjLWy+LooyBdQ01pTIyQ=
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+To: Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Leon Romanovsky <leonro@nvidia.com>, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	linux-rdma@vger.kernel.org, Itamar Gozlan <igozlan@nvidia.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>
-Subject: Re: [PATCH net-next 10/12] net/mlx5: DR, add support for ConnectX-8
- steering
-Message-ID: <20241212173113.GF73795@kernel.org>
-References: <20241211134223.389616-1-tariqt@nvidia.com>
- <20241211134223.389616-11-tariqt@nvidia.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Jeff Johnson <jjohnson@kernel.org>
+Cc: Easwar Hariharan <eahariha@linux.microsoft.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ath11k@lists.infradead.org,
+	Jeff Johnson <quic_jjohnson@quicinc.com>
+Subject: [PATCH net-next v4 0/2] Converge on using secs_to_jiffies() in netdev
+Date: Thu, 12 Dec 2024 17:33:00 +0000
+Message-ID: <20241212-netdev-converge-secs-to-jiffies-v4-0-6dac97a6d6ab@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241211134223.389616-11-tariqt@nvidia.com>
+Content-Type: text/plain; charset="utf-8"
+X-Change-ID: 20241211-netdev-converge-secs-to-jiffies-f18b18c775c1
+X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 11, 2024 at 03:42:21PM +0200, Tariq Toukan wrote:
-> From: Itamar Gozlan <igozlan@nvidia.com>
-> 
-> Add support for a new steering format version that is implemented by
-> ConnectX-8.
-> Except for several differences, the STEv3 is identical to STEv2, so
-> for most callbacks STEv3 context struct will call STEv2 functions.
-> 
-> Signed-off-by: Itamar Gozlan <igozlan@nvidia.com>
-> Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  .../net/ethernet/mellanox/mlx5/core/Makefile  |   1 +
->  .../mlx5/core/steering/sws/dr_domain.c        |   2 +-
->  .../mellanox/mlx5/core/steering/sws/dr_ste.c  |   2 +
->  .../mellanox/mlx5/core/steering/sws/dr_ste.h  |   1 +
->  .../mlx5/core/steering/sws/dr_ste_v3.c        | 221 ++++++++++++++++++
->  .../mlx5/core/steering/sws/mlx5_ifc_dr.h      |  40 ++++
->  .../mellanox/mlx5/core/steering/sws/mlx5dr.h  |   2 +-
->  7 files changed, 267 insertions(+), 2 deletions(-)
->  create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_ste_v3.c
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-> index 79fe09de0a9f..10a763e668ed 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-> @@ -123,6 +123,7 @@ mlx5_core-$(CONFIG_MLX5_SW_STEERING) += steering/sws/dr_domain.o \
->  					steering/sws/dr_ste_v0.o \
->  					steering/sws/dr_ste_v1.o \
->  					steering/sws/dr_ste_v2.o \
-> +					steering/sws/dr_ste_v3.o \
->  					steering/sws/dr_cmd.o \
->  					steering/sws/dr_fw.o \
->  					steering/sws/dr_action.o \
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
-> index 3d74109f8230..bd361ba6658c 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
-> @@ -8,7 +8,7 @@
->  #define DR_DOMAIN_SW_STEERING_SUPPORTED(dmn, dmn_type)	\
->  	((dmn)->info.caps.dmn_type##_sw_owner ||	\
->  	 ((dmn)->info.caps.dmn_type##_sw_owner_v2 &&	\
-> -	  (dmn)->info.caps.sw_format_ver <= MLX5_STEERING_FORMAT_CONNECTX_7))
-> +	  (dmn)->info.caps.sw_format_ver <= MLX5_STEERING_FORMAT_CONNECTX_8))
-
-A definition for MLX5_STEERING_FORMAT_CONNECTX_8 seems to be missing
-from this patch.
-
->  
->  bool mlx5dr_domain_is_support_ptrn_arg(struct mlx5dr_domain *dmn)
->  {
-
-...
+These patches are pulled out from v2 [1] and v3 [2] of my series to be sent=
+=0D
+through netdev. The series converts users of msecs_to_jiffies() that need=0D
+seconds-denominated timeouts to the new secs_to_jiffies() API in=0D
+include/linux/jiffies.h to avoid the multiplication with 1000 or MSEC_PER_S=
+EC.=0D
+=0D
+[1]: https://lore.kernel.org/r/20241115-converge-secs-to-jiffies-v2-0-911fb=
+7595e79@linux.microsoft.com=0D
+[2]: https://lore.kernel.org/r/20241210-converge-secs-to-jiffies-v3-0-ddfef=
+d7e9f2a@linux.microsoft.com=0D
+=0D
+Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>=0D
+---=0D
+Easwar Hariharan (2):=0D
+      gve: Convert timeouts to secs_to_jiffies()=0D
+      wifi: ath11k: Convert timeouts to secs_to_jiffies()=0D
+=0D
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c | 6 ++----=0D
+ drivers/net/wireless/ath/ath11k/debugfs.c    | 2 +-=0D
+ 2 files changed, 3 insertions(+), 5 deletions(-)=0D
+---=0D
+base-commit: 91e71d606356e50f238d7a87aacdee4abc427f07=0D
+change-id: 20241211-netdev-converge-secs-to-jiffies-f18b18c775c1=0D
+=0D
+Best regards,=0D
+-- =0D
+Easwar Hariharan <eahariha@linux.microsoft.com>=0D
+=0D
 
