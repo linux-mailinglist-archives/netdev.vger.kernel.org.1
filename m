@@ -1,74 +1,112 @@
-Return-Path: <netdev+bounces-151430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 873D59EECB3
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 16:37:40 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2038188D4D8
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 15:35:20 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96692210CA;
-	Thu, 12 Dec 2024 15:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CfTQiBsC"
-X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A189EECA4
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 16:36:55 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1682D1547F0
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 15:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734017699; cv=none; b=s8CKbWGPHVqSVypZBr4C7AJFpWBDaz/s9yGb8M0jhS1Hs6DTnxDUaO9Hx/opqQvnk/DpU1DPTngnK5Xo6QXxNFjUnAjQdVtxqs5iSpa53qvdZcp7slXkiMEEEuQERhn+Ll3BZ+KqSkgqi/nAuQkYl/+ouDbEWeLibzm0pKZH3nA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734017699; c=relaxed/simple;
-	bh=C57TKEpLKHLYwxxb5Nfo8nwCv4fS7Uymf4LiqSL7lx0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jX7rHfy+GqrsPTnR7HC6Va46PHHwxiRvccMWdAx9MtDaEiUCDn6NTscp8fhsBvUYXRkjCvRjJ9YNu8RWdTn/mGV5mfCOhNFA3dtgRagTcT8FYxZttBPvDjwPpZiwgxFldTeFt1aEecGwX3ffUUF10yY1hWSpW6y1FBwptsVMBsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CfTQiBsC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734017697;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mgRpHTP53KJoPgmSVqas3EAYkmn+eljsiKnfwFmp98Y=;
-	b=CfTQiBsCamrKTUyRldnjNlUX+/GyJaVNAkaOe2My5gwiJ9lmbP75xsusO3C9RCZEpG5ish
-	fpEW7Ei81MeDrlfJMd5KRlAKiQr53vXUKCbgAvC+LvvfdTA7xEI2xurLYZfBssx4UfSqPp
-	zr6pEA/K8HZFHgNvNb3+cLcKkymo1qY=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-79-wnFhZv6mNTinhUTJ6RY-Jw-1; Thu,
- 12 Dec 2024 10:34:52 -0500
-X-MC-Unique: wnFhZv6mNTinhUTJ6RY-Jw-1
-X-Mimecast-MFC-AGG-ID: wnFhZv6mNTinhUTJ6RY-Jw
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98A5528241B
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 15:36:54 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70A32217F29;
+	Thu, 12 Dec 2024 15:36:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="JRwSXgm8";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="BZwizUGW"
+X-Original-To: netdev@vger.kernel.org
+Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E91A1955D45;
-	Thu, 12 Dec 2024 15:34:51 +0000 (UTC)
-Received: from rhel-developer-toolbox-2.redhat.com (unknown [10.45.224.236])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 23C02195606C;
-	Thu, 12 Dec 2024 15:34:48 +0000 (UTC)
-From: Michal Schmidt <mschmidt@redhat.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: [PATCH iwl-next 3/3] ice: remove special delay after processing a GNSS read batch
-Date: Thu, 12 Dec 2024 16:34:17 +0100
-Message-ID: <20241212153417.165919-4-mschmidt@redhat.com>
-In-Reply-To: <20241212153417.165919-1-mschmidt@redhat.com>
-References: <20241212153417.165919-1-mschmidt@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785272135C1;
+	Thu, 12 Dec 2024 15:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734017813; cv=none; b=f+GvGAsjlnUcVKNztR23QiJbI73XdqubZGc2gGrnh2LT/htftS8cpU+qrgaG9XUFcCReJJhaZQ5mKTRdTA4mPoL3XmehXknH8c/TIeTx2Q1i1qQ2kjBkfumKVP4G92vVKl93qzjTF3mSnpKFMTKMFsX9bYJt6YGbV90QpaHHLj8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734017813; c=relaxed/simple;
+	bh=DLLLbvi69BQMicdx2BH6I8SwkfRaZHD371VuFz38cUk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QbrfgNJWFwzQ+voFJTRDhNQoFS03IcJB10Qh6ExW4F9HYrfCk2vvmLeaBGzZakRuLLWCA6WeKbr51+XLPxQJZWwe+4kLZ6JkUFHeTEPOgb6zjxeZHw8Pwc4mZ00yzuv4ZjzhQ/3XyRuFN5IgWAoDWfTfOM62EvyBAkLmiLiwxTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=JRwSXgm8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=BZwizUGW; arc=none smtp.client-ip=202.12.124.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfout.stl.internal (Postfix) with ESMTP id D144811400CA;
+	Thu, 12 Dec 2024 10:36:47 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Thu, 12 Dec 2024 10:36:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
+	:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to; s=fm2; t=1734017807; x=1734104207; bh=0UIpBo4G/A
+	rQh5vm5xHd4YRs9JES7SmgkYyHOoNV6/Q=; b=JRwSXgm8EEJWrepnPHzqvNZc4d
+	Ru1QWxaXyQHG+4k+NnTLCf7fL/uJggge/an/kIvAZfMxge4wZPnn0NjZgUluaYh+
+	bSoMkYRb67SXlDlcEhZQ5KxJDmye/TedXuiCeZUGJtdqGeQuWTHXewGK+wNPsNqE
+	YnJP99aYC7pjhhNxIVf/vnqExr1ewSQbMHv2w9KXPkrPjMBjLkWtRhC4SYf7ozcA
+	T245pYgxPzW0PjQmJH0/I/dRE5u4XolDtV/nE6pK669kM/dwfL1AWTVpKl134i8K
+	lx2PA6i4t97FuQwb8p0V7xjHddF4Cj69B8rbp4Dkg9vEvap+FTj57l3j6Fpg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1734017807; x=1734104207; bh=0UIpBo4G/ArQh5vm5xHd4YRs9JES7SmgkYy
+	HOoNV6/Q=; b=BZwizUGWh6agRw0jFiD3FVPZWkkH2nDRm0lT67R5d4lK4lMR9AZ
+	oJGS8JG2NMya81lMkqKLKAIgQj3J3Q+LDOmdc+LD7T396qLYQpFgzlyUpElhMESI
+	qVDfjsTw6mNUxQhSP3zTTKnJ6cyC5uFrqiF20n2KfiA+kBFzoxNgCWxeTbz3kf7u
+	qu4/RwPqMOpzvHzs2C6+5jjLA2uo/2KVt3GpZ7w4l4KYpMvo449jBPl1siws2WQZ
+	EiEDdpNMC2Gz4qpQ+mwwE3x9PYryqTqin7zuk6sg3/+adh2jVr8ekpAgtB0lDkGj
+	rffo0xboF+HzouYxkoxK1DbqZ/jS1krQXSg==
+X-ME-Sender: <xms:DgNbZzpxXYrFnm35g6u-wAKnlKvlyUfljoVgoJOKt3tXS96lDL5eZQ>
+    <xme:DgNbZ9pt8dKn3f6ycilX_f_0on-iQP9psWOfHN8ezHHiIt9bXy4qqOUumqukYZzgy
+    LmBvbES3LM4_RcNmjA>
+X-ME-Received: <xmr:DgNbZwP61QGiZ8fsCED4vPZASbioWdbktcmQjRaPF1lMzfOX04WFqeuB2a6A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkeehgdejjecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhr
+    ohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrd
+    hnvghtqeenucggtffrrghtthgvrhhnpeegfeefudehueeggeevheffudejgefgkefgffeu
+    feeljeduiefffefgueeuleegudenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdhrfh
+    gtqdgvughithhorhdrohhrghdpghhithhlrggsrdgtohhmnecuvehluhhsthgvrhfuihii
+    vgeptdenucfrrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrd
+    hnvghtpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthht
+    ohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshguse
+    hquhgvrghshihsnhgrihhlrdhnvghtpdhrtghpthhtohepvhhfvgguohhrvghnkhhosehn
+    ohhvvghkrdhruhdprhgtphhtthhopehfkhhrvghniigvlhesrhgvughhrghtrdgtohhmpd
+    hrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhhnihih
+    uhesrghmrgiiohhnrdgtohhmpdhrtghpthhtoheprghpohhorhhvkhhosegrmhgriihonh
+    drtghomhdprhgtphhtthhopegsohhrihhsphesnhhvihguihgrrdgtohhmpdhrtghpthht
+    ohepjhhohhhnrdhfrghsthgrsggvnhgusehgmhgrihhlrdgtohhm
+X-ME-Proxy: <xmx:DgNbZ26RYWCUNoNm4iL1XbZBMS9PXGNA1dVRxi8K6pD5SECEqky7pw>
+    <xmx:DgNbZy6E32OnFCwwNzK0f0UtwIu9wFQN-cpB9dLwPmEeJX0_dqeIDg>
+    <xmx:DgNbZ-g3O5aSFXTL_JrG9Z23sZvHZpNMkm52bT-wr94QLjeGdbFUCw>
+    <xmx:DgNbZ07P7ld0xPN2l0MSWavsZEVJR48FRk5_7vUpmlFPZXA0l7CqJg>
+    <xmx:DwNbZ1qrpYN2qHwYqQQVI09PsfhyTf3cy8kUmb4bhuFSLCXn0krFKCs2>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 12 Dec 2024 10:36:45 -0500 (EST)
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: netdev@vger.kernel.org
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+	Vadim Fedorenko <vfedorenko@novek.ru>,
+	Frantisek Krenzelok <fkrenzel@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Apoorv Kothari <apoorvko@amazon.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Simon Horman <horms@kernel.org>,
+	Parthiban.Veerasooran@microchip.com
+Subject: [PATCH net-next v5 0/6] tls: implement key updates for TLS1.3
+Date: Thu, 12 Dec 2024 16:36:03 +0100
+Message-ID: <cover.1734013874.git.sd@queasysnail.net>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,55 +114,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-I do not see a reason to have a special longer delay (100 ms) after
-passing read GNSS data to userspace.
+This adds support for receiving KeyUpdate messages (RFC 8446, 4.6.3
+[1]). A sender transmits a KeyUpdate message and then changes its TX
+key. The receiver should react by updating its RX key before
+processing the next message.
 
-Just use the regular GNSS polling interval (20 ms).
+This patchset implements key updates by:
+ 1. pausing decryption when a KeyUpdate message is received, to avoid
+    attempting to use the old key to decrypt a record encrypted with
+    the new key
+ 2. returning -EKEYEXPIRED to syscalls that cannot receive the
+    KeyUpdate message, until the rekey has been performed by userspace
+ 3. passing the KeyUpdate message to userspace as a control message
+ 4. allowing updates of the crypto_info via the TLS_TX/TLS_RX
+    setsockopts
 
-Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
----
- drivers/net/ethernet/intel/ice/ice_gnss.c | 5 ++---
- drivers/net/ethernet/intel/ice/ice_gnss.h | 1 -
- 2 files changed, 2 insertions(+), 4 deletions(-)
+This API has been tested with gnutls to make sure that it allows
+userspace libraries to implement key updates [2]. Thanks to Frantisek
+Krenzelok <fkrenzel@redhat.com> for providing the implementation in
+gnutls and testing the kernel patches.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_gnss.c b/drivers/net/ethernet/intel/ice/ice_gnss.c
-index 7922311d2545..83a2f0d4091e 100644
---- a/drivers/net/ethernet/intel/ice/ice_gnss.c
-+++ b/drivers/net/ethernet/intel/ice/ice_gnss.c
-@@ -85,7 +85,6 @@ static void ice_gnss_read(struct kthread_work *work)
- {
- 	struct gnss_serial *gnss = container_of(work, struct gnss_serial,
- 						read_work.work);
--	unsigned long delay = ICE_GNSS_POLL_DATA_DELAY_TIME;
- 	unsigned int i, bytes_read, data_len, count;
- 	struct ice_aqc_link_topo_addr link_topo;
- 	char buf[ICE_MAX_I2C_DATA_SIZE];
-@@ -140,9 +139,9 @@ static void ice_gnss_read(struct kthread_work *work)
- 				count, bytes_read);
- 	}
- 
--	delay = ICE_GNSS_TIMER_DELAY_TIME;
- requeue:
--	kthread_queue_delayed_work(gnss->kworker, &gnss->read_work, delay);
-+	kthread_queue_delayed_work(gnss->kworker, &gnss->read_work,
-+				   ICE_GNSS_POLL_DATA_DELAY_TIME);
- 	if (err)
- 		dev_dbg(ice_pf_to_dev(pf), "GNSS failed to read err=%d\n", err);
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_gnss.h b/drivers/net/ethernet/intel/ice/ice_gnss.h
-index e0e939f1b102..fa52727cd3d7 100644
---- a/drivers/net/ethernet/intel/ice/ice_gnss.h
-+++ b/drivers/net/ethernet/intel/ice/ice_gnss.h
-@@ -6,7 +6,6 @@
- 
- #define ICE_E810T_GNSS_I2C_BUS		0x2
- #define ICE_GNSS_POLL_DATA_DELAY_TIME	(HZ / 50) /* poll every 20 ms */
--#define ICE_GNSS_TIMER_DELAY_TIME	(HZ / 10) /* 0.1 second per message */
- #define ICE_GNSS_TTY_WRITE_BUF		250
- /* ICE_MAX_I2C_DATA_SIZE is FIELD_MAX(ICE_AQC_I2C_DATA_SIZE_M).
-  * However, FIELD_MAX() does not evaluate to an integer constant expression,
+
+=======================================================================
+Discussions around v2 of this patchset focused on how HW offload would
+interact with rekey.
+
+RX
+ - The existing SW path will handle all records between the KeyUpdate
+   message signaling the change of key and the new key becoming known
+   to the kernel -- those will be queued encrypted, and decrypted in
+   SW as they are read by userspace (once the key is provided, ie same
+   as this patchset)
+ - Call ->tls_dev_del + ->tls_dev_add immediately during
+   setsockopt(TLS_RX)
+
+TX
+ - After setsockopt(TLS_TX), switch to the existing SW path (not the
+   current device_fallback) until we're able to re-enable HW offload
+   - tls_device_sendmsg will call into tls_sw_sendmsg under lock_sock
+     to avoid changing socket ops during the rekey while another
+     thread might be waiting on the lock
+ - We only re-enable HW offload (call ->tls_dev_add to install the new
+   key in HW) once all records sent with the old key have been
+   ACKed. At this point, all unacked records are SW-encrypted with the
+   new key, and the old key is unused by both HW and retransmissions.
+   - If there are no unacked records when userspace does
+     setsockopt(TLS_TX), we can (try to) install the new key in HW
+     immediately.
+   - If yet another key has been provided via setsockopt(TLS_TX), we
+     don't install intermediate keys, only the latest.
+   - TCP notifies ktls of ACKs via the icsk_clean_acked callback. In
+     case of a rekey, tls_icsk_clean_acked will record when all data
+     sent with the most recent past key has been sent. The next call
+     to sendmsg will install the new key in HW.
+   - We close and push the current SW record before reenabling
+     offload.
+
+If ->tls_dev_add fails to install the new key in HW, we stay in SW
+mode. We can add a counter to keep track of this.
+
+
+In addition:
+
+Because we can't change socket ops during a rekey, we'll also have to
+modify do_tls_setsockopt_conf to check ctx->tx_conf and only call
+either tls_set_device_offload or tls_set_sw_offload. RX already uses
+the same ops for both TLS_HW and TLS_SW, so we could switch between HW
+and SW mode on rekey.
+
+An alternative would be to have a common sendmsg which locks
+the socket and then calls the correct implementation. We'll need that
+anyway for the offload under rekey case, so that would only add a test
+to the SW path's ops (compared to the current code). That should allow
+us to simplify build_protos a bit, but might have a performance
+impact - we'll need to check it if we want to go that route.
+=======================================================================
+
+Changes since v4:
+ - add counter for received KeyUpdate messages
+ - improve wording in the documentation
+ - improve handling of bogus messages when looking for KeyUpdate's
+ - some coding style clean ups
+
+Changes since v3:
+ - rebase on top of net-next
+ - rework tls_check_pending_rekey according to Jakub's feedback
+ - add statistics for rekey: {RX,TX}REKEY{OK,ERROR}
+ - some coding style clean ups
+
+Link: https://lore.kernel.org/netdev/cover.1731597571.git.sd@queasysnail.net/ [v4]
+Link: https://lore.kernel.org/netdev/cover.1691584074.git.sd@queasysnail.net/ [v3]
+Link: https://lore.kernel.org/netdev/cover.1676052788.git.sd@queasysnail.net/ [v2]
+Link: https://lore.kernel.org/netdev/cover.1673952268.git.sd@queasysnail.net/ [v1]
+
+Link: https://www.rfc-editor.org/rfc/rfc8446#section-4.6.3 [1]
+Link: https://gitlab.com/gnutls/gnutls/-/merge_requests/1625 [2]
+
+Sabrina Dubroca (6):
+  tls: block decryption when a rekey is pending
+  tls: implement rekey for TLS1.3
+  tls: add counters for rekey
+  docs: tls: document TLS1.3 key updates
+  selftests: tls: add key_generation argument to tls_crypto_info_init
+  selftests: tls: add rekey tests
+
+ Documentation/networking/tls.rst  |  36 +++
+ include/net/tls.h                 |   3 +
+ include/uapi/linux/snmp.h         |   5 +
+ net/tls/tls.h                     |   3 +-
+ net/tls/tls_device.c              |   2 +-
+ net/tls/tls_main.c                |  71 ++++-
+ net/tls/tls_proc.c                |   5 +
+ net/tls/tls_sw.c                  | 140 ++++++---
+ tools/testing/selftests/net/tls.c | 478 +++++++++++++++++++++++++++++-
+ 9 files changed, 682 insertions(+), 61 deletions(-)
+
 -- 
 2.47.1
 
