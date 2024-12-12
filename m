@@ -1,79 +1,58 @@
-Return-Path: <netdev+bounces-151361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA63F9EE61D
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 13:03:15 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 771E59EE576
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 12:51:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 947CF287AE5
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 12:03:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54702167148
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 11:51:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B437C2054E8;
-	Thu, 12 Dec 2024 11:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="IlNQzRAI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526012054E8;
+	Thu, 12 Dec 2024 11:51:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC332158DB1
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 11:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E48158DB1;
+	Thu, 12 Dec 2024 11:51:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734004788; cv=none; b=L+GuMpLV8JK0OWkcHulQigvDIwnr47NJPZIYj6o8Uima7p2eAmVE6H9ASr/lCa3YysdrQXqgYg8FAxEScq/HAQGI1v6a27e7VloxrwOYnpakGM5vPIIM2VQ3WhN7zoYHq0qQ9BLT5JmpqhbA1mY/ABcOk+SIASibAXrrzMtXpHE=
+	t=1734004274; cv=none; b=NsWGVhJueTZZMUWoTMa7jOwLBJhzs4Ku1Khmu4AxbGo1k89ZMEQ+e1zgFeOd6y3pg0aDTFpONtMRgqRaJFcOWfBKOTfpBwd6jIdjxmbOXPxV7UwwSWNhFYINWx/QOkOjbvFVGHhS545SItbzl+XbvWsH44kPayuxWOazFGyI8yQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734004788; c=relaxed/simple;
-	bh=N99Z3SqeeeEArYdSrYwovkVydyD5i+JNQdfPOYDR5k4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fKmqowwUnyUe9Z9tfpj/qq/BLU0KWvPvvuDzLuTELEYiwLfR1ByD+Jy/UTRzSUTT5shDVelCmlRkRtF8+pjuXAC92J1GpVxOhQtjuQ4CWg9VCKYOC7jMEugCfytq40kgjZREwjR2skMj3dZmQ+1Y6PIXrTw7zvhXkeHY4lhageg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=IlNQzRAI; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1734004786; x=1765540786;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xFd2ABz6zoY7hN45K0k7JI4fYMfDHgxalGNDMTuK8MY=;
-  b=IlNQzRAI1dLrFrAmb5QPRN1l24k0XLf37oZWFDGX07kG0UdZXyTyWdTs
-   IvayP4asD2W12ADJQkJdJcv+C0P9NGzNDs2WokvhMfojZ/3EuJbG1w0ZT
-   FpKjf1y32kvWPRBL8y9iX8L3XvTabrkBXcfWjFXj9jQm7/77FyxvIZ8LH
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.12,228,1728950400"; 
-   d="scan'208";a="680847748"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2024 11:59:42 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.10.100:15512]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.22.153:2525] with esmtp (Farcaster)
- id c82b9b12-b4ed-46ee-9303-f188fe483d94; Thu, 12 Dec 2024 11:59:42 +0000 (UTC)
-X-Farcaster-Flow-ID: c82b9b12-b4ed-46ee-9303-f188fe483d94
-Received: from EX19D028EUB003.ant.amazon.com (10.252.61.31) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 12 Dec 2024 11:59:41 +0000
-Received: from u11acbc1324fb53.ant.amazon.com (10.13.248.51) by
- EX19D028EUB003.ant.amazon.com (10.252.61.31) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 12 Dec 2024 11:59:33 +0000
-From: Shay Agroskin <shayagr@amazon.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-CC: Shay Agroskin <shayagr@amazon.com>, "Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
-	<matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
-	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
-	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Arinzon, David"
-	<darinzon@amazon.com>, "Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky,
- Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>, "kernel
- test robot" <lkp@intel.com>
-Subject: [PATCH v1 net-next] net: ena: Fix incorrect indentation
-Date: Thu, 12 Dec 2024 13:59:08 +0200
-Message-ID: <20241212115910.2485851-1-shayagr@amazon.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1734004274; c=relaxed/simple;
+	bh=oubn445uqd0v0CXdIPwBnssEZajwfyX6Dn3lPr8i5DE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=utmtnu+OeUcluo4SrMgmlNMKcJA9HYTV30wmKsKI1ksIGANtsgQGeyQP20LFE40sbfqHpvpWZI3+2NcI3bcT8eH9/CflxvKWQLXn9xP4Lz+ZW6gveej/xEQe6+rt26mJ1aIxrpWs41cGDJskKEe71isLpvzjaoMmvGCDn/uFEx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Y89kl3SYqz6LDfv;
+	Thu, 12 Dec 2024 19:50:07 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id E6EED1403A0;
+	Thu, 12 Dec 2024 19:51:02 +0800 (CST)
+Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 12 Dec
+ 2024 12:50:53 +0100
+From: Gur Stavi <gur.stavi@huawei.com>
+To: Gur Stavi <gur.stavi@huawei.com>, gongfan <gongfan1@huawei.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Cai Huoqing
+	<cai.huoqing@linux.dev>, Xin Guo <guoxin09@huawei.com>, Shen Chenyang
+	<shenchenyang1@hisilicon.com>, Zhou Shuai <zhoushuai28@huawei.com>, Wu Like
+	<wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>, Meny Yossefi
+	<meny.yossefi@huawei.com>
+Subject: [RFC net-next v02 0/3] net: hinic3: Add a driver for Huawei 3rd gen NIC
+Date: Thu, 12 Dec 2024 14:04:14 +0200
+Message-ID: <cover.1733990727.git.gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,34 +61,130 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWB002.ant.amazon.com (10.13.139.175) To
- EX19D028EUB003.ant.amazon.com (10.252.61.31)
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-The assignment was accidentally aligned to the string one line before.
-This was raised by the kernel bot.
+The patch-set contains driver for Huawei's 3rd generation HiNIC
+Ethernet device that will be available in the future.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202412101739.umNl7yYu-lkp@intel.com/
-Signed-off-by: David Arinzon <darinzon@amazon.com>
-Signed-off-by: Shay Agroskin <shayagr@amazon.com>
----
- drivers/net/ethernet/amazon/ena/ena_netdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This is an SRIOV device, designed for data centers.
+Initially, the driver only supports VFs.
 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index 63c8a2328142..c1295dfad0d0 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -74,7 +74,7 @@ static void ena_tx_timeout(struct net_device *dev, unsigned int txqueue)
- 	if (threshold < time_since_last_napi && napi_scheduled) {
- 		netdev_err(dev,
- 			   "napi handler hasn't been called for a long time but is scheduled\n");
--			   reset_reason = ENA_REGS_RESET_SUSPECTED_POLL_STARVATION;
-+		reset_reason = ENA_REGS_RESET_SUSPECTED_POLL_STARVATION;
- 	}
- schedule_reset:
- 	/* Change the state of the device to trigger reset
--- 
-2.43.0
+Following the discussion over RFC01, the code will be submitted in
+separate smaller patches where until the last patch the driver is
+non-functional.
+This RFC02 is an overall view of the entire driver but every patch will be
+posted as a standalone submission.
+
+Changes:
+
+V01: https://lore.kernel.org/netdev/cover.1730290527.git.gur.stavi@huawei.com
+* Reduce overall line of code by removing optional functionality.
+* Break down into smaller patches.
+
+gongfan (3):
+  net: hinic3: module initialization and tx/rx logic
+  net: hinic3: management interfaces
+  net: hinic3: sw and hw initialization code
+
+ .../device_drivers/ethernet/huawei/hinic3.rst | 136 +++
+ MAINTAINERS                                   |   7 +
+ drivers/net/ethernet/huawei/Kconfig           |   1 +
+ drivers/net/ethernet/huawei/Makefile          |   1 +
+ drivers/net/ethernet/huawei/hinic3/Kconfig    |  16 +
+ drivers/net/ethernet/huawei/hinic3/Makefile   |  25 +
+ .../net/ethernet/huawei/hinic3/hinic3_cmdq.c  | 898 ++++++++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_cmdq.h  | 150 +++
+ .../ethernet/huawei/hinic3/hinic3_common.c    |  98 ++
+ .../ethernet/huawei/hinic3/hinic3_common.h    |  54 ++
+ .../net/ethernet/huawei/hinic3/hinic3_csr.h   |  74 ++
+ .../net/ethernet/huawei/hinic3/hinic3_eqs.c   | 786 +++++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_eqs.h   | 128 +++
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.c    | 266 ++++++
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.h    |  62 ++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.c   | 412 ++++++++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |  42 +
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   | 248 +++++
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.c | 569 +++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.h |  82 ++
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.c  | 430 +++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  91 ++
+ .../net/ethernet/huawei/hinic3/hinic3_irq.c   | 172 ++++
+ .../net/ethernet/huawei/hinic3/hinic3_lld.c   | 417 ++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_lld.h   |  20 +
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  | 417 ++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.c  | 844 ++++++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.h  | 147 +++
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.c  |  21 +
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.h  |  14 +
+ .../huawei/hinic3/hinic3_mgmt_interface.h     | 212 +++++
+ .../huawei/hinic3/hinic3_netdev_ops.c         | 518 ++++++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 395 ++++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  76 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   | 107 +++
+ .../ethernet/huawei/hinic3/hinic3_nic_io.c    | 885 +++++++++++++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_io.h    | 142 +++
+ .../huawei/hinic3/hinic3_pci_id_tbl.h         |  10 +
+ .../huawei/hinic3/hinic3_queue_common.c       |  65 ++
+ .../huawei/hinic3/hinic3_queue_common.h       |  51 +
+ .../net/ethernet/huawei/hinic3/hinic3_rss.c   | 378 ++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_rss.h   |  14 +
+ .../net/ethernet/huawei/hinic3/hinic3_rx.c    | 620 ++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    | 104 ++
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    | 817 ++++++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    | 141 +++
+ .../net/ethernet/huawei/hinic3/hinic3_wq.c    | 132 +++
+ .../net/ethernet/huawei/hinic3/hinic3_wq.h    |  87 ++
+ 48 files changed, 11382 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/huawei/hinic3.rst
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/Kconfig
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/Makefile
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_cmdq.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_cmdq.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_common.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_csr.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_eqs.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwif.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwif.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_lld.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_main.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_pci_id_tbl.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_queue_common.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_queue_common.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rss.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rss.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_wq.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_wq.h
+
+
+base-commit: 65fb414c93f486cef5408951350f20552113abd0
+--
+2.45.2
 
 
