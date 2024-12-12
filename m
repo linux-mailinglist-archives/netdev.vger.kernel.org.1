@@ -1,196 +1,315 @@
-Return-Path: <netdev+bounces-151304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 898A29EDF3A
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 07:09:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59C219EDF63
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 07:26:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C172188A6C8
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 06:09:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18345163467
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 06:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0B118132F;
-	Thu, 12 Dec 2024 06:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCAD0192D98;
+	Thu, 12 Dec 2024 06:26:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KMIP9/hK"
+	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="aRMmI9/9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00D55684
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 06:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2BC18C03A
+	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 06:26:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733983735; cv=none; b=g3hNuWhirSP8PAkTAVTyW6e3p/g22zgQtngq2ds7hsuL3YdtgDKUkP7WeHqTakkUXvAVm3KcqbiOxMdBAn6JqWOUmP+J/fpTBlQQaWRa4rWScis7DxQYbwLEXpmJ0Oox/e341IcO7TGqeBKPFE/jCNqXVztrIdyQLNlJdIxeh5k=
+	t=1733984780; cv=none; b=JQyWRuEHPo0EUKnQnUizaNU8BFgRpbFy0P8J3xS3UzSYuTcQzPyu07RsRbxDx/WYdyknLSPGxOBxauzq9fJHcRApXL/CEc9oONb4jhOGdR37nzlkyYarLcjGKOhwUh1jUzT6y8p3TPs8Z5EepH/2GDixUcOjicBIXkj94DdLyAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733983735; c=relaxed/simple;
-	bh=XY7MUBSthOOLrR15um9XNuwGlA368ZK+vfUSseCU06o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mHCz/bgUAKGRIx5mXBQHyWY/BVBmhh50b1xvcZrG0QdlooPFGZ5+Gp5wLOF5CwDakRlTU5SBAlHFUbUSGS4wyzBeqV5ZU5fW+E/hgAW+JIvcFHta70UoK3FQjD4C4TUTTGf2Bvy4MYtAxwWBku6edlsc+7HvLMXp1OjCQ4KVFLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KMIP9/hK; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-53e28cf55cdso211928e87.3
-        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 22:08:53 -0800 (PST)
+	s=arc-20240116; t=1733984780; c=relaxed/simple;
+	bh=Lw+ze2Co0gj+5K3wkHR1YRQPmlFOF/oD7NcnYt1tECY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lIZC1zdFhCsD2vXV4W3tMnZNte32FI9xqJeywzZffLDyHosgKWToQte1vLkrdId3vfvVhwsPan55O6T2+kbTzxCEjUCfaKHB8eZZVChB/NX8vRCmA/1HTJTQAAQ7Bk2dSgssLUh5/CqU4QTFWcLHcWGUCYuKZj4R1wcS8Vgjvms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=aRMmI9/9; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ff976ab0edso1554221fa.1
+        for <netdev@vger.kernel.org>; Wed, 11 Dec 2024 22:26:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1733983732; x=1734588532; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XY7MUBSthOOLrR15um9XNuwGlA368ZK+vfUSseCU06o=;
-        b=KMIP9/hKPqdLWUFdDjZdIMh+AW2l/69Li+nFcbc1J9bNzIww5rch4CVfXO0b8rhJ9T
-         tkblNknpkxBOATRTRvDLSWRivXf0cuLFXdGFpUnvq0o4oLaJcjN6rL9v8lrU37A54VLd
-         IWAV36Hh0vketSVcacAxhMGwPCOSZmqtbtpso=
+        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1733984777; x=1734589577; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kuRjAdbDbTEkU+Ho9EYzXIrZiSQv0hABO5CTMWmsx+w=;
+        b=aRMmI9/9iVJwzJMubQpRjVDyVvcEcRUtM80JiNDdtcJ/04ICHReprOLVWjAZ/lUvcd
+         YCT1BR/pEiNAPifyDSiL6TAcGGZqhOaKiidslfxozIx0sAnOJMqN87VjPY3uBmkXM0Zi
+         888J6Cs6dwUzpPXn5a+UyFDcvV7ZP8pvz4jZb5m/spR787JC1PNLnlqiuh8t+8lUnIuM
+         WBkaSLa0oQM8vMb+Tbyo4mFy7Fqw7mhcIys4s96PXV4cztECieIOdyJseyyG0AiROLuS
+         qQr6uxv9gwINf2PIGuyPAaPpJ9DE25SfkwaBW6oaJmXpUqbbTzNFGGd/FUqcyyQdkjd5
+         ji8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733983732; x=1734588532;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1733984777; x=1734589577;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XY7MUBSthOOLrR15um9XNuwGlA368ZK+vfUSseCU06o=;
-        b=JeCuwfMTk3LtHQvTHMMC820JIkT6gUCtt6x9BjuXxM0l4kH0oZsCUzf4kfoWQF5KrR
-         eWDhPPeuy503nySSkzxFA5RHdI1RMbvdxHZrWVnQIesklORsUCg1LVoX6w7O9cocTxGt
-         lDEuxj1+B8wnFiNgBi51Bfee5MNckscOgCy6ccGT2DohUMcmJyPeLnirEhMW6Kx98QFg
-         lhrpvLvMXNDEHxn3ClavV2CKqVzpmjioTZOf+WTD+/vrlcyYFnt40PJfmoho6/4QKG/5
-         UA7jk1KsLs81cHhLWVaNDHmqo0LYxmtiiyvmoZd1qZg2YTML7i5m5eAsyE2DAV27zper
-         LBbw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyqr9AjR1pga7nJKqG5wpj9sW6+/c7NYgd1mU44DRioR1PMsL1ASxSh2lbtd4rMJfP2l2Vle0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWJxoMZh+8h7eckFmwLijQECS+Rzm8g/LLy8Qk41r6AbpOnMuj
-	d00nV7W8z1Mja/TpX+8CTqZ3oXV/KV8w7QBdSQ7iOQZRk5Jx1kMoKBxKNHbLh06NIvSLLwM7JiF
-	MobZ5V8SG39Mbj2PZBA8ofkIAE6ouARpgoSY4
-X-Gm-Gg: ASbGnctA5n4wh/ZLocsIup7uPqKiKne4Z/QxR6iyI6/XnNwPOtP8Zh3g3KQfwqLTZPB
-	Mj6J9y2S5WB2I3KSchnMbFl4WQr9aTWzdmEQ2Z60=
-X-Google-Smtp-Source: AGHT+IHTMtkQO/5uh7jWv2lZr1kjRGtyLVEyGQuVTXNOyfLYOAsaRRBJNMZRgezlyFGwOKZ5Z7fZII/39OBT8yGA6OA=
-X-Received: by 2002:a05:6512:131d:b0:540:26b7:1929 with SMTP id
- 2adb3069b0e04-54032d53ebcmr22420e87.48.1733983732044; Wed, 11 Dec 2024
- 22:08:52 -0800 (PST)
+        bh=kuRjAdbDbTEkU+Ho9EYzXIrZiSQv0hABO5CTMWmsx+w=;
+        b=Cp03BtrvjiBkSONpiwqmlBFuLdSNC/iuYxwlwce1w9sQsv+Qin1rlxR6UBqyvKAtrP
+         y09YsJzOT8qDeVVjdIMHIKkDFSnPFFRCCSXbkyR5zMBoRs8pVM2vBVY6Fc6tRBQvQS/H
+         2678MBcWdkk2Fi+Sdt6Ayid2U2JFDAAsk37jrRAYU16OVRgvO7qedzfCSY7SHxnfxeaL
+         enEnhRnQ2TNdzEVY+ci4p7HuCk1SWIOMGLPU4NRaVQPjVcT2jmIgRrrup+B8b2311adr
+         +UvD3QRJsdvL/xhynwe5YgleVybI6pMCv01pu2TWqkHQOrgAMzh5i4NuJfo9IUYnY0n/
+         Chcg==
+X-Gm-Message-State: AOJu0YxRmC1mgR/1ldQlYeYCdQNNKR8w41coHMtUJVRsa3vPk0ogm1GW
+	EOJ/tjSx2xxQdPhwNdN7fUsuYKmOSpNbWZ4AAp6dTlvWH70yCqNCU703VMElQ00=
+X-Gm-Gg: ASbGncsrdZrM5Aaur+tOkZaXZVmZncrkpy5uUADPfk32o4p62XbOaKKB41pbMtsyqrZ
+	ZljAIDffF9r5mEotQvtXqAJZeYlnQsDVKvBzTyVnUheEYhgjNoAv+T08R+C6EiBunBQpHBhGXgF
+	9XGykrf3bSal6EficaeDNx1aU7wwSH68RnHezKd6YOVvhR18ohQRlH3i6KUbNlcxuzbX1I4MNyD
+	PCJ94BL3IKTlevX77pSdE2aLuTWR6E1Pyz0aozKVBQ4MG2HJB3awFq2/am5T0G5tK9DJu4=
+X-Google-Smtp-Source: AGHT+IEDTXGBo2HWzXx2i6Hv1sGpcVA3TggdLOBM18vE43jz6irncBSC3Gba5PIz1VR7slTQ7L8ovQ==
+X-Received: by 2002:a05:651c:2220:b0:302:3de5:b039 with SMTP id 38308e7fff4ca-3024a1d4bd1mr6264891fa.8.1733984776497;
+        Wed, 11 Dec 2024 22:26:16 -0800 (PST)
+Received: from cobook.home ([91.198.101.25])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30223be9b15sm11209191fa.106.2024.12.11.22.26.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Dec 2024 22:26:16 -0800 (PST)
+From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michael Dege <michael.dege@renesas.com>,
+	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+	Dennis Ostermann <dennis.ostermann@renesas.com>,
+	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Subject: [PATCH net] net: renesas: rswitch: rework ts tags management
+Date: Thu, 12 Dec 2024 11:25:58 +0500
+Message-Id: <20241212062558.436455-1-nikita.yoush@cogentembedded.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241211223231.397203-1-anthony.l.nguyen@intel.com> <20241211223231.397203-5-anthony.l.nguyen@intel.com>
-In-Reply-To: <20241211223231.397203-5-anthony.l.nguyen@intel.com>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Thu, 12 Dec 2024 11:38:42 +0530
-Message-ID: <CAH-L+nM1fQeGPUmDvh-X4qXpR7DXEdCCoMCi+GUm5H_j+rC=DA@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/7] ice: rename devlink_port.[ch] to port.[ch]
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, wojciech.drewek@intel.com, 
-	mateusz.polchlopek@intel.com, joe@perches.com, horms@kernel.org, 
-	jiri@resnulli.us, apw@canonical.com, lukas.bulwahn@gmail.com, 
-	dwaipayanray1@gmail.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000006a85ab06290c8cd7"
+Content-Transfer-Encoding: 8bit
 
---0000000000006a85ab06290c8cd7
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The existing linked list based implementation of how ts tags are
+assigned and managed is unsafe against concurrency and corner cases:
+- element addition in tx processing can race against element removal
+  in ts queue completion,
+- element removal in ts queue completion can race against element
+  removal in device close,
+- if a large number of frames gets added to tx queue without ts queue
+  completions in between, elements with duplicate tag values can get
+  added.
 
-On Thu, Dec 12, 2024 at 4:07=E2=80=AFAM Tony Nguyen <anthony.l.nguyen@intel=
-.com> wrote:
->
-> From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->
-> Drop "devlink_" prefix from files that sit in devlink/.
-> I'm going to add more files there, and repeating "devlink" does not feel
-> good. This is also the scheme used in most other places, most notably the
-> devlink core files are named like that.
->
-> devlink.[ch] stays as is.
->
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Use a different implementation, based on per-port used tags bitmaps and
+saved skb arrays.
 
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Safety for addition in tx processing vs removal in ts completion is
+provided by:
 
+    tag = find_first_zero_bit(...);
+    smp_mb();
+    <write rdev->ts_skb[tag]>
+    set_bit(...);
 
---=20
-Regards,
-Kalesh AP
+  vs
 
---0000000000006a85ab06290c8cd7
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+    <read rdev->ts_skb[tag]>
+    smp_mb();
+    clear_bit(...);
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIL7aL/Hf/Y66h9jGsKwf1tkC50Pw6cmM54CvUyeYUQ+fMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTIxMjA2MDg1MlowaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAFvbc/5zrs
-6nuym6vC7Ja49+fp5M2kLU1/0QZRch5lFaBzYFrtdv2C7iQB88DdvR57q5gOjClNpbD/CMDoUqVU
-nbmAsFR/GYjGr30W0Gy7RP1kjIRVBlCFqMF3FtRlntNvrEkFg68TdNE652EOeysZ3RYbmqvbYWk2
-WfGxgx3wiQOZu1q1K5CH52yhyF3hZOl/naEXfW3cFao4a/EZcBx2dixeWFSCOMu2bWXl+4wza8pH
-RrQspF8CGuTPsR7ABHV0P61yTHU7kvApj5wj+L7eUFtABxelA7QkTPswrznr0gn1B7x5CvgI48KR
-q0NTKYpPcd/tRPEmvqUY2FQTDKlf
---0000000000006a85ab06290c8cd7--
+Safety for removal in ts completion vs removal in device close is
+provided by using atomic read-and-clear for rdev->ts_skb[tag]:
+
+    ts_skb = xchg(&rdev->ts_skb[tag], NULL);
+    if (ts_skb)
+        <handle it>
+
+Fixes: 33f5d733b589 ("net: renesas: rswitch: Improve TX timestamp accuracy")
+Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+---
+ drivers/net/ethernet/renesas/rswitch.c | 74 ++++++++++++++------------
+ drivers/net/ethernet/renesas/rswitch.h | 13 ++---
+ 2 files changed, 42 insertions(+), 45 deletions(-)
+
+diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
+index dbbbf024e7ab..9ac6e2aad18f 100644
+--- a/drivers/net/ethernet/renesas/rswitch.c
++++ b/drivers/net/ethernet/renesas/rswitch.c
+@@ -547,7 +547,6 @@ static int rswitch_gwca_ts_queue_alloc(struct rswitch_private *priv)
+ 	desc = &gq->ts_ring[gq->ring_size];
+ 	desc->desc.die_dt = DT_LINKFIX;
+ 	rswitch_desc_set_dptr(&desc->desc, gq->ring_dma);
+-	INIT_LIST_HEAD(&priv->gwca.ts_info_list);
+ 
+ 	return 0;
+ }
+@@ -1003,9 +1002,10 @@ static int rswitch_gwca_request_irqs(struct rswitch_private *priv)
+ static void rswitch_ts(struct rswitch_private *priv)
+ {
+ 	struct rswitch_gwca_queue *gq = &priv->gwca.ts_queue;
+-	struct rswitch_gwca_ts_info *ts_info, *ts_info2;
+ 	struct skb_shared_hwtstamps shhwtstamps;
+ 	struct rswitch_ts_desc *desc;
++	struct rswitch_device *rdev;
++	struct sk_buff *ts_skb;
+ 	struct timespec64 ts;
+ 	unsigned int num;
+ 	u32 tag, port;
+@@ -1015,23 +1015,28 @@ static void rswitch_ts(struct rswitch_private *priv)
+ 		dma_rmb();
+ 
+ 		port = TS_DESC_DPN(__le32_to_cpu(desc->desc.dptrl));
+-		tag = TS_DESC_TSUN(__le32_to_cpu(desc->desc.dptrl));
+-
+-		list_for_each_entry_safe(ts_info, ts_info2, &priv->gwca.ts_info_list, list) {
+-			if (!(ts_info->port == port && ts_info->tag == tag))
+-				continue;
+-
+-			memset(&shhwtstamps, 0, sizeof(shhwtstamps));
+-			ts.tv_sec = __le32_to_cpu(desc->ts_sec);
+-			ts.tv_nsec = __le32_to_cpu(desc->ts_nsec & cpu_to_le32(0x3fffffff));
+-			shhwtstamps.hwtstamp = timespec64_to_ktime(ts);
+-			skb_tstamp_tx(ts_info->skb, &shhwtstamps);
+-			dev_consume_skb_irq(ts_info->skb);
+-			list_del(&ts_info->list);
+-			kfree(ts_info);
+-			break;
+-		}
++		if (unlikely(port >= RSWITCH_NUM_PORTS))
++			goto next;
++		rdev = priv->rdev[port];
+ 
++		tag = TS_DESC_TSUN(__le32_to_cpu(desc->desc.dptrl));
++		if (unlikely(tag >= TS_TAGS_PER_PORT))
++			goto next;
++		ts_skb = xchg(&rdev->ts_skb[tag], NULL);
++		smp_mb(); /* order rdev->ts_skb[] read before bitmap update */
++		clear_bit(tag, rdev->ts_skb_used);
++
++		if (unlikely(!ts_skb))
++			goto next;
++
++		memset(&shhwtstamps, 0, sizeof(shhwtstamps));
++		ts.tv_sec = __le32_to_cpu(desc->ts_sec);
++		ts.tv_nsec = __le32_to_cpu(desc->ts_nsec & cpu_to_le32(0x3fffffff));
++		shhwtstamps.hwtstamp = timespec64_to_ktime(ts);
++		skb_tstamp_tx(ts_skb, &shhwtstamps);
++		dev_consume_skb_irq(ts_skb);
++
++next:
+ 		gq->cur = rswitch_next_queue_index(gq, true, 1);
+ 		desc = &gq->ts_ring[gq->cur];
+ 	}
+@@ -1576,8 +1581,9 @@ static int rswitch_open(struct net_device *ndev)
+ static int rswitch_stop(struct net_device *ndev)
+ {
+ 	struct rswitch_device *rdev = netdev_priv(ndev);
+-	struct rswitch_gwca_ts_info *ts_info, *ts_info2;
++	struct sk_buff *ts_skb;
+ 	unsigned long flags;
++	unsigned int tag;
+ 
+ 	netif_tx_stop_all_queues(ndev);
+ 
+@@ -1594,12 +1600,13 @@ static int rswitch_stop(struct net_device *ndev)
+ 	if (bitmap_empty(rdev->priv->opened_ports, RSWITCH_NUM_PORTS))
+ 		iowrite32(GWCA_TS_IRQ_BIT, rdev->priv->addr + GWTSDID);
+ 
+-	list_for_each_entry_safe(ts_info, ts_info2, &rdev->priv->gwca.ts_info_list, list) {
+-		if (ts_info->port != rdev->port)
+-			continue;
+-		dev_kfree_skb_irq(ts_info->skb);
+-		list_del(&ts_info->list);
+-		kfree(ts_info);
++	for (tag = find_first_bit(rdev->ts_skb_used, TS_TAGS_PER_PORT);
++	     tag < TS_TAGS_PER_PORT;
++	     tag = find_next_bit(rdev->ts_skb_used, TS_TAGS_PER_PORT, tag + 1)) {
++		ts_skb = xchg(&rdev->ts_skb[tag], NULL);
++		clear_bit(tag, rdev->ts_skb_used);
++		if (ts_skb)
++			dev_kfree_skb(ts_skb);
+ 	}
+ 
+ 	return 0;
+@@ -1612,20 +1619,17 @@ static bool rswitch_ext_desc_set_info1(struct rswitch_device *rdev,
+ 	desc->info1 = cpu_to_le64(INFO1_DV(BIT(rdev->etha->index)) |
+ 				  INFO1_IPV(GWCA_IPV_NUM) | INFO1_FMT);
+ 	if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) {
+-		struct rswitch_gwca_ts_info *ts_info;
++		unsigned int tag;
+ 
+-		ts_info = kzalloc(sizeof(*ts_info), GFP_ATOMIC);
+-		if (!ts_info)
++		tag = find_first_zero_bit(rdev->ts_skb_used, TS_TAGS_PER_PORT);
++		if (tag == TS_TAGS_PER_PORT)
+ 			return false;
++		smp_mb(); /* order bitmap read before rdev->ts_skb[] write */
++		rdev->ts_skb[tag] = skb_get(skb);
++		set_bit(tag, rdev->ts_skb_used);
+ 
+ 		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
+-		rdev->ts_tag++;
+-		desc->info1 |= cpu_to_le64(INFO1_TSUN(rdev->ts_tag) | INFO1_TXC);
+-
+-		ts_info->skb = skb_get(skb);
+-		ts_info->port = rdev->port;
+-		ts_info->tag = rdev->ts_tag;
+-		list_add_tail(&ts_info->list, &rdev->priv->gwca.ts_info_list);
++		desc->info1 |= cpu_to_le64(INFO1_TSUN(tag) | INFO1_TXC);
+ 
+ 		skb_tx_timestamp(skb);
+ 	}
+diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
+index e020800dcc57..d8d4ed7d7f8b 100644
+--- a/drivers/net/ethernet/renesas/rswitch.h
++++ b/drivers/net/ethernet/renesas/rswitch.h
+@@ -972,14 +972,6 @@ struct rswitch_gwca_queue {
+ 	};
+ };
+ 
+-struct rswitch_gwca_ts_info {
+-	struct sk_buff *skb;
+-	struct list_head list;
+-
+-	int port;
+-	u8 tag;
+-};
+-
+ #define RSWITCH_NUM_IRQ_REGS	(RSWITCH_MAX_NUM_QUEUES / BITS_PER_TYPE(u32))
+ struct rswitch_gwca {
+ 	unsigned int index;
+@@ -989,7 +981,6 @@ struct rswitch_gwca {
+ 	struct rswitch_gwca_queue *queues;
+ 	int num_queues;
+ 	struct rswitch_gwca_queue ts_queue;
+-	struct list_head ts_info_list;
+ 	DECLARE_BITMAP(used, RSWITCH_MAX_NUM_QUEUES);
+ 	u32 tx_irq_bits[RSWITCH_NUM_IRQ_REGS];
+ 	u32 rx_irq_bits[RSWITCH_NUM_IRQ_REGS];
+@@ -997,6 +988,7 @@ struct rswitch_gwca {
+ };
+ 
+ #define NUM_QUEUES_PER_NDEV	2
++#define TS_TAGS_PER_PORT	256
+ struct rswitch_device {
+ 	struct rswitch_private *priv;
+ 	struct net_device *ndev;
+@@ -1004,7 +996,8 @@ struct rswitch_device {
+ 	void __iomem *addr;
+ 	struct rswitch_gwca_queue *tx_queue;
+ 	struct rswitch_gwca_queue *rx_queue;
+-	u8 ts_tag;
++	struct sk_buff *ts_skb[TS_TAGS_PER_PORT];
++	DECLARE_BITMAP(ts_skb_used, TS_TAGS_PER_PORT);
+ 	bool disabled;
+ 
+ 	int port;
+-- 
+2.39.5
+
 
