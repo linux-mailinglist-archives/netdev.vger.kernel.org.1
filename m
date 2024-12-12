@@ -1,163 +1,80 @@
-Return-Path: <netdev+bounces-151453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84C609EF433
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 18:06:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F24EA9EF997
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 18:52:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37C02281CE6
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:06:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B21BC28C241
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 17:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90D66222D4B;
-	Thu, 12 Dec 2024 17:04:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F814223E69;
+	Thu, 12 Dec 2024 17:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UR4jMgCF"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="KPhjBwDk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2B6176AA1
-	for <netdev@vger.kernel.org>; Thu, 12 Dec 2024 17:04:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14539223E60;
+	Thu, 12 Dec 2024 17:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734023080; cv=none; b=Fbgq0TNtTV8Qj/aQWjJQfrkBkVdmQwXJkhUPwj76eU8QAxn8edGbPDg/CZPrih+hcErn9O1R1nD6Q/OH9PAHt9GGDTX8ucjitsy23eywh9Ng7LCcuFED7HaAS7gM3bRVj1SnmsyxCeqcitPr93cr6Kv9VFe7AY69xmD+6c7Q9qY=
+	t=1734025920; cv=none; b=NQK5bOM4LWesxyq2Th8f1PXbYOy4OWVGY3Kan51kwuPwQrCpJtnvRonI7/zk7BXt+SCzCdDcEOydhb161kF3lWIWA4qFHrKgC5TG2dS7hCWmNXd3bLhR7czjTO3GhSySNPUJFotJ/6r8ingocGZpzo0yyJzPACbUBLH3ceErReY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734023080; c=relaxed/simple;
-	bh=DT792Ij2WAaBVTfzTATX6erZdGiiVPj0/Aw4QkGStTk=;
+	s=arc-20240116; t=1734025920; c=relaxed/simple;
+	bh=zFNmZLEv3s2UoaHFYRmHKXkQIJYcRZ1oOSynagA3kAw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MHJj1ZZMQc7gqK3rV41VnCmkp8vMYHLYn8t8WqJq8XTA/8ZrVYU6tGG31uhrJq9fTv1Kp5c7x3wufo4IHRNX+dSbKYn6ger+AZWpV5f2ajXGpTgpFCjFPVkvn53rXSRsMMRuh5AOyJXWuD56Fyvdt47L2nswPxO6MTVUbYlu+Go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UR4jMgCF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EE72C4CECE;
-	Thu, 12 Dec 2024 17:04:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734023080;
-	bh=DT792Ij2WAaBVTfzTATX6erZdGiiVPj0/Aw4QkGStTk=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=mr9IfkpIirK5D6vEAgv0UHUPApzYrY2wDNLzGqegsJFJk+P3F3p3b9eVsgY6Tahw/gBBz0clxatzVqpFd5ll2ZJZY13380nnu6qaL7UcayQxbC0AFcb4s9GNhKqkpDQiY1PwZlZH9oFMfvy4EVenudvhaBiqjTcnc6TSdYI85A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=KPhjBwDk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87F7FC4CECE;
+	Thu, 12 Dec 2024 17:51:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1734025919;
+	bh=zFNmZLEv3s2UoaHFYRmHKXkQIJYcRZ1oOSynagA3kAw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UR4jMgCF6haI4ZEi3OfpesVZ3KLFifj9skwyjYXpGwJMvKockv+Fe05p1QmkL7KGv
-	 MhS9chLgh6KnldpYxn/l2Sh3JTdrO57hsD/YZzTZ4RlU6p3gI8xQAdBwheN2mw4q/H
-	 P6Lx1Y2GpNbQ1WMVF3v1cEVFYO1SRMotXyg6xFbKqrQQrP289q+rXHY41JK4JvPexJ
-	 ER082SB0WFuk0GHxx7BAQeCQz4He3fsTK4Ulx8MUyr/TDrrh+1jZLclvPlnrV/Sbn/
-	 uVi9NTRfiPmqIAH51N6eOr0ubEoryKI/w2bJ4VpQ/RT5vlKTce+FuJhhnqE1s3f+C+
-	 62vQszH9V7IeQ==
-Date: Thu, 12 Dec 2024 18:04:37 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Davide Caratti <dcaratti@redhat.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, olteanv@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, nbd@nbd.name,
-	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
-	lorenzo.bianconi83@gmail.com
-Subject: Re: [RFC net-next 4/5] net: airoha: Add sched ETS offload support
-Message-ID: <Z1sXpWH8MMNlVVMr@lore-desk>
-References: <cover.1733930558.git.lorenzo@kernel.org>
- <b4d34136f5ef0d43e2727c2bf833adb41216cdc1.1733930558.git.lorenzo@kernel.org>
- <CAKa-r6shd3+2zgeEzVVJR7fKWdpjKv1YJxS3z+y7QWqDf8zDZQ@mail.gmail.com>
+	b=KPhjBwDkpvbkecFAw0ge8tKI4hoYMr3QXB3qmtzqFOJWVcI4t1ITo50MSXDDuxBM8
+	 c/c7rdhbtFF3obHzlZf5FRWtvGM/tPsbyf8tO4Hao3wREqgmrE4FKHK7tfvVihAC7/
+	 t6TLp5jzPuGBSh1gxFVBso2OPa6si7zHtilEwSZM=
+Date: Thu, 12 Dec 2024 16:17:56 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: cve@kernel.org, jianqi.ren.cn@windriver.com, stable@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	sashal@kernel.org, jamie.bainbridge@gmail.com, jdamato@fastly.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6.1.y] net: napi: Prevent overflow of napi_defer_hard_irqs
+Message-ID: <2024121246-phrase-dynamite-356d@gregkh>
+References: <20241211040304.3212711-1-jianqi.ren.cn@windriver.com>
+ <2024121250-preschool-napping-502e@gregkh>
+ <20241212065044.09d7b377@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="5lgxgD//6AJ2DkE7"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKa-r6shd3+2zgeEzVVJR7fKWdpjKv1YJxS3z+y7QWqDf8zDZQ@mail.gmail.com>
+In-Reply-To: <20241212065044.09d7b377@kernel.org>
 
+On Thu, Dec 12, 2024 at 06:50:44AM -0800, Jakub Kicinski wrote:
+> On Thu, 12 Dec 2024 12:41:08 +0100 Greg KH wrote:
+> > On Wed, Dec 11, 2024 at 12:03:04PM +0800, jianqi.ren.cn@windriver.com wrote:
+> > > From: Joe Damato <jdamato@fastly.com>
+> > > 
+> > > [ Upstream commit 08062af0a52107a243f7608fd972edb54ca5b7f8 ]  
+> > 
+> > You can't ignore the 6.6.y tree :(
+> > 
+> > Dropping from my review queue now.
+> 
+> Is it possible to instead mark CVE-2024-50018 as invalid, please?
+> The change is cosmetic.
 
---5lgxgD//6AJ2DkE7
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Now rejected, sorry about that.
 
-On Dec 12, Davide Caratti wrote:
-> hi Lorenzo,
->=20
-> On Wed, Dec 11, 2024 at 4:32=E2=80=AFPM Lorenzo Bianconi <lorenzo@kernel.=
-org> wrote:
-> >
-> > Introduce support for ETS qdisc offload available in the Airoha EN7581
-> > ethernet controller. Add the capability to configure hw ETS Qdisc for
-> > the specified DSA user port via the QDMA block available in the mac chip
-> > (QDMA block is connected to the DSA switch cpu port).
-> >
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >  drivers/net/ethernet/mediatek/airoha_eth.c | 155 ++++++++++++++++++++-
-> >  1 file changed, 154 insertions(+), 1 deletion(-)
-> >
-> [...]
->=20
-> > +static int airoha_qdma_set_tx_ets_sched(struct airoha_gdm_port *port,
-> > +                                       int channel,
-> > +                                       struct tc_ets_qopt_offload *opt)
-> > +{
-> > +       struct tc_ets_qopt_offload_replace_params *p =3D &opt->replace_=
-params;
-> > +       enum tx_sched_mode mode =3D TC_SCH_SP;
-> > +       u16 w[AIROHA_NUM_QOS_QUEUES] =3D {};
-> > +       int i, nstrict =3D 0;
-> > +
-> > +       if (p->bands !=3D AIROHA_NUM_QOS_QUEUES)
-> > +               return -EINVAL;
->=20
-> maybe this condition can be relaxed to '<'  if priomap is parsed ? (see b=
-elow)
-
-ack, I guess we can relax a bit this condition.
-
->=20
-> > +
-> > +       for (i =3D 0; i < p->bands; i++) {
-> > +               if (!p->quanta[i])
-> > +                       nstrict++;
-> > +       }
-> > +
-> > +       /* this configuration is not supported by the hw */
-> > +       if (nstrict =3D=3D AIROHA_NUM_QOS_QUEUES - 1)
-> > +               return -EINVAL;
-> > +
-> > +       for (i =3D 0; i < p->bands - nstrict; i++)
-> > +               w[i] =3D p->weights[nstrict + i];
-> > +
-> > +       if (!nstrict)
-> > +               mode =3D TC_SCH_WRR8;
-> > +       else if (nstrict < AIROHA_NUM_QOS_QUEUES - 1)
-> > +               mode =3D nstrict + 1;
-> > +
-> > +       return airoha_qdma_set_chan_tx_sched(port, channel, mode, w,
-> > +                                            ARRAY_SIZE(w));
->=20
-> it seems that SP queues have a fixed, non-programmable priority in
-> hardware (e.g., queue 7 is served prior to queue 6) If this is the
-> case, you probably have to ensure that 'priomap' maps correctly
-> skb->priority to one of the SP queues, like done in [1].
-
-ack, I will take a look.
-
-Regards,
-Lorenzo
-
->=20
-> thanks,
-> --=20
-> davide
->=20
-> [1] https://elixir.bootlin.com/linux/v6.12.4/source/drivers/net/ethernet/=
-microchip/lan966x/lan966x_ets.c#L41
->=20
-
---5lgxgD//6AJ2DkE7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ1sXpQAKCRA6cBh0uS2t
-rCubAQDE3VJFcnjXdz0J7uykptxG3Jeb+naJPfKlVNgCP8jC3wEAn9nF1enQjY8C
-aA5jzlKDmuDGktCrvWpjKZoL1FMl6g8=
-=vsq5
------END PGP SIGNATURE-----
-
---5lgxgD//6AJ2DkE7--
+greg k-h
 
