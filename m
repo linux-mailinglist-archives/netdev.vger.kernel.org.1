@@ -1,214 +1,519 @@
-Return-Path: <netdev+bounces-151311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BACD89EDFEC
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 08:06:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A85F9EDFFF
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 08:09:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22CDE188B39C
-	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 07:06:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26AA6188B7E9
+	for <lists+netdev@lfdr.de>; Thu, 12 Dec 2024 07:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0ACB204F88;
-	Thu, 12 Dec 2024 07:06:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A242080D9;
+	Thu, 12 Dec 2024 07:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yl6d8XxY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0018F204C35;
-	Thu, 12 Dec 2024 07:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.178.238
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733987195; cv=fail; b=hAoNQ1Kq5ZBCqX9zoZ7ZJxb/pTg8Ki/odS9MhNYRaeCFHiyBghAVL1H/d2iLTxp+GxD+pE8Ph8/yOYeGAbqVGIzEtw0gepgxtfPff2HEVhDjxn+/2qLWTwRC4n/8vOBTvdzPnq5r63TK+t9kyeXrA2bWook3znfBIOJuAWq8mGA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733987195; c=relaxed/simple;
-	bh=oWBOeM+Rn2mWOlDflUcYxpdk+s2ZkZJ3qON2bobPrmU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=csdBBhBbRfRMGPSpQl2hJbngSI/mSBBtfKQRhWVy5/VB9jEqhP3LGVMxVniAUdbyH7QVAgPsjTRVZhAWbGdUXCAcbRA+R4fM3lLiJItpuQFmsRc58cecL/Y7CfJEVWkdoQgE2QdM9T3BRdNRjiBuZB0nu8xsFLnNKeUJjRs7mTY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=fail smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BC5SxcS028348;
-	Thu, 12 Dec 2024 07:06:24 GMT
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2177.outbound.protection.outlook.com [104.47.55.177])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 43cx4xd79x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Dec 2024 07:06:24 +0000 (GMT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=G4HhIdvIqkzYcurkcg/F8VXVxbdiddSqcelMuDWQlklInDq2q9OUmtyW3322LOteQ2V6+tpYfFfJHtgdfY/JA53xSJTdSF4WWz2sRxsbsNGjgRu9AF44X+WrLABis9ICM79jXbX4BZc0hYOxEPC1J3SPzteyDqXGuVJTH8x0trAs7riJ+5XHJi1P/nnuDS0WD7IVlqbJ9dArQ3kTQNRdZtqE8AJaxid7dgUpX7wfh/5NBznI/uaAo4rI3zw591qQmQ6LwR/rmuFhoWO431JtlvafDFLtwznEruNZj1MRrtclkj8+E4NrQtWnYUIWOYlvtS62h9LAn9QqA+Fl3+XQvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oWBOeM+Rn2mWOlDflUcYxpdk+s2ZkZJ3qON2bobPrmU=;
- b=vByuplXK2rbrV+J6pSj8caDl9LmC2Df2tUZekxhHDpkEo/Yy3wneQNlluJmsjwAKdYzVeAAWbLHzoNPVsaBQD6uc2vkXacpBza8wJh7fkS8up3cq4lTEime2cBnK+0bZBxgucq2EBO35j9GLn/i448+n9o88dSYuVEwe6f+JDi4N2gMNWgPYve6BXvR1RfPfNGFxuOTzSZKPbvm5Ap6svIE0h3uVW6p1uu+rPWX8AHVVttyZRbtGHqGqHC8JnKt556pntepIRH8JKmZMLzM+K7vgkCbyHXpHEXQzgF/+113WTmhHSdxLy3V/aKhWz8fcQDPTco0Ew6VOh7FYI9YkgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
-Received: from IA1PR11MB6170.namprd11.prod.outlook.com (2603:10b6:208:3ea::11)
- by LV8PR11MB8721.namprd11.prod.outlook.com (2603:10b6:408:203::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.16; Thu, 12 Dec
- 2024 07:06:19 +0000
-Received: from IA1PR11MB6170.namprd11.prod.outlook.com
- ([fe80::f850:53da:e11b:1653]) by IA1PR11MB6170.namprd11.prod.outlook.com
- ([fe80::f850:53da:e11b:1653%4]) with mapi id 15.20.8251.008; Thu, 12 Dec 2024
- 07:06:19 +0000
-From: "Ren, Jianqi (Jacky) (CN)" <Jianqi.Ren.CN@windriver.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "sashal@kernel.org"
-	<sashal@kernel.org>,
-        "jamie.bainbridge@gmail.com"
-	<jamie.bainbridge@gmail.com>,
-        "jdamato@fastly.com" <jdamato@fastly.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH 6.1.y] net: napi: Prevent overflow of napi_defer_hard_irqs
-Thread-Topic: [PATCH 6.1.y] net: napi: Prevent overflow of
- napi_defer_hard_irqs
-Thread-Index: AQHbTEto4OqCZXDuc0C1kLGykNE/+7LiLomg
-Date: Thu, 12 Dec 2024 07:06:19 +0000
-Message-ID:
- <IA1PR11MB61702361F5B701B51B5C638FBB3F2@IA1PR11MB6170.namprd11.prod.outlook.com>
-References: <20241211040304.3212711-1-jianqi.ren.cn@windriver.com>
- <20241211200739.47686258@kernel.org>
-In-Reply-To: <20241211200739.47686258@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6170:EE_|LV8PR11MB8721:EE_
-x-ms-office365-filtering-correlation-id: 012d2a5f-e194-4619-1e30-08dd1a7b7a70
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?Ql04lK88uCYSX19UIvZBv3gRx1TtNUMQ1gMl8gKIL0+MTcecOXN5/L6omkls?=
- =?us-ascii?Q?l7rxOTwi/YSv/A1qoS9D9Rdjk/1ao6W3IKG/BtIVAlXzHMcYusHfeWTW0TkP?=
- =?us-ascii?Q?icKgWQpoH6oX7iJxdVossUWuHJHxsZwkPZ+PAvcM+YLF6ZZFLKBasq9uobZ5?=
- =?us-ascii?Q?WM/AxyZaJaKsfF13I9LwMPzV2mjpHJTxjiHcFz0n82Qgf1YcMLSiBMozQU2C?=
- =?us-ascii?Q?aI9+YqEabIBGerhdJKw9bM9WOZJlfm5DOyceeVnnCW6T8fAkgpW8yCYxNgJT?=
- =?us-ascii?Q?IBKeeDn2T6YpD3xl929SX9UINRh53+/qSaEq9Kc+R7QGzKgdyZuBCu3B7YrL?=
- =?us-ascii?Q?Q1BQEjxvtYvyvE6C9gGqgS5pD/+7IXdHEQXW2S/gIU5Ff8EWgZR8KaoxlzcZ?=
- =?us-ascii?Q?dCxhaLlSt960IxPj8P5AM/Z9a2c2+6stwxxkno+j8eWg44/0uZTIH21P7F15?=
- =?us-ascii?Q?UDj4vPOS3JnucGCt+jJCKyZXoXyQR/O5ynnXyQ2/5Hs5/5YJwh2BjPp2T73Q?=
- =?us-ascii?Q?iBBo8adkgb7MLMADcgPNMqJkVS/6QIJ8vP3TZp2XDkLqj9RQeMMPv3vaHr7y?=
- =?us-ascii?Q?KEFxuq2+X5y969xPs61Z4m99HT/hCUZJMIds1ecYy4GGxJCYkHIS3NoZLckE?=
- =?us-ascii?Q?/XUKcG2msRdztToFSVWfioxBToyaGn4AKRo32uYdT2EZvQdd+/me+7+oamgY?=
- =?us-ascii?Q?brPmY3EkGiylQcZXfwMFswYL3HKFZlShwWxujcS4FgkBi8YmcMLEeLQwuDbh?=
- =?us-ascii?Q?de5YmiQJW19MyoDsI148pabB6wVfBIgpKEDKEkMlZ5iJyweKGiFPhRWqu7na?=
- =?us-ascii?Q?47h/YL9rCbvaI/nCcF6Pd8iNtQFUhaegP7KJzICjUAKmqOJ7DOApwNFTpISh?=
- =?us-ascii?Q?pYLga69JNyFGGTyemYRsTsywK9MIEjsTiopHwZJoDjHMFGz9iNPNHST96vMJ?=
- =?us-ascii?Q?sbVZs1vEXRJcMjs0KdXx1qcCIjAEOPIm5oQ6ee85V7RBiSX8+c30UD3AhPkF?=
- =?us-ascii?Q?ES7TSNNIZ29QZ40/UG9Dou0wXoLRdhXzvYCHT/OXgZDdWDA5DZn/YHwubRjA?=
- =?us-ascii?Q?qV2Zv/ZiJTRK4KwcbXXwbedY3hBhmuzzzVrmK51kd5B55wuCECCwD3bFet5j?=
- =?us-ascii?Q?tPv/cDeejYibgUZdFIOXJz6SBV41RxGCvazVuN6i9iTU3t7v1OaG8LLUV/kQ?=
- =?us-ascii?Q?tY2WCu/+yeUYdTPjVfbI17mHHg30uF/Ajs1ncGCANHibniBUgm18GZY7V8iP?=
- =?us-ascii?Q?z+ySy7M76wpffOfAfTbrL7u/CpKaY9mGXcE73mYQGvURD3j4QdBjavMjtlim?=
- =?us-ascii?Q?xjMH2ZF+E3U+MFxrahnYTTk9ZfxI59ATEA/U+aa4O3vPt/Oxl7VvHavTZuiv?=
- =?us-ascii?Q?QGAzYGz3BkbHbKMOEAF8uZH3uzgXFPYjEub6LLg1TaZ3Ys+oHg=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6170.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?fXmv3ryP19n8FNW0vwStOuL5q1z2woCK0+ZVrqC2S7t0o6nm9IWJtUlyYXMT?=
- =?us-ascii?Q?XliXXH0JVNqqOUE/OA07FE+BCrGlqycQcM61TTQHyUdiV/1OiGk1c/r0ZqPw?=
- =?us-ascii?Q?1KIUPm2QfEgoWP9xVaMD27Urx/i9ItAqA3lVc9ssr0nkIrqt2hsNYmcNQyze?=
- =?us-ascii?Q?TeXJk7+RdgiolkjAA0yN8JBtoosFhO4PDxh9vTHWmRlXRZnDnQH/e1Vlah+A?=
- =?us-ascii?Q?caMfXkzJ8VLj0+PpOWbwmwWL1cGob4hop63tqPlEsDNBpV5MNBLSg0JjT1W1?=
- =?us-ascii?Q?xE4qxFUT0AyP0BrcFDNWUYIBseQXvQYOrthUVoppDw0tT46u4dYNkO6prvyd?=
- =?us-ascii?Q?YjwuHHUJC3hW10RgrXmWgqqYgy+WlcYZISlgCYJg4u/wrLBrQA6gGocZ1wOv?=
- =?us-ascii?Q?aVi5NTjsjCim7K3eGx59BbbAtiC/w4GUxkFb1Y3ChX7kY+k+lnCPEW1HrhUu?=
- =?us-ascii?Q?5b0fhpJfCyNXGpTtOKL4h53lfwCAUDQkr6XjjGLQKyNrfUin0mpjYKOLgaNf?=
- =?us-ascii?Q?Nit3yfe7NllsPGBT3+yHkGTI19yjehmrEpwS1vj5fl1KnMqo+l/lMSg5PEf9?=
- =?us-ascii?Q?VntyfteQCcNDAifSr7tSJOfT9Cdk+w1MAHta/G3S6xf/g2/MfiAHBE16T+di?=
- =?us-ascii?Q?O678+YxBk8i9yl7vnkzmQ7oVdU4Wq8kKNnt6vnjpe03/o4gYmvejJf54H6f7?=
- =?us-ascii?Q?cc9OpPoKCpjPyQ6l+eG7KqLL8Z5NI6qxo49z443zHr7iOBpcIrnvJpQFezol?=
- =?us-ascii?Q?+IJIzH7jD+AWmvHlipBeJfh+JfCS2ncAYRDG3Kl8LTjgsFOXSS4kOzNiCNPj?=
- =?us-ascii?Q?gJSwWX5EE9RspqOaPOloxm/FV+5SOpPIW5ewTrY7wIQHLGvutChHF+7S5lJo?=
- =?us-ascii?Q?aM06RT5myTMkmCytBt0HmACJ+E+vnNsrCCzh+4/14v74UUsnnV8zTIgn+ph9?=
- =?us-ascii?Q?zJfnu99LuELCOaFFC49xQpso4lzVEAS5po/x1Hls2BhcxhAEMs7rkWHmd6gw?=
- =?us-ascii?Q?a7v0lRmSyN99IOf+jigDWjZ6vwE8Srg7LCByIu2sNyp2r6pADHbbAX4hSNbt?=
- =?us-ascii?Q?y3+bDd8kkaV0W8ACO4wOQXat1xrz51Tifseabkl7j9lrmIow34/aEpemJY2Y?=
- =?us-ascii?Q?dJA9Bya4Pqm8OssjabmsKj1ZsXPYg67tSMYho1LKTNk7ZtTeuJq55vnjD4GY?=
- =?us-ascii?Q?HORJ8RuT/bO3Q/jHfGXPv67MuXbu+QRso1rReQtqZhwdxFohFnlzpx4GLRFK?=
- =?us-ascii?Q?nvzZAhXcPcFRkx11V2v9wFYVG9Wqil9Nnr8JeuwZrlZbuph1eRAw/i3mbv+Q?=
- =?us-ascii?Q?EWrvGQOOjT95/vWCFQ2AsOZ6+9u7VrZ/BLSzIOYbL7F0/il3ZkjLQ2mKrjRD?=
- =?us-ascii?Q?po7YaUBwalWRuEUQITjhjlCw8hR66wMDgkJytWGBTMyWPA/UwC8c3/lMBbsb?=
- =?us-ascii?Q?e5MAN8PpNaqXkDd5cf0ivEfxvdiiHspf4Jmj9g7TE+ka9R7TO6xdlkv5PPyA?=
- =?us-ascii?Q?qA9whdxH2SI2N7eppFHKOvC0Y+3hC/7v6cWjaJezr8cO61LGhY5ed/Gzcbzw?=
- =?us-ascii?Q?j2Jm1pFmXtOcPTEPjJSkB1K+yw8PICsBFU3nfu6Q?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51832054F5;
+	Thu, 12 Dec 2024 07:09:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733987364; cv=none; b=R+OBkteE7HDCh2isNeaNmxe58vYsgJN0/IjgMTndruDmbhv8cNnl9fZFkFnfwq0RIN45Xd3Qx8dGmzMknCUYiTAh7LxnPNmccpgTAxCZ/KpOWewmCpRM3fguRk98z8URlKCiyHbLH7hNYWy2h0IFGLFi0puSfpt4wkWhmSg1zTc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733987364; c=relaxed/simple;
+	bh=ppx7UfD7CEejgot3gKMNHifKqTD14/uIn7OPS3BeCXE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F/WPZpmiUbWmEODAW6MR/WjKlnNtrvgLaQc4z88AWebq0GIv8fPyLWpFiB3jfECeuYXN6OgEO7hFYQoAtp7PhD26qXkNGnf9P/b8KbHcYmo0aLomQFsvELkARh1dz3UHGZDicJo9PoKsEg4iHM8dg+EPidt+bsFKM4nmR5rg/bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yl6d8XxY; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-6efeb120f4dso2253327b3.0;
+        Wed, 11 Dec 2024 23:09:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733987362; x=1734592162; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f4diuvg+oaKU11EMSSWNfxeZbcZBFUZuzqgH4wRg5Iw=;
+        b=Yl6d8XxYd9ezRMzNz3kedcSiSiU241OTnN7m7ANnTcoJXo2aiAFECAyYEaM7ZA87Hv
+         YLJknx4RDSGoX0OPnw3iYcTArPyrI/a5nxm9CUdj1rvKQ1aGTabgb8TYgG9hqQjMhZIz
+         CDoUqu0t+uqskNmId53mnUiTuHU4rwU1LAdWt/WGhXLe9DxNJjtM9ZLJx8sR4aE9Oza3
+         lg2c2VvzHQg1aAiMIErUl9WMDy0589NqOVw4OtHnMisHtBmfvckhTLzxdWVN8P33rev2
+         l3WBuIzdAUxAXGGCbdsu4C+Mt22iiTRGpP9c/VZKaVow6ERXcnRdNry6ccUUQLtp6nk5
+         BSDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733987362; x=1734592162;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f4diuvg+oaKU11EMSSWNfxeZbcZBFUZuzqgH4wRg5Iw=;
+        b=BIPcomr0//F+dJV5zsar+DMbnmAamzXGqqH9S3g/OW+35tufZFTjCuW07kQ52dWxS6
+         4oUoHhP5Kbqa3ILkwjL7NBqzGjG370DJ7uxtgEgQVp8z63iV/qsnHe2puccMfgC+PI6k
+         UKAz1GLDWK0OSnhuXT/Cwkbx/OYLVcS5dcutH3tvtMms9iRWHtxbH9J2LwSJA1jJ6uj4
+         JM7sUU9fkmwa4CoA9lAvynBgFLUhk/mHTqf7Pc/CRFm3NTpmVoJNBk6Qmhb0UYQ0K8Pp
+         uWmbWG3Dn8BIQz9WCgfWNbPcyZKkbpP0MyQQR5Da4IMrgiWHbXXgRJjCk8yuyVzy0oRH
+         7gkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrr2fHwTwO0rUKWiKPYw5BBuwldfrrdUWadkf5KVUnRwT/cfTyQjE72mRreHkGVHtcvANuiZRYqc4=@vger.kernel.org, AJvYcCVRVkSGqlgN6WG9Ls39JTdZhQIkS1lNI63SoksXvmO1m3AgvfW8bgQlDubGbQoaVyEvXCQJey2YNOlO@vger.kernel.org, AJvYcCVq/mfjVqzltaw95yb44T6l/0crJYfWF1fAUNHAs5KoKAcLtX+wD1JLPe7ZBwpS04QXaxp516LM6dqAVrwwDro=@vger.kernel.org, AJvYcCWm8CLa0/rFMQZzorvu9BugDq0s5v5QDJjjw7FtUHNFPqbWqDva5ejeWUmMzWwO4cJJBGfJsx273wTIxQ==@vger.kernel.org, AJvYcCWozTPyNzY4Y1ePzq0RmQk2KeZTG1yiWUos6H1P3vh8eqT15YxO0Ya3APEoezuPG8LkxLxlZq7R@vger.kernel.org, AJvYcCX1T2W7ja3YLhP/apNLvDwJIVtM08IsUv6+QDs5ajLeiZOgzYMQLEspdIl3052azh4J0pxDGg8Xbzok@vger.kernel.org, AJvYcCXAQOwaGkOeB+THeZvz1uSIZBZpDiand+UA9dFeQ8/MeInxLGF2kVHqY2S7/Wwqvt6TO0kkX/qy7lt2Omk7@vger.kernel.org, AJvYcCXaIRaK8LU9Q3vX1rgUsL2SAYsRJ7VKMjP0a28DhP+bnei2euiwouxPRZmE96jECH+VfqYsqf5GNmWyI04=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzm1Q5Rvjmgt8hjTZaa84O2RrIZGC+OK5PtRSq7P1rNEiN8yoGJ
+	PE2DM4WLPjFzRWMXTcGscyHC1H925MmTt8JyL5yQxqlfTc2/E87nnvBzs+RBq3WVUv2Myt46g1c
+	sQ0Fd04h54pHSWM90snfaVkruzQE=
+X-Gm-Gg: ASbGncssVkSh3XRZl4rT0obgOL1aZtox1jyc5+sEw+gHHv5OBJRSUNMg1vIE+yGXIca
+	taSVc4ZNtwaLAcYWAllEAHyQ5w94MedG8cUVruBoBaImtMVAoEvlK/JAK74cVP2//kRxqIok=
+X-Google-Smtp-Source: AGHT+IEFnNvRXx/tWGI8Vg9odUppiuOyMiUJuKJRi9u+NERI+YEHW8pZeW9YW2nu+O89c7w8C1PY1wRA7xdCEH9HA/M=
+X-Received: by 2002:a05:690c:6510:b0:6ef:8c41:dee0 with SMTP id
+ 00721157ae682-6f19e5073cemr18308147b3.20.1733987361747; Wed, 11 Dec 2024
+ 23:09:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6170.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 012d2a5f-e194-4619-1e30-08dd1a7b7a70
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Dec 2024 07:06:19.3866
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nQigisXnZOdn2KIiLnqzXKlj6ViHiG/d5ZU3J7mMbMshQuWYGdoP+hZn5/350e4VGv46I0l4dOH1O8dB2GGiejB4IZkd1F9l6V4kiSKHdQY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8721
-X-Proofpoint-GUID: eYROlEtXm12SGexX0fxNH85feNbuFANr
-X-Proofpoint-ORIG-GUID: eYROlEtXm12SGexX0fxNH85feNbuFANr
-X-Authority-Analysis: v=2.4 cv=Y/UCsgeN c=1 sm=1 tr=0 ts=675a8b70 cx=c_pps a=Odf1NfffwWNqZHMsEJ1rEg==:117 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10 a=RZcAm9yDv7YA:10 a=bRTqI5nwn0kA:10
- a=VwQbUJbxAAAA:8 a=t7CeM3EgAAAA:8 a=ag1SF4gXAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8 a=pGLkceISAAAA:8 a=Cy2GHhHaAAAA:8 a=wvPkM9v7g1_ikmSEda4A:9 a=CjuIK1q_8ugA:10 a=FdTzh2GWekK77mhwV6Dw:22 a=Yupwre4RP9_Eg_Bd0iYG:22
- a=y1Q9-5lHfBjTkpIzbSAN:22 a=bTms1Ghn32FVZww6NAbk:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2024-12-12_02,2024-12-10_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 mlxscore=0 clxscore=1015 malwarescore=0 priorityscore=1501
- phishscore=0 suspectscore=0 adultscore=0 mlxlogscore=994 spamscore=0
- impostorscore=0 classifier=spam authscore=0 adjust=0 reason=mlx
- scancount=1 engine=8.21.0-2411120000 definitions=main-2412120047
+References: <20241210104524.2466586-1-tmyu0@nuvoton.com> <20241210104524.2466586-7-tmyu0@nuvoton.com>
+ <d3548f81-63f9-422c-9884-895d501e64b0@roeck-us.net>
+In-Reply-To: <d3548f81-63f9-422c-9884-895d501e64b0@roeck-us.net>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Thu, 12 Dec 2024 15:09:10 +0800
+Message-ID: <CAOoeyxX5Ahm91w2aJV77Q4653g75ZbNOEoHd44RJ=WeB98S_OQ@mail.gmail.com>
+Subject: Re: [PATCH v3 6/7] hwmon: Add Nuvoton NCT6694 HWMON support
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I port the fix to fix CVE-2024-50018 in linux 6.1.
+Dear Guenter,
 
------Original Message-----
-From: Jakub Kicinski <kuba@kernel.org>=20
-Sent: Thursday, December 12, 2024 12:08
-To: Ren, Jianqi (Jacky) (CN) <Jianqi.Ren.CN@windriver.com>
-Cc: gregkh@linuxfoundation.org; stable@vger.kernel.org; davem@davemloft.net=
-; edumazet@google.com; pabeni@redhat.com; sashal@kernel.org; jamie.bainbrid=
-ge@gmail.com; jdamato@fastly.com; netdev@vger.kernel.org; linux-kernel@vger=
-.kernel.org
-Subject: Re: [PATCH 6.1.y] net: napi: Prevent overflow of napi_defer_hard_i=
-rqs
+Thank you for your comments,
 
-CAUTION: This email comes from a non Wind River email account!
-Do not click links or open attachments unless you recognize the sender and =
-know the content is safe.
-
-On Wed, 11 Dec 2024 12:03:04 +0800 jianqi.ren.cn@windriver.com wrote:
-> From: Joe Damato <jdamato@fastly.com>
+Guenter Roeck <linux@roeck-us.net> =E6=96=BC 2024=E5=B9=B412=E6=9C=8810=E6=
+=97=A5 =E9=80=B1=E4=BA=8C =E4=B8=8B=E5=8D=8811:58=E5=AF=AB=E9=81=93=EF=BC=
+=9A
 >
-> [ Upstream commit 08062af0a52107a243f7608fd972edb54ca5b7f8 ]
+> On Tue, Dec 10, 2024 at 06:45:23PM +0800, Ming Yu wrote:
+> > This driver supports Hardware monitor functionality for NCT6694 MFD
+> > device based on USB interface.
+> >
+> > Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
 >
-> In commit 6f8b12d661d0 ("net: napi: add hard irqs deferral feature")=20
-> napi_defer_irqs was added to net_device and napi_defer_irqs_count was=20
-> added to napi_struct, both as type int.
+> checkpatch:
 >
-> This value never goes below zero, so there is not reason for it to be=20
-> a signed int. Change the type for both from int to u32, and add an=20
-> overflow check to sysfs to limit the value to S32_MAX.
+> WARNING: From:/Signed-off-by: email address mismatch: 'From: Ming Yu <a02=
+82524688@gmail.com>' !=3D 'Signed-off-by: Ming Yu <tmyu0@nuvoton.com>'
+>
 
-Could you explain why you want to backport this change to stable?
+Fix it in v4.
+
+...
+
+> > +static inline long in_from_reg(u8 reg)
+> > +{
+> > +     return reg * 16;
+> > +}
+> > +
+> > +static inline u8 in_to_reg(long val)
+> > +{
+> > +     if (val <=3D 0)
+> > +             return 0;
+>
+> This is pointless since the calling code already clamps the value to [0, =
+2032].
+>
+
+Drop it in v4.
+
+> > +     return val / 16;
+>
+> DIV_ROUND_CLOSEST() ?
+>
+
+Fix it in v4.
+
+> > +}
+> > +
+> > +static inline long temp_from_reg(u8 reg)
+> > +{
+> > +     return reg * 1000;
+>
+> This always returns a positive value, even though the temperature is
+> supposed to be signed. More on that below.
+>
+
+I will modify the return value to (sign_extend32(reg, 7) * 1000) in v4.
+
+> > +}
+> > +
+> > +static inline u8 temp_to_reg(long val)
+> > +{
+> > +     return val / 1000;
+>
+> DIV_ROUND_CLOSEST() ?
+>
+
+Fix it in v4.
+
+> > +}
+...
+> > +static int nct6694_in_read(struct device *dev, u32 attr, int channel,
+> > +                        long *val)
+> > +{
+> > +     struct nct6694_hwmon_data *data =3D dev_get_drvdata(dev);
+> > +     unsigned char vin_en;
+> > +     int ret;
+> > +
+> > +     guard(mutex)(&data->lock);
+> > +
+> > +     switch (attr) {
+> > +     case hwmon_in_enable:
+> > +             vin_en =3D data->hwmon_en[NCT6694_VIN_EN(channel / 8)];
+> > +             *val =3D !!(vin_en & BIT(channel % 8)) ? 1 : 0;
+>
+> Drop "? 1 : 0"
+>
+
+Drop it in v4.
+
+> > +
+> > +             return 0;
+> > +     case hwmon_in_input:
+> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_RPT_MOD,
+> > +                                    NCT6694_VIN_IDX(channel), 1,
+> > +                                    data->xmit_buf);
+>
+> I am curious: Since the received data length is not returned, and the
+> expected minimum length is not passed to nct6694_read_msg(), the driver
+> has no means to check if the received data actually includes the expected
+> values at the expected index. That doesn't matter here, but some of the
+> returned data is located far into the buffer. Is it indeed not necessary
+> for the driver to check if the received data is actually as long as
+> expected ?
+>
+
+The fourth parameter is expected length of nct6694_read_msg(), which
+in this case is 1.
+I will add the data length validation code for handling the
+response_header in both nct6694_read_msg() and nct6694_write_msg() in
+the next patch.
+
+> > +             if (ret)
+> > +                     return ret;
+...
+> > +static int nct6694_temp_read(struct device *dev, u32 attr, int channel=
+,
+> > +                          long *val)
+> > +{
+> > +     struct nct6694_hwmon_data *data =3D dev_get_drvdata(dev);
+> > +     unsigned char temp_en, temp_hyst;
+> > +     int ret, int_part, frac_part;
+> > +     signed char temp_max;
+> > +
+> > +     guard(mutex)(&data->lock);
+> > +
+> > +     switch (attr) {
+> > +     case hwmon_temp_enable:
+> > +             temp_en =3D data->hwmon_en[NCT6694_TIN_EN(channel / 8)];
+> > +             *val =3D !!(temp_en & BIT(channel % 8)) ? 1 : 0;
+>
+> Drop "? 1 : 0"
+>
+
+Drop it in v4.
+
+> > +
+> > +             return 0;
+> > +     case hwmon_temp_input:
+> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_RPT_MOD,
+> > +                                    NCT6694_TIN_IDX(channel), 2,
+> > +                                    data->xmit_buf);
+> > +             if (ret)
+> > +                     return ret;
+> > +
+> > +             int_part =3D sign_extend32(data->xmit_buf[0], 7);
+> > +             frac_part =3D FIELD_GET(NCT6694_LSB_REG_MASK, data->xmit_=
+buf[1]);
+> > +             if (int_part < 0)
+> > +                     *val =3D (int_part + 1) * 1000 - (8 - frac_part) =
+* 125;
+> > +             else
+> > +                     *val =3D int_part * 1000 + frac_part * 125;
+> > +
+> > +             return 0;
+> > +     case hwmon_temp_max:
+> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_HWMON_MOD=
+,
+> > +                                    NCT6694_HWMON_CMD2_OFFSET,
+> > +                                    NCT6694_HWMON_CMD2_LEN,
+> > +                                    data->xmit_buf);
+> > +             if (ret)
+> > +                     return ret;
+> > +
+> > +             *val =3D temp_from_reg(data->xmit_buf[NCT6694_TIN_HL(chan=
+nel)]);
+> > +
+>
+> If the value in NCT6694_TIN_HL() is signed, this will return a large posi=
+tive
+> value instead.
+>
+
+Understood! I will fix it in v4.
+
+> > +             return 0;
+> > +     case hwmon_temp_max_hyst:
+> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_HWMON_MOD=
+,
+> > +                                    NCT6694_HWMON_CMD2_OFFSET,
+> > +                                    NCT6694_HWMON_CMD2_LEN,
+> > +                                    data->xmit_buf);
+> > +             if (ret)
+> > +                     return ret;
+> > +
+> > +             temp_max =3D (signed char)data->xmit_buf[NCT6694_TIN_HL(c=
+hannel)];
+> > +             temp_hyst =3D FIELD_GET(NCT6694_TIN_HYST_MASK,
+> > +                                   data->xmit_buf[NCT6694_TIN_HYST(cha=
+nnel)]);
+> > +             if (temp_max < 0)
+>
+> This suggests that the temperature limit is signed, suggesting in turn th=
+at
+> temp_from_reg() is wrong.
+>
+
+Understood! I will fix it in v4.
+
+> > +                     *val =3D temp_from_reg(temp_max + temp_hyst);
+> > +             else
+> > +                     *val =3D temp_from_reg(temp_max - temp_hyst);
+> > +
+> > +             return 0;
+> > +     case hwmon_temp_max_alarm:
+> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_RPT_MOD,
+> > +                                    NCT6694_TIN_STS(channel / 8), 1,
+> > +                                        data->xmit_buf);
+> > +             if (ret)
+> > +                     return ret;
+> > +
+> > +             *val =3D !!(data->xmit_buf[0] & BIT(channel % 8));
+> > +
+> > +             return 0;
+> > +     default:
+> > +             return -EOPNOTSUPP;
+> > +     }
+> > +}
+> > +
+> > +static int nct6694_fan_read(struct device *dev, u32 attr, int channel,
+> > +                         long *val)
+> > +{
+> > +     struct nct6694_hwmon_data *data =3D dev_get_drvdata(dev);
+> > +     unsigned char fanin_en;
+> > +     int ret;
+> > +
+> > +     guard(mutex)(&data->lock);
+> > +
+> > +     switch (attr) {
+> > +     case hwmon_fan_enable:
+> > +             fanin_en =3D data->hwmon_en[NCT6694_FIN_EN(channel / 8)];
+> > +             *val =3D !!(fanin_en & BIT(channel % 8)) ? 1 : 0;
+>
+> Drop "? 1 : 0"
+>
+
+Drop it in v4.
+
+> > +
+> > +             return 0;
+> > +     case hwmon_fan_input:
+> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_RPT_MOD,
+> > +                                    NCT6694_FIN_IDX(channel), 2,
+> > +                                    data->xmit_buf);
+> > +             if (ret)
+> > +                     return ret;
+> > +
+> > +             *val =3D (data->xmit_buf[1] |
+> > +                    (data->xmit_buf[0] << 8)) & 0xFFFF;
+>
+> The "& 0xffff" is pointless.
+>
+
+Fix it in v4.
+
+> > +
+> > +             return 0;
+> > +     case hwmon_fan_min:
+> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_HWMON_MOD=
+,
+> > +                                    NCT6694_HWMON_CMD2_OFFSET,
+> > +                                    NCT6694_HWMON_CMD2_LEN,
+> > +                                    data->xmit_buf);
+> > +             if (ret)
+> > +                     return ret;
+> > +
+> > +             *val =3D (data->xmit_buf[NCT6694_FIN_LL(channel)] |
+> > +                     data->xmit_buf[NCT6694_FIN_HL(channel)] << 8) & 0=
+xFFFF;
+>
+> Same here.
+>
+
+Fix it in v4.
+
+> > +
+> > +             return 0;
+> > +     case hwmon_fan_min_alarm:
+> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_RPT_MOD,
+> > +                                    NCT6694_FIN_STS(channel / 8),
+> > +                                    1, data->xmit_buf);
+> > +             if (ret)
+> > +                     return ret;
+> > +
+> > +             *val =3D !!(data->xmit_buf[0] & BIT(channel % 8));
+> > +
+> > +             return 0;
+> > +     default:
+> > +             return -EOPNOTSUPP;
+> > +     }
+> > +}
+> > +
+> > +static int nct6694_pwm_read(struct device *dev, u32 attr, int channel,
+> > +                         long *val)
+> > +{
+> > +     struct nct6694_hwmon_data *data =3D dev_get_drvdata(dev);
+> > +     unsigned char pwm_en;
+> > +     int ret;
+> > +
+> > +     guard(mutex)(&data->lock);
+> > +
+> > +     switch (attr) {
+> > +     case hwmon_pwm_enable:
+> > +             pwm_en =3D data->hwmon_en[NCT6694_PWM_EN(channel / 8)];
+> > +             *val =3D !!(pwm_en & BIT(channel % 8)) ? 1 : 0;
+>
+> Drop "? 1 : 0".
+>
+
+Drop it in v4.
+
+> > +
+...
+> > +     case hwmon_temp_max_hyst:
+> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_HWMON_MOD=
+,
+> > +                                    NCT6694_HWMON_CMD2_OFFSET,
+> > +                                    NCT6694_HWMON_CMD2_LEN,
+> > +                                    data->xmit_buf);
+> > +
+> > +             val =3D clamp_val(val, -127000, 127000);
+> > +             temp_max =3D (signed char)data->xmit_buf[NCT6694_TIN_HL(c=
+hannel)];
+> > +             temp_hyst =3D (temp_max < 0) ? (temp_max + val / 1000) :
+> > +                                          (temp_max - val / 1000);
+>
+> DIV_ROUND_CLOSEST() ?
+>
+
+Fix it in v4.
+
+> > +             temp_hyst =3D clamp_val(temp_hyst, 0, 7);
+> > +             data->xmit_buf[NCT6694_TIN_HYST(channel)] =3D
+> > +                    (data->xmit_buf[NCT6694_TIN_HYST(channel)] & ~NCT6=
+694_TIN_HYST_MASK) |
+> > +                    FIELD_PREP(NCT6694_TIN_HYST_MASK, temp_hyst);
+> > +
+...
+> > +
+> > +static int nct6694_hwmon_init(struct nct6694_hwmon_data *data)
+> > +{
+> > +     int ret;
+> > +
+> > +     guard(mutex)(&data->lock);
+> > +
+>
+> Not significant, but this is unnecessary because the function is only
+> called once from probe.
+>
+
+Understood! I will drop it in the next patch.
+
+> > +     /*
+...
+> > +static int nct6694_hwmon_probe(struct platform_device *pdev)
+> > +{
+> > +     struct nct6694_hwmon_data *data;
+> > +     struct nct6694 *nct6694 =3D dev_get_drvdata(pdev->dev.parent);
+> > +     struct device *hwmon_dev;
+> > +     int ret;
+> > +
+> > +     data =3D devm_kzalloc(&pdev->dev, sizeof(*data), GFP_KERNEL);
+> > +     if (!data)
+> > +             return -ENOMEM;
+> > +
+> > +     data->xmit_buf =3D devm_kcalloc(&pdev->dev, NCT6694_MAX_PACKET_SZ=
+,
+> > +                                   sizeof(unsigned char), GFP_KERNEL);
+>
+> Wondering ... why not just devm_kzalloc(..,. NCT6694_MAX_PACKET_SZ, ...) =
+?
+> sizeof(unsigned char) is always 1, after all.
+>
+
+Okay, I'll fix it.
+
+> > +     if (!data->xmit_buf)
+> > +             return -ENOMEM;
+> > +
+> > +     data->nct6694 =3D nct6694;
+> > +     mutex_init(&data->lock);
+> > +     platform_set_drvdata(pdev, data);
+>
+> This is unnecessary unless I am missing something.
+>
+
+Drop it in v4.
+
+> > +
+> > +     ret =3D nct6694_hwmon_init(data);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     /* Register hwmon device to HWMON framework */
+> > +     hwmon_dev =3D devm_hwmon_device_register_with_info(&pdev->dev,
+> > +                                                      "nct6694", data,
+> > +                                                      &nct6694_chip_in=
+fo,
+> > +                                                      NULL);
+> > +     return PTR_ERR_OR_ZERO(hwmon_dev);
+> > +}
+> > +
+> > +static struct platform_driver nct6694_hwmon_driver =3D {
+> > +     .driver =3D {
+> > +             .name   =3D "nct6694-hwmon",
+> > +     },
+> > +     .probe          =3D nct6694_hwmon_probe,
+> > +};
+> > +
+> > +module_platform_driver(nct6694_hwmon_driver);
+> > +
+> > +MODULE_DESCRIPTION("USB-HWMON driver for NCT6694");
+> > +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
+> > +MODULE_LICENSE("GPL");
+> > +MODULE_ALIAS("platform:nct6694-hwmon");
+> > --
+> > 2.34.1
+> >
+> >
+
+Best regards,
+Ming
 
