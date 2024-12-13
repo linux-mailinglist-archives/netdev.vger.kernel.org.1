@@ -1,229 +1,113 @@
-Return-Path: <netdev+bounces-151832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A63169F1306
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 17:55:41 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 841A79F1320
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 18:00:58 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6149128191E
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 16:55:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBC0318866EE
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 17:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72DE71E3DD3;
-	Fri, 13 Dec 2024 16:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9B01BBBFD;
+	Fri, 13 Dec 2024 17:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZcXezQd"
+	dkim=pass (2048-bit key) header.d=brun.one header.i=@brun.one header.b="WaP2LlmE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.dolansoft.org (s2.dolansoft.org [212.51.146.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450C51E04B8;
-	Fri, 13 Dec 2024 16:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABB01422D4;
+	Fri, 13 Dec 2024 17:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.51.146.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734108939; cv=none; b=mA83uJl3Z5oauanHpAn2gXuYzGbyWGZ/TeDSkwoUOKBn73PV/pZ5dkRpzjCW9zjaI6tHboFDr8vYPQCZgusIDgMbqCv01GdXVZUjfjqWNI3/yXjuTnEahCr/NJiyejcwBSGJwPXirYmskIOHThmRx+vgthGkVGjOWM3Gt3INIEA=
+	t=1734109254; cv=none; b=cExvZ47KG5WbCoknv4LB3ZBKG63VqOYkkhRSwNdHoWh4RhittbB08Aqqh0xB5pgBcAo++qXtrnofLr2F+21xw4jNTqAaqSaHvIk4LYTITcSMYhM+vePY5Wq2Hdn8UMO4i1UZWiEGxPsOuI0QCvpHBt6bE6hpGTTtL3sU6ovSBy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734108939; c=relaxed/simple;
-	bh=PQGhwc4vbNPbMifKWeYjrbYNYXGkSHCLTSvZwdJRZMg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Iq08JIx1HvHnb/QsCv6kiIYrMWgR92iD8/Z+wo6LQkX9YKHCVm/JWCKcUIydbcBrEcwPuOrTmLvIQY1I9wTr5yX4d8RNsYdn5FlHjWDPHi6VkFOqkdI6Keek7nRgtKmQOCWkHzevtpjp4/iG1Th5qGaF8tKEbskC5FcmRsUi5tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZcXezQd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 742B5C4CED0;
-	Fri, 13 Dec 2024 16:55:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734108938;
-	bh=PQGhwc4vbNPbMifKWeYjrbYNYXGkSHCLTSvZwdJRZMg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EZcXezQdzcQs/GjsGrupMAy2AWg01kuukouuOagAI2OTPl7wAvLye7G5vTenGVdMU
-	 mtKTOPTGPJR7/IscecJ3FWRGkMtXifJYwUKHP+CObtoHsA7qsCqt0UtQPA1W8rJ2cR
-	 xzHVaNySzoEYdNYXmO9E2op0fVrmQsZ/GBePqnCAIu47cpbAM8diqLg1LSv1CMeaIq
-	 2nAX/EhWLTX0V3es2cSLZ19vQOIwIKOKd9w2m+wBkjN5WAzXn7VateBSYoMFsN1lSE
-	 ECYbuZWKMu+IKBfdqEe2hFlsAf9aIoJESY+wWGEEjtHFU0Tn8VDUSx7SiK/x50YaN2
-	 P8+DG4058CArA==
-Message-ID: <0a8b9448-7e1c-4a30-8011-1505e2133263@kernel.org>
-Date: Fri, 13 Dec 2024 16:55:34 +0000
+	s=arc-20240116; t=1734109254; c=relaxed/simple;
+	bh=G36R8NXw7mb55c/2JQU0c3hGoc+MXWGbESzEI7JUUBc=;
+	h=Date:From:Subject:To:Cc:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gEc67FFSpW+VM0+g2rxYFWOXPYBvnzbiMVxJGIwofgre60PA3o61Qtj0JaHsMGTeKxV6rvf7nk3fjMYUuvqyTjIjPxTu7yLHXGLVy0dHskq4mWevoh6TeXxIxMYaE5oK596w5/W/Ms6beNmqoeNLDIazxGZTyAf+tmNgTBFckXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=brun.one; spf=pass smtp.mailfrom=brun.one; dkim=pass (2048-bit key) header.d=brun.one header.i=@brun.one header.b=WaP2LlmE; arc=none smtp.client-ip=212.51.146.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=brun.one
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=brun.one
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=brun.one;
+	s=s1; h=MIME-Version:References:In-Reply-To:Message-Id:Cc:To:Subject:From:
+	Date:From:To:Subject:Date:Message-ID:Reply-To;
+	bh=Agp337t9HufqQqyypTdkJtJXEKPsUy8NiaqQfv8eEw8=; b=WaP2LlmE633wdtrQPxa6ZtXhfI
+	be48Cls+N6m9midh/N9OpR5UwzePYlBCMJr8Uf+aGn1thnVblzsI9fjqGJJr+bO/bELlPmBlIcPnn
+	JVP0uYQh456s2Tea4qmS5ZVIzHj0UifUs+pctZ5XIqkQ68pnFQwEBXxKksRStejt1hr6U8Ur7q9J2
+	xeL1S55tejR9fRi9tt7dJ1Dq+R5GGx6+pE0+jSudwFfDBUx10Gedv9RYDtgXU7GL1TFPlPx3Bt32N
+	iq8ILCwoYUO2Dis6+764sZmFYfSZ2qZ4in1+xsgtjyWi9fBcvAEUbXiCyq+onPUQXUw2H/akSSuV7
+	q2nsLvCA==;
+Received: from [212.51.153.89] (helo=[192.168.9.177])
+	by mx.dolansoft.org with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98)
+	(envelope-from <lorenz@dolansoft.org>)
+	id 1tM91p-00000001WXO-2PAS;
+	Fri, 13 Dec 2024 17:00:37 +0000
+Date: Fri, 13 Dec 2024 18:00:31 +0100
+From: Lorenz Brun <lorenz@brun.one>
+Subject: Re: [PATCH net] net: atlantic: keep rings across suspend/resume
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Igor Russkikh <irusskikh@marvell.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Manuel Ullmann
+	<labre@posteo.de>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <V8ZFOS.N7LNJ4P9ABW3@brun.one>
+In-Reply-To: <bbcd37de-c731-4f0b-92f0-8c332bb01c5b@lunn.ch>
+References: <20241212023946.3979643-1-lorenz@brun.one>
+	<bbcd37de-c731-4f0b-92f0-8c332bb01c5b@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v4 3/4] bpftool: btf: Support dumping a specific
- types from file
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: hawk@kernel.org, kuba@kernel.org, andrii@kernel.org,
- john.fastabend@gmail.com, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, martin.lau@linux.dev, eddyz87@gmail.com,
- song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- andrii.nakryiko@gmail.com, antony@phenome.org, toke@kernel.org
-References: <cover.1734052995.git.dxu@dxuuu.xyz>
- <5ec7617fd9c28ff721947aceb80937dc10fca770.1734052995.git.dxu@dxuuu.xyz>
- <7fa902e5-0916-4bc9-b1e0-2729903d3de0@kernel.org>
- <fojqbtlpjh3jrpzzctgllxtnyncbtbzw6q7qfrezrigpc2qqek@6m7cppwvgwb5>
-From: Quentin Monnet <qmo@kernel.org>
-Content-Language: en-GB
-In-Reply-To: <fojqbtlpjh3jrpzzctgllxtnyncbtbzw6q7qfrezrigpc2qqek@6m7cppwvgwb5>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Sender: lorenz@dolansoft.org
 
-2024-12-13 09:45 UTC-0700 ~ Daniel Xu <dxu@dxuuu.xyz>
-> Hi Quentin,
+
+
+Am Do, 12. Dez 2024 um 18:20:26 +01:00:00 schrieb Andrew Lunn 
+<andrew@lunn.ch>:
+> On Thu, Dec 12, 2024 at 03:39:24AM +0100, Lorenz Brun wrote:
+>>  The rings are order-6 allocations which tend to fail on suspend due 
+>> to
+>>  fragmentation. As memory is kept during suspend/resume, we don't 
+>> need to
+>>  reallocate them.
 > 
-> On Fri, Dec 13, 2024 at 03:17:36PM GMT, Quentin Monnet wrote:
->> 2024-12-12 18:24 UTC-0700 ~ Daniel Xu <dxu@dxuuu.xyz>
->>> Some projects, for example xdp-tools [0], prefer to check in a minimized
->>> vmlinux.h rather than the complete file which can get rather large.
->>>
->>> However, when you try to add a minimized version of a complex struct (eg
->>> struct xfrm_state), things can get quite complex if you're trying to
->>> manually untangle and deduplicate the dependencies.
->>>
->>> This commit teaches bpftool to do a minimized dump of a specific types by
->>> providing a optional root_id argument(s).
->>>
->>> Example usage:
->>>
->>>     $ ./bpftool btf dump file ~/dev/linux/vmlinux | rg "STRUCT 'xfrm_state'"
->>>     [12643] STRUCT 'xfrm_state' size=912 vlen=58
->>>
->>>     $ ./bpftool btf dump file ~/dev/linux/vmlinux root_id 12643 format c
->>>     #ifndef __VMLINUX_H__
->>>     #define __VMLINUX_H__
->>>
->>>     [..]
->>>
->>>     struct xfrm_type_offload;
->>>
->>>     struct xfrm_sec_ctx;
->>>
->>>     struct xfrm_state {
->>>             possible_net_t xs_net;
->>>             union {
->>>                     struct hlist_node gclist;
->>>                     struct hlist_node bydst;
->>>             };
->>>             union {
->>>                     struct hlist_node dev_gclist;
->>>                     struct hlist_node bysrc;
->>>             };
->>>             struct hlist_node byspi;
->>>     [..]
->>>
->>> [0]: https://github.com/xdp-project/xdp-tools/blob/master/headers/bpf/vmlinux.h
->>>
->>> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
->>> ---
->>>  .../bpf/bpftool/Documentation/bpftool-btf.rst |  8 +++-
->>>  tools/bpf/bpftool/btf.c                       | 39 ++++++++++++++++++-
->>>  2 files changed, 43 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/tools/bpf/bpftool/Documentation/bpftool-btf.rst b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
->>> index 245569f43035..dbe6d6d94e4c 100644
->>> --- a/tools/bpf/bpftool/Documentation/bpftool-btf.rst
->>> +++ b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
->>> @@ -24,7 +24,7 @@ BTF COMMANDS
->>>  =============
->>>  
->>>  | **bpftool** **btf** { **show** | **list** } [**id** *BTF_ID*]
->>> -| **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*]
->>> +| **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*] [**root_id** *ROOT_ID*]
->>>  | **bpftool** **btf help**
->>>  |
->>>  | *BTF_SRC* := { **id** *BTF_ID* | **prog** *PROG* | **map** *MAP* [{**key** | **value** | **kv** | **all**}] | **file** *FILE* }
->>> @@ -43,7 +43,7 @@ bpftool btf { show | list } [id *BTF_ID*]
->>>      that hold open file descriptors (FDs) against BTF objects. On such kernels
->>>      bpftool will automatically emit this information as well.
->>>  
->>> -bpftool btf dump *BTF_SRC* [format *FORMAT*]
->>> +bpftool btf dump *BTF_SRC* [format *FORMAT*] [root_id *ROOT_ID*]
->>>      Dump BTF entries from a given *BTF_SRC*.
->>>  
->>>      When **id** is specified, BTF object with that ID will be loaded and all
->>> @@ -67,6 +67,10 @@ bpftool btf dump *BTF_SRC* [format *FORMAT*]
->>>      formatting, the output is sorted by default. Use the **unsorted** option
->>>      to avoid sorting the output.
->>>  
->>> +    **root_id** option can be used to filter a dump to a single type and all
->>> +    its dependent types. It cannot be used with any other types of filtering.
->>> +    It can be passed multiple times to dump multiple types.
->>> +
->>>  bpftool btf help
->>>      Print short help message.
->>>  
->>> diff --git a/tools/bpf/bpftool/btf.c b/tools/bpf/bpftool/btf.c
->>> index 3e995faf9efa..2636655ac180 100644
->>> --- a/tools/bpf/bpftool/btf.c
->>> +++ b/tools/bpf/bpftool/btf.c
->>> @@ -27,6 +27,8 @@
->>>  #define KFUNC_DECL_TAG		"bpf_kfunc"
->>>  #define FASTCALL_DECL_TAG	"bpf_fastcall"
->>>  
->>> +#define MAX_ROOT_IDS		16
->>> +
->>>  static const char * const btf_kind_str[NR_BTF_KINDS] = {
->>>  	[BTF_KIND_UNKN]		= "UNKNOWN",
->>>  	[BTF_KIND_INT]		= "INT",
->>> @@ -880,7 +882,8 @@ static int do_dump(int argc, char **argv)
->>>  {
->>>  	bool dump_c = false, sort_dump_c = true;
->>>  	struct btf *btf = NULL, *base = NULL;
->>> -	__u32 root_type_ids[2];
->>> +	__u32 root_type_ids[MAX_ROOT_IDS];
->>> +	bool have_id_filtering;
->>>  	int root_type_cnt = 0;
->>>  	__u32 btf_id = -1;
->>>  	const char *src;
->>> @@ -974,6 +977,8 @@ static int do_dump(int argc, char **argv)
->>>  		goto done;
->>>  	}
->>>  
->>> +	have_id_filtering = !!root_type_cnt;
->>> +
->>>  	while (argc) {
->>>  		if (is_prefix(*argv, "format")) {
->>>  			NEXT_ARG();
->>> @@ -993,6 +998,36 @@ static int do_dump(int argc, char **argv)
->>>  				goto done;
->>>  			}
->>>  			NEXT_ARG();
->>> +		} else if (is_prefix(*argv, "root_id")) {
->>> +			__u32 root_id;
->>> +			char *end;
->>> +
->>> +			if (have_id_filtering) {
->>> +				p_err("cannot use root_id with other type filtering");
->>> +				err = -EINVAL;
->>> +				goto done;
->>> +			} else if (root_type_cnt == MAX_ROOT_IDS) {
->>> +				p_err("only %d root_id are supported", MAX_ROOT_IDS);
->>
->>
->> I doubt users will often reach this limit, but if they do, the message
->> can be confusing, because MAX_ROOT_IDS also accounts for root_type_ids[]
->> cells used when we pass map arguments ("key" or "value" or "kv"), so you
->> could pass 15 "root_id" on the command line and get a message telling
->> only 16 are supported.
->>
->> Maybe add a counter to tell how many were defined from the rest of the
->> command line, and adjust the value in the error message?
+> I don't know this driver. Are there other reasons to reallocate the
+> rings? Change of MTU? ethtool settings? If they are also potentially
+> going to run into memory fragmentation issues, maybe it would be
+> better to use smaller order allocations, or vmalloc, if the hardware
+> supports that, etc.
 > 
-> The above `if (have_id_filtering)` check prevents mixing key/value/kv
-> map args with root_id. That ought to prevent overcounting, right?
+> 	Andrew
 
-Ah, you're right, you even mentioned it in the docs, sorry. All good on
-that side, then.
+ethtool settings do indeed reallocate, but not during unsuspend where 
+we have GFP_NOIO. Smaller oder allocations would definitely be better, 
+but on systems without IOMMU that would probably pose a problem as 
+rings are generally assumed to be contigous by hardware (as far as I 
+understand). I don't have access to hardware docs, so I don't know if 
+you can make the HW work without physically-contiguous memory.
 
-Regarding the restriction, would you mind making the mention from the
-man page a bit more explicit, please? Something along:
+Linux just really doesn't handle high-order allocations well, I got one 
+unsuspend failure with 6GiB (!!) of free space in the relevant region 
+(but no order-6 or higher). I have no idea why it doesn't defragment 
+before failing the allocation as it clearly has enough memory.
 
-    [...] It cannot be used with any other types of filtering, such as
-    the "key", "value", or "kv" arguments when dumping BTF for a map.
-    **root_id** can be passed multiple times...
+kworker/u97:14: page allocation failure: order:6, 
+mode:0x40d00(GFP_NOIO|__GFP_COMP|__GFP_ZERO), 
+nodemask=(null),cpuset=/,mems_allowed=0
+Node 0 Normal: 787628*4kB (UME) 234026*8kB (UME) 50882*16kB (UME) 
+13751*32kB (UME) 35*64kB (UME) 9*128kB (M) 0*256kB 0*512kB 0*1024kB 
+1*2048kB (H) 0*4096kB = 6282304kB
 
-Thanks,
-Quentin
+
+Regards,
+Lorenz
+
+
 
