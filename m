@@ -1,101 +1,117 @@
-Return-Path: <netdev+bounces-151697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 862F09F0A46
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:00:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29A879F0A68
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:08:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8D98188655F
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:00:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4687D169C0B
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4005A1C07FC;
-	Fri, 13 Dec 2024 11:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79CF1CBEB9;
+	Fri, 13 Dec 2024 11:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BAynvb7w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I//GKY3T"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A409F1C3C1E
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 11:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5961C8FD4
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 11:08:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734087611; cv=none; b=C/sGO7OMfR2u17E8zlPOeuDsRLDMZkxynR+w8fhTLplaEBXc3KtMiwCPyfCZnlOH7ImUD08AtLGVH5Ckcd2NLT+5DIHlOmgkj8DGNmeLNmk53DjL7Nu5Nor2c2JVZgVEGuuET8+1lT9KtpM44dhXHKxDMm1GVjwu5pcXS4/YM68=
+	t=1734088116; cv=none; b=QZ6WSULGwOHlBA/RjIaVW7OZqRowYDKx2pshLvvC9Js+5hK4kjVjYIFpZC1a0a8u0kDPjGeFZFjHt4A15fCnPFkoyP/Fb7zr4TtvOWSK1oK3rlGtdX5X+DsO1guqEgJzJtONvCYB/jvflMNRu4u8LJrN3bPhSDrxy5f7hb9mNCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734087611; c=relaxed/simple;
-	bh=CVc7/ZmxdnRgoCyfzUnd5xmX4XEkW704Q7JoOUHlQLk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hdQbXNhRjekParSnPAxrMTTPDrB+Y6CYDiiGIrTDv+Gz6T2bNcKC2JP4MPowb6RMN1wFPaauea/ZYWeK3H1zQd9d/jwpDfc1YGGOWni1s5BbE8e7I3tmhWNYp4cpNa0iApue9wBfTxz3IgGQjRF1OvB8TTCO+QkuP/BMWpjRx1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=BAynvb7w; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=tW1kqG7AA7VKuaZuIchhnJLzAYeE13kvfdYICGMAvpA=; b=BAynvb7wzY0Qw60t6wnpt78/qq
-	vFB1MVGBVwIRglh/GEFtMTFb03eloxHgljpyzzDUs2omP3GUblZGcLOIc9evLq0qrEPJfPUQuJgOn
-	xDolDmF8a0Ag+MXGKmMfJEkKjpYABzH/x581Dt1BabS44Sbofprj51HoI5P5a622ScSqBlCT1O6yg
-	MGUhQmh8uBOBzQbcKrjCJbz9aL22I/+UpbWSzVQ/3GKAjjijlwErDxyH2XgnqjPmz5V0kWQ1Tp/wO
-	DpmJnZpgleUDOqghGcZs3+mDQeWuxuzTDS+83fti+X9buWRsGee9bvqHZL5FN3bQGLhto+z1CoCBv
-	Kt9Qx8PQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48066)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tM3On-0006ar-0n;
-	Fri, 13 Dec 2024 10:59:58 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tM3Ok-0006Fr-0f;
-	Fri, 13 Dec 2024 10:59:54 +0000
-Date: Fri, 13 Dec 2024 10:59:54 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1734088116; c=relaxed/simple;
+	bh=lbbqJqo2HRp7VpY0UlKyQUacObxkW/KgR4INRm++4zM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nqr9U5tG2dZ86Wap99VaQwIftqJUCmiHxttdaGbGOOqCopYjnsAeBf5K+kDnTzy4Bqh+puHqX25MjsQ4o4Y6VMDoYeynratvUph1d/VMc/uYysW27O+G7XVaR+CV3zssGKiMz1r/fL2vUZ/lG3mEHCGHjWxAKJa2u7rSfnoFMd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I//GKY3T; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-385e3621518so760910f8f.1
+        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 03:08:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734088113; x=1734692913; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LQ4blGxlluPeBYaVfrCec1bwwJc6f9bR30P9uNxoMjM=;
+        b=I//GKY3TfnTgdi0/v+QaYP6FKxxEffMHqRMhg5wSSEuJs7wdPJHvUPGaO9BuruHWnM
+         1STN6yQeI6EW9uaaYJNrOxgU6UdjEVWkxrMaVv/wFWsZZXZ4Duf2yKiDcmq9sXSUiE4I
+         VWSCf3ffE7RLeIW0MGUnoszkwqwuU+WZaIVE8PTGd+xvfNC2KC3uekHl/u7wYWAZX9HV
+         l7WAfhWr4+BnrnY8lMv5fLIbv9SbF3/x2ehWoWMupuWD7/aBTm+5+SQ8Bgy9YEDXDpdr
+         z8aXwQxN7nxaPNLjVD0NUiqrTKB3Lem/xVclrgQE2kZKyY0bl9/opwztWb3oTFnWN2PJ
+         rUTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734088113; x=1734692913;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LQ4blGxlluPeBYaVfrCec1bwwJc6f9bR30P9uNxoMjM=;
+        b=eksmJhPEH6nHJScjWyYLbO0BhfLjf9D/gyw/rxvnpFCQVdJ7V5ZGUTUbJQXUftLesw
+         s4PYxbl5elTifh8P0jKl9T2dwLhmtWYja4k3dJQ2KIt3CJOiUcw116jx3fyxcBPUnYpr
+         hv70LHPw9W9wEsUWDrx05StR5cmoEi9VTCX/Je4DnNSVriYwYL71pXSisoct/gJCtLVy
+         SkBaI2iExJBTTbr6mbjsjn2SLRAMgGCVe0XIGh48eU7AMUJksM/f1UsinVP6CsnOCpps
+         A1u1WogfC2jRTjPUrEDmX3XkAKBLlxDPWrBLU4U0UUqIRyqdF0MOeTZs50ye+yRAnwZP
+         HBzg==
+X-Gm-Message-State: AOJu0Ywzb1Y5Wv8pBKpnFojzMxMor5kyW1ic5btJvGU89cPubke+VDqe
+	Ftx70dIC+VJM3BrJdxd8MbIwdvuPm3pkb2heIRfAe55ZBTEWt+QV8MOmPA==
+X-Gm-Gg: ASbGncuVdBOzy0y/Qr9SSzUXQ6rZlUZSREL0IyqysWgqcWpiEePz/D3s2bqwrwvM3hT
+	xgHftsxdeXaFbNoTbjUWOShU2KJMKPkso4wDWAIOW3bql/dCoOUBVIHgvzCVImh+knEKl3csNXl
+	BMtNY7PwSwemDU4nZGFt3TCqDq8iRcIansBcw6LLGaL5mS1L8WmTZOqeH+Ez1/jRuM2abL7iLDQ
+	5hpvHUo2JBLYXg9FgbNTMml+VOaFUqPZpwKmYDpr6kw2W4wpDKxklFIEcmvNA/Nr3CdZwt5b1Y=
+X-Google-Smtp-Source: AGHT+IE22j6UBKyiKr3RkwybbxhzbhIt2F6iVXbqCjk7PADx6drmOxmjN1mmC7Fe0s0g8o64bIAzWA==
+X-Received: by 2002:a05:6000:1ac9:b0:385:f6c7:90c6 with SMTP id ffacd0b85a97d-38880acd940mr1693319f8f.20.1734088112405;
+        Fri, 13 Dec 2024 03:08:32 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:dda3:d162:f7b1:f903])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3878248f521sm6709004f8f.16.2024.12.13.03.08.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Dec 2024 03:08:31 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 2/7] net: stmmac: move tx_lpi_timer tracking to
- phylib
-Message-ID: <Z1wTqh-BnvPYLqU8@shell.armlinux.org.uk>
-References: <Z1r3MWZOt36SgGxf@shell.armlinux.org.uk>
- <E1tLkSX-006qfS-Rx@rmk-PC.armlinux.org.uk>
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v1] netlink: specs: add uint, sint to netlink-raw schema
+Date: Fri, 13 Dec 2024 11:08:27 +0000
+Message-ID: <20241213110827.32250-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1tLkSX-006qfS-Rx@rmk-PC.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 12, 2024 at 02:46:33PM +0000, Russell King (Oracle) wrote:
-> @@ -1092,6 +1092,7 @@ static void stmmac_mac_link_up(struct phylink_config *config,
->  			phy_init_eee(phy, !(priv->plat->flags &
->  				STMMAC_FLAG_RX_CLK_RUNS_IN_LPI)) >= 0;
->  		priv->eee_enabled = stmmac_eee_init(priv);
-> +		priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
->  		priv->tx_lpi_enabled = priv->eee_enabled;
->  		stmmac_set_eee_pls(priv, priv->hw, true);
->  	}
+Add uint, sint to the list of attr types in the netlink-raw schema. This
+fixes the rt_link spec which had a uint attr added in commit
+f858cc9eed5b ("net: add IFLA_MAX_PACING_OFFLOAD_HORIZON device attribute")
 
-While looking deeper at stmmac, there's a bug in the above hunk -
-stmmac_eee_init() makes use of priv->tx_lpi_timer, so this member
-needs to be set before calling this function. I'll post a v2 shortly.
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+---
+ Documentation/netlink/netlink-raw.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
+index 914aa1c0a273..1b0772c8e333 100644
+--- a/Documentation/netlink/netlink-raw.yaml
++++ b/Documentation/netlink/netlink-raw.yaml
+@@ -221,7 +221,7 @@ properties:
+               type: &attr-type
+                 description: The netlink attribute type
+                 enum: [ unused, pad, flag, binary, bitfield32,
+-                        u8, u16, u32, u64, s8, s16, s32, s64,
++                        uint, sint, u8, u16, u32, u64, s8, s16, s32, s64,
+                         string, nest, indexed-array, nest-type-value,
+                         sub-message ]
+               doc:
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.47.1
+
 
