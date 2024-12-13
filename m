@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-151651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A2FF9F07B4
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:22:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 898E59F07B9
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:22:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA8C2283E19
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 09:22:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45B84282B67
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 09:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2291AF0CE;
-	Fri, 13 Dec 2024 09:22:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48CCF1B0103;
+	Fri, 13 Dec 2024 09:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gojoqSF0"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pmGN40WE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2163D1B218A
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 09:22:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E51E1B0F00
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 09:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734081727; cv=none; b=kzpfcqjtir/MyyneKxeC7pjlhsiYDUupsVvrLSAurq8LXLB2YnB6e3jHyQt1sGntWmPpYOHz5x9WByvqBZOAYBmmc9M0B6WSGNpOTI7V9cRIInSEbIDpXixLSNdrKJ/vxnq3fOKVZWONXnKua6zF5DuN7iMa1c2AXJFXC9wCZqA=
+	t=1734081750; cv=none; b=oPZHoFTEOiqI5cVpsE6nHN4fJZNVZ2RL+E68xLl6JGBRqraN+FCkatM9q9fx1ewSSSDk567xi9aWMUH0OfXjtFX40PZW4d4JQAQHHYkClgOwMENyZ67gKTkLWj9gLec+O9FnslWls6cWgBK2P9yPxZUGYmffDny/6zZMWd9w2hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734081727; c=relaxed/simple;
-	bh=lJv2EINJ+/UrH9nDHo7iImZ0qofQ8bwmPRdGVXM4Oao=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AtiC0dz0lL1XiOc6ycV8tckJKLGwHnH263qPUtzgrmVnJqV4W8ZS7AQKg1RQbqFw7vqxJQD1R3ewKrOh+oxHX8E6bDZWnNB5GNnkpEKw1+frpq2hvnqwn0q09Fh0sYZRLcT2cji+0FJJLXxEIDcyZavq0BrIZxwU1jRQL4WrxFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gojoqSF0; arc=none smtp.client-ip=52.119.213.154
+	s=arc-20240116; t=1734081750; c=relaxed/simple;
+	bh=UDGllqEUUrZF/6yG7hAvbajFDJ0JNCJvyw8eQTbhPz0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AwAmAeO6MCsjNFzXUpKT4HwNnYaXFeFZdzjx9I7+I1zPx3P/sc03QEDg/biG9EvuMfIdi7gmaaeWeM4lO7jSwF2V+jK9BziPpt2rub55jEHKj9T5MpRveydEnVOAKL6YoQT7P0ZyceJl+O+SMZKchlgQwMUzxh8s3CWCjVXeo00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pmGN40WE; arc=none smtp.client-ip=52.95.48.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1734081724; x=1765617724;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=filTZnLUr2rbCPlKqKBLFPWglgFmpbUGZfBKN+Nu/d4=;
-  b=gojoqSF0oOEATnT1eoMriZhY310e0Hohe/jiMofDP/VHoTdn56iZAYtL
-   7IQCN8ft6wRuuP58cfpE+OFYbRkQcdYGmYBUArZDyfpY3gkFVi7p5dpm5
-   Rf+vDj7Lflbv2CndFVB04Vctrb/LzAYbaz9WzIpqYXgW+GZr5RRuvqpJs
-   M=;
+  t=1734081747; x=1765617747;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=zZzaPa2fGf+HXAdzh00hSvGf/HLk4hziAhpzPWmbyNo=;
+  b=pmGN40WEFnGveRuaN0BKd9wt0xQBT1AFaLRmtMmG9oRPUeuhTnlw3zom
+   Ml0w/bC13cWWTQWyzsSoNwRiSUGuXdzZaXRs5gIVCltywpi3J2CeHKlC+
+   5GsA9RIVRGqemXJnKXv03/meuPBigaiWR2IDrxfFPmVJUiXviw/u4ImQA
+   0=;
 X-IronPort-AV: E=Sophos;i="6.12,230,1728950400"; 
-   d="scan'208";a="254687486"
+   d="scan'208";a="445545413"
 Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 09:22:01 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:18043]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.45.5:2525] with esmtp (Farcaster)
- id 9606489a-edb6-4065-a2fb-31dd67fa8951; Fri, 13 Dec 2024 09:22:01 +0000 (UTC)
-X-Farcaster-Flow-ID: 9606489a-edb6-4065-a2fb-31dd67fa8951
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 09:22:22 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:42145]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.27:2525] with esmtp (Farcaster)
+ id 9a6b6ef7-7a8d-47c9-a04d-752a1af3d10c; Fri, 13 Dec 2024 09:22:22 +0000 (UTC)
+X-Farcaster-Flow-ID: 9a6b6ef7-7a8d-47c9-a04d-752a1af3d10c
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 13 Dec 2024 09:22:01 +0000
+ Fri, 13 Dec 2024 09:22:21 +0000
 Received: from 6c7e67c6786f.amazon.com (10.119.14.208) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 13 Dec 2024 09:21:57 +0000
+ Fri, 13 Dec 2024 09:22:18 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 00/15] treewide: socket: Clean up sock_create() and friends.
-Date: Fri, 13 Dec 2024 18:21:37 +0900
-Message-ID: <20241213092152.14057-1-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 01/15] socket: Un-export __sock_create().
+Date: Fri, 13 Dec 2024 18:21:38 +0900
+Message-ID: <20241213092152.14057-2-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241213092152.14057-1-kuniyu@amazon.com>
+References: <20241213092152.14057-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,215 +77,275 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB003.ant.amazon.com (10.13.139.176) To
+X-ClientProxiedBy: EX19D042UWB003.ant.amazon.com (10.13.139.135) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-There are a bunch of weird usages of sock_create() and friends due
-to poor documentation.
+Since commit eeb1bd5c40ed ("net: Add a struct net parameter to
+sock_create_kern"), we no longer need to export __sock_create()
+and can replace all non-core users with sock_create_kern().
 
-  1) some subsystems use __sock_create(), but all of them can be
-     replaced with sock_create_kern()
+Let's convert them and un-export __sock_create().
 
-  2) some subsystems use sock_create(), but most of the sockets are
-     not tied to userspace processes nor exposed via file descriptors
-     but are (most likely unintentionally) exposed to some BPF hooks
-     (infiniband, ISDN, NVMe over TCP, iscsi, Xen PV call, ocfs2, smbd)
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ fs/smb/client/connect.c        |  4 ++--
+ include/linux/net.h            |  2 --
+ net/9p/trans_fd.c              |  8 ++++----
+ net/handshake/handshake-test.c | 32 ++++++++++++++------------------
+ net/socket.c                   |  3 +--
+ net/sunrpc/clnt.c              |  4 ++--
+ net/sunrpc/svcsock.c           |  2 +-
+ net/sunrpc/xprtsock.c          |  6 +++---
+ net/wireless/nl80211.c         |  4 ++--
+ 9 files changed, 29 insertions(+), 36 deletions(-)
 
-  3) some subsystems use sock_create_kern() and convert the sockets
-     to hold netns refcnt (cifs, mptcp, rds, smc, and sunrpc)
-
-The primary goal is to sort out such confusion and provide enough
-documentation for future developers to choose an appropriate API.
-
-Regarding 3), we introduce a new API, sock_create_net(), that holds
-a netns refcnt for kernel socket to remove the socket conversion to
-avoid use-after-free triggered by TCP kernel socket after commit
-26abe14379f8 ("net: Modify sk_alloc to not reference count the netns
-of kernel sockets.").
-
-Finally, we rename sock_create() and sock_create_kern() to
-sock_create_user() and sock_create_net_noref(), respectively.
-This intentionally breaks out-of-tree drivers to give the owners
-a chance to choose an appropriate API.
-
-Throughout the series, we follow the definition below:
-
-  userspace socket:
-    * created by sock_create_user()
-    * holds the reference count of the network namespace
-    * directly linked to a file descriptor
-      * currently all sockets created by sane sock_create() users
-        are tied to userspace process and exposed via file descriptors
-    * accessed via a file descriptor (and some BPF hooks except
-      for BPF LSM)
-
-  kernel socket
-    * created by sock_create_net() or sock_create_net_noref()
-      * the former holds the refcnt of netns, but the latter doesn't
-    * not directly exposed to userspace via a file descriptor nor BPF
-      except for BPF LSM
-
-Note that __sock_create(kern=1) skips some LSMs (SELinux, AppArmor)
-but not all; BPF LSM can enforce security regardless of the argument.
-
-Since this refactoring is huge, there will be a concern that
-the series could make the future backport difficult.  However,
-socket() / accept() / sk_alloc() paths are unlikely to have many
-bugs and backports.  For example, net/socket.c has few backports
-and only 631083143315 touches __sock_create() in 6.1 and 6.6.
-
-  $ for v in 6.12 6.6 6.1 5.15 5.10 5.4; \
-  do \
-    echo "$v : $(git log --oneline stable/linux-$v.y...v$v -- net/socket.c | wc -l)"; \
-  done
-  6.12 : 0
-  6.6 : 7
-  6.1 : 13
-  5.15 : 8
-  5.10 : 13
-  5.4 : 13
-
-
-Changes:
-  v3:
-    * Drop /proc/net/sockstat patch
-    * Add a patch to make sock_inuse_add() static
-
-  v2: https://lore.kernel.org/netdev/20241210073829.62520-1-kuniyu@amazon.com/
-    * Patch 8
-      * Fix build error for PF_IUCV
-    * Patch 12
-      * Collect Acked-by from MPTCP/RDS maintainers
-
-  v1: https://lore.kernel.org/netdev/20241206075504.24153-1-kuniyu@amazon.com/
-
-
-Kuniyuki Iwashima (15):
-  socket: Un-export __sock_create().
-  socket: Pass hold_net flag to __sock_create().
-  smc: Pass kern to smc_sock_alloc().
-  socket: Pass hold_net to struct net_proto_family.create().
-  ppp: Pass hold_net to struct pppox_proto.create().
-  nfc: Pass hold_net to struct nfc_protocol.create().
-  socket: Add hold_net flag to struct proto_accept_arg.
-  socket: Pass hold_net to sk_alloc().
-  socket: Respect hold_net in sk_alloc().
-  socket: Introduce sock_create_net().
-  socket: Remove kernel socket conversion.
-  socket: Move sock_inuse_add() to sock.c.
-  socket: Use sock_create_net() instead of sock_create().
-  socket: Rename sock_create() to sock_create_user().
-  socket: Rename sock_create_kern() to sock_create_net_noref().
-
- crypto/af_alg.c                               |   7 +-
- drivers/block/drbd/drbd_receiver.c            |  12 +-
- drivers/infiniband/hw/erdma/erdma_cm.c        |   6 +-
- drivers/infiniband/sw/rxe/rxe_qp.c            |   2 +-
- drivers/infiniband/sw/siw/siw_cm.c            |   6 +-
- drivers/isdn/mISDN/l1oip_core.c               |   3 +-
- drivers/isdn/mISDN/socket.c                   |  17 +-
- drivers/net/ppp/pppoe.c                       |   5 +-
- drivers/net/ppp/pppox.c                       |   4 +-
- drivers/net/ppp/pptp.c                        |   5 +-
- drivers/net/tap.c                             |   2 +-
- drivers/net/tun.c                             |   2 +-
- drivers/nvme/host/tcp.c                       |   5 +-
- drivers/nvme/target/tcp.c                     |   5 +-
- drivers/soc/qcom/qmi_interface.c              |   4 +-
- drivers/target/iscsi/iscsi_target_login.c     |   7 +-
- drivers/xen/pvcalls-back.c                    |   7 +-
- drivers/xen/pvcalls-front.c                   |   3 +-
- fs/afs/rxrpc.c                                |   3 +-
- fs/dlm/lowcomms.c                             |   8 +-
- fs/ocfs2/cluster/tcp.c                        |  10 +-
- fs/smb/client/connect.c                       |  13 +-
- fs/smb/server/transport_tcp.c                 |   7 +-
- include/linux/if_pppox.h                      |   3 +-
- include/linux/net.h                           |  11 +-
- include/net/bluetooth/bluetooth.h             |   3 +-
- include/net/llc_conn.h                        |   2 +-
- include/net/sctp/structs.h                    |   2 +-
- include/net/sock.h                            |  12 +-
- io_uring/net.c                                |   2 +
- net/9p/trans_fd.c                             |   8 +-
- net/appletalk/ddp.c                           |   4 +-
- net/atm/common.c                              |   5 +-
- net/atm/common.h                              |   3 +-
- net/atm/pvc.c                                 |   4 +-
- net/atm/svc.c                                 |   8 +-
- net/ax25/af_ax25.c                            |   7 +-
- net/bluetooth/af_bluetooth.c                  |   9 +-
- net/bluetooth/bnep/sock.c                     |   5 +-
- net/bluetooth/cmtp/sock.c                     |   4 +-
- net/bluetooth/hci_sock.c                      |   4 +-
- net/bluetooth/hidp/sock.c                     |   5 +-
- net/bluetooth/iso.c                           |  11 +-
- net/bluetooth/l2cap_sock.c                    |  14 +-
- net/bluetooth/rfcomm/core.c                   |   3 +-
- net/bluetooth/rfcomm/sock.c                   |  12 +-
- net/bluetooth/sco.c                           |  11 +-
- net/bpf/test_run.c                            |   2 +-
- net/caif/caif_socket.c                        |   4 +-
- net/can/af_can.c                              |   4 +-
- net/ceph/messenger.c                          |   6 +-
- net/core/sock.c                               |  19 ++-
- net/handshake/handshake-test.c                |  33 ++--
- net/ieee802154/socket.c                       |   4 +-
- net/ipv4/af_inet.c                            |   7 +-
- net/ipv4/udp_tunnel_core.c                    |   2 +-
- net/ipv6/af_inet6.c                           |   4 +-
- net/ipv6/ip6_udp_tunnel.c                     |   4 +-
- net/iucv/af_iucv.c                            |  13 +-
- net/kcm/kcmsock.c                             |   6 +-
- net/key/af_key.c                              |   4 +-
- net/l2tp/l2tp_core.c                          |   8 +-
- net/l2tp/l2tp_ppp.c                           |   6 +-
- net/llc/af_llc.c                              |   6 +-
- net/llc/llc_conn.c                            |  11 +-
- net/mctp/af_mctp.c                            |   4 +-
- net/mctp/test/route-test.c                    |   6 +-
- net/mptcp/pm_netlink.c                        |   4 +-
- net/mptcp/subflow.c                           |  12 +-
- net/netfilter/ipvs/ip_vs_sync.c               |   8 +-
- net/netlink/af_netlink.c                      |  11 +-
- net/netrom/af_netrom.c                        |   7 +-
- net/nfc/af_nfc.c                              |   5 +-
- net/nfc/llcp.h                                |   3 +-
- net/nfc/llcp_core.c                           |   3 +-
- net/nfc/llcp_sock.c                           |  10 +-
- net/nfc/nfc.h                                 |   3 +-
- net/nfc/rawsock.c                             |   5 +-
- net/packet/af_packet.c                        |   4 +-
- net/phonet/af_phonet.c                        |   4 +-
- net/phonet/pep.c                              |   2 +-
- net/qrtr/af_qrtr.c                            |   4 +-
- net/qrtr/ns.c                                 |   6 +-
- net/rds/af_rds.c                              |   4 +-
- net/rds/tcp.c                                 |  14 --
- net/rds/tcp_connect.c                         |  21 ++-
- net/rds/tcp_listen.c                          |  17 +-
- net/rose/af_rose.c                            |  11 +-
- net/rxrpc/af_rxrpc.c                          |   4 +-
- net/rxrpc/rxperf.c                            |   4 +-
- net/sctp/ipv6.c                               |   7 +-
- net/sctp/protocol.c                           |   7 +-
- net/sctp/socket.c                             |   6 +-
- net/smc/af_smc.c                              |  38 ++---
- net/smc/smc_inet.c                            |   2 +-
- net/socket.c                                  | 145 +++++++++++++-----
- net/sunrpc/clnt.c                             |   4 +-
- net/sunrpc/svcsock.c                          |  12 +-
- net/sunrpc/xprtsock.c                         |  16 +-
- net/tipc/socket.c                             |   8 +-
- net/tipc/topsrv.c                             |   4 +-
- net/unix/af_unix.c                            |  17 +-
- net/vmw_vsock/af_vsock.c                      |  10 +-
- net/wireless/nl80211.c                        |   4 +-
- net/x25/af_x25.c                              |  13 +-
- net/xdp/xsk.c                                 |   4 +-
- .../selftests/bpf/bpf_testmod/bpf_testmod.c   |   4 +-
- 107 files changed, 512 insertions(+), 403 deletions(-)
-
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 2372538a1211..c36c1b4ffe6e 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -3133,8 +3133,8 @@ generic_ip_connect(struct TCP_Server_Info *server)
+ 		struct net *net = cifs_net_ns(server);
+ 		struct sock *sk;
+ 
+-		rc = __sock_create(net, sfamily, SOCK_STREAM,
+-				   IPPROTO_TCP, &server->ssocket, 1);
++		rc = sock_create_kern(net, sfamily, SOCK_STREAM,
++				      IPPROTO_TCP, &server->ssocket);
+ 		if (rc < 0) {
+ 			cifs_server_dbg(VFS, "Error %d creating socket\n", rc);
+ 			return rc;
+diff --git a/include/linux/net.h b/include/linux/net.h
+index b75bc534c1b3..68ac97e301be 100644
+--- a/include/linux/net.h
++++ b/include/linux/net.h
+@@ -251,8 +251,6 @@ int sock_wake_async(struct socket_wq *sk_wq, int how, int band);
+ int sock_register(const struct net_proto_family *fam);
+ void sock_unregister(int family);
+ bool sock_is_registered(int family);
+-int __sock_create(struct net *net, int family, int type, int proto,
+-		  struct socket **res, int kern);
+ int sock_create(int family, int type, int proto, struct socket **res);
+ int sock_create_kern(struct net *net, int family, int type, int proto, struct socket **res);
+ int sock_create_lite(int family, int type, int proto, struct socket **res);
+diff --git a/net/9p/trans_fd.c b/net/9p/trans_fd.c
+index 196060dc6138..83f81da24727 100644
+--- a/net/9p/trans_fd.c
++++ b/net/9p/trans_fd.c
+@@ -1011,8 +1011,8 @@ p9_fd_create_tcp(struct p9_client *client, const char *addr, char *args)
+ 	sin_server.sin_family = AF_INET;
+ 	sin_server.sin_addr.s_addr = in_aton(addr);
+ 	sin_server.sin_port = htons(opts.port);
+-	err = __sock_create(current->nsproxy->net_ns, PF_INET,
+-			    SOCK_STREAM, IPPROTO_TCP, &csocket, 1);
++	err = sock_create_kern(current->nsproxy->net_ns, PF_INET,
++			       SOCK_STREAM, IPPROTO_TCP, &csocket);
+ 	if (err) {
+ 		pr_err("%s (%d): problem creating socket\n",
+ 		       __func__, task_pid_nr(current));
+@@ -1062,8 +1062,8 @@ p9_fd_create_unix(struct p9_client *client, const char *addr, char *args)
+ 
+ 	sun_server.sun_family = PF_UNIX;
+ 	strcpy(sun_server.sun_path, addr);
+-	err = __sock_create(current->nsproxy->net_ns, PF_UNIX,
+-			    SOCK_STREAM, 0, &csocket, 1);
++	err = sock_create_kern(current->nsproxy->net_ns, PF_UNIX,
++			       SOCK_STREAM, 0, &csocket);
+ 	if (err < 0) {
+ 		pr_err("%s (%d): problem creating socket\n",
+ 		       __func__, task_pid_nr(current));
+diff --git a/net/handshake/handshake-test.c b/net/handshake/handshake-test.c
+index 55442b2f518a..4f300504f3e5 100644
+--- a/net/handshake/handshake-test.c
++++ b/net/handshake/handshake-test.c
+@@ -143,14 +143,18 @@ static void handshake_req_alloc_case(struct kunit *test)
+ 	kfree(result);
+ }
+ 
++static int handshake_sock_create(struct socket **sock)
++{
++	return sock_create_kern(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP, sock);
++}
++
+ static void handshake_req_submit_test1(struct kunit *test)
+ {
+ 	struct socket *sock;
+ 	int err, result;
+ 
+ 	/* Arrange */
+-	err = __sock_create(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP,
+-			    &sock, 1);
++	err = handshake_sock_create(&sock);
+ 	KUNIT_ASSERT_EQ(test, err, 0);
+ 
+ 	/* Act */
+@@ -190,8 +194,7 @@ static void handshake_req_submit_test3(struct kunit *test)
+ 	req = handshake_req_alloc(&handshake_req_alloc_proto_good, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_NULL(test, req);
+ 
+-	err = __sock_create(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP,
+-			    &sock, 1);
++	err = handshake_sock_create(&sock);
+ 	KUNIT_ASSERT_EQ(test, err, 0);
+ 	sock->file = NULL;
+ 
+@@ -216,8 +219,7 @@ static void handshake_req_submit_test4(struct kunit *test)
+ 	req = handshake_req_alloc(&handshake_req_alloc_proto_good, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_NULL(test, req);
+ 
+-	err = __sock_create(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP,
+-			    &sock, 1);
++	err = handshake_sock_create(&sock);
+ 	KUNIT_ASSERT_EQ(test, err, 0);
+ 	filp = sock_alloc_file(sock, O_NONBLOCK, NULL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, filp);
+@@ -251,8 +253,7 @@ static void handshake_req_submit_test5(struct kunit *test)
+ 	req = handshake_req_alloc(&handshake_req_alloc_proto_good, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_NULL(test, req);
+ 
+-	err = __sock_create(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP,
+-			    &sock, 1);
++	err = handshake_sock_create(&sock);
+ 	KUNIT_ASSERT_EQ(test, err, 0);
+ 	filp = sock_alloc_file(sock, O_NONBLOCK, NULL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, filp);
+@@ -289,8 +290,7 @@ static void handshake_req_submit_test6(struct kunit *test)
+ 	req2 = handshake_req_alloc(&handshake_req_alloc_proto_good, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_NULL(test, req2);
+ 
+-	err = __sock_create(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP,
+-			    &sock, 1);
++	err = handshake_sock_create(&sock);
+ 	KUNIT_ASSERT_EQ(test, err, 0);
+ 	filp = sock_alloc_file(sock, O_NONBLOCK, NULL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, filp);
+@@ -321,8 +321,7 @@ static void handshake_req_cancel_test1(struct kunit *test)
+ 	req = handshake_req_alloc(&handshake_req_alloc_proto_good, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_NULL(test, req);
+ 
+-	err = __sock_create(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP,
+-			    &sock, 1);
++	err = handshake_sock_create(&sock);
+ 	KUNIT_ASSERT_EQ(test, err, 0);
+ 
+ 	filp = sock_alloc_file(sock, O_NONBLOCK, NULL);
+@@ -357,8 +356,7 @@ static void handshake_req_cancel_test2(struct kunit *test)
+ 	req = handshake_req_alloc(&handshake_req_alloc_proto_good, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_NULL(test, req);
+ 
+-	err = __sock_create(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP,
+-			    &sock, 1);
++	err = handshake_sock_create(&sock);
+ 	KUNIT_ASSERT_EQ(test, err, 0);
+ 
+ 	filp = sock_alloc_file(sock, O_NONBLOCK, NULL);
+@@ -399,8 +397,7 @@ static void handshake_req_cancel_test3(struct kunit *test)
+ 	req = handshake_req_alloc(&handshake_req_alloc_proto_good, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_NULL(test, req);
+ 
+-	err = __sock_create(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP,
+-			    &sock, 1);
++	err = handshake_sock_create(&sock);
+ 	KUNIT_ASSERT_EQ(test, err, 0);
+ 
+ 	filp = sock_alloc_file(sock, O_NONBLOCK, NULL);
+@@ -457,8 +454,7 @@ static void handshake_req_destroy_test1(struct kunit *test)
+ 	req = handshake_req_alloc(&handshake_req_alloc_proto_destroy, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_NULL(test, req);
+ 
+-	err = __sock_create(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP,
+-			    &sock, 1);
++	err = handshake_sock_create(&sock);
+ 	KUNIT_ASSERT_EQ(test, err, 0);
+ 
+ 	filp = sock_alloc_file(sock, O_NONBLOCK, NULL);
+diff --git a/net/socket.c b/net/socket.c
+index 9a117248f18f..433f346ffc64 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -1484,7 +1484,7 @@ EXPORT_SYMBOL(sock_wake_async);
+  *	This function internally uses GFP_KERNEL.
+  */
+ 
+-int __sock_create(struct net *net, int family, int type, int protocol,
++static int __sock_create(struct net *net, int family, int type, int protocol,
+ 			 struct socket **res, int kern)
+ {
+ 	int err;
+@@ -1598,7 +1598,6 @@ int __sock_create(struct net *net, int family, int type, int protocol,
+ 	rcu_read_unlock();
+ 	goto out_sock_release;
+ }
+-EXPORT_SYMBOL(__sock_create);
+ 
+ /**
+  *	sock_create - creates a socket
+diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
+index 0090162ee8c3..37935082d799 100644
+--- a/net/sunrpc/clnt.c
++++ b/net/sunrpc/clnt.c
+@@ -1450,8 +1450,8 @@ static int rpc_sockname(struct net *net, struct sockaddr *sap, size_t salen,
+ 	struct socket *sock;
+ 	int err;
+ 
+-	err = __sock_create(net, sap->sa_family,
+-				SOCK_DGRAM, IPPROTO_UDP, &sock, 1);
++	err = sock_create_kern(net, sap->sa_family,
++			       SOCK_DGRAM, IPPROTO_UDP, &sock);
+ 	if (err < 0) {
+ 		dprintk("RPC:       can't create UDP socket (%d)\n", err);
+ 		goto out;
+diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+index 95397677673b..9583bad3d150 100644
+--- a/net/sunrpc/svcsock.c
++++ b/net/sunrpc/svcsock.c
+@@ -1526,7 +1526,7 @@ static struct svc_xprt *svc_create_socket(struct svc_serv *serv,
+ 		return ERR_PTR(-EINVAL);
+ 	}
+ 
+-	error = __sock_create(net, family, type, protocol, &sock, 1);
++	error = sock_create_kern(net, family, type, protocol, &sock);
+ 	if (error < 0)
+ 		return ERR_PTR(error);
+ 
+diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+index c60936d8cef7..feb1768e8a57 100644
+--- a/net/sunrpc/xprtsock.c
++++ b/net/sunrpc/xprtsock.c
+@@ -1924,7 +1924,7 @@ static struct socket *xs_create_sock(struct rpc_xprt *xprt,
+ 	struct socket *sock;
+ 	int err;
+ 
+-	err = __sock_create(xprt->xprt_net, family, type, protocol, &sock, 1);
++	err = sock_create_kern(xprt->xprt_net, family, type, protocol, &sock);
+ 	if (err < 0) {
+ 		dprintk("RPC:       can't create %d transport socket (%d).\n",
+ 				protocol, -err);
+@@ -2003,8 +2003,8 @@ static int xs_local_setup_socket(struct sock_xprt *transport)
+ 	struct socket *sock;
+ 	int status;
+ 
+-	status = __sock_create(xprt->xprt_net, AF_LOCAL,
+-					SOCK_STREAM, 0, &sock, 1);
++	status = sock_create_kern(xprt->xprt_net, AF_LOCAL,
++				  SOCK_STREAM, 0, &sock);
+ 	if (status < 0) {
+ 		dprintk("RPC:       can't create AF_LOCAL "
+ 			"transport socket (%d).\n", -status);
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index dd84fc54fb9b..27c58fd260e0 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -13689,8 +13689,8 @@ static int nl80211_parse_wowlan_tcp(struct cfg80211_registered_device *rdev,
+ 	port = nla_get_u16_default(tb[NL80211_WOWLAN_TCP_SRC_PORT], 0);
+ #ifdef CONFIG_INET
+ 	/* allocate a socket and port for it and use it */
+-	err = __sock_create(wiphy_net(&rdev->wiphy), PF_INET, SOCK_STREAM,
+-			    IPPROTO_TCP, &cfg->sock, 1);
++	err = sock_create_kern(wiphy_net(&rdev->wiphy), PF_INET, SOCK_STREAM,
++			       IPPROTO_TCP, &cfg->sock);
+ 	if (err) {
+ 		kfree(cfg);
+ 		return err;
 -- 
 2.39.5 (Apple Git-154)
 
