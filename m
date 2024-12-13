@@ -1,110 +1,132 @@
-Return-Path: <netdev+bounces-151768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB8879F0CED
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 14:06:55 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2BA39F0CF4
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 14:07:44 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC0AD28313D
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:06:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6313F188A84A
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FE981DEFDD;
-	Fri, 13 Dec 2024 13:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788501DFE2C;
+	Fri, 13 Dec 2024 13:07:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Oe3jm4pf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bFLaDf2f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F05D1A8F85
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 13:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A656B1B3922
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 13:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734095212; cv=none; b=InS7HPBpX06i7lkpQkOrJgvKlZi/aNP2449otmzajlrjd7AE/hy3nQBGC756kzk1d4V+91hOmUcfAejMGq3J/8wUXbzCTmvl2nBdcLGZHqr/XLE28lrN7xombj7EZBBs2UTa4HaFN0Ax5Z2/cn1w2j6YJQIUfA6rbUKOgX+whm0=
+	t=1734095250; cv=none; b=TbxqA/q49p7TI1k3OuYMZqcfXlpXM9QFeEyYZdK20kFjcpfVeRXLmDr/Z3H5hEfzkLkjxAHMZzo/zJ81s3p7gT/GmkTmaimWZWuEEueh5pxUs9GxGWKeTQkiOds3PFOJKO1G9hKGwua6eVZpOHpSHZi5P9bsuEebqUhNpkE2a0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734095212; c=relaxed/simple;
-	bh=ks9DxICgxlU/gCz85Nt643+qsojkXRxw0Z3p4r21hzo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=r6xqVJApeMiQILlhR/P9joYRVd/ScXMKsGD/lwTgaMTzUmDnkHi9RZ2NySLcTVvJLOkamWuVxrQYRDIDjta+OHMlbaxRdy1jlk81QGRs5lYZBYli3ooguj8w82xZ4Ejor/z81uHsD5s4kxCa1eBclm6LgnFvzpntQ8Je32i5ntM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Oe3jm4pf; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5d3e8f64d5dso3087769a12.3
-        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 05:06:50 -0800 (PST)
+	s=arc-20240116; t=1734095250; c=relaxed/simple;
+	bh=aUeCvcpTmnZ7DO6kPu73Qvod3ib0Q0iS6VNZQj8ecbs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=blHf73LQd6VlxttIW0ZSLO1WmXZEVWSWa1fweOg1ckkTa78Izl8rbPi3EfIwXSSRB7jrEI/xPKaEJLdGik/9PZbgvZkN0cumPaTMKj/HqRBpdUKoNIbIQ1bTPzpAnvZyH7iF1hmJ7EvnHUytazE4AIPDuGzmKlNUSqbmEonoyz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bFLaDf2f; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-436202dd730so12403105e9.2
+        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 05:07:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1734095208; x=1734700008; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ks9DxICgxlU/gCz85Nt643+qsojkXRxw0Z3p4r21hzo=;
-        b=Oe3jm4pfsa4rasaSL6ES7p5HrHxEN6/SaWKZOKG3mYyyXeq9SNcOG+8eilqxGO7OZk
-         UaId2xXnPB/x3uxJ4Ikw+MlIrDJArA6Q5J4LuRTCFGRpOHD+rFlGgBy/m54vsYR624Hy
-         cuhr4XDfVtlKZ7VgWlu0olGuLTjc4Cvk9YoCdRNtF7uPgno3WuQMX4bLRArYsolphbZc
-         1YZ4Lne9YrPwjTGnVjZEn/euKk5+rgl9batyB/g3QARNVU/QNp+QsjHslTw85pTepwAQ
-         ODrdPudYMM/FdT4UeR0x3Bk8vkqAQXIKgnO3/yJ6lSy+MotDpv02wKxaaf4eHd7Lu255
-         SvJw==
+        d=gmail.com; s=20230601; t=1734095245; x=1734700045; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eereptyc8NoqpTc1cXCD0uSN1W8/KqI4a9obj7asMw0=;
+        b=bFLaDf2fXuLBCkGos+H1httk+2ZcOFgQYGhBBnjXV2iilamZrp2x/narqF8fAi581b
+         SNPH+3wA3syTdyo+cuyv9CQTvjCea0PeUC6PcjHvVauhwyhcIF2Mdq1NFY2JfKB6WzHH
+         ZEFR5/PvvjjIjRdou1CLzdh3KDpdiTuBPDvNya+YuME8hJxozM1xOGF0FYifTiLCmZuT
+         2haE5992KGTMByHWMFC+FIbuQNb82gf6P4+U0Uq2Sir4gFJ0lOp6inl1bWq3eyvWvkxb
+         E8sP/Q1x08QLrQDH20x4V/BFwjZSYrxFcgyLjtOT8REzr5qBWzUfwKAIT8lYNlLtJe6Z
+         cFEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734095208; x=1734700008;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ks9DxICgxlU/gCz85Nt643+qsojkXRxw0Z3p4r21hzo=;
-        b=WFC6ZL5DooWEbdoeM+naDK6t4jCzdGpHQkNdpNuu55/JFtNiQL9epmJqd0X2v3H0Nw
-         UIGUFLfpLnkyv+mD39zvJlkSEX8eNO08Z9L4UIN5xtV48zxcDXfvG1tSVYhb0l7XhMba
-         FmYD3d1v2oJb0VFsyUVGZqNWfxuVWkK191w1CetGBNj0R8Bt42LfAMtJZ4fmXw2i/cJp
-         F5Q09zZEicGfkflhFTXWlPRyCUYLzKQ9nQro75gKIJX/FUOEHX0wKLzD5cdaGhjFYi5N
-         mxS3nQw+7iy21A3Q+ZlhoZkERlUAjmf5BYKMjSqoJF8LOX4qbah5G74wjAXFoSXKJuLM
-         vLnw==
-X-Gm-Message-State: AOJu0YyWhx4KTwMFNiKCQlg4mJk2Fg2HMkhB8YYpXg1In59lVx/30PGp
-	6NFtqUwn3HZX6V2xoZVAWN0Qoe+yjQ1/VKrRbad0NcsDO01VEnxr31Zp3wp83NYArX7ZKW1T/g7
-	isqo=
-X-Gm-Gg: ASbGncvlkNGvyhj2sYwDVnHkZNoIbuousfOVDTYPmPRE7hXaDLV9sQSdtmFUkwGzWVW
-	6vA9k5exvG1wVkvigxTjmg/u1V1eFasuGuLAdOHeKJT/iQZsJgcXg2zAFA0DJ0iXfs0rOCjV1Vi
-	wnRNb/kADSvgvyM2kkkDTbQMSRG2XTZsP+1OI7IzXV+CRsr/WCzwd1jRAHZ9oZuxwzWHS32h2H6
-	kXYmNMtxBTsPuFvD1Tx7CjWCV+doiJtbFh35hcZK2JdUnSiag==
-X-Google-Smtp-Source: AGHT+IGi0Ivecp5KJPLbfmwXXpWyVpr874E4nNajYZGt+2C76HKEnAVjhEX898dWwyAVYJQyWqD1VA==
-X-Received: by 2002:a17:907:780a:b0:aa6:8520:7187 with SMTP id a640c23a62f3a-aab779c1398mr275210166b.36.1734095208211;
-        Fri, 13 Dec 2024 05:06:48 -0800 (PST)
-Received: from cloudflare.com ([2a09:bac5:506b:2387::38a:31])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa66fd738d4sm837423466b.177.2024.12.13.05.06.47
+        d=1e100.net; s=20230601; t=1734095245; x=1734700045;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eereptyc8NoqpTc1cXCD0uSN1W8/KqI4a9obj7asMw0=;
+        b=cnS7C5i5OvVu0hLd6qmw4S3qBXNs90vkSXsMdTzmiaGrRDpT9KJt/P+0IyJwgN6Qkd
+         YQDIM13Tiauljzymc0rh+zpNo+GidwP4yybNPzUYaYmr8fhM8aK9UlMkGqyGsSUOXS5R
+         oDlBbl7+dEpabBtDj3STZY847NScvGPxFnvB1phgOL5dkk+CariUEKe6J6yI+w3npC0Y
+         bATb4qpC6E2yWngFV1IaZMfg1vRefP45jMAZS4AdGSZ4a3gwH6UQFuUmdrXarRZHI+Ia
+         rzi2yJsyte55dCrIunAeQCaAb4CMAOrbOiIMm4IbLjVJH6c5N/Hmnf4SejQoRRzdfMie
+         z9hA==
+X-Gm-Message-State: AOJu0YzvEnVcFq+Rkl03dbUUdRBJWscE4IQB7v5Ydzp0HyDnQ+k5LAU/
+	hE2SDC2mnbbFQ/3epg7r3+15tzolTNFaFZnhQjtta49yVwyYBixAuIl8qv7v
+X-Gm-Gg: ASbGncsP5JoGOmoL0fRDuNidfYD/hAGSVb1XrOa/wXGV/ZT6cXaEiygMNDsQs8hYZeB
+	ndwrtSwBO/1oAUW8qfDvo0+akNke0rY+GUSUEtDYUk+sGBP+XWSi7HhD0OyPLIZ6PSaRE/l0Hs1
+	bDc/pELwOnuIdeD9TxzLqepswA90qeBRrjqregwfKoHQwPAviIIJOtjzelbuuibclOEwOcHA3P5
+	dnCHJNxCpRB1Fs/W0ztwXVt+K8MXfKwzUMMkZimcS1TekRYASyX+YmC3LrO2OxAq/1rh4yy6vA=
+X-Google-Smtp-Source: AGHT+IFsyAQAsDo/fwq6Gkn1S5Wgm0bDyP8k2lqjAAOyubw2lS3hDHEjQf6bj1WCDC08s/IV778MYg==
+X-Received: by 2002:a05:600c:5397:b0:433:c76d:d57e with SMTP id 5b1f17b1804b1-4362aa34e4cmr18832755e9.5.1734095245223;
+        Fri, 13 Dec 2024 05:07:25 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:dda3:d162:f7b1:f903])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436256b7d46sm48562985e9.35.2024.12.13.05.07.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 05:06:47 -0800 (PST)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Jason Xing <kerneljasonxing@gmail.com>,  Adrien
- Vasseur <avasseur@cloudflare.com>,  Lee Valentine
- <lvalentine@cloudflare.com>,  kernel-team@cloudflare.com
-Subject: Re: [PATCH net-next v2 0/2] Make TIME-WAIT reuse delay
- deterministic and configurable
-In-Reply-To: <20241209-jakub-krn-909-poc-msec-tw-tstamp-v2-0-66aca0eed03e@cloudflare.com>
-	(Jakub Sitnicki's message of "Mon, 09 Dec 2024 20:38:02 +0100")
-References: <20241209-jakub-krn-909-poc-msec-tw-tstamp-v2-0-66aca0eed03e@cloudflare.com>
-Date: Fri, 13 Dec 2024 14:06:46 +0100
-Message-ID: <87ed2bu3yx.fsf@cloudflare.com>
+        Fri, 13 Dec 2024 05:07:24 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v1] tools/net/ynl: fix sub-message key lookup for nested attributes
+Date: Fri, 13 Dec 2024 13:07:11 +0000
+Message-ID: <20241213130711.40267-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 09, 2024 at 08:38 PM +01, Jakub Sitnicki wrote:
-> Packetdrill tests
-> -----------------
->
-> The packetdrill tests for TIME-WAIT reuse [3] did not change since v1.
-> Although we are not touching PAWS code any more, I would still like to add
-> tests to cover PAWS reject after TW reuse. This, however, requires patching
-> packetdrill as I mentioned in the last cover letter [2].
+Use the correct attribute space for sub-message key lookup in nested
+attributes when adding attributes. This fixes rt_link where the "kind"
+key and "data" sub-message are nested attributes in "linkinfo".
 
-Thank you for the prompt reviews. Happy to hear there are other users
-looking to adopt these.
+For example:
 
-Since patches are now in net-next, I have moved the accompanying
-packetdrill PR from Draft to Open, if you want to follow that work:
+./tools/net/ynl/cli.py \
+    --create \
+    --spec Documentation/netlink/specs/rt_link.yaml \
+    --do newlink \
+    --json '{"link": 99,
+             "linkinfo": { "kind": "vlan", "data": {"id": 4 } }
+             }'
 
-https://github.com/google/packetdrill/pull/90
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+---
+ tools/net/ynl/lib/ynl.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index 01ec01a90e76..eea29359a899 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -556,10 +556,10 @@ class YnlFamily(SpecFamily):
+         if attr["type"] == 'nest':
+             nl_type |= Netlink.NLA_F_NESTED
+             attr_payload = b''
+-            sub_attrs = SpaceAttrs(self.attr_sets[space], value, search_attrs)
++            sub_space = attr['nested-attributes']
++            sub_attrs = SpaceAttrs(self.attr_sets[sub_space], value, search_attrs)
+             for subname, subvalue in value.items():
+-                attr_payload += self._add_attr(attr['nested-attributes'],
+-                                               subname, subvalue, sub_attrs)
++                attr_payload += self._add_attr(sub_space, subname, subvalue, sub_attrs)
+         elif attr["type"] == 'flag':
+             if not value:
+                 # If value is absent or false then skip attribute creation.
+-- 
+2.47.1
+
 
