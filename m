@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-151704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8E469F0A79
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:10:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A8899F0A7D
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:11:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCEDC16A2FB
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:10:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 479A8188A9A1
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDED51CCEF6;
-	Fri, 13 Dec 2024 11:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8386F1CEAD6;
+	Fri, 13 Dec 2024 11:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="RsFQsN4w"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="jDDfaOhn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3162D1C4A17
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 11:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17EFE1CEEAB
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 11:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734088253; cv=none; b=NmaaczAm5E+5uNgUIrO5hsyjtT5rIBr6YCUxNI4NQblVvxRIlk4T/L9KmmgSQLmohA3IS4CTpRT2RQyqM8wO/Vvu5gGPg4IZRJwwqZ63rX58+jwyAMi/AA1cEan1IHmqYhUIiqmRv+GFZevKBBe/pLTbJopoB0yk+jjzE7e4GS0=
+	t=1734088271; cv=none; b=RDeKYq+o7kvYd31xjNDHIX+ZgJJqELK8/nh1+H2LWDGqY5Nx348KiTqCxjrUerGnFq+WJAzdyP1mv9zp8eX76FINMzccqlrH51s1pTc6OrtwVhR6m17bQl19sOlsA28l5RrFlc8nenutpksfNgnm53a6SV/Lf2mwbQqG/hB2w/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734088253; c=relaxed/simple;
-	bh=V1BmJ0959HgH8Mo/hNncFukz8f70UdCNr9zGhsVvCfw=;
+	s=arc-20240116; t=1734088271; c=relaxed/simple;
+	bh=bUwuAx4NQi30MALFApcrenx3ia58ywxqKspPzngOWcI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aVQAQGspvc7IyXtoRELjDoivriIPeATVSG4qqZ6aRVrISH4Zk8lCrNw5n30aKMs1jGWVKsb0kzohTZWwskDgZRm6ZpDiQ+kb3Z8Vwiz4VyEV0VMLpdEJOV0LDSEDQOExOpKihb1jNvq+0sVWlQ6mN9wUhs905NZ81Nptn/zjIho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=RsFQsN4w; arc=none smtp.client-ip=207.171.184.29
+	 MIME-Version:Content-Type; b=Uvr1FyOwDGWJ8MvLzMkhH3lh0bSdkrqisfwAIUefPqlw2CpN1siYhYuMB7qBhVINhiaLG3Cw7IVtJXJ967djSy+bG9dDk8/WPTK+14yfwMN8PdbqYt44rci/6vLMaNWqS8ZQMqre0OGN4xHj9s613Jm6jWBpaLZuifYWDieEEBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=jDDfaOhn; arc=none smtp.client-ip=52.119.213.152
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1734088253; x=1765624253;
+  t=1734088268; x=1765624268;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=C4GMTsQZIK3e/WTUSGWc1mvucMV2+fa9KW+a8sjwxP0=;
-  b=RsFQsN4wtBM343Ouqwspk8718/VvzqkQElydYbqrJI/Fl1+KP09C5HfX
-   2qYcihg0qNjgZHxvt4ktdwnXG+EjAHGX69BXe+xygJxKaeLF0xWLPdoj2
-   i+4dVBDSJAHNIwOHLIWN4QcvZr7nEexKvBr7rMbwPUXKphnVg2mz3ziyG
-   o=;
+  bh=QvHgMevHlV1sZ6QIgqY7Yatwo7KyLbz0Uih9INgouBo=;
+  b=jDDfaOhn71yPpEuzhMqrwSKKX6HbiQ5i4ekKZtJWClvlDfafbJW1fJGF
+   ALdIVIhjPdn6hoDW97C5Jqy6u1t3qbvbvs+xEKUFqaVOIY82OmxSymkvF
+   W/e8msbQYF0Fpreet4LkrM/Mk8lBDI0QmGquNKfV2+AGz7Z6zCnVxrZ6k
+   Q=;
 X-IronPort-AV: E=Sophos;i="6.12,231,1728950400"; 
-   d="scan'208";a="477825769"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 11:10:46 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:2003]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.33.57:2525] with esmtp (Farcaster)
- id d9ab8184-70b6-4e1c-b513-4404af480f9e; Fri, 13 Dec 2024 11:10:44 +0000 (UTC)
-X-Farcaster-Flow-ID: d9ab8184-70b6-4e1c-b513-4404af480f9e
+   d="scan'208";a="49107574"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 11:11:05 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:14557]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.51.231:2525] with esmtp (Farcaster)
+ id baaf783d-89e3-4e2b-8ade-185242955cd6; Fri, 13 Dec 2024 11:11:05 +0000 (UTC)
+X-Farcaster-Flow-ID: baaf783d-89e3-4e2b-8ade-185242955cd6
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 13 Dec 2024 11:10:43 +0000
+ Fri, 13 Dec 2024 11:11:04 +0000
 Received: from 6c7e67c6786f.amazon.com (10.119.14.208) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 13 Dec 2024 11:10:40 +0000
+ Fri, 13 Dec 2024 11:11:01 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next 05/12] af_unix: Set error only when needed in unix_dgram_sendmsg().
-Date: Fri, 13 Dec 2024 20:08:43 +0900
-Message-ID: <20241213110850.25453-6-kuniyu@amazon.com>
+Subject: [PATCH v2 net-next 06/12] af_unix: Move !sunaddr case in unix_dgram_sendmsg().
+Date: Fri, 13 Dec 2024 20:08:44 +0900
+Message-ID: <20241213110850.25453-7-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241213110850.25453-1-kuniyu@amazon.com>
 References: <20241213110850.25453-1-kuniyu@amazon.com>
@@ -77,113 +77,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWC001.ant.amazon.com (10.13.139.213) To
+X-ClientProxiedBy: EX19D032UWA004.ant.amazon.com (10.13.139.56) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-We will introduce skb drop reason for AF_UNIX, then we need to
-set an errno and a drop reason for each path.
+When other is NULL in unix_dgram_sendmsg(), we check if sunaddr
+is NULL before looking up a receiver socket.
 
-Let's set an error only when it's needed in unix_dgram_sendmsg().
+There are three paths going through the check, but it's always
+false for 2 out of the 3 paths: the first socket lookup and the
+second 'goto restart'.
 
-Then, we need not (re)set 0 to err.
+The condition can be true for the first 'goto restart' only when
+SOCK_DEAD is flagged for the socket found with msg->msg_name.
+
+Let's move the check to the single appropriate path.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/unix/af_unix.c | 32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+ net/unix/af_unix.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index d30bcd50527e..07d6fba99a7c 100644
+index 07d6fba99a7c..111f95384990 100644
 --- a/net/unix/af_unix.c
 +++ b/net/unix/af_unix.c
-@@ -1978,9 +1978,10 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 
- 	wait_for_unix_gc(scm.fp);
- 
--	err = -EOPNOTSUPP;
--	if (msg->msg_flags&MSG_OOB)
-+	if (msg->msg_flags & MSG_OOB) {
-+		err = -EOPNOTSUPP;
- 		goto out;
-+	}
- 
- 	if (msg->msg_namelen) {
- 		err = unix_validate_addr(sunaddr, msg->msg_namelen);
-@@ -1995,10 +1996,11 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 			goto out;
- 	} else {
- 		sunaddr = NULL;
--		err = -ENOTCONN;
- 		other = unix_peer_get(sk);
--		if (!other)
-+		if (!other) {
-+			err = -ENOTCONN;
- 			goto out;
-+		}
- 	}
- 
- 	if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
-@@ -2009,9 +2011,10 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 			goto out;
- 	}
- 
--	err = -EMSGSIZE;
--	if (len > READ_ONCE(sk->sk_sndbuf) - 32)
-+	if (len > READ_ONCE(sk->sk_sndbuf) - 32) {
-+		err = -EMSGSIZE;
- 		goto out;
-+	}
- 
- 	if (len > SKB_MAX_ALLOC) {
- 		data_len = min_t(size_t,
-@@ -2043,9 +2046,10 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+@@ -2046,11 +2046,6 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
  
  restart:
  	if (!other) {
--		err = -ECONNRESET;
--		if (sunaddr == NULL)
-+		if (!sunaddr) {
-+			err = -ECONNRESET;
- 			goto out_free;
-+		}
- 
+-		if (!sunaddr) {
+-			err = -ECONNRESET;
+-			goto out_free;
+-		}
+-
  		other = unix_find_other(sock_net(sk), sunaddr, msg->msg_namelen,
  					sk->sk_type);
-@@ -2065,9 +2069,11 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 	sk_locked = 0;
- 	unix_state_lock(other);
- restart_locked:
--	err = -EPERM;
--	if (!unix_may_send(sk, other))
+ 		if (IS_ERR(other)) {
+@@ -2105,6 +2100,9 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+ 			err = -ECONNREFUSED;
+ 		} else {
+ 			unix_state_unlock(sk);
 +
-+	if (!unix_may_send(sk, other)) {
-+		err = -EPERM;
- 		goto out_unlock;
-+	}
++			if (!sunaddr)
++				err = -ECONNRESET;
+ 		}
  
- 	if (unlikely(sock_flag(other, SOCK_DEAD))) {
- 		/*
-@@ -2080,7 +2086,6 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 		if (!sk_locked)
- 			unix_state_lock(sk);
- 
--		err = 0;
- 		if (sk->sk_type == SOCK_SEQPACKET) {
- 			/* We are here only when racing with unix_release_sock()
- 			 * is clearing @other. Never change state to TCP_CLOSE
-@@ -2108,9 +2113,10 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 		goto restart;
- 	}
- 
--	err = -EPIPE;
--	if (other->sk_shutdown & RCV_SHUTDOWN)
-+	if (other->sk_shutdown & RCV_SHUTDOWN) {
-+		err = -EPIPE;
- 		goto out_unlock;
-+	}
- 
- 	if (sk->sk_type != SOCK_SEQPACKET) {
- 		err = security_unix_may_send(sk->sk_socket, other->sk_socket);
+ 		other = NULL;
 -- 
 2.39.5 (Apple Git-154)
 
