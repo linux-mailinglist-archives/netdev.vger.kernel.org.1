@@ -1,123 +1,128 @@
-Return-Path: <netdev+bounces-151865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5634C9F1694
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:44:24 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EB259F1594
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:13:54 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 651C4188862C
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 19:44:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49EE7282DEC
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 19:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 996DA1EE00A;
-	Fri, 13 Dec 2024 19:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE611EBFF7;
+	Fri, 13 Dec 2024 19:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMTsaEJW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iLAGx6Ln"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFB51EC019;
-	Fri, 13 Dec 2024 19:38:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD451E8835
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 19:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734118731; cv=none; b=QImF8rzSWbRn/q6MCFekvgmCu+ujBiAafhIJvjzwsFBL8Mmt7ggZeBsWrpjODd5T70oEULhmMmkUIq+p4begHnmRzPCLhCwX55wcKbN1XlmJgHd1jkL9FE7HezfolIIy5NLc0xL4SbWLwOw/Wh/nn/I98gnoIfytAZqfBFyPMT0=
+	t=1734117228; cv=none; b=Gxmwg2LP1shNfTyRnL/Vr86qwGS8XPOx7wL9gPEPbCnWtIT4x1/UhoiuIJb6cj3ul+pU43bQxaPjCKM1m4wyP48qI2l4TiAyIf7ISq278eQIlY6LxFpMw/c0nItjwqP6zRECwTYTRwVRcplRweAqr5fPk8zxxym6KWv7qdiKmN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734118731; c=relaxed/simple;
-	bh=b9+0gx6NBBz3gKRdeNlQwgV9wK9wWLpOX8qq2KWvHT0=;
+	s=arc-20240116; t=1734117228; c=relaxed/simple;
+	bh=kZ6EcUzq2jNdidPybk0fuP8u4Ugi0Aq98UlB6cj6uvg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OuEdokf+ORFY0A+DdojMAYZ54lybbiIyQChB3sAz9pFNIIeyF+hdqkt5YAmALsEEsd/z42O5bdgpmsGTeSuHWTMLEZXg/PGxHsDtMkzUnTSLz/LwDVEW4/ijRRvYGRb8xXRaRFxyNeezeiVFJNL6sE5a6p2fq8Eu62yzH78l/p4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YMTsaEJW; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2ef6af22ea8so1845383a91.0;
-        Fri, 13 Dec 2024 11:38:49 -0800 (PST)
+	 To:Cc:Content-Type; b=iKsxB3oYRpTLlqpmLXooXixatUgAHLt5pl7OyGyaTX9awUEOn8HW2jYr960tnT/XOL1X1QZq4MzUK9kR8hzbko8WeaKg5P4O1EGjbYDUJO004IBN5vdaeNQf4JnmmwLC1DkfGV/2uc9Kk1FcuVcpL4YC8uOQdxWtcsgNEqF0u7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iLAGx6Ln; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-467896541e1so31821cf.0
+        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 11:13:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734118729; x=1734723529; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734117225; x=1734722025; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=b9+0gx6NBBz3gKRdeNlQwgV9wK9wWLpOX8qq2KWvHT0=;
-        b=YMTsaEJW+AC/ijjt7zKmcKbAJ8hK8OCiJrslAaVoMvXgGJveRBkdhIJZZb8KI52JyO
-         F4hzzVgAj8UvH88JoZL1qxjyFMm+pe7xN3Nqvc5RQWyeImqi5dK/eYqL7m27u1A6o7RB
-         WAjdZ+TDIh9J/WmM19DBelxpsA+FCED7w9gwXApTZ3YjxccSPtGDiz0P5BYQXE/iE+9v
-         lh1t6NR0NpTazKGjbnrYJz3Y7wBXvZmFkzLAW9Tuz28tsA6tJuLk9ajtC9JthYsEa6RL
-         Y8V2NBh1V7bprJ94TqiaXnr9lpqJhdGXBiTzUBPlhYJ/IROMHhXFC55xDwHCEEtURjgQ
-         QC8A==
+        bh=kZ6EcUzq2jNdidPybk0fuP8u4Ugi0Aq98UlB6cj6uvg=;
+        b=iLAGx6LnNkgwcTULek/3abeKGn5V84GGIKpqrra195wc3SC2sza0AJA/eGnnU0EotC
+         8mU6Ob0v2J47UVXC9iI/8n+pmJR4cvFUN1r47/k/BGosMoUCLXVHDfmLL7qzLqHI3YDL
+         LBpECFL/4BgILVgI+mwaG2CcS8WU9r7jdHUFlbHqYmBw4K6vOaUbOkbjkhS1xqsuzyWz
+         CgCYiwGfhtY+YmSF+mWgysmHlP3AE5X1I1QSfBkzl/zKIO2z3PWUva9id6BwdC+1ln54
+         OOoBf7OesAtcBWkfJcXj/0SLBZgxr5yYLu309b2zag5sVaYtoqwA3BIRcMTsaq1n2rBX
+         Zxbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734118729; x=1734723529;
+        d=1e100.net; s=20230601; t=1734117225; x=1734722025;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=b9+0gx6NBBz3gKRdeNlQwgV9wK9wWLpOX8qq2KWvHT0=;
-        b=JwasAt7JQmZnqIxBj4e5OTJubuBcQpOY9r2wrgCUzAPAwYqij/YpavFbTImdPqKl11
-         YpgKP3YFGwJjoRvK8zxbG1Ym+oweSiRnbp2zhsh2r83b6isUnsb/rw/Rx1VYjpBGJd2X
-         FdWiWY4J2lXp1/8UN0/Hv4K2SVyrSWziI6tP3cIoNAbBvnuPzlx+QQxivKjolXv+SG1E
-         janpyI+60lRv+SPW25ZXgzw7nHo9lp/1soAMFmbwv+ydRXAW83YudG/LiZMNFEwS/+hh
-         jlI6mr52vbcg4WIT06iy2+0MPHX6NWDqhY5IUj82nqEOL7X3kewTrqPeLuL8csHamKIn
-         Kh9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUetjRR0oIUXErnptcimoqqrDvw72FKdPsUv5FUxtXFn+td5rysJ9XFKtDJxqd6WCxcSca1dXVr@vger.kernel.org, AJvYcCVyGZw3YnBtEP012AJy7qEKwmarkLndOGvQbvTB1nmRlRMOKtIYgaO1wifGtnJdDYxAt6g/NImEalqMz/7SMivvMJCdzTE=@vger.kernel.org, AJvYcCXt4Z9J0MxqWzzf9A3X8gn6JzpJfShmUiQCeACIwda8oESgBdleermxAod4nNjD3hC5AhAf7F3CTw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw86T03jrs2YzL1OxTzcMTnEcvjzS0U4XlFuPQBR8E8QzA0eNyj
-	cXzcymDn7snSOiqi2fXusmQ4yYrZT9DEWc4QBgcL8ENX1CnSivX/CmXNC0/rY7Su0Bqihk+CTJP
-	ceD+YzG+UR/iFNdKwUyYuFhMMdGS+4Q==
-X-Gm-Gg: ASbGncstc7S/eyYJOMVOzSzkf9zKFkD9+wM04ahc7XFYPa38EEVGpebzLrsWtkf8DrA
-	X0Ih/laGAWlNmUsu/RS7SO21XQ88ddwbYfsWvpg==
-X-Google-Smtp-Source: AGHT+IERj/xTNDVTNuz30VRcBw/trJVoy7deAP4+WdTLQrW9/wwyW5HFwcNA0aH9mRIw+sx2+tUfPgczeZYab3M9fvk=
-X-Received: by 2002:a17:90b:280a:b0:2ee:b4d4:69 with SMTP id
- 98e67ed59e1d1-2f2903a450cmr6055716a91.35.1734117178087; Fri, 13 Dec 2024
- 11:12:58 -0800 (PST)
+        bh=kZ6EcUzq2jNdidPybk0fuP8u4Ugi0Aq98UlB6cj6uvg=;
+        b=LL/aMT9qfkYwz1bUBUB/YSWym8jjfz98EOIi4a8acnAEGYdbC+27/XzJzB8vXK78ti
+         cRdtzsJVAeCTTK+WbJT1jaLCRK9ul/DDQwCJby+xlCRvPERymFWXdtMO4xQAuL8ghN2b
+         6LIrecJAYdaG16I/Ljs/NxtU/lTL9yS1Jjo8GJIyz5PM+UeJcCZ9ErBVADvuXjaNN64U
+         7wMgSNYojJ2+/W9J1yJ6R+u91M70C1KqrEI8Rhv40dL8gUOmQKJGO37d3hWFlSo2IoxS
+         TGneTzyqtAnsVtVUxpxr26SKjtpD0fsK+9DQuTnZqwpuDhwEjn8FnKwTiUlT5PI04jkZ
+         cq4A==
+X-Forwarded-Encrypted: i=1; AJvYcCUHo6sVljxtWjUcDZE43F4/SgyVTnlewKbDZuoLwE0907Ue8z8f+1mlFmLGgPLExzPSX3xnouY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwePUTz4+aoM9z6eg3r7Y3Qrs+06SvFRGnpVn+3h7iD56i6hlbo
+	pTaO8cKSljl5T5V9jN0pe1GlFtcixjDwjCcjkko5ko9pUJvt1QkeujlFr3tAOUD5LgVelbQ4LXg
+	P+5ZFvKRXLDvy8QouwF9QCBsVOt/peWQqJf7k
+X-Gm-Gg: ASbGncsLLxk53PXPgNEHL+DMHlaQpFTvavMenNuWFiJBm0Mek6WiQQc7+ccbf67ztGK
+	C5dbhB8HR0EM9cuZXJQfM/hfZ00Sg7lyV3n5iIA==
+X-Google-Smtp-Source: AGHT+IF8Lt9b9Tc5G9jT4uQCd6qUIHKsCG+ri6mk/aF10xNf22rSX0wOK1yGdKJJt1WdnMH1NLbi3qayMa41u3rZCLw=
+X-Received: by 2002:a05:622a:89:b0:467:7f81:ade0 with SMTP id
+ d75a77b69052e-467b30b4e71mr129381cf.24.1734117224728; Fri, 13 Dec 2024
+ 11:13:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241212102000.2148788-1-ivanov.mikhail1@huawei-partners.com>
- <20241212.zoh7Eezee9ka@digikod.net> <b92e65aa-84aa-a66f-2f61-b70fd5c6b138@huawei-partners.com>
- <CAEjxPJ737irXncrwoM3avg4L+U37QB2w+fjJZZYTjND5Z4_Nig@mail.gmail.com> <fe8fe02f-db3b-a4a2-508f-dda8b434d44a@huawei-partners.com>
-In-Reply-To: <fe8fe02f-db3b-a4a2-508f-dda8b434d44a@huawei-partners.com>
-From: Stephen Smalley <stephen.smalley.work@gmail.com>
-Date: Fri, 13 Dec 2024 14:12:46 -0500
-Message-ID: <CAEjxPJ7a18Ux9OdRGzZu5om2N0kAPjLBNX5OYhbfT6y6-i3YpQ@mail.gmail.com>
-Subject: Re: [PATCH] selinux: Read sk->sk_family once in selinux_socket_bind()
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	paul@paul-moore.com, selinux@vger.kernel.org, omosnace@redhat.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, 
-	konstantin.meskhidze@huawei.com
+References: <20241211172649.761483-1-aleksander.lobakin@intel.com> <20241211172649.761483-10-aleksander.lobakin@intel.com>
+In-Reply-To: <20241211172649.761483-10-aleksander.lobakin@intel.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 13 Dec 2024 11:13:33 -0800
+Message-ID: <CAHS8izNEzoeuAQieg9=v7rHp8TCWXyw60UbrZgEm5LCKhtCEAg@mail.gmail.com>
+Subject: Re: [PATCH net-next 09/12] page_pool: add a couple of netmem counterparts
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	"Jose E. Marchesi" <jose.marchesi@oracle.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Magnus Karlsson <magnus.karlsson@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Jason Baron <jbaron@akamai.com>, 
+	Casey Schaufler <casey@schaufler-ca.com>, Nathan Chancellor <nathan@kernel.org>, 
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 13, 2024 at 11:40=E2=80=AFAM Mikhail Ivanov
-<ivanov.mikhail1@huawei-partners.com> wrote:
+On Wed, Dec 11, 2024 at 9:31=E2=80=AFAM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
 >
-> On 12/13/2024 6:46 PM, Stephen Smalley wrote:
-> > On Fri, Dec 13, 2024 at 5:57=E2=80=AFAM Mikhail Ivanov
-> > <ivanov.mikhail1@huawei-partners.com> wrote:
-> >>
-> >> On 12/12/2024 8:50 PM, Micka=C3=ABl Sala=C3=BCn wrote:
-> >>> This looks good be there are other places using sk->sk_family that
-> >>> should also be fixed.
-> >>
-> >> Thanks for checking this!
-> >>
-> >> For selinux this should be enough, I haven't found any other places
-> >> where sk->sk_family could be read from an IPv6 socket without locking.
-> >>
-> >> I also would like to prepare such fix for other LSMs (apparmor, smack,
-> >> tomoyo) (in separate patches).
-> >
-> > I'm wondering about the implications for SELinux beyond just
-> > sk->sk_family access, e.g. SELinux maps the (family, type, protocol)
-> > triple to a security class at socket creation time via
-> > socket_type_to_security_class() and caches the security class in the
-> > inode_security_struct and sk_security_struct for later use.
+> Add the following Page Pool netmem wrappers to be able to implement
+> an MP-agnostic driver:
 >
-> IPv6 and IPv4 TCP sockets are mapped to the same SECCLASS_TCP_SOCKET
-> security class. AFAICS there is no other places that can be affected by
-> the IPV6_ADDFORM transformation.
 
-Great, thank you for checking!
+Sorry, we raced a bit here. Jakub merged my "page_pool_alloc_netmem",
+which does similar to what this patch does.
+
+> * page_pool{,_dev}_alloc_best_fit_netmem()
+>
+> Same as page_pool{,_dev}_alloc(). Make the latter a wrapper around
+> the new helper (as a page is always a netmem, but not vice versa).
+> 'page_pool_alloc_netmem' is already busy, hence '_best_fit' (which
+> also says what the helper tries to do).
+>
+
+I freed the page_pool_alloc_netmem name by doing a rename, and now
+page_pool_alloc_netmem is the netmem counterpart to page_pool_alloc. I
+did not however add a page_pool_dev_alloc equivalent.
+
+> * page_pool_dma_sync_for_cpu_netmem()
+>
+> Same as page_pool_dma_sync_for_cpu(). Performs DMA sync only if
+> the netmem comes from the host.
+>
+
+My series also adds page_pool_dma_sync_netmem_for_cpu, which should be
+the same as your page_pool_dma_sync_for_cpu_netmem.
 
