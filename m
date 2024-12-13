@@ -1,162 +1,162 @@
-Return-Path: <netdev+bounces-151881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97D2E9F1726
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 21:09:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BC599F1737
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 21:11:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4AB1188F4FF
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:09:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60A39188D22E
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFABD1F130C;
-	Fri, 13 Dec 2024 20:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3924F190696;
+	Fri, 13 Dec 2024 20:06:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="QaOiHdKK";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="npwipiP1"
+	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="bUsl9Xks"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FFB190471;
-	Fri, 13 Dec 2024 20:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B33718FDBE;
+	Fri, 13 Dec 2024 20:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734120132; cv=none; b=dguIrS5ul4EbhmwxU8HIcyc1nCtTXBPRhnQi1acYSlSs9G8h4QLmOOowXyJHdY3GmbstALd9WIYhl5bifH9DEnG+cRuoUoi38czImhrCjlvw8Aum6KiCN/hkh9GIaZ+CEyGEdPkC9vsAmMmywmFBTHN/h1eGgFgWllPsE3OtiX4=
+	t=1734120386; cv=none; b=WS+EFUZmchgANShzcD4L2qvJryJcKmIQ9MxrIBr4r2NBHT2YFGlEUhOXacA7mCUELDVMtXRZ3T61UtO29j2MdyXHVtLCuwY8tko2YxSmqNEXp96jvvnU90AF64bCrkAabBEqD704RvpZ0VXACMALsoG1SjArYyKvUnxnRMBXwI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734120132; c=relaxed/simple;
-	bh=cQ7JGQb4NBBf1Vsc9XB1qFiRbuBlTCVNsKyI+dsWoFw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=madOa7XmyC8oadtIutfXwug/9zzVGAjZy8ooPg9SNaD+D/OaF89QX3CiyDL5y3hprPuSTzW/Wz5dwC7dYUNwwwybZ8/GEESfRVHVtr5AuFBIQVkmeFFYZ8miixyyynbAPERSEXwknVD3TADfha2HShcFpfe77M4G+KGk63RfhYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=QaOiHdKK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=npwipiP1; arc=none smtp.client-ip=103.168.172.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id 1DE081382149;
-	Fri, 13 Dec 2024 15:02:10 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Fri, 13 Dec 2024 15:02:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm3; t=1734120130; x=1734206530; bh=oZSIPzAhQd
-	6vMkfp3yMQ1DBeWcFBflQVOjU83wzxEX4=; b=QaOiHdKKYfMaqckjyQp2jyBt70
-	TNQZ9wbVN0hS8LoeUM0Uf4as2f8fEEd0zQmBJn9nPNnAosINt3wCW2FXbu4iKDrU
-	2NG+IwCrn+dvpAykLDXx9Xn7NWoMoRUO8XyMNQUZbBSeodLfAHs5Ahd7us7jyTN3
-	sVt8xYd5nQsuJWixAzePTvnzqjy71eW5V3jFOStho+145G1QypGSa4jtmWcjNdsm
-	FptiqWaAEk7kjy1L7PzlN7HWU30gTwpgeKwvXK0gpBlWKooQdIXMhQx5qLRUiRWF
-	ZdpgL+/JgtO+UFvwbAU91Waoqd/6CQwY9FNakNzVjHi/hhtkksv+8JgSFl6g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1734120130; x=1734206530; bh=oZSIPzAhQd6vMkfp3yMQ1DBeWcFBflQVOjU
-	83wzxEX4=; b=npwipiP1XXC2keiLDgS4skVFf57oEJxqMFIg2wrWPLmrLoLm0qo
-	ff9VPo/lq5SzuxayZ1qQwQJ85B29XG5N1FHHw9RP7k6LON+WKFfFL/JHmAF59AZc
-	zfIF5Rb4RqUlgTzvuU7wFSjPUZHpycihMDsPmqsv2VqfngQJhjyLF3N4UqhLdX/p
-	S3nQiqUrgil8/BSac85SYjv71Gd/TF07XSjc43IVv5+sycYpW5tBO+ISPG4Or18D
-	1UXXZfgIR75Xo2/WDjdl1kaDy8ps8VFp0lDDr+gj907ZmrCHcIyVv395Qa7LEvZi
-	L4lb10YHHh19Q7Caz2IsZZCH2odIx3RxyyQ==
-X-ME-Sender: <xms:wZJcZ0WgkYbzWqiAjt18KImf03Tm8rYkNAVORZ_oAtQPC8tVjGoupg>
-    <xme:wZJcZ4lXkf9NCylP0JqFFD9cqfAm9EQooK7iCeOvZWignuW6EiKow32bV8kDT8cL1
-    Auyf2TugP6Mc886pw>
-X-ME-Received: <xmr:wZJcZ4azM93Sv3SSPD2xB6B3NCzflyPluMxk7l4IIDQfFzXVj-sZSIwKqXF8fJ-zgccRdoAL29iwGU-o3pGu4vS1UB0rg5L62vJEFDZU4e1enA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkeejgddufeduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlje
-    dtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdfstddttddvnecuhfhrohhmpeff
-    rghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnh
-    epvdefkeetuddufeeigedtheefffekuedukeehudffudfffffggeeitdetgfdvhfdvnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesug
-    iguhhuuhdrgiihiidpnhgspghrtghpthhtohepudekpdhmohguvgepshhmthhpohhuthdp
-    rhgtphhtthhopegvugguhiiikeejsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnug
-    hrihhisehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrshhtsehkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurg
-    hnihgvlhesihhoghgvrghrsghogidrnhgvthdprhgtphhtthhopehjohhhnhdrfhgrshht
-    rggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhopehmrghrthhinhdrlhgruheslh
-    hinhhugidruggvvhdprhgtphhtthhopehsohhngheskhgvrhhnvghlrdhorhhgpdhrtghp
-    thhtohephihonhhghhhonhhgrdhsohhngheslhhinhhugidruggvvh
-X-ME-Proxy: <xmx:wZJcZzVAuZoo_2tDsg6gQgXZbVOiPgqlD3wNsaphtsHG3dO4cQDPnA>
-    <xmx:wZJcZ-m4r7NVbXa1e__aK0bY2ojwi4zXhzLI2T_JFW5x1NJu7JASvQ>
-    <xmx:wZJcZ4etpWewECywR9VZ9iMk32de5di6Ekv7arBhe6jCuNsh0hWoWA>
-    <xmx:wZJcZwG-g3hDriQIbatprdiZNUTPppPi91VzzKYOdQ2-g0b2f1Uqbg>
-    <xmx:wpJcZ0pbJKun6Nq6gQOkEMqvVGN8jJOtoZQAmCqu9IZ4W98mHU_B-79P>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 13 Dec 2024 15:02:07 -0500 (EST)
-Date: Fri, 13 Dec 2024 13:02:06 -0700
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Eduard Zingerman <eddyz87@gmail.com>
-Cc: andrii@kernel.org, ast@kernel.org, shuah@kernel.org, 
-	daniel@iogearbox.net, john.fastabend@gmail.com, martin.lau@linux.dev, song@kernel.org, 
-	yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, 
-	jolsa@kernel.org, mykolal@fb.com, bpf@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next v5 3/5] bpf: verifier: Refactor helper access
- type tracking
-Message-ID: <fsclbw3cvixxy3p3toxqegi55wew6mpqmkjs3uyhfxxgfwg5ic@k7g6iu6qgzze>
-References: <cover.1734045451.git.dxu@dxuuu.xyz>
- <4727abf12fbc53723359d4edcdf5b6dd7d33f9cb.1734045451.git.dxu@dxuuu.xyz>
- <341df2d52af6c1584353b89a8a65d9d0fb5f0f27.camel@gmail.com>
+	s=arc-20240116; t=1734120386; c=relaxed/simple;
+	bh=PpdV+TAyG3tKXdPwl6HN0V9j9NLvFMFR7G1T99bJP4A=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=gTrtVQhc82KU26l8aCjBOtPuQwFWgLz4uoNxHo4JfYV4KdUUYmHphUjTNXtDEqMBl6ZVL5eovbx7i45/koORwm3k1acSG8X47Kp31s5JCA1kuOt1+DB8e0xSfihxxUEunbuFX7sWsnzdERqtB07K2HgPBhYLkiRiAT/gI0fE3WU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b=bUsl9Xks; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id 0CCBF20BCAD0; Fri, 13 Dec 2024 12:06:24 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0CCBF20BCAD0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1734120384;
+	bh=vJ1S+b1BSe5VAHRIRV0GkW0d4sHaXpM7+ERD6ffAyVE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=bUsl9XksWclBwDTryioRbgDJcBWGomCsPSbbY003/uRc8A4dCpW+CVqRwunLyD8PB
+	 +EVjyuA//sWeDmAjX5OqxZIZ7hVVSgF1hgTD2yn6bGQbIIlDFn/rscNSFFmY1+6SxO
+	 VCOabvRZruoaaQ0IawAf86m9DlYMoIKcX61svFoM=
+From: longli@linuxonhyperv.com
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Stephen Hemminger <stephen@networkplumber.org>
+Cc: linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	Long Li <longli@microsoft.com>
+Subject: [Patch net-next v2] hv_netvsc: Set device flags for properly indicating bonding in Hyper-V
+Date: Fri, 13 Dec 2024 12:06:01 -0800
+Message-Id: <1734120361-26599-1-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <341df2d52af6c1584353b89a8a65d9d0fb5f0f27.camel@gmail.com>
 
-On Thu, Dec 12, 2024 at 08:04:28PM GMT, Eduard Zingerman wrote:
-> On Thu, 2024-12-12 at 16:22 -0700, Daniel Xu wrote:
-> > Previously, the verifier was treating all PTR_TO_STACK registers passed
-> > to a helper call as potentially written to by the helper. However, all
-> > calls to check_stack_range_initialized() already have precise access type
-> > information available.
-> > 
-> > Rather than treat ACCESS_HELPER as a proxy for BPF_WRITE, pass
-> > enum bpf_access_type to check_stack_range_initialized() to more
-> > precisely track helper arguments.
-> > 
-> > One benefit from this precision is that registers tracked as valid
-> > spills and passed as a read-only helper argument remain tracked after
-> > the call.  Rather than being marked STACK_MISC afterwards.
-> > 
-> > An additional benefit is the verifier logs are also more precise. For
-> > this particular error, users will enjoy a slightly clearer message. See
-> > included selftest updates for examples.
-> > 
-> > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> > ---
-> 
-> I think this change is ok.
-> With it there is only one use of 'enum bpf_access_src' remains,
-> but it doesn't look like it could be removed.
-> 
-> Acked-by: Eduard Zingerman <eddyz87@gmail.com>
-> 
-> [...]
-> 
-> > --- a/tools/testing/selftests/bpf/progs/uninit_stack.c
-> > +++ b/tools/testing/selftests/bpf/progs/uninit_stack.c
-> > @@ -55,33 +55,4 @@ exit_%=:	r0 = 0;					\
-> >  		      : __clobber_all);
-> >  }
-> >  
-> > -static __noinline void dummy(void) {}
-> > -
-> > -/* Pass a pointer to uninitialized stack memory to a helper.
-> > - * Passed memory block should be marked as STACK_MISC after helper call.
-> > - */
-> > -SEC("socket")
-> > -__log_level(7) __msg("fp-104=mmmmmmmm")
-> > -__naked int helper_uninit_to_misc(void *ctx)
-> 
-> Is it possible to peek a helper that writes into memory and not delete
-> this test?
+From: Long Li <longli@microsoft.com>
 
-Yeah, good idea. Will do.
+On Hyper-V platforms, a slave VF netdev always bonds to Netvsc and remains
+as Netvsc's only active slave as long as the slave device is present. This
+behavior is not user-configurable.
+
+Other kernel APIs (e.g those in "include/linux/netdevice.h") check for
+IFF_MASTER, IFF_SLAVE and IFF_BONDING for determing if those are used
+in a master/slave bonded setup. RDMA uses those APIs extensively when
+looking for master/slave devices. Netvsc's bonding setup with its slave
+device falls into this category.
+
+Make hv_netvsc properly indicate bonding with its slave and change the
+API to reflect this bonding setup.
+
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+
+Change log
+v2: instead of re-using IFF_BOND, introduce permanent_bond in netdev
+
+ drivers/net/hyperv/netvsc_drv.c | 12 ++++++++++++
+ include/linux/netdevice.h       |  8 ++++++--
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index d6c4abfc3a28..7867f8e45f86 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -2204,6 +2204,10 @@ static int netvsc_vf_join(struct net_device *vf_netdev,
+ 		goto rx_handler_failed;
+ 	}
+ 
++	vf_netdev->permanent_bond = 1;
++	ndev->permanent_bond = 1;
++	ndev->flags |= IFF_MASTER;
++
+ 	ret = netdev_master_upper_dev_link(vf_netdev, ndev,
+ 					   NULL, NULL, NULL);
+ 	if (ret != 0) {
+@@ -2484,7 +2488,15 @@ static int netvsc_unregister_vf(struct net_device *vf_netdev)
+ 
+ 	reinit_completion(&net_device_ctx->vf_add);
+ 	netdev_rx_handler_unregister(vf_netdev);
++
++	/* Unlink the slave device and clear flag */
++	vf_netdev->permanent_bond = 0;
++	ndev->permanent_bond = 0;
++	vf_netdev->flags &= ~IFF_SLAVE;
++	ndev->flags &= ~IFF_MASTER;
++
+ 	netdev_upper_dev_unlink(vf_netdev, ndev);
++
+ 	RCU_INIT_POINTER(net_device_ctx->vf_netdev, NULL);
+ 	dev_put(vf_netdev);
+ 
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index ecc686409161..4531f45d3e83 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -1997,6 +1997,7 @@ enum netdev_reg_state {
+  *	@change_proto_down: device supports setting carrier via IFLA_PROTO_DOWN
+  *	@netns_local: interface can't change network namespaces
+  *	@fcoe_mtu:	device supports maximum FCoE MTU, 2158 bytes
++ *	@permanent_bond: device is permanently bonded to another device
+  *
+  *	@net_notifier_list:	List of per-net netdev notifier block
+  *				that follow this device when it is moved
+@@ -2402,6 +2403,7 @@ struct net_device {
+ 	unsigned long		change_proto_down:1;
+ 	unsigned long		netns_local:1;
+ 	unsigned long		fcoe_mtu:1;
++	unsigned long		permanent_bond:1;
+ 
+ 	struct list_head	net_notifier_list;
+ 
+@@ -5150,12 +5152,14 @@ static inline bool netif_is_macvlan_port(const struct net_device *dev)
+ 
+ static inline bool netif_is_bond_master(const struct net_device *dev)
+ {
+-	return dev->flags & IFF_MASTER && dev->priv_flags & IFF_BONDING;
++	return dev->flags & IFF_MASTER &&
++	       (dev->priv_flags & IFF_BONDING || dev->permanent_bond);
+ }
+ 
+ static inline bool netif_is_bond_slave(const struct net_device *dev)
+ {
+-	return dev->flags & IFF_SLAVE && dev->priv_flags & IFF_BONDING;
++	return dev->flags & IFF_SLAVE &&
++	       (dev->priv_flags & IFF_BONDING || dev->permanent_bond);
+ }
+ 
+ static inline bool netif_supports_nofcs(struct net_device *dev)
+-- 
+2.34.1
+
 
