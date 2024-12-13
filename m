@@ -1,106 +1,126 @@
-Return-Path: <netdev+bounces-151869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B66219F16C0
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:49:19 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B4769F16CE
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:54:36 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7756228800F
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 19:49:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A700E1886195
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 19:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12D118C018;
-	Fri, 13 Dec 2024 19:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1CB018FC6B;
+	Fri, 13 Dec 2024 19:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="cz/DjlHr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RZfrCs8G"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225FE18E351;
-	Fri, 13 Dec 2024 19:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8394918027;
+	Fri, 13 Dec 2024 19:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734119356; cv=none; b=ivfXh7ed3uyyHZ3wuNgpiZ3Gc8OG7oWrbb9RLHJr4Jw7qwMn9GwAjomGhh9QrMYuFwYiWnxB+d6QThdAvNbEtddwChnFGzX3/LX9nC4/dW9DM/VuA4du2K4buWEesOdZq+ngtjaeQ4ZPrE7eJsRQZK2IG9MfRFQIog9X+qg6vUg=
+	t=1734119669; cv=none; b=o8OuQq45X8JgYAn87q0GRC+QiGbqUFSQNi/C20EismdxNqUwczHimg578v6VarS9Y0BqYC4lPRPlfQm07RLD+6gQpD3zs+jMFmslw0zBQI+0b6YdhnDSkA3QGpoB577ve7XtoavpSYLLYRyc3XrlsJGFFCEsJbQT5Jb0UmVfUYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734119356; c=relaxed/simple;
-	bh=XYPKXjceJoiDJNyMAmtuX6dCMkX1Hng+avTbh+C1S8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=esG0A9OrksRrctjKBHV2Kngnk125jwZEmucbAPQQlmIh3ZUTFO/NETKA/TQJXUgrFICXpOg81EPgnhYxmc4awHvwV+dwRnKG9e/TbMQdnM1+2HggTEHqx3M5k7vwyo7WlBmHp3CS+9d2yznDF09GdmoF+TYLhOX2flPz/hZAwFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=cz/DjlHr; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5bQC/f+ngK7vY3gU8HjH2GhzMwPXvxLIwJFxXKAK+bs=; b=cz/DjlHrD9RTa7cCUxkRhWc2nY
-	Lo9TtOlrd+CFq/Mpp6bbCjaH+TjXXnH4CxrzWK3JcN5txeQt5rhp+BdH9g6OqtZ04g3NfvEpu9G4m
-	S0w7wmw219AvKvke1HZ6PS/pvq9LuGZpDXaPI1s4dnBv5UoPxAlYWX6dzS4uMa8F8HnhOD7W134u9
-	bhtcSDXD36xo4Khf+PRPip+aHzuJI1nhbekvdshp6yulVg/Dc6T6gxmieQb4KCyfKh50VIaC9L7yV
-	aYIO7Sb24mKsWE/oOCRTa1U2wNqOjCa57JEZBXpYIctIxfLARqW3iscilWSLccBrjg9l+Hintxo1T
-	e0uRDsvg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54006)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tMBen-0007GK-0O;
-	Fri, 13 Dec 2024 19:49:01 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tMBel-0006Z0-1j;
-	Fri, 13 Dec 2024 19:48:59 +0000
-Date: Fri, 13 Dec 2024 19:48:59 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	jacob.e.keller@intel.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, robert.marko@sartura.hr
-Subject: Re: [PATCH net-next v4 6/9] net: sparx5: verify RGMII speeds
-Message-ID: <Z1yPq6OEziTNjWHK@shell.armlinux.org.uk>
-References: <20241213-sparx5-lan969x-switch-driver-4-v4-0-d1a72c9c4714@microchip.com>
- <20241213-sparx5-lan969x-switch-driver-4-v4-6-d1a72c9c4714@microchip.com>
+	s=arc-20240116; t=1734119669; c=relaxed/simple;
+	bh=1SuCCczWgEEZPVHAwfNRApsTYS5wZY7OUO6nCzu4LLc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=rfsAzSMqnKqndmiMxKBFgrE0PBrXVmut27NbVzLzIioYfUenbYQ9TQKDNbi/QlIyxEK1vx/jZRN6LRccPUNhqY55IYe9ZQ4IvMeixeOrfUdolsYlObNGLw61uUIkD1vQlDinQbzaCqq07+aZBiuIZQvFalqRm30iuEDfQ5EFlRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RZfrCs8G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D256DC4CED0;
+	Fri, 13 Dec 2024 19:54:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734119668;
+	bh=1SuCCczWgEEZPVHAwfNRApsTYS5wZY7OUO6nCzu4LLc=;
+	h=From:Subject:Date:To:Cc:From;
+	b=RZfrCs8GfBm7Vp+KkrxEc0Ifk+T5Kv7IfJhVx4+OXjc/FV6z0olv57E7MFf7gWVVq
+	 EzmxrwyzapA63/nIM8szWZWgtgdcPFv1DxRGhvNweNkJ09NgT06nKFUpQdHaV8AGk8
+	 i5127ICo/4/SqTqCctx6Yq9irl8Vw/Y6sW05jHlyY7rkqq0JNjeRlQqRNA+QkhT5sJ
+	 VwSnevorynNH1WLcJuXkghpTOXOGJpsZYi6QepYsBkJdw2sY3XYP8R/QCfN+FMXa6F
+	 YtARWNgaKXGZfpovh+2gdmO6yJj8PiyTMufnfwT6TCH9DKkfW0pbItapd21czZ17pQ
+	 Qv4lEXBFPNGsw==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 0/7] mptcp: pm: userspace: misc cleanups
+Date: Fri, 13 Dec 2024 20:52:51 +0100
+Message-Id: <20241213-net-next-mptcp-pm-misc-cleanup-v1-0-ddb6d00109a8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241213-sparx5-lan969x-switch-driver-4-v4-6-d1a72c9c4714@microchip.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJOQXGcC/zWNQQqDMBBFryKzdsBEa8GrFBfpONaBJg5JLIJ4d
+ 0PBxVu8xfv/gMRROMFQHRD5J0nWUMTUFdDiwodRpuJgG9sZa1oMnAt7Rq+ZFNWjl0RIX3ZhU7Q
+ 9tQ/n3s+OeygjGnmW/X/wgruF8TwvdPju9HoAAAA=
+X-Change-ID: 20241213-net-next-mptcp-pm-misc-cleanup-26c35aab74e6
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1544; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=1SuCCczWgEEZPVHAwfNRApsTYS5wZY7OUO6nCzu4LLc=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnXJDxqkRJPFt42+cynphJw8LIFCeCpke6RvE+f
+ yKn3p9o42SJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ1yQ8QAKCRD2t4JPQmmg
+ c0ETD/9UtNP0gtkaIb4NaZc4AfjMAtMoliJI2+B9purXNdxXXsXpMJlVXgOrmGWHUSCCBVI3R9F
+ cT4SnsTpjQi7AmXf21G+5EfVQP8IuwBYragiQSRNu5wXJPlVkIT9+sg1vcbwHkl5Or9iBjEn1WK
+ mPVdo5D7/hz0wKc8CiokzwAyjLIAwHcZK1oiAG4WSGjYDX6vgbxGVFwXRLRysejq8VjicE0cVRN
+ 87jFhWBpGC1/hSbysqjkZFfoQQAM1bHTqSkU8zOQW/O9thumZZ2qdR7ySvlLCIA8jDyZ2ZZg/4N
+ 7oX49y68Iu9tDsCWmednyOyH0fsuxOcPJI9pewfkFba6zr3gs3irtpzPatYgkwVjujFjuvIGWex
+ 9i2/frTcRMRAhBjFeTHMJHOFGThBoX6wvaEQ2UcKtwVmdd/8jra/xPvhnu8ntNOrWI4s1eHcfCv
+ K29w7baY/5gX95w8HvW7O+w+QIXMQEvvZ3ZdDew9Y4ckCEsWUJN6+3j0ShP1H/HLJIib4rUSNYn
+ UFE68DBtAeJawhNO58janfMeD2GfQ2trnoZUUxyIblRdF0UtM/d7DgUak8bCYDYGHsRtFmEVwA2
+ AdXF/DIBM8afTnhWzlttCytR98mJElasE6UAPIiTN1vhORDksjgb35YhVH/lYgoxMu2Okvljuxh
+ c5BB6HaY4UxwaJQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Fri, Dec 13, 2024 at 02:41:05PM +0100, Daniel Machon wrote:
-> When doing a port config, we verify the port speed against the PHY mode
-> and supported speeds of that PHY mode. Add checks for the four RGMII phy
-> modes: RGMII, RGMII_ID, RGMII_TXID and RGMII_RXID.
-> 
-> Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-> Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+These cleanups lead the way to the unification of the path-manager
+interfaces, and allow future extensions. The following patches are not
+linked to each others, but are all related to the userspace
+path-manager.
 
-You do realise that phylink knows what speeds each interface supports
-(see phylink_get_capabilities()) and restricts the media advertisement
-to ensure that ethtool link modes that can't be supported by the MAC
-capabilities and set of interfaces that would be used are not
-advertised.
+- Patch 1: add a new helper to reduce duplicated code.
 
-This should mean none of your verification ever triggers. If it does,
-then I'd like to know about it.
+- Patch 2: add a macro to iterate over the address list, clearer.
 
+- Patch 3: reduce duplicated code to get the corresponding MPTCP socket.
+
+- Patch 4: move userspace PM specific code out of the in-kernel one.
+
+- Patch 5: pass an entry instead of a list with always one entry.
+
+- Patch 6: uniform struct type used for the local addresses.
+
+- Patch 7: simplify error handling.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Geliang Tang (7):
+      mptcp: add mptcp_userspace_pm_lookup_addr helper
+      mptcp: add mptcp_for_each_userspace_pm_addr macro
+      mptcp: add mptcp_userspace_pm_get_sock helper
+      mptcp: move mptcp_pm_remove_addrs into pm_userspace
+      mptcp: drop free_list for deleting entries
+      mptcp: change local addr type of subflow_destroy
+      mptcp: drop useless "err = 0" in subflow_destroy
+
+ net/mptcp/pm_netlink.c   |  46 ++------
+ net/mptcp/pm_userspace.c | 295 +++++++++++++++++++++--------------------------
+ net/mptcp/protocol.h     |   7 +-
+ 3 files changed, 146 insertions(+), 202 deletions(-)
+---
+base-commit: 2c27c7663390d28bc71e97500eb68e0ce2a7223f
+change-id: 20241213-net-next-mptcp-pm-misc-cleanup-26c35aab74e6
+
+Best regards,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
