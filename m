@@ -1,187 +1,139 @@
-Return-Path: <netdev+bounces-151620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 794B39F035F
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 05:05:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 250E39F03D0
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 05:29:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A65C7188B2F7
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 04:05:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F827161B34
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 04:29:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E4017C7CA;
-	Fri, 13 Dec 2024 04:04:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88F7183CC2;
+	Fri, 13 Dec 2024 04:29:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ba+oFRq6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bFVs/7RZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8732317BB34;
-	Fri, 13 Dec 2024 04:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7EDE3398B;
+	Fri, 13 Dec 2024 04:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734062693; cv=none; b=KQTdGwRH2cJRE3CLkIP3Zb4UqNmrAJpzjOqN6sPGSX7zJWgFVWiAdDvhegoecbxQ0kO5WNkJbAJcnje1m0bxb+f6eGKNrjEi6ght0c/vh9st59h1Yhsc5YLjspJllb0wvU+5RC2YOxNuZcDjubzfBD7XI6EnHF0K2bcI/C2cUWQ=
+	t=1734064145; cv=none; b=gPT//XfYJzkoevbbfQxI6wUuYBjMHHiKmuL8UJOflF45pCPznHjNEvT5p5Dtv6dJO771wwWVHg3a2dkESaYsSnVa2/HR549BHnR2CvAoucWduFBAQwh74QIFUUKTLHoCsp5yY2u+NUlNSVr/uf+/Wuk92IXIqux/LdrdfJXevQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734062693; c=relaxed/simple;
-	bh=VYEwYTh4meAMKcxZgF3yTMcdoRqjlcIbP4/merjlEv0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gOJq+B5CfoDEpp/hFhoVXfU402L0pA8Ar1gNLAkUaLqmTAYOwVRzZYfSzIiV8lqRib9Sb2NQHAxfRkPO/l//YNDmj6eTxDv+KGOvRKll5NPeJuM+FiGu76joMG94O/XhB5BgzF16MGaOOjuCZoMmEwjF52XLqaTLzmcI4f+IAGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ba+oFRq6; arc=none smtp.client-ip=209.85.214.171
+	s=arc-20240116; t=1734064145; c=relaxed/simple;
+	bh=+L4rIwPf+GveKcDw4d37qzefPMQEtHgjvmRhVI9XKBk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tc9RWHNCKzwbuNt0K/hERjfa7uw4nIW8bALKJtaRlazpVG4HsGRDY2yCpXcVnCUtJTJjKJJ8YFw8yi2u1iQpJic3VfawT0YChEi2+CqyeTqE+2q10w4k47IXKW6PHUZRrCxAmNhMOWoDwHi8HrIGVJXVOQE0K6KyxZ/vepuAwD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bFVs/7RZ; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21619108a6bso10334985ad.3;
-        Thu, 12 Dec 2024 20:04:51 -0800 (PST)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-30033e07ef3so14022221fa.0;
+        Thu, 12 Dec 2024 20:29:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734062691; x=1734667491; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pTTUiqA1JaNZpV3zkUZn5BbgQBGF1lbLwZtKk2rpqZg=;
-        b=Ba+oFRq6JHBt0aVVT4+8qtekOFDooz0UYXArMw0vCu3zFWwwr8j7f7vyyyFsrSjwfv
-         maqsNo7jH+NaEor+jexXyBhKUvZbgWt7jTiiMzPGuQNFX/Soyi1a6NDofwwCVT1TPDFJ
-         S883OcwiqWTEu3c85jOqyejO+4P9BasgHzSUXnsOP1c0K0ZSsKW9l4GJaIo+LV1SpKOI
-         MNQgrEmSJJuxaWsq3jkkHofs/fATVUNHIXlkD47U7WfHFqshl7Pg6vvzpdgtF42gqRSC
-         U1R6ORydmL2ZSsnnNFWG3qRVeQR+OMssCRb8UhZBCZ1048mDh7ZroaBDAd9Inpdq2GNR
-         RwrA==
+        d=gmail.com; s=20230601; t=1734064142; x=1734668942; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uCvQILuEqni9koGNIRPa0LCov9Nq5Mb+hDK4nC1Iwh8=;
+        b=bFVs/7RZq66j1bzM53269Dqr/3hVrZZMIIlMGHIy8/tPgNco2kciSM4n2OSxxTWKX7
+         HXC0xjIXfsWdq5WIsrSw/5AGXXt128/PYjOJy1HcrkMNmeE8bhKp8As26eh5Y0rIXZlc
+         eDy01AOTkOSGbcJ03IvbO8UyqQnuc1PlqSGz7r8ekKI2MPAl8hq7vN/DHAni+0gMN+D7
+         +znFxdt271L3w7mudY+esdonChJnMm5aDaNY1fos+4hViLtLr3rKpEg4NwZdPkcyK5YF
+         YKap4mBV9joJdx9iwTgTkBr53kWwNS6lDKWMls0m93pNcDfNNKzPn9sr1kBMZ6srTliY
+         TYeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734062691; x=1734667491;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pTTUiqA1JaNZpV3zkUZn5BbgQBGF1lbLwZtKk2rpqZg=;
-        b=tRqL6jzeOr4dR/7aCbRYZaG/1HDRb+wPKLgqV3jeHcvwUx5DdwxXFt6iZLETZPTOau
-         431GXAQWZlGbEfI1iK4xBvTiWZv6w3YMPzChqbglbn6GBMc9qQfzg/h2LFZeCH2WA3cF
-         32y1hLwUrAoSmYC7N6Bl9hf6e11mI+ebCDu3aZSGeceSsuS0gk+jpU3aAKB7smMSX7z0
-         SsZhkd6OCGWKOtE4TDIJk8FE6/oux9/+v2IIE86h4zT24WlmMYBZ6lCTxZceHuBsz5UQ
-         ZERC0JtlVt6K52YSQYMYiTR4/3TQoprO76izGcU2CRMAPLfym7vOGcEh33GIUB34Hzhb
-         gpGg==
-X-Forwarded-Encrypted: i=1; AJvYcCUAql1FDTM1fIaQwAIddXXAdXor2AMd9xXEpZLGTCOf3MofaIpq1qrZKdq9VSDbw25VPvGFtwlW7xzeDsD/sQgS@vger.kernel.org, AJvYcCUUQhxaLz1ZIIRDcmIGfX6mo/qFFiW26StZtAYMwKj7bfnNzDT4omMe6JlWnPWABBUtPBo=@vger.kernel.org, AJvYcCUsNbpYCWuFQnieihqf1Fg758oAoeYRjGilrOiswd5XoM7U90Go1SpmY0c97qjTBy6ahw0qw20tFTaqHSXp@vger.kernel.org, AJvYcCVBt5JBhy0sjAwJXNGnastDxrcfUUqcdkArt+DMh9XqsThjQcBn0sLsZLHMLVq/+Jn6xkJtMrR+@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWRF+qvEQa3s810xTLM5zWF4OehNAJI5aM2rDxHm0cWKGLeh/U
-	iImTGS4XuOPLGtPcrHM7UVLtbtTNjZ6OBzVj44/5yAzt0n9gbovq
-X-Gm-Gg: ASbGncu4uB6MTWclx8WIzkRjaRBEWs8Tsm8MhDIaLNN+Fh8XD6xCsi5MC+6FiZApZwP
-	s4IPc1j7Mw/MB6mgVSVa//nHVsNZUKxvSOs/FKfQv/QVGmrlryymfzP2Eq3xUZA17WsioPLTOmg
-	JiglTj8SJf6vUJHIhU/i0FaOGgYy2XCsnEV7owdP52cszizic1Ag90uuOgF2y5L29wwZI8xZcQf
-	za+CR6TKl4OOH8Gv/MURelbJ5zKwuUGRbXH7tF2wAMaWFAKnZhzew==
-X-Google-Smtp-Source: AGHT+IEKy1GALG5iBgebmvW+KMj+zATRP8zpKqCAK01KBRgfIQNZW1RurQVztjBNlutr98NGSOSlrg==
-X-Received: by 2002:a17:902:db04:b0:216:414e:aa53 with SMTP id d9443c01a7336-21892a42244mr16122635ad.52.1734062690694;
-        Thu, 12 Dec 2024 20:04:50 -0800 (PST)
-Received: from [192.168.0.235] ([38.34.87.7])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fd4cd45b18sm7777975a12.73.2024.12.12.20.04.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2024 20:04:50 -0800 (PST)
-Message-ID: <1b0e59ee87b765513c6488112e6e3e3cf4af7cb6.camel@gmail.com>
-Subject: Re: [PATCH bpf-next v5 4/5] bpf: verifier: Support eliding map
- lookup nullness
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Daniel Xu <dxu@dxuuu.xyz>, andrii@kernel.org, ast@kernel.org, 
-	shuah@kernel.org, daniel@iogearbox.net
-Cc: john.fastabend@gmail.com, martin.lau@linux.dev, song@kernel.org, 
-	yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, 	jolsa@kernel.org, mykolal@fb.com, bpf@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	netdev@vger.kernel.org
-Date: Thu, 12 Dec 2024 20:04:45 -0800
-In-Reply-To: <92065ca054beccd6d0f35efe9715ef965e8d379f.1734045451.git.dxu@dxuuu.xyz>
-References: <cover.1734045451.git.dxu@dxuuu.xyz>
-		 <92065ca054beccd6d0f35efe9715ef965e8d379f.1734045451.git.dxu@dxuuu.xyz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.1 (3.54.1-1.fc41) 
+        d=1e100.net; s=20230601; t=1734064142; x=1734668942;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uCvQILuEqni9koGNIRPa0LCov9Nq5Mb+hDK4nC1Iwh8=;
+        b=auiiqbJHSdlAs734IAVqbdpCG3RSN5CPsHwK0LVul+T5uWV20XznkNYg3xaX07rnEG
+         meQUCje6GgbubYSN2wEuN8o8mGqtG9gmujhVAq7k/+IIyMG4HjuZ2czTDN+/SKZsiVHf
+         nbsGQVFsKc6kGbLpqHqnpzHhAF7j+/7wt1NhnT9+LH9hKZic4IcXyKBGH6d1Pmy6GqoK
+         DDUXDugpkFBDJMnO1Sz4iBplk2eL6yG/3rHu+0qn93QDZiXjnUXITM3QXX6fl4VGJO3x
+         HKurmqAqtDjRW3+sADGvd4Z+5IN/vsXyplstqViIhYJjDzwNOHDXBalfFryxEGvv+79K
+         p0Ew==
+X-Forwarded-Encrypted: i=1; AJvYcCUy55YimgFtto+y3CNs+XVlyq93Jkk0bj3z5u0HInJlNLHfhd/nC95MFYzB6t5OCbnF3yX7ce9i@vger.kernel.org, AJvYcCWBzqjsYW6lrq5owSUlXusudar+V9vmJcOq4BUHbtg+qX2zGjQmoiV5A/o0QYaay4I5mBzgAuDRWIkIJA6ewt0=@vger.kernel.org, AJvYcCWJBgXXueseWS67A9bHZ1t7QDAZCNOmqk6zD3nB6L7WKf3Ph16MQ4PQxt0DzPhzA+8NwYwCbt/zhJEd@vger.kernel.org, AJvYcCX2gP34MKcSXHMGZuyYuMnShxVe3iyCTjXTpGTKYXWXzdPE9vg/3awspDe2r1pNt1uidtCudK9BpeCE0wSH@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0pjVzFdgGyOZN5Z5RnTkwo0VH8LcYRP5VVA/Fw9qJ0HpPWF+c
+	Hlqy6bfQMvIHPcxfj/EBGpfvzwfdrDNfBPFqymJI1r5XyIF8p9vlljZf0gwIYIMmoEBzjs2lXEm
+	dRPWFZsQ23n6NpQeKC25hf2hDHSPTmLBO
+X-Gm-Gg: ASbGncvQAiKhph8yopljBaZmOUVxLYLbIVq0lU/dhl5ZYjvQTdk1VTKX029Sp9jiqmF
+	3qYQLLwfHo9tkfJp+gYZXkvzt0121k75C2j7Csw==
+X-Google-Smtp-Source: AGHT+IHhIZMzrUjX6OhgTdgCbFrO6miMc56t5nTDb6E+vXxnejuRboiGgCQouuWXc64JICWARJa+c4QiTrxibRLPcbM=
+X-Received: by 2002:a2e:a58e:0:b0:302:215f:94ee with SMTP id
+ 38308e7fff4ca-30251be6cc4mr9687611fa.4.1734064141597; Thu, 12 Dec 2024
+ 20:29:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20241208204708.3742696-1-ubizjak@gmail.com> <20241212193541.fa3dcac867421a971c38135c@linux-foundation.org>
+In-Reply-To: <20241212193541.fa3dcac867421a971c38135c@linux-foundation.org>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Fri, 13 Dec 2024 05:28:50 +0100
+Message-ID: <CAFULd4bJ71PT8-CetpF6fb7ufUQb24ZPNnStkvbjXSsuXGMqew@mail.gmail.com>
+Subject: Re: [PATCH v3 0/6] Enable strict percpu address space checks
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	linux-bcachefs@vger.kernel.org, linux-arch@vger.kernel.org, 
+	netdev@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, 
+	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, Andy Lutomirski <luto@kernel.org>, 
+	Ingo Molnar <mingo@kernel.org>, Nadav Amit <nadav.amit@gmail.com>, Brian Gerst <brgerst@gmail.com>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, "H . Peter Anvin" <hpa@zytor.com>, 
+	Peter Zijlstra <peterz@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2024-12-12 at 16:22 -0700, Daniel Xu wrote:
+On Fri, Dec 13, 2024 at 4:35=E2=80=AFAM Andrew Morton <akpm@linux-foundatio=
+n.org> wrote:
+>
+> On Sun,  8 Dec 2024 21:45:15 +0100 Uros Bizjak <ubizjak@gmail.com> wrote:
+>
+> > Enable strict percpu address space checks via x86 named address space
+> > qualifiers. Percpu variables are declared in __seg_gs/__seg_fs named
+> > AS and kept named AS qualified until they are dereferenced via percpu
+> > accessor. This approach enables various compiler checks for
+> > cross-namespace variable assignments.
+> >
+> > Please note that current version of sparse doesn't know anything about
+> > __typeof_unqual__() operator. Avoid the usage of __typeof_unqual__()
+> > when sparse checking is active to prevent sparse errors with unknowing
+> > keyword. The proposed patch by Dan Carpenter to implement
+> > __typeof_unqual__() handling in sparse is located at:
+>
+> google("what the hell is typeof_unequal") failed me.
 
-I think these changes are fine in general, but see below.
+It is not "typeof_unequal", but "typeof_unqual", as in "unqualified".
 
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index 58b36cc96bd5..4947ef884a18 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -287,6 +287,7 @@ struct bpf_call_arg_meta {
->  	u32 ret_btf_id;
->  	u32 subprogno;
->  	struct btf_field *kptr_field;
-> +	s64 const_map_key;
->  };
-> =20
->  struct bpf_kfunc_call_arg_meta {
-> @@ -9163,6 +9164,53 @@ static int check_reg_const_str(struct bpf_verifier=
-_env *env,
->  	return 0;
->  }
-> =20
-> +/* Returns constant key value if possible, else -1 */
-> +static s64 get_constant_map_key(struct bpf_verifier_env *env,
-> +				struct bpf_reg_state *key,
-> +				u32 key_size)
+Apparently, google does not like expletives, googling for "What is
+typeof_unqual?" returns some very informative hits, e.g.:
 
-I understand that this is not your use case, but maybe generalize this
-a bit by checking maximal register value instead of a constant?
+https://en.cppreference.com/w/c/keyword/typeof_unqual
+https://learn.microsoft.com/en-us/cpp/c-language/typeof-unqual-c?view=3Dmsv=
+c-170
+https://gcc.gnu.org/onlinedocs/gcc/Typeof.html
+https://dev.to/pauljlucas/typeof-in-c23-55p2
 
-> +{
-> +	struct bpf_func_state *state =3D func(env, key);
-> +	struct bpf_reg_state *reg;
-> +	int zero_size =3D 0;
-> +	int stack_off;
-> +	u8 *stype;
-> +	int slot;
-> +	int spi;
-> +	int i;
-> +
-> +	if (!env->bpf_capable)
-> +		return -1;
-> +	if (key->type !=3D PTR_TO_STACK)
-> +		return -1;
-> +	if (!tnum_is_const(key->var_off))
-> +		return -1;
-> +
-> +	stack_off =3D key->off + key->var_off.value;
-> +	slot =3D -stack_off - 1;
-> +	spi =3D slot / BPF_REG_SIZE;
-> +
-> +	/* First handle precisely tracked STACK_ZERO, up to BPF_REG_SIZE */
-> +	stype =3D state->stack[spi].slot_type;
-> +	for (i =3D 0; i < BPF_REG_SIZE && stype[i] =3D=3D STACK_ZERO; i++)
-> +		zero_size++;
-> +	if (zero_size =3D=3D key_size)
-> +		return 0;
-> +
-> +	if (!is_spilled_reg(&state->stack[spi]))
-> +		/* Not pointer to stack */
-> +		return -1;
+> I think it would be nice to include within the changelog (and code
+> comments!) an explanation-for-others of what this thing is and why
+> anyone would want to use it.  Rather than assuming that all kernel
+> developers are typeof() experts!
 
-Nit: there is a 'is_spilled_scalar_reg' utility function.
+The comment above definition of TYPEOF_UNQUAL in [PATCH 2/6]
+summarises the above as:
 
-> +
-> +	reg =3D &state->stack[spi].spilled_ptr;
-> +	if (reg->type !=3D SCALAR_VALUE)
-> +		/* Only scalars are valid array map keys */
-> +		return -1;
-> +	else if (!tnum_is_const(reg->var_off))
-> +		/* Stack value not statically known */
-> +		return -1;
++ * Define TYPEOF_UNQUAL() to use __typeof_unqual__() as typeof
++ * operator when available, to return unqualified type of the exp.
 
-I think you need to check if size of the spill matches the size of the key.
-The mismatch would be unsafe when spill size is smaller than key size.
-E.g. consider 1-byte spill with mask 'mmmmmmrr' and a 4-byte key,
-at runtime the 'mmmmmm' part might be non-zero, rendering key to be
-out of range.
+which is basically what the standard says in its reference document.
 
-> +
-> +	return reg->var_off.value;
-> +}
-> +
->  static int check_func_arg(struct bpf_verifier_env *env, u32 arg,
->  			  struct bpf_call_arg_meta *meta,
->  			  const struct bpf_func_proto *fn,
-
-[...]
-
+Thanks,
+Uros.
 
