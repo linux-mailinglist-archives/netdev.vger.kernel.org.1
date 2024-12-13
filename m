@@ -1,221 +1,105 @@
-Return-Path: <netdev+bounces-151739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7A769F0C06
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:15:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1864C9F0C0F
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:17:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44A4B188BF01
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:15:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 356F0167DD1
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:17:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED8E1DFE36;
-	Fri, 13 Dec 2024 12:15:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="J5RP4fDW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6A6364D6;
+	Fri, 13 Dec 2024 12:17:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D121DFE1C;
-	Fri, 13 Dec 2024 12:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25CF1BBBDC
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 12:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734092116; cv=none; b=NKe9RAWor5OZ5shiDI9wKTFpMsvMumDsjUbVYrQRwgjENQYgDTgge7bMJ/2PevEUHZ+hz1l4F0lY87gzdyyhxDQi9kEOwxyHBus7rbyfkRQgOWzBuTAl+5n90x7xRsKZz5m2s8YtKvxZ/sJZ7XnMtKgAb0QcIGyKNwwdxUMiq2Y=
+	t=1734092233; cv=none; b=peWPVUDqmUxuvV5ldV41tHMYXpNjQ5OG9Esg5+75hZ4SPjDbH5OscfdwbMbB9EBAzkjY0hWFCvErw6G90UGKjOHpFc1kk98URjw/QC8XQcIaaS+hhtThpwdoL6A4i+cnnV6GTc/s/qDakiVB/PK2abJ5K6KobDj9SOoCbjgtrr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734092116; c=relaxed/simple;
-	bh=M1LWHODFPFZcg6ygVvxHTUOufplb9lHFVshVeXKvNh4=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hZrQZnHjS4dihxrN26macDMH/+dBbdb4qg7Z3+jgkgNE4v4kd+jEhjgQxf9sh/7EFDzS5TjKJlE62zAO1yMLHzATSNtx0NarFAoQ4F7CnQFAcxbK74jPLgzZin7EKNlqgNhwW7I+y1vz5NUKgW/mFJ6JpLr7pTD+/hpo8aSt6ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=J5RP4fDW; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1734092114; x=1765628114;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version;
-  bh=M1LWHODFPFZcg6ygVvxHTUOufplb9lHFVshVeXKvNh4=;
-  b=J5RP4fDW/821hNVbo54ycb5/W4vL/aexP02+nNbsAHHtyu2EiYdI0EEw
-   SnBZ3wvqoM/Wpzs1oi0bftJt0ZLbsa66xIkT1BZG6MlMql49td66Oixr+
-   Vj1jvLwVJKQSvbK61OVBPgqPerC+qYX1pZBmh/9BY3afHxEnRK3bSmmt5
-   hoNwATZ8yuZYVETDlciiRMLwH9A62/dppznLZFWJSDF/9h+/8Yha1Xy91
-   cEnAhR+wT4a6OuSh3TER2ZB1BkVX+/Uw4wpOvL5UUAjFBMQyr5eJJjswr
-   UP58Z9oXOeCYIj4tRCSr27GPDNQD+QHWfMmyr9OQLKjmhgfRm2YuINOOO
-   A==;
-X-CSE-ConnectionGUID: fqitLqC9RdGNGf+tf8D7MA==
-X-CSE-MsgGUID: Vsrg875PQ3SLDHZZu0jjIQ==
-X-IronPort-AV: E=Sophos;i="6.12,231,1728975600"; 
-   d="scan'208";a="266719623"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Dec 2024 05:15:08 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 13 Dec 2024 05:14:37 -0700
-Received: from training-HP-280-G1-MT-PC.microchip.com (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 13 Dec 2024 05:14:32 -0700
-From: Divya Koppera <divya.koppera@microchip.com>
-To: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>,
-	<vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next v7 5/5] net: phy: microchip_t1 : Add initialization of ptp for lan887x
-Date: Fri, 13 Dec 2024 17:44:03 +0530
-Message-ID: <20241213121403.29687-6-divya.koppera@microchip.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20241213121403.29687-1-divya.koppera@microchip.com>
-References: <20241213121403.29687-1-divya.koppera@microchip.com>
+	s=arc-20240116; t=1734092233; c=relaxed/simple;
+	bh=ytUVsVWZvOJuemkIzzipVd5Jwy6oDdNZfWZ4ytUeMhQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lKlqb5eRKb28Hb+4LbnSmf7F54+9uLzTaoxephD1yR0qW7OzuT/CtsJUgVfe1k68e8SsklE6Uh9O/UCjpbEi3bu4gVdZq9V/9IW+kXnniIHLLFt5vMkGbU0JqyEUOE42n8wCMVifbvdPDlenvH4Fxp/nl9RVrEEE6Mi7vaYRv7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Y8pCp6dk0z1V5rg;
+	Fri, 13 Dec 2024 20:13:58 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3EC82180087;
+	Fri, 13 Dec 2024 20:17:07 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 13 Dec 2024 20:17:06 +0800
+Message-ID: <6b876bf8-ad97-49c9-867d-f16f122bd514@huawei.com>
+Date: Fri, 13 Dec 2024 20:17:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 3/3] bnxt_en: handle tpa_info in queue API
+ implementation
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Michael Chan <michael.chan@broadcom.com>, David Wei <dw@davidwei.uk>,
+	<netdev@vger.kernel.org>, Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20241204041022.56512-1-dw@davidwei.uk>
+ <20241204041022.56512-4-dw@davidwei.uk>
+ <9ca8506d-c42d-40a0-9532-7a95c06fed39@huawei.com>
+ <0bc60b9d-fbf7-4421-ab6a-5854355d68f4@davidwei.uk>
+ <a1d5ffda-1e6c-4730-8b36-6ba644bb0118@huawei.com>
+ <fedc8606-b3bc-4fb1-8803-a004cb24216e@davidwei.uk>
+ <CACKFLik1-rQB2QHY1pZ3eF0GYGUCgXFHvhh50DNboXV+A7MCuA@mail.gmail.com>
+ <20241211164841.44cba0ad@kernel.org>
+ <b0a4f301-9dfa-4785-9468-85f3849db81d@huawei.com>
+ <20241212065614.189cc7bc@kernel.org>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <20241212065614.189cc7bc@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-Add initialization of ptp for lan887x.
+On 2024/12/12 22:56, Jakub Kicinski wrote:
+> On Thu, 12 Dec 2024 19:23:52 +0800 Yunsheng Lin wrote:
+>> It seems an extra RCU sync is not really needed if page_pool_destroy()
+>> for the old page_pool is called between napi_disable() and napi_enable()
+>> as page_pool_destroy() already have a RCU sync.
+> 
+> I did my best.
+> 
 
-Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
----
-v6 -> v7
-- No changes
+I am not sure how to interpret the above comment.
 
-v5 -> v6
-- Renamed ptp functions and macros.
+Anyway, I guess it can be said the patch in [1] is only trying to fix
+a use-after-freed problem basing on the assumption that the softirq
+context on the same CPU has ensured sequential execution and a specific
+NAPI instance executed between different CPUs has also ensured sequential
+execution, so page_pool_napi_local() will only return true for a softirq
+context specific to the CPU being pool->p.napi->list_owner when list_owner
+!= -1 after napi_enable() is called, and page_pool_napi_local() will always
+return false after napi_disable() is called as pool->p.napi->list_owner is
+always -1 even when skb_defer_free_flush() can be called without binding to
+any NAPI instance and can be executed in the softirq context of any CPU.
 
-v2 -> v5
-- No changes
+If there is any timing window you think that might cause page_pool_napi_local()
+to return true unexpectly, it would be good to be more specific about it and
+a bigger rcu lock might be needed instead of a small rcu lock in [1].
 
-v1 -> v2
-Fixed below review comment
-  Added ptp support only if interrupts are supported as interrupts are mandatory
-  for ptp.
----
- drivers/net/phy/microchip_t1.c | 41 +++++++++++++++++++++++++++++++---
- 1 file changed, 38 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/phy/microchip_t1.c b/drivers/net/phy/microchip_t1.c
-index b17bf6708003..73f28463bc35 100644
---- a/drivers/net/phy/microchip_t1.c
-+++ b/drivers/net/phy/microchip_t1.c
-@@ -10,11 +10,15 @@
- #include <linux/ethtool.h>
- #include <linux/ethtool_netlink.h>
- #include <linux/bitfield.h>
-+#include "microchip_rds_ptp.h"
- 
- #define PHY_ID_LAN87XX				0x0007c150
- #define PHY_ID_LAN937X				0x0007c180
- #define PHY_ID_LAN887X				0x0007c1f0
- 
-+#define MCHP_RDS_PTP_LTC_BASE_ADDR		0xe000
-+#define MCHP_RDS_PTP_PORT_BASE_ADDR	    (MCHP_RDS_PTP_LTC_BASE_ADDR + 0x800)
-+
- /* External Register Control Register */
- #define LAN87XX_EXT_REG_CTL                     (0x14)
- #define LAN87XX_EXT_REG_CTL_RD_CTL              (0x1000)
-@@ -229,6 +233,7 @@
- 
- #define LAN887X_INT_STS				0xf000
- #define LAN887X_INT_MSK				0xf001
-+#define LAN887X_INT_MSK_P1588_MOD_INT_MSK	BIT(3)
- #define LAN887X_INT_MSK_T1_PHY_INT_MSK		BIT(2)
- #define LAN887X_INT_MSK_LINK_UP_MSK		BIT(1)
- #define LAN887X_INT_MSK_LINK_DOWN_MSK		BIT(0)
-@@ -319,6 +324,8 @@ struct lan887x_regwr_map {
- 
- struct lan887x_priv {
- 	u64 stats[ARRAY_SIZE(lan887x_hw_stats)];
-+	struct mchp_rds_ptp_clock *clock;
-+	bool init_done;
- };
- 
- static int lan937x_dsp_workaround(struct phy_device *phydev, u16 ereg, u8 bank)
-@@ -1269,8 +1276,19 @@ static int lan887x_get_features(struct phy_device *phydev)
- 
- static int lan887x_phy_init(struct phy_device *phydev)
- {
-+	struct lan887x_priv *priv = phydev->priv;
- 	int ret;
- 
-+	if (!priv->init_done && phy_interrupt_is_valid(phydev)) {
-+		priv->clock = mchp_rds_ptp_probe(phydev, MDIO_MMD_VEND1,
-+						 MCHP_RDS_PTP_LTC_BASE_ADDR,
-+						 MCHP_RDS_PTP_PORT_BASE_ADDR);
-+		if (IS_ERR(priv->clock))
-+			return PTR_ERR(priv->clock);
-+
-+		priv->init_done = true;
-+	}
-+
- 	/* Clear loopback */
- 	ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1,
- 				 LAN887X_MIS_CFG_REG2,
-@@ -1470,6 +1488,7 @@ static int lan887x_probe(struct phy_device *phydev)
- 	if (!priv)
- 		return -ENOMEM;
- 
-+	priv->init_done = false;
- 	phydev->priv = priv;
- 
- 	return lan887x_phy_setup(phydev);
-@@ -1518,6 +1537,7 @@ static void lan887x_get_strings(struct phy_device *phydev, u8 *data)
- 
- static int lan887x_config_intr(struct phy_device *phydev)
- {
-+	struct lan887x_priv *priv = phydev->priv;
- 	int rc;
- 
- 	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
-@@ -1537,12 +1557,24 @@ static int lan887x_config_intr(struct phy_device *phydev)
- 
- 		rc = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_INT_STS);
- 	}
-+	if (rc < 0)
-+		return rc;
- 
--	return rc < 0 ? rc : 0;
-+	if (phy_is_default_hwtstamp(phydev)) {
-+		return mchp_rds_ptp_top_config_intr(priv->clock,
-+					LAN887X_INT_MSK,
-+					LAN887X_INT_MSK_P1588_MOD_INT_MSK,
-+					(phydev->interrupts ==
-+					 PHY_INTERRUPT_ENABLED));
-+	}
-+
-+	return 0;
- }
- 
- static irqreturn_t lan887x_handle_interrupt(struct phy_device *phydev)
- {
-+	struct lan887x_priv *priv = phydev->priv;
-+	int rc = IRQ_NONE;
- 	int irq_status;
- 
- 	irq_status = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_INT_STS);
-@@ -1553,10 +1585,13 @@ static irqreturn_t lan887x_handle_interrupt(struct phy_device *phydev)
- 
- 	if (irq_status & LAN887X_MX_CHIP_TOP_LINK_MSK) {
- 		phy_trigger_machine(phydev);
--		return IRQ_HANDLED;
-+		rc = IRQ_HANDLED;
- 	}
- 
--	return IRQ_NONE;
-+	if (irq_status & LAN887X_INT_MSK_P1588_MOD_INT_MSK)
-+		rc = mchp_rds_ptp_handle_interrupt(priv->clock);
-+
-+	return rc;
- }
- 
- static int lan887x_cd_reset(struct phy_device *phydev,
--- 
-2.17.1
+1. https://lore.kernel.org/all/20241120103456.396577-2-linyunsheng@huawei.com/#r
 
 
