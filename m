@@ -1,162 +1,150 @@
-Return-Path: <netdev+bounces-151882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC599F1737
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 21:11:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC7579F1735
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 21:11:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60A39188D22E
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:11:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BD497A13D9
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3924F190696;
-	Fri, 13 Dec 2024 20:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D8A2190057;
+	Fri, 13 Dec 2024 20:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="bUsl9Xks"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aNI5GnhQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B33718FDBE;
-	Fri, 13 Dec 2024 20:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A765818FDBE
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 20:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734120386; cv=none; b=WS+EFUZmchgANShzcD4L2qvJryJcKmIQ9MxrIBr4r2NBHT2YFGlEUhOXacA7mCUELDVMtXRZ3T61UtO29j2MdyXHVtLCuwY8tko2YxSmqNEXp96jvvnU90AF64bCrkAabBEqD704RvpZ0VXACMALsoG1SjArYyKvUnxnRMBXwI8=
+	t=1734120397; cv=none; b=ss+pFt0TNkCR01ZWtJaStBON60s5q8QuGZJhEzZ94UzAAEfg9Ebx0yRD3cOtMPPL6ewh2n7DuRw09DcHG3+AJyQdbsz21EyWiIfw5/c+DZ9L1hqW4zLHtLGQKkSq/QD/f1Jyb2OXnpGJst+elPOWvWo0NFR57XLUtiQpbrJO3MU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734120386; c=relaxed/simple;
-	bh=PpdV+TAyG3tKXdPwl6HN0V9j9NLvFMFR7G1T99bJP4A=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=gTrtVQhc82KU26l8aCjBOtPuQwFWgLz4uoNxHo4JfYV4KdUUYmHphUjTNXtDEqMBl6ZVL5eovbx7i45/koORwm3k1acSG8X47Kp31s5JCA1kuOt1+DB8e0xSfihxxUEunbuFX7sWsnzdERqtB07K2HgPBhYLkiRiAT/gI0fE3WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b=bUsl9Xks; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1202)
-	id 0CCBF20BCAD0; Fri, 13 Dec 2024 12:06:24 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0CCBF20BCAD0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
-	s=default; t=1734120384;
-	bh=vJ1S+b1BSe5VAHRIRV0GkW0d4sHaXpM7+ERD6ffAyVE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=bUsl9XksWclBwDTryioRbgDJcBWGomCsPSbbY003/uRc8A4dCpW+CVqRwunLyD8PB
-	 +EVjyuA//sWeDmAjX5OqxZIZ7hVVSgF1hgTD2yn6bGQbIIlDFn/rscNSFFmY1+6SxO
-	 VCOabvRZruoaaQ0IawAf86m9DlYMoIKcX61svFoM=
-From: longli@linuxonhyperv.com
-To: Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
+	s=arc-20240116; t=1734120397; c=relaxed/simple;
+	bh=cG6uc0NBxNWqJgE99oquIu0aGeIAk+VARYlI2XGXnNA=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HyujAFwYzqiZoRZWUe36L/4l86/zNXWYmNLLer8PVXDLccp2h8r8dclbyfr1GJdCwlbyzKUqCBL8RhSk1B8fkPeRE/nT0fbWVhyD7o0gOR7+//Eg0mWSdGuf5LREGhyl5S4RVkZv0sFhWq13cSMFGMubm7SObz8HiwKCv/YK8Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aNI5GnhQ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:To:From:Date:Reply-To:Cc:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=q6XBpg/4IY/h2oG4Vm6RRozZRxiEoSr8X5lqGM2zVMQ=; b=aNI5GnhQ6591BedH7CtBIbwC3F
+	pPegR4DND7Y/V0E+4t4zeoFoiA4JLIzRvfkwicxC81fLd2Ni+pEJlR5DEadz7cng3p7F5+jqj7ut2
+	0gy193TVuR83XUqRwvK60EUJQZjeEznMo5DK7ygI8PaY2FTQGbMeBIk/Jubz49CQe9Wnm1H1onRjF
+	rWaijsyAlwiEioPkzZyU/rLwFrv3gujLHJGlaVMDMUlkgpfe6YqA6E4pmsgDMdYb7YtV+yd5VIpxF
+	peu09WWvvSxecCx9Bc+jUMX103IOvU51cBhnpqBHpmJh/c9W2gjBpkthcxqGqa6l/3oYMHIl7KNp6
+	XeeBe0yA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35158)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tMBvd-0007Iw-2d;
+	Fri, 13 Dec 2024 20:06:25 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tMBva-0006ZC-0s;
+	Fri, 13 Dec 2024 20:06:22 +0000
+Date: Fri, 13 Dec 2024 20:06:22 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Cc: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	Long Li <longli@microsoft.com>
-Subject: [Patch net-next v2] hv_netvsc: Set device flags for properly indicating bonding in Hyper-V
-Date: Fri, 13 Dec 2024 12:06:01 -0800
-Message-Id: <1734120361-26599-1-git-send-email-longli@linuxonhyperv.com>
-X-Mailer: git-send-email 1.8.3.1
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 2/7] net: stmmac: move tx_lpi_timer tracking to
+ phylib
+Message-ID: <Z1yTviYUZ8sbNOsK@shell.armlinux.org.uk>
+References: <Z1r3MWZOt36SgGxf@shell.armlinux.org.uk>
+ <E1tLkSX-006qfS-Rx@rmk-PC.armlinux.org.uk>
+ <Z1wTqh-BnvPYLqU8@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z1wTqh-BnvPYLqU8@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Long Li <longli@microsoft.com>
+On Fri, Dec 13, 2024 at 10:59:54AM +0000, Russell King (Oracle) wrote:
+> On Thu, Dec 12, 2024 at 02:46:33PM +0000, Russell King (Oracle) wrote:
+> > @@ -1092,6 +1092,7 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+> >  			phy_init_eee(phy, !(priv->plat->flags &
+> >  				STMMAC_FLAG_RX_CLK_RUNS_IN_LPI)) >= 0;
+> >  		priv->eee_enabled = stmmac_eee_init(priv);
+> > +		priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
+> >  		priv->tx_lpi_enabled = priv->eee_enabled;
+> >  		stmmac_set_eee_pls(priv, priv->hw, true);
+> >  	}
+> 
+> While looking deeper at stmmac, there's a bug in the above hunk -
+> stmmac_eee_init() makes use of priv->tx_lpi_timer, so this member
+> needs to be set before calling this function. I'll post a v2 shortly.
 
-On Hyper-V platforms, a slave VF netdev always bonds to Netvsc and remains
-as Netvsc's only active slave as long as the slave device is present. This
-behavior is not user-configurable.
+I'm going to hold off v2, there's a lot more that can be cleaned up
+here - the EEE code is rather horrid in stmmac, and there's definitely
+one race, and one logical error in it (e.g. why mark software EEE mode
+*enabled* when EEE mode is being disabled - which can lead to the EEE
+timer being added back onto the timer list.)
 
-Other kernel APIs (e.g those in "include/linux/netdevice.h") check for
-IFF_MASTER, IFF_SLAVE and IFF_BONDING for determing if those are used
-in a master/slave bonded setup. RDMA uses those APIs extensively when
-looking for master/slave devices. Netvsc's bonding setup with its slave
-device falls into this category.
+There's also weirdness with dwmac4's EEE register fiddling.
 
-Make hv_netvsc properly indicate bonding with its slave and change the
-API to reflect this bonding setup.
+The stmmac driver uses hardware timed LPI entry if the timer is small
+enough to be programmed into hardware, otherwise it uses software mode.
 
-Signed-off-by: Long Li <longli@microsoft.com>
----
+When software mode wants to enter LPI mode, it sets both:
 
-Change log
-v2: instead of re-using IFF_BOND, introduce permanent_bond in netdev
+	GMAC4_LPI_CTRL_STATUS_LPIEN (LPI enable)
+	GMAC4_LPI_CTRL_STATUS_LPITXA (LPI TX Automate)
 
- drivers/net/hyperv/netvsc_drv.c | 12 ++++++++++++
- include/linux/netdevice.h       |  8 ++++++--
- 2 files changed, 18 insertions(+), 2 deletions(-)
+When software mode wants to exit LPI mode, it clears both of these
+two bits.
 
-diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
-index d6c4abfc3a28..7867f8e45f86 100644
---- a/drivers/net/hyperv/netvsc_drv.c
-+++ b/drivers/net/hyperv/netvsc_drv.c
-@@ -2204,6 +2204,10 @@ static int netvsc_vf_join(struct net_device *vf_netdev,
- 		goto rx_handler_failed;
- 	}
- 
-+	vf_netdev->permanent_bond = 1;
-+	ndev->permanent_bond = 1;
-+	ndev->flags |= IFF_MASTER;
-+
- 	ret = netdev_master_upper_dev_link(vf_netdev, ndev,
- 					   NULL, NULL, NULL);
- 	if (ret != 0) {
-@@ -2484,7 +2488,15 @@ static int netvsc_unregister_vf(struct net_device *vf_netdev)
- 
- 	reinit_completion(&net_device_ctx->vf_add);
- 	netdev_rx_handler_unregister(vf_netdev);
-+
-+	/* Unlink the slave device and clear flag */
-+	vf_netdev->permanent_bond = 0;
-+	ndev->permanent_bond = 0;
-+	vf_netdev->flags &= ~IFF_SLAVE;
-+	ndev->flags &= ~IFF_MASTER;
-+
- 	netdev_upper_dev_unlink(vf_netdev, ndev);
-+
- 	RCU_INIT_POINTER(net_device_ctx->vf_netdev, NULL);
- 	dev_put(vf_netdev);
- 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index ecc686409161..4531f45d3e83 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1997,6 +1997,7 @@ enum netdev_reg_state {
-  *	@change_proto_down: device supports setting carrier via IFLA_PROTO_DOWN
-  *	@netns_local: interface can't change network namespaces
-  *	@fcoe_mtu:	device supports maximum FCoE MTU, 2158 bytes
-+ *	@permanent_bond: device is permanently bonded to another device
-  *
-  *	@net_notifier_list:	List of per-net netdev notifier block
-  *				that follow this device when it is moved
-@@ -2402,6 +2403,7 @@ struct net_device {
- 	unsigned long		change_proto_down:1;
- 	unsigned long		netns_local:1;
- 	unsigned long		fcoe_mtu:1;
-+	unsigned long		permanent_bond:1;
- 
- 	struct list_head	net_notifier_list;
- 
-@@ -5150,12 +5152,14 @@ static inline bool netif_is_macvlan_port(const struct net_device *dev)
- 
- static inline bool netif_is_bond_master(const struct net_device *dev)
- {
--	return dev->flags & IFF_MASTER && dev->priv_flags & IFF_BONDING;
-+	return dev->flags & IFF_MASTER &&
-+	       (dev->priv_flags & IFF_BONDING || dev->permanent_bond);
- }
- 
- static inline bool netif_is_bond_slave(const struct net_device *dev)
- {
--	return dev->flags & IFF_SLAVE && dev->priv_flags & IFF_BONDING;
-+	return dev->flags & IFF_SLAVE &&
-+	       (dev->priv_flags & IFF_BONDING || dev->permanent_bond);
- }
- 
- static inline bool netif_supports_nofcs(struct net_device *dev)
+In hardware mode, when enabling LPI generation, we set the hardware LPI
+entry timer (separate register) to a non-zero value, and then set:
+
+	GMAC4_LPI_CTRL_STATUS_LPIEN (LPI enable)
+	GMAC4_LPI_CTRL_STATUS_LPITXA (LPI TX Automate)
+	GMAC4_LPI_CTRL_STATUS_LPIATE (LPI Timer enable)
+
+That seems logical. However, in hardware mode, when we want to then
+disable hardware LPI generation, we set the hardware LPI entry timer to
+zero, the following bits:
+
+	GMAC4_LPI_CTRL_STATUS_LPIEN (LPI enable)
+	GMAC4_LPI_CTRL_STATUS_LPITXA (LPI TX Automate)
+
+and clear:
+
+	GMAC4_LPI_CTRL_STATUS_LPIATE (LPI Timer enable)
+
+So, hardware mode, disabled, ends up setting the same bits as
+software mode wanting to generate LPI state on the transmit side.
+This makes no sense to me, and looks like another bug in this driver.
+
+Can anyone suggest any hardware that I could source which uses the
+dwmac4 code and which supports EEE please, so that I have hardware to
+run some tests on.
+
+Thanks.
+
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
