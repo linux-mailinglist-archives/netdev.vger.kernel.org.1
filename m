@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-151920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0742E9F1A06
-	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 00:33:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0DDF9F1A0C
+	for <lists+netdev@lfdr.de>; Sat, 14 Dec 2024 00:33:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24820166E47
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 23:32:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EEB2188DF0E
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 23:33:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002231F427A;
-	Fri, 13 Dec 2024 23:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A081F472A;
+	Fri, 13 Dec 2024 23:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Htq04AlO"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="O90NrWUd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523CD1F3D3E
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 23:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349011F4293
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 23:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734132612; cv=none; b=qeF79eGz6GMI/FzdHbvA74yr0tnaTFlB/SZ09gw5erCqce+AF6iRVb7mupUc4/OIeGGS7O0GBhH2xdPAOIgRQhqwmtGNkaOLBTHVV81AhpexsDV5tvhcpHkOfbpwPaTcr4X6JbiM474h5V0YhYr//0ThasalSaUWYnTQ4SQRR2I=
+	t=1734132615; cv=none; b=aeaQ3gz7zagDzVQe3Wm32MhtalZ/usPFQouUHWutpowVKqOrdTVzgsetg1WS4IkvCP+++uwr7xoJUflANZAmz2M1KvJPKQAgYo4mcN7Knh7NY9ZHyw5SxQ2qTHCHiMDe6qdMCMQL2tuDEFDoQuOlkwt0Sp7pFsKGmAMDL8TIAsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734132612; c=relaxed/simple;
-	bh=u4js09ZrJprP9Ct6KS/KG66aSEf0301PiPjx92HhRYA=;
+	s=arc-20240116; t=1734132615; c=relaxed/simple;
+	bh=X+t8gDEwNbFCtVM95/5isGpSKd5GAziNVGIkVSSzfPg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=htfR8+g/h3IQUAk9iudg8Fkq6eImKNlhVCg/bmF0pNw8rsuZqLlVtiExU8L64VVvZaJvZi5j5sw86rP5pm6oJ+obcdlpUSRYX8E/ojrJ8CI4OCDVVbW/P4yy6VVRqZMGg8+WL4PQBSjFd2oFbVA9K4lXWAXBWaOwXJc8gy2RZS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Htq04AlO; arc=none smtp.client-ip=209.85.160.171
+	 MIME-Version; b=YjR2f+zX00XgJCKf8jxoYwJIG6fjJzhO0TD9jeQ0mqxgvr4Bk9b57ZcaeTkvsLpxI5QocW2FXWj5++6Jmz1FlqxL/+HchJhDIog3QB3w3onwSpAGF63c2nqsOU4MabkDDHNt2NPIfxuEaRn8yeYBLnLh0Qii+tH9gBDdG0/G3Ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=O90NrWUd; arc=none smtp.client-ip=209.85.222.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-46772a0f8fbso20220291cf.3
-        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 15:30:11 -0800 (PST)
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7b1601e853eso180576685a.2
+        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 15:30:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1734132610; x=1734737410; darn=vger.kernel.org;
+        d=bytedance.com; s=google; t=1734132611; x=1734737411; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AsUHCw4T0E7XChR9WsYxTd868449t9RXx5ZWu1kInUM=;
-        b=Htq04AlOlj5VkevqSqDPSSvoCiTKcpm6D8OxycxzNdf2rOBwvdi3CVGm+vHVWOhJco
-         hcGd8rJJFIyd4JbBBsOdiopBHK7SY5NmXv3S5Tg2mPAdTbb3wzCKwVPdJzixgnWk/oS/
-         GqqHR5B2e47DnK2zX1yexsMPvMZm3syERf0yTEVeHG9XQ+SnJT8bkX5UjT8m3gymNbS9
-         6bo5K8xMzDRDKl8mgqmQMPmRppiWDqZUMuhPYx+/xw73TKhOY9WD6axBr6QjNQfubXVp
-         Ir5G0vKpGJqq6dvA3wYATAgEQMrIcHaknqYePY0yLNQWcJb/v1SQwvItkvkc7gNEjOMY
-         dqNA==
+        bh=exqCsIoLkuY4OTkf+/hY3xBxRD9kSVmRMozwdnr8pz8=;
+        b=O90NrWUd4Bnr8pX5fjseoTNFdwK+KJvnmyvPupOeSzTDY2osw7LwnZb+/MSHO58Idw
+         l2meNhiaJ3qBlBG6g2UrF7ZVe3ilKU3j/PM9h6Cp4Miq07WhZW0FsE7yvLcAvBKzgeYU
+         Lska9uXft6POELeMJ9agF1go82UslmttA6wbaaPHbUcsIJSDrpA35hi+x+keeeX7ZXiX
+         UI2Ld4Ywd9JqD5L7DbOWxFNoarQO7NVW+SCwKVfVTWT1oYPhpRSv3JOYHcbxUfIpLZzL
+         DtyT2euuaFXOlTzv9vR3IaHMPTHfEjtOem12q2k7X83TFRk2CKseB1BfJ1kMtPFLGyRt
+         uMwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734132610; x=1734737410;
+        d=1e100.net; s=20230601; t=1734132611; x=1734737411;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AsUHCw4T0E7XChR9WsYxTd868449t9RXx5ZWu1kInUM=;
-        b=w9qodQtmLCRKbiI+UZjLbEWrz5r5HiuYxbACXNRUjpJAdshDJ6RNzps5CLx8P0Af7t
-         WrjLuGsibCX03W/ghKqw2uhQuqqbeTE1BxDyIhm7R2O1tGslnT3jAsepX2VVZCF8bAKl
-         c907hMdbbVj9OHjiRJvmPz62zne5Xx/H9ol79oMw6iMBBrkH310iFpML0DEu5vbmnjiP
-         bcIWBLuANkec/9UU4n9Gbbu65l794Q2ly1PiSwUl3mG5+18RRLT0QIjq3rGQ2/91VuJm
-         jwpGPJOaJH7Y9a2P8WvMFMqUsuc7UHHQ6JK9kiIol1BJBAaoG/9UJBlpjS/oUd0BsP4M
-         H6qA==
-X-Gm-Message-State: AOJu0Yz6uFmVUaq8PVtnulGq3gudHvsb/TCFKgVSNXcPOd/O5lX9h25N
-	3a97yKv+aM5A0zezh4jDqfV9l4hHVqwr3/xumHxNlqs3VASv5437FtHyonBVzsWkDc8/vfrBRvd
-	wOh7qOA==
-X-Gm-Gg: ASbGncuS4ssu8Gwg5O7ox0Wwdl1jYLV3h64mOoItURMvwYnA4FlaIOPMccPqfCXg2Qb
-	nbcWCpJ/cln3vR58BrTLN1FAY1/LodQsmrHjTKECgkgmCJH4Ew1XMoQVgOg5WPEZUw4igweK9LV
-	+Zggh2/TNaI8EflEGp6xlYtP2Vtqq3tvcdNM8AAXBZVDXP33h6LW3mre0k5B2zB4MGaH1FpDrF6
-	6T2ED4TVTJGV0OraeWLsuZtfo90QYDutMVi/aoGGDiHdfUxO/BJwABlnGPR7jH/IOI086Jx3cD2
-X-Google-Smtp-Source: AGHT+IF1w0JRYjaYuWkP2HsGdMaLVD3k7SbV34NZbx2XywOZUx4L6+IKiXSlKL9dxXI81FbxYMYgIQ==
-X-Received: by 2002:ac8:7dd6:0:b0:466:96ef:90c with SMTP id d75a77b69052e-467a5829a18mr66297661cf.41.1734132609973;
-        Fri, 13 Dec 2024 15:30:09 -0800 (PST)
+        bh=exqCsIoLkuY4OTkf+/hY3xBxRD9kSVmRMozwdnr8pz8=;
+        b=ludLqhjh+9SNgRYbuy9PcAt5RtsLvWTVh3jp4ZzpTEiyejA4xFJqayuIBkgYu23+ZW
+         Xfpto/aHQGUzQa7HdD7w37EFpIEny4R9OxnEKdRjSJD3TdWnizcu3HXIK/HFvJ55L3JA
+         47pUrhZpghVQxf+lVnz47O6Hd1091nxVeKGujGf2UN2g6txvCmXFYSy9ANm29dSJrTNm
+         fmgbKXuMTq2X9JdQJl9CEHabW/WDVtb+ZoxZFC+NUU1rWodcTwAcB9j3b6bOTtFDUTzh
+         xZQT8dG3ksxXAVBGVHPeEhGBYw9YMWC5X09BhOInVANjas1MSl1zZ8umbYqjpDcXITbH
+         FH8w==
+X-Gm-Message-State: AOJu0Yy4YnMARG2vtkNCLXcN65lY9oRSuF/7g0RcqDNGT/S+AVRkxNCy
+	2P7EcOPQsnv237CjH+Au+LGeOep182dsBrj4QlDZ52IDjYghHd2/4mf11+oRGbKjchWde45CWvn
+	j3oY=
+X-Gm-Gg: ASbGncsRWEl+YjfF3/2NSgirP4qZ00mcmPW0kQYC283r/7ugBd52y7qXNB/0fE6vZG2
+	ffJtoACmSUxFMCuJwAz+hB2aXxheCVmUbLr7Jbu+mGGZfq4sq1GgK29Um89Tilg/vflR/Jo24Nz
+	gpIWrIRlI0A5+wiksUqGzRelAmCCUv4LWMmwFZ6CWh/MdxUf1NxIDJRl8Bg/c5kL2TYEIDcZrGr
+	CizdVjGOxCWijGdfuAgw0pqTV3HLtrx3AMdLb/KPqC/Hku6pfVMWWidXE3f7VFZJrzSPZH8J4Wm
+X-Google-Smtp-Source: AGHT+IHabF5pqAFjUWYISSxmqI352ucWV5AJ52EofqpegSXFLtjrENmjqVDxwaeJ37QzD1+hNQ84fA==
+X-Received: by 2002:a05:620a:28cc:b0:7b6:6ffc:e972 with SMTP id af79cd13be357-7b6fbec7990mr742243185a.5.1734132611374;
+        Fri, 13 Dec 2024 15:30:11 -0800 (PST)
 Received: from n36-183-057.byted.org ([130.44.215.64])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b7047d4a20sm25805085a.39.2024.12.13.15.30.08
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b7047d4a20sm25805085a.39.2024.12.13.15.30.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 15:30:09 -0800 (PST)
+        Fri, 13 Dec 2024 15:30:11 -0800 (PST)
 From: Amery Hung <amery.hung@bytedance.com>
 To: netdev@vger.kernel.org
 Cc: bpf@vger.kernel.org,
@@ -88,9 +88,9 @@ Cc: bpf@vger.kernel.org,
 	xiyou.wangcong@gmail.com,
 	yepeilin.cs@gmail.com,
 	ameryhung@gmail.com
-Subject: [PATCH bpf-next v1 08/13] bpf: net_sched: Support updating bstats
-Date: Fri, 13 Dec 2024 23:29:53 +0000
-Message-Id: <20241213232958.2388301-9-amery.hung@bytedance.com>
+Subject: [PATCH bpf-next v1 09/13] bpf: net_sched: Support updating qstats
+Date: Fri, 13 Dec 2024 23:29:54 +0000
+Message-Id: <20241213232958.2388301-10-amery.hung@bytedance.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20241213232958.2388301-1-amery.hung@bytedance.com>
 References: <20241213232958.2388301-1-amery.hung@bytedance.com>
@@ -102,52 +102,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a kfunc to update Qdisc bstats when an skb is dequeued. The kfunc is
-only available in .dequeue programs.
+Allow bpf qdisc programs to update Qdisc qstats directly with btf struct
+access.
 
 Signed-off-by: Amery Hung <amery.hung@bytedance.com>
 ---
- net/sched/bpf_qdisc.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ net/sched/bpf_qdisc.c | 53 ++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 45 insertions(+), 8 deletions(-)
 
 diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
-index 7c155207fe1e..b5ac3b9923fb 100644
+index b5ac3b9923fb..3901f855effc 100644
 --- a/net/sched/bpf_qdisc.c
 +++ b/net/sched/bpf_qdisc.c
-@@ -176,6 +176,15 @@ __bpf_kfunc void bpf_qdisc_watchdog_schedule(struct Qdisc *sch, u64 expire, u64
- 	qdisc_watchdog_schedule_range_ns(&q->watchdog, expire, delta_ns);
+@@ -57,6 +57,7 @@ bpf_qdisc_get_func_proto(enum bpf_func_id func_id,
+ 	}
  }
  
-+/* bpf_qdisc_bstats_update - Update Qdisc basic statistics
-+ * @sch: The qdisc from which an skb is dequeued.
-+ * @skb: The skb to be dequeued.
-+ */
-+__bpf_kfunc void bpf_qdisc_bstats_update(struct Qdisc *sch, const struct sk_buff *skb)
-+{
-+	bstats_update(&sch->bstats, skb);
-+}
++BTF_ID_LIST_SINGLE(bpf_qdisc_ids, struct, Qdisc)
+ BTF_ID_LIST_SINGLE(bpf_sk_buff_ids, struct, sk_buff)
+ BTF_ID_LIST_SINGLE(bpf_sk_buff_ptr_ids, struct, bpf_sk_buff_ptr)
+ 
+@@ -81,20 +82,37 @@ static bool bpf_qdisc_is_valid_access(int off, int size,
+ 	return bpf_tracing_btf_ctx_access(off, size, type, prog, info);
+ }
+ 
+-static int bpf_qdisc_btf_struct_access(struct bpf_verifier_log *log,
+-					const struct bpf_reg_state *reg,
+-					int off, int size)
++static int bpf_qdisc_qdisc_access(struct bpf_verifier_log *log,
++				  const struct bpf_reg_state *reg,
++				  int off, int size)
+ {
+-	const struct btf_type *t, *skbt;
+ 	size_t end;
+ 
+-	skbt = btf_type_by_id(reg->btf, bpf_sk_buff_ids[0]);
+-	t = btf_type_by_id(reg->btf, reg->btf_id);
+-	if (t != skbt) {
+-		bpf_log(log, "only read is supported\n");
++	switch (off) {
++	case offsetof(struct Qdisc, qstats) ... offsetofend(struct Qdisc, qstats) - 1:
++		end = offsetofend(struct Qdisc, qstats);
++		break;
++	default:
++		bpf_log(log, "no write support to Qdisc at off %d\n", off);
++		return -EACCES;
++	}
 +
- __bpf_kfunc_end_defs();
- 
- #define BPF_QDISC_KFUNC_xxx \
-@@ -183,6 +192,7 @@ __bpf_kfunc_end_defs();
- 	BPF_QDISC_KFUNC(bpf_kfree_skb, KF_RELEASE) \
- 	BPF_QDISC_KFUNC(bpf_qdisc_skb_drop, KF_RELEASE) \
- 	BPF_QDISC_KFUNC(bpf_qdisc_watchdog_schedule, KF_TRUSTED_ARGS) \
-+	BPF_QDISC_KFUNC(bpf_qdisc_bstats_update, KF_TRUSTED_ARGS) \
- 
- BTF_KFUNCS_START(bpf_qdisc_kfunc_ids)
- #define BPF_QDISC_KFUNC(name, flag) BTF_ID_FLAGS(func, name, flag)
-@@ -204,6 +214,9 @@ static int bpf_qdisc_kfunc_filter(const struct bpf_prog *prog, u32 kfunc_id)
- 		if (strcmp(prog->aux->attach_func_name, "enqueue") &&
- 		    strcmp(prog->aux->attach_func_name, "dequeue"))
- 			return -EACCES;
-+	} else if (kfunc_id == bpf_qdisc_bstats_update_ids[0]) {
-+		if (strcmp(prog->aux->attach_func_name, "dequeue"))
-+			return -EACCES;
++	if (off + size > end) {
++		bpf_log(log,
++			"write access at off %d with size %d beyond the member of Qdisc ended at %zu\n",
++			off, size, end);
+ 		return -EACCES;
  	}
  
++	return 0;
++}
++
++static int bpf_qdisc_sk_buff_access(struct bpf_verifier_log *log,
++				    const struct bpf_reg_state *reg,
++				    int off, int size)
++{
++	size_t end;
++
+ 	switch (off) {
+ 	case offsetof(struct sk_buff, tstamp):
+ 		end = offsetofend(struct sk_buff, tstamp);
+@@ -136,6 +154,25 @@ static int bpf_qdisc_btf_struct_access(struct bpf_verifier_log *log,
  	return 0;
+ }
+ 
++static int bpf_qdisc_btf_struct_access(struct bpf_verifier_log *log,
++				       const struct bpf_reg_state *reg,
++				       int off, int size)
++{
++	const struct btf_type *t, *skbt, *qdisct;
++
++	skbt = btf_type_by_id(reg->btf, bpf_sk_buff_ids[0]);
++	qdisct = btf_type_by_id(reg->btf, bpf_qdisc_ids[0]);
++	t = btf_type_by_id(reg->btf, reg->btf_id);
++
++	if (t == skbt)
++		return bpf_qdisc_sk_buff_access(log, reg, off, size);
++	else if (t == qdisct)
++		return bpf_qdisc_qdisc_access(log, reg, off, size);
++
++	bpf_log(log, "only read is supported\n");
++	return -EACCES;
++}
++
+ __bpf_kfunc_start_defs();
+ 
+ /* bpf_skb_get_hash - Get the flow hash of an skb.
 -- 
 2.20.1
 
