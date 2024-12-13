@@ -1,135 +1,128 @@
-Return-Path: <netdev+bounces-151829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D63B19F1260
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 17:40:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4E0B9F1291
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 17:46:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3881A1886644
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 16:40:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C42F11634CF
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 16:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD53E1DFD8D;
-	Fri, 13 Dec 2024 16:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699311EF0B1;
+	Fri, 13 Dec 2024 16:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XvMpnbV/"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7BD16A395;
-	Fri, 13 Dec 2024 16:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48C21EB9FA;
+	Fri, 13 Dec 2024 16:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734108017; cv=none; b=gTlh9tzY34KZEqeAq91OSnVh5zcn4vmUUL5c6yVXzlBMBuOO1Hn7DPhWzQGAbcWvIxvZGvckRuqnyI90Fd4ad9x4xKwTWQDLzJK/6mr8fOHLhgNcOh4t94IKSz/KuREKxLFoxwJlocv6voIrs+Tn2oylxR6FfD+JZK0lnsHSLug=
+	t=1734108317; cv=none; b=pDgxJ+K8PCgnbRbLqEcbMVku4U3QJwmgGreYNLtEUR/297s2YMMjJ7tawQf8cYiI1g6IjFznThn62PbKg46iDZ/XL4RpeoFiZuyRu5zm5KMk34XuqdMnlpVkRuLjQYOUw+7pRTIgQqU7jTPYCfHiGSRwKD9K8BsPTPXVUsJ5Ndw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734108017; c=relaxed/simple;
-	bh=GDiexkk7pAH8avv7/z7D9a3xAVinxygO3SwzNDcyRFU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RJqgp7ibJYZ64L0yfgzhGlQZKG+P1RFfzRsgtdbHgszKoq8GlNqRaTpZ1E0s9e0HY2l56+QNzTnHqhLRqSGJjI3JezRYcWvd3lLY3/tMpeHmQQc234SXwlbJrulw+FqIr/NqQiPijBeYNSgoZsaaFZFTxer2OlOMWKc0jUEF8nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Y8w5t0Nz7z6L7FZ;
-	Sat, 14 Dec 2024 00:39:14 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id 536F1140A46;
-	Sat, 14 Dec 2024 00:40:11 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 13 Dec 2024 19:40:09 +0300
-Message-ID: <fe8fe02f-db3b-a4a2-508f-dda8b434d44a@huawei-partners.com>
-Date: Fri, 13 Dec 2024 19:40:07 +0300
+	s=arc-20240116; t=1734108317; c=relaxed/simple;
+	bh=NPAZUXfChV3Ora7zPnwBI0ZZT7tSuwhUS6n6eLE6twA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=crIFH19+HfKTelZlSU7Efv5AHx8NYrNy9fiqiyRgFs5WvWKA7KGqslMiQHT624v1Qy8g+/4hsoBZ5bydp+TnmfCXYzsEr9efY5gpeJPHIsfGugGDsteZa6SAHbnaxZ2pChifxvseR+zpT5i8xCECPztlEoZU9ZtmDiG3zEfejf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XvMpnbV/; arc=none smtp.client-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5f2da12248fso1490203eaf.1;
+        Fri, 13 Dec 2024 08:45:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734108313; x=1734713113; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=OwNuHyLKhIGlf1NAC+j01SXo3WPBAmH1vYDsVrnqpYQ=;
+        b=XvMpnbV/1N6JUlCOmub4ngscFn7RZvf0J+mmIqq0VIK3EC6t92viIAhCR2fiDfsIyh
+         iK23vZH80SdCdVxS30j6MMCwt3xtxBgXBjQ9FyPYNS1t/tHZb3XmdaVBc6j8mEgIwKaY
+         a5/XpnwKGbY0dKX/MmwqyvyqjjfyKeFN06x99jfkRdXXyn/o3ypficjT/gM1NFeqR5a9
+         8JiUpWhvrLutMizOSWufxlqvIUB2KcYQWWIeFitaNe4vURbsvH3OuSk7fjM4oLDK2iuS
+         rLuWO5U44zpzfAdAtB302BjihFKcE5g1G9jmUZAuDWCjhvGUz48F2f+CEcRGZ2TcfM0d
+         2oOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734108313; x=1734713113;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OwNuHyLKhIGlf1NAC+j01SXo3WPBAmH1vYDsVrnqpYQ=;
+        b=Iz6HmrF0W3hBfV8o3aI1gppJwyxbkDckE/W4i2jaN94jHXWsme+FWxj21lmUkN+eQ1
+         pr1TAA3HP4+27tj10qHCSFl3vMef+ycipFl1Ga4hxyFmTGIW0a7pvQjkFWmfx3L3g5ni
+         JbxMg454Schx8VgULXfdepSLZwqyKWYWYDptolAwSXHDuOpwP7hCY4gfYblD4vl9OJFX
+         vO/cVRSryjToVbdH8FOlaQEpIjh9XhxLcuIUqCRw9ryyVAaaBJGTT7WjY7xB8efLZ98V
+         V6G7cpsYhq0bFNFsoxIv2ZaBa4CM/CkFyLU9KwKSMBwLgayl9cD3yBxIfk7f+x+Qtml3
+         3Uxw==
+X-Forwarded-Encrypted: i=1; AJvYcCWjNezT1GVh7Pd8c0p1nMB2UeyWs/QWa8y1hNz42O0wsk2kEPpIGCj9/i8Mb88vSGYt1iVjSoOBht7ORBZvwlQQ@vger.kernel.org, AJvYcCX60HYipUmeG3C82q89UOHXs0ZBXwZdBvaibDEYDoUWbKh78cih7AKQTckTOxkz6RvhLZ+p7mIZftJAY3I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYcWjFLMzQccKZdW2soxMJ5jkZo7t+k/SmUkAJIQ1li6A7GheI
+	NoilSBz+1Z16LlISP1JGRT7hSQixeIDTwhfDYJqq8/bpDHNtcItGmvgybMhxngMK6TKDapMjuZN
+	fSq0wpdsuAsiM1MG51LU+0OOSxXY=
+X-Gm-Gg: ASbGncsKOR5AjRp2X4KfK/4pmH5u8tpqZTX2Yl/Th5++COGsI3WX2wP37yYEEEnJanF
+	bk12A9GSQ6LkNqiOJX2lTdnp9Vdgh7dxDWjKp5Fe20//4OyBYQPR7cfC5aK9ksLdPKfqd
+X-Google-Smtp-Source: AGHT+IH5ADgyiFzZyO3c31OoGlIMIA6FqPa1UlyERbfGuj/pj1zNOeVEVig4Vm77wMEWiAuhx3DZ49RgowBEUKbS6S8=
+X-Received: by 2002:a05:6870:ac90:b0:29a:ea3b:a68e with SMTP id
+ 586e51a60fabf-2a384fa112amr3853224fac.0.1734108313629; Fri, 13 Dec 2024
+ 08:45:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] selinux: Read sk->sk_family once in selinux_socket_bind()
-Content-Language: ru
-To: Stephen Smalley <stephen.smalley.work@gmail.com>
-CC: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
-	<paul@paul-moore.com>, <selinux@vger.kernel.org>, <omosnace@redhat.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20241212102000.2148788-1-ivanov.mikhail1@huawei-partners.com>
- <20241212.zoh7Eezee9ka@digikod.net>
- <b92e65aa-84aa-a66f-2f61-b70fd5c6b138@huawei-partners.com>
- <CAEjxPJ737irXncrwoM3avg4L+U37QB2w+fjJZZYTjND5Z4_Nig@mail.gmail.com>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <CAEjxPJ737irXncrwoM3avg4L+U37QB2w+fjJZZYTjND5Z4_Nig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+References: <20241211-b4-ovpn-v15-0-314e2cad0618@openvpn.net> <20241211-b4-ovpn-v15-2-314e2cad0618@openvpn.net>
+In-Reply-To: <20241211-b4-ovpn-v15-2-314e2cad0618@openvpn.net>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Fri, 13 Dec 2024 16:45:02 +0000
+Message-ID: <CAD4GDZwT=V5-3aAb7eHah5fjLC3R1CrBCVA5kUFywb+ajOvzDg@mail.gmail.com>
+Subject: Re: [PATCH net-next v15 02/22] ovpn: add basic netlink support
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sd@queasysnail.net, ryazanov.s.a@gmail.com, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 12/13/2024 6:46 PM, Stephen Smalley wrote:
-> On Fri, Dec 13, 2024 at 5:57 AM Mikhail Ivanov
-> <ivanov.mikhail1@huawei-partners.com> wrote:
->>
->> On 12/12/2024 8:50 PM, Mickaël Salaün wrote:
->>> This looks good be there are other places using sk->sk_family that
->>> should also be fixed.
->>
->> Thanks for checking this!
->>
->> For selinux this should be enough, I haven't found any other places
->> where sk->sk_family could be read from an IPv6 socket without locking.
->>
->> I also would like to prepare such fix for other LSMs (apparmor, smack,
->> tomoyo) (in separate patches).
-> 
-> I'm wondering about the implications for SELinux beyond just
-> sk->sk_family access, e.g. SELinux maps the (family, type, protocol)
-> triple to a security class at socket creation time via
-> socket_type_to_security_class() and caches the security class in the
-> inode_security_struct and sk_security_struct for later use.
+On Wed, 11 Dec 2024 at 21:32, Antonio Quartulli <antonio@openvpn.net> wrote:
+>
+> +        name: peer
+> +        type: nest
+> +        doc: |
+> +          The peer object containing the attributed of interest for the specific
 
-IPv6 and IPv4 TCP sockets are mapped to the same SECCLASS_TCP_SOCKET
-security class. AFAICS there is no other places that can be affected by
-the IPV6_ADDFORM transformation.
+typo: attributes
 
-> 
->>
->>>
->>> On Thu, Dec 12, 2024 at 06:20:00PM +0800, Mikhail Ivanov wrote:
->>>> selinux_socket_bind() is called without holding the socket lock.
->>>>
->>>> Use READ_ONCE() to safely read sk->sk_family for IPv6 socket in case
->>>> of lockless transformation to IPv4 socket via IPV6_ADDRFORM [1].
->>>>
->>>> [1] https://lore.kernel.org/all/20240202095404.183274-1-edumazet@google.com/
->>>>
->>>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->>>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->>>> ---
->>>>    security/selinux/hooks.c | 4 +++-
->>>>    1 file changed, 3 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
->>>> index 5e5f3398f39d..b7adff2cf5f6 100644
->>>> --- a/security/selinux/hooks.c
->>>> +++ b/security/selinux/hooks.c
->>>> @@ -4715,8 +4715,10 @@ static int selinux_socket_bind(struct socket *sock, struct sockaddr *address, in
->>>>       if (err)
->>>>               goto out;
->>>>
->>>> +    /* IPV6_ADDRFORM can change sk->sk_family under us. */
->>>> +    family = READ_ONCE(sk->sk_family);
->>>> +
->>>>       /* If PF_INET or PF_INET6, check name_bind permission for the port. */
->>>> -    family = sk->sk_family;
->>>>       if (family == PF_INET || family == PF_INET6) {
->>>>               char *addrp;
->>>>               struct common_audit_data ad;
->>>>
->>>> base-commit: 034294fbfdf0ded4f931f9503d2ca5bbf8b9aebd
->>>> --
->>>> 2.34.1
->>>>
->>>>
+> +          operation
+> +        nested-attributes: peer
+
+I also spotted that the doc: | construct results in extack messages
+with embedded \n chars in the ynl cli:
+
+./tools/net/ynl/cli.py --spec Documentation/netlink/specs/ovpn.yaml
+--do peer-new --json '{"ifindex": 2 }'
+Netlink error: Invalid argument
+nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
+error: -22
+extack: {'miss-type': 'peer', 'miss-type-doc': 'The peer object
+containing the attributed of interest for the specific\noperation\n'}
+
+We should probably sanitize the strings in the ynl cli, but you can
+specify a flattened block comment in yaml by using the doc: >-
+construct instead.
+
+      -
+        name: peer
+        type: nest
+        doc: >-
+          The peer object containing the attributes of interest for the specific
+          operation
+
+extack: {'miss-type': 'peer', 'miss-type-doc': 'The peer object
+containing the attributes of interest for the specific operation'}
+
+Thanks,
+Donald
 
