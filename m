@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-151787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9AAD9F0D9C
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 14:45:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37B3D9F0D9E
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 14:46:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C394282613
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:45:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E759A2810AC
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:46:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61791E0B7C;
-	Fri, 13 Dec 2024 13:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903011DF744;
+	Fri, 13 Dec 2024 13:46:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rxGNt7P9"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="U55XDS3h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5361C07EB
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 13:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EDAB1DF261
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 13:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734097546; cv=none; b=BxQjGXG9SAPznaPpSoLyrTVp3CjdgjdHV3w3Rk858542frXs50VhX2RHBD9IrBQ+wNqnnuMkzzc5zMdeEzUzXMHskc55jNU2WsEm4hNF/oU06e+3EL/h5a11IhKsMrW2mF7fvnBHj2O1cDByhpfWIXbTwmexIoipWL3ebbnhUzo=
+	t=1734097593; cv=none; b=KwrxW+JiySuW26LbNrmfOoTfvnPWmQc2dSpnZPUk2V6YXK2u63bMNYyWXa2VFNnhyi+pmfajpaVzL4UBPu5opEW1iP4UGeL3WIiVp4EpegbEJZ1ObP/WvHo6ZdKAiXHW1QGzaiRh+XroxO8g5NX2+iqv2i7u7vOSxfpp/sCr/IM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734097546; c=relaxed/simple;
-	bh=RlpfbF2Qe97DdHAofPSEkLSfXfplDAUO6tym4XGiIz0=;
+	s=arc-20240116; t=1734097593; c=relaxed/simple;
+	bh=9SjrfVR4rzH323D4lXLy6VOpkWpRSRmOCT6yFlAQ9xY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dGQT+YOWQyTeQL6s3CkQR814vybzFAbZtpkhDNxeSs+ALmIov5DyD6vRaUtfMGPGp6kO3t7JT9tl0OQqdYA9DoHCm1Qc1T5V2/hSmp+4lu4p5mQtWKTeGShGtMsRFM+T+L23c3deAzyNBbzR2jatoGVYAeYTjiSSK5fEJFAYxCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rxGNt7P9; arc=none smtp.client-ip=148.163.158.5
+	 In-Reply-To:Content-Type; b=okcR+kvLrKHtXmUEbClhY83SLAUNHO+2juT+Ypic/Nkr9tqrit3/POv0fLhp9nnc4zOiUrKpYlSRDwHpa4e/mntdezQzWi7f+f2tw3mCfq8Te4R7auC98vIi0IrTUoeobGNnA8AhrXaFINnFox23qm7hF+1SZ4dsKeF4raNuFnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=U55XDS3h; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BD85ruU011380;
-	Fri, 13 Dec 2024 13:45:34 GMT
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BD3rUWf004595;
+	Fri, 13 Dec 2024 13:46:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=ddP8TN
-	qUxSH8TDuq5YvvWfnWa02qdfUlwWgz0bWOvsU=; b=rxGNt7P9YpPFa4OatSJ9Fn
-	jeUA1CjxnVJpgGWToHhmT83qXR9O9Zf5yZ3mS8GAdZIs8FSfLfBYjGzlyUcCNs0V
-	R2LyXDDVl6ULzv0BIvmfBUy/EA+XxNTwKcRoxokBqIzDKRiCfWwNLexRdEbK2DsW
-	E2dMtwK0Dw6jG+E5Ed0UdzHD+w0osr/QlM4P0+9sOW+a8MFLM5vBYbGqdzUgYGnw
-	8AMZvNRxFKUfxZVzYa5s+y1QN26hhpUSnrYobn2/jdlOf69/gMT2zIg9PKxGishl
-	VrfjPzgAkjjUQ2vrFXxSiDh4K6zqO2iZBLC3J0pjtA3CWNcmJelf2zfGKXHTwPOQ
+	:message-id:mime-version:references:subject:to; s=pp1; bh=k+nms7
+	YTvqz15bo8q7QTQv1/GtxGi0mt7DpE8hzUrqE=; b=U55XDS3hRBs5VttfW1xQtJ
+	c8MjCofqcEAbL3CA9TKx8qxOX8dkT9B0prV3La/U4EgLPnldSy6lL74n/JxLUVFG
+	HrKxVO44I1onG7RfpzfCRFBB7GHaFF4OEw99tn3UTJyIluscwcsVM5pS8V9/2ZrL
+	PWn4es/zwNm2c0AXHOUuqzA3p+4xFld45fszTgHcWBnCagC49w5lOLj2vpF7lx8c
+	dy6yLB4N1oLDhLHRnoSZoRXJWZIcyHymrOARiuxqjaIsKlQg4XOtTeWtgk9KktnF
+	+yJMApxXCHV52YZMZdt/9gz1A35S3BMcRYBg8M9k5wcEfFAwPlQ/FU1W05k12XQg
 	==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43gh439e3p-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43gddmah6a-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Dec 2024 13:45:33 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BDDjAc3007335;
-	Fri, 13 Dec 2024 13:45:33 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43gh439e3m-1
+	Fri, 13 Dec 2024 13:46:23 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BDDkNb1009712;
+	Fri, 13 Dec 2024 13:46:23 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43gddmah66-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Dec 2024 13:45:33 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BDBFmrj029233;
-	Fri, 13 Dec 2024 13:45:32 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 43gcprt80e-1
+	Fri, 13 Dec 2024 13:46:22 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BDBj1Nj007873;
+	Fri, 13 Dec 2024 13:46:21 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43ft11yg6j-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Dec 2024 13:45:32 +0000
+	Fri, 13 Dec 2024 13:46:21 +0000
 Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BDDjWVw22544978
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BDDkLii62128520
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 13 Dec 2024 13:45:32 GMT
+	Fri, 13 Dec 2024 13:46:21 GMT
 Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3B3DF58059;
-	Fri, 13 Dec 2024 13:45:32 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id F0C9F58043;
+	Fri, 13 Dec 2024 13:46:20 +0000 (GMT)
 Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C03305805D;
-	Fri, 13 Dec 2024 13:45:30 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 83C8858055;
+	Fri, 13 Dec 2024 13:46:19 +0000 (GMT)
 Received: from [9.171.74.77] (unknown [9.171.74.77])
 	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 13 Dec 2024 13:45:30 +0000 (GMT)
-Message-ID: <61c83d74-1d42-4a00-ab78-1825c0b16fdc@linux.ibm.com>
-Date: Fri, 13 Dec 2024 14:45:29 +0100
+	Fri, 13 Dec 2024 13:46:19 +0000 (GMT)
+Message-ID: <68efd6e8-e938-4a0e-9bf3-fa370fd1591e@linux.ibm.com>
+Date: Fri, 13 Dec 2024 14:46:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,754 +84,658 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next 08/15] socket: Pass hold_net to sk_alloc().
+Subject: Re: [PATCH v3 net-next 15/15] socket: Rename sock_create_kern() to
+ sock_create_net_noref().
 To: Kuniyuki Iwashima <kuniyu@amazon.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
 Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 References: <20241213092152.14057-1-kuniyu@amazon.com>
- <20241213092152.14057-9-kuniyu@amazon.com>
+ <20241213092152.14057-16-kuniyu@amazon.com>
 Content-Language: en-US
 From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <20241213092152.14057-9-kuniyu@amazon.com>
+In-Reply-To: <20241213092152.14057-16-kuniyu@amazon.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Sxk7jyCB87cTAqPTzcfiH5aAUxPp8HFw
-X-Proofpoint-GUID: xkVnp_wzI4IBzsL1vptioHVZ4NUdRFin
+X-Proofpoint-ORIG-GUID: 1gagtgcIQTEpi0L7HKiKz7M37aSwybwQ
+X-Proofpoint-GUID: OxYGOp_14U48TBd3LSQfH8hj2I8eg5lp
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 adultscore=0 impostorscore=0 spamscore=0
- mlxlogscore=999 suspectscore=0 phishscore=0 lowpriorityscore=0 bulkscore=0
- mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 mlxlogscore=999 suspectscore=0 impostorscore=0 malwarescore=0
+ phishscore=0 adultscore=0 bulkscore=0 priorityscore=1501 clxscore=1015
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2411120000 definitions=main-2412130095
 
 
 
 On 13.12.24 10:21, Kuniyuki Iwashima wrote:
-> We will introduce a new API to create a kernel socket with netns refcnt
-> held.  Then, sk_alloc() need the hold_net flag passed to __sock_create().
+> sock_create_kern() is quite a bad name, and the non-netdev folks tend
+> to use it without taking care of the netns lifetime.
 > 
-> Let's pass it to sk_alloc().
+> Since commit 26abe14379f8 ("net: Modify sk_alloc to not reference count
+> the netns of kernel sockets."), TCP sockets created by sock_create_kern()
+> have caused many use-after-free.
 > 
-> The actual use of hold_net will be in the next patch to make its review
-> easy.
+> Let's rename sock_create_kern() to sock_create_net_noref() and add fat
+> documentation so that we no longer introduce the same issue in the future.
 > 
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 > ---
-> v2:
->    * Fix build error in iucv_sock_alloc()
-> ---
->   crypto/af_alg.c              | 5 +++--
->   drivers/isdn/mISDN/socket.c  | 4 ++--
->   drivers/net/ppp/pppoe.c      | 2 +-
->   drivers/net/ppp/pptp.c       | 2 +-
->   drivers/net/tap.c            | 2 +-
->   drivers/net/tun.c            | 2 +-
->   drivers/xen/pvcalls-front.c  | 3 ++-
->   include/net/sock.h           | 2 +-
->   net/appletalk/ddp.c          | 2 +-
->   net/atm/common.c             | 2 +-
->   net/ax25/af_ax25.c           | 5 +++--
->   net/bluetooth/af_bluetooth.c | 2 +-
->   net/bluetooth/cmtp/sock.c    | 2 +-
->   net/bpf/test_run.c           | 2 +-
->   net/caif/caif_socket.c       | 2 +-
->   net/can/af_can.c             | 2 +-
->   net/core/sock.c              | 3 ++-
->   net/ieee802154/socket.c      | 2 +-
->   net/ipv4/af_inet.c           | 2 +-
->   net/ipv6/af_inet6.c          | 2 +-
->   net/iucv/af_iucv.c           | 2 +-
->   net/kcm/kcmsock.c            | 4 ++--
->   net/key/af_key.c             | 2 +-
->   net/l2tp/l2tp_ppp.c          | 3 ++-
->   net/llc/llc_conn.c           | 2 +-
->   net/mctp/af_mctp.c           | 2 +-
->   net/netlink/af_netlink.c     | 3 ++-
->   net/netrom/af_netrom.c       | 5 +++--
->   net/nfc/llcp_sock.c          | 2 +-
->   net/nfc/rawsock.c            | 2 +-
->   net/packet/af_packet.c       | 2 +-
->   net/phonet/af_phonet.c       | 2 +-
->   net/phonet/pep.c             | 2 +-
->   net/qrtr/af_qrtr.c           | 2 +-
->   net/rds/af_rds.c             | 2 +-
->   net/rose/af_rose.c           | 9 +++++----
->   net/rxrpc/af_rxrpc.c         | 2 +-
->   net/sctp/ipv6.c              | 2 +-
->   net/sctp/protocol.c          | 2 +-
->   net/smc/af_smc.c             | 2 +-
->   net/tipc/socket.c            | 2 +-
->   net/unix/af_unix.c           | 8 +++++---
->   net/vmw_vsock/af_vsock.c     | 2 +-
->   net/x25/af_x25.c             | 2 +-
->   net/xdp/xsk.c                | 2 +-
->   45 files changed, 65 insertions(+), 55 deletions(-)
+>   drivers/block/drbd/drbd_receiver.c            | 12 +++----
+>   drivers/infiniband/sw/rxe/rxe_qp.c            |  2 +-
+>   drivers/soc/qcom/qmi_interface.c              |  4 +--
+>   fs/afs/rxrpc.c                                |  3 +-
+>   fs/dlm/lowcomms.c                             |  8 ++---
+>   include/linux/net.h                           |  3 +-
+>   net/9p/trans_fd.c                             |  8 ++---
+>   net/bluetooth/rfcomm/core.c                   |  3 +-
+>   net/ceph/messenger.c                          |  6 ++--
+>   net/handshake/handshake-test.c                |  3 +-
+>   net/ipv4/af_inet.c                            |  3 +-
+>   net/ipv4/udp_tunnel_core.c                    |  2 +-
+>   net/ipv6/ip6_udp_tunnel.c                     |  4 +--
+>   net/l2tp/l2tp_core.c                          |  8 ++---
+>   net/mctp/test/route-test.c                    |  6 ++--
+>   net/mptcp/pm_netlink.c                        |  4 +--
+>   net/mptcp/subflow.c                           |  2 +-
+>   net/netfilter/ipvs/ip_vs_sync.c               |  8 ++---
+>   net/qrtr/ns.c                                 |  6 ++--
+>   net/rds/tcp_listen.c                          |  4 +--
+>   net/rxrpc/rxperf.c                            |  4 +--
+>   net/sctp/socket.c                             |  2 +-
+>   net/smc/smc_inet.c                            |  2 +-
+>   net/socket.c                                  | 35 +++++++++++++------
+>   net/sunrpc/clnt.c                             |  4 +--
+>   net/sunrpc/svcsock.c                          |  2 +-
+>   net/sunrpc/xprtsock.c                         |  6 ++--
+>   net/tipc/topsrv.c                             |  4 +--
+>   net/wireless/nl80211.c                        |  4 +--
+>   .../selftests/bpf/bpf_testmod/bpf_testmod.c   |  4 +--
+>   30 files changed, 92 insertions(+), 74 deletions(-)
 > 
-> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-> index e60032b94d97..bef4f0c8dac8 100644
-> --- a/crypto/af_alg.c
-> +++ b/crypto/af_alg.c
-> @@ -423,7 +423,8 @@ int af_alg_accept(struct sock *sk, struct socket *newsock,
->   	if (!type)
->   		goto unlock;
+> diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+> index 0c9f54197768..39be44e5db8a 100644
+> --- a/drivers/block/drbd/drbd_receiver.c
+> +++ b/drivers/block/drbd/drbd_receiver.c
+> @@ -618,9 +618,9 @@ static struct socket *drbd_try_connect(struct drbd_connection *connection)
+>   	peer_addr_len = min_t(int, connection->peer_addr_len, sizeof(src_in6));
+>   	memcpy(&peer_in6, &connection->peer_addr, peer_addr_len);
 >   
-> -	sk2 = sk_alloc(sock_net(sk), PF_ALG, GFP_KERNEL, &alg_proto, arg->kern);
-> +	sk2 = sk_alloc(sock_net(sk), PF_ALG, GFP_KERNEL, &alg_proto,
-> +		       arg->kern, arg->hold_net);
->   	err = -ENOMEM;
->   	if (!sk2)
->   		goto unlock;
-> @@ -514,7 +515,7 @@ static int alg_create(struct net *net, struct socket *sock, int protocol,
->   		return -EPROTONOSUPPORT;
->   
->   	err = -ENOMEM;
-> -	sk = sk_alloc(net, PF_ALG, GFP_KERNEL, &alg_proto, kern);
-> +	sk = sk_alloc(net, PF_ALG, GFP_KERNEL, &alg_proto, kern, hold_net);
->   	if (!sk)
+> -	what = "sock_create_kern";
+> -	err = sock_create_kern(&init_net, ((struct sockaddr *)&src_in6)->sa_family,
+> -			       SOCK_STREAM, IPPROTO_TCP, &sock);
+> +	what = "sock_create_net_noref";
+> +	err = sock_create_net_noref(&init_net, ((struct sockaddr *)&src_in6)->sa_family,
+> +				    SOCK_STREAM, IPPROTO_TCP, &sock);
+>   	if (err < 0) {
+>   		sock = NULL;
 >   		goto out;
+> @@ -713,9 +713,9 @@ static int prepare_listen_socket(struct drbd_connection *connection, struct acce
+>   	my_addr_len = min_t(int, connection->my_addr_len, sizeof(struct sockaddr_in6));
+>   	memcpy(&my_addr, &connection->my_addr, my_addr_len);
 >   
-> diff --git a/drivers/isdn/mISDN/socket.c b/drivers/isdn/mISDN/socket.c
-> index 54157c24ccb9..2d2404cf5649 100644
-> --- a/drivers/isdn/mISDN/socket.c
-> +++ b/drivers/isdn/mISDN/socket.c
-> @@ -598,7 +598,7 @@ data_sock_create(struct net *net, struct socket *sock, int protocol,
->   	if (sock->type != SOCK_DGRAM)
->   		return -ESOCKTNOSUPPORT;
+> -	what = "sock_create_kern";
+> -	err = sock_create_kern(&init_net, ((struct sockaddr *)&my_addr)->sa_family,
+> -			       SOCK_STREAM, IPPROTO_TCP, &s_listen);
+> +	what = "sock_create_net_noref";
+> +	err = sock_create_net_noref(&init_net, ((struct sockaddr *)&my_addr)->sa_family,
+> +				    SOCK_STREAM, IPPROTO_TCP, &s_listen);
+>   	if (err) {
+>   		s_listen = NULL;
+>   		goto out;
+> diff --git a/drivers/infiniband/sw/rxe/rxe_qp.c b/drivers/infiniband/sw/rxe/rxe_qp.c
+> index 91d329e90308..250673cf6cbf 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_qp.c
+> +++ b/drivers/infiniband/sw/rxe/rxe_qp.c
+> @@ -241,7 +241,7 @@ static int rxe_qp_init_req(struct rxe_dev *rxe, struct rxe_qp *qp,
+>   	/* if we don't finish qp create make sure queue is valid */
+>   	skb_queue_head_init(&qp->req_pkts);
 >   
-> -	sk = sk_alloc(net, PF_ISDN, GFP_KERNEL, &mISDN_proto, kern);
-> +	sk = sk_alloc(net, PF_ISDN, GFP_KERNEL, &mISDN_proto, kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
+> -	err = sock_create_kern(&init_net, AF_INET, SOCK_DGRAM, 0, &qp->sk);
+> +	err = sock_create_net_noref(&init_net, AF_INET, SOCK_DGRAM, 0, &qp->sk);
+>   	if (err < 0)
+>   		return err;
+>   	qp->sk->sk->sk_user_data = (void *)(uintptr_t)qp->elem.index;
+> diff --git a/drivers/soc/qcom/qmi_interface.c b/drivers/soc/qcom/qmi_interface.c
+> index bc6d6379d8b1..eb5a64f6fd6f 100644
+> --- a/drivers/soc/qcom/qmi_interface.c
+> +++ b/drivers/soc/qcom/qmi_interface.c
+> @@ -588,8 +588,8 @@ static struct socket *qmi_sock_create(struct qmi_handle *qmi,
+>   	struct socket *sock;
+>   	int ret;
 >   
-> @@ -757,7 +757,7 @@ base_sock_create(struct net *net, struct socket *sock, int protocol,
->   	if (!capable(CAP_NET_RAW))
->   		return -EPERM;
+> -	ret = sock_create_kern(&init_net, AF_QIPCRTR, SOCK_DGRAM,
+> -			       PF_QIPCRTR, &sock);
+> +	ret = sock_create_net_noref(&init_net, AF_QIPCRTR, SOCK_DGRAM,
+> +				    PF_QIPCRTR, &sock);
+>   	if (ret < 0)
+>   		return ERR_PTR(ret);
 >   
-> -	sk = sk_alloc(net, PF_ISDN, GFP_KERNEL, &mISDN_proto, kern);
-> +	sk = sk_alloc(net, PF_ISDN, GFP_KERNEL, &mISDN_proto, kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
+> diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
+> index 9f2a3bb56ec6..7443fe801894 100644
+> --- a/fs/afs/rxrpc.c
+> +++ b/fs/afs/rxrpc.c
+> @@ -44,7 +44,8 @@ int afs_open_socket(struct afs_net *net)
 >   
-> diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-> index 90995f8a08a3..6606aa4374e9 100644
-> --- a/drivers/net/ppp/pppoe.c
-> +++ b/drivers/net/ppp/pppoe.c
-> @@ -538,7 +538,7 @@ static int pppoe_create(struct net *net, struct socket *sock,
+>   	_enter("");
+>   
+> -	ret = sock_create_kern(net->net, AF_RXRPC, SOCK_DGRAM, PF_INET6, &socket);
+> +	ret = sock_create_net_noref(net->net, AF_RXRPC, SOCK_DGRAM, PF_INET6,
+> +				    &socket);
+>   	if (ret < 0)
+>   		goto error_1;
+>   
+> diff --git a/fs/dlm/lowcomms.c b/fs/dlm/lowcomms.c
+> index df40c3fd1070..b0450aff4cd4 100644
+> --- a/fs/dlm/lowcomms.c
+> +++ b/fs/dlm/lowcomms.c
+> @@ -1579,8 +1579,8 @@ static int dlm_connect(struct connection *con)
+>   	}
+>   
+>   	/* Create a socket to communicate with */
+> -	result = sock_create_kern(&init_net, dlm_local_addr[0].ss_family,
+> -				  SOCK_STREAM, dlm_proto_ops->proto, &sock);
+> +	result = sock_create_net_noref(&init_net, dlm_local_addr[0].ss_family,
+> +				       SOCK_STREAM, dlm_proto_ops->proto, &sock);
+>   	if (result < 0)
+>   		return result;
+>   
+> @@ -1760,8 +1760,8 @@ static int dlm_listen_for_all(void)
+>   	if (result < 0)
+>   		return result;
+>   
+> -	result = sock_create_kern(&init_net, dlm_local_addr[0].ss_family,
+> -				  SOCK_STREAM, dlm_proto_ops->proto, &sock);
+> +	result = sock_create_net_noref(&init_net, dlm_local_addr[0].ss_family,
+> +				       SOCK_STREAM, dlm_proto_ops->proto, &sock);
+>   	if (result < 0) {
+>   		log_print("Can't create comms socket: %d", result);
+>   		return result;
+> diff --git a/include/linux/net.h b/include/linux/net.h
+> index 1ba4abb18863..582faf2fdd08 100644
+> --- a/include/linux/net.h
+> +++ b/include/linux/net.h
+> @@ -254,7 +254,8 @@ bool sock_is_registered(int family);
+>   int sock_create_user(int family, int type, int proto, struct socket **res);
+>   int sock_create_net(struct net *net, int family, int type, int proto,
+>   		    struct socket **res);
+> -int sock_create_kern(struct net *net, int family, int type, int proto, struct socket **res);
+> +int sock_create_net_noref(struct net *net, int family, int type, int proto,
+> +			  struct socket **res);
+>   int sock_create_lite(int family, int type, int proto, struct socket **res);
+>   struct socket *sock_alloc(void);
+>   void sock_release(struct socket *sock);
+> diff --git a/net/9p/trans_fd.c b/net/9p/trans_fd.c
+> index 83f81da24727..ae014999040f 100644
+> --- a/net/9p/trans_fd.c
+> +++ b/net/9p/trans_fd.c
+> @@ -1011,8 +1011,8 @@ p9_fd_create_tcp(struct p9_client *client, const char *addr, char *args)
+>   	sin_server.sin_family = AF_INET;
+>   	sin_server.sin_addr.s_addr = in_aton(addr);
+>   	sin_server.sin_port = htons(opts.port);
+> -	err = sock_create_kern(current->nsproxy->net_ns, PF_INET,
+> -			       SOCK_STREAM, IPPROTO_TCP, &csocket);
+> +	err = sock_create_net_noref(current->nsproxy->net_ns, PF_INET,
+> +				    SOCK_STREAM, IPPROTO_TCP, &csocket);
+>   	if (err) {
+>   		pr_err("%s (%d): problem creating socket\n",
+>   		       __func__, task_pid_nr(current));
+> @@ -1062,8 +1062,8 @@ p9_fd_create_unix(struct p9_client *client, const char *addr, char *args)
+>   
+>   	sun_server.sun_family = PF_UNIX;
+>   	strcpy(sun_server.sun_path, addr);
+> -	err = sock_create_kern(current->nsproxy->net_ns, PF_UNIX,
+> -			       SOCK_STREAM, 0, &csocket);
+> +	err = sock_create_net_noref(current->nsproxy->net_ns, PF_UNIX,
+> +				    SOCK_STREAM, 0, &csocket);
+>   	if (err < 0) {
+>   		pr_err("%s (%d): problem creating socket\n",
+>   		       __func__, task_pid_nr(current));
+> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> index 4c56ca5a216c..6204514667b6 100644
+> --- a/net/bluetooth/rfcomm/core.c
+> +++ b/net/bluetooth/rfcomm/core.c
+> @@ -200,7 +200,8 @@ static int rfcomm_l2sock_create(struct socket **sock)
+>   
+>   	BT_DBG("");
+>   
+> -	err = sock_create_kern(&init_net, PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP, sock);
+> +	err = sock_create_net_noref(&init_net, PF_BLUETOOTH, SOCK_SEQPACKET,
+> +				    BTPROTO_L2CAP, sock);
+>   	if (!err) {
+>   		struct sock *sk = (*sock)->sk;
+>   		sk->sk_data_ready   = rfcomm_l2data_ready;
+> diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
+> index d1b5705dc0c6..cb6a1532ff9f 100644
+> --- a/net/ceph/messenger.c
+> +++ b/net/ceph/messenger.c
+> @@ -442,10 +442,10 @@ int ceph_tcp_connect(struct ceph_connection *con)
+>   	     ceph_pr_addr(&con->peer_addr));
+>   	BUG_ON(con->sock);
+>   
+> -	/* sock_create_kern() allocates with GFP_KERNEL */
+> +	/* sock_create_net_noref() allocates with GFP_KERNEL */
+>   	noio_flag = memalloc_noio_save();
+> -	ret = sock_create_kern(read_pnet(&con->msgr->net), ss.ss_family,
+> -			       SOCK_STREAM, IPPROTO_TCP, &sock);
+> +	ret = sock_create_net_noref(read_pnet(&con->msgr->net), ss.ss_family,
+> +				    SOCK_STREAM, IPPROTO_TCP, &sock);
+>   	memalloc_noio_restore(noio_flag);
+>   	if (ret)
+>   		return ret;
+> diff --git a/net/handshake/handshake-test.c b/net/handshake/handshake-test.c
+> index 4f300504f3e5..54793f9e4d30 100644
+> --- a/net/handshake/handshake-test.c
+> +++ b/net/handshake/handshake-test.c
+> @@ -145,7 +145,8 @@ static void handshake_req_alloc_case(struct kunit *test)
+>   
+>   static int handshake_sock_create(struct socket **sock)
 >   {
->   	struct sock *sk;
->   
-> -	sk = sk_alloc(net, PF_PPPOX, GFP_KERNEL, &pppoe_sk_proto, kern);
-> +	sk = sk_alloc(net, PF_PPPOX, GFP_KERNEL, &pppoe_sk_proto, kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
->   
-> diff --git a/drivers/net/ppp/pptp.c b/drivers/net/ppp/pptp.c
-> index 7bfb5c227c40..4c41e07ec497 100644
-> --- a/drivers/net/ppp/pptp.c
-> +++ b/drivers/net/ppp/pptp.c
-> @@ -546,7 +546,7 @@ static int pptp_create(struct net *net, struct socket *sock,
->   	struct pppox_sock *po;
->   	struct pptp_opt *opt;
->   
-> -	sk = sk_alloc(net, PF_PPPOX, GFP_KERNEL, &pptp_sk_proto, kern);
-> +	sk = sk_alloc(net, PF_PPPOX, GFP_KERNEL, &pptp_sk_proto, kern, hold_net);
->   	if (!sk)
->   		goto out;
->   
-> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> index 5aa41d5f7765..7bce097e96a5 100644
-> --- a/drivers/net/tap.c
-> +++ b/drivers/net/tap.c
-> @@ -522,7 +522,7 @@ static int tap_open(struct inode *inode, struct file *file)
->   
->   	err = -ENOMEM;
->   	q = (struct tap_queue *)sk_alloc(net, AF_UNSPEC, GFP_KERNEL,
-> -					     &tap_proto, 0);
-> +					 &tap_proto, false, true);
->   	if (!q)
->   		goto err;
->   	if (ptr_ring_init(&q->ring, tap->dev->tx_queue_len, GFP_KERNEL)) {
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 8e94df88392c..13bbee8d0a4b 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -3481,7 +3481,7 @@ static int tun_chr_open(struct inode *inode, struct file * file)
->   	struct tun_file *tfile;
->   
->   	tfile = (struct tun_file *)sk_alloc(net, AF_UNSPEC, GFP_KERNEL,
-> -					    &tun_proto, 0);
-> +					    &tun_proto, false, true);
->   	if (!tfile)
->   		return -ENOMEM;
->   	if (ptr_ring_init(&tfile->tx_ring, 0, GFP_KERNEL)) {
-> diff --git a/drivers/xen/pvcalls-front.c b/drivers/xen/pvcalls-front.c
-> index b72ee9379d77..a2308d24e67d 100644
-> --- a/drivers/xen/pvcalls-front.c
-> +++ b/drivers/xen/pvcalls-front.c
-> @@ -882,7 +882,8 @@ int pvcalls_front_accept(struct socket *sock, struct socket *newsock, int flags)
->   
->   received:
->   	map2->sock = newsock;
-> -	newsock->sk = sk_alloc(sock_net(sock->sk), PF_INET, GFP_KERNEL, &pvcalls_proto, false);
-> +	newsock->sk = sk_alloc(sock_net(sock->sk), PF_INET, GFP_KERNEL, &pvcalls_proto,
-> +			       false, true);
->   	if (!newsock->sk) {
->   		bedata->rsp[req_id].req_id = PVCALLS_INVALID_ID;
->   		map->passive.inflight_req_id = PVCALLS_INVALID_ID;
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index 9963dccec2f8..8de415fefe3b 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -1743,7 +1743,7 @@ static inline bool sock_allow_reclassification(const struct sock *csk)
+> -	return sock_create_kern(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP, sock);
+> +	return sock_create_net_noref(&init_net, PF_INET, SOCK_STREAM,
+> +				     IPPROTO_TCP, sock);
 >   }
 >   
->   struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
-> -		      struct proto *prot, int kern);
-> +		      struct proto *prot, bool kern, bool hold_net);
->   void sk_free(struct sock *sk);
->   void sk_destruct(struct sock *sk);
->   struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority);
-> diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
-> index 9bd361ccf5f4..3eab462100e0 100644
-> --- a/net/appletalk/ddp.c
-> +++ b/net/appletalk/ddp.c
-> @@ -1050,7 +1050,7 @@ static int atalk_create(struct net *net, struct socket *sock, int protocol,
->   		goto out;
->   
->   	rc = -ENOMEM;
-> -	sk = sk_alloc(net, PF_APPLETALK, GFP_KERNEL, &ddp_proto, kern);
-> +	sk = sk_alloc(net, PF_APPLETALK, GFP_KERNEL, &ddp_proto, kern, hold_net);
->   	if (!sk)
->   		goto out;
->   	rc = 0;
-> diff --git a/net/atm/common.c b/net/atm/common.c
-> index c1e05b0c0b4b..2cf074c3e8a5 100644
-> --- a/net/atm/common.c
-> +++ b/net/atm/common.c
-> @@ -146,7 +146,7 @@ int vcc_create(struct net *net, struct socket *sock, int protocol, int family,
->   	sock->sk = NULL;
->   	if (sock->type == SOCK_STREAM)
->   		return -EINVAL;
-> -	sk = sk_alloc(net, family, GFP_KERNEL, &vcc_proto, kern);
-> +	sk = sk_alloc(net, family, GFP_KERNEL, &vcc_proto, kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
->   	sock_init_data(sock, sk);
-> diff --git a/net/ax25/af_ax25.c b/net/ax25/af_ax25.c
-> index 6c68b5e5b11c..6f572c0b3f59 100644
-> --- a/net/ax25/af_ax25.c
-> +++ b/net/ax25/af_ax25.c
-> @@ -890,7 +890,7 @@ static int ax25_create(struct net *net, struct socket *sock, int protocol,
->   		return -ESOCKTNOSUPPORT;
->   	}
->   
-> -	sk = sk_alloc(net, PF_AX25, GFP_ATOMIC, &ax25_proto, kern);
-> +	sk = sk_alloc(net, PF_AX25, GFP_ATOMIC, &ax25_proto, kern, hold_net);
->   	if (sk == NULL)
->   		return -ENOMEM;
->   
-> @@ -916,7 +916,8 @@ struct sock *ax25_make_new(struct sock *osk, struct ax25_dev *ax25_dev)
->   	struct sock *sk;
->   	ax25_cb *ax25, *oax25;
->   
-> -	sk = sk_alloc(sock_net(osk), PF_AX25, GFP_ATOMIC, osk->sk_prot, 0);
-> +	sk = sk_alloc(sock_net(osk), PF_AX25, GFP_ATOMIC, osk->sk_prot,
-> +		      false, true);
->   	if (sk == NULL)
->   		return NULL;
->   
-> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-> index 7c24a6f87281..6c89fa2d9ccd 100644
-> --- a/net/bluetooth/af_bluetooth.c
-> +++ b/net/bluetooth/af_bluetooth.c
-> @@ -146,7 +146,7 @@ struct sock *bt_sock_alloc(struct net *net, struct socket *sock,
->   {
->   	struct sock *sk;
->   
-> -	sk = sk_alloc(net, PF_BLUETOOTH, prio, prot, kern);
-> +	sk = sk_alloc(net, PF_BLUETOOTH, prio, prot, kern, hold_net);
->   	if (!sk)
->   		return NULL;
->   
-> diff --git a/net/bluetooth/cmtp/sock.c b/net/bluetooth/cmtp/sock.c
-> index 2ea9da9fe1d5..6e9138748317 100644
-> --- a/net/bluetooth/cmtp/sock.c
-> +++ b/net/bluetooth/cmtp/sock.c
-> @@ -207,7 +207,7 @@ static int cmtp_sock_create(struct net *net, struct socket *sock, int protocol,
->   	if (sock->type != SOCK_RAW)
->   		return -ESOCKTNOSUPPORT;
->   
-> -	sk = sk_alloc(net, PF_BLUETOOTH, GFP_ATOMIC, &cmtp_proto, kern);
-> +	sk = sk_alloc(net, PF_BLUETOOTH, GFP_ATOMIC, &cmtp_proto, kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
->   
-> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-> index 9ae2a7f1738b..f663f760bcb8 100644
-> --- a/net/bpf/test_run.c
-> +++ b/net/bpf/test_run.c
-> @@ -1024,7 +1024,7 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
->   		break;
->   	}
->   
-> -	sk = sk_alloc(net, AF_UNSPEC, GFP_USER, &bpf_dummy_proto, 1);
-> +	sk = sk_alloc(net, AF_UNSPEC, GFP_USER, &bpf_dummy_proto, true, false);
->   	if (!sk) {
->   		kfree(data);
->   		kfree(ctx);
-> diff --git a/net/caif/caif_socket.c b/net/caif/caif_socket.c
-> index 6eef0e83f442..60fa870cfe97 100644
-> --- a/net/caif/caif_socket.c
-> +++ b/net/caif/caif_socket.c
-> @@ -1048,7 +1048,7 @@ static int caif_create(struct net *net, struct socket *sock, int protocol,
->   	 * is really not used at all in the net/core or socket.c but the
->   	 * initialization makes sure that sock->state is not uninitialized.
->   	 */
-> -	sk = sk_alloc(net, PF_CAIF, GFP_KERNEL, &prot, kern);
-> +	sk = sk_alloc(net, PF_CAIF, GFP_KERNEL, &prot, kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
->   
-> diff --git a/net/can/af_can.c b/net/can/af_can.c
-> index c4094ccc9978..cecdc8b7420c 100644
-> --- a/net/can/af_can.c
-> +++ b/net/can/af_can.c
-> @@ -155,7 +155,7 @@ static int can_create(struct net *net, struct socket *sock, int protocol,
->   
->   	sock->ops = cp->ops;
->   
-> -	sk = sk_alloc(net, PF_CAN, GFP_KERNEL, cp->prot, kern);
-> +	sk = sk_alloc(net, PF_CAN, GFP_KERNEL, cp->prot, kern, hold_net);
->   	if (!sk) {
->   		err = -ENOMEM;
->   		goto errout;
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 74729d20cd00..8546d97cc6ec 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -2209,9 +2209,10 @@ static void sk_prot_free(struct proto *prot, struct sock *sk)
->    *	@priority: for allocation (%GFP_KERNEL, %GFP_ATOMIC, etc)
->    *	@prot: struct proto associated with this new sock instance
->    *	@kern: is this to be a kernel socket?
-> + *	@hold_net: hold netns refcnt or not
->    */
->   struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
-> -		      struct proto *prot, int kern)
-> +		      struct proto *prot, bool kern, bool hold_net)
->   {
->   	struct sock *sk;
->   
-> diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-> index 0dd1a8829c42..6144338c420d 100644
-> --- a/net/ieee802154/socket.c
-> +++ b/net/ieee802154/socket.c
-> @@ -1027,7 +1027,7 @@ static int ieee802154_create(struct net *net, struct socket *sock,
->   	}
->   
->   	rc = -ENOMEM;
-> -	sk = sk_alloc(net, PF_IEEE802154, GFP_KERNEL, proto, kern);
-> +	sk = sk_alloc(net, PF_IEEE802154, GFP_KERNEL, proto, kern, hold_net);
->   	if (!sk)
->   		goto out;
->   	rc = 0;
+>   static void handshake_req_submit_test1(struct kunit *test)
 > diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-> index 7313ec410fb5..d22bb0d3ddc1 100644
+> index d22bb0d3ddc1..03c3854f382a 100644
 > --- a/net/ipv4/af_inet.c
 > +++ b/net/ipv4/af_inet.c
-> @@ -323,7 +323,7 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
->   	WARN_ON(!answer_prot->slab);
->   
->   	err = -ENOMEM;
-> -	sk = sk_alloc(net, PF_INET, GFP_KERNEL, answer_prot, kern);
-> +	sk = sk_alloc(net, PF_INET, GFP_KERNEL, answer_prot, kern, hold_net);
->   	if (!sk)
->   		goto out;
->   
-> diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-> index 8f951e5e58ab..c30fa8de7451 100644
-> --- a/net/ipv6/af_inet6.c
-> +++ b/net/ipv6/af_inet6.c
-> @@ -190,7 +190,7 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
->   	WARN_ON(!answer_prot->slab);
->   
->   	err = -ENOBUFS;
-> -	sk = sk_alloc(net, PF_INET6, GFP_KERNEL, answer_prot, kern);
-> +	sk = sk_alloc(net, PF_INET6, GFP_KERNEL, answer_prot, kern, hold_net);
->   	if (!sk)
->   		goto out;
->   
-> diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
-> index b7bbd4947855..76ecc64ec60c 100644
-> --- a/net/iucv/af_iucv.c
-> +++ b/net/iucv/af_iucv.c
-> @@ -452,7 +452,7 @@ static struct sock *iucv_sock_alloc(struct socket *sock, int proto, gfp_t prio,
->   	struct sock *sk;
->   	struct iucv_sock *iucv;
->   
-> -	sk = sk_alloc(&init_net, PF_IUCV, prio, &iucv_proto, kern);
-> +	sk = sk_alloc(&init_net, PF_IUCV, prio, &iucv_proto, kern, hold_net);
->   	if (!sk)
->   		return NULL;
->   	iucv = iucv_sk(sk);
-> diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-> index 50925046a392..8c791d1272cc 100644
-> --- a/net/kcm/kcmsock.c
-> +++ b/net/kcm/kcmsock.c
-> @@ -1517,7 +1517,7 @@ static struct file *kcm_clone(struct socket *osock)
->   	__module_get(newsock->ops->owner);
->   
->   	newsk = sk_alloc(sock_net(osock->sk), PF_KCM, GFP_KERNEL,
-> -			 &kcm_proto, false);
-> +			 &kcm_proto, false, true);
->   	if (!newsk) {
->   		sock_release(newsock);
->   		return ERR_PTR(-ENOMEM);
-> @@ -1798,7 +1798,7 @@ static int kcm_create(struct net *net, struct socket *sock,
->   	if (protocol != KCMPROTO_CONNECTED)
->   		return -EPROTONOSUPPORT;
->   
-> -	sk = sk_alloc(net, PF_KCM, GFP_KERNEL, &kcm_proto, kern);
-> +	sk = sk_alloc(net, PF_KCM, GFP_KERNEL, &kcm_proto, kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
->   
-> diff --git a/net/key/af_key.c b/net/key/af_key.c
-> index 1c35b1cfb1c5..765cc86d7923 100644
-> --- a/net/key/af_key.c
-> +++ b/net/key/af_key.c
-> @@ -149,7 +149,7 @@ static int pfkey_create(struct net *net, struct socket *sock, int protocol,
->   	if (protocol != PF_KEY_V2)
->   		return -EPROTONOSUPPORT;
->   
-> -	sk = sk_alloc(net, PF_KEY, GFP_KERNEL, &key_proto, kern);
-> +	sk = sk_alloc(net, PF_KEY, GFP_KERNEL, &key_proto, kern, hold_net);
->   	if (sk == NULL)
->   		return -ENOMEM;
->   
-> diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
-> index bab3c7b943db..5bd99d5ca128 100644
-> --- a/net/l2tp/l2tp_ppp.c
-> +++ b/net/l2tp/l2tp_ppp.c
-> @@ -483,7 +483,8 @@ static int pppol2tp_create(struct net *net, struct socket *sock,
->   	int error = -ENOMEM;
->   	struct sock *sk;
->   
-> -	sk = sk_alloc(net, PF_PPPOX, GFP_KERNEL, &pppol2tp_sk_proto, kern);
-> +	sk = sk_alloc(net, PF_PPPOX, GFP_KERNEL, &pppol2tp_sk_proto,
-> +		      kern, hold_net);
->   	if (!sk)
->   		goto out;
->   
-> diff --git a/net/llc/llc_conn.c b/net/llc/llc_conn.c
-> index 75b2e21bfd2b..ba0ed49b3085 100644
-> --- a/net/llc/llc_conn.c
-> +++ b/net/llc/llc_conn.c
-> @@ -932,7 +932,7 @@ static void llc_sk_init(struct sock *sk)
->   struct sock *llc_sk_alloc(struct net *net, int family, gfp_t priority,
->   			  struct proto *prot, bool kern, bool hold_net)
+> @@ -1644,8 +1644,9 @@ int inet_ctl_sock_create(struct sock **sk, unsigned short family,
+>   			 struct net *net)
 >   {
-> -	struct sock *sk = sk_alloc(net, family, priority, prot, kern);
-> +	struct sock *sk = sk_alloc(net, family, priority, prot, kern, hold_net);
+>   	struct socket *sock;
+> -	int rc = sock_create_kern(net, family, type, protocol, &sock);
+> +	int rc;
 >   
->   	if (!sk)
->   		goto out;
-> diff --git a/net/mctp/af_mctp.c b/net/mctp/af_mctp.c
-> index 17821c976213..5de6bc967271 100644
-> --- a/net/mctp/af_mctp.c
-> +++ b/net/mctp/af_mctp.c
-> @@ -702,7 +702,7 @@ static int mctp_pf_create(struct net *net, struct socket *sock,
->   	sock->state = SS_UNCONNECTED;
->   	sock->ops = ops;
+> +	rc = sock_create_net_noref(net, family, type, protocol, &sock);
+>   	if (rc == 0) {
+>   		*sk = sock->sk;
+>   		(*sk)->sk_allocation = GFP_ATOMIC;
+> diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
+> index 619a53eb672d..e8e079ebca36 100644
+> --- a/net/ipv4/udp_tunnel_core.c
+> +++ b/net/ipv4/udp_tunnel_core.c
+> @@ -15,7 +15,7 @@ int udp_sock_create4(struct net *net, struct udp_port_cfg *cfg,
+>   	struct socket *sock = NULL;
+>   	struct sockaddr_in udp_addr;
 >   
-> -	sk = sk_alloc(net, PF_MCTP, GFP_KERNEL, proto, kern);
-> +	sk = sk_alloc(net, PF_MCTP, GFP_KERNEL, proto, kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
+> -	err = sock_create_kern(net, AF_INET, SOCK_DGRAM, 0, &sock);
+> +	err = sock_create_net_noref(net, AF_INET, SOCK_DGRAM, 0, &sock);
+>   	if (err < 0)
+>   		goto error;
 >   
-> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-> index ddc51cb89c5b..273f3e43938a 100644
-> --- a/net/netlink/af_netlink.c
-> +++ b/net/netlink/af_netlink.c
-> @@ -626,7 +626,8 @@ static int __netlink_create(struct net *net, struct socket *sock,
+> diff --git a/net/ipv6/ip6_udp_tunnel.c b/net/ipv6/ip6_udp_tunnel.c
+> index c99053189ea8..65d859c7d9c4 100644
+> --- a/net/ipv6/ip6_udp_tunnel.c
+> +++ b/net/ipv6/ip6_udp_tunnel.c
+> @@ -18,10 +18,10 @@ int udp_sock_create6(struct net *net, struct udp_port_cfg *cfg,
+>   		     struct socket **sockp)
+>   {
+>   	struct sockaddr_in6 udp6_addr = {};
+> -	int err;
+>   	struct socket *sock = NULL;
+> +	int err;
 >   
->   	sock->ops = &netlink_ops;
+> -	err = sock_create_kern(net, AF_INET6, SOCK_DGRAM, 0, &sock);
+> +	err = sock_create_net_noref(net, AF_INET6, SOCK_DGRAM, 0, &sock);
+>   	if (err < 0)
+>   		goto error;
 >   
-> -	sk = sk_alloc(net, PF_NETLINK, GFP_KERNEL, &netlink_proto, kern);
-> +	sk = sk_alloc(net, PF_NETLINK, GFP_KERNEL, &netlink_proto,
-> +		      kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
+> diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+> index 369a2f2e459c..e43534185f45 100644
+> --- a/net/l2tp/l2tp_core.c
+> +++ b/net/l2tp/l2tp_core.c
+> @@ -1494,8 +1494,8 @@ static int l2tp_tunnel_sock_create(struct net *net,
+>   		if (cfg->local_ip6 && cfg->peer_ip6) {
+>   			struct sockaddr_l2tpip6 ip6_addr = {0};
 >   
-> diff --git a/net/netrom/af_netrom.c b/net/netrom/af_netrom.c
-> index 483f78951a19..0803ca64385d 100644
-> --- a/net/netrom/af_netrom.c
-> +++ b/net/netrom/af_netrom.c
-> @@ -435,7 +435,7 @@ static int nr_create(struct net *net, struct socket *sock, int protocol,
->   	if (sock->type != SOCK_SEQPACKET || protocol != 0)
->   		return -ESOCKTNOSUPPORT;
+> -			err = sock_create_kern(net, AF_INET6, SOCK_DGRAM,
+> -					       IPPROTO_L2TP, &sock);
+> +			err = sock_create_net_noref(net, AF_INET6, SOCK_DGRAM,
+> +						    IPPROTO_L2TP, &sock);
+>   			if (err < 0)
+>   				goto out;
 >   
-> -	sk = sk_alloc(net, PF_NETROM, GFP_ATOMIC, &nr_proto, kern);
-> +	sk = sk_alloc(net, PF_NETROM, GFP_ATOMIC, &nr_proto, kern, hold_net);
->   	if (sk  == NULL)
->   		return -ENOMEM;
+> @@ -1522,8 +1522,8 @@ static int l2tp_tunnel_sock_create(struct net *net,
+>   		{
+>   			struct sockaddr_l2tpip ip_addr = {0};
 >   
-> @@ -478,7 +478,8 @@ static struct sock *nr_make_new(struct sock *osk)
->   	if (osk->sk_type != SOCK_SEQPACKET)
->   		return NULL;
+> -			err = sock_create_kern(net, AF_INET, SOCK_DGRAM,
+> -					       IPPROTO_L2TP, &sock);
+> +			err = sock_create_net_noref(net, AF_INET, SOCK_DGRAM,
+> +						    IPPROTO_L2TP, &sock);
+>   			if (err < 0)
+>   				goto out;
 >   
-> -	sk = sk_alloc(sock_net(osk), PF_NETROM, GFP_ATOMIC, osk->sk_prot, 0);
-> +	sk = sk_alloc(sock_net(osk), PF_NETROM, GFP_ATOMIC, osk->sk_prot,
-> +		      false, true);
->   	if (sk == NULL)
->   		return NULL;
+> diff --git a/net/mctp/test/route-test.c b/net/mctp/test/route-test.c
+> index 8551dab1d1e6..f1b2cf0c8b48 100644
+> --- a/net/mctp/test/route-test.c
+> +++ b/net/mctp/test/route-test.c
+> @@ -310,7 +310,7 @@ static void __mctp_route_test_init(struct kunit *test,
+>   	rt = mctp_test_create_route(&init_net, dev->mdev, 8, 68);
+>   	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, rt);
 >   
-> diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
-> index 14f592becce0..80c427c32a91 100644
-> --- a/net/nfc/llcp_sock.c
-> +++ b/net/nfc/llcp_sock.c
-> @@ -977,7 +977,7 @@ struct sock *nfc_llcp_sock_alloc(struct socket *sock, int type, gfp_t gfp,
->   	struct sock *sk;
->   	struct nfc_llcp_sock *llcp_sock;
+> -	rc = sock_create_kern(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
+> +	rc = sock_create_net_noref(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
+>   	KUNIT_ASSERT_EQ(test, rc, 0);
 >   
-> -	sk = sk_alloc(&init_net, PF_NFC, gfp, &llcp_sock_proto, kern);
-> +	sk = sk_alloc(&init_net, PF_NFC, gfp, &llcp_sock_proto, kern, hold_net);
->   	if (!sk)
->   		return NULL;
+>   	addr.smctp_family = AF_MCTP;
+> @@ -568,7 +568,7 @@ static void mctp_test_route_input_sk_keys(struct kunit *test)
+>   	rt = mctp_test_create_route(&init_net, dev->mdev, 8, 68);
+>   	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, rt);
 >   
-> diff --git a/net/nfc/rawsock.c b/net/nfc/rawsock.c
-> index 4485b1ccb1c7..f2443d274065 100644
-> --- a/net/nfc/rawsock.c
-> +++ b/net/nfc/rawsock.c
-> @@ -339,7 +339,7 @@ static int rawsock_create(struct net *net, struct socket *sock,
->   		sock->ops = &rawsock_ops;
->   	}
+> -	rc = sock_create_kern(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
+> +	rc = sock_create_net_noref(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
+>   	KUNIT_ASSERT_EQ(test, rc, 0);
 >   
-> -	sk = sk_alloc(net, PF_NFC, GFP_ATOMIC, nfc_proto->proto, kern);
-> +	sk = sk_alloc(net, PF_NFC, GFP_ATOMIC, nfc_proto->proto, kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
+>   	msk = container_of(sock->sk, struct mctp_sock, sk);
+> @@ -994,7 +994,7 @@ static void mctp_test_route_output_key_create(struct kunit *test)
+>   	rt = mctp_test_create_route(&init_net, dev->mdev, dst, 68);
+>   	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, rt);
 >   
-> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> index 5a25dac333b0..2d1cab4839cd 100644
-> --- a/net/packet/af_packet.c
-> +++ b/net/packet/af_packet.c
-> @@ -3414,7 +3414,7 @@ static int packet_create(struct net *net, struct socket *sock, int protocol,
->   	sock->state = SS_UNCONNECTED;
+> -	rc = sock_create_kern(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
+> +	rc = sock_create_net_noref(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
+>   	KUNIT_ASSERT_EQ(test, rc, 0);
 >   
->   	err = -ENOBUFS;
-> -	sk = sk_alloc(net, PF_PACKET, GFP_KERNEL, &packet_proto, kern);
-> +	sk = sk_alloc(net, PF_PACKET, GFP_KERNEL, &packet_proto, kern, hold_net);
->   	if (sk == NULL)
->   		goto out;
+>   	dev->mdev->addrs = kmalloc(sizeof(u8), GFP_KERNEL);
+> diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
+> index 7a0f7998376a..3dc40a364fb2 100644
+> --- a/net/mptcp/pm_netlink.c
+> +++ b/net/mptcp/pm_netlink.c
+> @@ -1083,8 +1083,8 @@ static int mptcp_pm_nl_create_listen_socket(struct sock *sk,
+>   	int backlog = 1024;
+>   	int err;
 >   
-> diff --git a/net/phonet/af_phonet.c b/net/phonet/af_phonet.c
-> index 4bdbc93c74fb..dc2e03edd65d 100644
-> --- a/net/phonet/af_phonet.c
-> +++ b/net/phonet/af_phonet.c
-> @@ -84,7 +84,7 @@ static int pn_socket_create(struct net *net, struct socket *sock, int protocol,
->   		goto out;
->   	}
+> -	err = sock_create_kern(sock_net(sk), entry->addr.family,
+> -			       SOCK_STREAM, IPPROTO_MPTCP, &entry->lsk);
+> +	err = sock_create_net_noref(sock_net(sk), entry->addr.family,
+> +				    SOCK_STREAM, IPPROTO_MPTCP, &entry->lsk);
+>   	if (err)
+>   		return err;
 >   
-> -	sk = sk_alloc(net, PF_PHONET, GFP_KERNEL, pnp->prot, kern);
-> +	sk = sk_alloc(net, PF_PHONET, GFP_KERNEL, pnp->prot, kern, hold_net);
->   	if (sk == NULL) {
->   		err = -ENOMEM;
->   		goto out;
-> diff --git a/net/phonet/pep.c b/net/phonet/pep.c
-> index 53a858478e22..9b6e83b92f6f 100644
-> --- a/net/phonet/pep.c
-> +++ b/net/phonet/pep.c
-> @@ -836,7 +836,7 @@ static struct sock *pep_sock_accept(struct sock *sk,
+> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+> index e7e8972bdfca..7162873a232a 100644
+> --- a/net/mptcp/subflow.c
+> +++ b/net/mptcp/subflow.c
+> @@ -1953,7 +1953,7 @@ static int subflow_ulp_init(struct sock *sk)
+>   	int err = 0;
 >   
->   	/* Create a new to-be-accepted sock */
->   	newsk = sk_alloc(sock_net(sk), PF_PHONET, GFP_KERNEL, sk->sk_prot,
-> -			 arg->kern);
-> +			 arg->kern, arg->hold_net);
->   	if (!newsk) {
->   		pep_reject_conn(sk, skb, PN_PIPE_ERR_OVERLOAD, GFP_KERNEL);
->   		err = -ENOBUFS;
-> diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
-> index c05711f79a37..05a3b00fddf8 100644
-> --- a/net/qrtr/af_qrtr.c
-> +++ b/net/qrtr/af_qrtr.c
-> @@ -1266,7 +1266,7 @@ static int qrtr_create(struct net *net, struct socket *sock,
->   	if (sock->type != SOCK_DGRAM)
->   		return -EPROTOTYPE;
+>   	/* disallow attaching ULP to a socket unless it has been
+> -	 * created with sock_create_kern()
+> +	 * created with sock_create_net()
+>   	 */
+>   	if (!sk->sk_kern_sock) {
+>   		err = -EOPNOTSUPP;
+> diff --git a/net/netfilter/ipvs/ip_vs_sync.c b/net/netfilter/ipvs/ip_vs_sync.c
+> index 3402675bf521..e97cd30f196a 100644
+> --- a/net/netfilter/ipvs/ip_vs_sync.c
+> +++ b/net/netfilter/ipvs/ip_vs_sync.c
+> @@ -1470,8 +1470,8 @@ static int make_send_sock(struct netns_ipvs *ipvs, int id,
+>   	int result, salen;
 >   
-> -	sk = sk_alloc(net, AF_QIPCRTR, GFP_KERNEL, &qrtr_proto, kern);
-> +	sk = sk_alloc(net, AF_QIPCRTR, GFP_KERNEL, &qrtr_proto, kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
+>   	/* First create a socket */
+> -	result = sock_create_kern(ipvs->net, ipvs->mcfg.mcast_af, SOCK_DGRAM,
+> -				  IPPROTO_UDP, &sock);
+> +	result = sock_create_net_noref(ipvs->net, ipvs->mcfg.mcast_af, SOCK_DGRAM,
+> +				       IPPROTO_UDP, &sock);
+>   	if (result < 0) {
+>   		pr_err("Error during creation of socket; terminating\n");
+>   		goto error;
+> @@ -1527,8 +1527,8 @@ static int make_receive_sock(struct netns_ipvs *ipvs, int id,
+>   	int result, salen;
 >   
-> diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
-> index 3e1bb40485ad..a0999d9ee5ae 100644
-> --- a/net/rds/af_rds.c
-> +++ b/net/rds/af_rds.c
-> @@ -702,7 +702,7 @@ static int rds_create(struct net *net, struct socket *sock, int protocol,
->   	if (sock->type != SOCK_SEQPACKET || protocol)
->   		return -ESOCKTNOSUPPORT;
+>   	/* First create a socket */
+> -	result = sock_create_kern(ipvs->net, ipvs->bcfg.mcast_af, SOCK_DGRAM,
+> -				  IPPROTO_UDP, &sock);
+> +	result = sock_create_net_noref(ipvs->net, ipvs->bcfg.mcast_af, SOCK_DGRAM,
+> +				       IPPROTO_UDP, &sock);
+>   	if (result < 0) {
+>   		pr_err("Error during creation of socket; terminating\n");
+>   		goto error;
+> diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
+> index 3de9350cbf30..2f8f347150c0 100644
+> --- a/net/qrtr/ns.c
+> +++ b/net/qrtr/ns.c
+> @@ -692,8 +692,8 @@ int qrtr_ns_init(void)
+>   	INIT_LIST_HEAD(&qrtr_ns.lookups);
+>   	INIT_WORK(&qrtr_ns.work, qrtr_ns_worker);
 >   
-> -	sk = sk_alloc(net, AF_RDS, GFP_KERNEL, &rds_proto, kern);
-> +	sk = sk_alloc(net, AF_RDS, GFP_KERNEL, &rds_proto, kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
+> -	ret = sock_create_kern(&init_net, AF_QIPCRTR, SOCK_DGRAM,
+> -			       PF_QIPCRTR, &qrtr_ns.sock);
+> +	ret = sock_create_net_noref(&init_net, AF_QIPCRTR, SOCK_DGRAM,
+> +				    PF_QIPCRTR, &qrtr_ns.sock);
+>   	if (ret < 0)
+>   		return ret;
 >   
-> diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
-> index 1c175c92aa42..6aeaa526382a 100644
-> --- a/net/rose/af_rose.c
-> +++ b/net/rose/af_rose.c
-> @@ -555,8 +555,8 @@ static int rose_create(struct net *net, struct socket *sock, int protocol,
->   	if (sock->type != SOCK_SEQPACKET || protocol != 0)
->   		return -ESOCKTNOSUPPORT;
+> @@ -735,7 +735,7 @@ int qrtr_ns_init(void)
+>   	 *  qrtr module is inserted successfully.
+>   	 *
+>   	 * However, the reference count is increased twice in
+> -	 * sock_create_kern(): one is to increase the reference count of owner
+> +	 * sock_create_net_noref(): one is to increase the reference count of owner
+>   	 * of qrtr socket's proto_ops struct; another is to increment the
+>   	 * reference count of owner of qrtr proto struct. Therefore, we must
+>   	 * decrement the module reference count twice to ensure that it keeps
+> diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
+> index 440ac9057148..202afd77b532 100644
+> --- a/net/rds/tcp_listen.c
+> +++ b/net/rds/tcp_listen.c
+> @@ -289,8 +289,8 @@ struct socket *rds_tcp_listen_init(struct net *net, bool isv6)
+>   	int addr_len;
+>   	int ret;
 >   
-> -	sk = sk_alloc(net, PF_ROSE, GFP_ATOMIC, &rose_proto, kern);
-> -	if (sk == NULL)
-> +	sk = sk_alloc(net, PF_ROSE, GFP_ATOMIC, &rose_proto, kern, hold_net);
-> +	if (!sk)
->   		return -ENOMEM;
+> -	ret = sock_create_kern(net, isv6 ? PF_INET6 : PF_INET, SOCK_STREAM,
+> -			       IPPROTO_TCP, &sock);
+> +	ret = sock_create_net_noref(net, isv6 ? PF_INET6 : PF_INET, SOCK_STREAM,
+> +				    IPPROTO_TCP, &sock);
+>   	if (ret < 0) {
+>   		rdsdebug("could not create %s listener socket: %d\n",
+>   			 isv6 ? "IPv6" : "IPv4", ret);
+> diff --git a/net/rxrpc/rxperf.c b/net/rxrpc/rxperf.c
+> index 7ef93407be83..1c784d449a6b 100644
+> --- a/net/rxrpc/rxperf.c
+> +++ b/net/rxrpc/rxperf.c
+> @@ -182,8 +182,8 @@ static int rxperf_open_socket(void)
+>   	struct socket *socket;
+>   	int ret;
 >   
->   	rose = rose_sk(sk);
-> @@ -594,8 +594,9 @@ static struct sock *rose_make_new(struct sock *osk)
->   	if (osk->sk_type != SOCK_SEQPACKET)
->   		return NULL;
+> -	ret = sock_create_kern(&init_net, AF_RXRPC, SOCK_DGRAM, PF_INET6,
+> -			       &socket);
+> +	ret = sock_create_net_noref(&init_net, AF_RXRPC, SOCK_DGRAM, PF_INET6,
+> +				    &socket);
+>   	if (ret < 0)
+>   		goto error_1;
 >   
-> -	sk = sk_alloc(sock_net(osk), PF_ROSE, GFP_ATOMIC, &rose_proto, 0);
-> -	if (sk == NULL)
-> +	sk = sk_alloc(sock_net(osk), PF_ROSE, GFP_ATOMIC, &rose_proto,
-> +		      false, true);
-> +	if (!sk)
->   		return NULL;
+> diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+> index e49904f08559..fb8ed0290a4a 100644
+> --- a/net/sctp/socket.c
+> +++ b/net/sctp/socket.c
+> @@ -1328,7 +1328,7 @@ static int __sctp_setsockopt_connectx(struct sock *sk, struct sockaddr *kaddrs,
+>   		return err;
 >   
->   	rose = rose_sk(sk);
-> diff --git a/net/rxrpc/af_rxrpc.c b/net/rxrpc/af_rxrpc.c
-> index f2374f65b1c0..7e7e1163c476 100644
-> --- a/net/rxrpc/af_rxrpc.c
-> +++ b/net/rxrpc/af_rxrpc.c
-> @@ -830,7 +830,7 @@ static int rxrpc_create(struct net *net, struct socket *sock, int protocol,
->   	sock->ops = &rxrpc_rpc_ops;
->   	sock->state = SS_UNCONNECTED;
->   
-> -	sk = sk_alloc(net, PF_RXRPC, GFP_KERNEL, &rxrpc_proto, kern);
-> +	sk = sk_alloc(net, PF_RXRPC, GFP_KERNEL, &rxrpc_proto, kern, hold_net);
->   	if (!sk)
->   		return -ENOMEM;
->   
-> diff --git a/net/sctp/ipv6.c b/net/sctp/ipv6.c
-> index 2c4e4dd79246..5e62c77a6f47 100644
-> --- a/net/sctp/ipv6.c
-> +++ b/net/sctp/ipv6.c
-> @@ -784,7 +784,7 @@ static struct sock *sctp_v6_create_accept_sk(struct sock *sk,
->   	struct sock *newsk;
->   
->   	newsk = sk_alloc(sock_net(sk), PF_INET6, GFP_KERNEL, sk->sk_prot,
-> -			 arg->kern);
-> +			 arg->kern, arg->hold_net);
->   	if (!newsk)
->   		goto out;
->   
-> diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
-> index 7b2ae3df171a..73ee2ca9ff31 100644
-> --- a/net/sctp/protocol.c
-> +++ b/net/sctp/protocol.c
-> @@ -587,7 +587,7 @@ static struct sock *sctp_v4_create_accept_sk(struct sock *sk,
->   	struct sock *newsk;
->   
->   	newsk = sk_alloc(sock_net(sk), PF_INET, GFP_KERNEL, sk->sk_prot,
-> -			 arg->kern);
-> +			 arg->kern, arg->hold_net);
->   	if (!newsk)
->   		goto out;
->   
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 2535b922f760..6e93f188a908 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -393,7 +393,7 @@ static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
->   	struct sock *sk;
->   
->   	prot = (protocol == SMCPROTO_SMC6) ? &smc_proto6 : &smc_proto;
-> -	sk = sk_alloc(net, PF_SMC, GFP_KERNEL, prot, kern);
-> +	sk = sk_alloc(net, PF_SMC, GFP_KERNEL, prot, kern, hold_net);
->   	if (!sk)
->   		return NULL;
->   
+>   	/* in-kernel sockets don't generally have a file allocated to them
+> -	 * if all they do is call sock_create_kern().
+> +	 * if all they do is call sock_create_net_noref().
+>   	 */
+>   	if (sk->sk_socket->file)
+>   		flags = sk->sk_socket->file->f_flags;
+> diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
+> index a944e7dcb8b9..dbd76070e05e 100644
+> --- a/net/smc/smc_inet.c
+> +++ b/net/smc/smc_inet.c
+> @@ -111,7 +111,7 @@ static struct inet_protosw smc_inet6_protosw = {
+>   static unsigned int smc_sync_mss(struct sock *sk, u32 pmtu)
+>   {
+>   	/* No need pass it through to clcsock, mss can always be set by
+> -	 * sock_create_kern or smc_setsockopt.
+> +	 * sock_create_net or smc_setsockopt.
+>   	 */
+>   	return 0;
+>   }
+
 Only for the smc part:
 Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
-> diff --git a/net/tipc/socket.c b/net/tipc/socket.c
-> index 26566ff1d4c7..aba5b139c7d9 100644
-> --- a/net/tipc/socket.c
-> +++ b/net/tipc/socket.c
-> @@ -484,7 +484,7 @@ static int tipc_sk_create(struct net *net, struct socket *sock,
->   	}
+
+> diff --git a/net/socket.c b/net/socket.c
+> index 992de3dd94b8..8f45d17e52c3 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -1665,23 +1665,36 @@ int sock_create_net(struct net *net, int family, int type, int protocol,
+>   EXPORT_SYMBOL(sock_create_net);
 >   
->   	/* Allocate socket's protocol area */
-> -	sk = sk_alloc(net, AF_TIPC, GFP_KERNEL, &tipc_proto, kern);
-> +	sk = sk_alloc(net, AF_TIPC, GFP_KERNEL, &tipc_proto, kern, hold_net);
->   	if (sk == NULL)
->   		return -ENOMEM;
+>   /**
+> - *	sock_create_kern - creates a socket (kernel space)
+> - *	@net: net namespace
+> - *	@family: protocol family (AF_INET, ...)
+> - *	@type: communication type (SOCK_STREAM, ...)
+> - *	@protocol: protocol (0, ...)
+> - *	@res: new socket
+> + * sock_create_net_noref - creates a socket for kernel space
+> + *
+> + * @net: net namespace
+> + * @family: protocol family (AF_INET, ...)
+> + * @type: communication type (SOCK_STREAM, ...)
+> + * @protocol: protocol (0, ...)
+> + * @res: new socket
+>    *
+> - *	A wrapper around __sock_create().
+> - *	Returns 0 or an error. This function internally uses GFP_KERNEL.
+> + * Creates a new socket and assigns it to @res, passing through LSM.
+> + *
+> + * The socket is for kernel space and should not be exposed to
+> + * userspace via a file descriptor nor BPF hooks except for LSM
+> + * (see inet_create(), inet_release(), etc).
+> + *
+> + * The socket DOES NOT hold a reference count of @net to allow it to
+> + * be removed; the caller MUST ensure that the socket is always freed
+> + * before @net.
+> + *
+> + * @net MUST be alive as of calling sock_create_net_noref().
+> + *
+> + * Context: Process context. This function internally uses GFP_KERNEL.
+> + * Return: 0 or an error.
+>    */
 >   
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 393be726004c..136f4b1d05da 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -1020,9 +1020,11 @@ static struct sock *unix_create1(struct net *net, struct socket *sock, int type,
->   	}
+> -int sock_create_kern(struct net *net, int family, int type, int protocol,
+> -		     struct socket **res)
+> +int sock_create_net_noref(struct net *net, int family, int type, int protocol,
+> +			  struct socket **res)
+>   {
+>   	return __sock_create(net, family, type, protocol, res, true, false);
+>   }
+> -EXPORT_SYMBOL(sock_create_kern);
+> +EXPORT_SYMBOL(sock_create_net_noref);
 >   
->   	if (type == SOCK_STREAM)
-> -		sk = sk_alloc(net, PF_UNIX, GFP_KERNEL, &unix_stream_proto, kern);
-> -	else /*dgram and  seqpacket */
-> -		sk = sk_alloc(net, PF_UNIX, GFP_KERNEL, &unix_dgram_proto, kern);
-> +		sk = sk_alloc(net, PF_UNIX, GFP_KERNEL, &unix_stream_proto,
-> +			      kern, hold_net);
-> +	else /* dgram and seqpacket */
-> +		sk = sk_alloc(net, PF_UNIX, GFP_KERNEL, &unix_dgram_proto,
-> +			      kern, hold_net);
+>   static struct socket *__sys_socket_create(int family, int type, int protocol)
+>   {
+> diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
+> index 37935082d799..4e8723403e07 100644
+> --- a/net/sunrpc/clnt.c
+> +++ b/net/sunrpc/clnt.c
+> @@ -1450,8 +1450,8 @@ static int rpc_sockname(struct net *net, struct sockaddr *sap, size_t salen,
+>   	struct socket *sock;
+>   	int err;
 >   
->   	if (!sk) {
->   		err = -ENOMEM;
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index f2ce92cd57c4..10aa09e1a291 100644
-> --- a/net/vmw_vsock/af_vsock.c
-> +++ b/net/vmw_vsock/af_vsock.c
-> @@ -738,7 +738,7 @@ static struct sock *__vsock_create(struct net *net,
->   	struct vsock_sock *psk;
->   	struct vsock_sock *vsk;
->   
-> -	sk = sk_alloc(net, AF_VSOCK, priority, &vsock_proto, kern);
-> +	sk = sk_alloc(net, AF_VSOCK, priority, &vsock_proto, kern, hold_net);
->   	if (!sk)
->   		return NULL;
->   
-> diff --git a/net/x25/af_x25.c b/net/x25/af_x25.c
-> index 0b6c22b979e7..3619982cbb32 100644
-> --- a/net/x25/af_x25.c
-> +++ b/net/x25/af_x25.c
-> @@ -510,7 +510,7 @@ static struct sock *x25_alloc_socket(struct net *net, bool kern, bool hold_net)
->   	struct x25_sock *x25;
->   	struct sock *sk;
->   
-> -	sk = sk_alloc(net, AF_X25, GFP_ATOMIC, &x25_proto, kern);
-> +	sk = sk_alloc(net, AF_X25, GFP_ATOMIC, &x25_proto, kern, hold_net);
->   	if (!sk)
+> -	err = sock_create_kern(net, sap->sa_family,
+> -			       SOCK_DGRAM, IPPROTO_UDP, &sock);
+> +	err = sock_create_net_noref(net, sap->sa_family,
+> +				    SOCK_DGRAM, IPPROTO_UDP, &sock);
+>   	if (err < 0) {
+>   		dprintk("RPC:       can't create UDP socket (%d)\n", err);
 >   		goto out;
+> diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+> index cde5765f6f81..e20465c20b16 100644
+> --- a/net/sunrpc/svcsock.c
+> +++ b/net/sunrpc/svcsock.c
+> @@ -1529,7 +1529,7 @@ static struct svc_xprt *svc_create_socket(struct svc_serv *serv,
+>   	if (protocol == IPPROTO_TCP)
+>   		error = sock_create_net(net, family, type, protocol, &sock);
+>   	else
+> -		error = sock_create_kern(net, family, type, protocol, &sock);
+> +		error = sock_create_net_noref(net, family, type, protocol, &sock);
+>   	if (error < 0)
+>   		return ERR_PTR(error);
 >   
-> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> index 5763ef355c73..a93b600c6583 100644
-> --- a/net/xdp/xsk.c
-> +++ b/net/xdp/xsk.c
-> @@ -1703,7 +1703,7 @@ static int xsk_create(struct net *net, struct socket *sock, int protocol,
+> diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+> index f3e139c30442..e793914d48f6 100644
+> --- a/net/sunrpc/xprtsock.c
+> +++ b/net/sunrpc/xprtsock.c
+> @@ -1927,7 +1927,7 @@ static struct socket *xs_create_sock(struct rpc_xprt *xprt,
+>   	if (protocol == IPPROTO_TCP)
+>   		err = sock_create_net(xprt->xprt_net, family, type, protocol, &sock);
+>   	else
+> -		err = sock_create_kern(xprt->xprt_net, family, type, protocol, &sock);
+> +		err = sock_create_net_noref(xprt->xprt_net, family, type, protocol, &sock);
+>   	if (err < 0) {
+>   		dprintk("RPC:       can't create %d transport socket (%d).\n",
+>   				protocol, -err);
+> @@ -1999,8 +1999,8 @@ static int xs_local_setup_socket(struct sock_xprt *transport)
+>   	struct socket *sock;
+>   	int status;
 >   
->   	sock->state = SS_UNCONNECTED;
+> -	status = sock_create_kern(xprt->xprt_net, AF_LOCAL,
+> -				  SOCK_STREAM, 0, &sock);
+> +	status = sock_create_net_noref(xprt->xprt_net, AF_LOCAL,
+> +				       SOCK_STREAM, 0, &sock);
+>   	if (status < 0) {
+>   		dprintk("RPC:       can't create AF_LOCAL "
+>   			"transport socket (%d).\n", -status);
+> diff --git a/net/tipc/topsrv.c b/net/tipc/topsrv.c
+> index 8ee0c07d00e9..2e03391c1bd1 100644
+> --- a/net/tipc/topsrv.c
+> +++ b/net/tipc/topsrv.c
+> @@ -515,7 +515,7 @@ static int tipc_topsrv_create_listener(struct tipc_topsrv *srv)
+>   	struct sock *sk;
+>   	int rc;
 >   
-> -	sk = sk_alloc(net, PF_XDP, GFP_KERNEL, &xsk_proto, kern);
-> +	sk = sk_alloc(net, PF_XDP, GFP_KERNEL, &xsk_proto, kern, hold_net);
->   	if (!sk)
->   		return -ENOBUFS;
+> -	rc = sock_create_kern(srv->net, AF_TIPC, SOCK_SEQPACKET, 0, &lsock);
+> +	rc = sock_create_net_noref(srv->net, AF_TIPC, SOCK_SEQPACKET, 0, &lsock);
+>   	if (rc < 0)
+>   		return rc;
 >   
+> @@ -553,7 +553,7 @@ static int tipc_topsrv_create_listener(struct tipc_topsrv *srv)
+>   	 * after TIPC module is inserted successfully.
+>   	 *
+>   	 * However, the reference count is ever increased twice in
+> -	 * sock_create_kern(): one is to increase the reference count of owner
+> +	 * sock_create_net_noref(): one is to increase the reference count of owner
+>   	 * of TIPC socket's proto_ops struct; another is to increment the
+>   	 * reference count of owner of TIPC proto struct. Therefore, we must
+>   	 * decrement the module reference count twice to ensure that it keeps
+> diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+> index 27c58fd260e0..fef671d39d5e 100644
+> --- a/net/wireless/nl80211.c
+> +++ b/net/wireless/nl80211.c
+> @@ -13689,8 +13689,8 @@ static int nl80211_parse_wowlan_tcp(struct cfg80211_registered_device *rdev,
+>   	port = nla_get_u16_default(tb[NL80211_WOWLAN_TCP_SRC_PORT], 0);
+>   #ifdef CONFIG_INET
+>   	/* allocate a socket and port for it and use it */
+> -	err = sock_create_kern(wiphy_net(&rdev->wiphy), PF_INET, SOCK_STREAM,
+> -			       IPPROTO_TCP, &cfg->sock);
+> +	err = sock_create_net_noref(wiphy_net(&rdev->wiphy), PF_INET, SOCK_STREAM,
+> +				    IPPROTO_TCP, &cfg->sock);
+>   	if (err) {
+>   		kfree(cfg);
+>   		return err;
+> diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
+> index cc9dde507aba..b6e78e9d3280 100644
+> --- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
+> +++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
+> @@ -804,8 +804,8 @@ __bpf_kfunc int bpf_kfunc_init_sock(struct init_sock_args *args)
+>   		goto out;
+>   	}
+>   
+> -	err = sock_create_kern(current->nsproxy->net_ns, args->af, args->type,
+> -			       proto, &sock);
+> +	err = sock_create_net_noref(current->nsproxy->net_ns, args->af, args->type,
+> +				    proto, &sock);
+>   
+>   	if (!err)
+>   		/* Set timeout for call to kernel_connect() to prevent it from hanging,
 
 
