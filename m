@@ -1,284 +1,126 @@
-Return-Path: <netdev+bounces-151762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEEB19F0CB9
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:51:49 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 323239F0CDD
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 14:02:23 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AB6F281EF5
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:51:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91407188A9B8
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:02:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA671CF7A2;
-	Fri, 13 Dec 2024 12:51:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7611A1DF744;
+	Fri, 13 Dec 2024 13:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="RSJew3Ih"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j71JnRpF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E566B640
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 12:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D631B3922
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 13:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734094306; cv=none; b=sZ61ZHQhReCkQa34L1GJfquWmJf6I9Z8QrIb1F83xzpt7qR/WtodaH8jYAB8Ed67l4jptUTqpDf5QkrTWUOdJSnBG8f7R+aUH9TkSewuv6u0M2lHNgsClUb6z7jAQjYRr59ArlqC0AT5qI/OuQ3IKU9E8rQ9OhHIeTklOL9VcO0=
+	t=1734094938; cv=none; b=f6/maaTwLa/kfdyBxUS5H8eBLD4ruszthHwB/JJiKucle1tf9fsObkkShpgoa8K/DCHIi9KtwN8jq7RPZgqGn8SRsrwC2pw5F/RMFokZ9xAogikfhHMcCsODrXZtSILhqFN0epw29Wh9yWCV3sg8rxuWQJr0fkumncMnU/xJz+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734094306; c=relaxed/simple;
-	bh=8o73yXLfR1LStQv/NJe6NDYPITlAxXCS66O0VuLcA+U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kZp9X16HU/m1neoh3oQwH96SXYNrNU7gu+UCa+ii5lJWm9WrsD0mXiYrFoN35WEBLaBm9uRqAg0IzlUjB5QFZsWMe5Glla9xib80k/MJ8KvVwPjkBe2DFMCKXkyot8bv6RQBZi2b33uZDh6zvJTM5eSg/jbmjd+X1glaZpX7SPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=RSJew3Ih; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aa6c0d1833eso292259966b.1
-        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 04:51:44 -0800 (PST)
+	s=arc-20240116; t=1734094938; c=relaxed/simple;
+	bh=ry8Uv957TTllN6K/ZZsiaBd1j2fHjfjXIWrD6h++x1o=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=AC0xbzQbxD0xt9dTs1BtwDJGMsVyG/7BuIZ9kyZ91pGRyd/S1D2Gq9DdTjT4rxXXNt5CWnlDGP2obIsxSmKIZE5s92KX7Dnx/yYXGtNqP4gNamdQPIWlFff3UXt2SSN3BiAM6FGD+pjz1rtMzZ0yDkjgYTJ4A/YlQJHukCsx040=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j71JnRpF; arc=none smtp.client-ip=209.85.219.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-6d8eb5ea994so20550376d6.1
+        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 05:02:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1734094302; x=1734699102; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DmK4ciQ8X3wOVnRZJtrxhIpLn8W+EsbHXQWjDvNDlvc=;
-        b=RSJew3IhkDmy/MEbWMOVd9NJ8+Zd2oZqgGZaPN4iuuZ1Aih6ScAnlY/S2p9CQI4hUT
-         k84/I4Xr3XAkcQUybgS08aDgEJRR/XpBkwQTGVuG0Sh0AZkV+vLGODC3NKBo+Ps20z+h
-         TqxXWh4TH/RRg+cDGc+b0pIz0/Gm5u1VuYm6JVB29EC8sT/FiCXGlfjEdEJAIN0tOWeV
-         oYnwp2KcFUfBGoCuLxkhkViX5Pu+0VyRbYz3fiHWboJD4QaIRcZuQlVzxWNyeVdpXeSo
-         a4ztrtoWsUCuX4O7unw9TrtDwP/mOhTiX9gk4X1sL3fUojyeEeP8csYVJJ+bqOKZ33T6
-         rYUQ==
+        d=google.com; s=20230601; t=1734094936; x=1734699736; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=aeuLZ2EtebyWwdqzURa8lNzhzWdlubcFLysImD4erfk=;
+        b=j71JnRpFBxebYcsh93Yhewa6a537t1l5w3As90b8hPclbtnf3tTeavZ079ruXnjukD
+         ZKjL/vk+KW6exSF5AF4MHZjRupP2LTYVX7+sz8HGwJBOJeho/3bYvSo7W5ZZ4ufXfqXT
+         27CBn0Hwgi1y45a1myFCRbTtt2aSndwEWskmOvsK/++s8r1So0CqRQBV13yeqcKUhtCL
+         xX+AkoLJt0HK6M3izhL/XxNDmEPozj+6/ESxb49MB05Juydj4d3Qz9Jxlh3iBuHcHcvs
+         K0CvDvePxftzKtsCpxJmFKDAzPMogolol9lG+JI4i8rW8rHtVN+J42mH7yAXGNCTsHna
+         buAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734094302; x=1734699102;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DmK4ciQ8X3wOVnRZJtrxhIpLn8W+EsbHXQWjDvNDlvc=;
-        b=LDISam+Z9rpzlYBlyxQYrhvMNXHA5DmPxJc0idHVyV/cCxLhpvsZpk6k2Gm10yTefp
-         Itaz1w4KgvWIyXzVoIgXuVZIDcKN5HFEXhMfcoNH+kwtpLq3/wXXjMFJA6vLzYlQBjWF
-         ec9DaOPlbpETkzq9+dHb+sMfSb280UX/Dfv2UvXc5w8WGF1FsJBQSducnqPHNIgsEt3R
-         K5K3UNSkT/l2TH3ei6qwFAklbvw6XAauiWA5Al+Oi3/nJVXjbpmHMJhu+Y4bHMwGz4pc
-         Dvj0BLhpG5lcgj7wfxNFqLQtK2gVH6AZg5Hv0bX/LWs4FC9cHRSb+kdux8P9qyvtOrYb
-         H5ZQ==
-X-Gm-Message-State: AOJu0YynoCZWuw1lxghttchJgv+039HKk4xXgU8/j+J1yHJWyj/VhpWD
-	oYGiUs6W75dl0onQqltnWHXbhT9+PRBRNzhnfMcqHl8RgAxPSD8xNws+fRLkSboEb2qwPnnmr0W
-	OmS0Z4ZZbswp80nC3+zm/8M2Lbf+UKHXxycij8FUxLuSRQEgaDoTdpfUdz/MldVnoU0j5NpdwcZ
-	QRueXBdZE/lpwIe4pRY1sFX4YhpuLFpK+jF92dc5Mk5g==
-X-Gm-Gg: ASbGncvWyYHhUvr9i0raSn3CnkFYITASfpnCw9ZQOkekssmoJrB7Lx/k2OIEb9ZC4io
-	Bn0WO0L7L1yXtArJguaOQdZs1J39F11n8zf8APhTmtorR4O4AguvjUiPTqTmc3fDM7HbuU8KLgm
-	kc4NkJMQaoYa8btkkKcdcVXLBXXWajHSfHj98MGALeZfc211W9BEsPwvKsyKQLP/2j9PEF+yzhp
-	8oLcIonkK/TgupyxHuQwUTBfHGPk0Y4thxEsFqTLmv9K8RvjUywhmcK1eWA6BaTfboE67dz5sKD
-	ifHYJMpxuK2dJZ6O92Y=
-X-Google-Smtp-Source: AGHT+IHRyQfgTa1/ztKak0nbnuC8cq6nxpCHreKuybFqjWksYVyDKIzt1nVhQo9w1sedshxpzyQrww==
-X-Received: by 2002:a17:907:9722:b0:aa6:950c:ae0e with SMTP id a640c23a62f3a-aab77ec4347mr316751466b.51.1734094302144;
-        Fri, 13 Dec 2024 04:51:42 -0800 (PST)
-Received: from fedora.. (cpe-109-60-82-197.zg3.cable.xnet.hr. [109.60.82.197])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa68c4b52b8sm671371066b.52.2024.12.13.04.51.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 04:51:41 -0800 (PST)
-From: Robert Marko <robert.marko@sartura.hr>
-To: netdev@vger.kernel.org,
-	stephen@networkplumber.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	dsahern@kernel.org,
-	iri@resnulli.us,
-	andrew@lunn.ch
-Cc: luka.perkov@sartura.hr,
-	Robert Marko <robert.marko@sartura.hr>
-Subject: [iproute2-next v3] ip: link: rmnet: add support for flag handling
-Date: Fri, 13 Dec 2024 13:51:00 +0100
-Message-ID: <20241213125139.733201-1-robert.marko@sartura.hr>
-X-Mailer: git-send-email 2.47.1
+        d=1e100.net; s=20230601; t=1734094936; x=1734699736;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aeuLZ2EtebyWwdqzURa8lNzhzWdlubcFLysImD4erfk=;
+        b=LAmnpbzR5n/HKdgnHor80gsPYkU8U3z6WKsyOpRyfcJpSHlUAvtpgNlgaMTjIGcTAW
+         G5hHvD68vzXVaF6Y66aEY/XYmmMdS7oyggvgD2ffZJnDEXqvrw5xl6uO37qYMOblGzIY
+         Hs7fDjMAIO6eC0Hwfcu9NyzfxNMIZv/BpwTkF/UFUzzpwuIGwJbVkzyXHwV0goZwRElR
+         O651PN+2FyIxrdKQ5p+knvbSLk8dtjQeirVYLykJUa04VmbtVgzkptIt2GlIzdu0frCH
+         U7hnVNYE8dq4hTkPtfZIMxOFGXQkeCF8DAZmu1Vgfb6vxqLKWASBBN2mFNh0avdRJ7gp
+         JE1g==
+X-Gm-Message-State: AOJu0YxQ6U3uWt2jjHz6hBnGqPt2YoWHpt0oKCyQArZ8yG9aXU3ABdnl
+	I6XQYmScvMRsz+Pyjz8zdoqKjUNpoLcLReOEGhzdazI2sONUjx680OVp1uziPzrRihwio26bpRO
+	bzXjsvbHY6g==
+X-Google-Smtp-Source: AGHT+IE3/0CSOEfxjDnR80FDC78uhxp3VyNaX3C30I42S7noRWbHRQ3fMXx98waOe3ZDJEMVFXN+KVFU6BxNXw==
+X-Received: from vsig23.prod.google.com ([2002:a05:6102:9d7:b0:4b1:3409:907a])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ad4:5968:0:b0:6da:dc79:a3c9 with SMTP id 6a1803df08f44-6dc86ad79a3mr45143936d6.9.1734094935902;
+ Fri, 13 Dec 2024 05:02:15 -0800 (PST)
+Date: Fri, 13 Dec 2024 13:02:08 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20241213130212.1783302-1-edumazet@google.com>
+Subject: [PATCH net-next 0/4] inetpeer: reduce false sharing and atomic operations
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	David Ahern <dsahern@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Extend the current rmnet support to allow enabling or disabling
-IFLA_RMNET_FLAGS via ip link as well as printing the current settings.
+After commit 8c2bd38b95f7 ("icmp: change the order of rate limits"),
+there is a risk that a host receiving packets from an unique
+source targeting closed ports is using a common inet_peer structure
+from many cpus.
 
-Signed-off-by: Robert Marko <robert.marko@sartura.hr>
----
-Changes in v3:
-* Use parse_on_off() instead of hand-coding
-* Drop on_off() error message printing
+All these cpus have to acquire/release a refcount and update
+the inet_peer timestamp (p->dtime)
 
-Changes in v2:
-* Use strcmp() instead of matches()
-* Fix disabling flags (Forgotten ~)
-* Separate ingress and egress checksum flags
-* Rename flags to more closely resemble their meaning.
-For example add ingress when they only affect ingress, rename checksm
-flags to mapv4/v5-checksum.
+Switch to pure RCU to avoid changing the refcount, and update
+p->dtime only once per jiffy.
 
- ip/iplink_rmnet.c | 120 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 118 insertions(+), 2 deletions(-)
+Tested:
+  DUT : 128 cores, 32 hw rx queues.
+  receiving 8,400,000 UDP packets per second, targeting closed ports.
 
-diff --git a/ip/iplink_rmnet.c b/ip/iplink_rmnet.c
-index 1d16440c..d7596b2b 100644
---- a/ip/iplink_rmnet.c
-+++ b/ip/iplink_rmnet.c
-@@ -16,6 +16,12 @@ static void print_explain(FILE *f)
- {
- 	fprintf(f,
- 		"Usage: ... rmnet mux_id MUXID\n"
-+		"		[ ingress-deaggregation { on | off } ]\n"
-+		"		[ ingress-commands { on | off } ]\n"
-+		"		[ ingress-mapv4-checksum { on | off } ]\n"
-+		"		[ egress-mapv4-checksum { on | off } ]\n"
-+		"		[ ingress-mapv5-checksum { on | off } ]\n"
-+		"		[ egress-mapv5-checksum { on | off } ]\n"
- 		"\n"
- 		"MUXID := 1-254\n"
- 	);
-@@ -29,15 +35,95 @@ static void explain(void)
- static int rmnet_parse_opt(struct link_util *lu, int argc, char **argv,
- 			   struct nlmsghdr *n)
- {
-+	struct ifla_rmnet_flags flags = { 0 };
- 	__u16 mux_id;
-+	int ret;
- 
- 	while (argc > 0) {
--		if (matches(*argv, "mux_id") == 0) {
-+		if (strcmp(*argv, "mux_id") == 0) {
- 			NEXT_ARG();
- 			if (get_u16(&mux_id, *argv, 0))
- 				invarg("mux_id is invalid", *argv);
- 			addattr16(n, 1024, IFLA_RMNET_MUX_ID, mux_id);
--		} else if (matches(*argv, "help") == 0) {
-+		} else if (strcmp(*argv, "ingress-deaggregation") == 0) {
-+			bool deaggregation;
-+
-+			NEXT_ARG();
-+			deaggregation = parse_on_off("ingress-deaggregation", *argv, &ret);
-+			if (ret)
-+				return ret;
-+
-+			flags.mask |= RMNET_FLAGS_INGRESS_DEAGGREGATION;
-+			if (deaggregation)
-+				flags.flags |= RMNET_FLAGS_INGRESS_DEAGGREGATION;
-+			else
-+				flags.flags &= ~RMNET_FLAGS_INGRESS_DEAGGREGATION;
-+		} else if (strcmp(*argv, "ingress-commands") == 0) {
-+			bool commands;
-+
-+			NEXT_ARG();
-+			commands = parse_on_off("ingress-commands", *argv, &ret);
-+			if (ret)
-+				return ret;
-+
-+			flags.mask |= RMNET_FLAGS_INGRESS_MAP_COMMANDS;
-+			if (commands)
-+				flags.flags |= RMNET_FLAGS_INGRESS_MAP_COMMANDS;
-+			else
-+				flags.flags &= ~RMNET_FLAGS_INGRESS_MAP_COMMANDS;
-+		} else if (strcmp(*argv, "ingress-mapv4-checksum") == 0) {
-+			bool mapv4_checksum;
-+
-+			NEXT_ARG();
-+			mapv4_checksum = parse_on_off("ingress-mapv4-checksum", *argv, &ret);
-+			if (ret)
-+				return ret;
-+
-+			flags.mask |= RMNET_FLAGS_INGRESS_MAP_CKSUMV4;
-+			if (mapv4_checksum)
-+				flags.flags |= RMNET_FLAGS_INGRESS_MAP_CKSUMV4;
-+			else
-+				flags.flags &= ~RMNET_FLAGS_INGRESS_MAP_CKSUMV4;
-+		} else if (strcmp(*argv, "egress-mapv4-checksum") == 0) {
-+			bool mapv4_checksum;
-+
-+			NEXT_ARG();
-+			mapv4_checksum = parse_on_off("egress-mapv4-checksum", *argv, &ret);
-+			if (ret)
-+				return ret;
-+
-+			flags.mask |= RMNET_FLAGS_EGRESS_MAP_CKSUMV4;
-+			if (mapv4_checksum)
-+				flags.flags |= RMNET_FLAGS_EGRESS_MAP_CKSUMV4;
-+			else
-+				flags.flags &= ~RMNET_FLAGS_EGRESS_MAP_CKSUMV4;
-+		} else if (strcmp(*argv, "ingress-mapv5-checksum") == 0) {
-+			bool mapv5_checksum;
-+
-+			NEXT_ARG();
-+			mapv5_checksum = parse_on_off("ingress-mapv5-checksum", *argv, &ret);
-+			if (ret)
-+				return ret;
-+
-+			flags.mask |= RMNET_FLAGS_INGRESS_MAP_CKSUMV5;
-+			if (mapv5_checksum)
-+				flags.flags |= RMNET_FLAGS_INGRESS_MAP_CKSUMV5;
-+			else
-+				flags.flags &= ~RMNET_FLAGS_INGRESS_MAP_CKSUMV5;
-+		} else if (strcmp(*argv, "egress-mapv5-checksum") == 0) {
-+			bool mapv5_checksum;
-+
-+			NEXT_ARG();
-+			mapv5_checksum = parse_on_off("egress-mapv5-checksum", *argv, &ret);
-+			if (ret)
-+				return ret;
-+
-+			flags.mask |= RMNET_FLAGS_EGRESS_MAP_CKSUMV5;
-+			if (mapv5_checksum)
-+				flags.flags |= RMNET_FLAGS_EGRESS_MAP_CKSUMV5;
-+			else
-+				flags.flags &= ~RMNET_FLAGS_EGRESS_MAP_CKSUMV5;
-+		} else if (strcmp(*argv, "help") == 0) {
- 			explain();
- 			return -1;
- 		} else {
-@@ -48,11 +134,34 @@ static int rmnet_parse_opt(struct link_util *lu, int argc, char **argv,
- 		argc--, argv++;
- 	}
- 
-+	if (flags.mask)
-+		addattr_l(n, 1024, IFLA_RMNET_FLAGS, &flags, sizeof(flags));
-+
- 	return 0;
- }
-+static void rmnet_print_flags(FILE *fp, __u32 flags)
-+{
-+	open_json_array(PRINT_ANY, is_json_context() ? "flags" : "<");
-+#define _PF(f)	if (flags & RMNET_FLAGS_##f) {				\
-+		flags &= ~RMNET_FLAGS_##f;				\
-+		print_string(PRINT_ANY, NULL, flags ? "%s," : "%s", #f); \
-+	}
-+	_PF(INGRESS_DEAGGREGATION);
-+	_PF(INGRESS_MAP_COMMANDS);
-+	_PF(INGRESS_MAP_CKSUMV4);
-+	_PF(EGRESS_MAP_CKSUMV4);
-+	_PF(INGRESS_MAP_CKSUMV5);
-+	_PF(EGRESS_MAP_CKSUMV5);
-+#undef _PF
-+	if (flags)
-+		print_hex(PRINT_ANY, NULL, "%x", flags);
-+	close_json_array(PRINT_ANY, "> ");
-+}
- 
- static void rmnet_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- {
-+	struct ifla_rmnet_flags *flags;
-+
- 	if (!tb)
- 		return;
- 
-@@ -64,6 +173,13 @@ static void rmnet_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 		   "mux_id",
- 		   "mux_id %u ",
- 		   rta_getattr_u16(tb[IFLA_RMNET_MUX_ID]));
-+
-+	if (tb[IFLA_RMNET_FLAGS]) {
-+		if (RTA_PAYLOAD(tb[IFLA_RMNET_FLAGS]) < sizeof(*flags))
-+			return;
-+		flags = RTA_DATA(tb[IFLA_RMNET_FLAGS]);
-+		rmnet_print_flags(f, flags->flags);
-+	}
- }
- 
- static void rmnet_print_help(struct link_util *lu, int argc, char **argv,
+Before the series:
+- napi poll can not keep up, NIC drops 1,200,000 packets
+  per second. 
+- We use 20 % of cpu cycles
+
+After this series:
+- All packets are received (no more hw drops)
+- We use 12 % of cpu cycles.
+
+Eric Dumazet (4):
+  inetpeer: remove create argument of inet_getpeer_v[46]()
+  inetpeer: remove create argument of inet_getpeer()
+  inetpeer: update inetpeer timestamp in inet_getpeer()
+  inetpeer: do not get a refcount in inet_getpeer()
+
+ include/net/inetpeer.h | 12 +++++-------
+ net/ipv4/icmp.c        |  6 +++---
+ net/ipv4/inetpeer.c    | 29 ++++++++---------------------
+ net/ipv4/ip_fragment.c | 15 ++++++++++-----
+ net/ipv4/route.c       | 17 +++++++++--------
+ net/ipv6/icmp.c        |  6 +++---
+ net/ipv6/ip6_output.c  |  6 +++---
+ net/ipv6/ndisc.c       |  8 +++++---
+ 8 files changed, 46 insertions(+), 53 deletions(-)
+
 -- 
-2.47.1
+2.47.1.613.gc27f4b7a9f-goog
 
 
