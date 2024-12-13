@@ -1,233 +1,128 @@
-Return-Path: <netdev+bounces-151575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FB569F00AA
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 01:12:19 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79F049F00CA
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 01:29:16 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98820188CDFF
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 00:12:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B51B285B94
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 00:29:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5042623;
-	Fri, 13 Dec 2024 00:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465BB80B;
+	Fri, 13 Dec 2024 00:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L3y/qs6x"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U34RFqj4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED914184;
-	Fri, 13 Dec 2024 00:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FC7621
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 00:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734048734; cv=none; b=jKMGLDQJBfYisiY3hrxtajV6lixVdzakrU6QVADHnCc3Y1zzuWw/6eCSfoubpercwhYMMkCDW4cyjtvRsrcuTNarLJ1kjHEe2Tcfl2M05032YsLij8cF16no3tV7MtSDtbknLI5M7wgEU3rmzT1WVu3kr89oMsHs08qXlBJ/AMs=
+	t=1734049753; cv=none; b=udofpHa2hvXcBRsyqRxVCBu3n4zItOMeb2gUMG1hK6tcaWB267s7lFy0x+A95dKBki3/mxJeI1RZ1DCZLMj/WtSJPAcdp10p4iN9bcMu19opxV6zmQ+ei/jhUUGQZ2wQopoN486FnERaVGtMrWCOuhhEmMnx1538KTVydBDg6cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734048734; c=relaxed/simple;
-	bh=207+odalPbxbEAPrHgzkwQzzkDVnOq57XEBAxHtieag=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D41LjtShrKhjpQO+Atn1831+fM3FRh6BJIdhFMI0c4heJEmWMzIy3QerKOgYP4oXCd+cTM41tj/JgApWMYGIMrpbY01KRFUljfS7yZsE51GWE+i1IY4d3hJTHtWfHBuWv2Vj5FqjfXzIqTBRuvLP4iYLDjubKepTmra51bqanxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L3y/qs6x; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7fbbe0fb0b8so878017a12.0;
-        Thu, 12 Dec 2024 16:12:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734048732; x=1734653532; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AUcugkcBtA5iURiirDxOvWyTcW9Mof08SQApkdgzTEU=;
-        b=L3y/qs6xCxWb4eMkxO1B3Vwycc3xxOJq0LUQBArlHGjyGG2ZL4Z8k9i+STINfBznR4
-         d/UQuMD+wAd6N7LFr18ntOa490zn18QQHSZu3DfX/i+FLp2OuvCDrPW5RDVmPoSBI8U5
-         qORlNgwCg4fTaEefJ+GCkO16GTJg/ru5UqrTv2XVt6wYqbDD/YWAmVgsj9CtnxrEQ784
-         OKF8cE+x7Qc0EEKDXLQRXu4OXlUPT1kjrU4EHlt6WUIMLwoyfkdmz6B9ZRsgA0CzLUOG
-         h1nZSVyXPpqB61trq1e/MRQm4O7VxeLU24olIQeZfNg/Aze8eYDKfBD63xY+iGCSTPhG
-         +9oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734048732; x=1734653532;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AUcugkcBtA5iURiirDxOvWyTcW9Mof08SQApkdgzTEU=;
-        b=qa+51I4f/l9NN6DC9RMO1hI83VPFbkg0Bm/p0/9vd7D232S6FkrcBkvafE8/PeTvXJ
-         rQwRXN5eFXJp3th2SwJy4XisXouf4mobB3W1BXQDr4wwVi4iKF5K3wP1krb8a7Ujey44
-         ZP3pYlNGuyoL6SXkMkLg7Twvb1bFe3cAViq16TlLqxVg5dwufdm6wI08bTAJs2p0C+JV
-         NYNPoQrfVYbWjOrczMMvns9qa9WdFtsbBrZqG9pqzzfcqrDuSpW90ZZt3XUCbonl4LxW
-         ot7ghe7Or81P2ZjDjQQ3vIR8DnEgUfo0ZkZsu11nt3OqG+UB3PhRmGHKAa3ezdlWL8Dr
-         zLiw==
-X-Forwarded-Encrypted: i=1; AJvYcCWLEE+RXehJkgtBnWi23A4WxeNoyZIRRQxCM0AgwTeUe6EqQvBcvxSLvJfp05bp05x6zbAi9Ig9Jy9ASoRo@vger.kernel.org, AJvYcCWYS6cb2V5zHlVYvvcW/+8EsGr9qgJo3Xc9UF9L8kdUey/6A1B12Zlnj68x2jTCjwrgBf0=@vger.kernel.org, AJvYcCXuP4HN2vk3+MEJm8YAMbOYAe3wXceZQpeE4AFVZZLNWCBzHGQ6DLfxCqS8euzVa/3Q3OpGZSpm@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxns+bg8E0+HL6RCujeBaqtWpuMUXNhiLAbwI/Ja2acQuFxZBk3
-	6accJli+gUAQSv+GkyMhTYTG9D0WJsPT5taOT7h/5Bqo7JunW2hOV+f6HkvZiA6jE79DxM02gED
-	LS1juTl7U0jyxr+Kf9UYHmsxXZvU=
-X-Gm-Gg: ASbGncuNOa+pNn+pAWRFaXudePCLrD6+yo6+seK07mWDGxCKOeMr7T22LrhfSMcczTg
-	EH6Fgxnv15iC7QqwBC+TAbDbtCLpCecYIgEm4980fppFv4eR2bVRNQw==
-X-Google-Smtp-Source: AGHT+IHb/7T6462Jz4uTyGtsoFbmgsDh8W3Ij/SzirHwHST2bRyANuhqvYXmv6MpOPpeEuq9XSP4dr5i+g8vjot6SdA=
-X-Received: by 2002:a17:90b:2e4e:b0:2ee:e961:303d with SMTP id
- 98e67ed59e1d1-2f290dbcdd7mr980448a91.35.1734048732206; Thu, 12 Dec 2024
- 16:12:12 -0800 (PST)
+	s=arc-20240116; t=1734049753; c=relaxed/simple;
+	bh=I2xbHgAcaQiqOdZQSwNGkFq1GJGqkeiVvflcm12j9Cc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OX1mtkBpWHChS2rRheqy+W5tAtYQU/KYjiNO/KisJgQTlCbU844nn9cAh/j7jbkWBTtbBuNXlTr53M9xsvdW0NGV1MoDNophzF4Q+4PyjxP5a+/3HI3LlahEZHnnHsgzB0/UA4xE72Uo0cW/qL6KZBwA9nRsiUDs6nKd33Zcfe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U34RFqj4; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <9f5081bb-ed66-4171-acef-786ae02cf69c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734049738;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dp/lcL/R+NB1OTjfvM4LWF5XMRD7YyKKWa5v8JFjmAk=;
+	b=U34RFqj4ozNQo8pFiMEbLJVP2AjV104+VWeYZbP49wqSiCKRT1SGGuOzgEgmIBtdDRllOS
+	c4NCcNlG/pKqOcdOQ3GakjNZwc2sVwq3K0kDbQsgE//QD/9nd1b3l0ocJpQHRKlGPEYa/O
+	CffhrlJeG1nNVsi1NlRO3m2FRUWn4r4=
+Date: Thu, 12 Dec 2024 16:28:37 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1733787798.git.dxu@dxuuu.xyz> <3bc17d33161961409dc77a5de29761bf2bed4980.1733787798.git.dxu@dxuuu.xyz>
- <CAEf4BzaA9_up=3npADgJv8pCVg4eVzsWevef69c3PkdyuWNXDQ@mail.gmail.com> <zf62rqtgvl63sawxltmpgcnpek5bt3w5pleznby3zqb7ezhvdz@wqlwxy2f43wt>
-In-Reply-To: <zf62rqtgvl63sawxltmpgcnpek5bt3w5pleznby3zqb7ezhvdz@wqlwxy2f43wt>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Thu, 12 Dec 2024 16:12:00 -0800
-Message-ID: <CAEf4BzZOL5f4m=y6P0RF5=QtcegEDNXKXPav4uqVy97VN0kLOQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 3/4] bpftool: btf: Support dumping a single
- type from file
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: hawk@kernel.org, john.fastabend@gmail.com, ast@kernel.org, qmo@kernel.org, 
-	davem@davemloft.net, daniel@iogearbox.net, andrii@kernel.org, kuba@kernel.org, 
-	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, antony@phenome.org, 
-	toke@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next v4 10/11] net-timestamp: export the tskey for TCP
+ bpf extension
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
+ <20241207173803.90744-11-kerneljasonxing@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20241207173803.90744-11-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Dec 12, 2024 at 3:41=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
->
-> On Thu, Dec 12, 2024 at 11:09:34AM GMT, Andrii Nakryiko wrote:
-> > On Mon, Dec 9, 2024 at 3:45=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
-> > >
-> > > Some projects, for example xdp-tools [0], prefer to check in a minimi=
-zed
-> > > vmlinux.h rather than the complete file which can get rather large.
-> > >
-> > > However, when you try to add a minimized version of a complex struct =
-(eg
-> > > struct xfrm_state), things can get quite complex if you're trying to
-> > > manually untangle and deduplicate the dependencies.
-> > >
-> > > This commit teaches bpftool to do a minimized dump of a single type b=
-y
-> > > providing an optional root_id argument.
-> > >
-> > > Example usage:
-> > >
-> > >     $ ./bpftool btf dump file ~/dev/linux/vmlinux | rg "STRUCT 'xfrm_=
-state'"
-> > >     [12643] STRUCT 'xfrm_state' size=3D912 vlen=3D58
-> > >
-> > >     $ ./bpftool btf dump file ~/dev/linux/vmlinux root_id 12643 forma=
-t c
-> > >     #ifndef __VMLINUX_H__
-> > >     #define __VMLINUX_H__
-> > >
-> > >     [..]
-> > >
-> > >     struct xfrm_type_offload;
-> > >
-> > >     struct xfrm_sec_ctx;
-> > >
-> > >     struct xfrm_state {
-> > >             possible_net_t xs_net;
-> > >             union {
-> > >                     struct hlist_node gclist;
-> > >                     struct hlist_node bydst;
-> > >             };
-> > >             union {
-> > >                     struct hlist_node dev_gclist;
-> > >                     struct hlist_node bysrc;
-> > >             };
-> > >             struct hlist_node byspi;
-> > >     [..]
-> > >
-> > > [0]: https://github.com/xdp-project/xdp-tools/blob/master/headers/bpf=
-/vmlinux.h
-> > >
-> > > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> > > ---
-> > >  .../bpf/bpftool/Documentation/bpftool-btf.rst |  7 +++++--
-> > >  tools/bpf/bpftool/btf.c                       | 21 +++++++++++++++++=
-+-
-> > >  2 files changed, 25 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/tools/bpf/bpftool/Documentation/bpftool-btf.rst b/tools/=
-bpf/bpftool/Documentation/bpftool-btf.rst
-> > > index 245569f43035..4899b2c10777 100644
-> > > --- a/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-> > > +++ b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-> > > @@ -24,7 +24,7 @@ BTF COMMANDS
-> > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > >
-> > >  | **bpftool** **btf** { **show** | **list** } [**id** *BTF_ID*]
-> > > -| **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*]
-> > > +| **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*] [**root_i=
-d** *ROOT_ID*]
-> > >  | **bpftool** **btf help**
-> > >  |
-> > >  | *BTF_SRC* :=3D { **id** *BTF_ID* | **prog** *PROG* | **map** *MAP*=
- [{**key** | **value** | **kv** | **all**}] | **file** *FILE* }
-> > > @@ -43,7 +43,7 @@ bpftool btf { show | list } [id *BTF_ID*]
-> > >      that hold open file descriptors (FDs) against BTF objects. On su=
-ch kernels
-> > >      bpftool will automatically emit this information as well.
-> > >
-> > > -bpftool btf dump *BTF_SRC* [format *FORMAT*]
-> > > +bpftool btf dump *BTF_SRC* [format *FORMAT*] [root_id *ROOT_ID*]
-> > >      Dump BTF entries from a given *BTF_SRC*.
-> > >
-> > >      When **id** is specified, BTF object with that ID will be loaded=
- and all
-> > > @@ -67,6 +67,9 @@ bpftool btf dump *BTF_SRC* [format *FORMAT*]
-> > >      formatting, the output is sorted by default. Use the **unsorted*=
-* option
-> > >      to avoid sorting the output.
-> > >
-> > > +    **root_id** option can be used to filter a dump to a single type=
- and all
-> > > +    its dependent types. It cannot be used with any other types of f=
-iltering.
-> > > +
-> > >  bpftool btf help
-> > >      Print short help message.
-> > >
-> > > diff --git a/tools/bpf/bpftool/btf.c b/tools/bpf/bpftool/btf.c
-> > > index 3e995faf9efa..18b037a1414b 100644
-> > > --- a/tools/bpf/bpftool/btf.c
-> > > +++ b/tools/bpf/bpftool/btf.c
-> > > @@ -993,6 +993,25 @@ static int do_dump(int argc, char **argv)
-> > >                                 goto done;
-> > >                         }
-> > >                         NEXT_ARG();
-> > > +               } else if (is_prefix(*argv, "root_id")) {
-> > > +                       __u32 root_id;
-> > > +                       char *end;
-> > > +
-> > > +                       if (root_type_cnt) {
-> > > +                               p_err("cannot use root_id with other =
-type filtering");
-> >
-> > this is a confusing error if the user just wanted to provide two
-> > root_id arguments... Also, why don't we allow multiple root_ids?
-> >
-> > I'd bump root_type_ids[] to have something like 16 elements or
-> > something (though we can always do dynamic realloc as well, probably),
-> > and allow multiple types to be specified.
-> >
-> > Thoughts?
->
-> That's a good point. I added this check b/c I didn't think it would
-> make sense to allow `root_id` filtering in combination with map dump
-> filtering (which uses same root_type_ids param):
->
->         map MAP [{key | value | kv | all}]
->
-> But code can easily be tweaked to still block combination but allow
-> multiple `root_id`s when used alone. 16 seems sufficient to me.
->
-> Do you think it'd be more bpftool-y to require "root_id" each time or to
-> just take a comma separated value?
+On 12/7/24 9:38 AM, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> For now, there are three phases where we are not able to fetch
+> the right seqno from the skops->skb_data, because:
+> 1) in __dev_queue_xmit(), the skb->data doesn't point to the start
+> offset in tcp header.
+> 2) in tcp_ack_tstamp(), the skb doesn't have the tcp header.
+> 
+> In the long run, we may add other trace points for bpf extension.
+> And the shinfo->tskey is always the same value for both bpf and
+> non-bpf cases. With that said, let's directly use shinfo->tskey
+> for TCP protocol.
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>   net/core/skbuff.c | 7 +++++--
+>   1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 7c59ef501c74..2e13643f791c 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -5544,7 +5544,7 @@ static void __skb_tstamp_tx_bpf(struct sock *sk, struct sk_buff *skb,
+>   				int tstype)
+>   {
+>   	struct timespec64 tstamp;
+> -	u32 args[2] = {0, 0};
+> +	u32 args[3] = {0, 0, 0};
+>   	int op;
+>   
+>   	if (!sk)
+> @@ -5569,7 +5569,10 @@ static void __skb_tstamp_tx_bpf(struct sock *sk, struct sk_buff *skb,
+>   		return;
+>   	}
+>   
+> -	bpf_skops_tx_timestamping(sk, skb, op, 2, args);
+> +	if (sk_is_tcp(sk))
+> +		args[2] = skb_shinfo(skb)->tskey;
 
-root_id 123 root_id 345 root_id 789
+Instead of only passing one info "skb_shinfo(skb)->tskey" of a skb, pass the 
+whole skb ptr to the bpf prog. Take a look at bpf_skops_init_skb. Lets start 
+with end_offset = 0 for now so that the bpf prog won't use it to read the 
+skb->data. It can be revisited later.
 
-definitely more bpftool-y
+	bpf_skops_init_skb(&sock_ops, skb, 0);
+
+The bpf prog can use bpf_cast_to_kern_ctx() and bpf_core_cast() to get to the 
+skb_shinfo(skb). Take a look at the md_skb example in type_cast.c.
+
+Then it needs to add a bpf_sock->op check to the existing 
+bpf_sock_ops_{load,store}_hdr_opt() helpers to ensure these helpers can only be 
+used by the BPF_SOCK_OPS_PARSE_HDR_OPT_CB, BPF_SOCK_OPS_HDR_OPT_LEN_CB, and 
+BPF_SOCK_OPS_WRITE_HDR_OPT_CB callback.
+
+btw, how is the ack_skb used for the SCM_TSTAMP_ACK by the user space now?
 
