@@ -1,128 +1,86 @@
-Return-Path: <netdev+bounces-151749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A65939F0C4C
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:33:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0B929F0C99
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:42:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6184C282347
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:33:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31A4C282D44
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A5041DF975;
-	Fri, 13 Dec 2024 12:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hdmoHYi6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE2F1DFD94;
+	Fri, 13 Dec 2024 12:42:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail78-58.sinamail.sina.com.cn (mail78-58.sinamail.sina.com.cn [219.142.78.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBBD1DF752;
-	Fri, 13 Dec 2024 12:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5301DF97A
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 12:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=219.142.78.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734093160; cv=none; b=NdZ+2QZgF8ODKnpy8B+O17DnFeAYkEMEuvm/DeFhh6mdnwjM0EvzT3ODI/ai4iNzWx4d75Iw2doosegn3N5PUYiA0Cy20bYZjlRwee26atUFiww3vGXn+8CRsy5ixyKfX8ko77CslUamt6aYCQBBxrKrAwIqQuduoR01sFYusEI=
+	t=1734093744; cv=none; b=YIB0vKIahD/hz8NpSj91ZxUu1sGBvzixGabw52HZafxowRWSZHn/KF+alQwEDYSo4cpotu1ju09RTOw3QIzHUVGwWnKbtkuVtoeFhLhUzpGujGlz1Z+NIXzQN8L4QBS+IlsH9r1K74OJ2Z+ZyJZjX5FD6r5jICJ8ms48lEe2x2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734093160; c=relaxed/simple;
-	bh=fsTrHAiO83eVNFyOeYdHYXhiTz7hRv6LJ42aHUnEANY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rdecXivZAUfklImfV2HnRZVc69c8zUAXXdREZpbAUmwhuzas2HW+tWQYXfjiF3fxfCRry182lza2i6tMT3m2fS0P0ZPb+IbB8JYswNTQ3OBu1ojqzbHtE/YDFxhlPqJzUMftdHxNJyTOaHQh/GWNw98TPiY0rZEteD9svTsHsdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hdmoHYi6; arc=none smtp.client-ip=209.85.160.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-29e5c0c46c3so826986fac.3;
-        Fri, 13 Dec 2024 04:32:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734093158; x=1734697958; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rTGR/DL1qtr5aYS8f+9xO5Ih5JqqbBsRuf62d1H81s4=;
-        b=hdmoHYi6OVXlngwUzdFKeCXuiufm8dpy5PMAJY18X9laiG98wWwJoomsBxvN50UIZ3
-         xXn2mUOHIOw/C5qItGC0g/Y0PUCChPOo3Zd+FevyDoXAFtr4KvgVjLg43ZvelpELheGP
-         SVYTtkiAFyxx75tbs67D89LS1ZQIv/fXIn50Y1yPLbm79sFl9n/H61bA1Xh6ejaU5oUb
-         +V9HzV5tv85ov4kyiTcYram6zddI2Sr3142aOKwwDfZOcYawxDcvu7HD7vyLstjEPRob
-         J2e9O7KK1Mf3j4pof9WwJnXpKZObtZKIHdI/i7/mknNns8i+5OJUK+cpU8My7BDoC4DW
-         P/7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734093158; x=1734697958;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rTGR/DL1qtr5aYS8f+9xO5Ih5JqqbBsRuf62d1H81s4=;
-        b=lUcnXGOVnsG9i3KeyMDcN11p1I062dN1b75Tt4xw5l6J01vJvy7ewQW87nna9xHI9k
-         jTpkH+W6zR4ASuMUtJXHdyme/3GjGYAYYTK5DENvxLKhi5RGyHnfZVzayXf4UPceTffV
-         VLrWCXfjmc6T+xVvkuQHTLTafjAdW/LCvHI6z9YPY5rwFUT/9w3e01C+GuaV+D+pQOkQ
-         r6vs/5zWomryawUuRjxbwLjYARIoNSI+Sviji5bS9ZRBNaUQ/GKz0oSTOgXnRNys7ZBK
-         A4oiFrfztOifrn+01T8DcTAT/r5IQpZHzjd6xroDF0skmv1WB5OQStYRqoC3S4UpkW0g
-         KraQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWa1z7Ea88OzX/39ftsSsdBH0yC6LlummHeHD8oCoUcEVnKi2okHjB3rfAdJZgQh6JDCDmtKaqBjIlWSZ0UXMsx@vger.kernel.org, AJvYcCWr1rWOEMSwIpPh1vg4Th6slQxEuCO1WWNV2qSxzeG5re4UR0ACjQxnJMIHtojjRA5PUhQ8Fpu/EmwYFP4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyp5oGVbyTW5PN8Zk8Qyvp9fN2IVLD8AsVweVaFZOYIhddqqOIs
-	AF1eo95HF+V7CTI2n8WzJ684TCHXXbb8gfJGi9LLZpvfyHD1Sy9RAiPZvCWIldiXLZoBTNWgVq/
-	rquM1QDve/BJCB/6lzBBokjvOB9U=
-X-Gm-Gg: ASbGncsTwo/kD/1br55dpGgXoqhR5lsyy4rwTP5+UnCyFihwR86Iw0hihudU5CCRyqg
-	+kaa3pyh3zmI6rNqvxEgOqK2yrZEYgyhnivVowYQddqwPwC9NScsQZ6m3+QY5loz2AXkn
-X-Google-Smtp-Source: AGHT+IFwYIoqLqjl/TuiKrRORnQy/+BxiiyOPxgy7qaRAjIZ95kOqJVGZ9Xdoa3iSz19TX5MxdU4f0HIyBZv8+4dRN0=
-X-Received: by 2002:a05:6870:82a4:b0:29e:3c90:148b with SMTP id
- 586e51a60fabf-2a3ac8a8d08mr1470450fac.26.1734093157864; Fri, 13 Dec 2024
- 04:32:37 -0800 (PST)
+	s=arc-20240116; t=1734093744; c=relaxed/simple;
+	bh=WkuTvNKXZEGln+4PdhWfUwmeQ0+ppMC15Dp1iqzsY08=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=vA8+O3AKOvwooIWt+hHGG1OXO2lbc1IbUo6c3JD27AMbI6MM/MbhLdo62BCfPur8xl8Q/ApO4AhDMDIhIDtoJRG/bfIVjv1gDVD5+IOPEplhuj2fwGXzApAO71fOjlfYnDSI326cdHfBpTxO4NrXm8xKQkNyhBT18JY0Fgw0hGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=219.142.78.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.88.50.125])
+	by sina.com (10.185.250.24) with ESMTP
+	id 675C2A6000004E21; Fri, 13 Dec 2024 20:36:52 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 64236310748386
+X-SMAIL-UIID: B9AB6D57269D4CAFAE352980AC829871-20241213-203652-1
+From: Hillf Danton <hdanton@sina.com>
+To: Brian Vazquez <brianvv@google.com>,
+	Marco Leogrande <leogrande@google.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [iwl-next PATCH v3 2/3] idpf: convert workqueues to unbound
+Date: Fri, 13 Dec 2024 20:36:43 +0800
+Message-Id: <20241213123643.1898-1-hdanton@sina.com>
+In-Reply-To: <20241212233333.3743239-3-brianvv@google.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241211-b4-ovpn-v15-0-314e2cad0618@openvpn.net> <20241211-b4-ovpn-v15-3-314e2cad0618@openvpn.net>
-In-Reply-To: <20241211-b4-ovpn-v15-3-314e2cad0618@openvpn.net>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Fri, 13 Dec 2024 12:32:26 +0000
-Message-ID: <CAD4GDZyXK6rBH_ccHkYrA4h71bDkKxVy_B5o-bj0ezzdHTJKxQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v15 03/22] ovpn: add basic interface
- creation/destruction/management routines
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sd@queasysnail.net, ryazanov.s.a@gmail.com, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, 11 Dec 2024 at 21:32, Antonio Quartulli <antonio@openvpn.net> wrote:
->
->  static int ovpn_newlink(struct net *src_net, struct net_device *dev,
->                         struct nlattr *tb[], struct nlattr *data[],
->                         struct netlink_ext_ack *extack)
->  {
-> -       return -EOPNOTSUPP;
-> +       struct ovpn_priv *ovpn = netdev_priv(dev);
-> +       enum ovpn_mode mode = OVPN_MODE_P2P;
-> +
-> +       if (data && data[IFLA_OVPN_MODE]) {
-> +               mode = nla_get_u8(data[IFLA_OVPN_MODE]);
-> +               netdev_dbg(dev, "setting device mode: %u\n", mode);
-> +       }
-> +
-> +       ovpn->dev = dev;
-> +       ovpn->mode = mode;
-> +
-> +       /* turn carrier explicitly off after registration, this way state is
-> +        * clearly defined
-> +        */
-> +       netif_carrier_off(dev);
-> +
-> +       return register_netdevice(dev);
->  }
->
->  static struct rtnl_link_ops ovpn_link_ops = {
->         .kind = "ovpn",
->         .netns_refund = false,
-> +       .priv_size = sizeof(struct ovpn_priv),
-> +       .setup = ovpn_setup,
-> +       .policy = ovpn_policy,
-> +       .maxtype = IFLA_OVPN_MAX,
->         .newlink = ovpn_newlink,
->         .dellink = unregister_netdevice_queue,
->  };
+On Thu, 12 Dec 2024 23:33:32 +0000 Brian Vazquez <brianvv@google.com>
+> When a workqueue is created with `WQ_UNBOUND`, its work items are
+> served by special worker-pools, whose host workers are not bound to
+> any specific CPU. In the default configuration (i.e. when
+> `queue_delayed_work` and friends do not specify which CPU to run the
+> work item on), `WQ_UNBOUND` allows the work item to be executed on any
+> CPU in the same node of the CPU it was enqueued on. While this
+> solution potentially sacrifices locality, it avoids contention with
+> other processes that might dominate the CPU time of the processor the
+> work item was scheduled on.
+> 
+> This is not just a theoretical problem: in a particular scenario
 
-You need to implement .fill_info to add IFLA_OVPN_MODE into get / dump ops.
+The cpu hog due to (the user space) misconfig exists regardless it is
+bound workqueue or not, in addition to the fact that linux kernel is
+never the blue pill to kill all pains, so extra support for unbound wq
+is needed.
+
+> misconfigured process was hogging most of the time from CPU0, leaving
+> less than 0.5% of its CPU time to the kworker. The IDPF workqueues
+> that were using the kworker on CPU0 suffered large completion delays
+> as a result, causing performance degradation, timeouts and eventual
+> system crash.
 
