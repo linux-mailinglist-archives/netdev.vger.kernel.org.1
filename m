@@ -1,261 +1,289 @@
-Return-Path: <netdev+bounces-151650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F175C9F0784
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:18:08 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 344321886B17
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 09:18:09 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B84D1AD3E4;
-	Fri, 13 Dec 2024 09:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="nS6lkddv"
-X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2084.outbound.protection.outlook.com [40.107.223.84])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A2FF9F07B4
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:22:18 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778692A1BB;
-	Fri, 13 Dec 2024 09:18:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734081483; cv=fail; b=uxJR+g2fs1CVllVsBflwClTQnpWUe9zs/MGOq7IwtQtEaGhJbCbzteAqFdzu3skSG2XH2ykxJz68ciOEdTazoh9PKt3Qpk9kuEXthiFb5FSfbHJVfGxQLk9CrDzbLjDw23cz2binpOr8UFzklPK9tjBPJlLHVYP2oSXRIqf4b2U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734081483; c=relaxed/simple;
-	bh=XB4uG++nOZZr4/CgoKX5argO8Eb1kPBM+Bl+r9xcd2k=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Shb5wtUqWHCkkVfDu1tWJ0Fv+QNMDap1Cvhz7EgLqKB3bLJHSSF8X6xgDP3k+iReXu0IP1rnpRL3JnAU2cfuh8hCkpzTaVsWMM7o3qTdHi8JUCu6BOM3xqQF9cLLDmoK91iKZBrRIcDvEkJq1cWowdzwElBzFr+KRL8WI0udQqg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=nS6lkddv; arc=fail smtp.client-ip=40.107.223.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YeYa5AngremkLPn5jGPw6fRMaOL9OMUM4XZytTp2bPwrtVF6euJQi4/T3JWT7Kd4DLMPn0XXKgN6RfExBXjda6+qMIwmsW9U3IVs0eckOlYy/v4idijKL8Tj+KFqmvIVMDSqG2nFYfNAsplFZzHbMtL7pC1lZcJPPGzcvn+BT1au87zYyhH/CGbu5Ghx3fCOnfFxfDZcMHvSpHqe8wJyyyas5IB3rtPWMBRMfH0L/Dgavo2zrfMxxnlDM61PUd5HXScWBkH5ai8IXcwVEq84Mdhj3GVhZwHliAxAoHWSzXSTh5boqVL1GGm1JEja+frb4B3trw07wqyqr2W9+txjYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xqqUsyvtyc/g/b68NfgMgSHzyFUKaYM1/5dWPbDe4MA=;
- b=YFrJP15gr/YZIYvb/qLstU4LieyeoqIf/vrqi04d8IHi/cfGQnOie3ct232glOs4oE6mi8p1Omj13bGiLR12Uxxv+adLA11fWNfMlkJvZpd/1lfPcpLIg+HC3TYeKXLOMcUxhEBjK5mJ0Nsz00z7yVQQJgcejmmcX92CeUgvLnE3tckERXQQ4npA5qs8Jn1LLNrX6VcXZdr3epmVCj37kqyj6kUmHGZekqA+usT6jyJ7n+/9JcUOiJ7giW3+DV3+NLuZAz4vlHFSq9reLscT/DQaC+v6NNdJHK9hbgZ52P2+4+JbSThFfOHlIAGt7yT67X/QLowhtVyQMjLRUr1D4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xqqUsyvtyc/g/b68NfgMgSHzyFUKaYM1/5dWPbDe4MA=;
- b=nS6lkddvqJjgYsVGlBI+s0he+thuXJj4olhBnB6y41Vhu+yrCpaof9kExK9zvWgMWk3FdzrRgkzv8z5+rbGtJgvz/41sam2fPdeeRdGuAPizKbNqaxs/EiIFQBSpSlNK2xwPphWBuskATqPDPgCRX2x0eqYenbff025r9ylVgg0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by SN7PR12MB6790.namprd12.prod.outlook.com (2603:10b6:806:269::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.23; Fri, 13 Dec
- 2024 09:17:59 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.8230.016; Fri, 13 Dec 2024
- 09:17:59 +0000
-Message-ID: <7fa95860-5d4b-c19c-b9e6-94d8d8130793@amd.com>
-Date: Fri, 13 Dec 2024 09:17:54 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v7 07/28] sfc: use cxl api for regs setup and checking
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>, alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
- dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, dave.jiang@intel.com
-References: <20241209185429.54054-1-alejandro.lucero-palau@amd.com>
- <20241209185429.54054-8-alejandro.lucero-palau@amd.com>
- <20241212180420.GG73795@kernel.org>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <20241212180420.GG73795@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P265CA0080.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:8::20) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA8C2283E19
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 09:22:16 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2291AF0CE;
+	Fri, 13 Dec 2024 09:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gojoqSF0"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2163D1B218A
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 09:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734081727; cv=none; b=kzpfcqjtir/MyyneKxeC7pjlhsiYDUupsVvrLSAurq8LXLB2YnB6e3jHyQt1sGntWmPpYOHz5x9WByvqBZOAYBmmc9M0B6WSGNpOTI7V9cRIInSEbIDpXixLSNdrKJ/vxnq3fOKVZWONXnKua6zF5DuN7iMa1c2AXJFXC9wCZqA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734081727; c=relaxed/simple;
+	bh=lJv2EINJ+/UrH9nDHo7iImZ0qofQ8bwmPRdGVXM4Oao=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AtiC0dz0lL1XiOc6ycV8tckJKLGwHnH263qPUtzgrmVnJqV4W8ZS7AQKg1RQbqFw7vqxJQD1R3ewKrOh+oxHX8E6bDZWnNB5GNnkpEKw1+frpq2hvnqwn0q09Fh0sYZRLcT2cji+0FJJLXxEIDcyZavq0BrIZxwU1jRQL4WrxFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gojoqSF0; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1734081724; x=1765617724;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=filTZnLUr2rbCPlKqKBLFPWglgFmpbUGZfBKN+Nu/d4=;
+  b=gojoqSF0oOEATnT1eoMriZhY310e0Hohe/jiMofDP/VHoTdn56iZAYtL
+   7IQCN8ft6wRuuP58cfpE+OFYbRkQcdYGmYBUArZDyfpY3gkFVi7p5dpm5
+   Rf+vDj7Lflbv2CndFVB04Vctrb/LzAYbaz9WzIpqYXgW+GZr5RRuvqpJs
+   M=;
+X-IronPort-AV: E=Sophos;i="6.12,230,1728950400"; 
+   d="scan'208";a="254687486"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 09:22:01 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:18043]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.45.5:2525] with esmtp (Farcaster)
+ id 9606489a-edb6-4065-a2fb-31dd67fa8951; Fri, 13 Dec 2024 09:22:01 +0000 (UTC)
+X-Farcaster-Flow-ID: 9606489a-edb6-4065-a2fb-31dd67fa8951
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 13 Dec 2024 09:22:01 +0000
+Received: from 6c7e67c6786f.amazon.com (10.119.14.208) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 13 Dec 2024 09:21:57 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v3 net-next 00/15] treewide: socket: Clean up sock_create() and friends.
+Date: Fri, 13 Dec 2024 18:21:37 +0900
+Message-ID: <20241213092152.14057-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SN7PR12MB6790:EE_
-X-MS-Office365-Filtering-Correlation-Id: 14b5c05a-ebca-492b-efaa-08dd1b570979
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UG9ScnJyYkE5WDFJUG5jUCtCTm5FR2Y3U0xMVER1V2dwWDBNMXF1eWJaREtp?=
- =?utf-8?B?aVFpSS9CNGI5Q1h3dERxckYrOEtUbER4ZVFaMk5PUFlZd0Y0MkExa1U1ODU0?=
- =?utf-8?B?eEFLZHAyaXFIMmhhSlVvdnhsWUs5NkpaQXdGaDFqc3lKREtMbkhObXpzb0gy?=
- =?utf-8?B?SUMvbjQ5QmkxOGJRS2VVdnlBZXY2b2JoZTJkOUJ0ZWMzTlA1cXhyNUI5L0pM?=
- =?utf-8?B?eVh6bVUrT05MMWkwek9sUzJtYXBsU2pFWCs2SXZ0dTNlUzExUmNBMFRENXIx?=
- =?utf-8?B?a3dZMVpvWnpzV1AzU2pHS3ZXZytzeDNieVdDVEMzM3JtZXNtNS84UFcxTDA3?=
- =?utf-8?B?anZvOXovSjh2SUlWOE5weEl1WjJiYk4yQkEvTTVJT0VtUC9tZU5mZHh2bm1m?=
- =?utf-8?B?cFpLSXRQZVJUbFFvVWI2cVd3VTIvTURXb0dSYmROT2t5MEFBaEgvVXdHRVFa?=
- =?utf-8?B?dXorZ3ROMUpJRlNUS3B1WHJQdEVyaDkraEVmL3ZpWW1VVURVYWpCWUFzdktI?=
- =?utf-8?B?bUpvOVRWT0VzN2FNR29vWnFtM0dEemRoRVh3b1NoTzFveG1pRlhFNTFNdG9F?=
- =?utf-8?B?a0JOY2FBVThTSHhhWmFLZm9ITHdHRTc1ZGZMMmRTZHJXam1lVlVSUFJXUEFZ?=
- =?utf-8?B?SkRZb294ZkFTNHdEZ0ZDeTBLNlBJbm92TTRUNk9jdnk0WUg3aWZmSk9LaDY0?=
- =?utf-8?B?UGMrZDdYVHRMR3JaRytpWFErT0d3K3FPbVhlRys0dXVqb2Y5dGcxMEVMNUZI?=
- =?utf-8?B?WHp1SzhGUmtvdTZ2ejM1eWlVR3Rzb0YybDgzc3dob21oeE9jUnBnZjhsL09y?=
- =?utf-8?B?RFg1OXpBa0tQU1ZYYStRRndnTVh3M2dNTExxMGVtdmxjRTBIcnpjSDF0N3Jl?=
- =?utf-8?B?cXJBblZIRUQrbkZzUW45cjFTYnhpMDc3VWRoRVhtcTZ6SEpxN0FUZmE5Sis5?=
- =?utf-8?B?aTdQUmtRQjgwM2lFWXAycWZOK3JLSzZVUTJFZU5XemFTb2VzalNBMEU1bUZk?=
- =?utf-8?B?U2hadEcvR2QxT3U4cEphNThpdWd6WEhsZDR2dUYxRDFqNUZlejY2Yi9rbHB0?=
- =?utf-8?B?SEFhVkt4bmk3V0NNSTNRa0xKamlGOGpMY01heFBkNndWVlJhUFdIa0g4ZVg5?=
- =?utf-8?B?YnVEa2Q0U0c2MWNmQ0JmWUJCMC9sbzRObFcxb3Nqc2JIR3NVTVpMZExLNG5y?=
- =?utf-8?B?bEVsWDBONXNMdWVKR0NKVDcyYkFmNUFZNWhNc2YzaHlVTXNrdFduVU9PK3Ri?=
- =?utf-8?B?RStJbTJiMHhaaDZZUlFIOGR5WC9wcndJRWt1bE5tZlkwWEROWWFvZ3U0NVkw?=
- =?utf-8?B?QU94YkFiZFRkcHBwN2RuL294WWtHb2NpMWVnOVNIdHg4TjJ0REVUbkRqcXQv?=
- =?utf-8?B?cXRXRGwzaVIrSDB1NTNtbEVaTTlBU0ltbkRPYjFicGp3bWZZYnk5SFFEK0JG?=
- =?utf-8?B?VER6MGpyZThFOEc3a0FlcnpHQUpVRyt5MUYyUU1MOW9PRXdKU1N6WHV4UHJo?=
- =?utf-8?B?dnN6bFh5UHBCckhoUjlnSHh5Q1lsdnZYVGlxVFh0WEZ6RUNzUlpJbmZCK08x?=
- =?utf-8?B?TXdpUzFvY012LzZPVE51R25obXRlc01zK3FtRmFzeWM0MW1hU3JzV1J1UjZy?=
- =?utf-8?B?Ym9QQlpYdHhKNUhkM25IOEVqS0V2VGxic0dZWGJmUGhHN2ZwUndncVlSaWZn?=
- =?utf-8?B?aGpicWdzclZ3WCs1VnBUNHJINFZaVi92bEY5L3E0cU9FeXJjbGlIQmNvOUhN?=
- =?utf-8?B?b0taQ3pKZWYvbGZGcEpGbWNEWHdPOERLRitzMEZoVmIrYzljcXl1RVZqREQr?=
- =?utf-8?B?cS9rMnN4YjVHMEg3QTV4Zz09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NklLa05lMG1wdndBTDViRndqOG5qOG1hVjVielF5U1ZpVWV2MkJjaTVZZUJW?=
- =?utf-8?B?Z1NnMEtIb3JyVDJ6VWVtcjAxd280RjQxOHE5cjVoVnVTOHUvcDBIblVJVGNZ?=
- =?utf-8?B?cWlUR0YyMXRjbElJVVdUT0xoVXR2WXZod0FyVHUrVHNMU3MyVTNWbkQxMzhN?=
- =?utf-8?B?Vk05M0sraXJBOEhYMGhhS2p0MFJDWnZva21SWkpyaUJmUFBuSW42UXhwU2ZQ?=
- =?utf-8?B?dzlXdFI5Z0JiZzVlT3lxZk54dlc3YWJCWG93R0RaN0UzVmtLaW5wc0gzTVNz?=
- =?utf-8?B?VE9MNzBuMU5rajVRWWhtRXdhaVdFbzBsZmE5WHlUM0svSFM3UXNRWGZzQmpz?=
- =?utf-8?B?bDJBdVNQb1hPN0xaa3VkQStBaUVYSEkvRnppWWR2ZEdPamVscngwa3FuV0lR?=
- =?utf-8?B?THVHWFl5SjN2eEZYL002QmlTanlBSzR3R2lMK21Md1pFdnJvS2RIWHlxMkJs?=
- =?utf-8?B?Wm5HTmFFR2dKR3JGM1ZQRHJOcUxFWUQ2ZTNKVmJyTW9PUjFYNmh1cUl4RFBE?=
- =?utf-8?B?M2lIQWRWbmRkdVVMMVMwZHp0eStJMHVvQ0RHM1RieHFoMmpKcm93VS81WmJG?=
- =?utf-8?B?Z2V2b2pRN2d5TmQvbmNrSHE0M3h1SUtTUVRGSlVWMkJQc0dndSsxSjl0K3hq?=
- =?utf-8?B?NnBHQUJST3FKcDUxYW03ZW8vd0ZtV2RBa29QNXNoK3pDUnMrOVVJYUVEYjB1?=
- =?utf-8?B?Z1UwTmhES08yUWF5T0NLZHZrWnhaaWxhQ1F4aU95bGJXT1ZCb0ZPOXlyOTMz?=
- =?utf-8?B?U05oQUVaZ1ByQVhMVFJKZGhVKzRma0QrS2d4ZExoczJKNFhJajZWYUlHWU12?=
- =?utf-8?B?eWpwemNXdmFCVjl1Y2VWcUJWSFZ0cGkyZGEwc2NMdGhkTm1zak5sS0toVEdV?=
- =?utf-8?B?RmlXcURvRFcrQkNETVBMU3VzR2ZBRUEweUtpcVplMUYrYWwwRUZsdkw0Z1Bi?=
- =?utf-8?B?ZVk2Ymg1aGFvWTZmQjZlUnhVUU5FRFdRNWFKdDFYcTZUb1lTQkhQUWplNjhp?=
- =?utf-8?B?eUVBQWpxY2gzWEtzZXhiQVdsV0lHNjVJZGdaekxJQnpUK0Rma1FWZkhrNDdh?=
- =?utf-8?B?ZjlVK09IQzd1RU1sd3dtemp1bnhlNlVTdGxpV2RoMjF4aEVJZ1RvVVZ4L1dO?=
- =?utf-8?B?Z2R2M2JJeGw4N3RwNTdmQUZZeVFUSjR4VjV5Sk5GZml0ZkpsVDlYTXR2R0gy?=
- =?utf-8?B?SlliS3orTEtIR2NEbjZTeUpGZjNXQXRyNVc0RWtBR0JmU1Ird0FTQWZVSDl1?=
- =?utf-8?B?R0NsTGlONmVzdXQwTy9IWE9MTElwcTczVVJjUUx1NFhkaHIvWGNHbVFvYjlZ?=
- =?utf-8?B?WGlRb0FIVzc2WWVWbzdZOGNjbktRMHVjVnB1dXBUNzQ5ekV2bjdIMU1nVDRY?=
- =?utf-8?B?cjN4cmNScTUwWG9WV3o5VXQrSmZQL0NFK0dNSDVXelpDWGRYT1o3T2E5eHlu?=
- =?utf-8?B?YzN0MFJHdHpQS1VVZFdBcGhkTGE4YUh2dUNnQmVWczR5ZE9mNnNQaStDYWh6?=
- =?utf-8?B?enB4YWhoYzlPR0g0Wkk3Tnc4K25kcnlCQnRTZExlUEl3eG9JMjRZblNzay9y?=
- =?utf-8?B?d0UrVFNJRHFINXgrNG5WUXQ5RjVxT1hxR0VLUVFwWXNENWZEendxaThRbDVX?=
- =?utf-8?B?bUpJblZXaDVLVFBiUXJpTjNFVVpSZHEyMlMyR24zaTkxbjR5dGRxcG43YnhT?=
- =?utf-8?B?VGpPK1FFV0JlZFVKOXdFb0t6dy96cnlDZ2E0bUNxTzlrdnc4ZWtCbGFEc29S?=
- =?utf-8?B?S1g4QUlieDRUN2tORjNRQ29uaXRhMFNuaDAxMGFHd1RHTmtMRUFCWjdIeTNQ?=
- =?utf-8?B?b08rN3ZIQml1RThPV2NHa04rRUJiSzUvNjRYMnpsbE43d2ZKbVc2U2ZqeExx?=
- =?utf-8?B?TDN4d3lZNmpOWWVzY3RYdXB2U2pqaE1Da1YrSjE3eWFtTlcwWXZnZUc5WjZ6?=
- =?utf-8?B?MGxHR0piNGJKbUZERVhpN3JiWWQyVzJmNjY3MlBaN2xqM3lET3JBR0RpUjJU?=
- =?utf-8?B?aUdEREtua1JtM01qMjZnc0E1QnRzSFc1dTR1UjJqOGZ6WkE0QUs1V1hEWDRo?=
- =?utf-8?B?UFprSk52bUhnT2t1Q3ltN04zZ3FqdEd0VHNTZmp4eHdvK0FNY2NSSHZQOHpX?=
- =?utf-8?Q?S9lPyvY88hk9b+AD77rx/8A6r?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 14b5c05a-ebca-492b-efaa-08dd1b570979
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2024 09:17:59.4055
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fViCVCTt2/WkoNzeHvCOqCE/y2F+33pvlzuFvApt3Aton156xC6253ZQ4GCksuQhIazybURWqDs23lTbZqwaFw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6790
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWB003.ant.amazon.com (10.13.139.176) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+
+There are a bunch of weird usages of sock_create() and friends due
+to poor documentation.
+
+  1) some subsystems use __sock_create(), but all of them can be
+     replaced with sock_create_kern()
+
+  2) some subsystems use sock_create(), but most of the sockets are
+     not tied to userspace processes nor exposed via file descriptors
+     but are (most likely unintentionally) exposed to some BPF hooks
+     (infiniband, ISDN, NVMe over TCP, iscsi, Xen PV call, ocfs2, smbd)
+
+  3) some subsystems use sock_create_kern() and convert the sockets
+     to hold netns refcnt (cifs, mptcp, rds, smc, and sunrpc)
+
+The primary goal is to sort out such confusion and provide enough
+documentation for future developers to choose an appropriate API.
+
+Regarding 3), we introduce a new API, sock_create_net(), that holds
+a netns refcnt for kernel socket to remove the socket conversion to
+avoid use-after-free triggered by TCP kernel socket after commit
+26abe14379f8 ("net: Modify sk_alloc to not reference count the netns
+of kernel sockets.").
+
+Finally, we rename sock_create() and sock_create_kern() to
+sock_create_user() and sock_create_net_noref(), respectively.
+This intentionally breaks out-of-tree drivers to give the owners
+a chance to choose an appropriate API.
+
+Throughout the series, we follow the definition below:
+
+  userspace socket:
+    * created by sock_create_user()
+    * holds the reference count of the network namespace
+    * directly linked to a file descriptor
+      * currently all sockets created by sane sock_create() users
+        are tied to userspace process and exposed via file descriptors
+    * accessed via a file descriptor (and some BPF hooks except
+      for BPF LSM)
+
+  kernel socket
+    * created by sock_create_net() or sock_create_net_noref()
+      * the former holds the refcnt of netns, but the latter doesn't
+    * not directly exposed to userspace via a file descriptor nor BPF
+      except for BPF LSM
+
+Note that __sock_create(kern=1) skips some LSMs (SELinux, AppArmor)
+but not all; BPF LSM can enforce security regardless of the argument.
+
+Since this refactoring is huge, there will be a concern that
+the series could make the future backport difficult.  However,
+socket() / accept() / sk_alloc() paths are unlikely to have many
+bugs and backports.  For example, net/socket.c has few backports
+and only 631083143315 touches __sock_create() in 6.1 and 6.6.
+
+  $ for v in 6.12 6.6 6.1 5.15 5.10 5.4; \
+  do \
+    echo "$v : $(git log --oneline stable/linux-$v.y...v$v -- net/socket.c | wc -l)"; \
+  done
+  6.12 : 0
+  6.6 : 7
+  6.1 : 13
+  5.15 : 8
+  5.10 : 13
+  5.4 : 13
 
 
-On 12/12/24 18:04, Simon Horman wrote:
-> On Mon, Dec 09, 2024 at 06:54:08PM +0000, alejandro.lucero-palau@amd.com wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> Use cxl code for registers discovery and mapping.
->>
->> Validate capabilities found based on those registers against expected
->> capabilities.
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
->> Reviewed-by: Zhi Wang <zhi@nvidia.com>
->> ---
->>   drivers/net/ethernet/sfc/efx_cxl.c | 19 +++++++++++++++++++
->>   1 file changed, 19 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
->> index 58a6f14565ff..3f15486f99e4 100644
->> --- a/drivers/net/ethernet/sfc/efx_cxl.c
->> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
->> @@ -21,6 +21,8 @@
->>   int efx_cxl_init(struct efx_probe_data *probe_data)
->>   {
->>   	struct efx_nic *efx = &probe_data->efx;
->> +	DECLARE_BITMAP(expected, CXL_MAX_CAPS);
->> +	DECLARE_BITMAP(found, CXL_MAX_CAPS);
->>   	struct pci_dev *pci_dev;
->>   	struct efx_cxl *cxl;
->>   	struct resource res;
->> @@ -65,6 +67,23 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->>   		goto err2;
->>   	}
->>   
->> +	rc = cxl_pci_accel_setup_regs(pci_dev, cxl->cxlds);
->> +	if (rc) {
->> +		pci_err(pci_dev, "CXL accel setup regs failed");
->> +		goto err2;
->> +	}
->> +
->> +	bitmap_clear(expected, 0, CXL_MAX_CAPS);
->> +	bitmap_set(expected, CXL_DEV_CAP_HDM, 1);
->> +	bitmap_set(expected, CXL_DEV_CAP_RAS, 1);
->> +
->> +	if (!cxl_pci_check_caps(cxl->cxlds, expected, found)) {
->> +		pci_err(pci_dev,
->> +			"CXL device capabilities found(%08lx) not as expected(%08lx)",
->> +			*found, *expected);
->> +		goto err2;
-> Hi Alejandro,
->
-> goto err2 will result in the function returning rc.
-> However, rc is 0 here. Should it be set to a negative error value instead?
+Changes:
+  v3:
+    * Drop /proc/net/sockstat patch
+    * Add a patch to make sock_inuse_add() static
+
+  v2: https://lore.kernel.org/netdev/20241210073829.62520-1-kuniyu@amazon.com/
+    * Patch 8
+      * Fix build error for PF_IUCV
+    * Patch 12
+      * Collect Acked-by from MPTCP/RDS maintainers
+
+  v1: https://lore.kernel.org/netdev/20241206075504.24153-1-kuniyu@amazon.com/
 
 
-Hi Simon,
+Kuniyuki Iwashima (15):
+  socket: Un-export __sock_create().
+  socket: Pass hold_net flag to __sock_create().
+  smc: Pass kern to smc_sock_alloc().
+  socket: Pass hold_net to struct net_proto_family.create().
+  ppp: Pass hold_net to struct pppox_proto.create().
+  nfc: Pass hold_net to struct nfc_protocol.create().
+  socket: Add hold_net flag to struct proto_accept_arg.
+  socket: Pass hold_net to sk_alloc().
+  socket: Respect hold_net in sk_alloc().
+  socket: Introduce sock_create_net().
+  socket: Remove kernel socket conversion.
+  socket: Move sock_inuse_add() to sock.c.
+  socket: Use sock_create_net() instead of sock_create().
+  socket: Rename sock_create() to sock_create_user().
+  socket: Rename sock_create_kern() to sock_create_net_noref().
 
+ crypto/af_alg.c                               |   7 +-
+ drivers/block/drbd/drbd_receiver.c            |  12 +-
+ drivers/infiniband/hw/erdma/erdma_cm.c        |   6 +-
+ drivers/infiniband/sw/rxe/rxe_qp.c            |   2 +-
+ drivers/infiniband/sw/siw/siw_cm.c            |   6 +-
+ drivers/isdn/mISDN/l1oip_core.c               |   3 +-
+ drivers/isdn/mISDN/socket.c                   |  17 +-
+ drivers/net/ppp/pppoe.c                       |   5 +-
+ drivers/net/ppp/pppox.c                       |   4 +-
+ drivers/net/ppp/pptp.c                        |   5 +-
+ drivers/net/tap.c                             |   2 +-
+ drivers/net/tun.c                             |   2 +-
+ drivers/nvme/host/tcp.c                       |   5 +-
+ drivers/nvme/target/tcp.c                     |   5 +-
+ drivers/soc/qcom/qmi_interface.c              |   4 +-
+ drivers/target/iscsi/iscsi_target_login.c     |   7 +-
+ drivers/xen/pvcalls-back.c                    |   7 +-
+ drivers/xen/pvcalls-front.c                   |   3 +-
+ fs/afs/rxrpc.c                                |   3 +-
+ fs/dlm/lowcomms.c                             |   8 +-
+ fs/ocfs2/cluster/tcp.c                        |  10 +-
+ fs/smb/client/connect.c                       |  13 +-
+ fs/smb/server/transport_tcp.c                 |   7 +-
+ include/linux/if_pppox.h                      |   3 +-
+ include/linux/net.h                           |  11 +-
+ include/net/bluetooth/bluetooth.h             |   3 +-
+ include/net/llc_conn.h                        |   2 +-
+ include/net/sctp/structs.h                    |   2 +-
+ include/net/sock.h                            |  12 +-
+ io_uring/net.c                                |   2 +
+ net/9p/trans_fd.c                             |   8 +-
+ net/appletalk/ddp.c                           |   4 +-
+ net/atm/common.c                              |   5 +-
+ net/atm/common.h                              |   3 +-
+ net/atm/pvc.c                                 |   4 +-
+ net/atm/svc.c                                 |   8 +-
+ net/ax25/af_ax25.c                            |   7 +-
+ net/bluetooth/af_bluetooth.c                  |   9 +-
+ net/bluetooth/bnep/sock.c                     |   5 +-
+ net/bluetooth/cmtp/sock.c                     |   4 +-
+ net/bluetooth/hci_sock.c                      |   4 +-
+ net/bluetooth/hidp/sock.c                     |   5 +-
+ net/bluetooth/iso.c                           |  11 +-
+ net/bluetooth/l2cap_sock.c                    |  14 +-
+ net/bluetooth/rfcomm/core.c                   |   3 +-
+ net/bluetooth/rfcomm/sock.c                   |  12 +-
+ net/bluetooth/sco.c                           |  11 +-
+ net/bpf/test_run.c                            |   2 +-
+ net/caif/caif_socket.c                        |   4 +-
+ net/can/af_can.c                              |   4 +-
+ net/ceph/messenger.c                          |   6 +-
+ net/core/sock.c                               |  19 ++-
+ net/handshake/handshake-test.c                |  33 ++--
+ net/ieee802154/socket.c                       |   4 +-
+ net/ipv4/af_inet.c                            |   7 +-
+ net/ipv4/udp_tunnel_core.c                    |   2 +-
+ net/ipv6/af_inet6.c                           |   4 +-
+ net/ipv6/ip6_udp_tunnel.c                     |   4 +-
+ net/iucv/af_iucv.c                            |  13 +-
+ net/kcm/kcmsock.c                             |   6 +-
+ net/key/af_key.c                              |   4 +-
+ net/l2tp/l2tp_core.c                          |   8 +-
+ net/l2tp/l2tp_ppp.c                           |   6 +-
+ net/llc/af_llc.c                              |   6 +-
+ net/llc/llc_conn.c                            |  11 +-
+ net/mctp/af_mctp.c                            |   4 +-
+ net/mctp/test/route-test.c                    |   6 +-
+ net/mptcp/pm_netlink.c                        |   4 +-
+ net/mptcp/subflow.c                           |  12 +-
+ net/netfilter/ipvs/ip_vs_sync.c               |   8 +-
+ net/netlink/af_netlink.c                      |  11 +-
+ net/netrom/af_netrom.c                        |   7 +-
+ net/nfc/af_nfc.c                              |   5 +-
+ net/nfc/llcp.h                                |   3 +-
+ net/nfc/llcp_core.c                           |   3 +-
+ net/nfc/llcp_sock.c                           |  10 +-
+ net/nfc/nfc.h                                 |   3 +-
+ net/nfc/rawsock.c                             |   5 +-
+ net/packet/af_packet.c                        |   4 +-
+ net/phonet/af_phonet.c                        |   4 +-
+ net/phonet/pep.c                              |   2 +-
+ net/qrtr/af_qrtr.c                            |   4 +-
+ net/qrtr/ns.c                                 |   6 +-
+ net/rds/af_rds.c                              |   4 +-
+ net/rds/tcp.c                                 |  14 --
+ net/rds/tcp_connect.c                         |  21 ++-
+ net/rds/tcp_listen.c                          |  17 +-
+ net/rose/af_rose.c                            |  11 +-
+ net/rxrpc/af_rxrpc.c                          |   4 +-
+ net/rxrpc/rxperf.c                            |   4 +-
+ net/sctp/ipv6.c                               |   7 +-
+ net/sctp/protocol.c                           |   7 +-
+ net/sctp/socket.c                             |   6 +-
+ net/smc/af_smc.c                              |  38 ++---
+ net/smc/smc_inet.c                            |   2 +-
+ net/socket.c                                  | 145 +++++++++++++-----
+ net/sunrpc/clnt.c                             |   4 +-
+ net/sunrpc/svcsock.c                          |  12 +-
+ net/sunrpc/xprtsock.c                         |  16 +-
+ net/tipc/socket.c                             |   8 +-
+ net/tipc/topsrv.c                             |   4 +-
+ net/unix/af_unix.c                            |  17 +-
+ net/vmw_vsock/af_vsock.c                      |  10 +-
+ net/wireless/nl80211.c                        |   4 +-
+ net/x25/af_x25.c                              |  13 +-
+ net/xdp/xsk.c                                 |   4 +-
+ .../selftests/bpf/bpf_testmod/bpf_testmod.c   |   4 +-
+ 107 files changed, 512 insertions(+), 403 deletions(-)
 
-Right. The code is functionally correct because the driver's variable 
-setting the CXL initialization successful is not happening when skipping 
-with the goto, which is the key part. Returning an error will log a CXL 
-initialization driver's error but it has no impact with the driver's 
-initialization or the CXL usage by design.
+-- 
+2.39.5 (Apple Git-154)
 
-
-However, the error should be returned properly.
-
-
-I will fix it in v8.
-
-
-Thanks!
-
-
-> Flagged by Smatch.
->
->> +	}
->> +
->>   	probe_data->cxl = cxl;
->>   
->>   	return 0;
->> -- 
->> 2.17.1
->>
->>
 
