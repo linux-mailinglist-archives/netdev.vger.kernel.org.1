@@ -1,52 +1,46 @@
-Return-Path: <netdev+bounces-151695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45B199F0A2E
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:57:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 423009F0A31
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:57:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D695188CB1F
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:57:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7D8616A663
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 498571C3BF6;
-	Fri, 13 Dec 2024 10:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="SlDfjK+7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505CA1C3BF9;
+	Fri, 13 Dec 2024 10:57:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-zteg10011501.me.com (pv50p00im-zteg10011501.me.com [17.58.6.42])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED69B1C3BF3
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 10:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EE01C3BF5;
+	Fri, 13 Dec 2024 10:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734087459; cv=none; b=YyqDFqizr3VJrHldAgyVj1KOOYhdrd4M0a7XuI2ULGgFe5hNgc4+lbk7/J0GF+IuOPOb/27xJcOS+Jr/zaEaoWav6tvOovk6BzNldDS66Pi5neEaYY/1HNh4/cghs/WmvEJbpTO0+vTOm60k44RVS9HdtH/bduyGivUhJGaWfmE=
+	t=1734087466; cv=none; b=fYqzw4GwxDGk/GZ5DLCbpRGjfpER+1To3kPil4Ubif6+MVJAo6shNb9QDz/BtmqAgaj675mLED6lXoDUjABVlhgx+cfQA0XsbBZWY+A7CvU/6l3wk8NwEyki1fHPoP3vN0IF54HpTiUD4EJT9V4hxtD4QncgIztHFOORyZyJNVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734087459; c=relaxed/simple;
-	bh=z+o/Zz7krE43eRXV97sp4NU1krgfzZkKBi/loEK2Lrc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CDBQ7W6Rg+g1pbTlRz7WLNzsAxsDM9eqoJZnXAoGGcpb2M1n84sxRl6+8qvvzQA3VsS1jHCZGn2g23C2uoQBdToQNODJqFLXIEl9Ett3Cj/uahRFFwksBtGX8J8fKdMN+NrGLzTaIB16R6nDZXHyQqZEMMNw1DWWwUaVlr1F7fQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=SlDfjK+7; arc=none smtp.client-ip=17.58.6.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1734087457;
-	bh=00fZ8KH7ULyifEqPcXVN839tg77V4BOPE7wEvL/fgSE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
-	 x-icloud-hme;
-	b=SlDfjK+75cmB6VBxQUjzutgAasTq0XyHEZXuRQTMYANATZx80PokrHArSuUU1ZOzF
-	 8X3sfeGtQLu25CEgKou2az31SskKfKFymKuuK7TdGfiE3BFmQYmEkMQ3PgjAJ2UXxi
-	 YcheOvkpH9ggPo0gE8/pAaLPh7LXPBg5vZypQuqz3mDWsLop4V1oc3vzE4RZy1j9s4
-	 30JGRNTkvEiz4oRm+96fF2LGcy2So864ES8uPr/LrEC7Qjk2ZkoOaR4LhFdtElUmdh
-	 atzemgctHVG+7tfh6exPJZG9bEqxPr0kfuJ+Sg+sgazEKSP34Jrn9Z9ji/iqntcqM7
-	 9+JdJov1FP8eg==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-zteg10011501.me.com (Postfix) with ESMTPSA id 315A34A031F;
-	Fri, 13 Dec 2024 10:57:31 +0000 (UTC)
-Message-ID: <692ac4bc-aa97-4fea-9f40-bad7339e9474@icloud.com>
-Date: Fri, 13 Dec 2024 18:57:15 +0800
+	s=arc-20240116; t=1734087466; c=relaxed/simple;
+	bh=hRMOVVhsH85xo+YHkd5+b7Twl6ICG93NoR/iHXt5nUs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ceZ9igpFoAoB/DQkDYrszgSm+SofNP0tP4sm+dOzRs6VApNH2TdNg8r8h94NOv2ItgruMwPx+LKFpZd/i1NiBnrXijJYzX+PRmJFXvYHf2KvfbnEiQJmfGaP9NT+e3NFyPaIPOi2Atco38Nx4FPdtx/XvWCIRz755FzUH1H0gjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Y8mRs2lKHz6K5rG;
+	Fri, 13 Dec 2024 18:54:17 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id 208AF140134;
+	Fri, 13 Dec 2024 18:57:39 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Fri, 13 Dec 2024 13:57:37 +0300
+Message-ID: <b92e65aa-84aa-a66f-2f61-b70fd5c6b138@huawei-partners.com>
+Date: Fri, 13 Dec 2024 13:57:34 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,78 +48,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: wan: framer: Simplify API
- framer_provider_simple_of_xlate() implementation
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20241211-framer-core-fix-v1-1-0688c6905a0b@quicinc.com>
- <20241212164149.GB73795@kernel.org>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <20241212164149.GB73795@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: 2hmm-zXKEQIQuq-czsvIVfPnznAF18RJ
-X-Proofpoint-ORIG-GUID: 2hmm-zXKEQIQuq-czsvIVfPnznAF18RJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2024-12-13_04,2024-12-12_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=667 malwarescore=0
- clxscore=1015 spamscore=0 bulkscore=0 phishscore=0 suspectscore=0
- adultscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2412130076
+Subject: Re: [PATCH] selinux: Read sk->sk_family once in selinux_socket_bind()
+Content-Language: ru
+To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+CC: <paul@paul-moore.com>, <selinux@vger.kernel.org>,
+	<stephen.smalley.work@gmail.com>, <omosnace@redhat.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20241212102000.2148788-1-ivanov.mikhail1@huawei-partners.com>
+ <20241212.zoh7Eezee9ka@digikod.net>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20241212.zoh7Eezee9ka@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
-On 2024/12/13 00:41, Simon Horman wrote:
->>  struct framer *framer_provider_simple_of_xlate(struct device *dev,
->>  					       const struct of_phandle_args *args)
->>  {
->> -	struct class_dev_iter iter;
->> -	struct framer *framer;
->> -
->> -	class_dev_iter_init(&iter, &framer_class, NULL, NULL);
->> -	while ((dev = class_dev_iter_next(&iter))) {
->> -		framer = dev_to_framer(dev);
->> -		if (args->np != framer->dev.of_node)
->> -			continue;
->> +	struct device *target_dev;
->>  
->> -		class_dev_iter_exit(&iter);
->> -		return framer;
->> +	target_dev = class_find_device_by_of_node(&framer_class, args->np);
->> +	if (target_dev) {
->> +		put_device(target_dev);
->> +		return dev_to_framer(target_dev);
->>  	}
->>  
->> -	class_dev_iter_exit(&iter);
->>  	return ERR_PTR(-ENODEV);
-> Hi Zijun Hu,
+On 12/12/2024 8:50 PM, Mickaël Salaün wrote:
+> This looks good be there are other places using sk->sk_family that
+> should also be fixed.
+
+Thanks for checking this!
+
+For selinux this should be enough, I haven't found any other places
+where sk->sk_family could be read from an IPv6 socket without locking.
+
+I also would like to prepare such fix for other LSMs (apparmor, smack,
+tomoyo) (in separate patches).
+
 > 
-> FWIIW, I think it would be more idiomatic to have the non-error path in the
-> main flow of execution, something like this (completely untested!):
-> 
-> 	target_dev = class_find_device_by_of_node(&framer_class, args->np);
-> 	if (!target_dev)
-> 		return ERR_PTR(-ENODEV);
-> 
-> 	put_device(target_dev);
-> 	return dev_to_framer(target_dev);
-> 
-thank you Simon for code review.
-good suggestion. let me take it in v2.
-
-> Also, is it safe to put_device(target_dev) before
-> passing target_dev to dev_to_framer() ?
-
-Successful class_find_device_by_of_node() invocation will increase the
-refcount of @target_dev, so i put_device() here to keep the same logic
-as original.
-
-thank you.
-
-
+> On Thu, Dec 12, 2024 at 06:20:00PM +0800, Mikhail Ivanov wrote:
+>> selinux_socket_bind() is called without holding the socket lock.
+>>
+>> Use READ_ONCE() to safely read sk->sk_family for IPv6 socket in case
+>> of lockless transformation to IPv4 socket via IPV6_ADDRFORM [1].
+>>
+>> [1] https://lore.kernel.org/all/20240202095404.183274-1-edumazet@google.com/
+>>
+>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>>   security/selinux/hooks.c | 4 +++-
+>>   1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+>> index 5e5f3398f39d..b7adff2cf5f6 100644
+>> --- a/security/selinux/hooks.c
+>> +++ b/security/selinux/hooks.c
+>> @@ -4715,8 +4715,10 @@ static int selinux_socket_bind(struct socket *sock, struct sockaddr *address, in
+>>   	if (err)
+>>   		goto out;
+>>   
+>> +	/* IPV6_ADDRFORM can change sk->sk_family under us. */
+>> +	family = READ_ONCE(sk->sk_family);
+>> +
+>>   	/* If PF_INET or PF_INET6, check name_bind permission for the port. */
+>> -	family = sk->sk_family;
+>>   	if (family == PF_INET || family == PF_INET6) {
+>>   		char *addrp;
+>>   		struct common_audit_data ad;
+>>
+>> base-commit: 034294fbfdf0ded4f931f9503d2ca5bbf8b9aebd
+>> -- 
+>> 2.34.1
+>>
+>>
 
