@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-151765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C6D9F0CE1
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 14:02:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0946D9F0CDF
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 14:02:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EE53188B373
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:02:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5F8816656A
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27EB91E00B6;
-	Fri, 13 Dec 2024 13:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7C31E00A0;
+	Fri, 13 Dec 2024 13:02:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QV0eFRUU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E/4sZRFl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2951E0081
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 13:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C583A1DFE39
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 13:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734094942; cv=none; b=DOZbF/bJVdj+6FaRAiK5hlhDiHhMTf30LC9/mcfwDcSB9IiZsysoo5KTIU65YOOAaBPFf0hGrZ8qco3UuhVZEJZEl1PJnnK5SXo9yAiSA3gyOw184AIKRzptlvkqUFroiTn4csMkMBJxt2OiBNEBWZdIpdKpLnGssd5slUbQwPY=
+	t=1734094941; cv=none; b=Pk93uZ7ccxj1+PCqscd6b2LA9i0wniDJ2yd/e55Kc3AIctd5BNzfAXB9X5+Dph2aFIJMmbGEw128pDu4RTL9Na/pIfTlU99LJ52loptAoW9defDTBzkvn6gyMA4sngpqYm9l+Yk9wPgS5QCbxXMP91fnncOfVQFb9jsmq49GPNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734094942; c=relaxed/simple;
-	bh=s3MI24GtlqQdp5wNS4PFx7F9BjHZqq3Vm25eZ/KSfcA=;
+	s=arc-20240116; t=1734094941; c=relaxed/simple;
+	bh=mWG7wsebwSYYcIqh15+S7wil7C3IoKbNrM+dfseE5nA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=g+eoOEBrYBv+oQePyXnPKL0UHTHlWR354K4RUqxU16nA9a/DahPOTevT541Fcm5gjX5vvUy5T3G1sExz2Ql+LksQL7ew9Zvz2NZPudGDuY2SyJiK/ffHoF+m8Mj4WKH2jHIcjYrx6d6IHj3Z3GZodZCE0r52jtf479VQYwIhQcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QV0eFRUU; arc=none smtp.client-ip=209.85.219.74
+	 To:Cc:Content-Type; b=liBZcc747EBErwNXCx0IwDUDy1cNjRkLnhcZIqsigjvqZ3exsYMhblLOlPsiKyPKBzFk4xuNo5hQC77vNLxcFabKbq+J8SamosqyoZpCVsiA7CWX5mDIlzZjuQhJ8QTEG18sJMvnvinVOJuL4s0BtaE7T7CANjWshy+lvYidYJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E/4sZRFl; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-6d8edb40083so56234706d6.0
-        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 05:02:18 -0800 (PST)
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-467944446a0so31151441cf.1
+        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 05:02:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734094937; x=1734699737; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1734094939; x=1734699739; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gxiE9o12jvQE0EhYg4DBIO0tfvhpWtc9/ACQybVd+3k=;
-        b=QV0eFRUUdnKBUFWl1IGylWrb9M07LZ60edjpxSSWsJbinqu+mPddoFHdPwYeO5y95p
-         SY7t92ymO9KEhthEjCcaVxfAnH2KiuIhbmgy5X1Ew5DpQIIcYq/J8oYpwWzMcoqP6zXG
-         x450uVkhdqSMrYBdvf+BT4C2M/ZKYLaEdZ3iGIZwI6mY5bNMUIpuvfkpJi7vtM09aV+f
-         Aw+FGzVrofcO41EsnkPJPENhoKXD/AzuQ9BI4rKP1djkkqvB9U5VxIkdcOXDfXKV5UuM
-         n4QrKSj6z6GIb8ad3JxhJgyxMFanlv/KgzYpfLPogKgpXMWMYhgxypf1nM1J+n6UFn3O
-         5wvA==
+        bh=+3ZcHiGrMQ0qikxpAt1j1kpn8wlaFfz3JKlP8c3UDe8=;
+        b=E/4sZRFlLVJBoqZfl8F2220dqNB5vnv1bF6XBS5rx/kQ/4iptR5/lKlpHY8SAkeyUC
+         LDEq7n6yA+NsuMdQaMuazZvMxRc1hpVkT4258PBJSFmvDeb+U7emW8crTZdAcZHjcLRB
+         BGkVS/n9MrZiXfVMhuIt0IH3CS9y3Q4dTCmEEZTFsaXicGbem+bZgaW7zm+JSnXmMF5a
+         cImgXxPGDMe0kGbaNwefSx/jSSKSnxHdwnMmeUqSI7plE/4CWKcyzIHUM6KYHE/ZfnPd
+         gfeLYe/V+6bybrw/BVn4G+Jxhz8fHyCjhv9BzzC9hUjrV7VeJkhMPwGkfUGRRK9C9B6I
+         VGrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734094937; x=1734699737;
+        d=1e100.net; s=20230601; t=1734094939; x=1734699739;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gxiE9o12jvQE0EhYg4DBIO0tfvhpWtc9/ACQybVd+3k=;
-        b=P0VoUVOQfUJy+mznBkgGJbdch6o2gyUMxYatiemNbxOFdr/pIn+Jea0z6d+FN2Lc/5
-         hib4WmQPtqV8J8kLnz6FpFfhMNeU/fSegBpCit8ZFJR1UkaAVD1tpSnx/dRVdOICOWB9
-         WP7dYNwJoz6HirlhQRKDuTr3lDPaYDDeTgnEO4ehplRRWwkWjoNFBW96w7XFgG0I1GZ9
-         UMafSUtjZAp3IgtRxohandKQ+XL+N3T4FZJg+olUI/sAmWnJyhrL7asXIvH3r/apTmsp
-         6KX5afFZED6K3lpxnIk637vDPBULvMXyhaXf5k+8UudQqTC4aUBw2cspuOIpUfXVAeoM
-         rOsQ==
-X-Gm-Message-State: AOJu0YwS9HSW79gWRH1L71SERlR+LO6GvKzCnUZC/JXRm+aVt7ThexDE
-	WPkrF9Rd1/irLUdvRWgREKaoVGAHw6uyGvc2mQYIDMkbjwa/uV0oosxRb7Pfn+tJ6LWGWGJRFw6
-	5q/qs4j2qJQ==
-X-Google-Smtp-Source: AGHT+IHmnov1Q8Nab5/AMD2rs5XW+BayrRvjm1HlW8ijRzQ4cXzEuy8OraRh8VaGmGX2XrNjM1Nn0+bOKcDMYg==
-X-Received: from qvab9.prod.google.com ([2002:a05:6214:6109:b0:6d8:9fb4:cdb9])
+        bh=+3ZcHiGrMQ0qikxpAt1j1kpn8wlaFfz3JKlP8c3UDe8=;
+        b=Qgx+b8OLlqhdOflQF0elv7PU2JTiGr15DBNioT2UDGbZ0bEgqfTUbuKmrhkHES6mV9
+         DiG1l54e/PfWrfVHIoTg8emuX7R0EzeWqBg21/gJF5I0H6w2NCctVn0XtmW+35sSoEZt
+         Lm0ZdAHmv3Ju9fLX3I+O4Dvbg4dzB/8z1ueWUa7bDmumoQkE5bmnv7ez/Ocahm/gLL9k
+         OQBk9E919q5cpC6wBmbkqfd0I/Tkpy/j0ZaYFpfSuQoDUF4KvrqTpZO+6As6dgLDguGV
+         0KnS4P67/jyobLMNR/Z7BsScuc+ykQYtyanAM3FajfWJADbUnd8ZtCVTGZVXaSjgbKkd
+         VRgQ==
+X-Gm-Message-State: AOJu0YxyKuP5R1EgBHqmwmBgcNZA+6k18j7r7Aemqsl3H3ALaD7QpdNO
+	GxfYPYK6miIhPi8sS4prztnte301RJTHxaj6OxokHTUFBdiXSdWS31KTc84NtMRzb9QggBtPo8o
+	OolCag8laYQ==
+X-Google-Smtp-Source: AGHT+IF5Ft0ySfZj0pWAtikyzIfYWmMCmSd5cixmCjDz8fyO7mWujWDBMtX8HQQpdg38gwlbwsm/BaOdOeWzHg==
+X-Received: from qtbbs15.prod.google.com ([2002:ac8:6f0f:0:b0:467:6227:451b])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ad4:5949:0:b0:6d9:15c3:42c9 with SMTP id 6a1803df08f44-6db0f3e0cadmr65467126d6.7.1734094937321;
- Fri, 13 Dec 2024 05:02:17 -0800 (PST)
-Date: Fri, 13 Dec 2024 13:02:09 +0000
+ 2002:a05:622a:13d2:b0:467:84a7:5147 with SMTP id d75a77b69052e-467a5807dfdmr63435711cf.39.1734094938610;
+ Fri, 13 Dec 2024 05:02:18 -0800 (PST)
+Date: Fri, 13 Dec 2024 13:02:10 +0000
 In-Reply-To: <20241213130212.1783302-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241213130212.1783302-1-edumazet@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241213130212.1783302-2-edumazet@google.com>
-Subject: [PATCH net-next 1/4] inetpeer: remove create argument of inet_getpeer_v[46]()
+Message-ID: <20241213130212.1783302-3-edumazet@google.com>
+Subject: [PATCH net-next 2/4] inetpeer: remove create argument of inet_getpeer()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,141 +83,80 @@ Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-All callers of inet_getpeer_v4() and inet_getpeer_v6()
-want to create an inetpeer.
+All callers of inet_getpeer() want to create an inetpeer.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/inetpeer.h | 9 ++++-----
- net/ipv4/icmp.c        | 2 +-
- net/ipv4/ip_fragment.c | 2 +-
- net/ipv4/route.c       | 4 ++--
- net/ipv6/icmp.c        | 2 +-
- net/ipv6/ip6_output.c  | 2 +-
- net/ipv6/ndisc.c       | 2 +-
- 7 files changed, 11 insertions(+), 12 deletions(-)
+ include/net/inetpeer.h | 7 +++----
+ net/ipv4/inetpeer.c    | 9 ++-------
+ 2 files changed, 5 insertions(+), 11 deletions(-)
 
 diff --git a/include/net/inetpeer.h b/include/net/inetpeer.h
-index 74ff688568a0c6559946a9ae763d5c9822f1d112..6f51f81d6cb19c623e9b347dbdbbd8d849848f6e 100644
+index 6f51f81d6cb19c623e9b347dbdbbd8d849848f6e..f475757daafba998a10c815d0178c98d2bf1ae43 100644
 --- a/include/net/inetpeer.h
 +++ b/include/net/inetpeer.h
-@@ -101,25 +101,24 @@ struct inet_peer *inet_getpeer(struct inet_peer_base *base,
+@@ -96,8 +96,7 @@ static inline struct in6_addr *inetpeer_get_addr_v6(struct inetpeer_addr *iaddr)
+ 
+ /* can be called with or without local BH being disabled */
+ struct inet_peer *inet_getpeer(struct inet_peer_base *base,
+-			       const struct inetpeer_addr *daddr,
+-			       int create);
++			       const struct inetpeer_addr *daddr);
  
  static inline struct inet_peer *inet_getpeer_v4(struct inet_peer_base *base,
  						__be32 v4daddr,
--						int vif, int create)
-+						int vif)
- {
- 	struct inetpeer_addr daddr;
- 
+@@ -108,7 +107,7 @@ static inline struct inet_peer *inet_getpeer_v4(struct inet_peer_base *base,
  	daddr.a4.addr = v4daddr;
  	daddr.a4.vif = vif;
  	daddr.family = AF_INET;
--	return inet_getpeer(base, &daddr, create);
-+	return inet_getpeer(base, &daddr, 1);
+-	return inet_getpeer(base, &daddr, 1);
++	return inet_getpeer(base, &daddr);
  }
  
  static inline struct inet_peer *inet_getpeer_v6(struct inet_peer_base *base,
--						const struct in6_addr *v6daddr,
--						int create)
-+						const struct in6_addr *v6daddr)
- {
- 	struct inetpeer_addr daddr;
+@@ -118,7 +117,7 @@ static inline struct inet_peer *inet_getpeer_v6(struct inet_peer_base *base,
  
  	daddr.a6 = *v6daddr;
  	daddr.family = AF_INET6;
--	return inet_getpeer(base, &daddr, create);
-+	return inet_getpeer(base, &daddr, 1);
+-	return inet_getpeer(base, &daddr, 1);
++	return inet_getpeer(base, &daddr);
  }
  
  static inline int inetpeer_addr_cmp(const struct inetpeer_addr *a,
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 963a89ae9c26e8b462de57e4af981c6c46061052..5eeb9f569a706cf2766d74bcf1a667c8930804f2 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -322,7 +322,7 @@ static bool icmpv4_xrlim_allow(struct net *net, struct rtable *rt,
- 		goto out;
- 
- 	vif = l3mdev_master_ifindex(dst->dev);
--	peer = inet_getpeer_v4(net->ipv4.peers, fl4->daddr, vif, 1);
-+	peer = inet_getpeer_v4(net->ipv4.peers, fl4->daddr, vif);
- 	rc = inet_peer_xrlim_allow(peer,
- 				   READ_ONCE(net->ipv4.sysctl_icmp_ratelimit));
- 	if (peer)
-diff --git a/net/ipv4/ip_fragment.c b/net/ipv4/ip_fragment.c
-index 07036a2943c19f13f2d6d1d77cb8123867575b50..46e1171299f22ccf0b201eabbff5d3279a0703d8 100644
---- a/net/ipv4/ip_fragment.c
-+++ b/net/ipv4/ip_fragment.c
-@@ -89,7 +89,7 @@ static void ip4_frag_init(struct inet_frag_queue *q, const void *a)
- 	q->key.v4 = *key;
- 	qp->ecn = 0;
- 	qp->peer = q->fqdir->max_dist ?
--		inet_getpeer_v4(net->ipv4.peers, key->saddr, key->vif, 1) :
-+		inet_getpeer_v4(net->ipv4.peers, key->saddr, key->vif) :
- 		NULL;
+diff --git a/net/ipv4/inetpeer.c b/net/ipv4/inetpeer.c
+index 5ab56f4cb529769d4edb07261c08d61ff96f0c0f..58d2805b046d00cd509e2d2343abfb8eacfbdde7 100644
+--- a/net/ipv4/inetpeer.c
++++ b/net/ipv4/inetpeer.c
+@@ -169,8 +169,7 @@ static void inet_peer_gc(struct inet_peer_base *base,
  }
  
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 0fbec350961862f76b7eab332539472fed5a5286..297a9939c6e74beffc592dbdd7266281fe842440 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -873,7 +873,7 @@ void ip_rt_send_redirect(struct sk_buff *skb)
- 	rcu_read_unlock();
+ struct inet_peer *inet_getpeer(struct inet_peer_base *base,
+-			       const struct inetpeer_addr *daddr,
+-			       int create)
++			       const struct inetpeer_addr *daddr)
+ {
+ 	struct inet_peer *p, *gc_stack[PEER_MAX_GC];
+ 	struct rb_node **pp, *parent;
+@@ -189,10 +188,6 @@ struct inet_peer *inet_getpeer(struct inet_peer_base *base,
+ 	if (p)
+ 		return p;
  
- 	net = dev_net(rt->dst.dev);
--	peer = inet_getpeer_v4(net->ipv4.peers, ip_hdr(skb)->saddr, vif, 1);
-+	peer = inet_getpeer_v4(net->ipv4.peers, ip_hdr(skb)->saddr, vif);
- 	if (!peer) {
- 		icmp_send(skb, ICMP_REDIRECT, ICMP_REDIR_HOST,
- 			  rt_nexthop(rt, ip_hdr(skb)->daddr));
-@@ -976,7 +976,7 @@ static int ip_error(struct sk_buff *skb)
- 	}
+-	/* If no writer did a change during our lookup, we can return early. */
+-	if (!create && !invalidated)
+-		return NULL;
+-
+ 	/* retry an exact lookup, taking the lock before.
+ 	 * At least, nodes should be hot in our cache.
+ 	 */
+@@ -201,7 +196,7 @@ struct inet_peer *inet_getpeer(struct inet_peer_base *base,
  
- 	peer = inet_getpeer_v4(net->ipv4.peers, ip_hdr(skb)->saddr,
--			       l3mdev_master_ifindex(skb->dev), 1);
-+			       l3mdev_master_ifindex(skb->dev));
- 
- 	send = true;
- 	if (peer) {
-diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
-index 071b0bc1179d81b18c340ce415cef21e02a30cd7..4593e3992c67b84e3a10f30be28762974094d21f 100644
---- a/net/ipv6/icmp.c
-+++ b/net/ipv6/icmp.c
-@@ -222,7 +222,7 @@ static bool icmpv6_xrlim_allow(struct sock *sk, u8 type,
- 		if (rt->rt6i_dst.plen < 128)
- 			tmo >>= ((128 - rt->rt6i_dst.plen)>>5);
- 
--		peer = inet_getpeer_v6(net->ipv6.peers, &fl6->daddr, 1);
-+		peer = inet_getpeer_v6(net->ipv6.peers, &fl6->daddr);
- 		res = inet_peer_xrlim_allow(peer, tmo);
- 		if (peer)
- 			inet_putpeer(peer);
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 3d672dea9f56284e7a8ebabec037e04e7f3d19f4..2cbcfe70654b5cd90c433a24c47ef5496c604d0d 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -613,7 +613,7 @@ int ip6_forward(struct sk_buff *skb)
- 		else
- 			target = &hdr->daddr;
- 
--		peer = inet_getpeer_v6(net->ipv6.peers, &hdr->daddr, 1);
-+		peer = inet_getpeer_v6(net->ipv6.peers, &hdr->daddr);
- 
- 		/* Limit redirects both by destination (here)
- 		   and by source (inside ndisc_send_redirect)
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index aba94a34867379000e958538d880799c2d0c1476..f113554d13325453cd04ce4e5686d837943e96ff 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -1731,7 +1731,7 @@ void ndisc_send_redirect(struct sk_buff *skb, const struct in6_addr *target)
- 			  "Redirect: destination is not a neighbour\n");
- 		goto release;
- 	}
--	peer = inet_getpeer_v6(net->ipv6.peers, &ipv6_hdr(skb)->saddr, 1);
-+	peer = inet_getpeer_v6(net->ipv6.peers, &ipv6_hdr(skb)->saddr);
- 	ret = inet_peer_xrlim_allow(peer, 1*HZ);
- 	if (peer)
- 		inet_putpeer(peer);
+ 	gc_cnt = 0;
+ 	p = lookup(daddr, base, seq, gc_stack, &gc_cnt, &parent, &pp);
+-	if (!p && create) {
++	if (!p) {
+ 		p = kmem_cache_alloc(peer_cachep, GFP_ATOMIC);
+ 		if (p) {
+ 			p->daddr = *daddr;
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
