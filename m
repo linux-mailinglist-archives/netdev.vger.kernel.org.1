@@ -1,158 +1,184 @@
-Return-Path: <netdev+bounces-151893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B41A59F1794
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 21:49:07 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E1A9F1559
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:00:37 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03E2D188703E
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:49:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE599284128
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 19:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECACC18D649;
-	Fri, 13 Dec 2024 20:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B301EB9E1;
+	Fri, 13 Dec 2024 19:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hninDEb6"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aTdyCVo0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE4B189BAC
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 20:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68671EB9E2;
+	Fri, 13 Dec 2024 19:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734122941; cv=none; b=UzyL5Vu/P7fsKBTlp0C4BV3+zCrBCnU4pPfk6gFpxRW2yDQ5JJNL3bvnW6z/0FcDaWzqv4lB9nOgab/BCui/BTLXvoY5rQaSegVGtuG3dOUTtD5xVN0Av5IUgixnL+BJ1gD+N+hIRcKqkASnSMKUJBSoVdTbsI3keTGvxvGKfBw=
+	t=1734116430; cv=none; b=ZX6VygxdeuBuikbBH/vcpvEcELNTd6fJiJIP1SQUGvq08ythvQEI1p3igQA03v/C7QnIjoQgL7xIw4IDlF+yHy+W5WaaAIZpGVysMrpQ1egxrbgwJ2WtrTDPSM1KxEnFIfqL0RUsVyxe3eRyvPwlJsBdAt3WBYNIbm+Hz1hJAnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734122941; c=relaxed/simple;
-	bh=h84w4eJYdKl8umuChjOIfJrEe98yr8jKNoEwzxvnibM=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=M3wPdI8qysAN/W8qNIdzM6hU/IjjszE8fWK3JO0UZVECVwc6K0FrE8KMQg40McBTG5nVHU5SfFfmV1CV7GXHIGqbqIcomhhRAbh0y9MYCdGJEMv8IK75ZfUSA7NGWzPrH/y07dkFShszGaCGlXXXHMYifmeE/F6FPlaFv332xJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hninDEb6; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aa66ead88b3so402146066b.0
-        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 12:48:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734122937; x=1734727737; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=s6nyhrK1PwEvljraydkFoHfOJI8D15rx54zdqll0bjs=;
-        b=hninDEb6k84e5ulqIbCC4tCJnevddYt6ma1h9+dRj4wydmooV79uisRL28xpnTkBrM
-         /KLow9LCN3eSpK1rWcPg6KS9R4UwzKltSVDyEo9lE0/urafPJi1FyjJstmTgBO+B1TkO
-         IFGzMgQVsOpFSTf3ZdTtvnfXsPLIIGU5jIv2qP3MYUFKIgjEJSagDe8kKLaO0XAT8yZy
-         4il5nnJpVQjQTOoUWfz+OBn9X6DpoAU1uf4nIo0bghlE6pxV3nMC+aCWdVWsMvv3rPDq
-         U+sZsgUfmCsVk3Y/fFDJM4UkQOJmViT4K1Zvxp769DHtv/6HJ2eqf48w4eCE08R/24Jh
-         DS8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734122937; x=1734727737;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s6nyhrK1PwEvljraydkFoHfOJI8D15rx54zdqll0bjs=;
-        b=ZXyFXEIQ2ZbrSpWYwJfTG59xKYuUXL8lEmEpSTwpJLIpwGRMqturlKQSYrjxy5L4pQ
-         QxNnFczxV8PETGVWwyhpgEYnYICJFUXoOLcJeexmuDi4AUKoxUYKyr8VEkDaK8ENSYhH
-         v0ImUF2QkJyS4010ms6T/DjLEl7hNDWK35IlFWrSt4B0TVguSYGm4OpbqrovcmAAiqik
-         F1XK2g+J43CHa9cpifWq63NIx6acp8G8HaCY3V9myINutQQSOfwlPLA9FmEdFcC6lOKS
-         7fIySiS1MxbcfsIP/0PZTqnPPNxDpfycko16cYQ05KNAAef3Co4rhzMcHKu8Dv4OXAr5
-         Vokg==
-X-Gm-Message-State: AOJu0YwPMISalOsoGprVO6xwzMzcNaY+ttF98Cw80RCJc1eFkdSqEUsT
-	S5bSiM+ERrMmHhxQ9SlvVIgboVYvOQlkJ+47mrQ6f3ENsu9guO9Z78Kk5w==
-X-Gm-Gg: ASbGncsWpHUkCsjaXXwO1V/0tX8BAQBSX2kAAg8aYQ5f6L+st3fHTmcFtgf1j2Xuqop
-	hl+uSPjUOyWS2R0EGSK87x4wutUZgt9rXFfzzHxQ0yNQwRBbhrFLWfyFTFU+tdjO+kj1antHsRz
-	hI/a1lMqtlRS6aumPIdi/QCfXsAKV5zRM0argroWCoPeiHhavZdVkJBkgEpqOvPUfygKOwT3Cdo
-	D8s34yhTVOBDVr8M0fkLz7Mq0BwuP6+sh+kUT2IT1WysuQig8cUq2Y8nFBIb/O+jBqTOn0wog5U
-	MX8osbIVe1LFIzD3D+C3beCH3ND51r+tkRDV5ENMhEIvvQ6ToJz5Arn1UyaO8XAyW6c1BIblAIE
-	i6bq46KILpb9/SN6kLbqwIl9nHQNiCMagk/pk0fNs/WgcXg==
-X-Google-Smtp-Source: AGHT+IFoOJME/VAMzvGMmQNw33+W4Tud96xNonAHwtivAswTeHpu+scESh9H78xq59SiTXiMDiuR6A==
-X-Received: by 2002:a17:907:7211:b0:aa6:8ce6:1928 with SMTP id a640c23a62f3a-aab77e7b934mr409147466b.48.1734116386000;
-        Fri, 13 Dec 2024 10:59:46 -0800 (PST)
-Received: from ?IPV6:2a02:3100:adc3:fd00:9eb:6163:d514:e25d? (dynamic-2a02-3100-adc3-fd00-09eb-6163-d514-e25d.310.pool.telefonica.de. [2a02:3100:adc3:fd00:9eb:6163:d514:e25d])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aab96087424sm4036966b.83.2024.12.13.10.59.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Dec 2024 10:59:44 -0800 (PST)
-Message-ID: <15c4a9fd-a653-4b09-825d-751964832a7a@gmail.com>
-Date: Fri, 13 Dec 2024 19:59:43 +0100
+	s=arc-20240116; t=1734116430; c=relaxed/simple;
+	bh=4cQrfh6BfHc3IlT0NVwr6zi0Zv3UEuEKb0NBjH4L2/o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GBJU6T4EZvXYpgzUl2xXd4kcifa19KJ71XN5xvZ8Wj55wRT9jAVU2tVsAx3iD21T2hq/EzNAnUiWit9RHqfRYhzjIuULundpBeptUsqN+SJJiSVElX0EwcODsCL8v2F3MUNxY3u/3DCMqnkbRvRXPr8v1lMMBviw+XKuPS7LwNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aTdyCVo0; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=Q2Hh7i1IvMPkDPyJ+H+GPqol4Inldj3eRd/RH+IyPWA=; b=aTdyCVo0A04ii9Be59koxPyCGw
+	E2Tc3gu9An0oYSw9mHUF4BGt68XuQnuY7+qEv5mkl8S/1Mb8OjHTdPRLU0Y8nSm9EmCuNg7Z3wqqy
+	Gg5gNAXSG5wpcILgrKOSICOswOFwoAOw2xu5W3peK6/AB0NW9WDuFXCZ7pkBtkOFbvrxQ/H/Wso/7
+	vup/1RzSjj5IdPAXwNmGeAuD9eAGVay0ADicmlvi1bgfEe78EBpB3K0vpdptd3ZJgBtpkK/k30Da6
+	mWavV6+5CbolAjztRsfwtkpu703L7ZYCER9Q3dAaS2BVWWPNc2kEPctCfSAxVGrJ7DNTtle0nUDG7
+	bbwW1yNA==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tMAtg-0000000F6TE-2gCj;
+	Fri, 13 Dec 2024 19:00:20 +0000
+Date: Fri, 13 Dec 2024 19:00:20 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Michal Hocko <mhocko@suse.com>
+Cc: lsf-pc@lists.linuxfoundation.org, linux-scsi@vger.kernel.org,
+	linux-ide@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: LSF/MM/BPF: 2025: Call for Proposals
+Message-ID: <Z1yERChJxMKlZ5nZ@casper.infradead.org>
+References: <Z1wQcKKw14iei0Va@tiehlicka>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next 0/2] r8169: add support for RTL8125D rev.b
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Chun-Hao Lin <hau@realtek.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z1wQcKKw14iei0Va@tiehlicka>
 
-Add support for RTL8125D rev.b. Its XID is 0x689. It is basically
-based on the one with XID 0x688, but with different firmware file.
-To avoid a mess with the version numbering, adjust it first.
+On Fri, Dec 13, 2024 at 11:46:08AM +0100, Michal Hocko wrote:
+> The annual Linux Storage, Filesystem, Memory Management, and BPF
+> (LSF/MM/BPF) Summit for 2025 will be held March 24–26, 2025
+> at the Delta hotel Montreal
 
-ChunHao Lin (1):
-  r8169: add support for RTL8125D rev.b
-
-Heiner Kallweit (1):
-  r8169: adjust version numbering for RTL8126
-
- drivers/net/ethernet/realtek/r8169.h          |  3 +-
- drivers/net/ethernet/realtek/r8169_main.c     | 68 ++++++++++---------
- .../net/ethernet/realtek/r8169_phy_config.c   |  5 +-
- 3 files changed, 42 insertions(+), 34 deletions(-)
-
--- 
-2.47.1
+I've written an opinionated guide to Montreal.
+Patches accepted, latest version can be found at
+https://www.infradead.org/~willy/linux/lsfmm2025.txt
 
 
+Montreal
+========
 
+Montreal is the second-largest French-speaking city in the world.
+Despite that, you can generally manage without speaking any French;
+they are accustomed to tourists.
+
+Transport
+=========
+
+Montreal primarily uses the metro; it is an entirely underground system.
+Entrances are indicated with a blue downward pointing arrow.  The Delta
+hotel is between McGill and Place-des-Arts metro stops on the green line.
+Train announcements are only in French but signage is bilingual.
+
+Tickets for the STM (https://www.stm.info/en) are valid on both busses
+& metro (but not local rail which is a different system that you won't
+need to care about anyway).  Travel to and from the airport is a special
+$11 fare which includes 24 hours of travel.  You can use a credit card
+to buy fares from a big orange machine; while you can pay on the bus,
+everybody will look askance at you for slowing them down.  You'll get
+a credit-card sized piece of card with an embedded antenna; you can
+break it by folding it, and it is not recyclable.  While you could buy
+a plastic OPUS card, this will not be a wise investment decision.
+
+From the airport, you'll want to take the 747 bus to Lionel-Groulx, go
+down into the Metro and catch a green line train towards Honore-Beaugrand,
+getting off at McGill.  For getting back to the airport, you will again
+need to buy an $11 ticket for the 747 bus.  If you're travelling, say,
+Thursday evening, you might want to buy your special $11 ticket on
+Thursday morning, use it to travel around the city and eventually catch
+the 747 in time to catch your plane.
+
+I would not recommend driving in Montreal.  It is confusing and expensive.
+I'm going to take the train from Ottawa, but taking the train from New
+York is a 11+ hour ride.  I'm told it's very pretty!  There are also
+coaches (Flixbus / Greyhound / etc) but I have no experience with those.
+
+You can rent a bicycle by the minute: https://bixi.com/en/
+Scooters are probably not available to rent during winter.
+
+Beer
+====
+
+The closest brewer to the conference is Benelux.  They don't open until
+mid-afternoon, but the Provigo grocery store across the street sells
+their beer if they're not open.  It's not generally legal to drink on
+the street; take the beer back to the hotel before opening it.
+
+Other worthwhile breweries include Dieu de Ciel, 4 Origines, Saint Bock,
+Brewsky and McAuslan (aka St Ambroise).  Don't be afraid to use the
+metro to visit them.  There are many pubs on Crescent and de la Montagne
+streets; most will serve local beer.  Cans of beer are readily available
+at corner shops (referred to as "dep", short for Depanneur).
+
+Molson is headquartered in Montreal.  It is not usually considered
+local beer.
+
+Food
+====
+
+Montreal prides itself on food.  Classic dishes include poutine, smoked
+meat and tourtiere.  As a major city, there is plenty of international
+food.  Montreal and New York have different styles of bagels from each
+other and much ink has been spilled on the subject of which is superior;
+try St Viateur or Fairmont for a fair example of Montreal bagels.
+
+There is also fierce competition as to whether Quebec, Ontario or
+Vermont produces the best maple syrup.  You should probably find a
+Cabane a Sucre / Sugar Shack to form an opinion of your own, eg
+https://www.parcjeandrapeau.com/en/urban-sugar-shack-spring-restaurant-sainte-helene-bistro-terrace-montreal/
+
+Outside
+=======
+
+We're going to be there in March.  It could be -30C or +20C.  Montreal
+has an underground city (RESO) which has shops and restaurants, as
+well as being a sheltered route between office towers and the metro.
+There's an entrance at Union street, just two blocks from the hotel.
+https://www.mtl.org/en/experience/guide-underground-city-shopping
+(yes, that is a chunk of the Berlin wall in the picture)
+
+If the weather is clement, Mont Royal is a popular destination, but it
+can be icy and not much fun at this time of year.  The Lachine canal may
+be a better bet, or you can walk or cycle on the Formula 1 circuit on
+Ile Notre Dame.  It's not the Nurburgring; while you can drive on it,
+the speed limit is 30kph.  A more unusual route would be the Samuel
+De Champlain bridge Multiuse Path which is some of the best tarmac in
+the city (but ends on an unsurfaced path that connects to the Formula
+1 circuit).
+
+The local sport is hockey.  The Habs are not having a good year, so you
+may be able to buy tickets to a game.  The Colorado Avalanche are in town
+on Saturday 22nd; otherwise you should be able to watch a game in a pub.
+Women's hockey is gaining in popularity, and the Montreal Victoire are
+playing Toronto at Place Bell at noon on Sunday 23rd.
+
+St Catherine, St Laurent & St Denis are the major shopping streets.
+There are markets at Atwater and Jean Talon.  The Vieux Port area
+is full of tourist tat (but maybe you want a sweatshirt with Montreal
+written on it).
+
+The Biodome and Biosphere are both worth a visit.  There's also a
+planetarium, the Musee des Beaux Arts and the botanic gardens.  I like
+the Archaeology museum.
 
