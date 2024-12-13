@@ -1,224 +1,129 @@
-Return-Path: <netdev+bounces-151807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27C209F0F85
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 15:50:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE1A69F1061
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 16:09:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DCD518820B1
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 14:50:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E1791656DC
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 15:07:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D9E1E231D;
-	Fri, 13 Dec 2024 14:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18FCE1E2828;
+	Fri, 13 Dec 2024 15:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O6VvuRo0"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EkjO5/iw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329931E105B;
-	Fri, 13 Dec 2024 14:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773EA1E25EB;
+	Fri, 13 Dec 2024 15:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734101416; cv=none; b=WV5F/wB6YBmfLvFT+pd0nxZWjwYJ6HUfzcwWIe2ryRn5P0skfs1Yin4ulKG6RxiMzws0W8npsVy382EQ6D7Rb2e2zQOhIzObcjlhoCJmJAdgdS7Cai6pspip8tWYufrov/A0xHUWT/8tq8u5kQBLuSYsA1s48COG5t1PJYk+dX0=
+	t=1734102458; cv=none; b=Dt3+10SkzQOO45UnR5A6bTJut1u7kHEOmeWw9jdtqXRMfOPyM4yVDt9UBHEn7T82k5Ao3spqmGYsjO5e2hgknkT9lpAzQ9R7q391svYcvjzamZUL3F7u+6yIbwLbfgUgUoLmtdIlGM79Sd7cyQpFbg3TGTJCsiPsXTlkP229HCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734101416; c=relaxed/simple;
-	bh=xw2qwDPU03pE3skGrfstCy9lqdnfMzXHLdzFcKKwqsU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PWMr3WMAfzwZbhbt4upzXIXmjgJOA2ll7uxGpxeU6c5ilFul/OxR+eAH93P5t8JaNiuunSELFobcRJfyCCcoVnunQ1juT3pH1w08uFBsNfjpmueMFKc45cdfzsPohZkuah4q8tEaL6Wo0dS4iZ3J05yKo+y8ccl1DQN/biQVPWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O6VvuRo0; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3a8c7b02d68so14648205ab.3;
-        Fri, 13 Dec 2024 06:50:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734101414; x=1734706214; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5HO1hiKxaNhQPtZZ3RLZDJ5A2jzz1tPrRbupJAy1aZ8=;
-        b=O6VvuRo0SkmvwhpPZVxV4+ZwrbVpR+IsNPSVPdQy7qb5gvw5IbnavncrjEynrwL3s+
-         FsOHoZnL/aZcRN0ttTNqqw9O30x+EZwEOGmoUOclPdoiiq55Xf0oIFXw97r3aGXJotvV
-         JQ9lpOCWx1iEhYTCezRK+aU7S6a0PHSjBcsQxC67+uXcEzLcY5tN/vYYxk8hjl/kah4t
-         l4jQEn4wK+S16cXILbubKisMNQ8RslW9CSZl0F388p72SzAH8q93bD0slnDhR6McINi5
-         WBf9eLgTxJTTqIaE94ZPiJV6Wmn7DEmukns2/n6pHo5Rd/KuR+l9xqbC9I3E6YD2ZhR5
-         M5ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734101414; x=1734706214;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5HO1hiKxaNhQPtZZ3RLZDJ5A2jzz1tPrRbupJAy1aZ8=;
-        b=BPUFBEzkpWyeI1sPayRk0Gvr7NTf1dxR3qrSMM6b7XW3Iws036KkZf3NOK32q039iV
-         AJJ+luFvH3vVxkpyFmwlsQ8S+yIxXFD/GfvjqSlpvx20h1B9pNltZp2sCLpJl5n5qOfs
-         wJs1BDDUrkF25viXd+LI/qFK3BU5bojCYKApco033g2KI6hp1Sll98tpXMXXCJtHQcdj
-         jB1h780hoT2hNZaHweJ4LuTDrKWHFp5jz3byLj8ou6F+I0mmW5+KuFTgI3FDonNewiYo
-         52E+Xghn5ZYgFL5uJqeYH0msXXY+dCdFE2fWEG9LL9MqsmY8NMU3ExzN4w3k//wZN38u
-         LmmA==
-X-Forwarded-Encrypted: i=1; AJvYcCWLjbnVXzSTdaiXj2jzy6rBcVNa6n2sGfv/EzprKlMNxHkjDGH3+gVXOr9EmYjd7yVUanEeJoK9@vger.kernel.org, AJvYcCXHhHj3qrgtDxTrCKHiUmHuGm0f3Zlw9jrJpdA6ECAHEtuXAxd8L7bnLahyoAxKsTppqrk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrtRQXpo/u4ooLSpPwly/6AT65w2HMVykAlHf/PNmgknCWsFYo
-	QkClYNWM8LV1/i/A6MuV49YfnK2IPCMO7DnP5MKg1tM0dUxbYlh67VGodMTOpT9enCbb/QuOZPR
-	l0pBtMFZENFkLYaTB6grCd/ZLDeQ=
-X-Gm-Gg: ASbGncuLmDKHoQRSHjEHa7hzqFhGgjuZeAD8rrmVXlbgQbVThO6sXM8P38xJ+NUFc9z
-	8vfzq/57VdvOgz0pVdmvoa85QMWLHO6eZ8NtgPA==
-X-Google-Smtp-Source: AGHT+IFk6yxPexolgRkFLo5lTRr6FRWpSXk0gg6CH38CoabrQNKOrdodzyIrl9HZGICy7/aqXtukGvHwyMTOCEfpSaI=
-X-Received: by 2002:a05:6e02:1fc6:b0:3a7:6e34:9219 with SMTP id
- e9e14a558f8ab-3aff630e9bdmr28797235ab.14.1734101414148; Fri, 13 Dec 2024
- 06:50:14 -0800 (PST)
+	s=arc-20240116; t=1734102458; c=relaxed/simple;
+	bh=3QTAY3tHRim+xpPMr64cLamv+dItOKpaRcDuO8Bv/Yo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jA3LABr3UIXYh++WInNZBtDW3iHLzKuyZPMz4hgDHbf25vFFg/V5b/gLFMq+XM0RhlL8YxDmnKKSBNm/6lvR8O1Wh01JvaktW4hzCxpfJbeTG8eb/8TdlLOdcBkJY4vJmqiEIr7tblKrxqnSumpLiH7geKigIVOSlDJ71dWFS5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EkjO5/iw; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0F1FA40007;
+	Fri, 13 Dec 2024 15:07:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1734102447;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=cu/2fTCydb7q5G79TX/BssWpRTXcIiIiUTZtaHt1tHc=;
+	b=EkjO5/iwoE91KBRR+NpjoTTCB7e4d3WoqdBMymCs0LWQP5qQbUvumOvj4JHaL6yR1Y270U
+	G4f2fkhRoEqTaTiHgdLFn2Ogmp6nOcJnlSZ7NgN8CGZZ+5k5AcfzTMt8jpQkY6q2UAcXR2
+	2bgzusorJMMH7691OjgTahJjwdzUZ/QJb/5kIcvmbITAki5Rwj7bG8QTGkMSlZvxzHYAfT
+	V/eMC7Ax44/KF1v5i+rFp3c0DapNpVM8n4O74mbLtWAoB2fV53mb5eagZyeMnXN++unFBI
+	jVsHBos0cmHq4MGtPC1C4Tk/Fc1Qgcwdh1ztgxOwUQWUz1O9tJv+8Np/Pe/nIQ==
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Subject: [PATCH bpf-next v2 0/2] selftests: bpf: Migrate test_xdp_meta.sh
+ to test_progs
+Date: Fri, 13 Dec 2024 16:06:19 +0100
+Message-Id: <20241213-xdp_meta-v2-0-634582725b90@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
- <20241207173803.90744-7-kerneljasonxing@gmail.com> <6ccdc72c-f21c-4b02-aba3-b70363e58982@linux.dev>
-In-Reply-To: <6ccdc72c-f21c-4b02-aba3-b70363e58982@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 13 Dec 2024 22:49:38 +0800
-Message-ID: <CAL+tcoD+hf+o8SFpnxLRQPKiuqopbHMbU5taap=Va+0hMjJP5A@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 06/11] net-timestamp: support SCM_TSTAMP_ACK
- for bpf extension
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGtNXGcC/0WNQQqDMBBFryKzbsok1tS66j2KFI1jHaiJJEEsk
+ rs3SKHLx/u8v0MgzxSgKXbwtHJgZzOoUwFm6uyLBA+ZQaG6SIWl2IblOVPsRK3rEq9mQMIS8nz
+ xNPJ2pB7QL6OwtEVos5k4ROc/x8cqD//L6X9ulQJFZWSFWtajptu9dy6+2Z6Nm6FNKX0Bn1HZc
+ KwAAAA=
+X-Change-ID: 20241203-xdp_meta-868307cd0e03
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: Alexis Lothore <alexis.lothore@bootlin.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Bastien Curutchet <bastien.curutchet@bootlin.com>
+X-Mailer: b4 0.14.2
+X-GND-Sasl: bastien.curutchet@bootlin.com
 
-On Fri, Dec 13, 2024 at 6:36=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 12/7/24 9:37 AM, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Handle the ACK timestamp case. Actually testing SKBTX_BPF flag
-> > can work, but we need to Introduce a new txstamp_ack_bpf to avoid
-> > cache line misses in tcp_ack_tstamp().
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >   include/net/tcp.h              | 3 ++-
-> >   include/uapi/linux/bpf.h       | 5 +++++
-> >   net/core/skbuff.c              | 9 ++++++---
-> >   net/ipv4/tcp_input.c           | 3 ++-
-> >   net/ipv4/tcp_output.c          | 5 +++++
-> >   tools/include/uapi/linux/bpf.h | 5 +++++
-> >   6 files changed, 25 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/include/net/tcp.h b/include/net/tcp.h
-> > index e9b37b76e894..8e5103d3c6b9 100644
-> > --- a/include/net/tcp.h
-> > +++ b/include/net/tcp.h
-> > @@ -959,9 +959,10 @@ struct tcp_skb_cb {
-> >       __u8            sacked;         /* State flags for SACK.        *=
-/
-> >       __u8            ip_dsfield;     /* IPv4 tos or IPv6 dsfield     *=
-/
-> >       __u8            txstamp_ack:1,  /* Record TX timestamp for ack? *=
-/
-> > +                     txstamp_ack_bpf:1,      /* ack timestamp for bpf =
-use */
->
-> After quickly peeking at patch 8, I realize that the new txstamp_ack_bpf =
-bit is
-> not needed. SKBTX_BPF bit (in skb_shinfo(skb)->tx_flags) and the txstamp_=
-ack_bpf
-> are always set together. Then only use the SKBTX_BPF bit should be as goo=
-d.
+Hi all,
 
-Please see the comments below :)
+This patch series continues the work to migrate the script tests into
+prog_tests.
 
->
-> >                       eor:1,          /* Is skb MSG_EOR marked? */
-> >                       has_rxtstamp:1, /* SKB has a RX timestamp       *=
-/
-> > -                     unused:5;
-> > +                     unused:4;
-> >       __u32           ack_seq;        /* Sequence number ACK'd        *=
-/
-> >       union {
-> >               struct {
-> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> > index a6d761f07f67..a0aff1b4eb61 100644
-> > --- a/include/uapi/linux/bpf.h
-> > +++ b/include/uapi/linux/bpf.h
-> > @@ -7032,6 +7032,11 @@ enum {
-> >                                        * feature is on. It indicates th=
-e
-> >                                        * recorded timestamp.
-> >                                        */
-> > +     BPF_SOCK_OPS_TS_ACK_OPT_CB,     /* Called when all the skbs are
-> > +                                      * acknowledged when SO_TIMESTAMP=
-ING
-> > +                                      * feature is on. It indicates th=
-e
-> > +                                      * recorded timestamp.
-> > +                                      */
-> >   };
-> >
-> >   /* List of TCP states. There is a build check in net/ipv4/tcp.c to de=
-tect
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index 73b15d6277f7..48b0c71e9522 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -5553,6 +5553,9 @@ static void __skb_tstamp_tx_bpf(struct sock *sk, =
-struct sk_buff *skb, int tstype
-> >       case SCM_TSTAMP_SND:
-> >               op =3D BPF_SOCK_OPS_TS_SW_OPT_CB;
-> >               break;
-> > +     case SCM_TSTAMP_ACK:
-> > +             op =3D BPF_SOCK_OPS_TS_ACK_OPT_CB;
-> > +             break;
-> >       default:
-> >               return;
-> >       }
-> > @@ -5632,9 +5635,9 @@ static bool skb_tstamp_is_set(const struct sk_buf=
-f *skb, int tstype, bool bpf_mo
-> >                       return true;
-> >               return false;
-> >       case SCM_TSTAMP_ACK:
-> > -             if (TCP_SKB_CB(skb)->txstamp_ack)
-> > -                     return true;
-> > -             return false;
-> > +             flag =3D bpf_mode ? TCP_SKB_CB(skb)->txstamp_ack_bpf :
-> > +                               TCP_SKB_CB(skb)->txstamp_ack;
-> > +             return !!flag;
-> >       }
-> >
-> >       return false;
-> > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> > index 5bdf13ac26ef..82bb26f5b214 100644
-> > --- a/net/ipv4/tcp_input.c
-> > +++ b/net/ipv4/tcp_input.c
-> > @@ -3321,7 +3321,8 @@ static void tcp_ack_tstamp(struct sock *sk, struc=
-t sk_buff *skb,
-> >       const struct skb_shared_info *shinfo;
-> >
-> >       /* Avoid cache line misses to get skb_shinfo() and shinfo->tx_fla=
-gs */
+test_xdp_meta.sh uses the BPF programs defined in progs/test_xdp_meta.c
+to do a simple XDP/TC functional test that checks the metadata
+allocation performed by the bpf_xdp_adjust_meta() helper.
 
-Please take a look at the above comment.
+This is already partly covered by two tests under prog_tests/:
+- xdp_context_test_run.c uses bpf_prog_test_run_opts() to verify the
+validity of the xdp_md context after a call to bpf_xdp_adjust_meta()
+- xdp_metadata.c ensures that these meta-data can be exchanged through
+an AF_XDP socket.
 
-> > -     if (likely(!TCP_SKB_CB(skb)->txstamp_ack))
-> > +     if (likely(!TCP_SKB_CB(skb)->txstamp_ack &&
-> > +                !TCP_SKB_CB(skb)->txstamp_ack_bpf))
->
-> Change the test here to:
->         if (likely(!TCP_SKB_CB(skb)->txstamp_ack &&
->                    !(skb_shinfo(skb)->tx_flags & SKBTX_BPF)))
->
-> Does it make sense?
+However test_xdp_meta.sh also verifies that the meta-data initialized
+in the struct xdp_md is forwarded to the struct __sk_buff used by BPF
+programs at 'TC level'. To cover this, I add a test case in
+xdp_context_test_run.c that uses the same BPF programs from
+progs/test_xdp_meta.c.
 
-It surely works. Talking about the result only, introducing SKBTX_BPF
-can work for all the cases. However, in the ACK case, the above code
-snippet will access the shinfo->tx_flags, which triggers cache line
-misses. I also mentioned this on purpose in the patch [06/11].
+---
+Changes in v2:
+- Add missing close_netns()
+- Use a unique 'close' label
+- Link to v1: https://lore.kernel.org/r/20241206-xdp_meta-v1-0-5c150618f6e9@bootlin.com
+
+---
+Bastien Curutchet (2):
+      selftests/bpf: test_xdp_meta: Rename BPF sections
+      selftests/bpf: Migrate test_xdp_meta.sh into xdp_context_test_run.c
+
+ tools/testing/selftests/bpf/Makefile               |  1 -
+ .../bpf/prog_tests/xdp_context_test_run.c          | 87 ++++++++++++++++++++++
+ tools/testing/selftests/bpf/progs/test_xdp_meta.c  |  4 +-
+ tools/testing/selftests/bpf/test_xdp_meta.sh       | 58 ---------------
+ 4 files changed, 89 insertions(+), 61 deletions(-)
+---
+base-commit: 0c30734c4f35c4784d3d3ca1bb89d9779045878c
+change-id: 20241203-xdp_meta-868307cd0e03
+
+Best regards,
+-- 
+Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
+
 
