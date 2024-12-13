@@ -1,141 +1,258 @@
-Return-Path: <netdev+bounces-151877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26F369F16DC
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:57:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39E7E9F1725
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 21:09:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CFC616128C
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 19:57:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E028C188C3DF
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:08:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A8C1EE03D;
-	Fri, 13 Dec 2024 19:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 107621F12E0;
+	Fri, 13 Dec 2024 20:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z0IEwRBB"
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="Aw4oxx8n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB961EE00E;
-	Fri, 13 Dec 2024 19:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39499190471
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 20:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734119687; cv=none; b=WNxJYVq9vQtyfv24LzExo/aCE4oibfuz8t513+lDJw0nYiUlls8vJhHZOAe+5X5WYxyZK81/SO2SlwLfq4ffIHw+OwwMDxJ4JbOP16cDZF36Gf9rmtF69h2V6fv1Xzu07fbI7dSEnP/5+ik01NfBFQVvd58Q7ezm87cXwIJ7hMg=
+	t=1734120087; cv=none; b=BMukXCH5tLAPF0vevhSTMakzB4CxhMlYSwVuRl0cLusJuqhw2GLUsAg5KqUOB29Yk7fu5aar9gVgO71lt8Uhe73LwUsOj0Y6MkKC8Y2ve2bZs+3wChRBLM2SOVXrAMc1B2GLIRbTmvzmP9XqCYCJX4krVyqqhwGse1Lyrtdl7J8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734119687; c=relaxed/simple;
-	bh=7oL25jhFXzdbLw5+wM5A5ckyzaIWred6kZBGWuVszro=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=HeZIcZWCAJNNloMJfFX8nldjRiH6CVVphZ4pCmIkSIfIqWBzuEQVwbd6Vwaq2dUE7Xgyf24YuSY7vQC80MfB/csLOIVRYJopC/abQeIb9CM5sJ/LoO0YcIw6tn89KzDY7e7i09Wc9xGtEw3hta2+u0dYzD1DJUFTEJZTrhu75sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z0IEwRBB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9FBEC4CED0;
-	Fri, 13 Dec 2024 19:54:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734119686;
-	bh=7oL25jhFXzdbLw5+wM5A5ckyzaIWred6kZBGWuVszro=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Z0IEwRBBq1aJbH5BQBb7wG2L5dnWK2rseQ7exB3z3io7IzzkwiqsZT/hZlGY+qp0P
-	 BhDrg3Skmjg5ThxJKym0FIXHPxRy7N/QiagskD5v6/G9LJMfHa8tQ3yY6Ki36zTiNj
-	 e/PNvs1oe+cyI/bWv4HiUaNPxI7hACaSOyXymyp3P0mXE6k9LRBZJM4zJwh8yzXLyg
-	 3mINu447aa/4AYPPQ52mdm89MbkcE4aYCPpQ+eKqXYb337EaCN/UColTylUGLtbCzo
-	 DAOMjaBtdupnZ8KQL47S+hW6eIFq9G8dj9JeOcQ2lcMl5mnEN5IpM2UZeuT14FdN/K
-	 n8hOSJVWadBlA==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 13 Dec 2024 20:52:58 +0100
-Subject: [PATCH net-next 7/7] mptcp: drop useless "err = 0" in
- subflow_destroy
+	s=arc-20240116; t=1734120087; c=relaxed/simple;
+	bh=+IBdDuUpH0ffV3eW21HSRtsMzybmo8R7I3/oqhIog4o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DqWhYsdJCi9HW1vC1EWEiCs4efTce43sVQF77rCgC3gQNbG2CpH2wNybo39iwdzTitfeYlmAuGVvn5BxMt5bSQmzmrtvcRmhvqFOYel5gmNUr5lcmAvLHN6lqvTXviybDuplxIZ+2eet7xUynHE6bCYZYgedJfyg5XtI65MQBpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=Aw4oxx8n; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6ef7640e484so23889407b3.3
+        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 12:01:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sartura.hr; s=sartura; t=1734120084; x=1734724884; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WjFjYpSxXBJz9M1hdmG3iiPhNXo18zA2UB8YwR16DTw=;
+        b=Aw4oxx8nq9uHYAk75b2hNQ2JcHhr7tC+0dX8m9SZWRJDFJiu/sVJSvzM9XBXgYsnYS
+         bynk15+8A395Wh84G5ZpC4YGGfrkQ8xHpBJDMEyW4pvh7ya16WRTs5NBihS1LZp+MXdA
+         fdGX+h9rZL7wyDolyXRO6nqFyYzZJdh5lxbUKe9+3g9IqZVlwYdSOmCg5hVzekeHff8f
+         cd2d8tYPjB4jEbRPJV86IGQHA0YidWAptwpswJs1nuZbmXmmTZ1vPEpDw7vKMqKjZ8ZK
+         GILYUBC5+V+gSuchWSYUY+EMYhxiix7FXnt7pk2unihcDI8wHNYTiBdy1abjtd8OFvr2
+         HEmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734120084; x=1734724884;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WjFjYpSxXBJz9M1hdmG3iiPhNXo18zA2UB8YwR16DTw=;
+        b=oL5LsIZChxCGyvM1RxqXODk9KtGpb7WRaVr2TWdjTDiUepiMoW+jhAD2sN2UdrYz0L
+         ptnmZvW5gZnskzNeYLI9rSmV2FY0BWUUPFAoEapW3lluMllTMmdULPTBjfWBwZ8g2CAN
+         4CtAzcKWxxg8J5PLU2Q5oM9bUzg4s5iLounSm0wgLyh7hYFx/JqKty/zk6B8o40gBxTh
+         b5PV2EUjeo0lGaOVn0tpWw1GtogLTampeq4aRrK8+EdQVNcFm0hgpNNHyPJwvS4WSuhL
+         tyzJf8dBNp7zMZF4wKbdYK3EuqA2UwB56/uYToqFsw14+bhNwJbUqSBd5JtRNGcEHMgn
+         nI1w==
+X-Forwarded-Encrypted: i=1; AJvYcCW2qd+dsmYvCyefbFBhxZDBSP4NxES9qz9SlUt1G8UbHEFVnd1Wd4qNFaIzao67ZBPwBI4l8M8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzekHNS82bj5izZQxnzvnj+/T0r2jtPobQk8TN4hxUZwjCVmuOW
+	Ct64JkkGpW7aGEVmXOj6ikm0E+JgLelmdrgXX1s0ru6PYtPNnAhREykbT3Krd1jfXDW48jV/sU8
+	ErVAwpc+GRvO9ZloxHppxtDEN6v4pUJ1egaPqXoGkBDRoj4W+lKs=
+X-Gm-Gg: ASbGncun1JF8wnRDqvriwyqKQ4QlnTA0aa2Pq3nu2uz0Oix81SqquKP4vYb3k4L4Rb1
+	5B12E4HoQ4lSG4vQoSNFtljYKliQ/xxPY4Gmcsg==
+X-Google-Smtp-Source: AGHT+IEywBNIbwjppPoVSQ/XELBsV0fF8sTiDrKGwA9AnZLBRibm/aOssHinTtzowKOKfn5HmY+4fB4H6J+nE2ZGRjI=
+X-Received: by 2002:a17:90b:2242:b0:2ee:ba0c:1726 with SMTP id
+ 98e67ed59e1d1-2f2901b253dmr5268444a91.34.1734119680395; Fri, 13 Dec 2024
+ 11:54:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241213-net-next-mptcp-pm-misc-cleanup-v1-7-ddb6d00109a8@kernel.org>
-References: <20241213-net-next-mptcp-pm-misc-cleanup-v1-0-ddb6d00109a8@kernel.org>
-In-Reply-To: <20241213-net-next-mptcp-pm-misc-cleanup-v1-0-ddb6d00109a8@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Geliang Tang <geliang@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1935; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=rsC7IsSRZXPkUerMAAj+cBgM1aGHI4tEFgkPXwpi7nw=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnXJDxsnXB+CRb9Ph5EgoNY/WPHborbSYNMoaXt
- OMDtI2pUzGJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ1yQ8QAKCRD2t4JPQmmg
- c2y3D/90W3msnUl0x14ifXGyjR9XoFZOZpWoHdrYNpKncGXgAa/s7388ulrw2UXTYqq5C5k/lIX
- MFjPIS/CBle6OXe5nal9IfI2xiUjt9dbleIvlSgTvyebG6580b30E/qZBTZtunsD8uM21+wyBPZ
- q80V2c4AjikZ5edjeYmFbxYvGNLIdvWCXNa10l7NhIA8ss1J2TRTKwv8UEaiXG5vGg3iQtnVRHK
- hmk5/C+Yc3idfU6b9C1fnlR1oZxcHkdiiYcsZT23tmo8Vr+2etN4gUpo6YyLg+VuR+OH6CQqSw3
- SI8QdjaDIlmkSYhE4VlWGFoz1mi6jpPG24piKQPUGUvlg4SqZGFdZK+dUgQw7LqBDYMclU0F812
- 7urADlamsg8pTmSaWgh+hDRVaC4JhAANvZRLaNnVF8MSnGCCoPJr6tLzY4zMT5qmz864Ira0VLJ
- uKCTqSNEQKB99d/ro3EpLKcpNVNsTRgAgz0BfMT1HLvAoJXnhqSyBMlHxHyhPSqSvQUUinOXD13
- PZjJxhborHj+4ha/TMolrHIlP7q54lkUBO209Qm0NO2ESNWpUKbxAxgdt6eJww0qjV54QdC3uey
- G1ZPRuR00DXy6FegswOrBsRasBwXATsKXUn/APkQA3Y6KoRwnviC/C675T5HcZ8K1/TBFDnhHm1
- mebeauR6ocbMwkg==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+References: <20241213-sparx5-lan969x-switch-driver-4-v4-0-d1a72c9c4714@microchip.com>
+In-Reply-To: <20241213-sparx5-lan969x-switch-driver-4-v4-0-d1a72c9c4714@microchip.com>
+From: Robert Marko <robert.marko@sartura.hr>
+Date: Fri, 13 Dec 2024 20:54:29 +0100
+Message-ID: <CA+HBbNG0k24fO5OG42jw-7trWbT3iVTdo6Hh=55s1MaTh28p-A@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 0/9] net: lan969x: add RGMII support
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, Russell King <linux@armlinux.org.uk>, 
+	jacob.e.keller@intel.com, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, devicetree@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+On Fri, Dec 13, 2024 at 2:41=E2=80=AFPM Daniel Machon
+<daniel.machon@microchip.com> wrote:
+>
+> =3D=3D Description:
+>
+> This series is the fourth of a multi-part series, that prepares and adds
+> support for the new lan969x switch driver.
+>
+> The upstreaming efforts is split into multiple series (might change a
+> bit as we go along):
+>
+>         1) Prepare the Sparx5 driver for lan969x (merged)
+>
+>         2) Add support for lan969x (same basic features as Sparx5
+>            provides excl. FDMA and VCAP, merged).
+>
+>         3) Add lan969x VCAP functionality (merged).
+>
+>     --> 4) Add RGMII support.
+>
+>         5) Add FDMA support.
+>
+> =3D=3D RGMII support:
+>
+> The lan969x switch device includes two RGMII port interfaces (port 28
+> and 29) supporting data speeds of 1 Gbps, 100 Mbps and 10 Mbps.
+>
+> =3D=3D Patch breakdown:
+>
+> Patch #1 does some preparation work.
+>
+> Patch #2 adds new function: is_port_rgmii() to the match data ops.
+>
+> Patch #3 uses the is_port_rgmii() in a number of places.
+>
+> Patch #4 makes sure that we do not configure an RGMII device as a
+>          low-speed device, when doing a port config.
+>
+> Patch #5 makes sure we only return the PCS if the port mode requires
+>          it.
+>
+> Patch #6 adds checks for RGMII PHY modes in sparx5_verify_speeds().
+>
+> Patch #7 adds registers required to configure RGMII.
+>
+> Patch #8 adds RGMII implementation.
+>
+> Patch #9 documents RGMII delays in the dt-bindings.
+>
+> Details are in the commit description of the individual patches
+>
+> To: UNGLinuxDriver@microchip.com
+> To: Andrew Lunn <andrew+netdev@lunn.ch>
+> To: David S. Miller <davem@davemloft.net>
+> To: Eric Dumazet <edumazet@google.com>
+> To: Jakub Kicinski <kuba@kernel.org>
+> To: Paolo Abeni <pabeni@redhat.com>
+> To: Lars Povlsen <lars.povlsen@microchip.com>
+> To: Steen Hegelund <Steen.Hegelund@microchip.com>
+> To: Horatiu Vultur <horatiu.vultur@microchip.com>
+> To: Russell King <linux@armlinux.org.uk>
+> To: jacob.e.keller@intel.com
+> To: robh@kernel.org
+> To: krzk+dt@kernel.org
+> To: conor+dt@kernel.org
+> Cc: devicetree@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: robert.marko@sartura.hr
+>
+> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 
-Upon successful return, mptcp_pm_parse_addr() returns 0. There is no need
-to set "err = 0" after this. So after mptcp_nl_find_ssk() returns, just
-need to set "err = -ESRCH", then release and free msk socket if it returns
-NULL.
+Tested-by: Robert Marko <robert.marko@sartura.hr>
 
-Also, no need to define the variable "subflow" in subflow_destroy(), use
-mptcp_subflow_ctx(ssk) directly.
+> ---
+> Changes in v4:
+>
+> - Split patch #4 in v3 into two patches, where the new patch #5 handles
+>   PCS selection, by returning the PCS only for ports that require it.
+>
+> - Got rid of the '|' symbol for {rx,tx}-internal-delay-ps property
+>   description in the dt-bindings (patch #9).
+>
+> - Link to v3: https://lore.kernel.org/r/20241118-sparx5-lan969x-switch-dr=
+iver-4-v3-0-3cefee5e7e3a@microchip.com
+>
+> Changes in v3:
+>
+> v2 was kindly tested by Robert Marko. Not carrying the tag to v3 since
+> we have changes to the handling of the delays.
+>
+> - Modified lan969x_rgmii_delay_config() to not apply any MAC delay when
+>   the {rx,tx}-internal-delay-ps properties are missing or set to 0
+>   (patch #7).
+>
+> - Removed 'required' constraint from {rx-tx}-internal-delay-ps
+>   properties. Also added description and default value (Patch #8).
+>
+> - Link to v2: https://lore.kernel.org/r/20241113-sparx5-lan969x-switch-dr=
+iver-4-v2-0-0db98ac096d1@microchip.com
+>
+> Changes in v2:
+>
+>   Most changes are in patch #7. RGMII implementation has been moved to
+>   it's own file lan969x_rgmii.c.
+>
+>   Details:
+>
+>     - Use ETH_P_8021Q and ETH_P_8021AD instead of the Sparx5 provided
+>       equivalents (patch #7).
+>     - Configure MAC delays through "{rx,tx}-internal-delay-ps"
+>       properties (patch #7).
+>     - Add selectors for all the phase shifts that the hardware supports
+>       (instead of only 2.0 ns, patch #7).
+>     - Add selectors for all the port speeds (instead of only 1000 mbps.)
+>     - Document RGMII delays in dt-bindings.
+>
+>   - Link to v1: https://lore.kernel.org/r/20241106-sparx5-lan969x-switch-=
+driver-4-v1-0-f7f7316436bd@microchip.com
+>
+> ---
+> Daniel Machon (9):
+>       net: sparx5: do some preparation work
+>       net: sparx5: add function for RGMII port check
+>       net: sparx5: use is_port_rgmii() throughout
+>       net: sparx5: skip low-speed configuration when port is RGMII
+>       net: sparx5: only return PCS for modes that require it
+>       net: sparx5: verify RGMII speeds
+>       net: lan969x: add RGMII registers
+>       net: lan969x: add RGMII implementation
+>       dt-bindings: net: sparx5: document RGMII delays
+>
+>  .../bindings/net/microchip,sparx5-switch.yaml      |  18 ++
+>  drivers/net/ethernet/microchip/sparx5/Makefile     |   3 +-
+>  .../ethernet/microchip/sparx5/lan969x/lan969x.c    |   5 +
+>  .../ethernet/microchip/sparx5/lan969x/lan969x.h    |  10 +
+>  .../microchip/sparx5/lan969x/lan969x_rgmii.c       | 224 +++++++++++++++=
+++++++
+>  .../net/ethernet/microchip/sparx5/sparx5_main.c    |  29 ++-
+>  .../net/ethernet/microchip/sparx5/sparx5_main.h    |   3 +
+>  .../ethernet/microchip/sparx5/sparx5_main_regs.h   | 145 +++++++++++++
+>  .../net/ethernet/microchip/sparx5/sparx5_phylink.c |  14 +-
+>  .../net/ethernet/microchip/sparx5/sparx5_port.c    |  57 ++++--
+>  .../net/ethernet/microchip/sparx5/sparx5_port.h    |   5 +
+>  11 files changed, 484 insertions(+), 29 deletions(-)
+> ---
+> base-commit: 2c27c7663390d28bc71e97500eb68e0ce2a7223f
+> change-id: 20241104-sparx5-lan969x-switch-driver-4-d59b7820485a
+>
+> Best regards,
+> --
+> Daniel Machon <daniel.machon@microchip.com>
+>
 
-This patch doesn't change the behaviour of the code, just refactoring.
 
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/pm_userspace.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
-
-diff --git a/net/mptcp/pm_userspace.c b/net/mptcp/pm_userspace.c
-index 1d5b77e0a722de74f25c9731659b2c938122c025..740a10d669f859baec975556f1d7c4e90df62c4a 100644
---- a/net/mptcp/pm_userspace.c
-+++ b/net/mptcp/pm_userspace.c
-@@ -538,19 +538,18 @@ int mptcp_pm_nl_subflow_destroy_doit(struct sk_buff *skb, struct genl_info *info
- 
- 	lock_sock(sk);
- 	ssk = mptcp_nl_find_ssk(msk, &addr_l.addr, &addr_r);
--	if (ssk) {
--		struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(ssk);
--
--		spin_lock_bh(&msk->pm.lock);
--		mptcp_userspace_pm_delete_local_addr(msk, &addr_l);
--		spin_unlock_bh(&msk->pm.lock);
--		mptcp_subflow_shutdown(sk, ssk, RCV_SHUTDOWN | SEND_SHUTDOWN);
--		mptcp_close_ssk(sk, ssk, subflow);
--		MPTCP_INC_STATS(sock_net(sk), MPTCP_MIB_RMSUBFLOW);
--		err = 0;
--	} else {
-+	if (!ssk) {
- 		err = -ESRCH;
-+		goto release_sock;
- 	}
-+
-+	spin_lock_bh(&msk->pm.lock);
-+	mptcp_userspace_pm_delete_local_addr(msk, &addr_l);
-+	spin_unlock_bh(&msk->pm.lock);
-+	mptcp_subflow_shutdown(sk, ssk, RCV_SHUTDOWN | SEND_SHUTDOWN);
-+	mptcp_close_ssk(sk, ssk, mptcp_subflow_ctx(ssk));
-+	MPTCP_INC_STATS(sock_net(sk), MPTCP_MIB_RMSUBFLOW);
-+release_sock:
- 	release_sock(sk);
- 
- destroy_err:
-
--- 
-2.45.2
-
+--=20
+Robert Marko
+Staff Embedded Linux Engineer
+Sartura d.d.
+Lendavska ulica 16a
+10000 Zagreb, Croatia
+Email: robert.marko@sartura.hr
+Web: www.sartura.hr
 
