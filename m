@@ -1,152 +1,143 @@
-Return-Path: <netdev+bounces-151842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 791A69F1429
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 18:43:53 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC0369F1448
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 18:47:22 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39D2D28419A
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 17:43:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9421167F88
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 17:47:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEAC01E572A;
-	Fri, 13 Dec 2024 17:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76E2E157E9F;
+	Fri, 13 Dec 2024 17:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rroV4cgW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YPtBsdHl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058201E5705
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 17:43:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD19A80B
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 17:47:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734111828; cv=none; b=IR7fN+wnnIUYXiCbg2KRS9K2sluyW3iIY4HWHA266t3JmjmlSdFivpKZ9sUVIJe414wVMViy+fYpKTAYOKd24ZPwJ2o0djR54zPwdlwHv+x+3eRN1vN5/99q4BK1K/fZE8+uXL8LsE3fkCecafqfn8Faw1yjrTWLB4uvEA3v7+4=
+	t=1734112039; cv=none; b=WNBVDJW/SHkAG7hDYnlacV/590oOqaXU2YDuHJ0Gu51C8TjmLz5NQpQW2HJoLt2O0jHdZhAgiOUjp8NtbFonpI8DCoyfO0x1NUkkluzi7eSuf8ZYkgNs2ylzv+XDuouR+fB1r8Vx8Fk94+W6xM+cJZEXl9gbOmsvqyncWuh74+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734111828; c=relaxed/simple;
-	bh=/Y6ExPMSdtTNFFDetWL772H3JkfzBH5p/iYBW8zbvdE=;
+	s=arc-20240116; t=1734112039; c=relaxed/simple;
+	bh=wXzZI0ytxwVwzIBINluZ7b8Gru+8f5SBFBlNHB5NqpQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O3O/2CrINJqa6n/u+bKnD9IfULAvJ67VIcBvR/tuIlwzgjfjB74UV+TNOKpalW4gGy7otA6AM+qHC4OIIbiQumjnLtveNqb4U4Lf1aUCSPYJx2jZ+znMQvZZwq09ERJh4aXA2VAf4pEOrLCNpmOfA0vjsTGaumnwUydznk93M4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rroV4cgW; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6eeca49d8baso18094887b3.0
-        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 09:43:46 -0800 (PST)
+	 To:Cc:Content-Type; b=YyxsFDo142N3xj6tkR3B3vbs7e6HrcvsDd+Cqf/zUcak0Fgh5RQN3EDwGN8MNd/3miHy7S/5OV+H4NsKioEraLdu3r1GxoP6p+rTHphRn+GzS3ui4s5OXGHbZV5taSQftEuIblrX8iiDCg4yQDZYPAQH0PAykcBqq0tUqq3H1NQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YPtBsdHl; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-467896541e1so5511cf.0
+        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 09:47:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1734111826; x=1734716626; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=a8YKuxtRxjmT79uOPtT40ZwuY+Gm57+IISMu9btN/v8=;
-        b=rroV4cgWy+TyUGzh4/PCShgygTv04BADM834M8sEZmoiq9ZnD2jvK5kp8OYUXJz3Y4
-         YCWffeuH4W/3oe4CyfX/8CSD9vCYtwY9eWjzAlPCHP2Yg6BNhHcOhg6FmTthhOKkVrrz
-         QUv9fTRuVX+5QopwqMezv9w4XaXAPmlKl3qEoHpxqPZJNITA32SbGd47ICQhvcuoAD4d
-         gn5lrs63RvVvlLTuwcuYqB93df3z52iJOHBr+/5OcXGDodrmnVZhxjI3me4WbpIN1dqa
-         Bmf7pP18bqSHxNCXgQF0Bp1L7X/9ivi9UA6R4OrMrk0WRYMR5DjuzR2TRX8rPcuTTCDU
-         qTBg==
+        d=google.com; s=20230601; t=1734112037; x=1734716837; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wXzZI0ytxwVwzIBINluZ7b8Gru+8f5SBFBlNHB5NqpQ=;
+        b=YPtBsdHlbHaEXLc1QcTMZOOdcdjJAYxjqIkvqoYGuBxUUKr7bxCuZcdbBHmSV1BJV5
+         uFGhlEwpwRnovbbKZby/GGmTJe9fzb3WRHrdUBX7JVgJ6gk/4/LKYa5+9VGtmUwE2pyl
+         1xL7OL88Ay9eg4NZ1PNjX76XBxuZCkMZb6hTQSyotlxzFs7D1DDB1R5yB5cjPvpFJYvr
+         Fwf+gee2/ogM9Mj6senN5eiVKw18kRTHxj3xNDPj9U+mJR6UTZ9IK77wEtGhZg/TrApJ
+         82PGS+NK4I/nUGUwIh3/XJ0TvBvgpaDL/47M5YRaO4/Ths3eC095p5EZ799AxdTsV2Fv
+         YTFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734111826; x=1734716626;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a8YKuxtRxjmT79uOPtT40ZwuY+Gm57+IISMu9btN/v8=;
-        b=gWN2AM8q5m6p8mD0xmYmn4Kcbjaf7vYrK8k7Fq0n9EB2xMURfjqyDPGOUj/I3rkXSo
-         6+sMsL/Ozk+VzqUiqxQH9LejzyMLCTwBrE6SFynZVnTva7M56ewkryXcM8lSL3CPi26A
-         cA7Avr5lHp+EWzDin0beRvJDasGvuGZBBB+D8cT85bMNeBEN4OxrIWG0DprjSaqrlTNy
-         yY8PqeuWzBWF9ksi+hOaglEq8N5Wp25ojoUiacy8lfjP7UF1k6zMahPfiSpPCjLXOEBW
-         lcMjKJPKoygQrWy8RvNT5N7XhMj1TmEae5DOgNBCmGTkN4cxrwnqqAvMQNyFH6GSunN3
-         OC7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUiYBSrgMRDLceHZxKlK77dPQ/wh8VwefES8mlnhs+T7hXM1eKk9I8PmoRAJurYl5y4yC8a22g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9QYDsGiU+Pa2xaP0Bukgk18nGMW70mJ49dGwLn4YbUY/4Yvo6
-	x3kZuDdbrp88feEGxmd1Dyl+dnX80TJkG7n0VNF5zPtkOa/WspRxsGdFA6CgqiC+XJMHMqTDVKH
-	CFZOD4+SUQ/rSCGPtzin7xchS0/EWkxLzd3UmABNGIME/6H9WobE=
-X-Gm-Gg: ASbGncur/NYPSlaxRm53nb63nZNCbXa0Z26cIlHIl4NnD2GElpSVWerU1sT7tIsQoFT
-	kAomh9/VR0uNfP0+/01JXF6GhgLguSJu96yfuvA==
-X-Google-Smtp-Source: AGHT+IHbaQLKxW8jv06NHY5L5CZx11FwWYhSQ5kW5QXSr03iJ25TyiTxQjCbFy/xekILN9zlRCs+aOjMnMnK9oTU5yQ=
-X-Received: by 2002:a05:690c:6407:b0:6ee:8088:831d with SMTP id
- 00721157ae682-6f275c048f7mr54670927b3.3.1734111826063; Fri, 13 Dec 2024
- 09:43:46 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734112037; x=1734716837;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wXzZI0ytxwVwzIBINluZ7b8Gru+8f5SBFBlNHB5NqpQ=;
+        b=jkz8QqCEn4rW6o3cinQA0uH4CPbuG7pO1UuEDTOraWV+jw3UZEmYi55g42MlXDlWpt
+         WC6+tqjbxIRvnruTDLg/ObL9vU6rlafssD3PFJEqa9NW3uDw+TMAVePCOkkzE+PWM25h
+         +K08oHCUbAgBIHjaz1cyUr0sWdKI9emdha46dgN08bxXTVIB7Js3kmYo2HdN12P37WdL
+         zuF7FCDuzsXnv/yspgxPoHVOehJA3BWWNWjILbjpi6KRvE1mp6j04DA6ex/H3YK8CSIs
+         AFgxVygbtAZGlk6+Lnc0g6nMSrHwpZu1Y+7JW8Bvjb18Rpha9UDF+VNLqvYqL7hYrVa5
+         QMdw==
+X-Forwarded-Encrypted: i=1; AJvYcCWK8WfponpvqZu19J5qdfFqUGj19N6elg2/68eAXp0o+jqZdu1cQ+y2xdeQXOQjDE7PDGUtTbw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0hEQ23ZR4X2a7YVcxH/yIgwaujHCDzz9FndGcRiD6ILIzyr8S
+	Pr7w07RoeKxthUAt6x2sfH/SS6BpsIWYF1brp81UvX8NDRCxf77QC9HWzAVzW4J0j1u1YiCEoo/
+	9bwMevYkDuXjLt3f2PstMMyys3PRPkVikD2TI
+X-Gm-Gg: ASbGncviXap7jhj0kztN3C/dTZWCvRKrWdZQOgS0ku67eVapG+DJpVBERExbSu/iZBH
+	JGlEeR3njy9PmtlT8vPLYGwBUA0of2pZAKJU8/Q==
+X-Google-Smtp-Source: AGHT+IGS6+d2uRYYup3mVYQQsmrfUBS57cKOSQl/nu46hz99B2kTLXXHDIOiYXtqwLf3/LRiykknd6ZwprI5WjWzWn8=
+X-Received: by 2002:a05:622a:2299:b0:460:f093:f259 with SMTP id
+ d75a77b69052e-467a43136acmr4418311cf.22.1734112036558; Fri, 13 Dec 2024
+ 09:47:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241213153759.3086474-1-kuba@kernel.org>
-In-Reply-To: <20241213153759.3086474-1-kuba@kernel.org>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Fri, 13 Dec 2024 19:43:09 +0200
-Message-ID: <CAC_iWjLNzpu2RmGmr+q=Hbj5jeGQi_+Hm+K5n8_Sa0oXiOUrew@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: page_pool: rename page_pool_is_last_ref()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, hawk@kernel.org, aleksander.lobakin@intel.com, 
-	asml.silence@gmail.com, almasrymina@google.com
+References: <20240912171251.937743-1-sdf@fomichev.me> <ZuNFcP6UM4e5EdUX@mini-arch>
+ <CAHS8izM8e4OhOFjRm9cF2LuN=ePWPgd-EY09fZHSybgcOaH4MA@mail.gmail.com>
+ <ZuNgklyeerU5BjqG@mini-arch> <Z1uLgXIA8HApli8v@mini-arch>
+In-Reply-To: <Z1uLgXIA8HApli8v@mini-arch>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 13 Dec 2024 09:47:04 -0800
+Message-ID: <CAHS8izPAB2Vr0LoVfvz4SBpSdvmXv_CYSj7Z0ZX2Cngx1ooC9Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/13] selftests: ncdevmem: Add ncdevmem to ksft
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Taehee Yoo <ap420073@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 13 Dec 2024 at 17:38, Jakub Kicinski <kuba@kernel.org> wrote:
+On Thu, Dec 12, 2024 at 5:19=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
 >
-> page_pool_is_last_ref() releases a reference while the name,
-> to me at least, suggests it just checks if the refcount is 1.
-> The semantics of the function are the same as those of
-> atomic_dec_and_test() and refcount_dec_and_test(), so just
-> use the _and_test() suffix.
+> On 09/12, Stanislav Fomichev wrote:
+> > On 09/12, Mina Almasry wrote:
+> > > On Thu, Sep 12, 2024 at 12:48=E2=80=AFPM Stanislav Fomichev
+> > > <stfomichev@gmail.com> wrote:
+> > > >
+> > > > On 09/12, Stanislav Fomichev wrote:
+> > > > > The goal of the series is to simplify and make it possible to use
+> > > > > ncdevmem in an automated way from the ksft python wrapper.
+> > > > >
+> > > > > ncdevmem is slowly mutated into a state where it uses stdout
+> > > > > to print the payload and the python wrapper is added to
+> > > > > make sure the arrived payload matches the expected one.
+> > > >
+> > > > Mina, what's your plan/progress on the upstreamable TX side? I hope
+> > > > you're still gonna finish it up?
+> > > >
+> > >
+> > > I'm very open to someone pushing the TX side, but there is a bit of a
+> > > need here to get the TX side done sooner than later. In reality I
+> > > don't think anyone cares as much as me to push this ASAP so I
+> > > plan/hope to look into it. I have made some progress but a bit to be
+> > > worked through at the moment. I hope to have something ready as the
+> > > merge window reopens; very likely doable.
+> >
+> > Perfect!
 >
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> Hopefully this doesn't conflict with anyone's work, I've been
-> deferring sending this rename forever because I always look
-> at it while reviewing an in-flight series and then I'm worried
-> it will conflict.
+> Hey Mina,
 >
-> CC: hawk@kernel.org
-> CC: ilias.apalodimas@linaro.org
-> CC: aleksander.lobakin@intel.com
-> CC: asml.silence@gmail.com
-> CC: almasrymina@google.com
-> ---
->  include/net/page_pool/helpers.h | 4 ++--
->  net/core/page_pool.c            | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
+> Any updates on this? Any chance getting something out this merge window?
 >
-> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-> index 26caa2c20912..ef0e496bcd93 100644
-> --- a/include/net/page_pool/helpers.h
-> +++ b/include/net/page_pool/helpers.h
-> @@ -299,7 +299,7 @@ static inline void page_pool_ref_page(struct page *page)
->         page_pool_ref_netmem(page_to_netmem(page));
->  }
->
-> -static inline bool page_pool_is_last_ref(netmem_ref netmem)
-> +static inline bool page_pool_unref_and_test(netmem_ref netmem)
->  {
->         /* If page_pool_unref_page() returns 0, we were the last user */
->         return page_pool_unref_netmem(netmem, 1) == 0;
-> @@ -314,7 +314,7 @@ static inline void page_pool_put_netmem(struct page_pool *pool,
->          * allow registering MEM_TYPE_PAGE_POOL, but shield linker.
->          */
->  #ifdef CONFIG_PAGE_POOL
-> -       if (!page_pool_is_last_ref(netmem))
-> +       if (!page_pool_unref_and_test(netmem))
->                 return;
->
->         page_pool_put_unrefed_netmem(pool, netmem, dma_sync_size, allow_direct);
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 4c85b77cfdac..56efe3f8140b 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -867,7 +867,7 @@ void page_pool_put_netmem_bulk(struct page_pool *pool, netmem_ref *data,
->                 netmem_ref netmem = netmem_compound_head(data[i]);
->
->                 /* It is not the last user for the page frag case */
-> -               if (!page_pool_is_last_ref(netmem))
-> +               if (!page_pool_unref_and_test(netmem))
->                         continue;
->
->                 netmem = __page_pool_put_page(pool, netmem, -1, allow_direct);
-> --
-> 2.47.1
->
+> I was hoping you'd post something in the previous merge window (late Sep)=
+,
+> but if you're still busy with other things, should I post a v2 RFC? I hav=
+e
+> moved to the mode which you suggested where tx dmabuf is associated
+> with the socket; this lets me drop all tx ref counts (socket holds
+> dmabuf, skb holds socket until tx completion). I also moved to a
+> more performant offset->dma_addr resolution logic in tcp_sendmsg and
+> fixed a bunch of things on the test side...
 
-Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+My apologies for the delay. I have the TX path ready, but having
+trouble running the performance tests unrelated to the patch itself.
+I'm going to send the TX path after a round of internal reviews,
+likely by the end of next week.
+
+
+--=20
+Thanks,
+Mina
 
