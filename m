@@ -1,119 +1,114 @@
-Return-Path: <netdev+bounces-151901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDE4A9F1923
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 23:32:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5549A9F1919
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 23:28:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C3C0188E6F8
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 22:32:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 386F9161E9B
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 22:28:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A845018D65F;
-	Fri, 13 Dec 2024 22:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114CB19992B;
+	Fri, 13 Dec 2024 22:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="TtUhHujo"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sY6pK1H5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DF62114;
-	Fri, 13 Dec 2024 22:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A13318FDC8
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 22:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734129173; cv=none; b=qtuU9iQ0iggkdt+USvY34GjIiHmvd5uvScq2twSgWXs8VPEXbZCmDxeAXxeUVdfdAb/ukCuPZUKRSeny6qcfRAaRabfUNcNHPHrbLuDTcojvPuzZ8HBqlyIupmT+YyFmhbTfQkqUVIFGYTn+K2XRlhwDT74oztHd9DtY57OebZs=
+	t=1734128804; cv=none; b=YKB47UZWK3PoiIKG2B+2lVypIE8zNo7IbTwAX3juD5EVgNzxH5opBg/Z3xBFl96cTa3LGfoVtWzXsGzHoEmKaCN52efajfmIvuGxmz7ZR69/RGfabzjQHxyhSb9vSiFadJORwJd5nvW5k8cFhf1MWQdrLFb3SPohAI/LiXEaAco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734129173; c=relaxed/simple;
-	bh=vnmgKd4DpL+rwwN/tkLSZraFY2PgmaB34glLCaCeCWg=;
+	s=arc-20240116; t=1734128804; c=relaxed/simple;
+	bh=XX91Xi0yFJjRfC7Mk2DYxMUHNqgtt1Y0buHqAPALJbs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tET6nLahgjC4uAt7NBzy3O9kZyP733qKW+jKbatgucGgoStTgxt6Wjxx/Ngby/EqJOcTr/bHDhBMtidvIuuW2VqQO6kCpJYWTi3v5+nkmSniNi27XeraCrVFQWZ+7QipyF8qBGNS3q+ROnHKz435e6MkW+2pQCp1hle3zmYdWGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=TtUhHujo; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2BF71103B8FD5;
-	Fri, 13 Dec 2024 23:32:42 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1734129167;
+	 In-Reply-To:Content-Type; b=tX6uTCLb4r6f6fjHgvf1Rm6ICjuGVvzd50TRQXQH5b8J8wq7CJMi5lRNmYVqTpD64QKuJEJEQpHQGIMocZEk5LS2mv52EBCYE/Rc1feGI/CNQIk0krqXOiuxzqIyXJ4oU/n0oAGuFrHLR3HQNSxlcyj1tAOlN6PVEIdPbWDgQXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sY6pK1H5; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c1701350-236d-4a9e-9c53-4badc0738309@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734128799;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=G3lMENMefBk6pUR9W4xYAZB0rcngf/adMQ7Rd64R32A=;
-	b=TtUhHujoQYV7chB9SEaTrnGogUxwq5ffO+LBzAu0R980y8NtSb8AGVxW1K6Nii5SKgzXqp
-	D4wlV6E0Y3vRsVIGQmaE9VDzvj8NxFJqeDvjwrQJr88EnPeIRqz/5sgIA9HtGAbfz5T9i3
-	rR9O+tS5cdGYRSWhiKb3MtLf0vRp9xK6hOfImDmIBDiviWgBYHmpJ/Z+Scs94CCO3s7sjz
-	DOI2UUaZoAcru0Jcx+rVY28NPHjS9uRXPTDlJYIih00GwzdDfNWP7dmSoVYx4bacBlzusK
-	HBZkuG3tWujNwgrEEOuuwJkNGR8II1x6qCwBjpql5fW7o+t6OfekUWkYK/8VUQ==
-Message-ID: <72383917-4bbe-4b95-9e2f-4e364f5288bd@denx.de>
-Date: Fri, 13 Dec 2024 23:15:09 +0100
+	bh=MG6FDJJsoBDRM7h+Zj8HQ5/vOReax2EY7pVl0sF3C0Y=;
+	b=sY6pK1H5k4yNY68I/XoeOH/Iw8jNPCsidwJ65lQjB7iilAyvCMI9LSMZ74gDpeB4Ohv0or
+	2/F4jGRIvBogBTj3M78nIOfBtxdHKIt9I4bsYQ6c19Mjz3ggkQLPIhh3Ot9Mk20b1OJl84
+	I6RcAhwVX9A6KGr9E6oqvPtqqmDlYiI=
+Date: Fri, 13 Dec 2024 14:26:26 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] leds: trigger: netdev: Check offload ability on interface
- up
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: linux-leds@vger.kernel.org,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Christian Marangi <ansuelsmth@gmail.com>,
- Christophe Roullier <christophe.roullier@foss.st.com>,
- Daniel Golle <daniel@makrotopia.org>, Heiner Kallweit
- <hkallweit1@gmail.com>, Lee Jones <lee@kernel.org>,
- Lukasz Majewski <lukma@denx.de>, Pavel Machek <pavel@ucw.cz>,
- kernel@dh-electronics.com, linux-stm32@st-md-mailman.stormreply.com,
- netdev@vger.kernel.org
-References: <20241001024731.140069-1-marex@denx.de>
- <6f848ef7-c921-4694-9fd5-4a777d5271d0@lunn.ch>
+Subject: Re: [PATCH net-next v4 02/11] net-timestamp: prepare for bpf prog use
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
+ <20241207173803.90744-3-kerneljasonxing@gmail.com>
+ <f8e9ab4a-38b9-43a5-aaf4-15f95a3463d0@linux.dev>
+ <CAL+tcoDGq8Jih9vwsz=-O8byC1S0R1uojShMvUiTZKQvMDnfTQ@mail.gmail.com>
+ <996cbe46-e2cd-44b6-a53a-13fd6ebfc4c0@linux.dev>
+ <CAL+tcoAxmHj9_d5PUqvSHswavKFspd_D5tOt81fon-UtEf_OMA@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
 Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <6f848ef7-c921-4694-9fd5-4a777d5271d0@lunn.ch>
+In-Reply-To: <CAL+tcoAxmHj9_d5PUqvSHswavKFspd_D5tOt81fon-UtEf_OMA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-Migadu-Flow: FLOW_OUT
 
-On 10/3/24 2:06 PM, Andrew Lunn wrote:
-> On Tue, Oct 01, 2024 at 04:45:23AM +0200, Marek Vasut wrote:
->> The trigger_data->hw_control indicates whether the LED is controlled by HW
->> offload, i.e. the PHY. The trigger_data->hw_control = can_hw_control() is
->> currently called only from netdev_led_attr_store(), i.e. when writing any
->> sysfs attribute of the netdev trigger instance associated with a PHY LED.
+On 12/13/24 6:42 AM, Jason Xing wrote:
+>>>> I just noticed a trickier one, sockops bpf prog can write to sk->sk_txhash. The
+>>>> same should go for reading from sk. Also, sockops prog assumes a fullsock sk is
+>>>> a tcp_sock which also won't work for the udp case. A quick thought is to do
+>>>> something similar to is_fullsock. May be repurpose the is_fullsock somehow or a
+>>>> new u8 is needed. Take a look at SOCK_OPS_{GET,SET}_FIELD. It avoids
+>>>> writing/reading the sk when is_fullsock is false.
+
+May be this message buried in the earlier reply or some piece was not clear, so 
+worth to highlight here.
+
+Take a look at how is_fullsock is used in SOCK_OPS_{GET,SET}_FIELD. I think a 
+similar idea can be borrowed here.
+
+>>>
+>>> Do you mean that if we introduce a new field, then bpf prog can
+>>> read/write the socket?
 >>
->> The can_hw_control() calls validate_net_dev() which internally calls
->> led_cdev->hw_control_get_device(), which is phy_led_hw_control_get_device()
->> for PHY LEDs. The phy_led_hw_control_get_device() returns NULL if the PHY
->> is not attached.
+>> The same goes for writing the sk, e.g. writing the sk->sk_txhash. It needs the
+>> sk_lock held. Reading may be ok-ish. The bpf prog can read it anyway by
+>> bpf_probe_read...etc.
 >>
->> At least in case of DWMAC (STM32MP, iMX8M, ...), the PHY device is attached
->> only when the interface is brought up and is detached again when the
->> interface is brought down. In case e.g. udev rules configure the netdev
->> LED trigger sysfs attributes before the interface is brought up, then when
->> the interface is brought up, the LEDs are not blinking.
->>
->> This is because trigger_data->hw_control = can_hw_control() was called
->> when udev wrote the sysfs attribute files, before the interface was up,
->> so can_hw_control() resp. validate_net_dev() returned false, and the
->> trigger_data->hw_control = can_hw_control() was never called again to
->> update the trigger_data->hw_control content and let the offload take
->> over the LED blinking.
->>
->> Call data->hw_control = can_hw_control() from netdev_trig_notify() to
->> update the offload capability of the LED when the UP notification arrives.
->> This makes the LEDs blink after the interface is brought up.
->>
->> On STM32MP13xx with RTL8211F, it is enough to have the following udev rule
->> in place, boot the machine with cable plugged in, and the LEDs won't work
->> without this patch once the interface is brought up, even if they should:
->> "
->> ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:green:wan", ATTR{trigger}="netdev", ATTR{link_10}="1", ATTR{link_100}="1", ATTR{link_1000}="1", ATTR{device_name}="end0"
->> ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:yellow:wan", ATTR{trigger}="netdev", ATTR{rx}="1", ATTR{tx}="1", ATTR{device_name}="end0"
->> "
->>
->> Signed-off-by: Marek Vasut <marex@denx.de>
+>> When adding udp timestamp callback later, it needs to stop reading the tcp_sock
+>> through skops from the udp callback for sure. Do take a look at
+>> SOCK_OPS_GET_TCP_SOCK_FIELD. I think we need to ensure the udp timestamp
+>> callback won't break here before moving forward.
 > 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Is there anything blocking this patch from being picked up ?
+> Agreed. Removing the "sock_ops.sk = sk;" is simple, but I still want
+> the bpf prog to be able to read some fields from the socket under
+> those new callbacks.
+
+No need to remove "sock_ops.sk = sk;". Try to borrow the is_fullsock idea.
+
+Overall, the new timestamp callback breaks assumptions like, sk_lock is held and 
+is_fullsock must be a tcp_sock. This needs to be audited. In particular, please 
+check sock_ops_func_proto() for all accessible bpf helpers. Also check the 
+sock_ops_is_valid_access() and sock_ops_convert_ctx_access() for directly 
+accessible fields without the helpers. In particular, the BPF_WRITE (able) 
+fields and the tcp_sock fields.
 
