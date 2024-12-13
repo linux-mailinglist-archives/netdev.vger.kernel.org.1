@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-151820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 499819F10D7
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 16:23:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B42909F1123
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 16:38:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A7C82838A6
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 15:23:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B5DE28237B
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 15:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87F51E3DE7;
-	Fri, 13 Dec 2024 15:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59CB61E2611;
+	Fri, 13 Dec 2024 15:38:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pWffvQ0I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B4WaCxJv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE1F1E3DD6;
-	Fri, 13 Dec 2024 15:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3523C1DF988
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 15:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734103376; cv=none; b=G3YbBIC0mVP9E2EVwB+GbHX5W67VDE9exjNDQIKJHCeeLa7FmcNBkRaSJGBq7W15HqSxRy6w+60M1y9tfeWzaQVOtcdbCfK7LqUfAVLaD5fBe5u4Sj8YXwxryDaRQKlw2QmLjtQ9xWNKvhfWxyTT+j5yaukx8g1DQqb3p1KaEo0=
+	t=1734104294; cv=none; b=Iu8hL2VcetGMOIaGk8akKfO3WkuGhQgN3lt18URiJox3u1bhKKlhNlCntzB7RTU/k7o2M/5wWfEcpFH13HdfKAJaQmDY2bpU0MR9DeorfvY/TKNlM5I+C8xDsHFEW3mvZKvvn6G6cjCXPn4Oz7F/N7FE6R03MMm8mrJatTEW9PE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734103376; c=relaxed/simple;
-	bh=dTfzUm/+AiwIm2LTil+sjEdPMycULavutVM5qKOl4BI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IF0GcaSE7/EgHcah8U11cttzholSFrjbioqq2I0EmqlwWdlN/jQsErTQoimUtM27Bcv0QbgPkWJ79NzA0RtpKP7Vxxm2KjGsfeA33FBrgFOpCRwFbKbwVYniJJsAou5UYWDBs3JCBRmIffoGIq5CEANXkFAGvh3xHAyKP/hKjv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pWffvQ0I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0335C4CEDE;
-	Fri, 13 Dec 2024 15:22:55 +0000 (UTC)
+	s=arc-20240116; t=1734104294; c=relaxed/simple;
+	bh=AxHMPXFnWxgqcqQtqjkefSU0iKGlZw7Rp+fgdlUwm0c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T18RHmZfYAp2f8rBhH/J8B0o6Uh1LWx81QutoU5MyZtxMoPrratOYksLRQpXJwMuRnGl4MfQK8/XyNwUQrkZzfwZbFumkD8kTw2zOdgZbcRZ6UdW/TBdGpOnMe1XAwHSNh3d1rP7f2omJ8zeeIGwERruFKoEe3rgjzmmYw3Jkos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B4WaCxJv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48E40C4CED0;
+	Fri, 13 Dec 2024 15:38:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734103376;
-	bh=dTfzUm/+AiwIm2LTil+sjEdPMycULavutVM5qKOl4BI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pWffvQ0IhVCQANAZQD9Jt7/Xj+LoRRlRhuY13jB20lNQujMo0Rk+yOpccpyc4tFRS
-	 dHfBcRNT5Eg2wSkgw9YItpXXGcd+C4SNcLUbKgrOYpVnasCO6pwAAti9Nt4shgv9fY
-	 XhHXBudsq6SSBmAasfBHt79BnZUPqwLGc1NlA5Vnts5akvxTX1cprMzHCk8f6C2WwW
-	 TcfYhC74jOv40RrDD7hTTOysheMqEWwG9c+2wX26zQr+PNRQZ/LRz+y8Y4sTaUBat8
-	 QjGfKY7TfDrpI/5iTqpmNX6cW8Nnn/0Aw+1rmlj9Xjqb+ytBYY4mvKTU2rH7SBXDbh
-	 CNmcOkreSV4Lg==
+	s=k20201202; t=1734104293;
+	bh=AxHMPXFnWxgqcqQtqjkefSU0iKGlZw7Rp+fgdlUwm0c=;
+	h=From:To:Cc:Subject:Date:From;
+	b=B4WaCxJvh/5dQqs7ESwpZ5RizA9hyX+Jobs6eY/wOnFBdnx8F1AUVXaPKXe9CGohy
+	 ya+WSPEphcWriuJdxRvHzg+zP78GiNBK6Ko6diicp41s8Z4WSJeuYTaOVGBMvD9huy
+	 EeRuepjV/fhBza2lr7rNAS7050hrmdh5wZXG2ncExlwdqDOctlCMlOdLdwjSHHlno8
+	 YXafizQfBiVDU3lDc34P8qptcpN3NqGqD8rmfzSS7qVk2xsBO8w0V3ziSQrIJsHATF
+	 xxZiwZ/Tvm9yYA6jhHQiPTDEs3lBqs8yw4cfHAycpoCFEbkp6qmuG4uPjNxF6fAMbY
+	 17H25TJmXvchg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net 5/5] selftests: net-drv: stats: sanity check netlink dumps
-Date: Fri, 13 Dec 2024 07:22:44 -0800
-Message-ID: <20241213152244.3080955-6-kuba@kernel.org>
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	aleksander.lobakin@intel.com,
+	asml.silence@gmail.com,
+	almasrymina@google.com
+Subject: [PATCH net-next] net: page_pool: rename page_pool_is_last_ref()
+Date: Fri, 13 Dec 2024 07:37:59 -0800
+Message-ID: <20241213153759.3086474-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241213152244.3080955-1-kuba@kernel.org>
-References: <20241213152244.3080955-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,54 +63,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Sanity check netlink dumps, to make sure dumps don't have
-repeated entries or gaps in IDs.
+page_pool_is_last_ref() releases a reference while the name,
+to me at least, suggests it just checks if the refcount is 1.
+The semantics of the function are the same as those of
+atomic_dec_and_test() and refcount_dec_and_test(), so just
+use the _and_test() suffix.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: shuah@kernel.org
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/drivers/net/stats.py | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+Hopefully this doesn't conflict with anyone's work, I've been
+deferring sending this rename forever because I always look
+at it while reviewing an in-flight series and then I'm worried
+it will conflict.
 
-diff --git a/tools/testing/selftests/drivers/net/stats.py b/tools/testing/selftests/drivers/net/stats.py
-index 63e3c045a3b2..031ac9def6c0 100755
---- a/tools/testing/selftests/drivers/net/stats.py
-+++ b/tools/testing/selftests/drivers/net/stats.py
-@@ -110,6 +110,23 @@ rtnl = RtnlFamily()
-             ksft_ge(triple[1][key], triple[0][key], comment="bad key: " + key)
-             ksft_ge(triple[2][key], triple[1][key], comment="bad key: " + key)
+CC: hawk@kernel.org
+CC: ilias.apalodimas@linaro.org
+CC: aleksander.lobakin@intel.com
+CC: asml.silence@gmail.com
+CC: almasrymina@google.com
+---
+ include/net/page_pool/helpers.h | 4 ++--
+ net/core/page_pool.c            | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+index 26caa2c20912..ef0e496bcd93 100644
+--- a/include/net/page_pool/helpers.h
++++ b/include/net/page_pool/helpers.h
+@@ -299,7 +299,7 @@ static inline void page_pool_ref_page(struct page *page)
+ 	page_pool_ref_netmem(page_to_netmem(page));
+ }
  
-+    # Sanity check the dumps
-+    queues = NetdevFamily(recv_size=4096).qstats_get({"scope": "queue"}, dump=True)
-+    # Reformat the output into {ifindex: {rx: [id, id, ...], tx: [id, id, ...]}}
-+    parsed = {}
-+    for entry in queues:
-+        ifindex = entry["ifindex"]
-+        if ifindex not in parsed:
-+            parsed[ifindex] = {"rx":[], "tx": []}
-+        parsed[ifindex][entry["queue-type"]].append(entry['queue-id'])
-+    # Now, validate
-+    for ifindex, queues in parsed.items():
-+        for qtype in ['rx', 'tx']:
-+            ksft_eq(len(queues[qtype]), len(set(queues[qtype])),
-+                    comment="repeated queue keys")
-+            ksft_eq(len(queues[qtype]), max(queues[qtype]) + 1,
-+                    comment="missing queue keys")
-+
-     # Test invalid dumps
-     # 0 is invalid
-     with ksft_raises(NlError) as cm:
-@@ -158,7 +175,7 @@ rtnl = RtnlFamily()
+-static inline bool page_pool_is_last_ref(netmem_ref netmem)
++static inline bool page_pool_unref_and_test(netmem_ref netmem)
+ {
+ 	/* If page_pool_unref_page() returns 0, we were the last user */
+ 	return page_pool_unref_netmem(netmem, 1) == 0;
+@@ -314,7 +314,7 @@ static inline void page_pool_put_netmem(struct page_pool *pool,
+ 	 * allow registering MEM_TYPE_PAGE_POOL, but shield linker.
+ 	 */
+ #ifdef CONFIG_PAGE_POOL
+-	if (!page_pool_is_last_ref(netmem))
++	if (!page_pool_unref_and_test(netmem))
+ 		return;
  
+ 	page_pool_put_unrefed_netmem(pool, netmem, dma_sync_size, allow_direct);
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 4c85b77cfdac..56efe3f8140b 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -867,7 +867,7 @@ void page_pool_put_netmem_bulk(struct page_pool *pool, netmem_ref *data,
+ 		netmem_ref netmem = netmem_compound_head(data[i]);
  
- def main() -> None:
--    with NetDrvEnv(__file__) as cfg:
-+    with NetDrvEnv(__file__, queue_count=100) as cfg:
-         ksft_run([check_pause, check_fec, pkt_byte_sum, qstat_by_ifindex,
-                   check_down],
-                  args=(cfg, ))
+ 		/* It is not the last user for the page frag case */
+-		if (!page_pool_is_last_ref(netmem))
++		if (!page_pool_unref_and_test(netmem))
+ 			continue;
+ 
+ 		netmem = __page_pool_put_page(pool, netmem, -1, allow_direct);
 -- 
 2.47.1
 
