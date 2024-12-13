@@ -1,80 +1,167 @@
-Return-Path: <netdev+bounces-151798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6394C9F0EC4
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 15:14:14 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DF2916603B
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 14:12:55 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07E21E0DDC;
-	Fri, 13 Dec 2024 14:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RlpR6XB/"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49BB19F0EC3
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 15:14:06 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34B51E04B3;
-	Fri, 13 Dec 2024 14:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEBA7282EAC
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 14:14:04 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377D81E1C3F;
+	Fri, 13 Dec 2024 14:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k8n+xpG2"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9443E1E04BA;
+	Fri, 13 Dec 2024 14:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734099022; cv=none; b=s9zEZSRryHzVnzHZX2SxxfhpXwCoqyqj7iK6yQg4uHbbTQMHJ6KPqI6C0AMStxUo2JHp3JHhyfda12WvtA4DabGdAEHPZoAmqSCaGgqZbuGVVrXsl4BIfdfPa4IpbAoTCidkhVh6f9GyrnUixWq7Tzcm2Dr9YSCA1tz7HahB3qo=
+	t=1734099203; cv=none; b=ge2FvfSiuVRmrghdS9FPT89arv/bpRmhlGsHmjAVIDLXulgr/U+PFzqiSLPwkqiEe9tte0oH48+AVKo1Nx2WF8m1Vdr0iQnRpMdfN4+x0vLbH47jiyoXwmpWivrODntLv+xgWTlT8K24M4EbjiFj2+P9QCVka3/KQimfwttfpjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734099022; c=relaxed/simple;
-	bh=X1G8jyNdOTQp6RmoXhjSlh2R/WEz9Ja/0XTEzP+fWwo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cr0ZjXLS4Rp5PDb9n+Gz73LB+AY8n/aNRddinJf9OVAldkUv0AW5Cfqzpv/kN2Tnt14fCqM477znjcvTr58wlUp8tZ22MH1ZpabgjBg1FNfNg625+Gmr4KPyWdZnrhs9GKLedxcCgmxFZ639Kxqijy/3WAWHqq4GUxq4i36PzvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RlpR6XB/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C07ABC4CED0;
-	Fri, 13 Dec 2024 14:10:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734099022;
-	bh=X1G8jyNdOTQp6RmoXhjSlh2R/WEz9Ja/0XTEzP+fWwo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RlpR6XB/qnXaJXi1l7tthmJU7zeaD0PQbiidaPJYzkhQgxbbSCTCLI24pcF99v+3o
-	 3hT0WcWHIMo8z1aqmXnTvZpLt4UzWmlCENtPywXq6Xs7X7NyI96r5L90SEiBRHYjC0
-	 sLICrCYgymj7LC7ypOaw0/3nH7D6XXLE9GptEgIXExrMEB3V1+FUkqmOeVsP5TXC/l
-	 q6Et+sQ8npLd4ZRslCFpa8FlspuHWoMYcqroh2iYvD8ndfoNRH4nDD0H8w12DKxWP9
-	 6hsjyv4TorkWUUpLvZ6/tCPIna5n+ndCSecJB/+gz7/dA2arp2KA4dWqXROTk30YFK
-	 xk1VJGwatg4RQ==
-Date: Fri, 13 Dec 2024 06:10:20 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <andrew+netdev@lunn.ch>, <horms@kernel.org>, <shenjian15@huawei.com>,
- <salil.mehta@huawei.com>, <liuyonglong@huawei.com>,
- <wangpeiyang1@huawei.com>, <chenhao418@huawei.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RESEND net 3/7] net: hns3: Resolved the issue that the
- debugfs query result is inconsistent.
-Message-ID: <20241213061020.017b6f95@kernel.org>
-In-Reply-To: <1448b4a1-235c-4abe-9f95-fbf6e7f9d640@huawei.com>
-References: <20241107133023.3813095-1-shaojijie@huawei.com>
-	<20241107133023.3813095-4-shaojijie@huawei.com>
-	<20241111172511.773c71df@kernel.org>
-	<e4396ecc-7874-4caf-b25d-870a9d897eb1@huawei.com>
-	<20241113163145.04c92662@kernel.org>
-	<058dff3c-126a-423a-8608-aa2cebfc13eb@huawei.com>
-	<20241209131315.2b0e15bc@kernel.org>
-	<1448b4a1-235c-4abe-9f95-fbf6e7f9d640@huawei.com>
+	s=arc-20240116; t=1734099203; c=relaxed/simple;
+	bh=zWn2IZLTbvL+8YKZbzgareUkxM2q6bV7ucJj0MTfLaA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PVlBCFohU5LHvnvb+bcjH3E9ipP14Snt5fI46TWDm9QHcyBcAjP267UZKuCEo8SFNwFemOgatqbCyHWGyudnL1XxQPgmKV6mkkxBx4qXSuZcxScDx/mUJKrrsXQpfBwEx+uv8P82exoY+/CBu6bmirzNj/YuiU4CFvuOxFwNt0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k8n+xpG2; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a7d7c1b190so6192435ab.3;
+        Fri, 13 Dec 2024 06:13:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734099201; x=1734704001; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l1lwWXj0GpqnduKP+wpddkSnCxIqeOeyd8ONBWEKbeo=;
+        b=k8n+xpG22d1CDrvrDkqJNP8ZgBaK8XrEZz9xURu83ijQSqJfWWJg7oABb+BXRJOA+H
+         k7pyYm6LFxQ3QJWvNdijYt2Q1cRXnhg1ES78bheLlwW3Cx8hiOk03Bgp/bRRpDYy13f4
+         epUPUHsvlrd6C3ZyEmeiUO/h4RTEYuh59GD++oRv+4NYf+2snfOeitFgaABAuI6Kizw2
+         hYsFmk7wDipsRJSXoQz9KOodYiWDrsvTmee/ao5nnibj1n3ZwfttOGPcH/WWGbQ+ADYg
+         Zzup1Z0hsEwf7GmbLkVk6BbnspG3emALHczWNwa53E9pM2DHDvhXQTt69+Mjidhq0N7y
+         el/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734099201; x=1734704001;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l1lwWXj0GpqnduKP+wpddkSnCxIqeOeyd8ONBWEKbeo=;
+        b=QbsZW2vPyVCwxnEHUf5Ss8FUrmnHyVaUbxPfnVr7ZR/23zZmqyW5wJ1fCdKiQSPcwc
+         VaBFXhxVe3kUf0i55XFzDnx5MUk38cI9D1jD5ATq/bMQL2d5IvBaWlxsBbpo6SH9Izia
+         V5x1S1/WgY51fjdPS9/zzhUB1JZyOM40R1xDyMXJxuKveSqSqyQLGCZ+shkG7qM2lhbE
+         /CMuwpBeXtuiiahp77k/klh6VwsMALC06cpFyiQZWe/2JDh5y6holDc+5g/kC0Hudzjw
+         FzccYv3NMqUPAzmC+CwGpw7DKx3E9hnf1AvPmUl9x3/+QgL+V6jcFN+jrBOobclBj8Es
+         M9/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXD2kCxOWhEGkk142uHUEbnw8VOwUMd5lGaS77SJnx1KouG9G1zEZmX47N3mXPb3NqscmvWnh7U@vger.kernel.org, AJvYcCXYY4EupWpHbHY3PAloOzELVv3ySbTp4YzyVqOrcmtg3GAK86lJCJoPCiKTdxB5yz2Q14A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxI38nwEfVrAjGc8ydTkxKKNirnKwoN1jHwVIIm9yGnn1Y6CuBl
+	bRT+EJrCTR1G6jvM7fJxNSlxCYPl1zKTSeVuZKJwharjdyXtez5dxJZof/fqK47c7z3SXAW4BsI
+	2Gce04S0DGrMDJ4M5LNDWpJZaptg=
+X-Gm-Gg: ASbGncuqNUWwtLjErSrW84sf5cqbiZHyj2Wuw63gFPN++Qk1X4ayJvpBYDrCOlSvLZ6
+	u+kN96qFYwZ1DYT0PEiWCvsoh5hIzOrGpkF+oYA==
+X-Google-Smtp-Source: AGHT+IEw/fbnUZH+Gy+WnWvqFXZ1yJ+ThzxHi1BD+IJFQy2xOnxzkyF+aqfPk4+jrHHZTASt/Li9+Cloqh8rJg9iycA=
+X-Received: by 2002:a05:6e02:1948:b0:3a7:9533:c3ac with SMTP id
+ e9e14a558f8ab-3aff461aa6dmr24048955ab.4.1734099200688; Fri, 13 Dec 2024
+ 06:13:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
+ <20241207173803.90744-2-kerneljasonxing@gmail.com> <8a464155-3115-468b-88f3-5ee81d9e3b84@linux.dev>
+In-Reply-To: <8a464155-3115-468b-88f3-5ee81d9e3b84@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 13 Dec 2024 22:12:44 +0800
+Message-ID: <CAL+tcoA1omzkK=odvcjtt-LtstRB9Dx3MVLC+yezqOp+M1sqsA@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 01/11] net-timestamp: add support for bpf_setsockopt()
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 13 Dec 2024 21:11:49 +0800 Jijie Shao wrote:
-> If the framework does not call .release() for some reason, the buffer
-> cannot be freed, causing memory leakage. Maybe it's acceptable=EF=BC=9F
+On Fri, Dec 13, 2024 at 3:35=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 12/7/24 9:37 AM, Jason Xing wrote:
+> > diff --git a/net/core/filter.c b/net/core/filter.c
+> > index 6625b3f563a4..f7e9f88e09b1 100644
+> > --- a/net/core/filter.c
+> > +++ b/net/core/filter.c
+> > @@ -5214,6 +5214,24 @@ static const struct bpf_func_proto bpf_get_socke=
+t_uid_proto =3D {
+> >       .arg1_type      =3D ARG_PTR_TO_CTX,
+> >   };
+> >
+> > +static int sk_bpf_set_cb_flags(struct sock *sk, sockptr_t optval, bool=
+ getopt)
+>
+> It is confusing to take a sockptr_t argument. It is called by the kernel =
+bpf
+> prog only. It must be from the kernel memory. Directly pass the "int
+> sk_bpf_cb_flags" as the argument.
 
-Are you sure? How did you test?
-Looking at the code debugfs itself uses release in a similar way
-(u32_array_fops, for example), so I think it should work.
+Thanks. I will fix this.
+
+>
+> > +{
+> > +     int sk_bpf_cb_flags;
+> > +
+> > +     if (getopt)
+> > +             return -EINVAL;
+> > +
+> > +     if (copy_from_sockptr(&sk_bpf_cb_flags, optval, sizeof(sk_bpf_cb_=
+flags)))
+>
+> It is an unnecessary copy. Directly use the "int sk_bpf_cb_flags" arg ins=
+tead.
+>
+> > +             return -EFAULT;
+>
+> This should never happen.
+>
+> > +
+> > +     if (sk_bpf_cb_flags & ~SK_BPF_CB_MASK)
+> > +             return -EINVAL;
+> > +
+> > +     sk->sk_bpf_cb_flags =3D sk_bpf_cb_flags;
+> > +
+> > +     return 0;
+> > +}
+> > +
+> >   static int sol_socket_sockopt(struct sock *sk, int optname,
+> >                             char *optval, int *optlen,
+> >                             bool getopt)
+> > @@ -5230,6 +5248,7 @@ static int sol_socket_sockopt(struct sock *sk, in=
+t optname,
+> >       case SO_MAX_PACING_RATE:
+> >       case SO_BINDTOIFINDEX:
+> >       case SO_TXREHASH:
+> > +     case SK_BPF_CB_FLAGS:
+> >               if (*optlen !=3D sizeof(int))
+> >                       return -EINVAL;
+> >               break;
+> > @@ -5239,6 +5258,9 @@ static int sol_socket_sockopt(struct sock *sk, in=
+t optname,
+> >               return -EINVAL;
+> >       }
+> >
+> > +     if (optname =3D=3D SK_BPF_CB_FLAGS)
+> > +             return sk_bpf_set_cb_flags(sk, KERNEL_SOCKPTR(optval), ge=
+topt);
+> > +
+> >       if (getopt) {
+> >               if (optname =3D=3D SO_BINDTODEVICE)
+> >                       return -EINVAL;
 
