@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-151708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 124CE9F0A84
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:12:16 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FE8516017E
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:12:13 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E741CEADF;
-	Fri, 13 Dec 2024 11:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="e8RE6t0o"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C34139F0A87
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:12:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AF81C4A17
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 11:12:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 841B82813DF
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:12:38 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC0F1CEAD6;
+	Fri, 13 Dec 2024 11:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UMSrNph5"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5407B1C3C0D
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 11:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734088332; cv=none; b=ipKHaMleUzaNUJxgUUqmvI9sCepJtSVzlz9wmgKp+hs3nPshbTqYea0dfDqVPZq/1vvAjykbdUCbbRlQJvPXgrzSmeX+Lo82BaXq7epMk1eSgKoahTfzEqNxSh1rDJoZaVColl4HYFyM2k8T02Qwb48eib0fMvPROJcExc1AC3E=
+	t=1734088355; cv=none; b=ANPL6zPj2erRaIjKt2LpX+gWtwxiCwjBGeOOuotWxaBfU4IeiJWTYKB74tiTKVOjqQPLEvIjXn8NE0aZTrNXh5iAShd0PVN3SPEhGm4xZBAlF6h/VCzpCSZx9O3JFzwmrJlprd383L0qGsHdMU6JN6vm/LIyqzSl2X2ITBQgaOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734088332; c=relaxed/simple;
-	bh=8+Torv7ERHwa4e365yxKQCtdVtJICfFho9xb8Fot3DM=;
+	s=arc-20240116; t=1734088355; c=relaxed/simple;
+	bh=TM0u/8mFLm/7qIkMVPsUPf3j1Dxrb2Y/Ms6bixcdP3U=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GrTsx8HwRdsY7lLSLx2w3wckX6TYh70rEQquCSrzgJg6gTkjs6Kv9oMUWCFRAYLLiiM0G6J84In9BojFkQ63THbselTku8h9kSAipO+D0Yxe+wr6ywOMQwxmwp2S7kgPxuH5nzH3kWXAa9+Ri0cux5lFn9Sk4bnwpdGg0MWok4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=e8RE6t0o; arc=none smtp.client-ip=99.78.197.217
+	 MIME-Version:Content-Type; b=KLxO/lAgvK5Aq/4C+0dvmcsOyMq24ivnaPl1xMxGhR3Bqyrv3Dm7BopgNKcLMvepK/nHtVmaTGuymrRxFrOFzeNBvXKxdfYm/Kj0OgCDX+gDQhE/nYqXliTAI1TtA+pQMeY0zD7DR7hJSdltrsb5+0SVC9vWhNDf+/6PYeaidsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UMSrNph5; arc=none smtp.client-ip=72.21.196.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1734088253; x=1765624253;
+  t=1734088355; x=1765624355;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9bysGw94J8T39hGRAct4Xpnd1NtLR0WaLRZ6MzjVFlw=;
-  b=e8RE6t0oYNGFWES6w8mDLUe0dxqDfNCJTZxUpKU8roPXCSayCfavKXFU
-   L4+0Fq6Nxs7iciRYzIzXyoQn3eO37XZB5ILUd6mE5NH6XTMh5CTVEPm9h
-   4a411nz0WtgD5ueKFn4aoGtQ3phAABvL76xZOjRetcyD44H/U5UCMCWS2
-   8=;
+  bh=olq8vX6FoC3FvG+Gy8jio4+l0B1gY6gF8+X04oMpuEc=;
+  b=UMSrNph57sj8fDiFDsd7vHBQ8EI9D1r44jwgUUOMkfWVbIkEduhuDRYa
+   aIafjd5UylH5vsqSKvMyA1z/9Kuqor8uWBuLUYs5yjR87HRQFGrer/6G+
+   mj4F5tQtcve4EGdwOAxmK4D66XqRcoTUj/ZeUp7OYyWs2y6VUuidhE+ua
+   U=;
 X-IronPort-AV: E=Sophos;i="6.12,231,1728950400"; 
-   d="scan'208";a="5700688"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 11:10:52 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:62286]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.69:2525] with esmtp (Farcaster)
- id 2367eab7-658d-477c-b78c-3ec99fa68039; Fri, 13 Dec 2024 11:12:09 +0000 (UTC)
-X-Farcaster-Flow-ID: 2367eab7-658d-477c-b78c-3ec99fa68039
+   d="scan'208";a="450548061"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 11:12:32 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:36356]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.194:2525] with esmtp (Farcaster)
+ id f78084f2-741d-487f-b69a-507c25bfeb29; Fri, 13 Dec 2024 11:12:30 +0000 (UTC)
+X-Farcaster-Flow-ID: f78084f2-741d-487f-b69a-507c25bfeb29
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 13 Dec 2024 11:12:08 +0000
+ Fri, 13 Dec 2024 11:12:30 +0000
 Received: from 6c7e67c6786f.amazon.com (10.119.14.208) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 13 Dec 2024 11:12:05 +0000
+ Fri, 13 Dec 2024 11:12:26 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next 09/12] af_unix: Defer sock_put() to clean up path in unix_dgram_sendmsg().
-Date: Fri, 13 Dec 2024 20:08:47 +0900
-Message-ID: <20241213110850.25453-10-kuniyu@amazon.com>
+Subject: [PATCH v2 net-next 10/12] af_unix: Clean up SOCK_DEAD error paths in unix_dgram_sendmsg().
+Date: Fri, 13 Dec 2024 20:08:48 +0900
+Message-ID: <20241213110850.25453-11-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241213110850.25453-1-kuniyu@amazon.com>
 References: <20241213110850.25453-1-kuniyu@amazon.com>
@@ -77,42 +77,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB004.ant.amazon.com (10.13.139.177) To
+X-ClientProxiedBy: EX19D045UWC002.ant.amazon.com (10.13.139.230) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-When other has SOCK_DEAD in unix_dgram_sendmsg(), we call sock_put() for
-it first and then set NULL to other before jumping to the error path.
+When other has SOCK_DEAD in unix_dgram_sendmsg(), we hold
+unix_state_lock() for the sender socket first.
 
-This is to skip sock_put() in the error path.
+However, we do not need it for sk->sk_type.
 
-Let's not set NULL to other and defer the sock_put() to the error path
-to clean up the labels later.
+Let's move the lock down a bit.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/unix/af_unix.c | 2 --
- 1 file changed, 2 deletions(-)
+ net/unix/af_unix.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 513d0fd12e6a..b8adfb41d11b 100644
+index b8adfb41d11b..22c689b0044f 100644
 --- a/net/unix/af_unix.c
 +++ b/net/unix/af_unix.c
-@@ -2075,7 +2075,6 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 		 *	datagram error
- 		 */
- 		unix_state_unlock(other);
--		sock_put(other);
+@@ -2070,23 +2070,23 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	}
  
- 		if (!sk_locked)
- 			unix_state_lock(sk);
-@@ -2104,7 +2103,6 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 				err = -ECONNRESET;
+ 	if (unlikely(sock_flag(other, SOCK_DEAD))) {
+-		/*
+-		 *	Check with 1003.1g - what should
+-		 *	datagram error
+-		 */
+-		unix_state_unlock(other);
++		/* Check with 1003.1g - what should datagram error */
+ 
+-		if (!sk_locked)
+-			unix_state_lock(sk);
++		unix_state_unlock(other);
+ 
+ 		if (sk->sk_type == SOCK_SEQPACKET) {
+ 			/* We are here only when racing with unix_release_sock()
+ 			 * is clearing @other. Never change state to TCP_CLOSE
+ 			 * unlike SOCK_DGRAM wants.
+ 			 */
+-			unix_state_unlock(sk);
+ 			err = -EPIPE;
+-		} else if (unix_peer(sk) == other) {
++			goto out_free;
++		}
++
++		if (!sk_locked)
++			unix_state_lock(sk);
++
++		if (unix_peer(sk) == other) {
+ 			unix_peer(sk) = NULL;
+ 			unix_dgram_peer_wake_disconnect_wakeup(sk, other);
+ 
+@@ -2096,15 +2096,15 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+ 			unix_dgram_disconnected(sk, other);
+ 			sock_put(other);
+ 			err = -ECONNREFUSED;
+-		} else {
+-			unix_state_unlock(sk);
+-
+-			if (!msg->msg_namelen)
+-				err = -ECONNRESET;
++			goto out_free;
  		}
  
--		other = NULL;
- 		if (err)
+-		if (err)
++		unix_state_unlock(sk);
++
++		if (!msg->msg_namelen) {
++			err = -ECONNRESET;
  			goto out_free;
++		}
  
+ 		goto lookup;
+ 	}
 -- 
 2.39.5 (Apple Git-154)
 
