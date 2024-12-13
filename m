@@ -1,117 +1,101 @@
-Return-Path: <netdev+bounces-151696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 423009F0A31
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:57:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 862F09F0A46
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:00:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7D8616A663
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:57:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8D98188655F
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:00:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505CA1C3BF9;
-	Fri, 13 Dec 2024 10:57:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4005A1C07FC;
+	Fri, 13 Dec 2024 11:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BAynvb7w"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EE01C3BF5;
-	Fri, 13 Dec 2024 10:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A409F1C3C1E
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 11:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734087466; cv=none; b=fYqzw4GwxDGk/GZ5DLCbpRGjfpER+1To3kPil4Ubif6+MVJAo6shNb9QDz/BtmqAgaj675mLED6lXoDUjABVlhgx+cfQA0XsbBZWY+A7CvU/6l3wk8NwEyki1fHPoP3vN0IF54HpTiUD4EJT9V4hxtD4QncgIztHFOORyZyJNVk=
+	t=1734087611; cv=none; b=C/sGO7OMfR2u17E8zlPOeuDsRLDMZkxynR+w8fhTLplaEBXc3KtMiwCPyfCZnlOH7ImUD08AtLGVH5Ckcd2NLT+5DIHlOmgkj8DGNmeLNmk53DjL7Nu5Nor2c2JVZgVEGuuET8+1lT9KtpM44dhXHKxDMm1GVjwu5pcXS4/YM68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734087466; c=relaxed/simple;
-	bh=hRMOVVhsH85xo+YHkd5+b7Twl6ICG93NoR/iHXt5nUs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ceZ9igpFoAoB/DQkDYrszgSm+SofNP0tP4sm+dOzRs6VApNH2TdNg8r8h94NOv2ItgruMwPx+LKFpZd/i1NiBnrXijJYzX+PRmJFXvYHf2KvfbnEiQJmfGaP9NT+e3NFyPaIPOi2Atco38Nx4FPdtx/XvWCIRz755FzUH1H0gjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Y8mRs2lKHz6K5rG;
-	Fri, 13 Dec 2024 18:54:17 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id 208AF140134;
-	Fri, 13 Dec 2024 18:57:39 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 13 Dec 2024 13:57:37 +0300
-Message-ID: <b92e65aa-84aa-a66f-2f61-b70fd5c6b138@huawei-partners.com>
-Date: Fri, 13 Dec 2024 13:57:34 +0300
+	s=arc-20240116; t=1734087611; c=relaxed/simple;
+	bh=CVc7/ZmxdnRgoCyfzUnd5xmX4XEkW704Q7JoOUHlQLk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hdQbXNhRjekParSnPAxrMTTPDrB+Y6CYDiiGIrTDv+Gz6T2bNcKC2JP4MPowb6RMN1wFPaauea/ZYWeK3H1zQd9d/jwpDfc1YGGOWni1s5BbE8e7I3tmhWNYp4cpNa0iApue9wBfTxz3IgGQjRF1OvB8TTCO+QkuP/BMWpjRx1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=BAynvb7w; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=tW1kqG7AA7VKuaZuIchhnJLzAYeE13kvfdYICGMAvpA=; b=BAynvb7wzY0Qw60t6wnpt78/qq
+	vFB1MVGBVwIRglh/GEFtMTFb03eloxHgljpyzzDUs2omP3GUblZGcLOIc9evLq0qrEPJfPUQuJgOn
+	xDolDmF8a0Ag+MXGKmMfJEkKjpYABzH/x581Dt1BabS44Sbofprj51HoI5P5a622ScSqBlCT1O6yg
+	MGUhQmh8uBOBzQbcKrjCJbz9aL22I/+UpbWSzVQ/3GKAjjijlwErDxyH2XgnqjPmz5V0kWQ1Tp/wO
+	DpmJnZpgleUDOqghGcZs3+mDQeWuxuzTDS+83fti+X9buWRsGee9bvqHZL5FN3bQGLhto+z1CoCBv
+	Kt9Qx8PQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48066)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tM3On-0006ar-0n;
+	Fri, 13 Dec 2024 10:59:58 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tM3Ok-0006Fr-0f;
+	Fri, 13 Dec 2024 10:59:54 +0000
+Date: Fri, 13 Dec 2024 10:59:54 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 2/7] net: stmmac: move tx_lpi_timer tracking to
+ phylib
+Message-ID: <Z1wTqh-BnvPYLqU8@shell.armlinux.org.uk>
+References: <Z1r3MWZOt36SgGxf@shell.armlinux.org.uk>
+ <E1tLkSX-006qfS-Rx@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] selinux: Read sk->sk_family once in selinux_socket_bind()
-Content-Language: ru
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-CC: <paul@paul-moore.com>, <selinux@vger.kernel.org>,
-	<stephen.smalley.work@gmail.com>, <omosnace@redhat.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20241212102000.2148788-1-ivanov.mikhail1@huawei-partners.com>
- <20241212.zoh7Eezee9ka@digikod.net>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20241212.zoh7Eezee9ka@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1tLkSX-006qfS-Rx@rmk-PC.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 12/12/2024 8:50 PM, Mickaël Salaün wrote:
-> This looks good be there are other places using sk->sk_family that
-> should also be fixed.
+On Thu, Dec 12, 2024 at 02:46:33PM +0000, Russell King (Oracle) wrote:
+> @@ -1092,6 +1092,7 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+>  			phy_init_eee(phy, !(priv->plat->flags &
+>  				STMMAC_FLAG_RX_CLK_RUNS_IN_LPI)) >= 0;
+>  		priv->eee_enabled = stmmac_eee_init(priv);
+> +		priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
+>  		priv->tx_lpi_enabled = priv->eee_enabled;
+>  		stmmac_set_eee_pls(priv, priv->hw, true);
+>  	}
 
-Thanks for checking this!
+While looking deeper at stmmac, there's a bug in the above hunk -
+stmmac_eee_init() makes use of priv->tx_lpi_timer, so this member
+needs to be set before calling this function. I'll post a v2 shortly.
 
-For selinux this should be enough, I haven't found any other places
-where sk->sk_family could be read from an IPv6 socket without locking.
-
-I also would like to prepare such fix for other LSMs (apparmor, smack,
-tomoyo) (in separate patches).
-
-> 
-> On Thu, Dec 12, 2024 at 06:20:00PM +0800, Mikhail Ivanov wrote:
->> selinux_socket_bind() is called without holding the socket lock.
->>
->> Use READ_ONCE() to safely read sk->sk_family for IPv6 socket in case
->> of lockless transformation to IPv4 socket via IPV6_ADDRFORM [1].
->>
->> [1] https://lore.kernel.org/all/20240202095404.183274-1-edumazet@google.com/
->>
->> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->> ---
->>   security/selinux/hooks.c | 4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
->> index 5e5f3398f39d..b7adff2cf5f6 100644
->> --- a/security/selinux/hooks.c
->> +++ b/security/selinux/hooks.c
->> @@ -4715,8 +4715,10 @@ static int selinux_socket_bind(struct socket *sock, struct sockaddr *address, in
->>   	if (err)
->>   		goto out;
->>   
->> +	/* IPV6_ADDRFORM can change sk->sk_family under us. */
->> +	family = READ_ONCE(sk->sk_family);
->> +
->>   	/* If PF_INET or PF_INET6, check name_bind permission for the port. */
->> -	family = sk->sk_family;
->>   	if (family == PF_INET || family == PF_INET6) {
->>   		char *addrp;
->>   		struct common_audit_data ad;
->>
->> base-commit: 034294fbfdf0ded4f931f9503d2ca5bbf8b9aebd
->> -- 
->> 2.34.1
->>
->>
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
