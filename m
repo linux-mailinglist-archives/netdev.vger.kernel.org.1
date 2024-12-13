@@ -1,219 +1,115 @@
-Return-Path: <netdev+bounces-151691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4A809F09F8
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:46:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 063669F0A0D
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 11:51:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EEAC16A877
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:46:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 198F816567A
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:51:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D450C1C3BE0;
-	Fri, 13 Dec 2024 10:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E2D11C1F29;
+	Fri, 13 Dec 2024 10:51:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="KBEDEq8N"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="c9bKyVtN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mr85p00im-ztdg06021101.me.com (mr85p00im-ztdg06021101.me.com [17.58.23.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384811AF0AB
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 10:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 083BC1C07F0
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 10:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.23.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734086773; cv=none; b=ZJbhmJbRw9rhHdshmwkd/3zNIXS8gtOR4mqHt2WyATddRUgYG4QunBkc7IfMsJgkX553WVW9bSDPU8Vv/YlKgqjOvE+CiDiJ5iTw9O9p7Tf7M3AFzw4dSoaFPYKmZNs2Au7QCd+RJn9hVU7AfuQUmr05qy6bRdfpEqbkKXgrIU0=
+	t=1734087063; cv=none; b=TaXdglmTbrCcJvRjg9RuQDztWnlw9g9pS4H8ttZ8V6VRN5kYmSryDiqDRWOrLf3tfJ6yuoaUXIeM2UA28HnVg8qCcMjFEYVJL5z0MK3YZdYvmKreU1/ynfFqqwJDaSdZP2UhRBul1RsEuWoWNFez7OOa+9wvVjZjU0EVIuM0c5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734086773; c=relaxed/simple;
-	bh=yvGIyROqXTCwWw3C1ksAH2chXTpdbfX1VhFRfwvgLX8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=uEwQNHGTKt3ts6RJS/AW9P1oqz3dZJSSWgi2TUNUAYZEH8LZiSwJd/peXEr25cWfQVE3OhjPa7DmL4gAw/VmQBucuh5lRjYK8MLXy+nKPwIROD4YFChb+jsqWl0U4OVpg0uzfTyQ5ge7Bfg2qTGX0LjScPkKScbrvoUkX7ZY8sY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=KBEDEq8N; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43628e97467so9428245e9.3
-        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 02:46:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1734086769; x=1734691569; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1Sve8pnwBIa0k3Fo9Yj0biS11b57p46yyg7zp7DqbGE=;
-        b=KBEDEq8NHyyDc/AXPEBEPZfGrQN0aPWtquX8dNnULEdMLkS4pB1iF9aphlyq5NqKKs
-         H94BLUkWn2vrJbkBOO1DRPvYmzDTjBk9U+s2fP8auY+QCjee7WlSxcPOrlRBT3rJLWno
-         OBJ7nHFs5Ba4jctJz4e7MO5dlrK2vjUCPpwhxkjLfTVtTDpL1Y4dwiXFPvL35of/KBIo
-         ko3A4CD5zKMd7/vrRo3LMVw2BjwNquEcUEdci5Bytzc+mDxwyUCeQvp70Z+yWJqzKKws
-         f2bUI2HhdgM5yhy4IYlRnUOmRcBe4hjJQx49Dhf45V50M62OUFmTZK+glxesrjvCYvbO
-         7uww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734086769; x=1734691569;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1Sve8pnwBIa0k3Fo9Yj0biS11b57p46yyg7zp7DqbGE=;
-        b=lFX3lBr1IZByicEq96BI0z5xRtO+DJPEEwm2SiRWjuBe8YwLVtv7xrMoIuv08BovwA
-         KrlTHj3oPIcXumTpSuTeak8jozhRbs8aUbhJVFlj6JdQuRZHFaSc+6yIauspZ0WYDx3S
-         R6979o1q0LjDutoEoK1j6s8qxANVAShDmVedPzz1atBoobwOKm/NlJRSwJfT/Xl3GRjd
-         kJrR1jrurD02A/6YE/aWAawt7xpoZ1J6nsDnRkfX72mCvg2f3jQidFTQNPxOM9ZGZYMa
-         4rb/TmowMKM18ds3J6CKXOvSK6itQfAjTSf2dqIuFFK07XbQU+Loyyyi28uNxui66G57
-         LIiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWn0NH446OXHFDJ3izVxP8gFfNTjp2y24XvDI2FWrVKjA1ulpgeb1zNaHaMxXyhj4fYkcJg/MM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBnsIZpTie50Qyv7UwOo4ruCNIaRGrZJ10vib+fqCUsm2HalNa
-	et3zUQ/UM5LZapqoZ9Bip9r/DMoKXzc3q7//mBOj2nBymHryJOd5M/Dm5KZxJQA=
-X-Gm-Gg: ASbGnctwNtUOAt1HbQhUEOm0Js14rCwrn3EgOxPFl/0FEVLyeP5yOXghVOMJHtNMZAs
-	jJSJWmgtSlWTSwNi/IlEF9jCBBQmUfTEIk4s1kbXIRn9bpO58obpbVwB0Cz6k9E4kz0mpBE6RFY
-	UizSrjU96Hk+tFLzVjj69xaR5LkIzWwCXmnbLCb4Ki1Jp3pADrW+RcCKR49usFf97hPmyIR3FcU
-	SiaQyWxWsTZUORdCTLxv+xPIO0nRdRHpvPNf8o7yPacpEI=
-X-Google-Smtp-Source: AGHT+IFwOoZpIuq7JwkqBKBUH1jKuHJePdoKI8a5nIlR5OcswOlr6jGLXfryjmtIfeJ9smPPAQIYMg==
-X-Received: by 2002:a05:600c:154c:b0:434:ff30:a159 with SMTP id 5b1f17b1804b1-4362a982c34mr18289725e9.0.1734086769544;
-        Fri, 13 Dec 2024 02:46:09 -0800 (PST)
-Received: from localhost ([193.86.92.181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436255531b1sm46569255e9.2.2024.12.13.02.46.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 02:46:09 -0800 (PST)
-Date: Fri, 13 Dec 2024 11:46:08 +0100
-From: Michal Hocko <mhocko@suse.com>
-To: lsf-pc@lists.linuxfoundation.org
-Cc: linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: LSF/MM/BPF: 2025: Call for Proposals
-Message-ID: <Z1wQcKKw14iei0Va@tiehlicka>
+	s=arc-20240116; t=1734087063; c=relaxed/simple;
+	bh=z0iXpoNb4O/AXMoJ113xZe5lMIUsxk1J8XGPhZijSK8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LvHLaI4okTn6OYwQYWX7yYsJy886QW82fQCV5mhhXN/r6en7avoyg1qFMuAqZBGpMGdrjwyJ2R+9oNO9KU5jHSXH4M8QOTMrjLqJJYo2h1P3bhGLJQaIYlgA4ODj6s5X/68sNhOQxcLqAKx9LpRvzf9kr6/bJwMYgD1j1Dr78MU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=c9bKyVtN; arc=none smtp.client-ip=17.58.23.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1734087061;
+	bh=K4LFQWPW7szczQxv+lJdGb4IxngOT+WcKY1uNekNjGE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
+	 x-icloud-hme;
+	b=c9bKyVtNHrmkkh/4lM0GW3fyK49HYdqywdGrW5a12y2qIRmNdC3NmRgK+53jYLoVG
+	 dCMuWhLnwiWWFQQeOS5kGCg6bWMBclDJioobcRtmGTA4757aeH+dceKwOd9Vz4NV5p
+	 Q78Rchh1e5wH0SooT9XibtlSSFNEGkP/a0L7jWBp05rWjpAlUGOPwncozFrxWgQy6d
+	 O1HzxXxew7LtypdOpBx+n1B3Ulqu0xTdGH9Q3fLBP8OHTLEUfvJzEWPO6o2/Mtl/TJ
+	 n92FzVEvPEXAP8tqkWZpHuKqk08CdbnjYAhPi5PeZQfn4HB/3BqsX16jQrjNadj4p/
+	 RkfXaufLUc3jQ==
+Received: from [192.168.1.26] (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
+	by mr85p00im-ztdg06021101.me.com (Postfix) with ESMTPSA id DE6E480108;
+	Fri, 13 Dec 2024 10:50:56 +0000 (UTC)
+Message-ID: <34d1ccdf-f4dd-44c0-afb5-fe1c7fe49a61@icloud.com>
+Date: Fri, 13 Dec 2024 18:50:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 0/2] net: Fix 2 OF device node refcount leakage issues
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Justin Chen <justin.chen@broadcom.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
+ Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20241212-drivers_fix-v1-0-a3fbb0bf6846@quicinc.com>
+ <20241212163317.5e6829ec@kmaincent-XPS-13-7390>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <20241212163317.5e6829ec@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: a6lKxkS-OUGyU397s7wp3R5cr1qbysVN
+X-Proofpoint-GUID: a6lKxkS-OUGyU397s7wp3R5cr1qbysVN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-13_04,2024-12-12_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
+ malwarescore=0 spamscore=0 bulkscore=0 mlxscore=0 mlxlogscore=999
+ phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2412130075
 
-The annual Linux Storage, Filesystem, Memory Management, and BPF
-(LSF/MM/BPF) Summit for 2025 will be held March 24–26, 2025
-at the Delta hotel Montreal
+On 2024/12/12 23:33, Kory Maincent wrote:
+> On Thu, 12 Dec 2024 23:06:53 +0800
+> Zijun Hu <zijun_hu@icloud.com> wrote:
+> 
+>> This patch series is to fix 2 OF device node refcount leakage issues.
+>>
+>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>> ---
+>> Zijun Hu (2):
+>>       net: pse-pd: tps23881: Fix device node refcount leakage in
+>> tps23881_get_of_channels() net: bcmasp: Fix device node refcount leakage in
+>> bcmasp_probe()
+> 
+> Thanks for the patch. This fix was already sent by Zhang Zekun:
+> https://lore.kernel.org/netdev/20241024015909.58654-1-zhangzekun11@huawei.com/
+> 
+thank you for sharing this info.
 
-LSF/MM/BPF is an invitation-only technical workshop to map out
-improvements to the Linux storage, filesystem, BPF, and memory
-management subsystems that will make their way into the mainline
-kernel within the coming years.
+> net maintainers would prefer to have the API changed as calling of_node_get
+> before of_find_node_by_name is not intuitive.
+> 
 
-LSF/MM/BPF 2025 will be a three day, stand-alone conference with
-four subsystem-specific tracks, cross-track discussions, as well
-as BoF and hacking sessions:
+agree.
 
-          https://events.linuxfoundation.org/lsfmmbpf/
+> Still, don't know if we should fix it until the API is changed?  
+> 
 
-On behalf of the committee I am issuing a call for agenda proposals
-that are suitable for cross-track discussion as well as technical
-subjects for the breakout sessions.
+(^^)
+> Regards,
 
-If advance notice is required for visa applications then please
-point that out in your proposal or request to attend, and submit
-the topic as soon as possible.
-
-We are asking that you please let us know you want to be invited
-by Feb 1st 2025. We realize that travel is an ever changing target,
-but it helps us to get an idea of possible attendance numbers.
-Clearly things can and will change, so consider the request to
-attend deadline more about planning and less about concrete plans.
-
-We are still looking to arrange / fund a virtual component for one
-or more of the tracks. We will follow up on the final decision soon
-hopefuly. Please note that it is possible that we might not have
-virtual attendees option this time.
-
-1) Fill out the following Google form to request attendance and
-suggest any topics for discussion:
-
-	  https://forms.gle/xXvQicSFeFKjayxB9
-
-In previous years we have accidentally missed people's attendance
-requests because they either did not Cc lsf-pc@ or we simply missed
-them in the flurry of emails we get. Our community is large and our
-volunteers are busy, filling this out will help us to make sure we
-do not miss anybody.
-
-2) Proposals for agenda topics should ideally still be sent to the
-following lists to allow for discussion among your peers. This will
-help us figure out which topics are important for the agenda:
-
-          lsf-pc@lists.linux-foundation.org
-
-... and Cc the mailing lists that are relevant for the topic in
-question:
-
-          FS:     linux-fsdevel@vger.kernel.org
-          MM:     linux-mm@kvack.org
-          Block:  linux-block@vger.kernel.org
-          ATA:    linux-ide@vger.kernel.org
-          SCSI:   linux-scsi@vger.kernel.org
-          NVMe:   linux-nvme@lists.infradead.org
-          BPF:    bpf@vger.kernel.org
-
-Please tag your proposal with [LSF/MM/BPF TOPIC] to make it easier
-to track. In addition, please make sure to start a new thread for
-each topic rather than following up to an existing one. Agenda
-topics and attendees will be selected by the program committee,
-but the final agenda will be formed by consensus of the attendees
-on the day.
-
-3) Like previous years we would also like to try and make sure we are
-including new members in the community that the program committee
-may not be familiar with. The Google form has an area for people to
-add required/optional attendees. Please encourage new members of the
-community to submit a request for an invite as well, but additionally
-if maintainers or long term community members could add nominees to
-the form it would help us make sure that new members get the proper
-consideration.
-
-For discussion leaders, slides and visualizations are encouraged to
-outline the subject matter and focus the discussions. Please refrain
-from lengthy presentations and talks in order for sessions to be
-productive; the sessions are supposed to be interactive, inclusive
-discussions.
-
-We are still looking into the virtual component. We will likely run
-something similar to what we did last year, but details on that will
-be forthcoming.
-
-2024: https://lwn.net/Articles/lsfmmbpf2024/
-
-2023: https://lwn.net/Articles/lsfmmbpf2023/
-
-2022: https://lwn.net/Articles/lsfmm2022/
-
-2019: https://lwn.net/Articles/lsfmm2019/
-
-2018: https://lwn.net/Articles/lsfmm2018/
-
-2017: https://lwn.net/Articles/lsfmm2017/
-
-2016: https://lwn.net/Articles/lsfmm2016/
-
-2015: https://lwn.net/Articles/lsfmm2015/
-
-2014: http://lwn.net/Articles/LSFMM2014/
-
-4) If you have feedback on last year's meeting that we can use to
-improve this year's, please also send that to:
-
-          lsf-pc@lists.linux-foundation.org
-
-Thank you on behalf of the program committee:
-
-          Christian Brauner (Filesystems)
-          Jan Kara (Filesystems)
-          Martin K. Petersen (Storage)
-          Javier González (Storage)
-          Michal Hocko (MM)
-          Dan Williams (MM)
-          Daniel Borkmann (BPF)
-          Martin KaFai Lau (BPF)
-
--- 
-Michal Hocko
-SUSE Labs
 
