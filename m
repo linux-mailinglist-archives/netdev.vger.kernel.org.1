@@ -1,230 +1,359 @@
-Return-Path: <netdev+bounces-151582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B98C29F01BA
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 02:14:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC2589F01BC
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 02:14:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75C6E286ECF
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 01:14:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ED3928753E
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 01:14:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2676E8472;
-	Fri, 13 Dec 2024 01:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ECE7125D6;
+	Fri, 13 Dec 2024 01:14:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QTs0V/i5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FPvJVffr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EBCF249E5;
-	Fri, 13 Dec 2024 01:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED2A2114
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 01:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734052454; cv=none; b=Voig2Q19TT7+CuRVm6p0WZdayeWl2OIwD9ZKvcYa6R+5mOOTS89Gs/9Wg1VmzEYSCQeEHmkdRv7iZPdxL+/tqeE40wXnUG3laocJigd90vojXXmal/M3s87YdQHfh5MWtKczg7mZiW4/zC1pFJ702yiDLRZqENkVRZODe8DFclc=
+	t=1734052462; cv=none; b=LcDF55ITrRFi4kh1o3SVmuJCQeNMNEmTKpmGJK1n5gg+xpLTyhcjjL54tJvSSA2GBB8MSBw0nMex+KMkx17sN2OVh7F1r3bkhl+f7kFbgRUU3P/EiDos1Q01NA6wh2Troagl/DZw/peo/G2Te3sIEzMIsPW2xX68RpxYN4xVJBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734052454; c=relaxed/simple;
-	bh=rJspH013U22683GEjWtelKB37u8YLwlLWq0GPVy5ArY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t/sQ/GaDFGtQXdtusOBaITVLtis9vCgTbEz+FUWtnq6fg7rK7UfRKAL/X51SrCsIknw5ozO//pGS6nlkHLkLPiiMOfkeloljzZWXegUMmY7IWlWIJVZRb0k33YtAVK6VF17CJunDwpZXRT3Ex4dwCK0o8K74cKNL7jxhK7ZOF4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QTs0V/i5; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d0bf4ec53fso229004a12.0;
-        Thu, 12 Dec 2024 17:14:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734052450; x=1734657250; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jlR7YjzWOcyJAWoeh6nLPh4Md77VUhAPBYzRJQYlorc=;
-        b=QTs0V/i52gzmc7TmBZcer1OUyNd1XJdM771MTru/Mu08zRkfm/hzgSX+nmapX4SyXp
-         05zJdrq7nazOcuaNw6RsZGSqglBXTkmOEddUWu3WRyEiCoGSLITcBdYJneTs+mYDk/lD
-         kKHaAbdH94/rw3xDjXklmqh4kUHGX2O/Hc7PWRPdHZYGFua77NbcABb8CTwy5gGE+08t
-         zVeQRCWhHOJs09+c6zOPT8RjEmQyKoiJs2C+GznyL06MJuaCekgeHG2CvBvfEDQ+zJ5g
-         55gnAsZ2ht928IYWS658o3FmFfL1hsQh/6u/wz8mBHdbVwV9BW+1NeEAhUJL9E+MlAxx
-         lGpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734052450; x=1734657250;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jlR7YjzWOcyJAWoeh6nLPh4Md77VUhAPBYzRJQYlorc=;
-        b=GnDYDoIekO507aVCX3VXYkfKLHF0Mu2fj302pntvM45a452L/iExUogIG5wWYS4rNL
-         SWgeACPb1rXrgPkVu/e9z7cDlqenV/YqVwYOWR5M/3Axoz07qdqyTW1kEaQVewt0ZccM
-         Jh5WmuS2W1Cauw5lK2OEo/P4p+WKDe+eKszpEhoSYAQLbTjy09qny0WA98YFdCfDKH/W
-         2L34AlZnc3RakB9XIy3zozRoUa+M1IEgQfd9Xs9FnnTjB4VwpLayx3NFBrpHEJfPqnM1
-         ZZ5jLMoiK1R/vDsqgeiEjI0BOp2fLQAIimrwbYmoV7dBItPPurmOTgWGhPtD4xkHQSKm
-         m+fw==
-X-Forwarded-Encrypted: i=1; AJvYcCW3Y9hOlWZNLPg3oflbgdtnWTn4mXFvU7oCZF8XCbrLWzDFthOeAzV36vbhI3663b964mhmek5hjPoDFAo=@vger.kernel.org, AJvYcCW8H8jnaWhkEdTp5ulWJr/wsGd5qlEMapkBCl8Rv/VzT/UkGg4PU/YFJgUu2QOEXVPU1vupQ/54@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIUE0N8U2dogOTQpxyiiM3ia1M0AFaJITwh7kf7mYeUIuPYNrY
-	ipjQht9W4uvcb4NDWi4uMykddRkwQaVmPMWvuUbbij/tkrLwAPH3
-X-Gm-Gg: ASbGncvxFW7EnmXW3UrZBHg3p/gLAXp4ddPOHAOorcokF6FCXwCnSVc0lclvfhMVvD5
-	iQXHGgrVw8ehVfnpiBCO/LLVwWQDnOH81+P3rM/DjW7o6JwuP297n/qQ0wc/btSkE9g02gc4f3t
-	yS/a8llI6d5h2iKCsJGBAeSro8GpmPsNMpftH+EQlARx9XY1C2J4PG4NirPRRIdWmJI84sKtzQu
-	+JJhahsa92tDiGIAfzUIA3UlyuvRDl5VH5VkU6bARTd
-X-Google-Smtp-Source: AGHT+IEPZCGIzxf8E+fyXrKGKu1OQUyVSK031o087hyOh80Spj2tLlKPg9ejvsvuJrEG9KomTN+CNg==
-X-Received: by 2002:a17:907:c28:b0:aa6:9407:34e3 with SMTP id a640c23a62f3a-aab77e89c1emr24063066b.9.1734052450191;
-        Thu, 12 Dec 2024 17:14:10 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa6701b08c2sm790332566b.124.2024.12.12.17.14.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2024 17:14:08 -0800 (PST)
-Date: Fri, 13 Dec 2024 03:14:05 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tim Harvey <tharvey@gateworks.com>
-Cc: Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: dsa: microchip: ksz9477: fix multicast filtering
-Message-ID: <20241213011405.ogogu5rvbjimuqji@skbuf>
-References: <20241212215132.3111392-1-tharvey@gateworks.com>
- <20241213000023.jkrxbogcws4azh4w@skbuf>
- <CAJ+vNU2WQ2n588vOcofJ5Ga76hsyff51EW-e6T8PbYFY_4xu0A@mail.gmail.com>
+	s=arc-20240116; t=1734052462; c=relaxed/simple;
+	bh=Z8NZU10lqxCjMNIMYlB4+pTlmXi8SnoozYRhLLasBcI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cJ6nFyzs7vPMQEk/2PaiTQymec4he+/wfb7oDQCgqU1Np6lD5t40NT4cKikcJXH6A5KfciuUyA8P7EuSTF73IQVxpFH33qAtMAv/DgHEhVZyznBt12YV8iedaCpabRw7W9MjNnKKhtneMhKXGR9GJNcJuYSG3s4WUlDd4Ot0tXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FPvJVffr; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <65a83b0e-5547-408a-a081-083ffd9d1c91@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734052457;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mnv4HruEQX6MfZNU3lmvh1Od5gfd8xReBtQY46lrXCs=;
+	b=FPvJVffrEUsdZ6D/7AWwFnN1TeBDWsQaZXprKduXuIdZMP0XDkc60cOrQdmJZcLZa6t7s8
+	+ku6hvEamFKdXfLCt30gpX8j2cOqfC09Vr14FWMKJWitEciWYrsKOrtyU6BwzRMxnlaqaA
+	hP1LdifARK/yEUG8QrQlOsLCcbjnAgo=
+Date: Thu, 12 Dec 2024 17:14:06 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJ+vNU2WQ2n588vOcofJ5Ga76hsyff51EW-e6T8PbYFY_4xu0A@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 11/11] bpf: add simple bpf tests in the tx
+ path for so_timstamping feature
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
+ <20241207173803.90744-12-kerneljasonxing@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20241207173803.90744-12-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Dec 12, 2024 at 04:32:28PM -0800, Tim Harvey wrote:
-> > >  - forward to all but cpu port:
-> >
-> > Why would you not forward packets to the CPU port as a hardcoded configuration?
-> > What if the KSZ ports are bridged together with a foreign interface
-> > (different NIC, WLAN, tunnel etc), how should the packets reach that?
+On 12/7/24 9:38 AM, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
 > 
-> If that is the correct thing to do I can certainly do that. I was
-> assuming that the default policy above must be somewhat standard. This
-> patch leaves the policy that was created by the default table
-> configuration and just updates the port configuration based on the dt
-> definition of the user vs host ports.
-
-I think you misunderstood my comment which you've quoted here, it was:
-"why would you hardcode a configuration which can't be changed and which
-doesn't include _at least_ the CPU port in the list of destination
-ports?! isn't that needed for so many reasons?"
-
-This particular paragraph did not contain any suggestion of the form
-"the correct thing to do is ...", just an observation that the choice
-you've made is most likely wrong.
-
-> > >    group 4 (01-80-C2-00)-00-20 (GMRP)
-> > >    group 5 (01-80-C2-00)-00-21 (GVRP)
-> > >    group 7 (01-80-C2-00)-00-11 - (01-80-C2-00)-00-1F,
-> > >            (01-80-C2-00)-00-22 - (01-80-C2-00)-00-2F
-> >
-> > Don't you want to forgo the (odd) hardware defaults for the Reserved Multicast
-> > table, and instead follow what the Linux bridge does in br_handle_frame()?
-> > Which is to trap all is_link_local_ether_addr() addresses to the CPU, do
-> > _not_ call dsa_default_offload_fwd_mark() for those packets (aka let the
-> > bridge know that they haven't been forwarded in hardware, and if they
-> > should reach other bridge ports, this must be done in software), and let the
-> > user choose, via the bridge group_fwd_mask, if they should be forwarded
-> > to other bridge ports or not?
+> Only check if we pass those three key points after we enable the
+> bpf extension for so_timestamping. During each point, we can choose
+> whether to print the current timestamp.
 > 
-> Again, I really don't know what the 'right' thing to do is for
-> multicast packets but the enabling of the reserved multicast table
-> done in commit 331d64f752bb ("net: dsa: microchip: add the
-> enable_stp_addr pointer in ksz_dev_ops") breaks forwarding of all
-> multicast packets that are not sent to 01-80-C2-00-00-00
-
-Yes, because prior to that commit, this table wasn't consulted by the
-data path of the switch.
-
-> > > Datasheets:
-> > > [1] https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9897S-Data-Sheet-DS00002394C.pdf
-> > > [2] https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9896C-Data-Sheet-DS00002390C.pdf
-> > > [3] https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9893R-Data-Sheet-DS00002420D.pdf
-> > > [4] https://ww1.microchip.com/downloads/en/DeviceDoc/00002330B.pdf
-> > > [5] https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ9563R-Data-Sheet-DS00002419D.pdf
-> > > [6] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/DataSheets/KSZ9567R-Data-Sheet-DS00002329.pdf
-> > > [7] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/DataSheets/KSZ9567R-Data-Sheet-DS00002329.pdf
-> >
-> > [6] and [7] are the same.
-> >
-> > Also, you'd better specify in the commit message what's with these datasheet
-> > links, which to me and I suppose all other non-expert readers, are pasted here
-> > out of the blue, with no context.
-> >
-> > Like for example: "KSZ9897, ..., have arbitrary CPU port assignments, as
-> > can be seen in the driver's ksz_chip_data :: cpu_ports entries for these
-> > families, and the CPU port selection on a certain board rarely coincides
-> > with the default host port selection in the Reserved Multicast address
-> > table".
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>   .../bpf/prog_tests/so_timestamping.c          |  97 +++++++++++++
+>   .../selftests/bpf/progs/so_timestamping.c     | 135 ++++++++++++++++++
+>   2 files changed, 232 insertions(+)
+>   create mode 100644 tools/testing/selftests/bpf/prog_tests/so_timestamping.c
+>   create mode 100644 tools/testing/selftests/bpf/progs/so_timestamping.c
 > 
-> I was just trying to be thorough. I took the time to look up the
-> datasheets for all the switches that the ksz9447 driver supports to
-> ensure they all had the same default configuration policy and same
-> configuration method/registers so I thought I would include them in
-> the message. I can drop the datasheet links if they add no value. I
-> was also expecting perhaps the commit message was confusing so I
-> wanted to show where the information came from.
+> diff --git a/tools/testing/selftests/bpf/prog_tests/so_timestamping.c b/tools/testing/selftests/bpf/prog_tests/so_timestamping.c
+> new file mode 100644
+> index 000000000000..c5978444f9c8
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/prog_tests/so_timestamping.c
+> @@ -0,0 +1,97 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2024 Tencent */
+> +
+> +#define _GNU_SOURCE
+> +#include <sched.h>
+> +#include <linux/socket.h>
+> +#include <linux/tls.h>
+> +#include <net/if.h>
+> +
+> +#include "test_progs.h"
+> +#include "cgroup_helpers.h"
+> +#include "network_helpers.h"
+> +
+> +#include "so_timestamping.skel.h"
+> +
+> +#define CG_NAME "/so-timestamping-test"
+> +
+> +static const char addr4_str[] = "127.0.0.1";
+> +static const char addr6_str[] = "::1";
+> +static struct so_timestamping *skel;
+> +static int cg_fd;
+> +
+> +static int create_netns(void)
+> +{
+> +	if (!ASSERT_OK(unshare(CLONE_NEWNET), "create netns"))
+> +		return -1;
+> +
+> +	if (!ASSERT_OK(system("ip link set dev lo up"), "set lo up"))
+> +		return -1;
+> +
+> +	return 0;
+> +}
+> +
+> +static void test_tcp(int family)
+> +{
+> +	struct so_timestamping__bss *bss = skel->bss;
+> +	char buf[] = "testing testing";
+> +	int sfd = -1, cfd = -1;
+> +	int n;
+> +
+> +	memset(bss, 0, sizeof(*bss));
+> +
+> +	sfd = start_server(family, SOCK_STREAM,
+> +			   family == AF_INET6 ? addr6_str : addr4_str, 0, 0);
+> +	if (!ASSERT_GE(sfd, 0, "start_server"))
+> +		goto out;
+> +
+> +	cfd = connect_to_fd(sfd, 0);
+> +	if (!ASSERT_GE(cfd, 0, "connect_to_fd_server")) {
+> +		close(sfd);
+> +		goto out;
+> +	}
+> +
+> +	n = write(cfd, buf, sizeof(buf));
+> +	if (!ASSERT_EQ(n, sizeof(buf), "send to server"))
+> +		goto out;
+> +
+> +	ASSERT_EQ(bss->nr_active, 1, "nr_active");
+> +	ASSERT_EQ(bss->nr_sched, 1, "nr_sched");
+> +	ASSERT_EQ(bss->nr_txsw, 1, "nr_txsw");
+> +	ASSERT_EQ(bss->nr_ack, 1, "nr_ack");
+> +
+> +out:
+> +	if (sfd >= 0)
+> +		close(sfd);
+> +	if (cfd >= 0)
+> +		close(cfd);
+> +}
+> +
+> +void test_so_timestamping(void)
+> +{
+> +	cg_fd = test__join_cgroup(CG_NAME);
+> +	if (cg_fd < 0)
+> +		return;
+> +
+> +	if (create_netns())
+> +		goto done;
+> +
+> +	skel = so_timestamping__open();
+> +	if (!ASSERT_OK_PTR(skel, "open skel"))
+> +		goto done;
+> +
+> +	if (!ASSERT_OK(so_timestamping__load(skel), "load skel"))
+> +		goto done;
+> +
+> +	skel->links.skops_sockopt =
+> +		bpf_program__attach_cgroup(skel->progs.skops_sockopt, cg_fd);
+> +	if (!ASSERT_OK_PTR(skel->links.skops_sockopt, "attach cgroup"))
+> +		goto done;
+> +
+> +	test_tcp(AF_INET6);
+> +	test_tcp(AF_INET);
+> +
+> +done:
+> +	so_timestamping__destroy(skel);
+> +	close(cg_fd);
+> +}
+> diff --git a/tools/testing/selftests/bpf/progs/so_timestamping.c b/tools/testing/selftests/bpf/progs/so_timestamping.c
+> new file mode 100644
+> index 000000000000..f64e94dbd70e
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/so_timestamping.c
+> @@ -0,0 +1,135 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2024 Tencent */
+> +
+> +#include "vmlinux.h"
+> +#include "bpf_tracing_net.h"
+> +#include <bpf/bpf_core_read.h>
+> +#include <bpf/bpf_helpers.h>
+> +#include <bpf/bpf_tracing.h>
+> +#include "bpf_misc.h"
+> +
+> +#define SK_BPF_CB_FLAGS 1009
+> +#define SK_BPF_CB_TX_TIMESTAMPING 1
+> +
+> +int nr_active;
+> +int nr_passive;
+> +int nr_sched;
+> +int nr_txsw;
+> +int nr_ack;
+> +
+> +struct sockopt_test {
+> +	int opt;
+> +	int new;
+> +};
+> +
+> +static const struct sockopt_test sol_socket_tests[] = {
+> +	{ .opt = SK_BPF_CB_FLAGS, .new = SK_BPF_CB_TX_TIMESTAMPING, },
+> +	{ .opt = 0, },
+> +};
+> +
+> +struct loop_ctx {
+> +	void *ctx;
+> +	struct sock *sk;
+> +};
+> +
+> +struct {
+> +	__uint(type, BPF_MAP_TYPE_HASH);
+> +	__type(key, u32);
+> +	__type(value, u64);
+> +	__uint(max_entries, 1024);
+> +} hash_map SEC(".maps");
+> +
+> +static u64 delay_tolerance_nsec = 5000000;
 
-They do add value, just guide the reader towards what they should be
-looking at, rather than throwing 6 books at them. I gave my own
-interpretation above of what I think should be the takeaway, after
-spending more than 1 hour studying, and I still might have not seen the
-same things as you. Just don't expect everybody to spend the same amount
-of time.
+If I count right, 5ms may not a lot for the bpf CI and the test could become 
+flaky. Probably good enough to ensure the delay is larger than the previous one.
 
-> What you're suggesting above regarding trapping all
-> is_link_local_ether_addr() addresses to the CPU and not calling
-> dsa_default_offload_fwd_mark() is beyond my understanding.
-> If the behavior of the reserved multicast address table is non-standard
+> +
+> +static int bpf_test_sockopt_int(void *ctx, struct sock *sk,
+> +				const struct sockopt_test *t,
+> +				int level)
+> +{
+> +	int new, opt;
+> +
+> +	opt = t->opt;
+> +	new = t->new;
+> +
+> +	if (bpf_setsockopt(ctx, level, opt, &new, sizeof(new)))
+> +		return 1;
+> +
+> +	return 0;
+> +}
+> +
+> +static int bpf_test_socket_sockopt(__u32 i, struct loop_ctx *lc)
+> +{
+> +	const struct sockopt_test *t;
+> +
+> +	if (i >= ARRAY_SIZE(sol_socket_tests))
+> +		return 1;
+> +
+> +	t = &sol_socket_tests[i];
+> +	if (!t->opt)
+> +		return 1;
+> +
+> +	return bpf_test_sockopt_int(lc->ctx, lc->sk, t, SOL_SOCKET);
+> +}
+> +
+> +static int bpf_test_sockopt(void *ctx, struct sock *sk)
+> +{
+> +	struct loop_ctx lc = { .ctx = ctx, .sk = sk, };
+> +	int n;
+> +
+> +	n = bpf_loop(ARRAY_SIZE(sol_socket_tests), bpf_test_socket_sockopt, &lc, 0);
+> +	if (n != ARRAY_SIZE(sol_socket_tests))
+> +		return -1;
+> +
+> +	return 0;
+> +}
+> +
+> +static bool bpf_test_delay(struct bpf_sock_ops *skops)
+> +{
+> +	u64 timestamp = bpf_ktime_get_ns();
+> +	u32 seq = skops->args[2];
+> +	u64 *value;
+> +
+> +	value = bpf_map_lookup_elem(&hash_map, &seq);
+> +	if (value && (timestamp - *value > delay_tolerance_nsec)) {
+> +		bpf_printk("time delay: %lu", timestamp - *value);
 
-The behavior of that table is customizable, in fact, and can be brought
-into compliance with the Linux network stack's expectations.
+Please try not to printk in selftests. The bpf CI cannot interpret it 
+meaningfully and turn it into a PASS/FAIL signal.
 
-Other network stacks might be different, but in Linux, the easiest way
-to achieve configurability of the group forwarding would be to let
-software do it. The bridge group_fwd_mask is a bit mask of reserved
-multicast groups (group X in 01-80-C2-00-00-0X). For example, setting
-bit 14 (0xe) (aka set group_fwd_mask to 0x4000) would mean "let group
-01-80-C2-00-00-0E be forwarded on all bridge ports, and all other groups
-be just trapped".
+> +		return false;
+> +	}
+> +
+> +	bpf_map_update_elem(&hash_map, &seq, &timestamp, BPF_ANY);
 
-Conceivably, even in Linux there might be other ways to do it, like
-reprogram the hardware tables according to the group_fwd_mask value
-communicated through switchdev. But that infrastructure doesn't exist.
+A nit.
 
-> then it should be disabled and the content of ksz9477_enable_stp_addr()
-> removed.
+	*value = timestamp;
 
-I wouldn't jump the gun so soon.
+> +	return true;
+> +}
+> +
+> +SEC("sockops")
+> +int skops_sockopt(struct bpf_sock_ops *skops)
+> +{
+> +	struct bpf_sock *bpf_sk = skops->sk;
+> +	struct sock *sk;
+> +
+> +	if (!bpf_sk)
+> +		return 1;
+> +
+> +	sk = (struct sock *)bpf_skc_to_tcp_sock(bpf_sk);
+> +	if (!sk)
+> +		return 1;
+> +
+> +	switch (skops->op) {
+> +	case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
+> +		nr_active += !bpf_test_sockopt(skops, sk);
+> +		break;
+> +	case BPF_SOCK_OPS_TS_SCHED_OPT_CB:
+> +		if (bpf_test_delay(skops))
+> +			nr_sched += 1;
+> +		break;
+> +	case BPF_SOCK_OPS_TS_SW_OPT_CB:
+> +		if (bpf_test_delay(skops))
+> +			nr_txsw += 1;
+> +		break;
+> +	case BPF_SOCK_OPS_TS_ACK_OPT_CB:
+> +		if (bpf_test_delay(skops))
+> +			nr_ack += 1;
+> +		break;
 
-> However based on Arun's commit message it seems that prior to
-> that patch STP BPDU packets were not being forwarded to the CPU so
-> it's unclear to me what the default behavior was for multicast without
-> the reserved muticast address table being enabled. I know that if the
-> table is disabled by removing the call to ksz9477_enable_stp_addr then
-> LLDP packets are forwarded to the cpu port like they were before that
-> patch.
+The test is a good step forward. Thanks. Instead of one u64 as the map value, I 
+think it can be improved to make the test more real to record the individual 
+delay. e.g. the following map value:
 
-Reading the commit message: "In order to transmit the STP BPDU packet to
-the CPU port, the STP address (...) has to be added to static alu table",
-I think the correct key in which it should be interpreted is:
+struct delay_info {
+	u64 sendmsg_ns;
+	u32 sched_delay;  /* SCHED_OPT_CB - sendmsg_ns */
+	u32 sw_snd_delay;
+	u32 ack_delay;
+};
 
-"In order to transmit the STP BPDU packets [just] to the CPU port
-[rather than flood them towards all ports], the STP address has to ...".
+and I think a bpf callback during the sendmsg is still needed in the next respin.
 
-I will give it to you that it is quite a stretch to interpret it in this
-way, and it is also frustrating to me to have to extract technically
-valid information from loose formulations like these. Plus, unlike both
-you and Arun, no access to this hardware. But at least, this is the only
-interpretation with which I see no contradictions.
+> +	}
+> +
+> +	return 1;
+> +}
+> +
+> +char _license[] SEC("license") = "GPL";
 
-I will let Arun confirm that the commit message should be interpreted in
-this way and not in another. But at the same time, you could also
-confirm that when the Reserved Multicast address table lookup is disabled,
-they are treated just like any other multicast traffic with no hit in
-the address table: aka broadcast.
 
