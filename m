@@ -1,60 +1,105 @@
-Return-Path: <netdev+bounces-151879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12EA29F171A
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 21:07:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97D2E9F1726
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 21:09:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CB3D1881A3D
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:07:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4AB1188F4FF
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3811198E96;
-	Fri, 13 Dec 2024 20:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFABD1F130C;
+	Fri, 13 Dec 2024 20:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YOPPvpbT"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="QaOiHdKK";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="npwipiP1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824361990C4;
-	Fri, 13 Dec 2024 20:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FFB190471;
+	Fri, 13 Dec 2024 20:02:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734120041; cv=none; b=eheL6oPwoBj2Gvmhoesj6kQldklHdsKcZruqjqXssEcM8ywmfHE1h1n0ZPrDMmw/VCdeTdKEHm7i4ciqYxqRLyzyed+okSGbp3Pni5tN6YGJQwCkzir6t11Up6zccmPTXrj9NKGXhYyGG3UCYZFth/eGX8xpRtAqiq5lAbW9odo=
+	t=1734120132; cv=none; b=dguIrS5ul4EbhmwxU8HIcyc1nCtTXBPRhnQi1acYSlSs9G8h4QLmOOowXyJHdY3GmbstALd9WIYhl5bifH9DEnG+cRuoUoi38czImhrCjlvw8Aum6KiCN/hkh9GIaZ+CEyGEdPkC9vsAmMmywmFBTHN/h1eGgFgWllPsE3OtiX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734120041; c=relaxed/simple;
-	bh=xhtS6wcQI01sWh/2YXkLeK90U0JZniriHzDuVNitY8k=;
+	s=arc-20240116; t=1734120132; c=relaxed/simple;
+	bh=cQ7JGQb4NBBf1Vsc9XB1qFiRbuBlTCVNsKyI+dsWoFw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l9uH8PdB4m/3IWG32OJB5RWEMGggw85G4Yu0qZzDfaNIKXVxlSE1wb71DThRLKfYuYCX7gRrB8P+V3Qn26HyzpIA04Qq7pHX+NEILOroYa0Wsey6dngWTpUoh2osxCcJu+UnOSoAUbkAYAHvCHX2cGpdDd24+bql9CmZbVxGP1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YOPPvpbT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19A35C4CED0;
-	Fri, 13 Dec 2024 20:00:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734120041;
-	bh=xhtS6wcQI01sWh/2YXkLeK90U0JZniriHzDuVNitY8k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YOPPvpbTuYkJJSMmdr48hzkYCupGrgyvYpaB9b7Z/+H5B+jeTHPYCEInC6/6bMH4U
-	 xplvR2gbdbFjg3wro/JToT+WP/gaGzkkAa2Io7N80yikxQ/6fAxO7s+U7W1niPYYJp
-	 Zgf3C8czMKKRGoi12XePzqXTobfwLydxxDrx2VsZUa9cAule0DaJKbMb8b8EK8P/kB
-	 Q1gsHwSFbnpsU9mVsZVCrAamdJeVathhsal2LVC85L8ycSt37IDM60Rv5FPNrDCZqa
-	 u+RaF7Bw/YAZN+fsdGpgRDfOVxTU80VMiF/yjsMpc3rXQtLwp94PMDqV2HYDDaTyfE
-	 lOp1LZPK9lZhQ==
-Date: Fri, 13 Dec 2024 20:00:36 +0000
-From: Simon Horman <horms@kernel.org>
-To: Zijun Hu <zijun_hu@icloud.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Zijun Hu <quic_zijuhu@quicinc.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH net-next v2] net: wan: framer: Simplify API
- framer_provider_simple_of_xlate() implementation
-Message-ID: <20241213200036.GG561418@kernel.org>
-References: <20241213-net_fix-v2-1-6d06130d630f@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=madOa7XmyC8oadtIutfXwug/9zzVGAjZy8ooPg9SNaD+D/OaF89QX3CiyDL5y3hprPuSTzW/Wz5dwC7dYUNwwwybZ8/GEESfRVHVtr5AuFBIQVkmeFFYZ8miixyyynbAPERSEXwknVD3TADfha2HShcFpfe77M4G+KGk63RfhYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=QaOiHdKK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=npwipiP1; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id 1DE081382149;
+	Fri, 13 Dec 2024 15:02:10 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Fri, 13 Dec 2024 15:02:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1734120130; x=1734206530; bh=oZSIPzAhQd
+	6vMkfp3yMQ1DBeWcFBflQVOjU83wzxEX4=; b=QaOiHdKKYfMaqckjyQp2jyBt70
+	TNQZ9wbVN0hS8LoeUM0Uf4as2f8fEEd0zQmBJn9nPNnAosINt3wCW2FXbu4iKDrU
+	2NG+IwCrn+dvpAykLDXx9Xn7NWoMoRUO8XyMNQUZbBSeodLfAHs5Ahd7us7jyTN3
+	sVt8xYd5nQsuJWixAzePTvnzqjy71eW5V3jFOStho+145G1QypGSa4jtmWcjNdsm
+	FptiqWaAEk7kjy1L7PzlN7HWU30gTwpgeKwvXK0gpBlWKooQdIXMhQx5qLRUiRWF
+	ZdpgL+/JgtO+UFvwbAU91Waoqd/6CQwY9FNakNzVjHi/hhtkksv+8JgSFl6g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1734120130; x=1734206530; bh=oZSIPzAhQd6vMkfp3yMQ1DBeWcFBflQVOjU
+	83wzxEX4=; b=npwipiP1XXC2keiLDgS4skVFf57oEJxqMFIg2wrWPLmrLoLm0qo
+	ff9VPo/lq5SzuxayZ1qQwQJ85B29XG5N1FHHw9RP7k6LON+WKFfFL/JHmAF59AZc
+	zfIF5Rb4RqUlgTzvuU7wFSjPUZHpycihMDsPmqsv2VqfngQJhjyLF3N4UqhLdX/p
+	S3nQiqUrgil8/BSac85SYjv71Gd/TF07XSjc43IVv5+sycYpW5tBO+ISPG4Or18D
+	1UXXZfgIR75Xo2/WDjdl1kaDy8ps8VFp0lDDr+gj907ZmrCHcIyVv395Qa7LEvZi
+	L4lb10YHHh19Q7Caz2IsZZCH2odIx3RxyyQ==
+X-ME-Sender: <xms:wZJcZ0WgkYbzWqiAjt18KImf03Tm8rYkNAVORZ_oAtQPC8tVjGoupg>
+    <xme:wZJcZ4lXkf9NCylP0JqFFD9cqfAm9EQooK7iCeOvZWignuW6EiKow32bV8kDT8cL1
+    Auyf2TugP6Mc886pw>
+X-ME-Received: <xmr:wZJcZ4azM93Sv3SSPD2xB6B3NCzflyPluMxk7l4IIDQfFzXVj-sZSIwKqXF8fJ-zgccRdoAL29iwGU-o3pGu4vS1UB0rg5L62vJEFDZU4e1enA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkeejgddufeduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlje
+    dtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdfstddttddvnecuhfhrohhmpeff
+    rghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnh
+    epvdefkeetuddufeeigedtheefffekuedukeehudffudfffffggeeitdetgfdvhfdvnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesug
+    iguhhuuhdrgiihiidpnhgspghrtghpthhtohepudekpdhmohguvgepshhmthhpohhuthdp
+    rhgtphhtthhopegvugguhiiikeejsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnug
+    hrihhisehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrshhtsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurg
+    hnihgvlhesihhoghgvrghrsghogidrnhgvthdprhgtphhtthhopehjohhhnhdrfhgrshht
+    rggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhopehmrghrthhinhdrlhgruheslh
+    hinhhugidruggvvhdprhgtphhtthhopehsohhngheskhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtohephihonhhghhhonhhgrdhsohhngheslhhinhhugidruggvvh
+X-ME-Proxy: <xmx:wZJcZzVAuZoo_2tDsg6gQgXZbVOiPgqlD3wNsaphtsHG3dO4cQDPnA>
+    <xmx:wZJcZ-m4r7NVbXa1e__aK0bY2ojwi4zXhzLI2T_JFW5x1NJu7JASvQ>
+    <xmx:wZJcZ4etpWewECywR9VZ9iMk32de5di6Ekv7arBhe6jCuNsh0hWoWA>
+    <xmx:wZJcZwG-g3hDriQIbatprdiZNUTPppPi91VzzKYOdQ2-g0b2f1Uqbg>
+    <xmx:wpJcZ0pbJKun6Nq6gQOkEMqvVGN8jJOtoZQAmCqu9IZ4W98mHU_B-79P>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 13 Dec 2024 15:02:07 -0500 (EST)
+Date: Fri, 13 Dec 2024 13:02:06 -0700
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Eduard Zingerman <eddyz87@gmail.com>
+Cc: andrii@kernel.org, ast@kernel.org, shuah@kernel.org, 
+	daniel@iogearbox.net, john.fastabend@gmail.com, martin.lau@linux.dev, song@kernel.org, 
+	yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, 
+	jolsa@kernel.org, mykolal@fb.com, bpf@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v5 3/5] bpf: verifier: Refactor helper access
+ type tracking
+Message-ID: <fsclbw3cvixxy3p3toxqegi55wew6mpqmkjs3uyhfxxgfwg5ic@k7g6iu6qgzze>
+References: <cover.1734045451.git.dxu@dxuuu.xyz>
+ <4727abf12fbc53723359d4edcdf5b6dd7d33f9cb.1734045451.git.dxu@dxuuu.xyz>
+ <341df2d52af6c1584353b89a8a65d9d0fb5f0f27.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,26 +108,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241213-net_fix-v2-1-6d06130d630f@quicinc.com>
+In-Reply-To: <341df2d52af6c1584353b89a8a65d9d0fb5f0f27.camel@gmail.com>
 
-On Fri, Dec 13, 2024 at 08:09:11PM +0800, Zijun Hu wrote:
-> From: Zijun Hu <quic_zijuhu@quicinc.com>
+On Thu, Dec 12, 2024 at 08:04:28PM GMT, Eduard Zingerman wrote:
+> On Thu, 2024-12-12 at 16:22 -0700, Daniel Xu wrote:
+> > Previously, the verifier was treating all PTR_TO_STACK registers passed
+> > to a helper call as potentially written to by the helper. However, all
+> > calls to check_stack_range_initialized() already have precise access type
+> > information available.
+> > 
+> > Rather than treat ACCESS_HELPER as a proxy for BPF_WRITE, pass
+> > enum bpf_access_type to check_stack_range_initialized() to more
+> > precisely track helper arguments.
+> > 
+> > One benefit from this precision is that registers tracked as valid
+> > spills and passed as a read-only helper argument remain tracked after
+> > the call.  Rather than being marked STACK_MISC afterwards.
+> > 
+> > An additional benefit is the verifier logs are also more precise. For
+> > this particular error, users will enjoy a slightly clearer message. See
+> > included selftest updates for examples.
+> > 
+> > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> > ---
 > 
-> Simplify framer_provider_simple_of_xlate() implementation by API
-> class_find_device_by_of_node().
+> I think this change is ok.
+> With it there is only one use of 'enum bpf_access_src' remains,
+> but it doesn't look like it could be removed.
 > 
-> Also correct comments to mark its parameter @dev as unused instead of
-> @args in passing.
+> Acked-by: Eduard Zingerman <eddyz87@gmail.com>
 > 
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
-> Changes in v2:
-> - Use non-error path solution suggested by Simon Horman
-> - Link to v1: https://lore.kernel.org/r/20241211-framer-core-fix-v1-1-0688c6905a0b@quicinc.com
+> [...]
+> 
+> > --- a/tools/testing/selftests/bpf/progs/uninit_stack.c
+> > +++ b/tools/testing/selftests/bpf/progs/uninit_stack.c
+> > @@ -55,33 +55,4 @@ exit_%=:	r0 = 0;					\
+> >  		      : __clobber_all);
+> >  }
+> >  
+> > -static __noinline void dummy(void) {}
+> > -
+> > -/* Pass a pointer to uninitialized stack memory to a helper.
+> > - * Passed memory block should be marked as STACK_MISC after helper call.
+> > - */
+> > -SEC("socket")
+> > -__log_level(7) __msg("fp-104=mmmmmmmm")
+> > -__naked int helper_uninit_to_misc(void *ctx)
+> 
+> Is it possible to peek a helper that writes into memory and not delete
+> this test?
 
-Thanks for the update.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+Yeah, good idea. Will do.
 
