@@ -1,227 +1,189 @@
-Return-Path: <netdev+bounces-151745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1C659F0C34
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:27:26 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 116DE18886FF
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:27:27 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD10C1DF739;
-	Fri, 13 Dec 2024 12:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="sTl5zanL"
-X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02CE29F0C53
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 13:34:37 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972B11DF256;
-	Fri, 13 Dec 2024 12:27:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B17C3284AC0
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 12:34:35 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1EBB1DF73E;
+	Fri, 13 Dec 2024 12:34:33 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A201DF256;
+	Fri, 13 Dec 2024 12:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734092843; cv=none; b=XF9FY//WUtI9VODVxrXlJAOpM+a/qoZrSHv0SNcu/tbasTMJAfwnFVLkXdMeFVUMoWao6zWpmRq8YOd+qqvs+a0sW1Dx58BNeEFYjqEfoHUrbuEAusIz68nwtjcW8GBbmr6SKIw7DJAjC/HO+l2ygluWsBvhdUu/f8DHUr/msek=
+	t=1734093273; cv=none; b=ce9YKy9IMb70vxPQ+xu3vBgF/rpOZwhn6YlqLH3DD1OGlbA1BBbDf76v7D39sTq8chCb1wI37I93bs0j4hqnWnU6q6dfANyz5cZ7o/swLwdwqn46glTWS/rpTbMCKftxX9pYunQwJWqVZ8PbGjhgG/W790LSjVHHOCxpns6Hgto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734092843; c=relaxed/simple;
-	bh=RNe5ohNpUyEDQ89uT1QfgzBzs2jm2Vw0Oha4SoeU/gM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QEGSi+JfUFGzrQKMhTOXYAeqPGOGc05P5XodtjBMScWFx3sfH+ajlnQ3uXfhxaEboIfBsOjMHOg36ZPluHhd5JPeUlT8LcY6HPhUGbKh0v/4OBXLm2OUO5S6DVEeqrSMuwoztQ6e9ZbV2Jp0R+mekjM4xB3RxbSXqNXXIMWNpa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=sTl5zanL; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 4BDCQw6T3086016
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 13 Dec 2024 06:26:58 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1734092818;
-	bh=STXJOLYyzLHgBSnUGBfmxsn3ExlIXLRjzN5ci1FD8As=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=sTl5zanLe+f9MmjsXgc64Z6gwv0BT6Xb9IJEroD+PQWyQ3Wb3TQTSLFBNrW6Icu+j
-	 MgDdiIECu7HEfHocq029dHBmakeaKHVPuNTv+KGXNXG9uPh2E8t97i7Cp6Pmf8lJxa
-	 n4xgq6x8iRAaMJ0tfvxlc8v6OjxQ4ACGJA/M//ig=
-Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4BDCQwGc008976
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 13 Dec 2024 06:26:58 -0600
-Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 13
- Dec 2024 06:26:58 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 13 Dec 2024 06:26:58 -0600
-Received: from [10.24.69.13] (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4BDCQqoV123016;
-	Fri, 13 Dec 2024 06:26:53 -0600
-Message-ID: <5ed274f9-ca25-40a7-96c6-43b36b7663af@ti.com>
-Date: Fri, 13 Dec 2024 17:56:52 +0530
+	s=arc-20240116; t=1734093273; c=relaxed/simple;
+	bh=4o5NI4bsGY6wIj4gfMamlO8SkUMVjCEA4aebTAcSTpk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eSKlfQb+L48YmfU7nTLwbH3ieeRg2BdzESQNYZ+/xC2MmEwlNb2CMiwMsz7QdExJqo/YXgSITR5HkO+bQ9uWFF5Ab2XlINFcuU51JnQNLaqrfbFd/BOUsVkApGnV+6bmQw6tqd1q48wa6TqhQ/GYS23dKdrgEqlz/rd/My3lV/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Y8pcZ33WXzhZTt;
+	Fri, 13 Dec 2024 20:31:58 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 538CD140123;
+	Fri, 13 Dec 2024 20:34:25 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 13 Dec 2024 20:34:25 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <somnath.kotur@broadcom.com>, <liuyonglong@huawei.com>,
+	<fanghaiqing@huawei.com>, <zhangkun09@huawei.com>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Robin Murphy <robin.murphy@arm.com>, Alexander Duyck
+	<alexander.duyck@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, IOMMU
+	<iommu@lists.linux.dev>, MM <linux-mm@kvack.org>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>
+Subject: [PATCH RFCv5 0/8] fix two bugs related to page_pool
+Date: Fri, 13 Dec 2024 20:27:31 +0800
+Message-ID: <20241213122739.4050137-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXTERNAL] Re: [PATCH net v4 1/2] net: ti: icssg-prueth: Fix
- firmware load sequence.
-To: Dan Carpenter <dan.carpenter@linaro.org>
-CC: <vigneshr@ti.com>, <matthias.schiffer@ew.tq-group.com>, <robh@kernel.org>,
-        <u.kleine-koenig@baylibre.com>, <javier.carrasco.cruz@gmail.com>,
-        <diogo.ivo@siemens.com>, <horms@kernel.org>, <pabeni@redhat.com>,
-        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
-        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <srk@ti.com>, Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-References: <20241211135941.1800240-1-m-malladi@ti.com>
- <20241211135941.1800240-2-m-malladi@ti.com>
- <304870d9-10c7-43b3-8255-8f2b0422d759@stanley.mountain>
-Content-Language: en-US
-From: Meghana Malladi <m-malladi@ti.com>
-In-Reply-To: <304870d9-10c7-43b3-8255-8f2b0422d759@stanley.mountain>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
+This version is mainly to see if using page_pool_item metadata
+to keep track of all pages is the correct way to fix the dma
+API misuse problem.
 
+Note, it is not based on the latest net-next tree yet, but based
+on the below commit in net-next:
+commit da4fa00abe56 ("Merge branch 'mitigate-the-two-reallocations-issue-for-iptunnels'")
 
-On 11/12/24 21:16, Dan Carpenter wrote:
-> On Wed, Dec 11, 2024 at 07: 29: 40PM +0530, Meghana Malladi wrote: > 
-> -static int prueth_emac_start(struct prueth *prueth, struct prueth_emac 
-> *emac) > +static int prueth_emac_start(struct prueth *prueth, int slice) 
->  > { > struct icssg_firmwares
-> ZjQcmQRYFpfptBannerStart
-> This message was sent from outside of Texas Instruments.
-> Do not click links or open attachments unless you recognize the source 
-> of this email and know the content is safe.
-> Report Suspicious
-> <https://us-phishalarm-ewt.proofpoint.com/EWT/v1/G3vK!uldqfRcOdo0RqyXEHNnjPxku43QuA2sRmrlczDVj-denyMX3qWPEeHokm6IS-fNmWZGSvK3Wn7nSFeNotanVMDOTlZZjZ8Ausf9AkMk$>
-> ZjQcmQRYFpfptBannerEnd
-> 
-> On Wed, Dec 11, 2024 at 07:29:40PM +0530, Meghana Malladi wrote:
->> -static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
->> +static int prueth_emac_start(struct prueth *prueth, int slice)
->>  {
->>  	struct icssg_firmwares *firmwares;
->>  	struct device *dev = prueth->dev;
->> -	int slice, ret;
->> +	int ret;
->>  
->>  	if (prueth->is_switch_mode)
->>  		firmwares = icssg_switch_firmwares;
->> @@ -177,16 +177,6 @@ static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
->>  	else
->>  		firmwares = icssg_emac_firmwares;
->>  
->> -	slice = prueth_emac_slice(emac);
->> -	if (slice < 0) {
->> -		netdev_err(emac->ndev, "invalid port\n");
->> -		return -EINVAL;
->> -	}
->> -
->> -	ret = icssg_config(prueth, emac, slice);
->> -	if (ret)
->> -		return ret;
->> -
->>  	ret = rproc_set_firmware(prueth->pru[slice], firmwares[slice].pru);
->>  	ret = rproc_boot(prueth->pru[slice]);
-> 
-> This isn't introduced by this patch but eventually Colin King is going to
-> get annoyed with you for setting ret twice in a row.
-> 
+From the below performance data, the overhead is avoided as much as possible
+for time_bench_page_pool01_fast_path() and time_bench_page_pool02_ptr_ring,
+and there is about 20ns overhead for time_bench_page_pool03_slow() for fixing
+the bug.
 
-Yeah ok, I will fix this as part of this patch.
+Before this patchset:
+root@(none)$ insmod bench_page_pool_simple.ko
+root@(none)$ insmod bench_page_pool_simple.ko
+[   67.667196] bench_page_pool_simple: Loaded
+[   67.748321] time_bench: Type:for_loop Per elem: 0 cycles(tsc) 0.769 ns (step:0) - (measurement period time:0.076977910 sec time_interval:76977910) - (invoke count:100000000 tsc_interval:7697783)
+[   69.851812] time_bench: Type:atomic_inc Per elem: 2 cycles(tsc) 20.862 ns (step:0) - (measurement period time:2.086207700 sec time_interval:2086207700) - (invoke count:100000000 tsc_interval:208620764)
+[   70.019852] time_bench: Type:lock Per elem: 1 cycles(tsc) 15.015 ns (step:0) - (measurement period time:0.150151600 sec time_interval:150151600) - (invoke count:10000000 tsc_interval:15015154)
+[   70.691100] time_bench: Type:rcu Per elem: 0 cycles(tsc) 6.541 ns (step:0) - (measurement period time:0.654142450 sec time_interval:654142450) - (invoke count:100000000 tsc_interval:65414239)
+[   70.708119] bench_page_pool_simple: time_bench_page_pool01_fast_path(): Cannot use page_pool fast-path
+[   70.975262] time_bench: Type:no-softirq-page_pool01 Per elem: 2 cycles(tsc) 25.785 ns (step:0) - (measurement period time:0.257850110 sec time_interval:257850110) - (invoke count:10000000 tsc_interval:25785005)
+[   70.993931] bench_page_pool_simple: time_bench_page_pool02_ptr_ring(): Cannot use page_pool fast-path
+[   71.575053] time_bench: Type:no-softirq-page_pool02 Per elem: 5 cycles(tsc) 57.191 ns (step:0) - (measurement period time:0.571916900 sec time_interval:571916900) - (invoke count:10000000 tsc_interval:57191684)
+[   71.593722] bench_page_pool_simple: time_bench_page_pool03_slow(): Cannot use page_pool fast-path
+[   73.384560] time_bench: Type:no-softirq-page_pool03 Per elem: 17 cycles(tsc) 178.197 ns (step:0) - (measurement period time:1.781979820 sec time_interval:1781979820) - (invoke count:10000000 tsc_interval:178197975)
+[   73.403581] bench_page_pool_simple: pp_tasklet_handler(): in_serving_softirq fast-path
+[   73.411485] bench_page_pool_simple: time_bench_page_pool01_fast_path(): in_serving_softirq fast-path
+[   73.678410] time_bench: Type:tasklet_page_pool01_fast_path Per elem: 2 cycles(tsc) 25.780 ns (step:0) - (measurement period time:0.257807630 sec time_interval:257807630) - (invoke count:10000000 tsc_interval:25780758)
+[   73.697686] bench_page_pool_simple: time_bench_page_pool02_ptr_ring(): in_serving_softirq fast-path
+[   74.242807] time_bench: Type:tasklet_page_pool02_ptr_ring Per elem: 5 cycles(tsc) 53.608 ns (step:0) - (measurement period time:0.536089620 sec time_interval:536089620) - (invoke count:10000000 tsc_interval:53608957)
+[   74.261996] bench_page_pool_simple: time_bench_page_pool03_slow(): in_serving_softirq fast-path
+[   76.115762] time_bench: Type:tasklet_page_pool03_slow Per elem: 18 cycles(tsc) 184.508 ns (step:0) - (measurement period time:1.845082100 sec time_interval:1845082100) - (invoke count:10000000 tsc_interval:184508203)
 
->>  	if (ret) {
->> @@ -208,7 +198,6 @@ static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
->>  		goto halt_rtu;
->>  	}
->>  
->> -	emac->fw_running = 1;
->>  	return 0;
->>  
->>  halt_rtu:
->> @@ -220,6 +209,78 @@ static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
->>  	return ret;
->>  }
->>  
->> +static int prueth_emac_common_start(struct prueth *prueth)
->> +{
->> +	struct prueth_emac *emac;
->> +	int ret = 0;
->> +	int slice;
->> +
->> +	if (!prueth->emac[ICSS_SLICE0] && !prueth->emac[ICSS_SLICE1])
->> +		return -EINVAL;
->> +
->> +	/* clear SMEM and MSMC settings for all slices */
->> +	memset_io(prueth->msmcram.va, 0, prueth->msmcram.size);
->> +	memset_io(prueth->shram.va, 0, ICSSG_CONFIG_OFFSET_SLICE1 * PRUETH_NUM_MACS);
->> +
->> +	icssg_class_default(prueth->miig_rt, ICSS_SLICE0, 0, false);
->> +	icssg_class_default(prueth->miig_rt, ICSS_SLICE1, 0, false);
->> +
->> +	if (prueth->is_switch_mode || prueth->is_hsr_offload_mode)
->> +		icssg_init_fw_offload_mode(prueth);
->> +	else
->> +		icssg_init_emac_mode(prueth);
->> +
->> +	for (slice = 0; slice < PRUETH_NUM_MACS; slice++) {
->> +		emac = prueth->emac[slice];
->> +		if (emac) {
->> +			ret |= icssg_config(prueth, emac, slice);
->> +			if (ret)
->> +				return ret;
-> 
-> Here we return directly.
-> 
->> +		}
->> +		ret |= prueth_emac_start(prueth, slice);
-> 
-> Here we continue.  Generally, I would expect there to be some clean up
-> on this error path like this:
-> 
-> 		ret = prueth_emac_start(prueth, slice);
-> 		if (ret)
-> 			goto unwind_slices;
-> 
-> 	...
-> 
-> 	return 0;
-> 
-> unwind_slices:
-> 	while (--slice >= 0)
-> 		prueth_emac_stop(prueth, slice);
-> 
-> 	return ret;
-> 
-> I dread to see how the cleanup is handled on this path...
-> 
-> Ok.  I've looked at it and, nope, it doesn't work.  This is freed in
-> prueth_emac_common_stop() but partial allocations are not freed.
-> Also the prueth_emac_stop() is open coded as three calls to
-> rproc_shutdown() which is ugly.
-> 
-> I've written a blog which describes a system for writing error
-> handling code.  If each function cleans up after itself by freeing
-> its own partial allocations then you don't need to have a variable
-> like "prueth->prus_running = 1;" to track how far the allocation
-> process went before failing.
-> https://urldefense.com/v3/__https://staticthinking.wordpress.com/2022/04/28/free-the-last-thing-style/__;!!G3vK!T5VCna8tMLVZNSL49zSwJOQBnoAQEa2xqXUUsIYY78CYm5mEH2wAdMX9CDEfMHXWsjTn0sG4mwKevVIOrgfAuQ$  <https://urldefense.com/v3/__https://staticthinking.wordpress.com/2022/04/28/free-the-last-thing-style/__;!!G3vK!T5VCna8tMLVZNSL49zSwJOQBnoAQEa2xqXUUsIYY78CYm5mEH2wAdMX9CDEfMHXWsjTn0sG4mwKevVIOrgfAuQ$>
-> 
+After this patchset:
+root@(none)$ insmod bench_page_pool_simple.ko
+[   88.665991] bench_page_pool_simple: Loaded
+[   88.747105] time_bench: Type:for_loop Per elem: 0 cycles(tsc) 0.769 ns (step:0) - (measurement period time:0.076981170 sec time_interval:76981170) - (invoke count:100000000 tsc_interval:7698109)
+[   91.585102] time_bench: Type:atomic_inc Per elem: 2 cycles(tsc) 28.206 ns (step:0) - (measurement period time:2.820699360 sec time_interval:2820699360) - (invoke count:100000000 tsc_interval:282069929)
+[   91.753048] time_bench: Type:lock Per elem: 1 cycles(tsc) 15.005 ns (step:0) - (measurement period time:0.150057320 sec time_interval:150057320) - (invoke count:10000000 tsc_interval:15005727)
+[   92.424306] time_bench: Type:rcu Per elem: 0 cycles(tsc) 6.541 ns (step:0) - (measurement period time:0.654151520 sec time_interval:654151520) - (invoke count:100000000 tsc_interval:65415145)
+[   92.441325] bench_page_pool_simple: time_bench_page_pool01_fast_path(): Cannot use page_pool fast-path
+[   92.696225] time_bench: Type:no-softirq-page_pool01 Per elem: 2 cycles(tsc) 24.560 ns (step:0) - (measurement period time:0.245607210 sec time_interval:245607210) - (invoke count:10000000 tsc_interval:24560715)
+[   92.714893] bench_page_pool_simple: time_bench_page_pool02_ptr_ring(): Cannot use page_pool fast-path
+[   93.336550] time_bench: Type:no-softirq-page_pool02 Per elem: 6 cycles(tsc) 61.245 ns (step:0) - (measurement period time:0.612451380 sec time_interval:612451380) - (invoke count:10000000 tsc_interval:61245127)
+[   93.355219] bench_page_pool_simple: time_bench_page_pool03_slow(): Cannot use page_pool fast-path
+[   95.402370] time_bench: Type:no-softirq-page_pool03 Per elem: 20 cycles(tsc) 203.828 ns (step:0) - (measurement period time:2.038286740 sec time_interval:2038286740) - (invoke count:10000000 tsc_interval:203828660)
+[   95.421395] bench_page_pool_simple: pp_tasklet_handler(): in_serving_softirq fast-path
+[   95.429301] bench_page_pool_simple: time_bench_page_pool01_fast_path(): in_serving_softirq fast-path
+[   95.684025] time_bench: Type:tasklet_page_pool01_fast_path Per elem: 2 cycles(tsc) 24.560 ns (step:0) - (measurement period time:0.245605490 sec time_interval:245605490) - (invoke count:10000000 tsc_interval:24560544)
+[   95.703301] bench_page_pool_simple: time_bench_page_pool02_ptr_ring(): in_serving_softirq fast-path
+[   96.401877] time_bench: Type:tasklet_page_pool02_ptr_ring Per elem: 6 cycles(tsc) 68.954 ns (step:0) - (measurement period time:0.689544160 sec time_interval:689544160) - (invoke count:10000000 tsc_interval:68954410)
+[   96.421065] bench_page_pool_simple: time_bench_page_pool03_slow(): in_serving_softirq fast-path
+[   98.496283] time_bench: Type:tasklet_page_pool03_slow Per elem: 20 cycles(tsc) 206.653 ns (step:0) - (measurement period time:2.066533210 sec time_interval:2066533210) - (invoke count:10000000 tsc_interval:206653316)
 
-I agree that current error handling is all over the place. But I wasn't 
-sure what would be the cleanest approach here. Thanks for sharing the 
-blog, I have looked into it and looks very promising. I will try this 
-approach and get back to you.
+1. https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
 
-thanks & regards,
-Meghana Malladi.
+CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: Robin Murphy <robin.murphy@arm.com>
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+CC: Andrew Morton <akpm@linux-foundation.org>
+CC: IOMMU <iommu@lists.linux.dev>
+CC: MM <linux-mm@kvack.org>
 
-> regards,
-> dan carpenter
-> 
+Change log:
+V5:
+  1. Support unlimit inflight pages.
+  2. Add some optimization to avoid the overhead of fixing bug.
+
+V4:
+  1. use scanning to do the unmapping
+  2. spilt dma sync skipping into separate patch
+
+V3:
+  1. Target net-next tree instead of net tree.
+  2. Narrow the rcu lock as the discussion in v2.
+  3. Check the ummapping cnt against the inflight cnt.
+
+V2:
+  1. Add a item_full stat.
+  2. Use container_of() for page_pool_to_pp().
+
+Yunsheng Lin (8):
+  page_pool: introduce page_pool_to_pp() API
+  page_pool: fix timing for checking and disabling napi_local
+  page_pool: fix IOMMU crash when driver has already unbound
+  page_pool: support unlimited number of inflight pages
+  page_pool: skip dma sync operation for inflight pages
+  page_pool: use list instead of ptr_ring for ring cache
+  page_pool: batch refilling pages to reduce atomic operation
+  page_pool: use list instead of array for alloc cache
+
+ drivers/net/ethernet/freescale/fec_main.c     |   8 +-
+ .../ethernet/google/gve/gve_buffer_mgmt_dqo.c |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   |   6 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  14 +-
+ drivers/net/ethernet/intel/libeth/rx.c        |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |   3 +-
+ drivers/net/netdevsim/netdev.c                |   6 +-
+ drivers/net/wireless/mediatek/mt76/mt76.h     |   2 +-
+ include/linux/mm_types.h                      |   2 +-
+ include/linux/skbuff.h                        |   1 +
+ include/net/libeth/rx.h                       |   3 +-
+ include/net/netmem.h                          |  10 +-
+ include/net/page_pool/helpers.h               |  11 +
+ include/net/page_pool/types.h                 |  57 +-
+ net/core/devmem.c                             |   4 +-
+ net/core/netmem_priv.h                        |   5 +-
+ net/core/page_pool.c                          | 660 ++++++++++++++----
+ net/core/page_pool_priv.h                     |  12 +-
+ net/core/skbuff.c                             |   3 +-
+ net/core/xdp.c                                |   3 +-
+ 20 files changed, 650 insertions(+), 164 deletions(-)
+
+-- 
+2.33.0
+
 
