@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-151646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CC439F0733
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:05:49 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB4E19F0734
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 10:05:50 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 192E2188BD15
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 09:05:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABF27282A39
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 09:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 199981AF0B8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877721AF0C9;
 	Fri, 13 Dec 2024 09:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JaL5zOhb"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mBjcJwO0"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5EB819CC2D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E5D19AA58;
 	Fri, 13 Dec 2024 09:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734080735; cv=none; b=GpIerndlQ5dAk0ksWKB6McY29FBzk/3TI8UKk3Z+wLldwAgzDn799vjkZ+mDrDGWn8tPKXWLiu9PktQD7UCF/y0UNPEmkTEoRl+Fo1PN7vKBUrVX9XesGkxTFd4K5uouM+BWVYqy3YaxpYPzHKnLYN6ZIJiVuukQMqpwL+rBPdw=
+	t=1734080736; cv=none; b=ryBmHxoLGvObCE49AatdoIqFffomYGy9StHVIf4gMVRu71XcaHhsqIQS8xa2fUCyroBZi/+8DqHpuTDUO/hAHp4VtfqZjXhqplQvKolXq9aZ7KortXRaUtIkE+Hd29pbNmr1zP4FjM1T4cVpdjviG/IR8UuVpG0Pob3HhNAinW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734080735; c=relaxed/simple;
-	bh=n5ZcLBHj7pfsmR/9MuwhngnQRBs3J+uwb0CL9BUR8Cw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F6u2JKjhc4FgKt33lk0WvTAtlMahT8RUdliqDVHDoewFP73jn6u7Ho+1NUACmuV1RckD3fX07tWicKdMp6iXIA+HqaBPeRgCQh191XeresGS5/Hbw5euMBXDoWsFMiMLJS9bf6q1DjWjyYzv5tXxE4XyDeiBJ3F92BpLR5dkc6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JaL5zOhb; arc=none smtp.client-ip=217.70.183.201
+	s=arc-20240116; t=1734080736; c=relaxed/simple;
+	bh=PjBNtQtI1GIsHH8PL+ueThE6odOdzV+opW9CKy1Xd5w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dJpudjcCoS6Rx0cZQArDwDgq+x1p/TktvufpMBR/x8U/8p5kJXWLtSjE4MEO1Gk/wfWiZpHAjQjAn2Mdi7d/I18DZgchk9fyJO2Im08Xw3RVHWr7W8shxPoTYcttReiBPb7BijOiF7ePSgi6oYCQq3qEWy5I+5sEqLGnK29WLkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mBjcJwO0; arc=none smtp.client-ip=217.70.183.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6F8BC1BF207;
-	Fri, 13 Dec 2024 09:05:28 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E25651BF204;
+	Fri, 13 Dec 2024 09:05:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1734080730;
+	t=1734080731;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=oMe35rpj3pGiRrVthFbN55YWzxRRPpFse7Y8Q5/jxqg=;
-	b=JaL5zOhbshsW8+n7cBu7ZUVx3aRCCpSTvbQZkydzCq2K1aFWd/DAM0B9WvMnCmRxwWlzGW
-	uh2MRn9ref2MKLQqurotEa+QH2KCG+Uu3eeuFttjFgrLvhOSfRYp4beZ3wkVG9KWiE9NIZ
-	73L81hYlOmS9UKYb//0LcyZ6EduS9mtv2kf+3+s2/2+LbYUHiO2GLu6cmIwsjw9ssYfUyI
-	/dyp7lG2YK4dY+tpc4C93baFrIL1659QYlw3DbtAFYSp+jL4wC2tSs9S2yFSMGHCedJJ4Z
-	o+y/qRFHwI9MmTf5GG8OpMs5Ld8NIXSXeVrHy2QuH5xTykTMUwbRHlP+pRNkCA==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FxM8+Leu8MwruhsMJIlIYRMswoFi1MwEa2tyG0/MFaI=;
+	b=mBjcJwO02cTezzCp3XYcoFdJbdVzBVazXlvccMmSiZd4UY/Kkyw+8TbOHO1Q85aXZ2GDXV
+	rwd5DBplbdmBg60aSgTT8UExB2pIEAbtVLkhXfkX2h4sJVkhkG9xwdcUTa3IlQ2y9765r0
+	aZIDleIr7dVb6VJcdZ3rzPn2gyes+lLphrABQJYTFanWm8xIb4d8buR/xK+ZKzJL23Sy2C
+	kSR0L7oj0vd/lM/FAexfIJ6ptBBJVgo03/QAdB2adYYgn207pcviXxf1zuDeTIIj+j4xCt
+	Tu6xea8EOQM8K+l11+4dSqBDHFbwKGgq6yXf3+YdVh/SkynlBGWS0qIPD3Kzfg==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Jose Abreu <joabreu@synopsys.com>,
@@ -59,10 +61,12 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 0/2] net: stmmac: dwmac-socfpga: Allow using 1000BaseX
-Date: Fri, 13 Dec 2024 10:05:23 +0100
-Message-ID: <20241213090526.71516-1-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next 1/2] net: stmmac: dwmac-socfpga: Add support for 1000BaseX
+Date: Fri, 13 Dec 2024 10:05:24 +0100
+Message-ID: <20241213090526.71516-2-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20241213090526.71516-1-maxime.chevallier@bootlin.com>
+References: <20241213090526.71516-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,47 +76,66 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello everyone,
+The dwmac-socfpga found on altera socfpga SoCs can use 1000BaseX or
+SGMII. The IP integrates a variation of the Lynx PCS, which the driver
+supports well. However, there's some internal circuitry that needs
+enabling when using SGMII or 1000BaseX through the "sgmii_adapter" in
+the socfpga wrapper. So far, this is only enabled when SGMII is used as
+the interface mode. Make so that 1000BaseX also enables that block.
 
-This short series enables 1000BaseX support in dwmac-socfpga. The support
-for this mode is coming from the Lync PCS, however some internal
-configuration is also needed in dwmac-socfpga as well.
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-Patch 1 makes so that we enable the "sgmii_adapter" when using 1000BaseX
-as well. The name is a bit misleading for that field, as this is merely
-a GMII serializer, the 1000BaseX vs SGMII differences are handled in the
-Lynx PCS.
-
-Patch 2 makes so that both 1000BaseX and SGMII are set in the phylink
-supported_interfaces. The supported_interfaces are populated by what's
-set in DT, which isn't enough for SFP use-cases as the interface mode
-will change based on the inserted module, thus failing the validation of
-the new interface if it's not the one specified in DT.
-
-When XPCS is used, the interfaces list if populated by asking XPCS for
-its supported interfaces. I considered using the same kind of approach
-(asking Lynx for the supported modes), but dwmac-socfpga would be the
-sole user for that, and this would also need modifying Lynx so that the
-driver would maintain different sets of capabilities depending on how
-it's integrated (it only supports SGMII/1000BaseX in dwmac-socfpga, but
-other modes are supported on other devices that use Lynx).
-
-I've chosen to "just" populate the interfaces in .pcs_init() from
-stmmac, which is called before phylink_create() so we should be good in
-that regard.
-
-Thanks,
-
-Maxime
-
-Maxime Chevallier (2):
-  net: stmmac: dwmac-socfpga: Add support for 1000BaseX
-  net: stmmac: dwmac-socfpga: Set interface modes from Lynx PCS as
-    supported
-
- .../ethernet/stmicro/stmmac/dwmac-socfpga.c   | 20 +++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+index 16020b72dec8..8c7b82d29fd1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+@@ -258,6 +258,7 @@ static int socfpga_set_phy_mode_common(int phymode, u32 *val)
+ 	case PHY_INTERFACE_MODE_MII:
+ 	case PHY_INTERFACE_MODE_GMII:
+ 	case PHY_INTERFACE_MODE_SGMII:
++	case PHY_INTERFACE_MODE_1000BASEX:
+ 		*val = SYSMGR_EMACGRP_CTRL_PHYSEL_ENUM_GMII_MII;
+ 		break;
+ 	case PHY_INTERFACE_MODE_RMII:
+@@ -300,6 +301,7 @@ static int socfpga_gen5_set_phy_mode(struct socfpga_dwmac *dwmac)
+ 	if (dwmac->f2h_ptp_ref_clk ||
+ 	    phymode == PHY_INTERFACE_MODE_MII ||
+ 	    phymode == PHY_INTERFACE_MODE_GMII ||
++	    phymode == PHY_INTERFACE_MODE_1000BASEX ||
+ 	    phymode == PHY_INTERFACE_MODE_SGMII) {
+ 		regmap_read(sys_mgr_base_addr, SYSMGR_FPGAGRP_MODULE_REG,
+ 			    &module);
+@@ -321,7 +323,8 @@ static int socfpga_gen5_set_phy_mode(struct socfpga_dwmac *dwmac)
+ 	 */
+ 	reset_control_deassert(dwmac->stmmac_ocp_rst);
+ 	reset_control_deassert(dwmac->stmmac_rst);
+-	if (phymode == PHY_INTERFACE_MODE_SGMII)
++	if (phymode == PHY_INTERFACE_MODE_SGMII ||
++	    phymode == PHY_INTERFACE_MODE_1000BASEX)
+ 		socfpga_sgmii_config(dwmac, true);
+ 
+ 	return 0;
+@@ -356,6 +359,7 @@ static int socfpga_gen10_set_phy_mode(struct socfpga_dwmac *dwmac)
+ 	if (dwmac->f2h_ptp_ref_clk ||
+ 	    phymode == PHY_INTERFACE_MODE_MII ||
+ 	    phymode == PHY_INTERFACE_MODE_GMII ||
++	    phymode == PHY_INTERFACE_MODE_1000BASEX ||
+ 	    phymode == PHY_INTERFACE_MODE_SGMII) {
+ 		ctrl |= SYSMGR_GEN10_EMACGRP_CTRL_PTP_REF_CLK_MASK;
+ 		regmap_read(sys_mgr_base_addr, SYSMGR_FPGAINTF_EMAC_REG,
+@@ -374,7 +378,8 @@ static int socfpga_gen10_set_phy_mode(struct socfpga_dwmac *dwmac)
+ 	 */
+ 	reset_control_deassert(dwmac->stmmac_ocp_rst);
+ 	reset_control_deassert(dwmac->stmmac_rst);
+-	if (phymode == PHY_INTERFACE_MODE_SGMII)
++	if (phymode == PHY_INTERFACE_MODE_SGMII ||
++	    phymode == PHY_INTERFACE_MODE_1000BASEX)
+ 		socfpga_sgmii_config(dwmac, true);
+ 	return 0;
+ }
 -- 
 2.47.1
 
