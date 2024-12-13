@@ -1,192 +1,154 @@
-Return-Path: <netdev+bounces-151823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D5B39F1138
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 16:45:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 443EA9F1145
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 16:46:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E9F918839A4
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 15:45:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62A28164488
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 15:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960F81E32CA;
-	Fri, 13 Dec 2024 15:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA381DF988;
+	Fri, 13 Dec 2024 15:46:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ll7rrHzJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iKnxpLP4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37C0158D80;
-	Fri, 13 Dec 2024 15:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A792F24;
+	Fri, 13 Dec 2024 15:46:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734104712; cv=none; b=rb275vOjWvFsRQNoJfLiuw6LmBE1ZRnxzvdUghqyhzcWkTc6pATy0bRCVMQ3p2Guylqo5wqbrszdDczv7xF6EZc+5PmsO1Izrc6LxrFaxmgQkfJIPTGdtjHtsx0SIY34x5xlHWBhJ9cB54T2gBxzEqwTXcpUVRMs/xcZblNMh3A=
+	t=1734104800; cv=none; b=SsdtyeRLAisqxz0pyWzLxmn9y7Ah+++K/9v/+EYV4y9j0GrrAsoPalseU+LT/WLs7NJIODGVMugzioAbY2CS0zX5lGxnZ5f8/HssPS3WRP1F0C+DyXaybfVGLf6zgqknSkhGuOGGAzNP9Vq2ap6Z5l+NfXR7txMK5MleZPEWE5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734104712; c=relaxed/simple;
-	bh=pQV04T28yKXyB45MBWGS+eAwnSvswfhwmRhvCl6hBsU=;
+	s=arc-20240116; t=1734104800; c=relaxed/simple;
+	bh=yDWvwmhDMeacL/yRoDS1GfmjTJAOd+U0Gqm66CaMR4M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O/cSQBsIJr8uT3iKonZ41Pn5yZScW6nDCPvcS/Ajn48R6QGHP63Cjs4/J8Nng0pg2ByslLsUr9xi6nGT6NpmUmCcGeXWA5VY4rpxcYI+/h/s5aD0WbCuFD/FT3ub5Pvekbf3zk2N8T5cLzX76hSHAZ7vbpYKK6Bf5Ke9dKme72w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ll7rrHzJ; arc=none smtp.client-ip=209.85.166.173
+	 To:Cc:Content-Type; b=IBviH++RfxZehOn1fq5vqYd3RLtJDQEjzTQfGhpujACKUV5vAKUfZ2AHZRUC6W1ujR2rhh61/YGE1rkSMxSiGZCY+Mk3q8FylvtkZzernjuVqgsmQuDpBD5H4jROqGQRYtQypaIT0+XsJkzMs+SkOw7/mQc/YepJIBp/mEwE6wQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iKnxpLP4; arc=none smtp.client-ip=209.85.215.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3a7d7c1b190so6557545ab.3;
-        Fri, 13 Dec 2024 07:45:10 -0800 (PST)
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-801c7e6518eso536976a12.2;
+        Fri, 13 Dec 2024 07:46:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734104710; x=1734709510; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1734104798; x=1734709598; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hdLCryXHVXWdUEQGqJUqoTPzEG99j9zrpJMlLFpm9+8=;
-        b=ll7rrHzJcTw7R4n+NevdHTXVqh/VpmcLhqezhf0KRXAPGaW3on8do/Vbk4YscE0Dyo
-         KYCkVbciYysFw4pfvO6knStukqGMEaOmngNxGbs1oHHmWIzmpr9zRzz9eaDAmddc+kDJ
-         QRdHxrDmzhsvF5hjiVFPahjBCdcgPQ39NiOIWa4X3YCQWZJfJKpxoyEXyINrZde499SW
-         R3/tM5kksFURRbq2iTz5AQk3+XrKfgA5/s3/MFdbDw30gtLJ7CfkU8YVs3FlMp+U9+Wy
-         oLINnL2h7NYMbq77sKCJtjrtAgObeqeMTWgeLUf4FC2nN1ivSpF04pF4e1NbHAg6KsCA
-         VzoQ==
+        bh=1vXA2/urSSs2Rh5p3xBC9KaPnKWnmLtFXFX4YA6dOUY=;
+        b=iKnxpLP4VwCdmM/zmo30MKcfO27kSI+W21doJW+LuBiN9vT/2sO05wK5zaaWdlfuiJ
+         hM4h+yJrp3Z6WAXLR+w9W2aIlfq/SKyiNJgbgBEsoYG1mqfEuLkHypiMm1J75csYwf1l
+         k/LNRMROHcUWaXoL3ms8xoxDm2/+2KpyXF5tJ7i17BZfXYZDU17O6Hr+ARqJpWz99rPb
+         S4QOqUSpd6kTKnir3ojFkVz/IQM6AApQDG6MoQ/KwkA5GGbloxFvozuriSGfYAOKUs2o
+         ltKmzI0luF9WsL10EoMlVy5jcGpInqElYQdWnCSZICONRJYRQTz3qzdffpjp4On8vJ0t
+         Ltpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734104710; x=1734709510;
+        d=1e100.net; s=20230601; t=1734104798; x=1734709598;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hdLCryXHVXWdUEQGqJUqoTPzEG99j9zrpJMlLFpm9+8=;
-        b=ilAkUP2qnEihBr50khfArZa2e3l11EodNaeqV+xTcM4cWasMnqJserkK1bqyV2L040
-         G3SI5Gmz3aI+O4Kn6iYgfqMPACBu7lqSo48/nwaUn2d+R7U8k0dRc+h4P3LRC7GlEiYl
-         9sOBedy1jnRNyRK9gyPa53A0pP1LS8pUvZoYqWjM2eQN+s1vlsujLP5RKbAM7mO2VGXx
-         3QsyP4SigetkBqc5tue0opaBxiKwNIJOjCks88CWdI4qXHzmc/lZsR5RwpHx+RyvWAJV
-         EBaVxRp6itPz9f2mti8FsCaYV9l91bUHkkJQbsqPBJfg5P8eKTn824q7PeOM90gJjY2x
-         tggA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpqfV4sZU2o2ittk85zV7WD76IdToD7tEVUniz1Bt/tMYKWneMW/FaRLfcj1udqF/wyYc=@vger.kernel.org, AJvYcCXDsN4/3GtklW0t+0kjEl5FyBHGN1Nd0q3PYnsZK+9jsCyNToDdgKd8fQJsvBWsxHQ2dJLcTsDX@vger.kernel.org
-X-Gm-Message-State: AOJu0YweO8HlZEz4mJYU/6ZLGjs90CrlaxdOhqo2ntYICuXzjpwEeX/O
-	RvxtWkbGky1cRAbxMPeN5Zxa6sL5ghlCPazU+r8EUxVfHSZDQzHJpGf09od90xYUPpldjmZo7P+
-	/fTWS1YejeNSxCtI1GWpwCul8oZc=
-X-Gm-Gg: ASbGnctBe1oV29oyRd27KYGPhxKiBkw4pljvv+Ks13BC7Tlw9u+mwBY5kMtgpa8QAhr
-	4ONh4SGI0qBXISC264Kj0u2rEcqqcHgoX84YQ3A==
-X-Google-Smtp-Source: AGHT+IEO8bMjZqEqfBdyT4Z2IPeiay/Z1DSYQEJKaduztZhZmFlZbHIBnArrJ+4wGNQuZx9ekLBJIGSrmHGUGleWPF8=
-X-Received: by 2002:a05:6e02:156f:b0:3a7:e452:db5 with SMTP id
- e9e14a558f8ab-3aff800ffcfmr30340235ab.15.1734104710017; Fri, 13 Dec 2024
- 07:45:10 -0800 (PST)
+        bh=1vXA2/urSSs2Rh5p3xBC9KaPnKWnmLtFXFX4YA6dOUY=;
+        b=dBUjOwRySIW/aZFsBSFvlVdJnngfhEX34m9FgUnpfxem40zLQNdEv83/0Lf5ActPtp
+         MhK3A+QDhloHlfvUhbrIynK+ETzoPQGLJNcI1IEOzi1rU+ly16Tsf7CN9Ai9FIZFqVdl
+         1xmgCHlDqARfCQT7zO0oLd9KVEoxbYKP6sA6tPImVEyI5fTX56wLaezrneddFDuaPlYx
+         PEoxzEisaI3RkMRC4uGLrXw+Z+u9Um0aUsaYeMZPfGGY0RQLl/ameAZ9ahi1f+5gnEsq
+         Di6bXrpRJW1k4aJyLtioJWaoAdQYbyP/CvCcBg2WyfdbyhQ4T7qbfTLa+9LsV+XuukXE
+         IXAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVRPJ8fAHTiot+c5bSrLItQ5i8hmaGocpqjC6bBYmTKgL3nw15hkzi6/DKRNISZJgSvedwqoDT7TFZrWOqniWxJ6VLO3ek=@vger.kernel.org, AJvYcCXVALwkOamvqSUwxZEG57JJ93V4KyC7SWGVLDlQYBcZysBhOUysyshafh/kDTWNfWQhiwIOcPPY+A==@vger.kernel.org, AJvYcCXuPiikhpKOT4Q1UFjM5bQtPQBt9Vd6DKYJxCv+AO5G9D3C1OkRrar9fWsK+tDY6qibBpcDV1mD@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+SV8jx24feUp/8FTJdExIG5svKXJYUAD7ng17dkgjGnDBvH+x
+	ZZODz79WOewgax5GRrqz8vYxQrl0QH5lzWSyZiAe8FgYZp8kGT3wbvFBHssn+3P8mw+KNOx5+YX
+	PYw2CLw1DBatRylzL2CroMs4Yzc0=
+X-Gm-Gg: ASbGnctImJHOAx4r++hlomCifrQItS7yhwCutPbS1erxgJmdZTZBfBO5/ipwzLRGHB2
+	JtMN8AE4uodEwYyXjYFSTQ8Ti8IiUlWxQ8l3T0Q==
+X-Google-Smtp-Source: AGHT+IGSoI1gRTcKmTJ6qDwY45AoOFeM+TOJQsXJVS1HcUojGwkYvMp1Yp+U2SfDzJ70oJ5suMPNWbUxXV0qJejlsjU=
+X-Received: by 2002:a17:90b:3d0a:b0:2ea:4578:46d8 with SMTP id
+ 98e67ed59e1d1-2f28fb6f01cmr5075422a91.9.1734104796398; Fri, 13 Dec 2024
+ 07:46:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
- <20241207173803.90744-11-kerneljasonxing@gmail.com> <9f5081bb-ed66-4171-acef-786ae02cf69c@linux.dev>
-In-Reply-To: <9f5081bb-ed66-4171-acef-786ae02cf69c@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 13 Dec 2024 23:44:34 +0800
-Message-ID: <CAL+tcoCCvKapSQ8N48iKh83YxYskDkPyM+bpT5=m8cE_YrCovg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 10/11] net-timestamp: export the tskey for TCP
- bpf extension
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241212102000.2148788-1-ivanov.mikhail1@huawei-partners.com>
+ <20241212.zoh7Eezee9ka@digikod.net> <b92e65aa-84aa-a66f-2f61-b70fd5c6b138@huawei-partners.com>
+In-Reply-To: <b92e65aa-84aa-a66f-2f61-b70fd5c6b138@huawei-partners.com>
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Fri, 13 Dec 2024 10:46:25 -0500
+Message-ID: <CAEjxPJ737irXncrwoM3avg4L+U37QB2w+fjJZZYTjND5Z4_Nig@mail.gmail.com>
+Subject: Re: [PATCH] selinux: Read sk->sk_family once in selinux_socket_bind()
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	paul@paul-moore.com, selinux@vger.kernel.org, omosnace@redhat.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com, 
+	konstantin.meskhidze@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 13, 2024 at 8:28=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
+On Fri, Dec 13, 2024 at 5:57=E2=80=AFAM Mikhail Ivanov
+<ivanov.mikhail1@huawei-partners.com> wrote:
 >
-> On 12/7/24 9:38 AM, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > For now, there are three phases where we are not able to fetch
-> > the right seqno from the skops->skb_data, because:
-> > 1) in __dev_queue_xmit(), the skb->data doesn't point to the start
-> > offset in tcp header.
-> > 2) in tcp_ack_tstamp(), the skb doesn't have the tcp header.
-> >
-> > In the long run, we may add other trace points for bpf extension.
-> > And the shinfo->tskey is always the same value for both bpf and
-> > non-bpf cases. With that said, let's directly use shinfo->tskey
-> > for TCP protocol.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >   net/core/skbuff.c | 7 +++++--
-> >   1 file changed, 5 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index 7c59ef501c74..2e13643f791c 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -5544,7 +5544,7 @@ static void __skb_tstamp_tx_bpf(struct sock *sk, =
-struct sk_buff *skb,
-> >                               int tstype)
-> >   {
-> >       struct timespec64 tstamp;
-> > -     u32 args[2] =3D {0, 0};
-> > +     u32 args[3] =3D {0, 0, 0};
-> >       int op;
-> >
-> >       if (!sk)
-> > @@ -5569,7 +5569,10 @@ static void __skb_tstamp_tx_bpf(struct sock *sk,=
- struct sk_buff *skb,
-> >               return;
-> >       }
-> >
-> > -     bpf_skops_tx_timestamping(sk, skb, op, 2, args);
-> > +     if (sk_is_tcp(sk))
-> > +             args[2] =3D skb_shinfo(skb)->tskey;
+> On 12/12/2024 8:50 PM, Micka=C3=ABl Sala=C3=BCn wrote:
+> > This looks good be there are other places using sk->sk_family that
+> > should also be fixed.
 >
-> Instead of only passing one info "skb_shinfo(skb)->tskey" of a skb, pass =
-the
-> whole skb ptr to the bpf prog. Take a look at bpf_skops_init_skb. Lets st=
-art
-> with end_offset =3D 0 for now so that the bpf prog won't use it to read t=
-he
-> skb->data. It can be revisited later.
+> Thanks for checking this!
 >
->         bpf_skops_init_skb(&sock_ops, skb, 0);
+> For selinux this should be enough, I haven't found any other places
+> where sk->sk_family could be read from an IPv6 socket without locking.
 >
-> The bpf prog can use bpf_cast_to_kern_ctx() and bpf_core_cast() to get to=
- the
-> skb_shinfo(skb). Take a look at the md_skb example in type_cast.c.
+> I also would like to prepare such fix for other LSMs (apparmor, smack,
+> tomoyo) (in separate patches).
 
-Sorry, I didn't give it much thought on getting to the shinfo. That's
-why I quickly gave up using bpf_skops_init_skb() after I noticed the
-seq of skb is always zero :(
-
-I will test it tomorrow. Thanks.
+I'm wondering about the implications for SELinux beyond just
+sk->sk_family access, e.g. SELinux maps the (family, type, protocol)
+triple to a security class at socket creation time via
+socket_type_to_security_class() and caches the security class in the
+inode_security_struct and sk_security_struct for later use.
 
 >
-> Then it needs to add a bpf_sock->op check to the existing
-> bpf_sock_ops_{load,store}_hdr_opt() helpers to ensure these helpers can o=
-nly be
-> used by the BPF_SOCK_OPS_PARSE_HDR_OPT_CB, BPF_SOCK_OPS_HDR_OPT_LEN_CB, a=
-nd
-> BPF_SOCK_OPS_WRITE_HDR_OPT_CB callback.
-
-Forgive me. I cannot see how the bpf_sock_ops_load_hdr_opt helper has
-something to do with the current thread? Could you enlighten me?
-
->
-> btw, how is the ack_skb used for the SCM_TSTAMP_ACK by the user space now=
-?
-
-To be honest, I hardly use the ack_skb[1] under this circumstance... I
-think if someone offers a suggestion to use it, then we can support
-it?
-
-[1]
-commit e7ed11ee945438b737e2ae2370e35591e16ec371
-Author: Yousuk Seung <ysseung@google.com>
-Date:   Wed Jan 20 12:41:55 2021 -0800
-
-    tcp: add TTL to SCM_TIMESTAMPING_OPT_STATS
-
-    This patch adds TCP_NLA_TTL to SCM_TIMESTAMPING_OPT_STATS that exports
-    the time-to-live or hop limit of the latest incoming packet with
-    SCM_TSTAMP_ACK. The value exported may not be from the packet that acks
-    the sequence when incoming packets are aggregated. Exporting the
-    time-to-live or hop limit value of incoming packets helps to estimate
-    the hop count of the path of the flow that may change over time.
+> >
+> > On Thu, Dec 12, 2024 at 06:20:00PM +0800, Mikhail Ivanov wrote:
+> >> selinux_socket_bind() is called without holding the socket lock.
+> >>
+> >> Use READ_ONCE() to safely read sk->sk_family for IPv6 socket in case
+> >> of lockless transformation to IPv4 socket via IPV6_ADDRFORM [1].
+> >>
+> >> [1] https://lore.kernel.org/all/20240202095404.183274-1-edumazet@googl=
+e.com/
+> >>
+> >> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> >> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> >> ---
+> >>   security/selinux/hooks.c | 4 +++-
+> >>   1 file changed, 3 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+> >> index 5e5f3398f39d..b7adff2cf5f6 100644
+> >> --- a/security/selinux/hooks.c
+> >> +++ b/security/selinux/hooks.c
+> >> @@ -4715,8 +4715,10 @@ static int selinux_socket_bind(struct socket *s=
+ock, struct sockaddr *address, in
+> >>      if (err)
+> >>              goto out;
+> >>
+> >> +    /* IPV6_ADDRFORM can change sk->sk_family under us. */
+> >> +    family =3D READ_ONCE(sk->sk_family);
+> >> +
+> >>      /* If PF_INET or PF_INET6, check name_bind permission for the por=
+t. */
+> >> -    family =3D sk->sk_family;
+> >>      if (family =3D=3D PF_INET || family =3D=3D PF_INET6) {
+> >>              char *addrp;
+> >>              struct common_audit_data ad;
+> >>
+> >> base-commit: 034294fbfdf0ded4f931f9503d2ca5bbf8b9aebd
+> >> --
+> >> 2.34.1
+> >>
+> >>
 
