@@ -1,306 +1,172 @@
-Return-Path: <netdev+bounces-151811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4BBD9F1093
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 16:14:36 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65AD39F10A4
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 16:16:13 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3382160686
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 15:14:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25E35281E92
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 15:16:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D09F1E1C1A;
-	Fri, 13 Dec 2024 15:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E191E25EA;
+	Fri, 13 Dec 2024 15:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A88Myh5V"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rKZdkblv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB581E1A33;
-	Fri, 13 Dec 2024 15:14:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF451B412E
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 15:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734102873; cv=none; b=RJ9Nc/c4LWVlcOTUlFl9emmMkPEq3xoQnyUaaQW8Whn4Tj4SCmgflsBn7po4hV9BhZkue9h4jhC1ima04POxrdY+4YEoXXyvhPpbbIvjrj/xqj4yYi86d7aziZAN+GnZyMV7RPW6s+4r7R0uIQOT6i/sXGpSUKocgwBFN3pg+xc=
+	t=1734102965; cv=none; b=hzOoAijd53T0cwy2Aupq9AyHDz1IEn7jSDDkC8BVO0Di9iALdOJ4v+EjaknzvFIhqynMEhzCmGiLRXrvE6Sq3U/KGVkGLQ51Eqw6FqEzcVhfh3TfGZKQXBJdcJuF7zgaMI19Ufeuj/Fpiydet+QU7F08d8/FR63nUSRtq/rmVTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734102873; c=relaxed/simple;
-	bh=L/6bt2zuZBjuuxbl9MEknRwy3TqcGrAlQ87M7h2xAlY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UBVhV319pFUlwuCQ/7qnMRRRqpfBSPGpWC3Jr2ANWucZ4jRh/O4ePVwVnDfmsOl2ldPaaDMoDs+W/NWVK8BWQ/tWsYEQflBZ9BizcNaxbD70P4Z05p6Xxx3w5soYHka7+ZWgcKxax/XUUnNziPW+j9ImWTRVXiDspAZzbBqWGBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A88Myh5V; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3a9628d20f0so12753795ab.2;
-        Fri, 13 Dec 2024 07:14:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734102870; x=1734707670; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q+f/HxZGUZDanH3LBibTxLyZbTgAZQyGycgYH/BQoKI=;
-        b=A88Myh5V/+4JdYsMH93VfyP8H2KTmqYpazkCsTMOKYYe1kMO0JHZSzK8PVCmsygHte
-         2bSKzy64vtu0i9NcXXHgdPYRFdzy8hWHQAqOKbw3ekqxA5LU/kH5ei92kyNzKw3D/Cdd
-         pa++jzVM/Y7dSSPaWDmM+H9k1sLEj/+KQJcj492hSJpOukwwu+eSGvHBgi1UMHanzEU6
-         EuveYirBsDFXpJZeFqflvD2eqQ1K3YTaz5WUdrioK2K43BpSfaUqMwdP8S/N5rILWna3
-         K97kyqIuCMENClMl7tuEnbrvXmG08g3fLm1eobf9NlstY6d6X6EGxkdRWO4tQSV+8987
-         EjwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734102870; x=1734707670;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q+f/HxZGUZDanH3LBibTxLyZbTgAZQyGycgYH/BQoKI=;
-        b=VIqbv0z6DUtno98ev2nvZRMGFf/aMrHYkS8P0xtf5r00ZYbg0yPuU56WWBXkD1i6Qb
-         CZ40OTUKizw3dGpPdOWDcQa+lcY599ey855b7ykNhSYCly9cMw8oLb5Ozpy/qC0x2y4v
-         Jy0wCy7uuFPcbZBmXCrsthZRUD5jhkGVE7kcZme8WPVeV5z+pXmuqy/BJTIT0hjQmre4
-         +mvA8cQYSm8YuN+/tHVAyZzhDvZOjmuPban11FJ2i11BqWCXudkj/X8U7LplssLGnXcm
-         9flYtPAC6iIqCOgmaUmQJYrCN+bR4shSCznNTr65bTO6irTUGEmPGPFscG3A5m5b+mhH
-         knfA==
-X-Forwarded-Encrypted: i=1; AJvYcCW7DIbRsCYBa58msPPPiKgfr4GJmb4zf/E6nfGGJ2xUnQH0jzYGWp8KNxSrnXKPmOmpb44JwqfE@vger.kernel.org, AJvYcCXmYefCmH2B5XNhusrkum0nRFYUH0mfrbFOxraQzF4e0qtdqEQBcjTCHZx2fjVVnqi+qak=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7HpU2YC9Jq3s6ioy8IgmF4KhQpzj12Sjx0BFz525L11WmVzsu
-	lWkGPcvS2bLqZmlu64DunzBKjV4FKRCBd9Zn8jkMJ9pt2uycgKtXJJxx8ddxR46q5J2rseQyWZG
-	ku7bdRcmwCzDwb8bI1nuaTm78VW0=
-X-Gm-Gg: ASbGncte63cydiL/nE0e4BKkXTc53uTFtDR7RjfNWS+YjijEQKkKqTck95tpFGI+Qfi
-	aXnV8B5LmiAfg0TZr6mg9SGw5nlm3eUBBFhIHMg==
-X-Google-Smtp-Source: AGHT+IGLo2YwU/bo5x/0oaht8wS5GlYfG6j1MkC4wQMRi5Rhuq/SfZpNX3QPI3BHm38s5/+Z6H5ZHJB7HPySh6AmH58=
-X-Received: by 2002:a92:cd83:0:b0:3a7:6e97:9877 with SMTP id
- e9e14a558f8ab-3aff1303cd1mr37865915ab.24.1734102870525; Fri, 13 Dec 2024
- 07:14:30 -0800 (PST)
+	s=arc-20240116; t=1734102965; c=relaxed/simple;
+	bh=PWMoxDtVdkcOGn4zW9kZQI+Wz1ON5+gQghWQQoC+1gA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O6aD549p6f0KrZ02zl7O2E/wFZH7zb2SUbhiNa1gNHnw+s/v2XSv1aUIdT3YCL/C1qqyZ5lZ8PYk2YJUFMBlZRiELNRh+NFnaA0dc2HNR6c5VVg0VaMx3QCkkjFwyYZa4WG9CtxLg4Y/COggNor+YRUulbN287IJIgZwYVC6ZBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rKZdkblv; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BDEIu5h017035;
+	Fri, 13 Dec 2024 15:15:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=CKx0Sd
+	S6a3qwOz6m0OtYnu6TjW/vZYosDtQhE7niUn8=; b=rKZdkblvL5HyxCU/wmI8FB
+	K7s+dviNCJn70ATmVkVCUy7itXbKMVXyUJgga77QBrHxCP4yBEwwWTEsl5rTWGSu
+	hzY/QlVpj1IJ0WOOBBdbrFbuzYh1lXzmbV0xkI3WK9c+7VuTMsT4DMRbAsWj2rNz
+	SWeDJzaDBXQhOzUker8RGXfuwlnJFv1r5zentxBPKGaejIC60ElZNS4niRhVqXYS
+	1caRd7pn71gUtOUndiJKXgTSWhm0YLTc/kS/M1MMyPXivfz4y59owSIcCDrsX041
+	KM23eK2qWVE300NNFQo3kaKdpYkWJcN/Xlc9D7NXbhjc36mXGpTrRtVc6F4VnSzQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43gddbu1sp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Dec 2024 15:15:44 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BDFBWEu012434;
+	Fri, 13 Dec 2024 15:15:43 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43gddbu1sc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Dec 2024 15:15:43 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BDC9sdH032744;
+	Fri, 13 Dec 2024 15:15:42 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43d0psxp68-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Dec 2024 15:15:42 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BDFFg7e44958058
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 13 Dec 2024 15:15:42 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6B9DE58043;
+	Fri, 13 Dec 2024 15:15:42 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ED28D5805F;
+	Fri, 13 Dec 2024 15:15:39 +0000 (GMT)
+Received: from [9.171.74.77] (unknown [9.171.74.77])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 13 Dec 2024 15:15:39 +0000 (GMT)
+Message-ID: <64c67302-dc08-44d3-87a3-ea8b545d4f8b@linux.ibm.com>
+Date: Fri, 13 Dec 2024 16:15:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
- <20241207173803.90744-8-kerneljasonxing@gmail.com> <a3abb0b6-cd94-46f6-b996-f90da7e790b9@linux.dev>
-In-Reply-To: <a3abb0b6-cd94-46f6-b996-f90da7e790b9@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 13 Dec 2024 23:13:53 +0800
-Message-ID: <CAL+tcoCyu6w=O5y2fRSfrzDVm04SB2ycXB06uYn2+r2jSRhehA@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 07/11] net-timestamp: support hwtstamp print
- for bpf extension
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 net-next 11/15] socket: Remove kernel socket
+ conversion.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alibuda@linux.alibaba.com, allison.henderson@oracle.com,
+        chuck.lever@oracle.com, davem@davemloft.net, edumazet@google.com,
+        horms@kernel.org, jaka@linux.ibm.com, jlayton@kernel.org,
+        kuba@kernel.org, kuni1840@gmail.com, matttbe@kernel.org,
+        netdev@vger.kernel.org, pabeni@redhat.com, sfrench@samba.org
+References: <919d9910-a405-40f0-ad0b-fa3e8b908013@linux.ibm.com>
+ <20241213135437.44216-1-kuniyu@amazon.com>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <20241213135437.44216-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: MZPYQgzCtfRidzLeg63de-dVqL_3IcvP
+X-Proofpoint-GUID: Z5Yp02qDkAmVZQLW0oJVyjW2fTbClIYU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
+ clxscore=1015 suspectscore=0 mlxlogscore=999 adultscore=0 impostorscore=0
+ lowpriorityscore=0 malwarescore=0 priorityscore=1501 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412130106
 
-On Fri, Dec 13, 2024 at 7:26=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 12/7/24 9:37 AM, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Passing the hwtstamp to bpf prog which can print.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >   include/net/sock.h |  6 ++++--
-> >   net/core/skbuff.c  | 17 +++++++++++++----
-> >   net/core/sock.c    |  4 +++-
-> >   3 files changed, 20 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/include/net/sock.h b/include/net/sock.h
-> > index f88a00108a2f..9bc883573208 100644
-> > --- a/include/net/sock.h
-> > +++ b/include/net/sock.h
-> > @@ -2921,9 +2921,11 @@ int sock_set_timestamping(struct sock *sk, int o=
-ptname,
-> >
-> >   void sock_enable_timestamps(struct sock *sk);
-> >   #if defined(CONFIG_CGROUP_BPF) && defined(CONFIG_BPF_SYSCALL)
-> > -void bpf_skops_tx_timestamping(struct sock *sk, struct sk_buff *skb, i=
-nt op);
-> > +void bpf_skops_tx_timestamping(struct sock *sk, struct sk_buff *skb, i=
-nt op,
-> > +                            u32 nargs, u32 *args);
-> >   #else
-> > -static inline void bpf_skops_tx_timestamping(struct sock *sk, struct s=
-k_buff *skb, int op)
-> > +static inline void bpf_skops_tx_timestamping(struct sock *sk, struct s=
-k_buff *skb, int op,
-> > +                                          u32 nargs, u32 *args)
-> >   {
-> >   }
-> >   #endif
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index 48b0c71e9522..182a44815630 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -5539,8 +5539,12 @@ void skb_complete_tx_timestamp(struct sk_buff *s=
-kb,
-> >   }
-> >   EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
-> >
-> > -static void __skb_tstamp_tx_bpf(struct sock *sk, struct sk_buff *skb, =
-int tstype)
-> > +static void __skb_tstamp_tx_bpf(struct sock *sk, struct sk_buff *skb,
-> > +                             struct skb_shared_hwtstamps *hwtstamps,
-> > +                             int tstype)
-> >   {
-> > +     struct timespec64 tstamp;
-> > +     u32 args[2] =3D {0, 0};
-> >       int op;
-> >
-> >       if (!sk)
-> > @@ -5552,6 +5556,11 @@ static void __skb_tstamp_tx_bpf(struct sock *sk,=
- struct sk_buff *skb, int tstype
-> >               break;
-> >       case SCM_TSTAMP_SND:
-> >               op =3D BPF_SOCK_OPS_TS_SW_OPT_CB;
->
-> > +             if (hwtstamps) {
-> > +                     tstamp =3D ktime_to_timespec64(hwtstamps->hwtstam=
-p);
->
-> Avoid this conversion which is likely not useful to the bpf prog. Directl=
-y pass
-> hwtstamps->hwtstamp (in ns?) to the bpf prog. Put lower 32bits in args[0]=
- and
-> higher 32bits in args[1].
 
-It makes sense.
 
->
-> Also, how about adding a BPF_SOCK_OPS_TS_"HW"_OPT_CB for the "hwtstamps !=
-=3D NULL"
-> case instead of reusing the BPF_SOCK_OPS_TS_"SW"_OPT_CB?
+On 13.12.24 14:54, Kuniyuki Iwashima wrote:
+> From: Wenjia Zhang <wenjia@linux.ibm.com>
+> Date: Fri, 13 Dec 2024 14:45:20 +0100
+>>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>>> index 6e93f188a908..7b0de80b3aca 100644
+>>> --- a/net/smc/af_smc.c
+>>> +++ b/net/smc/af_smc.c
+>>> @@ -3310,25 +3310,8 @@ static const struct proto_ops smc_sock_ops = {
+>>>    
+>>>    int smc_create_clcsk(struct net *net, struct sock *sk, int family)
+>>>    {
+>>> -	struct smc_sock *smc = smc_sk(sk);
+>>> -	int rc;
+>>> -
+>>> -	rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
+>>> -			      &smc->clcsock);
+>>> -	if (rc)
+>>> -		return rc;
+>>> -
+>>> -	/* smc_clcsock_release() does not wait smc->clcsock->sk's
+>>> -	 * destruction;  its sk_state might not be TCP_CLOSE after
+>>> -	 * smc->sk is close()d, and TCP timers can be fired later,
+>>> -	 * which need net ref.
+>>> -	 */
+>>> -	sk = smc->clcsock->sk;
+>>> -	__netns_tracker_free(net, &sk->ns_tracker, false);
+>>> -	sk->sk_net_refcnt = 1;
+>>> -	get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
+>>> -	sock_inuse_add(net, 1);
+>> I don't think this line shoud be removed. Otherwise, the popurse here to
+>> manage the per namespace statistics in the case of network namespace
+>> isolation would be lost.
+> 
+> Now it's counted in sk_alloc().
+> 
+> sock_create_net() below passes hold_net=true to sk_alloc() and if
+> sk->sk_netns_refcnt (== hold_net) is true, sock_inuse_add() is
+> called there.
+> 
+> See patch 9 and 10:
+> https://lore.kernel.org/netdev/20241213092152.14057-10-kuniyu@amazon.com/
+> https://lore.kernel.org/netdev/20241213092152.14057-11-kuniyu@amazon.com/
+> 
+> 
+ok, I see. Thank you for pointing it out!
 
-Good suggestion. Will do that.
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
 
->
-> A more subtle thing for the hwtstamps case is, afaik the bpf prog will no=
-t be
-> called. All drivers are still only testing SKBTX_HW_TSTAMP instead of tes=
-ting
-> (SKBTX_HW_TSTAMP | SKBTX_BPF).
+>> @D. Wythe, could you please check it again? Maybe you have some good
+>> testing on this case.
+>>
+>>> -	return 0;
+>>> +	return sock_create_net(net, family, SOCK_STREAM, IPPROTO_TCP,
+>>> +			       &smc_sk(sk)->clcsock);
+>>>    }
 
-Ah, I didn't realize that!!
-
->
-> There are a lot of drivers to change though. A quick thought is to rename=
- the
-> existing SKBTX_HW_TSTAMP (e.g. __SKBTX_HW_TSTAMP =3D 1 << 0) and define
-> SKBTX_HW_TSTAMP like:
->
-> #define SKBTX_HW_TSTAMP (__SKBTX_HW_TSTAMP | SKBTX_BPF)
-
-I will take it, thanks!
-
->
-> Then change some of the existing skb_shinfo(skb)->tx_flags "setting" site=
- to use
-> __SKBTX_HW_TSTAMP instead. e.g. in __sock_tx_timestamp(). Not very pretty=
- but
-> may be still better than changing many drivers. May be there is a better =
-way...
-
-I agree with your approach. Changing so many drivers would be a head-ache t=
-hing.
-
->
-> While talking about where to test the SKBTX_BPF bit, I wonder if the new
-> skb_tstamp_is_set() is needed. For the non SKBTX_HW_TSTAMP case, the numb=
-er of
-> tx_flags testing sites should be limited, so should be easy to add the SK=
-BTX_BPF
-> bit test. e.g. at the __dev_queue_xmit, test "if
-> (unlikely(skb_shinfo(skb)->tx_flags & (SKBTX_SCHED_TSTAMP | SKBTX_BPF)))"=
-. Patch
-> 6 has also tested the bpf specific bit at tcp_ack_tstamp() before calling=
- the
-> __skb_tstamp_tx().
->
-> At the beginning of __skb_tstamp_tx(), do something like this:
->
-> void __skb_tstamp_tx(struct sk_buff *orig_skb,
->                      const struct sk_buff *ack_skb,
->                      struct skb_shared_hwtstamps *hwtstamps,
->                      struct sock *sk, int tstype)
-> {
->         if (cgroup_bpf_enabled(CGROUP_SOCK_OPS) &&
->             unlikely(skb_shinfo(skb)->tx_flags & SKBTX_BPF))
->                 __skb_tstamp_tx_bpf(sk, orig_skb, hwtstamps, tstype);
->
->         if (unlikely(!(skb_shinfo(skb)->tx_flags & ~SKBTX_BPF)))
->                 return;
->
-> Then the new skb_tstamp_tx_output() shuffle is probably not be needed als=
-o.
->
-> > +                     args[0] =3D tstamp.tv_sec;
-> > +                     args[1] =3D tstamp.tv_nsec;
-> > +             }
-> >               break;
-> >       case SCM_TSTAMP_ACK:
-> >               op =3D BPF_SOCK_OPS_TS_ACK_OPT_CB;
-> > @@ -5560,7 +5569,7 @@ static void __skb_tstamp_tx_bpf(struct sock *sk, =
-struct sk_buff *skb, int tstype
-> >               return;
-> >       }
-> >
-> > -     bpf_skops_tx_timestamping(sk, skb, op);
-> > +     bpf_skops_tx_timestamping(sk, skb, op, 2, args);
-> >   }
-> >
-> >   static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
-> > @@ -5651,7 +5660,7 @@ void __skb_tstamp_tx(struct sk_buff *orig_skb,
-> >       if (unlikely(skb_tstamp_is_set(orig_skb, tstype, false)))
-> >               skb_tstamp_tx_output(orig_skb, ack_skb, hwtstamps, sk, ts=
-type);
-> >       if (unlikely(skb_tstamp_is_set(orig_skb, tstype, true)))
-> > -             __skb_tstamp_tx_bpf(sk, orig_skb, tstype);
-> > +             __skb_tstamp_tx_bpf(sk, orig_skb, hwtstamps, tstype);
-> >   }
-> >   EXPORT_SYMBOL_GPL(__skb_tstamp_tx);
-> >
-> > @@ -5662,7 +5671,7 @@ void skb_tstamp_tx(struct sk_buff *orig_skb,
-> >
-> >       skb_tstamp_tx_output(orig_skb, NULL, hwtstamps, orig_skb->sk, tst=
-ype);
-> >       if (unlikely(skb_tstamp_is_set(orig_skb, tstype, true)))
-> > -             __skb_tstamp_tx_bpf(orig_skb->sk, orig_skb, tstype);
-> > +             __skb_tstamp_tx_bpf(orig_skb->sk, orig_skb, hwtstamps, ts=
-type);
-> >   }
-> >   EXPORT_SYMBOL_GPL(skb_tstamp_tx);
-> >
-> > diff --git a/net/core/sock.c b/net/core/sock.c
-> > index 79cb5c74c76c..504939bafe0c 100644
-> > --- a/net/core/sock.c
-> > +++ b/net/core/sock.c
-> > @@ -942,7 +942,8 @@ int sock_set_timestamping(struct sock *sk, int optn=
-ame,
-> >   }
-> >
-> >   #if defined(CONFIG_CGROUP_BPF) && defined(CONFIG_BPF_SYSCALL)
-> > -void bpf_skops_tx_timestamping(struct sock *sk, struct sk_buff *skb, i=
-nt op)
-> > +void bpf_skops_tx_timestamping(struct sock *sk, struct sk_buff *skb, i=
-nt op,
-> > +                            u32 nargs, u32 *args)
->
-> Directly pass hwtstamps->hwtstamp instead of args and nargs. Save a memcp=
-y below.
->
-> >   {
-> >       struct bpf_sock_ops_kern sock_ops;
-> >
-> > @@ -952,6 +953,7 @@ void bpf_skops_tx_timestamping(struct sock *sk, str=
-uct sk_buff *skb, int op)
-> >       sock_ops.op =3D op;
-> >       sock_ops.is_fullsock =3D 1;
-> >       sock_ops.sk =3D sk;
-> > +     memcpy(sock_ops.args, args, nargs * sizeof(*args));
-> >       __cgroup_bpf_run_filter_sock_ops(sk, &sock_ops, CGROUP_SOCK_OPS);
-> >   }
-> >   #endif
->
 
