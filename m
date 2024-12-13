@@ -1,289 +1,207 @@
-Return-Path: <netdev+bounces-151587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EEE79F0227
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 02:26:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 342319F0265
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 02:41:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AA9E188EAC8
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 01:25:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84112188E750
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 01:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA09B13C80C;
-	Fri, 13 Dec 2024 01:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872261F95E;
+	Fri, 13 Dec 2024 01:41:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="NsrHQO8W";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="m/bFB3BP"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s0ldrN8W"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a1-smtp.messagingengine.com (flow-a1-smtp.messagingengine.com [103.168.172.136])
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11517082C;
-	Fri, 13 Dec 2024 01:24:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8512AF07
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 01:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734053081; cv=none; b=JNiDdGTW8v5k+1UXbOBmsc+rQC0QIzxiHHFMnvhIedj10ruh1tL4Y+ab02ez3IOFkBtQu56TPMQ0EsLGfgUWNyNNVT3FqKljHoeRDeuzysT2+Mds0uXrkLyE3KLFWQFiaJqHxfPuqUSzqybGzEwfS9oEt+HbBOgfE1bsid8/hLg=
+	t=1734054104; cv=none; b=esL8gqBIPyZAcApw3Mfor1LIANXH4JMuOM0PkDUBXI9sGOQrD4CSM7y352Vm278Ig80+M65SSD/bQmdwLZ8Wj9l59GCaPzLVHHh/KhZYwFBn51vDOR6Sm7dd+o8R/HDIEgmKt50SZ/yQmKBa8FvfSGY4+hNpqIYKfvuZ82Z43Y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734053081; c=relaxed/simple;
-	bh=Xlr00EpboX3eZ9NN8BWfYhvPSIPU75I+cn8Uw0VlVoM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j8d28mVsbqecWulh9LxxxwknoBe+YKhmaY2mG4Gp/WpH5iABMRI4M8biGSMjKlzWswAvrrOMSJMPMNzKWx8LRYMumlbFhhMrV5h9oS+oF7+l8gQPg7yYBtujj+FYgwGKXd9LvsOMMCs88xmG2/pFeTi1cn3zdpTvyOJT5rWQa60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=NsrHQO8W; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=m/bFB3BP; arc=none smtp.client-ip=103.168.172.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailflow.phl.internal (Postfix) with ESMTP id BF984200804;
-	Thu, 12 Dec 2024 20:24:38 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Thu, 12 Dec 2024 20:24:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1734053078; x=
-	1734060278; bh=YccxXOXPERZDzs8A9WsRki084bV04s4hgsiDdgoqGtw=; b=N
-	srHQO8W4eHslfAxnE8l2yicRucFK0rfFlNlXS3Dl6A7xRfQb1XPmJ+NkeuEXEwnM
-	ZxpSqSZ6AjMSv22YZZFwgjjMu8gGgzqye6OVBp2VwTDC0/LsDJ8R+43M9pnXQaet
-	5CnnI0K01YIv0vs4kOEJbMLDaAMsAY2uXg1JrQqDW1NoOWMrp6HqptOwI1Q5F4qp
-	CxLuBDDXuyYSaK0zc+5SRdtFSaFs6VRfCKHT7WXhiRt7jf+Pr0UcV+TR3ZtwKvcr
-	8/qUCxxO/eeYCTQlrlVSHs8p5iCSuHCJTl/1MwF3mGX29XS27MFYWcDO0yOOq9DD
-	iLCZnk5t8uW4O4M4UZseA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1734053078; x=1734060278; bh=Y
-	ccxXOXPERZDzs8A9WsRki084bV04s4hgsiDdgoqGtw=; b=m/bFB3BPfSX33QXqw
-	oGpNtF5yGVagNMgUAt20QwUf3Dvv5MYS+L3raIGh13Ci94yvp0SFFICOi2b8Mp4q
-	Du9LFL1dL38rRtE2mX66/c5msfLIxuxDHh8z4HlhYx1KlzWwFyeg49WCvqdLwGp8
-	nmhlcnh2L8go6chyS+avnsrWef+OUNIzc2bdfiTUrTixNjNJYcsJTS0WT2/s/uam
-	1YqSNWUOZqi8mPR203mLvE6q/ARWhbsLvT1ZoToDZ/bGx11ED48gkxn3Y1QCjwKu
-	t5Oq34umlQEdiXclGqwhZoJQJFkQdmMFvSoznij/094eYDzLLMcM5TXBcGq6ZxDs
-	Hhi5g==
-X-ME-Sender: <xms:1oxbZxxpHOCCK-Ois-80mDD5RIIqU3jmHzL6QHzaBhRgYkjbNRjXGw>
-    <xme:1oxbZxQFTmi0XxgN_V8IOQVJiybwmH9la3_6q4zVFI5v0Om8DOKPN0jCYltnEwEdR
-    xUR9pUH7z0rLyLk0g>
-X-ME-Received: <xmr:1oxbZ7V5mH-5dbe2sJrQjqWlQK4txk_itGtooi6Q33KnjOxuMTuDd4fFHct-981YVAHTB7qZXmFlZTdNu86tQLMVdWtD8kSS70IxPXizxfglcNEFWQGA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkeeigdeffecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdefhe
-    dmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepffgr
-    nhhivghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpe
-    evtdekjeffkefgfefhvefffeetgfeuueeutdetjeduudehheeiffdvgefhhfevhfenucff
-    ohhmrghinhepghhithhhuhgsrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghrtghpthht
-    ohepvddvpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehhrgifkheskhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pegrnhgurhhiiheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhhohhhnrdhfrghsth
-    grsggvnhgusehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghstheskhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtohepqhhmoheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrnh
-    hivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtghpthhtohepuggrvhgvmhesuggrvhgv
-    mhhlohhfthdrnhgvthdprhgtphhtthhopehmrghrthhinhdrlhgruheslhhinhhugidrug
-    gvvh
-X-ME-Proxy: <xmx:1oxbZzjcA79T2FppZ1oGSD0JYT66PbmqVxuQQqFArFHguS2Q9xCsgA>
-    <xmx:1oxbZzDYYpwf5VI3l4qoNxhAr9nuNNm-0RXnnKTfB362pQdIT0B-0w>
-    <xmx:1oxbZ8LId9EUtJYtbQ788MNonyG0z5l8Z9SAMcdfYBkyI8J3agnkRA>
-    <xmx:1oxbZyBY1I-eiXdc2rhDe2v7pxmOQZj1g68sHVvXauox7MZAc89x_g>
-    <xmx:1oxbZ6Wfv2IxMblS0DGkHW63eB88msetgeTnA5w3qJRrIomJmOWmNAu9>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 12 Dec 2024 20:24:35 -0500 (EST)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: hawk@kernel.org,
-	kuba@kernel.org,
-	andrii@kernel.org,
-	john.fastabend@gmail.com,
-	ast@kernel.org,
-	qmo@kernel.org,
-	daniel@iogearbox.net,
-	davem@davemloft.net
-Cc: martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	andrii.nakryiko@gmail.com,
-	antony@phenome.org,
-	toke@kernel.org
-Subject: [PATCH bpf-next v4 3/4] bpftool: btf: Support dumping a specific types from file
-Date: Thu, 12 Dec 2024 18:24:15 -0700
-Message-ID: <5ec7617fd9c28ff721947aceb80937dc10fca770.1734052995.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <cover.1734052995.git.dxu@dxuuu.xyz>
-References: <cover.1734052995.git.dxu@dxuuu.xyz>
+	s=arc-20240116; t=1734054104; c=relaxed/simple;
+	bh=ui59P38uJwis1FiwNN+RGOJebMgUHp6llktsO9CLa2s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G2sq4bXcVGWvk8zE0D0oasv/f1kmKhzY15s7+HYE9+S76vFBz85ZceVGz8i9xmP/hos6PlYtyR6VSSKOmdXcl9i299e+iO5Cd3IMv5ZiUasfDD0AzjKKv8I0c9/Z/uBu9Am9GXTyzNb3jJsh/vZPsJPeBknqojvKLRw+BJ9Q3OI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s0ldrN8W; arc=none smtp.client-ip=91.218.175.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <996cbe46-e2cd-44b6-a53a-13fd6ebfc4c0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734054099;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z6eBcxaJia8xUifVxoqhVW2ol1hqy4lN6BzesBYXABk=;
+	b=s0ldrN8WjKpCOsNKziOSZ7EexAUWRECaYxUhHanY72MjbEJJPS84cKGqRWZn5k2/Exljc8
+	7QTOK1YkPvzBz1OVeTx6UWNXyCFbw2smYqSbn8rEVstzQ8pH6N/dFcGokzi6ClydP0B1tR
+	uV9hrEamdKBSpJ08IY6pko7K2dNvYrc=
+Date: Thu, 12 Dec 2024 17:41:23 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next v4 02/11] net-timestamp: prepare for bpf prog use
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
+ <20241207173803.90744-3-kerneljasonxing@gmail.com>
+ <f8e9ab4a-38b9-43a5-aaf4-15f95a3463d0@linux.dev>
+ <CAL+tcoDGq8Jih9vwsz=-O8byC1S0R1uojShMvUiTZKQvMDnfTQ@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <CAL+tcoDGq8Jih9vwsz=-O8byC1S0R1uojShMvUiTZKQvMDnfTQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Some projects, for example xdp-tools [0], prefer to check in a minimized
-vmlinux.h rather than the complete file which can get rather large.
+On 12/11/24 1:17 AM, Jason Xing wrote:
+> On Wed, Dec 11, 2024 at 10:02 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>> On 12/7/24 9:37 AM, Jason Xing wrote:
+>>> From: Jason Xing <kernelxing@tencent.com>
+>>>
+>>> Later, I would introduce three points to report some information
+>>> to user space based on this.
+>>>
+>>> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+>>> ---
+>>>    include/net/sock.h |  7 +++++++
+>>>    net/core/sock.c    | 15 +++++++++++++++
+>>>    2 files changed, 22 insertions(+)
+>>>
+>>> diff --git a/include/net/sock.h b/include/net/sock.h
+>>> index 0dd464ba9e46..f88a00108a2f 100644
+>>> --- a/include/net/sock.h
+>>> +++ b/include/net/sock.h
+>>> @@ -2920,6 +2920,13 @@ int sock_set_timestamping(struct sock *sk, int optname,
+>>>                          struct so_timestamping timestamping);
+>>>
+>>>    void sock_enable_timestamps(struct sock *sk);
+>>> +#if defined(CONFIG_CGROUP_BPF) && defined(CONFIG_BPF_SYSCALL)
+>>> +void bpf_skops_tx_timestamping(struct sock *sk, struct sk_buff *skb, int op);
+>>> +#else
+>>> +static inline void bpf_skops_tx_timestamping(struct sock *sk, struct sk_buff *skb, int op)
+>>> +{
+>>> +}
+>>> +#endif
+>>>    void sock_no_linger(struct sock *sk);
+>>>    void sock_set_keepalive(struct sock *sk);
+>>>    void sock_set_priority(struct sock *sk, u32 priority);
+>>> diff --git a/net/core/sock.c b/net/core/sock.c
+>>> index 74729d20cd00..79cb5c74c76c 100644
+>>> --- a/net/core/sock.c
+>>> +++ b/net/core/sock.c
+>>> @@ -941,6 +941,21 @@ int sock_set_timestamping(struct sock *sk, int optname,
+>>>        return 0;
+>>>    }
+>>>
+>>> +#if defined(CONFIG_CGROUP_BPF) && defined(CONFIG_BPF_SYSCALL)
+>>> +void bpf_skops_tx_timestamping(struct sock *sk, struct sk_buff *skb, int op)
+>>> +{
+>>> +     struct bpf_sock_ops_kern sock_ops;
+>>> +
+>>> +     sock_owned_by_me(sk);
+>>
+>> I don't think this can be assumed in the time stamping callback.
+> 
+> I'll remove this.
+> 
+>>
+>> To remove this assumption for sockops, I believe it needs to stop the bpf prog
+>> from calling a few bpf helpers. In particular, the bpf_sock_ops_cb_flags_set and
+>> bpf_sock_ops_setsockopt. This should be easy by asking the helpers to check the
+>> "u8 op" in "struct bpf_sock_ops_kern *".
+> 
+> Sorry, I don't follow. Could you rephrase your thoughts? Thanks.
 
-However, when you try to add a minimized version of a complex struct (eg
-struct xfrm_state), things can get quite complex if you're trying to
-manually untangle and deduplicate the dependencies.
+Take a look at bpf_sock_ops_setsockopt in filter.c. To change a sk, it needs to 
+hold the sk_lock. If you drill down bpf_sock_ops_setsockopt, 
+sock_owned_by_me(sk) is checked somewhere.
 
-This commit teaches bpftool to do a minimized dump of a specific types by
-providing a optional root_id argument(s).
+The sk_lock held assumption is true so far for the existing sockops callbacks.
+The new timestamping sockops callback does not necessary have the sk_lock held, 
+so it will break the bpf_sock_ops_setsockopt() assumption on the sk_lock.
 
-Example usage:
+> 
+>>
+>> I just noticed a trickier one, sockops bpf prog can write to sk->sk_txhash. The
+>> same should go for reading from sk. Also, sockops prog assumes a fullsock sk is
+>> a tcp_sock which also won't work for the udp case. A quick thought is to do
+>> something similar to is_fullsock. May be repurpose the is_fullsock somehow or a
+>> new u8 is needed. Take a look at SOCK_OPS_{GET,SET}_FIELD. It avoids
+>> writing/reading the sk when is_fullsock is false.
+> 
+> Do you mean that if we introduce a new field, then bpf prog can
+> read/write the socket?
 
-    $ ./bpftool btf dump file ~/dev/linux/vmlinux | rg "STRUCT 'xfrm_state'"
-    [12643] STRUCT 'xfrm_state' size=912 vlen=58
+The same goes for writing the sk, e.g. writing the sk->sk_txhash. It needs the 
+sk_lock held. Reading may be ok-ish. The bpf prog can read it anyway by 
+bpf_probe_read...etc.
 
-    $ ./bpftool btf dump file ~/dev/linux/vmlinux root_id 12643 format c
-    #ifndef __VMLINUX_H__
-    #define __VMLINUX_H__
+When adding udp timestamp callback later, it needs to stop reading the tcp_sock 
+through skops from the udp callback for sure. Do take a look at 
+SOCK_OPS_GET_TCP_SOCK_FIELD. I think we need to ensure the udp timestamp 
+callback won't break here before moving forward.
 
-    [..]
+> 
+> Reading the socket could be very helpful in the long run.
+> 
+>>
+>> This is a signal that the existing sockops interface has already seen better
+>> days. I hope not too many fixes like these are needed to get tcp/udp
+>> timestamping to work.
+>>
+>>> +
+>>> +     memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
+>>> +     sock_ops.op = op;
+>>> +     sock_ops.is_fullsock = 1;
+>>
+>> I don't think we can assume it is always is_fullsock either.
+> 
+> Right, but for now, TCP seems to need this. I can remove this also.
 
-    struct xfrm_type_offload;
+I take this back. After reading the existing __skb_tstamp_tx, I think sk is 
+always fullsock here.
 
-    struct xfrm_sec_ctx;
-
-    struct xfrm_state {
-            possible_net_t xs_net;
-            union {
-                    struct hlist_node gclist;
-                    struct hlist_node bydst;
-            };
-            union {
-                    struct hlist_node dev_gclist;
-                    struct hlist_node bysrc;
-            };
-            struct hlist_node byspi;
-    [..]
-
-[0]: https://github.com/xdp-project/xdp-tools/blob/master/headers/bpf/vmlinux.h
-
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- .../bpf/bpftool/Documentation/bpftool-btf.rst |  8 +++-
- tools/bpf/bpftool/btf.c                       | 39 ++++++++++++++++++-
- 2 files changed, 43 insertions(+), 4 deletions(-)
-
-diff --git a/tools/bpf/bpftool/Documentation/bpftool-btf.rst b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-index 245569f43035..dbe6d6d94e4c 100644
---- a/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-+++ b/tools/bpf/bpftool/Documentation/bpftool-btf.rst
-@@ -24,7 +24,7 @@ BTF COMMANDS
- =============
- 
- | **bpftool** **btf** { **show** | **list** } [**id** *BTF_ID*]
--| **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*]
-+| **bpftool** **btf dump** *BTF_SRC* [**format** *FORMAT*] [**root_id** *ROOT_ID*]
- | **bpftool** **btf help**
- |
- | *BTF_SRC* := { **id** *BTF_ID* | **prog** *PROG* | **map** *MAP* [{**key** | **value** | **kv** | **all**}] | **file** *FILE* }
-@@ -43,7 +43,7 @@ bpftool btf { show | list } [id *BTF_ID*]
-     that hold open file descriptors (FDs) against BTF objects. On such kernels
-     bpftool will automatically emit this information as well.
- 
--bpftool btf dump *BTF_SRC* [format *FORMAT*]
-+bpftool btf dump *BTF_SRC* [format *FORMAT*] [root_id *ROOT_ID*]
-     Dump BTF entries from a given *BTF_SRC*.
- 
-     When **id** is specified, BTF object with that ID will be loaded and all
-@@ -67,6 +67,10 @@ bpftool btf dump *BTF_SRC* [format *FORMAT*]
-     formatting, the output is sorted by default. Use the **unsorted** option
-     to avoid sorting the output.
- 
-+    **root_id** option can be used to filter a dump to a single type and all
-+    its dependent types. It cannot be used with any other types of filtering.
-+    It can be passed multiple times to dump multiple types.
-+
- bpftool btf help
-     Print short help message.
- 
-diff --git a/tools/bpf/bpftool/btf.c b/tools/bpf/bpftool/btf.c
-index 3e995faf9efa..2636655ac180 100644
---- a/tools/bpf/bpftool/btf.c
-+++ b/tools/bpf/bpftool/btf.c
-@@ -27,6 +27,8 @@
- #define KFUNC_DECL_TAG		"bpf_kfunc"
- #define FASTCALL_DECL_TAG	"bpf_fastcall"
- 
-+#define MAX_ROOT_IDS		16
-+
- static const char * const btf_kind_str[NR_BTF_KINDS] = {
- 	[BTF_KIND_UNKN]		= "UNKNOWN",
- 	[BTF_KIND_INT]		= "INT",
-@@ -880,7 +882,8 @@ static int do_dump(int argc, char **argv)
- {
- 	bool dump_c = false, sort_dump_c = true;
- 	struct btf *btf = NULL, *base = NULL;
--	__u32 root_type_ids[2];
-+	__u32 root_type_ids[MAX_ROOT_IDS];
-+	bool have_id_filtering;
- 	int root_type_cnt = 0;
- 	__u32 btf_id = -1;
- 	const char *src;
-@@ -974,6 +977,8 @@ static int do_dump(int argc, char **argv)
- 		goto done;
- 	}
- 
-+	have_id_filtering = !!root_type_cnt;
-+
- 	while (argc) {
- 		if (is_prefix(*argv, "format")) {
- 			NEXT_ARG();
-@@ -993,6 +998,36 @@ static int do_dump(int argc, char **argv)
- 				goto done;
- 			}
- 			NEXT_ARG();
-+		} else if (is_prefix(*argv, "root_id")) {
-+			__u32 root_id;
-+			char *end;
-+
-+			if (have_id_filtering) {
-+				p_err("cannot use root_id with other type filtering");
-+				err = -EINVAL;
-+				goto done;
-+			} else if (root_type_cnt == MAX_ROOT_IDS) {
-+				p_err("only %d root_id are supported", MAX_ROOT_IDS);
-+				err = -E2BIG;
-+				goto done;
-+			}
-+
-+			NEXT_ARG();
-+			root_id = strtoul(*argv, &end, 0);
-+			if (*end) {
-+				err = -1;
-+				p_err("can't parse %s as root ID", *argv);
-+				goto done;
-+			}
-+			for (i = 0; i < root_type_cnt; i++) {
-+				if (root_type_ids[i] == root_id) {
-+					err = -EINVAL;
-+					p_err("duplicate root_id %d supplied", root_id);
-+					goto done;
-+				}
-+			}
-+			root_type_ids[root_type_cnt++] = root_id;
-+			NEXT_ARG();
- 		} else if (is_prefix(*argv, "unsorted")) {
- 			sort_dump_c = false;
- 			NEXT_ARG();
-@@ -1403,7 +1438,7 @@ static int do_help(int argc, char **argv)
- 
- 	fprintf(stderr,
- 		"Usage: %1$s %2$s { show | list } [id BTF_ID]\n"
--		"       %1$s %2$s dump BTF_SRC [format FORMAT]\n"
-+		"       %1$s %2$s dump BTF_SRC [format FORMAT] [root_id ROOT_ID]\n"
- 		"       %1$s %2$s help\n"
- 		"\n"
- 		"       BTF_SRC := { id BTF_ID | prog PROG | map MAP [{key | value | kv | all}] | file FILE }\n"
--- 
-2.46.0
+> 
+>>
+>>> +     sock_ops.sk = sk;
+>>> +     __cgroup_bpf_run_filter_sock_ops(sk, &sock_ops, CGROUP_SOCK_OPS);
+>>
+>> Same here. sk may not be fullsock. BPF_CGROUP_RUN_PROG_SOCK_OPS(&sock_ops) is
+>> needed.
+> 
+> If we use this helper, we will change when the udp bpf extension needs
+> to be supported.
+> 
+>>
+>> [ I will continue the rest of the set later. ]
+> 
+> Thanks a lot :)
+> 
+>>
+>>> +}
+>>> +#endif
+>>> +
+>>>    void sock_set_keepalive(struct sock *sk)
+>>>    {
+>>>        lock_sock(sk);
+>>
 
 
