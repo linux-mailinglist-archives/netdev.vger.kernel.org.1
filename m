@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-151855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F729F1576
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:08:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4C229F174E
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 21:14:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C09416807B
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 19:08:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 664B816139D
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 20:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D8B13EFE3;
-	Fri, 13 Dec 2024 19:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F4518FDBE;
+	Fri, 13 Dec 2024 20:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F4wUiqm6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kq87gbaa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C8F1EBFE1
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 19:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82C842A92
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 20:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734116927; cv=none; b=rd/18CYmi7WKHFtHL8iv2ISjyv76VKGBfyjKrCPZ+RM1gbThboj/MPX7l8+G4TF1GYv1alD51QRmQjKlqcVINjwXAx6W1PmlYN31l1LP6kVE6tVkzdDmICrEr+j/IA1AbVlEqJw7suCWhbUoiznU4NttxzUFxUCzA6/jRQqVYiM=
+	t=1734120857; cv=none; b=tfZVNmnc9rf4Hp2LhN5MVFu1jsGTSCyDBURXj0K0bpNCPW2qQDHilf8jaSMYo6dn7+CCnqw5m1YlQa9VImH5WrKh1xidlt+Im/gzkQHK7PUI+hV7grKG3xfq2w/TqnjMK2XaY5qnOVksuRTdHQ9oyjOp8SwC8iO1AdbnVWyc5R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734116927; c=relaxed/simple;
-	bh=mDGA6dOvVemXunoAUl1Mu9Uqyx5Kt63Q7lL6Di+u2E0=;
+	s=arc-20240116; t=1734120857; c=relaxed/simple;
+	bh=ul+Ig+5EMCBFCkC7jtgQlDYMGuzA/ywpDUuLDZk6mqA=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=hcHBNgFvVPlPYKGbCqWf89RlQpu8dCz/e9bjEozCfiB+Qx+hEDfyZZ2EdMNyOC16KleM9RoqMzKrFhFtSp/BtAPTN7xjXE8Y3RbjuU02Y9tqbQHU7su30EjdGQKAHSU5mRRBRz+B1u6IC5pMMlWpgz3XXl+eRttzS8ZEzR5dF6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F4wUiqm6; arc=none smtp.client-ip=209.85.208.176
+	 In-Reply-To:Content-Type; b=TRWfCU/5y/OXAYbFLPke334egQ699ThUwljjIjQdBBaYr69deKb/UWllp2Ilul+Qi+xMJ+8Wx6/IdoyVPYR/RF2Lle7bBuPgldZyQMcR8iD6WdfMwxR7hi744UHV5Xeb1ksU4GFNE0tWlySTpNQeHTaodWpXxn6/JN4m+MQ23Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kq87gbaa; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-30227c56b11so19193361fa.3
-        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 11:08:44 -0800 (PST)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d414b8af7bso4334155a12.0
+        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 12:14:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734116922; x=1734721722; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1734120854; x=1734725654; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=uJx5Ram6M7qDQ8vw53chCTiYXpAsG5qpk7s82ViO9zM=;
-        b=F4wUiqm6/IeHGRt+MisxNrwhiS77PFH7zjoONvwXhNBdncyVEQlfkWO3TkYMuuOgH/
-         K3rLIbqYBbJRf0u9tMsRGxhp9l4Sayje+n2SOQcdHSKKG953SEdW8e2JfphfW8Z0hosK
-         LcAD5K8+A+hJYTukHRzAJuUhj7UbpO6cHBeSG1N+citJURedd5hlsKEq9Steyha9AMe/
-         JM+EC2MvbjDInqhEfgImfhWYPPSgbqFGZc2cmFyxDHkdwh2rCAy6nKP3bBeq9DUljjZJ
-         AlrXPkRmQQZtLgIvF+FkO+3QMTtWPZYs9518qbMkEAJEeuibDVXZzi/UmCVEg7PMrgsi
-         uzcQ==
+        bh=GxLhhx1bPHZyy7VCIJxdS8FHBEvN8N4uFCgXQLUtZ0Q=;
+        b=kq87gbaa62AHaAA1CsgFDRwP0OAXWMht4AEhPl06zAW+whxv2vIxu5bJKEYeEVUQn4
+         SnbVkBh/pnwq4h/Qpk2lqNZce/oT5BFAmVIVA7Qw5C24UZA8M6NUQI9FVdlo6fDB6xVo
+         lZGXZy3E5hvbSJN66LSjDBE5CPvCJgmdAtSUvzQOk1EiTwDiapeM+Fq6mWoYXX+LXBhs
+         kiV0X5W1bgLfUBBSXPP2jRly2MKv5wS9QO9eEfo6awwad3u/+8kLi/TUmIzGO99876ov
+         QeZp0Lo0jVg4ugUxKGeKMyxdEfbOjWnkmjQEtggIYjplYjzxRwIxK1j5GfULSitWWx57
+         LG9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734116922; x=1734721722;
+        d=1e100.net; s=20230601; t=1734120854; x=1734725654;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uJx5Ram6M7qDQ8vw53chCTiYXpAsG5qpk7s82ViO9zM=;
-        b=rbs/QFp++zHDNRzzyhh4ILoLnMwfvz7TYsFipyqo0Yxy1PSFFnKKLS2Kq0D8YJNlth
-         51Ulh2edZ0cU96iz0RGSV3feTviSIlKPo1csf+DRhF8fxE9Hubo+D3SHWMqVv9hJy8q+
-         oL0NuMDVW0xvRvkMxP2heYtg3vHQIymrUGKxYB9s8uVWbHm5haZGOxpTErBsRnh8yvHW
-         TQl2LwPfG8KzlaHoMUJssSuMWAZ/jeldwyQTuhTK+bJO0aD0Yh7rebW/psh6V1KbA3RG
-         X7vc8F+S7I0Iiz6tHZLwFkW2zYNM63t9c4ytdmdTFLdQ/tKfKir75op3fhMgV3DzUbpX
-         b1pg==
-X-Gm-Message-State: AOJu0Yxjfuyv+Qykk79qyROW6hb8t797SwaeFbN3MIB7x0nScFXtCBJA
-	YbePbO7HrCNlgljTR1YfB5Dc+RGRV9t+RAAvWvslUgY72r4vNDpNl37D9w==
-X-Gm-Gg: ASbGncvu+coCYOH5yMDRycsgCXKCVa5eS6+7+G/nKfH6Pxsq5GAspDvE+hUK4qKjfEW
-	hT/BA4opK6UKOWj1pDeSvntQVzjQz3NU2vQyMjwTuiBCp3hEE4jMPyaYQGEBcD8xzCrCHlEu6OM
-	Chyr7WCEh2bPbKmLwJg+p22BylviynoXhS94HfZ0WXfrZsrkcvmNzW0B2WBDY2pvDERfX0bMly7
-	A0x1XQf/rzdypHAfwW8HeZGwRmYwZ5TwkkNZXRuMFIl1nL0IPhX1A5tnFv0tHztiOtFkJ4bTa+P
-	ZW2D92fCIyJB8Mhe23w/5OMCkGPWlcvsqwRAW9jbyfuZZ+8/tJXPbE7WgrRlJ/6EfBFonJc5knr
-	rPuxSxyQApSny9TdJH2hg8PIltvjPm1P8ZJD+kH8TcL5clg==
-X-Google-Smtp-Source: AGHT+IEbp3IOp5Wev6coB8RF7lboMKwFTtbCijcruAaD5C5sG6DMfs/7FYt8lTiUAYZaQ4uHuUMmiA==
-X-Received: by 2002:a17:906:c106:b0:aa6:ab70:4a78 with SMTP id a640c23a62f3a-aab77e8ab51mr330619366b.37.1734116503402;
-        Fri, 13 Dec 2024 11:01:43 -0800 (PST)
+        bh=GxLhhx1bPHZyy7VCIJxdS8FHBEvN8N4uFCgXQLUtZ0Q=;
+        b=VWoIYYilYe1ZGI9y5RZl0Z3xWCu15do7QMpz0nE3PpQU1NekTQ6uOm8rZ30PQ0tp8R
+         jKqjnFO0yR8Lo+E42PzGskRLRF5+UR5hnvhrqaMJscB/4mC6wSV43TaQqqwS5OO2SdQW
+         lddFMHX848KrdoRM0l7j4EiBrx0AYUvXE2EGzuHAPBUyLJgw1U354CzVkrXkfmO7YWfY
+         piuJG9aiUKy5izElkfeRlTmSLEzgwUVPd71Pnjn5S99B1ONDopydRCjnZyk9/+1kMqwb
+         N2p6QPcOLmx/j6U5+He3n0hpLuSXJwAh3jkoxFWGG8tWt5OoyQxSeW37ApImNwPRl+RY
+         VhUQ==
+X-Gm-Message-State: AOJu0YyTcewc9C7stm2zRJZEOIDIYsB/A0fw66STR/kP6XasQ2RRtCeO
+	WJMNZVI+ISzLMxZfgb+sD0EEC1Z80mVLm4nIROhy07k8AQdSp/pDh7TIMQ==
+X-Gm-Gg: ASbGncvrCRLdMj/ou3V1dWkjBWGLCAbJEXvQVTw8rL5NSs9AAyIgVOCddsrddHwdIM+
+	q9zOFUFX+kyMoAfqEPlZtWp8TR3GSPtpwaKScYBX7FRkeFaMGntVVQdxAuQXW1KO+yjE4AHd1BZ
+	FvoHJVFti5t5uYdCZ7CfixhN2in4hT6RLB7aW/6mwNdv75yCZq3nFiwYOaBvE915Quuh1lNic1G
+	/YZ8mhIH/IcPvVQQ295NMvwBctDOGgrrvplqp0MMPfbzQVd8a+ETvlnv9FddtbU/B8ROaWXu+Yh
+	vOhbsTR4/fYyoqW2cPJVi2ITpyQAW/0XEii8rZZQLcV4Cyof2DLhF3zxGNRao7txthN2KSi9qu0
+	33AbX24WBoel/Hr6tF6cZBIKZlUy9svyr+naDhC0245DAvA==
+X-Google-Smtp-Source: AGHT+IFXAfIyk8r84WarUoe21uQeW080AX18O2r/M/+zqnVuC+NDsVyJueufVFuP35jr3gNPDBSN0Q==
+X-Received: by 2002:a17:907:3e8d:b0:aa6:c168:8dc8 with SMTP id a640c23a62f3a-aab77e827c9mr450750666b.44.1734116580998;
+        Fri, 13 Dec 2024 11:03:00 -0800 (PST)
 Received: from ?IPV6:2a02:3100:adc3:fd00:9eb:6163:d514:e25d? (dynamic-2a02-3100-adc3-fd00-09eb-6163-d514-e25d.310.pool.telefonica.de. [2a02:3100:adc3:fd00:9eb:6163:d514:e25d])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aab96068af9sm4374066b.69.2024.12.13.11.01.41
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aab96006514sm4485666b.36.2024.12.13.11.02.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Dec 2024 11:01:42 -0800 (PST)
-Message-ID: <6a354364-20e9-48ad-a198-468264288757@gmail.com>
-Date: Fri, 13 Dec 2024 20:01:41 +0100
+        Fri, 13 Dec 2024 11:02:59 -0800 (PST)
+Message-ID: <75e5e9ec-d01f-43ac-b0f4-e7456baf18d1@gmail.com>
+Date: Fri, 13 Dec 2024 20:02:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,7 +82,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 1/2] r8169: adjust version numbering for RTL8126
+Subject: [PATCH net-next 2/2] r8169: add support for RTL8125D rev.b
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
@@ -139,261 +139,96 @@ In-Reply-To: <15c4a9fd-a653-4b09-825d-751964832a7a@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Adjust version numbering for RTL8126, so that it doesn't overlap with
-new RTL8125 versions.
+From: ChunHao Lin <hau@realtek.com>
 
+Add support for RTL8125D rev.b. Its XID is 0x689. It is basically
+based on the one with XID 0x688, but with different firmware file.
+
+Signed-off-by: ChunHao Lin <hau@realtek.com>
+[hkallweit1@gmail.com: rebased after adjusted version numbering]
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/ethernet/realtek/r8169.h          |  4 +-
- drivers/net/ethernet/realtek/r8169_main.c     | 62 +++++++++----------
- .../net/ethernet/realtek/r8169_phy_config.c   |  4 +-
- 3 files changed, 35 insertions(+), 35 deletions(-)
+ drivers/net/ethernet/realtek/r8169.h            | 1 +
+ drivers/net/ethernet/realtek/r8169_main.c       | 6 ++++++
+ drivers/net/ethernet/realtek/r8169_phy_config.c | 1 +
+ 3 files changed, 8 insertions(+)
 
 diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
-index 8904aae41..00d74e76c 100644
+index 00d74e76c..e0817f2a3 100644
 --- a/drivers/net/ethernet/realtek/r8169.h
 +++ b/drivers/net/ethernet/realtek/r8169.h
-@@ -69,8 +69,8 @@ enum mac_version {
+@@ -69,6 +69,7 @@ enum mac_version {
  	RTL_GIGA_MAC_VER_61,
  	RTL_GIGA_MAC_VER_63,
  	RTL_GIGA_MAC_VER_64,
--	RTL_GIGA_MAC_VER_65,
--	RTL_GIGA_MAC_VER_66,
-+	RTL_GIGA_MAC_VER_70,
-+	RTL_GIGA_MAC_VER_71,
++	RTL_GIGA_MAC_VER_65,
+ 	RTL_GIGA_MAC_VER_70,
+ 	RTL_GIGA_MAC_VER_71,
  	RTL_GIGA_MAC_NONE
- };
- 
 diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 6934bdee2..d153fa559 100644
+index d153fa559..5724f650f 100644
 --- a/drivers/net/ethernet/realtek/r8169_main.c
 +++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -140,8 +140,8 @@ static const struct {
+@@ -57,6 +57,7 @@
+ #define FIRMWARE_8125A_3	"rtl_nic/rtl8125a-3.fw"
+ #define FIRMWARE_8125B_2	"rtl_nic/rtl8125b-2.fw"
+ #define FIRMWARE_8125D_1	"rtl_nic/rtl8125d-1.fw"
++#define FIRMWARE_8125D_2	"rtl_nic/rtl8125d-2.fw"
+ #define FIRMWARE_8126A_2	"rtl_nic/rtl8126a-2.fw"
+ #define FIRMWARE_8126A_3	"rtl_nic/rtl8126a-3.fw"
+ 
+@@ -140,6 +141,7 @@ static const struct {
  	/* reserve 62 for CFG_METHOD_4 in the vendor driver */
  	[RTL_GIGA_MAC_VER_63] = {"RTL8125B",		FIRMWARE_8125B_2},
  	[RTL_GIGA_MAC_VER_64] = {"RTL8125D",		FIRMWARE_8125D_1},
--	[RTL_GIGA_MAC_VER_65] = {"RTL8126A",		FIRMWARE_8126A_2},
--	[RTL_GIGA_MAC_VER_66] = {"RTL8126A",		FIRMWARE_8126A_3},
-+	[RTL_GIGA_MAC_VER_70] = {"RTL8126A",		FIRMWARE_8126A_2},
-+	[RTL_GIGA_MAC_VER_71] = {"RTL8126A",		FIRMWARE_8126A_3},
++	[RTL_GIGA_MAC_VER_65] = {"RTL8125D",		FIRMWARE_8125D_2},
+ 	[RTL_GIGA_MAC_VER_70] = {"RTL8126A",		FIRMWARE_8126A_2},
+ 	[RTL_GIGA_MAC_VER_71] = {"RTL8126A",		FIRMWARE_8126A_3},
  };
+@@ -706,6 +708,7 @@ MODULE_FIRMWARE(FIRMWARE_8107E_2);
+ MODULE_FIRMWARE(FIRMWARE_8125A_3);
+ MODULE_FIRMWARE(FIRMWARE_8125B_2);
+ MODULE_FIRMWARE(FIRMWARE_8125D_1);
++MODULE_FIRMWARE(FIRMWARE_8125D_2);
+ MODULE_FIRMWARE(FIRMWARE_8126A_2);
+ MODULE_FIRMWARE(FIRMWARE_8126A_3);
  
- static const struct pci_device_id rtl8169_pci_tbl[] = {
-@@ -1228,7 +1228,7 @@ static void rtl_writephy(struct rtl8169_private *tp, int location, int val)
- 	case RTL_GIGA_MAC_VER_31:
- 		r8168dp_2_mdio_write(tp, location, val);
- 		break;
--	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_71:
- 		r8168g_mdio_write(tp, location, val);
- 		break;
- 	default:
-@@ -1243,7 +1243,7 @@ static int rtl_readphy(struct rtl8169_private *tp, int location)
- 	case RTL_GIGA_MAC_VER_28:
- 	case RTL_GIGA_MAC_VER_31:
- 		return r8168dp_2_mdio_read(tp, location);
--	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_71:
- 		return r8168g_mdio_read(tp, location);
- 	default:
- 		return r8169_mdio_read(tp, location);
-@@ -1574,7 +1574,7 @@ static void __rtl8169_set_wol(struct rtl8169_private *tp, u32 wolopts)
- 		break;
- 	case RTL_GIGA_MAC_VER_34:
- 	case RTL_GIGA_MAC_VER_37:
--	case RTL_GIGA_MAC_VER_39 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_39 ... RTL_GIGA_MAC_VER_71:
- 		r8169_mod_reg8_cond(tp, Config2, PME_SIGNAL, wolopts);
- 		break;
- 	default:
-@@ -2047,7 +2047,7 @@ static void rtl_set_eee_txidle_timer(struct rtl8169_private *tp)
- 		tp->tx_lpi_timer = timer_val;
- 		r8168_mac_ocp_write(tp, 0xe048, timer_val);
- 		break;
--	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_71:
- 		tp->tx_lpi_timer = timer_val;
- 		RTL_W16(tp, EEE_TXIDLE_TIMER_8125, timer_val);
- 		break;
-@@ -2255,8 +2255,8 @@ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
- 		enum mac_version ver;
- 	} mac_info[] = {
- 		/* 8126A family. */
--		{ 0x7cf, 0x64a,	RTL_GIGA_MAC_VER_66 },
--		{ 0x7cf, 0x649,	RTL_GIGA_MAC_VER_65 },
-+		{ 0x7cf, 0x64a,	RTL_GIGA_MAC_VER_71 },
-+		{ 0x7cf, 0x649,	RTL_GIGA_MAC_VER_70 },
+@@ -2259,6 +2262,7 @@ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
+ 		{ 0x7cf, 0x649,	RTL_GIGA_MAC_VER_70 },
  
  		/* 8125D family. */
++		{ 0x7cf, 0x689,	RTL_GIGA_MAC_VER_65 },
  		{ 0x7cf, 0x688,	RTL_GIGA_MAC_VER_64 },
-@@ -2526,7 +2526,7 @@ static void rtl_init_rxcfg(struct rtl8169_private *tp)
- 	case RTL_GIGA_MAC_VER_61:
- 		RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST);
- 		break;
--	case RTL_GIGA_MAC_VER_63 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_63 ... RTL_GIGA_MAC_VER_71:
- 		RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST |
- 			RX_PAUSE_SLOT_ON);
- 		break;
-@@ -2658,7 +2658,7 @@ static void rtl_wait_txrx_fifo_empty(struct rtl8169_private *tp)
- 	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_61:
- 		rtl_loop_wait_high(tp, &rtl_rxtx_empty_cond, 100, 42);
- 		break;
--	case RTL_GIGA_MAC_VER_63 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_63 ... RTL_GIGA_MAC_VER_71:
- 		RTL_W8(tp, ChipCmd, RTL_R8(tp, ChipCmd) | StopReq);
- 		rtl_loop_wait_high(tp, &rtl_rxtx_empty_cond, 100, 42);
- 		rtl_loop_wait_high(tp, &rtl_rxtx_empty_cond_2, 100, 42);
-@@ -2901,7 +2901,7 @@ static void rtl_enable_exit_l1(struct rtl8169_private *tp)
- 	case RTL_GIGA_MAC_VER_37 ... RTL_GIGA_MAC_VER_38:
- 		rtl_eri_set_bits(tp, 0xd4, 0x0c00);
- 		break;
--	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_71:
- 		r8168_mac_ocp_modify(tp, 0xc0ac, 0, 0x1f80);
- 		break;
- 	default:
-@@ -2915,7 +2915,7 @@ static void rtl_disable_exit_l1(struct rtl8169_private *tp)
- 	case RTL_GIGA_MAC_VER_34 ... RTL_GIGA_MAC_VER_38:
- 		rtl_eri_clear_bits(tp, 0xd4, 0x1f00);
- 		break;
--	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_71:
- 		r8168_mac_ocp_modify(tp, 0xc0ac, 0x1f80, 0);
- 		break;
- 	default:
-@@ -2941,8 +2941,8 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
  
- 		rtl_mod_config5(tp, 0, ASPM_en);
- 		switch (tp->mac_version) {
--		case RTL_GIGA_MAC_VER_65:
--		case RTL_GIGA_MAC_VER_66:
-+		case RTL_GIGA_MAC_VER_70:
-+		case RTL_GIGA_MAC_VER_71:
- 			val8 = RTL_R8(tp, INT_CFG0_8125) | INT_CFG0_CLKREQEN;
- 			RTL_W8(tp, INT_CFG0_8125, val8);
- 			break;
-@@ -2953,7 +2953,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
- 
- 		switch (tp->mac_version) {
- 		case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
--		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
-+		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_71:
- 			/* reset ephy tx/rx disable timer */
- 			r8168_mac_ocp_modify(tp, 0xe094, 0xff00, 0);
- 			/* chip can trigger L1.2 */
-@@ -2965,7 +2965,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
- 	} else {
- 		switch (tp->mac_version) {
- 		case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
--		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
-+		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_71:
- 			r8168_mac_ocp_modify(tp, 0xe092, 0x00ff, 0);
- 			break;
- 		default:
-@@ -2973,8 +2973,8 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
- 		}
- 
- 		switch (tp->mac_version) {
--		case RTL_GIGA_MAC_VER_65:
--		case RTL_GIGA_MAC_VER_66:
-+		case RTL_GIGA_MAC_VER_70:
-+		case RTL_GIGA_MAC_VER_71:
- 			val8 = RTL_R8(tp, INT_CFG0_8125) & ~INT_CFG0_CLKREQEN;
- 			RTL_W8(tp, INT_CFG0_8125, val8);
- 			break;
-@@ -3694,12 +3694,12 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
- 	/* disable new tx descriptor format */
- 	r8168_mac_ocp_modify(tp, 0xeb58, 0x0001, 0x0000);
- 
--	if (tp->mac_version == RTL_GIGA_MAC_VER_65 ||
--	    tp->mac_version == RTL_GIGA_MAC_VER_66)
-+	if (tp->mac_version == RTL_GIGA_MAC_VER_70 ||
-+	    tp->mac_version == RTL_GIGA_MAC_VER_71)
- 		RTL_W8(tp, 0xD8, RTL_R8(tp, 0xD8) & ~0x02);
- 
--	if (tp->mac_version == RTL_GIGA_MAC_VER_65 ||
--	    tp->mac_version == RTL_GIGA_MAC_VER_66)
-+	if (tp->mac_version == RTL_GIGA_MAC_VER_70 ||
-+	    tp->mac_version == RTL_GIGA_MAC_VER_71)
- 		r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0400);
- 	else if (tp->mac_version == RTL_GIGA_MAC_VER_63)
- 		r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0200);
-@@ -3717,8 +3717,8 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
- 	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0030);
- 	r8168_mac_ocp_modify(tp, 0xe040, 0x1000, 0x0000);
- 	r8168_mac_ocp_modify(tp, 0xea1c, 0x0003, 0x0001);
--	if (tp->mac_version == RTL_GIGA_MAC_VER_65 ||
--	    tp->mac_version == RTL_GIGA_MAC_VER_66)
-+	if (tp->mac_version == RTL_GIGA_MAC_VER_70 ||
-+	    tp->mac_version == RTL_GIGA_MAC_VER_71)
- 		r8168_mac_ocp_modify(tp, 0xea1c, 0x0300, 0x0000);
- 	else
- 		r8168_mac_ocp_modify(tp, 0xea1c, 0x0004, 0x0000);
-@@ -3837,8 +3837,8 @@ static void rtl_hw_config(struct rtl8169_private *tp)
+ 		/* 8125B family. */
+@@ -3837,6 +3841,7 @@ static void rtl_hw_config(struct rtl8169_private *tp)
  		[RTL_GIGA_MAC_VER_61] = rtl_hw_start_8125a_2,
  		[RTL_GIGA_MAC_VER_63] = rtl_hw_start_8125b,
  		[RTL_GIGA_MAC_VER_64] = rtl_hw_start_8125d,
--		[RTL_GIGA_MAC_VER_65] = rtl_hw_start_8126a,
--		[RTL_GIGA_MAC_VER_66] = rtl_hw_start_8126a,
-+		[RTL_GIGA_MAC_VER_70] = rtl_hw_start_8126a,
-+		[RTL_GIGA_MAC_VER_71] = rtl_hw_start_8126a,
++		[RTL_GIGA_MAC_VER_65] = rtl_hw_start_8125d,
+ 		[RTL_GIGA_MAC_VER_70] = rtl_hw_start_8126a,
+ 		[RTL_GIGA_MAC_VER_71] = rtl_hw_start_8126a,
  	};
- 
- 	if (hw_configs[tp->mac_version])
-@@ -3859,8 +3859,8 @@ static void rtl_hw_start_8125(struct rtl8169_private *tp)
- 			RTL_W32(tp, i, 0);
- 		break;
- 	case RTL_GIGA_MAC_VER_63:
--	case RTL_GIGA_MAC_VER_65:
--	case RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_70:
-+	case RTL_GIGA_MAC_VER_71:
- 		for (i = 0xa00; i < 0xa80; i += 4)
- 			RTL_W32(tp, i, 0);
- 		RTL_W16(tp, INT_CFG1_8125, 0x0000);
-@@ -4092,7 +4092,7 @@ static void rtl8169_cleanup(struct rtl8169_private *tp)
- 		RTL_W8(tp, ChipCmd, RTL_R8(tp, ChipCmd) | StopReq);
- 		rtl_loop_wait_high(tp, &rtl_txcfg_empty_cond, 100, 666);
- 		break;
--	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_71:
- 		rtl_enable_rxdvgate(tp);
- 		fsleep(2000);
- 		break;
-@@ -4249,7 +4249,7 @@ static unsigned int rtl_quirk_packet_padto(struct rtl8169_private *tp,
- 
+@@ -3855,6 +3860,7 @@ static void rtl_hw_start_8125(struct rtl8169_private *tp)
  	switch (tp->mac_version) {
- 	case RTL_GIGA_MAC_VER_34:
--	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_71:
- 		padto = max_t(unsigned int, padto, ETH_ZLEN);
+ 	case RTL_GIGA_MAC_VER_61:
+ 	case RTL_GIGA_MAC_VER_64:
++	case RTL_GIGA_MAC_VER_65:
+ 		for (i = 0xa00; i < 0xb00; i += 4)
+ 			RTL_W32(tp, i, 0);
  		break;
- 	default:
-@@ -5267,7 +5267,7 @@ static void rtl_hw_initialize(struct rtl8169_private *tp)
- 	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_48:
- 		rtl_hw_init_8168g(tp);
- 		break;
--	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_71:
- 		rtl_hw_init_8125(tp);
- 		break;
- 	default:
 diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
-index b28b30390..bc498ea78 100644
+index bc498ea78..968c8a218 100644
 --- a/drivers/net/ethernet/realtek/r8169_phy_config.c
 +++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
-@@ -1162,8 +1162,8 @@ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
+@@ -1162,6 +1162,7 @@ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
  		[RTL_GIGA_MAC_VER_61] = rtl8125a_2_hw_phy_config,
  		[RTL_GIGA_MAC_VER_63] = rtl8125b_hw_phy_config,
  		[RTL_GIGA_MAC_VER_64] = rtl8125d_hw_phy_config,
--		[RTL_GIGA_MAC_VER_65] = rtl8126a_hw_phy_config,
--		[RTL_GIGA_MAC_VER_66] = rtl8126a_hw_phy_config,
-+		[RTL_GIGA_MAC_VER_70] = rtl8126a_hw_phy_config,
-+		[RTL_GIGA_MAC_VER_71] = rtl8126a_hw_phy_config,
++		[RTL_GIGA_MAC_VER_65] = rtl8125d_hw_phy_config,
+ 		[RTL_GIGA_MAC_VER_70] = rtl8126a_hw_phy_config,
+ 		[RTL_GIGA_MAC_VER_71] = rtl8126a_hw_phy_config,
  	};
- 
- 	if (phy_configs[ver])
 -- 
 2.47.1
 
