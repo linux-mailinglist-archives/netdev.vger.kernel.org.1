@@ -1,104 +1,87 @@
-Return-Path: <netdev+bounces-151601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A28E9F02DB
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 04:00:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6BA09F02DD
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 04:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E25A7284F66
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 03:00:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7844128195C
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 03:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B37F313A271;
-	Fri, 13 Dec 2024 03:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC412AD14;
+	Fri, 13 Dec 2024 03:00:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kA+uXg5y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dRcw5Yq2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81ED527715;
-	Fri, 13 Dec 2024 03:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4654E2CA9
+	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 03:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734058814; cv=none; b=COKXj3jgNeXqEEjPhBYqk43pI0r+v/Gd9M5tbJJAZ6jjD6W0psyN1T77DeFXqUsG9cfOnd01WwDQKlQE7JV4ERZXW0pOhc5DkDkeDIw3l5fqo21KQlc7HYShbW5qstrlPQ1Y8XFKhnoOfXUBY03Mn2FZwvHFQ8pMt3SWsM6tnCA=
+	t=1734058842; cv=none; b=DmxCW7SERVlK5mj+fCw5JNeRuWFWInfNGXF17ejMhoav06E3E1VlNvsvcWvZK2FHJGQooer+UvB+Jm6HU0naC2bzcDYXQPkzPnk2fEnoZzoUzycVHq8bxka8Uu/XesQm+5SIcrTmsk51IcKQ5Fr8EeXibMGCZkcPSfJ/HcMuYDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734058814; c=relaxed/simple;
-	bh=sUWgms/m2M8cMtkGOkYr4LrmL4/DOIF9JUD9CV216iQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=l7hlU6Pq3oFOEP9PbinG7bwbkR+ufOGSD+gfbzfydiqnmVFoG1e9Un3Elh7GbC0cUnknr7TUkfDEQyloIhdKSTg1Z/KDp01cp27B8SujG0a0zYmLnaxT0/xoF+UQiSaMCNrnLWsw8ZICLwoO1XC46uHpFbRljYVO01XjHoPwmHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kA+uXg5y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECC66C4CECE;
-	Fri, 13 Dec 2024 03:00:13 +0000 (UTC)
+	s=arc-20240116; t=1734058842; c=relaxed/simple;
+	bh=T0sOKS6YS/1dE1j9zgYFAExqSYhZRKMgj9DLJHWxbxI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ldsm/a46gI/q6PjO0EOQzF8z+4+On43rUULj+ZcmL3yFijDuCXwo+ru06qJ8CKYjr+tLwqsZs0yYMZjJzIqtVRNRnh/SuAd27EfkUAMnw04W3ZKTjBsjMhb2aNq66t82ilNdnDgkshhPd38gd3PkfPVSxGMTWT5QnnDUItSY+1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dRcw5Yq2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 231D2C4CECE;
+	Fri, 13 Dec 2024 03:00:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734058814;
-	bh=sUWgms/m2M8cMtkGOkYr4LrmL4/DOIF9JUD9CV216iQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kA+uXg5y3WGv5YF7JDNeGmFQ6H4hlKu5LRJJjgxHdZZB/eXl1QTuMUMwJie0BQzvC
-	 OvDVXpH57SVARZ5GbdThREcWahNBZ31gdY9JMh4Ua/DQz+PqIsq1lL70Jcv2hZ9sUs
-	 KowwyOTBM2CcxCLcfbQgT2HXwc3SF59rg6LNhYhQiA8YLm/jONO/1+Tg8fco+agCw7
-	 DU9iAuorvHxuvB/okBITPsU2Rjbbfdrnvzt0PelL+dBie1BPW+iV5cwEAs3ElBuYyc
-	 Wj9EyBEG6EkNmQgF9CQXhSih/QQe+J4Zh2AiDy6BbADVuBBw4NuLWtyZ5/V+Z7ddGa
-	 44yF8JsxdQDDg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EA5380A959;
-	Fri, 13 Dec 2024 03:00:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1734058841;
+	bh=T0sOKS6YS/1dE1j9zgYFAExqSYhZRKMgj9DLJHWxbxI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dRcw5Yq2TFlm800S5F147YrPzbzrGjvT/muFyWE99kfRRGI8rYd784Ft+Ys/OeaG/
+	 k4mxaVBkqhqWJ/YrvvkEuGqDgI3dmV9+CV/ENx05Km4dgIwhw7cBWO0JBlUyxu/t3z
+	 TwtWEXTnssWi6Jvhh7VrJbq5ioP+zOwtmBsy5f/4Bj7DygRKFqI5XFEBos5QyXjziK
+	 r9tl1xOlwtC2qFa9o9V1PTuR6kRP8+XdANf8/5Q7K8xqyYGAUy5328oN5e18OfowSA
+	 +uqkZwZAAHzA5skIBlQNCRE+SsH3wRrOFwXFsvd9maX6+Gjw1qHfhKAEltCqUC6skB
+	 nYNeRyeIMMJGg==
+Date: Thu, 12 Dec 2024 19:00:40 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ andrew+netdev@lunn.ch, netdev@vger.kernel.org, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, wojciech.drewek@intel.com,
+ mateusz.polchlopek@intel.com, joe@perches.com, horms@kernel.org,
+ jiri@resnulli.us, apw@canonical.com, lukas.bulwahn@gmail.com,
+ dwaipayanray1@gmail.com, Igor Bagnucki <igor.bagnucki@intel.com>, Pucha
+ Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: Re: [PATCH net-next 6/7] ice: dump ethtool stats and skb by Tx hang
+ devlink health reporter
+Message-ID: <20241212190040.3b99b7af@kernel.org>
+In-Reply-To: <20241211223231.397203-7-anthony.l.nguyen@intel.com>
+References: <20241211223231.397203-1-anthony.l.nguyen@intel.com>
+	<20241211223231.397203-7-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/5] devmem TCP fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173405883030.2519119.15952110801173674783.git-patchwork-notify@kernel.org>
-Date: Fri, 13 Dec 2024 03:00:30 +0000
-References: <20241211212033.1684197-1-almasrymina@google.com>
-In-Reply-To: <20241211212033.1684197-1-almasrymina@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, asml.silence@gmail.com,
- willemb@google.com, kaiyuanz@google.com, skhawaja@google.com,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
- hawk@kernel.org, ilias.apalodimas@linaro.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 11 Dec 2024 21:20:27 +0000 you wrote:
-> Couple unrelated devmem TCP fixes bundled in a series for some
-> convenience.
+On Wed, 11 Dec 2024 14:32:14 -0800 Tony Nguyen wrote:
+> From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 > 
-> - fix naming and provide page_pool_alloc_netmem for fragged
-> netmem.
+> Print the ethtool stats and skb diagnostic information as part of Tx hang
+> devlink health dump.
 > 
-> - fix issues with dma-buf dma addresses being potentially
-> passed to dma_sync_for_* helpers.
+> Move the declarations of ethtool functions that devlink health uses out
+> to a new file: ice_ethtool_common.h
 > 
-> [...]
+> To utilize our existing ethtool code in this context, convert it to
+> non-static.
 
-Here is the summary with links:
-  - [net-next,v4,1/5] net: page_pool: rename page_pool_alloc_netmem to *_netmems
-    https://git.kernel.org/netdev/net-next/c/91a152cbb49c
-  - [net-next,v4,2/5] net: page_pool: create page_pool_alloc_netmem
-    https://git.kernel.org/netdev/net-next/c/8156c310499a
-  - [net-next,v4,3/5] page_pool: Set `dma_sync` to false for devmem memory provider
-    https://git.kernel.org/netdev/net-next/c/b400f4b87430
-  - [net-next,v4,4/5] page_pool: disable sync for cpu for dmabuf memory provider
-    https://git.kernel.org/netdev/net-next/c/7dba339faae9
-  - [net-next,v4,5/5] net: Document netmem driver support
-    (no matching commit)
-
-You are awesome, thank you!
+This is going too far, user space is fully capable of capturing this
+data. It gets a netlink notification when health reporter flips to 
+a bad state. I think Jiri worked on a daemon what could capture more
+data from user space ? I may be misremembering...
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
