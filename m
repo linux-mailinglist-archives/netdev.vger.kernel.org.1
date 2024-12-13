@@ -1,116 +1,119 @@
-Return-Path: <netdev+bounces-151899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-151901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7838A9F1826
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 22:52:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDE4A9F1923
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 23:32:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 637C2165DD8
-	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 21:52:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C3C0188E6F8
+	for <lists+netdev@lfdr.de>; Fri, 13 Dec 2024 22:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3BFE196446;
-	Fri, 13 Dec 2024 21:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A845018D65F;
+	Fri, 13 Dec 2024 22:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="aPKgSu/7"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="TtUhHujo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574BE194C7D
-	for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 21:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DF62114;
+	Fri, 13 Dec 2024 22:32:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734126736; cv=none; b=bSMLvvAI6ipm+9L9OWHlgwYX14B4l+OKXTgr7FUX1ZSNxLma0lK5HBpud+L6yEIRnYpImW2g1WwU3KIzsr3ue8P+bHyX+FQ5Zua0N5qQDXzf6tuwF6Lq/A96jQtssSWXQaZ2vvooKNq+9zorFna/NiEoWUWYxy0O8NgBUuEen/s=
+	t=1734129173; cv=none; b=qtuU9iQ0iggkdt+USvY34GjIiHmvd5uvScq2twSgWXs8VPEXbZCmDxeAXxeUVdfdAb/ukCuPZUKRSeny6qcfRAaRabfUNcNHPHrbLuDTcojvPuzZ8HBqlyIupmT+YyFmhbTfQkqUVIFGYTn+K2XRlhwDT74oztHd9DtY57OebZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734126736; c=relaxed/simple;
-	bh=sdPWg6UMMWRlFERRT1a4togFVACj1wpKDF7YtLOCw0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CMJTYR08uy/VsjC5oJQVDUWd/vDV9lYootBv2oQkDtWHnrr88xIPuZCcULogliSgvli6YuthW8Bbbo90JZfv8rH7h2yQRQ0wjepmPrwq1DsFCjqVlcLF1ZHAVE18+oS2mRTySmHaVghYRSGELq3mBMOS1aQPPOcYfihW347zNWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=aPKgSu/7; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2161eb95317so21319475ad.1
-        for <netdev@vger.kernel.org>; Fri, 13 Dec 2024 13:52:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1734126734; x=1734731534; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o3yQ+Geoyy37/CgwBJIKvgzXSArVOH8eMq6ft9chLNo=;
-        b=aPKgSu/7somZLCrMUetuNP6tLYD7EV6OR4oZ/FcLF2dHnhPBeJBon9Xgdcac0A+LGP
-         AC3uCI4bhYINdGiAAy4c28X640fxROxNlvL5DZaAX69+kArGoKqNO5hsJ3GdyoMVUzGf
-         LSvT0+/yLUOTy5rGe5WYzyKe/33ySz398o6rs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734126734; x=1734731534;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o3yQ+Geoyy37/CgwBJIKvgzXSArVOH8eMq6ft9chLNo=;
-        b=t+7lqWH9WHMxnJMRH2Su9vff9AnxOd7nQK0Qb3EK60XZ7H7KdT0mwRH1wXuBWdqulP
-         1KCkWi1wjpcdCM1Srgx4/8usWaSbyfZ51xuIRbfzwN0OSk/bf7jAlKervcd6iYTXTVFJ
-         bOEgdXx1WAvv/+7BgYCDhEnddRe3/nt8jk6eg5/Q7sJm2KTz5rQ15omv0z8ErvMNAFGU
-         BxppvKv/rER+JrDdqUnIawriZqZU2SWH2+NCMyfeivc/matTK+/8FNe8vhHeGHt68UOi
-         E1hMWcx6G9YtX1TCnp8E5dTayxWTjdccESkqYSgHeXLVopre0whxsp3dDwGOMPAVaQRJ
-         gu9w==
-X-Forwarded-Encrypted: i=1; AJvYcCVg5vMea2pgJK3oDZCImq5rRMH/mfFTCvgSrUDd7zYTzeSgnTIHrBD+yhk7DBLgT3SURsHLH38=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxc5QrWfXMPOEqmoE+ECmahSiVDB0XZTzVljHhb1hnqhIpMJQpT
-	nXpOpX865lhWmnZBwMDOtktffQB+AtwEKlo9P2Nz6Gq1Sfo2BCSynQ89k3BBSMw=
-X-Gm-Gg: ASbGncvPShA9nhBd8cKm7wWe+BUgp3ntvNoAiCX8vmEzs8XqXR5kNYOoSG4VwO2sBTp
-	r+4KtzrZXEOuqLqf2xvCf3oEvHax+Mx0EyvUJbfo7xK9TulZlMLa1rq2DN3JDygb/4a0k/1fGqh
-	yTTrF5t92WhEqDGvGM/l72BfR0etWQhMOtvMCF0H1DWjF9cq+PeZUYJfC1Oezub3+9oA+eVDFCe
-	T6FuDR5/pB5oyBVnwxhevlrm4F+/j5Fc2ePRWXnrqsgAjBcZwOd5mnoHrEyTc19WXNTZXfU78Pn
-	+QbILIsy3y5ZH2kvXXXHostLqwF0
-X-Google-Smtp-Source: AGHT+IFkC6MJXlC9+7p4z+9Nm60Lzpb8Gsf0z9+xTJuPGFTINtVStlIRhHQsvsSYLwMByV8Pus6GYA==
-X-Received: by 2002:a17:903:946:b0:215:a179:14d2 with SMTP id d9443c01a7336-21892a5c0ecmr58766495ad.50.1734126734665;
-        Fri, 13 Dec 2024 13:52:14 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1e6d87asm2147205ad.264.2024.12.13.13.52.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 13:52:14 -0800 (PST)
-Date: Fri, 13 Dec 2024 13:52:11 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com
-Subject: Re: [PATCH net 0/5] netdev: fix repeated netlink messages in queue
- dumps
-Message-ID: <Z1ysi1RHOr3S-40F@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com
-References: <20241213152244.3080955-1-kuba@kernel.org>
+	s=arc-20240116; t=1734129173; c=relaxed/simple;
+	bh=vnmgKd4DpL+rwwN/tkLSZraFY2PgmaB34glLCaCeCWg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tET6nLahgjC4uAt7NBzy3O9kZyP733qKW+jKbatgucGgoStTgxt6Wjxx/Ngby/EqJOcTr/bHDhBMtidvIuuW2VqQO6kCpJYWTi3v5+nkmSniNi27XeraCrVFQWZ+7QipyF8qBGNS3q+ROnHKz435e6MkW+2pQCp1hle3zmYdWGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=TtUhHujo; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2BF71103B8FD5;
+	Fri, 13 Dec 2024 23:32:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1734129167;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G3lMENMefBk6pUR9W4xYAZB0rcngf/adMQ7Rd64R32A=;
+	b=TtUhHujoQYV7chB9SEaTrnGogUxwq5ffO+LBzAu0R980y8NtSb8AGVxW1K6Nii5SKgzXqp
+	D4wlV6E0Y3vRsVIGQmaE9VDzvj8NxFJqeDvjwrQJr88EnPeIRqz/5sgIA9HtGAbfz5T9i3
+	rR9O+tS5cdGYRSWhiKb3MtLf0vRp9xK6hOfImDmIBDiviWgBYHmpJ/Z+Scs94CCO3s7sjz
+	DOI2UUaZoAcru0Jcx+rVY28NPHjS9uRXPTDlJYIih00GwzdDfNWP7dmSoVYx4bacBlzusK
+	HBZkuG3tWujNwgrEEOuuwJkNGR8II1x6qCwBjpql5fW7o+t6OfekUWkYK/8VUQ==
+Message-ID: <72383917-4bbe-4b95-9e2f-4e364f5288bd@denx.de>
+Date: Fri, 13 Dec 2024 23:15:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241213152244.3080955-1-kuba@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] leds: trigger: netdev: Check offload ability on interface
+ up
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: linux-leds@vger.kernel.org,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Christian Marangi <ansuelsmth@gmail.com>,
+ Christophe Roullier <christophe.roullier@foss.st.com>,
+ Daniel Golle <daniel@makrotopia.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Lee Jones <lee@kernel.org>,
+ Lukasz Majewski <lukma@denx.de>, Pavel Machek <pavel@ucw.cz>,
+ kernel@dh-electronics.com, linux-stm32@st-md-mailman.stormreply.com,
+ netdev@vger.kernel.org
+References: <20241001024731.140069-1-marex@denx.de>
+ <6f848ef7-c921-4694-9fd5-4a777d5271d0@lunn.ch>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <6f848ef7-c921-4694-9fd5-4a777d5271d0@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Fri, Dec 13, 2024 at 07:22:39AM -0800, Jakub Kicinski wrote:
-> Fix dump continuation for queues and queue stats in the netdev family.
-> Because we used post-increment when saving id of dumped queue next
-> skb would re-dump the already dumped queue.
+On 10/3/24 2:06 PM, Andrew Lunn wrote:
+> On Tue, Oct 01, 2024 at 04:45:23AM +0200, Marek Vasut wrote:
+>> The trigger_data->hw_control indicates whether the LED is controlled by HW
+>> offload, i.e. the PHY. The trigger_data->hw_control = can_hw_control() is
+>> currently called only from netdev_led_attr_store(), i.e. when writing any
+>> sysfs attribute of the netdev trigger instance associated with a PHY LED.
+>>
+>> The can_hw_control() calls validate_net_dev() which internally calls
+>> led_cdev->hw_control_get_device(), which is phy_led_hw_control_get_device()
+>> for PHY LEDs. The phy_led_hw_control_get_device() returns NULL if the PHY
+>> is not attached.
+>>
+>> At least in case of DWMAC (STM32MP, iMX8M, ...), the PHY device is attached
+>> only when the interface is brought up and is detached again when the
+>> interface is brought down. In case e.g. udev rules configure the netdev
+>> LED trigger sysfs attributes before the interface is brought up, then when
+>> the interface is brought up, the LEDs are not blinking.
+>>
+>> This is because trigger_data->hw_control = can_hw_control() was called
+>> when udev wrote the sysfs attribute files, before the interface was up,
+>> so can_hw_control() resp. validate_net_dev() returned false, and the
+>> trigger_data->hw_control = can_hw_control() was never called again to
+>> update the trigger_data->hw_control content and let the offload take
+>> over the LED blinking.
+>>
+>> Call data->hw_control = can_hw_control() from netdev_trig_notify() to
+>> update the offload capability of the LED when the UP notification arrives.
+>> This makes the LEDs blink after the interface is brought up.
+>>
+>> On STM32MP13xx with RTL8211F, it is enough to have the following udev rule
+>> in place, boot the machine with cable plugged in, and the LEDs won't work
+>> without this patch once the interface is brought up, even if they should:
+>> "
+>> ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:green:wan", ATTR{trigger}="netdev", ATTR{link_10}="1", ATTR{link_100}="1", ATTR{link_1000}="1", ATTR{device_name}="end0"
+>> ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:yellow:wan", ATTR{trigger}="netdev", ATTR{rx}="1", ATTR{tx}="1", ATTR{device_name}="end0"
+>> "
+>>
+>> Signed-off-by: Marek Vasut <marex@denx.de>
 > 
-> Jakub Kicinski (5):
->   netdev: fix repeated netlink messages in queue dump
->   netdev: fix repeated netlink messages in queue stats
->   selftests: net: support setting recv_size in YNL
->   selftests: net-drv: queues: sanity check netlink dumps
->   selftests: net-drv: stats: sanity check netlink dumps
-
-Thanks for the work and improvements.
-
-Patch 1 and 2 definitely seem to be "fixes" and are against net
-which seems appropriate to me.
-
-Patches 3, 4, and 5 seem like new features, though. Should those
-three be a separate series against net-next, instead?
-
-In the event that you do decide to separate out 3, 4, and 5 you can
-feel free to carry along my Reviewed-bys.
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Is there anything blocking this patch from being picked up ?
 
